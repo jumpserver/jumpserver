@@ -31,8 +31,6 @@ from orgs.utils import tmp_to_org
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
-from users.const import FileNameConflictResolution
-from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
 from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
@@ -253,19 +251,39 @@ class RDPFileClientProtocolURLMixin:
             "low_speed_broadband": rdp_low_speed_broadband_option,
             "high_speed_broadband": rdp_high_speed_broadband_option,
         }
+
+        client_options = token.user.preference.get_value(
+            'rdp_client_option', category='luna',
+            default=settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+        )
+        if isinstance(client_options, str):
+            try:
+                client_options = json.loads(client_options)
+            except json.JSONDecodeError:
+                client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+        if not isinstance(client_options, (list, set, tuple)):
+            client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+        client_options = set(client_options)
+
         # 设置多屏显示
-        multi_mon = is_true(self.request.query_params.get('multi_mon'))
+        multi_mon_value = self.request.query_params.get('multi_mon')
+        multi_mon = 'multi_screen' in client_options if multi_mon_value is None else is_true(multi_mon_value)
         if multi_mon:
             rdp_options['use multimon:i'] = '1'
 
         # 设置磁盘挂载
-        drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
+        drives_redirect_value = self.request.query_params.get('drives_redirect')
+        drives_redirect = (
+            'drives_redirect' in client_options
+            if drives_redirect_value is None else is_true(drives_redirect_value)
+        )
         if drives_redirect:
             if ActionChoices.contains(token.actions, ActionChoices.transfer()):
                 rdp_options['drivestoredirect:s'] = '*'
 
         # 设置全屏
-        full_screen = is_true(self.request.query_params.get('full_screen'))
+        full_screen_value = self.request.query_params.get('full_screen')
+        full_screen = 'full_screen' in client_options if full_screen_value is None else is_true(full_screen_value)
         rdp_options['screen mode id:i'] = '2' if full_screen else '1'
 
         # 设置 RDP Server 地址
@@ -278,7 +296,12 @@ class RDPFileClientProtocolURLMixin:
 
         # 设置宽高
 
-        resolution_value = token.connect_options.get('resolution', 'auto')
+        resolution_value = token.connect_options.get('resolution')
+        if not resolution_value:
+            resolution_value = token.user.preference.get_value(
+                'rdp_resolution', category='luna',
+                default=settings.LUNA_DEFAULT_RDP_RESOLUTION
+            )
         if resolution_value != 'auto':
             width, height = resolution_value.split('x')
             if width and height:
@@ -288,12 +311,22 @@ class RDPFileClientProtocolURLMixin:
                 rdp_options['dynamic resolution:i'] = '0'
 
         color_quality = self.request.query_params.get('rdp_color_quality')
-        color_quality = color_quality if color_quality else os.getenv('JUMPSERVER_COLOR_DEPTH', RDPColorQuality.HIGH)
+        if not color_quality:
+            color_quality = token.user.preference.get_value(
+                'rdp_color_quality', category='luna',
+                default=os.getenv('JUMPSERVER_COLOR_DEPTH', settings.LUNA_DEFAULT_RDP_COLOR_QUALITY)
+            )
 
         # 设置其他选项
         rdp_options['session bpp:i'] = color_quality
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
-        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
+        smart_size = self.request.query_params.get('rdp_smart_size')
+        if smart_size is None:
+            smart_size = token.user.preference.get_value(
+                'rdp_smart_size', category='luna',
+                default=settings.LUNA_DEFAULT_RDP_SMART_SIZE
+            )
+        rdp_options['smart sizing:i'] = smart_size
 
         # 设置远程应用, 不是 Mstsc
         if token.connect_method != NativeClient.mstsc:
@@ -540,8 +573,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     def _insert_connect_options(self, data, user):
         connect_options = data.pop('connect_options', {})
         default_name_opts = {
-            'file_name_conflict_resolution': FileNameConflictResolution.REPLACE,
-            'terminal_theme_name': 'Default',
+            'file_name_conflict_resolution': settings.LUNA_DEFAULT_FILE_NAME_CONFLICT_RESOLUTION,
+            'terminal_theme_name': settings.LUNA_DEFAULT_TERMINAL_THEME_NAME,
         }
         preferences_query = Preference.objects.filter(
             user=user, category='luna', name__in=default_name_opts.keys()

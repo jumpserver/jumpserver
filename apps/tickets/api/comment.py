@@ -7,14 +7,14 @@ from common.utils import lazyproperty
 from rbac.permissions import RBACPermission
 from tickets import serializers
 from tickets.models import Ticket, Comment
-from tickets.permissions.comment import IsAssignee, IsApplicant, IsSwagger
+from tickets.permissions.comment import IsAssignee, IsApplicant, IsCcUser, IsSwagger
 
 __all__ = ['CommentViewSet']
 
 
 class CommentViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CommentSerializer
-    permission_classes = (RBACPermission, IsSwagger | IsAssignee | IsApplicant)
+    permission_classes = (RBACPermission, IsSwagger | IsAssignee | IsApplicant | IsCcUser)
     rbac_perms = {
         '*': 'tickets.view_ticket'
     }

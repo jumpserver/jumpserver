@@ -38,8 +38,8 @@ is_available:
   type: bool
   sample: true
 server_version:
-  description: MongoDB server version.
-  returned: always
+  description: MongoDB server version when gather_version is enabled.
+  returned: when gather_version is enabled
   type: str
   sample: '4.0.0'
 conn_err_msg:
@@ -55,8 +55,9 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 from ansible_collections.community.mongodb.plugins.module_utils.mongodb_common import (
     mongodb_common_argument_spec,
-    mongo_auth,
-    get_mongodb_client,
+)
+from libs.ansible.modules_utils.mongodb_client import (
+    get_authenticated_mongodb_client,
 )
 
 
@@ -67,23 +68,44 @@ class MongoDBPing(object):
         self.is_available = False
         self.conn_err_msg = ''
         self.version = ''
+        self.users = {}
 
     def do(self):
-        self.get_mongodb_version()
-        return self.is_available, self.version
+        self.probe()
+        return self.is_available, self.version, self.users
 
     def get_err(self):
         return self.conn_err_msg
 
-    def get_mongodb_version(self):
+    def probe(self):
         try:
-            server_info = self.client.server_info()
+            self.client.admin.command('ping')
             self.is_available = True
-            self.version = server_info.get('version', '')
+            if self.module.params['gather_version']:
+                server_info = self.client.server_info()
+                self.version = server_info.get('version', '')
+            if self.module.params['gather_users']:
+                self.users = self.get_users()
         except PyMongoError as err:
             self.is_available = False
             self.version = ''
+            self.users = {}
             self.conn_err_msg = err
+
+    def get_users(self):
+        result = {}
+        for database_name in self.client.list_database_names():
+            users = self.client[database_name].command(
+                {'usersInfo': 1}
+            ).get('users', [])
+            result[database_name] = {
+                user['user']: {
+                    'roles': user.get('roles', []),
+                }
+                for user in users
+                if user.get('user')
+            }
+        return result
 
 
 # =========================================
@@ -93,6 +115,10 @@ class MongoDBPing(object):
 
 def main():
     argument_spec = mongodb_common_argument_spec()
+    argument_spec.update(
+        gather_version=dict(type='bool', default=False),
+        gather_users=dict(type='bool', default=False),
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -100,16 +126,22 @@ def main():
 
     client = None
     result = {
-        'changed': False, 'is_available': False, 'server_version': ''
+        'changed': False,
+        'is_available': False,
+        'server_version': '',
+        'users': {},
     }
     try:
-        client = get_mongodb_client(module, directConnection=True)
-        client = mongo_auth(module, client, directConnection=True)
+        client = get_authenticated_mongodb_client(module)
     except Exception as e:
         module.fail_json(msg='Unable to connect to database: %s' % to_native(e))
 
     mongodb_ping = MongoDBPing(module, client)
-    result["is_available"], result["server_version"] = mongodb_ping.do()
+    (
+        result["is_available"],
+        result["server_version"],
+        result["users"],
+    ) = mongodb_ping.do()
     conn_err_msg = mongodb_ping.get_err()
     if conn_err_msg:
         module.fail_json(msg='Unable to connect to database: %s' % conn_err_msg)

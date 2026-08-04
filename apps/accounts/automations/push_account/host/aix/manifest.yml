@@ -20,7 +20,7 @@ params:
   - name: shell
     type: str
     label: 'Shell'
-    default: '/bin/bash'
+    default: '/usr/bin/ksh'
 
   - name: home
     type: str
@@ -48,9 +48,9 @@ params:
 
 i18n:
   Aix account push:
-    zh: '使用 Ansible 模块 user 执行 Aix 账号推送 (DES)'
-    ja: 'Ansible user モジュールを使用して Aix アカウントをプッシュする (DES)'
-    en: 'Using Ansible module user to push account (DES)'
+    zh: '使用 AIX chpasswd 执行 Aix 账号推送'
+    ja: 'AIX chpasswd を使用して Aix アカウントをプッシュ'
+    en: 'Using AIX chpasswd to push account'
 
   Modify params sudo help text:
     zh: '如果用户存在，可以修改sudo权限'

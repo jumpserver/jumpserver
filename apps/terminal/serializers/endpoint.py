@@ -1,5 +1,4 @@
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
 from rest_framework import serializers
 
 from acls.serializers.rules import address_validator, ip_group_help_text
@@ -16,8 +15,7 @@ class EndpointSerializer(BulkModelSerializer):
         fields_mini = ['id', 'name']
         fields_small = [
             'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port',
-            'mysql_port', 'mariadb_port', 'postgresql_port', 'redis_port', 'vnc_port',
-            'oracle_port', 'sqlserver_port', 'mongodb_port', 'is_active'
+            'magnus_port', 'vnc_port', 'is_active'
         ]
         fields = fields_mini + fields_small + [
             'comment', 'date_created', 'date_updated', 'created_by'
@@ -32,15 +30,6 @@ class EndpointSerializer(BulkModelSerializer):
             },
         }
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.remove_fields_if_need()
-    
-    def remove_fields_if_need(self):
-        if settings.VENDOR.lower() != 'jumpserver':
-            self.fields.pop('oracle_port')
-            self.fields.pop('mongodb_port')
-
     def get_extra_kwargs(self):
         extra_kwargs = super().get_extra_kwargs()
         model_fields = self.Meta.model._meta.fields

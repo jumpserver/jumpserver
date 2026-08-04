@@ -45,6 +45,33 @@ HTTP_BIND_HOST: 0.0.0.0
 HTTP_LISTEN_PORT: 8080
 WS_LISTEN_PORT: 8070
 
+# Ansible 单批次超时（一次 ansible-runner 执行，单位：秒）
+# JOB_TIMEOUT：无论是否持续有输出，批次运行超过该时间就终止
+# IDLE_TIMEOUT：连续这么久没有任何 Ansible 事件或输出，就认为批次卡死并终止
+# 任一项设为 0，只关闭该项限制
+# ANSIBLE_RUNNER_JOB_TIMEOUT: 1800
+# ANSIBLE_RUNNER_IDLE_TIMEOUT: 900
+
+# 整个自动化任务的监控与超时（单位：秒）
+# STALL_LOG_INTERVAL：每隔多久记录一次仍在执行 task 的主机；只记录，不会终止任务
+# TASK_TIMEOUT：每台主机执行单个 Ansible task 的默认最长时间
+#               playbook 中为 task 显式设置 timeout 时，以 playbook 为准
+# TOTAL_TIMEOUT：整个自动化任务（包含所有批次）的最长时间，超时后停止当前及后续批次
+# 设置为 0 可关闭对应的日志记录或超时限制
+# ANSIBLE_STALL_LOG_INTERVAL: 60
+# ANSIBLE_AUTOMATION_TASK_TIMEOUT: 300
+# ANSIBLE_AUTOMATION_TOTAL_TIMEOUT: 21600
+
+# SSH 网关连接超时（单位：秒）
+# 限制通过网关建隧道时 DNS 解析、TCP 连接、SSH 握手和认证的总等待时间
+# 设置为 0 时不增加 JumpServer 的总超时限制，仍受 sshtunnel/Paramiko 默认超时约束
+# SSH_GATEWAY_CONNECT_TIMEOUT: 30
+
+# SSH/交换机 remote_client 诊断日志
+# 开启后输出已脱敏的连接、切换用户、命令收发和网关阶段信息，并自动传入 Ansible EE
+# 仅建议排障时临时开启；可用值：true/false
+# JMS_REMOTE_CLIENT_DEBUG: false
+
 # Use Redis as broker for celery and web socket
 # Redis配置
 REDIS_HOST: 127.0.0.1

@@ -94,7 +94,10 @@ class BaseTicketMessage(UserMessage):
 
     @property
     def basic_items(self):
-        item_names = ['serial_num', 'title', 'type', 'state', 'org_id', 'applicant', 'comment']
+        item_names = [
+            'serial_num', 'title', 'type', 'state', 'org_id',
+            'applicant', 'cc_users', 'comment'
+        ]
         return self._get_fields_items(item_names)
 
     @property
@@ -182,3 +185,27 @@ class TicketProcessedToApplicantMessage(BaseTicketMessage):
         user = User.objects.first()
         processor = User.objects.last()
         return cls(user, ticket, processor)
+
+
+class TicketUpdatedToCcUserMessage(BaseTicketMessage):
+    def __init__(self, user, ticket):
+        self.ticket = ticket
+        super().__init__(user)
+
+    @property
+    def content_title(self):
+        return _('A ticket you are copied on has been updated')
+
+    @property
+    def subject(self):
+        return _('Ticket updated - {} ({})').format(
+            self.ticket.title, self.ticket.get_type_display()
+        )
+
+    @classmethod
+    def gen_test_msg(cls):
+        from .models import Ticket
+        from users.models import User
+        ticket = Ticket.objects.first()
+        user = User.objects.first()
+        return cls(user, ticket)

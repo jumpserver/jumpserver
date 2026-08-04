@@ -115,6 +115,7 @@ class ChangeSecretRecordStatusChoice(models.TextChoices):
     success = 'success', _('Success')
     failed = 'failed', _('Failed')
     pending = 'pending', _('Pending')
+    unverified = 'unverified', _('Unverified')
 
 
 class ChangeSecretAccountStatus(models.TextChoices):

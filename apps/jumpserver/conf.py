@@ -669,6 +669,22 @@ class Config(dict):
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
         'CELERY_WORKER_COUNT': 10,
+        # Per Ansible batch. Prevent a blocked remote operation from occupying
+        # a Celery thread forever. Set to 0 to disable.
+        'ANSIBLE_RUNNER_JOB_TIMEOUT': 1800,
+        'ANSIBLE_RUNNER_IDLE_TIMEOUT': 900,
+        # Log hosts that have not returned from their current Ansible task.
+        # Cap each host action first, then the complete automation across all
+        # 80-host batches. An explicit YAML task timeout takes precedence.
+        'ANSIBLE_STALL_LOG_INTERVAL': 60,
+        'ANSIBLE_AUTOMATION_TASK_TIMEOUT': 300,
+        'ANSIBLE_AUTOMATION_TOTAL_TIMEOUT': 21600,
+        # Bound SSH gateway TCP connect, handshake and authentication.
+        # Set to 0 to retain sshtunnel's built-in timeout behavior.
+        'SSH_GATEWAY_CONNECT_TIMEOUT': 30,
+        # Emit redacted, structured diagnostics from remote_client. Intended
+        # for temporary troubleshooting only.
+        'JMS_REMOTE_CLIENT_DEBUG': False,
 
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
@@ -679,6 +695,21 @@ class Config(dict):
         'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
+        # Luna user preference defaults
+        'LUNA_DEFAULT_IS_ASYNC_ASSET_TREE': True,
+        'LUNA_DEFAULT_CONNECT_DEFAULT_OPEN_METHOD': 'current',
+        'LUNA_DEFAULT_THEMES': 'default',
+        'LUNA_DEFAULT_RDP_RESOLUTION': 'auto',
+        'LUNA_DEFAULT_KEYBOARD_LAYOUT': 'en-us-qwerty',
+        'LUNA_DEFAULT_RDP_CLIENT_OPTION': ['full_screen'],
+        'LUNA_DEFAULT_RDP_COLOR_QUALITY': '32',
+        'LUNA_DEFAULT_RDP_SMART_SIZE': '0',
+        'LUNA_DEFAULT_APPLET_CONNECTION_METHOD': 'web',
+        'LUNA_DEFAULT_FILE_NAME_CONFLICT_RESOLUTION': 'replace',
+        'LUNA_DEFAULT_CHARACTER_TERMINAL_FONT_SIZE': 14,
+        'LUNA_DEFAULT_IS_BACKSPACE_AS_CTRL_H': False,
+        'LUNA_DEFAULT_IS_RIGHT_CLICK_QUICKLY_PASTE': False,
+        'LUNA_DEFAULT_TERMINAL_THEME_NAME': 'Default',
         'TIME_ZONE': 'Asia/Shanghai',
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
@@ -692,9 +723,6 @@ class Config(dict):
         'GMSSL_ENABLED': False,
         # 操作日志变更字段的存储ES配置
         'OPERATE_LOG_ELASTICSEARCH_CONFIG': {},
-        # Magnus 组件需要监听的 Oracle 端口范围
-        'MAGNUS_ORACLE_PORTS': '30000-30030',
-
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 180,
         'TASK_LOG_KEEP_DAYS': 180,
@@ -789,6 +817,7 @@ class Config(dict):
 
         # JDMC
         'JDMC_ENABLED': False,
+        'KOTL_ENABLED': False,
         'JDMC_SOCK_PATH': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 

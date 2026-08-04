@@ -3,6 +3,7 @@
   vars:
     ansible_python_interpreter: "{{ local_python_interpreter }}"
     ansible_timeout: 30
+    target_db: "{{ jms_asset.spec_info.db_name | default('master', true) }}"
 
   tasks:
     - name: Test SQLServer connection
@@ -11,8 +12,11 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        name: '{{ jms_asset.spec_info.db_name }}'
+        name: "{{ target_db }}"
         encryption: "{{ jms_asset.encryption | default(None) }}"
         tds_version: "{{ jms_asset.tds_version | default(None) }}"
+        login_timeout: 15
+        query_timeout: 30
         script: |
-          SELECT @@version
+          SELECT 1
+        changed: false

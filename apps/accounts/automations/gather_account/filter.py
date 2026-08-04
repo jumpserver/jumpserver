@@ -11,6 +11,25 @@ def parse_date(date_str, default=None):
         return default
     if date_str in ['Never', 'null']:
         return default
+    if isinstance(date_str, datetime):
+        dt = date_str
+        if timezone.is_naive(dt):
+            return timezone.make_aware(
+                dt, timezone.get_current_timezone()
+            )
+        return dt
+
+    text = str(date_str).strip()
+    try:
+        dt = datetime.fromisoformat(text.replace('Z', '+00:00'))
+        if timezone.is_naive(dt):
+            return timezone.make_aware(
+                dt, timezone.get_current_timezone()
+            )
+        return dt
+    except ValueError:
+        pass
+
     formats = [
         '%Y/%m/%d %H:%M:%S',
         '%Y-%m-%dT%H:%M:%S',
@@ -21,7 +40,7 @@ def parse_date(date_str, default=None):
     ]
     for fmt in formats:
         try:
-            dt = datetime.strptime(date_str, fmt)
+            dt = datetime.strptime(text, fmt)
             return timezone.make_aware(dt, timezone.get_current_timezone())
         except ValueError:
             continue
@@ -65,14 +84,50 @@ class GatherAccountsFilter:
         for host, user_dict in info.items():
             for username, user_info in user_dict.items():
                 password_last_changed = parse_date(user_info.get('password_last_changed'))
-                password_lifetime = user_info.get('password_lifetime')
+                password_lifetime = parse_int(
+                    user_info.get('password_lifetime')
+                )
+                password_expired = (
+                    password_last_changed + timezone.timedelta(
+                        days=password_lifetime
+                    )
+                    if password_last_changed and password_lifetime
+                    else None
+                )
+                host_detail = {
+                    'host': host,
+                    'plugin': user_info.get('plugin', ''),
+                    'account_locked': user_info.get('account_locked'),
+                }
+                if username in result:
+                    current = result[username]
+                    current['detail']['hosts'].append(host_detail)
+                    current_change = current.get('date_password_change')
+                    if (
+                        password_last_changed
+                        and (
+                            current_change is None
+                            or password_last_changed > current_change
+                        )
+                    ):
+                        current['date_password_change'] = password_last_changed
+                    current_expiry = current.get('date_password_expired')
+                    if (
+                        password_expired
+                        and (
+                            current_expiry is None
+                            or password_expired < current_expiry
+                        )
+                    ):
+                        current['date_password_expired'] = password_expired
+                    continue
                 user = {
                     'username': username,
                     'date_password_change': password_last_changed,
-                    'date_password_expired': password_last_changed + timezone.timedelta(
-                        days=password_lifetime) if password_last_changed and password_lifetime else None,
+                    'date_password_expired': password_expired,
                     'date_last_login': None,
                     'groups': '',
+                    'detail': {'hosts': [host_detail]},
                 }
                 result[username] = user
         return result
@@ -86,7 +141,7 @@ class GatherAccountsFilter:
                 'date_password_change': None,
                 'date_password_expired': parse_date(user_info.get('valid_until')),
                 'date_last_login': None,
-                'groups': '',
+                'groups': user_info.get('member_of', []),
             }
             detail = {
                 'can_login': user_info.get('canlogin'),
@@ -103,8 +158,16 @@ class GatherAccountsFilter:
         result = {}
         for user_info in info[0][0]:
             days_until_expiration = parse_int(user_info.get('days_until_expiration'))
-            date_password_expired = timezone.now() + timezone.timedelta(
-                days=int(days_until_expiration)) if days_until_expiration else None
+            date_password_expired = (
+                timezone.now() + timezone.timedelta(
+                    days=int(days_until_expiration)
+                )
+                if (
+                    days_until_expiration is not None
+                    and days_until_expiration >= 0
+                )
+                else None
+            )
             user = {
                 'username': user_info.get('name', ''),
                 'date_password_change': parse_date(user_info.get('modify_date')),
@@ -211,8 +274,15 @@ class GatherAccountsFilter:
             if _password_date and len(_password_date) == 2:
                 if _password_date[0]:
                     user['date_password_change'] = start_date + timezone.timedelta(days=int(_password_date[0]))
-                if _password_date[1]:
-                    user['date_password_expired'] = start_date + timezone.timedelta(days=int(_password_date[1]))
+                if (
+                    _password_date[0] and _password_date[1]
+                    and int(_password_date[1]) >= 0
+                ):
+                    user['date_password_expired'] = (
+                        start_date + timezone.timedelta(
+                            days=int(_password_date[0]) + int(_password_date[1])
+                        )
+                    )
             detail = {
                 'groups': username_groups.get(username) or '',
                 'sudoers': username_sudo.get(username) or '',
@@ -226,27 +296,36 @@ class GatherAccountsFilter:
     def windows_filter(info):
         result = {}
         for user_details in info['user_details']:
-            user_info = {}
-            lines = user_details['stdout_lines']
-            for line in lines:
-                if not line.strip():
-                    continue
-                parts = line.split('  ', 1)
-                if len(parts) == 2:
-                    key, value = parts
-                    user_info[key.strip()] = value.strip()
-            detail = {'groups': user_info.get('Global Group memberships', ''), }
-
-            username = user_info.get('User name')
+            if 'stdout_lines' in user_details:
+                user_info = {}
+                for line in user_details['stdout_lines']:
+                    if not line.strip():
+                        continue
+                    parts = line.split('  ', 1)
+                    if len(parts) == 2:
+                        key, value = parts
+                        user_info[key.strip()] = value.strip()
+                username = user_info.get('User name')
+                groups = user_info.get('Global Group memberships', '')
+                password_last_set = user_info.get('Password last set')
+                password_expires = user_info.get('Password expires')
+                last_logon = user_info.get('Last logon')
+            else:
+                user_info = user_details
+                username = user_info.get('UserName')
+                groups = user_info.get('GlobalGroupMemberships', [])
+                password_last_set = user_info.get('PasswordLastSet')
+                password_expires = user_info.get('PasswordExpires')
+                last_logon = user_info.get('LastLogon')
             if not username:
                 continue
 
             result[username] = {
                 'username': username,
-                'date_password_change': parse_date(user_info.get('Password last set')),
-                'date_password_expired': parse_date(user_info.get('Password expires')),
-                'date_last_login': parse_date(user_info.get('Last logon')),
-                'groups': detail,
+                'date_password_change': parse_date(password_last_set),
+                'date_password_expired': parse_date(password_expires),
+                'date_last_login': parse_date(last_logon),
+                'groups': groups,
             }
         return result
 
@@ -254,7 +333,6 @@ class GatherAccountsFilter:
     def windows_ad_filter(info):
         result = {}
         for user_info in info['user_details']:
-            detail = {'groups': user_info.get('GlobalGroupMemberships', ''), }
             username = user_info.get('SamAccountName')
             if not username:
                 continue
@@ -263,7 +341,7 @@ class GatherAccountsFilter:
                 'date_password_change': parse_date(user_info.get('PasswordLastSet')),
                 'date_password_expired': parse_date(user_info.get('PasswordExpires')),
                 'date_last_login': parse_date(user_info.get('LastLogonDate')),
-                'groups': detail,
+                'groups': user_info.get('GlobalGroupMemberships', []),
             }
         return result
 
@@ -272,14 +350,21 @@ class GatherAccountsFilter:
         result = {}
         for db, users in info.items():
             for username, user_info in users.items():
+                db_detail = {
+                    'db': db,
+                    'roles': user_info.get('roles', []),
+                }
+                if username in result:
+                    result[username]['detail']['databases'].append(db_detail)
+                    continue
                 user = {
                     'username': username,
                     'date_password_change': None,
                     'date_password_expired': None,
                     'date_last_login': None,
                     'groups': '',
+                    'detail': {'databases': [db_detail]},
                 }
-                result['detail'] = {'db': db, 'roles': user_info.get('roles', [])}
                 result[username] = user
         return result
 

@@ -1,4 +1,3 @@
-import time
 from collections import defaultdict
 
 from django.utils import timezone
@@ -221,6 +220,27 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 break
         return data
 
+    @classmethod
+    def _get_gathered_info(cls, result):
+        result = result or {}
+        task_results = result.get("ok")
+        if task_results is None:
+            task_results = result
+        if not isinstance(task_results, dict):
+            return {}
+
+        for task_result in reversed(list(task_results.values())):
+            if not isinstance(task_result, dict):
+                continue
+            response = task_result.get("res", {})
+            facts = response.get("ansible_facts", {})
+            if "info" in facts:
+                return facts["info"]
+
+        # Keep compatibility with older/custom gather methods which still
+        # expose the final value through a debug task.
+        return cls._get_nested_info(result, "debug", "res", "info")
+
     def _collect_asset_account_info(self, asset, info):
         result = self._filter_success_result(asset.type, info)
         accounts = []
@@ -233,14 +253,26 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         self.asset_account_info[asset] = accounts
 
     def on_host_success(self, host, result):
-        super().on_host_success(host, result)
-        info = self._get_nested_info(result, "debug", "res", "info")
+        info = self._get_gathered_info(result)
         asset = self.host_asset_mapper.get(host)
 
         if asset and info:
-            self._collect_asset_account_info(asset, info)
+            try:
+                self._collect_asset_account_info(asset, info)
+            except Exception as error:
+                logger.exception(
+                    'Collect gathered account result failed: host=%s',
+                    host,
+                )
+                return super().on_host_error(
+                    host, str(error), result
+                )
+            super().on_host_success(host, result)
         else:
             print(f"\033[31m Not found {host} info \033[0m\n")
+            super().on_host_error(
+                host, 'Gathered account result is empty', result
+            )
 
     def prefetch_origin_account_usernames(self):
         """
@@ -405,11 +437,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 ).update(
                     present=True
                 )
-        # 因为有 bulk create, bulk update, 所以这里需要 sleep 一下，等待数据同步
         _update_risk.finish()
         _create_risk.finish()
-
-        time.sleep(0.5)
 
     def get_report_template(self):
         return "accounts/gather_account_report.html"

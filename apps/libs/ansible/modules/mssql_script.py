@@ -69,6 +69,12 @@ options:
     choices: ["dict", "default"]
     default: 'default'
     type: str
+  changed:
+    description:
+      - Whether successful execution should be reported as changed.
+      - Set to false for connectivity checks and read-only queries.
+    type: bool
+    default: true
   params:
     description: |-
       Parameters passed to the script as SQL parameters.
@@ -280,11 +286,14 @@ def main():
         login_port=dict(type='int', default=1433),
         script=dict(required=True),
         output=dict(default='default', choices=['dict', 'default']),
+        changed=dict(type='bool', default=True),
         # 防止 params 中的密码出现在日志中
         params=dict(type='dict', no_log=True),
-        transaction=dict(type='bool', default=True),
+        transaction=dict(type='bool', default=False),
         tds_version=dict(type='str', required=False, default=None),
-        encryption=dict(type='str', required=False, default=None)
+        encryption=dict(type='str', required=False, default=None),
+        login_timeout=dict(type='int', required=False, default=15),
+        query_timeout=dict(type='int', required=False, default=30),
     )
 
     result = dict(
@@ -303,14 +312,19 @@ def main():
     login_port = module.params['login_port']
     script = module.params['script']
     output = module.params['output']
+    report_changed = module.params['changed']
     sql_params = module.params['params']
     transaction = module.params['transaction']
     # TODO 待 ansible 官方支持这两个参数
     tds_version = module.params['tds_version'] or None
     encryption = module.params['encryption'] or None
+    login_timeout = module.params['login_timeout']
+    query_timeout = module.params['query_timeout']
 
     login_querystring = login_host
     if login_port != 1433:
+        if ':' in login_host and not login_host.startswith('['):
+            login_host = '[%s]' % login_host
         login_querystring = "%s:%s" % (login_host, login_port)
 
     if login_user is not None and login_password is None:
@@ -320,7 +334,8 @@ def main():
     try:
         conn = pymssql.connect(
             user=login_user, password=login_password, host=login_querystring,
-            database=db, encryption=encryption, tds_version=tds_version)
+            database=db, encryption=encryption, tds_version=tds_version,
+            login_timeout=login_timeout, timeout=query_timeout)
         cursor = conn.cursor()
     except Exception as e:
         if "Unknown database" in str(e):
@@ -328,8 +343,8 @@ def main():
             module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
         else:
             module.fail_json(
-                msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
-                    "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
+                msg="unable to connect, check login_user and login_password "
+                    "or the FreeTDS configuration: %s" % str(e))
 
     # If transactional mode is requested, start a transaction
     conn.autocommit(not transaction)
@@ -357,7 +372,7 @@ def main():
     if len(current_batch) > 0:
         queries.append(''.join(current_batch))
 
-    result['changed'] = True
+    result['changed'] = report_changed
     if module.check_mode:
         module.exit_json(**result)
 
@@ -367,10 +382,11 @@ def main():
         try:
             cursor.execute(query, sql_params)
             qry_result = []
-            rows = cursor.fetchall()
-            while rows:
-                qry_result.append(rows)
-                rows = cursor.fetchall()
+            while True:
+                if cursor.description:
+                    qry_result.append(cursor.fetchall())
+                if not cursor.nextset():
+                    break
             query_results.append(qry_result)
         except Exception as e:
             # We know we executed the statement so this error just means we have no resultset

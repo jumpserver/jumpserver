@@ -48,7 +48,9 @@ class WebTypes(BaseType):
         choices = list(super().get_choices())
         try:
             from assets.models import Platform
-            dynamic_types = Platform.objects.filter(category='web').values_list('type', flat=True)
+            dynamic_types = list(
+                Platform.objects.filter(category='web').values_list('type', flat=True)
+            )
         except Exception:
             return choices
 

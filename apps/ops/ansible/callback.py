@@ -1,4 +1,5 @@
 import os
+import time
 from collections import defaultdict
 from functools import reduce
 
@@ -13,6 +14,7 @@ class DefaultCallback:
         "running": "running",
         "pending": "pending",
         "timeout": "timeout",
+        "canceled": "canceled",
         "unknown": "unknown",
     }
 
@@ -34,6 +36,10 @@ class DefaultCallback:
         self.finished = False
         self.local_pid = 0
         self.private_data_dir = None
+        # Hosts disappear from this mapping only after Ansible emits a
+        # terminal event for the current task. This makes slow or blocked
+        # connections observable while ansible-runner is still waiting.
+        self.running_hosts = {}
 
     @property
     def host_results(self):
@@ -44,7 +50,7 @@ class DefaultCallback:
         return results
 
     def is_success(self):
-        return self.status != "success"
+        return self.status == "success"
 
     def event_handler(self, data, **kwargs):
         event = data.get("event", None)
@@ -56,13 +62,22 @@ class DefaultCallback:
             self.write_pid(pid)
 
         event_data = data.get("event_data", {})
-        host = event_data.get("remote_addr", "")
+        # runner_on_start carries `host` but no `remote_addr`; terminal host
+        # events normally carry both. Prefer the displayed remote name while
+        # retaining the start event needed for in-flight host tracking.
+        host = (
+            event_data.get("remote_addr")
+            or event_data.get("host")
+            or ""
+        )
         task = event_data.get("task", "")
         res = event_data.get("res", {})
         handler = getattr(self, event, self.on_any)
         handler(event_data, host=host, task=task, res=res)
 
     def runner_on_ok(self, event_data, host=None, task=None, res=None):
+        self._finish_host_task(host, task)
+        res = res or {}
         detail = {
             "action": event_data.get("task_action", ""),
             "res": res,
@@ -72,6 +87,7 @@ class DefaultCallback:
         self.result["ok"][host][task] = detail
 
     def runner_on_skipped(self, event_data, host=None, task=None, **kwargs):
+        self._finish_host_task(host, task)
         detail = {
             "action": event_data.get("task_action", ""),
             "res": {},
@@ -80,6 +96,8 @@ class DefaultCallback:
         self.result["skipped"][host][task] = detail
 
     def runner_on_failed(self, event_data, host=None, task=None, res=None, **kwargs):
+        self._finish_host_task(host, task)
+        res = res or {}
         detail = {
             "action": event_data.get("task_action", ""),
             "res": res,
@@ -94,6 +112,8 @@ class DefaultCallback:
     def runner_on_unreachable(
             self, event_data, host=None, task=None, res=None, **kwargs
     ):
+        self._finish_host_task(host, task)
+        res = res or {}
         detail = {
             "action": event_data.get("task_action", ""),
             "res": res,
@@ -153,8 +173,37 @@ class DefaultCallback:
 
         return False
 
-    def runner_on_start(self, event_data, **kwargs):
-        pass
+    def runner_on_start(
+            self, event_data, host=None, task=None, **kwargs
+    ):
+        if not host:
+            return
+        self.running_hosts[host] = {
+            'task': task or '',
+            'started_at': time.monotonic(),
+        }
+
+    def _finish_host_task(self, host, task):
+        if not host:
+            return
+        current = self.running_hosts.get(host)
+        if not current:
+            return
+        if task and current.get('task') and current['task'] != task:
+            return
+        self.running_hosts.pop(host, None)
+
+    def get_running_hosts(self):
+        now = time.monotonic()
+        return {
+            host: {
+                'task': detail.get('task', ''),
+                'elapsed': max(
+                    0, int(now - detail.get('started_at', now))
+                ),
+            }
+            for host, detail in self.running_hosts.items()
+        }
 
     def runner_retry(self, event_data, **kwargs):
         pass
@@ -172,6 +221,8 @@ class DefaultCallback:
         pass
 
     def playbook_on_stats(self, event_data, **kwargs):
+        self.finished = True
+        self.running_hosts.clear()
         error_func = (
             lambda err, task_detail: err
                                      + f"{task_detail[0]}: {task_detail[1]['stderr']};"
@@ -227,9 +278,13 @@ class DefaultCallback:
     def status_handler(self, data, **kwargs):
         status = data.get("status", "")
         self.status = self.STATUS_MAPPER.get(status, "unknown")
-        self.private_data_dir = data.get("private_data_dir", None)
+        self.private_data_dir = (
+            data.get("private_data_dir") or self.private_data_dir
+        )
 
     def write_pid(self, pid):
+        if not self.private_data_dir:
+            return
         pid_filepath = os.path.join(self.private_data_dir, "local.pid")
         with open(pid_filepath, "w") as f:
             f.write(str(pid))

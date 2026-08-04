@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: "{{ local_python_interpreter }}"
+    target_db: "{{ jms_asset.spec_info.db_name | default('master', true) }}"
 
   tasks:
     - name: Test SQLServer connection
@@ -10,9 +11,11 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        name: '{{ jms_asset.spec_info.db_name }}'
+        name: "{{ target_db }}"
         encryption: "{{ jms_asset.encryption | default(None) }}"
         tds_version: "{{ jms_asset.tds_version | default(None) }}"
+        login_timeout: 15
+        query_timeout: 30
         script: |
           SELECT 
               l.name,
@@ -21,25 +24,13 @@
               l.create_date,
               l.default_database_name,
               CAST(LOGINPROPERTY(name, 'DaysUntilExpiration') AS INT) AS days_until_expiration,
-              MAX(s.login_time) AS last_login_time
-          FROM 
-              sys.sql_logins l
-          LEFT JOIN 
-              sys.dm_exec_sessions s
-          ON 
-              l.name = s.login_name
-          WHERE 
-              s.is_user_process = 1 OR s.login_name IS NULL
-          GROUP BY 
-              l.name, l.create_date, l.modify_date, l.is_disabled, l.default_database_name
-          ORDER BY 
-              last_login_time DESC;
+              CAST(NULL AS datetime) AS last_login_time
+          FROM sys.sql_logins l
+          ORDER BY l.name;
         output: dict
+        changed: false
       register: db_info
 
     - name: Define info by set_fact
       set_fact:
         info: "{{ db_info.query_results_dict }}"
-
-    - debug:
-        var: info

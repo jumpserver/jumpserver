@@ -4,42 +4,26 @@
     ansible_python_interpreter: "{{ local_python_interpreter }}"
 
   tasks:
-    - name: Test MongoDB connection
-      mongodb_ping:
-        login_user: "{{ jms_account.username }}"
-        login_password: "{{ jms_account.secret }}"
-        login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.spec_info.db_name }}"
-        ssl: "{{ jms_asset.spec_info.use_ssl | default('') }}"
-        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
-        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
-        connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
-      register: db_info
-
-    - name: Display MongoDB version
-      debug:
-        var: db_info.server_version
-      when: db_info is succeeded
-
     - name: Change MongoDB password
       mongodb_user:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.spec_info.db_name }}"
+        login_database: "{{ jms_asset.mongodb_auth_source }}"
         ssl: "{{ jms_asset.spec_info.use_ssl }}"
         ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
-        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
-        connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
-        db: "{{ jms_asset.spec_info.db_name }}"
+        ssl_certfile: >-
+          {{ jms_asset.secret_info.client_cert_key
+             | default(jms_asset.secret_info.client_key | default('')) }}
+        connection_options: "{{ jms_asset.mongodb_connection_options }}"
+        db: "{{ jms_asset.mongodb_auth_source }}"
+        role_database: "{{ jms_asset.spec_info.db_name }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
+        create_roles: "{{ (params.roles | default('readWrite')).split(',') }}"
       ignore_errors: true
-      when: db_info is succeeded
+      register: change_secret_result
 
     - name: Verify password
       mongodb_ping:
@@ -47,12 +31,31 @@
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.spec_info.db_name }}"
+        login_database: "{{ jms_asset.mongodb_auth_source }}"
         ssl: "{{ jms_asset.spec_info.use_ssl }}"
         ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
-        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
-        connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
-      when: check_conn_after_change
-      register: result
-      failed_when: not result.is_available
+        ssl_certfile: >-
+          {{ jms_asset.secret_info.client_cert_key
+             | default(jms_asset.secret_info.client_key | default('')) }}
+        connection_options: "{{ jms_asset.mongodb_connection_options }}"
+      when: check_conn_after_change or change_secret_result.failed | default(false)
+      register: verify_secret_result
+      failed_when: not verify_secret_result.is_available
+      ignore_errors: true
+
+    - name: Mark MongoDB verification as inconclusive
+      ansible.builtin.set_fact:
+        jms_credential_probe:
+          auth_status: unknown
+          reason_code: MONGODB_VERIFY_FAILED
+          change_succeeded: true
+      when:
+        - not (change_secret_result.failed | default(false))
+        - verify_secret_result.failed | default(false)
+
+    - name: Fail when MongoDB change and verification both fail
+      ansible.builtin.fail:
+        msg: "MongoDB password change failed: {{ change_secret_result.msg | default('unknown error') }}"
+      when:
+        - change_secret_result.failed | default(false)
+        - verify_secret_result.failed | default(false)

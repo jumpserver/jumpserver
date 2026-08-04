@@ -88,7 +88,10 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
 
         failed_records = queryset.filter(
             ~Q(account__in=Subquery(recent_success_accounts.values('account'))),
-            status=ChangeSecretRecordStatusChoice.failed,
+            status__in=[
+                ChangeSecretRecordStatusChoice.failed,
+                ChangeSecretRecordStatusChoice.unverified,
+            ],
             ignore_fail=False
         )
         return failed_records

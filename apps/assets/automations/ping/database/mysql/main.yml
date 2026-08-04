@@ -11,7 +11,7 @@
 
   tasks:
     - name: Test MySQL connection
-      community.mysql.mysql_info:
+      community.mysql.mysql_query:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
@@ -20,4 +20,5 @@
         ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
         client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
         client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
-        filter: version
+        connect_timeout: 15
+        query: SELECT 1
