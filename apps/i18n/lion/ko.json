@@ -8,6 +8,7 @@
     "Cancel": "취소",
     "ClearDone": "정리 완료",
     "Clipboard": "클립보드",
+    "ClipboardFileSizeLimitExceeded": "剪贴板文件超过限制->클립보드 파일 한도 초과\n剪贴板文本超过限制->클립보드 텍스트 한도 초과\n无权限->권한 없음\n粘贴->붙여넣기\n复制->복사",
     "Close": "닫기",
     "ConfirmBtn": "확인",
     "Connecting": "연결 중",
