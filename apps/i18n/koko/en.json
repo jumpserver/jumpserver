@@ -223,6 +223,7 @@
     "network is unreachable": "",
     "not found matched username %s": "",
     "part IP, Hostname, Comment": "",
+    "part IP,, Hostname, Comment": "/ + IP, hostname, remarks",
     "print help": "",
     "refresh your assets and nodes": "",
     "select one asset to login": "",

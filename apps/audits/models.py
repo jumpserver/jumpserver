@@ -41,9 +41,9 @@ __all__ = [
 
 def _get_city_display(ip, city='') -> str:
     try:
-        return get_ip_city(ip) or gettext(city or '')
+        return get_ip_city(ip) or (gettext(city) if city else '')
     except Exception:
-        return gettext(city or '')
+        return gettext(city) if city else ''
 
 
 class JobLog(JobExecution):

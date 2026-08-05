@@ -27,7 +27,16 @@ class OpenAITranslate:
         model: str | None = None,
     ):
         key = key or os.getenv("OPENAI_API_KEY")
-        base_url = base_url or os.getenv("OPENAI_BASE_URL") or None
+        base_url = (
+            base_url
+            or os.getenv("OPENAI_BASE_URL")
+            or os.getenv("OPENAI_API_BASE_URL")
+            or None
+        )
+        if base_url:
+            base_url = base_url.rstrip("/")
+            if base_url.endswith("/chat/completions"):
+                base_url = base_url[:-len("/chat/completions")]
         self.model = model or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
         self.client = AsyncOpenAI(api_key=key, base_url=base_url)
 
@@ -37,7 +46,7 @@ class OpenAITranslate:
                 messages=[
                     {
                         "role": "system",
-                        "content": _TRANSLATION_SYSTEM_PROMPT.format(target_lang=target_lang),
+                        "content": _TRANSLATION_SYSTEM_PROMPT.replace("{target_lang}", target_lang),
                     },
                     {
                         "role": "user",
@@ -47,7 +56,7 @@ class OpenAITranslate:
                 model=self.model,
             )
         except Exception as e:
-            print("OpenAI Error: ", e)
+            print(f"OpenAI Error (base_url={self.client.base_url}, model={self.model}): {e}")
             return None
         return response.choices[0].message.content.strip()
 

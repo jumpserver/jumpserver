@@ -83,8 +83,13 @@ class PushAccountManager(BaseChangeSecretPushManager):
         )
         total = success + unverified + failed
         print(
-            _('Success: %s, Unverified: %s, Failed: %s, Total: %s')
-            % (success, unverified, failed, total)
+            _('Success: %(success)s, Unverified: %(unverified)s, Failed: %(failed)s, Total: %(total)s')
+            % {
+                'success': success,
+                'unverified': unverified,
+                'failed': failed,
+                'total': total,
+            }
         )
 
     def get_report_template(self):
