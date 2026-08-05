@@ -30,6 +30,10 @@ options:
       - The password to use for the user.
     type: str
     aliases: [pass]
+  privilege_password:
+    description:
+      - The existing privilege or enable password used by custom commands.
+    type: str
   commands:
     description:
       - Custom change password commands.
@@ -71,11 +75,13 @@ def get_commands_and_answers(module) -> (list, list):
     commands = module.params['commands'] or ''
     answers = module.params['answers'] or ''
     login_password = module.params['login_password']
+    privilege_password = module.params.get('privilege_password', '')
 
     for field_name, value in (
         ('username', username),
         ('password', password),
         ('login_password', login_password),
+        ('privilege_password', privilege_password),
     ):
         if value and ('\r' in value or '\n' in value):
             module.fail_json(
@@ -91,9 +97,10 @@ def get_commands_and_answers(module) -> (list, list):
         'username': username,
         'password': password,
         'login_password': login_password,
+        'privilege_password': privilege_password,
     }
     commands = re.sub(
-        r'\{(username|password|login_password)\}',
+        r'\{(username|password|login_password|privilege_password)\}',
         lambda match: replacements.get(match.group(1)) or '',
         commands,
     )
@@ -112,6 +119,7 @@ def main():
     argument_spec.update(
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),
+        privilege_password=dict(default='', no_log=True),
     )
     module = AnsibleModule(argument_spec=argument_spec)
 
