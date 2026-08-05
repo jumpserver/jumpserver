@@ -1,6 +1,4 @@
 # ~*~ coding: utf-8 ~*~
-import uuid
-
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
@@ -27,11 +25,7 @@ class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     serializer_class = serializers.UserSerializer
 
     def perform_update(self, serializer):
-        # Note: we are not updating the user object here.
-        # We just do the reset-password stuff.
         user = self.get_object()
-        user.password_raw = str(uuid.uuid4())
-        user.save()
         ResetPasswordMsg(user).publish_async()
 
 
