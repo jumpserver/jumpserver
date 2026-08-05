@@ -12,6 +12,7 @@ router.register(r'leak-passwords', api.LeakPasswordViewSet, 'leak-passwords')
 
 urlpatterns = [
     path('mail/testing/', api.MailTestingAPI.as_view(), name='mail-testing'),
+    path('syslog/testing/', api.SyslogTestingAPI.as_view(), name='syslog-testing'),
     path('ldap/users/', api.LDAPUserListApi.as_view(), name='ldap-user-list'),
     path('wecom/testing/', api.WeComTestingAPI.as_view(), name='wecom-testing'),
     path('dingtalk/testing/', api.DingTalkTestingAPI.as_view(), name='dingtalk-testing'),
