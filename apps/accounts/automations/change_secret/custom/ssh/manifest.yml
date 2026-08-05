@@ -56,6 +56,13 @@ i18n:
       enable secret {password} <br />
       end <br />
       write memory <br />
+      如果修改 Cisco 普通用户，请使用：<br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
     ja: |
       コマンド内の指定された位置を特殊記号に変更してください。<br />
       新しいパスワード（アカウント変更） -> {username} <br />
@@ -68,6 +75,13 @@ i18n:
       {privilege_password} <br />
       configure terminal <br />
       enable secret {password} <br />
+      end <br />
+      write memory <br />
+      Cisco の一般ユーザーを変更する場合：<br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
       end <br />
       write memory <br />
     en: |
@@ -83,6 +97,13 @@ i18n:
       {privilege_password} <br />
       configure terminal <br />
       enable secret {password} <br />
+      end <br />
+      write memory <br />
+      To change a regular Cisco user, use: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
       end <br />
       write memory <br />
 
