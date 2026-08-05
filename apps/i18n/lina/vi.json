@@ -1711,6 +1711,7 @@
     "SyslogAddr": "Syslog address",
     "SyslogEnable": "Enable syslog",
     "SyslogFacility": "Syslog facility",
-    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
-    "SyslogSockType": "Syslog socket type"
+    "SyslogHelpText": "Nhấp 'Gửi' để lưu cấu hình, sau đó nhấp 'Kiểm tra' để đảm bảo có hiệu lực",
+    "SyslogSockType": "Syslog socket type",
+    "SyslogTest": "Kiểm tra"
 }

@@ -7471,6 +7471,19 @@ msgstr "메일이 전송되었습니다 {}, 확인해 주세요"
 msgid "Test smtp setting"
 msgstr "SMTP 설정 테스트"
 
+#: settings/api/syslog.py:17
+#, python-brace-format
+msgid "Test syslog message sent to {}, please check"
+msgstr "테스트 Syslog 메시지가 {}로 전송되었습니다. 확인하세요"
+
+#: settings/api/syslog.py:27
+msgid "Syslog address is not configured or invalid"
+msgstr "Syslog 주소가 구성되지 않았거나 유효하지 않습니다"
+
+#: settings/api/syslog.py:38
+msgid "Syslog handler is not active, please save configuration first"
+msgstr "Syslog 핸들러가 활성화되지 않았습니다. 먼저 설정을 저장하세요"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"

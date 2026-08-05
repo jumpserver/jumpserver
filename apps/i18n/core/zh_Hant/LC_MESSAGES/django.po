@@ -7322,6 +7322,19 @@ msgstr "郵件已經發送{}, 請檢查"
 msgid "Test smtp setting"
 msgstr "測試 smtp 設定"
 
+#: settings/api/syslog.py:17
+#, python-brace-format
+msgid "Test syslog message sent to {}, please check"
+msgstr "測試 Syslog 訊息已發送至 {}，請檢查"
+
+#: settings/api/syslog.py:27
+msgid "Syslog address is not configured or invalid"
+msgstr "Syslog 位址未設定或無效"
+
+#: settings/api/syslog.py:38
+msgid "Syslog handler is not active, please save configuration first"
+msgstr "Syslog 處理器未啟動，請先儲存設定"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"

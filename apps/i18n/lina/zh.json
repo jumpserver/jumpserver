@@ -1798,6 +1798,7 @@
     "SyslogAddr": "Syslog 地址",
     "SyslogEnable": "启用 Syslog",
     "SyslogFacility": "Syslog 设施",
-    "SyslogHelpText": "Syslog 配置,点击提交保存生效",
-    "SyslogSockType": "Syslog 套接字类型"
+    "SyslogHelpText": "请点击'提交'按钮保存当前配置后，再点击'测试'以确保信息生效",
+    "SyslogSockType": "Syslog 套接字类型",
+    "SyslogTest": "测试"
 }

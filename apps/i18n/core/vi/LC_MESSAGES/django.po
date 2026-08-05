@@ -7565,6 +7565,19 @@ msgstr "Email đã được gửi {}, vui lòng kiểm tra"
 msgid "Test smtp setting"
 msgstr "Kiểm tra cài đặt smtp"
 
+#: settings/api/syslog.py:17
+#, python-brace-format
+msgid "Test syslog message sent to {}, please check"
+msgstr "Tin nhắn kiểm tra Syslog đã được gửi đến {}, vui lòng kiểm tra"
+
+#: settings/api/syslog.py:27
+msgid "Syslog address is not configured or invalid"
+msgstr "Địa chỉ Syslog chưa được cấu hình hoặc không hợp lệ"
+
+#: settings/api/syslog.py:38
+msgid "Syslog handler is not active, please save configuration first"
+msgstr "Trình xử lý Syslog không hoạt động, vui lòng lưu cấu hình trước"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"

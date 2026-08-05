@@ -7480,6 +7480,19 @@ msgstr "{}に送信されたテストメールを確認してください"
 msgid "Test smtp setting"
 msgstr "SMTP設定のテスト"
 
+#: settings/api/syslog.py:17
+#, python-brace-format
+msgid "Test syslog message sent to {}, please check"
+msgstr "テスト Syslog メッセージは {} に送信されました、確認してください"
+
+#: settings/api/syslog.py:27
+msgid "Syslog address is not configured or invalid"
+msgstr "Syslog アドレスが設定されていないか無効です"
+
+#: settings/api/syslog.py:38
+msgid "Syslog handler is not active, please save configuration first"
+msgstr "Syslog ハンドラーがアクティブではありません。最初に設定を保存してください"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"

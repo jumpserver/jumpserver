@@ -1760,6 +1760,7 @@
     "SyslogAddr": "Syslog 位址",
     "SyslogEnable": "啟用 Syslog",
     "SyslogFacility": "Syslog 設施",
-    "SyslogHelpText": "Syslog 配置,點擊提交保存生效",
-    "SyslogSockType": "Syslog 套接字類型"
+    "SyslogHelpText": "請點擊'提交'按鈕儲存當前設定後，再點擊'測試'以確保資訊生效",
+    "SyslogSockType": "Syslog 套接字類型",
+    "SyslogTest": "測試"
 }

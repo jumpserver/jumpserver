@@ -7679,6 +7679,19 @@ msgstr "El correo electrónico ha sido enviado {}, por favor verifica."
 msgid "Test smtp setting"
 msgstr "Prueba la configuración de SMTP"
 
+#: settings/api/syslog.py:17
+#, python-brace-format
+msgid "Test syslog message sent to {}, please check"
+msgstr "Mensaje de prueba Syslog enviado a {}, verifique"
+
+#: settings/api/syslog.py:27
+msgid "Syslog address is not configured or invalid"
+msgstr "La dirección Syslog no está configurada o no es válida"
+
+#: settings/api/syslog.py:38
+msgid "Syslog handler is not active, please save configuration first"
+msgstr "El manejador Syslog no está activo, primero guarde la configuración"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"

@@ -1713,6 +1713,7 @@
     "SyslogAddr": "Syslog address",
     "SyslogEnable": "Enable syslog",
     "SyslogFacility": "Syslog facility",
-    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
-    "SyslogSockType": "Syslog socket type"
+    "SyslogHelpText": "Нажмите 'Отправить', чтобы сохранить конфигурацию, затем нажмите 'Тест', чтобы убедиться в её применении",
+    "SyslogSockType": "Syslog socket type",
+    "SyslogTest": "Тест"
 }

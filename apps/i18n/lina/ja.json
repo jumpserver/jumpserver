@@ -1716,6 +1716,7 @@
     "SyslogAddr": "Syslog address",
     "SyslogEnable": "Enable syslog",
     "SyslogFacility": "Syslog facility",
-    "SyslogHelpText": "Syslog configuration, click submit to save and take effect",
-    "SyslogSockType": "Syslog socket type"
+    "SyslogHelpText": "「送信」をクリックして設定を保存し、「テスト」をクリックして有効になっていることを確認してください",
+    "SyslogSockType": "Syslog socket type",
+    "SyslogTest": "テスト"
 }
