@@ -23,6 +23,7 @@
         become_private_key_path: "{{ jms_custom_become_private_key_path | default(None) }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
+        privilege_password: "{{ account.become.ansible_become_password | default(jms_account.secret) }}"
         commands: "{{ params.commands }}"
         answers: "{{ params.answers }}"
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
