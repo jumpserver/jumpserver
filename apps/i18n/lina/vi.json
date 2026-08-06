@@ -1720,5 +1720,5 @@
     "FTPFileMaxStore": "Lưu trữ tối đa tệp FTP",
     "FTPFileMaxStoreHelpTip": "Kích thước lưu trữ tối đa khi tải lên tệp FTP (MB), <= 0 nghĩa là không sao lưu",
     "StorageUsageThreshold": "Ngưỡng sử dụng lưu trữ",
-    "StorageUsageThresholdHelpTip": "Ngưỡng sử dụng lưu trữ (MB), 0 nghĩa là không giới hạn"
+    "StorageUsageThresholdHelpTip": "Ngưỡng phần trăm sử dụng lưu trữ (0-100), 0 nghĩa là không giới hạn"
 }

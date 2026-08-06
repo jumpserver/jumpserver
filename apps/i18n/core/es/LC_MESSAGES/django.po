@@ -4334,6 +4334,20 @@ msgstr ""
 "según la configuración del sistema en la lista de tareas, limpiando "
 "diariamente a las 2 de la madrugada los elementos que excedan el tiempo"
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "Liberar almacenamiento por umbral"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest day's session records, commands and replays "
+"until usage falls below threshold"
+msgstr ""
+"Si el uso del almacenamiento del sistema supera STORAGE_USAGE_THRESHOLD "
+"(porcentaje 0-100), elimine los registros de sesión, comandos y "
+"repeticiones del día más antiguo hasta que el uso caiga por debajo del umbral"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Subir archivos FTP al almacenamiento externo."

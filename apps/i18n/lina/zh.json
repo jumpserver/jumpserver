@@ -1807,5 +1807,5 @@
     "FTPFileMaxStore": "FTP 文件最大存储",
     "FTPFileMaxStoreHelpTip": "FTP 文件上传最大存储大小 (MB)，<= 0 表示不备份",
     "StorageUsageThreshold": "存储使用阈值",
-    "StorageUsageThresholdHelpTip": "存储使用阈值 (MB)，0 表示不限制"
+    "StorageUsageThresholdHelpTip": "存储使用百分比阈值 (0-100)，0 表示不限制"
 }

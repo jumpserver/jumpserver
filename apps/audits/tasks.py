@@ -2,6 +2,7 @@
 #
 import datetime
 import os
+import shutil
 
 from celery import shared_task
 from django.conf import settings
@@ -12,7 +13,7 @@ from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Min
 
-from common.const.crontab import CRONTAB_AT_AM_TWO
+from common.const.crontab import CRONTAB_AT_AM_TWO, CRONTAB_AT_AM_THREE
 from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import get_log_keep_day, get_logger
 from common.utils.safe import find_and_delete_empty_dirs, find_and_delete_files, truncate_file
@@ -178,6 +179,76 @@ def clean_expired_session_period():
 
     find_and_delete_empty_dirs(replay_dir)
     logger.info("Clean session replay done")
+
+
+@shared_task(
+    verbose_name=_('Reclaim storage by threshold'),
+    description=_(
+        """If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100),
+        delete the oldest day's session records, commands and replays
+        until usage falls below threshold"""
+    )
+)
+@register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
+def reclaim_storage_by_threshold():
+    """If storage usage exceeds STORAGE_USAGE_THRESHOLD, delete oldest day's
+    session records, commands and replays until usage falls below threshold."""
+    threshold_pct = getattr(settings, 'STORAGE_USAGE_THRESHOLD', 0)
+    if threshold_pct <= 0 or threshold_pct >= 100:
+        return
+
+    base_path = default_storage.base_location
+    usage = shutil.disk_usage(base_path)
+    current_pct = usage.used / usage.total * 100
+
+    if current_pct <= threshold_pct:
+        return
+
+    logger.info(
+        'System storage used %.1f%% exceeds threshold %d%%, start reclaiming oldest data',
+        current_pct, threshold_pct
+    )
+
+    replay_dir = safe_join(default_storage.base_location, 'replay')
+
+    # 查询最早一条 session 的时间，从那里开始逐天清理
+    oldest_session = Session.objects.order_by('date_start').first()
+    if not oldest_session or not oldest_session.date_start:
+        logger.info('No sessions found, reclamation done')
+        return
+    oldest_days = (timezone.now() - oldest_session.date_start).days
+    if oldest_days <= 0:
+        return
+
+    logger.info('Oldest session dates back %d days, starting reclamation', oldest_days)
+
+    for days in range(oldest_days, 0, -1):
+        expire_date = timezone.now() - timezone.timedelta(days=days)
+        expired_sessions = Session.objects.filter(date_start__lt=expire_date)
+
+        if not expired_sessions.exists():
+            continue
+
+        logger.info('Reclaiming storage: deleting data older than %d days', days)
+        batch_delete(expired_sessions)
+        delete_expired_commands_by_day(keep_days=days)
+        remove_files_by_days(replay_dir, days)
+
+        usage = shutil.disk_usage(base_path)
+        current_pct = usage.used / usage.total * 100
+
+        if current_pct <= threshold_pct:
+            logger.info(
+                'System storage used %.1f%% now within threshold %d%%, reclamation done',
+                current_pct, threshold_pct
+            )
+            break
+
+    find_and_delete_empty_dirs(replay_dir)
+    logger.info(
+        'Storage reclamation complete, system used: %.1f%% (%d / %d MB)',
+        current_pct, usage.used // 1024 // 1024, usage.total // 1024 // 1024
+    )
 
 
 @shared_task(

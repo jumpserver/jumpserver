@@ -4292,6 +4292,20 @@ msgstr ""
 "        «Системные задачи - Регулярная очистка» в настройках системы в 2 "
 "часа ночи ежедневно"
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "Освобождение хранилища по порогу"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest day's session records, commands and replays "
+"until usage falls below threshold"
+msgstr ""
+"Если использование хранилища системы превышает STORAGE_USAGE_THRESHOLD "
+"(процент 0-100), удалите записи сеансов, команды и повторы самого старого "
+"дня, пока использование не упадет ниже порога"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Загрузка FTP файлов во внешнее хранилище"

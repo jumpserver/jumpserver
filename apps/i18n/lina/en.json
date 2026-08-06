@@ -1796,5 +1796,5 @@
     "FTPFileMaxStore": "FTP file max store",
     "FTPFileMaxStoreHelpTip": "FTP file upload max store size (MB), <= 0 means no backup",
     "StorageUsageThreshold": "Storage usage threshold",
-    "StorageUsageThresholdHelpTip": "Storage usage threshold (MB), 0 means no limit"
+    "StorageUsageThresholdHelpTip": "Storage usage percentage threshold (0-100), 0 means no limit"
 }

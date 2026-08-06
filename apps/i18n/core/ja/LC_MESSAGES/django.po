@@ -4254,6 +4254,20 @@ msgstr ""
 "します。システムは、システム設定-タスクリスト-定期クリーニング設定に基づき、"
 "毎日午前2時に時間を超えたものをクリーニングします"
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "しきい値に基づくストレージ解放"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest day's session records, commands and replays "
+"until usage falls below threshold"
+msgstr ""
+"システムストレージ使用率が STORAGE_USAGE_THRESHOLD (パーセント 0-100) "
+"を超えた場合、最も古い日のセッション記録、コマンド記録、リプレイを削除し、"
+"使用率がしきい値を下回るまで続けます"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "外部ストレージへのFTPファイルのアップロード"

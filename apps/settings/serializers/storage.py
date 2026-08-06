@@ -15,5 +15,5 @@ class StorageSettingSerializer(serializers.Serializer):
     STORAGE_USAGE_THRESHOLD = serializers.IntegerField(
         required=False, allow_null=True,
         label=_('Storage usage threshold'),
-        help_text=_('Storage usage threshold (MB), 0 means no limit')
+        help_text=_('Storage usage threshold (percentage 0-100), 0 means no limit')
     )

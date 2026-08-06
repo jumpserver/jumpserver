@@ -1721,5 +1721,5 @@
     "FTPFileMaxStore": "Armazenamento máximo de arquivos FTP",
     "FTPFileMaxStoreHelpTip": "Tamanho máximo de armazenamento de upload de arquivos FTP (MB), <= 0 significa sem backup",
     "StorageUsageThreshold": "Limite de uso de armazenamento",
-    "StorageUsageThresholdHelpTip": "Limite de uso de armazenamento (MB), 0 significa sem limite"
+    "StorageUsageThresholdHelpTip": "Limite percentual de uso de armazenamento (0-100), 0 significa sem limite"
 }

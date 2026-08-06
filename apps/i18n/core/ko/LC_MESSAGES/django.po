@@ -4216,6 +4216,20 @@ msgstr ""
 "업 목록 - 정기 청소 구성에 따라 설정된 시간에 따라 매일 오전 2시에 청소를 수"
 "행합니다."
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "임계값에 따라 저장 공간 확보"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest day's session records, commands and replays "
+"until usage falls below threshold"
+msgstr ""
+"시스템 저장소 사용률이 STORAGE_USAGE_THRESHOLD (백분율 0-100)를 초과하면, "
+"가장 오래된 날짜의 세션 기록, 명령 기록 및 리플레이를 삭제하여 "
+"사용률이 임계값 아래로 떨어질 때까지 진행합니다"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "외부 저장소에 FTP 파일을 업로드합니다."

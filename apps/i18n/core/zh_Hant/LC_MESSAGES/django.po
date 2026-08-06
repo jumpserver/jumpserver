@@ -4175,6 +4175,20 @@ msgstr ""
 "話錄像和命令記錄、改密日誌，系統會根據系統設置-任務列表定期清理配置，對於超出"
 "時間的，將於每天凌晨2點進行清理"
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "根據閾值騰退存儲空間"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest day's session records, commands and replays "
+"until usage falls below threshold"
+msgstr ""
+"當系統存儲使用率超過 STORAGE_USAGE_THRESHOLD (百分比 0-100) 時，"
+"刪除最早一天的會話記錄、命令記錄和錄像，"
+"直到使用率降至閾值以下"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "上傳 FTP 文件到外部儲存"

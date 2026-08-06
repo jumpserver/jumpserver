@@ -4309,6 +4309,20 @@ msgstr ""
 "thống - danh sách nhiệm vụ - định kỳ dọn dẹp cấu hình, đối với những thứ "
 "vượt quá thời gian sẽ được dọn dẹp vào lúc 2 giờ sáng mỗi ngày"
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "Giải phóng dung lượng theo ngưỡng"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest day's session records, commands and replays "
+"until usage falls below threshold"
+msgstr ""
+"Nếu dung lượng sử dụng hệ thống vượt quá STORAGE_USAGE_THRESHOLD "
+"(phần trăm 0-100), xóa bản ghi phiên, lệnh và phát lại của ngày cũ nhất "
+"cho đến khi dung lượng xuống dưới ngưỡng"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Tải lên tệp FTP vào bộ nhớ bên ngoài"
