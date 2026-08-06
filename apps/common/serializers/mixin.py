@@ -39,14 +39,14 @@ __all__ = [
 
 class SecretReadableCheckMixin(serializers.Serializer):
     """
-    根据 SECURITY_ACCOUNT_SECRET_READ 配置控制密码字段的可读性
-    当配置为 False 时，密码字段返回 None
+    根据 SECURITY_DISABLE_VIEW_SECRET 配置控制密码字段的可读性
+    当配置为 True 时，密码字段返回 <REDACTED>
     """
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
 
-        if not settings.SECURITY_ACCOUNT_SECRET_READ:
+        if settings.SECURITY_DISABLE_VIEW_SECRET:
             secret_fields = getattr(self.Meta, 'secret_fields', ['secret'])
             for field_name in secret_fields:
                 if field_name in ret:

@@ -57,9 +57,11 @@ class Crypto:
         return self.encryptor.encrypt(text)
 
     def decrypt(self, text):
-        for cryptor in self.cryptos:
+        for i, cryptor in enumerate(self.cryptos):
             try:
                 origin_text = cryptor.decrypt(text)
+                if i == 0:
+                    return origin_text
                 if origin_text:
                     # 有时不同算法解密不报错，但是返回空字符串
                     return origin_text

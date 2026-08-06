@@ -21,6 +21,7 @@ urlpatterns = [
     path('sms/<str:backend>/testing/', api.SMSTestingAPI.as_view(), name='sms-testing'),
     path('sms/backend/', api.SMSBackendAPI.as_view(), name='sms-backend'),
     path('vault/<str:backend>/testing/', api.VaultTestingAPI.as_view(), name='vault-testing'),
+    path('chatai/models/', api.ChatAIModelsAPI.as_view(), name='chatai-models'),
     path('chatai/testing/', api.ChatAITestingAPI.as_view(), name='chatai-testing'),
     path('vault/sync/', api.VaultSyncDataAPI.as_view(), name='vault-sync'),
     path('security/block-ip/', api.BlockIPSecurityAPI.as_view(), name='block-ip'),

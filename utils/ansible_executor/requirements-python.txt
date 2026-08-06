@@ -1,10 +1,10 @@
 # Aligned with JumpServer pyproject.toml ansible-related Python deps.
-paramiko==3.2.0
+paramiko==3.5.1
 sshtunnel==0.4.0
 pywinrm==0.4.3
 telnetlib3==4.0.2
 mysqlclient==2.2.4
-pymssql==2.3.4
+pymssql==2.3.10
 pymongo==4.6.3
-oracledb==1.4.0
-pyfreerdp==0.0.2
+oracledb==3.4.2
+pyfreerdp==0.0.4

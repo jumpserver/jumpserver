@@ -31,6 +31,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
+        'chat_ai.authentication.ChatAIDelegationAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
@@ -237,6 +238,7 @@ DJANGO_REDIS_SCAN_ITERSIZE = 1000
 # GM DEVICE
 GM_DEVICE_ENABLE = CONFIG.GM_DEVICE_ENABLE
 GM_VENDOR_NAME = CONFIG.GM_VENDOR_NAME
+GM_DRIVER_PATH = CONFIG.GM_DRIVER_PATH
 
 LEAK_PASSWORD_DB_PATH = CONFIG.LEAK_PASSWORD_DB_PATH
 

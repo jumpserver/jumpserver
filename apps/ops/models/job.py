@@ -88,7 +88,7 @@ class JMSPermedInventory(JMSInventory):
             host['login_user'] = account.username
             host['login_password'] = account.secret
             host['login_db'] = asset.spec_info.get('db_name', '')
-            host['ansible_python_interpreter'] = sys.executable
+            host['ansible_python_interpreter'] = '{{ local_python_interpreter }}'
             if gateway:
                 host['jms_gateway'] = {
                     'address': gateway.address, 'port': gateway.port,

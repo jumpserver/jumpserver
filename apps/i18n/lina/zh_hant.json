@@ -546,6 +546,7 @@
     "DingTalk": "釘釘",
     "DingTalkOAuth": "釘釘認證",
     "DingTalkTest": "測試",
+    "Directories": "目錄服務",
     "DirectoryServiceHelpMessage": "目錄服務（Directory Service）是一種用於集中儲存、管理和查詢網絡資源信息的服務，常見的實現包括 LDAP 和 Active Directory。其他資產關聯目錄服務後，將繼承來自目錄服務的帳號。",
     "Disable": "禁用",
     "DisableSelected": "停用所選",

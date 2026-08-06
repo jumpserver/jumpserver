@@ -1,4 +1,4 @@
-
+from .const import ECC_KEY_BITS_64
 from .ecc import *
 from .exception import GMDeviceError
 
@@ -13,13 +13,12 @@ class BaseMixin:
 class SM2Mixin(BaseMixin):
     def ecc_encrypt(self, public_key, plain_text, alg_id):
 
-        pos = 1
+        pos = 0
         k1 = bytes([0] * 32) + bytes(public_key[pos:pos + 32])
-        k1 = (c_ubyte * len(k1))(*k1)
         pos += 32
         k2 = bytes([0] * 32) + bytes(public_key[pos:pos + 32])
 
-        pk = ECCrefPublicKey(c_uint(0x40), (c_ubyte * len(k1))(*k1), (c_ubyte * len(k2))(*k2))
+        pk = ECCrefPublicKey(c_uint(ECC_KEY_BITS_64), (c_ubyte * len(k1))(*k1), (c_ubyte * len(k2))(*k2))
 
         plain_text = (c_ubyte * len(plain_text))(*plain_text)
         ecc_data = new_ecc_cipher_cla(len(plain_text))()
@@ -32,7 +31,7 @@ class SM2Mixin(BaseMixin):
     def ecc_decrypt(self, private_key, cipher_text, alg_id):
 
         k = bytes([0] * 32) + bytes(private_key[:32])
-        vk = ECCrefPrivateKey(c_uint(0x40), (c_ubyte * len(k))(*k))
+        vk = ECCrefPrivateKey(c_uint(ECC_KEY_BITS_64), (c_ubyte * len(k))(*k))
 
         pos = 1
         # c1
@@ -85,23 +84,23 @@ class SM3Mixin(BaseMixin):
             raise GMDeviceError("hash final failed", ret)
         return bytes(result_data[:result_length.value])
 
+    def sm3_hmac(self, key, data):
+        key_buf = (c_ubyte * len(key))(*key)
+        data_buf = (c_ubyte * len(data))(*data)
+        hash_buf = (c_ubyte * 32)()
+        hash_length = c_uint()
+        ret = self._driver.SPII_SM3Hmac(
+            self._session,
+            key_buf, c_uint(len(key)),
+            data_buf, c_uint(len(data)),
+            hash_buf, pointer(hash_length),
+        )
+        if ret != 0:
+            raise GMDeviceError("sm3 hmac failed", ret)
+        return bytes(hash_buf[:hash_length.value])
+
 
 class SM4Mixin(BaseMixin):
-
-    def import_key(self, key_val):
-        # to c lang
-        key_val = (c_ubyte * len(key_val))(*key_val)
-
-        key = c_void_p()
-        ret = self._driver.SDF_ImportKey(self._session, key_val, c_int(len(key_val)), pointer(key))
-        if ret != 0:
-            raise GMDeviceError("import key failed", ret)
-        return key
-
-    def destroy_cipher_key(self, key):
-        ret = self._driver.SDF_DestroyKey(self._session, key)
-        if ret != 0:
-            raise Exception("destroy key failed")
 
     def encrypt(self, plain_text, key, alg, iv=None):
         return self.__do_cipher_action(plain_text, key, alg, iv, True)
@@ -110,20 +109,35 @@ class SM4Mixin(BaseMixin):
         return self.__do_cipher_action(cipher_text, key, alg, iv, False)
 
     def __do_cipher_action(self, text, key, alg, iv=None, encrypt=True):
-        text = (c_ubyte * len(text))(*text)
+        text_buf = (c_ubyte * len(text))(*text)
+        key_buf = (c_ubyte * len(key))(*key)
+
+        iv_buf = None
+        iv_len = 0
         if iv is not None:
-            iv = (c_ubyte * len(iv))(*iv)
+            iv_buf = (c_ubyte * len(iv))(*iv)
+            iv_len = len(iv)
 
         temp_data = (c_ubyte * len(text))()
         temp_data_length = c_int()
         if encrypt:
-            ret = self._driver.SDF_Encrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
-                                           pointer(temp_data_length))
+            ret = self._driver.SPII_EncryptEx(
+                self._session, text_buf, c_int(len(text)),
+                key_buf, c_int(len(key)),
+                iv_buf, c_int(iv_len),
+                c_int(alg),
+                temp_data, pointer(temp_data_length),
+            )
             if ret != 0:
                 raise GMDeviceError("encrypt failed", ret)
         else:
-            ret = self._driver.SDF_Decrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
-                                           pointer(temp_data_length))
+            ret = self._driver.SPII_DecryptEx(
+                self._session, text_buf, c_int(len(text)),
+                key_buf, c_int(len(key)),
+                iv_buf, c_int(iv_len),
+                c_int(alg),
+                temp_data, pointer(temp_data_length),
+            )
             if ret != 0:
                 raise GMDeviceError("decrypt failed", ret)
         return temp_data[:temp_data_length.value]

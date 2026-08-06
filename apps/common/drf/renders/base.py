@@ -76,8 +76,8 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
 
         fields_unexport = getattr(meta, 'fields_unexport', [])
         fields = [v for v in fields if v.field_name not in fields_unexport]
-        # 仅真实导出数据时过滤敏感字段，模板需保留这些字段供用户填写
-        if self.template == 'export':
+        # 仅真实导出数据且禁用查看密文时过滤敏感字段，模板需保留这些字段供用户填写
+        if self.template == 'export' and settings.SECURITY_DISABLE_VIEW_SECRET:
             fields = [v for v in fields if not self.is_secret_field(v)]
         return fields
 

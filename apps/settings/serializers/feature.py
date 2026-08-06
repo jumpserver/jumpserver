@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
 from common.utils import date_expired_default
+from ops.ansible.docker import ANSIBLE_EE_IMAGE
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
@@ -13,9 +14,13 @@ __all__ = [
     'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
 ]
 
-from settings.const import (
-    ChatAITypeChoices, GPTModelChoices, DeepSeekModelChoices, ChatAIMethodChoices
-)
+ANSIBLE_DOCKER_HELP_TEXT = _(
+    'Run Ansible jobs in the Docker execution environment (%(image)s). '
+    'To run jobs locally instead, disable "Docker isolation for Ansible" under '
+    'System Settings > Feature Settings > Job Center. '
+    'If the image is missing, run this command on the Ansible worker: '
+    'docker pull %(image)s'
+) % {'image': ANSIBLE_EE_IMAGE}
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -126,55 +131,50 @@ class ChatAISettingSerializer(serializers.Serializer):
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Chat AI')
     )
-    CHAT_AI_METHOD = serializers.ChoiceField(
-        default=ChatAIMethodChoices.api, choices=ChatAIMethodChoices.choices,
-        label=_("Method"), required=False,
-    )
-    CHAT_AI_EMBED_URL = serializers.CharField(
+    CHAT_AI_BASE_URL = serializers.CharField(
         allow_blank=True, required=False, label=_('Base URL'),
-        help_text=_('The base URL of the Chat service.')
+        help_text=_('OpenAI-compatible API base URL, usually ending in /v1.')
     )
-    CHAT_AI_TYPE = serializers.ChoiceField(
-        default=ChatAITypeChoices.gpt, choices=ChatAITypeChoices.choices,
-        label=_("Types"), required=False,
-    )
-    GPT_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('Base URL'),
-        help_text=_('The base URL of the Chat service.')
-    )
-    GPT_API_KEY = EncryptedField(
+    CHAT_AI_API_KEY = EncryptedField(
         allow_blank=True, required=False, label=_('API Key'),
     )
-    GPT_PROXY = serializers.CharField(
+    CHAT_AI_PROXY = serializers.CharField(
         allow_blank=True, required=False, label=_('Proxy'),
-        help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
+        help_text=_('HTTP proxy used to reach the model provider. For example: http://ip:port')
     )
-    GPT_MODEL = serializers.ChoiceField(
-        default=GPTModelChoices.GPT_4_1_MINI, choices=GPTModelChoices.choices,
-        label=_("GPT Model"), required=False,
+    CHAT_AI_MODEL = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Model'),
+        help_text=_('Discover models from the provider or enter a model ID manually.')
     )
-    DEEPSEEK_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('Base URL'),
-        help_text=_('The base URL of the Chat service.')
+    CHAT_AI_VOICE_TRANSCRIPTION_MODE = serializers.ChoiceField(
+        choices=(('browser', _('Browser speech recognition')), ('server', _('Server transcription'))),
+        required=False, label=_('Voice transcription mode'),
+        help_text=_('Use browser speech recognition or upload audio to the configured server provider.'),
     )
-    DEEPSEEK_API_KEY = EncryptedField(
-        allow_blank=True, required=False, label=_('API Key'),
+    CHAT_AI_WEB_SEARCH_ENABLED = serializers.BooleanField(
+        required=False, label=_('Web search')
     )
-    DEEPSEEK_PROXY = serializers.CharField(
-        allow_blank=True, required=False, label=_('Proxy'),
-        help_text=_('The proxy server address of the GPT service. For example: http://ip:port')
+    CHAT_AI_WEB_SEARCH_PROVIDER = serializers.ChoiceField(
+        choices=(('tavily', 'Tavily'), ('searxng', 'SearXNG')),
+        required=False, label=_('Web search provider'),
     )
-    DEEPSEEK_MODEL = serializers.ChoiceField(
-        default=DeepSeekModelChoices.deepseek_chat, choices=DeepSeekModelChoices.choices,
-        label=_("DeepSeek Model"), required=False,
+    CHAT_AI_WEB_SEARCH_BASE_URL = serializers.CharField(
+        allow_blank=True, required=False, label=_('Web search base URL'),
+        help_text=_(
+            'Tavily API or SearXNG base URL. SearXNG must enable JSON responses.'
+        ),
     )
-    CUSTOM_GPT_MODEL = serializers.CharField(
-        max_length=256, allow_blank=True,
-        required=False, label=_('Custom gpt model'),
+    CHAT_AI_WEB_SEARCH_API_KEY = EncryptedField(
+        allow_blank=True, required=False, label=_('Web search API key'),
+        help_text=_('Used only by Tavily. It is never sent to SearXNG.'),
     )
-    CUSTOM_DEEPSEEK_MODEL = serializers.CharField(
-        max_length=256, allow_blank=True,
-        required=False, label=_('Custom DeepSeek model'),
+    CHAT_AI_WEB_SEARCH_PROXY = serializers.CharField(
+        allow_blank=True, required=False, label=_('Web search proxy'),
+        help_text=_('HTTP proxy used only for public web searches.'),
+    )
+    CHAT_AI_MAX_SCHEDULES_PER_USER = serializers.IntegerField(
+        min_value=1, max_value=100, required=False,
+        label=_('Maximum scheduled reports per user'),
     )
 
 
@@ -203,6 +203,11 @@ class OpsSettingSerializer(serializers.Serializer):
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
         required=False, label=_('Adhoc command'),
         help_text=_('Allow users to execute batch commands in the Workbench - Job Center - Adhoc')
+    )
+    ANSIBLE_DOCKER_ENABLED = serializers.BooleanField(
+        required=False,
+        label=_('Docker isolation for Ansible'),
+        help_text=ANSIBLE_DOCKER_HELP_TEXT,
     )
     SECURITY_COMMAND_BLACKLIST = serializers.ListField(
         child=serializers.CharField(max_length=1024),

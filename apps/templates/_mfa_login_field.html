@@ -6,7 +6,8 @@
 >
     {% for backend in mfa_backends %}
     <option value="{{ backend.name }}"
-            {% if not backend.is_active %} disabled {% endif %}
+            data-needs-bind="{% if backend.name == 'otp' and not backend.is_active %}true{% else %}false{% endif %}"
+            {% if not backend.is_active and backend.name != 'otp' %} disabled {% endif %}
     >
         {{ backend.display_name }}
     </option>
@@ -18,7 +19,9 @@
             {% if backend.challenge_required %}challenge-required{% endif %}"
          style="display: none"
     >
-        {% if backend.has_code %}
+        {% if backend.name == 'otp' and not backend.is_active %}
+        <small class="text-muted">{% trans 'Enable OTP' %}</small>
+        {% elif backend.has_code %}
         <input type="text" class="form-control input-style"
                placeholder="{{ backend.placeholder }}"
                autocomplete="off"
@@ -54,17 +57,52 @@
 </style>
 <script>
     const preferMFAKey = 'mfaPrefer'
+
+    function getMFAOption(selectRef, value) {
+        let optionRef = null
+        $(selectRef).find('option').each(function () {
+            if (this.value === value) {
+                optionRef = this
+                return false
+            }
+        })
+        return optionRef
+    }
+
+    function optionNeedsBind(optionRef) {
+        return optionRef && optionRef.dataset.needsBind === 'true'
+    }
+
+    function getFirstReadyMFAOption(selectRef) {
+        let optionRef = null
+        $(selectRef).find('option').each(function () {
+            if (!this.disabled && !optionNeedsBind(this)) {
+                optionRef = this
+                return false
+            }
+        })
+        return optionRef
+    }
+
     $(document).ready(function () {
         const mfaSelectRef = document.getElementById('mfa-select');
         const preferMFA = localStorage.getItem(preferMFAKey);
-        const valueSelector = "value=" + preferMFA
-        const preferMFADisabled = $(`#mfa-select option[${valueSelector}]`).attr('disabled')
+        const preferMFAOption = getMFAOption(mfaSelectRef, preferMFA)
 
-        if (preferMFA && !preferMFADisabled) {
+        if (preferMFAOption && !preferMFAOption.disabled && !optionNeedsBind(preferMFAOption)) {
             mfaSelectRef.value = preferMFA;
         }
 
-        const mfaSelect = mfaSelectRef.value;
+        let mfaSelect = mfaSelectRef.value;
+        const selectedOption = getMFAOption(mfaSelectRef, mfaSelect)
+        if (optionNeedsBind(selectedOption)) {
+            const readyOption = getFirstReadyMFAOption(mfaSelectRef)
+            if (readyOption) {
+                mfaSelectRef.value = readyOption.value
+                mfaSelect = readyOption.value
+            }
+        }
+
         if (mfaSelect !== null) {
             selectChange(mfaSelect, true);
         }

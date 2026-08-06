@@ -32,11 +32,13 @@ ARG TOOLS="                           \
         cron                          \
         ca-certificates               \
         default-libmysqlclient-dev    \
+        ffmpeg                        \
         libmariadb3                   \
         postgresql-client             \
         openssh-client                \
         sshpass                       \
-        bubblewrap"
+        bubblewrap                    \
+        docker-cli"
 
 ARG APT_MIRROR=http://deb.debian.org
 
@@ -64,7 +66,7 @@ VOLUME /opt/jumpserver/data
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-EXPOSE 8080
+EXPOSE 8080 8088
 
 STOPSIGNAL SIGQUIT
 

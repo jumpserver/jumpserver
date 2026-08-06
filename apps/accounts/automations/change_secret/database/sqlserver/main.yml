@@ -33,7 +33,9 @@
         name: '{{ jms_asset.spec_info.db_name }}'
         encryption: "{{ jms_asset.encryption | default(None) }}"
         tds_version: "{{ jms_asset.tds_version | default(None) }}"
-        script: "SELECT 1 from sys.sql_logins WHERE name='{{ account.username }}';"
+        script: "SELECT 1 FROM sys.sql_logins WHERE name=%(username)s;"
+        params:
+          username: "{{ account.username }}"
       when: db_info is succeeded
       register: user_exist
 
@@ -46,7 +48,35 @@
         name: '{{ jms_asset.spec_info.db_name }}'
         encryption: "{{ jms_asset.encryption | default(None) }}"
         tds_version: "{{ jms_asset.tds_version | default(None) }}"
-        script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}', DEFAULT_DATABASE = {{ jms_asset.spec_info.db_name }}; select @@version"
+        script: |
+          DECLARE @login_name nvarchar(256) = %(username)s;
+          DECLARE @password nvarchar(4000) = %(password)s;
+          DECLARE @db_name nvarchar(256) = %(db_name)s;
+          DECLARE @sql nvarchar(max);
+
+          IF @login_name IS NULL OR LEN(@login_name) = 0 OR LEN(@login_name) > 128
+          BEGIN
+              RAISERROR('Invalid login name', 16, 1);
+              RETURN;
+          END;
+
+          IF @db_name IS NULL OR LEN(@db_name) = 0 OR LEN(@db_name) > 128 OR DB_ID(@db_name) IS NULL
+          BEGIN
+              RAISERROR('Invalid default database', 16, 1);
+              RETURN;
+          END;
+
+          -- 标识符使用 QUOTENAME 防止名称逃逸，密码在拼接前转义单引号。
+          SET @sql = N'ALTER LOGIN ' + QUOTENAME(@login_name)
+                   + N' WITH PASSWORD = N''' + REPLACE(@password, N'''', N'''''') + N''', DEFAULT_DATABASE = '
+                   + QUOTENAME(@db_name) + N';';
+
+          EXEC sys.sp_executesql @sql;
+          SELECT @@VERSION AS version;
+        params:
+          username: "{{ account.username }}"
+          password: "{{ account.secret }}"
+          db_name: "{{ jms_asset.spec_info.db_name }}"
       ignore_errors: true
       when: user_exist.query_results[0] | length != 0
 
@@ -59,7 +89,43 @@
         name: '{{ jms_asset.spec_info.db_name }}'
         encryption: "{{ jms_asset.encryption | default(None) }}"
         tds_version: "{{ jms_asset.tds_version | default(None) }}"
-        script: "CREATE LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}', DEFAULT_DATABASE = {{ jms_asset.spec_info.db_name }}; CREATE USER {{ account.username }} FOR LOGIN {{ account.username }}; select @@version"
+        script: |
+          DECLARE @login_name nvarchar(256) = %(username)s;
+          DECLARE @password nvarchar(4000) = %(password)s;
+          DECLARE @db_name nvarchar(256) = %(db_name)s;
+          DECLARE @sql nvarchar(max);
+
+          IF @login_name IS NULL OR LEN(@login_name) = 0 OR LEN(@login_name) > 128
+          BEGIN
+              RAISERROR('Invalid login name', 16, 1);
+              RETURN;
+          END;
+
+          IF @db_name IS NULL OR LEN(@db_name) = 0 OR LEN(@db_name) > 128 OR DB_ID(@db_name) IS NULL
+          BEGIN
+              RAISERROR('Invalid default database', 16, 1);
+              RETURN;
+          END;
+
+          -- 标识符使用 QUOTENAME 防止名称逃逸，密码在拼接前转义单引号。
+          SET @sql = N'CREATE LOGIN ' + QUOTENAME(@login_name)
+                   + N' WITH PASSWORD = N''' + REPLACE(@password, N'''', N'''''') + N''', DEFAULT_DATABASE = '
+                   + QUOTENAME(@db_name) + N';';
+
+          EXEC sys.sp_executesql @sql;
+
+          IF USER_ID(@login_name) IS NULL
+          BEGIN
+              SET @sql = N'CREATE USER ' + QUOTENAME(@login_name)
+                       + N' FOR LOGIN ' + QUOTENAME(@login_name) + N';';
+              EXEC sys.sp_executesql @sql;
+          END;
+
+          SELECT @@VERSION AS version;
+        params:
+          username: "{{ account.username }}"
+          password: "{{ account.secret }}"
+          db_name: "{{ jms_asset.spec_info.db_name }}"
       ignore_errors: true
       when: user_exist.query_results[0] | length == 0
 

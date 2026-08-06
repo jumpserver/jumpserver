@@ -1,5 +1,6 @@
 # coding: utf-8
 import datetime
+import os
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
@@ -152,6 +153,8 @@ def create_or_update_registered_periodic_tasks():
 )
 @register_as_period_task(interval=300)
 def check_server_performance_period():
+    if os.environ.get('SKIP_SERVER_PERFORMANCE_CHECK', False):
+        return
     ServerPerformanceCheckUtil().check_and_publish()
 
 

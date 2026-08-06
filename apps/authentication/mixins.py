@@ -32,6 +32,7 @@ from common.utils import (
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
+from .const import OTP_BIND_AFTER_MFA_SESSION_KEY
 from .signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
@@ -726,7 +727,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
             'user_session_id', 'user_log_id', 'can_send_notifications',
-            'auth_ukey'
+            'auth_ukey', OTP_BIND_AFTER_MFA_SESSION_KEY
         ]
         for k in keys:
             self.request.session.pop(k, '')

@@ -199,7 +199,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "services", type=str, default='all', nargs="*",
-        choices=("all", "web", "task"),
+        choices=("all", "web", "task", "ai"),
         help="The service to start",
     )
     parser.add_argument('-d', '--daemon', nargs="?", const=True)

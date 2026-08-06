@@ -53,7 +53,7 @@ class AppletApplication(BaseApplication):
 
     @staticmethod
     def _write_config(config_file, config):
-        with open(config_file, 'w')as f:
+        with open(config_file, 'w') as f:
             for key, value in config.items():
                 f.write(f'{key}={value}\n')
 

@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_connection: local
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
     ansible_become: false
 
   tasks:
@@ -48,7 +49,7 @@
         delay_time: "{{ params.delay_time | default(2) }}"
         prompt: "{{ params.prompt | default('.*') }}"
       ignore_errors: true
-      when: ping_info is succeeded and check_conn_after_change
+      when: ping_info is succeeded
       register: change_info
       delegate_to: localhost
       connection: local

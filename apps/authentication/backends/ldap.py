@@ -99,7 +99,27 @@ class LDAPBaseBackend(LDAPBackend):
             return None
         user = self.authenticate_ldap_user(ldap_user, password)
         logger.info('Authenticate user: {}'.format(user))
+        if not user:
+            return None
+        if not self._is_same_login_user(username, user):
+            return None
         return user if self.user_can_authenticate(user) else None
+
+    def _is_same_login_user(self, submitted_username, user):
+        query_field = self.settings.USER_QUERY_FIELD or self.get_user_model().USERNAME_FIELD
+        submitted = self._normalize_login_identity(submitted_username)
+        authenticated = self._normalize_login_identity(getattr(user, query_field, None))
+        if not submitted or not authenticated:
+            return False
+        if submitted != authenticated:
+            return False
+        return True
+
+    @staticmethod
+    def _normalize_login_identity(value):
+        if value is None:
+            return ''
+        return str(value).strip().casefold()
 
     def pre_check(self, username, password):
         if not self.is_enabled():

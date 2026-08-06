@@ -310,8 +310,8 @@ class ConnectionToken(JMSOrgBaseModel):
             if not account.secret and self.input_secret:
                 account.secret = self.input_secret
                 account.secret_type = self.input_secret_type
-            self.set_ad_domain_if_need(account)
-
+        
+        self.set_ad_domain_if_need(account)
         return account
 
     @lazyproperty

@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import shutil
 import time
 from collections import defaultdict
@@ -27,6 +28,12 @@ from users.utils import activate_user_language
 logger = get_logger(__name__)
 
 BULK_SIZE = 80
+RUNTIME_DIR_UNSAFE_CHARS = re.compile(r'[\s/\\:<>|"?*\x00-\x1f]+')
+
+
+def safe_runtime_dir_name(name):
+    dir_name = RUNTIME_DIR_UNSAFE_CHARS.sub('_', str(name or '')).strip('_')
+    return dir_name or 'automation'
 
 
 class SSHTunnelManager:
@@ -52,12 +59,17 @@ class SSHTunnelManager:
             if not jms_gateway:
                 continue
             try:
+                gateway_proxy_host = interface.get_gateway_proxy_host()
                 server = SSHTunnelForwarder(
                     (jms_gateway["address"], jms_gateway["port"]),
                     ssh_username=jms_gateway["username"],
                     ssh_password=jms_gateway["secret"],
                     ssh_pkey=jms_gateway["private_key_path"],
                     remote_bind_address=(jms_asset["address"], jms_asset["port"]),
+                    local_bind_address=(
+                        '0.0.0.0' if gateway_proxy_host != '127.0.0.1' else '127.0.0.1',
+                        0,
+                    ),
                 )
                 server.start()
             except Exception as e:
@@ -68,7 +80,7 @@ class SSHTunnelManager:
                 local_bind_port = server.local_bind_port
 
                 host["ansible_host"] = jms_asset["address"] = host["login_host"] = (
-                    interface.get_gateway_proxy_host()
+                    gateway_proxy_host
                 )
                 host["ansible_port"] = jms_asset["port"] = host["login_port"] = (
                     local_bind_port
@@ -239,7 +251,7 @@ class PlaybookPrepareMixin:
     def prepare_runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
         task_name = self.execution.snapshot["name"]
-        dir_name = "{}_{}".format(task_name.replace(" ", "_"), self.execution.id)
+        dir_name = "{}_{}".format(safe_runtime_dir_name(task_name), self.execution.id)
         path = os.path.join(
             ansible_dir,
             "automations",

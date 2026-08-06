@@ -6,13 +6,14 @@ from importlib import import_module
 from django.conf import settings
 from django.core.cache import caches
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, CharField, F, Value
+from django.db.models.functions import Cast, Coalesce, Concat
 from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.sessions.cache import user_session_manager
-from common.utils import lazyproperty, i18n_trans
+from common.utils import lazyproperty, i18n_trans, get_ip_city
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -36,6 +37,13 @@ __all__ = [
     "PasswordChangeLog",
     "IntegrationApplicationLog",
 ]
+
+
+def _get_city_display(ip, city='') -> str:
+    try:
+        return get_ip_city(ip) or gettext(city or '')
+    except Exception:
+        return gettext(city or '')
 
 
 class JobLog(JobExecution):
@@ -174,6 +182,16 @@ class ActivityLog(OrgModelMixin):
         return super(ActivityLog, self).save(*args, **kwargs)
 
 
+def user_display_expression():
+    return Concat(
+        Coalesce(Cast(F('name'), CharField()), Value('None')),
+        Value('('),
+        Coalesce(Cast(F('username'), CharField()), Value('None')),
+        Value(')'),
+        output_field=CharField(),
+    )
+
+
 class PasswordChangeLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
@@ -181,7 +199,7 @@ class PasswordChangeLog(models.Model):
     remote_addr = models.CharField(
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
     )
-    datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))
+    datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"), db_index=True)
 
     def __str__(self):
         return "{} change {}'s password".format(self.change_by, self.user)
@@ -192,7 +210,11 @@ class PasswordChangeLog(models.Model):
     @staticmethod
     def filter_queryset_by_org(queryset):
         if not current_org.is_root():
-            users = current_org.get_members()
+            users = (
+                current_org.get_members()
+                .annotate(user_display=user_display_expression())
+                .values_list('user_display', flat=True)
+            )
             queryset = queryset.filter(
                 user__in=[str(user) for user in users]
             )
@@ -218,6 +240,12 @@ class UserLoginLog(models.Model):
     reason = models.CharField(
         default="", max_length=128, blank=True, verbose_name=_("Reason")
     )
+    reason_code = models.CharField(
+        default='', max_length=64, blank=True, verbose_name=_("Reason code")
+    )
+    reason_params = models.JSONField(
+        default=dict, blank=True, verbose_name=_("Reason params")
+    )
     status = models.BooleanField(
         default=LoginStatusChoices.success,
         choices=LoginStatusChoices.choices,
@@ -234,6 +262,10 @@ class UserLoginLog(models.Model):
     @property
     def backend_display(self) -> str:
         return gettext(self.backend)
+
+    @lazyproperty
+    def city_display(self) -> str:
+        return _get_city_display(self.ip, self.city)
 
     @classmethod
     def get_login_logs(cls, date_from=None, date_to=None, user=None, keyword=None):
@@ -259,7 +291,23 @@ class UserLoginLog(models.Model):
 
     @property
     def reason_display(self) -> str:
-        from authentication.errors import reason_choices, old_reason_choices
+        from authentication.errors import (
+            reason_choices, reason_template_choices, old_reason_choices
+        )
+
+        template = reason_template_choices.get(self.reason_code)
+        if template:
+            reason_params = self.reason_params
+            if not isinstance(reason_params, dict):
+                reason_params = {}
+            try:
+                return template.format(**reason_params)
+            except (AttributeError, KeyError, IndexError, TypeError, ValueError):
+                pass
+
+        reason = reason_choices.get(self.reason_code)
+        if reason:
+            return reason
 
         reason = reason_choices.get(self.reason)
         if reason:
@@ -298,6 +346,10 @@ class UserSession(models.Model):
 
     def __str__(self):
         return '%s(%s)' % (self.user, self.ip)
+
+    @lazyproperty
+    def city_display(self) -> str:
+        return _get_city_display(self.ip, self.city)
 
     @property
     def backend_display(self) -> str:

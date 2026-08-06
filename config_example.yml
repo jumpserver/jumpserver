@@ -45,6 +45,121 @@ HTTP_BIND_HOST: 0.0.0.0
 HTTP_LISTEN_PORT: 8080
 WS_LISTEN_PORT: 8070
 
+# Independent Chat AI ASGI service. The provider must expose an OpenAI-compatible
+# API. Credentials are managed by the JumpServer Chat AI setting and never
+# returned by Chat AI APIs.
+# CHAT_AI_ENABLED: false
+# CHAT_AI_BASE_URL: https://api.openai.com/v1
+# CHAT_AI_API_KEY: ""
+# CHAT_AI_PROXY: ""
+# CHAT_AI_MODEL: ""
+# CHAT_AI_BIND_HOST: 0.0.0.0
+# CHAT_AI_LISTEN_PORT: 8088
+# CHAT_AI_CORE_BASE_URL: http://jms_core:8080
+# CHAT_AI_CORE_TLS_VERIFY: true
+# CHAT_AI_CORE_CA_CERT: /etc/jumpserver/pki/ca.crt
+# CHAT_AI_CORE_CLIENT_CERT: /etc/jumpserver/pki/chat-ai.crt
+# CHAT_AI_CORE_CLIENT_KEY: /etc/jumpserver/pki/chat-ai.key
+# Delegation and approval signatures use independently derived keys by default.
+# Set explicit secrets to decouple them from SECRET_KEY. During rotation, keep
+# old key-id-to-secret mappings in the corresponding VERIFY_KEYS dictionary.
+# CHAT_AI_DELEGATION_KEY_ID: v1
+# CHAT_AI_DELEGATION_SECRET: ""
+# CHAT_AI_DELEGATION_VERIFY_KEYS: {}
+# CHAT_AI_APPROVAL_KEY_ID: v1
+# CHAT_AI_APPROVAL_SECRET: ""
+# CHAT_AI_APPROVAL_VERIFY_KEYS: {}
+# CHAT_AI_MODEL_TIMEOUT: 120
+# CHAT_AI_SSE_HEARTBEAT_INTERVAL: 15
+# CHAT_AI_PARTIAL_SAVE_INTERVAL: 2
+# CHAT_AI_PARTIAL_SAVE_CHARS: 1024
+# CHAT_AI_STALE_RUN_TIMEOUT: 600
+# CHAT_AI_QUEUED_RUN_TIMEOUT: 3600
+# Speech-to-text uses the OpenAI Audio Transcriptions protocol. When BASE_URL is
+# empty it reuses CHAT_AI_BASE_URL/CHAT_AI_API_KEY; an explicit local BASE_URL
+# without a key uses a non-secret local placeholder credential.
+# CHAT_AI_STT_ENABLED: true
+# CHAT_AI_STT_BASE_URL: http://whisper:8000/v1
+# CHAT_AI_STT_API_KEY: ""
+# CHAT_AI_STT_PROXY: ""
+# CHAT_AI_STT_MODEL: whisper-1
+# CHAT_AI_STT_TIMEOUT: 120
+# CHAT_AI_STT_MAX_FILE_SIZE: 10485760
+# CHAT_AI_STT_MAX_DURATION: 120
+# CHAT_AI_STT_FFPROBE_BIN: ffprobe
+# CHAT_AI_STT_RATE: 20/min
+# CHAT_AI_STT_MAX_CONCURRENCY: 1
+# CHAT_AI_STT_GLOBAL_CONCURRENCY: 4
+# Voice input defaults to the browser API. Set to server to upload recordings
+# to /api/v1/chat-ai/transcriptions/.
+# CHAT_AI_VOICE_TRANSCRIPTION_MODE: browser
+# Image messages accept JPEG, PNG, WebP, and non-animated GIF files.
+# CHAT_AI_IMAGE_MAX_COUNT: 4
+# CHAT_AI_IMAGE_MAX_FILE_SIZE: 5242880
+# CHAT_AI_IMAGE_MAX_TOTAL_SIZE: 10485760
+# Files accept PDF, DOCX, XLSX, PPTX, and common text/code formats. Extracted
+# text is stored with the message and sent to the model as user-provided data.
+# CHAT_AI_FILE_MAX_COUNT: 4
+# CHAT_AI_FILE_MAX_FILE_SIZE: 10485760
+# CHAT_AI_FILE_MAX_TOTAL_SIZE: 20971520
+# CHAT_AI_FILE_MAX_EXTRACTED_CHARS: 40000
+# CHAT_AI_FILE_MAX_TOTAL_EXTRACTED_CHARS: 80000
+# Public web search is disabled by default. Tavily requires an API key. SearXNG
+# can be self-hosted and must have JSON responses enabled.
+# CHAT_AI_WEB_SEARCH_ENABLED: false
+# CHAT_AI_WEB_SEARCH_PROVIDER: tavily  # tavily or searxng
+# CHAT_AI_WEB_SEARCH_BASE_URL: https://api.tavily.com
+# CHAT_AI_WEB_SEARCH_API_KEY: ""
+# CHAT_AI_WEB_SEARCH_PROXY: ""
+# CHAT_AI_WEB_SEARCH_TIMEOUT: 10
+# CHAT_AI_WEB_SEARCH_MAX_RESULTS: 5
+# CHAT_AI_WEB_SEARCH_MAX_CALLS: 3
+# CHAT_AI_WEB_SEARCH_MAX_RESPONSE_BYTES: 1048576
+# CHAT_AI_API_TIMEOUT: 15
+# CHAT_AI_MAX_CONCURRENCY: 2
+# CHAT_AI_MAX_STEPS: 10
+# CHAT_AI_MAX_API_CALLS: 20
+# Background submissions share one per-user rate and queue limit across
+# conversations and organizations. The token reservation closes the gap while
+# queued/running jobs have not persisted their final usage yet. Set the daily
+# token limit to 0 to disable that quota.
+# CHAT_AI_BACKGROUND_TASK_RATE: 10/min
+# CHAT_AI_BACKGROUND_MAX_PENDING_PER_USER: 5
+# CHAT_AI_BACKGROUND_TOKEN_RESERVATION: 8192
+# CHAT_AI_DAILY_TOKEN_LIMIT: 200000
+# CHAT_AI_MAX_SCHEDULES_PER_USER: 10
+# Chat AI data is cleaned daily at 02:00. Set an individual value to 0 to
+# disable cleanup for that data class.
+# CHAT_AI_CONVERSATION_KEEP_DAYS: 180
+# CHAT_AI_ATTACHMENT_KEEP_DAYS: 30
+# CHAT_AI_RESULT_CARD_KEEP_DAYS: 90
+# CHAT_AI_AUDIT_KEEP_DAYS: 180
+# CHAT_AI_MAX_RESPONSE_BYTES: 1048576
+# CHAT_AI_APPROVAL_TTL: 600
+# CHAT_AI_SCHEMA_LOAD_ON_START: false
+# Agent API allowlists. The default permits read-only asset, session, audit,
+# job, task, component, and terminal diagnosis. Host creation remains the only
+# default write operation and still requires explicit user approval.
+# CHAT_AI_ALLOWED_TAGS: []
+# CHAT_AI_ALLOWED_OPERATION_IDS:
+#   - assets_platforms_list
+#   - assets_nodes_list
+#   - assets_hosts_list
+#   - assets_hosts_retrieve
+#   - assets_hosts_create
+#   - terminal_sessions_list
+#   - terminal_sessions_retrieve
+#   - terminal_commands_list
+#   - terminal_commands_retrieve
+#   - audits_login_logs_list
+#   - audits_operate_logs_list
+#   - audits_job_logs_list
+#   - ops_jobs_list
+#   - ops_tasks_list
+# CHAT_AI_ALLOWED_PATHS: []
+# CHAT_AI_BLOCKED_PATHS: []
+# Method policy is also configurable as CHAT_AI_METHOD_POLICIES in JSON/YAML.
+
 # Use Redis as broker for celery and web socket
 # Redis配置
 REDIS_HOST: 127.0.0.1
