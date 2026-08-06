@@ -133,21 +133,6 @@ if CONFIG.DEBUG_DEV:
 
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
-# 仅从 django.conf.settings 读取（通过界面 / API 配置），
-# 未配置时使用硬编码默认值
-_syslog_addr = getattr(settings, 'SYSLOG_ADDR', '')
-_syslog_facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
-_syslog_socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
-
-if _syslog_addr != '' and len(_syslog_addr.split(':')) == 2:
-    host, port = _syslog_addr.split(':')
-    LOGGING['handlers']['syslog'].update({
-        'class': 'logging.handlers.SysLogHandler',
-        'facility': _syslog_facility,
-        'address': (host, int(port)),
-        'socktype': _syslog_socktype,
-    })
-
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR, mode=0o755)
 
