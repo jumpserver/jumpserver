@@ -19,7 +19,7 @@ from .backends import server_replay_storage
 from .const import ReplayStorageType, CommandStorageType
 from .models import (
     Status, Session, Task, AppletHostDeployment,
-    AppletHost, ReplayStorage, CommandStorage
+    AppletHost, AppProviderDeployment, ReplayStorage, CommandStorage
 )
 from .notifications import StorageConnectivityMessage
 
@@ -131,6 +131,17 @@ def run_applet_host_deployment(did, install_applets):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
         deployment.start(install_applets=install_applets)
+
+
+@shared_task(
+    verbose_name=_('Run app provider deployment'),
+    activity_callback=lambda self, did, *args, **kwargs: ([did],),
+    description=_('Deploy the Panda runtime on an application provider host'),
+)
+def run_app_provider_deployment(did):
+    with tmp_to_builtin_org(system=1):
+        deployment = AppProviderDeployment.objects.get(id=did)
+        deployment.start()
 
 
 @shared_task(

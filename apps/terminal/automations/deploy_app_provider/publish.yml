@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  vars:
+    APP_IMAGE: example/application:latest
+
+  tasks:
+    - name: Pull virtual application image
+      ansible.builtin.command: docker pull {{ APP_IMAGE }}
