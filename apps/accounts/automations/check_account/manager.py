@@ -155,7 +155,11 @@ class CheckLeakHandler(BaseCheckHandler):
 
 class CheckAccountManager(BaseManager):
     batch_size = 100
-    tmpl = 'Checked the status of account %s: %s'
+    handler_labels = {
+        CheckSecretHandler: _('Password strength'),
+        CheckRepeatHandler: _('Repeated password'),
+        CheckLeakHandler: _('Leaked password'),
+    }
 
     def __init__(self, execution):
         super().__init__(execution)
@@ -218,23 +222,26 @@ class CheckAccountManager(BaseManager):
         self.assets = self.execution.get_all_assets()
 
     def batch_check(self, handler):
-        print("Engine: {}".format(handler.__class__.__name__))
+        label = self.handler_labels.get(handler.__class__, _('Account security'))
+        self.print_log(
+            _("Checking account security: %(check)s") % {'check': label},
+            'progress',
+        )
         for i in range(0, len(self.assets), self.batch_size):
             _assets = self.assets[i: i + self.batch_size]
             accounts = Account.objects.filter(
                 asset__in=_assets
             ).select_related('asset')
 
-            print("Start to check accounts: {}".format(len(accounts)))
+            self.print_log(_("Processing %(count)s accounts") % {
+                'count': len(accounts),
+            }, 'progress')
 
             for account in accounts:
                 self.checked_account_ids.add(account.id)
                 if not account.secret:
                     self.no_secret_account_ids.add(account.id)
                 error = handler.check(account)
-                msg = handler.risk if error else 'ok'
-
-                print("Check: {} => {}".format(account, msg))
                 if not error:
                     AccountRisk.objects.filter(
                         asset=account.asset,
@@ -258,7 +265,7 @@ class CheckAccountManager(BaseManager):
             elif engine == "check_account_leak":
                 handler = CheckLeakHandler(self.assets)
             else:
-                print("Unknown engine: {}".format(engine))
+                logging.warning("Unknown account security check: %s", engine)
                 continue
 
             self.handlers.append(handler)
@@ -290,13 +297,32 @@ class CheckAccountManager(BaseManager):
         return "accounts/check_account_report.html"
 
     def print_summary(self):
-        tmpl = _("---\nSummary: \nok: {}, weak password: {}, leaked password: {}, "
-                 "repeated password: {}, no secret: {}, using time: {}s").format(
-            self.summary["ok"],
-            self.summary[RiskChoice.weak_password],
-            self.summary[RiskChoice.leaked_password],
-            self.summary[RiskChoice.repeated_password],
-            self.summary["no_secret"],
-            self.duration
-        )
-        print(tmpl)
+        normal = self.summary["ok"]
+        weak = self.summary[RiskChoice.weak_password]
+        leaked = self.summary[RiskChoice.leaked_password]
+        repeated = self.summary[RiskChoice.repeated_password]
+        no_secret = self.summary["no_secret"]
+        risk_count = len(self.risky_account_ids)
+        total = len(self.checked_account_ids)
+        self.print_log(_("Task execution completed"), 'success')
+        self.print_log(_(
+            "Checked %(total)s accounts: %(normal)s normal, %(risk)s at risk, "
+            "%(no_secret)s without secrets"
+        ) % {
+            'total': total,
+            'normal': normal,
+            'risk': risk_count,
+            'no_secret': no_secret,
+        }, 'error' if risk_count else 'success')
+        if risk_count:
+            self.print_log(_(
+                "Risk details: %(weak)s weak passwords, %(leaked)s leaked "
+                "passwords, %(repeated)s repeated passwords"
+            ) % {
+                'weak': weak,
+                'leaked': leaked,
+                'repeated': repeated,
+            }, 'error')
+        self.print_log(_("Duration: %(duration)s seconds") % {
+            'duration': self.duration,
+        }, 'info')

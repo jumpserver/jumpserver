@@ -362,7 +362,6 @@ def bulk_handle(handler, batch_size=50, timeout=0.5):
 
             # 添加实例到缓存
             cache.append(instance)
-            print(f"Instance added to cache. Cache size: {len(cache)}")
 
             # 如果缓存大小达到批量保存阈值，执行保存
             if len(cache) >= batch_size:

@@ -1,18 +1,31 @@
+import logging
 import time
 
-import paramiko
 from celery import current_task
 from celery.worker import state as celery_worker_state
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+import paramiko
+from sshtunnel import (
+    BaseSSHTunnelForwarderError, HandlerSSHTunnelForwarderError,
+)
 
+from assets.automations.base.manager import print_automation_log
 from assets.const import AutomationTypes, Connectivity
 from assets.models import Gateway
 from common.const import Status
 from common.utils import get_logger
+from libs.ansible.modules_utils.ssh_tunnel import (
+    GatewayConnectTimeout, TimeoutSSHTunnelForwarder,
+)
 
 logger = get_logger(__name__)
+_ssh_tunnel_logger = logging.Logger(
+    f'{__name__}.ssh_tunnel_internal', level=logging.CRITICAL + 1
+)
+_ssh_tunnel_logger.addHandler(logging.NullHandler())
+_ssh_tunnel_logger.propagate = False
 
 
 class PingGatewayManager:
@@ -24,6 +37,91 @@ class PingGatewayManager:
     def method_type(cls):
         return AutomationTypes.ping_gateway
 
+    @staticmethod
+    def get_error_message(error, gateway, local_port, phase):
+        error_text = str(getattr(error, 'text', None) or error).strip()
+        normalized = error_text.lower()
+
+        if (
+                'no password or public key available' in normalized
+                or 'private key' in normalized
+                or 'pkey' in normalized
+        ):
+            return _(
+                'The gateway account has no usable password or private key; '
+                'check the gateway account credentials'
+            )
+        if isinstance(error, GatewayConnectTimeout):
+            return _(
+                'Gateway connection timed out; check the gateway address, '
+                'port, and network'
+            )
+        if isinstance(error, HandlerSSHTunnelForwarderError):
+            return _(
+                'Connected to the gateway, but it cannot forward to '
+                '127.0.0.1:%(port)s; check the SSH service and port on the '
+                'gateway'
+            ) % {'port': local_port}
+        if isinstance(error, BaseSSHTunnelForwarderError):
+            return _(
+                'Unable to establish an SSH session to %(address)s:%(port)s; '
+                'check the network and gateway account credentials'
+            ) % {
+                'address': gateway.address,
+                'port': gateway.port,
+            }
+        if isinstance(error, (
+                paramiko.AuthenticationException,
+                paramiko.BadAuthenticationType,
+        )) or 'authentication failed' in normalized:
+            if phase == 'forwarded_authentication':
+                return _(
+                    'The SSH tunnel is available, but gateway account '
+                    'authentication through the tunnel failed; check the '
+                    'gateway account credentials'
+                )
+            return _(
+                'Gateway account authentication failed; check the gateway '
+                'account credentials'
+            )
+        if isinstance(error, (paramiko.ChannelException,)) or any(
+                text in normalized for text in (
+                    'connect failed', 'administratively prohibited',
+                    'channel open failure',
+                )
+        ):
+            return _(
+                'Connected to the gateway, but it cannot forward to '
+                '127.0.0.1:%(port)s; check the SSH service and port on the '
+                'gateway'
+            ) % {'port': local_port}
+        if any(text in normalized for text in (
+                'name or service not known', 'nodename nor servname',
+                'temporary failure in name resolution',
+                'unable to resolve ssh gateway',
+        )):
+            return _(
+                'Unable to resolve gateway address %(address)s; check the '
+                'address and DNS settings'
+            ) % {'address': gateway.address}
+        if any(text in normalized for text in (
+                'connection refused', 'no valid connections',
+                'unable to connect to port', 'network is unreachable',
+                'no route to host',
+        )):
+            return _(
+                'Unable to connect to gateway %(address)s:%(port)s; check '
+                'the address, port, and network'
+            ) % {
+                'address': gateway.address,
+                'port': gateway.port,
+            }
+        if not error_text:
+            error_text = str(_('Unknown error'))
+        return _('Gateway check failed: %(error)s') % {
+            'error': error_text.splitlines()[0][:240],
+        }
+
     def execute_task(self, gateway, account):
         from accounts.models import Account
         local_port = self.execution.snapshot.get('local_port')
@@ -34,67 +132,56 @@ class PingGatewayManager:
 
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        proxy = paramiko.SSHClient()
-        proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        tunnel = None
         connect_timeout = max(
             int(getattr(settings, 'SSH_GATEWAY_CONNECT_TIMEOUT', 30) or 30),
             1,
         )
 
-        print('- ' + _('Asset, {}, using account {}').format(gateway, account))
+        print_automation_log(
+            _("Checking SSH login and tunnel forwarding: %(gateway)s") % {
+                'gateway': gateway,
+            },
+            'progress',
+        )
         try:
             try:
                 private_key = account.private_key_obj
-                proxy.connect(
-                    gateway.address,
-                    port=gateway.port,
-                    username=account.username,
-                    password=account.secret,
-                    pkey=private_key,
-                    timeout=connect_timeout,
-                    banner_timeout=connect_timeout,
-                    auth_timeout=connect_timeout,
+                tunnel = TimeoutSSHTunnelForwarder(
+                    (gateway.address, gateway.port),
+                    ssh_username=account.username,
+                    ssh_password=account.secret,
+                    ssh_pkey=private_key,
+                    connect_timeout=connect_timeout,
+                    remote_bind_address=('127.0.0.1', local_port),
+                    local_bind_address=('127.0.0.1', 0),
                     allow_agent=False,
-                    look_for_keys=False,
+                    logger=_ssh_tunnel_logger,
                 )
+                tunnel.start()
             except (
                     paramiko.AuthenticationException,
                     paramiko.BadAuthenticationType,
                     paramiko.SSHException,
                     paramiko.ChannelException,
                     paramiko.ssh_exception.NoValidConnectionsError,
+                    BaseSSHTunnelForwarderError,
+                    GatewayConnectTimeout,
                     OSError,
                     EOFError,
+                    ValueError,
             ) as e:
-                err = str(e)
-                if err.startswith('[Errno None] Unable to connect to port'):
-                    err = _('Unable to connect to port {port} on {address}')
-                    err = err.format(
-                        port=gateway.port, address=gateway.address
-                    )
-                elif err == 'Authentication failed.':
-                    err = _('Authentication failed')
-                elif err == 'Connect failed':
-                    err = _('Connect failed')
-                return False, err
+                return False, self.get_error_message(
+                    e, gateway, local_port, 'tunnel_setup'
+                )
 
             try:
-                transport = proxy.get_transport()
-                if not transport or not transport.is_active():
-                    return False, _('Connect failed')
-                sock = transport.open_channel(
-                    'direct-tcpip',
-                    ('127.0.0.1', local_port),
-                    ('127.0.0.1', 0),
-                    timeout=connect_timeout,
-                )
                 client.connect(
                     '127.0.0.1',
-                    sock=sock,
                     timeout=connect_timeout,
                     banner_timeout=connect_timeout,
                     auth_timeout=connect_timeout,
-                    port=local_port,
+                    port=tunnel.local_bind_port,
                     username=account.username,
                     password=account.secret,
                     pkey=private_key,
@@ -105,55 +192,68 @@ class PingGatewayManager:
                     paramiko.SSHException,
                     paramiko.ChannelException,
                     paramiko.AuthenticationException,
+                    paramiko.BadAuthenticationType,
                     OSError,
                     EOFError,
             ) as e:
-                err = getattr(e, 'text', str(e))
-                if err == 'Connect failed':
-                    err = _('Connect failed')
-                return False, err
+                return False, self.get_error_message(
+                    e, gateway, local_port, 'forwarded_authentication'
+                )
             return True, None
         except Exception as error:
             logger.exception(
                 'Unexpected gateway connectivity error: gateway=%s account=%s',
                 gateway.id, account.id,
             )
-            return False, str(error)
+            return False, self.get_error_message(
+                error, gateway, local_port, 'unexpected'
+            )
         finally:
             client.close()
-            proxy.close()
+            if tunnel:
+                try:
+                    tunnel.stop(force=True)
+                except Exception:
+                    logger.exception(
+                        'Clean gateway tunnel failed: gateway=%s',
+                        gateway.id,
+                    )
 
     @staticmethod
     def on_host_success(gateway, account):
-        print('\033[32m {} -> {}\033[0m\n'.format(gateway, account))
+        print_automation_log(
+            _(
+                "✓ %(gateway)s: SSH login and tunnel forwarding are available"
+            ) % {'gateway': gateway},
+            'success',
+        )
         try:
             gateway.set_connectivity(Connectivity.OK)
             if not account:
                 return
             account.set_connectivity(Connectivity.OK)
         except Exception as e:
-            print(f'\033[31m Update account {getattr(account, "name", "-")} or '
-                  f'update asset {gateway.name} connectivity failed: {e} \033[0m\n')
             return str(e)
         return None
 
     @staticmethod
     def on_host_error(gateway, account, error):
-        print('\033[31m {} -> {} 原因: {} \033[0m\n'.format(gateway, account, error))
+        print_automation_log(_("✗ %(gateway)s: %(error)s") % {
+            'gateway': gateway,
+            'error': error,
+        }, 'error')
         try:
             gateway.set_connectivity(Connectivity.ERR)
             if not account:
                 return
             account.set_connectivity(Connectivity.ERR)
         except Exception as e:
-            print(f'\033[31m Update account {getattr(account, "name", "-")} or '
-                  f'update asset {gateway.name} connectivity failed: {e} \033[0m\n')
             return str(e)
         return None
 
     @staticmethod
     def before_runner_start():
-        print(_(">>> Start executing the task to test gateway connectivity"))
+        print_automation_log(_("Checking gateway connectivity"), 'progress')
 
     def get_accounts(self, gateway):
         account = gateway.select_account
@@ -261,7 +361,6 @@ class PingGatewayManager:
                         'gateway': str(gateway),
                         'error': str(e),
                     })
-                print('\n')
             if final_status != Status.success:
                 break
         if final_status == Status.success and failed:
@@ -278,3 +377,18 @@ class PingGatewayManager:
         self.execution.save(update_fields=[
             'status', 'date_finished', 'duration', 'summary', 'result',
         ])
+        print_automation_log(_("Task execution completed"), 'success')
+        print_automation_log(_("Result: %(result)s") % {
+            'result': ', '.join([
+                _("Successful: %(count)s") % {
+                    'count': len(result['ok']),
+                },
+                _("Failed: %(count)s") % {'count': failed},
+                _("Total: %(count)s") % {
+                    'count': len(result['ok']) + failed,
+                },
+            ]),
+        }, 'error' if failed else 'success')
+        print_automation_log(_("Duration: %(duration)s seconds") % {
+            'duration': self.execution.duration,
+        }, 'info')

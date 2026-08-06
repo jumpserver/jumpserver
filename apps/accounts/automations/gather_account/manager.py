@@ -269,7 +269,6 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 )
             super().on_host_success(host, result)
         else:
-            print(f"\033[31m Not found {host} info \033[0m\n")
             super().on_host_error(
                 host, 'Gathered account result is empty', result
             )

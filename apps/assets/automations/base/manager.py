@@ -30,11 +30,24 @@ logger = get_logger(__name__)
 
 BULK_SIZE = 80
 RUNTIME_DIR_UNSAFE_CHARS = re.compile(r'[\s/\\:<>|"?*\x00-\x1f]+')
+AUTOMATION_LOG_COLORS = {
+    'info': '\033[36m',
+    'progress': '\033[33m',
+    'success': '\033[32m',
+    'error': '\033[31m',
+}
+AUTOMATION_LOG_COLOR_RESET = '\033[0m'
+ANSI_ESCAPE_PATTERN = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
 
 
 def safe_runtime_dir_name(name):
     dir_name = RUNTIME_DIR_UNSAFE_CHARS.sub('_', str(name or '')).strip('_')
     return dir_name or 'automation'
+
+
+def print_automation_log(message, level='info'):
+    color = AUTOMATION_LOG_COLORS.get(level, AUTOMATION_LOG_COLORS['info'])
+    print(f'{color}{message}{AUTOMATION_LOG_COLOR_RESET}')
 
 
 class SSHTunnelManager:
@@ -106,7 +119,6 @@ class SSHTunnelManager:
                     servers.append(server)
             except Exception as e:
                 err_msg = "Gateway is not active: %s" % jms_asset.get("name", "")
-                print(f"\033[31m {err_msg} 原因: {e} \033[0m\n")
                 failed_targets.add(target_key)
                 failed_target_errors[target_key] = f'{err_msg}: {e}'
                 host_errors[k] = failed_target_errors[target_key]
@@ -143,6 +155,61 @@ class SSHTunnelManager:
 
 
 class PlaybookCallback(DefaultCallback):
+    STAGE_MAPPERS = {
+        'ping': (1, "Testing connectivity and credentials"),
+        'verify_account': (1, "Verifying account credentials"),
+        'gather_facts': (1, "Collecting asset information"),
+        'gather_accounts': (1, "Collecting account information"),
+    }
+
+    def __init__(self, task_type=''):
+        super().__init__()
+        self.task_type = str(task_type)
+        self.announced_hosts = set()
+        self.current_stage = 0
+
+    def get_stage(self, task):
+        task = str(task or '').lower()
+        if self.task_type in ('change_secret', 'push_account'):
+            if 'verify' in task or 'verification' in task:
+                return 3, _("Verifying the new credentials")
+            if (
+                    'lookup' in task
+                    or 'whether the user exists' in task
+                    or task.startswith('check if ')
+            ):
+                return 1, _("Checking the target account")
+            return 2, _("Updating the account credentials")
+        if self.task_type == 'remove_account':
+            if 'remove account' in task or 'rename user home' in task:
+                return 2, _("Removing the account")
+            return 1, _("Checking account removal conditions")
+        stages = self.STAGE_MAPPERS.get(self.task_type)
+        if stages:
+            stage, label = stages
+            return stage, _(label)
+        return 1, _("Executing automation")
+
+    def runner_on_start(
+            self, event_data, host=None, task=None, **kwargs
+    ):
+        super().runner_on_start(
+            event_data, host=host, task=task, **kwargs
+        )
+        stage, stage_label = self.get_stage(task)
+        if stage > self.current_stage:
+            self.current_stage = stage
+            print_automation_log(
+                _("Stage: %(stage)s") % {'stage': stage_label},
+                'progress',
+            )
+        if host and host not in self.announced_hosts:
+            self.announced_hosts.add(host)
+            print_automation_log(
+                _("• %(host)s: processing") % {'host': host},
+                'progress',
+            )
+
     def playbook_on_stats(self, event_data, **kwargs):
         super().playbook_on_stats(event_data, **kwargs)
 
@@ -158,6 +225,10 @@ class BaseManager:
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
+
+    @staticmethod
+    def print_log(message, level='info'):
+        print_automation_log(message, level)
 
     def pre_run(self):
         date_start = timezone.now()
@@ -180,11 +251,38 @@ class BaseManager:
         self.execution.save()
 
     def print_summary(self):
-        content = "\nSummary: \n"
-        for k, v in self.summary.items():
-            content += f"\t - {k}: {v}\n"
-        content += "\t - Using: {}s\n".format(self.duration)
-        print(content)
+        success = self.summary.get("ok_assets", 0)
+        failed = (
+            self.summary.get("fail_assets", 0)
+            + self.summary.get("error_assets", 0)
+        )
+        self.print_result_summary(success, failed, total=success + failed)
+
+    def print_result_summary(
+            self, success=0, failed=0, unverified=0, total=None,
+            include_unverified=False,
+    ):
+        result = [_("Successful: %(count)s") % {'count': success}]
+        if include_unverified or unverified:
+            result.append(
+                _("Needs verification: %(count)s") % {
+                    'count': unverified,
+                }
+            )
+        result.append(_("Failed: %(count)s") % {'count': failed})
+        if total is not None:
+            result.append(_("Total: %(count)s") % {'count': total})
+        final_level = (
+            'error' if failed else 'progress' if unverified else 'success'
+        )
+        self.print_log(_("Task execution completed"), final_level)
+        self.print_log(
+            _("Result: %(result)s") % {'result': '  |  '.join(result)},
+            final_level,
+        )
+        self.print_log(_("Duration: %(duration)s seconds") % {
+            'duration': self.duration,
+        }, 'info')
 
     def get_report_template(self):
         raise NotImplementedError
@@ -203,7 +301,6 @@ class BaseManager:
         recipients = self.execution.recipients
         if not recipients:
             return
-        print(f"Send report to: {','.join([str(u) for u in recipients])}")
         for user in recipients:
             with activate_user_language(user):
                 report = self.gen_report()
@@ -385,11 +482,7 @@ class PlaybookPrepareMixin:
 
     @lazyproperty
     def runtime_dir(self):
-        path = self.prepare_runtime_dir()
-        if settings.DEBUG_DEV:
-            msg = "Ansible runtime dir: {}".format(path)
-            print(msg)
-        return path
+        return self.prepare_runtime_dir()
 
     @staticmethod
     def generate_playbook(method, sub_playbook_dir):
@@ -411,7 +504,6 @@ class PlaybookPrepareMixin:
     def check_automation_enabled(self, platform, assets):
         automation = getattr(platform, 'automation', None)
         if not (automation and getattr(automation, 'ansible_enabled', False)):
-            print(_("  - Platform {} ansible disabled").format(platform.name))
             self.on_assets_not_ansible_enabled(assets)
             return False
 
@@ -437,16 +529,25 @@ class PlaybookPrepareMixin:
         self.summary["error_assets"] += len(assets)
         self.result["error_assets"].extend([str(asset) for asset in assets])
         for asset in assets:
-            print("\t{}".format(asset))
+            self.print_log(_("✗ %(asset)s: automation is not configured for its platform") % {
+                'asset': asset,
+            }, 'error')
 
     def on_assets_not_method_enabled(self, assets, method_type):
         self.summary["error_assets"] += len(assets)
         self.result["error_assets"].extend([str(asset) for asset in assets])
         for asset in assets:
-            print("\t{}".format(asset))
+            self.print_log(_("✗ %(asset)s: this automation is not enabled") % {
+                'asset': asset,
+            }, 'error')
 
     def on_playbook_not_found(self, assets):
-        print("Playbook generate failed")
+        self.summary["error_assets"] += len(assets)
+        self.result["error_assets"].extend([str(asset) for asset in assets])
+        for asset in assets:
+            self.print_log(_("✗ %(asset)s: unable to prepare this automation") % {
+                'asset': asset,
+            }, 'error')
 
 
 class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
@@ -465,6 +566,173 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
+
+    def get_task_display_name(self):
+        labels = {
+            'ping': _("Test asset connectivity"),
+            'gather_facts': _("Gather asset information"),
+            'change_secret': _("Change account secret"),
+            'push_account': _("Push account"),
+            'verify_account': _("Verify account credentials"),
+            'gather_accounts': _("Gather accounts"),
+            'remove_account': _("Remove account"),
+        }
+        task_type = str(self.method_type())
+        return labels.get(task_type, self.execution.snapshot.get("name", ""))
+
+    def get_target_summary(self):
+        count = len(set(map(
+            str, self.execution.snapshot.get('assets', [])
+        )))
+        return _("Targets: %(assets)s asset(s)") % {'assets': count}
+
+    def get_host_success_log(self, host):
+        result_labels = {
+            'ping': _("connection and authentication succeeded"),
+            'gather_facts': _("asset information collected"),
+            'verify_account': _("credential verification succeeded"),
+            'gather_accounts': _("account information collected"),
+            'remove_account': _("account removed"),
+        }
+        result = result_labels.get(str(self.method_type()), _("completed"))
+        return _("✓ %(host)s: %(result)s") % {
+            'host': host,
+            'result': result,
+        }, 'success'
+
+    @staticmethod
+    def get_error_step(error):
+        first_line = str(error or '').splitlines()[0]
+        task = first_line.split(': ', 1)[0].strip().lower()
+        step_mappers = (
+            (('verify ', 'verification'), _("verifying the new credential")),
+            (('check if ', 'whether the user exists', 'passwd lookup'),
+             _("checking the target account")),
+            (('add ', 'create '), _("creating the target account")),
+            (('sudo setting', 'sudo privilege'),
+             _("configuring sudo privileges")),
+            (('ssh key', 'authorized key'), _("updating the SSH key")),
+            (('change ', 'password'), _("changing the target credential")),
+            (('save ', 'record '), _("saving the execution result")),
+        )
+        for keywords, label in step_mappers:
+            if any(keyword in task for keyword in keywords):
+                return str(label), task
+        return str(_("executing the automation step")), task
+
+    @classmethod
+    def get_user_error_message(cls, error):
+        error = ANSI_ESCAPE_PATTERN.sub('', str(error or '')).strip()
+        normalized = error.lower()
+        identity = re.search(
+            r'([^\s@]+)@([^\s:]+):\s*permission denied',
+            error,
+            re.IGNORECASE,
+        )
+        is_authentication_error = identity or any(
+            item in normalized for item in (
+                'authentication failed', 'invalid/incorrect password',
+                'credentials rejected', 'logon failure',
+                'permission denied (publickey',
+                'permission denied (password',
+                'permission denied (keyboard-interactive',
+            )
+        )
+        if is_authentication_error:
+            step, task = cls.get_error_step(error)
+            if 'verify ' in task or 'verification' in task:
+                return _(
+                    "%(step)s failed: the new credential was rejected; "
+                    "the remote credential may already have changed, "
+                    "verify it before retrying"
+                ) % {'step': step}
+
+            if identity:
+                account, target = identity.groups()
+                return _(
+                    "%(step)s failed: %(target)s rejected the execution "
+                    "account %(account)s; the credential change was not "
+                    "reached, check the execution credential or reduce "
+                    "concurrent connections and retry"
+                ) % {
+                    'step': step,
+                    'target': target,
+                    'account': account,
+                }
+            return _(
+                "%(step)s failed: authentication was rejected; check the "
+                "execution or target account credential"
+            ) % {'step': step}
+        if any(item in normalized for item in (
+                'could not resolve hostname', 'name or service not known',
+                'temporary failure in name resolution', 'nodename nor servname',
+        )):
+            return _(
+                "Unable to resolve the asset address; check DNS or the asset address"
+            )
+        if any(item in normalized for item in (
+                'host key verification failed',
+                'remote host identification has changed',
+        )):
+            return _(
+                "SSH host key verification failed; verify that the asset host key changed as expected"
+            )
+        if any(item in normalized for item in (
+                'timed out', 'timeout', 'operation timed out',
+        )):
+            return _(
+                "Connection timed out; check the network, port, or gateway"
+            )
+        if any(item in normalized for item in (
+                'connection refused', 'no route to host',
+                'unable to connect', 'unreachable',
+        )):
+            return _(
+                "Unable to connect; check the network, port, and service"
+            )
+        if any(item in normalized for item in (
+                'connection reset', 'connection closed',
+                'broken pipe', 'kex_exchange_identification',
+        )):
+            return _(
+                "The SSH connection was interrupted; check connection limits, security policies, or network stability"
+            )
+        if any(item in normalized for item in (
+                'sudo password is required', 'missing sudo password',
+                'incorrect sudo password', 'become password',
+        )):
+            return _(
+                "Privilege escalation failed; check the sudo or become configuration of the execution account"
+            )
+        if any(item in normalized for item in (
+                'bad password', 'password quality',
+                'password does not meet', 'password is too short',
+                'password policy',
+        )):
+            return _(
+                "The target system rejected the new credential because it does not meet the password policy"
+            )
+        if 'permission denied' in normalized:
+            step, __ = cls.get_error_step(error)
+            return _(
+                "%(step)s failed: the execution account has insufficient permissions on the target system"
+            ) % {'step': step}
+        if any(item in normalized for item in (
+                'account not found', 'user does not exist',
+                'not found or inactive',
+        )):
+            return _("The target account was not found or is inactive")
+        if 'already being processed' in normalized:
+            return _(
+                "The account is being processed by another task; try again later"
+            )
+
+        first_line = error.splitlines()[0] if error else str(_("Unknown error"))
+        if ': ' in first_line:
+            first_line = first_line.split(': ', 1)[1]
+        if len(first_line) > 240:
+            first_line = first_line[:237] + '...'
+        return _("Operation failed: %(reason)s") % {'reason': first_line}
 
     @classmethod
     def method_type(cls):
@@ -501,15 +769,12 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             inventory_path,
             playbook_path,
             self.runtime_dir,
-            callback=PlaybookCallback(),
+            callback=PlaybookCallback(self.method_type()),
         )
         return runner, inventory_path
 
     def get_runners(self):
         assets_group_by_platform = self.get_assets_group_by_platform()
-        if settings.DEBUG_DEV:
-            msg = "Assets group by platform: {}".format(dict(assets_group_by_platform))
-            print(msg)
 
         runners = []
         available_asset_ids = {
@@ -531,11 +796,9 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         for platform, assets in assets_group_by_platform.items():
             self.summary["total_assets"] += len(assets)
             if not assets:
-                print("No assets for platform: {}".format(platform.name))
                 continue
 
             if not self.check_automation_enabled(platform, assets):
-                print("Platform {} ansible disabled".format(platform.name))
                 continue
 
             # 避免一个任务太大，分批执行
@@ -566,6 +829,9 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     def on_host_success(self, host, result):
         self.summary["ok_assets"] += 1
         self.result["ok_assets"].append(host)
+        message, level = self.get_host_success_log(host)
+        if message:
+            self.print_log(message, level)
 
         for cb in self.host_success_callbacks:
             cb(host, result)
@@ -573,7 +839,10 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     def on_host_error(self, host, error, result):
         self.summary["fail_assets"] += 1
         self.result["fail_assets"].append((host, str(error)))
-        print(f"\033[31m {host} error: {error} \033[0m\n")
+        self.print_log(_("✗ %(host)s: %(error)s") % {
+            'host': host,
+            'error': self.get_user_error_message(error),
+        }, 'error')
 
     def _on_host_success(self, host, result, hosts):
         self.on_host_success(host, result.get("ok", ""))
@@ -589,7 +858,10 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     def on_inventory_host_error(self, host, error):
         self.summary["fail_assets"] += 1
         self.result["fail_assets"].append((host, str(error)))
-        print(f"\033[31m {host} preparation error: {error} \033[0m\n")
+        self.print_log(_("✗ %(host)s: unable to prepare (%(error)s)") % {
+            'host': host,
+            'error': self.get_user_error_message(error),
+        }, 'error')
 
     def post_run(self):
         try:
@@ -606,6 +878,8 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             self.delete_runtime_dir()
 
     def on_runner_success(self, runner, cb):
+        if str(self.method_type()) in ('change_secret', 'push_account'):
+            self.print_log(_("Stage: Saving execution results"), 'progress')
         summary = cb.summary
         for state, hosts in summary.items():
             # 错误行为为，host 是 dict， ok 时是 list
@@ -700,7 +974,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             "Automation task exceeded the maximum runtime of "
             "%(seconds)s seconds"
         )) % {'seconds': task_timeout}
-        print(f">>> {self.interruption_reason}")
+        self.print_log(self.interruption_reason, 'error')
 
     def get_waiting_host_groups(
             self, runner, minimum_elapsed=0
@@ -794,9 +1068,9 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
         detail = self.format_waiting_host_groups(groups)
         count = sum(len(hosts) for hosts in groups.values())
-        print(str(_(
-            ">>> Still waiting for %(count)s host(s): %(detail)s"
-        )) % {'count': count, 'detail': detail})
+        self.print_log(str(_(
+            "Still processing %(count)s target(s): %(detail)s"
+        )) % {'count': count, 'detail': detail}, 'progress')
         self.persist_waiting_progress(groups)
 
     def should_cancel_runner(self, runner):
@@ -909,7 +1183,6 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             if cb and cb.finished:
                 with safe_atomic_db_connection():
                     self.on_runner_success(runner, cb)
-                print("Runner timeout but playbook exited normally, ignore fail mark")
                 return True
 
         waiting = self.get_waiting_host_groups(runner)
@@ -927,7 +1200,10 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         self.on_runner_incomplete(
             runner, error, assets=assets, **kwargs
         )
-        print("Runner failed: {} {}".format(e, self))
+        self.print_log(
+            _("Batch execution failed: %(error)s") % {'error': error},
+            'error',
+        )
         return False
 
     def delete_runtime_dir(self):
@@ -938,18 +1214,23 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             shutil.rmtree(runtime_dir, ignore_errors=True)
 
     def do_run(self, *args, **kwargs):
-        print(_(">>> Task preparation phase"), end="\n")
+        self.print_log(
+            _("Task: %(task)s") % {'task': self.get_task_display_name()},
+            'info',
+        )
+        self.print_log(self.get_target_summary(), 'info')
+        self.print_log(_("Stage: Preparing execution"), 'progress')
         runners = self.get_runners()
         if len(runners) > 1:
-            print(
-                _(">>> Executing tasks in batches, total {runner_count}").format(
-                    runner_count=len(runners)
-                )
+            self.print_log(
+                _("Task will run in %(count)s batches") % {
+                    'count': len(runners),
+                }, 'progress'
             )
         elif len(runners) == 1:
-            print(_(">>> Start executing tasks"))
+            self.print_log(_("Targets are ready; starting execution"), 'progress')
         else:
-            print(_(">>> No tasks need to be executed"), end="\n")
+            self.print_log(_("No eligible targets were found"), 'progress')
 
         total_runners = len(runners)
         if total_runners:
@@ -965,8 +1246,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
                 self.status = Status.error
                 break
 
-            if len(runners) > 1:
-                print(_(">>> Begin executing batch {index} of tasks").format(index=i))
+            if total_runners > 1:
+                self.print_log(_("Processing batch %(current)s of %(total)s") % {
+                    'current': i,
+                    'total': total_runners,
+                }, 'progress')
 
             runner, info = runner_info
             ssh_tunnel = SSHTunnelManager()
@@ -1018,7 +1302,9 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
                             str(_("Hosts still waiting")),
                             waiting_detail,
                         )
-                    print(f">>> {reason}")
+                    self.print_log(_("Batch did not complete: %(reason)s") % {
+                        'reason': reason,
+                    }, 'error')
                     self.on_runner_incomplete(runner, reason, **info)
                     if cb.status == Status.canceled:
                         self.status = (
@@ -1035,7 +1321,6 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
                 self.on_runner_failed(runner, e, **info)
             finally:
                 ssh_tunnel.local_gateway_clean(runner)
-                print("\n")
 
             next_batch = i + 1 if i < total_runners else None
             self.update_batch_progress(i, total_runners, current=next_batch)

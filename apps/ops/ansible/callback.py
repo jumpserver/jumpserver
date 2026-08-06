@@ -263,8 +263,6 @@ class DefaultCallback:
         pass
 
     def playbook_on_start(self, event_data, **kwargs):
-        if settings.DEBUG_DEV:
-            print("DEBUG: delete inventory: ", os.path.join(self.private_data_dir, 'inventory'))
         inventory_path = os.path.join(self.private_data_dir, 'inventory', 'hosts')
         if os.path.exists(inventory_path):
             os.remove(inventory_path)

@@ -36,11 +36,6 @@ class PingManager(BasePlaybookManager):
                 account.set_connectivity(Connectivity.OK)
         except Exception as e:
             super().on_host_error(host, str(e), result)
-            print(
-                f'\033[31m Update account {getattr(account, "name", "-")} or '
-                f'update asset {getattr(asset, "name", "-")} '
-                f'connectivity failed: {e} \033[0m\n'
-            )
             return
         super().on_host_success(host, result)
 
@@ -57,8 +52,7 @@ class PingManager(BasePlaybookManager):
                 return
             account.set_connectivity(error_tp)
         except Exception as e:
-            print(
-                f'\033[31m Update account {getattr(account, "name", "-")} or '
-                f'update asset {getattr(asset, "name", "-")} '
-                f'connectivity failed: {e} \033[0m\n'
+            logger.warning(
+                "Save connectivity failure result failed: host=%s error=%s",
+                host, e,
             )

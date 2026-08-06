@@ -66,7 +66,7 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
     def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \
                 and not self.execution.snapshot.get('secret'):
-            print('Custom secret is empty')
+            print(_("Secret cannot be empty"))
             return False
         return True
 
@@ -78,29 +78,31 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
 
     @staticmethod
     def get_summary(records):
-        total, succeed, failed, unverified = 0, 0, 0, 0
-        for record in records:
-            if record.status == ChangeSecretRecordStatusChoice.success.value:
-                succeed += 1
-            elif record.status == ChangeSecretRecordStatusChoice.unverified.value:
-                unverified += 1
-            else:
-                failed += 1
-            total += 1
+        succeed, failed, unverified = (
+            BaseChangeSecretPushManager.get_record_result_counts(records)
+        )
+        total = succeed + failed + unverified
         summary = _(
-            'Success: %s, Unverified: %s, Failed: %s, Total: %s'
-        ) % (succeed, unverified, failed, total)
+            'Successful: %(success)s, Needs verification: %(unverified)s, '
+            'Failed: %(failed)s, Total: %(total)s'
+        ) % {
+            'success': succeed,
+            'unverified': unverified,
+            'failed': failed,
+            'total': total,
+        }
         return summary
 
     def print_summary(self):
         records = list(self.name_record_mapper.values())
-        summary = self.get_summary(records)
-        print('\n\n' + '-' * 80)
-        plan_execution_end = _('Plan execution end')
-        print('{} {}\n'.format(plan_execution_end, local_now_filename()))
-        time_cost = _('Duration')
-        print('{}: {}s'.format(time_cost, self.duration))
-        print(summary)
+        success, failed, unverified = self.get_record_result_counts(records)
+        self.print_result_summary(
+            success,
+            failed,
+            unverified,
+            total=success + failed + unverified,
+            include_unverified=True,
+        )
 
     def send_report_if_need(self, *args, **kwargs):
         if self.secret_type and not self.check_secret():
