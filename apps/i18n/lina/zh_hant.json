@@ -1762,5 +1762,12 @@
     "SyslogFacility": "Syslog 設施",
     "SyslogHelpText": "請點擊'提交'按鈕儲存當前設定後，再點擊'測試'以確保資訊生效",
     "SyslogSockType": "Syslog 套接字類型",
-    "SyslogTest": "測試"
+    "SyslogTest": "測試",
+    "StorageHelpText": "儲存配置相關設定",
+    "FileAudit": "檔案審計",
+    "StorageReclamation": "儲存回收",
+    "FTPFileMaxStore": "FTP 檔案最大儲存",
+    "FTPFileMaxStoreHelpTip": "FTP 檔案上傳最大儲存大小 (MB)，<= 0 表示不備份",
+    "StorageUsageThreshold": "儲存使用閾值",
+    "StorageUsageThresholdHelpTip": "儲存使用閾值 (MB)，0 表示不限制"
 }

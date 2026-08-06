@@ -1713,5 +1713,12 @@
     "SyslogFacility": "Syslog facility",
     "SyslogHelpText": "Nhấp 'Gửi' để lưu cấu hình, sau đó nhấp 'Kiểm tra' để đảm bảo có hiệu lực",
     "SyslogSockType": "Syslog socket type",
-    "SyslogTest": "Kiểm tra"
+    "SyslogTest": "Kiểm tra",
+    "StorageHelpText": "Cài đặt cấu hình lưu trữ",
+    "FileAudit": "Kiểm tra tệp",
+    "StorageReclamation": "Thu hồi lưu trữ",
+    "FTPFileMaxStore": "Lưu trữ tối đa tệp FTP",
+    "FTPFileMaxStoreHelpTip": "Kích thước lưu trữ tối đa khi tải lên tệp FTP (MB), <= 0 nghĩa là không sao lưu",
+    "StorageUsageThreshold": "Ngưỡng sử dụng lưu trữ",
+    "StorageUsageThresholdHelpTip": "Ngưỡng sử dụng lưu trữ (MB), 0 nghĩa là không giới hạn"
 }

@@ -73,6 +73,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'virtualapp': serializers.VirtualAppSerializer,
         'tool': serializers.ToolSerializer,
         'syslog': serializers.SyslogSettingSerializer,
+        'storage': serializers.StorageSettingSerializer,
     }
 
     rbac_category_permissions = {
@@ -118,6 +119,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cmpp2': 'settings.change_sms',
         'vault': 'settings.change_vault',
         'syslog': 'settings.change_other',
+        'storage': 'settings.change_terminal',
     }
 
     def get_queryset(self):

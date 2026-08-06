@@ -1718,5 +1718,12 @@
     "SyslogFacility": "Syslog facility",
     "SyslogHelpText": "「送信」をクリックして設定を保存し、「テスト」をクリックして有効になっていることを確認してください",
     "SyslogSockType": "Syslog socket type",
-    "SyslogTest": "テスト"
+    "SyslogTest": "テスト",
+    "StorageHelpText": "ストレージ設定",
+    "FileAudit": "ファイル監査",
+    "StorageReclamation": "ストレージ回収",
+    "FTPFileMaxStore": "FTPファイル最大保存容量",
+    "FTPFileMaxStoreHelpTip": "FTPファイルアップロードの最大保存サイズ(MB)、0以下の場合はバックアップなし",
+    "StorageUsageThreshold": "ストレージ使用しきい値",
+    "StorageUsageThresholdHelpTip": "ストレージ使用しきい値(MB)、0の場合は制限なし"
 }

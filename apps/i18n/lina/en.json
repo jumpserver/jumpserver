@@ -1789,5 +1789,12 @@
     "SyslogFacility": "Syslog facility",
     "SyslogHelpText": "Please click 'Submit' to save the configuration, then click 'Test' to ensure it takes effect",
     "SyslogSockType": "Syslog socket type",
-    "SyslogTest": "Test"
+    "SyslogTest": "Test",
+    "StorageHelpText": "Storage configuration settings",
+    "FileAudit": "File Audit",
+    "StorageReclamation": "Storage Reclamation",
+    "FTPFileMaxStore": "FTP file max store",
+    "FTPFileMaxStoreHelpTip": "FTP file upload max store size (MB), <= 0 means no backup",
+    "StorageUsageThreshold": "Storage usage threshold",
+    "StorageUsageThresholdHelpTip": "Storage usage threshold (MB), 0 means no limit"
 }

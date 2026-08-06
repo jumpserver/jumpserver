@@ -1800,5 +1800,12 @@
     "SyslogFacility": "Syslog 设施",
     "SyslogHelpText": "请点击'提交'按钮保存当前配置后，再点击'测试'以确保信息生效",
     "SyslogSockType": "Syslog 套接字类型",
-    "SyslogTest": "测试"
+    "SyslogTest": "测试",
+    "StorageHelpText": "存储配置相关设置",
+    "FileAudit": "文件审计",
+    "StorageReclamation": "存储回收",
+    "FTPFileMaxStore": "FTP 文件最大存储",
+    "FTPFileMaxStoreHelpTip": "FTP 文件上传最大存储大小 (MB)，<= 0 表示不备份",
+    "StorageUsageThreshold": "存储使用阈值",
+    "StorageUsageThresholdHelpTip": "存储使用阈值 (MB)，0 表示不限制"
 }

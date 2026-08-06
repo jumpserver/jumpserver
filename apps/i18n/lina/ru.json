@@ -1715,5 +1715,12 @@
     "SyslogFacility": "Syslog facility",
     "SyslogHelpText": "Нажмите 'Отправить', чтобы сохранить конфигурацию, затем нажмите 'Тест', чтобы убедиться в её применении",
     "SyslogSockType": "Syslog socket type",
-    "SyslogTest": "Тест"
+    "SyslogTest": "Тест",
+    "StorageHelpText": "Настройки хранения",
+    "FileAudit": "Аудит файлов",
+    "StorageReclamation": "Восстановление хранилища",
+    "FTPFileMaxStore": "Макс. размер FTP файла",
+    "FTPFileMaxStoreHelpTip": "Максимальный размер загружаемого FTP файла (МБ), <= 0 означает без резервного копирования",
+    "StorageUsageThreshold": "Порог использования хранилища",
+    "StorageUsageThresholdHelpTip": "Порог использования хранилища (МБ), 0 означает без ограничений"
 }

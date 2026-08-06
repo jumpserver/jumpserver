@@ -1714,5 +1714,12 @@
     "SyslogFacility": "Syslog facility",
     "SyslogHelpText": "Clique em 'Enviar' para salvar a configuração, depois clique em 'Testar' para garantir que seja aplicada",
     "SyslogSockType": "Syslog socket type",
-    "SyslogTest": "Testar"
+    "SyslogTest": "Testar",
+    "StorageHelpText": "Configurações de armazenamento",
+    "FileAudit": "Auditoria de arquivos",
+    "StorageReclamation": "Recuperação de armazenamento",
+    "FTPFileMaxStore": "Armazenamento máximo de arquivos FTP",
+    "FTPFileMaxStoreHelpTip": "Tamanho máximo de armazenamento de upload de arquivos FTP (MB), <= 0 significa sem backup",
+    "StorageUsageThreshold": "Limite de uso de armazenamento",
+    "StorageUsageThresholdHelpTip": "Limite de uso de armazenamento (MB), 0 significa sem limite"
 }
