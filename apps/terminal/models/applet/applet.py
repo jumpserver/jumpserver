@@ -11,12 +11,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
-from assets.models import Platform
+from assets.models import Platform, PlatformPackage
 from assets.utils.platform_package import (
-    has_platform_package,
     locate_package_root,
-    save_platform_from_package,
-    validate_platform_package,
 )
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
@@ -93,34 +90,11 @@ class Applet(JMSBaseModel):
             return yaml.safe_load(f)
 
     @property
-    def automations_path(self) -> str:
-        return os.path.join(self.path, 'automations')
-
-    @property
     def icon(self) -> str:
         path = os.path.join(self.path, 'icon.png')
         if not os.path.exists(path):
             return None
         return os.path.join(settings.MEDIA_URL, 'applets', self.name, 'icon.png')
-
-    @staticmethod
-    def get_automation_methods(path=None, lang=None):
-        from assets.automations.methods import check_platform_methods
-        from assets.utils.platform_package import get_platform_automation_methods_from_pkg
-
-        methods = []
-        try:
-            applets = Applet.objects.filter(is_active=True).only('name', 'builtin')
-        except Exception:
-            return methods
-        for applet in applets:
-            applet_path = path or applet.automations_path
-            if not os.path.isdir(applet_path):
-                continue
-            applet_methods = get_platform_automation_methods_from_pkg(applet_path, lang=lang)
-            methods.extend(applet_methods)
-        check_platform_methods(methods)
-        return methods
 
     @classmethod
     def validate_pkg(cls, d):
@@ -135,8 +109,14 @@ class Applet(JMSBaseModel):
 
         if not manifest.get('name', ''):
             raise ValidationError({'error': 'Missing name in manifest.yml'})
-        if has_platform_package(d):
-            validate_platform_package(d)
+        has_platform = PlatformPackage.source_exists(d)
+        methods = PlatformPackage.load_automation_methods(d)
+        if methods and not has_platform:
+            raise ValidationError({
+                'error': _('Applet automation requires platform.yml')
+            })
+        if has_platform:
+            PlatformPackage.validate(d)
         return manifest
 
     @staticmethod
@@ -144,14 +124,30 @@ class Applet(JMSBaseModel):
         return locate_package_root(extract_to, filename, 'manifest.yml')
 
     def load_platform_if_need(self, d):
-        if not has_platform_package(d):
+        if not PlatformPackage.source_exists(d):
             return
         created_by = 'Applet:{}'.format(self.name)
         instance = self.get_related_platform()
-        save_platform_from_package(d, instance=instance, created_by=created_by)
+        platform = PlatformPackage.sync_platform(
+            d, instance=instance, created_by=created_by
+        )
+
+        # Applet is only the delivery vehicle. Once it contains automation,
+        # persist it as a PlatformPackage and load methods from that package.
+        methods = PlatformPackage.load_automation_methods(d)
+        package = platform.package
+        if not methods and package is None:
+            return platform
+        if package is None:
+            package = PlatformPackage.objects.create(name=platform.name)
+            platform.package = package
+            platform.save(update_fields=['package'])
+        package.persist(d)
+        return platform
 
     @classmethod
     def install_from_dir(cls, path, builtin=True):
+        from assets.const import AllTypes
         from terminal.serializers import AppletSerializer
 
         manifest = cls.validate_pkg(path)
@@ -166,6 +162,7 @@ class Applet(JMSBaseModel):
         if os.path.exists(pkg_path):
             shutil.rmtree(pkg_path)
         shutil.copytree(path, pkg_path)
+        AllTypes.reload_automation_methods()
         return instance, serializer
 
     host_prefer_key_tpl = 'applet_host_prefer_{}'

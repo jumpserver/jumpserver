@@ -13,13 +13,12 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from assets.const import AllTypes
-from assets.models import Platform, Node, Asset, PlatformProtocol, PlatformAutomation
+from assets.models import (
+    Platform, PlatformPackage, Node, Asset, PlatformProtocol, PlatformAutomation,
+)
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
 from assets.utils.platform_package import (
     locate_package_root,
-    persist_platform_package,
-    save_platform_from_package,
-    validate_platform_package,
 )
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
@@ -77,6 +76,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         queryset = (
             super().get_queryset()
             .annotate(assets_amount=Coalesce(Subquery(asset_count_subquery), Value(0)))
+            .select_related('package')
             .prefetch_related('protocols', 'automation')
         )
         queryset = queryset.filter(type__in=AllTypes.get_types_values())
@@ -87,6 +87,25 @@ class AssetPlatformViewSet(JMSModelViewSet):
         if pk.isnumeric():
             return super().get_object()
         return self.get_queryset().get(name=pk)
+
+    def perform_create(self, serializer):
+        clone_from = self.request.query_params.get('clone_from')
+        source = None
+        if clone_from:
+            source = Platform.objects.filter(pk=clone_from).first()
+            if source is None:
+                raise ValidationError({'clone_from': _('Invalid platform')})
+            category = serializer.validated_data.get('category')
+            tp = serializer.validated_data.get('type')
+            if (category, tp) != (source.category, source.type):
+                raise ValidationError({
+                    'clone_from': _('The cloned platform category and type must match the source')
+                })
+
+        platform = serializer.save()
+        if source and source.package_id:
+            platform.package = source.package
+            platform.save(update_fields=['package'])
 
 
     def check_permissions(self, request):
@@ -145,15 +164,21 @@ class AssetPlatformViewSet(JMSModelViewSet):
                 raise ValidationError({'error': 'Invalid zip file: {}'.format(e)})
 
             tmp_dir = locate_package_root(extract_to, file.name, 'platform.yml')
-            data = validate_platform_package(tmp_dir)
+            data = PlatformPackage.validate(tmp_dir)
             if not data:
                 raise ValidationError({'error': 'Missing platform.yml in package'})
             name = data['name']
             instance = Platform.objects.filter(name=name).first()
-            platform = save_platform_from_package(
+            platform = PlatformPackage.sync_platform(
                 tmp_dir, instance=instance, created_by='PlatformPackageUpload'
             )
-            persist_platform_package(tmp_dir, platform.name)
+            package = platform.package
+            if package is None:
+                package = PlatformPackage.objects.create(name=platform.name)
+                platform.package = package
+                platform.save(update_fields=['package'])
+            package.persist(tmp_dir)
+            AllTypes.reload_automation_methods()
             output_serializer = PlatformSerializer(platform, context=self.get_serializer_context())
             return Response(output_serializer.data, status=201)
         finally:

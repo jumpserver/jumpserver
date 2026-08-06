@@ -12,6 +12,8 @@ class AssetsConfig(AppConfig):
         super().__init__(*args, **kwargs)
 
     def ready(self):
+        from assets.const import AllTypes
         from . import signal_handlers  # noqa
         from . import tasks  # noqa
+        AllTypes.reload_automation_methods()
         super().ready()

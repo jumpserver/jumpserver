@@ -181,6 +181,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     custom_fields = PlatformCustomField(label=_("Custom fields"), many=True, required=False)
     assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Assets'))
     assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
+    has_package = serializers.SerializerMethodField(label=_('Has package'))
 
     class Meta:
         model = Platform
@@ -196,7 +197,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         fields_m2m = ['assets', 'assets_amount']
         fields = fields_small + fields_m2m + [
             "protocols", "gateway_enabled", "su_enabled", "su_method",
-            "ds_enabled", "automation", "comment", "custom_fields", "labels"
+            "ds_enabled", "automation", "comment", "custom_fields", "labels", "has_package"
         ] + read_only_fields
         extra_kwargs = {
             "su_enabled": {
@@ -243,6 +244,10 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         tp = self.fields['type']
         tp.choices[name] = label
         tp.choice_strings_to_values[name] = label
+
+    @staticmethod
+    def get_has_package(obj):
+        return bool(obj.package_id and obj.package.exists)
 
     @lazyproperty
     def constraints(self):
