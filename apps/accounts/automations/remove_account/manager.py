@@ -65,7 +65,6 @@ class RemoveAccountManager(AccountBasePlaybookManager):
                 inventory_hosts.append(h)
                 continue
             if username.lower() in self.super_accounts:
-                print("Super account can not be remove: ", username)
                 h["error"] = "Super account can not be removed"
                 inventory_hosts.append(h)
                 continue

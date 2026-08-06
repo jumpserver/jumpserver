@@ -184,6 +184,13 @@ class SuperPlaybookRunner(PlaybookRunner):
         self.envs = {"ANSIBLE_SUPER_MODE": "1"}
         self.isolate = False
 
+    def run(self, *args, **kwargs):
+        # Automation tasks report their own user-oriented progress. Suppress
+        # Ansible's raw PLAY/TASK/RECAP stream unless an administrator has
+        # explicitly enabled Ansible debugging.
+        kwargs.setdefault('quiet', not settings.DEBUG_ANSIBLE)
+        return super().run(*args, **kwargs)
+
 
 class UploadFileRunner:
     UPLOAD_STAGING_DIR = 'upload'

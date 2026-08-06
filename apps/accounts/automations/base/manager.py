@@ -1,3 +1,6 @@
+import json
+import os
+import shutil
 from copy import deepcopy
 
 from django.conf import settings
@@ -22,6 +25,70 @@ logger = get_logger(__name__)
 class AccountBasePlaybookManager(BasePlaybookManager):
     template_path = ''
 
+    @staticmethod
+    def changes_execution_account(runner):
+        try:
+            with open(runner.inventory, 'r') as inventory_file:
+                inventory = json.load(inventory_file)
+        except (OSError, TypeError, ValueError):
+            return False
+
+        hosts = inventory.get('all', {}).get('hosts', {})
+        for detail in hosts.values():
+            target = (detail.get('account') or {}).get('username')
+            execution = (
+                (detail.get('jms_account') or {}).get('username')
+                or detail.get('ansible_user')
+            )
+            if (
+                    target and execution
+                    and str(target).casefold() == str(execution).casefold()
+            ):
+                return True
+        return False
+
+    @staticmethod
+    def configure_runner_environment(runner):
+        BasePlaybookManager.configure_runner_environment(runner)
+        # Account automations represent every account as an Ansible host. The
+        # hosts can share one physical asset and one privileged account, so
+        # re-authenticating for every task creates dozens of identical SSH
+        # logins. Serialize creation of the first connection and reuse it for
+        # the remaining operations on that endpoint.
+        if not AccountBasePlaybookManager.changes_execution_account(runner):
+            runner.envs.setdefault(
+                'ANSIBLE_SSH_ARGS',
+                '-C -o ControlMaster=auto -o ControlPersist=60s',
+            )
+        wrapper_source = os.path.join(
+            settings.APPS_DIR, 'ops', 'ansible', 'serialized_ssh.py'
+        )
+        wrapper_dir = os.path.join(
+            runner.project_dir, '.serialized-ssh'
+        )
+        os.makedirs(wrapper_dir, mode=0o700, exist_ok=True)
+        for client in ('ssh', 'scp', 'sftp'):
+            wrapper_path = os.path.join(wrapper_dir, client)
+            shutil.copyfile(wrapper_source, wrapper_path)
+            os.chmod(wrapper_path, 0o700)
+            runner.envs[f'ANSIBLE_{client.upper()}_EXECUTABLE'] = (
+                wrapper_path
+            )
+
+    def get_target_summary(self):
+        account_count = len(set(map(
+            str, self.execution.snapshot.get('accounts', [])
+        )))
+        asset_count = len(set(map(
+            str, self.execution.snapshot.get('assets', [])
+        )))
+        return _(
+            "Targets: %(accounts)s account(s) on %(assets)s asset(s)"
+        ) % {
+            'accounts': account_count,
+            'assets': asset_count,
+        }
+
     @property
     def platform_automation_methods(self):
         from assets.const import AllTypes
@@ -44,6 +111,41 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.inventory_account_mapper = {}
         self.account_locks = {}
         self.found_account_ids = set()
+
+    @staticmethod
+    def get_record_result_counts(records):
+        success = failed = unverified = 0
+        for record in records:
+            if record.status == ChangeSecretRecordStatusChoice.success.value:
+                success += 1
+            elif record.status == ChangeSecretRecordStatusChoice.unverified.value:
+                unverified += 1
+            else:
+                failed += 1
+        return success, failed, unverified
+
+    def get_host_success_log(self, host):
+        return None, None
+
+    def print_final_host_result(self, host, record):
+        if (
+                record
+                and record.status
+                == ChangeSecretRecordStatusChoice.unverified.value
+        ):
+            self.print_log(_(
+                "△ %(host)s: operation completed; verification pending"
+            ) % {'host': host}, 'progress')
+            return
+
+        if str(self.method_type()) == 'change_secret':
+            result = _("secret changed and verified")
+        else:
+            result = _("account pushed and verified")
+        self.print_log(_("✓ %(host)s: %(result)s") % {
+            'host': host,
+            'result': result,
+        }, 'success')
 
     def gen_account_inventory(self, account, asset, h, path_dir):
         raise NotImplementedError
@@ -150,7 +252,13 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         error_msg = _("No pending accounts found")
         if not accounts:
-            print(f'{asset}: {error_msg}')
+            self.result['skipped_assets'].append({
+                'asset': str(asset),
+                'reason': str(error_msg),
+            })
+            self.print_log(_(
+                "○ %(asset)s: skipped; no eligible accounts"
+            ) % {'asset': asset}, 'progress')
             return []
 
         if asset.type == HostTypes.WINDOWS:
@@ -321,7 +429,6 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         account = record.account
         if not account:
-            print("Account not found, deleted ?")
             result_key = (
                 'unverified_accounts'
                 if inconclusive_probe
@@ -342,6 +449,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
                     'record=%s host=%s',
                     getattr(record, 'id', None), host,
                 )
+                record.status = ChangeSecretRecordStatusChoice.unverified.value
+            self.print_final_host_result(host, record)
             inventory_account = self.inventory_account_mapper.get(host)
             if inventory_account:
                 self.clear_account_queue_status(inventory_account.id)
@@ -404,6 +513,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
                     )
             finally:
                 self.clear_account_queue_status(account.id)
+        self.print_final_host_result(host, record)
 
     def finalize_incomplete_record(self, record, error):
         if record.status != ChangeSecretRecordStatusChoice.pending.value:
@@ -566,11 +676,11 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         record.error = error
         account = record.account
         if not account:
-            print("Account not found, deleted ?")
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
                 "asset": str(record.asset),
                 "username": record.comment or '',
+                "error": str(error),
             })
             super().on_host_error(host, error, result)
             try:
@@ -595,6 +705,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             {
                 "asset": str(record.asset),
                 "username": record.account.username,
+                "error": str(error),
             }
         )
         super().on_host_error(host, error, result)

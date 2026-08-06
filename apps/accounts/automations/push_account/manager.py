@@ -1,10 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import (
-    AutomationTypes, ChangeSecretRecordStatusChoice,
+    AutomationTypes,
 )
 from common.utils import get_logger
-from common.utils.timezone import local_now_filename
 from ..base.manager import BaseChangeSecretPushManager
 from ...models import PushSecretRecord
 
@@ -60,36 +59,17 @@ class PushAccountManager(BaseChangeSecretPushManager):
         return record
 
     def print_summary(self):
-        print('\n\n' + '-' * 80)
-        plan_execution_end = _('Plan execution end')
-        print('{} {}\n'.format(plan_execution_end, local_now_filename()))
-        time_cost = _('Duration')
-        print('{}: {}s'.format(time_cost, self.duration))
         records = {
             str(record.id): record
             for record in self.name_record_mapper.values()
         }.values()
-        success = sum(
-            record.status == ChangeSecretRecordStatusChoice.success.value
-            for record in records
-        )
-        unverified = sum(
-            record.status == ChangeSecretRecordStatusChoice.unverified.value
-            for record in records
-        )
-        failed = sum(
-            record.status == ChangeSecretRecordStatusChoice.failed.value
-            for record in records
-        )
-        total = success + unverified + failed
-        print(
-            _('Success: %(success)s, Unverified: %(unverified)s, Failed: %(failed)s, Total: %(total)s')
-            % {
-                'success': success,
-                'unverified': unverified,
-                'failed': failed,
-                'total': total,
-            }
+        success, failed, unverified = self.get_record_result_counts(records)
+        self.print_result_summary(
+            success,
+            failed,
+            unverified,
+            total=success + failed + unverified,
+            include_unverified=True,
         )
 
     def get_report_template(self):
