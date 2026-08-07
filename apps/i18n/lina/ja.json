@@ -1401,6 +1401,7 @@
     "RoleManage": "管理役割",
     "RoleUpdate": "ロールの更新",
     "RoleUsers": "権限ユーザー",
+    "RowNumber": "番号",
     "Rows": "行",
     "Rule": "条件",
     "RuleCount": "条件の数",
@@ -1889,6 +1890,5 @@
     "selectedAssets": "選択した資産",
     "setVariable": "パラメータ設定",
     "userId": "ユーザーID",
-    "userName": "ユーザー名",
-    "RowNumber": "番号"
+    "userName": "ユーザー名"
 }

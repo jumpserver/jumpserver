@@ -1401,6 +1401,7 @@
     "RoleManage": "角色管理",
     "RoleUpdate": "更新角色",
     "RoleUsers": "授權用戶",
+    "RowNumber": "序號",
     "Rows": "列",
     "Rule": "條件",
     "RuleCount": "條件數量",
@@ -1889,6 +1890,5 @@
     "selectedAssets": "已選資產",
     "setVariable": "設置參數",
     "userId": "用戶ID",
-    "userName": "用戶名",
-    "RowNumber": "序號"
+    "userName": "用戶名"
 }
