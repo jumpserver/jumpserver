@@ -1891,5 +1891,6 @@
     "selectedAssets": "Selected assets",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name"
+    "userName": "User name",
+    "RowNumber": "No."
 }

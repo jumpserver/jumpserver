@@ -1889,5 +1889,6 @@
     "selectedAssets": "選択した資産",
     "setVariable": "パラメータ設定",
     "userId": "ユーザーID",
-    "userName": "ユーザー名"
+    "userName": "ユーザー名",
+    "RowNumber": "番号"
 }

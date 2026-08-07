@@ -1885,5 +1885,6 @@
     "LabelFilterAllValues": "全部值",
     "LabelFilterSelectKey": "请选择标签键",
     "LabelFilterKeyLabel": "键",
-    "LabelFilterValueLabel": "值"
+    "LabelFilterValueLabel": "值",
+    "RowNumber": "序号"
 }
