@@ -1364,7 +1364,7 @@
     "ResourceSelectRemoveAll": "Удалить все",
     "ResourceSelectRemoveSelected": "Удалить выбранные элементы ({count})",
     "ResourceSelectSelected": "Выбрано",
-    "ResourceSelectSelectedCount": "Выбрано {count}",
+    "ResourceSelectSelectedCount": "Выбрано: {count} {resource}",
     "ResourceSelectSelectedResources": "Выбранные ресурсы",
     "ResourceSelectSelectedSummary": "Выбраны {resource} ({count}): {names} и др.",
     "ResourceSelectTotal": "Общее количество ресурсов",
