@@ -59,12 +59,16 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
         if url:
             break
 
+    # 处理下载地址编码问题 '%2Fui%2F'
+    url = unquote(url)
+
+    # URL 解码后再进行安全校验，避免编码后的外部地址绕过校验
     url = safe_next_url(url, request=request)
+
     # 防止 next 地址为 None
     if not url or url.lower() in ['none']:
         url = reverse('index')
-    # 处理下载地址编码问题 '%2Fui%2F'
-    url = unquote(url)
+
     return url
 
 
