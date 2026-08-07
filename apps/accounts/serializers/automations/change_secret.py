@@ -136,7 +136,7 @@ class ChangeSecretAutomationListSerializer(AutomationListSerializerMixin, Change
         relation_count_fields = {'assets_amount': 'assets', 'nodes_amount': 'nodes'}
         fields = [
             f for f in ChangeSecretAutomationSerializer.Meta.fields
-            if f not in ('assets', 'nodes')
+            if f not in ('assets', 'nodes', 'recipients')
         ] + ['assets_amount', 'nodes_amount']
 
 

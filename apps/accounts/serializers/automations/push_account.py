@@ -25,7 +25,7 @@ class PushAccountAutomationListSerializer(AutomationListSerializerMixin, PushAcc
         relation_count_fields = {'assets_amount': 'assets', 'nodes_amount': 'nodes'}
         fields = [
             f for f in PushAccountAutomationSerializer.Meta.fields
-            if f not in ('assets', 'nodes')
+            if f not in ('assets', 'nodes', 'recipients')
         ] + ['assets_amount', 'nodes_amount']
 
 
