@@ -1889,5 +1889,6 @@
     "selectedAssets": "已選資產",
     "setVariable": "設置參數",
     "userId": "用戶ID",
-    "userName": "用戶名"
+    "userName": "用戶名",
+    "RowNumber": "序號"
 }
