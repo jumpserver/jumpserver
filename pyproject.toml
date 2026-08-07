@@ -138,7 +138,7 @@ dependencies = [
     'pycountry>=024.6.1',
     'premailer==3.10.0',
     'azure-storage-blob==12.17.0',
-    'esdk-obs-python==3.21.4',
+    'esdk-obs-python==3.26.2',
     'oss2==2.18.1',
     'aliyun-python-sdk-core==2.15.2',
     'boto3==1.42.93',
