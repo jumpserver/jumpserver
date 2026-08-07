@@ -22,7 +22,10 @@ from common.permissions import IsValidLicense
 from common.utils import many_get
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
-from .base import AutomationExecutionViewSet
+from .base import (
+    AutomationExecutionViewSet, AutomationAssetsListApi, AutomationRemoveAssetApi,
+    AutomationAddAssetApi, AutomationNodeAddRemoveApi
+)
 from ...filters import (
     AccountRiskFilterSet, CheckAccountAutomationFilterSet,
     NodeFilterBackend,
@@ -34,6 +37,8 @@ __all__ = [
     "CheckAccountExecutionViewSet",
     "AccountRiskViewSet",
     "CheckAccountEngineViewSet",
+    "CheckAccountAssetsListApi", "CheckAccountRemoveAssetApi",
+    "CheckAccountAddAssetApi", "CheckAccountNodeAddRemoveApi",
 ]
 
 
@@ -42,7 +47,10 @@ class CheckAccountAutomationViewSet(OrgBulkModelViewSet):
     filterset_class = CheckAccountAutomationFilterSet
     search_fields = ("name",)
     permission_classes = [RBACPermission, IsValidLicense]
-    serializer_class = serializers.CheckAccountAutomationSerializer
+    serializer_classes = {
+        'default': serializers.CheckAccountAutomationSerializer,
+        'list': serializers.CheckAccountAutomationListSerializer,
+    }
 
 
 class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
@@ -166,3 +174,19 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
                 if search in item['name'] or item['comment']
             ]
         return queryset
+
+
+class CheckAccountAssetsListApi(AutomationAssetsListApi):
+    model = CheckAccountAutomation
+
+
+class CheckAccountRemoveAssetApi(AutomationRemoveAssetApi):
+    model = CheckAccountAutomation
+
+
+class CheckAccountAddAssetApi(AutomationAddAssetApi):
+    model = CheckAccountAutomation
+
+
+class CheckAccountNodeAddRemoveApi(AutomationNodeAddRemoveApi):
+    model = CheckAccountAutomation

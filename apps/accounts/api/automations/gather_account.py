@@ -16,12 +16,17 @@ from assets.models import Asset
 from common.const import ConfirmOrIgnore
 from common.utils.http import is_true
 from orgs.mixins.api import OrgBulkModelViewSet
-from .base import AutomationExecutionViewSet
+from .base import (
+    AutomationExecutionViewSet, AutomationAssetsListApi, AutomationRemoveAssetApi,
+    AutomationAddAssetApi, AutomationNodeAddRemoveApi
+)
 
 __all__ = [
     "DiscoverAccountsAutomationViewSet",
     "DiscoverAccountsExecutionViewSet",
     "GatheredAccountViewSet",
+    "DiscoverAccountsAssetsListApi", "DiscoverAccountsRemoveAssetApi",
+    "DiscoverAccountsAddAssetApi", "DiscoverAccountsNodeAddRemoveApi",
 ]
 
 from ...risk_handlers import RiskHandler
@@ -31,7 +36,10 @@ class DiscoverAccountsAutomationViewSet(OrgBulkModelViewSet):
     model = GatherAccountsAutomation
     filterset_fields = ("name",)
     search_fields = filterset_fields
-    serializer_class = serializers.DiscoverAccountAutomationSerializer
+    serializer_classes = {
+        'default': serializers.DiscoverAccountAutomationSerializer,
+        'list': serializers.DiscoverAccountAutomationListSerializer,
+    }
 
 
 class DiscoverAccountsExecutionViewSet(AutomationExecutionViewSet):
@@ -129,3 +137,19 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         account = get_object_or_404(GatheredAccount, pk=pk)
         serializer = self.get_serializer(account.detail)
         return Response(data=serializer.data)
+
+
+class DiscoverAccountsAssetsListApi(AutomationAssetsListApi):
+    model = GatherAccountsAutomation
+
+
+class DiscoverAccountsRemoveAssetApi(AutomationRemoveAssetApi):
+    model = GatherAccountsAutomation
+
+
+class DiscoverAccountsAddAssetApi(AutomationAddAssetApi):
+    model = GatherAccountsAutomation
+
+
+class DiscoverAccountsNodeAddRemoveApi(AutomationNodeAddRemoveApi):
+    model = GatherAccountsAutomation

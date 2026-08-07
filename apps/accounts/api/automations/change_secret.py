@@ -38,7 +38,10 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
     permission_classes = [RBACPermission, IsValidLicense]
     filterset_class = ChangeSecretAutomationFilterSet
     search_fields = ('name',)
-    serializer_class = serializers.ChangeSecretAutomationSerializer
+    serializer_classes = {
+        'default': serializers.ChangeSecretAutomationSerializer,
+        'list': serializers.ChangeSecretAutomationListSerializer,
+    }
 
 
 class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
