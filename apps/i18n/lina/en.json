@@ -1402,6 +1402,7 @@
     "RoleManage": "Manage role",
     "RoleUpdate": "Update the role",
     "RoleUsers": "Authorized users",
+    "RowNumber": "No.",
     "Rows": "Row",
     "Rule": "Condition",
     "RuleCount": "Condition quantity",
@@ -1891,6 +1892,5 @@
     "selectedAssets": "Selected assets",
     "setVariable": "Set variable",
     "userId": "User ID",
-    "userName": "User name",
-    "RowNumber": "No."
+    "userName": "User name"
 }
