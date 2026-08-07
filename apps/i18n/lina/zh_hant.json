@@ -1764,10 +1764,17 @@
     "SyslogSockType": "Syslog 套接字類型",
     "SyslogTest": "測試",
     "StorageHelpText": "儲存配置相關設定",
-    "FileAudit": "檔案審計",
-    "StorageReclamation": "儲存回收",
+    "NasSetting": "NAS 存儲設定",
     "FTPFileMaxStore": "FTP 檔案最大儲存",
-    "FTPFileMaxStoreHelpTip": "FTP 檔案上傳最大儲存大小 (MB)，<= 0 表示不備份",
     "StorageUsageThreshold": "儲存使用閾值",
-    "StorageUsageThresholdHelpTip": "儲存使用百分比閾值 (0-100)，0 表示不限制"
+    "NasEnabled": "NAS 存儲啟用",
+    "NasType": "NAS 類型",
+    "NasHost": "NAS 伺服器位址",
+    "NasShareName": "NAS 共用名稱",
+    "NasMountPath": "NAS 掛載路徑",
+    "NasUsername": "NAS 使用者名稱",
+    "NasPassword": "NAS 密碼",
+    "StorageReclamationTargets": "儲存騰退目標",
+    "StorageReclamationTargetsHelpTip": "選擇儲存騰退時需要清理的資料類型",
+    "SessionReplay": "工作階段錄像"
 }

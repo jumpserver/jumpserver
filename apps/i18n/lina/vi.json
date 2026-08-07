@@ -1715,10 +1715,17 @@
     "SyslogSockType": "Syslog socket type",
     "SyslogTest": "Kiểm tra",
     "StorageHelpText": "Cài đặt cấu hình lưu trữ",
-    "FileAudit": "Kiểm tra tệp",
-    "StorageReclamation": "Thu hồi lưu trữ",
+    "NasSetting": "Cài đặt lưu trữ NAS",
     "FTPFileMaxStore": "Lưu trữ tối đa tệp FTP",
-    "FTPFileMaxStoreHelpTip": "Kích thước lưu trữ tối đa khi tải lên tệp FTP (MB), <= 0 nghĩa là không sao lưu",
     "StorageUsageThreshold": "Ngưỡng sử dụng lưu trữ",
-    "StorageUsageThresholdHelpTip": "Ngưỡng phần trăm sử dụng lưu trữ (0-100), 0 nghĩa là không giới hạn"
+    "NasEnabled": "NAS đã bật",
+    "NasType": "Loại NAS",
+    "NasHost": "Máy chủ NAS",
+    "NasShareName": "Tên chia sẻ NAS",
+    "NasMountPath": "Đường dẫn gắn NAS",
+    "NasUsername": "Tên người dùng NAS",
+    "NasPassword": "Mật khẩu NAS",
+    "StorageReclamationTargets": "Mục tiêu giải phóng dung lượng",
+    "StorageReclamationTargetsHelpTip": "Chọn dữ liệu cần dọn khi giải phóng dung lượng",
+    "SessionReplay": "Phát lại phiên"
 }

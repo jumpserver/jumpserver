@@ -36,6 +36,7 @@ __all__ = [
     "UserLoginLog",
     "PasswordChangeLog",
     "IntegrationApplicationLog",
+    "StorageReclamationLog",
 ]
 
 
@@ -351,3 +352,19 @@ class IntegrationApplicationLog(models.Model):
     asset = models.CharField(max_length=128, verbose_name=_("Asset"))
     account = models.CharField(max_length=128, verbose_name=_("Account"))
     datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))
+
+
+class StorageReclamationLog(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    session_id = models.CharField(max_length=36, verbose_name=_("Session ID"))
+    target_type = models.CharField(
+        max_length=32, default='session_replay',
+        verbose_name=_("Target type")
+    )
+    file_path = models.CharField(max_length=1024, verbose_name=_("File path"))
+    file_size = models.BigIntegerField(default=0, verbose_name=_("File size (bytes)"))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+
+    class Meta:
+        ordering = ['-date_created']
+        verbose_name = _('Storage reclamation log')

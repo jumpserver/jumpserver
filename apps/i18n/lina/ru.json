@@ -1717,10 +1717,17 @@
     "SyslogSockType": "Syslog socket type",
     "SyslogTest": "Тест",
     "StorageHelpText": "Настройки хранения",
-    "FileAudit": "Аудит файлов",
-    "StorageReclamation": "Восстановление хранилища",
+    "NasSetting": "Настройки хранилища NAS",
     "FTPFileMaxStore": "Макс. размер FTP файла",
-    "FTPFileMaxStoreHelpTip": "Максимальный размер загружаемого FTP файла (МБ), <= 0 означает без резервного копирования",
     "StorageUsageThreshold": "Порог использования хранилища",
-    "StorageUsageThresholdHelpTip": "Порог использования хранилища в процентах (0-100), 0 означает без ограничений"
+    "NasEnabled": "NAS включен",
+    "NasType": "Тип NAS",
+    "NasHost": "Хост NAS",
+    "NasShareName": "Имя общего ресурса NAS",
+    "NasMountPath": "Путь монтирования NAS",
+    "NasUsername": "Пользователь NAS",
+    "NasPassword": "Пароль NAS",
+    "StorageReclamationTargets": "Цели освобождения хранилища",
+    "StorageReclamationTargetsHelpTip": "Выберите данные для очистки при освобождении хранилища",
+    "SessionReplay": "Запись сеанса"
 }

@@ -1791,10 +1791,17 @@
     "SyslogSockType": "Syslog socket type",
     "SyslogTest": "Test",
     "StorageHelpText": "Storage configuration settings",
-    "FileAudit": "File Audit",
-    "StorageReclamation": "Storage Reclamation",
+    "NasSetting": "NAS storage settings",
     "FTPFileMaxStore": "FTP file max store",
-    "FTPFileMaxStoreHelpTip": "FTP file upload max store size (MB), <= 0 means no backup",
     "StorageUsageThreshold": "Storage usage threshold",
-    "StorageUsageThresholdHelpTip": "Storage usage percentage threshold (0-100), 0 means no limit"
+    "NasEnabled": "NAS enabled",
+    "NasType": "NAS type",
+    "NasHost": "NAS host",
+    "NasShareName": "NAS share name",
+    "NasMountPath": "NAS mount path",
+    "NasUsername": "NAS username",
+    "NasPassword": "NAS password",
+    "StorageReclamationTargets": "Storage reclamation targets",
+    "StorageReclamationTargetsHelpTip": "Select which data to clean during storage reclamation",
+    "SessionReplay": "Session replay"
 }

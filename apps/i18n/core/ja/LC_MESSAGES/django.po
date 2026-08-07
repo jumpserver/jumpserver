@@ -4261,7 +4261,7 @@ msgstr "しきい値に基づくストレージ解放"
 #: audits/tasks.py:185
 msgid ""
 "If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete the oldest day's session records, commands and replays "
+"delete the oldest session replay files and update session records "
 "until usage falls below threshold"
 msgstr ""
 "システムストレージ使用率が STORAGE_USAGE_THRESHOLD (パーセント 0-100) "
@@ -7507,6 +7507,135 @@ msgstr "Syslog アドレスが設定されていないか無効です"
 msgid "Syslog handler is not active, please save configuration first"
 msgstr "Syslog ハンドラーがアクティブではありません。最初に設定を保存してください"
 
+#: settings/api/nas.py:18
+#, python-brace-format
+msgid "NAS connection test successful, mount path is accessible"
+msgstr "NAS 接続テスト成功、マウントパスにアクセス可能"
+
+#: settings/api/nas.py:34
+msgid "NAS storage is not enabled"
+msgstr "NAS ストレージが有効になっていません"
+
+#: settings/api/nas.py:40
+msgid "NAS host is not configured"
+msgstr "NAS ホストが設定されていません"
+
+#: settings/api/nas.py:46
+msgid "NAS mount path is not configured"
+msgstr "NAS マウントパスが設定されていません"
+
+#: settings/api/nas.py:53
+msgid "NAS username is required for CIFS"
+msgstr "CIFS には NAS ユーザー名が必要です"
+
+#: settings/api/nas.py:60
+#, python-brace-format
+msgid "NAS mount path does not exist: {}"
+msgstr "NAS マウントパスが存在しません：{}"
+
+#: settings/api/nas.py:66
+#, python-brace-format
+msgid "NAS mount path is not a directory: {}"
+msgstr "NAS マウントパスがディレクトリではありません：{}"
+
+#: settings/api/nas.py:78
+#, python-brace-format
+msgid "NAS mount path is not writable: {}"
+msgstr "NAS マウントパスに書き込みできません：{}"
+
+#: settings/api/nas.py:83
+#, python-brace-format
+msgid "NAS mount path I/O error: {}"
+msgstr "NAS マウントパス I/O エラー：{}"
+
+#: settings/serializers/storage.py:14
+msgid "FTP file max store"
+msgstr "FTP ファイル最大保存容量"
+
+#: settings/serializers/storage.py:15
+msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgstr "FTPファイルアップロードの最大保存サイズ(MB)、0以下の場合はバックアップなし"
+
+#: settings/serializers/storage.py:18
+msgid "Storage usage threshold"
+msgstr "ストレージ使用しきい値"
+
+#: settings/serializers/storage.py:19
+msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgstr "ストレージ使用率しきい値(0-100)、0の場合は制限なし"
+
+#: settings/serializers/storage.py:22
+msgid "NAS enabled"
+msgstr "NAS 有効"
+
+#: settings/serializers/storage.py:23
+msgid "Enable NAS storage"
+msgstr "NAS ストレージを有効にする"
+
+#: settings/serializers/storage.py:27
+msgid "NAS type"
+msgstr "NAS タイプ"
+
+#: settings/serializers/storage.py:28
+msgid "NAS storage type: NFS or CIFS"
+msgstr "NAS ストレージタイプ: NFS または CIFS"
+
+#: settings/serializers/storage.py:32
+msgid "NAS host"
+msgstr "NAS ホスト"
+
+#: settings/serializers/storage.py:33
+msgid "NAS server address, e.g. 192.168.1.100"
+msgstr "NAS サーバーアドレス、例: 192.168.1.100"
+
+#: settings/serializers/storage.py:37
+msgid "NAS share name"
+msgstr "NAS 共有名"
+
+#: settings/serializers/storage.py:38
+msgid "NAS share or export name"
+msgstr "NAS 共有またはエクスポート名"
+
+#: settings/serializers/storage.py:42
+msgid "NAS mount path"
+msgstr "NAS マウントパス"
+
+#: settings/serializers/storage.py:43
+msgid "Local mount path for NAS storage"
+msgstr "NAS ストレージのローカルマウントパス"
+
+#: settings/serializers/storage.py:47
+msgid "NAS username"
+msgstr "NAS ユーザー名"
+
+#: settings/serializers/storage.py:48
+msgid "NAS login username (CIFS required)"
+msgstr "NAS ログインユーザー名（CIFS 必須）"
+
+#: settings/serializers/storage.py:52
+msgid "NAS password"
+msgstr "NAS パスワード"
+
+#: settings/serializers/storage.py:53
+msgid "NAS login password (CIFS required)"
+msgstr "NAS ログインパスワード（CIFS 必須）"
+
+#: settings/serializers/storage.py:21
+msgid "Session replay"
+msgstr "セッション録画"
+
+#: settings/serializers/storage.py:22
+msgid "File transfer"
+msgstr "ファイル転送"
+
+#: settings/serializers/storage.py:27
+msgid "Storage reclamation targets"
+msgstr "ストレージ解放対象"
+
+#: settings/serializers/storage.py:28
+msgid "Select which data to clean during storage reclamation"
+msgstr "ストレージ解放時にクリーンアップするデータを選択"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
@@ -9715,7 +9844,31 @@ msgstr "ビデオのトランスコーディングに失敗しました"
 
 #: terminal/const.py:108
 msgid "Replay unsupported"
-msgstr "録画はサポートされていません"
+msgstr "録画未対応"
+
+#: terminal/const.py:109
+msgid "Replay cleaned for storage reclamation"
+msgstr "ストレージ解放により録画を削除"
+
+#: audits/models.py:355
+msgid "Storage reclamation log"
+msgstr "ストレージ解放ログ"
+
+#: audits/models.py:357
+msgid "Session ID"
+msgstr "セッション ID"
+
+#: audits/models.py:361
+msgid "Target type"
+msgstr "ターゲットタイプ"
+
+#: audits/models.py:363
+msgid "File path"
+msgstr "ファイルパス"
+
+#: audits/models.py:359
+msgid "File size (bytes)"
+msgstr "ファイルサイズ（バイト）"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

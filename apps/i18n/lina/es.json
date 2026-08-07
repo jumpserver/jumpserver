@@ -1715,10 +1715,17 @@
     "SyslogSockType": "Syslog socket type",
     "SyslogTest": "Probar",
     "StorageHelpText": "Configuración de almacenamiento",
-    "FileAudit": "Auditoría de archivos",
-    "StorageReclamation": "Recuperación de almacenamiento",
+    "NasSetting": "Configuración de almacenamiento NAS",
     "FTPFileMaxStore": "Almacenamiento máximo de archivos FTP",
-    "FTPFileMaxStoreHelpTip": "Tamaño máximo de almacenamiento de carga de archivos FTP (MB), <= 0 significa sin copia de seguridad",
     "StorageUsageThreshold": "Umbral de uso de almacenamiento",
-    "StorageUsageThresholdHelpTip": "Umbral de porcentaje de uso de almacenamiento (0-100), 0 significa sin límite"
+    "NasEnabled": "NAS habilitado",
+    "NasType": "Tipo de NAS",
+    "NasHost": "Host NAS",
+    "NasShareName": "Nombre compartido NAS",
+    "NasMountPath": "Ruta de montaje NAS",
+    "NasUsername": "Usuario NAS",
+    "NasPassword": "Contraseña NAS",
+    "StorageReclamationTargets": "Objetivos de liberación de almacenamiento",
+    "StorageReclamationTargetsHelpTip": "Seleccione qué datos limpiar durante la liberación de almacenamiento",
+    "SessionReplay": "Grabación de sesión"
 }

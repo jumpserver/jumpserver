@@ -1715,10 +1715,17 @@
     "SyslogSockType": "Syslog socket type",
     "SyslogTest": "테스트",
     "StorageHelpText": "스토리지 구성 설정",
-    "FileAudit": "파일 감사",
-    "StorageReclamation": "스토리지 회수",
+    "NasSetting": "NAS 스토리지 설정",
     "FTPFileMaxStore": "FTP 파일 최대 저장",
-    "FTPFileMaxStoreHelpTip": "FTP 파일 업로드 최대 저장 크기(MB), 0 이하는 백업 안 함",
     "StorageUsageThreshold": "스토리지 사용 임계값",
-    "StorageUsageThresholdHelpTip": "스토리지 사용률 임계값(0-100), 0은 제한 없음"
+    "NasEnabled": "NAS 활성화",
+    "NasType": "NAS 유형",
+    "NasHost": "NAS 호스트",
+    "NasShareName": "NAS 공유 이름",
+    "NasMountPath": "NAS 마운트 경로",
+    "NasUsername": "NAS 사용자 이름",
+    "NasPassword": "NAS 비밀번호",
+    "StorageReclamationTargets": "저장소 확보 대상",
+    "StorageReclamationTargetsHelpTip": "저장소 확보 시 정리할 데이터 선택",
+    "SessionReplay": "세션 녹화"
 }

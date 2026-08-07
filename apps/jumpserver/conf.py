@@ -722,6 +722,18 @@ class Config(dict):
         # 存储使用率阈值，百分占比(0-100)，0 表示不限制
         'STORAGE_USAGE_THRESHOLD': 0,
 
+        # 空间腾退清理目标，可选 session_replay / file_transfer
+        'STORAGE_RECLAMATION_TARGETS': ['session_replay', 'file_transfer'],
+
+        # NAS 存储配置
+        'NAS_ENABLED': False,
+        'NAS_TYPE': 'nfs',  # nfs / cifs
+        'NAS_HOST': '',
+        'NAS_SHARE_NAME': '',
+        'NAS_MOUNT_PATH': '',
+        'NAS_USERNAME': '',
+        'NAS_PASSWORD': '',
+
         # API 分页
         'MAX_LIMIT_PER_PAGE': 10000,  # 给导出用
         'MAX_PAGE_SIZE': 1000,

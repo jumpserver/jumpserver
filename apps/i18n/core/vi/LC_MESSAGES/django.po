@@ -4316,7 +4316,7 @@ msgstr "Giải phóng dung lượng theo ngưỡng"
 #: audits/tasks.py:185
 msgid ""
 "If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete the oldest day's session records, commands and replays "
+"delete the oldest session replay files and update session records "
 "until usage falls below threshold"
 msgstr ""
 "Nếu dung lượng sử dụng hệ thống vượt quá STORAGE_USAGE_THRESHOLD "
@@ -7592,6 +7592,135 @@ msgstr "Địa chỉ Syslog chưa được cấu hình hoặc không hợp lệ"
 msgid "Syslog handler is not active, please save configuration first"
 msgstr "Trình xử lý Syslog không hoạt động, vui lòng lưu cấu hình trước"
 
+#: settings/api/nas.py:18
+#, python-brace-format
+msgid "NAS connection test successful, mount path is accessible"
+msgstr "Kiểm tra kết nối NAS thành công, đường dẫn gắn có thể truy cập"
+
+#: settings/api/nas.py:34
+msgid "NAS storage is not enabled"
+msgstr "Lưu trữ NAS chưa được bật"
+
+#: settings/api/nas.py:40
+msgid "NAS host is not configured"
+msgstr "Máy chủ NAS chưa được cấu hình"
+
+#: settings/api/nas.py:46
+msgid "NAS mount path is not configured"
+msgstr "Đường dẫn gắn NAS chưa được cấu hình"
+
+#: settings/api/nas.py:53
+msgid "NAS username is required for CIFS"
+msgstr "Cần tên người dùng NAS cho CIFS"
+
+#: settings/api/nas.py:60
+#, python-brace-format
+msgid "NAS mount path does not exist: {}"
+msgstr "Đường dẫn gắn NAS không tồn tại: {}"
+
+#: settings/api/nas.py:66
+#, python-brace-format
+msgid "NAS mount path is not a directory: {}"
+msgstr "Đường dẫn gắn NAS không phải là thư mục: {}"
+
+#: settings/api/nas.py:78
+#, python-brace-format
+msgid "NAS mount path is not writable: {}"
+msgstr "Đường dẫn gắn NAS không thể ghi: {}"
+
+#: settings/api/nas.py:83
+#, python-brace-format
+msgid "NAS mount path I/O error: {}"
+msgstr "Lỗi I/O đường dẫn gắn NAS: {}"
+
+#: settings/serializers/storage.py:14
+msgid "FTP file max store"
+msgstr "Lưu trữ tối đa tệp FTP"
+
+#: settings/serializers/storage.py:15
+msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgstr "Kích thước lưu trữ tối đa khi tải lên tệp FTP (MB), <= 0 nghĩa là không sao lưu"
+
+#: settings/serializers/storage.py:18
+msgid "Storage usage threshold"
+msgstr "Ngưỡng sử dụng lưu trữ"
+
+#: settings/serializers/storage.py:19
+msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgstr "Ngưỡng phần trăm sử dụng lưu trữ (0-100), 0 nghĩa là không giới hạn"
+
+#: settings/serializers/storage.py:22
+msgid "NAS enabled"
+msgstr "NAS đã bật"
+
+#: settings/serializers/storage.py:23
+msgid "Enable NAS storage"
+msgstr "Bật lưu trữ NAS"
+
+#: settings/serializers/storage.py:27
+msgid "NAS type"
+msgstr "Loại NAS"
+
+#: settings/serializers/storage.py:28
+msgid "NAS storage type: NFS or CIFS"
+msgstr "Loại lưu trữ NAS: NFS hoặc CIFS"
+
+#: settings/serializers/storage.py:32
+msgid "NAS host"
+msgstr "Máy chủ NAS"
+
+#: settings/serializers/storage.py:33
+msgid "NAS server address, e.g. 192.168.1.100"
+msgstr "Địa chỉ máy chủ NAS, v.d. 192.168.1.100"
+
+#: settings/serializers/storage.py:37
+msgid "NAS share name"
+msgstr "Tên chia sẻ NAS"
+
+#: settings/serializers/storage.py:38
+msgid "NAS share or export name"
+msgstr "Tên chia sẻ hoặc xuất NAS"
+
+#: settings/serializers/storage.py:42
+msgid "NAS mount path"
+msgstr "Đường dẫn gắn NAS"
+
+#: settings/serializers/storage.py:43
+msgid "Local mount path for NAS storage"
+msgstr "Đường dẫn gắn cục bộ cho lưu trữ NAS"
+
+#: settings/serializers/storage.py:47
+msgid "NAS username"
+msgstr "Tên người dùng NAS"
+
+#: settings/serializers/storage.py:48
+msgid "NAS login username (CIFS required)"
+msgstr "Tên đăng nhập NAS (bắt buộc với CIFS)"
+
+#: settings/serializers/storage.py:52
+msgid "NAS password"
+msgstr "Mật khẩu NAS"
+
+#: settings/serializers/storage.py:53
+msgid "NAS login password (CIFS required)"
+msgstr "Mật khẩu đăng nhập NAS (bắt buộc với CIFS)"
+
+#: settings/serializers/storage.py:21
+msgid "Session replay"
+msgstr "Phát lại phiên"
+
+#: settings/serializers/storage.py:22
+msgid "File transfer"
+msgstr "Truyền tệp"
+
+#: settings/serializers/storage.py:27
+msgid "Storage reclamation targets"
+msgstr "Mục tiêu giải phóng dung lượng"
+
+#: settings/serializers/storage.py:28
+msgid "Select which data to clean during storage reclamation"
+msgstr "Chọn dữ liệu cần dọn khi giải phóng dung lượng"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
@@ -9828,7 +9957,31 @@ msgstr "chuyển mã video thất bại"
 
 #: terminal/const.py:108
 msgid "Replay unsupported"
-msgstr "không hỗ trợ video"
+msgstr "Không hỗ trợ phát lại"
+
+#: terminal/const.py:109
+msgid "Replay cleaned for storage reclamation"
+msgstr "Đã xóa phát lại để giải phóng dung lượng"
+
+#: audits/models.py:355
+msgid "Storage reclamation log"
+msgstr "Nhật ký giải phóng dung lượng"
+
+#: audits/models.py:357
+msgid "Session ID"
+msgstr "ID phiên"
+
+#: audits/models.py:361
+msgid "Target type"
+msgstr "Loại mục tiêu"
+
+#: audits/models.py:363
+msgid "File path"
+msgstr "Đường dẫn tệp"
+
+#: audits/models.py:359
+msgid "File size (bytes)"
+msgstr "Kích thước tệp (byte)"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

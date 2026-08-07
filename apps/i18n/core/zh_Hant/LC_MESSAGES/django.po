@@ -4182,7 +4182,7 @@ msgstr "根據閾值騰退存儲空間"
 #: audits/tasks.py:185
 msgid ""
 "If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete the oldest day's session records, commands and replays "
+"delete the oldest session replay files and update session records "
 "until usage falls below threshold"
 msgstr ""
 "當系統存儲使用率超過 STORAGE_USAGE_THRESHOLD (百分比 0-100) 時，"
@@ -7349,6 +7349,135 @@ msgstr "Syslog 位址未設定或無效"
 msgid "Syslog handler is not active, please save configuration first"
 msgstr "Syslog 處理器未啟動，請先儲存設定"
 
+#: settings/api/nas.py:18
+#, python-brace-format
+msgid "NAS connection test successful, mount path is accessible"
+msgstr "NAS 連接測試成功，掛載路徑可訪問"
+
+#: settings/api/nas.py:34
+msgid "NAS storage is not enabled"
+msgstr "NAS 存儲未啟用"
+
+#: settings/api/nas.py:40
+msgid "NAS host is not configured"
+msgstr "NAS 伺服器位址未配置"
+
+#: settings/api/nas.py:46
+msgid "NAS mount path is not configured"
+msgstr "NAS 掛載路徑未配置"
+
+#: settings/api/nas.py:53
+msgid "NAS username is required for CIFS"
+msgstr "CIFS 類型需要填寫 NAS 使用者名稱"
+
+#: settings/api/nas.py:60
+#, python-brace-format
+msgid "NAS mount path does not exist: {}"
+msgstr "NAS 掛載路徑不存在：{}"
+
+#: settings/api/nas.py:66
+#, python-brace-format
+msgid "NAS mount path is not a directory: {}"
+msgstr "NAS 掛載路徑不是目錄：{}"
+
+#: settings/api/nas.py:78
+#, python-brace-format
+msgid "NAS mount path is not writable: {}"
+msgstr "NAS 掛載路徑不可寫：{}"
+
+#: settings/api/nas.py:83
+#, python-brace-format
+msgid "NAS mount path I/O error: {}"
+msgstr "NAS 掛載路徑 I/O 錯誤：{}"
+
+#: settings/serializers/storage.py:14
+msgid "FTP file max store"
+msgstr "FTP 檔案最大儲存"
+
+#: settings/serializers/storage.py:15
+msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgstr "FTP 檔案上傳最大儲存大小 (MB)，<= 0 表示不備份"
+
+#: settings/serializers/storage.py:18
+msgid "Storage usage threshold"
+msgstr "儲存使用閾值"
+
+#: settings/serializers/storage.py:19
+msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgstr "儲存使用百分比閾值 (0-100)，0 表示不限制"
+
+#: settings/serializers/storage.py:22
+msgid "NAS enabled"
+msgstr "NAS 存儲啟用"
+
+#: settings/serializers/storage.py:23
+msgid "Enable NAS storage"
+msgstr "是否啟用 NAS 存儲"
+
+#: settings/serializers/storage.py:27
+msgid "NAS type"
+msgstr "NAS 類型"
+
+#: settings/serializers/storage.py:28
+msgid "NAS storage type: NFS or CIFS"
+msgstr "NAS 存儲類型：NFS 或 CIFS"
+
+#: settings/serializers/storage.py:32
+msgid "NAS host"
+msgstr "NAS 伺服器位址"
+
+#: settings/serializers/storage.py:33
+msgid "NAS server address, e.g. 192.168.1.100"
+msgstr "NAS 伺服器位址，例如 192.168.1.100"
+
+#: settings/serializers/storage.py:37
+msgid "NAS share name"
+msgstr "NAS 共用名稱"
+
+#: settings/serializers/storage.py:38
+msgid "NAS share or export name"
+msgstr "NAS 共用或匯出名稱"
+
+#: settings/serializers/storage.py:42
+msgid "NAS mount path"
+msgstr "NAS 掛載路徑"
+
+#: settings/serializers/storage.py:43
+msgid "Local mount path for NAS storage"
+msgstr "NAS 存儲的本地掛載路徑"
+
+#: settings/serializers/storage.py:47
+msgid "NAS username"
+msgstr "NAS 使用者名稱"
+
+#: settings/serializers/storage.py:48
+msgid "NAS login username (CIFS required)"
+msgstr "NAS 登入使用者名稱（CIFS 必填）"
+
+#: settings/serializers/storage.py:52
+msgid "NAS password"
+msgstr "NAS 密碼"
+
+#: settings/serializers/storage.py:53
+msgid "NAS login password (CIFS required)"
+msgstr "NAS 登入密碼（CIFS 必填）"
+
+#: settings/serializers/storage.py:21
+msgid "Session replay"
+msgstr "工作階段錄像"
+
+#: settings/serializers/storage.py:22
+msgid "File transfer"
+msgstr "檔案傳輸"
+
+#: settings/serializers/storage.py:27
+msgid "Storage reclamation targets"
+msgstr "儲存騰退目標"
+
+#: settings/serializers/storage.py:28
+msgid "Select which data to clean during storage reclamation"
+msgstr "選擇儲存騰退時需要清理的資料類型"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
@@ -9477,7 +9606,31 @@ msgstr "錄影轉檔失敗"
 
 #: terminal/const.py:108
 msgid "Replay unsupported"
-msgstr "不支持錄影"
+msgstr "不支援錄像"
+
+#: terminal/const.py:109
+msgid "Replay cleaned for storage reclamation"
+msgstr "因儲存騰退已清理錄像"
+
+#: audits/models.py:355
+msgid "Storage reclamation log"
+msgstr "儲存騰退日誌"
+
+#: audits/models.py:357
+msgid "Session ID"
+msgstr "工作階段 ID"
+
+#: audits/models.py:361
+msgid "Target type"
+msgstr "目標類型"
+
+#: audits/models.py:363
+msgid "File path"
+msgstr "檔案路徑"
+
+#: audits/models.py:359
+msgid "File size (bytes)"
+msgstr "檔案大小 (位元組)"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

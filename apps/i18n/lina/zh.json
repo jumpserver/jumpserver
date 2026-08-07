@@ -1802,10 +1802,17 @@
     "SyslogSockType": "Syslog 套接字类型",
     "SyslogTest": "测试",
     "StorageHelpText": "存储配置相关设置",
-    "FileAudit": "文件审计",
-    "StorageReclamation": "存储回收",
+    "NasSetting": "NAS 存储设置",
     "FTPFileMaxStore": "FTP 文件最大存储",
-    "FTPFileMaxStoreHelpTip": "FTP 文件上传最大存储大小 (MB)，<= 0 表示不备份",
     "StorageUsageThreshold": "存储使用阈值",
-    "StorageUsageThresholdHelpTip": "存储使用百分比阈值 (0-100)，0 表示不限制"
+    "NasEnabled": "NAS 存储启用",
+    "NasType": "NAS 类型",
+    "NasHost": "NAS 服务器地址",
+    "NasShareName": "NAS 共享名称",
+    "NasMountPath": "NAS 挂载路径",
+    "NasUsername": "NAS 用户名",
+    "NasPassword": "NAS 密码",
+    "StorageReclamationTargets": "空间腾退目标",
+    "StorageReclamationTargetsHelpTip": "选择空间腾退时需要清理的数据类型",
+    "SessionReplay": "会话录像"
 }

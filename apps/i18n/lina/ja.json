@@ -1720,10 +1720,17 @@
     "SyslogSockType": "Syslog socket type",
     "SyslogTest": "テスト",
     "StorageHelpText": "ストレージ設定",
-    "FileAudit": "ファイル監査",
-    "StorageReclamation": "ストレージ回収",
+    "NasSetting": "NAS ストレージ設定",
     "FTPFileMaxStore": "FTPファイル最大保存容量",
-    "FTPFileMaxStoreHelpTip": "FTPファイルアップロードの最大保存サイズ(MB)、0以下の場合はバックアップなし",
     "StorageUsageThreshold": "ストレージ使用しきい値",
-    "StorageUsageThresholdHelpTip": "ストレージ使用率しきい値(0-100)、0の場合は制限なし"
+    "NasEnabled": "NAS 有効",
+    "NasType": "NAS タイプ",
+    "NasHost": "NAS ホスト",
+    "NasShareName": "NAS 共有名",
+    "NasMountPath": "NAS マウントパス",
+    "NasUsername": "NAS ユーザー名",
+    "NasPassword": "NAS パスワード",
+    "StorageReclamationTargets": "ストレージ解放対象",
+    "StorageReclamationTargetsHelpTip": "ストレージ解放時にクリーンアップするデータを選択",
+    "SessionReplay": "セッション録画"
 }

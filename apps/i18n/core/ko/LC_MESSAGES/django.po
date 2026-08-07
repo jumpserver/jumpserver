@@ -4223,7 +4223,7 @@ msgstr "임계값에 따라 저장 공간 확보"
 #: audits/tasks.py:185
 msgid ""
 "If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete the oldest day's session records, commands and replays "
+"delete the oldest session replay files and update session records "
 "until usage falls below threshold"
 msgstr ""
 "시스템 저장소 사용률이 STORAGE_USAGE_THRESHOLD (백분율 0-100)를 초과하면, "
@@ -7498,6 +7498,135 @@ msgstr "Syslog 주소가 구성되지 않았거나 유효하지 않습니다"
 msgid "Syslog handler is not active, please save configuration first"
 msgstr "Syslog 핸들러가 활성화되지 않았습니다. 먼저 설정을 저장하세요"
 
+#: settings/api/nas.py:18
+#, python-brace-format
+msgid "NAS connection test successful, mount path is accessible"
+msgstr "NAS 연결 테스트 성공, 마운트 경로에 접근 가능"
+
+#: settings/api/nas.py:34
+msgid "NAS storage is not enabled"
+msgstr "NAS 스토리지가 활성화되지 않음"
+
+#: settings/api/nas.py:40
+msgid "NAS host is not configured"
+msgstr "NAS 호스트가 구성되지 않음"
+
+#: settings/api/nas.py:46
+msgid "NAS mount path is not configured"
+msgstr "NAS 마운트 경로가 구성되지 않음"
+
+#: settings/api/nas.py:53
+msgid "NAS username is required for CIFS"
+msgstr "CIFS에는 NAS 사용자 이름이 필요합니다"
+
+#: settings/api/nas.py:60
+#, python-brace-format
+msgid "NAS mount path does not exist: {}"
+msgstr "NAS 마운트 경로가 존재하지 않음: {}"
+
+#: settings/api/nas.py:66
+#, python-brace-format
+msgid "NAS mount path is not a directory: {}"
+msgstr "NAS 마운트 경로가 디렉토리가 아님: {}"
+
+#: settings/api/nas.py:78
+#, python-brace-format
+msgid "NAS mount path is not writable: {}"
+msgstr "NAS 마운트 경로에 쓰기 불가: {}"
+
+#: settings/api/nas.py:83
+#, python-brace-format
+msgid "NAS mount path I/O error: {}"
+msgstr "NAS 마운트 경로 I/O 오류: {}"
+
+#: settings/serializers/storage.py:14
+msgid "FTP file max store"
+msgstr "FTP 파일 최대 저장"
+
+#: settings/serializers/storage.py:15
+msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgstr "FTP 파일 업로드 최대 저장 크기(MB), 0 이하는 백업 안 함"
+
+#: settings/serializers/storage.py:18
+msgid "Storage usage threshold"
+msgstr "스토리지 사용 임계값"
+
+#: settings/serializers/storage.py:19
+msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgstr "스토리지 사용률 임계값(0-100), 0은 제한 없음"
+
+#: settings/serializers/storage.py:22
+msgid "NAS enabled"
+msgstr "NAS 활성화"
+
+#: settings/serializers/storage.py:23
+msgid "Enable NAS storage"
+msgstr "NAS 스토리지 활성화"
+
+#: settings/serializers/storage.py:27
+msgid "NAS type"
+msgstr "NAS 유형"
+
+#: settings/serializers/storage.py:28
+msgid "NAS storage type: NFS or CIFS"
+msgstr "NAS 스토리지 유형: NFS 또는 CIFS"
+
+#: settings/serializers/storage.py:32
+msgid "NAS host"
+msgstr "NAS 호스트"
+
+#: settings/serializers/storage.py:33
+msgid "NAS server address, e.g. 192.168.1.100"
+msgstr "NAS 서버 주소, 예: 192.168.1.100"
+
+#: settings/serializers/storage.py:37
+msgid "NAS share name"
+msgstr "NAS 공유 이름"
+
+#: settings/serializers/storage.py:38
+msgid "NAS share or export name"
+msgstr "NAS 공유 또는 내보내기 이름"
+
+#: settings/serializers/storage.py:42
+msgid "NAS mount path"
+msgstr "NAS 마운트 경로"
+
+#: settings/serializers/storage.py:43
+msgid "Local mount path for NAS storage"
+msgstr "NAS 스토리지의 로컬 마운트 경로"
+
+#: settings/serializers/storage.py:47
+msgid "NAS username"
+msgstr "NAS 사용자 이름"
+
+#: settings/serializers/storage.py:48
+msgid "NAS login username (CIFS required)"
+msgstr "NAS 로그인 사용자 이름 (CIFS 필수)"
+
+#: settings/serializers/storage.py:52
+msgid "NAS password"
+msgstr "NAS 비밀번호"
+
+#: settings/serializers/storage.py:53
+msgid "NAS login password (CIFS required)"
+msgstr "NAS 로그인 비밀번호 (CIFS 필수)"
+
+#: settings/serializers/storage.py:21
+msgid "Session replay"
+msgstr "세션 녹화"
+
+#: settings/serializers/storage.py:22
+msgid "File transfer"
+msgstr "파일 전송"
+
+#: settings/serializers/storage.py:27
+msgid "Storage reclamation targets"
+msgstr "저장소 확보 대상"
+
+#: settings/serializers/storage.py:28
+msgid "Select which data to clean during storage reclamation"
+msgstr "저장소 확보 시 정리할 데이터 선택"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
@@ -9707,7 +9836,31 @@ msgstr "영상 인코딩 실패"
 
 #: terminal/const.py:108
 msgid "Replay unsupported"
-msgstr "영상을 지원하지 않음"
+msgstr "녹화 미지원"
+
+#: terminal/const.py:109
+msgid "Replay cleaned for storage reclamation"
+msgstr "저장소 확보로 인해 녹화 삭제됨"
+
+#: audits/models.py:355
+msgid "Storage reclamation log"
+msgstr "저장소 확보 로그"
+
+#: audits/models.py:357
+msgid "Session ID"
+msgstr "세션 ID"
+
+#: audits/models.py:361
+msgid "Target type"
+msgstr "대상 유형"
+
+#: audits/models.py:363
+msgid "File path"
+msgstr "파일 경로"
+
+#: audits/models.py:359
+msgid "File size (bytes)"
+msgstr "파일 크기 (바이트)"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

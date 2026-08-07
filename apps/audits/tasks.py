@@ -22,7 +22,7 @@ from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_root_org
 from terminal.backends import server_replay_storage
 from terminal.models import Session, Command
-from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
+from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog, StorageReclamationLog
 
 logger = get_logger(__name__)
 
@@ -181,18 +181,62 @@ def clean_expired_session_period():
     logger.info("Clean session replay done")
 
 
+def _remove_replay_files_for_session(session):
+    """Delete all replay files for a session and return deleted file info.
+    Returns list of (file_path, file_size) tuples."""
+    deleted_files = []
+    possible_paths = session.get_all_possible_local_path()
+
+    for local_path in possible_paths:
+        abs_path = os.path.join(default_storage.base_location, local_path) \
+            if not os.path.isabs(local_path) else local_path
+        if not os.path.isfile(abs_path):
+            continue
+        try:
+            file_size = os.path.getsize(abs_path)
+            os.remove(abs_path)
+            deleted_files.append((abs_path, file_size))
+            logger.info('Deleted replay file: %s (%d bytes)', abs_path, file_size)
+        except OSError as e:
+            logger.error('Failed to delete replay file %s: %s', abs_path, e)
+
+    return deleted_files
+
+
+def _remove_ftp_file_for_log(ftp_log):
+    """Delete the file transfer file for an FTPLog record.
+    Returns (file_path, file_size) or (None, 0) if no file found."""
+    file_path = ftp_log.filepath
+    abs_path = os.path.join(default_storage.base_location, file_path) \
+        if not os.path.isabs(file_path) else file_path
+    if not os.path.isfile(abs_path):
+        return None, 0
+    try:
+        file_size = os.path.getsize(abs_path)
+        os.remove(abs_path)
+        logger.info('Deleted FTP file: %s (%d bytes)', abs_path, file_size)
+        return abs_path, file_size
+    except OSError as e:
+        logger.error('Failed to delete FTP file %s: %s', abs_path, e)
+        return None, 0
+
+
 @shared_task(
     verbose_name=_('Reclaim storage by threshold'),
     description=_(
         """If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100),
-        delete the oldest day's session records, commands and replays
+        delete the oldest session replay files and update session records
         until usage falls below threshold"""
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
 def reclaim_storage_by_threshold():
-    """If storage usage exceeds STORAGE_USAGE_THRESHOLD, delete oldest day's
-    session records, commands and replays until usage falls below threshold."""
+    """If storage usage exceeds STORAGE_USAGE_THRESHOLD, clean the oldest
+    replay files and/or FTP files based on STORAGE_RECLAMATION_TARGETS.
+    For each day, both replay and FTP files are cleaned together,
+    then disk usage is rechecked before proceeding to the next day."""
+    from terminal.const import SessionErrorReason
+
     threshold_pct = getattr(settings, 'STORAGE_USAGE_THRESHOLD', 0)
     if threshold_pct <= 0 or threshold_pct >= 100:
         return
@@ -204,51 +248,124 @@ def reclaim_storage_by_threshold():
     if current_pct <= threshold_pct:
         return
 
+    targets = getattr(settings, 'STORAGE_RECLAMATION_TARGETS', [])
+    if not targets:
+        return
+
     logger.info(
-        'System storage used %.1f%% exceeds threshold %d%%, start reclaiming oldest data',
-        current_pct, threshold_pct
+        'System storage used %.1f%% exceeds threshold %d%%, start reclaiming: %s',
+        current_pct, threshold_pct, targets
     )
 
-    replay_dir = safe_join(default_storage.base_location, 'replay')
+    # Find the oldest day across all enabled targets
+    oldest_days = 0
+    if 'session_replay' in targets:
+        oldest_session = Session.objects.filter(has_replay=True).order_by('date_start').first()
+        if oldest_session and oldest_session.date_start:
+            oldest_days = (timezone.now() - oldest_session.date_start).days
+    if 'file_transfer' in targets:
+        oldest_ftp = FTPLog.objects.filter(has_file=True).order_by('date_start').first()
+        if oldest_ftp and oldest_ftp.date_start:
+            ftp_oldest_days = (timezone.now() - oldest_ftp.date_start).days
+            oldest_days = max(oldest_days, ftp_oldest_days)
 
-    # 查询最早一条 session 的时间，从那里开始逐天清理
-    oldest_session = Session.objects.order_by('date_start').first()
-    if not oldest_session or not oldest_session.date_start:
-        logger.info('No sessions found, reclamation done')
-        return
-    oldest_days = (timezone.now() - oldest_session.date_start).days
     if oldest_days <= 0:
+        logger.info('No reclaimable data found')
         return
 
-    logger.info('Oldest session dates back %d days, starting reclamation', oldest_days)
+    logger.info('Oldest reclaimable data dates back %d days, starting reclamation', oldest_days)
 
     for days in range(oldest_days, 0, -1):
         expire_date = timezone.now() - timezone.timedelta(days=days)
-        expired_sessions = Session.objects.filter(date_start__lt=expire_date)
 
-        if not expired_sessions.exists():
-            continue
+        if 'session_replay' in targets:
+            _clean_replays_for_day(expire_date, days)
 
-        logger.info('Reclaiming storage: deleting data older than %d days', days)
-        batch_delete(expired_sessions)
-        delete_expired_commands_by_day(keep_days=days)
-        remove_files_by_days(replay_dir, days)
+        if 'file_transfer' in targets:
+            _clean_ftp_files_for_day(expire_date, days)
 
         usage = shutil.disk_usage(base_path)
         current_pct = usage.used / usage.total * 100
 
         if current_pct <= threshold_pct:
             logger.info(
-                'System storage used %.1f%% now within threshold %d%%, reclamation done',
+                'System storage used %.1f%% within threshold %d%%, reclamation done',
                 current_pct, threshold_pct
             )
             break
 
-    find_and_delete_empty_dirs(replay_dir)
+    find_and_delete_empty_dirs(safe_join(default_storage.base_location, 'replay'))
+    usage = shutil.disk_usage(base_path)
+    final_pct = usage.used / usage.total * 100
     logger.info(
         'Storage reclamation complete, system used: %.1f%% (%d / %d MB)',
-        current_pct, usage.used // 1024 // 1024, usage.total // 1024 // 1024
+        final_pct, usage.used // 1024 // 1024, usage.total // 1024 // 1024
     )
+
+
+def _clean_replays_for_day(expire_date, days):
+    """Delete replay files for sessions older than expire_date."""
+    from terminal.const import SessionErrorReason
+
+    sessions = Session.objects.filter(
+        has_replay=True, date_start__lt=expire_date
+    )
+    if not sessions.exists():
+        return
+
+    logger.info(
+        'Cleaning replay files for %d sessions older than %d days',
+        sessions.count(), days
+    )
+
+    with transaction.atomic():
+        for session in sessions.iterator():
+            deleted_files = _remove_replay_files_for_session(session)
+            if not deleted_files:
+                continue
+
+            session.has_replay = False
+            session.error_reason = SessionErrorReason.replay_cleaned
+            session.replay_size = 0
+            session.save(update_fields=['has_replay', 'error_reason', 'replay_size'])
+
+            for file_path, file_size in deleted_files:
+                StorageReclamationLog.objects.create(
+                    session_id=str(session.id),
+                    target_type='session_replay',
+                    file_path=file_path,
+                    file_size=file_size,
+                )
+
+
+def _clean_ftp_files_for_day(expire_date, days):
+    """Delete FTP transfer files for records older than expire_date."""
+    ftp_logs = FTPLog.objects.filter(
+        has_file=True, date_start__lt=expire_date
+    )
+    if not ftp_logs.exists():
+        return
+
+    logger.info(
+        'Cleaning FTP files for %d records older than %d days',
+        ftp_logs.count(), days
+    )
+
+    with transaction.atomic():
+        for ftp_log in ftp_logs.iterator():
+            file_path, file_size = _remove_ftp_file_for_log(ftp_log)
+            if file_path is None:
+                continue
+
+            ftp_log.has_file = False
+            ftp_log.save(update_fields=['has_file'])
+
+            StorageReclamationLog.objects.create(
+                session_id=str(ftp_log.id),
+                target_type='file_transfer',
+                file_path=file_path,
+                file_size=file_size,
+            )
 
 
 @shared_task(
