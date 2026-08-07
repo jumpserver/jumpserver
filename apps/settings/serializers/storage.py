@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -68,3 +69,29 @@ class StorageSettingSerializer(serializers.Serializer):
         label=_('NAS password'),
         help_text=_('NAS login password (CIFS required)')
     )
+
+    def _get_nas_config(self):
+        """Get NAS config from validated data, fall back to settings."""
+        validated_data = getattr(self, 'validated_data', {})
+        return {
+            'nas_enabled': validated_data.get('NAS_ENABLED',
+                                              getattr(settings, 'NAS_ENABLED', False)),
+            'nas_type': validated_data.get('NAS_TYPE',
+                                           getattr(settings, 'NAS_TYPE', 'nfs')),
+            'nas_host': validated_data.get('NAS_HOST',
+                                           getattr(settings, 'NAS_HOST', '')),
+            'nas_share_name': validated_data.get('NAS_SHARE_NAME',
+                                                 getattr(settings, 'NAS_SHARE_NAME', '')),
+            'nas_mount_path': validated_data.get('NAS_MOUNT_PATH',
+                                                 getattr(settings, 'NAS_MOUNT_PATH', '')),
+            'nas_username': validated_data.get('NAS_USERNAME',
+                                               getattr(settings, 'NAS_USERNAME', '')),
+            'nas_password': validated_data.get('NAS_PASSWORD',
+                                               getattr(settings, 'NAS_PASSWORD', '')),
+        }
+
+    def post_save(self):
+        """Ensure NAS is mounted after saving settings (force re-mount)."""
+        from settings.tools.nas_mount import ensure_nas_mounted
+        config = self._get_nas_config()
+        ensure_nas_mounted(config, force=True)

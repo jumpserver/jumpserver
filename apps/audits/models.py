@@ -368,3 +368,16 @@ class StorageReclamationLog(models.Model):
     class Meta:
         ordering = ['-date_created']
         verbose_name = _('Storage reclamation log')
+
+
+class ArchiveLog(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    session_id = models.CharField(max_length=36, verbose_name=_("Session ID"))
+    file_path = models.CharField(max_length=1024, verbose_name=_("File path"))
+    file_size = models.BigIntegerField(default=0, verbose_name=_("File size (bytes)"))
+    storage_path = models.CharField(max_length=1024, default='', verbose_name=_("Storage path"))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+
+    class Meta:
+        ordering = ['-date_created']
+        verbose_name = _('Archive log')

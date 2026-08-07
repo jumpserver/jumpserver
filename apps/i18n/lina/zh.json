@@ -1803,7 +1803,7 @@
     "SyslogTest": "测试",
     "StorageHelpText": "存储配置相关设置",
     "NasSetting": "NAS 存储设置",
-    "FTPFileMaxStore": "FTP 文件最大存储",
+    "FTPFileMaxStore": "单文件传输最大存储",
     "StorageUsageThreshold": "存储使用阈值",
     "NasEnabled": "NAS 存储启用",
     "NasType": "NAS 类型",
@@ -1814,5 +1814,12 @@
     "NasPassword": "NAS 密码",
     "StorageReclamationTargets": "空间腾退目标",
     "StorageReclamationTargetsHelpTip": "选择空间腾退时需要清理的数据类型",
-    "SessionReplay": "会话录像"
+    "SessionReplay": "会话录像",
+    "TargetType": "目标类型",
+    "FilePath": "文件路径",
+    "FileSize": "文件大小",
+    "ReclamationLogs": "空间腾退日志",
+    "ArchiveLogs": "归档日志",
+    "Syslog": "SYSLOG",
+    "StorageReclamation": "空间腾退"
 }

@@ -1765,7 +1765,8 @@
     "SyslogTest": "測試",
     "StorageHelpText": "儲存配置相關設定",
     "NasSetting": "NAS 存儲設定",
-    "FTPFileMaxStore": "FTP 檔案最大儲存",
+    "FTPFileMaxStore": "單檔案傳輸最大存儲",
+    "StorageReclamation": "空間騰退",
     "StorageUsageThreshold": "儲存使用閾值",
     "NasEnabled": "NAS 存儲啟用",
     "NasType": "NAS 類型",
@@ -1776,5 +1777,11 @@
     "NasPassword": "NAS 密碼",
     "StorageReclamationTargets": "儲存騰退目標",
     "StorageReclamationTargetsHelpTip": "選擇儲存騰退時需要清理的資料類型",
-    "SessionReplay": "工作階段錄像"
+    "SessionReplay": "工作階段錄像",
+    "TargetType": "目標類型",
+    "FilePath": "檔案路徑",
+    "FileSize": "檔案大小",
+    "ReclamationLogs": "空間騰退日誌",
+    "ArchiveLogs": "歸檔日誌",
+    "Syslog": "SYSLOG"
 }

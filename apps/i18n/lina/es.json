@@ -1716,7 +1716,8 @@
     "SyslogTest": "Probar",
     "StorageHelpText": "Configuración de almacenamiento",
     "NasSetting": "Configuración de almacenamiento NAS",
-    "FTPFileMaxStore": "Almacenamiento máximo de archivos FTP",
+    "FTPFileMaxStore": "Almacenamiento máximo de transferencia única de archivo",
+    "StorageReclamation": "Liberación de almacenamiento",
     "StorageUsageThreshold": "Umbral de uso de almacenamiento",
     "NasEnabled": "NAS habilitado",
     "NasType": "Tipo de NAS",
@@ -1727,5 +1728,11 @@
     "NasPassword": "Contraseña NAS",
     "StorageReclamationTargets": "Objetivos de liberación de almacenamiento",
     "StorageReclamationTargetsHelpTip": "Seleccione qué datos limpiar durante la liberación de almacenamiento",
-    "SessionReplay": "Grabación de sesión"
+    "SessionReplay": "Grabación de sesión",
+    "TargetType": "Tipo de objetivo",
+    "FilePath": "Ruta del archivo",
+    "FileSize": "Tamaño del archivo",
+    "ReclamationLogs": "Registros de liberación",
+    "ArchiveLogs": "Registros de archivo",
+    "Syslog": "SYSLOG"
 }

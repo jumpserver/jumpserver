@@ -1718,7 +1718,8 @@
     "SyslogTest": "Тест",
     "StorageHelpText": "Настройки хранения",
     "NasSetting": "Настройки хранилища NAS",
-    "FTPFileMaxStore": "Макс. размер FTP файла",
+    "FTPFileMaxStore": "Макс. хранилище передачи одного файла",
+    "StorageReclamation": "Освобождение хранилища",
     "StorageUsageThreshold": "Порог использования хранилища",
     "NasEnabled": "NAS включен",
     "NasType": "Тип NAS",
@@ -1729,5 +1730,11 @@
     "NasPassword": "Пароль NAS",
     "StorageReclamationTargets": "Цели освобождения хранилища",
     "StorageReclamationTargetsHelpTip": "Выберите данные для очистки при освобождении хранилища",
-    "SessionReplay": "Запись сеанса"
+    "SessionReplay": "Запись сеанса",
+    "TargetType": "Тип цели",
+    "FilePath": "Путь к файлу",
+    "FileSize": "Размер файла",
+    "ReclamationLogs": "Журнал освобождения",
+    "ArchiveLogs": "Архивные журналы",
+    "Syslog": "SYSLOG"
 }

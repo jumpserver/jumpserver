@@ -1716,7 +1716,8 @@
     "SyslogTest": "테스트",
     "StorageHelpText": "스토리지 구성 설정",
     "NasSetting": "NAS 스토리지 설정",
-    "FTPFileMaxStore": "FTP 파일 최대 저장",
+    "FTPFileMaxStore": "단일 파일 전송 최대 저장",
+    "StorageReclamation": "저장소 확보",
     "StorageUsageThreshold": "스토리지 사용 임계값",
     "NasEnabled": "NAS 활성화",
     "NasType": "NAS 유형",
@@ -1727,5 +1728,11 @@
     "NasPassword": "NAS 비밀번호",
     "StorageReclamationTargets": "저장소 확보 대상",
     "StorageReclamationTargetsHelpTip": "저장소 확보 시 정리할 데이터 선택",
-    "SessionReplay": "세션 녹화"
+    "SessionReplay": "세션 녹화",
+    "TargetType": "대상 유형",
+    "FilePath": "파일 경로",
+    "FileSize": "파일 크기",
+    "ReclamationLogs": "저장소 확보 로그",
+    "ArchiveLogs": "아카이브 로그",
+    "Syslog": "SYSLOG"
 }

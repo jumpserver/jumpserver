@@ -1792,7 +1792,8 @@
     "SyslogTest": "Test",
     "StorageHelpText": "Storage configuration settings",
     "NasSetting": "NAS storage settings",
-    "FTPFileMaxStore": "FTP file max store",
+    "FTPFileMaxStore": "Max single file transfer storage",
+    "StorageReclamation": "Storage reclamation",
     "StorageUsageThreshold": "Storage usage threshold",
     "NasEnabled": "NAS enabled",
     "NasType": "NAS type",
@@ -1803,5 +1804,11 @@
     "NasPassword": "NAS password",
     "StorageReclamationTargets": "Storage reclamation targets",
     "StorageReclamationTargetsHelpTip": "Select which data to clean during storage reclamation",
-    "SessionReplay": "Session replay"
+    "SessionReplay": "Session replay",
+    "TargetType": "Target type",
+    "FilePath": "File path",
+    "FileSize": "File size",
+    "ReclamationLogs": "Reclamation logs",
+    "ArchiveLogs": "Archive logs",
+    "Syslog": "Syslog"
 }

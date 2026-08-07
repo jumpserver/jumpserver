@@ -155,3 +155,23 @@ def on_django_ready_init_syslog_handler(sender, **kwargs):
         reconfigure_syslog_handler()
     except Exception as e:
         logger.error('Failed to reconfigure syslog handler: %s', e)
+
+
+@receiver(django_ready)
+def on_django_ready_mount_nas(sender, **kwargs):
+    """Ensure NAS is mounted when Django starts up."""
+    try:
+        from settings.tools.nas_mount import ensure_nas_mounted
+
+        config = {
+            'nas_enabled': getattr(settings, 'NAS_ENABLED', False),
+            'nas_type': getattr(settings, 'NAS_TYPE', 'nfs'),
+            'nas_host': getattr(settings, 'NAS_HOST', ''),
+            'nas_share_name': getattr(settings, 'NAS_SHARE_NAME', ''),
+            'nas_mount_path': getattr(settings, 'NAS_MOUNT_PATH', ''),
+            'nas_username': getattr(settings, 'NAS_USERNAME', ''),
+            'nas_password': getattr(settings, 'NAS_PASSWORD', ''),
+        }
+        ensure_nas_mounted(config)
+    except Exception as e:
+        logger.error('Failed to mount NAS on startup: %s', e)

@@ -1716,7 +1716,8 @@
     "SyslogTest": "Kiểm tra",
     "StorageHelpText": "Cài đặt cấu hình lưu trữ",
     "NasSetting": "Cài đặt lưu trữ NAS",
-    "FTPFileMaxStore": "Lưu trữ tối đa tệp FTP",
+    "FTPFileMaxStore": "Lưu trữ tối đa một lần truyền tệp",
+    "StorageReclamation": "Giải phóng dung lượng",
     "StorageUsageThreshold": "Ngưỡng sử dụng lưu trữ",
     "NasEnabled": "NAS đã bật",
     "NasType": "Loại NAS",
@@ -1727,5 +1728,11 @@
     "NasPassword": "Mật khẩu NAS",
     "StorageReclamationTargets": "Mục tiêu giải phóng dung lượng",
     "StorageReclamationTargetsHelpTip": "Chọn dữ liệu cần dọn khi giải phóng dung lượng",
-    "SessionReplay": "Phát lại phiên"
+    "SessionReplay": "Phát lại phiên",
+    "TargetType": "Loại mục tiêu",
+    "FilePath": "Đường dẫn tệp",
+    "FileSize": "Kích thước tệp",
+    "ReclamationLogs": "Nhật ký giải phóng",
+    "ArchiveLogs": "Nhật ký lưu trữ",
+    "Syslog": "SYSLOG"
 }
