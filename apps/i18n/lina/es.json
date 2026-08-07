@@ -1365,7 +1365,7 @@
     "ResourceSelectRemoveAll": "Eliminar todo",
     "ResourceSelectRemoveSelected": "Eliminar seleccionados ({count})",
     "ResourceSelectSelected": "Seleccionado",
-    "ResourceSelectSelectedCount": "{count} seleccionados",
+    "ResourceSelectSelectedCount": "{count} {resource} seleccionados",
     "ResourceSelectSelectedResources": "Recursos seleccionados",
     "ResourceSelectSelectedSummary": "{names} y otros {count} {resource} seleccionados",
     "ResourceSelectTotal": "资源总数",

@@ -1833,7 +1833,7 @@
     "setVariable": "设置参数",
     "userId": "用户ID",
     "userName": "用户名",
-    "ResourceSelectSelectedCount": "{count} 个{resource}已选择",
+    "ResourceSelectSelectedCount": "已选 {count} 个{resource}",
     "ResourceSelectSelectedSummary": "{names} 等 {count} 个{resource}已选择",
     "ResourceSelectEmpty": "请选择{resource}",
     "ResourceSelectDialogTitle": "选择{resource}",

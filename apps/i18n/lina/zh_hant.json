@@ -1369,7 +1369,7 @@
     "ResourceSelectRemoveAll": "移除所有",
     "ResourceSelectRemoveSelected": "批次移除 ({count})",
     "ResourceSelectSelected": "已選擇",
-    "ResourceSelectSelectedCount": "{count} 個{resource}已選擇",
+    "ResourceSelectSelectedCount": "已選 {count} 個{resource}",
     "ResourceSelectSelectedResources": "已選{resource}",
     "ResourceSelectSelectedSummary": "{names} 等 {count} 個{resource}已選擇",
     "ResourceSelectTotal": "資源總數",

@@ -1365,7 +1365,7 @@
     "ResourceSelectRemoveAll": "모두 제거",
     "ResourceSelectRemoveSelected": "선택 항목 제거 ({count})",
     "ResourceSelectSelected": "선택됨",
-    "ResourceSelectSelectedCount": "{count}개 선택됨",
+    "ResourceSelectSelectedCount": "{resource} {count}개 선택됨",
     "ResourceSelectSelectedResources": "선택한 리소스",
     "ResourceSelectSelectedSummary": "{names} 등 {count}개 {resource}가 선택되었습니다.",
     "ResourceSelectTotal": "리소스 총계",
