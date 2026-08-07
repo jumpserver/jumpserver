@@ -244,7 +244,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
     @staticmethod
     def get_activity_log_qs(fields, limit, org_q, **filters):
         queryset = ActivityLog.objects.filter(org_q, **filters).annotate(
-            r_type=F('type'), r_detail_id=F('detail_id'),
+            r_type=F('type'), r_detail_id=Cast(F('detail_id'), CharField()),
             r_detail=F('detail'), r_user=Value(None, CharField()),
             r_action=Value(None, CharField()),
         ).values(*fields)[:limit]
