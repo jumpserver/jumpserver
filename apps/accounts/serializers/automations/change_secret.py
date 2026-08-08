@@ -16,13 +16,14 @@ from assets.models import Asset
 from common.serializers import SecretReadableCheckMixin
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import get_logger
-from .base import BaseAutomationSerializer
+from .base import BaseAutomationSerializer, AutomationListSerializerMixin
 from ...utils import account_secret_task_status
 
 logger = get_logger(__file__)
 
 __all__ = [
     'ChangeSecretAutomationSerializer',
+    'ChangeSecretAutomationListSerializer',
     'ChangeSecretRecordSerializer',
     'ChangeSecretRecordViewSecretSerializer',
     'ChangeSecretRecordBackUpSerializer',
@@ -128,6 +129,15 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             if secret_strategy != SecretStrategy.custom:
                 attrs.pop('secret', None)
         return attrs
+
+
+class ChangeSecretAutomationListSerializer(AutomationListSerializerMixin, ChangeSecretAutomationSerializer):
+    class Meta(ChangeSecretAutomationSerializer.Meta):
+        relation_count_fields = {'assets_amount': 'assets', 'nodes_amount': 'nodes'}
+        fields = [
+            f for f in ChangeSecretAutomationSerializer.Meta.fields
+            if f not in ('assets', 'nodes', 'recipients')
+        ] + ['assets_amount', 'nodes_amount']
 
 
 class ChangeSecretRecordSerializer(serializers.ModelSerializer):

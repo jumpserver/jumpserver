@@ -1,4 +1,4 @@
-from django.db.models import Value, F, Q
+from django.db.models import Exists, F, OuterRef, Q, Value
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
@@ -7,7 +7,8 @@ from common.drf.filters import BaseFilterSet
 from orgs.models import Organization
 from tickets.models import (
     Ticket, ApplyAssetTicket,
-    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
+    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket,
+    TicketAssignee,
 )
 
 
@@ -65,10 +66,12 @@ class TicketFilter(BaseFilterSet):
 
     @staticmethod
     def filter_assignees_id(queryset, name, value):
-        return queryset.filter(
-            ticket_steps__level=F('approval_step'),
-            ticket_steps__ticket_assignees__assignee_id=value
+        current_assignee_tickets = TicketAssignee.objects.filter(
+            step__ticket_id=OuterRef('pk'),
+            step__level=OuterRef('approval_step'),
+            assignee_id=value,
         )
+        return queryset.filter(Exists(current_assignee_tickets))
 
     @staticmethod
     def filter_relevant_asset(queryset, name, value):

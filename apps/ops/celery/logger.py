@@ -105,7 +105,34 @@ class CeleryTaskLoggerHandler(StreamHandler):
     def after_task_publish(self, sender, body, **kwargs):
         pass
 
+    @staticmethod
+    def is_routine_task_success(record):
+        # Celery appends this framework-level acknowledgement after every
+        # task. It only exposes an internal task path and return value, while
+        # task implementations already provide the user-facing result.
+        message = record.getMessage()
+        return (
+            record.name == 'celery.app.trace'
+            and message.startswith('Task ')
+            and ' succeeded in ' in message
+        )
+
+    @staticmethod
+    def is_internal_automation_message(record):
+        message = record.getMessage()
+        return message.startswith((
+            "Acquire Lock('lock:account-change-secret:",
+            "Acquired Lock('lock:account-change-secret:",
+            "Release Lock('lock:account-change-secret:",
+            "Released Lock('lock:account-change-secret:",
+        ))
+
     def emit(self, record):
+        if (
+                self.is_routine_task_success(record)
+                or self.is_internal_automation_message(record)
+        ):
+            return
         task_id = self.get_current_task_id()
         if not task_id:
             return
@@ -131,6 +158,11 @@ class CeleryThreadingLoggerHandler(CeleryTaskLoggerHandler):
         return str(get_ident())
 
     def emit(self, record):
+        if (
+                self.is_routine_task_success(record)
+                or self.is_internal_automation_message(record)
+        ):
+            return
         thread_id = self.get_current_thread_id()
         try:
             self.write_thread_task_log(thread_id, record)
@@ -170,6 +202,11 @@ class CeleryTaskFileHandler(CeleryTaskLoggerHandler):
         super().__init__(*args, **kwargs)
 
     def emit(self, record):
+        if (
+                self.is_routine_task_success(record)
+                or self.is_internal_automation_message(record)
+        ):
+            return
         msg = self.format(record)
         if not self.f or self.f.closed:
             return

@@ -79,16 +79,14 @@ class AllTypes(ChoicesMixin):
     @classmethod
     def load_automation_methods(cls, language=None):
         from assets.automations import methods as asset
-        from assets.utils.platform_package import get_persisted_platform_automation_methods
+        from assets.models import PlatformPackage
         from accounts.automations import methods as account
-        from terminal.models import Applet
 
         language = cls.get_automation_methods_language(language)
         return \
             asset.get_platform_automation_methods(asset.BASE_DIR, language) + \
             account.get_platform_automation_methods(account.BASE_DIR, language) + \
-            get_persisted_platform_automation_methods(lang=language) + \
-            Applet.get_automation_methods(lang=language)
+            PlatformPackage.get_all_automation_methods(lang=language)
 
     @classmethod
     def get_automation_methods(cls, language=None, reload=False):

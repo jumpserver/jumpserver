@@ -9,12 +9,13 @@ from accounts.serializers.account.account import AccountAssetSerializer as _Acco
 from accounts.serializers.account.base import BaseAccountSerializer
 from common.const import ConfirmOrIgnore
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from .base import BaseAutomationSerializer
+from .base import BaseAutomationSerializer, AutomationListSerializerMixin
 
 __all__ = [
     'DiscoverAccountSerializer',
     'DiscoverAccountActionSerializer',
     'DiscoverAccountAutomationSerializer',
+    'DiscoverAccountAutomationListSerializer',
     'DiscoverAccountDetailsSerializer'
 ]
 
@@ -36,6 +37,17 @@ class DiscoverAccountAutomationSerializer(BaseAutomationSerializer):
     @property
     def model_type(self):
         return AutomationTypes.gather_accounts
+
+
+class DiscoverAccountAutomationListSerializer(
+    AutomationListSerializerMixin, DiscoverAccountAutomationSerializer
+):
+    class Meta(DiscoverAccountAutomationSerializer.Meta):
+        relation_count_fields = {'assets_amount': 'assets', 'nodes_amount': 'nodes'}
+        fields = [
+            f for f in DiscoverAccountAutomationSerializer.Meta.fields
+            if f not in ('assets', 'nodes', 'recipients')
+        ] + ['assets_amount', 'nodes_amount']
 
 
 class AccountAssetSerializer(_AccountAssetSerializer):

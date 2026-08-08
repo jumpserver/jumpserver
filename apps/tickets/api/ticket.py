@@ -71,6 +71,11 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
             raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
+        assignee_id = self.request.query_params.get('assignees__id')
+        is_current_assignee = str(self.request.user.id) == assignee_id
+        if getattr(self, 'action', None) == 'list' and is_current_assignee:
+            return self.model.objects.all()
+
         with tmp_to_root_org():
             queryset = self.model.get_user_related_tickets(self.request.user)
         return queryset

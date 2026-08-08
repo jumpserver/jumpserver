@@ -56,7 +56,6 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             self.host_account_mapper[h['name']] = account
             secret = account.secret
             if not secret:
-                print(f'account {account.name} secret is None')
                 h['error'] = 'Account secret is empty'
                 inventory_hosts.append(h)
                 continue
@@ -105,11 +104,6 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             account.set_connectivity(Connectivity.OK)
         except Exception as e:
             super().on_host_error(host, str(e), result)
-            print(
-                f'\033[31m Update account '
-                f'{getattr(account, "name", "-")} connectivity failed: '
-                f'{e} \033[0m\n'
-            )
             return
         super().on_host_success(host, result)
 
@@ -122,8 +116,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             error_tp = account.get_err_connectivity(error)
             account.set_connectivity(error_tp)
         except Exception as e:
-            print(
-                f'\033[31m Update account '
-                f'{getattr(account, "name", "-")} connectivity failed: '
-                f'{e} \033[0m\n'
+            logger.warning(
+                "Save account connectivity failure result failed: host=%s error=%s",
+                host, e,
             )
