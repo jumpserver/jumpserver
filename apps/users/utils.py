@@ -60,7 +60,7 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
             break
 
     # 处理下载地址编码问题 '%2Fui%2F'
-    url = unquote(url)
+    url = unquote(url or '')
 
     # URL 解码后再进行安全校验，避免编码后的外部地址绕过校验
     url = safe_next_url(url, request=request)

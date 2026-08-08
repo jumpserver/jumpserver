@@ -47,7 +47,9 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         name = attrs.get('name', getattr(self.instance, 'name', ''))
-        ticket_type = attrs.get('type', getattr(self.instance, 'type', None))
+        ticket_type = attrs.get(
+            'type', getattr(self.instance, 'type', TicketType.apply_asset)
+        )
         current_org_id = str(get_current_org_id())
         flows = TicketFlow.objects.filter(
             org_id=current_org_id, name__iexact=name, type=ticket_type
