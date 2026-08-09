@@ -572,6 +572,10 @@ msgstr ""
 "Vault operation failed. Please retry, or check the account information on "
 "Vault."
 
+#: accounts/exceptions.py
+msgid "Secret not found in Vault. The local sync marker has been preserved."
+msgstr "Secret not found in Vault. The local sync marker has been preserved."
+
 #: accounts/filters.py:93 accounts/filters.py:126 accounts/filters.py:273
 #: accounts/filters.py:292 perms/filters.py:169 terminal/filters.py:35
 #: terminal/serializers/session.py:60
@@ -1898,6 +1902,18 @@ msgid ""
 "task will be executed"
 msgstr ""
 "Execute this task when clicking Sync in System Settings-Function Settings-"
+"Account Storage"
+
+#: accounts/tasks/vault.py
+msgid "Restore secret from vault"
+msgstr "Restore secrets from Vault"
+
+#: accounts/tasks/vault.py
+msgid ""
+"When clicking 'Restore' in 'System Settings - Features - Account Storage' "
+"this task will be executed"
+msgstr ""
+"Execute this task when clicking Restore in System Settings - Features - "
 "Account Storage"
 
 #: accounts/tasks/verify_account.py:49
