@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.backends import vault_client
-from accounts.const import VaultTypeChoices
+from accounts.const import SecretType, VaultTypeChoices
 from accounts.models import Account, AccountTemplate
 from accounts.models.mixins.vault import VAULT_SAVED_SECRET_MARK
 from common.utils import get_logger
@@ -132,12 +132,12 @@ def _iter_parallel_results(action, instances, max_workers):
 
 
 def _get_model_queryset(model, action):
-    queryset = model.objects.all()
+    queryset = model.objects.exclude(secret_type=SecretType.SSH_CERTIFICATE)
     # OpenBao deliberately stores the marker as plaintext, so it can be
     # filtered efficiently. Other backends encrypt it with a random nonce and
     # must inspect the decrypted model value instead.
     if vault_client.type != VaultTypeChoices.openbao:
-        return queryset, 0
+        return queryset, model.objects.count() - queryset.count()
     if action == ACTION_SYNC:
         queryset = queryset.exclude(_secret=VAULT_SAVED_SECRET_MARK)
     else:

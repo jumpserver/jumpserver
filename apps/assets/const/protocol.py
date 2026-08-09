@@ -38,7 +38,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
         return {
             cls.ssh: {
                 'port': 22,
-                'secret_types': ['password', 'ssh_key'],
+                'secret_types': ['password', 'ssh_key', 'ssh_certificate'],
                 'setting': {
                     'old_ssh_version': {
                         'type': 'bool',
@@ -56,7 +56,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
             },
             cls.sftp: {
                 'port': 22,
-                'secret_types': ['password', 'ssh_key'],
+                'secret_types': ['password', 'ssh_key', 'ssh_certificate'],
                 'setting': {
                     'sftp_home': {
                         'type': 'str',

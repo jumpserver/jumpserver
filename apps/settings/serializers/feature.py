@@ -13,6 +13,7 @@ __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
     'OpenBaoSerializer', 'HashicorpKVSerializer', 'AzureKVSerializer', 'TicketSettingSerializer',
     'ChatAISettingSerializer', 'VirtualAppSerializer', 'AmazonSMSerializer',
+    'SSHCAOpenBaoSerializer',
 ]
 
 from settings.const import (
@@ -103,6 +104,39 @@ class OpenBaoSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     )
     VAULT_OPENBAO_TIMEOUT = serializers.IntegerField(
         max_value=120, min_value=1, required=False, label=_('Timeout')
+    )
+
+
+class SSHCAOpenBaoSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('OpenBao SSH CA')
+
+    SSH_CA_ENABLED = serializers.BooleanField(required=False, label=_('Enabled'))
+    SSH_CA_OPENBAO_ADDR = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('OpenBao address')
+    )
+    SSH_CA_OPENBAO_TOKEN = EncryptedField(
+        max_length=4096, allow_blank=True, required=False, label=_('Token'), default=''
+    )
+    SSH_CA_OPENBAO_MOUNT_POINT = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Mount Point')
+    )
+    SSH_CA_OPENBAO_ROLE = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Role')
+    )
+    SSH_CA_OPENBAO_TTL = serializers.IntegerField(
+        max_value=3600, min_value=30, required=False,
+        label=_('Certificate validity (seconds)')
+    )
+    SSH_CA_OPENBAO_TIMEOUT = serializers.IntegerField(
+        max_value=120, min_value=1, required=False, label=_('Timeout')
+    )
+    SSH_CA_OPENBAO_VERIFY_TLS = serializers.BooleanField(
+        required=False, label=_('Verify TLS certificate')
+    )
+    SSH_CA_OPENBAO_SOURCE_ADDRESS = serializers.CharField(
+        max_length=1024, allow_blank=True, required=False,
+        label=_('Allowed source addresses'),
+        help_text=_('Comma-separated CIDRs seen by the target SSH server')
     )
 
 

@@ -18,7 +18,7 @@ from common.utils.timezone import local_zero_hour, local_now
 from .const.automation import (
     ChangeSecretAccountStatus, ChangeSecretRecordStatusChoice,
 )
-from .const.account import Source
+from .const.account import SecretType, Source
 from .models import (
     Account, AccountRisk, AutomationExecution, BackupAccountAutomation,
     ChangeSecretAutomation, ChangeSecretRecord, CheckAccountAutomation,
@@ -199,9 +199,9 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
     def filter_has_secret(queryset, name, has_secret):
         q = Q(_secret__isnull=True) | Q(_secret="")
         if has_secret:
-            return queryset.exclude(q)
+            return queryset.filter(~q | Q(secret_type=SecretType.SSH_CERTIFICATE))
         else:
-            return queryset.filter(q)
+            return queryset.filter(q).exclude(secret_type=SecretType.SSH_CERTIFICATE)
 
     @staticmethod
     def filter_long_time(queryset, name, value):
