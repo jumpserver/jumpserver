@@ -12475,6 +12475,10 @@ msgstr "Pantalla múltiple"
 msgid "Drives redirect"
 msgstr "Montaje de disco"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "Micrófono remoto"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "Ventana actual"

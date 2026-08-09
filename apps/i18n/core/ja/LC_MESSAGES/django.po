@@ -11767,6 +11767,10 @@ msgstr "マルチスクリーンディスプレイ"
 msgid "Drives redirect"
 msgstr "ディスクマウント"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "リモートマイク"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "現在のウィンドウ"

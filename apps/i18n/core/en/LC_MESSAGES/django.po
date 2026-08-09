@@ -12216,6 +12216,10 @@ msgstr "Multi-display"
 msgid "Drives redirect"
 msgstr "Mount disk"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "Remote microphone"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "Current window"

@@ -12264,6 +12264,10 @@ msgstr "Exibição em várias telas"
 msgid "Drives redirect"
 msgstr "Montagem do disco"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "Microfone remoto"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "Janela atual"

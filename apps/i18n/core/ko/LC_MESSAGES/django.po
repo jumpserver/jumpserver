@@ -11817,6 +11817,10 @@ msgstr "다중 화면 표시"
 msgid "Drives redirect"
 msgstr "디스크 마운트"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "원격 마이크"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "현재 창"

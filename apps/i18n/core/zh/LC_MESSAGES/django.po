@@ -11908,6 +11908,10 @@ msgstr "多屏显示"
 msgid "Drives redirect"
 msgstr "磁盘挂载"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "远程麦克风"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "当前窗口"
