@@ -12225,6 +12225,10 @@ msgstr "Многоэкранный режим"
 msgid "Drives redirect"
 msgstr "Перенаправление дисков"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "Удаленный микрофон"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "Текущее окно"

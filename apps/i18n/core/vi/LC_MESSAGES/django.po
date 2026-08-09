@@ -12237,6 +12237,10 @@ msgstr "Hiển thị nhiều màn hình"
 msgid "Drives redirect"
 msgstr "Gắn đĩa"
 
+#: users/const.py:34
+msgid "Remote microphone"
+msgstr "Micrô từ xa"
+
 #: users/const.py:37
 msgid "Current window"
 msgstr "Cửa sổ hiện tại"
