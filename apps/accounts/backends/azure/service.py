@@ -33,13 +33,17 @@ class AZUREVaultClient(object):
         else:
             return True, ''
 
-    def get(self, name, version=None):
+    def get(self, name, version=None, strict=False):
         from azure.core.exceptions import ResourceNotFoundError, ClientAuthenticationError
 
         try:
             secret = self.client.get_secret(name, version)
             return secret.value
-        except (ResourceNotFoundError, ClientAuthenticationError) as e:
+        except ResourceNotFoundError:
+            return None if strict else ''
+        except ClientAuthenticationError:
+            if strict:
+                raise
             return ''
 
     def create(self, name, secret):

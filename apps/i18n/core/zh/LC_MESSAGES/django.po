@@ -578,6 +578,10 @@ msgid ""
 "Vault."
 msgstr "Vault 操作失败，请重试，或者检查 Vault 上的账号信息。"
 
+#: accounts/exceptions.py
+msgid "Secret not found in Vault. The local sync marker has been preserved."
+msgstr "Vault 中未找到密钥，本地同步标记已保留。"
+
 #: accounts/filters.py:93 accounts/filters.py:126 accounts/filters.py:273
 #: accounts/filters.py:292 perms/filters.py:169 terminal/filters.py:35
 #: terminal/serializers/session.py:60
@@ -1902,6 +1906,16 @@ msgid ""
 "When clicking 'Sync' in 'System Settings - Features - Account Storage' this "
 "task will be executed"
 msgstr "在系统设置-功能设置-账号存储点击同步时，执行该任务"
+
+#: accounts/tasks/vault.py
+msgid "Restore secret from vault"
+msgstr "从 Vault 还原密文"
+
+#: accounts/tasks/vault.py
+msgid ""
+"When clicking 'Restore' in 'System Settings - Features - Account Storage' "
+"this task will be executed"
+msgstr "在系统设置-功能设置-账号存储点击还原时，执行该任务"
 
 #: accounts/tasks/verify_account.py:49
 msgid "Verify asset account availability"

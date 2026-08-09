@@ -23,6 +23,7 @@ urlpatterns = [
     path('vault/<str:backend>/testing/', api.VaultTestingAPI.as_view(), name='vault-testing'),
     path('chatai/testing/', api.ChatAITestingAPI.as_view(), name='chatai-testing'),
     path('vault/sync/', api.VaultSyncDataAPI.as_view(), name='vault-sync'),
+    path('vault/restore/', api.VaultRestoreDataAPI.as_view(), name='vault-restore'),
     path('security/block-ip/', api.BlockIPSecurityAPI.as_view(), name='block-ip'),
     path('security/unlock-ip/', api.UnlockIPSecurityAPI.as_view(), name='unlock-ip'),
 

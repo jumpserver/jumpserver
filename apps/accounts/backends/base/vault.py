@@ -39,6 +39,10 @@ class BaseVault(ABC):
         """ 返回 secret 值 """
         return self._get(self.build_entry(instance))
 
+    def get_for_restore(self, instance):
+        """Read a secret without hiding a missing entry or backend failure."""
+        return self._get_for_restore(self.build_entry(instance))
+
     def create(self, instance):
         if not instance.secret_has_save_to_vault:
             entry = self.build_entry(instance)
@@ -87,6 +91,9 @@ class BaseVault(ABC):
     @abstractmethod
     def _get(self, instance):
         raise NotImplementedError
+
+    def _get_for_restore(self, entry):
+        return self._get(entry)
 
     @abstractmethod
     def _create(self, entry):
