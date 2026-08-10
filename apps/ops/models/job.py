@@ -5,6 +5,7 @@ import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta, datetime
+from functools import partial
 
 from celery import current_task
 from django.conf import settings
@@ -19,6 +20,7 @@ from simple_history.models import HistoricalRecords
 
 from accounts.models import Account
 from acls.models import CommandFilterACL, DataMaskingRule
+from assets.const import Protocol
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
@@ -32,10 +34,36 @@ from ops.const import Types, RunasPolicies, JobStatus, JobModules
 from ops.utils import merge_nodes_and_assets
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
+from perms.const import ActionChoices
+from perms.utils.asset_perm import PermAssetDetailUtil
 from perms.utils import UserPermAssetUtil
 from terminal.notifications import CommandExecutionAlert
 from terminal.notifications import CommandWarningMessage
 from terminal.const import RiskLevelChoices
+
+
+def check_upload_permission(host, *, user, asset, account, **kwargs):
+    if host.get('error'):
+        return host
+
+    protocols_required = {Protocol.ssh, Protocol.sftp, Protocol.winrm}
+    protocols = set(asset.protocols.values_list('name', flat=True))
+    if not protocols.intersection(protocols_required):
+        host['error'] = _(
+            'Asset ({asset}) must have at least one of the following protocols added: SSH, SFTP, or WinRM'
+        ).format(asset=asset.name)
+        return host
+
+    util = PermAssetDetailUtil(user, asset)
+    if not util.check_perm_protocols(protocols_required):
+        host['error'] = _(
+            'Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol'
+        ).format(asset=asset.name)
+    elif not util.check_perm_actions(account.username, [ActionChoices.upload.value]):
+        host['error'] = _(
+            'Asset ({asset}) authorization lacks upload permissions'
+        ).format(asset=asset.name)
+    return host
 
 
 def get_parent_keys(key, include_self=True):
@@ -209,8 +237,11 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
+        host_callback = None
+        if self.type == Types.upload_file:
+            host_callback = partial(check_upload_permission, user=self.creator)
         return JMSPermedInventory(self.assets.all(), self.nodes.all(),
-                                  self.runas_policy, self.runas,
+                                  self.runas_policy, self.runas, host_callback=host_callback,
                                   user=self.creator, module=self.module)
 
     @property
