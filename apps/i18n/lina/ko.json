@@ -1389,6 +1389,7 @@
     "Revoke": "취소",
     "Risk": "위험",
     "RiskDetection": "위험 감지",
+    "RiskDetectionAccountSourceHelpText": "위험 감지는 시스템에서 관리되는 계정 자격 증명만 검사하며, 자산에 연결하여 계정을 실시간으로 검색하지 않습니다. 자산의 실제 계정을 확인하려면 먼저 '계정 검색'을 실행한 후 검색된 계정을 관리 대상으로 등록하고 자격 증명을 설정하세요.",
     "RiskDetectionDetail": "위험 감지 상세 정보",
     "RiskyAccount": "위험 계정",
     "Role": "역할",

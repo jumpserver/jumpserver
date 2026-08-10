@@ -1347,6 +1347,7 @@
     "Revoke": "撤销",
     "Risk": "风险",
     "RiskDetection": "风险检测",
+    "RiskDetectionAccountSourceHelpText": "风险检测仅检查系统中已纳管的账号凭据，不会连接资产实时发现账号。如需核对资产上的实际账号，请先执行「账号发现」，并完成账号纳管和凭据配置。",
     "RiskDetectionDetail": "风险检测详情",
     "RiskyAccount": "风险账号",
     "Role": "角色",

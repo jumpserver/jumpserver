@@ -1393,6 +1393,7 @@
     "Revoke": "撤銷",
     "Risk": "風險",
     "RiskDetection": "風險檢測",
+    "RiskDetectionAccountSourceHelpText": "風險檢測僅檢查系統中已納管的帳號憑據，不會連線資產即時發現帳號。如需核對資產上的實際帳號，請先執行「帳號發現」，並完成帳號納管和憑據配置。",
     "RiskDetectionDetail": "風險檢測詳情",
     "RiskyAccount": "風險帳號",
     "Role": "角色",
