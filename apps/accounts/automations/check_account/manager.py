@@ -218,6 +218,7 @@ class CheckAccountManager(BaseManager):
             label = self.handler_labels.get(
                 handler.__class__, _('Account security')
             )
+            label = str(label).rstrip(':：')
             self.print_log(
                 _("Enabled account security check: %(check)s") % {
                     'check': label,

@@ -129,6 +129,10 @@ class CeleryTaskLoggerHandler(StreamHandler):
             "Acquired Lock('lock:{accounts:vault-secret-transfer}",
             "Release Lock('lock:{accounts:vault-secret-transfer}",
             "Released Lock('lock:{accounts:vault-secret-transfer}",
+            "Acquire Lock('lock:{account-risk-check:",
+            "Acquired Lock('lock:{account-risk-check:",
+            "Release Lock('lock:{account-risk-check:",
+            "Released Lock('lock:{account-risk-check:",
         ))
 
     def emit(self, record):
