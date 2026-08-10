@@ -13710,6 +13710,22 @@ msgstr "ID подписки"
 msgid "API Endpoint"
 msgstr "Конечная точка API"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:196
+msgid "Local user"
+msgstr "Локальный пользователь"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:197
+msgid "Domain user"
+msgstr "Доменный пользователь"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:198
+msgid "Interface interconnection user"
+msgstr "Пользователь интеграционного интерфейса"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:200
+msgid "User type"
+msgstr "Тип пользователя"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:89
 msgid "Auto node classification"
 msgstr "Автоматическая классификация узлов"

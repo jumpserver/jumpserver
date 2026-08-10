@@ -13753,6 +13753,22 @@ msgstr "ID de inscrição"
 msgid "API Endpoint"
 msgstr "Ponto de extremidade da API"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:196
+msgid "Local user"
+msgstr "Usuário local"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:197
+msgid "Domain user"
+msgstr "Usuário de domínio"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:198
+msgid "Interface interconnection user"
+msgstr "Usuário de interconexão de interface"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:200
+msgid "User type"
+msgstr "Tipo de usuário"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:89
 msgid "Auto node classification"
 msgstr "Classificação automática de nós"

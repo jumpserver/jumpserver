@@ -13264,6 +13264,22 @@ msgstr "구독 ID"
 msgid "API Endpoint"
 msgstr "API 엔드포인트"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:196
+msgid "Local user"
+msgstr "로컬 사용자"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:197
+msgid "Domain user"
+msgstr "도메인 사용자"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:198
+msgid "Interface interconnection user"
+msgstr "인터페이스 연동 사용자"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:200
+msgid "User type"
+msgstr "사용자 유형"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:89
 msgid "Auto node classification"
 msgstr "자동 노드 분류"
