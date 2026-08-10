@@ -103,10 +103,12 @@ class CheckAccountAutomationSerializer(BaseAutomationSerializer):
     def validate_engines(engines):
         valid_slugs = {i['slug'] for i in CheckAccountEngine.get_default_engines()}
 
+        if not engines:
+            raise serializers.ValidationError(_("At least one engine is required"))
         if not all(engine in valid_slugs for engine in engines):
             raise serializers.ValidationError(_("Invalid engine id"))
 
-        return engines
+        return list(dict.fromkeys(engines))
 
 
 class CheckAccountAutomationListSerializer(
