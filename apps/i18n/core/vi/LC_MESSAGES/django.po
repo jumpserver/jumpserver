@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-06 15:33+0800\n"
+"POT-Creation-Date: 2026-08-10 17:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgid "No valid assets found for account creation."
 msgstr "Không tìm thấy tài sản hợp lệ để tạo tài khoản."
 
 #: accounts/api/account/application.py:91
-#: authentication/api/connection_token.py:668
+#: authentication/api/connection_token.py:681
 msgid "Account not found"
 msgstr "Tài khoản không tìm thấy"
 
@@ -42,7 +42,7 @@ msgstr "Tài khoản không tìm thấy"
 msgid "Protocols"
 msgstr "Nhóm giao thức"
 
-#: accounts/api/automations/base.py:89 tickets/api/ticket.py:138
+#: accounts/api/automations/base.py:89 tickets/api/ticket.py:143
 msgid "The parameter 'action' must be [{}]"
 msgstr "Tham số 'action' phải là [{}]"
 
@@ -99,7 +99,7 @@ msgid "The account backup plan is being executed"
 msgstr "Kế hoạch sao lưu tài khoản đang được thực hiện"
 
 #: accounts/automations/backup_account/manager.py:22
-#: accounts/automations/check_account/manager.py:307
+#: accounts/automations/check_account/manager.py:463
 #: assets/automations/base/manager.py:278
 #: assets/automations/ping_gateway/manager.py:380
 #: xpack/plugins/cloud/manager.py:113
@@ -107,25 +107,30 @@ msgid "Task execution completed"
 msgstr "Nhiệm vụ đã hoàn thành"
 
 #: accounts/automations/backup_account/manager.py:26
+#, python-format
 msgid "Backup failed: %(error)s"
 msgstr "Sao lưu thất bại: %(error)s"
 
 #: accounts/automations/backup_account/manager.py:29
+#, python-format
 msgid "Backed up %(count)s accounts"
 msgstr "已备份 %(count)s 个账号"
 
 #: accounts/automations/backup_account/manager.py:32
-#: accounts/automations/check_account/manager.py:326
+#: accounts/automations/check_account/manager.py:483
 #: assets/automations/base/manager.py:283
 #: assets/automations/ping_gateway/manager.py:392
+#, python-format
 msgid "Duration: %(duration)s seconds"
 msgstr "Thời gian: %(duration)s giây"
 
 #: accounts/automations/base/manager.py:86
+#, python-format
 msgid "Targets: %(accounts)s account(s) on %(assets)s asset(s)"
 msgstr "Mục tiêu: %(accounts)s tài khoản, liên quan đến %(assets)s tài sản"
 
 #: accounts/automations/base/manager.py:137
+#, python-format
 msgid "△ %(host)s: operation completed; verification pending"
 msgstr ""
 "△ %(host)s: Hoạt động đã hoàn tất, chờ xác nhận thông tin xác thực mới"
@@ -140,6 +145,7 @@ msgstr "账号推送成功，新凭据验证通过"
 
 #: accounts/automations/base/manager.py:145
 #: assets/automations/base/manager.py:598
+#, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s: %(result)s"
 
@@ -152,6 +158,7 @@ msgid "No pending accounts found"
 msgstr "Không tìm thấy tài khoản chờ xử lý"
 
 #: accounts/automations/base/manager.py:260
+#, python-format
 msgid "○ %(asset)s: skipped; no eligible accounts"
 msgstr "○ %(asset)s: Đã bỏ qua, không có tài khoản chờ xử lý phù hợp"
 
@@ -188,45 +195,57 @@ msgid "Secret cannot be empty"
 msgstr "Nội dung mã hóa không được để trống"
 
 #: accounts/automations/change_secret/manager.py:86
+#, python-format
 msgid ""
 "Successful: %(success)s, Needs verification: %(unverified)s, Failed: "
 "%(failed)s, Total: %(total)s"
 msgstr "成功：%(success)s，待确认：%(unverified)s，失败：%(failed)s，总计：%(total)s"
 
-#: accounts/automations/check_account/manager.py:159
+#: accounts/automations/check_account/manager.py:170
 #: users/templates/users/reset_password.html:24
 msgid "Password strength"
 msgstr "Độ mạnh mật khẩu:"
 
-#: accounts/automations/check_account/manager.py:160
+#: accounts/automations/check_account/manager.py:171
+#: accounts/automations/check_account/manager.py:176
 #: accounts/models/automations/check_account.py:54
 #: accounts/templates/accounts/check_account_report.html:52
 msgid "Repeated password"
 msgstr "Mật khẩu trùng lặp"
 
-#: accounts/automations/check_account/manager.py:161
+#: accounts/automations/check_account/manager.py:172
+#: accounts/automations/check_account/manager.py:177
 #: accounts/models/automations/check_account.py:53
 #: accounts/templates/accounts/check_account_report.html:45
 msgid "Leaked password"
 msgstr "Rò rỉ mật khẩu"
 
-#: accounts/automations/check_account/manager.py:225
+#: accounts/automations/check_account/manager.py:175
+#: accounts/models/automations/check_account.py:52
+#: accounts/templates/accounts/check_account_report.html:38
+msgid "Weak password"
+msgstr "Mật khẩu yếu"
+
+#: accounts/automations/check_account/manager.py:219
 msgid "Account security"
-msgstr "账号安全"
+msgstr "Bảo mật tài khoản"
 
-#: accounts/automations/check_account/manager.py:227
-msgid "Checking account security: %(check)s"
-msgstr "Đang kiểm tra bảo mật tài khoản: %(check)s"
+#: accounts/automations/check_account/manager.py:223
+#, python-format
+msgid "Enabled account security check: %(check)s"
+msgstr "Đã bật kiểm tra bảo mật tài khoản: %(check)s"
 
-#: accounts/automations/check_account/manager.py:236
+#: accounts/automations/check_account/manager.py:386
+#, python-format
 msgid "Processing %(count)s accounts"
 msgstr "Đang xử lý %(count)s tài khoản"
 
-#: accounts/automations/check_account/manager.py:294
+#: accounts/automations/check_account/manager.py:419
 msgid "Check account report of {}"
 msgstr "Báo cáo phát hiện rủi ro {}"
 
-#: accounts/automations/check_account/manager.py:309
+#: accounts/automations/check_account/manager.py:465
+#, python-format
 msgid ""
 "Checked %(total)s accounts: %(normal)s normal, %(risk)s at risk, "
 "%(no_secret)s without secrets"
@@ -234,7 +253,8 @@ msgstr ""
 "Đã kiểm tra %(total)s tài khoản: %(normal)s bình thường, %(risk)s có rủi ro,"
 " %(no_secret)s không có thông tin xác thực"
 
-#: accounts/automations/check_account/manager.py:319
+#: accounts/automations/check_account/manager.py:475
+#, python-format
 msgid ""
 "Risk details: %(weak)s weak passwords, %(leaked)s leaked passwords, "
 "%(repeated)s repeated passwords"
@@ -247,7 +267,7 @@ msgid "Checking gateway account connectivity"
 msgstr "正在检查网关账号连通性"
 
 #: accounts/const/account.py:6
-#: accounts/serializers/automations/change_secret.py:37
+#: accounts/serializers/automations/change_secret.py:38
 #: audits/auth_backends.py:16 authentication/confirm/password.py:25
 #: authentication/confirm/password.py:27 authentication/const.py:14
 #: authentication/forms.py:28
@@ -266,7 +286,7 @@ msgid "Password"
 msgstr "Mật khẩu"
 
 #: accounts/const/account.py:7
-#: accounts/serializers/automations/change_secret.py:38
+#: accounts/serializers/automations/change_secret.py:39
 #: authentication/models/ssh_key.py:27 terminal/serializers/storage.py:124
 msgid "SSH key"
 msgstr "Khóa SSH"
@@ -331,7 +351,7 @@ msgid "Update"
 msgstr "Cập nhật"
 
 #: accounts/const/account.py:34 accounts/const/automation.py:116
-#: accounts/serializers/automations/change_secret.py:194 audits/const.py:66
+#: accounts/serializers/automations/change_secret.py:204 audits/const.py:66
 #: audits/signal_handlers/activity_log.py:34 common/const/choices.py:67
 #: ops/const.py:77 terminal/const.py:81 xpack/plugins/cloud/const.py:55
 msgid "Failed"
@@ -454,7 +474,7 @@ msgid "SFTP"
 msgstr "SFTP"
 
 #: accounts/const/automation.py:115
-#: accounts/serializers/automations/change_secret.py:191 audits/const.py:65
+#: accounts/serializers/automations/change_secret.py:201 audits/const.py:65
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
 #: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:42
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
@@ -468,7 +488,7 @@ msgid "Pending"
 msgstr "Đang chờ xử lý"
 
 #: accounts/const/automation.py:118
-#: accounts/serializers/automations/change_secret.py:193
+#: accounts/serializers/automations/change_secret.py:203
 #, fuzzy
 #| msgid "Verified"
 msgid "Unverified"
@@ -570,6 +590,10 @@ msgstr ""
 "Thao tác Vault thất bại, vui lòng thử lại hoặc kiểm tra thông tin tài khoản "
 "trên Vault."
 
+#: accounts/exceptions.py:25
+msgid "Secret not found in Vault. The local sync marker has been preserved."
+msgstr "Không tìm thấy khóa trong Vault, cờ đồng bộ cục bộ đã được giữ lại."
+
 #: accounts/filters.py:93 accounts/filters.py:126 accounts/filters.py:273
 #: accounts/filters.py:292 perms/filters.py:169 terminal/filters.py:35
 #: terminal/serializers/session.py:60
@@ -631,7 +655,7 @@ msgid "Recent secret change failed"
 msgstr "Lần đổi mật khẩu gần nhất thất bại"
 
 #: accounts/filters.py:164 accounts/models/automations/check_account.py:70
-#: accounts/serializers/automations/check_account.py:36
+#: accounts/serializers/automations/check_account.py:37
 msgid "Risk"
 msgstr "Rủi ro"
 
@@ -656,18 +680,18 @@ msgstr "Chưa xác minh trong thời gian dài"
 #: accounts/filters.py:382 accounts/models/automations/change_secret.py:49
 #: accounts/models/automations/check_account.py:73
 #: accounts/models/automations/gather_account.py:26
-#: accounts/serializers/automations/check_account.py:39
+#: accounts/serializers/automations/check_account.py:40
 #: assets/models/automations/base.py:147
 #: assets/serializers/automations/base.py:47 audits/filters.py:127
 #: audits/filters.py:209 audits/models.py:252 audits/reporting.py:607
 #: audits/serializers.py:79 ops/filters.py:54 ops/models/base.py:49
-#: ops/models/job.py:240 terminal/models/applet/applet.py:401
+#: ops/models/job.py:271 terminal/models/applet/applet.py:398
 #: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:104
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:285
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:291
 #: tickets/reporting.py:80 tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/filters.py:51
+#: tickets/serializers/ticket/ticket.py:21 xpack/plugins/cloud/filters.py:51
 #: xpack/plugins/cloud/models.py:233 xpack/plugins/cloud/models.py:300
 msgid "Status"
 msgstr "Trạng thái"
@@ -703,11 +727,11 @@ msgstr "Tên nhiệm vụ"
 #: accounts/models/automations/gather_account.py:17
 #: accounts/serializers/account/account.py:228
 #: accounts/serializers/account/account.py:295
-#: accounts/serializers/automations/change_secret.py:135
-#: accounts/serializers/automations/change_secret.py:168
-#: accounts/serializers/automations/change_secret.py:211
-#: accounts/serializers/automations/check_account.py:33
-#: accounts/serializers/automations/gather_account.py:48
+#: accounts/serializers/automations/change_secret.py:145
+#: accounts/serializers/automations/change_secret.py:178
+#: accounts/serializers/automations/change_secret.py:221
+#: accounts/serializers/automations/check_account.py:34
+#: accounts/serializers/automations/gather_account.py:60
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_report.html:79
 #: accounts/templates/accounts/change_secret_report.html:119
@@ -741,7 +765,7 @@ msgid "Su from"
 msgstr "Switch from"
 
 #: accounts/models/account.py:97 assets/const/protocol.py:195
-#: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:42
+#: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:39
 #: terminal/models/virtualapp/virtualapp.py:22
 msgid "Version"
 msgstr "Phiên bản"
@@ -778,13 +802,13 @@ msgstr "Trạng thái đổi mật khẩu"
 #: accounts/models/automations/check_account.py:64
 #: accounts/serializers/account/account.py:296
 #: accounts/serializers/account/service.py:13
-#: accounts/serializers/automations/change_secret.py:137
-#: accounts/serializers/automations/change_secret.py:169
+#: accounts/serializers/automations/change_secret.py:147
+#: accounts/serializers/automations/change_secret.py:179
 #: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
 #: audits/reporting.py:114 audits/serializers.py:261
-#: authentication/api/connection_token.py:680 ops/models/base.py:18
+#: authentication/api/connection_token.py:693 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/filters.py:114
 #: terminal/models/session/session.py:31 terminal/notifications.py:306
@@ -837,30 +861,31 @@ msgstr "Hoạt động tài khoản"
 #: acls/serializers/base.py:35 assets/models/asset/common.py:133
 #: assets/models/asset/common.py:199 assets/models/cmd_filter.py:21
 #: assets/models/favorite_asset.py:14 assets/models/label.py:18
-#: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/models/zone.py:19 assets/serializers/asset/common.py:179
-#: assets/serializers/platform.py:159 assets/serializers/platform.py:284
+#: assets/models/platform.py:22 assets/models/platform.py:299
+#: assets/models/platform.py:378 assets/models/zone.py:19
+#: assets/serializers/asset/common.py:179 assets/serializers/platform.py:159
+#: assets/serializers/platform.py:289
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12 authentication/notifications.py:17
 #: authentication/notifications.py:56
 #: authentication/serializers/connect_token_secret.py:127
 #: authentication/serializers/connect_token_secret.py:223 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
-#: ops/models/celery.py:81 ops/models/job.py:154 ops/models/playbook.py:28
+#: ops/models/celery.py:81 ops/models/job.py:182 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 reports/models.py:15 settings/models.py:38
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/api/component/terminal.py:30
-#: terminal/models/applet/applet.py:40
+#: terminal/models/applet/applet.py:37
 #: terminal/models/component/endpoint.py:13
 #: terminal/models/component/endpoint.py:108
 #: terminal/models/component/storage.py:26
 #: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
 #: terminal/models/virtualapp/provider.py:10
-#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:93
+#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:98
 #: tickets/models/flow.py:42 tickets/serializers/flow.py:26
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:67
@@ -1017,7 +1042,7 @@ msgstr "Kiểm tra kết nối sau khi thay đổi"
 #: accounts/models/automations/change_secret.py:17
 #: accounts/models/automations/check_account.py:19
 #: accounts/models/automations/gather_account.py:117
-#: accounts/serializers/automations/change_secret.py:62
+#: accounts/serializers/automations/change_secret.py:63
 #: settings/serializers/auth/ldap.py:112
 #: settings/serializers/auth/ldap_ha.py:94 settings/serializers/msg.py:46
 msgid "Recipient"
@@ -1029,7 +1054,7 @@ msgstr "Tự động hóa đổi mật khẩu"
 
 #: accounts/models/automations/change_secret.py:47
 #: assets/models/automations/base.py:155 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:249
+#: ops/models/celery.py:90 ops/models/job.py:280
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "Ngày kết thúc"
@@ -1105,11 +1130,6 @@ msgstr "Mật khẩu đã hết hạn"
 msgid "Long time no change"
 msgstr "Thay đổi mật khẩu đã lâu"
 
-#: accounts/models/automations/check_account.py:52
-#: accounts/templates/accounts/check_account_report.html:38
-msgid "Weak password"
-msgstr "Mật khẩu yếu"
-
 #: accounts/models/automations/check_account.py:61
 #: accounts/models/automations/gather_account.py:18 accounts/models/base.py:64
 #: accounts/serializers/account/virtual.py:21
@@ -1156,22 +1176,10 @@ msgid "Check engine"
 msgstr "Công cụ phát hiện"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the discovered accounts"
-msgstr "Kiểm tra các tài khoản được phát hiện"
-
-#: accounts/models/automations/check_account.py:135
-msgid ""
-"Perform checks and analyses based on automatically discovered account "
-"results, including user groups, public keys, sudoers, and other information."
-msgstr ""
-"Tiến hành kiểm tra và phân tích kết quả của các tài khoản được phát hiện tự "
-"động, bao gồm nhóm người dùng, khóa công khai, sudoers và thông tin khác."
-
-#: accounts/models/automations/check_account.py:142
 msgid "Check the strength of your account and password"
 msgstr "Kiểm tra độ mạnh của tài khoản và mật khẩu của bạn"
 
-#: accounts/models/automations/check_account.py:144
+#: accounts/models/automations/check_account.py:135
 msgid ""
 "Perform checks and analyses based on the security of account passwords, "
 "including password strength, leakage, etc."
@@ -1179,21 +1187,21 @@ msgstr ""
 "Phân tích và kiểm tra tính an toàn của tài khoản và mật khẩu, bao gồm độ "
 "mạnh của mật khẩu, tình trạng rò rỉ, v.v."
 
-#: accounts/models/automations/check_account.py:151
+#: accounts/models/automations/check_account.py:142
 msgid "Check if the account and password are repeated"
 msgstr "Kiểm tra xem tài khoản và mật khẩu có bị trùng lặp không"
 
-#: accounts/models/automations/check_account.py:152
+#: accounts/models/automations/check_account.py:143
 msgid "Check if the account is the same as other accounts."
 msgstr "Kiểm tra xem tài khoản này có giống với các tài khoản khác hay không."
 
-#: accounts/models/automations/check_account.py:157
+#: accounts/models/automations/check_account.py:148
 msgid "Check whether the account password is a common password"
 msgstr ""
 "Kiểm tra xem tài khoản và mật khẩu có phải là mật khẩu thông thường hay "
 "không"
 
-#: accounts/models/automations/check_account.py:158
+#: accounts/models/automations/check_account.py:149
 msgid "Check whether the account password is a commonly leaked password."
 msgstr ""
 "Kiểm tra xem tài khoản và mật khẩu có phải là mật khẩu bị rò rỉ thông thường"
@@ -1254,7 +1262,7 @@ msgstr "Xác thực tài khoản"
 #: accounts/models/base.py:37 accounts/models/base.py:66
 #: accounts/serializers/account/account.py:499
 #: accounts/serializers/account/base.py:19
-#: accounts/serializers/automations/change_secret.py:51
+#: accounts/serializers/automations/change_secret.py:52
 #: authentication/serializers/connect_token_secret.py:44
 #: authentication/serializers/connect_token_secret.py:54
 #: terminal/serializers/storage.py:140
@@ -1262,7 +1270,7 @@ msgid "Secret type"
 msgstr "Loại mật mã."
 
 #: accounts/models/base.py:42
-#: accounts/serializers/automations/change_secret.py:44
+#: accounts/serializers/automations/change_secret.py:45
 msgid "Secret strategy"
 msgstr ""
 "Chính sách mật văn < - SEP -> Quy tắc mật khẩu < - SEP -> Đẩy tự động < - "
@@ -1277,7 +1285,7 @@ msgstr ""
 " kết quả nhiệm vụ sao lưu tài khoản."
 
 #: accounts/models/base.py:44 accounts/serializers/account/template.py:32
-#: accounts/serializers/automations/change_secret.py:50
+#: accounts/serializers/automations/change_secret.py:51
 msgid "Password rules"
 msgstr "Quy tắc mật khẩu"
 
@@ -1288,7 +1296,7 @@ msgstr "Tài khoản đặc quyền"
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: audits/filters.py:55 authentication/serializers/connect_token_secret.py:131
-#: reports/models.py:18 terminal/models/applet/applet.py:47
+#: reports/models.py:18 terminal/models/applet/applet.py:44
 #: terminal/models/virtualapp/virtualapp.py:24 users/serializers/user.py:263
 msgid "Is active"
 msgstr "Active"
@@ -1453,9 +1461,9 @@ msgid "Exist policy"
 msgstr "Tài khoản đã tồn tại chính sách"
 
 #: accounts/serializers/account/account.py:207 assets/models/label.py:21
-#: assets/models/platform.py:95 assets/serializers/asset/common.py:146
+#: assets/models/platform.py:379 assets/serializers/asset/common.py:146
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:174
-#: assets/serializers/platform.py:285 perms/serializers/user_permission.py:27
+#: assets/serializers/platform.py:290 perms/serializers/user_permission.py:27
 #: settings/models.py:40 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/filters.py:17
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:327
@@ -1466,21 +1474,21 @@ msgstr "Thể loại"
 #: accounts/serializers/account/account.py:208 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:22 assets/models/automations/base.py:27
 #: assets/models/automations/base.py:156 assets/models/cmd_filter.py:74
-#: assets/models/platform.py:96 assets/serializers/asset/common.py:147
+#: assets/models/platform.py:380 assets/serializers/asset/common.py:147
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:78
 #: audits/serializers.py:225 authentication/models/connection_token.py:68
 #: authentication/serializers/connect_token_secret.py:140
-#: ops/models/job.py:162 perms/serializers/user_permission.py:28
-#: reports/models.py:16 terminal/models/applet/applet.py:46
+#: ops/models/job.py:190 perms/serializers/user_permission.py:28
+#: reports/models.py:16 terminal/models/applet/applet.py:43
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:46 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:277 tickets/reporting.py:70
-#: tickets/serializers/flow.py:29 tickets/serializers/flow.py:100
-#: tickets/serializers/ticket/ticket.py:19
+#: tickets/models/ticket/general.py:283 tickets/reporting.py:70
+#: tickets/serializers/flow.py:29 tickets/serializers/flow.py:102
+#: tickets/serializers/ticket/ticket.py:20
 msgid "Type"
 msgstr "Loại"
 
@@ -1500,10 +1508,10 @@ msgid "Account already exists. Field(s): {fields} must be unique."
 msgstr "Tài khoản đã tồn tại. Trường :{fields} phải là duy nhất."
 
 #: accounts/serializers/account/account.py:297 ops/models/celery.py:84
-#: tickets/filters.py:32 tickets/models/comment.py:13
-#: tickets/models/ticket/general.py:49 tickets/models/ticket/general.py:281
+#: tickets/filters.py:33 tickets/models/comment.py:13
+#: tickets/models/ticket/general.py:49 tickets/models/ticket/general.py:287
 #: tickets/reporting.py:75 tickets/serializers/super_ticket.py:14
-#: tickets/serializers/ticket/ticket.py:21
+#: tickets/serializers/ticket/ticket.py:22
 msgid "State"
 msgstr "Trạng thái"
 
@@ -1596,14 +1604,14 @@ msgstr "Danh sách trắng IP"
 #: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36
-#: ops/models/adhoc.py:25 ops/models/job.py:172 ops/models/playbook.py:31
+#: ops/models/adhoc.py:25 ops/models/job.py:200 ops/models/playbook.py:31
 #: rbac/models/role.py:37 settings/models.py:43
-#: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:402
+#: terminal/models/applet/applet.py:49 terminal/models/applet/applet.py:399
 #: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:23
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:29 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:303 users/models/user/__init__.py:104
+#: tickets/models/ticket/general.py:309 users/models/user/__init__.py:104
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
 msgid "Comment"
 msgstr "Description"
@@ -1702,7 +1710,7 @@ msgstr "Mật khẩu mã hóa tệp"
 
 #: accounts/serializers/automations/backup.py:36
 #: accounts/serializers/automations/backup.py:40
-#: accounts/serializers/automations/change_secret.py:63
+#: accounts/serializers/automations/change_secret.py:64
 msgid "Currently only mail sending is supported"
 msgstr "Hiện tại chỉ hỗ trợ gửi qua email"
 
@@ -1710,72 +1718,97 @@ msgstr "Hiện tại chỉ hỗ trợ gửi qua email"
 msgid "Asset type"
 msgstr "Loại tài sản"
 
-#: accounts/serializers/automations/base.py:22
+#: accounts/serializers/automations/base.py:25
 msgid "Name already exists"
 msgstr "Tên đã tồn tại"
 
-#: accounts/serializers/automations/base.py:31
+#: accounts/serializers/automations/base.py:40
+#: accounts/templates/accounts/change_secret_report.html:33
+#: accounts/templates/accounts/gather_account_report.html:31
+#: accounts/templates/accounts/push_account_report.html:32
+#: assets/serializers/domain.py:22 assets/serializers/platform.py:183
+#: orgs/serializers.py:13 perms/serializers/permission.py:62
+msgid "Assets amount"
+msgstr "Số lượng tài sản"
+
+#: accounts/serializers/automations/base.py:41 orgs/serializers.py:14
+#: perms/serializers/permission.py:63
+msgid "Nodes amount"
+msgstr "Số lượng nút"
+
+#: accounts/serializers/automations/base.py:43
+#: assets/serializers/automations/base.py:22
+msgid "Executed amount"
+msgstr "Thông báo gắn kết OAuth"
+
+#: accounts/serializers/automations/base.py:68
 #: assets/models/automations/base.py:159
 #: assets/serializers/automations/base.py:45
 msgid "Automation snapshot"
 msgstr "Chụp nhanh tự động"
 
-#: accounts/serializers/automations/change_secret.py:47
+#: accounts/serializers/automations/change_secret.py:48
 msgid "SSH Key strategy"
 msgstr "Cách thay đổi khóa SSH"
 
-#: accounts/serializers/automations/change_secret.py:61
+#: accounts/serializers/automations/change_secret.py:62
 msgid "Please enter your account username"
 msgstr "Vui lòng nhập tên người dùng tài khoản của bạn"
 
-#: accounts/serializers/automations/change_secret.py:65
+#: accounts/serializers/automations/change_secret.py:66
 msgid "Notification before execution"
 msgstr "Thông báo trước khi thực hiện"
 
-#: accounts/serializers/automations/change_secret.py:67
+#: accounts/serializers/automations/change_secret.py:68
 msgid ""
 "Secret parameter settings, currently only effective for assets of the host "
 "type."
 msgstr ""
 "Cài đặt tham số, hiện chỉ có hiệu lực đối với loại tài sản AIX, LINUX, UNIX."
 
-#: accounts/serializers/automations/change_secret.py:92
+#: accounts/serializers/automations/change_secret.py:93
 msgid "* Please enter the correct password length"
 msgstr "* Vui lòng nhập độ dài mật khẩu chính xác"
 
-#: accounts/serializers/automations/change_secret.py:96
+#: accounts/serializers/automations/change_secret.py:97
 msgid "* Password length range 8-36 bits"
 msgstr "* Độ dài mật khẩu trong khoảng 8-36 ký tự"
 
-#: accounts/serializers/automations/change_secret.py:117
+#: accounts/serializers/automations/change_secret.py:118
 msgid "Secret is required for the custom strategy"
 msgstr ""
 
-#: accounts/serializers/automations/change_secret.py:134
-#: accounts/serializers/automations/change_secret.py:170
+#: accounts/serializers/automations/change_secret.py:144
+#: accounts/serializers/automations/change_secret.py:180
 #: ops/serializers/job.py:93 terminal/serializers/session.py:62
 msgid "Is success"
 msgstr "Is success"
 
-#: accounts/serializers/automations/change_secret.py:141
+#: accounts/serializers/automations/change_secret.py:151
 #: assets/models/automations/base.py:181
 msgid "Automation task execution"
 msgstr "Lịch sử thực hiện tác vụ tự động."
 
-#: accounts/serializers/automations/change_secret.py:213
+#: accounts/serializers/automations/change_secret.py:223
 msgid "TTL"
 msgstr "TTL"
 
-#: accounts/serializers/automations/change_secret.py:214
-#: assets/models/platform.py:97 tickets/models/ticket/general.py:306
+#: accounts/serializers/automations/change_secret.py:224
+#: assets/models/platform.py:381 tickets/models/ticket/general.py:312
 msgid "Meta"
 msgstr "Siêu dữ liệu"
 
-#: accounts/serializers/automations/check_account.py:106
+#: accounts/serializers/automations/check_account.py:107
+#, fuzzy
+#| msgid "At least one clipboard operation is required"
+msgid "At least one engine is required"
+msgstr "Ít nhất phải chọn một thao tác Clipboard"
+
+#: accounts/serializers/automations/check_account.py:109
 msgid "Invalid engine id"
 msgstr "ID động cơ không hợp lệ"
 
-#: accounts/serializers/automations/gather_account.py:31
+#: accounts/serializers/automations/gather_account.py:32
 msgid "Whether to check the risk of the discovered accounts."
 msgstr "Có tiến hành kiểm tra rủi ro cho tài khoản tập trung không."
 
@@ -1923,17 +1956,29 @@ msgstr ""
 "Khi trong bảng điều khiển - Mẫu tài khoản - Tài khoản - Nhấp vào đồng bộ để "
 "cập nhật thông tin tài khoản, thực hiện nhiệm vụ này"
 
-#: accounts/tasks/vault.py:33
+#: accounts/tasks/vault.py:308
 msgid "Sync secret to vault"
 msgstr "Đồng bộ mật mã đến vault"
 
-#: accounts/tasks/vault.py:35
+#: accounts/tasks/vault.py:310
 msgid ""
 "When clicking 'Sync' in 'System Settings - Features - Account Storage' this "
 "task will be executed"
 msgstr ""
 "Tại cài đặt hệ thống - Cài đặt chức năng - Nhấp vào đồng bộ lưu trữ tài "
 "khoản, thực hiện nhiệm vụ này"
+
+#: accounts/tasks/vault.py:318
+msgid "Restore secret from vault"
+msgstr "Khôi phục bản mã từ Vault"
+
+#: accounts/tasks/vault.py:320
+msgid ""
+"When clicking 'Restore' in 'System Settings - Features - Account Storage' "
+"this task will be executed"
+msgstr ""
+"Khi bấm Khôi phục trong Cài đặt hệ thống-Cài đặt chức năng-Lưu trữ tài "
+"khoản, hãy thực hiện tác vụ này"
 
 #: accounts/tasks/verify_account.py:49
 msgid "Verify asset account availability"
@@ -1969,8 +2014,8 @@ msgstr "Thông tin cơ bản."
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:153 audits/models.py:74
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:248
-#: ops/templates/ops/celery_task_log.html:154
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:279
+#: ops/templates/ops/celery_task_log.html:291
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:42
@@ -2001,14 +2046,6 @@ msgstr "Thời gian tiêu tốn"
 #: accounts/templates/accounts/backup_account_report.html:43
 msgid "Type count"
 msgstr "Số loại"
-
-#: accounts/templates/accounts/change_secret_report.html:33
-#: accounts/templates/accounts/gather_account_report.html:31
-#: accounts/templates/accounts/push_account_report.html:32
-#: assets/serializers/domain.py:22 assets/serializers/platform.py:183
-#: orgs/serializers.py:13 perms/serializers/permission.py:62
-msgid "Assets amount"
-msgstr "Số lượng tài sản"
 
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:36
@@ -2200,9 +2237,9 @@ msgstr "Người dùng"
 #: acls/models/base.py:97 acls/templates/acls/asset_login_reminder.html:10
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:39
-#: assets/serializers/platform.py:182 assets/serializers/platform.py:214
-#: authentication/api/connection_token.py:679 ops/models/base.py:17
-#: ops/models/job.py:164 ops/serializers/job.py:21
+#: assets/serializers/platform.py:182 assets/serializers/platform.py:215
+#: authentication/api/connection_token.py:692 ops/models/base.py:17
+#: ops/models/job.py:192 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:103
@@ -2423,7 +2460,7 @@ msgstr "IP/Máy chủ"
 msgid "Recipients"
 msgstr "Người nhận"
 
-#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:92
+#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:99
 msgid "The organization `{}` does not exist"
 msgstr "Tổ chức `{}` không tồn tại."
 
@@ -2550,32 +2587,32 @@ msgstr "Không bao gồm loại nền tảng"
 msgid "Exclude platform category"
 msgstr "Không bao gồm loại nền tảng"
 
-#: assets/api/asset/asset.py:86 assets/models/platform.py:104
-#: assets/serializers/platform.py:210
+#: assets/api/asset/asset.py:86 assets/models/platform.py:392
+#: assets/serializers/platform.py:211
 msgid "Gateway enabled"
 msgstr "Kích hoạt cổng mạng miền"
 
-#: assets/api/asset/asset.py:90 assets/models/platform.py:41
+#: assets/api/asset/asset.py:90 assets/models/platform.py:325
 #: assets/serializers/platform.py:36
 msgid "Ping enabled"
 msgstr "Kích hoạt Tài sản Khám Phá"
 
-#: assets/api/asset/asset.py:94 assets/models/platform.py:45
-#: assets/models/platform.py:69 assets/serializers/platform.py:39
+#: assets/api/asset/asset.py:94 assets/models/platform.py:329
+#: assets/models/platform.py:353 assets/serializers/platform.py:39
 msgid "Gather facts enabled"
 msgstr "Kích hoạt Thu Thập Thông Tin Tài sản"
 
-#: assets/api/asset/asset.py:98 assets/models/platform.py:51
+#: assets/api/asset/asset.py:98 assets/models/platform.py:335
 #: assets/serializers/platform.py:53
 msgid "Change secret enabled"
 msgstr "Kích hoạt Đổi Mật Khẩu"
 
-#: assets/api/asset/asset.py:102 assets/models/platform.py:57
+#: assets/api/asset/asset.py:102 assets/models/platform.py:341
 #: assets/serializers/platform.py:60
 msgid "Push account enabled"
 msgstr "Kích hoạt Đẩy Tài Khoản"
 
-#: assets/api/asset/asset.py:106 assets/models/platform.py:63
+#: assets/api/asset/asset.py:106 assets/models/platform.py:347
 #: assets/serializers/platform.py:46
 msgid "Verify account enabled"
 msgstr "Mở Kích Hoạt Xác Minh Tài Khoản"
@@ -2622,9 +2659,19 @@ msgstr "Xóa không thành công, nút chứa tài sản"
 msgid "Node {} is an ancestor of node {}, can't be added as its child"
 msgstr ""
 
-#: assets/api/platform.py:38
+#: assets/api/platform.py:37
 msgid "Name starts with"
 msgstr "Phần đầu tên"
+
+#: assets/api/platform.py:97
+#, fuzzy
+#| msgid "Invalid SMS platform"
+msgid "Invalid platform"
+msgstr "Nền tảng SMS không hợp lệ"
+
+#: assets/api/platform.py:102
+msgid "The cloned platform category and type must match the source"
+msgstr ""
 
 #: assets/api/tree.py:48 assets/serializers/node.py:42
 msgid "The same level node name cannot be the same"
@@ -2671,34 +2718,41 @@ msgid "Executing automation"
 msgstr "Thực hiện thao tác tự động"
 
 #: assets/automations/base/manager.py:203
+#, python-format
 msgid "Stage: %(stage)s"
 msgstr "▶ Giai đoạn: %(stage)s"
 
 #: assets/automations/base/manager.py:209
+#, python-format
 msgid "• %(host)s: processing"
 msgstr "• %(host)s: Đang xử lý"
 
 #: assets/automations/base/manager.py:265
 #: assets/automations/ping_gateway/manager.py:383
+#, python-format
 msgid "Successful: %(count)s"
 msgstr "Thành công %(count)s"
 
 #: assets/automations/base/manager.py:268
+#, python-format
 msgid "Needs verification: %(count)s"
 msgstr "Chờ xác nhận %(count)s"
 
 #: assets/automations/base/manager.py:272
 #: assets/automations/ping_gateway/manager.py:386
+#, python-format
 msgid "Failed: %(count)s"
 msgstr "Thất bại %(count)s"
 
 #: assets/automations/base/manager.py:274
 #: assets/automations/ping_gateway/manager.py:387
+#, python-format
 msgid "Total: %(count)s"
 msgstr "Tổng cộng %(count)s"
 
 #: assets/automations/base/manager.py:280
 #: assets/automations/ping_gateway/manager.py:381
+#, python-format
 msgid "Result: %(result)s"
 msgstr "Kết quả thực hiện: %(result)s"
 
@@ -2707,14 +2761,17 @@ msgid "Task: {} finished"
 msgstr "Nhiệm vụ: {} Hoàn thành"
 
 #: assets/automations/base/manager.py:532
+#, python-format
 msgid "✗ %(asset)s: automation is not configured for its platform"
 msgstr "✗ %(asset)s: Nền tảng chưa được cấu hình phương thức tự động hóa"
 
 #: assets/automations/base/manager.py:540
+#, python-format
 msgid "✗ %(asset)s: this automation is not enabled"
 msgstr "✗ %(asset)s：Chưa bật tác vụ tự động này"
 
 #: assets/automations/base/manager.py:548
+#, python-format
 msgid "✗ %(asset)s: unable to prepare this automation"
 msgstr "✗ %(asset)s: không thể chuẩn bị tác vụ tự động này"
 
@@ -2735,6 +2792,7 @@ msgid "Verify account credentials"
 msgstr "Xác minh thông tin đăng nhập tài khoản"
 
 #: assets/automations/base/manager.py:587
+#, python-format
 msgid "Targets: %(assets)s asset(s)"
 msgstr "Mục tiêu: %(assets)s tài sản"
 
@@ -2795,6 +2853,7 @@ msgid "executing the automation step"
 msgstr "Thực hiện các bước tự động hóa"
 
 #: assets/automations/base/manager.py:645
+#, python-format
 msgid ""
 "%(step)s failed: the new credential was rejected; the remote credential may "
 "already have changed, verify it before retrying"
@@ -2803,6 +2862,7 @@ msgstr ""
 "xa có thể đã bị sửa đổi, vui lòng xác minh trước rồi thử lại"
 
 #: assets/automations/base/manager.py:653
+#, python-format
 msgid ""
 "%(step)s failed: %(target)s rejected the execution account %(account)s; the "
 "credential change was not reached, check the execution credential or reduce "
@@ -2814,6 +2874,7 @@ msgstr ""
 "hợp lệ, hãy giảm số kết nối đồng thời rồi thử lại"
 
 #: assets/automations/base/manager.py:663
+#, python-format
 msgid ""
 "%(step)s failed: authentication was rejected; check the execution or target "
 "account credential"
@@ -2870,6 +2931,7 @@ msgstr ""
 "tiêu và đã bị hệ thống mục tiêu từ chối"
 
 #: assets/automations/base/manager.py:718
+#, python-format
 msgid ""
 "%(step)s failed: the execution account has insufficient permissions on the "
 "target system"
@@ -2891,6 +2953,7 @@ msgid "Unknown error"
 msgstr "Lỗi không xác định"
 
 #: assets/automations/base/manager.py:735
+#, python-format
 msgid "Operation failed: %(reason)s"
 msgstr "Thực thi thất bại: %(reason)s"
 
@@ -2901,10 +2964,12 @@ msgid "Asset not found or inactive"
 msgstr "Tài sản không tồn tại"
 
 #: assets/automations/base/manager.py:842
+#, python-format
 msgid "✗ %(host)s: %(error)s"
 msgstr "✗ %(host)s：%(error)s"
 
 #: assets/automations/base/manager.py:861
+#, python-format
 msgid "✗ %(host)s: unable to prepare (%(error)s)"
 msgstr "✗ %(host)s：chuẩn bị thất bại（%(error)s）"
 
@@ -2929,6 +2994,7 @@ msgid " and %(count)s more"
 msgstr ""
 
 #: assets/automations/base/manager.py:1072
+#, python-format
 msgid "Still processing %(count)s target(s): %(detail)s"
 msgstr "Vẫn đang xử lý %(count)s mục tiêu：%(detail)s"
 
@@ -2945,10 +3011,12 @@ msgid "Hosts still waiting"
 msgstr ""
 
 #: assets/automations/base/manager.py:1204
+#, python-format
 msgid "Batch execution failed: %(error)s"
 msgstr "Thực thi lô tác vụ này thất bại: %(error)s"
 
 #: assets/automations/base/manager.py:1218
+#, python-format
 msgid "Task: %(task)s"
 msgstr "Nhiệm vụ：%(task)s"
 
@@ -2957,6 +3025,7 @@ msgid "Stage: Preparing execution"
 msgstr "▶ Giai đoạn: Chuẩn bị môi trường thực thi"
 
 #: assets/automations/base/manager.py:1226
+#, python-format
 msgid "Task will run in %(count)s batches"
 msgstr "Nhiệm vụ sẽ được thực hiện theo %(count)s đợt"
 
@@ -2969,6 +3038,7 @@ msgid "No eligible targets were found"
 msgstr "Không có mục tiêu nào để thực thi"
 
 #: assets/automations/base/manager.py:1250
+#, python-format
 msgid "Processing batch %(current)s of %(total)s"
 msgstr "Đang thực hiện đợt %(current)s/%(total)s"
 
@@ -2978,6 +3048,7 @@ msgid "Ansible runner stopped before completing the batch: %(status)s"
 msgstr ""
 
 #: assets/automations/base/manager.py:1305
+#, python-format
 msgid "Batch did not complete: %(reason)s"
 msgstr "Nhiệm vụ của đợt này chưa hoàn thành：%(reason)s"
 
@@ -2998,6 +3069,7 @@ msgstr ""
 
 #: assets/automations/ping_gateway/manager.py:61
 #: assets/automations/ping_gateway/manager.py:94
+#, python-format
 msgid ""
 "Connected to the gateway, but it cannot forward to 127.0.0.1:%(port)s; check"
 " the SSH service and port on the gateway"
@@ -3006,6 +3078,7 @@ msgstr ""
 "lòng kiểm tra dịch vụ SSH và cổng trên gateway"
 
 #: assets/automations/ping_gateway/manager.py:67
+#, python-format
 msgid ""
 "Unable to establish an SSH session to %(address)s:%(port)s; check the "
 "network and gateway account credentials"
@@ -3029,18 +3102,21 @@ msgstr ""
 "tài khoản gateway"
 
 #: assets/automations/ping_gateway/manager.py:104
+#, python-format
 msgid ""
 "Unable to resolve gateway address %(address)s; check the address and DNS "
 "settings"
 msgstr "无法解析网关地址 %(address)s，请检查地址和 DNS 设置"
 
 #: assets/automations/ping_gateway/manager.py:113
+#, python-format
 msgid ""
 "Unable to connect to gateway %(address)s:%(port)s; check the address, port, "
 "and network"
 msgstr "无法连接网关 %(address)s:%(port)s，请检查地址、端口和网络"
 
 #: assets/automations/ping_gateway/manager.py:121
+#, python-format
 msgid "Gateway check failed: %(error)s"
 msgstr "网关检查失败：%(error)s"
 
@@ -3051,14 +3127,17 @@ msgid "No account"
 msgstr "Không có tài khoản"
 
 #: assets/automations/ping_gateway/manager.py:142
+#, python-format
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "正在验证网关登录与 SSH 隧道转发：%(gateway)s"
 
 #: assets/automations/ping_gateway/manager.py:226
+#, python-format
 msgid "✓ %(gateway)s: SSH login and tunnel forwarding are available"
 msgstr "✓ %(gateway)s：网关登录及 SSH 隧道转发正常"
 
 #: assets/automations/ping_gateway/manager.py:241
+#, python-format
 msgid "✗ %(gateway)s: %(error)s"
 msgstr "✗ %(gateway)s：%(error)s"
 
@@ -3076,6 +3155,7 @@ msgid "Task execution timed out"
 msgstr "Hết thời gian thực thi tác vụ"
 
 #: assets/automations/ping_gateway/manager.py:351
+#, python-brace-format
 msgid "Connectivity succeeded but saving the result failed: {error}"
 msgstr "连通性检查成功，但保存结果失败：{error}"
 
@@ -3167,7 +3247,7 @@ msgstr "Cloud"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:34 users/const.py:83
+#: terminal/models/applet/applet.py:31 users/const.py:84
 msgid "Web"
 msgstr "Web"
 
@@ -3208,7 +3288,7 @@ msgid "TP-Link"
 msgstr "TP-Link"
 
 #: assets/const/device.py:12 assets/const/ds.py:7
-#: terminal/models/applet/applet.py:33 tickets/const.py:9
+#: terminal/models/applet/applet.py:30 tickets/const.py:9
 msgid "General"
 msgstr "Chung"
 
@@ -3268,7 +3348,7 @@ msgstr ""
 "khoản đã kết nối<br> -${HOME} thư mục chính của tài khoản đã kết nối<br> "
 "-${USER} tên người dùng của người dùng"
 
-#: assets/const/protocol.py:81
+#: assets/const/protocol.py:81 ops/templates/ops/celery_task_log.html:4
 msgid "Console"
 msgstr "Bảng điều khiển"
 
@@ -3426,7 +3506,7 @@ msgstr "Trình chọn nút xác nhận"
 msgid "API mode"
 msgstr "Chế độ API"
 
-#: assets/const/types.py:259
+#: assets/const/types.py:261
 msgid "All types"
 msgstr "Tất cả loại"
 
@@ -3442,7 +3522,7 @@ msgstr "Tính năng này tạm thời không được hỗ trợ"
 msgid "Cloud"
 msgstr "Dịch vụ đám mây"
 
-#: assets/models/asset/common.py:134 assets/models/platform.py:16
+#: assets/models/asset/common.py:134 assets/models/platform.py:300
 #: assets/serializers/platform.py:87 settings/serializers/auth/radius.py:18
 #: settings/serializers/auth/sms.py:77 settings/serializers/msg.py:31
 #: terminal/serializers/storage.py:133
@@ -3455,7 +3535,7 @@ msgstr "Cổng"
 msgid "Address"
 msgstr "Địa chỉ"
 
-#: assets/models/asset/common.py:202 assets/models/platform.py:155
+#: assets/models/asset/common.py:202 assets/models/platform.py:443
 #: assets/serializers/asset/common.py:152
 #: assets/serializers/asset/common.py:273
 #: assets/serializers/asset/common.py:276
@@ -3541,13 +3621,13 @@ msgid "Proxy"
 msgstr "Đại lý"
 
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
-#: assets/models/node.py:560 ops/models/job.py:165
+#: assets/models/node.py:560 ops/models/job.py:193
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
 #: xpack/plugins/cloud/models.py:401
 msgid "Node"
 msgstr "Nút"
 
-#: assets/models/automations/base.py:29 ops/models/job.py:243
+#: assets/models/automations/base.py:29 ops/models/job.py:274
 #: ops/serializers/job.py:24 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr "Tham số"
@@ -3566,7 +3646,7 @@ msgstr "Nhiệm vụ tự động hóa tài sản"
 
 #: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
-#: ops/models/base.py:54 ops/models/job.py:247
+#: ops/models/base.py:54 ops/models/job.py:278
 #: users/models/user/__init__.py:344
 msgid "Date created"
 msgstr "Ngày tạo"
@@ -3578,13 +3658,13 @@ msgid "Trigger mode"
 msgstr "Chế độ kích hoạt"
 
 #: assets/models/automations/base.py:167 audits/serializers.py:38
-#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:245
+#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:276
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "Tổng hợp"
 
 #: assets/models/automations/base.py:168 ops/models/base.py:51
-#: ops/models/job.py:244 xpack/plugins/cloud/models.py:231
+#: ops/models/job.py:275 xpack/plugins/cloud/models.py:231
 msgid "Result"
 msgstr "Kết quả"
 
@@ -3711,113 +3791,165 @@ msgstr "Khóa SSH riêng"
 msgid "Can match node"
 msgstr "Có thể khớp với nút"
 
-#: assets/models/platform.py:17
+#: assets/models/platform.py:68
+msgid "Load platform.yml failed: {}"
+msgstr "Tải platform.yml thất bại: {}"
+
+#: assets/models/platform.py:97
+msgid "Package automation missing manifest.yml: {}"
+msgstr ""
+
+#: assets/models/platform.py:101
+msgid "Package automation missing main.yml: {}"
+msgstr ""
+
+#: assets/models/platform.py:112
+#, fuzzy
+#| msgid "Organization name already exists"
+msgid "Package automation method does not match directory name: {}"
+msgstr "Tên tổ chức đã tồn tại"
+
+#: assets/models/platform.py:203
+msgid "Platform automation category must contain platform category: {}"
+msgstr ""
+
+#: assets/models/platform.py:210
+msgid "Platform automation type must contain platform type: {}"
+msgstr ""
+
+#: assets/models/platform.py:217
+msgid "Platform automation protocol not found in platform.yml: {}"
+msgstr ""
+
+#: assets/models/platform.py:237
+#, fuzzy
+#| msgid "Organization name already exists"
+msgid "Platform automation method id already exists: {}"
+msgstr "Tên tổ chức đã tồn tại"
+
+#: assets/models/platform.py:249
+#, fuzzy
+#| msgid "Only support custom platform"
+msgid "Only support custom and web platform package"
+msgstr "Chỉ hỗ trợ nền tảng tùy chỉnh"
+
+#: assets/models/platform.py:254
+msgid "Missing type in platform.yml"
+msgstr "Thiếu loại trong platform.yml"
+
+#: assets/models/platform.py:295 assets/models/platform.py:385
+#, fuzzy
+#| msgid "Platform type"
+msgid "Platform package"
+msgstr "Kiểu nền tảng"
+
+#: assets/models/platform.py:301
 msgid "Primary"
 msgstr "Chính"
 
-#: assets/models/platform.py:18 ops/models/variable.py:20
+#: assets/models/platform.py:302 ops/models/variable.py:20
 msgid "Required"
 msgstr "Thiết yếu"
 
-#: assets/models/platform.py:19 assets/serializers/platform.py:162
+#: assets/models/platform.py:303 assets/serializers/platform.py:162
 #: notifications/const.py:7 terminal/models/component/storage.py:28
-#: users/const.py:42 xpack/plugins/cloud/providers/nutanix.py:30
+#: users/const.py:43 xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr "Mặc định"
 
-#: assets/models/platform.py:20
+#: assets/models/platform.py:304
 msgid "Public"
 msgstr "Công khai"
 
-#: assets/models/platform.py:21 assets/serializers/platform.py:85
-#: settings/serializers/settings.py:97
+#: assets/models/platform.py:305 assets/serializers/platform.py:85
+#: settings/serializers/settings.py:99
 msgid "Setting"
 msgstr "Thiết lập"
 
-#: assets/models/platform.py:38 audits/const.py:60
+#: assets/models/platform.py:322 audits/const.py:60
 #: authentication/backends/passkey/models.py:11 settings/models.py:42
 #: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "Kích hoạt"
 
-#: assets/models/platform.py:39
+#: assets/models/platform.py:323
 msgid "Ansible config"
 msgstr "Cấu hình Ansible"
 
-#: assets/models/platform.py:42 assets/serializers/platform.py:37
+#: assets/models/platform.py:326 assets/serializers/platform.py:37
 msgid "Ping method"
 msgstr "Phương thức Khám Phá Tài sản"
 
-#: assets/models/platform.py:43
+#: assets/models/platform.py:327
 msgid "Ping params"
 msgstr "Tham số Khám Phá Tài sản"
 
-#: assets/models/platform.py:47 assets/models/platform.py:71
+#: assets/models/platform.py:331 assets/models/platform.py:355
 #: assets/serializers/platform.py:43
 msgid "Gather facts method"
 msgstr "Phương thức Thu Thập Thông Tin"
 
-#: assets/models/platform.py:49 assets/models/platform.py:73
+#: assets/models/platform.py:333 assets/models/platform.py:357
 msgid "Gather facts params"
 msgstr "Tham số Thu Thập Thông Tin"
 
-#: assets/models/platform.py:53 assets/serializers/platform.py:57
+#: assets/models/platform.py:337 assets/serializers/platform.py:57
 msgid "Change secret method"
 msgstr "Phương thức Đổi Mật Khẩu"
 
-#: assets/models/platform.py:55
+#: assets/models/platform.py:339
 msgid "Change secret params"
 msgstr "Tham số Đổi Mật Khẩu"
 
-#: assets/models/platform.py:59 assets/serializers/platform.py:64
+#: assets/models/platform.py:343 assets/serializers/platform.py:64
 msgid "Push account method"
 msgstr "Phương thức Đẩy Tài Khoản"
 
-#: assets/models/platform.py:61
+#: assets/models/platform.py:345
 msgid "Push account params"
 msgstr "Tham số Đẩy Tài Khoản"
 
-#: assets/models/platform.py:65 assets/serializers/platform.py:50
+#: assets/models/platform.py:349 assets/serializers/platform.py:50
 msgid "Verify account method"
 msgstr "Phương thức Xác Minh Tài Khoản"
 
-#: assets/models/platform.py:67
+#: assets/models/platform.py:351
 msgid "Verify account params"
 msgstr "Tham số Xác Minh Tài Khoản"
 
-#: assets/models/platform.py:75
+#: assets/models/platform.py:359
 msgid "Remove account enabled"
 msgstr "Mở tài khoản xóa bỏ"
 
-#: assets/models/platform.py:77 assets/serializers/platform.py:74
+#: assets/models/platform.py:361 assets/serializers/platform.py:74
 msgid "Remove account method"
 msgstr "Cách xóa bỏ tài khoản"
 
-#: assets/models/platform.py:79
+#: assets/models/platform.py:363
 msgid "Remove account params"
 msgstr "Tham số xóa bỏ tài khoản"
 
-#: assets/models/platform.py:98 labels/models.py:13
+#: assets/models/platform.py:382 labels/models.py:13
 msgid "Internal"
 msgstr "Builtin"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:172
+#: assets/models/platform.py:390 assets/serializers/platform.py:172
 msgid "Charset"
 msgstr "Mã hóa"
 
-#: assets/models/platform.py:105
+#: assets/models/platform.py:393
 msgid "DS enabled"
 msgstr "Kích hoạt dịch vụ thư mục"
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:203
+#: assets/models/platform.py:395 assets/serializers/platform.py:204
 msgid "Su enabled"
 msgstr "Switch account enabled"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:178
+#: assets/models/platform.py:396 assets/serializers/platform.py:178
 msgid "Su method"
 msgstr "Switch account method"
 
-#: assets/models/platform.py:109 assets/serializers/platform.py:181
+#: assets/models/platform.py:397 assets/serializers/platform.py:181
 msgid "Custom fields"
 msgstr "Thuộc tính tùy chỉnh"
 
@@ -3938,7 +4070,7 @@ msgid "Model"
 msgstr "Mẫu"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:305
+#: tickets/models/ticket/general.py:311
 msgid "Serial number"
 msgstr "Số sê-ri."
 
@@ -3986,10 +4118,6 @@ msgstr "Mã GPU"
 #: assets/serializers/asset/info/gathered.py:24
 msgid "MAC address"
 msgstr "Địa chỉ MAC"
-
-#: assets/serializers/automations/base.py:22
-msgid "Executed amount"
-msgstr "Thông báo gắn kết OAuth"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -4134,7 +4262,13 @@ msgstr "Lựa chọn"
 msgid "Automation"
 msgstr "Tự động hóa"
 
-#: assets/serializers/platform.py:205
+#: assets/serializers/platform.py:184
+#, fuzzy
+#| msgid "Has public keys"
+msgid "Has package"
+msgstr "Có khóa công khai"
+
+#: assets/serializers/platform.py:206
 msgid ""
 "Login with account when accessing assets, then automatically switch to "
 "another, similar to logging in with a regular account and then switching to "
@@ -4144,19 +4278,19 @@ msgstr ""
 " sang một tài khoản khác, giống như việc đăng nhập bằng tài khoản thông "
 "thường rồi chuyển sang root"
 
-#: assets/serializers/platform.py:211
+#: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
 msgstr "Tài sản có thể kết nối qua cổng khu vực"
 
-#: assets/serializers/platform.py:213
+#: assets/serializers/platform.py:214
 msgid "Default zone"
 msgstr "Tên miền mặc định"
 
-#: assets/serializers/platform.py:240
+#: assets/serializers/platform.py:241
 msgid "type is required"
 msgstr "Loại: trường này là bắt buộc."
 
-#: assets/serializers/platform.py:255
+#: assets/serializers/platform.py:260
 msgid "Protocols is required"
 msgstr "Giao thức là bắt buộc"
 
@@ -4272,52 +4406,6 @@ msgstr "Vì lý do an toàn, không cho phép đẩy người dùng {}"
 msgid "No assets matched, stop task"
 msgstr "Không tìm thấy tài sản nào, kết thúc nhiệm vụ"
 
-#: assets/utils/platform_package.py:97
-msgid "Load platform.yml failed: {}"
-msgstr "Tải platform.yml thất bại: {}"
-
-#: assets/utils/platform_package.py:118
-msgid "Package automation missing manifest.yml: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:122
-msgid "Package automation missing main.yml: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:134
-#, fuzzy
-#| msgid "Organization name already exists"
-msgid "Package automation method does not match directory name: {}"
-msgstr "Tên tổ chức đã tồn tại"
-
-#: assets/utils/platform_package.py:218
-msgid "Platform automation category must contain platform category: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:224
-msgid "Platform automation type must contain platform type: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:230
-msgid "Platform automation protocol not found in platform.yml: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:247
-#, fuzzy
-#| msgid "Organization name already exists"
-msgid "Platform automation method id already exists: {}"
-msgstr "Tên tổ chức đã tồn tại"
-
-#: assets/utils/platform_package.py:256
-#, fuzzy
-#| msgid "Only support custom platform"
-msgid "Only support custom and web platform package"
-msgstr "Chỉ hỗ trợ nền tảng tùy chỉnh"
-
-#: assets/utils/platform_package.py:261
-msgid "Missing type in platform.yml"
-msgstr "Thiếu loại trong platform.yml"
-
 #: audits/apps.py:9
 msgid "App Audits"
 msgstr "Activities"
@@ -4424,7 +4512,7 @@ msgid "Symlink"
 msgstr "Tạo liên kết mềm"
 
 #: audits/const.py:18 audits/const.py:29
-#: ops/templates/ops/celery_task_log.html:139
+#: ops/templates/ops/celery_task_log.html:306
 #: terminal/api/session/session.py:170
 msgid "Download"
 msgstr "Tải xuống"
@@ -4910,7 +4998,7 @@ msgstr "Playbook"
 msgid "Unique creators"
 msgstr "Người tạo duy nhất"
 
-#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:161
+#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:189
 #: ops/models/playbook.py:89 ops/models/variable.py:23
 msgid "Playbook"
 msgstr "Playbook"
@@ -4928,7 +5016,7 @@ msgid "Module Distribution"
 msgstr "Phân bố mô-đun"
 
 #: audits/reporting.py:497 ops/filters.py:19 ops/models/adhoc.py:22
-#: ops/models/job.py:158
+#: ops/models/job.py:186
 msgid "Module"
 msgstr "Mô-đun"
 
@@ -4938,7 +5026,7 @@ msgstr "Người tạo"
 
 #: audits/reporting.py:502 audits/reporting.py:617 audits/serializers.py:33
 #: ops/models/adhoc.py:24 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/celery.py:87 ops/models/job.py:163 ops/models/job.py:246
+#: ops/models/celery.py:87 ops/models/job.py:191 ops/models/job.py:277
 #: ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
@@ -4948,7 +5036,7 @@ msgstr "Người tạo"
 msgid "Run as Policy Distribution"
 msgstr "Chiến lược người dùng"
 
-#: audits/reporting.py:507 ops/models/job.py:171
+#: audits/reporting.py:507 ops/models/job.py:199
 msgid "Run as policy"
 msgstr "Chiến lược người dùng"
 
@@ -5084,41 +5172,41 @@ msgid "This action require verify your MFA"
 msgstr ""
 "Thao tác này yêu cầu xác thực MFA của bạn, vui lòng bật và cấu hình trước"
 
-#: authentication/api/connection_token.py:510
+#: authentication/api/connection_token.py:523
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "Không cho phép sử dụng mã thông báo kết nối có thể tái sử dụng, chưa kích "
 "hoạt cài đặt toàn cầu"
 
-#: authentication/api/connection_token.py:639
+#: authentication/api/connection_token.py:652
 msgid "Anonymous account is not supported for this asset"
 msgstr "Tài khoản ẩn danh không hỗ trợ tài sản hiện tại"
 
-#: authentication/api/connection_token.py:671
+#: authentication/api/connection_token.py:684
 msgid "Permission expired"
 msgstr "Quyền truy cập đã hết hạn"
 
-#: authentication/api/connection_token.py:704
+#: authentication/api/connection_token.py:717
 msgid "ACL action is reject: {}({})"
 msgstr "Hành động ACL là từ chối: {}({})"
 
-#: authentication/api/connection_token.py:708
+#: authentication/api/connection_token.py:721
 msgid "ACL action is review"
 msgstr "Hành động ACL là xem xét"
 
-#: authentication/api/connection_token.py:718
+#: authentication/api/connection_token.py:731
 msgid "ACL action is face verify"
 msgstr "Hành động ACL là xác thực khuôn mặt"
 
-#: authentication/api/connection_token.py:723
+#: authentication/api/connection_token.py:736
 msgid "ACL action not supported for this asset"
 msgstr "Quy tắc đăng nhập tài sản không hỗ trợ tài sản hiện tại."
 
-#: authentication/api/connection_token.py:730
+#: authentication/api/connection_token.py:743
 msgid "ACL action is face online"
 msgstr "Hành động ACL là nhận diện khuôn mặt trực tuyến"
 
-#: authentication/api/connection_token.py:755
+#: authentication/api/connection_token.py:768
 msgid "No available face feature"
 msgstr "Không có đặc điểm khuôn mặt khả dụng"
 
@@ -5657,7 +5745,7 @@ msgstr "Mật khẩu tùy chỉnh"
 
 #: authentication/models/connection_token.py:48
 #: authentication/serializers/connect_token_secret.py:128
-#: terminal/models/applet/applet.py:49
+#: terminal/models/applet/applet.py:46
 #: terminal/models/virtualapp/virtualapp.py:25 terminal/notifications.py:170
 #: terminal/notifications.py:237 terminal/reporting.py:108
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
@@ -5941,13 +6029,13 @@ msgid "Show"
 msgstr "Hiển thị"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/terminal.py:24 users/const.py:48
+#: settings/serializers/terminal.py:24 users/const.py:49
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "Vô hiệu hóa"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: settings/serializers/terminal.py:24 users/const.py:49
+#: settings/serializers/terminal.py:24 users/const.py:50
 #: users/templates/users/mfa_setting.html:120
 #: users/templates/users/mfa_setting.html:158
 #: users/templates/users/mfa_setting.html:177
@@ -6431,7 +6519,7 @@ msgstr "Hủy bỏ"
 msgid "Confirmed"
 msgstr "Xác nhận"
 
-#: common/const/choices.py:136 terminal/models/applet/applet.py:37
+#: common/const/choices.py:136 terminal/models/applet/applet.py:34
 msgid "Community edition"
 msgstr "Phiên bản cộng đồng"
 
@@ -6867,7 +6955,7 @@ msgstr "Loại dữ liệu lỗi, nên là danh sách"
 msgid "Invalid choice: {}"
 msgstr "Tùy chọn không hợp lệ: {}"
 
-#: common/serializers/mixin.py:565 terminal/models/applet/applet.py:51
+#: common/serializers/mixin.py:565 terminal/models/applet/applet.py:48
 #: terminal/models/virtualapp/virtualapp.py:30
 msgid "Tags"
 msgstr "Nhãn"
@@ -7079,7 +7167,7 @@ msgstr ""
 " Docker, hãy thực hiện trên nút Ansible Worker: docker pull %(image)s"
 
 #: ops/ansible/inventory.py:193 ops/ansible/inventory.py:280
-#: ops/models/job.py:69
+#: ops/models/job.py:97
 msgid "No account available"
 msgstr "Không có tài khoản nào khả dụng"
 
@@ -7089,11 +7177,11 @@ msgid ""
 "target root credential. Configure su_from or use a root account."
 msgstr ""
 
-#: ops/ansible/inventory.py:405 ops/ansible/inventory.py:447
+#: ops/ansible/inventory.py:405 ops/ansible/inventory.py:457
 msgid "Ansible disabled"
 msgstr "Ansible đã bị vô hiệu hóa"
 
-#: ops/ansible/inventory.py:463
+#: ops/ansible/inventory.py:473
 msgid "Skip hosts below:"
 msgstr "Bỏ qua các máy chủ sau:"
 
@@ -7109,35 +7197,17 @@ msgstr "Nhiệm vụ {} không tồn tại"
 msgid "Task {} args or kwargs error"
 msgstr "Nhiệm vụ {} có tham số thực thi không hợp lệ"
 
-#: ops/api/job.py:67
+#: ops/api/job.py:66
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
 msgstr ""
 "Đăng nhập vào tài sản {}({}) bị từ chối, do bị giới hạn bởi quy tắc ACL tài "
 "sản đăng nhập ({})."
 
-#: ops/api/job.py:94
-#, python-brace-format
-msgid ""
-"Asset ({asset}) must have at least one of the following protocols added: "
-"SSH, SFTP, or WinRM"
-msgstr ""
-"Tài sản ({asset}) ít nhất phải thêm một trong các giao thức ssh, sftp, winrm"
-
-#: ops/api/job.py:95
-#, python-brace-format
-msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
-msgstr "Ủy quyền tài sản ({asset}) thiếu giao thức ssh, sftp hoặc winrm"
-
-#: ops/api/job.py:96
-#, python-brace-format
-msgid "Asset ({asset}) authorization lacks upload permissions"
-msgstr "Ủy quyền tài sản ({asset}) thiếu quyền tải lên"
-
-#: ops/api/job.py:193
+#: ops/api/job.py:173
 msgid "Duplicate file exists"
 msgstr "Có tệp cùng tên tồn tại"
 
-#: ops/api/job.py:198
+#: ops/api/job.py:178
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
@@ -7145,7 +7215,7 @@ msgstr ""
 "Kích thước tệp vượt quá giới hạn tối đa. Vui lòng chọn tệp nhỏ hơn "
 "{limit}MB."
 
-#: ops/api/job.py:285
+#: ops/api/job.py:265
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "Đang tạo nhiệm vụ, không thể ngắt quãng, xin vui lòng thử lại sau."
@@ -7365,7 +7435,7 @@ msgstr "Cần thiết lập theo chu kỳ hoặc định kỳ"
 msgid "Pattern"
 msgstr "Chế độ"
 
-#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:156
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:184
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "Nội dung"
@@ -7402,48 +7472,66 @@ msgstr "Ngày phát hành"
 msgid "Celery Task Execution"
 msgstr "Thực hiện nhiệm vụ Celery"
 
-#: ops/models/job.py:82
+#: ops/models/job.py:53
+#, python-brace-format
+msgid ""
+"Asset ({asset}) must have at least one of the following protocols added: "
+"SSH, SFTP, or WinRM"
+msgstr ""
+"Tài sản ({asset}) ít nhất phải thêm một trong các giao thức ssh, sftp, winrm"
+
+#: ops/models/job.py:60
+#, python-brace-format
+msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
+msgstr "Ủy quyền tài sản ({asset}) thiếu giao thức ssh, sftp hoặc winrm"
+
+#: ops/models/job.py:64
+#, python-brace-format
+msgid "Asset ({asset}) authorization lacks upload permissions"
+msgstr "Ủy quyền tài sản ({asset}) thiếu quyền tải lên"
+
+#: ops/models/job.py:110
 msgid "Module {} is not suitable for this asset"
 msgstr "Mô-đun {} không áp dụng cho tài sản này"
 
-#: ops/models/job.py:159
+#: ops/models/job.py:187
 msgid "Run dir"
 msgstr "Thư mục chạy"
 
-#: ops/models/job.py:160
+#: ops/models/job.py:188
 msgid "Timeout (Seconds)"
 msgstr "Timeout (Sec)"
 
-#: ops/models/job.py:166
+#: ops/models/job.py:194
 msgid "Use Parameter Define"
 msgstr "Sử dụng định nghĩa tham số"
 
-#: ops/models/job.py:167
+#: ops/models/job.py:195
 msgid "Parameters define"
 msgstr "Định nghĩa tham số"
 
-#: ops/models/job.py:168
+#: ops/models/job.py:196
 msgid "Periodic variable"
 msgstr "Biến thực thi chu kỳ"
 
-#: ops/models/job.py:169
+#: ops/models/job.py:197
 msgid "Run as"
 msgstr "Người dùng chạy"
 
-#: ops/models/job.py:228 ops/models/variable.py:28 ops/serializers/job.py:111
+#: ops/models/job.py:259 ops/models/variable.py:28 ops/serializers/job.py:111
 #: terminal/notifications.py:196
 msgid "Job"
 msgstr "Công việc"
 
-#: ops/models/job.py:251
+#: ops/models/job.py:282
 msgid "Material"
 msgstr "Vật liệu"
 
-#: ops/models/job.py:253
+#: ops/models/job.py:284
 msgid "Material Type"
 msgstr "Loại vật liệu"
 
-#: ops/models/job.py:588
+#: ops/models/job.py:619
 msgid "Job Execution"
 msgstr "Thực thi công việc"
 
@@ -7636,9 +7724,11 @@ msgstr ""
 "dọn dẹp định kỳ - cấu hình lịch sử thực hiện trung tâm công việc, vào lúc 2 "
 "giờ sáng mỗi ngày sẽ dọn dẹp các bản ghi đã vượt quá thời gian lưu trữ"
 
-#: ops/templates/ops/celery_task_log.html:4
-msgid "Task log"
-msgstr "Danh sách nhiệm vụ."
+#: ops/templates/ops/celery_task_log.html:296
+#: ops/templates/ops/celery_task_log.html:300
+#: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
+msgid "Output"
+msgstr "Xuất ra"
 
 #: ops/variables.py:24
 msgid "The current user`s username of JumpServer"
@@ -7706,8 +7796,8 @@ msgstr "Vui lòng chọn một tổ chức trước khi lưu"
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:308 tickets/reporting.py:85
-#: tickets/serializers/ticket/ticket.py:72
+#: tickets/models/ticket/general.py:314 tickets/reporting.py:85
+#: tickets/serializers/ticket/ticket.py:79
 msgid "Organization"
 msgstr "Tổ chức"
 
@@ -7724,7 +7814,7 @@ msgid "SYSTEM"
 msgstr "Tổ chức hệ thống"
 
 #: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:190
-#: terminal/models/applet/applet.py:48
+#: terminal/models/applet/applet.py:45
 msgid "Builtin"
 msgstr "Builtin"
 
@@ -7748,10 +7838,6 @@ msgstr "Số lượng người dùng"
 #: orgs/serializers.py:11
 msgid "User groups amount"
 msgstr "Số lượng nhóm người dùng"
-
-#: orgs/serializers.py:14 perms/serializers/permission.py:63
-msgid "Nodes amount"
-msgstr "Số lượng nút"
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
@@ -8214,8 +8300,8 @@ msgstr "Xác thực"
 msgid "Storage"
 msgstr "Lưu trữ"
 
-#: rbac/tree.py:64 terminal/models/applet/applet.py:59
-#: terminal/models/applet/applet.py:398 terminal/models/applet/host.py:30
+#: rbac/tree.py:64 terminal/models/applet/applet.py:56
+#: terminal/models/applet/applet.py:395 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:16
 msgid "Applet"
 msgstr "Ứng dụng từ xa"
@@ -8246,7 +8332,7 @@ msgid "Ticket comment"
 msgstr "Nhận xét nhiệm vụ"
 
 #: rbac/tree.py:204 settings/serializers/feature.py:211
-#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:315
+#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:321
 msgid "Ticket"
 msgstr "Nhiệm vụ"
 
@@ -10065,10 +10151,24 @@ msgstr "Người nhận email"
 msgid "Multiple user using , split"
 msgstr "Nhiều người dùng, sử dụng dấu phẩy để phân tách"
 
-#: settings/serializers/settings.py:63
+#: settings/serializers/settings.py:64
 #, python-format
 msgid "[%s] %s"
 msgstr "[%s] %s"
+
+#: settings/serializers/task.py:10 settings/serializers/task.py:16
+msgid "First notice"
+msgstr ""
+
+#: settings/serializers/task.py:13 settings/serializers/task.py:19
+#, fuzzy
+#| msgid "Daily Trend"
+msgid "Daily notice"
+msgstr "Xu hướng hằng ngày"
+
+#: settings/serializers/task.py:34
+msgid "First notice days must be greater than or equal to daily notice days."
+msgstr ""
 
 #: settings/serializers/terminal.py:15
 msgid "Auto"
@@ -10480,7 +10580,7 @@ msgstr "Xin hãy đảm bảo rằng bạn tin cậy vào liên kết bên dư�
 msgid "Back"
 msgstr "Quay lại"
 
-#: templates/resource_download.html:20 users/const.py:84
+#: templates/resource_download.html:20 users/const.py:85
 msgid "Client"
 msgstr "Khách hàng"
 
@@ -10618,10 +10718,6 @@ msgstr "Terminals"
 #: terminal/backends/command/models.py:19
 msgid "Input"
 msgstr "Nhập vào"
-
-#: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
-msgid "Output"
-msgstr "Xuất ra"
 
 #: terminal/connect_methods.py:29
 msgid "SSH Client"
@@ -10761,44 +10857,48 @@ msgstr "Mức độ rủi ro"
 msgid "Real storage"
 msgstr "Bộ lưu trữ thực"
 
-#: terminal/models/applet/applet.py:38
+#: terminal/models/applet/applet.py:35
 msgid "Enterprise"
 msgstr "Phiên bản doanh nghiệp"
 
-#: terminal/models/applet/applet.py:41
+#: terminal/models/applet/applet.py:38
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Display name"
 msgstr "Tên hiển thị"
 
-#: terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:40
 #: terminal/models/virtualapp/virtualapp.py:23
 msgid "Author"
 msgstr "Tác giả"
 
-#: terminal/models/applet/applet.py:45 terminal/serializers/applet.py:32
+#: terminal/models/applet/applet.py:42 terminal/serializers/applet.py:32
 msgid "Edition"
 msgstr "Phiên bản"
 
-#: terminal/models/applet/applet.py:50
+#: terminal/models/applet/applet.py:47
 msgid "Can concurrent"
 msgstr "Có thể đồng thời"
 
-#: terminal/models/applet/applet.py:55 terminal/serializers/applet_host.py:194
+#: terminal/models/applet/applet.py:52 terminal/serializers/applet_host.py:194
 #: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr "Máy chủ"
 
-#: terminal/models/applet/applet.py:131
+#: terminal/models/applet/applet.py:105
 #: terminal/models/virtualapp/virtualapp.py:67
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Gói Applet không hợp lệ, thiếu tệp {}"
 
-#: terminal/models/applet/applet.py:400 terminal/models/applet/host.py:36
+#: terminal/models/applet/applet.py:116
+msgid "Applet automation requires platform.yml"
+msgstr ""
+
+#: terminal/models/applet/applet.py:397 terminal/models/applet/host.py:36
 #: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "Máy chủ chủ"
 
-#: terminal/models/applet/applet.py:406
+#: terminal/models/applet/applet.py:403
 msgid "Applet Publication"
 msgstr "Phát hành ứng dụng"
 
@@ -11685,7 +11785,7 @@ msgstr ""
 "tác này hoặc phát hiện bất kỳ điều gì bất thường, hãy ngay lập tức thực hiện"
 " các biện pháp cần thiết."
 
-#: tickets/api/ticket.py:94 tickets/models/ticket/general.py:290
+#: tickets/api/ticket.py:99 tickets/models/ticket/general.py:296
 #: tickets/reporting.py:90
 msgid "Applicant"
 msgstr "Người nộp đơn."
@@ -11778,27 +11878,27 @@ msgstr "Tài sản được ủy quyền có hiệu lực"
 msgid "Ticket already closed"
 msgstr "Phiếu công việc đã đóng"
 
-#: tickets/filters.py:16
+#: tickets/filters.py:17
 msgid "Applicant ID"
 msgstr "ID người yêu cầu"
 
-#: tickets/filters.py:19
+#: tickets/filters.py:20
 msgid "Assignee ID"
 msgstr "ID người tiếp nhận phiếu yêu cầu"
 
-#: tickets/filters.py:23
+#: tickets/filters.py:24
 msgid "Relevant asset name or address"
 msgstr "Tên hoặc địa chỉ tài sản liên quan"
 
-#: tickets/filters.py:26
+#: tickets/filters.py:27
 msgid "Relevant command"
 msgstr "Lệnh liên quan"
 
-#: tickets/filters.py:30
+#: tickets/filters.py:31
 msgid "Applicant name or username"
 msgstr "Tên người yêu cầu hoặc tên người dùng"
 
-#: tickets/filters.py:34
+#: tickets/filters.py:35
 msgid "Organization name"
 msgstr "Tên tổ chức"
 
@@ -11839,7 +11939,7 @@ msgid "Body"
 msgstr "Cấp độ phê duyệt"
 
 #: tickets/models/flow.py:21 tickets/models/flow.py:51
-#: tickets/models/ticket/general.py:45 tickets/serializers/flow.py:102
+#: tickets/models/ticket/general.py:45 tickets/serializers/flow.py:104
 msgid "Approve level"
 msgstr "Thông tin phê duyệt công việc"
 
@@ -11847,16 +11947,16 @@ msgstr "Thông tin phê duyệt công việc"
 msgid "Ticket flow approval rule"
 msgstr "Quy trình công việc"
 
-#: tickets/models/flow.py:56 tickets/models/ticket/general.py:294
-#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:105
-#: tickets/serializers/ticket/ticket.py:24
+#: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
+#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
+#: tickets/serializers/ticket/ticket.py:25
 #, fuzzy
 #| msgid "All users"
 msgid "CC users"
 msgstr "Tất cả người dùng"
 
-#: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:27
-#: tickets/serializers/ticket/ticket.py:69
+#: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
+#: tickets/serializers/ticket/ticket.py:76
 msgid "Ticket flow"
 msgstr "Phiên công việc"
 
@@ -11918,23 +12018,23 @@ msgstr "Bước của phiếu công việc"
 msgid "Ticket assignee"
 msgstr "Người tiếp nhận phiếu công việc"
 
-#: tickets/models/ticket/general.py:274
+#: tickets/models/ticket/general.py:280
 msgid "Title"
 msgstr "Tiêu đề"
 
-#: tickets/models/ticket/general.py:298
+#: tickets/models/ticket/general.py:304
 msgid "TicketFlow"
 msgstr "Quy trình phiếu công việc"
 
-#: tickets/models/ticket/general.py:301 tickets/reporting.py:95
+#: tickets/models/ticket/general.py:307 tickets/reporting.py:95
 msgid "Approval step"
 msgstr "Bước phê duyệt"
 
-#: tickets/models/ticket/general.py:304
+#: tickets/models/ticket/general.py:310
 msgid "Relation snapshot"
 msgstr "Ảnh chụp phiếu công việc"
 
-#: tickets/models/ticket/general.py:415
+#: tickets/models/ticket/general.py:414
 msgid ""
 "Today's ticket creation limit (9999) has been reached. Please try again "
 "tomorrow."
@@ -11942,11 +12042,11 @@ msgstr ""
 "Hôm nay đã đạt giới hạn tạo phiếu yêu cầu (9999), vui lòng thử lại vào ngày "
 "mai"
 
-#: tickets/models/ticket/general.py:436
+#: tickets/models/ticket/general.py:435
 msgid "Please try again"
 msgstr "Vui lòng thử lại"
 
-#: tickets/models/ticket/general.py:515
+#: tickets/models/ticket/general.py:514
 msgid "Super ticket"
 msgstr "Phiếu công việc đặc biệt"
 
@@ -12062,11 +12162,11 @@ msgstr "Người nộp đơn."
 msgid "Approval Step Distribution"
 msgstr "Phê duyệt không cần đăng nhập"
 
-#: tickets/serializers/flow.py:58
+#: tickets/serializers/flow.py:60
 msgid "A ticket flow with the same name and type already exists"
 msgstr "Đã tồn tại luồng công việc cùng tên và cùng loại"
 
-#: tickets/serializers/flow.py:66
+#: tickets/serializers/flow.py:68
 msgid "The number of approval rules must match the approval level"
 msgstr "Số lượng quy tắc phê duyệt phải khớp với số cấp phê duyệt"
 
@@ -12103,19 +12203,19 @@ msgstr "Thời gian hết hạn phải lớn hơn thời gian bắt đầu"
 msgid "Permission named `{}` already exists"
 msgstr "Tên ủy quyền `{}` đã tồn tại"
 
-#: tickets/serializers/ticket/ticket.py:22
+#: tickets/serializers/ticket/ticket.py:23
 msgid "Process map"
 msgstr "Sơ đồ quy trình"
 
-#: tickets/serializers/ticket/ticket.py:110
+#: tickets/serializers/ticket/ticket.py:117
 msgid "The selected ticket flow is not available"
 msgstr "Luồng công việc đã chọn không khả dụng"
 
-#: tickets/serializers/ticket/ticket.py:114
+#: tickets/serializers/ticket/ticket.py:121
 msgid "Please select a ticket flow"
 msgstr "Vui lòng chọn luồng công việc"
 
-#: tickets/serializers/ticket/ticket.py:118
+#: tickets/serializers/ticket/ticket.py:125
 msgid "The ticket flow `{}` does not exist"
 msgstr "Quy trình công việc `{}` không tồn tại"
 
@@ -12241,39 +12341,39 @@ msgstr "Gắn đĩa"
 msgid "Remote microphone"
 msgstr "Micrô từ xa"
 
-#: users/const.py:37
+#: users/const.py:38
 msgid "Current window"
 msgstr "Cửa sổ hiện tại"
 
-#: users/const.py:38
+#: users/const.py:39
 msgid "New window"
 msgstr "Cửa sổ mới"
 
-#: users/const.py:43
+#: users/const.py:44
 msgid "Dark gray"
 msgstr "Màu xám đậm"
 
-#: users/const.py:44
+#: users/const.py:45
 msgid "Deep blue"
 msgstr "Màu xanh đậm"
 
-#: users/const.py:53
+#: users/const.py:54
 msgid "High（32 bit）"
 msgstr "Cao (32 bit)"
 
-#: users/const.py:54
+#: users/const.py:55
 msgid "True Color（24 bit）"
 msgstr "Màu thật (24 bit)"
 
-#: users/const.py:55
+#: users/const.py:56
 msgid "Medium（16 bit）"
 msgstr "Trung bình (16 bit)"
 
-#: users/const.py:88
+#: users/const.py:89
 msgid "Replace"
 msgstr "Thay thế"
 
-#: users/const.py:89
+#: users/const.py:90
 msgid "Suffix"
 msgstr "Thêm hậu tố"
 
@@ -12773,11 +12873,11 @@ msgstr ""
 "Kiểm tra vào lúc 2 giờ chiều mỗi ngày, xem người dùng trong hệ thống có hết "
 "hạn hay không, gửi thông báo trước 5 ngày"
 
-#: users/tasks.py:90
+#: users/tasks.py:97
 msgid "Periodic check user expired"
 msgstr "Kiểm tra định kỳ người dùng hết hạn."
 
-#: users/tasks.py:92
+#: users/tasks.py:99
 msgid ""
 "With version iterations, new tasks may be added, or task names and execution times may \n"
 "        be modified. Therefore, upon system startup, it is necessary to register or update the \n"
@@ -12787,11 +12887,11 @@ msgstr ""
 "nhiệm vụ, thời gian thực hiện. Do đó, khi hệ thống khởi động, hãy đăng ký "
 "hoặc cập nhật các tham số kiểm tra nhiệm vụ đã hết hạn của người dùng."
 
-#: users/tasks.py:111
+#: users/tasks.py:118
 msgid "Check unused users"
 msgstr "Kiểm tra người dùng chưa sử dụng."
 
-#: users/tasks.py:113
+#: users/tasks.py:120
 msgid ""
 "At 2 p.m. every day, according to the configuration in \"System Settings - Security - \n"
 "        Auth security - Auto disable threshold\" users who have not logged in or whose API keys \n"
@@ -12801,7 +12901,7 @@ msgstr ""
 "hình tự động vô hiệu hóa người dùng không hoạt động, những người dùng không "
 "đăng nhập trong thời gian dài hoặc không sử dụng api_key sẽ bị vô hiệu hóa."
 
-#: users/tasks.py:157
+#: users/tasks.py:164
 msgid "The user has not logged in recently and has been disabled."
 msgstr ""
 "Người dùng này đã không đăng nhập trong một thời gian gần đây và đã bị vô "
@@ -13975,6 +14075,19 @@ msgstr "Nhập giấy phép thành công"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "Giấy phép không hợp lệ"
+
+#~ msgid "Check the discovered accounts"
+#~ msgstr "Kiểm tra các tài khoản được phát hiện"
+
+#~ msgid ""
+#~ "Perform checks and analyses based on automatically discovered account "
+#~ "results, including user groups, public keys, sudoers, and other information."
+#~ msgstr ""
+#~ "Tiến hành kiểm tra và phân tích kết quả của các tài khoản được phát hiện tự "
+#~ "động, bao gồm nhóm người dùng, khóa công khai, sudoers và thông tin khác."
+
+#~ msgid "Task log"
+#~ msgstr "Danh sách nhiệm vụ."
 
 #, fuzzy, python-format
 #~ msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"

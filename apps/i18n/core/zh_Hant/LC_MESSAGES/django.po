@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-06 15:33+0800\n"
+"POT-Creation-Date: 2026-08-10 17:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -29,7 +29,7 @@ msgid "No valid assets found for account creation."
 msgstr "未找到可用於創建帳戶的有效資產。"
 
 #: accounts/api/account/application.py:91
-#: authentication/api/connection_token.py:668
+#: authentication/api/connection_token.py:681
 msgid "Account not found"
 msgstr "帳號未找到"
 
@@ -43,7 +43,7 @@ msgstr "帳號未找到"
 msgid "Protocols"
 msgstr "協議組"
 
-#: accounts/api/automations/base.py:89 tickets/api/ticket.py:138
+#: accounts/api/automations/base.py:89 tickets/api/ticket.py:143
 msgid "The parameter 'action' must be [{}]"
 msgstr "參數 'action' 必須是 [{}]"
 
@@ -100,7 +100,7 @@ msgid "The account backup plan is being executed"
 msgstr "帳號備份計劃正在執行"
 
 #: accounts/automations/backup_account/manager.py:22
-#: accounts/automations/check_account/manager.py:307
+#: accounts/automations/check_account/manager.py:463
 #: assets/automations/base/manager.py:278
 #: assets/automations/ping_gateway/manager.py:380
 #: xpack/plugins/cloud/manager.py:113
@@ -108,25 +108,30 @@ msgid "Task execution completed"
 msgstr "任務執行完成"
 
 #: accounts/automations/backup_account/manager.py:26
+#, python-format
 msgid "Backup failed: %(error)s"
 msgstr "備份失敗：%(error)s"
 
 #: accounts/automations/backup_account/manager.py:29
+#, python-format
 msgid "Backed up %(count)s accounts"
 msgstr "已備份 %(count)s 個帳號"
 
 #: accounts/automations/backup_account/manager.py:32
-#: accounts/automations/check_account/manager.py:326
+#: accounts/automations/check_account/manager.py:483
 #: assets/automations/base/manager.py:283
 #: assets/automations/ping_gateway/manager.py:392
+#, python-format
 msgid "Duration: %(duration)s seconds"
 msgstr "耗時：%(duration)s 秒"
 
 #: accounts/automations/base/manager.py:86
+#, python-format
 msgid "Targets: %(accounts)s account(s) on %(assets)s asset(s)"
 msgstr "目標：%(accounts)s 個帳號，涉及 %(assets)s 台資產"
 
 #: accounts/automations/base/manager.py:137
+#, python-format
 msgid "△ %(host)s: operation completed; verification pending"
 msgstr "△ %(host)s：操作已完成，新憑證驗證待確認"
 
@@ -140,6 +145,7 @@ msgstr "帳號推送成功，新憑據驗證通過"
 
 #: accounts/automations/base/manager.py:145
 #: assets/automations/base/manager.py:598
+#, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s：%(result)s"
 
@@ -152,6 +158,7 @@ msgid "No pending accounts found"
 msgstr "未找到待處理帳戶"
 
 #: accounts/automations/base/manager.py:260
+#, python-format
 msgid "○ %(asset)s: skipped; no eligible accounts"
 msgstr "○ %(asset)s：已跳過，沒有符合條件的待處理帳號"
 
@@ -188,51 +195,64 @@ msgid "Secret cannot be empty"
 msgstr "密文不能為空"
 
 #: accounts/automations/change_secret/manager.py:86
+#, python-format
 msgid ""
 "Successful: %(success)s, Needs verification: %(unverified)s, Failed: "
 "%(failed)s, Total: %(total)s"
 msgstr "成功：%(success)s，待確認：%(unverified)s，失敗：%(failed)s，總計：%(total)s"
 
-#: accounts/automations/check_account/manager.py:159
+#: accounts/automations/check_account/manager.py:170
 #: users/templates/users/reset_password.html:24
 msgid "Password strength"
 msgstr "密碼強度："
 
-#: accounts/automations/check_account/manager.py:160
+#: accounts/automations/check_account/manager.py:171
+#: accounts/automations/check_account/manager.py:176
 #: accounts/models/automations/check_account.py:54
 #: accounts/templates/accounts/check_account_report.html:52
 msgid "Repeated password"
 msgstr "重複密碼"
 
-#: accounts/automations/check_account/manager.py:161
+#: accounts/automations/check_account/manager.py:172
+#: accounts/automations/check_account/manager.py:177
 #: accounts/models/automations/check_account.py:53
 #: accounts/templates/accounts/check_account_report.html:45
 msgid "Leaked password"
 msgstr "密碼洩露"
 
-#: accounts/automations/check_account/manager.py:225
+#: accounts/automations/check_account/manager.py:175
+#: accounts/models/automations/check_account.py:52
+#: accounts/templates/accounts/check_account_report.html:38
+msgid "Weak password"
+msgstr "弱密碼"
+
+#: accounts/automations/check_account/manager.py:219
 msgid "Account security"
 msgstr "帳號安全"
 
-#: accounts/automations/check_account/manager.py:227
-msgid "Checking account security: %(check)s"
-msgstr "正在檢查帳號安全：%(check)s"
+#: accounts/automations/check_account/manager.py:223
+#, python-format
+msgid "Enabled account security check: %(check)s"
+msgstr "已啟用帳號安全檢查：%(check)s"
 
-#: accounts/automations/check_account/manager.py:236
+#: accounts/automations/check_account/manager.py:386
+#, python-format
 msgid "Processing %(count)s accounts"
 msgstr "正在處理 %(count)s 個帳號"
 
-#: accounts/automations/check_account/manager.py:294
+#: accounts/automations/check_account/manager.py:419
 msgid "Check account report of {}"
 msgstr "風險檢測報告 {}"
 
-#: accounts/automations/check_account/manager.py:309
+#: accounts/automations/check_account/manager.py:465
+#, python-format
 msgid ""
 "Checked %(total)s accounts: %(normal)s normal, %(risk)s at risk, "
 "%(no_secret)s without secrets"
 msgstr "已檢查 %(total)s 個帳號：正常 %(normal)s 個，存在風險 %(risk)s 個，無憑證 %(no_secret)s 個"
 
-#: accounts/automations/check_account/manager.py:319
+#: accounts/automations/check_account/manager.py:475
+#, python-format
 msgid ""
 "Risk details: %(weak)s weak passwords, %(leaked)s leaked passwords, "
 "%(repeated)s repeated passwords"
@@ -243,7 +263,7 @@ msgid "Checking gateway account connectivity"
 msgstr "正在檢查網關帳號連通性"
 
 #: accounts/const/account.py:6
-#: accounts/serializers/automations/change_secret.py:37
+#: accounts/serializers/automations/change_secret.py:38
 #: audits/auth_backends.py:16 authentication/confirm/password.py:25
 #: authentication/confirm/password.py:27 authentication/const.py:14
 #: authentication/forms.py:28
@@ -262,7 +282,7 @@ msgid "Password"
 msgstr "密碼"
 
 #: accounts/const/account.py:7
-#: accounts/serializers/automations/change_secret.py:38
+#: accounts/serializers/automations/change_secret.py:39
 #: authentication/models/ssh_key.py:27 terminal/serializers/storage.py:124
 msgid "SSH key"
 msgstr "SSH 金鑰"
@@ -327,7 +347,7 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:34 accounts/const/automation.py:116
-#: accounts/serializers/automations/change_secret.py:194 audits/const.py:66
+#: accounts/serializers/automations/change_secret.py:204 audits/const.py:66
 #: audits/signal_handlers/activity_log.py:34 common/const/choices.py:67
 #: ops/const.py:77 terminal/const.py:81 xpack/plugins/cloud/const.py:55
 msgid "Failed"
@@ -450,7 +470,7 @@ msgid "SFTP"
 msgstr "SFTP"
 
 #: accounts/const/automation.py:115
-#: accounts/serializers/automations/change_secret.py:191 audits/const.py:65
+#: accounts/serializers/automations/change_secret.py:201 audits/const.py:65
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
 #: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:42
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
@@ -464,7 +484,7 @@ msgid "Pending"
 msgstr "待定的"
 
 #: accounts/const/automation.py:118
-#: accounts/serializers/automations/change_secret.py:193
+#: accounts/serializers/automations/change_secret.py:203
 #, fuzzy
 #| msgid "Verified"
 msgid "Unverified"
@@ -564,6 +584,10 @@ msgid ""
 "Vault."
 msgstr "Vault 操作失敗，請重試，或檢查 Vault 上的帳號信息。"
 
+#: accounts/exceptions.py:25
+msgid "Secret not found in Vault. The local sync marker has been preserved."
+msgstr "Vault 中未找到金鑰，本機同步標記已保留。"
+
 #: accounts/filters.py:93 accounts/filters.py:126 accounts/filters.py:273
 #: accounts/filters.py:292 perms/filters.py:169 terminal/filters.py:35
 #: terminal/serializers/session.py:60
@@ -625,7 +649,7 @@ msgid "Recent secret change failed"
 msgstr "最近改密失敗"
 
 #: accounts/filters.py:164 accounts/models/automations/check_account.py:70
-#: accounts/serializers/automations/check_account.py:36
+#: accounts/serializers/automations/check_account.py:37
 msgid "Risk"
 msgstr "風險"
 
@@ -650,18 +674,18 @@ msgstr "長期未驗證"
 #: accounts/filters.py:382 accounts/models/automations/change_secret.py:49
 #: accounts/models/automations/check_account.py:73
 #: accounts/models/automations/gather_account.py:26
-#: accounts/serializers/automations/check_account.py:39
+#: accounts/serializers/automations/check_account.py:40
 #: assets/models/automations/base.py:147
 #: assets/serializers/automations/base.py:47 audits/filters.py:127
 #: audits/filters.py:209 audits/models.py:252 audits/reporting.py:607
 #: audits/serializers.py:79 ops/filters.py:54 ops/models/base.py:49
-#: ops/models/job.py:240 terminal/models/applet/applet.py:401
+#: ops/models/job.py:271 terminal/models/applet/applet.py:398
 #: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:104
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:285
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:291
 #: tickets/reporting.py:80 tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/filters.py:51
+#: tickets/serializers/ticket/ticket.py:21 xpack/plugins/cloud/filters.py:51
 #: xpack/plugins/cloud/models.py:233 xpack/plugins/cloud/models.py:300
 msgid "Status"
 msgstr "狀態"
@@ -697,11 +721,11 @@ msgstr "任務名稱"
 #: accounts/models/automations/gather_account.py:17
 #: accounts/serializers/account/account.py:228
 #: accounts/serializers/account/account.py:295
-#: accounts/serializers/automations/change_secret.py:135
-#: accounts/serializers/automations/change_secret.py:168
-#: accounts/serializers/automations/change_secret.py:211
-#: accounts/serializers/automations/check_account.py:33
-#: accounts/serializers/automations/gather_account.py:48
+#: accounts/serializers/automations/change_secret.py:145
+#: accounts/serializers/automations/change_secret.py:178
+#: accounts/serializers/automations/change_secret.py:221
+#: accounts/serializers/automations/check_account.py:34
+#: accounts/serializers/automations/gather_account.py:60
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: accounts/templates/accounts/change_secret_report.html:79
 #: accounts/templates/accounts/change_secret_report.html:119
@@ -735,7 +759,7 @@ msgid "Su from"
 msgstr "切換自"
 
 #: accounts/models/account.py:97 assets/const/protocol.py:195
-#: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:42
+#: settings/serializers/auth/cas.py:25 terminal/models/applet/applet.py:39
 #: terminal/models/virtualapp/virtualapp.py:22
 msgid "Version"
 msgstr "版本"
@@ -772,13 +796,13 @@ msgstr "改密狀態"
 #: accounts/models/automations/check_account.py:64
 #: accounts/serializers/account/account.py:296
 #: accounts/serializers/account/service.py:13
-#: accounts/serializers/automations/change_secret.py:137
-#: accounts/serializers/automations/change_secret.py:169
+#: accounts/serializers/automations/change_secret.py:147
+#: accounts/serializers/automations/change_secret.py:179
 #: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
 #: audits/reporting.py:114 audits/serializers.py:261
-#: authentication/api/connection_token.py:680 ops/models/base.py:18
+#: authentication/api/connection_token.py:693 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/filters.py:114
 #: terminal/models/session/session.py:31 terminal/notifications.py:306
@@ -831,30 +855,31 @@ msgstr "帳號活動"
 #: acls/serializers/base.py:35 assets/models/asset/common.py:133
 #: assets/models/asset/common.py:199 assets/models/cmd_filter.py:21
 #: assets/models/favorite_asset.py:14 assets/models/label.py:18
-#: assets/models/platform.py:15 assets/models/platform.py:94
-#: assets/models/zone.py:19 assets/serializers/asset/common.py:179
-#: assets/serializers/platform.py:159 assets/serializers/platform.py:284
+#: assets/models/platform.py:22 assets/models/platform.py:299
+#: assets/models/platform.py:378 assets/models/zone.py:19
+#: assets/serializers/asset/common.py:179 assets/serializers/platform.py:159
+#: assets/serializers/platform.py:289
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12 authentication/notifications.py:17
 #: authentication/notifications.py:56
 #: authentication/serializers/connect_token_secret.py:127
 #: authentication/serializers/connect_token_secret.py:223 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
-#: ops/models/celery.py:81 ops/models/job.py:154 ops/models/playbook.py:28
+#: ops/models/celery.py:81 ops/models/job.py:182 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: rbac/serializers/role.py:28 reports/models.py:15 settings/models.py:38
 #: settings/models.py:188 settings/serializers/msg.py:90
 #: settings/serializers/terminal.py:9 terminal/api/component/terminal.py:30
-#: terminal/models/applet/applet.py:40
+#: terminal/models/applet/applet.py:37
 #: terminal/models/component/endpoint.py:13
 #: terminal/models/component/endpoint.py:108
 #: terminal/models/component/storage.py:26
 #: terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
 #: terminal/models/virtualapp/provider.py:10
-#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:93
+#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:98
 #: tickets/models/flow.py:42 tickets/serializers/flow.py:26
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:67
@@ -1011,7 +1036,7 @@ msgstr "更改後檢查連接"
 #: accounts/models/automations/change_secret.py:17
 #: accounts/models/automations/check_account.py:19
 #: accounts/models/automations/gather_account.py:117
-#: accounts/serializers/automations/change_secret.py:62
+#: accounts/serializers/automations/change_secret.py:63
 #: settings/serializers/auth/ldap.py:112
 #: settings/serializers/auth/ldap_ha.py:94 settings/serializers/msg.py:46
 msgid "Recipient"
@@ -1023,7 +1048,7 @@ msgstr "自動化改密"
 
 #: accounts/models/automations/change_secret.py:47
 #: assets/models/automations/base.py:155 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:249
+#: ops/models/celery.py:90 ops/models/job.py:280
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "結束日期"
@@ -1099,11 +1124,6 @@ msgstr "密碼已過期"
 msgid "Long time no change"
 msgstr "長時間未改密"
 
-#: accounts/models/automations/check_account.py:52
-#: accounts/templates/accounts/check_account_report.html:38
-msgid "Weak password"
-msgstr "弱密碼"
-
 #: accounts/models/automations/check_account.py:61
 #: accounts/models/automations/gather_account.py:18 accounts/models/base.py:64
 #: accounts/serializers/account/virtual.py:21
@@ -1150,38 +1170,28 @@ msgid "Check engine"
 msgstr "檢測引擎"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the discovered accounts"
-msgstr "檢查發現的帳戶"
-
-#: accounts/models/automations/check_account.py:135
-msgid ""
-"Perform checks and analyses based on automatically discovered account "
-"results, including user groups, public keys, sudoers, and other information."
-msgstr "根據自動發現的帳戶結果進行檢查分析，包括用戶組、公鑰、sudoers等信息。"
-
-#: accounts/models/automations/check_account.py:142
 msgid "Check the strength of your account and password"
 msgstr "檢查您的帳號和密碼的強度"
 
-#: accounts/models/automations/check_account.py:144
+#: accounts/models/automations/check_account.py:135
 msgid ""
 "Perform checks and analyses based on the security of account passwords, "
 "including password strength, leakage, etc."
 msgstr "針對帳號密碼的安全性進行檢查分析，包括密碼強度、洩露情況等。"
 
-#: accounts/models/automations/check_account.py:151
+#: accounts/models/automations/check_account.py:142
 msgid "Check if the account and password are repeated"
 msgstr "檢查帳號和密碼是否重複"
 
-#: accounts/models/automations/check_account.py:152
+#: accounts/models/automations/check_account.py:143
 msgid "Check if the account is the same as other accounts."
 msgstr "檢查該帳號是否與其他帳戶相同。"
 
-#: accounts/models/automations/check_account.py:157
+#: accounts/models/automations/check_account.py:148
 msgid "Check whether the account password is a common password"
 msgstr "檢查帳號密碼是否為常用密碼"
 
-#: accounts/models/automations/check_account.py:158
+#: accounts/models/automations/check_account.py:149
 msgid "Check whether the account password is a commonly leaked password."
 msgstr "檢查帳號密碼是否為常見洩露密碼。"
 
@@ -1240,7 +1250,7 @@ msgstr "帳號驗證"
 #: accounts/models/base.py:37 accounts/models/base.py:66
 #: accounts/serializers/account/account.py:499
 #: accounts/serializers/account/base.py:19
-#: accounts/serializers/automations/change_secret.py:51
+#: accounts/serializers/automations/change_secret.py:52
 #: authentication/serializers/connect_token_secret.py:44
 #: authentication/serializers/connect_token_secret.py:54
 #: terminal/serializers/storage.py:140
@@ -1248,12 +1258,12 @@ msgid "Secret type"
 msgstr "密文類型"
 
 #: accounts/models/base.py:42
-#: accounts/serializers/automations/change_secret.py:44
+#: accounts/serializers/automations/change_secret.py:45
 msgid "Secret strategy"
 msgstr "密文策略"
 
 #: accounts/models/base.py:44 accounts/serializers/account/template.py:32
-#: accounts/serializers/automations/change_secret.py:50
+#: accounts/serializers/automations/change_secret.py:51
 msgid "Password rules"
 msgstr "密碼規則"
 
@@ -1264,7 +1274,7 @@ msgstr "特權帳號"
 #: accounts/models/base.py:69 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: audits/filters.py:55 authentication/serializers/connect_token_secret.py:131
-#: reports/models.py:18 terminal/models/applet/applet.py:47
+#: reports/models.py:18 terminal/models/applet/applet.py:44
 #: terminal/models/virtualapp/virtualapp.py:24 users/serializers/user.py:263
 msgid "Is active"
 msgstr "啟用"
@@ -1418,9 +1428,9 @@ msgid "Exist policy"
 msgstr "帳號存在策略"
 
 #: accounts/serializers/account/account.py:207 assets/models/label.py:21
-#: assets/models/platform.py:95 assets/serializers/asset/common.py:146
+#: assets/models/platform.py:379 assets/serializers/asset/common.py:146
 #: assets/serializers/cagegory.py:12 assets/serializers/platform.py:174
-#: assets/serializers/platform.py:285 perms/serializers/user_permission.py:27
+#: assets/serializers/platform.py:290 perms/serializers/user_permission.py:27
 #: settings/models.py:40 tickets/models/ticket/apply_application.py:13
 #: users/models/preference.py:12 xpack/plugins/cloud/filters.py:17
 #: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:327
@@ -1431,21 +1441,21 @@ msgstr "類別"
 #: accounts/serializers/account/account.py:208 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:22 assets/models/automations/base.py:27
 #: assets/models/automations/base.py:156 assets/models/cmd_filter.py:74
-#: assets/models/platform.py:96 assets/serializers/asset/common.py:147
+#: assets/models/platform.py:380 assets/serializers/asset/common.py:147
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:78
 #: audits/serializers.py:225 authentication/models/connection_token.py:68
 #: authentication/serializers/connect_token_secret.py:140
-#: ops/models/job.py:162 perms/serializers/user_permission.py:28
-#: reports/models.py:16 terminal/models/applet/applet.py:46
+#: ops/models/job.py:190 perms/serializers/user_permission.py:28
+#: reports/models.py:16 terminal/models/applet/applet.py:43
 #: terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:46 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:277 tickets/reporting.py:70
-#: tickets/serializers/flow.py:29 tickets/serializers/flow.py:100
-#: tickets/serializers/ticket/ticket.py:19
+#: tickets/models/ticket/general.py:283 tickets/reporting.py:70
+#: tickets/serializers/flow.py:29 tickets/serializers/flow.py:102
+#: tickets/serializers/ticket/ticket.py:20
 msgid "Type"
 msgstr "類型"
 
@@ -1465,10 +1475,10 @@ msgid "Account already exists. Field(s): {fields} must be unique."
 msgstr "帳號已存在。字段：{fields} 必須是唯一的。"
 
 #: accounts/serializers/account/account.py:297 ops/models/celery.py:84
-#: tickets/filters.py:32 tickets/models/comment.py:13
-#: tickets/models/ticket/general.py:49 tickets/models/ticket/general.py:281
+#: tickets/filters.py:33 tickets/models/comment.py:13
+#: tickets/models/ticket/general.py:49 tickets/models/ticket/general.py:287
 #: tickets/reporting.py:75 tickets/serializers/super_ticket.py:14
-#: tickets/serializers/ticket/ticket.py:21
+#: tickets/serializers/ticket/ticket.py:22
 msgid "State"
 msgstr "狀態"
 
@@ -1559,14 +1569,14 @@ msgstr "IP 白名單"
 #: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36
-#: ops/models/adhoc.py:25 ops/models/job.py:172 ops/models/playbook.py:31
+#: ops/models/adhoc.py:25 ops/models/job.py:200 ops/models/playbook.py:31
 #: rbac/models/role.py:37 settings/models.py:43
-#: terminal/models/applet/applet.py:52 terminal/models/applet/applet.py:402
+#: terminal/models/applet/applet.py:49 terminal/models/applet/applet.py:399
 #: terminal/models/applet/host.py:143 terminal/models/component/endpoint.py:23
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:29 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:303 users/models/user/__init__.py:104
+#: tickets/models/ticket/general.py:309 users/models/user/__init__.py:104
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
 msgid "Comment"
 msgstr "備註"
@@ -1657,7 +1667,7 @@ msgstr "文件加密密碼"
 
 #: accounts/serializers/automations/backup.py:36
 #: accounts/serializers/automations/backup.py:40
-#: accounts/serializers/automations/change_secret.py:63
+#: accounts/serializers/automations/change_secret.py:64
 msgid "Currently only mail sending is supported"
 msgstr "當前只支持郵件發送"
 
@@ -1665,71 +1675,96 @@ msgstr "當前只支持郵件發送"
 msgid "Asset type"
 msgstr "資產類型"
 
-#: accounts/serializers/automations/base.py:22
+#: accounts/serializers/automations/base.py:25
 msgid "Name already exists"
 msgstr "名稱已存在"
 
-#: accounts/serializers/automations/base.py:31
+#: accounts/serializers/automations/base.py:40
+#: accounts/templates/accounts/change_secret_report.html:33
+#: accounts/templates/accounts/gather_account_report.html:31
+#: accounts/templates/accounts/push_account_report.html:32
+#: assets/serializers/domain.py:22 assets/serializers/platform.py:183
+#: orgs/serializers.py:13 perms/serializers/permission.py:62
+msgid "Assets amount"
+msgstr "資產數量"
+
+#: accounts/serializers/automations/base.py:41 orgs/serializers.py:14
+#: perms/serializers/permission.py:63
+msgid "Nodes amount"
+msgstr "節點數量"
+
+#: accounts/serializers/automations/base.py:43
+#: assets/serializers/automations/base.py:22
+msgid "Executed amount"
+msgstr "執行數。"
+
+#: accounts/serializers/automations/base.py:68
 #: assets/models/automations/base.py:159
 #: assets/serializers/automations/base.py:45
 msgid "Automation snapshot"
 msgstr "自動化快照"
 
-#: accounts/serializers/automations/change_secret.py:47
+#: accounts/serializers/automations/change_secret.py:48
 msgid "SSH Key strategy"
 msgstr "SSH 金鑰更改方式"
 
-#: accounts/serializers/automations/change_secret.py:61
+#: accounts/serializers/automations/change_secret.py:62
 msgid "Please enter your account username"
 msgstr "請輸入您的帳戶使用者名稱"
 
-#: accounts/serializers/automations/change_secret.py:65
+#: accounts/serializers/automations/change_secret.py:66
 msgid "Notification before execution"
 msgstr "執行前通知"
 
-#: accounts/serializers/automations/change_secret.py:67
+#: accounts/serializers/automations/change_secret.py:68
 msgid ""
 "Secret parameter settings, currently only effective for assets of the host "
 "type."
 msgstr "參數設置，目前只對 AIX LINUX UNIX 類型的資產有效。"
 
-#: accounts/serializers/automations/change_secret.py:92
+#: accounts/serializers/automations/change_secret.py:93
 msgid "* Please enter the correct password length"
 msgstr "* 請輸入正確的密碼長度"
 
-#: accounts/serializers/automations/change_secret.py:96
+#: accounts/serializers/automations/change_secret.py:97
 msgid "* Password length range 8-36 bits"
 msgstr "* 密碼長度範圍 8-36 位"
 
-#: accounts/serializers/automations/change_secret.py:117
+#: accounts/serializers/automations/change_secret.py:118
 msgid "Secret is required for the custom strategy"
 msgstr ""
 
-#: accounts/serializers/automations/change_secret.py:134
-#: accounts/serializers/automations/change_secret.py:170
+#: accounts/serializers/automations/change_secret.py:144
+#: accounts/serializers/automations/change_secret.py:180
 #: ops/serializers/job.py:93 terminal/serializers/session.py:62
 msgid "Is success"
 msgstr "是否成功"
 
-#: accounts/serializers/automations/change_secret.py:141
+#: accounts/serializers/automations/change_secret.py:151
 #: assets/models/automations/base.py:181
 msgid "Automation task execution"
 msgstr "自動化任務執行歷史"
 
-#: accounts/serializers/automations/change_secret.py:213
+#: accounts/serializers/automations/change_secret.py:223
 msgid "TTL"
 msgstr "TTL"
 
-#: accounts/serializers/automations/change_secret.py:214
-#: assets/models/platform.py:97 tickets/models/ticket/general.py:306
+#: accounts/serializers/automations/change_secret.py:224
+#: assets/models/platform.py:381 tickets/models/ticket/general.py:312
 msgid "Meta"
 msgstr "元數據"
 
-#: accounts/serializers/automations/check_account.py:106
+#: accounts/serializers/automations/check_account.py:107
+#, fuzzy
+#| msgid "At least one clipboard operation is required"
+msgid "At least one engine is required"
+msgstr "至少需要選擇一個剪貼簿操作"
+
+#: accounts/serializers/automations/check_account.py:109
 msgid "Invalid engine id"
 msgstr "引擎 ID 無效"
 
-#: accounts/serializers/automations/gather_account.py:31
+#: accounts/serializers/automations/gather_account.py:32
 msgid "Whether to check the risk of the discovered accounts."
 msgstr "是否對聚集帳戶進行風險檢查。"
 
@@ -1852,15 +1887,25 @@ msgid ""
 "        Accounts' this task will be executed"
 msgstr "當在控制台-帳號模板-帳號-同步更新帳號信息點擊同步時，執行該任務"
 
-#: accounts/tasks/vault.py:33
+#: accounts/tasks/vault.py:308
 msgid "Sync secret to vault"
 msgstr "同步密文到 vault"
 
-#: accounts/tasks/vault.py:35
+#: accounts/tasks/vault.py:310
 msgid ""
 "When clicking 'Sync' in 'System Settings - Features - Account Storage' this "
 "task will be executed"
 msgstr "在系統設置-功能設置-帳號存儲點擊同步時，執行該任務"
+
+#: accounts/tasks/vault.py:318
+msgid "Restore secret from vault"
+msgstr "從 Vault 還原密文"
+
+#: accounts/tasks/vault.py:320
+msgid ""
+"When clicking 'Restore' in 'System Settings - Features - Account Storage' "
+"this task will be executed"
+msgstr "在系統設定-功能設定-帳號儲存點擊還原時，執行該任務"
 
 #: accounts/tasks/verify_account.py:49
 msgid "Verify asset account availability"
@@ -1894,8 +1939,8 @@ msgstr "基本資訊"
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:153 audits/models.py:74
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:248
-#: ops/templates/ops/celery_task_log.html:154
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:279
+#: ops/templates/ops/celery_task_log.html:291
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:42
@@ -1926,14 +1971,6 @@ msgstr "耗時"
 #: accounts/templates/accounts/backup_account_report.html:43
 msgid "Type count"
 msgstr "類型數"
-
-#: accounts/templates/accounts/change_secret_report.html:33
-#: accounts/templates/accounts/gather_account_report.html:31
-#: accounts/templates/accounts/push_account_report.html:32
-#: assets/serializers/domain.py:22 assets/serializers/platform.py:183
-#: orgs/serializers.py:13 perms/serializers/permission.py:62
-msgid "Assets amount"
-msgstr "資產數量"
 
 #: accounts/templates/accounts/change_secret_report.html:38
 #: accounts/templates/accounts/gather_account_report.html:36
@@ -2121,9 +2158,9 @@ msgstr "用戶管理"
 #: acls/models/base.py:97 acls/templates/acls/asset_login_reminder.html:10
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:39
-#: assets/serializers/platform.py:182 assets/serializers/platform.py:214
-#: authentication/api/connection_token.py:679 ops/models/base.py:17
-#: ops/models/job.py:164 ops/serializers/job.py:21
+#: assets/serializers/platform.py:182 assets/serializers/platform.py:215
+#: authentication/api/connection_token.py:692 ops/models/base.py:17
+#: ops/models/job.py:192 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:103
@@ -2344,7 +2381,7 @@ msgstr "IP/主機"
 msgid "Recipients"
 msgstr "接收人"
 
-#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:92
+#: acls/serializers/base.py:125 tickets/serializers/ticket/ticket.py:99
 msgid "The organization `{}` does not exist"
 msgstr "組織 `{}` 不存在"
 
@@ -2465,32 +2502,32 @@ msgstr "不包含平台類型"
 msgid "Exclude platform category"
 msgstr "不包含平台類別"
 
-#: assets/api/asset/asset.py:86 assets/models/platform.py:104
-#: assets/serializers/platform.py:210
+#: assets/api/asset/asset.py:86 assets/models/platform.py:392
+#: assets/serializers/platform.py:211
 msgid "Gateway enabled"
 msgstr "啟用網域網関"
 
-#: assets/api/asset/asset.py:90 assets/models/platform.py:41
+#: assets/api/asset/asset.py:90 assets/models/platform.py:325
 #: assets/serializers/platform.py:36
 msgid "Ping enabled"
 msgstr "啟用資產探活"
 
-#: assets/api/asset/asset.py:94 assets/models/platform.py:45
-#: assets/models/platform.py:69 assets/serializers/platform.py:39
+#: assets/api/asset/asset.py:94 assets/models/platform.py:329
+#: assets/models/platform.py:353 assets/serializers/platform.py:39
 msgid "Gather facts enabled"
 msgstr "啟用收集資產資訊"
 
-#: assets/api/asset/asset.py:98 assets/models/platform.py:51
+#: assets/api/asset/asset.py:98 assets/models/platform.py:335
 #: assets/serializers/platform.py:53
 msgid "Change secret enabled"
 msgstr "啟用改密"
 
-#: assets/api/asset/asset.py:102 assets/models/platform.py:57
+#: assets/api/asset/asset.py:102 assets/models/platform.py:341
 #: assets/serializers/platform.py:60
 msgid "Push account enabled"
 msgstr "啟用帳號推送"
 
-#: assets/api/asset/asset.py:106 assets/models/platform.py:63
+#: assets/api/asset/asset.py:106 assets/models/platform.py:347
 #: assets/serializers/platform.py:46
 msgid "Verify account enabled"
 msgstr "啟用帳號驗證"
@@ -2527,9 +2564,19 @@ msgstr "刪除失敗，節點包含資產"
 msgid "Node {} is an ancestor of node {}, can't be added as its child"
 msgstr ""
 
-#: assets/api/platform.py:38
+#: assets/api/platform.py:37
 msgid "Name starts with"
 msgstr "名稱開頭"
+
+#: assets/api/platform.py:97
+#, fuzzy
+#| msgid "Invalid SMS platform"
+msgid "Invalid platform"
+msgstr "無效的簡訊平台"
+
+#: assets/api/platform.py:102
+msgid "The cloned platform category and type must match the source"
+msgstr ""
 
 #: assets/api/tree.py:48 assets/serializers/node.py:42
 msgid "The same level node name cannot be the same"
@@ -2576,34 +2623,41 @@ msgid "Executing automation"
 msgstr "執行自動化操作"
 
 #: assets/automations/base/manager.py:203
+#, python-format
 msgid "Stage: %(stage)s"
 msgstr "▶ 階段：%(stage)s"
 
 #: assets/automations/base/manager.py:209
+#, python-format
 msgid "• %(host)s: processing"
 msgstr "• %(host)s：正在處理"
 
 #: assets/automations/base/manager.py:265
 #: assets/automations/ping_gateway/manager.py:383
+#, python-format
 msgid "Successful: %(count)s"
 msgstr "成功 %(count)s"
 
 #: assets/automations/base/manager.py:268
+#, python-format
 msgid "Needs verification: %(count)s"
 msgstr "待確認 %(count)s"
 
 #: assets/automations/base/manager.py:272
 #: assets/automations/ping_gateway/manager.py:386
+#, python-format
 msgid "Failed: %(count)s"
 msgstr "失敗 %(count)s"
 
 #: assets/automations/base/manager.py:274
 #: assets/automations/ping_gateway/manager.py:387
+#, python-format
 msgid "Total: %(count)s"
 msgstr "總計 %(count)s"
 
 #: assets/automations/base/manager.py:280
 #: assets/automations/ping_gateway/manager.py:381
+#, python-format
 msgid "Result: %(result)s"
 msgstr "執行結果：%(result)s"
 
@@ -2612,14 +2666,17 @@ msgid "Task: {} finished"
 msgstr "任務：{} 完成"
 
 #: assets/automations/base/manager.py:532
+#, python-format
 msgid "✗ %(asset)s: automation is not configured for its platform"
 msgstr "✗ %(asset)s：所在平台未設定自動化方式"
 
 #: assets/automations/base/manager.py:540
+#, python-format
 msgid "✗ %(asset)s: this automation is not enabled"
 msgstr "✗ %(asset)s：未啟用此自動化任務"
 
 #: assets/automations/base/manager.py:548
+#, python-format
 msgid "✗ %(asset)s: unable to prepare this automation"
 msgstr "✗ %(asset)s：無法準備此自動化任務"
 
@@ -2640,6 +2697,7 @@ msgid "Verify account credentials"
 msgstr "驗證帳號憑據"
 
 #: assets/automations/base/manager.py:587
+#, python-format
 msgid "Targets: %(assets)s asset(s)"
 msgstr "目標：%(assets)s 台資產"
 
@@ -2700,12 +2758,14 @@ msgid "executing the automation step"
 msgstr "執行自動化步驟"
 
 #: assets/automations/base/manager.py:645
+#, python-format
 msgid ""
 "%(step)s failed: the new credential was rejected; the remote credential may "
 "already have changed, verify it before retrying"
 msgstr "%(step)s失敗：新憑據被拒絕；遠端憑據可能已經修改，請先核實再重試"
 
 #: assets/automations/base/manager.py:653
+#, python-format
 msgid ""
 "%(step)s failed: %(target)s rejected the execution account %(account)s; the "
 "credential change was not reached, check the execution credential or reduce "
@@ -2715,6 +2775,7 @@ msgstr ""
 "登入；尚未執行到憑據修改，請檢查執行帳號憑據，若憑據有效請降低並發連線後重試"
 
 #: assets/automations/base/manager.py:663
+#, python-format
 msgid ""
 "%(step)s failed: authentication was rejected; check the execution or target "
 "account credential"
@@ -2757,6 +2818,7 @@ msgid ""
 msgstr "新憑證不符合目標系統的密碼策略，已被目標系統拒絕"
 
 #: assets/automations/base/manager.py:718
+#, python-format
 msgid ""
 "%(step)s failed: the execution account has insufficient permissions on the "
 "target system"
@@ -2776,6 +2838,7 @@ msgid "Unknown error"
 msgstr "未知錯誤"
 
 #: assets/automations/base/manager.py:735
+#, python-format
 msgid "Operation failed: %(reason)s"
 msgstr "執行失敗：%(reason)s"
 
@@ -2786,10 +2849,12 @@ msgid "Asset not found or inactive"
 msgstr "資產不存在"
 
 #: assets/automations/base/manager.py:842
+#, python-format
 msgid "✗ %(host)s: %(error)s"
 msgstr "✗ %(host)s：%(error)s"
 
 #: assets/automations/base/manager.py:861
+#, python-format
 msgid "✗ %(host)s: unable to prepare (%(error)s)"
 msgstr "✗ %(host)s：準備失敗（%(error)s）"
 
@@ -2814,6 +2879,7 @@ msgid " and %(count)s more"
 msgstr ""
 
 #: assets/automations/base/manager.py:1072
+#, python-format
 msgid "Still processing %(count)s target(s): %(detail)s"
 msgstr "仍在處理 %(count)s 個目標：%(detail)s"
 
@@ -2830,10 +2896,12 @@ msgid "Hosts still waiting"
 msgstr ""
 
 #: assets/automations/base/manager.py:1204
+#, python-format
 msgid "Batch execution failed: %(error)s"
 msgstr "本批任務執行失敗：%(error)s"
 
 #: assets/automations/base/manager.py:1218
+#, python-format
 msgid "Task: %(task)s"
 msgstr "任務：%(task)s"
 
@@ -2842,6 +2910,7 @@ msgid "Stage: Preparing execution"
 msgstr "▶ 階段：準備執行環境"
 
 #: assets/automations/base/manager.py:1226
+#, python-format
 msgid "Task will run in %(count)s batches"
 msgstr "任務將分 %(count)s 批執行"
 
@@ -2854,6 +2923,7 @@ msgid "No eligible targets were found"
 msgstr "沒有可執行的目標"
 
 #: assets/automations/base/manager.py:1250
+#, python-format
 msgid "Processing batch %(current)s of %(total)s"
 msgstr "正在執行第 %(current)s/%(total)s 批"
 
@@ -2863,6 +2933,7 @@ msgid "Ansible runner stopped before completing the batch: %(status)s"
 msgstr ""
 
 #: assets/automations/base/manager.py:1305
+#, python-format
 msgid "Batch did not complete: %(reason)s"
 msgstr "本批任務未完成：%(reason)s"
 
@@ -2879,12 +2950,14 @@ msgstr "連接網關逾時，請檢查網關位址、連接埠和網路"
 
 #: assets/automations/ping_gateway/manager.py:61
 #: assets/automations/ping_gateway/manager.py:94
+#, python-format
 msgid ""
 "Connected to the gateway, but it cannot forward to 127.0.0.1:%(port)s; check"
 " the SSH service and port on the gateway"
 msgstr "已連接網關，但無法轉發至 127.0.0.1:%(port)s，請檢查網關上的 SSH 服務和連接埠"
 
 #: assets/automations/ping_gateway/manager.py:67
+#, python-format
 msgid ""
 "Unable to establish an SSH session to %(address)s:%(port)s; check the "
 "network and gateway account credentials"
@@ -2902,18 +2975,21 @@ msgid ""
 msgstr "網關帳號驗證失敗，請檢查網關帳號憑據"
 
 #: assets/automations/ping_gateway/manager.py:104
+#, python-format
 msgid ""
 "Unable to resolve gateway address %(address)s; check the address and DNS "
 "settings"
 msgstr "無法解析網關位址 %(address)s，請檢查位址和 DNS 設定"
 
 #: assets/automations/ping_gateway/manager.py:113
+#, python-format
 msgid ""
 "Unable to connect to gateway %(address)s:%(port)s; check the address, port, "
 "and network"
 msgstr "無法連接網關 %(address)s:%(port)s，請檢查位址、連接埠和網路"
 
 #: assets/automations/ping_gateway/manager.py:121
+#, python-format
 msgid "Gateway check failed: %(error)s"
 msgstr "網關檢查失敗：%(error)s"
 
@@ -2924,14 +3000,17 @@ msgid "No account"
 msgstr "沒有帳號"
 
 #: assets/automations/ping_gateway/manager.py:142
+#, python-format
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "正在驗證網關登入與 SSH 隧道轉發：%(gateway)s"
 
 #: assets/automations/ping_gateway/manager.py:226
+#, python-format
 msgid "✓ %(gateway)s: SSH login and tunnel forwarding are available"
 msgstr "✓ %(gateway)s：網關登入及 SSH 隧道轉發正常"
 
 #: assets/automations/ping_gateway/manager.py:241
+#, python-format
 msgid "✗ %(gateway)s: %(error)s"
 msgstr "✗ %(gateway)s：%(error)s"
 
@@ -2949,6 +3028,7 @@ msgid "Task execution timed out"
 msgstr "任務執行逾時"
 
 #: assets/automations/ping_gateway/manager.py:351
+#, python-brace-format
 msgid "Connectivity succeeded but saving the result failed: {error}"
 msgstr "連通性檢查成功，但儲存結果失敗：{error}"
 
@@ -3040,7 +3120,7 @@ msgstr "雲服務"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:46
-#: terminal/models/applet/applet.py:34 users/const.py:83
+#: terminal/models/applet/applet.py:31 users/const.py:84
 msgid "Web"
 msgstr "Web"
 
@@ -3081,7 +3161,7 @@ msgid "TP-Link"
 msgstr "TP-Link"
 
 #: assets/const/device.py:12 assets/const/ds.py:7
-#: terminal/models/applet/applet.py:33 tickets/const.py:9
+#: terminal/models/applet/applet.py:30 tickets/const.py:9
 msgid "General"
 msgstr "一般"
 
@@ -3137,7 +3217,7 @@ msgid ""
 msgstr ""
 "SFTP根目錄，支持變數：<br>-${ACCOUNT}已連接帳戶使用者名稱<br>-${HOME}連接帳戶的主目錄<br>-${USER}用戶的使用者名稱"
 
-#: assets/const/protocol.py:81
+#: assets/const/protocol.py:81 ops/templates/ops/celery_task_log.html:4
 msgid "Console"
 msgstr "控制台"
 
@@ -3285,7 +3365,7 @@ msgstr "確認按鈕選擇器"
 msgid "API mode"
 msgstr "API 模式"
 
-#: assets/const/types.py:259
+#: assets/const/types.py:261
 msgid "All types"
 msgstr "所有類型"
 
@@ -3301,7 +3381,7 @@ msgstr "暫時不支持此功能"
 msgid "Cloud"
 msgstr "雲服務"
 
-#: assets/models/asset/common.py:134 assets/models/platform.py:16
+#: assets/models/asset/common.py:134 assets/models/platform.py:300
 #: assets/serializers/platform.py:87 settings/serializers/auth/radius.py:18
 #: settings/serializers/auth/sms.py:77 settings/serializers/msg.py:31
 #: terminal/serializers/storage.py:133
@@ -3314,7 +3394,7 @@ msgstr "埠"
 msgid "Address"
 msgstr "地址"
 
-#: assets/models/asset/common.py:202 assets/models/platform.py:155
+#: assets/models/asset/common.py:202 assets/models/platform.py:443
 #: assets/serializers/asset/common.py:152
 #: assets/serializers/asset/common.py:273
 #: assets/serializers/asset/common.py:276
@@ -3400,13 +3480,13 @@ msgid "Proxy"
 msgstr "代理"
 
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
-#: assets/models/node.py:560 ops/models/job.py:165
+#: assets/models/node.py:560 ops/models/job.py:193
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
 #: xpack/plugins/cloud/models.py:401
 msgid "Node"
 msgstr "節點"
 
-#: assets/models/automations/base.py:29 ops/models/job.py:243
+#: assets/models/automations/base.py:29 ops/models/job.py:274
 #: ops/serializers/job.py:24 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr "參數"
@@ -3427,7 +3507,7 @@ msgstr "資產自動化任務"
 # msgstr "備註"
 #: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
-#: ops/models/base.py:54 ops/models/job.py:247
+#: ops/models/base.py:54 ops/models/job.py:278
 #: users/models/user/__init__.py:344
 msgid "Date created"
 msgstr "創建日期"
@@ -3439,13 +3519,13 @@ msgid "Trigger mode"
 msgstr "觸發模式"
 
 #: assets/models/automations/base.py:167 audits/serializers.py:38
-#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:245
+#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:276
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "匯總"
 
 #: assets/models/automations/base.py:168 ops/models/base.py:51
-#: ops/models/job.py:244 xpack/plugins/cloud/models.py:231
+#: ops/models/job.py:275 xpack/plugins/cloud/models.py:231
 msgid "Result"
 msgstr "結果"
 
@@ -3572,113 +3652,165 @@ msgstr "ssh私鑰"
 msgid "Can match node"
 msgstr "可以匹配節點"
 
-#: assets/models/platform.py:17
+#: assets/models/platform.py:68
+msgid "Load platform.yml failed: {}"
+msgstr "載入 platform.yml 失敗: {}"
+
+#: assets/models/platform.py:97
+msgid "Package automation missing manifest.yml: {}"
+msgstr ""
+
+#: assets/models/platform.py:101
+msgid "Package automation missing main.yml: {}"
+msgstr ""
+
+#: assets/models/platform.py:112
+#, fuzzy
+#| msgid "Organization name already exists"
+msgid "Package automation method does not match directory name: {}"
+msgstr "組織名稱已存在"
+
+#: assets/models/platform.py:203
+msgid "Platform automation category must contain platform category: {}"
+msgstr ""
+
+#: assets/models/platform.py:210
+msgid "Platform automation type must contain platform type: {}"
+msgstr ""
+
+#: assets/models/platform.py:217
+msgid "Platform automation protocol not found in platform.yml: {}"
+msgstr ""
+
+#: assets/models/platform.py:237
+#, fuzzy
+#| msgid "Organization name already exists"
+msgid "Platform automation method id already exists: {}"
+msgstr "組織名稱已存在"
+
+#: assets/models/platform.py:249
+#, fuzzy
+#| msgid "Only support custom platform"
+msgid "Only support custom and web platform package"
+msgstr "只支持自訂平台"
+
+#: assets/models/platform.py:254
+msgid "Missing type in platform.yml"
+msgstr "在 platform.yml 中缺少類型"
+
+#: assets/models/platform.py:295 assets/models/platform.py:385
+#, fuzzy
+#| msgid "Platform type"
+msgid "Platform package"
+msgstr "平台類型"
+
+#: assets/models/platform.py:301
 msgid "Primary"
 msgstr "主要的"
 
-#: assets/models/platform.py:18 ops/models/variable.py:20
+#: assets/models/platform.py:302 ops/models/variable.py:20
 msgid "Required"
 msgstr "必須的"
 
-#: assets/models/platform.py:19 assets/serializers/platform.py:162
+#: assets/models/platform.py:303 assets/serializers/platform.py:162
 #: notifications/const.py:7 terminal/models/component/storage.py:28
-#: users/const.py:42 xpack/plugins/cloud/providers/nutanix.py:30
+#: users/const.py:43 xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr "默認"
 
-#: assets/models/platform.py:20
+#: assets/models/platform.py:304
 msgid "Public"
 msgstr "開放的"
 
-#: assets/models/platform.py:21 assets/serializers/platform.py:85
-#: settings/serializers/settings.py:97
+#: assets/models/platform.py:305 assets/serializers/platform.py:85
+#: settings/serializers/settings.py:99
 msgid "Setting"
 msgstr "設置"
 
-#: assets/models/platform.py:38 audits/const.py:60
+#: assets/models/platform.py:322 audits/const.py:60
 #: authentication/backends/passkey/models.py:11 settings/models.py:42
 #: terminal/serializers/applet_host.py:33 users/models/user/_auth.py:33
 msgid "Enabled"
 msgstr "啟用"
 
-#: assets/models/platform.py:39
+#: assets/models/platform.py:323
 msgid "Ansible config"
 msgstr "Ansible 配置"
 
-#: assets/models/platform.py:42 assets/serializers/platform.py:37
+#: assets/models/platform.py:326 assets/serializers/platform.py:37
 msgid "Ping method"
 msgstr "資產探活方式"
 
-#: assets/models/platform.py:43
+#: assets/models/platform.py:327
 msgid "Ping params"
 msgstr "資產探活參數"
 
-#: assets/models/platform.py:47 assets/models/platform.py:71
+#: assets/models/platform.py:331 assets/models/platform.py:355
 #: assets/serializers/platform.py:43
 msgid "Gather facts method"
 msgstr "收集資訊方式"
 
-#: assets/models/platform.py:49 assets/models/platform.py:73
+#: assets/models/platform.py:333 assets/models/platform.py:357
 msgid "Gather facts params"
 msgstr "收集資訊參數"
 
-#: assets/models/platform.py:53 assets/serializers/platform.py:57
+#: assets/models/platform.py:337 assets/serializers/platform.py:57
 msgid "Change secret method"
 msgstr "改密方式"
 
-#: assets/models/platform.py:55
+#: assets/models/platform.py:339
 msgid "Change secret params"
 msgstr "改密參數"
 
-#: assets/models/platform.py:59 assets/serializers/platform.py:64
+#: assets/models/platform.py:343 assets/serializers/platform.py:64
 msgid "Push account method"
 msgstr "帳號推送方式"
 
-#: assets/models/platform.py:61
+#: assets/models/platform.py:345
 msgid "Push account params"
 msgstr "帳號推送參數"
 
-#: assets/models/platform.py:65 assets/serializers/platform.py:50
+#: assets/models/platform.py:349 assets/serializers/platform.py:50
 msgid "Verify account method"
 msgstr "帳號驗證方式"
 
-#: assets/models/platform.py:67
+#: assets/models/platform.py:351
 msgid "Verify account params"
 msgstr "帳號驗證參數"
 
-#: assets/models/platform.py:75
+#: assets/models/platform.py:359
 msgid "Remove account enabled"
 msgstr "開啟帳號移除"
 
-#: assets/models/platform.py:77 assets/serializers/platform.py:74
+#: assets/models/platform.py:361 assets/serializers/platform.py:74
 msgid "Remove account method"
 msgstr "帳號移除方式"
 
-#: assets/models/platform.py:79
+#: assets/models/platform.py:363
 msgid "Remove account params"
 msgstr "帳號移除參數"
 
-#: assets/models/platform.py:98 labels/models.py:13
+#: assets/models/platform.py:382 labels/models.py:13
 msgid "Internal"
 msgstr "內建"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:172
+#: assets/models/platform.py:390 assets/serializers/platform.py:172
 msgid "Charset"
 msgstr "編碼"
 
-#: assets/models/platform.py:105
+#: assets/models/platform.py:393
 msgid "DS enabled"
 msgstr "目錄服務已啟用"
 
-#: assets/models/platform.py:107 assets/serializers/platform.py:203
+#: assets/models/platform.py:395 assets/serializers/platform.py:204
 msgid "Su enabled"
 msgstr "啟用帳號切換"
 
-#: assets/models/platform.py:108 assets/serializers/platform.py:178
+#: assets/models/platform.py:396 assets/serializers/platform.py:178
 msgid "Su method"
 msgstr "帳號切換方式"
 
-#: assets/models/platform.py:109 assets/serializers/platform.py:181
+#: assets/models/platform.py:397 assets/serializers/platform.py:181
 msgid "Custom fields"
 msgstr "自訂屬性"
 
@@ -3792,7 +3924,7 @@ msgid "Model"
 msgstr "型號"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:305
+#: tickets/models/ticket/general.py:311
 msgid "Serial number"
 msgstr "序號"
 
@@ -3840,10 +3972,6 @@ msgstr "GPU 型號"
 #: assets/serializers/asset/info/gathered.py:24
 msgid "MAC address"
 msgstr "MAC 位址"
-
-#: assets/serializers/automations/base.py:22
-msgid "Executed amount"
-msgstr "執行數。"
 
 #: assets/serializers/automations/base.py:40
 msgid "Executions"
@@ -3951,26 +4079,32 @@ msgstr "選擇"
 msgid "Automation"
 msgstr "自動化"
 
-#: assets/serializers/platform.py:205
+#: assets/serializers/platform.py:184
+#, fuzzy
+#| msgid "Has public keys"
+msgid "Has package"
+msgstr "有公鑰"
+
+#: assets/serializers/platform.py:206
 msgid ""
 "Login with account when accessing assets, then automatically switch to "
 "another, similar to logging in with a regular account and then switching to "
 "root"
 msgstr "在訪問資產時使用帳戶登入，然後自動切換到另一個帳戶，就像用普通帳戶登入然後切換到 root 一樣"
 
-#: assets/serializers/platform.py:211
+#: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
 msgstr "資產可以使用區域網關進行連接"
 
-#: assets/serializers/platform.py:213
+#: assets/serializers/platform.py:214
 msgid "Default zone"
 msgstr "默認網域"
 
-#: assets/serializers/platform.py:240
+#: assets/serializers/platform.py:241
 msgid "type is required"
 msgstr "類型 該欄位是必填項。"
 
-#: assets/serializers/platform.py:255
+#: assets/serializers/platform.py:260
 msgid "Protocols is required"
 msgstr "協議是必填的"
 
@@ -4076,52 +4210,6 @@ msgstr "為了安全，禁止推送用戶 {}"
 msgid "No assets matched, stop task"
 msgstr "沒有匹配到資產，結束任務"
 
-#: assets/utils/platform_package.py:97
-msgid "Load platform.yml failed: {}"
-msgstr "載入 platform.yml 失敗: {}"
-
-#: assets/utils/platform_package.py:118
-msgid "Package automation missing manifest.yml: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:122
-msgid "Package automation missing main.yml: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:134
-#, fuzzy
-#| msgid "Organization name already exists"
-msgid "Package automation method does not match directory name: {}"
-msgstr "組織名稱已存在"
-
-#: assets/utils/platform_package.py:218
-msgid "Platform automation category must contain platform category: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:224
-msgid "Platform automation type must contain platform type: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:230
-msgid "Platform automation protocol not found in platform.yml: {}"
-msgstr ""
-
-#: assets/utils/platform_package.py:247
-#, fuzzy
-#| msgid "Organization name already exists"
-msgid "Platform automation method id already exists: {}"
-msgstr "組織名稱已存在"
-
-#: assets/utils/platform_package.py:256
-#, fuzzy
-#| msgid "Only support custom platform"
-msgid "Only support custom and web platform package"
-msgstr "只支持自訂平台"
-
-#: assets/utils/platform_package.py:261
-msgid "Missing type in platform.yml"
-msgstr "在 platform.yml 中缺少類型"
-
 #: audits/apps.py:9
 msgid "App Audits"
 msgstr "日志审计"
@@ -4226,7 +4314,7 @@ msgid "Symlink"
 msgstr "建立軟連結"
 
 #: audits/const.py:18 audits/const.py:29
-#: ops/templates/ops/celery_task_log.html:139
+#: ops/templates/ops/celery_task_log.html:306
 #: terminal/api/session/session.py:170
 msgid "Download"
 msgstr "下載"
@@ -4712,7 +4800,7 @@ msgstr "Playbook 作業數"
 msgid "Unique creators"
 msgstr "唯一創建者數"
 
-#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:161
+#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:189
 #: ops/models/playbook.py:89 ops/models/variable.py:23
 msgid "Playbook"
 msgstr "Playbook"
@@ -4730,7 +4818,7 @@ msgid "Module Distribution"
 msgstr "模組分佈"
 
 #: audits/reporting.py:497 ops/filters.py:19 ops/models/adhoc.py:22
-#: ops/models/job.py:158
+#: ops/models/job.py:186
 msgid "Module"
 msgstr "模組"
 
@@ -4740,7 +4828,7 @@ msgstr "創建者 Top 10"
 
 #: audits/reporting.py:502 audits/reporting.py:617 audits/serializers.py:33
 #: ops/models/adhoc.py:24 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/celery.py:87 ops/models/job.py:163 ops/models/job.py:246
+#: ops/models/celery.py:87 ops/models/job.py:191 ops/models/job.py:277
 #: ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
@@ -4750,7 +4838,7 @@ msgstr "創建者"
 msgid "Run as Policy Distribution"
 msgstr "運行用戶策略分佈"
 
-#: audits/reporting.py:507 ops/models/job.py:171
+#: audits/reporting.py:507 ops/models/job.py:199
 msgid "Run as policy"
 msgstr "使用者策略"
 
@@ -4880,39 +4968,39 @@ msgstr "參數中的值必須包含 %s"
 msgid "This action require verify your MFA"
 msgstr "該操作需要驗證您的 MFA, 請先開啟並配置"
 
-#: authentication/api/connection_token.py:510
+#: authentication/api/connection_token.py:523
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允許使用可重複使用的連接令牌，未啟用全局設置"
 
-#: authentication/api/connection_token.py:639
+#: authentication/api/connection_token.py:652
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名帳號不支持當前資產"
 
-#: authentication/api/connection_token.py:671
+#: authentication/api/connection_token.py:684
 msgid "Permission expired"
 msgstr "授權已過期"
 
-#: authentication/api/connection_token.py:704
+#: authentication/api/connection_token.py:717
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 動作是拒絕: {}({})"
 
-#: authentication/api/connection_token.py:708
+#: authentication/api/connection_token.py:721
 msgid "ACL action is review"
 msgstr "ACL 動作是覆核"
 
-#: authentication/api/connection_token.py:718
+#: authentication/api/connection_token.py:731
 msgid "ACL action is face verify"
 msgstr "ACL Action 係人臉驗證"
 
-#: authentication/api/connection_token.py:723
+#: authentication/api/connection_token.py:736
 msgid "ACL action not supported for this asset"
 msgstr "資產登錄規則不支持當前資產"
 
-#: authentication/api/connection_token.py:730
+#: authentication/api/connection_token.py:743
 msgid "ACL action is face online"
 msgstr "ACL Action 係人臉在線"
 
-#: authentication/api/connection_token.py:755
+#: authentication/api/connection_token.py:768
 msgid "No available face feature"
 msgstr "沒有可用的人臉特徵"
 
@@ -5429,7 +5517,7 @@ msgstr "自訂密碼"
 
 #: authentication/models/connection_token.py:48
 #: authentication/serializers/connect_token_secret.py:128
-#: terminal/models/applet/applet.py:49
+#: terminal/models/applet/applet.py:46
 #: terminal/models/virtualapp/virtualapp.py:25 terminal/notifications.py:170
 #: terminal/notifications.py:237 terminal/reporting.py:108
 #: terminal/serializers/session.py:31 terminal/serializers/session.py:58
@@ -5701,13 +5789,13 @@ msgid "Show"
 msgstr "顯示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: settings/serializers/terminal.py:24 users/const.py:48
+#: settings/serializers/terminal.py:24 users/const.py:49
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: settings/serializers/terminal.py:24 users/const.py:49
+#: settings/serializers/terminal.py:24 users/const.py:50
 #: users/templates/users/mfa_setting.html:120
 #: users/templates/users/mfa_setting.html:158
 #: users/templates/users/mfa_setting.html:177
@@ -6167,7 +6255,7 @@ msgstr "取消"
 msgid "Confirmed"
 msgstr "確認"
 
-#: common/const/choices.py:136 terminal/models/applet/applet.py:37
+#: common/const/choices.py:136 terminal/models/applet/applet.py:34
 msgid "Community edition"
 msgstr "社區版"
 
@@ -6580,7 +6668,7 @@ msgstr "錯誤的數據類型，應該是列表"
 msgid "Invalid choice: {}"
 msgstr "無效選項: {}"
 
-#: common/serializers/mixin.py:565 terminal/models/applet/applet.py:51
+#: common/serializers/mixin.py:565 terminal/models/applet/applet.py:48
 #: terminal/models/virtualapp/virtualapp.py:30
 msgid "Tags"
 msgstr "標籤"
@@ -6779,7 +6867,7 @@ msgstr ""
 " Docker 隔離」；如需繼續使用 Docker 執行環境，請在 Ansible Worker 節點執行：docker pull %(image)s"
 
 #: ops/ansible/inventory.py:193 ops/ansible/inventory.py:280
-#: ops/models/job.py:69
+#: ops/models/job.py:97
 msgid "No account available"
 msgstr "無可用帳號"
 
@@ -6789,11 +6877,11 @@ msgid ""
 "target root credential. Configure su_from or use a root account."
 msgstr ""
 
-#: ops/ansible/inventory.py:405 ops/ansible/inventory.py:447
+#: ops/ansible/inventory.py:405 ops/ansible/inventory.py:457
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:463
+#: ops/ansible/inventory.py:473
 msgid "Skip hosts below:"
 msgstr "跳過以下主機: "
 
@@ -6809,38 +6897,21 @@ msgstr "任務 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任務 {} 執行參數錯誤"
 
-#: ops/api/job.py:67
+#: ops/api/job.py:66
 msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
 msgstr "登入資產 {}({}) 被拒絕，由登入資產規則 ACL ({}) 限制"
 
-#: ops/api/job.py:94
-#, python-brace-format
-msgid ""
-"Asset ({asset}) must have at least one of the following protocols added: "
-"SSH, SFTP, or WinRM"
-msgstr "资产({asset})至少要添加ssh,sftp,winrm其中一种协议"
-
-#: ops/api/job.py:95
-#, python-brace-format
-msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
-msgstr "资产({asset})授权缺少ssh,sftp或winrm协议"
-
-#: ops/api/job.py:96
-#, python-brace-format
-msgid "Asset ({asset}) authorization lacks upload permissions"
-msgstr "资产({asset})授权缺少上传权限"
-
-#: ops/api/job.py:193
+#: ops/api/job.py:173
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
-#: ops/api/job.py:198
+#: ops/api/job.py:178
 #, python-brace-format
 msgid ""
 "File size exceeds maximum limit. Please select a file smaller than {limit}MB"
 msgstr "檔案大小超過最大限制。請選擇小於 {limit}MB 的文件。"
 
-#: ops/api/job.py:285
+#: ops/api/job.py:265
 msgid ""
 "The task is being created and cannot be interrupted. Please try again later."
 msgstr "正在創建任務，無法中斷，請稍後重試。"
@@ -7059,7 +7130,7 @@ msgstr "需要週期或定期設定"
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:156
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:184
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "參數"
@@ -7098,48 +7169,65 @@ msgstr "發布日期"
 msgid "Celery Task Execution"
 msgstr "Celery 任務執行"
 
-#: ops/models/job.py:82
+#: ops/models/job.py:53
+#, python-brace-format
+msgid ""
+"Asset ({asset}) must have at least one of the following protocols added: "
+"SSH, SFTP, or WinRM"
+msgstr "资产({asset})至少要添加ssh,sftp,winrm其中一种协议"
+
+#: ops/models/job.py:60
+#, python-brace-format
+msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
+msgstr "资产({asset})授权缺少ssh,sftp或winrm协议"
+
+#: ops/models/job.py:64
+#, python-brace-format
+msgid "Asset ({asset}) authorization lacks upload permissions"
+msgstr "资产({asset})授权缺少上传权限"
+
+#: ops/models/job.py:110
 msgid "Module {} is not suitable for this asset"
 msgstr "模組 {} 不適用於此資產"
 
-#: ops/models/job.py:159
+#: ops/models/job.py:187
 msgid "Run dir"
 msgstr "執行目錄"
 
-#: ops/models/job.py:160
+#: ops/models/job.py:188
 msgid "Timeout (Seconds)"
 msgstr "超時時間 (秒)"
 
-#: ops/models/job.py:166
+#: ops/models/job.py:194
 msgid "Use Parameter Define"
 msgstr "使用參數定義"
 
-#: ops/models/job.py:167
+#: ops/models/job.py:195
 msgid "Parameters define"
 msgstr "參數定義"
 
-#: ops/models/job.py:168
+#: ops/models/job.py:196
 msgid "Periodic variable"
 msgstr "週期執行變數"
 
-#: ops/models/job.py:169
+#: ops/models/job.py:197
 msgid "Run as"
 msgstr "執行使用者"
 
-#: ops/models/job.py:228 ops/models/variable.py:28 ops/serializers/job.py:111
+#: ops/models/job.py:259 ops/models/variable.py:28 ops/serializers/job.py:111
 #: terminal/notifications.py:196
 msgid "Job"
 msgstr "作業"
 
-#: ops/models/job.py:251
+#: ops/models/job.py:282
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:253
+#: ops/models/job.py:284
 msgid "Material Type"
 msgstr "Material 類型"
 
-#: ops/models/job.py:588
+#: ops/models/job.py:619
 msgid "Job Execution"
 msgstr "作業執行"
 
@@ -7315,9 +7403,11 @@ msgstr ""
 "由於作業中心執行快捷命令，playbook，會產生執行記錄，系統會根據系統設置 - 任務列表 - 定期清理 - "
 "作業中心執行歷史配置，每天凌晨2點對超出保存時間的記錄進行清理"
 
-#: ops/templates/ops/celery_task_log.html:4
-msgid "Task log"
-msgstr "任務列表"
+#: ops/templates/ops/celery_task_log.html:296
+#: ops/templates/ops/celery_task_log.html:300
+#: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
+msgid "Output"
+msgstr "輸出"
 
 #: ops/variables.py:24
 msgid "The current user`s username of JumpServer"
@@ -7383,8 +7473,8 @@ msgstr "請選擇一個組織後再保存"
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:308 tickets/reporting.py:85
-#: tickets/serializers/ticket/ticket.py:72
+#: tickets/models/ticket/general.py:314 tickets/reporting.py:85
+#: tickets/serializers/ticket/ticket.py:79
 msgid "Organization"
 msgstr "組織"
 
@@ -7401,7 +7491,7 @@ msgid "SYSTEM"
 msgstr "系統組織"
 
 #: orgs/models.py:83 rbac/models/role.py:36 settings/models.py:190
-#: terminal/models/applet/applet.py:48
+#: terminal/models/applet/applet.py:45
 msgid "Builtin"
 msgstr "內建的"
 
@@ -7425,10 +7515,6 @@ msgstr "用戶數量"
 #: orgs/serializers.py:11
 msgid "User groups amount"
 msgstr "用戶組數量"
-
-#: orgs/serializers.py:14 perms/serializers/permission.py:63
-msgid "Nodes amount"
-msgstr "節點數量"
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
@@ -7881,8 +7967,8 @@ msgstr "認證"
 msgid "Storage"
 msgstr "儲存"
 
-#: rbac/tree.py:64 terminal/models/applet/applet.py:59
-#: terminal/models/applet/applet.py:398 terminal/models/applet/host.py:30
+#: rbac/tree.py:64 terminal/models/applet/applet.py:56
+#: terminal/models/applet/applet.py:395 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:16
 msgid "Applet"
 msgstr "遠程應用"
@@ -7913,7 +7999,7 @@ msgid "Ticket comment"
 msgstr "工單評論"
 
 #: rbac/tree.py:204 settings/serializers/feature.py:211
-#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:315
+#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:321
 msgid "Ticket"
 msgstr "工單管理"
 
@@ -9588,10 +9674,24 @@ msgstr "郵件收件人"
 msgid "Multiple user using , split"
 msgstr "多個用戶，使用 , 分割"
 
-#: settings/serializers/settings.py:63
+#: settings/serializers/settings.py:64
 #, python-format
 msgid "[%s] %s"
 msgstr "[%s] %s"
+
+#: settings/serializers/task.py:10 settings/serializers/task.py:16
+msgid "First notice"
+msgstr ""
+
+#: settings/serializers/task.py:13 settings/serializers/task.py:19
+#, fuzzy
+#| msgid "Daily Trend"
+msgid "Daily notice"
+msgstr "每日趨勢"
+
+#: settings/serializers/task.py:34
+msgid "First notice days must be greater than or equal to daily notice days."
+msgstr ""
 
 #: settings/serializers/terminal.py:15
 msgid "Auto"
@@ -9974,7 +10074,7 @@ msgstr "請確保你信任以下連結:"
 msgid "Back"
 msgstr "返回"
 
-#: templates/resource_download.html:20 users/const.py:84
+#: templates/resource_download.html:20 users/const.py:85
 msgid "Client"
 msgstr "用戶端"
 
@@ -10108,10 +10208,6 @@ msgstr "終端管理"
 #: terminal/backends/command/models.py:19
 msgid "Input"
 msgstr "輸入"
-
-#: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
-msgid "Output"
-msgstr "輸出"
 
 #: terminal/connect_methods.py:29
 msgid "SSH Client"
@@ -10251,44 +10347,48 @@ msgstr "風險等級"
 msgid "Real storage"
 msgstr "真實儲存"
 
-#: terminal/models/applet/applet.py:38
+#: terminal/models/applet/applet.py:35
 msgid "Enterprise"
 msgstr "企業版"
 
-#: terminal/models/applet/applet.py:41
+#: terminal/models/applet/applet.py:38
 #: terminal/models/virtualapp/virtualapp.py:21
 msgid "Display name"
 msgstr "顯示名稱"
 
-#: terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:40
 #: terminal/models/virtualapp/virtualapp.py:23
 msgid "Author"
 msgstr "作者"
 
-#: terminal/models/applet/applet.py:45 terminal/serializers/applet.py:32
+#: terminal/models/applet/applet.py:42 terminal/serializers/applet.py:32
 msgid "Edition"
 msgstr "版本"
 
-#: terminal/models/applet/applet.py:50
+#: terminal/models/applet/applet.py:47
 msgid "Can concurrent"
 msgstr "可以並發"
 
-#: terminal/models/applet/applet.py:55 terminal/serializers/applet_host.py:194
+#: terminal/models/applet/applet.py:52 terminal/serializers/applet_host.py:194
 #: terminal/serializers/storage.py:193
 msgid "Hosts"
 msgstr "主機"
 
-#: terminal/models/applet/applet.py:131
+#: terminal/models/applet/applet.py:105
 #: terminal/models/virtualapp/virtualapp.py:67
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Applet pkg 無效，缺少文件 {}"
 
-#: terminal/models/applet/applet.py:400 terminal/models/applet/host.py:36
+#: terminal/models/applet/applet.py:116
+msgid "Applet automation requires platform.yml"
+msgstr ""
+
+#: terminal/models/applet/applet.py:397 terminal/models/applet/host.py:36
 #: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "宿主機"
 
-#: terminal/models/applet/applet.py:406
+#: terminal/models/applet/applet.py:403
 msgid "Applet Publication"
 msgstr "應用發布"
 
@@ -11133,7 +11233,7 @@ msgid ""
 "notice anything unusual, please take the necessary actions immediately."
 msgstr "請檢查此命令的執行情況，以確保其符合您組織的安全政策。如果您未授權此操作或發現任何異常，請立即採取必要的措施。"
 
-#: tickets/api/ticket.py:94 tickets/models/ticket/general.py:290
+#: tickets/api/ticket.py:99 tickets/models/ticket/general.py:296
 #: tickets/reporting.py:90
 msgid "Applicant"
 msgstr "申請人"
@@ -11226,27 +11326,27 @@ msgstr "有效授權的資產"
 msgid "Ticket already closed"
 msgstr "工單已經關閉"
 
-#: tickets/filters.py:16
+#: tickets/filters.py:17
 msgid "Applicant ID"
 msgstr "申請人 ID"
 
-#: tickets/filters.py:19
+#: tickets/filters.py:20
 msgid "Assignee ID"
 msgstr "工單受理人 ID"
 
-#: tickets/filters.py:23
+#: tickets/filters.py:24
 msgid "Relevant asset name or address"
 msgstr "相關資產名稱或地址"
 
-#: tickets/filters.py:26
+#: tickets/filters.py:27
 msgid "Relevant command"
 msgstr "相關命令"
 
-#: tickets/filters.py:30
+#: tickets/filters.py:31
 msgid "Applicant name or username"
 msgstr "申請人名稱或用戶名"
 
-#: tickets/filters.py:34
+#: tickets/filters.py:35
 msgid "Organization name"
 msgstr "組織名稱"
 
@@ -11285,7 +11385,7 @@ msgid "Body"
 msgstr "內容"
 
 #: tickets/models/flow.py:21 tickets/models/flow.py:51
-#: tickets/models/ticket/general.py:45 tickets/serializers/flow.py:102
+#: tickets/models/ticket/general.py:45 tickets/serializers/flow.py:104
 msgid "Approve level"
 msgstr "審批級別"
 
@@ -11293,16 +11393,16 @@ msgstr "審批級別"
 msgid "Ticket flow approval rule"
 msgstr "工單批准資訊"
 
-#: tickets/models/flow.py:56 tickets/models/ticket/general.py:294
-#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:105
-#: tickets/serializers/ticket/ticket.py:24
+#: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
+#: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
+#: tickets/serializers/ticket/ticket.py:25
 #, fuzzy
 #| msgid "All users"
 msgid "CC users"
 msgstr "所有用戶"
 
-#: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:27
-#: tickets/serializers/ticket/ticket.py:69
+#: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
+#: tickets/serializers/ticket/ticket.py:76
 msgid "Ticket flow"
 msgstr "工單流程"
 
@@ -11364,33 +11464,33 @@ msgstr "工單步驟"
 msgid "Ticket assignee"
 msgstr "工單受理人"
 
-#: tickets/models/ticket/general.py:274
+#: tickets/models/ticket/general.py:280
 msgid "Title"
 msgstr "標題"
 
-#: tickets/models/ticket/general.py:298
+#: tickets/models/ticket/general.py:304
 msgid "TicketFlow"
 msgstr "工單流程"
 
-#: tickets/models/ticket/general.py:301 tickets/reporting.py:95
+#: tickets/models/ticket/general.py:307 tickets/reporting.py:95
 msgid "Approval step"
 msgstr "審批步驟"
 
-#: tickets/models/ticket/general.py:304
+#: tickets/models/ticket/general.py:310
 msgid "Relation snapshot"
 msgstr "工單快照"
 
-#: tickets/models/ticket/general.py:415
+#: tickets/models/ticket/general.py:414
 msgid ""
 "Today's ticket creation limit (9999) has been reached. Please try again "
 "tomorrow."
 msgstr "今日建立工單已達上限（9999）請明天再試"
 
-#: tickets/models/ticket/general.py:436
+#: tickets/models/ticket/general.py:435
 msgid "Please try again"
 msgstr "請再次嘗試"
 
-#: tickets/models/ticket/general.py:515
+#: tickets/models/ticket/general.py:514
 msgid "Super ticket"
 msgstr "超級工單"
 
@@ -11506,11 +11606,11 @@ msgstr "申請人 Top 10"
 msgid "Approval Step Distribution"
 msgstr "審批步驟分佈"
 
-#: tickets/serializers/flow.py:58
+#: tickets/serializers/flow.py:60
 msgid "A ticket flow with the same name and type already exists"
 msgstr "已存在同名且同類型的工單流"
 
-#: tickets/serializers/flow.py:66
+#: tickets/serializers/flow.py:68
 msgid "The number of approval rules must match the approval level"
 msgstr "審批規則數量必須與審批級數一致"
 
@@ -11547,19 +11647,19 @@ msgstr "過期時間要大於開始時間"
 msgid "Permission named `{}` already exists"
 msgstr "授權名稱 `{}` 已存在"
 
-#: tickets/serializers/ticket/ticket.py:22
+#: tickets/serializers/ticket/ticket.py:23
 msgid "Process map"
 msgstr "流程圖"
 
-#: tickets/serializers/ticket/ticket.py:110
+#: tickets/serializers/ticket/ticket.py:117
 msgid "The selected ticket flow is not available"
 msgstr "所選工單流不可用"
 
-#: tickets/serializers/ticket/ticket.py:114
+#: tickets/serializers/ticket/ticket.py:121
 msgid "Please select a ticket flow"
 msgstr "請選擇工單流"
 
-#: tickets/serializers/ticket/ticket.py:118
+#: tickets/serializers/ticket/ticket.py:125
 msgid "The ticket flow `{}` does not exist"
 msgstr "工單流程 `{}` 不存在"
 
@@ -11681,39 +11781,39 @@ msgstr "磁碟掛載"
 msgid "Remote microphone"
 msgstr "遠端麥克風"
 
-#: users/const.py:37
+#: users/const.py:38
 msgid "Current window"
 msgstr "當前窗口"
 
-#: users/const.py:38
+#: users/const.py:39
 msgid "New window"
 msgstr "新窗口"
 
-#: users/const.py:43
+#: users/const.py:44
 msgid "Dark gray"
 msgstr "深灰色"
 
-#: users/const.py:44
+#: users/const.py:45
 msgid "Deep blue"
 msgstr "深藍色"
 
-#: users/const.py:53
+#: users/const.py:54
 msgid "High（32 bit）"
 msgstr "高（32 bit）"
 
-#: users/const.py:54
+#: users/const.py:55
 msgid "True Color（24 bit）"
 msgstr "真彩色（24位）"
 
-#: users/const.py:55
+#: users/const.py:56
 msgid "Medium（16 bit）"
 msgstr "中（16 bit）"
 
-#: users/const.py:88
+#: users/const.py:89
 msgid "Replace"
 msgstr "替換"
 
-#: users/const.py:89
+#: users/const.py:90
 msgid "Suffix"
 msgstr "加後綴"
 
@@ -12169,29 +12269,29 @@ msgid ""
 "        notification 5 days in advance"
 msgstr "每天下午2點檢查，系統中的用戶是否過期，提前5天發送通知"
 
-#: users/tasks.py:90
+#: users/tasks.py:97
 msgid "Periodic check user expired"
 msgstr "週期檢測用戶過期"
 
-#: users/tasks.py:92
+#: users/tasks.py:99
 msgid ""
 "With version iterations, new tasks may be added, or task names and execution times may \n"
 "        be modified. Therefore, upon system startup, it is necessary to register or update the \n"
 "        parameters of the task that checks if users have expired"
 msgstr "隨著版本迭代，可能會新增任務或修改任務的名稱、執行時間，因此在系統啟動時，註冊或更新校驗用戶已過期任務的參數"
 
-#: users/tasks.py:111
+#: users/tasks.py:118
 msgid "Check unused users"
 msgstr "檢查未使用的用戶"
 
-#: users/tasks.py:113
+#: users/tasks.py:120
 msgid ""
 "At 2 p.m. every day, according to the configuration in \"System Settings - Security - \n"
 "        Auth security - Auto disable threshold\" users who have not logged in or whose API keys \n"
 "        have not been used for a long time will be disabled"
 msgstr "每天下午2點，根據系統配置-安全設置-不活躍用戶自動禁用配置，對長時間不登錄或api_key不使用的用戶進行禁用"
 
-#: users/tasks.py:157
+#: users/tasks.py:164
 msgid "The user has not logged in recently and has been disabled."
 msgstr "該用戶最近未登錄，已被禁用。"
 
@@ -13313,6 +13413,17 @@ msgstr "許可證匯入成功"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "許可證無效"
+
+#~ msgid "Check the discovered accounts"
+#~ msgstr "檢查發現的帳戶"
+
+#~ msgid ""
+#~ "Perform checks and analyses based on automatically discovered account "
+#~ "results, including user groups, public keys, sudoers, and other information."
+#~ msgstr "根據自動發現的帳戶結果進行檢查分析，包括用戶組、公鑰、sudoers等信息。"
+
+#~ msgid "Task log"
+#~ msgstr "任務列表"
 
 #, fuzzy, python-format
 #~ msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"

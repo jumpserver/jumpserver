@@ -2,6 +2,7 @@ from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
 
+from ops.celery.logger import CeleryTaskLoggerHandler
 from ops.models.job import JMSPermedInventory, check_upload_permission
 from perms.const import ActionChoices
 
@@ -59,4 +60,34 @@ class CheckUploadPermissionTestCase(SimpleTestCase):
         self.assertIn('asset-1', str(host['error']))
         perm_util.check_perm_actions.assert_called_once_with(
             'fallback', [ActionChoices.upload.value]
+        )
+
+
+class CeleryTaskLoggerHandlerTestCase(SimpleTestCase):
+    def test_hides_account_risk_check_lock_messages(self):
+        messages = (
+            "Acquire Lock('lock:{account-risk-check:org-id}').",
+            "Acquired Lock('lock:{account-risk-check:org-id}').",
+            "Release Lock('lock:{account-risk-check:org-id}').",
+            "Released Lock('lock:{account-risk-check:org-id}').",
+        )
+
+        for message in messages:
+            with self.subTest(message=message):
+                record = Mock()
+                record.getMessage.return_value = message
+                self.assertTrue(
+                    CeleryTaskLoggerHandler.is_internal_automation_message(
+                        record
+                    )
+                )
+
+    def test_keeps_account_risk_check_user_messages(self):
+        record = Mock()
+        record.getMessage.return_value = (
+            'Enabled account security check: password strength'
+        )
+
+        self.assertFalse(
+            CeleryTaskLoggerHandler.is_internal_automation_message(record)
         )
