@@ -17,7 +17,7 @@ __all__ = ['SuggestionMixin', 'RenderToJsonMixin']
 
 
 class CustomUserRateThrottle(UserRateThrottle):
-    rate = '60/m'
+    rate = '120/m'
 
 
 class SuggestionMixin:
