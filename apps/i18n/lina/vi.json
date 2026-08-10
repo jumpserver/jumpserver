@@ -1389,6 +1389,7 @@
     "Revoke": "Huỷ bỏ",
     "Risk": "Rủi ro",
     "RiskDetection": "Phát hiện rủi ro",
+    "RiskDetectionAccountSourceHelpText": "Tính năng phát hiện rủi ro chỉ kiểm tra thông tin xác thực của các tài khoản được quản lý trong hệ thống và không kết nối đến tài sản để phát hiện tài khoản theo thời gian thực. Để xác minh các tài khoản thực tế trên tài sản, hãy chạy Tài khoản đã phát hiện trước, sau đó đưa các tài khoản đã phát hiện vào quản lý và cấu hình thông tin xác thực.",
     "RiskDetectionDetail": "Chi tiết phát hiện rủi ro",
     "RiskyAccount": "Tài khoản rủi ro",
     "Role": "Vai trò",

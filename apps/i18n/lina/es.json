@@ -1389,6 +1389,7 @@
     "Revoke": "Revocar",
     "Risk": "Riesgo",
     "RiskDetection": "Detección de riesgos",
+    "RiskDetectionAccountSourceHelpText": "La detección de riesgos solo comprueba las credenciales de las cuentas administradas en el sistema y no se conecta a los activos para descubrir cuentas en tiempo real. Para verificar las cuentas reales de los activos, ejecute primero «Descubrimiento de cuentas», administre las cuentas descubiertas y configure sus credenciales.",
     "RiskDetectionDetail": "Detalles de detección de riesgos",
     "RiskyAccount": "Cuenta de riesgo",
     "Role": "Roles",

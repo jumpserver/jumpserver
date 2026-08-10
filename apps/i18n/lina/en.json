@@ -1394,6 +1394,7 @@
     "Revoke": "Revoke",
     "Risk": "Risk",
     "RiskDetection": "Risk detection",
+    "RiskDetectionAccountSourceHelpText": "Risk detection only checks credentials of accounts managed in the system and does not connect to assets to discover accounts in real time. To verify the accounts that actually exist on assets, run Account discovery first, then manage the discovered accounts and configure their credentials.",
     "RiskDetectionDetail": "Risk detection detail",
     "RiskyAccount": "Risky account",
     "Role": "Role",
