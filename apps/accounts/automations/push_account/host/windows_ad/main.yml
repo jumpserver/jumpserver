@@ -3,7 +3,7 @@
   tasks:
     - name: Push user password
       microsoft.ad.user:
-        name: "{{ account.username }}"
+        identity: "{{ account.username }}"
         password: "{{ account.secret }}"
         update_password: always
         password_never_expires: yes
