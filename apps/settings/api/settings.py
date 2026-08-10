@@ -74,6 +74,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'ops': serializers.OpsSettingSerializer,
         'virtualapp': serializers.VirtualAppSerializer,
         'tool': serializers.ToolSerializer,
+        'task_notice': serializers.TaskNoticeSettingSerializer,
     }
 
     rbac_category_permissions = {
@@ -91,6 +92,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'security_session': 'settings.change_security',
         'security_password': 'settings.change_security',
         'security_login_limit': 'settings.change_security',
+        'task_notice': 'settings.change_security',
         'ldap': 'settings.change_auth',
         'ldap_ha': 'settings.change_auth',
         'cas': 'settings.change_auth',

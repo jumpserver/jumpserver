@@ -1888,5 +1888,13 @@
     "LabelFilterSelectKey": "请选择标签键",
     "LabelFilterKeyLabel": "键",
     "LabelFilterValueLabel": "值",
+    "NotificationSettings": "通知设置",
+    "FirstNotice": "首次提醒",
+    "DailyNotice": "每日提醒",
+    "NoticeAdvance": "提前",
+    "NoticeDay": "天",
+    "NoticeStart": "开始",
+    "PositiveIntegerRequired": "请输入正整数。",
+    "FirstNoticeNotLessThanDailyNotice": "首次提醒天数必须大于或等于每日提醒天数。",
     "RowNumber": "序号"
 }

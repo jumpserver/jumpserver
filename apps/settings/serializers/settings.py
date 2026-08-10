@@ -18,6 +18,7 @@ from .luna import LunaSettingSerializer
 from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
+from .task import TaskNoticeSettingSerializer
 from .terminal import TerminalSettingSerializer
 
 __all__ = [
@@ -92,7 +93,8 @@ class SettingsSerializer(
     TencentSMSSettingSerializer,
     CMPP2SMSSettingSerializer,
     CustomSMSSettingSerializer,
-    PasskeySettingSerializer
+    PasskeySettingSerializer,
+    TaskNoticeSettingSerializer,
 ):
     PREFIX_TITLE = _('Setting')
     CACHE_KEY = 'SETTING_FIELDS_MAPPING'
