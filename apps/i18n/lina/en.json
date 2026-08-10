@@ -1687,6 +1687,7 @@
     "TicketFlowUpdate": "Update the approval flow",
     "TicketList": "Tickets",
     "Tickets": "Tickets",
+    "TicketViewAllAssignees": "View all handlers ({count})",
     "TicketsAudit": "Ticket audits",
     "Time": "Time",
     "TimeDelta": "Duration",

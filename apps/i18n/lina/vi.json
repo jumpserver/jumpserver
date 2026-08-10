@@ -1681,6 +1681,7 @@
     "TicketFlowUpdate": "Cập nhật quy trình phê duyệt",
     "TicketList": "Danh sách công việc",
     "Tickets": "Danh sách công việc",
+    "TicketViewAllAssignees": "Xem tất cả người xử lý ({count})",
     "TicketsAudit": "Kiểm tra công việc",
     "Time": "Thời gian",
     "TimeDelta": "Thời gian chạy",

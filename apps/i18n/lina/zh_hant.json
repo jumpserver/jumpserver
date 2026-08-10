@@ -1686,6 +1686,7 @@
     "TicketFlowUpdate": "更新審批流",
     "TicketList": "工單列表",
     "Tickets": "工單列表",
+    "TicketViewAllAssignees": "查看全部處理人（共 {count} 人）",
     "TicketsAudit": "工單審計",
     "Time": "時間",
     "TimeDelta": "運行時間",
