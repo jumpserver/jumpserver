@@ -721,8 +721,8 @@ msgid ""
 "Indicates the current approval outcome: pending, closed, approved, or "
 "rejected"
 msgstr ""
-"Показывает текущий результат согласования: на рассмотрении, закрыта, одобрена "
-"или отклонена"
+"Показывает текущий результат согласования: на рассмотрении, закрыта, "
+"одобрена или отклонена"
 
 #: accounts/filters.py:298
 msgid "Account username"
