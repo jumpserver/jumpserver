@@ -717,8 +717,8 @@ msgid ""
 "Indicates the current approval outcome: pending, closed, approved, or "
 "rejected"
 msgstr ""
-"Cho biết kết quả phê duyệt hiện tại: đang chờ, đã đóng, đã phê duyệt hoặc đã "
-"từ chối"
+"Cho biết kết quả phê duyệt hiện tại: đang chờ, đã đóng, đã phê duyệt hoặc đã"
+" từ chối"
 
 #: accounts/filters.py:298
 msgid "Account username"
