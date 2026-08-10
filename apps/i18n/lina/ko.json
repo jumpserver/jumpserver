@@ -1681,6 +1681,7 @@
     "TicketFlowUpdate": "승인 흐름 업데이트",
     "TicketList": "작업 목록",
     "Tickets": "작업 목록",
+    "TicketViewAllAssignees": "모든 처리자 보기 ({count}명)",
     "TicketsAudit": "작업 감사",
     "Time": "시간",
     "TimeDelta": "실행 시간",

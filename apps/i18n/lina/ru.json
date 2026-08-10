@@ -1680,6 +1680,7 @@
     "TicketFlowUpdate": "Обновить поток одобрения",
     "TicketList": "Список заявок",
     "Tickets": "Заявки",
+    "TicketViewAllAssignees": "Показать всех исполнителей ({count})",
     "TicketsAudit": "Аудит заявок",
     "Time": "Время",
     "TimeDelta": "Продолжительность",

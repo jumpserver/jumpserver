@@ -1681,6 +1681,7 @@
     "TicketFlowUpdate": "Actualizar flujo de aprobación",
     "TicketList": "Lista de órdenes de trabajo",
     "Tickets": "Lista de tickets",
+    "TicketViewAllAssignees": "Ver todos los responsables ({count})",
     "TicketsAudit": "Auditoría de órdenes de trabajo",
     "Time": "Hora",
     "TimeDelta": "Tiempo de funcionamiento",

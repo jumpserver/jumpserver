@@ -1686,6 +1686,7 @@
     "TicketFlowUpdate": "承認フローを更新",
     "TicketList": "作業リスト",
     "Tickets": "チケットリスト",
+    "TicketViewAllAssignees": "すべての処理者を表示（{count} 人）",
     "TicketsAudit": "作業監査",
     "Time": "時間",
     "TimeDelta": "運用時間",
