@@ -698,6 +698,30 @@ msgstr "Long-Term Unverified"
 msgid "Status"
 msgstr "Status"
 
+#: tickets/filters.py:36 tickets/serializers/super_ticket.py:15
+#: tickets/serializers/ticket/ticket.py:23
+msgid "Ticket status"
+msgstr "Ticket status"
+
+#: tickets/filters.py:33 tickets/serializers/super_ticket.py:20
+#: tickets/serializers/ticket/ticket.py:28
+msgid "Approval result"
+msgstr "Approval result"
+
+#: tickets/serializers/super_ticket.py:16
+#: tickets/serializers/ticket/ticket.py:24
+msgid "Indicates whether the ticket is open or finished"
+msgstr "Indicates whether the ticket is open or finished"
+
+#: tickets/serializers/super_ticket.py:21
+#: tickets/serializers/ticket/ticket.py:29
+msgid ""
+"Indicates the current approval outcome: pending, closed, approved, or "
+"rejected"
+msgstr ""
+"Indicates the current approval outcome: pending, closed, approved, or "
+"rejected"
+
 #: accounts/filters.py:298
 msgid "Account username"
 msgstr "Account username"
@@ -11921,7 +11945,7 @@ msgstr "Work Order Approval Info"
 #: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
 #: tickets/serializers/ticket/ticket.py:25
 msgid "CC users"
-msgstr ""
+msgstr "CC users"
 
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
 #: tickets/serializers/ticket/ticket.py:76
@@ -12062,11 +12086,11 @@ msgstr "Your work order has been processed, handler - {} ({})"
 
 #: tickets/notifications.py:197
 msgid "A ticket you are copied on has been updated"
-msgstr ""
+msgstr "A work order you are copied on has been updated"
 
 #: tickets/notifications.py:201
 msgid "Ticket updated - {} ({})"
-msgstr ""
+msgstr "Work order updated - {} ({})"
 
 #: tickets/reporting.py:10
 msgid "Ticket Report"
@@ -12131,6 +12155,10 @@ msgstr "A workflow with the same name and type already exists"
 #: tickets/serializers/flow.py:68
 msgid "The number of approval rules must match the approval level"
 msgstr "The number of approval rules must match the number of approval levels"
+
+#: tickets/serializers/flow.py:29
+msgid "No approvers matched. Please update the approval rule"
+msgstr "No approvers matched. Please update the approval rule"
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"

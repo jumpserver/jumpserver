@@ -690,6 +690,28 @@ msgstr "장기간 미검증"
 msgid "Status"
 msgstr "상태"
 
+#: tickets/filters.py:36 tickets/serializers/super_ticket.py:15
+#: tickets/serializers/ticket/ticket.py:23
+msgid "Ticket status"
+msgstr "티켓 상태"
+
+#: tickets/filters.py:33 tickets/serializers/super_ticket.py:20
+#: tickets/serializers/ticket/ticket.py:28
+msgid "Approval result"
+msgstr "승인 결과"
+
+#: tickets/serializers/super_ticket.py:16
+#: tickets/serializers/ticket/ticket.py:24
+msgid "Indicates whether the ticket is open or finished"
+msgstr "티켓이 진행 중인지 완료되었는지를 나타냅니다"
+
+#: tickets/serializers/super_ticket.py:21
+#: tickets/serializers/ticket/ticket.py:29
+msgid ""
+"Indicates the current approval outcome: pending, closed, approved, or "
+"rejected"
+msgstr "현재 승인 결과(승인 대기, 종료, 승인 또는 반려)를 나타냅니다"
+
 #: accounts/filters.py:298
 msgid "Account username"
 msgstr "계정 사용자 이름"
@@ -11521,10 +11543,8 @@ msgstr "작업 요청 승인 정보"
 #: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
 #: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
 #: tickets/serializers/ticket/ticket.py:25
-#, fuzzy
-#| msgid "All users"
 msgid "CC users"
-msgstr "모든 사용자"
+msgstr "참조 사용자"
 
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
 #: tickets/serializers/ticket/ticket.py:76
@@ -11664,16 +11684,12 @@ msgid "Ticket has processed - {} ({})"
 msgstr "귀하의 작업 티켓이 처리되었습니다, 처리자 - {} ({})"
 
 #: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
 msgid "A ticket you are copied on has been updated"
-msgstr "자산 \"%s\"이 업데이트되었습니다"
+msgstr "참조로 지정된 티켓이 업데이트되었습니다"
 
 #: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
 msgid "Ticket updated - {} ({})"
-msgstr "귀하의 작업 티켓이 처리되었습니다, 처리자 - {} ({})"
+msgstr "티켓 업데이트됨 - {} ({})"
 
 #: tickets/reporting.py:10
 msgid "Ticket Report"
@@ -11738,6 +11754,10 @@ msgstr "동일한 이름과 유형의 작업 흐름이 이미 존재합니다."
 #: tickets/serializers/flow.py:68
 msgid "The number of approval rules must match the approval level"
 msgstr "승인 규칙 수는 승인 단계 수와 일치해야 합니다."
+
+#: tickets/serializers/flow.py:29
+msgid "No approvers matched. Please update the approval rule"
+msgstr "일치하는 승인자가 없습니다. 승인 규칙을 수정해 주세요"
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"

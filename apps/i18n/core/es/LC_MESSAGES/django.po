@@ -708,6 +708,30 @@ msgstr "No verificado durante mucho tiempo"
 msgid "Status"
 msgstr "Estado"
 
+#: tickets/filters.py:36 tickets/serializers/super_ticket.py:15
+#: tickets/serializers/ticket/ticket.py:23
+msgid "Ticket status"
+msgstr "Estado de la orden de trabajo"
+
+#: tickets/filters.py:33 tickets/serializers/super_ticket.py:20
+#: tickets/serializers/ticket/ticket.py:28
+msgid "Approval result"
+msgstr "Resultado de la aprobación"
+
+#: tickets/serializers/super_ticket.py:16
+#: tickets/serializers/ticket/ticket.py:24
+msgid "Indicates whether the ticket is open or finished"
+msgstr "Indica si la orden de trabajo está abierta o finalizada"
+
+#: tickets/serializers/super_ticket.py:21
+#: tickets/serializers/ticket/ticket.py:29
+msgid ""
+"Indicates the current approval outcome: pending, closed, approved, or "
+"rejected"
+msgstr ""
+"Indica el resultado actual de la aprobación: pendiente, cerrada, aprobada o "
+"rechazada"
+
 #: accounts/filters.py:298
 msgid "Account username"
 msgstr "Nombre de usuario de la cuenta"
@@ -12180,10 +12204,8 @@ msgstr "Información de aprobación de la orden de trabajo"
 #: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
 #: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
 #: tickets/serializers/ticket/ticket.py:25
-#, fuzzy
-#| msgid "All users"
 msgid "CC users"
-msgstr "Todos los usuarios"
+msgstr "Usuarios en copia"
 
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
 #: tickets/serializers/ticket/ticket.py:76
@@ -12325,16 +12347,12 @@ msgid "Ticket has processed - {} ({})"
 msgstr "Tu orden de trabajo ha sido procesada, responsable - {} ({})"
 
 #: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
 msgid "A ticket you are copied on has been updated"
-msgstr "El activo \"%s\" ha sido actualizado"
+msgstr "Se ha actualizado una orden de trabajo en la que estás en copia"
 
 #: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
 msgid "Ticket updated - {} ({})"
-msgstr "Tu orden de trabajo ha sido procesada, responsable - {} ({})"
+msgstr "Orden de trabajo actualizada - {} ({})"
 
 #: tickets/reporting.py:10
 msgid "Ticket Report"
@@ -12401,6 +12419,10 @@ msgid "The number of approval rules must match the approval level"
 msgstr ""
 "El número de reglas de aprobación debe coincidir con el número de niveles de"
 " aprobación"
+
+#: tickets/serializers/flow.py:29
+msgid "No approvers matched. Please update the approval rule"
+msgstr "No se encontraron aprobadores. Actualice la regla de aprobación"
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"

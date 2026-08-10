@@ -691,6 +691,28 @@ msgstr "長期未検証"
 msgid "Status"
 msgstr "ステータス"
 
+#: tickets/filters.py:36 tickets/serializers/super_ticket.py:15
+#: tickets/serializers/ticket/ticket.py:23
+msgid "Ticket status"
+msgstr "チケットの状態"
+
+#: tickets/filters.py:33 tickets/serializers/super_ticket.py:20
+#: tickets/serializers/ticket/ticket.py:28
+msgid "Approval result"
+msgstr "承認結果"
+
+#: tickets/serializers/super_ticket.py:16
+#: tickets/serializers/ticket/ticket.py:24
+msgid "Indicates whether the ticket is open or finished"
+msgstr "チケットが受付中か完了済みかを示します"
+
+#: tickets/serializers/super_ticket.py:21
+#: tickets/serializers/ticket/ticket.py:29
+msgid ""
+"Indicates the current approval outcome: pending, closed, approved, or "
+"rejected"
+msgstr "現在の承認結果（承認待ち、終了、承認、却下）を示します"
+
 #: accounts/filters.py:298
 msgid "Account username"
 msgstr "アカウントのユーザー名"
@@ -11486,10 +11508,8 @@ msgstr "チケットフロー承認ルール"
 #: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
 #: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
 #: tickets/serializers/ticket/ticket.py:25
-#, fuzzy
-#| msgid "All users"
 msgid "CC users"
-msgstr "すべてのユーザー"
+msgstr "CCユーザー"
 
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
 #: tickets/serializers/ticket/ticket.py:76
@@ -11629,16 +11649,12 @@ msgid "Ticket has processed - {} ({})"
 msgstr "チケットが処理済み- {} ({})"
 
 #: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
 msgid "A ticket you are copied on has been updated"
-msgstr "資産 \"%s\" が更新されました"
+msgstr "CCに追加されているチケットが更新されました"
 
 #: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
 msgid "Ticket updated - {} ({})"
-msgstr "チケットが処理済み- {} ({})"
+msgstr "チケットが更新されました - {} ({})"
 
 #: tickets/reporting.py:10
 msgid "Ticket Report"
@@ -11703,6 +11719,10 @@ msgstr "同じ名前と種類のチケットフローが既に存在します"
 #: tickets/serializers/flow.py:68
 msgid "The number of approval rules must match the approval level"
 msgstr "承認ルール数は承認レベル数と一致する必要があります"
+
+#: tickets/serializers/flow.py:29
+msgid "No approvers matched. Please update the approval rule"
+msgstr "承認者が見つかりません。承認ルールを更新してください"
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"
