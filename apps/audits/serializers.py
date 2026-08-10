@@ -37,7 +37,9 @@ class JobLogSerializer(JobExecutionSerializer):
 class JobsAuditSerializer(JobSerializer):
     summary = serializers.ReadOnlyField(label=_("Summary"))
     crontab = serializers.ReadOnlyField(label=_("Execution cycle"))
-    is_periodic_display = serializers.BooleanField(read_only=True, source='is_periodic')
+    is_periodic_display = serializers.BooleanField(
+        read_only=True, source='is_periodic', label=_("Periodic execution")
+    )
 
     class Meta(JobSerializer.Meta):
         read_only_fields = [

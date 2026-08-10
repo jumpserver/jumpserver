@@ -26,13 +26,21 @@ logger = logging.getLogger(__file__)
 
 
 class TerminalFilterSet(BaseFilterSet):
-    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
-    remote_addr = filters.CharFilter(field_name='remote_addr', lookup_expr='icontains')
-    is_alive = filters.BooleanFilter(method='filter_is_alive')
+    name = filters.CharFilter(
+        field_name='name', lookup_expr='icontains', label=_('Name')
+    )
+    remote_addr = filters.CharFilter(
+        field_name='remote_addr', lookup_expr='icontains',
+        label=_('Remote address')
+    )
+    is_alive = filters.BooleanFilter(
+        method='filter_is_alive', label=_('Is alive')
+    )
+    load = filters.CharFilter(method='do_nothing', label=_('Load'))
 
     class Meta:
         model = Terminal
-        fields = ['name', 'remote_addr', 'type']
+        fields = ['name', 'remote_addr', 'type', 'is_alive', 'load']
 
     def filter_is_alive(self, queryset, name, value):
         ids = list(queryset.values_list('id', flat=True))
@@ -59,7 +67,6 @@ class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     filterset_class = TerminalFilterSet
-    custom_filter_fields = ['load']
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

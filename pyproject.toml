@@ -138,7 +138,7 @@ dependencies = [
     'pycountry>=024.6.1',
     'premailer==3.10.0',
     'azure-storage-blob==12.17.0',
-    'esdk-obs-python==3.21.4',
+    'esdk-obs-python==3.26.2',
     'oss2==2.18.1',
     'aliyun-python-sdk-core==2.15.2',
     'boto3==1.42.93',
@@ -189,7 +189,7 @@ xpack = [
     'aliyun-python-sdk-ecs==4.24.64',
     'keystoneauth1==5.2.1',
     'oracledb==3.4.2',
-    'protobuf>=5.29.6', 
+    'protobuf>=5.29.6',
     'ucloud-sdk-python3==0.11.50',
     'huaweicloudsdkecs==3.1.52',
     'huaweicloudsdkcore==3.1.52',
@@ -204,3 +204,8 @@ ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archi
 django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
 django-radius = { url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" }
 redis = { url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5.0.3.zip" }
+
+[[tool.uv.index]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple"
+default = true

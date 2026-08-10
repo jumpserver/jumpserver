@@ -8,6 +8,7 @@ from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
+from assets.utils.platform_package import locate_package_root
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty
 from common.utils.yml import yaml_load_with_i18n
@@ -71,6 +72,10 @@ class VirtualApp(JMSBaseModel):
         if not manifest.get('name', ''):
             raise ValidationError({'error': 'Missing name in manifest.yml'})
         return manifest
+
+    @staticmethod
+    def locate_pkg_root(extract_to, filename):
+        return locate_package_root(extract_to, filename, 'manifest.yml')
 
     @classmethod
     def install_from_dir(cls, path):

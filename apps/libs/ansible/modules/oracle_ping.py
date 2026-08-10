@@ -33,11 +33,6 @@ is_available:
   returned: always
   type: bool
   sample: true
-server_version:
-  description: Oracle server version.
-  returned: always
-  type: str
-  sample: '4.0.0'
 conn_err_msg:
   description: Connection error message.
   returned: always
@@ -60,19 +55,17 @@ class OracleDBPing(object):
         self.version = ''
 
     def do(self):
-        self.get_oracle_version()
-        return self.is_available, self.version
+        self.check_login()
+        return self.is_available
 
     def get_err(self):
         return self.conn_err_msg
 
-    def get_oracle_version(self):
-        version_sql = 'SELECT VERSION FROM PRODUCT_COMPONENT_VERSION where ROWNUM=1'
-        rtn, err = self.oracle_client.execute(version_sql)
+    def check_login(self):
+        _, err = self.oracle_client.execute('SELECT 1 FROM DUAL')
         if err:
             self.conn_err_msg = err
         else:
-            self.version = rtn.get('version')
             self.is_available = True
 
 
@@ -89,12 +82,12 @@ def main():
     )
 
     result = {
-        'changed': False, 'is_available': False, 'server_version': ''
+        'changed': False, 'is_available': False
     }
     oracle_client = OracleClient(module)
 
     oracle_ping = OracleDBPing(module, oracle_client)
-    result["is_available"], result["server_version"] = oracle_ping.do()
+    result["is_available"] = oracle_ping.do()
     conn_err_msg = oracle_ping.get_err()
     oracle_client.close()
     if conn_err_msg:

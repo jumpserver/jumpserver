@@ -26,6 +26,7 @@ class FavoriteFolderViewSet(BulkModelViewSet):
 
 
 class FavoriteAssetViewSet(BulkModelViewSet):
+    queryset = FavoriteAsset.objects.none()
     serializer_class = FavoriteAssetSerializer
     permission_classes = (IsValidUser,)
     filterset_fields = ['asset', 'folder']

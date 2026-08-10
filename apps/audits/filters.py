@@ -1,13 +1,23 @@
 from django.apps import apps
+from django.db.models import Q
 from django.utils import translation
+from django.utils.translation import gettext_lazy as _
 
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 from common.drf.filters import BaseFilterSet
 from common.sessions.cache import user_session_manager
+from common.utils import is_uuid
+from ops.const import JobStatus
+from ops.models import Job
 from orgs.utils import current_org
-from .models import UserSession, OperateLog
+from .auth_backends import get_auth_backend_choices
+from .const import LoginTypeChoices, MFAChoices
+from .models import (
+    FTPLog, IntegrationApplicationLog, JobLog, OperateLog,
+    PasswordChangeLog, UserLoginLog, UserSession,
+)
 
 __all__ = ['CurrentOrgMembersFilter']
 
@@ -38,7 +48,28 @@ class CurrentOrgMembersFilter(filters.BaseFilterBackend):
 
 
 class UserSessionFilterSet(BaseFilterSet):
-    is_active = drf_filters.BooleanFilter(method='filter_is_active')
+    user = drf_filters.CharFilter(
+        method='filter_user', label=_('User name, username or ID')
+    )
+    is_active = drf_filters.BooleanFilter(
+        method='filter_is_active', label=_('Is active')
+    )
+    type = drf_filters.ChoiceFilter(
+        choices=LoginTypeChoices.choices, label=_('Login type')
+    )
+    backend = drf_filters.ChoiceFilter(
+        choices=get_auth_backend_choices(), label=_('Auth backend')
+    )
+
+    @staticmethod
+    def filter_user(queryset, name, value):
+        query = (
+            Q(user__name__icontains=value) |
+            Q(user__username__icontains=value)
+        )
+        if is_uuid(value):
+            query |= Q(user_id=value)
+        return queryset.filter(query)
 
     @staticmethod
     def filter_is_active(queryset, name, is_active):
@@ -51,11 +82,93 @@ class UserSessionFilterSet(BaseFilterSet):
 
     class Meta:
         model = UserSession
-        fields = ['id', 'ip', 'city', 'type']
+        fields = [
+            'id', 'user', 'ip', 'city', 'type', 'backend',
+            'user_agent', 'is_active',
+        ]
+        fields_operator = {
+            'user': ('icontains',),
+            'ip': ('exact', 'in'),
+        }
+
+
+class FTPLogFilterSet(BaseFilterSet):
+    user = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('User name')
+    )
+    asset = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('Asset name')
+    )
+    account = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('Account name')
+    )
+    remote_addr = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('Remote address')
+    )
+    session = drf_filters.CharFilter(
+        lookup_expr='exact', label=_('Session ID')
+    )
+
+    class Meta:
+        model = FTPLog
+        fields = [
+            'id', 'user', 'asset', 'account', 'filename', 'remote_addr',
+            'operate', 'is_success', 'session',
+        ]
+        fields_operator = {
+            'session': ('exact', 'in'),
+        }
+
+
+class UserLoginLogFilterSet(BaseFilterSet):
+    type = drf_filters.ChoiceFilter(
+        choices=LoginTypeChoices.choices, label=_('Login type')
+    )
+    status = drf_filters.BooleanFilter(label=_('Status'))
+    mfa = drf_filters.ChoiceFilter(
+        choices=MFAChoices.choices, label=_('MFA')
+    )
+    backend = drf_filters.ChoiceFilter(
+        choices=get_auth_backend_choices(), label=_('Auth backend')
+    )
+
+    class Meta:
+        model = UserLoginLog
+        fields = [
+            'id', 'username', 'ip', 'city', 'type', 'backend',
+            'status', 'mfa', 'user_agent',
+        ]
+        fields_operator = {
+            'ip': ('exact', 'in'),
+        }
+
+
+class PasswordChangeLogFilterSet(BaseFilterSet):
+    user = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('User name')
+    )
+    change_by = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('Change by')
+    )
+    remote_addr = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('Remote address')
+    )
+
+    class Meta:
+        model = PasswordChangeLog
+        fields = ['id', 'user', 'change_by', 'remote_addr']
 
 
 class OperateLogFilterSet(BaseFilterSet):
-    resource_type = drf_filters.CharFilter(method='filter_resource_type')
+    user = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('User name')
+    )
+    remote_addr = drf_filters.CharFilter(
+        lookup_expr='iexact', label=_('Remote address')
+    )
+    resource_type = drf_filters.CharFilter(
+        method='filter_resource_type', label=_('Resource type')
+    )
 
     @staticmethod
     def filter_resource_type(queryset, name, resource_type):
@@ -69,5 +182,53 @@ class OperateLogFilterSet(BaseFilterSet):
     class Meta:
         model = OperateLog
         fields = [
-            'user', 'action', 'resource', 'remote_addr'
+            'id', 'user', 'action', 'resource_type', 'resource',
+            'remote_addr',
+        ]
+        fields_operator = {
+            'resource_type': ('exact',),
+        }
+
+
+class ServiceAccessLogFilterSet(BaseFilterSet):
+    service_id = drf_filters.UUIDFilter(label=_("Application ID"))
+
+    class Meta:
+        model = IntegrationApplicationLog
+        fields = [
+            "id", "service", "service_id", "asset", "account",
+            "remote_addr",
+        ]
+
+
+class JobLogFilterSet(BaseFilterSet):
+    creator__name = drf_filters.CharFilter(
+        field_name="creator__name", label=_("Creator name")
+    )
+    status = drf_filters.ChoiceFilter(
+        choices=JobStatus.choices, label=_("Status")
+    )
+    task_id = drf_filters.UUIDFilter(label=_("Task ID"))
+
+    class Meta:
+        model = JobLog
+        fields = [
+            "id", "material", "job_type", "status",
+            "task_id", "creator__name",
+        ]
+
+
+class JobsAuditFilterSet(BaseFilterSet):
+    creator__name = drf_filters.CharFilter(
+        field_name="creator__name", label=_("Creator name")
+    )
+    is_periodic_display = drf_filters.BooleanFilter(
+        field_name="is_periodic", label=_("Periodic execution")
+    )
+
+    class Meta:
+        model = Job
+        fields = [
+            "id", "name", "args", "type", "crontab", "interval",
+            "creator__name", "is_periodic_display",
         ]

@@ -30,6 +30,10 @@ options:
       - The password to use for the user.
     type: str
     aliases: [pass]
+  privilege_password:
+    description:
+      - The existing privilege or enable password used by custom commands.
+    type: str
   commands:
     description:
       - Custom change password commands.
@@ -56,6 +60,8 @@ name:
     type: str
 '''
 
+import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 from libs.ansible.modules_utils.remote_client import (
@@ -69,13 +75,38 @@ def get_commands_and_answers(module) -> (list, list):
     commands = module.params['commands'] or ''
     answers = module.params['answers'] or ''
     login_password = module.params['login_password']
+    privilege_password = module.params.get('privilege_password', '')
+
+    for field_name, value in (
+        ('username', username),
+        ('password', password),
+        ('login_password', login_password),
+        ('privilege_password', privilege_password),
+    ):
+        if value and ('\r' in value or '\n' in value):
+            module.fail_json(
+                msg=f'{field_name} cannot contain carriage returns or newlines'
+            )
 
     if isinstance(commands, list):
         commands = '\n'.join(commands)
-    commands = commands.format(
-        username=username, password=password, login_password=login_password
+    if not commands.strip():
+        return [], []
+
+    replacements = {
+        'username': username,
+        'password': password,
+        'login_password': login_password,
+        'privilege_password': privilege_password,
+    }
+    commands = re.sub(
+        r'\{(username|password|login_password|privilege_password)\}',
+        lambda match: replacements.get(match.group(1)) or '',
+        commands,
     )
-    return commands.split('\n'), answers.split('\n')
+    command_lines = commands.splitlines()
+    answer_lines = answers.splitlines() if answers else []
+    return command_lines, answer_lines
 
 
 # =========================================
@@ -88,6 +119,7 @@ def main():
     argument_spec.update(
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),
+        privilege_password=dict(default='', no_log=True),
     )
     module = AnsibleModule(argument_spec=argument_spec)
 
@@ -96,6 +128,13 @@ def main():
         module.fail_json(
             msg='No command found, please go to the platform details to add'
         )
+    try:
+        re.compile(module.params['prompt'])
+        for answer in answers:
+            re.compile(answer)
+    except (re.error, TypeError) as error:
+        module.fail_json(msg='Invalid answer regular expression: %s' % error)
+
     with SSHClient(module) as client:
         __, err_msg = client.execute(commands, answers)
         if err_msg:

@@ -73,6 +73,8 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def save_to_vault(sender, instance, created, **kwargs):
+        if getattr(instance, 'skip_vault_when_saving', False):
+            return
         try:
             if created:
                 vault_client.create(instance)

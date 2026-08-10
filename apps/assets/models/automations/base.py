@@ -103,16 +103,26 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
 
     def execute(self, trigger=Trigger.manual):
         try:
-            eid = current_task.request.id
+            request = current_task.request
+            eid = request.id
+            worker_hostname = request.hostname
         except AttributeError:
-            eid = str(uuid.uuid4())
+            eid = None
+            worker_hostname = None
+        eid = str(eid or uuid.uuid4())
 
+        task_context = {'celery_task_id': eid}
+        if worker_hostname:
+            task_context['celery_worker_hostname'] = worker_hostname
         execution = self.execution_model.objects.create(
             id=eid,
             type=self.type,
             trigger=trigger,
             automation=self,
-            snapshot=self.to_attr_json(),
+            snapshot={
+                **self.to_attr_json(),
+                **task_context,
+            },
         )
         return execution.start()
 
@@ -162,6 +172,12 @@ class AutomationExecution(OrgModelMixin):
             "org_id",
             "-date_start",
         )
+        indexes = [
+            models.Index(
+                fields=["status", "type"],
+                name="assets_ae_status_type_idx",
+            ),
+        ]
         verbose_name = _("Automation task execution")
 
     @property

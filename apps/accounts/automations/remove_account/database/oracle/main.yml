@@ -12,5 +12,6 @@
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
         mode: "{{ jms_account.mode }}"
+        connect_timeout: 15
         name: "{{ account.username }}"
         state: absent

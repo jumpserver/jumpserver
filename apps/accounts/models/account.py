@@ -9,7 +9,7 @@ from common.utils import lazyproperty, get_logger
 from labels.mixins import LabeledMixin
 from .base import BaseAccount
 from .mixins import VaultModelMixin
-from ..const import Source
+from ..const import SecretType, Source
 
 logger = get_logger(__file__)
 
@@ -63,7 +63,9 @@ class AccountHistoricalRecords(HistoricalRecords):
                 field.name for field in model._meta.fields
                 if field.name not in self.included_fields
             ]
-        return super().create_history_model(model, inherited)
+        history_model = super().create_history_model(model, inherited)
+        history_model.__module__ = model.__module__
+        return history_model
 
 
 class JSONFilterMixin:
@@ -199,8 +201,12 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         }
         if not su_from.secret:
             return var
-        var['ansible_password'] = self.escape_jinja2_syntax(su_from.secret)
-        var['ansible_ssh_private_key_file'] = su_from.private_key_path
+        if su_from.secret_type == SecretType.PASSWORD:
+            var['ansible_password'] = self.escape_jinja2_syntax(
+                su_from.secret
+            )
+        elif su_from.secret_type == SecretType.SSH_KEY:
+            var['ansible_ssh_private_key_file'] = su_from.private_key_path
         return var
 
     def get_ansible_become_auth(self):
@@ -213,11 +219,25 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         auth.update(self.make_account_ansible_vars(su_from))
 
         become_method = platform.ansible_become_method
-        password = su_from.secret if become_method == 'sudo' else self.secret
+        if become_method == 'sudo':
+            password = (
+                su_from.secret
+                if su_from.secret_type == SecretType.PASSWORD
+                else None
+            )
+        else:
+            password = (
+                self.secret
+                if self.secret_type == SecretType.PASSWORD
+                else None
+            )
         auth['ansible_become'] = True
         auth['ansible_become_method'] = become_method
         auth['ansible_become_user'] = self.username
-        auth['ansible_become_password'] = self.escape_jinja2_syntax(password)
+        if password:
+            auth['ansible_become_password'] = (
+                self.escape_jinja2_syntax(password)
+            )
         return auth
 
     @staticmethod

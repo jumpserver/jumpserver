@@ -7,7 +7,7 @@ from django.views.generic.edit import FormView
 
 from authentication import errors
 from authentication.mixins import AuthMixin
-from common.utils import get_logger
+from common.utils import get_logger, safe_next_url
 from ... import forms
 from ...utils import (
     get_user_or_pre_auth_user,
@@ -45,9 +45,9 @@ class UserVerifyPasswordView(AuthMixin, FormView):
         referer = self.request.META.get('HTTP_REFERER')
         next_url = self.request.GET.get("next")
         if next_url:
-            return next_url
+            return safe_next_url(next_url, request=self.request)
         else:
-            return referer
+            return safe_next_url(referer, request=self.request)
 
     def get_context_data(self, **kwargs):
         context = {

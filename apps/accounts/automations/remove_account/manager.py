@@ -14,7 +14,10 @@ logger = get_logger(__name__)
 
 
 class RemoveAccountManager(AccountBasePlaybookManager):
-    super_accounts = ["root", "administrator"]
+    super_accounts = [
+        "root", "administrator", "sa", "sys", "system", "dbsnmp",
+        "postgres", "mysql",
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,22 +56,37 @@ class RemoveAccountManager(AccountBasePlaybookManager):
 
         for account in accounts_to_remove:
             username = account.get("username")
-            if not username or username.lower() in self.super_accounts:
-                print("Super account can not be remove: ", username)
-                continue
             h = deepcopy(host)
-            h["name"] += "(" + username + ")"
+            h["name"] += "(" + (username or "-") + ")"
             self.host_account_mapper[h["name"]] = account
             h["account"] = {"username": username}
+            if not username:
+                h["error"] = "Account username is empty"
+                inventory_hosts.append(h)
+                continue
+            if username.lower() in self.super_accounts:
+                h["error"] = "Super account can not be removed"
+                inventory_hosts.append(h)
+                continue
+            connection_username = (
+                host.get("jms_account", {}).get("username") or ""
+            )
+            if username.lower() == connection_username.lower():
+                h["error"] = (
+                    "The account used to run this automation cannot be removed"
+                )
+                inventory_hosts.append(h)
+                continue
             inventory_hosts.append(h)
         return inventory_hosts
 
     def on_host_success(self, host, result):
-        super().on_host_success(host, result)
         account = self.host_account_mapper.get(host)
 
         if not account:
-            return
+            return super().on_host_error(
+                host, 'Account mapping not found', result
+            )
 
         try:
             if self.delete == "both":
@@ -90,6 +108,9 @@ class RemoveAccountManager(AccountBasePlaybookManager):
             ).delete()
 
         except Exception as e:
-            logger.error(
-                f"Failed to delete account {account['username']} on asset {account['asset']}: {e}"
+            logger.exception(
+                "Failed to delete account %s on asset %s",
+                account['username'], account['asset'],
             )
+            return super().on_host_error(host, str(e), result)
+        super().on_host_success(host, result)

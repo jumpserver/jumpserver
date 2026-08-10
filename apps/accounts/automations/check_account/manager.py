@@ -1,16 +1,16 @@
 import hashlib
+import logging
 import os
 import re
 import sqlite3
-import uuid
+import tempfile
 
-from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Account, AccountRisk, RiskChoice
 from assets.automations.base.manager import BaseManager
-from common.const import ConfirmOrIgnore
+from common.const import ConfirmOrIgnore, Status
 from common.decorators import bulk_create_decorator, bulk_update_decorator
 from settings.models import LeakPasswords
 
@@ -87,7 +87,11 @@ class CheckRepeatHandler(BaseCheckHandler):
 
     @staticmethod
     def init_repeat_check_db():
-        path = os.path.join('/tmp', 'accounts_' + str(uuid.uuid4()) + '.db')
+        tmp_file = tempfile.NamedTemporaryFile(
+            prefix='accounts_', suffix='.db', delete=False
+        )
+        path = tmp_file.name
+        tmp_file.close()
         sql = """
         CREATE TABLE IF NOT EXISTS accounts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,29 +136,14 @@ class CheckRepeatHandler(BaseCheckHandler):
     def clean(self):
         self.cursor.close()
         self.conn.close()
-        os.remove(self.path)
+        try:
+            os.remove(self.path)
+        except FileNotFoundError:
+            pass
 
 
 class CheckLeakHandler(BaseCheckHandler):
     risk = RiskChoice.leaked_password
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.conn, self.cursor = self.init_leak_password_db()
-
-    @staticmethod
-    def init_leak_password_db():
-        db_path = os.path.join(
-            settings.APPS_DIR, 'accounts', 'automations',
-            'check_account', 'leak_passwords.db'
-        )
-
-        if settings.LEAK_PASSWORD_DB_PATH and os.path.isfile(settings.LEAK_PASSWORD_DB_PATH):
-            db_path = settings.LEAK_PASSWORD_DB_PATH
-
-        db_conn = sqlite3.connect(db_path)
-        db_cursor = db_conn.cursor()
-        return db_conn, db_cursor
 
     def check(self, account):
         if not account.secret:
@@ -163,22 +152,26 @@ class CheckLeakHandler(BaseCheckHandler):
         is_exist = LeakPasswords.objects.using('sqlite').filter(password=account.secret).exists()
         return is_exist
 
-    def clean(self):
-        self.cursor.close()
-        self.conn.close()
-
 
 class CheckAccountManager(BaseManager):
     batch_size = 100
-    tmpl = 'Checked the status of account %s: %s'
+    handler_labels = {
+        CheckSecretHandler: _('Password strength'),
+        CheckRepeatHandler: _('Repeated password'),
+        CheckLeakHandler: _('Leaked password'),
+    }
 
     def __init__(self, execution):
         super().__init__(execution)
         self.assets = []
         self.batch_risks = []
         self.handlers = []
+        self.checked_account_ids = set()
+        self.risky_account_ids = set()
+        self.no_secret_account_ids = set()
 
     def add_risk(self, risk, account):
+        self.risky_account_ids.add(account.id)
         self.summary[risk] += 1
         self.result[risk].append({
             'asset': str(account.asset), 'username': account.username,
@@ -200,16 +193,17 @@ class CheckAccountManager(BaseManager):
             key = f'{account.id}_{d["risk"]}'
             origin_risk = ori_risk_map.get(key)
 
-            if origin_risk and origin_risk.status != ConfirmOrIgnore.pending:
-                details = origin_risk.details or []
-                details.append({"datetime": now, 'type': 'refind'})
+            if origin_risk:
+                if origin_risk.status != ConfirmOrIgnore.pending:
+                    details = origin_risk.details or []
+                    details.append({"datetime": now, 'type': 'refind'})
 
-                if len(details) > 10:
-                    details = [*details[:5], *details[-5:]]
+                    if len(details) > 10:
+                        details = [*details[:5], *details[-5:]]
 
-                origin_risk.details = details
-                origin_risk.status = ConfirmOrIgnore.pending
-                update_risk(origin_risk)
+                    origin_risk.details = details
+                    origin_risk.status = ConfirmOrIgnore.pending
+                    update_risk(origin_risk)
             else:
                 create_risk({
                     "account": account,
@@ -221,24 +215,33 @@ class CheckAccountManager(BaseManager):
 
         create_risk.finish()
         update_risk.finish()
+        self.batch_risks.clear()
 
     def pre_run(self):
         super().pre_run()
         self.assets = self.execution.get_all_assets()
 
     def batch_check(self, handler):
-        print("Engine: {}".format(handler.__class__.__name__))
+        label = self.handler_labels.get(handler.__class__, _('Account security'))
+        self.print_log(
+            _("Checking account security: %(check)s") % {'check': label},
+            'progress',
+        )
         for i in range(0, len(self.assets), self.batch_size):
             _assets = self.assets[i: i + self.batch_size]
-            accounts = Account.objects.filter(asset__in=_assets)
+            accounts = Account.objects.filter(
+                asset__in=_assets
+            ).select_related('asset')
 
-            print("Start to check accounts: {}".format(len(accounts)))
+            self.print_log(_("Processing %(count)s accounts") % {
+                'count': len(accounts),
+            }, 'progress')
 
             for account in accounts:
+                self.checked_account_ids.add(account.id)
+                if not account.secret:
+                    self.no_secret_account_ids.add(account.id)
                 error = handler.check(account)
-                msg = handler.risk if error else 'ok'
-
-                print("Check: {} => {}".format(account, msg))
                 if not error:
                     AccountRisk.objects.filter(
                         asset=account.asset,
@@ -262,16 +265,30 @@ class CheckAccountManager(BaseManager):
             elif engine == "check_account_leak":
                 handler = CheckLeakHandler(self.assets)
             else:
-                print("Unknown engine: {}".format(engine))
+                logging.warning("Unknown account security check: %s", engine)
                 continue
 
             self.handlers.append(handler)
             self.batch_check(handler)
 
+        self.summary['no_secret'] = len(self.no_secret_account_ids)
+        self.summary['ok'] = len(
+            self.checked_account_ids
+            - self.no_secret_account_ids
+            - self.risky_account_ids
+        )
+
     def post_run(self):
-        super().post_run()
         for handler in self.handlers:
-            handler.clean()
+            try:
+                handler.clean()
+            except Exception:
+                logging.exception(
+                    'Clean account check handler failed: %s',
+                    handler.__class__.__name__,
+                )
+                self.status = Status.error
+        super().post_run()
 
     def get_report_subject(self):
         return _("Check account report of {}").format(self.execution.id)
@@ -280,13 +297,32 @@ class CheckAccountManager(BaseManager):
         return "accounts/check_account_report.html"
 
     def print_summary(self):
-        tmpl = _("---\nSummary: \nok: {}, weak password: {}, leaked password: {}, "
-                 "repeated password: {}, no secret: {}, using time: {}s").format(
-            self.summary["ok"],
-            self.summary[RiskChoice.weak_password],
-            self.summary[RiskChoice.leaked_password],
-            self.summary[RiskChoice.repeated_password],
-            self.summary["no_secret"],
-            self.duration
-        )
-        print(tmpl)
+        normal = self.summary["ok"]
+        weak = self.summary[RiskChoice.weak_password]
+        leaked = self.summary[RiskChoice.leaked_password]
+        repeated = self.summary[RiskChoice.repeated_password]
+        no_secret = self.summary["no_secret"]
+        risk_count = len(self.risky_account_ids)
+        total = len(self.checked_account_ids)
+        self.print_log(_("Task execution completed"), 'success')
+        self.print_log(_(
+            "Checked %(total)s accounts: %(normal)s normal, %(risk)s at risk, "
+            "%(no_secret)s without secrets"
+        ) % {
+            'total': total,
+            'normal': normal,
+            'risk': risk_count,
+            'no_secret': no_secret,
+        }, 'error' if risk_count else 'success')
+        if risk_count:
+            self.print_log(_(
+                "Risk details: %(weak)s weak passwords, %(leaked)s leaked "
+                "passwords, %(repeated)s repeated passwords"
+            ) % {
+                'weak': weak,
+                'leaked': leaked,
+                'repeated': repeated,
+            }, 'error')
+        self.print_log(_("Duration: %(duration)s seconds") % {
+            'duration': self.duration,
+        }, 'info')

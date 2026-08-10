@@ -12,13 +12,14 @@ from ..serializers import (
     SiteMessageSendSerializer,
 )
 from ..site_msg import SiteMessageUtil
-from ..models import MessageContent
+from ..models import MessageContent, SiteMessage
 
 
 __all__ = ('SiteMessageViewSet',)
 
 
 class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):
+    queryset = SiteMessage.objects.none()
     permission_classes = (IsValidUser,)
     serializer_classes = {
         'default': SiteMessageSerializer,

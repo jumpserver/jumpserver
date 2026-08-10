@@ -14,6 +14,7 @@ from .auth import (
 )
 from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
+from .luna import LunaSettingSerializer
 from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
@@ -72,6 +73,7 @@ class SettingsSerializer(
     LDAPSettingSerializer,
     AuthSettingSerializer,
     TerminalSettingSerializer,
+    LunaSettingSerializer,
     SecuritySettingSerializer,
     WeComSettingSerializer,
     DingTalkSettingSerializer,

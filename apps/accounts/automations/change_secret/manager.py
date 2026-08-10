@@ -11,6 +11,7 @@ from accounts.const import (
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
+from common.const import Status
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_filename
@@ -38,6 +39,12 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         if asset_account_id in self.record_map:
             record_id = self.record_map[asset_account_id]
             record = ChangeSecretRecord.objects.filter(id=record_id).first()
+            if not record:
+                raise ValueError(f'Change secret record not found: {record_id}')
+            record.status = ChangeSecretRecordStatusChoice.pending.value
+            record.error = ''
+            record.date_finished = None
+            record.save(update_fields=['status', 'error', 'date_finished'])
         else:
             new_secret = self.get_secret(account)
             record = self.create_record(asset, account, new_secret)
@@ -46,7 +53,10 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         return record
 
     def create_record(self, asset, account, new_secret):
-        record = ChangeSecretRecord(
+        # Persist both the old and candidate secret before touching the remote
+        # account. If the worker is killed after the remote change, the
+        # candidate remains recoverable and the record stays pending.
+        record = ChangeSecretRecord.objects.create(
             asset=asset, account=account, execution=self.execution,
             old_secret=account.secret, new_secret=new_secret,
             comment=f'{account.username}@{asset.address}'
@@ -55,32 +65,44 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
 
     def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \
-                and not self.execution.snapshot['secret']:
-            print('Custom secret is empty')
+                and not self.execution.snapshot.get('secret'):
+            print(_("Secret cannot be empty"))
             return False
         return True
 
+    def get_runners(self):
+        if not self.check_secret():
+            self.status = Status.failed
+            return []
+        return super().get_runners()
+
     @staticmethod
     def get_summary(records):
-        total, succeed, failed = 0, 0, 0
-        for record in records:
-            if record.status == ChangeSecretRecordStatusChoice.success.value:
-                succeed += 1
-            else:
-                failed += 1
-            total += 1
-        summary = _('Success: %s, Failed: %s, Total: %s') % (succeed, failed, total)
+        succeed, failed, unverified = (
+            BaseChangeSecretPushManager.get_record_result_counts(records)
+        )
+        total = succeed + failed + unverified
+        summary = _(
+            'Successful: %(success)s, Needs verification: %(unverified)s, '
+            'Failed: %(failed)s, Total: %(total)s'
+        ) % {
+            'success': succeed,
+            'unverified': unverified,
+            'failed': failed,
+            'total': total,
+        }
         return summary
 
     def print_summary(self):
         records = list(self.name_record_mapper.values())
-        summary = self.get_summary(records)
-        print('\n\n' + '-' * 80)
-        plan_execution_end = _('Plan execution end')
-        print('{} {}\n'.format(plan_execution_end, local_now_filename()))
-        time_cost = _('Duration')
-        print('{}: {}s'.format(time_cost, self.duration))
-        print(summary)
+        success, failed, unverified = self.get_record_result_counts(records)
+        self.print_result_summary(
+            success,
+            failed,
+            unverified,
+            total=success + failed + unverified,
+            include_unverified=True,
+        )
 
     def send_report_if_need(self, *args, **kwargs):
         if self.secret_type and not self.check_secret():

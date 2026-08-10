@@ -1,4 +1,4 @@
-- hosts: oralce
+- hosts: oracle
   gather_facts: no
   vars:
     ansible_python_interpreter: "{{ local_python_interpreter }}"
@@ -12,12 +12,10 @@
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
         mode: "{{ jms_account.mode }}"
+        connect_timeout: 15
         filter: users
       register: db_info
 
     - name: Define info by set_fact
       set_fact:
         info: "{{ db_info.users }}"
-
-    - debug:
-        var: info

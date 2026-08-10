@@ -19,12 +19,10 @@
         ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
         client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
         client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
+        connect_timeout: 15
         filter: users
       register: db_info
 
     - name: Define info by set_fact
       set_fact:
         info: "{{ db_info.users }}"
-
-    - debug:
-        var: info

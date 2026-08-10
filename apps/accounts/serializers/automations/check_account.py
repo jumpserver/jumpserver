@@ -15,12 +15,13 @@ from assets.models import Asset
 from common.const import ConfirmOrIgnore
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
-from .base import BaseAutomationSerializer
+from .base import BaseAutomationSerializer, AutomationListSerializerMixin
 
 logger = get_logger(__file__)
 
 __all__ = [
     "CheckAccountAutomationSerializer",
+    "CheckAccountAutomationListSerializer",
     "AccountRiskSerializer",
     "CheckAccountEngineSerializer",
     "AssetRiskSerializer",
@@ -106,6 +107,17 @@ class CheckAccountAutomationSerializer(BaseAutomationSerializer):
             raise serializers.ValidationError(_("Invalid engine id"))
 
         return engines
+
+
+class CheckAccountAutomationListSerializer(
+    AutomationListSerializerMixin, CheckAccountAutomationSerializer
+):
+    class Meta(CheckAccountAutomationSerializer.Meta):
+        relation_count_fields = {'assets_amount': 'assets', 'nodes_amount': 'nodes'}
+        fields = [
+            f for f in CheckAccountAutomationSerializer.Meta.fields
+            if f not in ('assets', 'nodes', 'recipients')
+        ] + ['assets_amount', 'nodes_amount']
 
 
 class CheckAccountEngineSerializer(serializers.ModelSerializer):

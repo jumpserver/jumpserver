@@ -47,38 +47,65 @@ i18n:
       1. 改密账号 -> {username} <br />
       2. 改密密码 -> {password} <br />
       3. 登录用户密码 -> {login_password} <br />
+      4. 已有特权密码（如 Cisco enable 密码） -> {privilege_password} <br />
       <strong>多条命令使用换行分割，</strong>执行任务时系统会根据特殊符号替换真实数据。<br />
-      比如针对 Cisco 主机进行改密，一般需要配置五条命令：<br />
+      比如针对 Cisco enable 权限进行改密，一般需要配置以下命令：<br />
       enable <br />
-      {login_password} <br />
+      {privilege_password} <br />
       configure terminal <br />
-      username {username} privilege 0 password {password} <br />
+      enable secret {password} <br />
       end <br />
+      write memory <br />
+      如果修改 Cisco 普通用户，请使用：<br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
     ja: |
       コマンド内の指定された位置を特殊記号に変更してください。<br />
       新しいパスワード（アカウント変更） -> {username} <br />
       新しいパスワード（パスワード変更） -> {password} <br />
       ログインユーザーパスワード -> {login_password} <br />
+      既存の特権パスワード（Cisco enable パスワードなど） -> {privilege_password} <br />
       <strong>複数のコマンドは改行で区切り、</strong>タスクを実行するときにシステムは特殊記号を使用して実際のデータを置き換えます。<br />
-      例えば、Cisco機器のパスワードを変更する場合、一般的には5つのコマンドを設定する必要があります：<br />
+      例えば、Cisco の enable パスワードを変更する場合、次のコマンドを設定します：<br />
       enable <br />
-      {login_password} <br />
+      {privilege_password} <br />
       configure terminal <br />
-      username {username} privilege 0 password {password} <br />
+      enable secret {password} <br />
       end <br />
+      write memory <br />
+      Cisco の一般ユーザーを変更する場合：<br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
     en: |
       Please change the specified positions in the command to special symbols. <br /> 
       Change password account -> {username} <br /> 
       Change password -> {password} <br /> 
       Login user password -> {login_password} <br /> 
+      Existing privilege password (such as a Cisco enable password) -> {privilege_password} <br />
       <strong>Multiple commands are separated by new lines,</strong> and when executing tasks, <br /> 
       the system will replace the special symbols with real data. <br /> 
-      For example, to change the password for a Cisco device, you generally need to configure five commands: <br />
+      For example, to change a Cisco enable password, configure the following commands: <br />
       enable <br />
-      {login_password} <br />
+      {privilege_password} <br />
       configure terminal <br />
-      username {username} privilege 0 password {password} <br />
+      enable secret {password} <br />
       end <br />
+      write memory <br />
+      To change a regular Cisco user, use: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
 
   Params commands label:
     zh: '自定义命令'

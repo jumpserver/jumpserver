@@ -26,8 +26,7 @@ class AllTypes(ChoicesMixin):
         DirectoryTypes
     ]
     _category_constrains = {}
-    _automation_methods = None
-    _current_language = settings.LANGUAGE_CODE
+    _automation_methods_by_language = {}
 
     @classmethod
     def choices(cls):
@@ -68,35 +67,38 @@ class AllTypes(ChoicesMixin):
         return constraints.get('protocols')[0]['name']
 
     @classmethod
-    def get_automation_methods(cls):
-        from assets.automations import methods as asset
-        from assets.utils.platform_package import get_persisted_platform_automation_methods
-        from accounts.automations import methods as account
-        from terminal.models import Applet
-
-        automation_methods = \
-            asset.platform_automation_methods + \
-            account.platform_automation_methods + \
-            get_persisted_platform_automation_methods() + \
-            Applet.get_automation_methods()
+    def get_automation_methods_language(cls, language=None):
+        if language:
+            return language
 
         request = get_current_request()
-        if request is None:
-            return automation_methods
+        if request is not None:
+            return request.LANGUAGE_CODE
+        return settings.LANGUAGE_CODE
 
-        language = request.LANGUAGE_CODE
-        if cls._automation_methods is not None and language == cls._current_language:
-            automation_methods = cls._automation_methods
-        else:
-            automation_methods = \
-                asset.get_platform_automation_methods(asset.BASE_DIR, language) + \
-                account.get_platform_automation_methods(account.BASE_DIR, language) + \
-                get_persisted_platform_automation_methods(lang=language) + \
-                Applet.get_automation_methods(lang=language)
+    @classmethod
+    def load_automation_methods(cls, language=None):
+        from assets.automations import methods as asset
+        from assets.models import PlatformPackage
+        from accounts.automations import methods as account
 
-        cls._current_language = language
-        cls._automation_methods = automation_methods
-        return cls._automation_methods
+        language = cls.get_automation_methods_language(language)
+        return \
+            asset.get_platform_automation_methods(asset.BASE_DIR, language) + \
+            account.get_platform_automation_methods(account.BASE_DIR, language) + \
+            PlatformPackage.get_all_automation_methods(lang=language)
+
+    @classmethod
+    def get_automation_methods(cls, language=None, reload=False):
+        language = cls.get_automation_methods_language(language)
+        if reload or language not in cls._automation_methods_by_language:
+            cls._automation_methods_by_language[language] = cls.load_automation_methods(language)
+        return cls._automation_methods_by_language[language]
+
+    @classmethod
+    def reload_automation_methods(cls, language=None):
+        cls._automation_methods_by_language = {}
+        return cls.get_automation_methods(language=language, reload=True)
 
     @classmethod
     def set_automation_methods(cls, category, tp_name, constraints):

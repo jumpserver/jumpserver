@@ -24,18 +24,27 @@ class PingManager(BasePlaybookManager):
         return host
 
     def on_host_success(self, host, result):
-        asset, account = self.host_asset_and_account_mapper.get(host)
+        mapping = self.host_asset_and_account_mapper.get(host)
+        if not mapping:
+            return super().on_host_error(
+                host, 'Asset/account mapping not found', result
+            )
+        asset, account = mapping
         try:
             asset.set_connectivity(Connectivity.OK)
-            if not account:
-                return
-            account.set_connectivity(Connectivity.OK)
+            if account:
+                account.set_connectivity(Connectivity.OK)
         except Exception as e:
-            print(f'\033[31m Update account {account.name} or '
-                  f'update asset {asset.name} connectivity failed: {e} \033[0m\n')
+            super().on_host_error(host, str(e), result)
+            return
+        super().on_host_success(host, result)
 
     def on_host_error(self, host, error, result):
-        asset, account = self.host_asset_and_account_mapper.get(host)
+        super().on_host_error(host, error, result)
+        mapping = self.host_asset_and_account_mapper.get(host)
+        if not mapping:
+            return
+        asset, account = mapping
         try:
             error_tp = asset.get_err_connectivity(error)
             asset.set_connectivity(error_tp)
@@ -43,5 +52,7 @@ class PingManager(BasePlaybookManager):
                 return
             account.set_connectivity(error_tp)
         except Exception as e:
-            print(f'\033[31m Update account {account.name} or '
-                  f'update asset {asset.name} connectivity failed: {e} \033[0m\n')
+            logger.warning(
+                "Save connectivity failure result failed: host=%s error=%s",
+                host, e,
+            )

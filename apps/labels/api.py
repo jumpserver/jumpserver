@@ -122,7 +122,7 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
 
 class LabelViewSet(OrgBulkModelViewSet):
     model = Label
-    filterset_fields = ("name", "value")
+    filterset_fields = ("id", "name", "value")
     search_fields = filterset_fields
     serializer_classes = {
         'default': serializers.LabelSerializer,

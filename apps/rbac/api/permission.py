@@ -11,6 +11,7 @@ __all__ = ['PermissionViewSet']
 
 
 class PermissionViewSet(JMSModelViewSet):
+    queryset = Permission.objects.none()
     filterset_fields = ['codename']
     serializer_classes = {
         'get_tree': TreeNodeSerializer,
