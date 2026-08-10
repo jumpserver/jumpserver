@@ -700,6 +700,30 @@ msgstr "Долгое время без проверки"
 msgid "Status"
 msgstr "Статус"
 
+#: tickets/filters.py:36 tickets/serializers/super_ticket.py:15
+#: tickets/serializers/ticket/ticket.py:23
+msgid "Ticket status"
+msgstr "Статус заявки"
+
+#: tickets/filters.py:33 tickets/serializers/super_ticket.py:20
+#: tickets/serializers/ticket/ticket.py:28
+msgid "Approval result"
+msgstr "Результат согласования"
+
+#: tickets/serializers/super_ticket.py:16
+#: tickets/serializers/ticket/ticket.py:24
+msgid "Indicates whether the ticket is open or finished"
+msgstr "Показывает, открыта заявка или завершена"
+
+#: tickets/serializers/super_ticket.py:21
+#: tickets/serializers/ticket/ticket.py:29
+msgid ""
+"Indicates the current approval outcome: pending, closed, approved, or "
+"rejected"
+msgstr ""
+"Показывает текущий результат согласования: на рассмотрении, закрыта, одобрена "
+"или отклонена"
+
 #: accounts/filters.py:298
 msgid "Account username"
 msgstr "Имя пользователя учётной записи"
@@ -11934,10 +11958,8 @@ msgstr "Правило утверждения потока заявок"
 #: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
 #: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
 #: tickets/serializers/ticket/ticket.py:25
-#, fuzzy
-#| msgid "All users"
 msgid "CC users"
-msgstr "Все пользователи"
+msgstr "Пользователи в копии"
 
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
 #: tickets/serializers/ticket/ticket.py:76
@@ -12077,16 +12099,12 @@ msgid "Ticket has processed - {} ({})"
 msgstr "Заявка обработана - {} ({})"
 
 #: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
 msgid "A ticket you are copied on has been updated"
-msgstr "Актив \"%s\" обновлен"
+msgstr "Заявка, в которой вы указаны в копии, обновлена"
 
 #: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
 msgid "Ticket updated - {} ({})"
-msgstr "Заявка обработана - {} ({})"
+msgstr "Заявка обновлена - {} ({})"
 
 #: tickets/reporting.py:10
 msgid "Ticket Report"
@@ -12153,6 +12171,10 @@ msgid "The number of approval rules must match the approval level"
 msgstr ""
 "Количество правил утверждения должно соответствовать количеству уровней "
 "утверждения"
+
+#: tickets/serializers/flow.py:29
+msgid "No approvers matched. Please update the approval rule"
+msgstr "Подходящие согласующие не найдены. Измените правило согласования"
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"

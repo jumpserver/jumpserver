@@ -69,8 +69,16 @@ class TicketFlow(JMSBaseModel, OrgModelMixin):
                 flows = cls.objects.all()
         else:
             flows = cls.objects.all()
-        cur_flow_types = flows.values_list('type', flat=True)
+
+        # A flow in the current organization only overrides a global flow with
+        # the same type and name. Different named flows of the same type must
+        # remain available after multiple flows per type became supported.
+        current_flow_keys = list(flows.values_list('type', 'name'))
         root_id = Organization.ROOT_ID
         with tmp_to_org(root_id):
-            diff_global_flows = cls.objects.exclude(type__in=cur_flow_types).filter(org_id=root_id)
+            diff_global_flows = cls.objects.filter(org_id=root_id)
+            for flow_type, name in current_flow_keys:
+                diff_global_flows = diff_global_flows.exclude(
+                    type=flow_type, name__iexact=name
+                )
         return flows | diff_global_flows

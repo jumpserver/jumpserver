@@ -692,6 +692,28 @@ msgstr "长期未验证"
 msgid "Status"
 msgstr "状态"
 
+#: tickets/filters.py:36 tickets/serializers/super_ticket.py:15
+#: tickets/serializers/ticket/ticket.py:23
+msgid "Ticket status"
+msgstr "工单状态"
+
+#: tickets/filters.py:33 tickets/serializers/super_ticket.py:20
+#: tickets/serializers/ticket/ticket.py:28
+msgid "Approval result"
+msgstr "审批结果"
+
+#: tickets/serializers/super_ticket.py:16
+#: tickets/serializers/ticket/ticket.py:24
+msgid "Indicates whether the ticket is open or finished"
+msgstr "表示工单处于进行中还是已结束"
+
+#: tickets/serializers/super_ticket.py:21
+#: tickets/serializers/ticket/ticket.py:29
+msgid ""
+"Indicates the current approval outcome: pending, closed, approved, or "
+"rejected"
+msgstr "表示当前审批结果：审批中、已关闭、已通过或已驳回"
+
 #: accounts/filters.py:298
 msgid "Account username"
 msgstr "账号用户名"
@@ -11605,10 +11627,8 @@ msgstr "工单批准信息"
 #: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
 #: tickets/serializers/flow.py:34 tickets/serializers/flow.py:107
 #: tickets/serializers/ticket/ticket.py:25
-#, fuzzy
-#| msgid "All users"
 msgid "CC users"
-msgstr "所有用户"
+msgstr "抄送用户"
 
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:28
 #: tickets/serializers/ticket/ticket.py:76
@@ -11748,16 +11768,12 @@ msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
 #: tickets/notifications.py:197
-#, fuzzy
-#| msgid "Asset \"%s\" has been updated"
 msgid "A ticket you are copied on has been updated"
-msgstr "资产 \"%s\" 已更新"
+msgstr "您被抄送的工单已更新"
 
 #: tickets/notifications.py:201
-#, fuzzy
-#| msgid "Ticket has processed - {} ({})"
 msgid "Ticket updated - {} ({})"
-msgstr "你的工单已被处理, 处理人 - {} ({})"
+msgstr "工单已更新 - {} ({})"
 
 #: tickets/reporting.py:10
 msgid "Ticket Report"
@@ -11822,6 +11838,10 @@ msgstr "已存在同名且同类型的工单流"
 #: tickets/serializers/flow.py:68
 msgid "The number of approval rules must match the approval level"
 msgstr "审批规则数量必须与审批级数一致"
+
+#: tickets/serializers/flow.py:29
+msgid "No approvers matched. Please update the approval rule"
+msgstr "未匹配到审批人，请完善审批人设置"
 
 #: tickets/serializers/super_ticket.py:15
 msgid "Processor"
