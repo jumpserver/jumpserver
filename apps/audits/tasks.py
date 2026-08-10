@@ -417,4 +417,103 @@ def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
         default_storage.delete(local_path)
     except:
         pass
-    return
+
+
+@shared_task(
+    verbose_name=_('NAS archive session replays'),
+    description=_(
+        'Archive session replays on or before the specified date to NAS storage'
+    )
+)
+def nas_archive_session_replays(date_str):
+    from datetime import datetime
+
+    from audits.models import ArchiveLog
+
+    logger.info('NAS archive task started for date: %s', date_str)
+
+    nas_mount_path = getattr(settings, 'NAS_MOUNT_PATH', '')
+    if not nas_mount_path or not os.path.ismount(nas_mount_path):
+        logger.error('NAS mount path not available: %s', nas_mount_path)
+        return {"error": "NAS mount path not available"}
+
+    try:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        logger.error('Invalid date format: %s', date_str)
+        return {"error": "Invalid date format"}
+
+    selected_datetime = datetime.combine(selected_date, datetime.max.time())
+    if settings.USE_TZ:
+        tz = timezone.get_current_timezone()
+        selected_datetime = timezone.make_aware(selected_datetime, tz)
+
+    sessions = Session.objects.filter(
+        has_replay=True,
+        is_archived=False,
+        date_start__lte=selected_datetime
+    ).order_by('date_start')
+
+    if not sessions.exists():
+        logger.info('No sessions to archive before %s', date_str)
+        return {"msg": "No sessions to archive", "count": 0}
+
+    logger.info('Archiving %d sessions to NAS', sessions.count())
+
+    total_archived = 0
+    total_size = 0
+    errors = []
+
+    for session in sessions.iterator():
+        possible_paths = session.get_all_possible_local_path()
+        file_copied = False
+
+        for local_path in possible_paths:
+            abs_path = os.path.join(default_storage.base_location, local_path) \
+                if not os.path.isabs(local_path) else local_path
+            if not os.path.isfile(abs_path):
+                continue
+
+            try:
+                file_size = os.path.getsize(abs_path)
+                nas_target = os.path.join(nas_mount_path, local_path)
+                nas_target_dir = os.path.dirname(nas_target)
+                if not os.path.isdir(nas_target_dir):
+                    os.makedirs(nas_target_dir, exist_ok=True)
+
+                shutil.copy2(abs_path, nas_target)
+                logger.info('Archived: %s -> %s (%d bytes)', abs_path, nas_target, file_size)
+
+                ArchiveLog.objects.create(
+                    session_id=str(session.id),
+                    file_path=abs_path,
+                    file_size=file_size,
+                    storage_path=nas_target,
+                )
+                total_size += file_size
+                file_copied = True
+            except OSError as e:
+                logger.error('Failed to archive %s: %s', abs_path, e)
+                errors.append({
+                    "session_id": str(session.id),
+                    "file": abs_path,
+                    "error": str(e)
+                })
+
+        if file_copied:
+            session.is_archived = True
+            session.save(update_fields=['is_archived'])
+            total_archived += 1
+
+    total_size_mb = round(total_size / 1024 / 1024, 2)
+    logger.info(
+        'NAS archive complete: %d sessions, %d MB, %d errors',
+        total_archived, total_size_mb, len(errors)
+    )
+
+    return {
+        "msg": "Archive completed",
+        "count": total_archived,
+        "total_size_mb": total_size_mb,
+        "errors": errors[:10] if errors else None
+    }

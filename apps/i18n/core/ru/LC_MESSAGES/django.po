@@ -4306,6 +4306,15 @@ msgstr ""
 "(процент 0-100), удалите записи сеансов, команды и повторы самого старого "
 "дня, пока использование не упадет ниже порога"
 
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "Архивация записей сеансов на NAS"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "Архивировать записи сеансов на указанную дату или ранее в хранилище NAS"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Загрузка FTP файлов во внешнее хранилище"
@@ -7617,11 +7626,6 @@ msgstr "Для CIFS требуется имя пользователя NAS"
 msgid "NAS mount path does not exist: {}"
 msgstr "Путь монтирования NAS не существует: {}"
 
-#: settings/api/nas.py:66
-#, python-brace-format
-msgid "NAS mount path is not a directory: {}"
-msgstr "Путь монтирования NAS не является каталогом: {}"
-
 #: settings/api/nas.py:78
 #, python-brace-format
 msgid "NAS mount path is not writable: {}"
@@ -7632,12 +7636,29 @@ msgstr "Путь монтирования NAS не доступен для за�
 msgid "NAS mount path I/O error: {}"
 msgstr "Ошибка ввода-вывода пути монтирования NAS: {}"
 
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "Путь монтирования NAS не смонтирован: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "Требуется дата, формат: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "Неверный формат даты, используйте YYYY-MM-DD"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "Задача архивации запущена"
+
 #: settings/serializers/storage.py:14
-msgid "FTP file max store"
+msgid "File max store"
 msgstr "Макс. размер FTP файла"
 
 #: settings/serializers/storage.py:15
-msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgid "File max store size (MB), <= 0 means no backup"
 msgstr "Максимальный размер загружаемого FTP файла (МБ), <= 0 означает без резервного копирования"
 
 #: settings/serializers/storage.py:18
@@ -7704,7 +7725,8 @@ msgstr "Пароль NAS"
 msgid "NAS login password (CIFS required)"
 msgstr "Пароль для входа в NAS (обязательно для CIFS)"
 
-#: settings/serializers/storage.py:21
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "Запись сессии"
 
@@ -9820,10 +9842,7 @@ msgstr "Есть активные сессии"
 msgid "User %s %s session %s replay"
 msgstr "Пользователь %s %s запись сеанса %s"
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "Запись сессий"
+
 
 #: terminal/api/session/session.py:339
 #, python-brace-format

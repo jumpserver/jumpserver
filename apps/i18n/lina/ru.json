@@ -1736,5 +1736,8 @@
     "FileSize": "Размер файла",
     "ReclamationLogs": "Журнал освобождения",
     "ArchiveLogs": "Архивные журналы",
-    "Syslog": "SYSLOG"
+    "Syslog": "SYSLOG",
+    "NasTest": "Тест NAS",
+    "ArchiveDate": "Дата архивации",
+    "Archive": "Архивировать"
 }

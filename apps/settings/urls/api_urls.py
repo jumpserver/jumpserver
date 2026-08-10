@@ -14,6 +14,7 @@ urlpatterns = [
     path('mail/testing/', api.MailTestingAPI.as_view(), name='mail-testing'),
     path('syslog/testing/', api.SyslogTestingAPI.as_view(), name='syslog-testing'),
     path('nas/testing/', api.NasTestingAPI.as_view(), name='nas-testing'),
+    path('nas/archive/', api.NasArchiveAPI.as_view(), name='nas-archive'),
     path('ldap/users/', api.LDAPUserListApi.as_view(), name='ldap-user-list'),
     path('wecom/testing/', api.WeComTestingAPI.as_view(), name='wecom-testing'),
     path('dingtalk/testing/', api.DingTalkTestingAPI.as_view(), name='dingtalk-testing'),

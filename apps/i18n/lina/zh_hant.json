@@ -1783,5 +1783,8 @@
     "FileSize": "檔案大小",
     "ReclamationLogs": "空間騰退日誌",
     "ArchiveLogs": "歸檔日誌",
-    "Syslog": "SYSLOG"
+    "Syslog": "SYSLOG",
+    "NasTest": "NAS 測試",
+    "ArchiveDate": "歸檔日期",
+    "Archive": "歸檔"
 }

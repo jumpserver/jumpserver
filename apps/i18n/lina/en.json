@@ -1810,5 +1810,8 @@
     "FileSize": "File size",
     "ReclamationLogs": "Reclamation logs",
     "ArchiveLogs": "Archive logs",
-    "Syslog": "Syslog"
+    "Syslog": "Syslog",
+    "NasTest": "NAS test",
+    "ArchiveDate": "Archive date",
+    "Archive": "Archive"
 }

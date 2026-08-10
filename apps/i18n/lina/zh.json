@@ -1821,5 +1821,8 @@
     "ReclamationLogs": "空间腾退日志",
     "ArchiveLogs": "归档日志",
     "Syslog": "SYSLOG",
-    "StorageReclamation": "空间腾退"
+    "StorageReclamation": "空间腾退",
+    "NasTest": "NAS 测试",
+    "ArchiveDate": "归档日期",
+    "Archive": "归档"
 }

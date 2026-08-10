@@ -4323,6 +4323,15 @@ msgstr ""
 "(phần trăm 0-100), xóa bản ghi phiên, lệnh và phát lại của ngày cũ nhất "
 "cho đến khi dung lượng xuống dưới ngưỡng"
 
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "Lưu trữ bản ghi phiên vào NAS"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "Lưu trữ bản ghi phiên vào hoặc trước ngày đã chỉ định vào bộ nhớ NAS"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Tải lên tệp FTP vào bộ nhớ bên ngoài"
@@ -7618,11 +7627,6 @@ msgstr "Cần tên người dùng NAS cho CIFS"
 msgid "NAS mount path does not exist: {}"
 msgstr "Đường dẫn gắn NAS không tồn tại: {}"
 
-#: settings/api/nas.py:66
-#, python-brace-format
-msgid "NAS mount path is not a directory: {}"
-msgstr "Đường dẫn gắn NAS không phải là thư mục: {}"
-
 #: settings/api/nas.py:78
 #, python-brace-format
 msgid "NAS mount path is not writable: {}"
@@ -7633,12 +7637,29 @@ msgstr "Đường dẫn gắn NAS không thể ghi: {}"
 msgid "NAS mount path I/O error: {}"
 msgstr "Lỗi I/O đường dẫn gắn NAS: {}"
 
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "Đường dẫn gắn NAS chưa được gắn: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "Ngày là bắt buộc, định dạng: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "Định dạng ngày không hợp lệ, vui lòng sử dụng YYYY-MM-DD"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "Tác vụ lưu trữ đã bắt đầu"
+
 #: settings/serializers/storage.py:14
-msgid "FTP file max store"
+msgid "File max store"
 msgstr "Lưu trữ tối đa tệp FTP"
 
 #: settings/serializers/storage.py:15
-msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgid "File max store size (MB), <= 0 means no backup"
 msgstr "Kích thước lưu trữ tối đa khi tải lên tệp FTP (MB), <= 0 nghĩa là không sao lưu"
 
 #: settings/serializers/storage.py:18
@@ -7705,7 +7726,8 @@ msgstr "Mật khẩu NAS"
 msgid "NAS login password (CIFS required)"
 msgstr "Mật khẩu đăng nhập NAS (bắt buộc với CIFS)"
 
-#: settings/serializers/storage.py:21
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "Phát lại phiên"
 
@@ -9817,10 +9839,7 @@ msgstr "có phiên trực tuyến"
 msgid "User %s %s session %s replay"
 msgstr "người dùng %s %s đã ghi lại phiên %s"
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "ghi lại phiên"
+
 
 #: terminal/api/session/session.py:339
 #, python-brace-format

@@ -1739,5 +1739,8 @@
     "FileSize": "ファイルサイズ",
     "ReclamationLogs": "ストレージ解放ログ",
     "ArchiveLogs": "アーカイブログ",
-    "Syslog": "SYSLOG"
+    "Syslog": "SYSLOG",
+    "NasTest": "NAS テスト",
+    "ArchiveDate": "アーカイブ日付",
+    "Archive": "アーカイブ"
 }

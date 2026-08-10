@@ -4294,6 +4294,15 @@ msgstr ""
 "(porcentagem 0-100), exclua os registros de sessão, comandos e "
 "reproduções do dia mais antigo até que o uso caia abaixo do limite"
 
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "Arquivar gravações de sessão no NAS"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "Arquivar gravações de sessão na ou antes da data especificada para o armazenamento NAS"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Upload de arquivos FTP para armazenamento externo"
@@ -7598,11 +7607,6 @@ msgstr "Nome de usuário NAS é obrigatório para CIFS"
 msgid "NAS mount path does not exist: {}"
 msgstr "Caminho de montagem NAS não existe: {}"
 
-#: settings/api/nas.py:66
-#, python-brace-format
-msgid "NAS mount path is not a directory: {}"
-msgstr "Caminho de montagem NAS não é um diretório: {}"
-
 #: settings/api/nas.py:78
 #, python-brace-format
 msgid "NAS mount path is not writable: {}"
@@ -7613,12 +7617,29 @@ msgstr "Caminho de montagem NAS não tem permissão de escrita: {}"
 msgid "NAS mount path I/O error: {}"
 msgstr "Erro de E/S no caminho de montagem NAS: {}"
 
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "Caminho de montagem NAS não está montado: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "Data é obrigatória, formato: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "Formato de data inválido, use YYYY-MM-DD"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "Tarefa de arquivamento iniciada"
+
 #: settings/serializers/storage.py:14
-msgid "FTP file max store"
+msgid "File max store"
 msgstr "Armazenamento máximo de arquivos FTP"
 
 #: settings/serializers/storage.py:15
-msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgid "File max store size (MB), <= 0 means no backup"
 msgstr "Tamanho máximo de armazenamento de upload de arquivos FTP (MB), <= 0 significa sem backup"
 
 #: settings/serializers/storage.py:18
@@ -7685,7 +7706,8 @@ msgstr "Senha NAS"
 msgid "NAS login password (CIFS required)"
 msgstr "Senha de login NAS (obrigatório para CIFS)"
 
-#: settings/serializers/storage.py:21
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "Reprodução de sessão"
 
@@ -9813,10 +9835,7 @@ msgstr "Existem sessões online"
 msgid "User %s %s session %s replay"
 msgstr "O usuário %s %s a gravação da sessão %s"
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "Gravação de sessão"
+
 
 #: terminal/api/session/session.py:339
 #, python-brace-format

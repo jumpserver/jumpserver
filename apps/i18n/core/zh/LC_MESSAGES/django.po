@@ -4182,6 +4182,15 @@ msgstr ""
 "删除最早一天的会话记录、命令记录和录像，"
 "直到使用率降至阈值以下"
 
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "将指定日期及之前的会话录像归档到 NAS 存储"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "将指定日期及之前的会话录像归档到 NAS 存储"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
@@ -7366,11 +7375,6 @@ msgstr "CIFS 类型需要填写 NAS 用户名"
 msgid "NAS mount path does not exist: {}"
 msgstr "NAS 挂载路径不存在：{}"
 
-#: settings/api/nas.py:66
-#, python-brace-format
-msgid "NAS mount path is not a directory: {}"
-msgstr "NAS 挂载路径不是目录：{}"
-
 #: settings/api/nas.py:78
 #, python-brace-format
 msgid "NAS mount path is not writable: {}"
@@ -7381,12 +7385,29 @@ msgstr "NAS 挂载路径不可写：{}"
 msgid "NAS mount path I/O error: {}"
 msgstr "NAS 挂载路径 I/O 错误：{}"
 
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "NAS 挂载路径未挂载: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "日期必填，格式: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "日期格式无效，请使用 YYYY-MM-DD"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "归档任务已启动"
+
 #: settings/serializers/storage.py:14
-msgid "FTP file max store"
+msgid "File max store"
 msgstr "FTP 文件最大存储"
 
 #: settings/serializers/storage.py:15
-msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgid "File max store size (MB), <= 0 means no backup"
 msgstr "FTP 文件上传最大存储大小 (MB)，<= 0 表示不备份"
 
 #: settings/serializers/storage.py:18
@@ -7453,7 +7474,8 @@ msgstr "NAS 密码"
 msgid "NAS login password (CIFS required)"
 msgstr "NAS 登录密码（CIFS 必填）"
 
-#: settings/serializers/storage.py:21
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "会话录像"
 
@@ -9455,11 +9477,6 @@ msgstr "有在线会话"
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "用户 %s %s 了会话 %s 的录像"
-
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "会话录像"
 
 #: terminal/api/session/session.py:339
 #, python-brace-format

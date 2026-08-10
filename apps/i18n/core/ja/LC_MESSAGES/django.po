@@ -4268,6 +4268,15 @@ msgstr ""
 "を超えた場合、最も古い日のセッション記録、コマンド記録、リプレイを削除し、"
 "使用率がしきい値を下回るまで続けます"
 
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "NASセッション録画アーカイブ"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "指定日以前のセッション録画をNASストレージにアーカイブする"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "外部ストレージへのFTPファイルのアップロード"
@@ -7533,11 +7542,6 @@ msgstr "CIFS には NAS ユーザー名が必要です"
 msgid "NAS mount path does not exist: {}"
 msgstr "NAS マウントパスが存在しません：{}"
 
-#: settings/api/nas.py:66
-#, python-brace-format
-msgid "NAS mount path is not a directory: {}"
-msgstr "NAS マウントパスがディレクトリではありません：{}"
-
 #: settings/api/nas.py:78
 #, python-brace-format
 msgid "NAS mount path is not writable: {}"
@@ -7548,12 +7552,29 @@ msgstr "NAS マウントパスに書き込みできません：{}"
 msgid "NAS mount path I/O error: {}"
 msgstr "NAS マウントパス I/O エラー：{}"
 
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "NASマウントパスがマウントされていません: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "日付が必要です。形式: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "日付形式が無効です。YYYY-MM-DD を使用してください"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "アーカイブタスクが開始されました"
+
 #: settings/serializers/storage.py:14
-msgid "FTP file max store"
+msgid "File max store"
 msgstr "FTP ファイル最大保存容量"
 
 #: settings/serializers/storage.py:15
-msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgid "File max store size (MB), <= 0 means no backup"
 msgstr "FTPファイルアップロードの最大保存サイズ(MB)、0以下の場合はバックアップなし"
 
 #: settings/serializers/storage.py:18
@@ -7620,7 +7641,8 @@ msgstr "NAS パスワード"
 msgid "NAS login password (CIFS required)"
 msgstr "NAS ログインパスワード（CIFS 必須）"
 
-#: settings/serializers/storage.py:21
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "セッション録画"
 
@@ -9704,10 +9726,7 @@ msgstr "オンラインセッションを持つ"
 msgid "User %s %s session %s replay"
 msgstr "ユーザー%s %sこのセッション %s の録画です"
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "セッション再生"
+
 
 #: terminal/api/session/session.py:339
 #, python-brace-format

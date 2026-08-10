@@ -1734,5 +1734,8 @@
     "FileSize": "Kích thước tệp",
     "ReclamationLogs": "Nhật ký giải phóng",
     "ArchiveLogs": "Nhật ký lưu trữ",
-    "Syslog": "SYSLOG"
+    "Syslog": "SYSLOG",
+    "NasTest": "Kiểm tra NAS",
+    "ArchiveDate": "Ngày lưu trữ",
+    "Archive": "Lưu trữ"
 }

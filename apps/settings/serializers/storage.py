@@ -12,8 +12,8 @@ class StorageSettingSerializer(serializers.Serializer):
 
     FTP_FILE_MAX_STORE = serializers.IntegerField(
         required=False, allow_null=True,
-        label=_('FTP file max store'),
-        help_text=_('FTP file upload max store size (MB), <= 0 means no backup')
+        label=_('File max store'),
+        help_text=_('File max store size (MB), <= 0 means no backup')
     )
     STORAGE_USAGE_THRESHOLD = serializers.IntegerField(
         required=False, allow_null=True,
@@ -92,6 +92,14 @@ class StorageSettingSerializer(serializers.Serializer):
 
     def post_save(self):
         """Ensure NAS is mounted after saving settings (force re-mount)."""
-        from settings.tools.nas_mount import ensure_nas_mounted
+        from settings.tools.nas_mount import ensure_nas_mounted, is_nas_mounted, _unmount
         config = self._get_nas_config()
+
+        # If mount path changed, unmount the old one first
+        old_mount_path = getattr(settings, 'NAS_MOUNT_PATH', '')
+        new_mount_path = config.get('nas_mount_path', '')
+        if old_mount_path and old_mount_path != new_mount_path:
+            if is_nas_mounted(old_mount_path):
+                _unmount(old_mount_path)
+
         ensure_nas_mounted(config, force=True)

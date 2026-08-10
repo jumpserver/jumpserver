@@ -1734,5 +1734,8 @@
     "FileSize": "파일 크기",
     "ReclamationLogs": "저장소 확보 로그",
     "ArchiveLogs": "아카이브 로그",
-    "Syslog": "SYSLOG"
+    "Syslog": "SYSLOG",
+    "NasTest": "NAS 테스트",
+    "ArchiveDate": "아카이브 날짜",
+    "Archive": "아카이브"
 }

@@ -4113,6 +4113,15 @@ msgid ""
 "until usage falls below threshold"
 msgstr ""
 
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "NAS archive session replays"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "Archive session replays on or before the specified date to NAS storage"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr ""
@@ -7259,11 +7268,6 @@ msgstr ""
 msgid "NAS mount path does not exist: {}"
 msgstr ""
 
-#: settings/api/nas.py:66
-#, python-brace-format
-msgid "NAS mount path is not a directory: {}"
-msgstr ""
-
 #: settings/api/nas.py:78
 #, python-brace-format
 msgid "NAS mount path is not writable: {}"
@@ -7274,12 +7278,29 @@ msgstr ""
 msgid "NAS mount path I/O error: {}"
 msgstr ""
 
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "NAS mount path is not mounted: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "Date is required, format: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "Invalid date format, please use YYYY-MM-DD"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "Archive task started"
+
 #: settings/serializers/storage.py:14
-msgid "FTP file max store"
+msgid "File max store"
 msgstr ""
 
 #: settings/serializers/storage.py:15
-msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgid "File max store size (MB), <= 0 means no backup"
 msgstr ""
 
 #: settings/serializers/storage.py:18
@@ -7346,7 +7367,8 @@ msgstr ""
 msgid "NAS login password (CIFS required)"
 msgstr ""
 
-#: settings/serializers/storage.py:21
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr ""
 
@@ -9272,10 +9294,7 @@ msgstr ""
 msgid "User %s %s session %s replay"
 msgstr ""
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr ""
+
 
 #: terminal/api/session/session.py:339
 #, python-brace-format

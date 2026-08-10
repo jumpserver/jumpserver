@@ -4230,6 +4230,15 @@ msgstr ""
 "가장 오래된 날짜의 세션 기록, 명령 기록 및 리플레이를 삭제하여 "
 "사용률이 임계값 아래로 떨어질 때까지 진행합니다"
 
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "NAS 세션 녹화 아카이브"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "지정된 날짜 이전의 세션 녹화를 NAS 스토리지에 아카이브"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "외부 저장소에 FTP 파일을 업로드합니다."
@@ -7524,11 +7533,6 @@ msgstr "CIFS에는 NAS 사용자 이름이 필요합니다"
 msgid "NAS mount path does not exist: {}"
 msgstr "NAS 마운트 경로가 존재하지 않음: {}"
 
-#: settings/api/nas.py:66
-#, python-brace-format
-msgid "NAS mount path is not a directory: {}"
-msgstr "NAS 마운트 경로가 디렉토리가 아님: {}"
-
 #: settings/api/nas.py:78
 #, python-brace-format
 msgid "NAS mount path is not writable: {}"
@@ -7539,12 +7543,29 @@ msgstr "NAS 마운트 경로에 쓰기 불가: {}"
 msgid "NAS mount path I/O error: {}"
 msgstr "NAS 마운트 경로 I/O 오류: {}"
 
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "NAS 마운트 경로가 마운트되지 않았습니다: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "날짜가 필요합니다. 형식: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "날짜 형식이 올바르지 않습니다. YYYY-MM-DD를 사용하세요"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "아카이브 작업이 시작되었습니다"
+
 #: settings/serializers/storage.py:14
-msgid "FTP file max store"
+msgid "File max store"
 msgstr "FTP 파일 최대 저장"
 
 #: settings/serializers/storage.py:15
-msgid "FTP file upload max store size (MB), <= 0 means no backup"
+msgid "File max store size (MB), <= 0 means no backup"
 msgstr "FTP 파일 업로드 최대 저장 크기(MB), 0 이하는 백업 안 함"
 
 #: settings/serializers/storage.py:18
@@ -7611,7 +7632,8 @@ msgstr "NAS 비밀번호"
 msgid "NAS login password (CIFS required)"
 msgstr "NAS 로그인 비밀번호 (CIFS 필수)"
 
-#: settings/serializers/storage.py:21
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
 msgid "Session replay"
 msgstr "세션 녹화"
 
@@ -9696,10 +9718,7 @@ msgstr "온라인 세션이 있습니다."
 msgid "User %s %s session %s replay"
 msgstr "사용자 %s %s는 세션 %s의 녹화를 했습니다."
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "세션 녹화"
+
 
 #: terminal/api/session/session.py:339
 #, python-brace-format

@@ -1735,5 +1735,8 @@
     "FileSize": "Tamanho do arquivo",
     "ReclamationLogs": "Registros de liberação",
     "ArchiveLogs": "Registros de arquivo",
-    "Syslog": "SYSLOG"
+    "Syslog": "SYSLOG",
+    "NasTest": "Teste NAS",
+    "ArchiveDate": "Data de arquivamento",
+    "Archive": "Arquivar"
 }
