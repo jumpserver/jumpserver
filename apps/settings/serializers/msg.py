@@ -1,5 +1,8 @@
 # coding: utf-8
 #
+import ssl
+
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -23,6 +26,11 @@ class EmailSettingSerializer(serializers.Serializer):
     class EmailProtocol(models.TextChoices):
         smtp = 'smtp', _('SMTP')
         exchange = 'exchange', _('Microsoft Exchange Server')
+
+    class CertificateVerifyMode(models.TextChoices):
+        system = 'system', _('Use system trust store')
+        custom_ca = 'custom_ca', _('Use custom CA certificate')
+        none = 'none', _('Ignore certificate verification (insecure)')
 
     EMAIL_PROTOCOL = serializers.ChoiceField(
         choices=EmailProtocol.choices, label=_("Service"), default=EmailProtocol.smtp
@@ -56,6 +64,51 @@ class EmailSettingSerializer(serializers.Serializer):
         help_text=_(
             'Whether to use a TLS (secure) connection when talking to the SMTP server. This is used for explicit TLS connections, generally on port 587')
     )
+    EMAIL_CERT_VERIFY_MODE = serializers.ChoiceField(
+        choices=CertificateVerifyMode.choices,
+        default=CertificateVerifyMode.system,
+        label=_('Certificate verification'),
+        help_text=_('Controls verification of the SMTP TLS certificate')
+    )
+    EMAIL_CACERT_CONTENT = EncryptedField(
+        allow_blank=True, required=False, write_only=True,
+        max_length=1024 * 1024,
+        label=_('CA certificate'),
+        help_text=_('PEM certificate used in addition to the system trust store')
+    )
+
+    def validate(self, attrs):
+        ca_cert = attrs.get('EMAIL_CACERT_CONTENT')
+        verify_mode = attrs.get(
+            'EMAIL_CERT_VERIFY_MODE', settings.EMAIL_CERT_VERIFY_MODE
+        )
+        email_protocol = attrs.get('EMAIL_PROTOCOL', settings.EMAIL_PROTOCOL)
+        use_ssl = attrs.get('EMAIL_USE_SSL', settings.EMAIL_USE_SSL)
+        use_tls = attrs.get('EMAIL_USE_TLS', settings.EMAIL_USE_TLS)
+
+        if ca_cert:
+            if 'PRIVATE KEY-----' in ca_cert:
+                raise serializers.ValidationError({
+                    'EMAIL_CACERT_CONTENT': _('A CA certificate must not contain a private key')
+                })
+            try:
+                ssl.create_default_context(cadata=ca_cert)
+            except ssl.SSLError:
+                raise serializers.ValidationError({
+                    'EMAIL_CACERT_CONTENT': _('Invalid PEM CA certificate')
+                })
+
+        if (
+            email_protocol == self.EmailProtocol.smtp
+            and (use_ssl or use_tls)
+            and verify_mode == self.CertificateVerifyMode.custom_ca
+            and not (ca_cert or settings.EMAIL_CACERT_CONTENT)
+        ):
+            raise serializers.ValidationError({
+                'EMAIL_CACERT_CONTENT': _('A CA certificate is required')
+            })
+
+        return attrs
 
 
 class EmailContentSettingSerializer(serializers.Serializer):
