@@ -9358,6 +9358,42 @@ msgstr "SMTP"
 msgid "Microsoft Exchange Server"
 msgstr "Microsoft Exchange 服务器"
 
+#: settings/serializers/msg.py:31
+msgid "Use system trust store"
+msgstr "使用系统信任库"
+
+#: settings/serializers/msg.py:32
+msgid "Use custom CA certificate"
+msgstr "使用自定义 CA 证书"
+
+#: settings/serializers/msg.py:33
+msgid "Ignore certificate verification (insecure)"
+msgstr "忽略证书校验（不安全）"
+
+#: settings/serializers/msg.py:70
+msgid "Certificate verification"
+msgstr "证书校验"
+
+#: settings/serializers/msg.py:71
+msgid "Controls verification of the SMTP TLS certificate"
+msgstr "控制是否校验 SMTP TLS 证书"
+
+#: settings/serializers/msg.py:77
+msgid "PEM certificate used in addition to the system trust store"
+msgstr "在系统信任库之外额外信任的 PEM CA 证书"
+
+#: settings/serializers/msg.py:92
+msgid "A CA certificate must not contain a private key"
+msgstr "CA 证书不能包含私钥"
+
+#: settings/serializers/msg.py:98
+msgid "Invalid PEM CA certificate"
+msgstr "无效的 PEM CA 证书"
+
+#: settings/serializers/msg.py:108
+msgid "A CA certificate is required"
+msgstr "必须提供 CA 证书"
+
 #: settings/serializers/msg.py:28
 msgid "Service"
 msgstr "服务"
