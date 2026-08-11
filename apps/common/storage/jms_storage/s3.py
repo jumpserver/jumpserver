@@ -2,6 +2,7 @@
 #
 import boto3
 import os
+from botocore.config import Config
 
 from .base import ObjectStorage
 
@@ -19,7 +20,10 @@ class S3Storage(ObjectStorage):
                 's3', region_name=self.region,
                 aws_access_key_id=self.access_key,
                 aws_secret_access_key=self.secret_key,
-                endpoint_url=self.endpoint
+                endpoint_url=self.endpoint,
+                config=Config(
+                    request_checksum_calculation='when_required',
+                )
             )
         except ValueError:
             pass
