@@ -122,7 +122,7 @@ class LDAPServerUtil(object):
             password=password if password is not None else self.config.password,
             authentication=authentication
         )
-        conn.open()
+        conn.open(read_server_info=False)
         if not use_ldaps and self.config.start_tls:
             conn.start_tls()
         if bind:
