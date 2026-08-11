@@ -37,6 +37,7 @@ class JMSInventory:
         self.account_policy = account_policy
         self.host_callback = host_callback
         self.exclude_hosts = {}
+        self.exclude_host_details = {}
         self.exclude_localhost = exclude_localhost
         self.task_type = task_type
         self.protocol = protocol
@@ -411,8 +412,16 @@ class JMSInventory:
                         path_dir=path_dir
                     )
 
-                if host.get('error') and 'jms_asset' not in host:
-                    host['jms_asset'] = {'id': str(asset.id)}
+                if (
+                        isinstance(host, dict)
+                        and host.get('error')
+                        and 'jms_asset' not in host
+                ):
+                    host['jms_asset'] = {
+                        'id': str(asset.id),
+                        'name': asset.name,
+                        'address': asset.address,
+                    }
 
                 if isinstance(host, list):
                     hosts.extend(host)
@@ -423,6 +432,7 @@ class JMSInventory:
         for host in hosts:
             if host.get('error'):
                 self.exclude_hosts[host['name']] = host['error']
+                self.exclude_host_details[host['name']] = host
                 error_hosts.append({
                     'name': host['name'],
                     'id': host.get('jms_asset', {}).get('id'),
@@ -463,6 +473,17 @@ class JMSInventory:
                         path_dir=path_dir
                     )
 
+                if (
+                        isinstance(host, dict)
+                        and host.get('error')
+                        and 'jms_asset' not in host
+                ):
+                    host['jms_asset'] = {
+                        'id': str(asset.id),
+                        'name': asset.name,
+                        'address': asset.address,
+                    }
+
                 if isinstance(host, list):
                     hosts.extend(host)
                 else:
@@ -474,6 +495,7 @@ class JMSInventory:
             for i, host in enumerate(exclude_hosts, start=1):
                 print("{}: [{}] \t{}".format(i, host['name'], host['error']))
                 self.exclude_hosts[host['name']] = host['error']
+                self.exclude_host_details[host['name']] = host
         hosts = list(filter(lambda x: not x.get('error'), hosts))
         data = {'all': {'hosts': {}}}
         for host in hosts:

@@ -59,6 +59,7 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         record = ChangeSecretRecord.objects.create(
             asset=asset, account=account, execution=self.execution,
             old_secret=account.secret, new_secret=new_secret,
+            account_version=account.version,
             comment=f'{account.username}@{asset.address}'
         )
         return record
