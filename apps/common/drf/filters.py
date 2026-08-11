@@ -422,6 +422,27 @@ class SearchFilter(SearchFilterBase):
         groups.extend((params, False, True) for params in default_params)
         return groups
 
+    def must_call_distinct(self, queryset, search_fields):
+        filtered_relations = getattr(
+            getattr(queryset, 'query', None), '_filtered_relations', {}
+        )
+        if not filtered_relations:
+            return super().must_call_distinct(queryset, search_fields)
+
+        resolved_fields = []
+        for search_field in search_fields:
+            prefix = search_field[0] if search_field[0] in self.lookup_prefixes else ''
+            field_name = search_field[len(prefix):]
+            relation_alias, separator, related_field = field_name.partition('__')
+            filtered_relation = filtered_relations.get(relation_alias)
+            if filtered_relation:
+                field_name = filtered_relation.relation_name
+                if separator:
+                    field_name = f'{field_name}__{related_field}'
+            resolved_fields.append(f'{prefix}{field_name}')
+
+        return super().must_call_distinct(queryset, resolved_fields)
+
     @staticmethod
     def split_default_search_batches(params):
         batches = []
