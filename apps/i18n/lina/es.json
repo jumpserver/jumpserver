@@ -581,7 +581,7 @@
     "DeleteErrorMsg": "Error al eliminar",
     "DeleteGatherAccountTitle": "Eliminar la cuenta descubierta",
     "DeleteNode": "Eliminar nodo",
-    "DeleteOrgMsg": "Usuarios, grupos de usuarios, activos, nodos, etiquetas, dominios, autorización de activos",
+    "DeleteOrgMsg": "Usuarios, grupos de usuarios, activos, nodos, etiquetas, dominios, autorización de activos, plantilla de cuenta",
     "DeleteOrgTitle": "Por favor, asegúrese de que los siguientes recursos dentro de la organización se hayan eliminado",
     "DeleteReleasedAssets": "Eliminar activos liberados",
     "DeleteRemoteAccount": "Eliminar cuenta remota",

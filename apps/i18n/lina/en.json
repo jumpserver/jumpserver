@@ -586,7 +586,7 @@
     "DeleteErrorMsg": "Delete failed",
     "DeleteGatherAccountTitle": "Delete gather account",
     "DeleteNode": "Delete node",
-    "DeleteOrgMsg": "User, User group, Asset, Node, Label, Zone, Authorization",
+    "DeleteOrgMsg": "User, User group, Asset, Node, Label, Zone, Authorization, Account template",
     "DeleteOrgTitle": "Please delete the following resources within the organization first",
     "DeleteReleasedAssets": "Delete released assets",
     "DeleteRemoteAccount": "Delete remote account",

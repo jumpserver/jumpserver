@@ -581,7 +581,7 @@
     "DeleteErrorMsg": "삭제 실패",
     "DeleteGatherAccountTitle": "발견된 계정 삭제",
     "DeleteNode": "노드 삭제",
-    "DeleteOrgMsg": "사용자, 사용자 그룹, 자산, 노드, 태그, 도메인, 자산 권한",
+    "DeleteOrgMsg": "사용자, 사용자 그룹, 자산, 노드, 태그, 도메인, 자산 권한, 계정 템플릿",
     "DeleteOrgTitle": "조직 내의 다음 리소스가 삭제되었는지 확인하세요",
     "DeleteReleasedAssets": "해제된 자산 삭제",
     "DeleteRemoteAccount": "원격 계정 삭제",

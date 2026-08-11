@@ -585,7 +585,7 @@
     "DeleteErrorMsg": "削除に失敗",
     "DeleteGatherAccountTitle": "発見されたアカウントの削除",
     "DeleteNode": "ノードを削除",
-    "DeleteOrgMsg": "ユーザー、ユーザーグループ、アセット、ノード、ラベル、ドメイン、アセットの認可",
+    "DeleteOrgMsg": "ユーザー、ユーザーグループ、アセット、ノード、ラベル、ドメイン、アセットの認可、アカウントテンプレート",
     "DeleteOrgTitle": "以下の組織内の情報が削除されたことを確認してください",
     "DeleteReleasedAssets": "リリースされたアセットの削除",
     "DeleteRemoteAccount": "リモートアカウントの削除",
