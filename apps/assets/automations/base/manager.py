@@ -351,15 +351,22 @@ class PlaybookPrepareMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # example: {'gather_fact_windows': {'id': 'gather_fact_windows', 'name': '', 'method': 'gather_fact', ...} }
-        self.method_id_meta_mapper = {
-            method["id"]: method
-            for method in self.platform_automation_methods
-            if method["method"] == self.__class__.method_type()
-        }
+        self.reload_method_id_meta_mapper()
         # 根据执行方式就行分组, 不同资产的改密、推送等操作可能会使用不同的执行方式
         # 然后根据执行方式分组, 再根据 bulk_size 分组, 生成不同的 playbook
         self.playbooks = []
+
+    def reload_method_id_meta_mapper(self, reload=False):
+        from assets.const import AllTypes
+
+        methods = AllTypes.reload_automation_methods() if reload else \
+            self.platform_automation_methods
+        # example: {'gather_fact_windows': {'id': 'gather_fact_windows', 'name': '', 'method': 'gather_fact', ...} }
+        self.method_id_meta_mapper = {
+            method["id"]: method
+            for method in methods
+            if method["method"] == self.__class__.method_type()
+        }
 
     @classmethod
     def method_type(cls):
@@ -512,16 +519,20 @@ class PlaybookPrepareMixin:
         method_type = self.__class__.method_type()
         enabled_attr = "{}_enabled".format(method_type)
         method_attr = "{}_method".format(method_type)
+        method_enabled = getattr(automation, enabled_attr, False)
+        method_id = getattr(automation, method_attr, None)
 
-        method_enabled = (
-                automation
-                and getattr(automation, enabled_attr)
-                and getattr(automation, method_attr)
-                and getattr(automation, method_attr) in self.method_id_meta_mapper
-        )
-
-        if not method_enabled:
+        if not (method_enabled and method_id):
             self.on_assets_not_method_enabled(assets, method_type)
+            return False
+
+        # Platform packages can be uploaded by a web process after this worker
+        # has started. Refresh the process-local method cache on a miss so the
+        # worker can discover the newly persisted package without a restart.
+        if method_id not in self.method_id_meta_mapper:
+            self.reload_method_id_meta_mapper(reload=True)
+        if method_id not in self.method_id_meta_mapper:
+            self.on_assets_method_unavailable(assets, method_id)
             return False
         return True
 
@@ -539,6 +550,17 @@ class PlaybookPrepareMixin:
         for asset in assets:
             self.print_log(_("✗ %(asset)s: this automation is not enabled") % {
                 'asset': asset,
+            }, 'error')
+
+    def on_assets_method_unavailable(self, assets, method_id):
+        self.summary["error_assets"] += len(assets)
+        self.result["error_assets"].extend([str(asset) for asset in assets])
+        for asset in assets:
+            self.print_log(_(
+                "✗ %(asset)s: automation method is unavailable: %(method)s"
+            ) % {
+                'asset': asset,
+                'method': method_id,
             }, 'error')
 
     def on_playbook_not_found(self, assets):
