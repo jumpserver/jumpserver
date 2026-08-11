@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 <head>
-    <title>{% trans 'Task log' %}</title>
+    <title>{% trans 'Console' %}</title>
     <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
@@ -63,101 +63,251 @@
         }
     </script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
         body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             margin: 0;
         }
 
+        body {
+            padding: 18px 20px 20px;
+            background: #f6f8fa;
+            color: #24292f;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
         .xterm-rows {
-            font-family: "Bitstream Vera Sans Mono", Monaco, "Consolas", Courier, monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
             font-size: 13px;
         }
 
         .container {
             height: 100%;
+            min-height: 0;
             display: flex;
             flex-direction: column;
+            gap: 14px;
         }
 
-        .terminal .xterm-viewport {
-            background-color: #1f1b1b;
+        .header {
+            flex: 0 0 auto;
+            min-width: 0;
+            padding: 0 4px;
+        }
+
+        .task-type {
+            display: block;
+            min-width: 0;
+            color: #1f2328;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 24px;
             overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .terminal-shell {
+            min-height: 0;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(31, 35, 40, 0.08),
+                        0 8px 24px rgba(140, 149, 159, 0.12);
+        }
+
+        .terminal-toolbar {
+            height: 42px;
+            flex: 0 0 42px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0 10px 0 14px;
+            color: #8c959f;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .terminal-heading {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #c9d1d9;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 20px;
+        }
+
+        .terminal-mark {
+            color: #58a6ff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
         }
 
         #term {
-            flex-grow: 1;
-            background-color: black;
-            margin: 12px;
-            padding: 0 8px;
-            border-radius: 4px 0 0 0;
+            min-width: 0;
+            min-height: 0;
+            flex: 1 1 auto;
+            padding: 13px 14px;
+            background: #0d1117;
+            overflow: hidden;
+        }
+
+        #term .xterm-viewport {
+            background-color: #0d1117;
         }
 
         .info {
             display: flex;
             flex-wrap: wrap;
-            padding: 6px 8px 6px 24px;
+            align-items: center;
+            gap: 6px 18px;
+            padding: 3px 0 0;
             margin: 0;
         }
 
-        .task-type {
-            font-size: 16px;
-            font-weight: 500;
-            line-height: 24px;
-            text-align: left;
-            color: #1F2329;
-            padding-bottom: 8px;
+        .info .item {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #57606a;
+            font-size: 12px;
+            line-height: 20px;
+            list-style: none;
         }
 
-        .info .item {
-            flex: auto;
-            font-size: 14px;
-            list-style: none;
+        .info .item + .item {
+            padding-left: 18px;
+            border-left: 1px solid #d8dee4;
         }
 
         .info .item .label {
             font-weight: 400;
-            line-height: 22px;
-            font-size: 14px;
-            text-align: left;
-            color: #646A73;
-            padding-bottom: 12px;
+            color: #6e7781;
         }
 
         .info .item .value {
-            font-size: 14px;
             font-weight: 400;
-            line-height: 22px;
-            text-align: left;
-            color: #1F2329;
+            color: #424a53;
+        }
+
+        .info .task-id {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+        }
+
+        #download-log-btn {
+            flex: 0 0 auto;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 10px;
+            color: #c9d1d9;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 28px;
+            background: #21262d;
+            border: 1px solid #373e47;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+            cursor: pointer;
+            transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+        #download-log-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        #download-log-btn:hover {
+            color: #f0f6fc;
+            background: #30363d;
+            border-color: #484f58;
+        }
+
+        #download-log-btn:focus-visible {
+            outline: 2px solid #58a6ff;
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+
+            .header {
+                padding: 0;
+            }
+
+            .info {
+                align-items: flex-start;
+                gap: 0;
+            }
+
+            .info .item {
+                width: 100%;
+                overflow: hidden;
+            }
+
+            .info .item + .item {
+                padding-left: 0;
+                border-left: 0;
+            }
+
+            .info .value {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
     </style>
 </head>
 <div class="container">
-    <div style="position: absolute; top: 10px; right: 12px;">
-        <button id="download-log-btn"
-                style="background-color: #1ab394; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">
-            {% trans 'Download' %}
-        </button>
-    </div>
     <div class="header">
+        <span class="task-type"></span>
         <ul class="info">
             <li class="item">
-                <span class="task-type"></span>
-            </li>
-        </ul>
-        <ul class="info">
-            <li class="item">
-                <span class="label">ID:</span>
+                <span class="label">ID</span>
                 <span class="value task-id"></span>
             </li>
             <li class="item">
-                <span class="label">{% trans 'Date start' %}:</span>
+                <span class="label">{% trans 'Date start' %}</span>
                 <span class="value date-start"></span>
             </li>
         </ul>
     </div>
-    <div id="term">
-    </div>
+    <section class="terminal-shell" aria-label="{% trans 'Output' %}">
+        <div class="terminal-toolbar">
+            <div class="terminal-heading">
+                <span class="terminal-mark" aria-hidden="true">&gt;_</span>
+                <span>{% trans 'Output' %}</span>
+            </div>
+            <button id="download-log-btn" type="button">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M3.75 14A1.75 1.75 0 0 1 2 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 12.25 14Zm4.78-3.47a.75.75 0 0 1-1.06 0l-2.75-2.75a.75.75 0 0 1 1.06-1.06l1.47 1.47V2.75a.75.75 0 0 1 1.5 0v5.44l1.47-1.47a.75.75 0 1 1 1.06 1.06Z"/>
+                </svg>
+                {% trans 'Download' %}
+            </button>
+        </div>
+        <div id="term"></div>
+    </section>
 </div>
 <script>
 
@@ -182,6 +332,12 @@
             rightClickSelectsWord: true,
             disableStdin: true,
             scrollback: 9999999,
+            theme: {
+                background: '#0d1117',
+                foreground: '#f0f3f6',
+                cursor: '#f0f3f6',
+                selection: 'rgba(56, 139, 253, 0.35)',
+            },
         });
         term.open(document.getElementById('term'));
         window.fit.fit(term);
@@ -226,6 +382,7 @@
                 $('.task-id').html(data.id);
                 $('.task-type').html(data.task_name);
                 $('.date-start').html(dateStart);
+                document.title = data.task_name || document.title;
             }
         })
     }

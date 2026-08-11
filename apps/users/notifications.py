@@ -64,6 +64,8 @@ class ResetPasswordMsg(UserMessage):
     subject = _('Reset password')
     template_name = 'authentication/_msg_reset_password.html'
     contexts = [
+        {"name": "name", "label": _('Name'), "default": "John"},
+        {"name": "username", "label": _('Username'), "default": "john"},
         {"name": "email", "label": _('Email'), "default": "john@example.com"},
         {"name": "rest_password_url", "label": _('Reset password url'),
          "default": "https://example.com/reset-password"},
@@ -80,6 +82,8 @@ class ResetPasswordMsg(UserMessage):
     def get_html_msg(self) -> dict:
         user = self.user
         context = {
+            'name': user.name,
+            'username': user.username,
             'email': user.email,
             'rest_password_url': reverse('authentication:reset-password', external=True),
             'rest_password_token': self.reset_passwd_token,

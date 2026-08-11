@@ -17,7 +17,7 @@
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
 
-    - name: Verify password
+    - name: Verify password (win_ping)
       ansible.windows.win_ping:
       vars:
         ansible_user: "{{ account.username }}"
@@ -25,9 +25,33 @@
       when:
         - account.secret_type == "password"
         - check_conn_after_change or change_secret_result.failed | default(false)
-      register: verify_secret_result
+      register: verify_winping
       ignore_errors: true
       ignore_unreachable: true
+
+    - name: Verify password (pyfreerdp)
+      rdp_ping:
+        login_host: "{{ jms_asset.origin_address }}"
+        login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'rdp') | map(attribute='port') | first | default(3389, true) }}"
+        login_user: "{{ account.full_username }}"
+        login_password: "{{ account.secret }}"
+        login_secret_type: "{{ account.secret_type }}"
+        gateway_args: "{{ jms_gateway | default({}) }}"
+        connect_timeout: 30
+      when:
+        - account.secret_type == "password"
+        - check_conn_after_change or change_secret_result.failed | default(false)
+        - verify_winping is not defined
+          or (verify_winping.unreachable | default(false))
+          or (verify_winping.failed | default(false))
+      vars:
+        ansible_connection: local
+        ansible_shell_type: sh
+        ansible_python_interpreter: "{{ local_python_interpreter }}"
+      delegate_to: 127.0.0.1
+      connection: local
+      register: verify_rdp
+      ignore_errors: true
 
     - name: Mark Windows verification as inconclusive
       ansible.builtin.set_fact:
@@ -37,13 +61,17 @@
           change_succeeded: true
       when:
         - not (change_secret_result.failed | default(false))
-        - verify_secret_result.failed | default(false)
-          or verify_secret_result.unreachable | default(false)
+        - verify_winping.failed | default(false)
+          or verify_winping.unreachable | default(false)
+        - verify_rdp.failed | default(false)
+          or verify_rdp.unreachable | default(false)
 
     - name: Fail when Windows push and verification both fail
       ansible.builtin.fail:
         msg: "Windows account push failed: {{ change_secret_result.msg | default('unknown error') }}"
       when:
         - change_secret_result.failed | default(false)
-        - verify_secret_result.failed | default(false)
-          or verify_secret_result.unreachable | default(false)
+        - verify_winping.failed | default(false)
+          or verify_winping.unreachable | default(false)
+        - verify_rdp.failed | default(false)
+          or verify_rdp.unreachable | default(false)

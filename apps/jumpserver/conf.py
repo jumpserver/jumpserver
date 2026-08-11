@@ -575,6 +575,8 @@ class Config(dict):
 
         # Email
         'EMAIL_PROTOCOL': 'smtp',
+        'EMAIL_CERT_VERIFY_MODE': 'system',
+        'EMAIL_CACERT_CONTENT': '',
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
         'EMAIL_CUSTOM_USER_CREATED_BODY': _('Your account has been created successfully'),
@@ -692,6 +694,10 @@ class Config(dict):
 
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'PERM_EXPIRED_NOTICE_DAYS': 3,
+        'USER_EXPIRED_FIRST_NOTICE_DAYS': 5,
+        'USER_EXPIRED_DAILY_NOTICE_DAYS': 5,
+        'PERM_EXPIRED_FIRST_NOTICE_DAYS': 3,
+        'PERM_EXPIRED_DAILY_NOTICE_DAYS': 3,
         'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
@@ -841,6 +847,8 @@ class Config(dict):
     old_config_map = {
         'CONNECTION_TOKEN_ONETIME_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION',
         'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION_MAX',
+        'PERM_EXPIRED_FIRST_NOTICE_DAYS': 'PERM_EXPIRED_NOTICE_DAYS',
+        'PERM_EXPIRED_DAILY_NOTICE_DAYS': 'PERM_EXPIRED_NOTICE_DAYS',
     }
 
     def __init__(self, *args):

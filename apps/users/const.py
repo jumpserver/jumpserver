@@ -31,6 +31,7 @@ class RDPClientOption(TextChoices):
     FULL_SCREEN = 'full_screen', _('Full screen')
     MULTI_SCREEN = 'multi_screen', _('Multi screen')
     DRIVES_REDIRECT = 'drives_redirect', _('Drives redirect')
+    REMOTE_MICROPHONE = 'remote_microphone', _('Remote microphone')
 
 
 class ConnectDefaultOpenMethod(TextChoices):

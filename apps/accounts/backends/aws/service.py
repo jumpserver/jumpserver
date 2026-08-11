@@ -28,7 +28,7 @@ class AmazonSecretsManagerClient(object):
         else:
             return True, ''
 
-    def get(self, name, version=''):
+    def get(self, name, version='', strict=False):
         params = {'SecretId': name}
         if version:
             params['VersionStage'] = version
@@ -36,7 +36,11 @@ class AmazonSecretsManagerClient(object):
         try:
             secret = self.client.get_secret_value(**params)['SecretString']
             return secret if secret != self.empty_secret else ''
+        except self.client.exceptions.ResourceNotFoundException:
+            return None if strict else ''
         except Exception: # noqa
+            if strict:
+                raise
             return ''
 
     def create(self, name, secret):

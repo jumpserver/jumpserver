@@ -15,7 +15,7 @@ logger = get_logger(__file__)
 
 def get_email_connection(**kwargs):
     email_backend_map = {
-        'smtp': 'django.core.mail.backends.smtp.EmailBackend',
+        'smtp': 'jumpserver.rewriting.smtp.EmailBackend',
         'exchange': 'jumpserver.rewriting.exchange.EmailBackend'
     }
     return get_connection(

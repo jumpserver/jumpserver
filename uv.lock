@@ -1505,9 +1505,14 @@ sdist = { url = "https://mirrors.aliyun.com/pypi/packages/4f/1a/832ad7783efc176e
 
 [[package]]
 name = "esdk-obs-python"
-version = "3.21.4"
+version = "3.26.2"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/55/43/09ee6fab50215a6143225a6ca8d59fff021ecc870c0f55a1a4802ffa1a15/esdk-obs-python-3.21.4.tar.gz", hash = "sha256:a3b2a01b0a10768b5b02812abe239048feaae199256cbde67315870121d8ab1e" }
+dependencies = [
+    { name = "crcmod" },
+    { name = "pycryptodome" },
+    { name = "requests" },
+]
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ef/9a/090f718114eec808c04762d9ea64f9e6f170ee419a673beba8b7810ec758/esdk_obs_python-3.26.2.tar.gz", hash = "sha256:dc865356bb4be474e5eaa557ff226f0f89ac8f5afff61a1cc85143079bf6e223" }
 
 [[package]]
 name = "et-xmlfile"
@@ -2367,7 +2372,7 @@ requires-dist = [
     { name = "elasticsearch8", specifier = "==8.13.2" },
     { name = "enum-compat", specifier = "==0.0.3" },
     { name = "ephem", specifier = "==4.1.5" },
-    { name = "esdk-obs-python", specifier = "==3.21.4" },
+    { name = "esdk-obs-python", specifier = "==3.26.2" },
     { name = "eventlet", specifier = "==0.40.3" },
     { name = "exchangelib", specifier = ">=5.1.0" },
     { name = "fido2", specifier = ">=1.1.2" },

@@ -18,8 +18,19 @@ __all__ = [
 
 class TicketSerializer(OrgResourceModelSerializerMixin):
     type = LabeledChoiceField(choices=TicketType.choices, read_only=True, label=_('Type'))
-    status = LabeledChoiceField(choices=TicketStatus.choices, read_only=True, label=_('Status'))
-    state = LabeledChoiceField(choices=TicketState.choices, read_only=True, label=_("State"))
+    status = LabeledChoiceField(
+        choices=TicketStatus.choices, read_only=True,
+        label=_('Ticket status'),
+        help_text=_('Indicates whether the ticket is open or finished')
+    )
+    state = LabeledChoiceField(
+        choices=TicketState.choices, read_only=True,
+        label=_('Approval result'),
+        help_text=_(
+            'Indicates the current approval outcome: pending, closed, '
+            'approved, or rejected'
+        )
+    )
     process_map = serializers.JSONField(read_only=True, default=list, label=_('Process map'))
     cc_users = ObjectRelatedField(
         many=True, read_only=True, attrs=('id', 'name', 'username'), label=_('CC users')

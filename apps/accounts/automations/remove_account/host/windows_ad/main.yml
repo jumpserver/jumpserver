@@ -3,6 +3,5 @@
   tasks:
     - name: "Remove account"
       microsoft.ad.user:
-        name: "{{ account.username }}"
+        identity: "{{ account.username }}"
         state: absent
-

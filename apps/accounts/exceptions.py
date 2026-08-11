@@ -15,3 +15,12 @@ class VaultUnavailableException(VaultException):
 
     status_code = status.HTTP_503_SERVICE_UNAVAILABLE
     default_code = 'vault_unavailable'
+
+
+class VaultSecretNotFoundException(VaultException):
+    """The Vault entry or its secret field does not exist."""
+
+    default_code = 'vault_secret_not_found'
+    default_detail = _(
+        'Secret not found in Vault. The local sync marker has been preserved.'
+    )

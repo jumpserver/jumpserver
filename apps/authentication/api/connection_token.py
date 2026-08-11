@@ -320,6 +320,19 @@ class RDPFileClientProtocolURLMixin:
         # 设置其他选项
         rdp_options['session bpp:i'] = color_quality
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
+
+        # 设置远程麦克风。请求参数用于兼容直接下载 RDP 文件的场景，
+        # 连接令牌中的临时配置优先于用户偏好。
+        remote_microphone_value = self.request.query_params.get('remote_microphone')
+        if remote_microphone_value is None:
+            remote_microphone_value = token.connect_options.get('remote_microphone')
+        if remote_microphone_value is None:
+            remote_microphone = 'remote_microphone' in client_options
+        else:
+            remote_microphone = is_true(remote_microphone_value)
+        if remote_microphone:
+            rdp_options['audiocapturemode:i'] = '1'
+
         smart_size = self.request.query_params.get('rdp_smart_size')
         if smart_size is None:
             smart_size = token.user.preference.get_value(

@@ -30,7 +30,12 @@ class TicketFilter(BaseFilterSet):
         method='filter_applicant_username_name',
         label=_('Applicant name or username')
     )
-    state = filters.CharFilter(method='filter_state', label=_('State'))
+    state = filters.CharFilter(
+        method='filter_state', label=_('Approval result')
+    )
+    status = filters.CharFilter(
+        field_name='status', label=_('Ticket status')
+    )
     org_name = filters.CharFilter(
         method='filter_org_name', label=_('Organization name')
     )
@@ -46,6 +51,7 @@ class TicketFilter(BaseFilterSet):
             'assignees__id': ('exact',),
             'org_id': ('exact', 'in'),
             'state': ('exact',),
+            'status': ('exact',),
             'relevant_asset': ('icontains',),
             'relevant_command': ('icontains',),
             'applicant_username_name': ('icontains',),

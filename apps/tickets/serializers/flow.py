@@ -20,6 +20,15 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
         fields = ['level', 'users']
         read_only_fields = ['level']
 
+    def validate_users(self, value):
+        rule = ApprovalRule()
+        rule.users.set(value)
+        assignees = rule.get_assignees(org_id=get_current_org_id())
+        if not assignees.exists():
+            error = _('No approvers matched. Please update the approval rule')
+            raise serializers.ValidationError(error)
+        return value
+
 
 class TicketFlowSerializer(OrgResourceModelSerializerMixin):
     name = serializers.CharField(
@@ -47,7 +56,9 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         name = attrs.get('name', getattr(self.instance, 'name', ''))
-        ticket_type = attrs.get('type', getattr(self.instance, 'type', None))
+        ticket_type = attrs.get(
+            'type', getattr(self.instance, 'type', TicketType.apply_asset)
+        )
         current_org_id = str(get_current_org_id())
         flows = TicketFlow.objects.filter(
             org_id=current_org_id, name__iexact=name, type=ticket_type

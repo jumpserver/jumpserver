@@ -112,6 +112,20 @@ class VaultModelMixin(models.Model):
         # which may mutate `secret/_secret` again and cause post_save recursion.
         super(VaultModelMixin, self).save(update_fields=['_secret'])
 
+    def restore_secret_from_vault(self, secret):
+        """Persist a Vault secret locally without sending it back to Vault."""
+        self._secret = secret
+        self.__secret = secret
+        self.skip_history_when_saving = True
+        self.skip_vault_when_saving = True
+        try:
+            # Bypass concrete model save overrides for the same reason as
+            # mark_secret_save_to_vault(), while retaining field encryption.
+            super(VaultModelMixin, self).save(update_fields=['_secret'])
+        finally:
+            del self.skip_vault_when_saving
+            del self.skip_history_when_saving
+
     @property
     def secret_has_save_to_vault(self):
         return self._secret == self._secret_save_to_vault_mark

@@ -60,8 +60,10 @@ def close_old_connections(**kwargs):
 @contextmanager
 def safe_db_connection():
     close_old_connections()
-    yield
-    close_old_connections()
+    try:
+        yield
+    finally:
+        close_old_connections()
 
 
 @contextmanager

@@ -404,6 +404,16 @@ class JMSInventory:
                 if not automation.ansible_enabled:
                     host['error'] = _('Ansible disabled')
 
+                if self.host_callback is not None:
+                    host = self.host_callback(
+                        host, asset=asset, account=account,
+                        platform=platform, automation=automation,
+                        path_dir=path_dir
+                    )
+
+                if host.get('error') and 'jms_asset' not in host:
+                    host['jms_asset'] = {'id': str(asset.id)}
+
                 if isinstance(host, list):
                     hosts.extend(host)
                 else:
