@@ -8,7 +8,7 @@ from common.utils.safe import safe_run_cmd
 from .exception import AnsibleDockerImageNotFound
 
 ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor:latest'
-ANSIBLE_EE_PYTHON_INTERPRETER = '/usr/bin/python3.11'
+ANSIBLE_EE_PYTHON_INTERPRETER = '/usr/bin/python3.14'
 
 __all__ = [
     'ANSIBLE_EE_IMAGE',
