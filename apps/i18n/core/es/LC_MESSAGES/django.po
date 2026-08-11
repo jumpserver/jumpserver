@@ -99,13 +99,28 @@ msgstr "Tarea iniciada"
 msgid "The account backup plan is being executed"
 msgstr "El plan de respaldo de la cuenta se está ejecutando"
 
-#: accounts/automations/backup_account/manager.py:22
-#: accounts/automations/check_account/manager.py:463
-#: assets/automations/base/manager.py:278
-#: assets/automations/ping_gateway/manager.py:380
-#: xpack/plugins/cloud/manager.py:113
-msgid "Task execution completed"
-msgstr "Ejecución de tareas completada"
+#: apps/accounts/automations/backup_account/manager.py:24
+#: apps/accounts/automations/change_secret/manager.py:99
+#: apps/accounts/automations/push_account/manager.py:64
+msgid "Plan execution end"
+msgstr ""
+"La ejecución del plan ha finalizado.  \n"
+"No se encontraron cuentas pendientes de procesamiento.  \n"
+"Éxito: %s, Fallo: %s, Total: %s  \n"
+"---  \n"
+"Resumen:  \n"
+"Normal: {}, Contraseñas débiles: {}, Contraseñas filtradas: {}, Contraseñas duplicadas: {}, Sin contraseña: {}, Tiempo consumido: {} segundos.  \n"
+"{} no puede estar vacío.  \n"
+">>>> Comienza la tarea de probar la conectividad de la cuenta del portal de pruebas.  \n"
+"Contraseña  \n"
+"Clave SSH  \n"
+"Clave de acceso  \n"
+"Token  \n"
+"Clave API  \n"
+"Todo  \n"
+"Entrada manual  \n"
+"Cuentas con el mismo nombre  \n"
+"Cuentas anónimas"
 
 #: accounts/automations/backup_account/manager.py:26
 #, python-format
@@ -194,8 +209,27 @@ msgstr ""
 msgid "Task ended before the account received a final result"
 msgstr ""
 
-#: accounts/automations/change_secret/manager.py:69
-#: accounts/automations/push_account/manager.py:34
+#: apps/accounts/automations/change_secret/manager.py:91
+#, fuzzy, python-format
+#| msgid "Success: %s, Failed: %s, Total: %s"
+msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
+msgstr "Éxitos: %s, Fracasos: %s, Total: %s"
+
+#: apps/accounts/automations/check_account/manager.py:287
+msgid "Check account report of {}"
+msgstr "Informe de detección de riesgos {}"
+
+#: apps/accounts/automations/check_account/manager.py:293
+msgid ""
+"---\n"
+"Summary: \n"
+"ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no secret: {}, using time: {}s"
+msgstr ""
+"---\n"
+"Resumen: \n"
+"Normales: {}, Contraseñas débiles: {}, Contraseñas filtradas: {}, Contraseñas duplicadas: {}, Sin contraseña: {}, Tiempo transcurrido: {} segundos"
+
+#: apps/accounts/automations/push_account/manager.py:35
 msgid "Secret cannot be empty"
 msgstr ""
 "El texto no puede estar vacío.  \n"
@@ -205,8 +239,12 @@ msgstr ""
 #: accounts/automations/change_secret/manager.py:86
 #, python-format
 msgid ""
-"Successful: %(success)s, Needs verification: %(unverified)s, Failed: "
-"%(failed)s, Total: %(total)s"
+"Success: %(success)s, Unverified: %(unverified)s, Failed: %(failed)s, Total:"
+" %(total)s"
+msgstr "Éxitos: %s, Fracasos: %s, Total: %s"
+
+#: apps/accounts/automations/verify_gateway_account/manager.py:18
+msgid ">>> Start executing the task to test gateway account connectivity"
 msgstr ""
 "Éxitos: %(success)s, pendientes: %(unverified)s, fallos: %(failed)s, total: "
 "%(total)s"
@@ -1166,31 +1204,48 @@ msgstr "Contraseña expirada"
 msgid "Long time no change"
 msgstr "No se ha cambiado la contraseña durante mucho tiempo"
 
-#: accounts/models/automations/check_account.py:61
-#: accounts/models/automations/gather_account.py:18 accounts/models/base.py:64
-#: accounts/serializers/account/virtual.py:21
-#: accounts/templates/accounts/change_secret_report.html:80
-#: accounts/templates/accounts/change_secret_report.html:120
-#: accounts/templates/accounts/gather_account_report.html:78
-#: accounts/templates/accounts/gather_account_report.html:118
-#: accounts/templates/accounts/push_account_report.html:79
-#: accounts/templates/accounts/push_account_report.html:118
-#: accounts/templates/accounts/push_account_report.html:158
-#: acls/serializers/base.py:19 acls/serializers/base.py:50
-#: audits/models.py:226 audits/reporting.py:241
-#: authentication/backends/ukey/forms.py:8 authentication/forms.py:21
-#: authentication/forms.py:23 authentication/models/temp_token.py:10
-#: authentication/serializers/connect_token_secret.py:45
-#: authentication/serializers/connect_token_secret.py:55
-#: authentication/templates/authentication/_msg_different_city.html:9
-#: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: authentication/templates/authentication/login.html:415 perms/filters.py:71
-#: rbac/filters.py:13 terminal/serializers/storage.py:136
-#: users/forms/profile.py:32 users/forms/profile.py:117
-#: users/models/user/__init__.py:66 users/notifications.py:20
-#: users/serializers/profile.py:190
-#: users/templates/users/_msg_user_created.html:12
-#: xpack/plugins/cloud/serializers/account_attrs.py:41
+#: accounts/models/automations/check_account.py:52
+#: accounts/templates/accounts/check_account_report.html:38
+msgid "Weak password"
+msgstr "Contraseña débil"
+
+#: apps/accounts/models/automations/check_account.py:53
+#: apps/accounts/templates/accounts/check_account_report.html:45
+msgid "Leaked password"
+msgstr "Filtración de contraseña"
+
+#: apps/accounts/models/automations/check_account.py:54
+#: apps/accounts/templates/accounts/check_account_report.html:52
+msgid "Repeated password"
+msgstr "Contraseña duplicada"
+
+#: apps/accounts/models/automations/check_account.py:61
+#: apps/accounts/models/automations/gather_account.py:18
+#: apps/accounts/models/base.py:64
+#: apps/accounts/serializers/account/virtual.py:21
+#: apps/accounts/templates/accounts/change_secret_report.html:80
+#: apps/accounts/templates/accounts/change_secret_report.html:120
+#: apps/accounts/templates/accounts/gather_account_report.html:78
+#: apps/accounts/templates/accounts/gather_account_report.html:118
+#: apps/accounts/templates/accounts/push_account_report.html:79
+#: apps/accounts/templates/accounts/push_account_report.html:118
+#: apps/accounts/templates/accounts/push_account_report.html:158
+#: apps/acls/serializers/base.py:19 apps/acls/serializers/base.py:50
+#: apps/audits/models.py:226 apps/audits/reporting.py:241
+#: apps/authentication/backends/ukey/forms.py:8
+#: apps/authentication/forms.py:21 apps/authentication/forms.py:23
+#: apps/authentication/models/temp_token.py:10
+#: apps/authentication/serializers/connect_token_secret.py:45
+#: apps/authentication/serializers/connect_token_secret.py:55
+#: apps/authentication/templates/authentication/_msg_different_city.html:9
+#: apps/authentication/templates/authentication/_msg_oauth_bind.html:9
+#: apps/authentication/templates/authentication/login.html:415
+#: apps/perms/filters.py:71 apps/rbac/filters.py:13
+#: apps/terminal/serializers/storage.py:136 apps/users/forms/profile.py:32
+#: apps/users/forms/profile.py:117 apps/users/models/user/__init__.py:66
+#: apps/users/notifications.py:20 apps/users/serializers/profile.py:190
+#: apps/users/templates/users/_msg_user_created.html:12
+#: apps/xpack/plugins/cloud/serializers/account_attrs.py:41
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -1575,38 +1630,45 @@ msgstr "Información especial"
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:511 acls/notifications.py:18
-#: acls/notifications.py:68 acls/serializers/base.py:103
-#: acls/templates/acls/asset_login_reminder.html:8
-#: acls/templates/acls/user_login_reminder.html:8
-#: assets/models/cmd_filter.py:24 assets/models/label.py:16
-#: audits/models.py:63 audits/models.py:105 audits/models.py:197
-#: audits/models.py:344 audits/reporting.py:104 audits/reporting.py:317
-#: audits/reporting.py:414 audits/serializers.py:226
-#: authentication/models/connection_token.py:38
-#: authentication/models/ssh_key.py:22 authentication/models/sso_token.py:16
-#: authentication/notifications.py:16 authentication/notifications.py:55
-#: notifications/models/notification.py:12
-#: perms/api/user_permission/mixin.py:58 perms/models/asset_permission.py:63
-#: rbac/filters.py:10 rbac/models/rolebinding.py:50
-#: rbac/serializers/rolebinding.py:17 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:27 terminal/models/session/sharing.py:34
-#: terminal/notifications.py:168 terminal/notifications.py:235
-#: terminal/reporting.py:118 terminal/serializers/command.py:16
-#: terminal/templates/terminal/_msg_command_warning.html:9
-#: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 tickets/serializers/flow.py:16
-#: users/const.py:14 users/models/user/__init__.py:308
-#: users/models/user/__init__.py:341
+#: apps/accounts/serializers/account/account.py:511
+#: apps/acls/notifications.py:18 apps/acls/notifications.py:68
+#: apps/acls/serializers/base.py:103
+#: apps/acls/templates/acls/asset_login_reminder.html:8
+#: apps/acls/templates/acls/user_login_reminder.html:8
+#: apps/assets/models/cmd_filter.py:24 apps/assets/models/label.py:16
+#: apps/audits/models.py:63 apps/audits/models.py:105
+#: apps/audits/models.py:197 apps/audits/models.py:344
+#: apps/audits/reporting.py:104 apps/audits/reporting.py:317
+#: apps/audits/reporting.py:414 apps/audits/serializers.py:226
+#: apps/authentication/models/connection_token.py:38
+#: apps/authentication/models/ssh_key.py:22
+#: apps/authentication/models/sso_token.py:16
+#: apps/authentication/notifications.py:16
+#: apps/authentication/notifications.py:55
+#: apps/notifications/models/notification.py:12
+#: apps/perms/api/user_permission/mixin.py:58
+#: apps/perms/models/asset_permission.py:63 apps/rbac/filters.py:10
+#: apps/rbac/models/rolebinding.py:50 apps/rbac/serializers/rolebinding.py:17
+#: apps/terminal/backends/command/models.py:16
+#: apps/terminal/models/session/session.py:27
+#: apps/terminal/models/session/sharing.py:34
+#: apps/terminal/notifications.py:168 apps/terminal/notifications.py:235
+#: apps/terminal/reporting.py:118 apps/terminal/serializers/command.py:16
+#: apps/terminal/templates/terminal/_msg_command_warning.html:9
+#: apps/terminal/templates/terminal/_msg_session_sharing.html:6
+#: apps/tickets/models/comment.py:21 apps/tickets/serializers/flow.py:16
+#: apps/users/const.py:14 apps/users/models/user/__init__.py:308
+#: apps/users/models/user/__init__.py:341
 msgid "User"
 msgstr "Usuario"
 
-#: accounts/serializers/account/account.py:512 audits/reporting.py:94
-#: audits/reporting.py:216 audits/reporting.py:312 audits/reporting.py:399
-#: audits/reporting.py:487 audits/reporting.py:602
-#: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:173 terminal/notifications.py:240
-#: terminal/reporting.py:103 tickets/reporting.py:65
+#: apps/accounts/serializers/account/account.py:512
+#: apps/audits/reporting.py:94 apps/audits/reporting.py:216
+#: apps/audits/reporting.py:312 apps/audits/reporting.py:399
+#: apps/audits/reporting.py:487 apps/audits/reporting.py:602
+#: apps/authentication/templates/authentication/_access_key_modal.html:33
+#: apps/terminal/notifications.py:173 apps/terminal/notifications.py:240
+#: apps/terminal/reporting.py:103 apps/tickets/reporting.py:65
 msgid "Date"
 msgstr "Fecha"
 
@@ -3166,8 +3228,8 @@ msgstr "No hay cuenta"
 #, python-format
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr ""
-"Verificando el inicio de sesión en el gateway y el reenvío del túnel SSH: "
-"%(gateway)s"
+">>> Comenzando a ejecutar la tarea de conectividad de la puerta de enlace de"
+" prueba"
 
 #: assets/automations/ping_gateway/manager.py:226
 #, python-format
@@ -13562,19 +13624,23 @@ msgstr "Nombre de la instancia y parte del IP"
 msgid "Succeed"
 msgstr "Éxito"
 
-#: xpack/plugins/cloud/const.py:60 xpack/plugins/cloud/manager.py:109
+#: apps/xpack/plugins/cloud/const.py:60
+#: apps/xpack/plugins/cloud/manager.py:109
 msgid "Unsync"
 msgstr "No sincronizado"
 
-#: xpack/plugins/cloud/const.py:61 xpack/plugins/cloud/manager.py:108
+#: apps/xpack/plugins/cloud/const.py:61
+#: apps/xpack/plugins/cloud/manager.py:108
 msgid "New Sync"
 msgstr "Nueva sincronización"
 
-#: xpack/plugins/cloud/const.py:62 xpack/plugins/cloud/manager.py:108
+#: apps/xpack/plugins/cloud/const.py:62
+#: apps/xpack/plugins/cloud/manager.py:108
 msgid "Synced"
 msgstr "Sincronizado"
 
-#: xpack/plugins/cloud/const.py:63 xpack/plugins/cloud/manager.py:110
+#: apps/xpack/plugins/cloud/const.py:63
+#: apps/xpack/plugins/cloud/manager.py:110
 msgid "Released"
 msgstr "Liberado"
 
