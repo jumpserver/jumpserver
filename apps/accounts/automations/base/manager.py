@@ -128,6 +128,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         return None, None
 
     def print_final_host_result(self, host, record):
+        host = self.get_host_display_label(host)
         if (
                 record
                 and record.status
@@ -258,7 +259,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             })
             self.print_log(_(
                 "○ %(asset)s: skipped; no eligible accounts"
-            ) % {'asset': asset}, 'progress')
+            ) % {'asset': self.format_asset_label(asset)}, 'progress')
             return []
 
         if asset.type == HostTypes.WINDOWS:
@@ -268,6 +269,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'  # To distinguish different accounts
             self.inventory_account_mapper[h['name']] = account
+            h['account'] = {
+                'username': account.username,
+                'full_username': account.full_username,
+            }
 
             try:
                 if not self.acquire_account_lock(account.id):
@@ -300,14 +305,16 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         for account_id in sorted(missing_account_ids):
             self.clear_account_queue_status(account_id)
+            error = str(_(
+                'Account not found, inactive, or not eligible for this task'
+            ))
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
                 'asset': '',
                 'username': account_id,
-                'error': str(_(
-                    'Account not found, inactive, or not eligible for this task'
-                )),
+                'error': error,
             })
+            self.print_inventory_host_error(account_id, error)
         return runners
 
     @staticmethod
@@ -580,6 +587,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
                 'error': str(error),
             })
             self.clear_account_queue_status(account.id)
+            label = self._inventory_host_labels.get(host, host)
+            self.print_inventory_host_error(label, error)
             return
         return super().on_inventory_host_error(host, error)
 

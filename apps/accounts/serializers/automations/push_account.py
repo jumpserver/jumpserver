@@ -1,5 +1,5 @@
 from accounts.const import AutomationTypes
-from accounts.models import PushAccountAutomation
+from accounts.models import PushAccountAutomation, PushSecretRecord
 from .base import AutomationListSerializerMixin
 from .change_secret import (
     ChangeSecretAutomationSerializer, ChangeSecretUpdateAssetSerializer,
@@ -30,7 +30,15 @@ class PushAccountAutomationListSerializer(AutomationListSerializerMixin, PushAcc
 
 
 class PushSecretRecordSerializer(ChangeSecretRecordSerializer):
-    pass
+    class Meta(ChangeSecretRecordSerializer.Meta):
+        model = PushSecretRecord
+        fields = [
+            field for field in ChangeSecretRecordSerializer.Meta.fields
+            if field not in (
+                'verification_status', 'verification_error', 'date_verified',
+            )
+        ]
+        read_only_fields = fields
 
 
 class PushAccountUpdateAssetSerializer(ChangeSecretUpdateAssetSerializer):

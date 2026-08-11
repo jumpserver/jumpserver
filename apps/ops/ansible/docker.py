@@ -17,6 +17,7 @@ __all__ = [
     'docker_extravars',
     'docker_isolation_kwargs',
     'prepare_isolated_ansible_cfg',
+    'prepare_isolated_ansible_runtime',
     'stage_inventory_for_docker',
     'ensure_ansible_docker_image',
 ]
@@ -49,6 +50,49 @@ def prepare_isolated_ansible_cfg(project_dir):
     src = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
     dst = os.path.join(project_dir, 'ansible.cfg')
     shutil.copyfile(src, dst)
+
+
+def prepare_isolated_ansible_runtime(project_dir):
+    """Stage the app's Ansible plugins for the isolated execution image.
+
+    The executor image supplies system packages and database drivers, but its
+    embedded copy of JumpServer's custom modules can lag behind the running
+    core image.  Always use the modules shipped with the current application
+    so playbooks and module argument specs stay in sync.
+    """
+    if not use_ansible_docker_isolation():
+        return {}
+
+    prepare_isolated_ansible_cfg(project_dir)
+
+    source_libs_dir = os.path.join(settings.APPS_DIR, 'libs')
+    source_ansible_dir = os.path.join(source_libs_dir, 'ansible')
+    runtime_apps_dir = os.path.join(project_dir, 'jms_runtime', 'apps')
+    runtime_libs_dir = os.path.join(runtime_apps_dir, 'libs')
+    runtime_ansible_dir = os.path.join(runtime_libs_dir, 'ansible')
+
+    os.makedirs(runtime_libs_dir, mode=0o700, exist_ok=True)
+    libs_init = os.path.join(source_libs_dir, '__init__.py')
+    if os.path.isfile(libs_init):
+        shutil.copy2(libs_init, runtime_libs_dir)
+    shutil.copytree(
+        source_ansible_dir,
+        runtime_ansible_dir,
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.DS_Store'),
+    )
+
+    module_paths = [
+        os.path.join(runtime_ansible_dir, 'modules'),
+        os.path.join(project_dir, 'project', 'modules'),
+        os.path.join(project_dir, 'modules'),
+    ]
+
+    return {
+        'ANSIBLE_CONFIG': os.path.join(project_dir, 'ansible.cfg'),
+        'ANSIBLE_LIBRARY': os.pathsep.join(module_paths),
+        'PYTHONPATH': runtime_apps_dir,
+    }
 
 
 def stage_inventory_for_docker(project_dir, inventory_path):

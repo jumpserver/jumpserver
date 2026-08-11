@@ -2,8 +2,13 @@ import os
 from copy import deepcopy
 
 from django.db.models import QuerySet
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AutomationTypes, Connectivity, SecretType
+from accounts.const import (
+    AutomationTypes, ChangeSecretRecordStatusChoice, Connectivity, SecretType,
+)
+from accounts.models import ChangeSecretRecord
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
 
@@ -19,6 +24,16 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             str, self.execution.snapshot.get('accounts', [])
         ))
         self.found_account_ids = set()
+        self.recovery_record_map = self.execution.snapshot.get(
+            'recovery_record_map', {}
+        )
+        self.recovery_records = {
+            str(record.id): record
+            for record in ChangeSecretRecord.objects.filter(
+                id__in=self.recovery_record_map.values()
+            )
+        }
+        self.host_record_mapper = {}
 
     def prepare_runtime_dir(self):
         path = super().prepare_runtime_dir()
@@ -54,7 +69,20 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'
             self.host_account_mapper[h['name']] = account
-            secret = account.secret
+            h['account'] = {
+                'username': account.username,
+                'full_username': account.full_username,
+            }
+            record = self.get_recovery_record(asset.id, account.id)
+            if self.recovery_record_map and not record:
+                h['error'] = str(_(
+                    'Change secret record not found or does not match account'
+                ))
+                inventory_hosts.append(h)
+                continue
+            if record:
+                self.host_record_mapper[h['name']] = record
+            secret = record.new_secret if record else account.secret
             if not secret:
                 h['error'] = 'Account secret is empty'
                 inventory_hosts.append(h)
@@ -84,6 +112,28 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             inventory_hosts.append(h)
         return inventory_hosts
 
+    def get_recovery_record(self, asset_id, account_id):
+        key = f'{asset_id}-{account_id}'
+        record_id = self.recovery_record_map.get(key)
+        record = self.recovery_records.get(str(record_id))
+        if not record:
+            return None
+        if (
+                str(record.asset_id) != str(asset_id)
+                or str(record.account_id) != str(account_id)
+        ):
+            return None
+        return record
+
+    @staticmethod
+    def save_verification_result(record, status, error=''):
+        record.verification_status = status
+        record.verification_error = str(error)
+        record.date_verified = timezone.now()
+        record.save(update_fields=[
+            'verification_status', 'verification_error', 'date_verified',
+        ])
+
     def get_runners(self):
         runners = super().get_runners()
         for account_id in sorted(
@@ -92,6 +142,16 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             super().on_inventory_host_error(
                 account_id, 'Account not found or inactive'
             )
+            for key, record_id in self.recovery_record_map.items():
+                if not key.endswith(f'-{account_id}'):
+                    continue
+                record = self.recovery_records.get(str(record_id))
+                if record:
+                    self.save_verification_result(
+                        record,
+                        ChangeSecretRecordStatusChoice.failed.value,
+                        _('Account not found or inactive'),
+                    )
         return runners
 
     def on_host_success(self, host, result):
@@ -100,6 +160,12 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             return super().on_host_error(
                 host, 'Account mapping not found', result
             )
+        record = self.host_record_mapper.get(host)
+        if record:
+            self.save_verification_result(
+                record, ChangeSecretRecordStatusChoice.success.value
+            )
+            return super().on_host_success(host, result)
         try:
             account.set_connectivity(Connectivity.OK)
         except Exception as e:
@@ -109,6 +175,14 @@ class VerifyAccountManager(AccountBasePlaybookManager):
 
     def on_host_error(self, host, error, result):
         super().on_host_error(host, error, result)
+        record = self.host_record_mapper.get(host)
+        if record:
+            self.save_verification_result(
+                record,
+                ChangeSecretRecordStatusChoice.failed.value,
+                error,
+            )
+            return
         account = self.host_account_mapper.get(host)
         if not account:
             return
@@ -120,3 +194,26 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 "Save account connectivity failure result failed: host=%s error=%s",
                 host, e,
             )
+
+    def post_run(self):
+        try:
+            if self.recovery_records:
+                ChangeSecretRecord.objects.filter(
+                    id__in=[
+                        record.id
+                        for record in self.recovery_records.values()
+                    ],
+                    verification_status=(
+                        ChangeSecretRecordStatusChoice.pending.value
+                    ),
+                ).update(
+                    verification_status=(
+                        ChangeSecretRecordStatusChoice.unverified.value
+                    ),
+                    verification_error=str(_(
+                        'Verification ended before a final result was received'
+                    )),
+                    date_verified=timezone.now(),
+                )
+        finally:
+            super().post_run()

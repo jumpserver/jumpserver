@@ -259,9 +259,13 @@ class CheckAccountManager(BaseManager):
         self.summary[risk] += 1
         if len(self.result[risk]) >= self.result_limit:
             return
+        asset_label = str(account.asset)
+        address = account.asset.address
+        if address and str(address) not in asset_label:
+            asset_label = f'{asset_label}[{address}]'
         self.result[risk].append({
             'asset_id': str(account.asset_id),
-            'asset': str(account.asset),
+            'asset': asset_label,
             'username': account.username,
         })
 
@@ -460,7 +464,11 @@ class CheckAccountManager(BaseManager):
         weak = self.summary[RiskChoice.weak_password]
         leaked = self.summary[RiskChoice.leaked_password]
         repeated = self.summary[RiskChoice.repeated_password]
-        self.print_log(_("Task execution completed"), 'success')
+        execution_failed = self.status in (Status.failed, Status.error)
+        self.print_log(
+            _("Task execution completed"),
+            'error' if execution_failed else 'success',
+        )
         self.print_log(_(
             "Checked %(total)s accounts: %(normal)s normal, %(risk)s at risk, "
             "%(no_secret)s without secrets"

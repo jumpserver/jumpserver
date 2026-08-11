@@ -48,6 +48,7 @@ class RemoveAccountManager(AccountBasePlaybookManager):
     def host_callback(
         self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs
     ):
+        self.ensure_unique_inventory_host(host, asset)
         if host.get("error"):
             return host
 

@@ -70,7 +70,7 @@ class GraphicsSerializer(serializers.Serializer):
 
 class CommandLineSerializer(serializers.Serializer):
     character_terminal_font_size = serializers.IntegerField(
-        default=14, min_value=1, max_value=9999, required=False,
+        default=14, min_value=1, max_value=100, required=False,
         label=_('Terminal font size'),
     )
     is_backspace_as_ctrl_h = serializers.BooleanField(
