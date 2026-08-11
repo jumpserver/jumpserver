@@ -585,7 +585,7 @@
     "DeleteErrorMsg": "刪除失敗",
     "DeleteGatherAccountTitle": "刪除發現的帳號",
     "DeleteNode": "刪除節點",
-    "DeleteOrgMsg": "用戶，用戶組，資產，節點，標籤，網域，資產授權",
+    "DeleteOrgMsg": "用戶，用戶組，資產，節點，標籤，網域，資產授權，帳號模板",
     "DeleteOrgTitle": "請確保組織內的以下資訊已刪除",
     "DeleteReleasedAssets": "刪除已釋放資產",
     "DeleteRemoteAccount": "刪除遠端帳號",

@@ -581,7 +581,7 @@
     "DeleteErrorMsg": " Falha na exclusão ",
     "DeleteGatherAccountTitle": "Excluir conta encontrada",
     "DeleteNode": "Excluir nó",
-    "DeleteOrgMsg": "Usuários, grupos de usuários, ativos, nós, tags, domínios, autorizações de ativos",
+    "DeleteOrgMsg": "Usuários, grupos de usuários, ativos, nós, tags, domínios, autorizações de ativos, modelo de conta",
     "DeleteOrgTitle": "Certifique-se de que os seguintes recursos dentro da organização foram excluídos",
     "DeleteReleasedAssets": " Excluir ativos liberados ",
     "DeleteRemoteAccount": "Excluir conta remota",
