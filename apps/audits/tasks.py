@@ -448,62 +448,63 @@ def nas_archive_session_replays(date_str):
         tz = timezone.get_current_timezone()
         selected_datetime = timezone.make_aware(selected_datetime, tz)
 
-    sessions = Session.objects.filter(
-        has_replay=True,
-        is_archived=False,
-        date_start__lte=selected_datetime
-    ).order_by('date_start')
+    with tmp_to_root_org():
+        sessions = Session.objects.filter(
+            has_replay=True,
+            is_archived=False,
+            date_start__lte=selected_datetime
+        ).order_by('date_start')
 
-    if not sessions.exists():
-        logger.info('No sessions to archive before %s', date_str)
-        return {"msg": "No sessions to archive", "count": 0}
+        if not sessions.exists():
+            logger.info('No sessions to archive before %s', date_str)
+            return {"msg": "No sessions to archive", "count": 0}
 
-    logger.info('Archiving %d sessions to NAS', sessions.count())
+        logger.info('Archiving %d sessions to NAS', sessions.count())
 
-    total_archived = 0
-    total_size = 0
-    errors = []
+        total_archived = 0
+        total_size = 0
+        errors = []
 
-    for session in sessions.iterator():
-        possible_paths = session.get_all_possible_local_path()
-        file_copied = False
+        for session in sessions.iterator():
+            possible_paths = session.get_all_possible_local_path()
+            file_copied = False
 
-        for local_path in possible_paths:
-            abs_path = os.path.join(default_storage.base_location, local_path) \
-                if not os.path.isabs(local_path) else local_path
-            if not os.path.isfile(abs_path):
-                continue
+            for local_path in possible_paths:
+                abs_path = os.path.join(default_storage.base_location, local_path) \
+                    if not os.path.isabs(local_path) else local_path
+                if not os.path.isfile(abs_path):
+                    continue
 
-            try:
-                file_size = os.path.getsize(abs_path)
-                nas_target = os.path.join(nas_mount_path, local_path)
-                nas_target_dir = os.path.dirname(nas_target)
-                if not os.path.isdir(nas_target_dir):
-                    os.makedirs(nas_target_dir, exist_ok=True)
+                try:
+                    file_size = os.path.getsize(abs_path)
+                    nas_target = os.path.join(nas_mount_path, local_path)
+                    nas_target_dir = os.path.dirname(nas_target)
+                    if not os.path.isdir(nas_target_dir):
+                        os.makedirs(nas_target_dir, exist_ok=True)
 
-                shutil.copy2(abs_path, nas_target)
-                logger.info('Archived: %s -> %s (%d bytes)', abs_path, nas_target, file_size)
+                    shutil.copy2(abs_path, nas_target)
+                    logger.info('Archived: %s -> %s (%d bytes)', abs_path, nas_target, file_size)
 
-                ArchiveLog.objects.create(
-                    session_id=str(session.id),
-                    file_path=abs_path,
-                    file_size=file_size,
-                    storage_path=nas_target,
-                )
-                total_size += file_size
-                file_copied = True
-            except OSError as e:
-                logger.error('Failed to archive %s: %s', abs_path, e)
-                errors.append({
-                    "session_id": str(session.id),
-                    "file": abs_path,
-                    "error": str(e)
-                })
+                    ArchiveLog.objects.create(
+                        session_id=str(session.id),
+                        file_path=abs_path,
+                        file_size=file_size,
+                        storage_path=nas_target,
+                    )
+                    total_size += file_size
+                    file_copied = True
+                except OSError as e:
+                    logger.error('Failed to archive %s: %s', abs_path, e)
+                    errors.append({
+                        "session_id": str(session.id),
+                        "file": abs_path,
+                        "error": str(e)
+                    })
 
-        if file_copied:
-            session.is_archived = True
-            session.save(update_fields=['is_archived'])
-            total_archived += 1
+            if file_copied:
+                session.is_archived = True
+                session.save(update_fields=['is_archived'])
+                total_archived += 1
 
     total_size_mb = round(total_size / 1024 / 1024, 2)
     logger.info(
