@@ -3,7 +3,7 @@
     "%s approved": "%s Revisão aprovada.",
     "%s node has no assets": "O nó %s não possui ativos",
     "%s protocol client not installed.": "O cliente do protocolo %s não está instalado",
-    "%s rejected": "Rejeição da auditoria",
+    "%s rejected": "%s foi rejeitado",
     "ACL reject": "O login foi negado desta vez, devido a uma limitação da política de controle de acesso",
     "Account <%s> and asset <%s> protocol are inconsistent.": "O usuário do sistema <%s> e o ativo <%s> têm um acordo inconsistente",
     "ActionPerm": "Permissão de Ação",
