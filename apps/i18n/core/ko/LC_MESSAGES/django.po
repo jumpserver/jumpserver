@@ -7811,12 +7811,15 @@ msgstr "자산 권한 만료 알림 전송"
 
 #: perms/tasks.py:51
 msgid ""
-"Check every day at 10 a.m. and send a notification message to users associated with \n"
-"        assets whose authorization is about to expire, as well as to the organization's \n"
-"        administrators, 3 days in advance, to remind them that the asset authorization will \n"
+"Check every day at 10 a.m. and send a notification message to users "
+"associated with \n"
+"        assets whose authorization is about to expire, as well as to the "
+"organization's \n"
+"        administrators in advance, to remind them that the asset "
+"authorization\n"
 "        expire in a few days"
 msgstr ""
-"매일 오전 10시에 자산 권한이 곧 만료될 사용자 및 해당 조직 관리자가 관련된 사용자에게 3일 전에 메시지 알림을 보내어 자산이 남은 "
+"매일 오전 10시에 자산 권한이 곧 만료될 사용자 및 해당 조직 관리자가 관련된 사용자에게 미리 메시지 알림을 보내어 자산이 남은 "
 "며칠이 지나면 만료된다는 것을 알려줍니다"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
@@ -12531,9 +12534,10 @@ msgstr "사용자가 만료되었는지 확인"
 
 #: users/tasks.py:69
 msgid ""
-"Check every day at 2 p.m whether the users in the system are expired, and send a \n"
-"        notification 5 days in advance"
-msgstr "매일 오후 2시에 시스템 내 사용자가 만료되었는지 확인하고, 5일 전에 알림을 보냅니다."
+"Check every day at 2 p.m whether the users in the system are expired, and "
+"send a \n"
+"        notification in advance"
+msgstr "매일 오후 2시에 시스템 내 사용자가 만료되었는지 확인하고, 미리 알림을 보냅니다."
 
 #: users/tasks.py:97
 msgid "Periodic check user expired"

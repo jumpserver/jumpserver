@@ -8063,13 +8063,16 @@ msgstr "Отправка уведомлений об истечении дейс
 
 #: perms/tasks.py:51
 msgid ""
-"Check every day at 10 a.m. and send a notification message to users associated with \n"
-"        assets whose authorization is about to expire, as well as to the organization's \n"
-"        administrators, 3 days in advance, to remind them that the asset authorization will \n"
+"Check every day at 10 a.m. and send a notification message to users "
+"associated with \n"
+"        assets whose authorization is about to expire, as well as to the "
+"organization's \n"
+"        administrators in advance, to remind them that the asset "
+"authorization\n"
 "        expire in a few days"
 msgstr ""
 "Каждый день в 10:00 система проверяет активы с истекающим сроком разрешений\n"
-"        и за три дня до окончания отправляет уведомления связанным пользователям\n"
+"        и заранее отправляет уведомления связанным пользователям\n"
 "        и администраторам соответствующих организаций с информацией о том,\n"
 "        сколько дней осталось до истечения срока действия."
 
@@ -12959,11 +12962,12 @@ msgstr "Проверка истечения срока действия поль
 
 #: users/tasks.py:69
 msgid ""
-"Check every day at 2 p.m whether the users in the system are expired, and send a \n"
-"        notification 5 days in advance"
+"Check every day at 2 p.m whether the users in the system are expired, and "
+"send a \n"
+"        notification in advance"
 msgstr ""
 "Каждый день в 14:00 система проверяет, истёк ли срок действия пользователей,\n"
-"        и отправляет уведомление за 5 дней до истечения"
+"        и заранее отправляет уведомление"
 
 #: users/tasks.py:97
 msgid "Periodic check user expired"
