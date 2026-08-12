@@ -3233,9 +3233,7 @@ msgstr "No hay cuenta"
 #: assets/automations/ping_gateway/manager.py:155
 #, python-format
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
-msgstr ""
-">>> Comenzando a ejecutar la tarea de conectividad de la puerta de enlace de "
-"prueba"
+msgstr "Comprobando el inicio de sesión SSH y el reenvío del túnel: %(gateway)s"
 
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format
