@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -20,6 +21,7 @@ from tickets.models import (
     ApplyLoginAssetTicket, ApplyCommandTicket
 )
 from tickets.permissions.ticket import IsAssignee, IsApplicant
+from tickets.errors import AlreadyClosed
 from ..const import TicketAction
 
 __all__ = [
@@ -110,19 +112,30 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
         self.ticket_not_allowed()
 
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        with tmp_to_root_org():
-            serializer.is_valid(raise_exception=True)
-            instance = serializer.save()
-        instance.approve(processor=request.user)
+        with transaction.atomic():
+            instance = self.get_object()
+            instance = self.model.objects.select_for_update().get(pk=instance.pk)
+            self.check_object_permissions(request, instance)
+            if instance.is_status(instance.Status.closed):
+                raise AlreadyClosed
+
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            with tmp_to_root_org():
+                serializer.is_valid(raise_exception=True)
+                instance = serializer.save()
+            instance.approve(processor=request.user)
         self._record_operate_log(instance, TicketAction.approve)
         return Response('ok')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def reject(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.reject(processor=request.user)
+        with transaction.atomic():
+            instance = self.get_object()
+            instance = self.model.objects.select_for_update().get(pk=instance.pk)
+            self.check_object_permissions(request, instance)
+            if instance.is_status(instance.Status.closed):
+                raise AlreadyClosed
+            instance.reject(processor=request.user)
         self._record_operate_log(instance, TicketAction.reject)
         return Response('ok')
 
