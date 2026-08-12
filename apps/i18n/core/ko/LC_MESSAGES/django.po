@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 18:11+0800\n"
+"POT-Creation-Date: 2026-08-12 22:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,7 +32,7 @@ msgstr "계정 생성을 위한 유효한 자산을 찾을 수 없습니다."
 msgid "Account not found"
 msgstr "계정을 찾을 수 없습니다"
 
-#: accounts/api/account/template.py:20 assets/api/asset/asset.py:83
+#: accounts/api/account/template.py:23 assets/api/asset/asset.py:83
 #: assets/serializers/asset/common.py:148 assets/serializers/platform.py:175
 #: authentication/serializers/connect_token_secret.py:32
 #: authentication/serializers/connect_token_secret.py:79 perms/filters.py:23
@@ -42,7 +42,7 @@ msgstr "계정을 찾을 수 없습니다"
 msgid "Protocols"
 msgstr "프로토콜"
 
-#: accounts/api/automations/base.py:89 tickets/api/ticket.py:143
+#: accounts/api/automations/base.py:89 tickets/api/ticket.py:156
 msgid "The parameter 'action' must be [{}]"
 msgstr "파라미터 'action'은 [{}] 여야 합니다"
 
@@ -532,7 +532,7 @@ msgstr "SFTP"
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
 #: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:45
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
-#: tickets/views/approve.py:128
+#: tickets/views/approve.py:130
 msgid "Success"
 msgstr "성공"
 
@@ -642,6 +642,14 @@ msgstr ""
 "Vault 작업이 실패했습니다. 다시 시도하거나 Vault의 계정 정보를 확인하십시오."
 
 #: accounts/exceptions.py:25
+msgid ""
+"Vault service is unavailable. Unable to synchronize accounts. Please contact "
+"your administrator to check the Vault configuration."
+msgstr ""
+"Vault 서비스 오류로 계정을 동기화할 수 없습니다. 관리자에게 문의하여 Vault 구"
+"성을 확인하세요."
+
+#: accounts/exceptions.py:35
 msgid "Secret not found in Vault. The local sync marker has been preserved."
 msgstr "Vault에서 키를 찾을 수 없습니다. 로컬 동기화 표시는 유지되었습니다."
 
@@ -740,7 +748,7 @@ msgstr "장기간 미검증"
 #: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:104
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:291
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:309
 #: tickets/reporting.py:80 xpack/plugins/cloud/filters.py:51
 #: xpack/plugins/cloud/models.py:233 xpack/plugins/cloud/models.py:300
 msgid "Status"
@@ -913,7 +921,7 @@ msgstr "계정 활동"
 #: assets/models/favorite_asset.py:14 assets/models/label.py:18
 #: assets/models/platform.py:22 assets/models/platform.py:299
 #: assets/models/platform.py:378 assets/models/zone.py:19
-#: assets/serializers/asset/common.py:179 assets/serializers/platform.py:159
+#: assets/serializers/asset/common.py:178 assets/serializers/platform.py:159
 #: assets/serializers/platform.py:289
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12 authentication/notifications.py:17
@@ -933,7 +941,7 @@ msgstr "계정 활동"
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
 #: terminal/models/virtualapp/provider.py:10
-#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:98
+#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:100
 #: tickets/models/flow.py:42 tickets/serializers/flow.py:35
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:67
@@ -964,7 +972,7 @@ msgstr "암호"
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:149
-#: assets/serializers/asset/common.py:428 perms/filters.py:175
+#: assets/serializers/asset/common.py:493 perms/filters.py:175
 #: perms/serializers/permission.py:67 perms/serializers/user_permission.py:87
 #: rbac/tree.py:36 rbac/tree.py:51
 msgid "Accounts"
@@ -1528,7 +1536,7 @@ msgstr "카테고리"
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:46 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:283 tickets/reporting.py:70
+#: tickets/models/ticket/general.py:301 tickets/reporting.py:70
 #: tickets/serializers/flow.py:38 tickets/serializers/flow.py:111
 #: tickets/serializers/ticket/ticket.py:20
 msgid "Type"
@@ -1540,7 +1548,7 @@ msgstr "자산이 존재하지 않습니다"
 
 #: accounts/serializers/account/account.py:237 assets/const/category.py:15
 #: assets/models/asset/common.py:213 assets/models/asset/ds.py:14
-#: assets/serializers/asset/common.py:186
+#: assets/serializers/asset/common.py:185
 msgid "Directory service"
 msgstr "디렉토리 서비스"
 
@@ -1551,7 +1559,7 @@ msgstr "계정이 이미 존재합니다. 필드: {fields}는 고유해야 합�
 
 #: accounts/serializers/account/account.py:297 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
-#: tickets/models/ticket/general.py:287 tickets/reporting.py:75
+#: tickets/models/ticket/general.py:305 tickets/reporting.py:75
 msgid "State"
 msgstr "상태"
 
@@ -1577,7 +1585,7 @@ msgstr "자산 또는 노드 중 최소 하나 선택"
 #: accounts/serializers/account/account.py:490
 #: accounts/serializers/account/base.py:75
 #: accounts/serializers/account/base.py:94
-#: assets/serializers/asset/common.py:429
+#: assets/serializers/asset/common.py:494
 msgid "Spec info"
 msgstr "특별 정보"
 
@@ -1650,7 +1658,7 @@ msgstr "IP 화이트리스트"
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:29 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:309 users/models/user/__init__.py:104
+#: tickets/models/ticket/general.py:327 users/models/user/__init__.py:104
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
 msgid "Comment"
 msgstr "비고"
@@ -1827,7 +1835,7 @@ msgid "TTL"
 msgstr "TTL"
 
 #: accounts/serializers/automations/change_secret.py:225
-#: assets/models/platform.py:381 tickets/models/ticket/general.py:312
+#: assets/models/platform.py:381 tickets/models/ticket/general.py:330
 msgid "Meta"
 msgstr "메타데이터"
 
@@ -3574,15 +3582,15 @@ msgstr "클라우드 서비스"
 msgid "Port"
 msgstr "포트"
 
-#: assets/models/asset/common.py:200 assets/serializers/asset/common.py:180
+#: assets/models/asset/common.py:200 assets/serializers/asset/common.py:179
 #: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:58
 msgid "Address"
 msgstr "주소"
 
 #: assets/models/asset/common.py:202 assets/models/platform.py:443
 #: assets/serializers/asset/common.py:152
-#: assets/serializers/asset/common.py:273
 #: assets/serializers/asset/common.py:276
+#: assets/serializers/asset/common.py:279
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:132
 #: perms/serializers/user_permission.py:26 xpack/plugins/cloud/models.py:400
@@ -3594,7 +3602,7 @@ msgstr "플랫폼"
 msgid "Zone"
 msgstr "도메인"
 
-#: assets/models/asset/common.py:209 assets/serializers/asset/common.py:182
+#: assets/models/asset/common.py:209 assets/serializers/asset/common.py:181
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
 #: perms/serializers/permission.py:59
 msgid "Nodes"
@@ -3604,7 +3612,7 @@ msgstr "노드"
 msgid "Last login time"
 msgstr "마지막 로그인 시간"
 
-#: assets/models/asset/common.py:219 assets/serializers/asset/common.py:430
+#: assets/models/asset/common.py:219 assets/serializers/asset/common.py:495
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "자산 하드웨어 정보 수집"
@@ -4019,30 +4027,30 @@ msgstr ""
 "노드 경로, 형식은 [\"/조직/노드명\"], 만약 노드가 존재하지 않으면 생성됩니다"
 
 #: assets/serializers/asset/common.py:150
-#: assets/serializers/asset/common.py:181
+#: assets/serializers/asset/common.py:180
 msgid "Node path"
 msgstr "노드 경로"
 
 #: assets/serializers/asset/common.py:151
-#: assets/serializers/asset/common.py:178
-#: assets/serializers/asset/common.py:431
+#: assets/serializers/asset/common.py:177
+#: assets/serializers/asset/common.py:496
 msgid "Auto info"
 msgstr "자동화 정보"
 
-#: assets/serializers/asset/common.py:276
+#: assets/serializers/asset/common.py:279
 #: xpack/plugins/cloud/serializers/task.py:119
 msgid "Platform not exist"
 msgstr "플랫폼이 존재하지 않습니다"
 
-#: assets/serializers/asset/common.py:312
+#: assets/serializers/asset/common.py:315
 msgid "port out of range (0-65535)"
 msgstr "포트 범위를 초과했습니다 (0-65535)"
 
-#: assets/serializers/asset/common.py:319
+#: assets/serializers/asset/common.py:322
 msgid "Protocol is required: {}"
 msgstr "프로토콜은 필수입니다: {}"
 
-#: assets/serializers/asset/common.py:358
+#: assets/serializers/asset/common.py:364
 msgid "Invalid data"
 msgstr "유효하지 않은 데이터"
 
@@ -4103,7 +4111,7 @@ msgid "Model"
 msgstr "모델"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:311
+#: tickets/models/ticket/general.py:329
 msgid "Serial number"
 msgstr "일련 번호"
 
@@ -7786,7 +7794,7 @@ msgstr "저장하기 전에 조직을 선택해 주십시오"
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:314 tickets/reporting.py:85
+#: tickets/models/ticket/general.py:332 tickets/reporting.py:85
 #: tickets/serializers/ticket/ticket.py:90
 msgid "Organization"
 msgstr "조직"
@@ -8336,7 +8344,7 @@ msgid "Ticket comment"
 msgstr "작업 댓글"
 
 #: rbac/tree.py:204 settings/serializers/feature.py:211
-#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:321
+#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:339
 msgid "Ticket"
 msgstr "작업"
 
@@ -11759,7 +11767,7 @@ msgstr ""
 "시오. 이 작업이 승인되지 않았거나 이상 징후가 발견되면 즉시 필요한 조치를 취"
 "하십시오."
 
-#: tickets/api/ticket.py:99 tickets/models/ticket/general.py:296
+#: tickets/api/ticket.py:101 tickets/models/ticket/general.py:314
 #: tickets/reporting.py:90
 msgid "Applicant"
 msgstr "신청인"
@@ -11848,9 +11856,10 @@ msgstr "권한이 부여된 자산"
 msgid "Permed valid assets"
 msgstr "유효한 권한이 부여된 자산"
 
-#: tickets/errors.py:9
-msgid "Ticket already closed"
-msgstr "작업 요청이 종료되었습니다"
+#: tickets/errors.py:13
+msgid "The ticket status has changed. Please refresh the page and try again."
+msgstr ""
+"작업 요청 상태가 변경되었습니다. 페이지를 새로고침한 후 다시 시도하세요."
 
 #: tickets/filters.py:17
 msgid "Applicant ID"
@@ -11930,7 +11939,7 @@ msgstr "승인 수준"
 msgid "Ticket flow approval rule"
 msgstr "작업 요청 승인 정보"
 
-#: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
+#: tickets/models/flow.py:56 tickets/models/ticket/general.py:318
 #: tickets/serializers/flow.py:43 tickets/serializers/flow.py:116
 #: tickets/serializers/ticket/ticket.py:36
 msgid "CC users"
@@ -11999,33 +12008,33 @@ msgstr "작업 단계"
 msgid "Ticket assignee"
 msgstr "작업 수신자"
 
-#: tickets/models/ticket/general.py:280
+#: tickets/models/ticket/general.py:298
 msgid "Title"
 msgstr "제목"
 
-#: tickets/models/ticket/general.py:304
+#: tickets/models/ticket/general.py:322
 msgid "TicketFlow"
 msgstr "작업 프로세스"
 
-#: tickets/models/ticket/general.py:307 tickets/reporting.py:95
+#: tickets/models/ticket/general.py:325 tickets/reporting.py:95
 msgid "Approval step"
 msgstr "승인 단계"
 
-#: tickets/models/ticket/general.py:310
+#: tickets/models/ticket/general.py:328
 msgid "Relation snapshot"
 msgstr "작업 티켓 스냅샷"
 
-#: tickets/models/ticket/general.py:414
+#: tickets/models/ticket/general.py:432
 msgid ""
 "Today's ticket creation limit (9999) has been reached. Please try again "
 "tomorrow."
 msgstr "오늘 티켓 생성 한도(9999)에 도달했습니다. 내일 다시 시도해 주세요."
 
-#: tickets/models/ticket/general.py:435
+#: tickets/models/ticket/general.py:453
 msgid "Please try again"
 msgstr "다시 시도해 주세요"
 
-#: tickets/models/ticket/general.py:514
+#: tickets/models/ticket/general.py:532
 msgid "Super ticket"
 msgstr "슈퍼 작업 티켓"
 
@@ -12249,7 +12258,7 @@ msgstr "인증이 성공적으로 완료되면, 작업 요청이 직접 승인�
 msgid "Illegal approval action"
 msgstr "유효하지 않은 승인 Action"
 
-#: tickets/views/approve.py:119
+#: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"
 msgstr "이 사용자는 이 작업 요청을 승인할 권한이 없습니다"
 
@@ -14022,3 +14031,6 @@ msgstr "라이센스 가져오기 성공"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "라이센스가 유효하지 않습니다."
+
+#~ msgid "Ticket already closed"
+#~ msgstr "작업 요청이 종료되었습니다"

@@ -3,7 +3,7 @@
 import json
 from typing import Callable
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields import related
 from django.db.utils import IntegrityError
@@ -23,7 +23,7 @@ from tickets.const import (
     TicketType, TicketStatus, TicketState,
     TicketLevel, StepState, StepStatus
 )
-from tickets.errors import AlreadyClosed
+from tickets.errors import AlreadyClosed, TicketStateChanged
 from tickets.handlers import get_ticket_handler
 from ..flow import TicketFlow
 
@@ -142,8 +142,9 @@ class StatusMixin:
         self._open()
 
     def approve(self, processor):
-        self.set_rel_snapshot()
-        self._change_state(StepState.approved, processor)
+        self._change_state(
+            StepState.approved, processor, update_rel_snapshot=True
+        )
 
     def reject(self, processor):
         self._change_state(StepState.rejected, processor)
@@ -163,12 +164,29 @@ class StatusMixin:
         self.save(update_fields=['state', 'status'])
         self.handler.on_change_state(state)
 
-    def _change_state(self, state, processor):
-        if self.is_status(self.Status.closed):
-            raise AlreadyClosed
-        current_step = self.current_step
-        current_step.change_state(state, processor)
-        self._finish_or_next(current_step, state)
+    def _change_state(self, state, processor, update_rel_snapshot=False):
+        with transaction.atomic():
+            locked_ticket = self.__class__.objects.select_for_update().only(
+                'state', 'status', 'approval_step'
+            ).get(pk=self.pk)
+            self.state = locked_ticket.state
+            self.status = locked_ticket.status
+            self.approval_step = locked_ticket.approval_step
+
+            if self.is_status(self.Status.closed):
+                raise AlreadyClosed
+
+            is_assignee_action = state in (StepState.approved, StepState.rejected)
+            if is_assignee_action and not self.has_current_assignee(processor):
+                if self.has_all_assignee(processor):
+                    raise TicketStateChanged
+                raise PermissionError('Only assignees can do this')
+
+            if update_rel_snapshot:
+                self.set_rel_snapshot()
+            current_step = self.current_step
+            current_step.change_state(state, processor)
+            self._finish_or_next(current_step, state)
 
     def _finish_or_next(self, current_step, state):
         next_step = current_step.next()

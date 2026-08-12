@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jumpserver\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 18:11+0800\n"
+"POT-Creation-Date: 2026-08-12 22:20+0800\n"
 "PO-Revision-Date: 2025-11-13 12:26\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Russian\n"
@@ -36,7 +36,7 @@ msgstr "Нет подходящих активов для создания уч�
 msgid "Account not found"
 msgstr "Учетная запись не найдена"
 
-#: accounts/api/account/template.py:20 assets/api/asset/asset.py:83
+#: accounts/api/account/template.py:23 assets/api/asset/asset.py:83
 #: assets/serializers/asset/common.py:148 assets/serializers/platform.py:175
 #: authentication/serializers/connect_token_secret.py:32
 #: authentication/serializers/connect_token_secret.py:79 perms/filters.py:23
@@ -46,7 +46,7 @@ msgstr "Учетная запись не найдена"
 msgid "Protocols"
 msgstr "Протоколы"
 
-#: accounts/api/automations/base.py:89 tickets/api/ticket.py:143
+#: accounts/api/automations/base.py:89 tickets/api/ticket.py:156
 msgid "The parameter 'action' must be [{}]"
 msgstr "Параметр 'Действие' должен быть [{}]"
 
@@ -538,7 +538,7 @@ msgstr "SFTP"
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
 #: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:45
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
-#: tickets/views/approve.py:128
+#: tickets/views/approve.py:130
 msgid "Success"
 msgstr "Успех"
 
@@ -649,6 +649,14 @@ msgstr ""
 "информацию учетной записи на Vault."
 
 #: accounts/exceptions.py:25
+msgid ""
+"Vault service is unavailable. Unable to synchronize accounts. Please contact "
+"your administrator to check the Vault configuration."
+msgstr ""
+"Сервис Vault недоступен, поэтому синхронизация учетных записей невозможна. "
+"Обратитесь к администратору для проверки конфигурации Vault."
+
+#: accounts/exceptions.py:35
 msgid "Secret not found in Vault. The local sync marker has been preserved."
 msgstr "Ключ не найден в Vault, локальная метка синхронизации сохранена."
 
@@ -747,7 +755,7 @@ msgstr "Долгое время без проверки"
 #: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:104
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
-#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:291
+#: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:309
 #: tickets/reporting.py:80 xpack/plugins/cloud/filters.py:51
 #: xpack/plugins/cloud/models.py:233 xpack/plugins/cloud/models.py:300
 msgid "Status"
@@ -920,7 +928,7 @@ msgstr "Просмотр активности аккаунта"
 #: assets/models/favorite_asset.py:14 assets/models/label.py:18
 #: assets/models/platform.py:22 assets/models/platform.py:299
 #: assets/models/platform.py:378 assets/models/zone.py:19
-#: assets/serializers/asset/common.py:179 assets/serializers/platform.py:159
+#: assets/serializers/asset/common.py:178 assets/serializers/platform.py:159
 #: assets/serializers/platform.py:289
 #: authentication/backends/passkey/models.py:10
 #: authentication/models/ssh_key.py:12 authentication/notifications.py:17
@@ -940,7 +948,7 @@ msgstr "Просмотр активности аккаунта"
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:86
 #: terminal/models/virtualapp/provider.py:10
-#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:98
+#: terminal/models/virtualapp/virtualapp.py:20 tickets/api/ticket.py:100
 #: tickets/models/flow.py:42 tickets/serializers/flow.py:35
 #: users/forms/profile.py:33 users/models/group.py:16
 #: users/models/preference.py:11 users/models/user/__init__.py:67
@@ -971,7 +979,7 @@ msgstr "Секрет"
 #: accounts/models/application.py:21 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:149
-#: assets/serializers/asset/common.py:428 perms/filters.py:175
+#: assets/serializers/asset/common.py:493 perms/filters.py:175
 #: perms/serializers/permission.py:67 perms/serializers/user_permission.py:87
 #: rbac/tree.py:36 rbac/tree.py:51
 msgid "Accounts"
@@ -1542,7 +1550,7 @@ msgstr "Категория"
 #: terminal/serializers/session.py:33 terminal/serializers/storage.py:281
 #: terminal/serializers/storage.py:294 tickets/models/comment.py:26
 #: tickets/models/flow.py:46 tickets/models/ticket/apply_application.py:16
-#: tickets/models/ticket/general.py:283 tickets/reporting.py:70
+#: tickets/models/ticket/general.py:301 tickets/reporting.py:70
 #: tickets/serializers/flow.py:38 tickets/serializers/flow.py:111
 #: tickets/serializers/ticket/ticket.py:20
 msgid "Type"
@@ -1554,7 +1562,7 @@ msgstr "Актив не найден"
 
 #: accounts/serializers/account/account.py:237 assets/const/category.py:15
 #: assets/models/asset/common.py:213 assets/models/asset/ds.py:14
-#: assets/serializers/asset/common.py:186
+#: assets/serializers/asset/common.py:185
 msgid "Directory service"
 msgstr "Служба каталогов"
 
@@ -1565,7 +1573,7 @@ msgstr "Учётная запись уже существует. Поля: {fiel
 
 #: accounts/serializers/account/account.py:297 ops/models/celery.py:84
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:49
-#: tickets/models/ticket/general.py:287 tickets/reporting.py:75
+#: tickets/models/ticket/general.py:305 tickets/reporting.py:75
 msgid "State"
 msgstr "Состояние"
 
@@ -1591,7 +1599,7 @@ msgstr "Выберите хотя бы один актив или папку"
 #: accounts/serializers/account/account.py:490
 #: accounts/serializers/account/base.py:75
 #: accounts/serializers/account/base.py:94
-#: assets/serializers/asset/common.py:429
+#: assets/serializers/asset/common.py:494
 msgid "Spec info"
 msgstr "Специальная информация"
 
@@ -1664,7 +1672,7 @@ msgstr "Белый список IP"
 #: terminal/models/component/endpoint.py:118
 #: terminal/models/session/session.py:44
 #: terminal/models/virtualapp/virtualapp.py:29 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:309 users/models/user/__init__.py:104
+#: tickets/models/ticket/general.py:327 users/models/user/__init__.py:104
 #: xpack/plugins/cloud/models.py:45 xpack/plugins/cloud/models.py:129
 msgid "Comment"
 msgstr "Комментарий"
@@ -1844,7 +1852,7 @@ msgid "TTL"
 msgstr "TTL"
 
 #: accounts/serializers/automations/change_secret.py:225
-#: assets/models/platform.py:381 tickets/models/ticket/general.py:312
+#: assets/models/platform.py:381 tickets/models/ticket/general.py:330
 msgid "Meta"
 msgstr "Метаданные"
 
@@ -3634,15 +3642,15 @@ msgstr "Облака"
 msgid "Port"
 msgstr "Порт"
 
-#: assets/models/asset/common.py:200 assets/serializers/asset/common.py:180
+#: assets/models/asset/common.py:200 assets/serializers/asset/common.py:179
 #: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:58
 msgid "Address"
 msgstr "Адрес"
 
 #: assets/models/asset/common.py:202 assets/models/platform.py:443
 #: assets/serializers/asset/common.py:152
-#: assets/serializers/asset/common.py:273
 #: assets/serializers/asset/common.py:276
+#: assets/serializers/asset/common.py:279
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:132
 #: perms/serializers/user_permission.py:26 xpack/plugins/cloud/models.py:400
@@ -3654,7 +3662,7 @@ msgstr "Платформа"
 msgid "Zone"
 msgstr "Зона"
 
-#: assets/models/asset/common.py:209 assets/serializers/asset/common.py:182
+#: assets/models/asset/common.py:209 assets/serializers/asset/common.py:181
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
 #: perms/serializers/permission.py:59
 msgid "Nodes"
@@ -3664,7 +3672,7 @@ msgstr "Папки"
 msgid "Last login time"
 msgstr "Время последнего входа"
 
-#: assets/models/asset/common.py:219 assets/serializers/asset/common.py:430
+#: assets/models/asset/common.py:219 assets/serializers/asset/common.py:495
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "Собранные данные"
@@ -4082,30 +4090,30 @@ msgstr ""
 "существует, она будет создана"
 
 #: assets/serializers/asset/common.py:150
-#: assets/serializers/asset/common.py:181
+#: assets/serializers/asset/common.py:180
 msgid "Node path"
 msgstr "Путь к папке"
 
 #: assets/serializers/asset/common.py:151
-#: assets/serializers/asset/common.py:178
-#: assets/serializers/asset/common.py:431
+#: assets/serializers/asset/common.py:177
+#: assets/serializers/asset/common.py:496
 msgid "Auto info"
 msgstr "Информация об автоматизации"
 
-#: assets/serializers/asset/common.py:276
+#: assets/serializers/asset/common.py:279
 #: xpack/plugins/cloud/serializers/task.py:119
 msgid "Platform not exist"
 msgstr "Платформа не существует"
 
-#: assets/serializers/asset/common.py:312
+#: assets/serializers/asset/common.py:315
 msgid "port out of range (0-65535)"
 msgstr "порт вне диапазона (0-65535)"
 
-#: assets/serializers/asset/common.py:319
+#: assets/serializers/asset/common.py:322
 msgid "Protocol is required: {}"
 msgstr "Требуется протокол: {}"
 
-#: assets/serializers/asset/common.py:358
+#: assets/serializers/asset/common.py:364
 msgid "Invalid data"
 msgstr "Недопустимые данные"
 
@@ -4171,7 +4179,7 @@ msgid "Model"
 msgstr "Модель"
 
 #: assets/serializers/asset/info/gathered.py:8
-#: tickets/models/ticket/general.py:311
+#: tickets/models/ticket/general.py:329
 msgid "Serial number"
 msgstr "Серийный номер"
 
@@ -7914,7 +7922,7 @@ msgstr "Пожалуйста, выберите организацию перед
 #: terminal/notifications.py:309
 #: terminal/templates/terminal/_msg_command_warning.html:27
 #: terminal/templates/terminal/_msg_session_sharing.html:14
-#: tickets/models/ticket/general.py:314 tickets/reporting.py:85
+#: tickets/models/ticket/general.py:332 tickets/reporting.py:85
 #: tickets/serializers/ticket/ticket.py:90
 msgid "Organization"
 msgstr "Организация"
@@ -8470,7 +8478,7 @@ msgid "Ticket comment"
 msgstr "Комментарии к заявке"
 
 #: rbac/tree.py:204 settings/serializers/feature.py:211
-#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:321
+#: settings/serializers/feature.py:213 tickets/models/ticket/general.py:339
 msgid "Ticket"
 msgstr "Заявка"
 
@@ -11980,7 +11988,7 @@ msgstr ""
 "разрешение на это действие или заметили что-то необычное, примите "
 "необходимые меры немедленно."
 
-#: tickets/api/ticket.py:99 tickets/models/ticket/general.py:296
+#: tickets/api/ticket.py:101 tickets/models/ticket/general.py:314
 #: tickets/reporting.py:90
 msgid "Applicant"
 msgstr "Запрашивающий"
@@ -12069,9 +12077,9 @@ msgstr "Разрешенные активы"
 msgid "Permed valid assets"
 msgstr "Активы с действующими правами"
 
-#: tickets/errors.py:9
-msgid "Ticket already closed"
-msgstr "Заявка уже закрыта"
+#: tickets/errors.py:13
+msgid "The ticket status has changed. Please refresh the page and try again."
+msgstr "Статус заявки изменился. Обновите страницу и повторите попытку."
 
 #: tickets/filters.py:17
 msgid "Applicant ID"
@@ -12152,7 +12160,7 @@ msgstr "Уровень одобрения"
 msgid "Ticket flow approval rule"
 msgstr "Правило утверждения потока заявок"
 
-#: tickets/models/flow.py:56 tickets/models/ticket/general.py:300
+#: tickets/models/flow.py:56 tickets/models/ticket/general.py:318
 #: tickets/serializers/flow.py:43 tickets/serializers/flow.py:116
 #: tickets/serializers/ticket/ticket.py:36
 msgid "CC users"
@@ -12221,33 +12229,33 @@ msgstr "Этапы обработки заявки"
 msgid "Ticket assignee"
 msgstr "Ответственный за заявку"
 
-#: tickets/models/ticket/general.py:280
+#: tickets/models/ticket/general.py:298
 msgid "Title"
 msgstr "Заголовок"
 
-#: tickets/models/ticket/general.py:304
+#: tickets/models/ticket/general.py:322
 msgid "TicketFlow"
 msgstr "Процесс утверждения заявки"
 
-#: tickets/models/ticket/general.py:307 tickets/reporting.py:95
+#: tickets/models/ticket/general.py:325 tickets/reporting.py:95
 msgid "Approval step"
 msgstr "Этапы утверждения"
 
-#: tickets/models/ticket/general.py:310
+#: tickets/models/ticket/general.py:328
 msgid "Relation snapshot"
 msgstr "Снимок заявки"
 
-#: tickets/models/ticket/general.py:414
+#: tickets/models/ticket/general.py:432
 msgid ""
 "Today's ticket creation limit (9999) has been reached. Please try again "
 "tomorrow."
 msgstr "Лимит создания заявок на сегодня исчерпан (9999). Попробуйте завтра"
 
-#: tickets/models/ticket/general.py:435
+#: tickets/models/ticket/general.py:453
 msgid "Please try again"
 msgstr "Пожалуйста, попробуйте снова"
 
-#: tickets/models/ticket/general.py:514
+#: tickets/models/ticket/general.py:532
 msgid "Super ticket"
 msgstr "Супер-заявка"
 
@@ -12476,7 +12484,7 @@ msgstr "После успешной аутентификации заявку м
 msgid "Illegal approval action"
 msgstr "Недопустимое действие по рассмотрению"
 
-#: tickets/views/approve.py:119
+#: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"
 msgstr "Этот пользователь не имеет права одобрять эту заявку"
 
@@ -14284,3 +14292,6 @@ msgstr "Лицензия успешно импортирована"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "Лицензия недействительна"
+
+#~ msgid "Ticket already closed"
+#~ msgstr "Заявка уже закрыта"
