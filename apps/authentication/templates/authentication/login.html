@@ -444,7 +444,7 @@
 {% include '_foot_js.html' %}
 
 <script type="text/javascript" src="/static/js/crypto.bundle.js"></script>
-<script type="text/javascript" src="/static/js/session-encrypt.js"></script>
+<script type="text/javascript" src="{% static 'js/session-encrypt.js' %}?v=2"></script>
 
 <script>
     function doLogin(evt) {
