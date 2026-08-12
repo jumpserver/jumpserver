@@ -59,7 +59,6 @@ dependencies = [
     'data-tree==0.0.1',
     'pyvmomi==8.0.1.0.2',
     'termcolor==2.3.0',
-    'html2text==2020.1.16',
     'pyzipper==0.3.6',
     'python3-saml==1.16.0',
     'websocket-client==1.6.1',
@@ -154,6 +153,7 @@ dependencies = [
     "defusedxml>=0.7.1",
     "ansible-builder>=3.1.1",
     "pypdf==6.14.2",
+    "markdownify>=1.2.3",
 ]
 
 [project.urls]
