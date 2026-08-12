@@ -8105,14 +8105,17 @@ msgstr "Gửi thông báo hết hạn quyền tài sản"
 
 #: perms/tasks.py:51
 msgid ""
-"Check every day at 10 a.m. and send a notification message to users associated with \n"
-"        assets whose authorization is about to expire, as well as to the organization's \n"
-"        administrators, 3 days in advance, to remind them that the asset authorization will \n"
+"Check every day at 10 a.m. and send a notification message to users "
+"associated with \n"
+"        assets whose authorization is about to expire, as well as to the "
+"organization's \n"
+"        administrators in advance, to remind them that the asset "
+"authorization\n"
 "        expire in a few days"
 msgstr ""
 "Kiểm tra vào lúc 10 giờ sáng mỗi ngày, sẽ gửi thông báo đến người dùng liên "
-"quan và quản trị viên của tổ chức về tài sản ủy quyền sẽ hết hạn trong ba "
-"ngày, thông báo tài sản còn vài ngày sẽ hết hạn"
+"quan và quản trị viên của tổ chức về tài sản ủy quyền sắp hết hạn, thông báo "
+"tài sản còn vài ngày sẽ hết hạn"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
 #: perms/templates/perms/_msg_permed_items_expire.html:7
@@ -13004,11 +13007,12 @@ msgstr "Kiểm tra người dùng đã hết hạn"
 
 #: users/tasks.py:69
 msgid ""
-"Check every day at 2 p.m whether the users in the system are expired, and send a \n"
-"        notification 5 days in advance"
+"Check every day at 2 p.m whether the users in the system are expired, and "
+"send a \n"
+"        notification in advance"
 msgstr ""
 "Kiểm tra vào lúc 2 giờ chiều mỗi ngày, xem người dùng trong hệ thống có hết "
-"hạn hay không, gửi thông báo trước 5 ngày"
+"hạn hay không, gửi thông báo trước"
 
 #: users/tasks.py:97
 msgid "Periodic check user expired"

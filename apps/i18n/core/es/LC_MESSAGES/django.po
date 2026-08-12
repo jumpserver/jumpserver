@@ -8190,15 +8190,18 @@ msgstr "Enviar notificaciones de expiración de permisos de activos"
 
 #: perms/tasks.py:51
 msgid ""
-"Check every day at 10 a.m. and send a notification message to users associated with \n"
-"        assets whose authorization is about to expire, as well as to the organization's \n"
-"        administrators, 3 days in advance, to remind them that the asset authorization will \n"
+"Check every day at 10 a.m. and send a notification message to users "
+"associated with \n"
+"        assets whose authorization is about to expire, as well as to the "
+"organization's \n"
+"        administrators in advance, to remind them that the asset "
+"authorization\n"
 "        expire in a few days"
 msgstr ""
 "Cada día a las 10 de la mañana, se verificará y se enviará un mensaje a los "
 "usuarios asociados y a los administradores de la organización con respecto a"
-" la autorización de activos que está a punto de expirar, avisando con tres "
-"días de anticipación que el activo expirará en pocos días"
+" la autorización de activos que está a punto de expirar, avisando con "
+"anticipación que el activo expirará en pocos días"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
 #: perms/templates/perms/_msg_permed_items_expire.html:7
@@ -13230,11 +13233,12 @@ msgstr "Verificar si el usuario ha vencido"
 
 #: users/tasks.py:69
 msgid ""
-"Check every day at 2 p.m whether the users in the system are expired, and send a \n"
-"        notification 5 days in advance"
+"Check every day at 2 p.m whether the users in the system are expired, and "
+"send a \n"
+"        notification in advance"
 msgstr ""
 "Cada día a las 2 de la tarde se verifica si los usuarios en el sistema han "
-"vencido, y se envía una notificación con 5 días de antelación."
+"vencido, y se envía una notificación con antelación."
 
 #: users/tasks.py:97
 msgid "Periodic check user expired"

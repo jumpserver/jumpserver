@@ -7763,11 +7763,14 @@ msgstr "發送資產權限過期通知"
 
 #: perms/tasks.py:51
 msgid ""
-"Check every day at 10 a.m. and send a notification message to users associated with \n"
-"        assets whose authorization is about to expire, as well as to the organization's \n"
-"        administrators, 3 days in advance, to remind them that the asset authorization will \n"
+"Check every day at 10 a.m. and send a notification message to users "
+"associated with \n"
+"        assets whose authorization is about to expire, as well as to the "
+"organization's \n"
+"        administrators in advance, to remind them that the asset "
+"authorization\n"
 "        expire in a few days"
-msgstr "每天上午10點檢查，對資產授權即將過期的所關聯的用戶及該組織管理員提前三天發送消息通知，提示資產還有幾天即將過期"
+msgstr "每天上午10點檢查，對資產授權即將過期的所關聯的用戶及該組織管理員提前發送消息通知，提示資產還有幾天即將過期"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
 #: perms/templates/perms/_msg_permed_items_expire.html:7
@@ -12382,9 +12385,10 @@ msgstr "校驗用戶已過期"
 
 #: users/tasks.py:69
 msgid ""
-"Check every day at 2 p.m whether the users in the system are expired, and send a \n"
-"        notification 5 days in advance"
-msgstr "每天下午2點檢查，系統中的用戶是否過期，提前5天發送通知"
+"Check every day at 2 p.m whether the users in the system are expired, and "
+"send a \n"
+"        notification in advance"
+msgstr "每天下午2點檢查，系統中的用戶是否過期，提前發送通知"
 
 #: users/tasks.py:97
 msgid "Periodic check user expired"

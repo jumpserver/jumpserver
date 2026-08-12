@@ -7,6 +7,7 @@ from datetime import timedelta
 from celery import shared_task
 from django.conf import settings
 from django.db.transaction import atomic
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.const.crontab import CRONTAB_AT_AM_TEN
@@ -50,8 +51,8 @@ def check_asset_permission_expired():
     description=_(
         """Check every day at 10 a.m. and send a notification message to users associated with 
         assets whose authorization is about to expire, as well as to the organization's 
-        administrators, 3 days in advance, to remind them that the asset authorization will 
-        expire in a few days"""
+        administrators in advance, to remind them that the asset authorization
+        will expire in a few days"""
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_TEN)
@@ -74,7 +75,8 @@ def check_asset_permission_will_expired():
 
     for asset_perm in asset_perms:
         date_expired = dt_parser(asset_perm.date_expired)
-        remain_days = (date_expired - start).days
+        date_expired = timezone.localtime(date_expired).date()
+        remain_days = (date_expired - start.date()).days
         should_notify = (
             remain_days == first_notice_days
             or 0 <= remain_days <= daily_notice_days
