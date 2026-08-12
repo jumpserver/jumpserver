@@ -162,19 +162,24 @@ class PlaybookRunner:
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
-        interface.run(
-            private_data_dir=self.project_dir,
-            inventory=inventory,
-            playbook=self.playbook,
-            verbosity=verbosity,
-            event_handler=self.cb.event_handler,
-            status_handler=self.cb.status_handler,
-            # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
-            host_cwd=self.playbook_project_dir,
-            envvars=self.envs,
-            extravars=docker_extravars(self.extra_vars),
-            **kwargs
-        )
+        try:
+            interface.run(
+                private_data_dir=self.project_dir,
+                inventory=inventory,
+                playbook=self.playbook,
+                verbosity=verbosity,
+                event_handler=self.cb.event_handler,
+                status_handler=self.cb.status_handler,
+                # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
+                host_cwd=self.playbook_project_dir,
+                envvars=self.envs,
+                extravars=docker_extravars(self.extra_vars),
+                **kwargs
+            )
+        finally:
+            close_callback = getattr(self.cb, 'close', None)
+            if close_callback:
+                close_callback()
         return self.cb
 
 

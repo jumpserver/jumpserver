@@ -75,6 +75,12 @@ def clean_celery_tasks_period():
     tasks = CeleryTaskExecution.objects.filter(date_start__isnull=True)
     tasks.delete()
     find_and_delete_files(settings.CELERY_LOG_DIR, name_pattern="*.log", mtime_days=expire_days)
+    if os.path.isdir(settings.ANSIBLE_LOG_DIR):
+        find_and_delete_files(
+            settings.ANSIBLE_LOG_DIR,
+            name_pattern="*.log",
+            mtime_days=expire_days,
+        )
     celery_log_path = safe_join(settings.LOG_DIR, 'celery.log')
     truncate_file(celery_log_path)
 

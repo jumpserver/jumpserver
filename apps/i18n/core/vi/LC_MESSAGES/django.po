@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-11 23:44+0800\n"
+"POT-Creation-Date: 2026-08-12 15:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -104,6 +104,10 @@ msgstr "Tệp sao lưu sẽ được gửi đến"
 msgid "The backup task has no assigned sftp server"
 msgstr "Nhiệm vụ sao lưu này chưa được phân bổ máy chủ sftp"
 
+#: accounts/automations/backup_account/handlers.py:254
+msgid "Recipients not found"
+msgstr "Không tìm thấy người nhận"
+
 #: accounts/automations/backup_account/handlers.py:268
 msgid "The backup task has no assigned recipient"
 msgstr "Nhiệm vụ sao lưu không chỉ định người nhận"
@@ -117,8 +121,8 @@ msgid "The account backup plan is being executed"
 msgstr "Kế hoạch sao lưu tài khoản đang được thực hiện"
 
 #: accounts/automations/backup_account/manager.py:25
-#: accounts/automations/check_account/manager.py:469
-#: assets/automations/base/manager.py:282
+#: accounts/automations/check_account/manager.py:473
+#: assets/automations/base/manager.py:312
 #: assets/automations/ping_gateway/manager.py:405
 #: xpack/plugins/cloud/manager.py:113
 msgid "Task execution completed"
@@ -135,8 +139,8 @@ msgid "Backed up %(count)s accounts"
 msgstr "已备份 %(count)s 个账号"
 
 #: accounts/automations/backup_account/manager.py:38
-#: accounts/automations/check_account/manager.py:491
-#: assets/automations/base/manager.py:287
+#: accounts/automations/check_account/manager.py:495
+#: assets/automations/base/manager.py:317
 #: assets/automations/ping_gateway/manager.py:417
 #, python-format
 msgid "Duration: %(duration)s seconds"
@@ -161,10 +165,14 @@ msgid "account pushed and verified"
 msgstr "账号推送成功，新凭据验证通过"
 
 #: accounts/automations/base/manager.py:146
-#: assets/automations/base/manager.py:652
+#: assets/automations/base/manager.py:682
 #, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s: %(result)s"
+
+#: accounts/automations/base/manager.py:178
+msgid "No privileged account"
+msgstr "Không có tài khoản đặc quyền"
 
 #: accounts/automations/base/manager.py:232
 msgid "Windows does not support SSH key authentication"
@@ -182,11 +190,13 @@ msgstr "○ %(asset)s: Đã bỏ qua, không có tài khoản chờ xử lý ph�
 #: accounts/automations/base/manager.py:280
 #, python-format
 msgid "Account is already being processed, skipping: %(account)s"
-msgstr ""
+msgstr "Tài khoản đang được xử lý, bỏ qua: %(account)s"
 
 #: accounts/automations/base/manager.py:309
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr ""
+"Không tìm thấy tài khoản, tài khoản không hoạt động hoặc không đủ điều kiện "
+"cho tác vụ này"
 
 #: accounts/automations/base/manager.py:429
 #, python-format
@@ -194,6 +204,8 @@ msgid ""
 "The remote secret may have changed, but the independent credential "
 "verification was inconclusive: %(code)s"
 msgstr ""
+"Khóa bí mật từ xa có thể đã thay đổi nhưng việc xác minh thông tin xác thực "
+"độc lập không đưa ra được kết luận: %(code)s"
 
 #: accounts/automations/base/manager.py:505
 #, python-format
@@ -201,25 +213,31 @@ msgid ""
 "The remote operation completed, but saving the local account result failed: "
 "%(error)s"
 msgstr ""
+"Thao tác từ xa đã hoàn tất nhưng không thể lưu kết quả tài khoản cục bộ: "
+"%(error)s"
 
 #: accounts/automations/base/manager.py:613
 msgid "Task ended before the account received a final result"
-msgstr ""
+msgstr "Tác vụ đã kết thúc trước khi tài khoản nhận được kết quả cuối cùng"
 
-#: accounts/automations/change_secret/manager.py:70
+#: accounts/automations/change_secret/manager.py:44
+#, python-format
+msgid "Change secret record not found: %(record_id)s"
+msgstr "Không tìm thấy lịch sử thay đổi khóa: %(record_id)s"
+
+#: accounts/automations/change_secret/manager.py:72
 #: accounts/automations/push_account/manager.py:34
 msgid "Secret cannot be empty"
 msgstr "Nội dung mã hóa không được để trống"
 
-#: accounts/automations/change_secret/manager.py:87
-#, fuzzy, python-format
-#| msgid ""
-#| "Success: %(success)s, Unverified: %(unverified)s, Failed: %(failed)s, "
-#| "Total: %(total)s"
+#: accounts/automations/change_secret/manager.py:89
+#, python-format
 msgid ""
 "Successful: %(success)s, Needs verification: %(unverified)s, Failed: "
 "%(failed)s, Total: %(total)s"
-msgstr "Thành công: %s, Thất bại: %s, Tổng số: %s"
+msgstr ""
+"Thành công: %(success)s, cần xác minh: %(unverified)s, thất bại: %(failed)s, "
+"tổng cộng: %(total)s"
 
 #: accounts/automations/check_account/manager.py:170
 #: users/templates/users/reset_password.html:24
@@ -246,25 +264,33 @@ msgstr "Rò rỉ mật khẩu"
 msgid "Weak password"
 msgstr "Mật khẩu yếu"
 
-#: accounts/automations/check_account/manager.py:219
+#: accounts/automations/check_account/manager.py:212
+msgid "No supported account security check selected"
+msgstr "Không có kiểm tra bảo mật tài khoản được hỗ trợ nào được chọn"
+
+#: accounts/automations/check_account/manager.py:221
 msgid "Account security"
 msgstr "Bảo mật tài khoản"
 
-#: accounts/automations/check_account/manager.py:223
+#: accounts/automations/check_account/manager.py:225
 #, python-format
 msgid "Enabled account security check: %(check)s"
 msgstr "Đã bật kiểm tra bảo mật tài khoản: %(check)s"
 
-#: accounts/automations/check_account/manager.py:390
+#: accounts/automations/check_account/manager.py:392
 #, python-format
 msgid "Processing %(count)s accounts"
 msgstr "Đang xử lý %(count)s tài khoản"
 
-#: accounts/automations/check_account/manager.py:423
+#: accounts/automations/check_account/manager.py:403
+msgid "Another account risk check is already running"
+msgstr "Một quy trình kiểm tra rủi ro tài khoản khác đang chạy"
+
+#: accounts/automations/check_account/manager.py:427
 msgid "Check account report of {}"
 msgstr "Báo cáo phát hiện rủi ro {}"
 
-#: accounts/automations/check_account/manager.py:473
+#: accounts/automations/check_account/manager.py:477
 #, python-format
 msgid ""
 "Checked %(total)s accounts: %(normal)s normal, %(risk)s at risk, "
@@ -273,7 +299,7 @@ msgstr ""
 "Đã kiểm tra %(total)s tài khoản: %(normal)s bình thường, %(risk)s có rủi ro, "
 "%(no_secret)s không có thông tin xác thực"
 
-#: accounts/automations/check_account/manager.py:483
+#: accounts/automations/check_account/manager.py:487
 #, python-format
 msgid ""
 "Risk details: %(weak)s weak passwords, %(leaked)s leaked passwords, "
@@ -282,19 +308,23 @@ msgstr ""
 "Chi tiết rủi ro: %(weak)s mật khẩu yếu, %(leaked)s mật khẩu bị lộ, "
 "%(repeated)s mật khẩu trùng lặp"
 
+#: accounts/automations/push_account/manager.py:48
+#, python-format
+msgid "Push secret record not found: %(record_id)s"
+msgstr "Không tìm thấy bản ghi mật mã đã được đẩy: %(record_id)s"
+
 #: accounts/automations/verify_account/manager.py:79
 msgid "Change secret record not found or does not match account"
 msgstr ""
+"Không tìm thấy bản ghi thay đổi khóa hoặc bản ghi không khớp với tài khoản"
 
 #: accounts/automations/verify_account/manager.py:153
-#, fuzzy
-#| msgid "Asset not found"
 msgid "Account not found or inactive"
-msgstr "Tài sản không tồn tại"
+msgstr "Không tìm thấy tài khoản hoặc tài khoản không hoạt động"
 
 #: accounts/automations/verify_account/manager.py:214
 msgid "Verification ended before a final result was received"
-msgstr ""
+msgstr "Quá trình xác minh đã kết thúc trước khi nhận được kết quả cuối cùng"
 
 #: accounts/automations/verify_gateway_account/manager.py:17
 msgid "Checking gateway account connectivity"
@@ -389,7 +419,7 @@ msgstr "Cập nhật"
 msgid "Failed"
 msgstr "Thất bại"
 
-#: accounts/const/automation.py:25 assets/automations/base/manager.py:629
+#: accounts/const/automation.py:25 assets/automations/base/manager.py:659
 #: rbac/tree.py:55
 msgid "Push account"
 msgstr "Đẩy tài khoản"
@@ -404,11 +434,11 @@ msgid "Verify account"
 msgstr "Xác thực tài khoản"
 
 #: accounts/const/automation.py:28 accounts/tasks/remove_account.py:25
-#: accounts/tasks/remove_account.py:38 assets/automations/base/manager.py:632
+#: accounts/tasks/remove_account.py:38 assets/automations/base/manager.py:662
 msgid "Remove account"
 msgstr "Xóa tài khoản"
 
-#: accounts/const/automation.py:29 assets/automations/base/manager.py:631
+#: accounts/const/automation.py:29 assets/automations/base/manager.py:661
 msgid "Gather accounts"
 msgstr "Phát hiện tài khoản"
 
@@ -508,7 +538,7 @@ msgstr "SFTP"
 #: accounts/const/automation.py:115
 #: accounts/serializers/automations/change_secret.py:202 audits/const.py:65
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
-#: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:42
+#: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:45
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -1210,6 +1240,7 @@ msgstr "Tên đăng nhập"
 
 #: accounts/models/automations/check_account.py:75
 #: accounts/models/automations/gather_account.py:27 audits/models.py:165
+#: ops/templates/ops/celery_task_log.html:374
 msgid "Detail"
 msgstr "Chi tiết"
 
@@ -1860,8 +1891,6 @@ msgstr "ID động cơ không hợp lệ"
 msgid "Whether to check the risk of the discovered accounts."
 msgstr "Có tiến hành kiểm tra rủi ro cho tài khoản tập trung không."
 
-# msgid "Success"
-# msgstr ""
 #: accounts/signal_handlers.py:43
 #, python-format
 msgid "Push related accounts to assets: %s, by system"
@@ -2088,7 +2117,7 @@ msgstr "Thông tin cơ bản."
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:153 audits/models.py:74
 #: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:279
-#: ops/templates/ops/celery_task_log.html:291
+#: ops/templates/ops/celery_task_log.html:360
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:42
@@ -2766,185 +2795,200 @@ msgstr "Cần phải là số"
 msgid "App Assets"
 msgstr "Assets"
 
-#: assets/automations/base/manager.py:175
+#: assets/automations/base/manager.py:159
+msgid "Testing connectivity and credentials"
+msgstr "Đang kiểm tra kết nối và thông tin xác thực"
+
+#: assets/automations/base/manager.py:160
+msgid "Verifying account credentials"
+msgstr "Đang xác minh thông tin đăng nhập tài khoản"
+
+#: assets/automations/base/manager.py:161
+msgid "Collecting asset information"
+msgstr "Đang thu thập thông tin tài sản"
+
+#: assets/automations/base/manager.py:162
+msgid "Collecting account information"
+msgstr "Đang thu thập thông tin tài khoản"
+
+#: assets/automations/base/manager.py:205
 msgid "Verifying the new credentials"
 msgstr "Xác minh thông tin xác thực mới"
 
-#: assets/automations/base/manager.py:181
+#: assets/automations/base/manager.py:211
 msgid "Checking the target account"
 msgstr "检查目标账号"
 
-#: assets/automations/base/manager.py:182
+#: assets/automations/base/manager.py:212
 msgid "Updating the account credentials"
 msgstr "Cập nhật thông tin xác thực tài khoản"
 
-#: assets/automations/base/manager.py:185
+#: assets/automations/base/manager.py:215
 msgid "Removing the account"
 msgstr "Xóa tài khoản"
 
-#: assets/automations/base/manager.py:186
+#: assets/automations/base/manager.py:216
 msgid "Checking account removal conditions"
 msgstr "Kiểm tra điều kiện xóa tài khoản"
 
-#: assets/automations/base/manager.py:191
+#: assets/automations/base/manager.py:221
 msgid "Executing automation"
 msgstr "Thực hiện thao tác tự động"
 
-#: assets/automations/base/manager.py:203
+#: assets/automations/base/manager.py:233
 #, python-format
 msgid "Stage: %(stage)s"
 msgstr "▶ Giai đoạn: %(stage)s"
 
-#: assets/automations/base/manager.py:209
-#: assets/automations/base/manager.py:1038
+#: assets/automations/base/manager.py:239
+#: assets/automations/base/manager.py:1072
 #, python-format
 msgid "• %(host)s: processing"
 msgstr "• %(host)s: Đang xử lý"
 
-#: assets/automations/base/manager.py:265
+#: assets/automations/base/manager.py:295
 #: assets/automations/ping_gateway/manager.py:408
 #, python-format
 msgid "Successful: %(count)s"
 msgstr "Thành công %(count)s"
 
-#: assets/automations/base/manager.py:268
+#: assets/automations/base/manager.py:298
 #, python-format
 msgid "Needs verification: %(count)s"
 msgstr "Chờ xác nhận %(count)s"
 
-#: assets/automations/base/manager.py:272
+#: assets/automations/base/manager.py:302
 #: assets/automations/ping_gateway/manager.py:411
 #, python-format
 msgid "Failed: %(count)s"
 msgstr "Thất bại %(count)s"
 
-#: assets/automations/base/manager.py:274
+#: assets/automations/base/manager.py:304
 #: assets/automations/ping_gateway/manager.py:412
 #, python-format
 msgid "Total: %(count)s"
 msgstr "Tổng cộng %(count)s"
 
-#: assets/automations/base/manager.py:284
+#: assets/automations/base/manager.py:314
 #: assets/automations/ping_gateway/manager.py:406
 #, python-format
 msgid "Result: %(result)s"
 msgstr "Kết quả thực hiện: %(result)s"
 
-#: assets/automations/base/manager.py:295
+#: assets/automations/base/manager.py:325
 msgid "Task: {} finished"
 msgstr "Nhiệm vụ: {} Hoàn thành"
 
-#: assets/automations/base/manager.py:338
-#: assets/automations/base/manager.py:782
+#: assets/automations/base/manager.py:368
+#: assets/automations/base/manager.py:812
 #: assets/automations/ping_gateway/manager.py:133
 msgid "Unknown error"
 msgstr "Lỗi không xác định"
 
-#: assets/automations/base/manager.py:340
-#: assets/automations/base/manager.py:787
+#: assets/automations/base/manager.py:370
+#: assets/automations/base/manager.py:817
 #, python-format
 msgid "Operation failed: %(reason)s"
 msgstr "Thực thi thất bại: %(reason)s"
 
-#: assets/automations/base/manager.py:572
+#: assets/automations/base/manager.py:602
 #, python-format
 msgid "✗ %(asset)s: automation is not configured for its platform"
 msgstr "✗ %(asset)s: Nền tảng chưa được cấu hình phương thức tự động hóa"
 
-#: assets/automations/base/manager.py:580
+#: assets/automations/base/manager.py:610
 #, python-format
 msgid "✗ %(asset)s: this automation is not enabled"
 msgstr "✗ %(asset)s：Chưa bật tác vụ tự động này"
 
-#: assets/automations/base/manager.py:589
-#, fuzzy, python-format
-#| msgid "✗ %(asset)s: this automation is not enabled"
+#: assets/automations/base/manager.py:619
+#, python-format
 msgid "✗ %(asset)s: automation method is unavailable: %(method)s"
-msgstr "✗ %(asset)s：Chưa bật tác vụ tự động này"
+msgstr "✗ %(asset)s: phương thức tự động hóa không khả dụng: %(method)s"
 
-#: assets/automations/base/manager.py:599
+#: assets/automations/base/manager.py:629
 #, python-format
 msgid "✗ %(asset)s: unable to prepare this automation"
 msgstr "✗ %(asset)s: không thể chuẩn bị tác vụ tự động này"
 
-#: assets/automations/base/manager.py:626
+#: assets/automations/base/manager.py:656
 msgid "Test asset connectivity"
 msgstr "Kiểm tra khả năng kết nối của tài sản"
 
-#: assets/automations/base/manager.py:627
+#: assets/automations/base/manager.py:657
 msgid "Gather asset information"
 msgstr "Thu thập thông tin tài sản"
 
-#: assets/automations/base/manager.py:628
+#: assets/automations/base/manager.py:658
 msgid "Change account secret"
 msgstr "Đổi mật khẩu tài khoản"
 
-#: assets/automations/base/manager.py:630
+#: assets/automations/base/manager.py:660
 msgid "Verify account credentials"
 msgstr "Xác minh thông tin đăng nhập tài khoản"
 
-#: assets/automations/base/manager.py:641
+#: assets/automations/base/manager.py:671
 #, python-format
 msgid "Targets: %(assets)s asset(s)"
 msgstr "Mục tiêu: %(assets)s tài sản"
 
-#: assets/automations/base/manager.py:645
+#: assets/automations/base/manager.py:675
 msgid "connection and authentication succeeded"
 msgstr "Kết nối và xác thực thành công"
 
-#: assets/automations/base/manager.py:646
+#: assets/automations/base/manager.py:676
 msgid "asset information collected"
 msgstr "Hoàn tất thu thập thông tin tài sản"
 
-#: assets/automations/base/manager.py:647
+#: assets/automations/base/manager.py:677
 msgid "credential verification succeeded"
 msgstr "Xác thực thông tin đăng nhập thành công"
 
-#: assets/automations/base/manager.py:648
+#: assets/automations/base/manager.py:678
 msgid "account information collected"
 msgstr "Thu thập thông tin tài khoản hoàn tất"
 
-#: assets/automations/base/manager.py:649
+#: assets/automations/base/manager.py:679
 msgid "account removed"
 msgstr "Xóa tài khoản thành công"
 
-#: assets/automations/base/manager.py:651
+#: assets/automations/base/manager.py:681
 msgid "completed"
 msgstr "Thực thi hoàn tất"
 
-#: assets/automations/base/manager.py:662
+#: assets/automations/base/manager.py:692
 msgid "verifying the new credential"
 msgstr "Xác minh thông tin xác thực mới"
 
-#: assets/automations/base/manager.py:664
+#: assets/automations/base/manager.py:694
 msgid "checking the target account"
 msgstr "Kiểm tra tài khoản mục tiêu"
 
-#: assets/automations/base/manager.py:665
+#: assets/automations/base/manager.py:695
 msgid "creating the target account"
 msgstr "Tạo tài khoản mục tiêu"
 
-#: assets/automations/base/manager.py:667
+#: assets/automations/base/manager.py:697
 msgid "configuring sudo privileges"
 msgstr "Cấu hình quyền sudo"
 
-#: assets/automations/base/manager.py:668
+#: assets/automations/base/manager.py:698
 msgid "updating the SSH key"
 msgstr "Cập nhật khóa SSH"
 
-#: assets/automations/base/manager.py:669
+#: assets/automations/base/manager.py:699
 msgid "changing the target credential"
 msgstr "Sửa đổi thông tin xác thực mục tiêu"
 
-#: assets/automations/base/manager.py:670
+#: assets/automations/base/manager.py:700
 msgid "saving the execution result"
 msgstr "Lưu kết quả thực thi"
 
-#: assets/automations/base/manager.py:675
+#: assets/automations/base/manager.py:705
 msgid "executing the automation step"
 msgstr "Thực hiện các bước tự động hóa"
 
-#: assets/automations/base/manager.py:699
+#: assets/automations/base/manager.py:729
 #, python-format
 msgid ""
 "%(step)s failed: the new credential was rejected; the remote credential may "
@@ -2953,7 +2997,7 @@ msgstr ""
 "%(step)s thất bại: thông tin xác thực mới bị từ chối; thông tin xác thực từ "
 "xa có thể đã bị sửa đổi, vui lòng xác minh trước rồi thử lại"
 
-#: assets/automations/base/manager.py:707
+#: assets/automations/base/manager.py:737
 #, python-format
 msgid ""
 "%(step)s failed: %(target)s rejected the execution account %(account)s; the "
@@ -2965,7 +3009,7 @@ msgstr ""
 "kiểm tra thông tin xác thực của tài khoản thực thi, nếu thông tin xác thực "
 "hợp lệ, hãy giảm số kết nối đồng thời rồi thử lại"
 
-#: assets/automations/base/manager.py:717
+#: assets/automations/base/manager.py:747
 #, python-format
 msgid ""
 "%(step)s failed: authentication was rejected; check the execution or target "
@@ -2974,13 +3018,13 @@ msgstr ""
 "%(step)s thất bại: xác thực bị từ chối, vui lòng kiểm tra thông tin xác thực "
 "của tài khoản thực thi hoặc tài khoản mục tiêu"
 
-#: assets/automations/base/manager.py:725
+#: assets/automations/base/manager.py:755
 msgid "Unable to resolve the asset address; check DNS or the asset address"
 msgstr ""
 "Không thể phân giải địa chỉ tài sản, vui lòng kiểm tra DNS hoặc cấu hình địa "
 "chỉ tài sản"
 
-#: assets/automations/base/manager.py:732
+#: assets/automations/base/manager.py:762
 msgid ""
 "SSH host key verification failed; verify that the asset host key changed as "
 "expected"
@@ -2988,17 +3032,17 @@ msgstr ""
 "Quá trình xác minh khóa máy chủ SSH thất bại, vui lòng xác nhận xem khóa máy "
 "chủ của tài sản đã có thay đổi như dự kiến hay chưa"
 
-#: assets/automations/base/manager.py:736
+#: assets/automations/base/manager.py:766
 msgid "Connection timed out; check the network, port, or gateway"
 msgstr "Kết nối quá thời gian chờ, vui lòng kiểm tra mạng, cổng hoặc gateway"
 
-#: assets/automations/base/manager.py:743
+#: assets/automations/base/manager.py:773
 msgid "Unable to connect; check the network, port, and service"
 msgstr ""
 "Không thể kết nối đến mục tiêu, vui lòng kiểm tra mạng, cổng và trạng thái "
 "dịch vụ"
 
-#: assets/automations/base/manager.py:750
+#: assets/automations/base/manager.py:780
 msgid ""
 "The SSH connection was interrupted; check connection limits, security "
 "policies, or network stability"
@@ -3006,7 +3050,7 @@ msgstr ""
 "Kết nối SSH bị gián đoạn, vui lòng kiểm tra giới hạn số kết nối, chính sách "
 "bảo mật hoặc độ ổn định của mạng"
 
-#: assets/automations/base/manager.py:757
+#: assets/automations/base/manager.py:787
 msgid ""
 "Privilege escalation failed; check the sudo or become configuration of the "
 "execution account"
@@ -3014,7 +3058,7 @@ msgstr ""
 "Nâng quyền thất bại, vui lòng kiểm tra cấu hình sudo hoặc become của tài "
 "khoản thực thi"
 
-#: assets/automations/base/manager.py:765
+#: assets/automations/base/manager.py:795
 msgid ""
 "The target system rejected the new credential because it does not meet the "
 "password policy"
@@ -3022,7 +3066,7 @@ msgstr ""
 "Thông tin xác thực mới không tuân thủ chính sách mật khẩu của hệ thống mục "
 "tiêu và đã bị hệ thống mục tiêu từ chối"
 
-#: assets/automations/base/manager.py:770
+#: assets/automations/base/manager.py:800
 #, python-format
 msgid ""
 "%(step)s failed: the execution account has insufficient permissions on the "
@@ -3031,108 +3075,118 @@ msgstr ""
 "%(step)s thất bại: tài khoản thực thi không có đủ quyền trên hệ thống mục "
 "tiêu"
 
-#: assets/automations/base/manager.py:776
+#: assets/automations/base/manager.py:806
 msgid "The target account was not found or is inactive"
 msgstr "Tài khoản mục tiêu không tồn tại hoặc đã hết hạn"
 
-#: assets/automations/base/manager.py:779
+#: assets/automations/base/manager.py:809
 msgid "The account is being processed by another task; try again later"
 msgstr "Tài khoản đang được xử lý bởi tác vụ khác, vui lòng thử lại sau"
 
-#: assets/automations/base/manager.py:845
-#, fuzzy
-#| msgid "Asset not found"
+#: assets/automations/base/manager.py:879
 msgid "Asset not found or inactive"
-msgstr "Tài sản không tồn tại"
+msgstr "Không tìm thấy tài sản hoặc tài sản không hoạt động"
 
-#: assets/automations/base/manager.py:895
+#: assets/automations/base/manager.py:929
 #, python-format
 msgid "✗ %(host)s: %(error)s"
 msgstr "✗ %(host)s：%(error)s"
 
-#: assets/automations/base/manager.py:919
+#: assets/automations/base/manager.py:953
 #, python-format
 msgid "✗ %(host)s: unable to prepare (%(error)s)"
 msgstr "✗ %(host)s：chuẩn bị thất bại（%(error)s）"
 
-#: assets/automations/base/manager.py:940
+#: assets/automations/base/manager.py:974
 msgid "Stage: Saving execution results"
 msgstr "▶ Giai đoạn：Lưu kết quả thực hiện"
 
-#: assets/automations/base/manager.py:1088
+#: assets/automations/base/manager.py:1122
 #, python-format
 msgid "Automation task exceeded the maximum runtime of %(seconds)s seconds"
-msgstr ""
+msgstr "Tác vụ tự động hóa đã vượt quá thời gian chạy tối đa %(seconds)s giây"
 
-#: assets/automations/base/manager.py:1106
-#, fuzzy
-#| msgid "Unknown"
+#: assets/automations/base/manager.py:1140
 msgid "Unknown task"
-msgstr "Không xác định"
+msgstr "Tác vụ không xác định"
 
-#: assets/automations/base/manager.py:1123
+#: assets/automations/base/manager.py:1157
 #, python-format
 msgid " and %(count)s more"
-msgstr ""
+msgstr " và %(count)s mục khác"
 
-#: assets/automations/base/manager.py:1186
+#: assets/automations/base/manager.py:1220
 #, python-format
 msgid "Still processing %(count)s target(s): %(detail)s"
 msgstr "Vẫn đang xử lý %(count)s mục tiêu：%(detail)s"
 
-#: assets/automations/base/manager.py:1192
-#: assets/automations/base/manager.py:1356
+#: assets/automations/base/manager.py:1226
+#: assets/automations/base/manager.py:1390
 #: assets/automations/ping_gateway/manager.py:319
 #: assets/automations/ping_gateway/manager.py:354
 msgid "Task canceled by user"
-msgstr ""
+msgstr "Người dùng đã hủy tác vụ"
 
-#: assets/automations/base/manager.py:1308
-#: assets/automations/base/manager.py:1416
+#: assets/automations/base/manager.py:1342
+#: assets/automations/base/manager.py:1457
 msgid "Hosts still waiting"
-msgstr ""
+msgstr "Các máy chủ vẫn đang chờ"
 
-#: assets/automations/base/manager.py:1318
+#: assets/automations/base/manager.py:1352
 #, python-format
 msgid "Batch execution failed: %(error)s"
 msgstr "Thực thi lô tác vụ này thất bại: %(error)s"
 
-#: assets/automations/base/manager.py:1332
+#: assets/automations/base/manager.py:1366
 #, python-format
 msgid "Task: %(task)s"
 msgstr "Nhiệm vụ：%(task)s"
 
-#: assets/automations/base/manager.py:1336
+#: assets/automations/base/manager.py:1370
 msgid "Stage: Preparing execution"
 msgstr "▶ Giai đoạn: Chuẩn bị môi trường thực thi"
 
-#: assets/automations/base/manager.py:1340
+#: assets/automations/base/manager.py:1374
 #, python-format
 msgid "Task will run in %(count)s batches"
 msgstr "Nhiệm vụ sẽ được thực hiện theo %(count)s đợt"
 
-#: assets/automations/base/manager.py:1345
+#: assets/automations/base/manager.py:1379
 msgid "Targets are ready; starting execution"
 msgstr "Mục tiêu đã sẵn sàng, bắt đầu thực thi"
 
-#: assets/automations/base/manager.py:1347
+#: assets/automations/base/manager.py:1381
 msgid "No eligible targets were found"
 msgstr "Không có mục tiêu nào để thực thi"
 
-#: assets/automations/base/manager.py:1364
+#: assets/automations/base/manager.py:1398
 #, python-format
 msgid "Processing batch %(current)s of %(total)s"
 msgstr "Đang thực hiện đợt %(current)s/%(total)s"
 
-#: assets/automations/base/manager.py:1404
+#: assets/automations/base/manager.py:1445
 #, python-format
 msgid "Ansible runner stopped before completing the batch: %(status)s"
-msgstr ""
+msgstr "Trình chạy Ansible đã dừng trước khi hoàn thành đợt: %(status)s"
 
-#: assets/automations/base/manager.py:1419
+#: assets/automations/base/manager.py:1460
 #, python-format
 msgid "Batch did not complete: %(reason)s"
 msgstr "Nhiệm vụ của đợt này chưa hoàn thành：%(reason)s"
+
+#: assets/automations/gather_facts/format_asset_info.py:23
+msgid "CPU list format not recognized"
+msgstr "Định dạng danh sách CPU không được nhận dạng"
+
+#: assets/automations/gather_facts/format_asset_info.py:28
+#, python-format
+msgid "Error processing CPU model list: %(error)s"
+msgstr "Lỗi khi xử lý danh sách model CPU: %(error)s"
+
+#: assets/automations/gather_facts/format_asset_info.py:41
+#, python-format
+msgid "Error processing GPU model list: %(error)s"
+msgstr "Lỗi khi xử lý danh sách model GPU: %(error)s"
 
 #: assets/automations/ping_gateway/manager.py:64
 msgid ""
@@ -3300,8 +3354,7 @@ msgstr "Vô hiệu hóa"
 
 #: assets/const/base.py:35 settings/serializers/basic.py:8
 #: users/serializers/preference/koko.py:19
-#: users/serializers/preference/lina.py:51
-#: users/serializers/preference/luna.py:89
+#: users/serializers/preference/lina.py:70
 msgid "Basic"
 msgstr "Cơ bản"
 
@@ -3373,21 +3426,6 @@ msgstr "TP-Link"
 #: terminal/models/applet/applet.py:30 tickets/const.py:9
 msgid "General"
 msgstr "Chung"
-
-#: users/serializers/preference/luna.py:91
-msgctxt "Luna preference section"
-msgid "General"
-msgstr "Cấu hình cơ bản"
-
-#: users/serializers/preference/luna.py:95
-msgctxt "Luna preference section"
-msgid "GUI"
-msgstr "Đồ họa"
-
-#: users/serializers/preference/luna.py:99
-msgctxt "Luna preference section"
-msgid "CLI"
-msgstr "Dòng lệnh"
 
 #: assets/const/device.py:13
 msgid "Switch"
@@ -4615,7 +4653,7 @@ msgid "Symlink"
 msgstr "Tạo liên kết mềm"
 
 #: audits/const.py:18 audits/const.py:29
-#: ops/templates/ops/celery_task_log.html:306
+#: ops/templates/ops/celery_task_log.html:380
 #: terminal/api/session/session.py:170
 msgid "Download"
 msgstr "Tải xuống"
@@ -5183,7 +5221,7 @@ msgstr "Phân bố thời lượng"
 msgid "Duration range"
 msgstr "Thời gian tiêu tốn"
 
-#: audits/serializers.py:39 ops/serializers/celery.py:27
+#: audits/serializers.py:39 ops/serializers/celery.py:30
 msgid "Execution cycle"
 msgstr "Thực hiện theo chu kỳ"
 
@@ -5232,11 +5270,11 @@ msgstr "Người dùng %s đăng nhập vào hệ thống %s"
 msgid "User %s perform a task for this resource: %s"
 msgstr "Người dùng %s đã thực hiện nhiệm vụ (%s) trên tài nguyên hiện tại"
 
-#: audits/tasks.py:184
+#: audits/tasks.py:190
 msgid "Clean audits session task log"
 msgstr "Dọn dẹp nhật ký nhiệm vụ kiểm toán tài sản"
 
-#: audits/tasks.py:186
+#: audits/tasks.py:192
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -5252,11 +5290,11 @@ msgstr ""
 "thống - danh sách nhiệm vụ - định kỳ dọn dẹp cấu hình, đối với những thứ "
 "vượt quá thời gian sẽ được dọn dẹp vào lúc 2 giờ sáng mỗi ngày"
 
-#: audits/tasks.py:206
+#: audits/tasks.py:212
 msgid "Upload FTP file to external storage"
 msgstr "Tải lên tệp FTP vào bộ nhớ bên ngoài"
 
-#: audits/tasks.py:208
+#: audits/tasks.py:214
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -5798,7 +5836,7 @@ msgid "Clear phone number to disable"
 msgstr "Xóa số điện thoại để vô hiệu hóa."
 
 #: authentication/middleware.py:94 terminal/api/component/storage.py:129
-#: xpack/plugins/cloud/providers/fc.py:47
+#: xpack/plugins/cloud/providers/fc.py:48
 #: xpack/plugins/cloud/providers/proxmox.py:29
 msgid "Authentication failed"
 msgstr "Xác thực thất bại"
@@ -5934,13 +5972,13 @@ msgstr "Mã thông báo riêng tư"
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
 #: users/models/user/__init__.py:99
-#: xpack/plugins/cloud/serializers/account_attrs.py:250
+#: xpack/plugins/cloud/serializers/account_attrs.py:258
 msgid "Private key"
 msgstr "Khóa ssh riêng"
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:38
 #: users/forms/profile.py:175 users/models/user/__init__.py:102
-#: xpack/plugins/cloud/serializers/account_attrs.py:247
+#: xpack/plugins/cloud/serializers/account_attrs.py:255
 msgid "Public key"
 msgstr "Khóa công khai SSH"
 
@@ -7714,7 +7752,7 @@ msgstr "Tỷ lệ sử dụng bộ nhớ vượt quá {max_threshold}%: => {valu
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "Tỷ lệ sử dụng CPU vượt quá {max_threshold}: => {value}"
 
-#: ops/serializers/celery.py:29
+#: ops/serializers/celery.py:32
 msgid "Next execution time"
 msgstr "Thời gian thực hiện tiếp theo"
 
@@ -7845,8 +7883,9 @@ msgstr ""
 "dọn dẹp định kỳ - cấu hình lịch sử thực hiện trung tâm công việc, vào lúc 2 "
 "giờ sáng mỗi ngày sẽ dọn dẹp các bản ghi đã vượt quá thời gian lưu trữ"
 
-#: ops/templates/ops/celery_task_log.html:296
-#: ops/templates/ops/celery_task_log.html:300
+#: ops/templates/ops/celery_task_log.html:365
+#: ops/templates/ops/celery_task_log.html:369
+#: ops/templates/ops/celery_task_log.html:387
 #: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
 msgid "Output"
 msgstr "Xuất ra"
@@ -9345,7 +9384,7 @@ msgid "SSO auth key TTL"
 msgstr "Thời gian hiệu lực token"
 
 #: settings/serializers/auth/sso.py:20
-#: xpack/plugins/cloud/serializers/account_attrs.py:237
+#: xpack/plugins/cloud/serializers/account_attrs.py:245
 msgid "Unit: second"
 msgstr "Đơn vị: giây"
 
@@ -9806,19 +9845,15 @@ msgstr "Máy chủ Microsoft Exchange"
 
 #: settings/serializers/msg.py:31
 msgid "Use system trust store"
-msgstr ""
+msgstr "Sử dụng kho tin cậy hệ thống"
 
 #: settings/serializers/msg.py:32
-#, fuzzy
-#| msgid "CA certificate"
 msgid "Use custom CA certificate"
-msgstr "Chứng chỉ CA"
+msgstr "Sử dụng chứng chỉ CA tùy chỉnh"
 
 #: settings/serializers/msg.py:33
-#, fuzzy
-#| msgid "Ignore Certificate Verification"
 msgid "Ignore certificate verification (insecure)"
-msgstr "Bỏ qua xác thực chứng chỉ"
+msgstr "Bỏ qua xác minh chứng chỉ (không an toàn)"
 
 #: settings/serializers/msg.py:36
 msgid "Service"
@@ -9873,36 +9908,28 @@ msgstr ""
 "Điều này được sử dụng cho kết nối TLS rõ ràng, thường trên cổng 587."
 
 #: settings/serializers/msg.py:70
-#, fuzzy
-#| msgid "Ignore Certificate Verification"
 msgid "Certificate verification"
-msgstr "Bỏ qua xác thực chứng chỉ"
+msgstr "Xác minh chứng chỉ"
 
 #: settings/serializers/msg.py:71
 msgid "Controls verification of the SMTP TLS certificate"
-msgstr ""
+msgstr "Kiểm soát việc xác minh chứng chỉ TLS SMTP"
 
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
-msgstr ""
+msgstr "Chứng chỉ CA PEM được tin cậy thêm ngoài kho tin cậy hệ thống"
 
 #: settings/serializers/msg.py:92
-#, fuzzy
-#| msgid "Certificate authentication failed"
 msgid "A CA certificate must not contain a private key"
-msgstr "Can public key authentication"
+msgstr "Chứng chỉ CA không được chứa khóa riêng"
 
 #: settings/serializers/msg.py:98
-#, fuzzy
-#| msgid "Invalid certificate format"
 msgid "Invalid PEM CA certificate"
-msgstr "Mã xác nhận không chính xác"
+msgstr "Chứng chỉ CA PEM không hợp lệ"
 
 #: settings/serializers/msg.py:108
-#, fuzzy
-#| msgid "CA certificate"
 msgid "A CA certificate is required"
-msgstr "Chứng chỉ CA"
+msgstr "Phải cung cấp chứng chỉ CA"
 
 #: settings/serializers/msg.py:118
 msgid "Subject prefix"
@@ -12826,20 +12853,27 @@ msgstr ""
 msgid "The newly set password is inconsistent"
 msgstr "Mật khẩu không khớp"
 
-#: users/serializers/preference/lina.py:47 users/serializers/profile.py:66
+#: users/serializers/preference/lina.py:64 users/serializers/profile.py:66
 msgid "Language"
 msgstr "Ngôn ngữ"
 
-#: users/serializers/preference/lina.py:52
+#: users/serializers/preference/lina.py:71
 msgid "File Encryption"
 msgstr "Mật khẩu mã hóa tệp"
 
-#: users/serializers/preference/luna.py:90
-msgid "Graphics"
-msgstr "Đồ họa hóa"
-
 #: users/serializers/preference/luna.py:91
-msgid "Command line"
+msgctxt "Luna preference section"
+msgid "General"
+msgstr "Cấu hình cơ bản"
+
+#: users/serializers/preference/luna.py:95
+msgctxt "Luna preference section"
+msgid "GUI"
+msgstr "Đồ họa"
+
+#: users/serializers/preference/luna.py:99
+msgctxt "Luna preference section"
+msgid "CLI"
 msgstr "Dòng lệnh"
 
 #: users/serializers/profile.py:22
@@ -14050,7 +14084,7 @@ msgstr "ID đăng ký"
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
 #: xpack/plugins/cloud/serializers/account_attrs.py:163
 #: xpack/plugins/cloud/serializers/account_attrs.py:193
-#: xpack/plugins/cloud/serializers/account_attrs.py:243
+#: xpack/plugins/cloud/serializers/account_attrs.py:251
 msgid "API Endpoint"
 msgstr "Điểm cuối API"
 
@@ -14090,15 +14124,31 @@ msgstr "Khóa tài khoản dịch vụ"
 msgid "The file is in JSON format"
 msgstr "Tập tin định dạng JSON"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:196
+msgid "Local user"
+msgstr "Người dùng cục bộ"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:197
+msgid "Domain user"
+msgstr "Người dùng miền"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:198
+msgid "Interface interconnection user"
+msgstr "Người dùng liên kết giao diện"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
+msgid "User type"
+msgstr "Loại người dùng"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:208
 msgid "IP address invalid `{}`, {}"
 msgstr "Địa chỉ IP không hợp lệ: `{}`, {}"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:216
+#: xpack/plugins/cloud/serializers/account_attrs.py:224
 msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 msgstr "Ví dụ: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:219
+#: xpack/plugins/cloud/serializers/account_attrs.py:227
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -14108,23 +14158,23 @@ msgstr ""
 "thực hiện nhiệm vụ đồng bộ, chỉ những địa chỉ IP hợp lệ mới được đồng bộ. "
 "<br> Nếu cổng là 0, điều đó có nghĩa là tất cả các địa chỉ IP đều hợp lệ."
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:227
+#: xpack/plugins/cloud/serializers/account_attrs.py:235
 msgid "Hostname prefix"
 msgstr "Tiền tố tên máy chủ"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:230
+#: xpack/plugins/cloud/serializers/account_attrs.py:238
 msgid "IP segment"
 msgstr "Phân đoạn IP"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:234
+#: xpack/plugins/cloud/serializers/account_attrs.py:242
 msgid "Test port"
 msgstr "Cổng kiểm tra"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:237
+#: xpack/plugins/cloud/serializers/account_attrs.py:245
 msgid "Test timeout"
 msgstr "Thời gian timeout kiểm tra"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:253
+#: xpack/plugins/cloud/serializers/account_attrs.py:261
 msgid "Project"
 msgstr "dự án"
 
@@ -14284,107 +14334,3 @@ msgstr "Nhập giấy phép thành công"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "Giấy phép không hợp lệ"
-
-#, fuzzy, python-format
-#~| msgid "Success: %s, Failed: %s, Total: %s"
-#~ msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
-#~ msgstr "Thành công: %s, Thất bại: %s, Tổng số: %s"
-
-#~ msgid ""
-#~ "---\n"
-#~ "Summary: \n"
-#~ "ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no "
-#~ "secret: {}, using time: {}s"
-#~ msgstr ""
-#~ "--- Tóm tắt: Bình thường: {}, Mật khẩu yếu: {}, Mật khẩu bị rò rỉ: {}, "
-#~ "Mật khẩu trùng lặp: {}, Không có mật khẩu: {}, Thời gian tiêu tốn: {} giây"
-
-#~ msgid "Local user"
-#~ msgstr "Người dùng cục bộ"
-
-#~ msgid "Domain user"
-#~ msgstr "Người dùng miền"
-
-#~ msgid "Interface interconnection user"
-#~ msgstr "Người dùng liên kết giao diện"
-
-#~ msgid "User type"
-#~ msgstr "Loại người dùng"
-
-#~ msgid "Check the discovered accounts"
-#~ msgstr "Kiểm tra các tài khoản được phát hiện"
-
-#~ msgid ""
-#~ "Perform checks and analyses based on automatically discovered account "
-#~ "results, including user groups, public keys, sudoers, and other "
-#~ "information."
-#~ msgstr ""
-#~ "Tiến hành kiểm tra và phân tích kết quả của các tài khoản được phát hiện "
-#~ "tự động, bao gồm nhóm người dùng, khóa công khai, sudoers và thông tin "
-#~ "khác."
-
-#~ msgid "Task log"
-#~ msgstr "Danh sách nhiệm vụ."
-
-#~ msgid ">>> Start executing the task to test gateway account connectivity"
-#~ msgstr ""
-#~ ">>> Bắt đầu thực hiện nhiệm vụ kiểm tra khả năng kết nối tài khoản testnet"
-
-#~ msgid "  - Platform {} ansible disabled"
-#~ msgstr ""
-#~ "- Nền tảng {} Ansible đã bị vô hiệu hóa, không thể thực hiện nhiệm vụ"
-
-#~ msgid ">>> Task preparation phase"
-#~ msgstr ">>> Giai đoạn chuẩn bị nhiệm vụ"
-
-#, python-brace-format
-#~ msgid ">>> Executing tasks in batches, total {runner_count}"
-#~ msgstr ">>> Thực hiện nhiệm vụ theo từng đợt, tổng cộng {runner_count}"
-
-#~ msgid ">>> Start executing tasks"
-#~ msgstr ">>> Bắt đầu thực hiện nhiệm vụ"
-
-#~ msgid ">>> No tasks need to be executed"
-#~ msgstr ">>> Không có nhiệm vụ nào cần thực hiện"
-
-#, python-brace-format
-#~ msgid ">>> Begin executing batch {index} of tasks"
-#~ msgstr ">>> Bắt đầu thực hiện đợt nhiệm vụ thứ {index}"
-
-#~ msgid "Asset, {}, using account {}"
-#~ msgstr "Tài sản, {}, Sử dụng tài khoản {}"
-
-#~ msgid ">>> Start executing the task to test gateway connectivity"
-#~ msgstr ">>> Bắt đầu thực hiện nhiệm vụ kiểm tra kết nối của cổng"
-
-#~ msgid "Windows password cannot contain special characters like > ^"
-#~ msgstr ""
-#~ "Mật khẩu Windows không được bao gồm ký tự đặc biệt, ví dụ như > ^< -SEP-"
-#~ ">Tên ACL"
-
-#~ msgid "MySQL port"
-#~ msgstr "Cổng MySQL"
-
-#~ msgid "MariaDB port"
-#~ msgstr "Cổng MariaDB"
-
-#~ msgid "PostgreSQL port"
-#~ msgstr "Cổng PostgreSQL"
-
-#~ msgid "Redis port"
-#~ msgstr "Cổng Redis"
-
-#~ msgid "SQLServer port"
-#~ msgstr "Cổng SQL Server"
-
-#~ msgid "Oracle port"
-#~ msgstr "Cổng Oracle"
-
-#~ msgid "MongoDB port"
-#~ msgstr "Cổng MongoDB"
-
-#~ msgid "The current organization type already exists"
-#~ msgstr "Tổ chức hiện tại đã tồn tại loại này"
-
-#~ msgid "domain_name"
-#~ msgstr "Tên miền"

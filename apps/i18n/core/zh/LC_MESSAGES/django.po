@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-11 23:44+0800\n"
+"POT-Creation-Date: 2026-08-12 15:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -104,6 +104,10 @@ msgstr "备份文件将被发送至"
 msgid "The backup task has no assigned sftp server"
 msgstr "该备份任务未分配sftp服务器"
 
+#: accounts/automations/backup_account/handlers.py:254
+msgid "Recipients not found"
+msgstr "未找到接收人"
+
 #: accounts/automations/backup_account/handlers.py:268
 msgid "The backup task has no assigned recipient"
 msgstr "备份任务没有指定收件人"
@@ -117,8 +121,8 @@ msgid "The account backup plan is being executed"
 msgstr "账号备份计划正在执行"
 
 #: accounts/automations/backup_account/manager.py:25
-#: accounts/automations/check_account/manager.py:469
-#: assets/automations/base/manager.py:282
+#: accounts/automations/check_account/manager.py:473
+#: assets/automations/base/manager.py:312
 #: assets/automations/ping_gateway/manager.py:405
 #: xpack/plugins/cloud/manager.py:113
 msgid "Task execution completed"
@@ -135,8 +139,8 @@ msgid "Backed up %(count)s accounts"
 msgstr "已备份 %(count)s 个账号"
 
 #: accounts/automations/backup_account/manager.py:38
-#: accounts/automations/check_account/manager.py:491
-#: assets/automations/base/manager.py:287
+#: accounts/automations/check_account/manager.py:495
+#: assets/automations/base/manager.py:317
 #: assets/automations/ping_gateway/manager.py:417
 #, python-format
 msgid "Duration: %(duration)s seconds"
@@ -161,10 +165,14 @@ msgid "account pushed and verified"
 msgstr "账号推送成功，新凭据验证通过"
 
 #: accounts/automations/base/manager.py:146
-#: assets/automations/base/manager.py:652
+#: assets/automations/base/manager.py:682
 #, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s：%(result)s"
+
+#: accounts/automations/base/manager.py:178
+msgid "No privileged account"
+msgstr "未找到特权账号"
 
 #: accounts/automations/base/manager.py:232
 msgid "Windows does not support SSH key authentication"
@@ -182,36 +190,41 @@ msgstr "○ %(asset)s：已跳过，没有符合条件的待处理账号"
 #: accounts/automations/base/manager.py:280
 #, python-format
 msgid "Account is already being processed, skipping: %(account)s"
-msgstr ""
+msgstr "账号正在处理中，已跳过：%(account)s"
 
 #: accounts/automations/base/manager.py:309
 msgid "Account not found, inactive, or not eligible for this task"
-msgstr ""
+msgstr "账号不存在、已停用或不符合此任务的条件"
 
 #: accounts/automations/base/manager.py:429
 #, python-format
 msgid ""
 "The remote secret may have changed, but the independent credential "
 "verification was inconclusive: %(code)s"
-msgstr ""
+msgstr "远端凭据可能已更改，但独立凭据验证未能得出明确结论：%(code)s"
 
 #: accounts/automations/base/manager.py:505
 #, python-format
 msgid ""
 "The remote operation completed, but saving the local account result failed: "
 "%(error)s"
-msgstr ""
+msgstr "远端操作已完成，但保存本地账号结果失败：%(error)s"
 
 #: accounts/automations/base/manager.py:613
 msgid "Task ended before the account received a final result"
-msgstr ""
+msgstr "任务结束时账号尚未收到最终结果"
 
-#: accounts/automations/change_secret/manager.py:70
+#: accounts/automations/change_secret/manager.py:44
+#, python-format
+msgid "Change secret record not found: %(record_id)s"
+msgstr "未找到改密记录：%(record_id)s"
+
+#: accounts/automations/change_secret/manager.py:72
 #: accounts/automations/push_account/manager.py:34
 msgid "Secret cannot be empty"
 msgstr "密文不能为空"
 
-#: accounts/automations/change_secret/manager.py:87
+#: accounts/automations/change_secret/manager.py:89
 #, python-format
 msgid ""
 "Successful: %(success)s, Needs verification: %(unverified)s, Failed: "
@@ -244,25 +257,33 @@ msgstr "密码泄露"
 msgid "Weak password"
 msgstr "弱密码"
 
-#: accounts/automations/check_account/manager.py:219
+#: accounts/automations/check_account/manager.py:212
+msgid "No supported account security check selected"
+msgstr "未选择支持的账号安全检查项"
+
+#: accounts/automations/check_account/manager.py:221
 msgid "Account security"
 msgstr "账号安全"
 
-#: accounts/automations/check_account/manager.py:223
+#: accounts/automations/check_account/manager.py:225
 #, python-format
 msgid "Enabled account security check: %(check)s"
 msgstr "已启用账号安全检查：%(check)s"
 
-#: accounts/automations/check_account/manager.py:390
+#: accounts/automations/check_account/manager.py:392
 #, python-format
 msgid "Processing %(count)s accounts"
 msgstr "正在处理 %(count)s 个账号"
 
-#: accounts/automations/check_account/manager.py:423
+#: accounts/automations/check_account/manager.py:403
+msgid "Another account risk check is already running"
+msgstr "另一个账号风险检查任务正在运行"
+
+#: accounts/automations/check_account/manager.py:427
 msgid "Check account report of {}"
 msgstr "风险检测报告 {}"
 
-#: accounts/automations/check_account/manager.py:473
+#: accounts/automations/check_account/manager.py:477
 #, python-format
 msgid ""
 "Checked %(total)s accounts: %(normal)s normal, %(risk)s at risk, "
@@ -271,7 +292,7 @@ msgstr ""
 "已检查 %(total)s 个账号：正常 %(normal)s 个，存在风险 %(risk)s 个，无凭据 "
 "%(no_secret)s 个"
 
-#: accounts/automations/check_account/manager.py:483
+#: accounts/automations/check_account/manager.py:487
 #, python-format
 msgid ""
 "Risk details: %(weak)s weak passwords, %(leaked)s leaked passwords, "
@@ -280,19 +301,22 @@ msgstr ""
 "风险明细：弱密码 %(weak)s 个，泄露密码 %(leaked)s 个，重复密码 %(repeated)s "
 "个"
 
+#: accounts/automations/push_account/manager.py:48
+#, python-format
+msgid "Push secret record not found: %(record_id)s"
+msgstr "未找到推送密文记录：%(record_id)s"
+
 #: accounts/automations/verify_account/manager.py:79
 msgid "Change secret record not found or does not match account"
-msgstr ""
+msgstr "改密记录不存在或与账号不匹配"
 
 #: accounts/automations/verify_account/manager.py:153
-#, fuzzy
-#| msgid "Asset not found"
 msgid "Account not found or inactive"
-msgstr "资产不存在"
+msgstr "账号不存在或已停用"
 
 #: accounts/automations/verify_account/manager.py:214
 msgid "Verification ended before a final result was received"
-msgstr ""
+msgstr "验证结束时尚未收到最终结果"
 
 #: accounts/automations/verify_gateway_account/manager.py:17
 msgid "Checking gateway account connectivity"
@@ -387,7 +411,7 @@ msgstr "更新"
 msgid "Failed"
 msgstr "失败"
 
-#: accounts/const/automation.py:25 assets/automations/base/manager.py:629
+#: accounts/const/automation.py:25 assets/automations/base/manager.py:659
 #: rbac/tree.py:55
 msgid "Push account"
 msgstr "账号推送"
@@ -402,11 +426,11 @@ msgid "Verify account"
 msgstr "验证账号"
 
 #: accounts/const/automation.py:28 accounts/tasks/remove_account.py:25
-#: accounts/tasks/remove_account.py:38 assets/automations/base/manager.py:632
+#: accounts/tasks/remove_account.py:38 assets/automations/base/manager.py:662
 msgid "Remove account"
 msgstr "移除账号"
 
-#: accounts/const/automation.py:29 assets/automations/base/manager.py:631
+#: accounts/const/automation.py:29 assets/automations/base/manager.py:661
 msgid "Gather accounts"
 msgstr "账号发现"
 
@@ -506,7 +530,7 @@ msgstr "SFTP"
 #: accounts/const/automation.py:115
 #: accounts/serializers/automations/change_secret.py:202 audits/const.py:65
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
-#: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:42
+#: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:45
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
 #: tickets/views/approve.py:128
 msgid "Success"
@@ -1206,6 +1230,7 @@ msgstr "用户名"
 
 #: accounts/models/automations/check_account.py:75
 #: accounts/models/automations/gather_account.py:27 audits/models.py:165
+#: ops/templates/ops/celery_task_log.html:374
 msgid "Detail"
 msgstr "详情"
 
@@ -1351,10 +1376,6 @@ msgstr "账号模板"
 msgid "Can view asset account template secret"
 msgstr "可以查看资产账号模板密码"
 
-# msgid "Can view asset account template secret"
-# msgstr "可以查看资产账号模板密码"
-# msgid "Can change asset account template secret"
-# msgstr "可以更改资产账号模板密码"
 #: accounts/models/virtual.py:13
 msgid "Alias"
 msgstr "别名"
@@ -2033,7 +2054,7 @@ msgstr "基本信息"
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:153 audits/models.py:74
 #: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:279
-#: ops/templates/ops/celery_task_log.html:291
+#: ops/templates/ops/celery_task_log.html:360
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:42
@@ -2693,192 +2714,207 @@ msgstr "需要为数字"
 msgid "App Assets"
 msgstr "资产管理"
 
-#: assets/automations/base/manager.py:175
+#: assets/automations/base/manager.py:159
+msgid "Testing connectivity and credentials"
+msgstr "检测网络连接并验证账号"
+
+#: assets/automations/base/manager.py:160
+msgid "Verifying account credentials"
+msgstr "验证账号凭据"
+
+#: assets/automations/base/manager.py:161
+msgid "Collecting asset information"
+msgstr "收集资产信息"
+
+#: assets/automations/base/manager.py:162
+msgid "Collecting account information"
+msgstr "收集账号信息"
+
+#: assets/automations/base/manager.py:205
 msgid "Verifying the new credentials"
 msgstr "验证新凭据"
 
-#: assets/automations/base/manager.py:181
+#: assets/automations/base/manager.py:211
 msgid "Checking the target account"
 msgstr "检查目标账号"
 
-#: assets/automations/base/manager.py:182
+#: assets/automations/base/manager.py:212
 msgid "Updating the account credentials"
 msgstr "更新账号凭据"
 
-#: assets/automations/base/manager.py:185
+#: assets/automations/base/manager.py:215
 msgid "Removing the account"
 msgstr "删除账号"
 
-#: assets/automations/base/manager.py:186
+#: assets/automations/base/manager.py:216
 msgid "Checking account removal conditions"
 msgstr "检查账号删除条件"
 
-#: assets/automations/base/manager.py:191
+#: assets/automations/base/manager.py:221
 msgid "Executing automation"
 msgstr "执行自动化操作"
 
-#: assets/automations/base/manager.py:203
+#: assets/automations/base/manager.py:233
 #, python-format
 msgid "Stage: %(stage)s"
 msgstr "▶ 阶段：%(stage)s"
 
-#: assets/automations/base/manager.py:209
-#: assets/automations/base/manager.py:1038
+#: assets/automations/base/manager.py:239
+#: assets/automations/base/manager.py:1072
 #, python-format
 msgid "• %(host)s: processing"
 msgstr "• %(host)s：正在处理"
 
-#: assets/automations/base/manager.py:265
+#: assets/automations/base/manager.py:295
 #: assets/automations/ping_gateway/manager.py:408
 #, python-format
 msgid "Successful: %(count)s"
 msgstr "成功 %(count)s"
 
-#: assets/automations/base/manager.py:268
+#: assets/automations/base/manager.py:298
 #, python-format
 msgid "Needs verification: %(count)s"
 msgstr "待确认 %(count)s"
 
-#: assets/automations/base/manager.py:272
+#: assets/automations/base/manager.py:302
 #: assets/automations/ping_gateway/manager.py:411
 #, python-format
 msgid "Failed: %(count)s"
 msgstr "失败 %(count)s"
 
-#: assets/automations/base/manager.py:274
+#: assets/automations/base/manager.py:304
 #: assets/automations/ping_gateway/manager.py:412
 #, python-format
 msgid "Total: %(count)s"
 msgstr "总计 %(count)s"
 
-#: assets/automations/base/manager.py:284
+#: assets/automations/base/manager.py:314
 #: assets/automations/ping_gateway/manager.py:406
 #, python-format
 msgid "Result: %(result)s"
 msgstr "执行结果：%(result)s"
 
-#: assets/automations/base/manager.py:295
+#: assets/automations/base/manager.py:325
 msgid "Task: {} finished"
 msgstr "任务：{} 完成"
 
-#: assets/automations/base/manager.py:338
-#: assets/automations/base/manager.py:782
+#: assets/automations/base/manager.py:368
+#: assets/automations/base/manager.py:812
 #: assets/automations/ping_gateway/manager.py:133
 msgid "Unknown error"
 msgstr "未知错误"
 
-#: assets/automations/base/manager.py:340
-#: assets/automations/base/manager.py:787
+#: assets/automations/base/manager.py:370
+#: assets/automations/base/manager.py:817
 #, python-format
 msgid "Operation failed: %(reason)s"
 msgstr "执行失败：%(reason)s"
 
-#: assets/automations/base/manager.py:572
+#: assets/automations/base/manager.py:602
 #, python-format
 msgid "✗ %(asset)s: automation is not configured for its platform"
 msgstr "✗ %(asset)s：所在平台未配置自动化方式"
 
-#: assets/automations/base/manager.py:580
+#: assets/automations/base/manager.py:610
 #, python-format
 msgid "✗ %(asset)s: this automation is not enabled"
 msgstr "✗ %(asset)s：未启用此自动化任务"
 
-#: assets/automations/base/manager.py:589
-#, fuzzy, python-format
-#| msgid "✗ %(asset)s: this automation is not enabled"
+#: assets/automations/base/manager.py:619
+#, python-format
 msgid "✗ %(asset)s: automation method is unavailable: %(method)s"
-msgstr "✗ %(asset)s：未启用此自动化任务"
+msgstr "✗ %(asset)s：自动化方式不可用：%(method)s"
 
-#: assets/automations/base/manager.py:599
+#: assets/automations/base/manager.py:629
 #, python-format
 msgid "✗ %(asset)s: unable to prepare this automation"
 msgstr "✗ %(asset)s：无法准备此自动化任务"
 
-#: assets/automations/base/manager.py:626
+#: assets/automations/base/manager.py:656
 msgid "Test asset connectivity"
 msgstr "测试资产可连接性"
 
-#: assets/automations/base/manager.py:627
+#: assets/automations/base/manager.py:657
 msgid "Gather asset information"
 msgstr "收集资产信息"
 
-#: assets/automations/base/manager.py:628
+#: assets/automations/base/manager.py:658
 msgid "Change account secret"
 msgstr "账号改密"
 
-#: assets/automations/base/manager.py:630
+#: assets/automations/base/manager.py:660
 msgid "Verify account credentials"
 msgstr "验证账号凭据"
 
-#: assets/automations/base/manager.py:641
+#: assets/automations/base/manager.py:671
 #, python-format
 msgid "Targets: %(assets)s asset(s)"
 msgstr "目标：%(assets)s 台资产"
 
-#: assets/automations/base/manager.py:645
+#: assets/automations/base/manager.py:675
 msgid "connection and authentication succeeded"
 msgstr "连接及认证成功"
 
-#: assets/automations/base/manager.py:646
+#: assets/automations/base/manager.py:676
 msgid "asset information collected"
 msgstr "资产信息收集完成"
 
-#: assets/automations/base/manager.py:647
+#: assets/automations/base/manager.py:677
 msgid "credential verification succeeded"
 msgstr "凭据验证通过"
 
-#: assets/automations/base/manager.py:648
+#: assets/automations/base/manager.py:678
 msgid "account information collected"
 msgstr "账号信息收集完成"
 
-#: assets/automations/base/manager.py:649
+#: assets/automations/base/manager.py:679
 msgid "account removed"
 msgstr "账号删除成功"
 
-#: assets/automations/base/manager.py:651
+#: assets/automations/base/manager.py:681
 msgid "completed"
 msgstr "执行完成"
 
-#: assets/automations/base/manager.py:662
+#: assets/automations/base/manager.py:692
 msgid "verifying the new credential"
 msgstr "验证新凭据"
 
-#: assets/automations/base/manager.py:664
+#: assets/automations/base/manager.py:694
 msgid "checking the target account"
 msgstr "检查目标账号"
 
-#: assets/automations/base/manager.py:665
+#: assets/automations/base/manager.py:695
 msgid "creating the target account"
 msgstr "创建目标账号"
 
-#: assets/automations/base/manager.py:667
+#: assets/automations/base/manager.py:697
 msgid "configuring sudo privileges"
 msgstr "配置 sudo 权限"
 
-#: assets/automations/base/manager.py:668
+#: assets/automations/base/manager.py:698
 msgid "updating the SSH key"
 msgstr "更新 SSH 密钥"
 
-#: assets/automations/base/manager.py:669
+#: assets/automations/base/manager.py:699
 msgid "changing the target credential"
 msgstr "修改目标凭据"
 
-#: assets/automations/base/manager.py:670
+#: assets/automations/base/manager.py:700
 msgid "saving the execution result"
 msgstr "保存执行结果"
 
-#: assets/automations/base/manager.py:675
+#: assets/automations/base/manager.py:705
 msgid "executing the automation step"
 msgstr "执行自动化步骤"
 
-#: assets/automations/base/manager.py:699
+#: assets/automations/base/manager.py:729
 #, python-format
 msgid ""
 "%(step)s failed: the new credential was rejected; the remote credential may "
 "already have changed, verify it before retrying"
 msgstr "%(step)s失败：新凭据被拒绝；远端凭据可能已经修改，请先核实再重试"
 
-#: assets/automations/base/manager.py:707
+#: assets/automations/base/manager.py:737
 #, python-format
 msgid ""
 "%(step)s failed: %(target)s rejected the execution account %(account)s; the "
@@ -2888,158 +2924,168 @@ msgstr ""
 "%(step)s失败：%(target)s 拒绝执行账号 %(account)s 登录；尚未执行到凭据修改，"
 "请检查执行账号凭据，若凭据有效请降低并发连接后重试"
 
-#: assets/automations/base/manager.py:717
+#: assets/automations/base/manager.py:747
 #, python-format
 msgid ""
 "%(step)s failed: authentication was rejected; check the execution or target "
 "account credential"
 msgstr "%(step)s失败：认证被拒绝，请检查执行账号或目标账号凭据"
 
-#: assets/automations/base/manager.py:725
+#: assets/automations/base/manager.py:755
 msgid "Unable to resolve the asset address; check DNS or the asset address"
 msgstr "无法解析资产地址，请检查 DNS 或资产地址配置"
 
-#: assets/automations/base/manager.py:732
+#: assets/automations/base/manager.py:762
 msgid ""
 "SSH host key verification failed; verify that the asset host key changed as "
 "expected"
 msgstr "SSH 主机密钥校验失败，请确认资产主机密钥是否发生了预期变更"
 
-#: assets/automations/base/manager.py:736
+#: assets/automations/base/manager.py:766
 msgid "Connection timed out; check the network, port, or gateway"
 msgstr "连接超时，请检查网络、端口或网关"
 
-#: assets/automations/base/manager.py:743
+#: assets/automations/base/manager.py:773
 msgid "Unable to connect; check the network, port, and service"
 msgstr "无法连接目标，请检查网络、端口及服务状态"
 
-#: assets/automations/base/manager.py:750
+#: assets/automations/base/manager.py:780
 msgid ""
 "The SSH connection was interrupted; check connection limits, security "
 "policies, or network stability"
 msgstr "SSH 连接被中断，请检查连接数限制、安全策略或网络稳定性"
 
-#: assets/automations/base/manager.py:757
+#: assets/automations/base/manager.py:787
 msgid ""
 "Privilege escalation failed; check the sudo or become configuration of the "
 "execution account"
 msgstr "权限提升失败，请检查执行账号的 sudo 或 become 配置"
 
-#: assets/automations/base/manager.py:765
+#: assets/automations/base/manager.py:795
 msgid ""
 "The target system rejected the new credential because it does not meet the "
 "password policy"
 msgstr "新凭据不符合目标系统的密码策略，已被目标系统拒绝"
 
-#: assets/automations/base/manager.py:770
+#: assets/automations/base/manager.py:800
 #, python-format
 msgid ""
 "%(step)s failed: the execution account has insufficient permissions on the "
 "target system"
 msgstr "%(step)s失败：执行账号在目标系统上的权限不足"
 
-#: assets/automations/base/manager.py:776
+#: assets/automations/base/manager.py:806
 msgid "The target account was not found or is inactive"
 msgstr "目标账号不存在或已失效"
 
-#: assets/automations/base/manager.py:779
+#: assets/automations/base/manager.py:809
 msgid "The account is being processed by another task; try again later"
 msgstr "账号正在被其他任务处理，请稍后重试"
 
-#: assets/automations/base/manager.py:845
-#, fuzzy
-#| msgid "Asset not found"
+#: assets/automations/base/manager.py:879
 msgid "Asset not found or inactive"
-msgstr "资产不存在"
+msgstr "资产不存在或已停用"
 
-#: assets/automations/base/manager.py:895
+#: assets/automations/base/manager.py:929
 #, python-format
 msgid "✗ %(host)s: %(error)s"
 msgstr "✗ %(host)s：%(error)s"
 
-#: assets/automations/base/manager.py:919
+#: assets/automations/base/manager.py:953
 #, python-format
 msgid "✗ %(host)s: unable to prepare (%(error)s)"
 msgstr "✗ %(host)s：准备失败（%(error)s）"
 
-#: assets/automations/base/manager.py:940
+#: assets/automations/base/manager.py:974
 msgid "Stage: Saving execution results"
 msgstr "▶ 阶段：保存执行结果"
 
-#: assets/automations/base/manager.py:1088
+#: assets/automations/base/manager.py:1122
 #, python-format
 msgid "Automation task exceeded the maximum runtime of %(seconds)s seconds"
-msgstr ""
+msgstr "自动化任务已超过最大运行时间 %(seconds)s 秒"
 
-#: assets/automations/base/manager.py:1106
-#, fuzzy
-#| msgid "Unknown"
+#: assets/automations/base/manager.py:1140
 msgid "Unknown task"
-msgstr "未知"
+msgstr "未知任务"
 
-#: assets/automations/base/manager.py:1123
+#: assets/automations/base/manager.py:1157
 #, python-format
 msgid " and %(count)s more"
-msgstr ""
+msgstr "，另有 %(count)s 个"
 
-#: assets/automations/base/manager.py:1186
+#: assets/automations/base/manager.py:1220
 #, python-format
 msgid "Still processing %(count)s target(s): %(detail)s"
 msgstr "仍在处理 %(count)s 个目标：%(detail)s"
 
-#: assets/automations/base/manager.py:1192
-#: assets/automations/base/manager.py:1356
+#: assets/automations/base/manager.py:1226
+#: assets/automations/base/manager.py:1390
 #: assets/automations/ping_gateway/manager.py:319
 #: assets/automations/ping_gateway/manager.py:354
 msgid "Task canceled by user"
-msgstr ""
+msgstr "任务已被用户取消"
 
-#: assets/automations/base/manager.py:1308
-#: assets/automations/base/manager.py:1416
+#: assets/automations/base/manager.py:1342
+#: assets/automations/base/manager.py:1457
 msgid "Hosts still waiting"
-msgstr ""
+msgstr "仍在等待的主机"
 
-#: assets/automations/base/manager.py:1318
+#: assets/automations/base/manager.py:1352
 #, python-format
 msgid "Batch execution failed: %(error)s"
 msgstr "本批任务执行失败：%(error)s"
 
-#: assets/automations/base/manager.py:1332
+#: assets/automations/base/manager.py:1366
 #, python-format
 msgid "Task: %(task)s"
 msgstr "任务：%(task)s"
 
-#: assets/automations/base/manager.py:1336
+#: assets/automations/base/manager.py:1370
 msgid "Stage: Preparing execution"
 msgstr "▶ 阶段：准备执行环境"
 
-#: assets/automations/base/manager.py:1340
+#: assets/automations/base/manager.py:1374
 #, python-format
 msgid "Task will run in %(count)s batches"
 msgstr "任务将分 %(count)s 批执行"
 
-#: assets/automations/base/manager.py:1345
+#: assets/automations/base/manager.py:1379
 msgid "Targets are ready; starting execution"
 msgstr "目标准备完成，开始执行"
 
-#: assets/automations/base/manager.py:1347
+#: assets/automations/base/manager.py:1381
 msgid "No eligible targets were found"
 msgstr "没有可执行的目标"
 
-#: assets/automations/base/manager.py:1364
+#: assets/automations/base/manager.py:1398
 #, python-format
 msgid "Processing batch %(current)s of %(total)s"
 msgstr "正在执行第 %(current)s/%(total)s 批"
 
-#: assets/automations/base/manager.py:1404
+#: assets/automations/base/manager.py:1445
 #, python-format
 msgid "Ansible runner stopped before completing the batch: %(status)s"
-msgstr ""
+msgstr "Ansible 运行器在完成本批任务前停止：%(status)s"
 
-#: assets/automations/base/manager.py:1419
+#: assets/automations/base/manager.py:1460
 #, python-format
 msgid "Batch did not complete: %(reason)s"
 msgstr "本批任务未完成：%(reason)s"
+
+#: assets/automations/gather_facts/format_asset_info.py:23
+msgid "CPU list format not recognized"
+msgstr "无法识别 CPU 列表格式"
+
+#: assets/automations/gather_facts/format_asset_info.py:28
+#, python-format
+msgid "Error processing CPU model list: %(error)s"
+msgstr "处理 CPU 型号列表失败：%(error)s"
+
+#: assets/automations/gather_facts/format_asset_info.py:41
+#, python-format
+msgid "Error processing GPU model list: %(error)s"
+msgstr "处理 GPU 型号列表失败：%(error)s"
 
 #: assets/automations/ping_gateway/manager.py:64
 msgid ""
@@ -3196,8 +3242,7 @@ msgstr "禁用"
 
 #: assets/const/base.py:35 settings/serializers/basic.py:8
 #: users/serializers/preference/koko.py:19
-#: users/serializers/preference/lina.py:51
-#: users/serializers/preference/luna.py:89
+#: users/serializers/preference/lina.py:70
 msgid "Basic"
 msgstr "基本"
 
@@ -3269,21 +3314,6 @@ msgstr "TP-Link"
 #: terminal/models/applet/applet.py:30 tickets/const.py:9
 msgid "General"
 msgstr "一般"
-
-#: users/serializers/preference/luna.py:91
-msgctxt "Luna preference section"
-msgid "General"
-msgstr "基本配置"
-
-#: users/serializers/preference/luna.py:95
-msgctxt "Luna preference section"
-msgid "GUI"
-msgstr "图形化"
-
-#: users/serializers/preference/luna.py:99
-msgctxt "Luna preference section"
-msgid "CLI"
-msgstr "命令行"
 
 #: assets/const/device.py:13
 msgid "Switch"
@@ -3626,8 +3656,6 @@ msgstr "自动化任务"
 msgid "Asset automation task"
 msgstr "资产自动化任务"
 
-# msgid "Comment"
-# msgstr "备注"
 #: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
 #: ops/models/base.py:54 ops/models/job.py:278
@@ -4445,7 +4473,7 @@ msgid "Symlink"
 msgstr "建立软链接"
 
 #: audits/const.py:18 audits/const.py:29
-#: ops/templates/ops/celery_task_log.html:306
+#: ops/templates/ops/celery_task_log.html:380
 #: terminal/api/session/session.py:170
 msgid "Download"
 msgstr "下载"
@@ -5013,7 +5041,7 @@ msgstr "耗时分布"
 msgid "Duration range"
 msgstr "耗时范围"
 
-#: audits/serializers.py:39 ops/serializers/celery.py:27
+#: audits/serializers.py:39 ops/serializers/celery.py:30
 msgid "Execution cycle"
 msgstr "周期执行"
 
@@ -5062,11 +5090,11 @@ msgstr "用户 %s 登录系统 %s"
 msgid "User %s perform a task for this resource: %s"
 msgstr "用户 %s 在当前资源， 执行了任务 (%s)"
 
-#: audits/tasks.py:184
+#: audits/tasks.py:190
 msgid "Clean audits session task log"
 msgstr "清理资产审计会话任务日志"
 
-#: audits/tasks.py:186
+#: audits/tasks.py:192
 msgid ""
 "Since the system generates login logs, operation logs, file upload logs, "
 "activity \n"
@@ -5080,11 +5108,11 @@ msgstr ""
 "话录像和命令记录，改密日志，所以系统会根据系统设置-任务列表-定期清理配置，对"
 "于超出时间的于每天凌晨2点进行清理"
 
-#: audits/tasks.py:206
+#: audits/tasks.py:212
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
 
-#: audits/tasks.py:208
+#: audits/tasks.py:214
 msgid ""
 "If SERVER_REPLAY_STORAGE is configured, files uploaded through file "
 "management will be \n"
@@ -5608,7 +5636,7 @@ msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
 #: authentication/middleware.py:94 terminal/api/component/storage.py:129
-#: xpack/plugins/cloud/providers/fc.py:47
+#: xpack/plugins/cloud/providers/fc.py:48
 #: xpack/plugins/cloud/providers/proxmox.py:29
 msgid "Authentication failed"
 msgstr "认证失败"
@@ -5740,13 +5768,13 @@ msgstr "私有令牌"
 
 #: authentication/models/ssh_key.py:15 terminal/serializers/storage.py:146
 #: users/models/user/__init__.py:99
-#: xpack/plugins/cloud/serializers/account_attrs.py:250
+#: xpack/plugins/cloud/serializers/account_attrs.py:258
 msgid "Private key"
 msgstr "ssh私钥"
 
 #: authentication/models/ssh_key.py:18 settings/serializers/terminal.py:38
 #: users/forms/profile.py:175 users/models/user/__init__.py:102
-#: xpack/plugins/cloud/serializers/account_attrs.py:247
+#: xpack/plugins/cloud/serializers/account_attrs.py:255
 msgid "Public key"
 msgstr "SSH公钥"
 
@@ -6821,8 +6849,6 @@ msgstr "无效选项: {}"
 msgid "Tags"
 msgstr "标签"
 
-# msgid "Labels"
-# msgstr "标签管理"
 #: common/tasks.py:35
 msgid "Send email"
 msgstr "发件邮件"
@@ -7448,7 +7474,7 @@ msgstr "内存使用率超过 {max_threshold}%: => {value}"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
-#: ops/serializers/celery.py:29
+#: ops/serializers/celery.py:32
 msgid "Next execution time"
 msgstr "下次执行时间"
 
@@ -7568,8 +7594,9 @@ msgstr ""
 "由于作业中心执行快捷命令，playbook，会产生执行记录，系统会根据系统设置-任务列"
 "表-定期清理-作业中心执行历史配置，每天凌晨2点对超出保存时间的记录进行清理"
 
-#: ops/templates/ops/celery_task_log.html:296
-#: ops/templates/ops/celery_task_log.html:300
+#: ops/templates/ops/celery_task_log.html:365
+#: ops/templates/ops/celery_task_log.html:369
+#: ops/templates/ops/celery_task_log.html:387
 #: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
 msgid "Output"
 msgstr "输出"
@@ -9024,7 +9051,7 @@ msgid "SSO auth key TTL"
 msgstr "令牌有效期"
 
 #: settings/serializers/auth/sso.py:20
-#: xpack/plugins/cloud/serializers/account_attrs.py:237
+#: xpack/plugins/cloud/serializers/account_attrs.py:245
 msgid "Unit: second"
 msgstr "单位: 秒"
 
@@ -9425,8 +9452,6 @@ msgstr "RDP 颜色质量"
 msgid "RDP smart size"
 msgstr "RDP 智能尺寸"
 
-# msgid "Rdp smart size"
-# msgstr "RDP 智能大小"
 #: settings/serializers/luna.py:50 users/serializers/preference/luna.py:58
 msgid ""
 "Determines whether the client computer should scale the content on the "
@@ -12252,8 +12277,6 @@ msgstr "微信"
 msgid "OTP secret key"
 msgstr "OTP 密钥"
 
-# msgid "Private key"
-# msgstr "ssh私钥"
 #: users/models/user/__init__.py:105 users/serializers/profile.py:86
 #: users/serializers/user.py:262
 msgid "Is first login"
@@ -12388,20 +12411,27 @@ msgstr ""
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/preference/lina.py:47 users/serializers/profile.py:66
+#: users/serializers/preference/lina.py:64 users/serializers/profile.py:66
 msgid "Language"
 msgstr "语言"
 
-#: users/serializers/preference/lina.py:52
+#: users/serializers/preference/lina.py:71
 msgid "File Encryption"
 msgstr "文件加密密码"
 
-#: users/serializers/preference/luna.py:90
-msgid "Graphics"
+#: users/serializers/preference/luna.py:91
+msgctxt "Luna preference section"
+msgid "General"
+msgstr "基本配置"
+
+#: users/serializers/preference/luna.py:95
+msgctxt "Luna preference section"
+msgid "GUI"
 msgstr "图形化"
 
-#: users/serializers/preference/luna.py:91
-msgid "Command line"
+#: users/serializers/preference/luna.py:99
+msgctxt "Luna preference section"
+msgid "CLI"
 msgstr "命令行"
 
 #: users/serializers/profile.py:22
@@ -13534,7 +13564,7 @@ msgstr "订阅 ID"
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
 #: xpack/plugins/cloud/serializers/account_attrs.py:163
 #: xpack/plugins/cloud/serializers/account_attrs.py:193
-#: xpack/plugins/cloud/serializers/account_attrs.py:243
+#: xpack/plugins/cloud/serializers/account_attrs.py:251
 msgid "API Endpoint"
 msgstr "API 端点"
 
@@ -13574,15 +13604,31 @@ msgstr "服务账号密钥"
 msgid "The file is in JSON format"
 msgstr "JSON 格式的文件"
 
+#: xpack/plugins/cloud/serializers/account_attrs.py:196
+msgid "Local user"
+msgstr "本地用户"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:197
+msgid "Domain user"
+msgstr "域用户"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:198
+msgid "Interface interconnection user"
+msgstr "接口互联用户"
+
 #: xpack/plugins/cloud/serializers/account_attrs.py:200
+msgid "User type"
+msgstr "用户类型"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:208
 msgid "IP address invalid `{}`, {}"
 msgstr "IP 地址无效: `{}`, {}"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:216
+#: xpack/plugins/cloud/serializers/account_attrs.py:224
 msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
 msgstr "例: 192.168.1.0/24,10.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:219
+#: xpack/plugins/cloud/serializers/account_attrs.py:227
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -13591,23 +13637,23 @@ msgstr ""
 "端口用来检测 IP 地址的有效性，在同步任务执行时，只会同步有效的 IP 地址。 <br>"
 "如果端口为 0，则表示所有 IP 地址均有效。"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:227
+#: xpack/plugins/cloud/serializers/account_attrs.py:235
 msgid "Hostname prefix"
 msgstr "主机名前缀"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:230
+#: xpack/plugins/cloud/serializers/account_attrs.py:238
 msgid "IP segment"
 msgstr "IP 网段"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:234
+#: xpack/plugins/cloud/serializers/account_attrs.py:242
 msgid "Test port"
 msgstr "测试端口"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:237
+#: xpack/plugins/cloud/serializers/account_attrs.py:245
 msgid "Test timeout"
 msgstr "测试超时时间"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:253
+#: xpack/plugins/cloud/serializers/account_attrs.py:261
 msgid "Project"
 msgstr "project"
 
@@ -13737,189 +13783,3 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "许可证无效"
-
-#~ msgid "Local user"
-#~ msgstr "本地用户"
-
-#~ msgid "Domain user"
-#~ msgstr "域用户"
-
-#~ msgid "Interface interconnection user"
-#~ msgstr "接口互联用户"
-
-#~ msgid "User type"
-#~ msgstr "用户类型"
-
-#~ msgid "Check the discovered accounts"
-#~ msgstr "检查发现的账号"
-
-#~ msgid ""
-#~ "Perform checks and analyses based on automatically discovered account "
-#~ "results, including user groups, public keys, sudoers, and other "
-#~ "information."
-#~ msgstr ""
-#~ "根据自动发现的账号结果进行检查分析，包括用户组、公钥、sudoers等信息。"
-
-#~ msgid "Task log"
-#~ msgstr "任务列表"
-
-#~ msgid "Plan execution end"
-#~ msgstr "计划执行结束"
-
-#, fuzzy, python-format
-#~| msgid "Success: %s, Failed: %s, Total: %s"
-#~ msgid "Success: %s, Unverified: %s, Failed: %s, Total: %s"
-#~ msgstr "成功: %s, 失败: %s, 总数: %s"
-
-#~ msgid ""
-#~ "---\n"
-#~ "Summary: \n"
-#~ "ok: {}, weak password: {}, leaked password: {}, repeated password: {}, no "
-#~ "secret: {}, using time: {}s"
-#~ msgstr ""
-#~ "---\n"
-#~ "摘要: \n"
-#~ "正常: {}, 弱密码: {}, 泄露密码: {}, 重复密码: {}, 无密码: {}, 耗时: {}秒"
-
-#, fuzzy, python-format
-#~| msgid "Success: %s, Failed: %s, Total: %s"
-#~ msgid ""
-#~ "Success: %(success)s, Unverified: %(unverified)s, Failed: %(failed)s, "
-#~ "Total: %(total)s"
-#~ msgstr "成功: %s, 失败: %s, 总数: %s"
-
-#~ msgid ">>> Start executing the task to test gateway account connectivity"
-#~ msgstr ">>> 开始执行测试网关账号可连接性任务"
-
-#~ msgid "  - Platform {} ansible disabled"
-#~ msgstr "  - 平台 {} Ansible 已禁用, 无法执行任务"
-
-#~ msgid ">>> Task preparation phase"
-#~ msgstr ">>> 任务准备阶段"
-
-#, python-format
-#~ msgid "Preparing task: %(task)s"
-#~ msgstr "正在准备任务：%(task)s"
-
-#~ msgid "Starting task"
-#~ msgstr "开始执行任务"
-
-#, python-format
-#~ msgid "✓ %(host)s: completed"
-#~ msgstr "✓ %(host)s：已完成"
-
-#, python-format
-#~ msgid "Running: %(task)s"
-#~ msgstr "正在执行：%(task)s"
-
-#~ msgid "Testing connectivity and credentials"
-#~ msgstr "检测网络连接并验证账号"
-
-#~ msgid "Verifying account credentials"
-#~ msgstr "验证账号凭据"
-
-#~ msgid "Collecting asset information"
-#~ msgstr "收集资产信息"
-
-#~ msgid "Collecting account information"
-#~ msgstr "收集账号信息"
-
-#~ msgid "Authentication failed; check the account credentials"
-#~ msgstr "认证失败，请检查执行账号或目标账号凭据"
-
-#, python-brace-format
-#~ msgid ">>> Executing tasks in batches, total {runner_count}"
-#~ msgstr ">>> 分次执行任务，总共 {runner_count}"
-
-#~ msgid ">>> Start executing tasks"
-#~ msgstr ">>> 开始执行任务"
-
-#~ msgid ">>> No tasks need to be executed"
-#~ msgstr ">>> 没有需要执行的任务"
-
-#, python-brace-format
-#~ msgid ">>> Begin executing batch {index} of tasks"
-#~ msgstr ">>> 开始执行第 {index} 批任务"
-
-#~ msgid "Asset, {}, using account {}"
-#~ msgstr "资产, {}, 使用账号 {}"
-
-#, python-brace-format
-#~ msgid "Unable to connect to port {port} on {address}"
-#~ msgstr "无法连接到 {port} 上的端口 {address}"
-
-#~ msgid ">>> Start executing the task to test gateway connectivity"
-#~ msgstr ">>> 开始执行测试网关可连接性任务"
-
-#, python-format
-#~ msgid "Checking: %(gateway)s"
-#~ msgstr "正在检查：%(gateway)s"
-
-#, python-format
-#~ msgid "✓ %(gateway)s: connection successful"
-#~ msgstr "✓ %(gateway)s：连接正常"
-
-#~ msgid "Windows password cannot contain special characters like > ^"
-#~ msgstr "Windows 密码不能包含特殊字符，例如 > ^"
-
-#, python-format
-#~ msgid "Success: %s, Failed: %s, Total: %s"
-#~ msgstr "成功: %s, 失败: %s, 总数: %s"
-
-#~ msgid ""
-#~ "length is the length of the password, and the range is 8 to 30.\n"
-#~ "lowercase indicates whether the password contains lowercase letters, \n"
-#~ "uppercase indicates whether it contains uppercase letters,\n"
-#~ "digit indicates whether it contains numbers, and symbol indicates whether "
-#~ "it contains special symbols.\n"
-#~ "exclude_symbols is used to exclude specific symbols. You can fill in the "
-#~ "symbol characters to be excluded (up to 16). \n"
-#~ "If you do not need to exclude symbols, you can leave it blank.\n"
-#~ "default: {\"length\": 16, \"lowercase\": true, \"uppercase\": true, "
-#~ "\"digit\": true, \"symbol\": true, \"exclude_symbols\": \"\"}"
-#~ msgstr ""
-#~ "length 是密码的长度，填写范围为 8 到 30。lowercase 表示密码中是否包含小写"
-#~ "字母，uppercase 表示是否包含大写字母，digit 表示是否包含数字，symbol 表示"
-#~ "是否包含特殊符号。exclude_symbols 用于排除特定符号，您可以填写要排除的符号"
-#~ "字符（最多 16 个），如果无需排除符号，可以留空。默认: {\"length\": 16, "
-#~ "\"lowercase\": true, \"uppercase\": true, \"digit\": true, \"symbol\": "
-#~ "true, \"exclude_symbols\": \"\"}"
-
-#~ msgid "MySQL port"
-#~ msgstr "MySQL 端口"
-
-#~ msgid "MariaDB port"
-#~ msgstr "MariaDB 端口"
-
-#~ msgid "PostgreSQL port"
-#~ msgstr "PostgreSQL 端口"
-
-#~ msgid "Redis port"
-#~ msgstr "Redis 端口"
-
-#~ msgid "SQLServer port"
-#~ msgstr "SQLServer 端口"
-
-#~ msgid "Oracle port"
-#~ msgstr "Oracle 端口"
-
-#~ msgid "MongoDB port"
-#~ msgstr "MongoDB 端口"
-
-#~ msgid "The current organization type already exists"
-#~ msgstr "当前组织已存在该类型"
-
-#~ msgid "domain_name"
-#~ msgstr "域名"
-
-#~ msgid "Automation ID"
-#~ msgstr "自动化 ID"
-
-#~ msgid "Verify TLS"
-#~ msgstr "校验 TLS"
-
-#~ msgid "Waiting task start"
-#~ msgstr "等待任务开始"
-
-#~ msgid "Offline video player"
-#~ msgstr "离线录像播放器"

@@ -251,7 +251,7 @@ class AccountBackupHandler:
                 f'\033[31m>>> {no_assigned_sftp_server}\033[0m'
                 ''
             )
-            raise RecipientsNotFound('Not Found Recipients')
+            raise RecipientsNotFound(_('Recipients not found'))
         if obj_recipients_part_one and obj_recipients_part_two:
             print(f'\033[32m>>> {split_help_text}\033[0m')
             files = self.create_excel(section='front')

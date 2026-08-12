@@ -14,7 +14,7 @@ from celery.worker import state as celery_worker_state
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_noop
 from premailer import transform
 
 from common.const import Status
@@ -156,17 +156,47 @@ class SSHTunnelManager:
 
 class PlaybookCallback(DefaultCallback):
     STAGE_MAPPERS = {
-        'ping': (1, "Testing connectivity and credentials"),
-        'verify_account': (1, "Verifying account credentials"),
-        'gather_facts': (1, "Collecting asset information"),
-        'gather_accounts': (1, "Collecting account information"),
+        'ping': (1, gettext_noop("Testing connectivity and credentials")),
+        'verify_account': (1, gettext_noop("Verifying account credentials")),
+        'gather_facts': (1, gettext_noop("Collecting asset information")),
+        'gather_accounts': (1, gettext_noop("Collecting account information")),
     }
 
-    def __init__(self, task_type=''):
+    def __init__(self, task_type='', task_id=None):
         super().__init__()
         self.task_type = str(task_type)
         self.announced_hosts = set()
         self.current_stage = 0
+        self.ansible_task_id = task_id
+        self.ansible_log = None
+
+    def open_ansible_log(self):
+        if not self.ansible_log and self.ansible_task_id:
+            from ops.ansible.utils import get_ansible_task_log_path
+            log_path = get_ansible_task_log_path(self.ansible_task_id)
+            self.ansible_log = open(
+                log_path, 'a', encoding='utf-8', buffering=1
+            )
+
+    def write_ansible_output(self, output):
+        if not output:
+            return
+        self.open_ansible_log()
+        if not self.ansible_log:
+            return
+        output = str(output)
+        self.ansible_log.write(output)
+        if not output.endswith(('\n', '\r')):
+            self.ansible_log.write('\n')
+        self.ansible_log.flush()
+
+    def event_handler(self, data, **kwargs):
+        self.write_ansible_output(data.get('stdout'))
+        return super().event_handler(data, **kwargs)
+
+    def close(self):
+        if self.ansible_log and not self.ansible_log.closed:
+            self.ansible_log.close()
 
     def get_stage(self, task):
         task = str(task or '').lower()
@@ -821,7 +851,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             inventory_path,
             playbook_path,
             self.runtime_dir,
-            callback=PlaybookCallback(self.method_type()),
+            callback=PlaybookCallback(
+                self.method_type(),
+                self.execution.snapshot.get('celery_task_id')
+                or self.execution.id,
+            ),
         )
         return runner, inventory_path
 
@@ -1370,6 +1404,13 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             ssh_tunnel = SSHTunnelManager()
             self.announce_runner_targets(runner, info.get('inventory'))
             self.configure_runner_environment(runner)
+
+            platform = info.get('platform')
+            platform_name = getattr(platform, 'name', '')
+            batch_heading = '\n### Ansible {}/{}'.format(i, total_runners)
+            if platform_name:
+                batch_heading += ' [{}]'.format(platform_name)
+            runner.cb.write_ansible_output(batch_heading + '\n')
 
             try:
                 gateway_ready = ssh_tunnel.local_gateway_prepare(

@@ -1,3 +1,4 @@
+import os
 from logging import StreamHandler
 from threading import get_ident
 
@@ -8,6 +9,7 @@ from kombu import Connection, Exchange, Queue, Producer
 from kombu.mixins import ConsumerMixin
 
 from .utils import get_celery_task_log_path
+from ..ansible.utils import get_ansible_task_log_path
 from ..const import CELERY_LOG_MAGIC_MARK
 
 routing_key = 'celery_log'
@@ -266,3 +268,8 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
             f.write(CELERY_LOG_MAGIC_MARK)
             f.close()
         self.task_id_thread_id_mapper.pop(task_id, None)
+
+        ansible_log_path = get_ansible_task_log_path(task_id, create=False)
+        if os.path.isfile(ansible_log_path):
+            with open(ansible_log_path, 'ab') as ansible_log:
+                ansible_log.write(CELERY_LOG_MAGIC_MARK)

@@ -208,7 +208,9 @@ class CheckAccountManager(BaseManager):
                 engine_names.append(engine)
 
         if not engine_names:
-            raise ValueError('No supported account security check selected')
+            raise ValueError(_(
+                'No supported account security check selected'
+            ))
         return engine_names
 
     def init_handlers(self, engine_names):
@@ -397,7 +399,9 @@ class CheckAccountManager(BaseManager):
             'account-risk-check:{}'.format(self.execution.org_id)
         )
         if not lock.acquire(blocking=False):
-            raise RuntimeError('Another account risk check is already running')
+            raise RuntimeError(_(
+                'Another account risk check is already running'
+            ))
 
         try:
             self.run_checks()

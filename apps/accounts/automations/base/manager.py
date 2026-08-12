@@ -175,7 +175,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
     def get_accounts(self, privilege_account) -> BaseAccountQuerySet | None:
         if not privilege_account:
-            print('Not privilege account')
+            print(_('No privileged account'))
             return
 
         asset = privilege_account.asset
