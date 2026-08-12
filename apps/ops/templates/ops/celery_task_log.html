@@ -76,7 +76,7 @@
         }
 
         body {
-            padding: 18px 20px 20px;
+            padding: 10px 16px 14px;
             background: #f6f8fa;
             color: #24292f;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -92,12 +92,17 @@
             min-height: 0;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 8px;
         }
 
         .header {
             flex: 0 0 auto;
             min-width: 0;
+            min-height: 28px;
+            display: grid;
+            grid-template-columns: minmax(180px, auto) 1fr;
+            align-items: center;
+            column-gap: 20px;
             padding: 0 4px;
         }
 
@@ -158,17 +163,67 @@
             letter-spacing: -0.5px;
         }
 
-        #term {
+        .terminal-body {
+            position: relative;
             min-width: 0;
             min-height: 0;
             flex: 1 1 auto;
-            padding: 13px 14px;
+            background: #0d1117;
+            overflow: hidden;
+        }
+
+        #term {
+            width: 100%;
+            height: 100%;
+            padding: 11px 12px;
             background: #0d1117;
             overflow: hidden;
         }
 
         #term .xterm-viewport {
             background-color: #0d1117;
+            overflow-y: scroll !important;
+            scrollbar-width: none;
+        }
+
+        #term .xterm-viewport::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .terminal-scrollbar {
+            position: absolute;
+            z-index: 3;
+            top: 8px;
+            right: 3px;
+            bottom: 8px;
+            width: 9px;
+            background: #21262d;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .terminal-scrollbar[hidden] {
+            display: none;
+        }
+
+        .terminal-scrollbar-thumb {
+            width: 7px;
+            min-height: 36px;
+            margin-left: 1px;
+            background: #6e7681;
+            border-radius: 5px;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .terminal-scrollbar-thumb:hover,
+        .terminal-scrollbar-thumb.is-dragging {
+            background: #8c959f;
+        }
+
+        .terminal-scrollbar-thumb.is-dragging {
+            cursor: grabbing;
         }
 
         .info {
@@ -176,7 +231,7 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 6px 18px;
-            padding: 3px 0 0;
+            padding: 0;
             margin: 0;
         }
 
@@ -211,7 +266,13 @@
             font-size: 11px;
         }
 
-        #download-log-btn {
+        .terminal-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-button {
             flex: 0 0 auto;
             height: 30px;
             display: inline-flex;
@@ -230,21 +291,26 @@
             transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
         }
 
-        #download-log-btn svg {
+        .terminal-button svg {
             width: 14px;
             height: 14px;
             fill: currentColor;
         }
 
-        #download-log-btn:hover {
+        .terminal-button:hover,
+        .terminal-button.is-active {
             color: #f0f6fc;
             background: #30363d;
             border-color: #484f58;
         }
 
-        #download-log-btn:focus-visible {
+        .terminal-button:focus-visible {
             outline: 2px solid #58a6ff;
             outline-offset: 2px;
+        }
+
+        #toggle-ansible-log-btn[hidden] {
+            display: none;
         }
 
         @media (max-width: 640px) {
@@ -253,12 +319,15 @@
             }
 
             .header {
+                min-height: 0;
+                display: block;
                 padding: 0;
             }
 
             .info {
                 align-items: flex-start;
                 gap: 0;
+                padding-top: 2px;
             }
 
             .info .item {
@@ -297,16 +366,29 @@
         <div class="terminal-toolbar">
             <div class="terminal-heading">
                 <span class="terminal-mark" aria-hidden="true">&gt;_</span>
-                <span>{% trans 'Output' %}</span>
+                <span id="terminal-heading-label">{% trans 'Output' %}</span>
             </div>
-            <button id="download-log-btn" type="button">
-                <svg viewBox="0 0 16 16" aria-hidden="true">
-                    <path d="M3.75 14A1.75 1.75 0 0 1 2 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 12.25 14Zm4.78-3.47a.75.75 0 0 1-1.06 0l-2.75-2.75a.75.75 0 0 1 1.06-1.06l1.47 1.47V2.75a.75.75 0 0 1 1.5 0v5.44l1.47-1.47a.75.75 0 1 1 1.06 1.06Z"/>
-                </svg>
-                {% trans 'Download' %}
-            </button>
+            <div class="terminal-actions">
+                <button id="toggle-ansible-log-btn" class="terminal-button"
+                        type="button" aria-pressed="false" hidden>
+                    <span class="toggle-log-label">Ansible {% trans 'Detail' %}</span>
+                </button>
+                <button id="download-log-btn" class="terminal-button" type="button">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M3.75 14A1.75 1.75 0 0 1 2 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 12.25 14Zm4.78-3.47a.75.75 0 0 1-1.06 0l-2.75-2.75a.75.75 0 0 1 1.06-1.06l1.47 1.47V2.75a.75.75 0 0 1 1.5 0v5.44l1.47-1.47a.75.75 0 1 1 1.06 1.06Z"/>
+                    </svg>
+                    {% trans 'Download' %}
+                </button>
+            </div>
         </div>
-        <div id="term"></div>
+        <div class="terminal-body">
+            <div id="term"></div>
+            <div id="terminal-scrollbar" class="terminal-scrollbar" role="scrollbar"
+                 aria-label="{% trans 'Output' %}" aria-controls="term"
+                 aria-orientation="vertical" hidden>
+                <div class="terminal-scrollbar-thumb"></div>
+            </div>
+        </div>
     </section>
 </div>
 <script>
@@ -320,6 +402,12 @@
     var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
     var term;
     var ws;
+    var terminalViewport;
+    var terminalScrollbar;
+    var terminalScrollbarThumb;
+    var scrollbarDragStartY = 0;
+    var scrollbarDragStartTop = 0;
+    var currentLogType = 'celery';
     var vendor = "{{ vendor }}";
     var extraQuery = Object.fromEntries(new URLSearchParams(window.location.search));
     $(document).ready(function () {
@@ -341,34 +429,143 @@
         });
         term.open(document.getElementById('term'));
         window.fit.fit(term);
+        setupTerminalScrollbar();
 
-        ws = new WebSocket(wsURL);
+        connectLog('celery');
+        getAutomationExecutionInfo();
+    }).on('resize', window, function () {
+        window.fit.fit(term);
+        scheduleTerminalScrollbarUpdate();
+    });
+
+    function setupTerminalScrollbar() {
+        terminalViewport = document.querySelector('#term .xterm-viewport');
+        terminalScrollbar = document.getElementById('terminal-scrollbar');
+        terminalScrollbarThumb = terminalScrollbar.querySelector('.terminal-scrollbar-thumb');
+
+        terminalViewport.addEventListener('scroll', updateTerminalScrollbar);
+        terminalScrollbar.addEventListener('pointerdown', function (event) {
+            if (event.target === terminalScrollbarThumb) {
+                return;
+            }
+            const trackRect = terminalScrollbar.getBoundingClientRect();
+            const maxThumbTop = terminalScrollbar.clientHeight - terminalScrollbarThumb.offsetHeight;
+            const thumbTop = Math.max(0, Math.min(
+                maxThumbTop,
+                event.clientY - trackRect.top - terminalScrollbarThumb.offsetHeight / 2
+            ));
+            scrollTerminalToThumbPosition(thumbTop);
+        });
+        terminalScrollbarThumb.addEventListener('pointerdown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            scrollbarDragStartY = event.clientY;
+            scrollbarDragStartTop = parseFloat(terminalScrollbarThumb.style.transform.replace('translateY(', '')) || 0;
+            terminalScrollbarThumb.classList.add('is-dragging');
+            terminalScrollbarThumb.setPointerCapture(event.pointerId);
+        });
+        terminalScrollbarThumb.addEventListener('pointermove', function (event) {
+            if (!terminalScrollbarThumb.hasPointerCapture(event.pointerId)) {
+                return;
+            }
+            scrollTerminalToThumbPosition(scrollbarDragStartTop + event.clientY - scrollbarDragStartY);
+        });
+        terminalScrollbarThumb.addEventListener('pointerup', stopTerminalScrollbarDrag);
+        terminalScrollbarThumb.addEventListener('pointercancel', stopTerminalScrollbarDrag);
+        scheduleTerminalScrollbarUpdate();
+    }
+
+    function stopTerminalScrollbarDrag(event) {
+        if (terminalScrollbarThumb.hasPointerCapture(event.pointerId)) {
+            terminalScrollbarThumb.releasePointerCapture(event.pointerId);
+        }
+        terminalScrollbarThumb.classList.remove('is-dragging');
+    }
+
+    function scrollTerminalToThumbPosition(thumbTop) {
+        const maxScrollTop = terminalViewport.scrollHeight - terminalViewport.clientHeight;
+        const maxThumbTop = terminalScrollbar.clientHeight - terminalScrollbarThumb.offsetHeight;
+        const boundedThumbTop = Math.max(0, Math.min(maxThumbTop, thumbTop));
+        terminalViewport.scrollTop = maxThumbTop ? boundedThumbTop / maxThumbTop * maxScrollTop : 0;
+    }
+
+    function scheduleTerminalScrollbarUpdate() {
+        window.requestAnimationFrame(updateTerminalScrollbar);
+    }
+
+    function updateTerminalScrollbar() {
+        if (!terminalViewport || !terminalScrollbar) {
+            return;
+        }
+        const maxScrollTop = terminalViewport.scrollHeight - terminalViewport.clientHeight;
+        const hasOverflow = maxScrollTop > 1;
+        terminalScrollbar.hidden = !hasOverflow;
+        if (!hasOverflow) {
+            return;
+        }
+
+        const trackHeight = terminalScrollbar.clientHeight;
+        const thumbHeight = Math.max(36, Math.round(
+            terminalViewport.clientHeight / terminalViewport.scrollHeight * trackHeight
+        ));
+        const maxThumbTop = trackHeight - thumbHeight;
+        const thumbTop = maxThumbTop * terminalViewport.scrollTop / maxScrollTop;
+        terminalScrollbarThumb.style.height = `${thumbHeight}px`;
+        terminalScrollbarThumb.style.transform = `translateY(${thumbTop}px)`;
+        terminalScrollbar.setAttribute('aria-valuemin', '0');
+        terminalScrollbar.setAttribute('aria-valuemax', String(Math.round(maxScrollTop)));
+        terminalScrollbar.setAttribute('aria-valuenow', String(Math.round(terminalViewport.scrollTop)));
+    }
+
+    function connectLog(logType, useFailOver) {
+        if (ws) {
+            ws.onopen = null;
+            ws.onmessage = null;
+            ws.onerror = null;
+            ws.close();
+        }
+
+        currentLogType = logType;
+        term.reset();
+        scheduleTerminalScrollbarUpdate();
+        ws = new WebSocket(useFailOver ? failOverWsURL : wsURL);
+        const currentWs = ws;
+
         ws.onmessage = function (e) {
+            if (currentWs !== ws) {
+                return;
+            }
             var data = JSON.parse(e.data);
-            var message = data.message;
+            if (data.event === 'unavailable') {
+                term.write(`Ansible ${gettext('Detail')}: ${gettext('Not found')}\r\n`);
+                scheduleTerminalScrollbarUpdate();
+                return;
+            }
+            var message = data.message || '';
             if (vendor !== 'jumpserver') {
                 message = message.replace(/jumpserver/g, vendor);
             }
             term.write(message);
+            scheduleTerminalScrollbarUpdate();
         };
         ws.onopen = function () {
-            var msg = {"task": taskId};
+            if (currentWs !== ws) {
+                return;
+            }
+            var msg = {"task": taskId, "type": logType};
             ws.send(JSON.stringify(msg))
         };
         ws.onerror = function (e) {
-            ws = new WebSocket(failOverWsURL);
-            ws.onmessage = function (e) {
-                var data = JSON.parse(e.data);
-                term.write(data.message);
-            };
-            ws.onerror = function (e) {
+            if (currentWs !== ws) {
+                return;
+            }
+            if (!useFailOver) {
+                connectLog(logType, true);
+            } else {
                 term.write("Connect websocket server error")
             }
         }
-        getAutomationExecutionInfo();
-    }).on('resize', window, function () {
-        window.fit.fit(term);
-    });
+    }
 
     function getAutomationExecutionInfo() {
         let url = "{% url 'api-ops:task-executions-detail' pk=task_id %}";
@@ -383,6 +580,9 @@
                 $('.task-type').html(data.task_name);
                 $('.date-start').html(dateStart);
                 document.title = data.task_name || document.title;
+                if (data.has_ansible_log || data.is_ansible_task) {
+                    $('#toggle-ansible-log-btn').prop('hidden', false);
+                }
             }
         })
     }
@@ -394,7 +594,7 @@
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `log_${taskId}.txt`;
+        a.download = `log_${currentLogType}_${taskId}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -402,4 +602,18 @@
     }
 
     document.getElementById('download-log-btn').addEventListener('click', downloadLog);
+    document.getElementById('toggle-ansible-log-btn').addEventListener('click', function () {
+        const showAnsible = currentLogType !== 'ansible';
+        const button = $(this);
+        currentLogType = showAnsible ? 'ansible' : 'celery';
+        button.toggleClass('is-active', showAnsible);
+        button.attr('aria-pressed', showAnsible ? 'true' : 'false');
+        button.find('.toggle-log-label').text(
+            showAnsible ? gettext('Back') : `Ansible ${gettext('Detail')}`
+        );
+        $('#terminal-heading-label').text(
+            showAnsible ? `Ansible ${gettext('Detail')}` : gettext('Output')
+        );
+        connectLog(currentLogType);
+    });
 </script>

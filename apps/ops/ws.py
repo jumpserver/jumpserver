@@ -87,13 +87,31 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
         task_type = content.get('type', 'celery')
         log_path = self.get_log_path(task_id, task_type)
-        await self.async_handle_task(task_id, log_path)
+        await self.async_handle_task(
+            task_id, log_path, task_type, task.is_finished
+        )
 
-    async def async_handle_task(self, task_id, log_path):
+    async def async_handle_task(
+            self, task_id, log_path, log_type='celery', task_finished=False
+    ):
         logger.info("Task id: {}".format(task_id))
         timeout = 0
         while not self.disconnected:
+            if (
+                    log_type == 'ansible'
+                    and task_finished
+                    and not os.path.exists(log_path)
+            ):
+                await self.send_json({
+                    'event': 'unavailable', 'message': '', 'task': task_id,
+                })
+                break
             if timeout >= 60:
+                if log_type == 'ansible':
+                    await self.send_json({
+                        'event': 'unavailable', 'message': '', 'task': task_id,
+                    })
+                    break
                 await self.send_json({'message': '\r\n', 'task': task_id})
                 await self.send_json({'message': 'Task log was not found, the directory may not be shared.',
                                       'task': task_id})

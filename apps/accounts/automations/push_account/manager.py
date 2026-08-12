@@ -44,7 +44,9 @@ class PushAccountManager(BaseChangeSecretPushManager):
             record_id = self.record_map[asset_account_id]
             record = PushSecretRecord.objects.filter(id=record_id).first()
             if not record:
-                raise ValueError(f'Push secret record not found: {record_id}')
+                raise ValueError(_(
+                    'Push secret record not found: %(record_id)s'
+                ) % {'record_id': record_id})
         else:
             record = self.create_record(asset, account)
 
