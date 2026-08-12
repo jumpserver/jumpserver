@@ -3276,6 +3276,21 @@ msgstr "TP-Link"
 msgid "General"
 msgstr "一般"
 
+#: users/serializers/preference/luna.py:91
+msgctxt "Luna preference section"
+msgid "General"
+msgstr "基本配置"
+
+#: users/serializers/preference/luna.py:95
+msgctxt "Luna preference section"
+msgid "GUI"
+msgstr "圖形化"
+
+#: users/serializers/preference/luna.py:99
+msgctxt "Luna preference section"
+msgid "CLI"
+msgstr "命令行"
+
 #: assets/const/device.py:13
 msgid "Switch"
 msgstr "交換機"
