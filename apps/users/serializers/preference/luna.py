@@ -1,6 +1,6 @@
 import json
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from rest_framework import serializers
 
 from users.const import (
@@ -86,6 +86,15 @@ class CommandLineSerializer(serializers.Serializer):
 
 
 class LunaSerializer(serializers.Serializer):
-    basic = BasicSerializer(required=False, label=_('Basic'))
-    graphics = GraphicsSerializer(required=False, label=_('Graphics'))
-    command_line = CommandLineSerializer(required=False, label=_('Command line'))
+    basic = BasicSerializer(
+        required=False,
+        label=pgettext_lazy('Luna preference section', 'General'),
+    )
+    graphics = GraphicsSerializer(
+        required=False,
+        label=pgettext_lazy('Luna preference section', 'GUI'),
+    )
+    command_line = CommandLineSerializer(
+        required=False,
+        label=pgettext_lazy('Luna preference section', 'CLI'),
+    )
