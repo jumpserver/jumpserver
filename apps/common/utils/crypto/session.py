@@ -5,12 +5,15 @@ from .rsa_aes import  RsaAesCryptoSuite
 from .gm import  GmCryptoSuite
 
 
+ENCRYPTED_SEPARATOR = '::encrypted::'
+
+
 def decrypt_session_password(value):
     from jumpserver.utils import current_request
     if not current_request:
         return value
 
-    cipher = value.split(':')
+    cipher = value.split(ENCRYPTED_SEPARATOR)
     if len(cipher) != 2:
         return value
 
@@ -30,12 +33,11 @@ def decrypt_session_password(value):
     else:
         crypto_suite = RsaAesCryptoSuite(None)
 
-    key = crypto_suite.decrypt_with_key_pair(key_cipher, private_key)
-    crypto_suite.key = key
-
     try:
+        key = crypto_suite.decrypt_with_key_pair(key_cipher, private_key)
+        crypto_suite.key = key
         password = crypto_suite.decrypt(password_cipher)
     except Exception as e:
-        logging.error("Decrypt password error: {}, {}".format(password_cipher, e))
+        logging.error("Decrypt password error: {}".format(e))
         return value
     return password
