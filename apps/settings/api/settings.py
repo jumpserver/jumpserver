@@ -10,6 +10,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from authentication.const import ConfirmType
+from authentication.permissions import UserConfirmation
 from common.utils import get_logger
 from jumpserver.conf import Config
 from rbac.models import RoleBinding
@@ -197,6 +199,14 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
     def clean_ldap_user_dn_cache():
         del_count = cache.delete_pattern('django_auth_ldap.user_dn.*')
         logger.debug(f'clear LDAP user_dn_cache count={del_count}')
+
+
+class BootstrapTokenApi(APIView):
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    rbac_perms = {'GET': 'settings.change_terminal'}
+
+    def get(self, request):
+        return Response({'bootstrap_token': settings.BOOTSTRAP_TOKEN})
 
 
 class SettingsLogoApi(APIView):

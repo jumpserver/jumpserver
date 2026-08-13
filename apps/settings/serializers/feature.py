@@ -222,3 +222,7 @@ class VirtualAppSerializer(serializers.Serializer):
             'in remote applications.'
         )
     )
+    PANDA_HOST = serializers.CharField(
+        max_length=256, allow_blank=True, required=False,
+        default='http://panda:9001', label='Panda URL'
+    )

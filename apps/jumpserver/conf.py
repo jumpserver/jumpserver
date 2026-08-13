@@ -744,6 +744,7 @@ class Config(dict):
         'DEEPSEEK_MODEL': 'deepseek-chat',
         'CUSTOM_DEEPSEEK_MODEL': 'deepseek-chat',
         'VIRTUAL_APP_ENABLED': False,
+        'PANDA_HOST': 'http://panda:9001',
 
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
 

@@ -27,6 +27,7 @@ urlpatterns = [
     path('security/unlock-ip/', api.UnlockIPSecurityAPI.as_view(), name='unlock-ip'),
 
     path('setting/', api.SettingsApi.as_view(), name='settings-setting'),
+    path('bootstrap-token/', api.BootstrapTokenApi.as_view(), name='bootstrap-token'),
     path('logo/', api.SettingsLogoApi.as_view(), name='settings-logo'),
     path('public/', api.PublicSettingApi.as_view(), name='public-setting'),
     path('public/open/', api.OpenPublicSettingApi.as_view(), name='open-public-setting'),
