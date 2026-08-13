@@ -5,10 +5,12 @@ from .feishu import *
 from .i18n import *
 from .lark import *
 from .ldap import *
+from .nas import *
 from .public import *
 from .security import *
 from .settings import *
 from .slack import *
 from .sms import *
+from .syslog import *
 from .vault import *
 from .wecom import *

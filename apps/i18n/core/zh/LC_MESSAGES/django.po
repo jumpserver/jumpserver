@@ -4168,6 +4168,29 @@ msgstr ""
 "话录像和命令记录，改密日志，所以系统会根据系统设置-任务列表-定期清理配置，对"
 "于超出时间的于每天凌晨2点进行清理"
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "根据阈值腾退存储空间"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest session replay files and update session records "
+"until usage falls below threshold"
+msgstr ""
+"当系统存储使用率超过 STORAGE_USAGE_THRESHOLD (百分比 0-100) 时，"
+"删除最早一天的会话记录、命令记录和录像，"
+"直到使用率降至阈值以下"
+
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "将指定日期及之前的会话录像归档到 NAS 存储"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "将指定日期及之前的会话录像归档到 NAS 存储"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
@@ -7313,6 +7336,161 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
+#: settings/api/syslog.py:17
+#, python-brace-format
+msgid "Test syslog message sent to {}, please check"
+msgstr "测试 Syslog 消息已发送至 {}，请检查"
+
+#: settings/api/syslog.py:27
+msgid "Syslog address is not configured or invalid"
+msgstr "Syslog 地址未配置或无效"
+
+#: settings/api/syslog.py:38
+msgid "Syslog handler is not active, please save configuration first"
+msgstr "Syslog 处理器未激活，请先保存配置"
+
+#: settings/api/nas.py:18
+#, python-brace-format
+msgid "NAS connection test successful, mount path is accessible"
+msgstr "NAS 连接测试成功，挂载路径可访问"
+
+#: settings/api/nas.py:34
+msgid "NAS storage is not enabled"
+msgstr "NAS 存储未启用"
+
+#: settings/api/nas.py:40
+msgid "NAS host is not configured"
+msgstr "NAS 服务器地址未配置"
+
+#: settings/api/nas.py:46
+msgid "NAS mount path is not configured"
+msgstr "NAS 挂载路径未配置"
+
+#: settings/api/nas.py:53
+msgid "NAS username is required for CIFS"
+msgstr "CIFS 类型需要填写 NAS 用户名"
+
+#: settings/api/nas.py:60
+#, python-brace-format
+msgid "NAS mount path does not exist: {}"
+msgstr "NAS 挂载路径不存在：{}"
+
+#: settings/api/nas.py:78
+#, python-brace-format
+msgid "NAS mount path is not writable: {}"
+msgstr "NAS 挂载路径不可写：{}"
+
+#: settings/api/nas.py:83
+#, python-brace-format
+msgid "NAS mount path I/O error: {}"
+msgstr "NAS 挂载路径 I/O 错误：{}"
+
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "NAS 挂载路径未挂载: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "日期必填，格式: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "日期格式无效，请使用 YYYY-MM-DD"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "归档任务已启动"
+
+#: settings/serializers/storage.py:14
+msgid "File max store"
+msgstr "FTP 文件最大存储"
+
+#: settings/serializers/storage.py:15
+msgid "File max store size (MB), <= 0 means no backup"
+msgstr "FTP 文件上传最大存储大小 (MB)，<= 0 表示不备份"
+
+#: settings/serializers/storage.py:18
+msgid "Storage usage threshold"
+msgstr "存储使用阈值"
+
+#: settings/serializers/storage.py:19
+msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgstr "存储使用百分比阈值 (0-100)，0 表示不限制"
+
+#: settings/serializers/storage.py:22
+msgid "NAS enabled"
+msgstr "NAS 存储启用"
+
+#: settings/serializers/storage.py:23
+msgid "Enable NAS storage"
+msgstr "是否启用 NAS 存储"
+
+#: settings/serializers/storage.py:27
+msgid "NAS type"
+msgstr "NAS 类型"
+
+#: settings/serializers/storage.py:28
+msgid "NAS storage type: NFS or CIFS"
+msgstr "NAS 存储类型：NFS 或 CIFS"
+
+#: settings/serializers/storage.py:32
+msgid "NAS host"
+msgstr "NAS 服务器地址"
+
+#: settings/serializers/storage.py:33
+msgid "NAS server address, e.g. 192.168.1.100"
+msgstr "NAS 服务器地址，例如 192.168.1.100"
+
+#: settings/serializers/storage.py:37
+msgid "NAS share name"
+msgstr "NAS 共享名称"
+
+#: settings/serializers/storage.py:38
+msgid "NAS share or export name"
+msgstr "NAS 共享或导出名称"
+
+#: settings/serializers/storage.py:42
+msgid "NAS mount path"
+msgstr "NAS 挂载路径"
+
+#: settings/serializers/storage.py:43
+msgid "Local mount path for NAS storage"
+msgstr "NAS 存储的本地挂载路径"
+
+#: settings/serializers/storage.py:47
+msgid "NAS username"
+msgstr "NAS 用户名"
+
+#: settings/serializers/storage.py:48
+msgid "NAS login username (CIFS required)"
+msgstr "NAS 登录用户名（CIFS 必填）"
+
+#: settings/serializers/storage.py:52
+msgid "NAS password"
+msgstr "NAS 密码"
+
+#: settings/serializers/storage.py:53
+msgid "NAS login password (CIFS required)"
+msgstr "NAS 登录密码（CIFS 必填）"
+
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
+msgid "Session replay"
+msgstr "会话录像"
+
+#: settings/serializers/storage.py:22
+msgid "File transfer"
+msgstr "文件传输"
+
+#: settings/serializers/storage.py:27
+msgid "Storage reclamation targets"
+msgstr "空间腾退目标"
+
+#: settings/serializers/storage.py:28
+msgid "Select which data to clean during storage reclamation"
+msgstr "选择空间腾退时需要清理的数据类型"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
@@ -9300,11 +9478,6 @@ msgstr "有在线会话"
 msgid "User %s %s session %s replay"
 msgstr "用户 %s %s 了会话 %s 的录像"
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "会话录像"
-
 #: terminal/api/session/session.py:339
 #, python-brace-format
 msgid "Session does not exist: {}"
@@ -9441,6 +9614,30 @@ msgstr "录像转码失败"
 #: terminal/const.py:108
 msgid "Replay unsupported"
 msgstr "不支持录像"
+
+#: terminal/const.py:109
+msgid "Replay cleaned for storage reclamation"
+msgstr "因存储腾退已清理录像"
+
+#: audits/models.py:355
+msgid "Storage reclamation log"
+msgstr "存储腾退日志"
+
+#: audits/models.py:357
+msgid "Session ID"
+msgstr "会话 ID"
+
+#: audits/models.py:361
+msgid "Target type"
+msgstr "目标类型"
+
+#: audits/models.py:363
+msgid "File path"
+msgstr "文件路径"
+
+#: audits/models.py:359
+msgid "File size (bytes)"
+msgstr "文件大小 (字节)"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

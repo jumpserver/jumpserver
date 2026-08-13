@@ -246,3 +246,24 @@ class ServiceAccessLogSerializer(serializers.ModelSerializer):
             'account': {'label': _('Account')},
             'datetime': {'label': _('Datetime')},
         }
+
+
+class StorageReclamationLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.StorageReclamationLog
+        fields = [
+            'id', 'session_id', 'target_type',
+            'file_path', 'file_size', 'date_created',
+        ]
+        read_only_fields = fields
+
+
+class ArchiveLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ArchiveLog
+        fields = [
+            'id', 'session_id',
+            'file_path', 'file_size', 'storage_path',
+            'date_created',
+        ]
+        read_only_fields = fields

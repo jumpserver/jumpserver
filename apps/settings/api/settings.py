@@ -72,6 +72,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'ops': serializers.OpsSettingSerializer,
         'virtualapp': serializers.VirtualAppSerializer,
         'tool': serializers.ToolSerializer,
+        'syslog': serializers.SyslogSettingSerializer,
+        'storage': serializers.StorageSettingSerializer,
     }
 
     rbac_category_permissions = {
@@ -116,6 +118,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'huawei': 'settings.change_sms',
         'cmpp2': 'settings.change_sms',
         'vault': 'settings.change_vault',
+        'syslog': 'settings.change_other',
+        'storage': 'settings.change_terminal',
     }
 
     def get_queryset(self):

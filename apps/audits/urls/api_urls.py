@@ -19,6 +19,8 @@ router.register(r'jobs', api.JobsAuditViewSet, 'job')
 router.register(r'my-login-logs', api.MyLoginLogViewSet, 'my-login-log')
 router.register(r'user-sessions', api.UserSessionViewSet, 'user-session')
 router.register(r'service-access-logs', api.ServiceAccessLogViewSet, 'service-access-log')
+router.register(r'storage-reclamation-logs', api.StorageReclamationLogViewSet, 'storage-reclamation-log')
+router.register(r'storage-archive-logs', api.ArchiveLogViewSet, 'storage-archive-log')
 
 urlpatterns = [
     path('activities/', api.ResourceActivityAPIView.as_view(), name='resource-activities'),

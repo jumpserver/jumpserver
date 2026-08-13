@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.utils.functional import LazyObject
 from django.apps import apps
+from django.core.signals import request_started
 
 from jumpserver.const import BASE_DIR
 from common.decorators import on_transaction_commit
@@ -18,6 +19,7 @@ from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
 from .models import Setting
+from .signals import setting_changed
 
 logger = get_logger(__file__)
 
@@ -133,3 +135,43 @@ def register_sqlite_connection(sender, **kwargs):
         'OPTIONS': {},
         'AUTOCOMMIT': True,
     }
+
+
+@receiver(setting_changed)
+def on_syslog_setting_changed(sender, name='', **kwargs):
+    if name not in ('SYSLOG_ADDR', 'SYSLOG_FACILITY', 'SYSLOG_SOCKTYPE'):
+        return
+    try:
+        from jumpserver.settings.logging import reconfigure_syslog_handler
+        reconfigure_syslog_handler()
+        logger.debug('Syslog handler reconfigured after %s changed', name)
+    except Exception as e:
+        logger.error('Failed to reconfigure syslog handler: %s', e)
+
+@receiver(django_ready)
+def on_django_ready_init_syslog_handler(sender, **kwargs):
+    try:
+        from jumpserver.settings.logging import reconfigure_syslog_handler
+        reconfigure_syslog_handler()
+    except Exception as e:
+        logger.error('Failed to reconfigure syslog handler: %s', e)
+
+
+@receiver(django_ready)
+def on_django_ready_mount_nas(sender, **kwargs):
+    """Ensure NAS is mounted when Django starts up."""
+    try:
+        from settings.tools.nas_mount import ensure_nas_mounted
+
+        config = {
+            'nas_enabled': getattr(settings, 'NAS_ENABLED', False),
+            'nas_type': getattr(settings, 'NAS_TYPE', 'nfs'),
+            'nas_host': getattr(settings, 'NAS_HOST', ''),
+            'nas_share_name': getattr(settings, 'NAS_SHARE_NAME', ''),
+            'nas_mount_path': getattr(settings, 'NAS_MOUNT_PATH', ''),
+            'nas_username': getattr(settings, 'NAS_USERNAME', ''),
+            'nas_password': getattr(settings, 'NAS_PASSWORD', ''),
+        }
+        ensure_nas_mounted(config)
+    except Exception as e:
+        logger.error('Failed to mount NAS on startup: %s', e)
