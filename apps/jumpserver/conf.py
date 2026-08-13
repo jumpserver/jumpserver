@@ -662,6 +662,7 @@ class Config(dict):
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'PERM_EXPIRED_NOTICE_DAYS': 3,
         'PERM_TREE_REGEN_INTERVAL': 1,
+        'TREE_NODE_AMOUNT_ENABLED': True,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
         'TIME_ZONE': 'Asia/Shanghai',

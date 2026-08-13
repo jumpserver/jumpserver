@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
+from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
@@ -146,7 +147,8 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
     def list(self, request, *args, **kwargs):
         nodes = self.filter_queryset(self.get_queryset()).order_by('value')
-        with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
+        with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED and \
+            request.query_params.get('asset_amount', '1') == '1'
         nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
         node_key = self.instance.key if self.instance else None
@@ -177,7 +179,12 @@ class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         count_resource = self.request.query_params.get('count_resource', 'asset')
 
         if not self.request.query_params.get('key'):
-            nodes = AllTypes.to_tree_nodes(include_asset, count_resource=count_resource)
+            with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED
+            nodes = AllTypes.to_tree_nodes(
+                include_asset,
+                count_resource=count_resource,
+                with_asset_amount=with_asset_amount
+            )
         elif include_asset:
             nodes = self.get_assets()
         else:
