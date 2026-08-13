@@ -1,4 +1,5 @@
 from collections import defaultdict
+from dataclasses import dataclass
 
 from accounts.const import AliasAccount
 from accounts.models import Account, VirtualAccount
@@ -14,10 +15,22 @@ logger = get_logger(__name__)
 __all__ = ['PermAssetAccountsBatchUtil', 'PermAssetDetailUtil']
 
 
+@dataclass(frozen=True)
+class PermAssetAccountsBatchContext:
+    """Input data shared while resolving permitted accounts for assets."""
+
+    permissions_by_id: dict
+    asset_protocols: dict
+    asset_usernames: dict
+    required_protocols: set
+    action_required: int
+
+
 class PermAssetAccountsBatchUtil:
     """Resolve a user's permitted real accounts for multiple assets in bulk."""
 
     def __init__(self, user):
+        """Initialize the resolver for a user."""
         self.user = user
 
     @staticmethod
@@ -42,21 +55,7 @@ class PermAssetAccountsBatchUtil:
         for asset_id, permission_id in direct_relations:
             asset_permission_ids[asset_id].add(permission_id)
 
-        asset_node_relations = list(
-            Asset.nodes.through.objects.filter(
-                asset_id__in=asset_ids,
-            ).values_list('asset_id', 'node__key')
-        )
-        assets_with_nodes = {
-            asset_id for asset_id, _key in asset_node_relations
-        }
-        assets_without_nodes = set(asset_ids) - assets_with_nodes
-        if assets_without_nodes:
-            root_key = Node.org_root().key
-            if root_key:
-                asset_node_relations.extend(
-                    (asset_id, root_key) for asset_id in assets_without_nodes
-                )
+        asset_node_relations = self.get_asset_node_relations(asset_ids)
 
         ancestor_assets = defaultdict(set)
         for asset_id, node_key in asset_node_relations:
@@ -76,6 +75,25 @@ class PermAssetAccountsBatchUtil:
             for asset_id in ancestor_assets.get(node_key, set()):
                 asset_permission_ids[asset_id].add(permission_id)
         return asset_permission_ids
+
+    @staticmethod
+    def get_asset_node_relations(asset_ids):
+        asset_node_relations = list(
+            Asset.nodes.through.objects.filter(
+                asset_id__in=asset_ids,
+            ).values_list('asset_id', 'node__key')
+        )
+        assets_with_nodes = {
+            asset_id for asset_id, _key in asset_node_relations
+        }
+        assets_without_nodes = set(asset_ids) - assets_with_nodes
+        if assets_without_nodes:
+            root_key = Node.org_root().key
+            if root_key:
+                asset_node_relations.extend(
+                    (asset_id, root_key) for asset_id in assets_without_nodes
+                )
+        return asset_node_relations
 
     @staticmethod
     def get_asset_protocols(asset_ids):
@@ -156,26 +174,24 @@ class PermAssetAccountsBatchUtil:
         return resolved_actions
 
     def get_asset_permitted_usernames(
-        self, asset_id, permission_ids, permissions_by_id,
-        asset_protocols, asset_usernames, required_protocols,
-        action_required,
+        self, asset_id, permission_ids, context,
     ):
-        actual_protocols = asset_protocols.get(asset_id, set())
+        actual_protocols = context.asset_protocols.get(asset_id, set())
         protocols = (
-            actual_protocols.intersection(required_protocols)
-            if required_protocols else actual_protocols
+            actual_protocols.intersection(context.required_protocols)
+            if context.required_protocols else actual_protocols
         )
         if not protocols:
             return []
 
         permissions = (
-            permissions_by_id[permission_id]
+            context.permissions_by_id[permission_id]
             for permission_id in permission_ids
             if self.permission_matches_protocol(
-                permissions_by_id[permission_id], protocols,
+                context.permissions_by_id[permission_id], protocols,
             )
         )
-        account_usernames = asset_usernames.get(asset_id, [])
+        account_usernames = context.asset_usernames.get(asset_id, [])
         account_username_set = set(account_usernames)
         alias_actions = self.get_alias_actions(permissions)
         self.expand_all_alias(alias_actions, account_username_set)
@@ -188,7 +204,7 @@ class PermAssetAccountsBatchUtil:
             username for username in account_usernames
             if not username.startswith(('jms_', 'js_'))
             and ActionChoices.contains(
-                resolved_actions.get(username, 0), action_required,
+                resolved_actions.get(username, 0), context.action_required,
             )
         ]
 
@@ -221,20 +237,20 @@ class PermAssetAccountsBatchUtil:
         if not asset_ids:
             return []
 
-        asset_protocols = self.get_asset_protocols(asset_ids)
-        asset_usernames = self.get_asset_account_usernames(asset_ids)
-        required_protocols = set(protocols_required or [])
+        context = PermAssetAccountsBatchContext(
+            permissions_by_id=permissions_by_id,
+            asset_protocols=self.get_asset_protocols(asset_ids),
+            asset_usernames=self.get_asset_account_usernames(asset_ids),
+            required_protocols=set(protocols_required or []),
+            action_required=action_required,
+        )
 
         usernames = []
         for asset_id in asset_ids:
             usernames.extend(self.get_asset_permitted_usernames(
                 asset_id,
                 asset_permission_ids[asset_id],
-                permissions_by_id,
-                asset_protocols,
-                asset_usernames,
-                required_protocols,
-                action_required,
+                context,
             ))
         return usernames
 

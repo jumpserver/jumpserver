@@ -54,11 +54,11 @@ class UsernameHintsPermissionTest(TestCase):
                 username=username,
             )
 
-    def grant(self, name, asset, account, actions, protocols=None):
+    def grant(self, asset, account, actions, protocols=None):
         with tmp_to_root_org():
             permission = AssetPermission.objects.create(
                 org_id=self.org.id,
-                name=name,
+                name=f'{asset.name}-{account}',
                 accounts=[account],
                 protocols=protocols or list(
                     asset.protocols.values_list('name', flat=True)
@@ -90,19 +90,16 @@ class UsernameHintsPermissionTest(TestCase):
         self.create_account(asset, 'connect-only-user')
         self.create_account(asset, 'ungranted-user')
         self.grant(
-            'Upload account permission',
             asset,
             'upload-user',
             ActionChoices.connect.value | ActionChoices.upload.value,
         )
         self.grant(
-            'Connect account permission',
             asset,
             'connect-only-user',
             ActionChoices.connect.value,
         )
         self.grant(
-            'Virtual upload account permission',
             asset,
             '@INPUT',
             ActionChoices.upload.value,
@@ -116,7 +113,6 @@ class UsernameHintsPermissionTest(TestCase):
         asset = self.create_asset('telnet-asset', protocol=Protocol.telnet)
         self.create_account(asset, 'telnet-user')
         self.grant(
-            'Telnet upload permission',
             asset,
             'telnet-user',
             ActionChoices.upload.value,
@@ -131,14 +127,12 @@ class UsernameHintsPermissionTest(TestCase):
         self.create_account(asset, 'ssh-user')
         self.create_account(asset, 'telnet-only-user')
         self.grant(
-            'SSH upload permission',
             asset,
             'ssh-user',
             ActionChoices.upload.value,
             protocols=[Protocol.ssh],
         )
         self.grant(
-            'Telnet upload permission',
             asset,
             'telnet-only-user',
             ActionChoices.upload.value,
@@ -154,13 +148,11 @@ class UsernameHintsPermissionTest(TestCase):
         self.create_account(asset, 'connect-user')
         self.create_account(asset, 'upload-only-user')
         self.grant(
-            'Connect account permission',
             asset,
             'connect-user',
             ActionChoices.connect.value,
         )
         self.grant(
-            'Upload account permission',
             asset,
             'upload-only-user',
             ActionChoices.upload.value,
@@ -174,7 +166,6 @@ class UsernameHintsPermissionTest(TestCase):
         small_asset = self.create_asset('query-small')
         self.create_account(small_asset, 'small-user')
         self.grant(
-            'Small query permission',
             small_asset,
             'small-user',
             ActionChoices.upload.value,
@@ -186,7 +177,6 @@ class UsernameHintsPermissionTest(TestCase):
             username = f'large-user-{index}'
             self.create_account(asset, username)
             self.grant(
-                f'Large query permission {index}',
                 asset,
                 username,
                 ActionChoices.upload.value,
@@ -241,13 +231,11 @@ class UsernameHintsPermissionTest(TestCase):
         self.create_account(asset, 'allowed-user')
         self.create_account(asset, 'excluded-user')
         self.grant(
-            'All upload accounts',
             asset,
             '@ALL',
             ActionChoices.upload.value,
         )
         self.grant(
-            'Exclude upload account',
             asset,
             '!excluded-user',
             ActionChoices.upload.value,
