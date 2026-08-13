@@ -168,6 +168,9 @@
             min-width: 0;
             min-height: 0;
             flex: 1 1 auto;
+            /* Reserve a track for the custom scrollbar so terminal content never
+               extends underneath it (the fit addon does not subtract the padding) */
+            padding-right: 16px;
             background: #0d1117;
             overflow: hidden;
         }
@@ -433,10 +436,169 @@
 
         connectLog('celery');
         getAutomationExecutionInfo();
-    }).on('resize', window, function () {
-        window.fit.fit(term);
-        scheduleTerminalScrollbarUpdate();
     });
+
+    var terminalResizeTimer = null;
+    function handleTerminalResize() {
+        window.clearTimeout(terminalResizeTimer);
+        terminalResizeTimer = window.setTimeout(function () {
+            if (!term || !term._core) {
+                return;
+            }
+            var prevCols = term._core.cols;
+            window.fit.fit(term);
+            // The bundled xterm.js cannot reflow existing buffer lines by itself,
+            // rebuild them here so already-printed text re-wraps to the new width.
+            if (term._core.cols !== prevCols) {
+                reflowTerminalBuffer();
+            }
+            scheduleTerminalScrollbarUpdate();
+        }, 80);
+    }
+
+    // The bundled xterm.js does not reflow the scrollback on resize: its
+    // Buffer#resize only pads existing lines with spaces, so after enlarging the
+    // window the .xterm-screen grows but already-displayed text keeps wrapping at
+    // the old width. This rebuilds the buffer from its own cell data so the text
+    // re-wraps to the new column count, keeping colors and approximate scroll pos.
+    function reflowTerminalBuffer() {
+        try {
+            var core = term._core;
+            var buffer = core.buffer;
+            var lines = buffer.lines;
+            var cols = core.cols;
+            var rows = core.rows;
+            if (!lines || lines.length === 0 || cols < 1 || rows < 1) {
+                return;
+            }
+
+            // 1) Flatten the physical lines into logical lines (join wrapped runs)
+            var logical = [];
+            var current = [];
+            var i, line, end, segment;
+            for (i = 0; i < lines.length; i++) {
+                line = lines.get(i);
+                end = line.length;
+                while (end > 0 && line[end - 1][2] === 1 && line[end - 1][3] === 32) {
+                    end--;
+                }
+                segment = line.slice(0, end);
+                if (line.isWrapped) {
+                    current = current.concat(segment);
+                } else {
+                    if (i > 0) {
+                        logical.push(current);
+                    }
+                    current = segment;
+                }
+            }
+            logical.push(current);
+
+            // 2) Re-split every logical line at the new column count
+            var blank = core.blankLine(false, false, cols);
+            var blankCell = blank[0];
+            var rebuilt = [];
+            var cursorIndex = -1;
+            var cursorX = 0;
+            var lastLogicalIndex = logical.length - 1;
+            for (i = 0; i < logical.length; i++) {
+                var l = logical[i];
+                if (l.length === 0) {
+                    rebuilt.push(blank.slice());
+                    if (i === lastLogicalIndex) {
+                        cursorIndex = rebuilt.length - 1;
+                        cursorX = 0;
+                    }
+                    continue;
+                }
+                var chunks = Math.ceil(l.length / cols);
+                for (var c = 0; c < chunks; c++) {
+                    var chunk = l.slice(c * cols, Math.min((c + 1) * cols, l.length));
+                    if (c > 0) {
+                        chunk.isWrapped = true;
+                    }
+                    while (chunk.length < cols) {
+                        chunk.push(blankCell);
+                    }
+                    rebuilt.push(chunk);
+                    if (i === lastLogicalIndex && c === chunks - 1) {
+                        cursorIndex = rebuilt.length - 1;
+                        cursorX = l.length % cols;
+                    }
+                }
+            }
+            // If the last logical line ends exactly at a column boundary, the
+            // cursor continues on a new line instead of overwriting column 0.
+            var lastLen = logical[lastLogicalIndex].length;
+            if (cursorIndex >= 0 && cursorX === 0 && lastLen > 0 && lastLen % cols === 0) {
+                rebuilt.push(blank.slice());
+                cursorIndex = rebuilt.length - 1;
+            }
+
+            // 3) Always keep the viewport (rows) filled
+            while (rebuilt.length < rows) {
+                rebuilt.push(blank.slice());
+            }
+
+            // 4) Swap the lines in place so all internal references stay valid
+            var oldLength = lines.length;
+            var oldYdisp = buffer.ydisp;
+            var total = rebuilt.length;
+            if (lines.maxLength < total) {
+                lines.maxLength = total;
+            }
+            lines.length = 0;
+            for (i = 0; i < total; i++) {
+                lines.push(rebuilt[i]);
+            }
+
+            // 5) Recompute scroll/cursor state
+            buffer.ybase = Math.max(0, total - rows);
+            var distanceFromBottom = Math.max(0, oldLength - 1 - oldYdisp);
+            buffer.ydisp = Math.max(0, total - 1 - distanceFromBottom);
+            if (buffer.ydisp > buffer.ybase) {
+                buffer.ydisp = buffer.ybase;
+            }
+            buffer.y = cursorIndex >= 0
+                ? cursorIndex - buffer.ybase
+                : total - 1 - buffer.ybase;
+            if (buffer.y < 0) {
+                buffer.y = 0;
+            } else if (buffer.y > rows - 1) {
+                buffer.y = rows - 1;
+            }
+            buffer.x = cursorX < 0 ? 0 : Math.min(cols - 1, cursorX);
+            buffer.scrollTop = 0;
+            buffer.scrollBottom = rows - 1;
+
+            // 6) Force a full re-render and resync the scroll area
+            if (core.renderer) {
+                core.renderer.clear();
+            }
+            if (core.clearSelection) {
+                core.clearSelection();
+            }
+            core.refresh(0, rows - 1);
+            if (core.viewport && core.viewport.syncScrollArea) {
+                core.viewport.syncScrollArea();
+            }
+        } catch (e) {
+            // Never break the log view if the reflow hits an unexpected state.
+        }
+    }
+
+    // Bind the resize handler to `window` directly. The previous
+    // `.on('resize', window, ...)` treated `window` as event data (it's not a
+    // selector string) and attached the handler to `document`, where the
+    // native `resize` event never bubbles to, so fit() was never re-run.
+    $(window).on('resize', handleTerminalResize);
+
+    // Also observe the terminal container so the size follows viewport
+    // changes that do not fire a window resize (DevTools, zoom, iframe, ...)
+    var termElement = document.getElementById('term');
+    if (window.ResizeObserver && termElement) {
+        new ResizeObserver(handleTerminalResize).observe(termElement);
+    }
 
     function setupTerminalScrollbar() {
         terminalViewport = document.querySelector('#term .xterm-viewport');
