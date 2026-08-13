@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
@@ -69,12 +69,29 @@ class AppProvider(JMSBaseModel):
             return None
         return self.host.zone.select_gateway()
 
-    def check_terminal_binding(self, request):
-        request_terminal = getattr(request.user, 'terminal', None)
-        if not request_terminal:
+    def bind_terminal(self, terminal):
+        if not terminal:
             raise ValidationError('Request user has no terminal')
-        self.terminal = request_terminal
-        self.save(update_fields=['terminal', 'date_updated'])
+
+        with transaction.atomic():
+            terminal = terminal.__class__.objects.select_for_update().get(pk=terminal.pk)
+            bound_provider = self.__class__.objects.select_for_update().filter(
+                terminal=terminal,
+            ).exclude(pk=self.pk).first()
+            if bound_provider:
+                is_legacy_direct = (
+                    bound_provider.connection_mode == self.ConnectionMode.direct
+                    and bound_provider.host_id is None
+                )
+                if not is_legacy_direct:
+                    raise ValidationError('Terminal is already bound to another provider')
+                bound_provider.delete()
+
+            self.terminal = terminal
+            self.save(update_fields=['terminal', 'date_updated'])
+
+    def check_terminal_binding(self, request):
+        self.bind_terminal(getattr(request.user, 'terminal', None))
 
     def select_account(self):
         if not self.host:
