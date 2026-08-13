@@ -31,6 +31,7 @@ router.register(r'applet-host-deployments', api.AppletHostDeploymentViewSet, 'ap
 router.register(r'virtual-apps', api.VirtualAppViewSet, 'virtual-app')
 router.register(r'app-providers', api.AppProviderViewSet, 'app-provider')
 router.register(r'app-provider-deployments', api.AppProviderDeploymentViewSet, 'app-provider-deployment')
+router.register(r'app-providers/((?P<provider>[^/.]+)/)?accounts', api.AppProviderAccountViewSet, 'app-provider-account')
 router.register(r'app-providers/((?P<provider>[^/.]+)/)?apps', api.AppProviderAppViewSet, 'app-provider-app')
 router.register(r'virtual-app-publications', api.VirtualAppPublicationViewSet, 'virtual-app-publication')
 

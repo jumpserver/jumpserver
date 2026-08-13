@@ -145,6 +145,23 @@ def run_app_provider_deployment(did):
 
 
 @shared_task(
+    verbose_name=_('Publish all virtual apps'),
+    activity_callback=lambda self, ids, *args, **kwargs: (ids,),
+    description=_('Publish all virtual applications on an application provider'),
+)
+def run_app_provider_deployments(ids):
+    with tmp_to_builtin_org(system=1):
+        deployments = AppProviderDeployment.objects.filter(id__in=ids).select_related(
+            'provider', 'publication', 'publication__app'
+        )
+        deployments_by_id = {str(item.id): item for item in deployments}
+        for deployment_id in ids:
+            deployment = deployments_by_id.get(str(deployment_id))
+            if deployment:
+                deployment.start()
+
+
+@shared_task(
     verbose_name=_('Install applet'),
     activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,),
     description=_(

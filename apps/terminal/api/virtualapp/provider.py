@@ -1,5 +1,8 @@
+import uuid
+
 from django.core.cache import cache
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,7 +15,7 @@ from terminal.serializers import (
     AppProviderSerializer, AppProviderContainerSerializer,
     AppProviderDeploymentSerializer,
 )
-from terminal.tasks import run_app_provider_deployment
+from terminal.tasks import run_app_provider_deployment, run_app_provider_deployments
 
 __all__ = ['AppProviderViewSet', 'AppProviderDeploymentViewSet']
 
@@ -23,8 +26,10 @@ class AppProviderViewSet(JMSBulkModelViewSet):
     filterset_fields = ['name', 'hostname']
     search_fields = ['name', 'hostname', ]
     rbac_perms = {
+        'startup': 'terminal.change_appprovider',
         'containers': 'terminal.view_appprovider',
         'status': 'terminal.view_appprovider',
+        'publish_apps': 'terminal.change_virtualapppublication',
     }
 
     cache_status_key_prefix = AppProvider.cache_status_key_prefix
@@ -81,6 +86,31 @@ class AppProviderViewSet(JMSBulkModelViewSet):
         key = self.cache_status_key_prefix.format(instance.id)
         cache.set(key, validated_data, 60 * 3)
         return Response({'msg': 'ok'})
+
+    @action(detail=True, methods=['post'], url_path='publish-apps')
+    def publish_apps(self, request, *args, **kwargs):
+        provider = self.get_object()
+        publications = list(provider.publications.all())
+        if not publications:
+            return Response({'task': None, 'count': 0}, status=200)
+
+        task_id = uuid.uuid4()
+        provider.publications.update(status='pending', date_updated=timezone.now())
+        deployments = AppProviderDeployment.objects.bulk_create([
+            AppProviderDeployment(
+                provider=provider, publication=publication, task=task_id,
+            )
+            for publication in publications
+        ])
+        deployment_ids = [str(item.id) for item in deployments]
+        transaction.on_commit(
+            lambda: run_app_provider_deployments.apply_async(
+                (deployment_ids,), task_id=str(task_id)
+            )
+        )
+        return Response(
+            {'task': str(task_id), 'count': len(deployment_ids)}, status=201
+        )
 
 
 class AppProviderDeploymentViewSet(viewsets.ModelViewSet):

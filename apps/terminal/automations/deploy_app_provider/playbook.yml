@@ -30,7 +30,9 @@
       when: docker_version.rc != 0
 
     - name: Ensure Docker service is running
-      ansible.builtin.service:
+      # Avoid the generic service action selecting the legacy `systemd`
+      # redirect stub as an executable module on newer Ansible runtimes.
+      ansible.builtin.systemd_service:
         name: docker
         state: started
         enabled: true

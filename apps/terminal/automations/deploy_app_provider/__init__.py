@@ -42,7 +42,6 @@ class DeployAppProviderManager:
 
         options = self.provider.deploy_options
         core_host = options.get('CORE_HOST') or settings.SITE_URL or 'http://localhost:8080'
-        service_url = self.provider.service_url or f'http://{self.provider.host.address}:9001'
         variables = {
             **options,
             'CORE_HOST': core_host.rstrip('/'),
@@ -58,10 +57,6 @@ class DeployAppProviderManager:
             variables['APP_IMAGE'] = self.deployment.publication.app.image_name
         for play in plays:
             play['vars'].update(variables)
-
-        if self.provider.service_url != service_url:
-            self.provider.service_url = service_url
-            self.provider.save(update_fields=['service_url'])
 
         path = os.path.join(self.run_dir, 'playbook', 'main.yml')
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -79,7 +74,10 @@ class DeployAppProviderManager:
                 safety_mode='playbook_unsafe',
                 inventory_safety='json_escape',
             )
-            result = runner.run()
+            # Provider deployments are user-triggered and their Celery task log
+            # is the primary place to follow progress. Keep Ansible's normal
+            # PLAY/TASK/RECAP output visible without enabling debug verbosity.
+            result = runner.run(quiet=False)
             self.deployment.status = result.status
             if self.deployment.publication_id:
                 publication_status = (

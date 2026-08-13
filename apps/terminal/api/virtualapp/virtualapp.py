@@ -85,6 +85,9 @@ class VirtualAppPublicationViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.VirtualAppPublicationSerializer
     filterset_fields = ['app', 'app__name', 'provider', 'provider__name', 'status']
     search_fields = ['app__name', 'provider__name', ]
+    rbac_perms = {
+        'publish': 'terminal.change_virtualapppublication',
+    }
 
     @staticmethod
     def start_publish(publication):

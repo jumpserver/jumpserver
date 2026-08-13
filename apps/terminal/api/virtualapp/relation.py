@@ -8,6 +8,9 @@ from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
 from common.utils import is_uuid
 from rbac.permissions import RBACPermission
+from accounts.models import Account
+from accounts.serializers import AccountSerializer
+from orgs.utils import tmp_to_builtin_org
 from terminal.models import AppProvider, VirtualAppPublication
 from terminal.serializers import (
     VirtualAppPublicationSerializer
@@ -63,3 +66,25 @@ class AppProviderAppViewSet(ProviderMixin, JMSModelViewSet):
     def get_queryset(self):
         queryset = self.provider.publications.all()
         return queryset
+
+
+class AppProviderAccountViewSet(ProviderMixin, JMSModelViewSet):
+    queryset = Account.objects.none()
+    serializer_class = AccountSerializer
+    search_fields = ('username', 'name', 'comment')
+    rbac_perms = (
+        ('list', 'accounts.view_account'),
+        ('retrieve', 'accounts.view_account'),
+    )
+
+    def get_permissions(self):
+        if self.kwargs.get('provider'):
+            return [RBACPermission()]
+        return [IsServiceAccount()]
+
+    def get_queryset(self):
+        if not self.provider.host_id:
+            return Account.objects.none()
+        with tmp_to_builtin_org(system=1):
+            queryset = self.provider.host.accounts.all()
+            return AccountSerializer.setup_eager_loading(queryset)
