@@ -43,7 +43,9 @@ def change_user_password(username, old_password, new_password):
         return EXIT_OLD_PASSWORD_MISMATCH
 
     print("Change user password:", username)
-    user.reset_password(new_password=new_password)
+    user.set_password(new_password)
+    user.save()
+
     return EXIT_SUCCESS
 
 
