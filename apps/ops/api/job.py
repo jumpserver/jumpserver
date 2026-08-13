@@ -44,7 +44,7 @@ from ops.const import COMMAND_EXECUTION_DISABLED
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from perms.const import ActionChoices
-from perms.utils.asset_perm import PermAssetDetailUtil
+from perms.utils.asset_perm import PermAssetAccountsBatchUtil
 from jumpserver.settings import get_file_md5
 
 
@@ -325,45 +325,14 @@ class UsernameHintsAPI(APIView):
     upload_protocols = {Protocol.ssh, Protocol.sftp, Protocol.winrm}
 
     @staticmethod
-    def is_account_permitted(account, action_required):
-        return (
-            not account.is_virtual()
-            and ActionChoices.contains(account.actions, action_required)
-            and not account.username.startswith(('jms_', 'js_'))
-        )
-
-    @classmethod
-    def get_asset_permed_account_usernames(
-        cls, user, asset, action_required, protocols_required=None,
-    ):
-        permitted_protocols = set(
-            asset.protocols.values_list('name', flat=True)
-        )
-        if protocols_required:
-            permitted_protocols &= protocols_required
-        if not permitted_protocols:
-            return []
-
-        util = PermAssetDetailUtil(user, asset)
-        if not util.check_perm_protocols(permitted_protocols):
-            return []
-
-        return [
-            account.username
-            for account in util.get_permed_accounts_for_user()
-            if cls.is_account_permitted(account, action_required)
-        ]
-
-    @classmethod
     def get_permed_account_usernames(
-        cls, user, assets, action_required, protocols_required=None,
+        user, assets, action_required, protocols_required=None,
     ):
-        usernames = []
-        for asset in assets:
-            usernames.extend(cls.get_asset_permed_account_usernames(
-                user, asset, action_required, protocols_required,
-            ))
-        return usernames
+        return PermAssetAccountsBatchUtil(
+            user
+        ).get_permitted_account_usernames(
+            assets, action_required, protocols_required,
+        )
 
     def post(self, request, **kwargs):
         if settings.SAFE_MODE:

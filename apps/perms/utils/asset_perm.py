@@ -1,16 +1,242 @@
 from collections import defaultdict
 
 from accounts.const import AliasAccount
-from accounts.models import VirtualAccount
-from assets.models import Asset, MyAsset
+from accounts.models import Account, VirtualAccount
+from assets.models import Asset, MyAsset, Node, Protocol
 from common.utils import lazyproperty, get_logger
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from perms.const import ActionChoices
+from perms.models import AssetPermission
 from .permission import AssetPermissionUtil
 
 logger = get_logger(__name__)
 
-__all__ = ['PermAssetDetailUtil']
+__all__ = ['PermAssetAccountsBatchUtil', 'PermAssetDetailUtil']
+
+
+class PermAssetAccountsBatchUtil:
+    """Resolve a user's permitted real accounts for multiple assets in bulk."""
+
+    def __init__(self, user):
+        self.user = user
+
+    @staticmethod
+    def permission_matches_protocol(permission, protocols):
+        permitted = set(permission.protocols or [])
+        return 'all' in permitted or bool(permitted.intersection(protocols))
+
+    @staticmethod
+    def get_node_ancestor_keys(key):
+        parts = key.split(':')
+        return {
+            ':'.join(parts[:index])
+            for index in range(1, len(parts) + 1)
+        }
+
+    def get_asset_permission_ids(self, asset_ids, permission_ids):
+        asset_permission_ids = defaultdict(set)
+        direct_relations = AssetPermission.assets.through.objects.filter(
+            asset_id__in=asset_ids,
+            assetpermission_id__in=permission_ids,
+        ).values_list('asset_id', 'assetpermission_id')
+        for asset_id, permission_id in direct_relations:
+            asset_permission_ids[asset_id].add(permission_id)
+
+        asset_node_relations = list(
+            Asset.nodes.through.objects.filter(
+                asset_id__in=asset_ids,
+            ).values_list('asset_id', 'node__key')
+        )
+        assets_with_nodes = {
+            asset_id for asset_id, _key in asset_node_relations
+        }
+        assets_without_nodes = set(asset_ids) - assets_with_nodes
+        if assets_without_nodes:
+            root_key = Node.org_root().key
+            if root_key:
+                asset_node_relations.extend(
+                    (asset_id, root_key) for asset_id in assets_without_nodes
+                )
+
+        ancestor_assets = defaultdict(set)
+        for asset_id, node_key in asset_node_relations:
+            for ancestor_key in self.get_node_ancestor_keys(node_key):
+                ancestor_assets[ancestor_key].add(asset_id)
+
+        ancestor_keys = set(ancestor_assets)
+        if not ancestor_keys:
+            return asset_permission_ids
+        permission_node_relations = (
+            AssetPermission.nodes.through.objects.filter(
+                assetpermission_id__in=permission_ids,
+                node__key__in=ancestor_keys,
+            ).values_list('assetpermission_id', 'node__key')
+        )
+        for permission_id, node_key in permission_node_relations:
+            for asset_id in ancestor_assets.get(node_key, set()):
+                asset_permission_ids[asset_id].add(permission_id)
+        return asset_permission_ids
+
+    @staticmethod
+    def get_asset_protocols(asset_ids):
+        asset_protocols = defaultdict(set)
+        relations = Protocol.objects.filter(
+            asset_id__in=asset_ids,
+        ).values_list('asset_id', 'name')
+        for asset_id, protocol in relations:
+            asset_protocols[asset_id].add(protocol)
+        return asset_protocols
+
+    @staticmethod
+    def get_asset_account_usernames(asset_ids):
+        source_asset_ids = set(asset_ids)
+        source_targets = defaultdict(set)
+        for asset_id in asset_ids:
+            source_targets[asset_id].add(asset_id)
+
+        directory_relations = (
+            Asset.directory_services.through.objects.filter(
+                asset_id__in=asset_ids,
+            ).values_list('asset_id', 'directoryservice_id')
+        )
+        for asset_id, directory_service_id in directory_relations:
+            source_asset_ids.add(directory_service_id)
+            source_targets[directory_service_id].add(asset_id)
+
+        asset_usernames = defaultdict(list)
+        accounts = Account.objects.filter(
+            asset_id__in=source_asset_ids,
+            is_active=True,
+        ).values_list('asset_id', 'username')
+        for source_asset_id, username in accounts:
+            for target_asset_id in source_targets[source_asset_id]:
+                asset_usernames[target_asset_id].append(username)
+        return asset_usernames
+
+    @staticmethod
+    def get_alias_actions(permissions):
+        alias_actions = defaultdict(int)
+        for permission in permissions:
+            for alias in permission.accounts:
+                alias_actions[alias] |= permission.actions
+        return alias_actions
+
+    @staticmethod
+    def expand_all_alias(alias_actions, account_usernames):
+        all_actions = alias_actions.pop(AliasAccount.ALL, 0)
+        if not all_actions:
+            return
+        for username in account_usernames:
+            alias_actions[username] |= all_actions
+
+    @staticmethod
+    def apply_exclusions(alias_actions):
+        exclusions = {
+            alias: actions
+            for alias, actions in alias_actions.items()
+            if alias.startswith('!')
+        }
+        for alias, actions in exclusions.items():
+            alias_actions.pop(alias, None)
+            alias_actions[alias.lstrip('!')] &= ~actions
+
+    def resolve_alias_actions(self, alias_actions, account_usernames):
+        resolved_actions = defaultdict(int)
+        for alias, actions in alias_actions.items():
+            if actions <= 0:
+                continue
+            if alias == AliasAccount.USER:
+                username = self.user.username
+            elif alias.startswith('@'):
+                continue
+            else:
+                username = alias
+            if username in account_usernames:
+                resolved_actions[username] |= actions
+        return resolved_actions
+
+    def get_asset_permitted_usernames(
+        self, asset_id, permission_ids, permissions_by_id,
+        asset_protocols, asset_usernames, required_protocols,
+        action_required,
+    ):
+        actual_protocols = asset_protocols.get(asset_id, set())
+        protocols = (
+            actual_protocols.intersection(required_protocols)
+            if required_protocols else actual_protocols
+        )
+        if not protocols:
+            return []
+
+        permissions = (
+            permissions_by_id[permission_id]
+            for permission_id in permission_ids
+            if self.permission_matches_protocol(
+                permissions_by_id[permission_id], protocols,
+            )
+        )
+        account_usernames = asset_usernames.get(asset_id, [])
+        account_username_set = set(account_usernames)
+        alias_actions = self.get_alias_actions(permissions)
+        self.expand_all_alias(alias_actions, account_username_set)
+        self.apply_exclusions(alias_actions)
+        resolved_actions = self.resolve_alias_actions(
+            alias_actions, account_username_set,
+        )
+
+        return [
+            username for username in account_usernames
+            if not username.startswith(('jms_', 'js_'))
+            and ActionChoices.contains(
+                resolved_actions.get(username, 0), action_required,
+            )
+        ]
+
+    def get_permitted_account_usernames(
+        self, assets, action_required, protocols_required=None,
+    ):
+        asset_ids = [asset.id for asset in assets]
+        if not asset_ids:
+            return []
+
+        permissions = list(
+            AssetPermissionUtil().get_permissions_for_user(self.user).only(
+                'id', 'accounts', 'protocols', 'actions',
+            )
+        )
+        permissions_by_id = {
+            permission.id: permission for permission in permissions
+        }
+        permission_ids = list(permissions_by_id)
+        if not permission_ids:
+            return []
+
+        asset_permission_ids = self.get_asset_permission_ids(
+            asset_ids, permission_ids,
+        )
+        asset_ids = [
+            asset_id for asset_id in asset_ids
+            if asset_permission_ids.get(asset_id)
+        ]
+        if not asset_ids:
+            return []
+
+        asset_protocols = self.get_asset_protocols(asset_ids)
+        asset_usernames = self.get_asset_account_usernames(asset_ids)
+        required_protocols = set(protocols_required or [])
+
+        usernames = []
+        for asset_id in asset_ids:
+            usernames.extend(self.get_asset_permitted_usernames(
+                asset_id,
+                asset_permission_ids[asset_id],
+                permissions_by_id,
+                asset_protocols,
+                asset_usernames,
+                required_protocols,
+                action_required,
+            ))
+        return usernames
 
 
 class PermAssetDetailUtil:
