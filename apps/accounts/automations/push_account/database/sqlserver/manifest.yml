@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 mssql 执行 SQLServer 账号推送
     ja: Ansible mssql モジュールを使用してアカウントをプッシュする
     en: Using Ansible module mssql to push account
+    es: Usar el módulo Ansible mssql para aprovisionar la cuenta
+    ko: Ansible mssql 모듈을 사용하여 계정 푸시
+    pt-br: Usar o módulo Ansible mssql para enviar a conta
+    ru: Использовать модуль Ansible mssql, чтобы добавить учетную запись
+    vi: Sử dụng mô-đun Ansible mssql để đẩy tài khoản
+    zh-hant: 使用 Ansible 模組 mssql 執行 SQLServer 帳號推送

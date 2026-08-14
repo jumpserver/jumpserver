@@ -11,3 +11,9 @@ i18n:
     zh: 使用命令 getent passwd 收集 Posix 资产账号
     ja: コマンド getent を使用してアセットアカウントを収集する
     en: Using command getent to gather accounts
+    es: Usar el comando getent para recopilar cuentas
+    ko: getent 명령을 사용하여 계정 수집
+    pt-br: Usar o comando getent para coletar contas
+    ru: Использовать команду getent для сбора учетных записей
+    vi: Sử dụng lệnh getent để thu thập tài khoản
+    zh-hant: 使用命令 getent passwd 收集 Posix 資產帳號

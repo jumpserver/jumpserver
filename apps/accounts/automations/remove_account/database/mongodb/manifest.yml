@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 mongodb 删除账号
     ja: Ansible モジュール mongodb を使用してアカウントを削除する
     en: Delete account using Ansible module mongodb
+    es: Usar el módulo Ansible mongodb para eliminar la cuenta
+    ko: Ansible mongodb 모듈을 사용하여 계정 삭제
+    pt-br: Usar o módulo Ansible mongodb para excluir a conta
+    ru: Использовать модуль Ansible mongodb, чтобы удалить учетную запись
+    vi: Sử dụng mô-đun Ansible mongodb để xóa tài khoản
+    zh-hant: 使用 Ansible 模組 mongodb 刪除帳號

@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 mssql 验证账号
     ja: Ansible mssql モジュールを使用してアカウントを検証する
     en: Using Ansible module mssql to verify account
+    es: Usar el módulo Ansible mssql para verificar la cuenta
+    ko: Ansible mssql 모듈을 사용하여 계정 확인
+    pt-br: Usar o módulo Ansible mssql para verificar a conta
+    ru: Использовать модуль Ansible mssql, чтобы проверить учетную запись
+    vi: Sử dụng mô-đun Ansible mssql để xác minh tài khoản
+    zh-hant: 使用 Ansible 模組 mssql 驗證帳號

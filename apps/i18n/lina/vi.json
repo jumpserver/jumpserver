@@ -1846,6 +1846,8 @@
     "VaultHelpText": "1. Vì lý do bảo mật, hãy bật lưu trữ Vault trong tệp cấu hình.<br>2. Sau khi bật, hoàn tất cấu hình và kiểm tra kết nối.<br>3. Đồng bộ sẽ di chuyển các bí mật từ cơ sở dữ liệu cục bộ sang Vault từ xa; sau đó chúng không còn được lưu cục bộ. Dùng Khôi phục vào cơ sở dữ liệu để ghi lại các bí mật đã đồng bộ vào máy cục bộ. Các bản sao trong Vault sẽ được giữ lại.<br>4. Khởi động lại dịch vụ sau khi thay đổi cấu hình Vault.",
     "VaultOpenBaoAddr": "Địa chỉ OpenBao Server, mặc định là http://127.0.0.1:8200",
     "VaultOpenBaoMountPoint": "Điểm gắn kết OpenBao KV v2, mặc định là pam",
+    "VaultSecretUnavailable": "Dịch vụ Vault không khả dụng. Không thể lấy mật khẩu.",
+    "VaultSecretUnavailableTip": "Không thể kết nối với dịch vụ Vault. Vui lòng thử lại sau hoặc nhờ quản trị viên kiểm tra cấu hình Vault.",
     "VerificationCodeSent": "Mã xác nhận đã được gửi",
     "VerifyFace": "Xác thực khuôn mặt",
     "VerifySecret": "Xác thực văn bản mã hóa",

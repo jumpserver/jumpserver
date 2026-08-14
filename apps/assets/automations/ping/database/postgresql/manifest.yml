@@ -9,3 +9,9 @@ i18n:
     zh: 使用 Ansible 模块 postgresql 来测试 PostgreSQL 连接性
     en: Ping PostgreSQL using ansible postgresql module
     ja: ansible postgresql モジュールを使用して PostgreSQL に ping を送信する
+    es: Usar el módulo Ansible postgresql para probar PostgreSQL
+    ko: Ansible postgresql 모듈을 사용하여 테스트 PostgreSQL
+    pt-br: Usar o módulo Ansible postgresql para testar PostgreSQL
+    ru: Использовать модуль Ansible postgresql, чтобы проверить PostgreSQL
+    vi: Sử dụng mô-đun Ansible postgresql để kiểm tra PostgreSQL
+    zh-hant: 使用 Ansible 模組 postgresql 來測試 PostgreSQL 連線性

@@ -9,3 +9,10 @@ i18n:
   MongoDB account gather:
     zh: MongoDB 账号收集
     ja: MongoDB アカウントの収集
+    en: MongoDB account gather
+    es: Recopilación de cuentas de MongoDB
+    ko: MongoDB 계정 수집
+    pt-br: Coleta de contas MongoDB
+    ru: Сбор учетных записей MongoDB
+    vi: Thu thập tài khoản MongoDB
+    zh-hant: MongoDB 帳號收集

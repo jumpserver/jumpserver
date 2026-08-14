@@ -20,13 +20,31 @@ i18n:
     ja: 'Ansible win_domain_user モジュールを使用して Windows アカウントのパスワード変更'
     en: 'Using Ansible module win_domain_user to change Windows account secret'
 
+    es: Usar el módulo Ansible win_domain_user para cambiar la contraseña de la cuenta Windows
+    ko: Ansible win_domain_user 모듈을 사용하여 Windows 계정 비밀번호 변경
+    pt-br: Usar o módulo Ansible win_domain_user para alterar a senha da conta Windows
+    ru: Использовать модуль Ansible win_domain_user, чтобы изменить пароль учетной записи Windows
+    vi: Sử dụng mô-đun Ansible win_domain_user để đổi mật khẩu tài khoản Windows
+    zh-hant: 使用 Ansible 模組 win_domain_user 執行 Windows 帳號改密
   Params groups help text:
     zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
     ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
     en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
 
+    es: Introduzca los grupos existentes separados por comas
+    ko: 기존 그룹을 입력하세요. 여러 그룹은 쉼표로 구분합니다
+    pt-br: Insira os grupos existentes separados por vírgulas
+    ru: Введите существующие группы, разделяя их запятыми
+    vi: Nhập các nhóm đã tồn tại, phân tách bằng dấu phẩy
+    zh-hant: 請輸入使用者組，多個使用者組使用逗號分隔（需填寫已存在的使用者組）
   Params groups label:
     zh: '用户组'
     ja: 'グループ'
     en: 'Groups'
 
+    es: Grupos
+    ko: 그룹
+    pt-br: Grupos
+    ru: Группы
+    vi: Nhóm
+    zh-hant: 使用者組

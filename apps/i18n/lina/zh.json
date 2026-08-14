@@ -1846,6 +1846,8 @@
     "VaultHelpText": "1. 由于安全原因，需要在配置文件中开启 Vault 存储，默认后端为 OpenBao。<br>2. 开启后，填写存储配置并测试连接。<br>3. 同步会将密钥从本地数据库迁移到远端 Vault，同步完成后本地数据库不再存储密钥；使用“还原”可将已同步密钥重新写回本地，Vault 中的副本会保留。<br>4. 修改 Vault 配置后需重启服务。",
     "VaultOpenBaoAddr": "OpenBao Server 地址，默认为 http://127.0.0.1:8200",
     "VaultOpenBaoMountPoint": "OpenBao KV v2 挂载点，默认为 pam",
+    "VaultSecretUnavailable": "Vault 服务异常，无法获取密码",
+    "VaultSecretUnavailableTip": "无法连接到 Vault 服务。请稍后重试或联系管理员检查 Vault 配置。",
     "VerificationCodeSent": "验证码已发送",
     "VerifyFace": "验证人脸",
     "VerifySecret": "验证密文",

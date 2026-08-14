@@ -7,12 +7,38 @@ method: push_account
 params:
   - name: roles
     type: str
-    label: Roles
+    label: "{{ 'Roles' | trans }}"
     default: readWrite
-    help_text: Comma-separated roles used only when the remote user is created
+    help_text: "{{ 'Roles help text' | trans }}"
 
 i18n:
   MongoDB account push:
     zh: 使用 Ansible 模块 mongodb 执行 MongoDB 账号推送
     ja: Ansible mongodb モジュールを使用してアカウントをプッシュする
     en: Using Ansible module mongodb to push account
+    es: Usar el módulo Ansible mongodb para aprovisionar la cuenta
+    ko: Ansible mongodb 모듈을 사용하여 계정 푸시
+    pt-br: Usar o módulo Ansible mongodb para enviar a conta
+    ru: Использовать модуль Ansible mongodb, чтобы добавить учетную запись
+    vi: Sử dụng mô-đun Ansible mongodb để đẩy tài khoản
+    zh-hant: 使用 Ansible 模組 mongodb 執行 MongoDB 帳號推送
+  Roles:
+    zh: 角色
+    zh-hant: 角色
+    ja: ロール
+    ko: 역할
+    es: Roles
+    pt-br: Funções
+    ru: Роли
+    vi: Vai trò
+    en: Roles
+  Roles help text:
+    zh: 仅在创建远程用户时使用，多个角色使用逗号分隔
+    zh-hant: 僅在建立遠端使用者時使用，多個角色以逗號分隔
+    ja: リモートユーザーの作成時にのみ使用するロール（複数の場合はカンマ区切り）
+    ko: 원격 사용자를 생성할 때만 사용되는 쉼표로 구분된 역할
+    es: Roles separados por comas que se usan solo al crear el usuario remoto
+    pt-br: Funções separadas por vírgulas usadas apenas quando o usuário remoto é criado
+    ru: Роли через запятую, используемые только при создании удаленного пользователя
+    vi: Các vai trò được phân tách bằng dấu phẩy, chỉ dùng khi tạo người dùng từ xa
+    en: Comma-separated roles used only when the remote user is created

@@ -1846,6 +1846,8 @@
     "VaultHelpText": "1. Por segurança, ative o armazenamento Vault no arquivo de configuração.<br>2. Depois de ativá-lo, preencha a configuração e teste a conexão.<br>3. A sincronização migra os segredos do banco de dados local para o Vault remoto; depois disso, eles não ficam armazenados localmente. Use Restaurar para o banco de dados para gravar novamente os segredos sincronizados no banco local. As cópias no Vault serão mantidas.<br>4. Reinicie o serviço após alterar a configuração do Vault.",
     "VaultOpenBaoAddr": "Endereço do servidor OpenBao, padrão http://127.0.0.1:8200",
     "VaultOpenBaoMountPoint": "Ponto de montagem do OpenBao KV v2, padrão: pam",
+    "VaultSecretUnavailable": "O serviço Vault está indisponível. Não foi possível obter a senha.",
+    "VaultSecretUnavailableTip": "Não foi possível conectar ao serviço Vault. Tente novamente mais tarde ou peça ao administrador para verificar a configuração do Vault.",
     "VerificationCodeSent": "O código de verificação foi enviado",
     "VerifyFace": " Verificar rosto ",
     "VerifySecret": " Verificar texto cifrado ",

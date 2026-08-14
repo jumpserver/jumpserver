@@ -9,3 +9,10 @@ i18n:
   PostgreSQL account gather:
     zh: PostgreSQL 账号收集
     ja: PostgreSQL アカウントの収集
+    en: PostgreSQL account gather
+    es: Recopilación de cuentas de PostgreSQL
+    ko: PostgreSQL 계정 수집
+    pt-br: Coleta de contas PostgreSQL
+    ru: Сбор учетных записей PostgreSQL
+    vi: Thu thập tài khoản PostgreSQL
+    zh-hant: PostgreSQL 帳號收集

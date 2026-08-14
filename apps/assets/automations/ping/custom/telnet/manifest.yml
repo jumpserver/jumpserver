@@ -15,3 +15,9 @@ i18n:
     zh: '使用 Python 模块 telnet 测试主机可连接性'
     en: 'Ping by telnet module'
     ja: 'Pythonモジュールtelnetを使用したホスト接続性のテスト'
+    es: Comprobar la conectividad mediante el módulo telnet
+    ko: telnet 모듈로 연결 테스트
+    pt-br: Testar a conectividade com o módulo telnet
+    ru: Проверить подключение с помощью модуля telnet
+    vi: Kiểm tra kết nối bằng mô-đun telnet
+    zh-hant: 使用 Python 模組 telnet 測試主機可連線性

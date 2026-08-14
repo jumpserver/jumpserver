@@ -1850,6 +1850,8 @@
     "VaultHelpText": "1. セキュリティ上の理由から、設定ファイルで Vault ストレージを有効にします。<br>2. 有効化後、ストレージ設定を入力して接続をテストします。<br>3. 同期すると、シークレットがローカルデータベースからリモート Vault に移行され、ローカルには保存されなくなります。「復元」を使用すると、同期済みシークレットをローカルに書き戻せます。Vault 内のコピーは保持されます。<br>4. Vault の設定を変更した後はサービスを再起動してください。",
     "VaultOpenBaoAddr": "OpenBao Server アドレス、デフォルトは http://127.0.0.1:8200",
     "VaultOpenBaoMountPoint": "OpenBao KV v2 マウントポイント、デフォルトは pam",
+    "VaultSecretUnavailable": "Vault サービスに異常があるため、パスワードを取得できません",
+    "VaultSecretUnavailableTip": "Vault サービスに接続できません。後でもう一度試すか、管理者に Vault 設定の確認を依頼してください。",
     "VerificationCodeSent": "認証コードが送信されました",
     "VerifyFace": "顔認証を行います",
     "VerifySecret": "暗号文を検証",

@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 mssql 删除账号
     ja: Ansible モジュール mssql を使用してアカウントを削除する
     en: Use Ansible module mssql to delete account
+    es: Usar el módulo Ansible mssql para eliminar la cuenta
+    ko: Ansible mssql 모듈을 사용하여 계정 삭제
+    pt-br: Usar o módulo Ansible mssql para excluir a conta
+    ru: Использовать модуль Ansible mssql, чтобы удалить учетную запись
+    vi: Sử dụng mô-đun Ansible mssql để xóa tài khoản
+    zh-hant: 使用 Ansible 模組 mssql 刪除帳號
