@@ -54,10 +54,6 @@ class AssetImportTemplate:
         - is_active: bool
         - accounts 不参与资产创建/更新提交
         """
-        # 注意: 用户标签在 labels 应用（labels_label 表），assets.models.Label 为旧模型
-        from assets.models import Node
-        from labels.models import Label
-
         display_row = {}
         for k, v in row_data.items():
             column = self.get_column_by_field_name(k)
@@ -83,23 +79,11 @@ class AssetImportTemplate:
                     'name': str(v).strip(),
                 } if parsed is not None else None
             elif field_name == 'nodes_display':
-                node_pks = []
-                for path in parsed or []:
-                    node = Node.objects.filter(full_value=path).first()
-                    # 解析失败（节点不存在）的项不展示
-                    if node:
-                        node_pks.append({'pk': node.pk, 'name': node.full_value})
-                # 更新接口参数为 nodes，title 与数据均以 nodes 为准
-                display_row['nodes'] = node_pks
+                # 直接返回节点路径列表，节点不存在时由后端创建接口自动创建
+                display_row['nodes_display'] = parsed or []
             elif field_name == 'labels':
-                label_pks = []
-                for item in parsed or []:
-                    name, _, value = str(item).partition(':')
-                    label = Label.objects.filter(name=name, value=value).first()
-                    # 解析失败（标签不存在）的项不展示
-                    if label:
-                        label_pks.append({'pk': label.pk, 'name': str(item)})
-                display_row[field_name] = label_pks
+                # 直接返回 name:value 列表，标签不存在时由后端创建接口自动创建
+                display_row[field_name] = parsed or []
             else:
                 display_row[field_name] = parsed
         display_row.setdefault('directory_services', [])

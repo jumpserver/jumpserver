@@ -229,11 +229,7 @@ class BaseFileParser(BaseParser):
 
             # 给 `common.mixins.api.RenderToJsonMixin` 提供，暂时只能耦合
             column_title_field_pairs = list(zip(column_titles, field_names))
-            # 节点路径列: 模板内部用 nodes_display，更新接口参数为 nodes，title 以 nodes 为准
-            column_title_field_pairs = [
-                (k, 'nodes' if v == 'nodes_display' else v)
-                for k, v in column_title_field_pairs if k and v
-            ]
+            column_title_field_pairs = [(k, v) for k, v in column_title_field_pairs if k and v]
             if not hasattr(request, 'jms_context'):
                 request.jms_context = {}
             request.jms_context['column_title_field_pairs'] = column_title_field_pairs

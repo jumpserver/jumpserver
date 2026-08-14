@@ -20,6 +20,7 @@ from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Protocol, Host, Device, Database, Cloud, Web, Custom
+from .template_definition import host_import_template
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -170,6 +171,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         fields_unexport = ['auto_config']
+        # 通用资产列表（/api/v1/assets/assets/）导出复用主机模板格式
+        import_template = host_import_template
         extra_kwargs = {
             'auto_config': {'label': _('Auto info')},
             'name': {'label': _("Name"), 'initial': 'Asset name'},

@@ -12,6 +12,8 @@ class DSSerializer(AssetSerializer):
         fields = AssetSerializer.Meta.fields + [
             'domain_name',
         ]
+        # 目录服务无专门导入模板，避免继承通用 host 模板
+        import_template = None
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
             'domain_name': {

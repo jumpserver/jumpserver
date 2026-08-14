@@ -13,6 +13,8 @@ class GPTSerializer(AssetSerializer):
         fields = AssetSerializer.Meta.fields + [
             'proxy',
         ]
+        # GPT 无专门导入模板，避免继承通用 host 模板
+        import_template = None
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
             'proxy': {

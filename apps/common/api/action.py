@@ -13,6 +13,7 @@ from common.const.http import POST, PUT
 from orgs.models import Organization
 from orgs.utils import current_org
 
+
 __all__ = ['SuggestionMixin', 'RenderToJsonMixin']
 
 
@@ -75,6 +76,19 @@ class RenderToJsonMixin:
         jms_context = getattr(request, 'jms_context', {})
         column_title_field_pairs = jms_context.get('column_title_field_pairs', ())
         data['title'] = column_title_field_pairs
+
+        # 模板模式下展示用户填写的原始值（含 id、平台/网域名称），而非解析后的 pk
+        display_rows = jms_context.get('template_display_data')
+        if display_rows:
+            data['data'] = display_rows
+
+        # # 调试输出: 打印返回的数据格式（F12 看不到时便于排查）
+        # print(
+        #     'render_to_json return: title={}, rows={}, data={}'.format(
+        #         data['title'], len(data['data']),
+        #         json.dumps(data, ensure_ascii=False, default=str)[:2000],
+        #     )
+        # )
 
         if isinstance(request.data, (list, tuple)) and not any(request.data):
             error = _("Request file format may be wrong")
