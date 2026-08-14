@@ -55,6 +55,12 @@ class StepAction:
         self.command = command
 
     def execute(self, driver: webdriver.Chrome) -> bool:
+        if self.command == 'open':
+            url = self.value or self.target
+            if not url:
+                return True
+            driver.get(url)
+            return True
         if not self.target:
             return True
         if self.command == 'select_frame':
@@ -72,8 +78,6 @@ class StepAction:
             ele.send_keys(self.value)
         elif self.command in ['click', 'button']:
             ele.click()
-        elif self.command in ['open']:
-            driver.get(self.value)
         elif self.command == 'code':
             unblock_input()
             code_string = CodeDialog(title="Code Dialog", label="Code").wait_string()
