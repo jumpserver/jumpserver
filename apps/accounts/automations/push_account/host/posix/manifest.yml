@@ -54,57 +54,129 @@ i18n:
     ja: 'Ansible user モジュールを使用してアカウントをプッシュする (sha512)'
     en: 'Using Ansible module user to push account (sha512)'
 
+    es: Usar el módulo Ansible user para aprovisionar la cuenta (sha512)
+    ko: Ansible user 모듈을 사용하여 계정 푸시 (sha512)
+    pt-br: Usar o módulo Ansible user para enviar a conta (sha512)
+    ru: Использовать модуль Ansible user, чтобы добавить учетную запись (sha512)
+    vi: Sử dụng mô-đun Ansible user để đẩy tài khoản (sha512)
+    zh-hant: 使用 Ansible 模組 user 執行帳號推送 (sha512)
   Modify params sudo help text:
     zh: '如果用户存在，可以修改sudo权限'
     ja: 'ユーザーが存在する場合、sudo権限を変更できます'
     en: 'If the user exists, sudo permissions can be modified'
 
+    es: Si el usuario existe, se pueden modificar los permisos de sudo
+    ko: 사용자가 존재하면 sudo 권한을 수정할 수 있습니다
+    pt-br: Se o usuário existir, as permissões sudo poderão ser modificadas
+    ru: Если пользователь существует, его права sudo можно изменить
+    vi: Nếu người dùng tồn tại, có thể sửa quyền sudo
+    zh-hant: 如果使用者存在，可以修改sudo許可權
   Params sudo help text:
     zh: '使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig'
     ja: 'コンマで区切って複数のコマンドを入力してください。例: /bin/whoami,/sbin/ifconfig'
     en: 'Use commas to separate multiple commands, such as: /bin/whoami,/sbin/ifconfig'
 
+    es: 'Separe varios comandos con comas, por ejemplo: /bin/whoami,/sbin/ifconfig'
+    ko: '여러 명령은 쉼표로 구분합니다. 예: /bin/whoami,/sbin/ifconfig'
+    pt-br: 'Separe vários comandos com vírgulas, por exemplo: /bin/whoami,/sbin/ifconfig'
+    ru: 'Разделяйте несколько команд запятыми, например: /bin/whoami,/sbin/ifconfig'
+    vi: 'Phân tách nhiều lệnh bằng dấu phẩy, ví dụ: /bin/whoami,/sbin/ifconfig'
+    zh-hant: '使用逗號分隔多個命令，如: /bin/whoami,/sbin/ifconfig'
   Params home help text:
     zh: '默认家目录 /home/{账号用户名}'
     ja: 'デフォルトのホームディレクトリ /home/{アカウントユーザ名}'
     en: 'Default home directory /home/{account username}'
 
+    es: Directorio personal predeterminado /home/{account username}
+    ko: 기본 홈 디렉터리 /home/{account username}
+    pt-br: Diretório inicial padrão /home/{account username}
+    ru: Домашний каталог по умолчанию /home/{account username}
+    vi: Thư mục chính mặc định /home/{account username}
+    zh-hant: 預設家目錄 /home/{帳號使用者名稱}
   Params group help text:
     zh: '请输入用户组（名字或数字），只能输入一个（需填写已存在的用户组）'
     ja: 'ユーザー グループ (名前または番号) を入力してください。入力できるのは 1 つだけです (既存のユーザー グループを入力する必要があります)'
     en: 'Please enter a user group (name or number), only one can be entered (must fill in an existing user group)'
 
+    es: Introduzca un grupo de usuarios (nombre o número); solo se admite uno y debe existir
+    ko: 사용자 그룹(이름 또는 숫자)을 입력하세요. 기존 그룹 하나만 입력할 수 있습니다
+    pt-br: Insira um grupo de usuários (nome ou número); apenas um grupo existente pode ser informado
+    ru: Введите группу пользователей (имя или номер); можно указать только одну существующую группу
+    vi: Nhập nhóm người dùng (tên hoặc số); chỉ được nhập một nhóm đã tồn tại
+    zh-hant: 請輸入使用者組（名字或數字），只能輸入一個（需填寫已存在的使用者組）
   Params groups help text:
     zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
     ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
     en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
 
+    es: Introduzca los grupos existentes separados por comas
+    ko: 기존 그룹을 입력하세요. 여러 그룹은 쉼표로 구분합니다
+    pt-br: Insira os grupos existentes separados por vírgulas
+    ru: Введите существующие группы, разделяя их запятыми
+    vi: Nhập các nhóm đã tồn tại, phân tách bằng dấu phẩy
+    zh-hant: 請輸入使用者組，多個使用者組使用逗號分隔（需填寫已存在的使用者組）
   Params uid help text:
     zh: '请输入用户ID'
     ja: 'ユーザーIDを入力してください'
     en: 'Please enter the user ID'
 
+    es: Introduzca el ID de usuario
+    ko: 사용자 ID를 입력하세요
+    pt-br: Insira o ID do usuário
+    ru: Введите ID пользователя
+    vi: Nhập ID người dùng
+    zh-hant: 請輸入使用者ID
   Modify sudo label:
     zh: '修改 sudo 权限'
     ja: 'sudo 権限を変更'
     en: 'Modify sudo'
 
+    es: Modificar sudo
+    ko: sudo 수정
+    pt-br: Modificar sudo
+    ru: Изменить sudo
+    vi: Sửa sudo
+    zh-hant: 修改 sudo 許可權
   Params home label:
     zh: '家目录'
     ja: 'ホームディレクトリ'
     en: 'Home'
 
+    es: Directorio personal
+    ko: 홈 디렉터리
+    pt-br: Diretório inicial
+    ru: Домашний каталог
+    vi: Thư mục chính
+    zh-hant: 家目錄
   Params groups label:
     zh: '附加组'
     ja: '追加グループ'
     en: 'Additional Group'
 
+    es: Grupo adicional
+    ko: 추가 그룹
+    pt-br: Grupo adicional
+    ru: Дополнительная группа
+    vi: Nhóm bổ sung
+    zh-hant: 附加組
   Params group label:
     zh: '主组'
     ja: '主组'
     en: 'Main group'
 
+    es: Grupo principal
+    ko: 기본 그룹
+    pt-br: Grupo principal
+    ru: Основная группа
+    vi: Nhóm chính
+    zh-hant: 主組
   Params uid label:
     zh: '用户ID'
     ja: 'ユーザーID'
     en: 'User ID'
+    es: ID de usuario
+    ko: 사용자 ID
+    pt-br: ID do usuário
+    ru: ID пользователя
+    vi: ID người dùng
+    zh-hant: 使用者ID

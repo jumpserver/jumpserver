@@ -9,3 +9,9 @@ i18n:
     zh: 使用 Ansible 模块 mssql 来测试 SQLServer 连接性
     en: Ping SQLServer using ansible mssql module
     ja: ansible mssql モジュールを使用して SQLServer に ping を送信する
+    es: Usar el módulo Ansible mssql para probar SQLServer
+    ko: Ansible mssql 모듈을 사용하여 테스트 SQLServer
+    pt-br: Usar o módulo Ansible mssql para testar SQLServer
+    ru: Использовать модуль Ansible mssql, чтобы проверить SQLServer
+    vi: Sử dụng mô-đun Ansible mssql để kiểm tra SQLServer
+    zh-hant: 使用 Ansible 模組 mssql 來測試 SQLServer 連線性

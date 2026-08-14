@@ -1852,6 +1852,8 @@
     "VaultHelpText": "1. For security reasons, enable Vault storage in the configuration file; the default backend is OpenBao.<br>2. After enabling it, complete the provider configuration and test the connection.<br>3. Sync migrates secrets from the local database to the remote Vault. After synchronization, the local database no longer stores the secrets. Use Restore to database to write synchronized secrets back locally; copies in Vault are retained.<br>4. Restart the service after changing the Vault configuration.",
     "VaultOpenBaoAddr": "OpenBao server address, default is http://127.0.0.1:8200",
     "VaultOpenBaoMountPoint": "OpenBao KV v2 mount point, default is pam",
+    "VaultSecretUnavailable": "Vault service unavailable. Unable to retrieve the password.",
+    "VaultSecretUnavailableTip": "Unable to connect to the Vault service. Try again later or ask an administrator to check the Vault configuration.",
     "VerificationCodeSent": "Verification code has been sent",
     "VerifyFace": "Verify face",
     "VerifySecret": "Verify secret",

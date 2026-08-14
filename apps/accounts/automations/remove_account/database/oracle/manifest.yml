@@ -8,5 +8,11 @@ method: remove_account
 i18n:
   Oracle account remove:
     zh: 使用 Python 模块 oracledb 删除账号
-    ja: Python モジュール oracledb を使用してアカウントを検証する
-    en: Using Python module oracledb to verify account
+    ja: Python モジュール oracledb を使用してアカウントを削除する
+    en: Using Python module oracledb to delete account
+    es: Usar el módulo Python oracledb para eliminar la cuenta
+    ko: Python oracledb 모듈을 사용하여 계정 삭제
+    pt-br: Usar o módulo Python oracledb para excluir a conta
+    ru: Использовать модуль Python oracledb, чтобы удалить учетную запись
+    vi: Sử dụng mô-đun Python oracledb để xóa tài khoản
+    zh-hant: 使用 Python 模組 oracledb 刪除帳號

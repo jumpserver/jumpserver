@@ -16,7 +16,19 @@ i18n:
     en: Chrome Browser
     zh: Chrome 浏览器
     ja: Chrome ブラウザ
+    es: Navegador Chrome
+    ko: Chrome 브라우저
+    pt-br: Navegador Chrome
+    ru: Браузер Chrome
+    vi: Trình duyệt Chrome
+    zh-hant: Chrome 瀏覽器
   Chrome Browser Open URL Page Address:
     en: Chrome Browser Open URL Page Address
     zh: Chrome 浏览器打开网页地址
     ja: Chrome ブラウザでウェブページを開く
+    es: Dirección URL que abrirá el navegador Chrome
+    ko: Chrome 브라우저에서 열 URL 페이지 주소
+    pt-br: Endereço da página URL a ser aberta pelo navegador Chrome
+    ru: URL-адрес страницы для открытия в браузере Chrome
+    vi: Địa chỉ URL trang sẽ mở bằng trình duyệt Chrome
+    zh-hant: Chrome 瀏覽器開啟網頁地址

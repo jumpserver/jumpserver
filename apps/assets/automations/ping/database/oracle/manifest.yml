@@ -9,3 +9,9 @@ i18n:
     zh: 使用 python oracledb 模块来测试 Oracle 可连接性
     en: Use python oracledb module to test Oracle
     ja: Python oracledbモジュールを使用してテストする Oracle
+    es: Usar el módulo Python oracledb para probar Oracle
+    ko: Python oracledb 모듈을 사용하여 테스트 Oracle
+    pt-br: Usar o módulo Python oracledb para testar Oracle
+    ru: Использовать модуль Python oracledb, чтобы проверить Oracle
+    vi: Sử dụng mô-đun Python oracledb để kiểm tra Oracle
+    zh-hant: 使用 python oracledb 模組來測試 Oracle 可連線性

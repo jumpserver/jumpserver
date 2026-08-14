@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 postgresql 执行 PostgreSQL 账号推送
     ja: Ansible postgresql モジュールを使用してアカウントをプッシュする
     en: Using Ansible module postgresql to push account
+    es: Usar el módulo Ansible postgresql para aprovisionar la cuenta
+    ko: Ansible postgresql 모듈을 사용하여 계정 푸시
+    pt-br: Usar o módulo Ansible postgresql para enviar a conta
+    ru: Использовать модуль Ansible postgresql, чтобы добавить учетную запись
+    vi: Sử dụng mô-đun Ansible postgresql để đẩy tài khoản
+    zh-hant: 使用 Ansible 模組 postgresql 執行 PostgreSQL 帳號推送

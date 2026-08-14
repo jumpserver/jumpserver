@@ -9,3 +9,10 @@ i18n:
   SQLServer account change secret:
     zh: SQLServer 账号改密
     ja: SQLServer アカウントのパスワード変更
+    en: SQLServer account change secret
+    es: Cambio de contraseña de la cuenta SQLServer
+    ko: SQLServer 계정 비밀번호 변경
+    pt-br: Alteração da senha da conta SQLServer
+    ru: Смена пароля учетной записи SQLServer
+    vi: Đổi mật khẩu tài khoản SQLServer
+    zh-hant: SQLServer 帳號改密

@@ -41,6 +41,12 @@ i18n:
     ja: 'SSH コマンドライン方式でカスタムパスワード変更'
     en: 'Custom password change by SSH command line'
 
+    es: Cambio de contraseña personalizado mediante la línea de comandos SSH
+    ko: SSH 명령줄을 사용한 사용자 지정 비밀번호 변경
+    pt-br: Alteração de senha personalizada pela linha de comando SSH
+    ru: Пользовательская смена пароля через командную строку SSH
+    vi: Đổi mật khẩu tùy chỉnh bằng dòng lệnh SSH
+    zh-hant: 使用 SSH 命令列自定義改密
   Params commands help text:
     zh: |
       请将命令中的指定位置改成特殊符号 <br />
@@ -107,46 +113,225 @@ i18n:
       end <br />
       write memory <br />
 
+    es: |
+      Cambie las posiciones indicadas del comando por símbolos especiales. <br />
+      Cuenta cuya contraseña se cambiará -> {username} <br />
+      Nueva contraseña -> {password} <br />
+      Contraseña del usuario de inicio de sesión -> {login_password} <br />
+      Contraseña de privilegios existente (como la contraseña enable de Cisco) -> {privilege_password} <br />
+      <strong>Separe varios comandos con saltos de línea.</strong> Al ejecutar la tarea, <br />
+      el sistema sustituirá los símbolos especiales por datos reales. <br />
+      Por ejemplo, para cambiar una contraseña enable de Cisco, configure estos comandos: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      enable secret {password} <br />
+      end <br />
+      write memory <br />
+      Para cambiar un usuario normal de Cisco, utilice: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
+    ko: |
+      명령의 지정된 위치를 특수 기호로 변경하세요. <br />
+      비밀번호를 변경할 계정 -> {username} <br />
+      새 비밀번호 -> {password} <br />
+      로그인 사용자 비밀번호 -> {login_password} <br />
+      기존 특권 비밀번호(예: Cisco enable 비밀번호) -> {privilege_password} <br />
+      <strong>여러 명령은 줄바꿈으로 구분합니다.</strong> 작업 실행 시 <br />
+      시스템이 특수 기호를 실제 데이터로 바꿉니다. <br />
+      예를 들어 Cisco enable 비밀번호를 변경하려면 다음 명령을 설정하세요. <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      enable secret {password} <br />
+      end <br />
+      write memory <br />
+      일반 Cisco 사용자를 변경하려면 다음을 사용하세요. <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
+    pt-br: |
+      Altere as posições indicadas no comando para símbolos especiais. <br />
+      Conta cuja senha será alterada -> {username} <br />
+      Nova senha -> {password} <br />
+      Senha do usuário de login -> {login_password} <br />
+      Senha de privilégio existente (como a senha enable da Cisco) -> {privilege_password} <br />
+      <strong>Separe vários comandos por novas linhas.</strong> Ao executar a tarefa, <br />
+      o sistema substituirá os símbolos especiais pelos dados reais. <br />
+      Por exemplo, para alterar uma senha enable da Cisco, configure os comandos a seguir: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      enable secret {password} <br />
+      end <br />
+      write memory <br />
+      Para alterar um usuário comum da Cisco, use: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
+    ru: |
+      Замените указанные места в команде специальными символами. <br />
+      Учетная запись для смены пароля -> {username} <br />
+      Новый пароль -> {password} <br />
+      Пароль пользователя для входа -> {login_password} <br />
+      Текущий привилегированный пароль (например, пароль Cisco enable) -> {privilege_password} <br />
+      <strong>Разделяйте несколько команд переводами строк.</strong> При выполнении задачи <br />
+      система заменит специальные символы реальными данными. <br />
+      Например, чтобы изменить пароль Cisco enable, настройте следующие команды: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      enable secret {password} <br />
+      end <br />
+      write memory <br />
+      Чтобы изменить обычного пользователя Cisco, используйте: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
+    vi: |
+      Thay các vị trí được chỉ định trong lệnh bằng ký hiệu đặc biệt. <br />
+      Tài khoản cần đổi mật khẩu -> {username} <br />
+      Mật khẩu mới -> {password} <br />
+      Mật khẩu người dùng đăng nhập -> {login_password} <br />
+      Mật khẩu đặc quyền hiện tại (như mật khẩu Cisco enable) -> {privilege_password} <br />
+      <strong>Phân tách nhiều lệnh bằng dòng mới.</strong> Khi thực thi tác vụ, <br />
+      hệ thống sẽ thay các ký hiệu đặc biệt bằng dữ liệu thực. <br />
+      Ví dụ, để đổi mật khẩu Cisco enable, hãy cấu hình các lệnh sau: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      enable secret {password} <br />
+      end <br />
+      write memory <br />
+      Để thay đổi người dùng Cisco thông thường, hãy dùng: <br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
+    zh-hant: |
+      請將命令中的指定位置改成特殊符號 <br />
+      1. 改密帳號 -> {username} <br />
+      2. 改密密碼 -> {password} <br />
+      3. 登入使用者密碼 -> {login_password} <br />
+      4. 已有特權密碼（如 Cisco enable 密碼） -> {privilege_password} <br />
+      <strong>多條命令使用換行分割，</strong>執行任務時系統會根據特殊符號替換真實資料。<br />
+      比如針對 Cisco enable 許可權進行改密，一般需要配置以下命令：<br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      enable secret {password} <br />
+      end <br />
+      write memory <br />
+      如果修改 Cisco 普通使用者，請使用：<br />
+      enable <br />
+      {privilege_password} <br />
+      configure terminal <br />
+      username {username} privilege 15 secret {password} <br />
+      end <br />
+      write memory <br />
   Params commands label:
     zh: '自定义命令'
     ja: 'カスタムコマンド'
     en: 'Custom command'
 
+    es: Comando personalizado
+    ko: 사용자 지정 명령
+    pt-br: Comando personalizado
+    ru: Пользовательская команда
+    vi: Lệnh tùy chỉnh
+    zh-hant: 自定義命令
   Params recv_timeout label:
     zh: '超时时间'
     ja: 'タイムアウト'
     en: 'Timeout'
 
+    es: Tiempo de espera
+    ko: 시간 초과
+    pt-br: Tempo limite
+    ru: Время ожидания
+    vi: Thời gian chờ
+    zh-hant: 超時時間
   Params recv_timeout help text:
     zh: '等待命令结果返回的超时时间（秒）'
     ja: 'コマンドの結果を待つタイムアウト時間（秒）'
     en: 'The timeout for waiting for the command result to return (Seconds)'
 
+    es: Tiempo máximo de espera del resultado del comando (segundos)
+    ko: 명령 결과 반환 대기 시간(초)
+    pt-br: Tempo limite para aguardar o resultado do comando (segundos)
+    ru: Время ожидания результата команды (секунды)
+    vi: Thời gian chờ kết quả lệnh trả về (giây)
+    zh-hant: 等待命令結果返回的超時時間（秒）
   Params delay_time label:
     zh: '延迟发送时间'
     ja: '遅延送信時間'
     en: 'Delayed send time'
 
+    es: Tiempo de envío diferido
+    ko: 전송 지연 시간
+    pt-br: Tempo de atraso do envio
+    ru: Задержка отправки
+    vi: Thời gian trì hoãn gửi
+    zh-hant: 延遲傳送時間
   Params delay_time help text:
     zh: '每条命令延迟发送的时间间隔（秒）'
     ja: '各コマンド送信の遅延間隔（秒）'
     en: 'Time interval for each command delay in sending (Seconds)'
 
+    es: Intervalo de retraso entre el envío de comandos (segundos)
+    ko: 각 명령 전송 사이의 지연 시간(초)
+    pt-br: Intervalo de atraso entre o envio de cada comando (segundos)
+    ru: Интервал задержки между отправкой команд (секунды)
+    vi: Khoảng trễ giữa mỗi lần gửi lệnh (giây)
+    zh-hant: 每條命令延遲傳送的時間間隔（秒）
   Params prompt label:
     zh: '提示符'
     ja: 'ヒント'
     en: 'Prompt'
 
+    es: Indicador
+    ko: 프롬프트
+    pt-br: Prompt
+    ru: Приглашение
+    vi: Dấu nhắc
+    zh-hant: 提示符
   Params prompt help text:
     zh: '终端连接后显示的提示符信息（正则表达式）'
     ja: 'ターミナル接続後に表示されるプロンプト情報（正規表現）'
     en: 'Prompt information displayed after terminal connection (Regular expression)'
 
+    es: Indicador mostrado tras conectar con el terminal (expresión regular)
+    ko: 터미널 연결 후 표시되는 프롬프트 정보(정규식)
+    pt-br: Informação de prompt exibida após a conexão com o terminal (expressão regular)
+    ru: Приглашение, отображаемое после подключения к терминалу (регулярное выражение)
+    vi: Thông tin dấu nhắc hiển thị sau khi kết nối terminal (biểu thức chính quy)
+    zh-hant: 終端連線後顯示的提示符資訊（正規表示式）
   Params answer label:
     zh: '命令结果'
     ja: 'コマンド結果'
     en: 'Command result'
 
+    es: Resultado del comando
+    ko: 명령 결과
+    pt-br: Resultado do comando
+    ru: Результат команды
+    vi: Kết quả lệnh
+    zh-hant: 命令結果
   Params answer help text:
     zh: |
       根据结果匹配度决定是否执行下一条命令，输入框的内容和上方 “自定义命令” 内容按行一一对应（正则表达式）
@@ -157,3 +342,25 @@ i18n:
       Decide whether to execute the next command based on the result match. 
       The input content corresponds line by line with the content 
       of the `Custom command` above. (Regular expression)
+    es: |
+      Decida si se ejecuta el siguiente comando según la coincidencia del resultado.
+      El contenido introducido se corresponde línea por línea con el contenido
+      del `Comando personalizado` anterior. (Expresión regular)
+    ko: |
+      결과 일치 여부에 따라 다음 명령을 실행할지 결정합니다.
+      입력 내용은 위의 `사용자 지정 명령` 내용과
+      줄 단위로 대응합니다. (정규식)
+    pt-br: |
+      Decida se o próximo comando deve ser executado conforme a correspondência do resultado.
+      O conteúdo informado corresponde linha a linha ao conteúdo
+      do `Comando personalizado` acima. (Expressão regular)
+    ru: |
+      Определяет, выполнять ли следующую команду, на основе совпадения результата.
+      Введенное содержимое построчно соответствует содержимому
+      `Пользовательской команды` выше. (Регулярное выражение)
+    vi: |
+      Quyết định có thực thi lệnh tiếp theo hay không dựa trên kết quả khớp.
+      Nội dung nhập tương ứng theo từng dòng với nội dung
+      của `Lệnh tùy chỉnh` ở trên. (Biểu thức chính quy)
+    zh-hant: |
+      根據結果匹配度決定是否執行下一條命令，輸入框的內容和上方 “自定義命令” 內容按行一一對應（正規表示式）

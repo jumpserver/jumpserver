@@ -1846,6 +1846,8 @@
     "VaultHelpText": "1. 보안을 위해 구성 파일에서 Vault 저장소를 활성화합니다.<br>2. 활성화 후 저장소 구성을 입력하고 연결을 테스트합니다.<br>3. 동기화는 비밀을 로컬 데이터베이스에서 원격 Vault로 마이그레이션하며, 완료 후에는 로컬에 저장하지 않습니다. 데이터베이스로 복원을 사용하면 동기화된 비밀을 로컬에 다시 기록할 수 있으며 Vault의 복사본은 유지됩니다.<br>4. Vault 구성을 변경한 후 서비스를 다시 시작하십시오.",
     "VaultOpenBaoAddr": "OpenBao Server 주소, 기본값은 http://127.0.0.1:8200",
     "VaultOpenBaoMountPoint": "OpenBao KV v2 마운트 포인트, 기본값은 pam",
+    "VaultSecretUnavailable": "Vault 서비스에 문제가 있어 비밀번호를 가져올 수 없습니다.",
+    "VaultSecretUnavailableTip": "Vault 서비스에 연결할 수 없습니다. 나중에 다시 시도하거나 관리자에게 Vault 설정 확인을 요청하세요.",
     "VerificationCodeSent": "인증 코드가 발송되었습니다",
     "VerifyFace": "얼굴 인식",
     "VerifySecret": "암호 검증",

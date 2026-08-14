@@ -21,7 +21,19 @@ i18n:
     zh: DBeaver 社区版
     ja: DBeaver コミュニティ
 
+    es: DBeaver Community
+    ko: DBeaver Community
+    pt-br: DBeaver Community
+    ru: DBeaver Community
+    vi: DBeaver Community
+    zh-hant: DBeaver 社群版
   Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.:
     en: Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.
     zh: 免费的多平台数据库工具，供开发人员、数据库管理员、分析师和所有需要使用数据库的人使用。
     ja: 開発者、データベース管理者、分析家、およびデータベースを使用する必要があるすべての人のための無料のマルチプラットフォームデータベースツール。
+    es: Herramienta de base de datos multiplataforma gratuita para desarrolladores, administradores, analistas y cualquier persona que trabaje con bases de datos.
+    ko: 개발자, 데이터베이스 관리자, 분석가 및 데이터베이스 작업이 필요한 모든 사용자를 위한 무료 멀티플랫폼 데이터베이스 도구입니다.
+    pt-br: Ferramenta de banco de dados multiplataforma gratuita para desenvolvedores, administradores, analistas e todos que precisam trabalhar com bancos de dados.
+    ru: Бесплатный кроссплатформенный инструмент для разработчиков, администраторов, аналитиков и всех, кто работает с базами данных.
+    vi: Công cụ cơ sở dữ liệu đa nền tảng miễn phí dành cho nhà phát triển, quản trị viên, nhà phân tích và mọi người làm việc với cơ sở dữ liệu.
+    zh-hant: 免費的多平台資料庫工具，供開發人員、資料庫管理員、分析師和所有需要使用資料庫的人使用。

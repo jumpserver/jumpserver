@@ -1850,6 +1850,8 @@
     "VaultHelpText": "1. 由於安全原因，需要在設定檔中開啟 Vault 儲存。<br>2. 開啟後，填寫儲存設定並測試連線。<br>3. 同步會將密鑰從本機資料庫遷移到遠端 Vault；同步完成後本機資料庫不再儲存密鑰。使用「還原」可將已同步密鑰重新寫回本機，Vault 中的副本會保留。<br>4. 修改 Vault 設定後需重新啟動服務。",
     "VaultOpenBaoAddr": "OpenBao Server 位址，預設為 http://127.0.0.1:8200",
     "VaultOpenBaoMountPoint": "OpenBao KV v2 掛載點，預設為 pam",
+    "VaultSecretUnavailable": "Vault 服務異常，無法取得密碼",
+    "VaultSecretUnavailableTip": "無法連線到 Vault 服務。請稍後再試，或聯絡管理員檢查 Vault 設定。",
     "VerificationCodeSent": "驗證碼已發送",
     "VerifyFace": "驗證面孔",
     "VerifySecret": "驗證密文",
