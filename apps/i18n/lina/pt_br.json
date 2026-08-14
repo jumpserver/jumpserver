@@ -682,7 +682,7 @@
     "ErrorMsg": "Erro",
     "EsDisabled": "O nó não está disponível, por favor contate o administrador",
     "EsIndex": "'es' fornece o índice padrão: 'pam'. Se você ativar a criação de índices por data, o valor inserido será usado como prefixo do índice.",
-    "EsUrl": "Não pode conter o caractere especial `#`; ex: http://es_user:es_password@es_host:es_port",
+    "EsUrl": "Não pode conter o caractere especial `#`; ex: http://es_user:es_password{'@'}es_host:es_port",
     "Every": "Cada",
     "Example": "Exemplo de valor",
     "Exclude": "Não inclui",

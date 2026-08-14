@@ -686,7 +686,7 @@
     "ErrorMsg": "錯誤",
     "EsDisabled": "節點不可用, 請聯絡管理員",
     "EsIndex": "es 提供預設 index：pam。如果開啟按日期建立索引，那麼輸入的值會作為索引前綴",
-    "EsUrl": "不能包含特殊字符 `#`；eg: http://es_user:es_password@es_host:es_port",
+    "EsUrl": "不能包含特殊字符 `#`；eg: http://es_user:es_password{'@'}es_host:es_port",
     "Every": "每",
     "Example": "示例值",
     "Exclude": "不包含",

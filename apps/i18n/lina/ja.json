@@ -686,7 +686,7 @@
     "ErrorMsg": "エラー",
     "EsDisabled": "ノードが利用できません、管理者に連絡してください",
     "EsIndex": "es はデフォルト index：pamを提供します。日付でインデックスを作成する設定が有効な場合、入力値はインデックスのプレフィックスとして使用されます",
-    "EsUrl": "特殊文字 `#` は含むことができません；例: http://es_user:es_password@es_host:es_port",
+    "EsUrl": "特殊文字 `#` は含むことができません；例: http://es_user:es_password{'@'}es_host:es_port",
     "Every": "毎",
     "Example": "例の値",
     "Exclude": "除外",
