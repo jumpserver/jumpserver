@@ -61,11 +61,9 @@ class AnnouncementSettingSerializer(serializers.Serializer):
 
 class BaseVaultSettingSerializer(serializers.Serializer):
 
-    def validate(self, data):
+    def post_save(self):
         from accounts.signal_handlers import vault_pub_sub
-        data = super().validate(data)
         vault_pub_sub.publish('vault')
-        return data
 
 
 class VaultSettingSerializer(BaseVaultSettingSerializer, serializers.Serializer):

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 from urllib.parse import quote
 
 import requests
@@ -31,7 +32,13 @@ class OpenBaoKVClient(object):
         data = {'secret': 'secret'}
         try:
             self._check_health()
-            self.create(path, data)
+            try:
+                self.create(path, data)
+            except OpenBaoAPIError as e:
+                if getattr(e, 'status_code', None) != 404:
+                    raise
+                self.enable_secrets_engine()
+                self.create(path, data)
             self.get(path)
             self.patch(path, data)
             self.delete(path)
@@ -40,6 +47,96 @@ class OpenBaoKVClient(object):
             return False, f'OpenBao is not reachable: {e}'
         else:
             return True, ''
+
+    def enable_secrets_engine(self):
+        """Create the selected mount as a KV v2 engine when it does not exist."""
+        mount_point = quote(self.mount_point, safe='')
+        response = self._send(
+            'POST', f'/v1/sys/mounts/{mount_point}',
+            json={'type': 'kv', 'options': {'version': '2'}},
+        )
+        if response.status_code not in (200, 204):
+            error = self._build_error(response)
+            if response.status_code == 403:
+                error = OpenBaoAPIError(
+                    'The OpenBao token cannot create the requested mount point. '
+                    'Grant it create/update access to sys/mounts/*.'
+                )
+                error.status_code = response.status_code
+            raise error
+
+        # OpenBao 2.6 may briefly report that a newly enabled KV engine is being
+        # upgraded to v2. Wait for that transition before running the write test.
+        deadline = time.monotonic() + self.timeout
+        while True:
+            response = self._send(
+                'POST', f'/v1/{mount_point}/config',
+                json={'max_versions': self.max_versions},
+            )
+            if response.status_code in (200, 204):
+                return
+            if response.status_code != 400 or time.monotonic() >= deadline:
+                raise self._build_error(response)
+            time.sleep(0.2)
+
+    def iter_secret_paths(self, prefix=''):
+        """Yield all current secret paths below this KV v2 mount."""
+        try:
+            response = self._request(
+                'LIST', self._kv_path('metadata', prefix), expected_statuses=(200,)
+            )
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) == 404:
+                return
+            raise
+
+        for key in response.get('data', {}).get('keys', []):
+            path = f'{prefix}{key}'
+            if key.endswith('/'):
+                yield from self.iter_secret_paths(path)
+            else:
+                yield path
+
+    def copy_current_secrets_from(self, source):
+        """Copy current values and custom metadata from another KV v2 mount."""
+        if self.addr == source.addr and self.mount_point == source.mount_point:
+            return 0
+
+        copied = 0
+        for path in source.iter_secret_paths():
+            source_secret = source.get(path)
+            if 'data' not in source_secret:
+                continue
+
+            target_secret = self.get(path)
+            if 'data' in target_secret:
+                if target_secret['data'] != source_secret['data']:
+                    raise OpenBaoAPIError(
+                        f'The target mount already contains different data at {path}'
+                    )
+                continue
+
+            self.create(path, source_secret['data'])
+            metadata = source._request(
+                'GET', source._kv_path('metadata', path), expected_statuses=(200,)
+            ).get('data', {})
+            custom_metadata = metadata.get('custom_metadata') or {}
+            if custom_metadata:
+                self.update_metadata(path, custom_metadata)
+            copied += 1
+
+        # Verify again after copying so a concurrent source update aborts the
+        # settings change instead of silently switching to stale data.
+        for path in source.iter_secret_paths():
+            source_secret = source.get(path)
+            if 'data' not in source_secret:
+                continue
+            target_secret = self.get(path)
+            if target_secret.get('data') != source_secret['data']:
+                raise OpenBaoAPIError(
+                    f'Vault data changed while migrating mount point at {path}'
+                )
+        return copied
 
     def get(self, path, version=None):
         params = {'version': version} if version else None

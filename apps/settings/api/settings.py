@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.views.static import serve
 from rest_framework import generics
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -183,6 +184,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         category_setting_updated.send(sender=self.__class__, category=category, serializer=serializer)
 
     def perform_update(self, serializer):
+        self.prepare_openbao_mount_change(serializer)
         post_data_names = list(self.request.data.keys())
         settings_items = self.parse_serializer_data(serializer)
         serializer_data = getattr(serializer, 'data', {})
@@ -201,6 +203,48 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         self.send_signal(serializer)
         if self.request.query_params.get('category') == User.Source.ldap.value:
             self.clean_ldap_user_dn_cache()
+
+    def prepare_openbao_mount_change(self, serializer):
+        if self.request.query_params.get('category') != 'openbao':
+            return
+
+        new_mount_point = serializer.validated_data.get('VAULT_OPENBAO_MOUNT_POINT')
+        old_mount_point = settings.VAULT_OPENBAO_MOUNT_POINT
+        if not new_mount_point or new_mount_point.strip('/') == old_mount_point.strip('/'):
+            return
+
+        from accounts.backends.openbao.service import OpenBaoKVClient
+
+        data = serializer.validated_data
+
+        def target_value(name):
+            return data.get(name) or getattr(settings, name, None)
+
+        source = OpenBaoKVClient(
+            addr=settings.VAULT_OPENBAO_ADDR,
+            token=settings.VAULT_OPENBAO_TOKEN,
+            mount_point=old_mount_point,
+            timeout=settings.VAULT_OPENBAO_TIMEOUT,
+        )
+        target = OpenBaoKVClient(
+            addr=target_value('VAULT_OPENBAO_ADDR'),
+            token=target_value('VAULT_OPENBAO_TOKEN'),
+            mount_point=new_mount_point,
+            timeout=target_value('VAULT_OPENBAO_TIMEOUT'),
+        )
+
+        ok, error = target.is_active()
+        if not ok:
+            raise ValidationError({'VAULT_OPENBAO_MOUNT_POINT': error})
+
+        if settings.VAULT_ENABLED and settings.VAULT_BACKEND == 'openbao':
+            try:
+                target.copy_current_secrets_from(source)
+            except Exception as e:
+                logger.exception('Migrate OpenBao mount point failed: %s', e)
+                raise ValidationError({
+                    'VAULT_OPENBAO_MOUNT_POINT': f'Migrate OpenBao data failed: {e}'
+                }) from e
 
     @staticmethod
     def clean_ldap_user_dn_cache():
