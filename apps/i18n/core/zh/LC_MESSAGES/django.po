@@ -12811,5 +12811,205 @@ msgstr "许可证导入成功"
 msgid "Invalid license"
 msgstr "许可证无效"
 
+#: assets/serializers/asset/template_definition.py
+msgid "{} (Required)"
+msgstr "{}（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "{} name, max {} characters"
+msgstr "{}名称，长度不超过{}个字符"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Node path (Required)"
+msgstr "节点路径（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Node path, format /root/child, auto-created if not exist"
+msgstr "节点路径，格式 /根节点/子节点，不存在时自动创建"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Account info"
+msgstr "帐号信息"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Account info, JSON format [{\"帐号名\":\"x\",\"帐号密码\":\"x\",\"帐号密钥\":\"x\",\"是否是特权帐号\":\"是/否\"}]"
+msgstr "帐号信息，JSON格式 [{\"帐号名\":\"x\",\"帐号密码\":\"x\",\"帐号密钥\":\"x\",\"是否是特权帐号\":\"是/否\"}]"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Zone name, must be an existing zone under current organization"
+msgstr "网域名称，需为当前组织下已存在的网域"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Tags, format [\"key:value\", ...], auto-created if not exist"
+msgstr "标签，格式 [\"标签名:标签值\"]，不存在时自动创建"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Is active, fill Yes/No"
+msgstr "是否激活，填写 Yes/No"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Comment, max {} characters"
+msgstr "备注信息，长度不超过{}个字符"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Host name"
+msgstr "主机名称"
+
+#: assets/serializers/asset/template_definition.py
+msgid "IP/Host"
+msgstr "IP/主机名"
+
+#: assets/serializers/asset/template_definition.py
+msgid "IP/Host, max 767 characters, supports IPv4/IPv6 and domain names"
+msgstr "IP/主机名，长度不超过767个字符，支持IPv4/IPv6和域名"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type (Required)"
+msgstr "平台名类型（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Windows, Linux"
+msgstr "平台类型，如 Windows、Linux 等"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols (Required)"
+msgstr "运维协议组（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format sftp/22;ssh/22;telnet/23;rdp/3389;vnc/5900"
+msgstr "运维协议组，格式 sftp/22;ssh/22;telnet/23;rdp/3389;vnc/5900"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Device name"
+msgstr "网络设备名称"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Cisco, H3C, Huawei"
+msgstr "平台类型，如 Cisco、H3C、Huawei 等"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format ssh/22;telnet/23"
+msgstr "运维协议组，格式 ssh/22;telnet/23"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Database name"
+msgstr "数据库名称"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Database address, max 767 characters, supports IPv4/IPv6 and domain names"
+msgstr "数据库地址，长度不超过767个字符，支持IPv4/IPv6和域名"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform/DB type (Required)"
+msgstr "平台名称/数据库类型（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform/Database type, such as MySQL, MariaDB, PostgreSQL"
+msgstr "平台/数据库类型，如 MySQL、MariaDB、PostgreSQL"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocol (Required)"
+msgstr "运维协议（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocol, format mysql/4000, mariadb/3306"
+msgstr "运维协议，格式 mysql/4000, mariadb/3306"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Default database (Required)"
+msgstr "默认数据库（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Default database name"
+msgstr "默认数据库名称"
+
+#: assets/serializers/asset/template_definition.py
+msgid "CA cert"
+msgstr "CA 证书"
+
+#: assets/serializers/asset/template_definition.py
+msgid "CA certificate content"
+msgstr "CA 证书内容"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client cert"
+msgstr "客户端证书"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client certificate content"
+msgstr "客户端证书内容"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client key"
+msgstr "客户端密钥"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client key content"
+msgstr "客户端密钥内容"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Use SSL"
+msgstr "使用 SSL"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Use SSL, fill Yes/No"
+msgstr "是否使用 SSL，填写 Yes/No"
+
+#: assets/serializers/asset/template_definition.py
+msgid "PostgreSQL SSL mode"
+msgstr "PostgreSQL SSL 模式"
+
+#: assets/serializers/asset/template_definition.py
+msgid "PostgreSQL SSL mode, such as require, verify-ca, verify-full"
+msgstr "PostgreSQL SSL 模式，如 require, verify-ca, verify-full"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Ignore cert verify"
+msgstr "忽略证书校验"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Ignore certificate verification, fill Yes/No"
+msgstr "是否忽略证书校验，填写 Yes/No"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Web name"
+msgstr "Web名称"
+
+#: assets/serializers/asset/template_definition.py
+msgid "URL address, such as http://172.18.18.7:9000"
+msgstr "URL地址，如 http://172.18.18.7:9000"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform (Required)"
+msgstr "平台（必填项）"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Website"
+msgstr "平台类型，如 Website"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format http/9000"
+msgstr "协议组，格式 http/9000"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Cloud service name"
+msgstr "云服务名称"
+
+#: assets/serializers/asset/template_definition.py
+msgid "URL address, such as https://172.18.18.11:6443/"
+msgstr "URL地址，如 https://172.18.18.11:6443/"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Kubernetes, Vmware-vSphere"
+msgstr "平台类型，如 Kubernetes、Vmware-vSphere"
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format k8s/6443;http(s)/80"
+msgstr "协议组，格式 k8s/6443;http(s)/80"
+
+#: assets/serializers/asset/template_definition.py
+msgid "ID, asset unique identifier, leave blank when importing to create a new asset"
+msgstr "ID，资产唯一标识，导入新建资产时留空"
+
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"

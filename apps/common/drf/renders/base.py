@@ -62,7 +62,16 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
                 return True
         return False
 
+    def _get_import_template(self):
+        """获取 serializer 关联的导入模板定义"""
+        meta = getattr(self.serializer, 'Meta', None)
+        return getattr(meta, 'import_template', None)
+
     def get_rendered_fields(self):
+        import_template = self._get_import_template()
+        if import_template:
+            return import_template.columns
+
         fields = self.serializer.fields
         meta = getattr(self.serializer, 'Meta', None)
         if self.template == 'import':
@@ -85,10 +94,13 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
     def get_column_titles(render_fields):
         titles = []
         for field in render_fields:
-            name = field.label
-            if field.required:
-                name = '*' + name
-            titles.append(name)
+            if hasattr(field, 'header'):
+                titles.append(field.header)
+            else:
+                name = field.label
+                if field.required:
+                    name = '*' + name
+                titles.append(name)
         return titles
 
     def process_data(self, data):
@@ -124,6 +136,8 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
     def render_value(self, field, value):
         if value is None:
             value = '-'
+        elif hasattr(field, 'render_transform') and field.render_transform:
+            value = field.render_transform(value)
         elif hasattr(field, 'to_file_representation'):
             value = field.to_file_representation(value)
         elif isinstance(value, bool):
@@ -151,6 +165,8 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
 
     def get_field_help_text(self, field):
         text = ''
+        if hasattr(field, 'header') and hasattr(field, 'help_text'):
+            return str(field.help_text)
         if hasattr(field, 'get_render_help_text'):
             text = field.get_render_help_text()
         # boolean field

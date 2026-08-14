@@ -1,5 +1,6 @@
 from assets.models import Web
 from .common import AssetSerializer
+from .template_definition import web_import_template
 
 __all__ = ['WebSerializer']
 
@@ -12,6 +13,7 @@ class WebSerializer(AssetSerializer):
             'password_selector', 'submit_selector',
             'script'
         ]
+        import_template = web_import_template
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
             'address': {

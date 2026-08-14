@@ -48,7 +48,24 @@ class BaseFileParser(BaseParser):
     def get_column_titles(self, rows):
         return next(rows)
 
+    def _get_template_definition(self):
+        """检查 serializer 是否有关联的导入模板"""
+        meta = getattr(self.serializer_cls, 'Meta', None)
+        return getattr(meta, 'import_template', None)
+
     def convert_to_field_names(self, column_titles):
+        import_template = self._get_template_definition()
+        if import_template:
+            header_to_field = {
+                c.header: c.field_name for c in import_template.columns
+            }
+            field_names = []
+            for title in column_titles:
+                clean_title = title.strip('*').strip()
+                field_name = header_to_field.get(clean_title, '')
+                field_names.append(field_name)
+            return field_names
+
         fields_map = {}
         fields = self.serializer_fields
         for k, v in fields.items():
@@ -113,8 +130,10 @@ class BaseFileParser(BaseParser):
         return {'pk': obj_id, 'name': obj_name}
 
     def parse_value(self, field, value):
-        if value == '-' and field and field.allow_null:
+        if value == '-' and field and getattr(field, 'allow_null', False):
             return None
+        elif hasattr(field, 'parse_transform') and field.parse_transform:
+            value = field.parse_transform(value)
         elif hasattr(field, 'to_file_internal_value'):
             value = field.to_file_internal_value(value)
         elif isinstance(field, serializers.BooleanField):
@@ -143,24 +162,40 @@ class BaseFileParser(BaseParser):
         """
         构建json数据后的行数据处理
         """
+        import_template = self._get_template_definition()
         new_row = {}
         for k, v in row_data.items():
-            field = self.serializer_fields.get(k)
+            if import_template:
+                field = import_template.get_column_by_field_name(k)
+            else:
+                field = self.serializer_fields.get(k)
             v = self.parse_value(field, v)
+            # 模板模式下 None 表示该列未填写（如 ID 列），不传给 serializer
+            if import_template and v is None:
+                continue
             new_row[k] = v
         return new_row
 
     def generate_data(self, fields_name, rows):
+        """
+        构建 json 数据并返回 (serializer 数据, 模板展示数据)
+        serializer 数据: 供导入创建使用（id 忽略、平台/网域为 pk）
+        模板展示数据: 解析为前端更新接口可直接提交的格式（由模板定义转换）
+        """
+        import_template = self._get_template_definition()
         data = []
+        display_data = []
         for row in rows:
             # 空行不处理
             if not any(row):
                 continue
             row = self.load_row(row)
             row_data = dict(zip(fields_name, row))
+            if import_template:
+                display_data.append(import_template.build_display_row(row_data))
             row_data = self.process_row_data(row_data)
             data.append(row_data)
-        return data
+        return data, display_data
 
     @staticmethod
     def pop_help_text_if_need(rows):
@@ -194,13 +229,19 @@ class BaseFileParser(BaseParser):
 
             # 给 `common.mixins.api.RenderToJsonMixin` 提供，暂时只能耦合
             column_title_field_pairs = list(zip(column_titles, field_names))
-            column_title_field_pairs = [(k, v) for k, v in column_title_field_pairs if k and v]
+            # 节点路径列: 模板内部用 nodes_display，更新接口参数为 nodes，title 以 nodes 为准
+            column_title_field_pairs = [
+                (k, 'nodes' if v == 'nodes_display' else v)
+                for k, v in column_title_field_pairs if k and v
+            ]
             if not hasattr(request, 'jms_context'):
                 request.jms_context = {}
             request.jms_context['column_title_field_pairs'] = column_title_field_pairs
 
             rows = self.pop_help_text_if_need(rows)
-            data = self.generate_data(field_names, rows)
+            data, display_data = self.generate_data(field_names, rows)
+            if display_data:
+                request.jms_context['template_display_data'] = display_data
             return data
         except Exception as e:
             logger.error(e, exc_info=True)
