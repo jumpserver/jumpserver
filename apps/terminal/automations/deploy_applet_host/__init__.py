@@ -146,6 +146,11 @@ class DeployAppletHostManager:
             safety_mode="playbook_unsafe",
             inventory_safety="json_escape",
         )
+        # Unlike asset automations, applet host deployments do not have a
+        # callback that writes user-oriented progress. Keep Ansible's output
+        # enabled so the Celery task log shown by the deployment page is not
+        # empty.
+        kwargs.setdefault("quiet", False)
         return runner.run(**kwargs)
 
     def delete_runtime_dir(self):
