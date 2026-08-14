@@ -10,13 +10,30 @@ from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 
 from audits.models import UserLoginLog
+from assets.const import Protocol
 from common.utils import get_ip_city, get_request_ip
 from common.utils import get_logger, get_object_or_none
 from common.utils import static_or_direct
+from common.utils.http import is_true
 from users.models import User
 from .notifications import DifferentCityLoginMessage
 
 logger = get_logger(__file__)
+
+
+def should_use_oracle_sysdba(connect_options, protocol):
+    return protocol == Protocol.oracle and is_true(
+        (connect_options or {}).get('use_sysdba', False)
+    )
+
+
+def get_effective_connect_options(connect_options, protocol):
+    options = dict(connect_options or {})
+    if protocol != Protocol.oracle:
+        options.pop('use_sysdba', None)
+        return options
+    options['use_sysdba'] = should_use_oracle_sysdba(options, protocol)
+    return options
 
 
 def check_different_city_login_if_need(user, request):
