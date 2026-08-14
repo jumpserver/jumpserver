@@ -682,7 +682,7 @@
     "ErrorMsg": "Error",
     "EsDisabled": "Nodos no disponibles, por favor contacte al administrador",
     "EsIndex": "es proporcionando el índice predeterminado: pam. Si se habilita el índice por fecha, el valor ingresado se usará como prefijo del índice",
-    "EsUrl": "No puede incluir caracteres especiales `#`; ej: http://es_user:es_password@es_host:es_port",
+    "EsUrl": "No puede incluir caracteres especiales `#`; ej: http://es_user:es_password{'@'}es_host:es_port",
     "Every": "Cada",
     "Example": "Ejemplo de valor",
     "Exclude": "No incluir",

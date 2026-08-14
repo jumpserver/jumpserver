@@ -682,7 +682,7 @@
     "ErrorMsg": "Lỗi",
     "EsDisabled": "Nút không khả dụng, vui lòng liên hệ quản lý",
     "EsIndex": "Cung cấp chỉ mục mặc định: pam. Nếu kích hoạt tạo chỉ mục theo ngày, thì giá trị nhập vào sẽ được sử dụng như tiền tố chỉ mục",
-    "EsUrl": "Không được chứa ký tự đặc biệt `#`; ví dụ: http://es_user:es_password@es_host:es_port",
+    "EsUrl": "Không được chứa ký tự đặc biệt `#`; ví dụ: http://es_user:es_password{'@'}es_host:es_port",
     "Every": "Mỗi",
     "Example": "Giá trị mẫu",
     "Exclude": "Không chứa",

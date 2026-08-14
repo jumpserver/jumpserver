@@ -687,7 +687,7 @@
     "ErrorMsg": "Error",
     "EsDisabled": "Node is unavailable, please contact administrator",
     "EsIndex": "Es provides the default index: pam. if indexing by date is enabled, the entered value will serve as the index prefix",
-    "EsUrl": "Cannot include special char `#`; eg: http://es_user:es_password@es_host:es_port",
+    "EsUrl": "Cannot include special char `#`; eg: http://es_user:es_password{'@'}es_host:es_port",
     "Every": "Every",
     "Example": "Example value",
     "Exclude": "Does not include",

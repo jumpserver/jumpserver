@@ -682,7 +682,7 @@
     "ErrorMsg": "오류",
     "EsDisabled": "노드 사용 불가, 관리자에게 문의하십시오",
     "EsIndex": "es 기본 인덱스 제공: pam. 날짜별 인덱스 생성을 활성화하면 입력된 값이 인덱스 접두사로 사용됩니다",
-    "EsUrl": "특수 문자 `#`를 포함할 수 없습니다; 예: http://es_user:es_password@es_host:es_port",
+    "EsUrl": "특수 문자 `#`를 포함할 수 없습니다; 예: http://es_user:es_password{'@'}es_host:es_port",
     "Every": "매우",
     "Example": "예시 값",
     "Exclude": "포함되지 않음",
