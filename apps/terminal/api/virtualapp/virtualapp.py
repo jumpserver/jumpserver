@@ -3,6 +3,7 @@ import shutil
 from typing import Callable
 
 from django.core.files.storage import default_storage
+from django.db import transaction
 from django.utils.translation import gettext as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -13,7 +14,8 @@ from rest_framework.serializers import ValidationError
 from common.api import JMSBulkModelViewSet
 from common.serializers import FileSerializer
 from terminal import serializers
-from terminal.models import VirtualAppPublication, VirtualApp
+from terminal.models import VirtualAppPublication, VirtualApp, AppProviderDeployment
+from terminal.tasks import run_app_provider_deployment
 from common.utils.zip import safe_extract_zip
 
 __all__ = ['VirtualAppViewSet', 'VirtualAppPublicationViewSet']
@@ -81,5 +83,36 @@ class VirtualAppViewSet(UploadMixin, JMSBulkModelViewSet):
 class VirtualAppPublicationViewSet(viewsets.ModelViewSet):
     queryset = VirtualAppPublication.objects.all()
     serializer_class = serializers.VirtualAppPublicationSerializer
-    filterset_fields = ['app__name', 'provider__name', 'status']
+    filterset_fields = ['app', 'app__name', 'provider', 'provider__name', 'status']
     search_fields = ['app__name', 'provider__name', ]
+
+    @staticmethod
+    def start_publish(publication):
+        deployment = AppProviderDeployment.objects.create(
+            provider=publication.provider,
+            publication=publication,
+        )
+        deployment.save_task(deployment.id)
+        transaction.on_commit(
+            lambda: run_app_provider_deployment.apply_async(
+                (deployment.id,), task_id=str(deployment.id)
+            )
+        )
+        return deployment
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        publication = serializer.save(status='pending')
+        deployment = self.start_publish(publication)
+        data = serializer.data
+        data['task'] = str(deployment.id)
+        return Response(data, status=201)
+
+    @action(detail=True, methods=['post'])
+    def publish(self, request, *args, **kwargs):
+        publication = self.get_object()
+        publication.status = 'pending'
+        publication.save(update_fields=['status', 'date_updated'])
+        deployment = self.start_publish(publication)
+        return Response({'task': str(deployment.id)}, status=201)
