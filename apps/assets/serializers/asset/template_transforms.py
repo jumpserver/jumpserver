@@ -9,7 +9,7 @@
 """
 
 import json
-from uuid import UUID
+from uuid import UUID, uuid4
 
 
 # ============================================================
@@ -283,9 +283,11 @@ def boolean_from_template(value):
 # ============================================================
 # ID 转换
 # 模板格式: UUID 字符串（导出时展示）
-# 导入时忽略（新建资产留空）
+# 导入时 ID 为空则自动生成 UUID，否则保留原值
 # ============================================================
 
 def id_from_template(value):
-    """导入: 忽略 ID 列，导入均为新建资产"""
-    return None
+    """导入: ID 列为空时自动生成 UUID，否则保留原值"""
+    if value is None or str(value).strip() in ('', '-'):
+        return str(uuid4())
+    return value

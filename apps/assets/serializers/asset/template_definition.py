@@ -62,8 +62,8 @@ class AssetImportTemplate:
                 continue
             field_name = column.field_name
             if field_name == 'id':
-                # ID 仅展示，导入新建资产时忽略
-                display_row[k] = v
+                # ID 为空时自动生成 UUID，否则保留原值
+                display_row[k] = transforms.id_from_template(v)
                 continue
             if field_name == 'accounts':
                 continue
