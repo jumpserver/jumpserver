@@ -36,6 +36,7 @@ __all__ = [
     "UserLoginLog",
     "PasswordChangeLog",
     "IntegrationApplicationLog",
+    "StorageReclamationLog",
 ]
 
 
@@ -351,3 +352,38 @@ class IntegrationApplicationLog(models.Model):
     asset = models.CharField(max_length=128, verbose_name=_("Asset"))
     account = models.CharField(max_length=128, verbose_name=_("Account"))
     datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))
+
+
+class StorageReclamationMethodChoices(models.TextChoices):
+    delete_day = 'delete_day', _('Delete the earliest day of audit')
+    archive_day = 'archive_day', _('Archive the earliest day of audit')
+    delete_month = 'delete_month', _('Delete the earliest month of audit')
+    archive_month = 'archive_month', _('Archive the earliest month of audit')
+    delete = 'delete', _('Delete')
+    archive = 'archive', _('Archive')
+
+
+class StorageReclamationResultChoices(models.TextChoices):
+    success = 'success', _('Success')
+    fail = 'fail', _('Fail')
+
+
+class StorageReclamationLog(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    method = models.CharField(
+        max_length=16, default='delete_day',
+        choices=StorageReclamationMethodChoices.choices,
+        verbose_name=_("Reclamation method")
+    )
+    data_start = models.DateTimeField(null=True, verbose_name=_("Data start"))
+    data_end = models.DateTimeField(null=True, verbose_name=_("Data end"))
+    result = models.CharField(
+        max_length=16, default='success',
+        choices=StorageReclamationResultChoices.choices,
+        verbose_name=_("Result")
+    )
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+
+    class Meta:
+        ordering = ['-date_created']
+        verbose_name = _('Storage reclamation log')

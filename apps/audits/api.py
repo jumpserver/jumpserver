@@ -37,14 +37,16 @@ from .const import ActivityChoices, ActionChoices
 from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
-    ActivityLog, JobLog, UserSession, IntegrationApplicationLog
+    ActivityLog, JobLog, UserSession, IntegrationApplicationLog,
+    StorageReclamationLog
 )
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
-    ServiceAccessLogSerializer, OperateLogFullSerializer
+    ServiceAccessLogSerializer, OperateLogFullSerializer,
+    StorageReclamationLogSerializer
 )
 from .reporting import (
     FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
@@ -363,3 +365,15 @@ class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
     filterset_fields = ['account', 'remote_addr', 'service_id']
     search_fields = filterset_fields
     ordering = ['-datetime']
+
+
+class StorageReclamationLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = StorageReclamationLog.objects.all()
+    serializer_class = StorageReclamationLogSerializer
+    extra_filter_backends = [DatetimeRangeFilterBackend]
+    date_range_filter_fields = [
+        ('date_created', ('date_from', 'date_to'))
+    ]
+    filterset_fields = ['method', 'result']
+    search_fields = ['method', 'result']
+    ordering = ['-date_created']

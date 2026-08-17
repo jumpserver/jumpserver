@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+import logging
 import os
+from logging.handlers import SysLogHandler
+
+from django.conf import settings
 
 from ..const import PROJECT_DIR, CONFIG
 
@@ -131,14 +135,50 @@ if CONFIG.DEBUG_DEV:
 
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
-if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
-    host, port = CONFIG.SYSLOG_ADDR.split(':')
-    LOGGING['handlers']['syslog'].update({
-        'class': 'logging.handlers.SysLogHandler',
-        'facility': CONFIG.SYSLOG_FACILITY,
-        'address': (host, int(port)),
-        'socktype': CONFIG.SYSLOG_SOCKTYPE,
-    })
-
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR, mode=0o755)
+
+
+def _get_syslog_config():
+    """获取当前 syslog 配置（仅从 django.conf.settings，由界面 / API 管理）"""
+    host = getattr(settings, 'SYSLOG_HOST', '')
+    port = getattr(settings, 'SYSLOG_PORT', 514)
+    facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
+    socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
+    return host, port, facility, socktype
+
+
+def _is_valid_host(host):
+    """检查 syslog 主机是否合法（非空）"""
+    return bool(host)
+
+
+SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
+
+
+def reconfigure_syslog_handler():
+    """动态重载 syslog handler，支持 API 修改后不重启生效"""
+    host, port, facility, socktype = _get_syslog_config()
+
+    if _is_valid_host(host):
+        handler = SysLogHandler(
+            address=(host, int(port)),
+            facility=facility,
+            socktype=socktype,
+        )
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(logging.Formatter('jumpserver: %(message)s'))
+    else:
+        handler = logging.NullHandler()
+
+    for logger_name in SYSLOG_LOGGER_NAMES:
+        logger = logging.getLogger(logger_name)
+        for h in list(logger.handlers):
+            if h.__class__.__name__ in ('SysLogHandler', 'NullHandler'):
+                logger.removeHandler(h)
+                try:
+                    h.close()
+                except Exception:
+                    pass
+        logger.addHandler(handler)
+

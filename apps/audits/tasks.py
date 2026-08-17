@@ -2,6 +2,7 @@
 #
 import datetime
 import os
+import shutil
 
 from celery import shared_task
 from django.conf import settings
@@ -12,16 +13,17 @@ from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Min
 
-from common.const.crontab import CRONTAB_AT_AM_TWO
+from common.const.crontab import CRONTAB_AT_AM_TWO, CRONTAB_AT_AM_THREE
 from common.storage.ftp_file import FTPFileStorageHandler
 from common.utils import get_log_keep_day, get_logger
 from common.utils.safe import find_and_delete_empty_dirs, find_and_delete_files, truncate_file
 from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_root_org
+from settings.const import NAS_MOUNT_PATH
 from terminal.backends import server_replay_storage
 from terminal.models import Session, Command
-from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
+from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog, StorageReclamationLog
 
 logger = get_logger(__name__)
 
@@ -180,6 +182,245 @@ def clean_expired_session_period():
     logger.info("Clean session replay done")
 
 
+def _archive_or_delete_file(abs_path, action, nas_mount_path=None):
+    """Archive a file to NAS (in archive mode) and then delete the local file.
+    Returns (file_size, error). If archiving fails, the local file is kept."""
+    if not os.path.isfile(abs_path):
+        return 0, None
+    try:
+        file_size = os.path.getsize(abs_path)
+        if action == 'archive':
+            rel_path = os.path.relpath(abs_path, default_storage.base_location)
+            nas_target = os.path.join(nas_mount_path, rel_path)
+            nas_target_dir = os.path.dirname(nas_target)
+            if not os.path.isdir(nas_target_dir):
+                os.makedirs(nas_target_dir, exist_ok=True)
+            shutil.copy2(abs_path, nas_target)
+            logger.info('Archived: %s -> %s (%d bytes)', abs_path, nas_target, file_size)
+        os.remove(abs_path)
+        logger.info('Deleted local file: %s (%d bytes)', abs_path, file_size)
+        return file_size, None
+    except OSError as e:
+        logger.error('Failed to %s file %s: %s', action, abs_path, e)
+        return 0, e
+
+
+def _process_replay_files_for_session(session, action, nas_mount_path=None):
+    """Process (archive or delete) all replay files for a session.
+    Returns (processed_count, errors)."""
+    processed = 0
+    errors = []
+    for local_path in session.get_all_possible_local_path():
+        abs_path = os.path.join(default_storage.base_location, local_path) \
+            if not os.path.isabs(local_path) else local_path
+        if not os.path.isfile(abs_path):
+            continue
+        _, err = _archive_or_delete_file(abs_path, action, nas_mount_path)
+        if err:
+            errors.append((abs_path, str(err)))
+        else:
+            processed += 1
+    return processed, errors
+
+
+def _process_ftp_file_for_log(ftp_log, action, nas_mount_path=None):
+    """Process (archive or delete) the file transfer file for an FTPLog record.
+    Returns (processed_count, errors)."""
+    file_path = ftp_log.filepath
+    abs_path = os.path.join(default_storage.base_location, file_path) \
+        if not os.path.isabs(file_path) else file_path
+    if not os.path.isfile(abs_path):
+        return 0, []
+    _, err = _archive_or_delete_file(abs_path, action, nas_mount_path)
+    if err:
+        return 0, [(abs_path, str(err))]
+    return 1, []
+
+
+RECLAMATION_METHODS = {
+    'delete_day': ('delete', 1),
+    'archive_day': ('archive', 1),
+    'delete_month': ('delete', 30),
+    'archive_month': ('archive', 30),
+}
+
+
+def _parse_reclamation_method(method):
+    action, window_days = RECLAMATION_METHODS.get(method, ('delete', 1))
+    return action, window_days
+
+
+@shared_task(
+    verbose_name=_('Reclaim storage by threshold'),
+    description=_(
+        """If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100),
+        delete or archive the oldest session replay files and update session records
+        until usage falls below threshold"""
+    )
+)
+@register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
+def reclaim_storage_by_threshold():
+    """If storage usage exceeds STORAGE_USAGE_THRESHOLD, clean the oldest
+    replay files and/or FTP files based on STORAGE_RECLAMATION_TARGETS.
+    STORAGE_RECLAMATION_METHOD determines both the action (delete/archive)
+    and the time window (earliest day/month) to clean in this run."""
+    threshold_pct = getattr(settings, 'STORAGE_USAGE_THRESHOLD', 0)
+    if threshold_pct <= 0 or threshold_pct >= 100:
+        return
+
+    base_path = default_storage.base_location
+    usage = shutil.disk_usage(base_path)
+    current_pct = usage.used / usage.total * 100
+
+    if current_pct <= threshold_pct:
+        return
+
+    targets = getattr(settings, 'STORAGE_RECLAMATION_TARGETS', [])
+    if not targets:
+        return
+
+    method = getattr(settings, 'STORAGE_RECLAMATION_METHOD', 'delete_day')
+    action, window_days = _parse_reclamation_method(method)
+
+    nas_mount_path = None
+    if action == 'archive':
+        nas_mount_path = NAS_MOUNT_PATH
+        if not nas_mount_path or not os.path.ismount(nas_mount_path):
+            logger.error('NAS mount path not available for archive reclamation: %s', nas_mount_path)
+            StorageReclamationLog.objects.create(
+                method=method, data_start=None, data_end=None, result='fail'
+            )
+            return
+
+    logger.info(
+        'System storage used %.1f%% exceeds threshold %d%%, start reclaiming (method=%s): %s',
+        current_pct, threshold_pct, method, targets
+    )
+
+    # Find the oldest data across all enabled targets
+    data_start = None
+    if 'session_replay' in targets:
+        oldest_session = Session.objects.filter(has_replay=True).order_by('date_start').first()
+        if oldest_session and oldest_session.date_start:
+            data_start = oldest_session.date_start
+    if 'file_transfer' in targets:
+        oldest_ftp = FTPLog.objects.filter(has_file=True).order_by('date_start').first()
+        if oldest_ftp and oldest_ftp.date_start:
+            if data_start is None or oldest_ftp.date_start < data_start:
+                data_start = oldest_ftp.date_start
+
+    if not data_start:
+        logger.info('No reclaimable data found')
+        return
+
+    data_end = data_start + timezone.timedelta(days=window_days)
+
+    logger.info(
+        'Reclaiming oldest data from %s to %s (action=%s, window=%d days)',
+        data_start, data_end, action, window_days
+    )
+
+    result = 'success'
+    total_errors = []
+
+    try:
+        if 'session_replay' in targets:
+            _, errors = _clean_replays_for_day(data_end, action, nas_mount_path)
+            total_errors.extend(errors)
+
+        if 'file_transfer' in targets:
+            _, errors = _clean_ftp_files_for_day(data_end, action, nas_mount_path)
+            total_errors.extend(errors)
+    except Exception as e:
+        logger.error('Storage reclamation failed: %s', e)
+        result = 'fail'
+
+    if total_errors:
+        result = 'fail'
+
+    find_and_delete_empty_dirs(safe_join(default_storage.base_location, 'replay'))
+
+    StorageReclamationLog.objects.create(
+        method=method,
+        data_start=data_start,
+        data_end=data_end,
+        result=result,
+    )
+
+    usage = shutil.disk_usage(base_path)
+    final_pct = usage.used / usage.total * 100
+    logger.info(
+        'Storage reclamation complete, system used: %.1f%% (%d / %d MB)',
+        final_pct, usage.used // 1024 // 1024, usage.total // 1024 // 1024
+    )
+
+
+def _clean_replays_for_day(expire_date, action, nas_mount_path=None):
+    """Process (archive or delete) replay files for sessions older than expire_date."""
+    from terminal.const import SessionErrorReason
+
+    sessions = Session.objects.filter(
+        has_replay=True, date_start__lt=expire_date
+    )
+    if not sessions.exists():
+        return 0, []
+
+    logger.info(
+        'Processing replay files for %d sessions older than %s (action=%s)',
+        sessions.count(), expire_date, action
+    )
+
+    processed = 0
+    errors = []
+    with transaction.atomic():
+        for session in sessions.iterator():
+            count, session_errors = _process_replay_files_for_session(
+                session, action, nas_mount_path
+            )
+            errors.extend(session_errors)
+            if count == 0:
+                continue
+
+            processed += count
+            if not session_errors:
+                session.has_replay = False
+                session.error_reason = SessionErrorReason.replay_cleaned
+                session.replay_size = 0
+                session.save(update_fields=['has_replay', 'error_reason', 'replay_size'])
+
+    return processed, errors
+
+
+def _clean_ftp_files_for_day(expire_date, action, nas_mount_path=None):
+    """Process (archive or delete) FTP transfer files for records older than expire_date."""
+    ftp_logs = FTPLog.objects.filter(
+        has_file=True, date_start__lt=expire_date
+    )
+    if not ftp_logs.exists():
+        return 0, []
+
+    logger.info(
+        'Processing FTP files for %d records older than %s (action=%s)',
+        ftp_logs.count(), expire_date, action
+    )
+
+    processed = 0
+    errors = []
+    with transaction.atomic():
+        for ftp_log in ftp_logs.iterator():
+            count, log_errors = _process_ftp_file_for_log(ftp_log, action, nas_mount_path)
+            errors.extend(log_errors)
+            if count == 0:
+                continue
+
+            processed += count
+            if not log_errors:
+                ftp_log.has_file = False
+                ftp_log.save(update_fields=['has_file'])
+
+    return processed, errors
+
+
 @shared_task(
     verbose_name=_('Clean audits session task log'),
     description=_(
@@ -229,4 +470,3 @@ def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
         default_storage.delete(local_path)
     except:
         pass
-    return

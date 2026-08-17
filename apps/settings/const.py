@@ -2,6 +2,10 @@ from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
 
+# NAS 存储固定挂载路径（取消配置项，固定为 /mnt/nas）
+NAS_MOUNT_PATH = '/mnt/nas'
+
+
 class ImportStatus(TextChoices):
     ok = 'ok', 'Ok'
     pending = 'pending', 'Pending'

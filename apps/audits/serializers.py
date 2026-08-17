@@ -246,3 +246,19 @@ class ServiceAccessLogSerializer(serializers.ModelSerializer):
             'account': {'label': _('Account')},
             'datetime': {'label': _('Datetime')},
         }
+
+
+class StorageReclamationLogSerializer(serializers.ModelSerializer):
+    method = LabeledChoiceField(
+        choices=models.StorageReclamationMethodChoices.choices, label=_("Reclamation method")
+    )
+    result = LabeledChoiceField(
+        choices=models.StorageReclamationResultChoices.choices, label=_("Result")
+    )
+
+    class Meta:
+        model = models.StorageReclamationLog
+        fields = [
+            'id', 'method', 'data_start', 'data_end', 'result', 'date_created',
+        ]
+        read_only_fields = fields

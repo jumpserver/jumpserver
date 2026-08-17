@@ -4280,6 +4280,29 @@ msgstr ""
 "configuração de limpeza regular, para além do tempo às 2 da manhã todos os "
 "dias"
 
+#: audits/tasks.py:184
+msgid "Reclaim storage by threshold"
+msgstr "Liberar armazenamento por limite"
+
+#: audits/tasks.py:185
+msgid ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
+"delete the oldest session replay files and update session records "
+"until usage falls below threshold"
+msgstr ""
+"Se o uso do armazenamento do sistema exceder STORAGE_USAGE_THRESHOLD "
+"(porcentagem 0-100), exclua os registros de sessão, comandos e "
+"reproduções do dia mais antigo até que o uso caia abaixo do limite"
+
+#: audits/tasks.py:420
+msgid "NAS archive session replays"
+msgstr "Arquivar gravações de sessão no NAS"
+
+#: audits/tasks.py:422
+msgid ""
+"Archive session replays on or before the specified date to NAS storage"
+msgstr "Arquivar gravações de sessão na ou antes da data especificada para o armazenamento NAS"
+
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
 msgstr "Upload de arquivos FTP para armazenamento externo"
@@ -7545,6 +7568,161 @@ msgstr "O e-mail já foi enviado {}, por favor verifique"
 msgid "Test smtp setting"
 msgstr " Testar configurações SMTP"
 
+#: settings/api/syslog.py:17
+#, python-brace-format
+msgid "Test syslog message sent to {}, please check"
+msgstr "Mensagem de teste Syslog enviada para {}, verifique"
+
+#: settings/api/syslog.py:27
+msgid "Syslog address is not configured or invalid"
+msgstr "Endereço Syslog não configurado ou inválido"
+
+#: settings/api/syslog.py:38
+msgid "Syslog handler is not active, please save configuration first"
+msgstr "Manipulador Syslog não está ativo, salve a configuração primeiro"
+
+#: settings/api/nas.py:18
+#, python-brace-format
+msgid "NAS connection test successful, mount path is accessible"
+msgstr "Teste de conexão NAS bem-sucedido, caminho de montagem acessível"
+
+#: settings/api/nas.py:34
+msgid "NAS storage is not enabled"
+msgstr "Armazenamento NAS não está ativado"
+
+#: settings/api/nas.py:40
+msgid "NAS host is not configured"
+msgstr "Host NAS não está configurado"
+
+#: settings/api/nas.py:46
+msgid "NAS mount path is not configured"
+msgstr "Caminho de montagem NAS não está configurado"
+
+#: settings/api/nas.py:53
+msgid "NAS username is required for CIFS"
+msgstr "Nome de usuário NAS é obrigatório para CIFS"
+
+#: settings/api/nas.py:60
+#, python-brace-format
+msgid "NAS mount path does not exist: {}"
+msgstr "Caminho de montagem NAS não existe: {}"
+
+#: settings/api/nas.py:78
+#, python-brace-format
+msgid "NAS mount path is not writable: {}"
+msgstr "Caminho de montagem NAS não tem permissão de escrita: {}"
+
+#: settings/api/nas.py:83
+#, python-brace-format
+msgid "NAS mount path I/O error: {}"
+msgstr "Erro de E/S no caminho de montagem NAS: {}"
+
+#: settings/api/nas.py:65
+#, python-brace-format
+msgid "NAS mount path is not mounted: {}"
+msgstr "Caminho de montagem NAS não está montado: {}"
+
+#: settings/api/nas.py:100
+msgid "Date is required, format: YYYY-MM-DD"
+msgstr "Data é obrigatória, formato: YYYY-MM-DD"
+
+#: settings/api/nas.py:128
+msgid "Invalid date format, please use YYYY-MM-DD"
+msgstr "Formato de data inválido, use YYYY-MM-DD"
+
+#: settings/api/nas.py:138
+msgid "Archive task started"
+msgstr "Tarefa de arquivamento iniciada"
+
+#: settings/serializers/storage.py:14
+msgid "File max store"
+msgstr "Armazenamento máximo de arquivos FTP"
+
+#: settings/serializers/storage.py:15
+msgid "File max store size (MB), <= 0 means no backup"
+msgstr "Tamanho máximo de armazenamento de upload de arquivos FTP (MB), <= 0 significa sem backup"
+
+#: settings/serializers/storage.py:18
+msgid "Storage usage threshold"
+msgstr "Limite de uso de armazenamento"
+
+#: settings/serializers/storage.py:19
+msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgstr "Limite percentual de uso de armazenamento (0-100), 0 significa sem limite"
+
+#: settings/serializers/storage.py:22
+msgid "NAS enabled"
+msgstr "NAS ativado"
+
+#: settings/serializers/storage.py:23
+msgid "Enable NAS storage"
+msgstr "Ativar armazenamento NAS"
+
+#: settings/serializers/storage.py:27
+msgid "NAS type"
+msgstr "Tipo de NAS"
+
+#: settings/serializers/storage.py:28
+msgid "NAS storage type: NFS or CIFS"
+msgstr "Tipo de armazenamento NAS: NFS ou CIFS"
+
+#: settings/serializers/storage.py:32
+msgid "NAS host"
+msgstr "Host NAS"
+
+#: settings/serializers/storage.py:33
+msgid "NAS server address, e.g. 192.168.1.100"
+msgstr "Endereço do servidor NAS, ex. 192.168.1.100"
+
+#: settings/serializers/storage.py:37
+msgid "NAS share name"
+msgstr "Nome compartilhado NAS"
+
+#: settings/serializers/storage.py:38
+msgid "NAS share or export name"
+msgstr "Nome compartilhado ou de exportação NAS"
+
+#: settings/serializers/storage.py:42
+msgid "NAS mount path"
+msgstr "Caminho de montagem NAS"
+
+#: settings/serializers/storage.py:43
+msgid "Local mount path for NAS storage"
+msgstr "Caminho de montagem local para armazenamento NAS"
+
+#: settings/serializers/storage.py:47
+msgid "NAS username"
+msgstr "Usuário NAS"
+
+#: settings/serializers/storage.py:48
+msgid "NAS login username (CIFS required)"
+msgstr "Nome de usuário de login NAS (obrigatório para CIFS)"
+
+#: settings/serializers/storage.py:52
+msgid "NAS password"
+msgstr "Senha NAS"
+
+#: settings/serializers/storage.py:53
+msgid "NAS login password (CIFS required)"
+msgstr "Senha de login NAS (obrigatório para CIFS)"
+
+#: settings/serializers/storage.py:21 terminal/api/session/session.py:163
+#: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
+msgid "Session replay"
+msgstr "Reprodução de sessão"
+
+#: settings/serializers/storage.py:22
+msgid "File transfer"
+msgstr "Transferência de arquivos"
+
+#: settings/serializers/storage.py:27
+msgid "Storage reclamation targets"
+msgstr "Alvos de liberação de armazenamento"
+
+#: settings/serializers/storage.py:28
+msgid "Select which data to clean during storage reclamation"
+msgstr "Selecione quais dados limpar durante a liberação de armazenamento"
+
 #: settings/api/ldap.py:92
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
@@ -9657,10 +9835,7 @@ msgstr "Existem sessões online"
 msgid "User %s %s session %s replay"
 msgstr "O usuário %s %s a gravação da sessão %s"
 
-#: terminal/api/session/session.py:163 terminal/api/session/session.py:297
-#: terminal/models/session/replay.py:12
-msgid "Session replay"
-msgstr "Gravação de sessão"
+
 
 #: terminal/api/session/session.py:339
 #, python-brace-format
@@ -9797,7 +9972,31 @@ msgstr "Falha na conversão da gravação"
 
 #: terminal/const.py:108
 msgid "Replay unsupported"
-msgstr "Gravação não suportada"
+msgstr "Replay não suportado"
+
+#: terminal/const.py:109
+msgid "Replay cleaned for storage reclamation"
+msgstr "Replay removido para liberação de armazenamento"
+
+#: audits/models.py:355
+msgid "Storage reclamation log"
+msgstr "Registro de liberação de armazenamento"
+
+#: audits/models.py:357
+msgid "Session ID"
+msgstr "ID da sessão"
+
+#: audits/models.py:361
+msgid "Target type"
+msgstr "Tipo de alvo"
+
+#: audits/models.py:363
+msgid "File path"
+msgstr "Caminho do arquivo"
+
+#: audits/models.py:359
+msgid "File size (bytes)"
+msgstr "Tamanho do arquivo (bytes)"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

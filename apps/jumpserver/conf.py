@@ -655,7 +655,8 @@ class Config(dict):
         'WS_LISTEN_PORT': 8070,
         'CELERY_WORKER_COUNT': 10,
 
-        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
+        'SYSLOG_HOST': '',  # '192.168.0.1'
+        'SYSLOG_PORT': 514,
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
 
@@ -719,6 +720,25 @@ class Config(dict):
 
         # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
         'FTP_FILE_MAX_STORE': 0,
+
+        # 存储使用率阈值，百分占比(0-100)，0 表示不限制
+        'STORAGE_USAGE_THRESHOLD': 0,
+
+        # 空间腾退清理目标，可选 session_replay / file_transfer
+        'STORAGE_RECLAMATION_TARGETS': ['session_replay', 'file_transfer'],
+
+        # 空间腾退方式，可选 delete_day / archive_day / delete_month / archive_month
+        # 语义：删除或归档最早一天 / 最早一个月的审计数据
+        'STORAGE_RECLAMATION_METHOD': 'delete_day',
+
+        # NAS 存储配置
+        'NAS_ENABLED': False,
+        'NAS_TYPE': 'nfs',  # nfs / cifs
+        'NAS_HOST': '',
+        'NAS_PORT': 0,  # 0 表示使用默认端口 (nfs: 2049, cifs: 445)
+        'NAS_SHARE_NAME': '',
+        'NAS_USERNAME': '',
+        'NAS_PASSWORD': '',
 
         # API 分页
         'MAX_LIMIT_PER_PAGE': 10000,  # 给导出用

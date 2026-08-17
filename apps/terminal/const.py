@@ -106,6 +106,7 @@ class SessionErrorReason(TextChoices):
     replay_upload_failed = 'replay_upload_failed', _('Replay upload failed')
     replay_convert_failed = 'replay_convert_failed', _('Replay convert failed')
     replay_unsupported = 'replay_unsupported', _('Replay unsupported')
+    replay_cleaned = 'replay_cleaned', _('Replay cleaned for storage reclamation')
 
 
 class LoginFrom(TextChoices):
