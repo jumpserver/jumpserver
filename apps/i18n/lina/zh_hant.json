@@ -1501,6 +1501,7 @@
     "SelectAdhoc": "選擇腳本模板",
     "SelectAll": "全選",
     "SelectAtLeastOneAssetOrNodeErrMsg": "資產或者節點至少選擇一項",
+    "SelectAtLeastOneProperty": "請至少選擇一個屬性",
     "SelectAttrs": "選擇屬性",
     "SelectByAttr": "屬性篩選",
     "SelectFile": "選擇文件",

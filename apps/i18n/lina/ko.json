@@ -1497,6 +1497,7 @@
     "SelectAdhoc": "명령 선택",
     "SelectAll": "전체 선택",
     "SelectAtLeastOneAssetOrNodeErrMsg": "자산 또는 노드 중 하나 이상 선택",
+    "SelectAtLeastOneProperty": "하나 이상의 속성을 선택하세요",
     "SelectAttrs": "속성 선택",
     "SelectByAttr": "속성 필터링",
     "SelectFile": "파일 선택",

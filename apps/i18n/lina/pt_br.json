@@ -1497,6 +1497,7 @@
     "SelectAdhoc": "Selecione o modelo de script",
     "SelectAll": "Selecionar tudo",
     "SelectAtLeastOneAssetOrNodeErrMsg": "Selecione pelo menos um ativo ou nó",
+    "SelectAtLeastOneProperty": "Selecione pelo menos um atributo",
     "SelectAttrs": "Selecionar atributos",
     "SelectByAttr": "Filtro de atributos",
     "SelectFile": "Selecionar arquivo",

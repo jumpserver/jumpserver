@@ -1497,6 +1497,7 @@
     "SelectAdhoc": "选择命令",
     "SelectAll": "全选",
     "SelectAtLeastOneAssetOrNodeErrMsg": "资产或者节点至少选择一项",
+    "SelectAtLeastOneProperty": "请至少选择一个属性",
     "SelectAttrs": "选择属性",
     "SelectByAttr": "属性筛选",
     "SelectFile": "选择文件",

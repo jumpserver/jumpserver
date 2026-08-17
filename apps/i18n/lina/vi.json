@@ -1497,6 +1497,7 @@
     "SelectAdhoc": "Chọn hành động",
     "SelectAll": "Chọn tất cả",
     "SelectAtLeastOneAssetOrNodeErrMsg": "Vui lòng chọn ít nhất một tài sản hoặc nút",
+    "SelectAtLeastOneProperty": "Vui lòng chọn ít nhất một thuộc tính",
     "SelectAttrs": "Chọn thuộc tính",
     "SelectByAttr": "Lọc thuộc tính",
     "SelectFile": "Chọn tệp",

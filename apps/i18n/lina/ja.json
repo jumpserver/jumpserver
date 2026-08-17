@@ -1501,6 +1501,7 @@
     "SelectAdhoc": "スクリプトテンプレートを選択",
     "SelectAll": "全選択",
     "SelectAtLeastOneAssetOrNodeErrMsg": "アセットまたはノードは少なくとも一つ選択してください",
+    "SelectAtLeastOneProperty": "少なくとも1つの属性を選択してください",
     "SelectAttrs": "属性の選択",
     "SelectByAttr": "プロパティフィルタ",
     "SelectFile": "ファイル選択",

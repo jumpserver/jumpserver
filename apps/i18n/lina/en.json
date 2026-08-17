@@ -1502,6 +1502,7 @@
     "SelectAdhoc": "Select command template",
     "SelectAll": "Select all",
     "SelectAtLeastOneAssetOrNodeErrMsg": "Select at least one asset or node",
+    "SelectAtLeastOneProperty": "Please select at least one attribute",
     "SelectAttrs": "Select attributes",
     "SelectByAttr": "Filter by attribute",
     "SelectFile": "Select file",
