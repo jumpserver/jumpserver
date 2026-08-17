@@ -1,10 +1,49 @@
+import re
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 __all__ = [
+    'AttributeMapField',
     'AuthSettingSerializer',
     'OrgListField'
 ]
+
+
+LDAP_ATTRIBUTE_PATTERN = re.compile(
+    r'^(?:[A-Za-z][A-Za-z0-9-]*|[0-9]+(?:\.[0-9]+)+)$'
+)
+
+
+class AttributeMapField(serializers.DictField):
+    default_error_messages = {
+        'missing': _('Missing required user attributes: {attributes}'),
+        'unknown': _('Unsupported user attributes: {attributes}'),
+    }
+
+    def __init__(self, *args, allowed_fields=None, required_fields=None, **kwargs):
+        self.allowed_fields = set(allowed_fields or ())
+        self.required_fields = set(required_fields or ())
+        kwargs.setdefault(
+            'child',
+            serializers.RegexField(
+                LDAP_ATTRIBUTE_PATTERN,
+                max_length=256,
+                error_messages={'invalid': _('Invalid LDAP attribute name')},
+            )
+        )
+        super().__init__(*args, **kwargs)
+
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data)
+        keys = set(value)
+        missing = self.required_fields - keys
+        if missing:
+            self.fail('missing', attributes=', '.join(sorted(missing)))
+        unknown = keys - self.allowed_fields
+        if unknown:
+            self.fail('unknown', attributes=', '.join(sorted(unknown)))
+        return value
 
 
 class AuthSettingSerializer(serializers.Serializer):
