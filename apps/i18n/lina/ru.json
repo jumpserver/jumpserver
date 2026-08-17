@@ -1497,6 +1497,7 @@
     "SelectAdhoc": "Выбор шаблона команды",
     "SelectAll": "Выбрать все",
     "SelectAtLeastOneAssetOrNodeErrMsg": "Выберите хотя бы один актив или папку",
+    "SelectAtLeastOneProperty": "Выберите хотя бы один атрибут",
     "SelectAttrs": "Выбор атрибутов",
     "SelectByAttr": "Фильтр по атрибуту",
     "SelectFile": "Выбрать файл",
