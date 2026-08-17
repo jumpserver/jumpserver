@@ -249,21 +249,16 @@ class ServiceAccessLogSerializer(serializers.ModelSerializer):
 
 
 class StorageReclamationLogSerializer(serializers.ModelSerializer):
+    method = LabeledChoiceField(
+        choices=models.StorageReclamationMethodChoices.choices, label=_("Reclamation method")
+    )
+    result = LabeledChoiceField(
+        choices=models.StorageReclamationResultChoices.choices, label=_("Result")
+    )
+
     class Meta:
         model = models.StorageReclamationLog
         fields = [
-            'id', 'session_id', 'target_type',
-            'file_path', 'file_size', 'date_created',
-        ]
-        read_only_fields = fields
-
-
-class ArchiveLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ArchiveLog
-        fields = [
-            'id', 'session_id',
-            'file_path', 'file_size', 'storage_path',
-            'date_created',
+            'id', 'method', 'data_start', 'data_end', 'result', 'date_created',
         ]
         read_only_fields = fields

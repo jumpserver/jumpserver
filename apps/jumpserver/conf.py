@@ -655,7 +655,8 @@ class Config(dict):
         'WS_LISTEN_PORT': 8070,
         'CELERY_WORKER_COUNT': 10,
 
-        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
+        'SYSLOG_HOST': '',  # '192.168.0.1'
+        'SYSLOG_PORT': 514,
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
 
@@ -724,6 +725,10 @@ class Config(dict):
 
         # 空间腾退清理目标，可选 session_replay / file_transfer
         'STORAGE_RECLAMATION_TARGETS': ['session_replay', 'file_transfer'],
+
+        # 空间腾退方式，可选 delete_day / archive_day / delete_month / archive_month
+        # 语义：删除或归档最早一天 / 最早一个月的审计数据
+        'STORAGE_RECLAMATION_METHOD': 'delete_day',
 
         # NAS 存储配置
         'NAS_ENABLED': False,

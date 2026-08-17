@@ -22,6 +22,17 @@ class StorageSettingSerializer(serializers.Serializer):
         label=_('Storage usage threshold'),
         help_text=_('Storage usage threshold (percentage 0-100), 0 means no limit')
     )
+    STORAGE_RECLAMATION_METHOD = serializers.ChoiceField(
+        required=False, default='delete_day',
+        choices=(
+            ('delete_day', _('Delete the earliest day of audit')),
+            ('archive_day', _('Archive the earliest day of audit')),
+            ('delete_month', _('Delete the earliest month of audit')),
+            ('archive_month', _('Archive the earliest month of audit')),
+        ),
+        label=_('Storage reclamation method'),
+        help_text=_('Archive means move files to NAS storage and then delete local files')
+    )
     STORAGE_RECLAMATION_TARGETS = serializers.ListField(
         required=False, default=list,
         child=serializers.ChoiceField(
@@ -47,17 +58,17 @@ class StorageSettingSerializer(serializers.Serializer):
         help_text=_('NAS storage type: NFS or CIFS')
     )
     NAS_HOST = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True, max_length=128,
+        required=True, allow_null=True, allow_blank=True, max_length=128,
         label=_('NAS host'),
         help_text=_('NAS server address, e.g. 192.168.1.100')
     )
     NAS_PORT = serializers.IntegerField(
-        required=False, allow_null=True, min_value=0, max_value=65535,
+        required=True, allow_null=True, min_value=0, max_value=65535,
         label=_('NAS port'),
         help_text=_('NAS port, 0 means use the default port')
     )
     NAS_SHARE_NAME = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True, max_length=256,
+        required=True, allow_null=True, allow_blank=True, max_length=256,
         label=_('NAS share name'),
         help_text=_('NAS share or export name')
     )

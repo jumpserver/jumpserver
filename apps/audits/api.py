@@ -38,7 +38,7 @@ from .filters import UserSessionFilterSet, OperateLogFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession, IntegrationApplicationLog,
-    StorageReclamationLog, ArchiveLog
+    StorageReclamationLog
 )
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
@@ -46,7 +46,7 @@ from .serializers import (
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer, OperateLogFullSerializer,
-    StorageReclamationLogSerializer, ArchiveLogSerializer
+    StorageReclamationLogSerializer
 )
 from .reporting import (
     FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
@@ -374,17 +374,6 @@ class StorageReclamationLogViewSet(viewsets.ReadOnlyModelViewSet):
     date_range_filter_fields = [
         ('date_created', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['target_type']
-    search_fields = ['file_path', 'session_id']
-    ordering = ['-date_created']
-
-
-class ArchiveLogViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ArchiveLog.objects.all()
-    serializer_class = ArchiveLogSerializer
-    extra_filter_backends = [DatetimeRangeFilterBackend]
-    date_range_filter_fields = [
-        ('date_created', ('date_from', 'date_to'))
-    ]
-    search_fields = ['file_path', 'session_id']
+    filterset_fields = ['method', 'result']
+    search_fields = ['method', 'result']
     ordering = ['-date_created']

@@ -20,10 +20,11 @@ class SyslogTestingAPI(APIView):
     }
 
     def post(self, request):
-        addr = getattr(settings, 'SYSLOG_ADDR', '')
-        if not addr or ':' not in addr:
+        host = getattr(settings, 'SYSLOG_HOST', '')
+        port = getattr(settings, 'SYSLOG_PORT', 514)
+        if not host:
             return Response(
-                {"error": str(_("Syslog address is not configured or invalid"))},
+                {"error": str(_("Syslog host is not configured"))},
                 status=400
             )
 
@@ -44,4 +45,5 @@ class SyslogTestingAPI(APIView):
             logger.error("Failed to send test syslog message: %s", e)
             return Response({"error": str(e)}, status=400)
 
+        addr = '{}:{}'.format(host, port)
         return Response({"msg": str(self.success_message.format(addr))})

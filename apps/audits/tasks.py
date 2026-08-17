@@ -182,51 +182,79 @@ def clean_expired_session_period():
     logger.info("Clean session replay done")
 
 
-def _remove_replay_files_for_session(session):
-    """Delete all replay files for a session and return deleted file info.
-    Returns list of (file_path, file_size) tuples."""
-    deleted_files = []
-    possible_paths = session.get_all_possible_local_path()
+def _archive_or_delete_file(abs_path, action, nas_mount_path=None):
+    """Archive a file to NAS (in archive mode) and then delete the local file.
+    Returns (file_size, error). If archiving fails, the local file is kept."""
+    if not os.path.isfile(abs_path):
+        return 0, None
+    try:
+        file_size = os.path.getsize(abs_path)
+        if action == 'archive':
+            rel_path = os.path.relpath(abs_path, default_storage.base_location)
+            nas_target = os.path.join(nas_mount_path, rel_path)
+            nas_target_dir = os.path.dirname(nas_target)
+            if not os.path.isdir(nas_target_dir):
+                os.makedirs(nas_target_dir, exist_ok=True)
+            shutil.copy2(abs_path, nas_target)
+            logger.info('Archived: %s -> %s (%d bytes)', abs_path, nas_target, file_size)
+        os.remove(abs_path)
+        logger.info('Deleted local file: %s (%d bytes)', abs_path, file_size)
+        return file_size, None
+    except OSError as e:
+        logger.error('Failed to %s file %s: %s', action, abs_path, e)
+        return 0, e
 
-    for local_path in possible_paths:
+
+def _process_replay_files_for_session(session, action, nas_mount_path=None):
+    """Process (archive or delete) all replay files for a session.
+    Returns (processed_count, errors)."""
+    processed = 0
+    errors = []
+    for local_path in session.get_all_possible_local_path():
         abs_path = os.path.join(default_storage.base_location, local_path) \
             if not os.path.isabs(local_path) else local_path
         if not os.path.isfile(abs_path):
             continue
-        try:
-            file_size = os.path.getsize(abs_path)
-            os.remove(abs_path)
-            deleted_files.append((abs_path, file_size))
-            logger.info('Deleted replay file: %s (%d bytes)', abs_path, file_size)
-        except OSError as e:
-            logger.error('Failed to delete replay file %s: %s', abs_path, e)
-
-    return deleted_files
+        _, err = _archive_or_delete_file(abs_path, action, nas_mount_path)
+        if err:
+            errors.append((abs_path, str(err)))
+        else:
+            processed += 1
+    return processed, errors
 
 
-def _remove_ftp_file_for_log(ftp_log):
-    """Delete the file transfer file for an FTPLog record.
-    Returns (file_path, file_size) or (None, 0) if no file found."""
+def _process_ftp_file_for_log(ftp_log, action, nas_mount_path=None):
+    """Process (archive or delete) the file transfer file for an FTPLog record.
+    Returns (processed_count, errors)."""
     file_path = ftp_log.filepath
     abs_path = os.path.join(default_storage.base_location, file_path) \
         if not os.path.isabs(file_path) else file_path
     if not os.path.isfile(abs_path):
-        return None, 0
-    try:
-        file_size = os.path.getsize(abs_path)
-        os.remove(abs_path)
-        logger.info('Deleted FTP file: %s (%d bytes)', abs_path, file_size)
-        return abs_path, file_size
-    except OSError as e:
-        logger.error('Failed to delete FTP file %s: %s', abs_path, e)
-        return None, 0
+        return 0, []
+    _, err = _archive_or_delete_file(abs_path, action, nas_mount_path)
+    if err:
+        return 0, [(abs_path, str(err))]
+    return 1, []
+
+
+RECLAMATION_METHODS = {
+    'delete_day': ('delete', 1),
+    'archive_day': ('archive', 1),
+    'delete_month': ('delete', 30),
+    'archive_month': ('archive', 30),
+}
+
+
+def _parse_reclamation_method(method):
+    action, window_days = RECLAMATION_METHODS.get(method, ('delete', 1))
+    return action, window_days
 
 
 @shared_task(
     verbose_name=_('Reclaim storage by threshold'),
     description=_(
         """If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100),
-        delete the oldest session replay files and update session records
+        delete or archive the oldest session replay files and update session records
         until usage falls below threshold"""
     )
 )
@@ -234,10 +262,8 @@ def _remove_ftp_file_for_log(ftp_log):
 def reclaim_storage_by_threshold():
     """If storage usage exceeds STORAGE_USAGE_THRESHOLD, clean the oldest
     replay files and/or FTP files based on STORAGE_RECLAMATION_TARGETS.
-    For each day, both replay and FTP files are cleaned together,
-    then disk usage is rechecked before proceeding to the next day."""
-    from terminal.const import SessionErrorReason
-
+    STORAGE_RECLAMATION_METHOD determines both the action (delete/archive)
+    and the time window (earliest day/month) to clean in this run."""
     threshold_pct = getattr(settings, 'STORAGE_USAGE_THRESHOLD', 0)
     if threshold_pct <= 0 or threshold_pct >= 100:
         return
@@ -253,49 +279,74 @@ def reclaim_storage_by_threshold():
     if not targets:
         return
 
+    method = getattr(settings, 'STORAGE_RECLAMATION_METHOD', 'delete_day')
+    action, window_days = _parse_reclamation_method(method)
+
+    nas_mount_path = None
+    if action == 'archive':
+        nas_mount_path = NAS_MOUNT_PATH
+        if not nas_mount_path or not os.path.ismount(nas_mount_path):
+            logger.error('NAS mount path not available for archive reclamation: %s', nas_mount_path)
+            StorageReclamationLog.objects.create(
+                method=method, data_start=None, data_end=None, result='fail'
+            )
+            return
+
     logger.info(
-        'System storage used %.1f%% exceeds threshold %d%%, start reclaiming: %s',
-        current_pct, threshold_pct, targets
+        'System storage used %.1f%% exceeds threshold %d%%, start reclaiming (method=%s): %s',
+        current_pct, threshold_pct, method, targets
     )
 
-    # Find the oldest day across all enabled targets
-    oldest_days = 0
+    # Find the oldest data across all enabled targets
+    data_start = None
     if 'session_replay' in targets:
         oldest_session = Session.objects.filter(has_replay=True).order_by('date_start').first()
         if oldest_session and oldest_session.date_start:
-            oldest_days = (timezone.now() - oldest_session.date_start).days
+            data_start = oldest_session.date_start
     if 'file_transfer' in targets:
         oldest_ftp = FTPLog.objects.filter(has_file=True).order_by('date_start').first()
         if oldest_ftp and oldest_ftp.date_start:
-            ftp_oldest_days = (timezone.now() - oldest_ftp.date_start).days
-            oldest_days = max(oldest_days, ftp_oldest_days)
+            if data_start is None or oldest_ftp.date_start < data_start:
+                data_start = oldest_ftp.date_start
 
-    if oldest_days <= 0:
+    if not data_start:
         logger.info('No reclaimable data found')
         return
 
-    logger.info('Oldest reclaimable data dates back %d days, starting reclamation', oldest_days)
+    data_end = data_start + timezone.timedelta(days=window_days)
 
-    for days in range(oldest_days, 0, -1):
-        expire_date = timezone.now() - timezone.timedelta(days=days)
+    logger.info(
+        'Reclaiming oldest data from %s to %s (action=%s, window=%d days)',
+        data_start, data_end, action, window_days
+    )
 
+    result = 'success'
+    total_errors = []
+
+    try:
         if 'session_replay' in targets:
-            _clean_replays_for_day(expire_date, days)
+            _, errors = _clean_replays_for_day(data_end, action, nas_mount_path)
+            total_errors.extend(errors)
 
         if 'file_transfer' in targets:
-            _clean_ftp_files_for_day(expire_date, days)
+            _, errors = _clean_ftp_files_for_day(data_end, action, nas_mount_path)
+            total_errors.extend(errors)
+    except Exception as e:
+        logger.error('Storage reclamation failed: %s', e)
+        result = 'fail'
 
-        usage = shutil.disk_usage(base_path)
-        current_pct = usage.used / usage.total * 100
-
-        if current_pct <= threshold_pct:
-            logger.info(
-                'System storage used %.1f%% within threshold %d%%, reclamation done',
-                current_pct, threshold_pct
-            )
-            break
+    if total_errors:
+        result = 'fail'
 
     find_and_delete_empty_dirs(safe_join(default_storage.base_location, 'replay'))
+
+    StorageReclamationLog.objects.create(
+        method=method,
+        data_start=data_start,
+        data_end=data_end,
+        result=result,
+    )
+
     usage = shutil.disk_usage(base_path)
     final_pct = usage.used / usage.total * 100
     logger.info(
@@ -304,69 +355,70 @@ def reclaim_storage_by_threshold():
     )
 
 
-def _clean_replays_for_day(expire_date, days):
-    """Delete replay files for sessions older than expire_date."""
+def _clean_replays_for_day(expire_date, action, nas_mount_path=None):
+    """Process (archive or delete) replay files for sessions older than expire_date."""
     from terminal.const import SessionErrorReason
 
     sessions = Session.objects.filter(
         has_replay=True, date_start__lt=expire_date
     )
     if not sessions.exists():
-        return
+        return 0, []
 
     logger.info(
-        'Cleaning replay files for %d sessions older than %d days',
-        sessions.count(), days
+        'Processing replay files for %d sessions older than %s (action=%s)',
+        sessions.count(), expire_date, action
     )
 
+    processed = 0
+    errors = []
     with transaction.atomic():
         for session in sessions.iterator():
-            deleted_files = _remove_replay_files_for_session(session)
-            if not deleted_files:
+            count, session_errors = _process_replay_files_for_session(
+                session, action, nas_mount_path
+            )
+            errors.extend(session_errors)
+            if count == 0:
                 continue
 
-            session.has_replay = False
-            session.error_reason = SessionErrorReason.replay_cleaned
-            session.replay_size = 0
-            session.save(update_fields=['has_replay', 'error_reason', 'replay_size'])
+            processed += count
+            if not session_errors:
+                session.has_replay = False
+                session.error_reason = SessionErrorReason.replay_cleaned
+                session.replay_size = 0
+                session.save(update_fields=['has_replay', 'error_reason', 'replay_size'])
 
-            for file_path, file_size in deleted_files:
-                StorageReclamationLog.objects.create(
-                    session_id=str(session.id),
-                    target_type='session_replay',
-                    file_path=file_path,
-                    file_size=file_size,
-                )
+    return processed, errors
 
 
-def _clean_ftp_files_for_day(expire_date, days):
-    """Delete FTP transfer files for records older than expire_date."""
+def _clean_ftp_files_for_day(expire_date, action, nas_mount_path=None):
+    """Process (archive or delete) FTP transfer files for records older than expire_date."""
     ftp_logs = FTPLog.objects.filter(
         has_file=True, date_start__lt=expire_date
     )
     if not ftp_logs.exists():
-        return
+        return 0, []
 
     logger.info(
-        'Cleaning FTP files for %d records older than %d days',
-        ftp_logs.count(), days
+        'Processing FTP files for %d records older than %s (action=%s)',
+        ftp_logs.count(), expire_date, action
     )
 
+    processed = 0
+    errors = []
     with transaction.atomic():
         for ftp_log in ftp_logs.iterator():
-            file_path, file_size = _remove_ftp_file_for_log(ftp_log)
-            if file_path is None:
+            count, log_errors = _process_ftp_file_for_log(ftp_log, action, nas_mount_path)
+            errors.extend(log_errors)
+            if count == 0:
                 continue
 
-            ftp_log.has_file = False
-            ftp_log.save(update_fields=['has_file'])
+            processed += count
+            if not log_errors:
+                ftp_log.has_file = False
+                ftp_log.save(update_fields=['has_file'])
 
-            StorageReclamationLog.objects.create(
-                session_id=str(ftp_log.id),
-                target_type='file_transfer',
-                file_path=file_path,
-                file_size=file_size,
-            )
+    return processed, errors
 
 
 @shared_task(
@@ -418,117 +470,3 @@ def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
         default_storage.delete(local_path)
     except:
         pass
-
-
-@shared_task(
-    verbose_name=_('NAS archive session replays'),
-    description=_(
-        'Archive session replays within the specified date range to NAS storage'
-    )
-)
-def nas_archive_session_replays(start_date, end_date):
-    from datetime import datetime
-
-    from audits.models import ArchiveLog
-
-    logger.info('NAS archive task started for range: %s ~ %s', start_date or '-', end_date or '-')
-
-    nas_mount_path = NAS_MOUNT_PATH
-    if not nas_mount_path or not os.path.ismount(nas_mount_path):
-        logger.error('NAS mount path not available: %s', nas_mount_path)
-        return {"error": "NAS mount path not available"}
-
-    try:
-        start = datetime.strptime(start_date, '%Y-%m-%d').date() if start_date else None
-        end = datetime.strptime(end_date, '%Y-%m-%d').date() if end_date else None
-    except ValueError:
-        logger.error('Invalid date format: start=%s end=%s', start_date, end_date)
-        return {"error": "Invalid date format"}
-
-    if start and end and start > end:
-        logger.error('Start date after end date: %s > %s', start, end)
-        return {"error": "Start date after end date"}
-
-    tz = timezone.get_current_timezone() if settings.USE_TZ else None
-
-    filter_kwargs = {
-        'has_replay': True,
-        'is_archived': False,
-    }
-    if start:
-        start_datetime = datetime.combine(start, datetime.min.time())
-        if tz:
-            start_datetime = timezone.make_aware(start_datetime, tz)
-        filter_kwargs['date_start__gte'] = start_datetime
-    if end:
-        end_datetime = datetime.combine(end, datetime.max.time())
-        if tz:
-            end_datetime = timezone.make_aware(end_datetime, tz)
-        filter_kwargs['date_start__lte'] = end_datetime
-
-    with tmp_to_root_org():
-        sessions = Session.objects.filter(**filter_kwargs).order_by('date_start')
-
-        if not sessions.exists():
-            logger.info('No sessions to archive in range %s ~ %s', start_date or '-', end_date or '-')
-            return {"msg": "No sessions to archive", "count": 0}
-
-        logger.info('Archiving %d sessions to NAS', sessions.count())
-
-        total_archived = 0
-        total_size = 0
-        errors = []
-
-        for session in sessions.iterator():
-            possible_paths = session.get_all_possible_local_path()
-            file_copied = False
-
-            for local_path in possible_paths:
-                abs_path = os.path.join(default_storage.base_location, local_path) \
-                    if not os.path.isabs(local_path) else local_path
-                if not os.path.isfile(abs_path):
-                    continue
-
-                try:
-                    file_size = os.path.getsize(abs_path)
-                    nas_target = os.path.join(nas_mount_path, local_path)
-                    nas_target_dir = os.path.dirname(nas_target)
-                    if not os.path.isdir(nas_target_dir):
-                        os.makedirs(nas_target_dir, exist_ok=True)
-
-                    shutil.copy2(abs_path, nas_target)
-                    logger.info('Archived: %s -> %s (%d bytes)', abs_path, nas_target, file_size)
-
-                    ArchiveLog.objects.create(
-                        session_id=str(session.id),
-                        file_path=abs_path,
-                        file_size=file_size,
-                        storage_path=nas_target,
-                    )
-                    total_size += file_size
-                    file_copied = True
-                except OSError as e:
-                    logger.error('Failed to archive %s: %s', abs_path, e)
-                    errors.append({
-                        "session_id": str(session.id),
-                        "file": abs_path,
-                        "error": str(e)
-                    })
-
-            if file_copied:
-                session.is_archived = True
-                session.save(update_fields=['is_archived'])
-                total_archived += 1
-
-    total_size_mb = round(total_size / 1024 / 1024, 2)
-    logger.info(
-        'NAS archive complete: %d sessions, %d MB, %d errors',
-        total_archived, total_size_mb, len(errors)
-    )
-
-    return {
-        "msg": "Archive completed",
-        "count": total_archived,
-        "total_size_mb": total_size_mb,
-        "errors": errors[:10] if errors else None
-    }

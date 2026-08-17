@@ -354,30 +354,36 @@ class IntegrationApplicationLog(models.Model):
     datetime = models.DateTimeField(auto_now=True, verbose_name=_("Datetime"))
 
 
+class StorageReclamationMethodChoices(models.TextChoices):
+    delete_day = 'delete_day', _('Delete the earliest day of audit')
+    archive_day = 'archive_day', _('Archive the earliest day of audit')
+    delete_month = 'delete_month', _('Delete the earliest month of audit')
+    archive_month = 'archive_month', _('Archive the earliest month of audit')
+    delete = 'delete', _('Delete')
+    archive = 'archive', _('Archive')
+
+
+class StorageReclamationResultChoices(models.TextChoices):
+    success = 'success', _('Success')
+    fail = 'fail', _('Fail')
+
+
 class StorageReclamationLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    session_id = models.CharField(max_length=36, verbose_name=_("Session ID"))
-    target_type = models.CharField(
-        max_length=32, default='session_replay',
-        verbose_name=_("Target type")
+    method = models.CharField(
+        max_length=16, default='delete_day',
+        choices=StorageReclamationMethodChoices.choices,
+        verbose_name=_("Reclamation method")
     )
-    file_path = models.CharField(max_length=1024, verbose_name=_("File path"))
-    file_size = models.BigIntegerField(default=0, verbose_name=_("File size (bytes)"))
+    data_start = models.DateTimeField(null=True, verbose_name=_("Data start"))
+    data_end = models.DateTimeField(null=True, verbose_name=_("Data end"))
+    result = models.CharField(
+        max_length=16, default='success',
+        choices=StorageReclamationResultChoices.choices,
+        verbose_name=_("Result")
+    )
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
 
     class Meta:
         ordering = ['-date_created']
         verbose_name = _('Storage reclamation log')
-
-
-class ArchiveLog(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    session_id = models.CharField(max_length=36, verbose_name=_("Session ID"))
-    file_path = models.CharField(max_length=1024, verbose_name=_("File path"))
-    file_size = models.BigIntegerField(default=0, verbose_name=_("File size (bytes)"))
-    storage_path = models.CharField(max_length=1024, default='', verbose_name=_("Storage path"))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
-
-    class Meta:
-        ordering = ['-date_created']
-        verbose_name = _('Archive log')

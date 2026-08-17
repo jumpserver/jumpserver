@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
+import logging
 import os
+from logging.handlers import SysLogHandler
 
 from django.conf import settings
 
@@ -139,24 +141,16 @@ if not os.path.isdir(LOG_DIR):
 
 def _get_syslog_config():
     """获取当前 syslog 配置（仅从 django.conf.settings，由界面 / API 管理）"""
-    addr = getattr(settings, 'SYSLOG_ADDR', '')
+    host = getattr(settings, 'SYSLOG_HOST', '')
+    port = getattr(settings, 'SYSLOG_PORT', 514)
     facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
     socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
-    return addr, facility, socktype
+    return host, port, facility, socktype
 
 
-def _is_valid_addr(addr):
-    """检查 syslog 地址是否合法（host:port 格式）"""
-    if not addr:
-        return False
-    parts = addr.split(':')
-    if len(parts) != 2:
-        return False
-    try:
-        int(parts[1])
-        return True
-    except ValueError:
-        return False
+def _is_valid_host(host):
+    """检查 syslog 主机是否合法（非空）"""
+    return bool(host)
 
 
 SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
@@ -164,16 +158,27 @@ SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
 
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
-    addr, facility, socktype = _get_syslog_config()
+    host, port, facility, socktype = _get_syslog_config()
 
-    if _is_valid_addr(addr):
-        host, port = addr.split(':')
-        LOGGING['handlers']['syslog'].update({
-        'class': 'logging.handlers.SysLogHandler',
-        'facility': facility,
-        'address': (host, int(port)),
-        'socktype': socktype,
-    })
+    if _is_valid_host(host):
+        handler = SysLogHandler(
+            address=(host, int(port)),
+            facility=facility,
+            socktype=socktype,
+        )
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(logging.Formatter('jumpserver: %(message)s'))
     else:
-        LOGGING['handlers']['syslog']['class'] = 'logging.NullHandler'
+        handler = logging.NullHandler()
+
+    for logger_name in SYSLOG_LOGGER_NAMES:
+        logger = logging.getLogger(logger_name)
+        for h in list(logger.handlers):
+            if h.__class__.__name__ in ('SysLogHandler', 'NullHandler'):
+                logger.removeHandler(h)
+                try:
+                    h.close()
+                except Exception:
+                    pass
+        logger.addHandler(handler)
 

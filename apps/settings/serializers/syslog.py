@@ -7,13 +7,18 @@ __all__ = ['SyslogSettingSerializer']
 class SyslogSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Syslog')
 
-    SYSLOG_ADDR = serializers.CharField(
-        required=False, allow_blank=True, max_length=128,
-        label=_('Syslog address'),
-        help_text=_('Format: host:port, e.g. 192.168.0.1:514. Leave blank to disable syslog.')
+    SYSLOG_HOST = serializers.CharField(
+        required=True, allow_blank=True, max_length=128,
+        label=_('Syslog host'),
+        help_text=_('Syslog server IP or hostname')
+    )
+    SYSLOG_PORT = serializers.IntegerField(
+        required=True, min_value=1, max_value=65535,
+        label=_('Syslog port'),
+        help_text=_('Syslog server port, default 514')
     )
     SYSLOG_FACILITY = serializers.ChoiceField(
-        required=False, allow_blank=True,
+        required=True, allow_blank=True,
         choices=(
             ('kern', 'kern'),
             ('user', 'user'),
@@ -40,7 +45,7 @@ class SyslogSettingSerializer(serializers.Serializer):
         help_text=_('Syslog facility type')
     )
     SYSLOG_SOCKTYPE = serializers.ChoiceField(
-        required=False, allow_blank=True,
+        required=True, allow_blank=True,
         choices=(
             (1, _('TCP')),
             (2, _('UDP')),
