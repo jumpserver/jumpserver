@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView, Response
 
 from common.utils import get_logger
+from ..const import NAS_MOUNT_PATH
 
 logger = get_logger(__file__)
 
@@ -24,7 +25,7 @@ class NasTestingAPI(APIView):
         nas_type = getattr(settings, 'NAS_TYPE', 'nfs')
         nas_host = getattr(settings, 'NAS_HOST', '')
         nas_share_name = getattr(settings, 'NAS_SHARE_NAME', '')
-        nas_mount_path = getattr(settings, 'NAS_MOUNT_PATH', '')
+        nas_mount_path = NAS_MOUNT_PATH
         nas_username = getattr(settings, 'NAS_USERNAME', '')
         nas_password = getattr(settings, 'NAS_PASSWORD', '')
 
@@ -37,12 +38,6 @@ class NasTestingAPI(APIView):
         if not nas_host:
             return Response(
                 {"error": str(_("NAS host is not configured"))},
-                status=400
-            )
-
-        if not nas_mount_path:
-            return Response(
-                {"error": str(_("NAS mount path is not configured"))},
                 status=400
             )
 
@@ -94,10 +89,12 @@ class NasArchiveAPI(APIView):
     def post(self, request):
         from datetime import datetime
 
-        date_str = request.data.get('date', '')
-        if not date_str:
+        start_date_str = request.data.get('start_date', '')
+        end_date_str = request.data.get('end_date', '')
+
+        if not start_date_str and not end_date_str:
             return Response(
-                {"error": _("Date is required, format: YYYY-MM-DD")},
+                {"error": _("At least one of start date and end date is required")},
                 status=400
             )
 
@@ -108,34 +105,51 @@ class NasArchiveAPI(APIView):
                 status=400
             )
 
-        nas_mount_path = getattr(settings, 'NAS_MOUNT_PATH', '')
-        if not nas_mount_path:
-            return Response(
-                {"error": _("NAS mount path is not configured")},
-                status=400
-            )
-
         if not os.path.ismount(nas_mount_path):
             return Response(
                 {"error": _("NAS mount path is not mounted: {}").format(nas_mount_path)},
                 status=400
             )
 
-        try:
-            datetime.strptime(date_str, '%Y-%m-%d')
-        except ValueError:
+        def parse_date(date_str):
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return None
+
+        start_date = parse_date(start_date_str) if start_date_str else None
+        if start_date_str and start_date is None:
             return Response(
-                {"error": _("Invalid date format, please use YYYY-MM-DD")},
+                {"error": _("Invalid start date format, please use YYYY-MM-DD")},
+                status=400
+            )
+
+        end_date = parse_date(end_date_str) if end_date_str else None
+        if end_date_str and end_date is None:
+            return Response(
+                {"error": _("Invalid end date format, please use YYYY-MM-DD")},
+                status=400
+            )
+
+        if start_date and end_date and start_date > end_date:
+            return Response(
+                {"error": _("Start date cannot be later than end date")},
                 status=400
             )
 
         from audits.tasks import nas_archive_session_replays
-        task = nas_archive_session_replays.delay(date_str)
+        task = nas_archive_session_replays.delay(
+            start_date_str, end_date_str
+        )
 
-        logger.info('NAS archive task enqueued: %s for date %s', task.id, date_str)
+        logger.info(
+            'NAS archive task enqueued: %s for range %s ~ %s',
+            task.id, start_date_str or '-', end_date_str or '-'
+        )
 
         return Response({
             "msg": _("Archive task started"),
             "task_id": task.id,
-            "date": date_str
+            "start_date": start_date_str or None,
+            "end_date": end_date_str or None
         })

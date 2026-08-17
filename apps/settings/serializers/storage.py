@@ -2,7 +2,9 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from apps.settings.serializers.cleaning import MIN_VALUE
 from common.serializers.fields import EncryptedField
+from ..const import NAS_MOUNT_PATH
 
 __all__ = ['StorageSettingSerializer']
 
@@ -11,12 +13,12 @@ class StorageSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Storage')
 
     FTP_FILE_MAX_STORE = serializers.IntegerField(
-        required=False, allow_null=True,
+        required=True,min_value=0,
         label=_('File max store'),
         help_text=_('File max store size (MB), <= 0 means no backup')
     )
     STORAGE_USAGE_THRESHOLD = serializers.IntegerField(
-        required=False, allow_null=True,
+        required=True,min_value=0, max_value=100,
         label=_('Storage usage threshold'),
         help_text=_('Storage usage threshold (percentage 0-100), 0 means no limit')
     )
@@ -49,15 +51,15 @@ class StorageSettingSerializer(serializers.Serializer):
         label=_('NAS host'),
         help_text=_('NAS server address, e.g. 192.168.1.100')
     )
+    NAS_PORT = serializers.IntegerField(
+        required=False, allow_null=True, min_value=0, max_value=65535,
+        label=_('NAS port'),
+        help_text=_('NAS port, 0 means use the default port')
+    )
     NAS_SHARE_NAME = serializers.CharField(
         required=False, allow_null=True, allow_blank=True, max_length=256,
         label=_('NAS share name'),
         help_text=_('NAS share or export name')
-    )
-    NAS_MOUNT_PATH = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True, max_length=256,
-        label=_('NAS mount path'),
-        help_text=_('Local mount path for NAS storage')
     )
     NAS_USERNAME = serializers.CharField(
         required=False, allow_null=True, allow_blank=True, max_length=256,
@@ -80,10 +82,11 @@ class StorageSettingSerializer(serializers.Serializer):
                                            getattr(settings, 'NAS_TYPE', 'nfs')),
             'nas_host': validated_data.get('NAS_HOST',
                                            getattr(settings, 'NAS_HOST', '')),
+            'nas_port': validated_data.get('NAS_PORT',
+                                           getattr(settings, 'NAS_PORT', 0)),
             'nas_share_name': validated_data.get('NAS_SHARE_NAME',
                                                  getattr(settings, 'NAS_SHARE_NAME', '')),
-            'nas_mount_path': validated_data.get('NAS_MOUNT_PATH',
-                                                 getattr(settings, 'NAS_MOUNT_PATH', '')),
+            'nas_mount_path': NAS_MOUNT_PATH,
             'nas_username': validated_data.get('NAS_USERNAME',
                                                getattr(settings, 'NAS_USERNAME', '')),
             'nas_password': validated_data.get('NAS_PASSWORD',
@@ -92,14 +95,6 @@ class StorageSettingSerializer(serializers.Serializer):
 
     def post_save(self):
         """Ensure NAS is mounted after saving settings (force re-mount)."""
-        from settings.tools.nas_mount import ensure_nas_mounted, is_nas_mounted, _unmount
+        from settings.tools.nas_mount import ensure_nas_mounted
         config = self._get_nas_config()
-
-        # If mount path changed, unmount the old one first
-        old_mount_path = getattr(settings, 'NAS_MOUNT_PATH', '')
-        new_mount_path = config.get('nas_mount_path', '')
-        if old_mount_path and old_mount_path != new_mount_path:
-            if is_nas_mounted(old_mount_path):
-                _unmount(old_mount_path)
-
         ensure_nas_mounted(config, force=True)

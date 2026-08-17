@@ -18,6 +18,7 @@ from common.decorators import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
+from .const import NAS_MOUNT_PATH
 from .models import Setting
 from .signals import setting_changed
 
@@ -167,8 +168,9 @@ def on_django_ready_mount_nas(sender, **kwargs):
             'nas_enabled': getattr(settings, 'NAS_ENABLED', False),
             'nas_type': getattr(settings, 'NAS_TYPE', 'nfs'),
             'nas_host': getattr(settings, 'NAS_HOST', ''),
+            'nas_port': getattr(settings, 'NAS_PORT', 0),
             'nas_share_name': getattr(settings, 'NAS_SHARE_NAME', ''),
-            'nas_mount_path': getattr(settings, 'NAS_MOUNT_PATH', ''),
+            'nas_mount_path': NAS_MOUNT_PATH,
             'nas_username': getattr(settings, 'NAS_USERNAME', ''),
             'nas_password': getattr(settings, 'NAS_PASSWORD', ''),
         }

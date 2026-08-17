@@ -729,8 +729,8 @@ class Config(dict):
         'NAS_ENABLED': False,
         'NAS_TYPE': 'nfs',  # nfs / cifs
         'NAS_HOST': '',
+        'NAS_PORT': 0,  # 0 表示使用默认端口 (nfs: 2049, cifs: 445)
         'NAS_SHARE_NAME': '',
-        'NAS_MOUNT_PATH': '',
         'NAS_USERNAME': '',
         'NAS_PASSWORD': '',
 

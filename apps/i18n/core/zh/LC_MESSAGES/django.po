@@ -4188,8 +4188,8 @@ msgstr "将指定日期及之前的会话录像归档到 NAS 存储"
 
 #: audits/tasks.py:422
 msgid ""
-"Archive session replays on or before the specified date to NAS storage"
-msgstr "将指定日期及之前的会话录像归档到 NAS 存储"
+"Archive session replays within the specified date range to NAS storage"
+msgstr "将指定时间段内的会话录像归档到 NAS 存储"
 
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
@@ -7362,10 +7362,6 @@ msgstr "NAS 存储未启用"
 msgid "NAS host is not configured"
 msgstr "NAS 服务器地址未配置"
 
-#: settings/api/nas.py:46
-msgid "NAS mount path is not configured"
-msgstr "NAS 挂载路径未配置"
-
 #: settings/api/nas.py:53
 msgid "NAS username is required for CIFS"
 msgstr "CIFS 类型需要填写 NAS 用户名"
@@ -7391,14 +7387,22 @@ msgid "NAS mount path is not mounted: {}"
 msgstr "NAS 挂载路径未挂载: {}"
 
 #: settings/api/nas.py:100
-msgid "Date is required, format: YYYY-MM-DD"
-msgstr "日期必填，格式: YYYY-MM-DD"
+msgid "At least one of start date and end date is required"
+msgstr "开始日期和结束日期至少选择一个"
 
-#: settings/api/nas.py:128
-msgid "Invalid date format, please use YYYY-MM-DD"
-msgstr "日期格式无效，请使用 YYYY-MM-DD"
+#: settings/api/nas.py:132
+msgid "Invalid start date format, please use YYYY-MM-DD"
+msgstr "开始日期格式无效，请使用 YYYY-MM-DD"
 
-#: settings/api/nas.py:138
+#: settings/api/nas.py:137
+msgid "Invalid end date format, please use YYYY-MM-DD"
+msgstr "结束日期格式无效，请使用 YYYY-MM-DD"
+
+#: settings/api/nas.py:142
+msgid "Start date cannot be later than end date"
+msgstr "开始日期不能晚于结束日期"
+
+#: settings/api/nas.py:147
 msgid "Archive task started"
 msgstr "归档任务已启动"
 
@@ -7408,15 +7412,17 @@ msgstr "FTP 文件最大存储"
 
 #: settings/serializers/storage.py:15
 msgid "File max store size (MB), <= 0 means no backup"
-msgstr "FTP 文件上传最大存储大小 (MB)，<= 0 表示不备份"
-
+msgstr "通过SFTP传输文件时，保存到运维审计的最大文件大小（MB），超过的不保存"
+        
 #: settings/serializers/storage.py:18
 msgid "Storage usage threshold"
-msgstr "存储使用阈值"
+msgstr "空间腾退阈值"
+
+
 
 #: settings/serializers/storage.py:19
 msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
-msgstr "存储使用百分比阈值 (0-100)，0 表示不限制"
+msgstr "空间腾退百分比阈值 (0-100)，达到设置值时，根据设置决定删除最早一天会话录像和运维审计文件"
 
 #: settings/serializers/storage.py:22
 msgid "NAS enabled"
@@ -7438,7 +7444,15 @@ msgstr "NAS 存储类型：NFS 或 CIFS"
 msgid "NAS host"
 msgstr "NAS 服务器地址"
 
-#: settings/serializers/storage.py:33
+#: settings/serializers/storage.py:37
+msgid "NAS port"
+msgstr "NAS 端口"
+
+#: settings/serializers/storage.py:38
+msgid "NAS port, 0 means use the default port"
+msgstr "NAS 端口，0 表示使用默认端口"
+
+#: settings/serializers/storage.py:39
 msgid "NAS server address, e.g. 192.168.1.100"
 msgstr "NAS 服务器地址，例如 192.168.1.100"
 
@@ -7449,14 +7463,6 @@ msgstr "NAS 共享名称"
 #: settings/serializers/storage.py:38
 msgid "NAS share or export name"
 msgstr "NAS 共享或导出名称"
-
-#: settings/serializers/storage.py:42
-msgid "NAS mount path"
-msgstr "NAS 挂载路径"
-
-#: settings/serializers/storage.py:43
-msgid "Local mount path for NAS storage"
-msgstr "NAS 存储的本地挂载路径"
 
 #: settings/serializers/storage.py:47
 msgid "NAS username"

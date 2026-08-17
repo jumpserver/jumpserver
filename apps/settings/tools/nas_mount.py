@@ -53,16 +53,21 @@ def ensure_nas_mounted(config, force=False):
             return False
 
     # Build mount command
+    nas_port = config.get('nas_port', 0) or 0
     if nas_type == 'cifs':
         source = f'//{host}/{share_name}'
         password = config.get('nas_password', '') or ''
         password = password.replace(',', '\\,')
         username = config.get('nas_username', '') or ''
-        cmd = ['mount', '-t', 'cifs', '-o', f'username={username},password={password}',
-               source, mount_path]
+        options = f'username={username},password={password}'
+        if nas_port:
+            options += f',port={nas_port}'
+        cmd = ['mount', '-t', 'cifs', '-o', options, source, mount_path]
     else:
         source = f'{host}:{share_name}'
         cmd = ['mount', '-t', 'nfs', source, mount_path]
+        if nas_port:
+            cmd = ['mount', '-t', 'nfs', '-o', f'port={nas_port}', source, mount_path]
 
     logger.info('Mounting NAS: %s -> %s (type=%s)', source, mount_path, nas_type)
 

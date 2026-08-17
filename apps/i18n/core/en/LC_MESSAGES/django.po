@@ -4119,8 +4119,8 @@ msgstr "NAS archive session replays"
 
 #: audits/tasks.py:422
 msgid ""
-"Archive session replays on or before the specified date to NAS storage"
-msgstr "Archive session replays on or before the specified date to NAS storage"
+"Archive session replays within the specified date range to NAS storage"
+msgstr "Archive session replays within the specified date range to NAS storage"
 
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"
@@ -7255,10 +7255,6 @@ msgstr ""
 msgid "NAS host is not configured"
 msgstr ""
 
-#: settings/api/nas.py:46
-msgid "NAS mount path is not configured"
-msgstr ""
-
 #: settings/api/nas.py:53
 msgid "NAS username is required for CIFS"
 msgstr ""
@@ -7284,14 +7280,22 @@ msgid "NAS mount path is not mounted: {}"
 msgstr "NAS mount path is not mounted: {}"
 
 #: settings/api/nas.py:100
-msgid "Date is required, format: YYYY-MM-DD"
-msgstr "Date is required, format: YYYY-MM-DD"
+msgid "At least one of start date and end date is required"
+msgstr "At least one of start date and end date is required"
 
-#: settings/api/nas.py:128
-msgid "Invalid date format, please use YYYY-MM-DD"
-msgstr "Invalid date format, please use YYYY-MM-DD"
+#: settings/api/nas.py:132
+msgid "Invalid start date format, please use YYYY-MM-DD"
+msgstr "Invalid start date format, please use YYYY-MM-DD"
 
-#: settings/api/nas.py:138
+#: settings/api/nas.py:137
+msgid "Invalid end date format, please use YYYY-MM-DD"
+msgstr "Invalid end date format, please use YYYY-MM-DD"
+
+#: settings/api/nas.py:142
+msgid "Start date cannot be later than end date"
+msgstr "Start date cannot be later than end date"
+
+#: settings/api/nas.py:147
 msgid "Archive task started"
 msgstr "Archive task started"
 
@@ -7301,15 +7305,15 @@ msgstr ""
 
 #: settings/serializers/storage.py:15
 msgid "File max store size (MB), <= 0 means no backup"
-msgstr ""
+msgstr "When transferring files via SFTP, the maximum size (MB) saved to the operation audit; files exceeding this size will not be saved"
 
 #: settings/serializers/storage.py:18
 msgid "Storage usage threshold"
-msgstr ""
+msgstr "Storage reclamation threshold"
 
 #: settings/serializers/storage.py:19
 msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
-msgstr ""
+msgstr "Storage reclamation percentage threshold (0-100); when the set value is reached, delete the session replays of the earliest day"
 
 #: settings/serializers/storage.py:22
 msgid "NAS enabled"
@@ -7329,9 +7333,17 @@ msgstr ""
 
 #: settings/serializers/storage.py:32
 msgid "NAS host"
-msgstr ""
+msgstr "NAS host"
 
-#: settings/serializers/storage.py:33
+#: settings/serializers/storage.py:37
+msgid "NAS port"
+msgstr "NAS port"
+
+#: settings/serializers/storage.py:38
+msgid "NAS port, 0 means use the default port"
+msgstr "NAS port, 0 means use the default port"
+
+#: settings/serializers/storage.py:39
 msgid "NAS server address, e.g. 192.168.1.100"
 msgstr ""
 
@@ -7341,14 +7353,6 @@ msgstr ""
 
 #: settings/serializers/storage.py:38
 msgid "NAS share or export name"
-msgstr ""
-
-#: settings/serializers/storage.py:42
-msgid "NAS mount path"
-msgstr ""
-
-#: settings/serializers/storage.py:43
-msgid "Local mount path for NAS storage"
 msgstr ""
 
 #: settings/serializers/storage.py:47

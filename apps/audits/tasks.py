@@ -20,6 +20,7 @@ from common.utils.safe import find_and_delete_empty_dirs, find_and_delete_files,
 from ops.celery.decorator import register_as_period_task
 from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_root_org
+from settings.const import NAS_MOUNT_PATH
 from terminal.backends import server_replay_storage
 from terminal.models import Session, Command
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog, StorageReclamationLog
@@ -422,41 +423,54 @@ def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
 @shared_task(
     verbose_name=_('NAS archive session replays'),
     description=_(
-        'Archive session replays on or before the specified date to NAS storage'
+        'Archive session replays within the specified date range to NAS storage'
     )
 )
-def nas_archive_session_replays(date_str):
+def nas_archive_session_replays(start_date, end_date):
     from datetime import datetime
 
     from audits.models import ArchiveLog
 
-    logger.info('NAS archive task started for date: %s', date_str)
+    logger.info('NAS archive task started for range: %s ~ %s', start_date or '-', end_date or '-')
 
-    nas_mount_path = getattr(settings, 'NAS_MOUNT_PATH', '')
+    nas_mount_path = NAS_MOUNT_PATH
     if not nas_mount_path or not os.path.ismount(nas_mount_path):
         logger.error('NAS mount path not available: %s', nas_mount_path)
         return {"error": "NAS mount path not available"}
 
     try:
-        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        start = datetime.strptime(start_date, '%Y-%m-%d').date() if start_date else None
+        end = datetime.strptime(end_date, '%Y-%m-%d').date() if end_date else None
     except ValueError:
-        logger.error('Invalid date format: %s', date_str)
+        logger.error('Invalid date format: start=%s end=%s', start_date, end_date)
         return {"error": "Invalid date format"}
 
-    selected_datetime = datetime.combine(selected_date, datetime.max.time())
-    if settings.USE_TZ:
-        tz = timezone.get_current_timezone()
-        selected_datetime = timezone.make_aware(selected_datetime, tz)
+    if start and end and start > end:
+        logger.error('Start date after end date: %s > %s', start, end)
+        return {"error": "Start date after end date"}
+
+    tz = timezone.get_current_timezone() if settings.USE_TZ else None
+
+    filter_kwargs = {
+        'has_replay': True,
+        'is_archived': False,
+    }
+    if start:
+        start_datetime = datetime.combine(start, datetime.min.time())
+        if tz:
+            start_datetime = timezone.make_aware(start_datetime, tz)
+        filter_kwargs['date_start__gte'] = start_datetime
+    if end:
+        end_datetime = datetime.combine(end, datetime.max.time())
+        if tz:
+            end_datetime = timezone.make_aware(end_datetime, tz)
+        filter_kwargs['date_start__lte'] = end_datetime
 
     with tmp_to_root_org():
-        sessions = Session.objects.filter(
-            has_replay=True,
-            is_archived=False,
-            date_start__lte=selected_datetime
-        ).order_by('date_start')
+        sessions = Session.objects.filter(**filter_kwargs).order_by('date_start')
 
         if not sessions.exists():
-            logger.info('No sessions to archive before %s', date_str)
+            logger.info('No sessions to archive in range %s ~ %s', start_date or '-', end_date or '-')
             return {"msg": "No sessions to archive", "count": 0}
 
         logger.info('Archiving %d sessions to NAS', sessions.count())
