@@ -589,13 +589,52 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             'file_name_conflict_resolution': settings.LUNA_DEFAULT_FILE_NAME_CONFLICT_RESOLUTION,
             'terminal_theme_name': settings.LUNA_DEFAULT_TERMINAL_THEME_NAME,
         }
+        backspace_preference_name = 'is_backspace_as_ctrl_h'
+        resolution_preference_name = 'rdp_resolution'
+        rdp_client_option_preference_name = 'rdp_client_option'
         preferences_query = Preference.objects.filter(
-            user=user, category='luna', name__in=default_name_opts.keys()
+            user=user, category='luna',
+            name__in=(
+                *default_name_opts.keys(),
+                backspace_preference_name,
+                resolution_preference_name,
+                rdp_client_option_preference_name,
+            )
         ).values_list('name', 'value')
         preferences = dict(preferences_query)
         for name in default_name_opts.keys():
             value = preferences.get(name, default_name_opts[name])
             connect_options[name] = value
+
+        # The advanced option submitted by Luna takes precedence.  When it is
+        # absent, use the personal preference as the connection default.
+        if 'backspaceAsCtrlH' not in connect_options:
+            # Koko consumes this option using camelCase. Preferences are stored
+            # in a TextField, so convert the value back to a real boolean.
+            backspace_as_ctrl_h = preferences.get(
+                backspace_preference_name, settings.LUNA_DEFAULT_IS_BACKSPACE_AS_CTRL_H
+            )
+            connect_options['backspaceAsCtrlH'] = is_true(backspace_as_ctrl_h)
+
+        if data.get('protocol') == 'rdp':
+            if 'resolution' not in connect_options:
+                connect_options['resolution'] = preferences.get(
+                    resolution_preference_name, settings.LUNA_DEFAULT_RDP_RESOLUTION
+                )
+
+            if 'remote_microphone' not in connect_options:
+                rdp_client_options = preferences.get(
+                    rdp_client_option_preference_name,
+                    settings.LUNA_DEFAULT_RDP_CLIENT_OPTION,
+                )
+                if isinstance(rdp_client_options, str):
+                    try:
+                        rdp_client_options = json.loads(rdp_client_options)
+                    except json.JSONDecodeError:
+                        rdp_client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+                if not isinstance(rdp_client_options, (list, set, tuple)):
+                    rdp_client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+                connect_options['remote_microphone'] = 'remote_microphone' in rdp_client_options
         connect_options['lang'] = getattr(user, 'lang') or settings.LANGUAGE_CODE
         data['connect_options'] = connect_options
 
