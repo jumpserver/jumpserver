@@ -212,7 +212,10 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-        'FavoriteAsset', 'FavoriteFolder', 'ChangeSecretRecord', 'AppProvider', 'Variable', 'LeakPasswords'
+        'FavoriteAsset', 'FavoriteFolder', 'ChangeSecretRecord', 'AppProvider',
+        'Variable', 'LeakPasswords',
+        # OAuth authorization codes are short-lived protocol artifacts.
+        'Grant',
     }
     include_models = {'UserSession'}
     for i, app in enumerate(apps.get_models(), 1):
