@@ -137,6 +137,12 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
             'XPACK_LICENSE_CONTENT': settings.XPACK_LICENSE_CONTENT
         }
 
+    @staticmethod
+    def get_component_settings():
+        return {
+            'PANDA_HOST': settings.PANDA_HOST,
+        }
+
     @property
     def config(self):
         configs = {}
@@ -149,6 +155,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_login_title_setting())
         configs.update(self.get_chat_ai_setting())
         configs.update(self.get_xpack_license())
+        configs.update(self.get_component_settings())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,
             'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
