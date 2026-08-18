@@ -4128,11 +4128,11 @@ msgstr "空间腾退任务"
 
 #: audits/tasks.py:185
 msgid ""
-"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete or archive the oldest session replay files and update session records until "
-"usage falls below threshold"
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),\n"
+"delete or archive the oldest session replay files and update session records\n"
+"until usage falls below threshold"
 msgstr ""
-"当系统存储使用率超过 STORAGE_USAGE_THRESHOLD (百分比 0-100) "
+"当系统存储使用率超过 STORAGE_USAGE_THRESHOLD (百分比 50-95) "
 "时，删除或归档最早一天的会话记录、命令记录和录像，直到使用率降至阈值以下"
 
 #: audits/tasks.py:206
@@ -7236,13 +7236,12 @@ msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
 #: settings/api/syslog.py:17
-#, python-brace-format
-msgid "Test syslog message sent to {}, please check"
-msgstr "测试 Syslog 消息已发送至 {}，请检查"
+msgid "Test message sent, please check"
+msgstr "测试消息已发送，请查收"
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
-msgstr "Syslog 处理器未激活，请先保存配置"
+msgstr "SYSLOG 处理器未激活，请先保存配置"
 
 #: settings/api/nas.py:18
 #, python-brace-format
@@ -7306,12 +7305,12 @@ msgid "File max store size (MB), <= 0 means no backup"
 msgstr "通过SFTP传输文件时，保存到运维审计的最大文件大小（MB），超过的不保存"
 
 #: settings/serializers/storage.py:18
-msgid "Storage usage threshold"
-msgstr "空间腾退阈值"
+msgid "Disk threshold"
+msgstr "磁盘阈值"
 
 #: settings/serializers/storage.py:19
-msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
-msgstr "空间腾退百分比阈值 (0-100)，达到设置值时，根据设置决定删除最早一天会话录像和运维审计文件"
+msgid "When disk space usage exceeds the set threshold percentage, the periodic reclamation task is triggered. Threshold range: 50-95"
+msgstr "当磁盘空间占用超过设定阈值百分比时，触发定时腾退任务，阈值范围：50-95"
 
 #: settings/serializers/storage.py:22
 msgid "NAS enabled"
@@ -7326,20 +7325,16 @@ msgid "NAS type"
 msgstr "NAS 类型"
 
 #: settings/serializers/storage.py:28
-msgid "NAS storage type: NFS or CIFS"
-msgstr "NAS 存储类型：NFS 或 CIFS"
+msgid "NAS storage type: windows or linux"
+msgstr "NAS 存储类型：windows 或 linux"
 
 #: settings/serializers/storage.py:32
 msgid "NAS host"
 msgstr "NAS 服务器地址"
 
-#: settings/serializers/storage.py:37
+#: settings/serializers/storage.py:37 settings/serializers/storage.py:38
 msgid "NAS port"
 msgstr "NAS 端口"
-
-#: settings/serializers/storage.py:38
-msgid "NAS port, 0 means use the default port"
-msgstr "NAS 端口，0 表示使用默认端口"
 
 #: settings/serializers/storage.py:39
 msgid "NAS server address, e.g. 192.168.1.100"
@@ -7350,24 +7345,24 @@ msgid "NAS share name"
 msgstr "NAS 共享名称"
 
 #: settings/serializers/storage.py:38
-msgid "NAS share or export name"
-msgstr "NAS 共享或导出名称"
+msgid "NAS storage path"
+msgstr "NAS 存储路径"
 
 #: settings/serializers/storage.py:47
 msgid "NAS username"
 msgstr "NAS 用户名"
 
 #: settings/serializers/storage.py:48
-msgid "NAS login username (CIFS required)"
-msgstr "NAS 登录用户名（CIFS 必填）"
+msgid "NAS login username"
+msgstr "NAS 登录用户名"
 
 #: settings/serializers/storage.py:52
 msgid "NAS password"
 msgstr "NAS 密码"
 
 #: settings/serializers/storage.py:53
-msgid "NAS login password (CIFS required)"
-msgstr "NAS 登录密码（CIFS 必填）"
+msgid "NAS login password"
+msgstr "NAS 登录密码"
 
 #: settings/serializers/storage.py:21 terminal/api/session/session.py:163
 #: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
@@ -7408,7 +7403,11 @@ msgstr "归档最早一个月审计"
 
 #: settings/serializers/storage.py:32
 msgid "Archive means move files to NAS storage and then delete local files"
-msgstr "归档是将文件归档到 NAS 存储后删除本地文件"
+msgstr "归档是将审计文件传输到 NAS 存储后删除本地文件"
+
+#: settings/serializers/storage.py
+msgid "Archive reclamation requires NAS storage to be enabled"
+msgstr "归档腾退需要启用 NAS 存储"
 
 #: settings/api/ldap.py:92
 msgid ""
@@ -12632,39 +12631,39 @@ msgstr "syslog"
 
 #: settings/serializers/syslog.py:12
 msgid "Syslog facility"
-msgstr "syslog 设施"
+msgstr "SYSLOG 设施"
 
 #: settings/serializers/syslog.py:12
 msgid "Syslog facility type"
-msgstr "syslog 设施类型"
+msgstr "SYSLOG 设施类型"
 
 #: settings/serializers/syslog.py:12
 msgid "Syslog socket type"
-msgstr "syslog 协议类型"
+msgstr "SYSLOG 协议类型"
 
 #: settings/serializers/syslog.py:12
 msgid "TCP or UDP protocol for syslog"
-msgstr "syslog 使用的 TCP 或 UDP 协议"
+msgstr "SYSLOG 使用的 TCP 或 UDP 协议"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog host"
-msgstr "syslog 主机"
+msgstr "SYSLOG 主机"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog server IP or hostname"
-msgstr "syslog 服务器 IP 或主机名"
+msgstr "SYSLOG 服务器 IP 或主机名"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog port"
-msgstr "syslog 端口"
+msgstr "SYSLOG 端口"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog server port, default 514"
-msgstr "syslog 服务器端口，默认 514"
+msgstr "SYSLOG 服务器端口，默认 514"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog host is not configured"
-msgstr "syslog 主机未配置"
+msgstr "SYSLOG 主机未配置"
 
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"

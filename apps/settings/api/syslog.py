@@ -14,14 +14,13 @@ __all__ = ['SyslogTestingAPI']
 
 
 class SyslogTestingAPI(APIView):
-    success_message = _("Test syslog message sent to {}, please check")
+    success_message = _("Test message sent, please check")
     rbac_perms = {
         'POST': 'settings.change_other'
     }
 
     def post(self, request):
         host = getattr(settings, 'SYSLOG_HOST', '')
-        port = getattr(settings, 'SYSLOG_PORT', 514)
         if not host:
             return Response(
                 {"error": str(_("Syslog host is not configured"))},
@@ -45,5 +44,4 @@ class SyslogTestingAPI(APIView):
             logger.error("Failed to send test syslog message: %s", e)
             return Response({"error": str(e)}, status=400)
 
-        addr = '{}:{}'.format(host, port)
-        return Response({"msg": str(self.success_message.format(addr))})
+        return Response({"msg": str(self.success_message)})

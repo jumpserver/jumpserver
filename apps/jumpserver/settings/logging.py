@@ -155,11 +155,24 @@ def _is_valid_host(host):
 
 SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
 
+def init_syslog_handler():
+    host, port, facility, socktype = _get_syslog_config()
+
+    if _is_valid_host(host):
+        LOGGING['handlers']['syslog'].update({
+        'class': 'logging.handlers.SysLogHandler',
+        'facility': facility,
+        'address': (host, int(port)),
+        'socktype': socktype,
+    })
+    else:
+        LOGGING['handlers']['syslog']['class'] = 'logging.NullHandler'
+
 
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
     host, port, facility, socktype = _get_syslog_config()
-
+    
     if _is_valid_host(host):
         handler = SysLogHandler(
             address=(host, int(port)),
@@ -171,14 +184,18 @@ def reconfigure_syslog_handler():
     else:
         handler = logging.NullHandler()
 
+    to_close = set()
     for logger_name in SYSLOG_LOGGER_NAMES:
         logger = logging.getLogger(logger_name)
         for h in list(logger.handlers):
             if h.__class__.__name__ in ('SysLogHandler', 'NullHandler'):
                 logger.removeHandler(h)
-                try:
-                    h.close()
-                except Exception:
-                    pass
+                to_close.add(h)
         logger.addHandler(handler)
+
+    for h in to_close:
+        try:
+            h.close()
+        except Exception:
+            pass
 
