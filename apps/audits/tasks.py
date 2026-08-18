@@ -253,7 +253,7 @@ def _parse_reclamation_method(method):
 @shared_task(
     verbose_name=_('Reclaim storage by threshold'),
     description=_(
-        """If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100),
+        """If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),
         delete or archive the oldest session replay files and update session records
         until usage falls below threshold"""
     )

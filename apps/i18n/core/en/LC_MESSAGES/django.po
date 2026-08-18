@@ -4094,9 +4094,9 @@ msgstr "Storage reclamation task"
 
 #: audits/tasks.py:185
 msgid ""
-"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete or archive the oldest session replay files and update session records until "
-"usage falls below threshold"
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),\n"
+"delete or archive the oldest session replay files and update session records\n"
+"until usage falls below threshold"
 msgstr ""
 
 #: audits/tasks.py:206
@@ -7188,8 +7188,7 @@ msgid "Test syslog setting"
 msgstr ""
 
 #: settings/api/syslog.py:17
-#, python-brace-format
-msgid "Test syslog message sent to {}, please check"
+msgid "Test message sent, please check"
 msgstr ""
 
 #: settings/api/syslog.py:38
@@ -7260,14 +7259,14 @@ msgstr ""
 "operation audit; files exceeding this size will not be saved"
 
 #: settings/serializers/storage.py:18
-msgid "Storage usage threshold"
-msgstr "Storage reclamation threshold"
+msgid "Disk threshold"
+msgstr "Disk threshold"
 
 #: settings/serializers/storage.py:19
-msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgid "When disk space usage exceeds the set threshold percentage, the periodic reclamation task is triggered. Threshold range: 50-95"
 msgstr ""
-"Storage reclamation percentage threshold (0-100); when the set value is "
-"reached, delete the session replays of the earliest day"
+"When disk space usage exceeds the set threshold percentage, the periodic "
+"reclamation task is triggered. Threshold range: 50-95"
 
 #: settings/serializers/storage.py:22
 msgid "NAS enabled"
@@ -7282,20 +7281,16 @@ msgid "NAS type"
 msgstr ""
 
 #: settings/serializers/storage.py:28
-msgid "NAS storage type: NFS or CIFS"
+msgid "NAS storage type: windows or linux"
 msgstr ""
 
 #: settings/serializers/storage.py:32
 msgid "NAS host"
 msgstr "NAS host"
 
-#: settings/serializers/storage.py:37
+#: settings/serializers/storage.py:37 settings/serializers/storage.py:38
 msgid "NAS port"
 msgstr "NAS port"
-
-#: settings/serializers/storage.py:38
-msgid "NAS port, 0 means use the default port"
-msgstr "NAS port, 0 means use the default port"
 
 #: settings/serializers/storage.py:39
 msgid "NAS server address, e.g. 192.168.1.100"
@@ -7306,23 +7301,20 @@ msgid "NAS share name"
 msgstr ""
 
 #: settings/serializers/storage.py:38
-msgid "NAS share or export name"
+msgid "NAS storage path"
 msgstr ""
 
 #: settings/serializers/storage.py:47
 msgid "NAS username"
 msgstr ""
 
-#: settings/serializers/storage.py:48
-msgid "NAS login username (CIFS required)"
-msgstr ""
 
-#: settings/serializers/storage.py:52
-msgid "NAS password"
+#: settings/serializers/storage.py:48
+msgid "NAS login username"
 msgstr ""
 
 #: settings/serializers/storage.py:53
-msgid "NAS login password (CIFS required)"
+msgid "NAS login password"
 msgstr ""
 
 #: settings/serializers/storage.py:21 terminal/api/session/session.py:163
@@ -7364,6 +7356,10 @@ msgstr ""
 
 #: settings/serializers/storage.py:32
 msgid "Archive means move files to NAS storage and then delete local files"
+msgstr ""
+
+#: settings/serializers/storage.py
+msgid "Archive reclamation requires NAS storage to be enabled"
 msgstr ""
 
 #: settings/api/ldap.py:92

@@ -152,10 +152,10 @@ def on_syslog_setting_changed(sender, name='', **kwargs):
 @receiver(django_ready)
 def on_django_ready_init_syslog_handler(sender, **kwargs):
     try:
-        from jumpserver.settings.logging import reconfigure_syslog_handler
-        reconfigure_syslog_handler()
+        from jumpserver.settings.logging import init_syslog_handler
+        init_syslog_handler()
     except Exception as e:
-        logger.error('Failed to reconfigure syslog handler: %s', e)
+        logger.error('Failed to init syslog handler: %s', e)
 
 
 @receiver(django_ready)
