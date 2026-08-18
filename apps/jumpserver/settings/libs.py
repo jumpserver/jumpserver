@@ -72,7 +72,7 @@ SPECTACULAR_SETTINGS = {
     'BASE_PATH': '/api/v1/',
     'SCHEMA_PATH_PREFIX': '/api/v1/',
     'SWAGGER_UI_DIST': 'SIDECAR',
-    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': f'{CONFIG.FORCE_SCRIPT_NAME}/static/img/facio.ico',
     'SWAGGER_UI_OAUTH2_REDIRECT_URL': 'SIDECAR',
     'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
     'DEFAULT_GENERATOR_CLASS': 'jumpserver.views.schema.CustomSchemaGenerator',
