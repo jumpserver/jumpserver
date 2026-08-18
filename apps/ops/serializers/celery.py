@@ -51,7 +51,7 @@ class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
         model = CeleryTaskExecution
         fields = [
             "id", "name", "task_name", "args", "kwargs", "time_cost", "timedelta",
-            "is_success", "is_finished", "date_published",
+            "state", "is_success", "is_finished", "date_published",
             "date_start", "date_finished", "has_ansible_log",
             "is_ansible_task",
         ]

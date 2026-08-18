@@ -359,9 +359,21 @@
                 <span class="label">ID</span>
                 <span class="value task-id"></span>
             </li>
-            <li class="item">
+            <li class="item task-start-item">
                 <span class="label">{% trans 'Date start' %}</span>
                 <span class="value date-start"></span>
+            </li>
+            <li class="item">
+                <span class="label">{% trans 'Status' %}</span>
+                <span class="value task-state"></span>
+            </li>
+            <li class="item task-published-item" hidden>
+                <span class="label">{% trans 'Date published' %}</span>
+                <span class="value date-published"></span>
+            </li>
+            <li class="item task-wait-duration-item" hidden>
+                <span class="label">{% trans 'Duration' %}</span>
+                <span class="value task-wait-duration"></span>
             </li>
         </ul>
     </div>
@@ -413,6 +425,9 @@
     var currentLogType = 'celery';
     var vendor = "{{ vendor }}";
     var extraQuery = Object.fromEntries(new URLSearchParams(window.location.search));
+    var displayedTaskState = null;
+    var announcedTaskState = null;
+    var taskPublishedAt = null;
     $(document).ready(function () {
         term = new Terminal({
             cursorBlink: false,
@@ -698,8 +713,24 @@
                 return;
             }
             var data = JSON.parse(e.data);
+            if (data.event === 'status') {
+                updateTaskPublishedAt(data.date_published);
+                updateTaskState(data.state, true);
+                return;
+            }
             if (data.event === 'unavailable') {
-                term.write(`Ansible ${gettext('Detail')}: ${gettext('Not found')}\r\n`);
+                updateTaskState(data.state);
+                if (
+                    data.reason === 'finished_without_log' &&
+                    currentLogType === 'celery'
+                ) {
+                    term.write(
+                        `${gettext('Status')}: ${getTaskStateLabel(data.state)}\r\n` +
+                        `${gettext('Output')}: ${gettext('Log unavailable or the log directory is not shared.')}\r\n`
+                    );
+                } else {
+                    term.write(`Ansible ${gettext('Detail')}: ${gettext('Not found')}\r\n`);
+                }
                 scheduleTerminalScrollbarUpdate();
                 return;
             }
@@ -729,6 +760,72 @@
         }
     }
 
+    function getTaskStateLabel(state) {
+        const labels = {
+            PENDING: gettext('Queued'),
+            RUNNING: gettext('Running'),
+            SUCCESS: gettext('Finished'),
+            FAILURE: gettext('Failed'),
+            REVOKED: gettext('Canceled'),
+        };
+        return labels[state] || state || '-';
+    }
+
+    function updateTaskState(state, writeToTerminal) {
+        if (!state) {
+            return;
+        }
+        displayedTaskState = state;
+        $('.task-state').text(getTaskStateLabel(state));
+        const isQueued = state === 'PENDING';
+        $('.task-start-item').prop('hidden', isQueued);
+        $('.task-published-item, .task-wait-duration-item').prop('hidden', !isQueued);
+        updateTaskWaitDuration();
+        if (writeToTerminal && announcedTaskState !== state) {
+            announcedTaskState = state;
+            term.write(`${gettext('Status')}: ${getTaskStatusMessage(state)}\r\n`);
+            scheduleTerminalScrollbarUpdate();
+        }
+    }
+
+    function getTaskStatusMessage(state) {
+        const messages = {
+            PENDING: gettext('Queued: waiting for an available ansible worker.'),
+            RUNNING: gettext('Running: worker has accepted the task and is preparing execution logs.'),
+        };
+        return messages[state] || getTaskStateLabel(state);
+    }
+
+    function updateTaskPublishedAt(value) {
+        if (!value) {
+            return;
+        }
+        const publishedAt = new Date(value);
+        if (Number.isNaN(publishedAt.getTime())) {
+            return;
+        }
+        taskPublishedAt = publishedAt;
+        $('.date-published').text(publishedAt.toLocaleString());
+        updateTaskWaitDuration();
+    }
+
+    function updateTaskWaitDuration() {
+        if (displayedTaskState !== 'PENDING' || !taskPublishedAt) {
+            $('.task-wait-duration').text('');
+            return;
+        }
+        const elapsedSeconds = Math.max(
+            0, Math.floor((Date.now() - taskPublishedAt.getTime()) / 1000)
+        );
+        const hours = Math.floor(elapsedSeconds / 3600);
+        const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+        const seconds = elapsedSeconds % 60;
+        const duration = [hours, minutes, seconds]
+            .map(value => String(value).padStart(2, '0'))
+            .join(':');
+        $('.task-wait-duration').text(duration);
+    }
+
     function getAutomationExecutionInfo() {
         let url = "{% url 'api-ops:task-executions-detail' pk=task_id %}";
 
@@ -741,6 +838,8 @@
                 $('.task-id').html(data.id);
                 $('.task-type').html(data.task_name);
                 $('.date-start').html(dateStart);
+                updateTaskPublishedAt(data.date_published);
+                updateTaskState(data.state);
                 document.title = data.task_name || document.title;
                 if (data.has_ansible_log || data.is_ansible_task) {
                     $('#toggle-ansible-log-btn').prop('hidden', false);
@@ -748,6 +847,8 @@
             }
         })
     }
+
+    window.setInterval(updateTaskWaitDuration, 1000);
 
     function downloadLog() {
         term.selectAll()
