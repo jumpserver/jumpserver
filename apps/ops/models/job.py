@@ -24,7 +24,9 @@ from assets.const import Protocol
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
-from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, UploadFileRunner
+from ops.ansible import (
+    JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
+)
 
 """stop all ssh child processes of the given ansible process pid."""
 from ops.ansible.exception import CommandInBlackListException
@@ -588,6 +590,7 @@ class JobExecution(JMSOrgBaseModel):
         self.before_start()
 
         runner = self.get_runner()
+        runner.cb = TaskLogCallback(self.task_id)
         ssh_tunnel = SSHTunnelManager()
         ssh_tunnel.local_gateway_prepare(runner)
         try:
@@ -601,6 +604,9 @@ class JobExecution(JMSOrgBaseModel):
             logging.error(e, exc_info=True)
             self.set_error(e)
         finally:
+            close_callback = getattr(runner.cb, 'close', None)
+            if close_callback:
+                close_callback()
             ssh_tunnel.local_gateway_clean(runner)
 
     def stop(self):

@@ -5,6 +5,8 @@ from functools import reduce
 
 from django.conf import settings
 
+from .utils import get_ansible_task_log_path
+
 
 class DefaultCallback:
     STATUS_MAPPER = {
@@ -286,3 +288,37 @@ class DefaultCallback:
         pid_filepath = os.path.join(self.private_data_dir, "local.pid")
         with open(pid_filepath, "w") as f:
             f.write(str(pid))
+
+
+class TaskLogCallback(DefaultCallback):
+    """Persist raw ansible-runner output for a Celery task."""
+
+    def __init__(self, task_id=None):
+        super().__init__()
+        self.task_id = task_id
+        self.task_log = None
+
+    def open_task_log(self):
+        if not self.task_log and self.task_id:
+            path = get_ansible_task_log_path(self.task_id)
+            self.task_log = open(path, 'a', encoding='utf-8', buffering=1)
+
+    def write_task_output(self, output):
+        if not output:
+            return
+        self.open_task_log()
+        if not self.task_log:
+            return
+        output = str(output)
+        self.task_log.write(output)
+        if not output.endswith(('\n', '\r')):
+            self.task_log.write('\n')
+        self.task_log.flush()
+
+    def event_handler(self, data, **kwargs):
+        self.write_task_output(data.get('stdout'))
+        return super().event_handler(data, **kwargs)
+
+    def close(self):
+        if self.task_log and not self.task_log.closed:
+            self.task_log.close()
