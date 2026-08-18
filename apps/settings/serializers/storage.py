@@ -65,7 +65,7 @@ class StorageSettingSerializer(serializers.Serializer):
     NAS_PORT = serializers.IntegerField(
         required=True, allow_null=True, min_value=0, max_value=65535,
         label=_('NAS port'),
-        help_text=_('NAS port, 0 means use the default port')
+        help_text=_('NAS port')
     )
     NAS_SHARE_NAME = serializers.CharField(
         required=True, allow_null=True, allow_blank=True, max_length=256,
@@ -73,15 +73,25 @@ class StorageSettingSerializer(serializers.Serializer):
         help_text=_('NAS share or export name')
     )
     NAS_USERNAME = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True, max_length=256,
+        required=True, allow_null=True, allow_blank=True, max_length=256,
         label=_('NAS username'),
-        help_text=_('NAS login username (windows required)')
+        help_text=_('NAS login username')
     )
     NAS_PASSWORD = EncryptedField(
-        required=False, allow_null=True, allow_blank=True, max_length=1024,
+        required=True, allow_null=True, allow_blank=True, max_length=1024,
         label=_('NAS password'),
-        help_text=_('NAS login password (windows required)')
+        help_text=_('NAS login password')
     )
+
+    def validate(self, attrs):
+        method = attrs.get('STORAGE_RECLAMATION_METHOD')
+        if method in ('archive_day', 'archive_month'):
+            nas_enabled = attrs.get('NAS_ENABLED', getattr(settings, 'NAS_ENABLED', False))
+            if not nas_enabled:
+                raise serializers.ValidationError(
+                    _('Archive reclamation requires NAS storage to be enabled')
+                )
+        return attrs
 
     def _get_nas_config(self):
         """Get NAS config from validated data, fall back to settings."""

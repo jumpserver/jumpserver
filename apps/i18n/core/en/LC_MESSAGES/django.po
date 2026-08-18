@@ -7184,9 +7184,8 @@ msgid "Test smtp setting"
 msgstr ""
 
 #: settings/api/syslog.py:17
-#, python-brace-format
-msgid "Test syslog message sent to {}, please check"
-msgstr "Test SYSLOG message sent to {}, please check"
+msgid "Test message sent, please check"
+msgstr ""
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
@@ -7285,13 +7284,9 @@ msgstr ""
 msgid "NAS host"
 msgstr "NAS host"
 
-#: settings/serializers/storage.py:37
+#: settings/serializers/storage.py:37 settings/serializers/storage.py:38
 msgid "NAS port"
 msgstr "NAS port"
-
-#: settings/serializers/storage.py:38
-msgid "NAS port, 0 means use the default port"
-msgstr "NAS port, 0 means use the default port"
 
 #: settings/serializers/storage.py:39
 msgid "NAS server address, e.g. 192.168.1.100"
@@ -7309,16 +7304,13 @@ msgstr ""
 msgid "NAS username"
 msgstr ""
 
-#: settings/serializers/storage.py:48
-msgid "NAS login username (windows required)"
-msgstr ""
 
-#: settings/serializers/storage.py:52
-msgid "NAS password"
+#: settings/serializers/storage.py:48
+msgid "NAS login username"
 msgstr ""
 
 #: settings/serializers/storage.py:53
-msgid "NAS login password (windows required)"
+msgid "NAS login password"
 msgstr ""
 
 #: settings/serializers/storage.py:21 terminal/api/session/session.py:163
@@ -7360,6 +7352,10 @@ msgstr ""
 
 #: settings/serializers/storage.py:32
 msgid "Archive means move files to NAS storage and then delete local files"
+msgstr ""
+
+#: settings/serializers/storage.py
+msgid "Archive reclamation requires NAS storage to be enabled"
 msgstr ""
 
 #: settings/api/ldap.py:92

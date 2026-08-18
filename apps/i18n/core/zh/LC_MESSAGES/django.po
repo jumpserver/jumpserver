@@ -7236,13 +7236,12 @@ msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
 #: settings/api/syslog.py:17
-#, python-brace-format
-msgid "Test syslog message sent to {}, please check"
-msgstr "测试 SYSYLOG 消息已发送至 {}，请检查"
+msgid "Test message sent, please check"
+msgstr "测试消息已发送，请查收"
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
-msgstr "Syslog 处理器未激活，请先保存配置"
+msgstr "SYSLOG 处理器未激活，请先保存配置"
 
 #: settings/api/nas.py:18
 #, python-brace-format
@@ -7333,13 +7332,9 @@ msgstr "NAS 存储类型：windows 或 linux"
 msgid "NAS host"
 msgstr "NAS 服务器地址"
 
-#: settings/serializers/storage.py:37
+#: settings/serializers/storage.py:37 settings/serializers/storage.py:38
 msgid "NAS port"
 msgstr "NAS 端口"
-
-#: settings/serializers/storage.py:38
-msgid "NAS port, 0 means use the default port"
-msgstr "NAS 端口，0 表示使用默认端口"
 
 #: settings/serializers/storage.py:39
 msgid "NAS server address, e.g. 192.168.1.100"
@@ -7358,16 +7353,16 @@ msgid "NAS username"
 msgstr "NAS 用户名"
 
 #: settings/serializers/storage.py:48
-msgid "NAS login username (windows required)"
-msgstr "NAS 登录用户名（windows 必填）"
+msgid "NAS login username"
+msgstr "NAS 登录用户名"
 
 #: settings/serializers/storage.py:52
 msgid "NAS password"
 msgstr "NAS 密码"
 
 #: settings/serializers/storage.py:53
-msgid "NAS login password (windows required)"
-msgstr "NAS 登录密码（windows 必填）"
+msgid "NAS login password"
+msgstr "NAS 登录密码"
 
 #: settings/serializers/storage.py:21 terminal/api/session/session.py:163
 #: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
@@ -7408,7 +7403,11 @@ msgstr "归档最早一个月审计"
 
 #: settings/serializers/storage.py:32
 msgid "Archive means move files to NAS storage and then delete local files"
-msgstr "归档是将文件归档到 NAS 存储后删除本地文件"
+msgstr "归档是将审计文件传输到 NAS 存储后删除本地文件"
+
+#: settings/serializers/storage.py
+msgid "Archive reclamation requires NAS storage to be enabled"
+msgstr "归档腾退需要启用 NAS 存储"
 
 #: settings/api/ldap.py:92
 msgid ""
