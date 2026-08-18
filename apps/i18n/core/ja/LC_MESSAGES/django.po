@@ -7503,6 +7503,10 @@ msgstr "{}に送信されたテストメールを確認してください"
 msgid "Test smtp setting"
 msgstr "SMTP設定のテスト"
 
+#: settings/api/syslog.py:43
+msgid "Test syslog setting"
+msgstr "Syslog設定のテスト"
+
 #: settings/api/syslog.py:17
 #, python-brace-format
 msgid "Test syslog message sent to {}, please check"
