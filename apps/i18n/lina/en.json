@@ -1795,7 +1795,7 @@
     "NasSetting": "NAS storage settings",
     "FTPFileMaxStore": "File transfer audit",
     "StorageReclamation": "Storage reclamation",
-    "StorageUsageThreshold": "Storage reclamation threshold",
+    "StorageUsageThreshold": "Disk threshold",
     "NasEnabled": "NAS enabled",
     "NasType": "NAS type",
     "NasHost": "NAS host",

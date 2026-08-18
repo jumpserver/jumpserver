@@ -18,9 +18,9 @@ class StorageSettingSerializer(serializers.Serializer):
         help_text=_('File max store size (MB), <= 0 means no backup')
     )
     STORAGE_USAGE_THRESHOLD = serializers.IntegerField(
-        required=True,min_value=0, max_value=100,
-        label=_('Storage usage threshold'),
-        help_text=_('Storage usage threshold (percentage 0-100), 0 means no limit')
+        required=True,min_value=50, max_value=95,
+        label=_('Disk threshold'),
+        help_text=_('When disk space usage exceeds the set threshold percentage, the periodic reclamation task is triggered. Threshold range: 50-95')
     )
     STORAGE_RECLAMATION_METHOD = serializers.ChoiceField(
         required=False, default='delete_day',

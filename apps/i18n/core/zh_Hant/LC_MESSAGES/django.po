@@ -4131,11 +4131,11 @@ msgstr "空間騰退任務"
 
 #: audits/tasks.py:185
 msgid ""
-"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete or archive the oldest session replay files and update session records until "
-"usage falls below threshold"
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),\n"
+"delete or archive the oldest session replay files and update session records\n"
+"until usage falls below threshold"
 msgstr ""
-"當系統存儲使用率超過 STORAGE_USAGE_THRESHOLD (百分比 0-100) "
+"當系統存儲使用率超過 STORAGE_USAGE_THRESHOLD (百分比 50-95) "
 "時，刪除或歸檔最早一天的會話記錄、命令記錄和錄像，直到使用率降至閾值以下"
 
 #: audits/tasks.py:206
@@ -7245,7 +7245,7 @@ msgstr "測試 smtp 設定"
 #: settings/api/syslog.py:17
 #, python-brace-format
 msgid "Test syslog message sent to {}, please check"
-msgstr "測試 Syslog 訊息已發送至 {}，請檢查"
+msgstr "測試 SYSYLOG 訊息已發送至 {}，請檢查"
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
@@ -7309,12 +7309,12 @@ msgid "File max store size (MB), <= 0 means no backup"
 msgstr "FTP 檔案上傳最大儲存大小 (MB)，<= 0 表示不備份"
 
 #: settings/serializers/storage.py:18
-msgid "Storage usage threshold"
-msgstr "儲存使用閾值"
+msgid "Disk threshold"
+msgstr "磁碟閾值"
 
 #: settings/serializers/storage.py:19
-msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
-msgstr "儲存使用百分比閾值 (0-100)，0 表示不限制"
+msgid "When disk space usage exceeds the set threshold percentage, the periodic reclamation task is triggered. Threshold range: 50-95"
+msgstr "當磁碟空間占用超過設定閾值百分比時，觸發定時騰退任務，閾值範圍：50-95"
 
 #: settings/serializers/storage.py:22
 msgid "NAS enabled"

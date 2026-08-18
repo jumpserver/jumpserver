@@ -4094,9 +4094,9 @@ msgstr "Storage reclamation task"
 
 #: audits/tasks.py:185
 msgid ""
-"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 0-100), "
-"delete or archive the oldest session replay files and update session records until "
-"usage falls below threshold"
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),\n"
+"delete or archive the oldest session replay files and update session records\n"
+"until usage falls below threshold"
 msgstr ""
 
 #: audits/tasks.py:206
@@ -7186,7 +7186,7 @@ msgstr ""
 #: settings/api/syslog.py:17
 #, python-brace-format
 msgid "Test syslog message sent to {}, please check"
-msgstr ""
+msgstr "Test SYSLOG message sent to {}, please check"
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
@@ -7256,14 +7256,14 @@ msgstr ""
 "operation audit; files exceeding this size will not be saved"
 
 #: settings/serializers/storage.py:18
-msgid "Storage usage threshold"
-msgstr "Storage reclamation threshold"
+msgid "Disk threshold"
+msgstr "Disk threshold"
 
 #: settings/serializers/storage.py:19
-msgid "Storage usage threshold (percentage 0-100), 0 means no limit"
+msgid "When disk space usage exceeds the set threshold percentage, the periodic reclamation task is triggered. Threshold range: 50-95"
 msgstr ""
-"Storage reclamation percentage threshold (0-100); when the set value is "
-"reached, delete the session replays of the earliest day"
+"When disk space usage exceeds the set threshold percentage, the periodic "
+"reclamation task is triggered. Threshold range: 50-95"
 
 #: settings/serializers/storage.py:22
 msgid "NAS enabled"
