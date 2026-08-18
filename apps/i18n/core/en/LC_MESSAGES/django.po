@@ -7297,7 +7297,7 @@ msgid "NAS share name"
 msgstr ""
 
 #: settings/serializers/storage.py:38
-msgid "NAS share or export name"
+msgid "NAS storage path"
 msgstr ""
 
 #: settings/serializers/storage.py:47

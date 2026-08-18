@@ -70,7 +70,7 @@ class StorageSettingSerializer(serializers.Serializer):
     NAS_SHARE_NAME = serializers.CharField(
         required=True, allow_null=True, allow_blank=True, max_length=256,
         label=_('NAS share name'),
-        help_text=_('NAS share or export name')
+        help_text=_('NAS storage path')
     )
     NAS_USERNAME = serializers.CharField(
         required=True, allow_null=True, allow_blank=True, max_length=256,

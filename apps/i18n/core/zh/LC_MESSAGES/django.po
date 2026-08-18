@@ -7345,8 +7345,8 @@ msgid "NAS share name"
 msgstr "NAS 共享名称"
 
 #: settings/serializers/storage.py:38
-msgid "NAS share or export name"
-msgstr "NAS 共享或导出名称"
+msgid "NAS storage path"
+msgstr "NAS 存储路径"
 
 #: settings/serializers/storage.py:47
 msgid "NAS username"
@@ -12631,39 +12631,39 @@ msgstr "syslog"
 
 #: settings/serializers/syslog.py:12
 msgid "Syslog facility"
-msgstr "syslog 设施"
+msgstr "SYSLOG 设施"
 
 #: settings/serializers/syslog.py:12
 msgid "Syslog facility type"
-msgstr "syslog 设施类型"
+msgstr "SYSLOG 设施类型"
 
 #: settings/serializers/syslog.py:12
 msgid "Syslog socket type"
-msgstr "syslog 协议类型"
+msgstr "SYSLOG 协议类型"
 
 #: settings/serializers/syslog.py:12
 msgid "TCP or UDP protocol for syslog"
-msgstr "syslog 使用的 TCP 或 UDP 协议"
+msgstr "SYSLOG 使用的 TCP 或 UDP 协议"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog host"
-msgstr "syslog 主机"
+msgstr "SYSLOG 主机"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog server IP or hostname"
-msgstr "syslog 服务器 IP 或主机名"
+msgstr "SYSLOG 服务器 IP 或主机名"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog port"
-msgstr "syslog 端口"
+msgstr "SYSLOG 端口"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog server port, default 514"
-msgstr "syslog 服务器端口，默认 514"
+msgstr "SYSLOG 服务器端口，默认 514"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog host is not configured"
-msgstr "syslog 主机未配置"
+msgstr "SYSLOG 主机未配置"
 
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"
