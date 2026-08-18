@@ -52,7 +52,7 @@ class AssetImportTemplate:
         - protocols: [{"name", "port"}]
         - labels: [{"pk": <label_id>}]（由 name:value 解析）
         - is_active: bool
-        - accounts 不参与资产创建/更新提交
+        - accounts: [{"name", "username", "secret", "secret_type", "privileged"}]（由中文键模板解析）
         """
         display_row = {}
         for k, v in row_data.items():
@@ -64,8 +64,6 @@ class AssetImportTemplate:
             if field_name == 'id':
                 # ID 为空时自动生成 UUID，否则保留原值
                 display_row[k] = transforms.id_from_template(v)
-                continue
-            if field_name == 'accounts':
                 continue
             parsed = column.parse_transform(v) if column.parse_transform else v
             if field_name == 'platform':
