@@ -39,7 +39,8 @@ class SyslogTestingAPI(APIView):
             )
 
         try:
-            syslog_logger.info('syslog_test - {"test": "message"}')
+            message = _("Test syslog setting")
+            syslog_logger.info(message)
         except Exception as e:
             logger.error("Failed to send test syslog message: %s", e)
             return Response({"error": str(e)}, status=400)

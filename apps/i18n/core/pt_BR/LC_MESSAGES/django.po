@@ -7568,6 +7568,10 @@ msgstr "O e-mail já foi enviado {}, por favor verifique"
 msgid "Test smtp setting"
 msgstr " Testar configurações SMTP"
 
+#: settings/api/syslog.py:43
+msgid "Test syslog setting"
+msgstr "Testar configurações Syslog"
+
 #: settings/api/syslog.py:17
 #, python-brace-format
 msgid "Test syslog message sent to {}, please check"

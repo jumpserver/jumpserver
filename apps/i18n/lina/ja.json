@@ -1596,7 +1596,7 @@
     "VerifySignTmpl": "認証コードのSMSテンプレート",
     "Version": "バージョン",
     "BootstrapToken": "コンポーネント登録トークン",
-    "PandaURLTip": "panda サービスの接続アドレス",
+    "PandaURLTip": "Panda サービスの接続アドレス",
     "View": "閲覧",
     "ViewMore": "もっと見る",
     "ViewPerm": "認可を表示",

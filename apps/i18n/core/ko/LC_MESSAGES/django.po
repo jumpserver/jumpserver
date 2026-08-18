@@ -7494,6 +7494,10 @@ msgstr "메일이 전송되었습니다 {}, 확인해 주세요"
 msgid "Test smtp setting"
 msgstr "SMTP 설정 테스트"
 
+#: settings/api/syslog.py:43
+msgid "Test syslog setting"
+msgstr "Syslog 설정 테스트"
+
 #: settings/api/syslog.py:17
 #, python-brace-format
 msgid "Test syslog message sent to {}, please check"

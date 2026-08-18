@@ -7235,6 +7235,10 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
+#: settings/api/syslog.py:43
+msgid "Test syslog setting"
+msgstr "测试 syslog 设置"
+
 #: settings/api/syslog.py:17
 msgid "Test message sent, please check"
 msgstr "测试消息已发送，请查收"
