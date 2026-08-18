@@ -55,7 +55,7 @@ class StorageSettingSerializer(serializers.Serializer):
         choices=(('nfs', 'NFS'), ('cifs', 'CIFS')),
         required=False, allow_null=True, allow_blank=True,
         label=_('NAS type'),
-        help_text=_('NAS storage type: NFS or CIFS')
+        help_text=_('NAS storage type: windows or linux')
     )
     NAS_HOST = serializers.CharField(
         required=True, allow_null=True, allow_blank=True, max_length=128,
@@ -75,12 +75,12 @@ class StorageSettingSerializer(serializers.Serializer):
     NAS_USERNAME = serializers.CharField(
         required=False, allow_null=True, allow_blank=True, max_length=256,
         label=_('NAS username'),
-        help_text=_('NAS login username (CIFS required)')
+        help_text=_('NAS login username (windows required)')
     )
     NAS_PASSWORD = EncryptedField(
         required=False, allow_null=True, allow_blank=True, max_length=1024,
         label=_('NAS password'),
-        help_text=_('NAS login password (CIFS required)')
+        help_text=_('NAS login password (windows required)')
     )
 
     def _get_nas_config(self):

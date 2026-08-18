@@ -7329,8 +7329,8 @@ msgid "NAS type"
 msgstr "NAS 類型"
 
 #: settings/serializers/storage.py:28
-msgid "NAS storage type: NFS or CIFS"
-msgstr "NAS 存儲類型：NFS 或 CIFS"
+msgid "NAS storage type: windows or linux"
+msgstr "NAS 存儲類型：windows 或 linux"
 
 #: settings/serializers/storage.py:32
 msgid "NAS host"
@@ -7361,16 +7361,16 @@ msgid "NAS username"
 msgstr "NAS 使用者名稱"
 
 #: settings/serializers/storage.py:48
-msgid "NAS login username (CIFS required)"
-msgstr "NAS 登入使用者名稱（CIFS 必填）"
+msgid "NAS login username (windows required)"
+msgstr "NAS 登入使用者名稱（windows 必填）"
 
 #: settings/serializers/storage.py:52
 msgid "NAS password"
 msgstr "NAS 密碼"
 
 #: settings/serializers/storage.py:53
-msgid "NAS login password (CIFS required)"
-msgstr "NAS 登入密碼（CIFS 必填）"
+msgid "NAS login password (windows required)"
+msgstr "NAS 登入密碼（windows 必填）"
 
 #: settings/serializers/storage.py:21 terminal/api/session/session.py:163
 #: terminal/api/session/session.py:297 terminal/models/session/replay.py:12
