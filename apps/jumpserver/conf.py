@@ -659,6 +659,7 @@ class Config(dict):
         'SYSLOG_PORT': 514,
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
+        'SYSLOG_ENABLE': False,
 
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'PERM_EXPIRED_NOTICE_DAYS': 3,

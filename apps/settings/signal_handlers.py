@@ -52,6 +52,16 @@ def on_django_ready_add_db_config(sender, **kwargs):
 
 
 @receiver(django_ready)
+def on_django_ready_init_syslog_handler(sender, **kwargs):
+    try:
+        from jumpserver.settings.logging import reconfigure_syslog_handler
+        reconfigure_syslog_handler()
+        logger.debug('Syslog handler initialized')
+    except (OSError, ValueError) as e:
+        logger.error('Failed to initialize syslog handler: %s', e)
+
+
+@receiver(django_ready)
 def auto_generate_terminal_host_key(sender, **kwargs):
     try:
         if Setting.objects.filter(name='TERMINAL_HOST_KEY').exists():
@@ -148,15 +158,6 @@ def on_syslog_setting_changed(sender, name='', **kwargs):
         logger.debug('Syslog handler reconfigured after %s changed', name)
     except Exception as e:
         logger.error('Failed to reconfigure syslog handler: %s', e)
-
-@receiver(django_ready)
-def on_django_ready_init_syslog_handler(sender, **kwargs):
-    try:
-        from jumpserver.settings.logging import init_syslog_handler
-        init_syslog_handler()
-    except Exception as e:
-        logger.error('Failed to init syslog handler: %s', e)
-
 
 @receiver(django_ready)
 def on_django_ready_mount_nas(sender, **kwargs):
