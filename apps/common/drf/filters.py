@@ -1005,6 +1005,7 @@ class NotOrRelFilterBackend(filters.BaseFilterBackend):
         ]
 
     def filter_queryset(self, request, queryset, view):
+        return queryset
         _rel = request.query_params.get("_rel")
         if not _rel or _rel not in ("or", "not"):
             return queryset
