@@ -12697,6 +12697,14 @@ msgstr "SYSLOG 伺服器埠，預設 514"
 msgid "Syslog host is not configured"
 msgstr "SYSLOG 主機未設定"
 
+#: settings/api/syslog.py:1
+msgid "Syslog format document"
+msgstr "SYSLOG 格式文檔"
+
+#: settings/api/syslog.py:1
+msgid "Syslog format document not found"
+msgstr "找不到 SYSLOG 格式文檔"
+
 #~ msgid "Offline video player"
 #~ msgstr "離線錄影播放器"
 

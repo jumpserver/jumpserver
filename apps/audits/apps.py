@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-from django.conf import settings
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
@@ -12,5 +11,6 @@ class AuditsConfig(AppConfig):
         from . import signal_handlers  # noqa
         from . import tasks  # noqa
 
-        if settings.SYSLOG_ENABLE:
-            post_save.connect(signal_handlers.on_audits_log_create)
+        # 始终连接信号，是否发送 syslog 由 logging handler 根据
+        # SYSLOG_ENABLE 开关动态决定，从而支持修改配置后立刻生效
+        post_save.connect(signal_handlers.on_audits_log_create)

@@ -12674,6 +12674,15 @@ msgstr "SYSLOG 服务器端口，默认 514"
 #: settings/serializers/syslog.py:1
 msgid "Syslog host is not configured"
 msgstr "SYSLOG 主机未配置"
+
+#: settings/api/syslog.py:1
+msgid "Syslog format document"
+msgstr "SYSLOG 格式文档"
+
+#: settings/api/syslog.py:1
+msgid "Syslog format document not found"
+msgstr "未找到 SYSLOG 格式文档"
+
 #: assets/serializers/asset/template_definition.py
 msgid "{} (Required)"
 msgstr "{}（必填项）"

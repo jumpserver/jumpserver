@@ -12596,6 +12596,14 @@ msgstr "Syslog server port, default 514"
 msgid "Syslog host is not configured"
 msgstr "Syslog host is not configured"
 
+#: settings/api/syslog.py:1
+msgid "Syslog format document"
+msgstr ""
+
+#: settings/api/syslog.py:1
+msgid "Syslog format document not found"
+msgstr ""
+
 #: assets/serializers/asset/template_definition.py
 msgid "{} (Required)"
 msgstr ""
