@@ -1,14 +1,13 @@
 import os
 from copy import deepcopy
 
-from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import (
     AutomationTypes, ChangeSecretRecordStatusChoice, Connectivity, SecretType,
 )
-from accounts.models import ChangeSecretRecord
+from accounts.models import Account, ChangeSecretRecord
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
 
@@ -34,6 +33,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             )
         }
         self.host_record_mapper = {}
+        self._accounts_by_asset_id = None
 
     def prepare_runtime_dir(self):
         path = super().prepare_runtime_dir()
@@ -48,9 +48,21 @@ class VerifyAccountManager(AccountBasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.verify_account
 
-    def get_accounts(self, privilege_account, accounts: QuerySet):
-        accounts = accounts.filter(id__in=self.account_ids)
-        return accounts
+    def load_accounts_by_asset(self):
+        if self._accounts_by_asset_id is not None:
+            return
+
+        # A large verification task previously evaluated this complete account
+        # ID filter once per asset. Load it once, together with the relations
+        # needed while building each Ansible inventory.
+        accounts = Account.objects.filter(id__in=self.account_ids)
+        self._accounts_by_asset_id = self.index_accounts_by_execution_asset(
+            accounts
+        )
+
+    def get_accounts(self, asset):
+        self.load_accounts_by_asset()
+        return self._accounts_by_asset_id.get(str(asset.id), [])
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super().host_callback(
@@ -60,8 +72,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        accounts = asset.all_accounts.all()
-        accounts = self.get_accounts(account, accounts)
+        accounts = self.get_accounts(asset)
         inventory_hosts = []
 
         for account in accounts:

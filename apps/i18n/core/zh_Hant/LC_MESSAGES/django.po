@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 14:52+0800\n"
+"POT-Creation-Date: 2026-08-19 10:30+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -30,7 +30,7 @@ msgid "No valid assets found for account creation."
 msgstr "未找到可用於創建帳戶的有效資產。"
 
 #: accounts/api/account/application.py:91
-#: authentication/api/connection_token.py:681
+#: authentication/api/connection_token.py:720
 msgid "Account not found"
 msgstr "帳號未找到"
 
@@ -76,7 +76,7 @@ msgstr "生成資產相關備份信息文件"
 
 #: accounts/automations/backup_account/handlers.py:178
 #: assets/models/automations/base.py:157 ops/serializers/job.py:71
-#: ops/serializers/job.py:95
+#: ops/serializers/job.py:95 ops/templates/ops/celery_task_log.html:375
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 #: terminal/serializers/session.py:57
 msgid "Duration"
@@ -144,71 +144,71 @@ msgstr "已備份 %(count)s 個帳號"
 msgid "Duration: %(duration)s seconds"
 msgstr "耗時：%(duration)s 秒"
 
-#: accounts/automations/base/manager.py:86
+#: accounts/automations/base/manager.py:87
 #, python-format
 msgid "Targets: %(accounts)s account(s) on %(assets)s asset(s)"
 msgstr "目標：%(accounts)s 個帳號，涉及 %(assets)s 台資產"
 
-#: accounts/automations/base/manager.py:138
+#: accounts/automations/base/manager.py:190
 #, python-format
 msgid "△ %(host)s: operation completed; verification pending"
 msgstr "△ %(host)s：操作已完成，新憑證驗證待確認"
 
-#: accounts/automations/base/manager.py:143
+#: accounts/automations/base/manager.py:195
 msgid "secret changed and verified"
 msgstr "改密成功，新憑據驗證通過"
 
-#: accounts/automations/base/manager.py:145
+#: accounts/automations/base/manager.py:197
 msgid "account pushed and verified"
 msgstr "帳號推送成功，新憑據驗證通過"
 
-#: accounts/automations/base/manager.py:146
+#: accounts/automations/base/manager.py:198
 #: assets/automations/base/manager.py:682
 #, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s：%(result)s"
 
-#: accounts/automations/base/manager.py:178
+#: accounts/automations/base/manager.py:265
 msgid "No privileged account"
 msgstr "未找到特權帳號"
 
-#: accounts/automations/base/manager.py:232
+#: accounts/automations/base/manager.py:321
 msgid "Windows does not support SSH key authentication"
 msgstr "Windows 不支持 SSH 金鑰認證"
 
-#: accounts/automations/base/manager.py:254
+#: accounts/automations/base/manager.py:338
 msgid "No pending accounts found"
 msgstr "未找到待處理帳戶"
 
-#: accounts/automations/base/manager.py:261
+#: accounts/automations/base/manager.py:345
 #, python-format
 msgid "○ %(asset)s: skipped; no eligible accounts"
 msgstr "○ %(asset)s：已跳過，沒有符合條件的待處理帳號"
 
-#: accounts/automations/base/manager.py:280
+#: accounts/automations/base/manager.py:367
 #, python-format
 msgid "Account is already being processed, skipping: %(account)s"
 msgstr "帳號正在處理中，已跳過：%(account)s"
 
-#: accounts/automations/base/manager.py:309
+#: accounts/automations/base/manager.py:396
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "帳號不存在、已停用或不符合此任務的條件"
 
-#: accounts/automations/base/manager.py:429
+#: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
 "The remote secret may have changed, but the independent credential "
 "verification was inconclusive: %(code)s"
 msgstr "遠端憑據可能已變更，但獨立憑據驗證未能得出明確結論：%(code)s"
 
-#: accounts/automations/base/manager.py:505
+#: accounts/automations/base/manager.py:592
 #, python-format
 msgid ""
 "The remote operation completed, but saving the local account result failed: "
 "%(error)s"
 msgstr "遠端操作已完成，但儲存本機帳號結果失敗：%(error)s"
 
-#: accounts/automations/base/manager.py:613
+#: accounts/automations/base/manager.py:700
 msgid "Task ended before the account received a final result"
 msgstr "任務結束時帳號尚未收到最終結果"
 
@@ -304,15 +304,15 @@ msgstr ""
 msgid "Push secret record not found: %(record_id)s"
 msgstr "未找到推送密文紀錄：%(record_id)s"
 
-#: accounts/automations/verify_account/manager.py:79
+#: accounts/automations/verify_account/manager.py:90
 msgid "Change secret record not found or does not match account"
 msgstr "改密記錄不存在或與帳號不匹配"
 
-#: accounts/automations/verify_account/manager.py:153
+#: accounts/automations/verify_account/manager.py:164
 msgid "Account not found or inactive"
 msgstr "帳號不存在或已停用"
 
-#: accounts/automations/verify_account/manager.py:214
+#: accounts/automations/verify_account/manager.py:225
 msgid "Verification ended before a final result was received"
 msgstr "驗證結束時尚未收到最終結果"
 
@@ -739,8 +739,9 @@ msgstr "長期未驗證"
 #: assets/serializers/automations/base.py:47 audits/filters.py:127
 #: audits/filters.py:209 audits/models.py:252 audits/reporting.py:607
 #: audits/serializers.py:79 ops/filters.py:54 ops/models/base.py:49
-#: ops/models/job.py:271 terminal/models/applet/applet.py:398
-#: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
+#: ops/models/job.py:273 ops/templates/ops/celery_task_log.html:367
+#: terminal/models/applet/applet.py:398 terminal/models/applet/host.py:140
+#: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:104
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
 #: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:309
@@ -861,7 +862,7 @@ msgstr "改密狀態"
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
 #: audits/reporting.py:114 audits/serializers.py:261
-#: authentication/api/connection_token.py:693 ops/models/base.py:18
+#: authentication/api/connection_token.py:732 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:41
 #: terminal/backends/command/models.py:18 terminal/filters.py:114
 #: terminal/models/session/session.py:31 terminal/notifications.py:306
@@ -924,7 +925,7 @@ msgstr "帳號活動"
 #: authentication/serializers/connect_token_secret.py:127
 #: authentication/serializers/connect_token_secret.py:223 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
-#: ops/models/celery.py:81 ops/models/job.py:182 ops/models/playbook.py:28
+#: ops/models/celery.py:81 ops/models/job.py:184 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
@@ -1102,7 +1103,7 @@ msgstr "自動化改密"
 
 #: accounts/models/automations/change_secret.py:47
 #: assets/models/automations/base.py:155 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:280
+#: ops/models/celery.py:90 ops/models/job.py:282
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "結束日期"
@@ -1226,7 +1227,7 @@ msgstr "使用者名稱"
 
 #: accounts/models/automations/check_account.py:75
 #: accounts/models/automations/gather_account.py:27 audits/models.py:165
-#: ops/templates/ops/celery_task_log.html:374
+#: ops/templates/ops/celery_task_log.html:389
 msgid "Detail"
 msgstr "詳情"
 
@@ -1519,7 +1520,7 @@ msgstr "類別"
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:78
 #: audits/serializers.py:225 authentication/models/connection_token.py:68
-#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:190
+#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:192
 #: perms/serializers/user_permission.py:28 reports/models.py:16
 #: terminal/models/applet/applet.py:43 terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
@@ -1641,7 +1642,7 @@ msgstr "IP 白名單"
 #: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
-#: ops/models/job.py:200 ops/models/playbook.py:31 rbac/models/role.py:37
+#: ops/models/job.py:202 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:43 terminal/models/applet/applet.py:49
 #: terminal/models/applet/applet.py:399 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:23
@@ -2036,8 +2037,8 @@ msgstr "基本資訊"
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:153 audits/models.py:74
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:279
-#: ops/templates/ops/celery_task_log.html:360
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:281
+#: ops/templates/ops/celery_task_log.html:363
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:42
@@ -2252,8 +2253,8 @@ msgstr "用戶管理"
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:39
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:215
-#: authentication/api/connection_token.py:692 ops/models/base.py:17
-#: ops/models/job.py:192 ops/serializers/job.py:21
+#: authentication/api/connection_token.py:731 ops/models/base.py:17
+#: ops/models/job.py:194 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:103
@@ -3609,13 +3610,13 @@ msgid "Proxy"
 msgstr "代理"
 
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
-#: assets/models/node.py:560 ops/models/job.py:193
+#: assets/models/node.py:560 ops/models/job.py:195
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
 #: xpack/plugins/cloud/models.py:402
 msgid "Node"
 msgstr "節點"
 
-#: assets/models/automations/base.py:29 ops/models/job.py:274
+#: assets/models/automations/base.py:29 ops/models/job.py:276
 #: ops/serializers/job.py:24 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr "參數"
@@ -3634,7 +3635,7 @@ msgstr "資產自動化任務"
 
 #: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
-#: ops/models/base.py:54 ops/models/job.py:278
+#: ops/models/base.py:54 ops/models/job.py:280
 #: users/models/user/__init__.py:344
 msgid "Date created"
 msgstr "創建日期"
@@ -3646,13 +3647,13 @@ msgid "Trigger mode"
 msgstr "觸發模式"
 
 #: assets/models/automations/base.py:167 audits/serializers.py:38
-#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:276
+#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:278
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "匯總"
 
 #: assets/models/automations/base.py:168 ops/models/base.py:51
-#: ops/models/job.py:275 xpack/plugins/cloud/models.py:232
+#: ops/models/job.py:277 xpack/plugins/cloud/models.py:232
 msgid "Result"
 msgstr "結果"
 
@@ -4439,7 +4440,7 @@ msgid "Symlink"
 msgstr "建立軟連結"
 
 #: audits/const.py:18 audits/const.py:29
-#: ops/templates/ops/celery_task_log.html:380
+#: ops/templates/ops/celery_task_log.html:395
 #: terminal/api/session/session.py:170
 msgid "Download"
 msgstr "下載"
@@ -4925,7 +4926,7 @@ msgstr "Playbook 作業數"
 msgid "Unique creators"
 msgstr "唯一創建者數"
 
-#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:189
+#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:191
 #: ops/models/playbook.py:89 ops/models/variable.py:23
 msgid "Playbook"
 msgstr "Playbook"
@@ -4943,7 +4944,7 @@ msgid "Module Distribution"
 msgstr "模組分佈"
 
 #: audits/reporting.py:497 ops/filters.py:19 ops/models/adhoc.py:22
-#: ops/models/job.py:186
+#: ops/models/job.py:188
 msgid "Module"
 msgstr "模組"
 
@@ -4953,7 +4954,7 @@ msgstr "創建者 Top 10"
 
 #: audits/reporting.py:502 audits/reporting.py:617 audits/serializers.py:33
 #: ops/models/adhoc.py:24 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/celery.py:87 ops/models/job.py:191 ops/models/job.py:277
+#: ops/models/celery.py:87 ops/models/job.py:193 ops/models/job.py:279
 #: ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
@@ -4963,7 +4964,7 @@ msgstr "創建者"
 msgid "Run as Policy Distribution"
 msgstr "運行用戶策略分佈"
 
-#: audits/reporting.py:507 ops/models/job.py:199
+#: audits/reporting.py:507 ops/models/job.py:201
 msgid "Run as policy"
 msgstr "使用者策略"
 
@@ -5103,35 +5104,35 @@ msgstr "該操作需要驗證您的 MFA, 請先開啟並配置"
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允許使用可重複使用的連接令牌，未啟用全局設置"
 
-#: authentication/api/connection_token.py:652
+#: authentication/api/connection_token.py:691
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名帳號不支持當前資產"
 
-#: authentication/api/connection_token.py:684
+#: authentication/api/connection_token.py:723
 msgid "Permission expired"
 msgstr "授權已過期"
 
-#: authentication/api/connection_token.py:717
+#: authentication/api/connection_token.py:756
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 動作是拒絕: {}({})"
 
-#: authentication/api/connection_token.py:721
+#: authentication/api/connection_token.py:760
 msgid "ACL action is review"
 msgstr "ACL 動作是覆核"
 
-#: authentication/api/connection_token.py:731
+#: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
 msgstr "ACL Action 係人臉驗證"
 
-#: authentication/api/connection_token.py:736
+#: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
 msgstr "資產登錄規則不支持當前資產"
 
-#: authentication/api/connection_token.py:743
+#: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
 msgstr "ACL Action 係人臉在線"
 
-#: authentication/api/connection_token.py:768
+#: authentication/api/connection_token.py:807
 msgid "No available face feature"
 msgstr "沒有可用的人臉特徵"
 
@@ -7012,7 +7013,7 @@ msgstr ""
 "行環境，請在 Ansible Worker 節點執行：docker pull %(image)s"
 
 #: ops/ansible/inventory.py:194 ops/ansible/inventory.py:281
-#: ops/models/job.py:97
+#: ops/models/job.py:99
 msgid "No account available"
 msgstr "無可用帳號"
 
@@ -7274,7 +7275,7 @@ msgstr "需要週期或定期設定"
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:184
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:186
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "參數"
@@ -7303,7 +7304,7 @@ msgstr "可以查看任務監控"
 msgid "Kwargs"
 msgstr "其它參數"
 
-#: ops/models/celery.py:88
+#: ops/models/celery.py:88 ops/templates/ops/celery_task_log.html:371
 msgid "Date published"
 msgstr "發布日期"
 
@@ -7311,65 +7312,65 @@ msgstr "發布日期"
 msgid "Celery Task Execution"
 msgstr "Celery 任務執行"
 
-#: ops/models/job.py:53
+#: ops/models/job.py:55
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
 "SSH, SFTP, or WinRM"
 msgstr "资产({asset})至少要添加ssh,sftp,winrm其中一种协议"
 
-#: ops/models/job.py:60
+#: ops/models/job.py:62
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr "资产({asset})授权缺少ssh,sftp或winrm协议"
 
-#: ops/models/job.py:64
+#: ops/models/job.py:66
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "资产({asset})授权缺少上传权限"
 
-#: ops/models/job.py:110
+#: ops/models/job.py:112
 msgid "Module {} is not suitable for this asset"
 msgstr "模組 {} 不適用於此資產"
 
-#: ops/models/job.py:187
+#: ops/models/job.py:189
 msgid "Run dir"
 msgstr "執行目錄"
 
-#: ops/models/job.py:188
+#: ops/models/job.py:190
 msgid "Timeout (Seconds)"
 msgstr "超時時間 (秒)"
 
-#: ops/models/job.py:194
+#: ops/models/job.py:196
 msgid "Use Parameter Define"
 msgstr "使用參數定義"
 
-#: ops/models/job.py:195
+#: ops/models/job.py:197
 msgid "Parameters define"
 msgstr "參數定義"
 
-#: ops/models/job.py:196
+#: ops/models/job.py:198
 msgid "Periodic variable"
 msgstr "週期執行變數"
 
-#: ops/models/job.py:197
+#: ops/models/job.py:199
 msgid "Run as"
 msgstr "執行使用者"
 
-#: ops/models/job.py:259 ops/models/variable.py:28 ops/serializers/job.py:111
+#: ops/models/job.py:261 ops/models/variable.py:28 ops/serializers/job.py:111
 #: terminal/notifications.py:196
 msgid "Job"
 msgstr "作業"
 
-#: ops/models/job.py:282
+#: ops/models/job.py:284
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:284
+#: ops/models/job.py:286
 msgid "Material Type"
 msgstr "Material 類型"
 
-#: ops/models/job.py:619
+#: ops/models/job.py:625
 msgid "Job Execution"
 msgstr "作業執行"
 
@@ -7561,9 +7562,9 @@ msgstr ""
 "列表 - 定期清理 - 作業中心執行歷史配置，每天凌晨2點對超出保存時間的記錄進行清"
 "理"
 
-#: ops/templates/ops/celery_task_log.html:365
-#: ops/templates/ops/celery_task_log.html:369
-#: ops/templates/ops/celery_task_log.html:387
+#: ops/templates/ops/celery_task_log.html:380
+#: ops/templates/ops/celery_task_log.html:384
+#: ops/templates/ops/celery_task_log.html:402
 #: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
 msgid "Output"
 msgstr "輸出"
