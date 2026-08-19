@@ -193,6 +193,7 @@ special_setting_pid_mapper = {
     "settings.change_license": "license",
     'orgs.organization': 'view_setting',
     "settings.view_setting": "view_setting",
+    "settings.change_basic": "view_setting",
     "settings.change_other": "other",
 }
 
