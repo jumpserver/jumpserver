@@ -1214,6 +1214,7 @@
     "PlatformCreate": "Create platform",
     "PlatformDetail": "Platform details",
     "PlatformList": "Platforms",
+    "PlatformPackage": "Platform package",
     "PlatformPageHelpMsg": "The platform categorizes assets, such as windows, linux, network devices, etc. configuration settings, such as protocols, gateways, etc., can also be specified on the platform to determine whether certain features are enabled on assets.",
     "PlatformProtocolConfig": "Platform protocol configuration",
     "PlatformUpdate": "Update the platform",
