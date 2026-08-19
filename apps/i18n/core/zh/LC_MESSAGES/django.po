@@ -388,6 +388,7 @@ msgid "Is disabled"
 msgstr "已禁用"
 
 #: accounts/const/automation.py:131
+#: assets/serializers/asset/template_definition.py
 msgid "Default database name"
 msgstr "默认数据库名称"
 
@@ -2066,6 +2067,7 @@ msgstr ""
 "2001:db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
+#: assets/serializers/asset/template_definition.py
 msgid "IP/Host"
 msgstr "IP/主机"
 
@@ -2517,6 +2519,7 @@ msgstr "当我们看到这个提示时，我们将认为登录成功"
 
 #: assets/const/protocol.py:145 assets/models/asset/database.py:11
 #: settings/serializers/msg.py:50
+#: assets/serializers/asset/template_definition.py
 msgid "Use SSL"
 msgstr "使用 SSL"
 
@@ -2684,14 +2687,17 @@ msgid "Custom asset"
 msgstr "自定义资产"
 
 #: assets/models/asset/database.py:12
+#: assets/serializers/asset/template_definition.py
 msgid "CA cert"
 msgstr "CA 证书"
 
 #: assets/models/asset/database.py:13
+#: assets/serializers/asset/template_definition.py
 msgid "Client cert"
 msgstr "客户端证书"
 
 #: assets/models/asset/database.py:14
+#: assets/serializers/asset/template_definition.py
 msgid "Client key"
 msgstr "客户端密钥"
 
@@ -7234,6 +7240,10 @@ msgstr "邮件已经发送{}, 请检查"
 #: settings/api/email.py:47
 msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
+
+#: settings/api/syslog.py:43
+msgid "Test syslog setting"
+msgstr "测试 syslog 设置"
 
 #: settings/api/syslog.py:17
 msgid "Test message sent, please check"
@@ -12718,10 +12728,6 @@ msgid "Host name"
 msgstr "主机名称"
 
 #: assets/serializers/asset/template_definition.py
-msgid "IP/Host"
-msgstr "IP/主机名"
-
-#: assets/serializers/asset/template_definition.py
 msgid "IP/Host, max 767 characters, supports IPv4/IPv6 and domain names"
 msgstr "IP/主机名，长度不超过767个字符，支持IPv4/IPv6和域名"
 
@@ -12782,36 +12788,16 @@ msgid "Default database (Required)"
 msgstr "默认数据库（必填项）"
 
 #: assets/serializers/asset/template_definition.py
-msgid "Default database name"
-msgstr "默认数据库名称"
-
-#: assets/serializers/asset/template_definition.py
-msgid "CA cert"
-msgstr "CA 证书"
-
-#: assets/serializers/asset/template_definition.py
 msgid "CA certificate content"
 msgstr "CA 证书内容"
-
-#: assets/serializers/asset/template_definition.py
-msgid "Client cert"
-msgstr "客户端证书"
 
 #: assets/serializers/asset/template_definition.py
 msgid "Client certificate content"
 msgstr "客户端证书内容"
 
 #: assets/serializers/asset/template_definition.py
-msgid "Client key"
-msgstr "客户端密钥"
-
-#: assets/serializers/asset/template_definition.py
 msgid "Client key content"
 msgstr "客户端密钥内容"
-
-#: assets/serializers/asset/template_definition.py
-msgid "Use SSL"
-msgstr "使用 SSL"
 
 #: assets/serializers/asset/template_definition.py
 msgid "Use SSL, fill Yes/No"

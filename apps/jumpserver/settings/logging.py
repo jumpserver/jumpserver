@@ -172,7 +172,7 @@ def init_syslog_handler():
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
     host, port, facility, socktype = _get_syslog_config()
-    
+
     if _is_valid_host(host):
         handler = SysLogHandler(
             address=(host, int(port)),
@@ -198,4 +198,3 @@ def reconfigure_syslog_handler():
             h.close()
         except Exception:
             pass
-
