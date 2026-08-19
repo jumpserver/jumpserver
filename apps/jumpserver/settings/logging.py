@@ -34,7 +34,7 @@ LOGGING = {
             'format': '%(levelname)s %(message)s'
         },
         'syslog': {
-            'format': 'jumpserver: %(message)s'
+            'format': 'osm: %(message)s'
         },
         'msg': {
             'format': '%(message)s'
@@ -172,7 +172,7 @@ def init_syslog_handler():
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
     host, port, facility, socktype = _get_syslog_config()
-    
+
     if _is_valid_host(host):
         handler = SysLogHandler(
             address=(host, int(port)),
@@ -180,7 +180,7 @@ def reconfigure_syslog_handler():
             socktype=socktype,
         )
         handler.setLevel(logging.INFO)
-        handler.setFormatter(logging.Formatter('jumpserver: %(message)s'))
+        handler.setFormatter(logging.Formatter('osm: %(message)s'))
     else:
         handler = logging.NullHandler()
 
@@ -198,4 +198,3 @@ def reconfigure_syslog_handler():
             h.close()
         except Exception:
             pass
-
