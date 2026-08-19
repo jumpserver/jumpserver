@@ -153,7 +153,7 @@ def _is_valid_host(host):
     return bool(host)
 
 
-SYSLOG_LOGGER_NAMES = ('django.request', 'django.server', 'syslog')
+SYSLOG_LOGGER_NAMES = ('django.server', 'syslog')
 
 def init_syslog_handler():
     host, port, facility, socktype = _get_syslog_config()
