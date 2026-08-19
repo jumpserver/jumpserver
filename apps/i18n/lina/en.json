@@ -1793,6 +1793,7 @@
     "SyslogHelpText": "Please click 'Submit' to save the configuration, then click 'Test' to ensure it takes effect",
     "SyslogSockType": "Protocol",
     "SyslogTest": "Test",
+    "SyslogDoc": "Format document",
     "StorageHelpText": "1. Storage reclamation targets session replays and file transfer audit data<br>2. Based on the reclamation method, audit data can be deleted or archived<br>3. Please click the 'Submit' button to save the current configuration, then click 'Connection test' to ensure it takes effect",
     "NasSetting": "NAS archive settings",
     "FTPFileMaxStore": "File transfer audit",

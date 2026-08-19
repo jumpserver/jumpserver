@@ -1804,6 +1804,7 @@
     "SyslogHelpText": "请点击'提交'按钮保存当前配置后，再点击'测试'以确保信息生效",
     "SyslogSockType": "协议",
     "SyslogTest": "测试",
+    "SyslogDoc": "格式文档",
     "StorageHelpText": "1.空间腾退目标为会话录像和文件传输审计数据<br>2.可以根据腾退方式，删除或归档审计数据<br>3.请点击'提交'按钮保存当前配置后，再点击'连接测试'以确保信息生效",
     "NasSetting": "NAS 归档设置",
     "FTPFileMaxStore": "文件传输审计",
