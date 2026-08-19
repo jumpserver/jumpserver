@@ -39,7 +39,7 @@ class SyslogTestingAPI(APIView):
             )
 
         try:
-            syslog_logger.info("JumpServer syslog test message - testing configuration")
+            syslog_logger.info('syslog_test - {"test": "message"}')
         except Exception as e:
             logger.error("Failed to send test syslog message: %s", e)
             return Response({"error": str(e)}, status=400)
