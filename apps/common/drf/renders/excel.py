@@ -40,7 +40,7 @@ class ExcelFileRenderer(BaseFileRenderer):
             adjusted_width = 300 if adjusted_width > 300 else adjusted_width
             adjusted_width = 30 if adjusted_width < 30 else adjusted_width
             self.ws.column_dimensions[column].width = adjusted_width
-            self.wb.save('/tmp/test.xlsx')
+            # self.wb.save('/tmp/test.xlsx')
 
     def get_rendered_value(self):
         value = save_virtual_workbook(self.wb)

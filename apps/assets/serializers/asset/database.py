@@ -5,6 +5,7 @@ from rest_framework import serializers
 from assets.models import Database, Platform
 from assets.serializers.gateway import GatewayWithAccountSecretSerializer
 from .common import AssetSerializer
+from .template_definition import database_import_template
 
 __all__ = ['DatabaseSerializer', 'DatabaseWithGatewaySerializer']
 
@@ -14,6 +15,7 @@ class DatabaseSerializer(AssetSerializer):
 
     class Meta(AssetSerializer.Meta):
         model = Database
+        import_template = database_import_template
         extra_fields = [
             'db_name', 'use_ssl', 'ca_cert', 'client_cert',
             'client_key', 'allow_invalid_cert', 'pg_ssl_mode'

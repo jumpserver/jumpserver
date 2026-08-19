@@ -158,6 +158,7 @@ class CeleryTaskViewSet(
                 continue
             i.exec_cycle = self.extract_schedule(str(task.scheduler))
             last_run_at = task.last_run_at or now
+            last_run_at = last_run_at.astimezone()
             next_run_at = task.schedule.remaining_estimate(last_run_at)
             if next_run_at.total_seconds() < 0:
                 next_run_at = task.schedule.remaining_estimate(now)

@@ -18,6 +18,8 @@ class CustomSerializer(AssetSerializer):
         model = Custom
         fields = AssetSerializer.Meta.fields + ['custom_info']
         fields_unimport_template = ['custom_info']
+        # 自定义资产无专门导入模板，避免继承通用 host 模板
+        import_template = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

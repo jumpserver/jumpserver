@@ -6,6 +6,7 @@ from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import AccountInvalidPolicy
 from accounts.models import Account
 from accounts.serializers import AccountSerializer
 from common.const import UUID_PATTERN
@@ -20,6 +21,7 @@ from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Protocol, Host, Device, Database, Cloud, Web, Custom
+from .template_definition import host_import_template
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -174,6 +176,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         fields_unexport = ['auto_config']
+        # 通用资产列表（/api/v1/assets/assets/）导出复用主机模板格式
+        import_template = host_import_template
         extra_kwargs = {
             'auto_config': {'label': _('Auto info')},
             'name': {'label': _("Name"), 'initial': 'Asset name'},
@@ -349,7 +353,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
                 account.su_from = su_from_account
                 account.save()
 
-    def accounts_create(self, accounts_data, asset):
+    def accounts_create(self, accounts_data, asset, on_invalid=None):
         from accounts.models import AccountTemplate
         if not accounts_data:
             return
@@ -360,6 +364,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         su_from_name_username_secret_type_map = {}
         for data in accounts_data:
             data['asset'] = asset.id
+            if on_invalid:
+                data['on_invalid'] = on_invalid
             name = data.get('name')
             su_from = data.pop('su_from', None)
             template_id = data.get('template', None)
@@ -421,6 +427,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         instance = super().update(instance, validated_data)
         self.sync_platform_protocols(instance, old_platform)
         self.perform_nodes_display_create(instance, nodes_display)
+        self.accounts_create(self._accounts, instance, on_invalid=AccountInvalidPolicy.UPDATE)
         return instance
 
 

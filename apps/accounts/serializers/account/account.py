@@ -271,6 +271,10 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         if instance:
             return super().validate(attrs)
 
+        on_invalid = attrs.get('on_invalid')
+        if on_invalid in (AccountInvalidPolicy.UPDATE, AccountInvalidPolicy.SKIP):
+            return attrs
+
         field_errors = {}
         for _fields in Account._meta.unique_together:
             lookup = {field: attrs.get(field) for field in _fields}

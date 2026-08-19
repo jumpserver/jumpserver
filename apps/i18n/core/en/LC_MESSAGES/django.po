@@ -12586,5 +12586,206 @@ msgstr "Syslog server port, default 514"
 msgid "Syslog host is not configured"
 msgstr "Syslog host is not configured"
 
+#: assets/serializers/asset/template_definition.py
+msgid "{} (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "{} name, max {} characters"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Node path (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Node path, format /root/child, auto-created if not exist"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Account info"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Account info, JSON format [{\"帐号名\":\"x\",\"帐号密码\":\"x\",\"帐号密钥\":\"x\",\"是否是特权帐号\":\"是/否\"}]"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Zone name, must be an existing zone under current organization"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Tags, format [\"key:value\", ...], auto-created if not exist"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Is active, fill Yes/No"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Comment, max {} characters"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Host name"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "IP/Host"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "IP/Host, max 767 characters, supports IPv4/IPv6 and domain names"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Windows, Linux"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format sftp/22;ssh/22;telnet/23;rdp/3389;vnc/5900"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Device name"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Cisco, H3C, Huawei"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format ssh/22;telnet/23"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Database name"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Database address, max 767 characters, supports IPv4/IPv6 and domain names"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform/DB type (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform/Database type, such as MySQL, MariaDB, PostgreSQL"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocol (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocol, format mysql/4000, mariadb/3306"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Default database (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Default database name"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "CA cert"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "CA certificate content"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client cert"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client certificate content"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client key"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Client key content"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Use SSL"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Use SSL, fill Yes/No"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "PostgreSQL SSL mode"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "PostgreSQL SSL mode, such as require, verify-ca, verify-full"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Ignore cert verify"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Ignore certificate verification, fill Yes/No"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Web name"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "URL address, such as http://172.18.18.7:9000"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform (Required)"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Website"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format http/9000"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Cloud service name"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "URL address, such as https://172.18.18.11:6443/"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Platform type, such as Kubernetes, Vmware-vSphere"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "Protocols, format k8s/6443;http(s)/80"
+msgstr ""
+
+#: assets/serializers/asset/template_definition.py
+msgid "ID, asset unique identifier, leave blank when importing to create a new asset"
+msgstr ""
+
+#~| msgid "App Authentication"
 #~ msgid "Certificate Auth"
 #~ msgstr "Authentication"
