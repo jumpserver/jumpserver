@@ -1209,6 +1209,7 @@
     "PlatformCreate": "创建平台",
     "PlatformDetail": "平台详情",
     "PlatformList": "平台列表",
+    "PlatformPackage": "平台包",
     "PlatformPageHelpMsg": "平台是资产的分类，例如：Windows、Linux、网络设备等。也可以在平台上指定一些配置，如 协议，网关 等，决定资产上是否启用某些功能。",
     "PlatformProtocolConfig": "平台协议配置",
     "PlatformUpdate": "更新平台",
