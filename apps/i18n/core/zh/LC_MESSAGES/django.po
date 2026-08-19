@@ -8295,70 +8295,74 @@ msgid "Encrypted"
 msgstr "加密的"
 
 #: settings/models.py:168
+msgid "Can change basic setting"
+msgstr "基本设置"
+
+#: settings/models.py:169
 msgid "Can change email setting"
 msgstr "邮件设置"
 
-#: settings/models.py:169
+#: settings/models.py:170
 msgid "Can change auth setting"
 msgstr "认证设置"
 
-#: settings/models.py:170
+#: settings/models.py:171
 msgid "Can change auth ops"
 msgstr "任务中心设置"
 
-#: settings/models.py:171
+#: settings/models.py:172
 msgid "Can change auth ticket"
 msgstr "工单设置"
 
-#: settings/models.py:172
+#: settings/models.py:173
 msgid "Can change virtual app setting"
 msgstr "可以更改虚拟应用设置"
 
-#: settings/models.py:173
+#: settings/models.py:174
 msgid "Can change auth announcement"
 msgstr "公告设置"
 
-#: settings/models.py:174
+#: settings/models.py:175
 msgid "Can change vault setting"
 msgstr "可以更改 vault 设置"
 
-#: settings/models.py:175
+#: settings/models.py:176
 msgid "Can change chat ai setting"
 msgstr "可以修改聊天 AI 设置"
 
-#: settings/models.py:176
+#: settings/models.py:177
 msgid "Can change system msg sub setting"
 msgstr "消息订阅设置"
 
-#: settings/models.py:177
+#: settings/models.py:178
 msgid "Can change sms setting"
 msgstr "短信设置"
 
-#: settings/models.py:178
+#: settings/models.py:179
 msgid "Can change security setting"
 msgstr "安全设置"
 
-#: settings/models.py:179
+#: settings/models.py:180
 msgid "Can change clean setting"
 msgstr "定期清理"
 
-#: settings/models.py:180
+#: settings/models.py:181
 msgid "Can change interface setting"
 msgstr "界面设置"
 
-#: settings/models.py:181
+#: settings/models.py:182
 msgid "Can change license setting"
 msgstr "许可证设置"
 
-#: settings/models.py:182
+#: settings/models.py:183
 msgid "Can change terminal setting"
 msgstr "终端设置"
 
-#: settings/models.py:183
+#: settings/models.py:184
 msgid "Can change other setting"
 msgstr "其它设置"
 
-#: settings/models.py:193
+#: settings/models.py:194
 msgid "Chat prompt"
 msgstr "聊天提示"
 
