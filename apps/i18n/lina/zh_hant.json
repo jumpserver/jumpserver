@@ -1804,7 +1804,7 @@
     "SyslogHelpText": "請點擊'提交'按鈕儲存當前設定後，再點擊'測試'以確保資訊生效",
     "SyslogSockType": "協議",
     "SyslogTest": "測試",
-    "SyslogDoc": "格式文件",
+    "SyslogDoc": "格式文檔",
     "StorageHelpText": "1.空間騰退目標為工作階段錄像和檔案傳輸稽核資料<br>2.可以根據騰退方式，刪除或歸檔稽核資料<br>3.請點擊'提交'按鈕儲存當前設定後，再點擊'連線測試'以確保資訊生效",
     "NasSetting": "NAS 歸檔設定",
     "FTPFileMaxStore": "單檔案傳輸最大存儲",
