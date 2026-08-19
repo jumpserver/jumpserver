@@ -385,6 +385,7 @@ msgid "Is disabled"
 msgstr ""
 
 #: accounts/const/automation.py:131
+#: assets/serializers/asset/template_definition.py
 msgid "Default database name"
 msgstr ""
 
@@ -2048,6 +2049,7 @@ msgid ""
 msgstr ""
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
+#: assets/serializers/asset/template_definition.py
 msgid "IP/Host"
 msgstr ""
 
@@ -2495,6 +2497,7 @@ msgstr ""
 
 #: assets/const/protocol.py:145 assets/models/asset/database.py:11
 #: settings/serializers/msg.py:50
+#: assets/serializers/asset/template_definition.py
 msgid "Use SSL"
 msgstr ""
 
@@ -2662,14 +2665,17 @@ msgid "Custom asset"
 msgstr ""
 
 #: assets/models/asset/database.py:12
+#: assets/serializers/asset/template_definition.py
 msgid "CA cert"
 msgstr ""
 
 #: assets/models/asset/database.py:13
+#: assets/serializers/asset/template_definition.py
 msgid "Client cert"
 msgstr ""
 
 #: assets/models/asset/database.py:14
+#: assets/serializers/asset/template_definition.py
 msgid "Client key"
 msgstr ""
 
@@ -12635,10 +12641,6 @@ msgid "Host name"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
-msgid "IP/Host"
-msgstr ""
-
-#: assets/serializers/asset/template_definition.py
 msgid "IP/Host, max 767 characters, supports IPv4/IPv6 and domain names"
 msgstr ""
 
@@ -12699,19 +12701,7 @@ msgid "Default database (Required)"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
-msgid "Default database name"
-msgstr ""
-
-#: assets/serializers/asset/template_definition.py
-msgid "CA cert"
-msgstr ""
-
-#: assets/serializers/asset/template_definition.py
 msgid "CA certificate content"
-msgstr ""
-
-#: assets/serializers/asset/template_definition.py
-msgid "Client cert"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
@@ -12719,15 +12709,7 @@ msgid "Client certificate content"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
-msgid "Client key"
-msgstr ""
-
-#: assets/serializers/asset/template_definition.py
 msgid "Client key content"
-msgstr ""
-
-#: assets/serializers/asset/template_definition.py
-msgid "Use SSL"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
