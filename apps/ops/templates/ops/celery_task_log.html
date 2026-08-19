@@ -371,9 +371,9 @@
                 <span class="label">{% trans 'Date published' %}</span>
                 <span class="value date-published"></span>
             </li>
-            <li class="item task-wait-duration-item" hidden>
+            <li class="item task-duration-item">
                 <span class="label">{% trans 'Duration' %}</span>
-                <span class="value task-wait-duration"></span>
+                <span class="value task-duration"></span>
             </li>
         </ul>
     </div>
@@ -428,6 +428,10 @@
     var displayedTaskState = null;
     var announcedTaskState = null;
     var taskPublishedAt = null;
+    var taskStartedAt = null;
+    var taskFinishedAt = null;
+    var taskIsFinished = false;
+    var isTaskInfoLoading = false;
     $(document).ready(function () {
         term = new Terminal({
             cursorBlink: false,
@@ -714,7 +718,7 @@
             }
             var data = JSON.parse(e.data);
             if (data.event === 'status') {
-                updateTaskPublishedAt(data.date_published);
+                updateTaskTiming(data);
                 updateTaskState(data.state, true);
                 return;
             }
@@ -762,11 +766,11 @@
 
     function getTaskStateLabel(state) {
         const labels = {
-            PENDING: gettext('Queued'),
-            RUNNING: gettext('Running'),
-            SUCCESS: gettext('Finished'),
-            FAILURE: gettext('Failed'),
-            REVOKED: gettext('Canceled'),
+            PENDING: '{% trans "Queued" %}',
+            RUNNING: '{% trans "Running" %}',
+            SUCCESS: '{% trans "Finished" %}',
+            FAILURE: '{% trans "Failed" %}',
+            REVOKED: '{% trans "Canceled" %}',
         };
         return labels[state] || state || '-';
     }
@@ -778,9 +782,9 @@
         displayedTaskState = state;
         $('.task-state').text(getTaskStateLabel(state));
         const isQueued = state === 'PENDING';
-        $('.task-start-item').prop('hidden', isQueued);
-        $('.task-published-item, .task-wait-duration-item').prop('hidden', !isQueued);
-        updateTaskWaitDuration();
+        $('.task-start-item').prop('hidden', isQueued && !taskStartedAt);
+        $('.task-published-item, .task-duration-item').prop('hidden', false);
+        updateTaskDuration();
         if (writeToTerminal && announcedTaskState !== state) {
             announcedTaskState = state;
             term.write(`${gettext('Status')}: ${getTaskStatusMessage(state)}\r\n`);
@@ -796,26 +800,47 @@
         return messages[state] || getTaskStateLabel(state);
     }
 
-    function updateTaskPublishedAt(value) {
+    function parseTaskDatetime(value) {
         if (!value) {
-            return;
+            return null;
         }
-        const publishedAt = new Date(value);
-        if (Number.isNaN(publishedAt.getTime())) {
-            return;
-        }
-        taskPublishedAt = publishedAt;
-        $('.date-published').text(publishedAt.toLocaleString());
-        updateTaskWaitDuration();
+        const datetime = new Date(value);
+        return Number.isNaN(datetime.getTime()) ? null : datetime;
     }
 
-    function updateTaskWaitDuration() {
-        if (displayedTaskState !== 'PENDING' || !taskPublishedAt) {
-            $('.task-wait-duration').text('');
+    function updateTaskTiming(data) {
+        const publishedAt = parseTaskDatetime(data.date_published);
+        const startedAt = parseTaskDatetime(data.date_start);
+        const finishedAt = parseTaskDatetime(data.date_finished);
+        if (publishedAt) {
+            taskPublishedAt = publishedAt;
+            $('.date-published').text(publishedAt.toLocaleString());
+        }
+        if (startedAt) {
+            taskStartedAt = startedAt;
+            $('.date-start').text(startedAt.toLocaleString());
+        }
+        if (finishedAt) {
+            taskFinishedAt = finishedAt;
+        }
+        if (typeof data.is_finished === 'boolean') {
+            taskIsFinished = data.is_finished;
+        }
+        if (taskFinishedAt) {
+            taskIsFinished = true;
+        }
+        updateTaskDuration();
+    }
+
+    function updateTaskDuration() {
+        const startedAt = taskStartedAt || taskPublishedAt;
+        if (!startedAt) {
+            $('.task-duration').text('');
             return;
         }
+        const endedAt = taskFinishedAt || new Date();
         const elapsedSeconds = Math.max(
-            0, Math.floor((Date.now() - taskPublishedAt.getTime()) / 1000)
+            0, Math.floor((endedAt.getTime() - startedAt.getTime()) / 1000)
         );
         const hours = Math.floor(elapsedSeconds / 3600);
         const minutes = Math.floor((elapsedSeconds % 3600) / 60);
@@ -823,10 +848,14 @@
         const duration = [hours, minutes, seconds]
             .map(value => String(value).padStart(2, '0'))
             .join(':');
-        $('.task-wait-duration').text(duration);
+        $('.task-duration').text(duration);
     }
 
     function getAutomationExecutionInfo() {
+        if (isTaskInfoLoading) {
+            return;
+        }
+        isTaskInfoLoading = true;
         let url = "{% url 'api-ops:task-executions-detail' pk=task_id %}";
 
         requestApi({
@@ -834,21 +863,28 @@
             method: "GET",
             flash_message: false,
             success(data) {
-                const dateStart = data.date_start ? new Date(data.date_start).toLocaleString() : '';
                 $('.task-id').html(data.id);
                 $('.task-type').html(data.task_name);
-                $('.date-start').html(dateStart);
-                updateTaskPublishedAt(data.date_published);
+                updateTaskTiming(data);
                 updateTaskState(data.state);
                 document.title = data.task_name || document.title;
                 if (data.has_ansible_log || data.is_ansible_task) {
                     $('#toggle-ansible-log-btn').prop('hidden', false);
                 }
+                isTaskInfoLoading = false;
+            },
+            error() {
+                isTaskInfoLoading = false;
             }
         })
     }
 
-    window.setInterval(updateTaskWaitDuration, 1000);
+    window.setInterval(updateTaskDuration, 1000);
+    window.setInterval(function () {
+        if (!taskIsFinished) {
+            getAutomationExecutionInfo();
+        }
+    }, 2000);
 
     function downloadLog() {
         term.selectAll()

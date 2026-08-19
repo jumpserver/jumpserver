@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 14:52+0800\n"
+"POT-Creation-Date: 2026-08-19 10:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgid "No valid assets found for account creation."
 msgstr "No se encontraron activos válidos disponibles para crear una cuenta."
 
 #: accounts/api/account/application.py:91
-#: authentication/api/connection_token.py:681
+#: authentication/api/connection_token.py:720
 msgid "Account not found"
 msgstr "Cuenta no encontrada"
 
@@ -75,7 +75,7 @@ msgstr "Generar archivo de información de respaldo relacionado con activos"
 
 #: accounts/automations/backup_account/handlers.py:178
 #: assets/models/automations/base.py:157 ops/serializers/job.py:71
-#: ops/serializers/job.py:95
+#: ops/serializers/job.py:95 ops/templates/ops/celery_task_log.html:375
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 #: terminal/serializers/session.py:57
 msgid "Duration"
@@ -143,62 +143,62 @@ msgstr "Se han respaldado %(count)s cuentas"
 msgid "Duration: %(duration)s seconds"
 msgstr "Duración: %(duration)s segundos"
 
-#: accounts/automations/base/manager.py:86
+#: accounts/automations/base/manager.py:87
 #, python-format
 msgid "Targets: %(accounts)s account(s) on %(assets)s asset(s)"
 msgstr "Objetivo: %(accounts)s cuentas, que involucran %(assets)s activos"
 
-#: accounts/automations/base/manager.py:138
+#: accounts/automations/base/manager.py:190
 #, python-format
 msgid "△ %(host)s: operation completed; verification pending"
 msgstr ""
 "△ %(host)s: Operación completada, verificación de nuevas credenciales "
 "pendiente de confirmar"
 
-#: accounts/automations/base/manager.py:143
+#: accounts/automations/base/manager.py:195
 msgid "secret changed and verified"
 msgstr ""
 "Cambio de contraseña exitoso, nuevas credenciales verificadas correctamente"
 
-#: accounts/automations/base/manager.py:145
+#: accounts/automations/base/manager.py:197
 msgid "account pushed and verified"
 msgstr ""
 "Cuenta enviada con éxito, nuevas credenciales verificadas correctamente"
 
-#: accounts/automations/base/manager.py:146
+#: accounts/automations/base/manager.py:198
 #: assets/automations/base/manager.py:682
 #, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s: %(result)s"
 
-#: accounts/automations/base/manager.py:178
+#: accounts/automations/base/manager.py:265
 msgid "No privileged account"
 msgstr "No hay ninguna cuenta privilegiada"
 
-#: accounts/automations/base/manager.py:232
+#: accounts/automations/base/manager.py:321
 msgid "Windows does not support SSH key authentication"
 msgstr "Windows no soporta la autenticación con claves SSH"
 
-#: accounts/automations/base/manager.py:254
+#: accounts/automations/base/manager.py:338
 msgid "No pending accounts found"
 msgstr "No se encontraron cuentas pendientes de procesar."
 
-#: accounts/automations/base/manager.py:261
+#: accounts/automations/base/manager.py:345
 #, python-format
 msgid "○ %(asset)s: skipped; no eligible accounts"
 msgstr ""
 "○ %(asset)s: Omitido, no hay cuentas pendientes que cumplan los requisitos"
 
-#: accounts/automations/base/manager.py:280
+#: accounts/automations/base/manager.py:367
 #, python-format
 msgid "Account is already being processed, skipping: %(account)s"
 msgstr "La cuenta ya se está procesando; se omite: %(account)s"
 
-#: accounts/automations/base/manager.py:309
+#: accounts/automations/base/manager.py:396
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "Cuenta no encontrada, inactiva o no apta para esta tarea"
 
-#: accounts/automations/base/manager.py:429
+#: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
 "The remote secret may have changed, but the independent credential "
@@ -207,7 +207,7 @@ msgstr ""
 "El secreto remoto puede haber cambiado, pero la verificación independiente "
 "de las credenciales no fue concluyente: %(code)s"
 
-#: accounts/automations/base/manager.py:505
+#: accounts/automations/base/manager.py:592
 #, python-format
 msgid ""
 "The remote operation completed, but saving the local account result failed: "
@@ -216,7 +216,7 @@ msgstr ""
 "La operación remota se completó, pero no se pudo guardar el resultado de la "
 "cuenta local: %(error)s"
 
-#: accounts/automations/base/manager.py:613
+#: accounts/automations/base/manager.py:700
 msgid "Task ended before the account received a final result"
 msgstr ""
 "La tarea finalizó antes de que la cuenta recibiera un resultado definitivo"
@@ -315,16 +315,16 @@ msgstr ""
 msgid "Push secret record not found: %(record_id)s"
 msgstr "No se encontró el registro de texto cifrado enviado: %(record_id)s"
 
-#: accounts/automations/verify_account/manager.py:79
+#: accounts/automations/verify_account/manager.py:90
 msgid "Change secret record not found or does not match account"
 msgstr ""
 "El registro de cambio de clave no se encontró o no corresponde a la cuenta"
 
-#: accounts/automations/verify_account/manager.py:153
+#: accounts/automations/verify_account/manager.py:164
 msgid "Account not found or inactive"
 msgstr "Cuenta no encontrada o inactiva"
 
-#: accounts/automations/verify_account/manager.py:214
+#: accounts/automations/verify_account/manager.py:225
 msgid "Verification ended before a final result was received"
 msgstr "La verificación finalizó antes de recibir un resultado definitivo"
 
@@ -758,8 +758,9 @@ msgstr "No verificado durante mucho tiempo"
 #: assets/serializers/automations/base.py:47 audits/filters.py:127
 #: audits/filters.py:209 audits/models.py:252 audits/reporting.py:607
 #: audits/serializers.py:79 ops/filters.py:54 ops/models/base.py:49
-#: ops/models/job.py:271 terminal/models/applet/applet.py:398
-#: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
+#: ops/models/job.py:273 ops/templates/ops/celery_task_log.html:367
+#: terminal/models/applet/applet.py:398 terminal/models/applet/host.py:140
+#: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:104
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
 #: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:309
@@ -880,7 +881,7 @@ msgstr "Estado de cambio de contraseña"
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
 #: audits/reporting.py:114 audits/serializers.py:261
-#: authentication/api/connection_token.py:693 ops/models/base.py:18
+#: authentication/api/connection_token.py:732 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:41
 #: terminal/backends/command/models.py:18 terminal/filters.py:114
 #: terminal/models/session/session.py:31 terminal/notifications.py:306
@@ -943,7 +944,7 @@ msgstr "Actividad de cuenta"
 #: authentication/serializers/connect_token_secret.py:127
 #: authentication/serializers/connect_token_secret.py:223 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
-#: ops/models/celery.py:81 ops/models/job.py:182 ops/models/playbook.py:28
+#: ops/models/celery.py:81 ops/models/job.py:184 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
@@ -1121,7 +1122,7 @@ msgstr "Automatización de cambio de clave"
 
 #: accounts/models/automations/change_secret.py:47
 #: assets/models/automations/base.py:155 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:280
+#: ops/models/celery.py:90 ops/models/job.py:282
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "Fecha de finalización"
@@ -1245,7 +1246,7 @@ msgstr "Nombre de usuario"
 
 #: accounts/models/automations/check_account.py:75
 #: accounts/models/automations/gather_account.py:27 audits/models.py:165
-#: ops/templates/ops/celery_task_log.html:374
+#: ops/templates/ops/celery_task_log.html:389
 msgid "Detail"
 msgstr "Detalles"
 
@@ -1553,7 +1554,7 @@ msgstr "Categoría"
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:78
 #: audits/serializers.py:225 authentication/models/connection_token.py:68
-#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:190
+#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:192
 #: perms/serializers/user_permission.py:28 reports/models.py:16
 #: terminal/models/applet/applet.py:43 terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
@@ -1675,7 +1676,7 @@ msgstr "Lista blanca de IP"
 #: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
-#: ops/models/job.py:200 ops/models/playbook.py:31 rbac/models/role.py:37
+#: ops/models/job.py:202 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:43 terminal/models/applet/applet.py:49
 #: terminal/models/applet/applet.py:399 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:23
@@ -2114,8 +2115,8 @@ msgstr "Información básica"
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:153 audits/models.py:74
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:279
-#: ops/templates/ops/celery_task_log.html:360
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:281
+#: ops/templates/ops/celery_task_log.html:363
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:42
@@ -2334,8 +2335,8 @@ msgstr "Usuario"
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:39
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:215
-#: authentication/api/connection_token.py:692 ops/models/base.py:17
-#: ops/models/job.py:192 ops/serializers/job.py:21
+#: authentication/api/connection_token.py:731 ops/models/base.py:17
+#: ops/models/job.py:194 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:103
@@ -3765,13 +3766,13 @@ msgid "Proxy"
 msgstr "Proxy"
 
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
-#: assets/models/node.py:560 ops/models/job.py:193
+#: assets/models/node.py:560 ops/models/job.py:195
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
 #: xpack/plugins/cloud/models.py:402
 msgid "Node"
 msgstr "Nodo"
 
-#: assets/models/automations/base.py:29 ops/models/job.py:274
+#: assets/models/automations/base.py:29 ops/models/job.py:276
 #: ops/serializers/job.py:24 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr "Parámetro"
@@ -3790,7 +3791,7 @@ msgstr "Tareas de automatización de activos"
 
 #: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
-#: ops/models/base.py:54 ops/models/job.py:278
+#: ops/models/base.py:54 ops/models/job.py:280
 #: users/models/user/__init__.py:344
 msgid "Date created"
 msgstr "Fecha de creación"
@@ -3802,13 +3803,13 @@ msgid "Trigger mode"
 msgstr "Modo de activación"
 
 #: assets/models/automations/base.py:167 audits/serializers.py:38
-#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:276
+#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:278
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "Resumen"
 
 #: assets/models/automations/base.py:168 ops/models/base.py:51
-#: ops/models/job.py:275 xpack/plugins/cloud/models.py:232
+#: ops/models/job.py:277 xpack/plugins/cloud/models.py:232
 msgid "Result"
 msgstr "Resultado"
 
@@ -4632,7 +4633,7 @@ msgid "Symlink"
 msgstr "Establecer enlace simbólico"
 
 #: audits/const.py:18 audits/const.py:29
-#: ops/templates/ops/celery_task_log.html:380
+#: ops/templates/ops/celery_task_log.html:395
 #: terminal/api/session/session.py:170
 msgid "Download"
 msgstr "Descargar"
@@ -5118,7 +5119,7 @@ msgstr "Playbook"
 msgid "Unique creators"
 msgstr "Creadores únicos"
 
-#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:189
+#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:191
 #: ops/models/playbook.py:89 ops/models/variable.py:23
 msgid "Playbook"
 msgstr "Playbook"
@@ -5136,7 +5137,7 @@ msgid "Module Distribution"
 msgstr "Distribución de módulos"
 
 #: audits/reporting.py:497 ops/filters.py:19 ops/models/adhoc.py:22
-#: ops/models/job.py:186
+#: ops/models/job.py:188
 msgid "Module"
 msgstr "Módulo"
 
@@ -5146,7 +5147,7 @@ msgstr "Creador"
 
 #: audits/reporting.py:502 audits/reporting.py:617 audits/serializers.py:33
 #: ops/models/adhoc.py:24 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/celery.py:87 ops/models/job.py:191 ops/models/job.py:277
+#: ops/models/celery.py:87 ops/models/job.py:193 ops/models/job.py:279
 #: ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
@@ -5156,7 +5157,7 @@ msgstr "Creador"
 msgid "Run as Policy Distribution"
 msgstr "Política de usuario"
 
-#: audits/reporting.py:507 ops/models/job.py:199
+#: audits/reporting.py:507 ops/models/job.py:201
 msgid "Run as policy"
 msgstr "Política de usuario"
 
@@ -5304,37 +5305,37 @@ msgstr ""
 "No se permite el uso de tokens de conexión reutilizables, no se han "
 "habilitado configuraciones globales."
 
-#: authentication/api/connection_token.py:652
+#: authentication/api/connection_token.py:691
 msgid "Anonymous account is not supported for this asset"
 msgstr "Las cuentas anónimas no son compatibles con los activos actuales."
 
-#: authentication/api/connection_token.py:684
+#: authentication/api/connection_token.py:723
 msgid "Permission expired"
 msgstr "La autorización ha expirado."
 
-#: authentication/api/connection_token.py:717
+#: authentication/api/connection_token.py:756
 msgid "ACL action is reject: {}({})"
 msgstr "La acción de ACL es rechazar: {}({})"
 
-#: authentication/api/connection_token.py:721
+#: authentication/api/connection_token.py:760
 msgid "ACL action is review"
 msgstr "La acción de ACL es revisar."
 
-#: authentication/api/connection_token.py:731
+#: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
 msgstr "La acción de ACL es verificación facial."
 
-#: authentication/api/connection_token.py:736
+#: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
 msgstr ""
 "La regla de inicio de sesión del activo no es compatible con los activos "
 "actuales."
 
-#: authentication/api/connection_token.py:743
+#: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
 msgstr "La acción de ACL es verificación facial en línea."
 
-#: authentication/api/connection_token.py:768
+#: authentication/api/connection_token.py:807
 msgid "No available face feature"
 msgstr "No hay características faciales disponibles."
 
@@ -7317,7 +7318,7 @@ msgstr ""
 "de Docker, ejecute en el nodo Ansible Worker: docker pull %(image)s"
 
 #: ops/ansible/inventory.py:194 ops/ansible/inventory.py:281
-#: ops/models/job.py:97
+#: ops/models/job.py:99
 msgid "No account available"
 msgstr "No hay cuentas disponibles"
 
@@ -7586,7 +7587,7 @@ msgstr "Se requiere un ciclo o configuración periódica"
 msgid "Pattern"
 msgstr "Modo"
 
-#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:184
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:186
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "Contenido"
@@ -7615,7 +7616,7 @@ msgstr "Se puede ver el monitoreo de tareas"
 msgid "Kwargs"
 msgstr "Otros parámetros"
 
-#: ops/models/celery.py:88
+#: ops/models/celery.py:88 ops/templates/ops/celery_task_log.html:371
 msgid "Date published"
 msgstr "Fecha de publicación"
 
@@ -7623,7 +7624,7 @@ msgstr "Fecha de publicación"
 msgid "Celery Task Execution"
 msgstr "Ejecución de tareas de Celery"
 
-#: ops/models/job.py:53
+#: ops/models/job.py:55
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
@@ -7632,58 +7633,58 @@ msgstr ""
 "El activo ({asset}) debe tener al menos uno de los siguientes protocolos: "
 "ssh, sftp, winrm"
 
-#: ops/models/job.py:60
+#: ops/models/job.py:62
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr "Falta autorización de ssh, sftp o winrm para el activo ({asset})"
 
-#: ops/models/job.py:64
+#: ops/models/job.py:66
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "Falta permiso de subida para el activo ({asset})"
 
-#: ops/models/job.py:110
+#: ops/models/job.py:112
 msgid "Module {} is not suitable for this asset"
 msgstr "El módulo {} no es aplicable a este activo."
 
-#: ops/models/job.py:187
+#: ops/models/job.py:189
 msgid "Run dir"
 msgstr "Directorio de ejecución"
 
-#: ops/models/job.py:188
+#: ops/models/job.py:190
 msgid "Timeout (Seconds)"
 msgstr "Tiempo de espera (segundos)"
 
-#: ops/models/job.py:194
+#: ops/models/job.py:196
 msgid "Use Parameter Define"
 msgstr "Definición de parámetros de uso"
 
-#: ops/models/job.py:195
+#: ops/models/job.py:197
 msgid "Parameters define"
 msgstr "Definición de parámetros"
 
-#: ops/models/job.py:196
+#: ops/models/job.py:198
 msgid "Periodic variable"
 msgstr "Variables de ejecución periódica"
 
-#: ops/models/job.py:197
+#: ops/models/job.py:199
 msgid "Run as"
 msgstr "Usuario de ejecución"
 
-#: ops/models/job.py:259 ops/models/variable.py:28 ops/serializers/job.py:111
+#: ops/models/job.py:261 ops/models/variable.py:28 ops/serializers/job.py:111
 #: terminal/notifications.py:196
 msgid "Job"
 msgstr "Trabajo"
 
-#: ops/models/job.py:282
+#: ops/models/job.py:284
 msgid "Material"
 msgstr "Material"
 
-#: ops/models/job.py:284
+#: ops/models/job.py:286
 msgid "Material Type"
 msgstr "Tipo de material"
 
-#: ops/models/job.py:619
+#: ops/models/job.py:625
 msgid "Job Execution"
 msgstr "Ejecución de trabajos"
 
@@ -7890,9 +7891,9 @@ msgstr ""
 "configuración del sistema - lista de tareas - limpieza programada - "
 "configuración del historial de ejecución del centro de trabajos"
 
-#: ops/templates/ops/celery_task_log.html:365
-#: ops/templates/ops/celery_task_log.html:369
-#: ops/templates/ops/celery_task_log.html:387
+#: ops/templates/ops/celery_task_log.html:380
+#: ops/templates/ops/celery_task_log.html:384
+#: ops/templates/ops/celery_task_log.html:402
 #: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
 msgid "Output"
 msgstr "Salida"

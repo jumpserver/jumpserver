@@ -115,6 +115,14 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
                         'event': 'status', 'state': task.state,
                         'is_finished': task.is_finished,
                         'date_published': task.date_published.isoformat(),
+                        'date_start': (
+                            task.date_start.isoformat()
+                            if task.date_start else None
+                        ),
+                        'date_finished': (
+                            task.date_finished.isoformat()
+                            if task.date_finished else None
+                        ),
                         'task': task_id,
                     })
                     last_task_state = task.state

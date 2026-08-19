@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 14:52+0800\n"
+"POT-Creation-Date: 2026-08-19 10:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgid "No valid assets found for account creation."
 msgstr "계정 생성을 위한 유효한 자산을 찾을 수 없습니다."
 
 #: accounts/api/account/application.py:91
-#: authentication/api/connection_token.py:681
+#: authentication/api/connection_token.py:720
 msgid "Account not found"
 msgstr "계정을 찾을 수 없습니다"
 
@@ -74,7 +74,7 @@ msgstr "자산 관련 백업 정보 파일 생성"
 
 #: accounts/automations/backup_account/handlers.py:178
 #: assets/models/automations/base.py:157 ops/serializers/job.py:71
-#: ops/serializers/job.py:95
+#: ops/serializers/job.py:95 ops/templates/ops/celery_task_log.html:375
 #: settings/templates/ldap/_msg_import_ldap_user.html:7
 #: terminal/serializers/session.py:57
 msgid "Duration"
@@ -142,57 +142,57 @@ msgstr "계정 %(count)s개가 백업되었습니다."
 msgid "Duration: %(duration)s seconds"
 msgstr "소요 시간: %(duration)s초"
 
-#: accounts/automations/base/manager.py:86
+#: accounts/automations/base/manager.py:87
 #, python-format
 msgid "Targets: %(accounts)s account(s) on %(assets)s asset(s)"
 msgstr "대상: 계정 %(accounts)s개, 관련 자산 %(assets)s개"
 
-#: accounts/automations/base/manager.py:138
+#: accounts/automations/base/manager.py:190
 #, python-format
 msgid "△ %(host)s: operation completed; verification pending"
 msgstr "△ %(host)s: 작업이 완료되었으며, 새 자격 증명 검증 확인 대기 중"
 
-#: accounts/automations/base/manager.py:143
+#: accounts/automations/base/manager.py:195
 msgid "secret changed and verified"
 msgstr "비밀번호 변경 성공, 새 자격 증명이 검증되었습니다."
 
-#: accounts/automations/base/manager.py:145
+#: accounts/automations/base/manager.py:197
 msgid "account pushed and verified"
 msgstr "계정 푸시 성공, 새 자격 증명이 검증되었습니다."
 
-#: accounts/automations/base/manager.py:146
+#: accounts/automations/base/manager.py:198
 #: assets/automations/base/manager.py:682
 #, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s: %(result)s"
 
-#: accounts/automations/base/manager.py:178
+#: accounts/automations/base/manager.py:265
 msgid "No privileged account"
 msgstr "권한 있는 계정이 없습니다"
 
-#: accounts/automations/base/manager.py:232
+#: accounts/automations/base/manager.py:321
 msgid "Windows does not support SSH key authentication"
 msgstr "Windows는 SSH 키 인증을 지원하지 않습니다."
 
-#: accounts/automations/base/manager.py:254
+#: accounts/automations/base/manager.py:338
 msgid "No pending accounts found"
 msgstr "처리할 계정 찾을 수 없음"
 
-#: accounts/automations/base/manager.py:261
+#: accounts/automations/base/manager.py:345
 #, python-format
 msgid "○ %(asset)s: skipped; no eligible accounts"
 msgstr "○ %(asset)s: 건너뜀, 조건에 맞는 처리 대기 계정 없음"
 
-#: accounts/automations/base/manager.py:280
+#: accounts/automations/base/manager.py:367
 #, python-format
 msgid "Account is already being processed, skipping: %(account)s"
 msgstr "계정이 이미 처리 중이므로 건너뜁니다: %(account)s"
 
-#: accounts/automations/base/manager.py:309
+#: accounts/automations/base/manager.py:396
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "계정을 찾을 수 없거나 비활성 상태이거나 이 작업의 대상이 아닙니다"
 
-#: accounts/automations/base/manager.py:429
+#: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
 "The remote secret may have changed, but the independent credential "
@@ -201,7 +201,7 @@ msgstr ""
 "원격 암호가 변경되었을 수 있지만 독립적인 자격 증명 검증에서 명확한 결론을 얻"
 "지 못했습니다: %(code)s"
 
-#: accounts/automations/base/manager.py:505
+#: accounts/automations/base/manager.py:592
 #, python-format
 msgid ""
 "The remote operation completed, but saving the local account result failed: "
@@ -209,7 +209,7 @@ msgid ""
 msgstr ""
 "원격 작업이 완료되었지만 로컬 계정 결과를 저장하지 못했습니다: %(error)s"
 
-#: accounts/automations/base/manager.py:613
+#: accounts/automations/base/manager.py:700
 msgid "Task ended before the account received a final result"
 msgstr "계정이 최종 결과를 받기 전에 작업이 종료되었습니다"
 
@@ -306,15 +306,15 @@ msgstr ""
 msgid "Push secret record not found: %(record_id)s"
 msgstr "푸시 암호 기록을 찾을 수 없습니다: %(record_id)s"
 
-#: accounts/automations/verify_account/manager.py:79
+#: accounts/automations/verify_account/manager.py:90
 msgid "Change secret record not found or does not match account"
 msgstr "비밀번호 변경 기록을 찾을 수 없거나 계정과 일치하지 않습니다"
 
-#: accounts/automations/verify_account/manager.py:153
+#: accounts/automations/verify_account/manager.py:164
 msgid "Account not found or inactive"
 msgstr "계정을 찾을 수 없거나 비활성 상태입니다"
 
-#: accounts/automations/verify_account/manager.py:214
+#: accounts/automations/verify_account/manager.py:225
 msgid "Verification ended before a final result was received"
 msgstr "최종 결과를 받기 전에 검증이 종료되었습니다"
 
@@ -744,8 +744,9 @@ msgstr "장기간 미검증"
 #: assets/serializers/automations/base.py:47 audits/filters.py:127
 #: audits/filters.py:209 audits/models.py:252 audits/reporting.py:607
 #: audits/serializers.py:79 ops/filters.py:54 ops/models/base.py:49
-#: ops/models/job.py:271 terminal/models/applet/applet.py:398
-#: terminal/models/applet/host.py:140 terminal/models/component/status.py:30
+#: ops/models/job.py:273 ops/templates/ops/celery_task_log.html:367
+#: terminal/models/applet/applet.py:398 terminal/models/applet/host.py:140
+#: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:104
 #: terminal/serializers/applet.py:19 terminal/serializers/applet_host.py:163
 #: terminal/serializers/virtualapp.py:36 tickets/models/ticket/general.py:309
@@ -866,7 +867,7 @@ msgstr "비밀번호 변경 상태"
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
 #: audits/reporting.py:114 audits/serializers.py:261
-#: authentication/api/connection_token.py:693 ops/models/base.py:18
+#: authentication/api/connection_token.py:732 ops/models/base.py:18
 #: perms/models/asset_permission.py:75 settings/serializers/msg.py:41
 #: terminal/backends/command/models.py:18 terminal/filters.py:114
 #: terminal/models/session/session.py:31 terminal/notifications.py:306
@@ -929,7 +930,7 @@ msgstr "계정 활동"
 #: authentication/serializers/connect_token_secret.py:127
 #: authentication/serializers/connect_token_secret.py:223 labels/models.py:11
 #: ops/mixin.py:32 ops/models/adhoc.py:19 ops/models/celery.py:15
-#: ops/models/celery.py:81 ops/models/job.py:182 ops/models/playbook.py:28
+#: ops/models/celery.py:81 ops/models/job.py:184 ops/models/playbook.py:28
 #: ops/models/variable.py:9 ops/serializers/job.py:20
 #: ops/serializers/variable.py:20 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
@@ -1107,7 +1108,7 @@ msgstr "자동화 비밀번호 변경"
 
 #: accounts/models/automations/change_secret.py:47
 #: assets/models/automations/base.py:155 ops/models/base.py:56
-#: ops/models/celery.py:90 ops/models/job.py:280
+#: ops/models/celery.py:90 ops/models/job.py:282
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "종료 날짜"
@@ -1231,7 +1232,7 @@ msgstr "사용자 이름"
 
 #: accounts/models/automations/check_account.py:75
 #: accounts/models/automations/gather_account.py:27 audits/models.py:165
-#: ops/templates/ops/celery_task_log.html:374
+#: ops/templates/ops/celery_task_log.html:389
 msgid "Detail"
 msgstr "상세 정보"
 
@@ -1529,7 +1530,7 @@ msgstr "카테고리"
 #: assets/serializers/platform.py:161 assets/serializers/platform.py:173
 #: audits/reporting.py:221 audits/reporting.py:492 audits/serializers.py:78
 #: audits/serializers.py:225 authentication/models/connection_token.py:68
-#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:190
+#: authentication/serializers/connect_token_secret.py:140 ops/models/job.py:192
 #: perms/serializers/user_permission.py:28 reports/models.py:16
 #: terminal/models/applet/applet.py:43 terminal/models/component/storage.py:58
 #: terminal/models/component/storage.py:152 terminal/serializers/applet.py:30
@@ -1651,7 +1652,7 @@ msgstr "IP 화이트리스트"
 #: accounts/serializers/account/service.py:28
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
-#: ops/models/job.py:200 ops/models/playbook.py:31 rbac/models/role.py:37
+#: ops/models/job.py:202 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:43 terminal/models/applet/applet.py:49
 #: terminal/models/applet/applet.py:399 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:23
@@ -2064,8 +2065,8 @@ msgstr "기본 정보"
 #: accounts/templates/accounts/gather_account_report.html:21
 #: accounts/templates/accounts/push_account_report.html:22
 #: assets/models/automations/base.py:153 audits/models.py:74
-#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:279
-#: ops/templates/ops/celery_task_log.html:360
+#: ops/models/base.py:55 ops/models/celery.py:89 ops/models/job.py:281
+#: ops/templates/ops/celery_task_log.html:363
 #: perms/models/asset_permission.py:78 settings/serializers/feature.py:42
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:42
@@ -2282,8 +2283,8 @@ msgstr "사용자"
 #: assets/models/automations/base.py:25
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:39
 #: assets/serializers/platform.py:182 assets/serializers/platform.py:215
-#: authentication/api/connection_token.py:692 ops/models/base.py:17
-#: ops/models/job.py:192 ops/serializers/job.py:21
+#: authentication/api/connection_token.py:731 ops/models/base.py:17
+#: ops/models/job.py:194 ops/serializers/job.py:21
 #: perms/serializers/permission.py:58
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/cloud/manager.py:103
@@ -3671,13 +3672,13 @@ msgid "Proxy"
 msgstr "프록시."
 
 #: assets/models/automations/base.py:23 assets/models/cmd_filter.py:32
-#: assets/models/node.py:560 ops/models/job.py:193
+#: assets/models/node.py:560 ops/models/job.py:195
 #: perms/models/asset_permission.py:72 tickets/models/ticket/apply_asset.py:15
 #: xpack/plugins/cloud/models.py:402
 msgid "Node"
 msgstr "노드."
 
-#: assets/models/automations/base.py:29 ops/models/job.py:274
+#: assets/models/automations/base.py:29 ops/models/job.py:276
 #: ops/serializers/job.py:24 settings/serializers/auth/sms.py:108
 msgid "Parameters"
 msgstr "파라미터."
@@ -3696,7 +3697,7 @@ msgstr "자산 자동화 작업"
 
 #: assets/models/automations/base.py:150 assets/models/cmd_filter.py:41
 #: authentication/serializers/token.py:134 common/db/models.py:34
-#: ops/models/base.py:54 ops/models/job.py:278
+#: ops/models/base.py:54 ops/models/job.py:280
 #: users/models/user/__init__.py:344
 msgid "Date created"
 msgstr "생성 날짜"
@@ -3708,13 +3709,13 @@ msgid "Trigger mode"
 msgstr "트리거 모드"
 
 #: assets/models/automations/base.py:167 audits/serializers.py:38
-#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:276
+#: common/drf/reporting.py:24 ops/models/base.py:52 ops/models/job.py:278
 #: xpack/plugins/cloud/manager.py:113
 msgid "Summary"
 msgstr "요약"
 
 #: assets/models/automations/base.py:168 ops/models/base.py:51
-#: ops/models/job.py:275 xpack/plugins/cloud/models.py:232
+#: ops/models/job.py:277 xpack/plugins/cloud/models.py:232
 msgid "Result"
 msgstr "결과"
 
@@ -4519,7 +4520,7 @@ msgid "Symlink"
 msgstr "심볼릭 링크 생성"
 
 #: audits/const.py:18 audits/const.py:29
-#: ops/templates/ops/celery_task_log.html:380
+#: ops/templates/ops/celery_task_log.html:395
 #: terminal/api/session/session.py:170
 msgid "Download"
 msgstr "다운로드"
@@ -5005,7 +5006,7 @@ msgstr "플레이북"
 msgid "Unique creators"
 msgstr "고유 생성자"
 
-#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:189
+#: audits/reporting.py:467 ops/const.py:40 ops/models/job.py:191
 #: ops/models/playbook.py:89 ops/models/variable.py:23
 msgid "Playbook"
 msgstr "플레이북"
@@ -5023,7 +5024,7 @@ msgid "Module Distribution"
 msgstr "모듈 분포"
 
 #: audits/reporting.py:497 ops/filters.py:19 ops/models/adhoc.py:22
-#: ops/models/job.py:186
+#: ops/models/job.py:188
 msgid "Module"
 msgstr "모듈"
 
@@ -5033,7 +5034,7 @@ msgstr "생성자"
 
 #: audits/reporting.py:502 audits/reporting.py:617 audits/serializers.py:33
 #: ops/models/adhoc.py:24 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/celery.py:87 ops/models/job.py:191 ops/models/job.py:277
+#: ops/models/celery.py:87 ops/models/job.py:193 ops/models/job.py:279
 #: ops/models/playbook.py:30 ops/models/variable.py:17
 #: terminal/models/session/sharing.py:25
 msgid "Creator"
@@ -5043,7 +5044,7 @@ msgstr "생성자"
 msgid "Run as Policy Distribution"
 msgstr "사용자 정책"
 
-#: audits/reporting.py:507 ops/models/job.py:199
+#: audits/reporting.py:507 ops/models/job.py:201
 msgid "Run as policy"
 msgstr "사용자 정책"
 
@@ -5188,35 +5189,35 @@ msgstr ""
 "재사용 가능한 연결 토큰은 허용되지 않으며, 글로벌 설정이 활성화되지 않았습니"
 "다."
 
-#: authentication/api/connection_token.py:652
+#: authentication/api/connection_token.py:691
 msgid "Anonymous account is not supported for this asset"
 msgstr "익명 계정은 현재 자산을 지원하지 않습니다."
 
-#: authentication/api/connection_token.py:684
+#: authentication/api/connection_token.py:723
 msgid "Permission expired"
 msgstr "권한이 만료되었습니다."
 
-#: authentication/api/connection_token.py:717
+#: authentication/api/connection_token.py:756
 msgid "ACL action is reject: {}({})"
 msgstr "ACL Action은 거부: {}({})입니다."
 
-#: authentication/api/connection_token.py:721
+#: authentication/api/connection_token.py:760
 msgid "ACL action is review"
 msgstr "ACL Action은 재검토입니다."
 
-#: authentication/api/connection_token.py:731
+#: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
 msgstr "ACL Action은 얼굴 인식입니다."
 
-#: authentication/api/connection_token.py:736
+#: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
 msgstr "자산 로그인 규칙은 현재 자산을 지원하지 않습니다."
 
-#: authentication/api/connection_token.py:743
+#: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
 msgstr "ACL Action은 온라인 얼굴 인식입니다."
 
-#: authentication/api/connection_token.py:768
+#: authentication/api/connection_token.py:807
 msgid "No available face feature"
 msgstr "사용 가능한 얼굴 특징이 없습니다."
 
@@ -7158,7 +7159,7 @@ msgstr ""
 "음을 실행하십시오: docker pull %(image)s"
 
 #: ops/ansible/inventory.py:194 ops/ansible/inventory.py:281
-#: ops/models/job.py:97
+#: ops/models/job.py:99
 msgid "No account available"
 msgstr "사용 가능한 계정 없음"
 
@@ -7425,7 +7426,7 @@ msgstr "주기 또는 정기 설정이 필요합니다"
 msgid "Pattern"
 msgstr "모드"
 
-#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:184
+#: ops/models/adhoc.py:23 ops/models/celery.py:82 ops/models/job.py:186
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "내용"
@@ -7454,7 +7455,7 @@ msgstr "작업 모니터링을 볼 수 있음"
 msgid "Kwargs"
 msgstr "기타 매개변수"
 
-#: ops/models/celery.py:88
+#: ops/models/celery.py:88 ops/templates/ops/celery_task_log.html:371
 msgid "Date published"
 msgstr "출시 날짜"
 
@@ -7462,7 +7463,7 @@ msgstr "출시 날짜"
 msgid "Celery Task Execution"
 msgstr "Celery 작업 실행"
 
-#: ops/models/job.py:53
+#: ops/models/job.py:55
 #, python-brace-format
 msgid ""
 "Asset ({asset}) must have at least one of the following protocols added: "
@@ -7471,58 +7472,58 @@ msgstr ""
 "자산({asset})에는 최소한 ssh, sftp 또는 winrm 중 하나의 프로토콜이 추가되어"
 "야 합니다"
 
-#: ops/models/job.py:60
+#: ops/models/job.py:62
 #, python-brace-format
 msgid "Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol"
 msgstr "자산({asset})의 인증에 ssh, sftp 또는 winrm 프로토콜이 부족합니다"
 
-#: ops/models/job.py:64
+#: ops/models/job.py:66
 #, python-brace-format
 msgid "Asset ({asset}) authorization lacks upload permissions"
 msgstr "자산({asset})의 인증에 업로드 권한이 부족합니다"
 
-#: ops/models/job.py:110
+#: ops/models/job.py:112
 msgid "Module {} is not suitable for this asset"
 msgstr "모듈 {}는 이 자산에 적합하지 않음"
 
-#: ops/models/job.py:187
+#: ops/models/job.py:189
 msgid "Run dir"
 msgstr "실행 디렉터리"
 
-#: ops/models/job.py:188
+#: ops/models/job.py:190
 msgid "Timeout (Seconds)"
 msgstr "타임아웃 시간 (초)"
 
-#: ops/models/job.py:194
+#: ops/models/job.py:196
 msgid "Use Parameter Define"
 msgstr "매개변수 정의 사용"
 
-#: ops/models/job.py:195
+#: ops/models/job.py:197
 msgid "Parameters define"
 msgstr "매개변수 정의"
 
-#: ops/models/job.py:196
+#: ops/models/job.py:198
 msgid "Periodic variable"
 msgstr "주기적인 실행 변수"
 
-#: ops/models/job.py:197
+#: ops/models/job.py:199
 msgid "Run as"
 msgstr "운영 사용자"
 
-#: ops/models/job.py:259 ops/models/variable.py:28 ops/serializers/job.py:111
+#: ops/models/job.py:261 ops/models/variable.py:28 ops/serializers/job.py:111
 #: terminal/notifications.py:196
 msgid "Job"
 msgstr "작업"
 
-#: ops/models/job.py:282
+#: ops/models/job.py:284
 msgid "Material"
 msgstr "자재"
 
-#: ops/models/job.py:284
+#: ops/models/job.py:286
 msgid "Material Type"
 msgstr "자재 유형"
 
-#: ops/models/job.py:619
+#: ops/models/job.py:625
 msgid "Job Execution"
 msgstr "작업 실행"
 
@@ -7721,9 +7722,9 @@ msgstr ""
 "시스템은 시스템 설정 - 작업 목록 - 정기 정리 - 작업 센터 실행 이력 구성에 따"
 "라, 매일 새벽 2시에 저장 기간을 초과한 기록을 정리합니다."
 
-#: ops/templates/ops/celery_task_log.html:365
-#: ops/templates/ops/celery_task_log.html:369
-#: ops/templates/ops/celery_task_log.html:387
+#: ops/templates/ops/celery_task_log.html:380
+#: ops/templates/ops/celery_task_log.html:384
+#: ops/templates/ops/celery_task_log.html:402
 #: terminal/backends/command/models.py:20 terminal/serializers/command.py:73
 msgid "Output"
 msgstr "출력"
