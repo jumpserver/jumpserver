@@ -14,7 +14,7 @@ from rest_framework.settings import api_settings
 
 from common.drf.filters import (
     IDSpmFilterBackend, CustomFilterBackend, IDInFilterBackend,
-    IDNotFilterBackend, NotOrRelFilterBackend, LabelFilterBackend
+    IDNotFilterBackend, LabelFilterBackend
 )
 from common.utils import get_logger, lazyproperty
 from common.utils import is_uuid
@@ -226,8 +226,6 @@ class ExtraFilterFieldsMixin:
             self.default_added_filters,
             self.extra_filter_backends,
         ))
-        # 这个要放在最后
-        backends.append(NotOrRelFilterBackend)
         return backends
 
     def filter_queryset(self, queryset):
