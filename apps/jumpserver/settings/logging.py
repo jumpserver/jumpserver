@@ -148,14 +148,16 @@ def _get_syslog_config():
     return host, port, facility, socktype
 
 
-# 'django.server',
+def _is_valid_host(host):
+    return bool(host)
+
+# 'django.server', 
 SYSLOG_LOGGER_NAMES = ('syslog',)
 
 
 def reconfigure_syslog_handler():
-    """动态重载 syslog handler，支持 API 修改后不重启生效"""
-    host, port, facility, socktype = _get_syslog_config()
-    if host:
+    enabled, host, port, facility, socktype = _get_syslog_config()
+    if enabled and _is_valid_host(host):
         handler = SysLogHandler(
             address=(host, int(port)),
             facility=facility,
