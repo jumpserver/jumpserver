@@ -1833,7 +1833,7 @@ msgstr "引擎 ID 无效"
 
 #: accounts/serializers/automations/gather_account.py:32
 msgid "Whether to check the risk of the discovered accounts."
-msgstr "是否对聚集账户进行风险检查。"
+msgstr "是否对发现的账号进行风险检查。"
 
 #: accounts/signal_handlers.py:43
 #, python-format
