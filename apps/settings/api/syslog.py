@@ -23,6 +23,13 @@ class SyslogTestingAPI(APIView):
     }
 
     def post(self, request):
+        enabled = getattr(settings, 'SYSLOG_ENABLE', False)
+        if not enabled:
+            return Response(
+                {"error": str(_("Syslog is not enabled"))},
+                status=400
+            )
+
         host = getattr(settings, 'SYSLOG_HOST', '')
         if not host:
             return Response(

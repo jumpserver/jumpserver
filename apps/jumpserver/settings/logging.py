@@ -141,11 +141,12 @@ if not os.path.isdir(LOG_DIR):
 
 def _get_syslog_config():
     """获取当前 syslog 配置（仅从 django.conf.settings，由界面 / API 管理）"""
+    enabled = getattr(settings, 'SYSLOG_ENABLE', False)
     host = getattr(settings, 'SYSLOG_HOST', '')
     port = getattr(settings, 'SYSLOG_PORT', 514)
     facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
     socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
-    return host, port, facility, socktype
+    return enabled, host, port, facility, socktype
 
 
 def _is_valid_host(host):
@@ -158,8 +159,8 @@ SYSLOG_LOGGER_NAMES = ('syslog',)
 
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
-    host, port, facility, socktype = _get_syslog_config()
-    if _is_valid_host(host):
+    enabled, host, port, facility, socktype = _get_syslog_config()
+    if enabled and _is_valid_host(host):
         handler = SysLogHandler(
             address=(host, int(port)),
             facility=facility,
@@ -172,11 +173,9 @@ def reconfigure_syslog_handler():
 
     to_close = set()
     for logger_name in SYSLOG_LOGGER_NAMES:
-        print("logger_name=", logger_name)
         logger = logging.getLogger(logger_name)
         for h in list(logger.handlers):
             if h.__class__.__name__ in ('SysLogHandler', 'NullHandler'):
-                print("remove handler=", h)
                 logger.removeHandler(h)
                 to_close.add(h)
         logger.addHandler(handler)

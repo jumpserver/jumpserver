@@ -7,6 +7,11 @@ __all__ = ['SyslogSettingSerializer']
 class SyslogSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Syslog')
 
+    SYSLOG_ENABLE = serializers.BooleanField(
+        required=False,
+        label=_('Enable syslog'),
+        help_text=_('Whether to enable syslog')
+    )
     SYSLOG_HOST = serializers.CharField(
         required=True, allow_blank=True, max_length=128,
         label=_('Syslog host'),

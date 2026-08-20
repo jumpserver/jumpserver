@@ -158,7 +158,7 @@ def register_sqlite_connection(sender, **kwargs):
 
 @receiver(setting_changed)
 def on_syslog_setting_changed(sender, name='', **kwargs):
-    if name not in ('SYSLOG_HOST', 'SYSLOG_PORT', 'SYSLOG_FACILITY', 'SYSLOG_SOCKTYPE'):
+    if name not in ('SYSLOG_ENABLE', 'SYSLOG_HOST', 'SYSLOG_PORT', 'SYSLOG_FACILITY', 'SYSLOG_SOCKTYPE'):
         return
     try:
         from jumpserver.settings.logging import reconfigure_syslog_handler

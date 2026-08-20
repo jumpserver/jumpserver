@@ -12561,6 +12561,18 @@ msgid "Syslog"
 msgstr "syslog"
 
 #: settings/serializers/syslog.py:12
+msgid "Enable syslog"
+msgstr "Enable syslog"
+
+#: settings/serializers/syslog.py:12
+msgid "Whether to enable syslog"
+msgstr "Whether to enable syslog"
+
+#: settings/api/syslog.py:1
+msgid "Syslog is not enabled"
+msgstr "Syslog is not enabled"
+
+#: settings/serializers/syslog.py:12
 msgid "Syslog facility"
 msgstr "syslog facility"
 
@@ -12574,7 +12586,7 @@ msgstr "syslog protocol type"
 
 #: settings/serializers/syslog.py:12
 msgid "TCP or UDP protocol for syslog"
-msgstr "TCP or UDP protocol for syslog"
+msgstr "SYSLOG protocol type"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog host"
