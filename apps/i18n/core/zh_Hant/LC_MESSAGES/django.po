@@ -12661,7 +12661,19 @@ msgstr "許可證無效"
 msgid "Syslog"
 msgstr "SYSLOG"
 
-#: settings/serializers/syslog.py:1
+#: settings/serializers/syslog.py:12
+msgid "Enable syslog"
+msgstr "啟用 SYSLOG"
+
+#: settings/serializers/syslog.py:12
+msgid "Whether to enable syslog"
+msgstr "是否啟用 SYSLOG"
+
+#: settings/api/syslog.py:1
+msgid "Syslog is not enabled"
+msgstr "SYSLOG 未啟用"
+
+#: settings/serializers/syslog.py:12
 msgid "Syslog facility"
 msgstr "SYSLOG 設施"
 
@@ -12675,7 +12687,7 @@ msgstr "SYSLOG 協議"
 
 #: settings/serializers/syslog.py:1
 msgid "TCP or UDP protocol for syslog"
-msgstr "SYSLOG 使用的 TCP 或 UDP 協議"
+msgstr "SYSLOG 協議類型"
 
 #: settings/serializers/syslog.py:1
 msgid "Syslog host"
