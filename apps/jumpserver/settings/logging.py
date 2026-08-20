@@ -149,16 +149,13 @@ def _get_syslog_config():
     return enabled, host, port, facility, socktype
 
 
-def _is_valid_host(host):
-    return bool(host)
-
-# 'django.server', 
+# 'django.server',
 SYSLOG_LOGGER_NAMES = ('syslog',)
 
 
 def reconfigure_syslog_handler():
     enabled, host, port, facility, socktype = _get_syslog_config()
-    if enabled and _is_valid_host(host):
+    if enabled and host:
         handler = SysLogHandler(
             address=(host, int(port)),
             facility=facility,
