@@ -120,7 +120,8 @@
     function GetAssertReq(getAssert) {
         getAssert.publicKey.challenge = decode(getAssert.publicKey.challenge)
 
-        for (const allowCred of getAssert.publicKey.allowCredentials) {
+        const allowCredentials = getAssert.publicKey.allowCredentials || []
+        for (const allowCred of allowCredentials) {
             allowCred.id = decode(allowCred.id)
         }
         return getAssert
