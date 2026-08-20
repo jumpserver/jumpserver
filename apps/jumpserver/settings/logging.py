@@ -141,14 +141,16 @@ if not os.path.isdir(LOG_DIR):
 
 def _get_syslog_config():
     """获取当前 syslog 配置（仅从 django.conf.settings，由界面 / API 管理）"""
+    enabled = getattr(settings, 'SYSLOG_ENABLE', False)
     host = getattr(settings, 'SYSLOG_HOST', '')
     port = getattr(settings, 'SYSLOG_PORT', 514)
     facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
     socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
-    return host, port, facility, socktype
+    return enabled, host, port, facility, socktype
 
 
 def _is_valid_host(host):
+    """检查 syslog 主机是否合法（非空）"""
     return bool(host)
 
 # 'django.server', 
@@ -156,6 +158,7 @@ SYSLOG_LOGGER_NAMES = ('syslog',)
 
 
 def reconfigure_syslog_handler():
+    """动态重载 syslog handler，支持 API 修改后不重启生效"""
     enabled, host, port, facility, socktype = _get_syslog_config()
     if enabled and _is_valid_host(host):
         handler = SysLogHandler(
