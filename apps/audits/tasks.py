@@ -264,6 +264,11 @@ def reclaim_storage_by_threshold():
     replay files and/or FTP files based on STORAGE_RECLAMATION_TARGETS.
     STORAGE_RECLAMATION_METHOD determines both the action (delete/archive)
     and the time window (earliest day/month) to clean in this run."""
+    with tmp_to_root_org():
+        reclaim_storage_by_threshold_task()
+
+        
+def reclaim_storage_by_threshold_task():        
     threshold_pct = getattr(settings, 'STORAGE_USAGE_THRESHOLD', 0)
     if threshold_pct <= 0 or threshold_pct >= 100:
         return
