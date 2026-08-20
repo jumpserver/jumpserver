@@ -644,7 +644,7 @@
     "FormatIPV4": "Recognized as IPv4 address",
     "FormatIPV6": "Recognized as IPv6 address",
     "FormatURL": "Recognized as URL",
-    "FormatUnknownWarning": "Unable to recognize the address type, please check",
+    "FormatUnknownWarning": "Invalid address, please check the input",
     "FoundAccountInAssetDeleteMsg": "Delete the found items from the system assets",
     "Friday": "Fri",
     "From": "From",

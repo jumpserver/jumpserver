@@ -54,8 +54,6 @@ def on_django_ready_add_db_config(sender, **kwargs):
 _syslog_configured = False
 @receiver(request_started, dispatch_uid='settings.signal_handlers.init_syslog_first_request')
 def on_first_request_init_syslog_handler(sender, **kwargs):
-    """首次请求时才重载 syslog handler，且只重载一次。
-    """
     global _syslog_configured
     if _syslog_configured:
         return
