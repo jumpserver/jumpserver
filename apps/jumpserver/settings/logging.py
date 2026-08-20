@@ -152,8 +152,9 @@ def _is_valid_host(host):
     """检查 syslog 主机是否合法（非空）"""
     return bool(host)
 
-# 'django.server',
-SYSLOG_LOGGER_NAMES = ('syslog')
+# 'django.server', 
+SYSLOG_LOGGER_NAMES = ('syslog',)
+
 
 def reconfigure_syslog_handler():
     """动态重载 syslog handler，支持 API 修改后不重启生效"""
@@ -171,9 +172,11 @@ def reconfigure_syslog_handler():
 
     to_close = set()
     for logger_name in SYSLOG_LOGGER_NAMES:
+        print("logger_name=", logger_name)
         logger = logging.getLogger(logger_name)
         for h in list(logger.handlers):
             if h.__class__.__name__ in ('SysLogHandler', 'NullHandler'):
+                print("remove handler=", h)
                 logger.removeHandler(h)
                 to_close.add(h)
         logger.addHandler(handler)
