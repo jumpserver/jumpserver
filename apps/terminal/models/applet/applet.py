@@ -11,7 +11,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
-from assets.models import Platform
+from assets.models import Platform, PlatformPackage
+from assets.utils.platform_package import (
+    locate_package_root,
+)
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
 from common.utils.yml import yaml_load_with_i18n
@@ -93,8 +96,8 @@ class Applet(JMSBaseModel):
             return None
         return os.path.join(settings.MEDIA_URL, 'applets', self.name, 'icon.png')
 
-    @staticmethod
-    def validate_pkg(d):
+    @classmethod
+    def validate_pkg(cls, d):
         files = ['manifest.yml', 'icon.png', 'setup.yml']
         for name in files:
             path = os.path.join(d, name)
@@ -106,42 +109,45 @@ class Applet(JMSBaseModel):
 
         if not manifest.get('name', ''):
             raise ValidationError({'error': 'Missing name in manifest.yml'})
+        has_platform = PlatformPackage.source_exists(d)
+        methods = PlatformPackage.load_automation_methods(d)
+        if methods and not has_platform:
+            raise ValidationError({
+                'error': _('Applet automation requires platform.yml')
+            })
+        if has_platform:
+            PlatformPackage.validate(d)
         return manifest
 
+    @staticmethod
+    def locate_pkg_root(extract_to, filename):
+        return locate_package_root(extract_to, filename, 'manifest.yml')
+
     def load_platform_if_need(self, d):
-        from assets.serializers import PlatformSerializer
-        from assets.const import CustomTypes
-
-        if not os.path.exists(os.path.join(d, 'platform.yml')):
+        if not PlatformPackage.source_exists(d):
             return
-        try:
-            with open(os.path.join(d, 'platform.yml'), encoding='utf8') as f:
-                data = yaml_load_with_i18n(f)
-        except Exception as e:
-            raise ValidationError({'error': _('Load platform.yml failed: {}').format(e)})
-
-        if data['category'] != 'custom':
-            raise ValidationError({'error': _('Only support custom platform')})
-
-        try:
-            tp = data['type']
-        except KeyError:
-            raise ValidationError({'error': _('Missing type in platform.yml')})
-
-        if not data.get('automation'):
-            data['automation'] = CustomTypes._get_automation_constrains()['*']
-
         created_by = 'Applet:{}'.format(self.name)
         instance = self.get_related_platform()
-        s = PlatformSerializer(data=data, instance=instance)
-        s.add_type_choices(tp, tp)
-        s.is_valid(raise_exception=True)
-        p = s.save()
-        p.created_by = created_by
-        p.save(update_fields=['created_by'])
+        platform = PlatformPackage.sync_platform(
+            d, instance=instance, created_by=created_by
+        )
+
+        # Applet is only the delivery vehicle. Once it contains automation,
+        # persist it as a PlatformPackage and load methods from that package.
+        methods = PlatformPackage.load_automation_methods(d)
+        package = platform.package
+        if not methods and package is None:
+            return platform
+        if package is None:
+            package = PlatformPackage.objects.create(name=platform.name)
+            platform.package = package
+            platform.save(update_fields=['package'])
+        package.persist(d)
+        return platform
 
     @classmethod
     def install_from_dir(cls, path, builtin=True):
+        from assets.const import AllTypes
         from terminal.serializers import AppletSerializer
 
         manifest = cls.validate_pkg(path)
@@ -156,6 +162,7 @@ class Applet(JMSBaseModel):
         if os.path.exists(pkg_path):
             shutil.rmtree(pkg_path)
         shutil.copytree(path, pkg_path)
+        AllTypes.reload_automation_methods()
         return instance, serializer
 
     host_prefer_key_tpl = 'applet_host_prefer_{}'

@@ -3,8 +3,8 @@
 import json
 from typing import Callable
 
-from django.db import models
-from django.db.models import Prefetch, Q
+from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.fields import related
 from django.db.utils import IntegrityError
 from django.forms import model_to_dict
@@ -23,7 +23,7 @@ from tickets.const import (
     TicketType, TicketStatus, TicketState,
     TicketLevel, StepState, StepStatus
 )
-from tickets.errors import AlreadyClosed
+from tickets.errors import AlreadyClosed, TicketStateChanged
 from tickets.handlers import get_ticket_handler
 from ..flow import TicketFlow
 
@@ -133,6 +133,7 @@ class StatusMixin:
         self._change_state_by_applicant(TicketState.pending)
 
     def open(self):
+        self.cc_users.set(self.flow.cc_users.all())
         self.create_process_steps_by_flow()
         self._open()
 
@@ -141,8 +142,9 @@ class StatusMixin:
         self._open()
 
     def approve(self, processor):
-        self.set_rel_snapshot()
-        self._change_state(StepState.approved, processor)
+        self._change_state(
+            StepState.approved, processor, update_rel_snapshot=True
+        )
 
     def reject(self, processor):
         self._change_state(StepState.rejected, processor)
@@ -162,12 +164,29 @@ class StatusMixin:
         self.save(update_fields=['state', 'status'])
         self.handler.on_change_state(state)
 
-    def _change_state(self, state, processor):
-        if self.is_status(self.Status.closed):
-            raise AlreadyClosed
-        current_step = self.current_step
-        current_step.change_state(state, processor)
-        self._finish_or_next(current_step, state)
+    def _change_state(self, state, processor, update_rel_snapshot=False):
+        with transaction.atomic():
+            locked_ticket = self.__class__.objects.select_for_update().only(
+                'state', 'status', 'approval_step'
+            ).get(pk=self.pk)
+            self.state = locked_ticket.state
+            self.status = locked_ticket.status
+            self.approval_step = locked_ticket.approval_step
+
+            if self.is_status(self.Status.closed):
+                raise AlreadyClosed
+
+            is_assignee_action = state in (StepState.approved, StepState.rejected)
+            if is_assignee_action and not self.has_current_assignee(processor):
+                if self.has_all_assignee(processor):
+                    raise TicketStateChanged
+                raise PermissionError('Only assignees can do this')
+
+            if update_rel_snapshot:
+                self.set_rel_snapshot()
+            current_step = self.current_step
+            current_step.change_state(state, processor)
+            self._finish_or_next(current_step, state)
 
     def _finish_or_next(self, current_step, state):
         next_step = current_step.next()
@@ -193,7 +212,13 @@ class StatusMixin:
             processor_display = ''
             assignees_display = []
             state = step.state
-            for i in step.ticket_assignees.all().prefetch_related('assignee'):
+            prefetched = getattr(step, '_prefetched_objects_cache', {})
+            if 'ticket_assignees' in prefetched:
+                ticket_assignees = step.ticket_assignees.all()
+            else:
+                ticket_assignees = step.ticket_assignees.select_related('assignee')
+
+            for i in ticket_assignees:
                 assignee_id = i.assignee_id
                 assignee_display = str(i.assignee)
 
@@ -288,6 +313,10 @@ class Ticket(StatusMixin, JMSBaseModel):
         'users.User', related_name='applied_tickets', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Applicant")
     )
+    cc_users = models.ManyToManyField(
+        'users.User', related_name='cc_tickets', blank=True,
+        verbose_name=_('CC users')
+    )
     flow = models.ForeignKey(
         'TicketFlow', related_name='tickets', null=True,
         on_delete=models.SET_NULL, verbose_name=_('TicketFlow')
@@ -343,15 +372,12 @@ class Ticket(StatusMixin, JMSBaseModel):
 
     @classmethod
     def get_user_related_tickets(cls, user):
-        queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
-        # TODO: 与 StatusMixin.process_map 内连表查询有部分重叠 有优化空间 待验证排除是否不影响其它调用
-        prefetch_ticket_assignee = Prefetch('ticket_steps__ticket_assignees',
-                                            queryset=TicketAssignee.objects.select_related('assignee'), )
-        tickets = cls.objects.prefetch_related(prefetch_ticket_assignee) \
-            .select_related('applicant') \
-            .filter(queries) \
-            .distinct()
-        return tickets
+        queries = (
+            Q(applicant=user) |
+            Q(ticket_steps__ticket_assignees__assignee=user) |
+            Q(cc_users=user)
+        )
+        return cls.objects.filter(queries).distinct()
 
     def get_current_ticket_flow_approve(self):
         return self.flow.rules.filter(level=self.approval_step).first()

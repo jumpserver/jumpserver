@@ -112,9 +112,10 @@ class AccountBackupType(models.TextChoices):
 
 
 class ChangeSecretRecordStatusChoice(models.TextChoices):
-    failed = 'failed', _('Failed')
     success = 'success', _('Success')
+    failed = 'failed', _('Failed')
     pending = 'pending', _('Pending')
+    unverified = 'unverified', _('Unverified')
 
 
 class ChangeSecretAccountStatus(models.TextChoices):

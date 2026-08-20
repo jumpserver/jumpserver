@@ -22,9 +22,9 @@ AnsibleUnsafeDumper.add_representer(
 
 def translate(key, i18n, lang):
     lang = settings.LANGUAGE_CODE if lang is None else lang
-    lang = lang[:2]
+    lang = lang.lower().replace('_', '-')
     lang_data = i18n.get(key, {})
-    return lang_data.get(lang, key)
+    return lang_data.get(lang, lang_data.get(lang.split('-')[0], key))
 
 
 def yaml_load_with_i18n(stream, lang=None):

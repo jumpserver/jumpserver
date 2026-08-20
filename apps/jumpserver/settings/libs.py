@@ -48,7 +48,7 @@ REST_FRAMEWORK = {
         'file_transfer': CONFIG.THROTTLE_FILE_TRANSFER,
     },
     'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
+        'common.drf.filters.LookupFilterBackend',
         'common.drf.filters.SearchFilter',
         'common.drf.filters.RewriteOrderingFilter',
     ),

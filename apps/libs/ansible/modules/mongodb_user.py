@@ -29,6 +29,11 @@ options:
     required: true
     type: str
     aliases: [db]
+  role_database:
+    description:
+      - Database on which string-form roles apply.
+      - Defaults to C(database).
+    type: str
   name:
     description:
       - The name of the user to add or remove.
@@ -199,6 +204,9 @@ from ansible_collections.community.mongodb.plugins.module_utils.mongodb_common i
     pymongo_found,
     get_mongodb_client,
 )
+from libs.ansible.modules_utils.mongodb_client import (
+    get_authenticated_mongodb_client,
+)
 
 
 def user_find(client, user, db_name):
@@ -230,7 +238,22 @@ def user_find(client, user, db_name):
     return False
 
 
-def user_add(module, client, db_name, user, password, roles):
+def normalize_roles(roles, role_database):
+    normalized = []
+    for role in roles:
+        if isinstance(role, (binary_type, text_type)):
+            role = role.strip()
+            if not role:
+                continue
+            normalized.append({'role': role, 'db': role_database})
+        else:
+            normalized.append(role)
+    return normalized
+
+
+def user_add(
+        module, client, db_name, role_database, user, password, roles
+):
     # pymongo's user_add is a _create_or_update_user so we won't know if it was changed or updated
     # without reproducing a lot of the logic in database.py of pymongo
     db = client[db_name]
@@ -253,13 +276,15 @@ def user_add(module, client, db_name, user, password, roles):
             roles = None
     else:
         user_add_db_command = 'createUser'
+        if not roles:
+            roles = module.params['create_roles']
 
     user_dict = {}
 
     if password is not None:
         user_dict["pwd"] = password
     if roles is not None:
-        user_dict["roles"] = roles
+        user_dict["roles"] = normalize_roles(roles, role_database)
 
     db.command(user_add_db_command, user, **user_dict)
 
@@ -275,7 +300,7 @@ def user_remove(module, client, db_name, user):
         module.exit_json(changed=False, user=user)
 
 
-def check_if_roles_changed(uinfo, roles, db_name):
+def check_if_roles_changed(uinfo, roles, role_database):
     # We must be aware of users which can read the oplog on a replicaset
     # Such users must have access to the local DB, but since this DB does not store users credentials
     # and is not synchronized among replica sets, the user must be stored on the admin db
@@ -292,17 +317,7 @@ def check_if_roles_changed(uinfo, roles, db_name):
     #     ]
     # }
 
-    def make_sure_roles_are_a_list_of_dict(roles, db_name):
-        output = list()
-        for role in roles:
-            if isinstance(role, (binary_type, text_type)):
-                new_role = {"role": role, "db": db_name}
-                output.append(new_role)
-            else:
-                output.append(role)
-        return output
-
-    roles_as_list_of_dict = make_sure_roles_are_a_list_of_dict(roles, db_name)
+    roles_as_list_of_dict = normalize_roles(roles, role_database)
     uinfo_roles = uinfo.get('roles', [])
 
     if sorted(roles_as_list_of_dict, key=itemgetter('db')) == sorted(uinfo_roles, key=itemgetter('db')):
@@ -318,10 +333,14 @@ def main():
     argument_spec = mongodb_common_argument_spec()
     argument_spec.update(
         database=dict(required=True, aliases=['db']),
+        role_database=dict(required=False, default=None),
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),
         replica_set=dict(default=None),
         roles=dict(default=None, type='list', elements='raw'),
+        create_roles=dict(
+            default=['readWrite'], type='list', elements='raw'
+        ),
         state=dict(default='present', choices=['absent', 'present']),
         update_password=dict(default="always", choices=["always", "on_create"], no_log=False),
         create_for_localhost_exception=dict(default=None, type='path'),
@@ -347,6 +366,7 @@ def main():
     )
 
     db_name = module.params['database']
+    role_database = module.params['role_database'] or db_name
     user = module.params['name']
     password = module.params['password']
     roles = module.params['roles'] or []
@@ -355,10 +375,15 @@ def main():
 
     try:
         directConnection = False
-        if module.params['replica_set'] is None:
-            directConnection = True
-        client = get_mongodb_client(module, directConnection=directConnection)
-        client = mongo_auth(module, client, directConnection=directConnection)
+        if module.params['login_user']:
+            client = get_authenticated_mongodb_client(module)
+        else:
+            client = get_mongodb_client(
+                module, directConnection=directConnection
+            )
+            client = mongo_auth(
+                module, client, directConnection=directConnection
+            )
     except Exception as e:
         module.fail_json(msg='Unable to connect to database: %s' % to_native(e))
 
@@ -379,12 +404,17 @@ def main():
                 uinfo = user_find(client, user, db_name)
                 if uinfo:
                     password = None
-                    if not check_if_roles_changed(uinfo, roles, db_name):
+                    if not check_if_roles_changed(
+                            uinfo, roles, role_database
+                    ):
                         module.exit_json(changed=False, user=user)
 
             if module.check_mode:
                 module.exit_json(changed=True, user=user)
-            user_add(module, client, db_name, user, password, roles)
+            user_add(
+                module, client, db_name, role_database,
+                user, password, roles
+            )
         except Exception as e:
             module.fail_json(msg='Unable to add or update user: %s' % to_native(e), exception=traceback.format_exc())
         finally:

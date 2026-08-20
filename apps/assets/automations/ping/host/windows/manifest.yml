@@ -13,3 +13,9 @@ i18n:
     zh: 使用 Ansible 模块 内置模块 win_ping 来测试可连接性
     en: Use Ansible builtin module win_ping to test Windows
     ja: Ansible 組み込みモジュール win_ping を使用してテストする Windows
+    es: Usar el módulo Ansible win_ping para probar Windows
+    ko: Ansible win_ping 모듈을 사용하여 테스트 Windows
+    pt-br: Usar o módulo Ansible win_ping para testar Windows
+    ru: Использовать модуль Ansible win_ping, чтобы проверить Windows
+    vi: Sử dụng mô-đun Ansible win_ping để kiểm tra Windows
+    zh-hant: 使用 Ansible 模組 內建模組 win_ping 來測試可連線性

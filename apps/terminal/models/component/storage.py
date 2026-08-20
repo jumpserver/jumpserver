@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
 import copy
-import os
 from importlib import import_module
+from tempfile import NamedTemporaryFile
+from uuid import uuid4
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -199,9 +199,11 @@ class ReplayStorage(CommonStorageModelMixin, JMSBaseModel):
         if self.type_null_or_server:
             return True
         storage = jms_storage.get_object_storage(self.config)
-        target = "tests.py"
-        src = os.path.join(settings.BASE_DIR, "common", target)
-        return storage.is_valid(src, target)
+        target = f'jms-storage-test-{uuid4().hex}.txt'
+        with NamedTemporaryFile(mode='wb', prefix='jms-storage-test-', suffix='.txt') as src:
+            src.write(b'JumpServer storage connectivity test')
+            src.flush()
+            return storage.is_valid(src.name, target)
 
     def used_by(self):
         return Terminal.objects.filter(

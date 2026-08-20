@@ -23,7 +23,10 @@ class PushAccountAutomationViewSet(OrgBulkModelViewSet):
     model = PushAccountAutomation
     filterset_fields = ('name', 'secret_type', 'secret_strategy')
     search_fields = filterset_fields
-    serializer_class = serializers.PushAccountAutomationSerializer
+    serializer_classes = {
+        'default': serializers.PushAccountAutomationSerializer,
+        'list': serializers.PushAccountAutomationListSerializer,
+    }
 
 
 class PushAccountExecutionViewSet(AutomationExecutionViewSet):

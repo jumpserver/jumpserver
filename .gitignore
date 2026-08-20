@@ -50,3 +50,6 @@ apps.iml
 *.mmdb
 *.ipdb
 context
+luna
+lina
+.envrc

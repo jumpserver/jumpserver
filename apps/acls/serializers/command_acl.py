@@ -10,7 +10,10 @@ from terminal.models import Session
 from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
 from ..const import ActionChoices
 
-__all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer", "CommandReviewSerializer"]
+__all__ = [
+    "CommandFilterACLSerializer", "CommandFilterACLListSerializer",
+    "CommandGroupSerializer", "CommandReviewSerializer",
+]
 
 
 class CommandGroupSerializer(BulkOrgResourceModelSerializer):
@@ -28,15 +31,32 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     command_groups = ObjectRelatedField(
         queryset=CommandGroup.objects, many=True, required=False, label=_('Command group')
     )
+    command_groups_amount = serializers.IntegerField(
+        read_only=True, label=_('Command group')
+    )
 
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
-        fields = BaseSerializer.Meta.fields + ['command_groups']
+        relation_count_fields = {
+            'command_groups_amount': 'command_groups',
+        }
+        amount_fields = list(relation_count_fields)
+        fields = BaseSerializer.Meta.fields + ['command_groups'] + amount_fields
         action_choices_exclude = [
             ActionChoices.notice,
             ActionChoices.face_verify,
             ActionChoices.face_online,
             ActionChoices.change_secret
+        ]
+
+
+class CommandFilterACLListSerializer(CommandFilterACLSerializer):
+    class Meta(CommandFilterACLSerializer.Meta):
+        fields = [
+            field for field in CommandFilterACLSerializer.Meta.fields
+            if field not in [
+                'command_groups', 'assets', 'accounts', 'reviewers', 'users'
+            ]
         ]
 
 

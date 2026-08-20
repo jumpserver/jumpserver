@@ -327,7 +327,7 @@ class User(
     def set_ukey_sn(self, ukey_sn):
         if not isinstance(ukey_sn, str):
             return
-        self.ukey_sn = ukey_sn.strip()
+        self.ukey_sn = ukey_sn.strip() or None
         self.save(update_fields=['ukey_sn'])
 
 

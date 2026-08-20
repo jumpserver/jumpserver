@@ -1,3 +1,4 @@
+from accounts.exceptions import VaultSecretNotFoundException
 from common.utils import get_logger
 
 
@@ -12,6 +13,12 @@ class GeneralVaultMixin(object):
 
     def _get(self, entry):
         secret = self.client.get(name=entry.full_path)
+        return entry.get_decrypt_secret(secret)
+
+    def _get_for_restore(self, entry):
+        secret = self.client.get(name=entry.full_path, strict=True)
+        if secret is None:
+            raise VaultSecretNotFoundException()
         return entry.get_decrypt_secret(secret)
 
     def _create(self, entry):

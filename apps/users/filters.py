@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
@@ -11,27 +11,50 @@ from users.models.user import User
 
 
 class UserFilter(BaseFilterSet):
-    system_roles = filters.CharFilter(method='filter_system_roles')
-    org_roles = filters.CharFilter(method='filter_org_roles')
-    groups = filters.CharFilter(field_name="groups__name", lookup_expr='exact')
-    group_id = filters.CharFilter(field_name="groups__id", lookup_expr='exact')
-    exclude_group_id = filters.CharFilter(
-        field_name="groups__id", lookup_expr='exact', exclude=True
+    email = filters.CharFilter(method='filter_email', label=_('Email'))
+    groups = filters.CharFilter(
+        field_name="groups__name", lookup_expr='iexact',
+        label=_('User group name')
     )
-    is_expired = filters.BooleanFilter(method='filter_is_expired')
-    is_valid = filters.BooleanFilter(method='filter_is_valid')
-    is_password_expired = filters.BooleanFilter(method='filter_is_password_expired')
-    is_long_time_no_login = filters.BooleanFilter(method='filter_long_time')
-    is_login_blocked = filters.BooleanFilter(method='filter_is_blocked')
-    email = filters.CharFilter(method='filter_email')
+    group_id = filters.CharFilter(
+        field_name="groups__id", label=_('User group ID')
+    )
+    exclude_group_id = filters.CharFilter(
+        field_name="groups__id", exclude=True,
+        label=_('Exclude user group ID')
+    )
+    system_roles = filters.CharFilter(
+        method='filter_system_roles', label=_('System role name or ID')
+    )
+    org_roles = filters.CharFilter(
+        method='filter_org_roles', label=_('Org role name or ID')
+    )
+    is_expired = filters.BooleanFilter(
+        method='filter_is_expired', label=_('Is expired')
+    )
+    is_valid = filters.BooleanFilter(
+        method='filter_is_valid', label=_('Is valid')
+    )
+    is_password_expired = filters.BooleanFilter(
+        method='filter_is_password_expired', label=_('Password expired')
+    )
+    is_long_time_no_login = filters.BooleanFilter(
+        method='filter_long_time', label=_('Long time no login')
+    )
+    is_login_blocked = filters.BooleanFilter(
+        method='filter_is_blocked', label=_('Login blocked')
+    )
 
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'name', 'ukey_sn',
-            'groups', 'group_id', 'exclude_group_id',
-            'source', 'org_roles', 'system_roles',
-            'is_active', 'is_first_login', 'mfa_level'
+            'id', 'name', 'username', 'email',
+            'system_roles', 'org_roles', 'groups', 'source',
+            'mfa_level',
+            'is_active', 'is_valid', 'is_expired', 'is_login_blocked',
+            'group_id', 'exclude_group_id',
+            'is_password_expired', 'is_long_time_no_login', 'is_first_login',
+            'ukey_sn',
         )
 
     def filter_email(self, queryset, name, value):
@@ -104,7 +127,7 @@ class UserFilter(BaseFilterSet):
         from rbac.builtin import BuiltinRole
         roles = BuiltinRole.get_roles()
         for role in roles.values():
-            if _(role.name) == value:
+            if gettext(role.name) == value:
                 return role
 
         if is_uuid(value):

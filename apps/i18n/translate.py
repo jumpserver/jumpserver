@@ -1,23 +1,27 @@
 import asyncio
 import os
 
-from _translator.const import LOCALE_DIR, RED
+from _translator.const import LOCALE_DIR, RED, RESET
 from _translator.core import CoreTranslateManager
 from _translator.other import OtherTranslateManager
 from _translator.utils import build_translator
 
 
 class Translate:
-    IGNORE_TRANSLATE_DIRS = ('translate',)
+    IGNORE_TRANSLATE_DIRS = ('_translator', '__pycache__')
 
     def __init__(self, oai_trans_instance):
         self.oai_trans = oai_trans_instance
 
     def get_dir_names(self):
         dir_names = []
-        for name in os.listdir(LOCALE_DIR):
+        for name in sorted(os.listdir(LOCALE_DIR)):
             _path = os.path.join(LOCALE_DIR, name)
-            if not os.path.isdir(_path) or name in self.IGNORE_TRANSLATE_DIRS:
+            if (
+                not os.path.isdir(_path)
+                or name.startswith('_')
+                or name in self.IGNORE_TRANSLATE_DIRS
+            ):
                 continue
             dir_names.append(name)
         return dir_names
@@ -26,7 +30,7 @@ class Translate:
         _dir = os.path.join(LOCALE_DIR, dir_name)
         zh_file = os.path.join(_dir, 'zh', 'LC_MESSAGES', 'django.po')
         if not os.path.exists(zh_file):
-            print(f'{RED}File: {zh_file} not exists.{RED}')
+            print(f'{RED}File does not exist: {zh_file}{RESET}')
             return
 
         await CoreTranslateManager(_dir, self.oai_trans).run()
@@ -35,7 +39,7 @@ class Translate:
         _dir = os.path.join(LOCALE_DIR, dir_name)
         zh_file = os.path.join(_dir, 'zh.json')
         if not os.path.exists(zh_file):
-            print(f'{RED}File: {zh_file} not exists.{RED}\n')
+            print(f'{RED}File does not exist: {zh_file}{RESET}\n')
             return
 
         await OtherTranslateManager(_dir, self.oai_trans).run()
@@ -46,12 +50,8 @@ class Translate:
             return
 
         for dir_name in dir_names:
-            if dir_name.startswith('_'):
-                continue
-            if hasattr(self, f'{dir_name}_trans'):
-                await getattr(self, f'{dir_name}_trans')(dir_name)
-            else:
-                await self.other_trans(dir_name)
+            handler = getattr(self, f'{dir_name}_trans', self.other_trans)
+            await handler(dir_name)
 
 
 if __name__ == '__main__':

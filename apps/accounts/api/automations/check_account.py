@@ -22,8 +22,14 @@ from common.permissions import IsValidLicense
 from common.utils import many_get
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
-from .base import AutomationExecutionViewSet
-from ...filters import NodeFilterBackend
+from .base import (
+    AutomationExecutionViewSet, AutomationAssetsListApi, AutomationRemoveAssetApi,
+    AutomationAddAssetApi, AutomationNodeAddRemoveApi
+)
+from ...filters import (
+    AccountRiskFilterSet, CheckAccountAutomationFilterSet,
+    NodeFilterBackend,
+)
 from ...risk_handlers import RiskHandler
 
 __all__ = [
@@ -31,15 +37,20 @@ __all__ = [
     "CheckAccountExecutionViewSet",
     "AccountRiskViewSet",
     "CheckAccountEngineViewSet",
+    "CheckAccountAssetsListApi", "CheckAccountRemoveAssetApi",
+    "CheckAccountAddAssetApi", "CheckAccountNodeAddRemoveApi",
 ]
 
 
 class CheckAccountAutomationViewSet(OrgBulkModelViewSet):
     model = CheckAccountAutomation
-    filterset_fields = ("name",)
-    search_fields = filterset_fields
+    filterset_class = CheckAccountAutomationFilterSet
+    search_fields = ("name",)
     permission_classes = [RBACPermission, IsValidLicense]
-    serializer_class = serializers.CheckAccountAutomationSerializer
+    serializer_classes = {
+        'default': serializers.CheckAccountAutomationSerializer,
+        'list': serializers.CheckAccountAutomationListSerializer,
+    }
 
 
 class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
@@ -84,7 +95,7 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
 class AccountRiskViewSet(OrgBulkModelViewSet):
     model = AccountRisk
     search_fields = ["username", "asset__name"]
-    filterset_fields = ("risk", "status", "asset_id")
+    filterset_class = AccountRiskFilterSet
     extra_filter_backends = [NodeFilterBackend]
     permission_classes = [RBACPermission, IsValidLicense]
     serializer_classes = {
@@ -160,6 +171,22 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
         if search is not None:
             queryset = [
                 item for item in queryset
-                if search in item['name']
+                if search in item['name'] or item['comment']
             ]
         return queryset
+
+
+class CheckAccountAssetsListApi(AutomationAssetsListApi):
+    model = CheckAccountAutomation
+
+
+class CheckAccountRemoveAssetApi(AutomationRemoveAssetApi):
+    model = CheckAccountAutomation
+
+
+class CheckAccountAddAssetApi(AutomationAddAssetApi):
+    model = CheckAccountAutomation
+
+
+class CheckAccountNodeAddRemoveApi(AutomationNodeAddRemoveApi):
+    model = CheckAccountAutomation

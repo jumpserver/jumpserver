@@ -67,11 +67,14 @@ def check_password_expired_periodic():
     verbose_name=_('Check user expired'),
     description=_(
         """Check every day at 2 p.m whether the users in the system are expired, and send a 
-        notification 5 days in advance"""
+        notification in advance"""
     )
 )
 def check_user_expired():
-    date_expired_lt = timezone.now() + timezone.timedelta(days=User.DATE_EXPIRED_WARNING_DAYS)
+    first_notice_days = settings.USER_EXPIRED_FIRST_NOTICE_DAYS
+    daily_notice_days = settings.USER_EXPIRED_DAILY_NOTICE_DAYS
+    today = timezone.localdate()
+    date_expired_lt = timezone.now() + timezone.timedelta(days=first_notice_days + 1)
     users = User.get_nature_users() \
         .filter(source=User.Source.local) \
         .filter(date_expired__lt=date_expired_lt)
@@ -79,10 +82,16 @@ def check_user_expired():
     for user in users:
         if not user.is_valid:
             continue
-        if not user.will_expired:
+        date_expired = timezone.localtime(user.date_expired).date()
+        remain_days = (date_expired - today).days
+        should_notify = (
+            remain_days == first_notice_days
+            or 0 <= remain_days <= daily_notice_days
+        )
+        if not should_notify:
             continue
         msg = "The user {} will expires in {} days"
-        logger.info(msg.format(user, user.expired_remain_days))
+        logger.info(msg.format(user, remain_days))
         UserExpirationReminderMsg(user).publish_async()
 
 

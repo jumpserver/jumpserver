@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 postgresql_user 删除账号
     ja: Ansible モジュール postgresql_user を使用してアカウントを削除します
     en: Use the Ansible module postgresql_user to delete the account
+    es: Usar el módulo Ansible postgresql_user para eliminar la cuenta
+    ko: Ansible postgresql_user 모듈을 사용하여 계정 삭제
+    pt-br: Usar o módulo Ansible postgresql_user para excluir a conta
+    ru: Использовать модуль Ansible postgresql_user, чтобы удалить учетную запись
+    vi: Sử dụng mô-đun Ansible postgresql_user để xóa tài khoản
+    zh-hant: 使用 Ansible 模組 postgresql_user 刪除帳號

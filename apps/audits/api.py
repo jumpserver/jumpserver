@@ -37,7 +37,12 @@ from tickets.serializers.ticket import TicketSerializer
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices, ActionChoices
-from .filters import UserSessionFilterSet, OperateLogFilterSet
+from .filters import (
+    FTPLogFilterSet, JobLogFilterSet, OperateLogFilterSet,
+    JobsAuditFilterSet,
+    PasswordChangeLogFilterSet, ServiceAccessLogFilterSet,
+    UserLoginLogFilterSet, UserSessionFilterSet,
+)
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession, IntegrationApplicationLog
@@ -61,23 +66,30 @@ logger = get_logger(__name__)
 
 class JobLogAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = JobLog
+    filterset_class = JobLogFilterSet
     report_exporter_class = JobLogAuditReportExporter
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
     search_fields = ['creator__name', 'material']
-    filterset_fields = ['creator__name', 'material']
     serializer_class = JobLogSerializer
+    ordering_fields = [
+        'material', 'job_type', 'date_start', 'date_finished',
+    ]
     ordering = ['-date_start']
 
 
 class JobsAuditViewSet(ReportExportMixin, OrgModelViewSet):
     model = Job
     search_fields = ['creator__name', 'args', 'name']
-    filterset_fields = ['creator__name', 'args', 'name']
+    filterset_class = JobsAuditFilterSet
     serializer_class = JobsAuditSerializer
     report_exporter_class = JobsAuditReportExporter
+    ordering_fields = [
+        'name', 'args', 'type', 'crontab', 'interval', 'created_by',
+        'is_periodic',
+    ]
     ordering = ['-is_periodic', '-date_updated']
     http_method_names = ['get', 'options', 'patch']
 
@@ -110,8 +122,11 @@ class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['id', 'user', 'asset', 'account', 'filename', 'session']
-    search_fields = filterset_fields
+    filterset_class = FTPLogFilterSet
+    search_fields = [
+        'id', 'user', 'asset', 'account', 'filename', 'remote_addr',
+        'session',
+    ]
     ordering = ['-date_start']
     http_method_names = ['post', 'get', 'head', 'options', 'patch']
     rbac_perms = {
@@ -175,8 +190,10 @@ class UserLoginCommonMixin(ReportExportMixin):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['id', 'username', 'ip', 'city', 'type', 'status', 'mfa']
-    search_fields = ['id', 'username', 'ip', 'city']
+    filterset_class = UserLoginLogFilterSet
+    search_fields = [
+        'id', 'username', 'ip', 'city', 'user_agent',
+    ]
 
 
 class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
@@ -227,7 +244,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
     @staticmethod
     def get_activity_log_qs(fields, limit, org_q, **filters):
         queryset = ActivityLog.objects.filter(org_q, **filters).annotate(
-            r_type=F('type'), r_detail_id=F('detail_id'),
+            r_type=F('type'), r_detail_id=Cast(F('detail_id'), CharField()),
             r_detail=F('detail'), r_user=Value(None, CharField()),
             r_action=Value(None, CharField()),
         ).values(*fields)[:limit]
@@ -308,8 +325,8 @@ class PasswordChangeLogViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'change_by', 'remote_addr']
-    search_fields = filterset_fields
+    filterset_class = PasswordChangeLogFilterSet
+    search_fields = ['id', 'user', 'change_by', 'remote_addr']
     ordering = ['-datetime']
 
     def get_queryset(self):
@@ -322,6 +339,10 @@ class TicketAuditViewSet(OrgReadonlyModelViewSet):
     serializer_class = TicketSerializer
     filterset_class = TicketFilter
     search_fields = ['title', 'type', 'status']
+    ordering_fields = [
+        'title', 'serial_num', 'type', 'state', 'status', 'applicant',
+        'date_created',
+    ]
     ordering = ('-date_created',)
     permission_classes = [RBACPermission]
     rbac_perms = {
@@ -340,7 +361,10 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'head', 'options', 'trace')
     serializer_class = UserSessionSerializer
     filterset_class = UserSessionFilterSet
-    search_fields = ['id', 'ip', 'city']
+    search_fields = [
+        'id', 'user__name', 'user__username', 'ip', 'city',
+        'backend', 'user_agent',
+    ]
     rbac_perms = {
         'offline': ['audits.offline_usersession']
     }
@@ -378,10 +402,11 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
 class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
     model = IntegrationApplicationLog
     serializer_class = ServiceAccessLogSerializer
+    filterset_class = ServiceAccessLogFilterSet
     extra_filter_backends = [DatetimeRangeFilterBackend]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['account', 'remote_addr', 'service_id']
-    search_fields = filterset_fields
+    search_fields = ('service', 'asset', 'account', 'remote_addr')
+    ordering_fields = ('datetime',)
     ordering = ['-datetime']

@@ -9,3 +9,10 @@ i18n:
   PostgreSQL account change secret:
     zh: PostgreSQL 账号改密
     ja: PostgreSQL アカウントのパスワード変更
+    en: PostgreSQL account change secret
+    es: Cambio de contraseña de la cuenta PostgreSQL
+    ko: PostgreSQL 계정 비밀번호 변경
+    pt-br: Alteração da senha da conta PostgreSQL
+    ru: Смена пароля учетной записи PostgreSQL
+    vi: Đổi mật khẩu tài khoản PostgreSQL
+    zh-hant: PostgreSQL 帳號改密

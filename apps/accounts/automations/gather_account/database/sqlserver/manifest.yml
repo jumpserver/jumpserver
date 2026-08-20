@@ -8,3 +8,10 @@ i18n:
   SQLServer account gather:
     zh: SQLServer 账号收集
     ja: SQLServer アカウントの収集
+    en: SQLServer account gather
+    es: Recopilación de cuentas de SQLServer
+    ko: SQLServer 계정 수집
+    pt-br: Coleta de contas SQLServer
+    ru: Сбор учетных записей SQLServer
+    vi: Thu thập tài khoản SQLServer
+    zh-hant: SQLServer 帳號收集

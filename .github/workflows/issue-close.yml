@@ -15,6 +15,7 @@ jobs:
       - name: Remove labels
         run: |
           gh issue edit "${{ github.event.issue.number }}" \
+            --repo "${{ github.repository }}" \
             --remove-label "🔔 Pending processing" \
             --remove-label "⏳ Pending feedback"
         env:

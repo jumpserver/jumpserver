@@ -284,7 +284,12 @@ class Config(dict):
 
         # Vault
         'VAULT_ENABLED': False,
-        'VAULT_BACKEND': 'local',
+        'VAULT_BACKEND': 'openbao',
+
+        'VAULT_OPENBAO_ADDR': 'http://openbao:8200',
+        'VAULT_OPENBAO_TOKEN': '',
+        'VAULT_OPENBAO_MOUNT_POINT': 'pam',
+        'VAULT_OPENBAO_TIMEOUT': 10,
 
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
@@ -570,6 +575,8 @@ class Config(dict):
 
         # Email
         'EMAIL_PROTOCOL': 'smtp',
+        'EMAIL_CERT_VERIFY_MODE': 'system',
+        'EMAIL_CACERT_CONTENT': '',
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
         'EMAIL_CUSTOM_USER_CREATED_BODY': _('Your account has been created successfully'),
@@ -664,6 +671,22 @@ class Config(dict):
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
         'CELERY_WORKER_COUNT': 10,
+        # Per Ansible batch. Prevent a blocked remote operation from occupying
+        # a Celery thread forever. Set to 0 to disable.
+        'ANSIBLE_RUNNER_JOB_TIMEOUT': 1800,
+        'ANSIBLE_RUNNER_IDLE_TIMEOUT': 900,
+        # Log hosts that have not returned from their current Ansible task.
+        # Cap each host action first, then the complete automation across all
+        # 80-host batches. An explicit YAML task timeout takes precedence.
+        'ANSIBLE_STALL_LOG_INTERVAL': 60,
+        'ANSIBLE_AUTOMATION_TASK_TIMEOUT': 300,
+        'ANSIBLE_AUTOMATION_TOTAL_TIMEOUT': 21600,
+        # Bound SSH gateway TCP connect, handshake and authentication.
+        # Set to 0 to retain sshtunnel's built-in timeout behavior.
+        'SSH_GATEWAY_CONNECT_TIMEOUT': 30,
+        # Emit redacted, structured diagnostics from remote_client. Intended
+        # for temporary troubleshooting only.
+        'JMS_REMOTE_CLIENT_DEBUG': False,
 
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
@@ -671,9 +694,28 @@ class Config(dict):
 
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'PERM_EXPIRED_NOTICE_DAYS': 3,
+        'USER_EXPIRED_FIRST_NOTICE_DAYS': 5,
+        'USER_EXPIRED_DAILY_NOTICE_DAYS': 5,
+        'PERM_EXPIRED_FIRST_NOTICE_DAYS': 3,
+        'PERM_EXPIRED_DAILY_NOTICE_DAYS': 3,
         'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
+        # Luna user preference defaults
+        'LUNA_DEFAULT_IS_ASYNC_ASSET_TREE': True,
+        'LUNA_DEFAULT_CONNECT_DEFAULT_OPEN_METHOD': 'current',
+        'LUNA_DEFAULT_THEMES': 'default',
+        'LUNA_DEFAULT_RDP_RESOLUTION': 'auto',
+        'LUNA_DEFAULT_KEYBOARD_LAYOUT': 'en-us-qwerty',
+        'LUNA_DEFAULT_RDP_CLIENT_OPTION': ['full_screen'],
+        'LUNA_DEFAULT_RDP_COLOR_QUALITY': '32',
+        'LUNA_DEFAULT_RDP_SMART_SIZE': '0',
+        'LUNA_DEFAULT_APPLET_CONNECTION_METHOD': 'web',
+        'LUNA_DEFAULT_FILE_NAME_CONFLICT_RESOLUTION': 'replace',
+        'LUNA_DEFAULT_CHARACTER_TERMINAL_FONT_SIZE': 14,
+        'LUNA_DEFAULT_IS_BACKSPACE_AS_CTRL_H': False,
+        'LUNA_DEFAULT_IS_RIGHT_CLICK_QUICKLY_PASTE': False,
+        'LUNA_DEFAULT_TERMINAL_THEME_NAME': 'Default',
         'TIME_ZONE': 'Asia/Shanghai',
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
@@ -687,9 +729,6 @@ class Config(dict):
         'GMSSL_ENABLED': False,
         # 操作日志变更字段的存储ES配置
         'OPERATE_LOG_ELASTICSEARCH_CONFIG': {},
-        # Magnus 组件需要监听的 Oracle 端口范围
-        'MAGNUS_ORACLE_PORTS': '30000-30030',
-
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 180,
         'TASK_LOG_KEEP_DAYS': 180,
@@ -722,6 +761,7 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+        'PROMETHEUS_METRICS_TOKEN': '',
 
         # Applet 等软件的下载地址
         'APPLET_DOWNLOAD_HOST': '',
@@ -783,6 +823,7 @@ class Config(dict):
 
         # JDMC
         'JDMC_ENABLED': False,
+        'KOTL_ENABLED': False,
         'JDMC_SOCK_PATH': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 
@@ -806,6 +847,8 @@ class Config(dict):
     old_config_map = {
         'CONNECTION_TOKEN_ONETIME_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION',
         'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION_MAX',
+        'PERM_EXPIRED_FIRST_NOTICE_DAYS': 'PERM_EXPIRED_NOTICE_DAYS',
+        'PERM_EXPIRED_DAILY_NOTICE_DAYS': 'PERM_EXPIRED_NOTICE_DAYS',
     }
 
     def __init__(self, *args):

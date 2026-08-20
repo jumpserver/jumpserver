@@ -1,10 +1,12 @@
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
+from ..models import SSHKey
 from ..serializers import SSHKeySerializer
 from users.notifications import ResetPublicKeySuccessMsg
 
 
 class SSHkeyViewSet(JMSModelViewSet):
+    queryset = SSHKey.objects.none()
     serializer_class = SSHKeySerializer
     permission_classes = [IsValidUser]
     filterset_fields = ('name', 'is_active')

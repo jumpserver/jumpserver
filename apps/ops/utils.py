@@ -12,7 +12,7 @@ from assets.models import Asset, Node
 logger = get_logger(__file__)
 
 
-def get_task_log_path(base_path, task_id, level=2):
+def get_task_log_path(base_path, task_id, level=2, create=True):
     task_id = str(task_id)
     try:
         uuid.UUID(task_id)
@@ -21,7 +21,8 @@ def get_task_log_path(base_path, task_id, level=2):
 
     rel_path = os.path.join(*task_id[:level], task_id + '.log')
     path = os.path.join(base_path, rel_path)
-    make_dirs(os.path.dirname(path), exist_ok=True)
+    if create:
+        make_dirs(os.path.dirname(path), exist_ok=True)
     return path
 
 

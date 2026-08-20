@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts import serializers
+from accounts.filters import IntegrationApplicationFilterSet
 from accounts.models import IntegrationApplication
 from audits.models import IntegrationApplicationLog
 from authentication.permissions import UserConfirmation, ConfirmType
@@ -18,6 +19,7 @@ from rbac.permissions import RBACPermission
 
 class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     model = IntegrationApplication
+    filterset_class = IntegrationApplicationFilterSet
     search_fields = ('name', 'comment')
     serializer_classes = {
         'default': serializers.IntegrationApplicationSerializer,
@@ -53,6 +55,8 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         demo_path = os.path.join(sdk_path, f'demo.{code_suffix_mapper[sdk_language]}')
 
         readme_content = self.read_file(readme_path)
+        if not readme_content:
+            readme_content = self.read_file(os.path.join(sdk_path, 'README.en.md'))
         demo_content = self.read_file(demo_path)
 
         return Response(data={'readme': readme_content, 'code': demo_content})

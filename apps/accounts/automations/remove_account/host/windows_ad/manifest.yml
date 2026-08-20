@@ -12,3 +12,9 @@ i18n:
     zh: 使用 Ansible 模块 win_domain_user 删除账号
     ja: Ansible モジュール win_domain_user を使用してアカウントを削除する
     en: Use the Ansible module win_domain_user to delete an account
+    es: Usar el módulo Ansible win_domain_user para eliminar la cuenta
+    ko: Ansible win_domain_user 모듈을 사용하여 계정 삭제
+    pt-br: Usar o módulo Ansible win_domain_user para excluir a conta
+    ru: Использовать модуль Ansible win_domain_user, чтобы удалить учетную запись
+    vi: Sử dụng mô-đun Ansible win_domain_user để xóa tài khoản
+    zh-hant: 使用 Ansible 模組 win_domain_user 刪除帳號

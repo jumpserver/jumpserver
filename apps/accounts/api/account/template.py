@@ -1,9 +1,13 @@
 from django_filters import rest_framework as drf_filters
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts import serializers
+from accounts.exceptions import (
+    VaultAccountSyncUnavailableException, VaultUnavailableException,
+)
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import AccountTemplate
 from accounts.tasks import template_sync_related_accounts
@@ -15,11 +19,16 @@ from rbac.permissions import RBACPermission
 
 
 class AccountTemplateFilterSet(BaseFilterSet):
-    protocols = drf_filters.CharFilter(method='filter_protocols')
+    protocols = drf_filters.CharFilter(
+        method='filter_protocols', label=_('Protocols')
+    )
 
     class Meta:
         model = AccountTemplate
-        fields = ('username', 'name')
+        fields = ('id', 'name', 'username', 'protocols')
+        fields_operator = {
+            'protocols': ('in',),
+        }
 
     @staticmethod
     def filter_protocols(queryset, name, value):
@@ -61,6 +70,10 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
     @action(methods=['patch'], detail=True, url_path='sync-related-accounts')
     def sync_related_accounts(self, request, *args, **kwargs):
         instance = self.get_object()
+        try:
+            instance.get_secret()
+        except VaultUnavailableException as exc:
+            raise VaultAccountSyncUnavailableException() from exc
         user_id = str(request.user.id)
         task = template_sync_related_accounts.delay(str(instance.id), user_id)
         return Response({'task': task.id}, status=status.HTTP_200_OK)

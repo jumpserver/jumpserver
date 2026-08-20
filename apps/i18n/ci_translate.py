@@ -128,7 +128,7 @@ async def _translate_json_item(
         target_dict = _read_json_text(target_path)
 
         to_update: dict[str, str] = {}
-        for k in changed_keys:
+        for k in sorted(changed_keys):
             if k not in zh_dict:
                 continue
             if overwrite or k not in target_dict:
@@ -172,7 +172,7 @@ async def _translate_po_item(
         trans_po = _read_po_from_fs(target_path)
         to_update: dict[str, str] = {}
 
-        for msgid in changed_msgids:
+        for msgid in sorted(changed_msgids):
             if msgid not in zh_dict:
                 continue
             entry = trans_po.find(msgid)
@@ -188,7 +188,7 @@ async def _translate_po_item(
             entry = trans_po.find(msgid)
             if not entry:
                 continue
-            entry.flags = []
+            entry.flags = [flag for flag in entry.flags if flag != "fuzzy"]
             entry.previous_msgid = None
             entry.msgstr = msgstr
         trans_po.save(str(target_path))

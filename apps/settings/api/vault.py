@@ -5,7 +5,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.views import Response, APIView
 
 from accounts.backends import get_vault_client
-from accounts.tasks.vault import sync_secret_to_vault
+from accounts.tasks.vault import restore_secret_from_vault, sync_secret_to_vault
 from common.exceptions import JMSException
 from settings.models import Setting
 from .. import serializers
@@ -13,6 +13,7 @@ from .. import serializers
 
 class VaultTestingAPI(GenericAPIView):
     backends_serializer = {
+        'openbao': serializers.OpenBaoSerializer,
         'azure': serializers.AzureKVSerializer,
         'aws': serializers.AmazonSMSerializer,
         'hcp': serializers.HashicorpKVSerializer
@@ -66,4 +67,11 @@ class VaultSyncDataAPI(APIView):
     @staticmethod
     def _run_task():
         task = sync_secret_to_vault.delay()
+        return task
+
+
+class VaultRestoreDataAPI(VaultSyncDataAPI):
+    @staticmethod
+    def _run_task():
+        task = restore_secret_from_vault.delay()
         return task

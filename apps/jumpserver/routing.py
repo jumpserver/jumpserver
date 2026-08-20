@@ -73,8 +73,6 @@ class SocketContextMiddleware:
         if fno:
             logger.debug(f"Successfully extracted FNO: {fno}")
             scope['fno'] = fno
-        else:
-            logger.debug(f"Failed to trace FNO for {scope.get('client')}")
 
         return await self.app(scope, receive, send)
 

@@ -355,6 +355,10 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixi
     def filter_spm_queryset(resource_ids, queryset):
         return queryset.filter(history_id__in=resource_ids)
 
+    @staticmethod
+    def exclude_spm_queryset(resource_ids, queryset):
+        return queryset.exclude(history_id__in=resource_ids)
+
     def get_queryset(self):
         account = self.account
         histories = account.history.all()

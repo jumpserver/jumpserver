@@ -6,12 +6,14 @@ from django.utils.translation import gettext as _
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveAPIView
 
+from accounts.models import AccountTemplate
 from assets.models import (
-    Asset, Zone, Label, Node,
+    Asset, Zone, Node,
 )
 from common.api import JMSBulkModelViewSet
 from common.permissions import IsValidUser, IsValidLicenseForWriteAction
 from common.utils import get_logger
+from labels.models import Label
 from orgs.utils import current_org, tmp_to_root_org
 from perms.models import AssetPermission
 from rbac.permissions import RBACPermission
@@ -25,7 +27,7 @@ logger = get_logger(__file__)
 
 # 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
 org_related_models = [
-    User, UserGroup, Asset, Node, Label, Zone, AssetPermission
+    User, UserGroup, Asset, Node, Label, Zone, AssetPermission, AccountTemplate
 ]
 
 

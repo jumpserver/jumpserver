@@ -4,7 +4,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from assets.automations.base.manager import BaseManager
-from common.utils.timezone import local_now_display
+from common.const import Status
 from .handlers import AccountBackupHandler
 
 
@@ -12,7 +12,7 @@ class AccountBackupManager(BaseManager):
     def do_run(self):
         execution = self.execution
         account_backup_execution_being_executed = _('The account backup plan is being executed')
-        print(f'\033[33m# {account_backup_execution_being_executed}\033[0m')
+        self.print_log(account_backup_execution_being_executed, 'progress')
         handler = AccountBackupHandler(self, execution)
         handler.run()
 
@@ -20,11 +20,24 @@ class AccountBackupManager(BaseManager):
         pass
 
     def print_summary(self):
-        print('\n\n' + '-' * 80)
-        plan_execution_end = _('Plan execution end')
-        print('{} {}\n'.format(plan_execution_end, local_now_display()))
-        time_cost = _('Duration')
-        print('{}: {}s'.format(time_cost, self.duration))
+        error = self.summary.get('error')
+        self.print_log(
+            _("Task execution completed"),
+            'error'
+            if error or self.status in (Status.failed, Status.error)
+            else 'success',
+        )
+        if error:
+            self.print_log(
+                _("Backup failed: %(error)s") % {'error': error}, 'error'
+            )
+        else:
+            self.print_log(_("Backed up %(count)s accounts") % {
+                'count': self.summary.get('total_accounts', 0),
+            }, 'success')
+        self.print_log(_("Duration: %(duration)s seconds") % {
+            'duration': self.duration,
+        }, 'info')
 
     def get_report_template(self):
         return "accounts/backup_account_report.html"

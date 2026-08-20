@@ -6,6 +6,7 @@ __all__ = ['VaultTypeChoices']
 
 class VaultTypeChoices(models.TextChoices):
     local = 'local', _('Database')
+    openbao = 'openbao', _('OpenBao')
     hcp = 'hcp', _('HCP Vault')
     azure = 'azure', _('Azure Key Vault')
     aws = 'aws', _('Amazon Secrets Manager')

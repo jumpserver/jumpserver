@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import F, Count
+from django.db.models import F, Q
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -152,10 +152,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
                                   attrs=('id', 'name', 'type'))
     accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
-    _accounts = None
 
     class Meta:
         model = Asset
+        relation_count_fields = {
+            'accounts_amount': 'accounts',
+        }
+        amount_fields = list(relation_count_fields)
         fields_fk = ['zone', 'platform']
         fields_mini = ['id', 'name', 'address'] + fields_fk
         fields_small = fields_mini + ['is_active', 'comment']
@@ -164,9 +167,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'nodes_display', 'accounts',
             'directory_services',
         ]
-        read_only_fields = [
-            'accounts_amount', 'category', 'type', 'connectivity', 'auto_config',
-            'date_verified', 'created_by', 'date_created', 'date_updated',
+        read_only_fields = amount_fields + [
+            'category', 'type', 'connectivity', 'auto_config',
+            'date_verified', 'date_last_login', 'created_by', 'date_created', 'date_updated',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         fields_unexport = ['auto_config']
@@ -186,15 +189,19 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_field_choices()
-        self._extract_accounts()
 
-    def _extract_accounts(self):
-        if not getattr(self, 'initial_data', None):
-            return
-        if isinstance(self.initial_data, list):
-            return
-        accounts = self.initial_data.pop('accounts', None)
-        self._accounts = accounts
+    def to_internal_value(self, data):
+        accounts = serializers.empty
+        if isinstance(data, dict) and 'accounts' in data:
+            data = data.copy()
+            accounts = data.pop('accounts')
+
+        validated_data = super().to_internal_value(data)
+        if accounts is not serializers.empty:
+            # Accounts need the asset instance, so validate and save them after
+            # the asset itself has been created or updated.
+            validated_data['accounts'] = accounts
+        return validated_data
 
     def _get_protocols_required_default(self):
         platform = self._asset_platform
@@ -238,8 +245,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         queryset = queryset.prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
-            .annotate(type=F("platform__type")) \
-            .annotate(accounts_amount=Count('accounts'))
+            .annotate(type=F("platform__type"))
         return queryset
 
     @staticmethod
@@ -346,22 +352,32 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
                 account.su_from = su_from_account
                 account.save()
 
-    def accounts_create(self, accounts_data, asset):
+    @staticmethod
+    def prepare_accounts_data(accounts_data, asset):
         from accounts.models import AccountTemplate
         if not accounts_data:
-            return
+            return [], {}, []
 
-        if not isinstance(accounts_data[0], dict):
+        if not isinstance(accounts_data, (list, tuple)) or not all(
+                isinstance(data, dict) for data in accounts_data
+        ):
             raise serializers.ValidationError({'accounts': _("Invalid data")})
 
+        prepared_data = []
+        account_lookups = []
         su_from_name_username_secret_type_map = {}
-        for data in accounts_data:
+        for raw_data in accounts_data:
+            data = raw_data.copy()
             data['asset'] = asset.id
             name = data.get('name')
             su_from = data.pop('su_from', None)
             template_id = data.get('template', None)
+            template = None
             if template_id:
-                template = AccountTemplate.objects.get(id=template_id)
+                if isinstance(template_id, AccountTemplate):
+                    template = template_id
+                else:
+                    template = AccountTemplate.objects.get(id=template_id)
                 template.push_params = data.pop('push_params', {})
                 data['params'] = template.push_params
                 if template.su_from:
@@ -373,16 +389,66 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
                 su_from_name_username_secret_type_map[name] = (
                     su_from.username, su_from.secret_type
                 )
+
+            lookup_data = template or data
+            account_lookups.append({
+                'name': getattr(lookup_data, 'name', None) or data.get('name'),
+                'username': getattr(lookup_data, 'username', None) or data.get('username'),
+                'secret_type': (
+                    getattr(lookup_data, 'secret_type', None) or
+                    data.get('secret_type', 'password')
+                ),
+                'name_provided': bool(template or raw_data.get('name')),
+            })
+            prepared_data.append(data)
+
+        return prepared_data, su_from_name_username_secret_type_map, account_lookups
+
+    def accounts_create(self, accounts_data, asset):
+        accounts_data, su_from_map, __ = self.prepare_accounts_data(accounts_data, asset)
+        if not accounts_data:
+            return
+
         s = AssetAccountSerializer(data=accounts_data, many=True)
         s.is_valid(raise_exception=True)
         accounts = s.save()
-        self.update_account_su_from(accounts, su_from_name_username_secret_type_map)
+        self.update_account_su_from(accounts, su_from_map)
+
+    def accounts_update(self, accounts_data, asset):
+        accounts_data, su_from_map, account_lookups = self.prepare_accounts_data(
+            accounts_data, asset
+        )
+        accounts = []
+        for data, lookup in zip(accounts_data, account_lookups):
+            filters = Q()
+            if lookup['name']:
+                filters |= Q(name=lookup['name'])
+            if lookup['username']:
+                filters |= Q(
+                    username=lookup['username'],
+                    secret_type=lookup['secret_type'],
+                )
+
+            account = asset.accounts.filter(filters).first() if filters else None
+            if account and not lookup['name_provided']:
+                data['name'] = account.name
+
+            serializer = AssetAccountSerializer(
+                instance=account,
+                data=data,
+                partial=account is not None,
+            )
+            serializer.is_valid(raise_exception=True)
+            accounts.append(serializer.save())
+
+        self.update_account_su_from(accounts, su_from_map)
 
     @atomic
     def create(self, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
+        accounts_data = validated_data.pop('accounts', None)
         instance = super().create(validated_data)
-        self.accounts_create(self._accounts, instance)
+        self.accounts_create(accounts_data, instance)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
@@ -415,8 +481,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     def update(self, instance, validated_data):
         old_platform = instance.platform
         nodes_display = validated_data.pop('nodes_display', '')
+        accounts_data = validated_data.pop('accounts', None)
         instance = super().update(instance, validated_data)
         self.sync_platform_protocols(instance, old_platform)
+        self.accounts_update(accounts_data, instance)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 

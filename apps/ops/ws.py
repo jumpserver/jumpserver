@@ -87,24 +87,56 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
         task_type = content.get('type', 'celery')
         log_path = self.get_log_path(task_id, task_type)
-        await self.async_handle_task(task_id, log_path)
+        await self.async_handle_task(task_id, log_path, task_type)
 
-    async def async_handle_task(self, task_id, log_path):
+    async def async_handle_task(
+            self, task_id, log_path, log_type='celery'
+    ):
         logger.info("Task id: {}".format(task_id))
-        timeout = 0
+        status_check_interval = 10  # Check the task state every five seconds.
+        status_check_countdown = 0
+        last_task_state = None
         while not self.disconnected:
-            if timeout >= 60:
-                await self.send_json({'message': '\r\n', 'task': task_id})
-                await self.send_json({'message': 'Task log was not found, the directory may not be shared.',
-                                      'task': task_id})
-                break
-            if not os.path.exists(log_path):
-                await self.send_json({'message': '.', 'task': task_id})
-                timeout += 0.5
-                await asyncio.sleep(0.5)
-            else:
+            if os.path.exists(log_path):
                 await self.send_task_log(task_id, log_path)
                 break
+
+            if status_check_countdown <= 0:
+                task = await self.get_task(task_id)
+                if not task:
+                    await self.send_json({
+                        'event': 'unavailable', 'reason': 'task_not_found',
+                        'message': '', 'task': task_id,
+                    })
+                    break
+
+                if task.state != last_task_state:
+                    await self.send_json({
+                        'event': 'status', 'state': task.state,
+                        'is_finished': task.is_finished,
+                        'date_published': task.date_published.isoformat(),
+                        'date_start': (
+                            task.date_start.isoformat()
+                            if task.date_start else None
+                        ),
+                        'date_finished': (
+                            task.date_finished.isoformat()
+                            if task.date_finished else None
+                        ),
+                        'task': task_id,
+                    })
+                    last_task_state = task.state
+
+                if task.is_finished:
+                    await self.send_json({
+                        'event': 'unavailable', 'reason': 'finished_without_log',
+                        'state': task.state, 'message': '', 'task': task_id,
+                    })
+                    break
+                status_check_countdown = status_check_interval
+
+            status_check_countdown -= 1
+            await asyncio.sleep(0.5)
 
     async def send_task_log(self, task_id, log_path):
         await self.send_json({'message': '\r\n'})

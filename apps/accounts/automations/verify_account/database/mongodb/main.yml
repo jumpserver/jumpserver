@@ -10,11 +10,12 @@
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.spec_info.db_name }}"
+        login_database: "{{ jms_asset.mongodb_auth_source }}"
         ssl: "{{ jms_asset.spec_info.use_ssl }}"
         ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
-        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
-        connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert }}"
+        ssl_certfile: >-
+          {{ jms_asset.secret_info.client_cert_key
+             | default(jms_asset.secret_info.client_key | default('')) }}
+        connection_options: "{{ jms_asset.mongodb_connection_options }}"
       register: result
       failed_when: not result.is_available

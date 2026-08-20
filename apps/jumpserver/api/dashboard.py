@@ -218,7 +218,7 @@ class DatesLoginMetricMixin:
         return date_metrics_dict.get('id', [])
 
     def get_dates_login_times_assets(self):
-        cache_key = f"stats:top10_assets:{self.days}"
+        cache_key = f"stats:top10_assets:{self.org.id}:{self.days}"
         data = cache.get(cache_key)
         if data is not None:
             return data
@@ -233,7 +233,7 @@ class DatesLoginMetricMixin:
         return result
 
     def get_dates_login_times_users(self):
-        cache_key = f"stats:top10_users:{self.days}"
+        cache_key = f"stats:top10_users:{self.org.id}:{self.days}"
         data = cache.get(cache_key)
         if data is not None:
             return data

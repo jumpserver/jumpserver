@@ -128,15 +128,6 @@ class CheckAccountEngine(JMSBaseModel):
     def get_default_engines():
         data = [
             {
-                "id": "00000000-0000-0000-0000-000000000001",
-                "slug": "check_gathered_account",
-                "name": _("Check the discovered accounts"),
-                "comment": _(
-                    "Perform checks and analyses based on automatically discovered account results, "
-                    "including user groups, public keys, sudoers, and other information."
-                )
-            },
-            {
                 "id": "00000000-0000-0000-0000-000000000002",
                 "slug": "check_account_secret",
                 "name": _("Check the strength of your account and password"),

@@ -7,6 +7,7 @@
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
     ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
+    account_host: "{{ params.account_host | default('%') }}"
 
   tasks:
     - name: "Remove account"
@@ -19,5 +20,8 @@
         ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
         client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
         client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
+        connect_timeout: 15
         name: "{{ account.username }}"
+        host: "{{ account_host }}"
+        host_all: "{{ params.all_hosts | default(false) }}"
         state: absent

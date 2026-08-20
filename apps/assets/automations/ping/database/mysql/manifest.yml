@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 mysql 来测试 MySQL 可连接性
     en: Use ansible mysql module to test MySQL
     ja: Ansible mysqlモジュールを使用してテストする MySQL
+    es: Usar el módulo Ansible mysql para probar MySQL
+    ko: Ansible mysql 모듈을 사용하여 테스트 MySQL
+    pt-br: Usar o módulo Ansible mysql para testar MySQL
+    ru: Использовать модуль Ansible mysql, чтобы проверить MySQL
+    vi: Sử dụng mô-đun Ansible mysql để kiểm tra MySQL
+    zh-hant: 使用 Ansible 模組 mysql 來測試 MySQL 可連線性

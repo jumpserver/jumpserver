@@ -15,6 +15,7 @@ jobs:
       - name: Add labels
         run: |
           gh issue edit "${{ github.event.issue.number }}" \
+            --repo "${{ github.repository }}" \
             --add-label "🔔 Pending processing"
         env:
           GH_TOKEN: ${{ github.token }}

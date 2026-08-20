@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.conf import settings
 from django.db import models
 from django.db.models import TextChoices
@@ -60,6 +62,18 @@ class BaseType(TextChoices):
             tp_constrains = {**tp_base, 'protocols': tp_protocols, 'automation': tp_auto}
             constrains[k] = tp_constrains
         return constrains
+
+    @classmethod
+    def get_default_constrains(cls, tp=''):
+        base = deepcopy(cls._get_base_constrains())
+        protocols = deepcopy(cls._get_protocol_constrains())
+        automation = deepcopy(cls._get_automation_constrains())
+
+        tp_base = base.get('*', {})
+        tp_auto = automation.get('*', {})
+        tp_protocols = {**protocols.get('*', {}), **{'port_from_addr': False}}
+        tp_protocols = cls._parse_protocols(tp_protocols, tp)
+        return {**tp_base, 'protocols': tp_protocols, 'automation': tp_auto}
 
     @classmethod
     def _parse_protocols(cls, protocol, tp):

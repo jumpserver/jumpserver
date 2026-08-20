@@ -72,6 +72,19 @@ class BaseSecretRecord(JMSBaseModel):
 class ChangeSecretRecord(BaseSecretRecord):
     old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
     new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
+    account_version = models.IntegerField(
+        blank=True, null=True, verbose_name=_('Account version')
+    )
+    verification_status = models.CharField(
+        max_length=16, choices=ChangeSecretRecordStatusChoice.choices,
+        blank=True, default='', verbose_name=_('Verification status')
+    )
+    verification_error = models.TextField(
+        blank=True, default='', verbose_name=_('Verification error')
+    )
+    date_verified = models.DateTimeField(
+        blank=True, null=True, verbose_name=_('Date verified')
+    )
     ignore_fail = models.BooleanField(default=False, verbose_name=_('Ignore fail'))
 
     class Meta:

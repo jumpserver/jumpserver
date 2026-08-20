@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 <head>
-    <title>{% trans 'Task log' %}</title>
+    <title>{% trans 'Console' %}</title>
     <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
@@ -63,101 +63,348 @@
         }
     </script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
         body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             margin: 0;
         }
 
+        body {
+            padding: 10px 16px 14px;
+            background: #f6f8fa;
+            color: #24292f;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
         .xterm-rows {
-            font-family: "Bitstream Vera Sans Mono", Monaco, "Consolas", Courier, monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
             font-size: 13px;
         }
 
         .container {
             height: 100%;
+            min-height: 0;
             display: flex;
             flex-direction: column;
+            gap: 8px;
         }
 
-        .terminal .xterm-viewport {
-            background-color: #1f1b1b;
+        .header {
+            flex: 0 0 auto;
+            min-width: 0;
+            min-height: 28px;
+            display: grid;
+            grid-template-columns: minmax(180px, auto) 1fr;
+            align-items: center;
+            column-gap: 20px;
+            padding: 0 4px;
+        }
+
+        .task-type {
+            display: block;
+            min-width: 0;
+            color: #1f2328;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 24px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .terminal-shell {
+            min-height: 0;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(31, 35, 40, 0.08),
+                        0 8px 24px rgba(140, 149, 159, 0.12);
+        }
+
+        .terminal-toolbar {
+            height: 42px;
+            flex: 0 0 42px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0 10px 0 14px;
+            color: #8c959f;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .terminal-heading {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #c9d1d9;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 20px;
+        }
+
+        .terminal-mark {
+            color: #58a6ff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .terminal-body {
+            position: relative;
+            min-width: 0;
+            min-height: 0;
+            flex: 1 1 auto;
+            /* Reserve a track for the custom scrollbar so terminal content never
+               extends underneath it (the fit addon does not subtract the padding) */
+            padding-right: 16px;
+            background: #0d1117;
             overflow: hidden;
         }
 
         #term {
-            flex-grow: 1;
-            background-color: black;
-            margin: 12px;
-            padding: 0 8px;
-            border-radius: 4px 0 0 0;
+            width: 100%;
+            height: 100%;
+            padding: 11px 12px;
+            background: #0d1117;
+            overflow: hidden;
+        }
+
+        #term .xterm-viewport {
+            background-color: #0d1117;
+            overflow-y: scroll !important;
+            scrollbar-width: none;
+        }
+
+        #term .xterm-viewport::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .terminal-scrollbar {
+            position: absolute;
+            z-index: 3;
+            top: 8px;
+            right: 3px;
+            bottom: 8px;
+            width: 9px;
+            background: #21262d;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .terminal-scrollbar[hidden] {
+            display: none;
+        }
+
+        .terminal-scrollbar-thumb {
+            width: 7px;
+            min-height: 36px;
+            margin-left: 1px;
+            background: #6e7681;
+            border-radius: 5px;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .terminal-scrollbar-thumb:hover,
+        .terminal-scrollbar-thumb.is-dragging {
+            background: #8c959f;
+        }
+
+        .terminal-scrollbar-thumb.is-dragging {
+            cursor: grabbing;
         }
 
         .info {
             display: flex;
             flex-wrap: wrap;
-            padding: 6px 8px 6px 24px;
+            align-items: center;
+            gap: 6px 18px;
+            padding: 0;
             margin: 0;
         }
 
-        .task-type {
-            font-size: 16px;
-            font-weight: 500;
-            line-height: 24px;
-            text-align: left;
-            color: #1F2329;
-            padding-bottom: 8px;
+        .info .item {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #57606a;
+            font-size: 12px;
+            line-height: 20px;
+            list-style: none;
         }
 
-        .info .item {
-            flex: auto;
-            font-size: 14px;
-            list-style: none;
+        .info .item + .item {
+            padding-left: 18px;
+            border-left: 1px solid #d8dee4;
         }
 
         .info .item .label {
             font-weight: 400;
-            line-height: 22px;
-            font-size: 14px;
-            text-align: left;
-            color: #646A73;
-            padding-bottom: 12px;
+            color: #6e7781;
         }
 
         .info .item .value {
-            font-size: 14px;
             font-weight: 400;
-            line-height: 22px;
-            text-align: left;
-            color: #1F2329;
+            color: #424a53;
+        }
+
+        .info .task-id {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+        }
+
+        .terminal-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-button {
+            flex: 0 0 auto;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 10px;
+            color: #c9d1d9;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 28px;
+            background: #21262d;
+            border: 1px solid #373e47;
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+            cursor: pointer;
+            transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .terminal-button svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .terminal-button:hover,
+        .terminal-button.is-active {
+            color: #f0f6fc;
+            background: #30363d;
+            border-color: #484f58;
+        }
+
+        .terminal-button:focus-visible {
+            outline: 2px solid #58a6ff;
+            outline-offset: 2px;
+        }
+
+        #toggle-ansible-log-btn[hidden] {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+
+            .header {
+                min-height: 0;
+                display: block;
+                padding: 0;
+            }
+
+            .info {
+                align-items: flex-start;
+                gap: 0;
+                padding-top: 2px;
+            }
+
+            .info .item {
+                width: 100%;
+                overflow: hidden;
+            }
+
+            .info .item + .item {
+                padding-left: 0;
+                border-left: 0;
+            }
+
+            .info .value {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
     </style>
 </head>
 <div class="container">
-    <div style="position: absolute; top: 10px; right: 12px;">
-        <button id="download-log-btn"
-                style="background-color: #1ab394; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">
-            {% trans 'Download' %}
-        </button>
-    </div>
     <div class="header">
+        <span class="task-type"></span>
         <ul class="info">
             <li class="item">
-                <span class="task-type"></span>
-            </li>
-        </ul>
-        <ul class="info">
-            <li class="item">
-                <span class="label">ID:</span>
+                <span class="label">ID</span>
                 <span class="value task-id"></span>
             </li>
-            <li class="item">
-                <span class="label">{% trans 'Date start' %}:</span>
+            <li class="item task-start-item">
+                <span class="label">{% trans 'Date start' %}</span>
                 <span class="value date-start"></span>
+            </li>
+            <li class="item">
+                <span class="label">{% trans 'Status' %}</span>
+                <span class="value task-state"></span>
+            </li>
+            <li class="item task-published-item" hidden>
+                <span class="label">{% trans 'Date published' %}</span>
+                <span class="value date-published"></span>
+            </li>
+            <li class="item task-duration-item">
+                <span class="label">{% trans 'Duration' %}</span>
+                <span class="value task-duration"></span>
             </li>
         </ul>
     </div>
-    <div id="term">
-    </div>
+    <section class="terminal-shell" aria-label="{% trans 'Output' %}">
+        <div class="terminal-toolbar">
+            <div class="terminal-heading">
+                <span class="terminal-mark" aria-hidden="true">&gt;_</span>
+                <span id="terminal-heading-label">{% trans 'Output' %}</span>
+            </div>
+            <div class="terminal-actions">
+                <button id="toggle-ansible-log-btn" class="terminal-button"
+                        type="button" aria-pressed="false" hidden>
+                    <span class="toggle-log-label">Ansible {% trans 'Detail' %}</span>
+                </button>
+                <button id="download-log-btn" class="terminal-button" type="button">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M3.75 14A1.75 1.75 0 0 1 2 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 12.25 14Zm4.78-3.47a.75.75 0 0 1-1.06 0l-2.75-2.75a.75.75 0 0 1 1.06-1.06l1.47 1.47V2.75a.75.75 0 0 1 1.5 0v5.44l1.47-1.47a.75.75 0 1 1 1.06 1.06Z"/>
+                    </svg>
+                    {% trans 'Download' %}
+                </button>
+            </div>
+        </div>
+        <div class="terminal-body">
+            <div id="term"></div>
+            <div id="terminal-scrollbar" class="terminal-scrollbar" role="scrollbar"
+                 aria-label="{% trans 'Output' %}" aria-controls="term"
+                 aria-orientation="vertical" hidden>
+                <div class="terminal-scrollbar-thumb"></div>
+            </div>
+        </div>
+    </section>
 </div>
 <script>
 
@@ -170,8 +417,21 @@
     var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
     var term;
     var ws;
+    var terminalViewport;
+    var terminalScrollbar;
+    var terminalScrollbarThumb;
+    var scrollbarDragStartY = 0;
+    var scrollbarDragStartTop = 0;
+    var currentLogType = 'celery';
     var vendor = "{{ vendor }}";
     var extraQuery = Object.fromEntries(new URLSearchParams(window.location.search));
+    var displayedTaskState = null;
+    var announcedTaskState = null;
+    var taskPublishedAt = null;
+    var taskStartedAt = null;
+    var taskFinishedAt = null;
+    var taskIsFinished = false;
+    var isTaskInfoLoading = false;
     $(document).ready(function () {
         term = new Terminal({
             cursorBlink: false,
@@ -182,39 +442,420 @@
             rightClickSelectsWord: true,
             disableStdin: true,
             scrollback: 9999999,
+            theme: {
+                background: '#0d1117',
+                foreground: '#f0f3f6',
+                cursor: '#f0f3f6',
+                selection: 'rgba(56, 139, 253, 0.35)',
+            },
         });
         term.open(document.getElementById('term'));
         window.fit.fit(term);
+        setupTerminalScrollbar();
 
-        ws = new WebSocket(wsURL);
+        connectLog('celery');
+        getAutomationExecutionInfo();
+    });
+
+    var terminalResizeTimer = null;
+    function handleTerminalResize() {
+        window.clearTimeout(terminalResizeTimer);
+        terminalResizeTimer = window.setTimeout(function () {
+            if (!term || !term._core) {
+                return;
+            }
+            var prevCols = term._core.cols;
+            window.fit.fit(term);
+            // The bundled xterm.js cannot reflow existing buffer lines by itself,
+            // rebuild them here so already-printed text re-wraps to the new width.
+            if (term._core.cols !== prevCols) {
+                reflowTerminalBuffer();
+            }
+            scheduleTerminalScrollbarUpdate();
+        }, 80);
+    }
+
+    // The bundled xterm.js does not reflow the scrollback on resize: its
+    // Buffer#resize only pads existing lines with spaces, so after enlarging the
+    // window the .xterm-screen grows but already-displayed text keeps wrapping at
+    // the old width. This rebuilds the buffer from its own cell data so the text
+    // re-wraps to the new column count, keeping colors and approximate scroll pos.
+    function reflowTerminalBuffer() {
+        try {
+            var core = term._core;
+            var buffer = core.buffer;
+            var lines = buffer.lines;
+            var cols = core.cols;
+            var rows = core.rows;
+            if (!lines || lines.length === 0 || cols < 1 || rows < 1) {
+                return;
+            }
+
+            // 1) Flatten the physical lines into logical lines (join wrapped runs)
+            var logical = [];
+            var current = [];
+            var i, line, end, segment;
+            for (i = 0; i < lines.length; i++) {
+                line = lines.get(i);
+                end = line.length;
+                while (end > 0 && line[end - 1][2] === 1 && line[end - 1][3] === 32) {
+                    end--;
+                }
+                segment = line.slice(0, end);
+                if (line.isWrapped) {
+                    current = current.concat(segment);
+                } else {
+                    if (i > 0) {
+                        logical.push(current);
+                    }
+                    current = segment;
+                }
+            }
+            logical.push(current);
+
+            // 2) Re-split every logical line at the new column count
+            var blank = core.blankLine(false, false, cols);
+            var blankCell = blank[0];
+            var rebuilt = [];
+            var cursorIndex = -1;
+            var cursorX = 0;
+            var lastLogicalIndex = logical.length - 1;
+            for (i = 0; i < logical.length; i++) {
+                var l = logical[i];
+                if (l.length === 0) {
+                    rebuilt.push(blank.slice());
+                    if (i === lastLogicalIndex) {
+                        cursorIndex = rebuilt.length - 1;
+                        cursorX = 0;
+                    }
+                    continue;
+                }
+                var chunks = Math.ceil(l.length / cols);
+                for (var c = 0; c < chunks; c++) {
+                    var chunk = l.slice(c * cols, Math.min((c + 1) * cols, l.length));
+                    if (c > 0) {
+                        chunk.isWrapped = true;
+                    }
+                    while (chunk.length < cols) {
+                        chunk.push(blankCell);
+                    }
+                    rebuilt.push(chunk);
+                    if (i === lastLogicalIndex && c === chunks - 1) {
+                        cursorIndex = rebuilt.length - 1;
+                        cursorX = l.length % cols;
+                    }
+                }
+            }
+            // If the last logical line ends exactly at a column boundary, the
+            // cursor continues on a new line instead of overwriting column 0.
+            var lastLen = logical[lastLogicalIndex].length;
+            if (cursorIndex >= 0 && cursorX === 0 && lastLen > 0 && lastLen % cols === 0) {
+                rebuilt.push(blank.slice());
+                cursorIndex = rebuilt.length - 1;
+            }
+
+            // 3) Always keep the viewport (rows) filled
+            while (rebuilt.length < rows) {
+                rebuilt.push(blank.slice());
+            }
+
+            // 4) Swap the lines in place so all internal references stay valid
+            var oldLength = lines.length;
+            var oldYdisp = buffer.ydisp;
+            var total = rebuilt.length;
+            if (lines.maxLength < total) {
+                lines.maxLength = total;
+            }
+            lines.length = 0;
+            for (i = 0; i < total; i++) {
+                lines.push(rebuilt[i]);
+            }
+
+            // 5) Recompute scroll/cursor state
+            buffer.ybase = Math.max(0, total - rows);
+            var distanceFromBottom = Math.max(0, oldLength - 1 - oldYdisp);
+            buffer.ydisp = Math.max(0, total - 1 - distanceFromBottom);
+            if (buffer.ydisp > buffer.ybase) {
+                buffer.ydisp = buffer.ybase;
+            }
+            buffer.y = cursorIndex >= 0
+                ? cursorIndex - buffer.ybase
+                : total - 1 - buffer.ybase;
+            if (buffer.y < 0) {
+                buffer.y = 0;
+            } else if (buffer.y > rows - 1) {
+                buffer.y = rows - 1;
+            }
+            buffer.x = cursorX < 0 ? 0 : Math.min(cols - 1, cursorX);
+            buffer.scrollTop = 0;
+            buffer.scrollBottom = rows - 1;
+
+            // 6) Force a full re-render and resync the scroll area
+            if (core.renderer) {
+                core.renderer.clear();
+            }
+            if (core.clearSelection) {
+                core.clearSelection();
+            }
+            core.refresh(0, rows - 1);
+            if (core.viewport && core.viewport.syncScrollArea) {
+                core.viewport.syncScrollArea();
+            }
+        } catch (e) {
+            // Never break the log view if the reflow hits an unexpected state.
+        }
+    }
+
+    // Bind the resize handler to `window` directly. The previous
+    // `.on('resize', window, ...)` treated `window` as event data (it's not a
+    // selector string) and attached the handler to `document`, where the
+    // native `resize` event never bubbles to, so fit() was never re-run.
+    $(window).on('resize', handleTerminalResize);
+
+    // Also observe the terminal container so the size follows viewport
+    // changes that do not fire a window resize (DevTools, zoom, iframe, ...)
+    var termElement = document.getElementById('term');
+    if (window.ResizeObserver && termElement) {
+        new ResizeObserver(handleTerminalResize).observe(termElement);
+    }
+
+    function setupTerminalScrollbar() {
+        terminalViewport = document.querySelector('#term .xterm-viewport');
+        terminalScrollbar = document.getElementById('terminal-scrollbar');
+        terminalScrollbarThumb = terminalScrollbar.querySelector('.terminal-scrollbar-thumb');
+
+        terminalViewport.addEventListener('scroll', updateTerminalScrollbar);
+        terminalScrollbar.addEventListener('pointerdown', function (event) {
+            if (event.target === terminalScrollbarThumb) {
+                return;
+            }
+            const trackRect = terminalScrollbar.getBoundingClientRect();
+            const maxThumbTop = terminalScrollbar.clientHeight - terminalScrollbarThumb.offsetHeight;
+            const thumbTop = Math.max(0, Math.min(
+                maxThumbTop,
+                event.clientY - trackRect.top - terminalScrollbarThumb.offsetHeight / 2
+            ));
+            scrollTerminalToThumbPosition(thumbTop);
+        });
+        terminalScrollbarThumb.addEventListener('pointerdown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            scrollbarDragStartY = event.clientY;
+            scrollbarDragStartTop = parseFloat(terminalScrollbarThumb.style.transform.replace('translateY(', '')) || 0;
+            terminalScrollbarThumb.classList.add('is-dragging');
+            terminalScrollbarThumb.setPointerCapture(event.pointerId);
+        });
+        terminalScrollbarThumb.addEventListener('pointermove', function (event) {
+            if (!terminalScrollbarThumb.hasPointerCapture(event.pointerId)) {
+                return;
+            }
+            scrollTerminalToThumbPosition(scrollbarDragStartTop + event.clientY - scrollbarDragStartY);
+        });
+        terminalScrollbarThumb.addEventListener('pointerup', stopTerminalScrollbarDrag);
+        terminalScrollbarThumb.addEventListener('pointercancel', stopTerminalScrollbarDrag);
+        scheduleTerminalScrollbarUpdate();
+    }
+
+    function stopTerminalScrollbarDrag(event) {
+        if (terminalScrollbarThumb.hasPointerCapture(event.pointerId)) {
+            terminalScrollbarThumb.releasePointerCapture(event.pointerId);
+        }
+        terminalScrollbarThumb.classList.remove('is-dragging');
+    }
+
+    function scrollTerminalToThumbPosition(thumbTop) {
+        const maxScrollTop = terminalViewport.scrollHeight - terminalViewport.clientHeight;
+        const maxThumbTop = terminalScrollbar.clientHeight - terminalScrollbarThumb.offsetHeight;
+        const boundedThumbTop = Math.max(0, Math.min(maxThumbTop, thumbTop));
+        terminalViewport.scrollTop = maxThumbTop ? boundedThumbTop / maxThumbTop * maxScrollTop : 0;
+    }
+
+    function scheduleTerminalScrollbarUpdate() {
+        window.requestAnimationFrame(updateTerminalScrollbar);
+    }
+
+    function updateTerminalScrollbar() {
+        if (!terminalViewport || !terminalScrollbar) {
+            return;
+        }
+        const maxScrollTop = terminalViewport.scrollHeight - terminalViewport.clientHeight;
+        const hasOverflow = maxScrollTop > 1;
+        terminalScrollbar.hidden = !hasOverflow;
+        if (!hasOverflow) {
+            return;
+        }
+
+        const trackHeight = terminalScrollbar.clientHeight;
+        const thumbHeight = Math.max(36, Math.round(
+            terminalViewport.clientHeight / terminalViewport.scrollHeight * trackHeight
+        ));
+        const maxThumbTop = trackHeight - thumbHeight;
+        const thumbTop = maxThumbTop * terminalViewport.scrollTop / maxScrollTop;
+        terminalScrollbarThumb.style.height = `${thumbHeight}px`;
+        terminalScrollbarThumb.style.transform = `translateY(${thumbTop}px)`;
+        terminalScrollbar.setAttribute('aria-valuemin', '0');
+        terminalScrollbar.setAttribute('aria-valuemax', String(Math.round(maxScrollTop)));
+        terminalScrollbar.setAttribute('aria-valuenow', String(Math.round(terminalViewport.scrollTop)));
+    }
+
+    function connectLog(logType, useFailOver) {
+        if (ws) {
+            ws.onopen = null;
+            ws.onmessage = null;
+            ws.onerror = null;
+            ws.close();
+        }
+
+        currentLogType = logType;
+        term.reset();
+        scheduleTerminalScrollbarUpdate();
+        ws = new WebSocket(useFailOver ? failOverWsURL : wsURL);
+        const currentWs = ws;
+
         ws.onmessage = function (e) {
+            if (currentWs !== ws) {
+                return;
+            }
             var data = JSON.parse(e.data);
-            var message = data.message;
+            if (data.event === 'status') {
+                updateTaskTiming(data);
+                updateTaskState(data.state, true);
+                return;
+            }
+            if (data.event === 'unavailable') {
+                updateTaskState(data.state);
+                if (
+                    data.reason === 'finished_without_log' &&
+                    currentLogType === 'celery'
+                ) {
+                    term.write(
+                        `${gettext('Status')}: ${getTaskStateLabel(data.state)}\r\n` +
+                        `${gettext('Output')}: ${gettext('Log unavailable or the log directory is not shared.')}\r\n`
+                    );
+                } else {
+                    term.write(`Ansible ${gettext('Detail')}: ${gettext('Not found')}\r\n`);
+                }
+                scheduleTerminalScrollbarUpdate();
+                return;
+            }
+            var message = data.message || '';
             if (vendor !== 'jumpserver') {
                 message = message.replace(/jumpserver/g, vendor);
             }
             term.write(message);
+            scheduleTerminalScrollbarUpdate();
         };
         ws.onopen = function () {
-            var msg = {"task": taskId};
+            if (currentWs !== ws) {
+                return;
+            }
+            var msg = {"task": taskId, "type": logType};
             ws.send(JSON.stringify(msg))
         };
         ws.onerror = function (e) {
-            ws = new WebSocket(failOverWsURL);
-            ws.onmessage = function (e) {
-                var data = JSON.parse(e.data);
-                term.write(data.message);
-            };
-            ws.onerror = function (e) {
+            if (currentWs !== ws) {
+                return;
+            }
+            if (!useFailOver) {
+                connectLog(logType, true);
+            } else {
                 term.write("Connect websocket server error")
             }
         }
-        getAutomationExecutionInfo();
-    }).on('resize', window, function () {
-        window.fit.fit(term);
-    });
+    }
+
+    function getTaskStateLabel(state) {
+        const labels = {
+            PENDING: '{% trans "Queued" %}',
+            RUNNING: '{% trans "Running" %}',
+            SUCCESS: '{% trans "Finished" %}',
+            FAILURE: '{% trans "Failed" %}',
+            REVOKED: '{% trans "Canceled" %}',
+        };
+        return labels[state] || state || '-';
+    }
+
+    function updateTaskState(state, writeToTerminal) {
+        if (!state) {
+            return;
+        }
+        displayedTaskState = state;
+        $('.task-state').text(getTaskStateLabel(state));
+        const isQueued = state === 'PENDING';
+        $('.task-start-item').prop('hidden', isQueued && !taskStartedAt);
+        $('.task-published-item, .task-duration-item').prop('hidden', false);
+        updateTaskDuration();
+        if (writeToTerminal && announcedTaskState !== state) {
+            announcedTaskState = state;
+            term.write(`${gettext('Status')}: ${getTaskStatusMessage(state)}\r\n`);
+            scheduleTerminalScrollbarUpdate();
+        }
+    }
+
+    function getTaskStatusMessage(state) {
+        const messages = {
+            PENDING: gettext('Queued: waiting for an available ansible worker.'),
+            RUNNING: gettext('Running: worker has accepted the task and is preparing execution logs.'),
+        };
+        return messages[state] || getTaskStateLabel(state);
+    }
+
+    function parseTaskDatetime(value) {
+        if (!value) {
+            return null;
+        }
+        const datetime = new Date(value);
+        return Number.isNaN(datetime.getTime()) ? null : datetime;
+    }
+
+    function updateTaskTiming(data) {
+        const publishedAt = parseTaskDatetime(data.date_published);
+        const startedAt = parseTaskDatetime(data.date_start);
+        const finishedAt = parseTaskDatetime(data.date_finished);
+        if (publishedAt) {
+            taskPublishedAt = publishedAt;
+            $('.date-published').text(publishedAt.toLocaleString());
+        }
+        if (startedAt) {
+            taskStartedAt = startedAt;
+            $('.date-start').text(startedAt.toLocaleString());
+        }
+        if (finishedAt) {
+            taskFinishedAt = finishedAt;
+        }
+        if (typeof data.is_finished === 'boolean') {
+            taskIsFinished = data.is_finished;
+        }
+        if (taskFinishedAt) {
+            taskIsFinished = true;
+        }
+        updateTaskDuration();
+    }
+
+    function updateTaskDuration() {
+        const startedAt = taskStartedAt || taskPublishedAt;
+        if (!startedAt) {
+            $('.task-duration').text('');
+            return;
+        }
+        const endedAt = taskFinishedAt || new Date();
+        const elapsedSeconds = Math.max(
+            0, Math.floor((endedAt.getTime() - startedAt.getTime()) / 1000)
+        );
+        const hours = Math.floor(elapsedSeconds / 3600);
+        const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+        const seconds = elapsedSeconds % 60;
+        const duration = [hours, minutes, seconds]
+            .map(value => String(value).padStart(2, '0'))
+            .join(':');
+        $('.task-duration').text(duration);
+    }
 
     function getAutomationExecutionInfo() {
+        if (isTaskInfoLoading) {
+            return;
+        }
+        isTaskInfoLoading = true;
         let url = "{% url 'api-ops:task-executions-detail' pk=task_id %}";
 
         requestApi({
@@ -222,13 +863,28 @@
             method: "GET",
             flash_message: false,
             success(data) {
-                const dateStart = data.date_start ? new Date(data.date_start).toLocaleString() : '';
                 $('.task-id').html(data.id);
                 $('.task-type').html(data.task_name);
-                $('.date-start').html(dateStart);
+                updateTaskTiming(data);
+                updateTaskState(data.state);
+                document.title = data.task_name || document.title;
+                if (data.has_ansible_log || data.is_ansible_task) {
+                    $('#toggle-ansible-log-btn').prop('hidden', false);
+                }
+                isTaskInfoLoading = false;
+            },
+            error() {
+                isTaskInfoLoading = false;
             }
         })
     }
+
+    window.setInterval(updateTaskDuration, 1000);
+    window.setInterval(function () {
+        if (!taskIsFinished) {
+            getAutomationExecutionInfo();
+        }
+    }, 2000);
 
     function downloadLog() {
         term.selectAll()
@@ -237,7 +893,7 @@
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `log_${taskId}.txt`;
+        a.download = `log_${currentLogType}_${taskId}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -245,4 +901,18 @@
     }
 
     document.getElementById('download-log-btn').addEventListener('click', downloadLog);
+    document.getElementById('toggle-ansible-log-btn').addEventListener('click', function () {
+        const showAnsible = currentLogType !== 'ansible';
+        const button = $(this);
+        currentLogType = showAnsible ? 'ansible' : 'celery';
+        button.toggleClass('is-active', showAnsible);
+        button.attr('aria-pressed', showAnsible ? 'true' : 'false');
+        button.find('.toggle-log-label').text(
+            showAnsible ? gettext('Back') : `Ansible ${gettext('Detail')}`
+        );
+        $('#terminal-heading-label').text(
+            showAnsible ? `Ansible ${gettext('Detail')}` : gettext('Output')
+        );
+        connectLog(currentLogType);
+    });
 </script>

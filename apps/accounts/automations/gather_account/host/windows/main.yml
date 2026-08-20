@@ -1,33 +1,56 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Run net user command to get all users
-      win_shell: net user
-      register: user_list_output
-      failed_when: false
+    - name: Gather local Windows accounts as JSON
+      win_shell: |
+        $ErrorActionPreference = 'Stop'
+        $groupMap = @{}
 
-    - name: Parse all users from net user command
-      set_fact:
-        all_users: >-
-          {%- set users = [] -%}
-          {%- for line in user_list_output.stdout_lines -%}
-            {%- if loop.index > 4 and line.strip() != "" and not line.startswith("The command completed") -%}
-              {%- for user in line.split() -%}
-                {%- set _ = users.append(user) -%}
-              {%- endfor -%}
-            {%- endif -%}
-          {%- endfor -%}
-          {{ users }}
+        Get-LocalGroup | ForEach-Object {
+          $groupName = $_.Name
+          try {
+            Get-LocalGroupMember -Group $groupName -ErrorAction Stop |
+              ForEach-Object {
+                $localPrefix = "$env:COMPUTERNAME$([char]92)"
+                if (-not $_.Name.StartsWith(
+                  $localPrefix,
+                  [System.StringComparison]::OrdinalIgnoreCase
+                )) {
+                  return
+                }
+                $memberName = $_.Name.Substring($localPrefix.Length)
+                if (-not $groupMap.ContainsKey($memberName)) {
+                  $groupMap[$memberName] = @()
+                }
+                $groupMap[$memberName] += $groupName
+              }
+          } catch [Microsoft.PowerShell.Commands.PrincipalNotFoundException] {
+          }
+        }
 
-    - name: Run net user command for each user to get details
-      win_shell: net user {{ item }}
-      loop: "{{ all_users }}"
-      register: user_details
-      ignore_errors: yes
+        $users = Get-LocalUser | ForEach-Object {
+          $username = $_.Name
+          [PSCustomObject]@{
+            UserName = $username
+            Enabled = $_.Enabled
+            PasswordLastSet = if ($_.PasswordLastSet) {
+              $_.PasswordLastSet.ToString('o')
+            } else { $null }
+            PasswordExpires = if ($_.PasswordExpires) {
+              $_.PasswordExpires.ToString('o')
+            } else { $null }
+            LastLogon = if ($_.LastLogon) {
+              $_.LastLogon.ToString('o')
+            } else { $null }
+            GlobalGroupMemberships = @($groupMap[$username])
+          }
+        }
 
-    - set_fact:
+        ConvertTo-Json -InputObject @($users) -Depth 4 -Compress
+      register: local_users
+      changed_when: false
+
+    - name: Define gathered account info
+      ansible.builtin.set_fact:
         info:
-          user_details: "{{ user_details.results }}"
-
-    - debug:
-        var: info
+          user_details: "{{ local_users.stdout | from_json }}"

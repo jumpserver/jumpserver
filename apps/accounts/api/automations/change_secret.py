@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #
+from django.db import transaction
 from django.db.models import Max, Q, Subquery, OuterRef
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,9 +12,14 @@ from accounts import serializers
 from accounts.const import (
     AutomationTypes, ChangeSecretRecordStatusChoice
 )
-from accounts.filters import ChangeSecretRecordFilterSet, ChangeSecretStatusFilterSet
+from accounts.filters import (
+    ChangeSecretAutomationFilterSet, ChangeSecretRecordFilterSet,
+    ChangeSecretStatusFilterSet,
+)
 from accounts.models import ChangeSecretAutomation, ChangeSecretRecord, Account
-from accounts.tasks import execute_automation_record_task
+from accounts.tasks import (
+    execute_automation_record_task, verify_change_secret_records_task,
+)
 from accounts.utils import account_secret_task_status
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.permissions import IsValidLicense
@@ -33,9 +41,12 @@ __all__ = [
 class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
     model = ChangeSecretAutomation
     permission_classes = [RBACPermission, IsValidLicense]
-    filterset_fields = ('name', 'secret_type', 'secret_strategy')
-    search_fields = filterset_fields
-    serializer_class = serializers.ChangeSecretAutomationSerializer
+    filterset_class = ChangeSecretAutomationFilterSet
+    search_fields = ('name',)
+    serializer_classes = {
+        'default': serializers.ChangeSecretAutomationSerializer,
+        'list': serializers.ChangeSecretAutomationListSerializer,
+    }
 
 
 class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
@@ -53,6 +64,14 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
         'secret': 'accounts.view_changesecretrecord',
         'dashboard': 'accounts.view_changesecretrecord',
         'ignore_fail': 'accounts.view_changesecretrecord',
+        'verify': [
+            'accounts.view_changesecretrecord',
+            'accounts.verify_account',
+        ],
+        'restore': [
+            'accounts.view_changesecretrecord',
+            'accounts.change_account',
+        ],
     }
 
     def get_permissions(self):
@@ -60,6 +79,12 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
             self.permission_classes = [
                 RBACPermission,
                 UserConfirmation.require(ConfirmType.MFA)
+            ]
+        elif self.action == 'restore':
+            self.permission_classes = [
+                RBACPermission,
+                IsValidLicense,
+                UserConfirmation.require(ConfirmType.MFA),
             ]
         return super().get_permissions()
 
@@ -85,7 +110,10 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
 
         failed_records = queryset.filter(
             ~Q(account__in=Subquery(recent_success_accounts.values('account'))),
-            status=ChangeSecretRecordStatusChoice.failed,
+            status__in=[
+                ChangeSecretRecordStatusChoice.failed,
+                ChangeSecretRecordStatusChoice.unverified,
+            ],
             ignore_fail=False
         )
         return failed_records
@@ -106,6 +134,127 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
         record_ids = [str(_id) for _id in records.values_list('id', flat=True)]
         task = execute_automation_record_task.delay(record_ids, self.tp)
         return Response({'task': task.id}, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False, url_path='verify')
+    def verify(self, request, *args, **kwargs):
+        record_ids = request.data.get('record_ids')
+        if not isinstance(record_ids, list) or not record_ids:
+            return Response(
+                {'detail': _('Record IDs must be a non-empty list')},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        records = self.get_queryset().filter(
+            id__in=record_ids,
+            new_secret__isnull=False,
+        )
+        record_ids = [
+            str(record_id)
+            for record_id in records.values_list('id', flat=True)
+        ]
+        if not record_ids:
+            return Response(
+                {'detail': _('No valid records found')},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        task = verify_change_secret_records_task.delay(record_ids)
+        return Response({'task': task.id}, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False, url_path='restore')
+    def restore(self, request, *args, **kwargs):
+        record_ids = request.data.get('record_ids')
+        force = request.data.get('force', False)
+        if not isinstance(record_ids, list) or not record_ids:
+            return Response(
+                {'detail': _('Record IDs must be a non-empty list')},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(force, bool):
+            return Response(
+                {'detail': _('Force must be a boolean')},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        valid_record_ids = list(
+            self.get_queryset().filter(id__in=record_ids)
+            .values_list('id', flat=True)
+        )
+        if not valid_record_ids:
+            return Response(
+                {'detail': _('No valid records found')},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        result = {
+            'restored': 0,
+            'already_synced': 0,
+            'not_verified': 0,
+            'conflicts': [],
+        }
+        for record_id in valid_record_ids:
+            with transaction.atomic():
+                record = (
+                    self.get_queryset().select_for_update()
+                    .select_related('account')
+                    .filter(id=record_id)
+                    .first()
+                )
+                if not record or not record.account_id:
+                    continue
+                verification_status = record.verification_status
+                if verification_status == ChangeSecretRecordStatusChoice.pending.value:
+                    result['not_verified'] += 1
+                    continue
+                if (
+                        not force
+                        and verification_status
+                        != ChangeSecretRecordStatusChoice.success.value
+                ):
+                    result['not_verified'] += 1
+                    continue
+
+                account = Account.objects.select_for_update().filter(
+                    id=record.account_id
+                ).first()
+                if not account:
+                    continue
+
+                if account.secret == record.new_secret:
+                    result['already_synced'] += 1
+                elif (
+                        (
+                            record.account_version is not None
+                            and account.version != record.account_version
+                        )
+                        or account.secret != record.old_secret
+                ):
+                    result['conflicts'].append({
+                        'record': str(record.id),
+                        'account': str(account.id),
+                    })
+                    continue
+                else:
+                    account.secret = record.new_secret
+                    account.date_updated = timezone.now()
+                    account.date_change_secret = timezone.now()
+                    account.change_secret_status = (
+                        ChangeSecretRecordStatusChoice.success.value
+                    )
+                    account.save(update_fields=[
+                        'secret', 'date_updated', 'date_change_secret',
+                        'change_secret_status',
+                    ])
+                    result['restored'] += 1
+
+                record.status = ChangeSecretRecordStatusChoice.success.value
+                record.error = ''
+                record.ignore_fail = False
+                record.save(update_fields=[
+                    'status', 'error', 'ignore_fail',
+                ])
+
+        return Response(result, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=True, url_path='secret')
     def secret(self, request, *args, **kwargs):

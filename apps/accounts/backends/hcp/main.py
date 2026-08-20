@@ -3,6 +3,7 @@ from .service import VaultKVClient
 from ..base.vault import BaseVault
 
 from ...const import VaultTypeChoices
+from ...exceptions import VaultSecretNotFoundException
 
 
 logger = get_logger(__name__)
@@ -29,6 +30,12 @@ class Vault(BaseVault):
         data = self.client.get(path=entry.full_path).get('data', {})
         data = entry.get_decrypt_secret(data.get('secret'))
         return data
+
+    def _get_for_restore(self, entry):
+        data = self.client.get(path=entry.full_path).get('data')
+        if not isinstance(data, dict) or 'secret' not in data:
+            raise VaultSecretNotFoundException()
+        return entry.get_decrypt_secret(data['secret'])
 
     def _create(self, entry):
         data = {'secret': entry.get_encrypt_secret()}

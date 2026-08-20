@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: "{{ local_python_interpreter }}"
+    target_db: "{{ jms_asset.spec_info.db_name | default('master', true) }}"
 
   tasks:
     - name: "Remove account"
@@ -10,12 +11,17 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        name: "{{ jms_asset.spec_info.db_name }}"
+        name: "{{ target_db }}"
         encryption: "{{ jms_asset.encryption | default(None) }}"
         tds_version: "{{ jms_asset.tds_version | default(None) }}"
+        login_timeout: 15
+        query_timeout: 30
+        transaction: true
         script: |
           DECLARE @login_name nvarchar(256) = %(username)s;
           DECLARE @sql nvarchar(max);
+          DECLARE @login_sid varbinary(85);
+          DECLARE @database_name sysname;
 
           IF @login_name IS NULL OR LEN(@login_name) = 0 OR LEN(@login_name) > 128
           BEGIN
@@ -23,10 +29,58 @@
               RETURN;
           END;
 
-          -- 标识符使用 QUOTENAME 防止 login name 逃逸。
-          SET @sql = N'DROP LOGIN ' + QUOTENAME(@login_name) + N';';
-          EXEC sys.sp_executesql @sql;
+          SET @login_sid = SUSER_SID(@login_name);
+          IF @login_sid IS NOT NULL
+          BEGIN
+              CREATE TABLE #mapped_databases (database_name sysname);
+              DECLARE database_cursor CURSOR LOCAL FAST_FORWARD FOR
+                  SELECT name
+                  FROM sys.databases
+                  WHERE state = 0 AND HAS_DBACCESS(name) = 1;
 
-          SELECT @@VERSION AS version;
+              OPEN database_cursor;
+              FETCH NEXT FROM database_cursor INTO @database_name;
+              WHILE @@FETCH_STATUS = 0
+              BEGIN
+                  SET @sql = N'IF EXISTS (
+                      SELECT 1 FROM ' + QUOTENAME(@database_name)
+                      + N'.sys.database_principals WHERE sid = @sid
+                  ) INSERT INTO #mapped_databases VALUES (@db);';
+                  EXEC sys.sp_executesql
+                      @sql,
+                      N'@sid varbinary(85), @db sysname',
+                      @sid = @login_sid,
+                      @db = @database_name;
+                  FETCH NEXT FROM database_cursor INTO @database_name;
+              END;
+              CLOSE database_cursor;
+              DEALLOCATE database_cursor;
+
+              IF EXISTS (
+                  SELECT 1 FROM #mapped_databases
+                  WHERE database_name <> DB_NAME()
+              )
+              BEGIN
+                  RAISERROR(
+                      'Login is mapped in other databases; remove those users first',
+                      16, 1
+                  );
+                  RETURN;
+              END;
+          END;
+
+          IF USER_ID(@login_name) IS NOT NULL
+          BEGIN
+              SET @sql = N'DROP USER ' + QUOTENAME(@login_name) + N';';
+              EXEC sys.sp_executesql @sql;
+          END;
+
+          IF EXISTS (SELECT 1 FROM sys.sql_logins WHERE name = @login_name)
+          BEGIN
+              SET @sql = N'DROP LOGIN ' + QUOTENAME(@login_name) + N';';
+              EXEC sys.sp_executesql @sql;
+          END;
+
+          SELECT 1 AS ok;
         params:
           username: "{{ account.username }}"

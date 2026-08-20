@@ -4,9 +4,41 @@ category: database
 type:
   - mongodb
 method: change_secret
+params:
+  - name: roles
+    type: str
+    label: "{{ 'Roles' | trans }}"
+    default: readWrite
+    help_text: "{{ 'Roles help text' | trans }}"
 
 i18n:
   MongoDB account change secret:
     zh: 使用 Ansible 模块 mongodb 执行 MongoDB 账号改密
     ja: Ansible mongodb モジュールを使用して MongoDB アカウントのパスワード変更
     en: Using Ansible module mongodb to change MongoDB account secret
+    es: Usar el módulo Ansible mongodb para cambiar la contraseña de la cuenta MongoDB
+    ko: Ansible mongodb 모듈을 사용하여 MongoDB 계정 비밀번호 변경
+    pt-br: Usar o módulo Ansible mongodb para alterar a senha da conta MongoDB
+    ru: Использовать модуль Ansible mongodb, чтобы изменить пароль учетной записи MongoDB
+    vi: Sử dụng mô-đun Ansible mongodb để đổi mật khẩu tài khoản MongoDB
+    zh-hant: 使用 Ansible 模組 mongodb 執行 MongoDB 帳號改密
+  Roles:
+    zh: 角色
+    zh-hant: 角色
+    ja: ロール
+    ko: 역할
+    es: Roles
+    pt-br: Funções
+    ru: Роли
+    vi: Vai trò
+    en: Roles
+  Roles help text:
+    zh: 仅在创建远程用户时使用，多个角色使用逗号分隔
+    zh-hant: 僅在建立遠端使用者時使用，多個角色以逗號分隔
+    ja: リモートユーザーの作成時にのみ使用するロール（複数の場合はカンマ区切り）
+    ko: 원격 사용자를 생성할 때만 사용되는 쉼표로 구분된 역할
+    es: Roles separados por comas que se usan solo al crear el usuario remoto
+    pt-br: Funções separadas por vírgulas usadas apenas quando o usuário remoto é criado
+    ru: Роли через запятую, используемые только при создании удаленного пользователя
+    vi: Các vai trò được phân tách bằng dấu phẩy, chỉ dùng khi tạo người dùng từ xa
+    en: Comma-separated roles used only when the remote user is created
