@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
-from assets.const import AllTypes, GATEWAY_NAME
+from assets.const import AllTypes, Category, GATEWAY_NAME
 from assets.models import Node, Asset
 from common.drf.filters import BaseFilterSet
 from common.utils import get_object_or_none, is_uuid
@@ -19,6 +19,10 @@ class PermedAssetFilterSet(BaseFilterSet):
         field_name='platform__type', choices=AllTypes.choices(),
         label=_('Platform type')
     )
+    category = filters.ChoiceFilter(
+        field_name='platform__category', choices=Category.choices,
+        label=_('Platform category')
+    )
     protocols = filters.CharFilter(
         method='filter_protocols', label=_('Protocols')
     )
@@ -29,11 +33,12 @@ class PermedAssetFilterSet(BaseFilterSet):
     class Meta:
         model = Asset
         fields = [
-            'id', 'name', 'address', 'platform', 'type', 'protocols',
+            'id', 'name', 'address', 'platform', 'type', 'category', 'protocols',
             'zone', 'is_active', 'comment',
         ]
         fields_operator = {
             'platform': ('exact',),
+            'category': ('in',),
             'protocols': ('in',),
             'zone': ('icontains',),
         }
