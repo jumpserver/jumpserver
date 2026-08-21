@@ -39,6 +39,11 @@ class CurrentOrgMembersFilter(filters.BaseFilterBackend):
 
 class UserSessionFilterSet(BaseFilterSet):
     is_active = drf_filters.BooleanFilter(method='filter_is_active')
+    ip__icontains = drf_filters.CharFilter(method='filter_ip_contains')
+
+    @staticmethod
+    def filter_ip_contains(queryset, name, value):
+        return queryset.filter(ip__icontains=value)
 
     @staticmethod
     def filter_is_active(queryset, name, is_active):
