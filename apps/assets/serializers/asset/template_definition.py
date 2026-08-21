@@ -109,10 +109,10 @@ class AssetImportTemplate:
 
 def _id_column():
     return TemplateColumn(
-        header=_('ID'),
+        header=format_lazy(_('{} (Required)'), _('ID')),
         field_name='id',
-        help_text=_('ID, asset unique identifier, leave blank when importing to create a new asset'),
-        required=False,
+        help_text=_('ID, asset unique identifier'),
+        required=True,
         parse_transform=transforms.id_from_template,
     )
 
@@ -236,7 +236,7 @@ host_import_template = AssetImportTemplate(columns=[
     _name_column(_('Host name')),
     _address_column(
         _('IP/Host'),
-        _('IP/Host, max 767 characters, supports IPv4/IPv6 and domain names'),
+        _('IP/Host, max 512 characters, supports IPv4/IPv6 and domain names'),
     ),
     _platform_column(
         _('Platform type (Required)'),
@@ -264,7 +264,7 @@ device_import_template = AssetImportTemplate(columns=[
     _name_column(_('Device name')),
     _address_column(
         _('IP/Host'),
-        _('IP/Host, max 767 characters, supports IPv4/IPv6 and domain names'),
+        _('IP/Host, max 512 characters, supports IPv4/IPv6 and domain names'),
     ),
     _platform_column(
         _('Platform type (Required)'),
@@ -292,7 +292,7 @@ database_import_template = AssetImportTemplate(columns=[
     _name_column(_('Database name')),
     _address_column(
         _('Address'),
-        _('Database address, max 767 characters, supports IPv4/IPv6 and domain names'),
+        _('Database address, max 512 characters, supports IPv4/IPv6 and domain names'),
     ),
     TemplateColumn(
         header=_('Platform/DB type (Required)'),

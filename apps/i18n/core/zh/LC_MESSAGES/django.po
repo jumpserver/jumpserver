@@ -5533,7 +5533,11 @@ msgstr "无效的ID，应为列表"
 #: xpack/plugins/cloud/serializers/account_attrs.py:95
 #: xpack/plugins/cloud/serializers/account_attrs.py:187
 msgid "This field is required."
-msgstr "该字段是必填项。"
+msgstr "该字段是必填项"
+
+#: assets/serializers/asset/common.py
+msgid "This field may not be empty."
+msgstr "该字段不能为空"
 
 #: common/db/fields.py:592 common/db/fields.py:597
 msgid "Invalid attrs, should be a list of dict"
@@ -7251,7 +7255,7 @@ msgstr "测试消息已发送，请查收"
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
-msgstr "SYSLOG 处理器未激活，请先保存配置"
+msgstr "SYSLOG 服务异常，请检查配置"
 
 #: settings/api/nas.py:18
 #, python-brace-format
@@ -12740,8 +12744,10 @@ msgid "Host name"
 msgstr "主机名称"
 
 #: assets/serializers/asset/template_definition.py
-msgid "IP/Host, max 767 characters, supports IPv4/IPv6 and domain names"
-msgstr "IP/主机名，长度不超过767个字符，支持IPv4/IPv6和域名"
+msgid "IP/Host, max 512 characters, supports IPv4/IPv6 and domain names"
+msgstr "IP/主机名，长度不超过512个字符，支持IPv4/IPv6和域名"
+
+
 
 #: assets/serializers/asset/template_definition.py
 msgid "Platform type (Required)"
@@ -12776,8 +12782,8 @@ msgid "Database name"
 msgstr "数据库名称"
 
 #: assets/serializers/asset/template_definition.py
-msgid "Database address, max 767 characters, supports IPv4/IPv6 and domain names"
-msgstr "数据库地址，长度不超过767个字符，支持IPv4/IPv6和域名"
+msgid "Database address, max 512 characters, supports IPv4/IPv6 and domain names"
+msgstr "数据库地址，长度不超过512个字符，支持IPv4/IPv6和域名"
 
 #: assets/serializers/asset/template_definition.py
 msgid "Platform/DB type (Required)"
@@ -12868,8 +12874,8 @@ msgid "Protocols, format k8s/6443;http(s)/80"
 msgstr "协议组，格式 k8s/6443;http(s)/80"
 
 #: assets/serializers/asset/template_definition.py
-msgid "ID, asset unique identifier, leave blank when importing to create a new asset"
-msgstr "ID，资产唯一标识，导入新建资产时留空"
+msgid "ID, asset unique identifier"
+msgstr "ID，资产唯一标识"
 
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"
