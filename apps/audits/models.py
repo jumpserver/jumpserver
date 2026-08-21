@@ -372,6 +372,20 @@ class UserSession(models.Model):
         keys = user_session_manager.get_keys()
         cls.objects.exclude(key__in=keys).delete()
 
+    @classmethod
+    def clear_expired_session_leases(cls):
+        expired_keys = user_session_manager.pop_expired_keys()
+        if not expired_keys:
+            return
+
+        removed_keys = [
+            key for key in expired_keys
+            if user_session_manager.remove_if_inactive(
+                key, browser_close_only=True
+            )
+        ]
+        cls.objects.filter(key__in=removed_keys).delete()
+
     class Meta:
         ordering = ['-date_created']
         verbose_name = _('User session')
