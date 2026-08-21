@@ -1,10 +1,52 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models import Q
+from django.utils.translation import gettext as _
+from rest_framework import serializers
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 
 from assets.utils import get_node_from_request, is_query_node_all_assets
+
+
+def parse_protocol_filters(value):
+    """Parse protocol search values such as ``ssh``, ``ssh/22`` and ``22``."""
+    protocol_filters = []
+    invalid = []
+    for item in value.split(','):
+        item = item.strip(' /')
+        if not item:
+            continue
+
+        if '/' in item:
+            parts = item.split('/')
+            if len(parts) != 2:
+                invalid.append(item)
+                continue
+            protocol_name, port_value = (part.strip() for part in parts)
+            if not protocol_name or not port_value.isdigit():
+                invalid.append(item)
+                continue
+            port = int(port_value)
+            if port > 65535:
+                invalid.append(item)
+                continue
+            protocol_filters.append(Q(name__iexact=protocol_name, port=port))
+        elif item.isdigit():
+            port = int(item)
+            if port > 65535:
+                invalid.append(item)
+                continue
+            protocol_filters.append(Q(port=port))
+        elif item.lstrip('-').isdigit():
+            invalid.append(item)
+        else:
+            protocol_filters.append(Q(name__iexact=item))
+
+    if invalid:
+        message = _('Invalid protocol filter: {}').format(', '.join(invalid))
+        raise serializers.ValidationError({'protocols': message})
+    return protocol_filters
 
 
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
