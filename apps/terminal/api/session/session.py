@@ -77,7 +77,7 @@ class SessionFilterSet(BaseFilterSet):
         if is_uuid(value):
             return queryset.filter(terminal__id=value)
         else:
-            return queryset.filter(terminal__name=value)
+            return queryset.filter(terminal__name__icontains=value)
 
 
 class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):

@@ -12,7 +12,8 @@ from django.utils import timezone
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, F
+from django.db.models.functions import Cast
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
@@ -68,18 +69,29 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             field_name, lookup = param.rsplit("__", 1)
             if lookup not in self.dynamic_text_lookups:
                 continue
-            if not self.is_text_lookup_field(model, field_name):
+            is_text_field = self.is_text_lookup_field(model, field_name)
+            is_uuid_field = self.is_uuid_lookup_field(model, field_name)
+            if not is_text_field and not is_uuid_field:
                 continue
 
             for value in values:
                 if value == "":
                     continue
-                queryset = queryset.filter(**{param: value})
+                if is_text_field:
+                    queryset = queryset.filter(**{param: value})
+                else:
+                    alias = f"_lookup_{field_name.replace('__', '_')}_text"
+                    queryset = queryset.annotate(
+                        **{alias: Cast(F(field_name), output_field=models.CharField())}
+                    ).filter(**{f"{alias}__{lookup}": value})
         return queryset
 
     def is_text_lookup_field(self, model, field_path):
         field = self.resolve_model_field(model, field_path)
         return isinstance(field, (models.CharField, models.TextField))
+
+    def is_uuid_lookup_field(self, model, field_path):
+        return isinstance(self.resolve_model_field(model, field_path), models.UUIDField)
 
     def filter_dynamic_value_lookups(self, request, queryset):
         model = getattr(queryset, "model", None)
@@ -569,7 +581,7 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
         if attr_rules:
             attr_rules = self.json_base64_to_dict(attr_rules)
             return self.filter_queryset_by_attr_rules(attr_rules, queryset)
-        
+
         attr_rules_instance = request.query_params.get("attr_rules_instance")
         if attr_rules_instance:
             attr_rules_instance = self.json_base64_to_dict(attr_rules_instance)
@@ -582,7 +594,7 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
         for q in qs:
             queryset = queryset.filter(q)
         return queryset.distinct()
-    
+
     def filter_queryset_by_attr_rules_instance(self, attr_rules_instance, queryset):
         if not attr_rules_instance or not isinstance(attr_rules_instance, dict):
             return queryset
@@ -601,7 +613,7 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
             error = f"AttrRulesFilterBackend get_queryset_by_attr_rules_instance error: {e}"
             logger.error(error)
             raise ValidationError({'attr_rules_instance': error})
-        
+
     def json_base64_to_dict(self, json_base64):
         try:
             json_data = base64.b64decode(json_base64.encode("utf-8"))
