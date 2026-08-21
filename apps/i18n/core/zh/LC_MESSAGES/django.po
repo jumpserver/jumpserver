@@ -12744,8 +12744,10 @@ msgid "Host name"
 msgstr "主机名称"
 
 #: assets/serializers/asset/template_definition.py
-msgid "IP/Host, max 767 characters, supports IPv4/IPv6 and domain names"
-msgstr "IP/主机名，长度不超过767个字符，支持IPv4/IPv6和域名"
+msgid "IP/Host, max 512 characters, supports IPv4/IPv6 and domain names"
+msgstr "IP/主机名，长度不超过512个字符，支持IPv4/IPv6和域名"
+
+
 
 #: assets/serializers/asset/template_definition.py
 msgid "Platform type (Required)"
@@ -12780,8 +12782,8 @@ msgid "Database name"
 msgstr "数据库名称"
 
 #: assets/serializers/asset/template_definition.py
-msgid "Database address, max 767 characters, supports IPv4/IPv6 and domain names"
-msgstr "数据库地址，长度不超过767个字符，支持IPv4/IPv6和域名"
+msgid "Database address, max 512 characters, supports IPv4/IPv6 and domain names"
+msgstr "数据库地址，长度不超过512个字符，支持IPv4/IPv6和域名"
 
 #: assets/serializers/asset/template_definition.py
 msgid "Platform/DB type (Required)"
@@ -12872,8 +12874,8 @@ msgid "Protocols, format k8s/6443;http(s)/80"
 msgstr "协议组，格式 k8s/6443;http(s)/80"
 
 #: assets/serializers/asset/template_definition.py
-msgid "ID, asset unique identifier, leave blank when importing to create a new asset"
-msgstr "ID，资产唯一标识，导入新建资产时留空"
+msgid "ID, asset unique identifier"
+msgstr "ID，资产唯一标识"
 
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"

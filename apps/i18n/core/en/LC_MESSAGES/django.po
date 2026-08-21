@@ -12661,7 +12661,7 @@ msgid "Host name"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
-msgid "IP/Host, max 767 characters, supports IPv4/IPv6 and domain names"
+msgid "IP/Host, max 512 characters, supports IPv4/IPv6 and domain names"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
@@ -12697,7 +12697,7 @@ msgid "Database name"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
-msgid "Database address, max 767 characters, supports IPv4/IPv6 and domain names"
+msgid "Database address, max 512 characters, supports IPv4/IPv6 and domain names"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
@@ -12789,8 +12789,8 @@ msgid "Protocols, format k8s/6443;http(s)/80"
 msgstr ""
 
 #: assets/serializers/asset/template_definition.py
-msgid "ID, asset unique identifier, leave blank when importing to create a new asset"
-msgstr ""
+msgid "ID, asset unique identifier"
+msgstr "ID, asset unique identifier"
 
 #~| msgid "App Authentication"
 #~ msgid "Certificate Auth"

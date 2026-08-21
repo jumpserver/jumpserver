@@ -12757,3 +12757,7 @@ msgstr "找不到 SYSLOG 格式文檔"
 
 #~ msgid "Closed"
 #~ msgstr "關閉的"
+
+#: assets/serializers/asset/template_definition.py
+msgid "ID, asset unique identifier"
+msgstr "ID，資產唯一標識"
