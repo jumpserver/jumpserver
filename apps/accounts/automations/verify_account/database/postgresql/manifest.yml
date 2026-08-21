@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 postgresql 验证账号
     ja: Ansible postgresql モジュールを使用してアカウントを検証する
     en: Using Ansible module postgresql to verify account
+    es: Usar el módulo Ansible postgresql para verificar la cuenta
+    ko: Ansible postgresql 모듈을 사용하여 계정 확인
+    pt-br: Usar o módulo Ansible postgresql para verificar a conta
+    ru: Использовать модуль Ansible postgresql, чтобы проверить учетную запись
+    vi: Sử dụng mô-đun Ansible postgresql để xác minh tài khoản
+    zh-hant: 使用 Ansible 模組 postgresql 驗證帳號

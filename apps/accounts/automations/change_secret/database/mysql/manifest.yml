@@ -5,9 +5,66 @@ type:
   - mysql
   - mariadb
 method: change_secret
+params:
+  - name: account_host
+    type: str
+    label: "{{ 'MySQL account host' | trans }}"
+    default: "%"
+    help_text: "{{ 'MySQL account host help text' | trans }}"
+  - name: all_hosts
+    type: bool
+    label: "{{ 'Apply to all hosts' | trans }}"
+    default: false
+    help_text: "{{ 'Apply to all hosts help text' | trans }}"
 
 i18n:
   MySQL account change secret:
     zh: 使用 Ansible 模块 mysql 执行 MySQL 账号改密
     ja: Ansible mysql モジュールを使用して MySQL アカウントのパスワード変更
     en: Using Ansible module mysql to change MySQL account secret
+    es: Usar el módulo Ansible mysql para cambiar la contraseña de la cuenta MySQL
+    ko: Ansible mysql 모듈을 사용하여 MySQL 계정 비밀번호 변경
+    pt-br: Usar o módulo Ansible mysql para alterar a senha da conta MySQL
+    ru: Использовать модуль Ansible mysql, чтобы изменить пароль учетной записи MySQL
+    vi: Sử dụng mô-đun Ansible mysql để đổi mật khẩu tài khoản MySQL
+    zh-hant: 使用 Ansible 模組 mysql 執行 MySQL 帳號改密
+  MySQL account host:
+    zh: MySQL 账号主机
+    zh-hant: MySQL 帳號主機
+    ja: MySQL アカウントホスト
+    ko: MySQL 계정 호스트
+    es: Host de la cuenta MySQL
+    pt-br: Host da conta MySQL
+    ru: Хост учетной записи MySQL
+    vi: Máy chủ tài khoản MySQL
+    en: MySQL account host
+  MySQL account host help text:
+    zh: MySQL 账号标识中的主机部分
+    zh-hant: MySQL 帳號識別中的主機部分
+    ja: MySQL アカウント識別子のホスト部分
+    ko: MySQL 계정 식별자의 호스트 부분
+    es: Parte del host de la identidad de la cuenta MySQL
+    pt-br: Parte do host da identidade da conta MySQL
+    ru: Часть хоста идентификатора учетной записи MySQL
+    vi: Phần máy chủ trong định danh tài khoản MySQL
+    en: Host part of the MySQL account identity
+  Apply to all hosts:
+    zh: 应用到所有主机
+    zh-hant: 套用到所有主機
+    ja: すべてのホストに適用
+    ko: 모든 호스트에 적용
+    es: Aplicar a todos los hosts
+    pt-br: Aplicar a todos os hosts
+    ru: Применить ко всем хостам
+    vi: Áp dụng cho tất cả máy chủ
+    en: Apply to all hosts
+  Apply to all hosts help text:
+    zh: 将该操作应用于具有此用户名的所有主机记录
+    zh-hant: 將此操作套用到具有此使用者名稱的所有主機記錄
+    ja: このユーザー名を持つすべてのホストエントリに操作を適用する
+    ko: 이 사용자 이름을 가진 모든 호스트 항목에 작업 적용
+    es: Aplicar la operación a todas las entradas de host con este nombre de usuario
+    pt-br: Aplicar a operação a todas as entradas de host com este nome de usuário
+    ru: Применить операцию ко всем записям хостов с этим именем пользователя
+    vi: Áp dụng thao tác cho mọi mục máy chủ có tên người dùng này
+    en: Apply the operation to every Host entry with this username

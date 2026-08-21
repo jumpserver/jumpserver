@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from functools import partial
 
 from celery.result import AsyncResult
 from django.conf import settings
@@ -23,7 +24,9 @@ from common.permissions import IsValidUser
 from common.utils import get_request_ip_or_data
 from ops.celery import app
 from ops.const import Types
+from ops.filters import JobExecutionFilterSet, JobFilterSet
 from ops.models import Job, JobExecution, JMSPermedInventory
+from ops.models.job import check_upload_permission
 from ops.serializers.job import (
     JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 )
@@ -40,9 +43,6 @@ from ops.const import COMMAND_EXECUTION_DISABLED
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
-from assets.const import Protocol
-from perms.const import ActionChoices
-from perms.utils.asset_perm import PermAssetDetailUtil
 from jumpserver.settings import get_file_md5
 
 
@@ -69,8 +69,12 @@ class LoginAssetACLCheckMixin:
 
 class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     serializer_class = JobSerializer
-    filterset_fields = ('name', 'type')
+    filterset_class = JobFilterSet
     search_fields = ('name', 'comment')
+    ordering_fields = (
+        'name', 'type', 'module', 'is_periodic', 'comment',
+        'date_updated', 'date_created',
+    )
     model = Job
     _parameters = None
 
@@ -82,22 +86,6 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
         if not settings.SECURITY_COMMAND_EXECUTION:
             return self.permission_denied(request, COMMAND_EXECUTION_DISABLED)
         return super().check_permissions(request)
-
-    def check_upload_permission(self, assets, account_name):
-        protocols_required = {Protocol.ssh, Protocol.sftp, Protocol.winrm}
-        error_msg_missing_protocol = _(
-            "Asset ({asset}) must have at least one of the following protocols added: SSH, SFTP, or WinRM")
-        error_msg_auth_missing_protocol = _("Asset ({asset}) authorization is missing SSH, SFTP, or WinRM protocol")
-        error_msg_auth_missing_upload = _("Asset ({asset}) authorization lacks upload permissions")
-        for asset in assets:
-            protocols = asset.protocols.values_list("name", flat=True)
-            if not set(protocols).intersection(protocols_required):
-                self.permission_denied(self.request, error_msg_missing_protocol.format(asset=asset.name))
-            util = PermAssetDetailUtil(self.request.user, asset)
-            if not util.check_perm_protocols(protocols_required):
-                self.permission_denied(self.request, error_msg_auth_missing_protocol.format(asset=asset.name))
-            if not util.check_perm_actions(account_name, [ActionChoices.upload.value]):
-                self.permission_denied(self.request, error_msg_auth_missing_upload.format(asset=asset.name))
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -116,9 +104,6 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
         nodes = serializer.validated_data.pop('nodes', [])
         assets = serializer.validated_data.get('assets', [])
         assets = merge_nodes_and_assets(nodes, assets, self.request.user)
-        if serializer.validated_data.get('type') == Types.upload_file:
-            account_name = serializer.validated_data.get('runas')
-            self.check_upload_permission(assets, account_name)
         instance = serializer.save()
 
         if instance.instant or run_after_save:
@@ -219,7 +204,11 @@ class JobExecutionViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     http_method_names = ('get', 'post', 'head', 'options',)
     model = JobExecution
     search_fields = ('material',)
-    filterset_fields = ['status', 'job_id']
+    filterset_class = JobExecutionFilterSet
+    ordering_fields = (
+        'material', 'job_type', 'status', 'date_start', 'date_finished',
+        'date_created',
+    )
 
     def check_permissions(self, request):
         if not settings.SECURITY_COMMAND_EXECUTION:
@@ -362,6 +351,7 @@ class ClassifiedHostsAPI(APIView):
         runas_policy = request.data.get('runas_policy', 'privileged_first')
         account_prefer = request.data.get('runas', 'root,Administrator')
         module = request.data.get('module', 'shell')
+        job_type = request.data.get('type')
         assets = list(Asset.objects.filter(id__in=asset_ids).all())
         tmp_dir = os.path.join(settings.PROJECT_DIR, 'inventory', str(uuid.uuid4()))
         os.makedirs(tmp_dir, exist_ok=True)
@@ -371,7 +361,11 @@ class ClassifiedHostsAPI(APIView):
             module=module,
             account_policy=runas_policy,
             account_prefer=account_prefer,
-            user=self.request.user
+            user=self.request.user,
+            host_callback=(
+                partial(check_upload_permission, user=self.request.user)
+                if job_type == Types.upload_file else None
+            )
         )
         classified_hosts = inventory.get_classified_hosts(tmp_dir)
 

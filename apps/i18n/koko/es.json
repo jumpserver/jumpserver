@@ -3,7 +3,7 @@
     "%s approved": "%s Aprobado en la revisión.",
     "%s node has no assets": "El nodo %s no tiene activos",
     "%s protocol client not installed.": "El cliente del protocolo %s no está instalado",
-    "%s rejected": "Revisión rechazada",
+    "%s rejected": "%s fue rechazado",
     "ACL reject": "El acceso se ha denegado en esta ocasión debido a las limitaciones de la política de control de acceso",
     "Account <%s> and asset <%s> protocol are inconsistent.": "El usuario del sistema <%s> y el activo <%s> presentan un desacuerdo en el protocolo",
     "ActionPerm": "Permisos de acción",
@@ -21,7 +21,7 @@
     "CaseSensitive": "Distinguir mayúsculas de minúsculas",
     "Clone Connect": "Copiar ventana",
     "Close All Tabs": "Cerrar todo",
-    "Close Current Tab": "Cerrar actual  \nColor del tema  \nSin dirección  \nPegar  \nTema  \nCerrar todo  \nMinuto  \nUnirse a compartir  \nHas sido removido de la sesión compartida  \nIntroduce el nombre de usuario  \nPor favor selecciona  \nBuscar  \nConfirmar  \nCrear enlace de compartición  \nSubir archivo",
+    "Close Current Tab": "Cerrar la pestaña actual",
     "Command `%s` is forbidden": "El comando `%s` está prohibido ...",
     "Comment": "Nota",
     "Confirm": "Confirmar",
@@ -61,6 +61,7 @@
     "Face ACL is not supported yet. Please use the WebTerminal to connect the asset.": "Este terminal no soporta las reglas de acceso facial, por favor utilice el terminal web para iniciar sesión",
     "Face verification is not supported yet. Please use the WebTerminal to connect the asset.": "Esta terminal no soporta la autenticación por reconocimiento facial; por favor inicie sesión a través de la terminal web.",
     "FailedCreateConnection": "Fallo al crear conexión",
+    "File transfer error, file transfer interrupted": "Error de transferencia de archivos, la transferencia fue interrumpida",
     "FileAlreadyExists": "El archivo ya existe",
     "FileListError": "No se pudo obtener la información de la lista de archivos",
     "FileManagement": "Gestión de archivos",
@@ -223,6 +224,5 @@
     "refresh your assets and nodes": "Actualizando la información más reciente de máquinas y nodos",
     "select one asset to login": "Selecciona uno de los activos para iniciar sesión",
     "to search login if unique": "Buscar inicio de sesión (si es único)",
-    "to search, such as: /192.168": "Buscar, por ejemplo: /192.168",
-    "File transfer error, file transfer interrupted": "Error de transferencia de archivos, la transferencia fue interrumpida"
+    "to search, such as: /192.168": "Buscar, por ejemplo: /192.168"
 }

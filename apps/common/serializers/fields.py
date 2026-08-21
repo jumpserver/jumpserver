@@ -430,8 +430,13 @@ class JSONManyToManyField(serializers.JSONField):
         if not isinstance(value, dict):
             return {"type": "ids", "ids": []}
         if value.get("type") == "ids":
-            valid_ids = manager.all().values_list("id", flat=True)
-            valid_ids = [str(i) for i in valid_ids]
+            valid_ids = [
+                str(resource_id)
+                for resource_id in manager.all()
+                .order_by()
+                .values_list("id", flat=True)
+                .iterator(chunk_size=2000)
+            ]
             return {"type": "ids", "ids": valid_ids}
         return value
 

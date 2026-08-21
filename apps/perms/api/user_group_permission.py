@@ -19,6 +19,7 @@ __all__ = [
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
+    queryset = Asset.objects.none()
     serializer_class = serializers.AssetPermedSerializer
     only_fields = serializers.AssetPermedSerializer.Meta.only_fields
     filterset_fields = ['name', 'address', 'id', 'comment']
@@ -54,6 +55,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedNodeAssetsApi(ListAPIView):
+    queryset = Asset.objects.none()
     serializer_class = serializers.AssetPermedSerializer
     only_fields = serializers.AssetPermedSerializer.Meta.only_fields
     filterset_fields = ['name', 'address', 'id', 'comment']

@@ -16,3 +16,11 @@ class IsApplicant(permissions.BasePermission):
 class IsAssignee(permissions.BasePermission):
     def has_permission(self, request, view):
         return view.ticket.has_all_assignee(request.user)
+
+
+class IsCcUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.method in permissions.SAFE_METHODS and
+            view.ticket.cc_users.filter(id=request.user.id).exists()
+        )

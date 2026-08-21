@@ -2,11 +2,11 @@
 
 ## 1. Introduction
 
-This API provides PAM asset account viewing service, supports RESTful style calls, and returns data in JSON format.
+This API retrieves account secrets for PAM assets, supports RESTful requests, and returns data in JSON format.
 
 ## 2. Environment Requirements
 
-- `Java 8+`
+- `Java 11+`
 - `HttpClient`
 
 ## 3. Usage
@@ -17,22 +17,22 @@ This API provides PAM asset account viewing service, supports RESTful style call
 
 | Parameter Name | Type | Required | Description       |
 |----------------|------|----------|-------------------|
-| asset          | str  | Yes      | Asset ID / Name   |
-| account        | str  | Yes      | Account ID / Name |
+| asset          | str  | Yes      | Asset Name        |
+| account        | str  | Yes      | Account Name      |
 
 **Response Example**:
 ```json
 {
-    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e", 
+    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e",
     "secret": "123456"
 }
 ```
 
 ## Frequently Asked Questions (FAQ)
 
-Q: How to obtain the API Key?
+Q: How do I obtain an API key?
 
-A: You can create an application in PAM - Application Management to generate KEY_ID and KEY_SECRET.
+A: Create an application in PAM - Application Management to generate a KEY_ID and KEY_SECRET.
 
 ## Changelog
 

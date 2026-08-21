@@ -15,3 +15,9 @@ i18n:
     zh: '使用 Python 模块 paramiko 测试主机可连接性'
     en: 'Ping by paramiko module'
     ja: 'Paramikoモジュールを使用してホストにPingする'
+    es: Comprobar la conectividad mediante el módulo paramiko
+    ko: paramiko 모듈로 연결 테스트
+    pt-br: Testar a conectividade com o módulo paramiko
+    ru: Проверить подключение с помощью модуля paramiko
+    vi: Kiểm tra kết nối bằng mô-đun paramiko
+    zh-hant: 使用 Python 模組 paramiko 測試主機可連線性

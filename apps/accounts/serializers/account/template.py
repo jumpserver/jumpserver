@@ -19,7 +19,7 @@ class PasswordRulesSerializer(serializers.Serializer):
 
     @staticmethod
     def get_render_help_text():
-        return _("""length is the length of the password, and the range is 8 to 30.
+        return _("""length is the length of the password, and the range is 8 to 36.
 lowercase indicates whether the password contains lowercase letters, 
 uppercase indicates whether it contains uppercase letters,
 digit indicates whether it contains numbers, and symbol indicates whether it contains special symbols.

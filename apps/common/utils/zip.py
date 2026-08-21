@@ -1,6 +1,7 @@
 import os
 import stat
 import hashlib
+import shutil
 from pathlib import Path
 from rest_framework.exceptions import ValidationError
 from zipfile import ZipFile, BadZipFile
@@ -10,8 +11,8 @@ from zipfile import ZipFile, BadZipFile
 # 可按你们安全规范调整
 # -------------------------
 MAX_FILES = 1000
-MAX_SINGLE_FILE_SIZE = 200 * 1024 * 1024      # 200MB
-MAX_TOTAL_SIZE = 1 * 1024 * 1024 * 1024        # 1GB
+MAX_SINGLE_FILE_SIZE = 1 * 1024 * 1024 * 1024  # 1GB
+MAX_TOTAL_SIZE = 2 * 1024 * 1024 * 1024        # 2GB
 MAX_COMPRESSION_RATIO = 100                   # 解压 / 压缩
 
 
@@ -140,7 +141,7 @@ def safe_extract_zip(
                 else:
                     target_path.parent.mkdir(parents=True, exist_ok=True)
                     with zf.open(info) as src, open(target_path, "wb") as dst:
-                        dst.write(src.read())
+                        shutil.copyfileobj(src, dst)
 
     except BadZipFile:
         raise ZipSecurityError("Invalid zip file")

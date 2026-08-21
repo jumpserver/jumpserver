@@ -1,32 +1,32 @@
 #!/bin/bash
 
-# 配置参数
+# Configuration parameters
 API_URL=${API_URL:-"http://127.0.0.1:8080"}
 KEY_ID=${API_KEY_ID:-"72b0b0aa-ad82-4182-a631-ae4865e8ae0e"}
 KEY_SECRET=${API_KEY_SECRET:-"6fuSO7P1m4cj8SSlgaYdblOjNAmnxDVD7tr8"}
 ORG_ID=${ORG_ID:-"00000000-0000-0000-0000-000000000002"}
 
-# 查询参数
+# Query parameters
 ASSET="ubuntu_docker"
 ACCOUNT="root"
 QUERY_STRING="asset=${ASSET}&account=${ACCOUNT}"
 
-# 计算时间戳
+# Calculate the timestamp
 DATE=$(date -u +"%a, %d %b %Y %H:%M:%S GMT")
 
-# 计算 (request-target) 需要包含查询参数
+# (request-target) must include the query parameters
 REQUEST_TARGET="get /api/v1/accounts/integration-applications/account-secret/?${QUERY_STRING}"
 
-# 生成签名字符串
+# Generate the signing string
 SIGNING_STRING="(request-target): $REQUEST_TARGET
 accept: application/json
 date: $DATE
 x-jms-org: $ORG_ID"
 
-# 计算 HMAC-SHA256 签名
+# Calculate the HMAC-SHA256 signature
 SIGNATURE=$(echo -n "$SIGNING_STRING" | openssl dgst -sha256 -hmac "$KEY_SECRET" -binary | base64)
 
-# 发送请求
+# Send the request
 curl -G "$API_URL/api/v1/accounts/integration-applications/account-secret/" \
     -H "Accept: application/json" \
     -H "Date: $DATE" \

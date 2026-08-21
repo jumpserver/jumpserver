@@ -4,6 +4,7 @@ from django.db.models import Q
 from common.api.generic import JMSBulkModelViewSet
 from common.permissions import IsOwnerOrAdminWritable
 from common.utils.http import is_true
+from ops.filters import AdHocFilterSet
 from rbac.permissions import RBACPermission
 from ..const import Scope
 from ..models import AdHoc
@@ -19,7 +20,11 @@ class AdHocViewSet(JMSBulkModelViewSet):
     serializer_class = AdHocSerializer
     permission_classes = (RBACPermission, IsOwnerOrAdminWritable)
     search_fields = ('name', 'comment')
-    filterset_fields = ['scope', 'creator']
+    filterset_class = AdHocFilterSet
+    ordering_fields = (
+        'name', 'module', 'scope', 'created_by', 'date_created',
+        'date_updated',
+    )
 
     def allow_bulk_destroy(self, qs, filtered):
         for obj in filtered:

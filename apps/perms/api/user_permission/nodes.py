@@ -39,7 +39,11 @@ class UserAllPermedNodesApi(BaseUserPermedNodesApi):
     """ 用户授权的节点 """
 
     def get_nodes(self):
-        return self.query_node_util.get_whole_tree_nodes()
+        nodes = self.query_node_util.get_whole_tree_nodes()
+        search = self.request.query_params.get('search', '').strip().casefold()
+        if search:
+            nodes = [node for node in nodes if search in node.full_value.casefold()]
+        return nodes
 
 
 class UserPermedNodeChildrenApi(BaseUserPermedNodesApi):

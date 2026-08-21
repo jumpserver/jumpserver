@@ -156,9 +156,9 @@ class OracleInfo(object):
             self.__get_users()
 
     def __get_version(self):
-        version_sql = 'SELECT VERSION FROM PRODUCT_COMPONENT_VERSION where ROWNUM=1'
-        rtn, err = self.oracle_client.execute(version_sql, exception_to_fail=True)
-        self.info['version'] = {'full': rtn.get('version')}
+        self.info['version'] = {
+            'full': self.oracle_client.server_version or ''
+        }
 
     def __get_settings(self):
         """Get global variables (instance settings)."""
@@ -180,42 +180,94 @@ class OracleInfo(object):
 
     def __get_users(self):
         """Get user info."""
+        column_sql = """
+            SELECT COLUMN_NAME
+            FROM ALL_TAB_COLUMNS
+            WHERE OWNER = 'SYS'
+              AND TABLE_NAME = 'DBA_USERS'
+        """
+        available, _ = self.oracle_client.execute(
+            column_sql, exception_to_fail=True
+        )
+        if isinstance(available, dict):
+            available = [available]
+        available_columns = {
+            row['column_name'].lower() for row in (available or [])
+        }
+        wanted_columns = [
+            'username', 'user_id', 'account_status', 'expiry_date',
+            'default_tablespace', 'created', 'authentication_type',
+            'last_login', 'password_change_date',
+        ]
+        selected_columns = [
+            column for column in wanted_columns
+            if column in available_columns
+        ]
+        required_columns = {'username', 'default_tablespace'}
+        if not required_columns.issubset(selected_columns):
+            self.module.fail_json(
+                msg='DBA_USERS does not expose the required account columns'
+            )
 
-        def _set_users_roles(username, item_dict):
-            users_sql = f"SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE = '{username}';"
-            try:
-                rtn, err = self.oracle_client.execute(users_sql, exception_to_fail=True)
-                item_dict['roles'] = [r['role'] for r in rtn]
-            except Exception:
-                pass
+        users_sql = 'SELECT {} FROM DBA_USERS'.format(
+            ', '.join(selected_columns)
+        )
+        users, _ = self.oracle_client.execute(
+            users_sql, exception_to_fail=True
+        )
+        if isinstance(users, dict):
+            users = [users]
 
-        def _set_users_privileges(username, item_dict):
-            users_sql = f"SELECT PRIVILEGE FROM DBA_SYS_PRIVS WHERE GRANTEE = '{username}';"
-            try:
-                rtn, err = self.oracle_client.execute(users_sql, exception_to_fail=True)
-                item_dict['privileges'] = [r['privilege'] for r in rtn]
-            except Exception:
-                pass
+        roles_sql = """
+            SELECT RP.GRANTEE, RP.GRANTED_ROLE
+            FROM DBA_ROLE_PRIVS RP
+            JOIN DBA_USERS U ON U.USERNAME = RP.GRANTEE
+        """
+        roles, roles_error = self.oracle_client.execute(roles_sql)
+        if roles_error:
+            self.module.warn(
+                'Unable to collect Oracle role memberships: %s'
+                % roles_error
+            )
+            roles = []
+        if isinstance(roles, dict):
+            roles = [roles]
 
-        def _set_users_value(item_dict):
-            try:
-                tablespace = item_dict.pop('default_tablespace')
-                username = item_dict.pop('username')
-                partial_users = self.info['users'].get(tablespace, {})
-                _set_users_roles(username, item_dict)
-                _set_users_privileges(username, item_dict)
-                partial_users[username] = item_dict
-                self.info['users'][tablespace] = partial_users
-            except KeyError:
-                pass
+        privileges_sql = """
+            SELECT SP.GRANTEE, SP.PRIVILEGE
+            FROM DBA_SYS_PRIVS SP
+            JOIN DBA_USERS U ON U.USERNAME = SP.GRANTEE
+        """
+        privileges, privileges_error = self.oracle_client.execute(
+            privileges_sql
+        )
+        if privileges_error:
+            self.module.warn(
+                'Unable to collect Oracle system privileges: %s'
+                % privileges_error
+            )
+            privileges = []
+        if isinstance(privileges, dict):
+            privileges = [privileges]
 
-        users_sql = "SELECT * FROM dba_users"
-        rtn, err = self.oracle_client.execute(users_sql, exception_to_fail=True)
-        if isinstance(rtn, dict):
-            _set_users_value(rtn)
-        elif isinstance(rtn, list):
-            for i in rtn:
-                _set_users_value(i)
+        roles_by_user = {}
+        for role in roles or []:
+            roles_by_user.setdefault(role['grantee'], []).append(
+                role['granted_role']
+            )
+        privileges_by_user = {}
+        for privilege in privileges or []:
+            privileges_by_user.setdefault(
+                privilege['grantee'], []
+            ).append(privilege['privilege'])
+
+        for item in users or []:
+            item = dict(item)
+            tablespace = item.pop('default_tablespace')
+            username = item.pop('username')
+            item['roles'] = roles_by_user.get(username, [])
+            item['privileges'] = privileges_by_user.get(username, [])
+            self.info['users'].setdefault(tablespace, {})[username] = item
 
     def __get_databases(self, exclude_fields):
         """Get info about databases."""
@@ -274,9 +326,13 @@ def main():
         exclude_fields = set([f.strip() for f in exclude_fields])
 
     oracle_client = OracleClient(module)
-    oracle = OracleInfo(module, oracle_client)
+    try:
+        oracle = OracleInfo(module, oracle_client)
+        info = oracle.get_info(filter_, exclude_fields)
+    finally:
+        oracle_client.close()
 
-    module.exit_json(changed=False, **oracle.get_info(filter_, exclude_fields))
+    module.exit_json(changed=False, **info)
 
 
 if __name__ == '__main__':

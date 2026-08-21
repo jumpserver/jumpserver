@@ -41,6 +41,15 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         'login_url': 'authentication.add_ssotoken',
     }
 
+    @staticmethod
+    def get_safe_next_url(request):
+        query_params = getattr(request, 'query_params', request.GET)
+        raw_next_url = query_params.get(NEXT_URL)
+        next_url = safe_next_url(raw_next_url, request=request)
+        if not raw_next_url or next_url == '/':
+            next_url = reverse('index')
+        return next_url
+
     @action(methods=[POST], detail=False, url_path='login-url')
     def login_url(self, request, *args, **kwargs):
         if not settings.AUTH_SSO:
@@ -73,9 +82,7 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         status_code = status.HTTP_400_BAD_REQUEST
         request.META['HTTP_X_JMS_LOGIN_TYPE'] = 'W'
         authkey = request.query_params.get(AUTH_KEY)
-        next_url = request.query_params.get(NEXT_URL)
-        if not next_url or not next_url.startswith('/'):
-            next_url = reverse('index')
+        next_url = self.get_safe_next_url(request)
 
         try:
             if not authkey:

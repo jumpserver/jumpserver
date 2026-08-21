@@ -65,10 +65,10 @@ class OperatorLogHandler(metaclass=Singleton):
         return str(left) == str(right)
 
     def _look_for_two_dict_change(self, left_dict, right_dict):
-        # 以右边的字典为基础
         before, after = {}, {}
-        for key, value in right_dict.items():
+        for key in left_dict.keys() | right_dict.keys():
             pre_value = left_dict.get(key, '')
+            value = right_dict.get(key, '')
             if self._value_equal_for_diff(pre_value, value):
                 continue
             before[key] = pre_value

@@ -3,28 +3,45 @@
   vars:
     ansible_python_interpreter: "{{ local_python_interpreter }}"
     db_name: "{{ jms_asset.spec_info.db_name }}"
-    check_ssl: "{{ jms_asset.spec_info.use_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
+    use_ssl: "{{ jms_asset.spec_info.use_ssl }}"
+    check_hostname: "{{ not jms_asset.spec_info.allow_invalid_cert }}"
     ca_cert: "{{ jms_asset.secret_info.ca_cert | default('') }}"
     ssl_cert: "{{ jms_asset.secret_info.client_cert | default('') }}"
     ssl_key: "{{ jms_asset.secret_info.client_key | default('') }}"
+    account_host: "{{ params.account_host | default('%') }}"
+    all_account_hosts: "{{ params.all_hosts | default(false) }}"
 
   tasks:
-    - name: Test MySQL connection
+    - name: Read MySQL version
       community.mysql.mysql_info:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        check_hostname: "{{ check_ssl if check_ssl else omit }}"
-        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
-        client_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
-        client_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
+        check_hostname: "{{ check_hostname if use_ssl else omit }}"
+        ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
+        client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
+        client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
+        connect_timeout: 15
         filter: version
       register: db_info
 
-    - name: MySQL version
-      debug:
-        var: db_info.version.full
+    - name: Check whether MySQL account exists on any host
+      community.mysql.mysql_query:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        check_hostname: "{{ check_hostname if use_ssl else omit }}"
+        ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
+        client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
+        client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
+        connect_timeout: 15
+        query: SELECT COUNT(*) AS account_count FROM mysql.user WHERE User = %s
+        positional_args:
+          - "{{ account.username }}"
+      when: all_account_hosts | bool
+      register: mysql_account_lookup
 
     - name: Change MySQL password
       community.mysql.mysql_user:
@@ -32,29 +49,55 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        check_hostname: "{{ check_ssl if check_ssl else omit }}"
-        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
-        client_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
-        client_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
+        check_hostname: "{{ check_hostname if use_ssl else omit }}"
+        ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
+        client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
+        client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
+        connect_timeout: 15
         name: "{{ account.username }}"
-        host: "%"
+        host: "{{ account_host }}"
+        host_all: >-
+          {{
+            (all_account_hosts | bool)
+            and (mysql_account_lookup.query_result[0][0].account_count | int > 0)
+          }}
         plugin: "{{ 'caching_sha2_password' if ('MariaDB' not in db_info.version.full and (db_info.version.full is version('8.0', '>='))) else omit }}"
         plugin_auth_string: "{{ account.secret if ('MariaDB' not in db_info.version.full and (db_info.version.full is version('8.0', '>='))) else omit }}"
         password: "{{ account.secret if ('MariaDB' in db_info.version.full or (db_info.version.full is version('8.0', '<'))) else omit }}"
         priv: "{{ omit if db_name == '' else db_name + '.*:ALL' }}"
         append_privs: "{{ db_name != '' }}"
       ignore_errors: true
-      when: db_info is succeeded
+      register: change_secret_result
 
     - name: Verify password
-      community.mysql.mysql_info:
+      community.mysql.mysql_query:
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        check_hostname: "{{ check_ssl if check_ssl else omit }}"
-        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
-        client_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
-        client_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
-        filter: version
-      when: check_conn_after_change
+        check_hostname: "{{ check_hostname if use_ssl else omit }}"
+        ca_cert: "{{ ca_cert if use_ssl and ca_cert | length > 0 else omit }}"
+        client_cert: "{{ ssl_cert if use_ssl and ssl_cert | length > 0 else omit }}"
+        client_key: "{{ ssl_key if use_ssl and ssl_key | length > 0 else omit }}"
+        connect_timeout: 15
+        query: SELECT 1
+      when: check_conn_after_change or change_secret_result.failed | default(false)
+      register: verify_secret_result
+      ignore_errors: true
+
+    - name: Mark MySQL verification as inconclusive
+      ansible.builtin.set_fact:
+        jms_credential_probe:
+          auth_status: unknown
+          reason_code: MYSQL_VERIFY_FAILED
+          change_succeeded: true
+      when:
+        - not (change_secret_result.failed | default(false))
+        - verify_secret_result.failed | default(false)
+
+    - name: Fail when MySQL push and verification both fail
+      ansible.builtin.fail:
+        msg: "MySQL account push failed: {{ change_secret_result.msg | default('unknown error') }}"
+      when:
+        - change_secret_result.failed | default(false)
+        - verify_secret_result.failed | default(false)

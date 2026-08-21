@@ -45,120 +45,66 @@ HTTP_BIND_HOST: 0.0.0.0
 HTTP_LISTEN_PORT: 8080
 WS_LISTEN_PORT: 8070
 
-# Independent Chat AI ASGI service. The provider must expose an OpenAI-compatible
-# API. Credentials are managed by the JumpServer Chat AI setting and never
-# returned by Chat AI APIs.
-# CHAT_AI_ENABLED: false
-# CHAT_AI_BASE_URL: https://api.openai.com/v1
-# CHAT_AI_API_KEY: ""
-# CHAT_AI_PROXY: ""
-# CHAT_AI_MODEL: ""
-# CHAT_AI_BIND_HOST: 0.0.0.0
-# CHAT_AI_LISTEN_PORT: 8088
-# CHAT_AI_CORE_BASE_URL: http://jms_core:8080
-# CHAT_AI_CORE_TLS_VERIFY: true
-# CHAT_AI_CORE_CA_CERT: /etc/jumpserver/pki/ca.crt
-# CHAT_AI_CORE_CLIENT_CERT: /etc/jumpserver/pki/chat-ai.crt
-# CHAT_AI_CORE_CLIENT_KEY: /etc/jumpserver/pki/chat-ai.key
-# Delegation and approval signatures use independently derived keys by default.
-# Set explicit secrets to decouple them from SECRET_KEY. During rotation, keep
-# old key-id-to-secret mappings in the corresponding VERIFY_KEYS dictionary.
-# CHAT_AI_DELEGATION_KEY_ID: v1
-# CHAT_AI_DELEGATION_SECRET: ""
-# CHAT_AI_DELEGATION_VERIFY_KEYS: {}
-# CHAT_AI_APPROVAL_KEY_ID: v1
-# CHAT_AI_APPROVAL_SECRET: ""
-# CHAT_AI_APPROVAL_VERIFY_KEYS: {}
-# CHAT_AI_MODEL_TIMEOUT: 120
-# CHAT_AI_SSE_HEARTBEAT_INTERVAL: 15
-# CHAT_AI_PARTIAL_SAVE_INTERVAL: 2
-# CHAT_AI_PARTIAL_SAVE_CHARS: 1024
-# CHAT_AI_STALE_RUN_TIMEOUT: 600
-# CHAT_AI_QUEUED_RUN_TIMEOUT: 3600
-# Speech-to-text uses the OpenAI Audio Transcriptions protocol. When BASE_URL is
-# empty it reuses CHAT_AI_BASE_URL/CHAT_AI_API_KEY; an explicit local BASE_URL
-# without a key uses a non-secret local placeholder credential.
-# CHAT_AI_STT_ENABLED: true
-# CHAT_AI_STT_BASE_URL: http://whisper:8000/v1
-# CHAT_AI_STT_API_KEY: ""
-# CHAT_AI_STT_PROXY: ""
-# CHAT_AI_STT_MODEL: whisper-1
-# CHAT_AI_STT_TIMEOUT: 120
-# CHAT_AI_STT_MAX_FILE_SIZE: 10485760
-# CHAT_AI_STT_MAX_DURATION: 120
-# CHAT_AI_STT_FFPROBE_BIN: ffprobe
-# CHAT_AI_STT_RATE: 20/min
-# CHAT_AI_STT_MAX_CONCURRENCY: 1
-# CHAT_AI_STT_GLOBAL_CONCURRENCY: 4
-# Voice input defaults to the browser API. Set to server to upload recordings
-# to /api/v1/chat-ai/transcriptions/.
-# CHAT_AI_VOICE_TRANSCRIPTION_MODE: browser
-# Image messages accept JPEG, PNG, WebP, and non-animated GIF files.
-# CHAT_AI_IMAGE_MAX_COUNT: 4
-# CHAT_AI_IMAGE_MAX_FILE_SIZE: 5242880
-# CHAT_AI_IMAGE_MAX_TOTAL_SIZE: 10485760
-# Files accept PDF, DOCX, XLSX, PPTX, and common text/code formats. Extracted
-# text is stored with the message and sent to the model as user-provided data.
-# CHAT_AI_FILE_MAX_COUNT: 4
-# CHAT_AI_FILE_MAX_FILE_SIZE: 10485760
-# CHAT_AI_FILE_MAX_TOTAL_SIZE: 20971520
-# CHAT_AI_FILE_MAX_EXTRACTED_CHARS: 40000
-# CHAT_AI_FILE_MAX_TOTAL_EXTRACTED_CHARS: 80000
-# Public web search is disabled by default. Tavily requires an API key. SearXNG
-# can be self-hosted and must have JSON responses enabled.
-# CHAT_AI_WEB_SEARCH_ENABLED: false
-# CHAT_AI_WEB_SEARCH_PROVIDER: tavily  # tavily or searxng
-# CHAT_AI_WEB_SEARCH_BASE_URL: https://api.tavily.com
-# CHAT_AI_WEB_SEARCH_API_KEY: ""
-# CHAT_AI_WEB_SEARCH_PROXY: ""
-# CHAT_AI_WEB_SEARCH_TIMEOUT: 10
-# CHAT_AI_WEB_SEARCH_MAX_RESULTS: 5
-# CHAT_AI_WEB_SEARCH_MAX_CALLS: 3
-# CHAT_AI_WEB_SEARCH_MAX_RESPONSE_BYTES: 1048576
-# CHAT_AI_API_TIMEOUT: 15
-# CHAT_AI_MAX_CONCURRENCY: 2
-# CHAT_AI_MAX_STEPS: 10
-# CHAT_AI_MAX_API_CALLS: 20
-# Background submissions share one per-user rate and queue limit across
-# conversations and organizations. The token reservation closes the gap while
-# queued/running jobs have not persisted their final usage yet. Set the daily
-# token limit to 0 to disable that quota.
-# CHAT_AI_BACKGROUND_TASK_RATE: 10/min
-# CHAT_AI_BACKGROUND_MAX_PENDING_PER_USER: 5
-# CHAT_AI_BACKGROUND_TOKEN_RESERVATION: 8192
-# CHAT_AI_DAILY_TOKEN_LIMIT: 200000
-# CHAT_AI_MAX_SCHEDULES_PER_USER: 10
-# Chat AI data is cleaned daily at 02:00. Set an individual value to 0 to
-# disable cleanup for that data class.
-# CHAT_AI_CONVERSATION_KEEP_DAYS: 180
-# CHAT_AI_ATTACHMENT_KEEP_DAYS: 30
-# CHAT_AI_RESULT_CARD_KEEP_DAYS: 90
-# CHAT_AI_AUDIT_KEEP_DAYS: 180
-# CHAT_AI_MAX_RESPONSE_BYTES: 1048576
-# CHAT_AI_APPROVAL_TTL: 600
-# CHAT_AI_SCHEMA_LOAD_ON_START: false
-# Agent API allowlists. The default permits read-only asset, session, audit,
-# job, task, component, and terminal diagnosis. Host creation remains the only
-# default write operation and still requires explicit user approval.
-# CHAT_AI_ALLOWED_TAGS: []
-# CHAT_AI_ALLOWED_OPERATION_IDS:
-#   - assets_platforms_list
-#   - assets_nodes_list
-#   - assets_hosts_list
-#   - assets_hosts_retrieve
-#   - assets_hosts_create
-#   - terminal_sessions_list
-#   - terminal_sessions_retrieve
-#   - terminal_commands_list
-#   - terminal_commands_retrieve
-#   - audits_login_logs_list
-#   - audits_operate_logs_list
-#   - audits_job_logs_list
-#   - ops_jobs_list
-#   - ops_tasks_list
-# CHAT_AI_ALLOWED_PATHS: []
-# CHAT_AI_BLOCKED_PATHS: []
-# Method policy is also configurable as CHAT_AI_METHOD_POLICIES in JSON/YAML.
+# Ansible 单批次超时（一次 ansible-runner 执行，单位：秒）
+# 当前资产自动化会按每 80 个资产分批；每批只启动一个 ansible-runner，
+# 各批次按顺序执行。一个资产有多个目标账号时，该批实际执行的账号数会更多。
+#
+# JOB_TIMEOUT：单个 80 资产批次的总时长上限；即使持续有输出，达到该时间也会终止。
+#              它不是整个任务的超时。不要仅因任务有 1 万资产就盲目调大；
+#              只有单批 P95 耗时接近 1800 秒（30 分钟）时才需要提高。
+# IDLE_TIMEOUT：单批连续这么久没有任何 Ansible 事件或输出，就认为批次卡死并终止。
+#               通常应保留此保护；只有已确认存在正常的长时间静默操作时再提高。
+# 任一项设为 0，只关闭对应的单批限制。
+# ANSIBLE_RUNNER_JOB_TIMEOUT: 1800
+# ANSIBLE_RUNNER_IDLE_TIMEOUT: 900
+
+# 整个自动化任务的监控与超时（单位：秒）
+# STALL_LOG_INTERVAL：每隔多久记录一次仍在执行 task 的主机；只记录，不会终止任务
+# TASK_TIMEOUT：每台主机执行单个 Ansible task 的默认最长时间
+#               playbook 中为 task 显式设置 timeout 时，以 playbook 为准
+# TOTAL_TIMEOUT：整个自动化任务（包括准备、全部批次和写入结果）的最长时间；
+#                超时后停止当前及后续批次。大规模改密主要应调整此项。
+#
+# 大规模改密容量估算（建议先在相同网络和平台上实测）：
+# 1. 选择 80 个有代表性的资产，按实际账号数执行一次改密，记录“单批 P95 耗时”。
+# 2. 按以下公式设置 TOTAL_TIMEOUT，预留至少 30% 余量：
+#      ceil(资产总数 / 80) * 单批 P95 耗时（秒） * 1.3
+# 3. 示例：1 万资产、2 万账号约为 125 批。若单批 P95 为 3 分钟，
+#    建议至少 32400 秒（9 小时）；若为 5 分钟，建议至少 54000 秒（15 小时）。
+#
+# 不建议未压测就执行 1 万资产的单个改密任务；可拆为每次约 1000 资产/2000 账号，
+# 并串行执行。若需并发多个任务，还应评估 Ansible forks、Celery、Redis、数据库及
+# 目标系统的并发连接承载能力。
+#
+# 1 万资产 / 2 万账号单任务的建议起始值（假定 80 资产单批 P95 不超过 5 分钟）：
+# ANSIBLE_RUNNER_JOB_TIMEOUT: 1800        # 单批硬超时：30 分钟
+# ANSIBLE_RUNNER_IDLE_TIMEOUT: 900        # 单批无输出超时：15 分钟
+# ANSIBLE_STALL_LOG_INTERVAL: 60          # 卡住主机的日志间隔：1 分钟
+# ANSIBLE_AUTOMATION_TASK_TIMEOUT: 300    # 单主机单 Ansible task 超时：5 分钟
+# ANSIBLE_AUTOMATION_TOTAL_TIMEOUT: 54000 # 公式结果 48750 秒，向上取整为 15 小时
+# SSH_GATEWAY_CONNECT_TIMEOUT: 30         # 单次网关连接超时：30 秒
+#
+# 若单批 P95 约为 3 分钟，可将 TOTAL_TIMEOUT 改为 32400（9 小时）；
+# 若单批 P95 超过 5 分钟，则按上面的公式重新计算，不能仍使用 54000。
+# 除 TOTAL_TIMEOUT 外，其余值不是按资产总量放大的：只有相应的单批或单主机操作
+# 确实会超时时，才提高对应配置。
+#
+# 设置 TOTAL_TIMEOUT 为 0 会关闭整任务的安全时限；此时改密账号锁最长会保留 24 小时，
+# 生产环境通常不建议这样设置。
+# 设置为 0 可关闭对应的日志记录或超时限制。
+# ANSIBLE_STALL_LOG_INTERVAL: 60
+# ANSIBLE_AUTOMATION_TASK_TIMEOUT: 300
+# ANSIBLE_AUTOMATION_TOTAL_TIMEOUT: 21600
+
+# SSH 网关连接超时（单位：秒）
+# 限制通过网关建隧道时 DNS 解析、TCP 连接、SSH 握手和认证的总等待时间
+# 设置为 0 时不增加 JumpServer 的总超时限制，仍受 sshtunnel/Paramiko 默认超时约束
+# SSH_GATEWAY_CONNECT_TIMEOUT: 30
+
+# SSH/交换机 remote_client 诊断日志
+# 开启后输出已脱敏的连接、切换用户、命令收发和网关阶段信息，并自动传入 Ansible EE
+# 仅建议排障时临时开启；可用值：true/false
+# JMS_REMOTE_CLIENT_DEBUG: false
 
 # Use Redis as broker for celery and web socket
 # Redis配置
@@ -167,6 +113,15 @@ REDIS_PORT: 6379
 # REDIS_PASSWORD:
 # REDIS_DB_CELERY: 3
 # REDIS_DB_CACHE: 4
+
+# Vault storage, OpenBao is the default backend when enabled.
+# 内置 OpenBao 作为默认 Vault backend；开启后请先确认 OpenBao Server 已完成初始化和授权
+# VAULT_ENABLED: true
+# VAULT_BACKEND: openbao
+# VAULT_OPENBAO_ADDR: http://openbao:8200
+# VAULT_OPENBAO_MOUNT_POINT: pam
+# VAULT_OPENBAO_TOKEN:
+# VAULT_OPENBAO_TIMEOUT: 10
 
 # LDAP/AD settings
 # LDAP 搜索分页数量

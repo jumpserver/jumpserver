@@ -1,11 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
+import os
+
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 from rest_framework import serializers
 
 from ops.celery import app
+from ops.ansible.utils import get_ansible_task_log_path
 from ops.models import CeleryTask, CeleryTaskExecution
 
 __all__ = [
@@ -41,13 +44,16 @@ class CeleryTaskSerializer(serializers.ModelSerializer):
 class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
     is_success = serializers.BooleanField(required=False, read_only=True, label=_('Success'))
     task_name = serializers.SerializerMethodField()
+    has_ansible_log = serializers.SerializerMethodField()
+    is_ansible_task = serializers.SerializerMethodField()
 
     class Meta:
         model = CeleryTaskExecution
         fields = [
             "id", "name", "task_name", "args", "kwargs", "time_cost", "timedelta",
-            "is_success", "is_finished", "date_published",
-            "date_start", "date_finished"
+            "state", "is_success", "is_finished", "date_published",
+            "date_start", "date_finished", "has_ansible_log",
+            "is_ansible_task",
         ]
 
     @staticmethod
@@ -61,3 +67,13 @@ class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
         if tp:
             task_name = f'{task_name}({tp_dict.get(tp, tp)})'
         return task_name
+
+    @staticmethod
+    def get_has_ansible_log(obj):
+        path = get_ansible_task_log_path(obj.id, create=False)
+        return os.path.isfile(path)
+
+    @staticmethod
+    def get_is_ansible_task(obj):
+        task = app.tasks.get(obj.name)
+        return bool(task and getattr(task, 'queue', None) == 'ansible')

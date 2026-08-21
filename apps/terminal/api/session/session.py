@@ -10,7 +10,7 @@ from django.db.models import F
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.encoding import escape_uri_path
-from django.utils.translation import gettext_noop, gettext as _
+from django.utils.translation import gettext_noop, gettext as _, gettext_lazy
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import viewsets, views
@@ -63,7 +63,18 @@ class MySessionAPIView(generics.ListAPIView):
 
 
 class SessionFilterSet(BaseFilterSet):
-    terminal = filters.CharFilter(method='filter_terminal')
+    user = filters.CharFilter(
+        lookup_expr='iexact', label=gettext_lazy('User name')
+    )
+    asset = filters.CharFilter(
+        lookup_expr='iexact', label=gettext_lazy('Asset name')
+    )
+    account = filters.CharFilter(
+        lookup_expr='iexact', label=gettext_lazy('Account name')
+    )
+    terminal = filters.CharFilter(
+        method='filter_terminal', label=gettext_lazy('Terminal name or ID')
+    )
 
     class Meta:
         model = Session

@@ -5,7 +5,8 @@ from common.utils import get_logger, convert_html_to_markdown
 from tickets.const import TicketState, TicketType
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant,
-    send_ticket_applied_mail_to_assignees
+    send_ticket_applied_mail_to_assignees,
+    send_ticket_updated_mail_to_cc_users
 )
 
 logger = get_logger(__name__)
@@ -23,11 +24,14 @@ class BaseHandler:
 
     def _on_pending(self):
         self._send_applied_mail_to_assignees()
+        self._send_ticket_updated_mail_to_cc_users()
 
     def on_step_state_change(self, step, state):
         self._create_state_change_comment(state)
         handler = getattr(self, f'_on_step_{state}', lambda: None)
-        return handler(step)
+        result = handler(step)
+        self._send_ticket_updated_mail_to_cc_users()
+        return result
 
     def _on_step_approved(self, step):
         next_step = step.next()
@@ -59,6 +63,12 @@ class BaseHandler:
         processor = step.processor if step else applicant
         logger.debug('Send processed mail to applicant: {}'.format(applicant))
         send_ticket_processed_mail_to_applicant(self.ticket, processor)
+
+    def _send_ticket_updated_mail_to_cc_users(self):
+        cc_users = self.ticket.cc_users.exclude(id=self.ticket.applicant_id)
+        cc_users_display = ', '.join([str(user) for user in cc_users])
+        logger.debug('Send updated email to CC users: {}'.format(cc_users_display))
+        send_ticket_updated_mail_to_cc_users(self.ticket)
 
     def _diff_prev_approve_context(self, state):
         diff_context = {}
@@ -97,7 +107,9 @@ class BaseHandler:
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
         html_str = render_to_string('tickets/ticket_approve_diff.html', context)
-        body = convert_html_to_markdown(html_str)
+        body = convert_html_to_markdown(
+            html_str, escape_asterisks=False, escape_underscores=False
+        )
         data = {
             'body': body,
             'user': user,

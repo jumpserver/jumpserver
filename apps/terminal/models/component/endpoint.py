@@ -17,13 +17,7 @@ class Endpoint(JMSBaseModel):
     http_port = PortField(default=80, verbose_name=_('HTTP port'))
     ssh_port = PortField(default=2222, verbose_name=_('SSH port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP port'))
-    mysql_port = PortField(default=33061, verbose_name=_('MySQL port'))
-    mariadb_port = PortField(default=33062, verbose_name=_('MariaDB port'))
-    postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
-    redis_port = PortField(default=63790, verbose_name=_('Redis port'))
-    sqlserver_port = PortField(default=14330, verbose_name=_('SQLServer port'))
-    oracle_port = PortField(default=15210, verbose_name=_('Oracle port'))
-    mongodb_port = PortField(default=27018, verbose_name=_('MongoDB port'))
+    magnus_port = PortField(default=5525, verbose_name=_('Magnus port'))
     vnc_port = PortField(default=15900, verbose_name=_('VNC port'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
@@ -40,6 +34,13 @@ class Endpoint(JMSBaseModel):
 
     def get_port(self, target_instance, protocol):
         from assets.const import Protocol
+        magnus_protocols = {
+            Protocol.mysql, Protocol.mariadb, Protocol.postgresql,
+            Protocol.redis, Protocol.sqlserver, Protocol.oracle,
+            Protocol.mongodb,
+        }
+        if protocol in magnus_protocols:
+            return self.magnus_port
         if protocol in [Protocol.sftp, Protocol.telnet]:
             protocol = Protocol.ssh
         port = getattr(self, f'{protocol}_port', 0)

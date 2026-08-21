@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.dispatch import receiver
 from django.utils import timezone, translation
-from django.utils.functional import LazyObject
-from django.utils.translation import gettext_lazy as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
@@ -15,40 +12,12 @@ from audits.models import UserLoginLog
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
 from common.utils import get_request_ip_or_data, get_logger
-from users.models import User
+from audits.auth_backends import AUTH_BACKEND_LABEL_MAPPING
 from ..const import LoginTypeChoices
 from ..models import UserSession
 from ..utils import write_login_log
 
 logger = get_logger(__name__)
-
-
-class AuthBackendLabelMapping(LazyObject):
-    @staticmethod
-    def get_login_backends():
-        backend_label_mapping = {}
-        for source, backends in User.SOURCE_BACKEND_MAPPING.items():
-            for backend in backends:
-                backend_label_mapping[backend] = source.label
-        backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _("SSH Key")
-        backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _("Password")
-        backend_label_mapping[settings.AUTH_BACKEND_SSO] = _("SSO")
-        backend_label_mapping[settings.AUTH_BACKEND_CUSTOM_SSO] = _("Custom SSO")
-        backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _("Auth Token")
-        backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _("WeCom")
-        backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _("FeiShu")
-        backend_label_mapping[settings.AUTH_BACKEND_LARK] = 'Lark'
-        backend_label_mapping[settings.AUTH_BACKEND_SLACK] = _("Slack")
-        backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _("DingTalk")
-        backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _("Temporary token")
-        backend_label_mapping[settings.AUTH_BACKEND_PASSKEY] = _("Passkey")
-        return backend_label_mapping
-
-    def _setup(self):
-        self._wrapped = self.get_login_backends()
-
-
-AUTH_BACKEND_LABEL_MAPPING = AuthBackendLabelMapping()
 
 
 def get_login_backend(request):

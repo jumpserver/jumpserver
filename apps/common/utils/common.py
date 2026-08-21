@@ -472,8 +472,8 @@ def is_macos():
     return platform.system() == 'Darwin'
 
 
-def convert_html_to_markdown(html_str):
-    markdown = markdownify(html_str)
+def convert_html_to_markdown(html_str, **options):
+    markdown = markdownify(html_str, **options)
     markdown = markdown.replace('\n\n', '\n')
     markdown = markdown.replace('\n ', '\n')
     return markdown

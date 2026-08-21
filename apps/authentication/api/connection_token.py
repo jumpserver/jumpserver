@@ -32,8 +32,6 @@ from orgs.utils import tmp_to_org
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
-from users.const import FileNameConflictResolution
-from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
 from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
@@ -254,19 +252,39 @@ class RDPFileClientProtocolURLMixin:
             "low_speed_broadband": rdp_low_speed_broadband_option,
             "high_speed_broadband": rdp_high_speed_broadband_option,
         }
+
+        client_options = token.user.preference.get_value(
+            'rdp_client_option', category='luna',
+            default=settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+        )
+        if isinstance(client_options, str):
+            try:
+                client_options = json.loads(client_options)
+            except json.JSONDecodeError:
+                client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+        if not isinstance(client_options, (list, set, tuple)):
+            client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+        client_options = set(client_options)
+
         # 设置多屏显示
-        multi_mon = is_true(self.request.query_params.get('multi_mon'))
+        multi_mon_value = self.request.query_params.get('multi_mon')
+        multi_mon = 'multi_screen' in client_options if multi_mon_value is None else is_true(multi_mon_value)
         if multi_mon:
             rdp_options['use multimon:i'] = '1'
 
         # 设置磁盘挂载
-        drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
+        drives_redirect_value = self.request.query_params.get('drives_redirect')
+        drives_redirect = (
+            'drives_redirect' in client_options
+            if drives_redirect_value is None else is_true(drives_redirect_value)
+        )
         if drives_redirect:
             if ActionChoices.contains(token.actions, ActionChoices.transfer()):
                 rdp_options['drivestoredirect:s'] = '*'
 
         # 设置全屏
-        full_screen = is_true(self.request.query_params.get('full_screen'))
+        full_screen_value = self.request.query_params.get('full_screen')
+        full_screen = 'full_screen' in client_options if full_screen_value is None else is_true(full_screen_value)
         rdp_options['screen mode id:i'] = '2' if full_screen else '1'
 
         # 设置 RDP Server 地址
@@ -279,7 +297,12 @@ class RDPFileClientProtocolURLMixin:
 
         # 设置宽高
 
-        resolution_value = token.connect_options.get('resolution', 'auto')
+        resolution_value = token.connect_options.get('resolution')
+        if not resolution_value:
+            resolution_value = token.user.preference.get_value(
+                'rdp_resolution', category='luna',
+                default=settings.LUNA_DEFAULT_RDP_RESOLUTION
+            )
         if resolution_value != 'auto':
             width, height = resolution_value.split('x')
             if width and height:
@@ -289,12 +312,35 @@ class RDPFileClientProtocolURLMixin:
                 rdp_options['dynamic resolution:i'] = '0'
 
         color_quality = self.request.query_params.get('rdp_color_quality')
-        color_quality = color_quality if color_quality else os.getenv('JUMPSERVER_COLOR_DEPTH', RDPColorQuality.HIGH)
+        if not color_quality:
+            color_quality = token.user.preference.get_value(
+                'rdp_color_quality', category='luna',
+                default=os.getenv('JUMPSERVER_COLOR_DEPTH', settings.LUNA_DEFAULT_RDP_COLOR_QUALITY)
+            )
 
         # 设置其他选项
         rdp_options['session bpp:i'] = color_quality
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
-        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
+
+        # 设置远程麦克风。请求参数用于兼容直接下载 RDP 文件的场景，
+        # 连接令牌中的临时配置优先于用户偏好。
+        remote_microphone_value = self.request.query_params.get('remote_microphone')
+        if remote_microphone_value is None:
+            remote_microphone_value = token.connect_options.get('remote_microphone')
+        if remote_microphone_value is None:
+            remote_microphone = 'remote_microphone' in client_options
+        else:
+            remote_microphone = is_true(remote_microphone_value)
+        if remote_microphone:
+            rdp_options['audiocapturemode:i'] = '1'
+
+        smart_size = self.request.query_params.get('rdp_smart_size')
+        if smart_size is None:
+            smart_size = token.user.preference.get_value(
+                'rdp_smart_size', category='luna',
+                default=settings.LUNA_DEFAULT_RDP_SMART_SIZE
+            )
+        rdp_options['smart sizing:i'] = smart_size
 
         # 设置远程应用, 不是 Mstsc
         if token.connect_method != NativeClient.mstsc:
@@ -500,6 +546,7 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
 
 
 class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
+    queryset = ConnectionToken.objects.none()
     filterset_fields = (
         'user_display', 'asset_display'
     )
@@ -540,16 +587,55 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     def _insert_connect_options(self, data, user):
         connect_options = data.pop('connect_options', {})
         default_name_opts = {
-            'file_name_conflict_resolution': FileNameConflictResolution.REPLACE,
-            'terminal_theme_name': 'Default',
+            'file_name_conflict_resolution': settings.LUNA_DEFAULT_FILE_NAME_CONFLICT_RESOLUTION,
+            'terminal_theme_name': settings.LUNA_DEFAULT_TERMINAL_THEME_NAME,
         }
+        backspace_preference_name = 'is_backspace_as_ctrl_h'
+        resolution_preference_name = 'rdp_resolution'
+        rdp_client_option_preference_name = 'rdp_client_option'
         preferences_query = Preference.objects.filter(
-            user=user, category='luna', name__in=default_name_opts.keys()
+            user=user, category='luna',
+            name__in=(
+                *default_name_opts.keys(),
+                backspace_preference_name,
+                resolution_preference_name,
+                rdp_client_option_preference_name,
+            )
         ).values_list('name', 'value')
         preferences = dict(preferences_query)
         for name in default_name_opts.keys():
             value = preferences.get(name, default_name_opts[name])
             connect_options[name] = value
+
+        # The advanced option submitted by Luna takes precedence.  When it is
+        # absent, use the personal preference as the connection default.
+        if 'backspaceAsCtrlH' not in connect_options:
+            # Koko consumes this option using camelCase. Preferences are stored
+            # in a TextField, so convert the value back to a real boolean.
+            backspace_as_ctrl_h = preferences.get(
+                backspace_preference_name, settings.LUNA_DEFAULT_IS_BACKSPACE_AS_CTRL_H
+            )
+            connect_options['backspaceAsCtrlH'] = is_true(backspace_as_ctrl_h)
+
+        if data.get('protocol') == 'rdp':
+            if 'resolution' not in connect_options:
+                connect_options['resolution'] = preferences.get(
+                    resolution_preference_name, settings.LUNA_DEFAULT_RDP_RESOLUTION
+                )
+
+            if 'remote_microphone' not in connect_options:
+                rdp_client_options = preferences.get(
+                    rdp_client_option_preference_name,
+                    settings.LUNA_DEFAULT_RDP_CLIENT_OPTION,
+                )
+                if isinstance(rdp_client_options, str):
+                    try:
+                        rdp_client_options = json.loads(rdp_client_options)
+                    except json.JSONDecodeError:
+                        rdp_client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+                if not isinstance(rdp_client_options, (list, set, tuple)):
+                    rdp_client_options = settings.LUNA_DEFAULT_RDP_CLIENT_OPTION
+                connect_options['remote_microphone'] = 'remote_microphone' in rdp_client_options
         connect_options['lang'] = getattr(user, 'lang') or settings.LANGUAGE_CODE
         data['connect_options'] = connect_options
 
@@ -582,6 +668,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             self.input_username = validate_account_username(self.input_username)
             data['input_username'] = self.input_username
         _data = self._validate(user, asset, account_name, protocol, connect_method)
+        _data['remote_addr'] = get_request_ip_or_data(self.request)
         data.update(_data)
         return serializer
 
@@ -590,6 +677,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         asset = token.asset
         account_alias = token.account
         _data = self._validate(user, asset, account_alias, token.protocol, token.connect_method)
+        _data['remote_addr'] = get_request_ip_or_data(self.request)
         for k, v in _data.items():
             setattr(token, k, v)
         return token
@@ -608,7 +696,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             data['input_secret'] = ''
             data['input_secret_type'] = account.secret_type
 
-        if account.username != AliasAccount.INPUT:
+        if account_alias != AliasAccount.INPUT and account_alias != AliasAccount.USER:
             data['input_username'] = ''
             data['input_secret_type'] = ''
 

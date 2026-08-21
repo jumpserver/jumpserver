@@ -72,11 +72,12 @@ def update_site_url():
     host_ip = os.environ.get('HOST_IP')
     if not host_ip:
         return
+    scheme = 'https' if os.environ.get('HTTPS_PORT') else 'http'
     if not site_url:
         site_url = Setting.objects.create(name='SITE_URL')
 
     if site_url.cleaned_value == f'http://127.0.0.1' or not site_url.cleaned_value:
-        site_url.cleaned_value = f'https://{host_ip}'
+        site_url.cleaned_value = f'{scheme}://{host_ip}'
         site_url.save()
 
 

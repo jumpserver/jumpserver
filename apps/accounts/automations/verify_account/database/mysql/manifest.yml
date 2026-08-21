@@ -12,3 +12,9 @@ i18n:
     ja: Ansible mysql モジュールを使用してアカウントを検証する
     en: Using Ansible module mysql to verify account
 
+    es: Usar el módulo Ansible mysql para verificar la cuenta
+    ko: Ansible mysql 모듈을 사용하여 계정 확인
+    pt-br: Usar o módulo Ansible mysql para verificar a conta
+    ru: Использовать модуль Ansible mysql, чтобы проверить учетную запись
+    vi: Sử dụng mô-đun Ansible mysql để xác minh tài khoản
+    zh-hant: 使用 Ansible 模組 mysql 驗證帳號

@@ -99,6 +99,45 @@
         <div class="header-container">
             <span
               class="triangle-down-icon collapse-toggle"
+              data-target="unverified"
+            ></span>
+
+            <h2>
+                {% trans 'Unverified accounts' %}:
+                <span> {{ summary.unverified_accounts | default:0 }} </span>
+            </h2>
+        </div>
+
+        <div class="container-section collapsible-content" id="unverified-content">
+            {% if summary.unverified_accounts %}
+            <table class="custom-table table-hover data-table">
+                <thead>
+                <tr>
+                    <th>{% trans 'No' %}</th>
+                    <th>{% trans 'Asset' %}</th>
+                    <th>{% trans 'Username' %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for account in result.unverified_accounts %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ account.asset }}</td>
+                        <td>{{ account.username }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="no-data">{% trans 'No unverified accounts' %}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="failed">
+        <div class="header-container">
+            <span
+              class="triangle-down-icon collapse-toggle"
               data-target="failed"
             ></span>
 

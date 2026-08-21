@@ -14,3 +14,9 @@ i18n:
     zh: 使用命令 net user 收集 Windows 账号
     ja: コマンド net user を使用して Windows アカウントを収集する
     en: Using command net user to gather accounts
+    es: Usar el comando net user para recopilar cuentas
+    ko: net user 명령을 사용하여 계정 수집
+    pt-br: Usar o comando net user para coletar contas
+    ru: Использовать команду net user для сбора учетных записей
+    vi: Sử dụng lệnh net user để thu thập tài khoản
+    zh-hant: 使用命令 net user 收集 Windows 帳號

@@ -5,10 +5,66 @@ type:
   - mysql
   - mariadb
 method: remove_account
+params:
+  - name: account_host
+    type: str
+    label: "{{ 'MySQL account host' | trans }}"
+    default: "%"
+    help_text: "{{ 'MySQL account host help text' | trans }}"
+  - name: all_hosts
+    type: bool
+    label: "{{ 'Apply to all hosts' | trans }}"
+    default: false
+    help_text: "{{ 'Apply to all hosts help text' | trans }}"
 
 i18n:
   MySQL account remove:
     zh: 使用 Ansible 模块 mysql_user 删除账号
     ja: Ansible モジュール mysql_user を使用してアカウントを削除します
     en: Use the Ansible module mysql_user to delete the account
-
+    es: Usar el módulo Ansible mysql_user para eliminar la cuenta
+    ko: Ansible mysql_user 모듈을 사용하여 계정 삭제
+    pt-br: Usar o módulo Ansible mysql_user para excluir a conta
+    ru: Использовать модуль Ansible mysql_user, чтобы удалить учетную запись
+    vi: Sử dụng mô-đun Ansible mysql_user để xóa tài khoản
+    zh-hant: 使用 Ansible 模組 mysql_user 刪除帳號
+  MySQL account host:
+    zh: MySQL 账号主机
+    zh-hant: MySQL 帳號主機
+    ja: MySQL アカウントホスト
+    ko: MySQL 계정 호스트
+    es: Host de la cuenta MySQL
+    pt-br: Host da conta MySQL
+    ru: Хост учетной записи MySQL
+    vi: Máy chủ tài khoản MySQL
+    en: MySQL account host
+  MySQL account host help text:
+    zh: MySQL 账号标识中的主机部分
+    zh-hant: MySQL 帳號識別中的主機部分
+    ja: MySQL アカウント識別子のホスト部分
+    ko: MySQL 계정 식별자의 호스트 부분
+    es: Parte del host de la identidad de la cuenta MySQL
+    pt-br: Parte do host da identidade da conta MySQL
+    ru: Часть хоста идентификатора учетной записи MySQL
+    vi: Phần máy chủ trong định danh tài khoản MySQL
+    en: Host part of the MySQL account identity
+  Apply to all hosts:
+    zh: 应用到所有主机
+    zh-hant: 套用到所有主機
+    ja: すべてのホストに適用
+    ko: 모든 호스트에 적용
+    es: Aplicar a todos los hosts
+    pt-br: Aplicar a todos os hosts
+    ru: Применить ко всем хостам
+    vi: Áp dụng cho tất cả máy chủ
+    en: Apply to all hosts
+  Apply to all hosts help text:
+    zh: 将该操作应用于具有此用户名的所有主机记录
+    zh-hant: 將此操作套用到具有此使用者名稱的所有主機記錄
+    ja: このユーザー名を持つすべてのホストエントリに操作を適用する
+    ko: 이 사용자 이름을 가진 모든 호스트 항목에 작업 적용
+    es: Aplicar la operación a todas las entradas de host con este nombre de usuario
+    pt-br: Aplicar a operação a todas as entradas de host com este nome de usuário
+    ru: Применить операцию ко всем записям хостов с этим именем пользователя
+    vi: Áp dụng thao tác cho mọi mục máy chủ có tên người dùng này
+    en: Apply the operation to every Host entry with this username

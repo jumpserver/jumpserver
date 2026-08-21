@@ -1,17 +1,29 @@
+import os
+import shutil
+
+from django.core.files.storage import default_storage
 from django.db.models import Subquery, OuterRef, Count, Value
 from django.db.models.functions import Coalesce
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
 from assets.const import AllTypes
-from assets.models import Platform, Node, Asset, PlatformProtocol, PlatformAutomation
+from assets.models import (
+    Platform, PlatformPackage, Node, Asset, PlatformProtocol, PlatformAutomation,
+)
 from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
+from assets.utils.platform_package import (
+    locate_package_root,
+)
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
-from common.serializers import GroupedChoiceSerializer
+from common.serializers import GroupedChoiceSerializer, FileSerializer
+from common.utils.zip import safe_extract_zip
 from rbac.models import RoleBinding
 
 __all__ = ['AssetPlatformViewSet', 'PlatformAutomationMethodsApi', 'PlatformProtocolViewSet']
@@ -20,11 +32,17 @@ __all__ = ['AssetPlatformViewSet', 'PlatformAutomationMethodsApi', 'PlatformProt
 
 
 class PlatformFilter(filters.FilterSet):
-    name__startswith = filters.CharFilter(field_name='name', lookup_expr='istartswith')
+    name__startswith = filters.CharFilter(
+        field_name='name', lookup_expr='istartswith',
+        label=_('Name starts with')
+    )
 
     class Meta:
         model = Platform
-        fields = ['name', 'category', 'type']
+        fields = ['name', 'name__startswith', 'category', 'type']
+        fields_operator = {
+            'name__startswith': ('startswith',),
+        }
 
 
 class AssetPlatformViewSet(JMSModelViewSet):
@@ -33,6 +51,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'default': PlatformSerializer,
         'list': PlatformListSerializer,
         'categories': GroupedChoiceSerializer,
+        'upload': FileSerializer,
     }
     filterset_class = PlatformFilter
     search_fields = ['name']
@@ -42,6 +61,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'type_constraints': 'assets.view_platform',
         'ops_methods': 'assets.view_platform',
         'filter_nodes_assets': 'assets.view_platform',
+        'upload': 'assets.add_platform',
     }
     page_no_limit = True
 
@@ -56,6 +76,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
         queryset = (
             super().get_queryset()
             .annotate(assets_amount=Coalesce(Subquery(asset_count_subquery), Value(0)))
+            .select_related('package')
             .prefetch_related('protocols', 'automation')
         )
         queryset = queryset.filter(type__in=AllTypes.get_types_values())
@@ -66,6 +87,25 @@ class AssetPlatformViewSet(JMSModelViewSet):
         if pk.isnumeric():
             return super().get_object()
         return self.get_queryset().get(name=pk)
+
+    def perform_create(self, serializer):
+        clone_from = self.request.query_params.get('clone_from')
+        source = None
+        if clone_from:
+            source = Platform.objects.filter(pk=clone_from).first()
+            if source is None:
+                raise ValidationError({'clone_from': _('Invalid platform')})
+            category = serializer.validated_data.get('category')
+            tp = serializer.validated_data.get('type')
+            if (category, tp) != (source.category, source.type):
+                raise ValidationError({
+                    'clone_from': _('The cloned platform category and type must match the source')
+                })
+
+        platform = serializer.save()
+        if source and source.package_id:
+            platform.package = source.package
+            platform.save(update_fields=['package'])
 
 
     def check_permissions(self, request):
@@ -101,6 +141,52 @@ class AssetPlatformViewSet(JMSModelViewSet):
         serializer = self.get_serializer(platforms, many=True)
         return Response(serializer.data)
 
+    @action(methods=['post'], detail=False)
+    def upload(self, request, *args, **kwargs):
+        input_serializer = FileSerializer(data=request.data)
+        input_serializer.is_valid(raise_exception=True)
+
+        file = input_serializer.validated_data['file']
+        save_to = 'platforms/{}'.format(file.name + '.tmp.zip')
+        if default_storage.exists(save_to):
+            default_storage.delete(save_to)
+        rel_path = default_storage.save(save_to, file)
+        path = default_storage.path(rel_path)
+        extract_to = default_storage.path('platforms/{}.tmp'.format(file.name))
+
+        if os.path.exists(extract_to):
+            shutil.rmtree(extract_to)
+
+        try:
+            try:
+                safe_extract_zip(path, extract_to)
+            except RuntimeError as e:
+                raise ValidationError({'error': 'Invalid zip file: {}'.format(e)})
+
+            tmp_dir = locate_package_root(extract_to, file.name, 'platform.yml')
+            data = PlatformPackage.validate(tmp_dir)
+            if not data:
+                raise ValidationError({'error': 'Missing platform.yml in package'})
+            name = data['name']
+            instance = Platform.objects.filter(name=name).first()
+            platform = PlatformPackage.sync_platform(
+                tmp_dir, instance=instance, created_by='PlatformPackageUpload'
+            )
+            package = platform.package
+            if package is None:
+                package = PlatformPackage.objects.create(name=platform.name)
+                platform.package = package
+                platform.save(update_fields=['package'])
+            package.persist(tmp_dir)
+            AllTypes.reload_automation_methods()
+            output_serializer = PlatformSerializer(platform, context=self.get_serializer_context())
+            return Response(output_serializer.data, status=201)
+        finally:
+            if default_storage.exists(rel_path):
+                default_storage.delete(rel_path)
+            if os.path.exists(extract_to):
+                shutil.rmtree(extract_to)
+
 
 class PlatformProtocolViewSet(JMSModelViewSet):
     queryset = PlatformProtocol.objects.all()
@@ -114,7 +200,7 @@ class PlatformProtocolViewSet(JMSModelViewSet):
 class PlatformAutomationMethodsApi(generics.ListAPIView):
     queryset = PlatformAutomation.objects.none()
     rbac_perms = {
-        'list': 'assets.view_platform'
+        'GET': 'assets.view_platform'
     }
 
     @staticmethod
