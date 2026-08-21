@@ -8,6 +8,8 @@ from copy import deepcopy
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
+from ldap import DECODING_ERROR
+from ldap.dn import str2dn
 from ldap3 import SIMPLE, Connection, Server, Tls
 from ldap3.core.exceptions import (
     LDAPAttributeError,
@@ -25,11 +27,19 @@ from ldap3.core.exceptions import (
 )
 from ldap3.utils.conv import escape_filter_chars
 
+from authentication.mapping import (
+    MISSING, AuthMappingError, AuthMappingService,
+    normalize_auth_attributes, normalize_values,
+)
+from authentication.models import AuthRoleBinding
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.db.utils import close_old_connections
 from common.utils import get_logger, timeit
 from common.utils.http import is_true
 from orgs.utils import tmp_to_org
+from rbac.builtin import BuiltinRole
+from rbac.const import Scope
+from rbac.models import RoleBinding
 from settings.const import ImportStatus
 from settings.ldap_tls import LDAPTLSUtil
 from users.models import User, UserGroup
@@ -55,6 +65,12 @@ class LDAPConfig(object):
         self.search_ou = None
         self.search_filter = None
         self.attr_map = None
+        self.group_attribute = None
+        self.group_search_ou = None
+        self.group_search_filter = None
+        self.group_search_user_attribute = None
+        self.user_group_map = None
+        self.user_role_map = None
         self.auth_ldap = None
         self.category = category
         if isinstance(config, dict):
@@ -70,6 +86,14 @@ class LDAPConfig(object):
         self.search_ou = config.get('search_ou')
         self.search_filter = config.get('search_filter')
         self.attr_map = config.get('attr_map')
+        self.group_attribute = config.get('group_attribute') or ''
+        self.group_search_ou = config.get('group_search_ou') or ''
+        self.group_search_filter = config.get('group_search_filter') or ''
+        self.group_search_user_attribute = (
+            config.get('group_search_user_attribute') or ''
+        )
+        self.user_group_map = config.get('user_group_map') or []
+        self.user_role_map = config.get('user_role_map') or []
         self.auth_ldap = config.get('auth_ldap')
 
     def load_from_settings(self):
@@ -81,14 +105,30 @@ class LDAPConfig(object):
         self.search_ou = getattr(settings, f"{prefix}_SEARCH_OU")
         self.search_filter = getattr(settings, f"{prefix}_SEARCH_FILTER")
         self.attr_map = getattr(settings, f"{prefix}_USER_ATTR_MAP")
+        self.group_attribute = getattr(settings, f"{prefix}_GROUP_ATTRIBUTE", '')
+        self.group_search_ou = getattr(settings, f"{prefix}_GROUP_SEARCH_OU", '')
+        self.group_search_filter = getattr(settings, f"{prefix}_GROUP_SEARCH_FILTER", '')
+        self.group_search_user_attribute = getattr(
+            settings, f"{prefix}_GROUP_SEARCH_USER_ATTRIBUTE", ''
+        )
+        self.user_group_map = getattr(settings, f"{prefix}_USER_GROUP_MAP", [])
+        self.user_role_map = getattr(settings, f"{prefix}_USER_ROLE_MAP", [])
         self.auth_ldap = getattr(settings, prefix)
+
+    @property
+    def effective_group_attribute(self):
+        if self.group_attribute:
+            return self.group_attribute
+        if isinstance(self.attr_map, dict):
+            return self.attr_map.get('groups', '')
+        return ''
 
 
 class LDAPServerUtil(object):
 
     def __init__(self, config=None, category=User.Source.ldap.value):
         if isinstance(config, dict):
-            self.config = LDAPConfig(config=config)
+            self.config = LDAPConfig(config=config, category=category)
         elif isinstance(config, LDAPConfig):
             self.config = config
         else:
@@ -134,10 +174,23 @@ class LDAPServerUtil(object):
 
     @property
     def connection(self):
-        if self._conn:
+        if self._conn is not None:
             return self._conn
         self._conn = self._create_connection()
         return self._conn
+
+    def close(self):
+        connection = self._conn
+        self._conn = None
+        if connection is None:
+            return
+        unbind = getattr(connection, 'unbind', None)
+        if not callable(unbind):
+            return
+        try:
+            unbind()
+        except Exception as error:
+            logger.debug('Close LDAP connection failed: %s', error)
 
     @staticmethod
     def get_paged_size():
@@ -167,7 +220,9 @@ class LDAPServerUtil(object):
             return '(|{})'.format(extra)
         if self.search_value:
             escaped_search_value = escape_filter_chars(self.search_value)
-            for attr in self.config.attr_map.values():
+            for key, attr in self.config.attr_map.items():
+                if key == 'groups':
+                    continue
                 extra += '({}={})'.format(attr, '*{}*'.format(escaped_search_value))
             return '(|{})'.format(extra)
         return extra
@@ -181,12 +236,52 @@ class LDAPServerUtil(object):
 
     def search_user_entries_ou(self, search_ou, paged_cookie=None):
         search_filter = self.get_search_filter()
-        attributes = list(self.config.attr_map.values())
-        self.connection.search(
+        attributes = self.get_user_search_attributes()
+        ok = self.connection.search(
             search_base=search_ou, search_filter=search_filter,
             attributes=attributes, paged_size=self._paged_size,
             paged_cookie=paged_cookie
         )
+        self.ensure_search_succeeded(ok, 'user search')
+
+    def ensure_search_succeeded(self, ok, operation):
+        result = self.connection.result or {}
+        result_code = result.get('result')
+        if ok is not False and result_code in (None, 0):
+            return
+        detail = (
+            result.get('description') or result.get('message') or result_code
+        )
+        raise RuntimeError(f'LDAP {operation} failed: {detail}')
+
+    def get_user_search_attributes(self):
+        attr_map = self.config.attr_map
+        if not isinstance(attr_map, dict):
+            return []
+        attributes = [value for key, value in attr_map.items() if key != 'groups']
+        if self.config.group_search_filter:
+            search_user_attr = (
+                self.config.group_search_user_attribute or attr_map.get('username')
+            )
+            if search_user_attr and search_user_attr.lower() != 'dn':
+                attributes.append(search_user_attr)
+        elif self.config.effective_group_attribute:
+            attributes.append(self.config.effective_group_attribute)
+        for rule in self.config.user_role_map:
+            attribute = rule.get('attribute', '')
+            if attribute and attribute.casefold() not in ('dn', 'groups'):
+                attributes.append(attribute)
+        distinct = []
+        seen = set()
+        for attribute in attributes:
+            key = attribute.casefold()
+            if key == 'dn':
+                continue
+            if key in seen:
+                continue
+            seen.add(key)
+            distinct.append(attribute)
+        return distinct
 
     @staticmethod
     def distinct_user_entries(user_entries):
@@ -217,53 +312,182 @@ class LDAPServerUtil(object):
         user_entries = self.distinct_user_entries(user_entries)
         return user_entries
 
+    @staticmethod
+    def get_entry_values(entry, attribute):
+        if attribute.lower() == 'dn':
+            value = getattr(entry, 'entry_dn', None)
+            return value is not None, [] if value is None else [value]
+        try:
+            entry_attribute = entry[attribute]
+        except (AttributeError, KeyError, TypeError, LDAPAttributeError):
+            try:
+                entry_attribute = getattr(entry, attribute)
+            except (AttributeError, LDAPAttributeError):
+                return False, []
+        values = getattr(entry_attribute, 'values', None)
+        if values is None:
+            values = getattr(entry_attribute, 'value', entry_attribute)
+        if values is None:
+            return True, []
+        if isinstance(values, (list, tuple, set)):
+            return True, list(values)
+        return True, [values]
+
+    def entry_to_auth_attributes(self, entry):
+        attributes = {}
+        for attribute in self.get_user_search_attributes():
+            found, values = self.get_entry_values(entry, attribute)
+            if found:
+                attributes[attribute] = values
+        return normalize_auth_attributes(
+            attributes, dn=getattr(entry, 'entry_dn', '')
+        )
+
+    def get_group_search_user_value(self, attributes):
+        attribute = self.config.group_search_user_attribute
+        if not attribute:
+            attribute = self.config.attr_map.get('username')
+        values = attributes.get(attribute.casefold(), [])
+        if not values:
+            return None
+        return values[0]
+
+    def search_group_dns(self, user_value):
+        if user_value in (None, ''):
+            raise ValueError('LDAP group search user attribute is unavailable')
+        search_filter = self.config.group_search_filter % escape_filter_chars(
+            user_value
+        )
+        search_ou = self.config.group_search_ou or self.config.search_ou
+        group_entries = []
+        for group_search_ou in str(search_ou).split('|'):
+            group_search_ou = group_search_ou.strip()
+            ok = self.connection.search(
+                search_base=group_search_ou,
+                search_filter=search_filter,
+                attributes=[],
+                paged_size=self._paged_size,
+            )
+            self.ensure_group_search_succeeded(ok)
+            group_entries.extend(self.connection.entries)
+            while self.paged_cookie():
+                ok = self.connection.search(
+                    search_base=group_search_ou,
+                    search_filter=search_filter,
+                    attributes=[],
+                    paged_size=self._paged_size,
+                    paged_cookie=self.paged_cookie(),
+                )
+                self.ensure_group_search_succeeded(ok)
+                group_entries.extend(self.connection.entries)
+        group_dns = []
+        seen = set()
+        for group_entry in group_entries:
+            group_dn = normalize_values(getattr(group_entry, 'entry_dn', ''))
+            if not group_dn:
+                continue
+            group_dn = group_dn[0]
+            key = group_dn.casefold()
+            if key in seen:
+                continue
+            seen.add(key)
+            group_dns.append(group_dn)
+        return group_dns
+
+    def ensure_group_search_succeeded(self, ok):
+        self.ensure_search_succeeded(ok, 'group search')
+
+    @staticmethod
+    def normalize_group_values(values):
+        groups = []
+        seen = set()
+        for value in normalize_values(values):
+            key = value.casefold()
+            if key in seen:
+                continue
+            seen.add(key)
+            groups.append(value)
+        return groups
+
+    def get_groups(self, auth_attributes):
+        if self.config.group_search_filter:
+            user_value = self.get_group_search_user_value(auth_attributes)
+            return self.search_group_dns(user_value)
+        group_attribute = self.config.effective_group_attribute
+        if group_attribute:
+            values = auth_attributes.get(group_attribute.casefold(), [])
+            return self.normalize_group_values(values)
+        return MISSING
+
     def user_entry_to_dict(self, entry):
         user = {}
-        attr_map = self.config.attr_map.items()
-        for attr, mapping in attr_map:
-            if not hasattr(entry, mapping):
+        auth_attributes = self.entry_to_auth_attributes(entry)
+        for attr, mapping in self.config.attr_map.items():
+            if attr == 'groups':
                 continue
-            value = getattr(entry, mapping).value or ''
+            values = auth_attributes.get(mapping.casefold())
+            if values is None:
+                continue
+            value = values[0] if values else ''
             if attr == 'is_active':
                 if mapping.lower() == 'useraccountcontrol' and value:
                     value = int(value) & LDAP_AD_ACCOUNT_DISABLE != LDAP_AD_ACCOUNT_DISABLE
                 else:
                     value = is_true(value)
-
-            if attr == 'groups' and mapping.lower() == 'memberof':
-                # AD: {'groups': 'memberOf'}
-                if isinstance(value, str) and value:
-                    value = [value]
-                if not isinstance(value, list):
-                    value = []
             user[attr] = value.strip() if isinstance(value, str) else value
-            user['status'] = ImportStatus.pending
+        groups = self.get_groups(auth_attributes)
+        if groups is not MISSING:
+            user['groups'] = groups
+            auth_attributes['groups'] = groups
+        user['_auth_attributes'] = auth_attributes
+        user['status'] = ImportStatus.pending
         return user
 
     def user_entries_to_dict(self, user_entries):
         users = []
         for user_entry in user_entries:
-            user = self.user_entry_to_dict(user_entry)
+            try:
+                user = self.user_entry_to_dict(user_entry)
+            except Exception as error:
+                username = self.get_entry_username(user_entry)
+                user = {
+                    'username': username,
+                    'name': '',
+                    'email': '',
+                    '_auth_mapping_error': str(error),
+                    'status': {'error': str(error)},
+                }
             users.append(user)
         return users
 
+    def get_entry_username(self, entry):
+        attribute = self.config.attr_map.get('username')
+        found, values = self.get_entry_values(entry, attribute)
+        values = normalize_values(values) if found else []
+        if not values:
+            raise ValueError('LDAP username attribute is unavailable')
+        return values[0]
+
     def search_for_user_dn(self, username):
-        user_entries = self.search_user_entries(search_users=[username])
-        if len(user_entries) == 1:
-            user_entry = user_entries[0]
-            user_dn = user_entry.entry_dn
-        else:
-            user_dn = None
-        return user_dn
+        try:
+            user_entries = self.search_user_entries(search_users=[username])
+            if len(user_entries) == 1:
+                user_entry = user_entries[0]
+                return user_entry.entry_dn
+            return None
+        finally:
+            self.close()
 
     @timeit
     def search(self, search_users=None, search_value=None):
         logger.info("Search ldap users")
-        user_entries = self.search_user_entries(
-            search_users=search_users, search_value=search_value
-        )
-        users = self.user_entries_to_dict(user_entries)
-        return users
+        try:
+            user_entries = self.search_user_entries(
+                search_users=search_users, search_value=search_value
+            )
+            return self.user_entries_to_dict(user_entries)
+        finally:
+            self.close()
 
 
 class LDAPCacheUtil(object):
@@ -425,39 +649,89 @@ class LDAPImportUtil(object):
 
     def get_user_group_names(self, groups) -> list:
         if not isinstance(groups, list):
-            logger.error('Groups type not list')
-            return []
+            raise TypeError('Groups type is not list')
         group_names = []
+        seen = set()
+        max_length = UserGroup._meta.get_field('name').max_length
         for group in groups:
             if not group:
                 continue
             if not isinstance(group, str):
-                continue
+                raise TypeError('Group DN type is not string')
             # get group name for AD, Such as: CN=Users,CN=Builtin,DC=jms,DC=com
-            group_name = group.split(',')[0].split('=')[-1]
+            try:
+                rdns = str2dn(group)
+            except DECODING_ERROR:
+                group_name = group
+            else:
+                if not rdns or not rdns[0]:
+                    continue
+                group_name = rdns[0][0][1]
             group_name = f'{self.user_group_name_prefix}{group_name}'.strip()
+            if len(group_name) > max_length:
+                raise ValueError(
+                    f'User group name exceeds {max_length} characters: {group_name}'
+                )
+            key = group_name.casefold()
+            if key in seen:
+                continue
+            seen.add(key)
             group_names.append(group_name)
         return group_names
+
+    def get_mapping_service(self):
+        if self.category != User.Source.ldap.value:
+            return None
+        return AuthMappingService(
+            source=self.category,
+            group_rules=getattr(settings, 'AUTH_LDAP_USER_GROUP_MAP', []),
+            role_rules=getattr(settings, 'AUTH_LDAP_USER_ROLE_MAP', []),
+        )
 
     def perform_import(self, users, orgs):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
         errors = []
-        objs = []
         new_users = []
         group_users_mapper = defaultdict(set)
+        group_sync_users = set()
+        mapping_service = self.get_mapping_service()
+        explicit_group_mapping = bool(
+            getattr(settings, 'AUTH_LDAP_USER_GROUP_MAP', [])
+        ) if mapping_service else False
         for user in users:
-            groups = user.pop('groups', [])
+            mapping_error = user.pop('_auth_mapping_error', None)
+            if mapping_error:
+                errors.append({user['username']: mapping_error})
+                logger.error(mapping_error)
+                continue
+            groups = user.pop('groups', MISSING)
+            auth_attributes = user.pop('_auth_attributes', MISSING)
             try:
                 obj, created = self.update_or_create(user)
                 if created:
                     new_users.append(obj)
-                objs.append(obj)
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
                 continue
+            self.bind_user_orgs(obj, orgs)
+            if mapping_service:
+                try:
+                    mapping_service.sync(
+                        obj,
+                        attributes=auth_attributes,
+                        groups=groups,
+                        raise_errors=True,
+                    )
+                except AuthMappingError as error:
+                    errors.append({user['username']: str(error)})
+                    logger.error(error)
+                    continue
+            if explicit_group_mapping or groups is MISSING:
+                continue
             try:
                 group_names = self.get_user_group_names(groups)
+                group_sync_users.add(obj)
                 for group_name in group_names:
                     group_users_mapper[group_name].add(obj)
             except Exception as e:
@@ -465,7 +739,7 @@ class LDAPImportUtil(object):
                 logger.error(e)
                 continue
         for org in orgs:
-            self.bind_org(org, objs, group_users_mapper)
+            self.bind_org(org, group_users_mapper, group_sync_users)
         logger.info('End perform import ldap users')
         # 禁止ldap 不存在的用户的
         disable_usernames = []
@@ -505,17 +779,34 @@ class LDAPImportUtil(object):
         for g, rm_users in group_remove_users_mapper.items():
             g.users.remove(*rm_users)
 
-    def bind_org(self, org, users, group_users_mapper):
+    def bind_user_orgs(self, user, orgs):
+        for org in orgs:
+            if not org or org.is_root():
+                continue
+            org.add_member(user)
+            role_binding = RoleBinding.objects_raw.filter(
+                user=user,
+                role_id=BuiltinRole.org_user.id,
+                org_id=org.id,
+                scope=Scope.org,
+            ).first()
+            if role_binding:
+                AuthRoleBinding.objects.filter(
+                    source=self.category,
+                    role_binding=role_binding,
+                    owned=True,
+                ).update(owned=False)
+
+    def bind_org(self, org, group_users_mapper, group_sync_users):
         if not org:
             return
         if org.is_root():
             return
-        # add user to org
-        for user in users:
-            org.add_member(user)
         # add user to group
         with tmp_to_org(org):
             user_groups_mapper = defaultdict(set)
+            for user in group_sync_users:
+                user_groups_mapper[user]
             for group_name, users in group_users_mapper.items():
                 group, created = UserGroup.objects.get_or_create(
                     name=group_name, defaults={'name': group_name}
@@ -639,14 +930,23 @@ class LDAPTestUtil(object):
     def _test_search_ou_and_filter(self):
         config = deepcopy(self.config)
         util = LDAPServerUtil(config=config)
-        search_ous = str(self.config.search_ou).split('|')
-        for search_ou in search_ous:
-            util.config.search_ou = search_ou
-            user_entries = util.search_user_entries()
-            logger.debug('Search ou: {}, count user: {}'.format(search_ou, len(user_entries)))
-            if len(user_entries) == 0:
-                error = _('Invalid User OU or User search filter: {}').format(search_ou)
-                raise self.LDAPInvalidSearchOuOrFilterError(error)
+        try:
+            search_ous = str(self.config.search_ou).split('|')
+            for search_ou in search_ous:
+                util.config.search_ou = search_ou
+                user_entries = util.search_user_entries()
+                logger.debug(
+                    'Search ou: {}, count user: {}'.format(
+                        search_ou, len(user_entries)
+                    )
+                )
+                if len(user_entries) == 0:
+                    error = _(
+                        'Invalid User OU or User search filter: {}'
+                    ).format(search_ou)
+                    raise self.LDAPInvalidSearchOuOrFilterError(error)
+        finally:
+            util.close()
 
     def test_search_ou_and_filter(self):
         try:
@@ -696,7 +996,17 @@ class LDAPTestUtil(object):
 
     def test_search(self):
         util = LDAPServerUtil(config=self.config)
-        self.user_entries = util.search_user_entries()
+        try:
+            self.user_entries = util.search_user_entries()
+            users = util.user_entries_to_dict(self.user_entries[:1])
+            errors = [
+                user['_auth_mapping_error'] for user in users
+                if '_auth_mapping_error' in user
+            ]
+            if errors:
+                raise ValueError(errors[0])
+        finally:
+            util.close()
 
     # test auth ldap enabled
 

@@ -172,6 +172,20 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
             'search_ou': serializer.validated_data.get(f"{prefix}SEARCH_OU"),
             'search_filter': serializer.validated_data.get(f"{prefix}SEARCH_FILTER"),
             'attr_map': serializer.validated_data.get(f"{prefix}USER_ATTR_MAP"),
+            'group_attribute': serializer.validated_data.get(f"{prefix}GROUP_ATTRIBUTE", ''),
+            'group_search_ou': serializer.validated_data.get(f"{prefix}GROUP_SEARCH_OU", ''),
+            'group_search_filter': serializer.validated_data.get(
+                f"{prefix}GROUP_SEARCH_FILTER", ''
+            ),
+            'group_search_user_attribute': serializer.validated_data.get(
+                f"{prefix}GROUP_SEARCH_USER_ATTRIBUTE", ''
+            ),
+            'user_group_map': serializer.validated_data.get(
+                f"{prefix}USER_GROUP_MAP", []
+            ),
+            'user_role_map': serializer.validated_data.get(
+                f"{prefix}USER_ROLE_MAP", []
+            ),
             'auth_ldap': serializer.validated_data.get(f"{prefix.rstrip('_')}", False)
         }
 
@@ -197,7 +211,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         else:
             serializer = LDAPHATestConfigSerializer(data=data)
         if not serializer.is_valid():
-            self.send_msg(msg=f'error: {str(serializer.errors)}')
+            return False, f'error: {serializer.errors}'
         config = self.get_ldap_config(serializer)
         ok, msg = LDAPTestUtil(config, category=self.category).test_config()
         if ok:
@@ -207,7 +221,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     def run_testing_login(self, data):
         serializer = LDAPTestLoginSerializer(data=data)
         if not serializer.is_valid():
-            self.send_msg(msg=f'error: {str(serializer.errors)}')
+            return False, f'error: {serializer.errors}'
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
         ok, msg = LDAPTestUtil(category=self.category).test_login(username, password)
