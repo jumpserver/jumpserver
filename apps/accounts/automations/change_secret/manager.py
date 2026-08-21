@@ -40,7 +40,9 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
             record_id = self.record_map[asset_account_id]
             record = ChangeSecretRecord.objects.filter(id=record_id).first()
             if not record:
-                raise ValueError(f'Change secret record not found: {record_id}')
+                raise ValueError(_(
+                    'Change secret record not found: %(record_id)s'
+                ) % {'record_id': record_id})
             record.status = ChangeSecretRecordStatusChoice.pending.value
             record.error = ''
             record.date_finished = None
@@ -59,6 +61,7 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         record = ChangeSecretRecord.objects.create(
             asset=asset, account=account, execution=self.execution,
             old_secret=account.secret, new_secret=new_secret,
+            account_version=account.version,
             comment=f'{account.username}@{asset.address}'
         )
         return record

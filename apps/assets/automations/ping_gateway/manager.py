@@ -33,6 +33,19 @@ class PingGatewayManager:
     def __init__(self, execution):
         self.execution = execution
 
+    @staticmethod
+    def format_gateway_target(gateway, account=None):
+        name = getattr(gateway, 'name', None) or str(gateway)
+        address = getattr(gateway, 'address', None)
+        port = getattr(gateway, 'port', None)
+        if address and str(address) not in str(name):
+            endpoint = f'{address}:{port}' if port else str(address)
+            name = f'{name}[{endpoint}]'
+        username = getattr(account, 'username', None)
+        if username:
+            name = f'{name} / {username}'
+        return str(name)
+
     @classmethod
     def method_type(cls):
         return AutomationTypes.ping_gateway
@@ -140,7 +153,7 @@ class PingGatewayManager:
 
         print_automation_log(
             _("Checking SSH login and tunnel forwarding: %(gateway)s") % {
-                'gateway': gateway,
+                'gateway': self.format_gateway_target(gateway, account),
             },
             'progress',
         )
@@ -219,12 +232,12 @@ class PingGatewayManager:
                         gateway.id,
                     )
 
-    @staticmethod
-    def on_host_success(gateway, account):
+    @classmethod
+    def on_host_success(cls, gateway, account):
         print_automation_log(
             _(
                 "✓ %(gateway)s: SSH login and tunnel forwarding are available"
-            ) % {'gateway': gateway},
+            ) % {'gateway': cls.format_gateway_target(gateway, account)},
             'success',
         )
         try:
@@ -236,12 +249,16 @@ class PingGatewayManager:
             return str(e)
         return None
 
-    @staticmethod
-    def on_host_error(gateway, account, error):
+    @classmethod
+    def print_host_error(cls, gateway, account, error):
         print_automation_log(_("✗ %(gateway)s: %(error)s") % {
-            'gateway': gateway,
+            'gateway': cls.format_gateway_target(gateway, account),
             'error': error,
         }, 'error')
+
+    @classmethod
+    def on_host_error(cls, gateway, account, error):
+        cls.print_host_error(gateway, account, error)
         try:
             gateway.set_connectivity(Connectivity.ERR)
             if not account:
@@ -283,11 +300,13 @@ class PingGatewayManager:
         result = {'ok': [], 'failed': []}
         found_gateway_ids = {str(gateway.id) for gateway in gateways}
         for gateway_id in sorted(asset_ids - found_gateway_ids):
+            error = str(_('Gateway not found or inactive'))
             failed += 1
             result['failed'].append({
                 'gateway': gateway_id,
-                'error': str(_('Gateway not found or inactive')),
+                'error': error,
             })
+            self.print_host_error(gateway_id, None, error)
 
         final_status = Status.success
         total_timeout = int(
@@ -313,6 +332,7 @@ class PingGatewayManager:
                 logger.exception(
                     'Load gateway accounts failed: gateway=%s', gateway.id
                 )
+                self.print_host_error(gateway, None, str(error))
                 failed += 1
                 result['failed'].append({
                     'gateway': str(gateway),
@@ -377,7 +397,12 @@ class PingGatewayManager:
         self.execution.save(update_fields=[
             'status', 'date_finished', 'duration', 'summary', 'result',
         ])
-        print_automation_log(_("Task execution completed"), 'success')
+        final_level = (
+            'error' if failed or final_status == Status.error
+            else 'progress' if final_status == Status.canceled
+            else 'success'
+        )
+        print_automation_log(_("Task execution completed"), final_level)
         print_automation_log(_("Result: %(result)s") % {
             'result': ', '.join([
                 _("Successful: %(count)s") % {
@@ -388,7 +413,7 @@ class PingGatewayManager:
                     'count': len(result['ok']) + failed,
                 },
             ]),
-        }, 'error' if failed else 'success')
+        }, final_level)
         print_automation_log(_("Duration: %(duration)s seconds") % {
             'duration': self.execution.duration,
         }, 'info')

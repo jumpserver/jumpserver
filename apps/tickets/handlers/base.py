@@ -107,7 +107,9 @@ class BaseHandler:
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
         html_str = render_to_string('tickets/ticket_approve_diff.html', context)
-        body = convert_html_to_markdown(html_str)
+        body = convert_html_to_markdown(
+            html_str, escape_asterisks=False, escape_underscores=False
+        )
         data = {
             'body': body,
             'user': user,

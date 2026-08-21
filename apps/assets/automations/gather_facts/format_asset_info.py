@@ -1,5 +1,7 @@
 from collections import Counter
 
+from django.utils.translation import gettext as _
+
 __all__ = ['FormatAssetInfo']
 
 
@@ -18,12 +20,14 @@ class FormatAssetInfo:
                 step = 2
                 models = [cpus[i + 1] for i in range(0, len(cpus), step)]
             else:
-                raise ValueError("CPU list format not recognized")
+                raise ValueError(_("CPU list format not recognized"))
 
             model_counts = Counter(models)
             result = ', '.join([f"{model} x{count}" for model, count in model_counts.items()])
         except Exception as e:
-            print(f"Error processing CPU model list: {e}")
+            print(_("Error processing CPU model list: %(error)s") % {
+                'error': e,
+            })
             result = ''
         return result
 
@@ -34,7 +38,9 @@ class FormatAssetInfo:
 
             result = ', '.join([f"{model} x{count}" for model, count in model_counts.items()])
         except Exception as e:
-            print(f"Error processing GPU model list: {e}")
+            print(_("Error processing GPU model list: %(error)s") % {
+                'error': e,
+            })
             result = ''
 
         return result

@@ -5,6 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts import serializers
+from accounts.exceptions import (
+    VaultAccountSyncUnavailableException, VaultUnavailableException,
+)
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import AccountTemplate
 from accounts.tasks import template_sync_related_accounts
@@ -67,6 +70,10 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
     @action(methods=['patch'], detail=True, url_path='sync-related-accounts')
     def sync_related_accounts(self, request, *args, **kwargs):
         instance = self.get_object()
+        try:
+            instance.get_secret()
+        except VaultUnavailableException as exc:
+            raise VaultAccountSyncUnavailableException() from exc
         user_id = str(request.user.id)
         task = template_sync_related_accounts.delay(str(instance.id), user_id)
         return Response({'task': task.id}, status=status.HTTP_200_OK)

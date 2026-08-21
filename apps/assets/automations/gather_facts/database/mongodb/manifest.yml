@@ -9,3 +9,9 @@ i18n:
     zh: 使用 Ansible 模块 mongodb 获取 mongodb 信息
     en: Gather facts from MongoDB using mongodb module
     ja: mongodbモジュールを使用して MongoDBから情報を収集する
+    es: Recopilar información de MongoDB con el módulo mongodb
+    ko: mongodb 모듈을 사용하여 MongoDB 정보 수집
+    pt-br: Coletar informações de MongoDB com o módulo mongodb
+    ru: Собрать сведения о MongoDB с помощью модуля mongodb
+    vi: Thu thập thông tin từ MongoDB bằng mô-đun mongodb
+    zh-hant: 使用 Ansible 模組 mongodb 獲取 mongodb 資訊

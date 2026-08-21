@@ -10,3 +10,9 @@ i18n:
     zh: 使用 Ansible 模块 mysql 从 MySQL server 获取信息
     en: Gather facts from MySQL server using mysql module
     ja: mysqlモジュールを使用して MySQL serverから情報を収集する
+    es: Recopilar información de MySQL con el módulo mysql
+    ko: mysql 모듈을 사용하여 MySQL 정보 수집
+    pt-br: Coletar informações de MySQL com o módulo mysql
+    ru: Собрать сведения о MySQL с помощью модуля mysql
+    vi: Thu thập thông tin từ MySQL bằng mô-đun mysql
+    zh-hant: 使用 Ansible 模組 mysql 從 MySQL server 獲取資訊

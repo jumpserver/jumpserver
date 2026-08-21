@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from django.db import transaction
 from django.utils import timezone
 
 from accounts.const import AutomationTypes
@@ -27,16 +28,6 @@ common_risk_items = [
     "detail"
 ]
 diff_items = risk_items + common_risk_items
-
-
-@bulk_create_decorator(AccountRisk)
-def _create_risk(data):
-    return AccountRisk(**data)
-
-
-@bulk_update_decorator(AccountRisk, update_fields=["details"])
-def _update_risk(account):
-    return account
 
 
 def format_datetime(value):
@@ -73,8 +64,22 @@ def get_item_diff(item, ori_account, d, diff):
 
 class AnalyseAccountRisk:
     long_time = timezone.timedelta(days=90)
+    risk_types = [
+        RiskChoice.long_time_no_login,
+        RiskChoice.new_found,
+        RiskChoice.account_deleted,
+        RiskChoice.group_changed,
+        RiskChoice.sudo_changed,
+        RiskChoice.authorized_keys_changed,
+        RiskChoice.password_expired,
+        RiskChoice.long_time_password,
+    ]
     datetime_check_items = [
-        {"field": "date_last_login", "risk": "long_time_no_login", "delta": long_time},
+        {
+            "field": "date_last_login",
+            "risk": RiskChoice.long_time_no_login,
+            "delta": long_time,
+        },
         {
             "field": "date_password_change",
             "risk": RiskChoice.long_time_password,
@@ -82,15 +87,123 @@ class AnalyseAccountRisk:
         },
         {
             "field": "date_password_expired",
-            "risk": "password_expired",
+            "risk": RiskChoice.password_expired,
             "delta": timezone.timedelta(seconds=1),
         },
     ]
 
-    def __init__(self, check_risk=True):
+    def __init__(self, check_risk=True, asset_ids=()):
         self.check_risk = check_risk
         self.now = timezone.now()
-        self.pending_add_risks = []
+        self.risks = {}
+        self.pending_creates = {}
+        self.pending_updates = {}
+        self.pending_delete_ids = set()
+        if self.check_risk:
+            self.load_risks(asset_ids)
+
+    @staticmethod
+    def get_key(asset_id, username, risk):
+        return str(asset_id), username, str(risk)
+
+    def load_risks(self, asset_ids):
+        risks = AccountRisk.objects.filter(
+            asset_id__in=asset_ids,
+            risk__in=[str(risk) for risk in self.risk_types],
+        )
+        self.risks = {
+            self.get_key(risk.asset_id, risk.username, risk.risk): risk
+            for risk in risks
+        }
+
+    @staticmethod
+    def append_detail(risk, detail):
+        details = risk.details or []
+        details.append(detail)
+        if len(details) > 10:
+            details = [*details[:5], *details[-5:]]
+        risk.details = details
+
+    def record_risk(self, data, append_if_pending=False):
+        if not self.check_risk:
+            return
+
+        data = dict(data)
+        detail = data.pop('detail', {})
+        detail['datetime'] = self.now.isoformat()
+        asset = data.get('asset')
+        asset_id = data.get('asset_id') or asset.id
+        key = self.get_key(asset_id, data['username'], data['risk'])
+        found = self.risks.get(key)
+
+        if found is None:
+            found = AccountRisk(**data, details=[detail])
+            self.risks[key] = found
+            self.pending_creates[key] = found
+            return
+
+        changed = False
+        if found.status != ConfirmOrIgnore.pending:
+            found.status = ConfirmOrIgnore.pending
+            self.append_detail(found, detail)
+            changed = True
+        elif append_if_pending:
+            self.append_detail(found, detail)
+            changed = True
+
+        for field in ('account', 'gathered_account'):
+            value = data.get(field)
+            if value is None:
+                continue
+            if getattr(found, f'{field}_id') == value.id:
+                continue
+            setattr(found, field, value)
+            changed = True
+
+        self.pending_delete_ids.discard(found.id)
+        if changed and key not in self.pending_creates:
+            self.pending_updates[found.id] = found
+
+    def resolve_risk(self, asset_id, username, risk):
+        if not self.check_risk:
+            return
+
+        key = self.get_key(asset_id, username, risk)
+        found = self.risks.pop(key, None)
+        if found is None:
+            return
+        if self.pending_creates.pop(key, None) is not None:
+            return
+        self.pending_updates.pop(found.id, None)
+        self.pending_delete_ids.add(found.id)
+
+    def flush(self):
+        if not self.check_risk:
+            return
+
+        to_create = list(self.pending_creates.values())
+        to_update = [
+            risk for risk in self.pending_updates.values()
+            if risk.id not in self.pending_delete_ids
+        ]
+        with transaction.atomic():
+            if self.pending_delete_ids:
+                AccountRisk.objects.filter(
+                    id__in=self.pending_delete_ids
+                ).delete()
+            if to_create:
+                AccountRisk.objects.bulk_create(
+                    to_create, ignore_conflicts=True
+                )
+            if to_update:
+                AccountRisk.objects.bulk_update(
+                    to_update,
+                    ['account', 'gathered_account', 'details', 'status'],
+                )
+
+        self.pending_creates.clear()
+        self.pending_updates.clear()
+        self.pending_delete_ids.clear()
 
     def _analyse_item_changed(self, ori_ga, d):
         diff = get_items_diff(ori_ga, d)
@@ -110,7 +223,8 @@ class AnalyseAccountRisk:
                     detail={"diff": v},
                 )
             )
-        self.save_or_update_risks(risks)
+        for risk in risks:
+            self.record_risk(risk, append_if_pending=True)
 
     def _analyse_datetime_changed(self, ori_account, d, asset, username):
         basic = {"asset_id": str(asset.id), "username": username}
@@ -130,60 +244,45 @@ class AnalyseAccountRisk:
             # if pre_date == date:
             #     continue
 
-            if date and date < timezone.now() - delta:
-                risks.append(
-                    dict(**basic, risk=risk, detail={"date": date.isoformat()})
-                )
+            if date < self.now - delta:
+                risks.append(dict(
+                    **basic,
+                    risk=risk,
+                    detail={"date": date.isoformat()},
+                ))
+            else:
+                self.resolve_risk(asset.id, username, risk)
 
-        self.save_or_update_risks(risks)
-
-    def save_or_update_risks(self, risks):
-        # 提前取出来，避免每次都查数据库
-        asset_ids = {r["asset_id"] for r in risks}
-        assets_risks = AccountRisk.objects.filter(asset_id__in=asset_ids)
-        assets_risks = {f"{r.asset_id}_{r.username}_{r.risk}": r for r in assets_risks}
-
-        for d in risks:
-            detail = d.pop("detail", {})
-            detail["datetime"] = self.now.isoformat()
-            key = f"{d['asset_id']}_{d['username']}_{d['risk']}"
-            found = assets_risks.get(key)
-
-            if not found:
-                _create_risk(dict(**d, details=[detail]))
-                continue
-
-            found.details.append(detail)
-            _update_risk(found)
+        for risk in risks:
+            self.record_risk(risk)
 
     def lost_accounts(self, asset, lost_users):
         if not self.check_risk:
             return
         for user in lost_users:
-            _create_risk(
-                dict(
-                    asset_id=str(asset.id),
-                    username=user,
-                    risk=RiskChoice.account_deleted,
-                    details=[{"datetime": self.now.isoformat()}],
-                )
-            )
+            self.record_risk(dict(
+                asset_id=str(asset.id),
+                username=user,
+                risk=RiskChoice.account_deleted,
+                detail={},
+            ))
 
     def analyse_risk(self, asset, ga, d, sys_found):
         if not self.check_risk:
             return
 
+        self.resolve_risk(asset.id, d['username'], RiskChoice.account_deleted)
         if ga:
             self._analyse_item_changed(ga, d)
         if not sys_found:
             basic = {"asset": asset, "username": d["username"], 'gathered_account': ga}
-            _create_risk(
-                dict(
-                    **basic,
-                    risk=RiskChoice.new_found,
-                    details=[{"datetime": self.now.isoformat()}],
-                )
-            )
+            self.record_risk(dict(
+                **basic,
+                risk=RiskChoice.new_found,
+                detail={},
+            ))
+        else:
+            self.resolve_risk(asset.id, d['username'], RiskChoice.new_found)
         self._analyse_datetime_changed(ga, d, asset, d["username"])
 
 
@@ -198,6 +297,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         self.ori_gathered_accounts_mapper = dict()
         self.is_sync_account = self.execution.snapshot.get("is_sync_account")
         self.check_risk = self.execution.snapshot.get("check_risk", False)
+        self.risk_analyser = None
 
     @classmethod
     def method_type(cls):
@@ -336,8 +436,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                         "username": username,
                     }
                 )
-            risk_analyser = AnalyseAccountRisk(self.check_risk)
-            risk_analyser.lost_accounts(asset, lost_users)
+            self.risk_analyser.lost_accounts(asset, lost_users)
 
         # 收集的账号 比 账号列表多的, 有可能是账号中删掉了, 但这时候状态已经是 confirm 了
         # 标识状态为 待处理, 让管理员去确认
@@ -403,7 +502,10 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def do_run(self, *args, **kwargs):
         super().do_run(*args, **kwargs)
         self.prefetch_origin_account_usernames()
-        risk_analyser = AnalyseAccountRisk(self.check_risk)
+        self.risk_analyser = AnalyseAccountRisk(
+            self.check_risk,
+            asset_ids=self.asset_usernames_mapper.keys(),
+        )
 
         for asset, accounts_data in self.asset_account_info.items():
             ori_users = self.ori_asset_usernames[str(asset.id)]
@@ -425,19 +527,21 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 self.create_gathered_account.finish()
                 self.update_gathered_account.finish()
                 for analysis_data in need_analyser_gather_account:
-                    risk_analyser.analyse_risk(*analysis_data)
+                    self.risk_analyser.analyse_risk(*analysis_data)
                 self.update_gather_accounts_status(asset)
-                if not self.is_sync_account:
-                    continue
-                gathered_accounts = GatheredAccount.objects.filter(asset=asset)
-                GatheredAccount.sync_accounts(gathered_accounts)
-                GatheredAccount.objects.filter(
-                    asset=asset, username__in=ori_users, present=False
-                ).update(
-                    present=True
-                )
-        _update_risk.finish()
-        _create_risk.finish()
+                if self.is_sync_account:
+                    gathered_accounts = GatheredAccount.objects.filter(asset=asset)
+                    GatheredAccount.sync_accounts(gathered_accounts)
+                    GatheredAccount.objects.filter(
+                        asset=asset, username__in=ori_users, present=False
+                    ).update(
+                        present=True
+                    )
+                    for username in self.asset_usernames_mapper[str(asset.id)]:
+                        self.risk_analyser.resolve_risk(
+                            asset.id, username, RiskChoice.new_found
+                        )
+                self.risk_analyser.flush()
 
     def get_report_template(self):
         return "accounts/gather_account_report.html"

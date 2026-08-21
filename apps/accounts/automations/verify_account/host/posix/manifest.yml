@@ -11,3 +11,9 @@ i18n:
     zh: 使用 Ansible 模块 ping 验证账号
     ja: Ansible ping モジュールを使用してアカウントを検証する
     en: Using Ansible module ping to verify account
+    es: Usar el módulo Ansible ping para verificar la cuenta
+    ko: Ansible ping 모듈을 사용하여 계정 확인
+    pt-br: Usar o módulo Ansible ping para verificar a conta
+    ru: Использовать модуль Ansible ping, чтобы проверить учетную запись
+    vi: Sử dụng mô-đun Ansible ping để xác minh tài khoản
+    zh-hant: 使用 Ansible 模組 ping 驗證帳號

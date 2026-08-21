@@ -14,3 +14,9 @@ i18n:
     zh: '使用 Python 模块 paramiko 验证账号'
     ja: 'Python モジュール paramiko を使用してアカウントを検証する'
     en: 'Using Python module paramiko to verify account'
+    es: Usar el módulo Python paramiko para verificar la cuenta
+    ko: Python paramiko 모듈을 사용하여 계정 확인
+    pt-br: Usar o módulo Python paramiko para verificar a conta
+    ru: Использовать модуль Python paramiko, чтобы проверить учетную запись
+    vi: Sử dụng mô-đun Python paramiko để xác minh tài khoản
+    zh-hant: 使用 Python 模組 paramiko 驗證帳號

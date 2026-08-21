@@ -8,14 +8,14 @@ build_arg_defaults:
 
 
 images:
-  # ansible-builder 仅支持 RPM 系镜像 (dnf)，不能用 python:3.11-slim 等 Debian 镜像
+  # 使用 RPM/DNF 基础镜像，并与 Core 保持 Python 3.14 一致。
   base_image:
-    name: quay.io/centos/centos:stream9
+    name: quay.io/fedora/fedora:43
 
 dependencies:
   python_interpreter:
-    package_system: python3.11
-    python_path: /usr/bin/python3.11
+    package_system: python3.14
+    python_path: /usr/bin/python3.14
 
   # 与 pyproject.toml [tool.uv.sources] 保持一致，不要用 PyPI 官方包
   ansible_core:
@@ -29,8 +29,6 @@ dependencies:
 additional_build_files:
   - src: files/pip.conf
     dest: configs/
-  - src: files/use-china-mirrors.sh
-    dest: scripts/
   - src: ../../apps/libs/ansible/
     dest: jumpserver-ansible/
   - src: ansible.cfg
@@ -40,12 +38,6 @@ additional_build_steps:
   prepend_base:
     # pip 镜像需在 base 阶段最早注入，后续各 stage 的 pip install 都会走国内源
     - COPY _build/configs/pip.conf /etc/pip.conf
-    - COPY _build/scripts/use-china-mirrors.sh /tmp/use-china-mirrors.sh
-    - RUN chmod +x /tmp/use-china-mirrors.sh && /tmp/use-china-mirrors.sh centos
-    # freetds-devel、sshpass 等在 EPEL；postgresql-devel 等开发包常需 CRB
-    - RUN $PKGMGR config-manager --set-enabled crb
-    - RUN $PKGMGR install -y epel-release
-    - RUN /tmp/use-china-mirrors.sh epel && $PKGMGR makecache -y
   append_final:
     - RUN mkdir -p /opt/jumpserver/apps
     - COPY _build/jumpserver-ansible/ /opt/jumpserver/apps/libs/ansible/

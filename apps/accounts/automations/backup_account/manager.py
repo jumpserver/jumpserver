@@ -4,6 +4,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from assets.automations.base.manager import BaseManager
+from common.const import Status
 from .handlers import AccountBackupHandler
 
 
@@ -19,8 +20,13 @@ class AccountBackupManager(BaseManager):
         pass
 
     def print_summary(self):
-        self.print_log(_("Task execution completed"), 'success')
         error = self.summary.get('error')
+        self.print_log(
+            _("Task execution completed"),
+            'error'
+            if error or self.status in (Status.failed, Status.error)
+            else 'success',
+        )
         if error:
             self.print_log(
                 _("Backup failed: %(error)s") % {'error': error}, 'error'

@@ -13,3 +13,9 @@ i18n:
     zh: '使用 Ansible 指令 gather_facts 从 Windows 获取设备信息'
     en: 'Gather facts from Windows using gather_facts'
     ja: 'gather_factsを使用してWindowsから情報を収集する'
+    es: Recopilar información de Windows con gather_facts
+    ko: gather_facts를 사용하여 Windows 정보 수집
+    pt-br: Coletar informações de Windows com gather_facts
+    ru: Собрать сведения о Windows с помощью gather_facts
+    vi: Thu thập thông tin từ Windows bằng gather_facts
+    zh-hant: 使用 Ansible 指令 gather_facts 從 Windows 獲取裝置資訊

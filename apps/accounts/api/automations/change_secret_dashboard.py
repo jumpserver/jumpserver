@@ -15,6 +15,7 @@ from common.permissions import IsValidLicense
 from common.utils import lazyproperty
 from common.utils.timezone import local_zero_hour, local_now
 from ops.celery import app
+from orgs.utils import current_org
 from rbac.permissions import RBACPermission
 
 __all__ = ['ChangeSecretDashboardApi']
@@ -28,7 +29,9 @@ class ChangeSecretDashboardApi(APIView):
     permission_classes = [RBACPermission, IsValidLicense]
     tp = AutomationTypes.change_secret
     task_name = 'accounts.tasks.automation.execute_account_automation_task'
-    ongoing_change_secret_cache_key = "ongoing_change_secret_cache_key"
+    @property
+    def ongoing_change_secret_cache_key(self):
+        return f"ongoing_change_secret_cache_key:{current_org.id}"
 
     @lazyproperty
     def days(self):
@@ -176,7 +179,7 @@ class ChangeSecretDashboardApi(APIView):
                 asset_ids = {asset for i in snapshots for asset in i.get('assets', [])}
                 account_ids = {account for i in snapshots for account in i.get('accounts', [])}
 
-                ongoing_counts = (len(execution_ids), len(asset_ids), len(account_ids))
+                ongoing_counts = (len(snapshots), len(asset_ids), len(account_ids))
                 data['total_count_ongoing_change_secret'] = ongoing_counts[0]
                 data['total_count_ongoing_change_secret_assets'] = ongoing_counts[1]
                 data['total_count_ongoing_change_secret_accounts'] = ongoing_counts[2]

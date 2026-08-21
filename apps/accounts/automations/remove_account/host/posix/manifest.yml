@@ -11,3 +11,9 @@ i18n:
     zh: 使用 Ansible 模块 user 删除账号
     ja: Ansible モジュール ユーザーを使用してアカウントを削除します
     en: Use the Ansible module user to delete the account
+    es: Usar el módulo Ansible user para eliminar la cuenta
+    ko: Ansible user 모듈을 사용하여 계정 삭제
+    pt-br: Usar o módulo Ansible user para excluir a conta
+    ru: Использовать модуль Ansible user, чтобы удалить учетную запись
+    vi: Sử dụng mô-đun Ansible user để xóa tài khoản
+    zh-hant: 使用 Ansible 模組 user 刪除帳號

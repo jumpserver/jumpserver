@@ -14,7 +14,7 @@ from celery.worker import state as celery_worker_state
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_noop
 from premailer import transform
 
 from common.const import Status
@@ -156,17 +156,47 @@ class SSHTunnelManager:
 
 class PlaybookCallback(DefaultCallback):
     STAGE_MAPPERS = {
-        'ping': (1, "Testing connectivity and credentials"),
-        'verify_account': (1, "Verifying account credentials"),
-        'gather_facts': (1, "Collecting asset information"),
-        'gather_accounts': (1, "Collecting account information"),
+        'ping': (1, gettext_noop("Testing connectivity and credentials")),
+        'verify_account': (1, gettext_noop("Verifying account credentials")),
+        'gather_facts': (1, gettext_noop("Collecting asset information")),
+        'gather_accounts': (1, gettext_noop("Collecting account information")),
     }
 
-    def __init__(self, task_type=''):
+    def __init__(self, task_type='', task_id=None):
         super().__init__()
         self.task_type = str(task_type)
         self.announced_hosts = set()
         self.current_stage = 0
+        self.ansible_task_id = task_id
+        self.ansible_log = None
+
+    def open_ansible_log(self):
+        if not self.ansible_log and self.ansible_task_id:
+            from ops.ansible.utils import get_ansible_task_log_path
+            log_path = get_ansible_task_log_path(self.ansible_task_id)
+            self.ansible_log = open(
+                log_path, 'a', encoding='utf-8', buffering=1
+            )
+
+    def write_ansible_output(self, output):
+        if not output:
+            return
+        self.open_ansible_log()
+        if not self.ansible_log:
+            return
+        output = str(output)
+        self.ansible_log.write(output)
+        if not output.endswith(('\n', '\r')):
+            self.ansible_log.write('\n')
+        self.ansible_log.flush()
+
+    def event_handler(self, data, **kwargs):
+        self.write_ansible_output(data.get('stdout'))
+        return super().event_handler(data, **kwargs)
+
+    def close(self):
+        if self.ansible_log and not self.ansible_log.closed:
+            self.ansible_log.close()
 
     def get_stage(self, task):
         task = str(task or '').lower()
@@ -273,7 +303,11 @@ class BaseManager:
         if total is not None:
             result.append(_("Total: %(count)s") % {'count': total})
         final_level = (
-            'error' if failed else 'progress' if unverified else 'success'
+            'error'
+            if failed or self.status in (Status.failed, Status.error)
+            else 'progress'
+            if unverified or self.status == Status.canceled
+            else 'success'
         )
         self.print_log(_("Task execution completed"), final_level)
         self.print_log(
@@ -328,6 +362,14 @@ class BaseManager:
         except Exception as e:
             logging.exception(e)
             self.status = Status.error
+            error_text = ANSI_ESCAPE_PATTERN.sub('', str(e)).strip()
+            reason = (
+                error_text.splitlines()[0]
+                if error_text else str(_("Unknown error"))
+            )[:240]
+            self.print_log(_("Operation failed: %(reason)s") % {
+                'reason': reason,
+            }, 'error')
         finally:
             self.post_run()
 
@@ -351,15 +393,22 @@ class PlaybookPrepareMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # example: {'gather_fact_windows': {'id': 'gather_fact_windows', 'name': '', 'method': 'gather_fact', ...} }
-        self.method_id_meta_mapper = {
-            method["id"]: method
-            for method in self.platform_automation_methods
-            if method["method"] == self.__class__.method_type()
-        }
+        self.reload_method_id_meta_mapper()
         # 根据执行方式就行分组, 不同资产的改密、推送等操作可能会使用不同的执行方式
         # 然后根据执行方式分组, 再根据 bulk_size 分组, 生成不同的 playbook
         self.playbooks = []
+
+    def reload_method_id_meta_mapper(self, reload=False):
+        from assets.const import AllTypes
+
+        methods = AllTypes.reload_automation_methods() if reload else \
+            self.platform_automation_methods
+        # example: {'gather_fact_windows': {'id': 'gather_fact_windows', 'name': '', 'method': 'gather_fact', ...} }
+        self.method_id_meta_mapper = {
+            method["id"]: method
+            for method in methods
+            if method["method"] == self.__class__.method_type()
+        }
 
     @classmethod
     def method_type(cls):
@@ -404,9 +453,21 @@ class PlaybookPrepareMixin:
         return path
 
     def host_callback(self, host, automation=None, **kwargs):
+        self.ensure_unique_inventory_host(host, kwargs.get('asset'))
         method_type = self.__class__.method_type()
         host = self.convert_cert_to_file(host, kwargs.get("path_dir"))
         host["params"] = self.get_params(automation, method_type)
+        return host
+
+    @staticmethod
+    def ensure_unique_inventory_host(host, asset):
+        asset_id = getattr(asset, 'id', None)
+        name = host.get('name')
+        if not (asset_id and name):
+            return host
+        suffix = f'__{asset_id}'
+        if not str(name).endswith(suffix):
+            host['name'] = f'{name}{suffix}'
         return host
 
     @staticmethod
@@ -474,10 +535,15 @@ class PlaybookPrepareMixin:
             account_prefer=self.ansible_account_prefer,
             account_policy=self.ansible_account_policy,
             host_callback=self.host_callback,
+            exclude_localhost=True,
             task_type=self.__class__.method_type(),
             protocol=protocol,
         )
         inventory.write_to_file(inventory_path)
+        self._inventory_host_labels = {
+            host: self.format_inventory_host_label(host, detail)
+            for host, detail in inventory.exclude_host_details.items()
+        }
         return dict(inventory.exclude_hosts)
 
     @lazyproperty
@@ -512,16 +578,20 @@ class PlaybookPrepareMixin:
         method_type = self.__class__.method_type()
         enabled_attr = "{}_enabled".format(method_type)
         method_attr = "{}_method".format(method_type)
+        method_enabled = getattr(automation, enabled_attr, False)
+        method_id = getattr(automation, method_attr, None)
 
-        method_enabled = (
-                automation
-                and getattr(automation, enabled_attr)
-                and getattr(automation, method_attr)
-                and getattr(automation, method_attr) in self.method_id_meta_mapper
-        )
-
-        if not method_enabled:
+        if not (method_enabled and method_id):
             self.on_assets_not_method_enabled(assets, method_type)
+            return False
+
+        # Platform packages can be uploaded by a web process after this worker
+        # has started. Refresh the process-local method cache on a miss so the
+        # worker can discover the newly persisted package without a restart.
+        if method_id not in self.method_id_meta_mapper:
+            self.reload_method_id_meta_mapper(reload=True)
+        if method_id not in self.method_id_meta_mapper:
+            self.on_assets_method_unavailable(assets, method_id)
             return False
         return True
 
@@ -530,7 +600,7 @@ class PlaybookPrepareMixin:
         self.result["error_assets"].extend([str(asset) for asset in assets])
         for asset in assets:
             self.print_log(_("✗ %(asset)s: automation is not configured for its platform") % {
-                'asset': asset,
+                'asset': self.format_asset_label(asset),
             }, 'error')
 
     def on_assets_not_method_enabled(self, assets, method_type):
@@ -538,7 +608,18 @@ class PlaybookPrepareMixin:
         self.result["error_assets"].extend([str(asset) for asset in assets])
         for asset in assets:
             self.print_log(_("✗ %(asset)s: this automation is not enabled") % {
+                'asset': self.format_asset_label(asset),
+            }, 'error')
+
+    def on_assets_method_unavailable(self, assets, method_id):
+        self.summary["error_assets"] += len(assets)
+        self.result["error_assets"].extend([str(asset) for asset in assets])
+        for asset in assets:
+            self.print_log(_(
+                "✗ %(asset)s: automation method is unavailable: %(method)s"
+            ) % {
                 'asset': asset,
+                'method': method_id,
             }, 'error')
 
     def on_playbook_not_found(self, assets):
@@ -546,7 +627,7 @@ class PlaybookPrepareMixin:
         self.result["error_assets"].extend([str(asset) for asset in assets])
         for asset in assets:
             self.print_log(_("✗ %(asset)s: unable to prepare this automation") % {
-                'asset': asset,
+                'asset': self.format_asset_label(asset),
             }, 'error')
 
 
@@ -557,12 +638,15 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
     def __init__(self, execution):
         super().__init__(execution)
-        self.params = execution.snapshot.get("params", {})
+        params = execution.snapshot.get("params", {})
+        self.params = params if isinstance(params, dict) else {}
         self.host_success_callbacks = []
         self.interruption_reason = ''
         self.task_timed_out = False
         self._runner_monitor_last_log = {}
         self._runner_host_labels = {}
+        self._active_host_labels = {}
+        self._inventory_host_labels = {}
 
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
@@ -677,9 +761,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             return _(
                 "SSH host key verification failed; verify that the asset host key changed as expected"
             )
-        if any(item in normalized for item in (
-                'timed out', 'timeout', 'operation timed out',
-        )):
+        if re.search(r'(?<![\w])(?:timed out|timeout)(?![\w])', normalized):
             return _(
                 "Connection timed out; check the network, port, or gateway"
             )
@@ -769,7 +851,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             inventory_path,
             playbook_path,
             self.runtime_dir,
-            callback=PlaybookCallback(self.method_type()),
+            callback=PlaybookCallback(
+                self.method_type(),
+                self.execution.snapshot.get('celery_task_id')
+                or self.execution.id,
+            ),
         )
         return runner, inventory_path
 
@@ -829,7 +915,8 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     def on_host_success(self, host, result):
         self.summary["ok_assets"] += 1
         self.result["ok_assets"].append(host)
-        message, level = self.get_host_success_log(host)
+        label = self.get_host_display_label(host)
+        message, level = self.get_host_success_log(label)
         if message:
             self.print_log(message, level)
 
@@ -840,7 +927,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         self.summary["fail_assets"] += 1
         self.result["fail_assets"].append((host, str(error)))
         self.print_log(_("✗ %(host)s: %(error)s") % {
-            'host': host,
+            'host': self.get_host_display_label(host),
             'error': self.get_user_error_message(error),
         }, 'error')
 
@@ -858,6 +945,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     def on_inventory_host_error(self, host, error):
         self.summary["fail_assets"] += 1
         self.result["fail_assets"].append((host, str(error)))
+        self.print_inventory_host_error(
+            self._inventory_host_labels.get(host, host), error
+        )
+
+    def print_inventory_host_error(self, host, error):
         self.print_log(_("✗ %(host)s: unable to prepare (%(error)s)") % {
             'host': host,
             'error': self.get_user_error_message(error),
@@ -916,15 +1008,71 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
     def get_inventory_host_names(cls, inventory_path):
         return list(cls.get_inventory_hosts(inventory_path).keys())
 
+    @staticmethod
+    def format_asset_label(asset):
+        name = getattr(asset, 'name', None) or str(asset)
+        address = getattr(asset, 'address', None)
+        if address and str(address) not in str(name):
+            return f'{name}[{address}]'
+        return str(name)
+
+    @staticmethod
+    def format_inventory_host_label(host, detail):
+        if not isinstance(detail, dict):
+            return str(host)
+
+        asset = detail.get('jms_asset') or {}
+        if not isinstance(asset, dict):
+            asset = {}
+        account = detail.get('account') or detail.get('jms_account') or {}
+        if not isinstance(account, dict):
+            account = {}
+
+        asset_name = asset.get('name')
+        address = asset.get('address') or detail.get('ansible_host')
+        username = account.get('username') or account.get('full_username')
+
+        label = str(asset_name or host)
+        if address and str(address) not in label:
+            label = f'{label}[{address}]'
+        if username and (asset_name or str(username) not in label):
+            label = f'{label} / {username}'
+        return label
+
+    def get_host_display_label(self, host):
+        return (
+            self._active_host_labels.get(host)
+            or self._inventory_host_labels.get(host)
+            or str(host)
+        )
+
     def cache_runner_host_labels(self, runner, inventory_path):
         labels = {}
         for host, detail in self.get_inventory_hosts(inventory_path).items():
-            asset = detail.get('jms_asset') or {}
-            address = asset.get('address') or detail.get('ansible_host')
-            labels[host] = (
-                f'{host}[{address}]' if address else str(host)
+            labels[host] = self.format_inventory_host_label(
+                host, detail
             )
         self._runner_host_labels[str(runner.id)] = labels
+        return labels
+
+    def announce_runner_targets(self, runner, inventory_path):
+        labels = self.cache_runner_host_labels(runner, inventory_path)
+        self._active_host_labels = labels
+        inventory_hosts = self.get_inventory_hosts(inventory_path)
+        callback = getattr(runner, 'cb', None)
+        announced_hosts = getattr(callback, 'announced_hosts', None)
+        if announced_hosts is not None:
+            announced_hosts.update(inventory_hosts)
+
+        for host, detail in inventory_hosts.items():
+            asset = detail.get('jms_asset') if isinstance(detail, dict) else None
+            if not isinstance(asset, dict):
+                continue
+            self.print_log(
+                _("• %(host)s: processing") % {'host': labels[host]},
+                'progress',
+            )
+        return labels
 
     @staticmethod
     def configure_runner_environment(runner):
@@ -1254,8 +1402,15 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
             runner, info = runner_info
             ssh_tunnel = SSHTunnelManager()
-            self.cache_runner_host_labels(runner, info.get('inventory'))
+            self.announce_runner_targets(runner, info.get('inventory'))
             self.configure_runner_environment(runner)
+
+            platform = info.get('platform')
+            platform_name = getattr(platform, 'name', '')
+            batch_heading = '\n### Ansible {}/{}'.format(i, total_runners)
+            if platform_name:
+                batch_heading += ' [{}]'.format(platform_name)
+            runner.cb.write_ansible_output(batch_heading + '\n')
 
             try:
                 gateway_ready = ssh_tunnel.local_gateway_prepare(

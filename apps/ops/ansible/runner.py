@@ -14,7 +14,7 @@ from .docker import (
     docker_extravars,
     docker_isolation_kwargs,
     ensure_ansible_docker_image,
-    prepare_isolated_ansible_cfg,
+    prepare_isolated_ansible_runtime,
     stage_inventory_for_docker,
     use_ansible_docker_isolation,
 )
@@ -69,7 +69,7 @@ class AdHocRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        prepare_isolated_ansible_cfg(self.project_dir)
+        self.envs.update(prepare_isolated_ansible_runtime(self.project_dir))
 
         run_kwargs = {
             'timeout': self.timeout if self.timeout > 0 else None,
@@ -151,7 +151,7 @@ class PlaybookRunner:
         if os.path.exists(private_env):
             shutil.rmtree(private_env)
 
-        prepare_isolated_ansible_cfg(self.project_dir)
+        self.envs.update(prepare_isolated_ansible_runtime(self.project_dir))
         inventory = stage_inventory_for_docker(self.project_dir, self.inventory)
 
         kwargs = dict(kwargs)
@@ -162,19 +162,24 @@ class PlaybookRunner:
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
-        interface.run(
-            private_data_dir=self.project_dir,
-            inventory=inventory,
-            playbook=self.playbook,
-            verbosity=verbosity,
-            event_handler=self.cb.event_handler,
-            status_handler=self.cb.status_handler,
-            # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
-            host_cwd=self.playbook_project_dir,
-            envvars=self.envs,
-            extravars=docker_extravars(self.extra_vars),
-            **kwargs
-        )
+        try:
+            interface.run(
+                private_data_dir=self.project_dir,
+                inventory=inventory,
+                playbook=self.playbook,
+                verbosity=verbosity,
+                event_handler=self.cb.event_handler,
+                status_handler=self.cb.status_handler,
+                # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
+                host_cwd=self.playbook_project_dir,
+                envvars=self.envs,
+                extravars=docker_extravars(self.extra_vars),
+                **kwargs
+            )
+        finally:
+            close_callback = getattr(self.cb, 'close', None)
+            if close_callback:
+                close_callback()
         return self.cb
 
 
@@ -200,6 +205,7 @@ class UploadFileRunner:
         self.inventory = inventory
         self.project_dir = project_dir
         self.cb = DefaultCallback()
+        self.envs = {}
         upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file')
         self.share_src_dir = safe_join(upload_file_dir, str(job_id))
         self.dest_path = safe_join("/tmp", dest_path)
@@ -218,7 +224,7 @@ class UploadFileRunner:
         if not os.path.exists(self.project_dir):
             os.makedirs(self.project_dir, mode=0o755, exist_ok=True)
 
-        prepare_isolated_ansible_cfg(self.project_dir)
+        self.envs.update(prepare_isolated_ansible_runtime(self.project_dir))
         src_path = self.stage_upload_files()
 
         verbosity = get_ansible_log_verbosity(verbosity)
@@ -232,6 +238,7 @@ class UploadFileRunner:
             'event_handler': self.cb.event_handler,
             'status_handler': self.cb.status_handler,
             'container_workdir': self.project_dir,
+            'envvars': self.envs,
             **kwargs,
         }
         if use_ansible_docker_isolation():

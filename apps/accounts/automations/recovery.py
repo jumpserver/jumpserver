@@ -114,6 +114,24 @@ def finalize_interrupted_execution(
             )
 
             snapshot = execution.snapshot or {}
+            verification_record_ids = list(
+                (snapshot.get('recovery_record_map') or {}).values()
+            )
+            verification_count = 0
+            if verification_record_ids:
+                verification_count = ChangeSecretRecord.objects.filter(
+                    id__in=verification_record_ids,
+                    verification_status=(
+                        ChangeSecretRecordStatusChoice.pending.value
+                    ),
+                ).update(
+                    verification_status=(
+                        ChangeSecretRecordStatusChoice.unverified.value
+                    ),
+                    verification_error=reason,
+                    date_verified=date_finished,
+                )
+
             retry_record_ids = [
                 record_id
                 for record_id in (
@@ -191,6 +209,7 @@ def finalize_interrupted_execution(
                 'date_finished': date_finished.isoformat(),
                 'change_secret_records': change_count,
                 'push_secret_records': push_count,
+                'verification_records': verification_count,
             }
 
             execution.status = status

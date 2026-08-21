@@ -14,7 +14,7 @@ from rest_framework.settings import api_settings
 
 from common.drf.filters import (
     IDSpmFilterBackend, CustomFilterBackend, IDInFilterBackend,
-    IDNotFilterBackend, NotOrRelFilterBackend, LabelFilterBackend
+    IDNotFilterBackend, LabelFilterBackend
 )
 from common.utils import get_logger, lazyproperty
 from common.utils import is_uuid
@@ -136,6 +136,12 @@ class QuerySetMixin:
         return queryset
 
     def setup_eager_loading(self, queryset, is_paginated=False):
+        # OPTIONS metadata only needs the object itself for permission checks.
+        # `determine_actions` temporarily changes `action` to update/retrieve,
+        # so use the preserved raw action to avoid loading relation data.
+        if getattr(self, 'raw_action', None) in ('metadata', 'OPTIONS'):
+            return queryset
+
         is_export_request = self.request.query_params.get('format') in ['csv', 'xlsx']
         no_request_page = self.request.query_params.get('limit') is None
         # 不分页不走一般这个，是因为会消耗多余的 sql 查询, 不如分页的时候查询一次
@@ -220,8 +226,6 @@ class ExtraFilterFieldsMixin:
             self.default_added_filters,
             self.extra_filter_backends,
         ))
-        # 这个要放在最后
-        backends.append(NotOrRelFilterBackend)
         return backends
 
     def filter_queryset(self, queryset):

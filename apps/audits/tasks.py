@@ -75,6 +75,12 @@ def clean_celery_tasks_period():
     tasks = CeleryTaskExecution.objects.filter(date_start__isnull=True)
     tasks.delete()
     find_and_delete_files(settings.CELERY_LOG_DIR, name_pattern="*.log", mtime_days=expire_days)
+    if os.path.isdir(settings.ANSIBLE_LOG_DIR):
+        find_and_delete_files(
+            settings.ANSIBLE_LOG_DIR,
+            name_pattern="*.log",
+            mtime_days=expire_days,
+        )
     celery_log_path = safe_join(settings.LOG_DIR, 'celery.log')
     truncate_file(celery_log_path)
 
@@ -83,8 +89,8 @@ def batch_delete(queryset, batch_size=3000):
     model = queryset.model
     count = queryset.count()
     with transaction.atomic():
-        for i in range(0, count, batch_size):
-            pks = queryset[i:i + batch_size].values_list('id', flat=True)
+        for _ in range(0, count, batch_size):
+            pks = queryset[:batch_size].values_list('id', flat=True)
             model.objects.filter(id__in=list(pks)).delete()
 
 
@@ -93,9 +99,9 @@ def delete_expired_commands_by_day(keep_days, direct_delete_limit=10000, batch_s
     expire_timestamp = (timezone.now() - timezone.timedelta(days=keep_days)).timestamp()
     expired_queryset = Command.objects.order_by().filter(timestamp__lt=expire_timestamp)
     min_timestamp = expired_queryset.aggregate(min_ts=Min('timestamp')).get('min_ts')
-    logger.info('Min date for expired commands: %s', datetime.datetime.fromtimestamp(min_timestamp))
     if min_timestamp is None:
         return
+    logger.info('Min date for expired commands: %s', datetime.datetime.fromtimestamp(min_timestamp))
 
     tz = timezone.get_current_timezone()
     current_day = datetime.datetime.fromtimestamp(min_timestamp, tz=tz).date()

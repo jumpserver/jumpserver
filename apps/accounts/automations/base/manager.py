@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from collections import defaultdict
 from copy import deepcopy
 
 from django.conf import settings
@@ -11,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice, \
     ChangeSecretAccountStatus
-from accounts.models import Account, BaseAccountQuerySet
+from accounts.models import Account
 from accounts.utils import SecretGenerator, account_secret_task_status
 from assets.automations.base.manager import BasePlaybookManager
 from assets.const import HostTypes
@@ -89,6 +90,55 @@ class AccountBasePlaybookManager(BasePlaybookManager):
             'assets': asset_count,
         }
 
+    def get_execution_asset_source_ids(self):
+        source_asset_ids_by_asset_id = getattr(
+            self, '_source_asset_ids_by_asset_id', None
+        )
+        if source_asset_ids_by_asset_id is not None:
+            return source_asset_ids_by_asset_id
+
+        # An asset can use accounts from joined directory services. Keep the
+        # same source set as Asset.all_accounts without querying that relation
+        # repeatedly while generating a large inventory.
+        asset_ids = {
+            str(asset_id)
+            for asset_id in self.execution.get_all_asset_ids()
+        }
+        source_asset_ids_by_asset_id = {
+            asset_id: {asset_id} for asset_id in asset_ids
+        }
+        from assets.models import Asset
+        relations = Asset.directory_services.through.objects.filter(
+            asset_id__in=asset_ids
+        ).values_list('asset_id', 'directoryservice_id')
+        for asset_id, directory_service_id in relations:
+            source_asset_ids_by_asset_id[str(asset_id)].add(
+                str(directory_service_id)
+            )
+        self._source_asset_ids_by_asset_id = source_asset_ids_by_asset_id
+        return source_asset_ids_by_asset_id
+
+    def index_accounts_by_execution_asset(self, accounts, include_related=True):
+        if include_related:
+            accounts = accounts.select_related(
+                'asset__platform', 'asset__ds', 'su_from',
+                'su_from__asset__platform', 'su_from__asset__ds',
+            )
+
+        accounts_by_source_asset_id = defaultdict(list)
+        for account in accounts:
+            accounts_by_source_asset_id[str(account.asset_id)].append(account)
+
+        accounts_by_asset_id = defaultdict(list)
+        for asset_id, source_asset_ids in (
+                self.get_execution_asset_source_ids().items()
+        ):
+            for source_asset_id in source_asset_ids:
+                accounts_by_asset_id[asset_id].extend(
+                    accounts_by_source_asset_id[source_asset_id]
+                )
+        return accounts_by_asset_id
+
     @property
     def platform_automation_methods(self):
         from assets.const import AllTypes
@@ -111,6 +161,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.inventory_account_mapper = {}
         self.account_locks = {}
         self.found_account_ids = set()
+        self._accounts_by_asset_id = None
+        self._target_account_ids_by_asset_id = None
 
     @staticmethod
     def get_record_result_counts(records):
@@ -128,6 +180,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         return None, None
 
     def print_final_host_result(self, host, record):
+        host = self.get_host_display_label(host)
         if (
                 record
                 and record.status
@@ -172,23 +225,60 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             new_secret = generator.get_secret()
         return new_secret
 
-    def get_accounts(self, privilege_account) -> BaseAccountQuerySet | None:
-        if not privilege_account:
-            print('Not privilege account')
+    def load_accounts_by_asset(self):
+        if self._accounts_by_asset_id is not None:
             return
 
-        asset = privilege_account.asset
-        accounts = asset.all_accounts.all()
-        accounts = accounts.filter(id__in=self.account_ids, secret_reset=True)
-
+        accounts = Account.objects.filter(
+            id__in=self.account_ids,
+            secret_reset=True,
+        )
         if self.secret_type:
             accounts = accounts.filter(secret_type=self.secret_type)
-
         if settings.CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED:
             accounts = accounts.filter(privileged=False).exclude(
-                username__in=['root', 'administrator', privilege_account.username]
+                username__in=['root', 'administrator']
             )
+
+        # Account automation can target a large node. Loading the eligible
+        # accounts once avoids issuing the complete account-id IN query again
+        # for every asset while inventories are prepared.
+        accounts_by_asset_id = self.index_accounts_by_execution_asset(accounts)
+
+        target_account_ids_by_asset_id = defaultdict(set)
+        target_accounts_by_asset_id = self.index_accounts_by_execution_asset(
+            Account.objects.filter(id__in=self.account_ids).only(
+                'id', 'asset_id'
+            ),
+            include_related=False,
+        )
+        for asset_id, target_accounts in target_accounts_by_asset_id.items():
+            target_account_ids_by_asset_id[asset_id].update(
+                str(account.id) for account in target_accounts
+            )
+
+        self._accounts_by_asset_id = accounts_by_asset_id
+        self._target_account_ids_by_asset_id = target_account_ids_by_asset_id
+
+    def get_accounts(self, privilege_account):
+        if not privilege_account:
+            print(_('No privileged account'))
+            return []
+
+        self.load_accounts_by_asset()
+        accounts = self._accounts_by_asset_id.get(
+            str(privilege_account.asset_id), []
+        )
+        if settings.CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED:
+            accounts = [
+                account for account in accounts
+                if account.username != privilege_account.username
+            ]
         return accounts
+
+    def get_target_account_ids(self, asset_id):
+        self.load_accounts_by_asset()
+        return self._target_account_ids_by_asset_id.get(str(asset_id), set())
 
     def handle_ssh_secret(self, secret_type, new_secret, path_dir):
         private_key_path = None
@@ -234,17 +324,12 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         host['ssh_params'] = {}
 
         accounts = self.get_accounts(account)
-        existing_ids = set(map(str, accounts.values_list('id', flat=True)))
+        existing_ids = {str(account.id) for account in accounts}
         self.found_account_ids.update(existing_ids)
         # `self.account_ids` covers the complete execution. Comparing it
         # directly with one asset's accounts releases statuses/locks already
         # prepared for other assets in the same execution.
-        target_ids = set(map(
-            str,
-            asset.all_accounts.filter(
-                id__in=self.account_ids
-            ).values_list('id', flat=True),
-        ))
+        target_ids = self.get_target_account_ids(asset.id)
         missing_ids = target_ids - existing_ids
 
         for account_id in missing_ids:
@@ -258,16 +343,23 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             })
             self.print_log(_(
                 "○ %(asset)s: skipped; no eligible accounts"
-            ) % {'asset': asset}, 'progress')
+            ) % {'asset': self.format_asset_label(asset)}, 'progress')
             return []
 
         if asset.type == HostTypes.WINDOWS:
-            accounts = accounts.filter(secret_type=SecretType.PASSWORD)
+            accounts = [
+                account for account in accounts
+                if account.secret_type == SecretType.PASSWORD
+            ]
 
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'  # To distinguish different accounts
             self.inventory_account_mapper[h['name']] = account
+            h['account'] = {
+                'username': account.username,
+                'full_username': account.full_username,
+            }
 
             try:
                 if not self.acquire_account_lock(account.id):
@@ -300,14 +392,16 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         for account_id in sorted(missing_account_ids):
             self.clear_account_queue_status(account_id)
+            error = str(_(
+                'Account not found, inactive, or not eligible for this task'
+            ))
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
                 'asset': '',
                 'username': account_id,
-                'error': str(_(
-                    'Account not found, inactive, or not eligible for this task'
-                )),
+                'error': error,
             })
+            self.print_inventory_host_error(account_id, error)
         return runners
 
     @staticmethod
@@ -580,6 +674,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
                 'error': str(error),
             })
             self.clear_account_queue_status(account.id)
+            label = self._inventory_host_labels.get(host, host)
+            self.print_inventory_host_error(label, error)
             return
         return super().on_inventory_host_error(host, error)
 

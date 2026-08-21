@@ -13,7 +13,7 @@ from common.exceptions import JMSException
 from common.utils import get_logger, FlashMessageUtil
 from orgs.utils import tmp_to_root_org
 from tickets.const import TicketType
-from tickets.errors import AlreadyClosed
+from tickets.errors import TicketStateChanged
 from tickets.models import (
     Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
@@ -116,9 +116,11 @@ class TicketDirectApproveView(TemplateView):
                 ticket_sub_model = self.TICKET_SUB_MODEL_MAP[ticket.type]
                 ticket = ticket_sub_model.objects.get(id=ticket_id)
             if not ticket.has_current_assignee(user):
+                if ticket.has_all_assignee(user):
+                    raise TicketStateChanged
                 raise JMSException(_("This user is not authorized to approve this ticket"))
             getattr(ticket, action)(user)
-        except AlreadyClosed as e:
+        except TicketStateChanged as e:
             self.clear(token)
             return self.redirect_message_response(error=str(e), redirect_url=self.login_url)
         except Exception as e:
