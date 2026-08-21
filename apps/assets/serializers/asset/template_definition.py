@@ -109,10 +109,10 @@ class AssetImportTemplate:
 
 def _id_column():
     return TemplateColumn(
-        header=_('ID'),
+        header=format_lazy(_('{} (Required)'), _('ID')),
         field_name='id',
         help_text=_('ID, asset unique identifier, leave blank when importing to create a new asset'),
-        required=False,
+        required=True,
         parse_transform=transforms.id_from_template,
     )
 
