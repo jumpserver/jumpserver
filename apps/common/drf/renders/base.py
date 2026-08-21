@@ -70,7 +70,10 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
     def get_rendered_fields(self):
         import_template = self._get_import_template()
         if import_template:
-            return import_template.columns
+            columns = import_template.columns
+            if self.template == 'import':
+                columns = [c for c in columns if c.field_name != 'id']
+            return columns
 
         fields = self.serializer.fields
         meta = getattr(self.serializer, 'Meta', None)
