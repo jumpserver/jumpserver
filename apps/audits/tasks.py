@@ -280,7 +280,8 @@ def reclaim_storage_by_threshold_task():
     if current_pct <= threshold_pct:
         return
 
-    targets = getattr(settings, 'STORAGE_RECLAMATION_TARGETS', [])
+    # targets = getattr(settings, 'STORAGE_RECLAMATION_TARGETS', [])
+    targets = ['session_replay', 'file_transfer']
     if not targets:
         return
 
