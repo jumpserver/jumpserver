@@ -18,8 +18,13 @@ __all__ = ['sign_connection_token_ssh_certificate', 'get_ssh_ca_client']
 
 def get_ssh_ca_client(config=None):
     config = config or settings
+    addr = getattr(config, 'SSH_CA_OPENBAO_ADDR', '') or getattr(
+        config, 'VAULT_OPENBAO_ADDR', ''
+    ) or getattr(
+        settings, 'VAULT_OPENBAO_ADDR', ''
+    )
     return OpenBaoSSHCAClient(
-        addr=getattr(config, 'SSH_CA_OPENBAO_ADDR', ''),
+        addr=addr,
         token=getattr(config, 'SSH_CA_OPENBAO_TOKEN', ''),
         mount_point=getattr(config, 'SSH_CA_OPENBAO_MOUNT_POINT', 'ssh-client-signer'),
         role=getattr(config, 'SSH_CA_OPENBAO_ROLE', 'jumpserver'),

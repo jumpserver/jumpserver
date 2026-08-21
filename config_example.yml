@@ -123,7 +123,8 @@ REDIS_PORT: 6379
 # VAULT_OPENBAO_TOKEN:
 # VAULT_OPENBAO_TIMEOUT: 10
 
-# OpenBao SSH CA (independent from the Vault KV backend above)
+# OpenBao SSH CA has an independent address, token and mount. The address may
+# point to the same OpenBao cluster as Vault KV or to a separate cluster.
 # SSH_CA_ENABLED: false
 # SSH_CA_OPENBAO_ADDR: http://openbao:8200
 # SSH_CA_OPENBAO_TOKEN:
