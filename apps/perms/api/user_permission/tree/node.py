@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.response import Response
 
 from assets.api import SerializeToTreeNodeMixin
@@ -22,7 +23,9 @@ class NodeTreeMixin(SerializeToTreeNodeMixin):
 
     def list(self, request, *args, **kwargs):
         nodes = self.filter_queryset(self.get_queryset())
-        data = self.serialize_nodes(nodes, with_asset_amount=True)
+        with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED and \
+            request.query_params.get('asset_amount', '1') == '1'
+        data = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
         return Response(data)
 
 
@@ -34,5 +37,4 @@ class UserAllPermedNodesAsTreeApi(NodeTreeMixin, UserAllPermedNodesApi):
 class UserPermedNodeChildrenAsTreeApi(NodeTreeMixin, UserPermedNodeChildrenApi):
     """ 用户授权的节点下的子节点树 """
     pass
-
 
