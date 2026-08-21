@@ -16,6 +16,7 @@ from common.serializers import (
 )
 from common.serializers.common import DictSerializer
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from common.validators import ProjectUniqueValidator
 from django.utils.translation import gettext
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -176,6 +177,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             'date_verified', 'created_by', 'date_created', 'date_updated',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
+        validators = [ProjectUniqueValidator(queryset=Asset.objects.all(), fields=('org_id', 'name'))]
         fields_unexport = ['auto_config']
         # 通用资产列表（/api/v1/assets/assets/）导出复用主机模板格式
         import_template = host_import_template
