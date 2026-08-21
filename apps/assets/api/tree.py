@@ -178,8 +178,9 @@ class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         # 资源数量统计可选项 (asset, account)
         count_resource = self.request.query_params.get('count_resource', 'asset')
 
+        with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED and \
+            self.request.query_params.get('asset_amount', '1') == '1'
         if not self.request.query_params.get('key'):
-            with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED
             nodes = AllTypes.to_tree_nodes(
                 include_asset,
                 count_resource=count_resource,
