@@ -123,6 +123,18 @@ REDIS_PORT: 6379
 # VAULT_OPENBAO_TOKEN:
 # VAULT_OPENBAO_TIMEOUT: 10
 
+# OpenBao SSH CA (independent from the Vault KV backend above)
+# SSH_CA_ENABLED: false
+# SSH_CA_OPENBAO_ADDR: http://openbao:8200
+# SSH_CA_OPENBAO_TOKEN:
+# SSH_CA_OPENBAO_MOUNT_POINT: ssh-client-signer
+# SSH_CA_OPENBAO_ROLE: jumpserver
+# SSH_CA_OPENBAO_TTL: 300
+# SSH_CA_OPENBAO_TIMEOUT: 10
+# SSH_CA_OPENBAO_VERIFY_TLS: true
+# Optional: comma-separated CIDRs seen by the target sshd (Koko or gateway egress)
+# SSH_CA_OPENBAO_SOURCE_ADDRESS:
+
 # LDAP/AD settings
 # LDAP 搜索分页数量
 # AUTH_LDAP_SEARCH_PAGED_SIZE: 1000

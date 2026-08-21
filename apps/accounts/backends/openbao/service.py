@@ -9,7 +9,7 @@ from common.utils import get_logger, random_string
 
 logger = get_logger(__name__)
 
-__all__ = ['OpenBaoKVClient']
+__all__ = ['OpenBaoAPIError', 'OpenBaoKVClient', 'OpenBaoSSHCAClient']
 
 
 class OpenBaoAPIError(Exception):
@@ -261,3 +261,75 @@ class OpenBaoKVClient(object):
         error = OpenBaoAPIError(errors or response.reason)
         error.status_code = response.status_code
         return error
+
+
+class OpenBaoSSHCAClient(OpenBaoKVClient):
+    """Small client for OpenBao's SSH certificate signing endpoint.
+
+    It intentionally shares only the HTTP transport with the KV client. SSH CA
+    settings and credentials are kept separate from the account Vault backend.
+    """
+
+    def __init__(
+            self, addr=None, token='', mount_point='ssh-client-signer',
+            role='jumpserver', timeout=10, verify_tls=True,
+    ):
+        super().__init__(
+            addr=addr,
+            token=token,
+            mount_point=mount_point,
+            timeout=timeout,
+            verify_tls=verify_tls,
+        )
+        self.role = (role or 'jumpserver').strip('/')
+
+    def is_active(self):
+        try:
+            self._check_health()
+            public_key = self.get_public_key()
+            if not public_key:
+                raise OpenBaoAPIError('OpenBao SSH CA public key is empty')
+        except Exception as e:
+            logger.error(str(e))
+            return False, f'OpenBao SSH CA is not available: {e}'
+        return True, ''
+
+    def get_public_key(self):
+        mount_point = quote(self.mount_point, safe='')
+        response = self._send('GET', f'/v1/{mount_point}/public_key')
+        if response.status_code != 200:
+            raise self._build_error(response)
+        return response.text.strip()
+
+    def sign(
+            self, public_key, valid_principals, ttl,
+            key_id='', extensions=None, critical_options=None,
+    ):
+        mount_point = quote(self.mount_point, safe='')
+        role = quote(self.role, safe='')
+        payload = {
+            'public_key': public_key,
+            'cert_type': 'user',
+            'valid_principals': valid_principals,
+            'ttl': f'{int(ttl)}s',
+        }
+        if key_id:
+            payload['key_id'] = key_id
+        if extensions:
+            payload['extensions'] = extensions
+        if critical_options:
+            payload['critical_options'] = critical_options
+
+        response = self._request(
+            'POST', f'/v1/{mount_point}/sign/{role}',
+            json=payload, expected_statuses=(200,)
+        )
+        data = response.get('data') or {}
+        signed_key = data.get('signed_key')
+        if not signed_key:
+            raise OpenBaoAPIError('OpenBao response does not contain signed_key')
+        return {
+            'signed_key': signed_key.strip(),
+            'serial_number': data.get('serial_number', ''),
+            'lease_duration': response.get('lease_duration') or int(ttl),
+        }

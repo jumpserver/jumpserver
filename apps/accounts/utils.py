@@ -42,6 +42,8 @@ class SecretGenerator:
             secret = self.generate_ssh_key()
         elif self.secret_type == SecretType.PASSWORD:
             secret = self.generate_password()
+        elif self.secret_type == SecretType.SSH_CERTIFICATE:
+            secret = ''
         else:
             raise ValueError("Secret must be set")
         return secret

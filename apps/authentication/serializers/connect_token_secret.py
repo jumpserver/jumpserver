@@ -152,10 +152,15 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     clipboard_policy = serializers.SerializerMethodField()
     data_masking_rules = _ConnectionTokenDataMaskingRuleSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
+    public_key = serializers.CharField(
+        label=_('SSH public key'), write_only=True, required=False,
+        allow_blank=True, max_length=16384,
+    )
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
     connect_options = serializers.JSONField(read_only=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
+    ssh_certificate = serializers.SerializerMethodField()
 
     class Meta:
         model = ConnectionToken
@@ -163,13 +168,17 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'clipboard_policy', 'data_masking_rules', 'protocol',
             'zone', 'gateway', 'actions', 'expire_at',
-            'from_ticket', 'expire_now', 'connect_method',
-            'connect_options', 'face_monitor_token'
+            'from_ticket', 'expire_now', 'public_key', 'connect_method',
+            'connect_options', 'face_monitor_token', 'ssh_certificate'
         ]
         extra_kwargs = {
             'face_monitor_token': {'read_only': True},
             'value': {'read_only': True},
         }
+
+    @staticmethod
+    def get_ssh_certificate(token):
+        return getattr(token, 'ssh_certificate', None)
 
     @staticmethod
     def _get_clipboard_acl_for_operation(token, operation):

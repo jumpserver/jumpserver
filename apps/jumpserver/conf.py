@@ -291,6 +291,18 @@ class Config(dict):
         'VAULT_OPENBAO_MOUNT_POINT': 'pam',
         'VAULT_OPENBAO_TIMEOUT': 10,
 
+        # OpenBao SSH CA. Keep its token and role separate from the KV Vault
+        # backend because the signing identity requires different permissions.
+        'SSH_CA_ENABLED': False,
+        'SSH_CA_OPENBAO_ADDR': 'http://openbao:8200',
+        'SSH_CA_OPENBAO_TOKEN': '',
+        'SSH_CA_OPENBAO_MOUNT_POINT': 'ssh-client-signer',
+        'SSH_CA_OPENBAO_ROLE': 'jumpserver',
+        'SSH_CA_OPENBAO_TTL': 300,
+        'SSH_CA_OPENBAO_TIMEOUT': 10,
+        'SSH_CA_OPENBAO_VERIFY_TLS': True,
+        'SSH_CA_OPENBAO_SOURCE_ADDRESS': '',
+
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'pam',

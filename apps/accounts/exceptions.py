@@ -34,3 +34,11 @@ class VaultSecretNotFoundException(VaultException):
     default_detail = _(
         'Secret not found in Vault. The local sync marker has been preserved.'
     )
+
+
+class SSHCertificateSigningException(JMSException):
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    default_code = 'ssh_certificate_signing_unavailable'
+    default_detail = _(
+        'SSH certificate signing is unavailable. Please retry or contact your administrator.'
+    )

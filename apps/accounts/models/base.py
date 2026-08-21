@@ -72,6 +72,8 @@ class BaseAccount(VaultModelMixin, JMSOrgBaseModel):
 
     @property
     def has_secret(self):
+        if self.secret_type == SecretType.SSH_CERTIFICATE:
+            return True
         return bool(self.secret)
 
     @property
