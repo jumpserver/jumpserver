@@ -5531,7 +5531,11 @@ msgstr "無效的ID，應為列表"
 #: xpack/plugins/cloud/serializers/account_attrs.py:95
 #: xpack/plugins/cloud/serializers/account_attrs.py:187
 msgid "This field is required."
-msgstr "該欄位是必填項。"
+msgstr "該欄位是必填項"
+
+#: assets/serializers/asset/common.py
+msgid "This field may not be empty."
+msgstr "該欄位不能為空"
 
 #: common/db/fields.py:592 common/db/fields.py:597
 msgid "Invalid attrs, should be a list of dict"
@@ -7252,7 +7256,7 @@ msgstr "測試訊息已發送，請查收"
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
-msgstr "SYSLOG 處理器未啟動，請先儲存設定"
+msgstr "SYSLOG 服務異常，請檢查配置"
 
 #: settings/api/nas.py:18
 #, python-brace-format

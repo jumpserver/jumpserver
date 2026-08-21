@@ -152,7 +152,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
     platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
-                                  attrs=('id', 'name', 'type'))
+                                  attrs=('id', 'name', 'type'),
+                                  error_messages={'null': _('This field may not be empty.')})
     accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
     _accounts = None
 
@@ -206,6 +207,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     def _get_protocols_required_default(self):
         platform = self._asset_platform
+        if platform is None:
+            return None, None
         platform_protocols = platform.protocols.all()
         protocols_default = [p for p in platform_protocols if p.default]
         protocols_required = [p for p in platform_protocols if p.required or p.primary]
@@ -221,6 +224,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             return
 
         protocols_required, protocols_default = self._get_protocols_required_default()
+        # Skip duplicate errors when the platform is empty
+        if protocols_required is None:
+            return
         protocol_map = {str(protocol.id): protocol for protocol in protocols_required + protocols_default}
         protocols = list(protocol_map.values())
         protocols_data = [{'name': p.name, 'port': p.port} for p in protocols]
@@ -270,18 +276,23 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         platform_data = getattr(self, 'initial_data', {}).get('platform')
         if not platform_data and self.instance:
             platform = self.instance.platform
+        elif not platform_data:
+            # Skip duplicate errors when the platform is empty
+            platform = None
         else:
             try:
                 platform = self.fields['platform'].to_internal_value(platform_data)
-            except serializers.ValidationError as exc:
-                raise serializers.ValidationError({gettext('Platform'): exc.detail})
-
-        if not platform:
-            raise serializers.ValidationError({gettext('Platform'): _("Platform not exist")})
+            except serializers.ValidationError:
+                raise serializers.ValidationError(
+                    {gettext('Platform'): _('This field may not be empty.')}
+                )
         return platform
 
     def validate_zone(self, value):
         platform = self._asset_platform
+        # Skip duplicate errors when the platform is empty
+        if platform is None:
+            return value
         if platform.gateway_enabled:
             return value
         else:
@@ -293,15 +304,14 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         nodes_display = self.initial_data.get('nodes_display')
         if nodes_display:
             return nodes
-        default_node = Node.org_root()
         request = self.context.get('request')
-        if not request:
-            return [default_node]
-        node_id = request.query_params.get('node_id')
-        if not node_id:
-            return [default_node]
-        nodes = Node.objects.filter(id=node_id)
-        return nodes
+        node_id = request.query_params.get('node_id') if request else None
+        if node_id:
+            return Node.objects.filter(id=node_id)
+        # nodes 与 nodes_display 均为空且未指定节点时，报必填错误
+        raise serializers.ValidationError(_('This field is required.'))
+
+
 
     def is_valid(self, raise_exception=False):
         self._set_protocols_default()
@@ -317,6 +327,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
                 raise serializers.ValidationError(error)
 
         protocols_required, __ = self._get_protocols_required_default()
+        # Skip duplicate errors when the platform is empty
+        if protocols_required is None:
+            return protocols_data_map.values()
         protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
         if protocols_not_found:
             raise serializers.ValidationError({
