@@ -2,6 +2,7 @@
 #
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Exists, OuterRef, Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django_filters import rest_framework as drf_filters
@@ -14,7 +15,7 @@ from accounts.serializers import AccountSerializer
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
 from assets.exceptions import NotSupportedTemporarilyError
-from assets.filters import IpInFilterBackend, NodeFilterBackend
+from assets.filters import IpInFilterBackend, NodeFilterBackend, parse_protocol_filters
 from assets.models import Asset, Gateway, Platform, Protocol
 from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
@@ -47,9 +48,15 @@ def get_license_asset_limit():
 
 class AssetFilterSet(BaseFilterSet):
     platform = drf_filters.CharFilter(method='filter_platform')
+    platform__name__icontains = drf_filters.CharFilter(
+        field_name='platform__name', lookup_expr='icontains'
+    )
     is_gateway = drf_filters.BooleanFilter(method='filter_is_gateway')
     exclude_platform = drf_filters.CharFilter(field_name="platform__name", lookup_expr='exact', exclude=True)
     zone = drf_filters.CharFilter(method='filter_zone')
+    zone__name__icontains = drf_filters.CharFilter(
+        field_name='zone__name', lookup_expr='icontains'
+    )
     type = drf_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     exclude_type = drf_filters.CharFilter(field_name="platform__type", lookup_expr="exact", exclude=True)
     category = drf_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
@@ -107,8 +114,15 @@ class AssetFilterSet(BaseFilterSet):
 
     @staticmethod
     def filter_protocols(queryset, name, value):
-        value = value.split(',')
-        return queryset.filter(protocols__name__in=value).distinct()
+        protocol_filters = parse_protocol_filters(value)
+        if not protocol_filters:
+            return queryset
+
+        protocol_query = Q()
+        for protocol_filter in protocol_filters:
+            protocol_query |= protocol_filter
+        protocol_exists = Protocol.objects.filter(asset_id=OuterRef('pk'))
+        return queryset.filter(Exists(protocol_exists.filter(protocol_query)))
 
 
 class BaseAssetViewSet(OrgBulkModelViewSet):
