@@ -7199,7 +7199,7 @@ msgstr ""
 
 #: settings/api/syslog.py:38
 msgid "Syslog handler is not active, please save configuration first"
-msgstr ""
+msgstr "SYSLOG service exception, please check the configuration"
 
 #: settings/api/nas.py:18
 #, python-brace-format
