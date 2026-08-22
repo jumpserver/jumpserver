@@ -154,7 +154,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
     platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
                                   attrs=('id', 'name', 'type'),
-                                  error_messages={'null': _('This field may not be empty.')})
+                                  error_messages={'null': _('This field is required.')})
     accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
     _accounts = None
 
