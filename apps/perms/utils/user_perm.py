@@ -1,5 +1,4 @@
 import json
-import re
 
 from django.conf import settings
 from django.core.cache import cache
@@ -73,15 +72,20 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         assets = assets.filter(id__in=list(asset_ids))
         return assets
 
-    def get_type_nodes_tree(self):
+    def get_type_nodes_tree(self, with_asset_amount=None):
+        if with_asset_amount is None:
+            with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED
         assets = self.get_all_assets()
         resource_platforms = assets.order_by('id').values_list('platform_id', flat=True)
-        node_all = AllTypes.get_tree_nodes(resource_platforms, get_root=True)
-        pattern = re.compile(r'\(0\)?')
+        node_all = AllTypes.get_tree_nodes(
+            resource_platforms,
+            get_root=True,
+            with_asset_amount=with_asset_amount,
+        )
         nodes = []
         for node in node_all:
             meta = node.get('meta', {})
-            if pattern.search(node['name']) or meta.get('type') == 'platform':
+            if meta.get('type') == 'platform':
                 continue
             _type = meta.get('_type')
             if _type:
@@ -93,12 +97,15 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         return nodes
 
     @classmethod
-    def get_type_nodes_tree_or_cached(cls, user):
+    def get_type_nodes_tree_or_cached(cls, user, with_asset_amount=None):
+        if with_asset_amount is None:
+            with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED
         lang = get_language()
-        key = f'perms:type-nodes-tree:{user.id}:{current_org.id}:{lang}'
+        amount = int(with_asset_amount)
+        key = f'perms:type-nodes-tree:{user.id}:{current_org.id}:{lang}:{amount}'
         nodes = cache.get(key)
         if nodes is None:
-            nodes = cls(user).get_type_nodes_tree()
+            nodes = cls(user).get_type_nodes_tree(with_asset_amount=with_asset_amount)
             nodes_json = json.dumps(nodes, cls=JSONEncoder)
             cache.set(key, nodes_json, 60 * 60 * 24)
         else:

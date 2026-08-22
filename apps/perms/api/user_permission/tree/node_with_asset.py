@@ -1,5 +1,4 @@
 import abc
-
 from django.conf import settings
 from django.db.models import F, Value, CharField
 from rest_framework.generics import ListAPIView
@@ -36,7 +35,9 @@ class BaseUserNodeWithAssetAsTreeApi(
             nodes, assets = self.get_nodes_assets()
             page = page_assets[:self.page_limit]
             assets = [*assets, *page]
-            tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+            with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED and \
+                request.query_params.get('asset_amount', '1') == '1'
+            tree_nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
             tree_assets = self.serialize_assets(assets, **self.serialize_asset_kwargs)
             data = list(tree_nodes) + list(tree_assets)
         else:
@@ -175,7 +176,11 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(BaseUserNodeWithAssetAsT
         if self.request.query_params.get('lv') == '0':
             return [], []
         if not self.tp or not all(self.tp):
-            nodes = UserPermAssetUtil.get_type_nodes_tree_or_cached(self.user)
+            with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED and \
+                self.request.query_params.get('asset_amount', '1') == '1'
+            nodes = UserPermAssetUtil.get_type_nodes_tree_or_cached(
+                self.user, with_asset_amount=with_asset_amount
+            )
             if self.request.query_params.get('count_resource'):
                 # 解决在 lina 使用该 api 类型树套娃问题
                 for node in nodes:
@@ -190,7 +195,9 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(BaseUserNodeWithAssetAsT
     def _get_tree_nodes_sync(self):
         if self.request.query_params.get('lv'):
             return []
-        nodes = self.query_asset_util.get_type_nodes_tree()
+        with_asset_amount = settings.TREE_NODE_AMOUNT_ENABLED and \
+            self.request.query_params.get('asset_amount', '1') == '1'
+        nodes = self.query_asset_util.get_type_nodes_tree(with_asset_amount=with_asset_amount)
         return nodes, []
 
     @property
