@@ -124,6 +124,10 @@ class SessionCookieMiddleware(MiddlewareMixin):
     USER_LOGIN_ENCRYPTION_KEY_PAIR = 'user_login_encryption_key_pair'
 
     def set_cookie_public_key(self, request, response):
+        resource_urls = (settings.STATIC_URL, settings.MEDIA_URL)
+        if request.path.startswith(resource_urls):
+            return
+
         whitelist = [
             '/api/v1/authentication/sso/login/',
         ]
