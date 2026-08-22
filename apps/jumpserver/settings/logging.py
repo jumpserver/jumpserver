@@ -2,11 +2,17 @@
 #
 import logging
 import os
+import socket
+import threading
+import time
+from dataclasses import dataclass
 from logging.handlers import SysLogHandler
 
 from django.conf import settings
 
 from ..const import PROJECT_DIR, CONFIG
+
+logger = logging.getLogger('jumpserver.logging')
 
 LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
@@ -139,44 +145,186 @@ if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR, mode=0o755)
 
 
-def _get_syslog_config():
-    """获取当前 syslog 配置（仅从 django.conf.settings，由界面 / API 管理）"""
-    enabled = getattr(settings, 'SYSLOG_ENABLE', False)
-    host = getattr(settings, 'SYSLOG_HOST', '')
-    port = getattr(settings, 'SYSLOG_PORT', 514)
-    facility = getattr(settings, 'SYSLOG_FACILITY', 'user')
-    socktype = getattr(settings, 'SYSLOG_SOCKTYPE', 2)
-    return enabled, host, port, facility, socktype
+@dataclass(frozen=True)
+class SyslogConfig:
+    enabled: bool
+    host: str
+    port: int
+    facility: str
+    socktype: int
+
+    @classmethod
+    def from_test_data(cls, data):
+        return cls(
+            enabled=True,
+            host=str(data['SYSLOG_HOST']).strip(),
+            port=data['SYSLOG_PORT'],
+            facility=data['SYSLOG_FACILITY'],
+            socktype=data['SYSLOG_SOCKTYPE'],
+        )
+
+    @classmethod
+    def from_settings(cls):
+        return cls(
+            enabled=bool(getattr(settings, 'SYSLOG_ENABLE', False)),
+            host=str(getattr(settings, 'SYSLOG_HOST', '') or '').strip(),
+            port=int(getattr(settings, 'SYSLOG_PORT', 514)),
+            facility=getattr(settings, 'SYSLOG_FACILITY', 'user'),
+            socktype=int(getattr(settings, 'SYSLOG_SOCKTYPE', 2)),
+        )
 
 
 # 'django.server',
 SYSLOG_LOGGER_NAMES = ('syslog',)
+SYSLOG_TCP_TIMEOUT = 5
+
+
+class LazySyslogHandler(logging.Handler):
+    """Create the network handler only when a syslog record is emitted."""
+
+    retry_interval = 5
+    warning_interval = 60
+
+    def __init__(self, config):
+        super().__init__(level=logging.INFO)
+        self._config = config
+        self._delegate = None
+        self._pid = os.getpid()
+        self._next_retry_at = 0
+        self._next_warning_at = 0
+        self._state_lock = threading.RLock()
+        self.setFormatter(logging.Formatter('osm: %(message)s'))
+
+    def update_config(self, config):
+        with self._state_lock:
+            if self._config == config:
+                return
+            self._config = config
+            self._reset_retry_state()
+            self._close_delegate()
+
+    def emit(self, record):
+        self.send(record)
+
+    def send(self, record):
+        """Attempt local delivery and return whether the socket accepted it."""
+        with self._state_lock:
+            self._reset_after_fork()
+            if not self._config.enabled or not self._config.host:
+                return False
+
+            delegate = self._get_delegate()
+            if delegate is None:
+                return False
+
+            try:
+                delegate.emit(record)
+                self._next_warning_at = 0
+                return True
+            except Exception as e:
+                self._mark_delegate_failed(e)
+                return False
+
+    def close(self):
+        with self._state_lock:
+            self._close_delegate()
+        super().close()
+
+    def _get_delegate(self):
+        if self._delegate is not None:
+            return self._delegate
+        if time.monotonic() < self._next_retry_at:
+            return None
+        try:
+            self._delegate = self._create_delegate()
+            return self._delegate
+        except Exception as e:
+            self._mark_delegate_failed(e)
+            return None
+
+    def _create_delegate(self):
+        return create_syslog_handler(self._config, self.formatter, self.level)
+
+    def _reset_after_fork(self):
+        pid = os.getpid()
+        if pid == self._pid:
+            return
+        self._pid = pid
+        self._reset_retry_state()
+        self._close_delegate()
+
+    def _reset_retry_state(self):
+        self._next_retry_at = 0
+        self._next_warning_at = 0
+
+    def _mark_delegate_failed(self, error):
+        now = time.monotonic()
+        self._next_retry_at = now + self.retry_interval
+        if now >= self._next_warning_at:
+            logger.warning(
+                'Syslog delivery failed, retry in %ss: host=%s port=%s '
+                'socktype=%s error=%s',
+                self.retry_interval, self._config.host, self._config.port,
+                self._config.socktype, error,
+            )
+            self._next_warning_at = now + self.warning_interval
+        self._close_delegate()
+
+    def _close_delegate(self):
+        if self._delegate is None:
+            return
+        try:
+            self._delegate.close()
+        except Exception:
+            pass
+        finally:
+            self._delegate = None
+
+
+class RetriableSysLogHandler(SysLogHandler):
+    """Let the lazy proxy handle delivery errors from SysLogHandler."""
+
+    def handleError(self, record):
+        raise RuntimeError('Failed to emit syslog record')
+
+
+def create_syslog_handler(config, formatter=None, level=logging.INFO):
+    handler = RetriableSysLogHandler(
+        address=(config.host, config.port),
+        facility=config.facility,
+        socktype=config.socktype,
+        timeout=SYSLOG_TCP_TIMEOUT if config.socktype == socket.SOCK_STREAM else None,
+    )
+    handler.setLevel(level)
+    handler.setFormatter(formatter or logging.Formatter('osm: %(message)s'))
+    return handler
+
+
+def _get_lazy_syslog_handler(logger):
+    return next(
+        (handler for handler in logger.handlers if isinstance(handler, LazySyslogHandler)),
+        None,
+    )
+
+
+def initialize_syslog_handler():
+    """Install the lazy proxy after database-backed settings are loaded."""
+    config = SyslogConfig.from_settings()
+    for logger_name in SYSLOG_LOGGER_NAMES:
+        logger = logging.getLogger(logger_name)
+        handler = _get_lazy_syslog_handler(logger)
+        if handler is not None:
+            handler.update_config(config)
+            continue
+
+        for old_handler in list(logger.handlers):
+            if isinstance(old_handler, (SysLogHandler, logging.NullHandler)):
+                logger.removeHandler(old_handler)
+                old_handler.close()
+
+        logger.addHandler(LazySyslogHandler(config))
 
 
 def reconfigure_syslog_handler():
-    enabled, host, port, facility, socktype = _get_syslog_config()
-    if enabled and host:
-        handler = SysLogHandler(
-            address=(host, int(port)),
-            facility=facility,
-            socktype=socktype,
-        )
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(logging.Formatter('osm: %(message)s'))
-    else:
-        handler = logging.NullHandler()
-
-    to_close = set()
-    for logger_name in SYSLOG_LOGGER_NAMES:
-        logger = logging.getLogger(logger_name)
-        for h in list(logger.handlers):
-            if h.__class__.__name__ in ('SysLogHandler', 'NullHandler'):
-                logger.removeHandler(h)
-                to_close.add(h)
-        logger.addHandler(handler)
-
-    for h in to_close:
-        try:
-            h.close()
-        except Exception:
-            pass
+    """Refresh the local snapshot without performing network I/O."""
+    initialize_syslog_handler()
