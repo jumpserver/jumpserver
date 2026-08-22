@@ -334,9 +334,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             return protocols_data_map.values()
         protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
         if protocols_not_found:
-            raise serializers.ValidationError({
-                'protocols': _("Protocol is required: {}").format(', '.join(protocols_not_found))
-            })
+            raise serializers.ValidationError(_("Protocol is required: {}").format(', '.join(protocols_not_found)))
         return protocols_data_map.values()
 
     def validate_platform(self, platform_data):
