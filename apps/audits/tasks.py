@@ -291,7 +291,19 @@ def reclaim_storage_by_threshold_task():
     nas_mount_path = None
     if action == 'archive':
         nas_mount_path = NAS_MOUNT_PATH
-        if not nas_mount_path or not os.path.ismount(nas_mount_path):
+        from settings.tools.nas_mount import ensure_nas_mounted
+
+        nas_config = {
+            'nas_enabled': getattr(settings, 'NAS_ENABLED', False),
+            'nas_type': getattr(settings, 'NAS_TYPE', 'nfs'),
+            'nas_host': getattr(settings, 'NAS_HOST', ''),
+            'nas_port': getattr(settings, 'NAS_PORT', 0),
+            'nas_share_name': getattr(settings, 'NAS_SHARE_NAME', ''),
+            'nas_mount_path': nas_mount_path,
+            'nas_username': getattr(settings, 'NAS_USERNAME', ''),
+            'nas_password': getattr(settings, 'NAS_PASSWORD', ''),
+        }
+        if not ensure_nas_mounted(nas_config, force=True) or not os.path.ismount(nas_mount_path):
             logger.error('NAS mount path not available for archive reclamation: %s', nas_mount_path)
             StorageReclamationLog.objects.create(
                 method=method, data_start=None, data_end=None, result='fail'

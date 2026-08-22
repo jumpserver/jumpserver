@@ -72,7 +72,6 @@ def ensure_nas_mounted(config, force=False):
     logger.info('Mounting NAS: %s -> %s (type=%s)', source, mount_path, nas_type)
 
     try:
-        print(cmd)
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
             logger.info('NAS mounted successfully: %s -> %s', source, mount_path)
