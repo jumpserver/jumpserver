@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db import transaction
 from django.http import HttpResponse
 from django.views.static import serve
 from rest_framework import generics
@@ -18,7 +19,7 @@ from rbac.models import RoleBinding
 from rbac.permissions import RBACPermission
 from users.models import User
 from .. import serializers
-from ..models import Setting
+from ..models import Setting, SYSLOG_SETTING_NAMES
 from ..signals import category_setting_updated
 from ..utils import get_interface_setting_or_default
 
@@ -181,16 +182,39 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         post_data_names = list(self.request.data.keys())
-        settings_items = self.parse_serializer_data(serializer)
+        settings_items = [
+            item for item in self.parse_serializer_data(serializer)
+            if item['name'] in post_data_names
+        ]
         serializer_data = getattr(serializer, 'data', {})
+        syslog_items = [
+            item for item in settings_items
+            if item['name'] in SYSLOG_SETTING_NAMES
+        ]
+        other_items = [
+            item for item in settings_items
+            if item['name'] not in SYSLOG_SETTING_NAMES
+        ]
 
-        for item in settings_items:
-            if item['name'] not in post_data_names:
-                continue
+        for item in other_items:
             changed, setting = Setting.update_or_create(**item)
             if not changed:
                 continue
             serializer_data[setting.name] = setting.cleaned_value
+
+        if syslog_items:
+            with transaction.atomic():
+                syslog_changed = False
+                for item in syslog_items:
+                    changed, setting = Setting.update_or_create(**item, notify=False)
+                    if not changed:
+                        continue
+                    syslog_changed = True
+                    serializer_data[setting.name] = setting.cleaned_value
+
+                if syslog_changed:
+                    from ..signal_handlers import publish_syslog_config_changed
+                    transaction.on_commit(publish_syslog_config_changed)
 
         setattr(serializer, '_data', serializer_data)
         if hasattr(serializer, 'post_save'):

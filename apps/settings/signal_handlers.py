@@ -11,7 +11,6 @@ from django.dispatch import receiver
 from django.db.models.signals import post_migrate
 from django.utils.functional import LazyObject
 from django.apps import apps
-from django.core.signals import request_started
 
 from jumpserver.const import BASE_DIR
 from common.decorators import on_transaction_commit
@@ -19,24 +18,41 @@ from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
 from .const import NAS_MOUNT_PATH
-from .models import Setting
+from .models import Setting, SYSLOG_SETTING_NAMES
 from .signals import setting_changed
 
 logger = get_logger(__file__)
 
 
-class SettingSubPub(LazyObject):
+class LazyRedisPubSub(LazyObject):
+    channel = ''
+
     def _setup(self):
-        self._wrapped = RedisPubSub('settings')
+        self._wrapped = RedisPubSub(self.channel)
+
+
+class SettingSubPub(LazyRedisPubSub):
+    channel = 'settings'
+
+
+class SyslogConfigSubPub(LazyRedisPubSub):
+    channel = 'syslog-config'
 
 
 setting_pub_sub = SettingSubPub()
+syslog_config_pub_sub = SyslogConfigSubPub()
+SYSLOG_CONFIG_UPDATED = 'SYSLOG_CONFIG_UPDATED'
 
 
 @receiver(post_save, sender=Setting)
 @on_transaction_commit
 def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if not instance:
+        return
+    if getattr(instance, '_skip_settings_refresh_notification', False):
+        return
+    if instance.name in SYSLOG_SETTING_NAMES:
+        publish_syslog_config_changed()
         return
     setting_pub_sub.publish(instance.name)
     if instance.is_name('PERM_SINGLE_ASSET_TO_UNGROUP_NODE'):
@@ -51,17 +67,12 @@ def on_django_ready_add_db_config(sender, **kwargs):
     Setting.refresh_all_settings()
 
 
-_syslog_configured = False
-@receiver(request_started, dispatch_uid='settings.signal_handlers.init_syslog_first_request')
-def on_first_request_init_syslog_handler(sender, **kwargs):
-    global _syslog_configured
-    if _syslog_configured:
-        return
-    _syslog_configured = True
+@receiver(django_ready)
+def on_django_ready_init_syslog_handler(sender, **kwargs):
     try:
-        from jumpserver.settings.logging import reconfigure_syslog_handler
-        reconfigure_syslog_handler()
-        logger.debug('Syslog handler initialized on first request')
+        from jumpserver.settings.logging import initialize_syslog_handler
+        initialize_syslog_handler()
+        logger.debug('Lazy syslog handler initialized')
     except Exception as e:
         logger.error('Failed to initialize syslog handler: %s', e)
 
@@ -84,6 +95,18 @@ def subscribe_settings_change(sender, **kwargs):
     logger.debug("Start subscribe setting change")
 
     setting_pub_sub.subscribe(lambda name: Setting.refresh_item(name))
+    syslog_config_pub_sub.subscribe(refresh_syslog_config)
+
+
+def publish_syslog_config_changed():
+    syslog_config_pub_sub.publish(SYSLOG_CONFIG_UPDATED)
+
+
+def refresh_syslog_config(event):
+    if event != SYSLOG_CONFIG_UPDATED:
+        return
+    Setting.refresh_syslog_settings()
+    setting_changed.send(sender=Setting, name='SYSLOG_CONFIG')
 
 
 def update_site_url():
@@ -156,12 +179,12 @@ def register_sqlite_connection(sender, **kwargs):
 
 @receiver(setting_changed)
 def on_syslog_setting_changed(sender, name='', **kwargs):
-    if name not in ('SYSLOG_ENABLE', 'SYSLOG_HOST', 'SYSLOG_PORT', 'SYSLOG_FACILITY', 'SYSLOG_SOCKTYPE'):
+    if name != 'SYSLOG_CONFIG':
         return
     try:
         from jumpserver.settings.logging import reconfigure_syslog_handler
         reconfigure_syslog_handler()
-        logger.debug('Syslog handler reconfigured after %s changed', name)
+        logger.debug('Syslog handler configuration refreshed after %s changed', name)
     except Exception as e:
         logger.error('Failed to reconfigure syslog handler: %s', e)
 

@@ -2,14 +2,13 @@
 #
 import logging
 import os
-
-from django.conf import settings
 from django.http import FileResponse
 from django.utils.encoding import escape_uri_path
 from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework.views import Response, APIView
 
 from common.utils import get_logger
+from .. import serializers
 
 logger = get_logger(__file__)
 
@@ -17,44 +16,34 @@ __all__ = ['SyslogTestingAPI', 'SyslogDocDownloadAPI']
 
 
 class SyslogTestingAPI(APIView):
-    success_message = _("Test message sent, please check")
+    serializer_class = serializers.SyslogTestSerializer
     rbac_perms = {
         'POST': 'settings.change_other'
     }
 
     def post(self, request):
-        enabled = getattr(settings, 'SYSLOG_ENABLE', False)
-        if not enabled:
-            return Response(
-                {"error": str(_("Syslog is not enabled"))},
-                status=400
-            )
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        host = getattr(settings, 'SYSLOG_HOST', '')
-        if not host:
-            return Response(
-                {"error": str(_("Syslog host is not configured"))},
-                status=400
-            )
+        from jumpserver.settings.logging import SyslogConfig, create_syslog_handler
 
-        syslog_logger = logging.getLogger('syslog')
-        syslog_handlers = [
-            h for h in syslog_logger.handlers
-            if h.__class__.__name__ == 'SysLogHandler'
-        ]
-        if not syslog_handlers:
-            return Response(
-                {"error": str(_("Syslog handler is not active, please save configuration first"))},
-                status=400
-            )
-
+        config = SyslogConfig.from_test_data(serializer.validated_data)
+        handler = None
         try:
-            syslog_logger.info('syslog_test - {"test": "message"}')
+            handler = create_syslog_handler(config)
+            record = logging.LogRecord(
+                'syslog', logging.INFO, __file__, 0,
+                'syslog_test - {"test": "message"}', (), None,
+            )
+            handler.emit(record)
         except Exception as e:
-            logger.error("Failed to send test syslog message: %s", e)
+            logger.error("Failed to test syslog delivery: %s", e)
             return Response({"error": str(e)}, status=400)
+        finally:
+            if handler is not None:
+                handler.close()
 
-        return Response({"msg": str(self.success_message)})
+        return Response({"msg": _('Test success')})
 
 
 class SyslogDocDownloadAPI(APIView):
