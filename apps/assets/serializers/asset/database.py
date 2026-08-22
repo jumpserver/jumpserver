@@ -11,6 +11,9 @@ __all__ = ['DatabaseSerializer', 'DatabaseWithGatewaySerializer']
 
 
 class DatabaseSerializer(AssetSerializer):
+    name = serializers.CharField(
+        max_length=128, label=_('Name'), error_messages={'blank': _('This field may not be empty.')}
+    )
     db_name = serializers.CharField(max_length=1024, label=_('Default database'), required=True)
 
     class Meta(AssetSerializer.Meta):
