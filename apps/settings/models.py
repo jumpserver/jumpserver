@@ -18,6 +18,11 @@ from .signals import setting_changed
 
 logger = get_logger(__name__)
 
+SYSLOG_SETTING_NAMES = (
+    'SYSLOG_ENABLE', 'SYSLOG_HOST', 'SYSLOG_PORT',
+    'SYSLOG_FACILITY', 'SYSLOG_SOCKTYPE',
+)
+
 
 class SettingQuerySet(models.QuerySet):
     def __getattr__(self, item):
@@ -91,6 +96,17 @@ class Setting(models.Model):
         item.refresh_setting()
         setting_changed.send(sender=cls, name=name, item=item)
 
+    @classmethod
+    def refresh_syslog_settings(cls):
+        """Refresh syslog fields as one snapshot after a configuration commit."""
+        settings_by_name = {
+            item.name: item for item in cls.objects.filter(name__in=SYSLOG_SETTING_NAMES)
+        }
+        for name in SYSLOG_SETTING_NAMES:
+            item = settings_by_name.get(name)
+            if item:
+                setattr(settings, name, item.cleaned_value)
+
     def refresh_setting(self):
         setattr(settings, self.name, self.cleaned_value)
         self.refresh_keycloak_to_openid_if_need()
@@ -140,7 +156,7 @@ class Setting(models.Model):
         return url
 
     @classmethod
-    def update_or_create(cls, name='', value='', encrypted=False, category=''):
+    def update_or_create(cls, name='', value='', encrypted=False, category='', notify=True):
         """
         不能使用 Model 提供的，update_or_create 因为这里有 encrypted 和 cleaned_value
         :return: (changed, instance)
@@ -156,6 +172,7 @@ class Setting(models.Model):
         if setting.cleaned_value != value:
             setting.encrypted = encrypted
             setting.cleaned_value = value
+            setting._skip_settings_refresh_notification = not notify
             setting.save()
             changed = True
         return changed, setting
