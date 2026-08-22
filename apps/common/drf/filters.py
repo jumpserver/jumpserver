@@ -34,7 +34,6 @@ __all__ = [
     "CustomFilterBackend",
     "BaseFilterSet",
     "IDNotFilterBackend",
-    "NotOrRelFilterBackend",
     "LabelFilterBackend",
     "RewriteOrderingFilter",
     "AttrRulesFilterBackend",
@@ -626,31 +625,6 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
 
         logger.debug("AttrRulesFilterBackend json_base64 data: %s", data)
         return data
-
-class NotOrRelFilterBackend(filters.BaseFilterBackend):
-    def get_schema_fields(self, view):
-        return [
-            coreapi.Field(
-                name="_rel",
-                location="query",
-                required=False,
-                type="string",
-                example="/api/v1/users/users?name=abc&username=def&_rel=union",
-                description="Filter by rel, or not, default is and",
-            )
-        ]
-
-    def filter_queryset(self, request, queryset, view):
-        return queryset
-        _rel = request.query_params.get("_rel")
-        if not _rel or _rel not in ("or", "not"):
-            return queryset
-        if _rel == "not":
-            queryset.query.where.negated = True
-        elif _rel == "or":
-            queryset.query.where.connector = "OR"
-        queryset._result_cache = None
-        return queryset
 
 
 class RewriteOrderingFilter(OrderingFilter):
