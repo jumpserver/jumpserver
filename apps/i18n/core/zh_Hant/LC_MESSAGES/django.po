@@ -4135,8 +4135,8 @@ msgid ""
 "delete or archive the oldest session replay files and update session records\n"
 "until usage falls below threshold"
 msgstr ""
-"當系統存儲使用率超過 STORAGE_USAGE_THRESHOLD (百分比 50-95) "
-"時，刪除或歸檔最早一天的會話記錄、命令記錄和錄像，直到使用率降至閾值以下"
+"當系統儲存使用率超過 STORAGE_USAGE_THRESHOLD（百分比 50-95）時，刪除或歸檔最早的會話錄像和 FTP "
+"檔案，直到使用率降至閾值以下"
 
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"

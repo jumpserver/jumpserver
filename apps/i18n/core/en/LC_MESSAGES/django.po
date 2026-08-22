@@ -4104,6 +4104,9 @@ msgid ""
 "delete or archive the oldest session replay files and update session records\n"
 "until usage falls below threshold"
 msgstr ""
+"If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),\n"
+"delete or archive the oldest session recordings and FTP files\n"
+"until usage falls below threshold"
 
 #: audits/tasks.py:206
 msgid "Upload FTP file to external storage"

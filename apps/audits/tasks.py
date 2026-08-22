@@ -307,9 +307,9 @@ def _get_clean_window(data_start, window_days):
 @shared_task(
     verbose_name=_('Reclaim storage by threshold'),
     description=_(
-        """If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),
-        delete or archive the oldest session replay files and update session records
-        until usage falls below threshold"""
+        'If system storage usage exceeds STORAGE_USAGE_THRESHOLD (percentage 50-95),\n'
+        'delete or archive the oldest session replay files and update session records\n'
+        'until usage falls below threshold'
     )
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
