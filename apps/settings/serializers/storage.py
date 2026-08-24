@@ -78,7 +78,7 @@ class StorageSettingSerializer(serializers.Serializer):
         help_text=_('NAS login username')
     )
     NAS_PASSWORD = EncryptedField(
-        required=True, allow_null=True, allow_blank=True, max_length=1024,
+        required=False, allow_null=True, allow_blank=True, max_length=1024,
         label=_('NAS password'),
         help_text=_('NAS login password')
     )
