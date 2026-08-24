@@ -81,7 +81,8 @@ class NodeChildrenApi(generics.ListCreateAPIView):
         query_all = self.request.query_params.get("all", "0") == "all"
 
         if self.is_initial and current_org.is_root():
-            return self.get_org_root_queryset(query_all)
+            queryset = self.get_org_root_queryset(query_all)
+            return queryset.with_realtime_assets_amount()
 
         if self.is_initial:
             with_self = True
@@ -95,7 +96,7 @@ class NodeChildrenApi(generics.ListCreateAPIView):
             queryset = self.instance.get_all_children(with_self=with_self)
         else:
             queryset = self.instance.get_children(with_self=with_self)
-        return queryset
+        return queryset.with_realtime_assets_amount()
 
 
 class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
@@ -145,7 +146,11 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         return assets
 
     def list(self, request, *args, **kwargs):
-        nodes = self.filter_queryset(self.get_queryset()).order_by('value')
+        include_assets = request.query_params.get('assets', '0') == '1'
+        nodes = self.filter_queryset(self.get_queryset()) \
+            .with_realtime_assets_amount() \
+            .with_has_children(include_assets=include_assets) \
+            .order_by('value')
         with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
         nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())

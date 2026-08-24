@@ -13,6 +13,9 @@ __all__ = [
 
 class NodeSerializer(BulkOrgResourceModelSerializer):
     name = serializers.ReadOnlyField(source='value')
+    assets_amount = serializers.SerializerMethodField(
+        label=_("Assets amount")
+    )
     value = serializers.CharField(
         required=False, allow_blank=True, allow_null=True, label=_("value")
     )
@@ -23,8 +26,22 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Node
         only_fields = ['id', 'key', 'value', 'org_id']
-        fields = only_fields + ['name', 'full_value']
+        fields = only_fields + ['name', 'full_value', 'assets_amount']
         read_only_fields = ['key', 'org_id']
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get('request')
+        if request and request.method != 'GET':
+            fields.pop('assets_amount', None)
+        return fields
+
+    @staticmethod
+    def get_assets_amount(obj):
+        amount = getattr(obj, 'assets_amount_realtime', None)
+        if amount is not None:
+            return amount
+        return obj.get_assets_amount()
 
     def validate_value(self, data):
         if '/' in data:

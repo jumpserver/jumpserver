@@ -22,7 +22,10 @@ class SerializeToTreeNodeMixin:
     def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
         if with_asset_amount:
             def _name(node: Node):
-                return '{} ({})'.format(node.value, node.assets_amount)
+                amount = getattr(
+                    node, 'assets_amount_realtime', node.assets_amount
+                )
+                return '{} ({})'.format(node.value, amount)
         else:
             def _name(node: Node):
                 return node.value
@@ -36,19 +39,26 @@ class SerializeToTreeNodeMixin:
             else:
                 return False
 
+        def _has_children(node):
+            # Callers that have not opted into the annotation keep the
+            # previous lazy-tree behaviour.
+            return bool(getattr(node, 'has_children', True))
+
         data = [
             {
                 'id': node.key,
                 'name': _name(node),
                 'title': _name(node),
                 'pId': node.parent_key,
-                'isParent': True,
+                'isParent': _has_children(node),
+                'hasChildren': _has_children(node),
                 'open': _open(node),
                 'meta': {
                     'data': {
                         "id": node.id,
                         "key": node.key,
                         "value": node.value,
+                        "has_children": _has_children(node),
                     },
                     'type': 'node'
                 }
