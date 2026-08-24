@@ -21,6 +21,7 @@ from rest_framework.response import Response
 from accounts.const import AliasAccount
 from accounts.utils import validate_account_username
 from acls.notifications import AssetLoginReminderMsg
+from assets.const import Protocol
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
 from common.utils import random_string, get_logger, get_request_ip_or_data
@@ -35,6 +36,9 @@ from users.models import Preference
 from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
+from ..utils import (
+    get_effective_connect_options, should_use_oracle_sysdba,
+)
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
@@ -418,6 +422,13 @@ class RDPFileClientProtocolURLMixin:
             'command': ''
         }
 
+        if token.protocol == Protocol.oracle:
+            data['connect_options'] = {
+                'use_sysdba': should_use_oracle_sysdba(
+                    token.connect_options, token.protocol
+                )
+            }
+
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
             data.update({
@@ -661,6 +672,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         account_name = data.get('account')
         protocol = data.get('protocol')
         connect_method = data.get('connect_method')
+        data['connect_options'] = get_effective_connect_options(
+            data['connect_options'], protocol
+        )
         self.input_username = self.get_input_username(data)
         if account_name == AliasAccount.INPUT:
             # Manual account input can reach Luna directly, so validate before ACL/token creation.

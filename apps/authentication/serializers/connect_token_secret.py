@@ -15,6 +15,7 @@ from perms.const import ActionChoices as PermActionChoices
 from perms.serializers.permission import ActionChoicesField
 from users.models import User
 from ..models import ConnectionToken
+from ..utils import get_effective_connect_options
 
 __all__ = [
     'ConnectionTokenSecretSerializer', 'ConnectTokenAppletOptionSerializer',
@@ -153,7 +154,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     data_masking_rules = _ConnectionTokenDataMaskingRuleSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
-    connect_options = serializers.JSONField(read_only=True)
+    connect_options = serializers.SerializerMethodField()
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
 
@@ -170,6 +171,12 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'face_monitor_token': {'read_only': True},
             'value': {'read_only': True},
         }
+
+    @staticmethod
+    def get_connect_options(token):
+        return get_effective_connect_options(
+            token.connect_options, token.protocol
+        )
 
     @staticmethod
     def _get_clipboard_acl_for_operation(token, operation):
