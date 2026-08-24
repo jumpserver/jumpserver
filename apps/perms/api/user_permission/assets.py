@@ -1,7 +1,8 @@
 import abc
 
 from django.conf import settings
-from django.db.models import FilteredRelation, Q
+from django.db.models import F, FilteredRelation, Q, Value
+from django.db.models.functions import Coalesce, NullIf
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from assets.models import Asset, Node, MyAsset
@@ -65,6 +66,20 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
         )
         assets = self.serializer_class.setup_eager_loading(assets)
         return assets
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        ordering = self.request.query_params.get('order')
+        if not self.need_custom_value_user or ordering not in ('name', '-name'):
+            return queryset
+        prefix = '-' if ordering.startswith('-') else ''
+        queryset = queryset.alias(
+            display_name=Coalesce(
+                NullIf(F('user_custom__name'), Value('')),
+                F('name'),
+            )
+        )
+        return queryset.order_by(f'{prefix}display_name')
 
     def get_serializer(self, *args, **kwargs):
         if len(args) == 1 and kwargs.get('many', False) and self.need_custom_value_user:
