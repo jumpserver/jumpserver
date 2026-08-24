@@ -304,7 +304,7 @@ wheels = [
 [[package]]
 name = "ansible-core"
 version = "2.16.18"
-source = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.3.zip" }
+source = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.4.zip" }
 dependencies = [
     { name = "cryptography" },
     { name = "jinja2" },
@@ -312,7 +312,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "resolvelib" },
 ]
-sdist = { hash = "sha256:539c00b75066960ba8c5002195f556713fb933559638f6e958b68ae163636a82" }
+sdist = { hash = "sha256:f8eef673e5f4a4d5667d9a224a0fa7898aae09b527b38fba26145589c7e7c31b" }
 
 [package.metadata]
 requires-dist = [
@@ -2323,7 +2323,7 @@ requires-dist = [
     { name = "annotated-types", specifier = ">=0.6.0" },
     { name = "ansible", specifier = "==9.13.0" },
     { name = "ansible-builder", specifier = ">=3.1.1" },
-    { name = "ansible-core", url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.3.zip" },
+    { name = "ansible-core", url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.4.zip" },
     { name = "ansible-runner", url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip" },
     { name = "asn1crypto", specifier = "==1.5.1" },
     { name = "azure-identity", specifier = "==1.16.0" },
