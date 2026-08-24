@@ -89,6 +89,7 @@ def ensure_nas_mounted(config, force=False):
         options = [
             f'username={username}',
             f'password={password}',
+            'soft',
         ]
         if nas_port:
             options.append(f'port={nas_port}')
