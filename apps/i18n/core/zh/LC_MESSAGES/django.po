@@ -8625,8 +8625,10 @@ msgstr "必须包含特殊字符"
 #: settings/serializers/security.py:71
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
-"allowed during this time interval."
-msgstr "当用户登录失败次数达到限制后，那么在此间隔内禁止登录"
+"allowed during this time interval. Each login attempt refreshes this time "
+"interval."
+msgstr ""
+"当用户登录失败次数达到限制后，那么在此间隔内禁止登录。每次登录尝试都会刷新此时间间隔"
 
 #: settings/serializers/security.py:79 settings/serializers/security.py:89
 msgid "Login failures count"

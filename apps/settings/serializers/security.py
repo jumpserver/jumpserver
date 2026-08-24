@@ -69,7 +69,8 @@ class SecurityPasswordRuleSerializer(serializers.Serializer):
 
 login_ip_limit_time_help_text = _(
     'If the user has failed to log in for a limited number of times, '
-    'no login is allowed during this time interval.'
+    'no login is allowed during this time interval. '
+    'Each login attempt refreshes this time interval.'
 )
 
 

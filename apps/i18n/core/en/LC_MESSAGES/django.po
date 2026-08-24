@@ -8566,7 +8566,8 @@ msgstr ""
 #: settings/serializers/security.py:71
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
-"allowed during this time interval."
+"allowed during this time interval. Each login attempt refreshes this time "
+"interval."
 msgstr ""
 
 #: settings/serializers/security.py:79 settings/serializers/security.py:89
