@@ -94,7 +94,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             ):
                 continue
             model_field_name = self.get_filterset_model_field(view, field_name)
-            if not self.is_text_lookup_field(model, model_field_name):
+            if not self.is_text_lookup_field(
+                model, model_field_name, queryset
+            ):
                 continue
 
             if lookup in self.dynamic_multi_text_lookups:
@@ -127,8 +129,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 queryset = queryset.distinct()
         return queryset
 
-    def is_text_lookup_field(self, model, field_path):
-        field = self.resolve_model_field(model, field_path)
+    def is_text_lookup_field(self, model, field_path, queryset=None):
+        field = self.resolve_model_field(model, field_path, queryset)
         return isinstance(field, (models.CharField, models.TextField))
 
     def filter_dynamic_value_lookups(self, request, queryset, view):
@@ -151,7 +153,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             ):
                 continue
             model_field_name = self.get_filterset_model_field(view, field_name)
-            if not self.is_value_lookup_field(model, model_field_name):
+            if not self.is_value_lookup_field(
+                model, model_field_name, queryset
+            ):
                 continue
 
             if lookup == "exact":
@@ -195,8 +199,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             return queryset.exclude(**kwargs)
         return queryset.filter(**kwargs)
 
-    def is_value_lookup_field(self, model, field_path):
-        field = self.resolve_model_field(model, field_path)
+    def is_value_lookup_field(self, model, field_path, queryset=None):
+        field = self.resolve_model_field(model, field_path, queryset)
         if field is None:
             return False
         return not getattr(field, "is_relation", False)
@@ -223,7 +227,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 model_field_name = self.get_filterset_model_field(
                     view, field_name
                 )
-                if not self.is_text_lookup_field(model, model_field_name):
+                if not self.is_text_lookup_field(
+                    model, model_field_name, queryset
+                ):
                     continue
                 for value in values:
                     if value == "":
@@ -243,7 +249,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 model_field_name = self.get_filterset_model_field(
                     view, field_name
                 )
-                if not self.is_value_lookup_field(model, model_field_name):
+                if not self.is_value_lookup_field(
+                    model, model_field_name, queryset
+                ):
                     continue
                 if lookup == "in":
                     cleaned_values = self.split_csv_values(values)
@@ -282,7 +290,17 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             )
         return cleaned_values
 
-    def resolve_model_field(self, model, field_path):
+    def resolve_model_field(self, model, field_path, queryset=None):
+        filtered_relations = getattr(
+            getattr(queryset, 'query', None), '_filtered_relations', {}
+        )
+        relation_alias, separator, related_field = field_path.partition('__')
+        filtered_relation = filtered_relations.get(relation_alias)
+        if filtered_relation:
+            field_path = filtered_relation.relation_name
+            if separator:
+                field_path = f'{field_path}__{related_field}'
+
         current_model = model
         field = None
         field_names = field_path.split("__")
