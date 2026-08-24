@@ -56,7 +56,7 @@ class MailTestingAPI(APIView):
                 subject, message, email_from, [email_recipient],
                 connection=connection
             )
-        except SMTPSenderRefused as e:
+        except SMTPSenderRefused:
             error = e.smtp_error
             if isinstance(error, bytes):
                 for coding in ('gbk', 'utf8'):
@@ -66,8 +66,12 @@ class MailTestingAPI(APIView):
                         continue
                     else:
                         break
-            return Response({"error": str(error)}, status=400)
+            logger.error(error)
+            hint = _("Sender address refused by the server, "
+                     "please check that EMAIL_FROM (sender) matches the SMTP account")
+            return Response({"error": hint}, status=400)
         except Exception as e:
             logger.error(e)
-            return Response({"error": str(e)}, status=400)
+            hint = _("Failed to send test mail, please check the mail server configuration")
+            return Response({"error": hint}, status=400)
         return Response({"msg": self.success_message.format(email_recipient)})

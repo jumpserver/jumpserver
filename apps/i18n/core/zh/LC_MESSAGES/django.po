@@ -7245,6 +7245,14 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
+#: settings/api/email.py:59
+msgid "Sender address refused by the server, please check that EMAIL_FROM (sender) matches the SMTP account"
+msgstr "发件地址被服务器拒绝，请检查 EMAIL_FROM（发件地址）是否与 SMTP 账号一致"
+
+#: settings/api/email.py:65
+msgid "Failed to send test mail, please check the mail server configuration"
+msgstr "测试邮件发送失败，请检查邮件服务器配置"
+
 #: settings/api/syslog.py:43
 msgid "Test syslog setting"
 msgstr "测试 syslog 设置"
