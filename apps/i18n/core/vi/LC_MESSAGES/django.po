@@ -10666,17 +10666,23 @@ msgstr "Quay lại"
 msgid "Client"
 msgstr "Khách hàng"
 
-#: templates/resource_download.html:22
-msgid "Client, currently used to launch the client"
-msgstr ""
-"Khách hàng, hiện đang được sử dụng để khởi động chương trình khách hàng cụ "
-"thể kết nối với tài sản"
+#: templates/resource_download.html:136
+msgid "JumpServer Client is a cross-platform desktop application for Windows, macOS and Linux, used to connect to and manage remote assets locally."
+msgstr "JumpServer Client là ứng dụng desktop đa nền tảng cho Windows, macOS và Linux, dùng để kết nối và quản lý tài sản từ xa tại máy cục bộ."
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:159
+msgid "Need other operating systems or architectures?"
+msgstr "Cần hệ điều hành hoặc kiến trúc khác?"
+
+#: templates/resource_download.html:161
+msgid "Get more installers from GitHub Releases"
+msgstr "Tải thêm trình cài đặt từ GitHub Releases"
+
+#: templates/resource_download.html:168
 msgid "More download"
 msgstr "Tải xuống thêm"
 
-#: templates/resource_download.html:34
+#: templates/resource_download.html:169
 msgid "Tools and applications"
 msgstr "Công cụ và ứng dụng"
 
