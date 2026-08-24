@@ -2,6 +2,7 @@
 #
 import os
 import subprocess
+import tempfile
 
 from common.utils import get_logger
 
@@ -13,6 +14,30 @@ def is_nas_mounted(mount_path):
     if not mount_path or not os.path.exists(mount_path):
         return False
     return os.path.ismount(mount_path)
+
+
+def _probe_nas_writable(mount_path):
+    """Best-effort write probe to confirm the NAS is actually reachable.
+
+    Existing mount points can stays mounted even when the NAS goes offline
+    (NFS/CIFS keep retrying in the background). A plain ``ismount`` therefore
+    does not prove the NAS is usable. Creating-and-removing a temp file forces
+    the filesystem to contact the server; with ``soft`` mount options a late
+    reply aborts in bounded time and the probe returns False.
+
+    Returns True if the NAS is writable/reachable, False otherwise.
+    """
+    if not mount_path or not os.path.isdir(mount_path):
+        return False
+    try:
+        fd, tmp = tempfile.mkstemp(dir=mount_path, prefix='.jumpserver_nas_probe_')
+        os.write(fd, b'probe')
+        os.close(fd)
+        os.remove(tmp)
+        return True
+    except OSError as e:
+        logger.error('NAS writability probe failed on %s: %s', mount_path, e)
+        return False
 
 
 def ensure_nas_mounted(config, force=False):
@@ -40,8 +65,10 @@ def ensure_nas_mounted(config, force=False):
 
     if is_nas_mounted(mount_path):
         if not force:
-            logger.info('NAS already mounted at %s', mount_path)
-            return True
+            if _probe_nas_writable(mount_path):
+                logger.info('NAS already mounted and writable at %s', mount_path)
+                return True
+            logger.warning('NAS mount point exists but is not writable, re-mounting %s', mount_path)
         _unmount(mount_path)
 
     if not os.path.exists(mount_path):
@@ -59,15 +86,26 @@ def ensure_nas_mounted(config, force=False):
         password = config.get('nas_password', '') or ''
         password = password.replace(',', '\\,')
         username = config.get('nas_username', '') or ''
-        options = f'username={username},password={password}'
+        options = [
+            f'username={username}',
+            f'password={password}',
+        ]
         if nas_port:
-            options += f',port={nas_port}'
-        cmd = ['mount', '-t', 'cifs', '-o', options, source, mount_path]
+            options.append(f'port={nas_port}')
+        cmd = ['mount', '-t', 'cifs', '-o', ','.join(options), source, mount_path]
     else:
         source = f'{host}:{share_name}'
-        cmd = ['mount', '-t', 'nfs', source, mount_path]
+        # NFS "soft" mount: return an I/O error after timeo*retrans instead of
+        # blocking forever on an unreachable server. timeo=600 = 10s per retry,
+        # retrans=2 responses, so the whole op fails in ~a few tens of seconds.
+        options = [
+            'soft',
+            'timeo=600',
+            'retrans=2',
+        ]
         if nas_port:
-            cmd = ['mount', '-t', 'nfs', '-o', f'port={nas_port}', source, mount_path]
+            options.append(f'port={nas_port}')
+        cmd = ['mount', '-t', 'nfs', '-o', ','.join(options), source, mount_path]
 
     logger.info('Mounting NAS: %s -> %s (type=%s)', source, mount_path, nas_type)
 
