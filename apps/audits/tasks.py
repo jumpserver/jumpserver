@@ -359,7 +359,7 @@ def reclaim_storage_by_threshold_task():
             StorageReclamationLog.objects.create(
                 method=method, data_start=None, data_end=None, result='fail'
             )
-            return
+            raise Exception('NAS mount path not available for archive reclamation')
 
     usage = shutil.disk_usage(base_path)
     current_pct = usage.used / usage.total * 100
