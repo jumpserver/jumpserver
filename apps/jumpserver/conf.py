@@ -843,8 +843,8 @@ class Config(dict):
         'CHAT_AI_MAX_TOKENS': 4096,
         'CHAT_AI_TEMPERATURE': 0.2,
         'CHAT_AI_MAX_CONCURRENCY': 2,
-        'CHAT_AI_MAX_STEPS': 10,
-        'CHAT_AI_MAX_API_CALLS': 20,
+        'CHAT_AI_MAX_STEPS': 15,
+        'CHAT_AI_MAX_API_CALLS': 30,
         'CHAT_AI_MAX_CANDIDATES': 5,
         'CHAT_AI_BACKGROUND_TASK_RATE': '10/min',
         'CHAT_AI_BACKGROUND_MAX_PENDING_PER_USER': 5,
@@ -930,9 +930,6 @@ class Config(dict):
 
         # Suggestion api
         'SUGGESTION_LIMIT': 10,
-
-        # MCP
-        'MCP_ENABLED': False,
 
         # oauth2_provider settings 
         'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,

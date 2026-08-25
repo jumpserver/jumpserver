@@ -390,6 +390,7 @@
     "ChartReport": "차트 보고서",
     "Chat": "채팅",
     "ChatAI": "지능형 질문 응답",
+    "ChatAIPrivateContext": "대화는 조직별로 분리되며 본인과 슈퍼 관리자만 볼 수 있습니다",
     "ChatHello": "안녕하세요! 무엇을 도와드릴까요?",
     "ChdirHelpText": "기본 실행 디렉토리는 실행 사용자의 홈 디렉토리입니다.",
     "CheckAssetsAmount": "데이터베이스 프로토콜 포트",

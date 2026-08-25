@@ -72,7 +72,7 @@ Conversation 的 `assistant` 支持：
 
 助手范围与全局 `CHAT_AI_ALLOWED_OPERATION_IDS` 取交集，不能借角色切换绕过全局白名单。默认白名单已扩展到资产、会话、命令、审计、作业、任务、组件和终端的只读查询；主机创建仍是唯一默认写操作。最终请求继续进入 Core RBAC 和组织权限校验。
 
-Core API 调用完成后，结果卡片先在本次执行的内存中累计，在消息结束时一次性持久化到 Assistant Message 的 `result_cards`。卡片包含 `table`、`timeline`、`detail`、`metric` 或 `sources` 类型，以及 operationId、Method、Path 和 HTTP 状态来源信息。SSE 的 `api_call_result` 同时返回 `presentation`，刷新对话后仍可从消息历史恢复结构化结果；卡片构建或持久化异常不会改变回答和 Run 的最终状态。
+Core API 调用完成后，结果卡片先在本次执行的内存中累计，在消息结束时一次性持久化到 Assistant Message 的 `result_cards`。卡片包含 `table`、`timeline`、`detail`、`metric`、`sources` 或仅供恢复用户可见过程的 `progress` 类型。SSE 的 `api_call_result` 同时返回 `presentation`，刷新对话后仍可从消息历史恢复过程与结构化结果；卡片构建或持久化异常不会改变回答和 Run 的最终状态。
 
 ## 后台执行和定时报告
 
@@ -163,9 +163,10 @@ data: {"content":"正在查询资产"}
 - `message_delta`：增量文本。
 - `knowledge_search_start`、`knowledge_search_result`：保留给后续知识服务；第一阶段不会发送。
 - `agent_plan`：本次执行边界和最大步数。
-- `web_search_start`、`web_search_result`：公网搜索状态和来源；不会包含搜索服务凭证或完整网页正文。
-- `api_search_start`、`api_search_result`：OpenAPI 搜索及候选 Operation。
-- `api_call_start`、`api_call_result`：Core API 调用过程；不包含认证信息。
+- `agent_progress`：模型生成的简短用户可见进度说明，不包含隐藏推理、技术标识或原始 API 数据。
+- `web_search_start`、`web_search_result`：公网搜索状态和来源，携带模型生成的简短动作名；不会包含搜索服务凭证或完整网页正文。
+- `api_search_start`、`api_search_result`：OpenAPI 搜索及候选 Operation，携带模型生成的简短动作名。
+- `api_call_start`、`api_call_result`：Core API 调用过程，携带模型生成的简短动作名；不包含认证信息。
 - `approval_required`：写操作安全预览和 Approval ID。
 - `message_done`：`completed`、`awaiting_approval` 或 `cancelled`。
 - `message_error`：安全错误码和可展示说明，不返回异常堆栈。
@@ -222,6 +223,7 @@ nonce
 - 还可用 Tag、operationId、Path 白名单及 Path 黑名单收窄范围。
 - 模型只能提交 `operation_id + path_params + query_params + body`，不能提交 URL 或 Method。
 - RequestBuilder 根据 OpenAPI 校验 Path、Query、Required、Enum、Array、Nullable、oneOf/anyOf、additionalProperties 和 JSON Body，并支持 form、spaceDelimited、pipeDelimited、deepObject Query 序列化。
+- 模型首次提交的接口参数未通过 RequestBuilder 校验时，错误会作为工具结果返回给模型修正；单次参数错误不会直接中断整个回答。
 - Approval 保存的请求不允许出现敏感字段；请求哈希由 Approval HMAC 票据覆盖。确认时会在事务内锁定记录并重新检查所有约束。
 - 确认会恢复暂停点、执行已批准的单次 Core 调用并结束当前 AgentRun；确认响应直接携带结构化执行结果，不再开启第二条 SSE。
 - 密码、Secret、Token、Cookie、私钥、API Key 等字段会被拒绝或脱敏。密码必须由 Lina 的独立安全表单直接提交给 Core。
@@ -334,8 +336,8 @@ CHAT_AI_WEB_SEARCH_MAX_CALLS: 3
 CHAT_AI_WEB_SEARCH_MAX_RESPONSE_BYTES: 1048576
 CHAT_AI_API_TIMEOUT: 15
 CHAT_AI_MAX_CONCURRENCY: 2
-CHAT_AI_MAX_STEPS: 10
-CHAT_AI_MAX_API_CALLS: 20
+CHAT_AI_MAX_STEPS: 15
+CHAT_AI_MAX_API_CALLS: 30
 CHAT_AI_MAX_CANDIDATES: 5
 CHAT_AI_BACKGROUND_TASK_RATE: 10/min
 CHAT_AI_BACKGROUND_MAX_PENDING_PER_USER: 5

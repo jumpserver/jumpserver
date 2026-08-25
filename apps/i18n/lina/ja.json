@@ -393,6 +393,7 @@
     "ChartReport": "グラフレポート",
     "Chat": "チャット",
     "ChatAI": "スマートアンサー",
+    "ChatAIPrivateContext": "会話は組織ごとに分離され、本人とスーパー管理者のみ閲覧できます",
     "ChatHello": "こんにちは！お手伝いできることがあれば何でもお申し付けください。",
     "ChdirHelpText": "デフォルトの実行ディレクトリは実行ユーザーのホームディレクトリです",
     "CheckAssetsAmount": "資産の数量を確認",

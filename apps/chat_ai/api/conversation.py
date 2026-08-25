@@ -546,7 +546,7 @@ class ConversationViewSet(JMSModelViewSet):
         cancel_timeout = max(
             60,
             getattr(settings, 'CHAT_AI_MODEL_TIMEOUT', 120)
-            * getattr(settings, 'CHAT_AI_MAX_STEPS', 10),
+            * getattr(settings, 'CHAT_AI_MAX_STEPS', 15),
         )
         for run_id in run_ids:
             try:

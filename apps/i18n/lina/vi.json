@@ -390,6 +390,7 @@
     "ChartReport": "Báo cáo biểu đồ",
     "Chat": "Trò chuyện",
     "ChatAI": "Hỏi đáp thông minh",
+    "ChatAIPrivateContext": "Các cuộc trò chuyện được tách biệt theo tổ chức và chỉ bạn cùng quản trị viên siêu cấp mới có thể xem",
     "ChatHello": "Chào bạn! Tôi có thể giúp gì cho bạn?",
     "ChdirHelpText": "Thư mục thực thi mặc định là thư mục home của người dùng thực hiện",
     "CheckAssetsAmount": "Kiểm tra số lượng tài sản",

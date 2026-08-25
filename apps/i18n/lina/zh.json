@@ -391,6 +391,7 @@
     "ChartReport": "图形报表",
     "Chat": "聊天",
     "ChatAI": "智能问答",
+    "ChatAIPrivateContext": "会话按组织隔离，仅本人和超级管理员可见",
     "ChatHello": "你好！我能为你提供什么帮助？",
     "ChdirHelpText": "默认执行目录为执行用户的 home 目录",
     "CheckAssetsAmount": "校对资产数量",

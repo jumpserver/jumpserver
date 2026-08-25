@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
@@ -9,6 +10,12 @@ from terminal.models import Command, CommandStorage, Session
 
 
 class CommandFilter(BaseFilterSet):
+    days = filters.NumberFilter(
+        method='filter_days', label=_('Created days')
+    )
+    days__lt = filters.NumberFilter(
+        method='filter_days', label=_('Created days less than')
+    )
     id = filters.UUIDFilter(
         method='filter_exact', label=_('Command ID')
     )
@@ -75,6 +82,18 @@ class CommandFilter(BaseFilterSet):
 
     def do_nothing(self, queryset, name, value):
         return queryset
+
+    @staticmethod
+    def filter_days(queryset, name, value):
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            return queryset.none()
+        timestamp = (
+            timezone.now() - timezone.timedelta(days=value)
+        ).timestamp()
+        lookup = 'timestamp__gte' if name == 'days' else 'timestamp__lt'
+        return queryset.filter(**{lookup: timestamp})
 
     @property
     def qs(self):
