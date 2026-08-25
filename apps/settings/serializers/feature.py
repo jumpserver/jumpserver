@@ -201,12 +201,6 @@ class ChatAISettingSerializer(serializers.Serializer):
         allow_blank=True, required=False, label=_('Web search proxy'),
         help_text=_('HTTP proxy used only for public web searches.'),
     )
-    CHAT_AI_MAX_SCHEDULES_PER_USER = serializers.IntegerField(
-        min_value=1, max_value=100, required=False,
-        label=_('Maximum scheduled reports per user'),
-    )
-
-
 class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 

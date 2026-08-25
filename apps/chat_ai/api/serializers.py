@@ -9,9 +9,8 @@ from chat_ai.assistants import ASSISTANTS
 from chat_ai.executor.sanitizer import sanitize_text, summarize
 from chat_ai.file_extractor import FileExtractionError, extract_file_text
 from chat_ai.models import (
-    Approval, Conversation, Message, MessageFile, MessageImage, ScheduledReport,
+    Approval, Conversation, Message, MessageFile, MessageImage,
 )
-from ops.mixin import PeriodTaskSerializerMixin
 
 
 SUPPORTED_IMAGE_TYPES = {'image/gif', 'image/jpeg', 'image/png', 'image/webp'}
@@ -308,71 +307,6 @@ class RegenerateMessageSerializer(serializers.Serializer):
         if value and not getattr(settings, 'CHAT_AI_WEB_SEARCH_ENABLED', False):
             raise serializers.ValidationError('Web search is disabled by the administrator.')
         return value
-
-
-class ScheduledReportSerializer(PeriodTaskSerializerMixin, serializers.ModelSerializer):
-    periodic_display = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = ScheduledReport
-        fields = (
-            'id', 'name', 'prompt', 'assistant', 'web_search', 'notify',
-            'is_active', 'is_periodic', 'interval', 'crontab', 'start_time',
-            'periodic_display', 'date_last_run', 'last_status', 'last_error',
-            'date_created', 'date_updated',
-        )
-        read_only_fields = (
-            'id', 'periodic_display', 'date_last_run', 'last_status',
-            'last_error', 'date_created', 'date_updated',
-        )
-
-    def validate_assistant(self, value):
-        if value not in ASSISTANTS:
-            raise serializers.ValidationError('Unknown Chat AI assistant.')
-        return value
-
-    def validate_prompt(self, value):
-        if not value.strip():
-            raise serializers.ValidationError('Prompt is required.')
-        if sanitize_text(value) != value:
-            raise serializers.ValidationError(
-                'Sensitive credentials cannot be stored in a scheduled report.'
-            )
-        return value
-
-    def validate_web_search(self, value):
-        if value and not getattr(settings, 'CHAT_AI_WEB_SEARCH_ENABLED', False):
-            raise serializers.ValidationError('Web search is disabled by the administrator.')
-        return value
-
-    def validate(self, attrs):
-        supplied = set(self.initial_data)
-        attrs = super().validate(attrs)
-        if self.instance and 'is_periodic' not in supplied:
-            attrs.pop('is_periodic', None)
-            if 'interval' in supplied:
-                attrs['interval'] = self.fields['interval'].run_validation(
-                    self.initial_data.get('interval')
-                )
-                attrs['crontab'] = ''
-            elif 'crontab' in supplied:
-                attrs['crontab'] = self.fields['crontab'].run_validation(
-                    self.initial_data.get('crontab')
-                )
-                if attrs['crontab']:
-                    attrs['interval'] = None
-            else:
-                attrs.pop('interval', None)
-                attrs.pop('crontab', None)
-        request = self.context.get('request')
-        if request and not self.instance:
-            maximum = max(1, getattr(settings, 'CHAT_AI_MAX_SCHEDULES_PER_USER', 10))
-            count = ScheduledReport.objects.filter(user=request.user).count()
-            if count >= maximum:
-                raise serializers.ValidationError(
-                    f'No more than {maximum} scheduled reports may be created.'
-                )
-        return attrs
 
 
 class ApprovalSerializer(serializers.ModelSerializer):

@@ -231,42 +231,6 @@ class Migration(migrations.Migration):
                 'ordering': ('date_created',),
             },
         ),
-        migrations.CreateModel(
-            name='ScheduledReport',
-            fields=[
-                ('created_by', models.CharField(blank=True, max_length=128, null=True, verbose_name='Created by')),
-                ('updated_by', models.CharField(blank=True, max_length=128, null=True, verbose_name='Updated by')),
-                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
-                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
-                ('name', models.CharField(max_length=128, verbose_name='Name')),
-                ('interval', models.IntegerField(blank=True, default=24, null=True, verbose_name='Interval')),
-                ('crontab', models.CharField(blank=True, default='', max_length=128, verbose_name='Crontab')),
-                ('start_time', models.DateTimeField(blank=True, help_text='Datetime when the schedule should begin triggering the task to run', null=True, verbose_name='Start Datetime')),
-                ('date_last_run', models.DateTimeField(blank=True, null=True, verbose_name='Date last run')),
-                ('is_periodic', models.BooleanField(default=True, verbose_name='Periodic run')),
-                ('prompt', models.TextField(verbose_name='Prompt')),
-                ('assistant', models.CharField(default='ops', max_length=32, verbose_name='Assistant')),
-                ('web_search', models.BooleanField(default=False, verbose_name='Web search')),
-                ('notify', models.BooleanField(default=True, verbose_name='Notify')),
-                ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
-                ('last_status', models.CharField(blank=True, default='', max_length=32, verbose_name='Last status')),
-                ('last_error', models.CharField(blank=True, default='', max_length=1024, verbose_name='Last error')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chat_ai_scheduled_reports', to=settings.AUTH_USER_MODEL, verbose_name='User')),
-            ],
-            options={
-                'verbose_name': 'Chat AI scheduled report',
-                'db_table': 'chat_ai_scheduled_report',
-                'ordering': ('-date_updated',),
-            },
-        ),
-        migrations.AddField(
-            model_name='conversation',
-            name='scheduled_report',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='conversations', to='chat_ai.scheduledreport', verbose_name='Scheduled report'),
-        ),
         migrations.AddIndex(
             model_name='approval',
             index=models.Index(fields=['user', 'org_id', 'status'], name='chat_ai_app_user_id_dc16f3_idx'),
@@ -314,14 +278,6 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name='messageimage',
             index=models.Index(fields=['date_created'], name='chat_ai_img_created_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='scheduledreport',
-            index=models.Index(fields=['user', 'org_id', 'is_active'], name='chat_ai_sch_user_id_d1fb55_idx'),
-        ),
-        migrations.AlterUniqueTogether(
-            name='scheduledreport',
-            unique_together={('user', 'org_id', 'name')},
         ),
         migrations.AddIndex(
             model_name='conversation',

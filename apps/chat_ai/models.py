@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
-from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import JMSOrgBaseModel
 
 
@@ -20,10 +19,6 @@ class Conversation(JMSOrgBaseModel):
     title = models.CharField(max_length=256, blank=True, default='', verbose_name=_('Title'))
     model = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Model'))
     assistant = models.CharField(max_length=32, blank=True, default='general', verbose_name=_('Assistant'))
-    scheduled_report = models.ForeignKey(
-        'ScheduledReport', null=True, blank=True, on_delete=models.SET_NULL,
-        related_name='conversations', verbose_name=_('Scheduled report')
-    )
     status = models.CharField(
         max_length=16, choices=Status.choices, default=Status.ACTIVE,
         verbose_name=_('Status')
@@ -290,35 +285,3 @@ class Approval(JMSBaseModel):
             models.Index(fields=('date_updated',), name='chat_ai_appr_updated_idx'),
         ]
         verbose_name = _('Chat AI approval')
-
-
-class ScheduledReport(JMSOrgBaseModel, PeriodTaskModelMixin):
-    is_periodic = models.BooleanField(default=True, verbose_name=_('Periodic run'))
-    user = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, related_name='chat_ai_scheduled_reports',
-        verbose_name=_('User')
-    )
-    prompt = models.TextField(verbose_name=_('Prompt'))
-    assistant = models.CharField(max_length=32, default='ops', verbose_name=_('Assistant'))
-    web_search = models.BooleanField(default=False, verbose_name=_('Web search'))
-    notify = models.BooleanField(default=True, verbose_name=_('Notify'))
-    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-    last_status = models.CharField(max_length=32, blank=True, default='', verbose_name=_('Last status'))
-    last_error = models.CharField(max_length=1024, blank=True, default='', verbose_name=_('Last error'))
-
-    @property
-    def interval_ratio(self):
-        return 3600, 'h'
-
-    def get_register_task(self):
-        from .tasks import run_scheduled_chat_ai_report
-
-        name = f'chat_ai_scheduled_report_{self.id}'
-        return name, run_scheduled_chat_ai_report.name, (str(self.id),), {}
-
-    class Meta:
-        db_table = 'chat_ai_scheduled_report'
-        ordering = ('-date_updated',)
-        unique_together = (('user', 'org_id', 'name'),)
-        indexes = [models.Index(fields=('user', 'org_id', 'is_active'))]
-        verbose_name = _('Chat AI scheduled report')

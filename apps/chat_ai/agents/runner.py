@@ -496,11 +496,6 @@ class AgentRunner:
             await sync_to_async(self.assistant_message.save, thread_sensitive=True)(
                 update_fields=('model', 'date_updated')
             )
-            if self.conversation.scheduled_report_id:
-                self.conversation.model = provider.model
-                await sync_to_async(self.conversation.save, thread_sensitive=True)(
-                    update_fields=('model', 'date_updated')
-                )
             registry = await OpenAPILoader().load()
             policy = PolicyEngine(
                 operation_scope=self.profile.operation_ids,

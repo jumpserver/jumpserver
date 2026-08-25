@@ -3,7 +3,6 @@ from datetime import timedelta
 from html import escape
 
 from celery import current_app, shared_task
-from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
@@ -19,9 +18,8 @@ from .agents import AgentRunner
 from .agents.context import RequestAuthContext
 from .models import (
     AgentRun, ApiCallAudit, Approval, Conversation, Message, MessageFile,
-    MessageImage, ScheduledReport,
+    MessageImage,
 )
-from .throttling import BackgroundTaskLimitExceeded, enforce_daily_token_limit
 
 
 logger = get_logger(__name__)
@@ -421,116 +419,3 @@ def run_chat_ai_agent(self, agent_run_id, web_search=False, read_only=False, not
     except Exception as exc:
         _mark_run_failed(agent_run_id, exc.__class__.__name__)
         raise
-
-
-def create_scheduled_report_run(
-    report, *, status=AgentRun.Status.RUNNING, task_id='',
-):
-    now = timezone.now()
-    conversation = Conversation.objects.create(
-        user=report.user,
-        org_id=str(report.org_id),
-        title=f'{report.name} - {timezone.localtime(now):%Y-%m-%d %H:%M}',
-        assistant=report.assistant,
-        scheduled_report=report,
-    )
-    Message.objects.create(
-        conversation=conversation,
-        role=Message.Role.USER,
-        content=report.prompt,
-        status=Message.Status.COMPLETED,
-    )
-    assistant_message = Message.objects.create(
-        conversation=conversation,
-        role=Message.Role.ASSISTANT,
-        status=(
-            Message.Status.PENDING
-            if status == AgentRun.Status.QUEUED
-            else Message.Status.STREAMING
-        ),
-        model=conversation.model,
-    )
-    return AgentRun.objects.create(
-        conversation=conversation,
-        assistant_message=assistant_message,
-        user=report.user,
-        org_id=str(report.org_id),
-        status=status,
-        task_id=task_id,
-        started_at=now if status == AgentRun.Status.RUNNING else None,
-    )
-
-
-@shared_task(
-    bind=True,
-    verbose_name=_('Run scheduled Chat AI report'),
-    description=_('Create and execute a read-only scheduled Chat AI diagnostic report.'),
-)
-def run_scheduled_chat_ai_report(self, report_id, agent_run_id=None):
-    lock_key = f'chat-ai:scheduled-report:{report_id}'
-    if not cache.add(lock_key, True, timeout=3600):
-        if agent_run_id:
-            _mark_run_failed(agent_run_id, 'SCHEDULED_REPORT_ALREADY_RUNNING')
-        return {'scheduled_report_id': str(report_id), 'status': 'already_running'}
-    with tmp_to_root_org():
-        try:
-            try:
-                report = ScheduledReport.objects.select_related('user').get(pk=report_id)
-            except ScheduledReport.DoesNotExist:
-                if agent_run_id:
-                    _mark_run_failed(agent_run_id, 'SCHEDULED_REPORT_NOT_FOUND')
-                return {'scheduled_report_id': str(report_id), 'status': 'not_found'}
-            if not report.is_active:
-                if agent_run_id:
-                    _mark_run_failed(agent_run_id, 'SCHEDULED_REPORT_DISABLED')
-                return {'scheduled_report_id': str(report.id), 'status': 'disabled'}
-
-            with tmp_to_org(report.org_id):
-                if agent_run_id:
-                    belongs_to_report = AgentRun.objects.filter(
-                        pk=agent_run_id,
-                        conversation__scheduled_report_id=report.id,
-                    ).exists()
-                    if not belongs_to_report or not _start_queued_run(
-                        agent_run_id, self.request.id
-                    ):
-                        result = _run_result(agent_run_id)
-                        return {'scheduled_report_id': str(report.id), **result}
-                    run = AgentRun.objects.get(pk=agent_run_id)
-                else:
-                    try:
-                        with transaction.atomic():
-                            get_user_model().objects.select_for_update().get(pk=report.user_id)
-                            enforce_daily_token_limit(report.user_id)
-                            run = create_scheduled_report_run(report)
-                    except BackgroundTaskLimitExceeded:
-                        result = {
-                            'status': 'quota_exceeded',
-                            'error': 'CHAT_AI_DAILY_TOKEN_LIMIT',
-                        }
-                        ScheduledReport.objects.filter(pk=report.pk).update(
-                            date_last_run=timezone.now(),
-                            last_status=result['status'],
-                            last_error=result['error'],
-                            date_updated=timezone.now(),
-                        )
-                        return {'scheduled_report_id': str(report.id), **result}
-                try:
-                    result = execute_chat_ai_run(
-                        run.id,
-                        web_search=report.web_search,
-                        read_only=True,
-                        notify=report.notify,
-                    )
-                except Exception as exc:
-                    _mark_run_failed(run.id, exc.__class__.__name__)
-                    result = _run_result(run.id)
-                ScheduledReport.objects.filter(pk=report.pk).update(
-                    date_last_run=timezone.now(),
-                    last_status=result['status'],
-                    last_error=result['error'][:1024],
-                    date_updated=timezone.now(),
-                )
-                return {'scheduled_report_id': str(report.id), **result}
-        finally:
-            cache.delete(lock_key)

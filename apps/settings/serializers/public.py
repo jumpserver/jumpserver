@@ -76,7 +76,6 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     CHAT_AI_METHOD = serializers.ChoiceField(choices=('api', 'iframe'))
     CHAT_AI_EMBED_URL = serializers.URLField(allow_blank=True)
     CHAT_AI_WEB_SEARCH_ENABLED = serializers.BooleanField()
-    CHAT_AI_MAX_SCHEDULES_PER_USER = serializers.IntegerField()
     CHAT_AI_VOICE_TRANSCRIPTION_MODE = serializers.ChoiceField(
         choices=('browser', 'server')
     )
