@@ -6080,6 +6080,31 @@ msgstr "配置文件存在问题，无法登录。请联系管理员或查看最
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "如果你是管理员，可以更新配置文件解决，设置配置项"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "浏览器未携带 CSRF Cookie，无法登录。请联系管理员"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"如果你是管理员，请检查 SESSION_COOKIE_DOMAIN 配置是否错误：访问域名必须是它或它的子域，否则浏览器不会保存 "
+"Cookie，请修正或删除该配置"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "未配置"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "请确认浏览器已启用 Cookie，并清除本站 Cookie 后重试"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "更多登录方式"

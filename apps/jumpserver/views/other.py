@@ -105,7 +105,8 @@ class ResourceDownload(TemplateView):
 
 def csrf_failure(request, reason=""):
     from django.shortcuts import reverse
-    login_url = reverse('authentication:login') + '?csrf_failure=1&admin=1'
+    reason_type = 'cookie' if reason.startswith('CSRF') else 'origin'
+    login_url = reverse('authentication:login') + f'?csrf_failure=1&admin=1&csrf_reason={reason_type}'
     return redirect(login_url)
 
 

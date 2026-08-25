@@ -6262,6 +6262,36 @@ msgstr ""
 "Nếu bạn là quản trị viên, bạn có thể cập nhật tệp cấu hình để giải quyết, "
 "thiết lập thông số cấu hình"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"Trình duyệt không gửi CSRF cookie nên không thể đăng nhập. Vui lòng liên hệ "
+"quản trị viên"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Nếu bạn là quản trị viên, hãy kiểm tra xem SESSION_COOKIE_DOMAIN có bị cấu "
+"hình sai không: tên miền bạn đang truy cập phải là nó hoặc tên miền con của "
+"nó, nếu không trình duyệt sẽ không lưu cookie; hãy sửa hoặc xóa cấu hình này"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "chưa được cấu hình"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Vui lòng đảm bảo cookie đã được bật trong trình duyệt, xóa cookie của trang "
+"web và thử lại"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "Or"

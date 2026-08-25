@@ -6207,6 +6207,31 @@ msgstr "당신이 관리자라면, 설정 항목을 업데이트하여 문제를
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "다른 통로로 로그인"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "브라우저가 CSRF 쿠키를 전송하지 않아 로그인할 수 없습니다. 관리자에게 문의하세요"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"관리자인 경우 SESSION_COOKIE_DOMAIN 설정이 잘못되었는지 확인하세요. 접속 도메인은 해당 값 또는 그 하위 도메인이어야 "
+"하며, 그렇지 않으면 브라우저가 쿠키를 저장하지 않습니다. 설정을 수정하거나 삭제하세요"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "설정되지 않음"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "브라우저에서 쿠키가 활성화되어 있는지 확인하고 사이트 쿠키를 삭제한 후 다시 시도하세요"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "기타 로그인 방법"

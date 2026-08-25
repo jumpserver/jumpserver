@@ -6084,6 +6084,31 @@ msgstr "配置文件有問題，無法登錄，請聯絡管理員或查看最新
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "如果你是管理員，可以更新配置文件解決，設置配置項"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "瀏覽器未攜帶 CSRF Cookie，無法登入。請聯絡管理員"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"如果你是管理員，請檢查 SESSION_COOKIE_DOMAIN 配置是否錯誤：訪問網域必須是它或它的子網域，否則瀏覽器不會保存 "
+"Cookie，請修正或刪除該配置"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "未配置"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "請確認瀏覽器已啟用 Cookie，並清除本站 Cookie 後重試"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "其他方式登錄"
