@@ -68,6 +68,8 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
+          provenance: false
+          sbom: false
           context: utils/ansible_executor/context
           file: utils/ansible_executor/context/Containerfile
           tags: |
