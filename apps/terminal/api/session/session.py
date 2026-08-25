@@ -171,7 +171,8 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
         )
         record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.download, detail, Session,
-            resource_display=f'{session.asset}', resource_type=_('Session replay')
+            resource=session, resource_display=f'{session.asset}',
+            resource_type=_('Session replay')
         )
         return response
 
@@ -229,7 +230,7 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
 
 class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    view_replay_cache_key = "SESSION_REPLAY_VIEW_{}"
+    view_replay_cache_key = "SESSION_REPLAY_VIEW_{}_{}"
     session = None
     rbac_perms = {
         'create': 'terminal.upload_sessionreplay',
@@ -296,16 +297,28 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
     def async_callback(self, *args, **kwargs):
         session_id = kwargs.get('pk')
+        cache_data = self.get_cache_data() or {}
+        response = cache_data.get('resp') or {}
+        response_data = response.get('data') or {}
+        if (
+                cache_data.get('status') != 'ok'
+                or not 200 <= response.get('status', 0) < 300
+        ):
+            return
+        if not response_data.get('type'):
+            return
+
         session = get_object_or_404(Session, id=session_id)
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('View'), str(session)
         )
-        key = self.view_replay_cache_key.format(session_id)
+        key = self.view_replay_cache_key.format(self.request.user.id, session_id)
         if cache.get(key):
             return
         record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.view, detail, Session,
-            resource_display=f'{session.asset}', resource_type=_('Session replay')
+            resource=session, resource_display=f'{session.asset}',
+            resource_type=_('Session replay')
         )
         cache.set(key, 1, 10)
 

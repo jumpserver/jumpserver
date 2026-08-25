@@ -8,11 +8,15 @@ from django.db import models
 from django.db.models import F, Value, CharField
 from django.db.models.functions import Concat
 from django.utils import translation
+from django.utils.translation import gettext_noop
+
+from rest_framework.exceptions import ValidationError
+from rest_framework.fields import DateTimeField
 
 from common.db.fields import RelatedManager
-from common.utils import validate_ip, get_ip_city, get_logger
+from common.utils import validate_ip, get_ip_city, get_logger, i18n_fmt
 from common.utils.timezone import as_current_tz
-from .const import DEFAULT_CITY, ActivityChoices as LogChoice
+from .const import ActionChoices, DEFAULT_CITY, ActivityChoices as LogChoice
 from .handler import create_or_update_operate_log
 from .models import ActivityLog
 
@@ -143,6 +147,89 @@ def construct_userlogin_usernames(user_queryset):
     ).values_list("usernames_combined_field", flat=True)
     usernames = list(chain(usernames_original, usernames_combined))
     return usernames
+
+
+def _format_view_log_datetime(value):
+    if not value:
+        return None
+    try:
+        value = DateTimeField().to_internal_value(value)
+    except (TypeError, ValueError, ValidationError):
+        return None
+    return as_current_tz(value).strftime('%Y-%m-%d %H:%M')
+
+
+def _build_view_log_resource_display(resource_type, query_params, count):
+    date_from = _format_view_log_datetime(query_params.get('date_from'))
+    date_to = _format_view_log_datetime(query_params.get('date_to'))
+    count_label = gettext_noop('Resource count')
+
+    if date_from and date_to:
+        return i18n_fmt(
+            '%s: %s ~ %s, %s: %s', resource_type, date_from, date_to,
+            count_label, count
+        )
+    if date_from:
+        return i18n_fmt(
+            '%s: %s: %s, %s: %s', resource_type,
+            gettext_noop('Date from'), date_from, count_label, count
+        )
+    if date_to:
+        return i18n_fmt(
+            '%s: %s: %s, %s: %s', resource_type,
+            gettext_noop('Date to'), date_to, count_label, count
+        )
+    return i18n_fmt(
+        '%s: %s, %s: %s', resource_type, gettext_noop('All'),
+        count_label, count
+    )
+
+
+def record_view_log(
+        request, response, model, resource=None, resource_display=None,
+        resource_type=None, exclude_params=()
+):
+    if request.method != 'GET':
+        return
+    if not 200 <= response.status_code < 300:
+        return
+    if request.query_params.get('format') in ('csv', 'xlsx'):
+        return
+
+    data = getattr(response, 'data', None)
+    if isinstance(data, dict) and 'results' in data:
+        data = data['results']
+    elif isinstance(data, dict):
+        data = [data]
+    if not isinstance(data, (list, tuple)) or not data:
+        return
+
+    ignore_params = {
+        'format', 'order', 'export_mode', 'refresh', '_', *exclude_params
+    }
+    params = {}
+    for key, values in request.query_params.lists():
+        if key in ignore_params:
+            continue
+        values = list(filter(None, values))
+        if not values:
+            continue
+        value = values[0] if len(values) == 1 else values
+        params[key] = {'value': value}
+    params['Resource count'] = {'value': len(data)}
+
+    with translation.override('en'):
+        resource_type = resource_type or getattr(
+            model._meta, 'verbose_name_raw', model._meta.verbose_name
+        )
+        if resource_display is None and resource is None:
+            resource_display = _build_view_log_resource_display(
+                resource_type, request.query_params, len(data)
+            )
+        create_or_update_operate_log(
+            ActionChoices.view, resource_type, resource=resource,
+            resource_display=resource_display, force=True, after=params
+        )
 
 
 def record_operate_log_and_activity_log(ids, action, detail, model, **kwargs):

@@ -8,6 +8,7 @@ from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
 from acls.models import CommandFilterACL, CommandGroup
+from audits.utils import record_view_log
 from common.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from orgs.utils import current_org
@@ -140,22 +141,27 @@ class CommandViewSet(JMSBulkModelViewSet):
 
         if session_id and not command_storage_id:
             # 会话里的命令列表肯定会提供 session_id，这里防止 merge 的时候取全量的数据
-            return self.merge_all_storage_list(request, *args, **kwargs)
-        queryset = self.get_queryset()
-        queryset = self.filter_queryset(queryset)
+            response = self.merge_all_storage_list(request, *args, **kwargs)
+        else:
+            queryset = self.get_queryset()
+            queryset = self.filter_queryset(queryset)
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            page = self.load_remote_addr(page)
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                page = self.load_remote_addr(page)
+                serializer = self.get_serializer(page, many=True)
+                response = self.get_paginated_response(serializer.data)
+            else:
+                # 适配像 ES 这种没有指定分页只返回少量数据的情况
+                queryset = queryset[:]
+                queryset = self.load_remote_addr(queryset)
+                serializer = self.get_serializer(queryset, many=True)
+                response = Response(serializer.data)
 
-        # 适配像 ES 这种没有指定分页只返回少量数据的情况
-        queryset = queryset[:]
-
-        queryset = self.load_remote_addr(queryset)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        record_view_log(
+            request, response, self.model, exclude_params=('input',)
+        )
+        return response
 
     def load_remote_addr(self, queryset):
         commands = list(queryset)

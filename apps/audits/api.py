@@ -59,7 +59,10 @@ from .serializers import (
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
     ServiceAccessLogSerializer, OperateLogFullSerializer
 )
-from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
+from .utils import (
+    construct_userlogin_usernames, record_operate_log_and_activity_log,
+    record_view_log,
+)
 
 logger = get_logger(__name__)
 
@@ -207,6 +210,18 @@ class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
         queryset = super().get_queryset()
         queryset = queryset.model.filter_queryset_by_org(queryset)
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        record_view_log(request, response, self.model)
+        return response
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        response = Response(serializer.data)
+        record_view_log(request, response, self.model, resource=instance)
+        return response
 
 
 class MyLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
