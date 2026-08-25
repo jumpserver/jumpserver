@@ -4,9 +4,76 @@ import os
 import subprocess
 import tempfile
 
+from django.utils.translation import gettext_lazy as _
+
 from common.utils import get_logger
+from settings.const import TEMP_NAS_MOUNT_PATH
 
 logger = get_logger(__file__)
+
+
+def _build_mount_command(config):
+    """Build the mount command for a NAS configuration."""
+    mount_path = config.get('nas_mount_path', '')
+    host = config.get('nas_host', '')
+    share_name = config.get('nas_share_name', '')
+    nas_type = config.get('nas_type', 'nfs')
+    nas_port = config.get('nas_port', 0) or 0
+
+    if nas_type == 'cifs':
+        source = f'//{host}/{share_name}'
+        password = (config.get('nas_password') or '').replace(',', '\\,')
+        username = config.get('nas_username') or ''
+        options = [f'username={username}', f'password={password}', 'soft']
+        if nas_port:
+            options.append(f'port={nas_port}')
+        cmd = ['mount', '-t', 'cifs', '-o', ','.join(options), source, mount_path]
+    else:
+        source = f'{host}:{share_name}'
+        options = ['soft', 'timeo=600', 'retrans=2']
+        if nas_port:
+            options.append(f'port={nas_port}')
+        cmd = ['mount', '-t', 'nfs', '-o', ','.join(options), source, mount_path]
+    return source, cmd
+
+
+def test_nas_connection(config):
+    """Mount a submitted configuration temporarily and verify it is writable."""
+    host = config.get('nas_host', '')
+    share_name = config.get('nas_share_name', '')
+    if not host or not share_name:
+        return False, _('NAS host and share name are required')
+    if config.get('nas_type') == 'cifs' and not config.get('nas_username'):
+        return False, _('NAS username is required for CIFS')
+
+    test_path = None
+    try:
+        os.makedirs(TEMP_NAS_MOUNT_PATH, exist_ok=True)
+        test_path = tempfile.mkdtemp(prefix='jumpserver_nas_test_', dir=TEMP_NAS_MOUNT_PATH)
+        test_config = dict(config, nas_mount_path=test_path)
+        source, cmd = _build_mount_command(test_config)
+        logger.info('Testing NAS mount: %s -> %s (type=%s)', source, test_path, test_config.get('nas_type'))
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        if result.returncode != 0:
+            logger.error('NAS test mount failed: %s', result.stderr.strip())
+            return False, _('NAS mount failed')
+        if not _probe_nas_writable(test_path):
+            return False, _('NAS mounted but the path is not writable')
+        return True, None
+    except subprocess.TimeoutExpired:
+        return False, _('NAS mount timed out')
+    except FileNotFoundError:
+        return False, _('mount command not found, is this Linux?')
+    except OSError as e:
+        logger.error('NAS connection test failed: %s', e)
+        return False, _('NAS connection failed')
+    finally:
+        if test_path:
+            _unmount(test_path)
+            try:
+                os.rmdir(test_path)
+            except OSError as e:
+                logger.warning('Failed to remove NAS test mount path %s: %s', test_path, e)
 
 
 def is_nas_mounted(mount_path):
@@ -79,34 +146,7 @@ def ensure_nas_mounted(config, force=False):
             logger.error('Failed to create mount path %s: %s', mount_path, e)
             return False
 
-    # Build mount command
-    nas_port = config.get('nas_port', 0) or 0
-    if nas_type == 'cifs':
-        source = f'//{host}/{share_name}'
-        password = config.get('nas_password', '') or ''
-        password = password.replace(',', '\\,')
-        username = config.get('nas_username', '') or ''
-        options = [
-            f'username={username}',
-            f'password={password}',
-            'soft',
-        ]
-        if nas_port:
-            options.append(f'port={nas_port}')
-        cmd = ['mount', '-t', 'cifs', '-o', ','.join(options), source, mount_path]
-    else:
-        source = f'{host}:{share_name}'
-        # NFS "soft" mount: return an I/O error after timeo*retrans instead of
-        # blocking forever on an unreachable server. timeo=600 = 10s per retry,
-        # retrans=2 responses, so the whole op fails in ~a few tens of seconds.
-        options = [
-            'soft',
-            'timeo=600',
-            'retrans=2',
-        ]
-        if nas_port:
-            options.append(f'port={nas_port}')
-        cmd = ['mount', '-t', 'nfs', '-o', ','.join(options), source, mount_path]
+    source, cmd = _build_mount_command(config)
 
     logger.info('Mounting NAS: %s -> %s (type=%s)', source, mount_path, nas_type)
 

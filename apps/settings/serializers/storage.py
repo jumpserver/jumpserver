@@ -84,34 +84,40 @@ class StorageSettingSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        method = attrs.get('STORAGE_RECLAMATION_METHOD')
+        method = attrs.get('STORAGE_RECLAMATION_METHOD', getattr(
+            settings, 'STORAGE_RECLAMATION_METHOD', 'delete_day'
+        ))
         if method in ('archive_day', 'archive_month'):
             nas_enabled = attrs.get('NAS_ENABLED', getattr(settings, 'NAS_ENABLED', False))
             if not nas_enabled:
                 raise serializers.ValidationError(
                     _('Archive reclamation requires NAS storage to be enabled')
                 )
+
+        nas_fields = {
+            'NAS_ENABLED', 'NAS_TYPE', 'NAS_HOST', 'NAS_PORT',
+            'NAS_SHARE_NAME', 'NAS_USERNAME', 'NAS_PASSWORD',
+        }
+        config = self._get_nas_config(attrs)
+        if config['nas_enabled'] and nas_fields.intersection(attrs):
+            from settings.tools.nas_mount import test_nas_connection
+            ok, message = test_nas_connection(config)
+            if not ok:
+                raise serializers.ValidationError(message)
         return attrs
 
-    def _get_nas_config(self):
-        """Get NAS config from validated data, fall back to settings."""
-        validated_data = getattr(self, 'validated_data', {})
+    def _get_nas_config(self, data=None):
+        """Get NAS config from submitted data, falling back to current settings."""
+        data = data if data is not None else getattr(self, 'validated_data', {})
         return {
-            'nas_enabled': validated_data.get('NAS_ENABLED',
-                                              getattr(settings, 'NAS_ENABLED', False)),
-            'nas_type': validated_data.get('NAS_TYPE',
-                                           getattr(settings, 'NAS_TYPE', 'nfs')),
-            'nas_host': validated_data.get('NAS_HOST',
-                                           getattr(settings, 'NAS_HOST', '')),
-            'nas_port': validated_data.get('NAS_PORT',
-                                           getattr(settings, 'NAS_PORT', 0)),
-            'nas_share_name': validated_data.get('NAS_SHARE_NAME',
-                                                 getattr(settings, 'NAS_SHARE_NAME', '')),
+            'nas_enabled': data.get('NAS_ENABLED', getattr(settings, 'NAS_ENABLED', False)),
+            'nas_type': data.get('NAS_TYPE', getattr(settings, 'NAS_TYPE', 'nfs')),
+            'nas_host': data.get('NAS_HOST', getattr(settings, 'NAS_HOST', '')),
+            'nas_port': data.get('NAS_PORT', getattr(settings, 'NAS_PORT', 0)),
+            'nas_share_name': data.get('NAS_SHARE_NAME', getattr(settings, 'NAS_SHARE_NAME', '')),
             'nas_mount_path': NAS_MOUNT_PATH,
-            'nas_username': validated_data.get('NAS_USERNAME',
-                                               getattr(settings, 'NAS_USERNAME', '')),
-            'nas_password': validated_data.get('NAS_PASSWORD',
-                                               getattr(settings, 'NAS_PASSWORD', '')),
+            'nas_username': data.get('NAS_USERNAME', getattr(settings, 'NAS_USERNAME', '')),
+            'nas_password': data.get('NAS_PASSWORD', getattr(settings, 'NAS_PASSWORD', '')),
         }
 
     def post_save(self):

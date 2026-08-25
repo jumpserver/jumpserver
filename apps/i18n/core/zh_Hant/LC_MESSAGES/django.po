@@ -7283,9 +7283,33 @@ msgstr "NAS 伺服器位址未配置"
 msgid "NAS mount path is not configured"
 msgstr "NAS 掛載路徑未配置"
 
-#: settings/api/nas.py:53
+#: settings/tools/nas_mount.py:47
 msgid "NAS username is required for CIFS"
 msgstr "CIFS 類型需要填寫 NAS 使用者名稱"
+
+#: settings/tools/nas_mount.py:45
+msgid "NAS host and share name are required"
+msgstr "需要填寫 NAS 伺服器位址和共享名稱"
+
+#: settings/tools/nas_mount.py:59
+msgid "NAS mount failed"
+msgstr "NAS 掛載失敗"
+
+#: settings/tools/nas_mount.py:61
+msgid "NAS mounted but the path is not writable"
+msgstr "NAS 已掛載，但路徑不可寫"
+
+#: settings/tools/nas_mount.py:64
+msgid "NAS mount timed out"
+msgstr "NAS 掛載逾時"
+
+#: settings/tools/nas_mount.py:69
+msgid "NAS connection failed"
+msgstr "NAS 連接失敗"
+
+#: settings/tools/nas_mount.py:66
+msgid "mount command not found, is this Linux?"
+msgstr "找不到 mount 命令，請確認是否執行於 Linux 系統"
 
 #: settings/api/nas.py:60
 #, python-brace-format

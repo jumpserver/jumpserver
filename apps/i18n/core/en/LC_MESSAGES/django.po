@@ -7225,8 +7225,32 @@ msgstr ""
 msgid "NAS host is not configured"
 msgstr ""
 
-#: settings/api/nas.py:53
+#: settings/tools/nas_mount.py:47
 msgid "NAS username is required for CIFS"
+msgstr ""
+
+#: settings/tools/nas_mount.py:45
+msgid "NAS host and share name are required"
+msgstr ""
+
+#: settings/tools/nas_mount.py:59
+msgid "NAS mount failed"
+msgstr ""
+
+#: settings/tools/nas_mount.py:61
+msgid "NAS mounted but the path is not writable"
+msgstr ""
+
+#: settings/tools/nas_mount.py:64
+msgid "NAS mount timed out"
+msgstr ""
+
+#: settings/tools/nas_mount.py:69
+msgid "NAS connection failed"
+msgstr ""
+
+#: settings/tools/nas_mount.py:66
+msgid "mount command not found, is this Linux?"
 msgstr ""
 
 #: settings/api/nas.py:60
