@@ -7270,14 +7270,6 @@ msgstr "SYSLOG 服务异常，请检查配置"
 msgid "NAS connection test successful, mount path is accessible"
 msgstr "NAS 连接测试成功，挂载路径可访问"
 
-#: settings/api/nas.py:34
-msgid "NAS storage is not enabled"
-msgstr "NAS 存储未启用"
-
-#: settings/api/nas.py:40
-msgid "NAS host is not configured"
-msgstr "NAS 服务器地址未配置"
-
 #: settings/tools/nas_mount.py:47
 msgid "NAS username is required for CIFS"
 msgstr "CIFS 类型需要填写 NAS 用户名"
@@ -7305,42 +7297,6 @@ msgstr "NAS 连接失败，请检查 NAS 配置"
 #: settings/tools/nas_mount.py:66
 msgid "mount command not found, is this Linux?"
 msgstr "未找到 mount 命令，请确认是否运行在 Linux 系统中"
-
-#: settings/api/nas.py:60
-#, python-brace-format
-msgid "NAS mount path does not exist: {}"
-msgstr "NAS 挂载路径不存在：{}"
-
-#: settings/api/nas.py:78
-#, python-brace-format
-msgid "NAS mount path is not writable: {}"
-msgstr "NAS 挂载路径不可写：{}"
-
-#: settings/api/nas.py:83
-#, python-brace-format
-msgid "NAS mount path I/O error: {}"
-msgstr "NAS 挂载路径 I/O 错误：{}"
-
-#: settings/api/nas.py:65
-#, python-brace-format
-msgid "NAS mount path is not mounted: {}"
-msgstr "NAS 挂载路径未挂载: {}"
-
-#: settings/api/nas.py:100
-msgid "At least one of start date and end date is required"
-msgstr "开始日期和结束日期至少选择一个"
-
-#: settings/api/nas.py:132
-msgid "Invalid start date format, please use YYYY-MM-DD"
-msgstr "开始日期格式无效，请使用 YYYY-MM-DD"
-
-#: settings/api/nas.py:137
-msgid "Invalid end date format, please use YYYY-MM-DD"
-msgstr "结束日期格式无效，请使用 YYYY-MM-DD"
-
-#: settings/api/nas.py:142
-msgid "Start date cannot be later than end date"
-msgstr "开始日期不能晚于结束日期"
 
 #: settings/serializers/storage.py:14
 msgid "File max store"

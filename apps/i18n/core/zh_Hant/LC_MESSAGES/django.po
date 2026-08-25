@@ -7271,18 +7271,6 @@ msgstr "SYSLOG 服務異常，請檢查配置"
 msgid "NAS connection test successful, mount path is accessible"
 msgstr "NAS 連接測試成功，掛載路徑可訪問"
 
-#: settings/api/nas.py:34
-msgid "NAS storage is not enabled"
-msgstr "NAS 存儲未啟用"
-
-#: settings/api/nas.py:40
-msgid "NAS host is not configured"
-msgstr "NAS 伺服器位址未配置"
-
-#: settings/api/nas.py:46
-msgid "NAS mount path is not configured"
-msgstr "NAS 掛載路徑未配置"
-
 #: settings/tools/nas_mount.py:47
 msgid "NAS username is required for CIFS"
 msgstr "CIFS 類型需要填寫 NAS 使用者名稱"
@@ -7310,34 +7298,6 @@ msgstr "NAS 連接失敗，請檢查 NAS 設定"
 #: settings/tools/nas_mount.py:66
 msgid "mount command not found, is this Linux?"
 msgstr "找不到 mount 命令，請確認是否執行於 Linux 系統"
-
-#: settings/api/nas.py:60
-#, python-brace-format
-msgid "NAS mount path does not exist: {}"
-msgstr "NAS 掛載路徑不存在：{}"
-
-#: settings/api/nas.py:78
-#, python-brace-format
-msgid "NAS mount path is not writable: {}"
-msgstr "NAS 掛載路徑不可寫：{}"
-
-#: settings/api/nas.py:83
-#, python-brace-format
-msgid "NAS mount path I/O error: {}"
-msgstr "NAS 掛載路徑 I/O 錯誤：{}"
-
-#: settings/api/nas.py:65
-#, python-brace-format
-msgid "NAS mount path is not mounted: {}"
-msgstr "NAS 掛載路徑未掛載: {}"
-
-#: settings/api/nas.py:100
-msgid "Date is required, format: YYYY-MM-DD"
-msgstr "日期必填，格式: YYYY-MM-DD"
-
-#: settings/api/nas.py:128
-msgid "Invalid date format, please use YYYY-MM-DD"
-msgstr "日期格式無效，請使用 YYYY-MM-DD"
 
 #: settings/serializers/storage.py:14
 msgid "File max store"
@@ -7390,14 +7350,6 @@ msgstr "NAS 共用名稱"
 #: settings/serializers/storage.py:38
 msgid "NAS storage path"
 msgstr "NAS 存儲路徑"
-
-#: settings/serializers/storage.py:42
-msgid "NAS mount path"
-msgstr "NAS 掛載路徑"
-
-#: settings/serializers/storage.py:43
-msgid "Local mount path for NAS storage"
-msgstr "NAS 存儲的本地掛載路徑"
 
 #: settings/serializers/storage.py:47
 msgid "NAS username"

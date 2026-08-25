@@ -7217,14 +7217,6 @@ msgstr "SYSLOG service exception, please check the configuration"
 msgid "NAS connection test successful, mount path is accessible"
 msgstr ""
 
-#: settings/api/nas.py:34
-msgid "NAS storage is not enabled"
-msgstr ""
-
-#: settings/api/nas.py:40
-msgid "NAS host is not configured"
-msgstr ""
-
 #: settings/tools/nas_mount.py:47
 msgid "NAS username is required for CIFS"
 msgstr ""
@@ -7252,42 +7244,6 @@ msgstr ""
 #: settings/tools/nas_mount.py:66
 msgid "mount command not found, is this Linux?"
 msgstr ""
-
-#: settings/api/nas.py:60
-#, python-brace-format
-msgid "NAS mount path does not exist: {}"
-msgstr ""
-
-#: settings/api/nas.py:78
-#, python-brace-format
-msgid "NAS mount path is not writable: {}"
-msgstr ""
-
-#: settings/api/nas.py:83
-#, python-brace-format
-msgid "NAS mount path I/O error: {}"
-msgstr ""
-
-#: settings/api/nas.py:65
-#, python-brace-format
-msgid "NAS mount path is not mounted: {}"
-msgstr "NAS mount path is not mounted: {}"
-
-#: settings/api/nas.py:100
-msgid "At least one of start date and end date is required"
-msgstr "At least one of start date and end date is required"
-
-#: settings/api/nas.py:132
-msgid "Invalid start date format, please use YYYY-MM-DD"
-msgstr "Invalid start date format, please use YYYY-MM-DD"
-
-#: settings/api/nas.py:137
-msgid "Invalid end date format, please use YYYY-MM-DD"
-msgstr "Invalid end date format, please use YYYY-MM-DD"
-
-#: settings/api/nas.py:142
-msgid "Start date cannot be later than end date"
-msgstr "Start date cannot be later than end date"
 
 #: settings/serializers/storage.py:14
 msgid "File max store"
