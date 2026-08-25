@@ -11,6 +11,8 @@ from .speech import OpenAICompatibleSpeechToTextProvider, SpeechToTextConfigurat
 def get_provider():
     if not settings.CHAT_AI_ENABLED:
         raise ProviderConfigurationError('Chat AI is disabled.')
+    if getattr(settings, 'CHAT_AI_METHOD', 'api') != 'api':
+        raise ProviderConfigurationError('Built-in Chat AI is disabled in iframe mode.')
     if getattr(settings, 'CHAT_AI_PROVIDER', 'openai_compatible') == 'fake':
         return FakeProvider(model='fake')
     config = get_chat_ai_config()
@@ -27,7 +29,11 @@ def get_provider():
 
 
 def get_transcription_provider():
-    if not settings.CHAT_AI_ENABLED or not getattr(settings, 'CHAT_AI_STT_ENABLED', True):
+    if (
+        not settings.CHAT_AI_ENABLED
+        or getattr(settings, 'CHAT_AI_METHOD', 'api') != 'api'
+        or not getattr(settings, 'CHAT_AI_STT_ENABLED', True)
+    ):
         raise SpeechToTextConfigurationError('Speech-to-text is disabled.')
     configured_base_url = getattr(settings, 'CHAT_AI_STT_BASE_URL', '') or ''
     configured_api_key = getattr(settings, 'CHAT_AI_STT_API_KEY', '') or ''

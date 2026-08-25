@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.validators import URLValidator
 from django.utils import timezone
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
@@ -149,6 +150,15 @@ class ChatAISettingSerializer(serializers.Serializer):
 
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Chat AI')
+    )
+    CHAT_AI_METHOD = serializers.ChoiceField(
+        choices=(('api', _('Built-in API')), ('iframe', _('iframe embed'))),
+        default='api', required=False, label=_('Method'),
+    )
+    CHAT_AI_EMBED_URL = serializers.URLField(
+        allow_blank=True, required=False, label=_('iframe URL'),
+        help_text=_('The page URL loaded in the isolated AI assistant iframe.'),
+        validators=[URLValidator(schemes=('http', 'https'))],
     )
     CHAT_AI_BASE_URL = serializers.CharField(
         allow_blank=True, required=False, label=_('Base URL'),
