@@ -35,12 +35,8 @@ class SettingSubPub(LazyRedisPubSub):
     channel = 'settings'
 
 
-class SyslogConfigSubPub(LazyRedisPubSub):
-    channel = 'syslog-config'
-
-
 setting_pub_sub = SettingSubPub()
-syslog_config_pub_sub = SyslogConfigSubPub()
+SETTING_UPDATED = 'SETTING_UPDATED'
 SYSLOG_CONFIG_UPDATED = 'SYSLOG_CONFIG_UPDATED'
 
 
@@ -54,7 +50,10 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if instance.name in SYSLOG_SETTING_NAMES:
         publish_syslog_config_changed()
         return
-    setting_pub_sub.publish(instance.name)
+    setting_pub_sub.publish({
+        'event': SETTING_UPDATED,
+        'name': instance.name,
+    })
     if instance.is_name('PERM_SINGLE_ASSET_TO_UNGROUP_NODE'):
         """ 过期所有用户授权树 """
         logger.debug('Expire all user perm tree')
@@ -92,21 +91,25 @@ def auto_generate_terminal_host_key(sender, **kwargs):
 
 @receiver(django_ready)
 def subscribe_settings_change(sender, **kwargs):
-    logger.debug("Start subscribe setting change")
+    logger.debug('Start subscribe setting change')
 
-    setting_pub_sub.subscribe(lambda name: Setting.refresh_item(name))
-    syslog_config_pub_sub.subscribe(refresh_syslog_config)
+    setting_pub_sub.subscribe(refresh_settings)
 
 
 def publish_syslog_config_changed():
-    syslog_config_pub_sub.publish(SYSLOG_CONFIG_UPDATED)
+    values = Setting.refresh_syslog_settings()
+    event = {'event': SYSLOG_CONFIG_UPDATED, 'values': values}
+    refresh_settings(event)
+    setting_pub_sub.publish(event)
 
 
-def refresh_syslog_config(event):
-    if event != SYSLOG_CONFIG_UPDATED:
-        return
-    Setting.refresh_syslog_settings()
-    setting_changed.send(sender=Setting, name='SYSLOG_CONFIG')
+def refresh_settings(event):
+    event_name = event['event']
+    if event_name == SETTING_UPDATED:
+        Setting.refresh_item(event['name'])
+    elif event_name == SYSLOG_CONFIG_UPDATED:
+        Setting.refresh_syslog_settings(event['values'])
+        setting_changed.send(sender=Setting, name='SYSLOG_CONFIG')
 
 
 def update_site_url():

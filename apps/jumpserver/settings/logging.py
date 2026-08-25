@@ -222,6 +222,8 @@ class LazySyslogHandler(logging.Handler):
                 self._next_warning_at = 0
                 return True
             except Exception as e:
+                if self._config.socktype == socket.SOCK_STREAM:
+                    return self._retry_tcp_delivery(record, e)
                 self._mark_delegate_failed(e)
                 return False
 
@@ -244,6 +246,25 @@ class LazySyslogHandler(logging.Handler):
 
     def _create_delegate(self):
         return create_syslog_handler(self._config, self.formatter, self.level)
+
+    def _retry_tcp_delivery(self, record, error):
+        """Reconnect once because TCP peers may close an idle connection."""
+        self._close_delegate()
+        try:
+            self._delegate = self._create_delegate()
+            self._delegate.emit(record)
+            self._next_warning_at = 0
+            logger.info(
+                'Syslog TCP delivery recovered: pid=%s host=%s port=%s',
+                os.getpid(), self._config.host, self._config.port,
+            )
+            return True
+        except Exception as retry_error:
+            logger.debug(
+                'Syslog TCP retry failed after delivery error: %s', error,
+            )
+            self._mark_delegate_failed(retry_error)
+            return False
 
     def _reset_after_fork(self):
         pid = os.getpid()
@@ -285,7 +306,7 @@ class RetriableSysLogHandler(SysLogHandler):
     """Let the lazy proxy handle delivery errors from SysLogHandler."""
 
     def handleError(self, record):
-        raise RuntimeError('Failed to emit syslog record')
+        raise
 
 
 def create_syslog_handler(config, formatter=None, level=logging.INFO):
@@ -311,18 +332,18 @@ def initialize_syslog_handler():
     """Install the lazy proxy after database-backed settings are loaded."""
     config = SyslogConfig.from_settings()
     for logger_name in SYSLOG_LOGGER_NAMES:
-        logger = logging.getLogger(logger_name)
-        handler = _get_lazy_syslog_handler(logger)
+        syslog_logger = logging.getLogger(logger_name)
+        handler = _get_lazy_syslog_handler(syslog_logger)
         if handler is not None:
             handler.update_config(config)
             continue
 
-        for old_handler in list(logger.handlers):
+        for old_handler in list(syslog_logger.handlers):
             if isinstance(old_handler, (SysLogHandler, logging.NullHandler)):
-                logger.removeHandler(old_handler)
+                syslog_logger.removeHandler(old_handler)
                 old_handler.close()
 
-        logger.addHandler(LazySyslogHandler(config))
+        syslog_logger.addHandler(LazySyslogHandler(config))
 
 
 def reconfigure_syslog_handler():

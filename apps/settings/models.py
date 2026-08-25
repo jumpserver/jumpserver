@@ -97,15 +97,26 @@ class Setting(models.Model):
         setting_changed.send(sender=cls, name=name, item=item)
 
     @classmethod
-    def refresh_syslog_settings(cls):
-        """Refresh syslog fields as one snapshot after a configuration commit."""
+    def get_syslog_settings(cls):
+        """Return the persisted syslog settings as one configuration snapshot."""
         settings_by_name = {
             item.name: item for item in cls.objects.filter(name__in=SYSLOG_SETTING_NAMES)
         }
+        return {
+            name: settings_by_name[name].cleaned_value
+            for name in SYSLOG_SETTING_NAMES
+            if name in settings_by_name
+        }
+
+    @classmethod
+    def refresh_syslog_settings(cls, values=None):
+        """Refresh syslog fields as one snapshot after a configuration commit."""
+        if values is None:
+            values = cls.get_syslog_settings()
         for name in SYSLOG_SETTING_NAMES:
-            item = settings_by_name.get(name)
-            if item:
-                setattr(settings, name, item.cleaned_value)
+            if name in values:
+                setattr(settings, name, values[name])
+        return values
 
     def refresh_setting(self):
         setattr(settings, self.name, self.cleaned_value)
