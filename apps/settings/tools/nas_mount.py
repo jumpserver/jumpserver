@@ -56,17 +56,17 @@ def test_nas_connection(config):
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode != 0:
             logger.error('NAS test mount failed: %s', result.stderr.strip())
-            return False, _('NAS mount failed')
+            return False, _('NAS mount failed, please check the NAS configuration')
         if not _probe_nas_writable(test_path):
             return False, _('NAS mounted but the path is not writable')
         return True, None
     except subprocess.TimeoutExpired:
-        return False, _('NAS mount timed out')
+        return False, _('NAS mount timed out, please check the NAS configuration')
     except FileNotFoundError:
         return False, _('mount command not found, is this Linux?')
     except OSError as e:
         logger.error('NAS connection test failed: %s', e)
-        return False, _('NAS connection failed')
+        return False, _('NAS connection failed, please check the NAS configuration')
     finally:
         if test_path:
             _unmount(test_path)

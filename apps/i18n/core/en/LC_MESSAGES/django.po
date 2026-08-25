@@ -7234,7 +7234,7 @@ msgid "NAS host and share name are required"
 msgstr ""
 
 #: settings/tools/nas_mount.py:59
-msgid "NAS mount failed"
+msgid "NAS mount failed, please check the NAS configuration"
 msgstr ""
 
 #: settings/tools/nas_mount.py:61
@@ -7242,11 +7242,11 @@ msgid "NAS mounted but the path is not writable"
 msgstr ""
 
 #: settings/tools/nas_mount.py:64
-msgid "NAS mount timed out"
+msgid "NAS mount timed out, please check the NAS configuration"
 msgstr ""
 
 #: settings/tools/nas_mount.py:69
-msgid "NAS connection failed"
+msgid "NAS connection failed, please check the NAS configuration"
 msgstr ""
 
 #: settings/tools/nas_mount.py:66

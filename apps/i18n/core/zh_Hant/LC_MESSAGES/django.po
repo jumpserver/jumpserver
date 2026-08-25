@@ -7292,20 +7292,20 @@ msgid "NAS host and share name are required"
 msgstr "需要填寫 NAS 伺服器位址和共享名稱"
 
 #: settings/tools/nas_mount.py:59
-msgid "NAS mount failed"
-msgstr "NAS 掛載失敗"
+msgid "NAS mount failed, please check the NAS configuration"
+msgstr "NAS 掛載失敗，請檢查 NAS 設定"
 
 #: settings/tools/nas_mount.py:61
 msgid "NAS mounted but the path is not writable"
 msgstr "NAS 已掛載，但路徑不可寫"
 
 #: settings/tools/nas_mount.py:64
-msgid "NAS mount timed out"
-msgstr "NAS 掛載逾時"
+msgid "NAS mount timed out, please check the NAS configuration"
+msgstr "NAS 掛載逾時，請檢查 NAS 設定"
 
 #: settings/tools/nas_mount.py:69
-msgid "NAS connection failed"
-msgstr "NAS 連接失敗"
+msgid "NAS connection failed, please check the NAS configuration"
+msgstr "NAS 連接失敗，請檢查 NAS 設定"
 
 #: settings/tools/nas_mount.py:66
 msgid "mount command not found, is this Linux?"
