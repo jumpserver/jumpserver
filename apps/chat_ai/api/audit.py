@@ -12,6 +12,7 @@ from orgs.utils import current_org
 from chat_ai.models import Conversation, Message
 from chat_ai.permissions import ChatAIServicePermission
 
+from .filters import ConversationAuditFilterSet
 from .serializers import (
     ConversationAuditDetailSerializer, ConversationAuditListSerializer,
 )
@@ -24,7 +25,8 @@ class ConversationAuditViewSet(
 ):
     permission_classes = (ChatAIServicePermission, OnlySuperUser)
     http_method_names = ('get', 'head', 'options')
-    search_fields = ('title', 'user__name', 'user__username')
+    filterset_class = ConversationAuditFilterSet
+    search_fields = ('title', 'user__username')
     ordering_fields = (
         'date_created', 'date_updated', 'title', 'message_count',
         'question_count', 'last_question_at',
@@ -36,13 +38,9 @@ class ConversationAuditViewSet(
             return ConversationAuditDetailSerializer
         return ConversationAuditListSerializer
 
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return Conversation.objects.none()
-
-        queryset = Conversation.objects.filter(
-            org_id=str(current_org.id),
-        ).select_related('user').annotate(
+    @staticmethod
+    def annotate_statistics(queryset):
+        return queryset.select_related('user').annotate(
             message_count=Count('messages'),
             question_count=Count(
                 'messages',
@@ -53,6 +51,15 @@ class ConversationAuditViewSet(
                 filter=Q(messages__role=Message.Role.USER),
             ),
         )
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Conversation.objects.none()
+
+        queryset = Conversation.objects.filter(
+            org_id=str(current_org.id),
+        )
+        queryset = self.annotate_statistics(queryset)
         if self.action == 'retrieve':
             audit_messages = Message.objects.filter(
                 role__in=(Message.Role.USER, Message.Role.ASSISTANT),
@@ -61,6 +68,10 @@ class ConversationAuditViewSet(
                 Prefetch('messages', queryset=audit_messages, to_attr='audit_messages')
             )
         return queryset
+
+    def setup_eager_loading(self, queryset, is_paginated=False):
+        queryset = super().setup_eager_loading(queryset, is_paginated)
+        return self.annotate_statistics(queryset)
 
     def retrieve(self, request, *args, **kwargs):
         conversation = self.get_object()
