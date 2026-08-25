@@ -453,7 +453,8 @@ def reclaim_storage_by_threshold_task():
             data_end=reclaimed_end,
             result=result,
         )
-
+    if total_errors:
+        raise Exception('Storage reclamation failed with errors')
     usage = shutil.disk_usage(base_path)
     final_pct = usage.used / usage.total * 100
     logger.info(
