@@ -5886,6 +5886,32 @@ msgstr "設定ファイルに問題があり、ログインできません。管
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "管理者の場合は、configを更新して解決することができます。"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "ブラウザが CSRF Cookie を送信していないため、ログインできません。管理者にお問い合わせください"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"管理者の場合は、SESSION_COOKIE_DOMAIN "
+"の設定に誤りがないか確認してください。アクセスに使用するドメインはその値またはそのサブドメインである必要があり、そうでない場合ブラウザは Cookie "
+"を保存しません。設定を修正するか削除してください"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "未設定"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "ブラウザで Cookie が有効になっていることを確認し、サイトの Cookie を削除してから再試行してください"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "その他のログインオプション"

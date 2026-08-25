@@ -6147,6 +6147,37 @@ msgstr ""
 "Si eres el administrador, puedes actualizar el perfil para solucionarlo, "
 "estableciendo los parámetros de configuración."
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"El navegador no envió la cookie CSRF y no se puede iniciar sesión. Por "
+"favor, contacte al administrador"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Si es administrador, compruebe si SESSION_COOKIE_DOMAIN está mal "
+"configurado: el dominio al que accede debe ser este o un subdominio suyo, de "
+"lo contrario el navegador no guardará la cookie; corrija o elimine esta "
+"configuración"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "sin configurar"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Asegúrese de que las cookies estén habilitadas en su navegador, borre las "
+"cookies del sitio e inténtelo de nuevo"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "Otras formas de iniciar sesión"

@@ -6086,6 +6086,37 @@ msgstr ""
 "Если вы администратор, вы можете обновить конфигурационный файл для решения "
 "проблемы, настроив параметры."
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"Браузер не передал CSRF cookie, вход невозможен. Пожалуйста, обратитесь к "
+"администратору"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Если вы администратор, проверьте, не настроен ли SESSION_COOKIE_DOMAIN "
+"неправильно: домен, по которому вы обращаетесь, должен совпадать с ним или "
+"быть его поддоменом, иначе браузер не сохранит cookie; исправьте или удалите "
+"эту настройку"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "не задано"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Убедитесь, что в браузере включены cookie, очистите cookie сайта и "
+"попробуйте снова"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "Другие способы входа"

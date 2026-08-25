@@ -6104,6 +6104,37 @@ msgstr ""
 "Se você é um administrador, pode resolver atualizando o arquivo de "
 "configuração, definindo itens de configuração"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"O navegador não enviou o cookie CSRF e não é possível fazer login. Entre em "
+"contato com o administrador"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Se você for administrador, verifique se SESSION_COOKIE_DOMAIN está "
+"configurado incorretamente: o domínio que você está acessando deve ser ele "
+"ou um subdomínio dele, caso contrário o navegador não salvará o cookie; "
+"corrija ou remova essa configuração"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "não configurado"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Verifique se os cookies estão habilitados no navegador, limpe os cookies do "
+"site e tente novamente"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "Login por outros métodos"
