@@ -8,7 +8,7 @@ from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
 from acls.models import CommandFilterACL, CommandGroup
-from audits.utils import record_view_log
+from audits.mixins import RecordViewLogMixin
 from common.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from orgs.utils import current_org
@@ -91,7 +91,7 @@ class CommandQueryMixin:
         return date_from_st, date_to_st
 
 
-class CommandViewSet(JMSBulkModelViewSet):
+class CommandViewSet(RecordViewLogMixin, JMSBulkModelViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
@@ -110,6 +110,11 @@ class CommandViewSet(JMSBulkModelViewSet):
     model = Command
     search_fields = ('input',)
     ordering_fields = ('timestamp', 'risk_level')
+    record_view_log_actions = ('list',)
+    record_view_log_query_params = (
+        'id', 'date_from', 'date_to', 'user', 'asset', 'asset_id', 'account',
+        'risk_level', 'session', 'session_id', 'command_storage_id',
+    )
 
     def merge_all_storage_list(self, request, *args, **kwargs):
         merged_commands = []
@@ -158,9 +163,7 @@ class CommandViewSet(JMSBulkModelViewSet):
                 serializer = self.get_serializer(queryset, many=True)
                 response = Response(serializer.data)
 
-        record_view_log(
-            request, response, self.model, exclude_params=('input',)
-        )
+        self.record_view_log(request, response)
         return response
 
     def load_remote_addr(self, queryset):

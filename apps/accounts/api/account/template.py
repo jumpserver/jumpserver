@@ -8,10 +8,10 @@ from accounts import serializers
 from accounts.exceptions import (
     VaultAccountSyncUnavailableException, VaultUnavailableException,
 )
-from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import AccountTemplate
 from accounts.tasks import template_sync_related_accounts
 from assets.const import Protocol
+from audits.mixins import RecordViewLogMixin
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.drf.filters import BaseFilterSet
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -79,7 +79,7 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
         return Response({'task': task.id}, status=status.HTTP_200_OK)
 
 
-class AccountTemplateSecretsViewSet(AccountRecordViewLogMixin, AccountTemplateViewSet):
+class AccountTemplateSecretsViewSet(RecordViewLogMixin, AccountTemplateViewSet):
     serializer_classes = {
         'default': serializers.AccountTemplateSecretSerializer,
     }

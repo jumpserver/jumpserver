@@ -10,10 +10,10 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from accounts import serializers
 from accounts.const import ChangeSecretRecordStatusChoice, Source
 from accounts.filters import AccountFilterSet, NodeFilterBackend
-from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import Account, ChangeSecretRecord, AccountTemplate
 from assets.const.gpt import create_or_update_chatx_resources
 from assets.models import Asset, Node
+from audits.mixins import RecordViewLogMixin
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.drf.filters import AttrRulesFilterBackend
@@ -215,7 +215,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         return Response(serializer.data)
 
 
-class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
+class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     """
     因为可能要导出所有账号,所以单独建立了一个 viewset
     """
@@ -324,7 +324,9 @@ class AssetAccountBulkCreateApi(CreateAPIView):
         return Response(data=out_ser.data, status=HTTP_200_OK)
 
 
-class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixin, ListAPIView):
+class AccountHistoriesSecretAPI(
+    ExtraFilterFieldsMixin, RecordViewLogMixin, ListAPIView
+):
     model = Account.history.model
     serializer_class = serializers.AccountHistorySerializer
     http_method_names = ['get', 'options']
