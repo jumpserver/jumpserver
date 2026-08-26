@@ -19,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from audits.const import ActionChoices
+from audits.mixins import RecordViewLogMixin
 from audits.utils import record_operate_log_and_activity_log
 from common.api import AsyncApiMixin, ReportExportMixin
 from common.const.http import GET, POST
@@ -91,9 +92,15 @@ class SessionFilterSet(BaseFilterSet):
             return queryset.filter(terminal__name=value)
 
 
-class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
+class SessionViewSet(RecordViewLogMixin, ReportExportMixin, OrgBulkModelViewSet):
     model = Session
     report_exporter_class = SessionReportExporter
+    record_view_log_actions = ('list', 'retrieve')
+    record_view_log_query_params = (
+        'id', 'date_from', 'date_to', 'user', 'user_id', 'asset', 'asset_id',
+        'account', 'remote_addr', 'protocol', 'is_finished', 'login_from',
+        'terminal',
+    )
     serializer_classes = {
         'default': serializers.SessionSerializer,
         'display': serializers.SessionDisplaySerializer,
