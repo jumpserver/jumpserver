@@ -43,6 +43,7 @@ urlpatterns = [
 
     path('nodes/category/tree/', api.CategoryTreeApi.as_view(), name='asset-category-tree'),
     path('nodes/children/tree/', api.NodeChildrenAsTreeApi.as_view(), name='node-children-tree'),
+    path('nodes/assets-amount/', api.NodeAssetsAmountApi.as_view(), name='node-assets-amount'),
     path('nodes/<uuid:pk>/children/', api.NodeChildrenApi.as_view(), name='node-children'),
     path('nodes/children/', api.NodeChildrenApi.as_view(), name='node-children-2'),
     path('nodes/<uuid:pk>/children/add/', api.NodeAddChildrenApi.as_view(), name='node-add-children'),

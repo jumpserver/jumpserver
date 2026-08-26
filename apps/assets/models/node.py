@@ -8,7 +8,10 @@ from collections import defaultdict
 
 from django.core.cache import cache
 from django.db import models, transaction
-from django.db.models import F, Q, Manager
+from django.db.models import (
+    Count, Exists, F, IntegerField, Manager, OuterRef, Q, Subquery, Value,
+)
+from django.db.models.functions import Coalesce, Concat
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _, gettext
 
@@ -30,7 +33,47 @@ def compute_parent_key(key):
 
 
 class NodeQuerySet(models.QuerySet):
-    pass
+    def with_has_children(self, include_assets=False):
+        children = self.model._base_manager.filter(
+            parent_key=OuterRef('key')
+        )
+        has_children = Exists(children)
+        if include_assets:
+            from .asset import Asset
+
+            direct_assets = Asset.nodes.through.objects.filter(
+                node_id=OuterRef('pk')
+            )
+            has_children |= Exists(direct_assets)
+        return self.annotate(has_children=has_children)
+
+    def with_realtime_assets_amount(self, include_descendants=True):
+        """Count distinct direct or subtree assets from current M2M relations.
+
+        The correlated subquery keeps this as one SQL query for a node list and
+        avoids relying on the materialized ``Node.assets_amount`` field.
+        """
+        from .asset import Asset
+
+        relations = Asset.nodes.through.objects.order_by()
+        if include_descendants:
+            relations = relations.filter(
+                Q(node__key=OuterRef('key')) |
+                Q(node__key__startswith=Concat(OuterRef('key'), Value(':')))
+            ).annotate(group=Value(1)).values('group')
+        else:
+            relations = relations.filter(
+                node_id=OuterRef('pk')
+            ).values('node_id')
+        relations = relations.annotate(
+            amount=Count('asset_id', distinct=True)
+        ).values('amount')
+        return self.annotate(
+            assets_amount_realtime=Coalesce(
+                Subquery(relations, output_field=IntegerField()),
+                Value(0),
+            )
+        )
 
 
 class FamilyMixin:
