@@ -47,24 +47,30 @@ class NodeQuerySet(models.QuerySet):
             has_children |= Exists(direct_assets)
         return self.annotate(has_children=has_children)
 
-    def with_realtime_assets_amount(self):
-        """Count distinct subtree assets from the current M2M relations.
+    def with_realtime_assets_amount(self, include_descendants=True):
+        """Count distinct direct or subtree assets from current M2M relations.
 
         The correlated subquery keeps this as one SQL query for a node list and
         avoids relying on the materialized ``Node.assets_amount`` field.
         """
         from .asset import Asset
 
-        descendants = Asset.nodes.through.objects.filter(
-            Q(node__key=OuterRef('key')) |
-            Q(node__key__startswith=Concat(OuterRef('key'), Value(':')))
-        ).order_by().annotate(group=Value(1)).values('group')
-        descendants = descendants.annotate(
+        relations = Asset.nodes.through.objects.order_by()
+        if include_descendants:
+            relations = relations.filter(
+                Q(node__key=OuterRef('key')) |
+                Q(node__key__startswith=Concat(OuterRef('key'), Value(':')))
+            ).annotate(group=Value(1)).values('group')
+        else:
+            relations = relations.filter(
+                node_id=OuterRef('pk')
+            ).values('node_id')
+        relations = relations.annotate(
             amount=Count('asset_id', distinct=True)
         ).values('amount')
         return self.annotate(
             assets_amount_realtime=Coalesce(
-                Subquery(descendants, output_field=IntegerField()),
+                Subquery(relations, output_field=IntegerField()),
                 Value(0),
             )
         )

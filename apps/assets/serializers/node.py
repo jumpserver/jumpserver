@@ -7,7 +7,8 @@ from ..models import Asset, Node
 
 __all__ = [
     'NodeSerializer', "NodeAddChildrenSerializer",
-    "NodeAssetsSerializer", "NodeTaskSerializer",
+    "NodeAssetsSerializer", "NodeAssetsAmountQuerySerializer",
+    "NodeTaskSerializer",
 ]
 
 
@@ -82,6 +83,24 @@ class NodeAssetsSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Node
         fields = ['assets']
+
+
+class NodeAssetsAmountQuerySerializer(serializers.Serializer):
+    node_ids = serializers.ListField(
+        child=serializers.UUIDField(),
+        allow_empty=False,
+        max_length=200,
+    )
+    include_descendants = serializers.BooleanField(
+        default=True,
+        required=False,
+    )
+
+    @staticmethod
+    def validate_node_ids(node_ids):
+        # Preserve the requested order while preventing duplicate correlated
+        # subqueries inside the same batch.
+        return list(dict.fromkeys(node_ids))
 
 
 class NodeAddChildrenSerializer(serializers.Serializer):
