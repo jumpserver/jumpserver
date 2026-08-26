@@ -5,45 +5,9 @@ from collections import defaultdict
 from django.db.models import F
 
 from common.struct import Stack
-from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none, timeit
+from common.utils import dict_get_any, is_uuid, get_object_or_none, timeit
 from common.utils.http import is_true
-from orgs.utils import ensure_in_real_or_default_org, current_org
-from ..locks import NodeTreeUpdateLock
-from ..models import Node, Asset
-
-logger = get_logger(__file__)
-
-
-@NodeTreeUpdateLock()
-@ensure_in_real_or_default_org
-def check_node_assets_amount():
-    logger.info(f'Check node assets amount {current_org}')
-    m2m_model = Asset.nodes.through
-    nodes = list(Node.objects.all().only('id', 'key', 'assets_amount'))
-    nodeid_assetid_pairs = list(m2m_model.objects.all().values_list('node_id', 'asset_id'))
-
-    nodekey_assetids_mapper = defaultdict(set)
-    nodeid_nodekey_mapper = {}
-    for node in nodes:
-        nodeid_nodekey_mapper[node.id] = node.key
-
-    for node_id, asset_id in nodeid_assetid_pairs:
-        if node_id not in nodeid_nodekey_mapper:
-            continue
-        node_key = nodeid_nodekey_mapper[node_id]
-        nodekey_assetids_mapper[node_key].add(asset_id)
-
-    util = NodeAssetsUtil(nodes, nodekey_assetids_mapper)
-    util.generate()
-
-    to_updates = []
-    for node in nodes:
-        assets_amount = util.get_assets_amount(node.key)
-        if node.assets_amount != assets_amount:
-            logger.error(f'Node[{node.key}] assets amount error {node.assets_amount} != {assets_amount}')
-            node.assets_amount = assets_amount
-            to_updates.append(node)
-    Node.objects.bulk_update(to_updates, fields=('assets_amount',))
+from ..models import Node
 
 
 def is_query_node_all_assets(request):

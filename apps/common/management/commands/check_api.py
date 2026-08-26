@@ -114,7 +114,6 @@ user_accessible_urls = known_unauth_urls + [
     "/api/v1/authentication/access-keys/",
     "/api/v1/users/profile/permissions/",
     "/api/v1/tickets/apply-login-asset-tickets/",
-    "/api/v1/resources/",
     "/api/v1/notifications/site-messages/",
     "/api/v1/notifications/site-messages/unread-total/",
     "/api/v1/assets/assets/suggestions/",

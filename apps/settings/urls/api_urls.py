@@ -23,6 +23,7 @@ urlpatterns = [
     path('vault/<str:backend>/testing/', api.VaultTestingAPI.as_view(), name='vault-testing'),
     path('ssh-ca/openbao/testing/', api.SSHCAOpenBaoTestingAPI.as_view(), name='ssh-ca-openbao-testing'),
     path('ssh-ca/openbao/public-key/', api.SSHCAOpenBaoPublicKeyAPI.as_view(), name='ssh-ca-openbao-public-key'),
+    path('chatai/models/', api.ChatAIModelsAPI.as_view(), name='chatai-models'),
     path('chatai/testing/', api.ChatAITestingAPI.as_view(), name='chatai-testing'),
     path('vault/sync/', api.VaultSyncDataAPI.as_view(), name='vault-sync'),
     path('vault/restore/', api.VaultRestoreDataAPI.as_view(), name='vault-restore'),

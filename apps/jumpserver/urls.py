@@ -31,18 +31,13 @@ resource_api = [
     path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
     path('labels/', include('labels.urls', namespace='api-label')),
     path('reports/', include('reports.urls.api_urls', namespace='api-reports')),
+    path('chat-ai/', include('chat_ai.api.urls', namespace='api-chat-ai')),
 ]
 
 api_v1 = resource_api + [
     path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
     path('search/', api.GlobalSearchView.as_view()),
 ]
-if settings.MCP_ENABLED:
-    api_v1.extend([
-        path('resources/', api.ResourceTypeListApi.as_view(), name='resource-list'),
-        path('resources/<str:resource>/', api.ResourceListApi.as_view()),
-        path('resources/<str:resource>/<str:pk>/', api.ResourceDetailApi.as_view()),
-    ])
 
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),

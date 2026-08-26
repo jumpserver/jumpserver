@@ -12,6 +12,12 @@ from users.models import User, UserGroup
 
 
 class PermedAssetFilterSet(BaseFilterSet):
+    user_name = filters.CharFilter(
+        field_name='user_custom__name', label=_('Custom Name')
+    )
+    user_comment = filters.CharFilter(
+        field_name='user_custom__comment', label=_('Custom Comment')
+    )
     platform = filters.CharFilter(
         method='filter_platform', label=_('Platform name or ID')
     )
@@ -34,7 +40,7 @@ class PermedAssetFilterSet(BaseFilterSet):
         model = Asset
         fields = [
             'id', 'name', 'address', 'platform', 'type', 'category', 'protocols',
-            'zone', 'is_active', 'comment',
+            'zone', 'is_active', 'comment', 'user_name', 'user_comment',
         ]
         fields_operator = {
             'platform': ('exact',),

@@ -10,7 +10,7 @@ from rest_framework import filters
 from rest_framework.compat import coreapi
 
 from assets.const import AllTypes, Category
-from assets.models import Asset, Node
+from assets.models import Asset
 from assets.utils import get_node_from_request
 from common.drf.filters import BaseFilterSet
 from common.utils import get_logger
@@ -59,11 +59,8 @@ class NodeFilterBackend(filters.BaseFilterBackend):
         if node is None:
             return queryset
 
-        node_qs = Node.objects.none()
-        node_qs |= node.get_all_children(with_self=True)
-        node_ids = list(node_qs.values_list("id", flat=True))
-        queryset = queryset.filter(asset__nodes__in=node_ids)
-        return queryset
+        node_ids = node.get_all_children(with_self=True).values_list("id", flat=True)
+        return queryset.filter(asset__nodes__in=node_ids).distinct()
 
 
 class ChoiceInFilter(drf_filters.BaseInFilter, drf_filters.ChoiceFilter):

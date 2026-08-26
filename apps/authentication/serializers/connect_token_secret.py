@@ -15,6 +15,7 @@ from perms.const import ActionChoices as PermActionChoices
 from perms.serializers.permission import ActionChoicesField
 from users.models import User
 from ..models import ConnectionToken
+from ..utils import get_effective_connect_options
 
 __all__ = [
     'ConnectionTokenSecretSerializer', 'ConnectTokenAppletOptionSerializer',
@@ -157,7 +158,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
         allow_blank=True, max_length=16384,
     )
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
-    connect_options = serializers.JSONField(read_only=True)
+    connect_options = serializers.SerializerMethodField()
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
     ssh_certificate = serializers.SerializerMethodField()
@@ -179,6 +180,12 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     @staticmethod
     def get_ssh_certificate(token):
         return getattr(token, 'ssh_certificate', None)
+
+    @staticmethod
+    def get_connect_options(token):
+        return get_effective_connect_options(
+            token.connect_options, token.protocol
+        )
 
     @staticmethod
     def _get_clipboard_acl_for_operation(token, operation):

@@ -59,6 +59,7 @@
           auth_status: unknown
           reason_code: WINDOWS_AD_VERIFY_FAILED
           change_succeeded: true
+          sync_candidate: true
       when:
         - not (change_secret_result.failed | default(false))
         - verify_winping.failed | default(false)

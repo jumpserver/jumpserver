@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status, serializers
 from rest_framework.decorators import action
+from rest_framework.settings import api_settings
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -21,6 +22,7 @@ from rest_framework.response import Response
 from accounts.const import AliasAccount, SecretType
 from accounts.utils import validate_account_username
 from acls.notifications import AssetLoginReminderMsg
+from assets.const import Protocol
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
 from common.utils import random_string, get_logger, get_request_ip_or_data
@@ -36,6 +38,9 @@ from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from ..services import sign_connection_token_ssh_certificate
+from ..utils import (
+    get_effective_connect_options, should_use_oracle_sysdba,
+)
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
@@ -419,6 +424,13 @@ class RDPFileClientProtocolURLMixin:
             'command': ''
         }
 
+        if token.protocol == Protocol.oracle:
+            data['connect_options'] = {
+                'use_sysdba': should_use_oracle_sysdba(
+                    token.connect_options, token.protocol
+                )
+            }
+
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
             data.update({
@@ -662,6 +674,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         account_name = data.get('account')
         protocol = data.get('protocol')
         connect_method = data.get('connect_method')
+        data['connect_options'] = get_effective_connect_options(
+            data['connect_options'], protocol
+        )
         self.input_username = self.get_input_username(data)
         if account_name == AliasAccount.INPUT:
             # Manual account input can reach Luna directly, so validate before ACL/token creation.
@@ -815,18 +830,20 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         response.data['face_token'] = face_verify_token
 
     @staticmethod
-    def format_validation_error(detail):
-        # Luna renders detail directly and cannot display DRF field-error dicts cleanly.
+    def serialize_validation_error(detail):
         if isinstance(detail, dict):
-            errors = []
-            for messages in detail.values():
-                if isinstance(messages, (list, tuple)):
-                    messages = ', '.join([str(message) for message in messages])
-                errors.append(str(messages))
-            return '; '.join(errors)
+            data = {}
+            for field, messages in detail.items():
+                if isinstance(messages, dict):
+                    data[field] = ConnectionTokenViewSet.serialize_validation_error(messages)
+                elif isinstance(messages, (list, tuple)):
+                    data[field] = [str(message) for message in messages]
+                else:
+                    data[field] = [str(messages)]
+            return data
         if isinstance(detail, (list, tuple)):
-            return '; '.join([str(item) for item in detail])
-        return str(detail)
+            return {api_settings.NON_FIELD_ERRORS_KEY: [str(item) for item in detail]}
+        return {api_settings.NON_FIELD_ERRORS_KEY: [str(detail)]}
 
     def create(self, request, *args, **kwargs):
         try:
@@ -837,7 +854,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             data = {'code': e.detail.code, 'detail': e.detail}
             return Response(data, status=e.status_code)
         except ValidationError as e:
-            data = {'detail': self.format_validation_error(e.detail)}
+            data = self.serialize_validation_error(e.detail)
             return Response(data, status=e.status_code)
         return response
 

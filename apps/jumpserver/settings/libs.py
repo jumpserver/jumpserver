@@ -31,6 +31,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
+        'chat_ai.authentication.ChatAIDelegationAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
@@ -203,10 +204,11 @@ else:
     }
 CELERY_TIMEZONE = CONFIG.TIME_ZONE
 CELERY_ENABLE_UTC = False
-CELERY_TASK_SERIALIZER = 'pickle'
-CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_ACCEPT_CONTENT = ['json', 'pickle']
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_ACCEPT_CONTENT = ['json'] #结果也限定为json
 CELERY_RESULT_EXPIRES = 600
 CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime).19s %(message)s'
 CELERY_WORKER_LOG_FORMAT = '%(asctime).19s %(message)s'
