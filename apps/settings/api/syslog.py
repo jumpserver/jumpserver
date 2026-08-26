@@ -36,12 +36,6 @@ class SyslogTestingAPI(APIView):
                 'syslog_test - {"test": "message"}', (), None,
             )
             handler.emit(record)
-        except ConnectionRefusedError as e:
-            logger.error("Failed to test syslog delivery: %s", e)
-            return Response({"error": _('Test failure: Connection refused')}, status=400)
-        except TimeoutError as e:
-            logger.error("Failed to test syslog delivery: %s", e)
-            return Response({"error": _('Test failure: Connection timeout')}, status=400)
         except Exception as e:
             logger.error("Failed to test syslog delivery: %s", e)
             return Response({"error": str(e)}, status=400)
