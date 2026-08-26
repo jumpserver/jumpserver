@@ -13,24 +13,37 @@ from .handler import create_or_update_operate_log
 class RecordViewLogMixin:
     record_view_log_actions = ('retrieve',)
     record_view_log_query_params = ()
+    record_view_log_datetime_field = None
 
     @staticmethod
-    def _format_view_log_datetime(value):
+    def _format_view_log_datetime(value, include_seconds=False):
         if not value:
             return None
         try:
             value = DateTimeField().to_internal_value(value)
         except (TypeError, ValueError, ValidationError):
             return None
-        return as_current_tz(value).strftime('%Y-%m-%d %H:%M')
+        fmt = '%Y-%m-%d %H:%M:%S' if include_seconds else '%Y-%m-%d %H:%M'
+        return as_current_tz(value).strftime(fmt)
 
     def _build_view_log_resource_display(
-            self, resource_type, query_params, count
+            self, resource_type, query_params, count, data
     ):
-        date_from = self._format_view_log_datetime(
+        dates = []
+        if self.record_view_log_datetime_field:
+            dates = [
+                self._format_view_log_datetime(
+                    item.get(self.record_view_log_datetime_field),
+                    include_seconds=True
+                )
+                for item in data if isinstance(item, dict)
+            ]
+            dates = sorted(filter(None, dates))
+
+        date_from = dates[0] if dates else self._format_view_log_datetime(
             query_params.get('date_from')
         )
-        date_to = self._format_view_log_datetime(
+        date_to = dates[-1] if dates else self._format_view_log_datetime(
             query_params.get('date_to')
         )
         count_label = gettext_noop('Resource count')
@@ -96,7 +109,7 @@ class RecordViewLogMixin:
             resource_display = None
             if resource is None:
                 resource_display = self._build_view_log_resource_display(
-                    resource_type, request.query_params, len(data)
+                    resource_type, request.query_params, len(data), data
                 )
             create_or_update_operate_log(
                 ActionChoices.view, resource_type, resource=resource,

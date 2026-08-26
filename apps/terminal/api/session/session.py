@@ -96,6 +96,7 @@ class SessionViewSet(RecordViewLogMixin, ReportExportMixin, OrgBulkModelViewSet)
     model = Session
     report_exporter_class = SessionReportExporter
     record_view_log_actions = ('list', 'retrieve')
+    record_view_log_datetime_field = 'date_start'
     record_view_log_query_params = (
         'id', 'date_from', 'date_to', 'user', 'user_id', 'asset', 'asset_id',
         'account', 'remote_addr', 'protocol', 'is_finished', 'login_from',
