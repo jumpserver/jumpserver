@@ -179,9 +179,13 @@ class BlockUtilBase:
 
     @classmethod
     def is_user_block(cls, username):
-        username = username.lower()
-        block_key = cls.BLOCK_KEY_TMPL.format(username)
+        block_key = cls.get_user_block_key(username)
         return bool(cache.get(block_key))
+
+    @classmethod
+    def get_user_block_key(cls, username):
+        username = username.lower()
+        return cls.BLOCK_KEY_TMPL.format(username)
 
     def is_block(self):
         return bool(cache.get(self.block_key))

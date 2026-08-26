@@ -3,6 +3,7 @@
 from functools import partial
 
 from django.conf import settings
+from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -409,13 +410,29 @@ class UserRetrieveSerializer(UserSerializer):
     login_confirm_settings = serializers.PrimaryKeyRelatedField(
         read_only=True, source="login_confirm_setting.reviewers", many=True
     )
-    has_public_keys = serializers.BooleanField(
+    has_public_keys = serializers.SerializerMethodField(
         label=_("Has public keys"),
-        read_only=True,
     )
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ["login_confirm_settings", "has_public_keys"]
+
+    @staticmethod
+    def get_has_public_keys(obj):
+        annotated = getattr(obj, '_has_public_keys', None)
+        if annotated is not None:
+            return annotated
+        return obj.has_public_keys
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        from authentication.models import SSHKey
+
+        queryset = super().setup_eager_loading(queryset)
+        active_keys = SSHKey.objects.filter(
+            user_id=OuterRef('pk'), is_active=True
+        )
+        return queryset.annotate(_has_public_keys=Exists(active_keys))
 
 
 class SmsUserSerializer(serializers.ModelSerializer):
