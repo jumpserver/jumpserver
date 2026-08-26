@@ -291,6 +291,20 @@ class Config(dict):
         'VAULT_OPENBAO_MOUNT_POINT': 'pam',
         'VAULT_OPENBAO_TIMEOUT': 10,
 
+        # OpenBao SSH CA uses an independent endpoint and credential so it can
+        # be deployed in a separate security/failure domain from Vault KV.
+        # An empty address keeps backward compatibility with deployments that
+        # previously reused VAULT_OPENBAO_ADDR.
+        'SSH_CA_ENABLED': False,
+        'SSH_CA_OPENBAO_ADDR': '',
+        'SSH_CA_OPENBAO_TOKEN': '',
+        'SSH_CA_OPENBAO_MOUNT_POINT': 'ssh-client-signer',
+        'SSH_CA_OPENBAO_ROLE': 'jumpserver',
+        'SSH_CA_OPENBAO_TTL': 300,
+        'SSH_CA_OPENBAO_TIMEOUT': 10,
+        'SSH_CA_OPENBAO_VERIFY_TLS': True,
+        'SSH_CA_OPENBAO_SOURCE_ADDRESS': '',
+
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'pam',

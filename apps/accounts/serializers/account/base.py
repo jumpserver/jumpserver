@@ -37,6 +37,8 @@ class AuthValidateMixin(serializers.Serializer):
 
     @staticmethod
     def handle_secret(secret, secret_type, passphrase=None):
+        if secret_type == SecretType.SSH_CERTIFICATE:
+            return ""
         if not secret:
             return ""
         if secret_type == SecretType.PASSWORD:
@@ -49,8 +51,39 @@ class AuthValidateMixin(serializers.Serializer):
         else:
             return secret
 
+    def validate_dynamic_credential(self, attrs):
+        instance = getattr(self, 'instance', None)
+        secret_type = attrs.get(
+            'secret_type', getattr(instance, 'secret_type', None)
+        )
+        if secret_type != SecretType.SSH_CERTIFICATE:
+            return attrs
+        if 'su_from' in self.fields:
+            attrs['su_from'] = None
+        if 'su_from_username' in attrs:
+            attrs['su_from_username'] = ''
+        if attrs.get('push_now') or attrs.get('auto_push'):
+            raise serializers.ValidationError({
+                'secret_type': _(
+                    'SSH certificate accounts cannot push or rotate credentials'
+                )
+            })
+        if 'secret_reset' in self.fields:
+            attrs['secret_reset'] = False
+        return attrs
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        return self.validate_dynamic_credential(attrs)
+
     def clean_auth_fields(self, validated_data):
         secret_type = validated_data.get("secret_type")
+        if secret_type == SecretType.SSH_CERTIFICATE:
+            # Explicitly remove credentials left by a previous static auth
+            # type when an existing account is switched to certificate auth.
+            validated_data["secret"] = ""
+            validated_data["passphrase"] = ""
+            return
         passphrase = validated_data.get("passphrase")
         secret = validated_data.pop("secret", None)
         validated_data["secret"] = self.handle_secret(secret, secret_type, passphrase)

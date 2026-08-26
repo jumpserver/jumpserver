@@ -19,7 +19,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from accounts.const import AliasAccount
+from accounts.const import AliasAccount, SecretType
 from accounts.utils import validate_account_username
 from acls.notifications import AssetLoginReminderMsg
 from assets.const import Protocol
@@ -37,6 +37,7 @@ from users.models import Preference
 from .face import FaceMonitorContext
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
+from ..services import sign_connection_token_ssh_certificate
 from ..utils import (
     get_effective_connect_options, should_use_oracle_sysdba,
 )
@@ -936,6 +937,21 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         if not token:
             raise PermissionDenied('Token {} is not valid'.format(token))
         token.is_valid()
+
+        account = token.account_object
+        if account and account.secret_type == SecretType.SSH_CERTIFICATE:
+            certificate = sign_connection_token_ssh_certificate(
+                token, request.data.get('public_key', '')
+            )
+            # The certificate is public material, but returning it through the
+            # existing account credential field keeps the component contract
+            # compact. Koko pairs it with the private key generated in memory.
+            account.secret = certificate['signed_key']
+            token.ssh_certificate = {
+                key: value for key, value in certificate.items()
+                if key != 'signed_key'
+            }
+
         serializer = self.get_serializer(instance=token)
 
         expire_now = request.data.get('expire_now', True)

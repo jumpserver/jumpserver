@@ -7,7 +7,7 @@ from django.utils.functional import LazyObject
 from django.utils.translation import gettext_noop
 
 from accounts.backends import vault_client, refresh_vault_client
-from accounts.const import Source
+from accounts.const import SecretType, Source
 from audits.const import ActivityChoices
 from audits.signal_handlers import create_activities
 from common.decorators import merge_delay_run
@@ -73,6 +73,8 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def save_to_vault(sender, instance, created, **kwargs):
+        if instance.secret_type == SecretType.SSH_CERTIFICATE:
+            return
         if getattr(instance, 'skip_vault_when_saving', False):
             return
         try:
@@ -86,6 +88,8 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def delete_to_vault(sender, instance, **kwargs):
+        if instance.secret_type == SecretType.SSH_CERTIFICATE:
+            return
         try:
             vault_client.delete(instance)
         except Exception as e:

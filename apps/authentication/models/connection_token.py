@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
+from accounts.const import SecretType
 from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
@@ -307,7 +308,10 @@ class ConnectionToken(JMSOrgBaseModel):
             )
         else:
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
-            if not account.secret and self.input_secret:
+            if (
+                account.secret_type != SecretType.SSH_CERTIFICATE
+                and not account.secret and self.input_secret
+            ):
                 account.secret = self.input_secret
                 account.secret_type = self.input_secret_type
         
