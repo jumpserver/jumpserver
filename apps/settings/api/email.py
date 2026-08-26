@@ -51,12 +51,13 @@ class MailTestingAPI(APIView):
                 host=email_host, port=email_port,
                 username=email_host_user, password=email_host_password,
                 use_tls=email_use_tls, use_ssl=email_use_ssl,
+                timeout=30,
             )
             send_mail(
                 subject, message, email_from, [email_recipient],
                 connection=connection
             )
-        except SMTPSenderRefused:
+        except SMTPSenderRefused as e:
             error = e.smtp_error
             if isinstance(error, bytes):
                 for coding in ('gbk', 'utf8'):
