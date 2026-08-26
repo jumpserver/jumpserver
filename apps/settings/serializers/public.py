@@ -91,7 +91,6 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     CHANGE_SECRET_AFTER_SESSION_END = serializers.BooleanField()
 
     JDMC_ENABLED = serializers.BooleanField()
-    KOTL_ENABLED = serializers.BooleanField()
     FLOWER_ENABLED = serializers.BooleanField()
     REMOTE_APP_STORE_URL = serializers.CharField()
     VENDOR = serializers.CharField()
