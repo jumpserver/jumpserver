@@ -97,7 +97,14 @@ class LDAPBaseBackend(LDAPBackend):
         except Exception as e:
             logger.error('Authenticate failed: {}'.format(e))
             return None
-        user = self.authenticate_ldap_user(ldap_user, password)
+        try:
+            user = self.authenticate_ldap_user(ldap_user, password)
+        except Exception as error:
+            from authentication.mapping import AuthMappingError
+            if not isinstance(error, AuthMappingError):
+                raise
+            logger.error('Authenticate mapping failed: %s', error)
+            return None
         logger.info('Authenticate user: {}'.format(user))
         return user if self.user_can_authenticate(user) else None
 
@@ -160,6 +167,53 @@ class LDAPUser(_LDAPUser):
         self.category = f"ldap{config_prefix}"
         self.search_filter = getattr(settings, f"AUTH_LDAP{config_prefix.upper()}_SEARCH_FILTER", None)
         self.search_ou = getattr(settings, f"AUTH_LDAP{config_prefix.upper()}_SEARCH_OU", None)
+
+    def _get_or_create_user(self, force_populate=False):
+        super()._get_or_create_user(force_populate)
+        if self.category == 'ldap':
+            self._sync_auth_mappings()
+
+    def _sync_auth_mappings(self):
+        from authentication.mapping import (
+            MISSING, AuthMappingError, AuthMappingService,
+        )
+        from settings.utils import LDAPServerUtil
+
+        group_rules = getattr(settings, 'AUTH_LDAP_USER_GROUP_MAP', [])
+        role_rules = getattr(settings, 'AUTH_LDAP_USER_ROLE_MAP', [])
+        has_group_exact = any(rule.get('value') != '*' for rule in group_rules)
+        has_role_exact = any(rule.get('value') != '*' for rule in role_rules)
+        attributes = {}
+        groups = MISSING
+        if has_group_exact or has_role_exact:
+            try:
+                users = LDAPServerUtil(category=self.category).search(
+                    search_users=[self._username]
+                )
+            except Exception as error:
+                raise AuthMappingError(str(error)) from error
+            if len(users) != 1:
+                raise AuthMappingError(
+                    f'Expected one LDAP mapping entry, got {len(users)}'
+                )
+            mapping_error = users[0].get('_auth_mapping_error')
+            if mapping_error:
+                raise AuthMappingError(mapping_error)
+            attributes = users[0].get('_auth_attributes', MISSING)
+            groups = users[0].get('groups', MISSING)
+            if has_group_exact and groups is MISSING:
+                raise AuthMappingError('LDAP group attributes are unavailable')
+
+        AuthMappingService(
+            source=self.category,
+            group_rules=group_rules,
+            role_rules=role_rules,
+        ).sync(
+            self._user,
+            attributes=attributes,
+            groups=groups,
+            raise_errors=True,
+        )
 
     def _search_for_user_dn_from_ldap_util(self):
         from settings.utils import LDAPServerUtil
