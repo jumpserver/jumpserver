@@ -9,6 +9,7 @@ from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
 from orgs.utils import tmp_to_root_org
+from settings.models import get_chat_ai_config
 from terminal.const import TerminalType as TypeChoices
 from users.models import User
 from .status import Status
@@ -125,6 +126,19 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
             'XPACK_LICENSE_CONTENT': settings.XPACK_LICENSE_CONTENT
         }
 
+    @staticmethod
+    def get_chat_ai_setting():
+        data = get_chat_ai_config()
+        return {
+            'CHAT_AI_ENABLED': settings.CHAT_AI_ENABLED,
+            'CHAT_AI_METHOD': settings.CHAT_AI_METHOD,
+            'CHAT_AI_PROVIDER': settings.CHAT_AI_PROVIDER,
+            'CHAT_AI_BASE_URL': data['base_url'],
+            'CHAT_AI_API_KEY': data['api_key'],
+            'CHAT_AI_PROXY': data['proxy'],
+            'CHAT_AI_MODEL': data['model'],
+        }
+
     @property
     def config(self):
         configs = {}
@@ -135,6 +149,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_command_storage_setting())
         configs.update(self.get_replay_storage_setting())
         configs.update(self.get_login_title_setting())
+        configs.update(self.get_chat_ai_setting())
         configs.update(self.get_xpack_license())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,
