@@ -9298,10 +9298,9 @@ msgstr "未发现 protocol 查询参数"
 msgid "Deleting the default storage is not allowed"
 msgstr "不允许删除默认存储配置"
 
-#: terminal/api/component/storage.py:36
-#, python-brace-format
-msgid "Cannot delete storage that is being used: {}"
-msgstr "无法删除正在使用的存储: {}"
+#: terminal/api/component/storage.py:35
+msgid "Cannot delete storage because it is in use by components"
+msgstr "有组件正在使用，无法删除"
 
 #: terminal/api/component/storage.py:77 terminal/api/component/storage.py:78
 msgid "Command storages"

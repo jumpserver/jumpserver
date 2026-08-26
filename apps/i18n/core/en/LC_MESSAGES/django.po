@@ -9234,9 +9234,8 @@ msgstr ""
 msgid "Deleting the default storage is not allowed"
 msgstr ""
 
-#: terminal/api/component/storage.py:36
-#, python-brace-format
-msgid "Cannot delete storage that is being used: {}"
+#: terminal/api/component/storage.py:35
+msgid "Cannot delete storage because it is in use by components"
 msgstr ""
 
 #: terminal/api/component/storage.py:77 terminal/api/component/storage.py:78

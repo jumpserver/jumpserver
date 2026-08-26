@@ -30,10 +30,8 @@ class BaseStorageViewSetMixin(CommonApiMixin):
         if instance.type_null_or_server or instance.is_default:
             data = {'msg': _('Deleting the default storage is not allowed')}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        used_by = instance.used_by()
-        if used_by:
-            names = ', '.join(list(used_by.values_list('name', flat=True)))
-            data = {'msg': _('Cannot delete storage that is being used: {}').format(names)}
+        if instance.used_by():
+            data = {'msg': _('Cannot delete storage because it is in use by components')}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         return super().destroy(request, *args, **kwargs)
 
@@ -46,7 +44,6 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     rbac_perms = {
         'tree': 'terminal.view_commandstorage | terminal.view_command'
     }
-
     @action(methods=[GET], detail=False, filterset_class=CommandFilterForStorageTree)
     def tree(self, request: Request):
         storage_qs = self.get_queryset().exclude(name='null')
