@@ -141,6 +141,7 @@ INSTALLED_APPS = [
     'rbac.apps.RBACConfig',
     'labels.apps.LabelsConfig',
     'reports.apps.ReportsConfig',
+    'chat_ai.apps.ChatAIConfig',
     'rest_framework',
     'drf_spectacular',
     'drf_spectacular_sidecar', 

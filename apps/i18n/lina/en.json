@@ -394,6 +394,7 @@
     "ChartReport": "Chart Report",
     "Chat": "Chat",
     "ChatAI": "Chat AI",
+    "ChatAIPrivateContext": "Conversations are isolated by organization and visible only to you and super administrators",
     "ChatHello": "Hello, can I help you?",
     "ChdirHelpText": "By default, the execution directory is the user's home directory",
     "CheckAssetsAmount": "Check asset quantity",

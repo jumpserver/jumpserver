@@ -125,7 +125,7 @@ class UserGroupGrantedNodesApi(ListAPIView):
             Q(granted_by_permissions__user_groups__id=user_group_id) |
             Q(assets__granted_by_permissions__user_groups__id=user_group_id)
         )
-        return nodes
+        return nodes.with_realtime_assets_amount()
 
 
 class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):

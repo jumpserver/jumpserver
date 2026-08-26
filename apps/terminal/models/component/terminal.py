@@ -9,7 +9,6 @@ from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
 from orgs.utils import tmp_to_root_org
-from settings.models import get_chatai_data
 from terminal.const import TerminalType as TypeChoices
 from users.models import User
 from .status import Status
@@ -120,17 +119,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         return {'TERMINAL_HEADER_TITLE': get_login_title()}
 
     @staticmethod
-    def get_chat_ai_setting():
-        data = get_chatai_data()
-        return {
-            'GPT_BASE_URL': data['url'],
-            'GPT_API_KEY': data['api_key'],
-            'GPT_PROXY': data['proxy'],
-            'GPT_MODEL': data['model'],
-            'CHAT_AI_TYPE': settings.CHAT_AI_TYPE,
-        }
-
-    @staticmethod
     def get_xpack_license():
         return {
             'XPACK_LICENSE_IS_VALID': settings.XPACK_LICENSE_IS_VALID,
@@ -147,7 +135,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_command_storage_setting())
         configs.update(self.get_replay_storage_setting())
         configs.update(self.get_login_title_setting())
-        configs.update(self.get_chat_ai_setting())
         configs.update(self.get_xpack_license())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,

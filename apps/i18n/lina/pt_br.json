@@ -390,6 +390,7 @@
     "ChartReport": "Relatório Gráfico",
     "Chat": "Chat",
     "ChatAI": "Resposta inteligente",
+    "ChatAIPrivateContext": "As conversas são isoladas por organização e visíveis apenas para você e super administradores",
     "ChatHello": "Olá! Como posso ajudá-lo? ",
     "ChdirHelpText": "O diretório de execução padrão é o diretório home do usuário de execução",
     "CheckAssetsAmount": "Verificar Quantidade de Ativos",
