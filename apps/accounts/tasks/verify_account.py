@@ -48,7 +48,7 @@ def verify_accounts_connectivity_util(accounts, task_name):
 
 
 @shared_task(
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_('Verify asset account availability'),
     activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None),
     description=_(
@@ -84,7 +84,7 @@ def change_secret_record_activity_callback(
 
 
 @shared_task(
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_('Verify change secret records'),
     activity_callback=change_secret_record_activity_callback,
     description=_(

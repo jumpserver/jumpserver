@@ -2,7 +2,9 @@ from .backup_account.manager import AccountBackupManager
 from .change_secret.manager import ChangeSecretManager
 from .check_account.manager import CheckAccountManager
 from .gather_account.manager import GatherAccountsManager
-from .push_account.manager import PushAccountManager
+from .push_account.manager import (
+    CredentialProvisionManager, PushAccountManager,
+)
 from .remove_account.manager import RemoveAccountManager
 from .verify_account.manager import VerifyAccountManager
 from .verify_gateway_account.manager import VerifyGatewayAccountManager
@@ -19,6 +21,7 @@ class ExecutionManager:
         AutomationTypes.verify_gateway_account: VerifyGatewayAccountManager,
         AutomationTypes.check_account: CheckAccountManager,
         AutomationTypes.backup_account: AccountBackupManager,
+        AutomationTypes.credential_issue: CredentialProvisionManager,
     }
 
     def __init__(self, execution):

@@ -176,6 +176,9 @@ CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
 
 # Celery using redis as broker
 CELERY_BROKER_URL_FORMAT = '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s'
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'priority_steps': list(range(10)),
+}
 if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     CELERY_BROKER_URL = ';'.join([CELERY_BROKER_URL_FORMAT % {
         'protocol': 'sentinel', 'password': CONFIG.REDIS_PASSWORD,
@@ -193,7 +196,8 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
             "ssl_ca_certs": REDIS_SSL_CA
         }
     }
-    CELERY_BROKER_TRANSPORT_OPTIONS = CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = SENTINEL_OPTIONS
+    CELERY_BROKER_TRANSPORT_OPTIONS.update(SENTINEL_OPTIONS)
+    CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = SENTINEL_OPTIONS
 else:
     CELERY_BROKER_URL = CELERY_BROKER_URL_FORMAT % {
         'protocol': REDIS_PROTOCOL,

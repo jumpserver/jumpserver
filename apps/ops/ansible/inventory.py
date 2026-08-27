@@ -25,7 +25,8 @@ class JMSInventory:
     def __init__(
             self, assets, account_policy='privileged_first',
             account_prefer='root,Administrator', host_callback=None,
-            exclude_localhost=False, task_type=None, protocol=None
+            exclude_localhost=False, task_type=None, protocol=None,
+            account_id=None,
     ):
         """
         :param assets:
@@ -34,6 +35,7 @@ class JMSInventory:
         """
         self.assets = self.clean_assets(assets)
         self.account_prefer = self.get_account_prefer(account_prefer)
+        self.account_id = str(account_id or '')
         self.account_policy = account_policy
         self.host_callback = host_callback
         self.exclude_hosts = {}
@@ -364,6 +366,13 @@ class JMSInventory:
         accounts = self.get_asset_sorted_accounts(asset)
         if not accounts:
             return None
+
+        if self.account_id:
+            return next(
+                (account for account in accounts
+                 if str(account.id) == self.account_id),
+                None,
+            )
 
         refer_account = self.get_refer_account(accounts)
         if refer_account:

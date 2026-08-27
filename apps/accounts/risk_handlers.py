@@ -66,6 +66,15 @@ class RiskHandler:
             r = r.filter(risk=self.risk)
         return r.first()
 
+    def ensure_not_credential_managed(self):
+        accounts = Account.objects.filter(
+            asset=self.asset, username=self.username,
+        )
+        if any(account.is_credential_managed for account in accounts):
+            raise ValidationError(
+                _('Credential policy accounts must be managed by their policy')
+            )
+
     def handle_ignore(self):
         (GatheredAccount.objects
          .filter(asset=self.asset, username=self.username)
@@ -75,6 +84,7 @@ class RiskHandler:
         pass
 
     def handle_delete_account(self):
+        self.ensure_not_credential_managed()
         Account.objects.filter(asset=self.asset, username=self.username).delete()
         GatheredAccount.objects.filter(asset=self.asset, username=self.username).delete()
 
@@ -128,6 +138,7 @@ class RiskHandler:
             raise ValidationError(msg)
 
     def _handle_delete(self, delete="both"):
+        self.ensure_not_credential_managed()
         asset = self.asset
         execution = AutomationExecution()
         execution.snapshot = {
@@ -144,6 +155,7 @@ class RiskHandler:
         self._handle_delete(delete="both")
 
     def handle_change_password(self):
+        self.ensure_not_credential_managed()
         asset = self.asset
         execution = AutomationExecution()
         account = self.asset.accounts.filter(username=self.username, secret_type=SecretType.PASSWORD).first()
@@ -162,6 +174,7 @@ class RiskHandler:
         self.start_execution(execution)
 
     def handle_change_password_add(self):
+        self.ensure_not_credential_managed()
         asset = self.asset
         secret_type = SecretType.PASSWORD
         secret = random_string(30)

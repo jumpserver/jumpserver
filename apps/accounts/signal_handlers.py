@@ -88,7 +88,8 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def delete_to_vault(sender, instance, **kwargs):
-        if instance.secret_type == SecretType.SSH_CERTIFICATE:
+        if instance.secret_type == SecretType.SSH_CERTIFICATE \
+                or getattr(instance, 'skip_vault_when_deleting', False):
             return
         try:
             vault_client.delete(instance)

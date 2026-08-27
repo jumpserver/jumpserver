@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 #
+import base64
+import hashlib
+import hmac
 import os
+from datetime import timezone as datetime_timezone
+from email.utils import parsedate_to_datetime
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
@@ -182,3 +188,75 @@ class ServiceAuthentication(signature.SignatureAuthentication):
 
     def after_authenticate_update_date(self, user):
         update_service_integration_last_used.delay((user.id,))
+
+
+class CredentialServiceAuthentication(ServiceAuthentication):
+    required_headers = [
+        '(request-target)', 'date', 'x-jms-org', 'x-source', 'x-jms-nonce',
+    ]
+    max_clock_skew = 300
+
+    def authenticate(self, request):
+        auth_header = authentication.get_authorization_header(request)
+        try:
+            method, fields = signature.utils.parse_authorization_header(
+                auth_header,
+            )
+            if method.lower() != 'signature':
+                return None
+            if fields.get('algorithm', '').lower() != 'hmac-sha256':
+                raise signature.FAILED
+            signed_headers = set(
+                fields.get('headers', '').lower().split()
+            )
+            if not set(self.required_headers).issubset(signed_headers):
+                raise signature.FAILED
+            if request.headers.get('Idempotency-Key') \
+                    and 'idempotency-key' not in signed_headers:
+                raise signature.FAILED
+            nonce = request.headers.get('X-JMS-Nonce', '')
+            if not 16 <= len(nonce) <= 128:
+                raise signature.FAILED
+
+            body = request.body or b''
+            if body:
+                if 'digest' not in signed_headers:
+                    raise signature.FAILED
+                digest = 'SHA-256=' + base64.b64encode(
+                    hashlib.sha256(body).digest()
+                ).decode()
+                if not hmac.compare_digest(
+                    request.headers.get('Digest', ''), digest,
+                ):
+                    raise signature.FAILED
+
+            request_date = parsedate_to_datetime(request.headers.get('Date', ''))
+            if request_date.tzinfo is None:
+                request_date = request_date.replace(
+                    tzinfo=datetime_timezone.utc,
+                )
+            if abs((timezone.now() - request_date).total_seconds()) \
+                    > self.max_clock_skew:
+                raise signature.FAILED
+        except exceptions.AuthenticationFailed:
+            raise
+        except Exception:
+            raise signature.FAILED
+
+        try:
+            result = super().authenticate(request)
+        except DjangoValidationError:
+            raise signature.FAILED
+        if not result:
+            return result
+        user, __ = result
+        if str(request.headers.get('X-JMS-ORG')) != str(user.org_id):
+            raise signature.FAILED
+        replay_key = 'credential-signature:' + hashlib.sha256(
+            f'{fields["keyid"]}:{nonce}'.encode(),
+        ).hexdigest()
+        if not cache.add(
+            replay_key, True, timeout=self.max_clock_skew * 2,
+        ):
+            raise signature.FAILED
+        return result

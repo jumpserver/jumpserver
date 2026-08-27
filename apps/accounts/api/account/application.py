@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts import serializers
+from accounts.const import CredentialPolicyStatus, Source
 from accounts.filters import IntegrationApplicationFilterSet
 from accounts.models import IntegrationApplication
 from audits.models import IntegrationApplicationLog
@@ -96,6 +97,18 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
             account=f'{account.name}({account.username})', asset=f'{asset.name}({asset.address})',
         )
         
-        # 根据配置决定是否返回密码
-        secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
+        managed_policies = account.credential_policies.all()
+        managed_policy_unavailable = (
+            managed_policies.exists()
+            and not managed_policies.filter(
+                application=service,
+                status=CredentialPolicyStatus.enabled,
+            ).exists()
+        )
+        secret_unavailable = (
+            settings.SECURITY_DISABLE_VIEW_SECRET
+            or account.source == Source.CREDENTIAL_LEASE
+            or managed_policy_unavailable
+        )
+        secret = None if secret_unavailable else account.secret
         return Response(data={'id': request.user.id, 'secret': secret})

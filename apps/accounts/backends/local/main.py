@@ -25,7 +25,7 @@ class Vault(BaseVault):
         """ Ignore """
         pass
 
-    def _delete(self, entry):
+    def _delete(self, entry, force=False):
         """ Ignore """
         pass
 

@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from xlsxwriter import Workbook
 
-from accounts.const import AccountBackupType
+from accounts.const import AccountBackupType, Source
 from accounts.models import BackupAccountAutomation, Account
 from accounts.notifications import AccountBackupExecutionTaskMsg, AccountBackupByObjStorageExecutionTaskMsg
 from accounts.serializers import AccountSecretSerializer
@@ -146,6 +146,8 @@ class AccountBackupHandler:
         self.manager.summary['total_types'] = len(types)
         qs = Account.objects.filter(
             asset__platform__type__in=types
+        ).exclude(
+            source=Source.CREDENTIAL_LEASE,
         ).annotate(type=F('asset__platform__type'))
         return qs
 

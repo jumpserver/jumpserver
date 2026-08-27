@@ -39,7 +39,7 @@ def task_activity_callback(self, pid, trigger, tp, *args, **kwargs):
 
 
 @shared_task(
-    queue='ansible',
+    queue='ansible', priority=5,
     verbose_name=_('Account execute automation'),
     activity_callback=task_activity_callback,
     description=_(
@@ -71,7 +71,7 @@ def record_task_activity_callback(self, record_ids, *args, **kwargs):
 
 
 @shared_task(
-    queue='ansible',
+    queue='ansible', priority=5,
     verbose_name=_('Execute automation record'),
     activity_callback=record_task_activity_callback,
     description=_(

@@ -57,7 +57,7 @@ class Vault(BaseVault):
         data = {'secret': self._get_plain_secret(entry)}
         self.client.patch(path=entry.full_path, data=data)
 
-    def _delete(self, entry):
+    def _delete(self, entry, force=False):
         self.client.delete(path=entry.full_path)
 
     def _save_metadata(self, entry, metadata):

@@ -54,7 +54,8 @@ class BaseSecretRecord(JMSBaseModel):
         abstract = True
 
     def __str__(self):
-        return f'{self.account.username}@{self.asset}'
+        username = self.account.username if self.account else self.comment or ''
+        return f'{username}@{self.asset}'
 
     @classmethod
     def get_valid_records(cls):

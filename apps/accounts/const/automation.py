@@ -30,6 +30,7 @@ class AutomationTypes(models.TextChoices):
     verify_gateway_account = 'verify_gateway_account', _('Verify gateway account')
     check_account = 'check_account', _('Check account')
     backup_account = 'backup_account', _('Backup account')
+    credential_issue = 'credential_issue', _('Issue temporary credential')
 
     @classmethod
     def get_type_model(cls, tp):

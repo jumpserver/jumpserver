@@ -15,7 +15,8 @@
         connect_timeout: 15
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
-      ignore_errors: true
+        require_absent: "{{ require_absent | default(false) | bool }}"
+      ignore_errors: "{{ not (require_absent | default(false) | bool) }}"
       register: change_secret_result
 
     - name: Verify password

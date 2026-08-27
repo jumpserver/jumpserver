@@ -17,7 +17,7 @@ __all__ = [
 
 @shared_task(
     verbose_name=_('Test gateways connectivity'),
-    queue='ansible',
+    queue='ansible', priority=5,
     activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id),
     description=_(
         "When clicking 'Test Connection' in 'Domain Details - Gateway' this task will be executed"

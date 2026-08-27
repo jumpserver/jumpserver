@@ -24,6 +24,8 @@ class AccountHistoricalRecords(HistoricalRecords):
 
     def post_save(self, instance, created, using=None, **kwargs):
         self.updated_version = None
+        if instance.source == Source.CREDENTIAL_LEASE:
+            return
         if not self.included_fields:
             return super().post_save(instance, created, using=using, **kwargs)
 
@@ -47,6 +49,11 @@ class AccountHistoricalRecords(HistoricalRecords):
         self.updated_version = history_account.version + 1
         instance.version = self.updated_version
         return super().post_save(instance, created, using=using, **kwargs)
+
+    def post_delete(self, instance, using=None, **kwargs):
+        if instance.source == Source.CREDENTIAL_LEASE:
+            return
+        return super().post_delete(instance, using=using, **kwargs)
 
     def create_historical_record(self, instance, history_type, using=None):
         super().create_historical_record(instance, history_type, using=using)
@@ -132,6 +139,13 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         else:
             host = 'Dynamic'
         return '{}({})'.format(self.name, host)
+
+    @property
+    def is_credential_managed(self):
+        return (
+            self.source == Source.CREDENTIAL_LEASE
+            or self.credential_policies.exists()
+        )
 
     @lazyproperty
     def platform(self):

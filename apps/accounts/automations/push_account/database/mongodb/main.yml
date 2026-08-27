@@ -22,7 +22,8 @@
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
         create_roles: "{{ (params.roles | default('readWrite')).split(',') }}"
-      ignore_errors: true
+        require_absent: "{{ require_absent | default(false) | bool }}"
+      ignore_errors: "{{ not (require_absent | default(false) | bool) }}"
       register: change_secret_result
 
     - name: Verify password

@@ -538,6 +538,7 @@ class PlaybookPrepareMixin:
             exclude_localhost=True,
             task_type=self.__class__.method_type(),
             protocol=protocol,
+            account_id=self.execution.snapshot.get('management_account'),
         )
         inventory.write_to_file(inventory_path)
         self._inventory_host_labels = {
@@ -1101,6 +1102,12 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         )
 
     def is_task_deadline_exceeded(self):
+        deadline = self.execution.snapshot.get('deadline')
+        if deadline is not None:
+            try:
+                return time.time() >= float(deadline)
+            except (TypeError, ValueError):
+                pass
         task_timeout = int(
             getattr(settings, 'ANSIBLE_AUTOMATION_TOTAL_TIMEOUT', 21600)
             or 0
@@ -1112,6 +1119,13 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
 
     def mark_task_timed_out(self):
         if self.task_timed_out:
+            return
+        if self.execution.snapshot.get('deadline') is not None:
+            self.task_timed_out = True
+            self.interruption_reason = str(_(
+                "Automation task deadline exceeded"
+            ))
+            self.print_log(self.interruption_reason, 'error')
             return
         task_timeout = int(
             getattr(settings, 'ANSIBLE_AUTOMATION_TOTAL_TIMEOUT', 21600)

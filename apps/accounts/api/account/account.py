@@ -50,6 +50,17 @@ class AccountViewSet(OrgBulkModelViewSet):
     }
     export_as_zip = True
 
+    @staticmethod
+    def ensure_not_credential_managed(account):
+        if account.is_credential_managed:
+            raise drf_serializers.ValidationError(
+                _('Credential policy accounts must be managed by their policy')
+            )
+
+    def perform_destroy(self, instance):
+        self.ensure_not_credential_managed(instance)
+        return super().perform_destroy(instance)
+
     def get_queryset(self):
         queryset = super().get_queryset()
         asset_id = self.request.query_params.get('asset') or self.request.query_params.get('asset_id')
@@ -165,11 +176,15 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['patch'], detail=False, url_path='clear-secret')
     def clear_secret(self, request, *args, **kwargs):
         account_ids = request.data.get('account_ids', [])
-        self.model.objects.filter(id__in=account_ids).update(secret=None)
+        accounts = self.model.objects.filter(id__in=account_ids)
+        for account in accounts:
+            self.ensure_not_credential_managed(account)
+        accounts.update(secret=None)
         return Response(status=HTTP_200_OK)
 
     def _copy_or_move_to_assets(self, request, move=False):
         account = self.get_object()
+        self.ensure_not_credential_managed(account)
         asset_ids = request.data.get('assets', [])
         assets = Asset.objects.filter(id__in=asset_ids)
         field_names = [

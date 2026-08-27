@@ -22,6 +22,13 @@
           {{ account.username in
              (user_info.ansible_facts.getent_passwd | default({})) }}
 
+    - name: Refuse to overwrite an existing account
+      ansible.builtin.fail:
+        msg: "JMS_CREDENTIAL_ACCOUNT_EXISTS: {{ account.username }}"
+      when:
+        - require_absent | default(false) | bool
+        - user_exists
+
     - name: "Add {{ account.username }} user"
       ansible.builtin.user:
         name: "{{ account.username }}"
@@ -33,6 +40,15 @@
         append: "{{ true if params.groups | length > 0 else false }}"
         expires: -1
         state: present
+        password: >-
+          {{ account.secret | password_hash('sha512', rounds=5000)
+             if (require_absent | default(false) | bool)
+                and account.secret_type == 'password'
+             else omit }}
+        update_password: >-
+          {{ 'on_create'
+             if (require_absent | default(false) | bool)
+             else omit }}
       when: not user_exists
 
     - name: "Set {{ account.username }} sudo setting"
@@ -53,7 +69,9 @@
         update_password: always
       ignore_errors: true
       register: change_secret_result
-      when: account.secret_type == "password"
+      when:
+        - account.secret_type == "password"
+        - not (require_absent | default(false) | bool)
 
     - name: "Refresh passwd data for {{ account.username }}"
       ansible.builtin.getent:

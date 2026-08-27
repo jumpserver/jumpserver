@@ -21,7 +21,7 @@ def task_activity_callback(self, pid, trigger, tp, *args, **kwargs):
 
 
 @shared_task(
-    queue='ansible',
+    queue='ansible', priority=5,
     verbose_name=_('Asset execute automation'),
     activity_callback=task_activity_callback,
     description=_("Unused")

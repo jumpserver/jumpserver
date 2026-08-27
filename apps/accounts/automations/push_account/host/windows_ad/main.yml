@@ -1,11 +1,38 @@
 - hosts: demo
   gather_facts: no
   tasks:
+    - name: Check whether the Active Directory account exists
+      ansible.windows.win_shell: |
+        $ErrorActionPreference = 'Stop'
+        Import-Module ActiveDirectory -ErrorAction Stop
+        try {
+          Get-ADUser -Identity $env:JMS_ACCOUNT_USERNAME `
+            -ErrorAction Stop | Out-Null
+          'true'
+        } catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+          'false'
+        }
+      environment:
+        JMS_ACCOUNT_USERNAME: "{{ account.username }}"
+      register: ad_account_lookup
+      changed_when: false
+      when: require_absent | default(false) | bool
+
+    - name: Refuse to overwrite an existing account
+      ansible.builtin.fail:
+        msg: "JMS_CREDENTIAL_ACCOUNT_EXISTS: {{ account.username }}"
+      when:
+        - require_absent | default(false) | bool
+        - ad_account_lookup.stdout | default('false') | trim == 'true'
+
     - name: Push user password
       microsoft.ad.user:
         identity: "{{ account.username }}"
         password: "{{ account.secret }}"
-        update_password: always
+        update_password: >-
+          {{ 'on_create'
+             if (require_absent | default(false) | bool)
+             else 'always' }}
         password_never_expires: yes
         state: present
         groups:

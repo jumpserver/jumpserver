@@ -60,9 +60,9 @@ class BaseVault(ABC):
         if instance.is_sync_metadata:
             self.save_metadata(entry)
 
-    def delete(self, instance):
+    def delete(self, instance, force=False):
         entry = self.build_entry(instance)
-        self._delete(entry)
+        self._delete(entry, force=force)
 
     def save_metadata(self, entry):
         metadata = model_to_dict(entry.instance, fields=[
@@ -104,7 +104,7 @@ class BaseVault(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _delete(self, entry):
+    def _delete(self, entry, force=False):
         raise NotImplementedError
 
     @abstractmethod

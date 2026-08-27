@@ -186,8 +186,11 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'kwargs': kwargs
     }
     request = get_current_request()
-    if request and request.user.is_authenticated:
-        data['creator'] = request.user
+    from users.models import User
+
+    user = getattr(request, 'user', None)
+    if isinstance(user, User) and user.is_authenticated:
+        data['creator'] = user
 
     with transaction.atomic():
         try:

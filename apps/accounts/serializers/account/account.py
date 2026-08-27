@@ -24,6 +24,9 @@ logger = get_logger(__name__)
 
 
 class AccountCreateUpdateSerializerMixin(serializers.Serializer):
+    credential_managed_editable_fields = {
+        'name', 'privileged', 'is_active', 'comment', 'labels',
+    }
     template = serializers.PrimaryKeyRelatedField(
         queryset=AccountTemplate.objects, required=False,
         label=_("Template"), write_only=True, allow_null=True
@@ -42,6 +45,14 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     )
     _template = None
     clean_auth_fields: callable
+
+    @staticmethod
+    def validate_source(value):
+        if value == Source.CREDENTIAL_LEASE:
+            raise serializers.ValidationError(
+                _('Temporary credential accounts are managed by credential policies')
+            )
+        return value
 
     class Meta:
         fields = ['template', 'push_now', 'params', 'on_invalid']
@@ -174,6 +185,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         if on_invalid == AccountInvalidPolicy.SKIP:
             return instance, 'skipped'
         elif on_invalid == AccountInvalidPolicy.UPDATE:
+            if instance.is_credential_managed:
+                raise serializers.ValidationError(
+                    _('Credential policy accounts cannot be modified here')
+                )
             for k, v in vd.items():
                 setattr(instance, k, v)
             instance.save()
@@ -191,12 +206,20 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         return instance
 
     def update(self, instance, validated_data):
+        if instance.is_credential_managed and (
+            instance.source == Source.CREDENTIAL_LEASE
+            or set(validated_data) - self.credential_managed_editable_fields
+        ):
+            raise serializers.ValidationError(
+                _('Credential policy accounts cannot be modified here')
+            )
         # account cannot be modified
         validated_data.pop('username', None)
         validated_data.pop('on_invalid', None)
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
-        validated_data['source_id'] = None
+        if not instance.is_credential_managed:
+            validated_data['source_id'] = None
         instance = super().update(instance, validated_data)
         self.push_account_if_need(instance, push_now, params, 'updated')
         return instance
@@ -288,8 +311,12 @@ class AccountDetailSerializer(AccountSerializer):
 
     class Meta(AccountSerializer.Meta):
         model = Account
-        fields = AccountSerializer.Meta.fields + ['has_secret', 'spec_info']
-        read_only_fields = AccountSerializer.Meta.read_only_fields + ['has_secret']
+        fields = AccountSerializer.Meta.fields + [
+            'has_secret', 'spec_info', 'is_credential_managed',
+        ]
+        read_only_fields = AccountSerializer.Meta.read_only_fields + [
+            'has_secret', 'is_credential_managed',
+        ]
 
 
 class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
@@ -347,6 +374,11 @@ class AssetAccountBulkSerializer(
 
     @staticmethod
     def _handle_update_create(vd, lookup):
+        instance = Account.objects.filter(**lookup).first()
+        if instance and instance.is_credential_managed:
+            raise serializers.ValidationError(
+                _('Credential policy accounts cannot be modified here')
+            )
         instance, value = Account.objects.update_or_create(defaults=vd, **lookup)
         state = 'created' if value else 'updated'
         return instance, True, state

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import SSHKeyStrategy
+from accounts.const import SSHKeyStrategy, Source
 from accounts.models import Account, SecretWithRandomMixin
 from accounts.tasks import execute_account_automation_task
 from assets.models.automations import (
@@ -88,6 +88,10 @@ class ChangeSecretMixin(SecretWithRandomMixin):
         accounts = Account.objects.filter(asset__in=assets)
         account_ids = accounts.filter(
             username__in=usernames, secret_type=self.secret_type
+        ).exclude(
+            source=Source.CREDENTIAL_LEASE,
+        ).filter(
+            credential_policies__isnull=True,
         ).values_list('id', flat=True)
         return [str(_id) for _id in account_ids]
 

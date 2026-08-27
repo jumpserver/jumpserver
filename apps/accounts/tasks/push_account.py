@@ -36,7 +36,7 @@ def _process_accounts(account_ids, automation_model, default_name, automation_ty
 
 
 @shared_task(
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_('Push accounts to assets'),
     activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None),
     description=_(
@@ -58,7 +58,7 @@ def push_accounts_to_assets_task(account_ids, params=None):
 
 
 @shared_task(
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_('Change secret accounts to assets'),
     activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None),
     description=_(

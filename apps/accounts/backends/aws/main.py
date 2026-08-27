@@ -14,3 +14,6 @@ class Vault(GeneralVaultMixin, BaseVault):
             access_key_id=kwargs.get('VAULT_AWS_ACCESS_KEY_ID'),
             secret_key=kwargs.get('VAULT_AWS_ACCESS_SECRET_KEY'),
         )
+
+    def _delete(self, entry, force=False):
+        self.client.delete(name=entry.full_path, force=force)

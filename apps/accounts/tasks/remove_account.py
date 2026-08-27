@@ -21,7 +21,7 @@ __all__ = ['remove_accounts_task']
 
 
 @shared_task(
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_('Remove account'),
     activity_callback=lambda self, gather_account_ids, *args, **kwargs: (gather_account_ids, None),
     description=_(

@@ -22,7 +22,10 @@ def template_sync_related_accounts(template_id, user_id=None):
     org_id = template.org_id
 
     with tmp_to_org(org_id):
-        accounts = Account.objects.filter(source_id=template_id)
+        accounts = Account.objects.filter(
+            source_id=template_id,
+            credential_policies__isnull=True,
+        )
     if not accounts:
         print('\033[35m>>> 没有需要同步的账号, 结束任务')
         print('\033[0m')

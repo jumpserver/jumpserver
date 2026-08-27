@@ -1,9 +1,12 @@
+from contextlib import nullcontext
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
 
 from ops.celery.logger import CeleryTaskLoggerHandler
 from ops.models.job import JMSPermedInventory, check_upload_permission
+from ops.signal_handlers import task_sent_handler
 from perms.const import ActionChoices
 
 
@@ -28,6 +31,7 @@ class CheckUploadPermissionTestCase(SimpleTestCase):
         inventory = JMSPermedInventory.__new__(JMSPermedInventory)
         inventory.assets = [asset]
         inventory.exclude_hosts = {}
+        inventory.exclude_host_details = {}
         inventory.group_by_platform = Mock(return_value={platform: [asset]})
         inventory.set_platform_protocol_setting_to_asset = Mock(return_value=[])
         inventory.select_account = Mock(return_value=Mock())
@@ -90,4 +94,31 @@ class CeleryTaskLoggerHandlerTestCase(SimpleTestCase):
 
         self.assertFalse(
             CeleryTaskLoggerHandler.is_internal_automation_message(record)
+        )
+
+
+class CeleryTaskExecutionCreatorTestCase(SimpleTestCase):
+    @patch('ops.signal_handlers.transaction.atomic', return_value=nullcontext())
+    @patch('ops.signal_handlers.get_current_request')
+    @patch('ops.signal_handlers.CeleryTask')
+    @patch('ops.signal_handlers.CeleryTaskExecution')
+    def test_non_user_auth_principal_is_not_saved_as_creator(
+            self, task_execution_model, celery_task_model,
+            get_current_request, atomic,
+    ):
+        get_current_request.return_value = SimpleNamespace(
+            user=SimpleNamespace(is_authenticated=True),
+        )
+        task_execution = task_execution_model.objects.create.return_value
+
+        task_sent_handler(
+            headers={'id': 'task-id', 'task': 'test.task'},
+            body=([], {}, {}),
+        )
+
+        create_data = task_execution_model.objects.create.call_args.kwargs
+        self.assertNotIn('creator', create_data)
+        task_execution.set_creator_if_need.assert_called_once_with()
+        celery_task_model.objects.filter.assert_called_once_with(
+            name='test.task',
         )

@@ -29,7 +29,7 @@ class GeneralVaultMixin(object):
         secret = entry.get_encrypt_secret()
         self.client.update(name=entry.full_path, secret=secret)
 
-    def _delete(self, entry):
+    def _delete(self, entry, force=False):
         self.client.delete(name=entry.full_path)
 
     def _save_metadata(self, entry, metadata):

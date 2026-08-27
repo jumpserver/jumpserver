@@ -18,7 +18,7 @@ __all__ = [
 
 
 @shared_task(
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_('Gather assets facts'),
     activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id),
     description=_(

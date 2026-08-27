@@ -1,6 +1,26 @@
 - hosts: demo
   gather_facts: no
   tasks:
+    - name: Check whether the Windows account exists
+      ansible.windows.win_shell: |
+        $ErrorActionPreference = 'Stop'
+        $user = Get-LocalUser | Where-Object {
+          $_.Name -eq $env:JMS_ACCOUNT_USERNAME
+        }
+        if ($null -ne $user) { 'true' } else { 'false' }
+      environment:
+        JMS_ACCOUNT_USERNAME: "{{ account.username }}"
+      register: windows_account_lookup
+      changed_when: false
+      when: require_absent | default(false) | bool
+
+    - name: Refuse to overwrite an existing account
+      ansible.builtin.fail:
+        msg: "JMS_CREDENTIAL_ACCOUNT_EXISTS: {{ account.username }}"
+      when:
+        - require_absent | default(false) | bool
+        - windows_account_lookup.stdout | default('false') | trim == 'true'
+
     - name: Push user password
       ansible.windows.win_user:
         fullname: "{{ account.username}}"
@@ -9,7 +29,10 @@
         password_never_expires: yes
         groups: "{{ params.groups }}"
         groups_action: add
-        update_password: always
+        update_password: >-
+          {{ 'on_create'
+             if (require_absent | default(false) | bool)
+             else 'always' }}
       ignore_errors: true
       when: account.secret_type == "password"
       register: change_secret_result

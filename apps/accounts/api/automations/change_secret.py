@@ -219,6 +219,12 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
                 ).first()
                 if not account:
                     continue
+                if account.is_credential_managed:
+                    result['conflicts'].append({
+                        'record': str(record.id),
+                        'account': str(account.id),
+                    })
+                    continue
 
                 if account.secret == record.new_secret:
                     result['already_synced'] += 1

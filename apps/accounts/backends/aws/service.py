@@ -49,8 +49,19 @@ class AmazonSecretsManagerClient(object):
     def update(self, name, secret):
         self.client.update_secret(SecretId=name, SecretString=secret or self.empty_secret)
 
-    def delete(self, name):
-        self.client.delete_secret(SecretId=name)
+    def delete(self, name, force=False):
+        params = {'SecretId': name}
+        if force:
+            params['ForceDeleteWithoutRecovery'] = True
+        try:
+            self.client.delete_secret(**params)
+        except self.client.exceptions.ResourceNotFoundException:
+            return
+        except self.client.exceptions.InvalidRequestException as exc:
+            if not force or 'scheduled for deletion' not in str(exc).lower():
+                raise
+            self.client.restore_secret(SecretId=name)
+            self.client.delete_secret(**params)
 
     def update_metadata(self, name, metadata: dict):
         tags = [{'Key': k, 'Value': v} for k, v in metadata.items()]

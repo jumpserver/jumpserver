@@ -71,6 +71,11 @@ options:
       - This option is effectively ignored when using x.509 certs. It is defaulted to 'on_create' to maintain a \
           a specific module behaviour when the login_database is '$external'.
     type: str
+  require_absent:
+    description:
+      - Fail instead of updating an existing user.
+    type: bool
+    default: false
   create_for_localhost_exception:
     type: path
     description:
@@ -252,7 +257,8 @@ def normalize_roles(roles, role_database):
 
 
 def user_add(
-        module, client, db_name, role_database, user, password, roles
+        module, client, db_name, role_database, user, password, roles,
+        require_absent
 ):
     # pymongo's user_add is a _create_or_update_user so we won't know if it was changed or updated
     # without reproducing a lot of the logic in database.py of pymongo
@@ -269,6 +275,12 @@ def user_add(
             exists = False
         else:
             raise
+
+    if exists and require_absent:
+        module.fail_json(
+            changed=False,
+            msg='JMS_CREDENTIAL_ACCOUNT_EXISTS: %s' % user,
+        )
 
     if exists:
         user_add_db_command = 'updateUser'
@@ -343,6 +355,7 @@ def main():
         ),
         state=dict(default='present', choices=['absent', 'present']),
         update_password=dict(default="always", choices=["always", "on_create"], no_log=False),
+        require_absent=dict(type='bool', default=False),
         create_for_localhost_exception=dict(default=None, type='path'),
     )
     module = AnsibleModule(
@@ -372,6 +385,7 @@ def main():
     roles = module.params['roles'] or []
     state = module.params['state']
     update_password = module.params['update_password']
+    require_absent = module.params['require_absent']
 
     try:
         directConnection = False
@@ -413,7 +427,7 @@ def main():
                 module.exit_json(changed=True, user=user)
             user_add(
                 module, client, db_name, role_database,
-                user, password, roles
+                user, password, roles, require_absent
             )
         except Exception as e:
             module.fail_json(msg='Unable to add or update user: %s' % to_native(e), exception=traceback.format_exc())

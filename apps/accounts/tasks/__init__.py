@@ -1,4 +1,5 @@
 from .automation import *
+from .credential import *
 from .gather_accounts import *
 from .push_account import *
 from .remove_account import *

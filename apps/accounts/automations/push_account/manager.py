@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import (
-    AutomationTypes,
+    AutomationTypes, Source,
 )
 from common.utils import get_logger
 from ..base.manager import BaseChangeSecretPushManager
@@ -76,3 +76,52 @@ class PushAccountManager(BaseChangeSecretPushManager):
 
     def get_report_template(self):
         return "accounts/push_account_report.html"
+
+
+class CredentialProvisionManager(PushAccountManager):
+    """Push an in-memory account and publish it only after verification."""
+
+    def load_accounts_by_asset(self):
+        if self._accounts_by_asset_id is not None:
+            return
+
+        from accounts.models import Account, CredentialIssueRequest
+
+        issue = CredentialIssueRequest.objects.select_related(
+            'policy__asset', 'policy__account_template',
+            'policy__management_account',
+        ).get(id=self.execution.snapshot['issue_request'])
+        policy = issue.policy
+        template = policy.account_template
+        account = Account(
+            id=self.account_ids[0],
+            name=issue.username,
+            username=issue.username,
+            secret=issue.provisional_secret,
+            secret_type=template.secret_type,
+            privileged=False,
+            is_active=True,
+            asset=policy.asset,
+            su_from=template.get_su_from_account(policy.asset),
+            source=Source.CREDENTIAL_LEASE,
+            source_id=str(issue.id),
+            org_id=policy.org_id,
+        )
+        account._credential_transient = True
+        asset_id = str(policy.asset_id)
+        management_asset_id = str(policy.management_account.asset_id)
+        self._accounts_by_asset_id = {
+            asset_id: [account],
+            management_asset_id: [account],
+        }
+        self._target_account_ids_by_asset_id = {
+            asset_id: {str(account.id)},
+        }
+
+    def create_record(self, asset, account):
+        return PushSecretRecord.objects.create(
+            asset=asset,
+            account=None,
+            execution=self.execution,
+            comment=f'{account.username}@{asset.address}',
+        )

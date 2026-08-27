@@ -2,10 +2,13 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
+from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AutomationTypes
-from accounts.models import Account, GatheredAccount, AccountRisk
+from accounts.const import AutomationTypes, Source
+from accounts.models import (
+    Account, AccountRisk, CredentialLease, GatheredAccount,
+)
 from common.const import ConfirmOrIgnore
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
@@ -63,6 +66,21 @@ class RemoveAccountManager(AccountBasePlaybookManager):
             h["account"] = {"username": username}
             if not username:
                 h["error"] = "Account username is empty"
+                inventory_hosts.append(h)
+                continue
+            managed = asset.all_accounts.filter(username=username).filter(
+                Q(source=Source.CREDENTIAL_LEASE)
+                | Q(credential_policies__isnull=False)
+            ).exists()
+            credential_revoke = CredentialLease.objects.filter(
+                revoke_execution_id=self.execution.id,
+                policy__asset=asset,
+                username=username,
+            ).exists()
+            if managed and not credential_revoke:
+                h["error"] = str(_(
+                    "Credential policy accounts must be managed by their policy"
+                ))
                 inventory_hosts.append(h)
                 continue
             if username.lower() in self.super_accounts:

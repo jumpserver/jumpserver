@@ -27,6 +27,7 @@ class Source(TextChoices):
     LOCAL = 'local', _('Local')
     DISCOVERY = 'collected', _('Discovery')
     TEMPLATE = 'template', _('Template')
+    CREDENTIAL_LEASE = 'credential_lease', _('Credential lease')
 
 
 class AccountInvalidPolicy(TextChoices):

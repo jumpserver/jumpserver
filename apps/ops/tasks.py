@@ -51,7 +51,7 @@ def _run_ops_job_execution(execution):
 
 @shared_task(
     soft_time_limit=60,
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_("Run ansible task"),
     activity_callback=job_task_activity_callback,
     description=_(
@@ -85,7 +85,7 @@ def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
 
 @shared_task(
     soft_time_limit=60,
-    queue="ansible",
+    queue="ansible", priority=5,
     verbose_name=_("Run ansible task execution"),
     activity_callback=job_execution_task_activity_callback,
     description=_(

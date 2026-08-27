@@ -10,6 +10,30 @@
       {{ jms_asset.spec_info.pg_ssl_mode if check_ssl else 'disable' }}
 
   tasks:
+    - name: Check whether the PostgreSQL account exists
+      community.postgresql.postgresql_info:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_db: "{{ jms_asset.spec_info.db_name }}"
+        ca_cert: "{{ ca_cert if check_ssl and ca_cert | length > 0 else omit }}"
+        ssl_cert: "{{ ssl_cert if check_ssl and ssl_cert | length > 0 else omit }}"
+        ssl_key: "{{ ssl_key if check_ssl and ssl_key | length > 0 else omit }}"
+        ssl_mode: "{{ effective_ssl_mode }}"
+        connect_params:
+          connect_timeout: 15
+        filter: roles
+      register: postgresql_account_lookup
+      when: require_absent | default(false) | bool
+
+    - name: Refuse to overwrite an existing account
+      ansible.builtin.fail:
+        msg: "JMS_CREDENTIAL_ACCOUNT_EXISTS: {{ account.username }}"
+      when:
+        - require_absent | default(false) | bool
+        - account.username in (postgresql_account_lookup.roles | default({}))
+
     - name: Change PostgreSQL password
       community.postgresql.postgresql_user:
         login_user: "{{ jms_account.username }}"
@@ -27,6 +51,7 @@
           connect_timeout: 15
           options: "-c statement_timeout=30000 -c lock_timeout=15000"
         role_attr_flags: LOGIN
+        no_password_changes: "{{ require_absent | default(false) | bool }}"
       ignore_errors: true
       register: change_secret_result
 

@@ -15,3 +15,6 @@ class Vault(GeneralVaultMixin, BaseVault):
             client_id=kwargs.get('VAULT_AZURE_CLIENT_ID'),
             client_secret=kwargs.get('VAULT_AZURE_CLIENT_SECRET')
         )
+
+    def _delete(self, entry, force=False):
+        self.client.delete(name=entry.full_path, force=force)

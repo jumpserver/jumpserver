@@ -67,6 +67,11 @@ options:
         login account that has C(ALTER USER).
     type: bool
     default: false
+  require_absent:
+    description:
+      - Fail instead of updating an existing user.
+    type: bool
+    default: false
 
 requirements:
   - "oracledb"
@@ -196,7 +201,8 @@ def user_change_password(module, oracle_client, username, password):
 
 def user_add(
         module, oracle_client, username, password, auth_type,
-        default_tablespace, temporary_tablespace, update_password
+        default_tablespace, temporary_tablespace, update_password,
+        require_absent
 ):
     valid, msg = validate_identifier(username)
     if not valid:
@@ -217,6 +223,11 @@ def user_add(
     user, err = user_find(oracle_client, username)
     if err:
         module.fail_json(msg=f"Failed to check user existence: {err}")
+    if user and require_absent:
+        module.fail_json(
+            changed=False,
+            msg=f"JMS_CREDENTIAL_ACCOUNT_EXISTS: {username}",
+        )
 
     desired_attrs = {
         'auth_type': auth_type.lower(),
@@ -321,6 +332,7 @@ def main():
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),
         password_only=dict(type='bool', default=False),
+        require_absent=dict(type='bool', default=False),
         state=dict(type='str', default='present', choices=['absent', 'present']),
         update_password=dict(default="always", choices=["always", "on_create"], no_log=False),
         temporary_tablespace=dict(type='str', default=None),
@@ -335,6 +347,7 @@ def main():
     user = module.params['name']
     password = module.params['password']
     password_only = module.params['password_only']
+    require_absent = module.params['require_absent']
     state = module.params['state']
     update_password = module.params['update_password']
     temporary_tablespace = module.params['temporary_tablespace']
@@ -357,7 +370,8 @@ def main():
         user_add(
             module, oracle_client, username=user, password=password,
             auth_type=authentication_type, default_tablespace=default_tablespace,
-            temporary_tablespace=temporary_tablespace, update_password=update_password
+            temporary_tablespace=temporary_tablespace,
+            update_password=update_password, require_absent=require_absent
         )
     elif state == 'absent':
         user_remove(module, oracle_client, user)

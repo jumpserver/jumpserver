@@ -56,8 +56,21 @@ class AZUREVaultClient(object):
             secret = ''
         self.client.set_secret(name, secret)
 
-    def delete(self, name):
-        self.client.begin_delete_secret(name)
+    def delete(self, name, force=False):
+        from azure.core.exceptions import ResourceNotFoundError
+
+        try:
+            poller = self.client.begin_delete_secret(name)
+            if force:
+                poller.wait()
+        except ResourceNotFoundError:
+            if not force:
+                return
+        if force:
+            try:
+                self.client.purge_deleted_secret(name)
+            except ResourceNotFoundError:
+                return
 
     def update_metadata(self, name, metadata: dict):
         try:

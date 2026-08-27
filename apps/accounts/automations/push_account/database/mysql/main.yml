@@ -40,8 +40,17 @@
         query: SELECT COUNT(*) AS account_count FROM mysql.user WHERE User = %s
         positional_args:
           - "{{ account.username }}"
-      when: all_account_hosts | bool
+      when: >-
+        (all_account_hosts | bool)
+        or (require_absent | default(false) | bool)
       register: mysql_account_lookup
+
+    - name: Refuse to overwrite an existing account
+      ansible.builtin.fail:
+        msg: "JMS_CREDENTIAL_ACCOUNT_EXISTS: {{ account.username }}"
+      when:
+        - require_absent | default(false) | bool
+        - mysql_account_lookup.query_result[0][0].account_count | int > 0
 
     - name: Change MySQL password
       community.mysql.mysql_user:
@@ -66,6 +75,10 @@
         password: "{{ account.secret if ('MariaDB' in db_info.version.full or (db_info.version.full is version('8.0', '<'))) else omit }}"
         priv: "{{ omit if db_name == '' else db_name + '.*:ALL' }}"
         append_privs: "{{ db_name != '' }}"
+        update_password: >-
+          {{ 'on_create'
+             if (require_absent | default(false) | bool)
+             else 'always' }}
       ignore_errors: true
       register: change_secret_result
 

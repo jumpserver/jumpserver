@@ -1,4 +1,5 @@
 # coding:utf-8
+from django.db.transaction import non_atomic_requests
 from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 
@@ -30,8 +31,44 @@ router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, '
 router.register(r'account-check-engines', api.CheckAccountEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
+router.register(r'credential-policies', api.CredentialPolicyViewSet, 'credential-policy')
+router.register(
+    r'credential-policy-versions',
+    api.CredentialPolicyVersionViewSet,
+    'credential-policy-version',
+)
+router.register(
+    r'credential-issue-requests',
+    api.CredentialIssueRequestViewSet,
+    'credential-issue-request',
+)
+router.register(r'credential-leases', api.CredentialLeaseViewSet, 'credential-lease')
 
 urlpatterns = [
+    path(
+        'credential-activities/', api.CredentialActivityAPIView.as_view(),
+        name='credential-activity',
+    ),
+    path(
+        'credential-service/policies/<uuid:policy_id>/credential/',
+        api.CredentialServiceStaticAPI.as_view(),
+        name='credential-service-static',
+    ),
+    path(
+        'credential-service/policies/<uuid:policy_id>/credentials/',
+        non_atomic_requests(api.CredentialServiceIssueAPI.as_view()),
+        name='credential-service-issue',
+    ),
+    path(
+        'credential-service/leases/<uuid:lease_id>/',
+        api.CredentialServiceLeaseAPI.as_view(),
+        name='credential-service-lease',
+    ),
+    path(
+        'credential-service/leases/<uuid:lease_id>/renew/',
+        api.CredentialServiceLeaseRenewAPI.as_view(),
+        name='credential-service-lease-renew',
+    ),
     path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),
     path('accounts/tasks/', api.AccountsTaskCreateAPI.as_view(), name='account-task-create'),
     path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(),

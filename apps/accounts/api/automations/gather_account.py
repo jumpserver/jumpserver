@@ -2,9 +2,11 @@
 #
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from accounts import serializers
@@ -119,6 +121,13 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         is_delete_account = params.get("is_delete_account")
         asset_id = params.get("asset")
         username = params.get("username")
+        accounts = Account.objects.filter(
+            username=username, asset_id=asset_id,
+        )
+        if any(account.is_credential_managed for account in accounts):
+            raise ValidationError(
+                _('Credential policy accounts must be managed by their policy')
+            )
         if is_true(is_delete_remote):
             self._delete_remote(asset_id, username)
         if is_true(is_delete_account):

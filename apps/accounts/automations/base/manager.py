@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice, \
-    ChangeSecretAccountStatus
+    ChangeSecretAccountStatus, Source
 from accounts.models import Account
 from accounts.utils import SecretGenerator, account_secret_task_status
 from assets.automations.base.manager import BasePlaybookManager
@@ -233,6 +233,23 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             id__in=self.account_ids,
             secret_reset=True,
         )
+        credential_policy_id = self.execution.snapshot.get(
+            'credential_policy',
+        )
+        if credential_policy_id:
+            from accounts.models import CredentialPolicy
+            credential_policy_execution = CredentialPolicy.objects.filter(
+                id=credential_policy_id,
+                last_execution_id=self.execution.id,
+            ).exists()
+        else:
+            credential_policy_execution = False
+        if not credential_policy_execution:
+            accounts = accounts.exclude(
+                source=Source.CREDENTIAL_LEASE,
+            ).filter(
+                credential_policies__isnull=True,
+            )
         if self.secret_type:
             accounts = accounts.filter(secret_type=self.secret_type)
         if settings.CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED:
@@ -299,6 +316,9 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             'private_key_path': private_key_path,
             'become': account.get_ansible_become_auth(),
         }
+        h['require_absent'] = bool(
+            self.execution.snapshot.get('require_absent', False)
+        )
         if asset.platform.type == 'oracle':
             use_sysdba = (
                 account.privileged and

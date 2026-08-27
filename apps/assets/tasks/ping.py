@@ -18,7 +18,7 @@ __all__ = [
 
 @shared_task(
     verbose_name=_('Test assets connectivity'),
-    queue='ansible',
+    queue='ansible', priority=5,
     activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id),
     description=_(
         "When clicking 'Test Asset Connectivity' in 'Asset Details - Basic Settings' this task will be executed"

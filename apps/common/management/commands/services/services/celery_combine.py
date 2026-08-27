@@ -9,3 +9,6 @@ class CeleryCombineService(CeleryDefaultService):
         kwargs['queue'] = 'ansible,celery'
         super().__init__(**kwargs)
 
+    @property
+    def cmd(self):
+        return [*super().cmd, '--prefetch-multiplier', '1']

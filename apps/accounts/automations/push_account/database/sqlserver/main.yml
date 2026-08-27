@@ -21,6 +21,7 @@
           DECLARE @login_name nvarchar(256) = %(username)s;
           DECLARE @password nvarchar(4000) = %(password)s;
           DECLARE @db_name nvarchar(256) = %(db_name)s;
+          DECLARE @require_absent bit = %(require_absent)s;
           DECLARE @sql nvarchar(max);
 
           IF @login_name IS NULL OR LEN(@login_name) = 0 OR LEN(@login_name) > 128
@@ -32,6 +33,16 @@
           IF @db_name IS NULL OR LEN(@db_name) = 0 OR LEN(@db_name) > 128 OR DB_ID(@db_name) IS NULL
           BEGIN
               RAISERROR('Invalid default database', 16, 1);
+              RETURN;
+          END;
+
+          IF @require_absent = 1
+             AND (
+                 EXISTS (SELECT 1 FROM sys.sql_logins WHERE name = @login_name)
+                 OR USER_ID(@login_name) IS NOT NULL
+             )
+          BEGIN
+              RAISERROR('JMS_CREDENTIAL_ACCOUNT_EXISTS', 16, 1);
               RETURN;
           END;
 
@@ -63,7 +74,9 @@
           username: "{{ account.username }}"
           password: "{{ account.secret }}"
           db_name: "{{ target_db }}"
-      ignore_errors: true
+          require_absent: >-
+            {{ 1 if (require_absent | default(false) | bool) else 0 }}
+      ignore_errors: "{{ not (require_absent | default(false) | bool) }}"
       register: change_secret_result
 
     - name: Verify password
