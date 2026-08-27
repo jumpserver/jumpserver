@@ -11,10 +11,11 @@ from common.tree import TreeNodeSerializer
 from common.utils import get_logger
 from orgs.mixins import generics
 from orgs.utils import current_org
-from .mixin import SerializeToTreeNodeMixin
+from .mixin import NodeAssetsAmountListMixin, SerializeToTreeNodeMixin
 from .. import serializers
 from ..const import AllTypes
 from ..models import Node, Platform, Asset
+from ..utils import attach_nodes_realtime_assets_amount
 
 logger = get_logger(__file__)
 __all__ = [
@@ -25,7 +26,7 @@ __all__ = [
 ]
 
 
-class NodeChildrenApi(generics.ListCreateAPIView):
+class NodeChildrenApi(NodeAssetsAmountListMixin, generics.ListCreateAPIView):
     """
     节点的增删改查
     """
@@ -99,7 +100,7 @@ class NodeChildrenApi(generics.ListCreateAPIView):
         return queryset
 
     def get_queryset(self):
-        return self.get_base_queryset().with_realtime_assets_amount()
+        return self.get_base_queryset()
 
 
 class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
@@ -152,11 +153,18 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         include_assets = request.query_params.get('assets', '0') == '1'
         with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
         query_all = request.query_params.get('all', '0') == 'all'
+        compact = request.query_params.get('compact', '0') == '1'
 
         nodes = self.filter_queryset(self.get_base_queryset())
-        if with_asset_amount:
-            nodes = nodes.with_realtime_assets_amount()
         nodes = nodes.order_by('value')
+
+        if compact and query_all and not include_assets and not with_asset_amount:
+            rows = nodes.values_list('id', 'key', 'value', 'parent_key')
+            return Response(data=self.serialize_compact_nodes(rows))
+
+        nodes = nodes.only(
+            'id', 'key', 'value', 'parent_key', 'org_id', 'assets_amount'
+        )
 
         if query_all and not include_assets:
             # The complete response already contains every descendant. Derive
@@ -166,7 +174,10 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             for node in nodes:
                 node.has_children = node.key in parent_keys
         else:
-            nodes = nodes.with_has_children(include_assets=include_assets)
+            nodes = list(nodes.with_has_children(include_assets=include_assets))
+
+        if with_asset_amount:
+            nodes = attach_nodes_realtime_assets_amount(nodes)
 
         nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
@@ -190,23 +201,20 @@ class NodeAssetsAmountApi(generics.CreateAPIView):
         node_ids = serializer.validated_data['node_ids']
         include_descendants = serializer.validated_data['include_descendants']
 
-        rows = (
-            Node.objects.filter(id__in=node_ids)
-            .with_realtime_assets_amount(
-                include_descendants=include_descendants
-            )
-            .values('id', 'key', 'assets_amount_realtime')
+        nodes = attach_nodes_realtime_assets_amount(
+            Node.objects.filter(id__in=node_ids).only('id', 'key', 'org_id'),
+            include_descendants=include_descendants,
         )
-        rows_by_id = {str(row['id']): row for row in rows}
+        nodes_by_id = {str(node.id): node for node in nodes}
         results = []
         for node_id in node_ids:
-            row = rows_by_id.get(str(node_id))
-            if not row:
+            node = nodes_by_id.get(str(node_id))
+            if not node:
                 continue
             results.append({
-                'id': str(row['id']),
-                'key': row['key'],
-                'assets_amount': row['assets_amount_realtime'],
+                'id': str(node.id),
+                'key': node.key,
+                'assets_amount': node.assets_amount_realtime,
             })
         return Response({'results': results})
 
