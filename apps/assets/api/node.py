@@ -23,6 +23,7 @@ from ..tasks import (
     update_node_assets_hardware_info_manual,
     test_node_assets_connectivity_manual,
 )
+from .mixin import NodeAssetsAmountListMixin
 
 logger = get_logger(__file__)
 __all__ = [
@@ -32,18 +33,14 @@ __all__ = [
 ]
 
 
-class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
+class NodeViewSet(
+    NodeAssetsAmountListMixin, SuggestionMixin, OrgBulkModelViewSet
+):
     model = Node
     filterset_fields = ('value', 'key', 'id')
     search_fields = ('full_value',)
     serializer_class = serializers.NodeSerializer
     rbac_perms = {'match': 'assets.view_node'}
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.request.method == 'GET':
-            queryset = queryset.with_realtime_assets_amount()
-        return queryset
 
     def perform_update(self, serializer):
         node = self.get_object()
