@@ -98,6 +98,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         role_mapper = {r.id: r for r in Role.objects.all()}
         user_org_role_mapper = defaultdict(set)
         user_system_role_mapper = defaultdict(set)
+        org_role_queryset_cache = {}
+        system_role_queryset_cache = {}
 
         for binding in role_bindings:
             role_id = binding['role_id']
@@ -107,11 +109,23 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             else:
                 user_org_role_mapper[user_id].add(role_mapper[role_id])
 
+        def set_role_cache(manager, roles, queryset_cache):
+            cache_key = tuple(sorted(str(role.id) for role in roles))
+            if cache_key not in queryset_cache:
+                manager.cache_set(roles)
+                queryset_cache[cache_key] = manager.get_queryset()
+            else:
+                manager._cache = queryset_cache[cache_key]
+
         for u in queryset_list:
-            system_roles = user_system_role_mapper[u.id]
-            org_roles = user_org_role_mapper[u.id]
-            u.org_roles.cache_set(org_roles)
-            u.system_roles.cache_set(system_roles)
+            set_role_cache(
+                u.org_roles, user_org_role_mapper[u.id],
+                org_role_queryset_cache
+            )
+            set_role_cache(
+                u.system_roles, user_system_role_mapper[u.id],
+                system_role_queryset_cache
+            )
         return queryset_list
 
     @staticmethod

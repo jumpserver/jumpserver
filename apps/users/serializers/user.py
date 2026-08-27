@@ -3,13 +3,14 @@
 from functools import partial
 
 from django.conf import settings
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Prefetch
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import ResourceLabelsMixin, CommonBulkModelSerializer
 from common.serializers.fields import (
     EncryptedField,
+    LabelRelatedField,
     ObjectRelatedField,
     LabeledChoiceField,
     PhoneField,
@@ -35,6 +36,18 @@ __all__ = [
 ]
 
 logger = get_logger(__file__)
+
+
+class PrefetchedManyRelatedField(serializers.ManyRelatedField):
+    def __init__(self, *args, prefetch_attr, **kwargs):
+        self.prefetch_attr = prefetch_attr
+        super().__init__(*args, **kwargs)
+
+    def get_attribute(self, instance):
+        try:
+            return getattr(instance, self.prefetch_attr)
+        except AttributeError:
+            return super().get_attribute(instance)
 
 
 def default_system_roles():
@@ -407,6 +420,20 @@ class UserSerializer(
 
 
 class UserRetrieveSerializer(UserSerializer):
+    groups = PrefetchedManyRelatedField(
+        child_relation=ObjectRelatedField(
+            read_only=True, attrs=("id", "name")
+        ),
+        prefetch_attr="_export_groups",
+        read_only=True,
+        label=_("Groups"),
+    )
+    labels = PrefetchedManyRelatedField(
+        child_relation=LabelRelatedField(read_only=True),
+        prefetch_attr="_export_labels",
+        read_only=True,
+        label=_("Tags"),
+    )
     login_confirm_settings = serializers.PrimaryKeyRelatedField(
         read_only=True, source="login_confirm_setting.reviewers", many=True
     )
@@ -427,12 +454,27 @@ class UserRetrieveSerializer(UserSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         from authentication.models import SSHKey
+        from labels.models import LabeledResource
+        from users.models import UserGroup
 
-        queryset = super().setup_eager_loading(queryset)
         active_keys = SSHKey.objects.filter(
             user_id=OuterRef('pk'), is_active=True
         )
-        return queryset.annotate(_has_public_keys=Exists(active_keys))
+        return queryset.prefetch_related(
+            Prefetch(
+                'groups', queryset=UserGroup.objects.all(),
+                to_attr='_export_groups'
+            ),
+            Prefetch(
+                'labels',
+                queryset=LabeledResource.objects.select_related('label'),
+                to_attr='_export_labels'
+            ),
+        ).annotate(_has_public_keys=Exists(active_keys))
+
+    @classmethod
+    def setup_eager_labels(cls, queryset):
+        return queryset
 
 
 class SmsUserSerializer(serializers.ModelSerializer):
