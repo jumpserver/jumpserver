@@ -141,7 +141,7 @@ def save_passwd_change(sender, instance: User, **kwargs):
     finally:
         instance._password_changed = False
 
-    if settings.XPACK_ENABLED and settings.JDMC_ENABLED and raw_password:
+    if settings.XPACK_ENABLED and raw_password:
         sync_jdmc_user_password(instance.username, raw_password)
 
 
