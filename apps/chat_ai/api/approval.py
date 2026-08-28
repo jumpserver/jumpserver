@@ -3,7 +3,7 @@ from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.response import Response
 
 from common.api import JMSGenericViewSet
@@ -11,12 +11,12 @@ from common.permissions import IsValidUser, OnlySuperUser
 from orgs.utils import current_org
 
 from chat_ai.agents.context import RequestAuthContext
-from chat_ai.assistants import get_assistant
+from chat_ai.assistants import get_assistant, is_assistant_available
 from chat_ai.approvals import ApprovalService
 from chat_ai.executor.core_client import CoreAPIExecutor
 from chat_ai.models import Approval
 from chat_ai.openapi import OpenAPILoader
-from chat_ai.permissions import ChatAIOrgPermission, ChatAIServicePermission
+from chat_ai.permissions import CanUseChatAI, ChatAIOrgPermission, ChatAIServicePermission
 from chat_ai.policies import PolicyEngine
 
 from .serializers import ApprovalSerializer, OpenAPIRegistrySerializer
@@ -30,7 +30,9 @@ class CoreExecutionError(APIException):
 
 class ApprovalViewSet(mixins.RetrieveModelMixin, JMSGenericViewSet):
     serializer_class = ApprovalSerializer
-    permission_classes = (ChatAIServicePermission, IsValidUser, ChatAIOrgPermission)
+    permission_classes = (
+        ChatAIServicePermission, IsValidUser, ChatAIOrgPermission, CanUseChatAI,
+    )
     http_method_names = ('get', 'post', 'head', 'options')
 
     def get_queryset(self):
@@ -45,6 +47,11 @@ class ApprovalViewSet(mixins.RetrieveModelMixin, JMSGenericViewSet):
         profile = get_assistant(
             approval_record.conversation.assistant if approval_record.conversation else None
         )
+        if (
+            not profile.core_api_enabled
+            or not is_assistant_available(profile.key, request.user)
+        ):
+            raise PermissionDenied('Assistant is not available for this operation.')
         loader = OpenAPILoader()
         registry = async_to_sync(loader.load)()
         policy = PolicyEngine(

@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.permissions import IsValidUser
 from jumpserver.views.schema import CustomAutoSchema
 
-from chat_ai.permissions import ChatAIOrgPermission, ChatAIServicePermission
+from chat_ai.permissions import CanUseChatAI, ChatAIOrgPermission, ChatAIServicePermission
 from chat_ai.providers import get_transcription_provider
 from chat_ai.providers.speech import (
     SpeechToTextConfigurationError, SpeechToTextError, SpeechToTextInputError,
@@ -188,7 +188,9 @@ def _probe_audio_duration(uploaded_file, suffix):
 
 class TranscriptionView(APIView):
     schema = TranscriptionAutoSchema()
-    permission_classes = (ChatAIServicePermission, IsValidUser, ChatAIOrgPermission)
+    permission_classes = (
+        ChatAIServicePermission, IsValidUser, ChatAIOrgPermission, CanUseChatAI,
+    )
     parser_classes = (MultiPartParser, FormParser)
     throttle_classes = (TranscriptionThrottle,)
 

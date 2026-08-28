@@ -9546,6 +9546,10 @@ msgid "Chat AI conversation"
 msgstr "チャットAIの会話"
 
 #: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Chat AI を使用できます"
+
+#: chat_ai/models.py
 msgid "Chat AI message"
 msgstr "チャットAIのメッセージ"
 

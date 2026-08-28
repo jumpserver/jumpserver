@@ -9,6 +9,10 @@ _view_all_joined_org_perms = (
     ('orgs', 'organization', 'view', 'alljoinedorg'),
 )
 
+chat_ai_user_perms = (
+    ('chat_ai', 'conversation', 'use', 'chatai'),
+)
+
 user_perms = (
     ('rbac', 'menupermission', 'view', 'workbench'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
@@ -24,6 +28,7 @@ user_perms = (
     ("ops", "jobexecution", "*", "*"),
     ("ops", "celerytaskexecution", "view", "*"),
     ("users", "user", "match", "user"),
+    *chat_ai_user_perms,
 )
 
 system_user_perms = (
@@ -62,6 +67,7 @@ app_exclude_perms = [
     ('users', 'user', 'add,delete', 'user'),
     ('orgs', 'org', 'add,delete,change', 'org'),
     ('rbac', '*', '*', '*'),
+    *chat_ai_user_perms,
 ]
 
 need_check = [
