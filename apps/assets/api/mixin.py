@@ -136,7 +136,7 @@ class SerializeToTreeNodeMixin:
                 continue
             # 根节点最多显示 1000 个资产
             if pid.isdigit():
-                if root_assets_count > 1000:
+                if root_assets_count >= 1000:
                     continue
                 root_assets_count += 1
             data.append({
