@@ -282,15 +282,11 @@ class NodeAssetTreeSearchApi(generics.ListAPIView):
         serializer = self.get_serializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        node_id = data.get('node_id')
-        scope_node = None
-        if node_id:
-            scope_node = get_object_or_404(Node, id=node_id)
         result = search_node_asset_tree(
+            include_ancestors=data['include_ancestors'],
             search=data['search'],
             target=data['target'],
             limit=data['limit'],
-            scope_node=scope_node,
         )
         return Response(result)
 
@@ -308,14 +304,10 @@ class NodeTreeMetricsApi(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        scope_node = None
-        if data.get('node_id'):
-            scope_node = get_object_or_404(Node, id=data['node_id'])
         results = get_asset_tree_metrics(
             items=data['items'],
             metric=data['metric'],
             search=data.get('search'),
-            scope_node=scope_node,
             fresh=data['fresh'],
         )
         return Response({

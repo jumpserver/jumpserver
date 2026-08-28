@@ -107,14 +107,21 @@ class NodeAssetsAmountQuerySerializer(serializers.Serializer):
 
 
 class NodeAssetTreeSearchQuerySerializer(serializers.Serializer):
+    ASSET_LIMIT = 100
+
     search = serializers.CharField(max_length=256, trim_whitespace=True)
     target = serializers.ChoiceField(
-        choices=('node', 'asset'), default='asset', required=False
+        choices=('all', 'node', 'asset'), default='asset', required=False
     )
-    node_id = serializers.UUIDField(required=False)
+    include_ancestors = serializers.BooleanField(default=True, required=False)
     limit = serializers.IntegerField(
         min_value=1, max_value=1000, default=1000, required=False
     )
+
+    def validate(self, attrs):
+        if attrs['target'] == 'asset':
+            attrs['limit'] = min(attrs['limit'], self.ASSET_LIMIT)
+        return attrs
 
 
 class NodeTreeAssetsLimitQuerySerializer(serializers.Serializer):
@@ -143,7 +150,6 @@ class NodeTreeMetricsQuerySerializer(serializers.Serializer):
         required=False, allow_blank=True, max_length=256,
         trim_whitespace=True,
     )
-    node_id = serializers.UUIDField(required=False)
     fresh = serializers.BooleanField(default=False, required=False)
 
     def validate(self, attrs):

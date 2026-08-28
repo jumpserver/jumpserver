@@ -7,6 +7,7 @@ from .node import _count_assets_by_target_key, get_nodes_realtime_assets_amount
 
 
 MAX_SEARCH_ASSET_RELATIONS = 5000
+MAX_ASSET_SEARCH_RESULTS = 100
 MAX_SEARCH_TREE_ROWS = 5000
 
 
@@ -52,20 +53,15 @@ def _select_relations_within_tree_budget(
     return accepted_rows, ancestor_keys, truncated
 
 
-def _scope_nodes(queryset, scope_node):
-    if not scope_node:
-        return queryset
-    return queryset.filter(
-        Q(key=scope_node.key) |
-        Q(key__startswith=f'{scope_node.key}:')
-    )
-
-
 def _serialize_search_node(
         node, response_parent_keys, asset_parent_keys=(), matched=False
 ):
     has_children = bool(
         getattr(node, 'has_children', False) or
+        node.key in response_parent_keys or
+        node.key in asset_parent_keys
+    )
+    open_node = bool(
         node.key in response_parent_keys or
         node.key in asset_parent_keys
     )
@@ -80,7 +76,7 @@ def _serialize_search_node(
         'pId': node.parent_key,
         'isParent': has_children,
         'hasChildren': has_children,
-        'open': True,
+        'open': open_node,
         'meta': {
             'type': 'node',
             'data': {
@@ -96,11 +92,13 @@ def _serialize_search_node(
     }
 
 
-def _serialize_search_asset(asset, node=None):
+def _serialize_search_asset(asset, node=None, detached=False):
     resource_id = str(asset.id)
-    orphan = node is None
-    if orphan:
-        tree_key = f'asset:{resource_id}@orphan'
+    is_root_result = node is None
+    orphan = is_root_result and not detached
+    if is_root_result:
+        suffix = 'search' if detached else 'orphan'
+        tree_key = f'asset:{resource_id}@{suffix}'
         parent_key = ''
         node_id = None
         node_key = None
@@ -134,58 +132,70 @@ def _serialize_search_asset(asset, node=None):
                 'node_id': node_id,
                 'node_key': node_key,
                 'orphan': orphan,
+                'search_root': detached,
                 'matched': True,
             },
         },
     }
 
 
-def search_node_asset_tree(search, target, limit, scope_node=None):
-    """Search a node/asset tree without loading the complete asset set."""
-    if target == 'node':
-        matches = Node.objects.filter(value__icontains=search)
-        matches = _scope_nodes(matches, scope_node)
-        matched_nodes = list(matches.order_by('key')[:limit + 1])
-        matches_truncated = len(matched_nodes) > limit
-        matched_count = len(matched_nodes)
-        matched_nodes = matched_nodes[:limit]
-        matched_nodes, ancestor_keys, tree_budget_truncated = (
-            _select_nodes_within_tree_budget(matched_nodes)
-        )
+def _with_target_metadata(result, target):
+    """Expose generic and per-resource metadata from the same result."""
+    return {
+        **result,
+        f'matched_{target}_count': result['matched_count'],
+        f'returned_{target}_count': result['returned_count'],
+        f'{target}_truncated': result['truncated'],
+        f'{target}_limit': result['limit'],
+    }
 
-        nodes = list(
-            Node.objects.filter(key__in=ancestor_keys)
-            .only('id', 'key', 'value', 'parent_key', 'org_id')
-            .order_by('key')
-        )
-        response_parent_keys = {
-            node.parent_key for node in nodes if node.parent_key
-        }
-        matched_node_ids = {node.id for node in matched_nodes}
-        tree = [
-            _serialize_search_node(
-                node, response_parent_keys,
-                matched=node.id in matched_node_ids,
-            )
-            for node in nodes
-        ]
-        return {
-            'tree': tree,
-            'matched_count': matched_count,
-            'returned_count': len(matched_nodes),
-            'truncated': matches_truncated or tree_budget_truncated,
-            'has_more': matches_truncated or tree_budget_truncated,
-            'limit': limit,
-        }
 
+def _search_nodes(
+        search, limit, max_tree_rows=MAX_SEARCH_TREE_ROWS):
+    matches = Node.objects.filter(value__icontains=search)
+    matched_nodes = list(matches.order_by('key')[:limit + 1])
+    matches_truncated = len(matched_nodes) > limit
+    matched_count = len(matched_nodes)
+    matched_nodes = matched_nodes[:limit]
+    matched_nodes, ancestor_keys, tree_budget_truncated = (
+        _select_nodes_within_tree_budget(
+            matched_nodes, max_tree_rows=max_tree_rows,
+        )
+    )
+
+    nodes = list(
+        Node.objects.filter(key__in=ancestor_keys).with_has_children()
+        .only('id', 'key', 'value', 'parent_key', 'org_id')
+        .order_by('key')
+    )
+    response_parent_keys = {
+        node.parent_key for node in nodes if node.parent_key
+    }
+    matched_node_ids = {node.id for node in matched_nodes}
+    tree = [
+        _serialize_search_node(
+            node, response_parent_keys,
+            matched=node.id in matched_node_ids,
+        )
+        for node in nodes
+    ]
+    truncated = matches_truncated or tree_budget_truncated
+    return _with_target_metadata({
+        'tree': tree,
+        'matched_count': matched_count,
+        'returned_count': len(matched_nodes),
+        'truncated': truncated,
+        'has_more': truncated,
+        'limit': limit,
+    }, 'node')
+
+
+def _search_assets(
+        search, limit, max_tree_rows=MAX_SEARCH_TREE_ROWS,
+        include_ancestors=True):
     matches = Asset.objects.filter(
         Q(name__icontains=search) | Q(address__icontains=search)
     )
-    if scope_node:
-        matches = matches.filter(
-            Q(nodes__key=scope_node.key) |
-            Q(nodes__key__startswith=f'{scope_node.key}:')
-        )
     matches = matches.distinct()
     assets = list(
         matches.select_related('platform')
@@ -198,16 +208,29 @@ def search_node_asset_tree(search, target, limit, scope_node=None):
     matches_truncated = len(assets) > limit
     matched_count = len(assets)
     assets = assets[:limit]
+
+    if not include_ancestors:
+        tree = [
+            _serialize_search_asset(asset, detached=True)
+            for asset in assets
+        ]
+        return _with_target_metadata({
+            'tree': tree,
+            'matched_count': matched_count,
+            'returned_count': len(tree),
+            'truncated': matches_truncated,
+            'has_more': matches_truncated,
+            'limit': limit,
+        }, 'asset')
+
     assets_by_id = {asset.id: asset for asset in assets}
 
-    orphan_asset_ids = set()
-    if not scope_node:
-        related_asset_ids = set(
-            Asset.nodes.through.objects.filter(
-                asset_id__in=assets_by_id.keys()
-            ).values_list('asset_id', flat=True).distinct()
-        )
-        orphan_asset_ids = set(assets_by_id) - related_asset_ids
+    related_asset_ids = set(
+        Asset.nodes.through.objects.filter(
+            asset_id__in=assets_by_id.keys()
+        ).values_list('asset_id', flat=True).distinct()
+    )
+    orphan_asset_ids = set(assets_by_id) - related_asset_ids
     orphan_assets = [
         asset for asset in assets if asset.id in orphan_asset_ids
     ]
@@ -215,11 +238,6 @@ def search_node_asset_tree(search, target, limit, scope_node=None):
     relations = Asset.nodes.through.objects.filter(
         asset_id__in=assets_by_id.keys()
     )
-    if scope_node:
-        relations = relations.filter(
-            Q(node__key=scope_node.key) |
-            Q(node__key__startswith=f'{scope_node.key}:')
-        )
     relation_rows = list(
         relations.order_by('node__key', 'asset_id')
         .values_list('asset_id', 'node_id', 'node__key')
@@ -230,7 +248,7 @@ def search_node_asset_tree(search, target, limit, scope_node=None):
     relation_rows, ancestor_keys, tree_budget_truncated = (
         _select_relations_within_tree_budget(
             relation_rows,
-            max_tree_rows=MAX_SEARCH_TREE_ROWS - len(orphan_assets),
+            max_tree_rows=max(0, max_tree_rows - len(orphan_assets)),
         )
     )
 
@@ -241,7 +259,7 @@ def search_node_asset_tree(search, target, limit, scope_node=None):
         node_ids.add(node_id)
 
     nodes = list(
-        Node.objects.filter(key__in=ancestor_keys)
+        Node.objects.filter(key__in=ancestor_keys).with_has_children()
         .only('id', 'key', 'value', 'parent_key', 'org_id')
         .order_by('key')
     )
@@ -273,19 +291,105 @@ def search_node_asset_tree(search, target, limit, scope_node=None):
         tree_budget_truncated or
         len(returned_asset_ids) < len(assets)
     )
-    return {
+    return _with_target_metadata({
         'tree': tree,
         'matched_count': matched_count,
         'returned_count': len(returned_asset_ids),
         'truncated': truncated,
         'has_more': truncated,
         'limit': limit,
+    }, 'asset')
+
+
+def _merge_search_tree_rows(*trees):
+    """Merge complete node paths while retaining each match annotation."""
+    rows = []
+    rows_by_identity = {}
+    for tree in trees:
+        for item in tree:
+            resource_type = item.get('meta', {}).get('type', 'node')
+            identity = (resource_type, item.get('id'))
+            existing = rows_by_identity.get(identity)
+            if existing is None:
+                copied = {
+                    **item,
+                    'meta': {
+                        **item.get('meta', {}),
+                        'data': dict(item.get('meta', {}).get('data', {})),
+                    },
+                }
+                rows_by_identity[identity] = copied
+                rows.append(copied)
+                continue
+
+            has_children = bool(
+                existing.get('hasChildren') or item.get('hasChildren') or
+                existing.get('isParent') or item.get('isParent')
+            )
+            existing['hasChildren'] = has_children
+            existing['isParent'] = has_children
+            existing['open'] = bool(existing.get('open') or item.get('open'))
+            existing_data = existing['meta']['data']
+            item_data = item.get('meta', {}).get('data', {})
+            matched = bool(
+                existing_data.get('matched') or item_data.get('matched')
+            )
+            existing_data.update(item_data)
+            existing_data['has_children'] = has_children
+            existing_data['matched'] = matched
+    return rows
+
+
+def search_node_asset_tree(
+        search, target, limit, include_ancestors=True
+):
+    """Search nodes/assets and return only their complete tree paths."""
+    if target == 'node':
+        return _search_nodes(search, limit)
+    if target == 'asset':
+        return _search_assets(
+            search, min(limit, MAX_ASSET_SEARCH_RESULTS),
+            include_ancestors=include_ancestors,
+        )
+    if target != 'all':
+        raise ValueError(f'Unsupported node asset tree search target: {target}')
+
+    # Bound the complete mixed response to the same budget as a single-target
+    # search. Each half still has an independent match limit of at most 1000.
+    node_budget = MAX_SEARCH_TREE_ROWS // 2
+    node_result = _search_nodes(
+        search, limit, max_tree_rows=node_budget,
+    )
+    asset_result = _search_assets(
+        search, limit,
+        max_tree_rows=MAX_SEARCH_TREE_ROWS - node_budget,
+    )
+    truncated = node_result['truncated'] or asset_result['truncated']
+    return {
+        'tree': _merge_search_tree_rows(
+            node_result['tree'], asset_result['tree'],
+        ),
+        'matched_count': (
+            node_result['matched_count'] + asset_result['matched_count']
+        ),
+        'returned_count': (
+            node_result['returned_count'] + asset_result['returned_count']
+        ),
+        'matched_node_count': node_result['matched_node_count'],
+        'returned_node_count': node_result['returned_node_count'],
+        'node_truncated': node_result['node_truncated'],
+        'node_limit': node_result['node_limit'],
+        'matched_asset_count': asset_result['matched_asset_count'],
+        'returned_asset_count': asset_result['returned_asset_count'],
+        'asset_truncated': asset_result['asset_truncated'],
+        'asset_limit': asset_result['asset_limit'],
+        'truncated': truncated,
+        'has_more': truncated,
+        'limit': limit,
     }
 
 
-def get_asset_tree_metrics(
-        items, metric, search=None, scope_node=None, fresh=False
-):
+def get_asset_tree_metrics(items, metric, search=None, fresh=False):
     node_ids = [item['id'] for item in items if item['type'] == 'node']
     asset_ids = [item['id'] for item in items if item['type'] == 'asset']
     nodes = list(
@@ -315,11 +419,6 @@ def get_asset_tree_metrics(
                 Q(asset__name__icontains=search) |
                 Q(asset__address__icontains=search)
             )
-            if scope_node:
-                relations = relations.filter(
-                    Q(node__key=scope_node.key) |
-                    Q(node__key__startswith=f'{scope_node.key}:')
-                )
             target_keys = {node.key for node in org_nodes}
             descendant_filter = Q()
             for root_key in Node.clean_children_keys(target_keys):
@@ -341,11 +440,6 @@ def get_asset_tree_metrics(
             Q(name__icontains=search) |
             Q(address__icontains=search)
         )
-        if scope_node:
-            matched_assets = matched_assets.filter(
-                Q(nodes__key=scope_node.key) |
-                Q(nodes__key__startswith=f'{scope_node.key}:')
-            )
         asset_matches = set(
             matched_assets.distinct()
             .values_list('id', flat=True)
