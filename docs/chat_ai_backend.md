@@ -65,12 +65,12 @@
 
 Conversation 的 `assistant` 支持：
 
-- `general`：通用问答和全局允许的 Core API；保留现有主机创建能力，写操作仍需 Approval。
+- `general`：通用问答和全部非敏感 Core API；绕过 operationId、Tag 和允许路径白名单，所有写操作仍需 Approval。
 - `asset`：仅搜索资产、节点、平台、协议等只读 operationId。
 - `session_audit`：仅搜索会话、命令、登录、操作、服务访问和工单审计 operationId。
 - `ops`：仅搜索作业、任务、组件指标和终端状态 operationId。
 
-助手范围与全局 `CHAT_AI_ALLOWED_OPERATION_IDS` 取交集，不能借角色切换绕过全局白名单。默认白名单已扩展到资产、会话、命令、审计、作业、任务、组件和终端的只读查询；主机创建仍是唯一默认写操作。最终请求继续进入 Core RBAC 和组织权限校验。
+通用助手不受 `CHAT_AI_ALLOWED_OPERATION_IDS`、`CHAT_AI_ALLOWED_TAGS` 和 `CHAT_AI_ALLOWED_PATHS` 限制；其他助手的固定范围仍与这些全局白名单取交集，不能借角色切换扩大权限。所有助手都继续受敏感路径、敏感参数、Method 策略、Core RBAC 和组织权限校验约束。默认允许通用助手执行查询及经 Approval 确认的创建、修改和删除操作。
 
 Core API 调用完成后，结果卡片先在本次执行的内存中累计，在消息结束时一次性持久化到 Assistant Message 的 `result_cards`。卡片包含 `table`、`timeline`、`detail`、`metric`、`sources` 或仅供恢复用户可见过程的 `progress` 类型。SSE 的 `api_call_result` 同时返回 `presentation`，刷新对话后仍可从消息历史恢复过程与结构化结果；卡片构建或持久化异常不会改变回答和 Run 的最终状态。
 
@@ -216,10 +216,10 @@ nonce
 ## Approval 和安全策略
 
 - GET 默认允许且无需确认。
-- POST、PUT、PATCH 默认需要确认。
-- DELETE 永久禁用。
-- Method 的 enabled、approval 和 risk_level 可通过 `CHAT_AI_METHOD_POLICIES` 收窄；建议始终保持 DELETE 禁用。
-- 默认屏蔽 Chat AI 自身、Settings、Password、Secret、Private Key、Access Key、Token、Credential 和账号备份相关路径。
+- POST、PUT、PATCH、DELETE 默认需要确认。
+- DELETE 默认启用并要求确认，可通过 `CHAT_AI_METHOD_POLICIES` 关闭。
+- Method 的 enabled、approval 和 risk_level 可通过 `CHAT_AI_METHOD_POLICIES` 收窄；高风险环境可继续关闭 DELETE。
+- 默认屏蔽 Chat AI 自身、Password、Secret、Private Key、Access Key、Token、Credential 和账号备份相关路径。
 - 还可用 Tag、operationId、Path 白名单及 Path 黑名单收窄范围。
 - 模型只能提交 `operation_id + path_params + query_params + body`，不能提交 URL 或 Method。
 - RequestBuilder 根据 OpenAPI 校验 Path、Query、Required、Enum、Array、Nullable、oneOf/anyOf、additionalProperties 和 JSON Body，并支持 form、spaceDelimited、pipeDelimited、deepObject Query 序列化。
@@ -361,7 +361,7 @@ CHAT_AI_ALLOWED_OPERATION_IDS:
 
 Chat AI 每天 02:00 分批清理超期数据。Conversation 默认保留 180 天，附件 30 天，结果卡片 90 天，Core API 调用审计、已结束 Approval 和已结束 AgentRun 保留 180 天；待执行、执行中和等待审批的数据不会被清理。任一 `*_KEEP_DAYS` 设置为 `0` 可单独关闭该类清理。
 
-默认开放资产、节点、平台、协议、会话、命令、审计、作业、任务、组件和终端的只读诊断 operationId，以及需要审批的主机创建。扩展 Agent 可访问的 Core API 时，仍应在 `CHAT_AI_ALLOWED_OPERATION_IDS` 中逐项加入 operationId，不建议使用路径通配放宽。模型 Base URL、API Key、代理和模型名由统一的 Chat AI 系统设置管理；管理页面调用 `/api/v1/settings/chatai/models/` 动态发现模型，并通过 `/api/v1/settings/chatai/testing/` 验证模型的工具调用能力。
+默认白名单用于资产、会话审计和运维助手的只读诊断范围；通用助手会绕过该白名单，并可执行全部非敏感 Core API。模型 Base URL、API Key、代理和模型名由统一的 Chat AI 系统设置管理；管理页面调用 `/api/v1/settings/chatai/models/` 动态发现模型，并通过 `/api/v1/settings/chatai/testing/` 验证模型的工具调用能力。
 
 ## 主要兼容性风险
 

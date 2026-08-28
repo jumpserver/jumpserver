@@ -9559,6 +9559,50 @@ msgstr "Bí mật khoá truy cập (SK)"
 msgid "Chat AI"
 msgstr "AI trò chuyện"
 
+#: rbac/tree.py
+msgid "Conversations"
+msgstr "Quản lý hội thoại"
+
+#: rbac/tree.py
+msgid "Messages and attachments"
+msgstr "Tin nhắn và tệp đính kèm"
+
+#: rbac/tree.py
+msgid "Runs and approvals"
+msgstr "Lượt chạy và phê duyệt"
+
+#: rbac/tree.py
+msgid "API call audits"
+msgstr "Nhật ký kiểm tra lệnh gọi API"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation"
+msgstr "Cuộc hội thoại Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI message"
+msgstr "Tin nhắn Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI message file"
+msgstr "Tệp tin nhắn Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI message image"
+msgstr "Hình ảnh tin nhắn Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI agent run"
+msgstr "Lượt chạy tác nhân Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI approval"
+msgstr "Phê duyệt Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI API call audit"
+msgstr "Nhật ký kiểm tra lệnh gọi API Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "Cách tạo"

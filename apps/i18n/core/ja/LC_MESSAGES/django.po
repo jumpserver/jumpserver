@@ -9525,6 +9525,50 @@ msgstr "アクセスキーシークレット"
 msgid "Chat AI"
 msgstr "チャットAI"
 
+#: rbac/tree.py
+msgid "Conversations"
+msgstr "会話管理"
+
+#: rbac/tree.py
+msgid "Messages and attachments"
+msgstr "メッセージと添付ファイル"
+
+#: rbac/tree.py
+msgid "Runs and approvals"
+msgstr "実行と承認"
+
+#: rbac/tree.py
+msgid "API call audits"
+msgstr "API呼び出し監査"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation"
+msgstr "チャットAIの会話"
+
+#: chat_ai/models.py
+msgid "Chat AI message"
+msgstr "チャットAIのメッセージ"
+
+#: chat_ai/models.py
+msgid "Chat AI message file"
+msgstr "チャットAIのメッセージファイル"
+
+#: chat_ai/models.py
+msgid "Chat AI message image"
+msgstr "チャットAIのメッセージ画像"
+
+#: chat_ai/models.py
+msgid "Chat AI agent run"
+msgstr "チャットAIエージェントの実行"
+
+#: chat_ai/models.py
+msgid "Chat AI approval"
+msgstr "チャットAIの承認"
+
+#: chat_ai/models.py
+msgid "Chat AI API call audit"
+msgstr "チャットAIのAPI呼び出し監査"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "作成方法"
