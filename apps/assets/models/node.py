@@ -378,7 +378,7 @@ class NodeAllAssetsMappingMixin:
 
             _mapping = cls.generate_node_all_asset_ids_mapping(org_id)
             cache_key = cls._get_cache_key_for_node_all_asset_ids_mapping(org_id)
-            cache.set(cache_key, mapping, timeout=None)
+            cache.set(cache_key, _mapping, timeout=None)
             return _mapping
 
     @classmethod
