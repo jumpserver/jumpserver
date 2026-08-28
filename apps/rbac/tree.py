@@ -146,7 +146,7 @@ special_pid_mapper = {
 }
 
 
-if settings.JDMC_ENABLED:
+if settings.XPACK_ENABLED:
     view_nodes_data.append({'id': 'view_jdmc', 'name': _('JDMC console')})
     special_pid_mapper["rbac.view_jdmc"] = "view_jdmc"
 
