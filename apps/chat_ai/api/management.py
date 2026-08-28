@@ -11,15 +11,17 @@ from orgs.utils import current_org
 
 from chat_ai.assistants import list_assistants
 from chat_ai.models import AgentRun, ApiCallAudit
-from chat_ai.permissions import ChatAIOrgPermission, ChatAIServicePermission
+from chat_ai.permissions import CanUseChatAI, ChatAIOrgPermission, ChatAIServicePermission
 
 
 class AssistantListView(APIView):
-    permission_classes = (ChatAIServicePermission, IsValidUser, ChatAIOrgPermission)
+    permission_classes = (
+        ChatAIServicePermission, IsValidUser, ChatAIOrgPermission, CanUseChatAI,
+    )
 
     @extend_schema(responses={200: dict})
     def get(self, request):
-        return Response({'results': list_assistants()})
+        return Response({'results': list_assistants(request.user)})
 
 
 class ChatAIStatsView(APIView):

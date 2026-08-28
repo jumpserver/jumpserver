@@ -49,6 +49,32 @@ OPS_OPERATIONS = frozenset({
     'terminal_terminals_retrieve',
 })
 
+ASSET_PERMISSIONS = frozenset({
+    'assets.view_asset',
+    'assets.view_node',
+    'assets.view_platform',
+})
+
+SESSION_AUDIT_PERMISSIONS = frozenset({
+    'audits.view_activitylog',
+    'audits.view_operatelog',
+    'audits.view_integrationapplicationlog',
+    'audits.view_userloginlog',
+    'terminal.view_command',
+    'terminal.view_session',
+    'terminal.view_task',
+    'tickets.view_ticket',
+})
+
+OPS_PERMISSIONS = frozenset({
+    'audits.view_joblog',
+    'ops.view_celerytask',
+    'ops.view_celerytaskexecution',
+    'ops.view_job',
+    'ops.view_jobexecution',
+    'terminal.view_terminal',
+})
+
 DIAGNOSTIC_OPERATIONS = ASSET_OPERATIONS | SESSION_AUDIT_OPERATIONS | OPS_OPERATIONS
 
 
@@ -60,6 +86,9 @@ class AssistantProfile:
     instructions: str
     operation_ids: frozenset | None = None
     full_access: bool = False
+    core_api_enabled: bool = True
+    admin_only: bool = False
+    required_permissions: frozenset = frozenset()
     starter_prompts: tuple = ()
 
     def as_dict(self):
@@ -68,7 +97,8 @@ class AssistantProfile:
             'name': self.name,
             'description': self.description,
             'scope': (
-                'full_access' if self.full_access
+                'chat_only' if not self.core_api_enabled
+                else 'full_access' if self.full_access
                 else 'global_allowlist' if self.operation_ids is None
                 else 'fixed'
             ),
@@ -81,13 +111,29 @@ ASSISTANTS = {
     'general': AssistantProfile(
         key='general',
         name='JumpServer assistant',
-        description='General JumpServer questions and all permitted Core operations.',
+        description='General JumpServer questions without access to live Core data.',
         instructions=(
-            'Act as a general JumpServer assistant with full Core operation access. Prefer read-only inspection '
-            'before proposing any change. All write operations require explicit user approval. '
-            'When data is incomplete, state what was checked and what remains unknown.'
+            'Act as a general JumpServer product assistant. Answer greetings, concepts, usage guidance, and other '
+            'general questions directly. You cannot access the current JumpServer environment or call Core APIs. '
+            'When live environment data or an operation is requested, tell the user to select a specialist assistant.'
+        ),
+        core_api_enabled=False,
+        starter_prompts=(
+            'What can JumpServer help me manage?',
+            'Explain how to use JumpServer safely.',
+        ),
+    ),
+    'management': AssistantProfile(
+        key='management',
+        name='Management assistant',
+        description='Manage permitted JumpServer resources and settings.',
+        instructions=(
+            'Act as a JumpServer management assistant with full permitted Core operation access. Prefer read-only '
+            'inspection before proposing any change. All write operations require explicit user approval. When data '
+            'is incomplete, state what was checked and what remains unknown.'
         ),
         full_access=True,
+        admin_only=True,
         starter_prompts=(
             'Summarize the current JumpServer environment.',
             'Check recent operational exceptions that I am allowed to view.',
@@ -102,6 +148,7 @@ ASSISTANTS = {
             'important identifiers, status, address, platform, and node placement in a compact structure.'
         ),
         operation_ids=ASSET_OPERATIONS,
+        required_permissions=ASSET_PERMISSIONS,
         starter_prompts=(
             'List recently updated assets and highlight incomplete platform information.',
             'Compare assets under the selected nodes.',
@@ -116,6 +163,7 @@ ASSISTANTS = {
             'service-access, and operation records. Never infer an event that is absent from the returned data.'
         ),
         operation_ids=SESSION_AUDIT_OPERATIONS,
+        required_permissions=SESSION_AUDIT_PERMISSIONS,
         starter_prompts=(
             'Analyze recent failed logins and show the supporting records.',
             'Build a timeline for the selected session and its commands.',
@@ -130,6 +178,7 @@ ASSISTANTS = {
             'include relevant timestamps and status values, and recommend the smallest safe follow-up check.'
         ),
         operation_ids=OPS_OPERATIONS,
+        required_permissions=OPS_PERMISSIONS,
         starter_prompts=(
             'Find recent failed jobs and summarize their execution status.',
             'Check terminal and component health and highlight anomalies.',
@@ -142,5 +191,23 @@ def get_assistant(key):
     return ASSISTANTS.get(str(key or 'general'), ASSISTANTS['general'])
 
 
-def list_assistants():
-    return [profile.as_dict() for profile in ASSISTANTS.values()]
+def is_assistant_available(key, user):
+    profile = ASSISTANTS.get(str(key or ''))
+    if profile is None:
+        return False
+    if profile.admin_only and not (
+        bool(getattr(user, 'is_superuser', False))
+        or bool(getattr(user, 'is_org_admin', False))
+    ):
+        return False
+    if not profile.required_permissions:
+        return True
+    return any(user.has_perm(permission) for permission in profile.required_permissions)
+
+
+def list_assistants(user):
+    return [
+        profile.as_dict()
+        for profile in ASSISTANTS.values()
+        if is_assistant_available(profile.key, user)
+    ]

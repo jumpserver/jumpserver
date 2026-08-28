@@ -5,7 +5,7 @@ from django.conf import settings
 from PIL import Image, UnidentifiedImageError
 from rest_framework import serializers
 
-from chat_ai.assistants import ASSISTANTS
+from chat_ai.assistants import ASSISTANTS, is_assistant_available
 from chat_ai.executor.sanitizer import sanitize_text, summarize
 from chat_ai.file_extractor import FileExtractionError, extract_file_text
 from chat_ai.models import (
@@ -57,6 +57,11 @@ class ConversationSerializer(serializers.ModelSerializer):
     def validate_assistant(self, value):
         if value not in ASSISTANTS:
             raise serializers.ValidationError('Unknown Chat AI assistant.')
+        request = self.context.get('request')
+        if not request or not is_assistant_available(value, request.user):
+            raise serializers.ValidationError(
+                'You do not have permission to use this Chat AI assistant.'
+            )
         return value
 
     class Meta:

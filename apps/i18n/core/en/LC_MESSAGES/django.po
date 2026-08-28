@@ -9596,6 +9596,10 @@ msgid "Chat AI conversation"
 msgstr "Chat AI conversation"
 
 #: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Can use Chat AI"
+
+#: chat_ai/models.py
 msgid "Chat AI message"
 msgstr "Chat AI message"
 

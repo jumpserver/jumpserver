@@ -27,6 +27,9 @@ class Conversation(JMSOrgBaseModel):
     class Meta:
         db_table = 'chat_ai_conversation'
         ordering = ('-date_updated',)
+        permissions = [
+            ('use_chatai', _('Can use Chat AI')),
+        ]
         indexes = [
             models.Index(fields=('user', 'org_id', '-date_updated')),
             models.Index(fields=('date_updated',), name='chat_ai_con_updated_idx'),

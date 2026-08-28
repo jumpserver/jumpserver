@@ -13,7 +13,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import APIException, ValidationError
+from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -27,10 +27,11 @@ from settings.models import get_chat_ai_config
 
 from chat_ai.agents import AgentRunner
 from chat_ai.agents.context import RequestAuthContext
+from chat_ai.assistants import is_assistant_available
 from chat_ai.models import (
     AgentRun, Approval, Conversation, Message, MessageFile, MessageImage,
 )
-from chat_ai.permissions import ChatAIOrgPermission, ChatAIServicePermission
+from chat_ai.permissions import CanUseChatAI, ChatAIOrgPermission, ChatAIServicePermission
 from chat_ai.tasks import run_chat_ai_agent
 from chat_ai.throttling import (
     BackgroundTaskThrottle, enforce_background_enqueue_limits,
@@ -58,7 +59,9 @@ logger = get_logger(__name__)
 
 class ConversationViewSet(JMSModelViewSet):
     serializer_class = ConversationSerializer
-    permission_classes = (ChatAIServicePermission, IsValidUser, ChatAIOrgPermission)
+    permission_classes = (
+        ChatAIServicePermission, IsValidUser, ChatAIOrgPermission, CanUseChatAI,
+    )
     http_method_names = ('get', 'post', 'patch', 'delete', 'head', 'options')
     search_fields = ('title',)
     ordering_fields = ('date_created', 'date_updated', 'title')
@@ -74,6 +77,10 @@ class ConversationViewSet(JMSModelViewSet):
     def perform_create(self, serializer):
         model = get_chat_ai_config().get('model') or ''
         serializer.save(user=self.request.user, org_id=str(current_org.id), model=model)
+
+    def ensure_assistant_available(self, conversation):
+        if not is_assistant_available(conversation.assistant, self.request.user):
+            raise PermissionDenied('You do not have permission to use this Chat AI assistant.')
 
     def destroy(self, request, *args, **kwargs):
         conversation = self.get_object()
@@ -228,6 +235,7 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def stream_message(self, request, pk=None):
         conversation = self.get_object()
+        self.ensure_assistant_available(conversation)
         serializer = StreamMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         content = serializer.validated_data['content']
@@ -305,6 +313,7 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def regenerate_message(self, request, pk=None, message_id=None):
         conversation = self.get_object()
+        self.ensure_assistant_available(conversation)
         serializer = RegenerateMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         source_message = get_object_or_404(
@@ -359,6 +368,7 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def branch_message(self, request, pk=None, message_id=None):
         source_conversation = self.get_object()
+        self.ensure_assistant_available(source_conversation)
         serializer = BranchMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         content = serializer.validated_data['content']
@@ -431,6 +441,7 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def background_message(self, request, pk=None):
         conversation = self.get_object()
+        self.ensure_assistant_available(conversation)
         serializer = BackgroundMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         content = serializer.validated_data['content']

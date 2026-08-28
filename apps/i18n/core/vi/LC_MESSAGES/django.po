@@ -9580,6 +9580,10 @@ msgid "Chat AI conversation"
 msgstr "Cuộc hội thoại Chat AI"
 
 #: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Có thể sử dụng Chat AI"
+
+#: chat_ai/models.py
 msgid "Chat AI message"
 msgstr "Tin nhắn Chat AI"
 
