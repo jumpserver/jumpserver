@@ -13,7 +13,7 @@ urlpatterns = [
     path('countries/', api.CountryListApi.as_view(), name='resources-cache'),
 ]
 
-if settings.XPACK_ENABLED:
+if settings.XPACK_ENABLED and settings.JDMC_ENABLED:
     from xpack.plugins.jdmc.api import JdmcSSOTokenAPI
 
     urlpatterns.append(
