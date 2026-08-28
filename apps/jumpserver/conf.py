@@ -722,8 +722,8 @@ class Config(dict):
         # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
         'FTP_FILE_MAX_STORE': 0,
 
-        # 存储使用率阈值，百分占比(0-100)，0 表示不限制
-        'STORAGE_USAGE_THRESHOLD': 0,
+        # 存储使用率阈值，百分占比(50-95)
+        'STORAGE_USAGE_THRESHOLD': 80,
 
         # 空间腾退清理目标，可选 session_replay / file_transfer
         'STORAGE_RECLAMATION_TARGETS': ['session_replay', 'file_transfer'],
