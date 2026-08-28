@@ -4,7 +4,7 @@
 import datetime
 import os
 
-from .base import INSTALLED_APPS, TEMPLATES
+from .base import CONFIG, INSTALLED_APPS, TEMPLATES
 from .. import const
 
 current_year = datetime.datetime.now().year
@@ -15,6 +15,7 @@ XPACK_DISABLED = os.environ.get('XPACK_ENABLED') in ['0', 'false', 'False', 'no'
 XPACK_ENABLED = False
 if not XPACK_DISABLED:
     XPACK_ENABLED = os.path.isdir(XPACK_DIR)
+JDMC_ENABLED = XPACK_ENABLED and CONFIG.JDMC_ENABLED
 XPACK_TEMPLATES_DIR = []
 XPACK_CONTEXT_PROCESSOR = []
 XPACK_LICENSE_IS_VALID = False

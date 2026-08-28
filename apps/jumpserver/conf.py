@@ -951,6 +951,7 @@ class Config(dict):
         'VENDOR': 'JumpServer',
 
         # JDMC
+        'JDMC_ENABLED': True,
         'JDMC_SOCK_PATH': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 
