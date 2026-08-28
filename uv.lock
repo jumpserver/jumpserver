@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.14"
 resolution-markers = [
     "platform_python_implementation == 'PyPy' and sys_platform == 'win32'",
@@ -2355,7 +2355,6 @@ dependencies = [
     { name = "pdf2image" },
     { name = "phonenumbers" },
     { name = "pillow" },
-    { name = "polib" },
     { name = "premailer" },
     { name = "psutil" },
     { name = "psycopg2-binary" },
@@ -2398,7 +2397,6 @@ dependencies = [
     { name = "sshtunnel" },
     { name = "telnetlib3" },
     { name = "termcolor" },
-    { name = "tqdm" },
     { name = "treelib" },
     { name = "ua-parser" },
     { name = "unicodecsv" },
@@ -2541,7 +2539,6 @@ requires-dist = [
     { name = "pdf2image", specifier = "==1.17.0" },
     { name = "phonenumbers", specifier = "==8.13.17" },
     { name = "pillow", specifier = "==12.3.0" },
-    { name = "polib", specifier = ">=1.2.0" },
     { name = "premailer", specifier = "==3.10.0" },
     { name = "psutil", specifier = "==5.9.5" },
     { name = "psycopg2-binary", specifier = "==2.9.12" },
@@ -2584,7 +2581,6 @@ requires-dist = [
     { name = "sshtunnel", specifier = "==0.4.0" },
     { name = "telnetlib3", specifier = "==4.0.2" },
     { name = "termcolor", specifier = "==2.3.0" },
-    { name = "tqdm", specifier = "==4.66.4" },
     { name = "treelib", specifier = "==1.6.4" },
     { name = "ua-parser", specifier = ">=0.18.0" },
     { name = "unicodecsv", specifier = "==0.14.1" },
@@ -3274,15 +3270,6 @@ wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/18/f0/a5595c1e8c3ae44b9828cb2f0fa8155e5095ef04d6327b8f61cf44a3df85/pillow-12.3.0-cp315-cp315t-win32.whl", hash = "sha256:1657923d2d45afb66526e5b933e5b3052e6bdea196c90d3abb2424e18c77dae8" },
     { url = "https://mirrors.aliyun.com/pypi/packages/e4/04/62bcd9f844984c5938d3b05264a61d797a29d3e0812341a8204af70bbdee/pillow-12.3.0-cp315-cp315t-win_amd64.whl", hash = "sha256:8cd2f7bdda092d99c9fc2fb7391354f306d01443d22785d0cbfafa2e2c8bb418" },
     { url = "https://mirrors.aliyun.com/pypi/packages/3d/68/1f3066acedf37673694a7141381d8f811ae97f30d34413d236abe7d489f1/pillow-12.3.0-cp315-cp315t-win_arm64.whl", hash = "sha256:06ff022112bc9cbf83b60f8e028d94ad87b60621706487e65f673de61610ab59" },
-]
-
-[[package]]
-name = "polib"
-version = "1.2.0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/10/9a/79b1067d27e38ddf84fe7da6ec516f1743f31f752c6122193e7bce38bdbf/polib-1.2.0.tar.gz", hash = "sha256:f3ef94aefed6e183e342a8a269ae1fc4742ba193186ad76f175938621dbfc26b" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/6b/99/45bb1f9926efe370c6dbe324741c749658e44cb060124f28dad201202274/polib-1.2.0-py2.py3-none-any.whl", hash = "sha256:1c77ee1b81feb31df9bca258cbc58db1bbb32d10214b173882452c73af06d62d" },
 ]
 
 [[package]]
@@ -4406,18 +4393,6 @@ wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/97/cf/fe33cf062834487d34d1559746a4a12521033c22645b6d74d4bca702e018/tornado-6.5.8-cp39-abi3-win32.whl", hash = "sha256:67832909c4779c64942380cb5f044a5c6163d00831472d80e25e115de9917836" },
     { url = "https://mirrors.aliyun.com/pypi/packages/cb/e1/468ad54333e92ccb62627e62cb88e5fc14a2171daa67ed47b1b8542d5b86/tornado-6.5.8-cp39-abi3-win_amd64.whl", hash = "sha256:11881db6b7c168494be2c2d12e65931451bdf7ee718535418ae1d8855dd5a0ee" },
     { url = "https://mirrors.aliyun.com/pypi/packages/ad/3e/cd5e4f06e34cde33b8ef66cf36aa2b5ad46354cc1af7d2136bbe365fee1d/tornado-6.5.8-cp39-abi3-win_arm64.whl", hash = "sha256:68a7468c7e289f8514d7d664101753903217eff1bb6822c6b5994a0b5f5bcb26" },
-]
-
-[[package]]
-name = "tqdm"
-version = "4.66.4"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/5a/c0/b7599d6e13fe0844b0cda01b9aaef9a0e87dbb10b06e4ee255d3fa1c79a2/tqdm-4.66.4.tar.gz", hash = "sha256:e4d936c9de8727928f3be6079590e97d9abfe8d39a590be678eb5919ffc186bb" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/18/eb/fdb7eb9e48b7b02554e1664afd3bd3f117f6b6d6c5881438a0b055554f9b/tqdm-4.66.4-py3-none-any.whl", hash = "sha256:b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644" },
 ]
 
 [[package]]
