@@ -9623,6 +9623,50 @@ msgstr "Segredo da chave de acesso (SK)"
 msgid "Chat AI"
 msgstr "Chat AI"
 
+#: rbac/tree.py
+msgid "Conversations"
+msgstr "Conversas"
+
+#: rbac/tree.py
+msgid "Messages and attachments"
+msgstr "Mensagens e anexos"
+
+#: rbac/tree.py
+msgid "Runs and approvals"
+msgstr "Execuções e aprovações"
+
+#: rbac/tree.py
+msgid "API call audits"
+msgstr "Auditorias de chamadas de API"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation"
+msgstr "Conversa do Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI message"
+msgstr "Mensagem do Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI message file"
+msgstr "Arquivo de mensagem do Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI message image"
+msgstr "Imagem da mensagem do Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI agent run"
+msgstr "Execução do agente do Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI approval"
+msgstr "Aprovação do Chat AI"
+
+#: chat_ai/models.py
+msgid "Chat AI API call audit"
+msgstr "Auditoria de chamadas de API do Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "Método de criação"

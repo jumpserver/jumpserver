@@ -11,6 +11,7 @@ from common.permissions import IsValidUser, OnlySuperUser
 from orgs.utils import current_org
 
 from chat_ai.agents.context import RequestAuthContext
+from chat_ai.assistants import get_assistant
 from chat_ai.approvals import ApprovalService
 from chat_ai.executor.core_client import CoreAPIExecutor
 from chat_ai.models import Approval
@@ -40,10 +41,16 @@ class ApprovalViewSet(mixins.RetrieveModelMixin, JMSGenericViewSet):
     @extend_schema(request=None, responses=ApprovalSerializer)
     @action(methods=('post',), detail=True, url_path='confirm')
     def confirm(self, request, pk=None):
-        self.get_object()
+        approval_record = self.get_object()
+        profile = get_assistant(
+            approval_record.conversation.assistant if approval_record.conversation else None
+        )
         loader = OpenAPILoader()
         registry = async_to_sync(loader.load)()
-        policy = PolicyEngine()
+        policy = PolicyEngine(
+            operation_scope=profile.operation_ids,
+            full_access=profile.full_access,
+        )
         service = ApprovalService(registry, policy)
         approval, _ = service.prepare_confirmation(pk, request.user, current_org.id)
         auth_context = RequestAuthContext.from_request(request, current_org.id)

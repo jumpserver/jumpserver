@@ -9281,6 +9281,50 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "聊天 AI"
 
+#: rbac/tree.py
+msgid "Conversations"
+msgstr "会话管理"
+
+#: rbac/tree.py
+msgid "Messages and attachments"
+msgstr "消息与附件"
+
+#: rbac/tree.py
+msgid "Runs and approvals"
+msgstr "执行与审批"
+
+#: rbac/tree.py
+msgid "API call audits"
+msgstr "API 调用审计"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation"
+msgstr "聊天 AI 会话"
+
+#: chat_ai/models.py
+msgid "Chat AI message"
+msgstr "聊天 AI 消息"
+
+#: chat_ai/models.py
+msgid "Chat AI message file"
+msgstr "聊天 AI 消息文件"
+
+#: chat_ai/models.py
+msgid "Chat AI message image"
+msgstr "聊天 AI 消息图片"
+
+#: chat_ai/models.py
+msgid "Chat AI agent run"
+msgstr "聊天 AI 助手执行"
+
+#: chat_ai/models.py
+msgid "Chat AI approval"
+msgstr "聊天 AI 操作审批"
+
+#: chat_ai/models.py
+msgid "Chat AI API call audit"
+msgstr "聊天 AI API 调用审计"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "创建方式"

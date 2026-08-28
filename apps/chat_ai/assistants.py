@@ -59,6 +59,7 @@ class AssistantProfile:
     description: str
     instructions: str
     operation_ids: frozenset | None = None
+    full_access: bool = False
     starter_prompts: tuple = ()
 
     def as_dict(self):
@@ -66,7 +67,11 @@ class AssistantProfile:
             'key': self.key,
             'name': self.name,
             'description': self.description,
-            'scope': 'global_allowlist' if self.operation_ids is None else 'fixed',
+            'scope': (
+                'full_access' if self.full_access
+                else 'global_allowlist' if self.operation_ids is None
+                else 'fixed'
+            ),
             'capabilities': sorted(self.operation_ids or ()),
             'starter_prompts': list(self.starter_prompts),
         }
@@ -76,11 +81,13 @@ ASSISTANTS = {
     'general': AssistantProfile(
         key='general',
         name='JumpServer assistant',
-        description='General JumpServer questions and permitted operations.',
+        description='General JumpServer questions and all permitted Core operations.',
         instructions=(
-            'Act as a general JumpServer assistant. Prefer read-only inspection before proposing any change. '
+            'Act as a general JumpServer assistant with full Core operation access. Prefer read-only inspection '
+            'before proposing any change. All write operations require explicit user approval. '
             'When data is incomplete, state what was checked and what remains unknown.'
         ),
+        full_access=True,
         starter_prompts=(
             'Summarize the current JumpServer environment.',
             'Check recent operational exceptions that I am allowed to view.',

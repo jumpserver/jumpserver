@@ -535,6 +535,7 @@ class AgentRunner:
             policy = PolicyEngine(
                 operation_scope=self.profile.operation_ids,
                 read_only=self.read_only,
+                full_access=self.profile.full_access,
             )
             search = OperationSearch(registry, policy)
             executor = CoreAPIExecutor(registry, policy)

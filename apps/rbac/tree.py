@@ -39,6 +39,7 @@ app_nodes_data = [
     {'id': 'audits', 'view': 'view_audit'},
     {'id': 'rbac', 'view': 'view_console'},
     {'id': 'settings', 'view': 'view_setting'},
+    {'id': 'chat_ai', 'name': _('Chat AI'), 'view': 'view_setting'},
     {'id': 'tickets', 'view': 'view_other'},
     {'id': 'labels', 'view': 'view_console'},
     {'id': 'authentication', 'view': 'view_other'},
@@ -69,6 +70,10 @@ extra_nodes_data = [
     {'id': "other", "name": _("Other"), "pId": "view_setting"},
     {'id': "job_audit", "name": _("Job audit"), "pId": "view_audit"},
     {'id': "report_node", "name": _("Report"), "pId": "view_audit"},
+    {'id': 'chat_ai_conversation_node', 'name': _('Conversations'), 'pId': 'chat_ai'},
+    {'id': 'chat_ai_message_node', 'name': _('Messages and attachments'), 'pId': 'chat_ai'},
+    {'id': 'chat_ai_execution_node', 'name': _('Runs and approvals'), 'pId': 'chat_ai'},
+    {'id': 'chat_ai_audit_node', 'name': _('API call audits'), 'pId': 'chat_ai'},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -131,6 +136,13 @@ special_pid_mapper = {
     'tickets.view_ticket': 'tickets',
     "audits.joblog": "job_audit",
     'oauth2_provider.accesstoken': 'authentication',
+    'chat_ai.conversation': 'chat_ai_conversation_node',
+    'chat_ai.message': 'chat_ai_message_node',
+    'chat_ai.messagefile': 'chat_ai_message_node',
+    'chat_ai.messageimage': 'chat_ai_message_node',
+    'chat_ai.agentrun': 'chat_ai_execution_node',
+    'chat_ai.approval': 'chat_ai_execution_node',
+    'chat_ai.apicallaudit': 'chat_ai_audit_node',
 }
 
 
