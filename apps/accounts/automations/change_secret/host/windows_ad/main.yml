@@ -17,41 +17,71 @@
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
 
-    - name: Verify password (win_ping)
-      ansible.windows.win_ping:
-      vars:
-        ansible_user: "{{ account.full_username }}"
-        ansible_password: "{{ account.secret }}"
+    - name: Verify password through Active Directory
+      ansible.windows.win_powershell:
+        parameters:
+          UserName: "{{ account.username }}"
+        sensitive_parameters:
+          - name: Password
+            value: "{{ account.secret }}"
+        script: |
+          param(
+              [string]$UserName,
+              [securestring]$Password
+          )
+
+          $ErrorActionPreference = 'Stop'
+          Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+
+          $domain = $env:USERDNSDOMAIN
+          if (-not $domain) {
+              $domain = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
+          }
+
+          $ctx = New-Object System.DirectoryServices.AccountManagement.PrincipalContext(
+              [System.DirectoryServices.AccountManagement.ContextType]::Domain,
+              $domain
+          )
+          try {
+              $principal = [System.DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity(
+                  $ctx,
+                  $UserName
+              )
+              if (-not $principal) {
+                  throw "AD account not found: $UserName in $domain"
+              }
+
+              try {
+                  $samAccountName = $principal.SamAccountName
+              }
+              finally {
+                  $principal.Dispose()
+              }
+
+              $plainPassword = (New-Object System.Net.NetworkCredential('', $Password)).Password
+              try {
+                  $ok = $ctx.ValidateCredentials($samAccountName, $plainPassword)
+              }
+              finally {
+                  $plainPassword = $null
+              }
+
+              if (-not $ok) {
+                  throw "AD credential verification failed for $UserName in $domain"
+              }
+
+              $Ansible.Result = "verified against $($ctx.ConnectedServer)"
+          }
+          finally {
+              $ctx.Dispose()
+          }
       when:
         - account.secret_type == "password"
         - check_conn_after_change or change_secret_result.failed | default(false)
-      register: verify_winping
+      register: verify_ad
+      changed_when: false
       ignore_errors: true
       ignore_unreachable: true
-
-    - name: Verify password (pyfreerdp)
-      rdp_ping:
-        login_host: "{{ jms_asset.origin_address }}"
-        login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'rdp') | map(attribute='port') | first | default(3389, true) }}"
-        login_user: "{{ account.full_username }}"
-        login_password: "{{ account.secret }}"
-        login_secret_type: "{{ account.secret_type }}"
-        gateway_args: "{{ jms_gateway | default({}) }}"
-        connect_timeout: 30
-      when:
-        - account.secret_type == "password"
-        - check_conn_after_change or change_secret_result.failed | default(false)
-        - verify_winping is not defined
-          or (verify_winping.unreachable | default(false))
-          or (verify_winping.failed | default(false))
-      vars:
-        ansible_connection: local
-        ansible_shell_type: sh
-        ansible_python_interpreter: "{{ local_python_interpreter }}"
-      delegate_to: 127.0.0.1
-      connection: local
-      register: verify_rdp
-      ignore_errors: true
 
     - name: Mark Windows AD verification as inconclusive
       ansible.builtin.set_fact:
@@ -62,17 +92,13 @@
           sync_candidate: true
       when:
         - not (change_secret_result.failed | default(false))
-        - verify_winping.failed | default(false)
-          or verify_winping.unreachable | default(false)
-        - verify_rdp.failed | default(false)
-          or verify_rdp.unreachable | default(false)
+        - verify_ad.failed | default(false)
+          or verify_ad.unreachable | default(false)
 
     - name: Fail when Windows AD change and verification both fail
       ansible.builtin.fail:
         msg: "Windows AD password change failed: {{ change_secret_result.msg | default('unknown error') }}"
       when:
         - change_secret_result.failed | default(false)
-        - verify_winping.failed | default(false)
-          or verify_winping.unreachable | default(false)
-        - verify_rdp.failed | default(false)
-          or verify_rdp.unreachable | default(false)
+        - verify_ad.failed | default(false)
+          or verify_ad.unreachable | default(false)
