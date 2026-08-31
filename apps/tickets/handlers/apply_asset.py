@@ -3,6 +3,7 @@ from django.utils.translation import gettext as _
 from common.utils import get_logger
 from orgs.utils import tmp_to_org
 from perms.models import AssetPermission
+from perms.utils.short_expire_notice import sync_short_expire_notice
 from tickets.models import ApplyAssetTicket
 from .base import BaseHandler
 
@@ -57,9 +58,12 @@ class Handler(BaseHandler):
             'name': apply_permission_name,
             'date_start': apply_date_start,
             'date_expired': apply_date_expired,
+            'short_expire_notice_enabled': self.ticket.apply_short_expire_notice_enabled,
+            'short_expire_notice_minutes': self.ticket.apply_short_expire_notice_minutes,
             'comment': str(permission_comment),
             'created_by': permission_created_by,
         }
+        sync_short_expire_notice(None, permission_data)
         with tmp_to_org(self.ticket.org_id):
             asset_permission = AssetPermission.objects.create(**permission_data)
             asset_permission.nodes.set(apply_nodes)

@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -5,6 +7,7 @@ from assets.models import Asset, Node
 from common.serializers.fields import ObjectRelatedField
 from perms.models import AssetPermission
 from perms.serializers.permission import ActionChoicesField
+from perms.utils.short_expire_notice import sync_ticket_short_expire_notice
 from tickets.models import ApplyAssetTicket
 from .common import BaseApplyAssetSerializer
 from .ticket import TicketApplySerializer
@@ -33,7 +36,8 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
         writeable_fields = [
             'id', 'title', 'type', 'flow_id', 'apply_nodes', 'apply_assets',
             'apply_accounts', 'apply_actions', 'apply_date_start',
-            'apply_date_expired', 'comment', 'org_id'
+            'apply_date_expired', 'apply_short_expire_notice_enabled',
+            'apply_short_expire_notice_minutes', 'comment', 'org_id'
         ]
         read_only_fields = TicketApplySerializer.Meta.read_only_fields + ['apply_permission_name', ]
         fields = TicketApplySerializer.Meta.fields_small + \
@@ -65,6 +69,23 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
     def validate(self, attrs):
         attrs['type'] = 'apply_asset'
         attrs = super().validate(attrs)
+        try:
+            sync_ticket_short_expire_notice(
+                self.instance,
+                attrs,
+                default_enabled=False,
+                default_minutes=settings.PERM_EXPIRED_SHORT_NOTICE_MINUTES,
+            )
+        except DjangoValidationError as exc:
+            field_mapping = {
+                'date_expired': 'apply_date_expired',
+                'short_expire_notice_minutes': 'apply_short_expire_notice_minutes',
+            }
+            errors = {
+                field_mapping.get(key, key): value
+                for key, value in exc.message_dict.items()
+            }
+            raise serializers.ValidationError(errors) from exc
         if self.is_final_approval and (
                 not attrs.get('apply_nodes') and not attrs.get('apply_assets')
         ):

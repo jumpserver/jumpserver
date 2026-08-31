@@ -19,10 +19,12 @@ from perms.models import AssetPermission
 from perms.notifications import (
     PermedAssetsWillExpireUserMsg,
     AssetPermsWillExpireForOrgAdminMsg,
+    ShortAssetPermissionWillExpireUserMsg,
 )
 from perms.utils import UserPermTreeExpireUtil
 
 logger = get_logger(__file__)
+SHORT_EXPIRE_NOTICE_BATCH_SIZE = 200
 
 
 @shared_task(
@@ -70,7 +72,7 @@ def check_asset_permission_will_expired():
     asset_perms = AssetPermission.objects.filter(
         is_active=True,
         date_expired__gte=start,
-        date_expired__lte=end
+        date_expired__lte=end,
     ).distinct()
 
     for asset_perm in asset_perms:
@@ -110,3 +112,39 @@ def check_asset_permission_will_expired():
             org_admins = org.admins.all()
             for org_admin in org_admins:
                 AssetPermsWillExpireForOrgAdminMsg(org_admin, perms, org, day_count).publish_async()
+
+
+def _publish_one_short_expire_notice(now):
+    with atomic():
+        asset_perm = AssetPermission.objects.select_for_update(skip_locked=True).filter(
+            is_active=True,
+            short_expire_notice_enabled=True,
+            short_expire_notice_at__isnull=False,
+            short_expire_notice_at__lte=now,
+            short_expire_notice_sent_at__isnull=True,
+            date_expired__gt=now,
+        ).order_by('short_expire_notice_at').first()
+        if asset_perm is None:
+            return False
+
+        for user in asset_perm.get_all_users():
+            ShortAssetPermissionWillExpireUserMsg(user, asset_perm).publish_async()
+
+        asset_perm.short_expire_notice_sent_at = timezone.now()
+        asset_perm.save(update_fields=['short_expire_notice_sent_at'])
+        return True
+
+
+@shared_task(
+    verbose_name=_('Send short asset permission expiration notification'),
+    description=_(
+        'Check due short asset permission notices every minute and enqueue user notifications'
+    )
+)
+@register_as_period_task(interval=60)
+@tmp_to_root_org()
+def check_short_asset_permission_will_expired():
+    now = timezone.now()
+    for _ in range(SHORT_EXPIRE_NOTICE_BATCH_SIZE):
+        if not _publish_one_short_expire_notice(now):
+            break

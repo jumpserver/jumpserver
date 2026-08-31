@@ -1,0 +1,18 @@
+{% load i18n %}
+<p>
+    {% trans 'Dear' %} {{ name }},
+</p>
+
+<p>
+    {% blocktranslate %}Asset permission "{{ permission_name }}" will expire in {{ minutes }} minutes.{% endblocktranslate %}
+</p>
+
+<ul>
+    <li>{% trans 'Organization' %}: {{ org_name }}</li>
+    <li>{% trans 'Expiration time' %}: {{ date_expired|date:'Y-m-d H:i' }}</li>
+</ul>
+
+<br>
+<p>
+    {% trans 'If you have any question, please contact the administrator' %}
+</p>
