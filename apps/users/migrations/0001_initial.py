@@ -27,7 +27,7 @@ def add_default_admin(apps, schema_editor):
     admin = user_model.objects.using(db_alias).create(
         username="admin", name="Administrator",
         email="admin@example.com", role="Admin",
-        password=make_password("ChangeMe"),
+        password=make_password("admin"),
     )
     group_model = apps.get_model("users", "UserGroup")
     default_group = group_model.objects.using(db_alias).get(name="Default")
