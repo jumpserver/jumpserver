@@ -71,7 +71,10 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         if not auth_header or len(auth_header) == 0:
             return None
 
-        method, fields = utils.parse_authorization_header(auth_header)
+        try:
+            method, fields = utils.parse_authorization_header(auth_header)
+        except Exception:
+            raise FAILED from None
 
         # Ignore foreign Authorization headers.
         if method.lower() != 'signature':
@@ -101,26 +104,23 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         if not self.is_ip_allow(key_id, request):
             raise IP_NOT_ALLOW
 
-        # Gather all request headers and translate them as stated in the Django docs:
-        # https://docs.djangoproject.com/en/1.6/ref/request-response/#django.http.HttpRequest.META
-        headers = {}
-        for key in request.META.keys():
-            if key.startswith("HTTP_") or \
-                    key in ("CONTENT_TYPE", "CONTENT_LENGTH"):
-                header = key[5:].lower().replace('_', '-')
-                headers[header] = request.META[key]
+        headers = request.headers
 
         # Verify headers
-        hs = HeaderVerifier(
-            headers,
-            secret,
-            required_headers=self.required_headers,
-            method=request.method.lower(),
-            path=request.get_full_path()
-        )
+        try:
+            hs = HeaderVerifier(
+                headers,
+                secret,
+                required_headers=self.required_headers,
+                method=request.method.lower(),
+                path=request.get_full_path()
+            )
+            verified = hs.verify()
+        except Exception:
+            raise FAILED from None
 
         # All of that just to get to this.
-        if not hs.verify():
+        if not verified:
             raise FAILED
 
         self.after_authenticate_update_date(user)
