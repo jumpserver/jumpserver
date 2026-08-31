@@ -121,14 +121,14 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
         return super().get_permissions()
 
     def retrieve(self, request, *args, **kwargs):
-        response = super().retrieve(request, *args, **kwargs)
-        if 200 <= response.status_code < 300:
-            with translation.override('en'):
-                create_or_update_operate_log(
-                    ActionChoices.view, self.model._meta.verbose_name,
-                    force=True, resource=self.get_object(),
-                )
-        return response
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        with translation.override('en'):
+            create_or_update_operate_log(
+                ActionChoices.view, self.model._meta.verbose_name,
+                force=True, resource=instance,
+            )
+        return Response(serializer.data)
 
     @staticmethod
     def prepare_offline_file(session, local_path):
@@ -308,7 +308,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
     def async_callback(self, *args, **kwargs):
         session_id = kwargs.get('pk')
-        cache_data = self.get_cache_data() or {}
+        cache_data = cache.get(self.async_cache_key) or {}
         response = cache_data.get('resp') or {}
         response_data = response.get('data') or {}
         if (
