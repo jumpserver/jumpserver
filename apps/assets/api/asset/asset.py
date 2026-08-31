@@ -177,6 +177,19 @@ class BaseAssetViewSet(OrgBulkModelViewSet):
             page = Asset.compute_all_accounts_amount(page)
         return page
 
+    def list(self, request, *args, **kwargs):
+        is_import_template = (
+            request.query_params.get('template') == 'import'
+            and request.query_params.get('format') in ('csv', 'xlsx')
+        )
+        if is_import_template:
+            serializer_meta = getattr(self.get_serializer_class(), 'Meta', None)
+            import_template = getattr(serializer_meta, 'import_template', None)
+            example_row = import_template.get_example_row() if import_template else None
+            if example_row is not None:
+                return Response([example_row])
+        return super().list(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         if request.path.find('/api/v1/assets/assets/') > -1:
             error = _('Cannot create asset directly, you should create a host or other')

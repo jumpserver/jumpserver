@@ -36,6 +36,10 @@ class TemplateColumn:
 @dataclass
 class AssetImportTemplate:
     columns: List[TemplateColumn]
+    example_row: Optional[dict] = None
+
+    def get_example_row(self):
+        return dict(self.example_row) if self.example_row else None
 
     def get_column_headers(self):
         return [c.header for c in self.columns]
@@ -231,188 +235,265 @@ def _comment_column(max_length=512):
 # Host template — corresponds to asset_hosts.xlsx
 # ============================================================
 
-host_import_template = AssetImportTemplate(columns=[
-    _id_column(),
-    _name_column(_('Host name')),
-    _address_column(
-        _('IP/Host'),
-        _('IP/Host, max 512 characters, supports IPv4/IPv6 and domain names'),
-    ),
-    _platform_column(
-        _('Platform type (Required)'),
-        _('Platform type, such as Windows, Linux'),
-    ),
-    _nodes_display_column(),
-    _protocols_column(
-        _('Protocols (Required)'),
-        _('Protocols, format sftp/22;ssh/22;telnet/23;rdp/3389;vnc/5900'),
-    ),
-    _accounts_column(),
-    _zone_column(),
-    _labels_column(),
-    _is_active_column(),
-    _comment_column(),
-])
+host_import_template = AssetImportTemplate(
+    columns=[
+        _id_column(),
+        _name_column(_('Host name')),
+        _address_column(
+            _('IP/Host'),
+            _('IP/Host, max 512 characters, supports IPv4/IPv6 and domain names'),
+        ),
+        _platform_column(
+            _('Platform type (Required)'),
+            _('Platform type, such as Windows, Linux'),
+        ),
+        _nodes_display_column(),
+        _protocols_column(
+            _('Protocols (Required)'),
+            _('Protocols, format sftp/22;ssh/22;telnet/23;rdp/3389;vnc/5900'),
+        ),
+        _accounts_column(),
+        _zone_column(),
+        _labels_column(),
+        _is_active_column(),
+        _comment_column(),
+    ],
+    example_row={
+        'name': 'example-host',
+        'address': '192.0.2.10',
+        'platform': 'Linux',
+        'nodes_display': '/Default/example-node',
+        'protocols': 'ssh/22',
+        'accounts': '',
+        'zone': '',
+        'labels': '["environment:test"]',
+        'is_active': True,
+        'comment': '',
+    },
+)
 
 
 # ============================================================
 # Device template — corresponds to asset_devices.xlsx
 # ============================================================
 
-device_import_template = AssetImportTemplate(columns=[
-    _id_column(),
-    _name_column(_('Device name')),
-    _address_column(
-        _('IP/Host'),
-        _('IP/Host, max 512 characters, supports IPv4/IPv6 and domain names'),
-    ),
-    _platform_column(
-        _('Platform type (Required)'),
-        _('Platform type, such as Cisco, H3C, Huawei'),
-    ),
-    _nodes_display_column(),
-    _protocols_column(
-        _('Protocols (Required)'),
-        _('Protocols, format ssh/22;telnet/23'),
-    ),
-    _accounts_column(),
-    _zone_column(),
-    _labels_column(),
-    _is_active_column(),
-    _comment_column(),
-])
+device_import_template = AssetImportTemplate(
+    columns=[
+        _id_column(),
+        _name_column(_('Device name')),
+        _address_column(
+            _('IP/Host'),
+            _('IP/Host, max 512 characters, supports IPv4/IPv6 and domain names'),
+        ),
+        _platform_column(
+            _('Platform type (Required)'),
+            _('Platform type, such as Cisco, H3C, Huawei'),
+        ),
+        _nodes_display_column(),
+        _protocols_column(
+            _('Protocols (Required)'),
+            _('Protocols, format ssh/22;telnet/23'),
+        ),
+        _accounts_column(),
+        _zone_column(),
+        _labels_column(),
+        _is_active_column(),
+        _comment_column(),
+    ],
+    example_row={
+        'name': 'example-device',
+        'address': '192.0.2.20',
+        'platform': 'Cisco',
+        'nodes_display': '/Default/example-node',
+        'protocols': 'ssh/22',
+        'accounts': '',
+        'zone': '',
+        'labels': '["environment:test"]',
+        'is_active': True,
+        'comment': '',
+    },
+)
 
 
 # ============================================================
 # Database template — corresponds to asset_databases.xlsx
 # ============================================================
 
-database_import_template = AssetImportTemplate(columns=[
-    _id_column(),
-    _name_column(_('Database name')),
-    _address_column(
-        _('Address'),
-        _('Database address, max 512 characters, supports IPv4/IPv6 and domain names'),
-    ),
-    TemplateColumn(
-        header=_('Platform/DB type (Required)'),
-        field_name='platform',
-        help_text=_('Platform/Database type, such as MySQL, MariaDB, PostgreSQL'),
-        required=True,
-        render_transform=transforms.platform_to_template,
-        parse_transform=transforms.platform_from_template,
-    ),
-    _nodes_display_column(),
-    TemplateColumn(
-        header=_('Protocol (Required)'),
-        field_name='protocols',
-        help_text=_('Protocol, format mysql/4000, mariadb/3306'),
-        required=True,
-        render_transform=transforms.protocols_to_template,
-        parse_transform=transforms.protocols_from_template,
-    ),
-    TemplateColumn(
-        header=_('Default database (Required)'),
-        field_name='db_name',
-        help_text=_('Default database name'),
-        required=True,
-    ),
-    _accounts_column(),
-    TemplateColumn(
-        header=_('CA cert'),
-        field_name='ca_cert',
-        help_text=_('CA certificate content'),
-        required=False,
-    ),
-    TemplateColumn(
-        header=_('Client cert'),
-        field_name='client_cert',
-        help_text=_('Client certificate content'),
-        required=False,
-    ),
-    TemplateColumn(
-        header=_('Client key'),
-        field_name='client_key',
-        help_text=_('Client key content'),
-        required=False,
-    ),
-    TemplateColumn(
-        header=_('Use SSL'),
-        field_name='use_ssl',
-        help_text=_('Use SSL, fill Yes/No'),
-        required=False,
-    ),
-    TemplateColumn(
-        header=_('PostgreSQL SSL mode'),
-        field_name='pg_ssl_mode',
-        help_text=_('PostgreSQL SSL mode, such as require, verify-ca, verify-full'),
-        required=False,
-    ),
-    TemplateColumn(
-        header=_('Ignore cert verify'),
-        field_name='allow_invalid_cert',
-        help_text=_('Ignore certificate verification, fill Yes/No'),
-        required=False,
-    ),
-    _zone_column(),
-    _labels_column(),
-    _is_active_column(),
-    _comment_column(),
-])
+database_import_template = AssetImportTemplate(
+    columns=[
+        _id_column(),
+        _name_column(_('Database name')),
+        _address_column(
+            _('Address'),
+            _('Database address, max 512 characters, supports IPv4/IPv6 and domain names'),
+        ),
+        TemplateColumn(
+            header=_('Platform/DB type (Required)'),
+            field_name='platform',
+            help_text=_('Platform/Database type, such as MySQL, MariaDB, PostgreSQL'),
+            required=True,
+            render_transform=transforms.platform_to_template,
+            parse_transform=transforms.platform_from_template,
+        ),
+        _nodes_display_column(),
+        TemplateColumn(
+            header=_('Protocol (Required)'),
+            field_name='protocols',
+            help_text=_('Protocol, format mysql/4000, mariadb/3306'),
+            required=True,
+            render_transform=transforms.protocols_to_template,
+            parse_transform=transforms.protocols_from_template,
+        ),
+        TemplateColumn(
+            header=_('Default database (Required)'),
+            field_name='db_name',
+            help_text=_('Default database name'),
+            required=True,
+        ),
+        _accounts_column(),
+        TemplateColumn(
+            header=_('CA cert'),
+            field_name='ca_cert',
+            help_text=_('CA certificate content'),
+            required=False,
+        ),
+        TemplateColumn(
+            header=_('Client cert'),
+            field_name='client_cert',
+            help_text=_('Client certificate content'),
+            required=False,
+        ),
+        TemplateColumn(
+            header=_('Client key'),
+            field_name='client_key',
+            help_text=_('Client key content'),
+            required=False,
+        ),
+        TemplateColumn(
+            header=_('Use SSL'),
+            field_name='use_ssl',
+            help_text=_('Use SSL, fill Yes/No'),
+            required=False,
+        ),
+        TemplateColumn(
+            header=_('PostgreSQL SSL mode'),
+            field_name='pg_ssl_mode',
+            help_text=_('PostgreSQL SSL mode, such as require, verify-ca, verify-full'),
+            required=False,
+        ),
+        TemplateColumn(
+            header=_('Ignore cert verify'),
+            field_name='allow_invalid_cert',
+            help_text=_('Ignore certificate verification, fill Yes/No'),
+            required=False,
+        ),
+        _zone_column(),
+        _labels_column(),
+        _is_active_column(),
+        _comment_column(),
+    ],
+    example_row={
+        'name': 'example-database',
+        'address': '192.0.2.30',
+        'platform': 'MySQL',
+        'nodes_display': '/Default/example-node',
+        'protocols': 'mysql/3306',
+        'db_name': 'example_database',
+        'accounts': '',
+        'ca_cert': '',
+        'client_cert': '',
+        'client_key': '',
+        'use_ssl': False,
+        'pg_ssl_mode': '',
+        'allow_invalid_cert': False,
+        'zone': '',
+        'labels': '["environment:test"]',
+        'is_active': True,
+        'comment': '',
+    },
+)
 
 
 # ============================================================
 # Web template — corresponds to asset_webs.xlsx
 # ============================================================
 
-web_import_template = AssetImportTemplate(columns=[
-    _id_column(),
-    _name_column(_('Web name')),
-    _address_column(
-        _('URL'),
-        _('URL address, such as http://172.18.18.7:9000'),
-    ),
-    _platform_column(
-        _('Platform (Required)'),
-        _('Platform type, such as Website'),
-    ),
-    _protocols_column(
-        _('Protocols'),
-        _('Protocols, format http/9000'),
-        required=False,
-    ),
-    _nodes_display_column(),
-    _accounts_column(),
-    _zone_column(),
-    _is_active_column(),
-    _comment_column(),
-    _labels_column(),
-])
+web_import_template = AssetImportTemplate(
+    columns=[
+        _id_column(),
+        _name_column(_('Web name')),
+        _address_column(
+            _('URL'),
+            _('URL address, such as http://172.18.18.7:9000'),
+        ),
+        _platform_column(
+            _('Platform (Required)'),
+            _('Platform type, such as Website'),
+        ),
+        _protocols_column(
+            _('Protocols'),
+            _('Protocols, format http/9000'),
+            required=False,
+        ),
+        _nodes_display_column(),
+        _accounts_column(),
+        _zone_column(),
+        _is_active_column(),
+        _comment_column(),
+        _labels_column(),
+    ],
+    example_row={
+        'name': 'example-website',
+        'address': 'https://www.example.com',
+        'platform': 'Website',
+        'protocols': 'https/443',
+        'nodes_display': '/Default/example-node',
+        'accounts': '',
+        'zone': '',
+        'is_active': True,
+        'comment': '',
+        'labels': '["environment:test"]',
+    },
+)
 
 
 # ============================================================
 # Cloud template — corresponds to asset_clouds.xlsx
 # ============================================================
 
-cloud_import_template = AssetImportTemplate(columns=[
-    _id_column(),
-    _name_column(_('Cloud service name')),
-    _address_column(
-        _('URL'),
-        _('URL address, such as https://172.18.18.11:6443/'),
-    ),
-    _platform_column(
-        _('Platform (Required)'),
-        _('Platform type, such as Kubernetes, Vmware-vSphere'),
-    ),
-    _nodes_display_column(),
-    _protocols_column(
-        _('Protocols (Required)'),
-        _('Protocols, format k8s/6443;http(s)/80'),
-    ),
-    _accounts_column(),
-    _zone_column(),
-    _labels_column(),
-    _is_active_column(),
-    _comment_column(),
-])
+cloud_import_template = AssetImportTemplate(
+    columns=[
+        _id_column(),
+        _name_column(_('Cloud service name')),
+        _address_column(
+            _('URL'),
+            _('URL address, such as https://172.18.18.11:6443/'),
+        ),
+        _platform_column(
+            _('Platform (Required)'),
+            _('Platform type, such as Kubernetes, Vmware-vSphere'),
+        ),
+        _nodes_display_column(),
+        _protocols_column(
+            _('Protocols (Required)'),
+            _('Protocols, format k8s/6443;http(s)/80'),
+        ),
+        _accounts_column(),
+        _zone_column(),
+        _labels_column(),
+        _is_active_column(),
+        _comment_column(),
+    ],
+    example_row={
+        'name': 'example-kubernetes',
+        'address': 'https://192.0.2.40:6443',
+        'platform': 'Kubernetes',
+        'nodes_display': '/Default/example-node',
+        'protocols': 'k8s/6443',
+        'accounts': '',
+        'zone': '',
+        'labels': '["environment:test"]',
+        'is_active': True,
+        'comment': '',
+    },
+)
