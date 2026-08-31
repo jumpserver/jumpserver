@@ -18,6 +18,9 @@ class TaskNoticeSettingSerializer(serializers.Serializer):
     PERM_EXPIRED_DAILY_NOTICE_DAYS = serializers.IntegerField(
         min_value=1, max_value=365, label=_('Daily notice'),
     )
+    PERM_EXPIRED_SHORT_NOTICE_MINUTES = serializers.IntegerField(
+        min_value=1, label=_('Short notice minutes'),
+    )
 
     notice_field_pairs = (
         ('USER_EXPIRED_FIRST_NOTICE_DAYS', 'USER_EXPIRED_DAILY_NOTICE_DAYS'),

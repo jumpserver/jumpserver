@@ -79,6 +79,18 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     date_expired = models.DateTimeField(
         default=asset_permission_date_expired_default, db_index=True, verbose_name=_('Date expired')
     )
+    short_expire_notice_enabled = models.BooleanField(
+        default=False, verbose_name=_('Short expiration notice enabled')
+    )
+    short_expire_notice_minutes = models.PositiveIntegerField(
+        null=True, blank=True, verbose_name=_('Short expiration notice minutes')
+    )
+    short_expire_notice_at = models.DateTimeField(
+        null=True, blank=True, db_index=True, verbose_name=_('Short expiration notice time')
+    )
+    short_expire_notice_sent_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_('Short expiration notice sent time')
+    )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
 
