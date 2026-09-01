@@ -15,7 +15,7 @@ from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import BitChoicesField, ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import ActionChoices, AssetPermission
-from perms.utils.short_expire_notice import sync_short_expire_notice
+from perms.utils.expire_soon_notice import sync_expire_soon_notice
 from users.models import User, UserGroup
 
 __all__ = ["AssetPermissionSerializer", "ActionChoicesField", "AssetPermissionListSerializer"]
@@ -86,15 +86,15 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
             "accounts", "protocols", "actions",
             "created_by", "date_created", "date_start", "date_expired", "is_active",
             "is_expired", "is_valid", "comment", "from_ticket",
-            "short_expire_notice_enabled", "short_expire_notice_minutes",
-            "short_expire_notice_at", "short_expire_notice_sent_at",
+            "expire_soon_notice_enabled", "expire_soon_notice_minutes",
+            "expire_soon_notice_at", "expire_soon_notice_sent_at",
         ]
         fields_small = fields_mini + fields_generic
         fields_m2m = ["users", "user_groups", "assets", "nodes", "labels"] + amount_fields
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = [
             "created_by", "date_created", "from_ticket",
-            "short_expire_notice_at", "short_expire_notice_sent_at",
+            "expire_soon_notice_at", "expire_soon_notice_sent_at",
         ]
         extra_kwargs = {
             "actions": {"label": _("Action"), },
@@ -212,11 +212,11 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
                 'date_expired', AssetPermission._meta.get_field('date_expired').get_default()
             )
         try:
-            sync_short_expire_notice(
+            sync_expire_soon_notice(
                 self.instance,
                 attrs,
                 default_enabled=False,
-                default_minutes=settings.PERM_EXPIRED_SHORT_NOTICE_MINUTES,
+                default_minutes=settings.PERM_EXPIRED_SOON_NOTICE_MINUTES,
             )
         except DjangoValidationError as exc:
             raise serializers.ValidationError(exc.message_dict) from exc
