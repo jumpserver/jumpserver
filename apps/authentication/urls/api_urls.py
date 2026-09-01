@@ -1,7 +1,6 @@
 # coding:utf-8
 #
 from django.urls import path, include
-from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
 from .. import api
@@ -51,9 +50,8 @@ urlpatterns += [
     path('ukey/', include(('authentication.backends.ukey.api_urls', 'ukey'), namespace='ukey'))
 ]
 
-if settings.AUTH_CUSTOM_SSO:
-    urlpatterns += [
-        path('custom-sso/login/', api.CustomSSOLoginAPIView.as_view(), name='custom-sso-login'),
-    ]
+urlpatterns += [
+    path('custom-sso/login/', api.CustomSSOLoginAPIView.as_view(), name='custom-sso-login'),
+]
 
 urlpatterns += router.urls + passkey_urlpatterns
