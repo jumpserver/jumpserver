@@ -130,26 +130,24 @@ def _claim_one_expire_soon_notice(now):
         claimed_at = timezone.now()
         asset_perm.expire_soon_notice_sent_at = claimed_at
         asset_perm.save(update_fields=['expire_soon_notice_sent_at'])
-        return asset_perm, claimed_at
+        return asset_perm
 
 
 def _publish_one_expire_soon_notice(now):
-    claimed = _claim_one_expire_soon_notice(now)
-    if claimed is None:
+    asset_perm = _claim_one_expire_soon_notice(now)
+    if asset_perm is None:
         return False
 
-    asset_perm, claimed_at = claimed
-    try:
-        for user in asset_perm.get_all_users():
+    for user in asset_perm.get_all_users():
+        try:
             AssetPermissionWillExpireSoonUserMsg(user, asset_perm).publish_async()
-    except Exception:
-        AssetPermission.objects.filter(
-            id=asset_perm.id,
-            expire_soon_notice_sent_at=claimed_at,
-        ).update(expire_soon_notice_sent_at=None)
-        raise
-    else:
-        return True
+        except Exception:
+            logger.exception(
+                'Enqueue asset permission expiration-soon notice failed: '
+                'permission=%s, user=%s',
+                asset_perm.id, user.id,
+            )
+    return True
 
 
 @shared_task(
