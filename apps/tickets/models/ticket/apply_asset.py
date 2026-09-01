@@ -19,11 +19,11 @@ class ApplyAssetTicket(Ticket):
     apply_actions = models.IntegerField(verbose_name=_('Actions'), default=ActionChoices.connect)
     apply_date_start = models.DateTimeField(verbose_name=_('Date start'), null=True)
     apply_date_expired = models.DateTimeField(verbose_name=_('Date expired'), null=True)
-    apply_short_expire_notice_enabled = models.BooleanField(
-        default=False, verbose_name=_('Short expiration notice enabled')
+    apply_expire_soon_notice_enabled = models.BooleanField(
+        default=False, verbose_name=_('Expiration-soon notice enabled')
     )
-    apply_short_expire_notice_minutes = models.PositiveIntegerField(
-        null=True, blank=True, verbose_name=_('Short expiration notice minutes')
+    apply_expire_soon_notice_minutes = models.PositiveIntegerField(
+        null=True, blank=True, verbose_name=_('Expiration-soon notice minutes')
     )
 
     TICKET_TYPE = TicketType.apply_asset

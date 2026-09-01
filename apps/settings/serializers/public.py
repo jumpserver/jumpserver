@@ -89,7 +89,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     ASSET_PERMISSION_DEFAULT_EXPIRED_DAYS = serializers.IntegerField()
     PERM_EXPIRED_FIRST_NOTICE_DAYS = serializers.IntegerField()
     PERM_EXPIRED_DAILY_NOTICE_DAYS = serializers.IntegerField()
-    PERM_EXPIRED_SHORT_NOTICE_MINUTES = serializers.IntegerField()
+    PERM_EXPIRED_SOON_NOTICE_MINUTES = serializers.IntegerField()
     PRIVACY_MODE = serializers.BooleanField()
     CHANGE_SECRET_AFTER_SESSION_END = serializers.BooleanField()
 

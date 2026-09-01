@@ -6,7 +6,7 @@ from common.utils import reverse as js_reverse
 from notifications.notifications import UserMessage
 
 
-class ShortAssetPermissionWillExpireUserMsg(UserMessage):
+class AssetPermissionWillExpireSoonUserMsg(UserMessage):
     def __init__(self, user, permission):
         super().__init__(user)
         self.permission = permission
@@ -16,10 +16,9 @@ class ShortAssetPermissionWillExpireUserMsg(UserMessage):
             'name': self.user.name,
             'permission_name': self.permission.name,
             'org_name': self.permission.org.name,
-            'minutes': self.permission.short_expire_notice_minutes,
             'date_expired': timezone.localtime(self.permission.date_expired),
         }
-        message = render_to_string('perms/_msg_short_asset_permission_expire.html', context)
+        message = render_to_string('perms/_msg_asset_permission_expire_soon.html', context)
         return {
             'subject': _('Asset permission is about to expire'),
             'message': message,

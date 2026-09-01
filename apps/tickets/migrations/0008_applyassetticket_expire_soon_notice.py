@@ -10,14 +10,14 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='applyassetticket',
-            name='apply_short_expire_notice_enabled',
-            field=models.BooleanField(default=False, verbose_name='Short expiration notice enabled'),
+            name='apply_expire_soon_notice_enabled',
+            field=models.BooleanField(default=False, verbose_name='Expiration-soon notice enabled'),
         ),
         migrations.AddField(
             model_name='applyassetticket',
-            name='apply_short_expire_notice_minutes',
+            name='apply_expire_soon_notice_minutes',
             field=models.PositiveIntegerField(
-                blank=True, null=True, verbose_name='Short expiration notice minutes'
+                blank=True, null=True, verbose_name='Expiration-soon notice minutes'
             ),
         ),
     ]
