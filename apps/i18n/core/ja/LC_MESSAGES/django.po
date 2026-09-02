@@ -10046,6 +10046,18 @@ msgstr "管理者のみ"
 msgid "Global MFA"
 msgstr "グローバル有効化MFA認証"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "許可する MFA 方式"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "ユーザーがバインドして使用できる MFA 方式を 1 つ以上選択してください"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "MFA 方式を少なくとも 1 つ選択してください"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "サードパーティのログインユーザーがMFA認証を実行"
@@ -12881,6 +12893,14 @@ msgstr "アバターURL"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA レベル"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "許可する MFA タイプ"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "空の場合はグローバルな MFA 方式を継承します"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

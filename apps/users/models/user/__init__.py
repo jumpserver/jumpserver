@@ -91,6 +91,9 @@ class User(
     mfa_level = models.SmallIntegerField(
         default=0, choices=MFAMixin.MFA_LEVEL_CHOICES, verbose_name=_("MFA")
     )
+    allowed_mfa_types = models.JSONField(
+        default=list, blank=True, verbose_name=_("Allowed MFA types"),
+    )
     otp_secret_key = fields.EncryptCharField(
         max_length=128, blank=True, null=True, verbose_name=_("OTP secret key")
     )

@@ -9788,6 +9788,18 @@ msgstr "僅管理員"
 msgid "Global MFA"
 msgstr "全局啟用 MFA 認證"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "允許的 MFA 方式"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "選擇使用者可以綁定和使用的一種或多種 MFA 方式"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "請至少選擇一種 MFA 方式"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "第三方認證開啟 MFA"
@@ -12564,6 +12576,14 @@ msgstr "頭像路徑"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA 級別"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "允許的 MFA 類型"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "留空則繼承全局 MFA 方式"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

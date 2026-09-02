@@ -8,10 +8,12 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import ResourceLabelsMixin, CommonBulkModelSerializer
+from authentication.const import MFAType
 from common.serializers.fields import (
     EncryptedField,
     ObjectRelatedField,
     LabeledChoiceField,
+    ListMultipleChoiceField,
     PhoneField,
 )
 from common.utils import pretty_string, get_logger, text_hmac_sha256
@@ -164,6 +166,13 @@ class UserSerializer(
         allow_null=True,
         label=_("Phone"),
     )
+    allowed_mfa_types = ListMultipleChoiceField(
+        choices=MFAType.choices,
+        required=False,
+        allow_empty=True,
+        label=_("Allowed MFA types"),
+        help_text=_("Leave empty to inherit the global MFA methods"),
+    )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
         "org_roles": [BuiltinRole.org_user],
@@ -185,7 +194,7 @@ class UserSerializer(
                 fields_mini
                 + fields_write_only
                 + [
-                    "email", "wechat", "phone", "mfa_level",
+                    "email", "wechat", "phone", "mfa_level", "allowed_mfa_types",
                     "source", *fields_xpack,
                     "created_by", "updated_by", "comment",  # 通用字段
                     "ukey_sn",  # UKey SN号

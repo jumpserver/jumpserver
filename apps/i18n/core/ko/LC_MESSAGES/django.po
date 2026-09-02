@@ -9999,6 +9999,18 @@ msgstr "관리자만"
 msgid "Global MFA"
 msgstr "전체적으로 MFA 인증 활성화"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "허용된 MFA 방식"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "사용자가 바인딩하고 사용할 수 있는 MFA 방식을 하나 이상 선택하세요"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "MFA 방식을 하나 이상 선택하세요"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "타사 인증 시 MFA 활성화"
@@ -12813,6 +12825,14 @@ msgstr "프로필 사진 경로"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "허용된 MFA 유형"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "비워 두면 전역 MFA 방식을 상속합니다"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

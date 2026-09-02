@@ -10098,6 +10098,18 @@ msgstr "Administrators only"
 msgid "Global MFA"
 msgstr "Enable MFA globally"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Allowed MFA methods"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Select one or more MFA methods that users can bind and use"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Select at least one MFA method"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "Third-party authentication enables MFA"
@@ -12947,6 +12959,14 @@ msgstr "Avatar Path"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Allowed MFA types"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Leave empty to inherit the global MFA methods"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

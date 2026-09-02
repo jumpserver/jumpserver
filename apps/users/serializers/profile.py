@@ -68,7 +68,7 @@ class UserProfileSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source',
-            'receive_backends', 'has_jdmc',
+            'receive_backends', 'has_jdmc', 'allowed_mfa_types',
         ]
         fields_mini = [
             'id', 'name', 'username', 'email',
