@@ -1,18 +1,22 @@
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
-from assets.serializers.node import TreeMetricItemSerializer
-
-
 __all__ = ['PermissionTreeMetricsQuerySerializer']
 
 
+class PermissionTreeMetricItemSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=(
+        'node', 'asset', 'organization', 'user_group', 'user',
+    ))
+    id = serializers.UUIDField()
+
+
 class PermissionTreeMetricsQuerySerializer(serializers.Serializer):
-    items = TreeMetricItemSerializer(
+    items = PermissionTreeMetricItemSerializer(
         many=True, allow_empty=False, max_length=200
     )
     metric = serializers.ChoiceField(choices=(
-        'permission_direct', 'permission_effective',
+        'permission_direct', 'permission_effective', 'direct', 'effective',
     ))
 
     def validate_items(self, items):
