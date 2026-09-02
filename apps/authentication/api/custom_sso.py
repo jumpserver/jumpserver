@@ -1,3 +1,5 @@
+import sys
+
 from django.utils.module_loading import import_string
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -24,6 +26,7 @@ if settings.AUTH_CUSTOM_SSO:
     ''' 保证自定义 SSO 认证方法在服务运行时不能被更改，只在第一次调用时加载一次 '''
     try:
         custom_auth_method_path = 'data.auth.custom_sso.authenticate'
+        sys.path.insert(0, settings.PROJECT_DIR)
         custom_sso_authenticate_method = import_string(custom_auth_method_path)
     except Exception as e:
         logger.warning('Import custom SSO auth method failed: {}, Maybe not enabled'.format(e))
@@ -50,7 +53,7 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
                 error = f'Missing required query parameter: {param}'
                 return Response({'detail': error}, status=status.HTTP_400_BAD_REQUEST)
             query_params[param] = value
-        
+
         user, error = self.authenticate(**query_params)
         if user:
             login(request, user, backend=settings.AUTH_BACKEND_CUSTOM_SSO)
@@ -69,7 +72,7 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
         except Exception as e:
             error = f'Custom SSO authenticate error: {e}'
             return None, error
-        
+
         try:
             user = self.get_or_create_user_from_userinfo(userinfo)
             return user, ''
@@ -83,7 +86,7 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
         if username == 'admin':
             user = User.objects.filter(username='admin').first()
             return user
-        
+
         name = userinfo.get('name')
         email = userinfo.get('email')
         defaults = {'name': name, 'email': email}
@@ -95,5 +98,5 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
             system_role = SystemRole.objects.filter(name=system_role_name).first()
             sys_role_binding = SystemRoleBinding(user=user, role=system_role)
             sys_role_binding.save()
-        
+
         return user
