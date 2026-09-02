@@ -19,6 +19,7 @@ router.register(r'service-account-registrations', api.ServiceAccountRegistration
 router.register(r'connection-token', auth_api.ConnectionTokenViewSet, 'connection-token')
 
 urlpatterns = [
+    path('users-groups/tree/', api.UserGroupTreeApi.as_view(), name='users-groups-tree'),
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
     path('profile/password/', api.UserPasswordApi.as_view(), name='user-password'),
     path('profile/mfa/reset/', api.UserResetMFAApi.as_view(), name='my-mfa-reset'),
