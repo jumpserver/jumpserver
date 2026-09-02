@@ -819,7 +819,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 ).publish_async()
 
     def create_face_verify(self, response):
-        if not self.request.user.face_vector:
+        if not self.request.user.is_face_code_set:
             raise JMSException(code='no_face_feature', detail=_('No available face feature'))
         connection_token_id = response.data.get('id')
         context_data = {

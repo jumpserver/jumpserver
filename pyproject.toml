@@ -195,6 +195,10 @@ xpack = [
     'volcengine-python-sdk==1.0.71',
     'aliyun-python-sdk-rds==2.7.49',
     "django-vastbase-backend==0.1.1",
+    "numpy>=2.0",
+    "insightface>=1.0.1",
+    "onnxruntime>=1.29.0",
+    "opencv-python>=5.0.0",
 ]
 
 [tool.uv.sources]

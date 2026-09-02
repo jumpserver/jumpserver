@@ -67,6 +67,14 @@ urlpatterns = [
     path('core/', include(app_view_patterns)),
 ]
 
+if settings.XPACK_ENABLED:
+    urlpatterns.append(
+        path(
+            'facelive/',
+            include('xpack.plugins.facelive.urls.view_urls', namespace='facelive'),
+        )
+    )
+
 # 静态文件处理路由
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += [
