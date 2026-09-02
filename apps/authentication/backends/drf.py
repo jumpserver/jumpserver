@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
 
-from accounts.models import IntegrationApplication
+from accounts.models import CredentialClientInstance, IntegrationApplication
 from common.auth import signature
 from common.decorators import merge_delay_run
 from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip, get_request_ip
@@ -182,3 +182,25 @@ class ServiceAuthentication(signature.SignatureAuthentication):
 
     def after_authenticate_update_date(self, user):
         update_service_integration_last_used.delay((user.id,))
+
+
+class CredentialAgentAuthentication(signature.SignatureAuthentication):
+    source = 'jms-pam-agent'
+
+    def get_object(self, key_id):
+        return CredentialClientInstance.objects.filter(
+            id=key_id, type=CredentialClientInstance.Type.agent,
+            is_active=True, application__is_active=True,
+        ).select_related('application').first()
+
+    def fetch_user_data(self, key_id, algorithm=None):
+        obj = self.get_object(key_id)
+        if not obj:
+            return None, None
+        return obj, obj.secret
+
+    def is_ip_allow(self, key_id, request):
+        obj = self.get_object(key_id)
+        if not obj:
+            return False
+        return contains_ip(get_request_ip(request), obj.application.ip_group)

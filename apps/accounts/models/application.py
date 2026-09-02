@@ -11,6 +11,10 @@ from orgs.mixins.models import JMSOrgBaseModel
 
 
 class IntegrationApplication(JMSOrgBaseModel):
+    class AccessMode(models.TextChoices):
+        sdk = 'sdk', _('SDK')
+        agent = 'agent', _('Agent')
+
     is_anonymous = False
 
     name = models.CharField(max_length=128, unique=False, verbose_name=_('Name'))
@@ -22,6 +26,10 @@ class IntegrationApplication(JMSOrgBaseModel):
     ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
     date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last used'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    credential_access_mode = models.CharField(
+        max_length=16, choices=AccessMode.choices, default=AccessMode.sdk,
+        verbose_name=_('Credential access mode')
+    )
 
     class Meta:
         unique_together = [('name', 'org_id')]

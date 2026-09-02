@@ -22,7 +22,8 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + ['logo', 'accounts']
         fields = fields_small + [
             'date_last_used', 'date_created', 'date_updated',
-            'ip_group', 'accounts_amount', 'comment', 'is_active'
+            'ip_group', 'accounts_amount', 'credential_access_mode',
+            'comment', 'is_active'
         ]
         extra_kwargs = {
             'comment': {'label': _('Comment')},
@@ -42,6 +43,17 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         instance = super().create(validated_data)
         instance.refresh_secret()
         return instance
+
+    def validate_credential_access_mode(self, value):
+        if (
+            self.instance
+            and self.instance.credential_access_mode != value
+            and self.instance.credential_bindings.exclude(policy__status='idle').exists()
+        ):
+            raise serializers.ValidationError(
+                _('Credential access mode cannot be changed during rotation.')
+            )
+        return value
 
 
 class IntegrationAccountSecretSerializer(serializers.Serializer):
