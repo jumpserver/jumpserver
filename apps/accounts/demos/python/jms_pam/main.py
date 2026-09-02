@@ -1,148 +1,184 @@
-import uuid
-from datetime import datetime
-from urllib.parse import urlencode
+import base64
+import hashlib
+import hmac
+import os
+import socket
+import threading
+from dataclasses import dataclass
+from email.utils import formatdate
 
 import requests
-from httpsig.requests_auth import HTTPSignatureAuth
-from requests.exceptions import RequestException
+from requests.auth import AuthBase
 
 DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000002'
+CLIENT_PATH = '/api/v1/accounts/credential-client'
+SIGNATURE_HEADERS = ('(request-target)', 'accept', 'date', 'x-jms-org')
 
 
-class RequestParamsError(ValueError):
-    def __init__(self, params):
-        self.params = params
-
-    def __str__(self):
-        msg = "At least one of the following fields must be provided: %s."
-        return 'RequestParamsError: (%s)' % msg % ', '.join(self.params)
-
-
-class SecretRequest(object):
-    """
-    Validate parameters and their interdependencies.
-    Parameters:
-        account_id (str): The account ID, must be a valid UUID.
-        asset_id (str): The asset ID, must be a valid UUID.
-        asset (str): The name of the asset, can be empty.
-        account (str): The name of the account, can be empty.
-
-    Validation Logic:
-    - When 'account_id' is provided, 'asset', 'asset_id', and 'account' must not be provided.
-    - When 'account' is provided, either 'asset' or 'asset_id' must be provided.
-    - It is not allowed to provide both 'account_id' and 'asset_id' together.
-
-    Raises:
-        ValueError: If the parameters do not meet the requirements, a detailed error message will be raised.
-    """
-
-    def __init__(self, asset='', asset_id='', account='', account_id=''):
-        self.account_id = account_id
-        self.asset_id = asset_id
-        self.asset = asset
-        self.account = account
-        self.method = 'get'
-        self._init_check()
-
-    @staticmethod
-    def _valid_uuid(value):
-        if not value:
-            return
-
-        try:
-            uuid.UUID(str(value))
-        except (ValueError, TypeError):
-            raise ValueError('Invalid UUID: %s. Value must be a valid UUID.' % value)
-
-    def _init_check(self):
-        for id_value in [self.account_id, self.asset_id]:
-            self._valid_uuid(id_value)
-
-        if self.account_id:
-            return
-
-        if not self.asset_id and not self.asset:
-            raise RequestParamsError(['asset', 'asset_id'])
-
-        if not self.account:
-            raise RequestParamsError(['account', 'account_id'])
-
-    @staticmethod
-    def get_url():
-        return '/api/v1/accounts/service-integrations/account-secret/'
-
-    def get_query(self):
-        return {k: getattr(self, k) for k in vars(self) if getattr(self, k)}
-
-
-class Secret(object):
-    def __init__(self, secret='', desc=''):
-        self.secret = secret
-        self.desc = desc
-        self.valid = not desc
-
-    @classmethod
-    def from_exception(cls, e):
-        return cls(desc=str(e))
-
-    @classmethod
-    def from_response(cls, response):
-        secret, error = '', ''
-        try:
-            data = response.json()
-            if response.status_code != 200:
-                for k, v in data.items():
-                    error += '%s: %s; ' % (k, v)
-            secret = data.get('secret')
-        except Exception as e:
-            error = str(e)
-        return cls(secret=secret, desc=error)
-
-
-class JumpServerPAM(object):
-    def __init__(self, endpoint, key_id, key_secret, org_id=DEFAULT_ORG_ID):
-        self.endpoint = endpoint
+class HTTPSignatureAuth(AuthBase):
+    def __init__(self, key_id, secret):
         self.key_id = key_id
-        self.key_secret = key_secret
-        self.org_id = org_id
-        self._auth = None
+        self.secret = secret.encode('ascii')
+
+    def __call__(self, request):
+        values = []
+        for header in SIGNATURE_HEADERS:
+            value = (
+                f'{request.method.lower()} {request.path_url}'
+                if header == '(request-target)'
+                else request.headers[header]
+            )
+            values.append(f'{header}: {value}')
+        digest = base64.b64encode(hmac.new(
+            self.secret, '\n'.join(values).encode('ascii'), hashlib.sha256,
+        ).digest()).decode('ascii')
+        request.headers['Authorization'] = (
+            f'Signature keyId="{self.key_id}",algorithm="hmac-sha256",'
+            f'signature="{digest}",headers="{" ".join(SIGNATURE_HEADERS)}"'
+        )
+        return request
+
+
+@dataclass(frozen=True)
+class Credential:
+    key: str
+    revision: int
+    asset: dict
+    account: dict
 
     @property
-    def headers(self):
-        gmt_form = '%a, %d %b %Y %H:%M:%S GMT'
-        return {
-            'Accept': 'application/json',
-            'X-JMS-ORG': self.org_id,
-            'Date': datetime.utcnow().strftime(gmt_form),
-            'X-Source': 'jms-pam'
-        }
+    def account_id(self):
+        return self.account['id']
 
-    def _build_url(self, url, query_params=None):
-        query_params = query_params or {}
-        endpoint = self.endpoint[:-1] if self.endpoint.endswith('/') else self.endpoint
-        return '%s%s?%s' % (endpoint, url, urlencode(query_params))
+    @property
+    def username(self):
+        return self.account['username']
 
-    def _get_auth(self):
-        if self._auth is None:
-            signature_headers = ['(request-target)', 'accept', 'date']
-            self._auth = HTTPSignatureAuth(
-                key_id=self.key_id, secret=self.key_secret,
-                algorithm='hmac-sha256', headers=signature_headers
-            )
-        return self._auth
+    @property
+    def secret(self):
+        return self.account['secret']
 
-    def send(self, secret_request):
+
+class SignedClient:
+    def __init__(
+        self, endpoint, key_id, key_secret, org_id=DEFAULT_ORG_ID,
+        source='jms-pam', timeout=10,
+    ):
+        self.endpoint = endpoint.rstrip('/')
+        self.org_id = org_id
+        self.source = source
+        self.timeout = timeout
+        self.session = requests.Session()
+        self.auth = HTTPSignatureAuth(
+            key_id=key_id,
+            secret=key_secret,
+        )
+
+    def request(self, method, path, params=None, data=None):
+        response = self.session.request(
+            method,
+            f'{self.endpoint}{path}',
+            params=params,
+            json=data,
+            headers={
+                'Accept': 'application/json',
+                'X-JMS-ORG': self.org_id,
+                'X-Source': self.source,
+                'Date': formatdate(usegmt=True),
+            },
+            auth=self.auth,
+            timeout=self.timeout,
+        )
         try:
-            url = secret_request.get_url()
-            query_params = secret_request.get_query()
-            request_method = getattr(requests, secret_request.method)
-            response = request_method(
-                self._build_url(url, query_params),
-                auth=self._get_auth(), headers=self.headers
-            )
-        except RequestException as e:
-            return Secret.from_exception(e)
-        return Secret.from_response(response)
+            response.raise_for_status()
+        except requests.HTTPError as error:
+            try:
+                detail = response.json().get('detail')
+            except (AttributeError, ValueError):
+                detail = None
+            if detail:
+                error.args = (f'{error}: {detail}',)
+            raise
+        return response.json()
 
-    def get_accounts(self):
-        pass
+
+class JumpServerPAMClient:
+    def __init__(
+        self, endpoint, app_id, app_secret, org_id=DEFAULT_ORG_ID,
+        instance_id=None, heartbeat_interval=30,
+    ):
+        self.instance_id = instance_id or os.getenv('JMS_PAM_INSTANCE_ID') or socket.gethostname()
+        self.heartbeat_interval = heartbeat_interval
+        self.http = SignedClient(endpoint, app_id, app_secret, org_id)
+        self._applied = {}
+        self._lock = threading.Lock()
+        self._stop = threading.Event()
+        self._heartbeat_thread = None
+        self.last_heartbeat_error = None
+
+    def get_credential(self, key):
+        data = self.http.request(
+            'GET', f'{CLIENT_PATH}/credential/',
+            params={'key': key, 'instance_id': self.instance_id},
+        )
+        self._start_heartbeat()
+        return Credential(**data)
+
+    def confirm_applied(self, credential=None, *, key=None, revision=None, account_id=None):
+        if credential is not None:
+            key = credential.key
+            revision = credential.revision
+            account_id = credential.account_id
+        if not all((key, revision, account_id)):
+            raise ValueError('credential or key, revision and account_id are required')
+        self.http.request('POST', f'{CLIENT_PATH}/confirm/', data={
+            'key': key,
+            'instance_id': self.instance_id,
+            'revision': revision,
+            'account_id': account_id,
+        })
+        with self._lock:
+            self._applied[key] = {
+                'key': key,
+                'revision': revision,
+                'account_id': account_id,
+            }
+
+    def heartbeat(self):
+        with self._lock:
+            credentials = list(self._applied.values())
+        return self.http.request('POST', f'{CLIENT_PATH}/heartbeat/', data={
+            'instance_id': self.instance_id,
+            'credentials': credentials,
+        })
+
+    def _start_heartbeat(self):
+        if self._heartbeat_thread and self._heartbeat_thread.is_alive():
+            return
+        self._heartbeat_thread = threading.Thread(
+            target=self._heartbeat_loop,
+            name='jms-pam-heartbeat',
+            daemon=True,
+        )
+        self._heartbeat_thread.start()
+
+    def _heartbeat_loop(self):
+        while not self._stop.wait(self.heartbeat_interval):
+            try:
+                self.heartbeat()
+                self.last_heartbeat_error = None
+            except requests.RequestException as error:
+                self.last_heartbeat_error = error
+
+    def close(self):
+        self._stop.set()
+        self.http.session.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self.close()
+
+
+JumpServerPAM = JumpServerPAMClient

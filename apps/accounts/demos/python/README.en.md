@@ -1,42 +1,45 @@
-# Instructions
+# JumpServer PAM Python SDK and Agent
 
-## 1. Introduction
+Install with Python 3.9 or later:
 
-This API retrieves account secrets for PAM assets, supports RESTful requests, and returns data in JSON format.
-
-## 2. Environment Requirements
-
-- `Python 3.11+`
-- `requests==2.31.0`
-- `httpsig==1.3.0`
-
-## 3. Usage
-**Request Method**: `GET api/v1/accounts/integration-applications/account-secret/`
-
-**Request Parameters**
-
-| Parameter Name | Type | Required | Description       |
-|----------------|------|----------|-------------------|
-| asset          | str  | Yes      | Asset Name        |
-| account        | str  | Yes      | Account Name      |
-
-**Response Example**:
-```json
-{
-    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e",
-    "secret": "123456"
-}
+```bash
+pip install ./apps/accounts/demos/python
 ```
 
-## Frequently Asked Questions (FAQ)
+Fetch a credential by its immutable key, replace and verify the application's connection pool, release the old pool, and then confirm the applied revision:
 
-Q: How do I obtain an API key?
+```python
+from jms_pam import JumpServerPAMClient
 
-A: Create an application in PAM - Application Management to generate a KEY_ID and KEY_SECRET.
+client = JumpServerPAMClient(
+    endpoint='https://jms.example.com',
+    app_id='application-id',
+    app_secret='application-secret',
+    org_id='organization-id',
+)
 
-## Changelog
+credential = client.get_credential('cred-pg-main')
+new_pool = create_pool(username=credential.username, password=credential.secret)
+new_pool.check_connection()
+old_pool.close()
+client.confirm_applied(credential)
+```
 
+The SDK reports a heartbeat every 30 seconds. Set `JMS_PAM_INSTANCE_ID` when an application runs more than one instance.
 
-| Version | Changes                | Date       |
-|---------|------------------------|------------|
-| 1.0.0   | Initial version        | 2025-02-11 |
+For Linux Agent installation, generate a one-time registration token in the application detail page and run:
+
+```bash
+sudo jms-pam-agent install \
+  --endpoint https://jms.example.com \
+  --token one-time-token \
+  --instance-id order-service-node-1 \
+  --credential cred-pg-main \
+  --app-user order-service
+```
+
+The Agent atomically writes `/etc/jumpserver-pam/credentials.json`. After the application reloads the file, verifies its new connection, and releases the old connection, confirm it with:
+
+```bash
+jms-pam-agent confirm cred-pg-main
+```
