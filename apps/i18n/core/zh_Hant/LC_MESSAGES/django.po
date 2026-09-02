@@ -2285,7 +2285,7 @@ msgstr "不適用"
 
 #: assets/const/automation.py:8
 msgid "OK"
-msgstr "Success"
+msgstr "成功"
 
 #: assets/const/automation.py:10
 msgid "RDP error"
