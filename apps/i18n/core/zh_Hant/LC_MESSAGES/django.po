@@ -2410,6 +2410,10 @@ msgstr "登錄資產訪問控制"
 msgid "Login asset confirm"
 msgstr "登錄資產覆核"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr "用戶登錄MFA控制"
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "用戶登錄提醒"

@@ -13,7 +13,17 @@
             <p class="red-fonts">{{ form.code.errors.as_text }}</p>
         {% endif %}
         <div class="form-group">
+            {% if acl_mfa_type %}
+            <input type="hidden" name="mfa_type" value="{{ acl_mfa_type }}">
+            <div class="alert alert-info" style="margin-bottom: 15px;">
+                {% blocktrans %}According to MFA ACL rules, you need to use {{ acl_mfa_type }} for verification{% endblocktrans %}
+            </div>
+            {% endif %}
+            {% if not acl_mfa_type %}
             {% include '_mfa_login_field.html' %}
+            {% else %}
+            {% include '_mfa_login_field.html' with mfa_backends=mfa_backends %}
+            {% endif %}
         </div>
         <button id='submit_button' type="submit" class="btn btn-primary block full-width m-b">
             {% trans 'Next' %}

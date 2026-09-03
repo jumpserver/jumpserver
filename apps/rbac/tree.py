@@ -90,6 +90,7 @@ special_pid_mapper = {
     'acls.clipboardacl': 'perms',
     'acls.commandgroup': 'perms',
     'acls.loginacl': 'perms',
+    'acls.loginmfaacl': 'perms',
     'acls.loginassetacl': 'perms',
     'acls.connectmethodacl': 'perms',
     'acls.datamaskingrule': 'perms',

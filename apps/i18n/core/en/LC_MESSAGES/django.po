@@ -2459,6 +2459,10 @@ msgstr "Login asset access control"
 msgid "Login asset confirm"
 msgstr "Login asset review"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr ""
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "User login reminder"

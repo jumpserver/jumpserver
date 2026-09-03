@@ -7,6 +7,7 @@ app_name = 'acls'
 
 router = BulkRouter()
 router.register(r'login-acls', api.LoginACLViewSet, 'login-acl')
+router.register(r'login-mfa-acls', api.LoginMFAACLViewSet, 'login-mfa-acl')
 router.register(r'login-asset-acls', api.LoginAssetACLViewSet, 'login-asset-acl')
 router.register(r'command-filter-acls', api.CommandFilterACLViewSet, 'command-filter-acl')
 router.register(r'clipboard-acls', api.ClipboardACLViewSet, 'clipboard-acl')

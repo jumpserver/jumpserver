@@ -2449,6 +2449,10 @@ msgstr "ログインasset acl"
 msgid "Login asset confirm"
 msgstr "ログイン資産の確認"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr "MFA aclにログインする"
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "ユーザーログインのリマインダ"

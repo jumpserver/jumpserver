@@ -2472,6 +2472,10 @@ msgstr "Controle de acesso a ativos de login"
 msgid "Login asset confirm"
 msgstr "Revisão de acesso a ativos de login"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr "Registro do MFA acl"
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "Alerta de login do usuário"

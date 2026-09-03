@@ -55,7 +55,8 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
     # 开启了 MFA，且没有校验过, 可以全局校验, middleware 中可以全局管理 oidc 等第三方认证的 MFA
     if settings.SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY \
             and user.mfa_enabled \
-            and not request.session.get('auth_mfa'):
+            and not request.session.get('auth_mfa') \
+            and not request.session.get('auth_mfa_skip'):
         request.session['auth_mfa_required'] = 1
     auth_backend = request.session.get('auth_backend', request.session.get(BACKEND_SESSION_KEY))
     if not request.session.get("auth_third_party_done") and \

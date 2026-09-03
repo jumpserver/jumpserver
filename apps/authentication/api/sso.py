@@ -108,6 +108,7 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
             self._check_is_block(username, True)
             self._check_only_allow_exists_user_auth(username)
             self._check_login_acl(user, ip)
+            self._check_login_mfa_acl(user, ip)
             self.check_user_login_confirm_if_need(user)
 
             self.request.session['auth_backend'] = settings.AUTH_BACKEND_SSO
