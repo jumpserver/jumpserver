@@ -74,12 +74,27 @@ class ResourceDownload(TemplateView):
     @lazyproperty
     def versions_content(self):
         more_downloads = os.environ.get('MORE_DOWNLOADS_URL', '')
-        return f"""
+        default_versions = """
         MRD_VERSION=10.6.7
         OPENSSH_VERSION=v9.4.0.0
         TINKER_VERSION=v0.1.6
         VIDEO_PLAYER_VERSION=0.5.2
         CLIENT_VERSION=4.1.6
+        """
+        version_file = os.path.join(settings.DATA_DIR, 'version.txt')
+        try:
+            with open(version_file) as f:
+                versions = f.read()
+        except OSError:
+            versions = default_versions
+
+        client_version = os.environ.get('CLIENT_VERSION', '')
+        client_version_override = (
+            f'CLIENT_VERSION={client_version}' if client_version else ''
+        )
+        return f"""
+        {versions}
+        {client_version_override}
         VENDOR={settings.VENDOR}
         MORE_DOWNLOADS_URL={more_downloads}
         """
@@ -92,7 +107,7 @@ class ResourceDownload(TemplateView):
             line = line.strip()
             if not line or line.startswith('#') or '=' not in line:
                 continue
-            key, value = line.split('=')
+            key, value = line.split('=', 1)
             meta[key] = value
         return meta
 
