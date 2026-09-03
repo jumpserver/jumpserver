@@ -102,6 +102,30 @@ class SignedClient:
         return response.json()
 
 
+class CredentialAPIClient(SignedClient):
+    def __init__(self, *args, instance_id='', **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance_id = instance_id
+
+    def get_credential(self, key):
+        params = {'key': key}
+        if self.instance_id:
+            params['instance_id'] = self.instance_id
+        return self.request('GET', f'{CLIENT_PATH}/credential/', params=params)
+
+    def confirm(self, item):
+        data = dict(item)
+        if self.instance_id:
+            data['instance_id'] = self.instance_id
+        return self.request('POST', f'{CLIENT_PATH}/confirm/', data=data)
+
+    def heartbeat(self, credentials):
+        data = {'credentials': credentials}
+        if self.instance_id:
+            data['instance_id'] = self.instance_id
+        return self.request('POST', f'{CLIENT_PATH}/heartbeat/', data=data)
+
+
 class JumpServerPAMClient:
     def __init__(
         self, endpoint, app_id, app_secret, org_id=DEFAULT_ORG_ID,
@@ -109,7 +133,9 @@ class JumpServerPAMClient:
     ):
         self.instance_id = instance_id or os.getenv('JMS_PAM_INSTANCE_ID') or socket.gethostname()
         self.heartbeat_interval = heartbeat_interval
-        self.http = SignedClient(endpoint, app_id, app_secret, org_id)
+        self.http = CredentialAPIClient(
+            endpoint, app_id, app_secret, org_id, instance_id=self.instance_id
+        )
         self._applied = {}
         self._lock = threading.Lock()
         self._stop = threading.Event()
@@ -117,10 +143,7 @@ class JumpServerPAMClient:
         self.last_heartbeat_error = None
 
     def get_credential(self, key):
-        data = self.http.request(
-            'GET', f'{CLIENT_PATH}/credential/',
-            params={'key': key, 'instance_id': self.instance_id},
-        )
+        data = self.http.get_credential(key)
         self._start_heartbeat()
         return Credential(**data)
 
@@ -131,9 +154,8 @@ class JumpServerPAMClient:
             account_id = credential.account_id
         if not all((key, revision, account_id)):
             raise ValueError('credential or key, revision and account_id are required')
-        self.http.request('POST', f'{CLIENT_PATH}/confirm/', data={
+        self.http.confirm({
             'key': key,
-            'instance_id': self.instance_id,
             'revision': revision,
             'account_id': account_id,
         })
@@ -147,10 +169,7 @@ class JumpServerPAMClient:
     def heartbeat(self):
         with self._lock:
             credentials = list(self._applied.values())
-        return self.http.request('POST', f'{CLIENT_PATH}/heartbeat/', data={
-            'instance_id': self.instance_id,
-            'credentials': credentials,
-        })
+        return self.http.heartbeat(credentials)
 
     def _start_heartbeat(self):
         if self._heartbeat_thread and self._heartbeat_thread.is_alive():
