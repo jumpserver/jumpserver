@@ -12,7 +12,7 @@ from pathlib import Path
 
 import requests
 
-from .main import CLIENT_PATH, SignedClient
+from .main import CLIENT_PATH, CredentialAPIClient
 
 CONFIG_FILE = '/etc/jumpserver-pam/agent.json'
 STATE_FILE = '/var/lib/jumpserver-pam/state.json'
@@ -44,33 +44,16 @@ def atomic_write_json(path, data, mode=0o600, owner=None):
     os.replace(temporary, target)
 
 
-class AgentRemoteClient(SignedClient):
-    def __init__(self, config):
-        super().__init__(
-            config['endpoint'], config['agent_id'], config['agent_secret'],
-            config['org_id'], source='jms-pam-agent',
-        )
-
-    def get_credential(self, key):
-        return self.request('GET', f'{CLIENT_PATH}/credential/', params={'key': key})
-
-    def confirm(self, item):
-        return self.request('POST', f'{CLIENT_PATH}/confirm/', data={
-            'key': item['key'],
-            'revision': item['revision'],
-            'account_id': item['account_id'],
-        })
-
-    def heartbeat(self, credentials):
-        return self.request('POST', f'{CLIENT_PATH}/heartbeat/', data={
-            'credentials': credentials,
-        })
-
-
 class Agent:
     def __init__(self, config_file=CONFIG_FILE):
         self.config = read_json(config_file)
-        self.remote = AgentRemoteClient(self.config)
+        self.remote = CredentialAPIClient(
+            self.config['endpoint'],
+            self.config['agent_id'],
+            self.config['agent_secret'],
+            self.config['org_id'],
+            source='jms-pam-agent',
+        )
         self.state = read_json(self.config.get('state_file', STATE_FILE))
         self.credentials = read_json(self.config.get('credential_file', CREDENTIAL_FILE))
         self.lock = threading.Lock()
@@ -86,14 +69,15 @@ class Agent:
     def poll(self):
         changed = False
         with self.lock:
+            credentials = dict(self.credentials)
             for key in self.config['credential_keys']:
                 data = self.remote.get_credential(key)
-                current = self.credentials.get(key, {})
+                current = credentials.get(key, {})
                 if current.get('revision') == data['revision']:
                     continue
                 account = data['account']
                 asset = data['asset']
-                self.credentials[key] = {
+                credentials[key] = {
                     'key': key,
                     'revision': data['revision'],
                     'asset_id': asset['id'],
@@ -109,9 +93,10 @@ class Agent:
             if changed:
                 atomic_write_json(
                     self.credential_file,
-                    self.credentials,
+                    credentials,
                     owner=self.config.get('app_user'),
                 )
+                self.credentials = credentials
         return changed
 
     def confirm(self, key):
@@ -125,8 +110,10 @@ class Agent:
                 'account_id': item['account_id'],
             }
             self.remote.confirm(applied)
-            self.state[key] = applied
-            atomic_write_json(self.state_file, self.state)
+            state = dict(self.state)
+            state[key] = applied
+            atomic_write_json(self.state_file, state)
+            self.state = state
         return applied
 
     def heartbeat(self):

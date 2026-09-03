@@ -56,6 +56,14 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         return value
 
 
+class CredentialAgentRegistrationSerializer(serializers.Serializer):
+    credential_keys = serializers.ListField(
+        child=serializers.CharField(max_length=64), allow_empty=False
+    )
+    app_user = serializers.CharField(max_length=128)
+    instance_id = serializers.CharField(max_length=128)
+
+
 class IntegrationAccountSecretSerializer(serializers.Serializer):
     asset = serializers.CharField(required=False, allow_blank=True)
     asset_id = serializers.UUIDField(required=False, allow_null=True)

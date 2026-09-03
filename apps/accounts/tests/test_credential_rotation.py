@@ -1,5 +1,6 @@
 import shlex
-from unittest.mock import Mock
+import threading
+from unittest.mock import Mock, patch
 
 import requests
 from django.core import signing
@@ -16,16 +17,21 @@ from accounts.api.account.credential import (
     CredentialPolicyViewSet,
 )
 from accounts.const import ChangeSecretRecordStatusChoice
+from accounts.demos.python.jms_pam.agent import Agent
+from accounts.demos.python.jms_pam.main import (
+    CLIENT_PATH, CredentialAPIClient, HTTPSignatureAuth, SignedClient,
+)
 from accounts.models import (
     Account, ChangeSecretRecord, CredentialPolicy, IntegrationApplication,
 )
 from assets.const import Category
 from assets.models import Asset, Platform
+from authentication.backends.drf import (
+    CredentialAgentAuthentication, ServiceAuthentication,
+)
 from orgs.models import Organization
 from orgs.utils import set_current_org
 from users.models import User
-
-from accounts.demos.python.jms_pam.main import HTTPSignatureAuth, SignedClient
 
 
 class CredentialRotationTestCase(TestCase):
@@ -211,6 +217,26 @@ class CredentialRotationTestCase(TestCase):
         )
         self.assertEqual(self.policy_action('check_usage').status_code, 200)
 
+    def test_rotation_can_be_cancelled_before_primary_secret_changes(self):
+        self.fetch_and_confirm(self.primary)
+        self.assertEqual(self.policy_action('start_rotation').status_code, 200)
+
+        cancelled = self.policy_action('cancel_rotation')
+        self.assertEqual(cancelled.status_code, 200)
+        self.assertTrue(cancelled.data['rotation_cancelled'])
+        self.assertEqual(
+            str(cancelled.data['published_account']['id']),
+            str(self.primary.id),
+        )
+
+        self.fetch_and_confirm(self.primary)
+        completed = self.policy_action('complete_rotation')
+        self.assertEqual(completed.status_code, 200)
+        self.assertEqual(
+            completed.data['status']['value'], CredentialPolicy.Status.idle
+        )
+        self.assertIsNone(completed.data['date_last_rotated'])
+
     def test_agent_registration_token_can_only_be_used_once(self):
         self.application.credential_access_mode = IntegrationApplication.AccessMode.agent
         self.application.save(update_fields=['credential_access_mode'])
@@ -310,3 +336,68 @@ class PythonSDKTestCase(SimpleTestCase):
             '403 Client Error: The application does not use SDK access mode.',
         ):
             client.request('GET', '/credential/')
+
+    def test_sdk_and_agent_share_credential_protocol_client(self):
+        sdk = CredentialAPIClient(
+            'https://jms.example.com', 'app-id', 'secret',
+            instance_id='sdk-instance',
+        )
+        sdk.request = Mock(return_value={})
+        sdk.get_credential('database')
+        sdk.confirm({'key': 'database', 'revision': 1, 'account_id': 'account'})
+        sdk.heartbeat([])
+
+        sdk.request.assert_any_call(
+            'GET', f'{CLIENT_PATH}/credential/',
+            params={'key': 'database', 'instance_id': 'sdk-instance'},
+        )
+        sdk.request.assert_any_call(
+            'POST', f'{CLIENT_PATH}/confirm/',
+            data={
+                'key': 'database', 'revision': 1, 'account_id': 'account',
+                'instance_id': 'sdk-instance',
+            },
+        )
+        sdk.request.assert_any_call(
+            'POST', f'{CLIENT_PATH}/heartbeat/',
+            data={'credentials': [], 'instance_id': 'sdk-instance'},
+        )
+
+        agent = CredentialAPIClient(
+            'https://jms.example.com', 'agent-id', 'secret',
+            source='jms-pam-agent',
+        )
+        agent.request = Mock(return_value={})
+        agent.get_credential('database')
+        agent.request.assert_called_once_with(
+            'GET', f'{CLIENT_PATH}/credential/', params={'key': 'database'}
+        )
+
+    def test_agent_keeps_previous_credentials_when_write_fails(self):
+        agent = Agent.__new__(Agent)
+        agent.config = {'credential_keys': ['database']}
+        agent.remote = Mock()
+        agent.remote.get_credential.return_value = {
+            'revision': 2,
+            'asset': {'id': 'asset', 'name': 'db', 'address': '127.0.0.1'},
+            'account': {
+                'id': 'account', 'name': 'db-user', 'username': 'db-user',
+                'secret_type': 'password', 'secret': 'new-secret',
+            },
+        }
+        agent.credentials = {'database': {'revision': 1, 'secret': 'old-secret'}}
+        agent.lock = threading.Lock()
+
+        with patch(
+            'accounts.demos.python.jms_pam.agent.atomic_write_json',
+            side_effect=OSError('disk full'),
+        ), self.assertRaisesRegex(OSError, 'disk full'):
+            agent.poll()
+
+        self.assertEqual(agent.credentials['database']['revision'], 1)
+        self.assertEqual(agent.credentials['database']['secret'], 'old-secret')
+
+    def test_agent_authentication_reuses_service_authentication(self):
+        self.assertTrue(issubclass(
+            CredentialAgentAuthentication, ServiceAuthentication
+        ))
