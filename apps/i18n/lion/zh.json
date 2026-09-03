@@ -66,7 +66,7 @@
     "JMSErrPermission": "无连接权限",
     "JMSErrPermissionExpired": "授权已过期，断开连接",
     "JMSErrRemoveShareUser": "你已经被移除共享会话",
-    "JMSErrTerminatedByAdmin": "管理员终断会话",
+    "JMSErrTerminatedByAdmin": "管理员中断会话",
     "JoinShare": "加入共享",
     "KeyboardLayout": "布局",
     "LeaveShare": "离开共享",

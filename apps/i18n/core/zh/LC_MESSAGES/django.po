@@ -9460,7 +9460,7 @@ msgstr "读写"
 
 #: terminal/const.py:98
 msgid "Kill session"
-msgstr "终断会话"
+msgstr "中断会话"
 
 #: terminal/const.py:99
 msgid "Lock session"
@@ -9769,7 +9769,7 @@ msgstr "可以分享会话"
 
 #: terminal/models/session/session.py:322
 msgid "Can terminate session"
-msgstr "可以终断会话"
+msgstr "可以中断会话"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
@@ -10339,7 +10339,7 @@ msgstr "空闲断开"
 
 #: terminal/session_lifecycle.py:156
 msgid "admin terminated"
-msgstr "管理员终断连接"
+msgstr "管理员中断连接"
 
 #: terminal/session_lifecycle.py:157
 msgid "maximum session time has been reached"
