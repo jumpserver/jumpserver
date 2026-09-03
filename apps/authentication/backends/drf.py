@@ -174,17 +174,21 @@ class ServiceAuthentication(signature.SignatureAuthentication):
             return None, None
         return obj, obj.secret
 
+    @staticmethod
+    def get_ip_group(obj):
+        return obj.ip_group
+
     def is_ip_allow(self, key_id, request):
         obj = self.get_object(key_id)
-        if not contains_ip(get_request_ip(request), obj.ip_group):
+        if not obj:
             return False
-        return True
+        return contains_ip(get_request_ip(request), self.get_ip_group(obj))
 
     def after_authenticate_update_date(self, user):
         update_service_integration_last_used.delay((user.id,))
 
 
-class CredentialAgentAuthentication(signature.SignatureAuthentication):
+class CredentialAgentAuthentication(ServiceAuthentication):
     source = 'jms-pam-agent'
 
     def get_object(self, key_id):
@@ -193,14 +197,9 @@ class CredentialAgentAuthentication(signature.SignatureAuthentication):
             is_active=True, application__is_active=True,
         ).select_related('application').first()
 
-    def fetch_user_data(self, key_id, algorithm=None):
-        obj = self.get_object(key_id)
-        if not obj:
-            return None, None
-        return obj, obj.secret
+    @staticmethod
+    def get_ip_group(obj):
+        return obj.application.ip_group
 
-    def is_ip_allow(self, key_id, request):
-        obj = self.get_object(key_id)
-        if not obj:
-            return False
-        return contains_ip(get_request_ip(request), obj.application.ip_group)
+    def after_authenticate_update_date(self, user):
+        update_service_integration_last_used.delay((user.application_id,))

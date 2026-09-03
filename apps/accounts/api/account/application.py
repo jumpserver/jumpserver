@@ -8,7 +8,6 @@ from django.core import signing
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -31,7 +30,8 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     search_fields = ('name', 'comment')
     serializer_classes = {
         'default': serializers.IntegrationApplicationSerializer,
-        'get_account_secret': serializers.IntegrationAccountSecretSerializer
+        'get_account_secret': serializers.IntegrationAccountSecretSerializer,
+        'agent_registration': serializers.CredentialAgentRegistrationSerializer,
     }
     rbac_perms = {
         'get_once_secret': 'accounts.change_integrationapplication',
@@ -95,23 +95,17 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
                 code='invalid_access_mode',
                 detail=_('The integration application does not use Agent access mode.'),
             )
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        credential_keys = serializer.validated_data['credential_keys']
+        app_user = serializer.validated_data['app_user']
+        instance_id = serializer.validated_data['instance_id']
         token = signing.dumps({
             'application_id': str(instance.id),
             'org_id': instance.org_id,
             'nonce': random_string(24),
         }, salt='credential-agent-register')
         endpoint = request.build_absolute_uri('/').rstrip('/')
-        credential_keys = request.data.get('credential_keys') or []
-        app_user = request.data.get('app_user') or ''
-        instance_id = request.data.get('instance_id') or ''
-        if not isinstance(credential_keys, list) or not credential_keys:
-            raise ValidationError({'credential_keys': _('At least one credential key is required.')})
-        if not all(isinstance(key, str) and key for key in credential_keys):
-            raise ValidationError({'credential_keys': _('Invalid credential key.')})
-        if not isinstance(app_user, str) or not app_user:
-            raise ValidationError({'app_user': _('This field is required.')})
-        if not isinstance(instance_id, str) or not instance_id:
-            raise ValidationError({'instance_id': _('This field is required.')})
         credentials = ' '.join(
             f'--credential {shlex.quote(key)}' for key in credential_keys
         )
