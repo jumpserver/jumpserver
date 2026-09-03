@@ -1,5 +1,3 @@
-import sys
-
 from django.utils.module_loading import import_string
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -25,8 +23,7 @@ custom_sso_authenticate_method = None
 if settings.AUTH_CUSTOM_SSO:
     ''' 保证自定义 SSO 认证方法在服务运行时不能被更改，只在第一次调用时加载一次 '''
     try:
-        custom_auth_method_path = 'data.auth.custom_sso.authenticate'
-        sys.path.insert(0, settings.PROJECT_DIR)
+        custom_auth_method_path = 'xpack.plugins.jdmc.custom_sso.authenticate'
         custom_sso_authenticate_method = import_string(custom_auth_method_path)
     except Exception as e:
         logger.warning('Import custom SSO auth method failed: {}, Maybe not enabled'.format(e))
