@@ -92,6 +92,19 @@ class OpenAPIRegistry:
                 operation_id = operation.get('operationId') or self._fallback_operation_id(method, path)
                 path_parameters, query_parameters = self._parameters(path_item, operation)
                 risk_level, requires_approval = self._risk(upper_method)
+                permission_metadata_present = 'x-jms-required-permissions' in operation
+                required_permissions = operation.get('x-jms-required-permissions') or ()
+                if (
+                    not isinstance(required_permissions, (list, tuple))
+                    or any(
+                        not isinstance(item, str) or not item
+                        for item in required_permissions
+                    )
+                ):
+                    required_permissions = ()
+                    permission_metadata_present = False
+                else:
+                    required_permissions = tuple(required_permissions)
                 result[operation_id] = Operation(
                     operation_id=operation_id,
                     method=upper_method,
@@ -105,6 +118,11 @@ class OpenAPIRegistry:
                     response_schema=self._response_schema(operation),
                     risk_level=risk_level,
                     requires_approval=requires_approval,
+                    required_permissions=required_permissions,
+                    permission_dynamic=(
+                        not permission_metadata_present
+                        or bool(operation.get('x-jms-permission-dynamic', False))
+                    ),
                 )
         return result
 

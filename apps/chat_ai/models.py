@@ -18,7 +18,6 @@ class Conversation(JMSOrgBaseModel):
     )
     title = models.CharField(max_length=256, blank=True, default='', verbose_name=_('Title'))
     model = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Model'))
-    assistant = models.CharField(max_length=32, blank=True, default='general', verbose_name=_('Assistant'))
     status = models.CharField(
         max_length=16, choices=Status.choices, default=Status.ACTIVE,
         verbose_name=_('Status')
@@ -67,6 +66,7 @@ class Message(JMSBaseModel):
     output_tokens = models.PositiveIntegerField(default=0, verbose_name=_('Output tokens'))
     error = models.CharField(max_length=1024, blank=True, default='', verbose_name=_('Error'))
     result_cards = models.JSONField(default=list, blank=True, verbose_name=_('Result cards'))
+    web_search = models.BooleanField(default=False, verbose_name=_('Web search'))
     regenerated_from = models.ForeignKey(
         'self', null=True, blank=True, on_delete=models.SET_NULL,
         related_name='regenerations', verbose_name=_('Regenerated from')

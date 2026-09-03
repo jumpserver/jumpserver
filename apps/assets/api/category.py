@@ -11,6 +11,7 @@ __all__ = ['CategoryViewSet']
 
 
 class CategoryViewSet(ListModelMixin, JMSGenericViewSet):
+    chat_ai_required_permissions = ()
     serializer_classes = {
         'default': CategorySerializer,
         'types': TypeSerializer,
