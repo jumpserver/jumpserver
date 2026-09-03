@@ -5,11 +5,11 @@
   "$defs": {
     "message_start": {
       "type": "object",
-      "required": ["message_id", "agent_run_id", "assistant"],
+      "required": ["message_id", "agent_run_id", "conversation_id"],
       "properties": {
         "message_id": {"type": "string", "format": "uuid"},
         "agent_run_id": {"type": "string", "format": "uuid"},
-        "assistant": {"enum": ["general", "asset", "session_audit", "ops"]}
+        "conversation_id": {"type": "string", "format": "uuid"}
       },
       "additionalProperties": false
     },

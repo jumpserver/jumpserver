@@ -57,7 +57,7 @@ class OpenAICompatibleProvider(BaseChatProvider):
         }
         if request.get('tools'):
             payload['tools'] = request['tools']
-            payload['tool_choice'] = 'auto'
+            payload['tool_choice'] = request.get('tool_choice') or 'auto'
         tool_calls = {}
         reasoning_parts = []
         usage = {}

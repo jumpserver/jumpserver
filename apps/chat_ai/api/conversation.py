@@ -13,7 +13,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -27,7 +27,6 @@ from settings.models import get_chat_ai_config
 
 from chat_ai.agents import AgentRunner
 from chat_ai.agents.context import RequestAuthContext
-from chat_ai.assistants import is_assistant_available
 from chat_ai.models import (
     AgentRun, Approval, Conversation, Message, MessageFile, MessageImage,
 )
@@ -77,10 +76,6 @@ class ConversationViewSet(JMSModelViewSet):
     def perform_create(self, serializer):
         model = get_chat_ai_config().get('model') or ''
         serializer.save(user=self.request.user, org_id=str(current_org.id), model=model)
-
-    def ensure_assistant_available(self, conversation):
-        if not is_assistant_available(conversation.assistant, self.request.user):
-            raise PermissionDenied('You do not have permission to use this Chat AI assistant.')
 
     def destroy(self, request, *args, **kwargs):
         conversation = self.get_object()
@@ -199,6 +194,7 @@ class ConversationViewSet(JMSModelViewSet):
                 input_tokens=source.input_tokens,
                 output_tokens=source.output_tokens,
                 result_cards=deepcopy(source.result_cards),
+                web_search=source.web_search,
                 regenerated_from=message_map.get(source.regenerated_from_id),
             )
             message_map[source.id] = copied
@@ -235,7 +231,6 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def stream_message(self, request, pk=None):
         conversation = self.get_object()
-        self.ensure_assistant_available(conversation)
         serializer = StreamMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         content = serializer.validated_data['content']
@@ -262,6 +257,7 @@ class ConversationViewSet(JMSModelViewSet):
                 role=Message.Role.USER,
                 content=content,
                 status=Message.Status.COMPLETED,
+                web_search=web_search_enabled,
             )
             for uploaded in images:
                 MessageImage.objects.create(
@@ -285,6 +281,7 @@ class ConversationViewSet(JMSModelViewSet):
                 role=Message.Role.ASSISTANT,
                 status=Message.Status.STREAMING,
                 model=conversation.model,
+                web_search=web_search_enabled,
             )
             agent_run = AgentRun.objects.create(
                 conversation=conversation,
@@ -297,6 +294,7 @@ class ConversationViewSet(JMSModelViewSet):
         auth_context = RequestAuthContext.from_request(request, current_org.id)
         runner = AgentRunner(
             conversation=conversation,
+            user=request.user,
             user_message=user_message,
             assistant_message=assistant_message,
             agent_run=agent_run,
@@ -313,7 +311,6 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def regenerate_message(self, request, pk=None, message_id=None):
         conversation = self.get_object()
-        self.ensure_assistant_available(conversation)
         serializer = RegenerateMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         source_message = get_object_or_404(
@@ -322,6 +319,7 @@ class ConversationViewSet(JMSModelViewSet):
             conversation=conversation,
             role=Message.Role.ASSISTANT,
         )
+        web_search_enabled = serializer.validated_data['web_search']
         with transaction.atomic():
             conversation = Conversation.objects.select_for_update().get(pk=conversation.pk)
             if conversation.agent_runs.filter(status__in=(
@@ -340,6 +338,7 @@ class ConversationViewSet(JMSModelViewSet):
                 role=Message.Role.ASSISTANT,
                 status=Message.Status.STREAMING,
                 model=conversation.model,
+                web_search=web_search_enabled,
                 regenerated_from=source_message,
             )
             agent_run = AgentRun.objects.create(
@@ -352,11 +351,12 @@ class ConversationViewSet(JMSModelViewSet):
             )
         runner = AgentRunner(
             conversation=conversation,
+            user=request.user,
             user_message=user_message,
             assistant_message=assistant_message,
             agent_run=agent_run,
             auth_context=RequestAuthContext.from_request(request, current_org.id),
-            web_search_enabled=serializer.validated_data['web_search'],
+            web_search_enabled=web_search_enabled,
         )
         return self._stream_response(runner)
 
@@ -368,7 +368,6 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def branch_message(self, request, pk=None, message_id=None):
         source_conversation = self.get_object()
-        self.ensure_assistant_available(source_conversation)
         serializer = BranchMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         content = serializer.validated_data['content']
@@ -379,6 +378,7 @@ class ConversationViewSet(JMSModelViewSet):
             role=Message.Role.USER,
             status=Message.Status.COMPLETED,
         )
+        web_search_enabled = serializer.validated_data['web_search']
         if not content.strip() and not source_message.images.exists() and not source_message.files.exists():
             raise ValidationError('A branched message must include text or an attachment.')
 
@@ -397,7 +397,6 @@ class ConversationViewSet(JMSModelViewSet):
                 org_id=str(current_org.id),
                 title=title,
                 model=source_conversation.model,
-                assistant=source_conversation.assistant,
             )
             self._copy_branch_history(source_conversation, source_message, branch)
             user_message = Message.objects.create(
@@ -405,6 +404,7 @@ class ConversationViewSet(JMSModelViewSet):
                 role=Message.Role.USER,
                 content=content,
                 status=Message.Status.COMPLETED,
+                web_search=web_search_enabled,
             )
             self._copy_message_attachments(source_message, user_message)
             assistant_message = Message.objects.create(
@@ -412,6 +412,7 @@ class ConversationViewSet(JMSModelViewSet):
                 role=Message.Role.ASSISTANT,
                 status=Message.Status.STREAMING,
                 model=branch.model,
+                web_search=web_search_enabled,
             )
             agent_run = AgentRun.objects.create(
                 conversation=branch,
@@ -423,11 +424,12 @@ class ConversationViewSet(JMSModelViewSet):
             )
         runner = AgentRunner(
             conversation=branch,
+            user=request.user,
             user_message=user_message,
             assistant_message=assistant_message,
             agent_run=agent_run,
             auth_context=RequestAuthContext.from_request(request, current_org.id),
-            web_search_enabled=serializer.validated_data['web_search'],
+            web_search_enabled=web_search_enabled,
         )
         response = self._stream_response(runner)
         response['X-Chat-AI-Conversation-ID'] = str(branch.id)
@@ -441,10 +443,10 @@ class ConversationViewSet(JMSModelViewSet):
     )
     def background_message(self, request, pk=None):
         conversation = self.get_object()
-        self.ensure_assistant_available(conversation)
         serializer = BackgroundMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         content = serializer.validated_data['content']
+        web_search_enabled = serializer.validated_data['web_search']
         task_id = str(uuid.uuid4())
         with transaction.atomic():
             get_user_model().objects.select_for_update().get(pk=request.user.pk)
@@ -463,12 +465,14 @@ class ConversationViewSet(JMSModelViewSet):
                 role=Message.Role.USER,
                 content=content,
                 status=Message.Status.COMPLETED,
+                web_search=web_search_enabled,
             )
             assistant_message = Message.objects.create(
                 conversation=conversation,
                 role=Message.Role.ASSISTANT,
                 status=Message.Status.PENDING,
                 model=conversation.model,
+                web_search=web_search_enabled,
             )
             agent_run = AgentRun.objects.create(
                 conversation=conversation,
@@ -482,7 +486,7 @@ class ConversationViewSet(JMSModelViewSet):
             run_chat_ai_agent.apply_async(
                 args=(
                     str(agent_run.id),
-                    serializer.validated_data['web_search'],
+                    web_search_enabled,
                     False,
                     serializer.validated_data['notify'],
                 ),
