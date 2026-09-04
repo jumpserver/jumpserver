@@ -1,89 +1,106 @@
-from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
 from accounts.const import ChangeSecretRecordStatusChoice
 from accounts.models import (
-    ChangeSecretRecord, CredentialClientStatus, CredentialPolicy,
+    ChangeSecretRecord, CredentialClientStatus, ApplicationCredential,
+    CredentialRotationRecord,
 )
 
 
 class CredentialRotationManager:
-    def __init__(self, policy_id):
-        self.policy_id = policy_id
+    def __init__(self, credential_id):
+        self.credential_id = credential_id
 
-    def _get_locked_policy(self):
-        return CredentialPolicy.objects.select_for_update().select_related(
+    def _get_locked_credential(self):
+        return ApplicationCredential.objects.select_for_update(of=('self',)).select_related(
             'primary_account', 'backup_account', 'published_account'
-        ).get(pk=self.policy_id)
+        ).get(pk=self.credential_id)
 
-    def start(self):
-        policy = self._get_locked_policy()
-        if policy.status != CredentialPolicy.Status.idle:
+    def start(self, operator=''):
+        credential = self._get_locked_credential()
+        if credential.type == ApplicationCredential.Type.fixed or not credential.is_active:
+            raise ValidationError(_('Only active rotation credentials can rotate.'))
+        if credential.status != ApplicationCredential.Status.idle:
             raise ValidationError(
-                _('The credential policy is already rotating.')
+                _('The application credential is already rotating.')
             )
 
         states = list(
             CredentialClientStatus.objects.select_for_update().filter(
-                binding__policy=policy,
+                binding__credential=credential,
                 client__is_active=True,
-                client__type=F('binding__application__credential_access_mode'),
+                client__configuration__is_active=True,
+                client__application__is_active=True,
             )
         )
-        if not states:
-            raise ValidationError(_(
-                'No active application client uses this credential policy.'
-            ))
-
-        policy.revision += 1
-        policy.published_account = policy.backup_account
-        policy.primary_version_at_start = policy.primary_account.version
-        policy.status = CredentialPolicy.Status.waiting_backup
-        policy.rotation_cancelled = False
-        policy.date_rotation_started = timezone.now()
-        policy.save(update_fields=[
+        dual = credential.rotation_mode == ApplicationCredential.RotationMode.dual
+        if dual:
+            credential.revision += 1
+            credential.published_account = credential.backup_account
+        credential.primary_version_at_start = credential.primary_account.version
+        credential.status = (
+            ApplicationCredential.Status.waiting_backup if dual
+            else ApplicationCredential.Status.ready_for_change
+        )
+        credential.change_execution = None
+        credential.rotation_cancelled = False
+        credential.date_rotation_started = timezone.now()
+        credential.save(update_fields=[
             'revision', 'published_account', 'primary_version_at_start',
             'status', 'rotation_cancelled', 'date_rotation_started',
-            'date_updated',
+            'date_updated', 'change_execution',
         ])
         state_ids = [state.id for state in states]
         CredentialClientStatus.objects.filter(id__in=state_ids).update(
-            required_revision=policy.revision, is_rotation_participant=True,
+            required_revision=credential.revision, is_rotation_participant=True,
         )
-        return policy
+        CredentialRotationRecord.objects.create(credential=credential, created_by=operator)
+        return credential
 
     def check_usage(self):
-        policy = self._get_locked_policy()
-        if policy.status != CredentialPolicy.Status.waiting_backup:
+        credential = self._get_locked_credential()
+        if credential.status != ApplicationCredential.Status.waiting_backup:
             raise ValidationError(_(
-                'The credential policy is not waiting for the backup account.'
+                'The application credential is not waiting for the backup account.'
             ))
-        blockers = policy.get_blockers()
+        blockers = credential.get_blockers()
         if blockers:
-            return policy, blockers
-        policy.status = CredentialPolicy.Status.ready_for_change
-        policy.save(update_fields=['status', 'date_updated'])
-        return policy, []
+            return credential, blockers
+        credential.status = ApplicationCredential.Status.ready_for_change
+        credential.save(update_fields=['status', 'date_updated'])
+        return credential, []
+
+    def change_secret(self):
+        credential = self._get_locked_credential()
+        if credential.status != ApplicationCredential.Status.ready_for_change:
+            raise ValidationError(_(
+                'The application credential is not ready for secret change.'
+            ))
+        if credential.rotation_mode == ApplicationCredential.RotationMode.dual and credential.get_blockers():
+            raise ValidationError(_('Wait for all enabled clients to apply the backup account.'))
+        credential.status = ApplicationCredential.Status.changing_secret
+        credential.save(update_fields=['status', 'date_updated'])
+        return credential
 
     def check_secret_change(self):
-        policy = self._get_locked_policy()
-        if policy.status != CredentialPolicy.Status.ready_for_change:
-            raise ValidationError(_(
-                'The credential policy is not ready for secret change.'
-            ))
+        credential = self._get_locked_credential()
+        if credential.status != ApplicationCredential.Status.changing_secret:
+            raise ValidationError(_('No secret change is running for this credential.'))
 
-        primary = policy.primary_account
+        primary = credential.primary_account
         primary.refresh_from_db()
         record = ChangeSecretRecord.objects.filter(
+            execution__org_id=credential.org_id,
+            execution__type='change_secret',
             account=primary,
-            account_version=policy.primary_version_at_start,
+            account_version=primary.version - 1,
             status=ChangeSecretRecordStatusChoice.success,
-            date_finished__gte=policy.date_rotation_started,
+            date_finished__gte=credential.date_rotation_started,
         ).order_by('-date_finished').first()
         changed = (
-            primary.version > policy.primary_version_at_start
+            primary.version > credential.primary_version_at_start
             and primary.change_secret_status == ChangeSecretRecordStatusChoice.success
             and record is not None
         )
@@ -93,58 +110,63 @@ class CredentialRotationManager:
                 'and verified successfully.'
             ))
 
-        policy.revision += 1
-        policy.published_account = primary
-        policy.status = CredentialPolicy.Status.waiting_primary
-        policy.save(update_fields=[
-            'revision', 'published_account', 'status', 'date_updated',
+        credential.revision += 1
+        credential.change_execution_id = record.execution_id
+        credential.published_account = primary
+        credential.status = ApplicationCredential.Status.waiting_primary
+        credential.save(update_fields=[
+            'revision', 'published_account', 'status', 'date_updated', 'change_execution',
         ])
         CredentialClientStatus.objects.filter(
-            binding__policy=policy, is_rotation_participant=True
-        ).update(required_revision=policy.revision)
-        return policy
+            binding__credential=credential, is_rotation_participant=True
+        ).update(required_revision=credential.revision)
+        return credential
 
     def complete(self):
-        policy = self._get_locked_policy()
-        if policy.status != CredentialPolicy.Status.waiting_primary:
+        credential = self._get_locked_credential()
+        if credential.status != ApplicationCredential.Status.waiting_primary:
             raise ValidationError(_(
-                'The credential policy is not waiting for the primary account.'
+                'The application credential is not waiting for the primary account.'
             ))
-        blockers = policy.get_blockers()
+        blockers = credential.get_blockers()
         if blockers:
-            return policy, blockers
+            return credential, blockers
 
-        if not policy.rotation_cancelled:
-            policy.date_last_rotated = timezone.now()
-        policy.status = CredentialPolicy.Status.idle
-        policy.primary_version_at_start = None
-        policy.date_rotation_started = None
-        policy.rotation_cancelled = False
-        policy.save(update_fields=[
+        if not credential.rotation_cancelled:
+            credential.date_last_rotated = timezone.now()
+        credential.rotation_records.filter(date_created__gte=credential.date_rotation_started).update(
+            status='cancelled' if credential.rotation_cancelled else 'success',
+            date_finished=timezone.now(),
+        )
+        credential.status = ApplicationCredential.Status.idle
+        credential.primary_version_at_start = None
+        credential.date_rotation_started = None
+        credential.rotation_cancelled = False
+        credential.save(update_fields=[
             'status', 'date_last_rotated', 'primary_version_at_start',
             'date_rotation_started', 'rotation_cancelled', 'date_updated',
         ])
         CredentialClientStatus.objects.filter(
-            binding__policy=policy, is_rotation_participant=True
+            binding__credential=credential, is_rotation_participant=True
         ).update(required_revision=None, is_rotation_participant=False)
-        return policy, []
+        return credential, []
 
     def cancel(self):
-        policy = self._get_locked_policy()
-        if policy.status not in (
-            CredentialPolicy.Status.waiting_backup,
-            CredentialPolicy.Status.ready_for_change,
+        credential = self._get_locked_credential()
+        if credential.status not in (
+            ApplicationCredential.Status.waiting_backup,
+            ApplicationCredential.Status.ready_for_change,
         ):
             raise ValidationError(_('This credential rotation cannot be cancelled.'))
-        policy.revision += 1
-        policy.published_account = policy.primary_account
-        policy.status = CredentialPolicy.Status.waiting_primary
-        policy.rotation_cancelled = True
-        policy.save(update_fields=[
+        credential.revision += 1
+        credential.published_account = credential.primary_account
+        credential.status = ApplicationCredential.Status.waiting_primary
+        credential.rotation_cancelled = True
+        credential.save(update_fields=[
             'revision', 'published_account', 'status',
             'rotation_cancelled', 'date_updated',
         ])
         CredentialClientStatus.objects.filter(
-            binding__policy=policy, is_rotation_participant=True
-        ).update(required_revision=policy.revision)
-        return policy
+            binding__credential=credential, is_rotation_participant=True
+        ).update(required_revision=credential.revision)
+        return credential
