@@ -27,8 +27,9 @@ urlpatterns = ops_urlpatterns + \
 
 if settings.XPACK_ENABLED:
     from xpack.plugins.cloud.urls.ws_urls import urlpatterns as xcloud_urlpatterns
+    from xpack.plugins.facelive.urls.ws_urls import urlpatterns as facelive_urlpatterns
 
-    urlpatterns += xcloud_urlpatterns
+    urlpatterns += xcloud_urlpatterns + facelive_urlpatterns
 
 
 @database_sync_to_async

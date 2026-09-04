@@ -49,6 +49,11 @@ apps.iml
 *.db
 *.mmdb
 *.ipdb
+# Downloaded face-recognition model artifacts
+*.onnx
+*.onnx.data
+**/buffalo_l.zip
+requirements/face_models/
 context
 luna
 lina
