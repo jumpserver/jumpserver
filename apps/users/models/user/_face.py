@@ -17,7 +17,14 @@ class FaceMixin:
 
     @property
     def is_face_code_set(self):
-        return self.face_vector is not None
+        if not self.face_vector:
+            return False
+        try:
+            from xpack.plugins.facelive.codec import is_native_face_code
+
+            return is_native_face_code(str(self.face_vector))
+        except ImportError:
+            return True
 
     def get_face_vector(self) -> list[float]:
         if not self.face_vector:
@@ -25,13 +32,27 @@ class FaceMixin:
         return self._decode_base64_vector(str(self.face_vector))
 
     def check_face(self, code, distance_threshold=None, similarity_threshold=None) -> bool:
-        distance = self.compare_euclidean_distance(code)
-        similarity = self.compare_cosine_similarity(code)
+        distance_threshold = (
+            settings.FACE_RECOGNITION_DISTANCE_THRESHOLD
+            if distance_threshold is None else distance_threshold
+        )
+        similarity_threshold = (
+            settings.FACE_RECOGNITION_COSINE_THRESHOLD
+            if similarity_threshold is None else similarity_threshold
+        )
+        try:
+            from xpack.plugins.facelive.codec import compare_face_codes
 
-        distance_threshold = distance_threshold or settings.FACE_RECOGNITION_DISTANCE_THRESHOLD
-        similarity_threshold = similarity_threshold or settings.FACE_RECOGNITION_COSINE_THRESHOLD
-
-        return distance < distance_threshold and similarity > similarity_threshold
+            return compare_face_codes(
+                str(self.face_vector),
+                code,
+                cosine_threshold=similarity_threshold,
+                distance_threshold=distance_threshold,
+            )
+        except ImportError:
+            distance = self.compare_euclidean_distance(code)
+            similarity = self.compare_cosine_similarity(code)
+            return distance < distance_threshold and similarity > similarity_threshold
 
     def compare_euclidean_distance(self, base64_vector: str) -> float:
         target_vector = self._decode_base64_vector(base64_vector)
@@ -45,6 +66,12 @@ class FaceMixin:
 
     @staticmethod
     def _decode_base64_vector(base64_vector: str) -> list[float]:
+        try:
+            from xpack.plugins.facelive.codec import decode_face_code
+
+            return decode_face_code(base64_vector).vector.astype(float).tolist()
+        except ImportError:
+            pass
         byte_data = base64.b64decode(base64_vector)
         return list(struct.unpack('<128d', byte_data))
 
