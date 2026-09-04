@@ -10223,6 +10223,18 @@ msgstr "Solo administradores"
 msgid "Global MFA"
 msgstr "Habilitar autenticación MFA a nivel global"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Métodos MFA permitidos"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Seleccione uno o más métodos MFA que los usuarios pueden vincular y usar"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Seleccione al menos un método MFA"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "Terceros habilitan MFA"
@@ -13122,6 +13134,14 @@ msgstr "Ruta del avatar"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Tipos MFA permitidos"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Deje vacío para heredar los métodos MFA globales"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

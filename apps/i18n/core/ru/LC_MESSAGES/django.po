@@ -10165,6 +10165,18 @@ msgstr "Только администраторы"
 msgid "Global MFA"
 msgstr "Глобальное включение МФА"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Разрешённые методы МФА"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Выберите один или несколько методов МФА, которые пользователи могут привязать и использовать"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Выберите хотя бы один метод МФА"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "Сторонняя проверка МФА"
@@ -13049,6 +13061,14 @@ msgstr "URL аватара"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "Уровень МФА"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Разрешённые типы МФА"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Оставьте пустым, чтобы наследовать глобальные методы МФА"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

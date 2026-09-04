@@ -645,6 +645,9 @@ class Config(dict):
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_MFA_BY_EMAIL': False,
+        'SECURITY_MFA_METHODS': [
+            'otp', 'sms', 'email', 'face', 'otp_radius', 'passkey', 'mfa_custom'
+        ],
         'SECURITY_COMMAND_EXECUTION': False,
         'ANSIBLE_DOCKER_ENABLED': True,
         'SECURITY_COMMAND_BLACKLIST': [

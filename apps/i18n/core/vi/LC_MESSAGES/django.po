@@ -10078,6 +10078,18 @@ msgstr "Chỉ quản trị viên"
 msgid "Global MFA"
 msgstr "Bật xác thực MFA toàn cầu"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Phương thức MFA được phép"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Chọn một hoặc nhiều phương thức MFA mà người dùng có thể liên kết và sử dụng"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Vui lòng chọn ít nhất một phương thức MFA"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "Bật xác thực MFA của bên thứ ba"
@@ -12932,6 +12944,14 @@ msgstr "Đường dẫn ảnh đại diện"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Loại MFA được phép"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Để trống để kế thừa phương thức MFA toàn cục"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
