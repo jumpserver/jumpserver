@@ -602,6 +602,12 @@ class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     class Meta:
         verbose_name = _("Node")
         ordering = ['parent_key', 'value']
+        indexes = [
+            models.Index(
+                fields=['org_id', 'parent_key', 'value', 'id'],
+                name='assets_node_org_parent_val_idx',
+            ),
+        ]
         permissions = [
             ('match_node', _('Can match node')),
         ]
