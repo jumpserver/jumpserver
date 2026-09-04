@@ -8396,10 +8396,6 @@ msgstr "終端設置"
 msgid "Can change other setting"
 msgstr "其它設置"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "聊天提示"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "同步LDAP用戶任務結果通知"
@@ -9317,53 +9313,9 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "聊天 AI"
 
-#: rbac/tree.py
-msgid "Conversations"
-msgstr "會話管理"
-
-#: rbac/tree.py
-msgid "Messages and attachments"
-msgstr "消息與附件"
-
-#: rbac/tree.py
-msgid "Runs and approvals"
-msgstr "執行與審批"
-
-#: rbac/tree.py
-msgid "API call audits"
-msgstr "API 調用審計"
-
-#: chat_ai/models.py
-msgid "Chat AI conversation"
-msgstr "聊天 AI 會話"
-
 #: chat_ai/models.py
 msgid "Can use Chat AI"
 msgstr "可使用 Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message"
-msgstr "聊天 AI 消息"
-
-#: chat_ai/models.py
-msgid "Chat AI message file"
-msgstr "聊天 AI 消息文件"
-
-#: chat_ai/models.py
-msgid "Chat AI message image"
-msgstr "聊天 AI 消息圖片"
-
-#: chat_ai/models.py
-msgid "Chat AI agent run"
-msgstr "聊天 AI 助手執行"
-
-#: chat_ai/models.py
-msgid "Chat AI approval"
-msgstr "聊天 AI 操作審批"
-
-#: chat_ai/models.py
-msgid "Chat AI API call audit"
-msgstr "聊天 AI API 調用審計"
 
 #: settings/serializers/feature.py:158
 msgid "Method"

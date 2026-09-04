@@ -203,25 +203,25 @@ class ObjectRelatedField(serializers.RelatedField):
         """
         为 drf-spectacular 提供 OpenAPI schema
         """
-        # 获取字段的基本信息
-        field_type = 'array' if self.many else 'object'
+        description = getattr(self, 'help_text', '') or ''
+        title = getattr(self, 'label', '') or ''
 
-        if field_type == 'array':
+        if self.many:
             # 如果是多对多关系
             return {
                 'type': 'array',
                 'items': self._get_openapi_item_schema(),
-                'description': getattr(self, 'help_text', ''),
-                'title': getattr(self, 'label', ''),
+                'description': description,
+                'title': title,
             }
-        else:
-            # 如果是一对一关系
-            return {
-                'type': 'object',
-                'properties': self._get_openapi_properties_schema(),
-                'description': getattr(self, 'help_text', ''),
-                'title': getattr(self, 'label', ''),
-            }
+
+        # 单值关系复用完整对象 schema，保留关联对象 id 的必填约束。
+        schema = self._get_openapi_object_schema()
+        schema.update({
+            'description': description,
+            'title': title,
+        })
+        return schema
 
     def _get_openapi_item_schema(self):
         """
@@ -272,10 +272,10 @@ class ObjectRelatedField(serializers.RelatedField):
         """
         将 Django 字段类型映射到 OpenAPI 类型
         """
-        field_type = type(field).__name__
+        field_type = field.get_internal_type()
 
         # 整数类型
-        if 'Integer' in field_type or 'BigInteger' in field_type or 'SmallInteger' in field_type:
+        if field_type in ('AutoField', 'BigAutoField', 'SmallAutoField') or 'Integer' in field_type:
             return 'integer'
         # 浮点数类型
         elif 'Float' in field_type or 'Decimal' in field_type:

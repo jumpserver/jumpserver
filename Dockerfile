@@ -32,7 +32,6 @@ ARG TOOLS="                           \
         cron                          \
         ca-certificates               \
         default-libmysqlclient-dev    \
-        ffmpeg                        \
         libmariadb3                   \
         postgresql-client             \
         openssh-client                \

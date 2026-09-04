@@ -96,7 +96,6 @@ user_accessible_urls = known_unauth_urls + [
     "/api/v1/users/profile/",
     "/api/v1/users/change-password/",
     "/api/v1/users/logout/",
-    "/api/v1/settings/chatai-prompts/",
     "/api/v1/authentication/confirm/",
     "/api/v1/users/connection-token/",
     "/api/v1/authentication/temp-tokens/",

@@ -8702,10 +8702,6 @@ msgstr "Изменение настроек терминала"
 msgid "Can change other setting"
 msgstr "Изменение прочих настроек"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "Подсказка в чате"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "Уведомление о результате задачи синхронизации пользователей LDAP"
@@ -9672,53 +9668,9 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "Чат AI"
 
-#: rbac/tree.py
-msgid "Conversations"
-msgstr "Диалоги"
-
-#: rbac/tree.py
-msgid "Messages and attachments"
-msgstr "Сообщения и вложения"
-
-#: rbac/tree.py
-msgid "Runs and approvals"
-msgstr "Выполнения и подтверждения"
-
-#: rbac/tree.py
-msgid "API call audits"
-msgstr "Аудит вызовов API"
-
-#: chat_ai/models.py
-msgid "Chat AI conversation"
-msgstr "Диалог Chat AI"
-
 #: chat_ai/models.py
 msgid "Can use Chat AI"
 msgstr "Можно использовать Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message"
-msgstr "Сообщение Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message file"
-msgstr "Файл сообщения Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message image"
-msgstr "Изображение сообщения Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI agent run"
-msgstr "Выполнение агента Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI approval"
-msgstr "Подтверждение Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI API call audit"
-msgstr "Аудит вызовов API Chat AI"
 
 #: settings/serializers/feature.py:158
 msgid "Method"

@@ -20,7 +20,6 @@ if SERVER_SIZE == 'auto':
         SERVER_SIZE = 'large'
 
 class Services(TextChoices):
-    ai = 'ai', 'ai'
     gunicorn = 'gunicorn', 'gunicorn'
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
@@ -37,7 +36,6 @@ class Services(TextChoices):
     def get_service_object_class(cls, name):
         from . import services
         services_map = {
-            cls.ai.value: services.AIService,
             cls.gunicorn.value: services.GunicornService,
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
@@ -71,7 +69,7 @@ class Services(TextChoices):
 
     @classmethod
     def export_services_values(cls):
-        return [cls.all.value, cls.web.value, cls.task.value, cls.ai.value] + [s.value for s in cls.all_services()]
+        return [cls.all.value, cls.web.value, cls.task.value] + [s.value for s in cls.all_services()]
 
     @classmethod
     def get_service_objects(cls, service_names, **kwargs):
@@ -132,9 +130,6 @@ class BaseActionCommand(BaseCommand):
 
         return {
             'gunicorn': {
-                'worker': worker
-            },
-            'ai': {
                 'worker': worker
             }
         }

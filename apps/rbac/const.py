@@ -135,7 +135,6 @@ exclude_permissions = (
     ('terminal', 'session', 'delete,share', 'session'),
     ('terminal', 'session', 'delete,change', 'command'),
     ('applications', '*', '*', '*'),
-    ('settings', 'chatprompt', 'add,delete,change', 'chatprompt'),
     ('oauth2_provider', 'grant', '*', '*'),
     ('oauth2_provider', 'refreshtoken', '*', '*'),
     ('oauth2_provider', 'idtoken', '*', '*'),
