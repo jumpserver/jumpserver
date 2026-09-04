@@ -4,6 +4,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
+from django.utils.module_loading import import_string
 
 from authentication.backends.drf import (
     SignatureAuthentication,
@@ -26,10 +27,7 @@ urlpatterns = ops_urlpatterns + \
               terminal_urlpatterns
 
 if settings.XPACK_ENABLED:
-    from xpack.plugins.cloud.urls.ws_urls import urlpatterns as xcloud_urlpatterns
-    from xpack.plugins.facelive.urls.ws_urls import urlpatterns as facelive_urlpatterns
-
-    urlpatterns += xcloud_urlpatterns + facelive_urlpatterns
+    urlpatterns += import_string('xpack.urls.ws_urls.urlpatterns')
 
 
 @database_sync_to_async

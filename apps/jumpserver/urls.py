@@ -69,10 +69,7 @@ urlpatterns = [
 
 if settings.XPACK_ENABLED:
     urlpatterns.append(
-        path(
-            'facelive/',
-            include('xpack.plugins.facelive.urls.view_urls', namespace='facelive'),
-        )
+        path('', include('xpack.urls.view_urls'))
     )
 
 # 静态文件处理路由
