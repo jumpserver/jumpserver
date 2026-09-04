@@ -212,3 +212,4 @@ redis = { url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple"
 default = true
+
