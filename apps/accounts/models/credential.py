@@ -9,31 +9,47 @@ from common.utils import random_string
 from orgs.mixins.models import JMSOrgBaseModel
 
 __all__ = [
-    'CredentialPolicy', 'CredentialApplicationBinding',
+    'ApplicationCredential', 'CredentialApplicationBinding',
     'CredentialClientInstance', 'CredentialClientStatus',
+    'ClientAccessConfiguration', 'CredentialRotationRecord',
 ]
 
 
-class CredentialPolicy(JMSOrgBaseModel):
+class ApplicationCredential(JMSOrgBaseModel):
+    class Type(models.TextChoices):
+        fixed = 'fixed', _('Fixed account')
+        rotation = 'rotation', _('Account rotation')
+
+    class RotationMode(models.TextChoices):
+        single = 'single', _('Single account')
+        dual = 'dual', _('Dual accounts')
+
     class Status(models.TextChoices):
         idle = 'idle', _('Idle')
         waiting_backup = 'waiting_backup', _('Waiting for backup account')
         ready_for_change = 'ready_for_change', _('Ready for secret change')
+        changing_secret = 'changing_secret', _('Changing secret')
         waiting_primary = 'waiting_primary', _('Waiting for primary account')
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     key = models.CharField(max_length=64, unique=True, default='', verbose_name=_('Key'))
+    type = models.CharField(max_length=16, choices=Type.choices, default=Type.rotation, verbose_name=_('Type'))
+    rotation_mode = models.CharField(
+        max_length=16, choices=RotationMode.choices, default=RotationMode.dual,
+        blank=True, verbose_name=_('Rotation mode')
+    )
     primary_account = models.ForeignKey(
         'accounts.Account', on_delete=models.PROTECT,
-        related_name='primary_credential_policies', verbose_name=_('Primary account')
+        related_name='primary_application_credentials', verbose_name=_('Primary account')
     )
     backup_account = models.ForeignKey(
         'accounts.Account', on_delete=models.PROTECT,
-        related_name='backup_credential_policies', verbose_name=_('Backup account')
+        null=True, blank=True,
+        related_name='backup_application_credentials', verbose_name=_('Backup account')
     )
     published_account = models.ForeignKey(
         'accounts.Account', on_delete=models.PROTECT,
-        related_name='published_credential_policies', verbose_name=_('Published account')
+        related_name='published_application_credentials', verbose_name=_('Published account')
     )
     revision = models.PositiveIntegerField(default=1, verbose_name=_('Revision'))
     status = models.CharField(
@@ -51,11 +67,19 @@ class CredentialPolicy(JMSOrgBaseModel):
         null=True, blank=True, verbose_name=_('Date last rotated')
     )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    change_execution = models.ForeignKey(
+        'accounts.AutomationExecution', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='+', verbose_name=_('Change secret execution')
+    )
+    applications = models.ManyToManyField(
+        'accounts.IntegrationApplication', through='accounts.CredentialApplicationBinding',
+        related_name='application_credentials', verbose_name=_('Integration applications')
+    )
 
     class Meta:
         unique_together = [('org_id', 'name'), ('org_id', 'primary_account')]
         ordering = ['name']
-        verbose_name = _('Credential policy')
+        verbose_name = _('Application credential')
 
     def __str__(self):
         return self.name
@@ -69,11 +93,19 @@ class CredentialPolicy(JMSOrgBaseModel):
     def asset(self):
         return self.primary_account.asset
 
+    @property
+    def current_revision(self):
+        if self.type == self.Type.fixed:
+            return self.primary_account.version + 1
+        return self.revision
+
     def participant_statuses(self):
         return CredentialClientStatus.objects.filter(
-            binding__policy=self,
+            binding__credential=self,
             is_rotation_participant=True,
             client__is_active=True,
+            client__configuration__is_active=True,
+            client__application__is_active=True,
         ).select_related(
             'binding__application', 'client', 'applied_account'
         )
@@ -113,9 +145,9 @@ class CredentialPolicy(JMSOrgBaseModel):
 
 
 class CredentialApplicationBinding(JMSOrgBaseModel):
-    policy = models.ForeignKey(
-        CredentialPolicy, on_delete=models.CASCADE,
-        related_name='application_bindings', verbose_name=_('Credential policy')
+    credential = models.ForeignKey(
+        ApplicationCredential, on_delete=models.CASCADE,
+        related_name='application_bindings', verbose_name=_('Application credential')
     )
     application = models.ForeignKey(
         'accounts.IntegrationApplication', on_delete=models.CASCADE,
@@ -123,12 +155,12 @@ class CredentialApplicationBinding(JMSOrgBaseModel):
     )
 
     class Meta:
-        unique_together = [('policy', 'application')]
+        unique_together = [('credential', 'application')]
         ordering = ['application__name']
         verbose_name = _('Credential application binding')
 
     def __str__(self):
-        return f'{self.application} - {self.policy}'
+        return f'{self.application} - {self.credential}'
 
 
 class CredentialClientInstance(JMSOrgBaseModel):
@@ -142,6 +174,10 @@ class CredentialClientInstance(JMSOrgBaseModel):
         'accounts.IntegrationApplication', on_delete=models.CASCADE,
         related_name='credential_clients', verbose_name=_('Integration application')
     )
+    configuration = models.ForeignKey(
+        'accounts.ClientAccessConfiguration', on_delete=models.CASCADE,
+        related_name='instances', verbose_name=_('Client access configuration')
+    )
     type = models.CharField(max_length=16, choices=Type.choices, verbose_name=_('Type'))
     instance_id = models.CharField(max_length=128, verbose_name=_('Instance ID'))
     secret = fields.EncryptTextField(default='', blank=True, verbose_name=_('Secret'))
@@ -149,7 +185,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
     class Meta:
-        unique_together = [('application', 'instance_id')]
+        unique_together = [('configuration', 'instance_id')]
         ordering = ['application__name', 'instance_id']
         verbose_name = _('Credential client instance')
 
@@ -162,7 +198,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
 
     @property
     def is_valid(self):
-        return self.is_active and self.application.is_active
+        return self.is_active and self.application.is_active and self.configuration.is_active
 
     @property
     def online(self):
@@ -208,4 +244,44 @@ class CredentialClientStatus(JMSOrgBaseModel):
         verbose_name = _('Credential client status')
 
     def __str__(self):
-        return f'{self.client} - {self.binding.policy.key}'
+        return f'{self.client} - {self.binding.credential.key}'
+
+
+class ClientAccessConfiguration(JMSOrgBaseModel):
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    application = models.ForeignKey(
+        'accounts.IntegrationApplication', on_delete=models.CASCADE,
+        related_name='access_configurations', verbose_name=_('Integration application')
+    )
+    type = models.CharField(max_length=16, choices=CredentialClientInstance.Type.choices, verbose_name=_('Type'))
+    credentials = models.ManyToManyField(
+        ApplicationCredential, related_name='access_configurations', verbose_name=_('Application credentials')
+    )
+    language = models.CharField(max_length=16, default='python', choices=[('python', 'Python')], verbose_name=_('Language'))
+    app_user = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Application user'))
+    install_path = models.CharField(max_length=256, default='/opt/jumpserver-pam', verbose_name=_('Install path'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+
+    class Meta:
+        unique_together = [('application', 'name')]
+        ordering = ['name']
+        verbose_name = _('Client access configuration')
+
+    def __str__(self):
+        return self.name
+
+
+class CredentialRotationRecord(JMSOrgBaseModel):
+    credential = models.ForeignKey(
+        ApplicationCredential, on_delete=models.CASCADE,
+        related_name='rotation_records', verbose_name=_('Application credential')
+    )
+    status = models.CharField(max_length=16, default='running', choices=[
+        ('running', _('Running')), ('success', _('Success')),
+        ('failed', _('Failed')), ('cancelled', _('Cancelled')),
+    ], verbose_name=_('Status'))
+    date_finished = models.DateTimeField(null=True, blank=True, verbose_name=_('Date finished'))
+
+    class Meta:
+        ordering = ['-date_created']
+        verbose_name = _('Credential rotation record')
