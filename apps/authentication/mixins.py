@@ -16,7 +16,7 @@ from django.contrib.auth import (
 )
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db.models import Q
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
@@ -31,6 +31,7 @@ from common.utils import (
 )
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
+from users.validators import get_validation_error_message
 from . import errors
 from .signals import post_auth_success, post_auth_failed
 
@@ -170,6 +171,12 @@ def authenticate(request=None, **credentials):
                     and the current user is not in the user list. Please contact the administrator.'''
                 )
             continue
+        except ValidationError as e:
+            error_msg = get_validation_error_message(e)
+            logger.warning('Authenticate failed: {}'.format(error_msg))
+            if request:
+                request.error_message = error_msg
+            continue
         except Exception as e:
             logger.error('Authenticate failed: {}'.format(e))
             continue
@@ -223,7 +230,11 @@ class CommonMixin:
         return self._ip
 
     def raise_credential_error(self, error):
-        raise self.partial_credential_error(error=error)
+        kwargs = {'error': error}
+        error_msg = getattr(self.request, 'error_message', None)
+        if error == errors.reason_password_failed and error_msg:
+            kwargs['message'] = error_msg
+        raise self.partial_credential_error(**kwargs)
 
     def _set_partial_credential_error(self, username, ip, request):
         self.partial_credential_error = partial(

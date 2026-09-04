@@ -2,6 +2,7 @@ from django.utils.module_loading import import_string
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
+from django.core.exceptions import ValidationError
 from django.http.response import HttpResponseRedirect
 
 from rest_framework.generics import RetrieveAPIView
@@ -11,6 +12,7 @@ from rest_framework.permissions import AllowAny
 
 from rbac.models import SystemRole, SystemRoleBinding
 from common.utils import get_logger
+from users.validators import get_validation_error_message
 from ..mixins import AuthMixin
 
 __all__  = ['CustomSSOLoginAPIView']
@@ -73,6 +75,8 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
         try:
             user = self.get_or_create_user_from_userinfo(userinfo)
             return user, ''
+        except ValidationError as e:
+            return None, get_validation_error_message(e)
         except Exception as e:
             error = f'Custom SSO get or create user error: {e}'
             return None, error

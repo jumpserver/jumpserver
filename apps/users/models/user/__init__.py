@@ -17,6 +17,7 @@ from common.utils import (
 )
 from labels.mixins import LabeledMixin
 from orgs.utils import current_org
+from users.validators import validate_username
 from ._auth import AuthMixin, MFAMixin
 from ._face import FaceMixin
 from ._json import JSONFilterMixin
@@ -253,6 +254,8 @@ class User(
             self.email = email
 
     def save(self, *args, **kwargs):
+        if self._state.adding:
+            validate_username(self.username)
         self.set_required_attr_if_need()
         if self.username == "admin":
             self.role = "Admin"

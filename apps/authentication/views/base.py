@@ -3,6 +3,7 @@ from functools import lru_cache
 from django.conf import settings
 from django.contrib.auth import logout as auth_logout
 from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -17,6 +18,7 @@ from common.utils.common import get_request_ip
 from common.utils.django import reverse, get_object_or_none
 from users.models import User
 from users.signal_handlers import bind_user_to_org_role, check_only_allow_exist_user_auth
+from users.validators import get_validation_error_message
 from .mixins import FlashMessageMixin
 
 logger = get_logger(__file__)
@@ -63,6 +65,10 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
                 setattr(user, 'source', self.user_type)
                 bind_user_to_org_role(user)
             user.save()
+        except ValidationError as err:
+            error_msg = get_validation_error_message(err)
+            logger.warning(f'{self.msg_client_err}: create user error: {error_msg}')
+            return None, (self.msg_client_err, error_msg)
         except IntegrityError as err:
             logger.error(f'{self.msg_client_err}: create user error: {err}')
 

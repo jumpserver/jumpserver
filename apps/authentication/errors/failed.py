@@ -70,7 +70,7 @@ class CredentialError(
     AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin,
     BlockGlobalIpLoginError, AuthFailedError
 ):
-    def __init__(self, error, username, ip, request):
+    def __init__(self, error, username, ip, request, message=None):
         util = LoginBlockUtil(username, ip)
         times_remainder = util.get_remainder_times()
         block_time = settings.SECURITY_LOGIN_LIMIT_TIME
@@ -80,7 +80,9 @@ class CredentialError(
             default_msg = const.invalid_login_msg.format(
                 times_try=times_remainder, block_time=block_time
             )
-            if error == const.reason_password_failed:
+            if message:
+                self.msg = message
+            elif error == const.reason_password_failed:
                 self.msg = default_msg
             else:
                 self.msg = const.reason_choices.get(error, default_msg)

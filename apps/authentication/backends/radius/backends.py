@@ -4,12 +4,16 @@ import traceback
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from radiusauth.backends import RADIUSBackend, RADIUSRealmBackend
 
 from authentication.backends.base import JMSBaseAuthBackend
+from common.utils import get_logger
+from users.validators import get_validation_error_message
 from .signals import radius_create_user
 
 User = get_user_model()
+logger = get_logger(__file__)
 
 
 class CreateUserMixin:
@@ -28,7 +32,13 @@ class CreateUserMixin:
             email = '{}@{}'.format(username, email_suffix)
 
         user = User(username=username, name=username, email=email)
-        user.save()
+        try:
+            user.save()
+        except ValidationError as e:
+            logger.warning(
+                'Create RADIUS user failed: {}'.format(get_validation_error_message(e))
+            )
+            return None
         radius_create_user.send(sender=user.__class__, user=user)
         return user
 

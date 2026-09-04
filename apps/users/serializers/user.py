@@ -23,6 +23,7 @@ from rbac.builtin import BuiltinRole
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
 from rbac.permissions import RBACPermission
 from users.signals import post_user_change_password
+from users.validators import validate_username as validate_user_username
 from ..const import PasswordStrategy
 from ..models import User
 
@@ -181,6 +182,11 @@ class UserSerializer(
         "system_roles": [BuiltinRole.system_user],
         "org_roles": [BuiltinRole.org_user],
     }
+
+    def validate_username(self, username):
+        if self.instance is None:
+            validate_user_username(username)
+        return username
 
     class Meta:
         model = User
@@ -525,6 +531,8 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         return "{}{}".format(name, User.service_account_email_suffix)
 
     def validate_name(self, name):
+        if self.instance is None:
+            validate_user_username(name)
         email = self.get_email()
         username = self.get_username()
         if self.instance:

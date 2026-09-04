@@ -10,6 +10,7 @@
 import base64
 
 import requests
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -19,6 +20,7 @@ from django.urls import reverse
 from authentication.utils import build_absolute_uri_for_oidc
 from common.utils import get_logger
 from users.utils import construct_user_email
+from users.validators import get_validation_error_message
 from .decorator import ssl_verification
 from .signals import (
     openid_create_or_update_user
@@ -227,6 +229,12 @@ class OIDCAuthPasswordBackend(OIDCBaseBackendMixin, JMSBaseAuthBackend, ModelBac
     def authenticate(self, request, username=None, password=None):
         try:
             return self._authenticate(request, username, password)
+        except ValidationError as e:
+            error_msg = get_validation_error_message(e)
+            logger.warning('Authenticate failed: {}'.format(error_msg))
+            if request:
+                request.error_message = error_msg
+            return None
         except Exception as e:
             error = f'Authenticate exception: {e}'
             logger.error(error, exc_info=True)
