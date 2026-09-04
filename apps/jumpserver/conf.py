@@ -945,7 +945,7 @@ class Config(dict):
             'POST': {'enabled': True, 'approval': True, 'risk_level': 'write'},
             'PUT': {'enabled': True, 'approval': True, 'risk_level': 'write'},
             'PATCH': {'enabled': True, 'approval': True, 'risk_level': 'write'},
-            'DELETE': {'enabled': True, 'approval': True, 'risk_level': 'dangerous'},
+            'DELETE': {'enabled': False, 'approval': True, 'risk_level': 'dangerous'},
         },
         'VIRTUAL_APP_ENABLED': False,
 

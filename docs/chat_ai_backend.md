@@ -27,7 +27,7 @@
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| POST | `/api/v1/chat-ai/conversations/` | 创建对话；请求可选 `title` 和内置 `assistant` |
+| POST | `/api/v1/chat-ai/conversations/` | 创建对话；请求可选 `title` |
 | GET | `/api/v1/chat-ai/conversations/` | 当前用户、当前组织的对话列表 |
 | GET | `/api/v1/chat-ai/conversations/{id}/` | 对话详情 |
 | DELETE | `/api/v1/chat-ai/conversations/{id}/` | 删除对话；运行中返回 `409 CONVERSATION_BUSY` |
@@ -41,7 +41,6 @@
 | POST | `/api/v1/chat-ai/approvals/{id}/confirm/` | 校验并一次性执行写操作 |
 | POST | `/api/v1/chat-ai/approvals/{id}/cancel/` | 取消写操作 |
 | POST | `/api/v1/chat-ai/openapi/refresh/` | 超级管理员手动刷新 Registry |
-| GET | `/api/v1/chat-ai/assistants/` | 返回内置通用、资产、会话审计和运维助手及其能力范围 |
 | GET/POST | `/api/v1/chat-ai/scheduled-reports/` | 管理当前用户的只读定时诊断报告 |
 | POST | `/api/v1/chat-ai/scheduled-reports/{id}/run/` | 立即排队执行一次定时报告 |
 | GET | `/api/v1/chat-ai/stats/?days=30` | 超级管理员查看当前组织用量、Token、热门操作和定时任务统计 |
@@ -61,16 +60,15 @@
 }
 ```
 
-## 内置助手和诊断范围
+## 单一自动助手和有效能力
 
-Conversation 的 `assistant` 支持：
+Chat AI 对用户呈现单一助手，由 Agent 根据每次提问自动判断是直接回答产品知识，还是搜索并调用当前环境中的 Core API。用户不需要选择角色或能力范围，切换对话也不会改变授权边界。
 
-- `general`：通用问答和全部非敏感 Core API；绕过 operationId、Tag 和允许路径白名单，所有写操作仍需 Approval。
-- `asset`：仅搜索资产、节点、平台、协议等只读 operationId。
-- `session_audit`：仅搜索会话、命令、登录、操作、服务访问和工单审计 operationId。
-- `ops`：仅搜索作业、任务、组件指标和终端状态 operationId。
+一次运行的有效 Core 能力始终是全局 Chat AI 策略与当前用户、当前组织 RBAC 权限的交集。全局策略包括 Method 开关、operationId、Tag 和 Path 白名单、敏感 Path 黑名单及敏感参数限制；用户与组织侧继续执行正常 RBAC、资源所有权和对象可见范围校验。超级管理员身份也不会绕过全局 Chat AI 策略。
 
-通用助手不受 `CHAT_AI_ALLOWED_OPERATION_IDS`、`CHAT_AI_ALLOWED_TAGS` 和 `CHAT_AI_ALLOWED_PATHS` 限制；其他助手的固定范围仍与这些全局白名单取交集，不能借角色切换扩大权限。所有助手都继续受敏感路径、敏感参数、Method 策略、Core RBAC 和组织权限校验约束。默认允许通用助手执行查询及经 Approval 确认的创建、修改和删除操作。
+完整 OpenAPI Registry 仅在服务端参与检索。模型先调用 `search_core_api`，只会收到本次意图和有效权限范围内的少量候选 Operation，再以候选 `operation_id` 调用 `call_core_api`；不能借助提示词、历史消息或直接提交 URL 扩大范围。没有匹配能力时返回不支持说明；存在相关能力但当前用户无权使用时，只返回通用权限不足信息，不向模型暴露被拒绝的 Operation、Path 或参数 Schema。
+
+GET 查询默认不需要 Approval。POST、PUT 和 PATCH 等写操作必须先生成安全预览并由当前用户明确确认，确认时重新校验用户、组织、全局策略、Operation 和请求参数。DELETE 默认禁用，不能仅凭模型请求或用户身份启用。
 
 Core API 调用完成后，结果卡片先在本次执行的内存中累计，在消息结束时一次性持久化到 Assistant Message 的 `result_cards`。卡片包含 `table`、`timeline`、`detail`、`metric`、`sources` 或仅供恢复用户可见过程的 `progress` 类型。SSE 的 `api_call_result` 同时返回 `presentation`，刷新对话后仍可从消息历史恢复过程与结构化结果；卡片构建或持久化异常不会改变回答和 Run 的最终状态。
 
@@ -216,9 +214,9 @@ nonce
 ## Approval 和安全策略
 
 - GET 默认允许且无需确认。
-- POST、PUT、PATCH、DELETE 默认需要确认。
-- DELETE 默认启用并要求确认，可通过 `CHAT_AI_METHOD_POLICIES` 关闭。
-- Method 的 enabled、approval 和 risk_level 可通过 `CHAT_AI_METHOD_POLICIES` 收窄；高风险环境可继续关闭 DELETE。
+- POST、PUT、PATCH 默认需要确认。
+- DELETE 默认禁用；仅在管理员通过 `CHAT_AI_METHOD_POLICIES` 显式启用后才可进入候选范围，并且仍必须确认。
+- Method 的 enabled、approval 和 risk_level 可通过 `CHAT_AI_METHOD_POLICIES` 继续收窄；配置不能绕过当前用户、当前组织 RBAC 或其他全局 Chat AI 策略。
 - 默认屏蔽 Chat AI 自身、Password、Secret、Private Key、Access Key、Token、Credential 和账号备份相关路径。
 - 还可用 Tag、operationId、Path 白名单及 Path 黑名单收窄范围。
 - 模型只能提交 `operation_id + path_params + query_params + body`，不能提交 URL 或 Method。
@@ -361,7 +359,7 @@ CHAT_AI_ALLOWED_OPERATION_IDS:
 
 Chat AI 每天 02:00 分批清理超期数据。Conversation 默认保留 180 天，附件 30 天，结果卡片 90 天，Core API 调用审计、已结束 Approval 和已结束 AgentRun 保留 180 天；待执行、执行中和等待审批的数据不会被清理。任一 `*_KEEP_DAYS` 设置为 `0` 可单独关闭该类清理。
 
-默认白名单用于资产、会话审计和运维助手的只读诊断范围；通用助手会绕过该白名单，并可执行全部非敏感 Core API。模型 Base URL、API Key、代理和模型名由统一的 Chat AI 系统设置管理；管理页面调用 `/api/v1/settings/chatai/models/` 动态发现模型，并通过 `/api/v1/settings/chatai/testing/` 验证模型的工具调用能力。
+默认白名单定义单一自动助手可检索的 Core API 上限；每次运行还会与当前用户、当前组织的 RBAC 权限及资源可见范围取交集，任何用户身份都不会绕过该白名单。模型 Base URL、API Key、代理和模型名由统一的 Chat AI 系统设置管理；管理页面调用 `/api/v1/settings/chatai/models/` 动态发现模型，并通过 `/api/v1/settings/chatai/testing/` 验证模型的工具调用能力。
 
 ## 主要兼容性风险
 
@@ -377,7 +375,6 @@ Chat AI 每天 02:00 分批清理超期数据。Conversation 默认保留 180 �
 
 - `apps/chat_ai/models.py`：Conversation、Message、AgentRun、ApiCallAudit、Approval 和 ScheduledReport。
 - `apps/chat_ai/api/`：REST、SSE、取消、重新生成、后台任务、定时报告、统计、会话审计、审批和 Registry 刷新。
-- `apps/chat_ai/assistants.py`：内置角色、提示约束和逐项 operationId 范围。
 - `apps/chat_ai/presentation.py`：Core API 和联网来源的结构化结果卡片。
 - `apps/chat_ai/agents/`：多步循环、Tool 调用、限额和取消。
 - `apps/chat_ai/openapi/`：Schema Loader、Resolver、Registry 和搜索。

@@ -5,6 +5,11 @@ from django.conf import settings
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.generators import SchemaGenerator
 
+from rbac.permissions import RBACPermission
+
+
+CHAT_AI_PERMISSIONS_UNSET = object()
+
 
 class CustomSchemaGenerator(SchemaGenerator):
     from_mcp = False
@@ -71,6 +76,65 @@ class CustomAutoSchema(AutoSchema):
             tokenized_path.append('formatted')
 
         return '_'.join(tokenized_path + [action])
+
+    def get_chat_ai_permission_metadata(self):
+        """Return the statically resolvable RBAC requirements for this action.
+
+        Chat AI must not guess permissions from an HTTP method or model name. A
+        view-provided ``get_rbac_perms`` can depend on request data, path
+        parameters, or the target object, so those operations are deliberately
+        marked dynamic and excluded from Chat AI discovery.
+        """
+        explicit_permissions = getattr(
+            self.view, 'chat_ai_required_permissions', CHAT_AI_PERMISSIONS_UNSET
+        )
+        if explicit_permissions is not CHAT_AI_PERMISSIONS_UNSET:
+            if isinstance(explicit_permissions, str):
+                explicit_permissions = (explicit_permissions,)
+            elif not isinstance(
+                explicit_permissions, (list, tuple, set, frozenset)
+            ):
+                return (), True
+            if any(
+                not isinstance(item, str) or not item
+                for item in explicit_permissions
+            ):
+                return (), True
+            return tuple(sorted(set(explicit_permissions))), False
+
+        if callable(getattr(self.view, 'get_rbac_perms', None)):
+            return (), True
+
+        permission_classes = getattr(self.view, 'permission_classes', ()) or ()
+        rbac_permission_classes = []
+        for permission_class in permission_classes:
+            try:
+                if isinstance(permission_class, type) and issubclass(
+                    permission_class, RBACPermission
+                ):
+                    rbac_permission_classes.append(permission_class)
+            except TypeError:
+                continue
+
+        if not rbac_permission_classes:
+            return (), True
+
+        permissions = set()
+        try:
+            for permission_class in rbac_permission_classes:
+                required = permission_class().get_require_perms(
+                    self.view.request, self.view
+                )
+                if isinstance(required, str):
+                    required = (required,)
+                elif not isinstance(required, (list, tuple, set, frozenset)):
+                    return (), True
+                if any(not isinstance(item, str) or not item for item in required):
+                    return (), True
+                permissions.update(required)
+        except Exception:
+            return (), True
+        return tuple(sorted(permissions)), False
 
     def get_description(self):
         description = super().get_description()
@@ -213,6 +277,9 @@ class CustomAutoSchema(AutoSchema):
         ]
         if operation_id in exclude_operations:
             return None
+        required_permissions, permission_dynamic = self.get_chat_ai_permission_metadata()
+        operation['x-jms-required-permissions'] = list(required_permissions)
+        operation['x-jms-permission-dynamic'] = permission_dynamic
         return operation
 
 # 添加自定义字段的 OpenAPI 扩展

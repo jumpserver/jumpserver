@@ -53,6 +53,8 @@ class Operation:
     enabled: bool = True
     risk_level: str = 'read'
     requires_approval: bool = False
+    required_permissions: tuple[str, ...] = field(default_factory=tuple)
+    permission_dynamic: bool = True
 
     def as_candidate(self, include_schema=False):
         result = {

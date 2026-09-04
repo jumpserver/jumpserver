@@ -61,6 +61,7 @@ class NodeViewSet(
 
 
 class NodeAssetsApi(generics.ListAPIView):
+    perm_model = Asset
     serializer_class = serializers.AssetSerializer
 
     def get_queryset(self):

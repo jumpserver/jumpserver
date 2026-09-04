@@ -8,6 +8,7 @@ __all__ = ['ProtocolListApi']
 
 
 class ProtocolListApi(ListAPIView):
+    chat_ai_required_permissions = ()
     serializer_class = serializers.ProtocolSerializer
     permission_classes = (IsValidUser,)
 

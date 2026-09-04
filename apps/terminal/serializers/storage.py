@@ -276,7 +276,13 @@ meta_is_default = {
 }
 
 
-# CommandStorageSerializer
+# Command storage serializers
+class CommandStorageTreeMetricsSerializer(serializers.Serializer):
+    node_ids = serializers.ListField(
+        child=serializers.UUIDField(), allow_empty=False, max_length=200
+    )
+
+
 class CommandStorageSerializer(BaseStorageSerializer):
     type = LabeledChoiceField(choices=const.CommandStorageType.choices, label=_('Type'))
     storage_type_serializer_classes_mapping = command_storage_type_serializer_classes_mapping

@@ -5,7 +5,6 @@ from django.conf import settings
 from PIL import Image, UnidentifiedImageError
 from rest_framework import serializers
 
-from chat_ai.assistants import ASSISTANTS, is_assistant_available
 from chat_ai.executor.sanitizer import sanitize_text, summarize
 from chat_ai.file_extractor import FileExtractionError, extract_file_text
 from chat_ai.models import (
@@ -54,19 +53,9 @@ class ConversationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Sensitive credentials cannot be stored in a conversation title.')
         return value
 
-    def validate_assistant(self, value):
-        if value not in ASSISTANTS:
-            raise serializers.ValidationError('Unknown Chat AI assistant.')
-        request = self.context.get('request')
-        if not request or not is_assistant_available(value, request.user):
-            raise serializers.ValidationError(
-                'You do not have permission to use this Chat AI assistant.'
-            )
-        return value
-
     class Meta:
         model = Conversation
-        fields = ('id', 'title', 'assistant', 'model', 'status', 'date_created', 'date_updated')
+        fields = ('id', 'title', 'model', 'status', 'date_created', 'date_updated')
         read_only_fields = ('id', 'model', 'status', 'date_created', 'date_updated')
 
 
@@ -78,7 +67,7 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = (
             'id', 'role', 'content', 'status', 'model', 'input_tokens',
-            'output_tokens', 'error', 'images', 'files', 'result_cards',
+            'output_tokens', 'error', 'images', 'files', 'result_cards', 'web_search',
             'regenerated_from', 'date_created',
         )
         read_only_fields = fields
@@ -101,7 +90,7 @@ class ConversationAuditMessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = (
             'id', 'role', 'content', 'status', 'model', 'input_tokens',
-            'output_tokens', 'error', 'images', 'files', 'date_created',
+            'output_tokens', 'error', 'images', 'files', 'web_search', 'date_created',
         )
         read_only_fields = fields
 
@@ -123,7 +112,7 @@ class ConversationAuditListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
         fields = (
-            'id', 'title', 'assistant', 'model', 'status', 'user',
+            'id', 'title', 'model', 'status', 'user',
             'message_count', 'question_count', 'last_question_at',
             'date_created', 'date_updated',
         )

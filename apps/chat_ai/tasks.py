@@ -16,7 +16,6 @@ from orgs.utils import tmp_to_org, tmp_to_root_org
 
 from .agents import AgentRunner
 from .agents.context import RequestAuthContext
-from .assistants import is_assistant_available
 from .models import (
     AgentRun, ApiCallAudit, Approval, Conversation, Message, MessageFile,
     MessageImage,
@@ -342,8 +341,6 @@ def execute_chat_ai_run(agent_run_id, *, web_search=False, read_only=False, noti
     with tmp_to_org(run.org_id):
         if not run.user.has_perm(CHAT_AI_USE_PERMISSION):
             raise PermissionError('Chat AI permission was revoked before execution.')
-        if not is_assistant_available(run.conversation.assistant, run.user):
-            raise PermissionError('Chat AI assistant permission was revoked before execution.')
         user_message = run.conversation.messages.filter(
             role=Message.Role.USER,
             date_created__lte=run.assistant_message.date_created,
@@ -352,6 +349,7 @@ def execute_chat_ai_run(agent_run_id, *, web_search=False, read_only=False, noti
             raise ValueError('Background Chat AI run has no user message.')
         runner = AgentRunner(
             conversation=run.conversation,
+            user=run.user,
             user_message=user_message,
             assistant_message=run.assistant_message,
             agent_run=run,

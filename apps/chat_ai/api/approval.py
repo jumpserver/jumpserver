@@ -3,7 +3,7 @@ from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import APIException, PermissionDenied
+from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 
 from common.api import JMSGenericViewSet
@@ -11,7 +11,6 @@ from common.permissions import IsValidUser, OnlySuperUser
 from orgs.utils import current_org
 
 from chat_ai.agents.context import RequestAuthContext
-from chat_ai.assistants import get_assistant, is_assistant_available
 from chat_ai.approvals import ApprovalService
 from chat_ai.executor.core_client import CoreAPIExecutor
 from chat_ai.models import Approval
@@ -43,21 +42,10 @@ class ApprovalViewSet(mixins.RetrieveModelMixin, JMSGenericViewSet):
     @extend_schema(request=None, responses=ApprovalSerializer)
     @action(methods=('post',), detail=True, url_path='confirm')
     def confirm(self, request, pk=None):
-        approval_record = self.get_object()
-        profile = get_assistant(
-            approval_record.conversation.assistant if approval_record.conversation else None
-        )
-        if (
-            not profile.core_api_enabled
-            or not is_assistant_available(profile.key, request.user)
-        ):
-            raise PermissionDenied('Assistant is not available for this operation.')
+        self.get_object()
         loader = OpenAPILoader()
         registry = async_to_sync(loader.load)()
-        policy = PolicyEngine(
-            operation_scope=profile.operation_ids,
-            full_access=profile.full_access,
-        )
+        policy = PolicyEngine(user=request.user)
         service = ApprovalService(registry, policy)
         approval, _ = service.prepare_confirmation(pk, request.user, current_org.id)
         auth_context = RequestAuthContext.from_request(request, current_org.id)

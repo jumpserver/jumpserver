@@ -27,12 +27,11 @@ class PolicyDecision:
 
 
 class PolicyEngine:
-    def __init__(self, operation_scope=None, read_only=False, full_access=False):
+    def __init__(self, user=None, read_only=False):
+        self.user = user
         self.allowed_tags = set(getattr(settings, 'CHAT_AI_ALLOWED_TAGS', []) or [])
         self.allowed_operations = set(getattr(settings, 'CHAT_AI_ALLOWED_OPERATION_IDS', []) or [])
-        self.operation_scope = set(operation_scope) if operation_scope is not None else None
         self.read_only = bool(read_only)
-        self.full_access = bool(full_access)
         self.allowed_paths = tuple(getattr(settings, 'CHAT_AI_ALLOWED_PATHS', []) or ())
         configured_blocked = tuple(getattr(settings, 'CHAT_AI_BLOCKED_PATHS', []) or ())
         self.blocked_paths = DEFAULT_BLOCKED_PATH_PATTERNS + configured_blocked
@@ -43,7 +42,7 @@ class PolicyEngine:
         if any(fnmatch.fnmatch(lowered, pattern.lower()) for pattern in self.blocked_paths):
             return False
         if (
-            not self.full_access and self.allowed_paths
+            self.allowed_paths
             and not any(fnmatch.fnmatch(path, pattern) for pattern in self.allowed_paths)
         ):
             return False
@@ -53,6 +52,8 @@ class PolicyEngine:
         method_policy = self.method_policies.get(operation.method) or {}
         risk_level = method_policy.get('risk_level', operation.risk_level)
         requires_approval = bool(method_policy.get('approval', operation.requires_approval))
+        if not operation.enabled:
+            return PolicyDecision(False, risk_level, requires_approval, 'Operation is disabled.')
         if self.read_only and operation.method != 'GET':
             return PolicyDecision(False, 'write', True, 'Background reports are read-only.')
         if operation.method not in self.method_policies:
@@ -62,17 +63,33 @@ class PolicyEngine:
         if not self._path_allowed(operation.path):
             return PolicyDecision(False, risk_level, requires_approval, 'Sensitive API path is blocked.')
         if (
-            not self.full_access and self.allowed_operations
+            self.allowed_operations
             and operation.operation_id not in self.allowed_operations
         ):
             return PolicyDecision(False, risk_level, requires_approval, 'Operation is not allowlisted.')
-        if self.operation_scope is not None and operation.operation_id not in self.operation_scope:
-            return PolicyDecision(False, risk_level, requires_approval, 'Operation is outside this assistant scope.')
         if (
-            not self.full_access and self.allowed_tags
+            self.allowed_tags
             and not self.allowed_tags.intersection(operation.tags)
         ):
             return PolicyDecision(False, risk_level, requires_approval, 'Operation tag is not allowlisted.')
+        if operation.permission_dynamic:
+            return PolicyDecision(
+                False, risk_level, requires_approval,
+                'Operation permissions cannot be resolved statically.',
+            )
+        if not self.user or not getattr(self.user, 'is_authenticated', False):
+            return PolicyDecision(False, risk_level, requires_approval, 'A valid user is required.')
+        if not getattr(self.user, 'is_valid', False):
+            return PolicyDecision(False, risk_level, requires_approval, 'The user is invalid.')
+        try:
+            has_permissions = self.user.has_perms(operation.required_permissions)
+        except Exception:
+            has_permissions = False
+        if not has_permissions:
+            return PolicyDecision(
+                False, risk_level, requires_approval,
+                'The user does not have permission for this operation.',
+            )
         return PolicyDecision(True, risk_level, requires_approval)
 
     def is_searchable(self, operation):
