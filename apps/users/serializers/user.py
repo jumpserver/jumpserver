@@ -515,7 +515,8 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "access_key", "comment"]
         read_only_fields = ["access_key"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, allow_invalid_username=False, **kwargs):
+        self.allow_invalid_username = allow_invalid_username
         super().__init__(*args, **kwargs)
         from authentication.serializers import AccessKeyCreateSerializer
 
@@ -531,7 +532,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         return "{}{}".format(name, User.service_account_email_suffix)
 
     def validate_name(self, name):
-        if self.instance is None:
+        if self.instance is None and not self.allow_invalid_username:
             validate_user_username(name)
         email = self.get_email()
         username = self.get_username()
@@ -548,5 +549,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
         name = validated_data["name"]
         email = self.get_email()
         comment = validated_data.get("comment", "")
-        user, ak = User.create_service_account(name, email, comment)
+        user, ak = User.create_service_account(
+            name, email, comment, allow_invalid_username=self.allow_invalid_username
+        )
         return user

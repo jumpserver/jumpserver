@@ -254,7 +254,7 @@ class User(
             self.email = email
 
     def save(self, *args, **kwargs):
-        if self._state.adding:
+        if self._state.adding and not getattr(self, '_allow_invalid_username', False):
             validate_username(self.username)
         self.set_required_attr_if_need()
         if self.username == "admin":

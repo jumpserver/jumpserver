@@ -115,7 +115,7 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         if len(raw_name) > 128:
             self.validated_data['comment'] = raw_name
         data = {'name': name}
-        kwargs = {'data': data}
+        kwargs = {'data': data, 'allow_invalid_username': True}
         if self.instance and self.instance.user:
             kwargs['instance'] = self.instance.user
         self.service_account = ServiceAccountSerializer(**kwargs)

@@ -339,8 +339,8 @@ class RoleMixin:
     service_account_email_suffix = "@local.domain"
 
     @classmethod
-    def create_service_account(cls, name, email, comment):
-        app = cls.objects.create(
+    def create_service_account(cls, name, email, comment, allow_invalid_username=False):
+        app = cls(
             username=name,
             name=name,
             email=email,
@@ -349,6 +349,8 @@ class RoleMixin:
             created_by="System",
             is_service_account=True,
         )
+        app._allow_invalid_username = allow_invalid_username
+        app.save()
         access_key = app.create_access_key()
         return app, access_key
 
