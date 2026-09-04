@@ -8536,10 +8536,6 @@ msgstr "단말기 설정"
 msgid "Can change other setting"
 msgstr "기타 설정"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "채팅 프롬프트"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "동기화된 LDAP 사용자 작업 결과 알림"
@@ -9481,53 +9477,9 @@ msgstr "액세스 키 비밀(SK)"
 msgid "Chat AI"
 msgstr "채팅 AI"
 
-#: rbac/tree.py
-msgid "Conversations"
-msgstr "대화 관리"
-
-#: rbac/tree.py
-msgid "Messages and attachments"
-msgstr "메시지 및 첨부 파일"
-
-#: rbac/tree.py
-msgid "Runs and approvals"
-msgstr "실행 및 승인"
-
-#: rbac/tree.py
-msgid "API call audits"
-msgstr "API 호출 감사"
-
-#: chat_ai/models.py
-msgid "Chat AI conversation"
-msgstr "채팅 AI 대화"
-
 #: chat_ai/models.py
 msgid "Can use Chat AI"
 msgstr "Chat AI 사용 가능"
-
-#: chat_ai/models.py
-msgid "Chat AI message"
-msgstr "채팅 AI 메시지"
-
-#: chat_ai/models.py
-msgid "Chat AI message file"
-msgstr "채팅 AI 메시지 파일"
-
-#: chat_ai/models.py
-msgid "Chat AI message image"
-msgstr "채팅 AI 메시지 이미지"
-
-#: chat_ai/models.py
-msgid "Chat AI agent run"
-msgstr "채팅 AI 에이전트 실행"
-
-#: chat_ai/models.py
-msgid "Chat AI approval"
-msgstr "채팅 AI 승인"
-
-#: chat_ai/models.py
-msgid "Chat AI API call audit"
-msgstr "채팅 AI API 호출 감사"
 
 #: settings/serializers/feature.py:158
 msgid "Method"

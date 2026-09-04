@@ -145,7 +145,7 @@ class NodeDisplaySerializer(serializers.ListField):
 class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    protocols = AssetProtocolsSerializer(many=True, required=True, label=_('Protocols'))
+    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Accounts'))
     nodes_display = NodeDisplaySerializer(read_only=False, required=False, label=_("Node path"))
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))

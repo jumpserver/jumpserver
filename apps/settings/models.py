@@ -9,7 +9,6 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
-from common.db.models import JMSBaseModel
 from common.db.utils import Encryptor
 from common.utils import get_logger
 from .signals import setting_changed
@@ -184,52 +183,12 @@ class Setting(models.Model):
         ]
 
 
-class ChatPrompt(JMSBaseModel):
-    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
-    content = models.TextField(blank=False, null=False, verbose_name=_('Content'))
-    builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
-
-    class Meta:
-        verbose_name = _("Chat prompt")
-
-    def __str__(self):
-        return self.name
-
-
 def get_chat_ai_config():
-    data = {
+    return {
         'base_url': settings.CHAT_AI_BASE_URL or '',
         'api_key': settings.CHAT_AI_API_KEY or '',
         'proxy': settings.CHAT_AI_PROXY or '',
         'model': settings.CHAT_AI_MODEL or '',
-    }
-    if data['api_key'] and data['model']:
-        return data
-
-    chat_type = getattr(settings, 'CHAT_AI_TYPE', '') or 'gpt'
-    if chat_type == 'deep-seek':
-        legacy_model = getattr(settings, 'DEEPSEEK_MODEL', '') or ''
-        custom_model = getattr(settings, 'CUSTOM_DEEPSEEK_MODEL', '') or ''
-        legacy = {
-            'base_url': getattr(settings, 'DEEPSEEK_BASE_URL', '') or '',
-            'api_key': getattr(settings, 'DEEPSEEK_API_KEY', '') or '',
-            'proxy': getattr(settings, 'DEEPSEEK_PROXY', '') or '',
-            'model': custom_model if legacy_model == 'custom' else legacy_model,
-        }
-    else:
-        legacy_model = getattr(settings, 'GPT_MODEL', '') or ''
-        custom_model = getattr(settings, 'CUSTOM_GPT_MODEL', '') or ''
-        legacy = {
-            'base_url': getattr(settings, 'GPT_BASE_URL', '') or '',
-            'api_key': getattr(settings, 'GPT_API_KEY', '') or '',
-            'proxy': getattr(settings, 'GPT_PROXY', '') or '',
-            'model': custom_model if legacy_model == 'custom' else legacy_model,
-        }
-    return {
-        'base_url': data['base_url'] or legacy['base_url'],
-        'api_key': data['api_key'] or legacy['api_key'],
-        'proxy': data['proxy'] or legacy['proxy'],
-        'model': data['model'] or legacy['model'],
     }
 
 

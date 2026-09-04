@@ -8598,10 +8598,6 @@ msgstr "Terminal Settings"
 msgid "Can change other setting"
 msgstr "Other Settings"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "Chat Prompts"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "Notification for syncing LDAP user task results"
@@ -9575,53 +9571,9 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "Chat AI"
 
-#: rbac/tree.py
-msgid "Conversations"
-msgstr "Conversations"
-
-#: rbac/tree.py
-msgid "Messages and attachments"
-msgstr "Messages and attachments"
-
-#: rbac/tree.py
-msgid "Runs and approvals"
-msgstr "Runs and approvals"
-
-#: rbac/tree.py
-msgid "API call audits"
-msgstr "API call audits"
-
-#: chat_ai/models.py
-msgid "Chat AI conversation"
-msgstr "Chat AI conversation"
-
 #: chat_ai/models.py
 msgid "Can use Chat AI"
 msgstr "Can use Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message"
-msgstr "Chat AI message"
-
-#: chat_ai/models.py
-msgid "Chat AI message file"
-msgstr "Chat AI message file"
-
-#: chat_ai/models.py
-msgid "Chat AI message image"
-msgstr "Chat AI message image"
-
-#: chat_ai/models.py
-msgid "Chat AI agent run"
-msgstr "Chat AI agent run"
-
-#: chat_ai/models.py
-msgid "Chat AI approval"
-msgstr "Chat AI approval"
-
-#: chat_ai/models.py
-msgid "Chat AI API call audit"
-msgstr "Chat AI API call audit"
 
 #: settings/serializers/feature.py:158
 msgid "Method"

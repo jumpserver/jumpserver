@@ -1,6 +1,5 @@
 import uuid
 
-from django.core.validators import URLValidator
 from django.utils import timezone
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
@@ -185,15 +184,6 @@ class ChatAISettingSerializer(serializers.Serializer):
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Chat AI')
     )
-    CHAT_AI_METHOD = serializers.ChoiceField(
-        choices=(('api', _('Built-in API')), ('iframe', _('iframe embed'))),
-        default='api', required=False, label=_('Method'),
-    )
-    CHAT_AI_EMBED_URL = serializers.URLField(
-        allow_blank=True, required=False, label=_('iframe URL'),
-        help_text=_('The page URL loaded in the isolated AI assistant iframe.'),
-        validators=[URLValidator(schemes=('http', 'https'))],
-    )
     CHAT_AI_BASE_URL = serializers.CharField(
         allow_blank=True, required=False, label=_('Base URL'),
         help_text=_('OpenAI-compatible API base URL, usually ending in /v1.')
@@ -209,32 +199,8 @@ class ChatAISettingSerializer(serializers.Serializer):
         max_length=256, allow_blank=True, required=False, label=_('Model'),
         help_text=_('Discover models from the provider or enter a model ID manually.')
     )
-    CHAT_AI_VOICE_TRANSCRIPTION_MODE = serializers.ChoiceField(
-        choices=(('browser', _('Browser speech recognition')), ('server', _('Server transcription'))),
-        required=False, label=_('Voice transcription mode'),
-        help_text=_('Use browser speech recognition or upload audio to the configured server provider.'),
-    )
-    CHAT_AI_WEB_SEARCH_ENABLED = serializers.BooleanField(
-        required=False, label=_('Web search')
-    )
-    CHAT_AI_WEB_SEARCH_PROVIDER = serializers.ChoiceField(
-        choices=(('tavily', 'Tavily'), ('searxng', 'SearXNG')),
-        required=False, label=_('Web search provider'),
-    )
-    CHAT_AI_WEB_SEARCH_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('Web search base URL'),
-        help_text=_(
-            'Tavily API or SearXNG base URL. SearXNG must enable JSON responses.'
-        ),
-    )
-    CHAT_AI_WEB_SEARCH_API_KEY = EncryptedField(
-        allow_blank=True, required=False, label=_('Web search API key'),
-        help_text=_('Used only by Tavily. It is never sent to SearXNG.'),
-    )
-    CHAT_AI_WEB_SEARCH_PROXY = serializers.CharField(
-        allow_blank=True, required=False, label=_('Web search proxy'),
-        help_text=_('HTTP proxy used only for public web searches.'),
-    )
+
+
 class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 
