@@ -126,6 +126,9 @@ class NodeAssetTreeSearchQuerySerializer(serializers.Serializer):
 
 class NodeTreeAssetsLimitQuerySerializer(serializers.Serializer):
     assets_limit = serializers.IntegerField(min_value=1, max_value=1000)
+    assets_offset = serializers.IntegerField(
+        min_value=0, max_value=1000000, default=0, required=False
+    )
 
 
 class NodeTreeAssetsOrderQuerySerializer(serializers.Serializer):
