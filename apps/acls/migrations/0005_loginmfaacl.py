@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('acls', '0003_datamaskingrule'),
+        ('acls', '0004_clipboardacl'),
     ]
 
     operations = [
