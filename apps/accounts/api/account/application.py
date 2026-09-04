@@ -1,13 +1,12 @@
 import os
-import shlex
 import zipfile
 from io import BytesIO
 
 from django.conf import settings
-from django.core import signing
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,8 +17,7 @@ from accounts.models import IntegrationApplication
 from audits.models import IntegrationApplicationLog
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.exceptions import JMSException
-from common.permissions import IsValidUser
-from common.utils import get_request_ip, random_string
+from common.utils import get_request_ip
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
@@ -31,14 +29,12 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     serializer_classes = {
         'default': serializers.IntegrationApplicationSerializer,
         'get_account_secret': serializers.IntegrationAccountSecretSerializer,
-        'agent_registration': serializers.CredentialAgentRegistrationSerializer,
     }
     rbac_perms = {
         'get_once_secret': 'accounts.change_integrationapplication',
         'get_account_secret': 'accounts.view_integrationapplication',
         'get_sdks_info': 'accounts.view_integrationapplication',
         'refresh_secret': 'accounts.change_integrationapplication',
-        'agent_registration': 'accounts.change_integrationapplication',
     }
 
     def read_file(self, path):
@@ -51,17 +47,12 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         ['GET'], detail=False, url_path='sdks',
     )
     def get_sdks_info(self, request, *args, **kwargs):
-        code_suffix_mapper = {
-            'python': 'py',
-            'java': 'java',
-            'go': 'go',
-            'node': 'js',
-            'curl': 'sh',
-        }
         sdk_language = request.query_params.get('language', 'python')
+        if sdk_language != 'python':
+            raise ValidationError(_('Application credentials currently support the Python SDK only.'))
         sdk_path = os.path.join(settings.APPS_DIR, 'accounts', 'demos', sdk_language)
         readme_path = os.path.join(sdk_path, f'README.{get_language()}.md')
-        demo_path = os.path.join(sdk_path, f'demo.{code_suffix_mapper[sdk_language]}')
+        demo_path = os.path.join(sdk_path, 'demo.py')
 
         readme_content = self.read_file(readme_path)
         if not readme_content:
@@ -87,43 +78,6 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         instance.refresh_secret()
         return Response(data={'id': instance.id, 'msg': 'Successfully refreshed secret'})
 
-    @action(['POST'], detail=True, url_path='agent-registration')
-    def agent_registration(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.credential_access_mode != IntegrationApplication.AccessMode.agent:
-            raise JMSException(
-                code='invalid_access_mode',
-                detail=_('The integration application does not use Agent access mode.'),
-            )
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        credential_keys = serializer.validated_data['credential_keys']
-        app_user = serializer.validated_data['app_user']
-        instance_id = serializer.validated_data['instance_id']
-        token = signing.dumps({
-            'application_id': str(instance.id),
-            'org_id': instance.org_id,
-            'nonce': random_string(24),
-        }, salt='credential-agent-register')
-        endpoint = request.build_absolute_uri('/').rstrip('/')
-        credentials = ' '.join(
-            f'--credential {shlex.quote(key)}' for key in credential_keys
-        )
-        endpoint_arg = shlex.quote(endpoint)
-        token_arg = shlex.quote(token)
-        return Response({
-            'token': token,
-            'expires_in': 600,
-            'download_url': f'{endpoint}/api/v1/accounts/python-sdk/',
-            'install_command': (
-                'sudo python3 -m venv /opt/jumpserver-pam/venv && '
-                f'sudo /opt/jumpserver-pam/venv/bin/pip install {endpoint_arg}/api/v1/accounts/python-sdk/ && '
-                f'sudo /opt/jumpserver-pam/venv/bin/jms-pam-agent install --endpoint {endpoint_arg} '
-                f'--token {token_arg} --instance-id {shlex.quote(instance_id)} '
-                f'{credentials} --app-user {shlex.quote(app_user)}'
-            ),
-        })
-
     @action(['GET'], detail=False, url_path='account-secret',
             permission_classes=[RBACPermission])
     def get_account_secret(self, request, *args, **kwargs):
@@ -144,7 +98,11 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         
         # 根据配置决定是否返回密码
         secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
-        return Response(data={'id': request.user.id, 'secret': secret})
+        response = Response(data={'id': request.user.id, 'secret': secret})
+        response['X-API-Deprecated'] = 'true'
+        response['Warning'] = '299 JumpServer "Use /api/v1/accounts/credential-client/credential/ instead."'
+        response['Cache-Control'] = 'no-store'
+        return response
 
 
 class PythonSDKDownloadAPI(APIView):

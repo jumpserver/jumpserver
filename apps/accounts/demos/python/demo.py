@@ -1,14 +1,7 @@
-import os
-
 from jms_pam import JumpServerPAMClient
 
 
-client = JumpServerPAMClient(
-    endpoint=os.environ['JMS_URL'],
-    app_id=os.environ['JMS_APP_ID'],
-    app_secret=os.environ['JMS_APP_SECRET'],
-    org_id=os.environ['JMS_ORG_ID'],
-)
+client = JumpServerPAMClient.from_config('jms-pam.json')
 
 credential = client.get_credential('cred-pg-main')
 

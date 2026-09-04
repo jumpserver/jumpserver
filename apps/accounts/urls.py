@@ -30,7 +30,9 @@ router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, '
 router.register(r'account-check-engines', api.CheckAccountEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
-router.register(r'credential-policies', api.CredentialPolicyViewSet, 'credential-policy')
+router.register(r'application-credentials', api.ApplicationCredentialViewSet, 'application-credential')
+router.register(r'client-access-configurations', api.ClientAccessConfigurationViewSet, 'client-access-configuration')
+router.register(r'credential-rotation-records', api.CredentialRotationRecordViewSet, 'credential-rotation-record')
 router.register(
     r'credential-application-bindings',
     api.CredentialApplicationBindingViewSet,

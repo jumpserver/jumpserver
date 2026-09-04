@@ -1,22 +1,25 @@
 # JumpServer PAM Python SDK and Agent
 
-Install with Python 3.9 or later:
+## URL installation
+
+Python 3.9+ and pip are required. Generate configuration in the application's Client Access tab and run its installation command using the application's Python interpreter or virtual environment. Example for a local JumpServer:
 
 ```bash
-pip install ./apps/accounts/demos/python
+python3 -m pip install --index-url https://pypi.org/simple http://127.0.0.1:8080/api/v1/accounts/python-sdk/
 ```
+
+The SDK source downloads from JumpServer; build tools such as setuptools and runtime dependencies such as requests download from official PyPI. Both must be reachable during installation. No local packages directory is needed. On another machine, use the generated reachable JumpServer address rather than 127.0.0.1.
+
+For `installing build dependencies` / `No matching distribution found for setuptools` errors, inspect package-index access with `pip -v`. A mirror returning 403 does not mean setuptools is unavailable. The explicit index above applies only to this installation, without changing global pip configuration. If public access is restricted, use an accessible internal index containing these dependencies. Do not hide missing dependencies with `--no-deps` or `--no-build-isolation`.
+
+## Application integration
 
 Fetch a credential by its immutable key, replace and verify the application's connection pool, release the old pool, and then confirm the applied revision:
 
 ```python
 from jms_pam import JumpServerPAMClient
 
-client = JumpServerPAMClient(
-    endpoint='https://jms.example.com',
-    app_id='application-id',
-    app_secret='application-secret',
-    org_id='organization-id',
-)
+client = JumpServerPAMClient.from_config('jms-pam.json')
 
 credential = client.get_credential('cred-pg-main')
 new_pool = create_pool(username=credential.username, password=credential.secret)
@@ -25,9 +28,9 @@ old_pool.close()
 client.confirm_applied(credential)
 ```
 
-The SDK reports a heartbeat every 30 seconds. Set `JMS_PAM_INSTANCE_ID` when an application runs more than one instance.
+Create a client access configuration in the application's Client Access tab, select credentials, and download `jms-pam.json`. It includes the endpoint, application credentials, organization and configuration ID. Protect this file as a secret. Fetch periodically while the application runs; confirm only after successfully applying the returned version. The SDK reports a heartbeat every 30 seconds. Set a distinct `JMS_PAM_INSTANCE_ID` for replicas sharing a hostname.
 
-For Linux Agent installation, generate a one-time registration token in the application detail page and run:
+The generated Linux Agent command creates a virtual environment, installs the SDK/Agent from the JumpServer URL using the specified index for dependencies, and registers with JumpServer. Registration material expires in 10 minutes and is single-use. With the Agent installed, run registration using `jms-pam-agent` from its virtual environment:
 
 ```bash
 sudo jms-pam-agent install \

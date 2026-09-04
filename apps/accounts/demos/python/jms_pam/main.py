@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import hmac
+import json
 import os
 import socket
 import threading
@@ -103,26 +104,33 @@ class SignedClient:
 
 
 class CredentialAPIClient(SignedClient):
-    def __init__(self, *args, instance_id='', **kwargs):
+    def __init__(self, *args, instance_id='', configuration_id=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance_id = instance_id
+        self.configuration_id = configuration_id
 
     def get_credential(self, key):
         params = {'key': key}
         if self.instance_id:
             params['instance_id'] = self.instance_id
+        if self.configuration_id:
+            params['configuration_id'] = self.configuration_id
         return self.request('GET', f'{CLIENT_PATH}/credential/', params=params)
 
     def confirm(self, item):
         data = dict(item)
         if self.instance_id:
             data['instance_id'] = self.instance_id
+        if self.configuration_id:
+            data['configuration_id'] = self.configuration_id
         return self.request('POST', f'{CLIENT_PATH}/confirm/', data=data)
 
     def heartbeat(self, credentials):
         data = {'credentials': credentials}
         if self.instance_id:
             data['instance_id'] = self.instance_id
+        if self.configuration_id:
+            data['configuration_id'] = self.configuration_id
         return self.request('POST', f'{CLIENT_PATH}/heartbeat/', data=data)
 
 
@@ -130,17 +138,28 @@ class JumpServerPAMClient:
     def __init__(
         self, endpoint, app_id, app_secret, org_id=DEFAULT_ORG_ID,
         instance_id=None, heartbeat_interval=30,
+        configuration_id=None,
     ):
         self.instance_id = instance_id or os.getenv('JMS_PAM_INSTANCE_ID') or socket.gethostname()
         self.heartbeat_interval = heartbeat_interval
         self.http = CredentialAPIClient(
-            endpoint, app_id, app_secret, org_id, instance_id=self.instance_id
+            endpoint, app_id, app_secret, org_id, instance_id=self.instance_id,
+            configuration_id=configuration_id,
         )
         self._applied = {}
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._heartbeat_thread = None
         self.last_heartbeat_error = None
+
+    @classmethod
+    def from_config(cls, path):
+        with open(path, encoding='utf-8') as stream:
+            config = json.load(stream)
+        return cls(**{key: config[key] for key in (
+            'endpoint', 'app_id', 'app_secret', 'org_id', 'configuration_id',
+            'instance_id', 'heartbeat_interval',
+        ) if key in config})
 
     def get_credential(self, key):
         data = self.http.get_credential(key)
