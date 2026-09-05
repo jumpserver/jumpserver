@@ -10379,15 +10379,23 @@ msgstr "返回"
 msgid "Client"
 msgstr "用戶端"
 
-#: templates/resource_download.html:22
-msgid "Client, currently used to launch the client"
-msgstr "客戶端，目前用來喚起特定客戶端程式連接資產"
+#: templates/resource_download.html:136
+msgid "JumpServer Client is a cross-platform desktop application for Windows, macOS and Linux, used to connect to and manage remote assets locally."
+msgstr "JumpServer 用戶端是一款支援 Windows、macOS 和 Linux 的跨平台桌面應用程式，用於在本機連接和管理遠端資產。"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:159
+msgid "Need other operating systems or architectures?"
+msgstr "需要其他作業系統或架構的安裝套件？"
+
+#: templates/resource_download.html:161
+msgid "Get more installers from GitHub Releases"
+msgstr "從 GitHub Releases 取得更多安裝套件"
+
+#: templates/resource_download.html:168
 msgid "More download"
 msgstr "更多下載"
 
-#: templates/resource_download.html:34
+#: templates/resource_download.html:169
 msgid "Tools and applications"
 msgstr "工具與應用程式"
 

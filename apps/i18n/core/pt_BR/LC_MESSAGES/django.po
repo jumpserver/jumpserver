@@ -10795,17 +10795,23 @@ msgstr "Retornar"
 msgid "Client"
 msgstr "Cliente"
 
-#: templates/resource_download.html:22
-msgid "Client, currently used to launch the client"
-msgstr ""
-"Cliente, atualmente utilizado para invocar um programa cliente específico "
-"para conectar ativos"
+#: templates/resource_download.html:136
+msgid "JumpServer Client is a cross-platform desktop application for Windows, macOS and Linux, used to connect to and manage remote assets locally."
+msgstr "O JumpServer Client é um aplicativo de desktop multiplataforma para Windows, macOS e Linux, usado para conectar e gerenciar ativos remotos localmente."
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:159
+msgid "Need other operating systems or architectures?"
+msgstr "Precisa de outros sistemas operacionais ou arquiteturas?"
+
+#: templates/resource_download.html:161
+msgid "Get more installers from GitHub Releases"
+msgstr "Obtenha mais instaladores no GitHub Releases"
+
+#: templates/resource_download.html:168
 msgid "More download"
 msgstr "Mais downloads"
 
-#: templates/resource_download.html:34
+#: templates/resource_download.html:169
 msgid "Tools and applications"
 msgstr "Ferramentas e aplicativos"
 
