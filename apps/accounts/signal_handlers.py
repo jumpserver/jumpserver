@@ -15,7 +15,7 @@ from common.signals import django_ready
 from common.utils import get_logger, i18n_fmt
 from common.utils.connection import RedisPubSub
 from .exceptions import VaultException
-from .models import Account, AccountTemplate
+from .models import Account, AccountTemplate, PersonalAssetCredential
 from .tasks.push_account import push_accounts_to_assets_task
 
 logger = get_logger(__name__)
@@ -97,7 +97,10 @@ class VaultSignalHandler(object):
             raise VaultException()
 
 
-for model in (Account, AccountTemplate, Account.history.model):
+for model in (
+        Account, AccountTemplate, Account.history.model,
+        PersonalAssetCredential,
+):
     post_save.connect(VaultSignalHandler.save_to_vault, sender=model)
     post_delete.connect(VaultSignalHandler.delete_to_vault, sender=model)
 

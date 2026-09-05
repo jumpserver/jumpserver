@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.backends import vault_client
 from accounts.const import SecretType, VaultTypeChoices
-from accounts.models import Account, AccountTemplate
+from accounts.models import Account, AccountTemplate, PersonalAssetCredential
 from accounts.models.mixins.vault import VAULT_SAVED_SECRET_MARK
 from common.utils import get_logger
 from common.utils.lock import DistributedLock
@@ -278,7 +278,10 @@ def _run_secret_transfer(action):
         ))
         return {'status': 'skipped', 'action': action}
 
-    models = (Account, AccountTemplate, Account.history.model)
+    models = (
+        Account, AccountTemplate, Account.history.model,
+        PersonalAssetCredential,
+    )
     max_workers = 1 if VaultTypeChoices.azure == vault_client.type else 10
     summary = _empty_stats()
     try:
