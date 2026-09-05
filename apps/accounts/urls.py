@@ -30,8 +30,23 @@ router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, '
 router.register(r'account-check-engines', api.CheckAccountEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
+router.register(r'application-credentials', api.ApplicationCredentialViewSet, 'application-credential')
+router.register(r'client-access-configurations', api.ClientAccessConfigurationViewSet, 'client-access-configuration')
+router.register(r'credential-rotation-records', api.CredentialRotationRecordViewSet, 'credential-rotation-record')
+router.register(
+    r'credential-application-bindings',
+    api.CredentialApplicationBindingViewSet,
+    'credential-application-binding',
+)
+router.register(
+    r'credential-client-instances',
+    api.CredentialClientInstanceViewSet,
+    'credential-client-instance',
+)
+router.register(r'credential-client', api.CredentialClientViewSet, 'credential-client')
 
 urlpatterns = [
+    path('python-sdk/', api.PythonSDKDownloadAPI.as_view(), name='python-sdk-download'),
     path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),
     path('accounts/tasks/', api.AccountsTaskCreateAPI.as_view(), name='account-task-create'),
     path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(),

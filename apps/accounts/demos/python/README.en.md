@@ -1,42 +1,48 @@
-# Instructions
+# JumpServer PAM Python SDK and Agent
 
-## 1. Introduction
+## URL installation
 
-This API retrieves account secrets for PAM assets, supports RESTful requests, and returns data in JSON format.
+Python 3.9+ and pip are required. Generate configuration in the application's Client Access tab and run its installation command using the application's Python interpreter or virtual environment. Example for a local JumpServer:
 
-## 2. Environment Requirements
-
-- `Python 3.11+`
-- `requests==2.31.0`
-- `httpsig==1.3.0`
-
-## 3. Usage
-**Request Method**: `GET api/v1/accounts/integration-applications/account-secret/`
-
-**Request Parameters**
-
-| Parameter Name | Type | Required | Description       |
-|----------------|------|----------|-------------------|
-| asset          | str  | Yes      | Asset Name        |
-| account        | str  | Yes      | Account Name      |
-
-**Response Example**:
-```json
-{
-    "id": "72b0b0aa-ad82-4182-a631-ae4865e8ae0e",
-    "secret": "123456"
-}
+```bash
+python3 -m pip install --index-url https://pypi.org/simple http://127.0.0.1:8080/api/v1/accounts/python-sdk/
 ```
 
-## Frequently Asked Questions (FAQ)
+The SDK source downloads from JumpServer; build tools such as setuptools and runtime dependencies such as requests download from official PyPI. Both must be reachable during installation. No local packages directory is needed. On another machine, use the generated reachable JumpServer address rather than 127.0.0.1.
 
-Q: How do I obtain an API key?
+For `installing build dependencies` / `No matching distribution found for setuptools` errors, inspect package-index access with `pip -v`. A mirror returning 403 does not mean setuptools is unavailable. The explicit index above applies only to this installation, without changing global pip configuration. If public access is restricted, use an accessible internal index containing these dependencies. Do not hide missing dependencies with `--no-deps` or `--no-build-isolation`.
 
-A: Create an application in PAM - Application Management to generate a KEY_ID and KEY_SECRET.
+## Application integration
 
-## Changelog
+Fetch a credential by its immutable key, replace and verify the application's connection pool, release the old pool, and then confirm the applied revision:
 
+```python
+from jms_pam import JumpServerPAMClient
 
-| Version | Changes                | Date       |
-|---------|------------------------|------------|
-| 1.0.0   | Initial version        | 2025-02-11 |
+client = JumpServerPAMClient.from_config('jms-pam.json')
+
+credential = client.get_credential('cred-pg-main')
+new_pool = create_pool(username=credential.username, password=credential.secret)
+new_pool.check_connection()
+old_pool.close()
+client.confirm_applied(credential)
+```
+
+Create a client access configuration in the application's Client Access tab, select credentials, and download `jms-pam.json`. It includes the endpoint, application credentials, organization and configuration ID. Protect this file as a secret. Fetch periodically while the application runs; confirm only after successfully applying the returned version. The SDK reports a heartbeat every 30 seconds. Set a distinct `JMS_PAM_INSTANCE_ID` for replicas sharing a hostname.
+
+The generated Linux Agent command creates a virtual environment, installs the SDK/Agent from the JumpServer URL using the specified index for dependencies, and registers with JumpServer. Registration material expires in 10 minutes and is single-use. With the Agent installed, run registration using `jms-pam-agent` from its virtual environment:
+
+```bash
+sudo jms-pam-agent install \
+  --endpoint https://jms.example.com \
+  --token one-time-token \
+  --instance-id order-service-node-1 \
+  --credential cred-pg-main \
+  --app-user order-service
+```
+
+The Agent atomically writes `/etc/jumpserver-pam/credentials.json`. After the application reloads the file, verifies its new connection, and releases the old connection, confirm it with:
+
+```bash
+jms-pam-agent confirm cred-pg-main
+```

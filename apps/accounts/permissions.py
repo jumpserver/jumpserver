@@ -1,5 +1,7 @@
 from rest_framework import permissions
 
+from accounts.models import CredentialClientInstance, IntegrationApplication
+
 
 def check_permissions(request):
     act = request.data.get('action')
@@ -17,3 +19,10 @@ class AccountTaskActionPermission(permissions.IsAuthenticated):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
             and check_permissions(request)
+
+
+class IsCredentialClient(permissions.BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return isinstance(user, (IntegrationApplication, CredentialClientInstance)) \
+            and user.is_authenticated
