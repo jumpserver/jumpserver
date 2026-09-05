@@ -1,0 +1,76 @@
+---
+- hosts: all
+  become: true
+  vars:
+    CORE_HOST: https://demo.example.com
+    BOOTSTRAP_TOKEN: PleaseChangeMe
+    PROVIDER_ID: 00000000-0000-0000-0000-000000000000
+    PROVIDER_NAME: panda
+    PANDA_HOST_IP: 127.0.0.1
+    PANDA_IMAGE: jumpserver/panda:latest
+    PANDA_RANGE_PORTS: 6900-7900
+    IGNORE_VERIFY_CERTS: true
+
+  tasks:
+    - name: Check Docker runtime
+      ansible.builtin.command: docker version
+      register: docker_version
+      changed_when: false
+      failed_when: false
+
+    - name: Download Docker installer
+      ansible.builtin.get_url:
+        url: https://get.docker.com
+        dest: /tmp/get-docker.sh
+        mode: '0700'
+      when: docker_version.rc != 0
+
+    - name: Install Docker runtime
+      ansible.builtin.command: sh /tmp/get-docker.sh
+      when: docker_version.rc != 0
+
+    - name: Ensure Docker service is running
+      # Avoid the generic service action selecting the legacy `systemd`
+      # redirect stub as an executable module on newer Ansible runtimes.
+      ansible.builtin.systemd_service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Ensure Panda data directory exists
+      ansible.builtin.file:
+        path: /opt/jumpserver/panda/data
+        state: directory
+        mode: '0700'
+
+    - name: Pull Panda image
+      ansible.builtin.command: docker pull {{ PANDA_IMAGE }}
+
+    - name: Remove previous Panda container
+      ansible.builtin.command: docker rm -f jms_panda
+      register: remove_panda
+      changed_when: remove_panda.rc == 0
+      failed_when: false
+
+    - name: Start Panda provider
+      ansible.builtin.shell: >-
+        docker run -d --name jms_panda --restart always --network host
+        -v /var/run/docker.sock:/var/run/docker.sock
+        -v /opt/jumpserver/panda/data:/opt/panda/data
+        -e CORE_HOST={{ CORE_HOST | quote }}
+        -e BOOTSTRAP_TOKEN={{ BOOTSTRAP_TOKEN | quote }}
+        -e IGNORE_VERIFY_CERTS={{ IGNORE_VERIFY_CERTS | string | lower | quote }}
+        -e PANDA_PROVIDER_ID={{ PROVIDER_ID | quote }}
+        -e PANDA_HOST_IP={{ PANDA_HOST_IP | quote }}
+        -e PANDA_RANGE_PORTS={{ PANDA_RANGE_PORTS | quote }}
+        {{ PANDA_IMAGE | quote }}
+      no_log: true
+
+    - name: Wait for Panda health endpoint
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9001/panda/health/
+        status_code: 200
+      register: panda_health
+      retries: 30
+      delay: 2
+      until: panda_health.status == 200

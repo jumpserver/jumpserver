@@ -240,3 +240,32 @@ class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):
     image_name = serializers.CharField(label=_('Image name'))
     image_port = serializers.IntegerField(label=_('Image port'))
     image_protocol = serializers.CharField(label=_('Image protocol'))
+    provider = serializers.SerializerMethodField(label=_('App Provider'))
+
+    @staticmethod
+    def get_provider(instance):
+        provider = instance.get('provider')
+        if provider is None:
+            return None
+        data = {
+            'id': str(provider.id),
+            'name': provider.name,
+            'hostname': provider.hostname,
+            'address': provider.address,
+            'host_id': str(provider.host_id) if provider.host_id else None,
+            'runtime_type': provider.runtime_type,
+            'connection_mode': provider.connection_mode,
+            'service_url': provider.service_url,
+            'load': provider.load,
+        }
+        if provider.connection_mode == provider.ConnectionMode.ssh:
+            data.update({
+                'host': _ConnectionTokenAssetSerializer(provider.host).data,
+                'account': _ConnectionTokenAccountSerializer(
+                    provider.select_account()
+                ).data,
+                'gateway': _ConnectionTokenGatewaySerializer(
+                    provider.select_gateway()
+                ).data if provider.select_gateway() else None,
+            })
+        return data

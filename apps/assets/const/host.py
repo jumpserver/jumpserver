@@ -80,6 +80,21 @@ class HostTypes(BaseType):
             cls.LINUX: [
                 {'name': 'Linux'},
                 {
+                    'name': 'VirtualAppHost',
+                    '_protocols': ['ssh'],
+                    'protocols_setting': {
+                        'ssh': {
+                            'required': True,
+                            'default': True,
+                        }
+                    },
+                    'automation': {
+                        'ansible_config': {
+                            'ansible_connection': 'ssh',
+                        }
+                    },
+                },
+                {
                     'name': GATEWAY_NAME,
                     'gateway_enabled': True,
                 }
