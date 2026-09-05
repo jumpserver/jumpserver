@@ -376,7 +376,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return user_ids
 
     def get_queryset(self):
-        keys = user_session_manager.get_keys()
+        keys = user_session_manager.get_active_keys()
         queryset = UserSession.objects.filter(key__in=keys)
         if current_org.is_root():
             return queryset
