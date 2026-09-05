@@ -2,6 +2,7 @@ import os
 import shutil
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils._os import safe_join
@@ -11,9 +12,13 @@ from rest_framework.serializers import ValidationError
 from assets.utils.platform_package import locate_package_root
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty
+from common.utils import get_logger
 from common.utils.yml import yaml_load_with_i18n
+from terminal.const import ComponentLoad, PublishStatus
 
 __all__ = ['VirtualApp', 'VirtualAppPublication']
+
+logger = get_logger(__name__)
 
 
 class VirtualApp(JMSBaseModel):
@@ -32,6 +37,8 @@ class VirtualApp(JMSBaseModel):
         through_fields=('app', 'provider',), through='VirtualAppPublication',
         to='AppProvider', verbose_name=_('Providers')
     )
+
+    provider_prefer_key_tpl = 'virtual_app_provider_prefer_{}_{}'
 
     class Meta:
         verbose_name = _('Virtual app')
@@ -93,6 +100,65 @@ class VirtualApp(JMSBaseModel):
         shutil.copytree(path, pkg_path)
         return instance, serializer
 
+    def filter_available_providers(self):
+        """Return providers where this app has been published successfully.
+
+        A provider without a bound terminal, or whose terminal reports offline,
+        must not receive a new virtual application instance.
+        """
+        publications = self.publications.filter(
+            status=PublishStatus.success
+        ).select_related('provider__terminal')
+        providers = [
+            publication.provider for publication in publications
+            if publication.provider.load != ComponentLoad.offline
+            and publication.provider.connection_ready
+        ]
+        if not providers:
+            logger.info('No available provider for virtual app: %s', self.name)
+        return providers
+
+    @classmethod
+    def clear_provider_prefer(cls):
+        cache.delete_pattern(cls.provider_prefer_key_tpl.format('*', '*'))
+
+    @classmethod
+    def _select_provider_by_load(cls, providers):
+        load_priorities = {
+            ComponentLoad.normal: 0,
+            ComponentLoad.high: 1,
+            ComponentLoad.critical: 2,
+        }
+        return min(
+            providers,
+            key=lambda provider: (
+                load_priorities.get(provider.load, 3),
+                provider.container_count,
+                str(provider.id),
+            ),
+            default=None,
+        )
+
+    def select_provider(self, user):
+        providers = self.filter_available_providers()
+        if not providers:
+            return None
+
+        prefer_key = self.provider_prefer_key_tpl.format(self.id, user.id)
+        preferred_provider_id = cache.get(prefer_key)
+        preferred_provider = next(
+            (item for item in providers if str(item.id) == str(preferred_provider_id)),
+            None,
+        )
+        provider = self._select_provider_by_load(providers)
+        # Affinity may choose a busier provider, but must never override a
+        # healthier load class.
+        if preferred_provider and preferred_provider.load == provider.load:
+            provider = preferred_provider
+        elif provider:
+            cache.set(prefer_key, str(provider.id), timeout=None)
+        return provider
+
 
 class VirtualAppPublication(JMSBaseModel):
     provider = models.ForeignKey(
@@ -102,6 +168,15 @@ class VirtualAppPublication(JMSBaseModel):
         'VirtualApp', on_delete=models.CASCADE, related_name='publications', verbose_name=_('Virtual app')
     )
     status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
+    app_version = models.CharField(
+        max_length=16, blank=True, default='', verbose_name=_('Published version')
+    )
+    image_digest = models.CharField(
+        max_length=255, blank=True, default='', verbose_name=_('Image digest')
+    )
+    date_synced = models.DateTimeField(
+        null=True, blank=True, verbose_name=_('Date synced')
+    )
 
     class Meta:
         verbose_name = _('Virtual app publication')

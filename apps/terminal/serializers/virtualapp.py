@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from rest_framework import serializers
 
 from common.const.choices import Status
@@ -28,9 +29,19 @@ class VirtualAppSerializer(ManifestI18nMixin, serializers.ModelSerializer):
             'protocols', 'tags', 'comment',
         ] + read_only_fields
 
+    def update(self, instance, validated_data):
+        image_changed = any(
+            field in validated_data and validated_data[field] != getattr(instance, field)
+            for field in ('version', 'image_name')
+        )
+        instance = super().update(instance, validated_data)
+        if image_changed:
+            instance.publications.update(status=PublishStatus.mismatch)
+        return instance
+
 
 class VirtualAppPublicationSerializer(serializers.ModelSerializer):
-    app = ObjectRelatedField(attrs=('id', 'name', 'image_name',), label=_("Virtual app"),
+    app = ObjectRelatedField(attrs=('id', 'name', 'image_name', 'version'), label=_("Virtual app"),
                              queryset=VirtualApp.objects.all())
     provider = ObjectRelatedField(queryset=AppProvider.objects.all(), label=_("App Provider"))
     status = LabeledChoiceField(choices=PublishStatus.choices, label=_("Status"), default=Status.pending)
@@ -38,5 +49,12 @@ class VirtualAppPublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = VirtualAppPublication
         fields_mini = ['id', 'provider', 'app']
-        read_only_fields = ['date_created', 'date_updated']
-        fields = fields_mini + ['status', 'comment'] + read_only_fields
+        read_only_fields = ['date_created', 'date_updated', 'date_synced']
+        fields = fields_mini + [
+            'status', 'app_version', 'image_digest', 'date_synced', 'comment'
+        ] + ['date_created', 'date_updated']
+
+    def update(self, instance, validated_data):
+        if {'status', 'app_version', 'image_digest'} & validated_data.keys():
+            validated_data['date_synced'] = timezone.now()
+        return super().update(instance, validated_data)
