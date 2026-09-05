@@ -184,22 +184,28 @@ class OperatorLogHandler(metaclass=Singleton):
     def create_or_update_operate_log(
             self, action, resource_type, resource=None, resource_display=None,
             force=False, log_id=None, before=None, after=None,
-            object_name=None
+            object_name=None, user=None, org_id=None, remote_addr=None,
+            resource_id=None,
     ):
-        user = current_request.user if current_request else None
+        request = current_request if current_request else None
+        if user is None:
+            user = request.user if request else None
         if not user or not user.is_authenticated:
             return
 
-        remote_addr = get_request_ip(current_request)
+        if remote_addr is None:
+            remote_addr = get_request_ip(request) if request else ''
         if resource_display is None:
             resource_display = self.get_resource_display(resource)
-        resource_id = getattr(resource, 'pk', '')
+        if resource_id is None:
+            resource_id = getattr(resource, 'pk', '')
         before, after = self.data_processing(before, after)
         if not force and (before == after):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return
 
-        org_id = self.get_org_id(user, object_name)
+        if org_id is None:
+            org_id = self.get_org_id(user, object_name)
         data = {
             'id': log_id, "user": str(user), 'action': action,
             'resource_type': str(resource_type), 'org_id': org_id,

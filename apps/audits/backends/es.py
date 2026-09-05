@@ -65,7 +65,9 @@ class OperateLogStore(ES, metaclass=Singleton):
         before = kwargs.get('before') or {}
         after = kwargs.get('after') or {}
 
-        op_log = self.get({'id': log_id})
+        # Most audit events are new records. Skip a remote lookup when there is
+        # no caller-supplied ID and index the event directly.
+        op_log = self.get({'id': log_id}) if log_id else None
         if op_log is not None:
             data = {'doc': {}}
             raw_after = op_log.get('after') or {}

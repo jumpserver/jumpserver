@@ -17,6 +17,17 @@ class AccountEntry(AzureBaseEntry):
         return path
 
 
+class PersonalAssetCredentialEntry(AzureBaseEntry):
+
+    @property
+    def path_spec(self):
+        path = (
+            f'assets-{self.instance.asset_id}-personal-credentials-'
+            f'{self.instance.id}'
+        )
+        return path
+
+
 class AccountTemplateEntry(AzureBaseEntry):
 
     @property

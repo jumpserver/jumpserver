@@ -2,12 +2,14 @@ import base64
 import json
 import os
 import urllib.parse
+from collections.abc import Mapping
 from struct import pack
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
 from django.conf import settings
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -15,21 +17,33 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import status, serializers
 from rest_framework.decorators import action
 from rest_framework.settings import api_settings
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from accounts.const import AliasAccount, SecretType
-from accounts.utils import validate_account_username
+from accounts.personal_credentials import (
+    get_personal_credential_for_use,
+    get_personal_credential_failure_reason,
+    get_personal_credential_permission_context,
+    record_personal_credential_audit,
+    save_personal_credential,
+    validate_personal_credential_secret_type,
+)
+from accounts.utils import validate_account_username, validate_ssh_key
 from acls.notifications import AssetLoginReminderMsg
 from assets.const import Protocol
+from assets.models import Asset
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
-from common.utils import random_string, get_logger, get_request_ip_or_data
+from common.utils import (
+    random_string, get_logger, get_request_ip_or_data, is_uuid,
+)
 from common.utils.django import get_request_os
 from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
-from orgs.utils import tmp_to_org
+from orgs.models import Organization
+from orgs.utils import get_org_from_request, tmp_to_org
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
@@ -384,14 +398,21 @@ class RDPFileClientProtocolURLMixin:
         return filename
 
     @staticmethod
-    def get_token_account_display(token):  #新增方法
-            try:
-                account = token.account_object
-            except Exception:
-                account = None
-            if account:
-                return account.full_username or account.username or account.name or token.account
-            return token.input_username or token.account    
+    def get_token_account_display(token):
+        if token.personal_credential_id:
+            return token.input_username or token.account
+        try:
+            account = token.account_object
+        except Exception:
+            account = None
+        if account:
+            return (
+                account.full_username
+                or account.username
+                or account.name
+                or token.account
+            )
+        return token.input_username or token.account
     @staticmethod
     def parse_env_bool(env_key, env_default, true_value, false_value):
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
@@ -501,6 +522,10 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         response = HttpResponse(content, content_type='application/octet-stream')
 
         if is_true(request.query_params.get('reusable')):
+            if token.personal_credential_id:
+                raise ValidationError(
+                    _('Personal credential connection tokens cannot be reusable')
+                )
             token.set_reusable(True)
             filename = '{}-{}'.format(filename, token.date_expired.strftime('%Y%m%d_%H%M%S'))
 
@@ -547,7 +572,23 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         # 只能兑换自己使用的 Token
         instance = get_object_or_404(ConnectionToken, pk=pk, user=request.user)
         instance.id = None
-        self.validate_exchange_token(instance)
+        try:
+            self.validate_exchange_token(instance)
+        except APIException as error:
+            if instance.personal_credential_id:
+                record_personal_credential_audit(
+                    operation='use',
+                    result='failed',
+                    failure_reason=get_personal_credential_failure_reason(error),
+                    user=instance.user,
+                    asset=instance.asset,
+                    credential_id=instance.personal_credential_id,
+                    username=instance.input_username,
+                    secret_type=instance.input_secret_type,
+                    remote_addr=get_request_ip_or_data(request),
+                    org_id=instance.org_id,
+                )
+            raise
         instance.date_expired = date_expired_default()
         instance.save()
         serializer = self.get_serializer(instance)
@@ -581,6 +622,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     input_username = ''
     need_face_verify = False
     face_monitor_token = ''
+    personal_credential_audit_context = None
+    personal_credential_saved = None
 
     def get_queryset(self):
         queryset = ConnectionToken.objects \
@@ -591,9 +634,25 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     def get_user(self, serializer):
         return self.request.user
 
+    @transaction.atomic
     def perform_create(self, serializer):
         self.validate_serializer(serializer)
         return super().perform_create(serializer)
+
+    def record_personal_credential_failure(self, reason):
+        context = self.personal_credential_audit_context
+        if not context:
+            return
+        try:
+            record_personal_credential_audit(
+                result='failed',
+                failure_reason=reason,
+                user=self.request.user,
+                remote_addr=get_request_ip_or_data(self.request),
+                **context,
+            )
+        except Exception:
+            logger.exception('Record personal credential failure audit failed')
 
 
     def _insert_connect_options(self, data, user):
@@ -674,30 +733,174 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         account_name = data.get('account')
         protocol = data.get('protocol')
         connect_method = data.get('connect_method')
+        save_credential = data.pop('save_personal_credential', False)
+        credential_version = data.pop('personal_credential_version', None)
+        credential_id = data.get('personal_credential_id')
+        personal_permission_context = None
+        if credential_id or save_credential:
+            self.personal_credential_audit_context = {
+                'operation': (
+                    'update' if credential_id and save_credential
+                    else 'create' if save_credential
+                    else 'use'
+                ),
+                'asset': asset,
+                'credential_id': credential_id,
+                'username': data.get('input_username', ''),
+                'secret_type': data.get('input_secret_type', ''),
+            }
         data['connect_options'] = get_effective_connect_options(
             data['connect_options'], protocol
         )
+
+        if (credential_id or save_credential) and user != self.request.user:
+            raise PermissionDenied(_(
+                'Personal credentials can only be managed by their owner'
+            ))
+
+        if account_name != AliasAccount.INPUT and (credential_id or save_credential):
+            raise ValidationError({
+                'personal_credential_id': _(
+                    'Personal credentials can only be used with the manual account'
+                )
+            })
+
+        if save_credential and not data.get('input_username'):
+            raise ValidationError({'input_username': _('This field is required.')})
+        if save_credential and not data.get('input_secret'):
+            raise ValidationError({'input_secret': _('This field is required.')})
+        if save_credential:
+            personal_permission_context = get_personal_credential_permission_context(
+                user, asset, protocol
+            )
+            platform_protocol, __ = personal_permission_context
+            input_secret_type = (
+                data.get('input_secret_type') or SecretType.PASSWORD
+            )
+            validate_personal_credential_secret_type(
+                platform_protocol,
+                input_secret_type,
+                field_name='input_secret_type',
+            )
+            if input_secret_type == SecretType.SSH_KEY:
+                data['input_secret'] = validate_ssh_key(data['input_secret'])
+        if save_credential and credential_id and credential_version is None:
+            raise ValidationError({
+                'personal_credential_version': _('This field is required.')
+            })
+        if save_credential and credential_id:
+            get_personal_credential_for_use(
+                user, asset, protocol, credential_id,
+                permission_context=personal_permission_context,
+            )
+        if credential_version is not None and not credential_id:
+            raise ValidationError({
+                'personal_credential_version': _(
+                    'A personal credential ID is required when a version is provided'
+                )
+            })
+
+        if credential_id and not save_credential:
+            if data.get('input_username') or data.get('input_secret'):
+                raise ValidationError({
+                    'personal_credential_id': _(
+                        'Do not submit a username or secret when using a saved credential'
+                    )
+                })
+            personal_permission_context = (
+                get_personal_credential_permission_context(
+                    user, asset, protocol
+                )
+            )
+            credential = get_personal_credential_for_use(
+                user, asset, protocol, credential_id,
+                version=credential_version,
+                permission_context=personal_permission_context,
+            )
+            data['input_username'] = credential.username
+            data['input_secret'] = ''
+            data['input_secret_type'] = credential.secret_type
+            data['personal_credential_version'] = credential.version
+            data['is_reusable'] = False
+            self.personal_credential_audit_context.update({
+                'username': credential.username,
+                'secret_type': credential.secret_type,
+            })
+
         self.input_username = self.get_input_username(data)
         if account_name == AliasAccount.INPUT:
             # Manual account input can reach Luna directly, so validate before ACL/token creation.
             self.input_username = validate_account_username(self.input_username)
             data['input_username'] = self.input_username
-        _data = self._validate(user, asset, account_name, protocol, connect_method)
+        personal_permission_account = (
+            personal_permission_context[1]
+            if personal_permission_context is not None
+            else None
+        )
+        _data = self._validate(
+            user, asset, account_name, protocol, connect_method,
+            permed_account=personal_permission_account,
+        )
         _data['remote_addr'] = get_request_ip_or_data(self.request)
         data.update(_data)
+
+        if save_credential:
+            credential = save_personal_credential(
+                user=user,
+                asset=asset,
+                protocol=protocol,
+                username=data.get('input_username', ''),
+                secret=data.get('input_secret', ''),
+                secret_type=data.get('input_secret_type') or SecretType.PASSWORD,
+                credential_id=credential_id,
+                version=credential_version,
+                permission_context=personal_permission_context,
+            )
+            data['personal_credential_id'] = credential.id
+            data['personal_credential_version'] = credential.version
+            data['input_username'] = credential.username
+            data['input_secret'] = ''
+            data['input_secret_type'] = credential.secret_type
+            data['is_reusable'] = False
+            self.personal_credential_audit_context.update({
+                'credential_id': credential.id,
+                'username': credential.username,
+                'secret_type': credential.secret_type,
+            })
+            self.personal_credential_saved = (
+                'update' if credential_id else 'create', credential
+            )
         return serializer
 
     def validate_exchange_token(self, token):
         user = token.user
         asset = token.asset
         account_alias = token.account
-        _data = self._validate(user, asset, account_alias, token.protocol, token.connect_method)
+        self.input_username = token.input_username
+        personal_permission_account = None
+        if token.personal_credential_id:
+            credential, permission_context = (
+                token.validate_personal_credential()
+            )
+            personal_permission_account = permission_context[1]
+            self.input_username = credential.username
+            token.input_username = credential.username
+            token.input_secret = ''
+            token.input_secret_type = credential.secret_type
+            token.is_reusable = False
+        _data = self._validate(
+            user, asset, account_alias, token.protocol, token.connect_method,
+            permed_account=personal_permission_account,
+        )
         _data['remote_addr'] = get_request_ip_or_data(self.request)
         for k, v in _data.items():
             setattr(token, k, v)
         return token
 
-    def _validate(self, user, asset, account_alias, protocol, connect_method):
+    def _validate(
+            self, user, asset, account_alias, protocol, connect_method,
+            permed_account=None,
+    ):
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
@@ -706,7 +909,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if account_alias == AliasAccount.ANON and asset.category not in ['web', 'custom']:
             raise ValidationError(_('Anonymous account is not supported for this asset'))
 
-        account = self._validate_perm(user, asset, account_alias, protocol)
+        account = permed_account
+        if account is None:
+            account = self._validate_perm(
+                user, asset, account_alias, protocol
+            )
         if account.has_secret:
             data['input_secret'] = ''
             data['input_secret_type'] = account.secret_type
@@ -846,16 +1053,89 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         return {api_settings.NON_FIELD_ERRORS_KEY: [str(detail)]}
 
     def create(self, request, *args, **kwargs):
+        self.personal_credential_audit_context = None
+        self.personal_credential_saved = None
+        raw_data = request.data if isinstance(request.data, Mapping) else {}
+        raw_save = raw_data.get('save_personal_credential', False)
+        save_credential = raw_save in (True, 1, '1', 'true', 'True')
+        credential_id = raw_data.get('personal_credential_id')
+        if credential_id or save_credential:
+            raw_asset_id = raw_data.get('asset')
+            if isinstance(raw_asset_id, Mapping):
+                raw_asset_id = raw_asset_id.get('id') or raw_asset_id.get('pk')
+            raw_asset = None
+            if (
+                    raw_asset_id
+                    and not isinstance(raw_asset_id, (list, tuple))
+                    and is_uuid(raw_asset_id)
+            ):
+                raw_asset = Asset.objects.filter(id=raw_asset_id).first()
+            request_org = get_org_from_request(request)
+            requested_audit_org_id = (
+                raw_asset.org_id if raw_asset else request_org.id
+            )
+            can_audit_requested_org = (
+                request.user.is_superuser
+                or request.user.orgs.filter(
+                    id=requested_audit_org_id
+                ).exists()
+            )
+            if not can_audit_requested_org:
+                raw_asset = None
+                requested_audit_org_id = Organization.DEFAULT_ID
+            self.personal_credential_audit_context = {
+                'operation': (
+                    'update' if credential_id and save_credential
+                    else 'create' if save_credential
+                    else 'use'
+                ),
+                'asset': raw_asset,
+                'credential_id': credential_id,
+                'username': raw_data.get('input_username', ''),
+                'secret_type': raw_data.get('input_secret_type', ''),
+                'org_id': requested_audit_org_id,
+            }
+        failure_reason = ''
         try:
-            response = super().create(request, *args, **kwargs)
-            if self.need_face_verify:
-                self.create_face_verify(response)
+            # Face context creation is part of the connection/save operation.
+            # If it fails, roll back both the token and any inline credential.
+            with transaction.atomic():
+                response = super().create(request, *args, **kwargs)
+                if self.need_face_verify:
+                    self.create_face_verify(response)
         except JMSException as e:
+            failure_reason = str(e.detail.code)
             data = {'code': e.detail.code, 'detail': e.detail}
-            return Response(data, status=e.status_code)
+            response = Response(data, status=e.status_code)
         except ValidationError as e:
+            failure_reason = get_personal_credential_failure_reason(e)
             data = self.serialize_validation_error(e.detail)
-            return Response(data, status=e.status_code)
+            response = Response(data, status=e.status_code)
+        except APIException as error:
+            self.record_personal_credential_failure(
+                get_personal_credential_failure_reason(error)
+            )
+            raise
+        except Exception as error:
+            self.record_personal_credential_failure(
+                error.__class__.__name__
+            )
+            raise
+        if failure_reason:
+            self.record_personal_credential_failure(failure_reason)
+        elif self.personal_credential_saved:
+            operation, credential = self.personal_credential_saved
+            try:
+                record_personal_credential_audit(
+                    operation=operation,
+                    result='success',
+                    user=self.request.user,
+                    credential=credential,
+                )
+            except Exception:
+                logger.exception(
+                    'Record personal credential success audit failed'
+                )
         return response
 
 
@@ -881,7 +1161,12 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
     def get_object(self):
         pk = self.kwargs.get(self.lookup_field)
-        token = get_object_or_404(ConnectionToken, pk=pk)
+        token = get_object_or_404(
+            ConnectionToken.objects.select_related(
+                'user', 'asset__platform'
+            ),
+            pk=pk,
+        )
         return token
 
     def get_user(self, serializer):
@@ -896,15 +1181,35 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             "expired": instance.is_expired
         }
         try:
-            self._validate_perm(
-                instance.user,
-                instance.asset,
-                instance.account,
-                instance.protocol
-            )
+            if instance.personal_credential_id:
+                instance.is_valid()
+            else:
+                self._validate_perm(
+                    instance.user,
+                    instance.asset,
+                    instance.account,
+                    instance.protocol
+                )
         except JMSException as e:
             data['code'] = e.detail.code
             data['detail'] = str(e.detail)
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        except APIException as error:
+            data['code'] = get_personal_credential_failure_reason(error)
+            data['detail'] = str(error.detail)
+            if instance.personal_credential_id:
+                record_personal_credential_audit(
+                    operation='use',
+                    result='failed',
+                    failure_reason=data['code'],
+                    user=instance.user,
+                    asset=instance.asset,
+                    credential_id=instance.personal_credential_id,
+                    username=instance.input_username,
+                    secret_type=instance.input_secret_type,
+                    remote_addr=instance.remote_addr,
+                    org_id=instance.org_id,
+                )
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(data=data, status=status.HTTP_200_OK)
@@ -936,9 +1241,34 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token = ConnectionToken.get_typed_connection_token(token_id)
         if not token:
             raise PermissionDenied('Token {} is not valid'.format(token))
-        token.is_valid()
-
-        account = token.account_object
+        requested_expire_now = request.data.get('expire_now', True)
+        try:
+            if token.personal_credential_id:
+                # Validate permissions and fetch the exact-version secret once.
+                # account_object reuses it on this request-local token instance.
+                token.is_valid(include_personal_secret=True)
+            else:
+                token.is_valid()
+            account = token.account_object
+        except Exception as error:
+            if token.personal_credential_id:
+                if isinstance(error, APIException):
+                    reason = get_personal_credential_failure_reason(error)
+                else:
+                    reason = error.__class__.__name__
+                record_personal_credential_audit(
+                    operation='use',
+                    result='failed',
+                    failure_reason=reason,
+                    user=token.user,
+                    asset=token.asset,
+                    credential_id=token.personal_credential_id,
+                    username=token.input_username,
+                    secret_type=token.input_secret_type,
+                    remote_addr=token.remote_addr,
+                    org_id=token.org_id,
+                )
+            raise
         if account and account.secret_type == SecretType.SSH_CERTIFICATE:
             certificate = sign_connection_token_ssh_certificate(
                 token, request.data.get('public_key', '')
@@ -954,7 +1284,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
         serializer = self.get_serializer(instance=token)
 
-        expire_now = request.data.get('expire_now', True)
+        expire_now = requested_expire_now
         asset_type = token.asset.type
         # 设置默认值
         if asset_type in ['k8s', 'kubernetes']:
@@ -963,9 +1293,28 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         if token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
             logger.debug('Token is reusable, not expire now')
         elif is_false(expire_now):
-            logger.debug('Api specified, now expire now')
+            logger.debug('API specified, do not expire now')
         else:
             token.expire()
+
+        # expire_now=false still returns the secret. Audit every disclosure,
+        # while distinguishing Koko's inspection phase from final consumption.
+        if token.personal_credential_id:
+            record_personal_credential_audit(
+                operation='use',
+                result=(
+                    'inspected'
+                    if is_false(requested_expire_now)
+                    else 'success'
+                ),
+                user=token.user,
+                asset=token.asset,
+                credential_id=token.personal_credential_id,
+                username=token.input_username,
+                secret_type=token.input_secret_type,
+                remote_addr=token.remote_addr,
+                org_id=token.org_id,
+            )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 

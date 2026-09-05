@@ -538,6 +538,7 @@ class PlaybookPrepareMixin:
             exclude_localhost=True,
             task_type=self.__class__.method_type(),
             protocol=protocol,
+            account_selector=self.get_inventory_account_selector(),
         )
         inventory.write_to_file(inventory_path)
         self._inventory_host_labels = {
@@ -545,6 +546,9 @@ class PlaybookPrepareMixin:
             for host, detail in inventory.exclude_host_details.items()
         }
         return dict(inventory.exclude_hosts)
+
+    def get_inventory_account_selector(self):
+        return None
 
     @lazyproperty
     def runtime_dir(self):

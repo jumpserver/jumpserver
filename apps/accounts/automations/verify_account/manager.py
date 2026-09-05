@@ -3,15 +3,81 @@ from copy import deepcopy
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import APIException
 
 from accounts.const import (
     AutomationTypes, ChangeSecretRecordStatusChoice, Connectivity, SecretType,
 )
-from accounts.models import Account, ChangeSecretRecord
+from accounts.models import Account, ChangeSecretRecord, PersonalAssetCredential
+from accounts.personal_credentials import (
+    get_personal_credential_permission_context,
+    record_personal_credential_audit,
+    validate_personal_credential_secret_type,
+    validate_personal_credential_test_acl,
+    validate_personal_credential_verification_protocol,
+)
+from common.const import Status
 from common.utils import get_logger
+from users.models import User
 from ..base.manager import AccountBasePlaybookManager
 
 logger = get_logger(__name__)
+
+
+class PersonalCredentialAccount:
+    """Account-shaped adapter used only by the existing verification runner."""
+
+    is_personal_credential = True
+
+    def __init__(self, credential):
+        self.credential = credential
+
+    def __getattr__(self, item):
+        return getattr(self.credential, item)
+
+    @property
+    def name(self):
+        return self.credential.username
+
+    @property
+    def full_username(self):
+        username = self.credential.username
+        if '@' in username or '\\' in username:
+            return username
+        if self.credential.protocol != 'rdp':
+            return username
+        rdp = self.credential.asset.platform.protocols.filter(
+            name='rdp'
+        ).first()
+        ad_domain = (rdp.setting or {}).get('ad_domain') if rdp else ''
+        return '{}@{}'.format(username, ad_domain) if ad_domain else username
+
+    @property
+    def platform(self):
+        return self.credential.asset.platform
+
+    @property
+    def privileged(self):
+        return False
+
+    @property
+    def su_from(self):
+        return None
+
+    @staticmethod
+    def escape_jinja2_syntax(value):
+        return Account.escape_jinja2_syntax(value)
+
+    @staticmethod
+    def get_ansible_become_auth():
+        return {'ansible_become': False}
+
+    def get_private_key_path(self, path):
+        if self.secret_type != SecretType.SSH_KEY:
+            return None
+        return VerifyAccountManager.generate_private_key_path(
+            self.secret, path
+        )
 
 
 class VerifyAccountManager(AccountBasePlaybookManager):
@@ -22,7 +88,26 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         self.account_ids = set(map(
             str, self.execution.snapshot.get('accounts', [])
         ))
+        self.personal_credential_ids = set(map(
+            str, self.execution.snapshot.get('personal_credentials', [])
+        ))
         self.found_account_ids = set()
+        self.found_personal_credential_ids = set()
+        self.personal_credential_accounts = {}
+        self.personal_credential_versions = {
+            str(key): value
+            for key, value in self.execution.snapshot.get(
+                'personal_credential_versions', {}
+            ).items()
+        }
+        self.finalized_personal_credential_ids = set()
+        self.personal_credential_errors = {}
+        self.personal_credential_user = User.objects.filter(
+            id=self.execution.snapshot.get('personal_credential_owner_id')
+        ).first()
+        self.personal_credential_remote_addr = self.execution.snapshot.get(
+            'personal_credential_remote_addr'
+        )
         self.recovery_record_map = self.execution.snapshot.get(
             'recovery_record_map', {}
         )
@@ -48,6 +133,18 @@ class VerifyAccountManager(AccountBasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.verify_account
 
+    def get_target_summary(self):
+        if not self.personal_credential_ids:
+            return super().get_target_summary()
+        return _(
+            "Targets: %(credentials)s personal credential(s) on %(assets)s asset(s)"
+        ) % {
+            'credentials': len(self.personal_credential_ids),
+            'assets': len(set(map(
+                str, self.execution.snapshot.get('assets', [])
+            ))),
+        }
+
     def load_accounts_by_asset(self):
         if self._accounts_by_asset_id is not None:
             return
@@ -59,6 +156,88 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         self._accounts_by_asset_id = self.index_accounts_by_execution_asset(
             accounts
         )
+        if not self.personal_credential_ids or not self.personal_credential_user:
+            return
+
+        credentials = PersonalAssetCredential.objects.filter(
+            id__in=self.personal_credential_ids,
+            owner=self.personal_credential_user,
+            is_active=True,
+        ).select_related('asset__platform').defer('_secret')
+        for credential in credentials:
+            credential_id = str(credential.id)
+            account = PersonalCredentialAccount(credential)
+            self.personal_credential_accounts[credential_id] = account
+            expected_version = self.personal_credential_versions.get(
+                credential_id
+            )
+            if (
+                    expected_version is not None
+                    and credential.version != expected_version
+            ):
+                self.personal_credential_errors[credential_id] = (
+                    'credential_changed_before_verification'
+                )
+                continue
+            try:
+                platform_protocol, permission_account = (
+                    get_personal_credential_permission_context(
+                        self.personal_credential_user,
+                        credential.asset,
+                        credential.protocol,
+                    )
+                )
+                validate_personal_credential_secret_type(
+                    platform_protocol, credential.secret_type
+                )
+                validate_personal_credential_test_acl(
+                    self.personal_credential_user,
+                    credential.asset,
+                    permission_account,
+                    credential.username,
+                    self.personal_credential_remote_addr,
+                )
+                validate_personal_credential_verification_protocol(
+                    credential.asset, credential.protocol
+                )
+            except APIException:
+                self.personal_credential_errors[credential_id] = (
+                    'permission_denied_or_credential_unavailable'
+                )
+                continue
+            # Decrypt only after every dynamic permission/ACL check, and bind
+            # the loaded secret to the exact version queued by the API.
+            secret_version = (
+                expected_version
+                if expected_version is not None
+                else credential.version
+            )
+            credential = PersonalAssetCredential.objects.filter(
+                id=credential.id,
+                owner=self.personal_credential_user,
+                is_active=True,
+                version=secret_version,
+            ).select_related('asset__platform').first()
+            if not credential:
+                self.personal_credential_errors[credential_id] = (
+                    'credential_changed_before_verification'
+                )
+                continue
+            account = PersonalCredentialAccount(credential)
+            self.personal_credential_accounts[credential_id] = account
+            self._accounts_by_asset_id[str(credential.asset_id)].append(account)
+
+    def get_inventory_account_selector(self):
+        if not self.personal_credential_ids:
+            return super().get_inventory_account_selector()
+        return self.select_personal_inventory_account
+
+    def select_personal_inventory_account(self, asset):
+        accounts = self.get_accounts(asset)
+        return next((
+            account for account in accounts
+            if getattr(account, 'is_personal_credential', False)
+        ), None)
 
     def get_accounts(self, asset):
         self.load_accounts_by_asset()
@@ -70,13 +249,30 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             automation=automation, path_dir=path_dir, **kwargs
         )
         if host.get('error'):
+            if self.personal_credential_ids:
+                self.load_accounts_by_asset()
+                reasons = [
+                    self.personal_credential_errors.get(credential_id)
+                    for credential_id, personal_account
+                    in self.personal_credential_accounts.items()
+                    if (
+                        str(personal_account.asset_id) == str(asset.id)
+                        and self.personal_credential_errors.get(credential_id)
+                    )
+                ]
+                if reasons:
+                    host['error'] = reasons[0]
             return host
 
         accounts = self.get_accounts(asset)
         inventory_hosts = []
 
         for account in accounts:
-            self.found_account_ids.add(str(account.id))
+            account_id = str(account.id)
+            if getattr(account, 'is_personal_credential', False):
+                self.found_personal_credential_ids.add(account_id)
+            else:
+                self.found_account_ids.add(account_id)
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'
             self.host_account_mapper[h['name']] = account
@@ -163,7 +359,71 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                         ChangeSecretRecordStatusChoice.failed.value,
                         _('Account not found or inactive'),
                     )
+        missing_personal_ids = (
+            self.personal_credential_ids
+            - self.found_personal_credential_ids
+        )
+        if missing_personal_ids:
+            self.status = Status.failed
+        for credential_id in sorted(missing_personal_ids):
+            reason = self.personal_credential_errors.get(
+                credential_id, 'credential_not_found_or_not_permitted'
+            )
+            account = self.personal_credential_accounts.get(credential_id)
+            self.record_personal_credential_result(
+                account, credential_id, 'failed', reason
+            )
         return runners
+
+    def record_personal_credential_result(
+            self, account, credential_id, result, failure_reason='',
+    ):
+        credential_id = str(credential_id)
+        if credential_id in self.finalized_personal_credential_ids:
+            return
+        credential = account.credential if account else None
+        if result != 'success':
+            self.status = Status.failed
+        connectivity = (
+            Connectivity.OK if result == 'success' else Connectivity.ERR
+        )
+        expected_version = self.personal_credential_versions.get(
+            credential_id
+        )
+        queryset = PersonalAssetCredential.objects.filter(
+            id=credential_id,
+            owner=self.personal_credential_user,
+        )
+        if expected_version is not None:
+            queryset = queryset.filter(version=expected_version)
+        updated = queryset.update(
+            connectivity=connectivity,
+            date_verified=timezone.now(),
+        )
+        if not updated:
+            result = 'failed'
+            failure_reason = 'credential_changed_during_verification'
+            self.status = Status.failed
+        # The connectivity result is final even when writing its audit record
+        # fails. Do not let post_run turn a successful probe into a false
+        # failure just to retry best-effort auditing.
+        self.finalized_personal_credential_ids.add(credential_id)
+        try:
+            record_personal_credential_audit(
+                operation='test',
+                result=result,
+                failure_reason=failure_reason,
+                user=self.personal_credential_user,
+                credential=credential,
+                credential_id=credential_id,
+                org_id=self.execution.org_id,
+                remote_addr=self.personal_credential_remote_addr,
+            )
+        except Exception:
+            logger.exception(
+                'Record personal credential verification audit failed: %s',
+                credential_id,
+            )
 
     def on_host_success(self, host, result):
         account = self.host_account_mapper.get(host)
@@ -175,6 +435,11 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         if record:
             self.save_verification_result(
                 record, ChangeSecretRecordStatusChoice.success.value
+            )
+            return super().on_host_success(host, result)
+        if getattr(account, 'is_personal_credential', False):
+            self.record_personal_credential_result(
+                account, account.id, 'success'
             )
             return super().on_host_success(host, result)
         try:
@@ -196,6 +461,14 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             return
         account = self.host_account_mapper.get(host)
         if not account:
+            return
+        if getattr(account, 'is_personal_credential', False):
+            self.record_personal_credential_result(
+                account,
+                account.id,
+                'failed',
+                'credential_verification_failed',
+            )
             return
         try:
             error_tp = account.get_err_connectivity(error)
@@ -225,6 +498,17 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                         'Verification ended before a final result was received'
                     )),
                     date_verified=timezone.now(),
+                )
+            for credential_id in (
+                self.personal_credential_ids
+                - self.finalized_personal_credential_ids
+            ):
+                account = self.personal_credential_accounts.get(credential_id)
+                self.record_personal_credential_result(
+                    account,
+                    credential_id,
+                    'failed',
+                    'credential_verification_did_not_complete',
                 )
         finally:
             super().post_run()
