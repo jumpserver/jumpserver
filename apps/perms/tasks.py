@@ -19,10 +19,12 @@ from perms.models import AssetPermission
 from perms.notifications import (
     PermedAssetsWillExpireUserMsg,
     AssetPermsWillExpireForOrgAdminMsg,
+    AssetPermissionWillExpireSoonUserMsg,
 )
 from perms.utils import UserPermTreeExpireUtil
 
 logger = get_logger(__file__)
+EXPIRE_SOON_NOTICE_BATCH_SIZE = 200
 
 
 @shared_task(
@@ -70,7 +72,7 @@ def check_asset_permission_will_expired():
     asset_perms = AssetPermission.objects.filter(
         is_active=True,
         date_expired__gte=start,
-        date_expired__lte=end
+        date_expired__lte=end,
     ).distinct()
 
     for asset_perm in asset_perms:
@@ -110,3 +112,54 @@ def check_asset_permission_will_expired():
             org_admins = org.admins.all()
             for org_admin in org_admins:
                 AssetPermsWillExpireForOrgAdminMsg(org_admin, perms, org, day_count).publish_async()
+
+
+def _claim_one_expire_soon_notice(now):
+    with atomic():
+        asset_perm = AssetPermission.objects.select_for_update(skip_locked=True).filter(
+            is_active=True,
+            expire_soon_notice_enabled=True,
+            expire_soon_notice_at__isnull=False,
+            expire_soon_notice_at__lte=now,
+            expire_soon_notice_sent_at__isnull=True,
+            date_expired__gt=now,
+        ).order_by('expire_soon_notice_at').first()
+        if asset_perm is None:
+            return None
+
+        claimed_at = timezone.now()
+        asset_perm.expire_soon_notice_sent_at = claimed_at
+        asset_perm.save(update_fields=['expire_soon_notice_sent_at'])
+        return asset_perm
+
+
+def _publish_one_expire_soon_notice(now):
+    asset_perm = _claim_one_expire_soon_notice(now)
+    if asset_perm is None:
+        return False
+
+    for user in asset_perm.get_all_users():
+        try:
+            AssetPermissionWillExpireSoonUserMsg(user, asset_perm).publish_async()
+        except Exception:
+            logger.exception(
+                'Enqueue asset permission expiration-soon notice failed: '
+                'permission=%s, user=%s',
+                asset_perm.id, user.id,
+            )
+    return True
+
+
+@shared_task(
+    verbose_name=_('Send asset permission expiration-soon notification'),
+    description=_(
+        'Check due asset permission expiration-soon notices every minute and enqueue notifications'
+    )
+)
+@register_as_period_task(interval=60)
+@tmp_to_root_org()
+def check_asset_permission_will_expire_soon():
+    now = timezone.now()
+    for _ in range(EXPIRE_SOON_NOTICE_BATCH_SIZE):
+        if not _publish_one_expire_soon_notice(now):
+            break
