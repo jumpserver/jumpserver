@@ -1,5 +1,8 @@
 import uuid
 
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.utils import timezone
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
@@ -27,6 +30,13 @@ ANSIBLE_DOCKER_HELP_TEXT = lazy(
     ) % {'image': ANSIBLE_EE_IMAGE},
     str,
 )()
+
+
+def validate_chat_ai_base_url(value):
+    message = _('Enter a valid HTTP or HTTPS URL.')
+    if not value.isascii():
+        raise ValidationError(message)
+    URLValidator(schemes=['http', 'https'], message=message)(value)
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -185,7 +195,8 @@ class ChatAISettingSerializer(serializers.Serializer):
         required=False, label=_('Chat AI')
     )
     CHAT_AI_BASE_URL = serializers.CharField(
-        allow_blank=True, required=False, label=_('Base URL'),
+        required=False, label=_('Base URL'),
+        validators=[validate_chat_ai_base_url],
         help_text=_('OpenAI-compatible API base URL, usually ending in /v1.')
     )
     CHAT_AI_API_KEY = EncryptedField(
@@ -199,6 +210,22 @@ class ChatAISettingSerializer(serializers.Serializer):
         max_length=256, allow_blank=True, required=False, label=_('Model'),
         help_text=_('Discover models from the provider or enter a model ID manually.')
     )
+
+    def validate(self, attrs):
+        enabled = attrs.get('CHAT_AI_ENABLED')
+        base_url = attrs.get('CHAT_AI_BASE_URL', settings.CHAT_AI_BASE_URL)
+        if enabled and not str(base_url or '').strip():
+            raise serializers.ValidationError({
+                'CHAT_AI_BASE_URL': self.fields['CHAT_AI_BASE_URL'].error_messages['blank']
+            })
+        if enabled and 'CHAT_AI_BASE_URL' not in attrs:
+            try:
+                self.fields['CHAT_AI_BASE_URL'].run_validation(base_url)
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({
+                    'CHAT_AI_BASE_URL': exc.detail
+                }) from exc
+        return attrs
 
 
 class TicketSettingSerializer(serializers.Serializer):
