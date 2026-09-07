@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed, PermissionDenied
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -20,10 +20,8 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     filterset_fields = ['id', 'name', 'type']
     search_fields = ['id', 'name', 'type']
 
-    def bulk_destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
-
-    def perform_destroy(self, instance):
+    @staticmethod
+    def check_destroy_permission(instance):
         current_org_id = str(get_current_org_id())
         if (
             current_org_id != Organization.ROOT_ID and
@@ -32,12 +30,29 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
             error = _('Inherited ticket flows cannot be deleted')
             raise PermissionDenied(error)
 
-        rule_ids = list(instance.rules.values_list('id', flat=True))
-        with transaction.atomic():
+    @staticmethod
+    def destroy_instances(instances):
+        rule_ids = []
+        for instance in instances:
+            rule_ids.extend(instance.rules.values_list('id', flat=True))
             instance.delete()
-            ApprovalRule.objects.filter(
-                id__in=rule_ids, ticket_flows__isnull=True
-            ).delete()
+
+        ApprovalRule.objects.filter(
+            id__in=rule_ids, ticket_flows__isnull=True
+        ).delete()
+
+    def perform_destroy(self, instance):
+        self.check_destroy_permission(instance)
+        with transaction.atomic():
+            self.destroy_instances([instance])
+
+    def perform_bulk_destroy(self, objects):
+        instances = list(objects)
+        for instance in instances:
+            self.check_destroy_permission(instance)
+
+        with transaction.atomic():
+            self.destroy_instances(instances)
 
     def get_queryset(self):
         queryset = TicketFlow.get_org_related_flows()
