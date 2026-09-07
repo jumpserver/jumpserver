@@ -27,14 +27,7 @@ urlpatterns = ops_urlpatterns + \
               terminal_urlpatterns
 
 if settings.XPACK_ENABLED:
-    try:
-        urlpatterns += import_string('xpack.urls.ws_urls.urlpatterns')
-    except ImportError:
-        for plugin in ('cloud', 'facelive'):
-            try:
-                urlpatterns += import_string(f'xpack.plugins.{plugin}.urls.ws_urls.urlpatterns')
-            except ImportError:
-                continue
+    urlpatterns += import_string('xpack.urls.ws_urls.urlpatterns')
 
 
 @database_sync_to_async
