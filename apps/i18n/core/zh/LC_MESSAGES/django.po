@@ -5824,6 +5824,10 @@ msgstr "工单信息"
 msgid "Actions"
 msgstr "动作"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 证书签发已禁用"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127

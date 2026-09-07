@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,12 +21,19 @@ class SSHCAOpenBaoTestingAPI(GenericAPIView):
     def get_config(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
         data = {}
         for name in serializer.fields:
-            value = serializer.validated_data.get(name)
-            if value in ('', None):
+            value = validated_data.get(name, getattr(settings, name, None))
+            if name == 'SSH_CA_OPENBAO_TOKEN' and value in ('', None):
                 value = getattr(settings, name, None)
             data[name] = value
+
+        address_field = 'SSH_CA_OPENBAO_ADDR'
+        if not data[address_field]:
+            raise ValidationError({
+                address_field: [_('This field may not be blank.')]
+            })
         return SimpleNamespace(**data)
 
     def post(self, request):
