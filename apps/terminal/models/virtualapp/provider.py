@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from django.db import models, transaction
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
@@ -18,6 +20,7 @@ class AppProvider(JMSBaseModel):
         ssh = 'ssh', 'SSH'
 
     cache_status_key_prefix = 'virtual_host_{}_status'
+    managed_service_url = 'http://127.0.0.1:9001'
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
     host = models.OneToOneField(
@@ -72,8 +75,13 @@ class AppProvider(JMSBaseModel):
     def bind_terminal(self, terminal):
         if not terminal:
             raise ValidationError('Request user has no terminal')
+        if terminal.type != 'panda':
+            raise ValidationError('Only Panda terminals can bind an application provider')
 
         with transaction.atomic():
+            provider = self.__class__.objects.select_for_update().get(pk=self.pk)
+            if provider.terminal_id and provider.terminal_id != terminal.pk:
+                raise ValidationError('Provider is already bound to another terminal')
             terminal = terminal.__class__.objects.select_for_update().get(pk=terminal.pk)
             bound_provider = self.__class__.objects.select_for_update().filter(
                 terminal=terminal,
@@ -102,6 +110,14 @@ class AppProvider(JMSBaseModel):
 
     @property
     def connection_ready(self):
+        if self.connection_mode == self.ConnectionMode.direct and not self.service_url:
+            return True
+        try:
+            url = urlsplit(self.service_url)
+            if url.scheme not in ('http', 'https') or not url.hostname or url.port == 0:
+                return False
+        except ValueError:
+            return False
         if self.connection_mode == self.ConnectionMode.direct:
             return True
         if not self.host:

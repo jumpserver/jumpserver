@@ -36,7 +36,7 @@ class VirtualAppSerializer(ManifestI18nMixin, serializers.ModelSerializer):
         )
         instance = super().update(instance, validated_data)
         if image_changed:
-            instance.publications.update(status=PublishStatus.mismatch)
+            instance.publications.update(status=PublishStatus.mismatch, app_version='', image_digest='')
         return instance
 
 
@@ -55,6 +55,14 @@ class VirtualAppPublicationSerializer(serializers.ModelSerializer):
         ] + ['date_created', 'date_updated']
 
     def update(self, instance, validated_data):
+        if (
+            validated_data.get('status') == PublishStatus.success
+            and instance.provider.host_id
+            and instance.app_version != instance.app.version
+        ):
+            # Older Panda versions only check whether an image tag exists.
+            # Managed providers must finish pulling the current version first.
+            validated_data['status'] = PublishStatus.mismatch
         if {'status', 'app_version', 'image_digest'} & validated_data.keys():
             validated_data['date_synced'] = timezone.now()
         return super().update(instance, validated_data)

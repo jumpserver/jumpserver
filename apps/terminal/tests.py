@@ -230,6 +230,10 @@ class VirtualAppProviderSelectionTests(SimpleTestCase):
 
 
 class AppProviderRuntimeTests(SimpleTestCase):
+    def test_provider_list_serializer_accepts_queryset(self):
+        serializer = AppProviderSerializer(AppProvider.objects.none(), many=True)
+        self.assertEqual(serializer.data, [])
+
     def test_provider_serializer_exposes_provider_comment(self):
         provider = AppProvider(name='provider-one', hostname='192.0.2.10', comment='Provider note')
 
@@ -239,7 +243,7 @@ class AppProviderRuntimeTests(SimpleTestCase):
 
     def test_provider_update_binds_existing_host_to_nested_serializer(self):
         host = mock.Mock()
-        provider = mock.Mock(host=host)
+        provider = mock.Mock(spec=AppProvider, host=host)
 
         serializer = AppProviderSerializer(instance=provider)
 
@@ -279,6 +283,26 @@ class AppProviderRuntimeTests(SimpleTestCase):
         self.assertEqual(result['hostname'], '192.0.2.10')
         self.assertEqual(result['runtime_type'], AppProvider.RuntimeType.docker)
         self.assertEqual(result['connection_mode'], AppProvider.ConnectionMode.ssh)
+        self.assertEqual(result['service_url'], 'http://127.0.0.1:9001')
+
+    @mock.patch('terminal.serializers.virtualapp_provider.Platform.objects.get')
+    @mock.patch('assets.serializers.HostSerializer.to_internal_value', side_effect=lambda data: data)
+    def test_partial_host_update_preserves_name_address_and_ssh_port(self, _internal, platform_get):
+        platform_get.return_value.id = 'virtual-app-platform'
+        host = mock.Mock(address='192.0.2.10')
+        host.name = 'provider-one'
+        provider = mock.Mock(spec=AppProvider, host=host)
+        serializer = AppProviderSerializer(instance=provider, partial=True)
+
+        host_data = serializer.fields['host'].to_internal_value({'comment': 'Updated'})
+        with mock.patch.object(AppProvider.objects, 'filter') as providers:
+            providers.return_value.exclude.return_value.exists.return_value = False
+            result = serializer.validate({'host': host_data})
+
+        self.assertNotIn('protocols', host_data)
+        self.assertNotIn('nodes_display', host_data)
+        self.assertEqual(result['name'], 'provider-one')
+        self.assertEqual(result['hostname'], '192.0.2.10')
 
     def test_address_falls_back_to_legacy_hostname(self):
         provider = AppProvider(hostname='192.0.2.10')
@@ -302,7 +326,10 @@ class AppProviderRuntimeTests(SimpleTestCase):
         self.assertEqual(provider.container_count, 2)
 
     def test_ssh_provider_requires_host_ssh_protocol_and_account(self):
-        provider = AppProvider(connection_mode=AppProvider.ConnectionMode.ssh)
+        provider = AppProvider(
+            connection_mode=AppProvider.ConnectionMode.ssh,
+            service_url=AppProvider.managed_service_url,
+        )
         provider.__dict__['host_id'] = '00000000-0000-0000-0000-000000000001'
         host = mock.Mock()
         host.protocols.filter.return_value.exists.return_value = True
@@ -317,6 +344,13 @@ class AppProviderRuntimeTests(SimpleTestCase):
             AppProvider, 'host', new=mock.PropertyMock(return_value=host)
         ):
             self.assertFalse(provider.connection_ready)
+
+    def test_ssh_provider_requires_valid_service_url(self):
+        for url in ('', 'panda:9001', 'http://127.0.0.1:invalid'):
+            with self.subTest(url=url):
+                provider = AppProvider(connection_mode='ssh', service_url=url)
+                self.assertFalse(provider.connection_ready)
+        self.assertTrue(AppProvider(connection_mode='direct').connection_ready)
 
 
 class AppProviderTerminalBindingTests(TestCase):
@@ -353,6 +387,90 @@ class AppProviderTerminalBindingTests(TestCase):
 
         with self.assertRaises(ValidationError):
             managed.bind_terminal(self.terminal)
+
+    def test_provider_does_not_replace_its_bound_terminal(self):
+        provider = AppProvider.objects.create(
+            name='managed-ssh', hostname='192.0.2.10', terminal=self.terminal,
+        )
+        another = Terminal.objects.create(name='another-panda', type='panda')
+        with self.assertRaises(ValidationError):
+            provider.bind_terminal(another)
+
+    def test_deployment_registers_and_reuses_panda_credentials(self):
+        provider = AppProvider.objects.create(
+            name='managed-ssh', hostname='192.0.2.10', connection_mode='ssh',
+            terminal=self.terminal,
+        )
+        deployment = mock.Mock(provider=provider)
+        manager = DeployAppProviderManager(deployment)
+
+        access_key = manager.get_access_key()
+        provider.refresh_from_db()
+
+        self.assertEqual(provider.terminal.type, 'panda')
+        self.assertEqual(access_key, provider.terminal.user.access_key.get_full_value())
+        self.assertEqual(manager.get_access_key(), access_key)
+
+    def test_managed_host_create_and_partial_update_preserve_ssh_port(self):
+        from orgs.utils import tmp_to_builtin_org
+
+        with tmp_to_builtin_org(system=1):
+            serializer = AppProviderSerializer(data={'host': {
+                'name': 'managed-ssh', 'address': '192.0.2.10',
+                'protocols': [{'name': 'ssh', 'port': 2222}],
+            }})
+            serializer.is_valid(raise_exception=True)
+            provider = serializer.save()
+            update = AppProviderSerializer(
+                provider, data={'host': {'comment': 'Updated'}}, partial=True,
+            )
+            update.is_valid(raise_exception=True)
+            provider = update.save()
+
+        self.assertEqual(provider.name, 'managed-ssh')
+        self.assertEqual(provider.hostname, '192.0.2.10')
+        self.assertEqual(provider.service_url, 'http://127.0.0.1:9001')
+        self.assertEqual(provider.host.protocols.get(name='ssh').port, 2222)
+
+
+class AppProviderCompatibilityTests(SimpleTestCase):
+    def test_panda_discovers_bound_provider_using_its_service_account_id(self):
+        from terminal.api.virtualapp.provider import AppProviderViewSet
+
+        user = mock.Mock(id='service-account-id', is_service_account=True)
+        provider = mock.Mock()
+        view = AppProviderViewSet()
+        view.request = mock.Mock(user=user)
+        view.kwargs = {'pk': user.id}
+        view.action = 'retrieve'
+        view.get_queryset = mock.Mock()
+        view.get_queryset.return_value.filter.return_value.first.return_value = provider
+        view.check_object_permissions = mock.Mock()
+
+        self.assertIs(view.get_object(), provider)
+        view.get_queryset.return_value.filter.assert_called_once_with(terminal__user=user)
+
+    def test_legacy_provider_publication_does_not_start_ansible(self):
+        from terminal.api.virtualapp.virtualapp import VirtualAppPublicationViewSet
+
+        publication = mock.Mock(provider=mock.Mock(host_id=None))
+        self.assertIsNone(VirtualAppPublicationViewSet.start_publish(publication))
+
+    @mock.patch('rest_framework.serializers.ModelSerializer.update', side_effect=lambda instance, data: data)
+    def test_panda_report_cannot_publish_stale_managed_image(self, _update):
+        from terminal.serializers import VirtualAppPublicationSerializer
+
+        publication = mock.Mock(
+            app_version='1.0', app=mock.Mock(version='2.0'),
+            provider=mock.Mock(host_id='managed-host'),
+        )
+        serializer = VirtualAppPublicationSerializer()
+        data = serializer.update(publication, {'status': 'success'})
+        self.assertEqual(data['status'], 'mismatch')
+
+        publication.provider.host_id = None
+        data = serializer.update(publication, {'status': 'success'})
+        self.assertEqual(data['status'], 'success')
 
 
 class AppProviderDeploymentTests(SimpleTestCase):
@@ -391,14 +509,18 @@ class AppProviderDeploymentTests(SimpleTestCase):
         deployment = mock.Mock(provider=provider, publication_id=None)
         with tempfile.TemporaryDirectory() as ansible_dir, override_settings(
             ANSIBLE_DIR=ansible_dir
+        ), mock.patch.object(
+            DeployAppProviderManager, 'get_access_key', return_value='access-key-id:secret'
         ):
             manager = DeployAppProviderManager(deployment)
             path = manager.generate_playbook()
             with open(path) as stream:
                 play = yaml.safe_load(stream)[0]
+            self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
 
         variables = play['vars']
-        self.assertEqual(variables['PROVIDER_ID'], str(provider.id))
+        self.assertEqual(variables['PANDA_ACCESS_KEY'], 'access-key-id:secret')
+        self.assertNotIn('BOOTSTRAP_TOKEN', variables)
         self.assertEqual(variables['PANDA_HOST_IP'], '192.0.2.10')
         self.assertEqual(variables['PANDA_IMAGE'], 'jumpserver/panda:test')
         docker_service_task = next(
@@ -407,6 +529,27 @@ class AppProviderDeploymentTests(SimpleTestCase):
         )
         self.assertIn('ansible.builtin.systemd_service', docker_service_task)
         self.assertNotIn('ansible.builtin.service', docker_service_task)
+        key_task = next(task for task in play['tasks'] if task['name'] == 'Configure Panda access key')
+        self.assertTrue(key_task['no_log'])
+        self.assertEqual(key_task['ansible.builtin.copy']['mode'], '0600')
+
+    @mock.patch('terminal.automations.deploy_app_provider.VirtualAppPublication.objects.filter')
+    @mock.patch('terminal.automations.deploy_app_provider.SuperPlaybookRunner')
+    def test_successful_image_pull_finishes_publication(self, runner, publications):
+        publication = mock.Mock(app=mock.Mock(version='1.0', image_name='example/app:v1'))
+        deployment = mock.Mock(publication_id='publication-id', publication=publication)
+        runner.return_value.run.return_value.status = 'success'
+        with mock.patch.object(
+            DeployAppProviderManager, 'generate_inventory', return_value='/tmp/inventory'
+        ), mock.patch.object(
+            DeployAppProviderManager, 'generate_playbook', return_value='/tmp/playbook'
+        ):
+            DeployAppProviderManager(deployment).run()
+
+        values = publications.return_value.update.call_args.kwargs
+        self.assertEqual(values['status'], 'success')
+        self.assertEqual(values['app_version'], '1.0')
+        self.assertIsNotNone(values['date_synced'])
 
     @override_settings(SITE_URL='https://core.example.com', BOOTSTRAP_TOKEN='token')
     def test_publish_playbook_pulls_virtual_app_image(self):

@@ -5,11 +5,14 @@ import uuid
 
 import yaml
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
 from ops.ansible import JMSInventory, SuperPlaybookRunner
+from terminal.const import PublishStatus
+from terminal.models import AppProvider, VirtualAppPublication
 
 logger = get_logger(__name__)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -35,6 +38,30 @@ class DeployAppProviderManager:
         inventory.write_to_file(path)
         return path
 
+    @transaction.atomic
+    def get_access_key(self):
+        from terminal.serializers import TerminalRegistrationSerializer
+
+        provider = AppProvider.objects.select_for_update().get(pk=self.provider.pk)
+        terminal = provider.terminal
+        if terminal and terminal.type != 'panda':
+            raise ValueError('Provider terminal must be Panda')
+        if not terminal or not terminal.user:
+            if terminal:
+                provider.terminal = None
+                provider.save(update_fields=['terminal', 'date_updated'])
+            serializer = TerminalRegistrationSerializer(data={
+                'name': f'[Panda]-{provider.id}',
+                'type': 'panda',
+                'provider_id': provider.id,
+            })
+            serializer.is_valid(raise_exception=True)
+            terminal = serializer.save()
+        access_key = terminal.user.access_keys.filter(is_active=True).first()
+        if not access_key:
+            access_key = terminal.user.create_access_key()
+        return access_key.get_full_value()
+
     def generate_playbook(self):
         template = 'publish.yml' if self.deployment.publication_id else 'playbook.yml'
         with open(os.path.join(CURRENT_DIR, template)) as f:
@@ -45,9 +72,6 @@ class DeployAppProviderManager:
         variables = {
             **options,
             'CORE_HOST': core_host.rstrip('/'),
-            'BOOTSTRAP_TOKEN': settings.BOOTSTRAP_TOKEN,
-            'PROVIDER_ID': str(self.provider.id),
-            'PROVIDER_NAME': self.provider.name,
             'PANDA_HOST_IP': self.provider.host.address,
             'PANDA_IMAGE': options.get('PANDA_IMAGE', 'jumpserver/panda:latest'),
             'PANDA_RANGE_PORTS': options.get('PANDA_RANGE_PORTS', '6900-7900'),
@@ -55,18 +79,23 @@ class DeployAppProviderManager:
         }
         if self.deployment.publication_id:
             variables['APP_IMAGE'] = self.deployment.publication.app.image_name
+        else:
+            variables['PANDA_ACCESS_KEY'] = self.get_access_key()
         for play in plays:
             play['vars'].update(variables)
 
         path = os.path.join(self.run_dir, 'playbook', 'main.yml')
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as f:
+            os.chmod(path, 0o600)
             yaml.safe_dump(plays, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
         return path
 
     def run(self):
         try:
             self.deployment.date_start = timezone.now()
+            self.deployment.status = 'running'
+            self.deployment.save(update_fields=['date_start', 'status', 'date_updated'])
             runner = SuperPlaybookRunner(
                 inventory=self.generate_inventory(),
                 playbook=self.generate_playbook(),
@@ -78,13 +107,20 @@ class DeployAppProviderManager:
             # is the primary place to follow progress. Keep Ansible's normal
             # PLAY/TASK/RECAP output visible without enabling debug verbosity.
             result = runner.run(quiet=False)
-            self.deployment.status = result.status
+            self.deployment.status = 'success' if result.status == 'successful' else result.status
             if self.deployment.publication_id:
-                publication_status = (
-                    'pending' if result.status in ('success', 'successful') else 'failed'
-                )
-                self.deployment.publication.status = publication_status
-                self.deployment.publication.save(update_fields=['status', 'date_updated'])
+                publication = self.deployment.publication
+                app = publication.app
+                success = self.deployment.status == 'success'
+                values = {
+                    'status': PublishStatus.success if success else PublishStatus.failed,
+                    'date_updated': timezone.now(),
+                }
+                if success:
+                    values.update(app_version=app.version, image_digest='', date_synced=timezone.now())
+                VirtualAppPublication.objects.filter(
+                    pk=publication.pk, app__version=app.version, app__image_name=app.image_name,
+                ).update(**values)
         except Exception as exc:
             logger.exception('Deploy app provider failed: %s', exc)
             self.deployment.status = 'error'

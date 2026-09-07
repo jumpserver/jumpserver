@@ -49,14 +49,15 @@ class AppProviderHostSerializer(HostSerializer):
         data.pop('id', None)
         platform = Platform.objects.get(name='VirtualAppHost', internal=True)
         data['platform'] = platform.id
-        data.setdefault('nodes_display', ['VirtualAppHosts'])
-        ssh_protocol = next(
-            (item for item in data.get('protocols', []) if item.get('name') == 'ssh'),
-            {'name': 'ssh', 'port': 22},
-        )
-        data['protocols'] = [ssh_protocol]
+        if not self.instance:
+            data.setdefault('nodes_display', ['VirtualAppHosts'])
+        if 'protocols' in data or not self.instance:
+            ssh_protocol = next(
+                (item for item in data.get('protocols', []) if item.get('name') == 'ssh'),
+                {'name': 'ssh', 'port': 22},
+            )
+            data['protocols'] = [ssh_protocol]
         self.initial_data = data
-        self._extract_accounts()
         return super().to_internal_value(data)
 
 
@@ -89,7 +90,7 @@ class AppProviderSerializer(serializers.ModelSerializer):
         # object unless its instance is bound explicitly. Provider updates
         # submit the represented host along with deploy options, so bind the
         # existing host to make UUID/name uniqueness checks update-aware.
-        if self.instance and not isinstance(self.instance, (list, tuple)):
+        if isinstance(self.instance, AppProvider):
             self.fields['host'].instance = self.instance.host
 
     def validate(self, attrs):
@@ -100,17 +101,25 @@ class AppProviderSerializer(serializers.ModelSerializer):
             request and getattr(request.user, 'is_service_account', False)
         )
         if host:
-            providers = AppProvider.objects.filter(name=host['name'])
+            existing_host = self.instance.host if self.instance else None
+            name = host.get('name', getattr(existing_host, 'name', None))
+            address = host.get('address', getattr(existing_host, 'address', None))
+            if not name or not address:
+                raise serializers.ValidationError({
+                    'host': _('Host name and address are required')
+                })
+            providers = AppProvider.objects.filter(name=name)
             if self.instance:
                 providers = providers.exclude(pk=self.instance.pk)
             if providers.exists():
                 raise serializers.ValidationError({
                     'host': {'name': _('An application provider with this name already exists')}
                 })
-            attrs['name'] = host['name']
-            attrs['hostname'] = host['address']
+            attrs['name'] = name
+            attrs['hostname'] = address
             attrs['runtime_type'] = AppProvider.RuntimeType.docker
             attrs['connection_mode'] = AppProvider.ConnectionMode.ssh
+            attrs['service_url'] = AppProvider.managed_service_url
         elif not self.instance:
             if not is_service_account:
                 raise serializers.ValidationError({

@@ -91,6 +91,8 @@ class VirtualAppPublicationViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def start_publish(publication):
+        if not publication.provider.host_id:
+            return None
         deployment = AppProviderDeployment.objects.create(
             provider=publication.provider,
             publication=publication,
@@ -109,13 +111,14 @@ class VirtualAppPublicationViewSet(viewsets.ModelViewSet):
         publication = serializer.save(status='pending')
         deployment = self.start_publish(publication)
         data = serializer.data
-        data['task'] = str(deployment.id)
+        data['task'] = str(deployment.id) if deployment else None
         return Response(data, status=201)
 
     @action(detail=True, methods=['post'])
     def publish(self, request, *args, **kwargs):
         publication = self.get_object()
         publication.status = 'pending'
-        publication.save(update_fields=['status', 'date_updated'])
+        publication.app_version = ''
+        publication.save(update_fields=['status', 'app_version', 'date_updated'])
         deployment = self.start_publish(publication)
-        return Response({'task': str(deployment.id)}, status=201)
+        return Response({'task': str(deployment.id) if deployment else None}, status=201)

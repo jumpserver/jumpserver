@@ -14,6 +14,7 @@ def migrate_app_provider_hosts(apps, schema_editor):
         return
 
     managed_providers.update(runtime_type='docker', connection_mode='ssh')
+    managed_providers.filter(service_url='').update(service_url='http://127.0.0.1:9001')
     asset_model.objects.filter(id__in=host_ids).update(platform_id=platform.id)
     protocol_model.objects.filter(asset_id__in=host_ids).exclude(name='ssh').delete()
     existing_ssh_asset_ids = set(
@@ -29,7 +30,7 @@ def migrate_app_provider_hosts(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0024_add_virtual_app_host_platform'),
+        ('assets', '0026_add_virtual_app_host_platform'),
         ('terminal', '0014_app_provider_deployment'),
     ]
 

@@ -79,7 +79,7 @@ def add_virtual_app_host_platform(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0023_platformpackage_platform_package'),
+        ('assets', '0025_node_tree_pagination_index'),
     ]
 
     operations = [

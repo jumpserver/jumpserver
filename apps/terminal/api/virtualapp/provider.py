@@ -45,6 +45,21 @@ class AppProviderViewSet(JMSBulkModelViewSet):
             return [IsServiceAccount()]
         return super().get_permissions()
 
+    def get_object(self):
+        # Existing Panda versions discover their provider using the service
+        # account UUID before switching to the provider UUID in the response.
+        user = self.request.user
+        if (
+            self.action == 'retrieve'
+            and getattr(user, 'is_service_account', False)
+            and str(self.kwargs.get(self.lookup_field)) == str(user.id)
+        ):
+            provider = self.get_queryset().filter(terminal__user=user).first()
+            if provider:
+                self.check_object_permissions(self.request, provider)
+                return provider
+        return super().get_object()
+
     def perform_create(self, serializer):
         request_terminal = getattr(self.request.user, 'terminal', None)
         if not request_terminal:
@@ -95,7 +110,9 @@ class AppProviderViewSet(JMSBulkModelViewSet):
             return Response({'task': None, 'count': 0}, status=200)
 
         task_id = uuid.uuid4()
-        provider.publications.update(status='pending', date_updated=timezone.now())
+        provider.publications.update(status='pending', app_version='', date_updated=timezone.now())
+        if not provider.host_id:
+            return Response({'task': None, 'count': len(publications)}, status=200)
         deployments = AppProviderDeployment.objects.bulk_create([
             AppProviderDeployment(
                 provider=provider, publication=publication, task=task_id,

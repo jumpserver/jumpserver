@@ -3,9 +3,6 @@
   become: true
   vars:
     CORE_HOST: https://demo.example.com
-    BOOTSTRAP_TOKEN: PleaseChangeMe
-    PROVIDER_ID: 00000000-0000-0000-0000-000000000000
-    PROVIDER_NAME: panda
     PANDA_HOST_IP: 127.0.0.1
     PANDA_IMAGE: jumpserver/panda:latest
     PANDA_RANGE_PORTS: 6900-7900
@@ -39,9 +36,16 @@
 
     - name: Ensure Panda data directory exists
       ansible.builtin.file:
-        path: /opt/jumpserver/panda/data
+        path: /opt/jumpserver/panda/data/keys
         state: directory
         mode: '0700'
+
+    - name: Configure Panda access key
+      ansible.builtin.copy:
+        content: '{{ PANDA_ACCESS_KEY }}'
+        dest: /opt/jumpserver/panda/data/keys/.access_key
+        mode: '0600'
+      no_log: true
 
     - name: Pull Panda image
       ansible.builtin.command: docker pull {{ PANDA_IMAGE }}
@@ -58,9 +62,7 @@
         -v /var/run/docker.sock:/var/run/docker.sock
         -v /opt/jumpserver/panda/data:/opt/panda/data
         -e CORE_HOST={{ CORE_HOST | quote }}
-        -e BOOTSTRAP_TOKEN={{ BOOTSTRAP_TOKEN | quote }}
         -e IGNORE_VERIFY_CERTS={{ IGNORE_VERIFY_CERTS | string | lower | quote }}
-        -e PANDA_PROVIDER_ID={{ PROVIDER_ID | quote }}
         -e PANDA_HOST_IP={{ PANDA_HOST_IP | quote }}
         -e PANDA_RANGE_PORTS={{ PANDA_RANGE_PORTS | quote }}
         {{ PANDA_IMAGE | quote }}
