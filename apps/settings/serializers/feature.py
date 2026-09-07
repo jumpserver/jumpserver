@@ -1,4 +1,7 @@
+import re
 import uuid
+from ipaddress import ip_network
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -19,7 +22,6 @@ __all__ = [
     'SSHCAOpenBaoSerializer',
 ]
 
-
 ANSIBLE_DOCKER_HELP_TEXT = lazy(
     lambda: _(
         'Run Ansible jobs in the Docker execution environment (%(image)s). '
@@ -37,6 +39,49 @@ def validate_chat_ai_base_url(value):
     if not value.isascii():
         raise ValidationError(message)
     URLValidator(schemes=['http', 'https'], message=message)(value)
+
+
+def validate_ssh_ca_openbao_address(value):
+    try:
+        parsed = urlsplit(value)
+        parsed.port
+    except ValueError:
+        parsed = None
+
+    hostname = parsed.hostname if parsed else ''
+    valid = (
+        value.isascii() and all(0x21 <= ord(char) <= 0x7e for char in value) and
+        parsed and parsed.scheme in ('http', 'https') and hostname and
+        not parsed.query and not parsed.fragment
+    )
+    if valid:
+        try:
+            URLValidator(schemes=('http', 'https'))(value)
+            return
+        except ValidationError:
+            # Django rejects single-label service names such as the Docker
+            # hostname in http://openbao:8200. They are valid internal targets.
+            valid = (
+                '.' not in hostname and ':' not in hostname and
+                re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?', hostname)
+            )
+            if valid:
+                return
+
+    raise serializers.ValidationError(_('address invalid: `{}`').format(value))
+
+
+def validate_ssh_ca_source_addresses(value):
+    for cidr in value.split(','):
+        cidr = cidr.strip()
+        try:
+            if '/' not in cidr:
+                raise ValueError
+            ip_network(cidr, strict=False)
+        except ValueError:
+            raise serializers.ValidationError(
+                _('IP address invalid: `{}`').format(cidr or value)
+            )
 
 
 class AnnouncementSerializer(serializers.Serializer):
@@ -117,7 +162,8 @@ class SSHCAOpenBaoSerializer(serializers.Serializer):
 
     SSH_CA_ENABLED = serializers.BooleanField(required=False, label=_('Enabled'))
     SSH_CA_OPENBAO_ADDR = serializers.CharField(
-        max_length=256, allow_blank=True, required=False, label=_('OpenBao address')
+        max_length=256, allow_blank=True, required=False, label=_('OpenBao address'),
+        validators=[validate_ssh_ca_openbao_address]
     )
     SSH_CA_OPENBAO_TOKEN = EncryptedField(
         max_length=4096, allow_blank=True, required=False, label=_('Token'), default=''
@@ -141,7 +187,8 @@ class SSHCAOpenBaoSerializer(serializers.Serializer):
     SSH_CA_OPENBAO_SOURCE_ADDRESS = serializers.CharField(
         max_length=1024, allow_blank=True, required=False,
         label=_('Allowed source addresses'),
-        help_text=_('Comma-separated CIDRs seen by the target SSH server')
+        help_text=_('Comma-separated CIDRs seen by the target SSH server'),
+        validators=[validate_ssh_ca_source_addresses]
     )
 
 
@@ -194,8 +241,17 @@ class ChatAISettingSerializer(serializers.Serializer):
     CHAT_AI_ENABLED = serializers.BooleanField(
         required=False, label=_('Chat AI')
     )
+    CHAT_AI_METHOD = serializers.ChoiceField(
+        choices=(('api', _('Built-in API')), ('iframe', _('iframe embed'))),
+        required=False, label=_('Method'),
+    )
+    CHAT_AI_EMBED_URL = serializers.URLField(
+        allow_blank=True, required=False, label=_('iframe URL'),
+        help_text=_('The page URL loaded in the isolated AI assistant iframe.'),
+        validators=[URLValidator(schemes=('http', 'https'))],
+    )
     CHAT_AI_BASE_URL = serializers.CharField(
-        required=False, label=_('Base URL'),
+        allow_blank=True, required=False, label=_('Base URL'),
         validators=[validate_chat_ai_base_url],
         help_text=_('OpenAI-compatible API base URL, usually ending in /v1.')
     )
@@ -212,18 +268,25 @@ class ChatAISettingSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        enabled = attrs.get('CHAT_AI_ENABLED')
-        base_url = attrs.get('CHAT_AI_BASE_URL', settings.CHAT_AI_BASE_URL)
-        if enabled and not str(base_url or '').strip():
+        enabled = attrs.get('CHAT_AI_ENABLED', settings.CHAT_AI_ENABLED)
+        method = attrs.get('CHAT_AI_METHOD', settings.CHAT_AI_METHOD)
+        if not enabled:
+            return attrs
+
+        field_name = (
+            'CHAT_AI_EMBED_URL' if method == 'iframe' else 'CHAT_AI_BASE_URL'
+        )
+        value = attrs.get(field_name, getattr(settings, field_name))
+        if not str(value or '').strip():
             raise serializers.ValidationError({
-                'CHAT_AI_BASE_URL': self.fields['CHAT_AI_BASE_URL'].error_messages['blank']
+                field_name: self.fields[field_name].error_messages['blank']
             })
-        if enabled and 'CHAT_AI_BASE_URL' not in attrs:
+        if field_name not in attrs:
             try:
-                self.fields['CHAT_AI_BASE_URL'].run_validation(base_url)
+                self.fields[field_name].run_validation(value)
             except serializers.ValidationError as exc:
                 raise serializers.ValidationError({
-                    'CHAT_AI_BASE_URL': exc.detail
+                    field_name: exc.detail
                 }) from exc
         return attrs
 
