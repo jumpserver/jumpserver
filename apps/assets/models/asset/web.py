@@ -11,6 +11,10 @@ class Web(Asset):
     password_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Password selector"))
     submit_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Submit selector"))
     success_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Success selector"))
+    interactive_selector = models.CharField(
+        max_length=128, blank=True, default='', verbose_name=_("Interactive selector"),
+        help_text=_("Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls.")
+    )
     script = models.JSONField(blank=True, default=list, verbose_name=_("Script"))
 
     class Meta:

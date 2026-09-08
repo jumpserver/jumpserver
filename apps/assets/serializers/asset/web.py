@@ -1,4 +1,8 @@
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
+
 from assets.models import Web
+from assets.validators import validate_web_script
 from .common import AssetSerializer
 
 __all__ = ['WebSerializer']
@@ -10,7 +14,7 @@ class WebSerializer(AssetSerializer):
         fields = AssetSerializer.Meta.fields + [
             'autofill', 'username_selector',
             'password_selector', 'submit_selector',
-            'success_selector', 'script'
+            'success_selector', 'interactive_selector', 'script'
         ]
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
@@ -27,12 +31,34 @@ class WebSerializer(AssetSerializer):
                 'default': 'id=login_button',
             },
             'success_selector': {
+                'required': False,
+                'allow_blank': True,
+                'default': '',
+            },
+            'interactive_selector': {
+                'required': False,
+                'allow_blank': True,
                 'default': '',
             },
             'script': {
                 'default': [],
             }
         }
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        interactive = attrs.get('interactive_selector', getattr(self.instance, 'interactive_selector', ''))
+        if interactive:
+            kind, separator, value = interactive.partition('=')
+            if not separator or not value.strip() or kind.strip().lower() not in (
+                'name', 'id', 'type', 'class_name', 'css', 'css_selector', 'xpath'
+            ):
+                raise serializers.ValidationError({'interactive_selector': _('Invalid selector')})
+        return attrs
+
+    def validate_script(self, value):
+        validate_web_script(value)
+        return value
 
     def to_internal_value(self, data):
         data = data.copy()
