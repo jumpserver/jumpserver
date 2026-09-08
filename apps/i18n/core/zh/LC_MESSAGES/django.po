@@ -13799,3 +13799,30 @@ msgstr "许可证无效"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "工单已经关闭"
+
+msgid "Interactive selector"
+msgstr "可交互区域选择器"
+
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "可选的人工验证区域，例如 css=#mfa-dialog。请排除账号密码及显示密码等控件。"
+
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "请填写完整的 HTTP/HTTPS 域，不支持路径、账号密码或通配符。"
+
+msgid "Enter at most 128 script steps."
+msgstr "最多填写 128 个脚本步骤。"
+
+msgid "Invalid script step."
+msgstr "脚本步骤格式无效。"
+
+msgid "Script step numbers must be unique positive integers."
+msgstr "脚本步骤编号必须是不重复的正整数。"
+
+msgid "Unsupported script command."
+msgstr "不支持此脚本命令。"
+
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "步骤超时必须为 1 至 180 秒。"
+
+msgid "The success command must be the last step."
+msgstr "success 必须是脚本的最后一步。"

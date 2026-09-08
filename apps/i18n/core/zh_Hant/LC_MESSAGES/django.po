@@ -13821,3 +13821,30 @@ msgstr "許可證無效"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "工單已經關閉"
+
+msgid "Interactive selector"
+msgstr "可互動區域選擇器"
+
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "選填的人工驗證區域，例如 css=#mfa-dialog。請排除帳號密碼及顯示密碼等控制項。"
+
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "請填寫完整的 HTTP/HTTPS 網域，不支援路徑、帳號密碼或萬用字元。"
+
+msgid "Enter at most 128 script steps."
+msgstr "最多填寫 128 個指令碼步驟。"
+
+msgid "Invalid script step."
+msgstr "指令碼步驟格式無效。"
+
+msgid "Script step numbers must be unique positive integers."
+msgstr "指令碼步驟編號必須是不重複的正整數。"
+
+msgid "Unsupported script command."
+msgstr "不支援此指令碼命令。"
+
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "步驟逾時必須為 1 至 180 秒。"
+
+msgid "The success command must be the last step."
+msgstr "success 必須是指令碼的最後一步。"

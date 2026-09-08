@@ -312,6 +312,19 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': 'type=submit',
                         'label': _('Submit selector')
                     },
+                    'interactive_selector': {
+                        'type': 'str',
+                        'required': False,
+                        'default': '',
+                        'label': _('Interactive selector'),
+                        'help_text': _('Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls.')
+                    },
+                    'success_selector': {
+                        'type': 'str',
+                        'required': False,
+                        'default': '',
+                        'label': _('Success selector')
+                    },
                     'script': {
                         'type': 'text',
                         'default': [],

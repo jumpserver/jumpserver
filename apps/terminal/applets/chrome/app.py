@@ -138,6 +138,7 @@ class WebAPP(object):
         self.account = account
         self.platform = platform
         self._steps = list()
+        self._success_selector = None
         # 确保 account_username 和 account_secret 不为 None
         self._account_username = account.username if account.username else ''
         self._account_secret = account.secret if account.secret else ''
@@ -158,6 +159,7 @@ class WebAPP(object):
             autofill_type = extra_data.autofill
         if autofill_type == "basic":
             self._steps = self._default_custom_steps(extra_data)
+            self._success_selector = extra_data.success_selector or ''
         elif autofill_type == "script":
             script_list = extra_data.script
             steps = sorted(script_list, key=lambda step_item: step_item.step)
@@ -194,6 +196,11 @@ class WebAPP(object):
     def execute(self, driver: webdriver.Chrome) -> bool:
         if not self.asset.address:
             return True
+        if self._success_selector == '':
+            unblock_input()
+            notify_err_message("登录失败: 未配置登录成功选择器", wait=True)
+            block_input()
+            return False
 
         for step in self._steps:
             action = StepAction(target=step.target, value=step.value,
@@ -201,10 +208,21 @@ class WebAPP(object):
             ret = execute_action(driver, action)
             if not ret:
                 unblock_input()
-                notify_err_message(f"执行失败: target: {action.target} command: {action.command}")
+                notify_err_message(
+                    f"执行失败: target: {action.target} command: {action.command}",
+                    wait=True
+                )
                 block_input()
                 return False
-        return True
+        if self._success_selector is None:
+            return True
+        action = StepAction(target=self._success_selector, command="check")
+        if execute_action(driver, action):
+            return True
+        unblock_input()
+        notify_err_message("登录失败: 未检测到登录成功标记", wait=True)
+        block_input()
+        return False
 
 
 def load_extensions():
@@ -271,6 +289,9 @@ class AppletApplication(BaseApplication):
             ok = self.app.execute(self.driver)
             if not ok:
                 print("执行失败")
+                self.driver.quit()
+                self.driver = None
+                return
         self.driver.maximize_window()
 
     def wait(self):
