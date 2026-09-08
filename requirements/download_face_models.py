@@ -14,9 +14,8 @@ import zipfile
 from pathlib import Path
 
 MODEL_NAME = "buffalo_l"
-MODEL_URL = (
-    "https://github.com/deepinsightface/insightface/releases/download/"
-    "v0.7/buffalo_l.zip"
+DEFAULT_MODEL_URL = (
+    "https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip"
 )
 MODEL_SHA256 = "80ffe37d8a5940d59a7384c201a2a38d4741f2f3c51eef46ebb28218a7b0ca2f"
 REQUIRED_FILES = (
@@ -35,6 +34,11 @@ def parse_args() -> argparse.Namespace:
         "--model-root",
         default=os.environ.get("INSIGHTFACE_MODEL_ROOT", "~/.insightface/models"),
         help="Value used for INSIGHTFACE_MODEL_ROOT (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--url",
+        default=os.environ.get("INSIGHTFACE_MODEL_URL", DEFAULT_MODEL_URL),
+        help="Model archive URL (default: %(default)s)",
     )
     parser.add_argument(
         "--archive",
@@ -77,15 +81,15 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def download_archive(destination: Path) -> None:
+def download_archive(destination: Path, url: str) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_suffix(destination.suffix + ".part")
     temporary.unlink(missing_ok=True)
     request = urllib.request.Request(
-        MODEL_URL,
+        url,
         headers={"User-Agent": "JumpServer-FaceModel-Downloader/1.0"},
     )
-    print(f"Downloading {MODEL_URL}")
+    print(f"Downloading {url}", flush=True)
     try:
         with (
             urllib.request.urlopen(request, timeout=60) as response,
@@ -166,7 +170,7 @@ def run(args: argparse.Namespace) -> int:
     if supplied_archive and not archive.is_file():
         raise ValueError(f"Model archive does not exist: {archive}")
     if not supplied_archive and (not archive.is_file() or args.force):
-        download_archive(archive)
+        download_archive(archive, args.url)
     print(f"Verifying SHA-256: {archive}")
     try:
         verify_archive(archive)
