@@ -15,7 +15,8 @@ XPACK_DISABLED = os.environ.get('XPACK_ENABLED') in ['0', 'false', 'False', 'no'
 XPACK_ENABLED = False
 if not XPACK_DISABLED:
     XPACK_ENABLED = os.path.isdir(XPACK_DIR)
-JDMC_ENABLED = XPACK_ENABLED and CONFIG.JDMC_ENABLED
+# JDMC can only be disabled explicitly in development mode.
+JDMC_ENABLED = XPACK_ENABLED and (CONFIG.JDMC_ENABLED or not CONFIG.DEBUG_DEV)
 XPACK_TEMPLATES_DIR = []
 XPACK_CONTEXT_PROCESSOR = []
 XPACK_LICENSE_IS_VALID = False
