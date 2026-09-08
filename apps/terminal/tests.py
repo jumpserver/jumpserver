@@ -1,19 +1,32 @@
+import errno
+import json
 import os
+import shutil
 import tempfile
+from contextlib import nullcontext
+from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 from unittest.mock import Mock, patch
 
-from unittest import mock
-
-from django.test import SimpleTestCase, TestCase
-from rest_framework.exceptions import ValidationError
-from django.test.utils import override_settings
 import yaml
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
+from accounts.models import Account
 from assets.utils.platform_package import locate_package_root
-from terminal.models import Applet, AppProvider, Terminal, VirtualApp, VirtualAppPublication
+from authentication.serializers.connect_token_secret import ConnectTokenVirtualAppOptionSerializer
+from orgs.utils import tmp_to_builtin_org
+from terminal.api.virtualapp.provider import AppProviderDeploymentViewSet, AppProviderViewSet
+from terminal.automations.deploy_app_provider import (
+    DeployAppProviderManager, default_panda_image, stage_resources,
+)
 from terminal.const import ComponentLoad
-from terminal.automations.deploy_app_provider import DeployAppProviderManager
-from terminal.serializers import AppProviderSerializer
+from terminal.models import Applet, AppProvider, AppProviderDeployment, Terminal, VirtualApp, VirtualAppPublication
+from terminal.serializers import AppProviderSerializer, VirtualAppPublicationSerializer
+from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
+from terminal.tasks import run_app_provider_deployment, run_app_provider_deployments
 
 
 class PackageRootLocateTests(SimpleTestCase):
@@ -584,6 +597,176 @@ class AppProviderPublicationSyncTests(TestCase):
         self.assertEqual(self.publication.image_digest, 'sha256:current')
 
 
+class VirtualAppPublicationConfirmationTests(TestCase):
+    image_id = 'sha256:' + '1' * 64
+    previous_image_id = 'sha256:' + '2' * 64
+    repo_digest = 'registry.local/app@sha256:' + '3' * 64
+
+    def setUp(self):
+        with tmp_to_builtin_org(system=1):
+            provider = AppProviderSerializer(data={'host': {
+                'name': 'offline-provider', 'address': '192.0.2.10',
+            }})
+            provider.is_valid(raise_exception=True)
+            provider = provider.save()
+        self.app = VirtualApp.objects.create(name='offline-app', version='2.0', image_name='app:v2')
+        self.publication = VirtualAppPublication.objects.get(provider=provider, app=self.app)
+
+    def confirm(self, digest=None, status='success'):
+        # The Core worker can finish while a previously loaded report waits.
+        VirtualAppPublication.objects.filter(pk=self.publication.pk).update(
+            status=status, app_version=self.app.version, image_digest=digest or self.image_id,
+        )
+
+    def report(self, **data):
+        serializer = VirtualAppPublicationSerializer(self.publication, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()
+
+    def assert_confirmation(self, status, digest=None):
+        self.publication.refresh_from_db()
+        self.assertEqual(self.publication.status, status)
+        self.assertEqual(self.publication.app_version, self.app.version)
+        self.assertEqual(self.publication.image_digest, digest or self.image_id)
+
+    def test_completed_panda_pull_establishes_publication_confirmation(self):
+        self.report(status='success', app_version='2.0', image_digest=self.image_id)
+        self.assert_confirmation('success')
+
+    def test_incomplete_or_invalid_success_cannot_establish_confirmation(self):
+        for fields in (
+            {}, {'app_version': '2.0'}, {'image_digest': self.image_id},
+            {'app_version': '2.0', 'image_digest': 'sha256:invalid'},
+        ):
+            with self.subTest(fields=fields):
+                publication = self.report(status='success', **fields)
+                self.assertEqual(publication.status, 'mismatch')
+                self.assertEqual(publication.app_version, '')
+                self.assertEqual(publication.image_digest, '')
+
+    def test_panda_pull_can_refresh_an_image_after_publication_is_invalidated(self):
+        for status in ('pending', 'mismatch', 'failed'):
+            with self.subTest(status=status):
+                self.confirm(self.previous_image_id)
+                self.report(status=status, app_version='2.0', image_digest=self.previous_image_id)
+                self.assert_confirmation(status, self.previous_image_id)
+                self.report(status='success', app_version='2.0', image_digest=self.image_id)
+                self.assert_confirmation('success')
+
+    def test_matching_reports_preserve_confirmation_and_allow_recovery(self):
+        self.confirm()
+        for status in ('pending', 'mismatch', 'failed', 'success'):
+            with self.subTest(status=status):
+                self.report(status=status, app_version='2.0', image_digest=self.image_id)
+                self.assert_confirmation(status)
+
+    def test_same_version_stale_reports_cannot_overwrite_new_image(self):
+        self.confirm(self.previous_image_id)
+        self.publication.refresh_from_db()
+        self.confirm()
+        for status in ('success', 'pending', 'mismatch', 'failed'):
+            with self.subTest(status=status), self.assertRaises(ValidationError):
+                self.report(status=status, app_version='2.0', image_digest=self.previous_image_id)
+            self.assert_confirmation('success')
+
+    def test_incomplete_reports_cannot_erase_or_restore_confirmation(self):
+        self.confirm(status='failed')
+        for fields in (
+            {}, {'app_version': '2.0'}, {'image_digest': self.image_id},
+            {'app_version': '2.0', 'image_digest': ''},
+        ):
+            with self.subTest(fields=fields):
+                self.report(status='success', **fields)
+                self.assert_confirmation('failed')
+
+    def test_old_or_empty_version_cannot_erase_confirmation(self):
+        self.confirm()
+        for version in ('1.0', ''):
+            with self.subTest(version=version), self.assertRaises(ValidationError):
+                self.report(status='failed', app_version=version, image_digest='')
+            self.assert_confirmation('success')
+
+    def test_verified_legacy_digest_migrates_once(self):
+        self.confirm(self.repo_digest)
+        self.report(status='success', app_version='2.0', image_digest=self.image_id)
+        self.assert_confirmation('success')
+        with self.assertRaises(ValidationError):
+            self.report(status='success', app_version='2.0', image_digest=self.repo_digest)
+        self.assert_confirmation('success')
+
+    def test_legacy_digest_requires_success_with_valid_image_id(self):
+        self.confirm(self.repo_digest)
+        for status, digest in (('failed', self.image_id), ('success', 'sha256:invalid')):
+            with self.subTest(status=status, digest=digest), self.assertRaises(ValidationError):
+                self.report(status=status, app_version='2.0', image_digest=digest)
+            self.assert_confirmation('success', self.repo_digest)
+
+    def test_unmanaged_provider_retains_publication_compatibility(self):
+        self.publication.provider.host = None
+        self.publication.provider.save(update_fields=['host'])
+        self.report(status='success', app_version='2.0', image_digest=self.image_id)
+        self.assert_confirmation('success')
+
+    @mock.patch('terminal.automations.deploy_app_provider.safe_db_connection', new=nullcontext)
+    def test_late_ssh_result_cannot_overwrite_a_completed_panda_pull(self):
+        for outcome in ('success', 'failed', 'error'):
+            with self.subTest(outcome=outcome):
+                self.confirm(self.previous_image_id, status='pending')
+                deployment = AppProviderDeployment.objects.create(
+                    provider=self.publication.provider, publication=self.publication,
+                )
+
+                def finish_pull(*args, **kwargs):
+                    self.report(status='success', app_version='2.0', image_digest=self.image_id)
+                    if outcome == 'error':
+                        raise RuntimeError('SSH verification failed')
+                    status = 'successful' if outcome == 'success' else outcome
+                    return mock.Mock(status=status, result={'ok': {'provider': {'image': {'res': {
+                        'ansible_stats': {'data': {'virtual_app_image': {
+                            'name': self.app.image_name, 'version': self.app.version,
+                            'id': self.previous_image_id,
+                        }}},
+                    }}}}})
+
+                with mock.patch.object(
+                    DeployAppProviderManager, 'generate_inventory', return_value='/tmp/inventory'
+                ), mock.patch.object(
+                    DeployAppProviderManager, 'generate_playbook', return_value='/tmp/playbook'
+                ), mock.patch('terminal.automations.deploy_app_provider.SuperPlaybookRunner') as runner:
+                    runner.return_value.run.side_effect = finish_pull
+                    DeployAppProviderManager(deployment).run()
+                deployment.refresh_from_db()
+                self.assertEqual(deployment.status, outcome)
+                self.assert_confirmation('success')
+
+
+class AppProviderDeployOptionsTests(SimpleTestCase):
+    def test_deploy_options_validate_and_normalize(self):
+        serializer = AppProviderDeployOptionsSerializer(data={
+            'CORE_HOST': 'https://core.example.com/',
+            'PANDA_IMAGE': 'registry.example.com:5000/team/panda:v4.0',
+            'PANDA_RANGE_PORTS': '6900-7900',
+        })
+        serializer.is_valid(raise_exception=True)
+        self.assertEqual(serializer.validated_data['CORE_HOST'], 'https://core.example.com')
+
+    def test_invalid_deploy_options_are_rejected(self):
+        invalid = {
+            'CORE_HOST': ('', 'ssh://core.example.com', 'https://user:secret@core.example.com',
+                          'http://core.example.com:65536', 'http://core.example.com?token=secret'),
+            'PANDA_IMAGE': ('--privileged', 'panda:latest;id', 'panda image', 'panda@sha256:abc'),
+            'PANDA_RANGE_PORTS': ('0-10', '7900-6900', '6900-6900', '9000-9100', '60000-65536'),
+        }
+        for field, values in invalid.items():
+            for value in values:
+                with self.subTest(field=field, value=value):
+                    serializer = AppProviderDeployOptionsSerializer(data={
+                        'CORE_HOST': 'https://core.example.com', field: value,
+                    })
+                    self.assertFalse(serializer.is_valid())
+                    self.assertIn(field, serializer.errors)
+
+
 class AppProviderDeploymentTests(SimpleTestCase):
     @mock.patch(
         'terminal.automations.deploy_app_provider.SuperPlaybookRunner'
@@ -715,3 +898,378 @@ class AppProviderDeploymentTests(SimpleTestCase):
         self.assertFalse(play['gather_facts'])
         self.assertNotIn('pre_tasks', play)
         self.assertIn('ansible.builtin.set_stats', play['tasks'][-1])
+
+
+class AppProviderDeploymentAPITests(TestCase):
+    def setUp(self):
+        self.enterContext(tmp_to_builtin_org(system=1))
+        self.cache = self.enterContext(mock.patch('terminal.models.virtualapp.provider.cache'))
+        self.cache.get.return_value = []
+        serializer = AppProviderSerializer(data={
+            'host': {'name': 'managed-provider', 'address': '192.0.2.10'},
+            'deploy_options': {
+                'CORE_HOST': 'https://core.example.com', 'PANDA_IMAGE': 'jumpserver/panda:test',
+            },
+        })
+        serializer.is_valid(raise_exception=True)
+        self.provider = serializer.save()
+        self.account = Account.objects.create(
+            asset=self.provider.host, name='root', username='root', secret='test-secret',
+        )
+
+    def create_deployment(self):
+        view = AppProviderDeploymentViewSet()
+        view.request = SimpleNamespace(data={'provider': str(self.provider.id)})
+        view.format_kwarg = None
+        return view.create(view.request)
+
+    def test_connection_options_include_ssh_host_and_account(self):
+        data = ConnectTokenVirtualAppOptionSerializer.get_provider({'provider': self.provider})
+
+        self.assertEqual(set(data), {
+            'id', 'name', 'hostname', 'address', 'host_id',
+            'load', 'host', 'account', 'gateway',
+        })
+        self.assertEqual(data['host']['address'], self.provider.host.address)
+        self.assertEqual(data['host']['protocols'][0]['name'], 'ssh')
+        self.assertEqual(data['account']['username'], 'root')
+        self.assertEqual(data['account']['secret'], 'test-secret')
+
+    def test_connection_options_reject_missing_host_or_ssh_account(self):
+        with self.assertRaisesMessage(ValidationError, 'provider is required'):
+            ConnectTokenVirtualAppOptionSerializer.get_provider({})
+
+        with self.assertRaisesMessage(ValidationError, 'SSH host'):
+            ConnectTokenVirtualAppOptionSerializer.get_provider({'provider': AppProvider()})
+
+        self.account.is_active = False
+        self.account.save(update_fields=['is_active'])
+        with self.assertRaisesMessage(ValidationError, 'SSH account'):
+            ConnectTokenVirtualAppOptionSerializer.get_provider({'provider': self.provider})
+
+    def test_failed_worker_is_reported_and_duplicate_delivery_does_not_redeploy(self):
+        deployment = AppProviderDeployment.objects.create(provider=self.provider)
+
+        def fail(instance):
+            instance.status = 'failed'
+            instance.save(update_fields=['status'])
+
+        with mock.patch.object(AppProviderDeployment, 'start', autospec=True, side_effect=fail) as start:
+            with self.assertRaisesMessage(RuntimeError, 'deployment failed'):
+                run_app_provider_deployment(str(deployment.id))
+            run_app_provider_deployment(str(deployment.id))
+        self.assertEqual(start.call_count, 1)
+
+    def test_batch_attempts_remaining_deployments_and_reports_failure(self):
+        deployments = [AppProviderDeployment.objects.create(provider=self.provider) for _ in range(2)]
+
+        def finish(instance):
+            instance.status = 'failed' if instance.pk == deployments[0].pk else 'success'
+            instance.save(update_fields=['status'])
+
+        with mock.patch.object(AppProviderDeployment, 'start', autospec=True, side_effect=finish) as start:
+            with self.assertRaisesMessage(RuntimeError, str(deployments[0].id)):
+                run_app_provider_deployments([str(item.id) for item in deployments])
+        self.assertEqual(start.call_count, 2)
+        deployments[1].refresh_from_db()
+        self.assertEqual(deployments[1].status, 'success')
+
+    @mock.patch('terminal.automations.deploy_app_provider.safe_db_connection', new=nullcontext)
+    def test_worker_preserves_claimed_start_time_on_a_preloaded_deployment(self):
+        deployment = AppProviderDeployment.objects.create(provider=self.provider)
+        claimed_start = timezone.now()
+        # Batch workers load deployment objects before the atomic task claim.
+        AppProviderDeployment.objects.filter(pk=deployment.pk).update(
+            status='running', date_start=claimed_start,
+        )
+        with mock.patch.object(
+            DeployAppProviderManager, 'generate_inventory', return_value='/tmp/inventory'
+        ), mock.patch.object(
+            DeployAppProviderManager, 'generate_playbook', return_value='/tmp/playbook'
+        ), mock.patch('terminal.automations.deploy_app_provider.SuperPlaybookRunner') as runner:
+            runner.return_value.run.return_value.status = 'successful'
+            DeployAppProviderManager(deployment).run()
+        deployment.refresh_from_db()
+        self.assertEqual(deployment.date_start, claimed_start)
+        self.assertEqual(deployment.status, 'success')
+        self.assertIsNotNone(deployment.date_finished)
+
+    def test_maintenance_host_can_deploy_but_cannot_receive_connections(self):
+        self.provider.host.is_active = False
+        self.provider.host.save(update_fields=['is_active'])
+        self.assertEqual(self.provider.validate_deployment()['PANDA_RANGE_PORTS'], '6900-7900')
+        self.assertFalse(self.provider.connection_ready)
+
+    def test_missing_bundle_and_unspecified_panda_image_block_deployment(self):
+        from django.test import override_settings
+
+        self.provider.deploy_options.pop('PANDA_IMAGE')
+        with tempfile.TemporaryDirectory() as data_dir, override_settings(DATA_DIR=data_dir):
+            with self.assertRaisesMessage(ValidationError, 'Select a Panda image'):
+                self.provider.validate_deployment()
+
+    def test_invalid_offline_manifest_is_exposed_as_deployment_error(self):
+        from pathlib import Path
+        from django.test import override_settings
+
+        with tempfile.TemporaryDirectory() as data_dir, override_settings(DATA_DIR=data_dir):
+            resources = Path(data_dir) / 'virtualapp'
+            resources.mkdir()
+            (resources / 'manifest.json').write_text('{invalid')
+            error = AppProviderSerializer.get_deployment_error(self.provider)
+        self.assertIn('Invalid offline deployment resources', error)
+
+    def test_deployment_api_rejects_invalid_account_and_reserved_ssh_port(self):
+        self.account.secret = ''
+        self.account.save()
+        with self.assertRaisesMessage(ValidationError, 'SSH account'):
+            self.create_deployment()
+        self.account.secret = 'test-secret'
+        self.account.save()
+        self.provider.host.protocols.filter(name='ssh').update(port=6900)
+        with self.assertRaisesMessage(ValidationError, 'SSH port'):
+            self.create_deployment()
+        self.assertFalse(AppProviderDeployment.objects.filter(provider=self.provider).exists())
+
+    def test_live_containers_block_deployment(self):
+        self.cache.get.return_value = [{'container_id': 'running-container'}]
+        with self.assertRaisesMessage(ValidationError, 'containers to exit'):
+            self.provider.validate_deployment()
+
+    def test_ssh_account_selection_skips_unusable_credentials(self):
+        Account.objects.create(
+            asset=self.provider.host, name='empty-key', username='operator',
+            secret_type='ssh_key', privileged=True,
+        )
+        Account.objects.create(
+            asset=self.provider.host, name='token', username='operator',
+            secret_type='token', secret='test-token', privileged=True,
+        )
+        self.assertEqual(self.provider.select_account().pk, self.account.pk)
+        self.assertEqual(self.provider.select_deploy_account().pk, self.account.pk)
+        self.account.is_active = False
+        self.account.save(update_fields=['is_active'])
+        self.assertIsNone(self.provider.select_account())
+        self.assertFalse(self.provider.connection_ready)
+
+    def test_disabled_provider_inventory_has_only_the_remote_ssh_target(self):
+        self.provider.host.is_active = False
+        self.provider.host.save(update_fields=['is_active'])
+        deployment = AppProviderDeployment(provider=self.provider)
+        with tempfile.TemporaryDirectory() as run_dir:
+            manager = DeployAppProviderManager(deployment)
+            manager.run_dir = run_dir
+            with open(manager.generate_inventory()) as stream:
+                hosts = json.load(stream)['all']['hosts']
+        self.assertEqual(len(hosts), 1)
+        self.assertNotIn('localhost', hosts)
+        host = next(iter(hosts.values()))
+        self.assertEqual(host['ansible_connection'], 'ssh')
+        self.assertEqual(host['ansible_host'], self.provider.host.address)
+        self.assertEqual(host['jms_asset']['id'], str(self.provider.host.id))
+
+    def test_privileged_password_account_inventory_uses_sudo_to_root(self):
+        self.account.username = 'operator'
+        self.account.privileged = True
+        self.account.save()
+        deployment = AppProviderDeployment(provider=self.provider)
+        with tempfile.TemporaryDirectory() as run_dir:
+            manager = DeployAppProviderManager(deployment)
+            manager.run_dir = run_dir
+            with open(manager.generate_inventory()) as stream:
+                hosts = json.load(stream)['all']['hosts']
+        host = next(iter(hosts.values()))
+        self.assertTrue(host['ansible_become'])
+        self.assertEqual(host['ansible_become_method'], 'sudo')
+        self.assertEqual(host['ansible_become_user'], 'root')
+        self.assertEqual(host['ansible_become_password'], self.account.secret)
+
+    def test_duplicate_deployment_is_rejected_and_failed_deployment_can_retry(self):
+        with self.captureOnCommitCallbacks(execute=False) as callbacks:
+            response = self.create_deployment()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['task'], response.data['id'])
+        self.assertEqual(len(callbacks), 1)
+        self.assertFalse(self.provider.connection_ready)
+        with self.assertRaisesMessage(ValidationError, 'already pending or running'):
+            self.create_deployment()
+        AppProviderDeployment.objects.filter(provider=self.provider).update(status='failed')
+        self.assertFalse(self.provider.connection_ready)
+        with self.captureOnCommitCallbacks(execute=False):
+            retry = self.create_deployment()
+        self.assertNotEqual(response.data['id'], retry.data['id'])
+        AppProviderDeployment.objects.filter(pk=retry.data['id']).update(status='success')
+        self.assertTrue(self.provider.connection_ready)
+
+    def test_dispatch_failure_records_error_and_allows_retry(self):
+        with mock.patch('terminal.api.virtualapp.provider.run_app_provider_deployment.apply_async',
+                        side_effect=RuntimeError('Broker unavailable')):
+            with self.assertRaisesMessage(RuntimeError, 'Broker unavailable'):
+                with self.captureOnCommitCallbacks(execute=True):
+                    self.create_deployment()
+        deployment = self.provider.latest_deployment
+        self.assertEqual(deployment.status, 'error')
+        self.assertIsNotNone(deployment.date_finished)
+        with self.captureOnCommitCallbacks(execute=False):
+            self.assertEqual(self.create_deployment().status_code, 201)
+
+    def test_provider_reports_deployment_and_rejects_edits_while_running(self):
+        with self.captureOnCommitCallbacks(execute=False):
+            response = self.create_deployment()
+        data = AppProviderSerializer(self.provider).data
+        self.assertEqual(data['deployment']['task'], response.data['task'])
+        self.assertEqual(data['deployment']['status']['value'], 'pending')
+        self.assertEqual(data['deployment_error'], '')
+        serializer = AppProviderSerializer(self.provider, data={'comment': 'edit'}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        with self.assertRaisesMessage(ValidationError, 'current deployment'):
+            serializer.save()
+
+    def test_provider_delete_and_bulk_delete_reject_unfinished_deployments(self):
+        deployment = AppProviderDeployment.objects.create(provider=self.provider)
+        view = AppProviderViewSet()
+        with self.assertRaisesMessage(ValidationError, 'current deployment'):
+            view.perform_destroy(self.provider)
+        idle = AppProvider.objects.create(
+            id='00000000-0000-0000-0000-000000000001', name='idle-provider', hostname='192.0.2.11',
+        )
+        providers = AppProvider.objects.filter(pk__in=[idle.pk, self.provider.pk])
+        with self.assertRaisesMessage(ValidationError, 'current deployment'):
+            view.perform_bulk_destroy(providers)
+        self.assertEqual(providers.count(), 2)
+        deployment.status = 'success'
+        deployment.save(update_fields=['status'])
+        view.perform_destroy(self.provider)
+        self.assertFalse(AppProvider.objects.filter(pk=self.provider.pk).exists())
+
+
+class OfflineProviderResourcesTests(SimpleTestCase):
+    def setUp(self):
+        self.directory = self.enterContext(tempfile.TemporaryDirectory())
+        self.enterContext(override_settings(DATA_DIR=self.directory))
+        self.resources = Path(self.directory) / 'virtualapp'
+        self.resources.mkdir()
+        self.image = 'jumpserver/panda:v5.0-ee'
+        self.metadata = {
+            'image': self.image, 'architecture': 'amd64',
+            'image_id': 'sha256:' + '1' * 64, 'sha256': '2' * 64, 'file': 'panda.zst',
+        }
+
+    def write_manifest(self):
+        (self.resources / 'manifest.json').write_text(json.dumps({'panda': self.metadata}))
+
+    def test_missing_bundle_requires_explicit_image_instead_of_latest(self):
+        self.assertEqual(default_panda_image(), '')
+        self.assertEqual(stage_resources(Path(self.directory) / 'task', self.image), {'panda': {}, 'docker': {}})
+
+    def test_malformed_manifest_keeps_form_readable_but_blocks_staging(self):
+        (self.resources / 'manifest.json').write_text('{invalid')
+        self.assertEqual(default_panda_image(), '')
+        with self.assertRaises(ValueError):
+            stage_resources(Path(self.directory) / 'task', self.image)
+
+    def test_options_default_and_cleared_override_use_exact_bundle_image(self):
+        self.write_manifest()
+        for options in ({}, {'PANDA_IMAGE': ''}):
+            serializer = AppProviderDeployOptionsSerializer(data={
+                'CORE_HOST': 'https://core.example.com', **options,
+            })
+            serializer.is_valid(raise_exception=True)
+            self.assertEqual(serializer.validated_data['PANDA_IMAGE'], self.image)
+
+    def test_staged_archive_remains_readable_after_installer_replaces_source(self):
+        self.write_manifest()
+        source = self.resources / 'panda.zst'
+        source.write_bytes(b'offline archive')
+        staged = stage_resources(Path(self.directory) / 'task', self.image)['panda']
+        self.assertEqual(os.stat(staged['file']).st_ino, source.stat().st_ino)
+        replacement = self.resources / 'new.zst'
+        replacement.write_bytes(b'new archive')
+        os.replace(replacement, source)
+        self.assertEqual(Path(staged['file']).read_bytes(), b'offline archive')
+        staged = stage_resources(Path(self.directory) / 'next-task', self.image)['panda']
+        source.unlink()
+        self.assertEqual(Path(staged['file']).read_bytes(), b'new archive')
+
+    def test_archive_removed_during_staging_preserves_identity_for_local_reuse(self):
+        self.write_manifest()
+        source = self.resources / 'panda.zst'
+        link, copyfile = os.link, shutil.copyfile
+
+        for cross_device in (False, True):
+            with self.subTest(cross_device=cross_device):
+                source.write_bytes(b'offline archive')
+
+                def stage_archive(src, dst):
+                    source.unlink()
+                    return (copyfile if cross_device else link)(src, dst)
+
+                with mock.patch('os.link', side_effect=(
+                    OSError(errno.EXDEV, 'Cross-device link') if cross_device else stage_archive
+                )), mock.patch('shutil.copyfile', side_effect=stage_archive):
+                    staged = stage_resources(Path(self.directory) / 'task', self.image)['panda']
+
+                self.assertEqual(staged, {**self.metadata, 'file': ''})
+
+    def test_staging_does_not_ignore_other_io_errors(self):
+        self.write_manifest()
+        (self.resources / 'panda.zst').write_bytes(b'offline archive')
+        with mock.patch('os.link', side_effect=PermissionError('Permission denied')):
+            with self.assertRaises(PermissionError):
+                stage_resources(Path(self.directory) / 'task', self.image)
+
+    def test_missing_archive_preserves_identity_for_local_reuse(self):
+        self.write_manifest()
+        staged = stage_resources(Path(self.directory) / 'task', self.image)['panda']
+        self.assertEqual(staged['file'], '')
+        self.assertEqual(staged['image_id'], self.metadata['image_id'])
+
+    def test_docker_service_snapshot_survives_installer_updates(self):
+        metadata = {'architecture': 'amd64', 'sha256': '3' * 64, 'file': 'docker.tar.gz'}
+        (self.resources / 'manifest.json').write_text(json.dumps({'docker': metadata}))
+        (self.resources / 'docker.tar.gz').write_bytes(b'docker archive')
+        service = self.resources / 'docker.service'
+        link = os.link
+        for cross_device in (False, True):
+            with self.subTest(cross_device=cross_device):
+                service.write_bytes(b'installer service')
+                with mock.patch('os.link', side_effect=(
+                    OSError(errno.EXDEV, 'Cross-device link') if cross_device else link
+                )):
+                    staged = stage_resources(
+                        Path(self.directory) / f'task-{cross_device}', self.image,
+                    )['docker']
+                replacement = self.resources / 'new.service'
+                replacement.write_bytes(b'updated installer service')
+                os.replace(replacement, service)
+                self.assertEqual(Path(staged['service']).read_bytes(), b'installer service')
+                self.assertEqual(Path(staged['file']).read_bytes(), b'docker archive')
+
+    def test_missing_docker_service_keeps_archive_available_for_runtime_check(self):
+        metadata = {'architecture': 'amd64', 'sha256': '3' * 64, 'file': 'docker.tar.gz'}
+        (self.resources / 'manifest.json').write_text(json.dumps({'docker': metadata}))
+        (self.resources / 'docker.tar.gz').write_bytes(b'docker archive')
+        staged = stage_resources(Path(self.directory) / 'task', self.image)['docker']
+        self.assertEqual(staged['service'], '')
+        self.assertEqual(Path(staged['file']).read_bytes(), b'docker archive')
+
+    def test_custom_image_does_not_use_bundle_identity(self):
+        self.write_manifest()
+        staged = stage_resources(Path(self.directory) / 'task', 'custom/panda:v1')
+        self.assertEqual(staged['panda'], {})
+
+    def test_archive_path_cannot_escape_resource_directory(self):
+        self.metadata['file'] = '../outside.zst'
+        self.write_manifest()
+        with self.assertRaisesMessage(ValueError, 'archive path'):
+            stage_resources(Path(self.directory) / 'task', self.image)
+
+    def test_success_requires_exact_image_confirmation_from_the_task(self):
+        app = SimpleNamespace(image_name='app:v1', version='1.0')
+        for image in (None, {'name': 'app:v1', 'version': 'old', 'id': 'sha256:' + '1' * 64}):
+            tasks = {} if image is None else {'image': {'res': {
+                'ansible_stats': {'data': {'virtual_app_image': image}},
+            }}}
+            result = SimpleNamespace(result={'ok': {'provider': tasks}})
+            with self.assertRaises(ValueError):
+                DeployAppProviderManager.get_published_image_id(result, app)

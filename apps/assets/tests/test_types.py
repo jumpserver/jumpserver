@@ -7,6 +7,9 @@ from assets.const.types import AllTypes
 
 
 class AllTypesAutomationMethodsTestCase(SimpleTestCase):
+    def setUp(self):
+        AllTypes._automation_methods_by_language = {}
+
     def tearDown(self):
         AllTypes._automation_methods_by_language = {}
         super().tearDown()
