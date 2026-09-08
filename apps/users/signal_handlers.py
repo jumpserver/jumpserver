@@ -237,6 +237,12 @@ def clean_expired_user_session_period():
     UserSession.clear_expired_sessions()
 
 
+@shared_task(verbose_name=_('Clean up expired user sessions'))
+@register_as_period_task(interval=30)
+def clean_expired_user_session_lease_period():
+    UserSession.clear_expired_session_leases()
+
+
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     session_key = request.session.session_key
