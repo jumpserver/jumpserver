@@ -10,7 +10,7 @@ class WebSerializer(AssetSerializer):
         fields = AssetSerializer.Meta.fields + [
             'autofill', 'username_selector',
             'password_selector', 'submit_selector',
-            'script'
+            'success_selector', 'script'
         ]
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
@@ -25,6 +25,9 @@ class WebSerializer(AssetSerializer):
             },
             'submit_selector': {
                 'default': 'id=login_button',
+            },
+            'success_selector': {
+                'default': '',
             },
             'script': {
                 'default': [],

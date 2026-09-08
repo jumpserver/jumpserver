@@ -312,6 +312,11 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': 'type=submit',
                         'label': _('Submit selector')
                     },
+                    'success_selector': {
+                        'type': 'str',
+                        'default': '',
+                        'label': _('Success selector')
+                    },
                     'script': {
                         'type': 'text',
                         'default': [],
