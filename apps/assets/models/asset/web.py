@@ -6,6 +6,7 @@ from .common import Asset
 
 
 class Web(Asset):
+    allowed_urls = models.JSONField(blank=True, default=list, verbose_name=_("Allowed sites"))
     autofill = models.CharField(max_length=16, choices=FillType.choices, default='basic', verbose_name=_("Autofill"))
     username_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Username selector"))
     password_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Password selector"))
