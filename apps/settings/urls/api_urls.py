@@ -7,7 +7,6 @@ from .. import api
 
 app_name = 'common'
 router = BulkRouter()
-router.register(r'chatai-prompts', api.ChatPromptViewSet, 'chatai-prompt')
 router.register(r'leak-passwords', api.LeakPasswordViewSet, 'leak-passwords')
 
 urlpatterns = [

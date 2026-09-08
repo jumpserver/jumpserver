@@ -4,3 +4,4 @@ from .pam_dashboard import *
 from .task import *
 from .template import *
 from .virtual import *
+from .personal import *

@@ -5929,6 +5929,10 @@ msgstr "작업 정보"
 msgid "Actions"
 msgstr "Action"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 인증서 서명이 비활성화되었습니다"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6206,6 +6210,31 @@ msgstr "당신이 관리자라면, 설정 항목을 업데이트하여 문제를
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "다른 통로로 로그인"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "브라우저가 CSRF 쿠키를 전송하지 않아 로그인할 수 없습니다. 관리자에게 문의하세요"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"관리자인 경우 SESSION_COOKIE_DOMAIN 설정이 잘못되었는지 확인하세요. 접속 도메인은 해당 값 또는 그 하위 도메인이어야 "
+"하며, 그렇지 않으면 브라우저가 쿠키를 저장하지 않습니다. 설정을 수정하거나 삭제하세요"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "설정되지 않음"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "브라우저에서 쿠키가 활성화되어 있는지 확인하고 사이트 쿠키를 삭제한 후 다시 시도하세요"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -8536,10 +8565,6 @@ msgstr "단말기 설정"
 msgid "Can change other setting"
 msgstr "기타 설정"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "채팅 프롬프트"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "동기화된 LDAP 사용자 작업 결과 알림"
@@ -9481,6 +9506,10 @@ msgstr "액세스 키 비밀(SK)"
 msgid "Chat AI"
 msgstr "채팅 AI"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Chat AI 사용 가능"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "생성 방법"
@@ -9950,6 +9979,18 @@ msgstr "관리자만"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "전체적으로 MFA 인증 활성화"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "허용된 MFA 방식"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "사용자가 바인딩하고 사용할 수 있는 MFA 방식을 하나 이상 선택하세요"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "MFA 방식을 하나 이상 선택하세요"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -12765,6 +12806,14 @@ msgstr "프로필 사진 경로"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "허용된 MFA 유형"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "비워 두면 전역 MFA 방식을 상속합니다"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

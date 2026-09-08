@@ -378,7 +378,7 @@ class NodeAllAssetsMappingMixin:
 
             _mapping = cls.generate_node_all_asset_ids_mapping(org_id)
             cache_key = cls._get_cache_key_for_node_all_asset_ids_mapping(org_id)
-            cache.set(cache_key, mapping, timeout=None)
+            cache.set(cache_key, _mapping, timeout=None)
             return _mapping
 
     @classmethod
@@ -602,6 +602,12 @@ class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     class Meta:
         verbose_name = _("Node")
         ordering = ['parent_key', 'value']
+        indexes = [
+            models.Index(
+                fields=['org_id', 'parent_key', 'value', 'id'],
+                name='assets_node_org_parent_val_idx',
+            ),
+        ]
         permissions = [
             ('match_node', _('Can match node')),
         ]

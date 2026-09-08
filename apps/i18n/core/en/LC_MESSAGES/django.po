@@ -5974,6 +5974,10 @@ msgstr "Ticket information"
 msgid "Actions"
 msgstr "Action"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH certificate signing is disabled"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6254,6 +6258,36 @@ msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 "If you are an administrator, you can resolve this by updating the "
 "configuration file and setting the configuration item"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "not set"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -8598,10 +8632,6 @@ msgstr "Terminal Settings"
 msgid "Can change other setting"
 msgstr "Other Settings"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "Chat Prompts"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "Notification for syncing LDAP user task results"
@@ -9575,6 +9605,10 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "Chat AI"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Can use Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "Creation method"
@@ -10049,6 +10083,18 @@ msgstr "Administrators only"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "Enable MFA globally"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Allowed MFA methods"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Select one or more MFA methods that users can bind and use"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Select at least one MFA method"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -12899,6 +12945,14 @@ msgstr "Avatar Path"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Allowed MFA types"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Leave empty to inherit the global MFA methods"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

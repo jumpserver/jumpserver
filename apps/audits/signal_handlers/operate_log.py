@@ -206,6 +206,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
         'BaseAutomation', 'CeleryTask', 'Command', 'JobLog',
         'ConnectionToken', 'SessionJoinRecord', 'SessionSharing',
+        'PersonalAssetCredential',
         'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
         'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',
         'SuperTicket', 'SuperConnectionToken', 'AdminConnectionToken', 'PermNode',

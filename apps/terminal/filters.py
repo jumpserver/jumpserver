@@ -128,22 +128,6 @@ class CommandFilter(BaseFilterSet):
         return queryset
 
 
-class CommandFilterForStorageTree(CommandFilter):
-    asset = filters.CharFilter(method='do_nothing', label=_('Asset'))
-    account = filters.CharFilter(method='do_nothing', label=_('Account'))
-    session = filters.CharFilter(method='do_nothing', label=_('Session'))
-    risk_level = filters.NumberFilter(
-        method='do_nothing', label=_('Risk level')
-    )
-
-    class Meta:
-        model = CommandStorage
-        fields = [
-            'asset', 'account', 'user', 'session', 'risk_level', 'input',
-            'date_from', 'date_to', 'session_id', 'risk_level', 'command_storage_id',
-        ]
-
-
 class CommandStorageFilter(filters.FilterSet):
     real = filters.BooleanFilter(
         method='filter_real', label=_('Real storage')

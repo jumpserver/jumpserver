@@ -5982,6 +5982,10 @@ msgstr "Thông tin công việc"
 msgid "Actions"
 msgstr "Action"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "Tính năng ký chứng chỉ SSH đã bị tắt"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6261,6 +6265,36 @@ msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 "Nếu bạn là quản trị viên, bạn có thể cập nhật tệp cấu hình để giải quyết, "
 "thiết lập thông số cấu hình"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"Trình duyệt không gửi CSRF cookie nên không thể đăng nhập. Vui lòng liên hệ "
+"quản trị viên"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Nếu bạn là quản trị viên, hãy kiểm tra xem SESSION_COOKIE_DOMAIN có bị cấu "
+"hình sai không: tên miền bạn đang truy cập phải là nó hoặc tên miền con của "
+"nó, nếu không trình duyệt sẽ không lưu cookie; hãy sửa hoặc xóa cấu hình này"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "chưa được cấu hình"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Vui lòng đảm bảo cookie đã được bật trong trình duyệt, xóa cookie của trang "
+"web và thử lại"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -8606,10 +8640,6 @@ msgstr "Cài đặt thiết bị đầu cuối"
 msgid "Can change other setting"
 msgstr "Cài đặt khác"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "Gợi ý trò chuyện"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "Thông báo kết quả nhiệm vụ đồng bộ người dùng LDAP"
@@ -9559,6 +9589,10 @@ msgstr "Bí mật khoá truy cập (SK)"
 msgid "Chat AI"
 msgstr "AI trò chuyện"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Có thể sử dụng Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "Cách tạo"
@@ -10029,6 +10063,18 @@ msgstr "Chỉ quản trị viên"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "Bật xác thực MFA toàn cầu"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Phương thức MFA được phép"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Chọn một hoặc nhiều phương thức MFA mà người dùng có thể liên kết và sử dụng"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Vui lòng chọn ít nhất một phương thức MFA"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -12884,6 +12930,14 @@ msgstr "Đường dẫn ảnh đại diện"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Loại MFA được phép"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Để trống để kế thừa phương thức MFA toàn cục"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

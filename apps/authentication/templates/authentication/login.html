@@ -314,6 +314,14 @@
         DOMAINS={{ error_origin }}
     </div>
 {% endif %}
+{% if csrf_cookie_error %}
+    <div class='alert alert-danger error-info'>
+        {% trans 'The browser did not carry the CSRF cookie and cannot be logged in. Please contact the administrator' %}<br/>
+        {% trans 'If you are administrator, check whether SESSION_COOKIE_DOMAIN is misconfigured: the domain you are accessing must be it or its subdomain, otherwise the browser will not save the cookie, fix or remove it' %} <br/>
+        SESSION_COOKIE_DOMAIN={% if session_cookie_domain %}{{ session_cookie_domain }}{% else %}{% trans 'not set' %}{% endif %}<br/>
+        {% trans 'Please make sure cookies are enabled in your browser, clear the site cookies and try again' %}
+    </div>
+{% endif %}
 <div class="login-content extra-fields-{{ extra_fields_count }}">
     <div class="right-image-box">
         <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver.git{% endif %}">

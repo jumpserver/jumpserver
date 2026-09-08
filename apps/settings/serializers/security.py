@@ -2,6 +2,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
+from authentication.const import MFAType
+from common.serializers.fields import ListMultipleChoiceField
 
 __all__ = [
     'SecurityPasswordRuleSerializer', 'SecuritySessionSerializer',
@@ -135,6 +137,11 @@ class SecurityAuthSerializer(serializers.Serializer):
         ),
         required=False, label=_("Global MFA")
     )
+    SECURITY_MFA_METHODS = ListMultipleChoiceField(
+        choices=MFAType.choices, required=False,
+        label=_("Allowed MFA methods"),
+        help_text=_("Select one or more MFA methods that users can bind and use")
+    )
     SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY = serializers.BooleanField(
         required=False, default=True,
         label=_('Third-party login MFA'),
@@ -194,6 +201,11 @@ class SecurityAuthSerializer(serializers.Serializer):
     def validate(self, attrs):
         if attrs.get('SECURITY_MFA_AUTH') != 1:
             attrs['SECURITY_MFA_IN_LOGIN_PAGE'] = False
+        methods = attrs.get('SECURITY_MFA_METHODS')
+        if methods is not None and len(methods) == 0:
+            raise serializers.ValidationError({
+                'SECURITY_MFA_METHODS': _('Select at least one MFA method')
+            })
         return attrs
 
     def to_representation(self, instance):

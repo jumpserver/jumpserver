@@ -5824,6 +5824,10 @@ msgstr "工单信息"
 msgid "Actions"
 msgstr "动作"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 证书签发已禁用"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6079,6 +6083,31 @@ msgstr "配置文件存在问题，无法登录。请联系管理员或查看最
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "如果你是管理员，可以更新配置文件解决，设置配置项"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "浏览器未携带 CSRF Cookie，无法登录。请联系管理员"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"如果你是管理员，请检查 SESSION_COOKIE_DOMAIN 配置是否错误：访问域名必须是它或它的子域，否则浏览器不会保存 "
+"Cookie，请修正或删除该配置"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "未配置"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "请确认浏览器已启用 Cookie，并清除本站 Cookie 后重试"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -8362,10 +8391,6 @@ msgstr "终端设置"
 msgid "Can change other setting"
 msgstr "其它设置"
 
-#: settings/models.py:194
-msgid "Chat prompt"
-msgstr "聊天提示"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "同步 LDAP 用户任务结果的通知"
@@ -9281,6 +9306,10 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "聊天 AI"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "可使用 Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "创建方式"
@@ -9729,6 +9758,18 @@ msgstr "仅管理员"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "全局启用 MFA 认证"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "允许的 MFA 方式"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "选择用户可以绑定和使用的一种或多种 MFA 方式"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "请至少选择一种 MFA 方式"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -12502,6 +12543,14 @@ msgstr "头像路径"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "允许的 MFA 类型"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "留空则继承全局 MFA 方式"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

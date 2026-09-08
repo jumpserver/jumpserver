@@ -39,6 +39,7 @@ app_nodes_data = [
     {'id': 'audits', 'view': 'view_audit'},
     {'id': 'rbac', 'view': 'view_console'},
     {'id': 'settings', 'view': 'view_setting'},
+    {'id': 'chat_ai', 'name': _('Chat AI'), 'view': 'view_setting'},
     {'id': 'tickets', 'view': 'view_other'},
     {'id': 'labels', 'view': 'view_console'},
     {'id': 'authentication', 'view': 'view_other'},
@@ -134,7 +135,7 @@ special_pid_mapper = {
 }
 
 
-if settings.JDMC_ENABLED:
+if settings.XPACK_ENABLED and settings.JDMC_ENABLED:
     view_nodes_data.append({'id': 'view_jdmc', 'name': _('JDMC console')})
     special_pid_mapper["rbac.view_jdmc"] = "view_jdmc"
 
@@ -166,7 +167,6 @@ special_setting_pid_mapper = {
     "settings.change_ops": "features",
     "settings.change_vault": "features",
     "settings.change_chatai": "features",
-    "settings.view_chatprompt": "features",
     "settings.change_virtualapp": "features",
     "settings.change_auth": "authentication_setting",
     "terminal.replaystorage": "storage",

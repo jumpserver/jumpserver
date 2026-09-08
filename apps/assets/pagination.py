@@ -1,9 +1,17 @@
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import CursorPagination, LimitOffsetPagination
 from rest_framework.request import Request
 
 from common.utils import get_logger
 
 logger = get_logger(__name__)
+
+
+class NodeTreeCursorPagination(CursorPagination):
+    page_size = 100
+    page_size_query_param = 'node_limit'
+    max_page_size = 100
+    cursor_query_param = 'node_cursor'
+    ordering = ('value', 'id')
 
 
 class AssetPaginationBase(LimitOffsetPagination):

@@ -82,7 +82,7 @@ class AuthValidateMixin(serializers.Serializer):
             # Explicitly remove credentials left by a previous static auth
             # type when an existing account is switched to certificate auth.
             validated_data["secret"] = ""
-            validated_data["passphrase"] = ""
+            validated_data.pop("passphrase", None)
             return
         passphrase = validated_data.get("passphrase")
         secret = validated_data.pop("secret", None)

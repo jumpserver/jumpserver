@@ -74,7 +74,7 @@ dependencies = [
     'django-ranged-response==0.2.0',
     'django-simple-captcha==0.5.18',
     'django-timezone-field==7.1',
-    'djangorestframework==3.16.1',
+    'djangorestframework==3.17.2',
     'djangorestframework-bulk==0.2.1',
     'django-simple-history==3.6.0',
     'django-private-storage==3.1.3',
@@ -128,10 +128,8 @@ dependencies = [
     'annotated-types>=00.6.0',
     'httpx>=00.27.0',
     'distro==1.9.0',
-    'tqdm==4.66.4',
     'elasticsearch7==7.17.13',
     'elasticsearch8==8.13.2',
-    'polib>=01.2.0',
     'azure-identity==1.16.0',
     'azure-keyvault-secrets==4.9.0',
     "psycopg2-binary==2.9.12",
@@ -147,12 +145,11 @@ dependencies = [
     'xmlsec==1.3.17',
     'pdf2image==1.17.0',
     'drf-spectacular-sidecar==2026.7.1',
-    "django-oauth-toolkit==2.4.0",
+    "django-oauth-toolkit==3.4.1",
     "pyhttpsig==1.3.0",
     "telnetlib3==4.0.2",
     "defusedxml>=0.7.1",
     "ansible-builder>=3.1.1",
-    "pypdf==6.14.2",
     "markdownify>=1.2.3",
 ]
 
@@ -197,6 +194,10 @@ xpack = [
     'volcengine-python-sdk==1.0.71',
     'aliyun-python-sdk-rds==2.7.49',
     "django-vastbase-backend==0.1.1",
+    "numpy>=2.0",
+    "insightface>=1.0.1",
+    "onnxruntime>=1.29.0",
+    "opencv-python>=5.0.0",
 ]
 
 [tool.uv.sources]
@@ -210,3 +211,4 @@ redis = { url = "https://github.com/jumpserver-dev/redis-py/archive/refs/tags/v5
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple"
 default = true
+
