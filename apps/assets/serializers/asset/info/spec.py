@@ -19,7 +19,7 @@ class WebSpecSerializer(serializers.ModelSerializer):
         model = Web
         fields = [
             'autofill', 'username_selector', 'password_selector',
-            'submit_selector', 'success_selector', 'interactive_selector', 'script'
+            'submit_selector', 'success_selector', 'interactive_selector', 'script', 'allowed_urls'
         ]
         extra_kwargs = {
             'success_selector': {'required': False, 'allow_blank': True},

@@ -2,19 +2,24 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Web
-from assets.validators import validate_web_script
+from assets.validators import normalize_web_origin, validate_web_script
 from .common import AssetSerializer
 
 __all__ = ['WebSerializer']
 
 
 class WebSerializer(AssetSerializer):
+    allowed_urls = serializers.ListField(
+        child=serializers.CharField(max_length=512, validators=[normalize_web_origin]),
+        max_length=100, required=False, label=_("Allowed sites")
+    )
+
     class Meta(AssetSerializer.Meta):
         model = Web
         fields = AssetSerializer.Meta.fields + [
             'autofill', 'username_selector',
             'password_selector', 'submit_selector',
-            'success_selector', 'interactive_selector', 'script'
+            'success_selector', 'interactive_selector', 'script', 'allowed_urls'
         ]
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
