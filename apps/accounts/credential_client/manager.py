@@ -1,33 +1,42 @@
 import json
 import shlex
+from datetime import timedelta
 
 from django.core import signing
 from django.core.cache import cache
+from django.db.models import Q
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
+from accounts.const import AuditEvent
 from accounts.models import (
     CredentialApplicationBinding, CredentialClientInstance,
     CredentialClientStatus, ApplicationCredential, IntegrationApplication,
     ClientAccessConfiguration,
 )
-from audits.models import IntegrationApplicationLog
+from .audit import record
 from common.utils import random_string
 from orgs.utils import tmp_to_org
 
 
 class CredentialClientManager:
-    def __init__(self, user, configuration_id=None, instance_id=''):
+    activity_write_interval = timedelta(seconds=60)
+
+    def __init__(self, user, configuration_id=None, instance_id='', audit_context=None):
         self.configuration_id = configuration_id
+        self.audit_context = audit_context
         self.application, self.client = self._get_application_and_client(
             user, instance_id
         )
+        if self.audit_context is not None:
+            self.audit_context.set_client(self.client)
 
     def _get_application_and_client(self, user, instance_id):
         if isinstance(user, CredentialClientInstance):
             if not user.is_valid or user.type != CredentialClientInstance.Type.agent:
-                raise PermissionDenied(_('The Agent client instance is disabled.'))
+                raise PermissionDenied(_('The Agent client instance is disabled.'), code=AuditEvent.CLIENT_DISABLED)
             self.configuration = user.configuration
             return user.application, user
 
@@ -42,7 +51,7 @@ class CredentialClientManager:
             type=CredentialClientInstance.Type.sdk, is_active=True,
         ).first()
         if not self.configuration:
-            raise PermissionDenied(_('The SDK client access configuration is disabled or invalid.'))
+            raise PermissionDenied(_('The SDK client access configuration is disabled or invalid.'), code='configuration_disabled')
         client = CredentialClientInstance.objects.get_or_create(
             configuration=self.configuration,
             application=user,
@@ -50,19 +59,22 @@ class CredentialClientManager:
             defaults={'type': CredentialClientInstance.Type.sdk},
         )[0]
         if client.type != CredentialClientInstance.Type.sdk or not client.is_active:
-            raise PermissionDenied(_('The SDK client instance is disabled.'))
+            raise PermissionDenied(_('The SDK client instance is disabled.'), code=AuditEvent.CLIENT_DISABLED)
         return user, client
 
-    def _get_credential(self, key):
-        credential = ApplicationCredential.objects.select_for_update(of=('self',)).select_related(
+    def _get_credential(self, key, lock=True):
+        queryset = ApplicationCredential.objects.all()
+        if lock:
+            queryset = queryset.select_for_update(of=('self',))
+        credential = queryset.select_related(
             'primary_account__asset__platform', 'backup_account',
             'published_account',
         ).filter(key=key, is_active=True).first()
         if not credential:
-            raise ValidationError({'key': _('Application credential not found.')})
+            raise ValidationError({'key': _('Application credential not found.')}, code='credential_not_found')
 
         if not self.configuration.credentials.filter(id=credential.id).exists():
-            raise PermissionDenied(_('The client access configuration does not include this credential.'))
+            raise PermissionDenied(_('The client access configuration does not include this credential.'), code='credential_not_selected')
         account_ids = {credential.primary_account_id}
         if credential.backup_account_id:
             account_ids.add(credential.backup_account_id)
@@ -74,7 +86,7 @@ class CredentialClientManager:
         if allowed != account_ids:
             raise PermissionDenied(_(
                 'The application is not authorized for every credential account.'
-            ))
+            ), code='credential_not_authorized')
         return credential
 
     def fetch(self, key, remote_addr):
@@ -83,7 +95,7 @@ class CredentialClientManager:
             credential.rotation_mode == ApplicationCredential.RotationMode.single
             and credential.status == ApplicationCredential.Status.changing_secret
         ):
-            raise ValidationError(_('The account secret is changing. Retry after the new revision is published.'))
+            raise ValidationError(_('The account secret is changing. Retry after the new revision is published.'), code='credential_changing')
         now = timezone.now()
         binding = CredentialApplicationBinding.objects.get_or_create(
             credential=credential, application=self.application
@@ -91,27 +103,19 @@ class CredentialClientManager:
         state = CredentialClientStatus.objects.get_or_create(
             binding=binding, client=self.client
         )[0]
-        state.fetched_revision = credential.current_revision
+        revision_changed = state.fetched_revision != credential.current_revision
+        values = {'fetched_revision': credential.current_revision}
         if credential.status != ApplicationCredential.Status.idle:
-            state.is_rotation_participant = True
-            state.required_revision = credential.revision
-        state.date_fetched = now
-        state.date_last_seen = now
-        state.save(update_fields=[
-            'fetched_revision', 'date_fetched', 'date_last_seen', 'date_updated',
-            'is_rotation_participant', 'required_revision',
-        ])
+            values.update(is_rotation_participant=True, required_revision=credential.revision)
+        self._save_status(state, now, values, fetched=True)
         self._touch(now)
 
         account = credential.published_account
         asset = account.asset
-        IntegrationApplicationLog.objects.create(
-            remote_addr=remote_addr,
-            service=self.application.name,
-            service_id=self.application.id,
-            account=f'{account.name}({account.username})',
-            asset=f'{asset.name}({asset.address})',
-        )
+        if revision_changed:
+            record(AuditEvent.CREDENTIAL_FETCHED, credential=credential, client=self.client, remote_addr=remote_addr)
+        if self.audit_context is not None:
+            self.audit_context.set_fetch_result(credential.current_revision, revision_changed)
         return {
             'key': credential.key,
             'revision': credential.current_revision,
@@ -144,13 +148,12 @@ class CredentialClientManager:
             binding__credential__key__in=[item['key'] for item in credentials],
             client=self.client,
         )
-        states_by_key = {
-            state.binding.credential.key: state for state in states
-        }
         updated = []
         for item in sorted(credentials, key=lambda item: item['key']):
             credential = self._get_credential(item['key'])
-            state = states_by_key.get(item['key'])
+            # Read after taking the credential lock, so concurrent confirmations
+            # cannot turn a repeated version into another state transition.
+            state = states.filter(binding__credential=credential).first()
             if not state:
                 continue
             if (
@@ -158,17 +161,9 @@ class CredentialClientManager:
                 or item['revision'] != credential.current_revision
                 or item['revision'] > state.fetched_revision
             ):
-                state.date_last_seen = now
-                state.save(update_fields=['date_last_seen'])
+                self._save_status(state, now, {})
                 continue
-            state.applied_revision = item['revision']
-            state.applied_account_id = item['account_id']
-            state.date_last_seen = now
-            state.date_applied = now
-            state.save(update_fields=[
-                'applied_revision', 'applied_account', 'date_applied',
-                'date_last_seen', 'date_updated',
-            ])
+            self._confirm_status(state, credential, now)
             updated.append(credential.key)
         self._touch(now)
         return {'updated': updated, 'date_last_seen': now}
@@ -190,21 +185,43 @@ class CredentialClientManager:
             raise ValidationError(_('Fetch the credential before confirming it.'))
 
         now = timezone.now()
-        state.applied_revision = credential.current_revision
-        state.applied_account = credential.published_account
-        state.date_applied = now
-        state.date_last_seen = now
-        state.save(update_fields=[
-            'applied_revision', 'applied_account', 'date_applied',
-            'date_last_seen', 'date_updated',
-        ])
+        self._confirm_status(state, credential, now)
         self._touch(now)
         return {'key': credential.key, 'revision': credential.current_revision}
 
+    def _confirm_status(self, state, credential, now):
+        values = {
+            'applied_revision': credential.current_revision,
+            'applied_account_id': credential.published_account_id,
+        }
+        if any(getattr(state, field) != value for field, value in values.items()):
+            record(AuditEvent.CREDENTIAL_CONFIRMED, credential=credential, client=self.client)
+            values['date_applied'] = now
+        self._save_status(state, now, values)
+
+    def _save_status(self, state, now, values, fetched=False):
+        changed = {field: value for field, value in values.items() if getattr(state, field) != value}
+        timestamps = ['date_last_seen', 'date_fetched'] if fetched else ['date_last_seen']
+        for field in timestamps:
+            previous = getattr(state, field)
+            if changed or previous is None or now - previous >= self.activity_write_interval:
+                values[field] = now
+        changed.update({field: values[field] for field in timestamps if field in values})
+        if not changed:
+            return
+        for field, value in changed.items():
+            setattr(state, field, value)
+        state.save(update_fields=[*changed, 'date_updated'])
+
     def _touch(self, now):
-        CredentialClientInstance.objects.filter(id=self.client.id).update(
-            date_last_seen=now
-        )
+        cutoff = now - self.activity_write_interval
+        if self.client.date_last_seen and self.client.date_last_seen > cutoff:
+            return
+        changed = CredentialClientInstance.objects.filter(id=self.client.id).filter(
+            Q(date_last_seen__isnull=True) | Q(date_last_seen__lte=cutoff)
+        ).update(date_last_seen=now)
+        if changed:
+            self.client.date_last_seen = now
 
     @staticmethod
     def register_agent(token, instance_id, name=''):
@@ -258,6 +275,8 @@ class CredentialClientManager:
             'configuration_id': str(configuration.id),
             'credential_keys': list(configuration.credentials.values_list('key', flat=True)),
             'org_id': application.org_id,
+            'notification_enabled': configuration.notification_enabled,
+            'notification_url': configuration.notification_url,
         }
 
 
@@ -276,18 +295,14 @@ class ClientAccessConfigurationManager:
             'configuration_id': str(configuration.id),
             'org_id': str(configuration.org_id),
             'credential_keys': keys,
+            'notification_enabled': configuration.notification_enabled,
         }
         if configuration.type == CredentialClientInstance.Type.sdk:
             config['app_secret'] = configuration.application.secret
-            code = (
-                'from jms_pam import JumpServerPAMClient\n\n'
-                "with JumpServerPAMClient.from_config('jms-pam.json') as client:\n"
-                f'    for key in {json.dumps(keys)}:\n'
-                '        credential = client.get_credential(key)\n'
-                '        # Connect/reload your application using credential.username and credential.secret.\n'
-                '        # Confirm ONLY after the application is using this version:\n'
-                '        # client.confirm_applied(credential)\n'
-            )
+            code = render_to_string('accounts/credential_client/sdk_example.py.tpl', {
+                'credential_keys': json.dumps(keys),
+                'notification_enabled': configuration.notification_enabled,
+            })
             return {
                 'type': 'sdk', 'config': config, 'code': code, 'filename': 'jms-pam.json',
                 'install_command': (

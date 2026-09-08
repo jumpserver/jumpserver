@@ -109,6 +109,22 @@ class CredentialAPIClient(SignedClient):
         self.instance_id = instance_id
         self.configuration_id = configuration_id
 
+    def fork(self):
+        client = CredentialAPIClient(
+            self.endpoint, self.auth.key_id, self.auth.secret.decode('ascii'), self.org_id,
+            source=self.source, timeout=self.timeout,
+            instance_id=self.instance_id, configuration_id=self.configuration_id,
+        )
+        return client
+
+    def event_request(self, action, **data):
+        if self.instance_id:
+            data['instance_id'] = self.instance_id
+        if self.configuration_id:
+            data['configuration_id'] = self.configuration_id
+        path = f'{CLIENT_PATH}/events/' + (f'{action}/' if action else '')
+        return self.request('POST', path, data=data)
+
     def get_credential(self, key):
         params = {'key': key}
         if self.instance_id:
@@ -138,7 +154,7 @@ class JumpServerPAMClient:
     def __init__(
         self, endpoint, app_id, app_secret, org_id=DEFAULT_ORG_ID,
         instance_id=None, heartbeat_interval=30,
-        configuration_id=None,
+        configuration_id=None, notification_enabled=False,
     ):
         self.instance_id = instance_id or os.getenv('JMS_PAM_INSTANCE_ID') or socket.gethostname()
         self.heartbeat_interval = heartbeat_interval
@@ -151,6 +167,8 @@ class JumpServerPAMClient:
         self._stop = threading.Event()
         self._heartbeat_thread = None
         self.last_heartbeat_error = None
+        self.notification_enabled = notification_enabled
+        self._events = None
 
     @classmethod
     def from_config(cls, path):
@@ -158,7 +176,7 @@ class JumpServerPAMClient:
             config = json.load(stream)
         return cls(**{key: config[key] for key in (
             'endpoint', 'app_id', 'app_secret', 'org_id', 'configuration_id',
-            'instance_id', 'heartbeat_interval',
+            'instance_id', 'heartbeat_interval', 'notification_enabled',
         ) if key in config})
 
     def get_credential(self, key):
@@ -210,7 +228,22 @@ class JumpServerPAMClient:
 
     def close(self):
         self._stop.set()
+        self.stop_events()
         self.http.session.close()
+
+    def start_events(self, handler):
+        from .events import EventWorker
+        if not callable(handler):
+            raise TypeError('handler must be callable')
+        if self._events and self._events.is_alive():
+            raise RuntimeError('An event listener is already running')
+        self._events = EventWorker(self.http.fork(), handler)
+        self._events.start()
+        return self._events
+
+    def stop_events(self):
+        if self._events:
+            self._events.close()
 
     def __enter__(self):
         return self

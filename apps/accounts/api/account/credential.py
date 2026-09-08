@@ -7,9 +7,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from accounts import serializers
+from accounts.const import AuditEvent
 from accounts.credential_client import CredentialClientManager
 from accounts.credential_client.manager import ClientAccessConfigurationManager
+from accounts.credential_client.events import ClientEventManager
 from accounts.credential_rotation import CredentialRotationManager
+from accounts.mixins import ApplicationAuditMixin
 from accounts.models import (
     CredentialApplicationBinding, CredentialClientInstance,
     ApplicationCredential, ClientAccessConfiguration, CredentialRotationRecord,
@@ -31,7 +34,7 @@ __all__ = [
 ]
 
 
-class ApplicationCredentialViewSet(OrgBulkModelViewSet):
+class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     model = ApplicationCredential
     serializer_class = serializers.ApplicationCredentialSerializer
     filterset_fields = ('id', 'name', 'key', 'type', 'rotation_mode', 'status', 'is_active', 'applications')
@@ -117,7 +120,7 @@ class CredentialApplicationBindingViewSet(
 
 
 class CredentialClientInstanceViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin,
+    ApplicationAuditMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin, mixins.DestroyModelMixin, OrgGenericViewSet,
 ):
     model = CredentialClientInstance
@@ -140,14 +143,21 @@ class CredentialClientInstanceViewSet(
         return super().perform_destroy(instance)
 
 
-class CredentialClientViewSet(JMSGenericViewSet):
+class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
     authentication_classes = [CredentialAgentAuthentication, ServiceAuthentication]
     permission_classes = [IsCredentialClient]
+    client_audit_events = {
+        'credential': AuditEvent.CREDENTIAL_FETCHED,
+        'confirm': AuditEvent.CREDENTIAL_CONFIRMED,
+    }
     serializer_classes = {
         'credential': serializers.CredentialFetchSerializer,
         'heartbeat': serializers.CredentialHeartbeatSerializer,
         'confirm': serializers.CredentialConfirmSerializer,
         'register_agent': serializers.CredentialAgentRegisterSerializer,
+        'events': serializers.EventRequestSerializer,
+        'subscribe_events': serializers.EventSubscriptionSerializer,
+        'report_event': serializers.EventReportSerializer,
     }
 
     @action(methods=['get'], detail=False, url_path='credential')
@@ -155,9 +165,7 @@ class CredentialClientViewSet(JMSGenericViewSet):
         serializer = self.get_serializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        manager = CredentialClientManager(
-            request.user, data.get('configuration_id'), data.get('instance_id', '')
-        )
+        manager = self.get_client_manager(data)
         response = Response(manager.fetch(data['key'], get_request_ip(request)))
         response['Cache-Control'] = 'no-store'
         return response
@@ -167,9 +175,7 @@ class CredentialClientViewSet(JMSGenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        manager = CredentialClientManager(
-            request.user, data.get('configuration_id'), data.get('instance_id', '')
-        )
+        manager = self.get_client_manager(data)
         return Response(manager.heartbeat(data['credentials']))
 
     @action(methods=['post'], detail=False)
@@ -177,9 +183,7 @@ class CredentialClientViewSet(JMSGenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        manager = CredentialClientManager(
-            request.user, data.get('configuration_id'), data.get('instance_id', '')
-        )
+        manager = self.get_client_manager(data)
         return Response(manager.confirm(
             data['key'], data['revision'], data['account_id']
         ))
@@ -197,8 +201,35 @@ class CredentialClientViewSet(JMSGenericViewSet):
         )
         return Response(identity, status=status.HTTP_201_CREATED)
 
+    def get_event_manager(self, data):
+        return ClientEventManager(self.get_client_manager(data))
 
-class ClientAccessConfigurationViewSet(OrgBulkModelViewSet):
+    @action(methods=['post'], detail=False, url_path='events/subscribe')
+    def subscribe_events(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        return Response(self.get_event_manager(data).subscribe(data['enabled']))
+
+    @action(methods=['post'], detail=False, url_path='events')
+    def events(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        response = Response(self.get_event_manager(serializer.validated_data).poll())
+        response['Cache-Control'] = 'no-store'
+        return response
+
+    @action(methods=['post'], detail=False, url_path='events/report')
+    def report_event(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        return Response(self.get_event_manager(data).report(
+            data['attempt_id'], data['result'], data.get('status_code'), data['reason'],
+        ))
+
+
+class ClientAccessConfigurationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     model = ClientAccessConfiguration
     serializer_class = serializers.ClientAccessConfigurationSerializer
     filterset_fields = ('application', 'type', 'is_active', 'credentials')

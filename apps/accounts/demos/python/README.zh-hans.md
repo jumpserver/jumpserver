@@ -63,7 +63,7 @@ sudo jms-pam-agent install \
 Agent 每 30 秒检查凭据版本并原子更新配置文件。应用重载、验证新连接并释放旧连接后执行：
 
 ```bash
-jms-pam-agent confirm cred-pg-main
+jms-pam-agent confirm cred-pg-main --revision 2
 ```
 
 凭据文件示例：
@@ -84,3 +84,34 @@ jms-pam-agent confirm cred-pg-main
 ```
 
 配置文件权限为 `0600`，只保留当前版本，不生成密码历史或备份文件。
+
+## 可选事件通知
+
+在客户端接入配置中启用「事件通知」。SDK 注册 Python 回调，Agent 填写应用的 HTTP(S) 通知地址；没有启用通知时继续按原方式定期取密。应用仍需明确确认使用的版本。
+
+SDK 在应用进程启动时注册一次，关闭时停止。监听不依赖首次取密成功，应用可直接把事件转交自己的消息队列或处理函数：
+
+```python
+client = JumpServerPAMClient.from_config('jms-pam.json')
+
+def on_event(event):
+    # event 只含事件 ID、实例标识、凭据 key、版本等元数据，不含密码。
+    application_event_queue.put(event)
+
+listener = client.start_events(handler=on_event)
+# 继续运行应用；处理 credential.published 时 get_credential(event['key'])，
+# 核对版本，重连成功后 confirm_applied(credential)。
+# 关闭应用时：client.close()
+```
+
+回调正常返回表示送达，抛异常表示失败。回调应快速返回，不要在回调里长时间等待；超过服务端 60 秒领取期限可能重复处理。`listener.last_error` 可查看连接 JumpServer 的最近错误。停止通知可调用 `client.stop_events()`，取密不受影响。
+
+Agent 使用同一事件监听、领取和结果上报逻辑，在本机向配置的通知地址 POST JSON。仅 HTTP 2xx 表示送达，不跟随重定向，不发送认证头。本版仅面向受信任的同机/同执行环境应用接口，不要把接口暴露到不受信任网络。通知 URL 变更后重新生成接入材料并更新/重新注册 Agent；配置禁用则停止通知。
+
+Agent 收到 `credential.published` 后先获取并原子写入本地凭据文件，文件版本与事件一致才通知应用；如果该事件版本已经过时，记录失败，不冒充送达。应用读取文件、使用该版本后，通过 CLI 的 `--revision`，或本机 `POST /v1/confirm` 的 `{"key":"cred-pg-main","revision":2}` 确认。只传 key 不再支持，以免确认了应用尚未使用的新版本。
+
+事件代码：`credential.published`（新版本可用）、`credential.unavailable`（单账号改密中）、`rotation.failed`（改密失败）、`access.revoked`（凭据授权撤销）。停用身份或认证被拒绝时，本地监听器发出一次 `access.stopped`，标记 `origin: client`；它不是服务端下发事件，服务端拒绝该身份后也不能继续上报通知结果。
+
+同一服务端事件对每个启用监听的实例单独投递。应用使用 `event_id + client_id` 识别重复事件；`client_id` 是全局唯一实例 ID，`instance_id` 是可读名称，在不同配置间可能重复。服务端最多安排 5 次尝试（失败后等待 5、15、30、60 秒），10 分钟未送达记为失败；离线恢复后可继续未过期任务。SDK/Agent 不另做一层业务重试，结果上报网络失败时先重报结果。**通知送达、取到凭据、确认生效是三个不同动作。** 通知与失败结果显示在应用管理的全局审计日志中。
+
+本版旧调用记录入口/API 停用，历史数据保留；新记录只写统一审计。旧 `account-secret` 取密接口的兼容期不受影响。

@@ -2,7 +2,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from accounts.const import ChangeSecretRecordStatusChoice
+from accounts.const import AuditEvent, ChangeSecretRecordStatusChoice
+from accounts.credential_client.audit import record
 from accounts.models import (
     ChangeSecretRecord, CredentialClientStatus, ApplicationCredential,
     CredentialRotationRecord,
@@ -47,6 +48,8 @@ class CredentialRotationManager:
         credential.change_execution = None
         credential.rotation_cancelled = False
         credential.date_rotation_started = timezone.now()
+        CredentialRotationRecord.objects.create(credential=credential, created_by=operator)
+        record(AuditEvent.ROTATION_STARTED, credential=credential, operator=operator)
         credential.save(update_fields=[
             'revision', 'published_account', 'primary_version_at_start',
             'status', 'rotation_cancelled', 'date_rotation_started',
@@ -56,7 +59,6 @@ class CredentialRotationManager:
         CredentialClientStatus.objects.filter(id__in=state_ids).update(
             required_revision=credential.revision, is_rotation_participant=True,
         )
-        CredentialRotationRecord.objects.create(credential=credential, created_by=operator)
         return credential
 
     def check_usage(self):
@@ -162,6 +164,7 @@ class CredentialRotationManager:
         credential.published_account = credential.primary_account
         credential.status = ApplicationCredential.Status.waiting_primary
         credential.rotation_cancelled = True
+        record(AuditEvent.ROTATION_CANCELLED, credential=credential)
         credential.save(update_fields=[
             'revision', 'published_account', 'status',
             'rotation_cancelled', 'date_updated',

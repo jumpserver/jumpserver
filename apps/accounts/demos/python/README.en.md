@@ -44,5 +44,29 @@ sudo jms-pam-agent install \
 The Agent atomically writes `/etc/jumpserver-pam/credentials.json`. After the application reloads the file, verifies its new connection, and releases the old connection, confirm it with:
 
 ```bash
-jms-pam-agent confirm cred-pg-main
+jms-pam-agent confirm cred-pg-main --revision 2
 ```
+
+## Optional event notifications
+
+Enable event notifications on the client access configuration. SDK applications register a Python callback; Agent configurations specify an application HTTP(S) URL. Notifications are independent of credential retrieval and never replace applied-version confirmation.
+
+```python
+client = JumpServerPAMClient.from_config('jms-pam.json')
+
+def on_event(event):
+    application_event_queue.put(event)  # Your application's own queue/handler.
+
+listener = client.start_events(handler=on_event)
+# Continue running your application. On credential.published, fetch, check the
+# version, reload connections, then confirm_applied(credential).
+# At application shutdown: client.close()
+```
+
+Returning from the callback means delivered; raising an exception means failed. Keep callbacks short (claims expire after 60 seconds). Inspect `listener.last_error` for connection errors. `client.stop_events()` stops notifications without stopping credential retrieval. Each instance receives its own delivery; deduplicate by `event_id + client_id` (the globally unique instance UUID, unlike the display name `instance_id`).
+
+Agent uses the same worker and POSTs JSON without authentication headers or redirects. Only 2xx responses count as delivered. This version targets trusted local execution environments, not publicly exposed endpoints. After changing the Agent URL, regenerate materials and update/re-register the Agent. Before delivering `credential.published`, Agent writes that exact revision to the local credential file. Superseded revisions fail delivery rather than being silently replaced. Confirm the actual revision using `--revision` or `POST /v1/confirm` with `{"key":"cred-pg-main","revision":2}`; key-only confirmation is no longer supported.
+
+Event codes: `credential.published`, `credential.unavailable` (single-account change in progress), `rotation.failed`, and `access.revoked`. If JumpServer rejects authentication/access, the listener emits one local `access.stopped` event with `origin: client` and stops. Disabled identities cannot report results or fetch additional events.
+
+JumpServer schedules at most five attempts, with 5/15/30/60-second retry delays and a ten-minute delivery deadline. Clients resume unexpired deliveries after reconnecting and retry result reports before invoking another callback. No secrets or application response bodies are sent in event/audit payloads. Delivery, credential retrieval and applied-version confirmation are distinct audit events. The old call-record UI/query API is retired (historical rows retained); legacy account-secret compatibility is unchanged.

@@ -7,6 +7,7 @@ from . import api
 app_name = 'accounts'
 
 router = BulkRouter()
+router.register(r'application-audits', api.ApplicationAuditViewSet, 'application-audit')
 
 router.register(r'accounts', api.AccountViewSet, 'account')
 router.register(r'virtual-accounts', api.VirtualAccountViewSet, 'virtual-account')
