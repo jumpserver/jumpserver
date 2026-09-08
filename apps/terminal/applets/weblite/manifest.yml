@@ -1,0 +1,12 @@
+name: weblite
+display_name: JumpServer WebLite
+version: 4.1.2
+comment: Managed browser with shared autofill and interactive verification
+author: JumpServer Team
+exec_type: exe
+path: bin/weblite.exe
+update_policy: always
+type: web
+can_concurrent: true
+tags: [web]
+protocols: [http]

@@ -8,6 +8,9 @@ def install_or_update_builtin_applets():
 
     applets = os.listdir(BASE_DIR)
     for d in applets:
+        # Chrome remains available for explicit legacy installations only.
+        if d == 'chrome':
+            continue
         path = os.path.join(BASE_DIR, d)
         if not os.path.isdir(path) or not os.path.exists(os.path.join(path, 'manifest.yml')):
             continue

@@ -49,3 +49,26 @@ class PackageRootLocateTests(SimpleTestCase):
             root = VirtualApp.locate_pkg_root(extract_to, 'demo.zip')
 
             self.assertEqual(root, extract_to)
+
+
+class WebAppletDefaultsTests(SimpleTestCase):
+    def test_builtin_install_skips_chrome_and_includes_web_applet(self):
+        from unittest.mock import patch
+        from terminal.applets import install_or_update_builtin_applets
+
+        with patch.object(Applet, 'install_from_dir', return_value=None) as install:
+            install_or_update_builtin_applets()
+        names = [os.path.basename(call.args[0]) for call in install.call_args_list]
+        self.assertIn('weblite', names)
+        self.assertNotIn('chrome', names)
+
+    def test_direct_mode_is_default_and_recording_endpoint_is_optional(self):
+        from terminal.serializers.applet_host import DeployOptionsSerializer
+
+        serializer = DeployOptionsSerializer(data={})
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertFalse(serializer.validated_data['WEB_APPLET_RECORDING_ENABLED'])
+        self.assertEqual(serializer.validated_data['WEB_PROXY_URL'], '')
+        enabled = DeployOptionsSerializer(data={'WEB_APPLET_RECORDING_ENABLED': True})
+        self.assertFalse(enabled.is_valid())
+        self.assertIn('WEB_PROXY_URL', enabled.errors)
