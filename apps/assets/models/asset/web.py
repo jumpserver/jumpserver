@@ -10,7 +10,13 @@ class Web(Asset):
     username_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Username selector"))
     password_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Password selector"))
     submit_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Submit selector"))
-    success_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Success selector"))
+    success_selector = models.CharField(
+        max_length=128, blank=True, default='', verbose_name=_("Success selector"),
+        help_text=_(
+            "Selector for an element that appears only after a successful login, e.g. css=#dashboard. "
+            "Required for basic autofill."
+        )
+    )
     interactive_selector = models.CharField(
         max_length=128, blank=True, default='', verbose_name=_("Interactive selector"),
         help_text=_("Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls.")

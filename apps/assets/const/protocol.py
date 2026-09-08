@@ -323,7 +323,11 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'type': 'str',
                         'required': False,
                         'default': '',
-                        'label': _('Success selector')
+                        'label': _('Success selector'),
+                        'help_text': _(
+                            'Selector for an element that appears only after a successful login, e.g. css=#dashboard. '
+                            'Required for basic autofill.'
+                        )
                     },
                     'script': {
                         'type': 'text',
