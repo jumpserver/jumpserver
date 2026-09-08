@@ -2,56 +2,172 @@
 {% load i18n %}
 {% block body %}
     <style>
-li {
-    list-style: disc;
-}
+        .download-wrapper {
+            max-width: 860px;
+            margin: 28px auto 40px;
+            padding: 0 20px;
+        }
+        .download-card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+            padding: 28px 32px;
+            margin-bottom: 24px;
+        }
+        .download-title {
+            margin: 0 0 10px;
+            font-size: 22px;
+            color: #1f2329;
+        }
+        .download-desc {
+            margin: 0 0 6px;
+            color: #4a4f57;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .download-list {
+            list-style: none;
+            margin: 22px 0 0;
+            padding: 0;
+        }
+        .download-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f1f3;
+        }
+        .download-item:last-child {
+            border-bottom: none;
+        }
+        .download-platform {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 200px;
+            flex-shrink: 0;
+        }
+        .download-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            background: #e8f3ff;
+            color: #3370ff;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .download-arch {
+            color: #646a73;
+            font-size: 13px;
+        }
+        .download-file {
+            flex: 1;
+            color: #1f2329;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .download-btn {
+            display: inline-block;
+            line-height: 1;
+            padding: 8px 18px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            font-size: 14px;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .download-btn-primary {
+            background-color: var(--primary-color, #1ab394);
+            color: #ffffff;
+        }
+        .download-btn-primary:hover {
+            opacity: 0.85;
+            color: #ffffff;
+        }
+        .download-btn-ghost {
+            background: #ffffff;
+            border-color: var(--primary-color, #1ab394);
+            color: var(--primary-color, #1ab394);
+        }
+        .download-btn-ghost:hover {
+            background: rgba(26, 179, 148, 0.08);
+        }
+        .download-release {
+            margin-top: 22px;
+            padding: 14px 16px;
+            background: #fafafa;
+            border: 1px dashed #d5d8dd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .download-release p {
+            margin: 0;
+            color: #646a73;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .download-more {
+            text-align: center;
+        }
+        .download-more a {
+            color: #3370ff;
+            text-decoration: none;
+        }
+        @media (max-width: 640px) {
+            .download-item {
+                flex-wrap: wrap;
+            }
+            .download-file {
+                flex: 1 1 100%;
+                order: 3;
+            }
+        }
+    </style>
 
-ul {
-    padding-left: 30px;
-    padding-top: 10px;
-}
+    <div class="download-wrapper">
+        <div class="download-card">
+            <h2 class="download-title">{{ VENDOR }} Client {{ CLIENT_VERSION }}</h2>
+            <p class="download-desc">
+                {% trans 'JumpServer Client is a cross-platform desktop application for Windows, macOS and Linux, used to connect to and manage remote assets locally.' %}
+            </p>
 
-p {
-    padding-top: 10px;
-}
-</style>
-    <div style="margin: 0 200px">
-    <div class="group">
-        <h2>{{ VENDOR }} {% trans 'Client' %} {{ CLIENT_VERSION }}</h2>
-        <p>
-            {% trans 'Client, currently used to launch the client' %}
-        </p>
-        <ul>
-            <li> <a href="/download/public/Client_{{ CLIENT_VERSION }}_x64-setup.exe">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_x64-setup.exe</a></li>
-            <li> <a href="/download/public/Client_{{ CLIENT_VERSION }}_aarch64.dmg">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_aarch64.dmg</a></li>
-        </ul>
+            <ul class="download-list">
+                <li class="download-item">
+                    <div class="download-platform">
+                        <span class="download-badge">Windows</span>
+                        <span class="download-arch">x64</span>
+                    </div>
+                    <span class="download-file">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_x64-setup.exe</span>
+                    <a class="download-btn download-btn-primary" href="/download/public/Client_{{ CLIENT_VERSION }}_x64-setup.exe">{% trans 'Download' %}</a>
+                </li>
+                <li class="download-item">
+                    <div class="download-platform">
+                        <span class="download-badge">macOS</span>
+                        <span class="download-arch">Apple Silicon</span>
+                    </div>
+                    <span class="download-file">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_aarch64.dmg</span>
+                    <a class="download-btn download-btn-primary" href="/download/public/Client_{{ CLIENT_VERSION }}_aarch64.dmg">{% trans 'Download' %}</a>
+                </li>
+            </ul>
+
+            <div class="download-release">
+                <p>{% trans 'Need other operating systems or architectures?' %}</p>
+                <a class="download-btn download-btn-ghost" href="https://github.com/jumpserver/client/releases/tag/v{{ CLIENT_VERSION }}" target="_blank" rel="noopener">
+                    {% trans 'Get more installers from GitHub Releases' %}
+                </a>
+            </div>
+        </div>
+
+        {% if MORE_DOWNLOADS_URL %}
+        <div class="download-card download-more">
+            <h2 class="download-title">{% trans 'More download' %}</h2>
+            <p><a href="{{ MORE_DOWNLOADS_URL }}">{% trans 'Tools and applications' %}</a></p>
+        </div>
+        {% endif %}
     </div>
-
-    {% if MORE_DOWNLOADS_URL %}
-    <div class="group">
-        <h2> {% trans 'More download' %} </h2>
-        <ul>
-            <li><a href="{{ MORE_DOWNLOADS_URL }}">{% trans 'Tools and applications' %}</a></li>
-        </ul>
-    </div>
-    {% endif %}
-</div>
-    <style>
-    ul {
-        list-style-type: disc;
-    }
-
-    li a {
-        color: blue;
-    }
-
-    .group {
-        padding-top: 40px;
-    }
-
-    .group ul {
-        padding-top: 10px;
-    }
-</style>
-
 {% endblock %}
