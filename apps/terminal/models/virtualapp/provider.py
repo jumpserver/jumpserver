@@ -1,5 +1,3 @@
-from urllib.parse import urlsplit
-
 from django.db import models, transaction
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
@@ -12,24 +10,12 @@ __all__ = ['AppProvider', 'AppProviderDeployment']
 
 
 class AppProvider(JMSBaseModel):
-    class RuntimeType(models.TextChoices):
-        docker = 'docker', 'Docker'
-        podman = 'podman', 'Podman'
-
     cache_status_key_prefix = 'virtual_host_{}_status'
-    managed_service_url = 'http://127.0.0.1:9001'
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
     host = models.OneToOneField(
         'assets.Host', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='app_provider', verbose_name=_('Host'),
-    )
-    runtime_type = models.CharField(
-        max_length=16, choices=RuntimeType.choices, default=RuntimeType.docker,
-        verbose_name=_('Runtime type'),
-    )
-    service_url = models.URLField(
-        max_length=1024, blank=True, default='', verbose_name=_('Service URL'),
     )
     deploy_options = models.JSONField(default=dict, blank=True, verbose_name=_('Deploy options'))
     terminal = models.OneToOneField(
@@ -118,13 +104,12 @@ class AppProvider(JMSBaseModel):
 
     def validate_deployment(self):
         from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
+        from terminal.automations.deploy_app_provider import load_manifest
 
         if not self.host:
             raise ValidationError({'host': _('Provider host is required before deployment')})
         if self.host.platform.type != 'linux':
             raise ValidationError({'host': _('Provider deployment requires a Linux host')})
-        if self.runtime_type != self.RuntimeType.docker:
-            raise ValidationError({'runtime_type': _('Managed providers require Docker')})
         ssh = self.host.protocols.filter(name='ssh').first()
         if not ssh or not 1 <= ssh.port <= 65535 or ssh.port == 9001:
             raise ValidationError({'host': _('A valid SSH port different from the Panda API port is required')})
@@ -134,9 +119,17 @@ class AppProvider(JMSBaseModel):
             })
         if self.container_count:
             raise ValidationError({'host': _('Disable the provider and wait for all containers to exit before deployment')})
+        try:
+            load_manifest()
+        except (OSError, ValueError) as exc:
+            raise ValidationError({'deploy_options': _('Invalid offline deployment resources: %s') % exc}) from exc
         options = AppProviderDeployOptionsSerializer(data=self.deploy_options)
         if not options.is_valid():
             raise ValidationError({'deploy_options': options.errors})
+        if not options.validated_data['PANDA_IMAGE']:
+            raise ValidationError({'deploy_options': {
+                'PANDA_IMAGE': _('Select a Panda image already loaded on the provider or prepare the Installer offline resources')
+            }})
         start, end = map(int, options.validated_data['PANDA_RANGE_PORTS'].split('-'))
         if start <= ssh.port <= end:
             raise ValidationError({'deploy_options': {
@@ -150,12 +143,6 @@ class AppProvider(JMSBaseModel):
             return False
         deployment = self.latest_deployment
         if deployment and deployment.status != 'success':
-            return False
-        try:
-            url = urlsplit(self.service_url)
-            if url.scheme not in ('http', 'https') or not url.hostname or url.port == 0:
-                return False
-        except ValueError:
             return False
         has_ssh = self.host.protocols.filter(name='ssh').exists()
         return has_ssh and self.select_account() is not None

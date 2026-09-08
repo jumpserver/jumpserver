@@ -259,8 +259,6 @@ class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):
             'hostname': provider.hostname,
             'address': provider.address,
             'host_id': str(provider.host_id) if provider.host_id else None,
-            'runtime_type': provider.runtime_type,
-            'service_url': provider.service_url,
             'load': provider.load,
             'host': _ConnectionTokenAssetSerializer(provider.host).data,
             'account': _ConnectionTokenAccountSerializer(account).data,

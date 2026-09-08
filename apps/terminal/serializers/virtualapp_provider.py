@@ -11,6 +11,7 @@ from common.const.choices import Status
 from assets.models import Platform
 from assets.serializers import HostSerializer
 from terminal import const
+from terminal.automations.deploy_app_provider import default_panda_image
 from ..models import AppProvider, AppProviderDeployment
 
 __all__ = [
@@ -27,7 +28,7 @@ class AppProviderDeployOptionsSerializer(serializers.Serializer):
         default=True, label=_('Ignore Certificate Verification')
     )
     PANDA_IMAGE = serializers.CharField(
-        default='jumpserver/panda:latest', max_length=255, label=_('Panda image')
+        default=default_panda_image, allow_blank=True, max_length=255, label=_('Panda image')
     )
     PANDA_RANGE_PORTS = serializers.CharField(
         default='6900-7900', max_length=64, label=_('Container port range')
@@ -52,6 +53,8 @@ class AppProviderDeployOptionsSerializer(serializers.Serializer):
 
         image = attrs.get('PANDA_IMAGE')
         if image is not None:
+            image = attrs['PANDA_IMAGE'] = image or default_panda_image()
+        if image:
             component = r'[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*'
             reference = (
                 rf'(?:(?:[a-z0-9][a-z0-9.-]*)(?::[0-9]{{1,5}})?/)?'
@@ -120,11 +123,11 @@ class AppProviderSerializer(serializers.ModelSerializer):
         model = AppProvider
         field_mini = ['id', 'name', 'hostname']
         read_only_fields = [
-            'runtime_type', 'service_url', 'terminal',
+            'terminal',
             'date_created', 'date_updated',
         ]
         fields = field_mini + [
-            'host', 'runtime_type', 'service_url',
+            'host',
             'deploy_options', 'deployment', 'deployment_error', 'load', 'terminal', 'comment',
         ] + read_only_fields
 
@@ -187,8 +190,6 @@ class AppProviderSerializer(serializers.ModelSerializer):
                 })
             attrs['name'] = name
             attrs['hostname'] = address
-            attrs['runtime_type'] = AppProvider.RuntimeType.docker
-            attrs['service_url'] = AppProvider.managed_service_url
         elif not self.instance:
             if not is_service_account:
                 raise serializers.ValidationError({
@@ -225,7 +226,6 @@ class AppProviderSerializer(serializers.ModelSerializer):
                 'host': host,
                 'name': host.name,
                 'hostname': host.address,
-                'runtime_type': AppProvider.RuntimeType.docker,
             })
         return super().update(instance, validated_data)
 
@@ -253,10 +253,6 @@ class AppProviderDeploymentSerializer(serializers.ModelSerializer):
             'status', 'task', 'date_start', 'date_finished',
             'date_created', 'date_updated',
         ]
-
-    def validate_provider(self, provider):
-        provider.validate_deployment()
-        return provider
 
     def validate(self, attrs):
         attrs = super().validate(attrs)

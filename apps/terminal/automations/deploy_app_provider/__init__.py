@@ -1,8 +1,11 @@
 import datetime
+import errno
 import json
 import os
+import re
 import shutil
 import uuid
+from pathlib import Path
 
 import yaml
 from django.conf import settings
@@ -17,6 +20,79 @@ from terminal.models import AppProvider, VirtualAppPublication
 
 logger = get_logger(__name__)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def load_manifest():
+    path = Path(settings.DATA_DIR) / 'virtualapp' / 'manifest.json'
+    try:
+        with path.open() as stream:
+            manifest = json.load(stream)
+    except FileNotFoundError:
+        return {}
+    if not isinstance(manifest, dict):
+        raise ValueError('Invalid virtual application offline manifest')
+    for name in ('panda', 'docker'):
+        if name in manifest and not isinstance(manifest[name], dict):
+            raise ValueError(f'Invalid {name} offline resource')
+        for key, value in manifest.get(name, {}).items():
+            if key in ('image', 'architecture', 'image_id', 'file', 'sha256', 'version') and not isinstance(value, str):
+                raise ValueError(f'Invalid {name} offline {key}')
+    return manifest
+
+
+def default_panda_image():
+    try:
+        return load_manifest().get('panda', {}).get('image', '')
+    except (OSError, ValueError):
+        # Keep form metadata readable. Deployment validation reports the
+        # malformed local configuration, and staging must never ignore it.
+        return ''
+
+
+def stage_resources(run_dir, image):
+    """Keep offline resources inside the directory already mounted into Ansible EE."""
+    root = (Path(settings.DATA_DIR) / 'virtualapp').resolve()
+    manifest = load_manifest()
+    resources = {}
+    for name in ('panda', 'docker'):
+        resource = dict(manifest.get(name, {}))
+        if not resource or (name == 'panda' and resource.get('image') != image):
+            resources[name] = {}
+            continue
+        if not re.fullmatch(r'[a-f0-9]{64}', resource.get('sha256', '')):
+            raise ValueError(f'Invalid {name} offline archive checksum')
+        if not resource.get('architecture'):
+            raise ValueError(f'Missing {name} offline architecture')
+        if name == 'panda' and not re.fullmatch(r'sha256:[a-f0-9]{64}', resource.get('image_id', '')):
+            raise ValueError('Invalid Panda offline image ID')
+        files = {'file': resource.get('file', '')}
+        if name == 'docker':
+            files['service'] = 'docker.service'
+        for key, relative in files.items():
+            source = (root / relative).resolve()
+            if not relative or Path(relative).is_absolute() or not source.is_relative_to(root):
+                raise ValueError(f'Invalid {name} offline archive path')
+            resource[key] = ''
+            # Existing Docker/images remain usable with missing offline files.
+            # Ansible only requires these files when installing from the bundle.
+            if source.is_file():
+                destination = Path(run_dir) / 'offline' / source.name
+                destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                try:
+                    try:
+                        os.link(source, destination)
+                    except OSError as exc:
+                        if exc.errno != errno.EXDEV:
+                            raise
+                        shutil.copyfile(source, destination)
+                except FileNotFoundError:
+                    # Installer may remove an old archive after publishing its manifest.
+                    if source.exists():
+                        raise
+                else:
+                    resource[key] = str(destination)
+        resources[name] = resource
+    return resources
 
 
 class DeployAppProviderManager:
@@ -95,19 +171,23 @@ class DeployAppProviderManager:
         with open(os.path.join(CURRENT_DIR, template)) as f:
             plays = yaml.safe_load(f)
 
-        options = self.provider.deploy_options
-        core_host = options.get('CORE_HOST') or settings.SITE_URL or ''
-        variables = {
-            **options,
-            'CORE_HOST': core_host.rstrip('/'),
-            'PANDA_HOST_IP': self.provider.host.address,
-            'PANDA_IMAGE': options.get('PANDA_IMAGE', 'jumpserver/panda:latest'),
-            'PANDA_RANGE_PORTS': options.get('PANDA_RANGE_PORTS', '6900-7900'),
-            'IGNORE_VERIFY_CERTS': options.get('IGNORE_VERIFY_CERTS', True),
-        }
         if self.deployment.publication_id:
-            variables['APP_IMAGE'] = self.deployment.publication.app.image_name
+            variables = {
+                'APP_IMAGE': self.deployment.publication.app.image_name,
+                'APP_VERSION': self.deployment.publication.app.version,
+            }
         else:
+            options = self.provider.deploy_options
+            core_host = options.get('CORE_HOST') or settings.SITE_URL or ''
+            variables = {
+                **options,
+                'CORE_HOST': core_host.rstrip('/'),
+                'PANDA_HOST_IP': self.provider.host.address,
+                'PANDA_IMAGE': options.get('PANDA_IMAGE') or default_panda_image(),
+            }
+            resources = stage_resources(self.run_dir, variables['PANDA_IMAGE'])
+            variables['PANDA_RESOURCE'] = resources['panda']
+            variables['DOCKER_RESOURCE'] = resources['docker']
             variables['PANDA_ACCESS_KEY'] = self.get_access_key()
             variables['PANDA_PROVIDER_ID'] = str(self.provider.id)
         for play in plays:
@@ -120,13 +200,28 @@ class DeployAppProviderManager:
             yaml.safe_dump(plays, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
         return path
 
+    @staticmethod
+    def get_published_image_id(result, app):
+        images = [
+            task['res']['ansible_stats']['data']['virtual_app_image']
+            for tasks in result.result['ok'].values()
+            for task in tasks.values()
+            if 'virtual_app_image' in task.get('res', {}).get('ansible_stats', {}).get('data', {})
+        ]
+        if len(images) != 1:
+            raise ValueError('The publication task did not confirm an image')
+        image = images[0]
+        if (
+            image.get('name') != app.image_name or image.get('version') != app.version
+            or not re.fullmatch(r'sha256:[a-f0-9]{64}', image.get('id', ''))
+        ):
+            raise ValueError('The publication result does not match the requested application image')
+        return image['id']
+
     def run(self):
         try:
             if not self.deployment.publication_id:
                 self.provider.deploy_options = self.provider.validate_deployment()
-            self.deployment.date_start = timezone.now()
-            self.deployment.status = 'running'
-            self.deployment.save(update_fields=['date_start', 'status', 'date_updated'])
             runner = SuperPlaybookRunner(
                 inventory=self.generate_inventory(),
                 playbook=self.generate_playbook(),
@@ -148,9 +243,15 @@ class DeployAppProviderManager:
                     'date_updated': timezone.now(),
                 }
                 if success:
-                    values.update(app_version=app.version, image_digest='', date_synced=timezone.now())
+                    values.update(
+                        app_version=app.version, image_digest=self.get_published_image_id(result, app),
+                        date_synced=timezone.now(),
+                    )
+                # Panda may confirm a newer image while this SSH check runs.
                 VirtualAppPublication.objects.filter(
                     pk=publication.pk, app__version=app.version, app__image_name=app.image_name,
+                ).exclude(
+                    status=PublishStatus.success, app_version=app.version,
                 ).update(**values)
         except Exception as exc:
             logger.exception('Deploy app provider failed: %s', exc)
@@ -160,10 +261,12 @@ class DeployAppProviderManager:
                 app = publication.app
                 VirtualAppPublication.objects.filter(
                     pk=publication.pk, app__version=app.version, app__image_name=app.image_name,
+                ).exclude(
+                    status=PublishStatus.success, app_version=app.version,
                 ).update(status=PublishStatus.failed, date_updated=timezone.now())
         finally:
             self.deployment.date_finished = timezone.now()
             with safe_db_connection():
-                self.deployment.save()
+                self.deployment.save(update_fields=['status', 'date_finished', 'date_updated'])
             if not settings.DEBUG_DEV:
                 shutil.rmtree(self.run_dir, ignore_errors=True)

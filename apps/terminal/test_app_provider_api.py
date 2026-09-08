@@ -1,9 +1,11 @@
 import json
 import tempfile
+from contextlib import nullcontext
 from types import SimpleNamespace
 from unittest import mock
 
 from django.test import SimpleTestCase, TestCase
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from accounts.models import Account
@@ -51,7 +53,9 @@ class AppProviderDeploymentAPITests(TestCase):
         self.cache.get.return_value = []
         serializer = AppProviderSerializer(data={
             'host': {'name': 'managed-provider', 'address': '192.0.2.10'},
-            'deploy_options': {'CORE_HOST': 'https://core.example.com'},
+            'deploy_options': {
+                'CORE_HOST': 'https://core.example.com', 'PANDA_IMAGE': 'jumpserver/panda:test',
+            },
         })
         serializer.is_valid(raise_exception=True)
         self.provider = serializer.save()
@@ -69,14 +73,13 @@ class AppProviderDeploymentAPITests(TestCase):
         data = ConnectTokenVirtualAppOptionSerializer.get_provider({'provider': self.provider})
 
         self.assertEqual(set(data), {
-            'id', 'name', 'hostname', 'address', 'host_id', 'runtime_type',
-            'service_url', 'load', 'host', 'account', 'gateway',
+            'id', 'name', 'hostname', 'address', 'host_id',
+            'load', 'host', 'account', 'gateway',
         })
         self.assertEqual(data['host']['address'], self.provider.host.address)
         self.assertEqual(data['host']['protocols'][0]['name'], 'ssh')
         self.assertEqual(data['account']['username'], 'root')
         self.assertEqual(data['account']['secret'], 'test-secret')
-        self.assertEqual(data['service_url'], 'http://127.0.0.1:9001')
 
     def test_connection_options_reject_missing_host_or_ssh_account(self):
         with self.assertRaisesMessage(ValidationError, 'provider is required'):
@@ -117,22 +120,62 @@ class AppProviderDeploymentAPITests(TestCase):
         deployments[1].refresh_from_db()
         self.assertEqual(deployments[1].status, 'success')
 
+    @mock.patch('terminal.automations.deploy_app_provider.safe_db_connection', new=nullcontext)
+    def test_worker_preserves_claimed_start_time_on_a_preloaded_deployment(self):
+        deployment = AppProviderDeployment.objects.create(provider=self.provider)
+        claimed_start = timezone.now()
+        # Batch workers load deployment objects before the atomic task claim.
+        AppProviderDeployment.objects.filter(pk=deployment.pk).update(
+            status='running', date_start=claimed_start,
+        )
+        with mock.patch.object(
+            DeployAppProviderManager, 'generate_inventory', return_value='/tmp/inventory'
+        ), mock.patch.object(
+            DeployAppProviderManager, 'generate_playbook', return_value='/tmp/playbook'
+        ), mock.patch('terminal.automations.deploy_app_provider.SuperPlaybookRunner') as runner:
+            runner.return_value.run.return_value.status = 'successful'
+            DeployAppProviderManager(deployment).run()
+        deployment.refresh_from_db()
+        self.assertEqual(deployment.date_start, claimed_start)
+        self.assertEqual(deployment.status, 'success')
+        self.assertIsNotNone(deployment.date_finished)
+
     def test_maintenance_host_can_deploy_but_cannot_receive_connections(self):
         self.provider.host.is_active = False
         self.provider.host.save(update_fields=['is_active'])
         self.assertEqual(self.provider.validate_deployment()['PANDA_RANGE_PORTS'], '6900-7900')
         self.assertFalse(self.provider.connection_ready)
 
-    def test_invalid_account_and_reserved_ssh_port_block_deployment(self):
+    def test_missing_bundle_and_unspecified_panda_image_block_deployment(self):
+        from django.test import override_settings
+
+        self.provider.deploy_options.pop('PANDA_IMAGE')
+        with tempfile.TemporaryDirectory() as data_dir, override_settings(DATA_DIR=data_dir):
+            with self.assertRaisesMessage(ValidationError, 'Select a Panda image'):
+                self.provider.validate_deployment()
+
+    def test_invalid_offline_manifest_is_exposed_as_deployment_error(self):
+        from pathlib import Path
+        from django.test import override_settings
+
+        with tempfile.TemporaryDirectory() as data_dir, override_settings(DATA_DIR=data_dir):
+            resources = Path(data_dir) / 'virtualapp'
+            resources.mkdir()
+            (resources / 'manifest.json').write_text('{invalid')
+            error = AppProviderSerializer.get_deployment_error(self.provider)
+        self.assertIn('Invalid offline deployment resources', error)
+
+    def test_deployment_api_rejects_invalid_account_and_reserved_ssh_port(self):
         self.account.secret = ''
         self.account.save()
         with self.assertRaisesMessage(ValidationError, 'SSH account'):
-            self.provider.validate_deployment()
+            self.create_deployment()
         self.account.secret = 'test-secret'
         self.account.save()
         self.provider.host.protocols.filter(name='ssh').update(port=6900)
         with self.assertRaisesMessage(ValidationError, 'SSH port'):
-            self.provider.validate_deployment()
+            self.create_deployment()
+        self.assertFalse(AppProviderDeployment.objects.filter(provider=self.provider).exists())
 
     def test_live_containers_block_deployment(self):
         self.cache.get.return_value = [{'container_id': 'running-container'}]

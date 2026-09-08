@@ -73,8 +73,6 @@ class AppProviderViewSet(JMSBulkModelViewSet):
         # Registration is performed by the provider service account. Runtime
         # routing and host binding remain administrator-controlled settings.
         data['host'] = None
-        data['runtime_type'] = AppProvider.RuntimeType.docker
-        data['service_url'] = ''
         data['deploy_options'] = {}
         serializer.save(**data)
 

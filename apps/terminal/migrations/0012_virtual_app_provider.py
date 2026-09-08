@@ -24,16 +24,6 @@ class Migration(migrations.Migration):
             field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='app_provider', to='assets.host', verbose_name='Host'),
         ),
         migrations.AddField(
-            model_name='appprovider',
-            name='runtime_type',
-            field=models.CharField(choices=[('docker', 'Docker'), ('podman', 'Podman')], default='docker', max_length=16, verbose_name='Runtime type'),
-        ),
-        migrations.AddField(
-            model_name='appprovider',
-            name='service_url',
-            field=models.URLField(blank=True, default='', max_length=1024, verbose_name='Service URL'),
-        ),
-        migrations.AddField(
             model_name='virtualapppublication',
             name='app_version',
             field=models.CharField(blank=True, default='', max_length=16, verbose_name='Published version'),
