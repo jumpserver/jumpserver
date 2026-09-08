@@ -2,7 +2,7 @@
 
 - hosts: all
   vars:
-    applet_name: chrome
+    applet_name: weblite
 
   tasks:
     - name: Install applet
