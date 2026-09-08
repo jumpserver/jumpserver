@@ -13800,6 +13800,12 @@ msgstr "许可证无效"
 #~ msgid "Ticket already closed"
 #~ msgstr "工单已经关闭"
 
+#: assets/models/asset/web.py assets/const/protocol.py
+msgid ""
+"Selector for an element that appears only after a successful login, e.g. css=#dashboard. "
+"Required for basic autofill."
+msgstr "用于定位仅在登录成功后出现的页面元素，例如 css=#dashboard。基本自动填充模式下必填。"
+
 msgid "Interactive selector"
 msgstr "可交互区域选择器"
 
