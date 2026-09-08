@@ -57,5 +57,6 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             enforce_unique_favorite_asset,
             reverse_code=migrations.RunPython.noop,
+            atomic=False,
         ),
     ]
