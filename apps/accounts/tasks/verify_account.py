@@ -13,6 +13,7 @@ logger = get_logger(__name__)
 __all__ = [
     'verify_accounts_connectivity_task',
     'verify_change_secret_records_task',
+    'verify_personal_credentials_task',
 ]
 
 
@@ -61,6 +62,52 @@ def verify_accounts_connectivity_task(account_ids):
     task_name = gettext_noop("Verify accounts connectivity")
     task_name = VerifyAccountAutomation.generate_unique_name(task_name)
     return verify_accounts_connectivity_util(accounts, task_name)
+
+
+@shared_task(
+    queue="ansible",
+    verbose_name=_('Verify personal credential connectivity'),
+    description=_("Verify a user's personal asset credential"),
+)
+def verify_personal_credentials_task(
+        credential_ids, user_id, org_id, asset_ids, remote_addr=None,
+        credential_versions=None,
+):
+    from accounts.models import (
+        PersonalAssetCredential, VerifyAccountAutomation,
+    )
+
+    with tmp_to_org(org_id):
+        if credential_versions is None:
+            credential_versions = dict(
+                PersonalAssetCredential.objects.filter(
+                    id__in=credential_ids,
+                    owner_id=user_id,
+                ).values_list('id', 'version')
+            )
+        task_name = gettext_noop("Verify personal credential connectivity")
+        task_name = VerifyAccountAutomation.generate_unique_name(task_name)
+        snapshot = {
+            'accounts': [],
+            'assets': [str(item) for item in asset_ids],
+            'personal_credentials': [str(item) for item in credential_ids],
+            'personal_credential_versions': {
+                str(key): value
+                for key, value in credential_versions.items()
+            },
+            'personal_credential_owner_id': str(user_id),
+            'personal_credential_remote_addr': remote_addr,
+        }
+        execution = quickstart_automation_by_snapshot(
+            task_name, AutomationTypes.verify_account, snapshot
+        )
+        execution.refresh_from_db(fields=('status',))
+        if not execution.is_success:
+            raise RuntimeError(str(_('Personal credential verification failed')))
+        return {
+            'execution': str(execution.id),
+            'success': True,
+        }
 
 
 def change_secret_record_activity_callback(

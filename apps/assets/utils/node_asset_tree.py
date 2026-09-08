@@ -56,11 +56,6 @@ def _select_relations_within_tree_budget(
 def _serialize_search_node(
         node, response_parent_keys, asset_parent_keys=(), matched=False
 ):
-    has_children = bool(
-        getattr(node, 'has_children', False) or
-        node.key in response_parent_keys or
-        node.key in asset_parent_keys
-    )
     open_node = bool(
         node.key in response_parent_keys or
         node.key in asset_parent_keys
@@ -74,8 +69,6 @@ def _serialize_search_node(
         'name': node.value,
         'title': node.value,
         'pId': node.parent_key,
-        'isParent': has_children,
-        'hasChildren': has_children,
         'open': open_node,
         'meta': {
             'type': 'node',
@@ -85,7 +78,6 @@ def _serialize_search_node(
                 'tree_key': tree_key,
                 'key': node.key,
                 'value': node.value,
-                'has_children': has_children,
                 'matched': matched,
             },
         },
@@ -164,7 +156,7 @@ def _search_nodes(
     )
 
     nodes = list(
-        Node.objects.filter(key__in=ancestor_keys).with_has_children()
+        Node.objects.filter(key__in=ancestor_keys)
         .only('id', 'key', 'value', 'parent_key', 'org_id')
         .order_by('key')
     )
@@ -259,7 +251,7 @@ def _search_assets(
         node_ids.add(node_id)
 
     nodes = list(
-        Node.objects.filter(key__in=ancestor_keys).with_has_children()
+        Node.objects.filter(key__in=ancestor_keys)
         .only('id', 'key', 'value', 'parent_key', 'org_id')
         .order_by('key')
     )
@@ -322,12 +314,6 @@ def _merge_search_tree_rows(*trees):
                 rows.append(copied)
                 continue
 
-            has_children = bool(
-                existing.get('hasChildren') or item.get('hasChildren') or
-                existing.get('isParent') or item.get('isParent')
-            )
-            existing['hasChildren'] = has_children
-            existing['isParent'] = has_children
             existing['open'] = bool(existing.get('open') or item.get('open'))
             existing_data = existing['meta']['data']
             item_data = item.get('meta', {}).get('data', {})
@@ -335,7 +321,6 @@ def _merge_search_tree_rows(*trees):
                 existing_data.get('matched') or item_data.get('matched')
             )
             existing_data.update(item_data)
-            existing_data['has_children'] = has_children
             existing_data['matched'] = matched
     return rows
 

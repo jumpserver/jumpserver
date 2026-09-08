@@ -286,6 +286,9 @@ class OpenBaoSSHCAClient(OpenBaoKVClient):
     def is_active(self):
         try:
             self._check_health()
+            self._request(
+                'GET', '/v1/auth/token/lookup-self', expected_statuses=(200,)
+            )
             public_key = self.get_public_key()
             if not public_key:
                 raise OpenBaoAPIError('OpenBao SSH CA public key is empty')

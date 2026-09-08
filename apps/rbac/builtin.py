@@ -10,7 +10,7 @@ _view_all_joined_org_perms = (
 )
 
 chat_ai_user_perms = (
-    ('chat_ai', 'conversation', 'use', 'chatai'),
+    ('chat_ai', 'runtimestore', 'use', 'chatai'),
 )
 
 user_perms = (

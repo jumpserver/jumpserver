@@ -7,7 +7,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
-from rest_framework.compat import coreapi
 
 from assets.const import AllTypes, Category
 from assets.models import Asset
@@ -45,12 +44,16 @@ class UUIDFilterMixin:
 class NodeFilterBackend(filters.BaseFilterBackend):
     fields = ['node_id']
 
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name=field, location='query', required=False,
-                type='string', example='', description='', schema=None,
-            )
+            {
+                'name': field,
+                'in': 'query',
+                'required': False,
+                'description': '',
+                'schema': {'type': 'string'},
+                'example': '',
+            }
             for field in self.fields
         ]
 

@@ -92,7 +92,12 @@ class OperateLogStore(object):
         before = kwargs.pop('before') or {}
         after = kwargs.pop('after') or {}
 
-        op_log = self.model.objects.filter(pk=log_id).first()
+        # New operation logs do not have an ID to look up. Avoid an empty
+        # SELECT on every append-only audit event, including credential use.
+        op_log = (
+            self.model.objects.filter(pk=log_id).first()
+            if log_id else None
+        )
         if op_log is not None:
             op_log_diff = op_log.diff or {}
             op_before, op_after = self.convert_diff_to_before_after(op_log_diff)

@@ -5970,6 +5970,10 @@ msgstr "作業指示情報"
 msgid "Actions"
 msgstr "アクション"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 証明書署名が無効になっています"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6241,6 +6245,32 @@ msgstr ""
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "管理者の場合は、configを更新して解決することができます。"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "ブラウザが CSRF Cookie を送信していないため、ログインできません。管理者にお問い合わせください"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"管理者の場合は、SESSION_COOKIE_DOMAIN "
+"の設定に誤りがないか確認してください。アクセスに使用するドメインはその値またはそのサブドメインである必要があり、そうでない場合ブラウザは Cookie "
+"を保存しません。設定を修正するか削除してください"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "未設定"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "ブラウザで Cookie が有効になっていることを確認し、サイトの Cookie を削除してから再試行してください"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -8581,10 +8611,6 @@ msgstr "ターミナルの設定を変えることができます"
 msgid "Can change other setting"
 msgstr "他の設定を変えることができます"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "チャットのヒント"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "アカウントバックアップルートタスクの結果の通知"
@@ -9525,53 +9551,9 @@ msgstr "アクセスキーシークレット"
 msgid "Chat AI"
 msgstr "チャットAI"
 
-#: rbac/tree.py
-msgid "Conversations"
-msgstr "会話管理"
-
-#: rbac/tree.py
-msgid "Messages and attachments"
-msgstr "メッセージと添付ファイル"
-
-#: rbac/tree.py
-msgid "Runs and approvals"
-msgstr "実行と承認"
-
-#: rbac/tree.py
-msgid "API call audits"
-msgstr "API呼び出し監査"
-
-#: chat_ai/models.py
-msgid "Chat AI conversation"
-msgstr "チャットAIの会話"
-
 #: chat_ai/models.py
 msgid "Can use Chat AI"
 msgstr "Chat AI を使用できます"
-
-#: chat_ai/models.py
-msgid "Chat AI message"
-msgstr "チャットAIのメッセージ"
-
-#: chat_ai/models.py
-msgid "Chat AI message file"
-msgstr "チャットAIのメッセージファイル"
-
-#: chat_ai/models.py
-msgid "Chat AI message image"
-msgstr "チャットAIのメッセージ画像"
-
-#: chat_ai/models.py
-msgid "Chat AI agent run"
-msgstr "チャットAIエージェントの実行"
-
-#: chat_ai/models.py
-msgid "Chat AI approval"
-msgstr "チャットAIの承認"
-
-#: chat_ai/models.py
-msgid "Chat AI API call audit"
-msgstr "チャットAIのAPI呼び出し監査"
 
 #: settings/serializers/feature.py:158
 msgid "Method"
@@ -10045,6 +10027,18 @@ msgstr "管理者のみ"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "グローバル有効化MFA認証"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "許可する MFA 方式"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "ユーザーがバインドして使用できる MFA 方式を 1 つ以上選択してください"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "MFA 方式を少なくとも 1 つ選択してください"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -12881,6 +12875,14 @@ msgstr "アバターURL"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA レベル"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "許可する MFA タイプ"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "空の場合はグローバルな MFA 方式を継承します"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
