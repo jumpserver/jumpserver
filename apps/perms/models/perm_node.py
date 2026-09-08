@@ -1,70 +1,11 @@
-from django.db import models
-from django.db.models import F, TextChoices
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Account
-from assets.models import Asset, Node, FamilyMixin
+from assets.models import Asset, Node
 from common.utils import lazyproperty
-from orgs.mixins.models import JMSOrgBaseModel
-
-
-class NodeFrom(TextChoices):
-    granted = 'granted', 'Direct node granted'
-    child = 'child', 'Have children node'
-    asset = 'asset', 'Direct asset granted'
-
-
-class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
-    NodeFrom = NodeFrom
-
-    id = models.AutoField(
-        auto_created=True, primary_key=True, serialize=False, verbose_name=_('ID')
-    )
-    user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
-    node = models.ForeignKey(
-        'assets.Node', default=None, on_delete=models.CASCADE, db_constraint=False, null=False,
-        related_name='granted_node_rels'
-    )
-    node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
-    node_parent_key = models.CharField(
-        max_length=64, default='', verbose_name=_('Parent key'), db_index=True
-    )
-    node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
-    node_assets_amount = models.IntegerField(default=0)
-    comment = ''
-
-    def __str__(self):
-        return f'{self.user}|{self.node}'
-
-    @property
-    def key(self):
-        return self.node_key
-
-    @property
-    def parent_key(self):
-        return self.node_parent_key
-
-    @classmethod
-    def get_node_from_with_node(cls, user, key):
-        """ 获取用户授权的节点的来源
-        这种情况就是因为 父节点被授权了, 找到是因为那个节点授权， 自己才会出现在授权树中
-        """
-        ancestor_keys = set(cls.get_node_ancestor_keys(key, with_self=True))
-        # 被授权的祖先节点
-        # Todo 每个节点都过滤速度不慢吗 ?
-        ancestor_nodes = cls.objects.filter(user=user, node_key__in=ancestor_keys)
-        for node in ancestor_nodes:
-            # 如果是直接授权的节点
-            if node.key == key:
-                return node.node_from, node
-            if node.node_from == cls.NodeFrom.granted:
-                return node.node_from, None
-        return '', None
 
 
 class PermNode(Node):
-    NodeFrom = NodeFrom
-
     class Meta:
         proxy = True
         ordering = []
@@ -75,19 +16,8 @@ class PermNode(Node):
     FAVORITE_NODE_KEY = 'favorite'
     FAVORITE_NODE_VALUE = _('Favorite')
 
-    node_from = ''
-    granted_assets_amount = 0
-
-    annotate_granted_node_rel_fields = {
-        'granted_assets_amount': F('granted_node_rels__node_assets_amount'),
-        'node_from': F('granted_node_rels__node_from')
-    }
-
     def __str__(self):
         return f'{self.name}'
-
-    def use_granted_assets_amount(self):
-        self.assets_amount = self.granted_assets_amount
 
     @classmethod
     def get_ungrouped_node(cls, assets_amount):
@@ -107,15 +37,6 @@ class PermNode(Node):
         )
         node.assets_amount = assets_amount
         return node
-
-    def compute_node_from_and_assets_amount(self, user):
-        node_from, node = UserAssetGrantedTreeNodeRelation.get_node_from_with_node(
-            user, self.key
-        )
-        self.node_from = node_from
-        #
-        if node:
-            self.granted_assets_amount = node.node_assets_amount
 
     def save(self):
         """ 这是个只读 Model """

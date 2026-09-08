@@ -2,17 +2,29 @@ from collections import defaultdict
 from uuid import UUID
 
 from django.db.models import OuterRef, Q, Subquery
+from django.utils.translation import gettext as _
 
 from orgs.models import Organization
 from orgs.utils import current_org
 from users.models import User, UserGroup
 
 
-__all__ = ['UserGroupTree']
+__all__ = ['UserGroupTree', 'get_ungrouped_users']
+
+
+def get_ungrouped_users(users=None, groups=None):
+    """Users with no group in the current organization scope."""
+    if users is None:
+        users = User.get_org_users(current_org).order_by()
+    if groups is None:
+        groups = UserGroup.objects.all()
+    return users.exclude(
+        groups__id__in=groups.order_by().values('id')
+    ).distinct()
 
 
 class UserGroupTree:
-    """Build the organization -> groups/users tree without N+1 queries."""
+    """Build organization -> real/virtual groups -> users without N+1 queries."""
 
     def __init__(self):
         self.org = current_org
@@ -91,6 +103,22 @@ class UserGroupTree:
             {str(org_id): name for org_id, name in rows}
         )
 
+    def _ungrouped_group_node(self):
+        name = _('Ungrouped users')
+        return {
+            'id': f'ungrouped_users:{self.org_id}',
+            'pId': self.org_id,
+            'name': name,
+            'username': '',
+            'hasChildren': True,
+            'isParent': True,
+            '_isLeaf': False,
+            'meta': self._node_meta(
+                'ungrouped_users', self.org_id,
+                name=name, org_id=self.org_id,
+            ),
+        }
+
     @staticmethod
     def _user_node(user, parent_id, parent_type='user_group'):
         user_id = str(user.id)
@@ -116,12 +144,11 @@ class UserGroupTree:
         return queryset.order_by(*fields)
 
     def _ungrouped_users(self):
-        group_ids = self.groups.values('id')
-        return self.users.exclude(groups__id__in=group_ids).distinct()
+        return get_ungrouped_users(self.users, self.groups)
 
     def root(self):
-        has_children = self.groups.exists() or self.users.exists()
-        return [self._organization_node(has_children)]
+        # The virtual group is always present; probe its users only on expand.
+        return [self._organization_node(True)]
 
     def children(
         self, parent_type, parent_id, order='name', limit=1000, offset=0
@@ -132,9 +159,13 @@ class UserGroupTree:
                     [], limit, False, offset=offset, paginated=True
                 )
             ordered_groups = self.groups.order_by('name', 'org_id', 'id')
-            group_count = ordered_groups.count()
-            group_limit = min(limit, max(group_count - offset, 0))
-            groups = list(ordered_groups[offset:offset + group_limit])
+            nodes = [self._ungrouped_group_node()] if offset == 0 else []
+            remaining = limit - len(nodes)
+            group_offset = max(offset - 1, 0)
+            candidates = list(
+                ordered_groups[group_offset:group_offset + remaining + 1]
+            )
+            groups = candidates[:remaining]
             self._set_group_org_names(groups)
             group_ids = [group.id for group in groups]
             groups_with_users = set(
@@ -143,38 +174,32 @@ class UserGroupTree:
                     user_id__in=self.users.values('id'),
                 ).values_list('usergroup_id', flat=True).distinct()
             )
-            nodes = [
+            nodes.extend(
                 self._group_node(group, group.id in groups_with_users)
                 for group in groups
-            ]
-            remaining = limit - len(nodes)
-            user_offset = max(offset - group_count, 0)
-            ungrouped = self._ordered_users(self._ungrouped_users(), order)
-            user_candidates = []
-            if remaining:
-                user_candidates = list(
-                    ungrouped[user_offset:user_offset + remaining + 1]
-                )
-                users = user_candidates[:remaining]
-                nodes.extend(
-                    self._user_node(
-                        user, self.org_id, parent_type='organization'
-                    )
-                    for user in users
-                )
-            groups_remain = offset + len(groups) < group_count
-            if groups_remain:
-                truncated = True
-            elif remaining:
-                truncated = len(user_candidates) > remaining
-            else:
-                truncated = ungrouped[user_offset:user_offset + 1].exists()
-            matched_user_count = sum(
-                node['meta']['type'] == 'user' for node in nodes
             )
             return self._result_envelope(
-                nodes, limit, truncated, offset=offset, paginated=True,
-                matched_user_count=matched_user_count,
+                nodes, limit, len(candidates) > remaining,
+                offset=offset, paginated=True,
+            )
+
+        if parent_type == 'ungrouped_users':
+            if str(parent_id) != self.org_id:
+                return self._result_envelope(
+                    [], limit, False, offset=offset, paginated=True
+                )
+            queryset = self._ordered_users(self._ungrouped_users(), order)
+            candidates = list(queryset[offset:offset + limit + 1])
+            nodes = [
+                self._user_node(
+                    user, f'ungrouped_users:{self.org_id}',
+                    parent_type='ungrouped_users',
+                )
+                for user in candidates[:limit]
+            ]
+            return self._result_envelope(
+                nodes, limit, len(candidates) > limit,
+                offset=offset, paginated=True, matched_user_count=len(nodes),
             )
 
         group = self.groups.filter(id=parent_id).first()
@@ -265,7 +290,31 @@ class UserGroupTree:
         matching_only_groups = [
             group for group in groups if group.id not in parent_group_ids
         ]
+        ungrouped_users = [
+            user for user in matched_users
+            if user.tree_parent_group_id is None
+            or user.tree_parent_group_id not in resolved_parent_ids
+        ]
+        if ungrouped_users:
+            nodes.append(self._ungrouped_group_node())
+            remaining -= 1
+            visible_users = ungrouped_users[:remaining]
+            nodes.extend(
+                self._user_node(
+                    user, f'ungrouped_users:{self.org_id}',
+                    parent_type='ungrouped_users',
+                )
+                for user in visible_users
+            )
+            visible_user_ids.update(user.id for user in visible_users)
+            remaining -= len(visible_users)
+            if len(visible_users) < len(ungrouped_users):
+                budget_truncated = True
+
         for group in parent_groups:
+            if remaining == 0:
+                budget_truncated = True
+                break
             user_ids = user_ids_by_group[group.id]
             nodes.append(
                 self._group_node(group, group.id in groups_with_users)
@@ -287,26 +336,6 @@ class UserGroupTree:
             if len(visible_users) < len(users):
                 budget_truncated = True
                 break
-
-        ungrouped_users = [
-            user for user in matched_users
-            if user.tree_parent_group_id is None
-            or user.tree_parent_group_id not in resolved_parent_ids
-        ]
-        if ungrouped_users and remaining:
-            visible_users = ungrouped_users[:remaining]
-            nodes.extend(
-                self._user_node(
-                    user, self.org_id, parent_type='organization'
-                )
-                for user in visible_users
-            )
-            visible_user_ids.update(user.id for user in visible_users)
-            remaining -= len(visible_users)
-            if len(visible_users) < len(ungrouped_users):
-                budget_truncated = True
-        elif ungrouped_users:
-            budget_truncated = True
 
         for group in matching_only_groups:
             if remaining == 0:

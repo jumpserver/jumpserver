@@ -40,7 +40,7 @@ class AssetPermissionTreeMetricsApi(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         results = get_permission_tree_metrics(
-            items=data['items'], metric=data['metric']
+            items=data['resources'], metric=data['metric']
         )
         return Response({
             'metric': data['metric'],

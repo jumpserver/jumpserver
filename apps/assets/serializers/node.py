@@ -10,7 +10,7 @@ __all__ = [
     "NodeAssetsSerializer", "NodeAssetsAmountQuerySerializer",
     "NodeAssetTreeSearchQuerySerializer", "NodeTreeMetricsQuerySerializer",
     "NodeTreeAssetsLimitQuerySerializer", "NodeTreeAssetsOrderQuerySerializer",
-    "NodeTaskSerializer",
+    "NodeTaskSerializer", "NodeTreeQuerySerializer", "CategoryTreeMetricsQuerySerializer",
 ]
 
 
@@ -91,7 +91,6 @@ class NodeAssetsAmountQuerySerializer(serializers.Serializer):
     node_ids = serializers.ListField(
         child=serializers.UUIDField(),
         allow_empty=False,
-        max_length=200,
     )
     include_descendants = serializers.BooleanField(
         default=True,
@@ -124,6 +123,36 @@ class NodeAssetTreeSearchQuerySerializer(serializers.Serializer):
         return attrs
 
 
+class NodeTreeQuerySerializer(serializers.Serializer):
+    """Explicit tree options; legacy names remain accepted for older clients."""
+    include_nodes = serializers.BooleanField(default=True)
+    include_assets = serializers.BooleanField(default=False)
+    include_asset_count = serializers.BooleanField(default=True)
+    node_page_size = serializers.IntegerField(
+        min_value=1, max_value=100, required=False
+    )
+    asset_page_size = serializers.IntegerField(
+        min_value=1, max_value=1000, required=False
+    )
+    asset_offset = serializers.IntegerField(min_value=0, default=0)
+    asset_order_by = serializers.ChoiceField(
+        choices=('name', 'address'), default='name'
+    )
+
+    def to_internal_value(self, data):
+        data = data.copy()
+        aliases = {
+            'nodes': 'include_nodes', 'assets': 'include_assets',
+            'asset_amount': 'include_asset_count',
+            'node_limit': 'node_page_size', 'assets_limit': 'asset_page_size',
+            'assets_offset': 'asset_offset', 'asset_order': 'asset_order_by',
+        }
+        for old, new in aliases.items():
+            if new not in data and old in data:
+                data[new] = data[old]
+        return super().to_internal_value(data)
+
+
 class NodeTreeAssetsLimitQuerySerializer(serializers.Serializer):
     assets_limit = serializers.IntegerField(min_value=1, max_value=1000)
     assets_offset = serializers.IntegerField(
@@ -145,8 +174,8 @@ class TreeMetricItemSerializer(serializers.Serializer):
 class NodeTreeMetricsQuerySerializer(serializers.Serializer):
     METRIC_CHOICES = ('asset_all', 'asset_direct', 'search_assets')
 
-    items = TreeMetricItemSerializer(
-        many=True, allow_empty=False, max_length=200
+    resources = TreeMetricItemSerializer(
+        many=True, allow_empty=False
     )
     metric = serializers.ChoiceField(choices=METRIC_CHOICES)
     search = serializers.CharField(
@@ -154,6 +183,12 @@ class NodeTreeMetricsQuerySerializer(serializers.Serializer):
         trim_whitespace=True,
     )
     fresh = serializers.BooleanField(default=False, required=False)
+
+    def to_internal_value(self, data):
+        data = data.copy()
+        if 'resources' not in data and 'items' in data:
+            data['resources'] = data['items']
+        return super().to_internal_value(data)
 
     def validate(self, attrs):
         if attrs['metric'] == 'search_assets' and not attrs.get('search'):
@@ -163,14 +198,28 @@ class NodeTreeMetricsQuerySerializer(serializers.Serializer):
 
         seen = set()
         items = []
-        for item in attrs['items']:
+        for item in attrs['resources']:
             identity = (item['type'], item['id'])
             if identity in seen:
                 continue
             seen.add(identity)
             items.append(item)
-        attrs['items'] = items
+        attrs['resources'] = items
         return attrs
+
+
+class CategoryTreeMetricResourceSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=('category', 'type', 'platform'))
+    id = serializers.CharField(max_length=256)
+
+
+class CategoryTreeMetricsQuerySerializer(serializers.Serializer):
+    resources = CategoryTreeMetricResourceSerializer(many=True, allow_empty=False)
+    count_resource = serializers.ChoiceField(choices=('asset', 'account'), default='asset')
+
+    @staticmethod
+    def validate_resources(resources):
+        return list({(item['type'], item['id']): item for item in resources}.values())
 
 
 class NodeAddChildrenSerializer(serializers.Serializer):

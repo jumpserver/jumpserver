@@ -12,6 +12,7 @@ from accounts.const import ChangeSecretRecordStatusChoice, Source
 from accounts.filters import AccountFilterSet, NodeFilterBackend
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import Account, ChangeSecretRecord, AccountTemplate
+from accounts.tree import get_account_tree_metrics
 from assets.const.gpt import create_or_update_chatx_resources
 from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
@@ -47,6 +48,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'move_to_assets': 'accounts.delete_account',
         'copy_to_assets': 'accounts.add_account',
         'chat': 'accounts.view_account',
+        'tree_metrics': 'accounts.view_account',
     }
     export_as_zip = True
 
@@ -59,6 +61,18 @@ class AccountViewSet(OrgBulkModelViewSet):
         asset = get_object_or_404(Asset, pk=asset_id)
         queryset = asset.all_accounts.all()
         return queryset
+
+    @action(methods=['post'], detail=False, url_path='tree-metrics',
+            serializer_class=serializers.AccountTreeMetricsQuerySerializer)
+    def tree_metrics(self, request):
+        serializer = serializers.AccountTreeMetricsQuerySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        results = get_account_tree_metrics(
+            data['resources'], accounts=self.get_queryset(),
+            include_descendants=data['include_descendants'],
+        )
+        return Response({'results': results})
 
     def perform_bulk_create(self, serializer):
         result = super().perform_create(serializer)

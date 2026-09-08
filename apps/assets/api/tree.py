@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -18,7 +19,7 @@ from ..models import Node, Platform, Asset
 from ..pagination import NodeTreeCursorPagination
 from ..utils import (
     attach_nodes_realtime_assets_amount, get_asset_tree_metrics,
-    search_node_asset_tree,
+    search_node_asset_tree, get_category_tree_metrics,
 )
 
 logger = get_logger(__file__)
@@ -28,7 +29,7 @@ __all__ = [
     'NodeAssetsAmountApi',
     'NodeAssetTreeSearchApi',
     'NodeTreeMetricsApi',
-    'CategoryTreeApi',
+    'CategoryTreeApi', 'CategoryTreeMetricsApi',
 ]
 
 
@@ -64,7 +65,8 @@ class NodeChildrenApi(NodeAssetsAmountListMixin, generics.ListCreateAPIView):
 
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
-        key = self.request.query_params.get("key")
+        key = (self.request.query_params.get("parent_key") or
+               self.request.query_params.get("key"))
 
         if not pk and not key:
             self.is_initial = True
@@ -124,28 +126,22 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     """
     model = Node
 
-    def get_assets_pagination(self):
-        raw_limit = self.request.query_params.get('assets_limit')
-        if raw_limit is None:
-            return None, 0
-        serializer = serializers.NodeTreeAssetsLimitQuerySerializer(data={
-            'assets_limit': raw_limit,
-            'assets_offset': self.request.query_params.get(
-                'assets_offset', 0
-            ),
-        })
+    @cached_property
+    def tree_query(self):
+        serializer = serializers.NodeTreeQuerySerializer(
+            data=self.request.query_params
+        )
         serializer.is_valid(raise_exception=True)
+        return serializer.validated_data
+
+    def get_assets_pagination(self):
         return (
-            serializer.validated_data['assets_limit'],
-            serializer.validated_data['assets_offset'],
+            self.tree_query.get('asset_page_size'),
+            self.tree_query['asset_offset'],
         )
 
     def get_assets_order(self):
-        serializer = serializers.NodeTreeAssetsOrderQuerySerializer(data={
-            'asset_order': self.request.query_params.get('asset_order', 'name'),
-        })
-        serializer.is_valid(raise_exception=True)
-        return serializer.validated_data['asset_order']
+        return self.tree_query['asset_order_by']
 
     def filter_queryset(self, queryset):
         """ queryset is Node queryset """
@@ -157,10 +153,10 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
     def get_queryset_for_assets(self):
         query_all = self.request.query_params.get("all", "0") == "all"
-        include_assets = self.request.query_params.get('assets', '0') == '1'
+        include_assets = self.tree_query['include_assets']
         if not self.instance or not include_assets:
             return Asset.objects.none()
-        has_assets_limit = 'assets_limit' in self.request.query_params
+        has_assets_limit = 'asset_page_size' in self.tree_query
         if (
                 not self.request.GET.get('search') and
                 self.instance.is_org_root() and not has_assets_limit
@@ -173,7 +169,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         return assets.only(
             "id", "name", "address", "platform_id",
             "org_id", "is_active", 'comment'
-        ).prefetch_related('platform')
+        )
 
     def filter_queryset_for_assets(self, assets):
         search = self.request.query_params.get('search')
@@ -185,7 +181,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     def paginate_nodes(self, nodes):
         query_params = self.request.query_params
         pagination_requested = (
-            'node_limit' in query_params or
+            'node_page_size' in self.tree_query or
             'node_cursor' in query_params
         )
         if not pagination_requested:
@@ -207,6 +203,8 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             )
 
         paginator = NodeTreeCursorPagination()
+        if 'node_page_size' in query_params:
+            paginator.page_size_query_param = 'node_page_size'
         page = paginator.paginate_queryset(nodes, self.request, view=self)
         page = list(page)
 
@@ -215,9 +213,9 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         return page, paginator, include_initial_root
 
     def list(self, request, *args, **kwargs):
-        include_assets = request.query_params.get('assets', '0') == '1'
-        include_nodes = request.query_params.get('nodes', '1') != '0'
-        with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
+        include_assets = self.tree_query['include_assets']
+        include_nodes = self.tree_query['include_nodes']
+        with_asset_amount = self.tree_query['include_asset_count']
         query_all = request.query_params.get('all', '0') == 'all'
         compact = request.query_params.get('compact', '0') == '1'
         assets_limit, assets_offset = self.get_assets_pagination()
@@ -385,7 +383,7 @@ class NodeTreeMetricsApi(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         results = get_asset_tree_metrics(
-            items=data['items'],
+            items=data['resources'],
             metric=data['metric'],
             search=data.get('search'),
             fresh=data['fresh'],
@@ -394,6 +392,26 @@ class NodeTreeMetricsApi(generics.CreateAPIView):
             'metric': data['metric'],
             'results': results,
         })
+
+
+class CategoryTreeMetricsApi(generics.CreateAPIView):
+    serializer_class = serializers.CategoryTreeMetricsQuerySerializer
+
+    @property
+    def rbac_perms(self):
+        permission = (
+            'accounts.view_account' if self.request.data.get('count_resource') == 'account'
+            else 'assets.view_asset'
+        )
+        return {'POST': permission}
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        return Response({'results': get_category_tree_metrics(
+            data['resources'], count_resource=data['count_resource'],
+        )})
 
 
 class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
