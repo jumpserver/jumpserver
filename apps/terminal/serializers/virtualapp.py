@@ -1,5 +1,3 @@
-import re
-
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db import transaction
@@ -48,7 +46,7 @@ class VirtualAppSerializer(ManifestI18nMixin, serializers.ModelSerializer):
         )
         instance = super().update(instance, validated_data)
         if image_changed:
-            instance.publications.update(status=PublishStatus.mismatch, app_version='', image_digest='')
+            instance.publications.update(status=PublishStatus.mismatch, app_version='')
         return instance
 
 
@@ -63,15 +61,15 @@ class VirtualAppPublicationSerializer(serializers.ModelSerializer):
         fields_mini = ['id', 'provider', 'app']
         read_only_fields = ['date_created', 'date_updated', 'date_synced']
         fields = fields_mini + [
-            'status', 'app_version', 'image_digest', 'date_synced', 'comment'
+            'status', 'app_version', 'date_synced', 'comment'
         ] + ['date_created', 'date_updated']
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        sync_fields = {'status', 'app_version', 'image_digest'}
+        sync_fields = {'status', 'app_version'}
         if sync_fields & validated_data.keys():
             # Serialize reports with changes to the desired app version and
-            # compare them against the latest confirmed publication state.
+            # compare them against the latest published version.
             app = VirtualApp.objects.select_for_update().get(pk=instance.app_id)
             instance.refresh_from_db(
                 fields=sync_fields,
@@ -90,41 +88,13 @@ class VirtualAppPublicationSerializer(serializers.ModelSerializer):
                     'app_version': _('Reported version does not match the current application version')
                 })
             if instance.provider.host_id:
-                reported_digest = validated_data.get('image_digest')
-                confirmed = bool(instance.app_version and instance.image_digest)
-                confirms_image = bool(
-                    validated_data.get('status') == PublishStatus.success
-                    and reported_version == app.version
-                    and re.fullmatch(r'sha256:[a-f0-9]{64}', reported_digest or '')
-                )
-                # Panda verifies legacy RepoDigests against the local image
-                # before reporting its ID. Migration is allowed only once.
-                migrate_digest = (
-                    confirms_image and reported_version == instance.app_version
-                    and re.fullmatch(r'.+@sha256:[a-f0-9]{64}', instance.image_digest)
-                )
-                if confirmed and (not confirms_image or current_version_published):
-                    if reported_version not in (None, '', instance.app_version):
-                        raise serializers.ValidationError({
-                            'app_version': _('Reported version does not match the confirmed publication')
-                        })
-                    if reported_digest not in (None, '', instance.image_digest) and not migrate_digest:
-                        raise serializers.ValidationError({
-                            'image_digest': _('Reported image does not match the confirmed publication')
-                        })
-                    if not reported_version or not reported_digest:
-                        # Old Panda reports cannot verify image identity. Do
-                        # not let them restore or invalidate a confirmed image.
-                        validated_data.pop('status', None)
-                if reports_success and not confirms_image:
-                    if confirmed:
-                        validated_data.pop('status', None)
-                    else:
-                        validated_data['status'] = PublishStatus.mismatch
-                # A completed Panda pull can confirm or refresh an unpublished
-                # image; failures and incomplete reports never erase identity.
-                if not confirms_image:
+                # Reports without a version cannot change a known publication.
+                if reported_version is None and instance.app_version:
+                    validated_data.pop('status', None)
+                elif reports_success and reported_version != app.version:
+                    validated_data['status'] = PublishStatus.mismatch
+                # Failed or incomplete reports keep the last published version.
+                if validated_data.get('status') != PublishStatus.success:
                     validated_data.pop('app_version', None)
-                    validated_data.pop('image_digest', None)
             validated_data['date_synced'] = timezone.now()
         return super().update(instance, validated_data)

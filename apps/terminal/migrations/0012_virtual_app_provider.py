@@ -30,11 +30,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='virtualapppublication',
-            name='image_digest',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Image digest'),
-        ),
-        migrations.AddField(
-            model_name='virtualapppublication',
             name='date_synced',
             field=models.DateTimeField(blank=True, null=True, verbose_name='Date synced'),
         ),

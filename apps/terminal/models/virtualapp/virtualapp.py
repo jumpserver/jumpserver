@@ -171,9 +171,6 @@ class VirtualAppPublication(JMSBaseModel):
     app_version = models.CharField(
         max_length=16, blank=True, default='', verbose_name=_('Published version')
     )
-    image_digest = models.CharField(
-        max_length=255, blank=True, default='', verbose_name=_('Image digest')
-    )
     date_synced = models.DateTimeField(
         null=True, blank=True, verbose_name=_('Date synced')
     )

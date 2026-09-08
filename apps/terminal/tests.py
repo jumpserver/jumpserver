@@ -24,7 +24,7 @@ from terminal.automations.deploy_app_provider import (
 )
 from terminal.const import ComponentLoad
 from terminal.models import Applet, AppProvider, AppProviderDeployment, Terminal, VirtualApp, VirtualAppPublication
-from terminal.serializers import AppProviderSerializer, VirtualAppPublicationSerializer
+from terminal.serializers import AppProviderSerializer
 from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
 from terminal.tasks import run_app_provider_deployment, run_app_provider_deployments
 
@@ -539,7 +539,7 @@ class AppProviderPublicationSyncTests(TestCase):
     def test_image_and_version_change_invalidates_previous_publication(self):
         from terminal.serializers import VirtualAppSerializer
 
-        self.report({'status': 'success', 'app_version': '2.0', 'image_digest': 'sha256:current'})
+        self.report({'status': 'success', 'app_version': '2.0'})
         serializer = VirtualAppSerializer(self.app, data={
             'image_name': 'example/app:v3', 'version': '3.0',
         }, partial=True)
@@ -548,34 +548,28 @@ class AppProviderPublicationSyncTests(TestCase):
         self.publication.refresh_from_db()
         self.assertEqual(self.publication.status, 'mismatch')
         self.assertEqual(self.publication.app_version, '')
-        self.assertEqual(self.publication.image_digest, '')
 
-    def test_native_panda_reports_current_version_and_digest_successfully(self):
-        VirtualAppPublication.objects.filter(pk=self.publication.pk).update(
-            status='success', app_version='2.0', image_digest='sha256:current',
-        )
+    def test_native_panda_reports_current_version_successfully(self):
         publication = self.report({
-            'status': 'success', 'app_version': '2.0', 'image_digest': 'sha256:current',
+            'status': 'success', 'app_version': '2.0',
         })
         self.assertEqual(publication.status, 'success')
         self.assertEqual(publication.app_version, '2.0')
-        self.assertEqual(publication.image_digest, 'sha256:current')
 
     def test_outdated_success_cannot_overwrite_a_newer_success(self):
         VirtualAppPublication.objects.filter(pk=self.publication.pk).update(
-            status='success', app_version='2.0', image_digest='sha256:current',
+            status='success', app_version='2.0',
         )
-        self.report({'status': 'success', 'app_version': '2.0', 'image_digest': 'sha256:current'})
+        self.report({'status': 'success', 'app_version': '2.0'})
         with self.assertRaises(ValidationError):
-            self.report({'status': 'success', 'app_version': '1.0', 'image_digest': 'sha256:old'})
+            self.report({'status': 'success', 'app_version': '1.0'})
         self.publication.refresh_from_db()
         self.assertEqual(self.publication.status, 'success')
         self.assertEqual(self.publication.app_version, '2.0')
-        self.assertEqual(self.publication.image_digest, 'sha256:current')
 
     def test_failed_pull_can_report_previously_observed_version(self):
         publication = self.report({
-            'status': 'failed', 'app_version': '1.0', 'image_digest': 'sha256:old',
+            'status': 'failed', 'app_version': '1.0',
         })
         self.assertEqual(publication.status, 'failed')
         self.assertEqual(publication.app_version, '1.0')
@@ -584,149 +578,43 @@ class AppProviderPublicationSyncTests(TestCase):
         # Keep the serializer instance stale, as when the request was loaded
         # before the current version finished publishing.
         VirtualAppPublication.objects.filter(pk=self.publication.pk).update(
-            status='success', app_version='2.0', image_digest='sha256:current',
+            status='success', app_version='2.0',
         )
         for status in ('failed', 'mismatch'):
             with self.subTest(status=status), self.assertRaises(ValidationError):
                 self.report({
-                    'status': status, 'app_version': '1.0', 'image_digest': 'sha256:old',
+                    'status': status, 'app_version': '1.0',
                 })
         self.publication.refresh_from_db()
         self.assertEqual(self.publication.status, 'success')
         self.assertEqual(self.publication.app_version, '2.0')
-        self.assertEqual(self.publication.image_digest, 'sha256:current')
 
-
-class VirtualAppPublicationConfirmationTests(TestCase):
-    image_id = 'sha256:' + '1' * 64
-    previous_image_id = 'sha256:' + '2' * 64
-    repo_digest = 'registry.local/app@sha256:' + '3' * 64
-
-    def setUp(self):
-        with tmp_to_builtin_org(system=1):
-            provider = AppProviderSerializer(data={'host': {
-                'name': 'offline-provider', 'address': '192.0.2.10',
-            }})
-            provider.is_valid(raise_exception=True)
-            provider = provider.save()
-        self.app = VirtualApp.objects.create(name='offline-app', version='2.0', image_name='app:v2')
-        self.publication = VirtualAppPublication.objects.get(provider=provider, app=self.app)
-
-    def confirm(self, digest=None, status='success'):
-        # The Core worker can finish while a previously loaded report waits.
+    def test_reports_without_version_preserve_known_publication(self):
         VirtualAppPublication.objects.filter(pk=self.publication.pk).update(
-            status=status, app_version=self.app.version, image_digest=digest or self.image_id,
+            status='failed', app_version='2.0',
         )
-
-    def report(self, **data):
-        serializer = VirtualAppPublicationSerializer(self.publication, data=data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        return serializer.save()
-
-    def assert_confirmation(self, status, digest=None):
-        self.publication.refresh_from_db()
-        self.assertEqual(self.publication.status, status)
-        self.assertEqual(self.publication.app_version, self.app.version)
-        self.assertEqual(self.publication.image_digest, digest or self.image_id)
-
-    def test_completed_panda_pull_establishes_publication_confirmation(self):
-        self.report(status='success', app_version='2.0', image_digest=self.image_id)
-        self.assert_confirmation('success')
-
-    def test_incomplete_or_invalid_success_cannot_establish_confirmation(self):
-        for fields in (
-            {}, {'app_version': '2.0'}, {'image_digest': self.image_id},
-            {'app_version': '2.0', 'image_digest': 'sha256:invalid'},
-        ):
-            with self.subTest(fields=fields):
-                publication = self.report(status='success', **fields)
-                self.assertEqual(publication.status, 'mismatch')
-                self.assertEqual(publication.app_version, '')
-                self.assertEqual(publication.image_digest, '')
-
-    def test_panda_pull_can_refresh_an_image_after_publication_is_invalidated(self):
-        for status in ('pending', 'mismatch', 'failed'):
+        for status in ('pending', 'failed', 'success'):
             with self.subTest(status=status):
-                self.confirm(self.previous_image_id)
-                self.report(status=status, app_version='2.0', image_digest=self.previous_image_id)
-                self.assert_confirmation(status, self.previous_image_id)
-                self.report(status='success', app_version='2.0', image_digest=self.image_id)
-                self.assert_confirmation('success')
-
-    def test_matching_reports_preserve_confirmation_and_allow_recovery(self):
-        self.confirm()
-        for status in ('pending', 'mismatch', 'failed', 'success'):
-            with self.subTest(status=status):
-                self.report(status=status, app_version='2.0', image_digest=self.image_id)
-                self.assert_confirmation(status)
-
-    def test_same_version_stale_reports_cannot_overwrite_new_image(self):
-        self.confirm(self.previous_image_id)
-        self.publication.refresh_from_db()
-        self.confirm()
-        for status in ('success', 'pending', 'mismatch', 'failed'):
-            with self.subTest(status=status), self.assertRaises(ValidationError):
-                self.report(status=status, app_version='2.0', image_digest=self.previous_image_id)
-            self.assert_confirmation('success')
-
-    def test_incomplete_reports_cannot_erase_or_restore_confirmation(self):
-        self.confirm(status='failed')
-        for fields in (
-            {}, {'app_version': '2.0'}, {'image_digest': self.image_id},
-            {'app_version': '2.0', 'image_digest': ''},
-        ):
-            with self.subTest(fields=fields):
-                self.report(status='success', **fields)
-                self.assert_confirmation('failed')
-
-    def test_old_or_empty_version_cannot_erase_confirmation(self):
-        self.confirm()
-        for version in ('1.0', ''):
-            with self.subTest(version=version), self.assertRaises(ValidationError):
-                self.report(status='failed', app_version=version, image_digest='')
-            self.assert_confirmation('success')
-
-    def test_verified_legacy_digest_migrates_once(self):
-        self.confirm(self.repo_digest)
-        self.report(status='success', app_version='2.0', image_digest=self.image_id)
-        self.assert_confirmation('success')
-        with self.assertRaises(ValidationError):
-            self.report(status='success', app_version='2.0', image_digest=self.repo_digest)
-        self.assert_confirmation('success')
-
-    def test_legacy_digest_requires_success_with_valid_image_id(self):
-        self.confirm(self.repo_digest)
-        for status, digest in (('failed', self.image_id), ('success', 'sha256:invalid')):
-            with self.subTest(status=status, digest=digest), self.assertRaises(ValidationError):
-                self.report(status=status, app_version='2.0', image_digest=digest)
-            self.assert_confirmation('success', self.repo_digest)
-
-    def test_unmanaged_provider_retains_publication_compatibility(self):
-        self.publication.provider.host = None
-        self.publication.provider.save(update_fields=['host'])
-        self.report(status='success', app_version='2.0', image_digest=self.image_id)
-        self.assert_confirmation('success')
+                publication = self.report({'status': status})
+                self.assertEqual(publication.status, 'failed')
+                self.assertEqual(publication.app_version, '2.0')
 
     @mock.patch('terminal.automations.deploy_app_provider.safe_db_connection', new=nullcontext)
     def test_late_ssh_result_cannot_overwrite_a_completed_panda_pull(self):
         for outcome in ('success', 'failed', 'error'):
             with self.subTest(outcome=outcome):
-                self.confirm(self.previous_image_id, status='pending')
+                VirtualAppPublication.objects.filter(pk=self.publication.pk).update(
+                    status='pending', app_version='',
+                )
                 deployment = AppProviderDeployment.objects.create(
                     provider=self.publication.provider, publication=self.publication,
                 )
 
                 def finish_pull(*args, **kwargs):
-                    self.report(status='success', app_version='2.0', image_digest=self.image_id)
+                    self.report({'status': 'success', 'app_version': self.app.version})
                     if outcome == 'error':
                         raise RuntimeError('SSH verification failed')
-                    status = 'successful' if outcome == 'success' else outcome
-                    return mock.Mock(status=status, result={'ok': {'provider': {'image': {'res': {
-                        'ansible_stats': {'data': {'virtual_app_image': {
-                            'name': self.app.image_name, 'version': self.app.version,
-                            'id': self.previous_image_id,
-                        }}},
-                    }}}}})
+                    return mock.Mock(status='successful' if outcome == 'success' else outcome)
 
                 with mock.patch.object(
                     DeployAppProviderManager, 'generate_inventory', return_value='/tmp/inventory'
@@ -736,8 +624,10 @@ class VirtualAppPublicationConfirmationTests(TestCase):
                     runner.return_value.run.side_effect = finish_pull
                     DeployAppProviderManager(deployment).run()
                 deployment.refresh_from_db()
+                self.publication.refresh_from_db()
                 self.assertEqual(deployment.status, outcome)
-                self.assert_confirmation('success')
+                self.assertEqual(self.publication.status, 'success')
+                self.assertEqual(self.publication.app_version, self.app.version)
 
 
 class AppProviderDeployOptionsTests(SimpleTestCase):
@@ -839,11 +729,6 @@ class AppProviderDeploymentTests(SimpleTestCase):
         publication = mock.Mock(app=mock.Mock(version='1.0', image_name='example/app:v1'))
         deployment = mock.Mock(publication_id='publication-id', publication=publication)
         runner.return_value.run.return_value.status = 'success'
-        runner.return_value.run.return_value.result = {'ok': {'provider': {'image': {'res': {
-            'ansible_stats': {'data': {'virtual_app_image': {
-                'name': 'example/app:v1', 'version': '1.0', 'id': 'sha256:' + '1' * 64,
-            }}},
-        }}}}}
         with mock.patch.object(
             DeployAppProviderManager, 'generate_inventory', return_value='/tmp/inventory'
         ), mock.patch.object(
@@ -854,7 +739,6 @@ class AppProviderDeploymentTests(SimpleTestCase):
         values = publications.return_value.exclude.return_value.update.call_args.kwargs
         self.assertEqual(values['status'], 'success')
         self.assertEqual(values['app_version'], '1.0')
-        self.assertEqual(values['image_digest'], 'sha256:' + '1' * 64)
         self.assertIsNotNone(values['date_synced'])
 
     @mock.patch('terminal.automations.deploy_app_provider.VirtualAppPublication.objects.filter')
@@ -894,10 +778,10 @@ class AppProviderDeploymentTests(SimpleTestCase):
             with open(path) as stream:
                 play = yaml.safe_load(stream)[0]
 
-        self.assertEqual(play['vars'], {'APP_IMAGE': 'example/app:v1', 'APP_VERSION': '1.0'})
+        self.assertEqual(play['vars'], {'APP_IMAGE': 'example/app:v1'})
         self.assertFalse(play['gather_facts'])
         self.assertNotIn('pre_tasks', play)
-        self.assertIn('ansible.builtin.set_stats', play['tasks'][-1])
+        self.assertIn('ansible.builtin.assert', play['tasks'][-1])
 
 
 class AppProviderDeploymentAPITests(TestCase):
@@ -1263,13 +1147,3 @@ class OfflineProviderResourcesTests(SimpleTestCase):
         self.write_manifest()
         with self.assertRaisesMessage(ValueError, 'archive path'):
             stage_resources(Path(self.directory) / 'task', self.image)
-
-    def test_success_requires_exact_image_confirmation_from_the_task(self):
-        app = SimpleNamespace(image_name='app:v1', version='1.0')
-        for image in (None, {'name': 'app:v1', 'version': 'old', 'id': 'sha256:' + '1' * 64}):
-            tasks = {} if image is None else {'image': {'res': {
-                'ansible_stats': {'data': {'virtual_app_image': image}},
-            }}}
-            result = SimpleNamespace(result={'ok': {'provider': tasks}})
-            with self.assertRaises(ValueError):
-                DeployAppProviderManager.get_published_image_id(result, app)

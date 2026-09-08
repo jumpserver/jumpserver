@@ -174,7 +174,6 @@ class DeployAppProviderManager:
         if self.deployment.publication_id:
             variables = {
                 'APP_IMAGE': self.deployment.publication.app.image_name,
-                'APP_VERSION': self.deployment.publication.app.version,
             }
         else:
             options = self.provider.deploy_options
@@ -199,24 +198,6 @@ class DeployAppProviderManager:
             os.chmod(path, 0o600)
             yaml.safe_dump(plays, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
         return path
-
-    @staticmethod
-    def get_published_image_id(result, app):
-        images = [
-            task['res']['ansible_stats']['data']['virtual_app_image']
-            for tasks in result.result['ok'].values()
-            for task in tasks.values()
-            if 'virtual_app_image' in task.get('res', {}).get('ansible_stats', {}).get('data', {})
-        ]
-        if len(images) != 1:
-            raise ValueError('The publication task did not confirm an image')
-        image = images[0]
-        if (
-            image.get('name') != app.image_name or image.get('version') != app.version
-            or not re.fullmatch(r'sha256:[a-f0-9]{64}', image.get('id', ''))
-        ):
-            raise ValueError('The publication result does not match the requested application image')
-        return image['id']
 
     def run(self):
         try:
@@ -244,10 +225,9 @@ class DeployAppProviderManager:
                 }
                 if success:
                     values.update(
-                        app_version=app.version, image_digest=self.get_published_image_id(result, app),
-                        date_synced=timezone.now(),
+                        app_version=app.version, date_synced=timezone.now(),
                     )
-                # Panda may confirm a newer image while this SSH check runs.
+                # Panda may finish publishing while this SSH check runs.
                 VirtualAppPublication.objects.filter(
                     pk=publication.pk, app__version=app.version, app__image_name=app.image_name,
                 ).exclude(
