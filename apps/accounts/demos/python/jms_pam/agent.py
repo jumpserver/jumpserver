@@ -9,10 +9,12 @@ import tempfile
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import requests
 
 from .main import CLIENT_PATH, CredentialAPIClient
+from .events import EventWorker, DeliveryError
 
 CONFIG_FILE = '/etc/jumpserver-pam/agent.json'
 STATE_FILE = '/var/lib/jumpserver-pam/state.json'
@@ -53,10 +55,14 @@ class Agent:
             self.config['agent_secret'],
             self.config['org_id'],
             source='jms-pam-agent',
+            instance_id=self.config.get('instance_id', self.config['agent_id']),
         )
         self.state = read_json(self.config.get('state_file', STATE_FILE))
         self.credentials = read_json(self.config.get('credential_file', CREDENTIAL_FILE))
         self.lock = threading.Lock()
+        self.events = None
+        self.notification_session = requests.Session()
+        self.notification_session.trust_env = False
 
     @property
     def credential_file(self):
@@ -66,14 +72,15 @@ class Agent:
     def state_file(self):
         return self.config.get('state_file', STATE_FILE)
 
-    def poll(self):
+    def poll(self, keys=None, remote=None):
+        fetched = {key: (remote or self.remote).get_credential(key)
+                   for key in keys or self.config['credential_keys']}
         changed = False
         with self.lock:
             credentials = dict(self.credentials)
-            for key in self.config['credential_keys']:
-                data = self.remote.get_credential(key)
+            for key, data in fetched.items():
                 current = credentials.get(key, {})
-                if current.get('revision') == data['revision']:
+                if current.get('revision', 0) >= data['revision']:
                     continue
                 account = data['account']
                 asset = data['asset']
@@ -99,11 +106,13 @@ class Agent:
                 self.credentials = credentials
         return changed
 
-    def confirm(self, key):
+    def confirm(self, key, revision):
         with self.lock:
             item = self.credentials.get(key)
             if not item:
                 raise KeyError(f'Credential not found: {key}')
+            if type(revision) is not int or revision != item['revision']:
+                raise ValueError('Confirm the exact revision actually used by your application')
             applied = {
                 'key': key,
                 'revision': item['revision'],
@@ -123,6 +132,10 @@ class Agent:
 
     def run(self):
         server = self.start_local_server()
+        if self.config.get('notification_enabled'):
+            remote = self.remote.fork()
+            self.events = EventWorker(remote, lambda event: self.notify(event, remote))
+            self.events.start()
         stop = threading.Event()
         try:
             while True:
@@ -135,8 +148,35 @@ class Agent:
         except KeyboardInterrupt:
             pass
         finally:
+            if self.events:
+                self.events.close()
             server.shutdown()
             self.remote.session.close()
+            self.notification_session.close()
+
+    def notify(self, event, remote):
+        url = self.config.get('notification_url', '')
+        parsed = urlsplit(url)
+        if parsed.scheme not in ('http', 'https') or not parsed.hostname or parsed.username or parsed.password or parsed.fragment:
+            raise DeliveryError('http_failed')
+        if event['event'] == 'credential.published':
+            try:
+                self.poll(keys=[event['key']], remote=remote)
+                with self.lock:
+                    current = self.credentials.get(event['key'], {})
+                    if current.get('revision') != event['revision']:
+                        raise DeliveryError('credential_not_ready')
+            except (requests.RequestException, OSError):
+                raise DeliveryError('credential_not_ready') from None
+        try:
+            response = self.notification_session.post(url, json=event, timeout=10, allow_redirects=False)
+            status_code = response.status_code
+            response.close()
+        except requests.RequestException:
+            raise DeliveryError('http_failed') from None
+        if not 200 <= status_code < 300:
+            raise DeliveryError('http_failed', status_code)
+        return status_code
 
     def start_local_server(self):
         agent = self
@@ -160,8 +200,10 @@ class Agent:
                     return self.reply(404, {'detail': 'Not found'})
                 try:
                     length = int(self.headers.get('Content-Length', '0'))
+                    if not 0 < length <= 4096:
+                        raise ValueError('Invalid request size')
                     data = json.loads(self.rfile.read(length) or b'{}')
-                    return self.reply(200, agent.confirm(data['key']))
+                    return self.reply(200, agent.confirm(data['key'], data['revision']))
                 except Exception as error:
                     return self.reply(400, {'detail': str(error)})
 
@@ -192,11 +234,14 @@ def register(args):
         'agent_secret': identity['agent_secret'],
         'credential_keys': identity['credential_keys'],
         'configuration_id': identity['configuration_id'],
+        'instance_id': args.instance_id,
         'credential_file': args.credential_file,
         'state_file': args.state_file,
         'app_user': args.app_user,
         'poll_interval': 30,
         'port': args.port,
+        'notification_enabled': identity.get('notification_enabled', False),
+        'notification_url': identity.get('notification_url', ''),
     }
     atomic_write_json(args.config, config)
     if not os.path.exists(args.credential_file):
@@ -223,7 +268,7 @@ def install(args):
 def confirm_local(args):
     response = requests.post(
         f'http://127.0.0.1:{args.port}/v1/confirm',
-        json={'key': args.key}, timeout=10,
+        json={'key': args.key, 'revision': args.revision}, timeout=10,
     )
     response.raise_for_status()
     print(json.dumps(response.json(), ensure_ascii=False))
@@ -259,6 +304,7 @@ def build_parser():
 
     confirm_parser = commands.add_parser('confirm')
     confirm_parser.add_argument('key')
+    confirm_parser.add_argument('--revision', type=int, required=True)
     confirm_parser.add_argument('--port', type=int, default=8081)
     confirm_parser.set_defaults(handler=confirm_local)
     return parser

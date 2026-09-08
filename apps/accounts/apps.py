@@ -9,3 +9,4 @@ class AccountsConfig(AppConfig):
     def ready(self):
         from . import signal_handlers  # noqa
         from . import tasks  # noqa
+        from .credential_client import audit_signals  # noqa

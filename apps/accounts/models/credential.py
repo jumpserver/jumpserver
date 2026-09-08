@@ -164,6 +164,7 @@ class CredentialApplicationBinding(JMSOrgBaseModel):
 
 
 class CredentialClientInstance(JMSOrgBaseModel):
+    events_enabled = models.BooleanField(default=False)
     class Type(models.TextChoices):
         sdk = 'sdk', _('SDK')
         agent = 'agent', _('Agent')
@@ -191,6 +192,10 @@ class CredentialClientInstance(JMSOrgBaseModel):
 
     def __str__(self):
         return f'{self.application.name}:{self.instance_id}'
+
+    @property
+    def name(self):
+        return self.instance_id
 
     @property
     def is_authenticated(self):
@@ -248,6 +253,8 @@ class CredentialClientStatus(JMSOrgBaseModel):
 
 
 class ClientAccessConfiguration(JMSOrgBaseModel):
+    notification_enabled = models.BooleanField(default=False, verbose_name=_('Event notifications'))
+    notification_url = models.URLField(max_length=2048, blank=True, default='', verbose_name=_('Notification URL'))
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     application = models.ForeignKey(
         'accounts.IntegrationApplication', on_delete=models.CASCADE,

@@ -17,6 +17,7 @@ __all__ = [
     'CredentialFetchSerializer', 'CredentialHeartbeatSerializer',
     'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer',
     'ClientAccessConfigurationSerializer', 'CredentialRotationRecordSerializer',
+    'EventRequestSerializer', 'EventSubscriptionSerializer', 'EventReportSerializer',
 ]
 
 
@@ -210,6 +211,25 @@ class CredentialFetchSerializer(serializers.Serializer):
     instance_id = serializers.CharField(max_length=128, required=False)
 
 
+class EventRequestSerializer(serializers.Serializer):
+    configuration_id = serializers.UUIDField(required=False)
+    instance_id = serializers.CharField(max_length=128, required=False)
+
+
+class EventSubscriptionSerializer(EventRequestSerializer):
+    enabled = serializers.BooleanField()
+
+
+class EventReportSerializer(EventRequestSerializer):
+    attempt_id = serializers.UUIDField()
+    result = serializers.ChoiceField(choices=['success', 'failed'])
+    status_code = serializers.IntegerField(min_value=100, max_value=599, required=False, allow_null=True)
+    reason = serializers.ChoiceField(
+        choices=['', 'callback_failed', 'http_failed', 'credential_not_ready'], default='',
+    )
+
+
+
 class CredentialStateSerializer(serializers.Serializer):
     key = serializers.CharField(max_length=64)
     revision = serializers.IntegerField(min_value=1)
@@ -250,7 +270,7 @@ class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
             'online_instances_amount', 'last_reported',
         ]
         fields = fields_small + [
-            'language', 'app_user', 'install_path',
+            'language', 'app_user', 'install_path', 'notification_enabled', 'notification_url',
             'date_created', 'date_updated', 'created_by', 'comment',
         ]
         read_only_fields = ['instances_amount', 'online_instances_amount']
@@ -301,6 +321,15 @@ class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
         path = attrs.get('install_path', getattr(self.instance, 'install_path', '/opt/jumpserver-pam'))
         if not path.startswith('/') or path == '/' or any(char in path for char in '\n\r\x00'):
             raise serializers.ValidationError({'install_path': _('Enter an absolute installation directory.')})
+        enabled = attrs.get('notification_enabled', getattr(self.instance, 'notification_enabled', False))
+        url = attrs.get('notification_url', getattr(self.instance, 'notification_url', ''))
+        if enabled and attrs.get('type', getattr(self.instance, 'type', None)) == 'agent':
+            from urllib.parse import urlsplit
+            parts = urlsplit(url)
+            if parts.scheme not in ('http', 'https') or not parts.hostname or parts.username or parts.password or parts.fragment:
+                raise serializers.ValidationError({'notification_url': _('Enter an HTTP(S) notification URL without authentication information.')})
+        else:
+            attrs['notification_url'] = ''
         return attrs
 
     def save(self, **kwargs):

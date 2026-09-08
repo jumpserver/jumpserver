@@ -6,13 +6,14 @@ from unittest.mock import Mock, patch, mock_open
 
 import requests
 from django.core import signing
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.models import F
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.permissions import AllowAny
-from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.test import force_authenticate
 
 from accounts.credential_client.manager import ClientAccessConfigurationManager, CredentialClientManager
 from accounts.credential_rotation import CredentialRotationManager
@@ -33,71 +34,14 @@ from accounts.models import (
     ClientAccessConfiguration,
     CredentialClientInstance,
 )
-from assets.const import Category
-from assets.models import Asset, Platform
 from authentication.backends.drf import (
     CredentialAgentAuthentication, ServiceAuthentication,
 )
-from orgs.models import Organization
-from orgs.utils import set_current_org
 from users.models import User
+from accounts.tests.base import CredentialTestCase
 
 
-class CredentialRotationTestCase(TestCase):
-    def setUp(self):
-        self.factory = APIRequestFactory()
-        self.org = Organization.default()
-        set_current_org(self.org)
-        self.admin = User.objects.create_superuser(
-            username='credential-admin', password='password',
-            name='Credential admin', email='credential-admin@example.com',
-        )
-        self.platform = Platform.objects.create(
-            name='CredentialTestPostgreSQL',
-            category=Category.DATABASE,
-            type='postgresql',
-        )
-        self.asset = Asset.objects.create(
-            name='credential-test-pg', address='127.0.0.1',
-            platform=self.platform,
-        )
-        self.primary = Account.objects.create(
-            name='account-a', username='account-a', asset=self.asset,
-            secret='primary-secret',
-        )
-        self.backup = Account.objects.create(
-            name='account-b', username='account-b', asset=self.asset,
-            secret='backup-secret',
-        )
-        self.application = IntegrationApplication.objects.create(
-            name='order-service', secret='application-secret',
-            accounts={
-                'type': 'ids',
-                'ids': [str(self.primary.id), str(self.backup.id)],
-            },
-        )
-        self.credential = ApplicationCredential.objects.create(
-            name='PostgreSQL primary',
-            primary_account=self.primary,
-            backup_account=self.backup,
-            published_account=self.primary,
-        )
-
-    def request(self, method, path, data=None, user=None):
-        if isinstance(user, IntegrationApplication):
-            configuration, _ = ClientAccessConfiguration.objects.get_or_create(
-                application=user, name='Test SDK', defaults={'type': 'sdk'},
-            )
-            configuration.credentials.add(self.credential)
-            data = dict(data or {}, configuration_id=str(configuration.id))
-        creator = getattr(self.factory, method)
-        request = creator(
-            path, data=data or {}, format='json',
-            HTTP_X_JMS_ORG=str(self.org.id),
-        )
-        force_authenticate(request, user=user or self.admin)
-        return request
-
+class CredentialRotationTestCase(CredentialTestCase):
     def client_action(self, action, method='post', data=None):
         view = CredentialClientViewSet.as_view({method: action})
         request = self.request(
@@ -569,6 +513,159 @@ class CredentialRotationTestCase(TestCase):
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data['account']['secret'], self.primary.secret)
         sdk.close()
+
+
+class CredentialClientStateWriteTests(CredentialTestCase):
+    def manager(self, kind):
+        configuration, _ = ClientAccessConfiguration.objects.get_or_create(
+            application=self.application, name=kind, defaults={'type': kind},
+        )
+        configuration.credentials.add(self.credential)
+        if kind == 'sdk':
+            return CredentialClientManager(self.application, configuration.id, kind)
+        client, _ = CredentialClientInstance.objects.get_or_create(
+            configuration=configuration, application=self.application,
+            instance_id=kind, defaults={'type': kind},
+        )
+        return CredentialClientManager(client)
+
+    def state_writes(self, queries):
+        return [item['sql'] for item in queries if item['sql'].startswith('UPDATE') and any(
+            table in item['sql'] for table in ('accounts_credentialclientstatus', 'accounts_credentialclientinstance')
+        )]
+
+    def test_success_fetch_audit_only_records_initial_or_changed_revision(self):
+        from accounts.models import ApplicationAudit
+        for kind in ('sdk', 'agent'):
+            with self.subTest(kind=kind):
+                manager = self.manager(kind)
+                logs = ApplicationAudit.objects.filter(
+                    event='credential_fetched', result='success', instance_id=kind,
+                    configuration_id=manager.configuration.id,
+                )
+                manager.fetch(self.credential.key, '127.0.0.1')
+                self.assertEqual(logs.count(), 1)
+                with CaptureQueriesContext(connection) as queries:
+                    self.manager(kind).fetch(self.credential.key, '127.0.0.1')
+                self.assertFalse(any(
+                    q['sql'].startswith('INSERT') and 'accounts_applicationaudit' in q['sql']
+                    for q in queries
+                ))
+                # The periodic timestamp refresh must not create another fetch audit.
+                future = timezone.now() + timedelta(seconds=61)
+                with patch('accounts.credential_client.manager.timezone.now', return_value=future):
+                    self.manager(kind).fetch(self.credential.key, '127.0.0.1')
+                self.assertEqual(logs.count(), 1)
+                self.credential.revision += 1
+                self.credential.save(update_fields=['revision'])
+                self.manager(kind).fetch(self.credential.key, '127.0.0.1')
+                self.manager(kind).fetch(self.credential.key, '127.0.0.1')
+                self.assertEqual(logs.count(), 2)
+                self.assertEqual(logs.first().revision, self.credential.revision)
+
+    def test_fixed_account_fetch_audit_tracks_account_version(self):
+        from accounts.models import ApplicationAudit
+        self.credential.type = 'fixed'
+        self.credential.save(update_fields=['type'])
+        manager = self.manager('sdk')
+        manager.fetch(self.credential.key, '127.0.0.1')
+        manager.fetch(self.credential.key, '127.0.0.1')
+        logs = ApplicationAudit.objects.filter(event='credential_fetched', instance_id='sdk')
+        self.assertEqual(logs.count(), 1)
+        Account.objects.filter(pk=self.primary.pk).update(version=F('version') + 1)
+        manager.fetch(self.credential.key, '127.0.0.1')
+        manager.fetch(self.credential.key, '127.0.0.1')
+        self.assertEqual(logs.count(), 2)
+
+    def test_repeat_fetch_heartbeat_confirm_skip_writes_until_interval(self):
+        for kind in ('sdk', 'agent'):
+            with self.subTest(kind=kind):
+                start = timezone.now()
+                manager = self.manager(kind)
+                item = {'key': self.credential.key, 'revision': 1, 'account_id': self.primary.id}
+                with patch('accounts.credential_client.manager.timezone.now', return_value=start):
+                    manager.fetch(self.credential.key, '127.0.0.1')
+                    manager.confirm(**item)
+                for seconds in (1, 30, 59, 60):
+                    # Rebuild the manager, matching separate authenticated requests.
+                    manager = self.manager(kind)
+                    current = start + timedelta(seconds=seconds)
+                    with patch('accounts.credential_client.manager.timezone.now', return_value=current):
+                        with CaptureQueriesContext(connection) as queries:
+                            manager.fetch(self.credential.key, '127.0.0.1')
+                            manager.heartbeat([item])
+                            manager.confirm(**item)
+                    self.assertEqual(len(self.state_writes(queries)), 2 if seconds == 60 else 0)
+                    state = manager.client.credential_statuses.get()
+                    self.assertEqual(state.date_applied, start)
+                    self.assertEqual(state.date_fetched, current if seconds == 60 else start)
+                    self.assertEqual(state.date_last_seen, current if seconds == 60 else start)
+
+    def test_new_version_and_first_heartbeat_confirmation_are_immediate(self):
+        manager = self.manager('sdk')
+        start = timezone.now()
+        with patch('accounts.credential_client.manager.timezone.now', return_value=start):
+            manager.fetch(self.credential.key, '127.0.0.1')
+            manager.confirm(self.credential.key, 1, self.primary.id)
+        self.credential.revision = 2
+        self.credential.published_account = self.backup
+        self.credential.status = 'waiting_backup'
+        self.credential.save()
+        current = start + timedelta(seconds=1)
+        with patch('accounts.credential_client.manager.timezone.now', return_value=current):
+            manager.fetch(self.credential.key, '127.0.0.1')
+            state = manager.client.credential_statuses.get()
+            self.assertEqual(state.fetched_revision, 2)
+            self.assertEqual(state.required_revision, 2)
+            self.assertTrue(state.is_rotation_participant)
+            manager.heartbeat([{'key': self.credential.key, 'revision': 2, 'account_id': self.backup.id}])
+        state.refresh_from_db()
+        self.assertEqual(state.applied_revision, 2)
+        self.assertEqual(state.applied_account_id, self.backup.id)
+        self.assertEqual(state.date_applied, current)
+        self.assertEqual(self.credential.get_blockers(now=current), [])
+
+    def test_same_version_rotation_participation_is_immediate(self):
+        manager = self.manager('agent')
+        manager.fetch(self.credential.key, '127.0.0.1')
+        self.credential.rotation_mode = 'single'
+        self.credential.status = 'ready_for_change'
+        self.credential.save()
+        manager.fetch(self.credential.key, '127.0.0.1')
+        state = manager.client.credential_statuses.get()
+        self.assertTrue(state.is_rotation_participant)
+        self.assertEqual(state.required_revision, 1)
+
+    def test_old_heartbeat_never_overwrites_confirmation_and_activity_recovers(self):
+        manager = self.manager('sdk')
+        manager.fetch(self.credential.key, '127.0.0.1')
+        manager.confirm(self.credential.key, 1, self.primary.id)
+        state = manager.client.credential_statuses.get()
+        applied = state.date_applied
+        stale = timezone.now() - timedelta(minutes=3)
+        type(state).objects.filter(pk=state.pk).update(date_last_seen=stale)
+        CredentialClientInstance.objects.filter(pk=manager.client.pk).update(date_last_seen=stale)
+        manager = self.manager('sdk')
+        with CaptureQueriesContext(connection) as queries:
+            response = manager.heartbeat([{'key': self.credential.key, 'revision': 0, 'account_id': self.primary.id}])
+        self.assertEqual(response['updated'], [])
+        self.assertEqual(len(self.state_writes(queries)), 2)
+        state.refresh_from_db()
+        self.assertGreater(state.date_last_seen, stale)
+        self.assertEqual(state.date_applied, applied)
+        self.assertEqual(state.applied_revision, 1)
+
+    def test_event_polling_shares_activity_throttle(self):
+        from accounts.credential_client.events import ClientEventManager
+        manager = self.manager('agent')
+        manager.client.events_enabled = True
+        manager.client.save(update_fields=['events_enabled'])
+        manager.configuration.notification_enabled = True
+        manager.configuration.save(update_fields=['notification_enabled'])
+        manager.fetch(self.credential.key, '127.0.0.1')
+        with CaptureQueriesContext(connection) as queries:
+            self.assertEqual(ClientEventManager(manager).poll(), {'enabled': True, 'events': []})
+        self.assertEqual(self.state_writes(queries), [])
 
 
 class CredentialClientInstanceDeletionTestCase(SimpleTestCase):

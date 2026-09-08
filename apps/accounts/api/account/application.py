@@ -12,9 +12,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts import serializers
+from accounts.const import AuditEvent
 from accounts.filters import IntegrationApplicationFilterSet
 from accounts.models import IntegrationApplication
-from audits.models import IntegrationApplicationLog
+from accounts.credential_client.audit import record
+from accounts.mixins import ApplicationAuditMixin
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.exceptions import JMSException
 from common.utils import get_request_ip
@@ -22,7 +24,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
 
-class IntegrationApplicationViewSet(OrgBulkModelViewSet):
+class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     model = IntegrationApplication
     filterset_class = IntegrationApplicationFilterSet
     search_fields = ('name', 'comment')
@@ -81,6 +83,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     @action(['GET'], detail=False, url_path='account-secret',
             permission_classes=[RBACPermission])
     def get_account_secret(self, request, *args, **kwargs):
+        self.start_audit(AuditEvent.CREDENTIAL_FETCHED, application=request.user)
         serializer = self.get_serializer(data=request.query_params)
         if not serializer.is_valid():
             return Response({'error': serializer.errors}, status=400)
@@ -90,11 +93,8 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
         if not account:
             msg = _('Account not found')
             raise JMSException(code='Not found', detail='%s' % msg)
-        asset = account.asset
-        IntegrationApplicationLog.objects.create(
-            remote_addr=get_request_ip(request), service=service.name, service_id=service.id,
-            account=f'{account.name}({account.username})', asset=f'{asset.name}({asset.address})',
-        )
+        record(AuditEvent.CREDENTIAL_FETCHED, application=service, remote_addr=get_request_ip(request),
+               summary='Legacy account-secret access.')
         
         # 根据配置决定是否返回密码
         secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
