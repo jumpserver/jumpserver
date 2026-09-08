@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.db import transaction
 from rest_framework import serializers
 
 from common.const.choices import Status
@@ -29,7 +30,16 @@ class VirtualAppSerializer(ManifestI18nMixin, serializers.ModelSerializer):
             'protocols', 'tags', 'comment',
         ] + read_only_fields
 
+    @transaction.atomic
     def update(self, instance, validated_data):
+        instance = VirtualApp.objects.select_for_update().get(pk=instance.pk)
+        if (
+            validated_data.get('image_name', instance.image_name) != instance.image_name
+            and validated_data.get('version', instance.version) == instance.version
+        ):
+            raise serializers.ValidationError({
+                'version': _('Changing the image requires a different application version')
+            })
         image_changed = any(
             field in validated_data and validated_data[field] != getattr(instance, field)
             for field in ('version', 'image_name')
@@ -54,15 +64,30 @@ class VirtualAppPublicationSerializer(serializers.ModelSerializer):
             'status', 'app_version', 'image_digest', 'date_synced', 'comment'
         ] + ['date_created', 'date_updated']
 
+    @transaction.atomic
     def update(self, instance, validated_data):
-        if (
-            validated_data.get('status') == PublishStatus.success
-            and instance.provider.host_id
-            and instance.app_version != instance.app.version
-        ):
-            # Older Panda versions only check whether an image tag exists.
-            # Managed providers must finish pulling the current version first.
-            validated_data['status'] = PublishStatus.mismatch
-        if {'status', 'app_version', 'image_digest'} & validated_data.keys():
+        sync_fields = {'status', 'app_version', 'image_digest'}
+        if sync_fields & validated_data.keys():
+            # Serialize reports with changes to the desired app version and
+            # compare them against the latest confirmed publication state.
+            app = VirtualApp.objects.select_for_update().get(pk=instance.app_id)
+            instance.refresh_from_db(fields=sync_fields)
+            reported_version = validated_data.get('app_version')
+            reports_success = validated_data.get('status', instance.status) == PublishStatus.success
+            current_version_published = (
+                instance.status == PublishStatus.success and instance.app_version == app.version
+            )
+            if (
+                reported_version is not None and reported_version != app.version
+                and (reports_success or current_version_published)
+            ):
+                raise serializers.ValidationError({
+                    'app_version': _('Reported version does not match the current application version')
+                })
+            if reports_success and reported_version is None and instance.provider.host_id:
+                # Older Panda versions only check whether an image tag exists.
+                # They cannot acknowledge a newly requested version themselves.
+                if instance.app_version != app.version:
+                    validated_data['status'] = PublishStatus.mismatch
             validated_data['date_synced'] = timezone.now()
         return super().update(instance, validated_data)

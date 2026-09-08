@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import shutil
 import uuid
@@ -32,11 +33,38 @@ class DeployAppProviderManager:
 
     def generate_inventory(self):
         inventory = JMSInventory(
-            [self.provider.host], account_policy='privileged_only'
+            [self.provider.host], account_policy='privileged_only',
+            protocol='ssh', exclude_localhost=True,
+            account_selector=lambda asset: self.provider.select_deploy_account(),
+            host_callback=self.configure_ssh_host,
         )
+        # A disabled provider must remain deployable during maintenance.
+        # This explicit target also avoids JMSInventory's active-asset filter.
+        inventory.assets = [self.provider.host]
         path = os.path.join(self.run_dir, 'inventory', 'hosts.yml')
         inventory.write_to_file(path)
+        with open(path) as stream:
+            hosts = json.load(stream)['all']['hosts']
+        if len(hosts) != 1 or inventory.exclude_hosts:
+            raise ValueError('No deployable SSH host: check the privileged account and platform automation')
+        host = next(iter(hosts.values()))
+        if host.get('ansible_connection') != 'ssh':
+            raise ValueError('Application provider deployment requires SSH')
         return path
+
+    @staticmethod
+    def configure_ssh_host(host, account=None, **kwargs):
+        if not account or host.get('error'):
+            return host
+        host['ansible_connection'] = 'ssh'
+        if not account.su_from:
+            host['ansible_become'] = account.username != 'root'
+            if host['ansible_become']:
+                host['ansible_become_method'] = 'sudo'
+                host['ansible_become_user'] = 'root'
+                if account.secret_type == 'password':
+                    host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
+        return host
 
     @transaction.atomic
     def get_access_key(self):
@@ -68,7 +96,7 @@ class DeployAppProviderManager:
             plays = yaml.safe_load(f)
 
         options = self.provider.deploy_options
-        core_host = options.get('CORE_HOST') or settings.SITE_URL or 'http://localhost:8080'
+        core_host = options.get('CORE_HOST') or settings.SITE_URL or ''
         variables = {
             **options,
             'CORE_HOST': core_host.rstrip('/'),
@@ -81,6 +109,7 @@ class DeployAppProviderManager:
             variables['APP_IMAGE'] = self.deployment.publication.app.image_name
         else:
             variables['PANDA_ACCESS_KEY'] = self.get_access_key()
+            variables['PANDA_PROVIDER_ID'] = str(self.provider.id)
         for play in plays:
             play['vars'].update(variables)
 
@@ -93,6 +122,8 @@ class DeployAppProviderManager:
 
     def run(self):
         try:
+            if not self.deployment.publication_id:
+                self.provider.deploy_options = self.provider.validate_deployment()
             self.deployment.date_start = timezone.now()
             self.deployment.status = 'running'
             self.deployment.save(update_fields=['date_start', 'status', 'date_updated'])
@@ -106,7 +137,7 @@ class DeployAppProviderManager:
             # Provider deployments are user-triggered and their Celery task log
             # is the primary place to follow progress. Keep Ansible's normal
             # PLAY/TASK/RECAP output visible without enabling debug verbosity.
-            result = runner.run(quiet=False)
+            result = runner.run(quiet=False, timeout=1800)
             self.deployment.status = 'success' if result.status == 'successful' else result.status
             if self.deployment.publication_id:
                 publication = self.deployment.publication
@@ -125,8 +156,11 @@ class DeployAppProviderManager:
             logger.exception('Deploy app provider failed: %s', exc)
             self.deployment.status = 'error'
             if self.deployment.publication_id:
-                self.deployment.publication.status = 'failed'
-                self.deployment.publication.save(update_fields=['status', 'date_updated'])
+                publication = self.deployment.publication
+                app = publication.app
+                VirtualAppPublication.objects.filter(
+                    pk=publication.pk, app__version=app.version, app__image_name=app.image_name,
+                ).update(status=PublishStatus.failed, date_updated=timezone.now())
         finally:
             self.deployment.date_finished = timezone.now()
             with safe_db_connection():

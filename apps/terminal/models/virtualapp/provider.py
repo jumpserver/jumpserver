@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
+from accounts.const import SecretType
 from common.db.models import JMSBaseModel
 
 __all__ = ['AppProvider', 'AppProviderDeployment']
@@ -14,10 +15,6 @@ class AppProvider(JMSBaseModel):
     class RuntimeType(models.TextChoices):
         docker = 'docker', 'Docker'
         podman = 'podman', 'Podman'
-
-    class ConnectionMode(models.TextChoices):
-        direct = 'direct', _('Direct')
-        ssh = 'ssh', 'SSH'
 
     cache_status_key_prefix = 'virtual_host_{}_status'
     managed_service_url = 'http://127.0.0.1:9001'
@@ -30,10 +27,6 @@ class AppProvider(JMSBaseModel):
     runtime_type = models.CharField(
         max_length=16, choices=RuntimeType.choices, default=RuntimeType.docker,
         verbose_name=_('Runtime type'),
-    )
-    connection_mode = models.CharField(
-        max_length=16, choices=ConnectionMode.choices, default=ConnectionMode.direct,
-        verbose_name=_('Connection mode'),
     )
     service_url = models.URLField(
         max_length=1024, blank=True, default='', verbose_name=_('Service URL'),
@@ -87,11 +80,7 @@ class AppProvider(JMSBaseModel):
                 terminal=terminal,
             ).exclude(pk=self.pk).first()
             if bound_provider:
-                is_legacy_direct = (
-                    bound_provider.connection_mode == self.ConnectionMode.direct
-                    and bound_provider.host_id is None
-                )
-                if not is_legacy_direct:
+                if bound_provider.host_id:
                     raise ValidationError('Terminal is already bound to another provider')
                 bound_provider.delete()
 
@@ -104,23 +93,69 @@ class AppProvider(JMSBaseModel):
     def select_account(self):
         if not self.host:
             return None
-        return self.host.accounts.active().order_by(
+        accounts = self.host.accounts.active().filter(
+            secret_type__in=(SecretType.PASSWORD, SecretType.SSH_KEY),
+        ).order_by(
             '-privileged', '-date_updated'
-        ).first()
+        )
+        return next((account for account in accounts if account.username and account.secret), None)
+
+    def select_deploy_account(self):
+        if not self.host:
+            return None
+        accounts = self.host.accounts.active().filter(
+            models.Q(privileged=True) | models.Q(username='root'),
+            secret_type__in=(SecretType.PASSWORD, SecretType.SSH_KEY),
+        ).order_by('-date_updated')
+        accounts = sorted(accounts, key=lambda account: account.username == 'root', reverse=True)
+        return next((account for account in accounts if account.username and account.secret), None)
+
+    @property
+    def latest_deployment(self):
+        if self._state.adding:
+            return None
+        return self.deployments.filter(publication__isnull=True).first()
+
+    def validate_deployment(self):
+        from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
+
+        if not self.host:
+            raise ValidationError({'host': _('Provider host is required before deployment')})
+        if self.host.platform.type != 'linux':
+            raise ValidationError({'host': _('Provider deployment requires a Linux host')})
+        if self.runtime_type != self.RuntimeType.docker:
+            raise ValidationError({'runtime_type': _('Managed providers require Docker')})
+        ssh = self.host.protocols.filter(name='ssh').first()
+        if not ssh or not 1 <= ssh.port <= 65535 or ssh.port == 9001:
+            raise ValidationError({'host': _('A valid SSH port different from the Panda API port is required')})
+        if not self.select_deploy_account():
+            raise ValidationError({
+                'host': _('An active root or privileged SSH account with a password or private key is required')
+            })
+        if self.container_count:
+            raise ValidationError({'host': _('Disable the provider and wait for all containers to exit before deployment')})
+        options = AppProviderDeployOptionsSerializer(data=self.deploy_options)
+        if not options.is_valid():
+            raise ValidationError({'deploy_options': options.errors})
+        start, end = map(int, options.validated_data['PANDA_RANGE_PORTS'].split('-'))
+        if start <= ssh.port <= end:
+            raise ValidationError({'deploy_options': {
+                'PANDA_RANGE_PORTS': _('Container port range must not include the SSH port')
+            }})
+        return options.validated_data
 
     @property
     def connection_ready(self):
-        if self.connection_mode == self.ConnectionMode.direct and not self.service_url:
-            return True
+        if not self.host or not self.host.is_active:
+            return False
+        deployment = self.latest_deployment
+        if deployment and deployment.status != 'success':
+            return False
         try:
             url = urlsplit(self.service_url)
             if url.scheme not in ('http', 'https') or not url.hostname or url.port == 0:
                 return False
         except ValueError:
-            return False
-        if self.connection_mode == self.ConnectionMode.direct:
-            return True
-        if not self.host:
             return False
         has_ssh = self.host.protocols.filter(name='ssh').exists()
         return has_ssh and self.select_account() is not None

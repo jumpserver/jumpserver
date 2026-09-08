@@ -246,26 +246,23 @@ class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):
     def get_provider(instance):
         provider = instance.get('provider')
         if provider is None:
-            return None
-        data = {
+            raise serializers.ValidationError(_('Virtual app provider is required'))
+        if not provider.host:
+            raise serializers.ValidationError(_('Virtual app provider requires an SSH host'))
+        account = provider.select_account()
+        if not account:
+            raise serializers.ValidationError(_('Virtual app provider requires an active SSH account'))
+        gateway = provider.select_gateway()
+        return {
             'id': str(provider.id),
             'name': provider.name,
             'hostname': provider.hostname,
             'address': provider.address,
             'host_id': str(provider.host_id) if provider.host_id else None,
             'runtime_type': provider.runtime_type,
-            'connection_mode': provider.connection_mode,
             'service_url': provider.service_url,
             'load': provider.load,
+            'host': _ConnectionTokenAssetSerializer(provider.host).data,
+            'account': _ConnectionTokenAccountSerializer(account).data,
+            'gateway': _ConnectionTokenGatewaySerializer(gateway).data if gateway else None,
         }
-        if provider.connection_mode == provider.ConnectionMode.ssh:
-            data.update({
-                'host': _ConnectionTokenAssetSerializer(provider.host).data,
-                'account': _ConnectionTokenAccountSerializer(
-                    provider.select_account()
-                ).data,
-                'gateway': _ConnectionTokenGatewaySerializer(
-                    provider.select_gateway()
-                ).data if provider.select_gateway() else None,
-            })
-        return data

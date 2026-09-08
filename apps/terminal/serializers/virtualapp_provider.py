@@ -1,3 +1,6 @@
+import re
+from urllib.parse import urlsplit
+
 from django.conf import settings
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +21,7 @@ __all__ = [
 
 class AppProviderDeployOptionsSerializer(serializers.Serializer):
     CORE_HOST = serializers.CharField(
-        default=settings.SITE_URL, max_length=1024, label=_('Core API')
+        default=settings.SITE_URL or '', max_length=1024, label=_('Core API')
     )
     IGNORE_VERIFY_CERTS = serializers.BooleanField(
         default=True, label=_('Ignore Certificate Verification')
@@ -29,6 +32,45 @@ class AppProviderDeployOptionsSerializer(serializers.Serializer):
     PANDA_RANGE_PORTS = serializers.CharField(
         default='6900-7900', max_length=64, label=_('Container port range')
     )
+
+    def validate(self, attrs):
+        core_host = attrs.get('CORE_HOST')
+        if core_host is not None:
+            try:
+                url = urlsplit(core_host)
+                valid = (
+                    url.scheme in ('http', 'https') and url.hostname
+                    and not any((url.username, url.password, url.query, url.fragment))
+                    and (url.port is None or 1 <= url.port <= 65535)
+                    and not any(char.isspace() for char in core_host)
+                )
+            except ValueError:
+                valid = False
+            if not valid:
+                raise serializers.ValidationError({'CORE_HOST': _('Enter a valid HTTP or HTTPS Core URL')})
+            attrs['CORE_HOST'] = core_host.rstrip('/')
+
+        image = attrs.get('PANDA_IMAGE')
+        if image is not None:
+            component = r'[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*'
+            reference = (
+                rf'(?:(?:[a-z0-9][a-z0-9.-]*)(?::[0-9]{{1,5}})?/)?'
+                rf'{component}(?:/{component})*'
+                r'(?::[A-Za-z0-9_][A-Za-z0-9_.-]{0,127})?(?:@sha256:[a-f0-9]{64})?'
+            )
+            if not re.fullmatch(reference, image):
+                raise serializers.ValidationError({'PANDA_IMAGE': _('Enter a valid Docker image reference')})
+
+        ports = attrs.get('PANDA_RANGE_PORTS')
+        if ports is not None:
+            match = re.fullmatch(r'([0-9]{1,5})-([0-9]{1,5})', ports)
+            start, end = map(int, match.groups()) if match else (0, 0)
+            if not 1 <= start < end <= 65535 or start <= 9001 <= end:
+                raise serializers.ValidationError({
+                    'PANDA_RANGE_PORTS': _('Use a port range between 1 and 65535, excluding the Panda API port 9001')
+                })
+            attrs['PANDA_RANGE_PORTS'] = f'{start}-{end}'
+        return attrs
 
 
 class AppProviderHostSerializer(HostSerializer):
@@ -71,17 +113,19 @@ class AppProviderSerializer(serializers.ModelSerializer):
     deploy_options = AppProviderDeployOptionsSerializer(
         required=False, label=_('Deploy options')
     )
+    deployment = serializers.SerializerMethodField(label=_('Deployment'))
+    deployment_error = serializers.SerializerMethodField(label=_('Deployment error'))
 
     class Meta:
         model = AppProvider
         field_mini = ['id', 'name', 'hostname']
         read_only_fields = [
-            'runtime_type', 'connection_mode', 'service_url', 'terminal',
+            'runtime_type', 'service_url', 'terminal',
             'date_created', 'date_updated',
         ]
         fields = field_mini + [
-            'host', 'runtime_type', 'connection_mode', 'service_url',
-            'deploy_options', 'load', 'terminal', 'comment',
+            'host', 'runtime_type', 'service_url',
+            'deploy_options', 'deployment', 'deployment_error', 'load', 'terminal', 'comment',
         ] + read_only_fields
 
     def __init__(self, *args, **kwargs):
@@ -93,6 +137,29 @@ class AppProviderSerializer(serializers.ModelSerializer):
         if isinstance(self.instance, AppProvider):
             self.fields['host'].instance = self.instance.host
 
+    @staticmethod
+    def get_deployment(instance):
+        deployment = instance.latest_deployment
+        if not deployment:
+            return None
+        data = AppProviderDeploymentSerializer(deployment).data
+        return {key: data[key] for key in ('id', 'status', 'task', 'date_start', 'date_finished')}
+
+    @staticmethod
+    def get_deployment_error(instance):
+        def message(detail):
+            if isinstance(detail, dict):
+                return '; '.join(message(value) for value in detail.values())
+            if isinstance(detail, list):
+                return '; '.join(message(value) for value in detail)
+            return str(detail)
+
+        try:
+            instance.validate_deployment()
+        except serializers.ValidationError as exc:
+            return message(exc.detail)
+        return ''
+
     def validate(self, attrs):
         attrs = super().validate(attrs)
         host = attrs.get('host')
@@ -100,8 +167,11 @@ class AppProviderSerializer(serializers.ModelSerializer):
         is_service_account = bool(
             request and getattr(request.user, 'is_service_account', False)
         )
-        if host:
-            existing_host = self.instance.host if self.instance else None
+        existing_host = self.instance.host if self.instance else None
+        if existing_host and 'host' in attrs and host is None:
+            raise serializers.ValidationError({'host': _('The provider host cannot be removed')})
+        if host or existing_host:
+            host = host or {}
             name = host.get('name', getattr(existing_host, 'name', None))
             address = host.get('address', getattr(existing_host, 'address', None))
             if not name or not address:
@@ -118,7 +188,6 @@ class AppProviderSerializer(serializers.ModelSerializer):
             attrs['name'] = name
             attrs['hostname'] = address
             attrs['runtime_type'] = AppProvider.RuntimeType.docker
-            attrs['connection_mode'] = AppProvider.ConnectionMode.ssh
             attrs['service_url'] = AppProvider.managed_service_url
         elif not self.instance:
             if not is_service_account:
@@ -140,6 +209,12 @@ class AppProviderSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        instance = AppProvider.objects.select_for_update().get(pk=instance.pk)
+        if instance.deployments.filter(publication__isnull=True, status__in=('pending', 'running')).exists():
+            raise serializers.ValidationError(_('Wait for the current deployment to finish before editing the provider'))
+        self.fields['host'].instance = instance.host
+        if 'deploy_options' in validated_data:
+            validated_data['deploy_options'] = {**instance.deploy_options, **validated_data['deploy_options']}
         host_data = validated_data.pop('host', None)
         if host_data:
             if instance.host:
@@ -151,7 +226,6 @@ class AppProviderSerializer(serializers.ModelSerializer):
                 'name': host.name,
                 'hostname': host.address,
                 'runtime_type': AppProvider.RuntimeType.docker,
-                'connection_mode': AppProvider.ConnectionMode.ssh,
             })
         return super().update(instance, validated_data)
 
@@ -181,18 +255,12 @@ class AppProviderDeploymentSerializer(serializers.ModelSerializer):
         ]
 
     def validate_provider(self, provider):
-        if not provider.host:
-            raise serializers.ValidationError(_('Provider host is required before deployment'))
-        if provider.runtime_type != AppProvider.RuntimeType.docker:
-            raise serializers.ValidationError(_('Only Docker runtime deployment is currently supported'))
+        provider.validate_deployment()
         return provider
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        provider = attrs.get('provider')
         publication = attrs.get('publication')
-        if publication and publication.provider_id != provider.id:
-            raise serializers.ValidationError(
-                {'publication': _('Publication does not belong to this provider')}
-            )
+        if publication:
+            raise serializers.ValidationError({'publication': _('Use the application publication API to publish images')})
         return attrs

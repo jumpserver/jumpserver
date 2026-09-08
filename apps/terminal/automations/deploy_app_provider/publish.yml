@@ -1,9 +1,30 @@
 ---
 - hosts: all
   become: true
+  gather_facts: false
   vars:
-    APP_IMAGE: example/application:latest
+    APP_IMAGE: ''
+
+  pre_tasks:
+    - name: Check Python 3 interpreter
+      ansible.builtin.raw: command -v python3
+      register: python_interpreter
+      changed_when: false
+      failed_when: false
+
+    - name: Require Python 3 on the provider
+      ansible.builtin.assert:
+        that: python_interpreter.rc == 0
+        fail_msg: Install Python 3 on the Linux provider before publishing virtual applications
+
+    - name: Select Python 3 interpreter
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: '{{ python_interpreter.stdout_lines | last | trim }}'
 
   tasks:
     - name: Pull virtual application image
-      ansible.builtin.command: docker pull {{ APP_IMAGE }}
+      ansible.builtin.command:
+        argv: [docker, pull, '{{ APP_IMAGE }}']
+        expand_argument_vars: false
+      async: 900
+      poll: 5

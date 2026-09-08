@@ -137,11 +137,19 @@ def run_applet_host_deployment(did, install_applets):
     verbose_name=_('Run app provider deployment'),
     activity_callback=lambda self, did, *args, **kwargs: ([did],),
     description=_('Deploy the Panda runtime on an application provider host'),
+    soft_time_limit=1860, time_limit=1920,
 )
 def run_app_provider_deployment(did):
     with tmp_to_builtin_org(system=1):
+        claimed = AppProviderDeployment.objects.filter(pk=did, status='pending').update(
+            status='running', date_start=timezone.now(), date_updated=timezone.now(),
+        )
+        if not claimed:
+            return
         deployment = AppProviderDeployment.objects.get(id=did)
         deployment.start()
+        if deployment.status != 'success':
+            raise RuntimeError('Application provider deployment failed; see the Ansible task log')
 
 
 @shared_task(
@@ -155,10 +163,21 @@ def run_app_provider_deployments(ids):
             'provider', 'publication', 'publication__app'
         )
         deployments_by_id = {str(item.id): item for item in deployments}
+        failed = []
         for deployment_id in ids:
             deployment = deployments_by_id.get(str(deployment_id))
-            if deployment:
-                deployment.start()
+            if not deployment:
+                continue
+            claimed = AppProviderDeployment.objects.filter(pk=deployment.pk, status='pending').update(
+                status='running', date_start=timezone.now(), date_updated=timezone.now(),
+            )
+            if not claimed:
+                continue
+            deployment.start()
+            if deployment.status != 'success':
+                failed.append(str(deployment.pk))
+        if failed:
+            raise RuntimeError('Virtual application publication failed: ' + ', '.join(failed))
 
 
 @shared_task(
