@@ -50,7 +50,7 @@ def enforce_unique_favorite_asset(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0025_node_tree_pagination_index'),
+        ('assets', '0027_web_allowed_urls'),
     ]
 
     operations = [
