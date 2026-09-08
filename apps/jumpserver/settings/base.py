@@ -120,6 +120,7 @@ CSRF_FAILURE_VIEW = 'jumpserver.views.other.csrf_failure'
 # print('  - ' + origin)
 # Max post update field num
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+DATA_UPLOAD_MAX_MEMORY_SIZE = CONFIG.DATA_UPLOAD_MAX_MEMORY_SIZE
 
 # Application definition
 
