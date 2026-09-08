@@ -1,11 +1,13 @@
 import abc
+from collections import defaultdict
+from uuid import UUID
 
 from django.conf import settings
 from django.db.models import F, FilteredRelation, Q, Value
 from django.db.models.functions import Coalesce, NullIf
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from assets.models import Asset, Node, MyAsset
+from assets.models import Asset, FavoriteAsset, FavoriteFolder, MyAsset, Node
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.utils import get_logger, lazyproperty, is_uuid
 from orgs.utils import tmp_to_root_org
@@ -13,9 +15,7 @@ from perms import serializers
 from perms.filters import PermedAssetFilterSet
 from perms.pagination import NodePermedAssetPagination, AllPermedAssetPagination
 from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
-from .mixin import (
-    SelfOrPKUserMixin
-)
+from .mixin import SelfOrPKUserMixin
 
 __all__ = [
     'UserAllPermedAssetsApi',
@@ -123,7 +123,32 @@ class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
 
 class UserFavoriteAssetsApi(BaseUserPermedAssetsApi):
     def get_assets(self):
-        return self.query_asset_util.get_favorite_assets()
+        favorite_asset_ids = FavoriteAsset.objects.filter(
+            user=self.user,
+        ).values('asset_id')
+        assets = Asset.objects.all().valid().filter(id__in=favorite_asset_ids)
+        folder_id = self.request.query_params.get('folder_id')
+        if not is_uuid(folder_id):
+            return assets
+        folders = list(
+            FavoriteFolder.objects.filter(user=self.user)
+            .values_list('id', 'parent_id')
+        )
+        children_by_parent = defaultdict(list)
+        for child_id, parent_id in folders:
+            children_by_parent[parent_id].append(child_id)
+        folder_ids = set()
+        pending = [UUID(folder_id)]
+        while pending:
+            current = pending.pop()
+            if current in folder_ids:
+                continue
+            folder_ids.add(current)
+            pending.extend(children_by_parent.get(current, ()))
+        folder_asset_ids = FavoriteAsset.objects.filter(
+            user=self.user, folder_id__in=folder_ids,
+        ).values('asset_id')
+        return assets.filter(id__in=folder_asset_ids)
 
 
 class UserPermedNodeAssetsApi(BaseUserPermedAssetsApi):
