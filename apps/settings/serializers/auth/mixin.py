@@ -33,8 +33,19 @@ class LDAPSerializerMixin:
         tls_util.sync_files(content_map=content_map)
         tls_util.refresh_global_options()
 
+    def _invalidate_ldap_users_cache_if_needed(self):
+        category = getattr(self, 'category', None)
+        if not category:
+            return
+        attr_map_key = f'AUTH_{category.upper()}_USER_ATTR_MAP'
+        if attr_map_key not in getattr(self, 'validated_data', {}):
+            return
+        from settings.utils.ldap import LDAPCacheUtil
+        LDAPCacheUtil(category=category).delete_users()
+
     def post_save(self):
         self._sync_tls_certs_if_needed()
+        self._invalidate_ldap_users_cache_if_needed()
         keys = [self.periodic_key, self.interval_key, self.crontab_key]
         kwargs = {k: self.validated_data[k] for k in keys if k in self.validated_data}
         if not kwargs:
