@@ -326,7 +326,18 @@ class ConnectionToken(JMSOrgBaseModel):
         virtual_app = VirtualApp.objects.filter(name=method.get('value')).first()
         if not virtual_app:
             return None
-        return virtual_app
+        provider = virtual_app.select_provider(self.user)
+        if provider is None:
+            raise JMSException({
+                'error': 'No provider available, please check the virtual app publication and provider status'
+            })
+        return {
+            'name': virtual_app.name,
+            'image_name': virtual_app.image_name,
+            'image_port': virtual_app.image_port,
+            'image_protocol': virtual_app.image_protocol,
+            'provider': provider,
+        }
 
     def get_applet_option(self):
         method = self.connect_method_object
