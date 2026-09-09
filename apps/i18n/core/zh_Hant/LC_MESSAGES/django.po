@@ -12746,3 +12746,23 @@ msgstr "找不到 SYSLOG 格式文檔"
 #: assets/serializers/asset/template_definition.py
 msgid "ID, asset unique identifier"
 msgstr "ID，資產唯一標識"
+
+#: audits/backends/db.py
+msgid "Upgrade"
+msgstr "全量升級"
+
+#: audits/backends/db.py
+msgid "upgrade_id"
+msgstr "升級包名稱"
+
+#: audits/backends/db.py
+msgid "action"
+msgstr "動作"
+
+#: audits/backends/db.py
+msgid "install"
+msgstr "安裝"
+
+#: audits/backends/db.py
+msgid "delete"
+msgstr "刪除"

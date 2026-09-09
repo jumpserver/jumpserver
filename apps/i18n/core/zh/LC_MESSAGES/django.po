@@ -12866,5 +12866,25 @@ msgstr "协议组，格式 k8s/6443;http(s)/80"
 msgid "ID, asset unique identifier"
 msgstr "ID，资产唯一标识"
 
+#: audits/backends/db.py
+msgid "Upgrade"
+msgstr "全量升级"
+
+#: audits/backends/db.py
+msgid "upgrade_id"
+msgstr "升级包名称"
+
+#: audits/backends/db.py
+msgid "action"
+msgstr "动作"
+
+#: audits/backends/db.py
+msgid "install"
+msgstr "安装"
+
+#: audits/backends/db.py
+msgid "delete"
+msgstr "删除"
+
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"

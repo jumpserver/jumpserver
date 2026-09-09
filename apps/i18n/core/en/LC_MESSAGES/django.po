@@ -12783,6 +12783,26 @@ msgstr ""
 msgid "ID, asset unique identifier"
 msgstr "ID, asset unique identifier"
 
+#: audits/backends/db.py
+msgid "Upgrade"
+msgstr "Full upgrade"
+
+#: audits/backends/db.py
+msgid "upgrade_id"
+msgstr "Upgrade package name"
+
+#: audits/backends/db.py
+msgid "action"
+msgstr "Action"
+
+#: audits/backends/db.py
+msgid "install"
+msgstr "Install"
+
+#: audits/backends/db.py
+msgid "delete"
+msgstr "Delete"
+
 #~| msgid "App Authentication"
 #~ msgid "Certificate Auth"
 #~ msgstr "Authentication"

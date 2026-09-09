@@ -77,6 +77,12 @@ class OperateLogStore(object):
         # 标记翻译字符串
         labels = _("labels")
         operate_log_id = _("operate_log_id")
+        # JDMC 审计词条由数据库动态读取，显式标记供翻译提取。
+        upgrade = _("Upgrade")
+        upgrade_id = _("upgrade_id")
+        action = _("action")
+        install = _("install")
+        delete = _("delete")
         handler = cls._get_special_handler(op_log.resource_type)
         for k, v in op_log.diff.items():
             before_value, after_value = cls.split_value(v)
