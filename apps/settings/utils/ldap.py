@@ -8,6 +8,8 @@ from copy import deepcopy
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
+from string import hexdigits
+
 from ldap3 import SIMPLE, Connection, Server, Tls
 from ldap3.core.exceptions import (
     LDAPAttributeError,
@@ -24,6 +26,7 @@ from ldap3.core.exceptions import (
     LDAPUserNameIsMandatoryError,
 )
 from ldap3.utils.conv import escape_filter_chars
+from ldap3.utils.dn import parse_dn
 
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.db.utils import close_old_connections
@@ -40,9 +43,90 @@ logger = get_logger(__file__)
 __all__ = [
     'LDAPConfig', 'LDAPServerUtil', 'LDAPCacheUtil', 'LDAPImportUtil',
     'LDAPSyncUtil', 'LDAP_USE_CACHE_FLAGS', 'LDAPTestUtil',
+    'LDAPUserGroupMappingError', 'is_dn_groups_mapping',
+    'extract_ou_values_from_dn', 'build_ldap_ou_group_name',
 ]
 
 LDAP_USE_CACHE_FLAGS = [1, '1', 'true', 'True', True]
+LDAP_GROUPS_MAPPING_DN = 'distinguishedname'
+LDAP_GROUPS_MAPPING_MEMBER_OF = 'memberof'
+LDAP_USER_GROUP_NAME_MAX_LENGTH = 128
+
+
+class LDAPUserGroupMappingError(Exception):
+    """Raised when distinguishedName cannot be mapped to a user group."""
+
+
+def is_dn_groups_mapping(mapping):
+    return str(mapping or '').strip().lower() == LDAP_GROUPS_MAPPING_DN
+
+
+def is_memberof_groups_mapping(mapping):
+    return str(mapping or '').strip().lower() == LDAP_GROUPS_MAPPING_MEMBER_OF
+
+
+def unescape_dn_attribute_value(value):
+    if not value:
+        return value
+    raw = bytearray()
+    i = 0
+    length = len(value)
+    while i < length:
+        ch = value[i]
+        if ch != '\\' or i + 1 >= length:
+            raw.extend(ch.encode('utf-8'))
+            i += 1
+            continue
+        nxt = value[i + 1]
+        if i + 2 < length and nxt in hexdigits and value[i + 2] in hexdigits:
+            raw.append(int(value[i + 1:i + 3], 16))
+            i += 3
+            continue
+        raw.extend(nxt.encode('utf-8'))
+        i += 2
+    try:
+        return raw.decode('utf-8')
+    except UnicodeDecodeError as e:
+        raise LDAPUserGroupMappingError(
+            _('Invalid LDAP distinguishedName encoding')
+        ) from e
+
+def extract_ou_values_from_dn(dn):
+    if not dn or not str(dn).strip():
+        raise LDAPUserGroupMappingError(
+            _('LDAP user distinguishedName is empty, cannot map OU group')
+        )
+    try:
+        rdns = parse_dn(dn, escape=False, strip=True)
+    except LDAPInvalidDnError as e:
+        raise LDAPUserGroupMappingError(
+            _('Invalid LDAP distinguishedName: {}').format(dn)
+        ) from e
+    ou_values = []
+    for attr, value, _sep in rdns:
+        if str(attr).lower() == 'ou':
+            ou_values.append(unescape_dn_attribute_value(value))
+    if not ou_values:
+        raise LDAPUserGroupMappingError(
+            _('LDAP distinguishedName has no OU, cannot map user group: {}').format(dn)
+        )
+    return ou_values
+
+
+def build_ldap_ou_group_name(ou_values, prefix='AD '):
+    path = '_'.join(ou_values)
+    if not path:
+        raise LDAPUserGroupMappingError(
+            _('LDAP distinguishedName has no OU, cannot map user group')
+        )
+    group_name = f'{prefix}{path}'.strip()
+    if len(group_name) > LDAP_USER_GROUP_NAME_MAX_LENGTH:
+        raise LDAPUserGroupMappingError(
+            _('LDAP OU group name exceeds {} characters: {}').format(
+                LDAP_USER_GROUP_NAME_MAX_LENGTH, group_name
+            )
+        )
+    return group_name
 
 
 class LDAPConfig(object):
@@ -156,6 +240,14 @@ class LDAPServerUtil(object):
             logger.debug(e, exc_info=True)
             return None
 
+    def iter_ldap_search_attributes(self):
+        attr_map = self.config.attr_map or {}
+        for attr, mapping in attr_map.items():
+            if attr == 'groups' and is_dn_groups_mapping(mapping):
+                continue
+            if mapping:
+                yield mapping
+
     def get_search_filter_extra(self):
         extra = ''
         if self.search_users:
@@ -167,7 +259,7 @@ class LDAPServerUtil(object):
             return '(|{})'.format(extra)
         if self.search_value:
             escaped_search_value = escape_filter_chars(self.search_value)
-            for attr in self.config.attr_map.values():
+            for attr in self.iter_ldap_search_attributes():
                 extra += '({}={})'.format(attr, '*{}*'.format(escaped_search_value))
             return '(|{})'.format(extra)
         return extra
@@ -181,7 +273,7 @@ class LDAPServerUtil(object):
 
     def search_user_entries_ou(self, search_ou, paged_cookie=None):
         search_filter = self.get_search_filter()
-        attributes = list(self.config.attr_map.values())
+        attributes = list(self.iter_ldap_search_attributes())
         self.connection.search(
             search_base=search_ou, search_filter=search_filter,
             attributes=attributes, paged_size=self._paged_size,
@@ -221,6 +313,11 @@ class LDAPServerUtil(object):
         user = {}
         attr_map = self.config.attr_map.items()
         for attr, mapping in attr_map:
+            if attr == 'groups' and is_dn_groups_mapping(mapping):
+                entry_dn = getattr(entry, 'entry_dn', None) or ''
+                user[attr] = [entry_dn] if entry_dn else []
+                user['status'] = ImportStatus.pending
+                continue
             if not hasattr(entry, mapping):
                 continue
             value = getattr(entry, mapping).value or ''
@@ -230,7 +327,7 @@ class LDAPServerUtil(object):
                 else:
                     value = is_true(value)
 
-            if attr == 'groups' and mapping.lower() == 'memberof':
+            if attr == 'groups' and is_memberof_groups_mapping(mapping):
                 # AD: {'groups': 'memberOf'}
                 if isinstance(value, str) and value:
                     value = [value]
@@ -423,7 +520,20 @@ class LDAPImportUtil(object):
         )
         return obj, created
 
-    def get_user_group_names(self, groups) -> list:
+    def get_groups_attr_mapping(self):
+        prefix = 'AUTH_LDAP' if self.category == User.Source.ldap.value else 'AUTH_LDAP_HA'
+        attr_map = getattr(settings, f'{prefix}_USER_ATTR_MAP', {}) or {}
+        if isinstance(attr_map, str):
+            try:
+                attr_map = json.loads(attr_map)
+            except Exception:
+                attr_map = {}
+        return attr_map.get('groups', '')
+
+    def _is_dn_groups_mapping(self):
+        return is_dn_groups_mapping(self.get_groups_attr_mapping())
+
+    def _get_memberof_group_names(self, groups) -> list:
         if not isinstance(groups, list):
             logger.error('Groups type not list')
             return []
@@ -438,6 +548,31 @@ class LDAPImportUtil(object):
             group_name = f'{self.user_group_name_prefix}{group_name}'.strip()
             group_names.append(group_name)
         return group_names
+
+    def _get_dn_group_names(self, groups) -> list:
+        if not isinstance(groups, list):
+            logger.error('Groups type not list')
+            raise LDAPUserGroupMappingError(
+                _('LDAP user groups must be a list')
+            )
+        group_names = []
+        for group in groups:
+            if not group or not isinstance(group, str):
+                continue
+            ou_values = extract_ou_values_from_dn(group)
+            group_names.append(build_ldap_ou_group_name(
+                ou_values, prefix=self.user_group_name_prefix
+            ))
+        if not group_names:
+            raise LDAPUserGroupMappingError(
+                _('Failed to map LDAP user group from distinguishedName: no OU found')
+            )
+        return group_names
+
+    def get_user_group_names(self, groups) -> list:
+        if self._is_dn_groups_mapping():
+            return self._get_dn_group_names(groups)
+        return self._get_memberof_group_names(groups)
 
     def perform_import(self, users, orgs):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
@@ -460,6 +595,10 @@ class LDAPImportUtil(object):
                 group_names = self.get_user_group_names(groups)
                 for group_name in group_names:
                     group_users_mapper[group_name].add(obj)
+            except LDAPUserGroupMappingError as e:
+                errors.append({user['username']: str(e)})
+                logger.error(e)
+                continue
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
@@ -524,6 +663,7 @@ class LDAPImportUtil(object):
                     user_groups_mapper[user].add(group)
                 group.users.add(*users)
             self.exit_user_group(user_groups_mapper)
+
 
 
 class LDAPTestUtil(object):
