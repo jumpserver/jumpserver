@@ -56,7 +56,7 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     async def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
-            has_perm = self.has_perms(user, ['rbac.view_systemtools'])
+            has_perm = await self.has_perms(user, ['rbac.view_systemtools'])
             if await self.is_superuser(user) or (settings.TOOL_USER_ENABLED and has_perm):
                 await self.accept()
             else:
