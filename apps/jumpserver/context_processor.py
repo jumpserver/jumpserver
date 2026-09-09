@@ -8,10 +8,10 @@ from django.utils.translation import gettext_lazy as _
 
 default_interface = dict((
     ('logo_logout', static('img/logo.png')),
-    ('logo_index', static('img/logo_text_white.png')),
+    ('logo_index', static('img/logo_text_white.svg')),
     ('login_image', static('img/login_image.png')),
     ('logo_white', static('img/logo_white.png')),
-    ('logo_text_white', static('img/logo_text_white.png')),
+    ('logo_text_white', static('img/logo_text_white.svg')),
     ('favicon', static('img/facio.ico')),
     ('login_title', _('JumpServer - An open-source PAM')),
     ('theme', 'classic_green'),

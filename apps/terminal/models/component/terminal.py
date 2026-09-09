@@ -131,7 +131,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         data = get_chat_ai_config()
         return {
             'CHAT_AI_ENABLED': settings.CHAT_AI_ENABLED,
-            'CHAT_AI_METHOD': settings.CHAT_AI_METHOD,
             'CHAT_AI_PROVIDER': settings.CHAT_AI_PROVIDER,
             'CHAT_AI_BASE_URL': data['base_url'],
             'CHAT_AI_API_KEY': data['api_key'],

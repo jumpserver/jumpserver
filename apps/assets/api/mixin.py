@@ -37,7 +37,10 @@ class SerializeToTreeNodeMixin:
         return False
 
     @timeit
-    def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
+    def serialize_nodes(
+            self, nodes: List[Node], with_asset_amount=False,
+            with_has_children=True,
+    ):
         if with_asset_amount:
             def _name(node: Node):
                 amount = getattr(
@@ -62,27 +65,31 @@ class SerializeToTreeNodeMixin:
             # previous lazy-tree behaviour.
             return bool(getattr(node, 'has_children', True))
 
-        data = [
-            {
+        data = []
+        for node in nodes:
+            item = {
                 'id': node.key,
                 'name': _name(node),
                 'title': _name(node),
                 'pId': node.parent_key,
-                'isParent': _has_children(node),
-                'hasChildren': _has_children(node),
                 'open': _open(node),
                 'meta': {
                     'data': {
                         "id": node.id,
                         "key": node.key,
                         "value": node.value,
-                        "has_children": _has_children(node),
                     },
                     'type': 'node'
                 }
             }
-            for node in nodes
-        ]
+            if with_has_children:
+                has_children = _has_children(node)
+                item.update({
+                    'isParent': has_children,
+                    'hasChildren': has_children,
+                })
+                item['meta']['data']['has_children'] = has_children
+            data.append(item)
         return data
 
     @timeit
@@ -116,13 +123,21 @@ class SerializeToTreeNodeMixin:
         
     @timeit
     def serialize_assets(self, assets, node_key=None, get_pid=None):
+        assets = list(assets)
+        if not assets:
+            return []
         if not get_pid and not node_key:
             get_pid = lambda asset, platform: getattr(asset, 'parent_key', '')
 
-        sftp_asset_ids = Protocol.objects.filter(name='sftp') \
-            .values_list('asset_id', flat=True)
+        sftp_asset_ids = Protocol.objects.filter(
+            name='sftp', asset_id__in=[asset.id for asset in assets]
+        ).values_list('asset_id', flat=True)
         sftp_asset_ids = set(sftp_asset_ids)
-        platform_map = {p.id: p for p in Platform.objects.all()}
+        platform_map = {
+            platform.id: platform for platform in Platform.objects.filter(
+                id__in={asset.platform_id for asset in assets}
+            )
+        }
 
         data = []
         root_assets_count = 0
@@ -131,6 +146,8 @@ class SerializeToTreeNodeMixin:
             platform = platform_map.get(asset.platform_id)
             if not platform:
                 continue
+            # get_icon_skin also reads asset.platform; reuse this page's map.
+            asset._state.fields_cache['platform'] = platform
             pid = node_key or get_pid(asset, platform)
             if not pid:
                 continue

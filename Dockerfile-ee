@@ -4,6 +4,21 @@ FROM jumpserver/gmssl:3.1.1-trixie AS gmssl-builder
 FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} AS build-xpack
 FROM jumpserver/core:${VERSION}-ce
 
+ARG INSIGHTFACE_MODEL_ROOT=/root/.insightface/models
+ARG INSIGHTFACE_MODEL_URL=https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip
+ENV INSIGHTFACE_MODEL_ROOT=${INSIGHTFACE_MODEL_ROOT}
+
+COPY requirements/download_face_models.py /opt/jumpserver/requirements/download_face_models.py
+
+RUN set -ex \
+    && python /opt/jumpserver/requirements/download_face_models.py \
+        --model-root "${INSIGHTFACE_MODEL_ROOT}" \
+        --url "${INSIGHTFACE_MODEL_URL}" \
+    && python /opt/jumpserver/requirements/download_face_models.py \
+        --model-root "${INSIGHTFACE_MODEL_ROOT}" \
+        --check \
+    && rm -f "${INSIGHTFACE_MODEL_ROOT}/buffalo_l.zip"
+
 COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
 ARG TOOLS="                           \

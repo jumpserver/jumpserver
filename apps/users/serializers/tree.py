@@ -9,7 +9,7 @@ __all__ = ['UserGroupTreeQuerySerializer']
 
 class UserGroupTreeQuerySerializer(serializers.Serializer):
     parent_type = serializers.ChoiceField(
-        choices=('organization', 'user_group'),
+        choices=('organization', 'user_group', 'ungrouped_users'),
         required=False,
     )
     parent_id = serializers.CharField(
@@ -44,7 +44,7 @@ class UserGroupTreeQuerySerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'offset': _('Offset is only supported when loading children.'),
             })
-        if parent_type in ('organization', 'user_group'):
+        if parent_type in ('organization', 'user_group', 'ungrouped_users'):
             try:
                 UUID(parent_id)
             except (TypeError, ValueError):

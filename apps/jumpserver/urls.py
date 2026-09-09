@@ -67,6 +67,11 @@ urlpatterns = [
     path('core/', include(app_view_patterns)),
 ]
 
+if settings.XPACK_ENABLED:
+    urlpatterns.append(
+        path('', include('xpack.urls.view_urls'))
+    )
+
 # 静态文件处理路由
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += [

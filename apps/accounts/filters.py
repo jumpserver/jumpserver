@@ -7,11 +7,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
-from rest_framework.compat import coreapi
 
 from assets.const import AllTypes, Category
 from assets.models import Asset
-from assets.utils import get_node_from_request
+from assets.utils import get_node_from_request, is_query_node_all_assets
+from common.utils.http import is_true
 from common.drf.filters import BaseFilterSet
 from common.utils import get_logger
 from common.utils.timezone import local_zero_hour, local_now
@@ -43,14 +43,18 @@ class UUIDFilterMixin:
 
 
 class NodeFilterBackend(filters.BaseFilterBackend):
-    fields = ['node_id']
+    fields = ['node_id', 'include_descendants']
 
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name=field, location='query', required=False,
-                type='string', example='', description='', schema=None,
-            )
+            {
+                'name': field,
+                'in': 'query',
+                'required': False,
+                'description': '',
+                'schema': {'type': 'boolean' if field == 'include_descendants' else 'string'},
+                'example': True if field == 'include_descendants' else '',
+            }
             for field in self.fields
         ]
 
@@ -59,7 +63,16 @@ class NodeFilterBackend(filters.BaseFilterBackend):
         if node is None:
             return queryset
 
-        node_ids = node.get_all_children(with_self=True).values_list("id", flat=True)
+        include_descendants = request.query_params.get('include_descendants')
+        include_descendants = (
+            is_query_node_all_assets(request) if include_descendants is None
+            else is_true(include_descendants)
+        )
+        if not include_descendants:
+            return queryset.filter(asset__nodes=node).distinct()
+        node_ids = node.get_all_children(with_self=True).filter(
+            org_id=node.org_id,
+        ).values_list("id", flat=True)
         return queryset.filter(asset__nodes__in=node_ids).distinct()
 
 

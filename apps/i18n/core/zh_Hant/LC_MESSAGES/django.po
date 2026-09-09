@@ -5828,6 +5828,10 @@ msgstr "工單資訊"
 msgid "Actions"
 msgstr "動作"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 憑證簽發已停用"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6083,6 +6087,31 @@ msgstr "配置文件有問題，無法登錄，請聯絡管理員或查看最新
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "如果你是管理員，可以更新配置文件解決，設置配置項"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "瀏覽器未攜帶 CSRF Cookie，無法登入。請聯絡管理員"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"如果你是管理員，請檢查 SESSION_COOKIE_DOMAIN 配置是否錯誤：訪問網域必須是它或它的子網域，否則瀏覽器不會保存 "
+"Cookie，請修正或刪除該配置"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "未配置"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "請確認瀏覽器已啟用 Cookie，並清除本站 Cookie 後重試"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -8371,10 +8400,6 @@ msgstr "終端設置"
 msgid "Can change other setting"
 msgstr "其它設置"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "聊天提示"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "同步LDAP用戶任務結果通知"
@@ -9292,53 +9317,9 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "聊天 AI"
 
-#: rbac/tree.py
-msgid "Conversations"
-msgstr "會話管理"
-
-#: rbac/tree.py
-msgid "Messages and attachments"
-msgstr "消息與附件"
-
-#: rbac/tree.py
-msgid "Runs and approvals"
-msgstr "執行與審批"
-
-#: rbac/tree.py
-msgid "API call audits"
-msgstr "API 調用審計"
-
-#: chat_ai/models.py
-msgid "Chat AI conversation"
-msgstr "聊天 AI 會話"
-
 #: chat_ai/models.py
 msgid "Can use Chat AI"
 msgstr "可使用 Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message"
-msgstr "聊天 AI 消息"
-
-#: chat_ai/models.py
-msgid "Chat AI message file"
-msgstr "聊天 AI 消息文件"
-
-#: chat_ai/models.py
-msgid "Chat AI message image"
-msgstr "聊天 AI 消息圖片"
-
-#: chat_ai/models.py
-msgid "Chat AI agent run"
-msgstr "聊天 AI 助手執行"
-
-#: chat_ai/models.py
-msgid "Chat AI approval"
-msgstr "聊天 AI 操作審批"
-
-#: chat_ai/models.py
-msgid "Chat AI API call audit"
-msgstr "聊天 AI API 調用審計"
 
 #: settings/serializers/feature.py:158
 msgid "Method"
@@ -9787,6 +9768,18 @@ msgstr "僅管理員"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "全局啟用 MFA 認證"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "允許的 MFA 方式"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "選擇使用者可以綁定和使用的一種或多種 MFA 方式"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "請至少選擇一種 MFA 方式"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -12565,6 +12558,14 @@ msgstr "頭像路徑"
 msgid "MFA level"
 msgstr "MFA 級別"
 
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "允許的 MFA 類型"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "留空則繼承全局 MFA 方式"
+
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
 msgstr "認證"
@@ -13820,3 +13821,36 @@ msgstr "許可證無效"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "工單已經關閉"
+
+#: assets/models/asset/web.py assets/const/protocol.py
+msgid ""
+"Selector for an element that appears only after a successful login, e.g. css=#dashboard. "
+"Required for basic autofill."
+msgstr "用於定位僅在登入成功後出現的頁面元素，例如 css=#dashboard。基本自動填入模式下必填。"
+
+msgid "Interactive selector"
+msgstr "可互動區域選擇器"
+
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "選填的人工驗證區域，例如 css=#mfa-dialog。請排除帳號密碼及顯示密碼等控制項。"
+
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "請填寫完整的 HTTP/HTTPS 網域，不支援路徑、帳號密碼或萬用字元。"
+
+msgid "Enter at most 128 script steps."
+msgstr "最多填寫 128 個指令碼步驟。"
+
+msgid "Invalid script step."
+msgstr "指令碼步驟格式無效。"
+
+msgid "Script step numbers must be unique positive integers."
+msgstr "指令碼步驟編號必須是不重複的正整數。"
+
+msgid "Unsupported script command."
+msgstr "不支援此指令碼命令。"
+
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "步驟逾時必須為 1 至 180 秒。"
+
+msgid "The success command must be the last step."
+msgstr "success 必須是指令碼的最後一步。"

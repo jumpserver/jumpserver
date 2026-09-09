@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -15,9 +16,10 @@ from .mixin import NodeAssetsAmountListMixin, SerializeToTreeNodeMixin
 from .. import serializers
 from ..const import AllTypes
 from ..models import Node, Platform, Asset
+from ..pagination import NodeTreeCursorPagination
 from ..utils import (
     attach_nodes_realtime_assets_amount, get_asset_tree_metrics,
-    search_node_asset_tree,
+    search_node_asset_tree, get_category_tree_metrics,
 )
 
 logger = get_logger(__file__)
@@ -27,7 +29,7 @@ __all__ = [
     'NodeAssetsAmountApi',
     'NodeAssetTreeSearchApi',
     'NodeTreeMetricsApi',
-    'CategoryTreeApi',
+    'CategoryTreeApi', 'CategoryTreeMetricsApi',
 ]
 
 
@@ -63,7 +65,8 @@ class NodeChildrenApi(NodeAssetsAmountListMixin, generics.ListCreateAPIView):
 
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
-        key = self.request.query_params.get("key")
+        key = (self.request.query_params.get("parent_key") or
+               self.request.query_params.get("key"))
 
         if not pk and not key:
             self.is_initial = True
@@ -123,22 +126,22 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     """
     model = Node
 
-    def get_assets_limit(self):
-        raw_limit = self.request.query_params.get('assets_limit')
-        if raw_limit is None:
-            return None
-        serializer = serializers.NodeTreeAssetsLimitQuerySerializer(data={
-            'assets_limit': raw_limit,
-        })
+    @cached_property
+    def tree_query(self):
+        serializer = serializers.NodeTreeQuerySerializer(
+            data=self.request.query_params
+        )
         serializer.is_valid(raise_exception=True)
-        return serializer.validated_data['assets_limit']
+        return serializer.validated_data
+
+    def get_assets_pagination(self):
+        return (
+            self.tree_query.get('asset_page_size'),
+            self.tree_query['asset_offset'],
+        )
 
     def get_assets_order(self):
-        serializer = serializers.NodeTreeAssetsOrderQuerySerializer(data={
-            'asset_order': self.request.query_params.get('asset_order', 'name'),
-        })
-        serializer.is_valid(raise_exception=True)
-        return serializer.validated_data['asset_order']
+        return self.tree_query['asset_order_by']
 
     def filter_queryset(self, queryset):
         """ queryset is Node queryset """
@@ -150,10 +153,10 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
     def get_queryset_for_assets(self):
         query_all = self.request.query_params.get("all", "0") == "all"
-        include_assets = self.request.query_params.get('assets', '0') == '1'
+        include_assets = self.tree_query['include_assets']
         if not self.instance or not include_assets:
             return Asset.objects.none()
-        has_assets_limit = 'assets_limit' in self.request.query_params
+        has_assets_limit = 'asset_page_size' in self.tree_query
         if (
                 not self.request.GET.get('search') and
                 self.instance.is_org_root() and not has_assets_limit
@@ -166,7 +169,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         return assets.only(
             "id", "name", "address", "platform_id",
             "org_id", "is_active", 'comment'
-        ).prefetch_related('platform')
+        )
 
     def filter_queryset_for_assets(self, assets):
         search = self.request.query_params.get('search')
@@ -175,16 +178,51 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             assets = assets.filter(q)
         return assets
 
+    def paginate_nodes(self, nodes):
+        query_params = self.request.query_params
+        pagination_requested = (
+            'node_page_size' in self.tree_query or
+            'node_cursor' in query_params
+        )
+        if not pagination_requested:
+            return nodes, None, False
+
+        # The global organization must receive every organization root in one
+        # lightweight response. Pagination starts only after a root is opened.
+        if self.is_initial and current_org.is_root():
+            return nodes, None, False
+
+        include_initial_root = (
+            self.is_initial and
+            self.instance is not None and
+            'node_cursor' not in query_params
+        )
+        if self.is_initial and self.instance is not None:
+            nodes = self.instance.get_children().only(
+                'id', 'key', 'value', 'parent_key', 'org_id', 'assets_amount'
+            )
+
+        paginator = NodeTreeCursorPagination()
+        if 'node_page_size' in query_params:
+            paginator.page_size_query_param = 'node_page_size'
+        page = paginator.paginate_queryset(nodes, self.request, view=self)
+        page = list(page)
+
+        if include_initial_root:
+            page.insert(0, self.instance)
+        return page, paginator, include_initial_root
+
     def list(self, request, *args, **kwargs):
-        include_assets = request.query_params.get('assets', '0') == '1'
-        with_asset_amount = request.query_params.get('asset_amount', '1') == '1'
+        include_assets = self.tree_query['include_assets']
+        include_nodes = self.tree_query['include_nodes']
+        with_asset_amount = self.tree_query['include_asset_count']
         query_all = request.query_params.get('all', '0') == 'all'
         compact = request.query_params.get('compact', '0') == '1'
-        assets_limit = self.get_assets_limit()
+        assets_limit, assets_offset = self.get_assets_pagination()
         assets_order = self.get_assets_order()
 
         nodes = self.filter_queryset(self.get_base_queryset())
-        nodes = nodes.order_by('value')
+        nodes = nodes.order_by('value') if include_nodes else nodes.none()
 
         if (
                 compact and query_all and not include_assets and
@@ -197,20 +235,21 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             'id', 'key', 'value', 'parent_key', 'org_id', 'assets_amount'
         )
 
-        if query_all and not include_assets:
-            # The complete response already contains every descendant. Derive
-            # leaf state in linear time and avoid one EXISTS subquery per node.
-            nodes = list(nodes)
-            parent_keys = {node.parent_key for node in nodes if node.parent_key}
-            for node in nodes:
-                node.has_children = node.key in parent_keys
+        if include_nodes:
+            nodes, node_paginator, _ = self.paginate_nodes(nodes)
         else:
-            nodes = list(nodes.with_has_children(include_assets=include_assets))
+            nodes, node_paginator = [], None
+
+        nodes = list(nodes)
 
         if with_asset_amount:
             nodes = attach_nodes_realtime_assets_amount(nodes)
 
-        nodes = self.serialize_nodes(nodes, with_asset_amount=with_asset_amount)
+        nodes = self.serialize_nodes(
+            nodes,
+            with_asset_amount=with_asset_amount,
+            with_has_children=False,
+        )
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
         assets_truncated = False
         if assets_limit is not None:
@@ -220,17 +259,56 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
                 else ('name', 'address', 'id')
             )
             assets = assets.order_by(*order_fields)
-            assets = list(assets[:assets_limit + 1])
+            assets = list(
+                assets[assets_offset:assets_offset + assets_limit + 1]
+            )
             assets_truncated = len(assets) > assets_limit
             assets = assets[:assets_limit]
         node_key = self.instance.key if self.instance else None
         assets = self.serialize_assets(assets, node_key=node_key)
         data = [*nodes, *assets]
+        if node_paginator is not None:
+            next_link = node_paginator.get_next_link()
+            response = {
+                'results': data,
+                'node_pagination': {
+                    'has_more': bool(next_link),
+                    'limit': node_paginator.get_page_size(request),
+                    'next': next_link,
+                    'parent_key': self.instance.key if self.instance else '',
+                },
+            }
+            if assets_limit is not None:
+                response.update({
+                    'assets_truncated': assets_truncated,
+                    'assets_limit': assets_limit,
+                    'asset_pagination': {
+                        'has_more': assets_truncated,
+                        'limit': assets_limit,
+                        'next_offset': (
+                            assets_offset + len(assets)
+                            if assets_truncated else None
+                        ),
+                        'offset': assets_offset,
+                        'parent_key': node_key or '',
+                    },
+                })
+            return Response(response)
         if assets_limit is not None:
             return Response({
                 'results': data,
                 'assets_truncated': assets_truncated,
                 'assets_limit': assets_limit,
+                'asset_pagination': {
+                    'has_more': assets_truncated,
+                    'limit': assets_limit,
+                    'next_offset': (
+                        assets_offset + len(assets)
+                        if assets_truncated else None
+                    ),
+                    'offset': assets_offset,
+                    'parent_key': node_key or '',
+                },
             })
         return Response(data=data)
 
@@ -305,7 +383,7 @@ class NodeTreeMetricsApi(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         results = get_asset_tree_metrics(
-            items=data['items'],
+            items=data['resources'],
             metric=data['metric'],
             search=data.get('search'),
             fresh=data['fresh'],
@@ -316,6 +394,26 @@ class NodeTreeMetricsApi(generics.CreateAPIView):
         })
 
 
+class CategoryTreeMetricsApi(generics.CreateAPIView):
+    serializer_class = serializers.CategoryTreeMetricsQuerySerializer
+
+    @property
+    def rbac_perms(self):
+        permission = (
+            'accounts.view_account' if self.request.data.get('count_resource') == 'account'
+            else 'assets.view_asset'
+        )
+        return {'POST': permission}
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        return Response({'results': get_category_tree_metrics(
+            data['resources'], count_resource=data['count_resource'],
+        )})
+
+
 class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
     serializer_class = TreeNodeSerializer
     rbac_perms = {
@@ -323,6 +421,41 @@ class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         'list': 'assets.view_asset',
     }
     queryset = Node.objects.none()
+
+    @staticmethod
+    def filter_tree_nodes(nodes, keyword):
+        keyword = keyword.strip().lower()
+        if not keyword:
+            return nodes
+        nodes_by_id = {str(node.get('id')): node for node in nodes}
+        included_ids = set()
+        for node in nodes:
+            text = '{} {}'.format(
+                node.get('name', ''), node.get('title', '')
+            ).lower()
+            if keyword not in text:
+                continue
+            current = node
+            while current:
+                current_id = str(current.get('id'))
+                if current_id in included_ids:
+                    break
+                included_ids.add(current_id)
+                current = nodes_by_id.get(str(current.get('pId')))
+
+        response_parent_ids = {
+            str(node.get('pId')) for node in nodes
+            if str(node.get('id')) in included_ids and node.get('pId')
+        }
+        results = []
+        for node in nodes:
+            node_id = str(node.get('id'))
+            if node_id not in included_ids:
+                continue
+            copied = dict(node)
+            copied['open'] = node_id in response_parent_ids
+            results.append(copied)
+        return results
 
     def get_assets(self):
         key = self.request.query_params.get('key')
@@ -343,4 +476,7 @@ class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
             nodes = self.get_assets()
         else:
             nodes = []
+        search = self.request.query_params.get('search', '')
+        if search:
+            nodes = self.filter_tree_nodes(nodes, search)
         return Response(data=nodes)

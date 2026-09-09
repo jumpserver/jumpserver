@@ -4,6 +4,7 @@ from assets.models import Asset, Node
 from orgs.utils import current_org
 from perms.models import AssetPermission
 from users.models import User, UserGroup
+from users.tree import get_ungrouped_users
 
 
 ANCESTOR_QUERY_BATCH_SIZE = 500
@@ -167,6 +168,16 @@ def get_permission_tree_metrics(items, metric):
         AssetPermission.objects.order_by().count()
         if organization_requested else None
     )
+    ungrouped_requested = any(
+        item['type'] == 'ungrouped_users'
+        and str(item['id']) == str(current_org.id)
+        for item in items
+    )
+    ungrouped_count = (
+        AssetPermission.objects.filter(users__in=get_ungrouped_users())
+        .order_by().distinct().count()
+        if ungrouped_requested else None
+    )
     for item in items:
         resource_type = item['type']
         resource_id = item['id']
@@ -186,6 +197,10 @@ def get_permission_tree_metrics(items, metric):
             if resource_id not in users_by_id:
                 continue
             count = len(permissions_by_user_id[resource_id])
+        elif resource_type == 'ungrouped_users':
+            if str(resource_id) != str(current_org.id):
+                continue
+            count = ungrouped_count
         else:
             if str(resource_id) != str(current_org.id):
                 continue

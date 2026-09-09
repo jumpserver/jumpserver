@@ -15,9 +15,10 @@
     RDS_RemoteAppLogoffTimeLimit: 0
     INSTALL_APPLETS: true
     PYTHON_VERSION: 3.11.11
-    CHROME_VERSION: 118.0.5993.118
-    CHROME_DRIVER_VERSION: 118.0.5993.70
-    TINKER_VERSION: v0.2.3
+    WEB_PROXY_URL: ""
+    WEB_APPLET_RECORDING_ENABLED: false
+    # Native Web applets require the matching Tinker release.
+    TINKER_VERSION: v0.3.0
 
   tasks:
     - block:
@@ -236,116 +237,10 @@
             data: "{{ RDS_RemoteAppLogoffTimeLimit }}"
             type: dword
 
-        - name: Stop chromedriver before install
-          ansible.windows.win_powershell:
-            script: |
-              if (Get-Process -Name 'chromedriver' -ErrorAction SilentlyContinue) {
-                TASKKILL /F /IM chromedriver.exe /T
-              }
-              else {
-               $Ansible.Changed = $false
-              }
-
-        - name: Remove old chromedriver (Chrome)
-          ansible.windows.win_powershell:
-            script: |
-              $ErrorActionPreference = 'Stop'
-              $Ansible.Changed = $false
-
-              $paths = @(
-                'C:\Program Files\JumpServer\drivers\chromedriver-win32'
-                'C:\Program Files\JumpServer\drivers\chromedriver_win32'
-                'C:\Program Files\JumpServer\drivers\chromedriver-win64'
-                'C:\Program Files\JumpServer\drivers\chromedriver_win64'
-              )
-
-              foreach ($path in $paths) {
-                if (Test-Path -LiteralPath $path) {
-                  Remove-Item -LiteralPath $path -Recurse -Force
-                  $Ansible.Changed = $true
-                }
-              }
-
-        - name: Download chromedriver (Chrome)
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver-{{ CHROME_DRIVER_VERSION }}-win64.zip"
-            dest: "{{ ansible_env.TEMP }}\\chromedriver-{{ CHROME_DRIVER_VERSION }}-win64.zip"
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-
-        - name: Unzip chromedriver (Chrome)
-          community.windows.win_unzip:
-            src: "{{ ansible_env.TEMP }}\\chromedriver-{{ CHROME_DRIVER_VERSION }}-win64.zip"
-            dest: "%ProgramFiles%\\JumpServer\\drivers"
-
-        - name: Download Chrome zip package (Chrome)
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chrome-{{ CHROME_VERSION }}-win.zip"
-            dest: "{{ ansible_env.TEMP }}\\chrome-{{ CHROME_VERSION }}-win.zip"
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-
-        - name: Stop Chrome before install
-          ansible.windows.win_powershell:
-            script: |
-              if (Get-Process -Name 'chrome' -ErrorAction SilentlyContinue) {
-                TASKKILL /F /IM chrome.exe /T
-              }
-              else {
-               $Ansible.Changed = $false
-              }
-
-        - name: Remove old Chrome (Chrome)
-          ansible.windows.win_powershell:
-            script: |
-              $ErrorActionPreference = 'Stop'
-              $Ansible.Changed = $false
-
-              $paths = @(
-                'C:\Program Files\JumpServer\applications\Chrome'
-                'C:\Program Files\Chrome\chrome-win32'
-                'C:\Program Files\Chrome\chrome-win'
-                'C:\Program Files\chrome-win'
-              )
-
-              foreach ($path in $paths) {
-                if (Test-Path -LiteralPath $path) {
-                  Remove-Item -LiteralPath $path -Recurse -Force
-                  $Ansible.Changed = $true
-                }
-              }
-
-        - name: Unzip Chrome (Chrome)
-          community.windows.win_unzip:
-            src: "{{ ansible_env.TEMP }}\\chrome-{{ CHROME_VERSION }}-win.zip"
-            dest: "%ProgramFiles%\\JumpServer\\applications"
-
-        - name: Check and Clean global system path (Chrome)
-          ansible.windows.win_path:
-            elements:
-              - 'C:\Program Files\JumpServer\drivers\chromedriver-win32'
-              - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
-              - 'C:\Program Files\Chrome\chrome-win32'
-              - 'C:\Program Files\Chrome\chrome-win'
-              - 'C:\Program Files\chrome-win'
-            state: absent
-
-        - name: Set Chrome and driver on the global system path (Chrome)
-          ansible.windows.win_path:
-            elements:
-              - '%ProgramFiles%\JumpServer\applications\Chrome\Application'
-              - '%ProgramFiles%\JumpServer\drivers\chromedriver-win64'
-
-        - name: Set Chrome variables disable Google Api (Chrome)
-          ansible.windows.win_environment:
-            level: machine
-            variables:
-              GOOGLE_API_KEY: ""
-              GOOGLE_DEFAULT_CLIENT_ID: ""
-              GOOGLE_DEFAULT_CLIENT_SECRET: ""
-
         - name: Generate tinkerd component config
           ansible.windows.win_powershell:
             script: |
-              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}
+              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }} --web-proxy-url "{{ WEB_PROXY_URL }}" --web-applet-recording={{ WEB_APPLET_RECORDING_ENABLED | bool | lower }}
 
         - name: Rename tinkerd keyfile
           ansible.windows.win_powershell:

@@ -58,7 +58,7 @@ def check_registered_tasks(*args, **kwargs):
         'settings.tasks.ldap.import_ldap_user', 'users.tasks.check_password_expired',
         'notifications.notifications.publish_task',
         'perms.tasks.check_asset_permission_will_expired',
-        'ops.tasks.create_or_update_registered_periodic_tasks', 'perms.tasks.check_asset_permission_expired',
+        'ops.tasks.create_or_update_registered_periodic_tasks',
         'settings.tasks.ldap.import_ldap_user_periodic', 'users.tasks.check_password_expired_periodic',
         'common.utils.verify_code.send_sms_async',
         'users.tasks.check_user_expired', 'orgs.tasks.refresh_org_cache_task',

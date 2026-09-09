@@ -6019,6 +6019,10 @@ msgstr "Информация о заявке"
 msgid "Actions"
 msgstr "Действия"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "Подписание SSH-сертификатов отключено"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6305,6 +6309,37 @@ msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 "Если вы администратор, вы можете обновить конфигурационный файл для решения "
 "проблемы, настроив параметры."
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"Браузер не передал CSRF cookie, вход невозможен. Пожалуйста, обратитесь к "
+"администратору"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Если вы администратор, проверьте, не настроен ли SESSION_COOKIE_DOMAIN "
+"неправильно: домен, по которому вы обращаетесь, должен совпадать с ним или "
+"быть его поддоменом, иначе браузер не сохранит cookie; исправьте или удалите "
+"эту настройку"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "не задано"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Убедитесь, что в браузере включены cookie, очистите cookie сайта и "
+"попробуйте снова"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -8671,10 +8706,6 @@ msgstr "Изменение настроек терминала"
 msgid "Can change other setting"
 msgstr "Изменение прочих настроек"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "Подсказка в чате"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "Уведомление о результате задачи синхронизации пользователей LDAP"
@@ -9641,53 +9672,9 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "Чат AI"
 
-#: rbac/tree.py
-msgid "Conversations"
-msgstr "Диалоги"
-
-#: rbac/tree.py
-msgid "Messages and attachments"
-msgstr "Сообщения и вложения"
-
-#: rbac/tree.py
-msgid "Runs and approvals"
-msgstr "Выполнения и подтверждения"
-
-#: rbac/tree.py
-msgid "API call audits"
-msgstr "Аудит вызовов API"
-
-#: chat_ai/models.py
-msgid "Chat AI conversation"
-msgstr "Диалог Chat AI"
-
 #: chat_ai/models.py
 msgid "Can use Chat AI"
 msgstr "Можно использовать Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message"
-msgstr "Сообщение Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message file"
-msgstr "Файл сообщения Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI message image"
-msgstr "Изображение сообщения Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI agent run"
-msgstr "Выполнение агента Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI approval"
-msgstr "Подтверждение Chat AI"
-
-#: chat_ai/models.py
-msgid "Chat AI API call audit"
-msgstr "Аудит вызовов API Chat AI"
 
 #: settings/serializers/feature.py:158
 msgid "Method"
@@ -10164,6 +10151,18 @@ msgstr "Только администраторы"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "Глобальное включение МФА"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Разрешённые методы МФА"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Выберите один или несколько методов МФА, которые пользователи могут привязать и использовать"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Выберите хотя бы один метод МФА"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -13049,6 +13048,14 @@ msgstr "URL аватара"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "Уровень МФА"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Разрешённые типы МФА"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Оставьте пустым, чтобы наследовать глобальные методы МФА"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"

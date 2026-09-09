@@ -35,8 +35,11 @@ def unblock_input():
         _blockInput(False)
 
 
-def notify_err_message(msg):
+def notify_err_message(msg, wait=False):
     if _messageBox:
+        if wait:
+            _messageBox(msg, 'Error')
+            return
         # _messageBox 是阻塞当前线程的，所以需要开启一个新线程执行
         t = Thread(target=_messageBox, args=(msg, 'Error'), kwargs={})
         t.daemon = True
@@ -129,6 +132,7 @@ class Specific(DictObj):
     username_selector: str
     password_selector: str
     submit_selector: str
+    success_selector: str
     script: list[Step]
 
     # database
@@ -179,6 +183,7 @@ class ProtocolSetting(DictObj):
     username_selector: str
     password_selector: str
     submit_selector: str
+    success_selector: str
     script: list[Step]
     safe_mode: bool
 

@@ -21,6 +21,12 @@ BOOTSTRAP_TOKEN:
 # SESSION_COOKIE_AGE: 3600
 # SESSION_EXPIRE_AT_BROWSER_CLOSE: false
 
+# Maximum request body size buffered in memory, in bytes. The default is 64 MiB plus
+# 8 KiB for the Kael Runtime Store request envelope.
+# 请求体缓冲到内存中的最大大小，单位为字节。默认值为 64 MiB，并额外预留 8 KiB
+# 用于 Kael Runtime Store 请求封装。
+# DATA_UPLOAD_MAX_MEMORY_SIZE: 67117056
+
 # Database setting, Support sqlite3, mysql, postgres ....
 # 数据库设置
 # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -179,7 +185,17 @@ REDIS_PORT: 6379
 # 仅允许已存在的用户登录，不允许第三方认证后，自动创建用户
 # ONLY_ALLOW_EXIST_USER_AUTH: False
 
-# 开启人脸识别 XPACK 功能
-#FACE_RECOGNITION_ENABLED: true
-#FACE_RECOGNITION_DISTANCE_THRESHOLD': 0.35
-#FACE_RECOGNITION_COSINE_THRESHOLD': 0.95
+# 人脸识别默认关闭。下载模型后再显式设为 true：
+# uv run python requirements/download_face_models.py
+#FACE_RECOGNITION_ENABLED: false
+#FACE_RECOGNITION_COSINE_THRESHOLD: 0.45
+#FACE_RECOGNITION_DEVICE: auto  # auto, cpu, gpu
+#FACE_RECOGNITION_PROVIDERS: []  # e.g. [CUDAExecutionProvider, CPUExecutionProvider]
+#INSIGHTFACE_MODEL_ROOT: ~/.insightface/models
+#INSIGHTFACE_MODEL_NAME: buffalo_l
+#FACE_RECOGNITION_DEBUG: false
+#FACE_RECOGNITION_ENROLLMENT_SAMPLES: 3
+#FACE_LIVENESS_MODE: motion  # off, motion, onnx, hybrid
+#FACE_LIVENESS_MODEL_PATH: ''
+#FACE_LIVENESS_THRESHOLD: 0.72
+#FACE_MONITOR_GRACE_SECONDS: 10
