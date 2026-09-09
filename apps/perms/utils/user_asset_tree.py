@@ -244,7 +244,7 @@ def _authorization_node_counts(user, resource_ids, asset_util):
 
     computed = {
         node.id: (
-            fully_granted_counts[node.key]
+            fully_granted_counts.get(node.key, 0)
             if node.key in fully_granted_keys else
             len(assets_by_key[node.key])
         )
