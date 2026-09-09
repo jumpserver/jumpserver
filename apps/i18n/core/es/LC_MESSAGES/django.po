@@ -6061,7 +6061,7 @@ msgstr "Información de la orden"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "Acciones"
 
 #: authentication/services/ssh_certificate.py:61
 msgid "SSH certificate signing is disabled"
