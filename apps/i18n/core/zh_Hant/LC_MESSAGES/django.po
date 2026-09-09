@@ -112,7 +112,7 @@ msgstr "備份任務沒有指定收件人"
 
 #: accounts/automations/backup_account/handlers.py:291
 msgid "Plan start"
-msgstr "Action開始"
+msgstr "計劃開始"
 
 #: accounts/automations/backup_account/manager.py:14
 msgid "The account backup plan is being executed"
@@ -1395,7 +1395,7 @@ msgstr "登錄時手動輸入 使用者名稱/密碼 來連接的帳號"
 
 #: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
-msgstr "登錄資產時，帳號使用者名稱與使用者使用者名稱相同的帳號"
+msgstr "登入資產時，帳號使用者名稱與使用者名稱相同的帳號"
 
 #: accounts/models/virtual.py:39
 msgid ""
@@ -4407,7 +4407,7 @@ msgstr "標籤"
 
 #: audits/backends/db.py:79
 msgid "operate_log_id"
-msgstr "Action日誌ID"
+msgstr "操作日誌 ID"
 
 #: audits/backends/db.py:111 ops/models/variable.py:19
 msgid "Tips"
@@ -5010,7 +5010,7 @@ msgstr "耗時範圍"
 
 #: audits/serializers.py:39 ops/serializers/celery.py:30
 msgid "Execution cycle"
-msgstr "週期性Action"
+msgstr "執行週期"
 
 #: audits/serializers.py:95
 msgid "Reason display"
@@ -5122,7 +5122,7 @@ msgstr "ACL 動作是覆核"
 
 #: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
-msgstr "ACL Action 係人臉驗證"
+msgstr "ACL 動作是人臉驗證"
 
 #: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
@@ -5130,7 +5130,7 @@ msgstr "資產登錄規則不支持當前資產"
 
 #: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
-msgstr "ACL Action 係人臉在線"
+msgstr "ACL 動作是在線人臉驗證"
 
 #: authentication/api/connection_token.py:807
 msgid "No available face feature"
@@ -7472,7 +7472,7 @@ msgstr "CPU 使用率超過 {max_threshold}: => {value}"
 
 #: ops/serializers/celery.py:32
 msgid "Next execution time"
-msgstr "下次Action時間"
+msgstr "下次執行時間"
 
 #: ops/serializers/job.py:17
 msgid "Run on save"
@@ -8496,7 +8496,7 @@ msgid ""
 "party authentication when the administrator enables third-party redirect "
 "authentication"
 msgstr ""
-"Action管理員啟用第三方重新定向身份驗證時，在使用者重定向到第三方身份驗證之前"
+"當管理員啟用第三方重新導向身份驗證時，在使用者重新導向到第三方身份驗證之前"
 "是否顯示 Flash 頁面"
 
 #: settings/serializers/auth/base.py:56
@@ -8551,7 +8551,7 @@ msgid ""
 "name and the `value` is this system user attribute name"
 msgstr ""
 "使用者屬性對照，其中 `key` 是 CAS 服務使用者屬性名稱，`value` 是本系統使用者"
-"使用者屬性名稱"
+"屬性名稱"
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
@@ -13103,7 +13103,7 @@ msgstr "實例 ID"
 #: xpack/plugins/cloud/manager.py:61
 #, python-format
 msgid "Task \"%s\" starts executing"
-msgstr "Action \"%s\" 開始執行"
+msgstr "任務 \"%s\" 開始執行"
 
 #: xpack/plugins/cloud/manager.py:101
 msgid "View the task details path: "

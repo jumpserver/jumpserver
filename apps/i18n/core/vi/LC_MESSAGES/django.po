@@ -2218,7 +2218,7 @@ msgstr "Khóa không hợp lệ hoặc mật khẩu của khóa sai"
 #: acls/api/clipboard_acl.py:15 acls/models/clipboard_acl.py:14
 #: acls/serializers/clipboard_acl.py:37
 msgid "Operations"
-msgstr "Action"
+msgstr "Thao tác"
 
 #: acls/api/common.py:11 audits/filters.py:52
 msgid "User name, username or ID"
@@ -2293,7 +2293,7 @@ msgstr ""
 #: perms/serializers/permission.py:64 perms/serializers/permission.py:92
 #: terminal/backends/command/models.py:24
 msgid "Action"
-msgstr "Action"
+msgstr "Hành động"
 
 #: acls/models/base.py:42 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:103
@@ -5980,7 +5980,7 @@ msgstr "Thông tin công việc"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "Hành động"
 
 #: authentication/services/ssh_certificate.py:61
 msgid "SSH certificate signing is disabled"
@@ -7201,7 +7201,7 @@ msgstr "Không thể chứa \":\""
 
 #: notifications/apps.py:7
 msgid "App Notifications"
-msgstr "Thông báo Action"
+msgstr "Quản lý thông báo"
 
 #: notifications/backends/__init__.py:13
 msgid "Site message"
@@ -8786,14 +8786,14 @@ msgstr "Kích hoạt ánh xạ thuộc tính"
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
-msgstr "Ánh xạ thuộc tính."
+msgstr "Ánh xạ thuộc tính"
 
 #: settings/serializers/auth/cas.py:36
 msgid ""
 "User attribute mapping, where the `key` is the CAS service user attribute "
 "name and the `value` is this system user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng "
 "dịch vụ CAS, `value` là tên thuộc tính người dùng hệ thống"
 
 #: settings/serializers/auth/dingtalk.py:16
@@ -8805,7 +8805,7 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the DingTalk service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
 "thống, `value` là tên thuộc tính người dùng dịch vụ DingTalk"
 
 #: settings/serializers/auth/feishu.py:20
@@ -8813,7 +8813,7 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the FeiShu service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
 "thống, `value` là tên thuộc tính người dùng dịch vụ FeiShu"
 
 #: settings/serializers/auth/lark.py:13 users/models/user/_source.py:24
@@ -8825,7 +8825,7 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the Lark service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
 "thống, `value` là tên thuộc tính người dùng dịch vụ Lark"
 
 #: settings/serializers/auth/ldap.py:46 settings/serializers/auth/ldap.py:115
@@ -11202,7 +11202,7 @@ msgstr "Có thể kết thúc cuộc trò chuyện"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
-msgstr "Có thể xác thực quyền Action của cuộc trò chuyện"
+msgstr "Có thể xác thực quyền thao tác của phiên"
 
 #: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
@@ -12348,7 +12348,7 @@ msgstr "Xin nút"
 
 #: tickets/serializers/ticket/apply_asset.py:28
 msgid "Apply actions"
-msgstr "Xin Action"
+msgstr "Hành động yêu cầu"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:91
@@ -13755,7 +13755,7 @@ msgstr "Chính sách tên máy chủ"
 
 #: xpack/plugins/cloud/models.py:415
 msgid "Action attr"
-msgstr "Thuộc tính Action"
+msgstr "Thuộc tính hành động"
 
 #: xpack/plugins/cloud/models.py:417
 msgid "Action value"

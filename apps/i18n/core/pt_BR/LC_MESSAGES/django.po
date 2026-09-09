@@ -642,8 +642,8 @@ msgid ""
 "Vault operation failed. Please retry or check your account information on "
 "Vault."
 msgstr ""
-"Falha na Action Vault, tente novamente ou verifique as informações da conta "
-"no Vault."
+"Falha na operação do Vault. Tente novamente ou verifique as informações da "
+"conta no Vault."
 
 #: accounts/exceptions.py:25
 msgid ""
@@ -2224,7 +2224,7 @@ msgstr "Chave inválida ou erro de senha da chave"
 #: acls/api/clipboard_acl.py:15 acls/models/clipboard_acl.py:14
 #: acls/serializers/clipboard_acl.py:37
 msgid "Operations"
-msgstr "Action"
+msgstr "Operações"
 
 #: acls/api/common.py:11 audits/filters.py:52
 msgid "User name, username or ID"
@@ -2299,7 +2299,7 @@ msgstr ""
 #: perms/serializers/permission.py:64 perms/serializers/permission.py:92
 #: terminal/backends/command/models.py:24
 msgid "Action"
-msgstr "Action"
+msgstr "Ação"
 
 #: acls/models/base.py:42 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:103
@@ -4381,7 +4381,7 @@ msgstr "Coletar informações de hardware do ativo"
 
 #: assets/tasks/automation.py:25
 msgid "Asset execute automation"
-msgstr "Action do ativo"
+msgstr "Automação de execução de ativo"
 
 #: assets/tasks/automation.py:27 orgs/tasks.py:11 terminal/tasks.py:33
 msgid "Unused"
@@ -4397,8 +4397,8 @@ msgid ""
 "this task \n"
 "        will be executed"
 msgstr ""
-"Quando clicar para atualizar as informações de hardware na página de "
-"detalhes do ativo - configurações básicas no console, execute essa Action"
+"Ao clicar para atualizar as informações de hardware em Detalhes do ativo - "
+"Configurações básicas no console, esta tarefa será executada"
 
 #: assets/tasks/gather_facts.py:44
 msgid "Update assets hardware info: "
@@ -4421,8 +4421,8 @@ msgid ""
 "        nodes and when the number of nodes exceeds 100"
 msgstr ""
 "Ajuste manual do número de ativos para atualizar o número de ativos do nó "
-"atual sob a organização; Atualizar o nó, quando o número de nós é maior que "
-"100, este Action será chamado"
+"atual da organização; ao atualizar o nó, se houver mais de 100 nós, esta "
+"tarefa será executada"
 
 #: assets/tasks/nodes_amount.py:34
 msgid ""
@@ -4440,7 +4440,7 @@ msgid ""
 "count of \n"
 "        all nodes under all organizations"
 msgstr ""
-"Convocação regular do Action check_node_assets_amount_task, atualização da "
+"Executa periodicamente a tarefa check_node_assets_amount_task e atualiza a "
 "quantidade de ativos de todos os nós em todas as organizações"
 
 #: assets/tasks/ping.py:20 assets/tasks/ping.py:30
@@ -4452,8 +4452,8 @@ msgid ""
 "When clicking 'Test Asset Connectivity' in 'Asset Details - Basic Settings' "
 "this task will be executed"
 msgstr ""
-"Quando clicar para testar a conectividade do ativo na página de detalhes do "
-"ativo - configurações básicas, execute essa Action"
+"Ao clicar em Testar conectividade do ativo em Detalhes do ativo - "
+"Configurações básicas, esta tarefa será executada"
 
 #: assets/tasks/ping.py:46
 msgid "Test if the assets under the node are connectable "
@@ -4469,8 +4469,8 @@ msgid ""
 "When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
 "be executed"
 msgstr ""
-"Quando esta Action é executada no detalhe do domínio de rede - gateway - "
-"teste de conexão"
+"Ao clicar em Testar conexão em Detalhes do domínio - Gateway, esta tarefa "
+"será executada"
 
 #: assets/tasks/utils.py:16
 msgid "Asset has been disabled, skipped: {}"
@@ -5208,7 +5208,7 @@ msgstr "Usuário %s logou no sistema %s"
 #: audits/signal_handlers/activity_log.py:65
 #, python-format
 msgid "User %s perform a task for this resource: %s"
-msgstr "Usuário %s realizou uma Action no recurso atual, (%s)"
+msgstr "O usuário %s executou uma tarefa para este recurso: %s"
 
 #: audits/tasks.py:190
 msgid "Clean audits session task log"
@@ -5693,11 +5693,11 @@ msgstr "Código de verificação MFA"
 
 #: authentication/forms.py:68
 msgid "Dynamic code"
-msgstr "Código Action"
+msgstr "Código dinâmico"
 
 #: authentication/mfa/base.py:9
 msgid "Please input security code"
-msgstr "Por favor, digite o código de segurança Action"
+msgstr "Digite o código de segurança"
 
 #: authentication/mfa/base.py:32
 msgid ""
@@ -6009,7 +6009,7 @@ msgstr "Informações do Ticket"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "Ações"
 
 #: authentication/services/ssh_certificate.py:61
 msgid "SSH certificate signing is disabled"
@@ -6931,7 +6931,7 @@ msgstr "O objeto %s não existe"
 
 #: common/exceptions.py:25
 msgid "Someone else is doing this. Please wait for complete"
-msgstr "Outra pessoa está em Action, aguarde a finalização"
+msgstr "Outra pessoa está realizando esta operação. Aguarde a conclusão"
 
 #: common/exceptions.py:30
 msgid "Your request timeout"
@@ -7384,7 +7384,7 @@ msgstr "Não é possível excluir este arquivo"
 
 #: ops/apps.py:9
 msgid "App Ops"
-msgstr "Centro de Action"
+msgstr "Central de operações"
 
 #: ops/const.py:8
 msgid "Push"
@@ -8818,7 +8818,7 @@ msgstr "Sincronizar logout"
 
 #: settings/serializers/auth/cas.py:22
 msgid "When the user signs out, they also be logged out from the CAS server"
-msgstr "Quando o usuário se desconecta, eles são desconectados do servidor CAS"
+msgstr "Quando o usuário sai, ele também é desconectado do servidor CAS"
 
 #: settings/serializers/auth/cas.py:28
 msgid "Username attr"
@@ -8835,7 +8835,7 @@ msgstr "Ativar mapeamento de atributos"
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
-msgstr "Mapear atributos"
+msgstr "Mapeamento de atributos"
 
 #: settings/serializers/auth/cas.py:36
 msgid ""
@@ -10292,8 +10292,7 @@ msgstr "Tempo máximo ocioso da conexão (minutos)"
 #: settings/serializers/security.py:237
 msgid "If idle time more than it, disconnect connection."
 msgstr ""
-"Observação: se essa configuração for excedida sem qualquer Action, a conexão "
-"será desconectada"
+"Se o período de inatividade exceder este valor, a conexão será desconectada"
 
 #: settings/serializers/security.py:240
 msgid "Session expire at browser closed"
@@ -11289,7 +11288,7 @@ msgstr "É possível encerrar a sessão"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
-msgstr "É possível validar as permissões de Action na sessão."
+msgstr "É possível validar as permissões de ação da sessão"
 
 #: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
@@ -12199,7 +12198,7 @@ msgstr "Usuários em cópia"
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:39
 #: tickets/serializers/ticket/ticket.py:87
 msgid "Ticket flow"
-msgstr "Fluxo de Action da ordem de serviço"
+msgstr "Fluxo da ordem de serviço"
 
 #: tickets/models/relation.py:12
 msgid "Ticket session relation"
@@ -12516,7 +12515,7 @@ msgstr ""
 
 #: tickets/views/approve.py:105
 msgid "Illegal approval action"
-msgstr "Action inválida de aprovação"
+msgstr "Ação de aprovação inválida"
 
 #: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"
@@ -13870,7 +13869,7 @@ msgstr "Valor de ação"
 
 #: xpack/plugins/cloud/models.py:424 xpack/plugins/cloud/serializers/task.py:85
 msgid "Strategy action"
-msgstr "Action"
+msgstr "Ação"
 
 #: xpack/plugins/cloud/providers/aws_international.py:18
 msgid "China (Beijing)"

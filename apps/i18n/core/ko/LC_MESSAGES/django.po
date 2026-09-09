@@ -4462,7 +4462,7 @@ msgstr "슬랙"
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:138
 #: users/models/user/_source.py:22
 msgid "DingTalk"
-msgstr "딩딩"
+msgstr "DingTalk"
 
 #: audits/auth_backends.py:25 authentication/models/temp_token.py:17
 msgid "Temporary token"
@@ -5199,15 +5199,15 @@ msgstr "권한이 만료되었습니다."
 
 #: authentication/api/connection_token.py:756
 msgid "ACL action is reject: {}({})"
-msgstr "ACL Action은 거부: {}({})입니다."
+msgstr "ACL 동작은 거부: {}({})입니다."
 
 #: authentication/api/connection_token.py:760
 msgid "ACL action is review"
-msgstr "ACL Action은 재검토입니다."
+msgstr "ACL 동작은 재검토입니다."
 
 #: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
-msgstr "ACL Action은 얼굴 인식입니다."
+msgstr "ACL 동작은 얼굴 인식입니다."
 
 #: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
@@ -5215,7 +5215,7 @@ msgstr "자산 로그인 규칙은 현재 자산을 지원하지 않습니다."
 
 #: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
-msgstr "ACL Action은 온라인 얼굴 인식입니다."
+msgstr "ACL 동작은 온라인 얼굴 인식입니다."
 
 #: authentication/api/connection_token.py:807
 msgid "No available face feature"
@@ -5553,7 +5553,7 @@ msgstr "기업 위챗이 연결되지 않았습니다"
 #: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
 #: authentication/views/dingtalk.py:249
 msgid "DingTalk is not bound"
-msgstr "딩딩이 연결되지 않았습니다"
+msgstr "DingTalk이 연결되지 않았습니다"
 
 #: authentication/errors/mfa.py:33 authentication/views/feishu.py:136
 msgid "FeiShu is not bound"
@@ -5927,7 +5927,7 @@ msgstr "작업 정보"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "동작"
 
 #: authentication/services/ssh_certificate.py:61
 msgid "SSH certificate signing is disabled"
@@ -6382,15 +6382,15 @@ msgstr "%s 바인딩 성공"
 
 #: authentication/views/dingtalk.py:43
 msgid "DingTalk Error, Please contact your system administrator"
-msgstr "딩딩 오류, 시스템 관리자에게 문의해 주세요."
+msgstr "DingTalk 오류입니다. 시스템 관리자에게 문의해 주세요."
 
 #: authentication/views/dingtalk.py:46 authentication/views/dingtalk.py:204
 msgid "DingTalk Error"
-msgstr "딩딩 오류"
+msgstr "DingTalk 오류"
 
 #: authentication/views/dingtalk.py:54
 msgid "DingTalk is already bound"
-msgstr "딩딩이 이미 바인딩되었습니다"
+msgstr "DingTalk이 이미 바인딩되었습니다"
 
 #: authentication/views/dingtalk.py:123
 msgid "Invalid user_id"
@@ -6398,23 +6398,23 @@ msgstr "유효하지 않은 user_id"
 
 #: authentication/views/dingtalk.py:139
 msgid "DingTalk query user failed"
-msgstr "딩딩 사용자 조회 실패"
+msgstr "DingTalk 사용자 조회 실패"
 
 #: authentication/views/dingtalk.py:147
 msgid "The DingTalk is already bound to another user"
-msgstr "해당 딩딩은 다른 사용자와 바인딩되었습니다"
+msgstr "해당 DingTalk은 다른 사용자와 바인딩되었습니다"
 
 #: authentication/views/dingtalk.py:154
 msgid "Binding DingTalk successfully"
-msgstr "딩딩 바인딩 성공"
+msgstr "DingTalk 바인딩 성공"
 
 #: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:243
 msgid "Failed to get user from DingTalk"
-msgstr "딩딩에서 사용자 정보를 가져오는 데 실패했습니다"
+msgstr "DingTalk에서 사용자 정보를 가져오는 데 실패했습니다"
 
 #: authentication/views/dingtalk.py:250
 msgid "Please login with a password and then bind the DingTalk"
-msgstr "비밀번호로 로그인한 후 딩딩을 바인딩해 주세요"
+msgstr "비밀번호로 로그인한 후 DingTalk을 바인딩해 주세요"
 
 #: authentication/views/feishu.py:44 authentication/views/feishu.py:135
 msgid "FeiShu Error"
@@ -8599,7 +8599,7 @@ msgstr "RADIUS 인증"
 
 #: settings/serializers/auth/base.py:20
 msgid "DingTalk Auth"
-msgstr "딩딩 인증"
+msgstr "DingTalk 인증"
 
 #: settings/serializers/auth/base.py:21
 msgid "FeiShu Auth"
@@ -8722,14 +8722,14 @@ msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
-msgstr "딩딩 인증 활성화"
+msgstr "DingTalk 인증 활성화"
 
 #: settings/serializers/auth/dingtalk.py:20
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the DingTalk service user attribute name"
 msgstr ""
-"사용자 속성 매핑에서 `key`는 이 시스템 사용자 속성 이름이고, `value`는 딩딩 "
+"사용자 속성 매핑에서 `key`는 이 시스템 사용자 속성 이름이고, `value`는 DingTalk "
 "서비스의 사용자 속성 이름입니다."
 
 #: settings/serializers/auth/feishu.py:20
@@ -11097,7 +11097,7 @@ msgstr "세션 종료 가능"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
-msgstr "세션 Action 권한 검증 가능"
+msgstr "세션 동작 권한 검증 가능"
 
 #: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
@@ -12230,7 +12230,7 @@ msgstr "신청 노드"
 
 #: tickets/serializers/ticket/apply_asset.py:28
 msgid "Apply actions"
-msgstr "신청 Action"
+msgstr "신청 동작"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:91
@@ -12298,7 +12298,7 @@ msgstr "인증이 성공적으로 완료되면, 작업 요청이 직접 승인�
 
 #: tickets/views/approve.py:105
 msgid "Illegal approval action"
-msgstr "유효하지 않은 승인 Action"
+msgstr "유효하지 않은 승인 동작"
 
 #: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"

@@ -4950,7 +4950,7 @@ msgstr "認証バックエンド"
 
 #: audits/reporting.py:220
 msgid "Login Type Distribution"
-msgstr "ログインリダイレクトの有効化msg"
+msgstr "ログインタイプの分布"
 
 #: audits/reporting.py:225
 msgid "Auth Backend Distribution"
@@ -4962,7 +4962,7 @@ msgstr "MFAの設定"
 
 #: audits/reporting.py:235
 msgid "Login Time Distribution"
-msgstr "ログインリダイレクトの有効化msg"
+msgstr "ログイン時間の分布"
 
 #: audits/reporting.py:240
 msgid "Failed User Top 10"
@@ -5244,7 +5244,7 @@ msgstr "ACL アクションはレビューです"
 
 #: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
-msgstr "ACL Action は顔認証です"
+msgstr "ACL アクションは顔認証です"
 
 #: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
@@ -5252,7 +5252,7 @@ msgstr "資産ログインルールは現在の資産をサポートしていま
 
 #: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
-msgstr "ACL Action は顔オンラインです"
+msgstr "ACL アクションはオンライン顔認証です"
 
 #: authentication/api/connection_token.py:807
 msgid "No available face feature"
@@ -8091,7 +8091,7 @@ msgid ""
 "config.txt"
 msgstr ""
 "利用者権限ツリーの組織集合キャッシュは期限切れになるため、期限切れの集合を"
-"キャッシュからクリアする必要があります。このActionは、システム設定ファイル"
+"キャッシュからクリアする必要があります。このタスクは、システム設定ファイル"
 "config.txt中のPERM_EXPIRED_CHECK_PERIODICの時間間隔に基づいて定期的に実行され"
 "ます"
 
@@ -8645,7 +8645,7 @@ msgstr "RADIUS 認証"
 
 #: settings/serializers/auth/base.py:20
 msgid "DingTalk Auth"
-msgstr "くぎ 認証"
+msgstr "DingTalk 認証"
 
 #: settings/serializers/auth/base.py:21
 msgid "FeiShu Auth"
@@ -8696,11 +8696,11 @@ msgstr "パスワードを忘れた場合のリンク"
 
 #: settings/serializers/auth/base.py:39
 msgid "The URL for Forgotten Password on the user login page"
-msgstr "ユーザーログイン画面のパスワードを忘れた URL"
+msgstr "ユーザーログイン画面に表示するパスワード再設定リンクの URL"
 
 #: settings/serializers/auth/base.py:42
 msgid "Login redirection"
-msgstr "ログインリダイレクトの有効化msg"
+msgstr "ログインリダイレクト通知を有効化"
 
 #: settings/serializers/auth/base.py:44
 msgid ""
@@ -8726,7 +8726,7 @@ msgstr "CAS"
 #: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:49
 #: settings/serializers/auth/ldap_ha.py:31 settings/serializers/auth/oidc.py:61
 msgid "Server"
-msgstr "LDAPサーバー"
+msgstr "サーバーアドレス"
 
 #: settings/serializers/auth/cas.py:18
 msgid "Proxy Server"
@@ -8743,11 +8743,11 @@ msgstr "ユーザーがログアウトすると、CAS サーバからもログ�
 
 #: settings/serializers/auth/cas.py:28
 msgid "Username attr"
-msgstr "ユーザー名のプロパティ"
+msgstr "ユーザー名属性"
 
 #: settings/serializers/auth/cas.py:31
 msgid "Enable attributes map"
-msgstr "属性マップの有効化"
+msgstr "属性マッピングを有効化"
 
 #: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
@@ -8756,7 +8756,7 @@ msgstr "属性マップの有効化"
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
-msgstr "マッピングのプロパティ"
+msgstr "属性マッピング"
 
 #: settings/serializers/auth/cas.py:36
 msgid ""
@@ -8768,7 +8768,7 @@ msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
-msgstr "ピン認証の有効化"
+msgstr "DingTalk 認証を有効化"
 
 #: settings/serializers/auth/dingtalk.py:20
 msgid ""
@@ -8776,7 +8776,7 @@ msgid ""
 "and the `value` is the DingTalk service user attribute name"
 msgstr ""
 "ユーザー属性のマッピング、ここで `key` はこのシステムのユーザー属性名で、"
-"`value` は ディントーク サービスのユーザー属性名です"
+"`value` は DingTalk サービスのユーザー属性名です"
 
 #: settings/serializers/auth/feishu.py:20
 msgid ""
@@ -10353,7 +10353,7 @@ msgid ""
 "When LDAP auto-sync is configured, this task will be invoked to synchronize "
 "users"
 msgstr ""
-"LDAPの自動同期が設定されている場合、このActionを呼び出して利用者の同期を行い"
+"LDAPの自動同期が設定されている場合、このタスクを呼び出して利用者の同期を行い"
 "ます"
 
 #: settings/tasks/ldap.py:77
@@ -10371,8 +10371,8 @@ msgid ""
 "        will be re-registered or updated, and this task will be invoked"
 msgstr ""
 "LDAPの自動同期パラメーターが変更された場合、たとえばCrontabパラメーターが変更"
-"され、ldap同期Actionの再登録または更新が必要になった場合、そのActionはこの"
-"Actionを呼び出します"
+"され、LDAP同期タスクの再登録または更新が必要になった場合、このタスクが呼び出"
+"されます"
 
 #: settings/tasks/ldap.py:131
 msgid "Registration periodic import ldap ha user task"
@@ -10385,7 +10385,7 @@ msgid ""
 "        will be re-registered or updated, and this task will be invoked"
 msgstr ""
 "LDAP HA自動同期パラメーターが変更された場合、Crontabパラメーターなど、ldap ha"
-"同期Actionを再登録または更新する際にはこのActionを呼び出します"
+"同期タスクを再登録または更新する際にはこのタスクを呼び出します"
 
 #: settings/templates/ldap/_msg_import_ldap_user.html:2
 msgid "Sync task finish"
@@ -11310,7 +11310,7 @@ msgstr "同意が必要です"
 
 #: terminal/reporting.py:112
 msgid "Login From Distribution"
-msgstr "ログインリダイレクトの有効化msg"
+msgstr "ログイン元の分布"
 
 #: terminal/reporting.py:127
 msgid "Terminal Top 10"
@@ -11789,7 +11789,9 @@ msgid ""
 "When deploying from the remote application publisher details page, and the "
 "'Deploy' \n"
 "        button is clicked, this task will be executed"
-msgstr "デプロイメントシステムの展開時に、このActionが実行されます"
+msgstr ""
+"リモートアプリケーションパブリッシャーの詳細ページで「デプロイ」をクリックす"
+"ると、このタスクが実行されます"
 
 #: terminal/tasks.py:137
 msgid "Install applet"
@@ -11801,7 +11803,7 @@ msgid ""
 "the remote \n"
 "        application publisher details page, this task will be executed"
 msgstr ""
-"リモートアプリケーションの詳細-リモートアプリケーションの展開時に、このAction"
+"リモートアプリケーションの詳細-リモートアプリケーションの展開時に、このタスク"
 "が実行されます"
 
 #: terminal/tasks.py:152
@@ -11815,7 +11817,7 @@ msgid ""
 "        remote application publisher details page, this task will be executed"
 msgstr ""
 "リモートアプリケーションの詳細-リモートアプリケーションのアンインストール時"
-"に、このActionが実行されます"
+"に、このタスクが実行されます"
 
 #: terminal/tasks.py:167
 msgid "Generate applet host accounts"
@@ -11828,7 +11830,7 @@ msgid ""
 "        automatically, this task will be executed"
 msgstr ""
 "リモートパブリッシャーを作成した後、自動でアカウントを作成する必要がある場"
-"合、このActionが実行されます"
+"合、このタスクが実行されます"
 
 #: terminal/tasks.py:184
 msgid "Check command replay storage connectivity"
@@ -12950,9 +12952,9 @@ msgid ""
 "register or update the \n"
 "        parameters of the task that checks if passwords have expired"
 msgstr ""
-"バージョンが進化するにつれて、新たなActionが追加されたり、Actionの名前、実行"
+"バージョンが進化するにつれて、新たなタスクが追加されたり、タスクの名前、実行"
 "時間が変更されたりする可能性があります。そのため、システムが起動するときに、"
-"パスワードの期限切れを確認するActionのパラメータを登録または更新します"
+"パスワードの期限切れを確認するタスクのパラメータを登録または更新します"
 
 #: users/tasks.py:67
 msgid "Check user expired"

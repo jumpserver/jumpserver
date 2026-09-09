@@ -8714,21 +8714,15 @@ msgstr ""
 
 #: settings/serializers/auth/base.py:38
 msgid "Forgot Password URL"
-msgstr ""
-"Forgot password link\n"
-"-"
+msgstr "Forgot password link"
 
 #: settings/serializers/auth/base.py:39
 msgid "The URL for Forgotten Password on the user login page"
-msgstr ""
-">URL for forgot password on user login page\n"
-"-"
+msgstr "URL for the forgot password link on the user login page"
 
 #: settings/serializers/auth/base.py:42
 msgid "Login redirection"
-msgstr ""
-">Enable login redirect notice\n"
-"-"
+msgstr "Enable login redirect notice"
 
 #: settings/serializers/auth/base.py:44
 msgid ""
@@ -8736,62 +8730,47 @@ msgid ""
 "party authentication when the administrator enables third-party redirect "
 "authentication"
 msgstr ""
-">When admin enables third-party redirect authentication, whether to show a "
-"flash page before redirecting the user to third-party authentication\n"
-"-"
+"Whether to show a flash page before redirecting the user to third-party "
+"authentication when the administrator enables third-party redirect "
+"authentication"
 
 #: settings/serializers/auth/base.py:56
 msgid ""
 "When you create a user, you associate the user to the organization of your "
 "choice. Users always belong to the Default organization."
 msgstr ""
-">When creating a user, you associate that user with the organization you "
-"choose. Users always belong to the Default organization.\n"
-"-"
+"When creating a user, you associate that user with the organization you "
+"choose. Users always belong to the Default organization."
 
 #: settings/serializers/auth/cas.py:12 settings/serializers/auth/cas.py:14
 msgid "CAS"
-msgstr ""
-">CAS\n"
-"-"
+msgstr "CAS"
 
 #: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:49
 #: settings/serializers/auth/ldap_ha.py:31 settings/serializers/auth/oidc.py:61
 msgid "Server"
-msgstr ""
-">Server address\n"
-"-"
+msgstr "Server address"
 
 #: settings/serializers/auth/cas.py:18
 msgid "Proxy Server"
-msgstr ""
-">Callback address\n"
-"-"
+msgstr "Callback address"
 
 #: settings/serializers/auth/cas.py:21 settings/serializers/auth/oauth2.py:56
 #: settings/serializers/auth/saml2.py:42
 msgid "Logout completely"
-msgstr ""
-">Synchronous logout\n"
-"-"
+msgstr "Synchronous logout"
 
 #: settings/serializers/auth/cas.py:22
 msgid "When the user signs out, they also be logged out from the CAS server"
-msgstr ""
-">When users log out, they also log out from the CAS server\n"
-"-"
+msgstr "When users log out, they also log out from the CAS server"
 
 #: settings/serializers/auth/cas.py:28
 msgid "Username attr"
-msgstr ""
-">Username attribute\n"
-"-"
+msgstr "Username attribute"
 
 #: settings/serializers/auth/cas.py:31
 msgid "Enable attributes map"
-msgstr ""
-">Enable attribute mapping\n"
-"-"
+msgstr "Enable attribute mapping"
 
 #: settings/serializers/auth/cas.py:34 settings/serializers/auth/dingtalk.py:18
 #: settings/serializers/auth/feishu.py:18 settings/serializers/auth/lark.py:17
@@ -8800,22 +8779,19 @@ msgstr ""
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
-msgstr ""
-">Mapping attributes\n"
-"-"
+msgstr "Mapping attributes"
 
 #: settings/serializers/auth/cas.py:36
 msgid ""
 "User attribute mapping, where the `key` is the CAS service user attribute "
 "name and the `value` is this system user attribute name"
 msgstr ""
-">User attribute mapping, where `key` is the CAS service user attribute name "
-"and `value` is the system user attribute name\n"
-"-"
+"User attribute mapping, where `key` is the CAS service user attribute name "
+"and `value` is the system user attribute name"
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
-msgstr ">Enable DingTalk authentication"
+msgstr "Enable DingTalk authentication"
 
 #: settings/serializers/auth/dingtalk.py:20
 msgid ""

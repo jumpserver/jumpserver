@@ -2233,7 +2233,7 @@ msgstr "неверный закрытый ключ или ошибка паро�
 #: acls/api/clipboard_acl.py:15 acls/models/clipboard_acl.py:14
 #: acls/serializers/clipboard_acl.py:37
 msgid "Operations"
-msgstr "Action"
+msgstr "Операции"
 
 #: acls/api/common.py:11 audits/filters.py:52
 msgid "User name, username or ID"
@@ -8823,16 +8823,16 @@ msgstr "CAS"
 #: settings/serializers/auth/cas.py:15 settings/serializers/auth/ldap.py:49
 #: settings/serializers/auth/ldap_ha.py:31 settings/serializers/auth/oidc.py:61
 msgid "Server"
-msgstr "Сервер"
+msgstr "Адрес сервера"
 
 #: settings/serializers/auth/cas.py:18
 msgid "Proxy Server"
-msgstr "Прокси-сервер"
+msgstr "Адрес обратного вызова"
 
 #: settings/serializers/auth/cas.py:21 settings/serializers/auth/oauth2.py:56
 #: settings/serializers/auth/saml2.py:42
 msgid "Logout completely"
-msgstr "Завершать выход полностью"
+msgstr "Синхронный выход"
 
 #: settings/serializers/auth/cas.py:22
 msgid "When the user signs out, they also be logged out from the CAS server"
@@ -8853,19 +8853,19 @@ msgstr "Включить сопоставление атрибутов"
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
-msgstr "Атрибуты пользователя"
+msgstr "Сопоставление атрибутов"
 
 #: settings/serializers/auth/cas.py:36
 msgid ""
 "User attribute mapping, where the `key` is the CAS service user attribute "
 "name and the `value` is this system user attribute name"
 msgstr ""
-"Сопоставление атрибутов пользователя, где \"ключ\" — это название атрибута "
-"пользователя CAS, а \"значение\" — название атрибута пользователя системы"
+"Сопоставление атрибутов пользователя, где `key` — название атрибута "
+"пользователя CAS, а `value` — название атрибута пользователя системы"
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
-msgstr "Dingtalk"
+msgstr "Включить аутентификацию DingTalk"
 
 #: settings/serializers/auth/dingtalk.py:20
 msgid ""
