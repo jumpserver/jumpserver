@@ -108,7 +108,7 @@ class AppProviderHostSerializer(HostSerializer):
 
 class AppProviderSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False, max_length=128, label=_('Name'))
-    hostname = serializers.CharField(required=False, max_length=128, label=_('Hostname'))
+    address = serializers.CharField(read_only=True, label=_('Address'))
     host = AppProviderHostSerializer(required=False, allow_null=True, label=_('Host'))
     load = LabeledChoiceField(
         read_only=True, label=_('Load status'), choices=const.ComponentLoad.choices,
@@ -121,7 +121,7 @@ class AppProviderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AppProvider
-        field_mini = ['id', 'name', 'hostname']
+        field_mini = ['id', 'name', 'address']
         read_only_fields = [
             'terminal',
             'date_created', 'date_updated',
@@ -189,16 +189,11 @@ class AppProviderSerializer(serializers.ModelSerializer):
                     'host': {'name': _('An application provider with this name already exists')}
                 })
             attrs['name'] = name
-            attrs['hostname'] = address
         elif not self.instance:
             if not is_service_account:
-                raise serializers.ValidationError({
-                    'host': _('Application provider host is required')
-                })
-            if not attrs.get('name') or not attrs.get('hostname'):
-                raise serializers.ValidationError({
-                    'host': _('Legacy provider registration requires name and hostname')
-                })
+                raise serializers.ValidationError({'host': _('Application provider host is required')})
+            if not attrs.get('name'):
+                raise serializers.ValidationError({'name': _('This field is required.')})
         return attrs
 
     @transaction.atomic
@@ -225,7 +220,6 @@ class AppProviderSerializer(serializers.ModelSerializer):
             validated_data.update({
                 'host': host,
                 'name': host.name,
-                'hostname': host.address,
             })
         return super().update(instance, validated_data)
 

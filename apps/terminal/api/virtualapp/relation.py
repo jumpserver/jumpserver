@@ -64,7 +64,7 @@ class AppProviderAppViewSet(ProviderMixin, JMSModelViewSet):
             return self.provider.publications.get(id=pk)
 
     def get_queryset(self):
-        queryset = self.provider.publications.all()
+        queryset = self.provider.publications.select_related('provider__host', 'app')
         return queryset
 
 

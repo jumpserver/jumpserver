@@ -4,12 +4,14 @@ from django.core.cache import cache
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
 from common.api import JMSBulkModelViewSet
+from common.drf.filters import BaseFilterSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
 from terminal.models import AppProvider, AppProviderDeployment
@@ -22,11 +24,19 @@ from terminal.tasks import run_app_provider_deployment, run_app_provider_deploym
 __all__ = ['AppProviderViewSet', 'AppProviderDeploymentViewSet']
 
 
+class AppProviderFilterSet(BaseFilterSet):
+    address = filters.CharFilter(field_name='host__address', label=_('Address'))
+
+    class Meta:
+        model = AppProvider
+        fields = ['name', 'address']
+
+
 class AppProviderViewSet(JMSBulkModelViewSet):
     serializer_class = AppProviderSerializer
-    queryset = AppProvider.objects.all()
-    filterset_fields = ['name', 'hostname']
-    search_fields = ['name', 'hostname', ]
+    queryset = AppProvider.objects.select_related('host')
+    filterset_class = AppProviderFilterSet
+    search_fields = ['name', 'host__address']
     rbac_perms = {
         'startup': 'terminal.change_appprovider',
         'containers': 'terminal.view_appprovider',

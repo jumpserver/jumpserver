@@ -12,7 +12,6 @@ __all__ = ['AppProvider', 'AppProviderDeployment']
 class AppProvider(JMSBaseModel):
     cache_status_key_prefix = 'virtual_host_{}_status'
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
-    hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
     host = models.OneToOneField(
         'assets.Host', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='app_provider', verbose_name=_('Host'),
@@ -44,7 +43,7 @@ class AppProvider(JMSBaseModel):
 
     @property
     def address(self):
-        return self.host.address if self.host else self.hostname
+        return self.host.address if self.host else ''
 
     def select_gateway(self):
         if not self.host or not self.host.zone:

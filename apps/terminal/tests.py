@@ -1,8 +1,12 @@
 import errno
+import hashlib
+import io
 import json
 import os
 import shutil
+import tarfile
 import tempfile
+from compression import zstd
 from contextlib import nullcontext
 from pathlib import Path
 from types import SimpleNamespace
@@ -10,9 +14,14 @@ from unittest import mock
 from unittest.mock import Mock, patch
 
 import yaml
+from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import transaction
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.urls import resolve, reverse
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import Account
 from assets.utils.platform_package import locate_package_root
@@ -27,6 +36,7 @@ from terminal.models import Applet, AppProvider, AppProviderDeployment, Terminal
 from terminal.serializers import AppProviderSerializer
 from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
 from terminal.tasks import run_app_provider_deployment, run_app_provider_deployments
+from terminal.utils import virtualapp as image_archives
 
 
 class PackageRootLocateTests(SimpleTestCase):
@@ -262,7 +272,7 @@ class AppProviderRuntimeTests(SimpleTestCase):
         self.assertEqual(serializer.data, [])
 
     def test_provider_serializer_exposes_provider_comment(self):
-        provider = AppProvider(name='provider-one', hostname='192.0.2.10', comment='Provider note')
+        provider = AppProvider(name='provider-one', comment='Provider note')
 
         data = AppProviderSerializer(instance=provider).data
 
@@ -307,7 +317,7 @@ class AppProviderRuntimeTests(SimpleTestCase):
             result = serializer.validate(attrs)
 
         self.assertEqual(result['name'], 'provider-one')
-        self.assertEqual(result['hostname'], '192.0.2.10')
+        self.assertNotIn('hostname', result)
 
     @mock.patch('terminal.serializers.virtualapp_provider.Platform.objects.get')
     @mock.patch('assets.serializers.HostSerializer.to_internal_value', side_effect=lambda data: data)
@@ -326,15 +336,22 @@ class AppProviderRuntimeTests(SimpleTestCase):
         self.assertNotIn('protocols', host_data)
         self.assertNotIn('nodes_display', host_data)
         self.assertEqual(result['name'], 'provider-one')
-        self.assertEqual(result['hostname'], '192.0.2.10')
+        self.assertNotIn('hostname', result)
 
-    def test_address_falls_back_to_legacy_hostname(self):
-        provider = AppProvider(hostname='192.0.2.10')
+    def test_provider_without_host_has_no_address(self):
+        provider = AppProvider()
 
-        self.assertEqual(provider.address, '192.0.2.10')
+        self.assertEqual(provider.address, '')
+
+    def test_provider_creation_requires_host_for_regular_users(self):
+        serializer = AppProviderSerializer(context={
+            'request': mock.Mock(user=mock.Mock(is_service_account=False)),
+        })
+        with self.assertRaises(ValidationError):
+            serializer.validate({'name': 'provider-one'})
 
     def test_address_uses_bound_host(self):
-        provider = AppProvider(hostname='legacy-address')
+        provider = AppProvider()
         provider.__dict__['host_id'] = '00000000-0000-0000-0000-000000000001'
         host = mock.Mock(address='198.51.100.10')
         with mock.patch.object(
@@ -375,7 +392,7 @@ class AppProviderRuntimeTests(SimpleTestCase):
             self.assertFalse(provider.connection_ready)
 
     def test_provider_without_host_cannot_receive_connections(self):
-        provider = AppProvider(hostname='192.0.2.10')
+        provider = AppProvider()
         self.assertFalse(provider.connection_ready)
 
 
@@ -384,12 +401,24 @@ class AppProviderTerminalBindingTests(TestCase):
         self.terminal = Terminal.objects.create(name='panda', type='panda')
 
     def test_managed_provider_replaces_unbound_registration(self):
-        legacy = AppProvider.objects.create(
-            name='unbound-provider', hostname='192.0.2.10',
-            terminal=self.terminal,
-        )
+        user = get_user_model().objects.create(username='legacy-panda', is_service_account=True)
+        self.terminal.user = user
+        self.terminal.save(update_fields=['user'])
+        url = reverse('api-terminal:app-provider-list')
+        incoming = APIRequestFactory().post(url, {
+            'name': 'unbound-provider', 'hostname': '192.0.2.10',
+        }, format='json')
+        force_authenticate(incoming, user=user)
+        match = resolve(url)
+        response = match.func(incoming, **match.kwargs)
+        self.assertEqual(response.status_code, 201)
+        self.assertNotIn('hostname', response.data)
+        self.assertEqual(response.data['address'], '')
+        legacy = AppProvider.objects.get(pk=user.pk)
+        self.assertIsNone(legacy.host_id)
+        self.assertEqual(legacy.terminal_id, self.terminal.id)
         managed = AppProvider.objects.create(
-            name='managed-ssh', hostname='192.0.2.10',
+            name='managed-ssh',
         )
 
         managed.bind_terminal(self.terminal)
@@ -408,7 +437,7 @@ class AppProviderTerminalBindingTests(TestCase):
             serializer.is_valid(raise_exception=True)
             serializer.save(terminal=self.terminal)
         managed = AppProvider.objects.create(
-            name='managed-ssh', hostname='198.51.100.10',
+            name='managed-ssh',
         )
 
         with self.assertRaises(ValidationError):
@@ -416,7 +445,7 @@ class AppProviderTerminalBindingTests(TestCase):
 
     def test_provider_does_not_replace_its_bound_terminal(self):
         provider = AppProvider.objects.create(
-            name='managed-ssh', hostname='192.0.2.10', terminal=self.terminal,
+            name='managed-ssh', terminal=self.terminal,
         )
         another = Terminal.objects.create(name='another-panda', type='panda')
         with self.assertRaises(ValidationError):
@@ -424,7 +453,7 @@ class AppProviderTerminalBindingTests(TestCase):
 
     def test_deployment_registers_and_reuses_panda_credentials(self):
         provider = AppProvider.objects.create(
-            name='managed-ssh', hostname='192.0.2.10',
+            name='managed-ssh',
             terminal=self.terminal,
         )
         deployment = mock.Mock(provider=provider)
@@ -440,6 +469,7 @@ class AppProviderTerminalBindingTests(TestCase):
 
     def test_managed_host_create_and_partial_update_preserve_ssh_port(self):
         from orgs.utils import tmp_to_builtin_org
+        from terminal.api.virtualapp.provider import AppProviderFilterSet
 
         with tmp_to_builtin_org(system=1):
             serializer = AppProviderSerializer(data={'host': {
@@ -449,14 +479,18 @@ class AppProviderTerminalBindingTests(TestCase):
             serializer.is_valid(raise_exception=True)
             provider = serializer.save()
             update = AppProviderSerializer(
-                provider, data={'host': {'comment': 'Updated'}}, partial=True,
+                provider, data={'host': {'comment': 'Updated'}, 'hostname': '198.51.100.20'}, partial=True,
             )
             update.is_valid(raise_exception=True)
             provider = update.save()
 
         self.assertEqual(provider.name, 'managed-ssh')
-        self.assertEqual(provider.hostname, '192.0.2.10')
+        self.assertEqual(provider.address, '192.0.2.10')
         self.assertEqual(provider.host.protocols.get(name='ssh').port, 2222)
+        data = AppProviderSerializer(provider).data
+        self.assertEqual(data['address'], '192.0.2.10')
+        self.assertNotIn('hostname', data)
+        self.assertEqual(list(AppProviderFilterSet({'address': '192.0.2.10'}).qs), [provider])
 
 
 class AppProviderCompatibilityTests(SimpleTestCase):
@@ -706,7 +740,6 @@ class AppProviderDeploymentTests(SimpleTestCase):
         self.assertEqual(variables['PANDA_ACCESS_KEY'], 'access-key-id:secret')
         self.assertEqual(variables['PANDA_PROVIDER_ID'], str(provider.id))
         self.assertNotIn('BOOTSTRAP_TOKEN', variables)
-        self.assertEqual(variables['PANDA_HOST_IP'], '192.0.2.10')
         self.assertEqual(variables['PANDA_IMAGE'], 'jumpserver/panda:test')
         self.assertEqual(variables['PANDA_RANGE_PORTS'], '7000-7100')
         self.assertTrue(variables['IGNORE_VERIFY_CERTS'])
@@ -773,12 +806,14 @@ class AppProviderDeploymentTests(SimpleTestCase):
         )
         with tempfile.TemporaryDirectory() as ansible_dir, override_settings(
             ANSIBLE_DIR=ansible_dir
+        ), mock.patch(
+            'terminal.automations.deploy_app_provider.stage_image_archives', return_value={}
         ):
             path = DeployAppProviderManager(deployment).generate_playbook()
             with open(path) as stream:
                 play = yaml.safe_load(stream)[0]
 
-        self.assertEqual(play['vars'], {'APP_IMAGE': 'example/app:v1'})
+        self.assertEqual(play['vars'], {'APP_IMAGE': 'example/app:v1', 'APP_IMAGE_RESOURCES': {}})
         self.assertFalse(play['gather_facts'])
         self.assertNotIn('pre_tasks', play)
         self.assertIn('ansible.builtin.assert', play['tasks'][-1])
@@ -811,7 +846,7 @@ class AppProviderDeploymentAPITests(TestCase):
         data = ConnectTokenVirtualAppOptionSerializer.get_provider({'provider': self.provider})
 
         self.assertEqual(set(data), {
-            'id', 'name', 'hostname', 'address', 'host_id',
+            'id', 'name', 'address', 'host_id',
             'load', 'host', 'account', 'gateway',
         })
         self.assertEqual(data['host']['address'], self.provider.host.address)
@@ -1015,7 +1050,7 @@ class AppProviderDeploymentAPITests(TestCase):
         with self.assertRaisesMessage(ValidationError, 'current deployment'):
             view.perform_destroy(self.provider)
         idle = AppProvider.objects.create(
-            id='00000000-0000-0000-0000-000000000001', name='idle-provider', hostname='192.0.2.11',
+            id='00000000-0000-0000-0000-000000000001', name='idle-provider',
         )
         providers = AppProvider.objects.filter(pk__in=[idle.pk, self.provider.pk])
         with self.assertRaisesMessage(ValidationError, 'current deployment'):
@@ -1147,3 +1182,150 @@ class OfflineProviderResourcesTests(SimpleTestCase):
         self.write_manifest()
         with self.assertRaisesMessage(ValueError, 'archive path'):
             stage_resources(Path(self.directory) / 'task', self.image)
+
+
+class VirtualAppImageArchiveTests(TestCase):
+    def setUp(self):
+        self.directory = self.enterContext(tempfile.TemporaryDirectory())
+        self.enterContext(override_settings(DATA_DIR=self.directory, ANSIBLE_DIR=self.directory))
+        self.app = VirtualApp.objects.create(name='offline-image', version='1.0', image_name='alpine:3.20')
+
+    @staticmethod
+    def make_archive(architecture='amd64', compressed=False, tag='docker.io/library/alpine:3.20',
+                     system='linux', extra=(), blobs=False):
+        config = json.dumps({'os': system, 'architecture': architecture, 'rootfs': {'type': 'layers', 'diff_ids': []}}).encode()
+        name = hashlib.sha256(config).hexdigest()
+        name = 'blobs/sha256/' + name if blobs else name + '.json'
+        manifest = json.dumps([{'Config': name, 'RepoTags': [tag], 'Layers': []}]).encode()
+        stream = io.BytesIO()
+        with tarfile.open(fileobj=stream, mode='w') as archive:
+            for filename, data in [(name, config), ('manifest.json', manifest), *extra]:
+                member = tarfile.TarInfo(filename)
+                member.size = len(data)
+                archive.addfile(member, io.BytesIO(data))
+        data = stream.getvalue()
+        return SimpleUploadedFile('image.TAR.ZST' if compressed else 'image.tar', zstd.compress(data) if compressed else data)
+
+    def test_tar_and_zstd_preserve_bytes_and_stage_both_platforms(self):
+        for architecture, compressed in [('amd64', False), ('arm64', True)]:
+            upload = self.make_archive(architecture, compressed=compressed, blobs=compressed)
+            payload = upload.read()
+            metadata = image_archives.save_image_archive(self.app, upload)
+            self.assertEqual(metadata['sha256'], hashlib.sha256(payload).hexdigest())
+            self.assertEqual((image_archives.archive_root(self.app) / metadata['file']).read_bytes(), payload)
+        resources = image_archives.stage_image_archives(self.app, Path(self.directory) / 'task')
+        self.assertEqual(set(resources), {'amd64', 'arm64'})
+        for architecture, image in resources.items():
+            source = image_archives.archive_root(self.app) / Path(image['file']).name
+            self.assertEqual(source.stat().st_ino, Path(image['file']).stat().st_ino)
+        deployment = mock.Mock(publication_id='publication', publication=mock.Mock(app=self.app))
+        with open(DeployAppProviderManager(deployment).generate_playbook()) as stream:
+            variables = yaml.safe_load(stream)[0]['vars']
+        self.assertEqual(set(variables['APP_IMAGE_RESOURCES']), {'amd64', 'arm64'})
+
+    def test_invalid_upload_preserves_previous_archive(self):
+        image = image_archives.save_image_archive(self.app, self.make_archive())
+        for upload in [
+            SimpleUploadedFile('invalid.zst', b'invalid archive'),
+            self.make_archive(tag='private.example.com/library/alpine:3.20'),
+            self.make_archive(tag='alpine:other'),
+            self.make_archive(system='windows'),
+            self.make_archive(extra=[('manifest.json', b'[]')]),
+            self.make_archive(extra=[('../outside', b'escape')]),
+        ]:
+            with self.subTest(filename=upload.name), self.assertRaises(ValidationError):
+                image_archives.save_image_archive(self.app, upload)
+            self.assertEqual(image_archives.get_image_archives(self.app), [image])
+        with mock.patch.object(image_archives, 'MAX_SCAN_SIZE', 1), self.assertRaises(ValidationError):
+            image_archives.save_image_archive(self.app, self.make_archive())
+        self.assertEqual(set(path.name for path in image_archives.archive_root(self.app).iterdir()), {'manifest.json', image['file']})
+
+    def test_replace_delete_and_app_delete_preserve_staged_files(self):
+        image = image_archives.save_image_archive(self.app, self.make_archive())
+        staged = image_archives.stage_image_archives(self.app, Path(self.directory) / 'task')['amd64']
+        payload = Path(staged['file']).read_bytes()
+        replacement = image_archives.save_image_archive(self.app, self.make_archive(compressed=True))
+        self.assertFalse((image_archives.archive_root(self.app) / image['file']).exists())
+        image_archives.save_image_archive(self.app, self.make_archive('arm64'))
+        image_archives.delete_image_archive(self.app, 'amd64')
+        self.assertFalse((image_archives.archive_root(self.app) / replacement['file']).exists())
+        root = image_archives.archive_root(self.app)
+        with self.captureOnCommitCallbacks(execute=True):
+            self.app.delete()
+        self.assertFalse(root.exists())
+        self.assertEqual(Path(staged['file']).read_bytes(), payload)
+
+    def test_missing_and_outdated_archives_allow_online_fallback(self):
+        self.assertEqual(image_archives.stage_image_archives(self.app, self.directory), {})
+        image = image_archives.save_image_archive(self.app, self.make_archive())
+        source = image_archives.archive_root(self.app) / image['file']
+        source.unlink()
+        self.assertEqual(image_archives.stage_image_archives(self.app, self.directory), {})
+        image_archives.save_image_archive(self.app, self.make_archive())
+        self.app.version = '2.0'
+        self.app.save(update_fields=['version'])
+        self.assertEqual(image_archives.stage_image_archives(self.app, self.directory), {})
+        self.assertEqual(image_archives.get_image_archives(self.app)[0]['version'], '1.0')
+
+    def test_upload_version_race_and_manifest_failure_keep_previous_resources(self):
+        image = image_archives.save_image_archive(self.app, self.make_archive())
+        with mock.patch.object(image_archives, '_write_manifest', side_effect=OSError('Disk full')):
+            with self.assertRaises(OSError):
+                image_archives.save_image_archive(self.app, self.make_archive(compressed=True))
+        self.assertEqual(image_archives.get_image_archives(self.app), [image])
+        inspect = image_archives._inspect_archive
+
+        def change_version(*args):
+            result = inspect(*args)
+            VirtualApp.objects.filter(pk=self.app.pk).update(version='2.0')
+            return result
+
+        with mock.patch.object(image_archives, '_inspect_archive', side_effect=change_version):
+            with self.assertRaisesMessage(ValidationError, 'changed'):
+                image_archives.save_image_archive(self.app, self.make_archive(compressed=True))
+        self.assertEqual(image_archives.get_image_archives(self.app), [image])
+
+    def test_cross_device_stage_keeps_open_source_during_replacement(self):
+        image = image_archives.save_image_archive(self.app, self.make_archive())
+        source = image_archives.archive_root(self.app) / image['file']
+        payload, copyfileobj = source.read_bytes(), shutil.copyfileobj
+
+        def replace_source(opened, output, length):
+            source.unlink()
+            copyfileobj(opened, output, length)
+
+        with mock.patch.object(image_archives.os, 'link', side_effect=OSError(errno.EXDEV, 'Cross-device')):
+            with mock.patch.object(image_archives.shutil, 'copyfileobj', side_effect=replace_source):
+                resources = image_archives.stage_image_archives(self.app, Path(self.directory) / 'task')
+        self.assertEqual(Path(resources['amd64']['file']).read_bytes(), payload)
+
+    def test_image_api_permissions_upload_and_architecture_delete(self):
+        user = get_user_model().objects.create(username='image-upload-user')
+        permissions = {'terminal.view_virtualapp'}
+        user.has_perms = lambda required: set(required).issubset(permissions)
+        url = reverse('api-terminal:virtual-app-images', kwargs={'pk': self.app.pk})
+        match = resolve(url)
+        factory = APIRequestFactory()
+
+        def request(method, data=None, suffix=''):
+            incoming = getattr(factory, method)(url + suffix, data or {}, format='multipart')
+            force_authenticate(incoming, user=user)
+            with transaction.atomic():
+                return match.func(incoming, **match.kwargs)
+
+        self.assertEqual(request('get').status_code, 200)
+        self.assertEqual(request('post', {'file': self.make_archive()}).status_code, 403)
+        self.assertEqual(request('delete', suffix='?architecture=amd64').status_code, 403)
+        permissions.add('terminal.change_virtualapp')
+        for architecture in ('amd64', 'arm64'):
+            response = request('post', {'file': self.make_archive(architecture)})
+            self.assertEqual(response.status_code, 201)
+        before = response.data
+        self.assertEqual(before['max_size'], image_archives.MAX_IMAGE_SIZE)
+        self.assertEqual(set(before['images'][0]), {'filename', 'size', 'version', 'image_name', 'os', 'architecture'})
+        self.assertEqual(request('post', {'file': SimpleUploadedFile('bad.tar', b'bad')}).status_code, 400)
+        self.assertEqual(request('get').data, before)
+        self.assertEqual(request('delete').status_code, 400)
+        response = request('delete', suffix='?architecture=amd64')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([image['architecture'] for image in response.data['images']], ['arm64'])

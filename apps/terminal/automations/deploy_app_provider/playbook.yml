@@ -4,7 +4,6 @@
   gather_facts: false
   vars:
     CORE_HOST: ''
-    PANDA_HOST_IP: 127.0.0.1
     PANDA_IMAGE: ''
     PANDA_RESOURCE: {}
     DOCKER_RESOURCE: {}
@@ -329,8 +328,6 @@
           - 'PANDA_PROVIDER_ID={{ PANDA_PROVIDER_ID }}'
           - -e
           - 'IGNORE_VERIFY_CERTS={{ IGNORE_VERIFY_CERTS | string | lower }}'
-          - -e
-          - 'PANDA_HOST_IP={{ PANDA_HOST_IP }}'
           - -e
           - 'PANDA_RANGE_PORTS={{ PANDA_RANGE_PORTS }}'
           - -e

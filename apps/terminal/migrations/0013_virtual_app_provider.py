@@ -5,11 +5,40 @@ import uuid
 from django.db import migrations, models
 
 
+def migrate_provider_addresses(apps, schema_editor):
+    provider_model = apps.get_model('terminal', 'AppProvider')
+    host_model = apps.get_model('assets', 'Host')
+    asset_model = apps.get_model('assets', 'Asset')
+    protocol_model = apps.get_model('assets', 'Protocol')
+    platform_model = apps.get_model('assets', 'Platform')
+    db = schema_editor.connection.alias
+    platform = platform_model.objects.using(db).get(name='VirtualAppHost', internal=True)
+    org_id = '00000000-0000-0000-0000-000000000004'
+    providers = provider_model.objects.using(db).filter(host__isnull=True).exclude(hostname='')
+    for provider in providers.iterator():
+        name = provider.name
+        if asset_model.objects.using(db).filter(org_id=org_id, name=name).exists():
+            name = f'{name[:91]}-{provider.pk}'
+        host = host_model.objects.using(db).create(
+            name=name, address=provider.hostname, platform_id=platform.pk, org_id=org_id,
+        )
+        protocol_model.objects.using(db).create(asset_id=host.pk, name='ssh', port=22)
+        provider_model.objects.using(db).filter(pk=provider.pk).update(host_id=host.pk)
+
+
+def restore_provider_addresses(apps, schema_editor):
+    provider_model = apps.get_model('terminal', 'AppProvider')
+    db = schema_editor.connection.alias
+    for provider in provider_model.objects.using(db).select_related('host').iterator():
+        if provider.host_id:
+            provider_model.objects.using(db).filter(pk=provider.pk).update(hostname=provider.host.address)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0026_add_virtual_app_host_platform'),
-        ('terminal', '0011_endpoint_magnus_port'),
+        ('assets', '0029_add_virtual_app_host_platform'),
+        ('terminal', '0012_retire_builtin_chrome'),
     ]
 
     operations = [
@@ -23,6 +52,13 @@ class Migration(migrations.Migration):
             name='host',
             field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='app_provider', to='assets.host', verbose_name='Host'),
         ),
+        migrations.AlterField(
+            model_name='appprovider',
+            name='hostname',
+            field=models.CharField(default='', max_length=128, verbose_name='Hostname'),
+        ),
+        migrations.RunPython(migrate_provider_addresses, restore_provider_addresses),
+        migrations.RemoveField(model_name='appprovider', name='hostname'),
         migrations.AddField(
             model_name='virtualapppublication',
             name='app_version',

@@ -7,6 +7,7 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -16,6 +17,9 @@ from common.serializers import FileSerializer
 from terminal import serializers
 from terminal.models import VirtualAppPublication, VirtualApp, AppProviderDeployment
 from terminal.tasks import run_app_provider_deployment
+from terminal.utils.virtualapp import (
+    MAX_IMAGE_SIZE, delete_image_archive, get_image_archives, save_image_archive,
+)
 from common.utils.zip import safe_extract_zip
 
 __all__ = ['VirtualAppViewSet', 'VirtualAppPublicationViewSet']
@@ -77,11 +81,44 @@ class VirtualAppViewSet(UploadMixin, JMSBulkModelViewSet):
     search_fields = ['name', 'image_name', 'display_name']
     rbac_perms = {
         'upload': 'terminal.add_virtualapp',
+        'images': 'terminal.view_virtualapp',
+        'upload_image': 'terminal.change_virtualapp',
+        'delete_image': 'terminal.change_virtualapp',
     }
+
+    @staticmethod
+    def image_response(app, status=200):
+        fields = ('filename', 'size', 'version', 'image_name', 'os', 'architecture')
+        images = [
+            {field: archive[field] for field in fields}
+            for archive in get_image_archives(app)
+        ]
+        return Response({'images': images, 'max_size': MAX_IMAGE_SIZE}, status=status)
+
+    @action(detail=True, methods=['get'], serializer_class=FileSerializer, parser_classes=[MultiPartParser])
+    def images(self, request, *args, **kwargs):
+        return self.image_response(self.get_object())
+
+    @images.mapping.post
+    def upload_image(self, request, *args, **kwargs):
+        app = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        save_image_archive(app, serializer.validated_data['file'])
+        return self.image_response(app, status=201)
+
+    @images.mapping.delete
+    def delete_image(self, request, *args, **kwargs):
+        app = self.get_object()
+        architecture = request.query_params.get('architecture')
+        if not architecture:
+            raise ValidationError({'architecture': _('Image architecture is required')})
+        delete_image_archive(app, architecture)
+        return self.image_response(app)
 
 
 class VirtualAppPublicationViewSet(viewsets.ModelViewSet):
-    queryset = VirtualAppPublication.objects.all()
+    queryset = VirtualAppPublication.objects.select_related('provider__host', 'app')
     serializer_class = serializers.VirtualAppPublicationSerializer
     filterset_fields = ['app', 'app__name', 'provider', 'provider__name', 'status']
     search_fields = ['app__name', 'provider__name', ]

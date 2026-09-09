@@ -17,6 +17,7 @@ from common.utils import get_logger
 from ops.ansible import JMSInventory, SuperPlaybookRunner
 from terminal.const import PublishStatus
 from terminal.models import AppProvider, VirtualAppPublication
+from terminal.utils.virtualapp import stage_image_archives
 
 logger = get_logger(__name__)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -172,8 +173,10 @@ class DeployAppProviderManager:
             plays = yaml.safe_load(f)
 
         if self.deployment.publication_id:
+            app = self.deployment.publication.app
             variables = {
-                'APP_IMAGE': self.deployment.publication.app.image_name,
+                'APP_IMAGE': app.image_name,
+                'APP_IMAGE_RESOURCES': stage_image_archives(app, self.run_dir),
             }
         else:
             options = self.provider.deploy_options
@@ -181,7 +184,6 @@ class DeployAppProviderManager:
             variables = {
                 **options,
                 'CORE_HOST': core_host.rstrip('/'),
-                'PANDA_HOST_IP': self.provider.host.address,
                 'PANDA_IMAGE': options.get('PANDA_IMAGE') or default_panda_image(),
             }
             resources = stage_resources(self.run_dir, variables['PANDA_IMAGE'])

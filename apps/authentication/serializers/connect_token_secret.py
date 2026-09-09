@@ -256,7 +256,6 @@ class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):
         return {
             'id': str(provider.id),
             'name': provider.name,
-            'hostname': provider.hostname,
             'address': provider.address,
             'host_id': str(provider.host_id) if provider.host_id else None,
             'load': provider.load,

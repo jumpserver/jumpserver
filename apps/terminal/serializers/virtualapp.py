@@ -53,7 +53,8 @@ class VirtualAppSerializer(ManifestI18nMixin, serializers.ModelSerializer):
 class VirtualAppPublicationSerializer(serializers.ModelSerializer):
     app = ObjectRelatedField(attrs=('id', 'name', 'image_name', 'version'), label=_("Virtual app"),
                              queryset=VirtualApp.objects.all())
-    provider = ObjectRelatedField(queryset=AppProvider.objects.all(), label=_("App Provider"))
+    provider = ObjectRelatedField(attrs=('id', 'name', 'address'),
+                                  queryset=AppProvider.objects.all(), label=_("App Provider"))
     status = LabeledChoiceField(choices=PublishStatus.choices, label=_("Status"), default=Status.pending)
 
     class Meta:
