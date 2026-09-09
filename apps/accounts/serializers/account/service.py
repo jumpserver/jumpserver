@@ -1,8 +1,12 @@
+from datetime import timedelta
+
+from django.db.models import Count, Max, Q
 from django.templatetags.static import static
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import IntegrationApplication
+from accounts.models import CredentialClientInstance, IntegrationApplication
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.serializers.fields import JSONManyToManyField
 from common.utils import random_string
@@ -43,6 +47,52 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         instance = super().create(validated_data)
         instance.refresh_secret()
         return instance
+
+
+class IntegrationApplicationDetailSerializer(IntegrationApplicationSerializer):
+    access_readiness = serializers.SerializerMethodField()
+
+    class Meta(IntegrationApplicationSerializer.Meta):
+        fields = IntegrationApplicationSerializer.Meta.fields + ['access_readiness']
+
+    @staticmethod
+    def get_access_readiness(instance):
+        configurations = list(
+            instance.access_configurations.filter(is_active=True)
+            .prefetch_related('credentials')
+        )
+        allowed_ids = set(instance.get_accounts().values_list('id', flat=True))
+        required_ids = {
+            account_id
+            for configuration in configurations
+            for credential in configuration.credentials.all()
+            for account_id in (credential.primary_account_id, credential.backup_account_id)
+            if account_id
+        }
+        clients = CredentialClientInstance.objects.filter(
+            application=instance, configuration__is_active=True, is_active=True,
+        ).aggregate(
+            instances_amount=Count('id', distinct=True),
+            online_instances_amount=Count(
+                'id', filter=Q(
+                    date_last_seen__gte=timezone.now() - timedelta(minutes=2)
+                ), distinct=True,
+            ),
+            last_fetched=Max('credential_statuses__date_fetched'),
+        )
+        first_configuration = configurations[0] if configurations else None
+        return {
+            'authorized_accounts_amount': len(allowed_ids),
+            'active_configurations_amount': len(configurations),
+            'missing_authorized_accounts_amount': len(required_ids - allowed_ids),
+            'active_instances_amount': clients['instances_amount'],
+            'online_instances_amount': clients['online_instances_amount'],
+            'last_fetched': clients['last_fetched'],
+            'configuration': (
+                {'id': first_configuration.id, 'name': first_configuration.name}
+                if first_configuration else None
+            ),
+        }
 
 
 class IntegrationAccountSecretSerializer(serializers.Serializer):

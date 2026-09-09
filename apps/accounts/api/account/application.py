@@ -30,13 +30,14 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     search_fields = ('name', 'comment')
     serializer_classes = {
         'default': serializers.IntegrationApplicationSerializer,
+        'retrieve': serializers.IntegrationApplicationDetailSerializer,
         'get_account_secret': serializers.IntegrationAccountSecretSerializer,
     }
     rbac_perms = {
         'get_once_secret': 'accounts.change_integrationapplication',
+        'reset_secret': 'accounts.change_integrationapplication',
         'get_account_secret': 'accounts.view_integrationapplication',
         'get_sdks_info': 'accounts.view_integrationapplication',
-        'refresh_secret': 'accounts.change_integrationapplication',
     }
 
     def read_file(self, path):
@@ -72,13 +73,17 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         return Response(data={'id': instance.id, 'secret': instance.secret})
     
     @action(
-        ['GET'], detail=True, url_path='refresh-secret',
-        permission_classes=[RBACPermission]
+        ['POST'], detail=True, url_path='reset-secret',
+        permission_classes=[RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     )
-    def refresh_secret(self, request, *args, **kwargs):
+    def reset_secret(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.refresh_secret()
-        return Response(data={'id': instance.id, 'msg': 'Successfully refreshed secret'})
+        self.start_audit(AuditEvent.APPLICATION_SECRET_RESET, application=instance)
+        secret = instance.refresh_secret()
+        record(AuditEvent.APPLICATION_SECRET_RESET, application=instance)
+        response = Response(data={'id': instance.id, 'secret': secret})
+        response['Cache-Control'] = 'no-store'
+        return response
 
     @action(['GET'], detail=False, url_path='account-secret',
             permission_classes=[RBACPermission])

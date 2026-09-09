@@ -22,6 +22,7 @@ class AuditEvent(TextChoices):
     CREDENTIAL_CONFIRMED = 'credential_confirmed', _('Credential confirmed')
     CREDENTIAL_PUBLISHED = 'credential_published', _('Credential published')
     SECRET_CHANGE_FINISHED = 'secret_change_finished', _('Secret change finished')
+    APPLICATION_SECRET_RESET = 'application_secret_reset', _('Application secret reset')
     ROTATION_STARTED = 'rotation_started', _('Rotation started')
     ROTATION_STEP = 'rotation_step', _('Rotation step')
     ROTATION_CANCELLED = 'rotation_cancelled', _('Rotation cancelled')
