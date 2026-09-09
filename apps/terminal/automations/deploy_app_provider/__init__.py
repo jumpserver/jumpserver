@@ -43,7 +43,7 @@ def load_manifest():
 
 def default_panda_image():
     try:
-        return load_manifest().get('panda', {}).get('image', '')
+        return load_manifest().get('panda', {}).get('image') or f'jumpserver/panda:{settings.VERSION}'
     except (OSError, ValueError):
         # Keep form metadata readable. Deployment validation reports the
         # malformed local configuration, and staging must never ignore it.

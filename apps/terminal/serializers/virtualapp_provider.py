@@ -28,11 +28,17 @@ class AppProviderDeployOptionsSerializer(serializers.Serializer):
         default=True, label=_('Ignore Certificate Verification')
     )
     PANDA_IMAGE = serializers.CharField(
-        default=default_panda_image, allow_blank=True, max_length=255, label=_('Panda image')
+        default='', allow_blank=True, max_length=255, label=_('Panda image')
     )
     PANDA_RANGE_PORTS = serializers.CharField(
         default='6900-7900', max_length=64, label=_('Container port range')
     )
+
+    def get_fields(self):
+        fields = super().get_fields()
+        # Form metadata only exposes concrete default values.
+        fields['PANDA_IMAGE'].default = default_panda_image()
+        return fields
 
     def validate(self, attrs):
         core_host = attrs.get('CORE_HOST')

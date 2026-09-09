@@ -26,6 +26,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from accounts.models import Account
 from assets.utils.platform_package import locate_package_root
 from authentication.serializers.connect_token_secret import ConnectTokenVirtualAppOptionSerializer
+from common.drf.metadata import SimpleMetadataWithFilters
 from orgs.utils import tmp_to_builtin_org
 from terminal.api.virtualapp.provider import AppProviderDeploymentViewSet, AppProviderViewSet
 from terminal.automations.deploy_app_provider import (
@@ -673,6 +674,7 @@ class AppProviderDeployOptionsTests(SimpleTestCase):
         })
         serializer.is_valid(raise_exception=True)
         self.assertEqual(serializer.validated_data['CORE_HOST'], 'https://core.example.com')
+        self.assertEqual(serializer.validated_data['PANDA_IMAGE'], 'registry.example.com:5000/team/panda:v4.0')
 
     def test_invalid_deploy_options_are_rejected(self):
         invalid = {
@@ -919,13 +921,12 @@ class AppProviderDeploymentAPITests(TestCase):
         self.assertEqual(self.provider.validate_deployment()['PANDA_RANGE_PORTS'], '6900-7900')
         self.assertFalse(self.provider.connection_ready)
 
-    def test_missing_bundle_and_unspecified_panda_image_block_deployment(self):
+    def test_missing_bundle_and_unspecified_panda_image_use_core_version(self):
         from django.test import override_settings
 
         self.provider.deploy_options.pop('PANDA_IMAGE')
-        with tempfile.TemporaryDirectory() as data_dir, override_settings(DATA_DIR=data_dir):
-            with self.assertRaisesMessage(ValidationError, 'Select a Panda image'):
-                self.provider.validate_deployment()
+        with tempfile.TemporaryDirectory() as data_dir, override_settings(DATA_DIR=data_dir, VERSION='dev'):
+            self.assertEqual(self.provider.validate_deployment()['PANDA_IMAGE'], 'jumpserver/panda:dev')
 
     def test_invalid_offline_manifest_is_exposed_as_deployment_error(self):
         from pathlib import Path
@@ -1065,7 +1066,7 @@ class AppProviderDeploymentAPITests(TestCase):
 class OfflineProviderResourcesTests(SimpleTestCase):
     def setUp(self):
         self.directory = self.enterContext(tempfile.TemporaryDirectory())
-        self.enterContext(override_settings(DATA_DIR=self.directory))
+        self.enterContext(override_settings(DATA_DIR=self.directory, VERSION='v5.0.1-ee'))
         self.resources = Path(self.directory) / 'virtualapp'
         self.resources.mkdir()
         self.image = 'jumpserver/panda:v5.0-ee'
@@ -1077,8 +1078,8 @@ class OfflineProviderResourcesTests(SimpleTestCase):
     def write_manifest(self):
         (self.resources / 'manifest.json').write_text(json.dumps({'panda': self.metadata}))
 
-    def test_missing_bundle_requires_explicit_image_instead_of_latest(self):
-        self.assertEqual(default_panda_image(), '')
+    def test_missing_bundle_uses_core_version(self):
+        self.assertEqual(default_panda_image(), 'jumpserver/panda:v5.0.1-ee')
         self.assertEqual(stage_resources(Path(self.directory) / 'task', self.image), {'panda': {}, 'docker': {}})
 
     def test_malformed_manifest_keeps_form_readable_but_blocks_staging(self):
@@ -1088,7 +1089,12 @@ class OfflineProviderResourcesTests(SimpleTestCase):
             stage_resources(Path(self.directory) / 'task', self.image)
 
     def test_options_default_and_cleared_override_use_exact_bundle_image(self):
+        metadata = SimpleMetadataWithFilters()
+        field = AppProviderDeployOptionsSerializer().fields['PANDA_IMAGE']
+        self.assertEqual(metadata.get_field_info(field).get('default'), 'jumpserver/panda:v5.0.1-ee')
         self.write_manifest()
+        fields = metadata.get_serializer_info(AppProviderSerializer())
+        self.assertEqual(fields['deploy_options']['children']['PANDA_IMAGE']['default'], self.image)
         for options in ({}, {'PANDA_IMAGE': ''}):
             serializer = AppProviderDeployOptionsSerializer(data={
                 'CORE_HOST': 'https://core.example.com', **options,
