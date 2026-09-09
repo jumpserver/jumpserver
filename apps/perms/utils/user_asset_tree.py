@@ -13,6 +13,9 @@ from perms.utils.user_perm import UserPermAssetUtil
 
 FAVORITE_ROOT_ID = 'favorite-root'
 AUTHORIZATION_METRIC_CACHE_TIMEOUT = 15
+# Keep SQL prefix predicates bounded. Large, scattered grant sets are matched
+# against node paths in Python while the database scans the requested subtree.
+SUBTREE_QUERY_KEY_LIMIT = 100
 
 
 def _subtree_filter(keys):
@@ -35,6 +38,31 @@ def _collect_assets_by_target_key(relations, target_keys, assets_by_key):
                 current = current.rpartition(':')[0]
             matches_by_node_key[node_key] = matched_keys
         for key in matched_keys:
+            assets_by_key[key].add(asset_id)
+
+
+def _collect_granted_assets_by_target_key(
+        relations, target_keys, granted_keys, assets_by_key
+):
+    matches_by_node_key = {}
+    for asset_id, node_key in relations:
+        match = matches_by_node_key.get(node_key)
+        if match is None:
+            matched_targets = []
+            is_granted = False
+            current = node_key
+            while current:
+                if current in target_keys:
+                    matched_targets.append(current)
+                if current in granted_keys:
+                    is_granted = True
+                current = current.rpartition(':')[0]
+            match = matched_targets, is_granted
+            matches_by_node_key[node_key] = match
+        matched_targets, is_granted = match
+        if not is_granted:
+            continue
+        for key in matched_targets:
             assets_by_key[key].add(asset_id)
 
 
@@ -72,18 +100,21 @@ def _count_assets_by_target_key(relations, target_keys):
     return counts
 
 
-def _node_grant_scan_keys(target_keys, granted_keys):
-    scan_keys = set()
-    for target_key in target_keys:
-        for granted_key in granted_keys:
-            if (
-                    target_key == granted_key or
-                    target_key.startswith(f'{granted_key}:')
-            ):
-                scan_keys.add(target_key)
-            elif granted_key.startswith(f'{target_key}:'):
-                scan_keys.add(granted_key)
-    return scan_keys
+def _key_batches(keys):
+    keys = list(keys)
+    for index in range(0, len(keys), SUBTREE_QUERY_KEY_LIMIT):
+        yield set(keys[index:index + SUBTREE_QUERY_KEY_LIMIT])
+
+
+def _granted_keys_in_targets(granted_keys, target_keys):
+    return {
+        granted_key for granted_key in granted_keys
+        if any(
+            granted_key == target_key or
+            granted_key.startswith(f'{target_key}:')
+            for target_key in target_keys
+        )
+    }
 
 
 def _uuid_values(values):
@@ -156,38 +187,58 @@ def _authorization_node_counts(user, resource_ids, asset_util):
     }
     fully_granted_counts = {}
     if fully_granted_keys:
-        relations = Asset.nodes.through.objects.filter(
-            _subtree_filter(fully_granted_keys)
-        )
-        fully_granted_counts = _count_assets_by_target_key(
-            relations, fully_granted_keys
-        )
+        for target_batch in _key_batches(fully_granted_keys):
+            relations = Asset.nodes.through.objects.filter(
+                _subtree_filter(target_batch)
+            )
+            fully_granted_counts.update(_count_assets_by_target_key(
+                relations, target_batch
+            ))
 
     partial_target_keys = target_keys - fully_granted_keys
-    granted_scan_keys = _node_grant_scan_keys(
-        partial_target_keys, asset_util.direct_node_keys
-    )
-    if granted_scan_keys:
-        relations = (
-            Asset.nodes.through.objects.order_by()
-            .filter(_subtree_filter(granted_scan_keys))
-            .values_list('asset_id', 'node__key')
-        )
-        _collect_assets_by_target_key(
-            relations.iterator(chunk_size=10000), target_keys, assets_by_key
-        )
+    granted_keys = asset_util.direct_node_key_set
+    for target_batch in _key_batches(partial_target_keys):
+        if granted_keys:
+            granted_scan_keys = _granted_keys_in_targets(
+                granted_keys, target_batch
+            )
+            if granted_scan_keys:
+                # A few grants are most efficient as indexed subtree queries.
+                # For a scattered large grant set, query the target subtree once
+                # and decide grant coverage with ancestor-set lookups in Python.
+                relations = (
+                    Asset.nodes.through.objects.order_by()
+                    .filter(_subtree_filter(
+                        granted_scan_keys
+                        if len(granted_scan_keys) <= SUBTREE_QUERY_KEY_LIMIT
+                        else target_batch
+                    ))
+                    .values_list('asset_id', 'node__key')
+                )
+                if len(granted_scan_keys) <= SUBTREE_QUERY_KEY_LIMIT:
+                    _collect_assets_by_target_key(
+                        relations.iterator(chunk_size=10000),
+                        target_batch,
+                        assets_by_key,
+                    )
+                else:
+                    _collect_granted_assets_by_target_key(
+                        relations.iterator(chunk_size=10000),
+                        target_batch,
+                        granted_keys,
+                        assets_by_key,
+                    )
 
-    if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-        if partial_target_keys:
+        if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             direct_relations = (
                 Asset.nodes.through.objects.order_by()
                 .filter(asset_id__in=asset_util.direct_asset_ids)
-                .filter(_subtree_filter(partial_target_keys))
+                .filter(_subtree_filter(target_batch))
                 .values_list('asset_id', 'node__key')
             )
             _collect_assets_by_target_key(
                 direct_relations.iterator(chunk_size=10000),
-                partial_target_keys,
+                target_batch,
                 assets_by_key,
             )
 

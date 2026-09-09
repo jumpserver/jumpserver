@@ -19,6 +19,10 @@ __all__ = ['AssetPermissionPermAssetUtil', 'UserPermAssetUtil', 'UserPermNodeUti
 
 logger = get_logger(__name__)
 USER_PERMISSION_IDS_CACHE_TIMEOUT = 15
+# A large OR of materialized-path prefixes becomes disproportionately expensive
+# to plan and execute. Above this size, scan the current org's much smaller node
+# key set once and keep the matching node ids.
+SUBTREE_QUERY_KEY_LIMIT = 100
 
 
 class AssetPermissionPermAssetUtil:
@@ -64,15 +68,43 @@ class AssetPermissionPermAssetUtil:
     def direct_node_keys(self):
         return self.get_direct_node_keys()
 
+    @lazyproperty
+    def direct_node_key_set(self):
+        return set(self.direct_node_keys)
+
+    @staticmethod
+    def is_key_in_subtrees(key, subtree_keys):
+        current = key
+        while current:
+            if current in subtree_keys:
+                return True
+            current = current.rpartition(':')[0]
+        return False
+
     def is_current_org_root_fully_granted(self):
         org = get_current_org()
         if not org or org.is_root():
             return False
         return any(':' not in key for key in self.direct_node_keys)
 
-    def get_descendant_nodes(self):
+    def get_descendant_nodes(self, keys=None):
+        if keys is None:
+            keys = self.direct_node_keys
+        keys = Node.clean_children_keys(keys)
+        if len(keys) > SUBTREE_QUERY_KEY_LIMIT:
+            key_set = set(keys)
+            node_ids = (
+                node_id
+                for node_id, key in
+                Node.objects.order_by().values_list('id', 'key').iterator(
+                    chunk_size=10000
+                )
+                if self.is_key_in_subtrees(key, key_set)
+            )
+            return Node.objects.filter(id__in=list(node_ids)).order_by()
+
         query = Q()
-        for key in self.direct_node_keys:
+        for key in keys:
             query |= Q(key=key) | Q(key__startswith=f'{key}:')
         if not query:
             return Node.objects.none()
@@ -265,35 +297,31 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
     def get_node_all_assets(self, node_id):
         """ 获取节点下的所有资产 """
         node = PermNode.objects.get(id=node_id)
-        node_subtree = (
+        node_subtree_filter = (
             Q(nodes__key=node.key) |
             Q(nodes__key__startswith=f'{node.key}:')
         )
         if self.is_node_fully_granted(node.key):
-            assets = Asset.objects.filter(node_subtree)
+            assets = Asset.objects.filter(node_subtree_filter)
             return node, assets.order_by().distinct()
 
-        granted_subtrees = Q()
-        for granted_key in self.direct_node_keys:
-            if granted_key.startswith(f'{node.key}:'):
-                granted_subtrees |= (
-                    Q(nodes__key=granted_key) |
-                    Q(nodes__key__startswith=f'{granted_key}:')
-                )
-        node_assets = (
-            Asset.objects.filter(granted_subtrees)
-            if granted_subtrees else Asset.objects.none()
-        )
+        granted_keys = [
+            granted_key for granted_key in self.direct_node_keys
+            if granted_key.startswith(f'{node.key}:')
+        ]
+        granted_node_ids = self.get_descendant_nodes(granted_keys).values('id')
+        node_assets = Asset.objects.filter(nodes__id__in=granted_node_ids)
         direct_assets = Asset.objects.none()
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            direct_assets = self.get_direct_assets().filter(node_subtree)
+            direct_assets = self.get_direct_assets().filter(
+                node_subtree_filter
+            )
         assets = (node_assets | direct_assets).order_by().distinct()
         return node, assets
 
     def is_node_fully_granted(self, key):
-        return any(
-            key == granted_key or key.startswith(f'{granted_key}:')
-            for granted_key in self.direct_node_keys
+        return self.is_key_in_subtrees(
+            key, self.direct_node_key_set
         )
 
 
