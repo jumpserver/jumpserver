@@ -1,10 +1,13 @@
 """Observe committed domain changes using the project's model signal entry points."""
+from django.db import transaction
 from django.db.models.signals import pre_save, post_save, pre_delete, m2m_changed
+from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
 
 from accounts.const import AuditEvent, ApplicationEvent, ChangeSecretRecordStatusChoice
 from accounts.models import (
     ApplicationCredential, ClientAccessConfiguration, CredentialClientInstance,
-    IntegrationApplication, ChangeSecretRecord, Account,
+    CredentialClientStatus, IntegrationApplication, ChangeSecretRecord, Account,
 )
 from .audit import record
 from .events import enqueue
@@ -124,13 +127,21 @@ def notify_model_change(instance, event, changes):
 
 def notify_revoked_credentials(application):
     allowed_accounts = set(application.get_accounts().values_list('id', flat=True))
-    for credential in application.application_credentials.all():
-        required_accounts = {credential.primary_account_id, credential.backup_account_id} - {None}
-        if required_accounts.issubset(allowed_accounts):
-            continue
-        event = record(AuditEvent.AUTHORIZATION_REVOKED, credential=credential, application=application)
-        clients = application.credential_clients.filter(configuration__credentials=credential)
-        enqueue(event, ApplicationEvent.ACCESS_REVOKED, clients)
+    with transaction.atomic():
+        credentials = application.application_credentials.select_for_update(
+            of=('self',)
+        ).order_by('key')
+        for credential in credentials:
+            required_accounts = {credential.primary_account_id, credential.backup_account_id} - {None}
+            if required_accounts.issubset(allowed_accounts):
+                continue
+            event = record(AuditEvent.AUTHORIZATION_REVOKED, credential=credential, application=application)
+            clients = application.credential_clients.filter(configuration__credentials=credential)
+            enqueue(event, ApplicationEvent.ACCESS_REVOKED, clients)
+            CredentialClientStatus.objects.filter(
+                binding__credential=credential,
+                client__application=application,
+            ).delete()
 
 
 def before_delete(sender, instance, **kwargs):
@@ -141,12 +152,29 @@ def credentials_changed(sender, instance, action, reverse, pk_set, **kwargs):
     if reverse:
         return  # API mutates configuration.credentials, never the reverse manager.
     if action in ('pre_remove', 'pre_clear'):
-        credentials = instance.credentials.all()
+        credentials = instance.credentials.select_for_update(of=('self',)).order_by('key')
         if pk_set is not None:
             credentials = credentials.filter(pk__in=pk_set)
+        credentials = list(credentials)
+        reason = getattr(instance, '_credential_removal_reason', '').strip()
+        rotating = any(
+            credential.status != ApplicationCredential.Status.idle
+            for credential in credentials
+        )
+        if rotating and not reason:
+            raise ValidationError(_('Explain why the rotating credential should stop participating.'))
         for credential in credentials:
-            event = record(AuditEvent.AUTHORIZATION_REVOKED, credential=credential, configuration=instance)
+            event = record(
+                AuditEvent.AUTHORIZATION_REVOKED,
+                credential=credential,
+                configuration=instance,
+                summary=reason,
+            )
             enqueue(event, ApplicationEvent.ACCESS_REVOKED, instance.instances.all())
+        CredentialClientStatus.objects.filter(
+            client__configuration=instance,
+            binding__credential_id__in=[credential.id for credential in credentials],
+        ).delete()
     elif action == 'post_add':
         for credential in instance.credentials.filter(pk__in=pk_set):
             event = record(AuditEvent.AUTHORIZATION_GRANTED, credential=credential, configuration=instance)

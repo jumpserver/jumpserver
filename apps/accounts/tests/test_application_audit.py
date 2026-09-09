@@ -99,10 +99,42 @@ class ApplicationAuditTests(CredentialTestCase):
 
     def test_authorization_removal_delivers_only_revocation_and_disable_rejects(self):
         manager, events = self.manager()
+        manager.fetch(self.credential.key, '127.0.0.1')
+        sibling_configuration = ClientAccessConfiguration.objects.create(
+            application=self.application, name='Sibling SDK', type='sdk',
+        )
+        sibling_configuration.credentials.add(self.credential)
+        sibling = CredentialClientManager(
+            self.application, sibling_configuration.id, 'sibling',
+        )
+        sibling.fetch(self.credential.key, '127.0.0.1')
         events.subscribe(True)
+        published = ApplicationEventDelivery.objects.get(
+            client=manager.client, code='credential.published', status='pending',
+        )
         manager, events = self.manager()
         configuration = manager.configuration
         configuration.credentials.remove(self.credential)
+        self.assertFalse(
+            manager.client.credential_statuses.filter(
+                binding__credential=self.credential,
+            ).exists()
+        )
+        self.assertTrue(
+            sibling.client.credential_statuses.filter(
+                binding__credential=self.credential,
+            ).exists()
+        )
+        published.refresh_from_db()
+        published.audit.refresh_from_db()
+        self.assertEqual(published.status, 'failed')
+        self.assertEqual(published.audit.result, 'failed')
+        self.assertEqual(
+            list(ApplicationEventDelivery.objects.filter(
+                client=manager.client, status='pending',
+            ).values_list('code', flat=True)),
+            ['access.revoked'],
+        )
         with self.assertRaises(PermissionDenied):
             manager.fetch(self.credential.key, '127.0.0.1')
         messages = events.poll()['events']
@@ -114,6 +146,24 @@ class ApplicationAuditTests(CredentialTestCase):
         audit = ApplicationAudit.objects.filter(event='client_disabled').get()
         self.assertEqual(audit.instance_id, 'one')
         self.assertEqual(audit.configuration_id, configuration.id)
+
+    def test_revocation_closes_stale_delivery_while_listener_is_paused(self):
+        manager, events = self.manager()
+        events.subscribe(True)
+        published = ApplicationEventDelivery.objects.get(
+            client=manager.client, code='credential.published', status='pending',
+        )
+        CredentialClientInstance.objects.filter(id=manager.client.id).update(events_enabled=False)
+
+        manager.configuration.credentials.remove(self.credential)
+
+        published.refresh_from_db()
+        self.assertEqual(published.status, 'failed')
+        self.assertFalse(
+            ApplicationEventDelivery.objects.filter(
+                client=manager.client, code='access.revoked',
+            ).exists()
+        )
 
     def test_audit_org_scope_pagination_and_retained_history(self):
         record('credential_fetched', application=self.application)

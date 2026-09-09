@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from common.db import fields
 from common.utils import random_string
 from orgs.mixins.models import JMSOrgBaseModel
+from .application import IntegrationApplication
 
 __all__ = [
     'ApplicationCredential', 'CredentialApplicationBinding',
@@ -99,13 +100,28 @@ class ApplicationCredential(JMSOrgBaseModel):
             return self.primary_account.version + 1
         return self.revision
 
-    def participant_statuses(self):
+    def authorized_applications(self):
+        applications = IntegrationApplication.objects.all()
+        for account in (self.primary_account, self.backup_account):
+            if account:
+                applications = applications.filter(
+                    IntegrationApplication.accounts.get_filter_q(account)
+                )
+        return applications
+
+    def rotation_statuses(self):
         return CredentialClientStatus.objects.filter(
             binding__credential=self,
-            is_rotation_participant=True,
+            binding__application__in=self.authorized_applications(),
+            client__configuration__credentials=self,
             client__is_active=True,
             client__configuration__is_active=True,
             client__application__is_active=True,
+        )
+
+    def participant_statuses(self):
+        return self.rotation_statuses().filter(
+            is_rotation_participant=True,
         ).select_related(
             'binding__application', 'client', 'applied_account'
         )

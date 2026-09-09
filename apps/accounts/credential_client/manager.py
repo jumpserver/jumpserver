@@ -75,15 +75,7 @@ class CredentialClientManager:
 
         if not self.configuration.credentials.filter(id=credential.id).exists():
             raise PermissionDenied(_('The client access configuration does not include this credential.'), code='credential_not_selected')
-        account_ids = {credential.primary_account_id}
-        if credential.backup_account_id:
-            account_ids.add(credential.backup_account_id)
-        allowed = set(
-            self.application.get_accounts().filter(
-                id__in=account_ids
-            ).values_list('id', flat=True)
-        )
-        if allowed != account_ids:
+        if not credential.authorized_applications().filter(id=self.application.id).exists():
             raise PermissionDenied(_(
                 'The application is not authorized for every credential account.'
             ), code='credential_not_authorized')

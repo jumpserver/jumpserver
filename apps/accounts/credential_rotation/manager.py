@@ -28,14 +28,7 @@ class CredentialRotationManager:
                 _('The application credential is already rotating.')
             )
 
-        states = list(
-            CredentialClientStatus.objects.select_for_update().filter(
-                binding__credential=credential,
-                client__is_active=True,
-                client__configuration__is_active=True,
-                client__application__is_active=True,
-            )
-        )
+        states = list(credential.rotation_statuses().select_for_update(of=('self',)))
         dual = credential.rotation_mode == ApplicationCredential.RotationMode.dual
         if dual:
             credential.revision += 1

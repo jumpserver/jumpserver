@@ -217,6 +217,8 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'Variable', 'LeakPasswords',
         # Audit records and delivery bookkeeping are not administrator resource changes.
         'ApplicationAudit', 'ApplicationEventDelivery', 'ApplicationEventAttempt',
+        # Current client credential state is derived operational bookkeeping.
+        'CredentialClientStatus',
         # OAuth authorization codes are short-lived protocol artifacts.
         'Grant',
     }

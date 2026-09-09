@@ -13795,3 +13795,19 @@ msgstr "许可证无效"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "工单已经关闭"
+
+#: accounts/const/application.py:25
+msgid "Application secret reset"
+msgstr "重置应用密钥"
+
+#: accounts/serializers/account/credential.py:103
+#, python-brace-format
+msgid ""
+"This account is already used by application credential \"{name}\". Choose "
+"another account or reuse that application credential."
+msgstr "该账号已被应用凭据「{name}」使用，请选择其他账号或复用该应用凭据。"
+
+#: accounts/serializers/account/credential.py:340
+msgid ""
+"The application is not authorized for every selected credential account."
+msgstr "企业应用未授权所选应用凭据关联的全部账号。"

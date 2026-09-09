@@ -93,6 +93,20 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             return []
         return instance.get_blockers()
 
+    def validate_primary_account(self, value):
+        queryset = ApplicationCredential.objects.filter(primary_account=value)
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        credential = queryset.only('name').first()
+        if credential:
+            raise serializers.ValidationError(
+                _('This account is already used by application credential "{name}". '
+                  'Choose another account or reuse that application credential.').format(
+                    name=credential.name
+                )
+            )
+        return value
+
     def validate(self, attrs):
         if self.instance and self.instance.status != ApplicationCredential.Status.idle:
             for field in ('type', 'rotation_mode', 'primary_account', 'backup_account', 'is_active'):
@@ -256,7 +270,11 @@ class CredentialAgentRegisterSerializer(serializers.Serializer):
 class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
     application = ObjectRelatedField(queryset=IntegrationApplication.objects, attrs=('id', 'name'))
     credentials = ObjectRelatedField(
-        queryset=ApplicationCredential.objects, many=True, attrs=('id', 'name', 'key', 'type')
+        queryset=ApplicationCredential.objects, many=True,
+        attrs=('id', 'name', 'key', 'type', 'status'),
+    )
+    removal_reason = serializers.CharField(
+        write_only=True, required=False, allow_blank=True, max_length=512,
     )
     instances_amount = serializers.IntegerField(read_only=True)
     online_instances_amount = serializers.IntegerField(read_only=True)
@@ -271,7 +289,7 @@ class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
         ]
         fields = fields_small + [
             'language', 'app_user', 'install_path', 'notification_enabled', 'notification_url',
-            'date_created', 'date_updated', 'created_by', 'comment',
+            'removal_reason', 'date_created', 'date_updated', 'created_by', 'comment',
         ]
         read_only_fields = ['instances_amount', 'online_instances_amount']
 
@@ -297,8 +315,15 @@ class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
             if 'credentials' in attrs:
                 old = set(self.instance.credentials.values_list('id', flat=True))
                 new = {credential.id for credential in attrs['credentials']}
-                if self.instance.credentials.filter(id__in=old - new).exclude(status='idle').exists():
-                    raise serializers.ValidationError(_('A rotating credential cannot be removed from a configuration.'))
+                rotating = self.instance.credentials.filter(id__in=old - new).exclude(status='idle')
+                if rotating.exists() and not attrs.get('removal_reason', '').strip():
+                    raise serializers.ValidationError({
+                        'removal_reason': _(
+                            'Explain why the rotating credential should stop participating.'
+                        )
+                    })
+        else:
+            attrs.pop('removal_reason', None)
         application = attrs.get('application') or getattr(self.instance, 'application', None)
         credentials = attrs.get('credentials')
         if credentials is None:
@@ -331,6 +356,13 @@ class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
         else:
             attrs['notification_url'] = ''
         return attrs
+
+    def update(self, instance, validated_data):
+        instance._credential_removal_reason = validated_data.pop('removal_reason', '').strip()
+        try:
+            return super().update(instance, validated_data)
+        finally:
+            del instance._credential_removal_reason
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)

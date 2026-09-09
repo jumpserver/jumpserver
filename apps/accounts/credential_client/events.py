@@ -1,6 +1,7 @@
 """Per-instance application event delivery and retry handling."""
 from datetime import timedelta
 
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
@@ -17,11 +18,24 @@ def enqueue(event, code, clients=None):
         clients = CredentialClientInstance.objects.filter(
             configuration__credentials=event.credential_id,
         )
-    clients = clients.filter(
+    revoked_client_ids = (
+        list(clients.values_list('id', flat=True).distinct())
+        if code == ApplicationEvent.ACCESS_REVOKED else []
+    )
+    clients = list(clients.filter(
         is_active=True, application__is_active=True,
         configuration__is_active=True, configuration__notification_enabled=True,
         events_enabled=True,
-    ).select_related('application', 'configuration').distinct()
+    ).select_related('application', 'configuration').distinct())
+    if revoked_client_ids:
+        with transaction.atomic():
+            stale = ApplicationEventDelivery.objects.select_for_update().filter(
+                client_id__in=revoked_client_ids,
+                event__credential_id=event.credential_id,
+                status='pending',
+            ).exclude(code=ApplicationEvent.ACCESS_REVOKED)
+            for delivery in stale:
+                ClientEventManager._finish(delivery, 'failed', 'Credential access was revoked.')
     for client in clients:
         if ApplicationEventDelivery.objects.filter(event=event, client=client).exists():
             continue
