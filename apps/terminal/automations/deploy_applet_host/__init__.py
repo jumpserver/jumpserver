@@ -116,7 +116,8 @@ class DeployAppletHostManager:
 
     def generate_inventory(self):
         inventory = JMSInventory(
-            [self.deployment.host], account_policy="privileged_only"
+            [self.deployment.host], account_policy="privileged_only",
+            exclude_localhost=True,
         )
         inventory_dir = os.path.join(self.run_dir, "inventory")
         inventory_path = os.path.join(inventory_dir, "hosts.yml")

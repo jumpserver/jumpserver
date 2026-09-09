@@ -1,6 +1,6 @@
 import os
 import tempfile
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
 
@@ -73,6 +73,24 @@ class WebAppletDefaultsTests(SimpleTestCase):
         enabled = DeployOptionsSerializer(data={'WEB_APPLET_RECORDING_ENABLED': True})
         self.assertFalse(enabled.is_valid())
         self.assertIn('WEB_PROXY_URL', enabled.errors)
+
+
+class DeployAppletHostManagerTests(SimpleTestCase):
+    @patch('terminal.automations.deploy_applet_host.JMSInventory')
+    def test_generate_inventory_excludes_localhost(self, inventory_class):
+        from terminal.automations.deploy_applet_host import DeployAppletHostManager
+
+        deployment = Mock()
+        deployment.host = Mock()
+        manager = DeployAppletHostManager(deployment)
+
+        manager.generate_inventory()
+
+        inventory_class.assert_called_once_with(
+            [deployment.host],
+            account_policy='privileged_only',
+            exclude_localhost=True,
+        )
 
 
 class WebsiteConnectMethodTests(SimpleTestCase):
