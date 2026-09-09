@@ -10742,18 +10742,22 @@ msgid "HTTP port"
 msgstr "HTTP 埠"
 
 #: terminal/models/component/endpoint.py:18
+msgid "Web proxy port"
+msgstr "Web 代理埠"
+
+#: terminal/models/component/endpoint.py:19
 msgid "SSH port"
 msgstr "SSH 埠"
 
-#: terminal/models/component/endpoint.py:19
+#: terminal/models/component/endpoint.py:20
 msgid "RDP port"
 msgstr "RDP 埠"
 
-#: terminal/models/component/endpoint.py:20
+#: terminal/models/component/endpoint.py:21
 msgid "Magnus port"
 msgstr "Magnus 連接埠"
 
-#: terminal/models/component/endpoint.py:21
+#: terminal/models/component/endpoint.py:22
 msgid "VNC port"
 msgstr "VNC 端口"
 
