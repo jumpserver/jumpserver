@@ -3,7 +3,8 @@ import re
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db.models import Q
+from django.db.models import CharField, Q
+from django.db.models.functions import Cast
 from django.utils.translation import get_language
 from rest_framework.utils.encoders import JSONEncoder
 
@@ -11,12 +12,13 @@ from assets.const import AllTypes
 from assets.models import FavoriteAsset, Asset, Node
 from common.utils import lazyproperty
 from common.utils.common import timeit, get_logger
-from orgs.utils import current_org, get_current_org_id
+from orgs.utils import current_org, get_current_org, get_current_org_id
 from perms.models import PermNode, AssetPermission
 
 __all__ = ['AssetPermissionPermAssetUtil', 'UserPermAssetUtil', 'UserPermNodeUtil']
 
 logger = get_logger(__name__)
+USER_PERMISSION_IDS_CACHE_TIMEOUT = 15
 
 
 class AssetPermissionPermAssetUtil:
@@ -27,6 +29,8 @@ class AssetPermissionPermAssetUtil:
         self.perm_ids = set(perm_ids)
 
     def get_all_assets(self):
+        if self.is_current_org_root_fully_granted():
+            return Asset.objects.all().order_by()
         node_assets = self.get_perm_nodes_assets()
         direct_assets = self.get_direct_assets()
         # 比原来的查到所有 asset id 再搜索块很多，因为当资产量大的时候，搜索会很慢
@@ -40,10 +44,31 @@ class AssetPermissionPermAssetUtil:
         nodes = Node.objects.filter(id__in=node_ids).only('id', 'key')
         return nodes
 
+    def get_direct_node_keys(self):
+        nodes = self.get_perm_nodes()
+        root_nodes = list(
+            nodes.filter(parent_key='').values_list('key', 'org_id')
+        )
+        org = get_current_org()
+        if root_nodes and org and not org.is_root():
+            return tuple(node[0] for node in root_nodes)
+
+        root_org_ids = {node[1] for node in root_nodes}
+        if root_org_ids:
+            nodes = nodes.exclude(org_id__in=root_org_ids)
+        keys = {node[0] for node in root_nodes}
+        keys.update(nodes.values_list('key', flat=True))
+        return tuple(Node.clean_children_keys(keys))
+
     @lazyproperty
     def direct_node_keys(self):
-        keys = self.get_perm_nodes().values_list('key', flat=True)
-        return tuple(Node.clean_children_keys(set(keys)))
+        return self.get_direct_node_keys()
+
+    def is_current_org_root_fully_granted(self):
+        org = get_current_org()
+        if not org or org.is_root():
+            return False
+        return any(':' not in key for key in self.direct_node_keys)
 
     def get_descendant_nodes(self):
         query = Q()
@@ -81,22 +106,85 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
     def __init__(self, user, perm_ids=None):
         self.user = user
         if perm_ids is None:
-            joined_org_ids = tuple(
-                str(org_id) for org_id in
-                self.user.orgs.values_list('id', flat=True)
-            )
-            perm_ids = (
-                AssetPermission.objects.valid()
-                .filter(org_id__in=joined_org_ids)
-                .filter(
-                    Q(users=self.user) |
-                    Q(user_groups__users=self.user)
-                )
-                .order_by()
-                .values_list('id', flat=True)
-                .distinct()
-            )
+            perm_ids = self.get_permission_ids()
         super().__init__(perm_ids)
+
+    def get_permission_ids(self):
+        cache_key = (
+            f'perms:user-permission-ids:{self.user.id}:'
+            f'{get_current_org_id()}'
+        )
+        perm_ids = cache.get(cache_key)
+        if perm_ids is not None:
+            return perm_ids
+
+        joined_org_ids = tuple(
+            str(org_id) for org_id in
+            self.user.orgs.values_list('id', flat=True)
+        )
+        if not joined_org_ids:
+            cache.set(
+                cache_key, (), timeout=USER_PERMISSION_IDS_CACHE_TIMEOUT
+            )
+            return ()
+
+        direct_perm_ids = set(
+            AssetPermission.users.through.objects
+            .filter(user_id=self.user.id)
+            .annotate(
+                permission_key=Cast('assetpermission_id', CharField())
+            )
+            .values_list('permission_key', flat=True)
+        )
+        user_group_ids = (
+            self.user.groups.through.objects
+            .filter(user_id=self.user.id)
+            .values_list('usergroup_id', flat=True)
+        )
+        group_perm_ids = set(
+            AssetPermission.user_groups.through.objects
+            .filter(usergroup_id__in=user_group_ids)
+            .annotate(
+                permission_key=Cast('assetpermission_id', CharField())
+            )
+            .values_list('permission_key', flat=True)
+        )
+        related_perm_ids = direct_perm_ids | group_perm_ids
+        if related_perm_ids:
+            perm_ids = tuple(
+                AssetPermission.objects.valid()
+                .filter(
+                    id__in=related_perm_ids,
+                    org_id__in=joined_org_ids,
+                )
+                .annotate(permission_key=Cast('id', CharField()))
+                .order_by()
+                .values_list('permission_key', flat=True)
+            )
+        else:
+            perm_ids = ()
+
+        cache.set(
+            cache_key,
+            perm_ids,
+            timeout=USER_PERMISSION_IDS_CACHE_TIMEOUT,
+        )
+        return perm_ids
+
+    def get_direct_node_keys(self):
+        cache_key = (
+            f'perms:user-permission-node-keys:{self.user.id}:'
+            f'{get_current_org_id()}'
+        )
+        keys = cache.get(cache_key)
+        if keys is None:
+            keys = super().get_direct_node_keys()
+            cache.set(
+                cache_key,
+                keys,
+                timeout=USER_PERMISSION_IDS_CACHE_TIMEOUT,
+            )
+        return keys
 
     def get_ungroup_assets(self):
         return self.get_direct_assets()
@@ -293,13 +381,28 @@ class UserPermNodeUtil:
     def direct_asset_node_keys(self):
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             return ()
+        if self.asset_util.is_current_org_root_fully_granted():
+            return ()
+        cache_key = (
+            f'perms:user-direct-asset-node-keys:{self.user.id}:'
+            f'{get_current_org_id()}'
+        )
+        cached_keys = cache.get(cache_key)
+        if cached_keys is not None:
+            return cached_keys
         keys = Asset.nodes.through.objects.filter(
             asset_id__in=self.asset_util.direct_asset_ids
         ).values_list('node__key', flat=True).distinct()
-        return tuple(
+        keys = tuple(
             key for key in keys
             if not self.asset_util.is_node_fully_granted(key)
         )
+        cache.set(
+            cache_key,
+            keys,
+            timeout=USER_PERMISSION_IDS_CACHE_TIMEOUT,
+        )
+        return keys
 
     @lazyproperty
     def visible_ancestor_keys(self):
