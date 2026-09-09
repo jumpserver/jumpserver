@@ -15,11 +15,13 @@ class WebMethod(TextChoices):
     web_gui = 'web_gui', 'Web GUI'
     web_cli = 'web_cli', 'Web CLI'
     web_sftp = 'web_sftp', 'Web SFTP'
+    web_proxy = 'web_proxy', 'Built-in Browser'
 
     @classmethod
     def get_spec_methods(cls):
         methods = {
-            Protocol.sftp: [cls.web_sftp]
+            Protocol.sftp: [cls.web_sftp],
+            Protocol.http: [cls.web_proxy],
         }
         return methods
 
@@ -157,6 +159,7 @@ class ConnectMethodUtil:
                     Protocol.ssh, Protocol.telnet, Protocol.sftp,
                     Protocol.redis, Protocol.mongodb,
                     Protocol.k8s, Protocol.clickhouse,
+                    Protocol.http,
 
                     Protocol.mysql, Protocol.mariadb,
                     Protocol.sqlserver, Protocol.postgresql,

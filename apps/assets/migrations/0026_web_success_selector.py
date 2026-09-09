@@ -12,9 +12,10 @@ class Migration(migrations.Migration):
             name="success_selector",
             field=models.CharField(
                 blank=True,
-                default="",
+                default='',
                 max_length=128,
-                verbose_name="Success selector",
+                verbose_name='Success selector',
+                help_text='Selector for an element that appears only after a successful login, e.g. css=#dashboard. Required for basic autofill.',
             ),
         ),
         migrations.AddField(
