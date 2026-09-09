@@ -102,7 +102,7 @@ def _json_object(pairs):
 
 
 def _inspect_archive(path, image_name, compressed):
-    manifest, configs, members = None, {}, {}
+    manifest, configs, members, descriptors = None, {}, {}, {}
     try:
         source = zstd.open(path, options={zstd.DecompressionParameter.window_log_max: 27}) if compressed else open(path, 'rb')
         with source:
@@ -133,6 +133,15 @@ def _inspect_archive(path, image_name, compressed):
                         if len(configs) >= 16:
                             raise ValidationError('Too many image configurations in application image archive')
                         configs[name] = ({key: value[key] for key in ('os', 'architecture')}, hashlib.sha256(raw).hexdigest())
+                    elif (
+                        isinstance(value, dict) and value.get('schemaVersion') == 2
+                        and isinstance(value.get('config'), dict) and isinstance(value.get('layers'), list)
+                        and name.startswith('blobs/sha256/')
+                    ):
+                        digest = hashlib.sha256(raw).hexdigest()
+                        if name != 'blobs/sha256/' + digest or len(descriptors) >= 16:
+                            raise ValidationError('Invalid or too many OCI manifests in application image archive')
+                        descriptors['sha256:' + digest] = value
             while reader.read(1024 ** 2):
                 pass
     except (OSError, EOFError, RecursionError, tarfile.TarError, zstd.ZstdError) as exc:
@@ -146,7 +155,7 @@ def _inspect_archive(path, image_name, compressed):
     config_name = entry.get('Config')
     if not isinstance(config_name, str) or _member_name(config_name) not in configs:
         raise ValidationError('Application image archive has no valid image configuration')
-    config, image_id = configs[_member_name(config_name)]
+    config, config_id = configs[_member_name(config_name)]
     layers = entry.get('Layers')
     if not isinstance(layers, list) or any(
         not isinstance(layer, str) or not members.get(_member_name(layer)) for layer in layers
@@ -155,7 +164,23 @@ def _inspect_archive(path, image_name, compressed):
     architecture = config.get('architecture')
     if config.get('os') != 'linux' or not isinstance(architecture, str) or not re.fullmatch(r'[a-z0-9_]+', architecture):
         raise ValidationError('Application image archive must contain one Linux platform')
-    return {'os': 'linux', 'architecture': architecture, 'image_id': 'sha256:' + image_id}
+    config_id = 'sha256:' + config_id
+    # Config and matching manifest IDs allow local reuse. Other IDs trigger a load.
+    manifest_ids = set()
+    for digest, descriptor in descriptors.items():
+        config_ref, layer_refs = descriptor['config'], descriptor['layers']
+        if config_ref.get('digest') != config_id:
+            continue
+        if not all(
+            isinstance(layer, dict) and isinstance(layer.get('digest'), str) for layer in layer_refs
+        ):
+            continue
+        if ['blobs/' + layer['digest'].replace(':', '/') for layer in layer_refs] == layers:
+            manifest_ids.add(digest)
+    return {
+        'os': 'linux', 'architecture': architecture,
+        'image_ids': [config_id, *sorted(manifest_ids)],
+    }
 
 
 def _read_manifest(app):
@@ -171,14 +196,19 @@ def _read_manifest(app):
         for architecture, image in manifest.items():
             if not isinstance(image, dict) or image.get('architecture') != architecture:
                 raise ValueError
-            for key in ('filename', 'version', 'image_name', 'os', 'architecture', 'sha256', 'image_id', 'file'):
+            for key in ('filename', 'version', 'image_name', 'os', 'architecture', 'sha256', 'file'):
                 if not isinstance(image.get(key), str) or not image[key]:
                     raise ValueError
             if (
                 image['file'] != Path(image['file']).name or image['file'] in ('.', '..')
                 or not re.fullmatch(r'[a-f0-9]{64}', image['sha256'])
-                or not re.fullmatch(r'sha256:[a-f0-9]{64}', image['image_id'])
                 or not isinstance(image.get('size'), int) or not 0 < image['size'] <= MAX_IMAGE_SIZE
+            ):
+                raise ValueError
+            image_ids = image.get('image_ids')
+            if (
+                not isinstance(image_ids, list) or not 1 <= len(image_ids) <= 17
+                or any(not isinstance(value, str) or not re.fullmatch(r'sha256:[a-f0-9]{64}', value) for value in image_ids)
             ):
                 raise ValueError
         return manifest

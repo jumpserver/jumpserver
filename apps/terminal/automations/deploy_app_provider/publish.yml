@@ -39,7 +39,7 @@
       ansible.builtin.set_fact:
         reuse_app_image: >-
           {{ app_image.get('Os', '') ~ '/' ~ app_image.get('Architecture', '') == docker_platform.stdout | trim
-             and (app_image_resource | length == 0 or app_image.get('Id') == app_image_resource.image_id) }}
+             and (app_image_resource | length == 0 or app_image.get('Id') in app_image_resource.image_ids) }}
 
     - name: Prepare application image for the Docker platform
       when: not reuse_app_image
@@ -103,7 +103,5 @@
 
     - name: Confirm application image
       ansible.builtin.assert:
-        that:
-          - app_image.get('Os', '') ~ '/' ~ app_image.get('Architecture', '') == docker_platform.stdout | trim
-          - app_image_resource | length == 0 or app_image.get('Id') == app_image_resource.image_id
-        fail_msg: 'Application image {{ APP_IMAGE }} does not match the requested image for {{ docker_platform.stdout | trim }}'
+        that: app_image.get('Os', '') ~ '/' ~ app_image.get('Architecture', '') == docker_platform.stdout | trim
+        fail_msg: 'Application image {{ APP_IMAGE }} does not match {{ docker_platform.stdout | trim }}'

@@ -1203,9 +1203,24 @@ class VirtualAppImageArchiveTests(TestCase):
         name = hashlib.sha256(config).hexdigest()
         name = 'blobs/sha256/' + name if blobs else name + '.json'
         manifest = json.dumps([{'Config': name, 'RepoTags': [tag], 'Layers': []}]).encode()
+        entries = [(name, config), ('manifest.json', manifest), *extra]
+        if blobs:
+            descriptor = json.dumps({
+                'schemaVersion': 2, 'mediaType': 'application/vnd.oci.image.manifest.v1+json',
+                'config': {'mediaType': 'application/vnd.oci.image.config.v1+json',
+                           'digest': 'sha256:' + hashlib.sha256(config).hexdigest(), 'size': len(config)},
+                'layers': [],
+            }).encode()
+            digest = 'sha256:' + hashlib.sha256(descriptor).hexdigest()
+            index = json.dumps({'schemaVersion': 2, 'manifests': [{'digest': digest}]}).encode()
+            entries += [
+                ('blobs/' + digest.replace(':', '/'), descriptor),
+                ('blobs/sha256/' + hashlib.sha256(index).hexdigest(), index),
+                ('index.json', index),
+            ]
         stream = io.BytesIO()
         with tarfile.open(fileobj=stream, mode='w') as archive:
-            for filename, data in [(name, config), ('manifest.json', manifest), *extra]:
+            for filename, data in entries:
                 member = tarfile.TarInfo(filename)
                 member.size = len(data)
                 archive.addfile(member, io.BytesIO(data))
@@ -1219,8 +1234,10 @@ class VirtualAppImageArchiveTests(TestCase):
             metadata = image_archives.save_image_archive(self.app, upload)
             self.assertEqual(metadata['sha256'], hashlib.sha256(payload).hexdigest())
             self.assertEqual((image_archives.archive_root(self.app) / metadata['file']).read_bytes(), payload)
+            self.assertEqual(len(metadata['image_ids']), 2 if compressed else 1)
         resources = image_archives.stage_image_archives(self.app, Path(self.directory) / 'task')
         self.assertEqual(set(resources), {'amd64', 'arm64'})
+        self.assertEqual(resources['arm64']['image_ids'], metadata['image_ids'])
         for architecture, image in resources.items():
             source = image_archives.archive_root(self.app) / Path(image['file']).name
             self.assertEqual(source.stat().st_ino, Path(image['file']).stat().st_ino)
@@ -1228,6 +1245,17 @@ class VirtualAppImageArchiveTests(TestCase):
         with open(DeployAppProviderManager(deployment).generate_playbook()) as stream:
             variables = yaml.safe_load(stream)[0]['vars']
         self.assertEqual(set(variables['APP_IMAGE_RESOURCES']), {'amd64', 'arm64'})
+
+    def test_oci_manifest_id_must_reference_the_selected_config(self):
+        descriptor = json.dumps({
+            'schemaVersion': 2, 'config': {'digest': 'sha256:' + '0' * 64}, 'layers': [],
+        }).encode()
+        digest = 'sha256:' + hashlib.sha256(descriptor).hexdigest()
+        image = image_archives.save_image_archive(self.app, self.make_archive(
+            blobs=True, extra=[('blobs/' + digest.replace(':', '/'), descriptor)],
+        ))
+        self.assertEqual(len(image['image_ids']), 2)
+        self.assertNotIn(digest, image['image_ids'])
 
     def test_invalid_upload_preserves_previous_archive(self):
         image = image_archives.save_image_archive(self.app, self.make_archive())
