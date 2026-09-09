@@ -40,12 +40,12 @@ from .const import ActivityChoices, ActionChoices
 from .filters import (
     FTPLogFilterSet, JobLogFilterSet, OperateLogFilterSet,
     JobsAuditFilterSet,
-    PasswordChangeLogFilterSet, ServiceAccessLogFilterSet,
+    PasswordChangeLogFilterSet,
     UserLoginLogFilterSet, UserSessionFilterSet,
 )
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
-    ActivityLog, JobLog, UserSession, IntegrationApplicationLog
+    ActivityLog, JobLog, UserSession
 )
 from .reporting import (
     FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
@@ -57,7 +57,7 @@ from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
-    ServiceAccessLogSerializer, OperateLogFullSerializer
+    OperateLogFullSerializer
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
@@ -398,16 +398,3 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
             user_session_manager.remove(key)
         queryset.delete()
         return Response(status=status.HTTP_200_OK)
-
-
-class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
-    model = IntegrationApplicationLog
-    serializer_class = ServiceAccessLogSerializer
-    filterset_class = ServiceAccessLogFilterSet
-    extra_filter_backends = [DatetimeRangeFilterBackend]
-    date_range_filter_fields = [
-        ('datetime', ('date_from', 'date_to'))
-    ]
-    search_fields = ('service', 'asset', 'account', 'remote_addr')
-    ordering_fields = ('datetime',)
-    ordering = ['-datetime']
