@@ -38,6 +38,39 @@ PERSONAL_CREDENTIAL_SAFE_VERIFY_METHODS = frozenset({
 })
 
 
+PERSONAL_CREDENTIAL_UPDATE_AUDIT_FIELDS = (
+    ('secret_type', _('Secret type')),
+    ('comment', _('Comment')),
+    ('is_active', _('Active')),
+)
+
+
+def get_personal_credential_update_diff(instance, validated_data):
+    """Build an update diff without ever reading or copying the secret."""
+    before, after = {}, {}
+
+    for field_name, label in PERSONAL_CREDENTIAL_UPDATE_AUDIT_FIELDS:
+        if field_name not in validated_data:
+            continue
+        before_value = getattr(instance, field_name, '')
+        after_value = validated_data[field_name]
+        if before_value == after_value:
+            continue
+        label = str(label)
+        before[label] = {'name': field_name, 'value': before_value}
+        after[label] = {'name': field_name, 'value': after_value}
+
+    if 'secret' in validated_data:
+        # Presence of this field is enough to prove a secret rotation. Never
+        # fetch the old secret or pass the submitted secret to the audit path.
+        label = str(_('Secret'))
+        masked = {'name': 'secret', 'value': '******'}
+        before[label] = masked.copy()
+        after[label] = masked.copy()
+
+    return before, after
+
+
 def get_personal_credential_failure_reason(error):
     codes = error.get_codes() if hasattr(error, 'get_codes') else None
     flattened = []
@@ -61,9 +94,9 @@ def get_personal_credential_failure_reason(error):
 def record_personal_credential_audit(
         *, operation, result, user, asset=None, credential=None,
         credential_id=None, username='', secret_type='', remote_addr=None,
-        failure_reason='', org_id=None,
+        failure_reason='', org_id=None, before=None, after=None,
 ):
-    """Record metadata only; a credential secret must never enter the audit log."""
+    """Record a credential event; secret values must never enter the audit log."""
     from audits.const import ActionChoices as AuditActionChoices
     from audits.handler import create_or_update_operate_log
 
@@ -130,13 +163,17 @@ def record_personal_credential_audit(
             'value': failure_reason,
         },
     }
+    if not before and not after:
+        after = details
+
     create_or_update_operate_log(
         action,
         _('Personal asset credential'),
         resource=credential,
         resource_display=display,
         force=True,
-        after=details,
+        before=before,
+        after=after,
         object_name='PersonalAssetCredential',
         user=user,
         org_id=str(org_id) if org_id is not None else None,

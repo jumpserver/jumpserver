@@ -85,6 +85,10 @@ class PersonalAssetCredentialSerializer(CommonModelSerializer):
         instance = self.instance
 
         if instance:
+            if 'username' in attrs and attrs['username'] != instance.username:
+                raise serializers.ValidationError({
+                    'username': _('Username cannot be changed')
+                })
             asset = instance.asset
             protocol = instance.protocol
             if 'asset' in attrs and attrs['asset'].id != instance.asset_id:
