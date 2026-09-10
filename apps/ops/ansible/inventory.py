@@ -159,6 +159,9 @@ class JMSInventory:
             if p.name == 'oracle':
                 setting = getattr(p, 'setting', {}) or {}
                 host['jms_asset']['oracle_sysdba'] = setting.get('sysdba', False)
+                host['jms_asset']['oracle_change_secret_with_old_password'] = (
+                    setting.get('change_secret_with_old_password', False)
+                )
             if p.name == 'mongodb':
                 setting = getattr(p, 'setting', {}) or {}
                 connection_options = {
