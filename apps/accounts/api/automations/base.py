@@ -118,6 +118,19 @@ class AutomationExecutionViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         automation = serializer.validated_data.get('automation')
+        from accounts.models import CredentialRotationRecord
+        from accounts.credential_rotation.execution import execute
+        from rest_framework.exceptions import ValidationError, PermissionDenied
+        if not automation or automation.type != self.tp:
+            raise ValidationError(_('Invalid automation task type.'))
+        rotation = CredentialRotationRecord.objects.filter(change_automation_id=automation.id).first()
+        if rotation:
+            if not request.user.has_perm('accounts.change_applicationcredential'):
+                raise PermissionDenied()
+            execution = execute(rotation.id, operator=request.user.name)
+            return Response({
+                'task': str(execution.id), 'credential_id': str(rotation.credential_id),
+            }, status=status.HTTP_201_CREATED)
         task = execute_account_automation_task.delay(
             pid=str(automation.pk), trigger=Trigger.manual, tp=self.tp
         )

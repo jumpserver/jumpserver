@@ -10,7 +10,7 @@ from accounts.const import (
 )
 from common.const import Status
 from common.utils import get_logger
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_org, tmp_to_root_org
 
 logger = get_logger(__file__)
 
@@ -223,6 +223,10 @@ def finalize_interrupted_execution(
             execution.save(update_fields=[
                 'status', 'date_finished', 'duration', 'summary', 'result',
             ])
+
+    from accounts.credential_rotation.execution import reconcile
+    with tmp_to_org(execution.org_id):
+        reconcile(execution_id)
 
     # Cache operations are intentionally outside the database transaction.
     # A cache outage must not roll back the recovered database state.

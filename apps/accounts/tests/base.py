@@ -1,4 +1,5 @@
 from django.test import TestCase
+from unittest.mock import patch
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import Account, ApplicationCredential, ClientAccessConfiguration, IntegrationApplication
@@ -48,6 +49,16 @@ class CredentialTestCase(TestCase):
             backup_account=self.backup,
             published_account=self.primary,
         )
+        # State-machine tests assume successful backup verification; the real
+        # preflight lifecycle is exercised separately in CredentialPreflightTests.
+        from accounts.credential_rotation import CredentialRotationManager
+        self.precheck_patch = patch(
+            'accounts.credential_rotation.preflight.start',
+            side_effect=lambda credential, operator='', operator_id=None:
+                CredentialRotationManager(credential.id)._publish(credential, operator),
+        )
+        self.precheck_patch.start()
+        self.addCleanup(self.precheck_patch.stop)
 
     def request(self, method, path, data=None, user=None):
         if isinstance(user, IntegrationApplication):

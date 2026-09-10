@@ -13,6 +13,14 @@ __all__ = ['AccountBaseAutomation', 'AutomationExecution', 'ChangeSecretMixin']
 
 
 class AccountBaseAutomation(AssetBaseAutomation):
+    def execute(self, trigger='manual'):
+        from accounts.models import CredentialRotationRecord
+        from accounts.credential_rotation.execution import execute
+        rotation = CredentialRotationRecord.objects.filter(change_automation_id=self.id).first()
+        if rotation:
+            return execute(rotation.id)
+        return super().execute(trigger)
+
     class Meta:
         proxy = True
         verbose_name = _("Account automation task")

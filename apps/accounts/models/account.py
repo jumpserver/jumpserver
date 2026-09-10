@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
@@ -86,6 +86,13 @@ class JSONFilterMixin:
 
 
 class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        # Keep the password, history and fixed-credential publication atomic.
+        if not self._state.adding:
+            type(self).objects.select_for_update().filter(pk=self.pk).first()
+        return super().save(*args, **kwargs)
+
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')

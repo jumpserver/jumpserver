@@ -203,11 +203,15 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
                 if not record or not record.account_id:
                     continue
                 verification_status = record.verification_status
+                from accounts.models import CredentialRotationRecord
+                rotation_requires_verification = CredentialRotationRecord.objects.filter(
+                    change_execution_id=record.execution_id,
+                ).exists()
                 if verification_status == ChangeSecretRecordStatusChoice.pending.value:
                     result['not_verified'] += 1
                     continue
                 if (
-                        not force
+                        (not force or rotation_requires_verification)
                         and verification_status
                         != ChangeSecretRecordStatusChoice.success.value
                 ):

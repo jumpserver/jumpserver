@@ -5,7 +5,7 @@ from hashlib import md5
 
 import sshpubkeys
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import SecretType, SecretStrategy
@@ -22,6 +22,11 @@ logger = get_logger(__file__)
 
 
 class BaseAccountQuerySet(VaultQuerySetMixin, models.QuerySet):
+    @transaction.atomic
+    def update(self, **kwargs):
+        # VaultQuerySetMixin emits password history signals after the SQL update.
+        return super().update(**kwargs)
+
     def active(self):
         return self.filter(is_active=True)
 

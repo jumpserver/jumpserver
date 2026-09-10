@@ -3,12 +3,15 @@ from django.db import transaction
 from django.db.models.signals import pre_save, post_save, pre_delete, m2m_changed
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
+from simple_history.signals import post_create_historical_record
 
 from accounts.const import AuditEvent, ApplicationEvent, ChangeSecretRecordStatusChoice
 from accounts.models import (
     ApplicationCredential, ClientAccessConfiguration, CredentialClientInstance,
     CredentialClientStatus, IntegrationApplication, ChangeSecretRecord, Account,
+    CredentialRotationRecord, ChangeSecretAutomation, AutomationExecution,
 )
+from assets.models import BaseAutomation, AutomationExecution as AssetAutomationExecution
 from .audit import record
 from .events import enqueue
 
@@ -23,7 +26,6 @@ MODEL_AUDIT_FIELDS = {
     CredentialClientInstance: ('is_active',),
     IntegrationApplication: ('name', 'is_active', 'accounts', 'ip_group'),
     ChangeSecretRecord: ('status',),
-    Account: ('version',),
 }
 
 
@@ -69,10 +71,6 @@ def after_save(sender, instance, created=False, raw=False, **kwargs):
         return
     if sender is ChangeSecretRecord:
         return record_secret_change(instance)
-    if sender is Account:
-        if not created:
-            publish_fixed_credentials(instance)
-        return
 
     event_name = get_audit_event(instance, created, before, after)
     event = record(event_name, **get_audit_context(instance), changes=changes)
@@ -83,7 +81,9 @@ def record_secret_change(instance):
     terminal_statuses = (ChangeSecretRecordStatusChoice.success, ChangeSecretRecordStatusChoice.failed)
     if instance.status not in terminal_statuses or not instance.account_id:
         return
-    credentials = ApplicationCredential.objects.filter(primary_account_id=instance.account_id).exclude(
+    credentials = ApplicationCredential.objects.filter(
+        primary_account_id=instance.account_id, change_execution_id=instance.execution_id,
+    ).exclude(
         status=ApplicationCredential.Status.idle,
     )
     for credential in credentials:
@@ -92,11 +92,17 @@ def record_secret_change(instance):
             enqueue(event, ApplicationEvent.ROTATION_FAILED)
 
 
-def publish_fixed_credentials(account):
-    credentials = ApplicationCredential.objects.filter(primary_account=account, type=ApplicationCredential.Type.fixed)
+def publish_fixed_credentials(sender, instance, history_instance, **kwargs):
+    if history_instance.history_type != '~':
+        return
+    credentials = ApplicationCredential.objects.select_for_update().filter(
+        primary_account=instance, type=ApplicationCredential.Type.fixed,
+    ).order_by('key')
     for credential in credentials:
-        event = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=credential)
-        enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED)
+        credential.revision += 1
+        # Existing credential signals record the revision and queue notifications
+        # in the same transaction; clients cannot read them before commit.
+        credential.save(update_fields=['revision', 'date_updated'])
 
 
 def get_audit_event(instance, created, before, after):
@@ -116,6 +122,11 @@ def notify_model_change(instance, event, changes):
     if event.event == AuditEvent.CREDENTIAL_PUBLISHED:
         enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED)
     elif event.event == AuditEvent.ROTATION_STEP:
+        if instance.status in (
+            ApplicationCredential.Status.change_failed,
+            ApplicationCredential.Status.recovery_required,
+        ):
+            enqueue(event, ApplicationEvent.ROTATION_FAILED)
         if (
             instance.status == ApplicationCredential.Status.changing_secret
             and instance.rotation_mode == ApplicationCredential.RotationMode.single
@@ -145,7 +156,25 @@ def notify_revoked_credentials(application):
 
 
 def before_delete(sender, instance, **kwargs):
+    if isinstance(instance, ApplicationCredential) and instance.rotation_records.filter(
+        change_automation__isnull=False,
+    ).exists():
+        raise ValidationError(_('Delete the linked rotation tasks before deleting this credential.'))
     record(AuditEvent.CONFIGURATION_DELETED, **get_audit_context(instance))
+
+
+def protect_rotation_execution(sender, instance, **kwargs):
+    if sender in (BaseAutomation, ChangeSecretAutomation):
+        rotations = CredentialRotationRecord.objects.filter(change_automation_id=instance.pk)
+    else:
+        rotations = CredentialRotationRecord.objects.filter(change_execution_id=instance.pk)
+    for rotation in rotations.select_related('credential'):
+        if rotation.status == 'running' and not rotation.date_finished:
+            # Use the same credential lock as create/execute/cancel.
+            ApplicationCredential.objects.select_for_update().get(pk=rotation.credential_id)
+            rotation.refresh_from_db()
+            if rotation.status == 'running' and not rotation.date_finished:
+                raise ValidationError(_('An active rotation task or execution cannot be deleted.'))
 
 
 def credentials_changed(sender, instance, action, reverse, pk_set, **kwargs):
@@ -187,3 +216,6 @@ for model in MODEL_AUDIT_FIELDS:
     if model not in (Account, ChangeSecretRecord):
         pre_delete.connect(before_delete, sender=model)
 m2m_changed.connect(credentials_changed, sender=ClientAccessConfiguration.credentials.through)
+post_create_historical_record.connect(publish_fixed_credentials, sender=Account.history.model)
+for model in (BaseAutomation, ChangeSecretAutomation, AutomationExecution, AssetAutomationExecution):
+    pre_delete.connect(protect_rotation_execution, sender=model)

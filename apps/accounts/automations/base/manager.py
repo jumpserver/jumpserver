@@ -416,7 +416,22 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         )
         return max(total_timeout + 600, 3600) if total_timeout else 86400
 
+    @transaction.atomic
     def acquire_account_lock(self, account_id):
+        from accounts.models import ApplicationCredential
+        from django.db.models import Q
+        credentials = ApplicationCredential.objects.select_for_update(of=('self',)).filter(
+            Q(primary_account_id=account_id) | Q(backup_account_id=account_id),
+            type=ApplicationCredential.Type.rotation,
+        ).order_by('key')
+        for credential in credentials:
+            if credential.status == credential.Status.idle:
+                continue
+            if (credential.primary_account_id != account_id
+                    and str(credential.primary_account_id) != str(account_id)) or (
+                credential.change_execution_id != self.execution.id
+            ):
+                raise ValueError(_('This account belongs to an active application credential rotation.'))
         account_id = str(account_id)
         if account_id in self.account_locks:
             return True

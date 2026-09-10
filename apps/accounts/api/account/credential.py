@@ -2,7 +2,7 @@ from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -22,6 +22,7 @@ from authentication.backends.drf import (
     CredentialAgentAuthentication, ServiceAuthentication,
 )
 from common.api import JMSGenericViewSet
+from common.exceptions import JMSException
 from common.utils import get_request_ip
 from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
 from authentication.permissions import UserConfirmation, ConfirmType
@@ -47,6 +48,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'change_secret': 'accounts.change_applicationcredential',
         'complete_rotation': 'accounts.change_applicationcredential',
         'cancel_rotation': 'accounts.change_applicationcredential',
+        'retry_change': ['accounts.change_applicationcredential', 'accounts.add_changesecretexecution'],
     }
 
     def perform_destroy(self, instance):
@@ -58,7 +60,10 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
 
     @action(methods=['post'], detail=True, url_path='start')
     def start_rotation(self, request, *args, **kwargs):
-        credential = CredentialRotationManager(self.get_object().id).start(request.user.name)
+        credential = self.get_object()
+        if credential.rotation_mode == 'dual' and not request.user.has_perm('accounts.verify_account'):
+            raise PermissionDenied()
+        credential = CredentialRotationManager(credential.id).start(request.user.name, request.user.id)
         serializer = self.get_serializer(credential)
         return Response(serializer.data)
 
@@ -92,7 +97,25 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
 
     @action(methods=['post'], detail=True, url_path='cancel')
     def cancel_rotation(self, request, *args, **kwargs):
-        credential = CredentialRotationManager(self.get_object().id).cancel()
+        params = serializers.CredentialRotationReasonSerializer(data=request.data)
+        params.is_valid(raise_exception=True)
+        credential = CredentialRotationManager(self.get_object().id).cancel(**params.validated_data)
+        serializer = self.get_serializer(credential)
+        return Response(serializer.data)
+
+    @action(methods=['post'], detail=True, url_path='retry-change')
+    def retry_change(self, request, *args, **kwargs):
+        from accounts.credential_rotation.execution import execute
+        credential = self.get_object()
+        params = serializers.CredentialChangeRetrySerializer(data=request.data)
+        params.is_valid(raise_exception=True)
+        rotation = credential.rotation_records.first()
+        if not rotation:
+            raise JMSException(_('No active rotation.'))
+        execute(rotation.id, request.user.name,
+                previous_execution_id=params.validated_data['execution_id'],
+                reason=params.validated_data['reason'])
+        credential.refresh_from_db()
         serializer = self.get_serializer(credential)
         return Response(serializer.data)
 

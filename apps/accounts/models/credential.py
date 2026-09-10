@@ -30,6 +30,8 @@ class ApplicationCredential(JMSOrgBaseModel):
         waiting_backup = 'waiting_backup', _('Waiting for backup account')
         ready_for_change = 'ready_for_change', _('Ready for secret change')
         changing_secret = 'changing_secret', _('Changing secret')
+        change_failed = 'change_failed', _('Secret change failed')
+        recovery_required = 'recovery_required', _('Recovery required')
         waiting_primary = 'waiting_primary', _('Waiting for primary account')
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
@@ -96,8 +98,6 @@ class ApplicationCredential(JMSOrgBaseModel):
 
     @property
     def current_revision(self):
-        if self.type == self.Type.fixed:
-            return self.primary_account.version + 1
         return self.revision
 
     def authorized_applications(self):
@@ -295,6 +295,16 @@ class ClientAccessConfiguration(JMSOrgBaseModel):
 
 
 class CredentialRotationRecord(JMSOrgBaseModel):
+    change_automation = models.OneToOneField(
+        'assets.BaseAutomation', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='credential_rotation',
+        verbose_name=_('Change secret automation'),
+    )
+    change_execution = models.ForeignKey(
+        'accounts.AutomationExecution', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='+',
+        verbose_name=_('Change secret execution'),
+    )
     credential = models.ForeignKey(
         ApplicationCredential, on_delete=models.CASCADE,
         related_name='rotation_records', verbose_name=_('Application credential')

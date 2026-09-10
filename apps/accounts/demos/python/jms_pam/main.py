@@ -3,7 +3,6 @@ import hashlib
 import hmac
 import json
 import os
-import socket
 import threading
 from dataclasses import dataclass
 from email.utils import formatdate
@@ -14,6 +13,26 @@ from requests.auth import AuthBase
 DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000002'
 CLIENT_PATH = '/api/v1/accounts/credential-client'
 SIGNATURE_HEADERS = ('(request-target)', 'accept', 'date', 'x-jms-org')
+REVOKED_CODES = frozenset(('credential_not_found', 'credential_not_selected', 'credential_not_authorized'))
+
+
+def response_error_code(error):
+    response = getattr(error, 'response', None)
+    if response is None or response.status_code not in (400, 403, 404):
+        return ''
+    try:
+        code = response.json().get('code', '')
+        return code if isinstance(code, str) else ''
+    except (ValueError, AttributeError):
+        return ''
+
+
+def identity_denied(error):
+    response = getattr(error, 'response', None)
+    return response is not None and (
+        response.status_code == 401
+        or (response.status_code == 403 and response_error_code(error) not in REVOKED_CODES)
+    )
 
 
 class HTTPSignatureAuth(AuthBase):
@@ -156,7 +175,12 @@ class JumpServerPAMClient:
         instance_id=None, heartbeat_interval=30,
         configuration_id=None, notification_enabled=False,
     ):
-        self.instance_id = instance_id or os.getenv('JMS_PAM_INSTANCE_ID') or socket.gethostname()
+        self.instance_id = instance_id or os.getenv('JMS_PAM_INSTANCE_ID')
+        if (not isinstance(self.instance_id, str) or not self.instance_id.strip()
+                or self.instance_id != self.instance_id.strip() or len(self.instance_id) > 128):
+            raise ValueError('Set instance_id or JMS_PAM_INSTANCE_ID to a stable, unique ID for each '
+                             'independent application process (1-128 characters, no surrounding whitespace).')
+        # ponytail: uniqueness is a deployment contract; add server leases if duplicate-session detection is required.
         self.heartbeat_interval = heartbeat_interval
         self.http = CredentialAPIClient(
             endpoint, app_id, app_secret, org_id, instance_id=self.instance_id,
@@ -205,8 +229,14 @@ class JumpServerPAMClient:
 
     def heartbeat(self):
         with self._lock:
-            credentials = list(self._applied.values())
-        return self.http.heartbeat(credentials)
+            sent = dict(self._applied)
+        result = self.http.heartbeat(list(sent.values()))
+        with self._lock:
+            for error in result.get('errors', []):
+                key = error['key']
+                if error['code'] in REVOKED_CODES and self._applied.get(key) is sent.get(key):
+                    self._applied.pop(key, None)
+        return result
 
     def _start_heartbeat(self):
         if self._heartbeat_thread and self._heartbeat_thread.is_alive():
