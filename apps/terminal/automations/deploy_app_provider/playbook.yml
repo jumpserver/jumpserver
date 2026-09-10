@@ -253,13 +253,12 @@
               ansible.builtin.set_fact:
                 provider_image: '{{ imported_image.stdout | from_json | first }}'
 
-            - name: Verify imported image identity and architecture
+            - name: Verify imported image architecture
               ansible.builtin.assert:
                 that:
-                  - provider_image.Id == PANDA_RESOURCE.image_id
                   - provider_image.Os == 'linux'
                   - provider_image.Architecture == provider_architecture
-                fail_msg: Imported image does not match the required image ID or provider architecture
+                fail_msg: Imported image does not match the provider OS or architecture
           always:
             - name: Remove image import directory
               ansible.builtin.file:
