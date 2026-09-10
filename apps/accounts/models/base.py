@@ -5,7 +5,7 @@ from hashlib import md5
 
 import sshpubkeys
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from accounts.const import SecretType, SecretStrategy
@@ -22,6 +22,7 @@ logger = get_logger(__file__)
 
 
 class BaseAccountQuerySet(VaultQuerySetMixin, models.QuerySet):
+    @transaction.atomic
     def update(self, **kwargs):
         if self.model._meta.model_name == 'account':
             from rest_framework.exceptions import ValidationError
@@ -30,6 +31,7 @@ class BaseAccountQuerySet(VaultQuerySetMixin, models.QuerySet):
             protected = {'secret', '_secret', 'secret_type', 'source', 'source_id'}
             if protected.intersection(kwargs) and self.filter(source='template', follow_template=True).exists():
                 raise ValidationError(_('Disable template following before editing credentials or their source.'))
+        # VaultQuerySetMixin emits password history signals after the SQL update.
         return super().update(**kwargs)
 
     def active(self):

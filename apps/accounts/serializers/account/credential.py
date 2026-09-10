@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -18,10 +19,33 @@ __all__ = [
     'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer',
     'ClientAccessConfigurationSerializer', 'CredentialRotationRecordSerializer',
     'EventRequestSerializer', 'EventSubscriptionSerializer', 'EventReportSerializer',
+    'CredentialChangeRetrySerializer', 'CredentialRotationReasonSerializer',
 ]
 
 
+class CredentialRotationReasonSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=512, required=False, default='', allow_blank=True)
+
+
+class CredentialChangeRetrySerializer(CredentialRotationReasonSerializer):
+    execution_id = serializers.UUIDField()
+    reason = serializers.CharField(max_length=512, allow_blank=False)
+
+
 class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
+    rotation = serializers.SerializerMethodField()
+    precheck = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_precheck(instance):
+        from accounts.credential_rotation.preflight import info
+        return info(instance) if instance.type == 'rotation' else None
+
+    @staticmethod
+    def get_rotation(instance):
+        from accounts.credential_rotation.execution import execution_info
+        return execution_info(instance)
+
     primary_account = ObjectRelatedField(
         queryset=Account.objects, attrs=('id', 'name', 'username', 'secret_type'),
         label=_('Primary account')
@@ -53,7 +77,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             'last_fetched', 'date_last_rotated', 'applications_amount',
         ]
         fields = fields_small + [
-            'applications', 'change_execution', 'blockers', 'primary_version_at_start',
+            'applications', 'change_execution', 'rotation', 'precheck', 'blockers', 'primary_version_at_start',
             'rotation_cancelled', 'date_rotation_started',
             'date_created', 'date_updated', 'created_by', 'comment',
         ]
@@ -108,6 +132,15 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         return value
 
     def validate(self, attrs):
+        from accounts.credential_rotation.preflight import check_ownership
+        attrs = self.validate_accounts(attrs)
+        check_ownership(self.instance or ApplicationCredential(), [
+            attrs.get('primary_account', getattr(self.instance, 'primary_account', None)),
+            attrs.get('backup_account', getattr(self.instance, 'backup_account', None)),
+        ])
+        return attrs
+
+    def validate_accounts(self, attrs):
         if self.instance and self.instance.status != ApplicationCredential.Status.idle:
             for field in ('type', 'rotation_mode', 'primary_account', 'backup_account', 'is_active'):
                 if field in attrs and attrs[field] != getattr(self.instance, field):
@@ -140,11 +173,33 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data['published_account'] = validated_data['primary_account']
-        return super().create(validated_data)
+        from accounts.credential_rotation.preflight import check_ownership
+        accounts = [validated_data['primary_account'], validated_data.get('backup_account')]
+        # Lock shared accounts before inserting a new credential, then recheck ownership.
+        with transaction.atomic():
+            list(Account.objects.select_for_update().filter(
+                pk__in=[a.pk for a in accounts if a],
+            ).order_by('id'))
+            check_ownership(ApplicationCredential(), accounts)
+            validated_data['published_account'] = validated_data['primary_account']
+            return super().create(validated_data)
 
+    @transaction.atomic
     def update(self, instance, validated_data):
+        from accounts.credential_rotation.preflight import check_ownership
+        instance = ApplicationCredential.objects.select_for_update().get(pk=instance.pk)
+        # Recheck stage constraints against the locked, current credential.
+        self.instance = instance
+        validated_data = self.validate(validated_data)
         primary = validated_data.get('primary_account', instance.primary_account)
+        accounts = [primary, validated_data.get('backup_account', instance.backup_account)]
+        # Existing bindings already exclude competing claims. Lock only newly
+        # acquired accounts, avoiding inversion with fixed-account publication.
+        existing_ids = {instance.primary_account_id, instance.backup_account_id}
+        list(Account.objects.select_for_update().filter(
+            pk__in=[a.pk for a in accounts if a and a.pk not in existing_ids],
+        ).order_by('id'))
+        check_ownership(instance, accounts)
         if primary.id != instance.primary_account_id:
             validated_data['published_account'] = primary
             validated_data['revision'] = instance.revision + 1

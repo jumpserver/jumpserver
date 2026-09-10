@@ -18,6 +18,7 @@ from accounts.models import (
 )
 from .audit import record
 from common.utils import random_string
+from common.exceptions import JMSException
 from orgs.utils import tmp_to_org
 
 
@@ -71,7 +72,7 @@ class CredentialClientManager:
             'published_account',
         ).filter(key=key, is_active=True).first()
         if not credential:
-            raise ValidationError({'key': _('Application credential not found.')}, code='credential_not_found')
+            raise JMSException(_('Application credential not found.'), code='credential_not_found')
 
         if not self.configuration.credentials.filter(id=credential.id).exists():
             raise PermissionDenied(_('The client access configuration does not include this credential.'), code='credential_not_selected')
@@ -85,9 +86,12 @@ class CredentialClientManager:
         credential = self._get_credential(key)
         if (
             credential.rotation_mode == ApplicationCredential.RotationMode.single
-            and credential.status == ApplicationCredential.Status.changing_secret
+            and credential.status in (
+                ApplicationCredential.Status.changing_secret,
+                ApplicationCredential.Status.recovery_required,
+            )
         ):
-            raise ValidationError(_('The account secret is changing. Retry after the new revision is published.'), code='credential_changing')
+            raise JMSException(_('The account secret is changing. Retry after the new revision is published.'), code='credential_changing')
         now = timezone.now()
         binding = CredentialApplicationBinding.objects.get_or_create(
             credential=credential, application=self.application
@@ -141,12 +145,22 @@ class CredentialClientManager:
             client=self.client,
         )
         updated = []
+        errors = []
         for item in sorted(credentials, key=lambda item: item['key']):
-            credential = self._get_credential(item['key'])
+            try:
+                credential = self._get_credential(item['key'])
+            except (PermissionDenied, JMSException) as exc:
+                code = exc.get_codes()
+                if code not in ('credential_not_found', 'credential_not_selected', 'credential_not_authorized'):
+                    raise
+                errors.append({'key': item['key'], 'code': code, 'detail': str(exc.detail)})
+                continue
             # Read after taking the credential lock, so concurrent confirmations
             # cannot turn a repeated version into another state transition.
             state = states.filter(binding__credential=credential).first()
             if not state:
+                errors.append({'key': item['key'], 'code': 'credential_not_fetched',
+                               'detail': str(_('Fetch the credential before confirming it.'))})
                 continue
             if (
                 item['account_id'] != credential.published_account_id
@@ -154,11 +168,13 @@ class CredentialClientManager:
                 or item['revision'] > state.fetched_revision
             ):
                 self._save_status(state, now, {})
+                errors.append({'key': item['key'], 'code': 'credential_revision_mismatch',
+                               'detail': str(_('The credential revision is no longer current.'))})
                 continue
             self._confirm_status(state, credential, now)
             updated.append(credential.key)
         self._touch(now)
-        return {'updated': updated, 'date_last_seen': now}
+        return {'updated': updated, 'errors': errors, 'date_last_seen': now}
 
     def confirm(self, key, revision, account_id):
         credential = self._get_credential(key)
@@ -231,7 +247,7 @@ class CredentialClientManager:
             application = IntegrationApplication.objects.filter(
                 id=payload['application_id'], is_active=True,
             ).first()
-            configuration = ClientAccessConfiguration.objects.filter(
+            configuration = ClientAccessConfiguration.objects.select_for_update().filter(
                 id=payload.get('configuration_id'), application=application,
                 type=CredentialClientInstance.Type.agent, is_active=True,
             ).first()
@@ -239,27 +255,30 @@ class CredentialClientManager:
                 raise ValidationError({
                     'token': _('Client access configuration not found.')
                 })
+            if CredentialClientInstance.objects.filter(
+                configuration=configuration, instance_id=instance_id,
+            ).exists():
+                raise JMSException(code='client_instance_exists', detail=_(
+                    'This client instance already exists. Reuse its local configuration. '
+                    'If that configuration was lost, review and remove the unused instance '
+                    'or choose a different instance ID; registration will not replace its identity.'
+                ))
             if not cache.add(used_key, True, timeout=600):
-                raise ValidationError({
-                    'token': _('Registration token has already been used.')
-                })
+                raise JMSException(code='registration_token_used', detail=_(
+                    'Registration token has already been used. Check whether the instance '
+                    'was created before generating a new token.'
+                ))
 
             secret = random_string(48)
-            if CredentialClientInstance.objects.filter(
-                configuration=configuration, instance_id=instance_id, is_active=False,
-            ).exists():
-                raise PermissionDenied(_('Enable the disabled client instance before registering it again.'))
-            client = CredentialClientInstance.objects.update_or_create(
+            client = CredentialClientInstance.objects.create(
                 configuration=configuration,
                 instance_id=instance_id,
-                defaults={
-                    'application': application,
-                    'type': CredentialClientInstance.Type.agent,
-                    'secret': secret,
-                    'is_active': True,
-                    'comment': name,
-                },
-            )[0]
+                application=application,
+                type=CredentialClientInstance.Type.agent,
+                secret=secret,
+                is_active=True,
+                comment=name,
+            )
         return {
             'agent_id': str(client.id),
             'agent_secret': secret,

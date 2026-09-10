@@ -353,7 +353,8 @@ class ApplicationAuditTests(CredentialTestCase):
         event = ApplicationAudit.objects.filter(event='credential_published', credential_id=self.credential.id).first()
         self.assertIsNotNone(event)
         self.primary.refresh_from_db()
-        self.assertEqual(event.revision, self.primary.version + 1)
+        self.credential.refresh_from_db()
+        self.assertEqual(event.revision, self.credential.revision)
 
 
 class CredentialFetchAuditTestsMixin:

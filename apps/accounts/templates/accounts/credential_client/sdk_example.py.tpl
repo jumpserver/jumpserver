@@ -2,6 +2,10 @@ import time
 import requests
 from jms_pam import JumpServerPAMClient
 
+# Set JMS_PAM_INSTANCE_ID before starting: a stable, unique ID for EACH independent
+# application process/connection pool. Do not reuse one ID across workers or hosts.
+# Create the SDK client inside each worker, after any process fork.
+
 {% if notification_enabled %}
 def on_event(event):
     # Replace with your application handler. No secrets are included.

@@ -1,11 +1,12 @@
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import ValidationError
+from common.exceptions import JMSException
 
-from accounts.const import AuditEvent, ChangeSecretRecordStatusChoice
+from accounts.const import AuditEvent
 from accounts.credential_client.audit import record
 from accounts.models import (
-    ChangeSecretRecord, CredentialClientStatus, ApplicationCredential,
+    CredentialClientStatus, ApplicationCredential,
     CredentialRotationRecord,
 )
 
@@ -19,15 +20,17 @@ class CredentialRotationManager:
             'primary_account', 'backup_account', 'published_account'
         ).get(pk=self.credential_id)
 
-    def start(self, operator=''):
+    @transaction.atomic
+    def start(self, operator='', operator_id=None):
+        from . import preflight
         credential = self._get_locked_credential()
-        if credential.type == ApplicationCredential.Type.fixed or not credential.is_active:
-            raise ValidationError(_('Only active rotation credentials can rotate.'))
-        if credential.status != ApplicationCredential.Status.idle:
-            raise ValidationError(
-                _('The application credential is already rotating.')
-            )
+        preflight.check(credential)
+        with preflight.account_locks(credential):
+            if credential.rotation_mode == credential.RotationMode.dual:
+                return preflight.start(credential, operator, operator_id)
+            return self._publish(credential, operator)
 
+    def _publish(self, credential, operator=''):
         states = list(credential.rotation_statuses().select_for_update(of=('self',)))
         dual = credential.rotation_mode == ApplicationCredential.RotationMode.dual
         if dual:
@@ -57,7 +60,7 @@ class CredentialRotationManager:
     def check_usage(self):
         credential = self._get_locked_credential()
         if credential.status != ApplicationCredential.Status.waiting_backup:
-            raise ValidationError(_(
+            raise JMSException(_(
                 'The application credential is not waiting for the backup account.'
             ))
         blockers = credential.get_blockers()
@@ -70,43 +73,42 @@ class CredentialRotationManager:
     def change_secret(self):
         credential = self._get_locked_credential()
         if credential.status != ApplicationCredential.Status.ready_for_change:
-            raise ValidationError(_(
+            raise JMSException(_(
                 'The application credential is not ready for secret change.'
             ))
         if credential.rotation_mode == ApplicationCredential.RotationMode.dual and credential.get_blockers():
-            raise ValidationError(_('Wait for all enabled clients to apply the backup account.'))
-        credential.status = ApplicationCredential.Status.changing_secret
-        credential.save(update_fields=['status', 'date_updated'])
+            raise JMSException(
+                detail=_('Wait for all enabled clients to apply the backup account.'),
+                code='credential_rotation_clients_not_ready',
+            )
         return credential
 
     def check_secret_change(self):
+        from .execution import outcome, reconcile
         credential = self._get_locked_credential()
-        if credential.status != ApplicationCredential.Status.changing_secret:
-            raise ValidationError(_('No secret change is running for this credential.'))
-
+        if credential.status == ApplicationCredential.Status.waiting_primary:
+            return credential
+        if credential.status not in (
+            ApplicationCredential.Status.changing_secret,
+            ApplicationCredential.Status.recovery_required,
+            ApplicationCredential.Status.change_failed,
+        ):
+            raise JMSException(_('No secret change is running for this credential.'))
+        if credential.change_execution_id:
+            reconcile(credential.change_execution_id)
+            credential.refresh_from_db()
+        else:
+            credential.status = ApplicationCredential.Status.recovery_required
+            credential.save(update_fields=['status', 'date_updated'])
+        rotation = credential.rotation_records.first()
+        if (not rotation or rotation.change_execution_id != credential.change_execution_id
+                or outcome(credential, credential.change_execution) != 'success'):
+            # Return the persisted recovery state, rather than rolling it back
+            # through ATOMIC_REQUESTS on a validation exception.
+            return credential
         primary = credential.primary_account
         primary.refresh_from_db()
-        record = ChangeSecretRecord.objects.filter(
-            execution__org_id=credential.org_id,
-            execution__type='change_secret',
-            account=primary,
-            account_version=primary.version - 1,
-            status=ChangeSecretRecordStatusChoice.success,
-            date_finished__gte=credential.date_rotation_started,
-        ).order_by('-date_finished').first()
-        changed = (
-            primary.version > credential.primary_version_at_start
-            and primary.change_secret_status == ChangeSecretRecordStatusChoice.success
-            and record is not None
-        )
-        if not changed:
-            raise ValidationError(_(
-                'The primary account secret has not been changed '
-                'and verified successfully.'
-            ))
-
         credential.revision += 1
-        credential.change_execution_id = record.execution_id
         credential.published_account = primary
         credential.status = ApplicationCredential.Status.waiting_primary
         credential.save(update_fields=[
@@ -120,7 +122,7 @@ class CredentialRotationManager:
     def complete(self):
         credential = self._get_locked_credential()
         if credential.status != ApplicationCredential.Status.waiting_primary:
-            raise ValidationError(_(
+            raise JMSException(_(
                 'The application credential is not waiting for the primary account.'
             ))
         blockers = credential.get_blockers()
@@ -146,18 +148,23 @@ class CredentialRotationManager:
         ).update(required_revision=None, is_rotation_participant=False)
         return credential, []
 
-    def cancel(self):
+    def cancel(self, reason=''):
+        from .execution import outcome
         credential = self._get_locked_credential()
+        if credential.status == ApplicationCredential.Status.change_failed:
+            if not reason.strip() or outcome(credential, credential.change_execution) != 'unchanged':
+                raise JMSException(_('Verify that the secret is unchanged and provide a cancellation reason.'))
         if credential.status not in (
             ApplicationCredential.Status.waiting_backup,
             ApplicationCredential.Status.ready_for_change,
+            ApplicationCredential.Status.change_failed,
         ):
-            raise ValidationError(_('This credential rotation cannot be cancelled.'))
+            raise JMSException(_('This credential rotation cannot be cancelled.'))
         credential.revision += 1
         credential.published_account = credential.primary_account
         credential.status = ApplicationCredential.Status.waiting_primary
         credential.rotation_cancelled = True
-        record(AuditEvent.ROTATION_CANCELLED, credential=credential)
+        record(AuditEvent.ROTATION_CANCELLED, credential=credential, summary=reason)
         credential.save(update_fields=[
             'revision', 'published_account', 'status',
             'rotation_cancelled', 'date_updated',

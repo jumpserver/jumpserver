@@ -100,6 +100,16 @@ class JSONFilterMixin:
 
 
 class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
+    def save(self, *args, **kwargs):
+        # Keep the password, history and fixed-credential publication atomic.
+        using = kwargs.get('using') or self._state.db or 'default'
+        with transaction.atomic(using=using):
+            previous = self._get_previous_for_update(using)
+            self._prepare_save_kwargs(kwargs)
+            if self._can_skip_template_transition(kwargs.get('update_fields')):
+                return self._save_without_template_transition(*args, **kwargs)
+            return self._save_with_locked_previous(previous, *args, **kwargs)
+
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')
@@ -295,19 +305,6 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         result = super().save(*args, **kwargs)
         self.__dict__.pop('_secret_explicitly_set', None)
         return result
-
-    def _save_template_transition(self, *args, **kwargs):
-        using = kwargs.get('using') or self._state.db or 'default'
-        # Keep the credential snapshot and opt-out in the same database transaction.
-        with transaction.atomic(using=using):
-            previous = self._get_previous_for_update(using)
-            return self._save_with_locked_previous(previous, *args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        self._prepare_save_kwargs(kwargs)
-        if self._can_skip_template_transition(kwargs.get('update_fields')):
-            return self._save_without_template_transition(*args, **kwargs)
-        return self._save_template_transition(*args, **kwargs)
 
     def __str__(self):
         if self.asset_id:

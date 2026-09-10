@@ -14,6 +14,7 @@ from accounts.models import (
 from accounts.serializers import AuthValidateMixin, PasswordRulesSerializer
 from assets.models import Asset
 from common.serializers import SecretReadableCheckMixin
+from common.exceptions import JMSException
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer, AutomationListSerializerMixin
@@ -41,6 +42,73 @@ def get_secret_types():
 
 
 class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializer):
+    rotation_id = serializers.UUIDField(write_only=True, required=False)
+    rotation = serializers.SerializerMethodField()
+
+    def run_validation(self, data=serializers.empty):
+        try:
+            return super().run_validation(data)
+        except serializers.ValidationError as exc:
+            if not (
+                isinstance(data, dict) and data.get('rotation_id')
+                or self.instance and self.get_rotation(self.instance)
+            ):
+                raise
+
+            def messages(detail):
+                if isinstance(detail, dict):
+                    detail = detail.values()
+                if isinstance(detail, str):
+                    return [detail]
+                return [message for item in detail for message in messages(item)]
+
+            # PAM forms display one operation-level error, including inherited field validation.
+            raise JMSException(detail='; '.join(messages(exc.detail)), code='invalid') from exc
+
+    @staticmethod
+    def get_rotation(instance):
+        from accounts.models import CredentialRotationRecord
+        rotation = CredentialRotationRecord.objects.filter(change_automation_id=instance.id).first()
+        if rotation:
+            return {'id': str(rotation.id), 'credential_id': str(rotation.credential_id)}
+        return None
+
+    def validate_rotation(self, attrs):
+        from accounts.models import CredentialRotationRecord
+        from accounts.credential_rotation.execution import locked_rotation, validate_parameters
+        from rest_framework.exceptions import PermissionDenied
+        rotation_id = attrs.pop('rotation_id', None)
+        linked = self.get_rotation(self.instance) if self.instance else None
+        if linked:
+            if rotation_id and str(rotation_id) != linked['id']:
+                raise JMSException(_('The task cannot be assigned to another rotation.'))
+            rotation_id = linked['id']
+        if not rotation_id:
+            return
+        request = self.context.get('request')
+        if not request or not request.user.has_perm('accounts.change_applicationcredential'):
+            raise PermissionDenied()
+        try:
+            credential, rotation = locked_rotation(rotation_id)
+        except CredentialRotationRecord.DoesNotExist:
+            raise JMSException(_('Rotation not found.'))
+        if credential.status not in (credential.Status.ready_for_change, credential.Status.change_failed):
+            raise JMSException(_('The rotation task cannot be edited at this stage.'))
+        if rotation.change_automation_id and (
+            not self.instance or rotation.change_automation_id != self.instance.id
+        ):
+            raise JMSException(_('This rotation already has a change secret task.'))
+        validate_parameters(credential, attrs, self.instance)
+        self.rotation = rotation
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        rotation = getattr(self, 'rotation', None)
+        if rotation:
+            rotation.change_automation = instance
+            rotation.save(update_fields=['change_automation'])
+        return instance
+
     secret_strategy = LabeledChoiceField(
         choices=SecretStrategy.choices, required=True, label=_('Secret strategy')
     )
@@ -56,7 +124,8 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = BaseAutomationSerializer.Meta.fields + read_only_fields + [
             'secret_type', 'secret_strategy', 'secret', 'password_rules',
-            'ssh_key_change_strategy', 'passphrase', 'recipients', 'params', 'check_conn_after_change'
+            'ssh_key_change_strategy', 'passphrase', 'recipients', 'params', 'check_conn_after_change',
+            'rotation_id', 'rotation',
         ]
         extra_kwargs = {**BaseAutomationSerializer.Meta.extra_kwargs, **{
             'accounts': {'required': True, 'help_text': _('Please enter your account username')},
@@ -100,6 +169,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         return password_rules
 
     def validate(self, attrs):
+        self.validate_rotation(attrs)
         secret_type = attrs.get(
             'secret_type',
             getattr(self.instance, 'secret_type', None),
