@@ -289,7 +289,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.http: {
                 'port': 80,
                 'port_from_addr': True,
-                'secret_types': ['password'],
+                'secret_types': ['password', 'access_key'],
                 'setting': {
                     'safe_mode': {
                         'type': 'bool',
