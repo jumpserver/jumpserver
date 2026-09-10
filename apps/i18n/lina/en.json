@@ -1053,6 +1053,7 @@
     "PrivateIP": "Private IP",
     "PrivateKey": "Private key",
     "Privileged": "Privileged",
+    "PrivilegedAccountHelpTip": "A privileged account has administrator or other elevated permissions on the target asset, such as root or Administrator, and is typically used for system maintenance and account management. Selecting this option only identifies the account type; actual permissions are determined by the target asset.",
     "PrivilegedFirst": "Privileged first",
     "PrivilegedOnly": "Privileged only",
     "PrivilegedTemplate": "Privileged",

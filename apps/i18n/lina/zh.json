@@ -1057,6 +1057,7 @@
     "PrivateIP": "私有 IP",
     "PrivateKey": "私钥",
     "Privileged": "特权账号",
+    "PrivilegedAccountHelpTip": "特权账号是在目标资产上拥有管理员或其他高权限的账号，如 root、Administrator，通常用于系统维护、账号管理等操作。勾选仅标识账号类型，实际权限由目标资产决定。",
     "PrivilegedFirst": "优先特权账号",
     "PrivilegedOnly": "仅特权账号",
     "PrivilegedTemplate": "特权的",
