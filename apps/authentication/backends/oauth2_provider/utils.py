@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 
 @transaction.atomic
 def get_or_create_jumpserver_client_application():
-    """Create the built-in client or add missing callbacks without replacing its credentials."""
+    """Refresh built-in client callbacks without replacing its credentials."""
     Application = get_application_model()
     
     application, created = Application.objects.select_for_update().get_or_create(
@@ -22,12 +22,13 @@ def get_or_create_jumpserver_client_application():
         }
     )
     if not created:
-        redirect_uris = application.redirect_uris.split()
+        original_uris = application.redirect_uris.split()
+        redirect_uris = [uri for uri in original_uris if not uri.lower().startswith('jms:')]
         missing_uris = [
             uri for uri in settings.OAUTH2_PROVIDER_CLIENT_REDIRECT_URI.split()
             if uri not in redirect_uris
         ]
-        if missing_uris:
+        if missing_uris or redirect_uris != original_uris:
             application.redirect_uris = ' '.join(redirect_uris + missing_uris)
             application.save(update_fields=['redirect_uris'])
     return application

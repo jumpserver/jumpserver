@@ -35,11 +35,10 @@ class RedirectConfirmTests(SimpleTestCase):
         # escapejs uses Unicode escapes, which JSON decodes the same way as JavaScript.
         return json.loads('"' + match.group(1) + '"')
 
-    def test_confirmation_accepts_new_legacy_and_web_urls(self):
+    def test_confirmation_accepts_client_and_web_urls(self):
         for target in (
             'jms2://auth/callback?code=abc&state=xyz',
-            'jms://auth/callback?code=abc&state=xyz',
-            'jms2://AbC+/DeF==', 'jms://AbC+/DeF==',
+            'jms2://AbC+/DeF==',
             'http://127.0.0.1:14876/auth/callback?code=abc&state=xyz',
             'https://sso.example/login?next=%2Fui%2F',
         ):
@@ -49,7 +48,7 @@ class RedirectConfirmTests(SimpleTestCase):
                 self.assertEqual(response.context_data['target_url'], target)
 
     def test_oauth_redirect_reaches_confirmation_without_changing_callback_parameters(self):
-        for scheme in ('jms', 'jms2'):
+        for scheme in ('jms2',):
             with self.subTest(scheme=scheme):
                 target = f'{scheme}://auth/callback?code=a%2Bb%26amp%3Bc&state=matching-state'
                 request = self.factory.get('/core/auth/oauth2-provider/authorize/')
@@ -70,6 +69,17 @@ class RedirectConfirmTests(SimpleTestCase):
                     'code': ['a+b&amp;c'], 'state': ['matching-state'],
                 })
 
+    def test_encoded_client_callback_query_reaches_confirmation(self):
+        request = self.factory.get(
+            '/core/redirect/confirm/?next=jms2%3A//auth/callback%3Fcode%3Dtest-code%26state%3Dtest_state'
+        )
+        response = RedirectConfirm.as_view()(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.callback_from_html(response.render().content.decode()),
+            'jms2://auth/callback?code=test-code&state=test_state',
+        )
+
     def test_javascript_url_literal_preserves_parameters_and_cannot_escape_script(self):
         target = "https://example.com/callback?code=a%2Bb&state=x'\"</script><script>alert(1)</script>"
         response = self.confirm(target)
@@ -81,7 +91,7 @@ class RedirectConfirmTests(SimpleTestCase):
 
     def test_invalid_schemes_and_malformed_urls_remain_rejected(self):
         for target in (
-            '', '/ui/', '//example.com/path', 'javascript://example.com/alert(1)',
+            'jms://auth/callback', 'jms://AbC+/DeF==', '', '/ui/', '//example.com/path', 'javascript://example.com/alert(1)',
             'data://text/html,test', 'file://host/path', 'ftp://example.com/file',
             'jms2:/auth/callback', 'jms2://', 'https://[invalid',
         ):

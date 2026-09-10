@@ -144,6 +144,6 @@ class RedirectConfirm(TemplateView):
             return False
         if not parsed.scheme or not parsed.netloc:
             return False
-        if parsed.scheme not in ['http', 'https', 'jms', 'jms2']:
+        if parsed.scheme not in ['http', 'https', 'jms2']:
             return False
         return True

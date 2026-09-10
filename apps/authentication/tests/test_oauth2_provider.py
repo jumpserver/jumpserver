@@ -24,7 +24,7 @@ DEV_CALLBACK = 'http://127.0.0.1:14876/auth/callback'
 
 @override_settings(
     OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME='JumpServer Client',
-    OAUTH2_PROVIDER_CLIENT_REDIRECT_URI=f'{LEGACY_CALLBACK} {CLIENT_CALLBACK}',
+    OAUTH2_PROVIDER_CLIENT_REDIRECT_URI=CLIENT_CALLBACK,
 )
 class OAuthClientApplicationTests(TestCase):
     def setUp(self):
@@ -39,12 +39,12 @@ class OAuthClientApplicationTests(TestCase):
             **kwargs,
         })
 
-    def test_new_client_allows_both_desktop_callbacks_without_production_loopback(self):
+    def test_new_client_allows_only_current_desktop_callback(self):
         application = get_or_create_jumpserver_client_application()
 
         application.clean()
         self.assertTrue(application.redirect_uri_allowed(CLIENT_CALLBACK))
-        self.assertTrue(application.redirect_uri_allowed(LEGACY_CALLBACK))
+        self.assertFalse(application.redirect_uri_allowed(LEGACY_CALLBACK))
         self.assertFalse(application.redirect_uri_allowed(DEV_CALLBACK))
         self.assertTrue(application.skip_authorization)
 
@@ -67,7 +67,7 @@ class OAuthClientApplicationTests(TestCase):
         call_command(Command(), stdout=StringIO())
 
         after = self.Application.objects.filter(pk=application.pk).values().get()
-        self.assertEqual(after.pop('redirect_uris').split(), original_uris.split() + [CLIENT_CALLBACK])
+        self.assertEqual(after.pop('redirect_uris').split(), original_uris.split()[1:] + [CLIENT_CALLBACK])
         before.pop('redirect_uris')
         self.assertEqual(after, before)
         self.assertEqual(list(get_access_token_model().objects.values()), access_before)
@@ -81,10 +81,10 @@ class OAuthClientApplicationTests(TestCase):
         with self.assertNumQueries(3):  # Savepoint, locked read, release; no UPDATE.
             again = get_or_create_jumpserver_client_application()
         self.assertEqual(again.pk, application.pk)
-        self.assertEqual(again.redirect_uris.split(), [LEGACY_CALLBACK, CLIENT_CALLBACK])
+        self.assertEqual(again.redirect_uris.split(), [CLIENT_CALLBACK])
 
     @override_settings(
-        OAUTH2_PROVIDER_CLIENT_REDIRECT_URI=f'{LEGACY_CALLBACK} {CLIENT_CALLBACK} {DEV_CALLBACK}',
+        OAUTH2_PROVIDER_CLIENT_REDIRECT_URI=f'{CLIENT_CALLBACK} {DEV_CALLBACK}',
     )
     def test_development_initialization_adds_loopback_to_existing_client(self):
         application = self.create_application()
@@ -92,7 +92,7 @@ class OAuthClientApplicationTests(TestCase):
         updated = get_or_create_jumpserver_client_application()
 
         self.assertEqual(updated.pk, application.pk)
-        self.assertEqual(updated.redirect_uris.split(), [LEGACY_CALLBACK, CLIENT_CALLBACK, DEV_CALLBACK])
+        self.assertEqual(updated.redirect_uris.split(), [CLIENT_CALLBACK, DEV_CALLBACK])
 
     def test_callback_matching_remains_exact(self):
         application = get_or_create_jumpserver_client_application()
@@ -119,7 +119,7 @@ class OAuthClientApplicationTests(TestCase):
 
         clear_cache.assert_called_once_with()
         application.refresh_from_db()
-        self.assertEqual(application.redirect_uris.split(), [LEGACY_CALLBACK, CLIENT_CALLBACK])
+        self.assertEqual(application.redirect_uris.split(), [CLIENT_CALLBACK])
         self.assertEqual(self.Application.objects.count(), 1)
 
     def test_startup_clears_cache_even_before_database_is_available(self):

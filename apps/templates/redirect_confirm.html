@@ -76,7 +76,7 @@
                 event.preventDefault();
             }
             setTimeout(() => {
-                if (targetUrl.startsWith('jms://') || targetUrl.startsWith('jms2://')) {
+                if (targetUrl.startsWith('jms2://')) {
                     if (startedCountdown) {
                         // 已经开始倒计时，直接跳转但不再重置倒计时
                         window.location.href = targetUrl;
