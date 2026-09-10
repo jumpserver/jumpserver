@@ -183,7 +183,7 @@ class JobHistoricalRecords(HistoricalRecords):
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
     instant = models.BooleanField(default=False)
-    args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
+    args = models.TextField(max_length=65536, default='', verbose_name=_('Args'), null=True, blank=True)
     module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell,
                               verbose_name=_('Module'), null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Run dir'), null=True, blank=True)
@@ -281,7 +281,7 @@ class JobExecution(JMSOrgBaseModel):
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
-    material = models.CharField(max_length=8192, default='', verbose_name=_('Material'), null=True, blank=True)
+    material = models.TextField(default='', verbose_name=_('Material'), null=True, blank=True)
     job_type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc,
                                 verbose_name=_("Material Type"))
 
