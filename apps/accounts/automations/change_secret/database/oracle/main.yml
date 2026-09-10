@@ -15,6 +15,7 @@
         connect_timeout: 15
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
+        old_password: "{{ account.old_secret | default(omit) }}"
         password_only: true
       ignore_errors: true
       register: change_secret_result
