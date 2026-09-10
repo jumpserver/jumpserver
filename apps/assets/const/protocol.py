@@ -180,6 +180,15 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'label': _('SYSDBA'),
                         'help_text': _('Connect as SYSDBA')
                     },
+                    'change_secret_with_old_password': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Use old password when changing password'),
+                        'help_text': _(
+                            'Use the currently managed password in the Oracle '
+                            'REPLACE clause when changing passwords'
+                        )
+                    },
                 }
             },
             cls.sqlserver: {
