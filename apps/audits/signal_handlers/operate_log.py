@@ -55,6 +55,8 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         return
     if not instance:
         return
+    if getattr(instance, OP_LOG_SKIP_SIGNAL, False):
+        return
 
     with translation.override('en'):
         resource_type = instance._meta.verbose_name

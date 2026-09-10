@@ -8,7 +8,7 @@ from django.utils.translation import gettext_noop
 
 from assets.models import Asset, Node, Host, Database, Device, Web, Cloud
 from assets.tasks import test_assets_connectivity_task, gather_assets_facts_task
-from common.const.signals import POST_REMOVE, PRE_REMOVE
+from common.const.signals import OP_LOG_SKIP_SIGNAL, POST_REMOVE, PRE_REMOVE
 from common.decorators import on_transaction_commit, merge_delay_run, key_by_org
 from common.utils import get_logger
 from orgs.utils import current_org
@@ -80,6 +80,7 @@ RELATED_NODE_IDS = '_related_node_ids'
 
 @receiver(pre_delete, sender=Asset)
 def on_asset_delete(instance: Asset, using, **kwargs):
+    setattr(instance, OP_LOG_SKIP_SIGNAL, True)
     node_ids = Node.objects.filter(assets=instance) \
         .distinct().values_list('id', flat=True)
     node_ids = list(node_ids)
