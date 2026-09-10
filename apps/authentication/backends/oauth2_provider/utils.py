@@ -1,16 +1,18 @@
 from django.conf import settings
 from django.core.cache import cache
+from django.db import transaction
 from oauth2_provider.models import get_application_model
 
 from common.utils import get_logger
 
 logger = get_logger(__name__)
 
+@transaction.atomic
 def get_or_create_jumpserver_client_application():
-    """Auto get or create OAuth2 JumpServer Client application."""
+    """Create the built-in client or add missing callbacks without replacing its credentials."""
     Application = get_application_model()
     
-    application, created = Application.objects.get_or_create(
+    application, created = Application.objects.select_for_update().get_or_create(
         name=settings.OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME,
         defaults={
             'client_type': Application.CLIENT_PUBLIC,
@@ -19,6 +21,15 @@ def get_or_create_jumpserver_client_application():
             'skip_authorization': True,
         }
     )
+    if not created:
+        redirect_uris = application.redirect_uris.split()
+        missing_uris = [
+            uri for uri in settings.OAUTH2_PROVIDER_CLIENT_REDIRECT_URI.split()
+            if uri not in redirect_uris
+        ]
+        if missing_uris:
+            application.redirect_uris = ' '.join(redirect_uris + missing_uris)
+            application.save(update_fields=['redirect_uris'])
     return application
 
 
@@ -27,5 +38,5 @@ CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX = 'oauth2_provider_metadata'
 
 def clear_oauth2_authorization_server_view_cache():
     logger.info("Clearing OAuth2 Authorization Server Metadata view cache")
-    cache_key = f'views.decorators.cache.cache_page.{CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX}.GET*'
+    cache_key = f'views.decorators.cache.cache_*.{CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX}.*'
     cache.delete_pattern(cache_key)
