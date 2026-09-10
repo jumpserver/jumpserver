@@ -3,7 +3,9 @@ import os
 from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
+from html2text import HTML2Text
 
 from common.storage import jms_storage
 from common.utils import text_hmac_sha256
@@ -29,6 +31,36 @@ def task_activity_callback(self, subject, message, recipient_list, *args, **kwar
     email_lookup_list = [text_hmac_sha256(email) for email in email_list]
     resource_ids = list(User.objects.filter(email_lookup__in=email_lookup_list).values_list('id', flat=True))
     return resource_ids,
+
+
+def _prepare_email_body(args, kwargs):
+    """Generate a text alternative only when the caller has not provided one."""
+    message = args[1] if len(args) > 1 else kwargs.get('message')
+    html_message = kwargs.get('html_message')
+    if not html_message or (message and message != html_message):
+        return args, kwargs
+
+    try:
+        converter = HTML2Text()
+        converter.body_width = 0
+        converter.ignore_links = False
+        # Reference links keep URL parentheses unescaped in text/plain.
+        converter.inline_links = False
+        converter.ignore_images = True
+        message = converter.handle(force_str(html_message)).strip()
+    except Exception as exc:
+        # Converter errors may contain sensitive message content.
+        logger.warning(
+            'Email body conversion failed (%s); falling back to original HTML email',
+            type(exc).__name__,
+        )
+        return args, kwargs
+
+    if len(args) > 1:
+        args = (args[0], message, *args[2:])
+    else:
+        kwargs = {**kwargs, 'message': message}
+    return args, kwargs
 
 
 @shared_task(
@@ -72,7 +104,8 @@ def send_mail_async(*args, **kwargs):
     for user in users:
         try:
             with activate_user_language(user):
-                send_mail(connection=get_email_connection(), *args, **kwargs)
+                mail_args, mail_kwargs = _prepare_email_body(args, kwargs)
+                send_mail(connection=get_email_connection(), *mail_args, **mail_kwargs)
         except Exception as e:
             logger.error(f"Sending mail to {user.email} error: {e}")
 
