@@ -10,6 +10,7 @@ from rest_framework.throttling import UserRateThrottle
 from accounts.models import PersonalAssetCredential
 from accounts.personal_credentials import (
     PERSONAL_CREDENTIAL_SECRET_TYPES,
+    get_personal_credential_update_diff,
     get_personal_credential_permission_context,
     record_personal_credential_audit,
     validate_personal_credential_secret_type,
@@ -164,10 +165,13 @@ class PersonalAssetCredentialViewSet(OrgBulkModelViewSet):
         )
 
     def perform_update(self, serializer):
+        before, after = get_personal_credential_update_diff(
+            serializer.instance, serializer.validated_data
+        )
         instance = serializer.save()
         record_personal_credential_audit(
             operation='update', result='success', user=self.request.user,
-            credential=instance,
+            credential=instance, before=before, after=after,
         )
 
     def perform_destroy(self, instance):
