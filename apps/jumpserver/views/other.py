@@ -138,9 +138,12 @@ class RedirectConfirm(TemplateView):
     def is_valid_url(url):
         if not url:
             return False
-        parsed = urlparse(url)
+        try:
+            parsed = urlparse(url)
+        except ValueError:
+            return False
         if not parsed.scheme or not parsed.netloc:
             return False
-        if parsed.scheme not in ['http', 'https', 'jms']:
+        if parsed.scheme not in ['http', 'https', 'jms', 'jms2']:
             return False
         return True
