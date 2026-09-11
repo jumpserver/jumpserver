@@ -243,6 +243,23 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         self.load_accounts_by_asset()
         return self._accounts_by_asset_id.get(str(asset.id), [])
 
+    def get_execution_account_label(self, detail):
+        # Verification connects with the target credential, overriding the
+        # privileged account initially selected for the asset inventory.
+        account = detail.get('account') or {}
+        protocol = (detail.get('jms_asset') or {}).get('protocol')
+        username = account.get('username')
+        if protocol in ('winrm', 'rdp'):
+            username = account.get('full_username') or username
+        auth = {}
+        if protocol == 'ssh' and account.get('secret_type') == SecretType.PASSWORD:
+            auth = dict(account.get('become') or {})
+            # ssh_ping verifies passwords through su (or a network-device
+            # enable method), regardless of the platform's sudo setting.
+            if auth.get('ansible_become_method') not in ('enable', 'super', 'super_level'):
+                auth['ansible_become_method'] = 'su'
+        return self.format_execution_account_label(username, auth, account)
+
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super().host_callback(
             host, asset=asset, account=account,
@@ -305,6 +322,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 'name': account.name,
                 'username': account.username,
                 'full_username': account.full_username,
+                'privileged': account.privileged,
                 'secret_type': account.secret_type,
                 'secret': account.escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,

@@ -2799,6 +2799,21 @@ msgstr "Thực hiện thao tác tự động"
 msgid "Stage: %(stage)s"
 msgstr "▶ Giai đoạn: %(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s: đang xử lý; tài khoản thực thi: %(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s (đăng nhập: %(login)s, %(method)s → %(become)s)"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s (tên người dùng: %(username)s, tài khoản đặc quyền: %(privileged)s)"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3229,6 +3244,11 @@ msgstr "Không có tài khoản"
 #, python-format
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "Đang kiểm tra đăng nhập SSH và chuyển tiếp đường hầm: %(gateway)s"
+
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "Đang kiểm tra đăng nhập SSH và chuyển tiếp đường hầm: %(gateway)s; tài khoản thực thi: %(account)s"
 
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format

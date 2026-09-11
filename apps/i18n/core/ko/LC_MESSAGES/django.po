@@ -2768,6 +2768,21 @@ msgstr "자동화 작업 실행"
 msgid "Stage: %(stage)s"
 msgstr "▶ 단계: %(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s: 처리 중; 실행 계정: %(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s (로그인: %(login)s, %(method)s → %(become)s)"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s (사용자 이름: %(username)s, 특권 계정: %(privileged)s)"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3190,6 +3205,11 @@ msgstr "계정이 없습니다."
 #, python-format
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "게이트웨이 로그인 및 SSH 터널 전달을 확인하는 중: %(gateway)s"
+
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "게이트웨이 로그인 및 SSH 터널 전달을 확인하는 중: %(gateway)s; 실행 계정: %(account)s"
 
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format

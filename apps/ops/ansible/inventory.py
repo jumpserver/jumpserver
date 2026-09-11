@@ -309,7 +309,9 @@ class JMSInventory:
             },
             'jms_account': {
                 'id': str(account.id),
+                'name': account.name,
                 'username': username,
+                'privileged': account.privileged,
                 'secret': account.escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
             } if account else None

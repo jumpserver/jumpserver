@@ -1,5 +1,9 @@
 {% load static %}
 {% load i18n %}
+{% translate "Back" as back_label %}
+{% translate "Detail" as detail_label %}
+{% translate "Output" as output_label %}
+{% translate "Status" as status_label %}
 <head>
     <title>{% trans 'Console' %}</title>
     <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
@@ -431,6 +435,12 @@
     var taskStartedAt = null;
     var taskFinishedAt = null;
     var taskIsFinished = false;
+    var taskLogLabels = {
+        back: "{{ back_label|escapejs }}",
+        detail: "{{ detail_label|escapejs }}",
+        output: "{{ output_label|escapejs }}",
+        status: "{{ status_label|escapejs }}",
+    };
     var isTaskInfoLoading = false;
     $(document).ready(function () {
         term = new Terminal({
@@ -729,11 +739,11 @@
                     currentLogType === 'celery'
                 ) {
                     term.write(
-                        `${gettext('Status')}: ${getTaskStateLabel(data.state)}\r\n` +
-                        `${gettext('Output')}: ${gettext('Log unavailable or the log directory is not shared.')}\r\n`
+                        `${taskLogLabels.status}: ${getTaskStateLabel(data.state)}\r\n` +
+                        `${taskLogLabels.output}: ${gettext('Log unavailable or the log directory is not shared.')}\r\n`
                     );
                 } else {
-                    term.write(`Ansible ${gettext('Detail')}: ${gettext('Not found')}\r\n`);
+                    term.write(`Ansible ${taskLogLabels.detail}: ${gettext('Not found')}\r\n`);
                 }
                 scheduleTerminalScrollbarUpdate();
                 return;
@@ -787,7 +797,7 @@
         updateTaskDuration();
         if (writeToTerminal && announcedTaskState !== state) {
             announcedTaskState = state;
-            term.write(`${gettext('Status')}: ${getTaskStatusMessage(state)}\r\n`);
+            term.write(`${taskLogLabels.status}: ${getTaskStatusMessage(state)}\r\n`);
             scheduleTerminalScrollbarUpdate();
         }
     }
@@ -908,10 +918,10 @@
         button.toggleClass('is-active', showAnsible);
         button.attr('aria-pressed', showAnsible ? 'true' : 'false');
         button.find('.toggle-log-label').text(
-            showAnsible ? gettext('Back') : `Ansible ${gettext('Detail')}`
+            showAnsible ? taskLogLabels.back : `Ansible ${taskLogLabels.detail}`
         );
         $('#terminal-heading-label').text(
-            showAnsible ? `Ansible ${gettext('Detail')}` : gettext('Output')
+            showAnsible ? `Ansible ${taskLogLabels.detail}` : taskLogLabels.output
         );
         connectLog(currentLogType);
     });

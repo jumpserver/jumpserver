@@ -2784,6 +2784,21 @@ msgstr "自動化操作の実行"
 msgid "Stage: %(stage)s"
 msgstr "▶ ステージ：%(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s：処理中、実行アカウント：%(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s（ログイン：%(login)s、%(method)s → %(become)s）"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s（ユーザー名：%(username)s、特権アカウント：%(privileged)s）"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3215,6 +3230,11 @@ msgstr "アカウントなし"
 #, python-format
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "ゲートウェイのログインとSSHトンネル転送を検証しています：%(gateway)s"
+
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "ゲートウェイのログインとSSHトンネル転送を検証しています：%(gateway)s、実行アカウント：%(account)s"
 
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format
