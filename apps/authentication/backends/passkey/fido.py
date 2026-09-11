@@ -126,15 +126,14 @@ def register_complete(request):
     return passkey
 
 
-def auth_begin(request):
+def auth_begin(request, discoverable=False):
     server = get_server(request)
     credentials = []
 
-    username = None
-    if request.user.is_authenticated:
-        username = request.user.username
-    if username:
-        credentials = get_user_credentials(username)
+    # Discoverable credentials (empty allowCredentials) are required for some
+    # platform authenticators (e.g. Windows Password Manager) during MFA confirm.
+    if not discoverable and request.user.is_authenticated:
+        credentials = get_user_credentials(request.user.username)
     auth_data, state = server.authenticate_begin(credentials)
     request.session['fido2_state'] = state
     return auth_data
