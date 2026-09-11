@@ -19,11 +19,16 @@ on:
         description: '构建 Ansible Executor 镜像所用的分支'
         required: true
         type: string
-        default: 'main'
+        default: 'dev'
       image_tag:
         description: '临时镜像标签（留空则使用时间戳，不更新 latest）'
         required: false
         type: string
+      platforms:
+        description: '临时验证平台，多个平台使用逗号分隔'
+        required: true
+        type: string
+        default: 'linux/amd64'
 
 jobs:
   build-and-push:
@@ -77,7 +82,7 @@ jobs:
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v6
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ github.event_name == 'workflow_dispatch' && inputs.platforms || 'linux/amd64,linux/arm64' }}
           push: true
           provenance: false
           sbom: false
