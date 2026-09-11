@@ -39,6 +39,7 @@ additional_build_steps:
     # pip 镜像需在 base 阶段最早注入，后续各 stage 的 pip install 都会走国内源
     - COPY _build/configs/pip.conf /etc/pip.conf
   append_final:
+    - RUN mkdir -p /root/.ssh && printf 'Host *\n\tHostKeyAlgorithms +ssh-rsa\n\tPubkeyAcceptedAlgorithms +ssh-rsa\n' > /root/.ssh/config && chmod 600 /root/.ssh/config
     - RUN mkdir -p /opt/jumpserver/apps
     - COPY _build/jumpserver-ansible/ /opt/jumpserver/apps/libs/ansible/
     - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
