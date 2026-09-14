@@ -290,5 +290,19 @@
     "system user": "системный пользователь",
     "tabLimits": "Сейчас открыто 15 вкладок.\nОткрыть Luna в новой вкладке браузера для продолжения работы, чтобы обеспечить стабильность системы?",
     "user": "пользователь",
-    "MarkAsRead": "Отметить как прочитанное"
+    "MarkAsRead": "Отметить как прочитанное",
+    "Loading monitor…": "Загрузка мониторинга…",
+    "Session details": "Сведения о сеансе",
+    "Monitor initialization": "Инициализация мониторинга",
+    "Watermark initialization": "Инициализация водяного знака",
+    "Unable to load monitor": "Не удалось загрузить мониторинг",
+    "Your login has expired or you are not signed in.": "Срок действия входа истёк или вход не выполнен.",
+    "You do not have permission to access the requested resource.": "У вас нет прав доступа к запрошенному ресурсу.",
+    "The requested resource does not exist or is no longer available.": "Запрошенный ресурс не существует или больше недоступен.",
+    "Unable to reach the server. Check your network and retry.": "Не удалось подключиться к серверу. Проверьте сеть и повторите попытку.",
+    "The request timed out. Please retry.": "Время ожидания запроса истекло. Повторите попытку.",
+    "Initialization failed. Please retry or contact the administrator.": "Ошибка инициализации. Повторите попытку или обратитесь к администратору.",
+    "Sign in in the new tab, then return here and click Retry.": "Войдите в систему в новой вкладке, затем вернитесь на эту страницу и нажмите «Повторить».",
+    "Sign in again": "Войти снова",
+    "Retry": "Повторить"
 }

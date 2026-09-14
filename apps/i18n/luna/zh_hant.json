@@ -291,5 +291,19 @@
     "system user": "系統用戶",
     "tabLimits": "當前已打開 15 個標籤頁。  \n為了確保系統穩定，是否在新的瀏覽器標籤頁中打開 Luna 以繼續操作？",
     "user": "用戶",
-    "MarkAsRead": "標記為已讀"
+    "MarkAsRead": "標記為已讀",
+    "Loading monitor…": "正在載入監控…",
+    "Session details": "工作階段詳情",
+    "Monitor initialization": "監控初始化",
+    "Watermark initialization": "浮水印初始化",
+    "Unable to load monitor": "監控載入失敗",
+    "Your login has expired or you are not signed in.": "尚未登入或登入已失效。",
+    "You do not have permission to access the requested resource.": "沒有權限存取所請求的資源。",
+    "The requested resource does not exist or is no longer available.": "所請求的資源不存在或已無法使用。",
+    "Unable to reach the server. Check your network and retry.": "無法連線至伺服器，請檢查網路後重試。",
+    "The request timed out. Please retry.": "請求逾時，請重試。",
+    "Initialization failed. Please retry or contact the administrator.": "初始化失敗，請重試或聯絡管理員。",
+    "Sign in in the new tab, then return here and click Retry.": "請在新分頁完成登入，再返回本頁點擊「重試」。",
+    "Sign in again": "重新登入",
+    "Retry": "重試"
 }

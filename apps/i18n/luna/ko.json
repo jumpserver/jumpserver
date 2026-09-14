@@ -290,5 +290,19 @@
     "system user": "시스템 사용자",
     "tabLimits": "현재 15개의 탭이 열려 있습니다. 시스템의 안정성을 위해 Luna를 계속 사용하려면 새로운 브라우저 탭에서 열어보시겠습니까?",
     "user": "사용자",
-    "MarkAsRead": "읽음으로 표시"
+    "MarkAsRead": "읽음으로 표시",
+    "Loading monitor…": "모니터를 불러오는 중…",
+    "Session details": "세션 정보",
+    "Monitor initialization": "모니터 초기화",
+    "Watermark initialization": "워터마크 초기화",
+    "Unable to load monitor": "모니터를 불러올 수 없습니다",
+    "Your login has expired or you are not signed in.": "로그인이 만료되었거나 로그인하지 않았습니다.",
+    "You do not have permission to access the requested resource.": "요청한 리소스에 접근할 권한이 없습니다.",
+    "The requested resource does not exist or is no longer available.": "요청한 리소스가 없거나 더 이상 사용할 수 없습니다.",
+    "Unable to reach the server. Check your network and retry.": "서버에 연결할 수 없습니다. 네트워크를 확인한 후 다시 시도하세요.",
+    "The request timed out. Please retry.": "요청 시간이 초과되었습니다. 다시 시도하세요.",
+    "Initialization failed. Please retry or contact the administrator.": "초기화에 실패했습니다. 다시 시도하거나 관리자에게 문의하세요.",
+    "Sign in in the new tab, then return here and click Retry.": "새 탭에서 로그인한 후 이 페이지로 돌아와 다시 시도를 클릭하세요.",
+    "Sign in again": "다시 로그인",
+    "Retry": "다시 시도"
 }

@@ -17,6 +17,62 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#: settings/serializers/security.py
+msgid "Allow viewing asset account passwords"
+msgstr "資産アカウントのパスワード表示を許可"
+
+#: settings/serializers/security.py
+msgid "When disabled, asset account passwords cannot be viewed. Asset connections are not affected. Enabling this still requires the appropriate permissions."
+msgstr "無効にすると、資産アカウントのパスワードを表示できません。資産への接続には影響しません。有効にしても所定の権限が必要です。"
+
+#: settings/serializers/security.py
+msgid "Web login lifetime (seconds)"
+msgstr "Web ログイン有効期間(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the web login lifetime. By default, web requests renew the session; this is not a fixed logout countdown. Log in again to use the new value. Changes do not immediately force logged-in users to log out."
+msgstr "Web ログイン状態の有効期間を設定します。標準設定では Web リクエストで延長されるため、固定のログアウト期限ではありません。変更後は再ログインすると新しい値が適用されます。ログイン中のユーザーを直ちに強制ログアウトさせることはありません。"
+
+#: settings/serializers/security.py
+msgid "Allow connection credential reuse"
+msgstr "接続資格情報の再利用を許可"
+
+#: settings/serializers/security.py
+msgid "When enabled, connection credentials can be set as reusable within their lifetime without obtaining a new one for each connection. Existing credentials are not automatically converted to reusable credentials."
+msgstr "有効にすると、接続資格情報を有効期間内に再利用するよう設定でき、接続のたびに取得し直す必要がなくなります。既存の資格情報が自動的に再利用可能になることはありません。"
+
+#: settings/serializers/security.py
+msgid "One-time connection credential lifetime (seconds)"
+msgstr "ワンタイム接続資格情報の有効期間(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the one-time connection credential lifetime, with a minimum of 300 seconds. Changes apply to newly created or renewed credentials without affecting established asset connections."
+msgstr "ワンタイム接続資格情報の有効期間を設定します。最小値は 300 秒です。変更は新規作成または更新された資格情報に適用され、確立済みの資産接続には影響しません。"
+
+#: settings/serializers/security.py
+msgid "Reusable connection credential lifetime (seconds)"
+msgstr "再利用可能な接続資格情報の有効期間(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the reusable credential lifetime, measured from its creation time. The new value is used when credentials are set as reusable. Existing expiry times remain unchanged."
+msgstr "再利用可能な資格情報の有効期間を、資格情報の作成時点から計算します。変更後に資格情報の再利用を設定すると新しい値が適用されます。既存の有効期限は変わりません。"
+
+#: settings/serializers/security.py
+msgid "Client access token lifetime (seconds)"
+msgstr "クライアントアクセストークンの有効期間(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the client access token lifetime. A refresh token can be used to renew access before expiry. Changes apply to newly issued access tokens. Existing token expiry times remain unchanged."
+msgstr "クライアントアクセストークンの有効期間を設定します。期限前にリフレッシュトークンで更新できます。変更は新規発行されたアクセストークンに適用され、既存のトークンの有効期限は変わりません。"
+
+#: settings/serializers/security.py
+msgid "Client refresh token lifetime (seconds)"
+msgstr "クライアントリフレッシュトークンの有効期間(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the lifetime of the credential used for automatic client renewal. For clients that check this lifetime, setting it much shorter than the access token lifetime, for example 1 second, prevents automatic renewal and logs the client out when the access token expires. Log in to the client again after changing this setting."
+msgstr "クライアントの自動更新に使う資格情報の有効期間を設定します。この有効期間を確認するクライアントでは、アクセストークンより十分短い値（例：1 秒）にすると自動更新が停止し、アクセストークンの期限到達時にログアウトします。変更後はクライアントに再ログインしてください。"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363

@@ -14,6 +14,13 @@ from settings.models import LeakPasswords
 
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
+    SECURITY_ACCOUNT_SECRET_READ = serializers.BooleanField(
+        required=False, label=_('Allow viewing asset account passwords'),
+        help_text=_(
+            'When disabled, asset account passwords cannot be viewed. Asset connections are not affected. '
+            'Enabling this still requires the appropriate permissions.'
+        )
+    )
     SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN = serializers.IntegerField(
         min_value=1, max_value=99999, required=True,
         label=_('Admin password expiration (day)'),
@@ -208,6 +215,54 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySessionSerializer(serializers.Serializer):
+    SESSION_COOKIE_AGE = serializers.IntegerField(
+        min_value=1, max_value=2147483647, required=False,
+        label=_('Web login lifetime (seconds)'),
+        help_text=_(
+            'Sets the web login lifetime. By default, web requests renew the session; this is not a fixed logout countdown. '
+            'Log in again to use the new value. Changes do not immediately force logged-in users to log out.'
+        )
+    )
+    CONNECTION_TOKEN_REUSABLE = serializers.BooleanField(
+        required=False, label=_('Allow connection credential reuse'),
+        help_text=_(
+            'When enabled, connection credentials can be set as reusable within their lifetime without obtaining a new '
+            'one for each connection. Existing credentials are not automatically converted to reusable credentials.'
+        )
+    )
+    CONNECTION_TOKEN_ONETIME_EXPIRATION = serializers.IntegerField(
+        min_value=300, max_value=2147483647, required=False,
+        label=_('One-time connection credential lifetime (seconds)'),
+        help_text=_(
+            'Sets the one-time connection credential lifetime, with a minimum of 300 seconds. '
+            'Changes apply to newly created or renewed credentials without affecting established asset connections.'
+        )
+    )
+    CONNECTION_TOKEN_REUSABLE_EXPIRATION = serializers.IntegerField(
+        min_value=1, max_value=2147483647, required=False,
+        label=_('Reusable connection credential lifetime (seconds)'),
+        help_text=_(
+            'Sets the reusable credential lifetime, measured from its creation time. '
+            'The new value is used when credentials are set as reusable. Existing expiry times remain unchanged.'
+        )
+    )
+    OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS = serializers.IntegerField(
+        min_value=1, max_value=2147483647, required=False,
+        label=_('Client access token lifetime (seconds)'),
+        help_text=_(
+            'Sets the client access token lifetime. A refresh token can be used to renew access before expiry. '
+            'Changes apply to newly issued access tokens. Existing token expiry times remain unchanged.'
+        )
+    )
+    OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS = serializers.IntegerField(
+        min_value=1, max_value=2147483647, required=False,
+        label=_('Client refresh token lifetime (seconds)'),
+        help_text=_(
+            'Sets the lifetime of the credential used for automatic client renewal. For clients that check this lifetime, '
+            'setting it much shorter than the access token lifetime, for example 1 second, prevents automatic renewal '
+            'and logs the client out when the access token expires. Log in to the client again after changing this setting.'
+        )
+    )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Watermark'),
     )

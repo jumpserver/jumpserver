@@ -290,5 +290,19 @@
     "system user": "系统用户",
     "user": "用户",
     "tabLimits": "当前已打开 15 个标签页。\n为保证系统稳定是否在新的浏览器标签页中打开 Luna 以继续操作？",
-    "MarkAsRead": "标记为已读"
+    "MarkAsRead": "标记为已读",
+    "Loading monitor…": "正在加载监控…",
+    "Session details": "会话详情",
+    "Monitor initialization": "监控初始化",
+    "Watermark initialization": "水印初始化",
+    "Unable to load monitor": "监控加载失败",
+    "Your login has expired or you are not signed in.": "尚未登录或登录已失效。",
+    "You do not have permission to access the requested resource.": "没有权限访问所请求的资源。",
+    "The requested resource does not exist or is no longer available.": "所请求的资源不存在或已不可用。",
+    "Unable to reach the server. Check your network and retry.": "无法连接服务器，请检查网络后重试。",
+    "The request timed out. Please retry.": "请求超时，请重试。",
+    "Initialization failed. Please retry or contact the administrator.": "初始化失败，请重试或联系管理员。",
+    "Sign in in the new tab, then return here and click Retry.": "请在新标签页完成登录，再返回本页点击“重试”。",
+    "Sign in again": "重新登录",
+    "Retry": "重试"
 }

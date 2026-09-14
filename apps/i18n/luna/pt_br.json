@@ -290,5 +290,19 @@
     "system user": "Usuário do Sistema",
     "tabLimits": "Atualmente, 15 abas estão abertas. Para garantir a estabilidade do sistema, você deseja abrir o Luna em uma nova aba do navegador para continuar a operação?",
     "user": "Usuário",
-    "MarkAsRead": "Marcar como lido"
+    "MarkAsRead": "Marcar como lido",
+    "Loading monitor…": "Carregando o monitor…",
+    "Session details": "Detalhes da sessão",
+    "Monitor initialization": "Inicialização do monitor",
+    "Watermark initialization": "Inicialização da marca d'água",
+    "Unable to load monitor": "Não foi possível carregar o monitor",
+    "Your login has expired or you are not signed in.": "Sua sessão expirou ou você não está conectado.",
+    "You do not have permission to access the requested resource.": "Você não tem permissão para acessar o recurso solicitado.",
+    "The requested resource does not exist or is no longer available.": "O recurso solicitado não existe ou não está mais disponível.",
+    "Unable to reach the server. Check your network and retry.": "Não foi possível conectar ao servidor. Verifique a rede e tente novamente.",
+    "The request timed out. Please retry.": "O tempo limite da solicitação foi excedido. Tente novamente.",
+    "Initialization failed. Please retry or contact the administrator.": "A inicialização falhou. Tente novamente ou entre em contato com o administrador.",
+    "Sign in in the new tab, then return here and click Retry.": "Entre na nova aba, volte a esta página e clique em Tentar novamente.",
+    "Sign in again": "Entrar novamente",
+    "Retry": "Tentar novamente"
 }

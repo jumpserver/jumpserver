@@ -290,5 +290,19 @@
     "system user": "Usuario del sistema",
     "tabLimits": "Actualmente tienes 15 pestañas abiertas.  \n¿Para garantizar la estabilidad del sistema, deberías abrir Luna en una nueva pestaña del navegador para continuar con la operación?",
     "user": "Usuario",
-    "MarkAsRead": "Marcar como leído"
+    "MarkAsRead": "Marcar como leído",
+    "Loading monitor…": "Cargando el monitor…",
+    "Session details": "Detalles de la sesión",
+    "Monitor initialization": "Inicialización del monitor",
+    "Watermark initialization": "Inicialización de la marca de agua",
+    "Unable to load monitor": "No se puede cargar el monitor",
+    "Your login has expired or you are not signed in.": "Su sesión ha caducado o no ha iniciado sesión.",
+    "You do not have permission to access the requested resource.": "No tiene permiso para acceder al recurso solicitado.",
+    "The requested resource does not exist or is no longer available.": "El recurso solicitado no existe o ya no está disponible.",
+    "Unable to reach the server. Check your network and retry.": "No se puede conectar con el servidor. Compruebe la red y vuelva a intentarlo.",
+    "The request timed out. Please retry.": "La solicitud ha agotado el tiempo de espera. Vuelva a intentarlo.",
+    "Initialization failed. Please retry or contact the administrator.": "La inicialización ha fallado. Vuelva a intentarlo o contacte con el administrador.",
+    "Sign in in the new tab, then return here and click Retry.": "Inicie sesión en la nueva pestaña, vuelva a esta página y haga clic en Reintentar.",
+    "Sign in again": "Iniciar sesión de nuevo",
+    "Retry": "Reintentar"
 }

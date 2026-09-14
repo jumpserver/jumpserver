@@ -121,6 +121,12 @@ class Setting(models.Model):
     def refresh_setting(self):
         setattr(settings, self.name, self.cleaned_value)
         self.refresh_keycloak_to_openid_if_need()
+        if self.name in (
+            'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS',
+            'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS',
+        ):
+            from authentication.backends.oauth2_provider.utils import refresh_oauth2_provider_settings
+            refresh_oauth2_provider_settings()
 
     def refresh_keycloak_to_openid_if_need(self):
         watch_config_names = [

@@ -18,6 +18,62 @@ msgstr ""
 "X-Generator: Poedit 2.4.3\n"
 "X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://zhconvert.org\n"
 
+#: settings/serializers/security.py
+msgid "Allow viewing asset account passwords"
+msgstr "允許檢視資產帳號密碼"
+
+#: settings/serializers/security.py
+msgid "When disabled, asset account passwords cannot be viewed. Asset connections are not affected. Enabling this still requires the appropriate permissions."
+msgstr "關閉後，不能檢視資產帳號密碼，不影響正常連線資產。開啟後仍需相應權限。"
+
+#: settings/serializers/security.py
+msgid "Web login lifetime (seconds)"
+msgstr "Web 登入有效期(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the web login lifetime. By default, web requests renew the session; this is not a fixed logout countdown. Log in again to use the new value. Changes do not immediately force logged-in users to log out."
+msgstr "設定網頁登入狀態的有效時長。預設隨網頁請求續期，不是固定登出倒數計時。修改後重新登入使用新值，不會立即強制登出已登入使用者。"
+
+#: settings/serializers/security.py
+msgid "Allow connection credential reuse"
+msgstr "允許連線憑據重複使用"
+
+#: settings/serializers/security.py
+msgid "When enabled, connection credentials can be set as reusable within their lifetime without obtaining a new one for each connection. Existing credentials are not automatically converted to reusable credentials."
+msgstr "開啟後，可將連線憑據設為重複使用，在有效期內無需每次重新取得。既有憑據不會自動轉為可重複使用的憑據。"
+
+#: settings/serializers/security.py
+msgid "One-time connection credential lifetime (seconds)"
+msgstr "一次性連線憑據有效期(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the one-time connection credential lifetime, with a minimum of 300 seconds. Changes apply to newly created or renewed credentials without affecting established asset connections."
+msgstr "設定一次性連線憑據的有效時長，最少 300 秒。修改後用於新建或續期的憑據，不影響已建立的資產連線。"
+
+#: settings/serializers/security.py
+msgid "Reusable connection credential lifetime (seconds)"
+msgstr "可重複使用連線憑據有效期(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the reusable credential lifetime, measured from its creation time. The new value is used when credentials are set as reusable. Existing expiry times remain unchanged."
+msgstr "設定可重複使用憑據的有效時長，從憑據建立時間起計算。修改後，在設定憑據重複使用時使用新值，既有憑據的到期時間保持不變。"
+
+#: settings/serializers/security.py
+msgid "Client access token lifetime (seconds)"
+msgstr "用戶端存取權杖有效期(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the client access token lifetime. A refresh token can be used to renew access before expiry. Changes apply to newly issued access tokens. Existing token expiry times remain unchanged."
+msgstr "設定用戶端存取權杖的有效時長。到期前可透過更新權杖續期。修改後對新簽發的存取權杖生效，既有權杖的到期時間保持不變。"
+
+#: settings/serializers/security.py
+msgid "Client refresh token lifetime (seconds)"
+msgstr "用戶端更新權杖有效期(秒)"
+
+#: settings/serializers/security.py
+msgid "Sets the lifetime of the credential used for automatic client renewal. For clients that check this lifetime, setting it much shorter than the access token lifetime, for example 1 second, prevents automatic renewal and logs the client out when the access token expires. Log in to the client again after changing this setting."
+msgstr "設定用戶端自動續期憑據的有效時長。對於支援此有效期驗證的用戶端，設為明顯短於存取權杖有效期（例如 1 秒），可阻止自動續期，使用戶端在存取權杖到期後登出。修改後需重新登入用戶端。"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363

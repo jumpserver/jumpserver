@@ -290,5 +290,19 @@
     "system user": "システムユーザー",
     "tabLimits": "現在、15個のタブが開かれています。システムの安定性を確保するために、新しいブラウザのタブでLunaを開いて操作を続けますか？",
     "user": "ユーザー",
-    "MarkAsRead": "既読にする"
+    "MarkAsRead": "既読にする",
+    "Loading monitor…": "モニターを読み込み中…",
+    "Session details": "セッション情報",
+    "Monitor initialization": "モニターの初期化",
+    "Watermark initialization": "透かしの初期化",
+    "Unable to load monitor": "モニターを読み込めません",
+    "Your login has expired or you are not signed in.": "未ログイン、またはログインの有効期限が切れています。",
+    "You do not have permission to access the requested resource.": "要求されたリソースへのアクセス権限がありません。",
+    "The requested resource does not exist or is no longer available.": "要求されたリソースが存在しないか、利用できません。",
+    "Unable to reach the server. Check your network and retry.": "サーバーに接続できません。ネットワークを確認して再試行してください。",
+    "The request timed out. Please retry.": "リクエストがタイムアウトしました。再試行してください。",
+    "Initialization failed. Please retry or contact the administrator.": "初期化に失敗しました。再試行するか、管理者にお問い合わせください。",
+    "Sign in in the new tab, then return here and click Retry.": "新しいタブでログインしてから、このページに戻って「再試行」をクリックしてください。",
+    "Sign in again": "再ログイン",
+    "Retry": "再試行"
 }

@@ -5,9 +5,21 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.urls import reverse
+from oauth2_provider import views as op_views
 from oauth2_provider.settings import oauth2_settings
 from typing import List, Dict, Any
-from .utils import get_or_create_jumpserver_client_application, CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX 
+from .utils import (
+    get_or_create_jumpserver_client_application, CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX,
+    DynamicOAuth2Mixin, oauth2_settings_lock,
+)
+
+
+class AuthorizationView(DynamicOAuth2Mixin, op_views.AuthorizationView):
+    pass
+
+
+class TokenView(DynamicOAuth2Mixin, op_views.TokenView):
+    pass
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -51,11 +63,12 @@ class OAuthAuthorizationServerView(View):
             "code_challenge_methods_supported": ["S256"],
             "response_modes_supported": ["query"],
         }
-        if hasattr(oauth2_settings, 'ACCESS_TOKEN_EXPIRE_SECONDS'):
-            metadata["token_expires_in"] = oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS
-        if hasattr(oauth2_settings, 'REFRESH_TOKEN_EXPIRE_SECONDS'):
-            if oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS:
-                metadata["refresh_token_expires_in"] = oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS
+        with oauth2_settings_lock:
+            if hasattr(oauth2_settings, 'ACCESS_TOKEN_EXPIRE_SECONDS'):
+                metadata["token_expires_in"] = oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS
+            if hasattr(oauth2_settings, 'REFRESH_TOKEN_EXPIRE_SECONDS'):
+                if oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS:
+                    metadata["refresh_token_expires_in"] = oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS
         return metadata
     
     def get(self, request, *args, **kwargs):
