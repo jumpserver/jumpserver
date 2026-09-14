@@ -411,7 +411,7 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" id="login" class="btn btn-transparent" onclick="doLogin(event);return false;">
+                        <button type="submit" id="login" class="btn btn-transparent">
                             {% trans 'Login' %}
                         </button>
                     </div>
@@ -455,25 +455,28 @@
 <script type="text/javascript" src="{% static 'js/session-encrypt.js' %}?v=2"></script>
 
 <script>
-    function doLogin(evt) {
-        //公钥加密
-        if (evt && evt.preventDefault) {
-            evt.preventDefault();
-        }
-        var password = $('#password').val(); //明文密码
-        var passwordEncrypted = encryptPassword(password)
-        $('#password-hidden').val(passwordEncrypted); //返回给密码输入input
-        $('#login-form').submit();
-    }
-
-    // Ensure we block default submit for both:
-    // 1) clicking the submit button
-    // 2) pressing Enter in an input
     (function () {
-        const form = document.getElementById('login-form');
+        var form = document.getElementById('login-form');
+        var loginBtn = document.getElementById('login');
         if (!form) return;
+        var submitting = false;
+
+        function unlock() {
+            submitting = false;
+            if (loginBtn) loginBtn.disabled = false;
+        }
+
         form.addEventListener('submit', function (evt) {
-            doLogin(evt);
+            evt.preventDefault();
+            if (submitting) return;
+            submitting = true;
+            if (loginBtn) loginBtn.disabled = true;
+            $('#password-hidden').val(encryptPassword($('#password').val()));
+            form.submit();
+        });
+
+        window.addEventListener('pageshow', function (e) {
+            if (e.persisted) unlock();
         });
     })();
 
