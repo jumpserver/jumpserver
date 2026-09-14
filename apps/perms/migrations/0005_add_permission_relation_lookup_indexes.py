@@ -68,5 +68,6 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             add_permission_relation_lookup_indexes,
             reverse_code=remove_permission_relation_lookup_indexes,
+            atomic=False,
         ),
     ]
