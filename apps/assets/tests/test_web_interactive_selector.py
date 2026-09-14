@@ -1,4 +1,4 @@
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from rest_framework.exceptions import ValidationError
 
 from assets.const import Protocol
@@ -8,6 +8,7 @@ from assets.serializers.asset.info.spec import WebSpecSerializer
 from common.serializers.dynamic import create_serializer_class
 
 
+@override_settings(XPACK_LICENSE_IS_VALID=True)
 class WebInteractiveSelectorTests(SimpleTestCase):
     def test_navigation_allowlist_is_optional_and_validates_origins(self):
         field = WebSerializer().fields['allowed_urls']

@@ -1,8 +1,9 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Web
-from assets.validators import normalize_web_origin, validate_web_script
+from assets.validators import normalize_web_origin, validate_web_script, web_xpack_fields
 from .common import AssetSerializer
 
 __all__ = ['WebSerializer']
@@ -50,8 +51,21 @@ class WebSerializer(AssetSerializer):
             }
         }
 
+    def get_fields(self):
+        fields = super().get_fields()
+        if not settings.XPACK_LICENSE_IS_VALID:
+            fields['autofill'].choices = {
+                key: label for key, label in fields['autofill'].choices.items() if key != 'script'
+            }
+        return fields
+
     def validate(self, attrs):
         attrs = super().validate(attrs)
+        restricted = web_xpack_fields(attrs)
+        if restricted:
+            raise serializers.ValidationError({
+                field: _('A valid enterprise license is required.') for field in restricted
+            })
         interactive = attrs.get('interactive_selector', getattr(self.instance, 'interactive_selector', ''))
         if interactive:
             kind, separator, value = interactive.partition('=')

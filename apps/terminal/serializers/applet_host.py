@@ -89,6 +89,10 @@ class DeployOptionsSerializer(serializers.Serializer):
     def validate(self, attrs):
         if attrs.get('WEB_APPLET_RECORDING_ENABLED') and not attrs.get('WEB_PROXY_URL'):
             raise serializers.ValidationError({'WEB_PROXY_URL': _('Required when Web applet recording is enabled.')})
+        if attrs.get('WEB_APPLET_RECORDING_ENABLED') and not settings.XPACK_LICENSE_IS_VALID:
+            raise serializers.ValidationError({
+                'WEB_APPLET_RECORDING_ENABLED': _('A valid enterprise license is required.')
+            })
         return attrs
 
 

@@ -15,6 +15,7 @@ from accounts.const import AliasAccount, SecretType
 from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
+from assets.validators import web_xpack_fields
 from authentication.const import ConnectionTokenType
 from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
@@ -195,6 +196,12 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset or not self.asset.is_active:
             error = _('No asset or inactive asset')
             raise PermissionDenied(error)
+        if self.protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
+            config = self.asset.spec_info or {}
+            protocol = self.platform.protocols.filter(name=self.protocol).first()
+            login = config if config.get('autofill') else (protocol.setting if protocol else {})
+            if web_xpack_fields(config) or web_xpack_fields(login):
+                raise PermissionDenied(_('A valid enterprise license is required.'))
         if not self.account:
             error = _('No account')
             raise PermissionDenied(error)
