@@ -82,7 +82,7 @@ special_pid_mapper = {
     'acls.loginassetacl': 'perms',
     'acls.connectmethodacl': 'perms',
     'acls.datamaskingrule': 'perms',
-    'xpack.account': 'cloud_import',
+    'xpack.cloudaccount': 'cloud_import',
     'xpack.syncinstancedetail': 'cloud_import',
     'xpack.syncinstancetask': 'cloud_import',
     'xpack.syncinstancetaskexecution': 'cloud_import',
