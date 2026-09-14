@@ -10692,7 +10692,7 @@ msgstr ""
 "클라이언트, 현재 특정 클라이언트 프로그램을 호출하여 자산에 연결하고 있습니다"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "추가 다운로드"
 
 #: templates/resource_download.html:34
@@ -14164,3 +14164,20 @@ msgstr "라이센스가 유효하지 않습니다."
 
 #~ msgid "Ticket already closed"
 #~ msgstr "작업 요청이 종료되었습니다"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "%(vendor)s 클라이언트 다운로드"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "운영 체제에 맞는 설치 프로그램을 선택하세요."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Linux, macOS Intel 및 기타 버전은 GitHub에서 다운로드할 수 있습니다."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "GitHub에서 보기"

@@ -10454,7 +10454,7 @@ msgid "Client, currently used to launch the client"
 msgstr "客户端，目前用来唤起 特定客户端程序 连接资产"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "更多下载"
 
 #: templates/resource_download.html:34
@@ -13912,3 +13912,20 @@ msgstr "步骤超时必须为 1 至 180 秒。"
 
 msgid "The success command must be the last step."
 msgstr "success 必须是脚本的最后一步。"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "下载 %(vendor)s 客户端"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "选择适合您操作系统的安装包。"
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Linux、macOS Intel 及其他版本可前往 GitHub 下载。"
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "前往 GitHub"

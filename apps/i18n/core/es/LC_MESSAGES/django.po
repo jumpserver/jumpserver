@@ -10957,7 +10957,7 @@ msgstr ""
 "para conectar activos"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "Más descargas"
 
 #: templates/resource_download.html:34
@@ -14508,3 +14508,20 @@ msgstr "Licencia no válida"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "El ticket ya ha sido cerrado"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "Descargar el cliente de %(vendor)s"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "Elija el instalador para su sistema operativo."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Encuentre Linux, macOS Intel y otras versiones en GitHub."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "Ver en GitHub"

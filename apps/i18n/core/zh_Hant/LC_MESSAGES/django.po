@@ -10464,7 +10464,7 @@ msgid "Client, currently used to launch the client"
 msgstr "客戶端，目前用來喚起特定客戶端程式連接資產"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "更多下載"
 
 #: templates/resource_download.html:34
@@ -13934,3 +13934,20 @@ msgstr "步驟逾時必須為 1 至 180 秒。"
 
 msgid "The success command must be the last step."
 msgstr "success 必須是指令碼的最後一步。"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "下載 %(vendor)s 用戶端"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "選擇適合您作業系統的安裝程式。"
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Linux、macOS Intel 及其他版本可前往 GitHub 下載。"
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "前往 GitHub"

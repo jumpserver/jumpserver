@@ -10788,7 +10788,7 @@ msgstr ""
 "assets"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "More downloads"
 
 #: templates/resource_download.html:34
@@ -14285,3 +14285,20 @@ msgstr "Invalid license"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "Ticket has been closed"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "Download %(vendor)s Client"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "Choose the installer for your operating system."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Find Linux, macOS Intel and other versions on GitHub."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "View on GitHub"

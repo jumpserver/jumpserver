@@ -10753,7 +10753,7 @@ msgstr ""
 "に使用されます"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "その他のダウンロード"
 
 #: templates/resource_download.html:34
@@ -14236,3 +14236,20 @@ msgstr "ライセンスが無効です"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "チケットはすでに閉じています"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "%(vendor)s クライアントをダウンロード"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "お使いの OS に対応したインストーラーを選択してください。"
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Linux、macOS Intel、その他のバージョンは GitHub で入手できます。"
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "GitHub で見る"

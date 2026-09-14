@@ -10795,7 +10795,7 @@ msgstr ""
 "thể kết nối với tài sản"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "Tải xuống thêm"
 
 #: templates/resource_download.html:34
@@ -14303,3 +14303,20 @@ msgstr "Giấy phép không hợp lệ"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "Phiếu công việc đã đóng"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "Tải ứng dụng khách %(vendor)s"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "Chọn bộ cài đặt phù hợp với hệ điều hành của bạn."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Các phiên bản Linux, macOS Intel và các phiên bản khác có trên GitHub."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "Xem trên GitHub"

@@ -10892,7 +10892,7 @@ msgstr ""
 "программы для подключения к активам"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "Дополнительные загрузки"
 
 #: templates/resource_download.html:34
@@ -14431,3 +14431,20 @@ msgstr "Лицензия недействительна"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "Заявка уже закрыта"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "Скачать клиент %(vendor)s"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "Выберите установщик для вашей операционной системы."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Версии для Linux, macOS Intel и другие выпуски доступны на GitHub."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "Открыть на GitHub"
