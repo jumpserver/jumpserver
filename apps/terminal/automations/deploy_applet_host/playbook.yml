@@ -15,8 +15,6 @@
     RDS_RemoteAppLogoffTimeLimit: 0
     INSTALL_APPLETS: true
     PYTHON_VERSION: 3.11.11
-    WEB_PROXY_URL: ""
-    WEB_APPLET_RECORDING_ENABLED: false
     # Native Web applets require the matching Tinker release.
     TINKER_VERSION: v0.3.0
 
@@ -240,7 +238,7 @@
         - name: Generate tinkerd component config
           ansible.windows.win_powershell:
             script: |
-              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }} --web-proxy-url "{{ WEB_PROXY_URL }}" --web-applet-recording={{ WEB_APPLET_RECORDING_ENABLED | bool | lower }}
+              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}
 
         - name: Rename tinkerd keyfile
           ansible.windows.win_powershell:
