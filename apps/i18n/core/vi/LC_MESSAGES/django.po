@@ -8549,6 +8549,62 @@ msgstr "Gửi thư thành công"
 msgid "Chat AI is not enabled"
 msgstr "AI trò chuyện chưa được bật"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "Kết nối đến nhà cung cấp mô hình đã hết thời gian chờ. Vui lòng kiểm tra URL cơ sở, proxy và mạng."
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "Xác minh chứng chỉ của nhà cung cấp mô hình không thành công. Vui lòng kiểm tra chứng chỉ HTTPS."
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "Không thể phân giải tên máy chủ của nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở và cài đặt DNS."
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "Nhà cung cấp mô hình đã từ chối kết nối. Vui lòng kiểm tra URL cơ sở, cổng và trạng thái dịch vụ."
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "Không thể kết nối đến nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở, proxy và mạng."
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "Tài khoản nhà cung cấp mô hình không đủ số dư. Vui lòng nạp tiền và thử lại."
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "Xác thực với nhà cung cấp mô hình không thành công. Vui lòng kiểm tra khóa API."
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "Nhà cung cấp mô hình đã từ chối quyền truy cập. Vui lòng kiểm tra quyền của khóa API."
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "Mô hình đã chọn không tồn tại hoặc không khả dụng. Vui lòng kiểm tra mô hình và URL cơ sở."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "Không tìm thấy điểm cuối của nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "Đã vượt quá giới hạn yêu cầu của nhà cung cấp mô hình. Vui lòng thử lại sau."
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "Dịch vụ của nhà cung cấp mô hình tạm thời không khả dụng. Vui lòng thử lại sau."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "Yêu cầu đến nhà cung cấp mô hình không thành công (HTTP {status_code}): {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "Yêu cầu đến nhà cung cấp mô hình không thành công (HTTP {status_code})."
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37

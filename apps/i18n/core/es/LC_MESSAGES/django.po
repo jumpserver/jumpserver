@@ -8655,6 +8655,62 @@ msgstr "Envío de correo electrónico exitoso"
 msgid "Chat AI is not enabled"
 msgstr "Chat AI no está habilitado"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "La conexión con el proveedor de modelos agotó el tiempo de espera. Compruebe la URL base, el proxy y la red."
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "Falló la verificación del certificado del proveedor de modelos. Compruebe su certificado HTTPS."
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "No se pudo resolver el nombre de host del proveedor de modelos. Compruebe la URL base y la configuración DNS."
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "El proveedor de modelos rechazó la conexión. Compruebe la URL base, el puerto y el estado del servicio."
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "No se puede conectar con el proveedor de modelos. Compruebe la URL base, el proxy y la red."
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "La cuenta del proveedor de modelos no tiene saldo suficiente. Recárguela e inténtelo de nuevo."
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "Falló la autenticación con el proveedor de modelos. Compruebe la clave de API."
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "El proveedor de modelos denegó el acceso. Compruebe los permisos de la clave de API."
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "El modelo seleccionado no existe o no está disponible. Compruebe el modelo y la URL base."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "No se encontró el punto de conexión del proveedor de modelos. Compruebe la URL base."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "Se superó el límite de solicitudes del proveedor de modelos. Inténtelo de nuevo más tarde."
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "El servicio del proveedor de modelos no está disponible temporalmente. Inténtelo de nuevo más tarde."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "Falló la solicitud al proveedor de modelos (HTTP {status_code}): {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "Falló la solicitud al proveedor de modelos (HTTP {status_code})."
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37

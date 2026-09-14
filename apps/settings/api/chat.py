@@ -1,3 +1,5 @@
+import re
+
 import httpx
 import openai
 from django.conf import settings
@@ -37,18 +39,133 @@ class ChatAIProviderMixin:
             kwargs['http_client'] = httpx.Client(proxy=config['proxy'])
         return openai.OpenAI(**kwargs)
 
-    @staticmethod
-    def get_error_response(error):
-        if isinstance(error, openai.APIStatusError):
-            detail = error.message
-        elif isinstance(error, openai.APIConnectionError):
-            detail = str(error.__cause__ or error)
-        else:
-            detail = str(error)
+    @classmethod
+    def get_error_response(cls, error):
+        detail = cls.get_error_detail(error)
         return Response(
             status=status.HTTP_400_BAD_REQUEST,
-            data={'detail': detail or _('Unable to connect to the model provider')},
+            data={'detail': detail},
         )
+
+    @classmethod
+    def get_error_detail(cls, error):
+        if isinstance(error, openai.APITimeoutError):
+            return _(
+                'The connection to the model provider timed out. Please check '
+                'the Base URL, proxy, and network.'
+            )
+
+        if isinstance(error, openai.APIConnectionError):
+            cause = str(error.__cause__ or error).lower()
+            if any(word in cause for word in (
+                'certificate verify', 'certificate_verify', 'ssl',
+            )):
+                return _(
+                    'The model provider certificate verification failed. '
+                    'Please check its HTTPS certificate.'
+                )
+            if any(word in cause for word in (
+                'getaddrinfo', 'name or service not known',
+                'nodename nor servname', 'temporary failure in name resolution',
+            )):
+                return _(
+                    'The model provider hostname could not be resolved. Please '
+                    'check the Base URL and DNS settings.'
+                )
+            if 'connection refused' in cause:
+                return _(
+                    'The model provider refused the connection. Please check '
+                    'the Base URL, port, and service status.'
+                )
+            return _(
+                'Unable to connect to the model provider. Please check the Base '
+                'URL, proxy, and network.'
+            )
+
+        if isinstance(error, openai.APIStatusError):
+            provider_detail, error_code, error_type = cls.get_provider_error(error)
+            fingerprint = ' '.join(filter(None, (
+                error_code,
+                error_type,
+                provider_detail,
+            ))).lower()
+            status_code = getattr(error, 'status_code', None)
+
+            if status_code == 402 or any(word in fingerprint for word in (
+                'insufficient balance', 'insufficient_balance',
+                'insufficient quota', 'insufficient_quota',
+            )):
+                return _(
+                    'The model provider account has insufficient balance. '
+                    'Please recharge it and try again.'
+                )
+            if status_code == 401 or any(word in fingerprint for word in (
+                'invalid_api_key', 'authentication', 'unauthorized',
+            )):
+                return _(
+                    'Authentication with the model provider failed. Please '
+                    'check the API key.'
+                )
+            if status_code == 403:
+                return _(
+                    'The model provider denied access. Please check the API key '
+                    'permissions.'
+                )
+            if any(word in fingerprint for word in (
+                'model_not_found', 'model not found', 'unknown model',
+                'model does not exist',
+            )):
+                return _(
+                    'The selected model does not exist or is unavailable. '
+                    'Please check the model and Base URL.'
+                )
+            if status_code == 404:
+                return _(
+                    'The model provider endpoint was not found. Please check '
+                    'the Base URL.'
+                )
+            if status_code == 429:
+                return _(
+                    'The model provider request limit was exceeded. Please try '
+                    'again later.'
+                )
+            if status_code and status_code >= 500:
+                return _(
+                    'The model provider service is temporarily unavailable. '
+                    'Please try again later.'
+                )
+            if provider_detail:
+                return _(
+                    'Model provider request failed (HTTP {status_code}): '
+                    '{detail}'
+                ).format(
+                    status_code=status_code or '-',
+                    detail=provider_detail,
+                )
+            return _('Model provider request failed (HTTP {status_code}).').format(
+                status_code=status_code or '-',
+            )
+
+        return str(error) or _('Unable to connect to the model provider')
+
+    @staticmethod
+    def get_provider_error(error):
+        body = getattr(error, 'body', None)
+        if isinstance(body, dict):
+            body = body.get('error', body)
+            if isinstance(body, dict):
+                detail = str(body.get('message') or '').strip()
+                code = str(body.get('code') or '').strip()
+                error_type = str(body.get('type') or '').strip()
+                return detail, code, error_type
+            if body:
+                return str(body).strip(), '', ''
+
+        message = str(getattr(error, 'message', '') or '').strip()
+        message = re.sub(r'^Error code:\s*\d+\s*-\s*', '', message)
+        if message.startswith(('{', '[')):
+            message = ''
+        return message, '', ''
 
 
 class ChatAIModelsAPI(ChatAIProviderMixin, GenericAPIView):
