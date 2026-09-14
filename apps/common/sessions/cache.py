@@ -2,6 +2,7 @@ import re
 from importlib import import_module
 
 from django.conf import settings
+from django.contrib.auth import SESSION_KEY
 from django.contrib.sessions.backends.cache import (
     SessionStore as DjangoSessionStore
 )
@@ -25,11 +26,44 @@ class SessionStore(DjangoSessionStore):
 
     def save(self, *args, **kwargs):
         request = get_current_request()
-        if request is None or not self.ignore_pattern.match(request.path):
-            try:
-                super().save(*args, **kwargs)
-            except Exception as e:
-                logger.info(f'SessionStore save error: {e}')
+        if (
+            request is not None and self.ignore_pattern.match(request.path)
+            and not self._should_renew_for_asset_session(request)
+        ):
+            return
+        try:
+            super().save(*args, **kwargs)
+        except Exception as e:
+            logger.info(f'SessionStore save error: {e}')
+
+    def _should_renew_for_asset_session(self, request):
+        if request.method != 'GET' or request.path != '/api/v1/users/profile/':
+            return False
+
+        try:
+            user = getattr(request, 'user', None)
+            if (
+                not self.session_key or user is None or not user.is_authenticated
+                or not user.is_valid
+            ):
+                return False
+            user_id = str(user.pk)
+            if self.get(SESSION_KEY) != user_id:
+                return False
+
+            from orgs.utils import tmp_to_root_org
+            from terminal.models import Session
+
+            # Asset sessions in any organization can keep this user's login alive.
+            with tmp_to_root_org():
+                session_ids = Session.objects.filter(
+                    user_id=user_id, is_finished=False
+                ).values_list('id', flat=True)
+                keys = [Session.ACTIVE_CACHE_KEY_PREFIX.format(i) for i in session_ids]
+            return bool(keys) and any(cache.get_many(keys).values())
+        except Exception as e:
+            logger.warning('Failed to check asset sessions for login renewal: %s', type(e).__name__)
+            return False
 
 
 class RedisUserSessionManager:
