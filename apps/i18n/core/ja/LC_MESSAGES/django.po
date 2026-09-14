@@ -8518,6 +8518,62 @@ msgstr "メール送信成功"
 msgid "Chat AI is not enabled"
 msgstr "チャットAIがオンになっていない"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "モデルプロバイダーへの接続がタイムアウトしました。ベース URL、プロキシ、ネットワークを確認してください。"
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "モデルプロバイダーの証明書検証に失敗しました。HTTPS 証明書を確認してください。"
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "モデルプロバイダーのホスト名を解決できませんでした。ベース URL と DNS 設定を確認してください。"
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "モデルプロバイダーが接続を拒否しました。ベース URL、ポート、サービスの状態を確認してください。"
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "モデルプロバイダーに接続できません。ベース URL、プロキシ、ネットワークを確認してください。"
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "モデルプロバイダーのアカウント残高が不足しています。チャージしてから再試行してください。"
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "モデルプロバイダーの認証に失敗しました。API キーを確認してください。"
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "モデルプロバイダーへのアクセスが拒否されました。API キーの権限を確認してください。"
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "選択したモデルが存在しないか、利用できません。モデルとベース URL を確認してください。"
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "モデルプロバイダーのエンドポイントが見つかりません。ベース URL を確認してください。"
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "モデルプロバイダーのリクエスト制限を超えました。しばらくしてから再試行してください。"
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "モデルプロバイダーのサービスは一時的に利用できません。しばらくしてから再試行してください。"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "モデルプロバイダーへのリクエストに失敗しました（HTTP {status_code}）：{detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "モデルプロバイダーへのリクエストに失敗しました（HTTP {status_code}）。"
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37

@@ -8474,6 +8474,62 @@ msgstr "메일 전송 성공"
 msgid "Chat AI is not enabled"
 msgstr "채팅 AI가 활성화되어 있지 않습니다"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "모델 공급자 연결 시간이 초과되었습니다. 기본 URL, 프록시 및 네트워크를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "모델 공급자의 인증서 검증에 실패했습니다. HTTPS 인증서를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "모델 공급자의 호스트 이름을 확인할 수 없습니다. 기본 URL과 DNS 설정을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "모델 공급자가 연결을 거부했습니다. 기본 URL, 포트 및 서비스 상태를 확인하세요."
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "모델 공급자에 연결할 수 없습니다. 기본 URL, 프록시 및 네트워크를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "모델 공급자 계정의 잔액이 부족합니다. 충전한 후 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "모델 공급자 인증에 실패했습니다. API 키를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "모델 공급자가 액세스를 거부했습니다. API 키 권한을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "선택한 모델이 존재하지 않거나 사용할 수 없습니다. 모델과 기본 URL을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "모델 공급자의 엔드포인트를 찾을 수 없습니다. 기본 URL을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "모델 공급자의 요청 한도를 초과했습니다. 나중에 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "모델 공급자 서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "모델 공급자 요청에 실패했습니다(HTTP {status_code}): {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "모델 공급자 요청에 실패했습니다(HTTP {status_code})."
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37

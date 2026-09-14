@@ -8296,6 +8296,62 @@ msgstr "发送邮件成功"
 msgid "Chat AI is not enabled"
 msgstr "聊天 AI 没有开启"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "连接模型服务商超时，请检查服务地址、代理和网络。"
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "模型服务商的证书验证失败，请检查其 HTTPS 证书。"
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "无法解析模型服务商的主机名，请检查服务地址和 DNS 设置。"
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "模型服务商拒绝连接，请检查服务地址、端口和服务状态。"
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "无法连接模型服务商，请检查服务地址、代理和网络。"
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "模型服务商账户余额不足，请充值后重试。"
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "模型服务商认证失败，请检查 API 密钥。"
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "模型服务商拒绝访问，请检查 API 密钥权限。"
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "所选模型不存在或不可用，请检查模型和服务地址。"
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "未找到模型服务接口，请检查服务地址。"
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "已超过模型服务商的请求频率限制，请稍后重试。"
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "模型服务商暂时不可用，请稍后重试。"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "模型服务商请求失败（HTTP {status_code}）：{detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "模型服务商请求失败（HTTP {status_code}）。"
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37
