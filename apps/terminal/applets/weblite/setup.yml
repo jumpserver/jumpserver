@@ -1,3 +1,6 @@
-type: zip
-source: jms:///download/applets/weblite-4.1.2-win32-x64.zip
-destination: .
+type: msi
+source: jms:///download/applets/JumpServer-WebLite-5.0.0-beta18-x64.msi
+arguments:
+  - /quiet
+  - /norestart
+  - ALLUSERS=1

@@ -15,7 +15,7 @@
     RDS_RemoteAppLogoffTimeLimit: 0
     INSTALL_APPLETS: true
     PYTHON_VERSION: 3.11.11
-    # Native Web applets require the matching Tinker release.
+    # WebLite MSI requires Tinker with %ProgramFiles%/JumpServer/ executable support.
     TINKER_VERSION: v0.3.0
 
   tasks:

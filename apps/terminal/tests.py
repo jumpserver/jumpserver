@@ -85,6 +85,27 @@ class PackageRootLocateTests(SimpleTestCase):
 
 
 class WebAppletDefaultsTests(SimpleTestCase):
+    def test_weblite_msi_package_and_executable_use_the_same_version(self):
+        applet_dir = Path(__file__).parent / 'applets' / 'weblite'
+        manifest, setup, uninstall = (
+            yaml.safe_load((applet_dir / filename).read_text())
+            for filename in ('manifest.yml', 'setup.yml', 'uninstall.yml')
+        )
+        version = manifest['version']
+        installer = f'JumpServer-WebLite-{version}-x64.msi'
+        self.assertEqual(setup['type'], 'msi')
+        self.assertEqual(setup['source'], f'jms:///download/applets/{installer}')
+        self.assertIn('/quiet', setup['arguments'])
+        self.assertIn('/norestart', setup['arguments'])
+        self.assertIn('ALLUSERS=1', setup['arguments'])
+        self.assertEqual(manifest['exec_type'], 'exe')
+        self.assertEqual(
+            manifest['path'],
+            f'%ProgramFiles%/JumpServer/WebLite/app-{version}/weblite.exe',
+        )
+        self.assertEqual(uninstall['type'], 'msi')
+        self.assertEqual(uninstall['product_name'], installer)
+
     def test_builtin_install_skips_chrome_and_includes_web_applet(self):
         from unittest.mock import patch
         from terminal.applets import install_or_update_builtin_applets
