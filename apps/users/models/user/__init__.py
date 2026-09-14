@@ -172,7 +172,7 @@ class User(
             queryset = current_org.get_members()
         queryset = queryset.exclude(is_service_account=True)
         return queryset
-    
+
 
     @property
     def has_jdmc(self):
@@ -259,7 +259,6 @@ class User(
         self.set_required_attr_if_need()
         if self.username == "admin":
             self.role = "Admin"
-            self.is_active = True
         return super().save(*args, **kwargs)
 
     def is_member_of(self, user_group):
