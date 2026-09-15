@@ -32,6 +32,9 @@ class BaseUserNodeWithAssetAsTreeApi(
     page_limit = 10000
     default_include_asset_count = True
 
+    def get_asset_custom_value_user(self):
+        return self.user
+
     def list(self, request, *args, **kwargs):
         offset = int(request.query_params.get('offset', 0))
         page_assets = self.get_page_assets()

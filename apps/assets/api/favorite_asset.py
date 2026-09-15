@@ -12,7 +12,7 @@ from rest_framework_bulk.generics import BulkModelViewSet
 
 from common.permissions import IsValidUser
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from ..models import Asset, FavoriteAsset, FavoriteFolder
+from ..models import Asset, FavoriteAsset, FavoriteFolder, MyAsset
 from ..serializers import (
     FavoriteAssetSerializer, FavoriteAssetsToFolderSerializer,
     FavoriteFolderSerializer,
@@ -185,6 +185,19 @@ class FavoriteAssetViewSet(BulkModelViewSet):
 
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
+
+    def get_serializer(self, *args, **kwargs):
+        if args and args[0] is not None and 'data' not in kwargs:
+            instance = args[0]
+            if isinstance(instance, FavoriteAsset):
+                favorites = [instance]
+            else:
+                favorites = list(instance)
+            MyAsset.set_asset_custom_value(
+                [favorite.asset for favorite in favorites],
+                self.request.user,
+            )
+        return super().get_serializer(*args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         asset_id = request.data.get('asset')
