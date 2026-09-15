@@ -12036,6 +12036,10 @@ msgstr "변경 후"
 msgid "{} {} the ticket"
 msgstr "{} {} 작업 요청"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} 님이 작업 요청을 제출했습니다"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "자주 묻는 질문"

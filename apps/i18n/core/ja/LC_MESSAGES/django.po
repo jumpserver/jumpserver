@@ -12108,6 +12108,10 @@ msgstr "変更後"
 msgid "{} {} the ticket"
 msgstr "{} {} チケット"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} がチケットを申請しました"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "ありふれた"
