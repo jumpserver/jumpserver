@@ -99,6 +99,7 @@ class WebAppletDefaultsTests(SimpleTestCase):
         self.assertIn('/norestart', setup['arguments'])
         self.assertIn('ALLUSERS=1', setup['arguments'])
         self.assertEqual(manifest['exec_type'], 'exe')
+        self.assertIs(manifest['stdin'], True)
         self.assertEqual(
             manifest['path'],
             f'%ProgramFiles%/JumpServer/WebLite/app-{version}/weblite.exe',
