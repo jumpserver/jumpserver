@@ -27,9 +27,13 @@ ARG TOOLS="                           \
         netcat-openbsd                \
         telnet"
 
+ARG FACE_RUNTIME_DEPENDENCIES="       \
+        libgl1                        \
+        libglib2.0-0t64"
+
 RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && apt-get -y install --no-install-recommends ${TOOLS} ${FACE_RUNTIME_DEPENDENCIES} \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
@@ -39,6 +43,7 @@ ARG PIP_MIRROR=https://pypi.org/simple
 
 RUN set -ex \
     && uv pip install -i${PIP_MIRROR} --group xpack \
+    && python -c "import cv2" \
     && rm -rf /root/.cache/
 
 COPY --from=gmssl-builder /usr/local/lib/libgmssl.so* /usr/local/lib/
