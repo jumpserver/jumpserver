@@ -28,6 +28,9 @@ class NodeAssetsAmountListMixin:
 class SerializeToTreeNodeMixin:
     request: Request
 
+    def get_asset_custom_value_user(self):
+        return self.request.user
+
     @lazyproperty
     def is_sync(self):
         sync_paths = ['/api/v1/perms/users/self/nodes/all-with-assets/tree/']
@@ -141,7 +144,8 @@ class SerializeToTreeNodeMixin:
 
         data = []
         root_assets_count = 0
-        MyAsset.set_asset_custom_value(assets, self.request.user)
+        custom_value_user = self.get_asset_custom_value_user()
+        MyAsset.set_asset_custom_value(assets, custom_value_user)
         for asset in assets:
             platform = platform_map.get(asset.platform_id)
             if not platform:

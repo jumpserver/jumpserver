@@ -19,6 +19,9 @@ class AssetTreeMixin(SerializeToTreeNodeMixin):
     filter_queryset: callable
     get_queryset: callable
 
+    def get_asset_custom_value_user(self):
+        return self.user
+
     def list(self, request, *args, **kwargs):
         assets = self.filter_queryset(self.get_queryset())
         if request.query_params.get('search'):

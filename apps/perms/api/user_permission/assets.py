@@ -88,7 +88,7 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
 
     @lazyproperty
     def need_custom_value_user(self):
-        return self.request_user_is_self() or self.request.user.is_service_account
+        return True
 
     @abc.abstractmethod
     def get_assets(self):

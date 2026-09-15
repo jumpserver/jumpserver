@@ -3,7 +3,7 @@ from uuid import UUID
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.response import Response
 
-from assets.models import Asset, FavoriteAsset, FavoriteFolder
+from assets.models import Asset, FavoriteAsset, FavoriteFolder, MyAsset
 from assets.serializers import FavoriteAssetSerializer
 from common.utils.http import is_true
 from perms import serializers
@@ -59,6 +59,7 @@ class UserFavoriteTreeApi(SelfOrPKUserMixin, ListAPIView):
         }
 
     def list(self, request, *args, **kwargs):
+        user = self.user
         parent_id = request.query_params.get('parent_id')
         folder_parent_id = None
         parent_key = FAVORITE_ROOT_ID
@@ -69,7 +70,7 @@ class UserFavoriteTreeApi(SelfOrPKUserMixin, ListAPIView):
             except (TypeError, ValueError, AttributeError):
                 return Response({'results': []})
             folder = FavoriteFolder.objects.filter(
-                id=folder_parent_id, user=self.user,
+                id=folder_parent_id, user=user,
             ).only('id').first()
             if folder is None:
                 return Response({'results': []})
@@ -77,7 +78,7 @@ class UserFavoriteTreeApi(SelfOrPKUserMixin, ListAPIView):
 
         folders = list(
             FavoriteFolder.objects.filter(
-                user=self.user, parent_id=folder_parent_id,
+                user=user, parent_id=folder_parent_id,
             ).only('id', 'name', 'parent_id').order_by('name')
         )
         include_assets = is_true(
@@ -88,11 +89,14 @@ class UserFavoriteTreeApi(SelfOrPKUserMixin, ListAPIView):
             valid_assets = Asset.objects.all().valid().values('id')
             favorites = list(
                 FavoriteAsset.objects.filter(
-                    user=self.user,
+                    user=user,
                     folder_id=folder_parent_id,
                     asset_id__in=valid_assets,
                 ).select_related('asset', 'asset__platform')
                 .order_by('asset__name')
+            )
+            MyAsset.set_asset_custom_value(
+                [favorite.asset for favorite in favorites], user
             )
         results = []
         if include_root:
