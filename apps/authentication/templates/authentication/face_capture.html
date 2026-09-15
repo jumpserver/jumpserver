@@ -11,6 +11,7 @@
     {% endif %}
 
     <div id="retry_container" style="text-align: center; margin-top: 20px; display: none;">
+        <p id="retry_message" class="text-muted" style="margin-bottom: 12px;"></p>
         <button id="retry_button" class="btn btn-primary">{% trans 'Retry' %}</button>
     </div>
 
@@ -35,10 +36,36 @@
     <script>
         $(document).ready(function () {
             const apiUrl = "{% url 'api-auth:face-context' %}";
-            const faceCaptureUrl = "/facelive/capture";
-            let token;
+            const coreIndex = window.location.pathname.indexOf('/core/');
+            const sitePrefix = coreIndex > 0 ? window.location.pathname.slice(0, coreIndex) : '';
+            const faceCaptureUrl = `${sitePrefix}/luna/facelive/capture`;
+            const faceFrame = document.getElementById('face_capture_iframe');
+            let token = '';
+            let statusTimer = null;
+            let statusRequestPending = false;
+            let captureGeneration = 0;
+
+            function stopCheckingStatus() {
+                if (statusTimer) {
+                    clearInterval(statusTimer);
+                    statusTimer = null;
+                }
+                statusRequestPending = false;
+            }
+
+            function showRetry(message) {
+                stopCheckingStatus();
+                $('#iframe_container').hide();
+                $('#face_capture_iframe').attr('src', 'about:blank');
+                $('#retry_message').text(message || "{% trans 'Face recognition failed' %}");
+                $('#retry_container').show();
+            }
 
             function createFaceCaptureToken() {
+                stopCheckingStatus();
+                const generation = ++captureGeneration;
+                $('#retry_container').hide();
+                $('#retry_message').text('');
                 let prefix = getCookie('SESSION_COOKIE_NAME_PREFIX');
                 if (!prefix || [`""`, `''`].includes(prefix)) {
                     prefix = '';
@@ -51,31 +78,61 @@
                         'X-CSRFToken': csrf
                     },
                     success: function (data) {
+                        if (generation !== captureGeneration) {
+                            return;
+                        }
                         token = data.token;
-                        $('#iframe_container').show();
-                        $('#face_capture_iframe').attr('src', `${faceCaptureUrl}?token=${token}`);
-                        startCheckingStatus();
+                        $('#face_capture_iframe').attr('src', `${faceCaptureUrl}?token=${encodeURIComponent(token)}`);
+                        $('#iframe_container').css('display', 'flex');
+                        startCheckingStatus(generation, token);
                     },
-                    error: function (error) {
-                        $('#retry_container').show();
+                    error: function () {
+                        if (generation !== captureGeneration) {
+                            return;
+                        }
+                        showRetry("{% trans 'Failed to start face recognition' %}");
                     }
                 });
             }
 
-            function startCheckingStatus() {
+            function startCheckingStatus(generation, captureToken) {
                 const interval = 1000;
-                const timer = setInterval(function () {
+                statusTimer = setInterval(function () {
+                    if (generation !== captureGeneration) {
+                        return;
+                    }
+                    if (statusRequestPending) {
+                        return;
+                    }
+                    statusRequestPending = true;
                     $.ajax({
-                        url: `${apiUrl}?token=${token}`,
+                        url: `${apiUrl}?token=${encodeURIComponent(captureToken)}`,
                         method: 'GET',
                         success: function (data) {
+                            if (generation !== captureGeneration) {
+                                return;
+                            }
                             if (data.is_finished) {
-                                clearInterval(timer);
-                                $('#submit_button').click();
+                                stopCheckingStatus();
+                                if (data.success) {
+                                    $('#submit_button').click();
+                                } else {
+                                    showRetry(data.error_message);
+                                }
                             }
                         },
                         error: function (error) {
-                            console.error('API request failed:', error);
+                            if (generation !== captureGeneration) {
+                                return;
+                            }
+                            if (error.status === 403 || error.status === 404) {
+                                showRetry("{% trans 'Face capture expired. Please retry.' %}");
+                            }
+                        },
+                        complete: function () {
+                            if (generation === captureGeneration) {
+                                statusRequestPending = false;
+                            }
                         }
                     });
                 }, interval);
@@ -85,12 +142,23 @@
             if (active) {
                 createFaceCaptureToken();
             } else {
-                $('#retry_container').show();
+                showRetry("{% trans 'Face recognition failed' %}");
             }
 
             $('#retry_button').on('click', function () {
-                window.location.href = "{{ request.get_full_path }}";
+                createFaceCaptureToken();
             });
+
+            window.addEventListener('message', function (event) {
+                if (event.origin !== window.location.origin || event.source !== faceFrame.contentWindow) {
+                    return;
+                }
+                const message = event.data;
+                if (message?.source === 'jumpserver-facelive' && message.event === 'retry_requested') {
+                    createFaceCaptureToken();
+                }
+            });
+            window.addEventListener('beforeunload', stopCheckingStatus);
         });
     </script>
 {% endblock %}
