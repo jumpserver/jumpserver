@@ -14324,3 +14324,16 @@ msgstr "Các phiên bản Linux, macOS Intel và các phiên bản khác có tr�
 #: templates/resource_download.html
 msgid "View on GitHub"
 msgstr "Xem trên GitHub"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA không khả dụng"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "Không có phương thức MFA nào khả dụng. Vui lòng liên hệ quản trị viên."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "Các phương thức MFA sau chưa được bật trong cài đặt hệ thống và không thể sử dụng: %(methods)s. Vui lòng liên hệ quản trị viên."

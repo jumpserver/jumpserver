@@ -14529,3 +14529,16 @@ msgstr "Encuentre Linux, macOS Intel y otras versiones en GitHub."
 #: templates/resource_download.html
 msgid "View on GitHub"
 msgstr "Ver en GitHub"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA no disponible"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "No hay ningún método MFA disponible. Póngase en contacto con su administrador."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "Los siguientes métodos MFA no están habilitados en la configuración del sistema y no se pueden utilizar: %(methods)s. Póngase en contacto con su administrador."
