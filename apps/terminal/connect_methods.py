@@ -114,7 +114,8 @@ class AppletMethod:
         if not has_applet_hosts:
             return methods
         applets = Applet.objects.filter(is_active=True)
-        for applet in applets:
+        # Prefer WebLite without excluding other explicitly installed browsers.
+        for applet in sorted(applets, key=lambda applet: applet.name != 'weblite'):
             for protocol in applet.protocols:
                 methods[protocol].append({
                     'value': applet.name,

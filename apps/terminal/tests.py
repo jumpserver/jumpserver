@@ -155,6 +155,31 @@ class DeployAppletHostManagerTests(SimpleTestCase):
 
 
 class WebsiteConnectMethodTests(SimpleTestCase):
+    @patch('terminal.models.AppletHost.objects.filter')
+    @patch('terminal.models.Applet.objects.filter')
+    def test_weblite_is_preferred_and_other_active_applets_remain_available(self, applets, hosts):
+        from terminal.connect_methods import AppletMethod
+
+        hosts.return_value.exists.return_value = True
+        applets.return_value = [
+            SimpleNamespace(
+                name=name, display_name=name, protocols=['http'],
+                icon='', is_active=True,
+            ) for name in ('chrome', 'custom-browser', 'weblite')
+        ]
+
+        methods = AppletMethod.get_methods()['http']
+
+        applets.assert_called_once_with(is_active=True)
+        self.assertEqual([method['value'] for method in methods], ['weblite', 'chrome', 'custom-browser'])
+        self.assertTrue(all(method['type'] == 'applet' for method in methods))
+
+    def test_weblite_default_migration_preserves_existing_applet_state(self):
+        from importlib import import_module
+
+        migration = import_module('terminal.migrations.0012_retire_builtin_chrome')
+        self.assertEqual(migration.Migration.operations, [])
+
     def test_builtin_web_proxy_does_not_require_an_applet_host(self):
         from terminal.connect_methods import ConnectMethodUtil
 
