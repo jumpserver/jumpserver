@@ -11782,7 +11782,11 @@ msgstr "变更后"
 
 #: tickets/handlers/base.py:106
 msgid "{} {} the ticket"
-msgstr "{} {} 工单"
+msgstr "{} 工单{}"
+
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} 提交了工单"
 
 #: tickets/models/comment.py:14
 msgid "common"

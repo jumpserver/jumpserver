@@ -12263,6 +12263,10 @@ msgstr "После изменения"
 msgid "{} {} the ticket"
 msgstr "{} {} заявка"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} отправил заявку"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "частые"

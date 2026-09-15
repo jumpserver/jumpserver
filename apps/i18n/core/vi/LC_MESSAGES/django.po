@@ -12150,6 +12150,10 @@ msgstr "Sau khi thay đổi"
 msgid "{} {} the ticket"
 msgstr "{} {} Phiếu công việc"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} đã gửi phiếu công việc"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "Tên hiển thị người dùng thường gặp"

@@ -12142,6 +12142,10 @@ msgstr "After Change"
 msgid "{} {} the ticket"
 msgstr "{} {} Ticket"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} submitted the ticket"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "Common"

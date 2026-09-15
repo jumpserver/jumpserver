@@ -12244,6 +12244,10 @@ msgstr "Depois da alteração"
 msgid "{} {} the ticket"
 msgstr "{} {} Ordem de serviço"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} enviou a ordem de serviço"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "Comum"
