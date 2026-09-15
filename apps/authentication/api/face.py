@@ -12,7 +12,13 @@ from orgs.utils import tmp_to_root_org
 from terminal.api.session.task import create_sessions_tasks
 from users.models import User
 from .. import serializers
-from ..const import FACE_CONTEXT_CACHE_KEY_PREFIX, FACE_SESSION_KEY, FACE_CONTEXT_CACHE_TTL, FaceMonitorActionChoices
+from ..const import (
+    FACE_CONTEXT_CACHE_KEY_PREFIX,
+    FACE_CONTEXT_CACHE_TTL,
+    FACE_MONITOR_CONTEXT_CACHE_TTL,
+    FACE_SESSION_KEY,
+    FaceMonitorActionChoices,
+)
 from ..mixins import AuthMixin
 from ..models import ConnectionToken
 from ..serializers.face import FaceMonitorCallbackSerializer, FaceMonitorContextSerializer
@@ -117,7 +123,11 @@ class FaceContextApi(AuthMixin, RetrieveAPIView, CreateAPIView):
         return Response({'token': token})
 
     def get(self, request, *args, **kwargs):
-        token = self.request.session.get(self.face_token_session_key)
+        session_token = self.request.session.get(self.face_token_session_key)
+        requested_token = self.request.query_params.get('token')
+        if requested_token and requested_token != session_token:
+            raise NotFound({'error': "Token does not belong to the current face capture."})
+        token = requested_token or session_token
 
         cache_key = self.get_face_cache_key(token)
         context = cache.get(cache_key)
@@ -164,7 +174,7 @@ class FaceMonitorContext:
 
     def save(self):
         cache_key = self.get_cache_key(self.token)
-        cache.set(cache_key, self)
+        cache.set(cache_key, self, FACE_MONITOR_CONTEXT_CACHE_TTL)
 
     def close(self):
         self.terminal_sessions()
