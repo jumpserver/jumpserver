@@ -2198,8 +2198,7 @@ msgstr "No unverified accounts"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"If the password starts with `{{` and ends with `}}`, it is not allowed."
+msgstr "The password cannot start with `{{` and end with `}}`."
 
 #: accounts/utils.py:76
 #, python-format
