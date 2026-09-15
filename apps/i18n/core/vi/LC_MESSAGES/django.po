@@ -14335,3 +14335,43 @@ msgstr "Không có phương thức MFA nào khả dụng. Vui lòng liên hệ q
 #, python-format
 msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
 msgstr "Các phương thức MFA sau chưa được bật trong cài đặt hệ thống và không thể sử dụng: %(methods)s. Vui lòng liên hệ quản trị viên."
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "Chạy triển khai nhà cung cấp ứng dụng"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "Triển khai môi trường chạy Panda trên máy chủ của nhà cung cấp ứng dụng"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "Công bố tất cả ứng dụng ảo"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "Công bố tất cả ứng dụng ảo trên một nhà cung cấp ứng dụng"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "Triển khai nhà cung cấp ứng dụng"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "Triển khai"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "Lỗi triển khai"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "Khi thay đổi ảnh, bạn cũng phải thay đổi phiên bản ứng dụng"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "Phiên bản được báo cáo không khớp với phiên bản ứng dụng hiện tại"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "Phiên bản đã công bố"

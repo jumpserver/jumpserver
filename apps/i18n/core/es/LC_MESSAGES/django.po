@@ -14540,3 +14540,43 @@ msgstr "No hay ningún método MFA disponible. Póngase en contacto con su admin
 #, python-format
 msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
 msgstr "Los siguientes métodos MFA no están habilitados en la configuración del sistema y no se pueden utilizar: %(methods)s. Póngase en contacto con su administrador."
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "Ejecutar el despliegue del proveedor de aplicaciones"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "Desplegar el entorno de ejecución de Panda en el host del proveedor de aplicaciones"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "Publicar todas las aplicaciones virtuales"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "Publicar todas las aplicaciones virtuales en un proveedor de aplicaciones"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "Despliegue del proveedor de aplicaciones"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "Despliegue"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "Error de despliegue"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "Al cambiar la imagen, también debe cambiar la versión de la aplicación"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "La versión informada no coincide con la versión actual de la aplicación"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "Versión publicada"
