@@ -58,8 +58,11 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
 
     @action(methods=['get', 'post'], detail=False, url_path='auth', permission_classes=[AllowAny])
     def auth(self, request):
+        # 查看账号密码等二次确认场景会设置该标记
+        confirm_mfa = bool(request.session.get('passkey_confirm_mfa'))
         if request.method == 'GET':
-            auth_data = auth_begin(request)
+            # MFA 确认与登录保持一致：使用可发现凭证（空 allowCredentials）
+            auth_data = auth_begin(request, discoverable=confirm_mfa)
             return JsonResponse(dict(auth_data))
 
         try:
@@ -70,13 +73,15 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
         if not user:
             return self.redirect_to_error(_('Auth failed'))
 
-        confirm_mfa = request.session.get('passkey_confirm_mfa')
         # 如果开启了安全模式，Passkey 不能作为 MFA
         if confirm_mfa and not settings.SAFE_MODE:
+            # 可发现凭证可能选到其他用户的钥匙，必须校验归属当前登录用户
+            if not request.user.is_authenticated or user != request.user:
+                return self.redirect_to_error(_('Auth failed'))
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
             request.session['CONFIRM_TIME'] = int(time.time())
             request.session['CONFIRM_TYPE'] = ConfirmType.MFA
-            request.session['passkey_confirm_mfa'] = ''
+            request.session.pop('passkey_confirm_mfa', None)
             return Response('ok')
 
         try:

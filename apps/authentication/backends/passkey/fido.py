@@ -126,15 +126,19 @@ def register_complete(request):
     return passkey
 
 
-def auth_begin(request):
+def auth_begin(request, discoverable=False):
+    """
+    开始 Passkey 认证。
+
+    discoverable=True 时不填充 allowCredentials，走可发现凭证流程。
+    登录未认证时本身就是空列表；MFA 二次确认也需要空列表，
+    否则 Windows Password Manager 无法完成断言。
+    """
     server = get_server(request)
     credentials = []
 
-    username = None
-    if request.user.is_authenticated:
-        username = request.user.username
-    if username:
-        credentials = get_user_credentials(username)
+    if not discoverable and request.user.is_authenticated:
+        credentials = get_user_credentials(request.user.username)
     auth_data, state = server.authenticate_begin(credentials)
     request.session['fido2_state'] = state
     return auth_data
