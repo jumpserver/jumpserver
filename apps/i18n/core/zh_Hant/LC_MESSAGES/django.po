@@ -13968,3 +13968,43 @@ msgstr "沒有可用的 MFA 驗證方式，請聯絡管理員。"
 #, python-format
 msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
 msgstr "以下 MFA 驗證方式尚未在系統設定中啟用，暫時無法使用：%(methods)s。請聯絡管理員。"
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "執行應用發布機部署"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "在應用發布機上部署 Panda 執行環境"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "發布所有虛擬應用"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "在應用發布機上發布所有虛擬應用"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "應用發布機部署"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "部署"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "部署錯誤"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "更換映像時，必須同時修改應用版本"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "回報版本與目前應用版本不一致"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "已發布版本"

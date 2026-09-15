@@ -14269,3 +14269,43 @@ msgstr "利用可能な MFA 方式がありません。管理者にお問い合�
 #, python-format
 msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
 msgstr "次の MFA 方式はシステム設定で有効になっていないため、使用できません：%(methods)s。管理者にお問い合わせください。"
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "アプリケーションプロバイダーのデプロイを実行"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "アプリケーションプロバイダーのホストに Panda 実行環境をデプロイ"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "すべての仮想アプリを公開"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "アプリケーションプロバイダーですべての仮想アプリケーションを公開"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "アプリケーションプロバイダーのデプロイ"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "デプロイ"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "デプロイエラー"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "イメージを変更する場合は、アプリケーションのバージョンも変更してください"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "報告されたバージョンが現在のアプリケーションのバージョンと一致しません"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "公開済みバージョン"

@@ -16,8 +16,8 @@ __all__ = [
 
 class VirtualAppSerializer(ManifestI18nMixin, serializers.ModelSerializer):
     icon = serializers.ReadOnlyField(label=_("Icon"))
-    image_protocol = serializers.CharField(max_length=16, default='vnc')
-    image_port = serializers.IntegerField(default=5900)
+    image_protocol = serializers.CharField(max_length=16, default='vnc', label=_('Image protocol'))
+    image_port = serializers.IntegerField(default=5900, label=_('Image port'))
 
     class Meta:
         model = VirtualApp
