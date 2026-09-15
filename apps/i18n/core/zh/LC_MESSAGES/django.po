@@ -2146,7 +2146,7 @@ msgstr "没有未校验账号"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr "如果密码以 `{{` 开始，并且以 `}}` 结束，则该密码是不允许的。"
+msgstr "密码不能以 `{{` 开头并以 `}}` 结尾。"
 
 #: accounts/utils.py:76
 #, python-format

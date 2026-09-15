@@ -2227,9 +2227,7 @@ msgstr "No hay cuentas sin verificar"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"Si la contraseña comienza con `{{` y termina con `}}`, esa contraseña no "
-"está permitida."
+msgstr "La contraseña no puede comenzar con `{{` y terminar con `}}`."
 
 #: accounts/utils.py:76
 #, python-format

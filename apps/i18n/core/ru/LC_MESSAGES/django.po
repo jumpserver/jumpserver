@@ -2218,8 +2218,7 @@ msgstr "Нет непроверенных учетных записей"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"Если пароль начинается с `{{` и заканчивается на `}}`, пароль недопустим."
+msgstr "Пароль не может начинаться с `{{` и заканчиваться на `}}`."
 
 #: accounts/utils.py:76
 #, python-format

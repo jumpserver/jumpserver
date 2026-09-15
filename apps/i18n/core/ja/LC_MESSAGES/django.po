@@ -2188,8 +2188,7 @@ msgstr "未検証のアカウントはありません"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"パスワードが`{{`で始まり、`}}`で終わる場合、パスワードは許可されません。"
+msgstr "パスワードを `{{` で始め、`}}` で終えることはできません。"
 
 #: accounts/utils.py:76
 #, python-format

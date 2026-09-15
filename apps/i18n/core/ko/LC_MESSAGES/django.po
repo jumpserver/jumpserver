@@ -2177,9 +2177,7 @@ msgstr "미검증 계정이 없습니다"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"비밀번호가 `{{`로 시작하고 `}}`로 끝나는 경우, 해당 비밀번호는 허용되지 않습"
-"니다."
+msgstr "비밀번호는 `{{`로 시작하고 `}}`로 끝날 수 없습니다."
 
 #: accounts/utils.py:76
 #, python-format

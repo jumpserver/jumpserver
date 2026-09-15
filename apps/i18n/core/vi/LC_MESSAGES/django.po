@@ -2202,9 +2202,7 @@ msgstr "Không có tài khoản chưa được xác minh"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"Nếu mật khẩu bắt đầu bằng `{{` và kết thúc bằng `}}`, thì mật khẩu đó không "
-"được phép."
+msgstr "Mật khẩu không được bắt đầu bằng `{{` và kết thúc bằng `}}`."
 
 #: accounts/utils.py:76
 #, python-format
