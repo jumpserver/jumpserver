@@ -120,9 +120,15 @@
     function GetAssertReq(getAssert) {
         getAssert.publicKey.challenge = decode(getAssert.publicKey.challenge)
 
+        // allowCredentials 可能为空（可发现凭证）；空数组时删除字段，兼容 Windows Password Manager
         const allowCredentials = getAssert.publicKey.allowCredentials || []
         for (const allowCred of allowCredentials) {
             allowCred.id = decode(allowCred.id)
+        }
+        if (allowCredentials.length) {
+            getAssert.publicKey.allowCredentials = allowCredentials
+        } else {
+            delete getAssert.publicKey.allowCredentials
         }
         return getAssert
     }

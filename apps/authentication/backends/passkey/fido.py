@@ -127,11 +127,16 @@ def register_complete(request):
 
 
 def auth_begin(request, discoverable=False):
+    """
+    开始 Passkey 认证。
+
+    discoverable=True 时不填充 allowCredentials，走可发现凭证流程。
+    登录未认证时本身就是空列表；MFA 二次确认也需要空列表，
+    否则 Windows Password Manager 无法完成断言。
+    """
     server = get_server(request)
     credentials = []
 
-    # Discoverable credentials (empty allowCredentials) are required for some
-    # platform authenticators (e.g. Windows Password Manager) during MFA confirm.
     if not discoverable and request.user.is_authenticated:
         credentials = get_user_credentials(request.user.username)
     auth_data, state = server.authenticate_begin(credentials)
