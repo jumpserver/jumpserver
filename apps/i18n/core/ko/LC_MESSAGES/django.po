@@ -3497,6 +3497,18 @@ msgstr "SYSDBA 역할로 연결"
 msgid "Connect as SYSDBA"
 msgstr "SQL Server 버전, 각기 다른 버전마다 연결 드라이버가 다릅니다"
 
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "비밀번호 변경 시 이전 비밀번호 사용"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr ""
+"비밀번호를 변경할 때 Oracle REPLACE 절에 현재 관리 중인 비밀번호를 "
+"사용합니다"
+
 #: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"

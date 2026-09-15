@@ -3556,6 +3556,18 @@ msgstr "SYSDBA"
 msgid "Connect as SYSDBA"
 msgstr "Conectar como a função SYSDBA"
 
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "Usar a senha antiga ao alterar a senha"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr ""
+"Usar a senha gerenciada atualmente na cláusula REPLACE do Oracle ao alterar "
+"senhas"
+
 #: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
