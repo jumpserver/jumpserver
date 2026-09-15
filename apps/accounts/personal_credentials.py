@@ -17,10 +17,11 @@ from perms.utils import PermAssetDetailUtil
 from .models import PersonalAssetCredential
 
 
-PERSONAL_CREDENTIAL_SECRET_TYPES = frozenset(
-    value for value, __ in SecretType.choices
-    if value != SecretType.SSH_CERTIFICATE
-)
+PERSONAL_CREDENTIAL_SECRET_TYPES = frozenset({
+    SecretType.PASSWORD,
+    SecretType.SSH_KEY,
+    SecretType.TOKEN,
+})
 PERSONAL_CREDENTIAL_SECRET_CHOICES = tuple(
     choice for choice in SecretType.choices
     if choice[0] in PERSONAL_CREDENTIAL_SECRET_TYPES
