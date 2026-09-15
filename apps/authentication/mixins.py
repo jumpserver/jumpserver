@@ -325,7 +325,14 @@ class MFAMixin:
             url = backend.get_enable_url()
             if url:
                 return url
-        return reverse('authentication:user-otp-enable-start')
+        message_data = {
+            'title': _('MFA unavailable'),
+            'error': _(
+                'No available MFA method. Please contact your administrator.'
+            ),
+            'redirect_url': reverse('authentication:login'),
+        }
+        return FlashMessageUtil.gen_message_url(message_data)
 
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper

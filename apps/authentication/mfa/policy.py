@@ -4,7 +4,7 @@ from authentication.const import MFAType
 
 
 def get_allowed_mfa_types(user=None):
-    allowed = set(settings.SECURITY_MFA_METHODS or MFAType.values)
-    if user is not None and getattr(user, 'allowed_mfa_types', None):
-        allowed &= set(user.allowed_mfa_types)
-    return allowed
+    user_allowed = getattr(user, 'allowed_mfa_types', None)
+    if user_allowed:
+        return set(user_allowed)
+    return set(settings.SECURITY_MFA_METHODS or MFAType.values)

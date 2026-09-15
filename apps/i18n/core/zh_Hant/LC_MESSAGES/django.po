@@ -13955,3 +13955,16 @@ msgstr "Linux、macOS Intel 及其他版本可前往 GitHub 下載。"
 #: templates/resource_download.html
 msgid "View on GitHub"
 msgstr "前往 GitHub"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA 無法使用"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "沒有可用的 MFA 驗證方式，請聯絡管理員。"
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "以下 MFA 驗證方式尚未在系統設定中啟用，暫時無法使用：%(methods)s。請聯絡管理員。"

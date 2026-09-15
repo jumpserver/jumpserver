@@ -14185,3 +14185,16 @@ msgstr "Linux, macOS Intel 및 기타 버전은 GitHub에서 다운로드할 수
 #: templates/resource_download.html
 msgid "View on GitHub"
 msgstr "GitHub에서 보기"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA를 사용할 수 없음"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "사용 가능한 MFA 방식이 없습니다. 관리자에게 문의하세요."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "다음 MFA 방식은 시스템 설정에서 활성화되지 않아 사용할 수 없습니다: %(methods)s. 관리자에게 문의하세요."
