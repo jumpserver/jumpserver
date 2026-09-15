@@ -8,7 +8,6 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from assets.serializers.asset.web import WebSerializer
 from assets.serializers.platform import PlatformProtocolSerializer
 from authentication.models.connection_token import ConnectionToken
-from terminal.serializers.applet_host import DeployOptionsSerializer
 
 
 @override_settings(XPACK_LICENSE_IS_VALID=False)
@@ -52,12 +51,3 @@ class WebLicenseTests(SimpleTestCase):
                         ConnectionToken.is_valid(token)
                     with override_settings(XPACK_LICENSE_IS_VALID=True):
                         self.assertTrue(ConnectionToken.is_valid(token))
-
-    def test_recording_requires_license(self):
-        data = {'WEB_APPLET_RECORDING_ENABLED': True, 'WEB_PROXY_URL': 'http://koko:5001'}
-        serializer = DeployOptionsSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('WEB_APPLET_RECORDING_ENABLED', serializer.errors)
-        with override_settings(XPACK_LICENSE_IS_VALID=True):
-            serializer = DeployOptionsSerializer(data=data)
-            self.assertTrue(serializer.is_valid(), serializer.errors)

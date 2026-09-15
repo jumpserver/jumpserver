@@ -116,16 +116,23 @@ class WebAppletDefaultsTests(SimpleTestCase):
         self.assertIn('weblite', names)
         self.assertNotIn('chrome', names)
 
-    def test_direct_mode_is_default_and_recording_endpoint_is_optional(self):
+    @override_settings(XPACK_LICENSE_IS_VALID=False)
+    def test_applet_deployment_has_no_proxy_or_web_recording_options(self):
         from terminal.serializers.applet_host import DeployOptionsSerializer
 
         serializer = DeployOptionsSerializer(data={})
         self.assertTrue(serializer.is_valid(), serializer.errors)
-        self.assertFalse(serializer.validated_data['WEB_APPLET_RECORDING_ENABLED'])
-        self.assertEqual(serializer.validated_data['WEB_PROXY_URL'], '')
-        enabled = DeployOptionsSerializer(data={'WEB_APPLET_RECORDING_ENABLED': True})
-        self.assertFalse(enabled.is_valid())
-        self.assertIn('WEB_PROXY_URL', enabled.errors)
+        legacy = {'WEB_APPLET_RECORDING_ENABLED': True, 'WEB_PROXY_URL': 'http://koko:5001'}
+        for key in legacy:
+            self.assertNotIn(key, serializer.fields)
+            self.assertNotIn(key, serializer.validated_data)
+        serializer = DeployOptionsSerializer(data=legacy)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertTrue(legacy.keys().isdisjoint(serializer.validated_data))
+        self.assertTrue(legacy.keys().isdisjoint(DeployOptionsSerializer(instance=legacy).data))
+        playbook = (Path(__file__).parent / 'automations/deploy_applet_host/playbook.yml').read_text()
+        for flag in ('--web-proxy-url', '--web-applet-recording'):
+            self.assertNotIn(flag, playbook)
 
 
 class DeployAppletHostManagerTests(SimpleTestCase):
