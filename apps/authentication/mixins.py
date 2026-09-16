@@ -581,12 +581,13 @@ class AuthFaceMixin:
     def _is_context_success(context):
         return context.get('success', False)
 
-    def create_face_verify_context(self, data=None):
+    def create_face_verify_context(self, data=None, *, user_id=None):
         token = uuid.uuid4().hex
-        try:
-            user_id = self.get_user_from_session().id
-        except errors.SessionEmptyError:
-            user_id = getattr(self.request.user, 'id', None)
+        if user_id is None:
+            try:
+                user_id = self.get_user_from_session().id
+            except errors.SessionEmptyError:
+                user_id = getattr(self.request.user, 'id', None)
         context_data = {
             "action": "mfa",
             "token": token,
