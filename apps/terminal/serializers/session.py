@@ -37,7 +37,8 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
     can_terminate = serializers.BooleanField(read_only=True, label=_("Can terminate"))
     asset = serializers.CharField(label=_("Asset"), style={'base_template': 'textarea.html'})
     error_reason = LabeledChoiceField(
-        choices=SessionErrorReason.choices, label=_("Error reason"), required=False
+        choices=SessionErrorReason.choices, label=_("Error reason"),
+        required=False, allow_blank=True
     )
 
     class Meta:

@@ -246,6 +246,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     rbac_perms = {
         'create': 'terminal.upload_sessionreplay',
         'retrieve': 'terminal.view_sessionreplay',
+        'index': 'terminal.view_sessionreplay',
     }
 
     def create(self, request, *args, **kwargs):
@@ -320,10 +321,13 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
             return
 
         session = get_object_or_404(Session, id=session_id)
+        self._record_replay_view(session)
+
+    def _record_replay_view(self, session):
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('View'), str(session)
         )
-        key = self.view_replay_cache_key.format(self.request.user.id, session_id)
+        key = self.view_replay_cache_key.format(self.request.user.id, session.id)
         if cache.get(key):
             return
         record_operate_log_and_activity_log(
@@ -348,6 +352,26 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
             return Response({"error": url}, status=404)
         data = self.get_replay_data(session, url)
         return Response(data)
+
+    def index(self, request, *args, **kwargs):
+        session = get_object_or_404(Session, id=kwargs.get('pk'))
+        storage = SessionPartReplayStorageHandler(session)
+        try:
+            content = storage.get_verified_index_bytes()
+        except FileNotFoundError:
+            return Response({'error': 'Replay index not found.'}, status=404)
+        except ValueError as exc:
+            logger.warning('Invalid replay index for session %s: %s', session.id, exc)
+            return Response({'error': 'Replay index is invalid.'}, status=422)
+        except OSError as exc:
+            logger.warning('Could not read replay index for session %s: %s', session.id, exc)
+            return Response({'error': 'Replay index is unavailable.'}, status=503)
+        self._record_replay_view(session)
+        response = HttpResponse(
+            content, content_type=storage.INDEX_MEDIA_TYPE
+        )
+        response['Cache-Control'] = 'private, no-store'
+        return response
 
 
 class SessionJoinValidateAPI(views.APIView):

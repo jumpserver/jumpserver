@@ -64,6 +64,8 @@ class SessionPartReplayStorageHandler(object):
     INDEX_SCHEMA_VERSION = 1
     INDEX_FILENAME_SUFFIX = '.index.v1.json'
     INDEX_MEDIA_TYPE = 'application/vnd.jumpserver.recording-index+json'
+    MAX_INDEX_BYTES = 64 * 1024 * 1024
+    MAX_INDEX_MANIFEST_BYTES = 4 * 1024 * 1024
 
     def __init__(self, obj: Session):
         self.obj = obj
@@ -368,6 +370,74 @@ class SessionPartReplayStorageHandler(object):
         if local_error:
             raise local_error
         raise FileNotFoundError('{} not found: {}'.format(index_name, url_or_error))
+
+    @staticmethod
+    def _read_regular_file_bytes(path, maximum):
+        path_stat = os.lstat(path)
+        if not stat.S_ISREG(path_stat.st_mode) or path_stat.st_size > maximum:
+            raise ValueError('replay index source is not a bounded regular file')
+        with open(path, 'rb') as source:
+            file_stat = os.fstat(source.fileno())
+            if (
+                    not stat.S_ISREG(file_stat.st_mode)
+                    or path_stat.st_dev != file_stat.st_dev
+                    or path_stat.st_ino != file_stat.st_ino
+                    or file_stat.st_size > maximum
+            ):
+                raise ValueError('replay index source changed while opening')
+            content = source.read(maximum + 1)
+            if len(content) != file_stat.st_size or len(content) > maximum:
+                raise ValueError('replay index source changed while reading')
+            return content
+
+    def get_verified_index_bytes(self):
+        """Return the exact sidecar bytes declared by this session's replay manifest."""
+        manifest_name = '{}.replay.json'.format(self.obj.id)
+        local_path, error = self.get_part_file_path_url(manifest_name)
+        if not local_path:
+            raise FileNotFoundError('{} not found: {}'.format(manifest_name, error))
+        manifest_path = os.path.join(default_storage.base_location, local_path)
+        manifest_bytes = self._read_regular_file_bytes(
+            manifest_path, self.MAX_INDEX_MANIFEST_BYTES
+        )
+        manifest = json.loads(manifest_bytes)
+        if not isinstance(manifest, dict):
+            raise ValueError('replay manifest must be an object')
+        descriptor = self._parse_index_descriptor(manifest)
+        if descriptor is None:
+            raise FileNotFoundError('replay index not declared in manifest')
+        if descriptor['size'] > self.MAX_INDEX_BYTES:
+            raise ValueError('replay index exceeds maximum response size')
+        part_files = self._parse_part_files(manifest, indexed=True)
+
+        try:
+            index_path = self._get_verified_index_path(descriptor)
+        except FileNotFoundError as exc:
+            # A published manifest is the commit pointer for its sidecar.
+            # Missing payload after that point is an invalid bundle, unlike
+            # a legacy replay whose manifest never declared an index.
+            raise ValueError('declared replay index file is missing') from exc
+        index_bytes = self._read_regular_file_bytes(index_path, self.MAX_INDEX_BYTES)
+        if (
+                len(index_bytes) != descriptor['size']
+                or hashlib.sha256(index_bytes).hexdigest() != descriptor['sha256']
+        ):
+            raise ValueError('replay index no longer matches manifest')
+        document = json.loads(index_bytes)
+        if (
+                not isinstance(document, dict)
+                or document.get('schema') != self.INDEX_SCHEMA
+                or type(document.get('version')) is not int
+                or document['version'] != self.INDEX_SCHEMA_VERSION
+                or not isinstance(document.get('session'), dict)
+                or document['session'].get('id') != str(self.obj.id)
+                or not isinstance(document.get('source'), dict)
+                or document['source'].get('part_count') != len(part_files)
+                or not isinstance(document.get('events'), list)
+                or document.get('event_count') != len(document['events'])
+        ):
+            raise ValueError('invalid replay index document')
+        return index_bytes
 
     @staticmethod
     def _indexed_tar_matches_manifest(
