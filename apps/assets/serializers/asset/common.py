@@ -20,6 +20,7 @@ from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Protocol, Host, Device, Database, Cloud, Web, Custom
+from ...validators import validate_asset_address
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -189,6 +190,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_field_choices()
+
+    def validate_address(self, value):
+        validate_asset_address(value)
+        return value
 
     def to_internal_value(self, data):
         accounts = serializers.empty

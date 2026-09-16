@@ -7055,9 +7055,25 @@ msgstr "계정 백업을 수행할 때 외부 저장소(sftp)에 이 작업을 �
 msgid "Invalid ip"
 msgstr "유효하지 않은 IP"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "유효하지 않은 주소"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "주소의 앞뒤에 공백을 포함할 수 없습니다"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "주소에 템플릿 구문을 포함할 수 없습니다"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "주소에 제어 문자를 포함할 수 없습니다"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "유효한 IP 주소 또는 호스트 이름을 입력하세요"
 
 #: common/utils/translate.py:46
 #, python-format

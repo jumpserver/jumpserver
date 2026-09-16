@@ -7117,9 +7117,25 @@ msgstr ""
 msgid "Invalid ip"
 msgstr "Invalid IP"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "Invalid address"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "The address cannot contain leading or trailing whitespace"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "The address cannot contain template syntax"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "The address cannot contain control characters"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "Enter a valid IP address or hostname"
 
 #: common/utils/translate.py:46
 #, python-format
