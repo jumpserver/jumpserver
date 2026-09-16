@@ -17,7 +17,13 @@ from urllib.parse import urlsplit
 
 import requests
 
-from .main import CLIENT_PATH, CredentialAPIClient, REVOKED_CODES, response_error_code, identity_denied
+from .common import credential
+from .common.exception import (
+    JumpServerPAMSDKException, REVOKED_CODES, identity_denied, response_error_code,
+)
+from .common.profile import client_profile
+from .credential.v1 import credential_client, models
+from .credential.v1.credential_client import CLIENT_PATH
 from .events import EventWorker, DeliveryError
 
 CONFIG_FILE = '/etc/jumpserver-pam/agent.json'
@@ -192,13 +198,13 @@ class Agent:
     def __init__(self, config_file=CONFIG_FILE):
         self.config = read_json(config_file)
         validate_deliveries(self.config)
-        self.remote = CredentialAPIClient(
-            self.config['endpoint'],
-            self.config['agent_id'],
-            self.config['agent_secret'],
-            self.config['org_id'],
-            source='jms-pam-agent',
-            instance_id=self.config.get('instance_id', self.config['agent_id']),
+        self.remote = credential_client.CredentialClient(
+            credential.Credential(self.config['agent_id'], self.config['agent_secret']),
+            self.config.get('instance_id', self.config['agent_id']),
+            client_profile.ClientProfile(
+                endpoint=self.config['endpoint'], org_id=self.config['org_id'],
+                source='jms-pam-agent',
+            ),
         )
         self.state = read_json(self.config.get('state_file', STATE_FILE))
         self.delivery_state = read_json(self.config.get('delivery_state_file', DELIVERY_STATE_FILE))
@@ -260,8 +266,9 @@ class Agent:
             sent_credentials, sent_state = dict(self.credentials), dict(self.state)
         for key in self.config['credential_keys'] if keys is None else keys:
             try:
-                fetched[key] = (remote or self.remote).get_credential(key)
-            except requests.RequestException as exc:
+                request = models.GetCredentialRequest(Key=key)
+                fetched[key] = (remote or self.remote).GetCredential(request)._serialize()
+            except JumpServerPAMSDKException as exc:
                 if identity_denied(exc):
                     raise
                 code = response_error_code(exc)
@@ -404,7 +411,7 @@ class Agent:
             ):
                 try:
                     self.confirm(key, credential['revision'])
-                except (requests.RequestException, OSError, KeyError, ValueError) as exc:
+                except (JumpServerPAMSDKException, OSError, KeyError, ValueError) as exc:
                     print(
                         f'JumpServer PAM Agent: delivery confirmation {key}: {type(exc).__name__}',
                         file=sys.stderr,
@@ -479,7 +486,10 @@ class Agent:
                 'revision': item['revision'],
                 'account_id': item['account_id'],
             }
-            self.remote.confirm(applied)
+            self.remote.ConfirmCredential(models.ConfirmCredentialRequest(
+                Key=applied['key'], Revision=applied['revision'],
+                AccountId=applied['account_id'],
+            ))
             state = dict(self.state)
             state[key] = applied
             atomic_write_json(self.state_file, state)
@@ -489,7 +499,10 @@ class Agent:
     def heartbeat(self):
         with self.lock:
             sent_state, sent_credentials = dict(self.state), dict(self.credentials)
-        result = self.remote.heartbeat(list(sent_state.values()))
+        request = models.HeartbeatRequest(Credentials=[models.CredentialState(
+            Key=item['key'], Revision=item['revision'], AccountId=item['account_id'],
+        ) for item in sent_state.values()])
+        result = self.remote.Heartbeat(request)._serialize()
         revoked = {error['key'] for error in result.get('errors', []) if error['code'] in REVOKED_CODES}
         with self.lock:
             self.remove_revoked(revoked, sent_credentials, sent_state)
@@ -499,7 +512,7 @@ class Agent:
     def run(self):
         server = self.start_local_server()
         if self.config.get('notification_enabled'):
-            remote = self.remote.fork()
+            remote = self.remote.clone()
             self.events = EventWorker(remote, lambda event: self.notify(event, remote))
             self.events.start()
         stop = threading.Event()
@@ -508,14 +521,14 @@ class Agent:
                 denied = False
                 try:
                     self.poll()
-                except (requests.RequestException, OSError) as error:
+                except (JumpServerPAMSDKException, OSError) as error:
                     denied = identity_denied(error)
                     print(f'JumpServer PAM Agent: poll: {type(error).__name__}', file=sys.stderr)
                 self.reconcile_deliveries()
                 try:
                     if not denied:
                         self.heartbeat()
-                except (requests.RequestException, OSError) as error:
+                except (JumpServerPAMSDKException, OSError, KeyError, TypeError, ValueError) as error:
                     print(f'JumpServer PAM Agent: heartbeat: {type(error).__name__}', file=sys.stderr)
                 stop.wait(self.config.get('poll_interval', 30))
         except KeyboardInterrupt:
@@ -524,7 +537,7 @@ class Agent:
             if self.events:
                 self.events.close()
             server.shutdown()
-            self.remote.session.close()
+            self.remote.close()
             self.notification_session.close()
 
     def notify(self, event, remote):
@@ -548,7 +561,7 @@ class Agent:
                         or delivery.get('revision') != event['revision']
                     ):
                         raise DeliveryError('application_apply_failed')
-            except (requests.RequestException, OSError):
+            except (JumpServerPAMSDKException, OSError):
                 raise DeliveryError('credential_not_ready') from None
         try:
             response = self.notification_session.post(url, json=event, timeout=10, allow_redirects=False)
@@ -611,12 +624,12 @@ def register(args):
         agent = Agent(args.config)
         try:
             agent.heartbeat()
-        except requests.RequestException as exc:
+        except (JumpServerPAMSDKException, KeyError, TypeError, ValueError) as exc:
             raise RuntimeError('Existing Agent identity could not be verified. Configuration was preserved; '
                                'check connectivity and whether the instance/configuration is enabled. '
                                'Registration will not replace it.') from exc
         finally:
-            agent.remote.session.close()
+            agent.remote.close()
             agent.notification_session.close()
         print('Existing Agent identity verified and reused; registration token was not submitted.')
         return existing

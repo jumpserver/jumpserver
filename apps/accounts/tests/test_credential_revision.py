@@ -5,6 +5,7 @@ from django.db import transaction
 
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.demos.python.jms_pam.agent import Agent
+from accounts.demos.python.jms_pam.credential.v1 import models
 from accounts.models import Account, ApplicationAudit, ApplicationCredential, ClientAccessConfiguration
 from accounts.serializers import ApplicationCredentialSerializer
 from accounts.tests.base import CredentialTestCase
@@ -103,7 +104,10 @@ class CredentialRevisionTests(CredentialTestCase):
         agent.credentials = {}
         agent.state = {}
         agent.remote = Mock()
-        agent.remote.get_credential.side_effect = [first, second, second]
+        agent.remote.GetCredential.side_effect = [
+            models.GetCredentialResponse()._deserialize(item)
+            for item in (first, second, second)
+        ]
         with patch('accounts.demos.python.jms_pam.agent.atomic_write_json') as write:
             agent.poll()
             agent.poll()
