@@ -7085,6 +7085,15 @@ msgstr "Gửi email"
 msgid "This task will be executed when sending email notifications"
 msgstr "Thực hiện tác vụ này khi gửi thông điệp email."
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"Đang gửi email: tiêu đề=%(subject)r, "
+"người nhận=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "Gửi tệp đính kèm email"

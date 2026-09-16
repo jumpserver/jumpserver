@@ -7123,6 +7123,15 @@ msgstr "Email de remetente"
 msgid "This task will be executed when sending email notifications"
 msgstr "Ação a ser realizada ao enviar uma mensagem de email"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"Enviando e-mail: assunto=%(subject)r, "
+"destinatários=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "Anexo do email"

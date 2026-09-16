@@ -6883,6 +6883,15 @@ msgstr "發件郵件"
 msgid "This task will be executed when sending email notifications"
 msgstr "發送郵件消息時執行該任務"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"正在傳送郵件：主旨=%(subject)r，"
+"收件者=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "發送郵件附件"

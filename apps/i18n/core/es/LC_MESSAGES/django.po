@@ -7178,6 +7178,15 @@ msgstr "Enviar correo electrónico"
 msgid "This task will be executed when sending email notifications"
 msgstr "Ejecutar esta tarea al enviar el mensaje de correo"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"Enviando correo electrónico: asunto=%(subject)r, "
+"destinatarios=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "Enviar archivo adjunto en el correo electrónico"

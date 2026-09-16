@@ -64,7 +64,14 @@ def send_mail_async(*args, **kwargs):
     subject = args[0] if len(args) > 0 else kwargs.get('subject')
     recipient_list = args[3] if len(args) > 3 else kwargs.get('recipient_list')
     logger.info(
-        "send_mail_async called with subject=%r, recipients=%r", subject, recipient_list
+        _(
+            "Sending email: subject=%(subject)r, "
+            "recipients=%(recipients)r"
+        ),
+        {
+            'subject': subject,
+            'recipients': recipient_list,
+        },
     )
 
     email_lookup_list = [text_hmac_sha256(email) for email in recipient_list]
