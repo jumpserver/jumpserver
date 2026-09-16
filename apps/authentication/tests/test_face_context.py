@@ -5,7 +5,9 @@ from django.test import SimpleTestCase
 from rest_framework.exceptions import NotFound
 
 from authentication.api.face import FaceContextApi
+from authentication.api.connection_token import ConnectionTokenViewSet
 from authentication.const import FACE_SESSION_KEY
+from authentication.mixins import AuthFaceMixin
 
 
 class FaceContextApiTest(SimpleTestCase):
@@ -47,3 +49,33 @@ class FaceContextApiTest(SimpleTestCase):
                 "error_message": "Timed out",
             },
         )
+
+
+class FaceContextCreationTest(SimpleTestCase):
+    @patch("authentication.mixins.cache")
+    def test_connection_token_uses_authenticated_user_without_login_mixin(self, cache):
+        view = ConnectionTokenViewSet()
+        view.request = SimpleNamespace(
+            user=SimpleNamespace(id="asset-user", is_face_code_set=True),
+            session={},
+        )
+        response = SimpleNamespace(data={"id": "connection-id"})
+
+        view.create_face_verify(response)
+
+        token = response.data["face_token"]
+        self.assertEqual(view.request.session[FACE_SESSION_KEY], token)
+        context = cache.set.call_args.args[1]
+        self.assertEqual(context["user_id"], "asset-user")
+        self.assertEqual(context["action"], "login_asset")
+        self.assertEqual(context["connection_token_id"], "connection-id")
+
+    @patch("authentication.mixins.cache")
+    def test_login_context_still_uses_session_user(self, cache):
+        view = AuthFaceMixin()
+        view.request = SimpleNamespace(user=SimpleNamespace(id="request-user"), session={})
+        view.get_user_from_session = lambda: SimpleNamespace(id="session-user")
+
+        view.create_face_verify_context()
+
+        self.assertEqual(cache.set.call_args.args[1]["user_id"], "session-user")

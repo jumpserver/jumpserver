@@ -1033,7 +1033,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             "action": "login_asset",
             "connection_token_id": connection_token_id,
         }
-        face_verify_token = self.create_face_verify_context(context_data)
+        face_verify_token = self.create_face_verify_context(
+            context_data, user_id=self.request.user.id
+        )
         response.data['face_token'] = face_verify_token
 
     @staticmethod
