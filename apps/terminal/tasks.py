@@ -28,6 +28,10 @@ RUNNING = False
 logger = get_task_logger(__name__)
 
 
+class AppProviderDeploymentError(RuntimeError):
+    """Deployment failure whose details are already included in the task log."""
+
+
 @shared_task(
     verbose_name=_('Periodic delete terminal status'),
     description=_("Unused")
@@ -138,6 +142,7 @@ def run_applet_host_deployment(did, install_applets):
     activity_callback=lambda self, did, *args, **kwargs: ([did],),
     description=_('Deploy the Panda runtime on an application provider host'),
     soft_time_limit=1860, time_limit=1920,
+    throws=(AppProviderDeploymentError,),
 )
 def run_app_provider_deployment(did):
     with tmp_to_builtin_org(system=1):
@@ -149,13 +154,14 @@ def run_app_provider_deployment(did):
         deployment = AppProviderDeployment.objects.get(id=did)
         deployment.start()
         if deployment.status != 'success':
-            raise RuntimeError('Application provider deployment failed; see the Ansible task log')
+            raise AppProviderDeploymentError('Application provider deployment failed; see the Ansible task log')
 
 
 @shared_task(
     verbose_name=_('Publish all virtual apps'),
     activity_callback=lambda self, ids, *args, **kwargs: (ids,),
     description=_('Publish all virtual applications on an application provider'),
+    throws=(AppProviderDeploymentError,),
 )
 def run_app_provider_deployments(ids):
     with tmp_to_builtin_org(system=1):
@@ -177,7 +183,7 @@ def run_app_provider_deployments(ids):
             if deployment.status != 'success':
                 failed.append(str(deployment.pk))
         if failed:
-            raise RuntimeError('Virtual application publication failed: ' + ', '.join(failed))
+            raise AppProviderDeploymentError('Virtual application publication failed: ' + ', '.join(failed))
 
 
 @shared_task(

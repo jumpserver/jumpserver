@@ -27,6 +27,7 @@ from accounts.models import Account
 from assets.utils.platform_package import locate_package_root
 from authentication.serializers.connect_token_secret import ConnectTokenVirtualAppOptionSerializer
 from common.drf.metadata import SimpleMetadataWithFilters
+from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_builtin_org
 from terminal.api.virtualapp.provider import AppProviderDeploymentViewSet, AppProviderViewSet
 from terminal.automations.deploy_app_provider import (
@@ -36,7 +37,9 @@ from terminal.const import ComponentLoad
 from terminal.models import Applet, AppProvider, AppProviderDeployment, Terminal, VirtualApp, VirtualAppPublication
 from terminal.serializers import AppProviderSerializer
 from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
-from terminal.tasks import run_app_provider_deployment, run_app_provider_deployments
+from terminal.tasks import (
+    AppProviderDeploymentError, run_app_provider_deployment, run_app_provider_deployments,
+)
 from terminal.utils import virtualapp as image_archives
 
 
@@ -898,6 +901,21 @@ class AppProviderDeploymentAPITests(TestCase):
         view.format_kwarg = None
         return view.create(view.request)
 
+    def assert_task_failure_without_traceback(self, task, args, message):
+        execution = CeleryTaskExecution.objects.create(
+            name=task.name, args=args, kwargs={}, state='PENDING',
+        )
+        with self.assertLogs('celery.app.trace', level='INFO') as logs:
+            result = task.apply(args=args, task_id=str(execution.id), throw=False)
+        self.assertEqual(result.state, 'FAILURE')
+        self.assertIsInstance(result.result, AppProviderDeploymentError)
+        self.assertIn(message, str(result.result))
+        execution.refresh_from_db()
+        self.assertEqual(execution.state, 'FAILURE')
+        self.assertTrue(execution.is_finished)
+        self.assertTrue(any(message in record.getMessage() for record in logs.records))
+        self.assertTrue(all(record.exc_info is None for record in logs.records))
+
     def test_connection_options_include_ssh_host_and_account(self):
         data = ConnectTokenVirtualAppOptionSerializer.get_provider({'provider': self.provider})
 
@@ -930,8 +948,9 @@ class AppProviderDeploymentAPITests(TestCase):
             instance.save(update_fields=['status'])
 
         with mock.patch.object(AppProviderDeployment, 'start', autospec=True, side_effect=fail) as start:
-            with self.assertRaisesMessage(RuntimeError, 'deployment failed'):
-                run_app_provider_deployment(str(deployment.id))
+            self.assert_task_failure_without_traceback(
+                run_app_provider_deployment, [str(deployment.id)], 'deployment failed',
+            )
             run_app_provider_deployment(str(deployment.id))
         self.assertEqual(start.call_count, 1)
 
@@ -943,8 +962,10 @@ class AppProviderDeploymentAPITests(TestCase):
             instance.save(update_fields=['status'])
 
         with mock.patch.object(AppProviderDeployment, 'start', autospec=True, side_effect=finish) as start:
-            with self.assertRaisesMessage(RuntimeError, str(deployments[0].id)):
-                run_app_provider_deployments([str(item.id) for item in deployments])
+            self.assert_task_failure_without_traceback(
+                run_app_provider_deployments, [[str(item.id) for item in deployments]],
+                str(deployments[0].id),
+            )
         self.assertEqual(start.call_count, 2)
         deployments[1].refresh_from_db()
         self.assertEqual(deployments[1].status, 'success')
