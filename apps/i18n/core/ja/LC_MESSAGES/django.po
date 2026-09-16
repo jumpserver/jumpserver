@@ -11442,6 +11442,14 @@ msgstr ""
 msgid "Ignore Certificate Verification"
 msgstr "証明書の検証を無視する"
 
+#: terminal/serializers/virtualapp_provider.py:31
+msgid "Panda image"
+msgstr "Panda イメージ"
+
+#: terminal/serializers/virtualapp_provider.py:34
+msgid "Container port range"
+msgstr "コンテナのポート範囲"
+
 #: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
 msgstr "既存の RDS 証明書"

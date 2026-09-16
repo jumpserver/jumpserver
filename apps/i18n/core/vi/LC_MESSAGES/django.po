@@ -11484,6 +11484,14 @@ msgstr ""
 msgid "Ignore Certificate Verification"
 msgstr "Bỏ qua xác thực chứng chỉ"
 
+#: terminal/serializers/virtualapp_provider.py:31
+msgid "Panda image"
+msgstr "Hình ảnh Panda"
+
+#: terminal/serializers/virtualapp_provider.py:34
+msgid "Container port range"
+msgstr "Dải cổng container"
+
 #: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
 msgstr "Đã có giấy phép RDS"
