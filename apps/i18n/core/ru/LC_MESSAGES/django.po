@@ -7131,6 +7131,15 @@ msgstr "Отправка почты"
 msgid "This task will be executed when sending email notifications"
 msgstr "Эта задача выполняется при отправке сообщения электронной почты"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"Отправка письма: тема=%(subject)r, "
+"получатели=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "Отправка вложения электронной почты"
