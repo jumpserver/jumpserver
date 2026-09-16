@@ -6918,9 +6918,25 @@ msgstr "當執行帳號備份時，需要到外部儲存（sftp），執行該�
 msgid "Invalid ip"
 msgstr "無效 IP"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "無效地址"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "位址不能包含開頭或結尾空白字元"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "位址不能包含範本語法"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "位址不能包含控制字元"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "請輸入有效的 IP 位址或主機名稱"
 
 #: common/utils/translate.py:46
 #, python-format

@@ -7096,9 +7096,25 @@ msgstr ""
 msgid "Invalid ip"
 msgstr "無効な IP"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "無効なアドレス。"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "アドレスの先頭または末尾に空白を含めることはできません"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "アドレスにテンプレート構文を含めることはできません"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "アドレスに制御文字を含めることはできません"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "有効な IP アドレスまたはホスト名を入力してください"
 
 #: common/utils/translate.py:46
 #, python-format
