@@ -6,7 +6,7 @@ author: JumpServer Team
 exec_type: exe
 stdin: true
 # Launch Electron directly to preserve Tinker's stdin pipe and process lifetime.
-path: '%ProgramFiles%/JumpServer/WebLite/app-5.0.0-beta18/weblite.exe'
+path: '%ProgramFiles%/JumpServer/WebLite/weblite.exe'
 update_policy: always
 type: web
 can_concurrent: true
