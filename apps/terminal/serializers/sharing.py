@@ -5,7 +5,7 @@ from common.serializers.fields import LabeledChoiceField
 from common.utils.common import pretty_string
 from common.utils.random import random_string
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from ..const import ActionPermission
+from ..const import ActionPermission, TerminalType
 from ..models import SessionSharing, SessionJoinRecord
 
 __all__ = ['SessionSharingSerializer', 'SessionJoinRecordSerializer']
@@ -38,6 +38,12 @@ class SessionSharingSerializer(OrgResourceModelSerializerMixin):
         return super().save(**kwargs)
 
     def create(self, validated_data):
+        request = self.context.get('request')
+        if request and 'X-JMS-SHARE-COMPONENT' in request.headers:
+            component = serializers.ChoiceField(choices=(TerminalType.koko, TerminalType.lion))
+            validated_data['share_component'] = component.run_validation(
+                request.headers['X-JMS-SHARE-COMPONENT']
+            )
         validated_data['verify_code'] = random_string(4)
         session = validated_data.get('session')
         if session:
