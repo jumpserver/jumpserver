@@ -26,6 +26,14 @@ PERSONAL_CREDENTIAL_SECRET_CHOICES = tuple(
     choice for choice in SecretType.choices
     if choice[0] in PERSONAL_CREDENTIAL_SECRET_TYPES
 )
+PERSONAL_CREDENTIAL_UNSUPPORTED_PROTOCOLS = frozenset({
+    Protocol.http,
+    Protocol.chatgpt,
+})
+PERSONAL_CREDENTIAL_PROTOCOL_CHOICES = tuple(
+    choice for choice in Protocol.choices
+    if choice[0] not in PERSONAL_CREDENTIAL_UNSUPPORTED_PROTOCOLS
+)
 PERSONAL_CREDENTIAL_SAFE_VERIFY_METHODS = frozenset({
     'verify_account_postgresql',
     'verify_account_oracle',
@@ -194,6 +202,10 @@ def get_personal_credential_permission_context(user, asset, protocol):
         raise PermissionDenied(_('Invalid user'), code='invalid_user')
     if not asset or not asset.is_active:
         raise PermissionDenied(_('Asset is inactive'), code='asset_inactive')
+    if protocol in PERSONAL_CREDENTIAL_UNSUPPORTED_PROTOCOLS:
+        raise serializers.ValidationError({
+            'protocol': _('Protocol is not supported for personal credentials')
+        })
 
     asset_protocol_exists = asset.protocols.filter(name=protocol).exists()
     platform_protocol = asset.platform.protocols.filter(name=protocol).first()

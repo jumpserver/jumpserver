@@ -5,6 +5,7 @@ from rest_framework import serializers
 from accounts.const import SecretType
 from accounts.models import PersonalAssetCredential
 from accounts.personal_credentials import (
+    PERSONAL_CREDENTIAL_PROTOCOL_CHOICES,
     PERSONAL_CREDENTIAL_SECRET_CHOICES,
     PersonalCredentialVersionConflict,
     get_personal_credential_permission_context,
@@ -33,7 +34,7 @@ class PersonalAssetCredentialSerializer(CommonModelSerializer):
         label=_('Secret type'),
     )
     protocol = LabeledChoiceField(
-        choices=Protocol.choices, default=Protocol.ssh,
+        choices=PERSONAL_CREDENTIAL_PROTOCOL_CHOICES, default=Protocol.ssh,
         label=_('Protocol'),
     )
     connectivity = LabeledChoiceField(
