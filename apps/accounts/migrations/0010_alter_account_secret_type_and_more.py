@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0008_alter_vault_secret_fields'),
+        ('accounts', '0009_changesecretrecord_verification'),
     ]
 
     operations = [

@@ -9,7 +9,7 @@ import accounts.models.mixins.vault
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0010_merge_0009_account_migrations'),
+        ('accounts', '0010_alter_account_secret_type_and_more'),
         ('assets', '0025_node_tree_pagination_index'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
