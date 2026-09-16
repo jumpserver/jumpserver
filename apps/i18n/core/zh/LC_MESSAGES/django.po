@@ -1242,8 +1242,8 @@ msgid "Check engine"
 msgstr "检测引擎"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
-msgstr "检查您的账号和密码的强度"
+msgid "Check account password strength"
+msgstr "检查账号密码的强度"
 
 #: accounts/models/automations/check_account.py:135
 msgid ""
@@ -1252,8 +1252,8 @@ msgid ""
 msgstr "针对账号密码的安全性进行检查分析，包括密码强度、泄露情况等。"
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
-msgstr "检查账号和密码是否重复"
+msgid "Check whether account passwords are duplicated"
+msgstr "检查账号密码是否重复"
 
 #: accounts/models/automations/check_account.py:143
 msgid "Check if the account is the same as other accounts."

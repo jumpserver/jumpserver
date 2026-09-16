@@ -1256,7 +1256,7 @@ msgid "Check engine"
 msgstr "Проверка механизма"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "Проверьте надежность своей учетной записи и пароля"
 
 #: accounts/models/automations/check_account.py:135
@@ -1268,7 +1268,7 @@ msgstr ""
 "утечки и т. д."
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "Проверка на дублирование учетных записей и паролей"
 
 #: accounts/models/automations/check_account.py:143
