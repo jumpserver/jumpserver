@@ -127,6 +127,8 @@ REDIS_PORT: 6379
 #
 # 使用 jumpserver/installer 时，VIDEO_WORKER_ENABLED 控制本地容器是否启动；
 # 外部分离部署 Worker 时设为 0。它不是 Core 的运行时开关。
+# 该接入仅供企业版：installer 需 USE_XPACK=1，KoKo/Lion 还会检查 Core 返回的
+# XPACK_LICENSE_IS_VALID。社区版/无效许可证继续使用原录像存储，缺少 OCR 索引为正常情况。
 # VIDEO_WORKER_ENABLED: 0
 # 下面两个参数应传给实际录制 Windows 会话的 KoKo/Lion，而非仅传给 Core。
 # installer 只管理 KoKo；独立部署的 Lion 需在其自身环境配置。

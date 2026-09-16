@@ -81,6 +81,35 @@ class SessionReplayIndexStorageTests(SimpleTestCase):
         with self.assertRaises(FileNotFoundError):
             self.read(manifest_name, index_path)
 
+    def test_missing_replay_manifest_is_not_found(self):
+        with patch.object(self.storage, 'get_part_file_path_url',
+                          return_value=(None, 'replay manifest not found')):
+            with self.assertRaises(FileNotFoundError):
+                self.storage.get_verified_index_bytes()
+
+    def test_invalid_index_descriptor_is_not_treated_as_absent(self):
+        manifest_name, index_path, _ = self.make_files()
+        manifest_path = self.root / manifest_name
+        manifest = json.loads(manifest_path.read_text())
+        manifest['index'] = None
+        manifest_path.write_text(json.dumps(manifest))
+
+        with self.assertRaises(ValueError):
+            self.read(manifest_name, index_path)
+
+    def test_missing_declared_sidecar_is_invalid_bundle(self):
+        manifest_name, _, _ = self.make_files()
+        with (
+                patch('common.storage.replay.default_storage',
+                      SimpleNamespace(base_location=str(self.root))),
+                patch.object(self.storage, 'get_part_file_path_url',
+                             return_value=(manifest_name, '')),
+                patch.object(self.storage, '_get_verified_index_path',
+                             side_effect=FileNotFoundError('missing sidecar')),
+        ):
+            with self.assertRaisesRegex(ValueError, 'declared replay index file is missing'):
+                self.storage.get_verified_index_bytes()
+
     def test_tampered_sidecar_is_rejected(self):
         manifest_name, index_path, _ = self.make_files(tampered=True)
 
@@ -160,6 +189,64 @@ class SessionReplayIndexAPITests(SimpleTestCase):
         response = self.request()
 
         self.assertEqual(response.status_code, 404)
+
+    @patch('terminal.api.session.session.get_object_or_404')
+    @patch.object(SessionPartReplayStorageHandler, 'get_part_file_path_url',
+                  return_value=(None, 'replay manifest not found'))
+    def test_ce_replay_without_manifest_returns_404(self, _get_part, get_session):
+        get_session.return_value = self.session
+
+        response = self.request()
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch('terminal.api.session.session.get_object_or_404')
+    def test_ce_manifest_without_index_field_returns_404(self, get_session):
+        get_session.return_value = self.session
+        with tempfile.TemporaryDirectory() as directory:
+            manifest_name = '{}.replay.json'.format(self.session.id)
+            Path(directory, manifest_name).write_text(json.dumps({
+                'type': 'mp4',
+                'files': [{'name': '{}.0.part.mp4'.format(self.session.id), 'size': 100}],
+            }))
+            with (
+                    patch('common.storage.replay.default_storage',
+                          SimpleNamespace(base_location=directory)),
+                    patch.object(SessionPartReplayStorageHandler, 'get_part_file_path_url',
+                                 return_value=(manifest_name, '')),
+            ):
+                response = self.request()
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch('terminal.api.session.session.get_object_or_404')
+    def test_declared_but_missing_sidecar_returns_422(self, get_session):
+        get_session.return_value = self.session
+        with tempfile.TemporaryDirectory() as directory:
+            manifest_name = '{}.replay.json'.format(self.session.id)
+            Path(directory, manifest_name).write_text(json.dumps({
+                'type': 'mp4',
+                'files': [{'name': '{}.0.part.mp4'.format(self.session.id), 'size': 100}],
+                'index': {
+                    'schema': SessionPartReplayStorageHandler.INDEX_SCHEMA,
+                    'schema_version': 1,
+                    'name': '{}.index.v1.json'.format(self.session.id),
+                    'media_type': SessionPartReplayStorageHandler.INDEX_MEDIA_TYPE,
+                    'size': 10,
+                    'sha256': '0' * 64,
+                },
+            }))
+            with (
+                    patch('common.storage.replay.default_storage',
+                          SimpleNamespace(base_location=directory)),
+                    patch.object(SessionPartReplayStorageHandler, 'get_part_file_path_url',
+                                 return_value=(manifest_name, '')),
+                    patch.object(SessionPartReplayStorageHandler, '_get_verified_index_path',
+                                 side_effect=FileNotFoundError('missing sidecar')),
+            ):
+                response = self.request()
+
+        self.assertEqual(response.status_code, 422)
 
     @patch('terminal.api.session.session.get_object_or_404')
     @patch('terminal.api.session.session.SessionPartReplayStorageHandler')

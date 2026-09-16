@@ -410,7 +410,13 @@ class SessionPartReplayStorageHandler(object):
             raise ValueError('replay index exceeds maximum response size')
         part_files = self._parse_part_files(manifest, indexed=True)
 
-        index_path = self._get_verified_index_path(descriptor)
+        try:
+            index_path = self._get_verified_index_path(descriptor)
+        except FileNotFoundError as exc:
+            # A published manifest is the commit pointer for its sidecar.
+            # Missing payload after that point is an invalid bundle, unlike
+            # a legacy replay whose manifest never declared an index.
+            raise ValueError('declared replay index file is missing') from exc
         index_bytes = self._read_regular_file_bytes(index_path, self.MAX_INDEX_BYTES)
         if (
                 len(index_bytes) != descriptor['size']
