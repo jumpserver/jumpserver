@@ -1,3 +1,4 @@
+from django.conf import settings
 from private_storage.servers import NginxXAccelRedirectServer, DjangoServer
 
 
@@ -6,9 +7,9 @@ class StaticFileServer(object):
     @staticmethod
     def serve(private_file):
         full_path = private_file.full_path
-        # todo: gzip 文件录像 nginx 处理后，浏览器无法正常解析内容
-        # 造成在线播放失败，暂时仅使用 nginx 处理 mp4 录像文件
-        if full_path.endswith('.mp4'):
+        # Nginx handles MP4 in production; the dev server must stream it itself.
+        # gzip replays keep using Django because Nginx changes their encoding.
+        if full_path.endswith('.mp4') and not settings.DEBUG_DEV:
             return NginxXAccelRedirectServer.serve(private_file)
         else:
             return DjangoServer.serve(private_file)

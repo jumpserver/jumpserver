@@ -120,6 +120,86 @@ REDIS_PORT: 6379
 # REDIS_DB_CELERY: 3
 # REDIS_DB_CACHE: 4
 
+# Windows/RDP 录像与 Video Worker（以下均为示例，按组件分别配置）
+# Core 自身只使用录像存储配置；终端组件的录像存储也可以在管理界面配置。
+# SERVER_REPLAY_STORAGE: {}
+# TERMINAL_REPLAY_STORAGE: {}
+#
+# 使用 jumpserver/installer 时，VIDEO_WORKER_ENABLED 控制本地容器是否启动；
+# 外部分离部署 Worker 时设为 0。它不是 Core 的运行时开关。
+# VIDEO_WORKER_ENABLED: 0
+# 下面两个参数应传给实际录制 Windows 会话的 KoKo/Lion，而非仅传给 Core。
+# installer 只管理 KoKo；独立部署的 Lion 需在其自身环境配置。
+# VIDEO_WORKER_HOST 必须从 KoKo/Lion 所在网络可达，不能盲用 127.0.0.1。
+# ENABLE_VIDEO_WORKER: true
+# VIDEO_WORKER_HOST: http://video-worker:9000
+#
+# 其余 VIDEO_WORKER_* 参数属于 Video Worker 进程，不由 Core 读取；
+# 请写入独立 Worker 的环境变量/配置文件，或 installer 的 config.txt。
+# Worker 的 CORE_HOST 是从 Worker 容器/主机可访问的 Core URL；
+# BOOTSTRAP_TOKEN、LOG_LEVEL 的 Core 示例见本文件前面。
+# CORE_HOST: http://core:8080
+# VIDEO_WORKER_NO_AUTH: false
+# VIDEO_WORKER_COUNT: 1  # 旧版转换 worker 数，持久任务并发见 QUEUE_WORKERS
+# VIDEO_WORKER_CLEAN_PERIOD: 7
+# VIDEO_WORKER_TASK_MODE: transcode_only  # full = 转码 + OCR；仅对新任务生效
+# VIDEO_WORKER_ANALYSIS_ENABLED: false   # 旧开关，仅在 TASK_MODE 未设置时生效
+# VIDEO_WORKER_DATA_DIR: data
+# VIDEO_WORKER_QUEUE_DB_PATH: data/queue.db
+# VIDEO_WORKER_INDEX_DB_PATH: data/index.db
+# VIDEO_WORKER_ARTIFACTS_DIR: data/artifacts
+# VIDEO_WORKER_QUEUE_WORKERS: 1
+# VIDEO_WORKER_GUACENC_PATH: guacenc-cli
+# VIDEO_WORKER_FFPROBE_PATH: ffprobe
+# VIDEO_WORKER_FFMPEG_PATH: ffmpeg
+# VIDEO_WORKER_NODE_PATH: node
+# VIDEO_WORKER_GUA_RENDERER_PATH: tools/gua-render/render.js
+# VIDEO_WORKER_CHROME_PATH: ''
+# VIDEO_WORKER_RENDER_INTERVAL: 30s
+# VIDEO_WORKER_FRAME_FILTER_MODE: shadow  # off / shadow / active
+# VIDEO_WORKER_FRAME_SETTLE: 0s
+# VIDEO_WORKER_BROWSER_PROBE_INTERVAL: 20s
+# VIDEO_WORKER_FILE_PROBE_INTERVAL: 30s
+# VIDEO_WORKER_HIGH_RISK_COOLDOWN: 5s
+# VIDEO_WORKER_FRAME_FILTER_CONFIRMATIONS: 2
+# VIDEO_WORKER_OCR_ENGINE: paddleocr
+# VIDEO_WORKER_OCR_WORKERS: 1
+# VIDEO_WORKER_PADDLE_PYTHON_PATH: python3
+# VIDEO_WORKER_PADDLE_SIDECAR_PATH: tools/paddleocr/sidecar.py
+# VIDEO_WORKER_PADDLE_CACHE_DIR: data/paddle-cache
+# VIDEO_WORKER_PADDLE_MODEL_SOURCE: BOS
+# VIDEO_WORKER_PADDLE_DEVICE: cpu  # GPU 容器可使用 gpu:0
+# VIDEO_WORKER_PADDLE_DETECTION_MODEL: PP-OCRv6_medium_det
+# VIDEO_WORKER_PADDLE_RECOGNITION_MODEL: PP-OCRv6_medium_rec
+# VIDEO_WORKER_PADDLE_DETECTION_MODEL_DIR: ''
+# VIDEO_WORKER_PADDLE_RECOGNITION_MODEL_DIR: ''
+# VIDEO_WORKER_PADDLE_CPU_THREADS: 4
+# VIDEO_WORKER_PADDLE_STARTUP_TIMEOUT: 5m
+# VIDEO_WORKER_PADDLE_REQUEST_TIMEOUT: 2m
+# VIDEO_WORKER_PADDLE_SHUTDOWN_TIMEOUT: 10s
+# VIDEO_WORKER_SHUTDOWN_TIMEOUT: 10s
+# VIDEO_WORKER_TASK_TIMEOUT: 2h
+# VIDEO_WORKER_ADMIN_ENABLED: false
+# VIDEO_WORKER_ADMIN_TOKEN: ''  # 启用管理页时通过 Secret 注入
+# VIDEO_WORKER_SECRET_KEY: ''   # 通过 Secret 注入，不要写入仓库
+# Video Worker 特有的通用参数，独立部署时还可覆盖默认监听、证书和存储：
+# NAME: '[Video-Worker]-ocr-01'
+# IGNORE_VERIFY_CERTS: false
+# BIND_HOST: 0.0.0.0
+# HTTPD_PORT: 9000
+# LION_BITRATE: 1
+# LION_RESOLUTION: 1280x720
+# STORAGE_TYPE: ''  # 默认从 Core 获取录像存储配置，通常不要覆盖
+# STORAGE_ENDPOINT: ''
+# STORAGE_BUCKET: ''
+# STORAGE_ACCESS_KEY: ''
+# STORAGE_SECRET_KEY: ''
+# STORAGE_REGION: ''
+# STORAGE_ACCOUNT_NAME: ''
+# STORAGE_ACCOUNT_KEY: ''
+# STORAGE_ENDPOINT_SUFFIX: ''
+# STORAGE_CONTAINER_NAME: ''
+
 # Vault storage, OpenBao is the default backend when enabled.
 # 内置 OpenBao 作为默认 Vault backend；开启后请先确认 OpenBao Server 已完成初始化和授权
 # VAULT_ENABLED: true

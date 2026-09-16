@@ -33,14 +33,38 @@ from terminal.api.virtualapp.provider import AppProviderDeploymentViewSet, AppPr
 from terminal.automations.deploy_app_provider import (
     DeployAppProviderManager, default_panda_image, stage_resources,
 )
-from terminal.const import ComponentLoad
+from terminal.const import ComponentLoad, SessionErrorReason
 from terminal.models import Applet, AppProvider, AppProviderDeployment, Terminal, VirtualApp, VirtualAppPublication
-from terminal.serializers import AppProviderSerializer
+from terminal.serializers import AppProviderSerializer, SessionSerializer
 from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
 from terminal.tasks import (
     AppProviderDeploymentError, run_app_provider_deployment, run_app_provider_deployments,
 )
 from terminal.utils import virtualapp as image_archives
+
+
+class SessionErrorReasonSerializerTests(SimpleTestCase):
+    def test_partial_update_can_clear_replay_failure(self):
+        serializer = SessionSerializer(data={'error_reason': ''}, partial=True)
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data['error_reason'], '')
+
+    def test_partial_update_accepts_known_replay_failure(self):
+        serializer = SessionSerializer(
+            data={'error_reason': SessionErrorReason.replay_convert_failed}, partial=True
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(
+            serializer.validated_data['error_reason'], SessionErrorReason.replay_convert_failed
+        )
+
+    def test_partial_update_rejects_unknown_replay_failure(self):
+        serializer = SessionSerializer(data={'error_reason': 'unknown_reason'}, partial=True)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('error_reason', serializer.errors)
 
 
 class PackageRootLocateTests(SimpleTestCase):
