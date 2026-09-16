@@ -1249,7 +1249,7 @@ msgid "Check engine"
 msgstr "검출 엔진"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "귀하의 계정 및 비밀번호 강도 점검"
 
 #: accounts/models/automations/check_account.py:135
@@ -1260,7 +1260,7 @@ msgstr ""
 "계정 비밀번호의 보안성을 점검하고 분석, 비밀번호 강도, 유출 상황 등을 포함"
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "계정과 비밀번호의 중복 여부 점검"
 
 #: accounts/models/automations/check_account.py:143

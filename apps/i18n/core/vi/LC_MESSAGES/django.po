@@ -1254,7 +1254,7 @@ msgid "Check engine"
 msgstr "Công cụ phát hiện"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "Kiểm tra độ mạnh của tài khoản và mật khẩu của bạn"
 
 #: accounts/models/automations/check_account.py:135
@@ -1266,7 +1266,7 @@ msgstr ""
 "mạnh của mật khẩu, tình trạng rò rỉ, v.v."
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "Kiểm tra xem tài khoản và mật khẩu có bị trùng lặp không"
 
 #: accounts/models/automations/check_account.py:143

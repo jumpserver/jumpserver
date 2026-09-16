@@ -1253,7 +1253,7 @@ msgid "Check engine"
 msgstr "検出エンジン"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "あなたのアカウントとパスワードの強度をチェックしてください。"
 
 #: accounts/models/automations/check_account.py:135
@@ -1265,7 +1265,7 @@ msgstr ""
 "ワードの強度や漏洩状況などが含まれます。"
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "アカウントとパスワードの重複をチェックしてください。"
 
 #: accounts/models/automations/check_account.py:143

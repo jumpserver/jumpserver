@@ -1254,7 +1254,7 @@ msgid "Check engine"
 msgstr "Motor de Detecção"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "Verifique a força da sua conta e senha"
 
 #: accounts/models/automations/check_account.py:135
@@ -1266,7 +1266,7 @@ msgstr ""
 "incluindo a força da senha e situações de vazamento."
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "Verifique se as contas e senhas são duplicadas"
 
 #: accounts/models/automations/check_account.py:143
