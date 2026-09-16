@@ -1,10 +1,8 @@
-import json
 import tempfile
 import threading
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import requests
 from django.db import transaction
 from django.test import SimpleTestCase
 from rest_framework.test import force_authenticate
@@ -12,16 +10,16 @@ from rest_framework.test import force_authenticate
 from accounts.api.account.credential import CredentialClientViewSet
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.demos.python.jms_pam.agent import Agent, read_json
-from accounts.demos.python.jms_pam.main import JumpServerPAMClient
+from accounts.demos.python.jms_pam.common.exception import JumpServerPAMSDKException
+from accounts.demos.python.jms_pam.credential.v1 import models
 from accounts.models import ClientAccessConfiguration, CredentialClientStatus
 from accounts.tests.base import CredentialTestCase
 
 
 def http_error(code, status=403):
-    response = requests.Response()
-    response.status_code = status
-    response._content = json.dumps({'code': code, 'detail': 'DO_NOT_LOG_SECRET'}).encode()
-    return requests.HTTPError(response=response)
+    return JumpServerPAMSDKException(
+        code, 'request failed', status_code=status, detail='DO_NOT_LOG_SECRET',
+    )
 
 
 class ClientIsolationTests(SimpleTestCase):
@@ -41,12 +39,12 @@ class ClientIsolationTests(SimpleTestCase):
 
     @staticmethod
     def fetched(key):
-        return {'key': key, 'revision': 2,
+        return models.GetCredentialResponse()._deserialize({'key': key, 'revision': 2,
                 'asset': {'id': 'asset', 'name': 'asset', 'address': '127.0.0.1'},
-                'account': {'id': key, 'name': key, 'username': key, 'secret_type': 'password', 'secret': 'new'}}
+                'account': {'id': key, 'name': key, 'username': key, 'secret_type': 'password', 'secret': 'new'}})
 
     def test_partial_fetch_revokes_one_and_writes_other_results(self):
-        self.agent.remote.get_credential.side_effect = [self.fetched('a'), http_error('credential_not_selected'), self.fetched('c')]
+        self.agent.remote.GetCredential.side_effect = [self.fetched('a'), http_error('credential_not_selected'), self.fetched('c')]
         with patch('sys.stderr') as stderr:
             errors = self.agent.poll()
         self.assertEqual(errors, {'b': 'credential_not_selected'})
@@ -59,9 +57,12 @@ class ClientIsolationTests(SimpleTestCase):
         self.assertEqual(self.agent.state['a']['revision'], 1)
 
     def test_temporary_failures_preserve_only_failed_item(self):
-        for error in (requests.Timeout(), http_error('credential_changing', 400), http_error('credential_not_found', 500)):
+        for error in (
+            JumpServerPAMSDKException('NetworkError', 'slow'),
+            http_error('credential_changing', 400), http_error('credential_not_found', 500),
+        ):
             with self.subTest(error=type(error).__name__):
-                self.agent.remote.get_credential.side_effect = [self.fetched('a'), error, self.fetched('c')]
+                self.agent.remote.GetCredential.side_effect = [self.fetched('a'), error, self.fetched('c')]
                 self.agent.poll()
                 self.assertEqual(self.agent.credentials['b']['revision'], 1)
                 self.assertEqual(self.agent.credentials['c']['revision'], 2)
@@ -69,73 +70,63 @@ class ClientIsolationTests(SimpleTestCase):
     def test_identity_failure_does_not_commit_partial_batch(self):
         for status, code in ((401, 'authentication_failed'), (403, 'client_disabled'), (403, 'configuration_disabled')):
             with self.subTest(code=code):
-                self.agent.remote.get_credential.reset_mock()
-                self.agent.remote.get_credential.side_effect = [self.fetched('a'), http_error(code, status), self.fetched('c')]
-                with self.assertRaises(requests.HTTPError):
+                self.agent.remote.GetCredential.reset_mock()
+                self.agent.remote.GetCredential.side_effect = [self.fetched('a'), http_error(code, status), self.fetched('c')]
+                with self.assertRaises(JumpServerPAMSDKException):
                     self.agent.poll()
                 self.assertEqual(self.agent.credentials['a']['revision'], 1)
-                self.assertEqual(self.agent.remote.get_credential.call_count, 2)
+                self.assertEqual(self.agent.remote.GetCredential.call_count, 2)
 
     def test_heartbeat_cleanup_and_late_response(self):
-        reply = {'updated': ['a'], 'errors': [{'key': 'b', 'code': 'credential_not_authorized'}]}
-        self.agent.remote.heartbeat.return_value = reply
+        reply = models.HeartbeatResponse()._deserialize({
+            'updated': ['a'], 'errors': [{'key': 'b', 'code': 'credential_not_authorized'}],
+            'date_last_seen': '2026-09-16T00:00:00Z',
+        })
+        self.agent.remote.Heartbeat.return_value = reply
         self.agent.heartbeat()
         self.assertNotIn('b', self.agent.credentials)
         self.assertNotIn('b', self.agent.state)
         self.agent.credentials['b'] = {'revision': 2}
-        self.agent.state['b'] = {'revision': 2}
+        self.agent.state['b'] = {'key': 'b', 'revision': 2, 'account_id': 'b'}
 
         def concurrent_confirmation(_):
             # Even a new confirmation of the same revision must survive an old response.
             self.agent.state['b'] = dict(self.agent.state['b'])
             return reply
 
-        self.agent.remote.heartbeat.side_effect = concurrent_confirmation
+        self.agent.remote.Heartbeat.side_effect = concurrent_confirmation
         self.agent.heartbeat()
         self.assertIn('b', self.agent.credentials)
         self.assertIn('b', self.agent.state)
 
-    def test_sdk_partial_heartbeat_preserves_new_confirmation(self):
-        sdk = JumpServerPAMClient('http://localhost', 'id', 'secret', instance_id='isolation-test')
-        self.addCleanup(sdk.close)
-        sdk._applied = {'a': {'revision': 1}, 'b': {'revision': 1}}
-        reply = {'updated': [], 'errors': [{'key': 'a', 'code': 'credential_revision_mismatch'},
-                                         {'key': 'b', 'code': 'credential_not_selected'}]}
-        sdk.http.heartbeat = Mock(return_value=reply)
-        sdk.heartbeat()
-        self.assertEqual(set(sdk._applied), {'a'})
-        sdk._applied['b'] = {'revision': 2}
-        def new_confirmation(_):
-            sdk._applied['b'] = dict(sdk._applied['b'])
-            return reply
-        sdk.http.heartbeat.side_effect = new_confirmation
-        sdk.heartbeat()
-        self.assertIn('b', sdk._applied)
-
     def test_late_fetch_rejection_preserves_new_confirmation(self):
-        def denied_after_confirmation(key):
-            self.agent.state[key] = dict(self.agent.state[key])
+        def denied_after_confirmation(request):
+            self.agent.state[request.Key] = dict(self.agent.state[request.Key])
             raise http_error('credential_not_selected')
-        self.agent.remote.get_credential.side_effect = denied_after_confirmation
+        self.agent.remote.GetCredential.side_effect = denied_after_confirmation
         self.agent.poll(keys=['b'])
         self.assertIn('b', self.agent.credentials)
         self.assertIn('b', self.agent.state)
 
     def test_late_rejection_preserves_same_revision_refetch(self):
         current = self.fetched('b')
-        current['revision'] = 1
+        current.Revision = 1
         other_remote = Mock()
-        other_remote.get_credential.return_value = current
-        def old_rejection(key):
-            self.agent.poll(keys=[key], remote=other_remote)
+        other_remote.GetCredential.return_value = current
+        def old_rejection(request):
+            self.agent.poll(keys=[request.Key], remote=other_remote)
             raise http_error('credential_not_selected')
-        self.agent.remote.get_credential.side_effect = old_rejection
+        self.agent.remote.GetCredential.side_effect = old_rejection
         self.agent.poll(keys=['b'])
         self.assertIn('b', self.agent.credentials)
         self.assertIn('b', self.agent.state)
 
     def test_poll_failure_does_not_skip_heartbeat_or_stop_loop(self):
-        for error, expected in ((OSError('disk full'), 1), (requests.Timeout(), 1), (http_error('client_disabled'), 0)):
+        for error, expected in (
+            (OSError('disk full'), 1),
+            (JumpServerPAMSDKException('NetworkError', 'slow'), 1),
+            (http_error('client_disabled'), 0),
+        ):
             self.agent.start_local_server = Mock()
             self.agent.notification_session = Mock()
             self.agent.events = None
@@ -151,7 +142,7 @@ class ClientIsolationTests(SimpleTestCase):
         from accounts.demos.python.jms_pam.events import DeliveryError
         self.agent.config['notification_url'] = 'http://localhost/events'
         self.agent.notification_session = Mock()
-        self.agent.remote.get_credential.side_effect = requests.Timeout()
+        self.agent.remote.GetCredential.side_effect = JumpServerPAMSDKException('NetworkError', 'slow')
         with self.assertRaises(DeliveryError):
             self.agent.notify({'event': 'credential.published', 'key': 'a', 'revision': 1}, self.agent.remote)
         self.agent.notification_session.post.assert_not_called()

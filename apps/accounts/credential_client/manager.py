@@ -1,4 +1,3 @@
-import json
 import shlex
 from datetime import timedelta
 
@@ -309,17 +308,21 @@ class ClientAccessConfigurationManager:
             'notification_enabled': configuration.notification_enabled,
         }
         if configuration.type == CredentialClientInstance.Type.sdk:
-            config['app_secret'] = configuration.application.secret
             code = render_to_string('accounts/credential_client/sdk_example.py.tpl', {
-                'credential_keys': json.dumps(keys),
                 'notification_enabled': configuration.notification_enabled,
             })
+            config = render_to_string('accounts/credential_client/sdk_config.py.tpl', {
+                'endpoint': repr(endpoint),
+                'app_id': repr(str(configuration.application_id)),
+                'app_secret': repr(configuration.application.secret),
+                'org_id': repr(str(configuration.org_id)),
+                'configuration_id': repr(str(configuration.id)),
+                'credential_keys': repr(keys),
+                'notification_enabled': repr(configuration.notification_enabled),
+            })
             return {
-                'type': 'sdk', 'config': config, 'code': code, 'filename': 'jms-pam.json',
-                'install_command': (
-                    'python3 -m pip install --index-url https://pypi.org/simple '
-                    f'{shlex.quote(endpoint + "/api/v1/accounts/python-sdk/")}'
-                ),
+                'type': 'sdk', 'config': config, 'code': code, 'filename': 'jms_pam_config.py',
+                'install_command': 'python3 -m pip install --upgrade jms-pam',
             }
         token = signing.dumps({
             'application_id': str(configuration.application_id),
@@ -331,8 +334,7 @@ class ClientAccessConfigurationManager:
         credentials = ' '.join(f'--credential {shlex.quote(key)}' for key in keys)
         command = (
             f'sudo python3 -m venv {shlex.quote(path + "/venv")} && '
-            f'sudo {shlex.quote(path + "/venv/bin/pip")} install --index-url https://pypi.org/simple '
-            f'{shlex.quote(endpoint + "/api/v1/accounts/python-sdk/")} && '
+            f'sudo {shlex.quote(path + "/venv/bin/pip")} install --upgrade jms-pam && '
             f'sudo {shlex.quote(path + "/venv/bin/jms-pam-agent")} install --endpoint {shlex.quote(endpoint)} '
             f'--token {shlex.quote(token)} --instance-id "$(hostname)" {credentials} '
             f'--app-user {shlex.quote(configuration.app_user)}'

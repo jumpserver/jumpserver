@@ -14,7 +14,10 @@ from rest_framework.permissions import AllowAny
 
 from accounts.api.account.credential import CredentialClientViewSet
 from accounts.demos.python.jms_pam.agent import Agent, atomic_write_json, install, read_json, register
-from accounts.demos.python.jms_pam.main import JumpServerPAMClient
+from accounts.demos.python.jms_pam.common.credential import Credential as PAMCredential
+from accounts.demos.python.jms_pam.common.exception import JumpServerPAMSDKException
+from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
 from accounts.models import ClientAccessConfiguration, CredentialClientInstance
 from accounts.tests.base import CredentialTestCase
 
@@ -113,7 +116,7 @@ class AgentInstallTests(SimpleTestCase):
     def test_failed_identity_check_preserves_configuration(self):
         original = self.first_install()
         with patch('accounts.demos.python.jms_pam.agent.Agent') as agent:
-            agent.return_value.heartbeat.side_effect = requests.HTTPError()
+            agent.return_value.heartbeat.side_effect = JumpServerPAMSDKException('HTTPError', 'failed')
             with self.assertRaisesRegex(RuntimeError, 'Configuration was preserved'):
                 register(self.args)
         self.assertEqual(read_json(self.args.config), original)
@@ -130,19 +133,16 @@ class AgentInstallTests(SimpleTestCase):
         ])
 
     def test_sdk_requires_explicit_stable_instance_id(self):
-        with patch.dict(os.environ, {}, clear=True):
-            for value in (None, '', ' ', ' worker ', 'a' * 129):
-                with self.assertRaisesRegex(ValueError, 'stable, unique ID'):
-                    JumpServerPAMClient('http://localhost', 'id', 'secret', instance_id=value)
-            first = JumpServerPAMClient('http://localhost', 'id', 'secret', instance_id='orders-worker-1')
-            second = JumpServerPAMClient('http://localhost', 'id', 'secret', instance_id='orders-worker-2')
-            self.assertNotEqual(first.http.instance_id, second.http.instance_id)
-            first.close()
-            second.close()
-        with patch.dict(os.environ, {'JMS_PAM_INSTANCE_ID': 'orders-worker-3'}):
-            client = JumpServerPAMClient('http://localhost', 'id', 'secret')
-            self.assertEqual(client.instance_id, 'orders-worker-3')
-            client.close()
+        cred = PAMCredential('id', 'secret')
+        profile = ClientProfile(endpoint='http://localhost', configuration_id='config')
+        for value in (None, '', ' ', ' worker ', 'a' * 129):
+            with self.assertRaisesRegex(ValueError, 'stable, unique ID'):
+                CredentialClient(cred, value, profile)
+        first = CredentialClient(cred, 'orders-worker-1', profile)
+        second = CredentialClient(cred, 'orders-worker-2', profile)
+        self.assertNotEqual(first.instance_id, second.instance_id)
+        first.close()
+        second.close()
 
 
 class AgentDeliveryTests(SimpleTestCase):
@@ -187,7 +187,8 @@ class AgentDeliveryTests(SimpleTestCase):
             "DB_USER=app_b\nDB_PASSWORD='new secret'\"'\"'s value'\n",
         )
         hook.assert_called_once_with(self.rule, 'published', 'db', 2)
-        self.agent.remote.confirm.assert_called_once_with({
+        request = self.agent.remote.ConfirmCredential.call_args.args[0]
+        self.assertEqual(request._serialize(), {
             'key': 'db', 'revision': 2, 'account_id': 'account-2',
         })
         self.assertEqual(self.agent.delivery_state['db']['status'], 'applied')
@@ -199,20 +200,22 @@ class AgentDeliveryTests(SimpleTestCase):
         with patch('sys.stderr'):
             self.agent.deliver('db')
         self.assertEqual(self.agent.delivery_state['db']['status'], 'pending')
-        self.agent.remote.confirm.assert_not_called()
+        self.agent.remote.ConfirmCredential.assert_not_called()
 
         self.agent.deliver('db')
         self.assertEqual(hook.call_count, 2)
-        self.agent.remote.confirm.assert_called_once()
+        self.agent.remote.ConfirmCredential.assert_called_once()
 
     @patch('accounts.demos.python.jms_pam.agent.run_hook')
     def test_confirmation_retry_does_not_run_apply_again(self, hook):
-        self.agent.remote.confirm.side_effect = [requests.Timeout(), None]
+        self.agent.remote.ConfirmCredential.side_effect = [
+            JumpServerPAMSDKException('NetworkError', 'slow'), None,
+        ]
         with patch('sys.stderr'):
             self.agent.deliver('db')
         self.agent.deliver('db')
         hook.assert_called_once()
-        self.assertEqual(self.agent.remote.confirm.call_count, 2)
+        self.assertEqual(self.agent.remote.ConfirmCredential.call_count, 2)
         self.assertEqual(self.agent.state['db']['revision'], 2)
 
     @patch('accounts.demos.python.jms_pam.agent.run_hook')
@@ -230,10 +233,11 @@ class AgentDeliveryTests(SimpleTestCase):
 
         hook.side_effect = publish_new_revision
         self.agent.deliver('db')
-        self.agent.remote.confirm.assert_not_called()
+        self.agent.remote.ConfirmCredential.assert_not_called()
 
         self.agent.deliver('db')
-        self.agent.remote.confirm.assert_called_once_with({
+        request = self.agent.remote.ConfirmCredential.call_args.args[0]
+        self.assertEqual(request._serialize(), {
             'key': 'db', 'revision': 3, 'account_id': 'account-3',
         })
 
@@ -266,7 +270,7 @@ class AgentDeliveryTests(SimpleTestCase):
         self.rule['confirmation'] = 'manual'
         self.agent.deliver('db')
         hook.assert_called_once()
-        self.agent.remote.confirm.assert_not_called()
+        self.agent.remote.ConfirmCredential.assert_not_called()
 
     @patch('accounts.demos.python.jms_pam.agent.run_hook')
     def test_delivery_refuses_to_replace_symlink(self, hook):
@@ -281,4 +285,4 @@ class AgentDeliveryTests(SimpleTestCase):
         self.assertTrue(self.target.is_symlink())
         self.assertEqual(self.agent.delivery_state['db']['error'], 'ValueError')
         hook.assert_not_called()
-        self.agent.remote.confirm.assert_not_called()
+        self.agent.remote.ConfirmCredential.assert_not_called()

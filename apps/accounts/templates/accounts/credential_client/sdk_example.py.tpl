@@ -1,26 +1,44 @@
 import time
-import requests
-from jms_pam import JumpServerPAMClient
 
-# Set JMS_PAM_INSTANCE_ID before starting: a stable, unique ID for EACH independent
-# application process/connection pool. Do not reuse one ID across workers or hosts.
-# Create the SDK client inside each worker, after any process fork.
+from jms_pam.common.exception import JumpServerPAMSDKException
+from jms_pam.credential.v1 import credential_client, models
+from jms_pam_config import cred, profile, credential_keys, notification_enabled
 
-{% if notification_enabled %}
-def on_event(event):
-    # Replace with your application handler. No secrets are included.
-    print(event['event'], event.get('key'), event.get('revision'))
 
-{% endif %}
-with JumpServerPAMClient.from_config('jms-pam.json') as client:
-{% if notification_enabled %}    client.start_events(handler=on_event)
-{% endif %}    while True:
-        for key in {{ credential_keys|safe }}:
+with credential_client.CredentialClient(
+    cred, instance_id='order-service-node-1', profile=profile,
+) as client:
+    if notification_enabled:
+        client.SubscribeEvents(models.SubscribeEventsRequest(Enabled=True))
+
+    applied = {}
+    while True:
+        for key in credential_keys:
             try:
-                credential = client.get_credential(key)
-                # Connect/reload using credential.username and credential.secret.
-                # Confirm ONLY after the application is using this version:
-                # client.confirm_applied(credential)
-            except requests.RequestException as error:
+                response = client.GetCredential(models.GetCredentialRequest(Key=key))
+
+                # Build and verify a new connection with response.Account.Username
+                # and response.Account.Secret, then release the old connection.
+
+                client.ConfirmCredential(models.ConfirmCredentialRequest(
+                    Key=response.Key,
+                    Revision=response.Revision,
+                    AccountId=response.Account.Id,
+                ))
+                applied[key] = models.CredentialState(
+                    Key=response.Key,
+                    Revision=response.Revision,
+                    AccountId=response.Account.Id,
+                )
+            except JumpServerPAMSDKException as error:
                 print(error)
+
+        client.Heartbeat(models.HeartbeatRequest(Credentials=list(applied.values())))
+        if notification_enabled:
+            events = client.PollEvents(models.PollEventsRequest())
+            for event in events.Events:
+                # Process event, then explicitly report its result.
+                client.ReportEvent(models.ReportEventRequest(
+                    AttemptId=event.AttemptId, Result='success',
+                ))
         time.sleep(30)

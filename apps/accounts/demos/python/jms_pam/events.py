@@ -2,7 +2,8 @@
 import threading
 import uuid
 
-import requests
+from .common.exception import JumpServerPAMSDKException
+from .credential.v1 import models
 
 
 class DeliveryError(Exception):
@@ -19,6 +20,16 @@ class EventWorker(threading.Thread):
         self.last_error = None
         self.pending_report = None
 
+    @staticmethod
+    def report_request(report):
+        names = {
+            'attempt_id': 'AttemptId', 'result': 'Result',
+            'status_code': 'StatusCode', 'reason': 'Reason',
+        }
+        return models.ReportEventRequest(**{
+            names[key]: value for key, value in report.items()
+        })
+
     def deliver(self, event):
         payload = {key: value for key, value in event.items() if key not in ('attempt_id', 'delivery_id')}
         report = {'attempt_id': event['attempt_id'], 'result': 'success'}
@@ -34,18 +45,19 @@ class EventWorker(threading.Thread):
 
     def step(self):
         if self.pending_report:
-            self.remote.event_request('report', **self.pending_report)
+            self.remote.ReportEvent(self.report_request(self.pending_report))
             self.pending_report = None
-        response = self.remote.event_request('')
-        if not response['enabled']:
+        response = self.remote.PollEvents(models.PollEventsRequest())
+        if not response.Enabled:
             self.stopping.set()
             return
-        for event in response['events']:
+        for item in response.Events:
             if self.stopping.is_set():
                 break
+            event = item._serialize()
             self.deliver(event)
             # Retain the report on network failure; do not immediately re-invoke the handler.
-            self.remote.event_request('report', **self.pending_report)
+            self.remote.ReportEvent(self.report_request(self.pending_report))
             self.pending_report = None
 
     def run(self):
@@ -54,14 +66,15 @@ class EventWorker(threading.Thread):
             while not self.stopping.is_set():
                 try:
                     if not subscribed:
-                        subscribed = self.remote.event_request('subscribe', enabled=True)['enabled']
+                        request = models.SubscribeEventsRequest(Enabled=True)
+                        subscribed = self.remote.SubscribeEvents(request).Enabled
                         if not subscribed:
                             break
                     self.step()
                     self.last_error = None
-                except requests.HTTPError as error:
+                except JumpServerPAMSDKException as error:
                     self.last_error = error
-                    if error.response is not None and error.response.status_code in (401, 403):
+                    if error.status_code in (401, 403):
                         # No privileged exception for disabled clients. This is a local observation.
                         try:
                             self.handler({
@@ -71,16 +84,16 @@ class EventWorker(threading.Thread):
                         except Exception:
                             pass
                         break
-                except (requests.RequestException, ValueError, KeyError) as error:
+                except (ValueError, KeyError) as error:
                     self.last_error = error
                 self.stopping.wait(self.interval)
         finally:
             if subscribed:
                 try:
-                    self.remote.event_request('subscribe', enabled=False)
-                except requests.RequestException:
+                    self.remote.SubscribeEvents(models.SubscribeEventsRequest(Enabled=False))
+                except JumpServerPAMSDKException:
                     pass
-            self.remote.session.close()
+            self.remote.close()
 
     def close(self):
         self.stopping.set()

@@ -28,7 +28,11 @@ from accounts.serializers.account.credential import EventReportSerializer
 from accounts.api.account.credential import CredentialClientViewSet
 from accounts.demos.python.jms_pam.events import EventWorker, DeliveryError
 from accounts.demos.python.jms_pam.agent import Agent
-from accounts.demos.python.jms_pam.main import CredentialAPIClient
+from accounts.demos.python.jms_pam.common.credential import Credential as PAMCredential
+from accounts.demos.python.jms_pam.common.exception import JumpServerPAMSDKException
+from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.demos.python.jms_pam.credential.v1 import models
+from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
 from orgs.utils import tmp_to_org
 from orgs.models import Organization
 
@@ -312,7 +316,12 @@ class ApplicationAuditTests(CredentialTestCase):
                 return response.data
             event_request('subscribe', enabled=True)
             remote = Mock(source='jms-pam-agent' if client_type == 'agent' else 'jms-pam')
-            remote.event_request.side_effect = event_request
+            remote.PollEvents.side_effect = lambda _: models.PollEventsResponse()._deserialize(
+                event_request('')
+            )
+            remote.ReportEvent.side_effect = lambda request: models.ReportEventResponse()._deserialize(
+                event_request('report', **request._serialize())
+            )
             handler = Mock(return_value=204)
             EventWorker(remote, handler).step()
             handler.assert_called_once()
@@ -327,20 +336,26 @@ class ApplicationAuditTests(CredentialTestCase):
     def test_generated_sdk_code_with_optional_notifications(self):
         from accounts.credential_client.manager import ClientAccessConfigurationManager
         manager, _ = self.manager()
+        self.application.secret = "secret'\n__import__('os').system('should-not-run')"
+        self.application.save(update_fields=['secret'])
         for enabled in (True, False):
             with self.subTest(notification_enabled=enabled):
                 manager.configuration.notification_enabled = enabled
                 materials = ClientAccessConfigurationManager(manager.configuration).materials('http://localhost')
                 code = materials['code']
                 compile(code, 'generated-sdk.py', 'exec')
-                self.assertEqual(materials['config']['notification_enabled'], enabled)
-                self.assertEqual('def on_event(event):' in code, enabled)
-                self.assertEqual('client.start_events(handler=on_event)' in code, enabled)
-                loop = next(node for node in ast.walk(ast.parse(code)) if isinstance(node, ast.For))
-                self.assertEqual(ast.literal_eval(loop.iter), materials['config']['credential_keys'])
-                self.assertIn('except requests.RequestException as error:', code)
+                compile(materials['config'], materials['filename'], 'exec')
+                config_tree = ast.parse(materials['config'])
+                self.assertTrue(all(
+                    isinstance(node, (ast.ImportFrom, ast.Assign))
+                    for node in config_tree.body
+                ))
+                self.assertIn(f'notification_enabled = {enabled}', materials['config'])
+                self.assertEqual('client.PollEvents' in code, enabled)
+                self.assertIn('except JumpServerPAMSDKException as error:', code)
                 self.assertIn('time.sleep(30)', code)
                 self.assertNotIn(self.application.secret, code)
+                self.assertIn(self.application.secret, materials['config'])
 
     def test_fixed_secret_publication(self):
         manager, events = self.manager()
@@ -559,26 +574,31 @@ class EventWorkerTests(SimpleTestCase):
         remote = Mock(source='jms-pam')
         event = {'attempt_id': 'attempt', 'delivery_id': 'delivery', 'event_id': 'event',
                  'event': 'credential.published', 'key': 'db', 'revision': 2}
-        remote.event_request.side_effect = [
-            {'enabled': True, 'events': [event]}, requests.ConnectionError(),
-            {'result': 'success'}, {'enabled': True, 'events': []},
+        remote.PollEvents.side_effect = [
+            models.PollEventsResponse()._deserialize({'enabled': True, 'events': [event]}),
+            models.PollEventsResponse()._deserialize({'enabled': True, 'events': []}),
+        ]
+        remote.ReportEvent.side_effect = [
+            JumpServerPAMSDKException('NetworkError', 'offline'),
+            models.ReportEventResponse(Result='success'),
         ]
         handler = Mock()
         worker = EventWorker(remote, handler)
-        with self.assertRaises(requests.ConnectionError):
+        with self.assertRaises(JumpServerPAMSDKException):
             worker.step()
         worker.step()
         self.assertEqual(handler.call_count, 1)
         self.assertNotIn('attempt_id', handler.call_args.args[0])
         self.assertIsNone(worker.pending_report)
-        self.assertEqual(remote.event_request.call_args_list[1], remote.event_request.call_args_list[2])
+        reports = [call.args[0]._serialize() for call in remote.ReportEvent.call_args_list]
+        self.assertEqual(reports[0], reports[1])
 
     def test_callback_failure_does_not_leak_exception_or_confirm(self):
         remote = Mock(source='jms-pam')
         worker = EventWorker(remote, Mock(side_effect=ValueError('PASSWORD')))
         worker.deliver({'attempt_id': 'attempt', 'event_id': 'event'})
         self.assertEqual(worker.pending_report, {'attempt_id': 'attempt', 'result': 'failed', 'reason': 'callback_failed'})
-        remote.confirm.assert_not_called()
+        remote.ConfirmCredential.assert_not_called()
 
     def test_agent_writes_before_notification_and_exact_confirmation(self):
         agent = Agent.__new__(Agent)
@@ -602,10 +622,13 @@ class EventWorkerTests(SimpleTestCase):
             agent.confirm('db', 1)
 
     def test_listener_has_own_http_session(self):
-        remote = CredentialAPIClient('http://localhost', 'id', 'secret', instance_id='one', configuration_id='config')
-        other = remote.fork()
+        remote = CredentialClient(
+            PAMCredential('id', 'secret'), 'one',
+            ClientProfile(endpoint='http://localhost', configuration_id='config'),
+        )
+        other = remote.clone()
         self.assertIsNot(remote.session, other.session)
-        self.assertEqual(other.configuration_id, 'config')
+        self.assertEqual(other.profile.ConfigurationId, 'config')
         self.assertEqual(other.instance_id, 'one')
-        remote.session.close()
-        other.session.close()
+        remote.close()
+        other.close()

@@ -2,7 +2,7 @@ import shlex
 import threading
 import json
 from datetime import timedelta
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, patch
 
 import requests
 from django.core import signing
@@ -10,6 +10,7 @@ from django.db import connection, transaction
 from django.db.models import F
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import CaptureQueriesContext
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import override as override_language
 from rest_framework.exceptions import ValidationError, PermissionDenied
@@ -27,9 +28,12 @@ from accounts.api.account.credential import (
 from accounts.api.account.application import IntegrationApplicationViewSet
 from accounts.const import ChangeSecretRecordStatusChoice
 from accounts.demos.python.jms_pam.agent import Agent
-from accounts.demos.python.jms_pam.main import (
-    CLIENT_PATH, CredentialAPIClient, HTTPSignatureAuth, SignedClient, JumpServerPAMClient,
-)
+from accounts.demos.python.jms_pam.common.abstract_client import HTTPSignatureAuth
+from accounts.demos.python.jms_pam.common.credential import Credential as PAMCredential
+from accounts.demos.python.jms_pam.common.exception import JumpServerPAMSDKException
+from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.demos.python.jms_pam.credential.v1 import models
+from accounts.demos.python.jms_pam.credential.v1.credential_client import CLIENT_PATH, CredentialClient
 from accounts.models import (
     Account, AutomationExecution, ChangeSecretRecord, ApplicationCredential, IntegrationApplication,
     ApplicationAudit, ClientAccessConfiguration,
@@ -468,7 +472,7 @@ class CredentialRotationTestCase(CredentialTestCase):
         data = ClientAccessConfigurationManager(configuration).materials('http://testserver')
         self.assertIn(f'--app-user {shlex.quote(app_user)}', data['install_command'])
         self.assertIn(
-            'pip install --index-url https://pypi.org/simple http://testserver/api/v1/accounts/python-sdk/',
+            'pip install --upgrade jms-pam',
             data['install_command'],
         )
         self.assertNotIn('--find-links', data['install_command'])
@@ -700,11 +704,12 @@ class CredentialRotationTestCase(CredentialTestCase):
         with override_settings(SECURITY_VIEW_AUTH_NEED_MFA=False):
             response = view(self.request('post', path), pk=configuration.id)
             self.assertEqual(response.status_code, 200, response.data)
-            self.assertEqual(response.data['config']['app_secret'], self.application.secret)
+            self.assertEqual(response.data['filename'], 'jms_pam_config.py')
+            self.assertIn(repr(self.application.secret), response.data['config'])
+            compile(response.data['config'], response.data['filename'], 'exec')
             self.assertEqual(
                 response.data['install_command'],
-                'python3 -m pip install --index-url https://pypi.org/simple '
-                'http://testserver/api/v1/accounts/python-sdk/',
+                'python3 -m pip install --upgrade jms-pam',
             )
             self.assertEqual(response['Cache-Control'], 'no-store')
             ordinary_user = User.objects.create_user(username='credential-reader', password='password')
@@ -786,10 +791,9 @@ class CredentialRotationTestCase(CredentialTestCase):
     def test_generated_python_configuration_loads_and_signed_sdk_fetch_authenticates(self):
         configuration = self.create_configuration()
         materials = ClientAccessConfigurationManager(configuration).materials('http://testserver')
-        with patch('builtins.open', mock_open(read_data=json.dumps(materials['config']))), \
-                patch.dict('os.environ', {'JMS_PAM_INSTANCE_ID': 'signed-sdk'}):
-            sdk = JumpServerPAMClient.from_config('jms-pam.json')
-        self.assertEqual(sdk.http.configuration_id, str(configuration.id))
+        compile(materials['config'], materials['filename'], 'exec')
+        self.assertEqual(materials['filename'], 'jms_pam_config.py')
+        self.assertIn(f"configuration_id='{configuration.id}'", materials['config'])
         prepared = requests.Request(
             'GET', f'http://testserver{CLIENT_PATH}/credential/',
             params={'key': self.credential.key, 'configuration_id': str(configuration.id), 'instance_id': 'signed-sdk'},
@@ -803,7 +807,6 @@ class CredentialRotationTestCase(CredentialTestCase):
             response = view(request)
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data['account']['secret'], self.primary.secret)
-        sdk.close()
 
 
 class CredentialClientStateWriteTests(CredentialTestCase):
@@ -975,6 +978,17 @@ class CredentialClientInstanceDeletionTestCase(SimpleTestCase):
 
 
 class PythonSDKTestCase(SimpleTestCase):
+    def test_generated_example_subscribes_and_deduplicates_applied_state(self):
+        code = render_to_string(
+            'accounts/credential_client/sdk_example.py.tpl',
+            {'notification_enabled': True},
+        )
+
+        compile(code, 'sdk_example.py', 'exec')
+        self.assertIn('client.SubscribeEvents(', code)
+        self.assertIn('applied[key] = models.CredentialState(', code)
+        self.assertIn('Credentials=list(applied.values())', code)
+
     def test_http_signature(self):
         request = requests.Request(
             'GET',
@@ -995,68 +1009,117 @@ class PythonSDKTestCase(SimpleTestCase):
         )
 
     def test_http_error_includes_server_detail(self):
-        response = Mock()
-        response.raise_for_status.side_effect = requests.HTTPError('403 Client Error')
-        response.json.return_value = {
-            'detail': 'The application does not use SDK access mode.',
-        }
-        client = SignedClient('https://jms.example.com', 'app-id', 'secret')
+        response = Mock(status_code=403, reason='Forbidden')
+        response.json.return_value = {'code': 'configuration_disabled', 'detail': 'Disabled.'}
+        client = CredentialClient(
+            PAMCredential('app-id', 'secret'), 'instance',
+            ClientProfile(endpoint='https://jms.example.com', configuration_id='config'),
+        )
         client.session.request = Mock(return_value=response)
 
-        with self.assertRaisesRegex(
-            requests.HTTPError,
-            '403 Client Error: The application does not use SDK access mode.',
-        ):
-            client.request('GET', '/credential/')
+        with self.assertRaises(JumpServerPAMSDKException) as error:
+            client.GetCredential(models.GetCredentialRequest(Key='database'))
+        self.assertEqual(error.exception.code, 'configuration_disabled')
+        self.assertEqual(error.exception.status_code, 403)
+        self.assertEqual(error.exception.detail, 'Disabled.')
 
-    def test_sdk_and_agent_share_credential_protocol_client(self):
-        sdk = CredentialAPIClient(
-            'https://jms.example.com', 'app-id', 'secret',
-            instance_id='sdk-instance',
+    def test_client_contract_and_model_mapping(self):
+        client = CredentialClient(
+            PAMCredential('app-id', 'secret'), 'sdk-instance',
+            ClientProfile(
+                endpoint='https://jms.example.com', configuration_id='config',
+            ),
         )
-        sdk.request = Mock(return_value={})
-        sdk.get_credential('database')
-        sdk.confirm({'key': 'database', 'revision': 1, 'account_id': 'account'})
-        sdk.heartbeat([])
+        payloads = [
+            {'key': 'database', 'revision': 1,
+             'asset': {'id': 'asset', 'name': 'db', 'address': '127.0.0.1',
+                       'platform': {'id': 'platform', 'name': 'PostgreSQL', 'category': 'db', 'type': 'postgresql'}},
+             'account': {'id': 'account', 'name': 'db-user', 'username': 'app',
+                         'secret_type': 'password', 'secret': 'secret'}},
+            {'key': 'database', 'revision': 1},
+            {'updated': 1, 'errors': [], 'date_last_seen': '2026-09-16T00:00:00Z'},
+            {'enabled': True}, {'enabled': True, 'events': []}, {'result': 'success'},
+        ]
+        client.session.request = Mock(side_effect=[
+            Mock(status_code=200, json=Mock(return_value=payload), reason='OK')
+            for payload in payloads
+        ])
+        credential = client.GetCredential(models.GetCredentialRequest(Key='database'))
+        client.ConfirmCredential(models.ConfirmCredentialRequest(
+            Key='database', Revision=1, AccountId='account',
+        ))
+        client.Heartbeat(models.HeartbeatRequest(Credentials=[]))
+        client.SubscribeEvents(models.SubscribeEventsRequest(Enabled=True))
+        client.PollEvents(models.PollEventsRequest())
+        client.ReportEvent(models.ReportEventRequest(AttemptId='attempt', Result='success'))
 
-        sdk.request.assert_any_call(
-            'GET', f'{CLIENT_PATH}/credential/',
-            params={'key': 'database', 'instance_id': 'sdk-instance'},
-        )
-        sdk.request.assert_any_call(
-            'POST', f'{CLIENT_PATH}/confirm/',
-            data={
-                'key': 'database', 'revision': 1, 'account_id': 'account',
-                'instance_id': 'sdk-instance',
-            },
-        )
-        sdk.request.assert_any_call(
-            'POST', f'{CLIENT_PATH}/heartbeat/',
-            data={'credentials': [], 'instance_id': 'sdk-instance'},
-        )
+        self.assertEqual(credential.Account.Username, 'app')
+        self.assertEqual(credential.Asset.Platform.Type, 'postgresql')
+        calls = client.session.request.call_args_list
+        self.assertEqual([call.args[:2] for call in calls], [
+            ('GET', f'https://jms.example.com{CLIENT_PATH}/credential/'),
+            ('POST', f'https://jms.example.com{CLIENT_PATH}/confirm/'),
+            ('POST', f'https://jms.example.com{CLIENT_PATH}/heartbeat/'),
+            ('POST', f'https://jms.example.com{CLIENT_PATH}/events/subscribe/'),
+            ('POST', f'https://jms.example.com{CLIENT_PATH}/events/'),
+            ('POST', f'https://jms.example.com{CLIENT_PATH}/events/report/'),
+        ])
+        self.assertEqual(calls[0].kwargs['params'], {
+            'key': 'database', 'instance_id': 'sdk-instance', 'configuration_id': 'config',
+        })
+        self.assertEqual(calls[1].kwargs['json'], {
+            'key': 'database', 'revision': 1, 'account_id': 'account',
+            'instance_id': 'sdk-instance', 'configuration_id': 'config',
+        })
+        common = {'instance_id': 'sdk-instance', 'configuration_id': 'config'}
+        self.assertEqual(calls[2].kwargs['json'], {'credentials': [], **common})
+        self.assertEqual(calls[3].kwargs['json'], {'enabled': True, **common})
+        self.assertEqual(calls[4].kwargs['json'], common)
+        self.assertEqual(calls[5].kwargs['json'], {
+            'attempt_id': 'attempt', 'result': 'success', **common,
+        })
 
-        agent = CredentialAPIClient(
-            'https://jms.example.com', 'agent-id', 'secret',
-            source='jms-pam-agent',
+    def test_network_and_invalid_response_errors_are_normalized(self):
+        client = CredentialClient(
+            PAMCredential('app-id', 'secret'), 'instance',
+            ClientProfile(endpoint='https://jms.example.com', configuration_id='config'),
         )
-        agent.request = Mock(return_value={})
-        agent.get_credential('database')
-        agent.request.assert_called_once_with(
-            'GET', f'{CLIENT_PATH}/credential/', params={'key': 'database'}
-        )
+        client.session.request = Mock(side_effect=requests.Timeout('slow'))
+        with self.assertRaises(JumpServerPAMSDKException) as network:
+            client.GetCredential(models.GetCredentialRequest(Key='database'))
+        self.assertEqual(network.exception.code, 'NetworkError')
+        self.assertIsInstance(network.exception.original_error, requests.Timeout)
+
+        response = Mock(status_code=200, reason='OK')
+        response.json.side_effect = ValueError('bad json')
+        client.session.request.side_effect = None
+        client.session.request.return_value = response
+        with self.assertRaises(JumpServerPAMSDKException) as invalid:
+            client.GetCredential(models.GetCredentialRequest(Key='database'))
+        self.assertEqual(invalid.exception.code, 'ResponseError')
+
+        response.json.side_effect = None
+        response.json.return_value = {
+            'key': 'database', 'revision': 1,
+            'asset': {'id': 'asset'}, 'account': {'id': 'account'},
+        }
+        with self.assertRaises(JumpServerPAMSDKException) as incomplete:
+            client.GetCredential(models.GetCredentialRequest(Key='database'))
+        self.assertEqual(incomplete.exception.code, 'ResponseError')
 
     def test_agent_keeps_previous_credentials_when_write_fails(self):
         agent = Agent.__new__(Agent)
         agent.config = {'credential_keys': ['database']}
         agent.remote = Mock()
-        agent.remote.get_credential.return_value = {
+        agent.remote.GetCredential.return_value = models.GetCredentialResponse()._deserialize({
+            'key': 'database',
             'revision': 2,
             'asset': {'id': 'asset', 'name': 'db', 'address': '127.0.0.1'},
             'account': {
                 'id': 'account', 'name': 'db-user', 'username': 'db-user',
                 'secret_type': 'password', 'secret': 'new-secret',
             },
-        }
+        })
         agent.credentials = {'database': {'revision': 1, 'secret': 'old-secret'}}
         agent.state = {}
         agent.lock = threading.Lock()
