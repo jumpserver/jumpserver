@@ -181,7 +181,7 @@ class ConnectMethodUtil:
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
                     Protocol.mariadb, Protocol.db2,
-                    Protocol.dameng
+                    Protocol.dameng, Protocol.clickhouse
                 ],
                 'match': 'm2m'
             },
