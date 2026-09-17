@@ -13950,6 +13950,10 @@ msgstr "許可證無效"
 #~ msgstr "工單已經關閉"
 
 #: assets/models/asset/web.py assets/const/protocol.py
+msgid "Success selector"
+msgstr "登入成功選擇器"
+
+#: assets/models/asset/web.py assets/const/protocol.py
 msgid ""
 "Selector for an element that appears only after a successful login, e.g. css=#dashboard. "
 "Required for basic autofill."
