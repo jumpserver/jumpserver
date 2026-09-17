@@ -9,7 +9,6 @@ from .luna import *
 from .msg import *
 from .msg import *
 from .other import *
-from .prompt import *
 from .public import *
 from .security import *
 from .settings import *

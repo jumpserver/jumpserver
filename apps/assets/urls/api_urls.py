@@ -41,8 +41,12 @@ urlpatterns = [
     path('assets/<uuid:pk>/perm-user-groups/<uuid:perm_user_group_id>/permissions/',
          api.AssetPermUserGroupPermissionsListApi.as_view(), name='asset-perm-user-group-permission-list'),
 
+    path('nodes/category/tree-metrics/', api.CategoryTreeMetricsApi.as_view(), name='category-tree-metrics'),
     path('nodes/category/tree/', api.CategoryTreeApi.as_view(), name='asset-category-tree'),
     path('nodes/children/tree/', api.NodeChildrenAsTreeApi.as_view(), name='node-children-tree'),
+    path('node-assets/tree/search/', api.NodeAssetTreeSearchApi.as_view(), name='node-asset-tree-search'),
+    path('nodes/assets-amount/', api.NodeAssetsAmountApi.as_view(), name='node-assets-amount'),
+    path('nodes/tree-metrics/', api.NodeTreeMetricsApi.as_view(), name='node-tree-metrics'),
     path('nodes/<uuid:pk>/children/', api.NodeChildrenApi.as_view(), name='node-children'),
     path('nodes/children/', api.NodeChildrenApi.as_view(), name='node-children-2'),
     path('nodes/<uuid:pk>/children/add/', api.NodeAddChildrenApi.as_view(), name='node-add-children'),

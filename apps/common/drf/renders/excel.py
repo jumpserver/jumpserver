@@ -1,6 +1,7 @@
+from io import BytesIO
+
 from openpyxl import Workbook
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
-from openpyxl.writer.excel import save_virtual_workbook
 
 from .base import BaseFileRenderer
 
@@ -14,6 +15,7 @@ class ExcelFileRenderer(BaseFileRenderer):
     row_count = 0
 
     def initial_writer(self):
+        self.row_count = 0
         self.wb = Workbook()
         self.ws = self.wb.active
 
@@ -40,8 +42,8 @@ class ExcelFileRenderer(BaseFileRenderer):
             adjusted_width = 300 if adjusted_width > 300 else adjusted_width
             adjusted_width = 30 if adjusted_width < 30 else adjusted_width
             self.ws.column_dimensions[column].width = adjusted_width
-            self.wb.save('/tmp/test.xlsx')
 
     def get_rendered_value(self):
-        value = save_virtual_workbook(self.wb)
-        return value
+        buffer = BytesIO()
+        self.wb.save(buffer)
+        return buffer.getvalue()

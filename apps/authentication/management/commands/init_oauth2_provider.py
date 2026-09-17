@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 class Command(BaseCommand):
-    help = 'Initialize OAuth2 Provider - Create default JumpServer Client application'
+    help = 'Initialize OAuth2 Provider - Create or update default JumpServer Client callback URIs'
 
     def add_arguments(self, parser):
         parser.add_argument(

@@ -2,7 +2,6 @@
 #
 from django.db.models import Q
 from rest_framework import filters
-from rest_framework.compat import coreapi, coreschema
 
 from assets.utils import get_node_from_request, is_query_node_all_assets
 
@@ -10,12 +9,16 @@ from assets.utils import get_node_from_request, is_query_node_all_assets
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
     fields = ['node', 'all']
 
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name=field, location='query', required=False,
-                type='string', example='', description='', schema=None,
-            )
+            {
+                'name': field,
+                'in': 'query',
+                'required': False,
+                'description': '',
+                'schema': {'type': 'string'},
+                'example': '',
+            }
             for field in self.fields
         ]
 
@@ -46,12 +49,16 @@ class NodeFilterBackend(filters.BaseFilterBackend):
     """
     fields = ['node', 'all']
 
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name=field, location='query', required=False,
-                type='string', example='', description='', schema=None,
-            )
+            {
+                'name': field,
+                'in': 'query',
+                'required': False,
+                'description': '',
+                'schema': {'type': 'string'},
+                'example': '',
+            }
             for field in self.fields
         ]
 
@@ -79,13 +86,13 @@ class IpInFilterBackend(filters.BaseFilterBackend):
         queryset = queryset.filter(address__in=ip_list)
         return queryset
 
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name='ips', location='query', required=False, type='string',
-                schema=coreschema.String(
-                    title='ips',
-                    description='address in filter'
-                )
-            )
+            {
+                'name': 'ips',
+                'in': 'query',
+                'required': False,
+                'description': 'address in filter',
+                'schema': {'type': 'string', 'title': 'ips'},
+            }
         ]

@@ -19,7 +19,6 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
-from rest_framework.compat import coreapi, coreschema
 from rest_framework.fields import DateTimeField
 from rest_framework.serializers import ValidationError
 from rest_framework.filters import OrderingFilter
@@ -94,7 +93,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             ):
                 continue
             model_field_name = self.get_filterset_model_field(view, field_name)
-            if not self.is_text_lookup_field(model, model_field_name):
+            if not self.is_text_lookup_field(
+                model, model_field_name, queryset
+            ):
                 continue
 
             if lookup in self.dynamic_multi_text_lookups:
@@ -127,8 +128,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 queryset = queryset.distinct()
         return queryset
 
-    def is_text_lookup_field(self, model, field_path):
-        field = self.resolve_model_field(model, field_path)
+    def is_text_lookup_field(self, model, field_path, queryset=None):
+        field = self.resolve_model_field(model, field_path, queryset)
         return isinstance(field, (models.CharField, models.TextField))
 
     def filter_dynamic_value_lookups(self, request, queryset, view):
@@ -151,7 +152,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             ):
                 continue
             model_field_name = self.get_filterset_model_field(view, field_name)
-            if not self.is_value_lookup_field(model, model_field_name):
+            if not self.is_value_lookup_field(
+                model, model_field_name, queryset
+            ):
                 continue
 
             if lookup == "exact":
@@ -195,8 +198,8 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             return queryset.exclude(**kwargs)
         return queryset.filter(**kwargs)
 
-    def is_value_lookup_field(self, model, field_path):
-        field = self.resolve_model_field(model, field_path)
+    def is_value_lookup_field(self, model, field_path, queryset=None):
+        field = self.resolve_model_field(model, field_path, queryset)
         if field is None:
             return False
         return not getattr(field, "is_relation", False)
@@ -223,7 +226,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 model_field_name = self.get_filterset_model_field(
                     view, field_name
                 )
-                if not self.is_text_lookup_field(model, model_field_name):
+                if not self.is_text_lookup_field(
+                    model, model_field_name, queryset
+                ):
                     continue
                 for value in values:
                     if value == "":
@@ -243,7 +248,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
                 model_field_name = self.get_filterset_model_field(
                     view, field_name
                 )
-                if not self.is_value_lookup_field(model, model_field_name):
+                if not self.is_value_lookup_field(
+                    model, model_field_name, queryset
+                ):
                     continue
                 if lookup == "in":
                     cleaned_values = self.split_csv_values(values)
@@ -282,7 +289,17 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
             )
         return cleaned_values
 
-    def resolve_model_field(self, model, field_path):
+    def resolve_model_field(self, model, field_path, queryset=None):
+        filtered_relations = getattr(
+            getattr(queryset, 'query', None), '_filtered_relations', {}
+        )
+        relation_alias, separator, related_field = field_path.partition('__')
+        filtered_relation = filtered_relations.get(relation_alias)
+        if filtered_relation:
+            field_path = filtered_relation.relation_name
+            if separator:
+                field_path = f'{field_path}__{related_field}'
+
         current_model = model
         field = None
         field_names = field_path.split("__")
@@ -575,7 +592,7 @@ class BaseFilterSet(drf_filters.FilterSet):
 
 
 class DatetimeRangeFilterBackend(filters.BaseFilterBackend):
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         ret = []
         fields = self._get_date_range_filter_fields(view)
 
@@ -584,15 +601,13 @@ class DatetimeRangeFilterBackend(filters.BaseFilterBackend):
                 continue
             for v in date_range_keyword:
                 ret.append(
-                    coreapi.Field(
-                        name=v,
-                        location="query",
-                        required=False,
-                        type="string",
-                        schema=coreschema.String(
-                            title=v, description="%s %s" % (attr, v)
-                        ),
-                    )
+                    {
+                        "name": v,
+                        "in": "query",
+                        "required": False,
+                        "description": "%s %s" % (attr, v),
+                        "schema": {"type": "string", "title": v},
+                    }
                 )
 
         return ret
@@ -646,26 +661,26 @@ class DatetimeRangeFilterBackend(filters.BaseFilterBackend):
 
 
 class IDSpmFilterBackend(filters.BaseFilterBackend):
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         fields = [
-            coreapi.Field(
-                name="spm",
-                location="query",
-                required=False,
-                type="string",
-                example="",
-                description="Pre post objects id get spm id, then using filter",
-            )
+            {
+                "name": "spm",
+                "in": "query",
+                "required": False,
+                "description": "Pre post objects id get spm id, then using filter",
+                "schema": {"type": "string"},
+                "example": "",
+            }
         ]
         fields.append(
-            coreapi.Field(
-                name="exclude_spm",
-                location="query",
-                required=False,
-                type="string",
-                example="",
-                description="Pre post objects id get spm id, then using exclude",
-            )
+            {
+                "name": "exclude_spm",
+                "in": "query",
+                "required": False,
+                "description": "Pre post objects id get spm id, then using exclude",
+                "schema": {"type": "string"},
+                "example": "",
+            }
         )
         return fields
 
@@ -708,16 +723,16 @@ class IDInFilterBackend(filters.BaseFilterBackend):
 
     Prefer the generic ``id__in=1,2,3`` syntax provided by LookupFilterBackend.
     """
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name="ids",
-                location="query",
-                required=False,
-                type="string",
-                example="/api/v1/users/users?ids=1,2,3",
-                description="Deprecated: filter by id set, prefer id__in",
-            )
+            {
+                "name": "ids",
+                "in": "query",
+                "required": False,
+                "description": "Deprecated: filter by id set, prefer id__in",
+                "schema": {"type": "string"},
+                "example": "/api/v1/users/users?ids=1,2,3",
+            }
         ]
 
     def filter_queryset(self, request, queryset, view):
@@ -739,16 +754,16 @@ class IDNotFilterBackend(filters.BaseFilterBackend):
 
     Prefer the generic ``id__in!=1,2,3`` syntax provided by LookupFilterBackend.
     """
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name="id!",
-                location="query",
-                required=False,
-                type="string",
-                example="/api/v1/users/users?id!=1,2,3",
-                description="Deprecated: exclude by id set, prefer id__in!",
-            )
+            {
+                "name": "id!",
+                "in": "query",
+                "required": False,
+                "description": "Deprecated: exclude by id set, prefer id__in!",
+                "schema": {"type": "string"},
+                "example": "/api/v1/users/users?id!=1,2,3",
+            }
         ]
 
     def filter_queryset(self, request, queryset, view):
@@ -765,16 +780,16 @@ class IDNotFilterBackend(filters.BaseFilterBackend):
 
 
 class LabelFilterBackend(filters.BaseFilterBackend):
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name="label",
-                location="query",
-                required=False,
-                type="string",
-                example="/api/v1/users/users?label=abc",
-                description="Filter by label",
-            )
+            {
+                "name": "label",
+                "in": "query",
+                "required": False,
+                "description": "Filter by label",
+                "schema": {"type": "string"},
+                "example": "/api/v1/users/users?label=abc",
+            }
         ]
 
     @classmethod
@@ -880,22 +895,31 @@ class LabelFilterBackend(filters.BaseFilterBackend):
 
 class CustomFilterBackend(filters.BaseFilterBackend):
 
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         fields = []
         defaults = dict(
-            location="query", required=False, type="string", example="", description=""
+            required=False,
+            description="",
+            schema={"type": "string"},
+            example="",
         )
         if not hasattr(view, "custom_filter_fields"):
             return []
 
         for field in view.custom_filter_fields:
+            parameter = defaults.copy()
             if isinstance(field, str):
-                defaults["name"] = field
+                parameter["name"] = field
             elif isinstance(field, dict):
-                defaults.update(field)
+                parameter.update(field)
             else:
                 continue
-            fields.append(coreapi.Field(**defaults))
+            parameter["in"] = parameter.pop(
+                "location", parameter.get("in", "query")
+            )
+            if "type" in parameter:
+                parameter["schema"] = {"type": parameter.pop("type")}
+            fields.append(parameter)
         return fields
 
     def filter_queryset(self, request, queryset, view):
@@ -919,24 +943,24 @@ class NumberInFilter(drf_filters.BaseInFilter, drf_filters.NumberFilter):
 
 
 class AttrRulesFilterBackend(filters.BaseFilterBackend):
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name="attr_rules",
-                location="query",
-                required=False,
-                type="string",
-                example="/api/v1/users/users?attr_rules=jsonbase64",
-                description='Filter by json like {"type": "attrs", "attrs": []} to base64',
-            ),
-            coreapi.Field(
-                name="attr_rules_instance",
-                location="query",
-                required=False,
-                type="string",
-                example="/api/v1/users/users?attr_rules_instance=jsonbase64",
-                description='Filter by json like {"app": "acls", "model": "LoginAssetACL", "id": "uuid"} to base64',
-            )
+            {
+                "name": "attr_rules",
+                "in": "query",
+                "required": False,
+                "description": 'Filter by json like {"type": "attrs", "attrs": []} to base64',
+                "schema": {"type": "string"},
+                "example": "/api/v1/users/users?attr_rules=jsonbase64",
+            },
+            {
+                "name": "attr_rules_instance",
+                "in": "query",
+                "required": False,
+                "description": 'Filter by json like {"app": "acls", "model": "LoginAssetACL", "id": "uuid"} to base64',
+                "schema": {"type": "string"},
+                "example": "/api/v1/users/users?attr_rules_instance=jsonbase64",
+            }
         ]
 
     def filter_queryset(self, request, queryset, view):

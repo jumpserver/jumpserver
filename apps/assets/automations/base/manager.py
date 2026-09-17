@@ -538,6 +538,7 @@ class PlaybookPrepareMixin:
             exclude_localhost=True,
             task_type=self.__class__.method_type(),
             protocol=protocol,
+            account_selector=self.get_inventory_account_selector(),
         )
         inventory.write_to_file(inventory_path)
         self._inventory_host_labels = {
@@ -545,6 +546,9 @@ class PlaybookPrepareMixin:
             for host, detail in inventory.exclude_host_details.items()
         }
         return dict(inventory.exclude_hosts)
+
+    def get_inventory_account_selector(self):
+        return None
 
     @lazyproperty
     def runtime_dir(self):
@@ -1055,6 +1059,39 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         self._runner_host_labels[str(runner.id)] = labels
         return labels
 
+    @staticmethod
+    def format_execution_account_label(username, auth, account=None):
+        if not username:
+            return ''
+        label = str(username)
+        if account and 'privileged' in account:
+            label = _(
+                "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+            ) % {
+                'name': account.get('name') or username,
+                'username': username,
+                'privileged': _("Yes") if account['privileged'] else _("No"),
+            }
+        login = auth.get('ansible_user')
+        become = auth.get('ansible_become_user')
+        if auth.get('ansible_become') and login and become:
+            return _(
+                "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+            ) % {
+                'account': label,
+                'login': login,
+                'method': auth.get('ansible_become_method') or 'sudo',
+                'become': become,
+            }
+        return label
+
+    def get_execution_account_label(self, detail):
+        # `account` is the operation's target; `jms_account` is the account
+        # selected to execute it. Only identity fields belong in the log.
+        account = detail.get('jms_account') or {}
+        username = account.get('username') or detail.get('ansible_user')
+        return self.format_execution_account_label(username, detail, account)
+
     def announce_runner_targets(self, runner, inventory_path):
         labels = self.cache_runner_host_labels(runner, inventory_path)
         self._active_host_labels = labels
@@ -1068,10 +1105,14 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
             asset = detail.get('jms_asset') if isinstance(detail, dict) else None
             if not isinstance(asset, dict):
                 continue
-            self.print_log(
-                _("• %(host)s: processing") % {'host': labels[host]},
-                'progress',
-            )
+            account = self.get_execution_account_label(detail)
+            if account:
+                message = _(
+                    "• %(host)s: processing; execution account: %(account)s"
+                ) % {'host': labels[host], 'account': account}
+            else:
+                message = _("• %(host)s: processing") % {'host': labels[host]}
+            self.print_log(message, 'progress')
         return labels
 
     @staticmethod

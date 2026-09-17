@@ -15,6 +15,7 @@ class Endpoint(JMSBaseModel):
     # value=0 表示 disabled
     https_port = PortField(default=443, verbose_name=_('HTTPS port'))
     http_port = PortField(default=80, verbose_name=_('HTTP port'))
+    web_proxy_port = PortField(default=5001, verbose_name=_('Web proxy port'))
     ssh_port = PortField(default=2222, verbose_name=_('SSH port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP port'))
     magnus_port = PortField(default=5525, verbose_name=_('Magnus port'))

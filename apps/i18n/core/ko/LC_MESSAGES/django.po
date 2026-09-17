@@ -1249,7 +1249,7 @@ msgid "Check engine"
 msgstr "검출 엔진"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "귀하의 계정 및 비밀번호 강도 점검"
 
 #: accounts/models/automations/check_account.py:135
@@ -1260,7 +1260,7 @@ msgstr ""
 "계정 비밀번호의 보안성을 점검하고 분석, 비밀번호 강도, 유출 상황 등을 포함"
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "계정과 비밀번호의 중복 여부 점검"
 
 #: accounts/models/automations/check_account.py:143
@@ -2177,9 +2177,7 @@ msgstr "미검증 계정이 없습니다"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"비밀번호가 `{{`로 시작하고 `}}`로 끝나는 경우, 해당 비밀번호는 허용되지 않습"
-"니다."
+msgstr "비밀번호는 `{{`로 시작하고 `}}`로 끝날 수 없습니다."
 
 #: accounts/utils.py:76
 #, python-format
@@ -2768,6 +2766,21 @@ msgstr "자동화 작업 실행"
 msgid "Stage: %(stage)s"
 msgstr "▶ 단계: %(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s: 처리 중; 실행 계정: %(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s (로그인: %(login)s, %(method)s → %(become)s)"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s (사용자 이름: %(username)s, 특권 계정: %(privileged)s)"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3191,6 +3204,11 @@ msgstr "계정이 없습니다."
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "게이트웨이 로그인 및 SSH 터널 전달을 확인하는 중: %(gateway)s"
 
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "게이트웨이 로그인 및 SSH 터널 전달을 확인하는 중: %(gateway)s; 실행 계정: %(account)s"
+
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format
 msgid "✓ %(gateway)s: SSH login and tunnel forwarding are available"
@@ -3479,6 +3497,18 @@ msgstr "SYSDBA 역할로 연결"
 msgid "Connect as SYSDBA"
 msgstr "SQL Server 버전, 각기 다른 버전마다 연결 드라이버가 다릅니다"
 
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "비밀번호 변경 시 이전 비밀번호 사용"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr ""
+"비밀번호를 변경할 때 Oracle REPLACE 절에 현재 관리 중인 비밀번호를 "
+"사용합니다"
+
 #: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
@@ -3554,6 +3584,10 @@ msgstr "비밀번호 선택기"
 #: assets/const/protocol.py:313 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "확인 버튼 선택기"
+
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "로그인 성공 선택기"
 
 #: assets/const/protocol.py:336
 msgid "API mode"
@@ -4462,7 +4496,7 @@ msgstr "슬랙"
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:138
 #: users/models/user/_source.py:22
 msgid "DingTalk"
-msgstr "딩딩"
+msgstr "DingTalk"
 
 #: audits/auth_backends.py:25 authentication/models/temp_token.py:17
 msgid "Temporary token"
@@ -5199,15 +5233,15 @@ msgstr "권한이 만료되었습니다."
 
 #: authentication/api/connection_token.py:756
 msgid "ACL action is reject: {}({})"
-msgstr "ACL Action은 거부: {}({})입니다."
+msgstr "ACL 동작은 거부: {}({})입니다."
 
 #: authentication/api/connection_token.py:760
 msgid "ACL action is review"
-msgstr "ACL Action은 재검토입니다."
+msgstr "ACL 동작은 재검토입니다."
 
 #: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
-msgstr "ACL Action은 얼굴 인식입니다."
+msgstr "ACL 동작은 얼굴 인식입니다."
 
 #: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
@@ -5215,7 +5249,7 @@ msgstr "자산 로그인 규칙은 현재 자산을 지원하지 않습니다."
 
 #: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
-msgstr "ACL Action은 온라인 얼굴 인식입니다."
+msgstr "ACL 동작은 온라인 얼굴 인식입니다."
 
 #: authentication/api/connection_token.py:807
 msgid "No available face feature"
@@ -5553,7 +5587,7 @@ msgstr "기업 위챗이 연결되지 않았습니다"
 #: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
 #: authentication/views/dingtalk.py:249
 msgid "DingTalk is not bound"
-msgstr "딩딩이 연결되지 않았습니다"
+msgstr "DingTalk이 연결되지 않았습니다"
 
 #: authentication/errors/mfa.py:33 authentication/views/feishu.py:136
 msgid "FeiShu is not bound"
@@ -5927,7 +5961,11 @@ msgstr "작업 정보"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "동작"
+
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 인증서 서명이 비활성화되었습니다"
 
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
@@ -6207,6 +6245,31 @@ msgstr "당신이 관리자라면, 설정 항목을 업데이트하여 문제를
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "다른 통로로 로그인"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "브라우저가 CSRF 쿠키를 전송하지 않아 로그인할 수 없습니다. 관리자에게 문의하세요"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"관리자인 경우 SESSION_COOKIE_DOMAIN 설정이 잘못되었는지 확인하세요. 접속 도메인은 해당 값 또는 그 하위 도메인이어야 "
+"하며, 그렇지 않으면 브라우저가 쿠키를 저장하지 않습니다. 설정을 수정하거나 삭제하세요"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "설정되지 않음"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "브라우저에서 쿠키가 활성화되어 있는지 확인하고 사이트 쿠키를 삭제한 후 다시 시도하세요"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "기타 로그인 방법"
@@ -6353,15 +6416,15 @@ msgstr "%s 바인딩 성공"
 
 #: authentication/views/dingtalk.py:43
 msgid "DingTalk Error, Please contact your system administrator"
-msgstr "딩딩 오류, 시스템 관리자에게 문의해 주세요."
+msgstr "DingTalk 오류입니다. 시스템 관리자에게 문의해 주세요."
 
 #: authentication/views/dingtalk.py:46 authentication/views/dingtalk.py:204
 msgid "DingTalk Error"
-msgstr "딩딩 오류"
+msgstr "DingTalk 오류"
 
 #: authentication/views/dingtalk.py:54
 msgid "DingTalk is already bound"
-msgstr "딩딩이 이미 바인딩되었습니다"
+msgstr "DingTalk이 이미 바인딩되었습니다"
 
 #: authentication/views/dingtalk.py:123
 msgid "Invalid user_id"
@@ -6369,23 +6432,23 @@ msgstr "유효하지 않은 user_id"
 
 #: authentication/views/dingtalk.py:139
 msgid "DingTalk query user failed"
-msgstr "딩딩 사용자 조회 실패"
+msgstr "DingTalk 사용자 조회 실패"
 
 #: authentication/views/dingtalk.py:147
 msgid "The DingTalk is already bound to another user"
-msgstr "해당 딩딩은 다른 사용자와 바인딩되었습니다"
+msgstr "해당 DingTalk은 다른 사용자와 바인딩되었습니다"
 
 #: authentication/views/dingtalk.py:154
 msgid "Binding DingTalk successfully"
-msgstr "딩딩 바인딩 성공"
+msgstr "DingTalk 바인딩 성공"
 
 #: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:243
 msgid "Failed to get user from DingTalk"
-msgstr "딩딩에서 사용자 정보를 가져오는 데 실패했습니다"
+msgstr "DingTalk에서 사용자 정보를 가져오는 데 실패했습니다"
 
 #: authentication/views/dingtalk.py:250
 msgid "Please login with a password and then bind the DingTalk"
-msgstr "비밀번호로 로그인한 후 딩딩을 바인딩해 주세요"
+msgstr "비밀번호로 로그인한 후 DingTalk을 바인딩해 주세요"
 
 #: authentication/views/feishu.py:44 authentication/views/feishu.py:135
 msgid "FeiShu Error"
@@ -6959,6 +7022,15 @@ msgstr "발송 이메일"
 msgid "This task will be executed when sending email notifications"
 msgstr "이메일 메시지를 전송할 때 이 작업을 수행합니다"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"이메일 전송 중: 제목=%(subject)r, "
+"수신자=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "이메일 첨부 파일 전송"
@@ -6987,9 +7059,25 @@ msgstr "계정 백업을 수행할 때 외부 저장소(sftp)에 이 작업을 �
 msgid "Invalid ip"
 msgstr "유효하지 않은 IP"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "유효하지 않은 주소"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "주소의 앞뒤에 공백을 포함할 수 없습니다"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "주소에 템플릿 구문을 포함할 수 없습니다"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "주소에 제어 문자를 포함할 수 없습니다"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "유효한 IP 주소 또는 호스트 이름을 입력하세요"
 
 #: common/utils/translate.py:46
 #, python-format
@@ -8425,6 +8513,62 @@ msgstr "메일 전송 성공"
 msgid "Chat AI is not enabled"
 msgstr "채팅 AI가 활성화되어 있지 않습니다"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "모델 공급자 연결 시간이 초과되었습니다. 기본 URL, 프록시 및 네트워크를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "모델 공급자의 인증서 검증에 실패했습니다. HTTPS 인증서를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "모델 공급자의 호스트 이름을 확인할 수 없습니다. 기본 URL과 DNS 설정을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "모델 공급자가 연결을 거부했습니다. 기본 URL, 포트 및 서비스 상태를 확인하세요."
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "모델 공급자에 연결할 수 없습니다. 기본 URL, 프록시 및 네트워크를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "모델 공급자 계정의 잔액이 부족합니다. 충전한 후 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "모델 공급자 인증에 실패했습니다. API 키를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "모델 공급자가 액세스를 거부했습니다. API 키 권한을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "선택한 모델이 존재하지 않거나 사용할 수 없습니다. 모델과 기본 URL을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "모델 공급자의 엔드포인트를 찾을 수 없습니다. 기본 URL을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "모델 공급자의 요청 한도를 초과했습니다. 나중에 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "모델 공급자 서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "모델 공급자 요청에 실패했습니다(HTTP {status_code}): {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "모델 공급자 요청에 실패했습니다(HTTP {status_code})."
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37
@@ -8536,10 +8680,6 @@ msgstr "단말기 설정"
 msgid "Can change other setting"
 msgstr "기타 설정"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "채팅 프롬프트"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "동기화된 LDAP 사용자 작업 결과 알림"
@@ -8574,7 +8714,7 @@ msgstr "RADIUS 인증"
 
 #: settings/serializers/auth/base.py:20
 msgid "DingTalk Auth"
-msgstr "딩딩 인증"
+msgstr "DingTalk 인증"
 
 #: settings/serializers/auth/base.py:21
 msgid "FeiShu Auth"
@@ -8697,14 +8837,14 @@ msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
-msgstr "딩딩 인증 활성화"
+msgstr "DingTalk 인증 활성화"
 
 #: settings/serializers/auth/dingtalk.py:20
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the DingTalk service user attribute name"
 msgstr ""
-"사용자 속성 매핑에서 `key`는 이 시스템 사용자 속성 이름이고, `value`는 딩딩 "
+"사용자 속성 매핑에서 `key`는 이 시스템 사용자 속성 이름이고, `value`는 DingTalk "
 "서비스의 사용자 속성 이름입니다."
 
 #: settings/serializers/auth/feishu.py:20
@@ -9481,6 +9621,10 @@ msgstr "액세스 키 비밀(SK)"
 msgid "Chat AI"
 msgstr "채팅 AI"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Chat AI 사용 가능"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "생성 방법"
@@ -9950,6 +10094,18 @@ msgstr "관리자만"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "전체적으로 MFA 인증 활성화"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "허용된 MFA 방식"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "사용자가 바인딩하고 사용할 수 있는 MFA 방식을 하나 이상 선택하세요"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "MFA 방식을 하나 이상 선택하세요"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -10575,7 +10731,7 @@ msgstr ""
 "클라이언트, 현재 특정 클라이언트 프로그램을 호출하여 자산에 연결하고 있습니다"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "추가 다운로드"
 
 #: templates/resource_download.html:34
@@ -11056,7 +11212,7 @@ msgstr "세션 종료 가능"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
-msgstr "세션 Action 권한 검증 가능"
+msgstr "세션 동작 권한 검증 가능"
 
 #: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
@@ -11250,6 +11406,14 @@ msgstr ""
 #: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "인증서 인증 무시"
+
+#: terminal/serializers/virtualapp_provider.py:31
+msgid "Panda image"
+msgstr "Panda 이미지"
+
+#: terminal/serializers/virtualapp_provider.py:34
+msgid "Container port range"
+msgstr "컨테이너 포트 범위"
 
 #: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
@@ -11919,6 +12083,10 @@ msgstr "변경 후"
 msgid "{} {} the ticket"
 msgstr "{} {} 작업 요청"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} 님이 작업 요청을 제출했습니다"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "자주 묻는 질문"
@@ -12189,7 +12357,7 @@ msgstr "신청 노드"
 
 #: tickets/serializers/ticket/apply_asset.py:28
 msgid "Apply actions"
-msgstr "신청 Action"
+msgstr "신청 동작"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:91
@@ -12257,7 +12425,7 @@ msgstr "인증이 성공적으로 완료되면, 작업 요청이 직접 승인�
 
 #: tickets/views/approve.py:105
 msgid "Illegal approval action"
-msgstr "유효하지 않은 승인 Action"
+msgstr "유효하지 않은 승인 동작"
 
 #: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"
@@ -12765,6 +12933,14 @@ msgstr "프로필 사진 경로"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "허용된 MFA 유형"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "비워 두면 전역 MFA 방식을 상속합니다"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
@@ -14039,3 +14215,73 @@ msgstr "라이센스가 유효하지 않습니다."
 
 #~ msgid "Ticket already closed"
 #~ msgstr "작업 요청이 종료되었습니다"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "%(vendor)s 클라이언트 다운로드"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "운영 체제에 맞는 설치 프로그램을 선택하세요."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Linux, macOS Intel 및 기타 버전은 GitHub에서 다운로드할 수 있습니다."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "GitHub에서 보기"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA를 사용할 수 없음"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "사용 가능한 MFA 방식이 없습니다. 관리자에게 문의하세요."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "다음 MFA 방식은 시스템 설정에서 활성화되지 않아 사용할 수 없습니다: %(methods)s. 관리자에게 문의하세요."
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "애플리케이션 제공자 배포 실행"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "애플리케이션 제공자 호스트에 Panda 실행 환경 배포"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "모든 가상 애플리케이션 배포"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "애플리케이션 제공자에 모든 가상 애플리케이션 배포"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "애플리케이션 제공자 배포"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "배포"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "배포 오류"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "이미지를 변경할 때는 애플리케이션 버전도 변경해야 합니다"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "보고된 버전이 현재 애플리케이션 버전과 일치하지 않습니다"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "배포된 버전"

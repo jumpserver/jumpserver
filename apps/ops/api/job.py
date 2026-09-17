@@ -68,6 +68,7 @@ class LoginAssetACLCheckMixin:
 
 
 class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
+    perm_model = Job
     serializer_class = JobSerializer
     filterset_class = JobFilterSet
     search_fields = ('name', 'comment')

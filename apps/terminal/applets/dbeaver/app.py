@@ -18,7 +18,6 @@ class AppletApplication(BaseApplication):
         self.path = _default_path
         self.username = self.account.username
         self.password = self.account.secret
-        self.privileged = self.account.privileged
         self.host = self.asset.address
         self.port = self.asset.get_protocol_port(self.protocol)
         if self.tinker_forward:
@@ -128,9 +127,10 @@ class AppletApplication(BaseApplication):
         return params_string
 
     def _get_oracle_exec_params(self):
-        if self.privileged:
-            self.username = '%s as sysdba' % self.username
-        return self._get_exec_params()
+        params_string = self._get_exec_params()
+        if self.connect_options.get('use_sysdba') is True:
+            params_string += '|authProp.oracle.logon-as=sysdba'
+        return params_string
 
     def _get_sqlserver_exec_params(self):
         setattr(self, 'driver', 'mssql_jdbc_ms_new')

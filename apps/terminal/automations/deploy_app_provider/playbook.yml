@@ -1,0 +1,350 @@
+---
+- hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    CORE_HOST: ''
+    PANDA_IMAGE: ''
+    PANDA_RESOURCE: {}
+    DOCKER_RESOURCE: {}
+    PANDA_RANGE_PORTS: 6900-7900
+    IGNORE_VERIFY_CERTS: true
+
+  pre_tasks:
+    - name: Check Python 3 interpreter
+      ansible.builtin.raw: command -v python3
+      register: python_interpreter
+      changed_when: false
+      failed_when: false
+
+    - name: Require Python 3 on the provider
+      ansible.builtin.assert:
+        that: python_interpreter.rc == 0
+        fail_msg: Install Python 3 on the Linux provider before deploying Panda
+
+    - name: Select Python 3 interpreter
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: '{{ python_interpreter.stdout_lines | last | trim }}'
+
+    - name: Gather host facts
+      ansible.builtin.setup:
+        gather_subset: ['!all', min]
+
+    - name: Require Linux provider
+      ansible.builtin.assert:
+        that: ansible_facts['system'] == 'Linux'
+        fail_msg: Panda deployment requires a Linux SSH host
+
+    - name: Normalize provider architecture
+      ansible.builtin.set_fact:
+        provider_architecture: >-
+          {{ {'x86_64': 'amd64', 'aarch64': 'arm64', 'i386': '386', 'i686': '386',
+              'armv7l': 'arm', 'loongarch64': 'loong64'}.get(
+              ansible_facts['architecture'], ansible_facts['architecture']) }}
+
+  tasks:
+    - name: Check Core connectivity from the provider
+      ansible.builtin.uri:
+        url: '{{ CORE_HOST }}/api/health/'
+        validate_certs: '{{ not IGNORE_VERIFY_CERTS }}'
+        status_code: 200
+        timeout: 10
+      register: core_health
+      retries: 3
+      delay: 2
+      until:
+        - core_health.status | default(0) == 200
+        - (core_health.json | default({})).get('status') == true
+
+    - name: Check Docker runtime
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+      failed_when: false
+
+    - name: Install missing Docker runtime
+      when: docker_version.rc != 0
+      block:
+        - name: Require a matching offline Docker package
+          ansible.builtin.assert:
+            that:
+              - DOCKER_RESOURCE.get('architecture') == provider_architecture
+              - DOCKER_RESOURCE.get('file', '') | length > 0
+              - DOCKER_RESOURCE.get('service', '') | length > 0
+              - ansible_facts['service_mgr'] == 'systemd'
+            fail_msg: >-
+              Install Docker on this provider first, or prepare an offline Docker package
+              for {{ provider_architecture }} and docker.service from Installer on a systemd host.
+              No download will be attempted.
+
+        - name: Check for an existing Docker daemon without its client
+          ansible.builtin.command: dockerd --version
+          register: dockerd_version
+          changed_when: false
+          failed_when: false
+
+        - name: Preserve an existing Docker installation
+          ansible.builtin.assert:
+            that: dockerd_version.rc != 0
+            fail_msg: Docker daemon exists but its client is unavailable; repair the existing Docker installation
+
+        - name: Require iptables for Docker networking
+          ansible.builtin.command: iptables --version
+          changed_when: false
+
+        - name: Create Docker installer directory
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: panda-docker-install-
+          register: docker_installer
+
+        - name: Transfer offline Docker package
+          ansible.builtin.copy:
+            src: '{{ DOCKER_RESOURCE.file }}'
+            dest: '{{ docker_installer.path }}/docker.tar.gz'
+            mode: '0600'
+
+        - name: Calculate Docker package checksum
+          ansible.builtin.stat:
+            path: '{{ docker_installer.path }}/docker.tar.gz'
+            checksum_algorithm: sha256
+          register: docker_archive
+
+        - name: Verify offline Docker package
+          ansible.builtin.assert:
+            that: docker_archive.stat.checksum == DOCKER_RESOURCE.sha256
+            fail_msg: Docker package checksum does not match the installation bundle
+
+        - name: Install offline Docker binaries
+          ansible.builtin.unarchive:
+            src: '{{ docker_installer.path }}/docker.tar.gz'
+            dest: /usr/local/bin
+            remote_src: true
+            extra_opts: [--strip-components=1]
+            owner: root
+            group: root
+
+        - name: Install Docker service
+          ansible.builtin.copy:
+            src: '{{ DOCKER_RESOURCE.service }}'
+            dest: /etc/systemd/system/docker.service
+            mode: '0644'
+
+        - name: Start newly installed Docker
+          ansible.builtin.systemd_service:
+            name: docker
+            daemon_reload: true
+            state: started
+            enabled: true
+      always:
+        - name: Remove Docker installer directory
+          ansible.builtin.file:
+            path: '{{ docker_installer.path }}'
+            state: absent
+          when: docker_installer.path is defined
+
+    - name: Check existing Docker daemon
+      ansible.builtin.command: docker info
+      register: docker_info
+      changed_when: false
+      failed_when: false
+
+    - name: Reuse existing Docker runtime
+      ansible.builtin.debug:
+        msg: Reusing the existing Docker runtime and configuration
+      when: docker_info.rc == 0
+
+    - name: Start existing Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+      when: docker_info.rc != 0
+
+    - name: Read Docker server API version
+      ansible.builtin.command:
+        argv: [docker, version, --format, '{{ "{{.Server.APIVersion}}" }}']
+      register: docker_api_version
+      changed_when: false
+
+    - name: Require Docker with native zstd image support
+      ansible.builtin.assert:
+        that: docker_api_version.stdout | trim is version('1.42', '>=')
+        fail_msg: Panda deployment requires Docker 23.0 or newer (API 1.42+) with native zstd image support; upgrade this Docker installation first
+
+    - name: Prepare Panda image offline
+      block:
+        - name: Inspect local image
+          ansible.builtin.command:
+            argv: [docker, image, inspect, '{{ PANDA_IMAGE }}']
+            expand_argument_vars: false
+          register: local_image
+          changed_when: false
+          failed_when: local_image.rc != 0 and 'No such image:' not in local_image.stderr
+
+        - name: Read local image identity
+          ansible.builtin.set_fact:
+            provider_image: '{{ (local_image.stdout | from_json | first) if local_image.rc == 0 else {} }}'
+            matching_image_resource: '{{ PANDA_RESOURCE.get("architecture") == provider_architecture }}'
+
+        - name: Check whether the local image can be reused
+          ansible.builtin.set_fact:
+            reuse_provider_image: >-
+              {{ provider_image.get('Os') == 'linux'
+                 and provider_image.get('Architecture') == provider_architecture
+                 and (not matching_image_resource
+                      or provider_image.get('Id') == PANDA_RESOURCE.get('image_id')) }}
+
+        - name: Reuse existing image
+          ansible.builtin.debug:
+            msg: 'Reusing {{ PANDA_IMAGE }} ({{ provider_image.Id }}) on {{ provider_architecture }}'
+          when: reuse_provider_image
+
+        - name: Import missing or outdated image from the offline bundle
+          when: not reuse_provider_image
+          block:
+            - name: Require a matching offline image
+              ansible.builtin.assert:
+                that:
+                  - matching_image_resource
+                  - PANDA_RESOURCE.get('file', '') | length > 0
+                fail_msg: >-
+                  Image {{ PANDA_IMAGE }} for linux/{{ provider_architecture }} is not available locally
+                  and no matching offline archive is available. Load the correct image on this
+                  provider and deploy again. No registry download will be attempted.
+
+            - name: Create image import directory
+              ansible.builtin.tempfile:
+                state: directory
+                prefix: panda-image-
+              register: image_import
+
+            - name: Transfer offline image
+              ansible.builtin.copy:
+                src: '{{ PANDA_RESOURCE.file }}'
+                dest: '{{ image_import.path }}/image.archive'
+                mode: '0600'
+
+            - name: Calculate transferred image archive checksum
+              ansible.builtin.stat:
+                path: '{{ image_import.path }}/image.archive'
+                checksum_algorithm: sha256
+              register: image_archive
+
+            - name: Verify offline image archive
+              ansible.builtin.assert:
+                that: image_archive.stat.checksum == PANDA_RESOURCE.sha256
+                fail_msg: Offline image archive checksum does not match the installation bundle
+
+            - name: Load offline image
+              ansible.builtin.command:
+                argv: [docker, load, --input, '{{ image_import.path }}/image.archive']
+              async: 900
+              poll: 5
+
+            - name: Inspect imported image
+              ansible.builtin.command:
+                argv: [docker, image, inspect, '{{ PANDA_IMAGE }}']
+                expand_argument_vars: false
+              register: imported_image
+              changed_when: false
+
+            - name: Read imported image identity
+              ansible.builtin.set_fact:
+                provider_image: '{{ imported_image.stdout | from_json | first }}'
+
+            - name: Verify imported image architecture
+              ansible.builtin.assert:
+                that:
+                  - provider_image.Os == 'linux'
+                  - provider_image.Architecture == provider_architecture
+                fail_msg: Imported image does not match the provider OS or architecture
+          always:
+            - name: Remove image import directory
+              ansible.builtin.file:
+                path: '{{ image_import.path }}'
+                state: absent
+              when: image_import.path is defined
+
+    - name: Check active virtual application containers
+      ansible.builtin.command:
+        argv: [docker, ps, --quiet, --filter, 'label=jms_label_virtual_app=panda']
+      register: app_containers
+      changed_when: false
+
+    - name: Require virtual application sessions to finish
+      ansible.builtin.assert:
+        that: app_containers.stdout | trim == ''
+        fail_msg: Disable the provider and wait for active sessions to finish before deploying Panda
+
+    - name: Ensure Panda data directory exists
+      ansible.builtin.file:
+        path: /opt/jumpserver/panda/data/keys
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Configure Panda access key
+      ansible.builtin.copy:
+        content: '{{ PANDA_ACCESS_KEY }}'
+        dest: /opt/jumpserver/panda/data/keys/.access_key
+        owner: root
+        group: root
+        mode: '0600'
+      no_log: true
+
+    - name: Find previous Panda container
+      ansible.builtin.command:
+        argv: [docker, ps, --all, --quiet, --filter, 'name=^/jms_panda$']
+      register: previous_panda
+      changed_when: false
+
+    - name: Remove previous Panda container
+      ansible.builtin.command: docker rm -f jms_panda
+      when: previous_panda.stdout | trim != ''
+
+    - name: Start Panda provider
+      ansible.builtin.command:
+        argv:
+          - docker
+          - run
+          - --pull=never
+          - -d
+          - --name
+          - jms_panda
+          - --restart
+          - always
+          - --network
+          - host
+          - -v
+          - /var/run/docker.sock:/var/run/docker.sock
+          - -v
+          - /opt/jumpserver/panda/data:/opt/panda/data
+          - -e
+          - 'CORE_HOST={{ CORE_HOST }}'
+          - -e
+          - 'PANDA_PROVIDER_ID={{ PANDA_PROVIDER_ID }}'
+          - -e
+          - 'IGNORE_VERIFY_CERTS={{ IGNORE_VERIFY_CERTS | string | lower }}'
+          - -e
+          - 'PANDA_RANGE_PORTS={{ PANDA_RANGE_PORTS }}'
+          - -e
+          - PANDA_BIND_HOST=127.0.0.1
+          - -e
+          - PANDA_BIND_PORT=9001
+          - '{{ provider_image.Id }}'
+        expand_argument_vars: false
+
+    - name: Wait for Panda health endpoint
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9001/panda/health/
+        status_code: 200
+        use_proxy: false
+        timeout: 5
+      register: panda_health
+      retries: 30
+      delay: 2
+      until:
+        - panda_health.status | default(0) == 200
+        - (panda_health.json | default({})).get('status') == 'ok'

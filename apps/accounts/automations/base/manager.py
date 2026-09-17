@@ -480,9 +480,20 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
     @staticmethod
     def should_sync_candidate(inconclusive_probe):
-        # An inconclusive independent probe must never replace the last known
-        # credential with an unverified candidate.
-        return inconclusive_probe is None
+        if inconclusive_probe is None:
+            return True
+
+        # A connectivity probe can be inconclusive even after the change
+        # module has authoritatively completed the remote update. This is
+        # common for Windows AD accounts that may change their password but
+        # are not allowed to log in through WinRM or RDP. Keep the verification
+        # status as unverified, but synchronize the candidate so JumpServer
+        # does not retain the now-stale old secret. Require an explicit probe
+        # opt-in so other automation types retain the conservative default.
+        return (
+            inconclusive_probe.get('change_succeeded') is True
+            and inconclusive_probe.get('sync_candidate') is True
+        )
 
     def move_account_result(self, source_key, target_key, item):
         if source_key == target_key:

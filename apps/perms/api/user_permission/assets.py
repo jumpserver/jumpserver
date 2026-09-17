@@ -1,10 +1,13 @@
 import abc
+from collections import defaultdict
+from uuid import UUID
 
 from django.conf import settings
-from django.db.models import FilteredRelation, Q
+from django.db.models import F, FilteredRelation, Q, Value
+from django.db.models.functions import Coalesce, NullIf
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from assets.models import Asset, Node, MyAsset
+from assets.models import Asset, FavoriteAsset, FavoriteFolder, MyAsset, Node
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.utils import get_logger, lazyproperty, is_uuid
 from orgs.utils import tmp_to_root_org
@@ -12,9 +15,7 @@ from perms import serializers
 from perms.filters import PermedAssetFilterSet
 from perms.pagination import NodePermedAssetPagination, AllPermedAssetPagination
 from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
-from .mixin import (
-    SelfOrPKUserMixin
-)
+from .mixin import SelfOrPKUserMixin
 
 __all__ = [
     'UserAllPermedAssetsApi',
@@ -66,6 +67,20 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
         assets = self.serializer_class.setup_eager_loading(assets)
         return assets
 
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        ordering = self.request.query_params.get('order')
+        if not self.need_custom_value_user or ordering not in ('name', '-name'):
+            return queryset
+        prefix = '-' if ordering.startswith('-') else ''
+        queryset = queryset.alias(
+            display_name=Coalesce(
+                NullIf(F('user_custom__name'), Value('')),
+                F('name'),
+            )
+        )
+        return queryset.order_by(f'{prefix}display_name')
+
     def get_serializer(self, *args, **kwargs):
         if len(args) == 1 and kwargs.get('many', False) and self.need_custom_value_user:
             MyAsset.set_asset_custom_value(args[0], self.user)
@@ -73,7 +88,7 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ExtraFilterFieldsMixin, ListAPI
 
     @lazyproperty
     def need_custom_value_user(self):
-        return self.request_user_is_self() or self.request.user.is_service_account
+        return True
 
     @abc.abstractmethod
     def get_assets(self):
@@ -108,7 +123,32 @@ class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
 
 class UserFavoriteAssetsApi(BaseUserPermedAssetsApi):
     def get_assets(self):
-        return self.query_asset_util.get_favorite_assets()
+        favorite_asset_ids = FavoriteAsset.objects.filter(
+            user=self.user,
+        ).values('asset_id')
+        assets = Asset.objects.all().valid().filter(id__in=favorite_asset_ids)
+        folder_id = self.request.query_params.get('folder_id')
+        if not is_uuid(folder_id):
+            return assets
+        folders = list(
+            FavoriteFolder.objects.filter(user=self.user)
+            .values_list('id', 'parent_id')
+        )
+        children_by_parent = defaultdict(list)
+        for child_id, parent_id in folders:
+            children_by_parent[parent_id].append(child_id)
+        folder_ids = set()
+        pending = [UUID(folder_id)]
+        while pending:
+            current = pending.pop()
+            if current in folder_ids:
+                continue
+            folder_ids.add(current)
+            pending.extend(children_by_parent.get(current, ()))
+        folder_asset_ids = FavoriteAsset.objects.filter(
+            user=self.user, folder_id__in=folder_ids,
+        ).values('asset_id')
+        return assets.filter(id__in=folder_asset_ids)
 
 
 class UserPermedNodeAssetsApi(BaseUserPermedAssetsApi):

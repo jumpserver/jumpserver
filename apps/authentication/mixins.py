@@ -320,11 +320,24 @@ class MFAMixin:
     get_user_from_session: Callable
     get_request_ip: Callable
 
+    def _get_mfa_bind_url(self, user):
+        for backend in user.get_user_mfa_backends(user):
+            url = backend.get_enable_url()
+            if url:
+                return url
+        message_data = {
+            'title': _('MFA unavailable'),
+            'error': _(
+                'No available MFA method. Please contact your administrator.'
+            ),
+            'redirect_url': reverse('authentication:login'),
+        }
+        return FlashMessageUtil.gen_message_url(message_data)
+
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper
         if not active_mfa_mapper:
-            set_url = reverse('authentication:user-otp-enable-start')
-            raise errors.MFAUnsetError(set_url, user, self.request)
+            raise errors.MFAUnsetError(self._get_mfa_bind_url(user), user, self.request)
 
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
@@ -568,12 +581,17 @@ class AuthFaceMixin:
     def _is_context_success(context):
         return context.get('success', False)
 
-    def create_face_verify_context(self, data=None):
+    def create_face_verify_context(self, data=None, *, user_id=None):
         token = uuid.uuid4().hex
+        if user_id is None:
+            try:
+                user_id = self.get_user_from_session().id
+            except errors.SessionEmptyError:
+                user_id = getattr(self.request.user, 'id', None)
         context_data = {
             "action": "mfa",
             "token": token,
-            "user_id": self.request.user.id,
+            "user_id": user_id,
             "is_finished": False
         }
         if data:

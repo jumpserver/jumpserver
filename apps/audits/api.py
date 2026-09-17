@@ -210,6 +210,7 @@ class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
 
 
 class MyLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
+    chat_ai_required_permissions = ()
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

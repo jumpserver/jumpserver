@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase, override_settings
 
 from jumpserver.rewriting.smtp import EmailBackend
+from settings.serializers.feature import ChatAISettingSerializer
 from settings.serializers.msg import EmailSettingSerializer
 
 
@@ -68,3 +69,78 @@ class EmailSettingSerializerTestCase(SimpleTestCase):
 
         self.assertFalse(serializer.is_valid())
         self.assertIn('EMAIL_CACERT_CONTENT', serializer.errors)
+
+
+@override_settings(
+    CHAT_AI_ENABLED=False,
+    CHAT_AI_METHOD='api',
+    CHAT_AI_EMBED_URL='',
+    CHAT_AI_BASE_URL='',
+)
+class ChatAISettingSerializerTestCase(SimpleTestCase):
+    def test_enabled_api_requires_base_url(self):
+        serializer = ChatAISettingSerializer(data={
+            'CHAT_AI_ENABLED': True,
+            'CHAT_AI_METHOD': 'api',
+            'CHAT_AI_BASE_URL': '',
+        })
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('CHAT_AI_BASE_URL', serializer.errors)
+
+    def test_enabled_api_accepts_http_url_without_embed_url(self):
+        serializer = ChatAISettingSerializer(data={
+            'CHAT_AI_ENABLED': True,
+            'CHAT_AI_METHOD': 'api',
+            'CHAT_AI_BASE_URL': 'http://models.example.test/v1',
+            'CHAT_AI_EMBED_URL': '',
+        })
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_enabled_iframe_requires_embed_url(self):
+        serializer = ChatAISettingSerializer(data={
+            'CHAT_AI_ENABLED': True,
+            'CHAT_AI_METHOD': 'iframe',
+            'CHAT_AI_EMBED_URL': '',
+            'CHAT_AI_BASE_URL': '',
+        })
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('CHAT_AI_EMBED_URL', serializer.errors)
+
+    def test_enabled_iframe_accepts_https_url_without_base_url(self):
+        serializer = ChatAISettingSerializer(data={
+            'CHAT_AI_ENABLED': True,
+            'CHAT_AI_METHOD': 'iframe',
+            'CHAT_AI_EMBED_URL': 'https://assistant.example.test/chat',
+            'CHAT_AI_BASE_URL': '',
+        })
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_iframe_rejects_non_http_urls(self):
+        for embed_url in (
+            'ftp://assistant.example.test/chat',
+            'javascript:alert(1)',
+        ):
+            with self.subTest(embed_url=embed_url):
+                serializer = ChatAISettingSerializer(data={
+                    'CHAT_AI_ENABLED': True,
+                    'CHAT_AI_METHOD': 'iframe',
+                    'CHAT_AI_EMBED_URL': embed_url,
+                })
+
+                self.assertFalse(serializer.is_valid())
+                self.assertIn('CHAT_AI_EMBED_URL', serializer.errors)
+
+    @override_settings(
+        CHAT_AI_ENABLED=True,
+        CHAT_AI_METHOD='iframe',
+        CHAT_AI_EMBED_URL='',
+    )
+    def test_partial_update_validates_configured_iframe_method(self):
+        serializer = ChatAISettingSerializer(data={}, partial=True)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('CHAT_AI_EMBED_URL', serializer.errors)

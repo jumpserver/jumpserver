@@ -31,6 +31,20 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
         record = self.get_or_create_record(asset, account, h['name'])
         new_secret, private_key_path = self.handle_ssh_secret(account.secret_type, record.new_secret, path_dir)
         h = self.gen_inventory(h, account, new_secret, private_key_path, asset)
+        if (
+                asset.platform.type == 'oracle'
+                and h['jms_asset'].get(
+                    'oracle_change_secret_with_old_password', False
+                )
+        ):
+            if not record.old_secret:
+                raise ValueError(_(
+                    'The currently managed password is required when Oracle '
+                    'password changes use the REPLACE clause'
+                ))
+            h['account']['old_secret'] = account.escape_jinja2_syntax(
+                record.old_secret
+            )
         return h, record
 
     def get_or_create_record(self, asset, account, name):

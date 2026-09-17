@@ -3,7 +3,7 @@ from logging import getLogger
 
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist as DJObjectDoesNotExist
 from django.db.models.deletion import ProtectedError
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.utils.translation import gettext
 from django.conf import settings
 from rest_framework import exceptions
@@ -59,5 +59,12 @@ def common_exception_handler(exc, context):
         return Response(data, status=exc.status_code, headers=headers)
     else:
         unexpected_exception_logger.exception('')
+        request = context.get('request')
+        if request and request.get_preferred_type(['text/html', 'application/json']) == 'application/json':
+            set_rollback()
+            return JsonResponse({
+                'detail': 'Server internal error',
+                'code': 'internal_error',
+            }, status=500)
 
     return None

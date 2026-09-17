@@ -213,6 +213,7 @@ class BaseApplication(abc.ABC):
         self.asset = Asset(kwargs.get('asset', {}))
         self.account = Account(kwargs.get('account', {}))
         self.platform = Platform(kwargs.get('platform', {}))
+        self.connect_options = kwargs.get('connect_options', {})
         self.gateway = None
         self.tinker_forward = None
         gateway = kwargs.get('gateway')

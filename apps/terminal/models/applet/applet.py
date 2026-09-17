@@ -212,6 +212,9 @@ class Applet(JMSBaseModel):
 
     def select_host(self, user, asset):
         hosts = self.filter_available_hosts()
+        if not hosts:
+            return None
+
         only_label_values = asset.get_labels().filter(
             name__in=['AppletHostOnly', '仅发布机']
         ).values_list('value', flat=True)

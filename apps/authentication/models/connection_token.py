@@ -9,11 +9,13 @@ from django.db import models
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied
 
+from accounts.const import AliasAccount, SecretType
 from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
+from assets.validators import web_xpack_fields
 from authentication.const import ConnectionTokenType
 from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
@@ -45,6 +47,15 @@ class ConnectionToken(JMSOrgBaseModel):
     input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input username"))
     input_secret = EncryptTextField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
     input_secret_type = models.CharField(max_length=16, default='password', blank=True, null=True, verbose_name=_("Input secret type"))
+    # Keep the source marker after credential deletion so a token cannot
+    # silently fall back to the raw @INPUT path.
+    personal_credential_id = models.UUIDField(
+        null=True, blank=True,
+        verbose_name=_("Personal credential ID"),
+    )
+    personal_credential_version = models.PositiveIntegerField(
+        null=True, blank=True, verbose_name=_("Personal credential version"),
+    )
     protocol = models.CharField(max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     connect_options = models.JSONField(default=dict, verbose_name=_("Connect options"))
@@ -79,14 +90,17 @@ class ConnectionToken(JMSOrgBaseModel):
     @classmethod
     def get_typed_connection_token(cls, token_id):
         try:
-            token = get_object_or_404(cls, id=token_id)
+            token = get_object_or_404(
+                cls.objects.select_related('user', 'asset__platform'),
+                id=token_id,
+            )
         except ValidationError:
             return None
 
         if token.type == ConnectionTokenType.ADMIN.value:
-            token = AdminConnectionToken.objects.get(id=token_id)
-        else:
-            token = ConnectionToken.objects.get(id=token_id)
+            token = AdminConnectionToken.objects.select_related(
+                'user', 'asset__platform'
+            ).get(id=token_id)
         return token
 
     @property
@@ -112,6 +126,8 @@ class ConnectionToken(JMSOrgBaseModel):
         self.save(update_fields=['date_expired'])
 
     def set_reusable(self, is_reusable):
+        if self.personal_credential_id:
+            is_reusable = False
         if not settings.CONNECTION_TOKEN_REUSABLE:
             return
         self.is_reusable = is_reusable
@@ -166,7 +182,7 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire_at(self):
         return self.permed_account.date_expired.timestamp()
 
-    def is_valid(self) -> bool:
+    def is_valid(self, include_personal_secret=False) -> bool:
         if not self.is_active:
             error = _('Connection token inactive')
             raise PermissionDenied(error)
@@ -180,10 +196,25 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset or not self.asset.is_active:
             error = _('No asset or inactive asset')
             raise PermissionDenied(error)
+        if self.protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
+            config = self.asset.spec_info or {}
+            protocol = self.platform.protocols.filter(name=self.protocol).first()
+            login = config if config.get('autofill') else (protocol.setting if protocol else {})
+            if web_xpack_fields(config) or web_xpack_fields(login):
+                raise PermissionDenied(_('A valid enterprise license is required.'))
         if not self.account:
             error = _('No account')
             raise PermissionDenied(error)
 
+        if self.personal_credential_id:
+            if self.account != AliasAccount.INPUT:
+                raise PermissionDenied(_(
+                    'Personal credentials can only be used with the manual account'
+                ))
+            self.validate_personal_credential(
+                include_secret=include_personal_secret
+            )
+            return True
         if timezone.now() - self.date_created < timedelta(seconds=60):
             return True, None
 
@@ -194,9 +225,68 @@ class ConnectionToken(JMSOrgBaseModel):
             )
             raise PermissionDenied(msg)
 
-        if self.permed_account.date_expired < timezone.now():
+        if permed_account.date_expired < timezone.now():
             raise PermissionDenied('Expired')
         return True
+
+    def validate_personal_credential(self, include_secret=False):
+        from accounts.personal_credentials import (
+            get_personal_credential_permission_context,
+        )
+
+        permission_context = get_personal_credential_permission_context(
+            self.user, self.asset, self.protocol
+        )
+        # Reuse this account only on the request-local model instance. A token
+        # loaded for a later request still performs the complete dynamic check.
+        for cache_key in ('account_object', 'actions', 'expire_at'):
+            self.__dict__.pop(cache_key, None)
+        self.__dict__['permed_account'] = permission_context[1]
+        credential = self.get_personal_credential(
+            include_secret=include_secret,
+            permission_context=permission_context,
+            force_refresh=True,
+        )
+        return credential, permission_context
+
+    def get_personal_credential(
+            self, include_secret=False, permission_context=None,
+            force_refresh=False,
+    ):
+        if not self.personal_credential_id:
+            return None
+        if self.personal_credential_version is None:
+            raise PermissionDenied(_('Personal credential version is missing'))
+
+        metadata_cache_key = '_personal_credential_metadata'
+        secret_cache_key = '_personal_credential_with_secret'
+        if force_refresh:
+            self.__dict__.pop(metadata_cache_key, None)
+            self.__dict__.pop(secret_cache_key, None)
+        elif include_secret and secret_cache_key in self.__dict__:
+            return self.__dict__[secret_cache_key]
+        elif not include_secret:
+            cached = self.__dict__.get(secret_cache_key)
+            if cached is None:
+                cached = self.__dict__.get(metadata_cache_key)
+            if cached is not None:
+                return cached
+
+        from accounts.personal_credentials import get_personal_credential_for_use
+        try:
+            credential = get_personal_credential_for_use(
+                self.user, self.asset, self.protocol, self.personal_credential_id,
+                version=self.personal_credential_version,
+                include_secret=include_secret,
+                permission_context=permission_context,
+            )
+        except NotFound as error:
+            raise PermissionDenied(_('Personal credential is no longer available')) from error
+        if include_secret:
+            self.__dict__[secret_cache_key] = credential
+        else:
+            self.__dict__[metadata_cache_key] = credential
+        return credential
 
     @lazyproperty
     def platform(self):
@@ -243,7 +333,18 @@ class ConnectionToken(JMSOrgBaseModel):
         virtual_app = VirtualApp.objects.filter(name=method.get('value')).first()
         if not virtual_app:
             return None
-        return virtual_app
+        provider = virtual_app.select_provider(self.user)
+        if provider is None:
+            raise JMSException({
+                'error': 'No provider available, please check the virtual app publication and provider status'
+            })
+        return {
+            'name': virtual_app.name,
+            'image_name': virtual_app.image_name,
+            'image_port': virtual_app.image_port,
+            'image_protocol': virtual_app.image_protocol,
+            'provider': provider,
+        }
 
     def get_applet_option(self):
         method = self.connect_method_object
@@ -300,14 +401,26 @@ class ConnectionToken(JMSOrgBaseModel):
             return None
 
         if self.account.startswith('@'):
+            credential = self.get_personal_credential(include_secret=True)
+            if credential:
+                input_username = credential.username
+                input_secret = credential.secret
+                input_secret_type = credential.secret_type
+            else:
+                input_username = self.input_username
+                input_secret = self.input_secret
+                input_secret_type = self.input_secret_type
             account = VirtualAccount.get_special_account(
-                self.account, self.user, self.asset, input_username=self.input_username,
-                input_secret=self.input_secret, input_secret_type=self.input_secret_type, 
+                self.account, self.user, self.asset, input_username=input_username,
+                input_secret=input_secret, input_secret_type=input_secret_type,
                 from_permed=False
             )
         else:
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
-            if not account.secret and self.input_secret:
+            if (
+                account.secret_type != SecretType.SSH_CERTIFICATE
+                and not account.secret and self.input_secret
+            ):
                 account.secret = self.input_secret
                 account.secret_type = self.input_secret_type
         
@@ -439,8 +552,10 @@ class AdminConnectionToken(ConnectionToken):
     def expire_at(self):
         return (timezone.now() + timezone.timedelta(days=365)).timestamp()
 
-    def is_valid(self):
-        return super().is_valid()
+    def is_valid(self, include_personal_secret=False):
+        return super().is_valid(
+            include_personal_secret=include_personal_secret
+        )
 
     @classmethod
     def get_user_permed_account(cls, user, asset, account_alias, protocol):

@@ -15,11 +15,13 @@ class WebMethod(TextChoices):
     web_gui = 'web_gui', 'Web GUI'
     web_cli = 'web_cli', 'Web CLI'
     web_sftp = 'web_sftp', 'Web SFTP'
+    web_proxy = 'web_proxy', 'Built-in Browser'
 
     @classmethod
     def get_spec_methods(cls):
         methods = {
-            Protocol.sftp: [cls.web_sftp]
+            Protocol.sftp: [cls.web_sftp],
+            Protocol.http: [cls.web_proxy],
         }
         return methods
 
@@ -112,7 +114,8 @@ class AppletMethod:
         if not has_applet_hosts:
             return methods
         applets = Applet.objects.filter(is_active=True)
-        for applet in applets:
+        # Prefer WebLite without excluding other explicitly installed browsers.
+        for applet in sorted(applets, key=lambda applet: applet.name != 'weblite'):
             for protocol in applet.protocols:
                 methods[protocol].append({
                     'value': applet.name,
@@ -157,6 +160,7 @@ class ConnectMethodUtil:
                     Protocol.ssh, Protocol.telnet, Protocol.sftp,
                     Protocol.redis, Protocol.mongodb,
                     Protocol.k8s, Protocol.clickhouse,
+                    Protocol.http,
 
                     Protocol.mysql, Protocol.mariadb,
                     Protocol.sqlserver, Protocol.postgresql,
@@ -177,7 +181,7 @@ class ConnectMethodUtil:
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
                     Protocol.mariadb, Protocol.db2,
-                    Protocol.dameng
+                    Protocol.dameng, Protocol.clickhouse
                 ],
                 'match': 'm2m'
             },

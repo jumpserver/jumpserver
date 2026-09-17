@@ -33,9 +33,7 @@ class Handler(BaseHandler):
         apply_accounts = self.ticket.apply_accounts
         apply_date_start = self.ticket.apply_date_start
         apply_date_expired = self.ticket.apply_date_expired
-        permission_created_by = '{}:{}'.format(
-            str(self.ticket.__class__.__name__), str(self.ticket.id)
-        )
+        permission_created_by = apply_permission_name
         permission_comment = _(
             'Created by the ticket '
             'ticket title: {} '

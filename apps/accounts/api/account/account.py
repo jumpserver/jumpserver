@@ -12,6 +12,8 @@ from accounts.const import ChangeSecretRecordStatusChoice, Source
 from accounts.filters import AccountFilterSet, NodeFilterBackend
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import Account, ChangeSecretRecord, AccountTemplate
+from accounts.tasks import push_accounts_to_assets_task
+from accounts.tree import get_account_tree_metrics
 from assets.const.gpt import create_or_update_chatx_resources
 from assets.models import Asset, Node
 from authentication.permissions import UserConfirmation, ConfirmType
@@ -47,6 +49,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'move_to_assets': 'accounts.delete_account',
         'copy_to_assets': 'accounts.add_account',
         'chat': 'accounts.view_account',
+        'tree_metrics': 'accounts.view_account',
     }
     export_as_zip = True
 
@@ -59,6 +62,18 @@ class AccountViewSet(OrgBulkModelViewSet):
         asset = get_object_or_404(Asset, pk=asset_id)
         queryset = asset.all_accounts.all()
         return queryset
+
+    @action(methods=['post'], detail=False, url_path='tree-metrics',
+            serializer_class=serializers.AccountTreeMetricsQuerySerializer)
+    def tree_metrics(self, request):
+        serializer = serializers.AccountTreeMetricsQuerySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        results = get_account_tree_metrics(
+            data['resources'], accounts=self.get_queryset(),
+            include_descendants=data['include_descendants'],
+        )
+        return Response({'results': results})
 
     def perform_bulk_create(self, serializer):
         result = super().perform_create(serializer)
@@ -179,6 +194,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         account_data = {field: getattr(account, field) for field in field_names}
 
         creation_results = {}
+        created_account_ids = []
         success_count = 0
 
         for asset in assets:
@@ -186,7 +202,8 @@ class AccountViewSet(OrgBulkModelViewSet):
             creation_results[asset] = {'state': 'created'}
             try:
                 with transaction.atomic():
-                    self.model.objects.create(**account_data)
+                    created_account = self.model.objects.create(**account_data)
+                    created_account_ids.append(str(created_account.id))
                     success_count += 1
             except Exception as e:
                 logger.debug(f'{"Move" if move else "Copy"} to assets error: {e}')
@@ -196,6 +213,16 @@ class AccountViewSet(OrgBulkModelViewSet):
 
         if move and success_count > 0:
             account.delete()
+
+        if created_account_ids:
+            template_auto_push = (
+                account.source == Source.TEMPLATE and
+                AccountTemplate.objects.filter(id=account.source_id, auto_push=True).exists()
+            )
+            if not template_auto_push:
+                transaction.on_commit(
+                    lambda ids=tuple(created_account_ids): push_accounts_to_assets_task.delay(ids)
+                )
 
         return Response(results, status=HTTP_200_OK)
 

@@ -19,7 +19,16 @@ on:
         description: '构建 Ansible Executor 镜像所用的分支'
         required: true
         type: string
-        default: 'main'
+        default: 'dev'
+      image_tag:
+        description: '临时镜像标签（留空则使用时间戳，不更新 latest）'
+        required: false
+        type: string
+      platforms:
+        description: '临时验证平台，多个平台使用逗号分隔'
+        required: true
+        type: string
+        default: 'linux/amd64'
 
 jobs:
   build-and-push:
@@ -50,9 +59,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract date
-        id: vars
-        run: echo "IMAGE_TAG=$(date +'%Y%m%d_%H%M%S')" >> $GITHUB_ENV
+      - name: Set image tag
+        env:
+          REQUESTED_IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          image_tag="${REQUESTED_IMAGE_TAG:-$(date +'%Y%m%d_%H%M%S')}"
+          if [[ ! "$image_tag" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; then
+            echo "Invalid Docker image tag: $image_tag" >&2
+            exit 1
+          fi
+          echo "IMAGE_TAG=$image_tag" >> "$GITHUB_ENV"
 
       - name: Install ansible-builder
         run: pip install 'ansible-builder>=3.1.1'
@@ -66,10 +82,12 @@ jobs:
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v6
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ github.event_name == 'workflow_dispatch' && inputs.platforms || 'linux/amd64,linux/arm64' }}
           push: true
+          provenance: false
+          sbom: false
           context: utils/ansible_executor/context
           file: utils/ansible_executor/context/Containerfile
           tags: |
             jumpserver/ansible-executor:${{ env.IMAGE_TAG }}
-            jumpserver/ansible-executor:latest
+            ${{ github.event_name != 'workflow_dispatch' && 'jumpserver/ansible-executor:latest' || '' }}

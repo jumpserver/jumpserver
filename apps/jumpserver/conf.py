@@ -245,6 +245,7 @@ class Config(dict):
         'CSRF_COOKIE_DOMAIN': None,
         'SESSION_COOKIE_NAME_PREFIX': None,
         'SESSION_COOKIE_AGE': 3600 * 24,
+        'DATA_UPLOAD_MAX_MEMORY_SIZE': 67_117_056,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'VIEW_ASSET_ONLINE_SESSION_INFO': True,
         'LOGIN_URL': reverse_lazy('authentication:login'),
@@ -290,6 +291,20 @@ class Config(dict):
         'VAULT_OPENBAO_TOKEN': '',
         'VAULT_OPENBAO_MOUNT_POINT': 'pam',
         'VAULT_OPENBAO_TIMEOUT': 10,
+
+        # OpenBao SSH CA uses an independent endpoint and credential so it can
+        # be deployed in a separate security/failure domain from Vault KV.
+        # An empty address keeps backward compatibility with deployments that
+        # previously reused VAULT_OPENBAO_ADDR.
+        'SSH_CA_ENABLED': False,
+        'SSH_CA_OPENBAO_ADDR': '',
+        'SSH_CA_OPENBAO_TOKEN': '',
+        'SSH_CA_OPENBAO_MOUNT_POINT': 'ssh-client-signer',
+        'SSH_CA_OPENBAO_ROLE': 'jumpserver',
+        'SSH_CA_OPENBAO_TTL': 300,
+        'SSH_CA_OPENBAO_TIMEOUT': 10,
+        'SSH_CA_OPENBAO_VERIFY_TLS': True,
+        'SSH_CA_OPENBAO_SOURCE_ADDRESS': '',
 
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
@@ -535,7 +550,29 @@ class Config(dict):
         # 人脸识别
         'FACE_RECOGNITION_ENABLED': False,
         'FACE_RECOGNITION_DISTANCE_THRESHOLD': 0.35,
-        'FACE_RECOGNITION_COSINE_THRESHOLD': 0.95,
+        'FACE_RECOGNITION_COSINE_THRESHOLD': 0.45,
+        'FACE_RECOGNITION_IDENTITY_THRESHOLD': 0.38,
+        'FACE_RECOGNITION_DEVICE': 'auto',
+        'FACE_RECOGNITION_PROVIDERS': [],
+        'FACE_RECOGNITION_DETECTION_SIZE': [640, 640],
+        'FACE_RECOGNITION_MAX_FACES': 4,
+        'FACE_RECOGNITION_MIN_FACE_RATIO': 0.06,
+        'FACE_RECOGNITION_CAPTURE_TIMEOUT': 30,
+        'FACE_RECOGNITION_ENROLLMENT_SAMPLES': 3,
+        'FACE_RECOGNITION_FRAME_MAX_BYTES': 2 * 1024 * 1024,
+        'FACE_RECOGNITION_FRAME_MIN_INTERVAL': 0.18,
+        'FACE_RECOGNITION_DEBUG': False,
+        'FACE_MONITOR_GRACE_SECONDS': 10,
+        'INSIGHTFACE_MODEL_ROOT': '~/.insightface/models',
+        'INSIGHTFACE_MODEL_NAME': 'buffalo_l',
+        'FACE_LIVENESS_MODE': 'motion',
+        'FACE_LIVENESS_THRESHOLD': 0.72,
+        'FACE_LIVENESS_MODEL_PATH': '',
+        'FACE_LIVENESS_LIVE_INDEX': -1,
+        'FACE_LIVENESS_MIN_MOTION': 0.045,
+        'FACE_LIVENESS_MIN_TEXTURE': 0.08,
+        'FACE_LIVENESS_MIN_FACE_SIZE': 96,
+        'FACE_LIVENESS_CHALLENGE_TIMEOUT': 15,
 
         'SMS_ENABLED': False,
         'SMS_BACKEND': '',
@@ -609,6 +646,9 @@ class Config(dict):
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_MFA_BY_EMAIL': False,
+        'SECURITY_MFA_METHODS': [
+            'otp', 'sms', 'email', 'face', 'otp_radius', 'passkey', 'mfa_custom'
+        ],
         'SECURITY_COMMAND_EXECUTION': False,
         'ANSIBLE_DOCKER_ENABLED': True,
         'SECURITY_COMMAND_BLACKLIST': [
@@ -782,17 +822,17 @@ class Config(dict):
         'CHAT_AI_ENABLED': False,
         'CHAT_AI_METHOD': 'api',
         'CHAT_AI_EMBED_URL': '',
-        'CHAT_AI_TYPE': 'gpt',
-        'GPT_BASE_URL': '',
-        'GPT_API_KEY': '',
-        'GPT_PROXY': '',
-        'GPT_MODEL': 'gpt-4o-mini',
-        'CUSTOM_GPT_MODEL': 'gpt-4o-mini',
-        'DEEPSEEK_BASE_URL': '',
-        'DEEPSEEK_API_KEY': '',
-        'DEEPSEEK_PROXY': '',
-        'DEEPSEEK_MODEL': 'deepseek-chat',
-        'CUSTOM_DEEPSEEK_MODEL': 'deepseek-chat',
+        'CHAT_AI_BASE_URL': '',
+        'CHAT_AI_API_KEY': '',
+        'CHAT_AI_PROXY': '',
+        'CHAT_AI_MODEL': '',
+        'CHAT_AI_PROVIDER': 'openai_compatible',
+        'CHAT_AI_DELEGATION_ISSUER': 'jumpserver-ai',
+        'CHAT_AI_DELEGATION_AUDIENCE': 'jumpserver-core',
+        'CHAT_AI_DELEGATION_KEY_ID': 'v1',
+        'CHAT_AI_DELEGATION_SECRET': '',
+        'CHAT_AI_DELEGATION_VERIFY_KEYS': {},
+        'CHAT_AI_MODEL_TIMEOUT': 120,
         'VIRTUAL_APP_ENABLED': False,
 
         'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
@@ -813,17 +853,13 @@ class Config(dict):
         # Suggestion api
         'SUGGESTION_LIMIT': 10,
 
-        # MCP
-        'MCP_ENABLED': False,
-
         # oauth2_provider settings 
         'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
         'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
         'VENDOR': 'JumpServer',
 
         # JDMC
-        'JDMC_ENABLED': False,
-        'KOTL_ENABLED': False,
+        'JDMC_ENABLED': True,
         'JDMC_SOCK_PATH': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 

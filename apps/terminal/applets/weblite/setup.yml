@@ -1,0 +1,6 @@
+type: msi
+source: jms:///download/applets/JumpServer-WebLite-5.0.0-x64.msi
+arguments:
+  - /quiet
+  - /norestart
+  - ALLUSERS=1

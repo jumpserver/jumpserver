@@ -40,7 +40,7 @@ class OrgRelatedCache(Cache):
 
         def func():
             logger.debug(f'CACHE: Send refresh task {self}.{fields}')
-            refresh_org_cache_task.delay(self, *fields)
+            refresh_org_cache_task.delay(str(self.org.id), *fields)
 
         on_commit(func)
 

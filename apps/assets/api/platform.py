@@ -200,7 +200,7 @@ class PlatformProtocolViewSet(JMSModelViewSet):
 class PlatformAutomationMethodsApi(generics.ListAPIView):
     queryset = PlatformAutomation.objects.none()
     rbac_perms = {
-        'list': 'assets.view_platform'
+        'GET': 'assets.view_platform'
     }
 
     @staticmethod

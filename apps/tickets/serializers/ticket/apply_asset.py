@@ -17,6 +17,9 @@ apply_help_text = _('Support fuzzy search, and display up to 10 items')
 
 
 class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
+    flow_id = serializers.UUIDField(
+        required=True, write_only=True, label=_('Ticket flow')
+    )
     apply_assets = ObjectRelatedField(
         queryset=Asset.objects, many=True, required=False,
         label=_('Apply assets'), help_text=apply_help_text

@@ -8,6 +8,7 @@ from .ldap import *
 from .public import *
 from .security import *
 from .settings import *
+from .ssh_ca import *
 from .slack import *
 from .sms import *
 from .vault import *

@@ -1254,7 +1254,7 @@ msgid "Check engine"
 msgstr "Công cụ phát hiện"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "Kiểm tra độ mạnh của tài khoản và mật khẩu của bạn"
 
 #: accounts/models/automations/check_account.py:135
@@ -1266,7 +1266,7 @@ msgstr ""
 "mạnh của mật khẩu, tình trạng rò rỉ, v.v."
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "Kiểm tra xem tài khoản và mật khẩu có bị trùng lặp không"
 
 #: accounts/models/automations/check_account.py:143
@@ -2202,9 +2202,7 @@ msgstr "Không có tài khoản chưa được xác minh"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"Nếu mật khẩu bắt đầu bằng `{{` và kết thúc bằng `}}`, thì mật khẩu đó không "
-"được phép."
+msgstr "Mật khẩu không được bắt đầu bằng `{{` và kết thúc bằng `}}`."
 
 #: accounts/utils.py:76
 #, python-format
@@ -2218,7 +2216,7 @@ msgstr "Khóa không hợp lệ hoặc mật khẩu của khóa sai"
 #: acls/api/clipboard_acl.py:15 acls/models/clipboard_acl.py:14
 #: acls/serializers/clipboard_acl.py:37
 msgid "Operations"
-msgstr "Action"
+msgstr "Thao tác"
 
 #: acls/api/common.py:11 audits/filters.py:52
 msgid "User name, username or ID"
@@ -2293,7 +2291,7 @@ msgstr ""
 #: perms/serializers/permission.py:64 perms/serializers/permission.py:92
 #: terminal/backends/command/models.py:24
 msgid "Action"
-msgstr "Action"
+msgstr "Hành động"
 
 #: acls/models/base.py:42 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:103
@@ -2799,6 +2797,21 @@ msgstr "Thực hiện thao tác tự động"
 msgid "Stage: %(stage)s"
 msgstr "▶ Giai đoạn: %(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s: đang xử lý; tài khoản thực thi: %(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s (đăng nhập: %(login)s, %(method)s → %(become)s)"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s (tên người dùng: %(username)s, tài khoản đặc quyền: %(privileged)s)"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3230,6 +3243,11 @@ msgstr "Không có tài khoản"
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "Đang kiểm tra đăng nhập SSH và chuyển tiếp đường hầm: %(gateway)s"
 
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "Đang kiểm tra đăng nhập SSH và chuyển tiếp đường hầm: %(gateway)s; tài khoản thực thi: %(account)s"
+
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format
 msgid "✓ %(gateway)s: SSH login and tunnel forwarding are available"
@@ -3521,6 +3539,18 @@ msgstr "SYSDBA"
 msgid "Connect as SYSDBA"
 msgstr "Kết nối với vai trò SYSDBA"
 
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "Sử dụng mật khẩu cũ khi đổi mật khẩu"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr ""
+"Sử dụng mật khẩu đang được quản lý trong mệnh đề REPLACE của Oracle khi đổi "
+"mật khẩu"
+
 #: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
@@ -3598,6 +3628,10 @@ msgstr "Trình chọn mật khẩu"
 #: assets/const/protocol.py:313 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "Trình chọn nút xác nhận"
+
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "Trình chọn đăng nhập thành công"
 
 #: assets/const/protocol.py:336
 msgid "API mode"
@@ -5980,7 +6014,11 @@ msgstr "Thông tin công việc"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "Hành động"
+
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "Tính năng ký chứng chỉ SSH đã bị tắt"
 
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
@@ -6261,6 +6299,36 @@ msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 "Nếu bạn là quản trị viên, bạn có thể cập nhật tệp cấu hình để giải quyết, "
 "thiết lập thông số cấu hình"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"Trình duyệt không gửi CSRF cookie nên không thể đăng nhập. Vui lòng liên hệ "
+"quản trị viên"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Nếu bạn là quản trị viên, hãy kiểm tra xem SESSION_COOKIE_DOMAIN có bị cấu "
+"hình sai không: tên miền bạn đang truy cập phải là nó hoặc tên miền con của "
+"nó, nếu không trình duyệt sẽ không lưu cookie; hãy sửa hoặc xóa cấu hình này"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "chưa được cấu hình"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Vui lòng đảm bảo cookie đã được bật trong trình duyệt, xóa cookie của trang "
+"web và thử lại"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -7021,6 +7089,15 @@ msgstr "Gửi email"
 msgid "This task will be executed when sending email notifications"
 msgstr "Thực hiện tác vụ này khi gửi thông điệp email."
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"Đang gửi email: tiêu đề=%(subject)r, "
+"người nhận=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "Gửi tệp đính kèm email"
@@ -7051,9 +7128,25 @@ msgstr ""
 msgid "Invalid ip"
 msgstr "IP không hợp lệ"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "Địa chỉ không hợp lệ"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "Địa chỉ không được chứa khoảng trắng ở đầu hoặc cuối"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "Địa chỉ không được chứa cú pháp mẫu"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "Địa chỉ không được chứa ký tự điều khiển"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "Nhập địa chỉ IP hoặc tên máy chủ hợp lệ"
 
 #: common/utils/translate.py:46
 #, python-format
@@ -7167,7 +7260,7 @@ msgstr "Không thể chứa \":\""
 
 #: notifications/apps.py:7
 msgid "App Notifications"
-msgstr "Thông báo Action"
+msgstr "Quản lý thông báo"
 
 #: notifications/backends/__init__.py:13
 msgid "Site message"
@@ -8495,6 +8588,62 @@ msgstr "Gửi thư thành công"
 msgid "Chat AI is not enabled"
 msgstr "AI trò chuyện chưa được bật"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "Kết nối đến nhà cung cấp mô hình đã hết thời gian chờ. Vui lòng kiểm tra URL cơ sở, proxy và mạng."
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "Xác minh chứng chỉ của nhà cung cấp mô hình không thành công. Vui lòng kiểm tra chứng chỉ HTTPS."
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "Không thể phân giải tên máy chủ của nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở và cài đặt DNS."
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "Nhà cung cấp mô hình đã từ chối kết nối. Vui lòng kiểm tra URL cơ sở, cổng và trạng thái dịch vụ."
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "Không thể kết nối đến nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở, proxy và mạng."
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "Tài khoản nhà cung cấp mô hình không đủ số dư. Vui lòng nạp tiền và thử lại."
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "Xác thực với nhà cung cấp mô hình không thành công. Vui lòng kiểm tra khóa API."
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "Nhà cung cấp mô hình đã từ chối quyền truy cập. Vui lòng kiểm tra quyền của khóa API."
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "Mô hình đã chọn không tồn tại hoặc không khả dụng. Vui lòng kiểm tra mô hình và URL cơ sở."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "Không tìm thấy điểm cuối của nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "Đã vượt quá giới hạn yêu cầu của nhà cung cấp mô hình. Vui lòng thử lại sau."
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "Dịch vụ của nhà cung cấp mô hình tạm thời không khả dụng. Vui lòng thử lại sau."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "Yêu cầu đến nhà cung cấp mô hình không thành công (HTTP {status_code}): {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "Yêu cầu đến nhà cung cấp mô hình không thành công (HTTP {status_code})."
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37
@@ -8605,10 +8754,6 @@ msgstr "Cài đặt thiết bị đầu cuối"
 #: settings/models.py:183
 msgid "Can change other setting"
 msgstr "Cài đặt khác"
-
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "Gợi ý trò chuyện"
 
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
@@ -8756,14 +8901,14 @@ msgstr "Kích hoạt ánh xạ thuộc tính"
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
-msgstr "Ánh xạ thuộc tính."
+msgstr "Ánh xạ thuộc tính"
 
 #: settings/serializers/auth/cas.py:36
 msgid ""
 "User attribute mapping, where the `key` is the CAS service user attribute "
 "name and the `value` is this system user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng "
 "dịch vụ CAS, `value` là tên thuộc tính người dùng hệ thống"
 
 #: settings/serializers/auth/dingtalk.py:16
@@ -8775,7 +8920,7 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the DingTalk service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
 "thống, `value` là tên thuộc tính người dùng dịch vụ DingTalk"
 
 #: settings/serializers/auth/feishu.py:20
@@ -8783,7 +8928,7 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the FeiShu service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
 "thống, `value` là tên thuộc tính người dùng dịch vụ FeiShu"
 
 #: settings/serializers/auth/lark.py:13 users/models/user/_source.py:24
@@ -8795,7 +8940,7 @@ msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the Lark service user attribute name"
 msgstr ""
-"Bản đồ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
+"Ánh xạ thuộc tính người dùng, trong đó `key` là tên thuộc tính người dùng hệ "
 "thống, `value` là tên thuộc tính người dùng dịch vụ Lark"
 
 #: settings/serializers/auth/ldap.py:46 settings/serializers/auth/ldap.py:115
@@ -9559,6 +9704,10 @@ msgstr "Bí mật khoá truy cập (SK)"
 msgid "Chat AI"
 msgstr "AI trò chuyện"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Có thể sử dụng Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "Cách tạo"
@@ -10029,6 +10178,18 @@ msgstr "Chỉ quản trị viên"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "Bật xác thực MFA toàn cầu"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Phương thức MFA được phép"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Chọn một hoặc nhiều phương thức MFA mà người dùng có thể liên kết và sử dụng"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Vui lòng chọn ít nhất một phương thức MFA"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -10673,7 +10834,7 @@ msgstr ""
 "thể kết nối với tài sản"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "Tải xuống thêm"
 
 #: templates/resource_download.html:34
@@ -11156,7 +11317,7 @@ msgstr "Có thể kết thúc cuộc trò chuyện"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
-msgstr "Có thể xác thực quyền Action của cuộc trò chuyện"
+msgstr "Có thể xác thực quyền thao tác của phiên"
 
 #: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
@@ -11351,6 +11512,14 @@ msgstr ""
 #: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "Bỏ qua xác thực chứng chỉ"
+
+#: terminal/serializers/virtualapp_provider.py:31
+msgid "Panda image"
+msgstr "Hình ảnh Panda"
+
+#: terminal/serializers/virtualapp_provider.py:34
+msgid "Container port range"
+msgstr "Dải cổng container"
 
 #: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
@@ -12028,6 +12197,10 @@ msgstr "Sau khi thay đổi"
 msgid "{} {} the ticket"
 msgstr "{} {} Phiếu công việc"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} đã gửi phiếu công việc"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "Tên hiển thị người dùng thường gặp"
@@ -12302,7 +12475,7 @@ msgstr "Xin nút"
 
 #: tickets/serializers/ticket/apply_asset.py:28
 msgid "Apply actions"
-msgstr "Xin Action"
+msgstr "Hành động yêu cầu"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:91
@@ -12884,6 +13057,14 @@ msgstr "Đường dẫn ảnh đại diện"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Loại MFA được phép"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Để trống để kế thừa phương thức MFA toàn cục"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
@@ -13701,7 +13882,7 @@ msgstr "Chính sách tên máy chủ"
 
 #: xpack/plugins/cloud/models.py:415
 msgid "Action attr"
-msgstr "Thuộc tính Action"
+msgstr "Thuộc tính hành động"
 
 #: xpack/plugins/cloud/models.py:417
 msgid "Action value"
@@ -14173,3 +14354,73 @@ msgstr "Giấy phép không hợp lệ"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "Phiếu công việc đã đóng"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "Tải ứng dụng khách %(vendor)s"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "Chọn bộ cài đặt phù hợp với hệ điều hành của bạn."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Các phiên bản Linux, macOS Intel và các phiên bản khác có trên GitHub."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "Xem trên GitHub"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA không khả dụng"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "Không có phương thức MFA nào khả dụng. Vui lòng liên hệ quản trị viên."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "Các phương thức MFA sau chưa được bật trong cài đặt hệ thống và không thể sử dụng: %(methods)s. Vui lòng liên hệ quản trị viên."
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "Chạy triển khai nhà cung cấp ứng dụng"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "Triển khai môi trường chạy Panda trên máy chủ của nhà cung cấp ứng dụng"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "Công bố tất cả ứng dụng ảo"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "Công bố tất cả ứng dụng ảo trên một nhà cung cấp ứng dụng"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "Triển khai nhà cung cấp ứng dụng"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "Triển khai"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "Lỗi triển khai"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "Khi thay đổi ảnh, bạn cũng phải thay đổi phiên bản ứng dụng"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "Phiên bản được báo cáo không khớp với phiên bản ứng dụng hiện tại"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "Phiên bản đã công bố"

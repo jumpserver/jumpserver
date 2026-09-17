@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -49,16 +50,24 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
 
     @property
     def share_component(self) -> str:
+        if hasattr(self, '_share_component'):
+            return self._share_component
+        if self.session.protocol in ('vnc', 'rdp'):
+            return TerminalType.lion
         terminal = self.session.terminal
         if terminal:
             return terminal.type
-        if self.session.protocol in ('vnc', 'rdp'):
-            return TerminalType.lion
         return TerminalType.koko
+
+    @share_component.setter
+    def share_component(self, value):
+        # Only used while creating the sharing notification; never persisted.
+        self._share_component = value
 
     @cached_property
     def url(self) -> str:
-        return '%s/%s/share/%s/' % (self.origin, self.share_component, self.id)
+        origin = (self.origin or settings.SITE_URL).rstrip('/')
+        return '%s/luna/share/%s/?component=%s' % (origin, self.id, self.share_component)
 
     @cached_property
     def users_display(self) -> list:

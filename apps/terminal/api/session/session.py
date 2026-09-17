@@ -9,6 +9,7 @@ from django.core.files.storage import default_storage
 from django.db.models import F
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404, reverse
+from django.utils import translation
 from django.utils.encoding import escape_uri_path
 from django.utils.translation import gettext_noop, gettext as _, gettext_lazy
 from django_filters import rest_framework as filters
@@ -19,6 +20,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from audits.const import ActionChoices
+from audits.handler import create_or_update_operate_log
 from audits.utils import record_operate_log_and_activity_log
 from common.api import AsyncApiMixin, ReportExportMixin
 from common.const.http import GET, POST
@@ -118,6 +120,16 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
             self.permission_classes = [RBACPermission | IsSessionAssignee]
         return super().get_permissions()
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        with translation.override('en'):
+            create_or_update_operate_log(
+                ActionChoices.view, self.model._meta.verbose_name,
+                force=True, resource=instance,
+            )
+        return Response(serializer.data)
+
     @staticmethod
     def prepare_offline_file(session, local_path):
         replay_path = default_storage.path(local_path)
@@ -171,7 +183,7 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
         )
         record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.download, detail, Session,
-            resource_display=f'{session.asset}', resource_type=_('Session replay')
+            resource=session, resource_type=_('Session replay')
         )
         return response
 
@@ -229,11 +241,12 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
 
 class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    view_replay_cache_key = "SESSION_REPLAY_VIEW_{}"
+    view_replay_cache_key = "SESSION_REPLAY_VIEW_{}_{}"
     session = None
     rbac_perms = {
         'create': 'terminal.upload_sessionreplay',
         'retrieve': 'terminal.view_sessionreplay',
+        'index': 'terminal.view_sessionreplay',
     }
 
     def create(self, request, *args, **kwargs):
@@ -296,16 +309,30 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
     def async_callback(self, *args, **kwargs):
         session_id = kwargs.get('pk')
+        cache_data = cache.get(self.async_cache_key) or {}
+        response = cache_data.get('resp') or {}
+        response_data = response.get('data') or {}
+        if (
+                cache_data.get('status') != 'ok'
+                or not 200 <= response.get('status', 0) < 300
+        ):
+            return
+        if not response_data.get('type'):
+            return
+
         session = get_object_or_404(Session, id=session_id)
+        self._record_replay_view(session)
+
+    def _record_replay_view(self, session):
         detail = i18n_fmt(
             REPLAY_OP, self.request.user, _('View'), str(session)
         )
-        key = self.view_replay_cache_key.format(session_id)
+        key = self.view_replay_cache_key.format(self.request.user.id, session.id)
         if cache.get(key):
             return
         record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.view, detail, Session,
-            resource_display=f'{session.asset}', resource_type=_('Session replay')
+            resource=session, resource_type=_('Session replay')
         )
         cache.set(key, 1, 10)
 
@@ -325,6 +352,26 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
             return Response({"error": url}, status=404)
         data = self.get_replay_data(session, url)
         return Response(data)
+
+    def index(self, request, *args, **kwargs):
+        session = get_object_or_404(Session, id=kwargs.get('pk'))
+        storage = SessionPartReplayStorageHandler(session)
+        try:
+            content = storage.get_verified_index_bytes()
+        except FileNotFoundError:
+            return Response({'error': 'Replay index not found.'}, status=404)
+        except ValueError as exc:
+            logger.warning('Invalid replay index for session %s: %s', session.id, exc)
+            return Response({'error': 'Replay index is invalid.'}, status=422)
+        except OSError as exc:
+            logger.warning('Could not read replay index for session %s: %s', session.id, exc)
+            return Response({'error': 'Replay index is unavailable.'}, status=503)
+        self._record_replay_view(session)
+        response = HttpResponse(
+            content, content_type=storage.INDEX_MEDIA_TYPE
+        )
+        response['Cache-Control'] = 'private, no-store'
+        return response
 
 
 class SessionJoinValidateAPI(views.APIView):

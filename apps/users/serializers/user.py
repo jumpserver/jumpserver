@@ -3,14 +3,17 @@
 from functools import partial
 
 from django.conf import settings
+from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import ResourceLabelsMixin, CommonBulkModelSerializer
+from authentication.const import MFAType
 from common.serializers.fields import (
     EncryptedField,
     ObjectRelatedField,
     LabeledChoiceField,
+    ListMultipleChoiceField,
     PhoneField,
 )
 from common.utils import pretty_string, get_logger, text_hmac_sha256
@@ -163,6 +166,13 @@ class UserSerializer(
         allow_null=True,
         label=_("Phone"),
     )
+    allowed_mfa_types = ListMultipleChoiceField(
+        choices=MFAType.choices,
+        required=False,
+        allow_empty=True,
+        label=_("Allowed MFA types"),
+        help_text=_("Leave empty to inherit the global MFA methods"),
+    )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
         "org_roles": [BuiltinRole.org_user],
@@ -184,7 +194,7 @@ class UserSerializer(
                 fields_mini
                 + fields_write_only
                 + [
-                    "email", "wechat", "phone", "mfa_level",
+                    "email", "wechat", "phone", "mfa_level", "allowed_mfa_types",
                     "source", *fields_xpack,
                     "created_by", "updated_by", "comment",  # 通用字段
                     "ukey_sn",  # UKey SN号
@@ -409,13 +419,29 @@ class UserRetrieveSerializer(UserSerializer):
     login_confirm_settings = serializers.PrimaryKeyRelatedField(
         read_only=True, source="login_confirm_setting.reviewers", many=True
     )
-    has_public_keys = serializers.BooleanField(
+    has_public_keys = serializers.SerializerMethodField(
         label=_("Has public keys"),
-        read_only=True,
     )
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ["login_confirm_settings", "has_public_keys"]
+
+    @staticmethod
+    def get_has_public_keys(obj):
+        annotated = getattr(obj, '_has_public_keys', None)
+        if annotated is not None:
+            return annotated
+        return obj.has_public_keys
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        from authentication.models import SSHKey
+
+        queryset = super().setup_eager_loading(queryset)
+        active_keys = SSHKey.objects.filter(
+            user_id=OuterRef('pk'), is_active=True
+        )
+        return queryset.annotate(_has_public_keys=Exists(active_keys))
 
 
 class SmsUserSerializer(serializers.ModelSerializer):

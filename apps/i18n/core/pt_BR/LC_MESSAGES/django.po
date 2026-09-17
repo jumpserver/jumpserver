@@ -642,8 +642,8 @@ msgid ""
 "Vault operation failed. Please retry or check your account information on "
 "Vault."
 msgstr ""
-"Falha na Action Vault, tente novamente ou verifique as informações da conta "
-"no Vault."
+"Falha na operação do Vault. Tente novamente ou verifique as informações da "
+"conta no Vault."
 
 #: accounts/exceptions.py:25
 msgid ""
@@ -1254,7 +1254,7 @@ msgid "Check engine"
 msgstr "Motor de Detecção"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "Verifique a força da sua conta e senha"
 
 #: accounts/models/automations/check_account.py:135
@@ -1266,7 +1266,7 @@ msgstr ""
 "incluindo a força da senha e situações de vazamento."
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "Verifique se as contas e senhas são duplicadas"
 
 #: accounts/models/automations/check_account.py:143
@@ -2209,8 +2209,7 @@ msgstr "Nenhuma conta não verificada"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"Se a senha começar com `{{` e terminar com `}}`, essa senha não é permitida."
+msgstr "A senha não pode começar com `{{` e terminar com `}}`."
 
 #: accounts/utils.py:76
 #, python-format
@@ -2224,7 +2223,7 @@ msgstr "Chave inválida ou erro de senha da chave"
 #: acls/api/clipboard_acl.py:15 acls/models/clipboard_acl.py:14
 #: acls/serializers/clipboard_acl.py:37
 msgid "Operations"
-msgstr "Action"
+msgstr "Operações"
 
 #: acls/api/common.py:11 audits/filters.py:52
 msgid "User name, username or ID"
@@ -2299,7 +2298,7 @@ msgstr ""
 #: perms/serializers/permission.py:64 perms/serializers/permission.py:92
 #: terminal/backends/command/models.py:24
 msgid "Action"
-msgstr "Action"
+msgstr "Ação"
 
 #: acls/models/base.py:42 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:103
@@ -2808,6 +2807,21 @@ msgstr "Executar operação automatizada"
 msgid "Stage: %(stage)s"
 msgstr "▶ Etapa: %(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s: processando; conta de execução: %(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s (nome de usuário: %(username)s, conta privilegiada: %(privileged)s)"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3243,6 +3257,11 @@ msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr ""
 "Verificando login no gateway e encaminhamento do túnel SSH: %(gateway)s"
 
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "Verificando login no gateway e encaminhamento do túnel SSH: %(gateway)s; conta de execução: %(account)s"
+
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format
 msgid "✓ %(gateway)s: SSH login and tunnel forwarding are available"
@@ -3537,6 +3556,18 @@ msgstr "SYSDBA"
 msgid "Connect as SYSDBA"
 msgstr "Conectar como a função SYSDBA"
 
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "Usar a senha antiga ao alterar a senha"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr ""
+"Usar a senha gerenciada atualmente na cláusula REPLACE do Oracle ao alterar "
+"senhas"
+
 #: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
@@ -3613,6 +3644,10 @@ msgstr "Seletor de senha"
 #: assets/const/protocol.py:313 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "Seletor do botão de confirmação"
+
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "Seletor de login bem-sucedido"
 
 #: assets/const/protocol.py:336
 msgid "API mode"
@@ -4381,7 +4416,7 @@ msgstr "Coletar informações de hardware do ativo"
 
 #: assets/tasks/automation.py:25
 msgid "Asset execute automation"
-msgstr "Action do ativo"
+msgstr "Automação de execução de ativo"
 
 #: assets/tasks/automation.py:27 orgs/tasks.py:11 terminal/tasks.py:33
 msgid "Unused"
@@ -4397,8 +4432,8 @@ msgid ""
 "this task \n"
 "        will be executed"
 msgstr ""
-"Quando clicar para atualizar as informações de hardware na página de "
-"detalhes do ativo - configurações básicas no console, execute essa Action"
+"Ao clicar para atualizar as informações de hardware em Detalhes do ativo - "
+"Configurações básicas no console, esta tarefa será executada"
 
 #: assets/tasks/gather_facts.py:44
 msgid "Update assets hardware info: "
@@ -4421,8 +4456,8 @@ msgid ""
 "        nodes and when the number of nodes exceeds 100"
 msgstr ""
 "Ajuste manual do número de ativos para atualizar o número de ativos do nó "
-"atual sob a organização; Atualizar o nó, quando o número de nós é maior que "
-"100, este Action será chamado"
+"atual da organização; ao atualizar o nó, se houver mais de 100 nós, esta "
+"tarefa será executada"
 
 #: assets/tasks/nodes_amount.py:34
 msgid ""
@@ -4440,7 +4475,7 @@ msgid ""
 "count of \n"
 "        all nodes under all organizations"
 msgstr ""
-"Convocação regular do Action check_node_assets_amount_task, atualização da "
+"Executa periodicamente a tarefa check_node_assets_amount_task e atualiza a "
 "quantidade de ativos de todos os nós em todas as organizações"
 
 #: assets/tasks/ping.py:20 assets/tasks/ping.py:30
@@ -4452,8 +4487,8 @@ msgid ""
 "When clicking 'Test Asset Connectivity' in 'Asset Details - Basic Settings' "
 "this task will be executed"
 msgstr ""
-"Quando clicar para testar a conectividade do ativo na página de detalhes do "
-"ativo - configurações básicas, execute essa Action"
+"Ao clicar em Testar conectividade do ativo em Detalhes do ativo - "
+"Configurações básicas, esta tarefa será executada"
 
 #: assets/tasks/ping.py:46
 msgid "Test if the assets under the node are connectable "
@@ -4469,8 +4504,8 @@ msgid ""
 "When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
 "be executed"
 msgstr ""
-"Quando esta Action é executada no detalhe do domínio de rede - gateway - "
-"teste de conexão"
+"Ao clicar em Testar conexão em Detalhes do domínio - Gateway, esta tarefa "
+"será executada"
 
 #: assets/tasks/utils.py:16
 msgid "Asset has been disabled, skipped: {}"
@@ -5208,7 +5243,7 @@ msgstr "Usuário %s logou no sistema %s"
 #: audits/signal_handlers/activity_log.py:65
 #, python-format
 msgid "User %s perform a task for this resource: %s"
-msgstr "Usuário %s realizou uma Action no recurso atual, (%s)"
+msgstr "O usuário %s executou uma tarefa para este recurso: %s"
 
 #: audits/tasks.py:190
 msgid "Clean audits session task log"
@@ -5693,11 +5728,11 @@ msgstr "Código de verificação MFA"
 
 #: authentication/forms.py:68
 msgid "Dynamic code"
-msgstr "Código Action"
+msgstr "Código dinâmico"
 
 #: authentication/mfa/base.py:9
 msgid "Please input security code"
-msgstr "Por favor, digite o código de segurança Action"
+msgstr "Digite o código de segurança"
 
 #: authentication/mfa/base.py:32
 msgid ""
@@ -6009,7 +6044,11 @@ msgstr "Informações do Ticket"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "Ações"
+
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "A assinatura de certificados SSH está desativada"
 
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
@@ -6294,6 +6333,37 @@ msgid "If you are administrator, you can update the config resolve it, set"
 msgstr ""
 "Se você é um administrador, pode resolver atualizando o arquivo de "
 "configuração, definindo itens de configuração"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"O navegador não enviou o cookie CSRF e não é possível fazer login. Entre em "
+"contato com o administrador"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Se você for administrador, verifique se SESSION_COOKIE_DOMAIN está "
+"configurado incorretamente: o domínio que você está acessando deve ser ele "
+"ou um subdomínio dele, caso contrário o navegador não salvará o cookie; "
+"corrija ou remova essa configuração"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "não configurado"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr ""
+"Verifique se os cookies estão habilitados no navegador, limpe os cookies do "
+"site e tente novamente"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -6896,7 +6966,7 @@ msgstr "O objeto %s não existe"
 
 #: common/exceptions.py:25
 msgid "Someone else is doing this. Please wait for complete"
-msgstr "Outra pessoa está em Action, aguarde a finalização"
+msgstr "Outra pessoa está realizando esta operação. Aguarde a conclusão"
 
 #: common/exceptions.py:30
 msgid "Your request timeout"
@@ -7057,6 +7127,15 @@ msgstr "Email de remetente"
 msgid "This task will be executed when sending email notifications"
 msgstr "Ação a ser realizada ao enviar uma mensagem de email"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"Enviando e-mail: assunto=%(subject)r, "
+"destinatários=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "Anexo do email"
@@ -7087,9 +7166,25 @@ msgstr ""
 msgid "Invalid ip"
 msgstr "IP inválido"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "Endereço inválido"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "O endereço não pode conter espaços em branco no início ou no fim"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "O endereço não pode conter sintaxe de modelo"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "O endereço não pode conter caracteres de controle"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "Insira um endereço IP ou nome de host válido"
 
 #: common/utils/translate.py:46
 #, python-format
@@ -7349,7 +7444,7 @@ msgstr "Não é possível excluir este arquivo"
 
 #: ops/apps.py:9
 msgid "App Ops"
-msgstr "Centro de Action"
+msgstr "Central de operações"
 
 #: ops/const.py:8
 msgid "Push"
@@ -8542,6 +8637,62 @@ msgstr "Envio de e-mail bem-sucedido"
 msgid "Chat AI is not enabled"
 msgstr "Chat AI Não Ativado"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "A conexão com o provedor de modelos expirou. Verifique a URL base, o proxy e a rede."
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "Falha na verificação do certificado do provedor de modelos. Verifique o certificado HTTPS."
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "Não foi possível resolver o nome do host do provedor de modelos. Verifique a URL base e as configurações de DNS."
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "O provedor de modelos recusou a conexão. Verifique a URL base, a porta e o status do serviço."
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "Não foi possível conectar ao provedor de modelos. Verifique a URL base, o proxy e a rede."
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "A conta do provedor de modelos não tem saldo suficiente. Recarregue-a e tente novamente."
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "Falha na autenticação com o provedor de modelos. Verifique a chave de API."
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "O provedor de modelos negou o acesso. Verifique as permissões da chave de API."
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "O modelo selecionado não existe ou está indisponível. Verifique o modelo e a URL base."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "O endpoint do provedor de modelos não foi encontrado. Verifique a URL base."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "O limite de solicitações do provedor de modelos foi excedido. Tente novamente mais tarde."
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "O serviço do provedor de modelos está temporariamente indisponível. Tente novamente mais tarde."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "Falha na solicitação ao provedor de modelos (HTTP {status_code}): {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "Falha na solicitação ao provedor de modelos (HTTP {status_code})."
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37
@@ -8652,10 +8803,6 @@ msgstr "Configuração do terminal"
 #: settings/models.py:183
 msgid "Can change other setting"
 msgstr "Outras configurações"
-
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "Alerta de chat"
 
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
@@ -8787,7 +8934,7 @@ msgstr "Sincronizar logout"
 
 #: settings/serializers/auth/cas.py:22
 msgid "When the user signs out, they also be logged out from the CAS server"
-msgstr "Quando o usuário se desconecta, eles são desconectados do servidor CAS"
+msgstr "Quando o usuário sai, ele também é desconectado do servidor CAS"
 
 #: settings/serializers/auth/cas.py:28
 msgid "Username attr"
@@ -8804,7 +8951,7 @@ msgstr "Ativar mapeamento de atributos"
 #: settings/serializers/auth/saml2.py:35 settings/serializers/auth/slack.py:18
 #: settings/serializers/auth/wecom.py:18
 msgid "User attribute"
-msgstr "Mapear atributos"
+msgstr "Mapeamento de atributos"
 
 #: settings/serializers/auth/cas.py:36
 msgid ""
@@ -9623,6 +9770,10 @@ msgstr "Segredo da chave de acesso (SK)"
 msgid "Chat AI"
 msgstr "Chat AI"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Pode usar o Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "Método de criação"
@@ -10107,6 +10258,18 @@ msgstr "Apenas administrador"
 msgid "Global MFA"
 msgstr "Ativar autenticação MFA global"
 
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Métodos MFA permitidos"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "Selecione um ou mais métodos MFA que os usuários podem vincular e usar"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Selecione pelo menos um método MFA"
+
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
 msgstr "Autenticação de terceiros habilita MFA"
@@ -10245,8 +10408,7 @@ msgstr "Tempo máximo ocioso da conexão (minutos)"
 #: settings/serializers/security.py:237
 msgid "If idle time more than it, disconnect connection."
 msgstr ""
-"Observação: se essa configuração for excedida sem qualquer Action, a conexão "
-"será desconectada"
+"Se o período de inatividade exceder este valor, a conexão será desconectada"
 
 #: settings/serializers/security.py:240
 msgid "Session expire at browser closed"
@@ -10759,7 +10921,7 @@ msgstr ""
 "para conectar ativos"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "Mais downloads"
 
 #: templates/resource_download.html:34
@@ -11242,7 +11404,7 @@ msgstr "É possível encerrar a sessão"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
-msgstr "É possível validar as permissões de Action na sessão."
+msgstr "É possível validar as permissões de ação da sessão"
 
 #: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
@@ -11438,6 +11600,14 @@ msgstr ""
 #: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "Ignorar certificação de certificado"
+
+#: terminal/serializers/virtualapp_provider.py:31
+msgid "Panda image"
+msgstr "Imagem do Panda"
+
+#: terminal/serializers/virtualapp_provider.py:34
+msgid "Container port range"
+msgstr "Faixa de portas do contêiner"
 
 #: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
@@ -12122,6 +12292,10 @@ msgstr "Depois da alteração"
 msgid "{} {} the ticket"
 msgstr "{} {} Ordem de serviço"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} enviou a ordem de serviço"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "Comum"
@@ -12152,7 +12326,7 @@ msgstr "Usuários em cópia"
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:39
 #: tickets/serializers/ticket/ticket.py:87
 msgid "Ticket flow"
-msgstr "Fluxo de Action da ordem de serviço"
+msgstr "Fluxo da ordem de serviço"
 
 #: tickets/models/relation.py:12
 msgid "Ticket session relation"
@@ -12469,7 +12643,7 @@ msgstr ""
 
 #: tickets/views/approve.py:105
 msgid "Illegal approval action"
-msgstr "Action inválida de aprovação"
+msgstr "Ação de aprovação inválida"
 
 #: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"
@@ -12986,6 +13160,14 @@ msgstr "Caminho do avatar"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Tipos MFA permitidos"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Deixe vazio para herdar os métodos MFA globais"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
@@ -13815,7 +13997,7 @@ msgstr "Valor de ação"
 
 #: xpack/plugins/cloud/models.py:424 xpack/plugins/cloud/serializers/task.py:85
 msgid "Strategy action"
-msgstr "Action"
+msgstr "Ação"
 
 #: xpack/plugins/cloud/providers/aws_international.py:18
 msgid "China (Beijing)"
@@ -14283,3 +14465,73 @@ msgstr "Licença inválida"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "A ordem de serviço foi fechada"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "Baixar o cliente %(vendor)s"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "Escolha o instalador para o seu sistema operacional."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Encontre Linux, macOS Intel e outras versões no GitHub."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "Ver no GitHub"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA indisponível"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "Não há nenhum método de MFA disponível. Entre em contato com o administrador."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "Os seguintes métodos de MFA não estão habilitados nas configurações do sistema e não podem ser usados: %(methods)s. Entre em contato com o administrador."
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "Executar a implantação do fornecedor de aplicativos"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "Implantar o ambiente de execução do Panda no host do fornecedor de aplicativos"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "Publicar todos os aplicativos virtuais"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "Publicar todos os aplicativos virtuais em um fornecedor de aplicativos"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "Implantação do fornecedor de aplicativos"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "Implantação"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "Erro de implantação"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "Ao alterar a imagem, também é necessário alterar a versão do aplicativo"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "A versão informada não corresponde à versão atual do aplicativo"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "Versão publicada"

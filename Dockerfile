@@ -1,4 +1,4 @@
-FROM jumpserver/core-base:20260729_065854 AS stage-build
+FROM jumpserver/core-base:20260908_003939 AS stage-build
 
 ARG VERSION
 
@@ -65,7 +65,7 @@ VOLUME /opt/jumpserver/data
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-EXPOSE 8080
+EXPOSE 8080 8088
 
 STOPSIGNAL SIGQUIT
 

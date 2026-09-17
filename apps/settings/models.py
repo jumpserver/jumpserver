@@ -9,10 +9,8 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
-from common.db.models import JMSBaseModel
 from common.db.utils import Encryptor
 from common.utils import get_logger
-from .const import ChatAITypeChoices
 from .signals import setting_changed
 
 
@@ -185,32 +183,13 @@ class Setting(models.Model):
         ]
 
 
-class ChatPrompt(JMSBaseModel):
-    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
-    content = models.TextField(blank=False, null=False, verbose_name=_('Content'))
-    builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
-
-    class Meta:
-        verbose_name = _("Chat prompt")
-
-    def __str__(self):
-        return self.name
-
-
-def get_chatai_data():
-    data = {
-        'url': settings.GPT_BASE_URL,
-        'api_key': settings.GPT_API_KEY,
-        'proxy': settings.GPT_PROXY,
-        'model': settings.GPT_MODEL if settings.GPT_MODEL != 'custom' else settings.CUSTOM_GPT_MODEL,
+def get_chat_ai_config():
+    return {
+        'base_url': settings.CHAT_AI_BASE_URL or '',
+        'api_key': settings.CHAT_AI_API_KEY or '',
+        'proxy': settings.CHAT_AI_PROXY or '',
+        'model': settings.CHAT_AI_MODEL or '',
     }
-    if settings.CHAT_AI_TYPE != ChatAITypeChoices.gpt:
-        data['url'] = settings.DEEPSEEK_BASE_URL
-        data['api_key'] = settings.DEEPSEEK_API_KEY
-        data['proxy'] = settings.DEEPSEEK_PROXY
-        data['model'] = settings.DEEPSEEK_MODEL if settings.DEEPSEEK_MODEL != 'custom' else settings.CUSTOM_DEEPSEEK_MODEL
-
-    return data
 
 
 class LeakPasswords(models.Model):

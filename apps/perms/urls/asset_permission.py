@@ -17,6 +17,7 @@ router.register('asset-permissions-nodes-relations', api.AssetPermissionNodeRela
                 'asset-permissions-nodes-relation')
 
 permission_urlpatterns = [
+    path('tree-metrics/', api.AssetPermissionTreeMetricsApi.as_view(), name='asset-permission-tree-metrics'),
     # 授权规则中授权的资产
     path('<uuid:pk>/assets/all/', api.AssetPermissionAllAssetListApi.as_view(), name='asset-permission-all-assets'),
     path('<uuid:pk>/users/all/', api.AssetPermissionAllUserListApi.as_view(), name='asset-permission-all-users'),

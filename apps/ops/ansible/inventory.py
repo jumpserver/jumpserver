@@ -25,7 +25,8 @@ class JMSInventory:
     def __init__(
             self, assets, account_policy='privileged_first',
             account_prefer='root,Administrator', host_callback=None,
-            exclude_localhost=False, task_type=None, protocol=None
+            exclude_localhost=False, task_type=None, protocol=None,
+            account_selector=None,
     ):
         """
         :param assets:
@@ -41,6 +42,7 @@ class JMSInventory:
         self.exclude_localhost = exclude_localhost
         self.task_type = task_type
         self.protocol = protocol
+        self.account_selector = account_selector
 
     @staticmethod
     def clean_assets(assets):
@@ -157,6 +159,9 @@ class JMSInventory:
             if p.name == 'oracle':
                 setting = getattr(p, 'setting', {}) or {}
                 host['jms_asset']['oracle_sysdba'] = setting.get('sysdba', False)
+                host['jms_asset']['oracle_change_secret_with_old_password'] = (
+                    setting.get('change_secret_with_old_password', False)
+                )
             if p.name == 'mongodb':
                 setting = getattr(p, 'setting', {}) or {}
                 connection_options = {
@@ -304,7 +309,9 @@ class JMSInventory:
             },
             'jms_account': {
                 'id': str(account.id),
+                'name': account.name,
                 'username': username,
+                'privileged': account.privileged,
                 'secret': account.escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
             } if account else None
@@ -361,6 +368,8 @@ class JMSInventory:
         return account
 
     def select_account(self, asset):
+        if self.account_selector is not None:
+            return self.account_selector(asset)
         accounts = self.get_asset_sorted_accounts(asset)
         if not accounts:
             return None

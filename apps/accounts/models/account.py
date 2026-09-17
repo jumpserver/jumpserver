@@ -185,6 +185,8 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
 
     @lazyproperty
     def has_secret(self) -> bool:
+        if self.secret_type == SecretType.SSH_CERTIFICATE:
+            return True
         return bool(self.secret)
 
     @lazyproperty

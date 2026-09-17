@@ -15,7 +15,7 @@ def handler404(request, *args, **argv):
 
 
 def handler500(request, *args, **argv):
-    if request.content_type.find('application/json') > -1:
+    if request.get_preferred_type(['text/html', 'application/json']) == 'application/json':
         response = JsonResponse({'error': 'Server internal error'}, status=500)
     else:
         response = render(request, '500.html', status=500)

@@ -20,30 +20,8 @@ from perms.notifications import (
     PermedAssetsWillExpireUserMsg,
     AssetPermsWillExpireForOrgAdminMsg,
 )
-from perms.utils import UserPermTreeExpireUtil
 
 logger = get_logger(__file__)
-
-
-@shared_task(
-    verbose_name=_('Check asset permission expired'),
-    description=_(
-        """The cache of organizational collections, which have completed user authorization tree 
-        construction, will expire. Therefore, expired collections need to be cleared from the 
-        cache, and this task will be executed periodically based on the time interval specified 
-        by PERM_EXPIRED_CHECK_PERIODIC in the system configuration file config.txt"""
-    )
-)
-@register_as_period_task(interval=settings.PERM_EXPIRED_CHECK_PERIODIC)
-@atomic()
-@tmp_to_root_org()
-def check_asset_permission_expired():
-    """ 这里的任务要足够短，不要影响周期任务 """
-    perms = AssetPermission.objects.get_expired_permissions()
-    perm_ids = list(perms.distinct().values_list('id', flat=True))
-    show_perm_ids = perm_ids[:5]
-    logger.info(f'Checking expired permissions: {show_perm_ids} ...')
-    UserPermTreeExpireUtil().expire_perm_tree_for_perms(perm_ids)
 
 
 @shared_task(

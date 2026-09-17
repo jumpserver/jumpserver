@@ -66,6 +66,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'custom': serializers.CustomSMSSettingSerializer,
         'vault': serializers.VaultSettingSerializer,
         'openbao': serializers.OpenBaoSerializer,
+        'ssh_ca': serializers.SSHCAOpenBaoSerializer,
         'azure_kv': serializers.AzureKVSerializer,
         'aws_sm': serializers.AmazonSMSerializer,
         'hcp': serializers.HashicorpKVSerializer,
@@ -123,6 +124,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cmpp2': 'settings.change_sms',
         'vault': 'settings.change_vault',
         'openbao': 'settings.change_vault',
+        'ssh_ca': 'settings.change_vault',
         'azure_kv': 'settings.change_vault',
         'aws_sm': 'settings.change_vault',
         'hcp': 'settings.change_vault',
@@ -278,4 +280,4 @@ class ClientVersionView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        return Response(['4.0.0', '4.1.0', '4.1.1', '4.1.2'], status=status.HTTP_200_OK)
+        return Response(['4.0.0', '4.1.0', '4.1.1', '4.1.2', '5.0.0'], status=status.HTTP_200_OK)

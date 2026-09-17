@@ -25,6 +25,7 @@
       "username_selector": "name=username",
       "password_selector": "name=password",
       "submit_selector": "id=login_button",
+      "success_selector": "id=dashboard",
       "script": []
     },
     "org_id": "2925D985-A435-411D-9BC4-FEA630F105D9"

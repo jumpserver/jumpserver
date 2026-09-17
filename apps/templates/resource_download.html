@@ -1,57 +1,75 @@
 {% extends '_without_nav_base.html' %}
-{% load i18n %}
+{% load i18n static %}
+
+{% block html_title %}{% blocktrans with vendor=VENDOR %}Download {{ vendor }} Client{% endblocktrans %}{% endblock %}
+{% block body_class %}resource-download{% endblock %}
+{% block custom_head_css_js %}
+    <link href="{% static 'css/resource_download.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
-    <style>
-li {
-    list-style: disc;
-}
+    <main class="download-page" aria-labelledby="download-title">
+        <div class="download-heading">
+            <div>
+                <h1 id="download-title">{% blocktrans with vendor=VENDOR %}Download {{ vendor }} Client{% endblocktrans %}</h1>
+                <p>{% trans 'Choose the installer for your operating system.' %}</p>
+            </div>
+            <span class="download-version">{% trans 'Version' %} {{ CLIENT_VERSION }}</span>
+        </div>
 
-ul {
-    padding-left: 30px;
-    padding-top: 10px;
-}
+        <div class="download-platforms">
+            <section class="download-card" aria-labelledby="windows-title">
+                <div class="download-platform-heading">
+                    <span class="download-platform-icon"><i class="fa fa-windows" aria-hidden="true"></i></span>
+                    <div>
+                        <h2 id="windows-title">Windows</h2>
+                        <p>Intel / AMD · x64</p>
+                    </div>
+                    <span class="download-format">.exe</span>
+                </div>
+                <a class="download-button" href="/download/public/Client_{{ CLIENT_VERSION }}_x64-setup.exe" download aria-label="{% trans 'Download' %} Windows x64">
+                    <i class="fa fa-download" aria-hidden="true"></i>
+                    {% trans 'Download' %} .exe
+                </a>
+                <p class="download-filename">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_x64-setup.exe</p>
+            </section>
 
-p {
-    padding-top: 10px;
-}
-</style>
-    <div style="margin: 0 200px">
-    <div class="group">
-        <h2>{{ VENDOR }} {% trans 'Client' %} {{ CLIENT_VERSION }}</h2>
-        <p>
-            {% trans 'Client, currently used to launch the client' %}
-        </p>
-        <ul>
-            <li> <a href="/download/public/Client_{{ CLIENT_VERSION }}_x64-setup.exe">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_x64-setup.exe</a></li>
-            <li> <a href="/download/public/Client_{{ CLIENT_VERSION }}_aarch64.dmg">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_aarch64.dmg</a></li>
-        </ul>
-    </div>
+            <section class="download-card" aria-labelledby="macos-title">
+                <div class="download-platform-heading">
+                    <span class="download-platform-icon"><i class="fa fa-apple" aria-hidden="true"></i></span>
+                    <div>
+                        <h2 id="macos-title">macOS</h2>
+                        <p>Apple silicon · ARM64</p>
+                    </div>
+                    <span class="download-format">.dmg</span>
+                </div>
+                <a class="download-button" href="/download/public/Client_{{ CLIENT_VERSION }}_aarch64.dmg" download aria-label="{% trans 'Download' %} macOS ARM64">
+                    <i class="fa fa-download" aria-hidden="true"></i>
+                    {% trans 'Download' %} .dmg
+                </a>
+                <p class="download-filename">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_aarch64.dmg</p>
+            </section>
+        </div>
 
-    {% if MORE_DOWNLOADS_URL %}
-    <div class="group">
-        <h2> {% trans 'More download' %} </h2>
-        <ul>
-            <li><a href="{{ MORE_DOWNLOADS_URL }}">{% trans 'Tools and applications' %}</a></li>
-        </ul>
-    </div>
-    {% endif %}
-</div>
-    <style>
-    ul {
-        list-style-type: disc;
-    }
+        <section class="download-more" aria-labelledby="more-downloads-title">
+            <i class="fa fa-github download-github-icon" aria-hidden="true"></i>
+            <div class="download-more-copy">
+                <h2 id="more-downloads-title">{% trans 'More downloads' %}</h2>
+                <p>{% trans 'Find Linux, macOS Intel and other versions on GitHub.' %}</p>
+            </div>
+            <a class="download-github-link" href="https://github.com/jumpserver/luna/releases" target="_blank" rel="noopener noreferrer">
+                {% trans 'View on GitHub' %}
+                <i class="fa fa-external-link" aria-hidden="true"></i>
+            </a>
+        </section>
 
-    li a {
-        color: blue;
-    }
-
-    .group {
-        padding-top: 40px;
-    }
-
-    .group ul {
-        padding-top: 10px;
-    }
-</style>
-
+        {% if MORE_DOWNLOADS_URL %}
+            <div class="download-custom">
+                <a href="{{ MORE_DOWNLOADS_URL }}" target="_blank" rel="noopener noreferrer">
+                    {% trans 'Tools and applications' %}
+                    <i class="fa fa-external-link" aria-hidden="true"></i>
+                </a>
+            </div>
+        {% endif %}
+    </main>
 {% endblock %}

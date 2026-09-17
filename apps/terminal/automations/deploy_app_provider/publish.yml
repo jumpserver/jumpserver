@@ -1,0 +1,107 @@
+---
+- hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    APP_IMAGE: ''
+    APP_IMAGE_RESOURCES: {}
+
+  tasks:
+    - name: Read Docker platform
+      ansible.builtin.command:
+        argv: [docker, version, --format, '{{ "{{.Server.Os}}/{{.Server.Arch}}" }}']
+      register: docker_platform
+      changed_when: false
+
+    - name: Select uploaded application image for the Docker platform
+      ansible.builtin.set_fact:
+        app_image_resource: '{{ APP_IMAGE_RESOURCES.get((docker_platform.stdout | trim).split("/")[-1], {}) }}'
+
+    - name: Check uploaded application image platform
+      ansible.builtin.assert:
+        that: app_image_resource.get('os', '') ~ '/' ~ app_image_resource.get('architecture', '') == docker_platform.stdout | trim
+        fail_msg: 'Uploaded image {{ APP_IMAGE }} does not match {{ docker_platform.stdout | trim }}'
+      when: app_image_resource | length > 0
+
+    - name: Inspect local application image
+      ansible.builtin.command:
+        argv: [docker, image, inspect, '{{ APP_IMAGE }}']
+        expand_argument_vars: false
+      register: local_image
+      changed_when: false
+      failed_when: false
+
+    - name: Read local application image
+      ansible.builtin.set_fact:
+        app_image: '{{ (local_image.stdout | from_json | first) if local_image.rc == 0 else {} }}'
+
+    - name: Check whether the local application image can be reused
+      ansible.builtin.set_fact:
+        reuse_app_image: >-
+          {{ app_image.get('Os', '') ~ '/' ~ app_image.get('Architecture', '') == docker_platform.stdout | trim
+             and (app_image_resource | length == 0 or app_image.get('Id') in app_image_resource.image_ids) }}
+
+    - name: Prepare application image for the Docker platform
+      when: not reuse_app_image
+      block:
+        - name: Import uploaded application image
+          when: app_image_resource | length > 0
+          block:
+            - name: Create application image import directory
+              ansible.builtin.tempfile:
+                state: directory
+                prefix: virtual-app-image-
+              register: image_import
+
+            - name: Transfer uploaded application image
+              ansible.builtin.copy:
+                src: '{{ app_image_resource.file }}'
+                dest: '{{ image_import.path }}/image.archive'
+                mode: '0600'
+
+            - name: Calculate transferred image archive checksum
+              ansible.builtin.stat:
+                path: '{{ image_import.path }}/image.archive'
+                checksum_algorithm: sha256
+              register: image_archive
+
+            - name: Verify uploaded image archive
+              ansible.builtin.assert:
+                that: image_archive.stat.checksum == app_image_resource.sha256
+                fail_msg: Uploaded application image archive checksum does not match
+
+            - name: Load uploaded application image
+              ansible.builtin.command:
+                argv: [docker, load, --input, '{{ image_import.path }}/image.archive']
+              async: 900
+              poll: 5
+
+        - name: Pull matching application image
+          ansible.builtin.command:
+            argv: [docker, pull, --platform, '{{ docker_platform.stdout | trim }}', '{{ APP_IMAGE }}']
+            expand_argument_vars: false
+          async: 900
+          poll: 5
+          when: app_image_resource | length == 0
+
+        - name: Inspect prepared application image
+          ansible.builtin.command:
+            argv: [docker, image, inspect, '{{ APP_IMAGE }}']
+            expand_argument_vars: false
+          register: prepared_image
+          changed_when: false
+
+        - name: Read prepared application image
+          ansible.builtin.set_fact:
+            app_image: '{{ prepared_image.stdout | from_json | first }}'
+      always:
+        - name: Remove application image import directory
+          ansible.builtin.file:
+            path: '{{ image_import.path }}'
+            state: absent
+          when: image_import.path is defined
+
+    - name: Confirm application image
+      ansible.builtin.assert:
+        that: app_image.get('Os', '') ~ '/' ~ app_image.get('Architecture', '') == docker_platform.stdout | trim
+        fail_msg: 'Application image {{ APP_IMAGE }} does not match {{ docker_platform.stdout | trim }}'

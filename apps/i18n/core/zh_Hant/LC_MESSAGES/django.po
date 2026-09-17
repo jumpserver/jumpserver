@@ -112,7 +112,7 @@ msgstr "備份任務沒有指定收件人"
 
 #: accounts/automations/backup_account/handlers.py:291
 msgid "Plan start"
-msgstr "Action開始"
+msgstr "計劃開始"
 
 #: accounts/automations/backup_account/manager.py:14
 msgid "The account backup plan is being executed"
@@ -1244,7 +1244,7 @@ msgid "Check engine"
 msgstr "檢測引擎"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "檢查您的帳號和密碼的強度"
 
 #: accounts/models/automations/check_account.py:135
@@ -1254,7 +1254,7 @@ msgid ""
 msgstr "針對帳號密碼的安全性進行檢查分析，包括密碼強度、洩露情況等。"
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "檢查帳號和密碼是否重複"
 
 #: accounts/models/automations/check_account.py:143
@@ -1395,7 +1395,7 @@ msgstr "登錄時手動輸入 使用者名稱/密碼 來連接的帳號"
 
 #: accounts/models/virtual.py:38
 msgid "The account username name same with user on connect"
-msgstr "登錄資產時，帳號使用者名稱與使用者使用者名稱相同的帳號"
+msgstr "登入資產時，帳號使用者名稱與使用者名稱相同的帳號"
 
 #: accounts/models/virtual.py:39
 msgid ""
@@ -2149,7 +2149,7 @@ msgstr "沒有未校驗帳號"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr "如果密碼以 `{{` 開始，並且以 `}}` 結束，則該密碼是不允許的。"
+msgstr "密碼不能以 `{{` 開頭並以 `}}` 結尾。"
 
 #: accounts/utils.py:76
 #, python-format
@@ -2737,6 +2737,21 @@ msgstr "執行自動化操作"
 msgid "Stage: %(stage)s"
 msgstr "▶ 階段：%(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s：正在處理，執行帳號：%(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s（登入帳號：%(login)s，%(method)s → %(become)s）"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s（使用者名稱：%(username)s，特權帳號：%(privileged)s）"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3134,6 +3149,11 @@ msgstr "沒有帳號"
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "正在驗證網關登入與 SSH 隧道轉發：%(gateway)s"
 
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "正在驗證網關登入與 SSH 隧道轉發：%(gateway)s，執行帳號：%(account)s"
+
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format
 msgid "✓ %(gateway)s: SSH login and tunnel forwarding are available"
@@ -3419,6 +3439,16 @@ msgstr "SYSDBA"
 #: assets/const/protocol.py:181
 msgid "Connect as SYSDBA"
 msgstr "以 SYSDBA 角色連接"
+
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "變更密碼時使用舊密碼"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr "變更密碼時，在 Oracle REPLACE 子句中使用目前納管的密碼"
 
 #: assets/const/protocol.py:196
 msgid ""
@@ -4407,7 +4437,7 @@ msgstr "標籤"
 
 #: audits/backends/db.py:79
 msgid "operate_log_id"
-msgstr "Action日誌ID"
+msgstr "操作日誌 ID"
 
 #: audits/backends/db.py:111 ops/models/variable.py:19
 msgid "Tips"
@@ -5010,7 +5040,7 @@ msgstr "耗時範圍"
 
 #: audits/serializers.py:39 ops/serializers/celery.py:30
 msgid "Execution cycle"
-msgstr "週期性Action"
+msgstr "執行週期"
 
 #: audits/serializers.py:95
 msgid "Reason display"
@@ -5122,7 +5152,7 @@ msgstr "ACL 動作是覆核"
 
 #: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
-msgstr "ACL Action 係人臉驗證"
+msgstr "ACL 動作是人臉驗證"
 
 #: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
@@ -5130,7 +5160,7 @@ msgstr "資產登錄規則不支持當前資產"
 
 #: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
-msgstr "ACL Action 係人臉在線"
+msgstr "ACL 動作是在線人臉驗證"
 
 #: authentication/api/connection_token.py:807
 msgid "No available face feature"
@@ -5828,6 +5858,10 @@ msgstr "工單資訊"
 msgid "Actions"
 msgstr "動作"
 
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 憑證簽發已停用"
+
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
 #: users/filters.py:33 users/serializers/user.py:127
@@ -6083,6 +6117,31 @@ msgstr "配置文件有問題，無法登錄，請聯絡管理員或查看最新
 #: xpack/plugins/interface/templates/login_i18n.html:6
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "如果你是管理員，可以更新配置文件解決，設置配置項"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "瀏覽器未攜帶 CSRF Cookie，無法登入。請聯絡管理員"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"如果你是管理員，請檢查 SESSION_COOKIE_DOMAIN 配置是否錯誤：訪問網域必須是它或它的子網域，否則瀏覽器不會保存 "
+"Cookie，請修正或刪除該配置"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "未配置"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "請確認瀏覽器已啟用 Cookie，並清除本站 Cookie 後重試"
 
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
@@ -6824,6 +6883,15 @@ msgstr "發件郵件"
 msgid "This task will be executed when sending email notifications"
 msgstr "發送郵件消息時執行該任務"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"正在傳送郵件：主旨=%(subject)r，"
+"收件者=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "發送郵件附件"
@@ -6850,9 +6918,25 @@ msgstr "當執行帳號備份時，需要到外部儲存（sftp），執行該�
 msgid "Invalid ip"
 msgstr "無效 IP"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "無效地址"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "位址不能包含開頭或結尾空白字元"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "位址不能包含範本語法"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "位址不能包含控制字元"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "請輸入有效的 IP 位址或主機名稱"
 
 #: common/utils/translate.py:46
 #, python-format
@@ -7443,7 +7527,7 @@ msgstr "CPU 使用率超過 {max_threshold}: => {value}"
 
 #: ops/serializers/celery.py:32
 msgid "Next execution time"
-msgstr "下次Action時間"
+msgstr "下次執行時間"
 
 #: ops/serializers/job.py:17
 msgid "Run on save"
@@ -8260,6 +8344,62 @@ msgstr "發送郵件成功"
 msgid "Chat AI is not enabled"
 msgstr "聊天 AI 沒有開啟"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "連線模型服務商逾時，請檢查服務位址、代理和網路。"
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "模型服務商的憑證驗證失敗，請檢查其 HTTPS 憑證。"
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "無法解析模型服務商的主機名稱，請檢查服務位址和 DNS 設定。"
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "模型服務商拒絕連線，請檢查服務位址、連接埠和服務狀態。"
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "無法連線模型服務商，請檢查服務位址、代理和網路。"
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "模型服務商帳戶餘額不足，請儲值後重試。"
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "模型服務商驗證失敗，請檢查 API 金鑰。"
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "模型服務商拒絕存取，請檢查 API 金鑰權限。"
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "所選模型不存在或無法使用，請檢查模型和服務位址。"
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "找不到模型服務介面，請檢查服務位址。"
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "已超過模型服務商的請求頻率限制，請稍後重試。"
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "模型服務商暫時無法使用，請稍後重試。"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "模型服務商請求失敗（HTTP {status_code}）：{detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "模型服務商請求失敗（HTTP {status_code}）。"
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37
@@ -8371,10 +8511,6 @@ msgstr "終端設置"
 msgid "Can change other setting"
 msgstr "其它設置"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "聊天提示"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "同步LDAP用戶任務結果通知"
@@ -8471,7 +8607,7 @@ msgid ""
 "party authentication when the administrator enables third-party redirect "
 "authentication"
 msgstr ""
-"Action管理員啟用第三方重新定向身份驗證時，在使用者重定向到第三方身份驗證之前"
+"當管理員啟用第三方重新導向身份驗證時，在使用者重新導向到第三方身份驗證之前"
 "是否顯示 Flash 頁面"
 
 #: settings/serializers/auth/base.py:56
@@ -8526,7 +8662,7 @@ msgid ""
 "name and the `value` is this system user attribute name"
 msgstr ""
 "使用者屬性對照，其中 `key` 是 CAS 服務使用者屬性名稱，`value` 是本系統使用者"
-"使用者屬性名稱"
+"屬性名稱"
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
@@ -9292,6 +9428,10 @@ msgstr "Access key secret(SK)"
 msgid "Chat AI"
 msgstr "聊天 AI"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "可使用 Chat AI"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "創建方式"
@@ -9739,6 +9879,18 @@ msgstr "僅管理員"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "全局啟用 MFA 認證"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "允許的 MFA 方式"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "選擇使用者可以綁定和使用的一種或多種 MFA 方式"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "請至少選擇一種 MFA 方式"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -10347,7 +10499,7 @@ msgid "Client, currently used to launch the client"
 msgstr "客戶端，目前用來喚起特定客戶端程式連接資產"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "更多下載"
 
 #: templates/resource_download.html:34
@@ -10701,18 +10853,22 @@ msgid "HTTP port"
 msgstr "HTTP 埠"
 
 #: terminal/models/component/endpoint.py:18
+msgid "Web proxy port"
+msgstr "Web 代理埠"
+
+#: terminal/models/component/endpoint.py:19
 msgid "SSH port"
 msgstr "SSH 埠"
 
-#: terminal/models/component/endpoint.py:19
+#: terminal/models/component/endpoint.py:20
 msgid "RDP port"
 msgstr "RDP 埠"
 
-#: terminal/models/component/endpoint.py:20
+#: terminal/models/component/endpoint.py:21
 msgid "Magnus port"
 msgstr "Magnus 連接埠"
 
-#: terminal/models/component/endpoint.py:21
+#: terminal/models/component/endpoint.py:22
 msgid "VNC port"
 msgstr "VNC 端口"
 
@@ -11022,6 +11178,14 @@ msgstr ""
 #: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "忽略證書認證"
+
+#: terminal/serializers/virtualapp_provider.py:31
+msgid "Panda image"
+msgstr "Panda 鏡像"
+
+#: terminal/serializers/virtualapp_provider.py:34
+msgid "Container port range"
+msgstr "容器埠範圍"
 
 #: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
@@ -11670,7 +11834,11 @@ msgstr "變更後"
 
 #: tickets/handlers/base.py:106
 msgid "{} {} the ticket"
-msgstr "{} {} 工單"
+msgstr "{} 工單{}"
+
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} 提交了工單"
 
 #: tickets/models/comment.py:14
 msgid "common"
@@ -12517,6 +12685,14 @@ msgstr "頭像路徑"
 msgid "MFA level"
 msgstr "MFA 級別"
 
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "允許的 MFA 類型"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "留空則繼承全局 MFA 方式"
+
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
 msgstr "認證"
@@ -13054,7 +13230,7 @@ msgstr "實例 ID"
 #: xpack/plugins/cloud/manager.py:61
 #, python-format
 msgid "Task \"%s\" starts executing"
-msgstr "Action \"%s\" 開始執行"
+msgstr "任務 \"%s\" 開始執行"
 
 #: xpack/plugins/cloud/manager.py:101
 msgid "View the task details path: "
@@ -13772,3 +13948,110 @@ msgstr "許可證無效"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "工單已經關閉"
+
+#: assets/models/asset/web.py assets/const/protocol.py
+msgid "Success selector"
+msgstr "登入成功選擇器"
+
+#: assets/models/asset/web.py assets/const/protocol.py
+msgid ""
+"Selector for an element that appears only after a successful login, e.g. css=#dashboard. "
+"Required for basic autofill."
+msgstr "用於定位僅在登入成功後出現的頁面元素，例如 css=#dashboard。基本自動填入模式下必填。"
+
+msgid "Interactive selector"
+msgstr "可互動區域選擇器"
+
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "選填的人工驗證區域，例如 css=#mfa-dialog。請排除帳號密碼及顯示密碼等控制項。"
+
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "請填寫完整的 HTTP/HTTPS 網域，不支援路徑、帳號密碼或萬用字元。"
+
+msgid "Enter at most 128 script steps."
+msgstr "最多填寫 128 個指令碼步驟。"
+
+msgid "Invalid script step."
+msgstr "指令碼步驟格式無效。"
+
+msgid "Script step numbers must be unique positive integers."
+msgstr "指令碼步驟編號必須是不重複的正整數。"
+
+msgid "Unsupported script command."
+msgstr "不支援此指令碼命令。"
+
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "步驟逾時必須為 1 至 180 秒。"
+
+msgid "The success command must be the last step."
+msgstr "success 必須是指令碼的最後一步。"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "下載 %(vendor)s 用戶端"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "選擇適合您作業系統的安裝程式。"
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Linux、macOS Intel 及其他版本可前往 GitHub 下載。"
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "前往 GitHub"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA 無法使用"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "沒有可用的 MFA 驗證方式，請聯絡管理員。"
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "以下 MFA 驗證方式尚未在系統設定中啟用，暫時無法使用：%(methods)s。請聯絡管理員。"
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "執行應用發布機部署"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "在應用發布機上部署 Panda 執行環境"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "發布所有虛擬應用"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "在應用發布機上發布所有虛擬應用"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "應用發布機部署"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "部署"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "部署錯誤"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "更換映像時，必須同時修改應用版本"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "回報版本與目前應用版本不一致"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "已發布版本"

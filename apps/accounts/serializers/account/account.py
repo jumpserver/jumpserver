@@ -267,6 +267,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         return queryset
 
     def validate(self, attrs):
+        attrs = self.validate_dynamic_credential(attrs)
         instance = getattr(self, "instance", None)
         if instance:
             return super().validate(attrs)

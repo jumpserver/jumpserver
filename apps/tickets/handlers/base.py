@@ -102,8 +102,11 @@ class BaseHandler:
             user = self.ticket.processor
 
         user_display = str(user)
-        state_display = getattr(TicketState, state).label
-        approve_info = _('{} {} the ticket').format(user_display, state_display)
+        if state == TicketState.pending:
+            approve_info = _('{} submitted the ticket').format(user_display)
+        else:
+            state_display = getattr(TicketState, state).label
+            approve_info = _('{} {} the ticket').format(user_display, state_display)
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
         html_str = render_to_string('tickets/ticket_approve_diff.html', context)

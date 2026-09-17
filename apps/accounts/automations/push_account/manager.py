@@ -66,6 +66,10 @@ class PushAccountManager(BaseChangeSecretPushManager):
             for record in self.name_record_mapper.values()
         }.values()
         success, failed, unverified = self.get_record_result_counts(records)
+        # Inventory preparation can reject an account before a push record is
+        # created. Include those failures in the final summary while avoiding
+        # double-counting record failures already tracked by fail_accounts.
+        failed = max(failed, self.summary.get('fail_accounts', 0))
         self.print_result_summary(
             success,
             failed,

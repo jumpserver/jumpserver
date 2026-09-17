@@ -2,10 +2,14 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
+from assets.const.host import HostTypes
 from assets.const.types import AllTypes
 
 
 class AllTypesAutomationMethodsTestCase(SimpleTestCase):
+    def setUp(self):
+        AllTypes._automation_methods_by_language = {}
+
     def tearDown(self):
         AllTypes._automation_methods_by_language = {}
         super().tearDown()
@@ -57,3 +61,21 @@ class AllTypesAutomationMethodsTestCase(SimpleTestCase):
         self.assertEqual(first, [{'id': 'asset-v1'}])
         self.assertEqual(second, [{'id': 'asset-v2'}])
         self.assertEqual(asset_loader.call_count, 2)
+
+
+class HostTypesInternalPlatformsTestCase(SimpleTestCase):
+    def test_virtual_app_host_is_linux_with_required_ssh(self):
+        platforms = HostTypes.internal_platforms()[HostTypes.LINUX]
+        virtual_app_host = next(
+            item for item in platforms if item['name'] == 'VirtualAppHost'
+        )
+
+        self.assertEqual(virtual_app_host['_protocols'], ['ssh'])
+        self.assertEqual(
+            virtual_app_host['protocols_setting']['ssh'],
+            {'required': True, 'default': True},
+        )
+        self.assertEqual(
+            virtual_app_host['automation']['ansible_config'],
+            {'ansible_connection': 'ssh'},
+        )

@@ -1,0 +1,14 @@
+name: weblite
+display_name: JumpServer WebLite
+version: 5.0.0
+comment: Managed browser with shared autofill and interactive verification
+author: JumpServer Team
+exec_type: exe
+stdin: true
+# Launch Electron directly to preserve Tinker's stdin pipe and process lifetime.
+path: '%ProgramFiles%/JumpServer/WebLite/weblite.exe'
+update_policy: always
+type: web
+can_concurrent: true
+tags: [web]
+protocols: [http]

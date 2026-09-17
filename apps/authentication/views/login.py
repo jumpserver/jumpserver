@@ -98,6 +98,11 @@ class UserLoginContextMixin:
         if not self.request.GET.get('csrf_failure'):
             return context
 
+        if self.request.GET.get('csrf_reason') == 'cookie':
+            context['csrf_cookie_error'] = True
+            context['session_cookie_domain'] = settings.SESSION_COOKIE_DOMAIN
+            return context
+
         http_origin = self.request.META.get('HTTP_ORIGIN')
         http_referer = self.request.META.get('HTTP_REFERER')
         http_origin = http_origin or http_referer
