@@ -221,7 +221,7 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
     if user and user.username not in ['admin']:
         exists = User.objects.filter(username=user.username).exists()
         if not exists:
-            user.source = user.Source.ldap.value
+            user.source = ldap_user.category
             user.save()
 
 
