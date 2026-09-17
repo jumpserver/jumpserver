@@ -3646,6 +3646,10 @@ msgstr "Селектор пароля"
 msgid "Submit selector"
 msgstr "Селектор подтверждения"
 
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "Селектор успешного входа"
+
 #: assets/const/protocol.py:336
 msgid "API mode"
 msgstr "Режим API"

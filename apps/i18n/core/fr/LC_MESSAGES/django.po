@@ -3606,6 +3606,10 @@ msgstr "Sélecteur de mot de passe"
 msgid "Submit selector"
 msgstr "Sélecteur de soumission"
 
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "Sélecteur de connexion réussie"
+
 #: assets/const/protocol.py:336
 msgid "API mode"
 msgstr "Mode API"

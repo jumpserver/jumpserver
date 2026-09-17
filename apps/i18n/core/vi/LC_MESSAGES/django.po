@@ -3629,6 +3629,10 @@ msgstr "Trình chọn mật khẩu"
 msgid "Submit selector"
 msgstr "Trình chọn nút xác nhận"
 
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "Trình chọn đăng nhập thành công"
+
 #: assets/const/protocol.py:336
 msgid "API mode"
 msgstr "Chế độ API"

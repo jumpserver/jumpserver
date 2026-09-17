@@ -3585,6 +3585,10 @@ msgstr "비밀번호 선택기"
 msgid "Submit selector"
 msgstr "확인 버튼 선택기"
 
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "로그인 성공 선택기"
+
 #: assets/const/protocol.py:336
 msgid "API mode"
 msgstr "API 모드"
