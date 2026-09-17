@@ -4,12 +4,11 @@
 import json
 from collections import defaultdict
 from copy import deepcopy
+from string import hexdigits
 
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
-from string import hexdigits
-
 from ldap3 import SIMPLE, Connection, Server, Tls
 from ldap3.core.exceptions import (
     LDAPAttributeError,
@@ -91,13 +90,14 @@ def unescape_dn_attribute_value(value):
             _('Invalid LDAP distinguishedName encoding')
         ) from e
 
+
 def extract_ou_values_from_dn(dn):
     if not dn or not str(dn).strip():
         raise LDAPUserGroupMappingError(
             _('LDAP user distinguishedName is empty, cannot map OU group')
         )
     try:
-        rdns = parse_dn(dn, escape=False, strip=True)
+        rdns = parse_dn(dn, escape=False, strip=False)
     except LDAPInvalidDnError as e:
         raise LDAPUserGroupMappingError(
             _('Invalid LDAP distinguishedName: {}').format(dn)
@@ -114,12 +114,13 @@ def extract_ou_values_from_dn(dn):
 
 
 def build_ldap_ou_group_name(ou_values, prefix='AD '):
-    path = '_'.join(ou_values)
+    # Escape both the separator and the escape marker to keep OU paths distinct.
+    path = '_'.join(value.replace('%', '%25').replace('_', '%5F') for value in ou_values)
     if not path:
         raise LDAPUserGroupMappingError(
             _('LDAP distinguishedName has no OU, cannot map user group')
         )
-    group_name = f'{prefix}{path}'.strip()
+    group_name = f'{prefix}{path}'
     if len(group_name) > LDAP_USER_GROUP_NAME_MAX_LENGTH:
         raise LDAPUserGroupMappingError(
             _('LDAP OU group name exceeds {} characters: {}').format(
@@ -583,6 +584,7 @@ class LDAPImportUtil(object):
         for user in users:
             groups = user.pop('groups', [])
             try:
+                group_names = self.get_user_group_names(groups)
                 obj, created = self.update_or_create(user)
                 if created:
                     new_users.append(obj)
@@ -591,18 +593,8 @@ class LDAPImportUtil(object):
                 errors.append({user['username']: str(e)})
                 logger.error(e)
                 continue
-            try:
-                group_names = self.get_user_group_names(groups)
-                for group_name in group_names:
-                    group_users_mapper[group_name].add(obj)
-            except LDAPUserGroupMappingError as e:
-                errors.append({user['username']: str(e)})
-                logger.error(e)
-                continue
-            except Exception as e:
-                errors.append({user['username']: str(e)})
-                logger.error(e)
-                continue
+            for group_name in group_names:
+                group_users_mapper[group_name].add(obj)
         for org in orgs:
             self.bind_org(org, objs, group_users_mapper)
         logger.info('End perform import ldap users')
@@ -663,7 +655,6 @@ class LDAPImportUtil(object):
                     user_groups_mapper[user].add(group)
                 group.users.add(*users)
             self.exit_user_group(user_groups_mapper)
-
 
 
 class LDAPTestUtil(object):
