@@ -34,4 +34,4 @@ class ResourceDownloadTestCase(SimpleTestCase):
                 with patch.dict(os.environ, {'CLIENT_VERSION': ''}):
                     meta = ResourceDownload().get_meta_json()
 
-        self.assertEqual(meta['CLIENT_VERSION'], '4.1.6')
+        self.assertEqual(meta['CLIENT_VERSION'], '5.0.0')

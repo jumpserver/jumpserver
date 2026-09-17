@@ -13,10 +13,10 @@ WebLite 直接访问资产，不与 Koko 通信，录像由 RemoteApp 的 RDP �
 构建源码位于 Luna 的 applets/weblite，安装包包含完整浏览器运行时。
 
 发布机通过 `tinkerd install` 执行 `setup.yml`，使用 Windows Installer 静默安装
-`JumpServer-WebLite-5.0.0-beta18-x64.msi`，不再解压浏览器 ZIP。
+`JumpServer-WebLite-5.0.0-x64.msi`，不再解压浏览器 ZIP。
 MSI 将完整运行时直接安装到 `%ProgramFiles%\JumpServer\WebLite`，供发布机上的所有用户使用。
 安装包需同步到 Core 下载服务的 `/download/applets/`，以便通过 `jms:///` 下载。
-上游安装包：[Luna v5.0.0-beta18](https://github.com/jumpserver/luna/releases/download/v5.0.0-beta18/JumpServer-WebLite-5.0.0-beta18-x64.msi)。
+上游安装包：[Luna v5.0.0](https://github.com/jumpserver/luna/releases/download/v5.0.0/JumpServer-WebLite-5.0.0-x64.msi)。
 
 需要配套支持 `%ProgramFiles%/JumpServer/` 路径的 Tinker。清单直接启动
 `%ProgramFiles%/JumpServer/WebLite/weblite.exe`，以保留启动管道和进程生命周期。
