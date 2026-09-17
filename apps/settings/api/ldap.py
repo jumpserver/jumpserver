@@ -63,7 +63,7 @@ class LDAPUserListApi(generics.ListAPIView):
             reverse = True
         else:
             reverse = False
-        queryset = sorted(queryset, key=lambda x: x[order_by], reverse=reverse)
+        queryset = sorted(queryset, key=lambda x: x.get(order_by, ''), reverse=reverse)
         return queryset
 
     def filter_queryset(self, queryset):

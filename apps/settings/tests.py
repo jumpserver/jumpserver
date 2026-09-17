@@ -1,9 +1,11 @@
 import ssl
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import SimpleTestCase, override_settings
 
 from jumpserver.rewriting.smtp import EmailBackend
+from settings.api.ldap import LDAPUserListApi
 from settings.serializers.feature import ChatAISettingSerializer
 from settings.serializers.msg import EmailSettingSerializer
 
@@ -144,3 +146,12 @@ class ChatAISettingSerializerTestCase(SimpleTestCase):
 
         self.assertFalse(serializer.is_valid())
         self.assertIn('CHAT_AI_EMBED_URL', serializer.errors)
+
+
+class LDAPUserListApiTest(SimpleTestCase):
+    def test_sort_ignores_missing_field(self):
+        view = LDAPUserListApi()
+        view.request = SimpleNamespace(query_params={'order': 'date_updated'})
+        users = [{'existing': False}, {'existing': True}]
+
+        self.assertEqual(view.sort_queryset(users), users)
