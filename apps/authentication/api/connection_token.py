@@ -49,6 +49,7 @@ from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
 from users.models import Preference
 from .face import FaceMonitorContext
+from ..const import ConnectionTokenType
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from ..services import sign_connection_token_ssh_certificate
@@ -937,8 +938,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     def get_permed_account(user, asset, account_alias, protocol):
         return ConnectionToken.get_user_permed_account(user, asset, account_alias, protocol)
 
-    def _validate_perm(self, user, asset, account_alias, protocol):
-        account = self.get_permed_account(user, asset, account_alias, protocol)
+    def _validate_perm(self, user, asset, account_alias, protocol, token_type=None):
+        get_permed_account = self.get_permed_account
+        if token_type == ConnectionTokenType.ADMIN:
+            get_permed_account = AdminConnectionToken.get_user_permed_account
+        account = get_permed_account(user, asset, account_alias, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
@@ -1190,7 +1194,8 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
                     instance.user,
                     instance.asset,
                     instance.account,
-                    instance.protocol
+                    instance.protocol,
+                    token_type=instance.type,
                 )
         except JMSException as e:
             data['code'] = e.detail.code
