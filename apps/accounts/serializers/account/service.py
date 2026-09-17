@@ -6,9 +6,14 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import CredentialClientInstance, IntegrationApplication
+from accounts.const import ApplicationEvent, WebhookRequestMethod
+from accounts.models import ApplicationWebhook, CredentialClientInstance, IntegrationApplication
+from accounts.webhooks import (
+    WebhookValidationError, mask_webhook_url, validate_webhook_headers,
+    validate_webhook_template, validate_webhook_url,
+)
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
-from common.serializers.fields import JSONManyToManyField
+from common.serializers.fields import JSONManyToManyField, ListMultipleChoiceField
 from common.utils import random_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
@@ -115,3 +120,69 @@ class IntegrationAccountSecretSerializer(serializers.Serializer):
         self._valid_at_least_one(attrs, ['asset', 'asset_id'])
         self._valid_at_least_one(attrs, ['account', 'account_id'])
         return attrs
+
+
+class ApplicationWebhookSerializer(serializers.ModelSerializer):
+    url = serializers.CharField(
+        write_only=True, required=False, allow_blank=True, max_length=2048,
+    )
+    headers = serializers.DictField(
+        child=serializers.CharField(allow_blank=True, max_length=4096),
+        write_only=True, required=False,
+    )
+    method = serializers.ChoiceField(choices=WebhookRequestMethod.choices)
+    events = ListMultipleChoiceField(choices=ApplicationEvent.choices)
+    body_template = serializers.JSONField()
+    url_display = serializers.SerializerMethodField()
+    header_names = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ApplicationWebhook
+        fields = [
+            'id', 'is_active', 'url', 'url_display', 'method', 'headers',
+            'header_names', 'events', 'body_template',
+        ]
+        read_only_fields = ['id', 'url_display', 'header_names']
+
+    @staticmethod
+    def _validation_error(exc):
+        raise serializers.ValidationError(str(exc))
+
+    def validate_url(self, value):
+        if not value:
+            return ''
+        try:
+            return validate_webhook_url(value)
+        except WebhookValidationError as exc:
+            self._validation_error(exc)
+
+    def validate_headers(self, value):
+        try:
+            return validate_webhook_headers(value)
+        except WebhookValidationError as exc:
+            self._validation_error(exc)
+
+    def validate_body_template(self, value):
+        try:
+            return validate_webhook_template(value)
+        except WebhookValidationError as exc:
+            self._validation_error(exc)
+
+    def validate(self, attrs):
+        instance = self.instance
+        enabled = attrs.get('is_active', getattr(instance, 'is_active', False))
+        url = attrs.get('url', getattr(instance, 'url', ''))
+        events = attrs.get('events', getattr(instance, 'events', []))
+        if enabled and not url:
+            raise serializers.ValidationError({'url': _('URL is required when webhook is enabled.')})
+        if enabled and not events:
+            raise serializers.ValidationError({'events': _('Select at least one event.')})
+        return attrs
+
+    @staticmethod
+    def get_url_display(instance):
+        return mask_webhook_url(instance.url)
+
+    @staticmethod
+    def get_header_names(instance):
+        return sorted(instance.headers)

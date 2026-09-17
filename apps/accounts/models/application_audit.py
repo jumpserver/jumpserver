@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from accounts.const import AuditSource
+from common.db import fields
 from orgs.mixins.models import JMSOrgBaseModel
 
 
@@ -32,15 +33,28 @@ class ApplicationEventDelivery(JMSOrgBaseModel):
     event = models.ForeignKey(ApplicationAudit, on_delete=models.PROTECT, related_name='deliveries')
     audit = models.OneToOneField(ApplicationAudit, on_delete=models.PROTECT, related_name='delivery')
     client = models.ForeignKey('accounts.CredentialClientInstance', null=True, on_delete=models.SET_NULL)
+    webhook = models.ForeignKey(
+        'accounts.ApplicationWebhook', null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='deliveries',
+    )
     code = models.CharField(max_length=64)
-    url = models.CharField(max_length=2048, blank=True)
+    url = fields.EncryptTextField(max_length=2048, blank=True, default='')
+    method = models.CharField(max_length=8, blank=True, default='')
+    headers = fields.EncryptJsonDictTextField(blank=True, default=dict)
+    body = models.JSONField(blank=True, default=dict)
     status = models.CharField(max_length=16, default='pending')
     available_at = models.DateTimeField(default=timezone.now)
     expires_at = models.DateTimeField()
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=['event', 'client'], name='unique_application_event_client')]
-        indexes = [models.Index(fields=['client', 'status', 'available_at'])]
+        constraints = [
+            models.UniqueConstraint(fields=['event', 'client'], name='unique_application_event_client'),
+            models.UniqueConstraint(fields=['event', 'webhook'], name='unique_application_event_webhook'),
+        ]
+        indexes = [
+            models.Index(fields=['client', 'status', 'available_at']),
+            models.Index(fields=['webhook', 'status', 'available_at']),
+        ]
 
 
 class ApplicationEventAttempt(JMSOrgBaseModel):

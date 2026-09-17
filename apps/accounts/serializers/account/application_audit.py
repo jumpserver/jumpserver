@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import ApplicationAudit
+from accounts.webhooks import mask_webhook_url
 
 __all__ = ['ApplicationAuditSerializer']
 
@@ -23,8 +24,9 @@ class ApplicationAuditSerializer(serializers.ModelSerializer):
         if self.context['view'].action != 'retrieve' or not hasattr(instance, 'delivery'):
             return None
         delivery = instance.delivery
+        url = mask_webhook_url(delivery.url) if delivery.method else delivery.url
         return {
-            'url': delivery.url, 'event': delivery.code, 'event_id': str(delivery.event_id),
+            'url': url, 'event': delivery.code, 'event_id': str(delivery.event_id),
             'attempts': [{
                 'id': attempt.number, 'datetime': attempt.date_created,
                 'result': attempt.result, 'status_code': attempt.status_code, 'reason': attempt.reason,
