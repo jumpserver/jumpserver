@@ -5,6 +5,7 @@ from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
 from django.utils.module_loading import import_string
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 
 from authentication.backends.drf import (
     SignatureAuthentication,
@@ -40,14 +41,18 @@ def get_signature_user(scope):
     # 因为 ws 使用的是 scope，所以需要转换成 request 对象，用于认证校验
     request = ASGIRequest(scope, None)
     backends = [SignatureAuthentication(),
-                AccessTokenAuthentication()]
+                AccessTokenAuthentication(),
+                OAuth2Authentication()]
     for backend in backends:
         try:
-            user, _ = backend.authenticate(request)
+            result = backend.authenticate(request)
+            if not result:
+                continue
+            user, _ = result
             if user:
                 return user
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.debug('WebSocket authentication failed for %s', backend.__class__.__name__)
     return None
 
 
