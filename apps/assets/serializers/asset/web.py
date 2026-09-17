@@ -54,9 +54,9 @@ class WebSerializer(AssetSerializer):
     def get_fields(self):
         fields = super().get_fields()
         if not settings.XPACK_LICENSE_IS_VALID:
-            fields['autofill'].choices = {
-                key: label for key, label in fields['autofill'].choices.items() if key != 'script'
-            }
+            fields['autofill'].choices = [
+                (key, label) for key, label in fields['autofill'].choices.items() if key != 'script'
+            ]
         return fields
 
     def validate(self, attrs):
