@@ -35,3 +35,9 @@ class ApplicationEvent(TextChoices):
     CREDENTIAL_UNAVAILABLE = 'credential.unavailable', _('Credential unavailable')
     ROTATION_FAILED = 'rotation.failed', _('Rotation failed')
     ACCESS_REVOKED = 'access.revoked', _('Access revoked')
+
+
+class WebhookRequestMethod(TextChoices):
+    POST = 'POST', 'POST'
+    PUT = 'PUT', 'PUT'
+    PATCH = 'PATCH', 'PATCH'

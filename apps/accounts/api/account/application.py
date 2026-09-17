@@ -12,9 +12,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts import serializers
-from accounts.const import AuditEvent
+from accounts.const import ApplicationEvent, AuditEvent
 from accounts.filters import IntegrationApplicationFilterSet
-from accounts.models import IntegrationApplication
+from accounts.models import ApplicationWebhook, IntegrationApplication
+from accounts.models.application import default_application_webhook_template
+from accounts.webhooks import (
+    WebhookValidationError, render_webhook_template, sample_webhook_context,
+    webhook_template_variables,
+)
 from accounts.credential_client.audit import record
 from accounts.mixins import ApplicationAuditMixin
 from authentication.permissions import UserConfirmation, ConfirmType
@@ -38,7 +43,110 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'reset_secret': 'accounts.change_integrationapplication',
         'get_account_secret': 'accounts.view_integrationapplication',
         'get_sdks_info': 'accounts.view_integrationapplication',
+        'webhook': 'accounts.view_integrationapplication',
+        'update_webhook': 'accounts.change_integrationapplication',
+        'webhook_preview': 'accounts.view_integrationapplication',
+        'webhook_test': 'accounts.change_integrationapplication',
     }
+
+    def get_webhook_application(self):
+        # These actions manage a related resource; avoid starting an application-update audit.
+        return OrgBulkModelViewSet.get_object(self)
+
+    @staticmethod
+    def get_webhook_instance(application):
+        return ApplicationWebhook.objects.filter(application=application).first()
+
+    @staticmethod
+    def get_default_webhook_instance(application):
+        return ApplicationWebhook(application=application, org_id=application.org_id)
+
+    def webhook_response(self, application, instance):
+        data = serializers.ApplicationWebhookSerializer(instance).data
+        if instance._state.adding:
+            data['id'] = None
+        data.update({
+            'event_options': [
+                {'value': value, 'label': str(label)}
+                for value, label in ApplicationEvent.choices
+            ],
+            'template_variables': webhook_template_variables(),
+            'default_template': default_application_webhook_template(),
+        })
+        return data
+
+    @action(['GET'], detail=True, url_path='webhook')
+    def webhook(self, request, *args, **kwargs):
+        application = self.get_webhook_application()
+        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
+        return Response(self.webhook_response(application, instance))
+
+    @webhook.mapping.patch
+    def update_webhook(self, request, *args, **kwargs):
+        application = self.get_webhook_application()
+        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
+        serializer = serializers.ApplicationWebhookSerializer(
+            instance, data=request.data, partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.webhook_response(application, instance))
+
+    def get_preview_data(self, request, application):
+        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
+        event = request.data.get('event') or (instance.events[0] if instance.events else None)
+        if event not in ApplicationEvent.values:
+            raise ValidationError({'event': _('Select a supported webhook event.')})
+        template = request.data.get('body_template', instance.body_template)
+        try:
+            body = render_webhook_template(template, sample_webhook_context(application, event))
+        except WebhookValidationError as exc:
+            raise ValidationError({'body_template': str(exc)}) from exc
+        return instance, event, body
+
+    @action(['POST'], detail=True, url_path='webhook/preview')
+    def webhook_preview(self, request, *args, **kwargs):
+        application = self.get_webhook_application()
+        _, _, body = self.get_preview_data(request, application)
+        return Response({'body': body})
+
+    @action(['POST'], detail=True, url_path='webhook/test')
+    def webhook_test(self, request, *args, **kwargs):
+        application = self.get_webhook_application()
+        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
+        data = {key: value for key, value in request.data.items() if key != 'event'}
+        serializer = serializers.ApplicationWebhookSerializer(instance, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        values = serializer.validated_data
+        url = values.get('url', instance.url)
+        events = values.get('events', instance.events)
+        event = request.data.get('event') or (events[0] if events else None)
+        if not url:
+            raise ValidationError({'url': _('URL is required to test the webhook.')})
+        if event not in events:
+            raise ValidationError({'event': _('Select one of the subscribed webhook events.')})
+        template = values.get('body_template', instance.body_template)
+        try:
+            body = render_webhook_template(template, sample_webhook_context(application, event))
+        except WebhookValidationError as exc:
+            raise ValidationError({'body_template': str(exc)}) from exc
+
+        from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
+        try:
+            status_code = send_webhook(
+                values.get('method', instance.method), url,
+                values.get('headers', instance.headers), body,
+            )
+        except WebhookRequestError as exc:
+            return Response({
+                'success': False, 'status_code': getattr(exc, 'status_code', None),
+                'reason': exc.reason,
+            })
+        success = 200 <= status_code < 300
+        return Response({
+            'success': success, 'status_code': status_code,
+            'reason': '' if success else 'http_error',
+        })
 
     def read_file(self, path):
         if os.path.exists(path):
