@@ -229,9 +229,9 @@ class PermAssetAccountsBatchUtil:
             return []
 
         permissions = list(
-            AssetPermissionUtil().get_permissions_for_user(
+            AssetPermissionUtil().get_permissions_for_user_by_ids(
                 self.user,
-                permission_ids=candidate_permission_ids,
+                candidate_permission_ids,
             ).only('id', 'accounts', 'protocols', 'actions')
         )
         permissions_by_id = {

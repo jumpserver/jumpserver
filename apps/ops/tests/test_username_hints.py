@@ -220,9 +220,9 @@ class UsernameHintsPermissionTest(TestCase):
             ActionChoices.upload.value,
         )
 
-        scoped_permissions = AssetPermissionUtil().get_permissions_for_user(
+        scoped_permissions = AssetPermissionUtil().get_permissions_for_user_by_ids(
             self.user,
-            permission_ids={selected_permission.id},
+            {selected_permission.id},
         )
         self.assertEqual(
             set(scoped_permissions.values_list('id', flat=True)),
@@ -230,15 +230,17 @@ class UsernameHintsPermissionTest(TestCase):
         )
 
         permission_id_filters = []
-        original_get_permissions = AssetPermissionUtil.get_permissions_for_user
+        original_get_permissions = (
+            AssetPermissionUtil.get_permissions_for_user_by_ids
+        )
 
-        def capture_permission_scope(util, user, *args, **kwargs):
-            permission_id_filters.append(kwargs.get('permission_ids'))
-            return original_get_permissions(util, user, *args, **kwargs)
+        def capture_permission_scope(util, user, permission_ids):
+            permission_id_filters.append(permission_ids)
+            return original_get_permissions(util, user, permission_ids)
 
         with patch.object(
             AssetPermissionUtil,
-            'get_permissions_for_user',
+            'get_permissions_for_user_by_ids',
             capture_permission_scope,
         ):
             hints = self.get_hints(selected_asset, action='upload')

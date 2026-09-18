@@ -15,9 +15,33 @@ class AssetPermissionUtil(object):
     @timeit
     def get_permissions_for_user(
         self, user, with_group=True, flat=False, with_expired=False,
-        permission_ids=None,
     ):
         """ 获取用户的授权规则 """
+        perms = self._get_permissions_for_user(
+            user,
+            with_group=with_group,
+            with_expired=with_expired,
+        )
+        if flat:
+            return perms.values_list('id', flat=True)
+        return perms
+
+    @timeit
+    def get_permissions_for_user_by_ids(
+        self, user, permission_ids, with_group=True, with_expired=False,
+    ):
+        """ 获取用户指定的授权规则 """
+        return self._get_permissions_for_user(
+            user,
+            with_group=with_group,
+            with_expired=with_expired,
+            permission_ids=permission_ids,
+        )
+
+    def _get_permissions_for_user(
+        self, user, with_group=True, with_expired=False,
+        permission_ids=None,
+    ):
         perm_ids = set()
         # user
         user_perm_query = AssetPermission.users.through.objects.filter(
@@ -42,8 +66,6 @@ class AssetPermissionUtil(object):
             )
             perm_ids.update(group_perm_ids)
         perms = self.get_permissions(ids=perm_ids, with_expired=with_expired)
-        if flat:
-            return perms.values_list('id', flat=True)
         return perms
 
     def get_permissions_for_user_groups(
