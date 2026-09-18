@@ -50,41 +50,41 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Dự án</th>
-      <th width="16%" align="center"><div align="center">Phiên bản</div></th>
-      <th width="64%" align="center"><div align="center">Mô tả</div></th>
+      <th width="160" align="left">Dự án</th>
+      <th width="135" align="center"><div align="center">Phiên bản</div></th>
+      <th width="550" align="center"><div align="center">Mô tả</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản JumpServer" /></a></div></td>
-      <td width="64%" align="left">Nền tảng quản lý truy cập đặc quyền mã nguồn mở</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản JumpServer" /></a></div></td>
+      <td width="550" align="left">Nền tảng quản lý truy cập đặc quyền mã nguồn mở</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Lina" /></a></div></td>
-      <td width="64%" align="left">Giao diện web của JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Lina" /></a></div></td>
+      <td width="550" align="left">Giao diện web của JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Luna" /></a></div></td>
-      <td width="64%" align="left">Terminal web và ứng dụng khách gốc của JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Luna" /></a></div></td>
+      <td width="550" align="left">Terminal web và ứng dụng khách gốc của JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản KoKo" /></a></div></td>
-      <td width="64%" align="left">Bộ kết nối và proxy giao thức đa dụng của JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản KoKo" /></a></div></td>
+      <td width="550" align="left">Bộ kết nối và proxy giao thức đa dụng của JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Chen" /></a></div></td>
-      <td width="64%" align="left">Bộ kết nối cơ sở dữ liệu trên web của JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Chen" /></a></div></td>
+      <td width="550" align="left">Bộ kết nối cơ sở dữ liệu trên web của JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Kael" /></a></div></td>
-      <td width="64%" align="left">Thành phần AI của JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Kael" /></a></div></td>
+      <td width="550" align="left">Thành phần AI của JumpServer</td>
     </tr>
   </tbody>
 </table>
@@ -94,36 +94,36 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Dự án</th>
-      <th width="16%" align="center"><div align="center">Phiên bản</div></th>
-      <th width="64%" align="center"><div align="center">Mô tả</div></th>
+      <th width="160" align="left">Dự án</th>
+      <th width="135" align="center"><div align="center">Phiên bản</div></th>
+      <th width="550" align="center"><div align="center">Mô tả</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
-      <td width="64%" align="left">Bộ kết nối ứng dụng Windows của JumpServer (miễn phí cho phiên bản Cộng đồng)</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
+      <td width="550" align="left">Bộ kết nối ứng dụng Windows của JumpServer (miễn phí cho phiên bản Cộng đồng)</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
-      <td width="64%" align="left">Bộ kết nối ứng dụng Linux của JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
+      <td width="550" align="left">Bộ kết nối ứng dụng Linux của JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
-      <td width="64%" align="left">Proxy giao thức RDP của JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
+      <td width="550" align="left">Proxy giao thức RDP của JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
-      <td width="64%" align="left">Proxy giao thức cơ sở dữ liệu của JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
+      <td width="550" align="left">Proxy giao thức cơ sở dữ liệu của JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
-      <td width="64%" align="left">Proxy giao thức VNC của JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
+      <td width="550" align="left">Proxy giao thức VNC của JumpServer Enterprise Edition</td>
     </tr>
   </tbody>
 </table>
@@ -133,21 +133,21 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Dự án</th>
-      <th width="16%" align="center"><div align="center">Phiên bản</div></th>
-      <th width="64%" align="center"><div align="center">Mô tả</div></th>
+      <th width="160" align="left">Dự án</th>
+      <th width="135" align="center"><div align="center">Phiên bản</div></th>
+      <th width="550" align="center"><div align="center">Mô tả</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
-      <td width="64%" align="left">Dịch vụ chuyển mã bản ghi phiên làm việc của JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
+      <td width="550" align="left">Dịch vụ chuyển mã bản ghi phiên làm việc của JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
-      <td width="64%" align="left">Dịch vụ vận hành và quản lý máy chủ của JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Phiên bản riêng tư" /></div></td>
+      <td width="550" align="left">Dịch vụ vận hành và quản lý máy chủ của JumpServer Enterprise Edition</td>
     </tr>
   </tbody>
 </table>
@@ -157,21 +157,21 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Dự án</th>
-      <th width="16%" align="center"><div align="center">Phiên bản</div></th>
-      <th width="64%" align="center"><div align="center">Mô tả</div></th>
+      <th width="160" align="left">Dự án</th>
+      <th width="135" align="center"><div align="center">Phiên bản</div></th>
+      <th width="550" align="center"><div align="center">Mô tả</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Installer" /></a></div></td>
-      <td width="64%" align="left">Công cụ cài đặt và quản lý JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Installer" /></a></div></td>
+      <td width="550" align="left">Công cụ cài đặt và quản lý JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Docker Web" /></a></div></td>
-      <td width="64%" align="left">Cổng web và tài nguyên tĩnh của JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Phiên bản Docker Web" /></a></div></td>
+      <td width="550" align="left">Cổng web và tài nguyên tĩnh của JumpServer</td>
     </tr>
   </tbody>
 </table>

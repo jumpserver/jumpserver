@@ -50,41 +50,41 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">프로젝트</th>
-      <th width="16%" align="center"><div align="center">버전</div></th>
-      <th width="64%" align="center"><div align="center">설명</div></th>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer 버전" /></a></div></td>
-      <td width="64%" align="left">오픈 소스 특권 접근 관리 플랫폼</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer 버전" /></a></div></td>
+      <td width="550" align="left">오픈 소스 특권 접근 관리 플랫폼</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina 버전" /></a></div></td>
-      <td width="64%" align="left">JumpServer 웹 인터페이스</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 인터페이스</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna 버전" /></a></div></td>
-      <td width="64%" align="left">JumpServer 웹 터미널 및 네이티브 클라이언트</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 터미널 및 네이티브 클라이언트</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo 버전" /></a></div></td>
-      <td width="64%" align="left">JumpServer 범용 프로토콜 커넥터 및 프록시</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 범용 프로토콜 커넥터 및 프록시</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen 버전" /></a></div></td>
-      <td width="64%" align="left">JumpServer 웹 데이터베이스 커넥터</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 데이터베이스 커넥터</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael 버전" /></a></div></td>
-      <td width="64%" align="left">JumpServer AI 구성 요소</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer AI 구성 요소</td>
     </tr>
   </tbody>
 </table>
@@ -94,36 +94,36 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">프로젝트</th>
-      <th width="16%" align="center"><div align="center">버전</div></th>
-      <th width="64%" align="center"><div align="center">설명</div></th>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
-      <td width="64%" align="left">JumpServer Windows 애플리케이션 커넥터(커뮤니티 에디션에서 무료)</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer Windows 애플리케이션 커넥터(커뮤니티 에디션에서 무료)</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
-      <td width="64%" align="left">JumpServer 엔터프라이즈 에디션 Linux 애플리케이션 커넥터</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 Linux 애플리케이션 커넥터</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
-      <td width="64%" align="left">JumpServer 엔터프라이즈 에디션 RDP 프로토콜 프록시</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 RDP 프로토콜 프록시</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
-      <td width="64%" align="left">JumpServer 엔터프라이즈 에디션 데이터베이스 프로토콜 프록시</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 데이터베이스 프로토콜 프록시</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
-      <td width="64%" align="left">JumpServer 엔터프라이즈 에디션 VNC 프로토콜 프록시</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 VNC 프로토콜 프록시</td>
     </tr>
   </tbody>
 </table>
@@ -133,21 +133,21 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">프로젝트</th>
-      <th width="16%" align="center"><div align="center">버전</div></th>
-      <th width="64%" align="center"><div align="center">설명</div></th>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
-      <td width="64%" align="left">JumpServer 엔터프라이즈 에디션 세션 녹화 트랜스코딩 서비스</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 세션 녹화 트랜스코딩 서비스</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
-      <td width="64%" align="left">JumpServer 엔터프라이즈 에디션 호스트 운영 및 관리 서비스</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 호스트 운영 및 관리 서비스</td>
     </tr>
   </tbody>
 </table>
@@ -157,21 +157,21 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">프로젝트</th>
-      <th width="16%" align="center"><div align="center">버전</div></th>
-      <th width="64%" align="center"><div align="center">설명</div></th>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer 버전" /></a></div></td>
-      <td width="64%" align="left">JumpServer 설치 및 관리 도구</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 설치 및 관리 도구</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web 버전" /></a></div></td>
-      <td width="64%" align="left">JumpServer 웹 게이트웨이 및 정적 자산</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 게이트웨이 및 정적 자산</td>
     </tr>
   </tbody>
 </table>

@@ -50,41 +50,41 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Proyecto</th>
-      <th width="16%" align="center"><div align="center">Versión</div></th>
-      <th width="64%" align="center"><div align="center">Descripción</div></th>
+      <th width="160" align="left">Proyecto</th>
+      <th width="135" align="center"><div align="center">Versión</div></th>
+      <th width="550" align="center"><div align="center">Descripción</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer versión" /></a></div></td>
-      <td width="64%" align="left">Plataforma de gestión de accesos privilegiados de código abierto</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer versión" /></a></div></td>
+      <td width="550" align="left">Plataforma de gestión de accesos privilegiados de código abierto</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina versión" /></a></div></td>
-      <td width="64%" align="left">Interfaz web de JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina versión" /></a></div></td>
+      <td width="550" align="left">Interfaz web de JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna versión" /></a></div></td>
-      <td width="64%" align="left">Terminal web y cliente nativo de JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna versión" /></a></div></td>
+      <td width="550" align="left">Terminal web y cliente nativo de JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo versión" /></a></div></td>
-      <td width="64%" align="left">Conector y proxy de protocolos de uso general de JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo versión" /></a></div></td>
+      <td width="550" align="left">Conector y proxy de protocolos de uso general de JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen versión" /></a></div></td>
-      <td width="64%" align="left">Conector de bases de datos web de JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen versión" /></a></div></td>
+      <td width="550" align="left">Conector de bases de datos web de JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael versión" /></a></div></td>
-      <td width="64%" align="left">Componente de IA de JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael versión" /></a></div></td>
+      <td width="550" align="left">Componente de IA de JumpServer</td>
     </tr>
   </tbody>
 </table>
@@ -94,36 +94,36 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Proyecto</th>
-      <th width="16%" align="center"><div align="center">Versión</div></th>
-      <th width="64%" align="center"><div align="center">Descripción</div></th>
+      <th width="160" align="left">Proyecto</th>
+      <th width="135" align="center"><div align="center">Versión</div></th>
+      <th width="550" align="center"><div align="center">Descripción</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
-      <td width="64%" align="left">Conector de aplicaciones Windows de JumpServer (gratuito en la edición Community)</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
+      <td width="550" align="left">Conector de aplicaciones Windows de JumpServer (gratuito en la edición Community)</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
-      <td width="64%" align="left">Conector de aplicaciones Linux de JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
+      <td width="550" align="left">Conector de aplicaciones Linux de JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
-      <td width="64%" align="left">Proxy del protocolo RDP de JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
+      <td width="550" align="left">Proxy del protocolo RDP de JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
-      <td width="64%" align="left">Proxy de protocolos de bases de datos de JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
+      <td width="550" align="left">Proxy de protocolos de bases de datos de JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
-      <td width="64%" align="left">Proxy del protocolo VNC de JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
+      <td width="550" align="left">Proxy del protocolo VNC de JumpServer Enterprise Edition</td>
     </tr>
   </tbody>
 </table>
@@ -133,21 +133,21 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Proyecto</th>
-      <th width="16%" align="center"><div align="center">Versión</div></th>
-      <th width="64%" align="center"><div align="center">Descripción</div></th>
+      <th width="160" align="left">Proyecto</th>
+      <th width="135" align="center"><div align="center">Versión</div></th>
+      <th width="550" align="center"><div align="center">Descripción</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
-      <td width="64%" align="left">Servicio de transcodificación de grabaciones de sesiones de JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
+      <td width="550" align="left">Servicio de transcodificación de grabaciones de sesiones de JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
-      <td width="64%" align="left">Servicio de operaciones y administración de hosts de JumpServer Enterprise Edition</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Versión privada" /></div></td>
+      <td width="550" align="left">Servicio de operaciones y administración de hosts de JumpServer Enterprise Edition</td>
     </tr>
   </tbody>
 </table>
@@ -157,21 +157,21 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">Proyecto</th>
-      <th width="16%" align="center"><div align="center">Versión</div></th>
-      <th width="64%" align="center"><div align="center">Descripción</div></th>
+      <th width="160" align="left">Proyecto</th>
+      <th width="135" align="center"><div align="center">Versión</div></th>
+      <th width="550" align="center"><div align="center">Descripción</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer versión" /></a></div></td>
-      <td width="64%" align="left">Herramienta de instalación y administración de JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer versión" /></a></div></td>
+      <td width="550" align="left">Herramienta de instalación y administración de JumpServer</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web versión" /></a></div></td>
-      <td width="64%" align="left">Puerta de enlace web y recursos estáticos de JumpServer</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web versión" /></a></div></td>
+      <td width="550" align="left">Puerta de enlace web y recursos estáticos de JumpServer</td>
     </tr>
   </tbody>
 </table>

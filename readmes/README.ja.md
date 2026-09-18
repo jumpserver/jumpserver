@@ -50,41 +50,41 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">プロジェクト</th>
-      <th width="16%" align="center"><div align="center">バージョン</div></th>
-      <th width="64%" align="center"><div align="center">説明</div></th>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer バージョン" /></a></div></td>
-      <td width="64%" align="left">オープンソースの特権アクセス管理プラットフォーム</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer バージョン" /></a></div></td>
+      <td width="550" align="left">オープンソースの特権アクセス管理プラットフォーム</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina バージョン" /></a></div></td>
-      <td width="64%" align="left">JumpServer の Web UI</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web UI</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna バージョン" /></a></div></td>
-      <td width="64%" align="left">JumpServer の Web ターミナルとネイティブクライアント</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web ターミナルとネイティブクライアント</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo バージョン" /></a></div></td>
-      <td width="64%" align="left">JumpServer の汎用プロトコルコネクターとプロキシ</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の汎用プロトコルコネクターとプロキシ</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen バージョン" /></a></div></td>
-      <td width="64%" align="left">JumpServer の Web データベースコネクター</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web データベースコネクター</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael バージョン" /></a></div></td>
-      <td width="64%" align="left">JumpServer の AI コンポーネント</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の AI コンポーネント</td>
     </tr>
   </tbody>
 </table>
@@ -94,36 +94,36 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">プロジェクト</th>
-      <th width="16%" align="center"><div align="center">バージョン</div></th>
-      <th width="64%" align="center"><div align="center">説明</div></th>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
-      <td width="64%" align="left">JumpServer の Windows アプリケーションコネクター（コミュニティ版では無料）</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer の Windows アプリケーションコネクター（コミュニティ版では無料）</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
-      <td width="64%" align="left">JumpServer エンタープライズ版の Linux アプリケーションコネクター</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版の Linux アプリケーションコネクター</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
-      <td width="64%" align="left">JumpServer エンタープライズ版の RDP プロトコルプロキシ</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版の RDP プロトコルプロキシ</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
-      <td width="64%" align="left">JumpServer エンタープライズ版のデータベースプロトコルプロキシ</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版のデータベースプロトコルプロキシ</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
-      <td width="64%" align="left">JumpServer エンタープライズ版の VNC プロトコルプロキシ</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版の VNC プロトコルプロキシ</td>
     </tr>
   </tbody>
 </table>
@@ -133,21 +133,21 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">プロジェクト</th>
-      <th width="16%" align="center"><div align="center">バージョン</div></th>
-      <th width="64%" align="center"><div align="center">説明</div></th>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
-      <td width="64%" align="left">JumpServer エンタープライズ版のセッション録画トランスコードサービス</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版のセッション録画トランスコードサービス</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
-      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
-      <td width="64%" align="left">JumpServer エンタープライズ版のホスト運用・管理サービス</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版のホスト運用・管理サービス</td>
     </tr>
   </tbody>
 </table>
@@ -157,21 +157,21 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 <table width="100%">
   <thead>
     <tr>
-      <th width="20%" align="left">プロジェクト</th>
-      <th width="16%" align="center"><div align="center">バージョン</div></th>
-      <th width="64%" align="center"><div align="center">説明</div></th>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer バージョン" /></a></div></td>
-      <td width="64%" align="left">JumpServer のインストール・管理ツール</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer のインストール・管理ツール</td>
     </tr>
     <tr>
-      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
-      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web バージョン" /></a></div></td>
-      <td width="64%" align="left">JumpServer の Web ゲートウェイと静的アセット</td>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web ゲートウェイと静的アセット</td>
     </tr>
   </tbody>
 </table>
