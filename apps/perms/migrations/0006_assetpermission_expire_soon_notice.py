@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('perms', '0003_alter_assetpermission_date_expired'),
+        ('perms', '0005_add_permission_relation_lookup_indexes'),
     ]
 
     operations = [
