@@ -226,6 +226,7 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
+    asset_address = serializers.CharField(source='asset.address', read_only=True, label=_('Asset IP'))
     source = LabeledChoiceField(
         choices=Source.choices, label=_("Source"), required=False,
         allow_null=True, default=Source.LOCAL
@@ -243,17 +244,17 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'date_change_secret', 'change_secret_status'
         ]
         fields = BaseAccountSerializer.Meta.fields + [
-            'su_from', 'asset', 'version', 'ds',
+            'su_from', 'asset', 'asset_address', 'version', 'ds',
             'source', 'source_id', 'secret_reset',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields + automation_fields
-        read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields
+        read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields + ['asset_address']
         fields = [f for f in fields if f not in ['spec_info']]
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False},
             'source_id': {'required': False, 'allow_null': True},
         }
-        fields_unimport_template = ['params']
+        fields_unimport_template = ['params', 'asset_address']
         # 手动判断唯一性校验
         validators = []
 
