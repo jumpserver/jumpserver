@@ -39,28 +39,7 @@ Abra o JumpServer no navegador em `http://your-jumpserver-ip/`
 
 ## Capturas de tela
 
-<table width="100%" align="center">
-  <tr>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/6164c92a-0b19-405a-b79c-73e28a9a1610" alt="JumpServer Console" width="100%" /></td>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/12d1206d-b511-4f29-8b00-fd13333f3a21" alt="JumpServer Gerenciamento de acesso privilegiado" width="100%" /></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/6d12d3c9-5f31-4294-b6e7-7c5b5836f688" alt="JumpServer Auditorias" width="100%" /></td>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/ba784bc8-e889-4fd6-aaae-0b8b14153da2" alt="JumpServer Área de trabalho" width="100%" /></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/d4b10b15-bccb-4a0d-a6e6-74a6439614e0" alt="JumpServer Funções e permissões" width="100%" /></td>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/ccbeb96e-9747-4182-bd03-031fb3af8bb2" alt="JumpServer Configurações" width="100%" /></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/9049888e-16fe-4fbe-b0f2-16bf140379c8" alt="JumpServer SSH" width="100%" /></td>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/133c4af6-90a9-457d-b372-bb53c29260dc" alt="JumpServer RDP" width="100%" /></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/ea48738f-b5f8-4a43-a487-ca09b11176e7" alt="JumpServer Kubernetes" width="100%" /></td>
-    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/3407539f-1235-4dcc-adf2-26d7b60dbc67" alt="JumpServer Bancos de dados" width="100%" /></td>
-  </tr>
-</table>
+![Capturas animadas do JumpServer com console, PAM, terminal, área de trabalho remota e sessões de banco de dados](assets/jumpserver-screenshots.gif)
 
 ## Componentes
 
