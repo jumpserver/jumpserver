@@ -18,6 +18,7 @@ __all__ = [
     "BitChoicesField",
     "TreeChoicesField",
     "LabeledMultipleChoiceField",
+    "ListMultipleChoiceField",
     "PhoneField",
     "JSONManyToManyField",
     "LabelRelatedField",
@@ -67,6 +68,17 @@ class LabeledChoiceField(serializers.ChoiceField):
         if isinstance(data, str) and "(" in data and data.endswith(")"):
             data = data.strip(")").split('(')[-1]
         return super(LabeledChoiceField, self).to_internal_value(data)
+
+
+class ListMultipleChoiceField(serializers.MultipleChoiceField):
+
+    def to_representation(self, value):
+        return list(value or [])
+
+    def to_internal_value(self, data):
+        if data is None:
+            return []
+        return list(super().to_internal_value(data))
 
 
 class LabeledMultipleChoiceField(serializers.MultipleChoiceField):
