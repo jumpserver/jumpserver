@@ -2,7 +2,7 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## 一个开源的 PAM 平台 (堡垒主机)
+## 开源特权访问管理（PAM）平台（堡垒机）
 
 [![][license-shield]][license-link]
 [![][docs-shield]][docs-link]
@@ -11,95 +11,205 @@
 [![][docker-shield]][docker-link]
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
-[![][gitcode-shield]][gitcode-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
+
 <br/>
 
 ## 什么是 JumpServer？
 
-JumpServer 是一个开源的特权访问管理 (PAM) 平台，提供 DevOps 和 IT 团队按需安全访问 SSH、RDP、Kubernetes、数据库和 RemoteApp 端点的功能，均可通过网页浏览器进行访问。
+JumpServer 是具备 AI 能力的开源特权访问管理（PAM）平台，为 DevOps 和 IT 团队提供统一的工作空间，安全访问 SSH、RDP、Kubernetes、数据库、网站、RemoteApp、VirtualApp 等资源。
 
+<img alt="JumpServer 架构图" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
 
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://www.jumpserver.com/images/jumpserver-arch-light.png">
-  <source media="(prefers-color-scheme: dark)" srcset="https://www.jumpserver.com/images/jumpserver-arch-dark.png">
-  <img src="https://github.com/user-attachments/assets/dd612f3d-c958-4f84-b164-f31b75454d7f" alt="主题相关图像">
-</picture>
+## 快速开始
 
-
-## 快速入门
-
-准备一台干净的 Linux 服务器 ( 64 位, >= 4c8g )
+准备一台干净的 64 位 Linux 服务器，至少配备 4 核 CPU 和 8 GB 内存。
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-在浏览器中访问 JumpServer，地址为 `http://your-jumpserver-ip/`
+在浏览器中访问 JumpServer： `http://your-jumpserver-ip/`
+
 - 用户名: `admin`
 - 密码: `ChangeMe`
 
-[![JumpServer 快速入门](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer 快速入门")
-
 ## 截图
-<table style="border-collapse: collapse; border: 1px solid black;">
+
+<table width="100%" align="center">
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/99fabe5b-0475-4a53-9116-4c370a1426c4" alt="JumpServer 控制台"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/7c1f81af-37e8-4f07-8ac9-182895e1062e" alt="JumpServer PAM"   /></td>    
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/6164c92a-0b19-405a-b79c-73e28a9a1610" alt="JumpServer 控制台" width="100%" /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/12d1206d-b511-4f29-8b00-fd13333f3a21" alt="JumpServer 特权访问管理" width="100%" /></td>
   </tr>
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/a424d731-1c70-4108-a7d8-5bbf387dda9a" alt="JumpServer 审计"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/393d2c27-a2d0-4dea-882d-00ed509e00c9" alt="JumpServer 工作台"   /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/6d12d3c9-5f31-4294-b6e7-7c5b5836f688" alt="JumpServer 审计" width="100%" /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/ba784bc8-e889-4fd6-aaae-0b8b14153da2" alt="JumpServer 工作台" width="100%" /></td>
   </tr>
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/eaa41f66-8cc8-4f01-a001-0d258501f1c9" alt="JumpServer RBAC"   /></td>     
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/3a2611cd-8902-49b8-b82b-2a6dac851f3e" alt="JumpServer 设置"   /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/d4b10b15-bccb-4a0d-a6e6-74a6439614e0" alt="JumpServer 角色权限管理" width="100%" /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/ccbeb96e-9747-4182-bd03-031fb3af8bb2" alt="JumpServer 设置" width="100%" /></td>
   </tr>
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/1e236093-31f7-4563-8eb1-e36d865f1568" alt="JumpServer SSH"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/69373a82-f7ab-41e8-b763-bbad2ba52167" alt="JumpServer RDP"   /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/9049888e-16fe-4fbe-b0f2-16bf140379c8" alt="JumpServer SSH" width="100%" /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/133c4af6-90a9-457d-b372-bb53c29260dc" alt="JumpServer RDP" width="100%" /></td>
   </tr>
   <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/5bed98c6-cbe8-4073-9597-d53c69dc3957" alt="JumpServer K8s"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/jumpserver/jumpserver/assets/32935519/b80ad654-548f-42bc-ba3d-c1cfdf1b46d6" alt="JumpServer 数据库"   /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/ea48738f-b5f8-4a43-a487-ca09b11176e7" alt="JumpServer Kubernetes" width="100%" /></td>
+    <td width="50%" align="center"><img src="https://github.com/user-attachments/assets/3407539f-1235-4dcc-adf2-26d7b60dbc67" alt="JumpServer 数据库" width="100%" /></td>
   </tr>
 </table>
 
 ## 组件
 
-JumpServer 由多个关键组件组成，这些组件共同构成了 JumpServer 的功能框架，为用户提供全面的操作管理和安全控制能力。
+JumpServer 按职责划分组件。核心项目提供平台、Web 界面、终端、协议连接和 AI 能力；企业版组件扩展应用与协议访问；支撑服务处理会话录像和主机运维；部署工具简化安装与 Web 资源交付。
 
-| 项目                                                | 状态                                                                                                                                                                 | 描述                                                                                             |
-|-----------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| [Lina](https://github.com/jumpserver/lina)          | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina 版本" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a>                  | JumpServer 网页 UI                                                                                 |
-| [Luna](https://github.com/jumpserver/luna)          | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna 版本" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a>                  | JumpServer 网页终端                                                                                 |
-| [KoKo](https://github.com/jumpserver/koko)          | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko 版本" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                  | JumpServer 字符协议连接器                                                                          |
-| [Lion](https://github.com/jumpserver/lion)          | <a href="https://github.com/jumpserver/lion/releases"><img alt="Lion 版本" src="https://img.shields.io/github/release/jumpserver/lion.svg" /></a>                  | JumpServer 图形协议连接器                                                                          |
-| [Chen](https://github.com/jumpserver/chen)          | <a href="https://github.com/jumpserver/chen/releases"><img alt="Chen 版本" src="https://img.shields.io/github/release/jumpserver/chen.svg" />                      | JumpServer 网页数据库                                                                                |  
-| [Tinker](https://github.com/jumpserver/tinker)      | <img alt="Tinker" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer 远程应用连接器 (Windows)                                                               |
-| [Panda](https://github.com/jumpserver/Panda)        | <img alt="Panda" src="https://img.shields.io/badge/release-private-red" />                                                                                          | JumpServer EE 远程应用连接器 (Linux)                                                              |
-| [Razor](https://github.com/jumpserver/razor)        | <img alt="Chen" src="https://img.shields.io/badge/release-private-red" />                                                                                          | JumpServer EE RDP 代理连接器                                                                        |
-| [Magnus](https://github.com/jumpserver/magnus)      | <img alt="Magnus" src="https://img.shields.io/badge/release-private-red" />                                                                                            | JumpServer EE 数据库代理连接器                                                                       |
-| [Nec](https://github.com/jumpserver/nec)            | <img alt="Nec" src="https://img.shields.io/badge/release-private-red" />                                                                                           | JumpServer EE VNC 代理连接器                                                                        |
-| [Facelive](https://github.com/jumpserver/facelive)  | <img alt="Facelive" src="https://img.shields.io/badge/release-private-red" />                                                                                      | JumpServer EE 面部识别                                                                                |
+### 核心项目
 
+<table width="100%" align="center">
+  <thead>
+    <tr>
+      <th width="160" align="left">项目</th>
+      <th width="135" align="center"><div align="center">版本</div></th>
+      <th align="center"><div align="center">说明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer 版本" /></a></div></td>
+      <td align="left">开源特权访问管理平台</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina 版本" /></a></div></td>
+      <td align="left">JumpServer Web 界面</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna 版本" /></a></div></td>
+      <td align="left">JumpServer Web 终端与原生客户端</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo 版本" /></a></div></td>
+      <td align="left">JumpServer 通用协议连接器与代理</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen 版本" /></a></div></td>
+      <td align="left">JumpServer Web 数据库连接器</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael 版本" /></a></div></td>
+      <td align="left">JumpServer AI 组件</td>
+    </tr>
+  </tbody>
+</table>
 
-## 贡献
+### 企业版组件
 
-欢迎提交 PR 进行贡献。请参考 [CONTRIBUTING.md][contributing-link] 获取指南。
+<table width="100%" align="center">
+  <thead>
+    <tr>
+      <th width="160" align="left">项目</th>
+      <th width="135" align="center"><div align="center">版本</div></th>
+      <th align="center"><div align="center">说明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td align="left">JumpServer Windows 应用连接器（社区版可免费使用）</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td align="left">JumpServer 企业版 Linux 应用连接器</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td align="left">JumpServer 企业版 RDP 协议代理</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td align="left">JumpServer 企业版数据库协议代理</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td align="left">JumpServer 企业版 VNC 协议代理</td>
+    </tr>
+  </tbody>
+</table>
 
-## License
+### 支撑服务
 
-Copyright (c) 2014-2026 FIT2CLOUD, All rights reserved.
+<table width="100%" align="center">
+  <thead>
+    <tr>
+      <th width="160" align="left">项目</th>
+      <th width="135" align="center"><div align="center">版本</div></th>
+      <th align="center"><div align="center">说明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td align="left">JumpServer 企业版会话录像转码服务</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td align="left">JumpServer 企业版主机运维与管理服务</td>
+    </tr>
+  </tbody>
+</table>
 
-Licensed under The GNU General Public License version 3 (GPLv3) (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+### 部署与工具
+
+<table width="100%" align="center">
+  <thead>
+    <tr>
+      <th width="160" align="left">项目</th>
+      <th width="135" align="center"><div align="center">版本</div></th>
+      <th align="center"><div align="center">说明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer 版本" /></a></div></td>
+      <td align="left">JumpServer 安装与管理工具</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web 版本" /></a></div></td>
+      <td align="left">JumpServer Web 网关与静态资源</td>
+    </tr>
+  </tbody>
+</table>
+
+## 参与贡献
+
+欢迎提交贡献。请阅读 [CONTRIBUTING.md][contributing-link] 了解贡献指南。
+
+## 许可证
+
+版权所有 (c) 2014-2026 FIT2CLOUD。保留所有权利。
+
+本项目依据 GNU 通用公共许可证第 3 版（GPLv3，以下简称“许可证”）授权；您只能在遵守许可证的前提下使用本文件。许可证副本可从以下地址获取：
 
 https://www.gnu.org/licenses/gpl-3.0.html
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+除非适用法律要求或另有书面约定，根据许可证分发的软件均按“原样”提供，不附带任何明示或暗示的保证或条件。有关权限和限制，请参阅许可证中的具体规定。
 
 <!-- JumpServer official link -->
 [docs-link]: https://jumpserver.com/docs
@@ -113,7 +223,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [github-release-link]: https://github.com/jumpserver/jumpserver/releases/latest
 [github-stars-link]: https://github.com/jumpserver/jumpserver
 [github-issues-link]: https://github.com/jumpserver/jumpserver/issues
-[gitcode-link]: https://gitcode.com/feizhiyun/JumpServer
 
 <!-- Shield link-->
 [docs-shield]: https://img.shields.io/badge/documentation-148F76
@@ -123,4 +232,3 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [license-shield]: https://img.shields.io/github/license/jumpserver/jumpserver
 [deepwiki-shield]: https://img.shields.io/badge/deepwiki-devin?color=blue
 [discord-shield]: https://img.shields.io/discord/1194233267294052363?style=flat&logo=discord&logoColor=%23f5f5f5&labelColor=%235462eb&color=%235462eb
-[gitcode-shield]: https://gitcode.com/feizhiyun/JumpServer/star/badge.svg
