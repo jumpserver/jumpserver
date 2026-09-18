@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release tag (v4.x or v5.x)'
+        description: 'Release tag (v5.x)'
         required: true
         type: string
       release_body:
@@ -17,7 +17,7 @@ on:
 jobs:
   send_discord_notification:
     runs-on: ubuntu-latest
-    if: startsWith(inputs.tag_name || github.event.release.tag_name, 'v4.') || startsWith(inputs.tag_name || github.event.release.tag_name, 'v5.')
+    if: startsWith(inputs.tag_name || github.event.release.tag_name, 'v5.')
     steps:
       - name: Send release notification to Discord
         env:
