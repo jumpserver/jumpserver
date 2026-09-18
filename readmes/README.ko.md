@@ -22,7 +22,7 @@
 
 JumpServer는 AI 기능을 갖춘 오픈 소스 특권 접근 관리(PAM) 플랫폼입니다. DevOps 및 IT 팀이 SSH, RDP, Kubernetes, 데이터베이스, 웹사이트, RemoteApp, VirtualApp 등에 안전하게 접근할 수 있는 통합 작업 공간을 제공합니다.
 
-<img alt="JumpServer 아키텍처 다이어그램" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="JumpServer 아키텍처 다이어그램" src="assets/jumpserver-architecture.png" />
 
 ## 빠른 시작
 
@@ -39,7 +39,30 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 스크린샷
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="콘솔, PAM, 터미널, 원격 데스크톱, 데이터베이스 화면을 차례로 보여 주는 JumpServer 애니메이션" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="JumpServer PAM 대시보드" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer 자산 관리" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="JumpServer SSH 연결 대화 상자" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer 터미널 AI 질문" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 어시스턴트" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer 원격 데스크톱 세션" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="JumpServer 밝은 테마의 터미널 자산 패널" width="49%" />
+  <img src="assets/screenshot-08.png" alt="JumpServer 밝은 테마의 SSH 세션" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="JumpServer 어두운 테마의 터미널 자산 패널" width="49%" />
+  <img src="assets/screenshot-10.png" alt="JumpServer 어두운 테마의 SSH 세션" width="49%" />
+</p>
 
 ## 구성 요소
 

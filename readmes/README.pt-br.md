@@ -22,7 +22,7 @@
 
 O JumpServer é uma plataforma de gerenciamento de acesso privilegiado (PAM) de código aberto com recursos de IA. Ele oferece às equipes de DevOps e TI um espaço de trabalho unificado para acessar com segurança SSH, RDP, Kubernetes, bancos de dados, sites, RemoteApp, VirtualApp e outros recursos.
 
-<img alt="Diagrama da arquitetura do JumpServer" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="Diagrama da arquitetura do JumpServer" src="assets/jumpserver-architecture.png" />
 
 ## Início rápido
 
@@ -39,7 +39,30 @@ Abra o JumpServer no navegador em `http://your-jumpserver-ip/`
 
 ## Capturas de tela
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="Capturas animadas do JumpServer com console, PAM, terminal, área de trabalho remota e sessões de banco de dados" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="Painel de PAM do JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Gerenciamento de ativos do JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="Janela de conexão SSH do JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Pergunta à IA no terminal do JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="Assistente de IA do JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Sessão de área de trabalho remota do JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="Painel de ativos do terminal do JumpServer no tema claro" width="49%" />
+  <img src="assets/screenshot-08.png" alt="Sessão SSH do JumpServer no tema claro" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="Painel de ativos do terminal do JumpServer no tema escuro" width="49%" />
+  <img src="assets/screenshot-10.png" alt="Sessão SSH do JumpServer no tema escuro" width="49%" />
+</p>
 
 ## Componentes
 

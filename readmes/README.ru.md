@@ -22,7 +22,7 @@
 
 JumpServer — платформа управления привилегированным доступом (PAM) с открытым исходным кодом и возможностями ИИ. Она предоставляет командам DevOps и ИТ единое рабочее пространство для безопасного доступа к SSH, RDP, Kubernetes, базам данных, веб-сайтам, RemoteApp, VirtualApp и другим ресурсам.
 
-<img alt="Схема архитектуры JumpServer" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="Схема архитектуры JumpServer" src="assets/jumpserver-architecture.png" />
 
 ## Быстрый старт
 
@@ -39,7 +39,30 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## Снимки экрана
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="Анимированная серия снимков JumpServer: консоль, PAM, терминал, удалённый рабочий стол и сеансы баз данных" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="Панель PAM JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Управление активами JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="Диалог подключения по SSH в JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Запрос к ИИ из терминала JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="ИИ-ассистент JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Сеанс удалённого рабочего стола JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="Панель активов терминала JumpServer в светлой теме" width="49%" />
+  <img src="assets/screenshot-08.png" alt="Сеанс SSH JumpServer в светлой теме" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="Панель активов терминала JumpServer в тёмной теме" width="49%" />
+  <img src="assets/screenshot-10.png" alt="Сеанс SSH JumpServer в тёмной теме" width="49%" />
+</p>
 
 ## Компоненты
 

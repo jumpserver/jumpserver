@@ -22,7 +22,7 @@
 
 JumpServer is an open-source Privileged Access Management (PAM) platform with AI-powered capabilities. It gives DevOps and IT teams a unified workspace for secure access to SSH, RDP, Kubernetes, databases, websites, RemoteApp, VirtualApp, and more.
 
-<img alt="JumpServer architecture diagram" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="JumpServer architecture diagram" src="readmes/assets/jumpserver-architecture.png" />
 
 ## Quickstart
 
@@ -39,7 +39,30 @@ Open JumpServer in your browser at `http://your-jumpserver-ip/`
 
 ## Screenshots
 
-<p align="center"><img src="readmes/assets/jumpserver-screenshots.gif" alt="Animated JumpServer screenshots showing the console, PAM, terminal, remote desktop, and database sessions" width="95%" /></p>
+<p align="center">
+  <img src="readmes/assets/screenshot-01.png" alt="JumpServer PAM dashboard" width="49%" />
+  <img src="readmes/assets/screenshot-02.png" alt="JumpServer asset management" width="49%" />
+</p>
+
+<p align="center">
+  <img src="readmes/assets/screenshot-03.png" alt="JumpServer SSH connection dialog" width="49%" />
+  <img src="readmes/assets/screenshot-04.png" alt="JumpServer terminal AI prompt" width="49%" />
+</p>
+
+<p align="center">
+  <img src="readmes/assets/screenshot-05.png" alt="JumpServer AI assistant" width="49%" />
+  <img src="readmes/assets/screenshot-06.png" alt="JumpServer remote desktop session" width="49%" />
+</p>
+
+<p align="center">
+  <img src="readmes/assets/screenshot-07.png" alt="JumpServer terminal asset panel in light theme" width="49%" />
+  <img src="readmes/assets/screenshot-08.png" alt="JumpServer SSH session in light theme" width="49%" />
+</p>
+
+<p align="center">
+  <img src="readmes/assets/screenshot-09.png" alt="JumpServer terminal asset panel in dark theme" width="49%" />
+  <img src="readmes/assets/screenshot-10.png" alt="JumpServer SSH session in dark theme" width="49%" />
+</p>
 
 ## Components
 

@@ -22,7 +22,7 @@
 
 JumpServer 是具备 AI 能力的开源特权访问管理（PAM）平台，为 DevOps 和 IT 团队提供统一的工作空间，安全访问 SSH、RDP、Kubernetes、数据库、网站、RemoteApp、VirtualApp 等资源。
 
-<img alt="JumpServer 架构图" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="JumpServer 架构图" src="assets/jumpserver-architecture.png" />
 
 ## 快速开始
 
@@ -39,7 +39,30 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 截图
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="JumpServer 控制台、特权访问管理、终端、远程桌面和数据库会话的循环截图" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="JumpServer 特权访问管理仪表盘" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer 资产管理" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="JumpServer SSH 连接对话框" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer 终端 AI 提问" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 助手" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer 远程桌面会话" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="JumpServer 浅色主题终端资产面板" width="49%" />
+  <img src="assets/screenshot-08.png" alt="JumpServer 浅色主题 SSH 会话" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="JumpServer 深色主题终端资产面板" width="49%" />
+  <img src="assets/screenshot-10.png" alt="JumpServer 深色主题 SSH 会话" width="49%" />
+</p>
 
 ## 组件
 

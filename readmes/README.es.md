@@ -22,7 +22,7 @@
 
 JumpServer es una plataforma de gestión de accesos privilegiados (PAM) de código abierto con funciones de IA. Ofrece a los equipos de DevOps y TI un espacio de trabajo unificado para acceder de forma segura a SSH, RDP, Kubernetes, bases de datos, sitios web, RemoteApp, VirtualApp y otros recursos.
 
-<img alt="Diagrama de arquitectura de JumpServer" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="Diagrama de arquitectura de JumpServer" src="assets/jumpserver-architecture.png" />
 
 ## Inicio rápido
 
@@ -39,7 +39,30 @@ Abra JumpServer en el navegador en `http://your-jumpserver-ip/`
 
 ## Capturas de pantalla
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="Capturas animadas de JumpServer: consola, PAM, terminal, escritorio remoto y sesiones de bases de datos" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="Panel de PAM de JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Gestión de activos de JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="Diálogo de conexión SSH de JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Consulta a la IA desde el terminal de JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="Asistente de IA de JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Sesión de escritorio remoto de JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="Panel de activos del terminal de JumpServer en tema claro" width="49%" />
+  <img src="assets/screenshot-08.png" alt="Sesión SSH de JumpServer en tema claro" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="Panel de activos del terminal de JumpServer en tema oscuro" width="49%" />
+  <img src="assets/screenshot-10.png" alt="Sesión SSH de JumpServer en tema oscuro" width="49%" />
+</p>
 
 ## Componentes
 

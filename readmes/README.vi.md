@@ -22,7 +22,7 @@
 
 JumpServer là nền tảng quản lý truy cập đặc quyền (PAM) mã nguồn mở có tích hợp AI. Nền tảng cung cấp cho các nhóm DevOps và CNTT một không gian làm việc thống nhất để truy cập an toàn vào SSH, RDP, Kubernetes, cơ sở dữ liệu, trang web, RemoteApp, VirtualApp và nhiều tài nguyên khác.
 
-<img alt="Sơ đồ kiến trúc JumpServer" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="Sơ đồ kiến trúc JumpServer" src="assets/jumpserver-architecture.png" />
 
 ## Bắt đầu nhanh
 
@@ -39,7 +39,30 @@ Mở JumpServer trong trình duyệt tại `http://your-jumpserver-ip/`
 
 ## Ảnh chụp màn hình
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="Ảnh động lần lượt hiển thị bảng điều khiển, PAM, terminal, màn hình từ xa và phiên cơ sở dữ liệu của JumpServer" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="Bảng điều khiển PAM của JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Quản lý tài sản trong JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="Hộp thoại kết nối SSH của JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Yêu cầu AI từ terminal JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="Trợ lý AI của JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Phiên máy tính từ xa trong JumpServer" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="Bảng tài sản terminal JumpServer ở giao diện sáng" width="49%" />
+  <img src="assets/screenshot-08.png" alt="Phiên SSH JumpServer ở giao diện sáng" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="Bảng tài sản terminal JumpServer ở giao diện tối" width="49%" />
+  <img src="assets/screenshot-10.png" alt="Phiên SSH JumpServer ở giao diện tối" width="49%" />
+</p>
 
 ## Thành phần
 

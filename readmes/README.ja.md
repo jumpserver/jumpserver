@@ -22,7 +22,7 @@
 
 JumpServer は AI 機能を備えたオープンソースの特権アクセス管理（PAM）プラットフォームです。DevOps チームと IT チームが、SSH、RDP、Kubernetes、データベース、Web サイト、RemoteApp、VirtualApp などに安全にアクセスできる統合ワークスペースを提供します。
 
-<img alt="JumpServer の構成図" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="JumpServer の構成図" src="assets/jumpserver-architecture.png" />
 
 ## クイックスタート
 
@@ -39,7 +39,30 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## スクリーンショット
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="JumpServer のコンソール、PAM、ターミナル、リモートデスクトップ、データベース画面を順に表示するアニメーション" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="JumpServer の PAM ダッシュボード" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer の資産管理" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="JumpServer の SSH 接続ダイアログ" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer のターミナル AI への質問" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="JumpServer の AI アシスタント" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer のリモートデスクトップセッション" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="JumpServer のライトテーマのターミナル資産パネル" width="49%" />
+  <img src="assets/screenshot-08.png" alt="JumpServer のライトテーマの SSH セッション" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="JumpServer のダークテーマのターミナル資産パネル" width="49%" />
+  <img src="assets/screenshot-10.png" alt="JumpServer のダークテーマの SSH セッション" width="49%" />
+</p>
 
 ## コンポーネント
 

@@ -22,7 +22,7 @@
 
 JumpServer 是具備 AI 能力的開源特權存取管理（PAM）平台，為 DevOps 和 IT 團隊提供統一的工作空間，安全存取 SSH、RDP、Kubernetes、資料庫、網站、RemoteApp、VirtualApp 等資源。
 
-<img alt="JumpServer 架構圖" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="JumpServer 架構圖" src="assets/jumpserver-architecture.png" />
 
 ## 快速開始
 
@@ -39,7 +39,30 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 畫面截圖
 
-<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="依序顯示 JumpServer 主控台、特權存取管理、終端機、遠端桌面和資料庫工作階段的動畫截圖" width="95%" /></p>
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="JumpServer 特權存取管理儀表板" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer 資產管理" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="JumpServer SSH 連線對話方塊" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer 終端機 AI 提問" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 助理" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer 遠端桌面工作階段" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="JumpServer 淺色主題終端機資產面板" width="49%" />
+  <img src="assets/screenshot-08.png" alt="JumpServer 淺色主題 SSH 工作階段" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="JumpServer 深色主題終端機資產面板" width="49%" />
+  <img src="assets/screenshot-10.png" alt="JumpServer 深色主題 SSH 工作階段" width="49%" />
+</p>
 
 ## 元件
 
