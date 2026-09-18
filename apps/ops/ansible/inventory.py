@@ -54,7 +54,9 @@ class JMSInventory:
 
     @staticmethod
     def get_username(asset, account):
-        if asset.category == const.Category.DS:
+        if asset.category == const.Category.DS or (
+                asset.type == const.HostTypes.WINDOWS and account.is_ds_account()
+        ):
             return account.full_username
         return account.username
 
