@@ -1,5 +1,6 @@
 from datetime import timedelta
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from django.db import connection
 from django.test import TestCase
@@ -14,6 +15,7 @@ from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from perms.const import ActionChoices
 from perms.models import AssetPermission
+from perms.utils.permission import AssetPermissionUtil
 from users.models import User
 
 
@@ -69,6 +71,7 @@ class UsernameHintsPermissionTest(TestCase):
             )
             permission.users.add(self.user)
             permission.assets.add(asset)
+        return permission
 
     def get_hints(self, asset, action=None):
         assets = asset if isinstance(asset, list) else [asset]
@@ -199,6 +202,50 @@ class UsernameHintsPermissionTest(TestCase):
 
         self.assertLessEqual(len(large_queries), len(small_queries) + 2)
         self.assertLessEqual(len(large_queries), 20)
+
+    def test_permission_query_is_scoped_to_selected_assets(self):
+        selected_asset = self.create_asset('scoped-selected-asset')
+        self.create_account(selected_asset, 'selected-user')
+        selected_permission = self.grant(
+            selected_asset,
+            'selected-user',
+            ActionChoices.upload.value,
+        )
+
+        unrelated_asset = self.create_asset('scoped-unrelated-asset')
+        self.create_account(unrelated_asset, 'unrelated-user')
+        unrelated_permission = self.grant(
+            unrelated_asset,
+            'unrelated-user',
+            ActionChoices.upload.value,
+        )
+
+        scoped_permissions = AssetPermissionUtil().get_permissions_for_user(
+            self.user,
+            permission_ids={selected_permission.id},
+        )
+        self.assertEqual(
+            set(scoped_permissions.values_list('id', flat=True)),
+            {selected_permission.id},
+        )
+
+        permission_id_filters = []
+        original_get_permissions = AssetPermissionUtil.get_permissions_for_user
+
+        def capture_permission_scope(util, user, *args, **kwargs):
+            permission_id_filters.append(kwargs.get('permission_ids'))
+            return original_get_permissions(util, user, *args, **kwargs)
+
+        with patch.object(
+            AssetPermissionUtil,
+            'get_permissions_for_user',
+            capture_permission_scope,
+        ):
+            hints = self.get_hints(selected_asset, action='upload')
+
+        self.assertEqual(hints, [{'username': 'selected-user', 'total': 1}])
+        self.assertEqual(permission_id_filters, [{selected_permission.id}])
+        self.assertNotIn(unrelated_permission.id, permission_id_filters[0])
 
     def test_node_permission_is_applied_to_child_asset(self):
         asset = self.create_asset('node-authorized-asset')

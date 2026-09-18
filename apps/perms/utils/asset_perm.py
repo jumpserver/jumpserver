@@ -46,11 +46,13 @@ class PermAssetAccountsBatchUtil:
             for index in range(1, len(parts) + 1)
         }
 
-    def get_asset_permission_ids(self, asset_ids, permission_ids):
+    def get_asset_permission_ids(self, asset_ids, permission_ids=None):
         asset_permission_ids = defaultdict(set)
+        direct_filter = {'asset_id__in': asset_ids}
+        if permission_ids is not None:
+            direct_filter['assetpermission_id__in'] = permission_ids
         direct_relations = AssetPermission.assets.through.objects.filter(
-            asset_id__in=asset_ids,
-            assetpermission_id__in=permission_ids,
+            **direct_filter,
         ).values_list('asset_id', 'assetpermission_id')
         for asset_id, permission_id in direct_relations:
             asset_permission_ids[asset_id].add(permission_id)
@@ -65,10 +67,12 @@ class PermAssetAccountsBatchUtil:
         ancestor_keys = set(ancestor_assets)
         if not ancestor_keys:
             return asset_permission_ids
+        node_filter = {'node__key__in': ancestor_keys}
+        if permission_ids is not None:
+            node_filter['assetpermission_id__in'] = permission_ids
         permission_node_relations = (
             AssetPermission.nodes.through.objects.filter(
-                assetpermission_id__in=permission_ids,
-                node__key__in=ancestor_keys,
+                **node_filter,
             ).values_list('assetpermission_id', 'node__key')
         )
         for permission_id, node_key in permission_node_relations:
@@ -215,21 +219,32 @@ class PermAssetAccountsBatchUtil:
         if not asset_ids:
             return []
 
+        asset_permission_ids = self.get_asset_permission_ids(asset_ids)
+        candidate_permission_ids = {
+            permission_id
+            for permission_ids in asset_permission_ids.values()
+            for permission_id in permission_ids
+        }
+        if not candidate_permission_ids:
+            return []
+
         permissions = list(
-            AssetPermissionUtil().get_permissions_for_user(self.user).only(
-                'id', 'accounts', 'protocols', 'actions',
-            )
+            AssetPermissionUtil().get_permissions_for_user(
+                self.user,
+                permission_ids=candidate_permission_ids,
+            ).only('id', 'accounts', 'protocols', 'actions')
         )
         permissions_by_id = {
             permission.id: permission for permission in permissions
         }
-        permission_ids = list(permissions_by_id)
-        if not permission_ids:
+        if not permissions_by_id:
             return []
 
-        asset_permission_ids = self.get_asset_permission_ids(
-            asset_ids, permission_ids,
-        )
+        available_permission_ids = set(permissions_by_id)
+        asset_permission_ids = {
+            asset_id: permission_ids & available_permission_ids
+            for asset_id, permission_ids in asset_permission_ids.items()
+        }
         asset_ids = [
             asset_id for asset_id in asset_ids
             if asset_permission_ids.get(asset_id)

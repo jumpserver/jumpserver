@@ -13,32 +13,58 @@ class AssetPermissionUtil(object):
     """ 资产授权相关的方法工具 """
 
     @timeit
-    def get_permissions_for_user(self, user, with_group=True, flat=False, with_expired=False):
+    def get_permissions_for_user(
+        self, user, with_group=True, flat=False, with_expired=False,
+        permission_ids=None,
+    ):
         """ 获取用户的授权规则 """
         perm_ids = set()
         # user
-        user_perm_ids = AssetPermission.users.through.objects.filter(user_id=user.id) \
-            .values_list('assetpermission_id', flat=True).distinct()
+        user_perm_query = AssetPermission.users.through.objects.filter(
+            user_id=user.id,
+        )
+        if permission_ids is not None:
+            user_perm_query = user_perm_query.filter(
+                assetpermission_id__in=permission_ids,
+            )
+        user_perm_ids = user_perm_query.values_list(
+            'assetpermission_id', flat=True,
+        ).distinct()
         perm_ids.update(user_perm_ids)
         # group
         if with_group:
             groups = user.groups.all()
-            group_perm_ids = self.get_permissions_for_user_groups(groups, flat=True, with_expired=with_expired)
+            group_perm_ids = self.get_permissions_for_user_groups(
+                groups,
+                flat=True,
+                with_expired=with_expired,
+                permission_ids=permission_ids,
+            )
             perm_ids.update(group_perm_ids)
         perms = self.get_permissions(ids=perm_ids, with_expired=with_expired)
         if flat:
             return perms.values_list('id', flat=True)
         return perms
 
-    def get_permissions_for_user_groups(self, user_groups, flat=False, with_expired=False):
+    def get_permissions_for_user_groups(
+        self, user_groups, flat=False, with_expired=False,
+        permission_ids=None,
+    ):
         """ 获取用户组的授权规则 """
         if isinstance(user_groups, list):
             group_ids = [g.id for g in user_groups]
         else:
             group_ids = user_groups.values_list('id', flat=True).distinct()
-        perm_ids = AssetPermission.user_groups.through.objects \
-            .filter(usergroup_id__in=group_ids) \
-            .values_list('assetpermission_id', flat=True).distinct()
+        group_perm_query = AssetPermission.user_groups.through.objects.filter(
+            usergroup_id__in=group_ids,
+        )
+        if permission_ids is not None:
+            group_perm_query = group_perm_query.filter(
+                assetpermission_id__in=permission_ids,
+            )
+        perm_ids = group_perm_query.values_list(
+            'assetpermission_id', flat=True,
+        ).distinct()
         perms = self.get_permissions(ids=perm_ids, with_expired=with_expired)
         if flat:
             return perms.values_list('id', flat=True)
