@@ -39,7 +39,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 畫面截圖
 
-![依序顯示 JumpServer 主控台、特權存取管理、終端機、遠端桌面和資料庫工作階段的動畫截圖](assets/jumpserver-screenshots.gif)
+<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="依序顯示 JumpServer 主控台、特權存取管理、終端機、遠端桌面和資料庫工作階段的動畫截圖" width="95%" /></p>
 
 ## 元件
 
@@ -47,7 +47,7 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 
 ### 核心專案
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">專案</th>
@@ -91,7 +91,7 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 
 ### 企業版元件
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">專案</th>
@@ -130,7 +130,7 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 
 ### 支援服務
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">專案</th>
@@ -154,7 +154,7 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 
 ### 部署與工具
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">專案</th>

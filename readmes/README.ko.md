@@ -39,7 +39,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 스크린샷
 
-![콘솔, PAM, 터미널, 원격 데스크톱, 데이터베이스 화면을 차례로 보여 주는 JumpServer 애니메이션](assets/jumpserver-screenshots.gif)
+<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="콘솔, PAM, 터미널, 원격 데스크톱, 데이터베이스 화면을 차례로 보여 주는 JumpServer 애니메이션" width="95%" /></p>
 
 ## 구성 요소
 
@@ -47,7 +47,7 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 
 ### 핵심 프로젝트
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">프로젝트</th>
@@ -91,7 +91,7 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 
 ### 엔터프라이즈 구성 요소
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">프로젝트</th>
@@ -130,7 +130,7 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 
 ### 지원 서비스
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">프로젝트</th>
@@ -154,7 +154,7 @@ JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로�
 
 ### 배포 및 도구
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">프로젝트</th>

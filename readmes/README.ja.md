@@ -39,7 +39,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## スクリーンショット
 
-![JumpServer のコンソール、PAM、ターミナル、リモートデスクトップ、データベース画面を順に表示するアニメーション](assets/jumpserver-screenshots.gif)
+<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="JumpServer のコンソール、PAM、ターミナル、リモートデスクトップ、データベース画面を順に表示するアニメーション" width="95%" /></p>
 
 ## コンポーネント
 
@@ -47,7 +47,7 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 
 ### コアプロジェクト
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">プロジェクト</th>
@@ -91,7 +91,7 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 
 ### エンタープライズコンポーネント
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">プロジェクト</th>
@@ -130,7 +130,7 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 
 ### 補助サービス
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">プロジェクト</th>
@@ -154,7 +154,7 @@ JumpServer のコンポーネントは役割ごとに分類されています。
 
 ### 導入とツール
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">プロジェクト</th>

@@ -39,7 +39,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## 截图
 
-![JumpServer 控制台、特权访问管理、终端、远程桌面和数据库会话的循环截图](assets/jumpserver-screenshots.gif)
+<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="JumpServer 控制台、特权访问管理、终端、远程桌面和数据库会话的循环截图" width="95%" /></p>
 
 ## 组件
 
@@ -47,7 +47,7 @@ JumpServer 按职责划分组件。核心项目提供平台、Web 界面、终�
 
 ### 核心项目
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">项目</th>
@@ -91,7 +91,7 @@ JumpServer 按职责划分组件。核心项目提供平台、Web 界面、终�
 
 ### 企业版组件
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">项目</th>
@@ -130,7 +130,7 @@ JumpServer 按职责划分组件。核心项目提供平台、Web 界面、终�
 
 ### 支撑服务
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">项目</th>
@@ -154,7 +154,7 @@ JumpServer 按职责划分组件。核心项目提供平台、Web 界面、终�
 
 ### 部署与工具
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">项目</th>

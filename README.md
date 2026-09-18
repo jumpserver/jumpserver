@@ -39,7 +39,7 @@ Open JumpServer in your browser at `http://your-jumpserver-ip/`
 
 ## Screenshots
 
-![Animated JumpServer screenshots showing the console, PAM, terminal, remote desktop, and database sessions](readmes/assets/jumpserver-screenshots.gif)
+<p align="center"><img src="readmes/assets/jumpserver-screenshots.gif" alt="Animated JumpServer screenshots showing the console, PAM, terminal, remote desktop, and database sessions" width="95%" /></p>
 
 ## Components
 
@@ -47,7 +47,7 @@ JumpServer groups its components by role. Core projects provide the platform, we
 
 ### Core Projects
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Project</th>
@@ -91,7 +91,7 @@ JumpServer groups its components by role. Core projects provide the platform, we
 
 ### Enterprise Components
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Project</th>
@@ -130,7 +130,7 @@ JumpServer groups its components by role. Core projects provide the platform, we
 
 ### Supporting Services
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Project</th>
@@ -154,7 +154,7 @@ JumpServer groups its components by role. Core projects provide the platform, we
 
 ### Deployment & Tooling
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Project</th>

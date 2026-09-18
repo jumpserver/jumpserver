@@ -39,7 +39,7 @@ Mở JumpServer trong trình duyệt tại `http://your-jumpserver-ip/`
 
 ## Ảnh chụp màn hình
 
-![Ảnh động lần lượt hiển thị bảng điều khiển, PAM, terminal, màn hình từ xa và phiên cơ sở dữ liệu của JumpServer](assets/jumpserver-screenshots.gif)
+<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="Ảnh động lần lượt hiển thị bảng điều khiển, PAM, terminal, màn hình từ xa và phiên cơ sở dữ liệu của JumpServer" width="95%" /></p>
 
 ## Thành phần
 
@@ -47,7 +47,7 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 
 ### Dự án cốt lõi
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Dự án</th>
@@ -91,7 +91,7 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 
 ### Thành phần doanh nghiệp
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Dự án</th>
@@ -130,7 +130,7 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 
 ### Dịch vụ hỗ trợ
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Dự án</th>
@@ -154,7 +154,7 @@ Các thành phần của JumpServer được nhóm theo vai trò. Các dự án 
 
 ### Triển khai và công cụ
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Dự án</th>

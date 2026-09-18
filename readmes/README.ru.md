@@ -39,7 +39,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ## Снимки экрана
 
-![Анимированная серия снимков JumpServer: консоль, PAM, терминал, удалённый рабочий стол и сеансы баз данных](assets/jumpserver-screenshots.gif)
+<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="Анимированная серия снимков JumpServer: консоль, PAM, терминал, удалённый рабочий стол и сеансы баз данных" width="95%" /></p>
 
 ## Компоненты
 
@@ -47,7 +47,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ### Основные проекты
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Проект</th>
@@ -91,7 +91,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ### Корпоративные компоненты
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Проект</th>
@@ -130,7 +130,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ### Вспомогательные службы
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Проект</th>
@@ -154,7 +154,7 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 
 ### Развёртывание и инструменты
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Проект</th>

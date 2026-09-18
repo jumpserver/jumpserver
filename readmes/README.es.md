@@ -39,7 +39,7 @@ Abra JumpServer en el navegador en `http://your-jumpserver-ip/`
 
 ## Capturas de pantalla
 
-![Capturas animadas de JumpServer: consola, PAM, terminal, escritorio remoto y sesiones de bases de datos](assets/jumpserver-screenshots.gif)
+<p align="center"><img src="assets/jumpserver-screenshots.gif" alt="Capturas animadas de JumpServer: consola, PAM, terminal, escritorio remoto y sesiones de bases de datos" width="95%" /></p>
 
 ## Componentes
 
@@ -47,7 +47,7 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 
 ### Proyectos principales
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Proyecto</th>
@@ -91,7 +91,7 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 
 ### Componentes empresariales
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Proyecto</th>
@@ -130,7 +130,7 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 
 ### Servicios auxiliares
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Proyecto</th>
@@ -154,7 +154,7 @@ Los componentes de JumpServer se organizan según su función. Los proyectos pri
 
 ### Despliegue y herramientas
 
-<table width="100%" align="center">
+<table width="100%">
   <thead>
     <tr>
       <th width="160" align="left">Proyecto</th>
