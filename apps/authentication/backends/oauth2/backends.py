@@ -5,6 +5,7 @@ import requests
 
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.utils.crypto import constant_time_compare
 from django.utils.http import urlencode
 from django.conf import settings
 from django.urls import reverse
@@ -77,13 +78,13 @@ class OAuth2Backend(RedirectAuthBackend):
             return None
 
         if settings.AUTH_OAUTH2_USE_STATE:
-            if state is None:
-                logger.error(log_prompt.format('state is missing'))
-                return None
-
             session_state = request.session.get('oauth2_state')
-            if not session_state or session_state != state:
-                logger.error(log_prompt.format('state parameter mismatch'))
+            if not state or not session_state or not constant_time_compare(session_state, state):
+                request.error_message = _('Invalid state parameter')
+                logger.error(
+                    log_prompt.format('Invalid state parameter: state=%r, session_state=%r'),
+                    state, session_state,
+                )
                 return None
 
             request.session.pop('oauth2_state', None)
