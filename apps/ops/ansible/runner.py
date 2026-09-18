@@ -1,4 +1,5 @@
 import os
+import shlex
 import shutil
 import uuid
 
@@ -21,7 +22,17 @@ from .docker import (
 from .exception import CommandInBlackListException
 from .interface import interface
 
-__all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
+__all__ = [
+    'AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner',
+    'neutralize_jinja2_syntax',
+]
+
+
+def neutralize_jinja2_syntax(value):
+    """Treat user-supplied Ansible args as data, not templates."""
+    if not isinstance(value, str):
+        return value
+    return value.replace('{{', '{ {').replace('{%', '{ %')
 
 
 class AdHocRunner:
@@ -208,7 +219,7 @@ class UploadFileRunner:
         self.envs = {}
         upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file')
         self.share_src_dir = safe_join(upload_file_dir, str(job_id))
-        self.dest_path = safe_join("/tmp", dest_path)
+        self.dest_path = safe_join("/tmp", neutralize_jinja2_syntax(dest_path or ''))
 
     def stage_upload_files(self):
         """Copy uploads into private_data_dir so Docker EE can read src for copy."""
@@ -233,7 +244,9 @@ class UploadFileRunner:
             'host_pattern': "*",
             'inventory': self.inventory,
             'module': 'copy',
-            'module_args': f"src={src_path}/ dest={self.dest_path}/",
+            'module_args': 'src={} dest={}'.format(
+                shlex.quote(src_path + '/'), shlex.quote(self.dest_path + '/')
+            ),
             'verbosity': verbosity,
             'event_handler': self.cb.event_handler,
             'status_handler': self.cb.status_handler,

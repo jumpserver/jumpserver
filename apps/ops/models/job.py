@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shlex
 import sys
 import uuid
 from collections import defaultdict
@@ -26,6 +27,7 @@ from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import (
     JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
+    neutralize_jinja2_syntax,
 )
 
 """stop all ssh child processes of the given ansible process pid."""
@@ -306,6 +308,7 @@ class JobExecution(JMSOrgBaseModel):
             return
 
         module = self.current_job.module
+        args = neutralize_jinja2_syntax(self.current_job.args or '')
 
         db_modules = ('mysql', 'postgresql', 'sqlserver', 'oracle')
         db_module_name_map = {
@@ -336,7 +339,7 @@ class JobExecution(JMSOrgBaseModel):
             if module == 'mssql_script':
                 login_args += "encryption={{jms_asset.encryption | default(None) }} " \
                               "tds_version={{jms_asset.tds_version | default(None) }} "
-            shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
+            shell = "{} {}=\"{}\" ".format(login_args, query_token, args)
             return module, shell
 
         if module == 'win_shell':
@@ -345,16 +348,18 @@ class JobExecution(JMSOrgBaseModel):
         if self.current_job.module in ['python']:
             module = "shell"
 
-        shell = self.current_job.args
+        shell = args
         if self.current_job.chdir:
             if module == "shell":
-                shell += " chdir={}".format(self.current_job.chdir)
+                shell += " chdir={}".format(
+                    shlex.quote(neutralize_jinja2_syntax(self.current_job.chdir))
+                )
         if self.current_job.module in ['python']:
             shell += " executable={}".format(self.current_job.module)
 
         if module == JobModules.huawei.value:
             module = 'ce_command'
-            shell = "commands=\"{}\" ".format(self.current_job.args)
+            shell = "commands=\"{}\" ".format(args)
 
         return module, shell
 
