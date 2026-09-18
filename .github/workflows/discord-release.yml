@@ -7,7 +7,7 @@ on:
 jobs:
   send_discord_notification:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.release.tag_name, 'v4.')
+    if: startsWith(github.event.release.tag_name, 'v4.') || startsWith(github.event.release.tag_name, 'v5.')
     steps:
       - name: Send release notification to Discord
         env:

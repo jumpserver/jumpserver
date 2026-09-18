@@ -7,7 +7,7 @@ on:
 jobs:
   update_docs_changelog:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.release.tag_name, 'v4.')
+    if: startsWith(github.event.release.tag_name, 'v4.') || startsWith(github.event.release.tag_name, 'v5.')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

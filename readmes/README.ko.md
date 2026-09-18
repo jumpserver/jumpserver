@@ -2,107 +2,216 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## 오픈 소스 PAM 플랫폼(점프 서버)
+## 오픈 소스 특권 접근 관리(PAM) 플랫폼(배스천 호스트)
+
+[![][license-shield]][license-link]
+[![][docs-shield]][docs-link]
+[![][deepwiki-shield]][deepwiki-link]
+[![][discord-shield]][discord-link]
+[![][docker-shield]][docker-link]
+[![][github-release-shield]][github-release-link]
+[![][github-stars-shield]][github-stars-link]
+
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+
 </div>
 
 <br/>
 
-## JumpServer란 무엇인가요?
+## JumpServer란?
 
-JumpServer는 AI 기능을 갖춘 오픈 소스 특권 액세스 관리(PAM) 플랫폼으로, DevOps 및 IT 팀이 SSH, RDP, Kubernetes, 데이터베이스, 웹사이트, RemoteApp, VirtualApp 등에 안전하게 액세스할 수 있는 통합 작업 공간을 제공합니다.
+JumpServer는 AI 기능을 갖춘 오픈 소스 특권 접근 관리(PAM) 플랫폼입니다. DevOps 및 IT 팀이 SSH, RDP, Kubernetes, 데이터베이스, 웹사이트, RemoteApp, VirtualApp 등에 안전하게 접근할 수 있는 통합 작업 공간을 제공합니다.
 
-<img alt="JumpServer 아키텍처 다이어그램" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="JumpServer 아키텍처 다이어그램" src="assets/jumpserver-architecture.png" />
 
 ## 빠른 시작
 
-깨끗한 리눅스 서버를 준비하세요 ( 64 비트, >= 4c8g )
+CPU 코어 4개 이상, 메모리 8 GB 이상을 갖춘 깨끗한 64비트 Linux 서버를 준비하세요.
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-브라우저에서 점프서버에 액세스하기: `http://your-jumpserver-ip/`
+브라우저에서 JumpServer에 접속하세요: `http://your-jumpserver-ip/`
+
 - 사용자 이름: `admin`
 - 비밀번호: `ChangeMe`
 
 ## 스크린샷
-<table style="border-collapse: collapse; border: 1px solid black;">
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/6164c92a-0b19-405a-b79c-73e28a9a1610" alt="JumpServer Console"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/12d1206d-b511-4f29-8b00-fd13333f3a21" alt="JumpServer PAM"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/6d12d3c9-5f31-4294-b6e7-7c5b5836f688" alt="JumpServer Audits"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/ba784bc8-e889-4fd6-aaae-0b8b14153da2" alt="JumpServer Workbench"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/d4b10b15-bccb-4a0d-a6e6-74a6439614e0" alt="JumpServer RBAC"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/ccbeb96e-9747-4182-bd03-031fb3af8bb2" alt="JumpServer Settings"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/9049888e-16fe-4fbe-b0f2-16bf140379c8" alt="JumpServer RBAC"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/133c4af6-90a9-457d-b372-bb53c29260dc" alt="JumpServer Settings"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/ea48738f-b5f8-4a43-a487-ca09b11176e7" alt="JumpServer RBAC"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/3407539f-1235-4dcc-adf2-26d7b60dbc67" alt="JumpServer Settings"   /></td>
-  </tr>
-</table>
+
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="JumpServer PAM 대시보드" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer 자산 관리" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="JumpServer SSH 연결 대화 상자" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer 터미널 AI 질문" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 어시스턴트" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer 원격 데스크톱 세션" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="JumpServer 밝은 테마의 터미널 자산 패널" width="49%" />
+  <img src="assets/screenshot-08.png" alt="JumpServer 밝은 테마의 SSH 세션" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="JumpServer 어두운 테마의 터미널 자산 패널" width="49%" />
+  <img src="assets/screenshot-10.png" alt="JumpServer 어두운 테마의 SSH 세션" width="49%" />
+</p>
 
 ## 구성 요소
 
-점프서버는 여러 핵심 구성 요소로 이루어져 있으며, 이는 점프서버의 기능적 프레임워크를 형성하여 사용자가 운영 관리 및 보안 제어를 위한 포괄적인 기능을 제공합니다.
-
-## 프로젝트
+JumpServer의 구성 요소는 역할에 따라 구분됩니다. 핵심 프로젝트는 플랫폼, 웹 인터페이스, 터미널, 프로토콜 연결 및 AI 기능을 제공합니다. 엔터프라이즈 구성 요소는 애플리케이션과 프로토콜 접근을 확장합니다. 지원 서비스는 세션 녹화와 호스트 운영을 담당하고, 배포 도구는 설치와 웹 콘텐츠 제공을 간소화합니다.
 
 ### 핵심 프로젝트
 
-| 프로젝트 | 버전 | 설명 |
-| --- | --- | --- |
-| [JumpServer](https://github.com/jumpserver/jumpserver) | [![tag](https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/jumpserver/tags) | 오픈 소스 특권 액세스 관리 플랫폼 |
-| [리나](https://github.com/jumpserver/lina) | [![tag](https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/lina/tags) | JumpServer 웹 UI |
-| [루나](https://github.com/jumpserver/luna) | [![tag](https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/luna/tags) | JumpServer 웹 터미널 및 네이티브 클라이언트 |
-| [코코](https://github.com/jumpserver/koko) | [![tag](https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/koko/tags) | JumpServer 범용 프로토콜 커넥터 및 프록시 |
-| [첸](https://github.com/jumpserver/chen) | [![tag](https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/chen/tags) | JumpServer 웹 데이터베이스 커넥터 |
-| [Kael](https://github.com/jumpserver/kael) | [![tag](https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/kael/tags) | JumpServer AI 구성 요소 |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer 버전" /></a></div></td>
+      <td width="550" align="left">오픈 소스 특권 접근 관리 플랫폼</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 인터페이스</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 터미널 및 네이티브 클라이언트</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 범용 프로토콜 커넥터 및 프록시</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 데이터베이스 커넥터</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer AI 구성 요소</td>
+    </tr>
+  </tbody>
+</table>
 
-### 엔터프라이즈 에디션 구성 요소
+### 엔터프라이즈 구성 요소
 
-| 프로젝트 | 버전 | 설명 |
-| --- | --- | --- |
-| [팅커](https://github.com/jumpserver/tinker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Windows 애플리케이션 커넥터(커뮤니티 에디션에서 무료 사용 가능) |
-| [판다](https://github.com/jumpserver/Panda) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer 엔터프라이즈 에디션 Linux 애플리케이션 커넥터 |
-| [레이저](https://github.com/jumpserver/razor) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer 엔터프라이즈 에디션 RDP 프로토콜 프록시 |
-| [마그누스](https://github.com/jumpserver/magnus) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer 엔터프라이즈 에디션 데이터베이스 프로토콜 프록시 |
-| [넥](https://github.com/jumpserver/nec) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer 엔터프라이즈 에디션 VNC 프로토콜 프록시 |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer Windows 애플리케이션 커넥터(커뮤니티 에디션에서 무료)</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 Linux 애플리케이션 커넥터</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 RDP 프로토콜 프록시</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 데이터베이스 프로토콜 프록시</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 VNC 프로토콜 프록시</td>
+    </tr>
+  </tbody>
+</table>
 
 ### 지원 서비스
 
-| 프로젝트 | 버전 | 설명 |
-| --- | --- | --- |
-| [Video Worker](https://github.com/jumpserver/video-worker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer 엔터프라이즈 에디션 세션 녹화 트랜스코딩 워커 |
-| [JDMC](https://github.com/jumpserver/jdmc) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer 엔터프라이즈 에디션 호스트 운영 및 관리 서비스 |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 세션 녹화 트랜스코딩 서비스</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="비공개 버전" /></div></td>
+      <td width="550" align="left">JumpServer 엔터프라이즈 에디션 호스트 운영 및 관리 서비스</td>
+    </tr>
+  </tbody>
+</table>
 
 ### 배포 및 도구
 
-| 프로젝트 | 버전 | 설명 |
-| --- | --- | --- |
-| [Installer](https://github.com/jumpserver/installer) | [![tag](https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/installer/tags) | JumpServer 설치 및 관리 도구 |
-| [Docker Web](https://github.com/jumpserver/docker-web) | [![tag](https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/docker-web/tags) | JumpServer 웹 게이트웨이 및 정적 리소스 |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">프로젝트</th>
+      <th width="135" align="center"><div align="center">버전</div></th>
+      <th width="550" align="center"><div align="center">설명</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 설치 및 관리 도구</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web 버전" /></a></div></td>
+      <td width="550" align="left">JumpServer 웹 게이트웨이 및 정적 자산</td>
+    </tr>
+  </tbody>
+</table>
 
-## 기여하기
+## 기여
 
-기여를 위해 PR을 제출하는 것을 환영합니다. 가이드라인은 [CONTRIBUTING.md][contributing-link]를 참조하세요.
+기여를 환영합니다. 자세한 내용은 [CONTRIBUTING.md][contributing-link]를 참고하세요.
 
-## 라이센스
+## 라이선스
 
-Copyright (c) 2014-2025 FIT2CLOUD, All rights reserved.
+Copyright (c) 2014-2026 FIT2CLOUD. All rights reserved.
 
-Licensed under The GNU General Public License version 3 (GPLv3) (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+이 프로젝트는 GNU 일반 공중 사용 허가서 버전 3(GPLv3, 이하 '라이선스')에 따라 제공됩니다. 이 파일은 라이선스를 준수하는 경우에만 사용할 수 있습니다. 라이선스 사본은 다음 주소에서 확인할 수 있습니다.
 
 https://www.gnu.org/licenses/gpl-3.0.html
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+관련 법률에서 요구하거나 서면으로 달리 합의한 경우를 제외하고, 라이선스에 따라 배포되는 소프트웨어는 명시적 또는 묵시적인 어떠한 보증이나 조건 없이 '있는 그대로' 제공됩니다. 권한과 제한 사항은 라이선스의 구체적인 내용을 참고하세요.
 
 <!-- JumpServer official link -->
 [docs-link]: https://jumpserver.com/docs

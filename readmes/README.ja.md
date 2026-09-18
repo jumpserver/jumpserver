@@ -2,108 +2,216 @@
   <a name="readme-top"></a>
   <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
-## オープンソースの PAM プラットフォーム (バスティオン ホスト)
+## オープンソースの特権アクセス管理（PAM）プラットフォーム（踏み台サーバー）
+
+[![][license-shield]][license-link]
+[![][docs-shield]][docs-link]
+[![][deepwiki-shield]][deepwiki-link]
+[![][discord-shield]][discord-link]
+[![][docker-shield]][docker-link]
+[![][github-release-shield]][github-release-link]
+[![][github-stars-shield]][github-stars-link]
+
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
+
 <br/>
 
 ## JumpServer とは？
 
-JumpServer は、AI 機能を備えたオープンソースの特権アクセス管理 (PAM) プラットフォームです。DevOps および IT チームに統一されたワークスペースを提供し、SSH、RDP、Kubernetes、データベース、Web サイト、RemoteApp、VirtualApp などへの安全なアクセスを実現します。
+JumpServer は AI 機能を備えたオープンソースの特権アクセス管理（PAM）プラットフォームです。DevOps チームと IT チームが、SSH、RDP、Kubernetes、データベース、Web サイト、RemoteApp、VirtualApp などに安全にアクセスできる統合ワークスペースを提供します。
 
-<img alt="JumpServer アーキテクチャ図" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
+<img alt="JumpServer の構成図" src="assets/jumpserver-architecture.png" />
 
 ## クイックスタート
 
-クリーンな Linux サーバーを準備します (64 ビット, >= 4c8g)
+CPU 4 コア以上、メモリ 8 GB 以上のクリーンな 64 ビット Linux サーバーを用意してください。
 
 ```sh
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-ブラウザで JumpServer にアクセスします: `http://your-jumpserver-ip/`
+ブラウザーで JumpServer にアクセスします： `http://your-jumpserver-ip/`
+
 - ユーザー名: `admin`
 - パスワード: `ChangeMe`
 
-
 ## スクリーンショット
-<table style="border-collapse: collapse; border: 1px solid black;">
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/6164c92a-0b19-405a-b79c-73e28a9a1610" alt="JumpServer Console"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/12d1206d-b511-4f29-8b00-fd13333f3a21" alt="JumpServer PAM"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/6d12d3c9-5f31-4294-b6e7-7c5b5836f688" alt="JumpServer Audits"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/ba784bc8-e889-4fd6-aaae-0b8b14153da2" alt="JumpServer Workbench"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/d4b10b15-bccb-4a0d-a6e6-74a6439614e0" alt="JumpServer RBAC"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/ccbeb96e-9747-4182-bd03-031fb3af8bb2" alt="JumpServer Settings"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/9049888e-16fe-4fbe-b0f2-16bf140379c8" alt="JumpServer RBAC"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/133c4af6-90a9-457d-b372-bb53c29260dc" alt="JumpServer Settings"   /></td>
-  </tr>
-  <tr>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/ea48738f-b5f8-4a43-a487-ca09b11176e7" alt="JumpServer RBAC"   /></td>
-    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/user-attachments/assets/3407539f-1235-4dcc-adf2-26d7b60dbc67" alt="JumpServer Settings"   /></td>
-  </tr>
-</table>
+
+<p align="center">
+  <img src="assets/screenshot-01.png" alt="JumpServer の PAM ダッシュボード" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer の資産管理" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-03.png" alt="JumpServer の SSH 接続ダイアログ" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer のターミナル AI への質問" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-05.png" alt="JumpServer の AI アシスタント" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer のリモートデスクトップセッション" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-07.png" alt="JumpServer のライトテーマのターミナル資産パネル" width="49%" />
+  <img src="assets/screenshot-08.png" alt="JumpServer のライトテーマの SSH セッション" width="49%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-09.png" alt="JumpServer のダークテーマのターミナル資産パネル" width="49%" />
+  <img src="assets/screenshot-10.png" alt="JumpServer のダークテーマの SSH セッション" width="49%" />
+</p>
 
 ## コンポーネント
 
-JumpServer は、複数の主要コンポーネントで構成されており、これらが集まって JumpServer の機能的なフレームワークを形成し、ユーザーに対して運用管理およびセキュリティ制御の包括的な機能を提供します。
-
-## プロジェクト
+JumpServer のコンポーネントは役割ごとに分類されています。コアプロジェクトはプラットフォーム、Web UI、ターミナル、プロトコル接続、AI 機能を提供します。エンタープライズコンポーネントはアプリケーションとプロトコルへのアクセスを拡張します。補助サービスはセッション録画とホスト運用を担い、導入ツールはインストールと Web 配信を簡素化します。
 
 ### コアプロジェクト
 
-| プロジェクト | バージョン | 説明 |
-| --- | --- | --- |
-| [JumpServer](https://github.com/jumpserver/jumpserver) | [![tag](https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/jumpserver/tags) | オープンソースの特権アクセス管理プラットフォーム |
-| [Lina](https://github.com/jumpserver/lina) | [![tag](https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/lina/tags) | JumpServer Web UI |
-| [Luna](https://github.com/jumpserver/luna) | [![tag](https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/luna/tags) | JumpServer Web ターミナルおよびネイティブクライアント |
-| [KoKo](https://github.com/jumpserver/koko) | [![tag](https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/koko/tags) | JumpServer 汎用プロトコルコネクターおよびプロキシ |
-| [Chen](https://github.com/jumpserver/chen) | [![tag](https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/chen/tags) | JumpServer Web データベースコネクター |
-| [Kael](https://github.com/jumpserver/kael) | [![tag](https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/kael/tags) | JumpServer AI コンポーネント |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer バージョン" /></a></div></td>
+      <td width="550" align="left">オープンソースの特権アクセス管理プラットフォーム</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web UI</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web ターミナルとネイティブクライアント</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の汎用プロトコルコネクターとプロキシ</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web データベースコネクター</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の AI コンポーネント</td>
+    </tr>
+  </tbody>
+</table>
 
-### エンタープライズ版コンポーネント
+### エンタープライズコンポーネント
 
-| プロジェクト | バージョン | 説明 |
-| --- | --- | --- |
-| [Tinker](https://github.com/jumpserver/tinker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Windows アプリケーションコネクター（コミュニティ版で無料利用可能） |
-| [Panda](https://github.com/jumpserver/Panda) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer エンタープライズ版 Linux アプリケーションコネクター |
-| [Razor](https://github.com/jumpserver/razor) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer エンタープライズ版 RDP プロトコルプロキシ |
-| [Magnus](https://github.com/jumpserver/magnus) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer エンタープライズ版データベースプロトコルプロキシ |
-| [Nec](https://github.com/jumpserver/nec) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer エンタープライズ版 VNC プロトコルプロキシ |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer の Windows アプリケーションコネクター（コミュニティ版では無料）</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版の Linux アプリケーションコネクター</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版の RDP プロトコルプロキシ</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版のデータベースプロトコルプロキシ</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版の VNC プロトコルプロキシ</td>
+    </tr>
+  </tbody>
+</table>
 
-### サポートサービス
+### 補助サービス
 
-| プロジェクト | バージョン | 説明 |
-| --- | --- | --- |
-| [Video Worker](https://github.com/jumpserver/video-worker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer エンタープライズ版セッション録画トランスコードワーカー |
-| [JDMC](https://github.com/jumpserver/jdmc) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer エンタープライズ版ホスト運用管理サービス |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版のセッション録画トランスコードサービス</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="非公開バージョン" /></div></td>
+      <td width="550" align="left">JumpServer エンタープライズ版のホスト運用・管理サービス</td>
+    </tr>
+  </tbody>
+</table>
 
-### デプロイとツール
+### 導入とツール
 
-| プロジェクト | バージョン | 説明 |
-| --- | --- | --- |
-| [Installer](https://github.com/jumpserver/installer) | [![tag](https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/installer/tags) | JumpServer インストールおよび管理ツール |
-| [Docker Web](https://github.com/jumpserver/docker-web) | [![tag](https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/docker-web/tags) | JumpServer Web ゲートウェイおよび静的アセット |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="160" align="left">プロジェクト</th>
+      <th width="135" align="center"><div align="center">バージョン</div></th>
+      <th width="550" align="center"><div align="center">説明</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer のインストール・管理ツール</td>
+    </tr>
+    <tr>
+      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web バージョン" /></a></div></td>
+      <td width="550" align="left">JumpServer の Web ゲートウェイと静的アセット</td>
+    </tr>
+  </tbody>
+</table>
 
-## 貢献
+## コントリビューション
 
-PR を提出して貢献していただけると幸いです。ガイドラインについては [CONTRIBUTING.md][contributing-link] を参照してください。
+コントリビューションを歓迎します。手順については [CONTRIBUTING.md][contributing-link] を参照してください。
 
 ## ライセンス
 
-Copyright (c) 2014-2025 FIT2CLOUD, All rights reserved.
+Copyright (c) 2014-2026 FIT2CLOUD. All rights reserved.
 
-Licensed under The GNU General Public License version 3 (GPLv3) (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+本プロジェクトは GNU General Public License バージョン 3（GPLv3、以下「ライセンス」）に基づいて提供されます。本ファイルはライセンスに従う場合にのみ使用できます。ライセンスの写しは次の URL で入手できます。
 
 https://www.gnu.org/licenses/gpl-3.0.html
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an " AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+適用法令で義務付けられる場合、または書面で別途合意した場合を除き、ライセンスに基づいて配布されるソフトウェアは「現状有姿」で提供され、明示または黙示を問わず、いかなる保証や条件も伴いません。権利と制限の詳細はライセンスを参照してください。
 
 <!-- JumpServer official link -->
 [docs-link]: https://jumpserver.com/docs
