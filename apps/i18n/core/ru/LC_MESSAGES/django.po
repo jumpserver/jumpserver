@@ -14553,3 +14553,17 @@ msgstr "Переданная версия не соответствует тек
 #: terminal/models/virtualapp/virtualapp.py
 msgid "Published version"
 msgstr "Опубликованная версия"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "Этот актив не поддерживает этот протокол"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "Этот актив не поддерживает проверку учетных данных"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "Проверка учетных данных недоступна, поскольку ACL входа в актив требует дополнительного действия."

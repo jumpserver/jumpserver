@@ -14535,3 +14535,17 @@ msgstr "A versão informada não corresponde à versão atual do aplicativo"
 #: terminal/models/virtualapp/virtualapp.py
 msgid "Published version"
 msgstr "Versão publicada"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "Este ativo não oferece suporte a este protocolo"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "Este ativo não oferece suporte à verificação de credenciais"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "Não é possível verificar as credenciais porque a ACL de login do ativo exige uma ação adicional."
