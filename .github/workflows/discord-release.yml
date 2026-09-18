@@ -3,22 +3,30 @@ name: Publish Release to Discord
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag (v4.x or v5.x)'
+        required: true
+        type: string
+      release_body:
+        description: 'Release notes to post to Discord'
+        required: true
+        type: string
 
 jobs:
   send_discord_notification:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.release.tag_name, 'v4.') || startsWith(github.event.release.tag_name, 'v5.')
+    if: startsWith(inputs.tag_name || github.event.release.tag_name, 'v4.') || startsWith(inputs.tag_name || github.event.release.tag_name, 'v5.')
     steps:
       - name: Send release notification to Discord
         env:
           WEBHOOK_URL: ${{ secrets.DISCORD_CHANGELOG_WEBHOOK }}
+          TAG_NAME: ${{ inputs.tag_name || github.event.release.tag_name }}
+          RELEASE_BODY: ${{ inputs.release_body || github.event.release.body }}
         run: |
-          # 获取标签名称和 release body
-          TAG_NAME="${{ github.event.release.tag_name }}"
-          RELEASE_BODY="${{ github.event.release.body }}"
-
           # 使用 jq 构建 JSON 数据，以确保安全传递
           JSON_PAYLOAD=$(jq -n --arg tag "# JumpServer $TAG_NAME Released! 🚀" --arg body "$RELEASE_BODY" '{content: "\($tag)\n\($body)"}')
 
           # 使用 curl 发送 JSON 数据
-          curl -X POST -H "Content-Type: application/json" -d "$JSON_PAYLOAD" "$WEBHOOK_URL"
+          curl --fail-with-body --silent --show-error -X POST -H "Content-Type: application/json" -d "$JSON_PAYLOAD" "$WEBHOOK_URL"

@@ -3,17 +3,23 @@ name: Auto update docs changelog
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag (v4.x or v5.x)'
+        required: true
+        type: string
 
 jobs:
   update_docs_changelog:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.release.tag_name, 'v4.') || startsWith(github.event.release.tag_name, 'v5.')
+    if: startsWith(inputs.tag_name || github.event.release.tag_name, 'v4.') || startsWith(inputs.tag_name || github.event.release.tag_name, 'v5.')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Update docs changelog
         env:
-          TAG_NAME: ${{ github.event.release.tag_name }}
+          TAG_NAME: ${{ inputs.tag_name || github.event.release.tag_name }}
           DOCS_TOKEN: ${{ secrets.DOCS_TOKEN }}
         run: |
           git config --global user.name 'BaiJiangJie'
