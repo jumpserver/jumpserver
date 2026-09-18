@@ -30,7 +30,7 @@ class AssetPermissionUtil(object):
     def get_permissions_for_user_by_ids(
         self, user, permission_ids, with_group=True, with_expired=False,
     ):
-        """ 获取用户指定的授权规则 """
+        """获取用户指定的授权规则。"""
         return self._get_permissions_for_user(
             user,
             with_group=with_group,
