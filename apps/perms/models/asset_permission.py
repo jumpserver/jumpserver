@@ -79,9 +79,6 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     date_expired = models.DateTimeField(
         default=asset_permission_date_expired_default, db_index=True, verbose_name=_('Date expired')
     )
-    expire_soon_notice_enabled = models.BooleanField(
-        default=False, verbose_name=_('Expiration-soon notice enabled')
-    )
     expire_soon_notice_minutes = models.PositiveIntegerField(
         null=True, blank=True, verbose_name=_('Expiration-soon notice minutes')
     )

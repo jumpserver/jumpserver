@@ -56,7 +56,6 @@ class Handler(BaseHandler):
             'name': apply_permission_name,
             'date_start': apply_date_start,
             'date_expired': apply_date_expired,
-            'expire_soon_notice_enabled': self.ticket.apply_expire_soon_notice_enabled,
             'expire_soon_notice_minutes': self.ticket.apply_expire_soon_notice_minutes,
             'comment': str(permission_comment),
             'created_by': permission_created_by,

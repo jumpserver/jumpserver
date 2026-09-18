@@ -10,11 +10,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='assetpermission',
-            name='expire_soon_notice_enabled',
-            field=models.BooleanField(default=False, verbose_name='Expiration-soon notice enabled'),
-        ),
-        migrations.AddField(
-            model_name='assetpermission',
             name='expire_soon_notice_minutes',
             field=models.PositiveIntegerField(
                 blank=True, null=True, verbose_name='Expiration-soon notice minutes'

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError
 from django.db.models import Q
@@ -86,15 +85,13 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
             "accounts", "protocols", "actions",
             "created_by", "date_created", "date_start", "date_expired", "is_active",
             "is_expired", "is_valid", "comment", "from_ticket",
-            "expire_soon_notice_enabled", "expire_soon_notice_minutes",
-            "expire_soon_notice_at", "expire_soon_notice_sent_at",
+            "expire_soon_notice_minutes", "expire_soon_notice_at",
         ]
         fields_small = fields_mini + fields_generic
         fields_m2m = ["users", "user_groups", "assets", "nodes", "labels"] + amount_fields
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = [
-            "created_by", "date_created", "from_ticket",
-            "expire_soon_notice_at", "expire_soon_notice_sent_at",
+            "created_by", "date_created", "from_ticket", "expire_soon_notice_at",
         ]
         extra_kwargs = {
             "actions": {"label": _("Action"), },
@@ -212,12 +209,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
                 'date_expired', AssetPermission._meta.get_field('date_expired').get_default()
             )
         try:
-            sync_expire_soon_notice(
-                self.instance,
-                attrs,
-                default_enabled=False,
-                default_minutes=settings.PERM_EXPIRED_SOON_NOTICE_MINUTES,
-            )
+            sync_expire_soon_notice(self.instance, attrs)
         except DjangoValidationError as exc:
             raise serializers.ValidationError(exc.message_dict) from exc
         self.create_account_through_template(

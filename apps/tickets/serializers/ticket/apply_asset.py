@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -39,8 +38,8 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
         writeable_fields = [
             'id', 'title', 'type', 'flow_id', 'apply_nodes', 'apply_assets',
             'apply_accounts', 'apply_actions', 'apply_date_start',
-            'apply_date_expired', 'apply_expire_soon_notice_enabled',
-            'apply_expire_soon_notice_minutes', 'comment', 'org_id'
+            'apply_date_expired', 'apply_expire_soon_notice_minutes',
+            'comment', 'org_id'
         ]
         read_only_fields = TicketApplySerializer.Meta.read_only_fields + ['apply_permission_name', ]
         fields = TicketApplySerializer.Meta.fields_small + \
@@ -76,8 +75,6 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
             sync_ticket_expire_soon_notice(
                 self.instance,
                 attrs,
-                default_enabled=False,
-                default_minutes=settings.PERM_EXPIRED_SOON_NOTICE_MINUTES,
                 allow_past=self.instance is not None,
             )
         except DjangoValidationError as exc:

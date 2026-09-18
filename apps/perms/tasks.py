@@ -96,7 +96,6 @@ def _claim_one_expire_soon_notice(now):
     with atomic():
         asset_perm = AssetPermission.objects.select_for_update(skip_locked=True).filter(
             is_active=True,
-            expire_soon_notice_enabled=True,
             expire_soon_notice_at__isnull=False,
             expire_soon_notice_at__lte=now,
             expire_soon_notice_sent_at__isnull=True,
