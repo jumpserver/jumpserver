@@ -14285,3 +14285,17 @@ msgstr "보고된 버전이 현재 애플리케이션 버전과 일치하지 않
 #: terminal/models/virtualapp/virtualapp.py
 msgid "Published version"
 msgstr "배포된 버전"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "이 자산은 이 프로토콜을 지원하지 않습니다"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "이 자산은 자격 증명 검증을 지원하지 않습니다"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "자산 로그인 ACL에서 추가 작업을 요구하므로 자격 증명을 검증할 수 없습니다."

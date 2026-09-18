@@ -14055,3 +14055,17 @@ msgstr "回報版本與目前應用版本不一致"
 #: terminal/models/virtualapp/virtualapp.py
 msgid "Published version"
 msgstr "已發布版本"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "該資產不支援此協定"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "該資產不支援憑據驗證"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "資產登入 ACL 要求執行額外操作，無法驗證憑據。"

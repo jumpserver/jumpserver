@@ -14330,3 +14330,17 @@ msgstr "Licence invalide"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "Le ticket est déjà fermé"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "Cet actif ne prend pas en charge ce protocole"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "Cet actif ne prend pas en charge la vérification des identifiants"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "La vérification des identifiants est indisponible car l’ACL de connexion à l’actif nécessite une action supplémentaire."

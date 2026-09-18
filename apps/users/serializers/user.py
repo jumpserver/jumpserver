@@ -250,6 +250,8 @@ class UserSerializer(
             },
             "email": {
                 "help_text": _("Email address"),
+                # Randomized ciphertext cannot be used for uniqueness checks.
+                "validators": [],
             },
             "password": {
                 "write_only": True,
@@ -309,6 +311,16 @@ class UserSerializer(
         if not settings.XPACK_ENABLED:
             choices = {k: v for k, v in choices.items() if k in open_source}
         source.choices = list(choices.items())
+
+    def validate_email(self, email):
+        users = User.objects.filter(email_lookup=text_hmac_sha256(email))
+        if self.instance is not None:
+            users = users.exclude(pk=self.instance.pk)
+        if users.exists():
+            raise serializers.ValidationError(
+                _("User email already exists ({})").format(email), code="unique"
+            )
+        return email
 
     def validate_password(self, password):
         password_strategy = self.initial_data.get("password_strategy")

@@ -14424,3 +14424,17 @@ msgstr "Phiên bản được báo cáo không khớp với phiên bản ứng d
 #: terminal/models/virtualapp/virtualapp.py
 msgid "Published version"
 msgstr "Phiên bản đã công bố"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "Tài sản này không hỗ trợ giao thức này"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "Tài sản này không hỗ trợ xác minh thông tin xác thực"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "Không thể xác minh thông tin xác thực vì ACL đăng nhập tài sản yêu cầu một thao tác bổ sung."
