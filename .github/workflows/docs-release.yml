@@ -6,14 +6,14 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release tag (v4.x or v5.x)'
+        description: 'Release tag (v5.x)'
         required: true
         type: string
 
 jobs:
   update_docs_changelog:
     runs-on: ubuntu-latest
-    if: startsWith(inputs.tag_name || github.event.release.tag_name, 'v4.') || startsWith(inputs.tag_name || github.event.release.tag_name, 'v5.')
+    if: startsWith(inputs.tag_name || github.event.release.tag_name, 'v5.')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
