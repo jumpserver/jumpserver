@@ -106,10 +106,6 @@ JumpServer consists of multiple key components, which collectively form the func
 | [Installer](https://github.com/jumpserver/installer) | [![tag](https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/installer/tags) | JumpServer Installation and Management Tool |
 | [Docker Web](https://github.com/jumpserver/docker-web) | [![tag](https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/docker-web/tags) | JumpServer Web Gateway and Static Assets |
 
-
-## Third-party projects 
-- [jumpserver-grafana-dashboard](https://github.com/acerrah/jumpserver-grafana-dashboard)   JumpServer with grafana dashboard
-
 ## Contributing
 
 Welcome to submit PR to contribute. Please refer to [CONTRIBUTING.md][contributing-link] for guidelines.
