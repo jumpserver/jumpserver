@@ -50,41 +50,41 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">Проект</th>
-      <th width="135" align="center"><div align="center">Версия</div></th>
-      <th align="center"><div align="center">Описание</div></th>
+      <th width="20%" align="left">Проект</th>
+      <th width="16%" align="center"><div align="center">Версия</div></th>
+      <th width="64%" align="center"><div align="center">Описание</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer версия" /></a></div></td>
-      <td align="left">Платформа управления привилегированным доступом с открытым исходным кодом</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer версия" /></a></div></td>
+      <td width="64%" align="left">Платформа управления привилегированным доступом с открытым исходным кодом</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina версия" /></a></div></td>
-      <td align="left">Веб-интерфейс JumpServer</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina версия" /></a></div></td>
+      <td width="64%" align="left">Веб-интерфейс JumpServer</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna версия" /></a></div></td>
-      <td align="left">Веб-терминал и нативный клиент JumpServer</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna версия" /></a></div></td>
+      <td width="64%" align="left">Веб-терминал и нативный клиент JumpServer</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo версия" /></a></div></td>
-      <td align="left">Универсальный протокольный коннектор и прокси JumpServer</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo версия" /></a></div></td>
+      <td width="64%" align="left">Универсальный протокольный коннектор и прокси JumpServer</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen версия" /></a></div></td>
-      <td align="left">Веб-коннектор баз данных JumpServer</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen версия" /></a></div></td>
+      <td width="64%" align="left">Веб-коннектор баз данных JumpServer</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael версия" /></a></div></td>
-      <td align="left">Компонент ИИ JumpServer</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael версия" /></a></div></td>
+      <td width="64%" align="left">Компонент ИИ JumpServer</td>
     </tr>
   </tbody>
 </table>
@@ -94,36 +94,36 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">Проект</th>
-      <th width="135" align="center"><div align="center">Версия</div></th>
-      <th align="center"><div align="center">Описание</div></th>
+      <th width="20%" align="left">Проект</th>
+      <th width="16%" align="center"><div align="center">Версия</div></th>
+      <th width="64%" align="center"><div align="center">Описание</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
-      <td align="left">Коннектор приложений Windows для JumpServer (бесплатно для редакции Community)</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
+      <td width="64%" align="left">Коннектор приложений Windows для JumpServer (бесплатно для редакции Community)</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
-      <td align="left">Коннектор приложений Linux для JumpServer Enterprise Edition</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
+      <td width="64%" align="left">Коннектор приложений Linux для JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
-      <td align="left">Прокси протокола RDP для JumpServer Enterprise Edition</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
+      <td width="64%" align="left">Прокси протокола RDP для JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
-      <td align="left">Прокси протоколов баз данных для JumpServer Enterprise Edition</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
+      <td width="64%" align="left">Прокси протоколов баз данных для JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
-      <td align="left">Прокси протокола VNC для JumpServer Enterprise Edition</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
+      <td width="64%" align="left">Прокси протокола VNC для JumpServer Enterprise Edition</td>
     </tr>
   </tbody>
 </table>
@@ -133,21 +133,21 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">Проект</th>
-      <th width="135" align="center"><div align="center">Версия</div></th>
-      <th align="center"><div align="center">Описание</div></th>
+      <th width="20%" align="left">Проект</th>
+      <th width="16%" align="center"><div align="center">Версия</div></th>
+      <th width="64%" align="center"><div align="center">Описание</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
-      <td align="left">Служба перекодирования записей сеансов JumpServer Enterprise Edition</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
+      <td width="64%" align="left">Служба перекодирования записей сеансов JumpServer Enterprise Edition</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
-      <td align="left">Служба эксплуатации и управления хостами JumpServer Enterprise Edition</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="Закрытая версия" /></div></td>
+      <td width="64%" align="left">Служба эксплуатации и управления хостами JumpServer Enterprise Edition</td>
     </tr>
   </tbody>
 </table>
@@ -157,21 +157,21 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">Проект</th>
-      <th width="135" align="center"><div align="center">Версия</div></th>
-      <th align="center"><div align="center">Описание</div></th>
+      <th width="20%" align="left">Проект</th>
+      <th width="16%" align="center"><div align="center">Версия</div></th>
+      <th width="64%" align="center"><div align="center">Описание</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer версия" /></a></div></td>
-      <td align="left">Инструмент установки и управления JumpServer</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer версия" /></a></div></td>
+      <td width="64%" align="left">Инструмент установки и управления JumpServer</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web версия" /></a></div></td>
-      <td align="left">Веб-шлюз и статические ресурсы JumpServer</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web версия" /></a></div></td>
+      <td width="64%" align="left">Веб-шлюз и статические ресурсы JumpServer</td>
     </tr>
   </tbody>
 </table>

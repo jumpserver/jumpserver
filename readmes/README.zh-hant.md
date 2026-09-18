@@ -50,41 +50,41 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">專案</th>
-      <th width="135" align="center"><div align="center">版本</div></th>
-      <th align="center"><div align="center">說明</div></th>
+      <th width="20%" align="left">專案</th>
+      <th width="16%" align="center"><div align="center">版本</div></th>
+      <th width="64%" align="center"><div align="center">說明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer 版本" /></a></div></td>
-      <td align="left">開源特權存取管理平台</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jumpserver">JumpServer</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/jumpserver/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&amp;filter=v5.*&amp;label=tag" alt="JumpServer 版本" /></a></div></td>
+      <td width="64%" align="left">開源特權存取管理平台</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina 版本" /></a></div></td>
-      <td align="left">JumpServer Web 介面</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/lina">Lina</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/lina/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Lina 版本" /></a></div></td>
+      <td width="64%" align="left">JumpServer Web 介面</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna 版本" /></a></div></td>
-      <td align="left">JumpServer Web 終端機與原生用戶端</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/luna">Luna</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/luna/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Luna 版本" /></a></div></td>
+      <td width="64%" align="left">JumpServer Web 終端機與原生用戶端</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo 版本" /></a></div></td>
-      <td align="left">JumpServer 通用協定連接器與代理</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/koko">KoKo</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/koko/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&amp;filter=v5.*&amp;label=tag" alt="KoKo 版本" /></a></div></td>
+      <td width="64%" align="left">JumpServer 通用協定連接器與代理</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen 版本" /></a></div></td>
-      <td align="left">JumpServer Web 資料庫連接器</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/chen">Chen</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/chen/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Chen 版本" /></a></div></td>
+      <td width="64%" align="left">JumpServer Web 資料庫連接器</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael 版本" /></a></div></td>
-      <td align="left">JumpServer AI 元件</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/kael">Kael</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/kael/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Kael 版本" /></a></div></td>
+      <td width="64%" align="left">JumpServer AI 元件</td>
     </tr>
   </tbody>
 </table>
@@ -94,36 +94,36 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">專案</th>
-      <th width="135" align="center"><div align="center">版本</div></th>
-      <th align="center"><div align="center">說明</div></th>
+      <th width="20%" align="left">專案</th>
+      <th width="16%" align="center"><div align="center">版本</div></th>
+      <th width="64%" align="center"><div align="center">說明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
-      <td align="left">JumpServer Windows 應用程式連接器（社群版可免費使用）</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/tinker">Tinker</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td width="64%" align="left">JumpServer Windows 應用程式連接器（社群版可免費使用）</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
-      <td align="left">JumpServer 企業版 Linux 應用程式連接器</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/Panda">Panda</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td width="64%" align="left">JumpServer 企業版 Linux 應用程式連接器</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
-      <td align="left">JumpServer 企業版 RDP 協定代理</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/razor">Razor</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td width="64%" align="left">JumpServer 企業版 RDP 協定代理</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
-      <td align="left">JumpServer 企業版資料庫協定代理</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/magnus">Magnus</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td width="64%" align="left">JumpServer 企業版資料庫協定代理</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
-      <td align="left">JumpServer 企業版 VNC 協定代理</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/nec">Nec</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td width="64%" align="left">JumpServer 企業版 VNC 協定代理</td>
     </tr>
   </tbody>
 </table>
@@ -133,21 +133,21 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">專案</th>
-      <th width="135" align="center"><div align="center">版本</div></th>
-      <th align="center"><div align="center">說明</div></th>
+      <th width="20%" align="left">專案</th>
+      <th width="16%" align="center"><div align="center">版本</div></th>
+      <th width="64%" align="center"><div align="center">說明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
-      <td align="left">JumpServer 企業版工作階段錄影轉碼服務</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/video-worker">Video&nbsp;Worker</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td width="64%" align="left">JumpServer 企業版工作階段錄影轉碼服務</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
-      <td width="135" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
-      <td align="left">JumpServer 企業版主機維運與管理服務</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/jdmc">JDMC</a></td>
+      <td width="16%" align="center"><div align="center"><img src="https://img.shields.io/badge/tag-private-red" alt="私有版本" /></div></td>
+      <td width="64%" align="left">JumpServer 企業版主機維運與管理服務</td>
     </tr>
   </tbody>
 </table>
@@ -157,21 +157,21 @@ JumpServer 依職責劃分元件。核心專案提供平台、Web 介面、終�
 <table width="100%">
   <thead>
     <tr>
-      <th width="160" align="left">專案</th>
-      <th width="135" align="center"><div align="center">版本</div></th>
-      <th align="center"><div align="center">說明</div></th>
+      <th width="20%" align="left">專案</th>
+      <th width="16%" align="center"><div align="center">版本</div></th>
+      <th width="64%" align="center"><div align="center">說明</div></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer 版本" /></a></div></td>
-      <td align="left">JumpServer 安裝與管理工具</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/installer">Installer</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/installer/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Installer 版本" /></a></div></td>
+      <td width="64%" align="left">JumpServer 安裝與管理工具</td>
     </tr>
     <tr>
-      <td width="160" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
-      <td width="135" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web 版本" /></a></div></td>
-      <td align="left">JumpServer Web 閘道與靜態資源</td>
+      <td width="20%" align="left" nowrap><a href="https://github.com/jumpserver/docker-web">Docker&nbsp;Web</a></td>
+      <td width="16%" align="center"><div align="center"><a href="https://github.com/jumpserver/docker-web/tags"><img src="https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&amp;filter=v5.*&amp;label=tag" alt="Docker Web 版本" /></a></div></td>
+      <td width="64%" align="left">JumpServer Web 閘道與靜態資源</td>
     </tr>
   </tbody>
 </table>
