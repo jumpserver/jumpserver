@@ -41,7 +41,6 @@ Access JumpServer in your browser at `http://your-jumpserver-ip/`
 - Username: `admin`
 - Password: `ChangeMe`
 
-[![JumpServer Quickstart](https://github.com/user-attachments/assets/0f32f52b-9935-485e-8534-336c63389612)](https://www.youtube.com/watch?v=UlGYRbKrpgY "JumpServer Quickstart")
 
 ## Screenshots
 <table style="border-collapse: collapse; border: 1px solid black;">
@@ -71,24 +70,42 @@ Access JumpServer in your browser at `http://your-jumpserver-ip/`
 
 JumpServer consists of multiple key components, which collectively form the functional framework of JumpServer, providing users with comprehensive capabilities for operations management and security control.
 
-| Project | Status | Description |
+## Projects
+
+### Core Projects
+
+| Project | Version | Description |
 | --- | --- | --- |
 | [JumpServer](https://github.com/jumpserver/jumpserver) | [![tag](https://img.shields.io/github/v/tag/jumpserver/jumpserver?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/jumpserver/tags) | Open-source Privileged Access Management platform |
 | [Lina](https://github.com/jumpserver/lina) | [![tag](https://img.shields.io/github/v/tag/jumpserver/lina?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/lina/tags) | JumpServer Web UI |
-| [Luna](https://github.com/jumpserver/luna) | [![tag](https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/luna/tags) | Unified JumpServer Web Terminal and Native Client |
-| [KoKo](https://github.com/jumpserver/koko) | [![tag](https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/koko/tags) | JumpServer Character Protocol Connector |
+| [Luna](https://github.com/jumpserver/luna) | [![tag](https://img.shields.io/github/v/tag/jumpserver/luna?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/luna/tags) | JumpServer Web Terminal and Native Client |
+| [KoKo](https://github.com/jumpserver/koko) | [![tag](https://img.shields.io/github/v/tag/jumpserver/koko?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/koko/tags) | JumpServer General-Purpose Protocol Connector and Proxy |
 | [Chen](https://github.com/jumpserver/chen) | [![tag](https://img.shields.io/github/v/tag/jumpserver/chen?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/chen/tags) | JumpServer Web Database Connector |
-| [Kael](https://github.com/jumpserver/kael) | [![tag](https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/kael/tags) | JumpServer AI and GPT Asset Connector |
-| [Docker Web](https://github.com/jumpserver/docker-web) | [![tag](https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/docker-web/tags) | JumpServer Web Gateway and Static Assets |
+| [Kael](https://github.com/jumpserver/kael) | [![tag](https://img.shields.io/github/v/tag/jumpserver/kael?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/kael/tags) | JumpServer AI Component |
+
+### Enterprise Components
+
+| Project | Version | Description |
+| --- | --- | --- |
+| [Tinker](https://github.com/jumpserver/tinker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Windows Application Connector (Free for Community Edition) |
+| [Panda](https://github.com/jumpserver/Panda) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Enterprise Edition Linux Application Connector |
+| [Razor](https://github.com/jumpserver/razor) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Enterprise Edition RDP Protocol Proxy |
+| [Magnus](https://github.com/jumpserver/magnus) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Enterprise Edition Database Protocol Proxy |
+| [Nec](https://github.com/jumpserver/nec) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Enterprise Edition VNC Protocol Proxy |
+
+### Supporting Services
+
+| Project | Version | Description |
+| --- | --- | --- |
+| [Video Worker](https://github.com/jumpserver/video-worker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Enterprise Edition Session Recording Transcoding Worker |
+| [JDMC](https://github.com/jumpserver/jdmc) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Enterprise Edition Host Operations and Management Service |
+
+### Deployment & Tooling
+
+| Project | Version | Description |
+| --- | --- | --- |
 | [Installer](https://github.com/jumpserver/installer) | [![tag](https://img.shields.io/github/v/tag/jumpserver/installer?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/installer/tags) | JumpServer Installation and Management Tool |
-| [Tinker](https://github.com/jumpserver/tinker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer Remote Application Connector for Windows |
-| [Panda](https://github.com/jumpserver/Panda) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer EE Remote Application Connector for Linux |
-| [Razor](https://github.com/jumpserver/razor) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer EE RDP Proxy Connector |
-| [Magnus](https://github.com/jumpserver/magnus) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer EE Database Proxy Connector |
-| [Nec](https://github.com/jumpserver/nec) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer EE VNC Proxy Connector |
-| [Facelive](https://github.com/jumpserver/facelive) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer EE Facial Recognition Component |
-| [Video Worker](https://github.com/jumpserver/video-worker) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer EE Session Recording Transcoding Worker |
-| [JDMC](https://github.com/jumpserver/jdmc) | ![tag](https://img.shields.io/badge/tag-private-red) | JumpServer EE Host Operations and Management Service |
+| [Docker Web](https://github.com/jumpserver/docker-web) | [![tag](https://img.shields.io/github/v/tag/jumpserver/docker-web?sort=semver&filter=v5.*&label=tag)](https://github.com/jumpserver/docker-web/tags) | JumpServer Web Gateway and Static Assets |
 
 
 ## Third-party projects 
