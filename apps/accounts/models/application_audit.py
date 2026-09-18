@@ -26,7 +26,10 @@ class ApplicationAudit(JMSOrgBaseModel):
 
     class Meta:
         ordering = ['-date_created', '-id']
-        indexes = [models.Index(fields=['org_id', '-date_created'])]
+        indexes = [
+            models.Index(fields=['org_id', '-date_created']),
+            models.Index(fields=['date_created'], name='accounts_app_audit_created_idx'),
+        ]
 
 
 class ApplicationEventDelivery(JMSOrgBaseModel):
@@ -54,6 +57,10 @@ class ApplicationEventDelivery(JMSOrgBaseModel):
         indexes = [
             models.Index(fields=['client', 'status', 'available_at']),
             models.Index(fields=['webhook', 'status', 'available_at']),
+            models.Index(
+                fields=['status', 'date_created'],
+                name='accounts_app_del_status_dt_idx',
+            ),
         ]
 
 

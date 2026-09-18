@@ -2550,6 +2550,14 @@ msgstr "添加账号: %s"
 msgid "Delete account: %s"
 msgstr "删除账号: %s"
 
+#: accounts/tasks/application_events.py:179
+msgid "Clean application records"
+msgstr "清理应用记录"
+
+#: accounts/tasks/application_events.py:180
+msgid "Clean expired application audits and completed webhook delivery records."
+msgstr "清理过期的应用审计记录和已完成的 Webhook 投递记录。"
+
 #: accounts/tasks/automation.py:43
 msgid "Account execute automation"
 msgstr "账号执行自动化"
@@ -10018,6 +10026,10 @@ msgid "Change secret and push record retention days"
 msgstr "账号改密推送记录保留天数"
 
 #: settings/serializers/cleaning.py:56
+msgid "Application record retention days"
+msgstr "应用记录保留天数"
+
+#: settings/serializers/cleaning.py:60
 msgid "Audit report send record retention days"
 msgstr "审计报告发送记录保留天数"
 
