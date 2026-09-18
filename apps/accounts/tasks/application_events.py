@@ -3,8 +3,10 @@ from datetime import timedelta
 from celery import shared_task
 from django.db import transaction
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from common.utils import get_logger
+from common.const.crontab import CRONTAB_AT_AM_THREE
+from common.utils import get_log_keep_day, get_logger
 from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_org, tmp_to_root_org
 
@@ -13,6 +15,17 @@ logger = get_logger(__name__)
 WEBHOOK_ATTEMPT_LIMIT = 3
 WEBHOOK_RETRY_DELAYS = (5, 15)
 WEBHOOK_CLAIM_LEASE = 25
+APPLICATION_RECORD_CLEAN_BATCH_SIZE = 3000
+
+
+def _delete_in_batches(queryset, batch_size=APPLICATION_RECORD_CLEAN_BATCH_SIZE):
+    deleted = {}
+    model = queryset.model
+    while ids := list(queryset.order_by('date_created', 'id').values_list('id', flat=True)[:batch_size]):
+        _, counts = model.objects.filter(id__in=ids).delete()
+        for label, count in counts.items():
+            deleted[label] = deleted.get(label, 0) + count
+    return deleted
 
 
 def dispatch_application_webhook(delivery_id, org_id, countdown=0):
@@ -157,3 +170,33 @@ def expire_application_event_deliveries():
             ).values_list('id', 'org_id'))
         for delivery_id, org_id in recovery:
             dispatch_application_webhook(delivery_id, org_id)
+
+
+@shared_task(
+    verbose_name=_('Clean application records'),
+    description=_('Clean expired application audits and completed webhook delivery records.'),
+)
+@register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
+def clean_application_records_period():
+    from accounts.models import ApplicationAudit, ApplicationEventAttempt, ApplicationEventDelivery
+
+    days = get_log_keep_day('APPLICATION_RECORD_KEEP_DAYS')
+    expired_at = timezone.now() - timedelta(days=days)
+    with tmp_to_root_org():
+        delivery_counts = _delete_in_batches(ApplicationEventDelivery.objects.filter(
+            date_created__lt=expired_at,
+            status__in=('success', 'failed'),
+        ))
+        audit_counts = _delete_in_batches(ApplicationAudit.objects.filter(
+            date_created__lt=expired_at,
+            deliveries__isnull=True,
+            delivery__isnull=True,
+        ))
+
+    logger.info(
+        'Cleaned application records older than %s days: audits=%s, deliveries=%s, attempts=%s.',
+        days,
+        audit_counts.get(ApplicationAudit._meta.label, 0),
+        delivery_counts.get(ApplicationEventDelivery._meta.label, 0),
+        delivery_counts.get(ApplicationEventAttempt._meta.label, 0),
+    )

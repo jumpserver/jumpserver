@@ -11,12 +11,16 @@ from accounts.credential_client.audit import record
 from accounts.credential_client.events import enqueue
 from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
 from accounts.models import (
-    ApplicationEventDelivery, ApplicationWebhook, CredentialClientInstance,
+    ApplicationAudit, ApplicationEventAttempt, ApplicationEventDelivery,
+    ApplicationWebhook, CredentialClientInstance,
 )
 from accounts.tasks.application_events import (
-    deliver_application_webhook, expire_application_event_deliveries,
+    clean_application_records_period, deliver_application_webhook,
+    expire_application_event_deliveries,
 )
 from accounts.tests.base import CredentialTestCase
+from common.const.crontab import CRONTAB_AT_AM_THREE
+from ops.celery.decorator import get_register_period_tasks
 
 
 class ApplicationWebhookDeliveryTests(CredentialTestCase):
@@ -197,6 +201,50 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         ) as dispatch:
             expire_application_event_deliveries()
         dispatch.assert_called_once_with(delivery.id, str(self.org.id))
+
+    @override_settings(APPLICATION_RECORD_KEEP_DAYS=30)
+    def test_periodic_cleanup_removes_only_expired_completed_records(self):
+        expired_at = timezone.now() - timedelta(days=31)
+        recent = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
+        expired = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
+        ApplicationAudit.objects.filter(id=expired.id).update(date_created=expired_at)
+
+        completed_event, _ = self.enqueue_event()
+        completed = ApplicationEventDelivery.objects.get(event=completed_event)
+        completed.status = 'success'
+        completed.save(update_fields=['status'])
+        attempt = ApplicationEventAttempt.objects.create(
+            delivery=completed, number=1, result='success', status_code=204,
+        )
+
+        pending_event, _ = self.enqueue_event()
+        pending = ApplicationEventDelivery.objects.get(event=pending_event)
+        old_ids = [
+            completed_event.id, completed.audit_id,
+            pending_event.id, pending.audit_id,
+        ]
+        ApplicationAudit.objects.filter(id__in=old_ids).update(date_created=expired_at)
+        ApplicationEventDelivery.objects.filter(id__in=[completed.id, pending.id]).update(
+            date_created=expired_at,
+        )
+        ApplicationEventAttempt.objects.filter(id=attempt.id).update(date_created=expired_at)
+
+        clean_application_records_period()
+
+        self.assertFalse(ApplicationAudit.objects.filter(id=expired.id).exists())
+        self.assertFalse(ApplicationEventDelivery.objects.filter(id=completed.id).exists())
+        self.assertFalse(ApplicationEventAttempt.objects.filter(id=attempt.id).exists())
+        self.assertFalse(ApplicationAudit.objects.filter(id__in=[completed_event.id, completed.audit_id]).exists())
+        self.assertTrue(ApplicationAudit.objects.filter(id=recent.id).exists())
+        self.assertTrue(ApplicationEventDelivery.objects.filter(id=pending.id).exists())
+        self.assertEqual(
+            ApplicationAudit.objects.filter(id__in=[pending_event.id, pending.audit_id]).count(), 2,
+        )
+
+    def test_periodic_cleanup_runs_at_three_am(self):
+        task_name = 'accounts.tasks.application_events.clean_application_records_period'
+        task = next(item[task_name] for item in get_register_period_tasks() if task_name in item)
+        self.assertEqual(task['crontab'], CRONTAB_AT_AM_THREE)
 
 
 class WebhookSenderTests(SimpleTestCase):
