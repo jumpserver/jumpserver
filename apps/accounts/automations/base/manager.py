@@ -260,14 +260,16 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self._accounts_by_asset_id = accounts_by_asset_id
         self._target_account_ids_by_asset_id = target_account_ids_by_asset_id
 
-    def get_accounts(self, privilege_account):
+    def get_accounts(self, asset, privilege_account):
         if not privilege_account:
             print(_('No privileged account'))
             return []
 
         self.load_accounts_by_asset()
+        # The login account may belong to a joined directory service. Targets
+        # are indexed by the asset being managed, not the login account's owner.
         accounts = self._accounts_by_asset_id.get(
-            str(privilege_account.asset_id), []
+            str(asset.id), []
         )
         if settings.CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED:
             accounts = [
@@ -323,7 +325,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         host['ssh_params'] = {}
 
-        accounts = self.get_accounts(account)
+        accounts = self.get_accounts(asset, account)
         existing_ids = {str(account.id) for account in accounts}
         self.found_account_ids.update(existing_ids)
         # `self.account_ids` covers the complete execution. Comparing it
