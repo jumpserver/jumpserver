@@ -21,7 +21,7 @@
 
 JumpServer is an Open-source Privileged Access Management (PAM) platform with AI-powered capabilities, providing DevOps and IT teams a unified workspace to securely access SSH, RDP, Kubernetes, databases, websites, RemoteApp, VirtualApp, and more.
 
-<img alt="jumpserver-architecture-diagram" src="https://github.com/user-attachments/assets/bfbe4ad5-05e2-4209-8746-67a00415bbf7" />
+<img alt="jumpserver-architecture-diagram" src="https://github.com/user-attachments/assets/2bbf0979-4e1e-43ea-8dac-5d3e3bfbf1d1" />
 
 ## Quickstart
 
