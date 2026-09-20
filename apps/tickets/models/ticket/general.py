@@ -108,14 +108,12 @@ class TicketAssignee(JMSBaseModel):
     )
 
     assignee_display = models.CharField(max_length=258, default='', blank=True, editable=False)
-    assignee_id_snapshot = models.UUIDField(null=True, editable=False, db_index=True)
 
     objects = TicketAssigneeQuerySet.as_manager()
 
     def set_assignee_snapshot(self):
         if self._state.adding and self.assignee_id:
             self.assignee_display = str(self.assignee)
-            self.assignee_id_snapshot = self.assignee_id
 
     def save(self, *args, **kwargs):
         self.set_assignee_snapshot()
@@ -246,7 +244,7 @@ class StatusMixin:
                 ticket_assignees = step.ticket_assignees.select_related('assignee')
 
             for i in ticket_assignees:
-                assignee_id = i.assignee_id_snapshot or i.assignee_id
+                assignee_id = i.assignee_id
                 assignee_display = i.assignee_display
 
                 if state != StepState.pending and state == i.state:
