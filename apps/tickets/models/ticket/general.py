@@ -76,14 +76,27 @@ class TicketStep(JMSBaseModel):
         processor = self.ticket_assignees.exclude(state=StepState.pending).first()
         return processor.assignee if processor else None
 
+    @property
+    def processor_display(self):
+        processor = self.ticket_assignees.exclude(state=StepState.pending).first()
+        return processor.assignee_display if processor else ''
+
     class Meta:
         verbose_name = _("Ticket step")
+
+
+class TicketAssigneeQuerySet(models.QuerySet):
+    def bulk_create(self, objs, *args, **kwargs):
+        objs = list(objs)
+        for obj in objs:
+            obj.set_assignee_snapshot()
+        return super().bulk_create(objs, *args, **kwargs)
 
 
 class TicketAssignee(JMSBaseModel):
     assignee = models.ForeignKey(
         'users.User', related_name='ticket_assignees',
-        on_delete=models.CASCADE, verbose_name='Assignee'
+        on_delete=models.SET_NULL, null=True, verbose_name='Assignee'
     )
     state = models.CharField(
         choices=TicketState.choices, max_length=64,
@@ -94,11 +107,25 @@ class TicketAssignee(JMSBaseModel):
         on_delete=models.CASCADE
     )
 
+    assignee_display = models.CharField(max_length=258, default='', blank=True, editable=False)
+    assignee_id_snapshot = models.UUIDField(null=True, editable=False, db_index=True)
+
+    objects = TicketAssigneeQuerySet.as_manager()
+
+    def set_assignee_snapshot(self):
+        if self._state.adding and self.assignee_id:
+            self.assignee_display = str(self.assignee)
+            self.assignee_id_snapshot = self.assignee_id
+
+    def save(self, *args, **kwargs):
+        self.set_assignee_snapshot()
+        return super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = _('Ticket assignee')
 
     def __str__(self):
-        return '{0.assignee.name}({0.assignee.username})_{0.step}'.format(self)
+        return f'{self.assignee_display}_{self.step}'
 
 
 class StatusMixin:
@@ -219,8 +246,8 @@ class StatusMixin:
                 ticket_assignees = step.ticket_assignees.select_related('assignee')
 
             for i in ticket_assignees:
-                assignee_id = i.assignee_id
-                assignee_display = str(i.assignee)
+                assignee_id = i.assignee_id_snapshot or i.assignee_id
+                assignee_display = i.assignee_display
 
                 if state != StepState.pending and state == i.state:
                     processor_id = assignee_id
@@ -273,7 +300,7 @@ class StatusMixin:
     @property
     def current_assignees(self):
         ticket_assignees = self.current_step.ticket_assignees.all()
-        return [i.assignee for i in ticket_assignees]
+        return [i.assignee for i in ticket_assignees if i.assignee_id]
 
     @property
     def processor(self):
@@ -285,6 +312,11 @@ class StatusMixin:
             level=self.approval_step,
             ticket_assignees__assignee=assignee,
         ).exists()
+
+    @property
+    def processor_display(self):
+        step = self.current_step
+        return step.processor_display if step else ''
 
     def has_all_assignee(self, assignee):
         return self.ticket_steps.filter(ticket_assignees__assignee=assignee).exists()
@@ -522,7 +554,7 @@ class Ticket(StatusMixin, JMSBaseModel):
             'ticket_detail_page_url': '{url}?type={type}'.format(
                 url=url_ticket_detail_external, type=self.type
             ),
-            'assignees': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees]
+            'assignees': [ticket_assignee.assignee_display for ticket_assignee in ticket_assignees]
         }
 
 

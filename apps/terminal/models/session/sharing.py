@@ -22,9 +22,18 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
     )
     # creator / created_by
     creator = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, blank=True, null=True,
+        'users.User', on_delete=models.SET_NULL, blank=True, null=True,
         verbose_name=_('Creator')
     )
+    creator_display = models.CharField(max_length=258, default='', blank=True, editable=False)
+    creator_id_snapshot = models.UUIDField(null=True, editable=False, db_index=True)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.creator_id:
+            self.creator_display = str(self.creator)
+            self.creator_id_snapshot = self.creator_id
+        return super().save(*args, **kwargs)
+
     verify_code = models.CharField(max_length=16, verbose_name=_('Verify code'))
     is_active = models.BooleanField(
         default=True, verbose_name=_('Active'), db_index=True
@@ -46,7 +55,7 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
         ]
 
     def __str__(self):
-        return 'Creator: {}'.format(self.creator)
+        return 'Creator: {}'.format(self.creator_display)
 
     @property
     def share_component(self) -> str:
@@ -97,6 +106,8 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
         return True
 
     def can_join(self, joiner):
+        if not self.creator_id or joiner is None:
+            return False, _('User does not exist')
         if not self.is_active:
             return False, _('Link not active')
         if not self.is_expired:
@@ -112,13 +123,22 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
     )
     verify_code = models.CharField(max_length=16, verbose_name=_('Verify code'))
     sharing = models.ForeignKey(
-        SessionSharing, on_delete=models.CASCADE,
+        SessionSharing, on_delete=models.SET_NULL, null=True,
         verbose_name=_('Session sharing')
     )
     joiner = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, blank=True, null=True,
+        'users.User', on_delete=models.SET_NULL, blank=True, null=True,
         verbose_name=_('Joiner')
     )
+    joiner_display = models.CharField(max_length=258, default='', blank=True, editable=False)
+    joiner_id_snapshot = models.UUIDField(null=True, editable=False, db_index=True)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.joiner_id:
+            self.joiner_display = str(self.joiner)
+            self.joiner_id_snapshot = self.joiner_id
+        return super().save(*args, **kwargs)
+
     date_joined = models.DateTimeField(
         auto_now_add=True, verbose_name=_("Date joined"), db_index=True,
     )
@@ -149,13 +169,11 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
         verbose_name = _("Session join record")
 
     def __str__(self):
-        return 'Joiner: {}'.format(self.joiner)
-
-    @property
-    def joiner_display(self) -> str:
-        return str(self.joiner)
+        return 'Joiner: {}'.format(self.joiner_display)
 
     def can_join(self):
+        if not self.sharing_id or not self.joiner_id:
+            return False, _('Session sharing or user does not exist')
         # sharing
         sharing_can_join, reason = self.sharing.can_join(self.joiner)
         if not sharing_can_join:
@@ -186,4 +204,4 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
 
     @property
     def action_permission(self):
-        return self.sharing.action_permission
+        return self.sharing.action_permission if self.sharing_id else ''
