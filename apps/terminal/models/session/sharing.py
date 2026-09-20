@@ -26,12 +26,10 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
         verbose_name=_('Creator')
     )
     creator_display = models.CharField(max_length=258, default='', blank=True, editable=False)
-    creator_id_snapshot = models.UUIDField(null=True, editable=False, db_index=True)
 
     def save(self, *args, **kwargs):
         if self._state.adding and self.creator_id:
             self.creator_display = str(self.creator)
-            self.creator_id_snapshot = self.creator_id
         return super().save(*args, **kwargs)
 
     verify_code = models.CharField(max_length=16, verbose_name=_('Verify code'))
@@ -131,12 +129,10 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
         verbose_name=_('Joiner')
     )
     joiner_display = models.CharField(max_length=258, default='', blank=True, editable=False)
-    joiner_id_snapshot = models.UUIDField(null=True, editable=False, db_index=True)
 
     def save(self, *args, **kwargs):
         if self._state.adding and self.joiner_id:
             self.joiner_display = str(self.joiner)
-            self.joiner_id_snapshot = self.joiner_id
         return super().save(*args, **kwargs)
 
     date_joined = models.DateTimeField(

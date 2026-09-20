@@ -13,13 +13,12 @@ def backfill_identity_snapshots(apps, schema_editor):
     for row in rows.iterator(chunk_size=1000):
         user = row.assignee
         row.assignee_display = f'{user.name}({user.username})'
-        row.assignee_id_snapshot = user.pk
         batch.append(row)
         if len(batch) == 1000:
-            model.objects.using(alias).bulk_update(batch, ['assignee_display', 'assignee_id_snapshot'])
+            model.objects.using(alias).bulk_update(batch, ['assignee_display'])
             batch.clear()
     if batch:
-        model.objects.using(alias).bulk_update(batch, ['assignee_display', 'assignee_id_snapshot'])
+        model.objects.using(alias).bulk_update(batch, ['assignee_display'])
 
 
 class Migration(migrations.Migration):
@@ -34,11 +33,6 @@ class Migration(migrations.Migration):
             model_name='ticketassignee',
             name='assignee_display',
             field=models.CharField(blank=True, default='', editable=False, max_length=258),
-        ),
-        migrations.AddField(
-            model_name='ticketassignee',
-            name='assignee_id_snapshot',
-            field=models.UUIDField(db_index=True, editable=False, null=True),
         ),
         migrations.AlterField(
             model_name='ticketassignee',

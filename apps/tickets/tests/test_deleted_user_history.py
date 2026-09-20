@@ -51,17 +51,15 @@ class DeletedUserHistoryTests(TestCase):
         self.sharing.refresh_from_db()
         self.record.refresh_from_db()
         self.assertIsNone(self.assignee.assignee_id)
-        self.assertEqual(self.assignee.assignee_id_snapshot, self.owner_id)
         self.assertEqual(self.assignee.assignee_display, 'Owner(history-owner)')
         self.assertIsNone(self.sharing.creator_id)
         self.assertFalse(self.sharing.is_active)
-        self.assertEqual(self.sharing.creator_id_snapshot, self.owner_id)
         self.assertEqual(self.record.joiner_id, self.joiner_id)
         self.assertFalse(self.record.can_join()[0])
         self.sharing.is_active = True
         self.assertFalse(self.sharing.can_join(self.joiner)[0])
         process = self.ticket.process_map[0]
-        self.assertEqual(process['processor'], self.owner_id)
+        self.assertIsNone(process['processor'])
         self.assertEqual(process['processor_display'], 'Owner(history-owner)')
         self.assertEqual(self.ticket.current_assignees, [])
         self.assertEqual(SuperTicketSerializer.get_processor(self.ticket), 'Owner(history-owner)')
@@ -71,7 +69,6 @@ class DeletedUserHistoryTests(TestCase):
         self.joiner.delete()
         self.record.refresh_from_db()
         self.assertIsNone(self.record.joiner_id)
-        self.assertEqual(self.record.joiner_id_snapshot, self.joiner_id)
         self.assertFalse(self.record.can_join()[0])
         self.assertEqual(SessionJoinRecordSerializer(self.record).data['joiner_display'], 'Joiner(history-joiner)')
 
@@ -97,15 +94,13 @@ class DeletedUserHistoryTests(TestCase):
 
     def test_direct_assignee_creation_and_readonly_api_fields(self):
         item = TicketAssignee.objects.create(step=self.step, assignee=self.joiner)
-        self.assertEqual(item.assignee_id_snapshot, self.joiner_id)
         self.assertEqual(item.assignee_display, 'Joiner(history-joiner)')
         for serializer, prefix in [(SessionSharingSerializer(), 'creator'), (SessionJoinRecordSerializer(), 'joiner')]:
             self.assertTrue(serializer.fields[f'{prefix}_display'].read_only)
-            self.assertTrue(serializer.fields[f'{prefix}_id_snapshot'].read_only)
 
     def test_backfill_existing_rows(self):
         for model, prefix in [(TicketAssignee, 'assignee'), (SessionSharing, 'creator'), (SessionJoinRecord, 'joiner')]:
-            model.objects.update(**{f'{prefix}_display': '', f'{prefix}_id_snapshot': None})
+            model.objects.update(**{f'{prefix}_display': ''})
         with connection.schema_editor(atomic=False) as editor:
             for module in [
                 'tickets.migrations.0009_ticketassignee_assignee_display_and_more',
@@ -115,6 +110,6 @@ class DeletedUserHistoryTests(TestCase):
         self.assignee.refresh_from_db()
         self.sharing.refresh_from_db()
         self.record.refresh_from_db()
-        self.assertEqual(self.assignee.assignee_id_snapshot, self.owner_id)
+        self.assertEqual(self.assignee.assignee_display, 'Owner(history-owner)')
         self.assertEqual(self.sharing.creator_display, 'Owner(history-owner)')
         self.assertEqual(self.record.joiner_display, 'Joiner(history-joiner)')

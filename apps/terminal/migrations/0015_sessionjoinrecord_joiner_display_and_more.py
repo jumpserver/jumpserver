@@ -13,26 +13,24 @@ def backfill_identity_snapshots(apps, schema_editor):
     for row in rows.iterator(chunk_size=1000):
         user = row.creator
         row.creator_display = f'{user.name}({user.username})'
-        row.creator_id_snapshot = user.pk
         batch.append(row)
         if len(batch) == 1000:
-            model.objects.using(alias).bulk_update(batch, ['creator_display', 'creator_id_snapshot'])
+            model.objects.using(alias).bulk_update(batch, ['creator_display'])
             batch.clear()
     if batch:
-        model.objects.using(alias).bulk_update(batch, ['creator_display', 'creator_id_snapshot'])
+        model.objects.using(alias).bulk_update(batch, ['creator_display'])
     model = apps.get_model('terminal', 'SessionJoinRecord')
     batch = []
     rows = model.objects.using(alias).filter(joiner__isnull=False).select_related('joiner')
     for row in rows.iterator(chunk_size=1000):
         user = row.joiner
         row.joiner_display = f'{user.name}({user.username})'
-        row.joiner_id_snapshot = user.pk
         batch.append(row)
         if len(batch) == 1000:
-            model.objects.using(alias).bulk_update(batch, ['joiner_display', 'joiner_id_snapshot'])
+            model.objects.using(alias).bulk_update(batch, ['joiner_display'])
             batch.clear()
     if batch:
-        model.objects.using(alias).bulk_update(batch, ['joiner_display', 'joiner_id_snapshot'])
+        model.objects.using(alias).bulk_update(batch, ['joiner_display'])
     apps.get_model('terminal', 'SessionSharing').objects.using(alias).filter(creator__isnull=True).update(is_active=False)
 
 
@@ -50,19 +48,9 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, default='', editable=False, max_length=258),
         ),
         migrations.AddField(
-            model_name='sessionjoinrecord',
-            name='joiner_id_snapshot',
-            field=models.UUIDField(db_index=True, editable=False, null=True),
-        ),
-        migrations.AddField(
             model_name='sessionsharing',
             name='creator_display',
             field=models.CharField(blank=True, default='', editable=False, max_length=258),
-        ),
-        migrations.AddField(
-            model_name='sessionsharing',
-            name='creator_id_snapshot',
-            field=models.UUIDField(db_index=True, editable=False, null=True),
         ),
         migrations.AlterField(
             model_name='sessionjoinrecord',
