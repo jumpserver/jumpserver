@@ -271,10 +271,14 @@ class CredentialClientManager:
         for key, value in changed.items():
             setattr(self.client, key, value)
 
-    def sync_agent(self, config_digest='', credentials=None, sync_status='', sync_error=''):
+    def sync_agent(
+        self, config_digest='', credentials=None, delivered_credentials=None,
+        sync_status='', sync_error='',
+    ):
         if self.client.type != CredentialClientInstance.Type.agent:
             raise PermissionDenied(_('Agent synchronization requires an Agent client.'))
         now = timezone.now()
+        self._record_delivered(delivered_credentials or [], now)
         desired = self.agent_configuration(self.configuration)
         desired_digest = self.agent_configuration_digest(self.configuration)
         known = {item['key']: item['revision'] for item in credentials or []}
@@ -315,6 +319,28 @@ class CredentialClientManager:
         if config_digest != desired_digest:
             response['configuration'] = desired
         return response
+
+    def _record_delivered(self, credentials, now):
+        revisions = {item['key']: item['revision'] for item in credentials}
+        if not revisions:
+            return
+        states = CredentialClientStatus.objects.select_related(
+            'binding__credential'
+        ).filter(
+            binding__application=self.application,
+            binding__credential__key__in=revisions,
+            client=self.client,
+        )
+        for state in states:
+            revision = revisions[state.binding.credential.key]
+            if (
+                revision == state.binding.credential.current_revision
+                and revision == state.fetched_revision
+                and revision != state.delivered_revision
+            ):
+                self._save_status(state, now, {
+                    'delivered_revision': revision, 'date_delivered': now,
+                })
 
     @staticmethod
     def register_agent(

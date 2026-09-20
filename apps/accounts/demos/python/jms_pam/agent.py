@@ -187,6 +187,7 @@ class Agent:
         )
         self.state = read_json(self.config.get('state_file', STATE_FILE))
         self.credentials = read_json(self.config.get('credential_file', CREDENTIAL_FILE))
+        self.delivered = read_json(self.delivery_file)
         self.authorized_keys = set(self.config.get('authorized_keys', self.configuration['credential_keys']))
         self.access_denied = bool(self.config.get('access_denied', False))
         self.lock = threading.Lock()
@@ -198,6 +199,11 @@ class Agent:
     @property
     def credential_file(self):
         return self.config.get('credential_file', CREDENTIAL_FILE)
+
+    @property
+    def delivery_file(self):
+        default = str(Path(self.state_file).with_name('delivered.json'))
+        return self.config.get('delivery_file', default)
 
     def save_config(self):
         atomic_write_json(self.config_file, self.config)
@@ -248,27 +254,36 @@ class Agent:
         return changed
 
     def deliver(self, changed):
-        mode = self.configuration['delivery_mode']
-        if mode == 'socket' or not changed:
+        if not changed:
             return
-        root = secure_root(self.configuration['delivery_root'])
-        owner = self.configuration['app_user']
-        for key in sorted(changed):
-            with self.lock:
-                item = dict(self.credentials[key])
-            suffix = 'json' if mode == 'json' else 'env'
-            target = secure_target(root, f'{key}.{suffix}')
-            content = (
-                json.dumps(item, ensure_ascii=False, indent=2) + '\n'
-                if mode == 'json' else render_environment(item)
-            )
-            atomic_write(target, content, owner=owner)
-        if mode == 'environment':
-            subprocess.run(
-                ['systemctl', self.configuration['systemd_action'], self.configuration['systemd_unit']],
-                check=True, stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            )
+        mode = self.configuration['delivery_mode']
+        if mode != 'socket':
+            root = secure_root(self.configuration['delivery_root'])
+            owner = self.configuration['app_user']
+            for key in sorted(changed):
+                with self.lock:
+                    item = dict(self.credentials[key])
+                suffix = 'json' if mode == 'json' else 'env'
+                target = secure_target(root, f'{key}.{suffix}')
+                content = (
+                    json.dumps(item, ensure_ascii=False, indent=2) + '\n'
+                    if mode == 'json' else render_environment(item)
+                )
+                atomic_write(target, content, owner=owner)
+            if mode == 'environment':
+                subprocess.run(
+                    ['systemctl', self.configuration['systemd_action'], self.configuration['systemd_unit']],
+                    check=True, stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+        with self.lock:
+            delivered = dict(self.delivered)
+            for key in changed:
+                delivered[key] = {
+                    'key': key, 'revision': self.credentials[key]['revision'],
+                }
+            atomic_write_json(self.delivery_file, delivered)
+            self.delivered = delivered
 
     def sync(self):
         with self.lock:
@@ -276,8 +291,13 @@ class Agent:
                 models.KnownCredentialRevision(Key=key, Revision=item.get('revision', 0))
                 for key, item in sorted(self.credentials.items())
             ]
+            delivered = [
+                models.KnownCredentialRevision(Key=key, Revision=item.get('revision', 0))
+                for key, item in sorted(self.delivered.items()) if key in self.authorized_keys
+            ]
         request = models.AgentSyncRequest(
             ConfigDigest=self.config.get('config_digest', ''), Credentials=known,
+            DeliveredCredentials=delivered,
             SyncStatus=self.config.get('sync_status', ''),
             SyncError=self.config.get('sync_error', ''),
         )
@@ -292,15 +312,24 @@ class Agent:
                 validate_configuration(configuration, self.capabilities)
                 self.configuration = configuration
                 self.config['configuration'] = configuration
-                self.config['config_digest'] = response['config_digest']
             keys = [
                 key for key, item in metadata.items()
                 if item['available'] and (
                     item['changed'] or self.credentials.get(key, {}).get('revision') != item['revision']
                 )
             ]
-            changed = self.fetch(keys)
-            self.deliver(changed)
+            self.fetch(keys)
+            pending = {
+                key for key, item in metadata.items()
+                if item['available']
+                and self.credentials.get(key, {}).get('revision') == item['revision']
+                and (
+                    configuration is not None
+                    or self.delivered.get(key, {}).get('revision') != item['revision']
+                )
+            }
+            self.deliver(pending)
+            self.config['config_digest'] = response['config_digest']
         except (OSError, KeyError, TypeError, ValueError, subprocess.SubprocessError) as error:
             self.config['sync_status'] = 'error'
             self.config['sync_error'] = type(error).__name__
@@ -323,17 +352,13 @@ class Agent:
                 raise KeyError(f'Credential not found: {key}')
             if type(revision) is not int or revision != item['revision']:
                 raise ValueError('Confirm the exact revision used by the application.')
-        self.remote.ConfirmCredential(models.ConfirmCredentialRequest(
-            Key=key, Revision=item['revision'], AccountId=item['account_id'],
-        ))
-        with self.lock:
             state = dict(self.state)
             state[key] = {
                 'key': key, 'revision': item['revision'], 'account_id': item['account_id'],
             }
             atomic_write_json(self.state_file, state)
             self.state = state
-        return state[key]
+            return {**state[key], 'status': 'accepted'}
 
     def heartbeat(self):
         with self.lock:
@@ -509,11 +534,13 @@ def register(args):
         'config_digest': identity['config_digest'],
         'authorized_keys': configuration['credential_keys'],
         'credential_file': str(base / 'credentials.json'),
+        'delivery_file': str(base / 'delivered.json'),
         'state_file': str(base / 'state.json'), 'poll_interval': 30,
         'sync_status': '', 'sync_error': '', 'access_denied': False,
     }
     atomic_write_json(config_file, config)
     atomic_write_json(config['credential_file'], {})
+    atomic_write_json(config['delivery_file'], {})
     atomic_write_json(config['state_file'], {})
     return config_file
 

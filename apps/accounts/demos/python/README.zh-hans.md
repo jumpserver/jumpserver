@@ -59,6 +59,8 @@ EnvironmentFile 模式要求应用的 systemd unit 提前引用对应文件，�
 EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.env
 ```
 
+默认选择 `restart`。只有应用的 reload 处理程序会主动重新读取 EnvironmentFile 时才选择 `reload`；systemd reload 本身不会把新环境变量重新注入已运行进程。
+
 `<configuration-id>` 可以在接入配置详情中查看。安装路径、应用用户、Socket 路径以及可操作的 systemd 服务会在安装时固定；扩大这些权限需要重新安装 Agent。
 
 ### 安装 Agent
@@ -113,7 +115,9 @@ sudo -u <app-user> /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
   --socket /run/jumpserver-pam/<configuration-id>/agent.sock
 ```
 
-成功响应包含 `key`、`revision` 和 `account_id`。确认接口是幂等的，上报网络失败时可以重试。不要因为文件写入、服务重启或 Webhook 送达就自动确认。
+生产应用应在真实连接验证和切换成功后自动调用本机确认接口；上述命令主要用于调试和人工兜底。Agent 会先在本机持久化确认状态，随后通过心跳自动补报 Core，因此 Core 暂时不可达不会要求应用再次确认。
+
+成功响应包含 `key`、`revision`、`account_id` 和 `status: accepted`。确认接口是幂等的。不要因为文件写入、服务重启或 Webhook 送达就自动确认。
 
 ## 完整示例：完成一次凭据轮换
 
@@ -171,7 +175,7 @@ curl --fail --silent --show-error \
 
 ### 确认凭据
 
-推荐使用随 Agent 安装的命令，它会通过本机 Socket 上报，应用不需要保存 Agent 密钥：
+生产应用应在新凭据通过真实连接验证并完成切换后调用本机接口。随 Agent 安装的命令用于调试和人工兜底，应用不需要保存 Agent 密钥：
 
 ```bash
 /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
@@ -188,6 +192,8 @@ Content-Type: application/json
 
 {"key":"<credential-key>","revision":<revision>}
 ```
+
+本机接口成功即表示确认状态已安全落盘；Agent 会在后续心跳中持续上报，直到 Core 接收。Core 短暂不可达不影响应用完成本机确认。
 
 ## Agent 常用命令
 

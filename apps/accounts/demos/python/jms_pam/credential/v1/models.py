@@ -93,9 +93,10 @@ class AgentSyncRequest(AbstractModel):
     _fields = {
         'ConfigDigest': ('config_digest', None),
         'Credentials': ('credentials', [KnownCredentialRevision]),
+        'DeliveredCredentials': ('delivered_credentials', [KnownCredentialRevision]),
         'SyncStatus': ('sync_status', None), 'SyncError': ('sync_error', None),
     }
-    _required = ('Credentials',)
+    _required = ('Credentials', 'DeliveredCredentials')
 
 
 class AgentSyncResponse(AbstractModel):

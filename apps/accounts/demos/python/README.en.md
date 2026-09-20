@@ -59,6 +59,8 @@ EnvironmentFile delivery requires the application systemd unit to reference the 
 EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.env
 ```
 
+Prefer `restart`. Use `reload` only when the application's reload handler explicitly rereads the EnvironmentFile; a systemd reload does not inject new environment variables into an already running process.
+
 Find `<configuration-id>` in the access configuration detail. The installation path, application user, socket path, and allowed systemd operation are pinned during installation. Expanding these permissions requires reinstalling the Agent.
 
 ### Install the Agent
@@ -113,7 +115,9 @@ sudo -u <app-user> /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
   --socket /run/jumpserver-pam/<configuration-id>/agent.sock
 ```
 
-A successful response contains `key`, `revision`, and `account_id`. Confirmation is idempotent and can be retried after a reporting network failure. Never confirm merely because a file was written, a service restarted, or a Webhook arrived.
+Production applications should call the local confirmation endpoint automatically after validating a real connection and completing the switch. The command above is primarily for diagnostics and manual recovery. The Agent persists the confirmation locally first, then retries reporting it to Core through heartbeats, so a temporary Core outage does not require the application to confirm again.
+
+A successful response contains `key`, `revision`, `account_id`, and `status: accepted`. Confirmation is idempotent. Never confirm merely because a file was written, a service restarted, or a Webhook arrived.
 
 ## Complete example: rotate one credential
 
@@ -171,7 +175,7 @@ The response contains the password. Never write the response, request debug outp
 
 ### Confirm a credential
 
-Use the command installed with the Agent. It reports through the local socket, so the application does not need to store Agent keys:
+Production applications should call the local endpoint after the new credential passes a real connection check and the switch completes. The installed command is for diagnostics and manual recovery; the application does not need to store Agent keys:
 
 ```bash
 /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
@@ -188,6 +192,8 @@ Content-Type: application/json
 
 {"key":"<credential-key>","revision":<revision>}
 ```
+
+A successful local response means the confirmation is durably stored. The Agent keeps reporting it in later heartbeats until Core accepts it, so a temporary Core outage does not block local confirmation.
 
 ## Common Agent commands
 

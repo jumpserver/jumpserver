@@ -220,9 +220,9 @@ class CredentialClientStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = CredentialClientStatus
         fields = [
-            'id', 'credential', 'fetched_revision', 'applied_revision',
+            'id', 'credential', 'fetched_revision', 'delivered_revision', 'applied_revision',
             'applied_account', 'required_revision', 'is_rotation_participant',
-            'date_last_seen', 'date_fetched', 'date_applied',
+            'date_last_seen', 'date_fetched', 'date_delivered', 'date_applied',
         ]
         read_only_fields = fields
 
@@ -343,6 +343,7 @@ class CredentialRevisionSerializer(serializers.Serializer):
 class CredentialAgentSyncSerializer(serializers.Serializer):
     config_digest = serializers.CharField(max_length=64, required=False, allow_blank=True)
     credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
+    delivered_credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
     sync_status = serializers.ChoiceField(
         choices=['', 'success', 'error'], required=False, default='', allow_blank=True,
     )

@@ -21,7 +21,9 @@ from accounts.demos.python.jms_pam.common.credential import Credential as PAMCre
 from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
 from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
 from accounts.demos.python.jms_pam.credential.v1 import models
-from accounts.models import ClientAccessConfiguration, CredentialClientInstance
+from accounts.models import (
+    ClientAccessConfiguration, CredentialClientInstance, CredentialClientStatus,
+)
 from accounts.tests.base import CredentialTestCase
 
 
@@ -160,7 +162,8 @@ class AgentInstallTests(SimpleTestCase):
 
     def test_initial_agent_sync_allows_empty_status(self):
         request = models.AgentSyncRequest(
-            ConfigDigest='', Credentials=[], SyncStatus='', SyncError='',
+            ConfigDigest='', Credentials=[], DeliveredCredentials=[],
+            SyncStatus='', SyncError='',
         )
         self.assertIs(request._validate(), request)
 
@@ -206,6 +209,17 @@ class AgentSyncTests(CredentialTestCase):
         self.assertEqual(response['credentials'], [])
         self.assertEqual(response['removed_keys'], [self.credential.key])
 
+    def test_delivery_report_does_not_confirm_application_use(self):
+        manager = CredentialClientManager(self.client)
+        fetched = manager.fetch(self.credential.key, '127.0.0.1')
+        manager.sync_agent(delivered_credentials=[{
+            'key': self.credential.key, 'revision': fetched['revision'],
+        }])
+        state = CredentialClientStatus.objects.get(client=self.client)
+        self.assertEqual(state.delivered_revision, fetched['revision'])
+        self.assertIsNotNone(state.date_delivered)
+        self.assertEqual(state.applied_revision, 0)
+
 
 class AgentDeliveryTests(SimpleTestCase):
     def setUp(self):
@@ -228,6 +242,7 @@ class AgentDeliveryTests(SimpleTestCase):
             }
         }
         self.agent.state = {}
+        self.agent.delivered = {}
         self.agent.authorized_keys = {'db'}
         self.agent.access_denied = False
         self.agent.lock = threading.Lock()
@@ -236,6 +251,7 @@ class AgentDeliveryTests(SimpleTestCase):
         self.agent.config = {
             'sync_status': '', 'sync_error': '',
             'state_file': str(self.root / 'state.json'),
+            'delivery_file': str(self.root / 'delivered.json'),
         }
 
     def socket_request(self, request):
@@ -253,6 +269,7 @@ class AgentDeliveryTests(SimpleTestCase):
         with patch('accounts.demos.python.jms_pam.agent.secure_root', return_value=self.root):
             self.agent.deliver({'db'})
         self.assertEqual(read_json(self.root / 'db.json')['revision'], 2)
+        self.assertEqual(read_json(self.agent.delivery_file)['db']['revision'], 2)
         self.agent.remote.ConfirmCredential.assert_not_called()
 
     def test_environment_delivery_runs_only_pinned_systemd_action(self):
@@ -268,7 +285,39 @@ class AgentDeliveryTests(SimpleTestCase):
             ['systemctl', 'reload', 'orders.service'], check=True,
             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
+        self.assertEqual(read_json(self.agent.delivery_file)['db']['revision'], 2)
         self.agent.remote.ConfirmCredential.assert_not_called()
+
+    def test_failed_systemd_action_does_not_mark_delivery(self):
+        self.agent.configuration.update({
+            'delivery_mode': 'environment', 'systemd_unit': 'orders.service',
+            'systemd_action': 'restart',
+        })
+        with patch('accounts.demos.python.jms_pam.agent.secure_root', return_value=self.root), \
+                patch(
+                    'accounts.demos.python.jms_pam.agent.subprocess.run',
+                    side_effect=subprocess.CalledProcessError(1, 'systemctl'),
+                ):
+            with self.assertRaises(subprocess.CalledProcessError):
+                self.agent.deliver({'db'})
+        self.assertEqual(self.agent.delivered, {})
+        self.assertFalse(Path(self.agent.delivery_file).exists())
+
+    def test_sync_retries_fetched_revision_until_delivered(self):
+        response = Mock()
+        response._serialize.return_value = {
+            'config_digest': 'digest',
+            'credentials': [{
+                'key': 'db', 'revision': 2, 'available': True, 'changed': False,
+            }],
+            'removed_keys': [], 'date_last_synced': 'now',
+        }
+        self.agent.remote.SyncAgent.return_value = response
+        with patch.object(self.agent, 'fetch') as fetch, \
+                patch.object(self.agent, 'deliver') as deliver:
+            self.agent.sync()
+        fetch.assert_called_once_with([])
+        deliver.assert_called_once_with({'db'})
 
     def test_delivery_refuses_to_replace_symlink(self):
         victim = self.root / 'victim.json'
@@ -298,8 +347,13 @@ class AgentDeliveryTests(SimpleTestCase):
             + f'Content-Length: {len(body)}\r\nConnection: close\r\n\r\n'.encode() + body
         )
         status, payload = self.socket_request(request)
-        self.assertEqual((status, payload['revision']), (200, 2))
-        self.agent.remote.ConfirmCredential.assert_called_once()
+        self.assertEqual((status, payload['revision'], payload['status']), (200, 2, 'accepted'))
+        self.assertEqual(read_json(self.agent.state_file)['db']['revision'], 2)
+        self.agent.remote.ConfirmCredential.assert_not_called()
+
+        self.agent.heartbeat()
+        heartbeat = self.agent.remote.Heartbeat.call_args.args[0]
+        self.assertEqual((heartbeat.Credentials[0].Key, heartbeat.Credentials[0].Revision), ('db', 2))
 
         self.agent.access_denied = True
         status, payload = self.socket_request(

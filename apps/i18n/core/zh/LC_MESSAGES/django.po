@@ -1764,44 +1764,52 @@ msgstr ""
 
 #: accounts/models/credential.py:240
 msgid "Application binding"
-msgstr "应用"
+msgstr "应用绑定"
 
 #: accounts/models/credential.py:244
 msgid "Client instance"
-msgstr "客户端证书"
+msgstr "客户端实例"
 
 #: accounts/models/credential.py:246
 msgid "Fetched revision"
-msgstr "已结束会话数"
+msgstr "已获取版本"
+
+#: accounts/models/credential.py:255
+msgid "Delivered revision"
+msgstr "已交付版本"
 
 #: accounts/models/credential.py:247
 msgid "Applied revision"
-msgstr "授权管理"
+msgstr "已应用版本"
 
 #: accounts/models/credential.py:250
 #: accounts/serializers/account/credential.py:157
 msgid "Applied account"
-msgstr "申请账号"
+msgstr "已应用账号"
 
 #: accounts/models/credential.py:253
 msgid "Required revision"
-msgstr "必须的"
+msgstr "要求版本"
 
 #: accounts/models/credential.py:256
 msgid "Rotation participant"
-msgstr ""
+msgstr "轮换参与者"
 
 #: accounts/models/credential.py:259
 msgid "Date fetched"
-msgstr "创建日期"
+msgstr "获取时间"
+
+#: accounts/models/credential.py:269
+msgid "Date delivered"
+msgstr "交付时间"
 
 #: accounts/models/credential.py:260
 msgid "Date applied"
-msgstr "发布日期"
+msgstr "应用时间"
 
 #: accounts/models/credential.py:265
 msgid "Credential client status"
-msgstr "容器状态"
+msgstr "凭据客户端状态"
 
 #: accounts/models/credential.py:272
 msgid "Event notifications"

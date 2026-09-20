@@ -252,6 +252,7 @@ class CredentialClientStatus(JMSOrgBaseModel):
         related_name='credential_statuses', verbose_name=_('Client instance')
     )
     fetched_revision = models.PositiveIntegerField(default=0, verbose_name=_('Fetched revision'))
+    delivered_revision = models.PositiveIntegerField(default=0, verbose_name=_('Delivered revision'))
     applied_revision = models.PositiveIntegerField(default=0, verbose_name=_('Applied revision'))
     applied_account = models.ForeignKey(
         'accounts.Account', on_delete=models.SET_NULL, null=True, blank=True,
@@ -265,6 +266,7 @@ class CredentialClientStatus(JMSOrgBaseModel):
     )
     date_last_seen = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last seen'))
     date_fetched = models.DateTimeField(null=True, blank=True, verbose_name=_('Date fetched'))
+    date_delivered = models.DateTimeField(null=True, blank=True, verbose_name=_('Date delivered'))
     date_applied = models.DateTimeField(null=True, blank=True, verbose_name=_('Date applied'))
 
     class Meta:
