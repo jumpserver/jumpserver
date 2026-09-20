@@ -2,6 +2,7 @@ import base64
 import copy
 import hashlib
 import hmac
+import uuid
 from email.utils import formatdate
 
 import requests
@@ -14,7 +15,7 @@ from .exception import JumpServerPAMSDKException
 from .profile.client_profile import ClientProfile
 
 SIGNATURE_HEADERS = (
-    '(request-target)', 'accept', 'date', 'x-jms-org',
+    '(request-target)', 'accept', 'date', 'digest', 'x-jms-request-id', 'x-jms-org',
     'x-jms-client-version', 'x-jms-protocol-version', 'x-jms-config-schema-version',
 )
 
@@ -25,6 +26,16 @@ class HTTPSignatureAuth(AuthBase):
         self.secret = secret.encode('ascii')
 
     def __call__(self, request):
+        body = request.body or b''
+        if isinstance(body, str):
+            body = body.encode()
+        if not isinstance(body, bytes):
+            raise TypeError('Signed request bodies must be bytes or strings.')
+        request.headers['Digest'] = 'SHA-256=' + base64.b64encode(
+            hashlib.sha256(body).digest()
+        ).decode('ascii')
+        request.headers.setdefault('Date', formatdate(usegmt=True))
+        request.headers.setdefault('X-JMS-Request-ID', str(uuid.uuid4()))
         values = []
         for header in SIGNATURE_HEADERS:
             value = (

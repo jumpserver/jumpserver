@@ -1,8 +1,16 @@
+import base64
+import hashlib
+import hmac
+import uuid
+from email.utils import parsedate_to_datetime
+
+from django.core.cache import cache
 from django.db.models import Count
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import APIException, ValidationError, PermissionDenied
+from rest_framework.exceptions import APIException, AuthenticationFailed, ValidationError, PermissionDenied
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -35,16 +43,74 @@ __all__ = [
 
 
 CREDENTIAL_CLIENT_SIGNATURE_HEADERS = [
-    '(request-target)', 'date', 'x-jms-client-version',
+    '(request-target)', 'date', 'digest', 'x-jms-request-id', 'x-jms-client-version',
     'x-jms-protocol-version', 'x-jms-config-schema-version',
 ]
 
 
-class CredentialClientServiceAuthentication(ServiceAuthentication):
+class CredentialClientSignatureAuthenticationMixin:
+    max_clock_skew = 300
+    replay_timeout = 660
+
+    def fetch_user_data(self, key_id, algorithm=None):
+        if algorithm != 'hmac-sha256':
+            return None, None
+        return super().fetch_user_data(key_id, algorithm)
+
+    def validate_authenticated_request(self, request, user, key_id):
+        try:
+            request_time = parsedate_to_datetime(request.headers['Date'])
+            if request_time.tzinfo is None:
+                raise ValueError
+        except (KeyError, OverflowError, TypeError, ValueError):
+            raise AuthenticationFailed(
+                _('The credential client request date is invalid.'), code='invalid_request_date',
+            ) from None
+        if abs((timezone.now() - request_time).total_seconds()) > self.max_clock_skew:
+            raise AuthenticationFailed(
+                _('The credential client request has expired.'), code='request_expired',
+            )
+
+        actual_digest = 'SHA-256=' + base64.b64encode(
+            hashlib.sha256(request.body).digest()
+        ).decode('ascii')
+        if not hmac.compare_digest(request.headers.get('Digest', ''), actual_digest):
+            raise AuthenticationFailed(
+                _('The credential client request body is invalid.'), code='invalid_digest',
+            )
+
+        request_id = request.headers.get('X-JMS-Request-ID', '')
+        try:
+            request_id = str(uuid.UUID(request_id))
+        except (TypeError, ValueError, AttributeError):
+            raise AuthenticationFailed(
+                _('The credential client request ID is invalid.'), code='invalid_request_id',
+            ) from None
+        try:
+            is_new = cache.add(
+                f'credential-client-request:{key_id}:{request_id}', True,
+                timeout=self.replay_timeout,
+            )
+        except Exception as exc:
+            raise AuthenticationFailed(
+                _('Credential client replay protection is unavailable.'),
+                code='replay_protection_unavailable',
+            ) from exc
+        if not is_new:
+            raise AuthenticationFailed(
+                _('The credential client request has already been used.'), code='request_replayed',
+            )
+
+
+class CredentialClientServiceAuthentication(
+    CredentialClientSignatureAuthenticationMixin, ServiceAuthentication,
+):
     required_headers = CREDENTIAL_CLIENT_SIGNATURE_HEADERS
 
 
-class CredentialClientAgentAuthentication(CredentialAgentAuthentication):
+class CredentialClientAgentAuthentication(
+    CredentialClientSignatureAuthenticationMixin, CredentialAgentAuthentication,
+):
     required_headers = CREDENTIAL_CLIENT_SIGNATURE_HEADERS
 
 

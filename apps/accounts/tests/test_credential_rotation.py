@@ -2,6 +2,7 @@ import shlex
 import threading
 import json
 from datetime import timedelta
+from email.utils import formatdate
 from unittest.mock import Mock, patch
 
 import requests
@@ -759,7 +760,7 @@ class CredentialRotationTestCase(CredentialTestCase):
                 },
                 headers={
                     'Accept': 'application/json',
-                    'Date': 'Wed, 09 Sep 2026 00:00:00 GMT',
+                    'Date': formatdate(usegmt=True),
                     'X-JMS-ORG': str(self.org.id),
                     'X-Source': 'jms-pam',
                     'X-JMS-Client-Version': '1.0.0',
@@ -805,7 +806,7 @@ class CredentialRotationTestCase(CredentialTestCase):
             params={'key': self.credential.key, 'configuration_id': str(configuration.id), 'instance_id': 'signed-sdk'},
             headers={
                 'Accept': 'application/json',
-                'Date': 'Fri, 04 Sep 2026 00:00:00 GMT',
+                'Date': formatdate(usegmt=True),
                 'X-JMS-ORG': str(self.org.id),
                 'X-Source': 'jms-pam',
                 'X-JMS-Client-Version': '1.0.0',
@@ -821,6 +822,75 @@ class CredentialRotationTestCase(CredentialTestCase):
             response = view(request)
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data['account']['secret'], self.primary.secret)
+
+    def test_signed_sdk_requests_reject_replay_expired_date_and_changed_body(self):
+        configuration = self.create_configuration()
+        headers = {
+            'Accept': 'application/json',
+            'Date': formatdate(usegmt=True),
+            'X-JMS-ORG': str(self.org.id),
+            'X-Source': 'jms-pam',
+            'X-JMS-Client-Version': '1.0.0',
+            'X-JMS-Protocol-Version': '1',
+            'X-JMS-Config-Schema-Version': '0',
+        }
+
+        def dispatch(prepared, body=None):
+            meta = {
+                f'HTTP_{key.upper().replace("-", "_")}': value
+                for key, value in prepared.headers.items()
+                if key.lower() not in ('content-type', 'content-length')
+            }
+            if prepared.method == 'GET':
+                request = self.factory.get(prepared.path_url, **meta)
+                view = CredentialClientViewSet.as_view({'get': 'credential'})
+            else:
+                request = self.factory.generic(
+                    prepared.method, prepared.path_url,
+                    data=prepared.body if body is None else body,
+                    content_type=prepared.headers['Content-Type'], **meta,
+                )
+                view = CredentialClientViewSet.as_view({'post': 'heartbeat'})
+            with patch('authentication.backends.drf.update_service_integration_last_used.delay'):
+                return view(request)
+
+        prepared = requests.Request(
+            'GET', f'http://testserver{CLIENT_PATH}/credential/',
+            params={
+                'key': self.credential.key,
+                'configuration_id': str(configuration.id),
+                'instance_id': 'signed-sdk-replay',
+            },
+            headers=headers,
+            auth=HTTPSignatureAuth(str(self.application.id), self.application.secret),
+        ).prepare()
+        self.assertEqual(dispatch(prepared).status_code, 200)
+        self.assertEqual(dispatch(prepared).status_code, 401)
+
+        expired = requests.Request(
+            'GET', f'http://testserver{CLIENT_PATH}/credential/',
+            params={
+                'key': self.credential.key,
+                'configuration_id': str(configuration.id),
+                'instance_id': 'signed-sdk-expired',
+            },
+            headers={**headers, 'Date': 'Tue, 01 Sep 2020 00:00:00 GMT'},
+            auth=HTTPSignatureAuth(str(self.application.id), self.application.secret),
+        ).prepare()
+        self.assertEqual(dispatch(expired).status_code, 401)
+
+        heartbeat = requests.Request(
+            'POST', f'http://testserver{CLIENT_PATH}/heartbeat/',
+            json={
+                'configuration_id': str(configuration.id),
+                'instance_id': 'signed-sdk-body',
+                'credentials': [],
+            },
+            headers=headers,
+            auth=HTTPSignatureAuth(str(self.application.id), self.application.secret),
+        ).prepare()
+        tampered = heartbeat.body.replace(b'signed-sdk-body', b'forged-sdk-body')
+        self.assertEqual(dispatch(heartbeat, tampered).status_code, 401)
 
 
 class CredentialClientStateWriteTests(CredentialTestCase):
@@ -999,6 +1069,7 @@ class PythonSDKTestCase(SimpleTestCase):
                 'X-JMS-Client-Version': '1.0.0',
                 'X-JMS-Protocol-Version': '1',
                 'X-JMS-Config-Schema-Version': '0',
+                'X-JMS-Request-ID': '00000000-0000-0000-0000-000000000001',
             },
             auth=HTTPSignatureAuth('app-id', 'secret'),
         ).prepare()
@@ -1006,9 +1077,13 @@ class PythonSDKTestCase(SimpleTestCase):
         self.assertEqual(
             request.headers['Authorization'],
             'Signature keyId="app-id",algorithm="hmac-sha256",'
-            'signature="GtAUL6L9AtFiTgve6PAweGUhOAygwIp9OPMZ39FXFno=",'
-            'headers="(request-target) accept date x-jms-org x-jms-client-version '
+            'signature="OdAVLGASetceujErkFpRssh2nvAryC78vP3tXUwqF/U=",'
+            'headers="(request-target) accept date digest x-jms-request-id x-jms-org x-jms-client-version '
             'x-jms-protocol-version x-jms-config-schema-version"',
+        )
+        self.assertEqual(
+            request.headers['Digest'],
+            'SHA-256=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=',
         )
 
     def test_http_error_includes_server_detail(self):
