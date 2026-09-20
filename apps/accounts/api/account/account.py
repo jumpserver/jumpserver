@@ -180,7 +180,10 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['patch'], detail=False, url_path='clear-secret')
     def clear_secret(self, request, *args, **kwargs):
         account_ids = request.data.get('account_ids', [])
-        self.model.objects.filter(id__in=account_ids).update(secret=None)
+        accounts = self.model.objects.filter(id__in=account_ids)
+        if accounts.filter(source=Source.TEMPLATE, follow_template=True).exists():
+            raise drf_serializers.ValidationError(_('Disable template following before clearing credentials.'))
+        accounts.update(secret=None)
         return Response(status=HTTP_200_OK)
 
     def _copy_or_move_to_assets(self, request, move=False):
@@ -189,8 +192,10 @@ class AccountViewSet(OrgBulkModelViewSet):
         assets = Asset.objects.filter(id__in=asset_ids)
         field_names = [
             'name', 'username', 'secret_type', 'secret',
-            'privileged', 'is_active', 'source', 'source_id', 'comment'
+            'privileged', 'is_active', 'source', 'source_id', 'follow_template', 'comment'
         ]
+        if account.follows_template:
+            field_names.remove('secret')
         account_data = {field: getattr(account, field) for field in field_names}
 
         creation_results = {}

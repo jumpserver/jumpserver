@@ -1,6 +1,7 @@
 from collections import defaultdict
 
-from django.db.models.signals import post_delete
+from django.db.models.deletion import ProtectedError
+from django.db.models.signals import pre_delete, post_delete
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
@@ -63,6 +64,18 @@ def on_account_create_by_template(sender, instance, created=False, **kwargs):
     create_accounts_activities(instance, action='create')
 
 
+@receiver(pre_delete, sender=AccountTemplate)
+def protect_followed_account_template(sender, instance, **kwargs):
+    from orgs.utils import tmp_to_org
+    with tmp_to_org(instance.org_id):
+        accounts = Account.objects.filter(
+            org_id=instance.org_id, source=Source.TEMPLATE,
+            source_id=str(instance.id), follow_template=True,
+        )
+        if accounts.exists():
+            raise ProtectedError('Disable account template following before deleting the template.', accounts)
+
+
 @receiver(post_delete, sender=Account)
 def on_account_delete(sender, instance, **kwargs):
     create_accounts_activities(instance, action='delete')
@@ -73,12 +86,14 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def save_to_vault(sender, instance, created, **kwargs):
+        if isinstance(instance, Account) and instance.follows_template:
+            return
         if instance.secret_type == SecretType.SSH_CERTIFICATE:
             return
         if getattr(instance, 'skip_vault_when_saving', False):
             return
         try:
-            if created:
+            if created or getattr(instance, '_create_vault_on_detach', False):
                 vault_client.create(instance)
             else:
                 vault_client.update(instance)
