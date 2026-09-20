@@ -26,7 +26,7 @@ class ApplicationAuditSerializer(serializers.ModelSerializer):
         delivery = instance.delivery
         url = mask_webhook_url(delivery.url) if delivery.method else delivery.url
         return {
-            'url': url, 'event': delivery.code, 'event_id': str(delivery.event_id),
+            'url_display': url, 'event': delivery.code, 'event_id': str(delivery.event_id),
             'attempts': [{
                 'id': attempt.number, 'datetime': attempt.date_created,
                 'result': attempt.result, 'status_code': attempt.status_code, 'reason': attempt.reason,

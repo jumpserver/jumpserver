@@ -85,7 +85,9 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['notification']['url'], 'https://hooks.example/***')
+        notification = response.data['notification']
+        self.assertEqual(notification['url_display'], 'https://hooks.example/***')
+        self.assertNotIn('url', notification)
         content = response.render().content.decode()
         self.assertNotIn('url-secret', content)
         self.assertNotIn('saved-token', content)
