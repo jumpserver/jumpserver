@@ -26,7 +26,7 @@ class SessionSharingSerializer(OrgResourceModelSerializerMixin):
         fields_small = fields_mini + [
             'verify_code', 'is_active', 'expired_time', 'created_by',
             'date_created', 'date_updated', 'users', 'users_display',
-            'action_permission', 'origin', 'url',
+            'action_permission', 'origin', 'url', 'creator_display', 'creator_id_snapshot',
         ]
         fields_fk = ['session', 'creator']
         fields = fields_small + fields_fk
@@ -62,7 +62,7 @@ class SessionJoinRecordSerializer(OrgResourceModelSerializerMixin):
         model = SessionJoinRecord
         fields_mini = ['id']
         fields_small = fields_mini + [
-            'joiner_display', 'verify_code', 'date_joined', 'date_left',
+            'joiner_display', 'joiner_id_snapshot', 'verify_code', 'date_joined', 'date_left',
             'remote_addr', 'login_from', 'is_success', 'reason', 'is_finished',
             'created_by', 'date_created', 'date_updated', 'action_permission'
         ]
