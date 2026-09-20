@@ -109,9 +109,9 @@ class CredentialRevisionTests(CredentialTestCase):
             for item in (first, second, second)
         ]
         with patch('accounts.demos.python.jms_pam.agent.atomic_write_json') as write:
-            agent.poll()
-            agent.poll()
-            agent.poll()
+            agent.fetch([self.credential.key])
+            agent.fetch([self.credential.key])
+            agent.fetch([self.credential.key])
         self.assertEqual(write.call_count, 2)
         self.assertEqual(agent.credentials[self.credential.key]['account_id'], str(self.backup.id))
         self.assertEqual(agent.credentials[self.credential.key]['secret'], self.backup.secret)

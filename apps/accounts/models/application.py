@@ -75,9 +75,12 @@ def default_application_webhook_events():
 
 def default_application_webhook_template():
     return {
+        'event_id': '{{ event.id }}',
         'event': '{{ event.code }}',
         'result': '{{ event.result }}',
         'application': '{{ application.name }}',
+        'credential_key': '{{ credential.key }}',
+        'credential_revision': '{{ credential.revision }}',
         'summary': '{{ event.summary }}',
         'occurred_at': '{{ event.occurred_at }}',
     }

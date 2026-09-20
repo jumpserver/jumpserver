@@ -1,3 +1,5 @@
+import re
+
 from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.utils import timezone
@@ -17,10 +19,13 @@ __all__ = [
     'CredentialClientInstanceSerializer', 'CredentialClientStatusSerializer',
     'CredentialFetchSerializer', 'CredentialHeartbeatSerializer',
     'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer',
+    'CredentialAgentSyncSerializer',
     'ClientAccessConfigurationSerializer', 'CredentialRotationRecordSerializer',
-    'EventRequestSerializer', 'EventSubscriptionSerializer', 'EventReportSerializer',
     'CredentialChangeRetrySerializer', 'CredentialRotationReasonSerializer',
 ]
+
+
+SYSTEMD_UNIT = re.compile(r'^[A-Za-z0-9_.@:-]+\.service$')
 
 
 class CredentialRotationReasonSerializer(serializers.Serializer):
@@ -234,6 +239,8 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
     )
     online = serializers.SerializerMethodField(label=_('Online'))
     credential_statuses = CredentialClientStatusSerializer(many=True, read_only=True)
+    configuration_current = serializers.SerializerMethodField()
+    upgrade_required = serializers.SerializerMethodField()
 
     class Meta:
         model = CredentialClientInstance
@@ -242,16 +249,38 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
             'application', 'configuration', 'online', 'date_last_seen', 'is_active',
         ]
         fields = fields_small + [
+            'client_version', 'protocol_version', 'config_schema_version',
+            'config_digest', 'configuration_current', 'upgrade_required',
+            'sync_status', 'sync_error', 'date_last_synced',
             'credential_statuses', 'date_created', 'date_updated', 'comment',
         ]
         read_only_fields = [
             'id', 'instance_id', 'type', 'application', 'online',
+            'client_version', 'protocol_version', 'config_schema_version',
+            'config_digest', 'configuration_current', 'upgrade_required',
+            'sync_status', 'sync_error', 'date_last_synced',
             'date_last_seen', 'credential_statuses', 'date_created', 'date_updated',
         ]
 
     @staticmethod
     def get_online(instance):
         return instance.online
+
+    @staticmethod
+    def get_configuration_current(instance):
+        if instance.type != CredentialClientInstance.Type.agent or not instance.config_digest:
+            return None
+        from accounts.credential_client.manager import CredentialClientManager
+        return instance.config_digest == CredentialClientManager.agent_configuration_digest(
+            instance.configuration
+        )
+
+    @staticmethod
+    def get_upgrade_required(instance):
+        return instance.protocol_version != 1 or (
+            instance.type == CredentialClientInstance.Type.agent
+            and instance.config_schema_version != 1
+        )
 
 
 class CredentialApplicationBindingSerializer(BulkOrgResourceModelSerializer):
@@ -280,25 +309,6 @@ class CredentialFetchSerializer(serializers.Serializer):
     instance_id = serializers.CharField(max_length=128, required=False)
 
 
-class EventRequestSerializer(serializers.Serializer):
-    configuration_id = serializers.UUIDField(required=False)
-    instance_id = serializers.CharField(max_length=128, required=False)
-
-
-class EventSubscriptionSerializer(EventRequestSerializer):
-    enabled = serializers.BooleanField()
-
-
-class EventReportSerializer(EventRequestSerializer):
-    attempt_id = serializers.UUIDField()
-    result = serializers.ChoiceField(choices=['success', 'failed'])
-    status_code = serializers.IntegerField(min_value=100, max_value=599, required=False, allow_null=True)
-    reason = serializers.ChoiceField(
-        choices=['', 'callback_failed', 'http_failed', 'credential_not_ready'], default='',
-    )
-
-
-
 class CredentialStateSerializer(serializers.Serializer):
     key = serializers.CharField(max_length=64)
     revision = serializers.IntegerField(min_value=1)
@@ -320,6 +330,23 @@ class CredentialAgentRegisterSerializer(serializers.Serializer):
     token = serializers.CharField()
     instance_id = serializers.CharField(max_length=128)
     name = serializers.CharField(max_length=128, required=False, allow_blank=True)
+    client_version = serializers.CharField(max_length=32)
+    protocol_version = serializers.IntegerField(min_value=1)
+    config_schema_version = serializers.IntegerField(min_value=1)
+
+
+class CredentialRevisionSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=64)
+    revision = serializers.IntegerField(min_value=0)
+
+
+class CredentialAgentSyncSerializer(serializers.Serializer):
+    config_digest = serializers.CharField(max_length=64, required=False, allow_blank=True)
+    credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
+    sync_status = serializers.ChoiceField(
+        choices=['', 'success', 'error'], required=False, default='', allow_blank=True,
+    )
+    sync_error = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
 
 
 class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
@@ -343,7 +370,8 @@ class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
             'online_instances_amount', 'last_reported',
         ]
         fields = fields_small + [
-            'language', 'app_user', 'install_path', 'notification_enabled', 'notification_url',
+            'language', 'app_user', 'install_path', 'delivery_mode',
+            'systemd_unit', 'systemd_action',
             'removal_reason', 'date_created', 'date_updated', 'created_by', 'comment',
         ]
         read_only_fields = ['instances_amount', 'online_instances_amount']
@@ -401,15 +429,18 @@ class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
         path = attrs.get('install_path', getattr(self.instance, 'install_path', '/opt/jumpserver-pam'))
         if not path.startswith('/') or path == '/' or any(char in path for char in '\n\r\x00'):
             raise serializers.ValidationError({'install_path': _('Enter an absolute installation directory.')})
-        enabled = attrs.get('notification_enabled', getattr(self.instance, 'notification_enabled', False))
-        url = attrs.get('notification_url', getattr(self.instance, 'notification_url', ''))
-        if enabled and attrs.get('type', getattr(self.instance, 'type', None)) == 'agent':
-            from urllib.parse import urlsplit
-            parts = urlsplit(url)
-            if parts.scheme not in ('http', 'https') or not parts.hostname or parts.username or parts.password or parts.fragment:
-                raise serializers.ValidationError({'notification_url': _('Enter an HTTP(S) notification URL without authentication information.')})
+        access_type = attrs.get('type', getattr(self.instance, 'type', None))
+        delivery_mode = attrs.get(
+            'delivery_mode', getattr(self.instance, 'delivery_mode', ClientAccessConfiguration.DeliveryMode.json)
+        )
+        systemd_unit = attrs.get('systemd_unit', getattr(self.instance, 'systemd_unit', '')).strip()
+        if access_type == CredentialClientInstance.Type.agent and delivery_mode == ClientAccessConfiguration.DeliveryMode.environment:
+            if not SYSTEMD_UNIT.fullmatch(systemd_unit):
+                raise serializers.ValidationError({
+                    'systemd_unit': _('Enter one systemd .service unit name.')
+                })
         else:
-            attrs['notification_url'] = ''
+            attrs['systemd_unit'] = ''
         return attrs
 
     def update(self, instance, validated_data):

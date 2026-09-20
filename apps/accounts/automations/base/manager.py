@@ -19,6 +19,7 @@ from assets.const import HostTypes
 from common.const import Status
 from common.db.utils import safe_atomic_db_connection
 from common.utils import get_logger
+from ops.ansible.exception import AnsibleDockerImageNotFound
 
 logger = get_logger(__name__)
 
@@ -175,6 +176,16 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             else:
                 failed += 1
         return success, failed, unverified
+
+    def on_runner_failed(self, runner, error, **kwargs):
+        not_started = isinstance(error, AnsibleDockerImageNotFound)
+        self._remote_change_not_started = not_started
+        if not_started and (self.execution.snapshot or {}).get('credential_rotation_id'):
+            self.summary['rotation_no_remote_change'] = True
+        try:
+            return super().on_runner_failed(runner, error, **kwargs)
+        finally:
+            self._remote_change_not_started = False
 
     def get_host_success_log(self, host):
         return None, None
@@ -696,6 +707,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         record = self.name_record_mapper.get(host)
         if not record:
             return super().on_host_incomplete(host, error)
+        if getattr(self, '_remote_change_not_started', False):
+            return self.on_host_error(host, error, {})
         self.finalize_incomplete_record(record, error)
 
     def on_inventory_host_error(self, host, error):
@@ -803,6 +816,12 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         record = self.name_record_mapper.get(host)
         if not record:
             return
+        if (self.execution.snapshot or {}).get('credential_rotation_id'):
+            task = str(error or '').splitlines()[0].split(': ', 1)[0].strip().lower()
+            if any(keyword in task for keyword in (
+                    'check if ', 'whether the user exists', 'passwd lookup',
+            )):
+                self.summary['rotation_no_remote_change'] = True
         record.status = ChangeSecretRecordStatusChoice.failed.value
         record.date_finished = timezone.now()
         record.error = error

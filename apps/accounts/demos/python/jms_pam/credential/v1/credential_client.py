@@ -28,20 +28,8 @@ class CredentialClient(AbstractClient):
             models.HeartbeatResponse,
         )
 
-    def SubscribeEvents(self, request):
+    def SyncAgent(self, request):
         return self._call(
-            'POST', 'events/subscribe', request, models.SubscribeEventsRequest,
-            models.SubscribeEventsResponse,
-        )
-
-    def PollEvents(self, request):
-        return self._call(
-            'POST', 'events', request, models.PollEventsRequest,
-            models.PollEventsResponse,
-        )
-
-    def ReportEvent(self, request):
-        return self._call(
-            'POST', 'events/report', request, models.ReportEventRequest,
-            models.ReportEventResponse,
+            'POST', 'agent/sync', request, models.AgentSyncRequest,
+            models.AgentSyncResponse,
         )

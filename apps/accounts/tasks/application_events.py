@@ -39,8 +39,11 @@ def dispatch_application_webhook(delivery_id, org_id, countdown=0):
 
 
 def _finish(delivery, result, reason):
-    from accounts.credential_client.events import ClientEventManager
-    ClientEventManager._finish(delivery, result, reason)
+    from accounts.models import ApplicationAudit
+    delivery.status = result
+    delivery.save(update_fields=['status'])
+    delivery.attempts.filter(result='pending').update(result='failed', reason=reason[:128])
+    ApplicationAudit.objects.filter(id=delivery.audit_id).update(result=result, summary=reason)
 
 
 def _claim_webhook(delivery_id):
@@ -49,7 +52,7 @@ def _claim_webhook(delivery_id):
     now = timezone.now()
     with transaction.atomic():
         delivery = ApplicationEventDelivery.objects.select_for_update().filter(
-            id=delivery_id, client__isnull=True,
+            id=delivery_id,
             method__in=('POST', 'PUT', 'PATCH'), status='pending',
         ).first()
         if not delivery:
@@ -164,7 +167,7 @@ def expire_application_event_deliveries():
                 )
                 _finish(delivery, 'failed', 'Notification delivery deadline reached.')
             recovery = list(ApplicationEventDelivery.objects.filter(
-                client__isnull=True, method__in=('POST', 'PUT', 'PATCH'),
+                method__in=('POST', 'PUT', 'PATCH'),
                 status='pending',
                 available_at__lte=now, expires_at__gt=now,
             ).values_list('id', 'org_id'))

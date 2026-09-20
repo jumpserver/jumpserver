@@ -180,7 +180,6 @@ class CredentialApplicationBinding(JMSOrgBaseModel):
 
 
 class CredentialClientInstance(JMSOrgBaseModel):
-    events_enabled = models.BooleanField(default=False)
     class Type(models.TextChoices):
         sdk = 'sdk', _('SDK')
         agent = 'agent', _('Agent')
@@ -198,6 +197,15 @@ class CredentialClientInstance(JMSOrgBaseModel):
     type = models.CharField(max_length=16, choices=Type.choices, verbose_name=_('Type'))
     instance_id = models.CharField(max_length=128, verbose_name=_('Instance ID'))
     secret = fields.EncryptTextField(default='', blank=True, verbose_name=_('Secret'))
+    client_version = models.CharField(max_length=32, blank=True, default='', verbose_name=_('Client version'))
+    protocol_version = models.PositiveSmallIntegerField(default=1, verbose_name=_('Protocol version'))
+    config_schema_version = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name=_('Configuration schema version')
+    )
+    config_digest = models.CharField(max_length=64, blank=True, default='', verbose_name=_('Configuration digest'))
+    sync_status = models.CharField(max_length=32, blank=True, default='', verbose_name=_('Sync status'))
+    sync_error = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Sync error'))
+    date_last_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last synced'))
     date_last_seen = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last seen'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
@@ -269,8 +277,15 @@ class CredentialClientStatus(JMSOrgBaseModel):
 
 
 class ClientAccessConfiguration(JMSOrgBaseModel):
-    notification_enabled = models.BooleanField(default=False, verbose_name=_('Event notifications'))
-    notification_url = models.URLField(max_length=2048, blank=True, default='', verbose_name=_('Notification URL'))
+    class DeliveryMode(models.TextChoices):
+        json = 'json', _('JSON files')
+        environment = 'environment', _('Environment files')
+        socket = 'socket', _('Unix socket')
+
+    class SystemdAction(models.TextChoices):
+        reload = 'reload', _('Reload')
+        restart = 'restart', _('Restart')
+
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     application = models.ForeignKey(
         'accounts.IntegrationApplication', on_delete=models.CASCADE,
@@ -283,6 +298,15 @@ class ClientAccessConfiguration(JMSOrgBaseModel):
     language = models.CharField(max_length=16, default='python', choices=[('python', 'Python')], verbose_name=_('Language'))
     app_user = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Application user'))
     install_path = models.CharField(max_length=256, default='/opt/jumpserver-pam', verbose_name=_('Install path'))
+    delivery_mode = models.CharField(
+        max_length=16, choices=DeliveryMode.choices,
+        default=DeliveryMode.json, verbose_name=_('Delivery mode'),
+    )
+    systemd_unit = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Systemd unit'))
+    systemd_action = models.CharField(
+        max_length=16, choices=SystemdAction.choices,
+        default=SystemdAction.restart, verbose_name=_('Systemd action'),
+    )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
     class Meta:

@@ -1,3 +1,5 @@
+import hashlib
+import json
 import shlex
 from datetime import timedelta
 
@@ -231,7 +233,94 @@ class CredentialClientManager:
             self.client.date_last_seen = now
 
     @staticmethod
-    def register_agent(token, instance_id, name=''):
+    def agent_configuration(configuration):
+        keys = []
+        for credential in configuration.credentials.filter(is_active=True).order_by('key'):
+            if credential.authorized_applications().filter(id=configuration.application_id).exists():
+                keys.append(credential.key)
+        root = configuration.install_path.rstrip('/')
+        return {
+            'delivery_mode': configuration.delivery_mode,
+            'credential_keys': keys,
+            'delivery_root': f'{root}/credentials/{configuration.id}',
+            'socket_path': f'/run/jumpserver-pam/{configuration.id}/agent.sock',
+            'app_user': configuration.app_user,
+            'systemd_unit': configuration.systemd_unit,
+            'systemd_action': configuration.systemd_action,
+        }
+
+    @classmethod
+    def agent_configuration_digest(cls, configuration):
+        payload = cls.agent_configuration(configuration)
+        encoded = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
+        return hashlib.sha256(encoded).hexdigest()
+
+    def update_client_metadata(self, client_version='', protocol_version=1, config_schema_version=None):
+        values = {
+            'client_version': client_version,
+            'protocol_version': protocol_version,
+            'config_schema_version': config_schema_version,
+        }
+        changed = {
+            key: value for key, value in values.items()
+            if value is not None and getattr(self.client, key) != value
+        }
+        if not changed:
+            return
+        CredentialClientInstance.objects.filter(id=self.client.id).update(**changed)
+        for key, value in changed.items():
+            setattr(self.client, key, value)
+
+    def sync_agent(self, config_digest='', credentials=None, sync_status='', sync_error=''):
+        if self.client.type != CredentialClientInstance.Type.agent:
+            raise PermissionDenied(_('Agent synchronization requires an Agent client.'))
+        now = timezone.now()
+        desired = self.agent_configuration(self.configuration)
+        desired_digest = self.agent_configuration_digest(self.configuration)
+        known = {item['key']: item['revision'] for item in credentials or []}
+        metadata = []
+        queryset = self.configuration.credentials.filter(
+            key__in=desired['credential_keys'], is_active=True,
+        ).order_by('key')
+        for credential in queryset:
+            available = not (
+                credential.rotation_mode == ApplicationCredential.RotationMode.single
+                and credential.status in (
+                    ApplicationCredential.Status.changing_secret,
+                    ApplicationCredential.Status.recovery_required,
+                )
+            )
+            metadata.append({
+                'key': credential.key,
+                'revision': credential.current_revision,
+                'available': available,
+                'changed': known.get(credential.key) != credential.current_revision,
+            })
+        values = {
+            'config_digest': config_digest,
+            'sync_status': sync_status,
+            'sync_error': sync_error[:128],
+            'date_last_synced': now,
+            'date_last_seen': now,
+        }
+        CredentialClientInstance.objects.filter(id=self.client.id).update(**values)
+        for key, value in values.items():
+            setattr(self.client, key, value)
+        response = {
+            'config_digest': desired_digest,
+            'credentials': metadata,
+            'removed_keys': sorted(set(known) - set(desired['credential_keys'])),
+            'date_last_synced': now,
+        }
+        if config_digest != desired_digest:
+            response['configuration'] = desired
+        return response
+
+    @staticmethod
+    def register_agent(
+        token, instance_id, name='', client_version='',
+        protocol_version=1, config_schema_version=1,
+    ):
         try:
             payload = signing.loads(
                 token, salt='credential-agent-register', max_age=600
@@ -275,18 +364,25 @@ class CredentialClientManager:
                 application=application,
                 type=CredentialClientInstance.Type.agent,
                 secret=secret,
+                client_version=client_version,
+                protocol_version=protocol_version,
+                config_schema_version=config_schema_version,
                 is_active=True,
                 comment=name,
             )
+            desired = CredentialClientManager.agent_configuration(configuration)
+            desired_digest = CredentialClientManager.agent_configuration_digest(configuration)
         return {
             'agent_id': str(client.id),
             'agent_secret': secret,
             'application_id': str(application.id),
             'configuration_id': str(configuration.id),
-            'credential_keys': list(configuration.credentials.values_list('key', flat=True)),
+            'credential_keys': desired['credential_keys'],
+            'configuration': desired,
+            'config_digest': desired_digest,
             'org_id': application.org_id,
-            'notification_enabled': configuration.notification_enabled,
-            'notification_url': configuration.notification_url,
+            'protocol_version': 1,
+            'config_schema_version': 1,
         }
 
 
@@ -299,26 +395,18 @@ class ClientAccessConfigurationManager:
         if not configuration.is_active or not configuration.application.is_active:
             raise ValidationError(_('The client access configuration is disabled.'))
         keys = list(configuration.credentials.values_list('key', flat=True))
-        config = {
-            'endpoint': endpoint,
-            'app_id': str(configuration.application_id),
-            'configuration_id': str(configuration.id),
-            'org_id': str(configuration.org_id),
-            'credential_keys': keys,
-            'notification_enabled': configuration.notification_enabled,
-        }
         if configuration.type == CredentialClientInstance.Type.sdk:
-            code = render_to_string('accounts/credential_client/sdk_example.py.tpl', {
-                'notification_enabled': configuration.notification_enabled,
-            })
+            app_secret = IntegrationApplication.objects.values_list(
+                'secret', flat=True,
+            ).get(id=configuration.application_id)
+            code = render_to_string('accounts/credential_client/sdk_example.py.tpl')
             config = render_to_string('accounts/credential_client/sdk_config.py.tpl', {
                 'endpoint': repr(endpoint),
                 'app_id': repr(str(configuration.application_id)),
-                'app_secret': repr(configuration.application.secret),
+                'app_secret': repr(app_secret),
                 'org_id': repr(str(configuration.org_id)),
                 'configuration_id': repr(str(configuration.id)),
                 'credential_keys': repr(keys),
-                'notification_enabled': repr(configuration.notification_enabled),
             })
             return {
                 'type': 'sdk', 'config': config, 'code': code, 'filename': 'jms_pam_config.py',
@@ -331,13 +419,14 @@ class ClientAccessConfigurationManager:
             'nonce': random_string(24),
         }, salt='credential-agent-register')
         path = configuration.install_path.rstrip('/')
-        credentials = ' '.join(f'--credential {shlex.quote(key)}' for key in keys)
         command = (
             f'sudo python3 -m venv {shlex.quote(path + "/venv")} && '
             f'sudo {shlex.quote(path + "/venv/bin/pip")} install --upgrade jms-pam && '
             f'sudo {shlex.quote(path + "/venv/bin/jms-pam-agent")} install --endpoint {shlex.quote(endpoint)} '
-            f'--token {shlex.quote(token)} --instance-id "$(hostname)" {credentials} '
-            f'--app-user {shlex.quote(configuration.app_user)}'
+            f'--token {shlex.quote(token)} --instance-id "$(hostname)" '
+            f'--configuration-id {shlex.quote(str(configuration.id))} '
+            f'--app-user {shlex.quote(configuration.app_user)} '
+            f'--install-path {shlex.quote(path)}'
         )
         return {
             'type': 'agent', 'expires_in': 600, 'install_command': command,

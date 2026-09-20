@@ -35,10 +35,9 @@ class ApplicationAudit(JMSOrgBaseModel):
 class ApplicationEventDelivery(JMSOrgBaseModel):
     event = models.ForeignKey(ApplicationAudit, on_delete=models.PROTECT, related_name='deliveries')
     audit = models.OneToOneField(ApplicationAudit, on_delete=models.PROTECT, related_name='delivery')
-    client = models.ForeignKey('accounts.CredentialClientInstance', null=True, on_delete=models.SET_NULL)
     webhook = models.ForeignKey(
-        'accounts.ApplicationWebhook', null=True, blank=True,
-        on_delete=models.SET_NULL, related_name='deliveries',
+        'accounts.ApplicationWebhook', on_delete=models.SET_NULL, null=True,
+        related_name='deliveries',
     )
     code = models.CharField(max_length=64)
     url = fields.EncryptTextField(max_length=2048, blank=True, default='')
@@ -51,11 +50,9 @@ class ApplicationEventDelivery(JMSOrgBaseModel):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['event', 'client'], name='unique_application_event_client'),
             models.UniqueConstraint(fields=['event', 'webhook'], name='unique_application_event_webhook'),
         ]
         indexes = [
-            models.Index(fields=['client', 'status', 'available_at']),
             models.Index(fields=['webhook', 'status', 'available_at']),
             models.Index(
                 fields=['status', 'date_created'],

@@ -28,13 +28,19 @@ class ClientIsolationTests(SimpleTestCase):
         self.addCleanup(directory.cleanup)
         self.agent = Agent.__new__(Agent)
         self.agent.config = {
-            'credential_keys': ['a', 'b', 'c'],
             'credential_file': str(Path(directory.name) / 'credentials.json'),
             'state_file': str(Path(directory.name) / 'state.json'),
         }
+        self.agent.config_file = str(Path(directory.name) / 'agent.json')
         self.agent.lock = threading.Lock()
-        self.agent.credentials = {key: {'revision': 1, 'secret': 'old'} for key in 'abc'}
+        self.agent.credentials = {
+            key: {'key': key, 'revision': 1, 'account_id': key, 'secret': 'old'}
+            for key in 'abc'
+        }
         self.agent.state = {key: {'key': key, 'revision': 1, 'account_id': key} for key in 'abc'}
+        self.agent.authorized_keys = set('abc')
+        self.agent.access_denied = False
+        self.agent.capabilities = {'socket_path': str(Path(directory.name) / 'agent.sock')}
         self.agent.remote = Mock()
 
     @staticmethod
@@ -43,18 +49,18 @@ class ClientIsolationTests(SimpleTestCase):
                 'asset': {'id': 'asset', 'name': 'asset', 'address': '127.0.0.1'},
                 'account': {'id': key, 'name': key, 'username': key, 'secret_type': 'password', 'secret': 'new'}})
 
-    def test_partial_fetch_revokes_one_and_writes_other_results(self):
+    def test_partial_fetch_preserves_failed_item_and_writes_successes(self):
         self.agent.remote.GetCredential.side_effect = [self.fetched('a'), http_error('credential_not_selected'), self.fetched('c')]
         with patch('sys.stderr') as stderr:
-            errors = self.agent.poll()
-        self.assertEqual(errors, {'b': 'credential_not_selected'})
+            changed = self.agent.fetch(['a', 'b', 'c'])
+        self.assertEqual(changed, {'a', 'c'})
         self.assertNotIn('DO_NOT_LOG_SECRET', str(stderr.write.call_args_list))
         persisted = read_json(self.agent.credential_file)
-        self.assertEqual(set(persisted), {'a', 'c'})
+        self.assertEqual(set(persisted), {'a', 'b', 'c'})
         self.assertEqual(persisted['a']['revision'], 2)
         self.assertEqual(persisted['c']['revision'], 2)
-        self.assertNotIn('b', read_json(self.agent.state_file))
-        self.assertEqual(self.agent.state['a']['revision'], 1)
+        self.assertEqual(persisted['b']['revision'], 1)
+        self.assertNotIn('b', self.agent.authorized_keys)
 
     def test_temporary_failures_preserve_only_failed_item(self):
         for error in (
@@ -63,7 +69,7 @@ class ClientIsolationTests(SimpleTestCase):
         ):
             with self.subTest(error=type(error).__name__):
                 self.agent.remote.GetCredential.side_effect = [self.fetched('a'), error, self.fetched('c')]
-                self.agent.poll()
+                self.agent.fetch(['a', 'b', 'c'])
                 self.assertEqual(self.agent.credentials['b']['revision'], 1)
                 self.assertEqual(self.agent.credentials['c']['revision'], 2)
 
@@ -73,79 +79,39 @@ class ClientIsolationTests(SimpleTestCase):
                 self.agent.remote.GetCredential.reset_mock()
                 self.agent.remote.GetCredential.side_effect = [self.fetched('a'), http_error(code, status), self.fetched('c')]
                 with self.assertRaises(JumpServerPAMSDKException):
-                    self.agent.poll()
+                    self.agent.fetch(['a', 'b', 'c'])
                 self.assertEqual(self.agent.credentials['a']['revision'], 1)
                 self.assertEqual(self.agent.remote.GetCredential.call_count, 2)
 
-    def test_heartbeat_cleanup_and_late_response(self):
+    def test_heartbeat_reports_only_authorized_confirmations(self):
         reply = models.HeartbeatResponse()._deserialize({
-            'updated': ['a'], 'errors': [{'key': 'b', 'code': 'credential_not_authorized'}],
+            'updated': ['a'], 'errors': [],
             'date_last_seen': '2026-09-16T00:00:00Z',
         })
         self.agent.remote.Heartbeat.return_value = reply
+        self.agent.authorized_keys = {'a'}
         self.agent.heartbeat()
-        self.assertNotIn('b', self.agent.credentials)
-        self.assertNotIn('b', self.agent.state)
-        self.agent.credentials['b'] = {'revision': 2}
-        self.agent.state['b'] = {'key': 'b', 'revision': 2, 'account_id': 'b'}
-
-        def concurrent_confirmation(_):
-            # Even a new confirmation of the same revision must survive an old response.
-            self.agent.state['b'] = dict(self.agent.state['b'])
-            return reply
-
-        self.agent.remote.Heartbeat.side_effect = concurrent_confirmation
-        self.agent.heartbeat()
+        request = self.agent.remote.Heartbeat.call_args.args[0]._serialize()
+        self.assertEqual([item['key'] for item in request['credentials']], ['a'])
         self.assertIn('b', self.agent.credentials)
         self.assertIn('b', self.agent.state)
 
-    def test_late_fetch_rejection_preserves_new_confirmation(self):
-        def denied_after_confirmation(request):
-            self.agent.state[request.Key] = dict(self.agent.state[request.Key])
-            raise http_error('credential_not_selected')
-        self.agent.remote.GetCredential.side_effect = denied_after_confirmation
-        self.agent.poll(keys=['b'])
-        self.assertIn('b', self.agent.credentials)
-        self.assertIn('b', self.agent.state)
-
-    def test_late_rejection_preserves_same_revision_refetch(self):
-        current = self.fetched('b')
-        current.Revision = 1
-        other_remote = Mock()
-        other_remote.GetCredential.return_value = current
-        def old_rejection(request):
-            self.agent.poll(keys=[request.Key], remote=other_remote)
-            raise http_error('credential_not_selected')
-        self.agent.remote.GetCredential.side_effect = old_rejection
-        self.agent.poll(keys=['b'])
-        self.assertIn('b', self.agent.credentials)
-        self.assertIn('b', self.agent.state)
-
-    def test_poll_failure_does_not_skip_heartbeat_or_stop_loop(self):
+    def test_sync_failure_does_not_skip_heartbeat_or_stop_loop(self):
         for error, expected in (
             (OSError('disk full'), 1),
             (JumpServerPAMSDKException('NetworkError', 'slow'), 1),
             (http_error('client_disabled'), 0),
         ):
-            self.agent.start_local_server = Mock()
-            self.agent.notification_session = Mock()
-            self.agent.events = None
-            self.agent.poll = Mock(side_effect=error)
+            server = Mock()
+            self.agent.start_local_server = Mock(return_value=server)
+            self.agent.sync = Mock(side_effect=error)
             self.agent.heartbeat = Mock(return_value={})
+            self.agent.set_access_denied = Mock(side_effect=lambda denied, reason='': setattr(self.agent, 'access_denied', denied))
             stop = Mock()
             stop.wait.side_effect = KeyboardInterrupt
             with patch('accounts.demos.python.jms_pam.agent.threading.Event', return_value=stop):
                 self.agent.run()
             self.assertEqual(self.agent.heartbeat.call_count, expected)
-
-    def test_notification_does_not_use_cached_revision_after_fetch_failure(self):
-        from accounts.demos.python.jms_pam.events import DeliveryError
-        self.agent.config['notification_url'] = 'http://localhost/events'
-        self.agent.notification_session = Mock()
-        self.agent.remote.GetCredential.side_effect = JumpServerPAMSDKException('NetworkError', 'slow')
-        with self.assertRaises(DeliveryError):
-            self.agent.notify({'event': 'credential.published', 'key': 'a', 'revision': 1}, self.agent.remote)
-        self.agent.notification_session.post.assert_not_called()
 
 
 class HeartbeatIsolationTests(CredentialTestCase):
@@ -159,7 +125,9 @@ class HeartbeatIsolationTests(CredentialTestCase):
     def heartbeat(self, items):
         request = self.factory.post('/api/v1/accounts/credential-client/heartbeat/', {
             'configuration_id': str(self.configuration.id), 'instance_id': 'instance', 'credentials': items,
-        }, format='json', HTTP_X_JMS_ORG=str(self.org.id))
+        }, format='json', HTTP_X_JMS_ORG=str(self.org.id),
+            HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
+            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
         force_authenticate(request, user=self.application)
         # Match ATOMIC_REQUESTS when calling a view directly with APIRequestFactory.
         with transaction.atomic():
@@ -198,7 +166,8 @@ class HeartbeatIsolationTests(CredentialTestCase):
     def test_fetch_rejection_has_machine_readable_code(self):
         request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
             'configuration_id': str(self.configuration.id), 'instance_id': 'instance', 'key': 'missing',
-        }, HTTP_X_JMS_ORG=str(self.org.id))
+        }, HTTP_X_JMS_ORG=str(self.org.id), HTTP_X_JMS_CLIENT_VERSION='1.0.0',
+            HTTP_X_JMS_PROTOCOL_VERSION='1', HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
         force_authenticate(request, user=self.application)
         response = CredentialClientViewSet.as_view({'get': 'credential'})(request)
         self.assertEqual(response.status_code, 400)

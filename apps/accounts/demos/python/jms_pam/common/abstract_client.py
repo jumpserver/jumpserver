@@ -7,12 +7,16 @@ from email.utils import formatdate
 import requests
 from requests.auth import AuthBase
 
+from .. import CONFIG_SCHEMA_VERSION, PROTOCOL_VERSION, __version__
 from .abstract_model import AbstractModel
 from .credential import Credential
 from .exception import JumpServerPAMSDKException
 from .profile.client_profile import ClientProfile
 
-SIGNATURE_HEADERS = ('(request-target)', 'accept', 'date', 'x-jms-org')
+SIGNATURE_HEADERS = (
+    '(request-target)', 'accept', 'date', 'x-jms-org',
+    'x-jms-client-version', 'x-jms-protocol-version', 'x-jms-config-schema-version',
+)
 
 
 class HTTPSignatureAuth(AuthBase):
@@ -81,6 +85,11 @@ class AbstractClient:
                     'Accept': 'application/json',
                     'X-JMS-ORG': self.profile.OrgId,
                     'X-Source': self.profile.Source,
+                    'X-JMS-Client-Version': __version__,
+                    'X-JMS-Protocol-Version': str(PROTOCOL_VERSION),
+                    'X-JMS-Config-Schema-Version': (
+                        str(CONFIG_SCHEMA_VERSION) if self.profile.Source == 'jms-pam-agent' else '0'
+                    ),
                     'Date': formatdate(usegmt=True),
                 },
                 auth=self.auth,

@@ -5,6 +5,7 @@ from common.exceptions import JMSException
 
 from accounts.const import AuditEvent, ChangeSecretRecordStatusChoice
 from accounts.credential_client.audit import record as audit
+from accounts.credential_rotation.preflight import check_secret_reset
 from accounts.models import (
     Account, ApplicationCredential, AutomationExecution, ChangeSecretAutomation,
     ChangeSecretRecord, CredentialRotationRecord,
@@ -36,6 +37,7 @@ def validate_parameters(credential, attrs, instance=None):
         return result.all() if hasattr(result, 'all') else result
 
     primary = credential.primary_account
+    check_secret_reset(primary)
     if (
         {str(asset.pk) for asset in value('assets', [])} != {str(primary.asset_id)}
         or list(value('nodes', []))
@@ -91,6 +93,7 @@ def execute(rotation_id, operator='', previous_execution_id=None, reason=''):
         raise JMSException(_('The rotation task is inactive or belongs to another organization.'))
     validate_parameters(credential, {}, automation)
     primary = Account.objects.select_for_update().get(pk=credential.primary_account_id)
+    check_secret_reset(primary)
     if primary.version != credential.primary_version_at_start:
         raise JMSException(_('The account version changed outside this rotation; verification is required.'))
     snapshot = automation.to_attr_json()
@@ -140,9 +143,9 @@ def outcome(credential, execution):
         and record.new_secret is not None and primary.secret == record.new_secret
     ):
         return 'success'
-    # The engine persists a candidate record before any remote mutation.
-    # No record plus an unchanged account is safe only for a known bound execution.
-    if (not record and expected_version == primary.version and execution.date_finished
+    # The engine may persist a candidate before the executor starts. Only an
+    # explicit pre-execution marker makes that record safe to retry.
+    if (expected_version == primary.version and execution.date_finished
             and (execution.summary or {}).get('rotation_no_remote_change')):
         return 'unchanged'
     return 'unverified'

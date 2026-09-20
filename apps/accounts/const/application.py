@@ -26,7 +26,6 @@ class AuditEvent(TextChoices):
     ROTATION_STARTED = 'rotation_started', _('Rotation started')
     ROTATION_STEP = 'rotation_step', _('Rotation step')
     ROTATION_CANCELLED = 'rotation_cancelled', _('Rotation cancelled')
-    SUBSCRIPTION_SNAPSHOT = 'subscription_snapshot', _('Subscription snapshot')
     NOTIFICATION = 'notification', _('Application notification')
 
 

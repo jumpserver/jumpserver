@@ -70,6 +70,18 @@ class CredentialChangeExecutionTests(CredentialTestCase):
                 self.assertIn('code', response.data)
         self.assertIsNone(self.rotation.change_automation_id)
 
+    def test_execution_rejects_account_with_secret_reset_disabled(self):
+        self.assertEqual(self.save_task().status_code, 201)
+        self.rotation.refresh_from_db()
+        self.primary.secret_reset = False
+        self.primary.save(update_fields=['secret_reset'])
+        with self.assertRaisesMessage(JMSException, 'does not allow secret reset') as error:
+            execute(self.rotation.id)
+        self.assertEqual(error.exception.detail.code, 'credential_account_secret_reset_disabled')
+        self.assertFalse(AutomationExecution.objects.exists())
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.status, 'ready_for_change')
+
     def test_rotation_form_field_errors_return_detail(self):
         for changes in (
             {'name': ''}, {'rotation_id': 'invalid-uuid'},
@@ -206,6 +218,12 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         execution.date_finished = timezone.now()
         execution.summary = {'rotation_no_remote_change': True}
         execution.save()
+        ChangeSecretRecord.objects.create(
+            account=self.primary, asset=self.asset, execution=execution,
+            old_secret=self.primary.secret, new_secret='candidate',
+            account_version=self.primary.version, status='failed',
+            date_finished=timezone.now(),
+        )
         reconcile(execution.id)
         retry = execute(self.rotation.id, previous_execution_id=execution.id, reason='Fixed parameters')
         duplicate = execute(self.rotation.id, previous_execution_id=execution.id, reason='Fixed parameters')
@@ -215,18 +233,61 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         self.assertEqual(self.credential.change_execution_id, retry.id)
         self.assertEqual(self.credential.status, 'changing_secret')
 
+    def test_missing_ansible_image_marks_rotation_as_not_started(self):
+        from accounts.automations.base.manager import BaseChangeSecretPushManager
+        from assets.automations.base.manager import BasePlaybookManager
+        from ops.ansible.exception import AnsibleDockerImageNotFound
+
+        execution = self.start_execution()
+        manager = object.__new__(BaseChangeSecretPushManager)
+        manager.execution = execution
+        manager.summary = {}
+        with patch.object(BasePlaybookManager, 'on_runner_failed', return_value=False):
+            manager.on_runner_failed(None, AnsibleDockerImageNotFound('missing'))
+        self.assertTrue(manager.summary['rotation_no_remote_change'])
+        self.assertFalse(manager._remote_change_not_started)
+        manager.name_record_mapper = {'host': object()}
+        manager._remote_change_not_started = True
+        with patch.object(manager, 'on_host_error') as on_host_error:
+            manager.on_host_incomplete('host', 'missing')
+        on_host_error.assert_called_once_with('host', 'missing', {})
+
+    def test_pre_change_host_failure_marks_rotation_as_not_started(self):
+        from collections import defaultdict
+        from unittest.mock import Mock
+
+        from accounts.automations.base.manager import BaseChangeSecretPushManager
+        from assets.automations.base.manager import BasePlaybookManager
+
+        execution = self.start_execution()
+        record = ChangeSecretRecord.objects.create(
+            account=self.primary, asset=self.asset, execution=execution,
+            old_secret=self.primary.secret, new_secret='candidate',
+            account_version=self.primary.version,
+        )
+        manager = object.__new__(BaseChangeSecretPushManager)
+        manager.execution = execution
+        manager.summary = defaultdict(int)
+        manager.result = defaultdict(list)
+        manager.name_record_mapper = {'host': record}
+        manager.save_record = Mock()
+        manager.clear_account_queue_status = Mock()
+        with patch.object(BasePlaybookManager, 'on_host_error'):
+            manager.on_host_error(
+                'host', 'Check if root user exists: connection refused', {},
+            )
+        self.assertTrue(manager.summary['rotation_no_remote_change'])
+        self.assertEqual(record.status, 'failed')
+
     def test_interrupted_rotation_notifies_in_execution_organization(self):
         from accounts.automations.recovery import finalize_interrupted_execution
-        from accounts.models import ClientAccessConfiguration, CredentialClientInstance, ApplicationEventDelivery
+        from accounts.models import ApplicationEventDelivery, ApplicationWebhook
         from orgs.utils import tmp_to_root_org
 
-        configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Recovery listener', type='sdk', notification_enabled=True,
-        )
-        configuration.credentials.add(self.credential)
-        client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=configuration, type='sdk',
-            instance_id='recovery-listener', events_enabled=True,
+        self.credential.applications.add(self.application)
+        webhook = ApplicationWebhook.objects.create(
+            application=self.application, is_active=True,
+            url='https://hooks.example/events', events=['rotation.failed'],
         )
         execution = self.start_execution()
         ChangeSecretRecord.objects.create(
@@ -239,7 +300,7 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.status, 'recovery_required')
         delivery = ApplicationEventDelivery.objects.filter(
-            client=client, code='rotation.failed',
+            webhook=webhook, code='rotation.failed',
         ).first()
         self.assertIsNotNone(delivery)
         self.assertEqual(str(delivery.org_id), str(self.org.id))

@@ -1,1 +1,5 @@
-__all__ = []
+__version__ = '1.0.0'
+PROTOCOL_VERSION = 1
+CONFIG_SCHEMA_VERSION = 1
+
+__all__ = ['__version__', 'PROTOCOL_VERSION', 'CONFIG_SCHEMA_VERSION']

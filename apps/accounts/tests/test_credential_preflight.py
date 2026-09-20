@@ -115,6 +115,14 @@ class CredentialPreflightTests(CredentialTestCase):
             self.start()
         self.assertFalse(AutomationExecution.objects.exists())
 
+    def test_primary_account_must_allow_secret_reset(self):
+        self.primary.secret_reset = False
+        self.primary.save(update_fields=['secret_reset'])
+        with self.assertRaisesMessage(JMSException, 'does not allow secret reset') as error:
+            self.start()
+        self.assertEqual(error.exception.detail.code, 'credential_account_secret_reset_disabled')
+        self.assertFalse(AutomationExecution.objects.exists())
+
     def test_serializer_rejects_cross_primary_backup_ownership(self):
         other = Account.objects.create(name='other', username='other', secret='secret', asset=self.asset)
         for account in (self.primary, self.backup):

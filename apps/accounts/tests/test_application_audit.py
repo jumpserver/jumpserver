@@ -1,38 +1,22 @@
 import ast
-import json
-import threading
 import time
 from contextlib import nullcontext
-from datetime import timedelta
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import Mock, patch
 
-import requests
 from django.core.cache.backends.locmem import LocMemCache
 from django.db import connection, transaction
-from django.test import SimpleTestCase
 from django.test.utils import CaptureQueriesContext
-from django.utils import timezone
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.test import force_authenticate
 from redis.exceptions import ConnectionError as RedisConnectionError
 
 from accounts.tests.base import CredentialTestCase
-from accounts.models import ApplicationAudit, ApplicationEventDelivery, ClientAccessConfiguration, CredentialClientInstance
+from accounts.models import ApplicationAudit, ClientAccessConfiguration, CredentialClientInstance
 from accounts.credential_client.manager import CredentialClientManager
-from accounts.credential_client.events import ClientEventManager, enqueue
 from accounts.credential_client.audit import record
 from accounts.middleware import ApplicationAuditMiddleware
 from accounts.api.account.application_audit import ApplicationAuditViewSet
-from accounts.serializers.account.credential import EventReportSerializer
 from accounts.api.account.credential import CredentialClientViewSet
-from accounts.demos.python.jms_pam.events import EventWorker, DeliveryError
-from accounts.demos.python.jms_pam.agent import Agent
-from accounts.demos.python.jms_pam.common.credential import Credential as PAMCredential
-from accounts.demos.python.jms_pam.common.exception import JumpServerPAMSDKException
-from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.demos.python.jms_pam.credential.v1 import models
-from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
 from orgs.utils import tmp_to_org
 from orgs.models import Organization
 
@@ -48,61 +32,17 @@ class ApplicationAuditTests(CredentialTestCase):
 
         return ApplicationAuditMiddleware(get_response)(request)
 
-    def manager(self, instance='one', enabled=True):
+    def manager(self, instance='one'):
         configuration, _ = ClientAccessConfiguration.objects.get_or_create(
             application=self.application, name='Events SDK',
-            defaults={'type': 'sdk', 'notification_enabled': enabled},
+            defaults={'type': 'sdk'},
         )
         configuration.credentials.add(self.credential)
         manager = CredentialClientManager(self.application, configuration.id, instance)
-        return manager, ClientEventManager(manager)
+        return manager, None
 
-    def test_optional_subscription_delivery_and_confirmation_are_independent(self):
-        manager, events = self.manager()
-        self.assertFalse(events.poll()['enabled'])
-        manager.fetch(self.credential.key, '127.0.0.1')
-        events.subscribe(True)
-        # Refresh manager, like a new HTTP request.
-        manager, events = self.manager()
-        message = events.poll()['events'][0]
-        self.assertEqual(message['event'], 'credential.published')
-        self.assertNotIn('secret', json.dumps(message, default=str))
-        with self.assertRaises(ValidationError):
-            events.report('00000000-0000-0000-0000-000000000000', 'success')
-        events.report(message['attempt_id'], 'success')
-        events.report(message['attempt_id'], 'success')
-        self.assertEqual(ApplicationEventDelivery.objects.get(id=message['delivery_id']).attempts.count(), 1)
-        state = manager.client.credential_statuses.get()
-        self.assertEqual(state.applied_revision, 0)
-        manager.confirm(self.credential.key, self.credential.revision, self.primary.id)
-        manager.confirm(self.credential.key, self.credential.revision, self.primary.id)
-        manager.heartbeat([{'key': self.credential.key, 'revision': self.credential.revision, 'account_id': self.primary.id}])
-        self.assertEqual(ApplicationAudit.objects.filter(event='credential_confirmed').count(), 1)
-        self.assertFalse(events.poll()['events'])
-        self.assertNotIn('primary-secret', json.dumps(list(ApplicationAudit.objects.values()), default=str))
-
-    def test_retry_identity_ownership_and_deadline(self):
-        manager, events = self.manager()
-        events.subscribe(True)
-        manager, events = self.manager()
-        first = events.poll()['events'][0]
-        _, other = self.manager('other')
-        with self.assertRaises(ValidationError):
-            other.report(first['attempt_id'], 'success')
-        self.assertEqual(events.poll()['events'], [])  # Claim is leased, not delivered twice concurrently.
-        for number in range(1, 6):
-            current = first if number == 1 else events.poll()['events'][0]
-            self.assertEqual(current['event_id'], first['event_id'])
-            events.report(current['attempt_id'], 'failed', reason='callback_failed')
-            delivery = ApplicationEventDelivery.objects.get(id=first['delivery_id'])
-            self.assertEqual(delivery.attempts.count(), number)
-            ApplicationEventDelivery.objects.filter(id=delivery.id).update(available_at=timezone.now())
-        self.assertEqual(events.poll()['events'], [])
-        delivery.refresh_from_db()
-        self.assertEqual(delivery.audit.result, 'failed')
-
-    def test_authorization_removal_delivers_only_revocation_and_disable_rejects(self):
-        manager, events = self.manager()
+    def test_authorization_removal_disables_fetch_and_preserves_sibling(self):
+        manager, _ = self.manager()
         manager.fetch(self.credential.key, '127.0.0.1')
         sibling_configuration = ClientAccessConfiguration.objects.create(
             application=self.application, name='Sibling SDK', type='sdk',
@@ -112,11 +52,7 @@ class ApplicationAuditTests(CredentialTestCase):
             self.application, sibling_configuration.id, 'sibling',
         )
         sibling.fetch(self.credential.key, '127.0.0.1')
-        events.subscribe(True)
-        published = ApplicationEventDelivery.objects.get(
-            client=manager.client, code='credential.published', status='pending',
-        )
-        manager, events = self.manager()
+        manager, _ = self.manager()
         configuration = manager.configuration
         configuration.credentials.remove(self.credential)
         self.assertFalse(
@@ -129,20 +65,8 @@ class ApplicationAuditTests(CredentialTestCase):
                 binding__credential=self.credential,
             ).exists()
         )
-        published.refresh_from_db()
-        published.audit.refresh_from_db()
-        self.assertEqual(published.status, 'failed')
-        self.assertEqual(published.audit.result, 'failed')
-        self.assertEqual(
-            list(ApplicationEventDelivery.objects.filter(
-                client=manager.client, status='pending',
-            ).values_list('code', flat=True)),
-            ['access.revoked'],
-        )
         with self.assertRaises(PermissionDenied):
             manager.fetch(self.credential.key, '127.0.0.1')
-        messages = events.poll()['events']
-        self.assertEqual([message['event'] for message in messages], ['access.revoked'])
         manager.client.is_active = False
         manager.client.save(update_fields=['is_active'])
         with self.assertRaises(PermissionDenied):
@@ -150,24 +74,6 @@ class ApplicationAuditTests(CredentialTestCase):
         audit = ApplicationAudit.objects.filter(event='client_disabled').get()
         self.assertEqual(audit.instance_id, 'one')
         self.assertEqual(audit.configuration_id, configuration.id)
-
-    def test_revocation_closes_stale_delivery_while_listener_is_paused(self):
-        manager, events = self.manager()
-        events.subscribe(True)
-        published = ApplicationEventDelivery.objects.get(
-            client=manager.client, code='credential.published', status='pending',
-        )
-        CredentialClientInstance.objects.filter(id=manager.client.id).update(events_enabled=False)
-
-        manager.configuration.credentials.remove(self.credential)
-
-        published.refresh_from_db()
-        self.assertEqual(published.status, 'failed')
-        self.assertFalse(
-            ApplicationEventDelivery.objects.filter(
-                client=manager.client, code='access.revoked',
-            ).exists()
-        )
 
     def test_audit_org_scope_pagination_and_retained_history(self):
         record('credential_fetched', application=self.application)
@@ -198,7 +104,8 @@ class ApplicationAuditTests(CredentialTestCase):
     def test_client_validation_failure_is_audited_before_manager_creation(self):
         request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
             'key': self.credential.key, 'configuration_id': 'invalid-uuid', 'instance_id': 'invalid-request',
-        })
+        }, HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
+            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
         force_authenticate(request, user=self.application)
         response = self.client_response(request, 'credential')
         self.assertEqual(response.status_code, 400)
@@ -214,7 +121,8 @@ class ApplicationAuditTests(CredentialTestCase):
         configuration.save(update_fields=['is_active'])
         request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
             'key': self.credential.key, 'configuration_id': str(configuration.id), 'instance_id': 'one',
-        })
+        }, HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
+            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
         force_authenticate(request, user=self.application)
         response = self.client_response(request, 'credential')
         self.assertEqual(response.status_code, 403)
@@ -228,7 +136,8 @@ class ApplicationAuditTests(CredentialTestCase):
         request = self.factory.post('/api/v1/accounts/credential-client/confirm/', {
             'key': self.credential.key, 'configuration_id': str(manager.configuration.id),
             'instance_id': 'one', 'revision': self.credential.revision, 'account_id': str(self.primary.id),
-        }, format='json')
+        }, format='json', HTTP_X_JMS_CLIENT_VERSION='1.0.0',
+            HTTP_X_JMS_PROTOCOL_VERSION='1', HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
         force_authenticate(request, user=self.application)
         response = self.client_response(request, 'confirm')
         self.assertEqual(response.status_code, 400)
@@ -257,26 +166,12 @@ class ApplicationAuditTests(CredentialTestCase):
         self.assertEqual({change['field'] for change in audit.changes}, {'revision', 'status'})
 
     def test_application_account_revocation_notifies_bound_clients(self):
-        manager, events = self.manager()
+        manager, _ = self.manager()
         manager.fetch(self.credential.key, '127.0.0.1')
-        events.subscribe(True)
         self.application.accounts = {'type': 'ids', 'ids': [str(self.primary.id)]}
         self.application.save(update_fields=['accounts'])
         audit = ApplicationAudit.objects.get(event='authorization_revoked', service_id=self.application.id)
         self.assertEqual(audit.credential_id, self.credential.id)
-        self.assertEqual(list(audit.deliveries.values_list('code', flat=True)), ['access.revoked'])
-
-    def test_subscribers_share_event_id_and_expiration_closes_audit(self):
-        for name in ('one', 'two'):
-            _, events = self.manager(name)
-            events.subscribe(True)
-        event = record('credential_published', credential=self.credential)
-        enqueue(event, 'credential.published')
-        self.assertEqual(event.deliveries.count(), 2)
-        from accounts.tasks.application_events import expire_application_event_deliveries
-        event.deliveries.update(expires_at=timezone.now() - timedelta(seconds=1))
-        expire_application_event_deliveries()
-        self.assertEqual(set(event.deliveries.values_list('audit__result', flat=True)), {'failed'})
 
     def test_admin_actor_is_distinct_from_target_client(self):
         manager, _ = self.manager()
@@ -287,82 +182,35 @@ class ApplicationAuditTests(CredentialTestCase):
         self.assertEqual(audit.operator, self.admin.name)
         self.assertEqual(audit.instance_id, 'one')
 
-    def test_no_notification_auth_and_safe_result_payload(self):
-        data = EventReportSerializer(data={'attempt_id': self.application.id, 'result': 'failed', 'reason': 'secret text'})
-        self.assertFalse(data.is_valid())
-        _, events = self.manager(enabled=False)
-        self.assertFalse(events.subscribe(True)['enabled'])
-
-    def test_sdk_and_agent_use_same_event_actions_and_real_audit_detail(self):
-        for client_type in ('sdk', 'agent'):
-            configuration = ClientAccessConfiguration.objects.create(
-                application=self.application, name=f'HTTP {client_type}', type=client_type,
-                notification_enabled=True,
-                notification_url='http://127.0.0.1:9000/events' if client_type == 'agent' else '',
-            )
-            configuration.credentials.add(self.credential)
-            user = self.application
-            if client_type == 'agent':
-                user = CredentialClientInstance.objects.create(
-                    configuration=configuration, application=self.application, instance_id='agent-http', type='agent',
-                )
-            def event_request(action, **data):
-                data.update(configuration_id=str(configuration.id), instance_id=f'{client_type}-http')
-                request = self.factory.post('/api/v1/accounts/credential-client/events/', data, format='json')
-                force_authenticate(request, user=user)
-                method = {'': 'events', 'subscribe': 'subscribe_events', 'report': 'report_event'}[action]
-                response = CredentialClientViewSet.as_view({'post': method})(request)
-                self.assertEqual(response.status_code, 200, response.data)
-                return response.data
-            event_request('subscribe', enabled=True)
-            remote = Mock(source='jms-pam-agent' if client_type == 'agent' else 'jms-pam')
-            remote.PollEvents.side_effect = lambda _: models.PollEventsResponse()._deserialize(
-                event_request('')
-            )
-            remote.ReportEvent.side_effect = lambda request: models.ReportEventResponse()._deserialize(
-                event_request('report', **request._serialize())
-            )
-            handler = Mock(return_value=204)
-            EventWorker(remote, handler).step()
-            handler.assert_called_once()
-            audit = ApplicationAudit.objects.filter(event='notification', configuration_id=configuration.id).get()
-            self.assertEqual(audit.result, 'success')
-            request = self.request('get', f'/api/v1/accounts/application-audits/{audit.id}/')
-            response = ApplicationAuditViewSet.as_view({'get': 'retrieve'})(request, pk=audit.id)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(len(response.data['notification']['attempts']), 1)
-            self.assertNotIn('secret', response.render().content.decode())
-
-    def test_generated_sdk_code_with_optional_notifications(self):
+    def test_generated_sdk_code_polls_credentials_without_event_subscription(self):
         from accounts.credential_client.manager import ClientAccessConfigurationManager
         manager, _ = self.manager()
         self.application.secret = "secret'\n__import__('os').system('should-not-run')"
         self.application.save(update_fields=['secret'])
-        for enabled in (True, False):
-            with self.subTest(notification_enabled=enabled):
-                manager.configuration.notification_enabled = enabled
-                materials = ClientAccessConfigurationManager(manager.configuration).materials('http://localhost')
-                code = materials['code']
-                compile(code, 'generated-sdk.py', 'exec')
-                compile(materials['config'], materials['filename'], 'exec')
-                config_tree = ast.parse(materials['config'])
-                self.assertTrue(all(
-                    isinstance(node, (ast.ImportFrom, ast.Assign))
-                    for node in config_tree.body
-                ))
-                self.assertIn(f'notification_enabled = {enabled}', materials['config'])
-                self.assertEqual('client.PollEvents' in code, enabled)
-                self.assertIn('except JumpServerPAMSDKException as error:', code)
-                self.assertIn('time.sleep(30)', code)
-                self.assertNotIn(self.application.secret, code)
-                self.assertIn(self.application.secret, materials['config'])
+        materials = ClientAccessConfigurationManager(manager.configuration).materials('http://localhost')
+        code = materials['code']
+        compile(code, 'generated-sdk.py', 'exec')
+        compile(materials['config'], materials['filename'], 'exec')
+        config_tree = ast.parse(materials['config'])
+        self.assertTrue(all(
+            isinstance(node, (ast.ImportFrom, ast.Assign))
+            for node in config_tree.body
+        ))
+        self.assertNotIn('PollEvents', code)
+        self.assertIn('GetCredential', code)
+        self.assertIn('time.sleep(30)', code)
+        self.assertNotIn(self.application.secret, code)
+        constants = [
+            node.value for node in ast.walk(config_tree)
+            if isinstance(node, ast.Constant)
+        ]
+        self.assertIn(self.application.secret, constants)
 
     def test_fixed_secret_publication(self):
-        manager, events = self.manager()
+        self.manager()
         self.credential.type = 'fixed'
         self.credential.backup_account = None
         self.credential.save()
-        events.subscribe(True)
         self.primary.secret = 'new-test-secret'
         self.primary.save()
         event = ApplicationAudit.objects.filter(event='credential_published', credential_id=self.credential.id).first()
@@ -401,7 +249,8 @@ class CredentialFetchAuditTestsMixin:
         request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
             'key': key or self.credential.key,
             'configuration_id': str(client.configuration_id), 'instance_id': client.instance_id,
-        })
+        }, HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
+            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='1' if self.client_type == 'agent' else '0')
         user = self.application if self.client_type == 'sdk' else client
         force_authenticate(request, user=user)
         response = ApplicationAuditMiddleware(self.get_response)(request)
@@ -535,100 +384,3 @@ class SDKFetchAuditTests(CredentialFetchAuditTestsMixin, CredentialTestCase):
 
 class AgentFetchAuditTests(CredentialFetchAuditTestsMixin, CredentialTestCase):
     client_type = 'agent'
-
-
-class EventWorkerTests(SimpleTestCase):
-    def test_agent_http_delivery_against_local_application(self):
-        received = []
-        class Handler(BaseHTTPRequestHandler):
-            def do_POST(self):
-                received.append((dict(self.headers), json.loads(self.rfile.read(int(self.headers['Content-Length'])))))
-                self.send_response(500 if len(received) == 1 else 204)
-                self.end_headers()
-
-            def log_message(self, *_):
-                pass
-        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
-        thread.start()
-        agent = Agent.__new__(Agent)
-        agent.config = {'notification_url': f'http://127.0.0.1:{server.server_port}/events'}
-        agent.notification_session = requests.Session()
-        agent.notification_session.trust_env = False
-        event = {'event': 'credential.unavailable', 'event_id': 'test-event', 'key': 'test-key', 'revision': 2}
-        try:
-            with self.assertRaises(DeliveryError) as error:
-                agent.notify(event, None)
-            self.assertEqual(error.exception.status_code, 500)
-            self.assertEqual(agent.notify(event, None), 204)
-            self.assertEqual(received[0][1], received[1][1])
-            self.assertNotIn('Authorization', received[0][0])
-            self.assertEqual(received[0][1], event)
-        finally:
-            server.shutdown()
-            server.server_close()
-            agent.notification_session.close()
-            thread.join()
-
-    def test_report_network_retry_does_not_repeat_callback(self):
-        remote = Mock(source='jms-pam')
-        event = {'attempt_id': 'attempt', 'delivery_id': 'delivery', 'event_id': 'event',
-                 'event': 'credential.published', 'key': 'db', 'revision': 2}
-        remote.PollEvents.side_effect = [
-            models.PollEventsResponse()._deserialize({'enabled': True, 'events': [event]}),
-            models.PollEventsResponse()._deserialize({'enabled': True, 'events': []}),
-        ]
-        remote.ReportEvent.side_effect = [
-            JumpServerPAMSDKException('NetworkError', 'offline'),
-            models.ReportEventResponse(Result='success'),
-        ]
-        handler = Mock()
-        worker = EventWorker(remote, handler)
-        with self.assertRaises(JumpServerPAMSDKException):
-            worker.step()
-        worker.step()
-        self.assertEqual(handler.call_count, 1)
-        self.assertNotIn('attempt_id', handler.call_args.args[0])
-        self.assertIsNone(worker.pending_report)
-        reports = [call.args[0]._serialize() for call in remote.ReportEvent.call_args_list]
-        self.assertEqual(reports[0], reports[1])
-
-    def test_callback_failure_does_not_leak_exception_or_confirm(self):
-        remote = Mock(source='jms-pam')
-        worker = EventWorker(remote, Mock(side_effect=ValueError('PASSWORD')))
-        worker.deliver({'attempt_id': 'attempt', 'event_id': 'event'})
-        self.assertEqual(worker.pending_report, {'attempt_id': 'attempt', 'result': 'failed', 'reason': 'callback_failed'})
-        remote.ConfirmCredential.assert_not_called()
-
-    def test_agent_writes_before_notification_and_exact_confirmation(self):
-        agent = Agent.__new__(Agent)
-        agent.config = {'notification_url': 'http://127.0.0.1:9000/events'}
-        agent.lock = threading.Lock()
-        agent.credentials = {'db': {'revision': 2, 'account_id': 'account'}}
-        agent.notification_session = Mock()
-        agent.notification_session.post.return_value.status_code = 204
-        order = []
-        agent.poll = Mock(side_effect=lambda **kwargs: order.append('write'))
-        agent.notification_session.post.side_effect = lambda *a, **kw: (order.append('notify') or Mock(status_code=204))
-        event = {'event': 'credential.published', 'key': 'db', 'revision': 2}
-        self.assertEqual(agent.notify(event, Mock()), 204)
-        self.assertEqual(order, ['write', 'notify'])
-        self.assertFalse(agent.notification_session.post.call_args.kwargs['allow_redirects'])
-        event['revision'] = 1
-        with self.assertRaises(DeliveryError):
-            agent.notify(event, Mock())
-        self.assertEqual(agent.notification_session.post.call_count, 1)
-        with self.assertRaises(ValueError):
-            agent.confirm('db', 1)
-
-    def test_listener_has_own_http_session(self):
-        remote = CredentialClient(
-            PAMCredential('id', 'secret'), 'one',
-            ClientProfile(endpoint='http://localhost', configuration_id='config'),
-        )
-        other = remote.clone()
-        self.assertIsNot(remote.session, other.session)
-        self.assertEqual(other.profile.ConfigurationId, 'config')
-        self.assertEqual(other.instance_id, 'one')
-        remote.close()
-        other.close()

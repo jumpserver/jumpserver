@@ -71,6 +71,9 @@ class CredentialTestCase(TestCase):
         request = creator(
             path, data=data or {}, format='json',
             HTTP_X_JMS_ORG=str(self.org.id),
+            HTTP_X_JMS_CLIENT_VERSION='1.0.0',
+            HTTP_X_JMS_PROTOCOL_VERSION='1',
+            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0',
         )
         force_authenticate(request, user=user or self.admin)
         return request

@@ -449,6 +449,9 @@ class CredentialRotationTestCase(CredentialTestCase):
             'token': token,
             'instance_id': 'order-agent-1',
             'name': 'Order agent',
+            'client_version': '1.0.0',
+            'protocol_version': 1,
+            'config_schema_version': 1,
         }
         first = view(self.factory.post(
             '/api/v1/accounts/credential-client/register-agent/',
@@ -759,6 +762,9 @@ class CredentialRotationTestCase(CredentialTestCase):
                     'Date': 'Wed, 09 Sep 2026 00:00:00 GMT',
                     'X-JMS-ORG': str(self.org.id),
                     'X-Source': 'jms-pam',
+                    'X-JMS-Client-Version': '1.0.0',
+                    'X-JMS-Protocol-Version': '1',
+                    'X-JMS-Config-Schema-Version': '0',
                 },
                 auth=HTTPSignatureAuth(str(self.application.id), secret),
             ).prepare()
@@ -797,7 +803,15 @@ class CredentialRotationTestCase(CredentialTestCase):
         prepared = requests.Request(
             'GET', f'http://testserver{CLIENT_PATH}/credential/',
             params={'key': self.credential.key, 'configuration_id': str(configuration.id), 'instance_id': 'signed-sdk'},
-            headers={'Accept': 'application/json', 'Date': 'Fri, 04 Sep 2026 00:00:00 GMT', 'X-JMS-ORG': str(self.org.id), 'X-Source': 'jms-pam'},
+            headers={
+                'Accept': 'application/json',
+                'Date': 'Fri, 04 Sep 2026 00:00:00 GMT',
+                'X-JMS-ORG': str(self.org.id),
+                'X-Source': 'jms-pam',
+                'X-JMS-Client-Version': '1.0.0',
+                'X-JMS-Protocol-Version': '1',
+                'X-JMS-Config-Schema-Version': '0',
+            },
             auth=HTTPSignatureAuth(str(self.application.id), self.application.secret),
         ).prepare()
         headers = {f'HTTP_{key.upper().replace("-", "_")}': value for key, value in prepared.headers.items()}
@@ -949,19 +963,6 @@ class CredentialClientStateWriteTests(CredentialTestCase):
         self.assertEqual(state.date_applied, applied)
         self.assertEqual(state.applied_revision, 1)
 
-    def test_event_polling_shares_activity_throttle(self):
-        from accounts.credential_client.events import ClientEventManager
-        manager = self.manager('agent')
-        manager.client.events_enabled = True
-        manager.client.save(update_fields=['events_enabled'])
-        manager.configuration.notification_enabled = True
-        manager.configuration.save(update_fields=['notification_enabled'])
-        manager.fetch(self.credential.key, '127.0.0.1')
-        with CaptureQueriesContext(connection) as queries:
-            self.assertEqual(ClientEventManager(manager).poll(), {'enabled': True, 'events': []})
-        self.assertEqual(self.state_writes(queries), [])
-
-
 class CredentialClientInstanceDeletionTestCase(SimpleTestCase):
     @override_language('en')
     def test_only_offline_client_can_be_deleted(self):
@@ -978,14 +979,12 @@ class CredentialClientInstanceDeletionTestCase(SimpleTestCase):
 
 
 class PythonSDKTestCase(SimpleTestCase):
-    def test_generated_example_subscribes_and_deduplicates_applied_state(self):
-        code = render_to_string(
-            'accounts/credential_client/sdk_example.py.tpl',
-            {'notification_enabled': True},
-        )
+    def test_generated_example_polls_and_deduplicates_applied_state(self):
+        code = render_to_string('accounts/credential_client/sdk_example.py.tpl')
 
         compile(code, 'sdk_example.py', 'exec')
-        self.assertIn('client.SubscribeEvents(', code)
+        self.assertNotIn('PollEvents', code)
+        self.assertIn('client.GetCredential(', code)
         self.assertIn('applied[key] = models.CredentialState(', code)
         self.assertIn('Credentials=list(applied.values())', code)
 
@@ -997,6 +996,9 @@ class PythonSDKTestCase(SimpleTestCase):
                 'Accept': 'application/json',
                 'Date': 'Tue, 01 Sep 2026 00:00:00 GMT',
                 'X-JMS-ORG': 'org',
+                'X-JMS-Client-Version': '1.0.0',
+                'X-JMS-Protocol-Version': '1',
+                'X-JMS-Config-Schema-Version': '0',
             },
             auth=HTTPSignatureAuth('app-id', 'secret'),
         ).prepare()
@@ -1004,8 +1006,9 @@ class PythonSDKTestCase(SimpleTestCase):
         self.assertEqual(
             request.headers['Authorization'],
             'Signature keyId="app-id",algorithm="hmac-sha256",'
-            'signature="UwK5G5SglCFNavwsGqEJM/GsvT9euZMlDDirt8kh6m8=",'
-            'headers="(request-target) accept date x-jms-org"',
+            'signature="GtAUL6L9AtFiTgve6PAweGUhOAygwIp9OPMZ39FXFno=",'
+            'headers="(request-target) accept date x-jms-org x-jms-client-version '
+            'x-jms-protocol-version x-jms-config-schema-version"',
         )
 
     def test_http_error_includes_server_detail(self):
@@ -1038,7 +1041,6 @@ class PythonSDKTestCase(SimpleTestCase):
                          'secret_type': 'password', 'secret': 'secret'}},
             {'key': 'database', 'revision': 1},
             {'updated': 1, 'errors': [], 'date_last_seen': '2026-09-16T00:00:00Z'},
-            {'enabled': True}, {'enabled': True, 'events': []}, {'result': 'success'},
         ]
         client.session.request = Mock(side_effect=[
             Mock(status_code=200, json=Mock(return_value=payload), reason='OK')
@@ -1049,9 +1051,6 @@ class PythonSDKTestCase(SimpleTestCase):
             Key='database', Revision=1, AccountId='account',
         ))
         client.Heartbeat(models.HeartbeatRequest(Credentials=[]))
-        client.SubscribeEvents(models.SubscribeEventsRequest(Enabled=True))
-        client.PollEvents(models.PollEventsRequest())
-        client.ReportEvent(models.ReportEventRequest(AttemptId='attempt', Result='success'))
 
         self.assertEqual(credential.Account.Username, 'app')
         self.assertEqual(credential.Asset.Platform.Type, 'postgresql')
@@ -1060,9 +1059,6 @@ class PythonSDKTestCase(SimpleTestCase):
             ('GET', f'https://jms.example.com{CLIENT_PATH}/credential/'),
             ('POST', f'https://jms.example.com{CLIENT_PATH}/confirm/'),
             ('POST', f'https://jms.example.com{CLIENT_PATH}/heartbeat/'),
-            ('POST', f'https://jms.example.com{CLIENT_PATH}/events/subscribe/'),
-            ('POST', f'https://jms.example.com{CLIENT_PATH}/events/'),
-            ('POST', f'https://jms.example.com{CLIENT_PATH}/events/report/'),
         ])
         self.assertEqual(calls[0].kwargs['params'], {
             'key': 'database', 'instance_id': 'sdk-instance', 'configuration_id': 'config',
@@ -1073,11 +1069,6 @@ class PythonSDKTestCase(SimpleTestCase):
         })
         common = {'instance_id': 'sdk-instance', 'configuration_id': 'config'}
         self.assertEqual(calls[2].kwargs['json'], {'credentials': [], **common})
-        self.assertEqual(calls[3].kwargs['json'], {'enabled': True, **common})
-        self.assertEqual(calls[4].kwargs['json'], common)
-        self.assertEqual(calls[5].kwargs['json'], {
-            'attempt_id': 'attempt', 'result': 'success', **common,
-        })
 
     def test_network_and_invalid_response_errors_are_normalized(self):
         client = CredentialClient(
@@ -1109,7 +1100,7 @@ class PythonSDKTestCase(SimpleTestCase):
 
     def test_agent_keeps_previous_credentials_when_write_fails(self):
         agent = Agent.__new__(Agent)
-        agent.config = {'credential_keys': ['database']}
+        agent.config = {'credential_file': '/unused/credentials.json'}
         agent.remote = Mock()
         agent.remote.GetCredential.return_value = models.GetCredentialResponse()._deserialize({
             'key': 'database',
@@ -1128,7 +1119,7 @@ class PythonSDKTestCase(SimpleTestCase):
             'accounts.demos.python.jms_pam.agent.atomic_write_json',
             side_effect=OSError('disk full'),
         ), self.assertRaisesRegex(OSError, 'disk full'):
-            agent.poll()
+            agent.fetch(['database'])
 
         self.assertEqual(agent.credentials['database']['revision'], 1)
         self.assertEqual(agent.credentials['database']['secret'], 'old-secret')

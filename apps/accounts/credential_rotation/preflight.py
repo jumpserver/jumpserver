@@ -25,6 +25,17 @@ ERRORS = {
 }
 
 
+def check_secret_reset(account):
+    if not account.secret_reset:
+        raise JMSException(
+            code='credential_account_secret_reset_disabled',
+            detail=_(
+                'Account "{name}" does not allow secret reset. '
+                'Enable secret reset before starting rotation.'
+            ).format(name=account.name),
+        )
+
+
 def check_ownership(credential, accounts):
     ids = [a.id for a in accounts if a]
     conflict = ApplicationCredential.objects.filter(
@@ -52,6 +63,7 @@ def check(credential):
     ):
         raise JMSException(_('Primary and backup accounts must be different and use the same asset and secret type.'))
     check_ownership(credential, accounts)
+    check_secret_reset(credential.primary_account)
     for account in accounts:
         if str(account.org_id) != str(credential.org_id) or str(account.asset.org_id) != str(credential.org_id):
             raise JMSException(_('The rotation accounts and asset must belong to the credential organization.'))

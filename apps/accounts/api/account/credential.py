@@ -2,7 +2,7 @@ from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import APIException, ValidationError, PermissionDenied
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -10,7 +10,6 @@ from accounts import serializers
 from accounts.const import AuditEvent
 from accounts.credential_client import CredentialClientManager
 from accounts.credential_client.manager import ClientAccessConfigurationManager
-from accounts.credential_client.events import ClientEventManager
 from accounts.credential_rotation import CredentialRotationManager
 from accounts.mixins import ApplicationAuditMixin
 from accounts.models import (
@@ -33,6 +32,20 @@ __all__ = [
     'CredentialClientInstanceViewSet', 'CredentialClientViewSet',
     'ClientAccessConfigurationViewSet', 'CredentialRotationRecordViewSet',
 ]
+
+
+CREDENTIAL_CLIENT_SIGNATURE_HEADERS = [
+    '(request-target)', 'date', 'x-jms-client-version',
+    'x-jms-protocol-version', 'x-jms-config-schema-version',
+]
+
+
+class CredentialClientServiceAuthentication(ServiceAuthentication):
+    required_headers = CREDENTIAL_CLIENT_SIGNATURE_HEADERS
+
+
+class CredentialClientAgentAuthentication(CredentialAgentAuthentication):
+    required_headers = CREDENTIAL_CLIENT_SIGNATURE_HEADERS
 
 
 class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
@@ -153,7 +166,8 @@ class CredentialClientInstanceViewSet(
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('application', 'configuration').prefetch_related(
-            'credential_statuses__binding__credential', 'credential_statuses__applied_account'
+            'credential_statuses__binding__credential', 'credential_statuses__applied_account',
+            'configuration__credentials',
         )
         credential = self.request.query_params.get('credential')
         if credential:
@@ -167,7 +181,9 @@ class CredentialClientInstanceViewSet(
 
 
 class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
-    authentication_classes = [CredentialAgentAuthentication, ServiceAuthentication]
+    authentication_classes = [
+        CredentialClientAgentAuthentication, CredentialClientServiceAuthentication,
+    ]
     permission_classes = [IsCredentialClient]
     client_audit_events = {
         'credential': AuditEvent.CREDENTIAL_FETCHED,
@@ -178,10 +194,42 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         'heartbeat': serializers.CredentialHeartbeatSerializer,
         'confirm': serializers.CredentialConfirmSerializer,
         'register_agent': serializers.CredentialAgentRegisterSerializer,
-        'events': serializers.EventRequestSerializer,
-        'subscribe_events': serializers.EventSubscriptionSerializer,
-        'report_event': serializers.EventReportSerializer,
+        'sync_agent': serializers.CredentialAgentSyncSerializer,
     }
+
+    class ClientUpgradeRequired(APIException):
+        status_code = 426
+        default_code = 'client_upgrade_required'
+        default_detail = _('The client protocol or configuration format is not supported.')
+
+    @staticmethod
+    def _version(value, default=None):
+        if value in (None, ''):
+            return default
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            raise CredentialClientViewSet.ClientUpgradeRequired() from None
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        if self.action == 'register_agent':
+            return
+        protocol = self._version(request.headers.get('X-JMS-Protocol-Version'))
+        schema = self._version(request.headers.get('X-JMS-Config-Schema-Version'))
+        if protocol != 1:
+            raise self.ClientUpgradeRequired()
+        if isinstance(request.user, CredentialClientInstance) and schema != 1:
+            raise self.ClientUpgradeRequired()
+
+    def get_client_manager(self, data):
+        manager = super().get_client_manager(data)
+        manager.update_client_metadata(
+            self.request.headers.get('X-JMS-Client-Version', ''),
+            self._version(self.request.headers.get('X-JMS-Protocol-Version')),
+            self._version(self.request.headers.get('X-JMS-Config-Schema-Version')),
+        )
+        return manager
 
     @action(methods=['get'], detail=False, url_path='credential')
     def credential(self, request, *args, **kwargs):
@@ -219,37 +267,23 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
+        if data['protocol_version'] != 1 or data['config_schema_version'] != 1:
+            raise self.ClientUpgradeRequired()
         identity = CredentialClientManager.register_agent(
-            data['token'], data['instance_id'], data.get('name', '')
+            data['token'], data['instance_id'], data.get('name', ''),
+            data['client_version'], data['protocol_version'], data['config_schema_version'],
         )
         return Response(identity, status=status.HTTP_201_CREATED)
 
-    def get_event_manager(self, data):
-        return ClientEventManager(self.get_client_manager(data))
-
-    @action(methods=['post'], detail=False, url_path='events/subscribe')
-    def subscribe_events(self, request):
+    @action(methods=['post'], detail=False, url_path='agent/sync')
+    def sync_agent(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        return Response(self.get_event_manager(data).subscribe(data['enabled']))
-
-    @action(methods=['post'], detail=False, url_path='events')
-    def events(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        response = Response(self.get_event_manager(serializer.validated_data).poll())
+        manager = self.get_client_manager(data)
+        response = Response(manager.sync_agent(**data))
         response['Cache-Control'] = 'no-store'
         return response
-
-    @action(methods=['post'], detail=False, url_path='events/report')
-    def report_event(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        return Response(self.get_event_manager(data).report(
-            data['attempt_id'], data['result'], data.get('status_code'), data['reason'],
-        ))
 
 
 class ClientAccessConfigurationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):

@@ -21,7 +21,8 @@ MODEL_AUDIT_FIELDS = {
         'name', 'type', 'primary_account_id', 'backup_account_id', 'status', 'revision', 'is_active',
     ),
     ClientAccessConfiguration: (
-        'name', 'is_active', 'notification_enabled', 'notification_url', 'app_user', 'install_path',
+        'name', 'is_active', 'app_user', 'install_path', 'delivery_mode',
+        'systemd_unit', 'systemd_action',
     ),
     CredentialClientInstance: ('is_active',),
     IntegrationApplication: ('name', 'is_active', 'accounts', 'ip_group'),
@@ -147,8 +148,7 @@ def notify_revoked_credentials(application):
             if required_accounts.issubset(allowed_accounts):
                 continue
             event = record(AuditEvent.AUTHORIZATION_REVOKED, credential=credential, application=application)
-            clients = application.credential_clients.filter(configuration__credentials=credential)
-            enqueue(event, ApplicationEvent.ACCESS_REVOKED, clients)
+            enqueue(event, ApplicationEvent.ACCESS_REVOKED)
             CredentialClientStatus.objects.filter(
                 binding__credential=credential,
                 client__application=application,
@@ -199,7 +199,7 @@ def credentials_changed(sender, instance, action, reverse, pk_set, **kwargs):
                 configuration=instance,
                 summary=reason,
             )
-            enqueue(event, ApplicationEvent.ACCESS_REVOKED, instance.instances.all())
+            enqueue(event, ApplicationEvent.ACCESS_REVOKED)
         CredentialClientStatus.objects.filter(
             client__configuration=instance,
             binding__credential_id__in=[credential.id for credential in credentials],
@@ -207,7 +207,7 @@ def credentials_changed(sender, instance, action, reverse, pk_set, **kwargs):
     elif action == 'post_add':
         for credential in instance.credentials.filter(pk__in=pk_set):
             event = record(AuditEvent.AUTHORIZATION_GRANTED, credential=credential, configuration=instance)
-            enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED, instance.instances.all())
+            enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED)
 
 
 for model in MODEL_AUDIT_FIELDS:

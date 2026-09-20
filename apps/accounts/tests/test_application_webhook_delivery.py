@@ -11,8 +11,7 @@ from accounts.credential_client.audit import record
 from accounts.credential_client.events import enqueue
 from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
 from accounts.models import (
-    ApplicationAudit, ApplicationEventAttempt, ApplicationEventDelivery,
-    ApplicationWebhook, CredentialClientInstance,
+    ApplicationAudit, ApplicationEventAttempt, ApplicationEventDelivery, ApplicationWebhook,
 )
 from accounts.tasks.application_events import (
     clean_application_records_period, deliver_application_webhook,
@@ -44,14 +43,13 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         with patch(
             'accounts.credential_client.events._dispatch_webhook',
         ) as dispatch, self.captureOnCommitCallbacks(execute=True):
-            enqueue(event, code, CredentialClientInstance.objects.none())
+            enqueue(event, code)
         return event, dispatch
 
     def test_selected_event_is_snapshotted_once_and_dispatched_after_commit(self):
         event, dispatch = self.enqueue_event()
         delivery = ApplicationEventDelivery.objects.get(event=event, webhook=self.webhook)
 
-        self.assertIsNone(delivery.client_id)
         self.assertEqual(delivery.method, 'POST')
         self.assertEqual(delivery.url, 'https://hooks.example/events')
         self.assertEqual(delivery.headers, {'Authorization': 'Bearer saved-token'})
@@ -67,7 +65,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.webhook.url = 'https://changed.example/events'
         self.webhook.headers = {'Authorization': 'changed'}
         self.webhook.save(update_fields=['url', 'headers'])
-        enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED, CredentialClientInstance.objects.none())
+        enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED)
         self.assertEqual(ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook).count(), 1)
         delivery.refresh_from_db()
         self.assertEqual(delivery.url, 'https://hooks.example/events')
@@ -99,13 +97,6 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.assertFalse(ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook).exists())
         dispatch.assert_not_called()
 
-        event = record(
-            AuditEvent.SUBSCRIPTION_SNAPSHOT,
-            application=self.application, credential=self.credential,
-        )
-        enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED, CredentialClientInstance.objects.none())
-        self.assertFalse(ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook).exists())
-
         self.webhook.events = list(ApplicationEvent.values)
         self.webhook.is_active = False
         self.webhook.save(update_fields=['events', 'is_active'])
@@ -119,10 +110,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         event = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=self.credential)
 
         with patch('accounts.credential_client.events.logger') as logger:
-            enqueue(
-                event, ApplicationEvent.CREDENTIAL_PUBLISHED,
-                CredentialClientInstance.objects.none(),
-            )
+            enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED)
 
         self.assertFalse(ApplicationEventDelivery.objects.filter(event=event).exists())
         logger.warning.assert_called_once_with(

@@ -76,44 +76,34 @@ class HeartbeatResponse(AbstractModel):
     _required = ('Updated', 'Errors', 'DateLastSeen')
 
 
-class SubscribeEventsRequest(AbstractModel):
-    _fields = {'Enabled': ('enabled', None)}
-    _required = ('Enabled',)
-
-
-class SubscribeEventsResponse(AbstractModel):
-    _fields = {'Enabled': ('enabled', None)}
-    _required = ('Enabled',)
-
-
-class PollEventsRequest(AbstractModel):
-    pass
-
-
-class Event(AbstractModel):
+class CredentialRevision(AbstractModel):
     _fields = {
-        'DeliveryId': ('delivery_id', None), 'AttemptId': ('attempt_id', None),
-        'EventId': ('event_id', None), 'Event': ('event', None),
-        'InstanceId': ('instance_id', None), 'ClientId': ('client_id', None),
-        'ConfigurationId': ('configuration_id', None), 'Key': ('key', None),
-        'Revision': ('revision', None), 'OccurredAt': ('occurred_at', None),
+        'Key': ('key', None), 'Revision': ('revision', None),
+        'Available': ('available', None), 'Changed': ('changed', None),
     }
-    _required = ('DeliveryId', 'AttemptId', 'EventId', 'Event', 'InstanceId', 'ClientId')
+    _required = ('Key', 'Revision', 'Available', 'Changed')
 
 
-class PollEventsResponse(AbstractModel):
-    _fields = {'Enabled': ('enabled', None), 'Events': ('events', [Event])}
-    _required = ('Enabled', 'Events')
+class KnownCredentialRevision(AbstractModel):
+    _fields = {'Key': ('key', None), 'Revision': ('revision', None)}
+    _required = ('Key', 'Revision')
 
 
-class ReportEventRequest(AbstractModel):
+class AgentSyncRequest(AbstractModel):
     _fields = {
-        'AttemptId': ('attempt_id', None), 'Result': ('result', None),
-        'StatusCode': ('status_code', None), 'Reason': ('reason', None),
+        'ConfigDigest': ('config_digest', None),
+        'Credentials': ('credentials', [KnownCredentialRevision]),
+        'SyncStatus': ('sync_status', None), 'SyncError': ('sync_error', None),
     }
-    _required = ('AttemptId', 'Result')
+    _required = ('Credentials',)
 
 
-class ReportEventResponse(AbstractModel):
-    _fields = {'Result': ('result', None)}
-    _required = ('Result',)
+class AgentSyncResponse(AbstractModel):
+    _fields = {
+        'ConfigDigest': ('config_digest', None),
+        'Configuration': ('configuration', None),
+        'Credentials': ('credentials', [CredentialRevision]),
+        'RemovedKeys': ('removed_keys', None),
+        'DateLastSynced': ('date_last_synced', None),
+    }
+    _required = ('ConfigDigest', 'Credentials', 'RemovedKeys', 'DateLastSynced')

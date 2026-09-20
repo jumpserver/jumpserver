@@ -9,4 +9,3 @@ profile = client_profile.ClientProfile(
     configuration_id={{ configuration_id|safe }},
 )
 credential_keys = {{ credential_keys|safe }}
-notification_enabled = {{ notification_enabled|safe }}
