@@ -101,18 +101,6 @@ def save_user_email_lookup(sender, instance, **kwargs):
     set_user_email_lookup(instance)
 
 
-@on_transaction_commit
-def sync_jdmc_user_password(username, raw_password):
-    try:
-        from xpack.plugins.jdmc.utils import change_jdmc_user_password
-        change_jdmc_user_password(username, raw_password)
-    except Exception as e:
-        logger.error(
-            "Failed to change JDMC user password for %s: %s",
-            username, e
-        )
-
-
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
     if not getattr(instance, '_password_changed', False):
@@ -140,9 +128,6 @@ def save_passwd_change(sender, instance: User, **kwargs):
             )
     finally:
         instance._password_changed = False
-
-    if settings.XPACK_ENABLED and settings.JDMC_ENABLED and raw_password:
-        sync_jdmc_user_password(instance.username, raw_password)
 
 
 def update_role_superuser_if_need(user):
