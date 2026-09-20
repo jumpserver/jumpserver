@@ -134,7 +134,7 @@ class WebAppletDefaultsTests(SimpleTestCase):
         self.assertEqual(uninstall['type'], 'msi')
         self.assertEqual(uninstall['product_name'], installer)
 
-    def test_builtin_install_skips_chrome_and_includes_web_applet(self):
+    def test_builtin_install_excludes_chrome_and_includes_web_applet(self):
         from unittest.mock import patch
         from terminal.applets import install_or_update_builtin_applets
 
