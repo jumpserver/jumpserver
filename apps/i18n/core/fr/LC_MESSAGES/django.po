@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: JumpServer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-24 14:25+0800\n"
-"PO-Revision-Date: 2026-08-28 00:00+0000\n"
+"PO-Revision-Date: 2026-09-20 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: French <fr@li.org>\n"
 "Language: fr\n"
@@ -7038,12 +7038,8 @@ msgstr "Cette tâche sera exécutée lors de l'envoi de notifications par e-mail
 
 #: common/tasks.py:67
 #, python-format
-msgid ""
-"Sending email: subject=%(subject)r, "
-"recipients=%(recipients)r"
-msgstr ""
-"Envoi de l'e-mail : objet=%(subject)r, "
-"destinataires=%(recipients)r"
+msgid "Sending email: subject=%(subject)r, recipients=%(recipients)r"
+msgstr "Envoi de l'e-mail : objet=%(subject)r, destinataires=%(recipients)r"
 
 #: common/tasks.py:81
 msgid "Send email attachment"
@@ -8129,7 +8125,6 @@ msgid "Send asset permission expired notification"
 msgstr "Envoyer une notification d'expiration d'autorisation d'actif"
 
 #: perms/tasks.py:52
-#, fuzzy
 #| msgid ""
 #| "Check every day at 10 a.m. and send a notification message to users associated with \n"
 #| "        assets whose authorization is about to expire, as well as to the organization's \n"
@@ -8141,10 +8136,10 @@ msgid ""
 "        administrators in advance, to remind them that the asset authorization\n"
 "        will expire in a few days"
 msgstr ""
-"Vérifier chaque jour à 10h du matin et envoyer un message de notification aux utilisateurs associés\n"
-"        aux actifs dont l'autorisation est sur le point d'expirer, ainsi qu'aux administrateurs\n"
-"        de l'organisation à l'avance, pour les rappeler que l'autorisation de l'actif\n"
-"        expirera dans quelques jours"
+"Chaque jour à 10 h, vérifier les autorisations d’actifs qui expirent bientôt"
+" et envoyer à l’avance une notification aux utilisateurs concernés ainsi "
+"qu’aux administrateurs de l’organisation pour leur rappeler que ces "
+"autorisations expireront dans quelques jours"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
 #: perms/templates/perms/_msg_permed_items_expire.html:7
@@ -14327,6 +14322,288 @@ msgstr "Import de licence réussi"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "Licence invalide"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s : traitement en cours ; compte d’exécution : %(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s (connexion : %(login)s, %(method)s → %(become)s)"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr ""
+"%(name)s (nom d’utilisateur : %(username)s, privilégié : %(privileged)s)"
+
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid ""
+"Checking SSH login and tunnel forwarding: %(gateway)s; execution account: "
+"%(account)s"
+msgstr ""
+"Vérification de la connexion SSH et du transfert par tunnel : %(gateway)s ; "
+"compte d’exécution : %(account)s"
+
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "Utiliser l’ancien mot de passe lors du changement de mot de passe"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr ""
+"Utiliser le mot de passe actuellement géré dans la clause Oracle REPLACE "
+"lors du changement de mot de passe"
+
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "La signature des certificats SSH est désactivée"
+
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr ""
+"Le navigateur n’a pas envoyé le cookie CSRF et la connexion est impossible. "
+"Contactez l’administrateur"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"Si vous êtes administrateur, vérifiez la configuration de "
+"SESSION_COOKIE_DOMAIN : le domaine utilisé doit correspondre à ce paramètre "
+"ou être l’un de ses sous-domaines, sinon le navigateur n’enregistrera pas le"
+" cookie. Corrigez ou supprimez ce paramètre"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "non défini"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies"
+" and try again"
+msgstr ""
+"Vérifiez que les cookies sont activés dans votre navigateur, effacez les "
+"cookies du site et réessayez"
+
+#: settings/api/chat.py
+msgid ""
+"The connection to the model provider timed out. Please check the Base URL, "
+"proxy, and network."
+msgstr ""
+"La connexion au fournisseur du modèle a expiré. Vérifiez l’URL de base, le "
+"proxy et le réseau."
+
+#: settings/api/chat.py
+msgid ""
+"The model provider certificate verification failed. Please check its HTTPS "
+"certificate."
+msgstr ""
+"La vérification du certificat du fournisseur du modèle a échoué. Vérifiez "
+"son certificat HTTPS."
+
+#: settings/api/chat.py
+msgid ""
+"The model provider hostname could not be resolved. Please check the Base URL"
+" and DNS settings."
+msgstr ""
+"Impossible de résoudre le nom d’hôte du fournisseur du modèle. Vérifiez "
+"l’URL de base et les paramètres DNS."
+
+#: settings/api/chat.py
+msgid ""
+"The model provider refused the connection. Please check the Base URL, port, "
+"and service status."
+msgstr ""
+"Le fournisseur du modèle a refusé la connexion. Vérifiez l’URL de base, le "
+"port et l’état du service."
+
+#: settings/api/chat.py
+msgid ""
+"Unable to connect to the model provider. Please check the Base URL, proxy, "
+"and network."
+msgstr ""
+"Impossible de se connecter au fournisseur du modèle. Vérifiez l’URL de base,"
+" le proxy et le réseau."
+
+#: settings/api/chat.py
+msgid ""
+"The model provider account has insufficient balance. Please recharge it and "
+"try again."
+msgstr ""
+"Le solde du compte du fournisseur du modèle est insuffisant. Rechargez-le et"
+" réessayez."
+
+#: settings/api/chat.py
+msgid ""
+"Authentication with the model provider failed. Please check the API key."
+msgstr ""
+"Échec de l’authentification auprès du fournisseur du modèle. Vérifiez la clé"
+" API."
+
+#: settings/api/chat.py
+msgid ""
+"The model provider denied access. Please check the API key permissions."
+msgstr ""
+"Le fournisseur du modèle a refusé l’accès. Vérifiez les permissions de la "
+"clé API."
+
+#: settings/api/chat.py
+msgid ""
+"The selected model does not exist or is unavailable. Please check the model "
+"and Base URL."
+msgstr ""
+"Le modèle sélectionné n’existe pas ou est indisponible. Vérifiez le modèle "
+"et l’URL de base."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr ""
+"Le point de terminaison du fournisseur du modèle est introuvable. Vérifiez "
+"l’URL de base."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr ""
+"La limite de requêtes du fournisseur du modèle a été dépassée. Réessayez "
+"plus tard."
+
+#: settings/api/chat.py
+msgid ""
+"The model provider service is temporarily unavailable. Please try again "
+"later."
+msgstr ""
+"Le service du fournisseur du modèle est temporairement indisponible. "
+"Réessayez plus tard."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr ""
+"Échec de la requête au fournisseur du modèle (HTTP {status_code}) : {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "Échec de la requête au fournisseur du modèle (HTTP {status_code})."
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "Méthodes MFA autorisées"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr ""
+"Sélectionnez une ou plusieurs méthodes MFA que les utilisateurs peuvent "
+"associer et utiliser"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "Sélectionnez au moins une méthode MFA"
+
+#: templates/resource_download.html:32
+msgid "More downloads"
+msgstr "Autres téléchargements"
+
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} a soumis le ticket"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "Types MFA autorisés"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "Laissez vide pour hériter des méthodes MFA globales"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "Télécharger le client %(vendor)s"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr ""
+"Choisissez le programme d’installation adapté à votre système "
+"d’exploitation."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Retrouvez les versions Linux, macOS Intel et autres sur GitHub."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "Voir sur GitHub"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA indisponible"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "Aucune méthode MFA disponible. Contactez votre administrateur."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid ""
+"The following MFA methods are not enabled in system settings and cannot be "
+"used: %(methods)s. Please contact your administrator."
+msgstr ""
+"Les méthodes MFA suivantes ne sont pas activées dans les paramètres du "
+"système et ne peuvent pas être utilisées : %(methods)s. Contactez votre "
+"administrateur."
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "Exécuter le déploiement du fournisseur d’applications"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr ""
+"Déployer l’environnement d’exécution Panda sur un hôte fournisseur "
+"d’applications"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "Publier toutes les applications virtuelles"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr ""
+"Publier toutes les applications virtuelles sur un fournisseur d’applications"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "Déploiement du fournisseur d’applications"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "Déploiement"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "Erreur de déploiement"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "Le changement d’image nécessite une version d’application différente"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr ""
+"La version signalée ne correspond pas à la version actuelle de l’application"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "Version publiée"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "Le ticket est déjà fermé"
