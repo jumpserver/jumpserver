@@ -2,8 +2,6 @@ name: '🤔 问题咨询'
 description: '提出一个问题'
 title: '[Question] '
 labels: ['🤔 Question']
-assignees: 
-  - baijiangjie
 body:
   - type: input
     attributes:

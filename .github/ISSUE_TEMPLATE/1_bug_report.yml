@@ -2,8 +2,6 @@ name: '🐛 Bug Report'
 description: 'Report an Bug'
 title: '[Bug] '
 labels: ['🐛 Bug']
-assignees: 
-  - baijiangjie
 body:
   - type: input
     attributes:
