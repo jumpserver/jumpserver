@@ -25,6 +25,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     SECURITY_DISABLE_VIEW_SECRET = serializers.BooleanField()
     SECURITY_VIEW_AUTH_NEED_MFA = serializers.BooleanField()
     SECURITY_MFA_AUTH = serializers.IntegerField()
+    MFA_METHODS_STATUS = serializers.ListField(child=serializers.DictField(), read_only=True)
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField()
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField()
     SECURITY_COMMAND_BLACKLIST = serializers.ListField()
