@@ -2,6 +2,7 @@ import re
 
 from django.apps import apps
 from django.conf import settings
+from drf_spectacular.contrib.django_filters import DjangoFilterExtension
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.generators import SchemaGenerator
 
@@ -9,6 +10,23 @@ from rbac.permissions import RBACPermission
 
 
 CHAT_AI_PERMISSIONS_UNSET = object()
+
+
+class CustomDjangoFilterExtension(DjangoFilterExtension):
+    priority = 1
+
+    def _get_explicit_filter_choices(self, filter_field):
+        # drf-spectacular 0.29 assumes every choice field has django-filter's
+        # null-choice attributes. Django's TypedChoiceField does not.
+        if 'choices' not in filter_field.extra:
+            return None
+        choices = filter_field.extra['choices']
+        if callable(choices):
+            return []
+        values = [value for value, _ in choices]
+        if getattr(filter_field.field, 'null_label', None):
+            values.append(filter_field.field.null_value)
+        return values
 
 
 class CustomSchemaGenerator(SchemaGenerator):
