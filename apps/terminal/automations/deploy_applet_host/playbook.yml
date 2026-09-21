@@ -37,7 +37,9 @@
         - name: Create Tinker keyfile
           ansible.windows.win_powershell:
             script: |
-              [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+              if ({{ IGNORE_VERIFY_CERTS | bool | ternary('$true', '$false') }}) {
+                [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+              }
               function New-RandomString {
                   param (
                       [int]$Length = 16
@@ -238,7 +240,7 @@
         - name: Generate tinkerd component config
           ansible.windows.win_powershell:
             script: |
-              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}
+              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs={{ IGNORE_VERIFY_CERTS | bool | lower }} --rdp-token-login={{ RDP_TOKEN_LOGIN | default(false) | bool | lower }}
 
         - name: Rename tinkerd keyfile
           ansible.windows.win_powershell:

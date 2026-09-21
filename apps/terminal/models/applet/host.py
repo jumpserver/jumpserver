@@ -86,7 +86,7 @@ class AppletHost(Host):
         return random_string(16, special_char=True)
 
     def generate_accounts(self):
-        if not self.auto_create_accounts:
+        if not self.auto_create_accounts or self.deploy_options.get('RDP_TOKEN_LOGIN') is True:
             return
         self.generate_public_accounts()
         self.generate_private_accounts()
@@ -109,6 +109,8 @@ class AppletHost(Host):
         bulk_create_with_history(accounts, account_model, batch_size=20, ignore_conflicts=True)
 
     def generate_private_accounts_by_usernames(self, usernames):
+        if self.deploy_options.get('RDP_TOKEN_LOGIN') is True:
+            return
         accounts = []
         account_model = self.accounts.model
         for username in usernames:

@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -20,6 +22,10 @@ __all__ = [
 
 
 class DeployOptionsSerializer(serializers.Serializer):
+    RDP_TOKEN_LOGIN = serializers.BooleanField(
+        default=False, label=_("RDP token login (experimental)"),
+        help_text=_("Create persistent Windows runtime accounts locally on first use; requires the Tinker credential provider."),
+    )
     LICENSE_MODE_CHOICES = (
         (2, _('Per Device (Device number limit)')),
         (4, _('Per User (User number limit)')),
@@ -75,6 +81,21 @@ class DeployOptionsSerializer(serializers.Serializer):
             'log off the session immediately).'
         )
     )
+
+    def validate(self, attrs):
+        instance = getattr(self.parent, 'instance', None)
+        options = {**(getattr(instance, 'deploy_options', None) or {}), **attrs}
+        if options.get('RDP_TOKEN_LOGIN'):
+            try:
+                core = urlsplit(options.get('CORE_HOST', settings.SITE_URL))
+            except ValueError:
+                raise serializers.ValidationError(_('Invalid Core URL.'))
+            if (core.scheme != 'https' or not core.netloc or core.username
+                    or core.query or core.fragment or options.get('IGNORE_VERIFY_CERTS', True)):
+                raise serializers.ValidationError(_(
+                    'RDP token login requires an HTTPS Core URL and certificate verification.'
+                ))
+        return attrs
 
 
 class AppletHostSerializer(HostSerializer):
