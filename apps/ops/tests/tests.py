@@ -1,9 +1,9 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 from django.test import SimpleTestCase
 
 from ops.celery.logger import CeleryTaskLoggerHandler
-from ops.models.job import JMSPermedInventory, check_upload_permission
+from ops.models.job import JobExecution, JMSPermedInventory, check_upload_permission
 from perms.const import ActionChoices
 
 
@@ -60,6 +60,37 @@ class CheckUploadPermissionTestCase(SimpleTestCase):
         self.assertIn('asset-1', str(host['error']))
         perm_util.check_perm_actions.assert_called_once_with(
             'fallback', [ActionChoices.upload.value]
+        )
+
+
+class JobExecutionACLTestCase(SimpleTestCase):
+    @patch('ops.models.job.DataMaskingRule.filter_queryset', return_value=[])
+    @patch('ops.models.job.CommandFilterACL.filter_queryset', return_value=[])
+    def test_node_expanded_assets_are_checked(self, command_filter, data_masking):
+        asset = Mock()
+        asset.protocols.all.return_value = []
+        job = Mock(type='adhoc', runas='root', args='')
+        job.assets.all.return_value = []
+        execution = JobExecution()
+        execution.__dict__['inventory'] = Mock(assets=[asset])
+
+        with patch.object(
+            JobExecution, 'current_job', new_callable=PropertyMock,
+            return_value=job,
+        ):
+            execution.check_assets_acls()
+
+        data_masking.assert_called_once_with(
+            user=execution.creator,
+            asset=asset,
+            is_active=True,
+            account_username='root',
+        )
+        command_filter.assert_called_once_with(
+            user=execution.creator,
+            asset=asset,
+            is_active=True,
+            account_username='root',
         )
 
 
