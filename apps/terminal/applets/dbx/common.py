@@ -166,6 +166,14 @@ class TinkerForward(DictObj):
     port: int
 
 
+class ConnectOption(DictObj):
+    lang: str
+    charset: str
+    terminal_theme_name: str
+    disableautohash: bool
+    backspaceAsCtrlH: bool
+
+
 class Manifest(DictObj):
     name: str
     version: str
@@ -203,6 +211,24 @@ def convert_base64_to_dict(base64_str: str) -> dict:
     return {}
 
 
+def get_system_language():
+    """
+    获取系统默认语言
+    :return: 系统默认语言代码
+    """
+    try:
+        import ctypes
+        import locale
+        # 获取系统默认的语言ID
+        lang_id = ctypes.windll.kernel32.GetUserDefaultUILanguage()
+        # 转换为语言代码
+        language = locale.windows_locale[lang_id]
+        return language
+    except Exception as e:
+        print(f"获取系统语言失败: {e}")
+        return 'en_US'
+
+
 class BaseApplication(abc.ABC):
 
     def __init__(self, *args, **kwargs):
@@ -213,7 +239,6 @@ class BaseApplication(abc.ABC):
         self.asset = Asset(kwargs.get('asset', {}))
         self.account = Account(kwargs.get('account', {}))
         self.platform = Platform(kwargs.get('platform', {}))
-        self.connect_options = kwargs.get('connect_options', {})
         self.gateway = None
         self.tinker_forward = None
         gateway = kwargs.get('gateway')
@@ -222,6 +247,8 @@ class BaseApplication(abc.ABC):
             self.gateway = Gateway(gateway)
         if tinker_forward:
             self.tinker_forward = TinkerForward(tinker_forward)
+
+        self.connect_option = ConnectOption(kwargs.get('connect_options', {}))
 
     @abc.abstractmethod
     def run(self):
