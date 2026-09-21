@@ -24,6 +24,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import Account
+from assets.const import Protocol
 from assets.utils.platform_package import locate_package_root
 from authentication.serializers.connect_token_secret import ConnectTokenVirtualAppOptionSerializer
 from common.drf.metadata import SimpleMetadataWithFilters
@@ -34,7 +35,11 @@ from terminal.automations.deploy_app_provider import (
     DeployAppProviderManager, default_panda_image, stage_resources,
 )
 from terminal.const import ComponentLoad, SessionErrorReason
-from terminal.models import Applet, AppProvider, AppProviderDeployment, Terminal, VirtualApp, VirtualAppPublication
+from terminal.connect_methods import ConnectMethodUtil, NativeClient
+from terminal.models import (
+    Applet, AppProvider, AppProviderDeployment, Endpoint, Terminal, VirtualApp,
+    VirtualAppPublication,
+)
 from terminal.serializers import AppProviderSerializer, SessionSerializer
 from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
 from terminal.tasks import (
@@ -228,6 +233,26 @@ class WebsiteConnectMethodTests(SimpleTestCase):
             'label': 'Built-in Browser',
         }])
         self.assertEqual(web_proxy, methods['http'][0])
+
+
+class DamengConnectMethodTests(SimpleTestCase):
+    @override_settings(VENDOR='jumpserver')
+    def test_dameng_uses_oracle_enterprise_connection_paths(self):
+        components = ConnectMethodUtil.components()
+
+        self.assertIn(Protocol.dameng, components['koko']['support'])
+        self.assertIn(Protocol.dameng, components['chen']['support'])
+        self.assertIn(Protocol.dameng, components['magnus']['support'])
+        self.assertEqual(
+            NativeClient.get_native_clients()[Protocol.dameng],
+            [NativeClient.db_client, NativeClient.db_guide],
+        )
+        self.assertTrue(Protocol.database_protocols()[Protocol.dameng]['xpack'])
+
+    def test_dameng_uses_shared_magnus_port(self):
+        endpoint = Endpoint(magnus_port=15525)
+
+        self.assertEqual(endpoint.get_port(None, Protocol.dameng), 15525)
 
 class VirtualAppProviderSelectionTests(SimpleTestCase):
     def setUp(self):
