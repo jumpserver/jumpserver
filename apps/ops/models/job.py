@@ -165,7 +165,7 @@ class JMSPermedInventory(JMSInventory):
             for my_asset in node_asset_map[node_key]:
                 asset_permed_accounts_mapper[my_asset].update(accounts)
 
-        accounts = Account.objects.filter(asset__in=asset_ids)
+        accounts = Account.objects.filter(asset__in=asset_ids, is_active=True)
         for account in accounts:
             if account.asset_id not in asset_permed_accounts_mapper:
                 continue
