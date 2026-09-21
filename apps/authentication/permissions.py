@@ -52,8 +52,12 @@ class UserConfirmation(permissions.BasePermission):
 
 class IsValidUserOrConnectionToken(IsValidUser):
     def has_permission(self, request, view):
-        return super().has_permission(request, view) \
-            or self.is_valid_connection_token(request)
+        if super().has_permission(request, view):
+            return True
+        # Connection tokens are bootstrap capabilities, not a user session.
+        if request.method not in permissions.SAFE_METHODS:
+            return False
+        return self.is_valid_connection_token(request)
 
     @staticmethod
     def is_valid_connection_token(request):
