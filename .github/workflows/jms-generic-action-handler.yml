@@ -7,12 +7,15 @@ on:
 
 name: JumpServer repos generic handler
 
+permissions:
+  contents: read
+
 jobs:
   handle_pull_request:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: jumpserver/action-generic-handler@master
+      - uses: jumpserver/action-generic-handler@35e782f25ac2f2d15e7ab7ec07b0ae6461138b0b # master
         env:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
           I18N_TOKEN: ${{ secrets.I18N_TOKEN }}
@@ -21,7 +24,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: jumpserver/action-generic-handler@master
+      - uses: jumpserver/action-generic-handler@35e782f25ac2f2d15e7ab7ec07b0ae6461138b0b # master
         env:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
           I18N_TOKEN: ${{ secrets.I18N_TOKEN }}
@@ -30,7 +33,7 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
-      - uses: jumpserver/action-generic-handler@master
+      - uses: jumpserver/action-generic-handler@35e782f25ac2f2d15e7ab7ec07b0ae6461138b0b # master
         env:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
           I18N_TOKEN: ${{ secrets.I18N_TOKEN }}

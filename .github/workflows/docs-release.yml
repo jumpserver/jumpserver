@@ -1,5 +1,8 @@
 name: Auto update docs changelog
 
+permissions:
+  contents: read
+
 on:
   release:
     types: [published]
@@ -15,16 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(inputs.tag_name || github.event.release.tag_name, 'v5.')
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout documentation
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: jumpservice/documentation
+          ref: b2314775d88e25f9bc6e546a9b05715a5b6c1062
+          token: ${{ secrets.DOCS_TOKEN }}
+          path: documentation
       - name: Update docs changelog
         env:
           TAG_NAME: ${{ inputs.tag_name || github.event.release.tag_name }}
-          DOCS_TOKEN: ${{ secrets.DOCS_TOKEN }}
         run: |
           git config --global user.name 'BaiJiangJie'
           git config --global user.email 'jiangjie.bai@fit2cloud.com'
 
-          git clone https://$DOCS_TOKEN@github.com/jumpservice/documentation.git
           cd documentation/utils
           bash update_changelog.sh

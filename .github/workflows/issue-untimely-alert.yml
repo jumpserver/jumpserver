@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check untimely issues and send msg
-        uses: jumpserver/action-issues-alert@master
+        uses: jumpserver/action-issues-alert@1dd2b999a14761d9442fb51a28b38acf0e485232 # master
         with:
           hook: ${{ secrets.WECHAT_GROUP_WEB_HOOK }}
           type: untimely
