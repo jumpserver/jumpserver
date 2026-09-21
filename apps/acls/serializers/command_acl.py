@@ -19,7 +19,12 @@ __all__ = [
 class CommandGroupSerializer(BulkOrgResourceModelSerializer):
     type = LabeledChoiceField(
         choices=CommandGroup.TypeChoices.choices, default=CommandGroup.TypeChoices.command,
-        label=_('Type')
+        label=_('Type'),
+        help_text=_(
+            'Use "command" for literal command names. Each line matches that '
+            'command as a standalone word anywhere in the input, so "rm" also '
+            'matches "rm -rf" and "sudo rm". Use "regex" only for custom patterns.'
+        ),
     )
 
     class Meta:
