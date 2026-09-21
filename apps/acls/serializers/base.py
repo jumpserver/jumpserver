@@ -108,7 +108,11 @@ class BaseUserACLSerializer(BaseACLSerializer):
 
 class BaseUserAssetAccountACLSerializer(BaseUserACLSerializer):
     assets = JSONManyToManyField(label=_('Asset'))
-    accounts = serializers.ListField(label=_('Account'))
+    accounts = serializers.ListField(
+        child=serializers.CharField(),
+        label=_('Account'),
+        help_text=_("Account usernames, or @ALL to match all accounts."),
+    )
 
     class Meta(BaseUserACLSerializer.Meta):
         fields = BaseUserACLSerializer.Meta.fields + ['assets', 'accounts', 'org_id']
