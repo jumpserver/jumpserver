@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -150,7 +151,7 @@ class ReportSerializer(serializers.ModelSerializer):
 
 
 class ReportViewSet(viewsets.ModelViewSet):
-    queryset = Report.objects.all().order_by('-date_created')
+    model = Report
     serializer_class = ReportSerializer
     permission_classes = [RBACPermission, IsValidLicense]
     rbac_perms = {
@@ -189,12 +190,13 @@ class ReportViewSet(viewsets.ModelViewSet):
             if lookup_value is None:
                 lookup_value = self.kwargs.get('pk')
             if lookup_value:
-                return Report.objects.filter(pk=lookup_value).values_list('tp', flat=True).first()
+                return get_object_or_404(self.get_queryset(), pk=lookup_value).tp
 
         return None
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        # OrgManager captures the current organization when constructing the query.
+        queryset = Report.objects.all().order_by('-date_created')
         tp = self.request.query_params.get('tp')
         if tp:
             queryset = queryset.filter(tp=tp)
