@@ -23,6 +23,8 @@ config.yml
 *.log
 host_rsa_key
 *.bat
+# applet 的卸载脚本要随应用包下发到发布机，不能忽略
+!apps/terminal/applets/*/*.bat
 tags
 jumpserver.iml
 .python-version

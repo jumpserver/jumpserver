@@ -1,0 +1,2 @@
+type: batch # exe, wmic, msi, batch
+path: uninstall.bat
