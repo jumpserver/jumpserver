@@ -21,6 +21,11 @@ class UserConfirmation(permissions.BasePermission):
             return True
 
         session = getattr(request, 'session', {})
+        if not request.user.is_authenticated or \
+                session.get('CONFIRM_USER_ID') != str(request.user.pk):
+            for key in ('CONFIRM_LEVEL', 'CONFIRM_TYPE', 'CONFIRM_TIME', 'CONFIRM_USER_ID'):
+                session.pop(key, None)
+            raise UserConfirmRequired(code=self.min_type)
         confirm_level = session.get('CONFIRM_LEVEL')
         confirm_type = session.get('CONFIRM_TYPE')
         confirm_time = session.get('CONFIRM_TIME')

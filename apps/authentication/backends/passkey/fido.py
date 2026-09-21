@@ -141,6 +141,9 @@ def auth_begin(request):
 
 
 def auth_complete(request):
+    state = request.session.pop('fido2_state', None)
+    if not state:
+        raise ValueError(_('No state found'))
     server = get_server(request)
     data = request.data.get("passkeys")
     data = json.loads(data)
@@ -151,7 +154,6 @@ def auth_complete(request):
         raise ValueError(_("This key is not registered"))
 
     credentials = [AttestedCredentialData(websafe_decode(key.token))]
-    state = request.session.get('fido2_state')
     server.authenticate_complete(state, credentials=credentials, response=data)
 
     request.session["passkey"] = '{}_{}'.format(key.id, key.name)

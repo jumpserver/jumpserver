@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth import user_logged_in, BACKEND_SESSION_KEY
+from django.contrib.auth import user_logged_in, user_logged_out, BACKEND_SESSION_KEY
 from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
@@ -10,6 +10,18 @@ from common.sessions.cache import user_session_manager
 from .signals import post_auth_failed, backend_auth_failed
 
 from .backends.oauth2_provider.signal_handlers import *
+
+
+@receiver(user_logged_in)
+@receiver(user_logged_out)
+def clear_user_confirmation(sender, request, **kwargs):
+    if request is None:
+        return
+    for key in (
+        'CONFIRM_LEVEL', 'CONFIRM_TYPE', 'CONFIRM_TIME', 'CONFIRM_USER_ID',
+        'passkey_confirm_mfa', 'fido2_state',
+    ):
+        request.session.pop(key, None)
 
 
 @receiver(user_logged_in)

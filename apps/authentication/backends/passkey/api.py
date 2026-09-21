@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
@@ -48,8 +49,12 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
     @action(methods=['get'], detail=False, url_path='login', permission_classes=[AllowAny])
     def login(self, request):
         confirm_mfa = request.GET.get('mfa')
+        request.session.pop('passkey_confirm_mfa', None)
+        request.session.pop('fido2_state', None)
         if confirm_mfa:
-            request.session['passkey_confirm_mfa'] = '1'
+            if not request.user.is_authenticated or settings.SAFE_MODE:
+                raise PermissionDenied(_('Auth failed'))
+            request.session['passkey_confirm_mfa'] = str(request.user.pk)
         return render(request, 'authentication/passkey.html', {})
 
     def redirect_to_error(self, error):
@@ -58,6 +63,15 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
 
     @action(methods=['get', 'post'], detail=False, url_path='auth', permission_classes=[AllowAny])
     def auth(self, request):
+        confirm_user_id = request.session.get('passkey_confirm_mfa')
+        if confirm_user_id and (
+            not request.user.is_authenticated or settings.SAFE_MODE
+            or confirm_user_id != str(request.user.pk)
+        ):
+            request.session.pop('passkey_confirm_mfa', None)
+            request.session.pop('fido2_state', None)
+            raise PermissionDenied(_('Auth failed'))
+
         if request.method == 'GET':
             auth_data = auth_begin(request)
             return JsonResponse(dict(auth_data))
@@ -70,13 +84,14 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
         if not user:
             return self.redirect_to_error(_('Auth failed'))
 
-        confirm_mfa = request.session.get('passkey_confirm_mfa')
-        # 如果开启了安全模式，Passkey 不能作为 MFA
-        if confirm_mfa and not settings.SAFE_MODE:
+        if confirm_user_id:
+            if user.pk != request.user.pk:
+                return self.redirect_to_error(_('Auth failed'))
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
             request.session['CONFIRM_TIME'] = int(time.time())
             request.session['CONFIRM_TYPE'] = ConfirmType.MFA
-            request.session['passkey_confirm_mfa'] = ''
+            request.session['CONFIRM_USER_ID'] = str(request.user.pk)
+            request.session.pop('passkey_confirm_mfa', None)
             return Response('ok')
 
         try:
