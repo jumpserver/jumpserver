@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from common.permissions import IsValidLicense
@@ -20,26 +21,32 @@ ALLOWED_REPORT_DAYS = {1, 7, 30}
 
 REPORT_TYPE_ACTION_PERMS = {
     'UserLoginReport': {
+        'view': 'rbac.view_userloginreport',
         'create': 'rbac.add_userloginreport',
         'delete': 'rbac.delete_userloginreport',
     },
     'UserChangePasswordReport': {
+        'view': 'rbac.view_userchangepasswordreport',
         'create': 'rbac.add_userchangepasswordreport',
         'delete': 'rbac.delete_userchangepasswordreport',
     },
     'AssetStatistics': {
+        'view': 'rbac.view_assetstatisticsreport',
         'create': 'rbac.add_assetstatisticsreport',
         'delete': 'rbac.delete_assetstatisticsreport',
     },
     'AssetReport': {
+        'view': 'rbac.view_assetactivityreport',
         'create': 'rbac.add_assetactivityreport',
         'delete': 'rbac.delete_assetactivityreport',
     },
     'AccountStatistics': {
+        'view': 'rbac.view_accountstatisticsreport',
         'create': 'rbac.add_accountstatisticsreport',
         'delete': 'rbac.delete_accountstatisticsreport',
     },
     'AccountAutomationReport': {
+        'view': 'rbac.view_accountautomationreport',
         'create': 'rbac.add_accountautomationreport',
         'delete': 'rbac.delete_accountautomationreport',
     },
@@ -172,7 +179,11 @@ class ReportViewSet(viewsets.ModelViewSet):
         report_type = self._resolve_report_type_for_permission()
         action_perms = REPORT_TYPE_ACTION_PERMS.get(report_type, {}) if isinstance(report_type, str) else {}
 
-        if action in ('create', 'update', 'partial_update') and action_perms.get('create'):
+        if action in ('retrieve', 'data'):
+            if not action_perms.get('view'):
+                raise PermissionDenied()
+            perms[action] = action_perms['view']
+        elif action in ('create', 'update', 'partial_update') and action_perms.get('create'):
             perms[action] = action_perms['create']
         elif action == 'destroy' and action_perms.get('delete'):
             perms[action] = action_perms['delete']
@@ -184,7 +195,7 @@ class ReportViewSet(viewsets.ModelViewSet):
         if action == 'create':
             return self.request.data.get('tp')
 
-        if action in ('update', 'partial_update', 'destroy'):
+        if action in ('retrieve', 'data', 'update', 'partial_update', 'destroy'):
             lookup_field = self.lookup_field or 'pk'
             lookup_value = self.kwargs.get(lookup_field)
             if lookup_value is None:
@@ -194,9 +205,17 @@ class ReportViewSet(viewsets.ModelViewSet):
 
         return None
 
+    def get_visible_report_types(self):
+        return [
+            report_type for report_type in CREATABLE_REPORT_TYPES
+            if self.request.user.has_perm(REPORT_TYPE_ACTION_PERMS[report_type]['view'])
+        ]
+
     def get_queryset(self):
         # OrgManager captures the current organization when constructing the query.
         queryset = Report.objects.all().order_by('-date_created')
+        if self.action in ('list', 'retrieve', 'data'):
+            queryset = queryset.filter(tp__in=self.get_visible_report_types())
         tp = self.request.query_params.get('tp')
         if tp:
             queryset = queryset.filter(tp=tp)
@@ -220,17 +239,18 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False, url_path='templates')
     def templates(self, request, *args, **kwargs):
-        return Response([build_template_item(report_type) for report_type in CREATABLE_REPORT_TYPES])
+        return Response([build_template_item(report_type) for report_type in self.get_visible_report_types()])
 
     @action(methods=['get'], detail=False, url_path='catalog')
     def catalog(self, request, *args, **kwargs):
-        custom_reports = Report.objects.filter(is_builtin=False).order_by('tp', 'name', '-date_created')
-        grouped = {report_type: [] for report_type in CREATABLE_REPORT_TYPES}
+        visible_types = self.get_visible_report_types()
+        custom_reports = Report.objects.filter(is_builtin=False, tp__in=visible_types).order_by('tp', 'name', '-date_created')
+        grouped = {report_type: [] for report_type in visible_types}
         for report in custom_reports:
             if report.tp in grouped:
                 grouped[report.tp].append(serialize_report_summary(report))
         data = []
-        for report_type in CREATABLE_REPORT_TYPES:
+        for report_type in visible_types:
             template = build_template_item(report_type)
             data.append({
                 'tp': report_type,
