@@ -30,6 +30,7 @@ def get_ssh_ca_client(config=None):
         role=getattr(config, 'SSH_CA_OPENBAO_ROLE', 'jumpserver'),
         timeout=getattr(config, 'SSH_CA_OPENBAO_TIMEOUT', 10),
         verify_tls=getattr(config, 'SSH_CA_OPENBAO_VERIFY_TLS', True),
+        ca_cert_file=getattr(config, 'SSH_CA_OPENBAO_CACERT_FILE', ''),
     )
 
 

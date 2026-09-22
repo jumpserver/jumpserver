@@ -28,6 +28,7 @@ class SSHCAOpenBaoTestingAPI(GenericAPIView):
             if name == 'SSH_CA_OPENBAO_TOKEN' and value in ('', None):
                 value = getattr(settings, name, None)
             data[name] = value
+        data['SSH_CA_OPENBAO_CACERT_FILE'] = settings.SSH_CA_OPENBAO_CACERT_FILE
 
         address_field = 'SSH_CA_OPENBAO_ADDR'
         if not data[address_field]:
