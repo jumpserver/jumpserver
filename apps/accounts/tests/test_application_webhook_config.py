@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.db import connection, transaction
 from django.test import SimpleTestCase
 
-from accounts.api.account.application import IntegrationApplicationViewSet
+from accounts.api.account.application import ApplicationWebhookViewSet
 from accounts.const import ApplicationEvent
 from accounts.models import ApplicationWebhook, IntegrationApplication
 from accounts.tests.base import CredentialTestCase
@@ -90,55 +90,48 @@ class ApplicationWebhookTemplateTests(SimpleTestCase):
 
 
 class ApplicationWebhookConfigAPITests(CredentialTestCase):
-    webhook_path = '/api/v1/accounts/integration-applications/{}/webhook/'
+    webhook_path = '/api/v1/accounts/application-webhooks/'
 
-    def call_webhook(self, method, data=None):
-        action = 'webhook' if method == 'get' else 'update_webhook'
-        view = IntegrationApplicationViewSet.as_view({method: action})
-        request = self.request(
-            method, self.webhook_path.format(self.application.id), data,
-        )
+    def create_webhook(self, **overrides):
+        data = {
+            'name': 'Operations notifications',
+            'applications': [str(self.application.id)],
+            'is_active': True,
+            'url': 'https://8.8.8.8/hooks/private-token',
+            'method': 'POST',
+            'headers': {'Authorization': 'Bearer private-header'},
+            'events': [ApplicationEvent.CREDENTIAL_UPDATED],
+            'body_template': {'event': '{{ event.code }}'},
+        }
+        data.update(overrides)
+        view = ApplicationWebhookViewSet.as_view({'post': 'create'})
         with transaction.atomic():
-            return view(request, pk=self.application.id)
+            return view(self.request('post', self.webhook_path, data))
 
-    def test_get_defaults_without_creating_configuration(self):
-        response = self.call_webhook('get')
-
+    def test_metadata_exposes_shared_events_and_template_variables(self):
+        view = ApplicationWebhookViewSet.as_view({'get': 'metadata'})
+        response = view(self.request('get', self.webhook_path + 'metadata/'))
         self.assertEqual(response.status_code, 200)
-        self.assertIsNone(response.data['id'])
-        self.assertFalse(response.data['is_active'])
-        self.assertEqual(response.data['method'], 'POST')
-        self.assertEqual(response.data['events'], list(ApplicationEvent.values))
-        self.assertNotIn('url', response.data)
-        self.assertNotIn('headers', response.data)
-        self.assertEqual(
-            set(response.data['template_variables'][0]),
-            {'name', 'label', 'default'},
-        )
-        self.assertFalse(ApplicationWebhook.objects.exists())
+        self.assertIn(ApplicationEvent.CREDENTIAL_UPDATED, {
+            item['value'] for item in response.data['event_options']
+        })
+        self.assertEqual(set(response.data['template_variables'][0]), {'name', 'label', 'default'})
 
     def test_sensitive_configuration_is_excluded_from_global_operate_logs(self):
         self.assertNotIn('ApplicationWebhook', MODELS_NEED_RECORD)
 
-    def test_invalid_patch_does_not_persist_default_row(self):
-        response = self.call_webhook('patch', {'is_active': True})
-
+    def test_applications_and_active_url_are_required(self):
+        response = self.create_webhook(applications=[])
         self.assertEqual(response.status_code, 400)
         self.assertFalse(ApplicationWebhook.objects.exists())
+        response = self.create_webhook(url='')
+        self.assertEqual(response.status_code, 400)
 
-    def test_configuration_is_unique_rbac_protected_and_org_scoped(self):
-        ApplicationWebhook.objects.create(application=self.application)
-        self.assertTrue(ApplicationWebhook._meta.get_field('application').unique)
-
+    def test_rules_are_rbac_protected_and_org_scoped(self):
         user = User.objects.create(username='webhook-no-permission', name='No permission')
-        view = IntegrationApplicationViewSet.as_view({'get': 'webhook'})
+        view = ApplicationWebhookViewSet.as_view({'get': 'list'})
         with transaction.atomic():
-            response = view(
-                self.request(
-                    'get', self.webhook_path.format(self.application.id), user=user,
-                ),
-                pk=self.application.id,
-            )
+            response = view(self.request('get', self.webhook_path, user=user))
         self.assertEqual(response.status_code, 403)
 
         other_org = Organization.objects.create(name='Webhook isolated org')
@@ -146,32 +139,23 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
             other_application = IntegrationApplication.objects.create(
                 name='isolated-application', secret='isolated-secret',
             )
+            other_webhook = ApplicationWebhook.objects.create(name='Isolated')
+            other_webhook.applications.add(other_application)
+        view = ApplicationWebhookViewSet.as_view({'get': 'retrieve'})
         with transaction.atomic():
-            response = view(
-                self.request('get', self.webhook_path.format(other_application.id)),
-                pk=other_application.id,
-            )
+            response = view(self.request('get', self.webhook_path), pk=other_webhook.id)
         self.assertEqual(response.status_code, 404)
 
-    def test_patch_encrypts_secrets_masks_response_and_omission_retains_values(self):
-        payload = {
-            'is_active': True,
-            'url': 'https://8.8.8.8/hooks/private-token',
-            'method': 'PATCH',
-            'headers': {'Authorization': 'Bearer private-header'},
-            'events': ['rotation.failed'],
-            'body_template': {'text': '{{ event.code }}: {{ application.name }}'},
-        }
-        response = self.call_webhook('patch', payload)
-
-        self.assertEqual(response.status_code, 200)
+    def test_create_encrypts_secrets_masks_response_and_patch_retains_values(self):
+        response = self.create_webhook()
+        self.assertEqual(response.status_code, 201, response.data)
         self.assertNotIn('url', response.data)
         self.assertNotIn('headers', response.data)
         self.assertEqual(response.data['url_display'], 'https://8.8.8.8/***')
         self.assertEqual(response.data['header_names'], ['Authorization'])
-        webhook = ApplicationWebhook.objects.get(application=self.application)
-        self.assertEqual(webhook.url, payload['url'])
-        self.assertEqual(webhook.headers, payload['headers'])
+        webhook = ApplicationWebhook.objects.get(pk=response.data['id'])
+        self.assertEqual(webhook.url, 'https://8.8.8.8/hooks/private-token')
+        self.assertEqual(webhook.headers, {'Authorization': 'Bearer private-header'})
         with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT url, headers FROM accounts_applicationwebhook WHERE id = %s',
@@ -181,40 +165,37 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
         self.assertNotIn('private-token', raw_url)
         self.assertNotIn('private-header', raw_headers)
 
-        response = self.call_webhook('patch', {'method': 'POST'})
+        view = ApplicationWebhookViewSet.as_view({'patch': 'partial_update'})
+        response = view(self.request('patch', self.webhook_path, {'method': 'PATCH'}), pk=webhook.id)
         self.assertEqual(response.status_code, 200)
         webhook.refresh_from_db()
-        self.assertEqual(webhook.url, payload['url'])
-        self.assertEqual(webhook.headers, payload['headers'])
+        self.assertEqual(webhook.url, 'https://8.8.8.8/hooks/private-token')
+        self.assertEqual(webhook.headers, {'Authorization': 'Bearer private-header'})
 
-    def test_preview_and_test_use_unsaved_configuration(self):
-        preview = IntegrationApplicationViewSet.as_view({'post': 'webhook_preview'})
-        request = self.request('post', self.webhook_path.format(self.application.id) + 'preview/', {
-            'event': 'credential.published',
+    def test_preview_and_test_saved_rule(self):
+        created = self.create_webhook()
+        webhook_id = created.data['id']
+        preview = ApplicationWebhookViewSet.as_view({'post': 'preview'})
+        request = self.request('post', self.webhook_path + 'preview/', {
+            'event': ApplicationEvent.CREDENTIAL_UPDATED,
             'body_template': {
                 'event': '{{ event.code }}',
                 'revision': '{{ credential.revision }}',
             },
         })
-        response = preview(request, pk=self.application.id)
+        response = preview(request, pk=webhook_id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['body']['event'], 'credential.published')
+        self.assertEqual(response.data['body']['event'], ApplicationEvent.CREDENTIAL_UPDATED)
         self.assertEqual(response.data['body']['revision'], 1)
 
-        test = IntegrationApplicationViewSet.as_view({'post': 'webhook_test'})
-        request = self.request('post', self.webhook_path.format(self.application.id) + 'test/', {
-            'url': 'https://8.8.8.8/hook',
-            'method': 'POST',
-            'headers': {'X-Target': 'test'},
-            'events': ['credential.published'],
-            'event': 'credential.published',
-            'body_template': {'event': '{{ event.code }}'},
+        test = ApplicationWebhookViewSet.as_view({'post': 'test_webhook'})
+        request = self.request('post', self.webhook_path + 'test/', {
+            'event': ApplicationEvent.CREDENTIAL_UPDATED,
         })
         with patch(
             'accounts.credential_client.webhook_delivery.send_webhook', return_value=204,
         ) as sender:
-            response = test(request, pk=self.application.id)
+            response = test(request, pk=webhook_id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'success': True, 'status_code': 204, 'reason': ''})
-        self.assertEqual(sender.call_args.args[3], {'event': 'credential.published'})
-        self.assertFalse(ApplicationWebhook.objects.exists())
+        self.assertEqual(sender.call_args.args[3], {'event': ApplicationEvent.CREDENTIAL_UPDATED})

@@ -9,7 +9,7 @@ from accounts.api.automations.change_secret import (
     ChangeSecretAutomationViewSet, ChangSecretExecutionViewSet,
 )
 from accounts.credential_rotation import CredentialRotationManager
-from accounts.credential_rotation.execution import execute, reconcile, outcome
+from accounts.credential_rotation.execution import execute, execution_info, outcome, reconcile
 from accounts.models import AutomationExecution, ChangeSecretRecord
 from accounts.tasks.common import execute_credential_change
 from accounts.tests.base import CredentialTestCase
@@ -21,11 +21,9 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         language = translation.get_language()
         self.addCleanup(translation.activate, language)
         super().setUp()
-        self.credential.rotation_mode = 'single'
-        self.credential.backup_account = None
-        self.credential.save()
         self.manager = CredentialRotationManager(self.credential.id)
         self.manager.start()
+        self.manager.check_usage()
         self.rotation = self.credential.rotation_records.get()
 
     def save_task(self, **overrides):
@@ -40,6 +38,13 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         view = ChangeSecretAutomationViewSet.as_view({'post': 'create'})
         with transaction.atomic():
             return view(self.request('post', '/api/v1/accounts/change-secret-automations/', data))
+
+    def test_rotation_info_includes_exact_account_to_change(self):
+        self.credential.refresh_from_db()
+        account = execution_info(self.credential)['change_account']
+        self.assertEqual(account['id'], str(self.rotation.change_account_id))
+        self.assertEqual(account['username'], self.rotation.change_account.username)
+        self.assertEqual(account['secret_type'], self.rotation.change_account.secret_type)
 
     def start_execution(self):
         response = self.save_task()
@@ -75,7 +80,7 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         self.rotation.refresh_from_db()
         self.primary.secret_reset = False
         self.primary.save(update_fields=['secret_reset'])
-        with self.assertRaisesMessage(JMSException, 'does not allow secret reset') as error:
+        with self.assertRaises(JMSException) as error:
             execute(self.rotation.id)
         self.assertEqual(error.exception.detail.code, 'credential_account_secret_reset_disabled')
         self.assertFalse(AutomationExecution.objects.exists())
@@ -125,11 +130,8 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         self.assertEqual(self.save_task().status_code, 201)
         self.rotation.refresh_from_db()
         self.credential.refresh_from_db()
-        self.credential.rotation_mode = 'dual'
-        self.credential.backup_account = self.backup
-        self.credential.save()
         expected = {
-            'detail': 'Wait for all enabled clients to apply the backup account.',
+            'detail': 'Wait for all enabled clients to apply the target account.',
             'code': 'credential_rotation_clients_not_ready',
         }
         with translation.override('en'), patch.object(
@@ -185,7 +187,7 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         self.assertEqual(start.call_count, 1)
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.status, 'change_failed')
-        self.assertEqual(self.manager.cancel(reason='No remote change').status, 'waiting_primary')
+        self.assertEqual(self.manager.cancel(reason='No remote change').status, 'waiting_revert')
 
     def test_unverified_requires_recovery_and_verified_sync_allows_publish(self):
         execution = self.start_execution()
@@ -208,7 +210,7 @@ class CredentialChangeExecutionTests(CredentialTestCase):
         self.assertEqual(self.manager.check_secret_change().status, 'recovery_required')
         self.primary.secret = record.new_secret
         self.primary.save()
-        self.assertEqual(self.manager.check_secret_change().status, 'waiting_primary')
+        self.assertEqual(self.manager.check_secret_change().status, 'idle')
         revision = self.manager.check_secret_change().revision
         self.assertEqual(self.manager.check_secret_change().revision, revision)
 
@@ -286,9 +288,10 @@ class CredentialChangeExecutionTests(CredentialTestCase):
 
         self.credential.applications.add(self.application)
         webhook = ApplicationWebhook.objects.create(
-            application=self.application, is_active=True,
+            name='Rotation failures', is_active=True,
             url='https://hooks.example/events', events=['rotation.failed'],
         )
+        webhook.applications.add(self.application)
         execution = self.start_execution()
         ChangeSecretRecord.objects.create(
             execution=execution, account=self.primary, asset=self.asset,

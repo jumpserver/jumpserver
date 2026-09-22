@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-09 10:08+0800\n"
+"POT-Creation-Date: 2026-09-22 15:30+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -27,45 +27,99 @@ msgstr "账号已存在"
 msgid "No valid assets found for account creation."
 msgstr "未找到可用于创建账户的有效资产。"
 
-#: accounts/api/account/application.py:55
-msgid "Application credentials currently support the Python SDK only."
-msgstr ""
+#: accounts/api/account/application.py:60
+msgid "Credential policies currently support the Python SDK only."
+msgstr "凭据策略目前仅支持 Python SDK。"
 
-#: accounts/api/account/application.py:99
+#: accounts/api/account/application.py:104
 #: authentication/api/connection_token.py:943
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: accounts/api/account/credential.py:54
-msgid "A rotating application credential cannot be deleted."
-msgstr "组织存在资源 ({}) 不能被删除"
+#: accounts/api/account/application.py:144
+msgid "Select a supported webhook event."
+msgstr "请选择受支持的 Webhook 事件。"
 
-#: accounts/api/account/credential.py:56
+#: accounts/api/account/application.py:147
+#: accounts/serializers/account/credential.py:144
+#: accounts/serializers/account/service.py:185
+msgid "Select at least one application."
+msgstr "请至少选择一个应用。"
+
+#: accounts/api/account/application.py:169
+msgid "URL is required to test the webhook."
+msgstr "测试 Webhook 时 URL 为必填项。"
+
+#: accounts/api/account/application.py:171
+msgid "Select one of the subscribed webhook events."
+msgstr "请选择已订阅的 Webhook 事件。"
+
+#: accounts/api/account/credential.py:67
+msgid "The credential client request date is invalid."
+msgstr "凭据客户端请求日期无效。"
+
+#: accounts/api/account/credential.py:71
+msgid "The credential client request has expired."
+msgstr "凭据客户端请求已过期。"
+
+#: accounts/api/account/credential.py:79
+msgid "The credential client request body is invalid."
+msgstr "凭据客户端请求体无效。"
+
+#: accounts/api/account/credential.py:87
+msgid "The credential client request ID is invalid."
+msgstr "凭据客户端请求 ID 无效。"
+
+#: accounts/api/account/credential.py:96
+msgid "Credential client replay protection is unavailable."
+msgstr "凭据客户端重放保护不可用。"
+
+#: accounts/api/account/credential.py:101
+msgid "The credential client request has already been used."
+msgstr "凭据客户端请求已被使用。"
+
+#: accounts/api/account/credential.py:136
+msgid "A rotating credential policy cannot be deleted."
+msgstr "轮换中的凭据策略不能删除。"
+
+#: accounts/api/account/credential.py:138
 msgid ""
 "Remove this credential from client access configurations before deleting it."
-msgstr ""
+msgstr "删除前请先从客户端接入配置中移除此凭据策略。"
 
-#: accounts/api/account/credential.py:116
-msgid "An application cannot be unbound during rotation."
-msgstr ""
-
-#: accounts/api/account/credential.py:118
-msgid ""
-"Remove the credential from client access configurations before unbinding it."
-msgstr ""
-
-#: accounts/api/account/credential.py:142
-msgid "An online client cannot be deleted."
-msgstr "无法删除此文件"
+#: accounts/api/account/credential.py:219
+msgid "No active rotation."
+msgstr "没有进行中的轮换。"
 
 #: accounts/api/account/credential.py:244
+msgid "An application cannot be unbound during rotation."
+msgstr "轮换期间不能解绑应用。"
+
+#: accounts/api/account/credential.py:246
+msgid ""
+"Remove the credential from client access configurations before unbinding it."
+msgstr "解绑前请先从客户端接入配置中移除此凭据策略。"
+
+#: accounts/api/account/credential.py:271
+msgid "An online client cannot be deleted."
+msgstr "不能删除在线客户端。"
+
+#: accounts/api/account/credential.py:276
+msgid "Disable the rotating client with a reason before deleting it."
+msgstr "删除前请先禁用该轮换客户端并填写原因。"
+
+#: accounts/api/account/credential.py:300
+msgid "The client protocol or configuration format is not supported."
+msgstr "不支持该客户端协议或配置格式。"
+
+#: accounts/api/account/credential.py:392
 msgid ""
 "Disable the client configuration instead of deleting it during rotation."
-msgstr ""
+msgstr "轮换期间请禁用客户端接入配置，不要将其删除。"
 
 #: accounts/api/account/personal.py:92
 msgid "Inactive personal credentials cannot be tested"
-msgstr ""
+msgstr "不能测试已禁用的个人凭据"
 
 #: accounts/api/account/template.py:23 assets/api/asset/asset.py:83
 #: assets/serializers/asset/common.py:148 assets/serializers/platform.py:175
@@ -81,6 +135,10 @@ msgstr "协议"
 #, python-brace-format
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
+
+#: accounts/api/automations/base.py:125
+msgid "Invalid automation task type."
+msgstr "无效的数据"
 
 #: accounts/api/automations/change_secret.py:143
 #: accounts/api/automations/change_secret.py:170
@@ -178,71 +236,75 @@ msgstr "已备份 %(count)s 个账号"
 msgid "Duration: %(duration)s seconds"
 msgstr "耗时：%(duration)s 秒"
 
-#: accounts/automations/base/manager.py:87
+#: accounts/automations/base/manager.py:88
 #, python-format
 msgid "Targets: %(accounts)s account(s) on %(assets)s asset(s)"
 msgstr "目标：%(accounts)s 个账号，涉及 %(assets)s 台资产"
 
-#: accounts/automations/base/manager.py:190
+#: accounts/automations/base/manager.py:201
 #, python-format
 msgid "△ %(host)s: operation completed; verification pending"
 msgstr "△ %(host)s：操作已完成，新凭据验证待确认"
 
-#: accounts/automations/base/manager.py:195
+#: accounts/automations/base/manager.py:206
 msgid "secret changed and verified"
 msgstr "改密成功，新凭据验证通过"
 
-#: accounts/automations/base/manager.py:197
+#: accounts/automations/base/manager.py:208
 msgid "account pushed and verified"
 msgstr "账号推送成功，新凭据验证通过"
 
-#: accounts/automations/base/manager.py:198
+#: accounts/automations/base/manager.py:209
 #: assets/automations/base/manager.py:686
 #, python-format
 msgid "✓ %(host)s: %(result)s"
 msgstr "✓ %(host)s：%(result)s"
 
-#: accounts/automations/base/manager.py:265
+#: accounts/automations/base/manager.py:276
 msgid "No privileged account"
 msgstr "未找到特权账号"
 
-#: accounts/automations/base/manager.py:321
+#: accounts/automations/base/manager.py:332
 msgid "Windows does not support SSH key authentication"
 msgstr "Windows 不支持 SSH 密钥认证"
 
-#: accounts/automations/base/manager.py:338
+#: accounts/automations/base/manager.py:349
 msgid "No pending accounts found"
 msgstr "未找到待处理帐户"
 
-#: accounts/automations/base/manager.py:345
+#: accounts/automations/base/manager.py:356
 #, python-format
 msgid "○ %(asset)s: skipped; no eligible accounts"
 msgstr "○ %(asset)s：已跳过，没有符合条件的待处理账号"
 
-#: accounts/automations/base/manager.py:367
+#: accounts/automations/base/manager.py:378
 #, python-format
 msgid "Account is already being processed, skipping: %(account)s"
 msgstr "账号正在处理中，已跳过：%(account)s"
 
-#: accounts/automations/base/manager.py:396
+#: accounts/automations/base/manager.py:407
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "账号不存在、已停用或不符合此任务的条件"
 
-#: accounts/automations/base/manager.py:527
+#: accounts/automations/base/manager.py:447
+msgid "This account belongs to an active credential policy rotation."
+msgstr "该账号属于进行中的凭据策略轮换。"
+
+#: accounts/automations/base/manager.py:555
 #, python-format
 msgid ""
 "The remote secret may have changed, but the independent credential "
 "verification was inconclusive: %(code)s"
 msgstr "远端凭据可能已更改，但独立凭据验证未能得出明确结论：%(code)s"
 
-#: accounts/automations/base/manager.py:603
+#: accounts/automations/base/manager.py:631
 #, python-format
 msgid ""
 "The remote operation completed, but saving the local account result failed: "
 "%(error)s"
 msgstr "远端操作已完成，但保存本地账号结果失败：%(error)s"
 
-#: accounts/automations/base/manager.py:711
+#: accounts/automations/base/manager.py:741
 msgid "Task ended before the account received a final result"
 msgstr "任务结束时账号尚未收到最终结果"
 
@@ -361,7 +423,7 @@ msgid "Checking gateway account connectivity"
 msgstr "正在检查网关账号连通性"
 
 #: accounts/const/account.py:6
-#: accounts/serializers/automations/change_secret.py:38
+#: accounts/serializers/automations/change_secret.py:39
 #: audits/auth_backends.py:16 authentication/confirm/password.py:25
 #: authentication/confirm/password.py:27 authentication/const.py:14
 #: authentication/forms.py:28
@@ -381,7 +443,7 @@ msgid "Password"
 msgstr "密码"
 
 #: accounts/const/account.py:7
-#: accounts/serializers/automations/change_secret.py:39
+#: accounts/serializers/automations/change_secret.py:40
 #: authentication/models/ssh_key.py:27 terminal/serializers/storage.py:124
 msgid "SSH key"
 msgstr "SSH 密钥"
@@ -449,8 +511,8 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:35 accounts/const/automation.py:116
-#: accounts/models/credential.py:304
-#: accounts/serializers/automations/change_secret.py:205 audits/const.py:66
+#: accounts/models/credential.py:333
+#: accounts/serializers/automations/change_secret.py:275 audits/const.py:66
 #: audits/signal_handlers/activity_log.py:34 common/const/choices.py:67
 #: ops/const.py:77 ops/templates/ops/celery_task_log.html:772
 #: terminal/const.py:81 xpack/plugins/cloud/const.py:55
@@ -461,101 +523,133 @@ msgstr "失败"
 msgid "Administrator"
 msgstr "超级管理员"
 
-#: accounts/const/application.py:7 accounts/models/credential.py:185
+#: accounts/const/application.py:7 accounts/models/credential.py:162
 msgid "SDK"
-msgstr ""
+msgstr "SDK"
 
-#: accounts/const/application.py:8 accounts/models/credential.py:186
+#: accounts/const/application.py:8 accounts/models/credential.py:163
 msgid "Agent"
-msgstr ""
+msgstr "Agent"
 
 #: accounts/const/application.py:9
 msgid "JumpServer"
-msgstr "服务端地址"
+msgstr "JumpServer"
 
 #: accounts/const/application.py:13
 msgid "Configuration created"
-msgstr "耗时范围"
+msgstr "接入配置已创建"
 
-#: accounts/const/application.py:14
+#: accounts/const/application.py:14 accounts/const/application.py:39
 msgid "Configuration updated"
-msgstr "截止日期"
+msgstr "接入配置已更新"
 
 #: accounts/const/application.py:15
 msgid "Configuration deleted"
-msgstr "账号已删除"
+msgstr "接入配置已删除"
 
 #: accounts/const/application.py:16
 msgid "Authorization granted"
-msgstr "授权端点地址"
+msgstr "账号授权已授予"
 
 #: accounts/const/application.py:17
 msgid "Authorization revoked"
-msgstr "授权端点地址"
+msgstr "账号授权已撤销"
 
 #: accounts/const/application.py:18
 msgid "Client registered"
-msgstr "此密钥未注册"
+msgstr "客户端已注册"
 
 #: accounts/const/application.py:19
 msgid "Client enabled"
-msgstr "启用资产探活"
+msgstr "客户端已启用"
 
 #: accounts/const/application.py:20
 msgid "Client disabled"
-msgstr "Ansible 已禁用"
+msgstr "客户端已禁用"
 
 #: accounts/const/application.py:21
 msgid "Credential fetched"
-msgstr "凭证 ID"
+msgstr "凭据已获取"
 
 #: accounts/const/application.py:22
 msgid "Credential confirmed"
-msgstr "凭证 ID"
+msgstr "凭据已确认"
 
-#: accounts/const/application.py:23 accounts/const/application.py:34
+#: accounts/const/application.py:23
 msgid "Credential published"
-msgstr "凭证 ID"
+msgstr "凭据已发布"
 
 #: accounts/const/application.py:24
-msgid "Secret change finished"
-msgstr "最近改密失败"
+msgid "Credential stream connected"
+msgstr "凭据事件流已连接"
 
 #: accounts/const/application.py:25
+msgid "Credential stream disconnected"
+msgstr "凭据事件流已断开"
+
+#: accounts/const/application.py:26
+msgid "Secret change started"
+msgstr "改密已开始"
+
+#: accounts/const/application.py:27
+msgid "Secret change completed"
+msgstr "改密已完成"
+
+#: accounts/const/application.py:28 accounts/models/credential.py:29
+msgid "Secret change failed"
+msgstr "最近改密失败"
+
+#: accounts/const/application.py:29
 msgid "Application secret reset"
 msgstr "重置应用密钥"
 
-#: accounts/const/application.py:26
+#: accounts/const/application.py:30 accounts/const/application.py:43
 msgid "Rotation started"
-msgstr "任务未开始"
+msgstr "轮换已开始"
 
-#: accounts/const/application.py:27
+#: accounts/const/application.py:31
 msgid "Rotation step"
-msgstr "旋转 (度)"
+msgstr "轮换步骤"
 
-#: accounts/const/application.py:28 accounts/models/credential.py:63
+#: accounts/const/application.py:32 accounts/models/credential.py:59
 msgid "Rotation cancelled"
-msgstr ""
+msgstr "轮换已取消"
 
-#: accounts/const/application.py:29
-msgid "Subscription snapshot"
-msgstr "订阅 ID"
-
-#: accounts/const/application.py:30
+#: accounts/const/application.py:33
 msgid "Application notification"
-msgstr "通知管理"
-
-#: accounts/const/application.py:35
-msgid "Credential unavailable"
-msgstr "账号无效"
-
-#: accounts/const/application.py:36
-msgid "Rotation failed"
-msgstr "认证失败"
+msgstr "应用事件通知"
 
 #: accounts/const/application.py:37
-msgid "Access revoked"
-msgstr "访问令牌"
+msgid "Credential updated"
+msgstr "凭据已更新"
+
+#: accounts/const/application.py:38
+msgid "Credential revoked"
+msgstr "凭据已撤销"
+
+#: accounts/const/application.py:40
+msgid "Credential change started"
+msgstr "凭据改密已开始"
+
+#: accounts/const/application.py:41
+msgid "Credential change completed"
+msgstr "凭据改密已完成"
+
+#: accounts/const/application.py:42
+msgid "Credential change failed"
+msgstr "凭据改密失败"
+
+#: accounts/const/application.py:44
+msgid "Rotation waiting for application"
+msgstr "轮换正在等待应用确认"
+
+#: accounts/const/application.py:45
+msgid "Rotation completed"
+msgstr "轮换已完成"
+
+#: accounts/const/application.py:46
+msgid "Rotation failed"
+msgstr "轮换失败"
 
 #: accounts/const/automation.py:25 assets/automations/base/manager.py:663
 #: rbac/tree.py:56
@@ -588,8 +682,7 @@ msgstr "验证网关账号"
 msgid "Check account"
 msgstr "检查账号"
 
-#: accounts/const/automation.py:32 accounts/models/credential.py:49
-#: accounts/serializers/account/credential.py:31 rbac/tree.py:54
+#: accounts/const/automation.py:32 rbac/tree.py:54
 msgid "Backup account"
 msgstr "账号备份"
 
@@ -674,8 +767,8 @@ msgstr "邮箱"
 msgid "SFTP"
 msgstr "SFTP"
 
-#: accounts/const/automation.py:115 accounts/models/credential.py:303
-#: accounts/serializers/automations/change_secret.py:202 audits/const.py:65
+#: accounts/const/automation.py:115 accounts/models/credential.py:332
+#: accounts/serializers/automations/change_secret.py:272 audits/const.py:65
 #: audits/models.py:73 audits/signal_handlers/activity_log.py:34
 #: common/const/choices.py:66 ops/const.py:75 ops/serializers/celery.py:45
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
@@ -689,7 +782,7 @@ msgid "Pending"
 msgstr "待定的"
 
 #: accounts/const/automation.py:118
-#: accounts/serializers/automations/change_secret.py:204
+#: accounts/serializers/automations/change_secret.py:274
 msgid "Unverified"
 msgstr "未校验"
 
@@ -782,110 +875,249 @@ msgstr "Azure Key Vault"
 msgid "Amazon Secrets Manager"
 msgstr "Amazon Secrets Manager"
 
-#: accounts/credential_client/audit_signals.py:165
-#: accounts/serializers/account/credential.py:322
+#: accounts/credential_client/audit_signals.py:218
+msgid "Delete the linked rotation tasks before deleting this credential."
+msgstr "删除此凭据策略前，请先删除关联的轮换任务。"
+
+#: accounts/credential_client/audit_signals.py:233
+msgid "An active rotation task or execution cannot be deleted."
+msgstr "不能删除进行中的轮换任务或执行记录。"
+
+#: accounts/credential_client/audit_signals.py:250
+#: accounts/serializers/account/credential.py:521
 msgid "Explain why the rotating credential should stop participating."
-msgstr ""
+msgstr "请说明轮换中的凭据停止参与的原因。"
 
-#: accounts/credential_client/manager.py:39
+#: accounts/credential_client/manager.py:42
 msgid "The Agent client instance is disabled."
-msgstr ""
+msgstr "Agent 客户端实例已禁用。"
 
-#: accounts/credential_client/manager.py:44
 #: accounts/credential_client/manager.py:47
+#: accounts/credential_client/manager.py:50
 msgid "This field is required for SDK access."
 msgstr "该字段是必填项。"
 
-#: accounts/credential_client/manager.py:54
+#: accounts/credential_client/manager.py:57
 msgid "The SDK client access configuration is disabled or invalid."
-msgstr ""
+msgstr "SDK 客户端接入配置已禁用或无效。"
 
-#: accounts/credential_client/manager.py:62
+#: accounts/credential_client/manager.py:65
 msgid "The SDK client instance is disabled."
-msgstr ""
-
-#: accounts/credential_client/manager.py:74
-msgid "Application credential not found."
-msgstr "账号未找到"
+msgstr "SDK 客户端实例已禁用。"
 
 #: accounts/credential_client/manager.py:77
-msgid "The client access configuration does not include this credential."
-msgstr ""
+#: accounts/credential_client/manager.py:87
+msgid "Credential policy not found."
+msgstr "未找到凭据策略。"
 
 #: accounts/credential_client/manager.py:80
+msgid "The client access configuration does not include this credential."
+msgstr "客户端接入配置未包含此凭据策略。"
+
+#: accounts/credential_client/manager.py:83
+msgid "The credential policy is not bound to this application."
+msgstr "凭据策略未绑定到此应用。"
+
+#: accounts/credential_client/manager.py:93
+#: accounts/credential_client/manager.py:122
+msgid "The application is not authorized for this credential account."
+msgstr "企业应用未授权所选应用凭据关联的全部账号。"
+
+#: accounts/credential_client/manager.py:98
 msgid "The application is not authorized for every credential account."
 msgstr "企业应用未授权所选应用凭据关联的全部账号。"
 
-#: accounts/credential_client/manager.py:90
+#: accounts/credential_client/manager.py:114
 msgid ""
-"The account secret is changing. Retry after the new revision is published."
-msgstr ""
+"The client access configuration does not include an active credential update "
+"subscription."
+msgstr "客户端接入配置未包含启用的凭据更新订阅。"
 
-#: accounts/credential_client/manager.py:173
-#: accounts/credential_client/manager.py:177
+#: accounts/credential_client/manager.py:186
+msgid "Credential update subscriptions do not require confirmation."
+msgstr "凭据更新订阅不需要确认。"
+
+#: accounts/credential_client/manager.py:195
+#: accounts/credential_client/manager.py:199
 msgid "Fetch the credential before confirming it."
-msgstr ""
+msgstr "请先获取凭据，再确认版本。"
 
-#: accounts/credential_client/manager.py:175
+#: accounts/credential_client/manager.py:197
 msgid "The credential revision is no longer current."
-msgstr ""
+msgstr "该凭据版本已不是当前版本。"
 
-#: accounts/credential_client/manager.py:226
+#: accounts/credential_client/manager.py:295
+msgid "Agent synchronization requires an Agent client."
+msgstr "Agent 同步需要使用 Agent 客户端。"
+
+#: accounts/credential_client/manager.py:366
 msgid "Invalid or expired registration token."
-msgstr "可以失效连接令牌"
+msgstr "注册令牌无效或已过期。"
 
-#: accounts/credential_client/manager.py:240
+#: accounts/credential_client/manager.py:380
 msgid "Client access configuration not found."
-msgstr ""
+msgstr "未找到客户端接入配置。"
 
-#: accounts/credential_client/manager.py:244
-msgid "Registration token has already been used."
-msgstr ""
-
-#: accounts/credential_client/manager.py:251
-msgid "Enable the disabled client instance before registering it again."
-msgstr ""
-
-#: accounts/credential_client/manager.py:282
-msgid "The client access configuration is disabled."
-msgstr ""
-
-#: accounts/credential_rotation/manager.py:25
-msgid "Only active rotation credentials can rotate."
-msgstr ""
-
-#: accounts/credential_rotation/manager.py:28
-msgid "The application credential is already rotating."
-msgstr ""
-
-#: accounts/credential_rotation/manager.py:61
-msgid "The application credential is not waiting for the backup account."
-msgstr "企业应用未授权所选应用凭据关联的全部账号。"
-
-#: accounts/credential_rotation/manager.py:74
-msgid "The application credential is not ready for secret change."
-msgstr "企业应用未授权所选应用凭据关联的全部账号。"
-
-#: accounts/credential_rotation/manager.py:77
-msgid "Wait for all enabled clients to apply the backup account."
-msgstr ""
-
-#: accounts/credential_rotation/manager.py:85
-msgid "No secret change is running for this credential."
-msgstr ""
-
-#: accounts/credential_rotation/manager.py:104
+#: accounts/credential_client/manager.py:386
 msgid ""
-"The primary account secret has not been changed and verified successfully."
-msgstr "你的账号已创建成功"
+"This client instance already exists. Reuse its local configuration. If that "
+"configuration was lost, review and remove the unused instance or choose a "
+"different instance ID; registration will not replace its identity."
+msgstr ""
+"此客户端实例已存在。请复用其本地配置。若配置已丢失，请检查并移除未使用的实"
+"例，或使用其他实例 ID；重新注册不会替换其身份。"
 
-#: accounts/credential_rotation/manager.py:124
-msgid "The application credential is not waiting for the primary account."
-msgstr "企业应用未授权所选应用凭据关联的全部账号。"
+#: accounts/credential_client/manager.py:392
+msgid ""
+"Registration token has already been used. Check whether the instance was "
+"created before generating a new token."
+msgstr "注册令牌已被使用。生成新令牌前，请先检查实例是否已创建。"
 
-#: accounts/credential_rotation/manager.py:155
+#: accounts/credential_client/manager.py:432
+msgid "The client access configuration is disabled."
+msgstr "客户端接入配置已禁用。"
+
+#: accounts/credential_client/manager.py:437
+#: accounts/serializers/account/credential.py:552
+msgid "SDK access configurations cannot mix credential policy modes."
+msgstr "SDK 接入配置不能混合选择不同模式的凭据策略。"
+
+#: accounts/credential_rotation/execution.py:29
+msgid "This rotation is no longer active."
+msgstr "此轮换已不再进行。"
+
+#: accounts/credential_rotation/execution.py:43
+#: accounts/credential_rotation/manager.py:104
+msgid "Wait for all enabled clients to apply the target account."
+msgstr "请等待所有已启用客户端应用目标账号。"
+
+#: accounts/credential_rotation/execution.py:57
+msgid ""
+"A rotation task must target only the account being replaced, run once, and "
+"verify the secret after changing it."
+msgstr "轮换任务只能针对待替换账号执行一次，并在改密后验证凭据。"
+
+#: accounts/credential_rotation/execution.py:87
+msgid "Only a confirmed unchanged secret can be retried; provide a reason."
+msgstr "仅确认凭据未变化后才能重试，并需填写原因。"
+
+#: accounts/credential_rotation/execution.py:89
+#: accounts/credential_rotation/manager.py:101
+msgid "The credential policy is not ready for secret change."
+msgstr "凭据策略尚未进入可改密状态。"
+
+#: accounts/credential_rotation/execution.py:93
+msgid "Save a change secret task for this rotation before executing it."
+msgstr "执行前请先保存此轮换的改密任务。"
+
+#: accounts/credential_rotation/execution.py:95
+msgid "The rotation task is inactive or belongs to another organization."
+msgstr "轮换任务已禁用或属于其他组织。"
+
+#: accounts/credential_rotation/execution.py:100
+msgid ""
+"The account version changed outside this rotation; verification is required."
+msgstr "账号版本在本轮换之外发生了变化，需要重新验证。"
+
+#: accounts/credential_rotation/execution.py:225
+msgid "The execution result requires verification."
+msgstr "执行结果需要验证。"
+
+#: accounts/credential_rotation/manager.py:52
+msgid "The alternating account configuration is incomplete."
+msgstr "交替账号配置不完整。"
+
+#: accounts/credential_rotation/manager.py:89
+msgid "The credential policy is not waiting for the account switch."
+msgstr "凭据策略当前未等待账号切换。"
+
+#: accounts/credential_rotation/manager.py:125
+msgid "No secret change is running for this credential policy."
+msgstr "此凭据策略没有进行中的改密。"
+
+#: accounts/credential_rotation/manager.py:175
+msgid "The credential policy is not waiting for account reversion."
+msgstr "凭据策略当前未等待账号切回。"
+
+#: accounts/credential_rotation/manager.py:189
+msgid "Verify that the secret is unchanged and provide a cancellation reason."
+msgstr "请确认凭据未变化并填写取消原因。"
+
+#: accounts/credential_rotation/manager.py:195
 msgid "This credential rotation cannot be cancelled."
-msgstr "当前组织 ({}) 不能被删除"
+msgstr "此凭据轮换不能取消。"
+
+#: accounts/credential_rotation/preflight.py:21
+msgid ""
+"Target account verification failed. The current account remains published."
+msgstr "目标账号验证失败，当前账号保持发布状态。"
+
+#: accounts/credential_rotation/preflight.py:22
+msgid ""
+"Target account verification timed out. Retry verification; rotation has not "
+"started."
+msgstr "目标账号验证超时。请重试验证，轮换尚未开始。"
+
+#: accounts/credential_rotation/preflight.py:23
+msgid ""
+"The account or credential changed during verification. Start verification "
+"again."
+msgstr "验证期间账号或凭据发生变化，请重新开始验证。"
+
+#: accounts/credential_rotation/preflight.py:24
+msgid "Unable to dispatch target account verification. Please retry."
+msgstr "无法下发目标账号验证任务，请重试。"
+
+#: accounts/credential_rotation/preflight.py:33
+#, python-brace-format
+msgid ""
+"Account \"{name}\" does not allow secret reset. Enable secret reset before "
+"starting rotation."
+msgstr "账号“{name}”不允许重置凭据，请启用凭据重置后再开始轮换。"
+
+#: accounts/credential_rotation/preflight.py:46
+#, python-brace-format
+msgid ""
+"This account is already used by credential policy \"{name}\". Choose another "
+"account or reuse that credential policy."
+msgstr "该账号已被凭据策略“{name}”使用，请选择其他账号或复用该凭据策略。"
+
+#: accounts/credential_rotation/preflight.py:57
+msgid "Only active, idle alternating rotation policies can start rotation."
+msgstr "只有已启用且空闲的双账号交替轮换策略可以开始轮换。"
+
+#: accounts/credential_rotation/preflight.py:60
+msgid "The rotation account configuration is incomplete."
+msgstr "轮换账号配置不完整。"
+
+#: accounts/credential_rotation/preflight.py:66
+msgid ""
+"The initial and alternate accounts must be different and use the same asset "
+"and secret type."
+msgstr "初始账号和交替账号必须不同，且属于同一资产并使用相同凭据类型。"
+
+#: accounts/credential_rotation/preflight.py:71
+msgid ""
+"The rotation accounts and asset must belong to the credential organization."
+msgstr "轮换账号和资产必须属于凭据策略所在组织。"
+
+#: accounts/credential_rotation/preflight.py:73
+#, python-brace-format
+msgid "Account \"{name}\" or its asset is disabled."
+msgstr "账号“{name}”或其资产已禁用。"
+
+#: accounts/credential_rotation/preflight.py:75
+#, python-brace-format
+msgid "Account \"{name}\" has no password or key."
+msgstr "账号“{name}”没有密码或密钥。"
+
+#: accounts/credential_rotation/preflight.py:85
+msgid "An account change is already running. Wait before starting rotation."
+msgstr "账号改密正在进行中，请等待完成后再开始轮换。"
+
+#: accounts/credential_rotation/preflight.py:153
+msgid "The verification task name is already in use."
+msgstr "验证任务名称已被使用。"
 
 #: accounts/exceptions.py:9
 msgid ""
@@ -907,7 +1139,7 @@ msgstr "Vault 中未找到密钥，本地同步标记已保留。"
 msgid ""
 "SSH certificate signing is unavailable. Please retry or contact your "
 "administrator."
-msgstr ""
+msgstr "SSH 证书签名不可用，请重试或联系管理员。"
 
 #: accounts/filters.py:93 accounts/filters.py:126 accounts/filters.py:273
 #: accounts/filters.py:292 perms/filters.py:180 terminal/filters.py:42
@@ -944,8 +1176,8 @@ msgstr "平台类别"
 msgid "Platform type"
 msgstr "平台类型"
 
-#: accounts/filters.py:146 accounts/models/account.py:103
-#: accounts/serializers/account/account.py:230
+#: accounts/filters.py:146 accounts/models/account.py:110
+#: accounts/serializers/account/account.py:230 accounts/webhooks.py:47
 #: users/models/user/__init__.py:135
 msgid "Source"
 msgstr "来源"
@@ -996,7 +1228,7 @@ msgstr "长期未验证"
 #: accounts/filters.py:382 accounts/models/automations/change_secret.py:49
 #: accounts/models/automations/check_account.py:73
 #: accounts/models/automations/gather_account.py:26
-#: accounts/models/credential.py:58 accounts/models/credential.py:305
+#: accounts/models/credential.py:57 accounts/models/credential.py:334
 #: accounts/serializers/automations/check_account.py:40
 #: assets/models/automations/base.py:147
 #: assets/serializers/automations/base.py:47 audits/filters.py:126
@@ -1039,17 +1271,17 @@ msgstr "任务 ID"
 msgid "Task name"
 msgstr "任务名称"
 
-#: accounts/models/account.py:91
+#: accounts/models/account.py:98
 #: accounts/models/automations/check_account.py:59
 #: accounts/models/automations/gather_account.py:17
 #: accounts/models/personal.py:21 accounts/personal_credentials.py:108
 #: accounts/serializers/account/account.py:228
 #: accounts/serializers/account/account.py:296
-#: accounts/serializers/account/credential.py:37
+#: accounts/serializers/account/credential.py:67
 #: accounts/serializers/account/personal.py:24
-#: accounts/serializers/automations/change_secret.py:145
-#: accounts/serializers/automations/change_secret.py:179
-#: accounts/serializers/automations/change_secret.py:222
+#: accounts/serializers/automations/change_secret.py:215
+#: accounts/serializers/automations/change_secret.py:249
+#: accounts/serializers/automations/change_secret.py:292
 #: accounts/serializers/automations/check_account.py:34
 #: accounts/serializers/automations/gather_account.py:60
 #: accounts/templates/accounts/asset_account_change_info.html:7
@@ -1074,7 +1306,7 @@ msgstr "任务名称"
 msgid "Asset"
 msgstr "资产"
 
-#: accounts/models/account.py:95 accounts/models/template.py:16
+#: accounts/models/account.py:102 accounts/models/template.py:16
 #: accounts/serializers/account/account.py:235
 #: accounts/serializers/account/account.py:307
 #: accounts/serializers/account/template.py:35
@@ -1082,47 +1314,48 @@ msgstr "资产"
 msgid "Su from"
 msgstr "切换自"
 
-#: accounts/models/account.py:97 accounts/models/personal.py:33
+#: accounts/models/account.py:104 accounts/models/personal.py:33
 #: assets/const/protocol.py:195 settings/serializers/auth/cas.py:25
 #: terminal/models/applet/applet.py:39
 #: terminal/models/virtualapp/virtualapp.py:22
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:100
+#: accounts/models/account.py:107
 msgid "historical Account"
 msgstr "历史账号"
 
-#: accounts/models/account.py:102
+#: accounts/models/account.py:109
 msgid "Secret reset"
 msgstr "可改密"
 
-#: accounts/models/account.py:104
+#: accounts/models/account.py:111
 msgid "Source ID"
 msgstr "来源 ID"
 
-#: accounts/models/account.py:105
+#: accounts/models/account.py:112
 msgid "Date last access"
 msgstr "上次访问日期"
 
-#: accounts/models/account.py:106
+#: accounts/models/account.py:113
 msgid "Access by"
 msgstr "访问方式"
 
-#: accounts/models/account.py:107
+#: accounts/models/account.py:114
 msgid "Date change secret"
 msgstr "密码日期"
 
-#: accounts/models/account.py:109
+#: accounts/models/account.py:116
 msgid "Change secret status"
 msgstr "改密状态"
 
-#: accounts/models/account.py:113
+#: accounts/models/account.py:120
 #: accounts/models/automations/check_account.py:64
-#: accounts/serializers/account/account.py:297
-#: accounts/serializers/account/service.py:17
-#: accounts/serializers/automations/change_secret.py:147
-#: accounts/serializers/automations/change_secret.py:180
+#: accounts/models/credential.py:42 accounts/serializers/account/account.py:297
+#: accounts/serializers/account/credential.py:57
+#: accounts/serializers/account/service.py:22
+#: accounts/serializers/automations/change_secret.py:217
+#: accounts/serializers/automations/change_secret.py:250
 #: acls/serializers/base.py:111
 #: acls/templates/acls/asset_login_reminder.html:11
 #: assets/serializers/gateway.py:33 audits/models.py:68 audits/models.py:389
@@ -1138,42 +1371,42 @@ msgstr "改密状态"
 msgid "Account"
 msgstr "账号"
 
-#: accounts/models/account.py:119
+#: accounts/models/account.py:126
 msgid "Can view asset account secret"
 msgstr "可以查看资产账号密码"
 
-#: accounts/models/account.py:120
+#: accounts/models/account.py:127
 msgid "Can view asset history account"
 msgstr "可以查看资产历史账号"
 
-#: accounts/models/account.py:121
+#: accounts/models/account.py:128
 msgid "Can view asset history account secret"
 msgstr "可以查看资产历史账号密码"
 
-#: accounts/models/account.py:122
+#: accounts/models/account.py:129
 msgid "Can verify account"
 msgstr "可以验证账号"
 
-#: accounts/models/account.py:123
+#: accounts/models/account.py:130
 msgid "Can push account"
 msgstr "可以推送账号"
 
-#: accounts/models/account.py:124
+#: accounts/models/account.py:131
 msgid "Can remove account"
 msgstr "可以移除账号"
 
-#: accounts/models/account.py:125
+#: accounts/models/account.py:132
 msgid "Can view session"
 msgstr "账号会话"
 
-#: accounts/models/account.py:126
+#: accounts/models/account.py:133
 msgid "Can view activity"
 msgstr "账号活动"
 
-#: accounts/models/application.py:16
-#: accounts/models/automations/check_account.py:118 accounts/models/base.py:63
-#: accounts/models/credential.py:35 accounts/models/credential.py:274
-#: accounts/serializers/account/service.py:34
+#: accounts/models/application.py:17 accounts/models/application.py:90
+#: accounts/models/automations/check_account.py:118 accounts/models/base.py:68
+#: accounts/models/credential.py:33 accounts/models/credential.py:269
+#: accounts/serializers/account/service.py:39
 #: accounts/serializers/account/virtual.py:20 acls/models/base.py:35
 #: acls/models/base.py:96 acls/models/command_acl.py:21
 #: acls/models/data_masking.py:20 acls/notifications.py:69
@@ -1215,13 +1448,13 @@ msgstr "账号活动"
 msgid "Name"
 msgstr "名称"
 
-#: accounts/models/application.py:18 settings/serializers/auth/oauth2.py:25
+#: accounts/models/application.py:19 settings/serializers/auth/oauth2.py:25
 #: xpack/plugins/interface/templates/login_i18n.html:9
 msgid "Logo"
 msgstr "图标"
 
-#: accounts/models/application.py:20 accounts/models/base.py:39
-#: accounts/models/credential.py:200 accounts/models/mixins/vault.py:76
+#: accounts/models/application.py:21 accounts/models/base.py:44
+#: accounts/models/credential.py:177 accounts/models/mixins/vault.py:76
 #: accounts/serializers/account/account.py:501
 #: accounts/serializers/account/base.py:22
 #: accounts/serializers/account/personal.py:28
@@ -1231,7 +1464,7 @@ msgstr "图标"
 msgid "Secret"
 msgstr "密文"
 
-#: accounts/models/application.py:21 acls/models/base.py:98
+#: accounts/models/application.py:22 acls/models/base.py:98
 #: assets/models/automations/base.py:22 assets/models/cmd_filter.py:38
 #: assets/serializers/asset/common.py:149
 #: assets/serializers/asset/common.py:493 perms/filters.py:186
@@ -1240,22 +1473,23 @@ msgstr "密文"
 msgid "Accounts"
 msgstr "账号"
 
-#: accounts/models/application.py:22 authentication/models/access_key.py:21
+#: accounts/models/application.py:23 authentication/models/access_key.py:21
 #: terminal/models/component/endpoint.py:109
 msgid "IP group"
 msgstr "IP 组"
 
-#: accounts/models/application.py:23
+#: accounts/models/application.py:24
 #: authentication/backends/passkey/models.py:14
 #: authentication/models/access_key.py:25
 #: authentication/models/private_token.py:8 authentication/models/ssh_key.py:20
 msgid "Date last used"
 msgstr "最后使用日期"
 
-#: accounts/models/application.py:24 accounts/models/credential.py:70
-#: accounts/models/credential.py:202 accounts/models/credential.py:286
-#: accounts/models/personal.py:32 acls/models/base.py:43
-#: assets/models/asset/common.py:215 authentication/models/access_key.py:24
+#: accounts/models/application.py:25 accounts/models/application.py:95
+#: accounts/models/credential.py:66 accounts/models/credential.py:188
+#: accounts/models/credential.py:290 accounts/models/personal.py:32
+#: acls/models/base.py:43 assets/models/asset/common.py:215
+#: authentication/models/access_key.py:24
 #: authentication/models/connection_token.py:71
 #: authentication/models/ssh_key.py:13 authentication/serializers/ssh_key.py:23
 #: authentication/templates/authentication/_access_key_modal.html:32
@@ -1265,9 +1499,41 @@ msgstr "最后使用日期"
 msgid "Active"
 msgstr "激活中"
 
-#: accounts/models/application.py:28
+#: accounts/models/application.py:29
 msgid "Integration App"
 msgstr "集成应用"
+
+#: accounts/models/application.py:93 accounts/models/credential.py:73
+#: accounts/serializers/account/credential.py:72
+#: accounts/serializers/account/service.py:128
+msgid "Integration applications"
+msgstr "集成应用"
+
+#: accounts/models/application.py:96 settings/serializers/auth/sms.py:106
+#: terminal/notifications.py:307
+msgid "URL"
+msgstr "URL"
+
+#: accounts/models/application.py:99 settings/serializers/auth/oauth2.py:46
+#: settings/serializers/auth/oidc.py:32 settings/serializers/auth/sms.py:111
+msgid "Request method"
+msgstr "请求方法"
+
+#: accounts/models/application.py:101
+msgid "Request headers"
+msgstr "请求头"
+
+#: accounts/models/application.py:102
+msgid "Events"
+msgstr "事件"
+
+#: accounts/models/application.py:104
+msgid "Body template"
+msgstr "请求体模板"
+
+#: accounts/models/application.py:109
+msgid "Application webhook"
+msgstr "应用 Webhook"
 
 #: accounts/models/automations/backup_account.py:27
 msgid "Backup type"
@@ -1304,73 +1570,74 @@ msgstr "文件加密密码"
 msgid "Account backup plan"
 msgstr "账号备份计划"
 
-#: accounts/models/automations/base.py:18
+#: accounts/models/automations/base.py:26
 msgid "Account automation task"
 msgstr "账号自动化任务"
 
-#: accounts/models/automations/base.py:32
+#: accounts/models/automations/base.py:40
 msgid "Automation execution"
 msgstr "自动化执行"
 
-#: accounts/models/automations/base.py:33
+#: accounts/models/automations/base.py:41
 msgid "Automation executions"
 msgstr "自动化执行"
 
-#: accounts/models/automations/base.py:35
+#: accounts/models/automations/base.py:43
 msgid "Can view change secret execution"
 msgstr "查看改密执行"
 
-#: accounts/models/automations/base.py:36
+#: accounts/models/automations/base.py:44
 msgid "Can add change secret execution"
 msgstr "创建改密执行"
 
-#: accounts/models/automations/base.py:38
+#: accounts/models/automations/base.py:46
 msgid "Can view gather accounts execution"
 msgstr "查看账号发现执行"
 
-#: accounts/models/automations/base.py:39
+#: accounts/models/automations/base.py:47
 msgid "Can add gather accounts execution"
 msgstr "创建账号发现执行"
 
-#: accounts/models/automations/base.py:41
+#: accounts/models/automations/base.py:49
 msgid "Can view push account execution"
 msgstr "查看推送账号执行"
 
-#: accounts/models/automations/base.py:42
+#: accounts/models/automations/base.py:50
 msgid "Can add push account execution"
 msgstr "创建推送账号执行"
 
-#: accounts/models/automations/base.py:44
+#: accounts/models/automations/base.py:52
 msgid "Can view backup account execution"
 msgstr "可以查看备份账号执行情况"
 
-#: accounts/models/automations/base.py:45
+#: accounts/models/automations/base.py:53
 msgid "Can add backup account execution"
 msgstr "可以添加备份账号执行"
 
-#: accounts/models/automations/base.py:63
+#: accounts/models/automations/base.py:71
 msgid "SSH key change strategy"
 msgstr "SSH 密钥推送方式"
 
-#: accounts/models/automations/base.py:67
+#: accounts/models/automations/base.py:75
 msgid "Check connection after change"
 msgstr "更改后检查连接"
 
 #: accounts/models/automations/change_secret.py:17
 #: accounts/models/automations/check_account.py:19
 #: accounts/models/automations/gather_account.py:117
-#: accounts/serializers/automations/change_secret.py:63
+#: accounts/serializers/automations/change_secret.py:132
 #: settings/serializers/auth/ldap.py:112
 #: settings/serializers/auth/ldap_ha.py:94 settings/serializers/msg.py:54
 msgid "Recipient"
 msgstr "收件人"
 
 #: accounts/models/automations/change_secret.py:24
+#: accounts/models/credential.py:305
 msgid "Change secret automation"
 msgstr "自动化改密"
 
 #: accounts/models/automations/change_secret.py:47
-#: accounts/models/credential.py:306 assets/models/automations/base.py:155
+#: accounts/models/credential.py:335 assets/models/automations/base.py:155
 #: ops/models/base.py:56 ops/models/celery.py:90 ops/models/job.py:282
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
@@ -1465,7 +1732,7 @@ msgid "Long time no change"
 msgstr "长时间未改密"
 
 #: accounts/models/automations/check_account.py:61
-#: accounts/models/automations/gather_account.py:18 accounts/models/base.py:64
+#: accounts/models/automations/gather_account.py:18 accounts/models/base.py:69
 #: accounts/models/personal.py:23 accounts/personal_credentials.py:112
 #: accounts/serializers/account/virtual.py:21
 #: accounts/templates/accounts/change_secret_report.html:80
@@ -1592,33 +1859,33 @@ msgstr "推送密文记录"
 msgid "Verify asset account"
 msgstr "账号验证"
 
-#: accounts/models/base.py:37 accounts/models/base.py:66
+#: accounts/models/base.py:42 accounts/models/base.py:71
 #: accounts/models/personal.py:26 accounts/personal_credentials.py:116
 #: accounts/serializers/account/account.py:500
 #: accounts/serializers/account/base.py:19
 #: accounts/serializers/account/personal.py:33
-#: accounts/serializers/automations/change_secret.py:52
+#: accounts/serializers/automations/change_secret.py:120
 #: authentication/serializers/connect_token_secret.py:45
 #: authentication/serializers/connect_token_secret.py:55
 #: terminal/serializers/storage.py:140
 msgid "Secret type"
 msgstr "密文类型"
 
-#: accounts/models/base.py:42
-#: accounts/serializers/automations/change_secret.py:45
+#: accounts/models/base.py:47
+#: accounts/serializers/automations/change_secret.py:113
 msgid "Secret strategy"
 msgstr "密文策略"
 
-#: accounts/models/base.py:44 accounts/serializers/account/template.py:32
-#: accounts/serializers/automations/change_secret.py:51
+#: accounts/models/base.py:49 accounts/serializers/account/template.py:32
+#: accounts/serializers/automations/change_secret.py:119
 msgid "Password rules"
 msgstr "密码规则"
 
-#: accounts/models/base.py:68
+#: accounts/models/base.py:73
 msgid "Privileged"
 msgstr "特权账号"
 
-#: accounts/models/base.py:69 assets/models/automations/base.py:28
+#: accounts/models/base.py:74 assets/models/automations/base.py:28
 #: assets/models/cmd_filter.py:39 assets/models/label.py:22
 #: audits/filters.py:54 authentication/serializers/connect_token_secret.py:132
 #: reports/models.py:18 terminal/models/applet/applet.py:44
@@ -1627,48 +1894,95 @@ msgid "Is active"
 msgstr "激活"
 
 #: accounts/models/credential.py:21
-msgid "Fixed account"
-msgstr "失败账号"
+msgid "Credential update subscription"
+msgstr "凭据更新订阅"
 
 #: accounts/models/credential.py:22
-msgid "Account rotation"
-msgstr "账号版本"
+msgid "Alternating dual-account rotation"
+msgstr "双账号交替轮换"
 
 #: accounts/models/credential.py:25
-msgid "Single account"
-msgstr "失败账号"
+msgid "Idle"
+msgstr "空闲"
 
 #: accounts/models/credential.py:26
-msgid "Dual accounts"
-msgstr "虚拟账号"
+msgid "Waiting for account switch"
+msgstr "等待账号切换"
 
-#: accounts/models/credential.py:29
-msgid "Idle"
-msgstr ""
-
-#: accounts/models/credential.py:30
-msgid "Waiting for backup account"
-msgstr "备份账号数量"
-
-#: accounts/models/credential.py:31
+#: accounts/models/credential.py:27
 msgid "Ready for secret change"
-msgstr "长期未改密"
+msgstr "等待改密"
 
-#: accounts/models/credential.py:32
+#: accounts/models/credential.py:28
 msgid "Changing secret"
 msgstr "改密"
 
-#: accounts/models/credential.py:33
-msgid "Waiting for primary account"
-msgstr "创建目标账号"
+#: accounts/models/credential.py:30
+msgid "Recovery required"
+msgstr "需要恢复"
 
-#: accounts/models/credential.py:36 assets/models/node.py:588
+#: accounts/models/credential.py:31
+msgid "Waiting for account revert"
+msgstr "等待账号切回"
+
+#: accounts/models/credential.py:34 assets/models/node.py:588
 #: perms/models/perm_node.py:28
 msgid "Key"
 msgstr "键"
 
-#: accounts/models/credential.py:37 accounts/models/credential.py:198
-#: accounts/models/credential.py:279
+#: accounts/models/credential.py:37
+msgid "Mode"
+msgstr "模式"
+
+#: accounts/models/credential.py:47
+#: accounts/serializers/account/credential.py:61
+msgid "Alternate account"
+msgstr "交替账号"
+
+#: accounts/models/credential.py:52
+#: accounts/serializers/account/credential.py:65
+msgid "Active account"
+msgstr "当前账号"
+
+#: accounts/models/credential.py:54
+msgid "Revision"
+msgstr "版本"
+
+#: accounts/models/credential.py:61
+msgid "Date rotation started"
+msgstr "轮换开始时间"
+
+#: accounts/models/credential.py:64
+msgid "Date last rotated"
+msgstr "最近轮换时间"
+
+#: accounts/models/credential.py:69 accounts/models/credential.py:310
+msgid "Change secret execution"
+msgstr "创建改密执行"
+
+#: accounts/models/credential.py:79 accounts/models/credential.py:144
+#: accounts/models/credential.py:314
+#: accounts/serializers/account/credential.py:281
+#: accounts/serializers/account/credential.py:404
+msgid "Credential policy"
+msgstr "凭据策略"
+
+#: accounts/models/credential.py:148 accounts/models/credential.py:169
+#: accounts/models/credential.py:272
+#: accounts/serializers/account/credential.py:307
+#: accounts/serializers/account/credential.py:408
+msgid "Integration application"
+msgstr "集成应用"
+
+#: accounts/models/credential.py:154
+msgid "Credential application binding"
+msgstr "凭据应用绑定"
+
+#: accounts/models/credential.py:173 accounts/models/credential.py:295
+msgid "Client access configuration"
+msgstr "客户端接入配置"
+
+#: accounts/models/credential.py:175 accounts/models/credential.py:274
 #: accounts/serializers/account/account.py:208 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:22 assets/models/automations/base.py:27
 #: assets/models/automations/base.py:156 assets/models/cmd_filter.py:74
@@ -1689,169 +2003,180 @@ msgstr "键"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/models/credential.py:40
-msgid "Rotation mode"
-msgstr "旋转 (度)"
-
-#: accounts/models/credential.py:44
-#: accounts/serializers/account/credential.py:27
-msgid "Primary account"
-msgstr "验证账号"
-
-#: accounts/models/credential.py:53
-#: accounts/serializers/account/credential.py:35
-msgid "Published account"
-msgstr "账号推送"
-
-#: accounts/models/credential.py:55
-msgid "Revision"
-msgstr "版本"
-
-#: accounts/models/credential.py:61
-msgid "Primary version at start"
-msgstr ""
-
-#: accounts/models/credential.py:65
-msgid "Date rotation started"
-msgstr "任务未开始"
-
-#: accounts/models/credential.py:68
-msgid "Date last rotated"
-msgstr "最后使用日期"
-
-#: accounts/models/credential.py:73
-msgid "Change secret execution"
-msgstr "创建改密执行"
-
-#: accounts/models/credential.py:77
-#: accounts/serializers/account/credential.py:42
-msgid "Integration applications"
-msgstr "集成应用 ID"
-
-#: accounts/models/credential.py:83 accounts/models/credential.py:166
-#: accounts/models/credential.py:300
-#: accounts/serializers/account/credential.py:155
-#: accounts/serializers/account/credential.py:205
-msgid "Application credential"
-msgstr "应用用户"
-
-#: accounts/models/credential.py:170 accounts/models/credential.py:192
-#: accounts/models/credential.py:277
-#: accounts/serializers/account/credential.py:178
-#: accounts/serializers/account/credential.py:209
-msgid "Integration application"
-msgstr "集成应用 ID"
-
-#: accounts/models/credential.py:176
-msgid "Credential application binding"
-msgstr "虚拟应用发布"
-
-#: accounts/models/credential.py:196 accounts/models/credential.py:291
-msgid "Client access configuration"
-msgstr "客户端连接"
-
-#: accounts/models/credential.py:199 xpack/plugins/cloud/filters.py:37
+#: accounts/models/credential.py:176 xpack/plugins/cloud/filters.py:37
 msgid "Instance ID"
 msgstr "实例 ID"
 
-#: accounts/models/credential.py:201 accounts/models/credential.py:258
-msgid "Date last seen"
+#: accounts/models/credential.py:178
+msgid "Client version"
+msgstr "客户端版本"
+
+#: accounts/models/credential.py:179
+msgid "Protocol version"
+msgstr "协议版本"
+
+#: accounts/models/credential.py:181
+msgid "Configuration schema version"
+msgstr "配置结构版本"
+
+#: accounts/models/credential.py:183
+msgid "Configuration digest"
+msgstr "配置摘要"
+
+#: accounts/models/credential.py:184
+msgid "Sync status"
+msgstr "同步状态"
+
+#: accounts/models/credential.py:185
+msgid "Sync error"
+msgstr "同步错误"
+
+#: accounts/models/credential.py:186
+msgid "Date last synced"
 msgstr "最后同步日期"
 
-#: accounts/models/credential.py:207
-msgid "Credential client instance"
-msgstr ""
+#: accounts/models/credential.py:187 accounts/models/credential.py:245
+msgid "Date last seen"
+msgstr "最近在线时间"
 
-#: accounts/models/credential.py:240
+#: accounts/models/credential.py:193
+msgid "Credential client instance"
+msgstr "凭据客户端实例"
+
+#: accounts/models/credential.py:226
 msgid "Application binding"
 msgstr "应用绑定"
 
-#: accounts/models/credential.py:244
+#: accounts/models/credential.py:230
 msgid "Client instance"
 msgstr "客户端实例"
 
-#: accounts/models/credential.py:246
+#: accounts/models/credential.py:232
 msgid "Fetched revision"
 msgstr "已获取版本"
 
-#: accounts/models/credential.py:255
+#: accounts/models/credential.py:233
 msgid "Delivered revision"
 msgstr "已交付版本"
 
-#: accounts/models/credential.py:247
+#: accounts/models/credential.py:234
 msgid "Applied revision"
 msgstr "已应用版本"
 
-#: accounts/models/credential.py:250
-#: accounts/serializers/account/credential.py:157
+#: accounts/models/credential.py:237
+#: accounts/serializers/account/credential.py:283
 msgid "Applied account"
 msgstr "已应用账号"
 
-#: accounts/models/credential.py:253
+#: accounts/models/credential.py:240
 msgid "Required revision"
 msgstr "要求版本"
 
-#: accounts/models/credential.py:256
+#: accounts/models/credential.py:243
 msgid "Rotation participant"
 msgstr "轮换参与者"
 
-#: accounts/models/credential.py:259
+#: accounts/models/credential.py:246
 msgid "Date fetched"
 msgstr "获取时间"
 
-#: accounts/models/credential.py:269
+#: accounts/models/credential.py:247
 msgid "Date delivered"
 msgstr "交付时间"
 
-#: accounts/models/credential.py:260
+#: accounts/models/credential.py:248
 msgid "Date applied"
 msgstr "应用时间"
 
-#: accounts/models/credential.py:265
+#: accounts/models/credential.py:253
 msgid "Credential client status"
 msgstr "凭据客户端状态"
 
-#: accounts/models/credential.py:272
-msgid "Event notifications"
-msgstr "通知"
+#: accounts/models/credential.py:261
+msgid "JSON files"
+msgstr "JSON 文件"
 
-#: accounts/models/credential.py:273
-msgid "Notification URL"
-msgstr "通知"
+#: accounts/models/credential.py:262
+msgid "Environment files"
+msgstr "环境变量文件"
 
-#: accounts/models/credential.py:281
-msgid "Application credentials"
-msgstr "无效的证书"
+#: accounts/models/credential.py:263
+msgid "Unix socket"
+msgstr "Unix 套接字"
 
-#: accounts/models/credential.py:283 users/serializers/preference/lina.py:64
+#: accounts/models/credential.py:266
+msgid "Reload"
+msgstr "重新加载"
+
+#: accounts/models/credential.py:267
+msgid "Restart"
+msgstr "重启"
+
+#: accounts/models/credential.py:276
+msgid "Credential policies"
+msgstr "凭据策略"
+
+#: accounts/models/credential.py:278 users/serializers/preference/lina.py:64
 #: users/serializers/profile.py:76
 msgid "Language"
 msgstr "语言"
 
-#: accounts/models/credential.py:284
+#: accounts/models/credential.py:279
 msgid "Application user"
 msgstr "应用用户"
 
-#: accounts/models/credential.py:285
+#: accounts/models/credential.py:280
 msgid "Install path"
-msgstr "安装应用"
+msgstr "安装路径"
 
-#: accounts/models/credential.py:303 common/const/choices.py:65 ops/const.py:74
+#: accounts/models/credential.py:283
+msgid "Delivery mode"
+msgstr "交付方式"
+
+#: accounts/models/credential.py:285
+msgid "Systemd unit"
+msgstr "Systemd 单元"
+
+#: accounts/models/credential.py:288
+msgid "Systemd action"
+msgstr "Systemd 操作"
+
+#: accounts/models/credential.py:318
+msgid "Source account"
+msgstr "来源账号"
+
+#: accounts/models/credential.py:322
+msgid "Target account"
+msgstr "目标账号"
+
+#: accounts/models/credential.py:326
+msgid "Account to change"
+msgstr "待改密账号"
+
+#: accounts/models/credential.py:329
+msgid "Account version at start"
+msgstr "账号版本"
+
+#: accounts/models/credential.py:332 common/const/choices.py:65 ops/const.py:74
 #: ops/templates/ops/celery_task_log.html:770
 msgid "Running"
 msgstr "运行中"
 
-#: accounts/models/credential.py:304
+#: accounts/models/credential.py:333
 msgid "Cancelled"
 msgstr "取消"
 
-#: accounts/models/credential.py:310
+#: accounts/models/credential.py:337
+msgid "Participant snapshot"
+msgstr "参与实例快照"
+
+#: accounts/models/credential.py:342
 msgid "Credential rotation record"
-msgstr "凭据验证通过"
+msgstr "凭据轮换记录"
 
 #: accounts/models/personal.py:17
 msgid "Owner"
-msgstr ""
+msgstr "所有者"
 
 #: accounts/models/personal.py:30 accounts/serializers/account/personal.py:37
 #: authentication/models/connection_token.py:58
@@ -1971,7 +2296,7 @@ msgstr "账号变更信息"
 msgid "Change secret or push account failed information"
 msgstr "改密或推送账号失败信息"
 
-#: accounts/personal_credentials.py:104
+#: accounts/personal_credentials.py:104 accounts/webhooks.py:40
 #: authentication/backends/passkey/models.py:15
 msgid "Credential ID"
 msgstr "凭证 ID"
@@ -2018,16 +2343,16 @@ msgstr "凭据验证通过"
 #: accounts/personal_credentials.py:231
 msgid ""
 "Personal credential verification does not allow custom automation methods"
-msgstr ""
+msgstr "个人凭据验证不允许使用自定义自动化方式"
 
 #: accounts/personal_credentials.py:262
 msgid ""
 "The configured credential verification method does not support this protocol"
-msgstr ""
+msgstr "配置的凭据验证方式不支持此协议"
 
 #: accounts/personal_credentials.py:279
 msgid "Secret type is not supported by this protocol"
-msgstr ""
+msgstr "此协议不支持该凭据类型"
 
 #: accounts/personal_credentials.py:307 accounts/personal_credentials.py:343
 #: accounts/serializers/account/personal.py:183
@@ -2035,7 +2360,6 @@ msgid "Personal credential not found"
 msgstr "未找到接收人"
 
 #: accounts/personal_credentials.py:328 accounts/personal_credentials.py:330
-#: accounts/serializers/account/credential.py:129
 #: accounts/serializers/account/personal.py:95
 #: accounts/serializers/account/personal.py:104
 #: authentication/api/connection_token.py:769
@@ -2216,7 +2540,7 @@ msgstr "密钥密码"
 
 #: accounts/serializers/account/base.py:68
 msgid "SSH certificate accounts cannot push or rotate credentials"
-msgstr ""
+msgstr "SSH 证书账号不能推送或轮换凭据"
 
 #: accounts/serializers/account/base.py:130
 msgid ""
@@ -2226,69 +2550,91 @@ msgstr ""
 "提示: 如果认证时不需要用户名，可填写为 null, 如果是 AD 账号，格式为 "
 "username@domain"
 
-#: accounts/serializers/account/credential.py:39
+#: accounts/serializers/account/credential.py:69
 msgid "Blockers"
-msgstr ""
+msgstr "阻塞项"
 
-#: accounts/serializers/account/credential.py:103
+#: accounts/serializers/account/credential.py:153
 #, python-brace-format
 msgid ""
-"This account is already used by application credential \"{name}\". Choose "
-"another account or reuse that application credential."
-msgstr "该账号已被应用凭据「{name}」使用，请选择其他账号或复用该应用凭据。"
+"These applications are not authorized for every credential account: {names}"
+msgstr "以下应用未获授权访问全部凭据账号：{names}"
 
-#: accounts/serializers/account/credential.py:114
+#: accounts/serializers/account/credential.py:162
+msgid "Remove this credential from the application access configuration first."
+msgstr "请先从应用接入配置中移除此凭据策略。"
+
+#: accounts/serializers/account/credential.py:170
+#: accounts/serializers/account/credential.py:174
 msgid "Credential settings cannot be changed during rotation."
-msgstr ""
+msgstr "轮换期间不能修改凭据设置。"
 
-#: accounts/serializers/account/credential.py:124
-msgid "This field is required for dual-account rotation."
-msgstr "该字段是必填项。"
+#: accounts/serializers/account/credential.py:176
+msgid "The credential policy mode cannot be changed."
+msgstr "凭据策略模式不能修改。"
 
-#: accounts/serializers/account/credential.py:133
-msgid "Primary and backup accounts must be different."
-msgstr "可以添加备份账号执行"
+#: accounts/serializers/account/credential.py:187
+#: accounts/serializers/account/credential.py:191
+msgid "This field is required for alternating dual-account rotation."
+msgstr "双账号交替轮换必须填写此字段。"
 
-#: accounts/serializers/account/credential.py:135
-msgid "Primary and backup accounts must belong to the same asset."
-msgstr ""
+#: accounts/serializers/account/credential.py:196
+msgid "The initial and alternate accounts must be different."
+msgstr "初始账号和交替账号必须不同。"
 
-#: accounts/serializers/account/credential.py:137
-msgid "Primary and backup accounts must belong to the same organization."
-msgstr ""
+#: accounts/serializers/account/credential.py:198
+msgid "The initial and alternate accounts must belong to the same asset."
+msgstr "初始账号和交替账号必须属于同一资产。"
 
-#: accounts/serializers/account/credential.py:139
-msgid "Primary and backup accounts must use the same secret type."
-msgstr ""
+#: accounts/serializers/account/credential.py:200
+msgid ""
+"The initial and alternate accounts must belong to the same organization."
+msgstr "初始账号和交替账号必须属于同一组织。"
 
-#: accounts/serializers/account/credential.py:180
+#: accounts/serializers/account/credential.py:202
+msgid "The initial and alternate accounts must use the same secret type."
+msgstr "初始账号和交替账号必须使用相同的凭据类型。"
+
+#: accounts/serializers/account/credential.py:309
 msgid "Online"
-msgstr "离线"
+msgstr "在线"
 
-#: accounts/serializers/account/credential.py:314
+#: accounts/serializers/account/credential.py:367
+msgid "Explain why the rotating client should be excluded."
+msgstr "请说明将该客户端排除出当前轮换的原因。"
+
+#: accounts/serializers/account/credential.py:429
+msgid "Provide exactly one of key or account_id."
+msgstr "请且仅请提供 key 或 account_id 其中一个。"
+
+#: accounts/serializers/account/credential.py:513
 msgid "The application and access type cannot be changed."
-msgstr ""
+msgstr "应用和接入类型不能修改。"
 
-#: accounts/serializers/account/credential.py:332
+#: accounts/serializers/account/credential.py:531
 msgid "Select at least one credential."
-msgstr "请至少选择一种 MFA 方式"
+msgstr "请至少选择一个凭据策略。"
 
-#: accounts/serializers/account/credential.py:340
+#: accounts/serializers/account/credential.py:536
+msgid "The selected credential policy is not bound to this application."
+msgstr "所选凭据策略未绑定到此应用。"
+
+#: accounts/serializers/account/credential.py:544
 msgid ""
 "The application is not authorized for every selected credential account."
 msgstr "企业应用未授权所选应用凭据关联的全部账号。"
 
-#: accounts/serializers/account/credential.py:345
+#: accounts/serializers/account/credential.py:557
 msgid "This field is required for Agent access."
-msgstr "该字段是必填项。"
+msgstr "Agent 接入必须填写此字段。"
 
-#: accounts/serializers/account/credential.py:348
+#: accounts/serializers/account/credential.py:560
 msgid "Enter an absolute installation directory."
-msgstr ""
+msgstr "请输入绝对安装目录。"
 
-#: accounts/serializers/account/credential.py:355
-msgid "Enter an HTTP(S) notification URL without authentication information."
-msgstr ""
+#: accounts/serializers/account/credential.py:568
+msgid "Enter one systemd .service unit name."
+msgstr "请输入一个 systemd .service 单元名称。"
 
 #: accounts/serializers/account/personal.py:41 assets/models/base.py:17
 #: terminal/notifications.py:264
@@ -2309,11 +2655,11 @@ msgstr "资产不存在"
 
 #: accounts/serializers/account/personal.py:93
 msgid "Protocol cannot be changed"
-msgstr ""
+msgstr "协议不能修改"
 
 #: accounts/serializers/account/personal.py:101
 msgid "This field is only valid when updating"
-msgstr ""
+msgstr "此字段仅在更新时有效"
 
 #: accounts/serializers/account/personal.py:107
 #: accounts/serializers/account/personal.py:144
@@ -2323,14 +2669,14 @@ msgstr "组织 ({}) 的资产授权"
 
 #: accounts/serializers/account/personal.py:123
 msgid "A new secret is required when changing the secret type"
-msgstr ""
+msgstr "修改凭据类型时必须提供新凭据"
 
-#: accounts/serializers/account/service.py:19
+#: accounts/serializers/account/service.py:24
 #: authentication/serializers/token.py:23
 msgid "Access IP"
 msgstr "IP 白名单"
 
-#: accounts/serializers/account/service.py:33
+#: accounts/serializers/account/service.py:38
 #: accounts/serializers/account/virtual.py:19 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 common/db/models.py:36 ops/models/adhoc.py:25
 #: ops/models/job.py:202 ops/models/playbook.py:31 rbac/models/role.py:37
@@ -2345,11 +2691,19 @@ msgstr "IP 白名单"
 msgid "Comment"
 msgstr "备注"
 
-#: accounts/serializers/account/service.py:35
+#: accounts/serializers/account/service.py:40
 #: accounts/templates/accounts/backup_account_report.html:33
 #: assets/serializers/asset/common.py:154
 msgid "Accounts amount"
 msgstr "账号数量"
+
+#: accounts/serializers/account/service.py:187
+msgid "URL is required when webhook is enabled."
+msgstr "启用 Webhook 时 URL 为必填项。"
+
+#: accounts/serializers/account/service.py:189
+msgid "Select at least one event."
+msgstr "请至少选择一个事件。"
 
 #: accounts/serializers/account/template.py:11
 msgid "Password length"
@@ -2429,7 +2783,7 @@ msgstr "文件加密密码"
 
 #: accounts/serializers/automations/backup.py:36
 #: accounts/serializers/automations/backup.py:40
-#: accounts/serializers/automations/change_secret.py:64
+#: accounts/serializers/automations/change_secret.py:133
 msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
@@ -2467,52 +2821,68 @@ msgstr "执行数"
 msgid "Automation snapshot"
 msgstr "自动化快照"
 
-#: accounts/serializers/automations/change_secret.py:48
+#: accounts/serializers/automations/change_secret.py:84
+msgid "The task cannot be assigned to another rotation."
+msgstr "该任务不能分配给其他轮换。"
+
+#: accounts/serializers/automations/change_secret.py:94
+msgid "Rotation not found."
+msgstr "旋转 (度)"
+
+#: accounts/serializers/automations/change_secret.py:96
+msgid "The rotation task cannot be edited at this stage."
+msgstr "当前阶段不能编辑轮换任务。"
+
+#: accounts/serializers/automations/change_secret.py:100
+msgid "This rotation already has a change secret task."
+msgstr "此轮换已有改密任务。"
+
+#: accounts/serializers/automations/change_secret.py:116
 msgid "SSH Key strategy"
 msgstr "SSH 密钥更改方式"
 
-#: accounts/serializers/automations/change_secret.py:62
+#: accounts/serializers/automations/change_secret.py:131
 msgid "Please enter your account username"
 msgstr "请输入您的账号用户名"
 
-#: accounts/serializers/automations/change_secret.py:66
+#: accounts/serializers/automations/change_secret.py:135
 msgid "Notification before execution"
 msgstr "执行前通知"
 
-#: accounts/serializers/automations/change_secret.py:68
+#: accounts/serializers/automations/change_secret.py:137
 msgid ""
 "Secret parameter settings, currently only effective for assets of the host "
 "type."
 msgstr "参数设置，目前只对 AIX LINUX UNIX 类型的资产有效。"
 
-#: accounts/serializers/automations/change_secret.py:93
+#: accounts/serializers/automations/change_secret.py:162
 msgid "* Please enter the correct password length"
 msgstr "* 请输入正确的密码长度"
 
-#: accounts/serializers/automations/change_secret.py:97
+#: accounts/serializers/automations/change_secret.py:166
 msgid "* Password length range 8-36 bits"
 msgstr "* 密码长度范围 8-36 位"
 
-#: accounts/serializers/automations/change_secret.py:118
+#: accounts/serializers/automations/change_secret.py:188
 msgid "Secret is required for the custom strategy"
 msgstr "自定义策略必须设置密文"
 
-#: accounts/serializers/automations/change_secret.py:144
-#: accounts/serializers/automations/change_secret.py:181
+#: accounts/serializers/automations/change_secret.py:214
+#: accounts/serializers/automations/change_secret.py:251
 #: ops/serializers/job.py:93 terminal/serializers/session.py:62
 msgid "Is success"
 msgstr "是否成功"
 
-#: accounts/serializers/automations/change_secret.py:151
+#: accounts/serializers/automations/change_secret.py:221
 #: assets/models/automations/base.py:181
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/serializers/automations/change_secret.py:224
+#: accounts/serializers/automations/change_secret.py:294
 msgid "TTL"
 msgstr "TTL"
 
-#: accounts/serializers/automations/change_secret.py:225
+#: accounts/serializers/automations/change_secret.py:295
 #: assets/models/platform.py:381 tickets/models/ticket/general.py:330
 msgid "Meta"
 msgstr "元数据"
@@ -2549,7 +2919,8 @@ msgid "Clean application records"
 msgstr "清理应用记录"
 
 #: accounts/tasks/application_events.py:180
-msgid "Clean expired application audits and completed webhook delivery records."
+msgid ""
+"Clean expired application audits and completed webhook delivery records."
 msgstr "清理过期的应用审计记录和已完成的 Webhook 投递记录。"
 
 #: accounts/tasks/automation.py:43
@@ -2870,6 +3241,164 @@ msgstr "用户名包含非法字符：%(chars)s"
 #: accounts/utils.py:86
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
+
+#: accounts/webhooks.py:33
+msgid "Event ID"
+msgstr "事件 ID"
+
+#: accounts/webhooks.py:34
+msgid "Event code"
+msgstr "事件代码"
+
+#: accounts/webhooks.py:35
+msgid "Event result"
+msgstr "事件结果"
+
+#: accounts/webhooks.py:36
+msgid "Occurred at"
+msgstr "发生时间"
+
+#: accounts/webhooks.py:37
+msgid "Event summary"
+msgstr "事件摘要"
+
+#: accounts/webhooks.py:38 audits/models.py:387
+msgid "Application ID"
+msgstr "应用 ID"
+
+#: accounts/webhooks.py:39
+msgid "Application name"
+msgstr "应用名称"
+
+#: accounts/webhooks.py:41
+msgid "Credential name"
+msgstr "凭据策略名称"
+
+#: accounts/webhooks.py:42
+msgid "Credential key"
+msgstr "凭据策略标识"
+
+#: accounts/webhooks.py:43
+msgid "Credential revision"
+msgstr "凭据版本"
+
+#: accounts/webhooks.py:44
+msgid "Configuration ID"
+msgstr "接入配置 ID"
+
+#: accounts/webhooks.py:45
+msgid "Configuration name"
+msgstr "接入配置名称"
+
+#: accounts/webhooks.py:46
+msgid "Client instance ID"
+msgstr "客户端实例 ID"
+
+#: accounts/webhooks.py:48
+msgid "Operator"
+msgstr "操作"
+
+#: accounts/webhooks.py:49 audits/filters.py:105 audits/filters.py:153
+#: audits/filters.py:166 terminal/api/component/terminal.py:34
+msgid "Remote address"
+msgstr "远程地址"
+
+#: accounts/webhooks.py:50
+msgid "Rotation ID"
+msgstr "轮换 ID"
+
+#: accounts/webhooks.py:81
+msgid "URL credentials are not allowed."
+msgstr "URL 中不能包含身份凭据。"
+
+#: accounts/webhooks.py:83
+msgid "URL fragments are not allowed."
+msgstr "URL 中不能包含片段。"
+
+#: accounts/webhooks.py:86
+msgid "URL port must be between 1 and 65535."
+msgstr "URL 端口必须介于 1 到 65535 之间。"
+
+#: accounts/webhooks.py:95
+msgid "URL resolves to a forbidden address."
+msgstr "URL 解析到了禁止访问的地址。"
+
+#: accounts/webhooks.py:99
+msgid "Enter a valid and resolvable HTTP(S) URL."
+msgstr "请输入有效且可解析的 HTTP(S) URL。"
+
+#: accounts/webhooks.py:117
+msgid "Request headers must be an object."
+msgstr "请求头必须是对象。"
+
+#: accounts/webhooks.py:119
+msgid "No more than 32 request headers are allowed."
+msgstr "请求头不能超过 32 个。"
+
+#: accounts/webhooks.py:124
+msgid "Request header name is invalid."
+msgstr "请求头名称无效。"
+
+#: accounts/webhooks.py:126
+msgid "Request header names must be unique."
+msgstr "请求头名称必须唯一。"
+
+#: accounts/webhooks.py:129
+msgid "Request header is reserved by JumpServer."
+msgstr "该请求头由 JumpServer 保留。"
+
+#: accounts/webhooks.py:131
+msgid "Request header values must be strings up to 4096 characters."
+msgstr "请求头值必须是长度不超过 4096 个字符的字符串。"
+
+#: accounts/webhooks.py:133
+msgid "Request header values contain invalid control characters."
+msgstr "请求头值包含无效控制字符。"
+
+#: accounts/webhooks.py:138
+msgid "Request header values must contain only ISO-8859-1 characters."
+msgstr "请求头值只能包含 ISO-8859-1 字符。"
+
+#: accounts/webhooks.py:141
+msgid "Request headers cannot contain template variables."
+msgstr "请求头不能包含模板变量。"
+
+#: accounts/webhooks.py:143
+msgid "Request headers are too large."
+msgstr "请求头过大。"
+
+#: accounts/webhooks.py:149
+msgid "Webhook template is too deeply nested."
+msgstr "Webhook 模板嵌套层级过深。"
+
+#: accounts/webhooks.py:153
+msgid "Webhook template keys must be static strings."
+msgstr "Webhook 模板键必须是静态字符串。"
+
+#: accounts/webhooks.py:160 accounts/webhooks.py:164
+msgid "Webhook template contains an invalid expression."
+msgstr "Webhook 模板包含无效表达式。"
+
+#: accounts/webhooks.py:167
+#, python-format
+msgid "Unknown webhook template variable: %s"
+msgstr "未知的 Webhook 模板变量：%s"
+
+#: accounts/webhooks.py:172
+msgid "Webhook template must be a JSON object."
+msgstr "Webhook 模板必须是 JSON 对象。"
+
+#: accounts/webhooks.py:176
+msgid "Webhook template must contain valid JSON values."
+msgstr "Webhook 模板必须包含有效的 JSON 值。"
+
+#: accounts/webhooks.py:178
+msgid "Webhook template cannot exceed 64 KiB."
+msgstr "Webhook 模板不能超过 64 KiB。"
+
+#: accounts/webhooks.py:215
+msgid "Rendered webhook body cannot exceed 64 KiB."
+msgstr "渲染后的 Webhook 请求体不能超过 64 KiB。"
 
 #: acls/api/clipboard_acl.py:15 acls/models/clipboard_acl.py:14
 #: acls/serializers/clipboard_acl.py:37
@@ -5253,11 +5782,6 @@ msgstr "认证方式"
 msgid "User name"
 msgstr "用户名称"
 
-#: audits/filters.py:105 audits/filters.py:153 audits/filters.py:166
-#: terminal/api/component/terminal.py:34
-msgid "Remote address"
-msgstr "远程地址"
-
 #: audits/filters.py:108 terminal/filters.py:27 terminal/filters.py:48
 msgid "Session ID"
 msgstr "会话 ID"
@@ -5406,10 +5930,6 @@ msgstr "下线用户会话"
 #: audits/models.py:386
 msgid "Application"
 msgstr "应用"
-
-#: audits/models.py:387
-msgid "Application ID"
-msgstr "应用 ID"
 
 #: audits/reporting.py:11
 msgid "File Transfer Report"
@@ -6044,8 +6564,6 @@ msgid "SMS"
 msgstr "短信"
 
 #: authentication/const.py:39 xpack/plugins/facelive/meta.py:6
-#: xpack/plugins/facelive/templates/facelive/capture.html:9
-#: xpack/plugins/facelive/templates/facelive/capture.html:371
 msgid "Face recognition"
 msgstr "人脸识别"
 
@@ -6851,7 +7369,6 @@ msgid "Cancel"
 msgstr "取消"
 
 #: authentication/templates/authentication/face_capture.html:14
-#: xpack/plugins/facelive/templates/facelive/capture.html:246
 msgid "Retry"
 msgstr "重试"
 
@@ -7241,7 +7758,7 @@ msgstr "企业专业版"
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
 
-#: common/const/common.py:5 xpack/plugins/cloud/manager.py:461
+#: common/const/common.py:5 xpack/plugins/cloud/manager.py:479
 #, python-format
 msgid "%(name)s was created successfully"
 msgstr "%(name)s 创建成功"
@@ -9649,11 +10166,6 @@ msgstr "授权端点地址"
 msgid "Token endpoint"
 msgstr "token 端点地址"
 
-#: settings/serializers/auth/oauth2.py:46 settings/serializers/auth/oidc.py:32
-#: settings/serializers/auth/sms.py:111
-msgid "Request method"
-msgstr "客户端认证方式"
-
 #: settings/serializers/auth/oauth2.py:50 settings/serializers/auth/oidc.py:90
 msgid "Userinfo endpoint"
 msgstr "用户信息端点地址"
@@ -9927,10 +10439,6 @@ msgstr "模板需要包含 {code}"
 #: settings/serializers/auth/sms.py:97
 msgid "Signature + Template must not exceed 65 words"
 msgstr "模板+签名不能超过65个字"
-
-#: settings/serializers/auth/sms.py:106 terminal/notifications.py:307
-msgid "URL"
-msgstr "URL"
 
 #: settings/serializers/auth/sso.py:16
 msgid "Enable SSO auth"
@@ -14113,54 +14621,54 @@ msgstr "实例"
 msgid "Failed to synchronize the instance \"%s\""
 msgstr "无法同步实例 %s"
 
-#: xpack/plugins/cloud/manager.py:386
+#: xpack/plugins/cloud/manager.py:404
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
 msgstr "资产 \"%s\" 的更新平台与原平台类型不一致。跳过平台和协议更新"
 
-#: xpack/plugins/cloud/manager.py:443
+#: xpack/plugins/cloud/manager.py:461
 #, python-format
 msgid "The asset \"%s\" already exists"
 msgstr "资产 \"%s\" 已存在"
 
-#: xpack/plugins/cloud/manager.py:445
+#: xpack/plugins/cloud/manager.py:463
 #, python-format
 msgid "Update asset \"%s\""
 msgstr "更新资产 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:448
+#: xpack/plugins/cloud/manager.py:466
 #, python-format
 msgid "Asset \"%s\" has been updated"
 msgstr "资产 \"%s\" 已更新"
 
-#: xpack/plugins/cloud/manager.py:457
+#: xpack/plugins/cloud/manager.py:475
 #, python-format
 msgid "Prepare to create asset \"%s\""
 msgstr "准备创建资产 %s"
 
-#: xpack/plugins/cloud/manager.py:478
+#: xpack/plugins/cloud/manager.py:496
 #, python-format
 msgid "Set nodes \"%s\""
 msgstr "设置节点: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:504
+#: xpack/plugins/cloud/manager.py:522
 #, python-format
 msgid "Set accounts \"%s\""
 msgstr "设置账号: %s"
 
-#: xpack/plugins/cloud/manager.py:520
+#: xpack/plugins/cloud/manager.py:538
 #, python-format
 msgid "Set protocols \"%s\""
 msgstr "设置协议 \"%s\""
 
-#: xpack/plugins/cloud/manager.py:528
+#: xpack/plugins/cloud/manager.py:546
 #, python-format
 msgid "Set labels \"%s\""
 msgstr "设置标签: \"%s\""
 
-#: xpack/plugins/cloud/manager.py:542 xpack/plugins/cloud/tasks.py:31
+#: xpack/plugins/cloud/manager.py:560 xpack/plugins/cloud/tasks.py:31
 msgid "Run sync instance task"
 msgstr "执行同步实例任务"
 
@@ -14697,92 +15205,6 @@ msgstr ""
 msgid "Task not started"
 msgstr "任务未开始"
 
-#: xpack/plugins/facelive/templates/facelive/capture.html:227
-msgid "Preparing face recognition"
-msgstr "人脸识别"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:229
-#: xpack/plugins/facelive/templates/facelive/capture.html:316
-msgid "Camera"
-msgstr ""
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:232
-msgid "Camera preview"
-msgstr "PAM"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:236
-#: xpack/plugins/facelive/templates/facelive/capture.html:489
-msgid "Allow camera access to continue"
-msgstr ""
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:241
-msgid "Connecting"
-msgstr "连接数"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:270
-msgid "Turn your head left and right, then face forward"
-msgstr ""
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:271
-msgid "Nod once, then face forward"
-msgstr ""
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:272
-msgid "Open and close your mouth"
-msgstr ""
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:297
-msgid "Face recognition unavailable"
-msgstr "人脸识别"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:352
-msgid "Unable to connect to face recognition"
-msgstr "无法连接到主机"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:357
-msgid "Face capture token is invalid or expired"
-msgstr "令牌错误或失效"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:358
-msgid "Face recognition connection closed"
-msgstr "人脸识别"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:370
-msgid "Online face monitor"
-msgstr "可以查看任务监控"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:371
-msgid "Look straight at the camera"
-msgstr ""
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:372
-msgid "Camera is ready"
-msgstr "Lark 已经绑定"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:419
-msgid "Verification complete"
-msgstr "校验错误"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:421
-msgid "Person left camera area"
-msgstr ""
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:423
-msgid "Monitored session paused"
-msgstr "可以监控会话"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:425
-msgid "Online monitoring"
-msgstr "在线会话"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:485
-msgid "This browser cannot access a camera"
-msgstr "该文件不能重命名"
-
-#: xpack/plugins/facelive/templates/facelive/capture.html:489
-msgid "Preparing camera"
-msgstr ""
-
 #: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
@@ -14876,6 +15298,94 @@ msgstr "许可证导入成功"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "许可证无效"
+
+#~ msgid "Subscription snapshot"
+#~ msgstr "订阅 ID"
+
+#~ msgid "Credential unavailable"
+#~ msgstr "账号无效"
+
+#~ msgid "Access revoked"
+#~ msgstr "访问令牌"
+
+#~ msgid "Application credential not found."
+#~ msgstr "账号未找到"
+
+#~ msgid ""
+#~ "The primary account secret has not been changed and verified successfully."
+#~ msgstr "你的账号已创建成功"
+
+#~ msgid "The application credential is not waiting for the primary account."
+#~ msgstr "企业应用未授权所选应用凭据关联的全部账号。"
+
+#~ msgid "Fixed account"
+#~ msgstr "失败账号"
+
+#~ msgid "Account rotation"
+#~ msgstr "账号版本"
+
+#~ msgid "Dual accounts"
+#~ msgstr "虚拟账号"
+
+#~ msgid "Waiting for primary account"
+#~ msgstr "创建目标账号"
+
+#~ msgid "Primary account"
+#~ msgstr "验证账号"
+
+#~ msgid "Published account"
+#~ msgstr "账号推送"
+
+#~ msgid "Application credential"
+#~ msgstr "应用用户"
+
+#~ msgid "Event notifications"
+#~ msgstr "通知"
+
+#~ msgid "Notification URL"
+#~ msgstr "通知"
+
+#~ msgid "Application credentials"
+#~ msgstr "无效的证书"
+
+#~ msgid "Preparing face recognition"
+#~ msgstr "人脸识别"
+
+#~ msgid "Camera preview"
+#~ msgstr "PAM"
+
+#~ msgid "Connecting"
+#~ msgstr "连接数"
+
+#~ msgid "Face recognition unavailable"
+#~ msgstr "人脸识别"
+
+#~ msgid "Unable to connect to face recognition"
+#~ msgstr "无法连接到主机"
+
+#~ msgid "Face capture token is invalid or expired"
+#~ msgstr "令牌错误或失效"
+
+#~ msgid "Face recognition connection closed"
+#~ msgstr "人脸识别"
+
+#~ msgid "Online face monitor"
+#~ msgstr "可以查看任务监控"
+
+#~ msgid "Camera is ready"
+#~ msgstr "Lark 已经绑定"
+
+#~ msgid "Verification complete"
+#~ msgstr "校验错误"
+
+#~ msgid "Monitored session paused"
+#~ msgstr "可以监控会话"
+
+#~ msgid "Online monitoring"
+#~ msgstr "在线会话"
+
+#~ msgid "This browser cannot access a camera"
+#~ msgstr "该文件不能重命名"
 
 #~ msgid "Check the amount of assets under the node"
 #~ msgstr "检查节点下资产数量"

@@ -31,7 +31,7 @@ BLOCKED_METADATA_ADDRESSES = {
 
 WEBHOOK_TEMPLATE_VARIABLES = {
     'event.id': (_('Event ID'), '00000000-0000-0000-0000-000000000001'),
-    'event.code': (_('Event code'), ApplicationEvent.CREDENTIAL_PUBLISHED),
+    'event.code': (_('Event code'), ApplicationEvent.CREDENTIAL_UPDATED),
     'event.result': (_('Event result'), 'success'),
     'event.occurred_at': (_('Occurred at'), '2026-01-01T00:00:00+00:00'),
     'event.summary': (_('Event summary'), 'Credential revision published.'),
@@ -247,8 +247,10 @@ def build_webhook_context(event, application=None, code=None):
     }
 
 
-def sample_webhook_context(application, code=ApplicationEvent.CREDENTIAL_PUBLISHED):
-    failed = code in (ApplicationEvent.CREDENTIAL_UNAVAILABLE, ApplicationEvent.ROTATION_FAILED)
+def sample_webhook_context(application, code=ApplicationEvent.CREDENTIAL_UPDATED):
+    failed = code in (
+        ApplicationEvent.CREDENTIAL_CHANGE_FAILED, ApplicationEvent.ROTATION_FAILED,
+    )
     now = timezone.now().isoformat()
     return {
         'event': {

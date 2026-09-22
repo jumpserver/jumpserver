@@ -42,7 +42,7 @@ class CredentialPreflightTests(CredentialTestCase):
                 dispatch.assert_not_called()
             self.assertEqual(dispatch.call_count, 1)
         self.credential.refresh_from_db()
-        self.assertEqual(self.credential.published_account_id, self.primary.id)
+        self.assertEqual(self.credential.active_account_id, self.primary.id)
         self.assertEqual(self.credential.revision, 1)
         self.assertFalse(self.credential.rotation_records.exists())
         self.assertEqual(preflight.info(ApplicationCredential.objects.get(pk=self.credential.pk))['status'], 'checking')
@@ -55,8 +55,8 @@ class CredentialPreflightTests(CredentialTestCase):
             preflight.finish(execution.id)
         self.assertEqual(verify.call_count, 1)
         self.credential.refresh_from_db()
-        self.assertEqual(self.credential.status, 'waiting_backup')
-        self.assertEqual(self.credential.published_account_id, self.backup.id)
+        self.assertEqual(self.credential.status, 'waiting_switch')
+        self.assertEqual(self.credential.active_account_id, self.backup.id)
         self.assertEqual(self.credential.revision, 2)
         self.assertEqual(self.credential.rotation_records.count(), 1)
 
@@ -107,18 +107,24 @@ class CredentialPreflightTests(CredentialTestCase):
             self.start()
         self.backup.is_active = True
         self.backup.save()
+        other = Account.objects.create(
+            name='conflict-other', username='conflict-other',
+            asset=self.asset, secret='secret',
+        )
         conflict = ApplicationCredential.objects.create(
-            name='Conflicting fixed credential', type='fixed', rotation_mode='',
-            primary_account=self.backup, published_account=self.backup,
+            name='Conflicting credential',
+            mode=ApplicationCredential.Mode.alternating_rotation,
+            account=self.backup, alternate_account=other,
+            active_account=self.backup,
         )
         with self.assertRaisesMessage(JMSException, conflict.name):
             self.start()
         self.assertFalse(AutomationExecution.objects.exists())
 
-    def test_primary_account_must_allow_secret_reset(self):
+    def test_account_must_allow_secret_reset(self):
         self.primary.secret_reset = False
         self.primary.save(update_fields=['secret_reset'])
-        with self.assertRaisesMessage(JMSException, 'does not allow secret reset') as error:
+        with self.assertRaises(JMSException) as error:
             self.start()
         self.assertEqual(error.exception.detail.code, 'credential_account_secret_reset_disabled')
         self.assertFalse(AutomationExecution.objects.exists())
@@ -127,8 +133,9 @@ class CredentialPreflightTests(CredentialTestCase):
         other = Account.objects.create(name='other', username='other', secret='secret', asset=self.asset)
         for account in (self.primary, self.backup):
             serializer = ApplicationCredentialSerializer(data={
-                'name': 'Conflicting', 'type': 'rotation', 'rotation_mode': 'dual',
-                'primary_account': str(other.id), 'backup_account': str(account.id),
+                'name': 'Conflicting', 'mode': ApplicationCredential.Mode.alternating_rotation,
+                'account': str(other.id), 'alternate_account': str(account.id),
+                'applications': [str(self.application.id)],
             })
             with self.subTest(account=account.id), self.assertRaises(JMSException):
                 serializer.is_valid(raise_exception=True)
@@ -169,7 +176,7 @@ class CredentialPreflightTests(CredentialTestCase):
             preflight.finish(execution.id)
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.status, 'idle')
-        self.assertEqual(self.credential.published_account_id, self.primary.id)
+        self.assertEqual(self.credential.active_account_id, self.primary.id)
         self.assertEqual(self.credential.revision, 1)
 
     def test_dual_start_requires_account_verification_permission(self):

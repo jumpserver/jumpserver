@@ -16,3 +16,12 @@ class ApplicationAuditViewSet(OrgReadonlyModelViewSet):
     date_range_filter_fields = [('date_created', ('date_from', 'date_to'))]
     ordering_fields = ('date_created',)
     ordering = ['-date_created', '-id']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        application = self.request.query_params.get('application')
+        if application:
+            queryset = queryset.filter(
+                application_relations__application_id=application
+            ).distinct()
+        return queryset

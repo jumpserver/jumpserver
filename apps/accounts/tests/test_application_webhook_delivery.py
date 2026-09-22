@@ -25,9 +25,8 @@ from ops.celery.decorator import get_register_period_tasks
 class ApplicationWebhookDeliveryTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
-        self.credential.applications.add(self.application)
         self.webhook = ApplicationWebhook.objects.create(
-            application=self.application, is_active=True,
+            name='Operations notifications', is_active=True,
             url='https://hooks.example/events', method='POST',
             headers={'Authorization': 'Bearer saved-token'},
             events=list(ApplicationEvent.values),
@@ -37,8 +36,9 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
                 'revision': '{{ credential.revision }}',
             },
         )
+        self.webhook.applications.add(self.application)
 
-    def enqueue_event(self, code=ApplicationEvent.CREDENTIAL_PUBLISHED):
+    def enqueue_event(self, code=ApplicationEvent.CREDENTIAL_UPDATED):
         event = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=self.credential)
         with patch(
             'accounts.credential_client.events._dispatch_webhook',
@@ -54,18 +54,18 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.assertEqual(delivery.url, 'https://hooks.example/events')
         self.assertEqual(delivery.headers, {'Authorization': 'Bearer saved-token'})
         self.assertEqual(delivery.body, {
-            'event': 'credential.published', 'application': 'order-service',
+            'event': 'credential.updated', 'application': 'order-service',
             'revision': self.credential.revision,
         })
         self.assertAlmostEqual(
             (delivery.expires_at - delivery.date_created).total_seconds(), 90, delta=2,
         )
-        dispatch.assert_called_once_with(delivery.id, self.org.id)
+        dispatch.assert_called_once_with(delivery.id, str(self.org.id))
 
         self.webhook.url = 'https://changed.example/events'
         self.webhook.headers = {'Authorization': 'changed'}
         self.webhook.save(update_fields=['url', 'headers'])
-        enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
         self.assertEqual(ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook).count(), 1)
         delivery.refresh_from_db()
         self.assertEqual(delivery.url, 'https://hooks.example/events')
@@ -93,7 +93,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.assertNotIn('saved-token', content)
 
     def test_disabled_or_unselected_webhook_is_not_enqueued(self):
-        self.webhook.events = [ApplicationEvent.ACCESS_REVOKED]
+        self.webhook.events = [ApplicationEvent.CREDENTIAL_REVOKED]
         self.webhook.save(update_fields=['events'])
         event, dispatch = self.enqueue_event()
         self.assertFalse(ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook).exists())
@@ -112,7 +112,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         event = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=self.credential)
 
         with patch('accounts.credential_client.events.logger') as logger:
-            enqueue(event, ApplicationEvent.CREDENTIAL_PUBLISHED)
+            enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
 
         self.assertFalse(ApplicationEventDelivery.objects.filter(event=event).exists())
         logger.warning.assert_called_once_with(

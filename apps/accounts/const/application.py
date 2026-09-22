@@ -21,7 +21,11 @@ class AuditEvent(TextChoices):
     CREDENTIAL_FETCHED = 'credential_fetched', _('Credential fetched')
     CREDENTIAL_CONFIRMED = 'credential_confirmed', _('Credential confirmed')
     CREDENTIAL_PUBLISHED = 'credential_published', _('Credential published')
-    SECRET_CHANGE_FINISHED = 'secret_change_finished', _('Secret change finished')
+    CREDENTIAL_STREAM_CONNECTED = 'credential_stream_connected', _('Credential stream connected')
+    CREDENTIAL_STREAM_DISCONNECTED = 'credential_stream_disconnected', _('Credential stream disconnected')
+    SECRET_CHANGE_STARTED = 'secret_change_started', _('Secret change started')
+    SECRET_CHANGE_COMPLETED = 'secret_change_completed', _('Secret change completed')
+    SECRET_CHANGE_FAILED = 'secret_change_failed', _('Secret change failed')
     APPLICATION_SECRET_RESET = 'application_secret_reset', _('Application secret reset')
     ROTATION_STARTED = 'rotation_started', _('Rotation started')
     ROTATION_STEP = 'rotation_step', _('Rotation step')
@@ -30,10 +34,16 @@ class AuditEvent(TextChoices):
 
 
 class ApplicationEvent(TextChoices):
-    CREDENTIAL_PUBLISHED = 'credential.published', _('Credential published')
-    CREDENTIAL_UNAVAILABLE = 'credential.unavailable', _('Credential unavailable')
+    CREDENTIAL_UPDATED = 'credential.updated', _('Credential updated')
+    CREDENTIAL_REVOKED = 'credential.revoked', _('Credential revoked')
+    CONFIGURATION_UPDATED = 'configuration.updated', _('Configuration updated')
+    CREDENTIAL_CHANGE_STARTED = 'credential.change.started', _('Credential change started')
+    CREDENTIAL_CHANGE_COMPLETED = 'credential.change.completed', _('Credential change completed')
+    CREDENTIAL_CHANGE_FAILED = 'credential.change.failed', _('Credential change failed')
+    ROTATION_STARTED = 'rotation.started', _('Rotation started')
+    ROTATION_WAITING = 'rotation.waiting_for_application', _('Rotation waiting for application')
+    ROTATION_COMPLETED = 'rotation.completed', _('Rotation completed')
     ROTATION_FAILED = 'rotation.failed', _('Rotation failed')
-    ACCESS_REVOKED = 'access.revoked', _('Access revoked')
 
 
 class WebhookRequestMethod(TextChoices):

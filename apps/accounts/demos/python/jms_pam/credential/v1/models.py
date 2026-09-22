@@ -35,8 +35,13 @@ class CredentialState(AbstractModel):
 
 
 class GetCredentialRequest(AbstractModel):
-    _fields = {'Key': ('key', None)}
-    _required = ('Key',)
+    _fields = {'Key': ('key', None), 'AccountId': ('account_id', None)}
+
+    def _validate(self):
+        super()._validate()
+        if bool(self.Key) == bool(self.AccountId):
+            raise ValueError('exactly one of Key or AccountId is required')
+        return self
 
 
 class GetCredentialResponse(AbstractModel):
@@ -54,26 +59,6 @@ class ConfirmCredentialRequest(CredentialState):
 class ConfirmCredentialResponse(AbstractModel):
     _fields = {'Key': ('key', None), 'Revision': ('revision', None)}
     _required = ('Key', 'Revision')
-
-
-class HeartbeatRequest(AbstractModel):
-    _fields = {'Credentials': ('credentials', [CredentialState])}
-    _required = ('Credentials',)
-
-
-class HeartbeatError(AbstractModel):
-    _fields = {
-        'Key': ('key', None), 'Code': ('code', None), 'Detail': ('detail', None),
-    }
-    _required = ('Key', 'Code', 'Detail')
-
-
-class HeartbeatResponse(AbstractModel):
-    _fields = {
-        'Updated': ('updated', None), 'Errors': ('errors', [HeartbeatError]),
-        'DateLastSeen': ('date_last_seen', None),
-    }
-    _required = ('Updated', 'Errors', 'DateLastSeen')
 
 
 class CredentialRevision(AbstractModel):

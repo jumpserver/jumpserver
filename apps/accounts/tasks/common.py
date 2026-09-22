@@ -45,8 +45,8 @@ def execute_credential_change(execution_id, org_id):
                 return
             if rotation.change_execution_id != execution.id or credential.change_execution_id != execution.id:
                 return
-            primary = Account.objects.get(id=credential.primary_account_id)
-            if primary.version != execution.snapshot['expected_account_version']:
+            account = Account.objects.get(id=rotation.change_account_id)
+            if account.version != execution.snapshot['expected_account_version']:
                 execution.status = Status.failed
                 execution.date_finished = timezone.now()
                 execution.save(update_fields=['status', 'date_finished'])

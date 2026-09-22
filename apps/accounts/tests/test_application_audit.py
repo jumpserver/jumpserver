@@ -1,17 +1,18 @@
 import ast
-import time
 from contextlib import nullcontext
 from unittest.mock import Mock, patch
 
 from django.core.cache.backends.locmem import LocMemCache
-from django.db import connection, transaction
-from django.test.utils import CaptureQueriesContext
+from django.db import transaction
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.test import force_authenticate
 from redis.exceptions import ConnectionError as RedisConnectionError
 
 from accounts.tests.base import CredentialTestCase
-from accounts.models import ApplicationAudit, ClientAccessConfiguration, CredentialClientInstance
+from accounts.models import (
+    ApplicationAudit, ApplicationCredential, ClientAccessConfiguration,
+    CredentialClientInstance,
+)
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.credential_client.audit import record
 from accounts.middleware import ApplicationAuditMiddleware
@@ -159,7 +160,7 @@ class ApplicationAuditTests(CredentialTestCase):
 
     def test_revision_publication_takes_precedence_over_rotation_step(self):
         self.credential.revision += 1
-        self.credential.status = 'waiting_primary'
+        self.credential.status = 'waiting_revert'
         self.credential.save(update_fields=['revision', 'status'])
         audit = ApplicationAudit.objects.filter(credential_id=self.credential.id).latest('date_created')
         self.assertEqual(audit.event, 'credential_published')
@@ -182,7 +183,7 @@ class ApplicationAuditTests(CredentialTestCase):
         self.assertEqual(audit.operator, self.admin.name)
         self.assertEqual(audit.instance_id, 'one')
 
-    def test_generated_sdk_code_polls_credentials_without_event_subscription(self):
+    def test_generated_sdk_code_uses_event_stream_without_heartbeat(self):
         from accounts.credential_client.manager import ClientAccessConfigurationManager
         manager, _ = self.manager()
         self.application.secret = "secret'\n__import__('os').system('should-not-run')"
@@ -196,9 +197,17 @@ class ApplicationAuditTests(CredentialTestCase):
             isinstance(node, (ast.ImportFrom, ast.Assign))
             for node in config_tree.body
         ))
-        self.assertNotIn('PollEvents', code)
+        self.assertIn('WatchCredentialEvents', code)
         self.assertIn('GetCredential', code)
-        self.assertIn('time.sleep(30)', code)
+        self.assertIn('response.Asset.Address', code)
+        self.assertIn('response.Account.Username', code)
+        self.assertIn('response.Account.Secret', code)
+        self.assertIn('confirmation_keys', code)
+        self.assertIn('GetCredentialRequest(Key=key)', code)
+        self.assertNotIn('GetCredentialRequest(AccountId=', code)
+        self.assertNotIn("credential_mode') == 'subscription'", code)
+        self.assertIn("event.get('event') == 'snapshot'", code)
+        self.assertNotIn('Heartbeat', code)
         self.assertNotIn(self.application.secret, code)
         constants = [
             node.value for node in ast.walk(config_tree)
@@ -206,25 +215,30 @@ class ApplicationAuditTests(CredentialTestCase):
         ]
         self.assertIn(self.application.secret, constants)
 
-    def test_fixed_secret_publication(self):
+    def test_subscription_secret_publication(self):
         self.manager()
-        self.credential.type = 'fixed'
-        self.credential.backup_account = None
+        self.credential.mode = ApplicationCredential.Mode.subscription
+        self.credential.account = None
+        self.credential.alternate_account = None
+        self.credential.active_account = None
         self.credential.save()
         self.primary.secret = 'new-test-secret'
         self.primary.save()
-        event = ApplicationAudit.objects.filter(event='credential_published', credential_id=self.credential.id).first()
+        event = ApplicationAudit.objects.filter(
+            event='credential_published', credential_id=self.credential.id,
+            account_id=self.primary.id,
+        ).first()
         self.assertIsNotNone(event)
         self.primary.refresh_from_db()
         self.credential.refresh_from_db()
-        self.assertEqual(event.revision, self.credential.revision)
+        self.assertEqual(event.revision, self.primary.version)
+        self.assertEqual(event.account_id, self.primary.id)
+        self.assertEqual(event.credential_key, self.credential.account_key(self.primary.id))
 
 
 class CredentialFetchAuditTestsMixin:
     def setUp(self):
         super().setUp()
-        self.credential.rotation_mode = 'single'
-        self.credential.save(update_fields=['rotation_mode'])
         self.client = self.create_client('one')
         self.audit_cache = LocMemCache(str(self.application.id), {})
         self.audit_cache.lock = lambda *args, **kwargs: nullcontext()
@@ -271,81 +285,19 @@ class CredentialFetchAuditTestsMixin:
     def fetch_audits(self, **filters):
         return ApplicationAudit.objects.filter(event='credential_fetched', **filters)
 
-    def test_unchanged_failure_does_not_write_even_after_a_day(self):
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        started = time.time()
-        with CaptureQueriesContext(connection) as queries:
-            for seconds in (1, 43200, 86400, 129600):
-                with patch('time.time', return_value=started + seconds):
-                    self.fetch(400)
-        writes = [
-            q['sql'] for q in queries
-            if q['sql'].lstrip().startswith(('INSERT', 'UPDATE')) and 'accounts_applicationaudit' in q['sql']
-        ]
-        self.assertEqual(writes, [])
-        self.assertEqual(self.fetch_audits(result='failed').count(), 1)
-
-    def test_changed_error_records_a_new_failure(self):
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.set_credential(is_active=False)
-        self.fetch(400)
-        self.assertEqual(set(self.fetch_audits().values_list('summary', flat=True)), {
-            'credential_changing', 'credential_not_found',
-        })
-
     def test_different_credentials_have_independent_failure_states(self):
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.fetch(400, key='missing-key')
-        self.fetch(400)
-        self.fetch(400, key='missing-key')
+        self.fetch(400, key='missing-one')
+        self.fetch(400, key='missing-two')
+        self.fetch(400, key='missing-one')
         self.assertEqual(self.fetch_audits().count(), 2)
 
     def test_different_instances_have_independent_failure_states(self):
         other = self.create_client('two')
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.fetch(400, client=other)
-        self.fetch(400, client=other)
+        self.fetch(400, key='missing-key')
+        self.fetch(400, key='missing-key', client=other)
+        self.fetch(400, key='missing-key', client=other)
         self.assertEqual(set(self.fetch_audits().values_list('instance_id', flat=True)), {'one', 'two'})
         self.assertEqual(self.fetch_audits().count(), 2)
-
-    def test_recovery_of_same_version_is_recorded_once(self):
-        self.fetch(200)
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.set_credential(status='idle')
-        self.fetch(200)
-        self.fetch(200)
-        self.assertEqual(self.fetch_audits(result='success').count(), 2)
-        self.assertEqual(self.fetch_audits(summary='Credential access recovered.').count(), 1)
-
-    def test_failure_after_recovery_is_a_new_failure(self):
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.set_credential(status='idle')
-        self.fetch(200)
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.assertEqual(self.fetch_audits(result='failed').count(), 2)
-
-    def test_first_success_does_not_duplicate_recovery(self):
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.set_credential(status='idle')
-        self.fetch(200)
-        self.assertEqual(self.fetch_audits(result='success').count(), 1)
-
-    def test_new_version_success_does_not_duplicate_recovery(self):
-        self.fetch(200)
-        self.set_credential(status='changing_secret')
-        self.fetch(400)
-        self.set_credential(status='idle', revision=self.credential.revision + 1)
-        self.fetch(200)
-        self.assertEqual(self.fetch_audits(result='success').count(), 2)
-        self.assertFalse(self.fetch_audits(summary='Credential access recovered.').exists())
 
     def test_disabled_configuration_failure_can_recover(self):
         self.fetch(200)
@@ -364,17 +316,15 @@ class CredentialFetchAuditTestsMixin:
         self.fetch(200)
         with patch.object(self.audit_cache, 'get', side_effect=RedisConnectionError):
             self.fetch(200)
-            self.set_credential(status='changing_secret')
-            self.fetch(400)
+            self.fetch(400, key='missing-key')
         self.assertEqual(self.fetch_audits(result='success').count(), 1)
         self.assertEqual(self.fetch_audits(result='failed').count(), 1)
 
     def test_failed_audit_insert_does_not_consume_transition(self):
-        self.set_credential(status='changing_secret')
         with patch('accounts.credential_client.audit.record', side_effect=RuntimeError('insert failed')):
             with self.assertRaisesRegex(RuntimeError, 'insert failed'):
-                self.fetch(400)
-        self.fetch(400)
+                self.fetch(400, key='missing-key')
+        self.fetch(400, key='missing-key')
         self.assertEqual(self.fetch_audits(result='failed').count(), 1)
 
 

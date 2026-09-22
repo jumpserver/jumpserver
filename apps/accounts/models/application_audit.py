@@ -13,6 +13,8 @@ class ApplicationAudit(JMSOrgBaseModel):
     credential = models.CharField(max_length=128, blank=True)
     credential_id = models.UUIDField(null=True)
     credential_key = models.CharField(max_length=64, blank=True)
+    account = models.CharField(max_length=128, blank=True)
+    account_id = models.UUIDField(null=True)
     configuration = models.CharField(max_length=128, blank=True)
     configuration_id = models.UUIDField(null=True)
     instance_id = models.CharField(max_length=128, blank=True)
@@ -29,6 +31,21 @@ class ApplicationAudit(JMSOrgBaseModel):
         indexes = [
             models.Index(fields=['org_id', '-date_created']),
             models.Index(fields=['date_created'], name='accounts_app_audit_created_idx'),
+        ]
+
+
+class ApplicationAuditApplication(JMSOrgBaseModel):
+    audit = models.ForeignKey(
+        ApplicationAudit, on_delete=models.CASCADE, related_name='application_relations'
+    )
+    application_id = models.UUIDField(db_index=True)
+    application = models.CharField(max_length=128)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['audit', 'application_id'], name='unique_application_audit_application'
+            ),
         ]
 
 

@@ -22,7 +22,7 @@ from accounts.credential_rotation import CredentialRotationManager
 from accounts.mixins import ApplicationAuditMixin
 from accounts.models import (
     CredentialApplicationBinding, CredentialClientInstance,
-    ApplicationCredential, ClientAccessConfiguration, CredentialRotationRecord,
+    ApplicationCredential, ClientAccessConfiguration,
 )
 from accounts.permissions import IsCredentialClient
 from authentication.backends.drf import (
@@ -38,7 +38,7 @@ from rbac.permissions import RBACPermission
 __all__ = [
     'ApplicationCredentialViewSet', 'CredentialApplicationBindingViewSet',
     'CredentialClientInstanceViewSet', 'CredentialClientViewSet',
-    'ClientAccessConfigurationViewSet', 'CredentialRotationRecordViewSet',
+    'ClientAccessConfigurationViewSet',
 ]
 
 
@@ -117,7 +117,7 @@ class CredentialClientAgentAuthentication(
 class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     model = ApplicationCredential
     serializer_class = serializers.ApplicationCredentialSerializer
-    filterset_fields = ('id', 'name', 'key', 'type', 'rotation_mode', 'status', 'is_active', 'applications')
+    filterset_fields = ('id', 'name', 'key', 'mode', 'status', 'is_active', 'applications')
     search_fields = ('name', 'key', 'comment')
     ordering_fields = ('name', 'status', 'date_last_rotated', 'date_created')
     rbac_perms = {
@@ -127,12 +127,13 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'change_secret': 'accounts.change_applicationcredential',
         'complete_rotation': 'accounts.change_applicationcredential',
         'cancel_rotation': 'accounts.change_applicationcredential',
+        'rotation_status': 'accounts.view_applicationcredential',
         'retry_change': ['accounts.change_applicationcredential', 'accounts.add_changesecretexecution'],
     }
 
     def perform_destroy(self, instance):
         if instance.status != ApplicationCredential.Status.idle:
-            raise ValidationError(_('A rotating application credential cannot be deleted.'))
+            raise ValidationError(_('A rotating credential policy cannot be deleted.'))
         if instance.access_configurations.exists():
             raise ValidationError(_('Remove this credential from client access configurations before deleting it.'))
         return super().perform_destroy(instance)
@@ -140,7 +141,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     @action(methods=['post'], detail=True, url_path='start')
     def start_rotation(self, request, *args, **kwargs):
         credential = self.get_object()
-        if credential.rotation_mode == 'dual' and not request.user.has_perm('accounts.verify_account'):
+        if not request.user.has_perm('accounts.verify_account'):
             raise PermissionDenied()
         credential = CredentialRotationManager(credential.id).start(request.user.name, request.user.id)
         serializer = self.get_serializer(credential)
@@ -148,7 +149,19 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
 
     @action(methods=['post'], detail=True, url_path='change-secret')
     def change_secret(self, request, *args, **kwargs):
-        credential = CredentialRotationManager(self.get_object().id).change_secret()
+        credential_id = self.get_object().id
+        try:
+            credential = CredentialRotationManager(credential_id).change_secret()
+        except JMSException as exc:
+            if exc.get_codes() != 'credential_rotation_clients_not_ready':
+                raise
+            from accounts.credential_rotation.participants import build
+            credential = ApplicationCredential.objects.get(pk=credential_id)
+            rotation_status = build(credential)
+            return Response({
+                'blockers': rotation_status['blockers'],
+                'rotation_status': rotation_status,
+            }, status=status.HTTP_409_CONFLICT)
         serializer = self.get_serializer(credential)
         return Response(serializer.data)
 
@@ -156,9 +169,18 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     def check_usage(self, request, *args, **kwargs):
         credential, blockers = CredentialRotationManager(self.get_object().id).check_usage()
         if blockers:
-            return Response({'blockers': blockers}, status=status.HTTP_409_CONFLICT)
+            from accounts.credential_rotation.participants import build
+            return Response({
+                'blockers': blockers,
+                'rotation_status': build(credential),
+            }, status=status.HTTP_409_CONFLICT)
         serializer = self.get_serializer(credential)
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=True, url_path='rotation-status')
+    def rotation_status(self, request, *args, **kwargs):
+        from accounts.credential_rotation.participants import build
+        return Response(build(self.get_object()))
 
     @action(methods=['post'], detail=True, url_path='check-secret-change')
     def check_secret_change(self, request, *args, **kwargs):
@@ -170,7 +192,11 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     def complete_rotation(self, request, *args, **kwargs):
         credential, blockers = CredentialRotationManager(self.get_object().id).complete()
         if blockers:
-            return Response({'blockers': blockers}, status=status.HTTP_409_CONFLICT)
+            from accounts.credential_rotation.participants import build
+            return Response({
+                'blockers': blockers,
+                'rotation_status': build(credential),
+            }, status=status.HTTP_409_CONFLICT)
         serializer = self.get_serializer(credential)
         return Response(serializer.data)
 
@@ -243,6 +269,12 @@ class CredentialClientInstanceViewSet(
     def perform_destroy(self, instance):
         if instance.online:
             raise ValidationError(_('An online client cannot be deleted.'))
+        if instance.credential_statuses.exclude(
+            binding__credential__status=ApplicationCredential.Status.idle,
+        ).exists():
+            raise ValidationError(_(
+                'Disable the rotating client with a reason before deleting it.'
+            ))
         return super().perform_destroy(instance)
 
 
@@ -257,7 +289,6 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
     }
     serializer_classes = {
         'credential': serializers.CredentialFetchSerializer,
-        'heartbeat': serializers.CredentialHeartbeatSerializer,
         'confirm': serializers.CredentialConfirmSerializer,
         'register_agent': serializers.CredentialAgentRegisterSerializer,
         'sync_agent': serializers.CredentialAgentSyncSerializer,
@@ -303,17 +334,11 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         manager = self.get_client_manager(data)
-        response = Response(manager.fetch(data['key'], get_request_ip(request)))
+        response = Response(manager.fetch(
+            data.get('key', ''), get_request_ip(request), data.get('account_id'),
+        ))
         response['Cache-Control'] = 'no-store'
         return response
-
-    @action(methods=['post'], detail=False)
-    def heartbeat(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        manager = self.get_client_manager(data)
-        return Response(manager.heartbeat(data['credentials']))
 
     @action(methods=['post'], detail=False)
     def confirm(self, request, *args, **kwargs):
@@ -378,11 +403,3 @@ class ClientAccessConfigurationViewSet(ApplicationAuditMixin, OrgBulkModelViewSe
         response = Response(data)
         response['Cache-Control'] = 'no-store'
         return response
-
-
-class CredentialRotationRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
-    model = CredentialRotationRecord
-    serializer_class = serializers.CredentialRotationRecordSerializer
-    filterset_fields = ('credential', 'status')
-    search_fields = ('created_by', 'comment')
-    rbac_perms = {'list': 'accounts.view_applicationcredential'}

@@ -116,6 +116,12 @@ def validate_configuration(configuration, capabilities):
     keys = configuration.get('credential_keys')
     if not isinstance(keys, list) or not all(isinstance(key, str) and key for key in keys):
         raise ValueError('Credential keys must be a string list.')
+    confirmation_keys = configuration.get('confirmation_keys', [])
+    if (
+        not isinstance(confirmation_keys, list)
+        or not all(isinstance(key, str) and key in keys for key in confirmation_keys)
+    ):
+        raise ValueError('Confirmation keys must be an authorized credential key list.')
     for field in ('delivery_root', 'socket_path', 'app_user'):
         if configuration.get(field, '') != capabilities.get(field, ''):
             raise ValueError(f'Agent configuration exceeds the installed {field} capability.')
@@ -189,8 +195,12 @@ class Agent:
         self.credentials = read_json(self.config.get('credential_file', CREDENTIAL_FILE))
         self.delivered = read_json(self.delivery_file)
         self.authorized_keys = set(self.config.get('authorized_keys', self.configuration['credential_keys']))
+        self.confirmation_keys = set(
+            self.configuration.get('confirmation_keys', self.configuration['credential_keys'])
+        )
         self.access_denied = bool(self.config.get('access_denied', False))
         self.lock = threading.Lock()
+        self.sync_lock = threading.Lock()
 
     @property
     def state_file(self):
@@ -311,6 +321,7 @@ class Agent:
             if configuration is not None:
                 validate_configuration(configuration, self.capabilities)
                 self.configuration = configuration
+                self.confirmation_keys = set(configuration.get('confirmation_keys', []))
                 self.config['configuration'] = configuration
             keys = [
                 key for key, item in metadata.items()
@@ -339,7 +350,24 @@ class Agent:
         self.config['sync_error'] = ''
         self.set_access_denied(False)
         self.save_config()
+        self.report_confirmations()
         return response
+
+    def report_confirmations(self):
+        with self.lock:
+            states = [
+                dict(item) for key, item in sorted(self.state.items())
+                if key in self.authorized_keys
+                and key in getattr(self, 'confirmation_keys', self.authorized_keys)
+                and self.credentials.get(key, {}).get('revision') == item.get('revision')
+            ]
+        for item in states:
+            try:
+                self.remote.ConfirmCredential(models.ConfirmCredentialRequest(
+                    Key=item['key'], Revision=item['revision'], AccountId=item['account_id'],
+                ))
+            except (JumpServerPAMSDKException, OSError):
+                continue
 
     def confirm(self, key, revision):
         with self.lock:
@@ -347,6 +375,8 @@ class Agent:
                 raise PermissionError(self.config.get('denied_reason') or 'Agent access is disabled.')
             if key not in self.authorized_keys:
                 raise KeyError(f'Credential not authorized: {key}')
+            if key not in getattr(self, 'confirmation_keys', self.authorized_keys):
+                raise ValueError('Credential update subscriptions do not require confirmation.')
             item = self.credentials.get(key)
             if not item:
                 raise KeyError(f'Credential not found: {key}')
@@ -358,17 +388,22 @@ class Agent:
             }
             atomic_write_json(self.state_file, state)
             self.state = state
-            return {**state[key], 'status': 'accepted'}
+        try:
+            self.remote.ConfirmCredential(models.ConfirmCredentialRequest(
+                Key=key, Revision=item['revision'], AccountId=item['account_id'],
+            ))
+            status = 'confirmed'
+        except (JumpServerPAMSDKException, OSError):
+            status = 'pending'
+        return {**state[key], 'status': status}
 
-    def heartbeat(self):
-        with self.lock:
-            states = [
-                models.CredentialState(
-                    Key=item['key'], Revision=item['revision'], AccountId=item['account_id'],
-                )
-                for key, item in sorted(self.state.items()) if key in self.authorized_keys
-            ]
-        return self.remote.Heartbeat(models.HeartbeatRequest(Credentials=states))._serialize()
+    def safe_sync(self):
+        if not self.sync_lock.acquire(blocking=False):
+            return
+        try:
+            self.sync()
+        finally:
+            self.sync_lock.release()
 
     def socket_reply(self, handler, status, payload):
         body = json.dumps(payload, ensure_ascii=False).encode()
@@ -444,27 +479,35 @@ class Agent:
     def run(self):
         server = self.start_local_server()
         stop = threading.Event()
+        reconcile_interval = self.config.get('reconcile_interval', 300)
+
+        def reconcile_loop():
+            while not stop.wait(reconcile_interval):
+                try:
+                    self.safe_sync()
+                except Exception as error:
+                    print(f'JumpServer PAM Agent: reconcile: {type(error).__name__}', file=sys.stderr)
+
+        threading.Thread(target=reconcile_loop, daemon=True).start()
         try:
-            while True:
-                denied = False
-                try:
-                    self.sync()
-                except (JumpServerPAMSDKException, OSError) as error:
-                    denied = identity_denied(error) or getattr(error, 'status_code', None) == 426
-                    if denied:
-                        self.set_access_denied(True, getattr(error, 'code', '') or 'agent_access_denied')
-                    print(f'JumpServer PAM Agent: sync: {type(error).__name__}', file=sys.stderr)
-                except (KeyError, TypeError, ValueError, subprocess.SubprocessError) as error:
-                    print(f'JumpServer PAM Agent: apply: {type(error).__name__}', file=sys.stderr)
-                try:
-                    if not denied and not self.access_denied:
-                        self.heartbeat()
-                except (JumpServerPAMSDKException, OSError, KeyError, TypeError, ValueError) as error:
-                    print(f'JumpServer PAM Agent: heartbeat: {type(error).__name__}', file=sys.stderr)
-                stop.wait(self.config.get('poll_interval', 30))
+            try:
+                self.safe_sync()
+            except Exception as error:
+                print(f'JumpServer PAM Agent: initial sync: {type(error).__name__}', file=sys.stderr)
+            actionable = {'snapshot', 'credential.updated', 'credential.revoked', 'configuration.updated'}
+            for event in self.remote.WatchCredentialEvents(stop):
+                if event.get('event') in actionable:
+                    self.safe_sync()
+                else:
+                    print(
+                        f"JumpServer PAM Agent: {event.get('event', 'unknown')}: "
+                        f"{event.get('result', '')}",
+                        file=sys.stderr,
+                    )
         except KeyboardInterrupt:
             pass
         finally:
+            stop.set()
             server.shutdown()
             server.server_close()
             try:

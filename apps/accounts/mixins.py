@@ -72,7 +72,8 @@ class ApplicationAuditMixin:
             # An SDK instance created by a failed first fetch is rolled back; its PK is not stable.
             context.fetch_identity = [
                 str(application.org_id), str(application.id), client_type,
-                configuration_id, instance_id, params.get('key', ''), get_request_ip(self.request),
+                configuration_id, instance_id, params.get('key', ''),
+                params.get('account_id', ''), get_request_ip(self.request),
             ]
         return context
 

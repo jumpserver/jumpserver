@@ -14,7 +14,8 @@ class ApplicationAuditSerializer(serializers.ModelSerializer):
         model = ApplicationAudit
         fields = [
             'id', 'event', 'result', 'service', 'service_id', 'credential', 'credential_id',
-            'credential_key', 'configuration', 'configuration_id', 'instance_id',
+            'credential_key', 'account', 'account_id',
+            'configuration', 'configuration_id', 'instance_id',
             'source', 'operator', 'remote_addr', 'revision', 'rotation_id', 'summary',
             'changes', 'datetime', 'notification',
         ]

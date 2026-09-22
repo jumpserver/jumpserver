@@ -17,50 +17,44 @@ __all__ = [
 
 
 class ApplicationCredential(JMSOrgBaseModel):
-    class Type(models.TextChoices):
-        fixed = 'fixed', _('Fixed account')
-        rotation = 'rotation', _('Account rotation')
-
-    class RotationMode(models.TextChoices):
-        single = 'single', _('Single account')
-        dual = 'dual', _('Dual accounts')
+    class Mode(models.TextChoices):
+        subscription = 'subscription', _('Credential update subscription')
+        alternating_rotation = 'alternating_rotation', _('Alternating dual-account rotation')
 
     class Status(models.TextChoices):
         idle = 'idle', _('Idle')
-        waiting_backup = 'waiting_backup', _('Waiting for backup account')
+        waiting_switch = 'waiting_switch', _('Waiting for account switch')
         ready_for_change = 'ready_for_change', _('Ready for secret change')
         changing_secret = 'changing_secret', _('Changing secret')
         change_failed = 'change_failed', _('Secret change failed')
         recovery_required = 'recovery_required', _('Recovery required')
-        waiting_primary = 'waiting_primary', _('Waiting for primary account')
+        waiting_revert = 'waiting_revert', _('Waiting for account revert')
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     key = models.CharField(max_length=64, unique=True, default='', verbose_name=_('Key'))
-    type = models.CharField(max_length=16, choices=Type.choices, default=Type.rotation, verbose_name=_('Type'))
-    rotation_mode = models.CharField(
-        max_length=16, choices=RotationMode.choices, default=RotationMode.dual,
-        blank=True, verbose_name=_('Rotation mode')
+    mode = models.CharField(
+        max_length=32, choices=Mode.choices, default=Mode.subscription,
+        verbose_name=_('Mode')
     )
-    primary_account = models.ForeignKey(
-        'accounts.Account', on_delete=models.PROTECT,
-        related_name='primary_application_credentials', verbose_name=_('Primary account')
-    )
-    backup_account = models.ForeignKey(
+    account = models.ForeignKey(
         'accounts.Account', on_delete=models.PROTECT,
         null=True, blank=True,
-        related_name='backup_application_credentials', verbose_name=_('Backup account')
+        related_name='application_credentials', verbose_name=_('Account')
     )
-    published_account = models.ForeignKey(
+    alternate_account = models.ForeignKey(
         'accounts.Account', on_delete=models.PROTECT,
-        related_name='published_application_credentials', verbose_name=_('Published account')
+        null=True, blank=True,
+        related_name='alternate_application_credentials', verbose_name=_('Alternate account')
+    )
+    active_account = models.ForeignKey(
+        'accounts.Account', on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name='active_application_credentials', verbose_name=_('Active account')
     )
     revision = models.PositiveIntegerField(default=1, verbose_name=_('Revision'))
     status = models.CharField(
         max_length=32, choices=Status.choices, default=Status.idle,
         verbose_name=_('Status')
-    )
-    primary_version_at_start = models.IntegerField(
-        null=True, blank=True, verbose_name=_('Primary version at start')
     )
     rotation_cancelled = models.BooleanField(default=False, verbose_name=_('Rotation cancelled'))
     date_rotation_started = models.DateTimeField(
@@ -80,9 +74,9 @@ class ApplicationCredential(JMSOrgBaseModel):
     )
 
     class Meta:
-        unique_together = [('org_id', 'name'), ('org_id', 'primary_account')]
+        unique_together = [('org_id', 'name')]
         ordering = ['name']
-        verbose_name = _('Application credential')
+        verbose_name = _('Credential policy')
 
     def __str__(self):
         return self.name
@@ -94,15 +88,28 @@ class ApplicationCredential(JMSOrgBaseModel):
 
     @property
     def asset(self):
-        return self.primary_account.asset
+        return self.account.asset if self.account_id else None
+
+    def account_key(self, account_id):
+        return f'{self.key}:{account_id}'
+
+    @property
+    def target_account(self):
+        if self.mode != self.Mode.alternating_rotation:
+            return None
+        if self.active_account_id == self.account_id:
+            return self.alternate_account
+        return self.account
 
     @property
     def current_revision(self):
         return self.revision
 
     def authorized_applications(self):
+        if self.mode == self.Mode.subscription:
+            return self.applications.all()
         applications = IntegrationApplication.objects.all()
-        for account in (self.primary_account, self.backup_account):
+        for account in (self.account, self.alternate_account):
             if account:
                 applications = applications.filter(
                     IntegrationApplication.accounts.get_filter_q(account)
@@ -127,43 +134,14 @@ class ApplicationCredential(JMSOrgBaseModel):
         )
 
     def get_blockers(self, now=None):
-        now = now or timezone.now()
-        offline_before = now - timedelta(minutes=2)
-        blockers = []
-        for state in self.participant_statuses():
-            reason = ''
-            if not state.date_last_seen or state.date_last_seen < offline_before:
-                reason = 'offline'
-            elif (
-                state.applied_revision != state.required_revision
-                or state.applied_account_id != self.published_account_id
-            ):
-                reason = 'not_applied'
-            if not reason:
-                continue
-            blockers.append({
-                'application': {
-                    'id': str(state.binding.application_id),
-                    'name': state.binding.application.name,
-                },
-                'client': {
-                    'id': str(state.client_id),
-                    'instance_id': state.client.instance_id,
-                    'type': state.client.type,
-                },
-                'reason': reason,
-                'applied_revision': state.applied_revision,
-                'required_revision': state.required_revision,
-                'applied_account': str(state.applied_account_id or ''),
-                'date_last_seen': state.date_last_seen,
-            })
-        return blockers
+        from accounts.credential_rotation.participants import build
+        return build(self, now=now)['blockers']
 
 
 class CredentialApplicationBinding(JMSOrgBaseModel):
     credential = models.ForeignKey(
         ApplicationCredential, on_delete=models.CASCADE,
-        related_name='application_bindings', verbose_name=_('Application credential')
+        related_name='application_bindings', verbose_name=_('Credential policy')
     )
     application = models.ForeignKey(
         'accounts.IntegrationApplication', on_delete=models.CASCADE,
@@ -295,7 +273,7 @@ class ClientAccessConfiguration(JMSOrgBaseModel):
     )
     type = models.CharField(max_length=16, choices=CredentialClientInstance.Type.choices, verbose_name=_('Type'))
     credentials = models.ManyToManyField(
-        ApplicationCredential, related_name='access_configurations', verbose_name=_('Application credentials')
+        ApplicationCredential, related_name='access_configurations', verbose_name=_('Credential policies')
     )
     language = models.CharField(max_length=16, default='python', choices=[('python', 'Python')], verbose_name=_('Language'))
     app_user = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Application user'))
@@ -333,13 +311,31 @@ class CredentialRotationRecord(JMSOrgBaseModel):
     )
     credential = models.ForeignKey(
         ApplicationCredential, on_delete=models.CASCADE,
-        related_name='rotation_records', verbose_name=_('Application credential')
+        related_name='rotation_records', verbose_name=_('Credential policy')
+    )
+    source_account = models.ForeignKey(
+        'accounts.Account', on_delete=models.PROTECT, related_name='+',
+        verbose_name=_('Source account'),
+    )
+    target_account = models.ForeignKey(
+        'accounts.Account', on_delete=models.PROTECT, related_name='+',
+        verbose_name=_('Target account'),
+    )
+    change_account = models.ForeignKey(
+        'accounts.Account', on_delete=models.PROTECT, related_name='+',
+        verbose_name=_('Account to change'),
+    )
+    change_account_version_at_start = models.PositiveIntegerField(
+        verbose_name=_('Account version at start')
     )
     status = models.CharField(max_length=16, default='running', choices=[
         ('running', _('Running')), ('success', _('Success')),
         ('failed', _('Failed')), ('cancelled', _('Cancelled')),
     ], verbose_name=_('Status'))
     date_finished = models.DateTimeField(null=True, blank=True, verbose_name=_('Date finished'))
+    participant_snapshot = models.JSONField(
+        default=dict, blank=True, verbose_name=_('Participant snapshot')
+    )
 
     class Meta:
         ordering = ['-date_created']

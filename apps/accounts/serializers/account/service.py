@@ -13,7 +13,7 @@ from accounts.webhooks import (
     validate_webhook_template, validate_webhook_url,
 )
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
-from common.serializers.fields import JSONManyToManyField, ListMultipleChoiceField
+from common.serializers.fields import JSONManyToManyField, ListMultipleChoiceField, ObjectRelatedField
 from common.utils import random_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
@@ -71,7 +71,7 @@ class IntegrationApplicationDetailSerializer(IntegrationApplicationSerializer):
             account_id
             for configuration in configurations
             for credential in configuration.credentials.all()
-            for account_id in (credential.primary_account_id, credential.backup_account_id)
+            for account_id in (credential.account_id, credential.alternate_account_id)
             if account_id
         }
         clients = CredentialClientInstance.objects.filter(
@@ -123,6 +123,10 @@ class IntegrationAccountSecretSerializer(serializers.Serializer):
 
 
 class ApplicationWebhookSerializer(serializers.ModelSerializer):
+    applications = ObjectRelatedField(
+        queryset=IntegrationApplication.objects, many=True,
+        attrs=('id', 'name'), label=_('Integration applications'),
+    )
     url = serializers.CharField(
         write_only=True, required=False, allow_blank=True, max_length=2048,
     )
@@ -139,8 +143,9 @@ class ApplicationWebhookSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicationWebhook
         fields = [
-            'id', 'is_active', 'url', 'url_display', 'method', 'headers',
-            'header_names', 'events', 'body_template',
+            'id', 'name', 'applications', 'is_active', 'url', 'url_display',
+            'method', 'headers', 'header_names', 'events', 'body_template',
+            'date_created', 'date_updated', 'comment',
         ]
         read_only_fields = ['id', 'url_display', 'header_names']
 
@@ -173,6 +178,11 @@ class ApplicationWebhookSerializer(serializers.ModelSerializer):
         enabled = attrs.get('is_active', getattr(instance, 'is_active', False))
         url = attrs.get('url', getattr(instance, 'url', ''))
         events = attrs.get('events', getattr(instance, 'events', []))
+        applications = attrs.get('applications')
+        if applications is None and instance and instance.pk:
+            applications = instance.applications.all()
+        if not applications:
+            raise serializers.ValidationError({'applications': _('Select at least one application.')})
         if enabled and not url:
             raise serializers.ValidationError({'url': _('URL is required when webhook is enabled.')})
         if enabled and not events:

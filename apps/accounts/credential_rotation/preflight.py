@@ -1,4 +1,4 @@
-"""Backup verification using existing automation rows, snapshots and runners."""
+"""Target-account verification using existing automation rows, snapshots and runners."""
 from contextlib import ExitStack, contextmanager
 from datetime import timedelta
 from billiard.exceptions import SoftTimeLimitExceeded
@@ -18,10 +18,10 @@ from common.utils import get_logger
 
 TIMEOUT = timedelta(minutes=10)
 ERRORS = {
-    'failed': _('Backup account verification failed. The primary account remains published.'),
-    'timeout': _('Backup account verification timed out. Retry verification; rotation has not started.'),
+    'failed': _('Target account verification failed. The current account remains published.'),
+    'timeout': _('Target account verification timed out. Retry verification; rotation has not started.'),
     'changed': _('The account or credential changed during verification. Start verification again.'),
-    'dispatch_failed': _('Unable to dispatch backup account verification. Please retry.'),
+    'dispatch_failed': _('Unable to dispatch target account verification. Please retry.'),
 }
 
 
@@ -39,21 +39,23 @@ def check_secret_reset(account):
 def check_ownership(credential, accounts):
     ids = [a.id for a in accounts if a]
     conflict = ApplicationCredential.objects.filter(
-        Q(primary_account_id__in=ids) | Q(backup_account_id__in=ids),
+        Q(account_id__in=ids) | Q(alternate_account_id__in=ids),
     ).exclude(pk=credential.pk).first()
     if conflict:
         raise JMSException(code='credential_account_in_use', detail=_(
-            'This account is already used by application credential "{name}". '
-            'Choose another account or reuse that application credential.'
+            'This account is already used by credential policy "{name}". '
+            'Choose another account or reuse that credential policy.'
         ).format(name=conflict.name))
 
 
 def check(credential):
-    if not credential.is_active or credential.type != 'rotation' or credential.status != 'idle':
-        raise JMSException(_('Only active, idle rotation credentials can start rotation.'))
-    accounts = [credential.primary_account]
-    if credential.rotation_mode == 'dual':
-        accounts.append(credential.backup_account)
+    if (
+        not credential.is_active
+        or credential.mode != ApplicationCredential.Mode.alternating_rotation
+        or credential.status != ApplicationCredential.Status.idle
+    ):
+        raise JMSException(_('Only active, idle alternating rotation policies can start rotation.'))
+    accounts = [credential.account, credential.alternate_account]
     if any(a is None for a in accounts):
         raise JMSException(_('The rotation account configuration is incomplete.'))
     if len(accounts) == 2 and (
@@ -61,9 +63,9 @@ def check(credential):
         or accounts[0].asset_id != accounts[1].asset_id
         or accounts[0].secret_type != accounts[1].secret_type
     ):
-        raise JMSException(_('Primary and backup accounts must be different and use the same asset and secret type.'))
+        raise JMSException(_('The initial and alternate accounts must be different and use the same asset and secret type.'))
     check_ownership(credential, accounts)
-    check_secret_reset(credential.primary_account)
+    check_secret_reset(credential.active_account)
     for account in accounts:
         if str(account.org_id) != str(credential.org_id) or str(account.asset.org_id) != str(credential.org_id):
             raise JMSException(_('The rotation accounts and asset must belong to the credential organization.'))
@@ -77,7 +79,7 @@ def check(credential):
 def account_locks(credential):
     # The credential row is locked by the caller, as in the normal change engine.
     with ExitStack() as stack:
-        for account_id in sorted(filter(None, (credential.primary_account_id, credential.backup_account_id))):
+        for account_id in sorted(filter(None, (credential.account_id, credential.alternate_account_id))):
             lock = cache.lock(f'account-change-secret:{account_id}', expire=30, auto_renewal=True)
             if not lock.acquire(blocking=False):
                 raise JMSException(_('An account change is already running. Wait before starting rotation.'))
@@ -86,7 +88,7 @@ def account_locks(credential):
 
 
 def fingerprint(credential):
-    accounts = [credential.primary_account, credential.backup_account]
+    accounts = [credential.account, credential.alternate_account]
     return {
         'credential_id': str(credential.id), 'revision': credential.revision,
         'credential_updated': credential.date_updated.isoformat(),
@@ -99,7 +101,7 @@ def fingerprint(credential):
 
 
 def task_name(credential):
-    return f'PAM backup verification {credential.id}'
+    return f'PAM target-account verification {credential.id}'
 
 
 def authorized(execution):
@@ -150,7 +152,7 @@ def start(credential, operator='', operator_id=None):
     if task.params.get('credential_precheck') != str(credential.id):
         raise JMSException(_('The verification task name is already in use.'))
     task = VerifyAccountAutomation.objects.select_for_update().get(pk=task.pk)
-    account = credential.backup_account
+    account = credential.target_account
     tp = 'verify_gateway_account' if account.asset.is_gateway else 'verify_account'
     execution = AutomationExecution.objects.create(
         automation=task, type=tp,
@@ -228,7 +230,7 @@ def finish(execution_id):
         with transaction.atomic(), account_locks(credential):
             # Serialize local password edits with the final fingerprint check and publication.
             list(Account.objects.select_for_update().filter(
-                id__in=[credential.primary_account_id, credential.backup_account_id],
+                id__in=[credential.account_id, credential.alternate_account_id],
             ).order_by('id'))
             credential.refresh_from_db()
             check(credential)

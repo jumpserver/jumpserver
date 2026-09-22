@@ -347,13 +347,10 @@ class AgentDeliveryTests(SimpleTestCase):
             + f'Content-Length: {len(body)}\r\nConnection: close\r\n\r\n'.encode() + body
         )
         status, payload = self.socket_request(request)
-        self.assertEqual((status, payload['revision'], payload['status']), (200, 2, 'accepted'))
+        self.assertEqual((status, payload['revision'], payload['status']), (200, 2, 'confirmed'))
         self.assertEqual(read_json(self.agent.state_file)['db']['revision'], 2)
-        self.agent.remote.ConfirmCredential.assert_not_called()
-
-        self.agent.heartbeat()
-        heartbeat = self.agent.remote.Heartbeat.call_args.args[0]
-        self.assertEqual((heartbeat.Credentials[0].Key, heartbeat.Credentials[0].Revision), ('db', 2))
+        confirmation = self.agent.remote.ConfirmCredential.call_args.args[0]
+        self.assertEqual((confirmation.Key, confirmation.Revision), ('db', 2))
 
         self.agent.access_denied = True
         status, payload = self.socket_request(

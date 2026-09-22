@@ -10,8 +10,8 @@ def fetch_credential(client, account_id):
     secret_type = response.Account.SecretType
     secret = response.Account.Secret
 
-    # 使用 address、username 和 secret 更新应用连接。
-    # 不要把 secret 或认证请求头写入日志。
+    # Use address, username and secret to update the application connection.
+    # Never write secret or authentication headers to logs.
 
 
 with credential_client.CredentialClient(

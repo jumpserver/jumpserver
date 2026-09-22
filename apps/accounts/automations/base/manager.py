@@ -434,17 +434,19 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         from accounts.models import ApplicationCredential
         from django.db.models import Q
         credentials = ApplicationCredential.objects.select_for_update(of=('self',)).filter(
-            Q(primary_account_id=account_id) | Q(backup_account_id=account_id),
-            type=ApplicationCredential.Type.rotation,
+            Q(account_id=account_id) | Q(alternate_account_id=account_id),
+            mode=ApplicationCredential.Mode.alternating_rotation,
         ).order_by('key')
         for credential in credentials:
             if credential.status == credential.Status.idle:
                 continue
-            if (credential.primary_account_id != account_id
-                    and str(credential.primary_account_id) != str(account_id)) or (
+            rotation = credential.rotation_records.first()
+            change_account_id = rotation.change_account_id if rotation else None
+            if (change_account_id != account_id
+                    and str(change_account_id) != str(account_id)) or (
                 credential.change_execution_id != self.execution.id
             ):
-                raise ValueError(_('This account belongs to an active application credential rotation.'))
+                raise ValueError(_('This account belongs to an active credential policy rotation.'))
         account_id = str(account_id)
         if account_id in self.account_locks:
             return True

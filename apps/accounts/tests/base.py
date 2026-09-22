@@ -2,7 +2,10 @@ from django.test import TestCase
 from unittest.mock import patch
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from accounts.models import Account, ApplicationCredential, ClientAccessConfiguration, IntegrationApplication
+from accounts.models import (
+    Account, ApplicationCredential, ClientAccessConfiguration,
+    CredentialApplicationBinding, IntegrationApplication,
+)
 from assets.const import Category
 from assets.models import Asset, Platform
 from orgs.models import Organization
@@ -45,9 +48,13 @@ class CredentialTestCase(TestCase):
         )
         self.credential = ApplicationCredential.objects.create(
             name='PostgreSQL primary',
-            primary_account=self.primary,
-            backup_account=self.backup,
-            published_account=self.primary,
+            mode=ApplicationCredential.Mode.alternating_rotation,
+            account=self.primary,
+            alternate_account=self.backup,
+            active_account=self.primary,
+        )
+        CredentialApplicationBinding.objects.create(
+            credential=self.credential, application=self.application,
         )
         # State-machine tests assume successful backup verification; the real
         # preflight lifecycle is exercised separately in CredentialPreflightTests.

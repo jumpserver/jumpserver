@@ -43,110 +43,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'reset_secret': 'accounts.change_integrationapplication',
         'get_account_secret': 'accounts.view_integrationapplication',
         'get_sdks_info': 'accounts.view_integrationapplication',
-        'webhook': 'accounts.view_integrationapplication',
-        'update_webhook': 'accounts.change_integrationapplication',
-        'webhook_preview': 'accounts.view_integrationapplication',
-        'webhook_test': 'accounts.change_integrationapplication',
     }
-
-    def get_webhook_application(self):
-        # These actions manage a related resource; avoid starting an application-update audit.
-        return OrgBulkModelViewSet.get_object(self)
-
-    @staticmethod
-    def get_webhook_instance(application):
-        return ApplicationWebhook.objects.filter(application=application).first()
-
-    @staticmethod
-    def get_default_webhook_instance(application):
-        return ApplicationWebhook(application=application, org_id=application.org_id)
-
-    def webhook_response(self, application, instance):
-        data = serializers.ApplicationWebhookSerializer(instance).data
-        if instance._state.adding:
-            data['id'] = None
-        data.update({
-            'event_options': [
-                {'value': value, 'label': str(label)}
-                for value, label in ApplicationEvent.choices
-            ],
-            'template_variables': webhook_template_variables(),
-            'default_template': default_application_webhook_template(),
-        })
-        return data
-
-    @action(['GET'], detail=True, url_path='webhook')
-    def webhook(self, request, *args, **kwargs):
-        application = self.get_webhook_application()
-        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
-        return Response(self.webhook_response(application, instance))
-
-    @webhook.mapping.patch
-    def update_webhook(self, request, *args, **kwargs):
-        application = self.get_webhook_application()
-        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
-        serializer = serializers.ApplicationWebhookSerializer(
-            instance, data=request.data, partial=True,
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(self.webhook_response(application, instance))
-
-    def get_preview_data(self, request, application):
-        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
-        event = request.data.get('event') or (instance.events[0] if instance.events else None)
-        if event not in ApplicationEvent.values:
-            raise ValidationError({'event': _('Select a supported webhook event.')})
-        template = request.data.get('body_template', instance.body_template)
-        try:
-            body = render_webhook_template(template, sample_webhook_context(application, event))
-        except WebhookValidationError as exc:
-            raise ValidationError({'body_template': str(exc)}) from exc
-        return instance, event, body
-
-    @action(['POST'], detail=True, url_path='webhook/preview')
-    def webhook_preview(self, request, *args, **kwargs):
-        application = self.get_webhook_application()
-        _, _, body = self.get_preview_data(request, application)
-        return Response({'body': body})
-
-    @action(['POST'], detail=True, url_path='webhook/test')
-    def webhook_test(self, request, *args, **kwargs):
-        application = self.get_webhook_application()
-        instance = self.get_webhook_instance(application) or self.get_default_webhook_instance(application)
-        data = {key: value for key, value in request.data.items() if key != 'event'}
-        serializer = serializers.ApplicationWebhookSerializer(instance, data=data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        values = serializer.validated_data
-        url = values.get('url', instance.url)
-        events = values.get('events', instance.events)
-        event = request.data.get('event') or (events[0] if events else None)
-        if not url:
-            raise ValidationError({'url': _('URL is required to test the webhook.')})
-        if event not in events:
-            raise ValidationError({'event': _('Select one of the subscribed webhook events.')})
-        template = values.get('body_template', instance.body_template)
-        try:
-            body = render_webhook_template(template, sample_webhook_context(application, event))
-        except WebhookValidationError as exc:
-            raise ValidationError({'body_template': str(exc)}) from exc
-
-        from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
-        try:
-            status_code = send_webhook(
-                values.get('method', instance.method), url,
-                values.get('headers', instance.headers), body,
-            )
-        except WebhookRequestError as exc:
-            return Response({
-                'success': False, 'status_code': getattr(exc, 'status_code', None),
-                'reason': exc.reason,
-            })
-        success = 200 <= status_code < 300
-        return Response({
-            'success': success, 'status_code': status_code,
-            'reason': '' if success else 'http_error',
-        })
 
     def read_file(self, path):
         if os.path.exists(path):
@@ -160,7 +57,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     def get_sdks_info(self, request, *args, **kwargs):
         sdk_language = request.query_params.get('language', 'python')
         if sdk_language != 'python':
-            raise ValidationError(_('Application credentials currently support the Python SDK only.'))
+            raise ValidationError(_('Credential policies currently support the Python SDK only.'))
         sdk_path = os.path.join(settings.APPS_DIR, 'accounts', 'demos', sdk_language)
         readme_path = os.path.join(sdk_path, f'README.{get_language()}.md')
         demo_path = os.path.join(sdk_path, 'demo.py')
@@ -216,6 +113,79 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         response['Warning'] = '299 JumpServer "Use /api/v1/accounts/credential-client/credential/ instead."'
         response['Cache-Control'] = 'no-store'
         return response
+
+
+class ApplicationWebhookViewSet(OrgBulkModelViewSet):
+    model = ApplicationWebhook
+    serializer_class = serializers.ApplicationWebhookSerializer
+    rbac_perms = {
+        'metadata': 'accounts.view_applicationwebhook',
+        'preview': 'accounts.view_applicationwebhook',
+        'test_webhook': 'accounts.change_applicationwebhook',
+    }
+    filterset_fields = ('is_active', 'applications')
+    search_fields = ('name', 'comment')
+    ordering_fields = ('name', 'date_created')
+
+    @action(['GET'], detail=False)
+    def metadata(self, request, *args, **kwargs):
+        return Response({
+            'event_options': [
+                {'value': value, 'label': str(label)}
+                for value, label in ApplicationEvent.choices
+            ],
+            'template_variables': webhook_template_variables(),
+            'default_template': default_application_webhook_template(),
+        })
+
+    def preview_data(self, request, instance):
+        event = request.data.get('event') or (instance.events[0] if instance.events else None)
+        if event not in ApplicationEvent.values:
+            raise ValidationError({'event': _('Select a supported webhook event.')})
+        application = instance.applications.order_by('name').first()
+        if not application:
+            raise ValidationError({'applications': _('Select at least one application.')})
+        template = request.data.get('body_template', instance.body_template)
+        try:
+            return render_webhook_template(template, sample_webhook_context(application, event))
+        except WebhookValidationError as exc:
+            raise ValidationError({'body_template': str(exc)}) from exc
+
+    @action(['POST'], detail=True)
+    def preview(self, request, *args, **kwargs):
+        return Response({'body': self.preview_data(request, self.get_object())})
+
+    @action(['POST'], detail=True, url_path='test')
+    def test_webhook(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = {key: value for key, value in request.data.items() if key != 'event'}
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        values = serializer.validated_data
+        url = values.get('url', instance.url)
+        events = values.get('events', instance.events)
+        event = request.data.get('event') or (events[0] if events else None)
+        if not url:
+            raise ValidationError({'url': _('URL is required to test the webhook.')})
+        if event not in events:
+            raise ValidationError({'event': _('Select one of the subscribed webhook events.')})
+        body = self.preview_data(request, instance)
+        from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
+        try:
+            status_code = send_webhook(
+                values.get('method', instance.method), url,
+                values.get('headers', instance.headers), body,
+            )
+        except WebhookRequestError as exc:
+            return Response({
+                'success': False, 'status_code': getattr(exc, 'status_code', None),
+                'reason': exc.reason,
+            })
+        success = 200 <= status_code < 300
+        return Response({
+            'success': success, 'status_code': status_code,
+            'reason': '' if success else 'http_error',
+        })
 
 
 class PythonSDKDownloadAPI(APIView):

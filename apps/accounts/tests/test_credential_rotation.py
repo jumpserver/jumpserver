@@ -12,6 +12,7 @@ from django.db.models import F
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.template.loader import render_to_string
+from django.urls import Resolver404, resolve
 from django.utils import timezone
 from django.utils.translation import override as override_language
 from rest_framework.exceptions import ValidationError, PermissionDenied
@@ -20,11 +21,13 @@ from rest_framework.test import force_authenticate
 
 from accounts.credential_client.manager import ClientAccessConfigurationManager, CredentialClientManager
 from accounts.credential_rotation import CredentialRotationManager
-from accounts.serializers import ApplicationCredentialSerializer, ClientAccessConfigurationSerializer
+from accounts.serializers import (
+    ApplicationCredentialSerializer, ClientAccessConfigurationSerializer,
+    CredentialClientInstanceSerializer, CredentialFetchSerializer,
+)
 from accounts.api.account.credential import (
     CredentialClientInstanceViewSet, CredentialClientViewSet,
     ApplicationCredentialViewSet, ClientAccessConfigurationViewSet,
-    CredentialRotationRecordViewSet,
 )
 from accounts.api.account.application import IntegrationApplicationViewSet
 from accounts.const import ChangeSecretRecordStatusChoice
@@ -39,6 +42,7 @@ from accounts.models import (
     Account, AutomationExecution, ChangeSecretRecord, ApplicationCredential, IntegrationApplication,
     ApplicationAudit, ClientAccessConfiguration,
     CredentialClientInstance, CredentialClientStatus,
+    CredentialApplicationBinding,
 )
 from authentication.backends.drf import (
     CredentialAgentAuthentication, ServiceAuthentication,
@@ -52,13 +56,14 @@ class CredentialRotationTestCase(CredentialTestCase):
     def execute_bound_change(self):
         from accounts.models import ChangeSecretAutomation
         from accounts.credential_rotation.execution import execute
+        rotation = self.credential.rotation_records.first()
+        account = rotation.change_account
         automation = ChangeSecretAutomation.objects.create(
-            name='PAM test change', accounts=[self.primary.username],
-            secret_type=self.primary.secret_type, secret_strategy='random',
+            name=f'PAM test change {rotation.id}', accounts=[account.username],
+            secret_type=account.secret_type, secret_strategy='random',
             check_conn_after_change=True, is_periodic=False,
         )
-        automation.assets.add(self.asset)
-        rotation = self.credential.rotation_records.first()
+        automation.assets.add(account.asset)
         rotation.change_automation = automation
         rotation.save()
         return execute(rotation.id)
@@ -97,6 +102,9 @@ class CredentialRotationTestCase(CredentialTestCase):
         )
         confirmed = view(request)
         self.assertEqual(confirmed.status_code, 200)
+        CredentialClientInstance.objects.filter(
+            application=application, instance_id=instance_id,
+        ).update(date_last_seen=timezone.now())
 
     def credential_action(self, action):
         view = ApplicationCredentialViewSet.as_view({'post': action})
@@ -129,7 +137,7 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.assertEqual(readiness['active_configurations_amount'], 1)
         self.assertEqual(readiness['missing_authorized_accounts_amount'], 0)
         self.assertEqual(readiness['active_instances_amount'], 1)
-        self.assertEqual(readiness['online_instances_amount'], 1)
+        self.assertEqual(readiness['online_instances_amount'], 0)
         self.assertIsNotNone(readiness['last_fetched'])
 
         self.application.accounts = {'type': 'ids', 'ids': [str(self.primary.id)]}
@@ -156,92 +164,58 @@ class CredentialRotationTestCase(CredentialTestCase):
             'account_id': response.data['account']['id'],
         })
         self.assertEqual(response.status_code, 200)
+        CredentialClientInstance.objects.filter(
+            application=self.application, instance_id='order-node-1',
+        ).update(date_last_seen=timezone.now())
 
-    def test_primary_backup_primary_rotation(self):
+    def test_accounts_alternate_across_two_rotations(self):
         self.fetch_and_confirm(self.primary)
-
-        response = self.credential_action('start_rotation')
-        self.assertEqual(response.status_code, 200)
-        self.credential.refresh_from_db()
-        self.assertEqual(self.credential.status, ApplicationCredential.Status.waiting_backup)
-        self.assertEqual(self.credential.published_account_id, self.backup.id)
-
-        blocked = self.credential_action('check_usage')
-        self.assertEqual(blocked.status_code, 409)
-
-        self.fetch_and_confirm(self.backup)
-        ready = self.credential_action('check_usage')
-        self.assertEqual(ready.status_code, 200)
-        self.assertEqual(
-            ready.data['status']['value'], ApplicationCredential.Status.ready_for_change
-        )
-
-        original_version = self.credential.primary_version_at_start
-        execution_count = AutomationExecution.objects.count()
-        changed = self.credential_action('change_secret')
-        self.assertEqual(changed.status_code, 200, changed.data)
-        self.assertEqual(AutomationExecution.objects.count(), execution_count)
-        self.credential.refresh_from_db()
-        self.assertIsNone(self.credential.change_execution_id)
-        execution = self.execute_bound_change()
-        execution.status = 'success'
-        execution.date_finished = timezone.now()
-        execution.save()
-        Account.objects.filter(id=self.primary.id).update(
-            version=F('version') + 1,
-            change_secret_status=ChangeSecretRecordStatusChoice.success,
-        )
-        ChangeSecretRecord.objects.create(
-            execution=execution,
-            account=self.primary,
-            asset=self.asset,
-            account_version=original_version,
-            new_secret=self.primary.secret,
-            status=ChangeSecretRecordStatusChoice.success,
-            date_finished=timezone.now(),
-        )
-        switched_back = self.credential_action('check_secret_change')
-        self.assertEqual(switched_back.status_code, 200)
-        self.assertEqual(
-            str(switched_back.data['published_account']['id']),
-            str(self.primary.id),
-        )
-
-        self.fetch_and_confirm(self.primary)
-        completed = self.credential_action('complete_rotation')
-        self.assertEqual(completed.status_code, 200)
-        self.assertEqual(completed.data['status']['value'], ApplicationCredential.Status.idle)
-        self.assertIsNotNone(completed.data['date_last_rotated'])
-
-    def test_rotation_record_search_keeps_credential_scope(self):
-        matched = self.credential.rotation_records.create(
-            created_by='alice', comment='manual database change',
-        )
-        self.credential.rotation_records.create(created_by='bob', comment='other change')
-        other = ApplicationCredential.objects.create(
-            name='Other credential', primary_account=self.backup,
-            published_account=self.backup, type='fixed', rotation_mode='',
-        )
-        other.rotation_records.create(created_by='alice', comment='manual database change')
-        view = CredentialRotationRecordViewSet.as_view({'get': 'list'})
-        for search in ['alice', 'database', 'not-found']:
-            response = view(self.request('get', '/api/v1/accounts/credential-rotation-records/', {
-                'credential': str(self.credential.id), 'search': search,
-            }))
+        for source, target in ((self.primary, self.backup), (self.backup, self.primary)):
+            response = self.credential_action('start_rotation')
             self.assertEqual(response.status_code, 200)
-            rows = response.data['results'] if isinstance(response.data, dict) else response.data
-            self.assertEqual(
-                [str(row['id']) for row in rows],
-                [] if search == 'not-found' else [str(matched.id)],
-            )
+            self.credential.refresh_from_db()
+            self.assertEqual(self.credential.active_account_id, target.id)
+            self.assertEqual(self.credential_action('check_usage').status_code, 409)
+            self.fetch_and_confirm(target)
+            self.assertEqual(self.credential_action('check_usage').status_code, 200)
+            self.assertEqual(self.credential_action('change_secret').status_code, 200)
 
-    def test_every_application_must_release_primary_account(self):
+            rotation = self.credential.rotation_records.first()
+            self.assertEqual(rotation.source_account_id, source.id)
+            self.assertEqual(rotation.target_account_id, target.id)
+            self.assertEqual(rotation.change_account_id, source.id)
+            execution = self.execute_bound_change()
+            execution.status = 'success'
+            execution.date_finished = timezone.now()
+            execution.save()
+            Account.objects.filter(id=source.id).update(
+                version=F('version') + 1,
+                change_secret_status=ChangeSecretRecordStatusChoice.success,
+            )
+            ChangeSecretRecord.objects.create(
+                execution=execution,
+                account=source,
+                asset=self.asset,
+                account_version=rotation.change_account_version_at_start,
+                new_secret=source.secret,
+                status=ChangeSecretRecordStatusChoice.success,
+                date_finished=timezone.now(),
+            )
+            completed = self.credential_action('check_secret_change')
+            self.assertEqual(completed.status_code, 200)
+            self.assertEqual(completed.data['status']['value'], ApplicationCredential.Status.idle)
+            self.assertEqual(str(completed.data['active_account']['id']), str(target.id))
+
+    def test_every_application_must_release_account(self):
         report_application = IntegrationApplication.objects.create(
             name='report-service', secret='report-secret',
             accounts={
                 'type': 'ids',
                 'ids': [str(self.primary.id), str(self.backup.id)],
             },
+        )
+        CredentialApplicationBinding.objects.create(
+            credential=self.credential, application=report_application,
         )
         self.fetch_and_confirm_for(
             self.application, 'order-node-1', self.primary
@@ -257,6 +231,7 @@ class CredentialRotationTestCase(CredentialTestCase):
         )
         blocked = self.credential_action('check_usage')
         self.assertEqual(blocked.status_code, 409)
+        self.assertEqual(blocked.data['rotation_status']['summary']['blocking'], 1)
         self.assertEqual(
             blocked.data['blockers'][0]['application']['name'],
             report_application.name,
@@ -266,6 +241,77 @@ class CredentialRotationTestCase(CredentialTestCase):
             report_application, 'report-node-1', self.backup
         )
         self.assertEqual(self.credential_action('check_usage').status_code, 200)
+
+    def test_rotation_status_groups_instances_and_warns_without_blocking(self):
+        configuration = self.create_configuration()
+        manager = CredentialClientManager(self.application, configuration.id, 'node-a')
+        fetched = manager.fetch(self.credential.key, '127.0.0.1')
+        manager.confirm(self.credential.key, fetched['revision'], self.primary.id)
+        CredentialClientInstance.objects.filter(pk=manager.client.pk).update(
+            date_last_seen=timezone.now(),
+        )
+        empty = ClientAccessConfiguration.objects.create(
+            application=self.application, name='Empty SDK', type='sdk',
+        )
+        empty.credentials.add(self.credential)
+
+        self.assertEqual(self.credential_action('start_rotation').status_code, 200)
+        self.credential.refresh_from_db()
+        manager.fetch(self.credential.key, '127.0.0.1')
+        CredentialClientInstance.objects.filter(pk=manager.client.pk).update(
+            date_last_seen=timezone.now(),
+        )
+
+        view = ApplicationCredentialViewSet.as_view({'get': 'rotation_status'})
+        response = view(self.request(
+            'get',
+            f'/api/v1/accounts/application-credentials/{self.credential.id}/rotation-status/',
+        ), pk=self.credential.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['summary']['awaiting_confirmation'], 1)
+        self.assertEqual(response.data['summary']['blocking'], 1)
+        self.assertEqual(response.data['applications'][0]['status'], 'not_switched')
+        self.assertEqual(response.data['warnings'][0]['code'], 'no_active_instance')
+
+        manager.confirm(self.credential.key, self.credential.revision, self.backup.id)
+        CredentialClientInstance.objects.filter(pk=manager.client.pk).update(
+            date_last_seen=timezone.now(),
+        )
+        self.assertEqual(self.credential_action('check_usage').status_code, 200)
+
+    def test_late_instance_joins_rotation_and_is_saved_in_snapshot(self):
+        configuration = self.create_configuration()
+        first = CredentialClientManager(self.application, configuration.id, 'node-a')
+        fetched = first.fetch(self.credential.key, '127.0.0.1')
+        first.confirm(self.credential.key, fetched['revision'], self.primary.id)
+        CredentialClientInstance.objects.filter(pk=first.client.pk).update(
+            date_last_seen=timezone.now(),
+        )
+        CredentialRotationManager(self.credential.id).start()
+        self.credential.refresh_from_db()
+
+        late = CredentialClientManager(self.application, configuration.id, 'node-b')
+        late.fetch(self.credential.key, '127.0.0.1')
+        CredentialClientInstance.objects.filter(pk=late.client.pk).update(
+            date_last_seen=timezone.now(),
+        )
+        rotation = self.credential.rotation_records.first()
+        participants = rotation.participant_snapshot['participants']
+        late_snapshot = next(
+            item for item in participants if item['client']['instance_id'] == 'node-b'
+        )
+        self.assertTrue(late_snapshot['joined_during_rotation'])
+        self.assertEqual(len(self.credential.get_blockers()), 2)
+
+        fetched = first.fetch(self.credential.key, '127.0.0.1')
+        first.confirm(self.credential.key, fetched['revision'], self.backup.id)
+        CredentialClientInstance.objects.filter(pk=first.client.pk).update(
+            date_last_seen=timezone.now(),
+        )
+        from accounts.credential_rotation.participants import build
+        status = build(self.credential)
+        self.assertEqual(status['applications'][0]['status'], 'partially_switched')
+        self.assertEqual(status['summary']['blocking'], 1)
 
     def test_removed_configuration_credential_does_not_block_future_rotation(self):
         self.fetch_and_confirm(self.primary)
@@ -282,6 +328,9 @@ class CredentialRotationTestCase(CredentialTestCase):
             self.application, sibling_configuration.id, 'sibling-node',
         )
         sibling.fetch(self.credential.key, '127.0.0.1')
+        CredentialClientInstance.objects.filter(pk=sibling.client.pk).update(
+            date_last_seen=timezone.now(),
+        )
 
         configuration.credentials.remove(self.credential)
         self.assertFalse(CredentialClientStatus.objects.filter(id=state.id).exists())
@@ -339,9 +388,9 @@ class CredentialRotationTestCase(CredentialTestCase):
         )]}
         self.application.save()
         other = ApplicationCredential.objects.create(
-            name='Other fixed credential', type='fixed', rotation_mode='',
-            primary_account=other_account, published_account=other_account,
+            name='Other subscription', mode=ApplicationCredential.Mode.subscription,
         )
+        other.applications.add(self.application)
         configuration = self.create_configuration()
         configuration.credentials.add(other)
         manager = CredentialClientManager(self.application, configuration.id, 'client')
@@ -406,7 +455,10 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.assertTrue(fresh_state.is_rotation_participant)
         self.assertTrue(self.credential.get_blockers())
         fresh_manager.confirm(
-            self.credential.key, fetched['revision'], self.credential.published_account_id,
+            self.credential.key, fetched['revision'], self.credential.active_account_id,
+        )
+        CredentialClientInstance.objects.filter(pk=fresh_manager.client.pk).update(
+            date_last_seen=timezone.now(),
         )
         self.assertEqual(self.credential.get_blockers(), [])
 
@@ -418,7 +470,7 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.assertEqual(cancelled.status_code, 200)
         self.assertTrue(cancelled.data['rotation_cancelled'])
         self.assertEqual(
-            str(cancelled.data['published_account']['id']),
+            str(cancelled.data['active_account']['id']),
             str(self.primary.id),
         )
 
@@ -488,23 +540,71 @@ class CredentialRotationTestCase(CredentialTestCase):
         configuration.credentials.add(self.credential)
         return configuration
 
-    def test_fixed_account_publishes_own_revision_and_does_not_rotate(self):
-        self.credential.type = 'fixed'
-        self.credential.rotation_mode = ''
-        self.credential.backup_account = None
+    def test_subscription_publishes_own_revision_and_does_not_rotate(self):
+        self.credential.mode = ApplicationCredential.Mode.subscription
+        self.credential.account = None
+        self.credential.alternate_account = None
+        self.credential.active_account = None
         self.credential.save()
         self.application.accounts = {'type': 'ids', 'ids': [str(self.primary.id)]}
         self.application.save()
         configuration = self.create_configuration()
-        manager = CredentialClientManager(self.application, configuration.id, 'fixed-client')
-        first = manager.fetch(self.credential.key, '127.0.0.1')
+        manager = CredentialClientManager(self.application, configuration.id, 'subscription-client')
+        key = self.credential.account_key(self.primary.id)
+        materials = ClientAccessConfigurationManager(configuration).materials('http://testserver')
+        config = materials['config']
+        self.assertNotIn(key, config)
+        self.assertNotIn('credential_keys', config)
+        self.assertIn('GetCredentialRequest(AccountId=account_id)', materials['code'])
+        self.assertNotIn('ConfirmCredential', materials['code'])
+        self.assertNotIn('Revision', materials['code'])
+        first = manager.fetch('', '127.0.0.1', self.primary.id)
         self.assertEqual(first['account']['secret'], self.primary.secret)
-        Account.objects.filter(id=self.primary.id).update(secret='new-fixed-secret')
-        second = manager.fetch(self.credential.key, '127.0.0.1')
+        self.assertEqual(first['key'], key)
+        self.primary.secret = 'new-subscription-secret'
+        self.primary.save()
+        second = manager.fetch('', '127.0.0.1', self.primary.id)
         self.assertEqual(second['revision'], first['revision'] + 1)
-        manager.confirm(self.credential.key, second['revision'], self.primary.id)
+        self.assertEqual(manager.fetch(key, '127.0.0.1')['revision'], second['revision'])
+        with self.assertRaises(ValidationError):
+            manager.confirm(key, second['revision'], self.primary.id)
         with self.assertRaises(JMSException):
             CredentialRotationManager(self.credential.id).start()
+
+    def test_subscription_account_id_requires_selection_and_authorization(self):
+        self.credential.mode = ApplicationCredential.Mode.subscription
+        self.credential.account = None
+        self.credential.alternate_account = None
+        self.credential.active_account = None
+        self.credential.save()
+        configuration = self.create_configuration()
+        manager = CredentialClientManager(self.application, configuration.id, 'subscription-client')
+        configuration.credentials.clear()
+        with self.assertRaises(PermissionDenied):
+            manager.fetch('', '127.0.0.1', self.primary.id)
+        configuration.credentials.add(self.credential)
+        self.application.accounts = {'type': 'ids', 'ids': [str(self.backup.id)]}
+        self.application.save()
+        with self.assertRaises(PermissionDenied):
+            manager.fetch('', '127.0.0.1', self.primary.id)
+
+    def test_subscription_fetch_api_requires_exactly_one_selector(self):
+        self.credential.mode = ApplicationCredential.Mode.subscription
+        self.credential.account = None
+        self.credential.alternate_account = None
+        self.credential.active_account = None
+        self.credential.save()
+        response = self.client_action(
+            'credential', method='get',
+            data={'account_id': str(self.primary.id), 'instance_id': 'subscription-sdk'},
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['account']['id'], str(self.primary.id))
+        self.assertFalse(CredentialFetchSerializer(data={}).is_valid())
+        self.assertFalse(CredentialFetchSerializer(data={
+            'key': self.credential.account_key(self.primary.id),
+            'account_id': str(self.primary.id),
+        }).is_valid())
 
     def test_configuration_selection_and_account_authorization_both_required(self):
         configuration = self.create_configuration()
@@ -527,9 +627,21 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.credential.refresh_from_db()
         self.assertTrue(self.credential.get_blockers())
         client = self.application.credential_clients.get(instance_id='order-node-1')
-        client.is_active = False
-        client.save()
+        missing_reason = CredentialClientInstanceSerializer(
+            client, data={'is_active': False}, partial=True,
+        )
+        self.assertFalse(missing_reason.is_valid())
+        self.assertIn('reason', missing_reason.errors)
+        serializer = CredentialClientInstanceSerializer(
+            client,
+            data={'is_active': False, 'reason': 'Instance decommissioned.'},
+            partial=True,
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
         self.assertEqual(self.credential.get_blockers(), [])
+        snapshot = self.credential.rotation_records.first().participant_snapshot
+        self.assertEqual(snapshot['participants'][0]['exclusion_reason'], 'Instance decommissioned.')
         self.assertEqual(self.credential_action('check_usage').status_code, 200)
         with self.assertRaises(PermissionDenied):
             CredentialClientManager(self.application, client.configuration_id, client.instance_id)
@@ -549,54 +661,12 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.credential.refresh_from_db()
         self.assertEqual(len(self.credential.get_blockers()), 2)
 
-    def test_single_account_waits_for_verified_task_and_client_confirmation(self):
-        self.credential.rotation_mode = 'single'
-        self.credential.backup_account = None
-        self.credential.save()
-        self.fetch_and_confirm(self.primary)
-        manager = CredentialRotationManager(self.credential.id)
-        self.assertEqual(manager.start().status, 'ready_for_change')
-        execution_count = AutomationExecution.objects.count()
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            changed = manager.change_secret()
-        self.assertEqual(callbacks, [])
-        self.assertEqual(AutomationExecution.objects.count(), execution_count)
-        self.assertEqual(changed.status, 'ready_for_change')
-        self.assertIsNone(changed.change_execution_id)
-        manager.change_secret()
-        with self.assertRaises(JMSException):
-            manager.check_secret_change()
-        execution = self.execute_bound_change()
-        configuration = self.application.access_configurations.get(name='Test SDK')
-        sdk = CredentialClientManager(self.application, configuration.id, 'order-node-1')
-        with self.assertRaisesMessage(JMSException, 'The account secret is changing.'):
-            sdk.fetch(self.credential.key, '127.0.0.1')
-        execution.status = 'success'
-        execution.date_finished = timezone.now()
-        execution.save()
-        ChangeSecretRecord.objects.create(
-            account=self.primary, asset=self.asset,
-            execution=execution,
-            account_version=changed.primary_version_at_start,
-            new_secret=self.primary.secret,
-            status='success', verification_status='success', date_finished=timezone.now(),
-        )
-        Account.objects.filter(id=self.primary.id).update(
-            version=F('version') + 1, change_secret_status='success',
-        )
-        checked = manager.check_secret_change()
-        self.assertEqual(checked.status, 'waiting_primary')
-        self.assertEqual(checked.change_execution_id, execution.id)
-        self.assertTrue(manager.complete()[1])
-        self.fetch_and_confirm(self.primary)
-        self.assertEqual(manager.complete()[0].status, 'idle')
-        self.assertEqual(self.credential.rotation_records.get().status, 'success')
-
     def test_manual_secret_change_requires_current_successful_account_record(self):
         manager = CredentialRotationManager(self.credential.id)
         manager.start()
         manager.check_usage()
-        changed = manager.change_secret()
+        manager.change_secret()
+        rotation = self.credential.rotation_records.first()
         execution = self.execute_bound_change()
         execution.status = 'success'
         execution.date_finished = timezone.now()
@@ -606,19 +676,19 @@ class CredentialRotationTestCase(CredentialTestCase):
         )
         record = ChangeSecretRecord.objects.create(
             account=self.primary, asset=self.asset, execution=execution,
-            account_version=changed.primary_version_at_start,
+            account_version=rotation.change_account_version_at_start,
             new_secret=self.primary.secret,
             status='success', date_finished=timezone.now(),
         )
         valid = {
             'account_id': self.primary.id,
-            'account_version': changed.primary_version_at_start,
+            'account_version': rotation.change_account_version_at_start,
             'status': 'success',
             'date_finished': record.date_finished,
         }
         for invalid in [
             {'account_id': self.backup.id},
-            {'account_version': changed.primary_version_at_start + 1},
+            {'account_version': rotation.change_account_version_at_start + 1},
             {'status': 'failed'},
             {'status': 'unverified'},
             {'execution_id': AutomationExecution.objects.create(type='change_secret').id},
@@ -626,47 +696,140 @@ class CredentialRotationTestCase(CredentialTestCase):
             with self.subTest(invalid=invalid):
                 ChangeSecretRecord.objects.filter(id=record.id).update(**(valid | invalid))
                 checked = manager.check_secret_change()
-                self.assertNotEqual(checked.status, 'waiting_primary')
+                self.assertNotEqual(checked.status, 'idle')
                 ChangeSecretRecord.objects.filter(id=record.id).update(execution_id=execution.id)
         ChangeSecretRecord.objects.filter(id=record.id).update(**valid)
         checked = manager.check_secret_change()
-        self.assertEqual(checked.status, 'waiting_primary')
-        self.assertEqual(checked.change_execution_id, execution.id)
+        self.assertEqual(checked.status, 'idle')
 
-    def test_serializer_normalizes_fixed_accounts_and_checks_configuration_authorization(self):
+    def test_subscription_normalizes_accounts_and_uses_application_authorization(self):
         serializer = ApplicationCredentialSerializer(self.credential, data={
-            'type': 'fixed', 'backup_account': str(self.backup.id),
+            'mode': ApplicationCredential.Mode.subscription,
+            'applications': [str(self.application.id)],
         }, partial=True)
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        credential = serializer.save()
-        self.assertIsNone(credential.backup_account)
-        self.assertEqual(credential.rotation_mode, '')
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('mode', serializer.errors)
+        self.credential.mode = ApplicationCredential.Mode.subscription
+        self.credential.account = None
+        self.credential.alternate_account = None
+        self.credential.active_account = None
+        self.credential.save()
+        credential = self.credential
+        self.assertIsNone(credential.alternate_account)
         self.application.accounts = {'type': 'ids', 'ids': [str(self.backup.id)]}
         self.application.save()
         serializer = ClientAccessConfigurationSerializer(data={
-            'name': 'Invalid config', 'type': 'sdk',
+            'name': 'Subscription config', 'type': 'sdk',
             'application': str(self.application.id), 'credentials': [str(credential.id)],
         })
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_sdk_configuration_requires_one_policy_mode_but_agent_allows_mixed(self):
+        second_rotation = ApplicationCredential.objects.create(
+            name='Second rotation', mode=ApplicationCredential.Mode.alternating_rotation,
+            account=self.primary, alternate_account=self.backup, active_account=self.primary,
+        )
+        CredentialApplicationBinding.objects.create(
+            credential=second_rotation, application=self.application,
+        )
+        same_mode = ClientAccessConfigurationSerializer(data={
+            'name': 'Rotation SDK', 'type': 'sdk',
+            'application': str(self.application.id),
+            'credentials': [str(self.credential.id), str(second_rotation.id)],
+        })
+        self.assertTrue(same_mode.is_valid(), same_mode.errors)
+
+        subscription = ApplicationCredential.objects.create(
+            name='Subscription policy', mode=ApplicationCredential.Mode.subscription,
+        )
+        CredentialApplicationBinding.objects.create(
+            credential=subscription, application=self.application,
+        )
+        mixed = [str(self.credential.id), str(subscription.id)]
+        sdk = ClientAccessConfigurationSerializer(data={
+            'name': 'Mixed SDK', 'type': 'sdk',
+            'application': str(self.application.id), 'credentials': mixed,
+        })
+        self.assertFalse(sdk.is_valid())
+        self.assertIn('credentials', sdk.errors)
+
+        agent = ClientAccessConfigurationSerializer(data={
+            'name': 'Mixed Agent', 'type': 'agent', 'app_user': 'app',
+            'application': str(self.application.id), 'credentials': mixed,
+        })
+        self.assertTrue(agent.is_valid(), agent.errors)
+
+        configuration = self.create_configuration()
+        configuration.credentials.add(subscription)
+        with self.assertRaises(ValidationError):
+            ClientAccessConfigurationManager(configuration).materials('http://testserver')
+
+    def test_subscription_policy_requires_applications_and_syncs_bindings(self):
+        data = {
+            'name': 'Subscription policy',
+            'mode': ApplicationCredential.Mode.subscription,
+        }
+        serializer = ApplicationCredentialSerializer(data=data)
         self.assertFalse(serializer.is_valid())
-        self.assertIn('credentials', serializer.errors)
+        self.assertIn('applications', serializer.errors)
+
+        serializer = ApplicationCredentialSerializer(data={
+            **data, 'applications': [str(self.application.id)],
+        })
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        policy = serializer.save()
+        self.assertIsNone(policy.account_id)
+        self.assertIsNone(policy.alternate_account_id)
+        self.assertIsNone(policy.active_account_id)
+        second = IntegrationApplication.objects.create(
+            name='billing-service', secret='billing-secret',
+            accounts={'type': 'ids', 'ids': [str(self.backup.id)]},
+        )
+        serializer = ApplicationCredentialSerializer(
+            policy, data={
+                'applications': [str(self.application.id), str(second.id)],
+            }, partial=True,
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        policy = serializer.save()
+        self.assertSetEqual(
+            set(policy.applications.values_list('id', flat=True)),
+            {self.application.id, second.id},
+        )
+
+        configuration = ClientAccessConfiguration.objects.create(
+            application=self.application, name='Bound policy', type='sdk',
+        )
+        configuration.credentials.add(policy)
+        serializer = ApplicationCredentialSerializer(
+            policy, data={'applications': [str(second.id)]}, partial=True,
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('applications', serializer.errors)
 
     @override_language('en')
-    def test_serializer_names_credential_using_the_primary_account(self):
+    def test_serializer_names_credential_using_the_account(self):
         serializer = ApplicationCredentialSerializer(data={
-            'name': 'Duplicate primary', 'type': 'fixed',
-            'primary_account': str(self.primary.id),
+            'name': 'Duplicate initial',
+            'mode': ApplicationCredential.Mode.alternating_rotation,
+            'account': str(self.primary.id),
+            'alternate_account': str(self.backup.id),
+            'applications': [str(self.application.id)],
         })
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            str(serializer.errors['primary_account'][0]),
-            'This account is already used by application credential '
-            '"PostgreSQL primary". Choose another account or reuse that application credential.',
-        )
+        with self.assertRaisesMessage(
+            JMSException,
+            'This account is already used by credential policy '
+            '"PostgreSQL primary". Choose another account or reuse that credential policy.',
+        ):
+            serializer.is_valid(raise_exception=True)
 
         self.credential.refresh_from_db()
         serializer = ApplicationCredentialSerializer(
             self.credential,
-            data={'primary_account': str(self.primary.id)},
+            data={
+                'account': str(self.primary.id),
+                'applications': [str(self.application.id)],
+            },
             partial=True,
         )
         self.assertTrue(serializer.is_valid(), serializer.errors)
@@ -801,6 +964,10 @@ class CredentialRotationTestCase(CredentialTestCase):
         compile(materials['config'], materials['filename'], 'exec')
         self.assertEqual(materials['filename'], 'jms_pam_config.py')
         self.assertIn(f"configuration_id='{configuration.id}'", materials['config'])
+        self.assertIn(f"credential_keys = ['{self.credential.key}']", materials['config'])
+        self.assertIn(f"confirmation_keys = ['{self.credential.key}']", materials['config'])
+        self.assertNotIn('credential_targets', materials)
+        self.assertNotIn('credential_targets', materials['config'])
         prepared = requests.Request(
             'GET', f'http://testserver{CLIENT_PATH}/credential/',
             params={'key': self.credential.key, 'configuration_id': str(configuration.id), 'instance_id': 'signed-sdk'},
@@ -850,7 +1017,7 @@ class CredentialRotationTestCase(CredentialTestCase):
                     data=prepared.body if body is None else body,
                     content_type=prepared.headers['Content-Type'], **meta,
                 )
-                view = CredentialClientViewSet.as_view({'post': 'heartbeat'})
+                view = CredentialClientViewSet.as_view({'post': 'confirm'})
             with patch('authentication.backends.drf.update_service_integration_last_used.delay'):
                 return view(request)
 
@@ -865,7 +1032,8 @@ class CredentialRotationTestCase(CredentialTestCase):
             auth=HTTPSignatureAuth(str(self.application.id), self.application.secret),
         ).prepare()
         self.assertEqual(dispatch(prepared).status_code, 200)
-        self.assertEqual(dispatch(prepared).status_code, 401)
+        with transaction.atomic():
+            self.assertEqual(dispatch(prepared).status_code, 401)
 
         expired = requests.Request(
             'GET', f'http://testserver{CLIENT_PATH}/credential/',
@@ -877,20 +1045,24 @@ class CredentialRotationTestCase(CredentialTestCase):
             headers={**headers, 'Date': 'Tue, 01 Sep 2020 00:00:00 GMT'},
             auth=HTTPSignatureAuth(str(self.application.id), self.application.secret),
         ).prepare()
-        self.assertEqual(dispatch(expired).status_code, 401)
+        with transaction.atomic():
+            self.assertEqual(dispatch(expired).status_code, 401)
 
-        heartbeat = requests.Request(
-            'POST', f'http://testserver{CLIENT_PATH}/heartbeat/',
+        confirmation = requests.Request(
+            'POST', f'http://testserver{CLIENT_PATH}/confirm/',
             json={
                 'configuration_id': str(configuration.id),
                 'instance_id': 'signed-sdk-body',
-                'credentials': [],
+                'key': self.credential.key,
+                'revision': self.credential.revision,
+                'account_id': str(self.primary.id),
             },
             headers=headers,
             auth=HTTPSignatureAuth(str(self.application.id), self.application.secret),
         ).prepare()
-        tampered = heartbeat.body.replace(b'signed-sdk-body', b'forged-sdk-body')
-        self.assertEqual(dispatch(heartbeat, tampered).status_code, 401)
+        tampered = confirmation.body.replace(b'signed-sdk-body', b'forged-sdk-body')
+        with transaction.atomic():
+            self.assertEqual(dispatch(confirmation, tampered).status_code, 401)
 
 
 class CredentialClientStateWriteTests(CredentialTestCase):
@@ -941,53 +1113,46 @@ class CredentialClientStateWriteTests(CredentialTestCase):
                 self.assertEqual(logs.count(), 2)
                 self.assertEqual(logs.first().revision, self.credential.revision)
 
-    def test_fixed_account_fetch_audit_tracks_credential_revision(self):
+    def test_subscription_fetch_audit_tracks_credential_revision(self):
         from accounts.models import ApplicationAudit
-        self.credential.type = 'fixed'
-        self.credential.save(update_fields=['type'])
+        self.credential.mode = ApplicationCredential.Mode.subscription
+        self.credential.account = None
+        self.credential.alternate_account = None
+        self.credential.active_account = None
+        self.credential.save()
         manager = self.manager('sdk')
-        manager.fetch(self.credential.key, '127.0.0.1')
-        manager.fetch(self.credential.key, '127.0.0.1')
+        key = self.credential.account_key(self.primary.id)
+        manager.fetch(key, '127.0.0.1')
+        manager.fetch(key, '127.0.0.1')
         logs = ApplicationAudit.objects.filter(event='credential_fetched', instance_id='sdk')
         self.assertEqual(logs.count(), 1)
-        Account.objects.filter(pk=self.primary.pk).update(secret='new-audited-secret')
-        manager.fetch(self.credential.key, '127.0.0.1')
-        manager.fetch(self.credential.key, '127.0.0.1')
+        self.primary.secret = 'new-audited-secret'
+        self.primary.save()
+        manager.fetch(key, '127.0.0.1')
+        manager.fetch(key, '127.0.0.1')
         self.assertEqual(logs.count(), 2)
 
-    def test_repeat_fetch_heartbeat_confirm_skip_writes_until_interval(self):
+    def test_fetch_and_confirm_do_not_mark_client_online(self):
         for kind in ('sdk', 'agent'):
             with self.subTest(kind=kind):
-                start = timezone.now()
                 manager = self.manager(kind)
                 item = {'key': self.credential.key, 'revision': 1, 'account_id': self.primary.id}
-                with patch('accounts.credential_client.manager.timezone.now', return_value=start):
-                    manager.fetch(self.credential.key, '127.0.0.1')
-                    manager.confirm(**item)
-                for seconds in (1, 30, 59, 60):
-                    # Rebuild the manager, matching separate authenticated requests.
-                    manager = self.manager(kind)
-                    current = start + timedelta(seconds=seconds)
-                    with patch('accounts.credential_client.manager.timezone.now', return_value=current):
-                        with CaptureQueriesContext(connection) as queries:
-                            manager.fetch(self.credential.key, '127.0.0.1')
-                            manager.heartbeat([item])
-                            manager.confirm(**item)
-                    self.assertEqual(len(self.state_writes(queries)), 2 if seconds == 60 else 0)
-                    state = manager.client.credential_statuses.get()
-                    self.assertEqual(state.date_applied, start)
-                    self.assertEqual(state.date_fetched, current if seconds == 60 else start)
-                    self.assertEqual(state.date_last_seen, current if seconds == 60 else start)
+                manager.fetch(self.credential.key, '127.0.0.1')
+                manager.confirm(**item)
+                manager.client.refresh_from_db()
+                state = manager.client.credential_statuses.get()
+                self.assertIsNone(manager.client.date_last_seen)
+                self.assertIsNone(state.date_last_seen)
 
-    def test_new_version_and_first_heartbeat_confirmation_are_immediate(self):
+    def test_new_version_confirmation_is_immediate(self):
         manager = self.manager('sdk')
         start = timezone.now()
         with patch('accounts.credential_client.manager.timezone.now', return_value=start):
             manager.fetch(self.credential.key, '127.0.0.1')
             manager.confirm(self.credential.key, 1, self.primary.id)
         self.credential.revision = 2
-        self.credential.published_account = self.backup
-        self.credential.status = 'waiting_backup'
+        self.credential.active_account = self.backup
+        self.credential.status = 'waiting_switch'
         self.credential.save()
         current = start + timedelta(seconds=1)
         with patch('accounts.credential_client.manager.timezone.now', return_value=current):
@@ -996,7 +1161,10 @@ class CredentialClientStateWriteTests(CredentialTestCase):
             self.assertEqual(state.fetched_revision, 2)
             self.assertEqual(state.required_revision, 2)
             self.assertTrue(state.is_rotation_participant)
-            manager.heartbeat([{'key': self.credential.key, 'revision': 2, 'account_id': self.backup.id}])
+            manager.confirm(self.credential.key, 2, self.backup.id)
+            CredentialClientInstance.objects.filter(pk=manager.client.pk).update(
+                date_last_seen=current,
+            )
         state.refresh_from_db()
         self.assertEqual(state.applied_revision, 2)
         self.assertEqual(state.applied_account_id, self.backup.id)
@@ -1006,7 +1174,6 @@ class CredentialClientStateWriteTests(CredentialTestCase):
     def test_same_version_rotation_participation_is_immediate(self):
         manager = self.manager('agent')
         manager.fetch(self.credential.key, '127.0.0.1')
-        self.credential.rotation_mode = 'single'
         self.credential.status = 'ready_for_change'
         self.credential.save()
         manager.fetch(self.credential.key, '127.0.0.1')
@@ -1014,31 +1181,13 @@ class CredentialClientStateWriteTests(CredentialTestCase):
         self.assertTrue(state.is_rotation_participant)
         self.assertEqual(state.required_revision, 1)
 
-    def test_old_heartbeat_never_overwrites_confirmation_and_activity_recovers(self):
-        manager = self.manager('sdk')
-        manager.fetch(self.credential.key, '127.0.0.1')
-        manager.confirm(self.credential.key, 1, self.primary.id)
-        state = manager.client.credential_statuses.get()
-        applied = state.date_applied
-        stale = timezone.now() - timedelta(minutes=3)
-        type(state).objects.filter(pk=state.pk).update(date_last_seen=stale)
-        CredentialClientInstance.objects.filter(pk=manager.client.pk).update(date_last_seen=stale)
-        manager = self.manager('sdk')
-        with CaptureQueriesContext(connection) as queries:
-            response = manager.heartbeat([{'key': self.credential.key, 'revision': 0, 'account_id': self.primary.id}])
-        self.assertEqual(response['updated'], [])
-        self.assertEqual(len(self.state_writes(queries)), 2)
-        state.refresh_from_db()
-        self.assertGreater(state.date_last_seen, stale)
-        self.assertEqual(state.date_applied, applied)
-        self.assertEqual(state.applied_revision, 1)
-
 class CredentialClientInstanceDeletionTestCase(SimpleTestCase):
     @override_language('en')
     def test_only_offline_client_can_be_deleted(self):
         view = CredentialClientInstanceViewSet()
         online_client = Mock(online=True)
         offline_client = Mock(online=False)
+        offline_client.credential_statuses.exclude.return_value.exists.return_value = False
 
         with self.assertRaisesMessage(ValidationError, 'An online client cannot be deleted.'):
             view.perform_destroy(online_client)
@@ -1049,14 +1198,29 @@ class CredentialClientInstanceDeletionTestCase(SimpleTestCase):
 
 
 class PythonSDKTestCase(SimpleTestCase):
-    def test_generated_example_polls_and_deduplicates_applied_state(self):
-        code = render_to_string('accounts/credential_client/sdk_example.py.tpl')
+    def test_rotation_record_api_is_not_exposed(self):
+        with self.assertRaises(Resolver404):
+            resolve('/api/v1/accounts/credential-rotation-records/')
 
-        compile(code, 'sdk_example.py', 'exec')
-        self.assertNotIn('PollEvents', code)
-        self.assertIn('client.GetCredential(', code)
-        self.assertIn('applied[key] = models.CredentialState(', code)
-        self.assertIn('Credentials=list(applied.values())', code)
+    def test_generated_examples_are_mode_specific(self):
+        subscription = render_to_string(
+            'accounts/credential_client/sdk_subscription_example.py.tpl'
+        )
+        rotation = render_to_string(
+            'accounts/credential_client/sdk_rotation_example.py.tpl'
+        )
+
+        compile(subscription, 'sdk_subscription_example.py', 'exec')
+        compile(rotation, 'sdk_rotation_example.py', 'exec')
+        self.assertIn('WatchCredentialEvents', subscription)
+        self.assertIn('GetCredentialRequest(AccountId=account_id)', subscription)
+        self.assertNotIn('ConfirmCredential', subscription)
+        self.assertNotIn('Revision', subscription)
+        self.assertIn('WatchCredentialEvents', rotation)
+        self.assertIn('GetCredentialRequest(Key=key)', rotation)
+        self.assertIn('client.ConfirmCredential(', rotation)
+        self.assertNotIn('AccountId=account_id', rotation)
+        self.assertNotIn('Heartbeat', subscription + rotation)
 
     def test_http_signature(self):
         request = requests.Request(
@@ -1101,6 +1265,16 @@ class PythonSDKTestCase(SimpleTestCase):
         self.assertEqual(error.exception.status_code, 403)
         self.assertEqual(error.exception.detail, 'Disabled.')
 
+    def test_get_credential_request_requires_one_selector(self):
+        self.assertEqual(
+            models.GetCredentialRequest(AccountId='account')._validate()._serialize(),
+            {'account_id': 'account'},
+        )
+        with self.assertRaises(ValueError):
+            models.GetCredentialRequest()._validate()
+        with self.assertRaises(ValueError):
+            models.GetCredentialRequest(Key='database', AccountId='account')._validate()
+
     def test_client_contract_and_model_mapping(self):
         client = CredentialClient(
             PAMCredential('app-id', 'secret'), 'sdk-instance',
@@ -1115,7 +1289,6 @@ class PythonSDKTestCase(SimpleTestCase):
              'account': {'id': 'account', 'name': 'db-user', 'username': 'app',
                          'secret_type': 'password', 'secret': 'secret'}},
             {'key': 'database', 'revision': 1},
-            {'updated': 1, 'errors': [], 'date_last_seen': '2026-09-16T00:00:00Z'},
         ]
         client.session.request = Mock(side_effect=[
             Mock(status_code=200, json=Mock(return_value=payload), reason='OK')
@@ -1125,15 +1298,12 @@ class PythonSDKTestCase(SimpleTestCase):
         client.ConfirmCredential(models.ConfirmCredentialRequest(
             Key='database', Revision=1, AccountId='account',
         ))
-        client.Heartbeat(models.HeartbeatRequest(Credentials=[]))
-
         self.assertEqual(credential.Account.Username, 'app')
         self.assertEqual(credential.Asset.Platform.Type, 'postgresql')
         calls = client.session.request.call_args_list
         self.assertEqual([call.args[:2] for call in calls], [
             ('GET', f'https://jms.example.com{CLIENT_PATH}/credential/'),
             ('POST', f'https://jms.example.com{CLIENT_PATH}/confirm/'),
-            ('POST', f'https://jms.example.com{CLIENT_PATH}/heartbeat/'),
         ])
         self.assertEqual(calls[0].kwargs['params'], {
             'key': 'database', 'instance_id': 'sdk-instance', 'configuration_id': 'config',
@@ -1142,8 +1312,6 @@ class PythonSDKTestCase(SimpleTestCase):
             'key': 'database', 'revision': 1, 'account_id': 'account',
             'instance_id': 'sdk-instance', 'configuration_id': 'config',
         })
-        common = {'instance_id': 'sdk-instance', 'configuration_id': 'config'}
-        self.assertEqual(calls[2].kwargs['json'], {'credentials': [], **common})
 
     def test_network_and_invalid_response_errors_are_normalized(self):
         client = CredentialClient(

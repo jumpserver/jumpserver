@@ -98,7 +98,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             not self.instance or rotation.change_automation_id != self.instance.id
         ):
             raise JMSException(_('This rotation already has a change secret task.'))
-        validate_parameters(credential, attrs, self.instance)
+        validate_parameters(credential, attrs, self.instance, rotation)
         self.rotation = rotation
 
     def create(self, validated_data):

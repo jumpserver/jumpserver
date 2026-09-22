@@ -101,7 +101,7 @@ class JSONFilterMixin:
 
 class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     def save(self, *args, **kwargs):
-        # Keep the password, history and fixed-credential publication atomic.
+        # Keep the password, history and subscription publication atomic.
         using = kwargs.get('using') or self._state.db or 'default'
         with transaction.atomic(using=using):
             previous = self._get_previous_for_update(using)

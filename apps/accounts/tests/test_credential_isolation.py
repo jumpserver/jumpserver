@@ -3,8 +3,8 @@ import threading
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from django.db import transaction
 from django.test import SimpleTestCase
+from rest_framework.exceptions import ValidationError
 from rest_framework.test import force_authenticate
 
 from accounts.api.account.credential import CredentialClientViewSet
@@ -83,85 +83,34 @@ class ClientIsolationTests(SimpleTestCase):
                 self.assertEqual(self.agent.credentials['a']['revision'], 1)
                 self.assertEqual(self.agent.remote.GetCredential.call_count, 2)
 
-    def test_heartbeat_reports_only_authorized_confirmations(self):
-        reply = models.HeartbeatResponse()._deserialize({
-            'updated': ['a'], 'errors': [],
-            'date_last_seen': '2026-09-16T00:00:00Z',
-        })
-        self.agent.remote.Heartbeat.return_value = reply
+    def test_confirmation_reporting_only_uses_authorized_credentials(self):
         self.agent.authorized_keys = {'a'}
-        self.agent.heartbeat()
-        request = self.agent.remote.Heartbeat.call_args.args[0]._serialize()
-        self.assertEqual([item['key'] for item in request['credentials']], ['a'])
+        self.agent.report_confirmations()
+        request = self.agent.remote.ConfirmCredential.call_args.args[0]._serialize()
+        self.assertEqual(request['key'], 'a')
         self.assertIn('b', self.agent.credentials)
         self.assertIn('b', self.agent.state)
 
-    def test_sync_failure_does_not_skip_heartbeat_or_stop_loop(self):
-        for error, expected in (
-            (OSError('disk full'), 1),
-            (JumpServerPAMSDKException('NetworkError', 'slow'), 1),
-            (http_error('client_disabled'), 0),
-        ):
-            server = Mock()
-            self.agent.start_local_server = Mock(return_value=server)
-            self.agent.sync = Mock(side_effect=error)
-            self.agent.heartbeat = Mock(return_value={})
-            self.agent.set_access_denied = Mock(side_effect=lambda denied, reason='': setattr(self.agent, 'access_denied', denied))
-            stop = Mock()
-            stop.wait.side_effect = KeyboardInterrupt
-            with patch('accounts.demos.python.jms_pam.agent.threading.Event', return_value=stop):
-                self.agent.run()
-            self.assertEqual(self.agent.heartbeat.call_count, expected)
+    def test_event_listener_syncs_only_actionable_events(self):
+        self.agent.start_local_server = Mock(return_value=Mock())
+        self.agent.safe_sync = Mock()
+        self.agent.remote.WatchCredentialEvents.return_value = iter([
+            {'event': 'credential.change.started'},
+            {'event': 'credential.updated'},
+        ])
+        self.agent.remote.close = Mock()
+        with patch('accounts.demos.python.jms_pam.agent.threading.Thread'):
+            self.agent.run()
+        self.assertEqual(self.agent.safe_sync.call_count, 2)
 
 
-class HeartbeatIsolationTests(CredentialTestCase):
+class ConfirmationIsolationTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
         self.configuration = ClientAccessConfiguration.objects.create(application=self.application, name='SDK', type='sdk')
         self.configuration.credentials.add(self.credential)
         self.manager = CredentialClientManager(self.application, self.configuration.id, 'instance')
         self.manager.fetch(self.credential.key, '127.0.0.1')
-
-    def heartbeat(self, items):
-        request = self.factory.post('/api/v1/accounts/credential-client/heartbeat/', {
-            'configuration_id': str(self.configuration.id), 'instance_id': 'instance', 'credentials': items,
-        }, format='json', HTTP_X_JMS_ORG=str(self.org.id),
-            HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
-            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
-        force_authenticate(request, user=self.application)
-        # Match ATOMIC_REQUESTS when calling a view directly with APIRequestFactory.
-        with transaction.atomic():
-            return CredentialClientViewSet.as_view({'post': 'heartbeat'})(request)
-
-    def item(self, key=None, revision=1):
-        return {'key': key or self.credential.key, 'revision': revision, 'account_id': str(self.primary.id)}
-
-    def test_missing_credential_does_not_rollback_valid_confirmation(self):
-        response = self.heartbeat([self.item('missing'), self.item()])
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['updated'], [self.credential.key])
-        self.assertEqual(response.data['errors'][0]['code'], 'credential_not_found')
-        state = CredentialClientStatus.objects.get(client=self.manager.client)
-        self.assertEqual(state.applied_revision, 1)
-
-    def test_revocation_is_partial_but_disabled_identity_is_not(self):
-        self.configuration.credentials.remove(self.credential)
-        response = self.heartbeat([self.item()])
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['errors'][0]['code'], 'credential_not_selected')
-        self.configuration.is_active = False
-        self.configuration.save()
-        self.assertEqual(self.heartbeat([self.item()]).status_code, 403)
-
-    def test_disabled_instance_and_application_reject_entire_heartbeat(self):
-        self.manager.client.is_active = False
-        self.manager.client.save()
-        self.assertEqual(self.heartbeat([self.item()]).status_code, 403)
-        self.manager.client.is_active = True
-        self.manager.client.save()
-        self.application.is_active = False
-        self.application.save()
-        self.assertIn(self.heartbeat([self.item()]).status_code, (401, 403))
 
     def test_fetch_rejection_has_machine_readable_code(self):
         request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
@@ -173,15 +122,8 @@ class HeartbeatIsolationTests(CredentialTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['code'], 'credential_not_found')
 
-    def test_bad_revision_and_invalid_payload_are_not_confirmed(self):
-        response = self.heartbeat([self.item(revision=2)])
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['errors'][0]['code'], 'credential_revision_mismatch')
+    def test_bad_revision_is_not_confirmed(self):
+        with self.assertRaises(ValidationError):
+            self.manager.confirm(self.credential.key, 2, self.primary.id)
         state = CredentialClientStatus.objects.get(client=self.manager.client)
         self.assertNotEqual(state.applied_revision, 2)
-        self.assertEqual(self.heartbeat([self.item(revision=0)]).status_code, 400)
-
-    def test_unexpected_error_is_not_swallowed(self):
-        with patch.object(self.manager, '_get_credential', side_effect=RuntimeError('database unavailable')):
-            with self.assertRaises(RuntimeError):
-                self.manager.heartbeat([self.item()])

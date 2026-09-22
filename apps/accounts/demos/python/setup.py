@@ -9,7 +9,7 @@ setup(
     name='jms-pam',
     version='1.0.0',
     packages=find_packages(),
-    install_requires=['requests>=2.31.0'],
+    install_requires=['requests>=2.31.0', 'websocket-client>=1.6.1'],
     description='JumpServer PAM SDK and Agent',
     long_description=(BASE_DIR / 'README.en.md').read_text(encoding='utf-8'),
     long_description_content_type='text/markdown',

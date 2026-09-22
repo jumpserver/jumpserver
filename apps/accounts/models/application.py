@@ -87,9 +87,10 @@ def default_application_webhook_template():
 
 
 class ApplicationWebhook(JMSOrgBaseModel):
-    application = models.OneToOneField(
-        IntegrationApplication, on_delete=models.CASCADE,
-        related_name='webhook', verbose_name=_('Integration application'),
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    applications = models.ManyToManyField(
+        IntegrationApplication, related_name='webhook_rules',
+        verbose_name=_('Integration applications'),
     )
     is_active = models.BooleanField(default=False, verbose_name=_('Active'))
     url = fields.EncryptTextField(default='', blank=True, max_length=2048, verbose_name=_('URL'))
@@ -104,4 +105,5 @@ class ApplicationWebhook(JMSOrgBaseModel):
     )
 
     class Meta:
+        unique_together = [('org_id', 'name')]
         verbose_name = _('Application webhook')

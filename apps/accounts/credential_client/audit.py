@@ -8,7 +8,10 @@ from django.db import transaction
 from redis.exceptions import RedisError
 
 from accounts.const import AuditSource
-from accounts.models import ApplicationAudit, CredentialClientInstance, IntegrationApplication
+from accounts.models import (
+    ApplicationAudit, ApplicationAuditApplication, CredentialClientInstance,
+    IntegrationApplication,
+)
 from common.utils import get_logger, get_request_ip
 from jumpserver.utils import get_current_request
 from orgs.utils import tmp_to_org
@@ -16,7 +19,10 @@ from orgs.utils import tmp_to_org
 logger = get_logger(__name__)
 
 
-def record(event, *, application=None, credential=None, client=None, configuration=None, **values):
+def record(
+    event, *, application=None, applications=None, account=None,
+    credential=None, client=None, configuration=None, **values,
+):
     if client:
         application, configuration = client.application, client.configuration
         values.update(instance_id=client.instance_id)
@@ -26,15 +32,26 @@ def record(event, *, application=None, credential=None, client=None, configurati
     if configuration:
         application = configuration.application
         values.update(configuration=configuration.name, configuration_id=configuration.id)
+    related_applications = {}
+    if applications is not None:
+        related_applications.update({item.id: item.name for item in applications})
+    elif credential and credential.pk:
+        related_applications.update(dict(
+            credential.applications.values_list('id', 'name')
+        ))
     if application:
         values.update(service=application.name, service_id=application.id)
+        related_applications[application.id] = application.name
     if credential:
         rotation = credential.rotation_records.order_by('-date_created').first()
         values.update(
             credential=credential.name, credential_id=credential.id,
-            credential_key=credential.key, revision=credential.current_revision,
             rotation_id=rotation.id if rotation else None,
         )
+        values.setdefault('credential_key', credential.key)
+        values.setdefault('revision', credential.current_revision)
+    if account:
+        values.update(account=account.name, account_id=account.id)
     request = get_current_request()
     user = getattr(request, 'user', None)
     if user and getattr(user, 'is_authenticated', False) and not isinstance(user, (IntegrationApplication, CredentialClientInstance)):
@@ -50,7 +67,15 @@ def record(event, *, application=None, credential=None, client=None, configurati
     if request:
         values.setdefault('remote_addr', get_request_ip(request) or None)
     with tmp_to_org(obj.org_id):
-        return ApplicationAudit.objects.create(event=event, **values)
+        audit = ApplicationAudit.objects.create(event=event, **values)
+        ApplicationAuditApplication.objects.bulk_create([
+            ApplicationAuditApplication(
+                audit=audit, application_id=application_id, application=name,
+                org_id=obj.org_id,
+            )
+            for application_id, name in related_applications.items()
+        ])
+        return audit
 
 
 @dataclass
@@ -65,12 +90,17 @@ class ApplicationAuditContext:
     def set_request_data(self, data):
         self.values.update(
             credential_key=data.get('key', ''),
+            account_id=data.get('account_id'),
             instance_id=data.get('instance_id', ''),
             configuration_id=data.get('configuration_id'),
         )
 
     def set_client(self, client):
-        self.values = {'client': client, 'credential_key': self.values.get('credential_key', '')}
+        self.values = {
+            'client': client,
+            'credential_key': self.values.get('credential_key', ''),
+            'account_id': self.values.get('account_id'),
+        }
 
     def set_fetch_result(self, revision, success_recorded):
         self.values['revision'] = revision
