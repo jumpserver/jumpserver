@@ -14069,3 +14069,18 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "資產登入 ACL 要求執行額外操作，無法驗證憑據。"
+
+msgid "CIDR ranges"
+msgstr "CIDR 網段"
+
+msgid "Auto assign new assets"
+msgstr "自動納入新建資產"
+
+msgid "Exclude zone"
+msgstr "排除 Zone"
+
+msgid "Invalid CIDR: %s"
+msgstr "無效的 CIDR：%s"
+
+msgid "At least one CIDR is required when auto assignment is enabled."
+msgstr "啟用自動納入時，至少需要設定一個 CIDR 網段。"
