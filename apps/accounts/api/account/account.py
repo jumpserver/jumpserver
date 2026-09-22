@@ -188,13 +188,9 @@ class AccountViewSet(OrgBulkModelViewSet):
             accounts = list(self.model.objects.select_for_update().filter(id__in=account_ids))
             if not detach and any(account.follows_template for account in accounts):
                 raise TemplateFollowingConflict()
-            for account in accounts:
-                update_fields = ['secret']
-                if account.follows_template:
-                    account.follow_template = False
-                    update_fields.append('follow_template')
-                account.secret = None
-                account.save(update_fields=update_fields)
+            self.model.objects.filter(id__in=[account.id for account in accounts]).update(
+                secret=None, follow_template=False,
+            )
         return Response(status=HTTP_200_OK)
 
     def _copy_or_move_to_assets(self, request, move=False):

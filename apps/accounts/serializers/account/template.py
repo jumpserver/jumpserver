@@ -1,9 +1,7 @@
-from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import Account, AccountTemplate
-from accounts.tasks import template_sync_related_accounts
+from accounts.models import AccountTemplate
 from common.serializers import SecretReadableMixin, SecretReadableCheckMixin
 from common.serializers.fields import ObjectRelatedField
 from .base import BaseAccountSerializer
@@ -36,21 +34,6 @@ class AccountTemplateSerializer(BaseAccountSerializer):
         required=False, queryset=AccountTemplate.objects, allow_null=True,
         allow_empty=True, label=_('Su from'), attrs=('id', 'name', 'username')
     )
-
-    def update(self, instance, validated_data):
-        changed = any(
-            field in validated_data and validated_data[field] != getattr(instance, field)
-            for field in Account.TEMPLATE_SYNC_FIELDS
-        )
-        instance = super().update(instance, validated_data)
-        if changed:
-            request = self.context.get('request')
-            user_id = str(request.user.id) if request else None
-            template_id = str(instance.id)
-            transaction.on_commit(
-                lambda: template_sync_related_accounts.delay(template_id, user_id)
-            )
-        return instance
 
     class Meta(BaseAccountSerializer.Meta):
         model = AccountTemplate

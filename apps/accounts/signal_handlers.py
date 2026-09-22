@@ -86,14 +86,12 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def save_to_vault(sender, instance, created, **kwargs):
-        if isinstance(instance, Account) and instance.follows_template:
-            return
         if instance.secret_type == SecretType.SSH_CERTIFICATE:
             return
         if getattr(instance, 'skip_vault_when_saving', False):
             return
         try:
-            if created or getattr(instance, '_create_vault_on_detach', False):
+            if created or getattr(instance, '_create_vault_entry', False):
                 vault_client.create(instance)
             else:
                 vault_client.update(instance)

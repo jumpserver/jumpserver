@@ -20,9 +20,12 @@ class TemplateCredentialOverrideTests(SimpleTestCase):
 
     def clear(self, data):
         with patch.object(Account.objects, 'select_for_update') as locked, \
+                patch.object(Account.objects, 'filter') as updated, \
                 patch('accounts.api.account.account.transaction.atomic', return_value=nullcontext()):
             locked.return_value.filter.return_value = [self.local, self.account]
-            return AccountViewSet().clear_secret(SimpleNamespace(data=data))
+            response = AccountViewSet().clear_secret(SimpleNamespace(data=data))
+            self.updated = updated
+            return response
 
     def test_clear_requires_confirmation_before_modifying_any_account(self):
         with self.assertRaises(TemplateFollowingConflict):
@@ -33,11 +36,8 @@ class TemplateCredentialOverrideTests(SimpleTestCase):
 
     def test_confirmed_clear_detaches_and_clears_in_one_save(self):
         self.clear({'account_ids': ['local', 'template'], 'follow_template': False})
-        self.assertFalse(self.account.follow_template)
-        self.assertFalse(self.account.secret)
-        self.assertEqual(self.account.source_id, 'template-id')
-        self.account.save.assert_called_once_with(update_fields=['secret', 'follow_template'])
-        self.local.save.assert_called_once_with(update_fields=['secret'])
+        self.updated.assert_called_once_with(id__in=[self.local.id, self.account.id])
+        self.updated.return_value.update.assert_called_once_with(secret=None, follow_template=False)
 
     def test_invalid_confirmation_is_rejected(self):
         with self.assertRaises(ValidationError):
