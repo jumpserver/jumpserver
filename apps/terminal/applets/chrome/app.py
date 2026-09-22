@@ -214,6 +214,18 @@ def load_extensions():
     return extension_paths
 
 
+def normalize_chrome_locale(lang: str) -> str:
+    lang = (lang or '').lower()
+    lang_map = {
+        'zh-hans': 'zh-CN', 'zh-hant': 'zh-TW',
+        'zh': 'zh-CN', 'zh-cn': 'zh-CN',
+        'zh-tw': 'zh-TW', 'zh-hk': 'zh-TW',
+        'zh_cn': 'zh-CN', 'zh_tw': 'zh-TW',
+        'en': 'en-US',
+    }
+    return lang_map.get(lang, lang or 'en')
+
+
 def default_chrome_driver_options(languag: str = 'en') -> webdriver.ChromeOptions:
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
@@ -249,6 +261,7 @@ class AppletApplication(BaseApplication):
                           account=self.account, asset=self.asset, platform=self.platform)
         self._tmp_user_dir = tempfile.TemporaryDirectory()
         lang = self.connect_option.lang if self.connect_option.lang else get_system_language()
+        lang = normalize_chrome_locale(lang)
         self._chrome_options = default_chrome_driver_options(languag=lang)
         self._chrome_options.add_argument("--app={}".format(self.asset.address))
         self._chrome_options.add_argument("--user-data-dir={}".format(self._tmp_user_dir.name))
