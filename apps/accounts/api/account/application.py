@@ -120,7 +120,6 @@ class ApplicationWebhookViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.ApplicationWebhookSerializer
     rbac_perms = {
         'metadata': 'accounts.view_applicationwebhook',
-        'preview': 'accounts.view_applicationwebhook',
         'test_webhook': 'accounts.change_applicationwebhook',
     }
     filterset_fields = ('is_active', 'applications')
@@ -138,7 +137,7 @@ class ApplicationWebhookViewSet(OrgBulkModelViewSet):
             'default_template': default_application_webhook_template(),
         })
 
-    def preview_data(self, request, instance):
+    def render_body(self, request, instance):
         event = request.data.get('event') or (instance.events[0] if instance.events else None)
         if event not in ApplicationEvent.values:
             raise ValidationError({'event': _('Select a supported webhook event.')})
@@ -150,10 +149,6 @@ class ApplicationWebhookViewSet(OrgBulkModelViewSet):
             return render_webhook_template(template, sample_webhook_context(application, event))
         except WebhookValidationError as exc:
             raise ValidationError({'body_template': str(exc)}) from exc
-
-    @action(['POST'], detail=True)
-    def preview(self, request, *args, **kwargs):
-        return Response({'body': self.preview_data(request, self.get_object())})
 
     @action(['POST'], detail=True, url_path='test')
     def test_webhook(self, request, *args, **kwargs):
@@ -169,7 +164,7 @@ class ApplicationWebhookViewSet(OrgBulkModelViewSet):
             raise ValidationError({'url': _('URL is required to test the webhook.')})
         if event not in events:
             raise ValidationError({'event': _('Select one of the subscribed webhook events.')})
-        body = self.preview_data(request, instance)
+        body = self.render_body(request, instance)
         from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
         try:
             status_code = send_webhook(

@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from django.db import connection, transaction
 from django.test import SimpleTestCase
+from django.urls import Resolver404, resolve
 
 from accounts.api.account.application import ApplicationWebhookViewSet
 from accounts.const import ApplicationEvent
@@ -18,6 +19,13 @@ from users.models import User
 
 
 class ApplicationWebhookTemplateTests(SimpleTestCase):
+    def test_preview_endpoint_is_not_exposed(self):
+        with self.assertRaises(Resolver404):
+            resolve(
+                '/api/v1/accounts/application-webhooks/'
+                '00000000-0000-0000-0000-000000000001/preview/'
+            )
+
     def test_renderer_allows_only_named_fields_and_preserves_exact_value_type(self):
         template = {
             'revision': '{{ credential.revision }}',
@@ -172,22 +180,9 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
         self.assertEqual(webhook.url, 'https://8.8.8.8/hooks/private-token')
         self.assertEqual(webhook.headers, {'Authorization': 'Bearer private-header'})
 
-    def test_preview_and_test_saved_rule(self):
+    def test_test_saved_rule_renders_request_body(self):
         created = self.create_webhook()
         webhook_id = created.data['id']
-        preview = ApplicationWebhookViewSet.as_view({'post': 'preview'})
-        request = self.request('post', self.webhook_path + 'preview/', {
-            'event': ApplicationEvent.CREDENTIAL_UPDATED,
-            'body_template': {
-                'event': '{{ event.code }}',
-                'revision': '{{ credential.revision }}',
-            },
-        })
-        response = preview(request, pk=webhook_id)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['body']['event'], ApplicationEvent.CREDENTIAL_UPDATED)
-        self.assertEqual(response.data['body']['revision'], 1)
-
         test = ApplicationWebhookViewSet.as_view({'post': 'test_webhook'})
         request = self.request('post', self.webhook_path + 'test/', {
             'event': ApplicationEvent.CREDENTIAL_UPDATED,
