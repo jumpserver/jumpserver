@@ -42,7 +42,9 @@ class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashM
             )
 
     def verify_state(self):
-        return wecom_tool.check_state(self.request.GET.get('state'), self.request)
+        return self.verify_state_with_session_key(
+            wecom_tool.WECOM_STATE_SESSION_KEY
+        )
 
     def get_already_bound_response(self, redirect_url):
         msg = _('WeCom is already bound')
@@ -130,6 +132,12 @@ class WeComQRLoginView(WeComQRMixin, View):
 
 class WeComQRLoginCallbackView(WeComQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
+
+    def verify_state(self):
+        session_key = wecom_tool.WECOM_STATE_SESSION_KEY
+        if session_key in self.request.session:
+            return super().verify_state()
+        return wecom_tool.check_state(self.request.GET.get('state'))
 
     client_type_path = 'common.sdk.im.wecom.WeCom'
     client_auth_params = {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
