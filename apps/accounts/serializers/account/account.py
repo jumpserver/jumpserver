@@ -11,6 +11,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
 
 from accounts.const import SecretType, Source, AccountInvalidPolicy
+from accounts.exceptions import TemplateFollowingConflict
 from accounts.models import Account, AccountTemplate, GatheredAccount
 from accounts.tasks import push_accounts_to_assets_task, template_sync_related_accounts
 from assets.const import Category, AllTypes
@@ -151,6 +152,11 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         following = attrs.get('follow_template', getattr(instance, 'follow_template', False))
         if not following:
             return attrs
+        if instance and instance.follow_template and (
+            'secret' in attrs or bool(attrs.get('passphrase'))
+            or ('secret_type' in attrs and attrs['secret_type'] != instance.secret_type)
+        ):
+            raise TemplateFollowingConflict()
         source = attrs.get('source', getattr(instance, 'source', None))
         source_id = attrs.get('source_id', getattr(instance, 'source_id', None))
         try:

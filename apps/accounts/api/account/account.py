@@ -9,6 +9,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from accounts import serializers
 from accounts.const import ChangeSecretRecordStatusChoice, Source
+from accounts.exceptions import TemplateFollowingConflict
 from accounts.filters import AccountFilterSet, NodeFilterBackend
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import Account, ChangeSecretRecord, AccountTemplate
@@ -180,10 +181,20 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['patch'], detail=False, url_path='clear-secret')
     def clear_secret(self, request, *args, **kwargs):
         account_ids = request.data.get('account_ids', [])
-        accounts = self.model.objects.filter(id__in=account_ids)
-        if accounts.filter(source=Source.TEMPLATE, follow_template=True).exists():
-            raise drf_serializers.ValidationError(_('Disable template following before clearing credentials.'))
-        accounts.update(secret=None)
+        detach = not drf_serializers.BooleanField().run_validation(
+            request.data.get('follow_template', True)
+        )
+        with transaction.atomic():
+            accounts = list(self.model.objects.select_for_update().filter(id__in=account_ids))
+            if not detach and any(account.follows_template for account in accounts):
+                raise TemplateFollowingConflict()
+            for account in accounts:
+                update_fields = ['secret']
+                if account.follows_template:
+                    account.follow_template = False
+                    update_fields.append('follow_template')
+                account.secret = None
+                account.save(update_fields=update_fields)
         return Response(status=HTTP_200_OK)
 
     def _copy_or_move_to_assets(self, request, move=False):

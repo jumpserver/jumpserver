@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 from django.test import SimpleTestCase
 from rest_framework import serializers
 
+from accounts.exceptions import TemplateFollowingConflict
 from accounts.models import Account
 from accounts.serializers.account.account import AccountCreateUpdateSerializerMixin, AccountSerializer
 from accounts.serializers.account.template import AccountTemplateSerializer
@@ -50,8 +51,9 @@ class TemplateFollowTests(SimpleTestCase):
     def test_managed_fields_require_opt_out(self, query):
         query.return_value.first.return_value = self.template
         serializer = FollowSerializer(instance=self.account)
-        with self.assertRaises(serializers.ValidationError):
+        with self.assertRaises(TemplateFollowingConflict) as error:
             serializer.validate({'secret': 'custom-password'})
+        self.assertEqual(error.exception.get_codes(), 'account_template_following')
         attrs = {'secret': 'custom-password', 'follow_template': False}
         self.assertEqual(serializer.validate(attrs), attrs)
 
