@@ -220,19 +220,28 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         data = serializer.validated_data
 
         def target_value(name):
-            return data.get(name) or getattr(settings, name, None)
+            value = data.get(name)
+            if value in ('', None):
+                return getattr(settings, name, None)
+            return value
 
         source = OpenBaoKVClient(
             addr=settings.VAULT_OPENBAO_ADDR,
             token=settings.VAULT_OPENBAO_TOKEN,
             mount_point=old_mount_point,
             timeout=settings.VAULT_OPENBAO_TIMEOUT,
+            verify_tls=settings.VAULT_OPENBAO_VERIFY_TLS,
+            ca_cert=settings.VAULT_OPENBAO_CACERT_CONTENT,
+            ca_cert_file=settings.VAULT_OPENBAO_CACERT_FILE,
         )
         target = OpenBaoKVClient(
             addr=target_value('VAULT_OPENBAO_ADDR'),
             token=target_value('VAULT_OPENBAO_TOKEN'),
             mount_point=new_mount_point,
             timeout=target_value('VAULT_OPENBAO_TIMEOUT'),
+            verify_tls=target_value('VAULT_OPENBAO_VERIFY_TLS'),
+            ca_cert=target_value('VAULT_OPENBAO_CACERT_CONTENT'),
+            ca_cert_file=settings.VAULT_OPENBAO_CACERT_FILE,
         )
 
         ok, error = target.is_active()

@@ -210,6 +210,14 @@ REDIS_PORT: 6379
 # VAULT_OPENBAO_MOUNT_POINT: pam
 # VAULT_OPENBAO_TOKEN:
 # VAULT_OPENBAO_TIMEOUT: 10
+# VAULT_OPENBAO_VERIFY_TLS: true
+# Optional CA file mounted into the Core and Celery containers by the installer.
+# VAULT_OPENBAO_CACERT_FILE: /opt/jumpserver/data/certs/openbao/ca.crt
+# Optional PEM CA certificate used to verify the OpenBao server.
+# VAULT_OPENBAO_CACERT_CONTENT: |
+#   -----BEGIN CERTIFICATE-----
+#   ...
+#   -----END CERTIFICATE-----
 
 # OpenBao SSH CA has an independent address, token and mount. The address may
 # point to the same OpenBao cluster as Vault KV or to a separate cluster.
@@ -221,6 +229,7 @@ REDIS_PORT: 6379
 # SSH_CA_OPENBAO_TTL: 300
 # SSH_CA_OPENBAO_TIMEOUT: 10
 # SSH_CA_OPENBAO_VERIFY_TLS: true
+# SSH_CA_OPENBAO_CACERT_FILE: /opt/jumpserver/data/certs/openbao/ca.crt
 # Optional: comma-separated CIDRs seen by the target sshd (Koko or gateway egress)
 # SSH_CA_OPENBAO_SOURCE_ADDRESS:
 
