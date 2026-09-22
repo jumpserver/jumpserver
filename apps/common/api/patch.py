@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import contextvars
 import time
 from hashlib import md5
 from threading import Thread
@@ -105,9 +106,10 @@ class AsyncApiMixin(InterceptMixin):
     def do_async(self, handler, *args, **kwargs):
         data = self.get_cache_data()
         if not data:
+            ctx = contextvars.copy_context()
             t = Thread(
-                target=self.do_in_thread,
-                args=(handler, *args),
+                target=ctx.run,
+                args=(self.do_in_thread, handler, *args),
                 kwargs=kwargs
             )
             t.start()
