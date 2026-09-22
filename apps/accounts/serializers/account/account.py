@@ -13,7 +13,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from accounts.const import SecretType, Source, AccountInvalidPolicy
 from accounts.exceptions import TemplateFollowingConflict
 from accounts.models import Account, AccountTemplate, GatheredAccount
-from accounts.tasks import push_accounts_to_assets_task
+from accounts.tasks import push_accounts_to_assets_task, template_sync_related_accounts
 from assets.const import Category, AllTypes
 from assets.models import Asset
 from common.serializers import SecretReadableMixin, SecretReadableCheckMixin, CommonBulkModelSerializer
@@ -176,6 +176,12 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             raise serializers.ValidationError({'secret_type': _('Account and template secret types must match.')})
         if 'secret' in attrs:
             raise serializers.ValidationError({'secret': _('Following accounts use template credentials.')})
+        if instance:
+            for field in Account.TEMPLATE_SYNC_FIELDS:
+                if field in attrs and attrs[field] != getattr(instance, field):
+                    raise serializers.ValidationError({
+                        field: _('Disable template following before editing this field.')
+                    })
         return attrs
 
     def clean_auth_fields(self, validated_data):
@@ -247,11 +253,15 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         validated_data.pop('on_invalid', None)
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
+        start_following = validated_data.get('follow_template', False) and not instance.follow_template
         if instance.follow_template and validated_data.get('follow_template') is False:
             # DRF assigns fields in order; detach before invoking the secret setter.
             validated_data = {'follow_template': False, **validated_data}
             validated_data.setdefault('secret_type', instance.secret_type)
         instance = super().update(instance, validated_data)
+        if start_following and Account.TEMPLATE_SYNC_FIELDS:
+            template_id = instance.source_id
+            transaction.on_commit(lambda: template_sync_related_accounts.delay(template_id))
         self.push_account_if_need(instance, push_now, params, 'updated')
         return instance
 
@@ -308,7 +318,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'name': {'required': False},
             'source_id': {'required': False, 'allow_null': True},
             'follow_template': {
-                'help_text': _('Only applies to template accounts. Template credential changes are synchronized to this account.')
+                'help_text': _('Only applies to template accounts. Credentials are read from the current template.')
             },
         }
         fields_unimport_template = ['params', 'asset_address']
@@ -396,7 +406,7 @@ class AssetAccountBulkSerializer(
             'source': {'required': False, 'allow_null': True},
             'source_id': {'required': False, 'allow_null': True},
             'follow_template': {
-                'help_text': _('Only applies to template accounts. Template credential changes are synchronized to this account.')
+                'help_text': _('Only applies to template accounts. Credentials are read from the current template.')
             },
         }
 

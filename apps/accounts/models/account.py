@@ -26,6 +26,8 @@ class AccountHistoricalRecords(HistoricalRecords):
 
     def post_save(self, instance, created, using=None, **kwargs):
         self.updated_version = None
+        if getattr(instance, "follows_template", False) and not created:
+            return
         if not self.included_fields:
             return super().post_save(instance, created, using=using, **kwargs)
 
@@ -51,7 +53,13 @@ class AccountHistoricalRecords(HistoricalRecords):
         return super().post_save(instance, created, using=using, **kwargs)
 
     def create_historical_record(self, instance, history_type, using=None):
-        super().create_historical_record(instance, history_type, using=using)
+        local_secret = instance._secret
+        try:
+            if getattr(instance, 'follows_template', False) and history_type != '-':
+                instance._secret = instance.secret
+            super().create_historical_record(instance, history_type, using=using)
+        finally:
+            instance._secret = local_secret
         # Ignore deletion history_type: -
         if self.updated_version is not None and history_type != '-':
             type(instance)._base_manager.db_manager(using=using).filter(
@@ -105,6 +113,10 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
     follow_template = models.BooleanField(default=False, verbose_name=_('Follow template'))
+    # Credentials are referenced dynamically; only these properties are copied.
+    # Credentials are resolved dynamically; account metadata remains independent.
+    TEMPLATE_SYNC_FIELDS = ()
+
     date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
     login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
@@ -150,23 +162,23 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             raise ValidationError({'secret_type': _('Account and template secret types must match.')})
         return template
 
-    @VaultModelMixin.secret.setter
+    @property
+    def secret(self):
+        if self.follows_template:
+            template = self.get_source_template()
+            secret = template.secret
+            if template.secret_has_save_to_vault and not secret:
+                from accounts.exceptions import VaultSecretNotFoundException
+                raise VaultSecretNotFoundException()
+            return secret
+        return VaultModelMixin.secret.fget(self)
+
+    @secret.setter
     def secret(self, value):
         if self.follows_template:
             raise ValidationError({'secret': _('Disable template following before editing credentials.')})
         VaultModelMixin.secret.fset(self, value)
         self._secret_explicitly_set = True
-
-    def copy_template_credentials(self, only_if_changed=False):
-        template = self.get_source_template()
-        secret = template.secret
-        if template.secret_has_save_to_vault and not secret:
-            from accounts.exceptions import VaultSecretNotFoundException
-            raise VaultSecretNotFoundException()
-        if only_if_changed and self.secret == secret:
-            return False
-        VaultModelMixin.secret.fset(self, secret)
-        return True
 
     def save(self, *args, **kwargs):
         # Match OrgModelMixin before resolving the organization-scoped template.
@@ -174,7 +186,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         org = get_current_org()
         if not org.is_root():
             self.org_id = org.id
-        # Serialize opt-in, opt-out and background synchronization for this account.
+        # Keep the credential snapshot and opt-out in the same database transaction.
         using = kwargs.get('using') or self._state.db or 'default'
         with transaction.atomic(using=using):
             previous = None
@@ -188,23 +200,29 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
                     raise ValidationError({'secret_type': _('Disable template following before changing the secret type.')})
                 if not self.follow_template:
                     if update_fields is not None and 'follow_template' not in update_fields:
-                        raise ValidationError({'follow_template': _('Save the following state with the credential change.')})
-                    if self.secret_type != previous.secret_type and not getattr(self, '_secret_explicitly_set', False):
-                        raise ValidationError({'secret': _('Provide credentials when changing the secret type.')})
-                    if update_fields is not None and getattr(self, '_secret_explicitly_set', False):
+                        raise ValidationError({'follow_template': _('Save the following state with the credential snapshot.')})
+                    has_new_secret = getattr(self, '_secret_explicitly_set', False)
+                    if not has_new_secret:
+                        if self.secret_type != previous.secret_type:
+                            raise ValidationError({'secret': _('Provide credentials when changing the secret type.')})
+                        self.secret = previous.secret
+                    self._create_vault_on_detach = True
+                    if update_fields is not None:
                         kwargs['update_fields'] = list(set(update_fields) | {'_secret'})
             if self.follow_template:
                 if not self.follows_template:
                     raise ValidationError({'follow_template': _('Only template accounts can follow a template.')})
-                if previous is None or not previous.follows_template:
-                    if update_fields is not None and 'follow_template' not in update_fields:
-                        raise ValidationError({'follow_template': _('Save the following state with the credential change.')})
-                    self.copy_template_credentials()
-                    if update_fields is not None:
-                        kwargs['update_fields'] = list(set(kwargs.get('update_fields', update_fields)) | {'_secret'})
-            result = super().save(*args, **kwargs)
-            self.__dict__.pop('_secret_explicitly_set', None)
-            return result
+                self.get_source_template()
+                # Do not retain an independent current credential while following.
+                self._secret = None
+                if update_fields is not None and 'follow_template' in update_fields:
+                    kwargs['update_fields'] = list(set(kwargs['update_fields']) | {'_secret'})
+            try:
+                result = super().save(*args, **kwargs)
+                self.__dict__.pop('_secret_explicitly_set', None)
+                return result
+            finally:
+                self.__dict__.pop('_create_vault_on_detach', None)
 
     def __str__(self):
         if self.asset_id:

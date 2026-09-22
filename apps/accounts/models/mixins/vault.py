@@ -45,11 +45,10 @@ class VaultQuerySetMixin(models.QuerySet):
             kwargs.update({
                 '_secret': kwargs.pop('secret')
             })
-        # Capture IDs before updating fields that may be part of the queryset filter.
-        ids = list(self.values_list('id', flat=True))
         rows = super().update(**kwargs)
 
         # 为了获取更新后的对象所以单独查询一次
+        ids = self.values_list('id', flat=True)
         objs = self.model.objects.filter(id__in=ids)
         for obj in objs:
             post_save.send(obj.__class__, instance=obj, created=False)

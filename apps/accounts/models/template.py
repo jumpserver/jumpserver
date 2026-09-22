@@ -1,4 +1,4 @@
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -109,16 +109,4 @@ class AccountTemplate(LabeledMixin, BaseAccount, SecretWithRandomMixin):
             self.secret = self.get_secret()
             if kwargs.get('update_fields') is not None:
                 kwargs['update_fields'] = list(set(kwargs['update_fields']) | {'_secret'})
-        update_fields = kwargs.get('update_fields')
-        secret_changed = previous is not None and self._secret != previous._secret and (
-            update_fields is None or bool({'secret', '_secret'} & set(update_fields))
-        )
-        using = kwargs.get('using') or self._state.db or 'default'
-        with transaction.atomic(using=using):
-            super().save(*args, **kwargs)
-            if secret_changed:
-                from accounts.tasks import template_sync_related_accounts
-                template_id = str(self.pk)
-                transaction.on_commit(
-                    lambda: template_sync_related_accounts.delay(template_id), using=using,
-                )
+        super().save(*args, **kwargs)

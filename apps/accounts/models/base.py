@@ -25,13 +25,10 @@ class BaseAccountQuerySet(VaultQuerySetMixin, models.QuerySet):
     def update(self, **kwargs):
         if self.model._meta.model_name == 'account':
             from rest_framework.exceptions import ValidationError
-            if 'follow_template' in kwargs and kwargs['follow_template'] is not False:
+            if 'follow_template' in kwargs:
                 raise ValidationError(_('Update template following through account save to preserve credentials.'))
-            if {'source', 'source_id'}.intersection(kwargs) and self.filter(source='template', follow_template=True).exists():
-                raise ValidationError(_('Disable template following before changing the source.'))
             protected = {'secret', '_secret', 'secret_type', 'source', 'source_id'}
-            if (protected.intersection(kwargs) and kwargs.get('follow_template') is not False
-                    and self.filter(source='template', follow_template=True).exists()):
+            if protected.intersection(kwargs) and self.filter(source='template', follow_template=True).exists():
                 raise ValidationError(_('Disable template following before editing credentials or their source.'))
         return super().update(**kwargs)
 

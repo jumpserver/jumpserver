@@ -8,6 +8,8 @@ from rest_framework import serializers
 from accounts.exceptions import TemplateFollowingConflict
 from accounts.models import Account
 from accounts.serializers.account.account import AccountCreateUpdateSerializerMixin, AccountSerializer
+from accounts.serializers.account.template import AccountTemplateSerializer
+from accounts.tasks.template import template_sync_related_accounts
 
 
 class FollowSerializer(AccountCreateUpdateSerializerMixin, serializers.Serializer):
@@ -55,6 +57,66 @@ class TemplateFollowTests(SimpleTestCase):
         attrs = {'secret': 'custom-password', 'follow_template': False}
         self.assertEqual(serializer.validate(attrs), attrs)
 
+    def run_sync(self, account):
+        with patch('accounts.models.AccountTemplate.objects.filter') as templates, \
+                patch('accounts.models.Account.objects.filter') as accounts, \
+                patch('accounts.models.Account.objects.select_for_update') as locked, \
+                patch('accounts.tasks.template.tmp_to_root_org', return_value=nullcontext()), \
+                patch('accounts.tasks.template.tmp_to_org', return_value=nullcontext()), \
+                patch('accounts.tasks.template.transaction.atomic', return_value=nullcontext()):
+            templates.return_value.first.return_value = self.template
+            accounts.return_value.values_list.return_value = ['account-id']
+            locked.return_value.filter.return_value.first.return_value = account
+            template_sync_related_accounts.run('template-id')
+            accounts.assert_called_once_with(
+                source='template', source_id='template-id', follow_template=True,
+            )
+            locked.return_value.filter.assert_called_once_with(
+                id='account-id', source='template', source_id='template-id', follow_template=True,
+            )
+
+    def test_sync_preserves_credentials_and_authentication_identity(self):
+        account = Account(name='old', username='original', secret_type='ssh_key',
+                          privileged=False, is_active=False, source='template',
+                          source_id='template-id', follow_template=True)
+        account._secret = 'external-vault-marker'
+        account.save = Mock()
+        self.run_sync(account)
+        account.save.assert_not_called()
+        self.assertFalse(account.privileged)
+        self.assertEqual(account._secret, 'external-vault-marker')
+        self.assertEqual(account.name, 'old')
+        self.assertEqual(account.username, 'original')
+        self.assertEqual(account.secret_type, 'ssh_key')
+        self.assertFalse(account.is_active)
+
+    def test_sync_preserves_source_and_following(self):
+        self.account.save = Mock(side_effect=ValueError('name conflict'))
+        with patch('accounts.tasks.template.logger.exception'):
+            self.run_sync(self.account)
+        self.assertEqual(self.account.source_id, 'template-id')
+        self.assertTrue(self.account.follow_template)
+
+    def test_queued_sync_respects_opt_out(self):
+        self.run_sync(None)
+
+    @patch('accounts.serializers.account.template.BaseAccountSerializer.update')
+    @patch('accounts.serializers.account.template.transaction.on_commit')
+    @patch('accounts.serializers.account.template.template_sync_related_accounts.delay')
+    def test_template_privilege_change_does_not_schedule_sync(self, delay, on_commit, update):
+        update.return_value = self.template
+        serializer = AccountTemplateSerializer()
+        serializer.update(self.template, {'privileged': False})
+        delay.assert_not_called()
+        on_commit.assert_not_called()
+
+    @patch('accounts.serializers.account.template.BaseAccountSerializer.update')
+    @patch('accounts.serializers.account.template.transaction.on_commit')
+    def test_template_name_and_secret_changes_do_not_schedule_sync(self, on_commit, update):
+        update.return_value = self.template
+        AccountTemplateSerializer().update(self.template, {'name': 'changed', 'secret': 'new-secret'})
+        on_commit.assert_not_called()
+
     @patch('accounts.serializers.account.account.Account.objects.filter')
     def test_account_creation_rejects_following_for_local_source(self, query):
         query.return_value.exists.return_value = False
@@ -90,12 +152,16 @@ class TemplateCredentialTests(SimpleTestCase):
         values.update(kwargs)
         return Account(**values)
 
-    def test_following_account_reads_stored_copy_without_template_lookup(self):
+    def test_reads_current_template_without_using_account_secret_cache(self):
         account = self.make_account(follow_template=False)
-        account.secret = 'stored-copy'
+        account.secret = 'stale-account-secret'
         account.follow_template = True
-        with patch.object(Account, 'get_source_template', side_effect=AssertionError('template lookup')):
-            self.assertEqual(account.secret, 'stored-copy')
+        template = SimpleNamespace(secret='first', secret_has_save_to_vault=False)
+        with patch.object(Account, 'get_source_template', return_value=template):
+            self.assertEqual(account.secret, 'first')
+            template.secret = 'second'
+            self.assertEqual(account.secret, 'second')
+        self.assertEqual(account._secret, 'stale-account-secret')
 
     def test_independent_account_reads_own_secret(self):
         account = self.make_account(follow_template=False)
@@ -110,14 +176,12 @@ class TemplateCredentialTests(SimpleTestCase):
             account.secret = 'replacement'
         self.assertIsNone(account._secret)
 
-    def test_sync_read_failure_preserves_existing_copy(self):
-        account = self.make_account(follow_template=False)
-        account.secret = 'old-secret'
-        account.follow_template = True
+    def test_template_lookup_failure_never_falls_back(self):
+        account = self.make_account()
+        account._secret = 'old-secret'
         with patch.object(Account, 'get_source_template', side_effect=serializers.ValidationError('missing')):
             with self.assertRaises(serializers.ValidationError):
-                account.copy_template_credentials()
-        self.assertEqual(account.secret, 'old-secret')
+                _ = account.secret
 
     def test_missing_vault_secret_never_falls_back(self):
         from accounts.exceptions import VaultSecretNotFoundException
@@ -126,17 +190,17 @@ class TemplateCredentialTests(SimpleTestCase):
         template = SimpleNamespace(secret=None, secret_has_save_to_vault=True)
         with patch.object(Account, 'get_source_template', return_value=template):
             with self.assertRaises(VaultSecretNotFoundException):
-                account.copy_template_credentials()
+                _ = account.secret
 
     @patch('accounts.signal_handlers.vault_client')
-    def test_following_account_save_writes_own_vault_entry(self, vault):
+    def test_following_account_save_does_not_write_vault(self, vault):
         from accounts.signal_handlers import VaultSignalHandler
         for created in (True, False):
             VaultSignalHandler.save_to_vault(Account, self.make_account(), created)
-        vault.create.assert_called_once()
-        vault.update.assert_called_once()
+        vault.create.assert_not_called()
+        vault.update.assert_not_called()
 
-    def test_following_creation_defers_copy_to_model_save(self):
+    def test_following_creation_does_not_generate_or_copy_secret(self):
         template = SimpleNamespace(name='name', username='user', secret_type='password',
                                    privileged=False, is_active=True, get_secret=Mock())
         attrs = AccountCreateUpdateSerializerMixin.get_template_attr_for_account(template, True)
@@ -147,23 +211,22 @@ class TemplateCredentialTests(SimpleTestCase):
 
     @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
     @patch('accounts.models.account.BaseAccount.save')
-    def test_detach_preserves_stored_copy_without_reading_template(self, save, atomic):
+    def test_detach_snapshots_current_credential_before_saving(self, save, atomic):
         from accounts.models import Account
         previous = self.make_account()
         account = self.make_account(follow_template=False)
         account._state.adding = False
-        account._secret = 'stored-copy'
         template = SimpleNamespace(secret='current-template-secret', secret_has_save_to_vault=False)
         with patch.object(Account._base_manager, 'using') as manager, \
                 patch.object(Account, 'get_source_template', return_value=template):
             manager.return_value.select_for_update.return_value.filter.return_value.first.return_value = previous
             account.save(update_fields=['follow_template'])
-        self.assertEqual(account._secret, 'stored-copy')
-        self.assertEqual(save.call_args.kwargs['update_fields'], ['follow_template'])
+        self.assertEqual(account._secret, 'current-template-secret')
+        self.assertEqual(set(save.call_args.kwargs['update_fields']), {'follow_template', '_secret'})
 
     @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
     @patch('accounts.models.account.BaseAccount.save')
-    def test_detach_succeeds_when_template_is_unavailable(self, save, atomic):
+    def test_failed_detach_read_does_not_save(self, save, atomic):
         from accounts.exceptions import VaultUnavailableException
         previous = self.make_account()
         account = self.make_account(follow_template=False)
@@ -171,8 +234,9 @@ class TemplateCredentialTests(SimpleTestCase):
         with patch.object(Account._base_manager, 'using') as manager, \
                 patch.object(Account, 'get_source_template', side_effect=VaultUnavailableException()):
             manager.return_value.select_for_update.return_value.filter.return_value.first.return_value = previous
-            account.save()
-        save.assert_called_once()
+            with self.assertRaises(VaultUnavailableException):
+                account.save()
+        save.assert_not_called()
 
     @patch('accounts.models.Account.objects.filter')
     def test_followed_template_cannot_be_deleted(self, query):
@@ -184,10 +248,9 @@ class TemplateCredentialTests(SimpleTestCase):
             with self.assertRaises(ProtectedError):
                 protect_followed_account_template(None, template)
 
-    @patch('accounts.models.template.transaction.atomic', return_value=nullcontext())
     @patch('accounts.models.template.BaseAccount.save')
     @patch('accounts.models.AccountTemplate.objects.filter')
-    def test_random_template_metadata_save_does_not_regenerate(self, query, save, atomic):
+    def test_random_template_metadata_save_does_not_regenerate(self, query, save):
         from accounts.models import AccountTemplate
         template = AccountTemplate(secret_strategy='random', name='new-name')
         template._state.adding = False
@@ -201,7 +264,6 @@ class TemplateCredentialTests(SimpleTestCase):
         from accounts.models.account import AccountHistoricalRecords
         from simple_history.models import HistoricalRecords
         account = self.make_account()
-        account._secret = 'stored-copy'
         template = SimpleNamespace(secret='snapshot-value', secret_has_save_to_vault=False)
         captured = []
         history = AccountHistoricalRecords()
@@ -209,8 +271,8 @@ class TemplateCredentialTests(SimpleTestCase):
                 patch.object(HistoricalRecords, 'create_historical_record',
                              side_effect=lambda obj, *a, **kw: captured.append(obj._secret)):
             history.create_historical_record(account, '+')
-        self.assertEqual(captured, ['stored-copy'])
-        self.assertEqual(account._secret, 'stored-copy')
+        self.assertEqual(captured, ['snapshot-value'])
+        self.assertIsNone(account._secret)
 
     def test_serializer_allows_credentials_when_detaching_in_same_request(self):
         account = self.make_account()
