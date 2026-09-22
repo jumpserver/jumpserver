@@ -17,13 +17,13 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+        uses: actions/checkout@v2
       - name: Get version
         id: get_version
         run: |
           TAG=$(basename ${GITHUB_REF})
           VERSION=${TAG/v/}
-          wget https://raw.githubusercontent.com/jumpserver/installer/fec28ae17c1e781e0cf87434d0e92a9f5ae17b00/quick_start.sh
+          wget https://raw.githubusercontent.com/jumpserver/installer/master/quick_start.sh
           sed -i "s@VERSION=dev@VERSION=v${VERSION}@g" quick_start.sh
           echo "::set-output name=TAG::$TAG"
           echo "::set-output name=VERSION::$VERSION"
@@ -38,7 +38,7 @@ jobs:
           tag: ${{ steps.get_version.outputs.TAG }}
       - name: Upload Quick Start Script
         id: upload-release-quick-start-shell
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -52,9 +52,9 @@ jobs:
     name: Build and Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+      - uses: actions/checkout@v2
       - name: Build it and upload
-        uses: jumpserver/action-build-upload-assets@f81e671f6e1405ac88ba606160ccde0ea5965ee0 # master
+        uses: jumpserver/action-build-upload-assets@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Auto Translate
-        uses: jumpserver-dev/action-translate-readme@d8ea47ca84c8befbd52717bbbba174643c55b94d # main
+        uses: jumpserver-dev/action-translate-readme@main
         env:
           GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.GPT_API_TOKEN }}

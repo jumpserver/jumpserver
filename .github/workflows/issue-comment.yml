@@ -30,14 +30,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+        uses: actions/checkout@v2
 
       - name: Get Organization name
         id: org_name
         run: echo "data=$(echo '${{ github.repository }}' | cut -d '/' -f 1)" >> $GITHUB_OUTPUT
 
       - name: Get Organization public members
-        uses: octokit/request-action@02f5e7c637a73a3b12ed81015fa7fb5f11cc5d7d # v2.x
+        uses: octokit/request-action@v2.x
         id: members
         with:
           route: GET /orgs/${{ steps.org_name.outputs.data }}/public_members
