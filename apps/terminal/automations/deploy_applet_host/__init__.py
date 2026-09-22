@@ -6,11 +6,13 @@ import uuid
 
 import yaml
 from django.conf import settings
+from django.core.cache import cache
 from django.utils import timezone
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger, random_string
 from ops.ansible import SuperPlaybookRunner, JMSInventory
+from terminal.const import TINKER_TARGET_VERSION
 from terminal.models import Applet, AppletHostDeployment
 
 logger = get_logger(__name__)
@@ -42,8 +44,23 @@ class DeployAppletHostManager:
         self._run(self._run_uninstall_applet, **kwargs)
 
     def _run_initial_deploy(self, **kwargs):
-        playbook = self.generate_initial_playbook
-        return self._run_playbook(playbook, **kwargs)
+        prepared = self._run_playbook(self.generate_initial_playbook, tags='prepare', **kwargs)
+        if prepared.status != 'success':
+            return prepared
+
+        self.detach_terminal()
+        # Open the registration window only after all downloads have completed.
+        cache.set('APPLET_HOST_DELOYING', str(self.deployment.id), timeout=300)
+        # The runner removes its workspace after each phase.
+        return self._run_playbook(self.generate_initial_playbook, tags='deploy', **kwargs)
+
+    def detach_terminal(self):
+        host = self.deployment.host
+        if host.terminal:
+            terminal = host.terminal
+            host.terminal = None
+            host.save(update_fields=['terminal'])
+            terminal.delete()
 
     def _run_install_applet(self, **kwargs):
         if self.applet:
@@ -85,6 +102,7 @@ class DeployAppletHostManager:
                 play["vars"]["HOST_ID"] = host_id
                 play["vars"]["HOST_NAME"] = hostname
                 play["vars"]["INSTALL_APPLETS"] = self.install_applets
+                play["vars"]["TINKER_VERSION"] = TINKER_TARGET_VERSION
             return plays
 
         return self._generate_playbook("playbook.yml", handler)

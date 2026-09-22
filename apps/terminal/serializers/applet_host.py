@@ -11,6 +11,7 @@ from common.validators import ProjectUniqueValidator
 from .applet import AppletSerializer
 from .. import const
 from ..models import AppletHost, AppletHostDeployment
+from ..utils.tinker import get_tinker_version_status
 
 __all__ = [
     'AppletHostSerializer', 'AppletHostDeploymentSerializer',
@@ -78,6 +79,8 @@ class DeployOptionsSerializer(serializers.Serializer):
 
 
 class AppletHostSerializer(HostSerializer):
+    tinker_target_version = serializers.SerializerMethodField()
+    tinker_version_status = serializers.SerializerMethodField()
     deploy_options = DeployOptionsSerializer(required=False, label=_("Deploy options"))
     load = LabeledChoiceField(
         read_only=True, label=_('Load status'), choices=const.ComponentLoad.choices,
@@ -88,10 +91,12 @@ class AppletHostSerializer(HostSerializer):
         fields = HostSerializer.Meta.fields + [
             'auto_create_accounts', 'accounts_create_amount',
             'load', 'date_synced', 'deploy_options', 'using_same_account',
+            'tinker_version', 'tinker_target_version', 'tinker_version_status',
         ]
         extra_kwargs = {
             **HostSerializer.Meta.extra_kwargs,
             'date_synced': {'read_only': True},
+            'tinker_version': {'read_only': True},
             'auto_create_accounts': {
                 'help_text': _(
                     'These accounts are used to connect to the published application, '
@@ -109,6 +114,12 @@ class AppletHostSerializer(HostSerializer):
                 )
             }
         }
+
+    def get_tinker_target_version(self, obj):
+        return const.TINKER_TARGET_VERSION
+
+    def get_tinker_version_status(self, obj):
+        return get_tinker_version_status(obj.tinker_version)
 
     def __init__(self, *args, data=None, **kwargs):
         if data:
@@ -187,7 +198,7 @@ class AppletHostAppletReportSerializer(serializers.Serializer):
 
 
 class AppletHostStartupSerializer(serializers.Serializer):
-    pass
+    version = serializers.CharField(required=False, allow_blank=True, default='', max_length=32)
 
 
 class AppletSetupSerializer(serializers.Serializer):

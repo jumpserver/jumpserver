@@ -1,5 +1,4 @@
 from collections import defaultdict
-from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +14,9 @@ __all__ = ['AppletHost', 'AppletHostDeployment']
 
 
 class AppletHost(Host):
+    tinker_version = models.CharField(
+        max_length=32, blank=True, default='', editable=False, verbose_name=_('Tinker version'),
+    )
     deploy_options = models.JSONField(default=dict, verbose_name=_('Deploy options'))
     auto_create_accounts = models.BooleanField(default=True, verbose_name=_('Auto create accounts'))
     accounts_create_amount = models.IntegerField(default=100, verbose_name=_('Accounts create amount'))
@@ -44,17 +46,15 @@ class AppletHost(Host):
             return 'offline'
         return self.terminal.load
 
-    def check_terminal_binding(self, request):
+    def check_terminal_binding(self, request, tinker_version=''):
         request_terminal = getattr(request.user, 'terminal', None)
         if not request_terminal:
             raise ValidationError('Request user has no terminal')
 
         self.date_synced = timezone.now()
-        if self.terminal == request_terminal:
-            self.save(update_fields=['date_synced'])
-        else:
-            self.terminal = request_terminal
-            self.save(update_fields=['terminal', 'date_synced'])
+        self.terminal = request_terminal
+        self.tinker_version = tinker_version
+        self.save(update_fields=['terminal', 'date_synced', 'tinker_version'])
 
     def check_applets_state(self, applets_value_list):
         applets = self.applets.all()
@@ -148,15 +148,6 @@ class AppletHostDeployment(JMSBaseModel):
         verbose_name = _("Applet host deployment")
 
     def start(self, **kwargs):
-        # 重新初始化部署，applet host 关联的终端需要删除
-        # 否则 tinker 会因组件注册名称相同，造成冲突，执行任务失败
-        if self.host.terminal:
-            terminal = self.host.terminal
-            self.host.terminal = None
-            self.host.save()
-            terminal.delete()
-
-        cache.set(f'APPLET_HOST_DELOYING', str(self.id), timeout=300)
         from ...automations.deploy_applet_host import DeployAppletHostManager
         manager = DeployAppletHostManager(self, **kwargs)
         manager.run()
