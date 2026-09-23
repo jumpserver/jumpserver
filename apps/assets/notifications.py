@@ -1,4 +1,5 @@
 from django.utils.translation import gettext as _
+from django.utils.html import format_html, format_html_join
 
 from notifications.notifications import UserMessage
 
@@ -10,7 +11,7 @@ class BulkUpdatePlatformSkipAssetUserMsg(UserMessage):
 
     def get_html_msg(self) -> dict:
         subject = _("Batch update platform in assets, skipping assets that do not meet platform type")
-        message = f'<ol>{"".join([f"<li>{asset}</li>" for asset in self.assets])}</ol>'
+        message = format_html('<ol>{}</ol>', format_html_join('', '<li>{}</li>', ((str(asset),) for asset in self.assets)))
         return {
             'subject': subject,
             'message': message
