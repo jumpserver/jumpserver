@@ -481,7 +481,7 @@ class Config(dict):
         'AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT': 'https://oauth2.example.com/logout',
         'AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT': 'https://oauth2.example.com/access_token',
         'AUTH_OAUTH2_ACCESS_TOKEN_METHOD': 'GET',
-        'AUTH_OAUTH2_CERT_VERIFY_MODE': 'default',
+        'AUTH_OAUTH2_CERT_VERIFY_MODE': 'system',
         'AUTH_OAUTH2_CACERT_CONTENT': '',
         'AUTH_OAUTH2_USER_ATTR_MAP': {
             'name': 'name', 'username': 'username', 'email': 'email'

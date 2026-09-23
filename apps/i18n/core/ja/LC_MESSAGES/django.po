@@ -9854,10 +9854,6 @@ msgstr "SMTPホスト"
 msgid "Microsoft Exchange Server"
 msgstr "マイクロソフトエクスチェンジ サーバー"
 
-#: settings/serializers/tls.py:9
-msgid "Use default trust store (compatible)"
-msgstr "デフォルトの信頼ストアを使用（互換）"
-
 #: settings/serializers/msg.py:31
 msgid "Use system trust store"
 msgstr "システム信頼ストアを使用"
