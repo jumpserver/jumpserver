@@ -9,7 +9,9 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework_bulk.generics import BulkModelViewSet
 
+from authentication.permissions import UserConfirmation, ConfirmType
 from common.api import CommonApiMixin, SuggestionMixin
+from common.permissions import IsValidUser
 from common.drf.filters import AttrRulesFilterBackend
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
@@ -255,14 +257,20 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
         MFABlockUtils.unblock_user(username)
 
 
-class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):
+class UserResetMFAApi(UserQuerysetMixin, generics.GenericAPIView):
     serializer_class = serializers.ResetOTPSerializer
+    http_method_names = ['post', 'options']
+    permission_classes = [IsValidUser, RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    rbac_perms = {'POST': 'users.change_user'}
 
-    def retrieve(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         user = self.get_object() if kwargs.get('pk') else request.user
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
             return Response({"error": msg}, status=400)
+
+        if user.is_superuser and not request.user.is_superuser:
+            raise PermissionDenied()
 
         backends = user.active_mfa_backends_mapper
         for backend in backends.values():

@@ -3,7 +3,7 @@ from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from simple_history.utils import bulk_create_with_history
 
 from assets.models import Host
@@ -49,12 +49,11 @@ class AppletHost(Host):
         if not request_terminal:
             raise ValidationError('Request user has no terminal')
 
+        # A service credential must not be able to claim another host at startup.
+        if self.terminal_id != request_terminal.pk:
+            raise PermissionDenied('Terminal is not bound to this applet host')
         self.date_synced = timezone.now()
-        if self.terminal == request_terminal:
-            self.save(update_fields=['date_synced'])
-        else:
-            self.terminal = request_terminal
-            self.save(update_fields=['terminal', 'date_synced'])
+        self.save(update_fields=['date_synced'])
 
     def check_applets_state(self, applets_value_list):
         applets = self.applets.all()
