@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
-from django.core.exceptions import ValidationError
+from django.core.exceptions import SuspiciousFileOperation, ValidationError
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
@@ -183,6 +183,9 @@ class Session(OrgModelMixin):
         return os.path.join(date, str(self.id))
 
     def get_replay_part_file_relative_path(self, filename):
+        if (not isinstance(filename, str) or not filename or filename in ('.', '..')
+                or any(char in filename for char in ('/', '\\', '\x00'))):
+            raise SuspiciousFileOperation('Invalid replay part filename')
         return os.path.join(self.get_replay_dir_relative_path(), filename)
 
     def get_replay_part_file_local_storage_path(self, filename):
