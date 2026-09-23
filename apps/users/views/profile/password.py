@@ -1,6 +1,5 @@
 # ~*~ coding: utf-8 ~*~
 
-from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
@@ -11,6 +10,7 @@ from common.utils import get_logger
 from ... import forms
 from ...utils import (
     get_user_or_pre_auth_user,
+    LoginBlockUtil,
 )
 
 __all__ = ['UserVerifyPasswordView']
@@ -29,16 +29,18 @@ class UserVerifyPasswordView(AuthMixin, FormView):
 
         try:
             password = form.cleaned_data['password']
+            ip = self.get_request_ip()
+            self._set_partial_credential_error(user.username, ip, self.request)
+            self._check_is_block(user.username)
+            authenticated_user = self._check_auth_user_is_valid(user.username, password, '')
+            if authenticated_user.pk != user.pk:
+                self.raise_credential_error(errors.reason_password_failed)
         except errors.AuthFailedError as e:
             form.add_error("password", _("Password invalid") + f'({e.msg})')
             return self.form_invalid(form)
 
-        user = authenticate(request=self.request, username=user.username, password=password)
-        if not user:
-            form.add_error("password", _("Password invalid"))
-            return self.form_invalid(form)
-
-        self.mark_password_ok(user)
+        LoginBlockUtil(user.username, ip).clean_failed_count()
+        self.mark_password_ok(authenticated_user)
         return redirect(self.get_success_url())
 
     def get_success_url(self):
