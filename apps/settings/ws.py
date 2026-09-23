@@ -7,6 +7,7 @@ from urllib.parse import parse_qs
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.cache import cache
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
@@ -15,7 +16,8 @@ from common.db.utils import close_old_connections, safe_db_connection
 from common.utils import get_logger
 from orgs.mixins.ws import OrgMixin
 from orgs.models import Organization
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_org, tmp_to_root_org
+from rbac.models import RoleBinding
 from settings.serializers import (
     LDAPHATestConfigSerializer,
     LDAPTestConfigSerializer,
@@ -128,29 +130,57 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
 class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     category: str
+    action_permissions = {
+        'testing_config': ('settings.change_auth',),
+        'testing_login': ('settings.change_auth',),
+        'sync_user': ('settings.change_auth',),
+        'import_user': (
+            'settings.change_auth', 'users.add_user', 'users.change_user', 'users.invite_user',
+        ),
+    }
+
+    def has_system_permissions(self, permissions):
+        # Re-read the user and roles for each message; a WebSocket can outlive a role change.
+        user = User.objects.filter(pk=self.scope['user'].pk).first()
+        if user is None or not user.is_valid:
+            return False
+        with tmp_to_root_org():
+            return set(permissions).issubset(RoleBinding.get_user_perms(user))
 
     async def connect(self):
         user = self.scope["user"]
         query = parse_qs(self.scope['query_string'].decode())
         self.category = query.get('category', [User.Source.ldap.value])[0]
-        if user.is_authenticated and await self.has_perms(user, ['settings.view_setting']):
+        self.cookie = self.get_cookie()
+        self.org = self.get_current_org()
+        valid_category = self.category in (User.Source.ldap.value, User.Source.ldap_ha.value)
+        if valid_category and user.is_authenticated and await sync_to_async(
+            self.has_system_permissions
+        )(['settings.change_auth']):
             await self.accept()
         else:
             await self.close()
 
     async def receive(self, text_data=None, bytes_data=None, **kwargs):
-        data = json.loads(text_data)
-        msg_type = data.pop('msg_type', 'testing_config')
         try:
-            ok, msg = await asyncio.to_thread(self.run_func, f'run_{msg_type.lower()}', data)
+            data = json.loads(text_data)
+            msg_type = data.pop('msg_type', 'testing_config').lower()
+            ok, msg = await asyncio.to_thread(self.run_func, msg_type, data)
             await self.send_msg(ok, msg)
+        except PermissionDenied:
+            await self.send_msg(ok=False, msg='Permission denied')
+            await self.close(code=1008)
         except Exception as error:
-            await self.send_msg(msg='Exception: %s' % error)
+            await self.send_msg(ok=False, msg='Exception: %s' % error)
 
-    def run_func(self, func_name, data):
+    def run_func(self, msg_type, data):
         with safe_db_connection():
-            with translation.override(getattr(self.scope['user'], 'lang') or settings.LANGUAGE_CODE):
-                return getattr(self, func_name)(data)
+            required = self.action_permissions.get(msg_type)
+            if required is None or not self.has_system_permissions(required):
+                raise PermissionDenied()
+            with tmp_to_org(self.org):
+                with translation.override(getattr(self.scope['user'], 'lang') or settings.LANGUAGE_CODE):
+                    return getattr(self, f'run_{msg_type}')(data)
 
     async def send_msg(self, ok=True, msg=''):
         await self.send_json({'ok': ok, 'msg': f'{msg}'})
@@ -196,8 +226,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
             serializer = LDAPTestConfigSerializer(data=data)
         else:
             serializer = LDAPHATestConfigSerializer(data=data)
-        if not serializer.is_valid():
-            self.send_msg(msg=f'error: {str(serializer.errors)}')
+        serializer.is_valid(raise_exception=True)
         config = self.get_ldap_config(serializer)
         ok, msg = LDAPTestUtil(config, category=self.category).test_config()
         if ok:
@@ -206,8 +235,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
     def run_testing_login(self, data):
         serializer = LDAPTestLoginSerializer(data=data)
-        if not serializer.is_valid():
-            self.send_msg(msg=f'error: {str(serializer.errors)}')
+        serializer.is_valid(raise_exception=True)
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
         ok, msg = LDAPTestUtil(category=self.category).test_login(username, password)
@@ -264,9 +292,15 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     @staticmethod
     def get_orgs(org_ids):
         if org_ids:
+            if not isinstance(org_ids, list) or not all(isinstance(oid, str) for oid in org_ids):
+                raise ValidationError('Invalid organization IDs')
             orgs = list(Organization.objects.filter(id__in=org_ids))
+            if len(orgs) != len(set(org_ids)) or any(org.is_root() or org.is_system() for org in orgs):
+                raise ValidationError('Invalid target organizations')
         else:
             orgs = [current_org]
+            if current_org.is_root() or current_org.is_system():
+                raise ValidationError('A target organization is required')
         return orgs
 
     def get_ldap_users(self, username_list, cache_police):

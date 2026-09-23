@@ -4,7 +4,7 @@ from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import APIException, MethodNotAllowed
 from rest_framework.response import Response
 
 from accounts import serializers
@@ -149,6 +149,8 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
             risk = handler.handle(act, risk)
             s = serializers.AccountRiskSerializer(instance=risk)
             return Response(data=s.data)
+        except APIException:
+            raise
         except Exception as e:
             return Response(status=400, data=str(e))
 

@@ -920,8 +920,8 @@ class Config(dict):
                 'AUTH_OPENID_KEYCLOAK': False
             })
 
-        if auth_openid_realm_name is None:
-            return
+        if not auth_openid_realm_name:
+            return openid_config
 
         # # convert key # #
         compatible_config = {
@@ -955,6 +955,10 @@ class Config(dict):
             value = build_absolute_uri(base, value)
             openid_config[key] = value
 
+        # The issuer is the realm URL, not the Keycloak server's base URL.
+        openid_config['AUTH_OPENID_PROVIDER_ENDPOINT'] = (
+            auth_openid_server_url.rstrip('/') + '/realms/' + auth_openid_realm_name
+        )
         return openid_config
 
     def get_keycloak_config(self):
