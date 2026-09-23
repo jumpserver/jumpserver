@@ -173,13 +173,9 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         fields = self.get_fields()
         encrypted_items = [name for name, field in fields.items() if field.write_only]
         category = self.request.query_params.get('category', '')
-        clearable_secrets = {
-            'AUTH_OAUTH2_CACERT_CONTENT',
-        }
         for name, value in serializer.validated_data.items():
             encrypted = name in encrypted_items
-            allow_explicit_empty = name in clearable_secrets
-            if encrypted and value in ['', None] and not allow_explicit_empty:
+            if encrypted and value in ['', None]:
                 continue
             data.append({
                 'name': name, 'value': value,

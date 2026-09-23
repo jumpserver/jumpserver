@@ -87,9 +87,8 @@ class OAuth2SettingSerializer(serializers.Serializer):
 
     def get_ca_configured(self, _obj):
         submitted = getattr(self, '_validated_data', {})
-        if 'AUTH_OAUTH2_CACERT_CONTENT' in submitted:
-            return bool(submitted['AUTH_OAUTH2_CACERT_CONTENT'])
-        return bool(settings.AUTH_OAUTH2_CACERT_CONTENT)
+        submitted_ca = submitted.get('AUTH_OAUTH2_CACERT_CONTENT')
+        return bool(submitted_ca or settings.AUTH_OAUTH2_CACERT_CONTENT)
 
     def validate(self, attrs):
         field_name = 'AUTH_OAUTH2_CACERT_CONTENT'
@@ -99,8 +98,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
         verify_mode = attrs.get(
             'AUTH_OAUTH2_CERT_VERIFY_MODE', settings.AUTH_OAUTH2_CERT_VERIFY_MODE
         )
-        existing_ca = settings.AUTH_OAUTH2_CACERT_CONTENT
-        effective_ca = ca_cert if field_name in attrs else existing_ca
+        effective_ca = ca_cert or settings.AUTH_OAUTH2_CACERT_CONTENT
         if verify_mode == CertificateVerifyMode.custom_ca and not effective_ca:
             raise serializers.ValidationError({
                 field_name: _('A CA certificate is required')
