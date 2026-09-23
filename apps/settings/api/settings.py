@@ -157,9 +157,11 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         return fields
 
     def get_object(self):
-        items = self.get_fields().keys()
+        fields = self.get_fields()
         obj = {}
-        for item in items:
+        for item, field in fields.items():
+            if field.source == '*':
+                continue
             if hasattr(settings, item):
                 obj[item] = getattr(settings, item)
             else:

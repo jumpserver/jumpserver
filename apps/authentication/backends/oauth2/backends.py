@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import base64
+
 import requests
 
 from django.utils.translation import gettext_lazy as _
@@ -11,12 +12,14 @@ from django.urls import reverse
 
 from common.utils import get_logger
 from users.utils import construct_user_email
+from authentication.backends.http import TLSConfigurationError
 from authentication.utils import build_absolute_uri
 from common.exceptions import JMSException
 
 from .signals import (
     oauth2_create_or_update_user
 )
+from .http import OAUTH2_HTTP_TIMEOUT, create_oauth2_session
 from ..base import RedirectAuthBackend
 
 
@@ -69,6 +72,30 @@ class OAuth2Backend(RedirectAuthBackend):
             response_data = response_data['data']
         return response_data
 
+    @staticmethod
+    def request_json(session, stage, method, url, **kwargs):
+        try:
+            response = session.request(
+                method, url, timeout=OAUTH2_HTTP_TIMEOUT, **kwargs
+            )
+            response.raise_for_status()
+            data = response.json()
+            if not isinstance(data, dict):
+                logger.error('OAuth2 %s response must be a JSON object', stage)
+                return None
+            return data
+        except requests.exceptions.Timeout:
+            logger.error('OAuth2 %s request timed out', stage)
+        except requests.exceptions.SSLError:
+            logger.error('OAuth2 %s TLS certificate verification failed', stage)
+        except requests.exceptions.RequestException as error:
+            logger.error(
+                'OAuth2 %s request failed (%s)', stage, error.__class__.__name__
+            )
+        except (TypeError, ValueError):
+            logger.error('OAuth2 %s response is not valid JSON', stage)
+        return None
+
     def authenticate(self, request, code=None, state=None):
         log_prompt = "Process authenticate [OAuth2Backend]: {}"
         logger.debug(log_prompt.format('Start'))
@@ -108,46 +135,49 @@ class OAuth2Backend(RedirectAuthBackend):
         headers = {
             'Accept': 'application/json', 'Authorization': f'Basic {encoded_credentials}'
         }
-        if token_method.startswith('post'):
-            body_key = 'json' if token_method.endswith('json') else 'data'
-            query_dict.update({
-                'client_id': settings.AUTH_OAUTH2_CLIENT_ID,
-                'client_secret': settings.AUTH_OAUTH2_CLIENT_SECRET,
-            })
-            access_token_response = requests.post(
-                access_token_url, headers=headers, **{body_key: query_dict}
-            )
-        else:
-            access_token_response = requests.get(access_token_url, headers=headers)
         try:
-            access_token_response.raise_for_status()
-            access_token_response_data = access_token_response.json()
-            response_data = self.get_response_data(access_token_response_data)
-        except Exception as e:
-            error = "Json access token response error, access token response " \
-                    "content is: {}, error is: {}".format(access_token_response.content, str(e))
-            logger.error(log_prompt.format(error))
+            session = create_oauth2_session()
+        except TLSConfigurationError:
+            logger.error('OAuth2 TLS configuration is invalid')
             return None
 
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer {}'.format(response_data.get('access_token', ''))
-        }
-        logger.debug(log_prompt.format('Get userinfo endpoint'))
-        userinfo_url = settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT
-        userinfo_response = requests.get(userinfo_url, headers=headers)
-        try:
-            userinfo_response.raise_for_status()
-            userinfo_response_data = userinfo_response.json()
-            if 'data' in userinfo_response_data:
-                userinfo = userinfo_response_data['data']
+        with session:
+            if token_method.startswith('post'):
+                body_key = 'json' if token_method.endswith('json') else 'data'
+                query_dict.update({
+                    'client_id': settings.AUTH_OAUTH2_CLIENT_ID,
+                    'client_secret': settings.AUTH_OAUTH2_CLIENT_SECRET,
+                })
+                request_data = {body_key: query_dict}
             else:
-                userinfo = userinfo_response_data
-        except Exception as e:
-            error = "Json userinfo response error, userinfo response " \
-                    "content is: {}, error is: {}".format(userinfo_response.content, str(e))
-            logger.error(log_prompt.format(error))
-            return None
+                request_data = {}
+
+            access_token_response_data = self.request_json(
+                session, 'token', token_method.split('_')[0],
+                access_token_url, headers=headers, **request_data
+            )
+            if access_token_response_data is None:
+                return None
+            response_data = self.get_response_data(access_token_response_data)
+            if not isinstance(response_data, dict):
+                logger.error('OAuth2 token response data must be a JSON object')
+                return None
+
+            headers = {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer {}'.format(response_data.get('access_token', ''))
+            }
+            logger.debug(log_prompt.format('Get userinfo endpoint'))
+            userinfo_response_data = self.request_json(
+                session, 'userinfo', 'get',
+                settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT, headers=headers
+            )
+            if userinfo_response_data is None:
+                return None
+            userinfo = self.get_response_data(userinfo_response_data)
+            if not isinstance(userinfo, dict):
+                logger.error('OAuth2 userinfo response data must be a JSON object')
+                return None
 
         try:
             logger.debug(log_prompt.format('Update or create oauth2 user'))
