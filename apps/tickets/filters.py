@@ -8,7 +8,7 @@ from orgs.models import Organization
 from tickets.models import (
     Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket,
-    TicketAssignee,
+    ApprovalTask,
 )
 
 
@@ -19,6 +19,7 @@ class TicketFilter(BaseFilterSet):
     assignees__id = filters.UUIDFilter(
         method='filter_assignees_id', label=_('Assignee ID')
     )
+    processed_by = filters.UUIDFilter(method='filter_processed_by', label=_('Assignee ID'))
     relevant_asset = filters.CharFilter(
         method='filter_relevant_asset',
         label=_('Relevant asset name or address')
@@ -44,7 +45,7 @@ class TicketFilter(BaseFilterSet):
         model = Ticket
         fields = (
             'id', 'title', 'serial_num', 'type', 'state', 'status',
-            'applicant', 'applicant_username_name', 'assignees__id',
+            'applicant', 'applicant_username_name', 'assignees__id', 'processed_by',
             'relevant_asset', 'relevant_command', 'org_name', 'org_id',
         )
         fields_operator = {
@@ -72,12 +73,20 @@ class TicketFilter(BaseFilterSet):
 
     @staticmethod
     def filter_assignees_id(queryset, name, value):
-        current_assignee_tickets = TicketAssignee.objects.filter(
-            step__ticket_id=OuterRef('pk'),
-            step__level=OuterRef('approval_step'),
+        current_assignee_tickets = ApprovalTask.objects.filter(
+            node_instance__instance__ticket_id=OuterRef('pk'),
+            state='pending', node_instance__instance__state='running',
             assignee_id=value,
         )
         return queryset.filter(Exists(current_assignee_tickets))
+
+    @staticmethod
+    def filter_processed_by(queryset, name, value):
+        tasks = ApprovalTask.objects.filter(
+            node_instance__instance__ticket_id=OuterRef('pk'), assignee_id=value,
+            state__in=['approved', 'rejected', 'transferred'],
+        )
+        return queryset.filter(Exists(tasks))
 
     @staticmethod
     def filter_relevant_asset(queryset, name, value):

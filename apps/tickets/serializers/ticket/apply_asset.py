@@ -19,7 +19,7 @@ apply_help_text = _('Support fuzzy search, and display up to 10 items')
 
 
 class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
-    flow_id = serializers.UUIDField(
+    workflow_id = serializers.UUIDField(
         required=True, write_only=True, label=_('Ticket flow')
     )
     apply_assets = ObjectRelatedField(
@@ -30,13 +30,13 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
         queryset=Node.objects, many=True, required=False,
         label=_('Apply nodes'), help_text=apply_help_text
     )
-    apply_actions = ActionChoicesField(required=False, allow_null=True, label=_("Apply actions"))
+    apply_actions = ActionChoicesField(required=True, allow_null=False, label=_("Apply actions"))
     permission_model = AssetPermission
 
     class Meta(TicketApplySerializer.Meta):
         model = ApplyAssetTicket
         writeable_fields = [
-            'id', 'title', 'type', 'flow_id', 'apply_nodes', 'apply_assets',
+            'id', 'title', 'type', 'workflow_id', 'apply_nodes', 'apply_assets',
             'apply_accounts', 'apply_actions', 'apply_date_start',
             'apply_date_expired', 'apply_expire_soon_notice_minutes',
             'comment', 'org_id'
@@ -46,7 +46,7 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
                  TicketApplySerializer.Meta.fields_m2m + writeable_fields + read_only_fields
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
-            'apply_accounts': {'required': False},
+            'apply_accounts': {'required': True},
             'apply_date_start': {'required': True, 'allow_null': False},
             'apply_date_expired': {'required': True, 'allow_null': False},
         }
@@ -87,7 +87,7 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
                 for key, value in exc.message_dict.items()
             }
             raise serializers.ValidationError(errors) from exc
-        if self.is_final_approval and (
+        if (
                 not attrs.get('apply_nodes') and not attrs.get('apply_assets')
         ):
             raise serializers.ValidationError({
@@ -99,7 +99,7 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
 
     @classmethod
     def setup_eager_loading(cls, queryset):
-        queryset = queryset.prefetch_related('apply_nodes', 'apply_assets')
+        queryset = super().setup_eager_loading(queryset).prefetch_related('apply_nodes', 'apply_assets')
         return queryset
 
 

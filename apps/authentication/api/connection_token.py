@@ -927,7 +927,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if ticket:
             data['from_ticket'] = ticket
 
-        if ticket or self.need_face_verify:
+        if (ticket and ticket.state != 'approved') or self.need_face_verify:
             data['is_active'] = False
         if self.face_monitor_token:
             FaceMonitorContext.get_or_create_context(self.face_monitor_token, self.request.user.id)
@@ -989,7 +989,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             self._record_operate_log(acl, asset)
             ticket = LoginAssetACL.create_login_asset_review_ticket(
                 user=user, asset=asset, account_username=self.input_username,
-                assignees=acl.reviewers.all(), org_id=asset.org_id
+                assignees=acl.reviewers.all(), org_id=asset.org_id, workflow=acl.workflow
             )
             return ticket
         if acl.is_action(acl.ActionChoices.face_verify):

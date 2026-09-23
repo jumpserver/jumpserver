@@ -73,15 +73,11 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
             raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
-        assignee_id = self.request.query_params.get('assignees__id')
-        is_current_assignee = str(self.request.user.id) == assignee_id
-        if getattr(self, 'action', None) == 'list' and is_current_assignee:
-            return self.model.objects.all()
-
         with tmp_to_root_org():
             queryset = self.model.get_user_related_tickets(self.request.user)
         return queryset
 
+    @transaction.atomic
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.save(update_fields=['applicant'])
@@ -89,6 +85,8 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
     def open(self, request, *args, **kwargs):
+        if self.model is not ApplyAssetTicket:
+            raise MethodNotAllowed(request.method, detail='Review tickets are created by their ACL business entrypoints.')
         with tmp_to_root_org():
             return super().create(request, *args, **kwargs)
 
@@ -109,63 +107,23 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):
-        self.ticket_not_allowed()
-
-        partial = request.method == PATCH
-        with transaction.atomic():
-            instance = self.get_object()
-            instance = self.model.objects.select_for_update().get(pk=instance.pk)
-            self.check_object_permissions(request, instance)
-            if instance.is_status(instance.Status.closed):
-                raise AlreadyClosed
-
-            serializer = self.get_serializer(instance, data=request.data, partial=partial)
-            with tmp_to_root_org():
-                serializer.is_valid(raise_exception=True)
-                instance = serializer.save()
-            instance.approve(processor=request.user)
-        self._record_operate_log(instance, TicketAction.approve)
-        return Response('ok')
+        raise MethodNotAllowed(request.method, detail='Use the approval-task endpoint with an exact task ID.')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def reject(self, request, *args, **kwargs):
-        with transaction.atomic():
-            instance = self.get_object()
-            instance = self.model.objects.select_for_update().get(pk=instance.pk)
-            self.check_object_permissions(request, instance)
-            if instance.is_status(instance.Status.closed):
-                raise AlreadyClosed
-            instance.reject(processor=request.user)
-        self._record_operate_log(instance, TicketAction.reject)
-        return Response('ok')
+        raise MethodNotAllowed(request.method, detail='Use the approval-task endpoint with an exact task ID.')
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee | IsApplicant, ])
+    @action(detail=True, methods=[PUT], permission_classes=[IsApplicant, ])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.close()
+        with tmp_to_org(instance.org_id):
+            instance.close(user=request.user)
         self._record_operate_log(instance, TicketAction.close)
         return Response('ok')
 
     @action(detail=False, methods=[PUT], permission_classes=[IsAuthenticated, ])
     def bulk(self, request, *args, **kwargs):
-        self.ticket_not_allowed()
-
-        allow_action = ('approve', 'reject')
-        action_ = request.query_params.get('action')
-        if action_ not in allow_action:
-            msg = _("The parameter 'action' must be [{}]").format(','.join(allow_action))
-            return Response({'error': msg}, status=400)
-
-        ticket_ids = request.data.get('tickets', [])
-        queryset = self.get_queryset().filter(state='pending').filter(id__in=ticket_ids)
-        for obj in queryset:
-            if not obj.has_current_assignee(request.user):
-                return Response(
-                    {'error': f"{_('User does not have permission')}: {obj}"}, status=400
-                )
-            handler = getattr(obj, action_)
-            handler(processor=request.user)
-        return Response('ok')
+        raise MethodNotAllowed(request.method, detail='Use exact approval-task IDs.')
 
 
 class ApplyAssetTicketViewSet(TicketViewSet):

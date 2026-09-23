@@ -14084,3 +14084,37 @@ msgstr "無效的 CIDR：%s"
 
 msgid "At least one CIDR is required when auto assignment is enabled."
 msgstr "啟用自動納入時，至少需要設定一個 CIDR 網段。"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "資產負責人"
+
+msgid "Manager"
+msgstr "直屬負責人"
+
+msgid "Workflow"
+msgstr "審批流程"
+
+msgid "Approval workflow"
+msgstr "審批流程"
+
+msgid "Workflow version"
+msgstr "流程版本"
+
+msgid "Workflow instance"
+msgstr "流程實例"
+
+msgid "Workflow node"
+msgstr "流程節點"
+
+msgid "Workflow edge"
+msgstr "流程連線"
+
+msgid "Workflow node instance"
+msgstr "節點實例"
+
+msgid "Approval task"
+msgstr "審批任務"
+
+msgid "Workflow event"
+msgstr "流程事件"

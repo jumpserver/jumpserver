@@ -59,7 +59,7 @@ class LoginAssetCheckAPI(CreateAPIView):
             user=self.serializer.user,
             asset=self.serializer.asset,
             account_username=self.serializer.validated_data.get('account_username'),
-            assignees=acl.reviewers.all(),
+            assignees=acl.reviewers.all(), workflow=acl.workflow,
             org_id=self.serializer.asset.org.id,
         )
         review_status_url = reverse(
@@ -72,12 +72,11 @@ class LoginAssetCheckAPI(CreateAPIView):
             external=True, api_to_ui=True
         )
         ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
-        ticket_assignees = ticket.current_step.ticket_assignees.all()
         data = {
             'check_review_status': {'method': 'GET', 'url': review_status_url},
             'close_review': {'method': 'DELETE', 'url': review_status_url},
             'ticket_detail_url': ticket_detail_url,
-            'reviewers': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees],
+            'reviewers': [str(user) for user in ticket.current_assignees],
             'ticket_id': str(ticket.id)
         }
         return data

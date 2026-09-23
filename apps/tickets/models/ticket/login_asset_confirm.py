@@ -22,10 +22,14 @@ class ApplyLoginAssetTicket(Ticket):
     TICKET_TYPE = TicketType.login_asset_confirm
 
     def activate_connection_token_if_need(self):
-        if not self.connection_token:
+        token = getattr(self, 'connection_token', None)
+        if not token:
             return
-        self.connection_token.is_active = True
-        self.connection_token.save(update_fields=['is_active'])
+        if token.is_expired:
+            from tickets.workflow.errors import WorkflowConfigurationError
+            raise WorkflowConfigurationError('The connection token has expired. Request a new connection.')
+        token.is_active = True
+        token.save(update_fields=['is_active'])
 
     class Meta:
         verbose_name = _('Apply Login Asset Ticket')

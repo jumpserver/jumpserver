@@ -524,7 +524,7 @@ class AuthACLMixin:
             return
         if not acl.is_action(acl.ActionChoices.review):
             return
-        if acl.is_user_in_reviewers(user):
+        if not acl.workflow_id and acl.is_user_in_reviewers(user):
             # 如果用户在审核人列表中，则不需要审核，直接通过
             # 避免管理员admin创建一条针对所有用户的复核规则导致admin自己也无法登录了
             return

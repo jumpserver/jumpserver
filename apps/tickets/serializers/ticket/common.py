@@ -51,10 +51,12 @@ class BaseApplyAssetSerializer(serializers.Serializer):
         ids = [instance.id for instance in values]
         with tmp_to_org(org_id):
             qs = model.objects.filter(id__in=ids, **kwargs).values_list('id', flat=True)
+        if len(qs) != len(set(ids)):
+            raise serializers.ValidationError("Resources must belong to the selected organization.")
         return list(qs)
 
     def validate_apply_accounts(self, accounts):
-        if self.is_final_approval and not accounts:
+        if not isinstance(accounts, list) or not accounts or any(not isinstance(a, str) or not a.strip() or len(a) > 128 for a in accounts):
             raise serializers.ValidationError(_('This field is required.'))
         return accounts
 

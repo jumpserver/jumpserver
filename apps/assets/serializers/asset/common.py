@@ -18,6 +18,9 @@ from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from django.utils.translation import gettext
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from orgs.models import Organization
+from orgs.utils import current_org
+from users.models import User
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Protocol, Host, Device, Database, Cloud, Web, Custom
 from ...validators import validate_asset_address
@@ -159,6 +162,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     platform = ObjectRelatedField(queryset=Platform.objects, required=True, label=_('Platform'),
                                   attrs=('id', 'name', 'type'))
     accounts_amount = serializers.IntegerField(read_only=True, label=_('Accounts amount'))
+    owner = ObjectRelatedField(
+        queryset=User.objects, required=False, allow_null=True,
+        attrs=('id', 'name', 'username'), label=_('Asset owner'),
+    )
 
     class Meta:
         model = Asset
@@ -168,7 +175,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         amount_fields = list(relation_count_fields)
         fields_fk = ['zone', 'platform']
         fields_mini = ['id', 'name', 'address'] + fields_fk
-        fields_small = fields_mini + ['is_active', 'comment']
+        fields_small = fields_mini + ['owner', 'is_active', 'comment']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
             'nodes_display', 'accounts',
@@ -199,6 +206,17 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
     def validate_address(self, value):
         validate_asset_address(value)
+        return value
+
+    def validate_owner(self, value):
+        if value is None:
+            return value
+        org_id = getattr(self.instance, 'org_id', None) or current_org.id
+        if org_id == Organization.ROOT_ID:
+            raise serializers.ValidationError(_('Select an organization before assigning an asset owner.'))
+        org = Organization.get_instance(org_id)
+        if not value.is_valid or value.is_service_account or not User.get_org_users(org).filter(pk=value.pk).exists():
+            raise serializers.ValidationError(_('The asset owner must be an active user in the asset organization.'))
         return value
 
     def to_internal_value(self, data):
@@ -255,7 +273,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
+        queryset = queryset.select_related('owner').prefetch_related('zone', 'nodes', 'protocols', 'directory_services') \
             .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
