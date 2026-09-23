@@ -242,6 +242,9 @@ class BaseAssetViewSet(OrgBulkModelViewSet):
 
 
 class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
+    # Core rejects direct creation on /assets/assets/; use a typed asset API.
+    chat_ai_excluded_actions = ('create',)
+
     @action(methods=["GET"], detail=True, url_path="platform")
     def platform(self, *args, **kwargs):
         asset = super().get_object()

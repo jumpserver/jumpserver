@@ -35,6 +35,16 @@ __all__ = [
 
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
+    chat_ai_operation_guidance = {
+        'create': (
+            'Create a password account on an existing asset using its ID and '
+            'the requested username. Set privileged true for root. Use only '
+            'asset, username, name, secret_type, privileged, is_active and '
+            'comment fields. Do not put the password in the request body '
+            'or ask for it in chat. The trusted approval form asks the user for '
+            'the password and sends it separately after confirmation.'
+        ),
+    }
     search_fields = ('username', 'name', 'asset__name', 'asset__address', 'comment')
     extra_filter_backends = [AttrRulesFilterBackend, NodeFilterBackend]
     filterset_class = AccountFilterSet
