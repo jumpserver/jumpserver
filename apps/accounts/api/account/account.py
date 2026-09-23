@@ -1,3 +1,5 @@
+from copy import copy
+
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -9,6 +11,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from accounts import serializers
 from accounts.const import ChangeSecretRecordStatusChoice, Source
+from accounts.exceptions import TemplateFollowingConflict
 from accounts.filters import AccountFilterSet, NodeFilterBackend
 from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import Account, ChangeSecretRecord, AccountTemplate
@@ -190,7 +193,21 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['patch'], detail=False, url_path='clear-secret')
     def clear_secret(self, request, *args, **kwargs):
         account_ids = request.data.get('account_ids', [])
-        self.model.objects.filter(id__in=account_ids).update(secret=None)
+        detach = not drf_serializers.BooleanField().run_validation(
+            request.data.get('follow_template', True)
+        )
+        with transaction.atomic():
+            accounts = list(self.model.objects.select_for_update().filter(id__in=account_ids))
+            if not detach and any(account.follows_template for account in accounts):
+                raise TemplateFollowingConflict()
+            for account in accounts:
+                previous = copy(account)
+                update_fields = ['secret']
+                if account.follows_template:
+                    account.follow_template = False
+                    update_fields.append('follow_template')
+                account.secret = None
+                account._save_with_locked_previous(previous, update_fields=update_fields)
         return Response(status=HTTP_200_OK)
 
     def _copy_or_move_to_assets(self, request, move=False):
@@ -199,8 +216,10 @@ class AccountViewSet(OrgBulkModelViewSet):
         assets = Asset.objects.filter(id__in=asset_ids)
         field_names = [
             'name', 'username', 'secret_type', 'secret',
-            'privileged', 'is_active', 'source', 'source_id', 'comment'
+            'privileged', 'is_active', 'source', 'source_id', 'follow_template', 'comment'
         ]
+        if account.follows_template:
+            field_names.remove('secret')
         account_data = {field: getattr(account, field) for field in field_names}
 
         creation_results = {}
