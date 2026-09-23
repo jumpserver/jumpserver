@@ -119,7 +119,10 @@ class TicketDirectApproveView(TemplateView):
                 if ticket.has_all_assignee(user):
                     raise TicketStateChanged
                 raise JMSException(_("This user is not authorized to approve this ticket"))
-            getattr(ticket, action)(user)
+            if not ticket_info.get('task_id') or str(user.pk) != str(ticket_info.get('approver_id')):
+                raise TicketStateChanged
+            with tmp_to_root_org():
+                getattr(ticket, action)(user, task_id=ticket_info['task_id'])
         except TicketStateChanged as e:
             self.clear(token)
             return self.redirect_message_response(error=str(e), redirect_url=self.login_url)

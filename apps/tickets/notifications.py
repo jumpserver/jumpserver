@@ -109,9 +109,10 @@ class BaseTicketMessage(UserMessage):
 
 
 class TicketAppliedToAssigneeMessage(BaseTicketMessage):
-    def __init__(self, user, ticket):
+    def __init__(self, user, ticket, task_id=None):
         self.token = random_string(32)
         self.ticket = ticket
+        self.task_id = str(task_id) if task_id else None
         super().__init__(user)
 
     @property
@@ -147,6 +148,7 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         data = {
             'ticket_id': self.ticket.id,
             'approver_id': self.user.id, 'content': self.content,
+            'task_id': self.task_id,
         }
         cache.set(self.token, data, 3600)
         return context

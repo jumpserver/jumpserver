@@ -12,6 +12,10 @@ logger = get_logger(__name__)
 
 
 class LoginAssetACL(UserAssetAccountBaseACL):
+    workflow = models.ForeignKey(
+        'tickets.Workflow', null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+', verbose_name=_('Workflow'),
+    )
     # 规则, ip_group, time_period
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
     review_duration = models.PositiveIntegerField(
@@ -71,7 +75,8 @@ class LoginAssetACL(UserAssetAccountBaseACL):
         timeout = acl.review_duration * 3600
         transaction.on_commit(lambda: cls._cache_review(key, ticket_id, timeout))
 
-    def create_login_asset_review_ticket(self, user, asset, account_username, assignees, org_id):
+    @transaction.atomic
+    def create_login_asset_review_ticket(self, user, asset, account_username, assignees, org_id, workflow=None):
         from tickets.const import TicketType
         from tickets.models import ApplyLoginAssetTicket
         title = _('Login asset confirm') + ' ({})'.format(user)
@@ -89,5 +94,5 @@ class LoginAssetACL(UserAssetAccountBaseACL):
             }},
         }
         ticket = ApplyLoginAssetTicket.objects.create(**data)
-        ticket.open_by_system(assignees)
+        ticket.open_by_system(assignees, workflow=workflow)
         return ticket

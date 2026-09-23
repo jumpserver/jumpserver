@@ -2,7 +2,7 @@
 #
 import re
 
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import lazyproperty, get_logger
@@ -93,6 +93,10 @@ class CommandGroup(JMSOrgBaseModel):
 
 
 class CommandFilterACL(UserAssetAccountBaseACL):
+    workflow = models.ForeignKey(
+        'tickets.Workflow', null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+', verbose_name=_('Workflow'),
+    )
     command_groups = models.ManyToManyField(
         CommandGroup, verbose_name=_('Command group'),
         related_name='command_filters'
@@ -105,6 +109,7 @@ class CommandFilterACL(UserAssetAccountBaseACL):
     def __str__(self):
         return self.name
 
+    @transaction.atomic
     def create_command_review_ticket(self, run_command, session, cmd_filter_acl, org_id):
         from tickets.models import ApplyCommandTicket
         data = {
@@ -120,5 +125,5 @@ class CommandFilterACL(UserAssetAccountBaseACL):
         }
         ticket = ApplyCommandTicket.objects.create(**data)
         assignees = self.reviewers.all()
-        ticket.open_by_system(assignees)
+        ticket.open_by_system(assignees, workflow=self.workflow)
         return ticket

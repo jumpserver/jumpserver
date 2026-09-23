@@ -127,109 +127,106 @@ class TicketAssignee(JMSBaseModel):
 
 
 class StatusMixin:
+    """Business facade; all new approvals are executed by WorkflowEngine."""
     State = TicketState
     Status = TicketStatus
 
-    state: str
-    status: str
-    applicant_id: str
-    applicant: models.ForeignKey
-    current_step: TicketStep
-    save: Callable
-    create_process_steps_by_flow: Callable
-    create_process_steps_by_assignees: Callable
-    assignees: Callable
-    set_serial_num: Callable
-    set_rel_snapshot: Callable
-    approval_step: int
-    handler: None
-    flow: TicketFlow
-    ticket_steps: models.Manager
-
-    def is_state(self, state: TicketState):
+    def is_state(self, state):
         return self.state == state
 
-    def is_status(self, status: TicketStatus):
+    def is_status(self, status):
         return self.status == status
 
-    def _open(self):
-        self.set_serial_num()
-        self.set_rel_snapshot()
-        self._change_state_by_applicant(TicketState.pending)
-
     def open(self):
-        self.cc_users.set(self.flow.cc_users.all())
-        self.create_process_steps_by_flow()
-        self._open()
+        from tickets.workflow.business import submit_ticket
+        return submit_ticket(self)
 
-    def open_by_system(self, assignees):
-        self.create_process_steps_by_assignees(assignees)
-        self._open()
+    def open_by_system(self, assignees, workflow=None):
+        from tickets.workflow.business import submit_system_ticket
+        return submit_system_ticket(self, assignees, workflow)
 
-    def approve(self, processor):
-        self._change_state(
-            StepState.approved, processor, update_rel_snapshot=True
-        )
+    @property
+    def approval_tasks(self):
+        from tickets.models import ApprovalTask
+        return ApprovalTask.objects.filter(node_instance__instance__ticket_id=self.pk)
 
-    def reject(self, processor):
-        self._change_state(StepState.rejected, processor)
+    def pending_task(self, user, task_id=None):
+        from tickets.workflow.errors import WorkflowConflict
+        tasks = self.approval_tasks.filter(assignee=user, state='pending',
+                                           node_instance__instance__state='running')
+        if task_id:
+            tasks = tasks.filter(pk=task_id)
+        task = tasks.first()
+        if not task:
+            raise WorkflowConflict()
+        return task
 
-    def close(self):
-        self._change_state(TicketState.closed, self.applicant)
+    def approve(self, processor, task_id=None, comment=''):
+        from tickets.workflow.engine import WorkflowEngine
+        return WorkflowEngine().approve(self.pending_task(processor, task_id), processor, comment)
 
-    def _change_state_by_applicant(self, state):
-        if state == TicketState.closed:
-            self.status = TicketStatus.closed
-        elif state == TicketState.pending:
-            self.status = TicketStatus.open
-        else:
-            raise ValueError("Not supported state: {}".format(state))
+    def reject(self, processor, task_id=None, comment=''):
+        from tickets.workflow.engine import WorkflowEngine
+        return WorkflowEngine().reject(self.pending_task(processor, task_id), processor, comment)
 
-        self.state = state
-        self.save(update_fields=['state', 'status'])
-        self.handler.on_change_state(state)
+    def close(self, user=None):
+        from tickets.workflow.engine import WorkflowEngine
+        return WorkflowEngine().cancel(self.workflow_instance, user or self.applicant)
 
-    def _change_state(self, state, processor, update_rel_snapshot=False):
-        with transaction.atomic():
-            locked_ticket = self.__class__.objects.select_for_update().only(
-                'state', 'status', 'approval_step'
-            ).get(pk=self.pk)
-            self.state = locked_ticket.state
-            self.status = locked_ticket.status
-            self.approval_step = locked_ticket.approval_step
+    @property
+    def current_assignees(self):
+        return [task.assignee for task in self.approval_tasks.filter(
+            state='pending', node_instance__instance__state='running'
+        ).select_related('assignee') if task.assignee_id]
 
-            if self.is_status(self.Status.closed):
-                raise AlreadyClosed
+    def has_current_assignee(self, user):
+        return self.approval_tasks.filter(
+            assignee=user, state='pending', node_instance__instance__state='running'
+        ).exists() if user and user.is_authenticated else False
 
-            is_assignee_action = state in (StepState.approved, StepState.rejected)
-            if is_assignee_action and not self.has_current_assignee(processor):
-                if self.has_all_assignee(processor):
-                    raise TicketStateChanged
-                raise PermissionError('Only assignees can do this')
+    def has_all_assignee(self, user):
+        return self.approval_tasks.filter(assignee=user).exists() if user else False
 
-            if update_rel_snapshot:
-                self.set_rel_snapshot()
-            current_step = self.current_step
-            current_step.change_state(state, processor)
-            self._finish_or_next(current_step, state)
+    @property
+    def processor(self):
+        task = self.approval_tasks.filter(state__in=['approved', 'rejected']).order_by('-date_finished').first()
+        return task.assignee if task else None
 
-    def _finish_or_next(self, current_step, state):
-        next_step = current_step.next()
-
-        # 提前结束，或者最后一步
-        if state in [TicketState.rejected, TicketState.closed] or not next_step:
-            self.state = state
-            self.status = Ticket.Status.closed
-            self.save(update_fields=['state', 'status'])
-            self.handler.on_step_state_change(current_step, state)
-        else:
-            self.handler.on_step_state_change(current_step, state)
-            next_step.set_active()
-            self.approval_step += 1
-            self.save(update_fields=['approval_step'])
+    @property
+    def processor_display(self):
+        task = self.approval_tasks.filter(state__in=['approved', 'rejected']).order_by('-date_finished').first()
+        if task:
+            return task.assignee_snapshot.get('name', '')
+        step = self.ticket_steps.order_by('-level').first()
+        return step.processor_display if step else ''
 
     @property
     def process_map(self):
+        instance = getattr(self, 'workflow_instance', None)
+        if not instance:
+            return self.legacy_process_map
+        result = []
+        runs = instance.node_instances.filter(node__type='approval').select_related('node').prefetch_related('tasks')
+        for level, run in enumerate(runs.order_by('date_created', 'id'), 1):
+            tasks = list(run.tasks.all())
+            votes = [t for t in tasks if t.state in ('approved', 'rejected')]
+            result.append({
+                'state': 'pending' if run.state == 'running' else run.state,
+                'name': run.node.name, 'approval_level': level,
+                'assignees': [str(t.assignee_id) if t.assignee_id else None for t in tasks],
+                'assignees_display': [t.assignee_snapshot.get('name', '') for t in tasks],
+                'processor': str(votes[-1].assignee_id) if votes else None,
+                'processor_display': ', '.join(t.assignee_snapshot.get('name', '') for t in votes),
+                'approval_date': str(run.date_finished or ''),
+            })
+        return result
+
+    @property
+    def handler(self):
+        return get_ticket_handler(ticket=self)
+
+    @property
+    def legacy_process_map(self):
         process_map = []
         for step in self.ticket_steps.all():
             processor_id = ''
@@ -269,59 +266,6 @@ class StatusMixin:
             process_map.append(step_info)
         return process_map
 
-    def exclude_applicant(self, assignees, applicant=None):
-        applicant = applicant if applicant else self.applicant
-        if len(assignees) != 1:
-            assignees = set(assignees) - {applicant, }
-        return list(assignees)
-
-    def create_process_steps_by_flow(self):
-        org_id = self.flow.org_id
-        flow_rules = self.flow.rules.order_by('level')
-        for rule in flow_rules:
-            assignees = rule.get_assignees(org_id=org_id)
-            assignees = self.exclude_applicant(assignees, self.applicant)
-            step = TicketStep.objects.create(ticket=self, level=rule.level)
-            step_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
-            TicketAssignee.objects.bulk_create(step_assignees)
-
-    def create_process_steps_by_assignees(self, assignees):
-        step = TicketStep.objects.create(ticket=self, level=1)
-        assignees = self.exclude_applicant(assignees, self.applicant)
-        ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
-        TicketAssignee.objects.bulk_create(ticket_assignees)
-
-    @property
-    def current_step(self):
-        return self.ticket_steps.filter(level=self.approval_step).first()
-
-    @property
-    def current_assignees(self):
-        ticket_assignees = self.current_step.ticket_assignees.all()
-        return [i.assignee for i in ticket_assignees if i.assignee_id]
-
-    @property
-    def processor(self):
-        """ 返回最后一步的处理人 """
-        return self.current_step.processor
-
-    def has_current_assignee(self, assignee):
-        return self.ticket_steps.filter(
-            level=self.approval_step,
-            ticket_assignees__assignee=assignee,
-        ).exists()
-
-    @property
-    def processor_display(self):
-        step = self.current_step
-        return step.processor_display if step else ''
-
-    def has_all_assignee(self, assignee):
-        return self.ticket_steps.filter(ticket_assignees__assignee=assignee).exists()
-
-    @property
-    def handler(self):
-        return get_ticket_handler(ticket=self)
 
 
 class Ticket(StatusMixin, JMSBaseModel):
@@ -350,6 +294,10 @@ class Ticket(StatusMixin, JMSBaseModel):
     flow = models.ForeignKey(
         'TicketFlow', related_name='tickets', null=True,
         on_delete=models.SET_NULL, verbose_name=_('TicketFlow')
+    )
+    workflow = models.ForeignKey(
+        'Workflow', related_name='tickets', null=True, blank=True,
+        on_delete=models.PROTECT, verbose_name=_('Workflow'),
     )
     approval_step = models.SmallIntegerField(
         default=TicketLevel.one, choices=TicketLevel.choices, verbose_name=_('Approval step')
@@ -380,7 +328,14 @@ class Ticket(StatusMixin, JMSBaseModel):
 
     @property
     def spec_ticket(self):
-        attr = self.type.replace('_', '') + 'ticket'
+        if self.type == TicketType.general:
+            return self
+        attr = {
+            TicketType.apply_asset: 'applyassetticket',
+            TicketType.login_confirm: 'applyloginticket',
+            TicketType.login_asset_confirm: 'applyloginassetticket',
+            TicketType.command_confirm: 'applycommandticket',
+        }[self.type]
         return getattr(self, attr)
 
     @property
@@ -405,6 +360,7 @@ class Ticket(StatusMixin, JMSBaseModel):
         queries = (
             Q(applicant=user) |
             Q(ticket_steps__ticket_assignees__assignee=user) |
+            Q(workflow_instance__node_instances__tasks__assignee=user) |
             Q(cc_users=user)
         )
         return cls.objects.filter(queries).distinct()
@@ -417,9 +373,12 @@ class Ticket(StatusMixin, JMSBaseModel):
         return cls.objects.all()
 
     def set_rel_snapshot(self, save=True):
+        from tickets.models import WorkflowInstance
+        if WorkflowInstance._base_manager.filter(ticket_id=self.pk).exists():
+            return
         rel_fields = set()
         m2m_fields = set()
-        excludes = ['ticket_ptr_id', 'ticket_ptr', 'flow_id', 'flow', 'applicant_id']
+        excludes = ['ticket_ptr_id', 'ticket_ptr', 'flow_id', 'flow', 'workflow', 'workflow_id', 'applicant_id']
         for name, field in self._meta._forward_fields_map.items():
             if name in excludes:
                 continue
@@ -545,14 +504,13 @@ class Ticket(StatusMixin, JMSBaseModel):
             external=True,
             api_to_ui=True
         )
-        ticket_assignees = self.current_step.ticket_assignees.all()
         return {
             'check_ticket_api': check_ticket_api,
             'close_ticket_api': close_ticket_api,
             'ticket_detail_page_url': '{url}?type={type}'.format(
                 url=url_ticket_detail_external, type=self.type
             ),
-            'assignees': [ticket_assignee.assignee_display for ticket_assignee in ticket_assignees]
+            'assignees': [str(user) for user in self.current_assignees]
         }
 
 
