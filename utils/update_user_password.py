@@ -1,4 +1,6 @@
 #!/usr/bin/python
+import argparse
+import getpass
 import os
 import sys
 import django
@@ -28,9 +30,18 @@ def update_user_password(username, password):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python update_user_password.py <username> <password>")
-        sys.exit(1)
-    username = sys.argv[1]
-    password = sys.argv[2]
-    update_user_password(username, password)
+    parser = argparse.ArgumentParser(description='Reset a local user password.')
+    parser.add_argument('username')
+    parser.add_argument('--stdin', action='store_true', help='Read the new password from one stdin line')
+    args = parser.parse_args()
+    if args.stdin:
+        password = sys.stdin.readline().rstrip('\r\n')
+    else:
+        if not sys.stdin.isatty():
+            parser.error('Use --stdin for non-interactive password input')
+        password = getpass.getpass('New password: ')
+        if password != getpass.getpass('Confirm new password: '):
+            parser.error('New passwords do not match')
+    if not password:
+        parser.error('Password must not be empty')
+    update_user_password(args.username, password)

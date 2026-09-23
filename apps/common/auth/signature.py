@@ -1,3 +1,6 @@
+from email.utils import parsedate_to_datetime
+
+from django.utils import timezone
 from rest_framework import authentication
 from rest_framework import exceptions
 
@@ -39,6 +42,7 @@ class SignatureAuthentication(authentication.BaseAuthentication):
     source = ''
     www_authenticate_realm = "api"
     required_headers = ["(request-target)", "date"]
+    max_clock_skew = 300
 
     def fetch_user_data(self, key_id, algorithm=None):
         """Returns a tuple (User, secret) or (None, None)."""
@@ -90,6 +94,15 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         # Ensure all required fields were included.
         if len({"keyid", "algorithm", "signature"} - set(fields.keys())) > 0:
             raise FAILED
+
+        try:
+            signed_at = parsedate_to_datetime(request.headers.get('Date', ''))
+            if timezone.is_naive(signed_at):
+                raise ValueError('Date must include a timezone')
+            if abs((timezone.now() - signed_at).total_seconds()) > self.max_clock_skew:
+                raise ValueError('Date is outside the accepted clock skew')
+        except (TypeError, ValueError, OverflowError):
+            raise FAILED from None
 
         key_id = fields["keyid"]
         # Fetch the secret associated with the keyid

@@ -76,17 +76,10 @@ class OAuth2Backend(RedirectAuthBackend):
             logger.error(log_prompt.format('code is missing'))
             return None
 
-        if settings.AUTH_OAUTH2_USE_STATE:
-            if state is None:
-                logger.error(log_prompt.format('state is missing'))
-                return None
-
-            session_state = request.session.get('oauth2_state')
-            if not session_state or session_state != state:
-                logger.error(log_prompt.format('state parameter mismatch'))
-                return None
-
-            request.session.pop('oauth2_state', None)
+        session_state = request.session.pop('oauth2_state', None)
+        if not state or not session_state or session_state != state:
+            logger.error(log_prompt.format('state parameter mismatch'))
+            return None
 
         query_dict = {
             'grant_type': 'authorization_code', 'code': code,

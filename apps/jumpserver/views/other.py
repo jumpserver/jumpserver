@@ -10,6 +10,7 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View, TemplateView
 from rest_framework.views import APIView
@@ -33,6 +34,10 @@ class LunaView(View):
 class I18NView(View):
     def get(self, request, lang):
         referer_url = request.META.get('HTTP_REFERER', '/')
+        if not url_has_allowed_host_and_scheme(
+            referer_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            referer_url = '/'
         response = HttpResponseRedirect(referer_url)
         expires = timezone.now() + timezone.timedelta(days=365)
         response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang, expires=expires)

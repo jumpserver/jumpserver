@@ -1,6 +1,6 @@
 from collections import defaultdict
 from django.core.cache import cache
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
@@ -48,12 +48,20 @@ class AppletHost(Host):
         request_terminal = getattr(request.user, 'terminal', None)
         if not request_terminal:
             raise ValidationError('Request user has no terminal')
+        if request_terminal.type != 'tinker':
+            raise ValidationError('Only Tinker terminals can bind an applet host')
 
-        self.date_synced = timezone.now()
-        if self.terminal == request_terminal:
-            self.save(update_fields=['date_synced'])
-        else:
+        with transaction.atomic():
+            host = self.__class__.objects.select_for_update().get(pk=self.pk)
+            if host.terminal_id and host.terminal_id != request_terminal.pk:
+                raise ValidationError('Applet host is already bound to another terminal')
+            request_terminal = request_terminal.__class__.objects.select_for_update().get(
+                pk=request_terminal.pk
+            )
+            if self.__class__.objects.filter(terminal=request_terminal).exclude(pk=self.pk).exists():
+                raise ValidationError('Terminal is already bound to another applet host')
             self.terminal = request_terminal
+            self.date_synced = timezone.now()
             self.save(update_fields=['terminal', 'date_synced'])
 
     def check_applets_state(self, applets_value_list):
