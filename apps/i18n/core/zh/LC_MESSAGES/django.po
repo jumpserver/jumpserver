@@ -9670,6 +9670,10 @@ msgstr "证书校验"
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "控制是否校验 SMTP TLS 证书"
 
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "控制是否校验 OAuth2 服务器的 TLS 证书"
+
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
 msgstr "在系统信任库之外额外信任的 PEM CA 证书"

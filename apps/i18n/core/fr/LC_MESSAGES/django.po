@@ -9940,6 +9940,10 @@ msgstr "Vérification du certificat"
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "Contrôle la vérification du certificat TLS SMTP"
 
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "Contrôle la vérification des certificats TLS du serveur OAuth2"
+
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
 msgstr "Certificat PEM utilisé en complément du magasin de confiance système"
