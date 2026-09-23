@@ -8,11 +8,11 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.http import FileResponse, HttpResponseBadRequest, JsonResponse
 from django.utils import timezone
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from pdf2image import convert_from_bytes
+from common.permissions import IsValidUser
+from common.views.mixins import PermissionsMixin
 
 charts_map = {
     "UserLoginReport": {
@@ -121,8 +121,9 @@ def export_chart_to_pdf(chart_name, sessionid, request=None):
         return pdf_bytes, page_title
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class ExportPdfView(View):
+class ExportPdfView(PermissionsMixin, View):
+    permission_classes = [IsValidUser]
+
     def get(self, request):
         chart_name = request.GET.get('chart')
         return self._handle_export(request, chart_name)
@@ -147,7 +148,8 @@ class ExportPdfView(View):
         return response
 
 
-class SendMailView(View):
+class SendMailView(PermissionsMixin, View):
+    permission_classes = [IsValidUser]
 
     def post(self, request):
         chart_name = request.GET.get('chart') or request.POST.get('chart')
