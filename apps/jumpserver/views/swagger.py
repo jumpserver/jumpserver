@@ -3,21 +3,22 @@ from drf_spectacular.views import (
     SpectacularSwaggerView, SpectacularRedocView,
     SpectacularYAMLAPIView, SpectacularJSONAPIView
 )
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
 from rest_framework.response import Response
 from django.contrib.auth.mixins import LoginRequiredMixin
+from common.permissions import IsValidUser
 
 
 class SwaggerUI(LoginRequiredMixin, SpectacularSwaggerView):
-    pass
+    permission_classes = [IsValidUser]
 
 
 class Redoc(LoginRequiredMixin, SpectacularRedocView):
-    pass
+    permission_classes = [IsValidUser]
 
 
 class SchemeMixin:
+    permission_classes = [IsValidUser]
+
     def get(self, request, *args, **kwargs):
         schema = super().get(request, *args, **kwargs).data
         host = request.get_host()
@@ -37,11 +38,9 @@ class SchemeMixin:
         }
         return Response(schema)
     
-@method_decorator(cache_page(60 * 5,), name="dispatch")
 class JsonApi(SchemeMixin, SpectacularJSONAPIView):
     pass
 
-@method_decorator(cache_page(60 * 5,), name="dispatch")
 class YamlApi(SchemeMixin, SpectacularYAMLAPIView):
     pass
 
