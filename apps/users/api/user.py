@@ -239,6 +239,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
+    # The gateway collects the new password in its approval form and redacts
+    # the response before it reaches the model.
+    chat_ai_safe_sensitive_actions = ('PUT', 'PATCH')
     serializer_class = serializers.ChangeUserPasswordSerializer
 
     def perform_update(self, serializer):

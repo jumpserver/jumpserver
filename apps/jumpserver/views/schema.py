@@ -101,33 +101,11 @@ class CustomAutoSchema(AutoSchema):
         return '_'.join(tokenized_path + [action])
 
     def get_chat_ai_permission_metadata(self):
-        """Return the statically resolvable RBAC requirements for this action.
+        """Return static requirements and whether Core enforces RBAC.
 
-        Chat AI must not guess permissions from an HTTP method or model name. A
-        view-provided ``get_rbac_perms`` can depend on request data, path
-        parameters, or the target object, so those operations are deliberately
-        marked dynamic and excluded from Chat AI discovery.
+        Dynamic RBAC actions are checked by Core against the actual request.
+        Non-RBAC actions must not become available through the AI gateway.
         """
-        explicit_permissions = getattr(
-            self.view, 'chat_ai_required_permissions', CHAT_AI_PERMISSIONS_UNSET
-        )
-        if explicit_permissions is not CHAT_AI_PERMISSIONS_UNSET:
-            if isinstance(explicit_permissions, str):
-                explicit_permissions = (explicit_permissions,)
-            elif not isinstance(
-                explicit_permissions, (list, tuple, set, frozenset)
-            ):
-                return (), True
-            if any(
-                not isinstance(item, str) or not item
-                for item in explicit_permissions
-            ):
-                return (), True
-            return tuple(sorted(set(explicit_permissions))), False
-
-        if callable(getattr(self.view, 'get_rbac_perms', None)):
-            return (), True
-
         permission_classes = getattr(self.view, 'permission_classes', ()) or ()
         rbac_permission_classes = []
         for permission_class in permission_classes:
@@ -138,9 +116,30 @@ class CustomAutoSchema(AutoSchema):
                     rbac_permission_classes.append(permission_class)
             except TypeError:
                 continue
+        rbac_protected = bool(rbac_permission_classes)
+
+        explicit_permissions = getattr(
+            self.view, 'chat_ai_required_permissions', CHAT_AI_PERMISSIONS_UNSET
+        )
+        if explicit_permissions is not CHAT_AI_PERMISSIONS_UNSET:
+            if isinstance(explicit_permissions, str):
+                explicit_permissions = (explicit_permissions,)
+            elif not isinstance(
+                explicit_permissions, (list, tuple, set, frozenset)
+            ):
+                return (), True, rbac_protected
+            if any(
+                not isinstance(item, str) or not item
+                for item in explicit_permissions
+            ):
+                return (), True, rbac_protected
+            return tuple(sorted(set(explicit_permissions))), False, rbac_protected
+
+        if callable(getattr(self.view, 'get_rbac_perms', None)):
+            return (), True, rbac_protected
 
         if not rbac_permission_classes:
-            return (), True
+            return (), True, False
 
         permissions = set()
         try:
@@ -151,13 +150,16 @@ class CustomAutoSchema(AutoSchema):
                 if isinstance(required, str):
                     required = (required,)
                 elif not isinstance(required, (list, tuple, set, frozenset)):
-                    return (), True
+                    return (), True, True
                 if any(not isinstance(item, str) or not item for item in required):
-                    return (), True
+                    return (), True, True
                 permissions.update(required)
         except Exception:
-            return (), True
-        return tuple(sorted(permissions)), False
+            return (), True, True
+        return tuple(sorted(permissions)), False, True
+
+    def is_chat_ai_schema(self):
+        return self.view.request.headers.get('X-JMS-AI-Schema') == '1'
 
     def get_description(self):
         description = super().get_description()
@@ -276,6 +278,8 @@ class CustomAutoSchema(AutoSchema):
         return False
 
     def is_excluded(self):
+        if self.is_chat_ai_schema():
+            return False
         if self.exclude_some_paths(self.path):
             return True
         if self.exclude_some_app_model(self.path):
@@ -287,8 +291,13 @@ class CustomAutoSchema(AutoSchema):
         if not operation:
             return operation
 
+        if self.is_chat_ai_schema():
+            action = getattr(self.view, 'action', None) or self.method
+            if action in getattr(self.view, 'chat_ai_excluded_actions', ()):
+                return None
+
         operation_id = operation.get('operationId')
-        if 'bulk' in operation_id:
+        if 'bulk' in operation_id and not self.is_chat_ai_schema():
             return None
 
         if not operation.get('summary', ''):
@@ -298,11 +307,15 @@ class CustomAutoSchema(AutoSchema):
             'orgs_orgs_read', 'orgs_orgs_update', 'orgs_orgs_delete', 
             'orgs_orgs_create', 'orgs_orgs_partial_update',
         ]
-        if operation_id in exclude_operations:
+        if operation_id in exclude_operations and not self.is_chat_ai_schema():
             return None
-        required_permissions, permission_dynamic = self.get_chat_ai_permission_metadata()
+        required_permissions, permission_dynamic, rbac_protected = self.get_chat_ai_permission_metadata()
         operation['x-jms-required-permissions'] = list(required_permissions)
         operation['x-jms-permission-dynamic'] = permission_dynamic
+        operation['x-jms-rbac-protected'] = rbac_protected
+        safe_actions = getattr(self.view, 'chat_ai_safe_sensitive_actions', ())
+        action = getattr(self.view, 'action', None) or self.method
+        operation['x-jms-safe-sensitive-path'] = action in safe_actions
 
         action = getattr(self.view, 'action', '')
         guidance = getattr(self.view, 'chat_ai_operation_guidance', {})
