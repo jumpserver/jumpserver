@@ -153,7 +153,12 @@ only_system_permissions = (
     ('orgs', 'organization', '*', '*'),
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', 'add,change,delete', '*'),
-    ('tickets', '*', '*', '*'),
+    # New workflow definitions and instance audit permissions are organization
+    # scoped. Other legacy ticket internals are already excluded globally.
+    ('tickets', 'ticket', '*', '*'),
+    ('tickets', 'ticketflow', '*', '*'),
+    ('tickets', 'superticket', '*', '*'),
+    ('tickets', 'ticketsession', '*', '*'),
     ('ops', 'celerytask', 'view', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
     ('terminal', 'commandstorage', '*', '*'),
@@ -168,7 +173,6 @@ only_system_permissions = (
     ('authentication', 'passkey', '*', '*'),
     ('authentication', 'ssotoken', '*', '*'),
     ('oauth2_provider', 'accesstoken', '*', '*'),
-    ('tickets', '*', '*', '*'),
     ('orgs', 'organization', 'view', 'rootorg'),
     ('terminal', 'applet', '*', '*'),
     ('terminal', 'applethost', '*', '*'),
