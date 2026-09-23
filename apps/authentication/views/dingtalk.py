@@ -117,8 +117,8 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
         if not self.verify_state():
             return self.get_verify_state_failed_response(redirect_url)
 
-        user = get_object_or_none(User, id=user_id)
-        if user is None:
+        user = request.user
+        if str(user.id) != str(user_id):
             logger.error(f'DingTalkQR bind callback error, user_id invalid: user_id={user_id}')
             msg = _('Invalid user_id')
             response = self.get_failed_response(redirect_url, msg, msg)
