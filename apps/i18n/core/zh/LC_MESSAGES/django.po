@@ -8187,6 +8187,10 @@ msgstr "审计台"
 msgid "System setting"
 msgstr "系统设置"
 
+#: rbac/tree.py
+msgid "System tools"
+msgstr "系统工具"
+
 #: rbac/tree.py:38
 msgid "Session audits"
 msgstr "会话审计"
@@ -8437,6 +8441,10 @@ msgstr "加密的"
 #: settings/models.py:168
 msgid "Can change basic setting"
 msgstr "基本设置"
+
+#: settings/models.py
+msgid "Can change system tools setting"
+msgstr "可以修改系统工具设置"
 
 #: settings/models.py:169
 msgid "Can change email setting"
