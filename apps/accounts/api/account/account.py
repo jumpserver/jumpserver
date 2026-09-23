@@ -47,6 +47,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'move_to_assets': 'accounts.delete_account',
         'copy_to_assets': 'accounts.add_account',
         'chat': 'accounts.view_account',
+        'username_suggestions': 'accounts.view_account|perms.add_assetpermission|perms.change_assetpermission',
     }
     export_as_zip = True
 
@@ -130,7 +131,7 @@ class AccountViewSet(OrgBulkModelViewSet):
 
     @action(
         methods=['post'], detail=False, url_path='username-suggestions',
-        permission_classes=[IsValidUser]
+        permission_classes=[IsValidUser, RBACPermission]
     )
     def username_suggestions(self, request, *args, **kwargs):
         raw_asset_ids = request.data.get('assets', [])
