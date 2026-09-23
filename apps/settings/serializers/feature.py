@@ -41,6 +41,18 @@ def validate_chat_ai_base_url(value):
     URLValidator(schemes=['http', 'https'], message=message)(value)
 
 
+def validate_secret_destination(attrs, secret_field, destination_fields):
+    if attrs.get(secret_field) or not getattr(settings, secret_field, ''):
+        return
+    if any(
+        name in attrs and (attrs[name] or '') != (getattr(settings, name, '') or '')
+        for name in destination_fields
+    ):
+        raise serializers.ValidationError({
+            secret_field: _('Enter a new credential when changing its destination.')
+        })
+
+
 def validate_ssh_ca_openbao_address(value):
     try:
         parsed = urlsplit(value)
@@ -156,6 +168,10 @@ class OpenBaoSerializer(BaseVaultSettingSerializer, serializers.Serializer):
         max_value=120, min_value=1, required=False, label=_('Timeout')
     )
 
+    def validate(self, attrs):
+        validate_secret_destination(attrs, 'VAULT_OPENBAO_TOKEN', ('VAULT_OPENBAO_ADDR',))
+        return attrs
+
 
 class SSHCAOpenBaoSerializer(serializers.Serializer):
     PREFIX_TITLE = _('OpenBao SSH CA')
@@ -203,6 +219,10 @@ class HashicorpKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     VAULT_HCP_MOUNT_POINT = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Mount Point')
     )
+
+    def validate(self, attrs):
+        validate_secret_destination(attrs, 'VAULT_HCP_TOKEN', ('VAULT_HCP_HOST',))
+        return attrs
 
 
 class AzureKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
@@ -268,6 +288,9 @@ class ChatAISettingSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
+        validate_secret_destination(
+            attrs, 'CHAT_AI_API_KEY', ('CHAT_AI_BASE_URL', 'CHAT_AI_PROXY')
+        )
         enabled = attrs.get('CHAT_AI_ENABLED', settings.CHAT_AI_ENABLED)
         method = attrs.get('CHAT_AI_METHOD', settings.CHAT_AI_METHOD)
         if not enabled:

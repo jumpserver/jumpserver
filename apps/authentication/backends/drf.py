@@ -79,7 +79,12 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
     def authenticate_credentials(token):
         model = get_user_model()
         user_id = cache.get(token)
+        if not user_id:
+            return None, None
         user = get_object_or_none(model, id=user_id)
+        if user is None or not user.is_valid:
+            cache.delete(token)
+            raise exceptions.AuthenticationFailed(_('User is inactive or expired.'))
         return user, None
 
     def authenticate_header(self, request):

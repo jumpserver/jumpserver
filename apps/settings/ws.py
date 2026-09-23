@@ -133,7 +133,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         user = self.scope["user"]
         query = parse_qs(self.scope['query_string'].decode())
         self.category = query.get('category', [User.Source.ldap.value])[0]
-        if user.is_authenticated and await self.has_perms(user, ['settings.view_setting']):
+        if user.is_authenticated and await self.has_perms(user, ['settings.change_auth']):
             await self.accept()
         else:
             await self.close()

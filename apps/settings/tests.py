@@ -1,13 +1,17 @@
 import ssl
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
+from channels.testing import WebsocketCommunicator
+from django.contrib.auth.models import AnonymousUser
 from django.test import SimpleTestCase, override_settings
 
 from jumpserver.rewriting.smtp import EmailBackend
 from settings.api.ldap import LDAPUserListApi
 from settings.serializers.feature import ChatAISettingSerializer
 from settings.serializers.msg import EmailSettingSerializer
+from settings.ws import LdapWebsocket
+from users.models import User
 
 
 class SMTPEmailBackendTestCase(SimpleTestCase):
@@ -155,3 +159,81 @@ class LDAPUserListApiTest(SimpleTestCase):
         users = [{'existing': False}, {'existing': True}]
 
         self.assertEqual(view.sort_queryset(users), users)
+
+
+@override_settings(
+    AUTHENTICATION_BACKENDS=['rbac.backends.RBACBackend'],
+    CHANNEL_LAYERS={},
+)
+class LDAPWebsocketPermissionTest(SimpleTestCase):
+    def setUp(self):
+        super().setUp()
+        self.enterContext(patch.object(User, 'lang', new_callable=PropertyMock, return_value='en'))
+
+    @staticmethod
+    def make_user(*perms):
+        user = User(username='ldap-test-user', is_active=True)
+        user._is_superuser = False
+        user.perms = list(perms)
+        return user
+
+    @staticmethod
+    def make_socket(user, category):
+        socket = WebsocketCommunicator(
+            LdapWebsocket.as_asgi(), f'/ws/ldap/?category={category}'
+        )
+        socket.scope['user'] = user
+        return socket
+
+    async def test_view_only_users_cannot_connect(self):
+        for category in ('ldap', 'ldap_ha'):
+            with self.subTest(category=category):
+                socket = self.make_socket(
+                    self.make_user('settings.view_setting'), category
+                )
+                try:
+                    connected, _ = await socket.connect()
+                    self.assertFalse(connected)
+                finally:
+                    await socket.disconnect()
+
+    async def test_users_without_auth_permission_cannot_connect(self):
+        for user in (
+            AnonymousUser(), self.make_user(),
+            self.make_user('settings.change_basic'),
+        ):
+            with self.subTest(user=user):
+                socket = self.make_socket(user, 'ldap')
+                try:
+                    connected, _ = await socket.connect()
+                    self.assertFalse(connected)
+                finally:
+                    await socket.disconnect()
+
+    async def test_auth_settings_editors_can_test_ldap(self):
+        for category in ('ldap', 'ldap_ha'):
+            with self.subTest(category=category):
+                socket = self.make_socket(
+                    self.make_user('settings.change_auth'), category
+                )
+                prefix = f'AUTH_{category.upper()}'
+                with patch('settings.ws.LDAPTestUtil') as test_util:
+                    test_util.return_value.test_config.return_value = (False, 'Test result')
+                    try:
+                        connected, _ = await socket.connect()
+                        self.assertTrue(connected)
+                        await socket.send_json_to({
+                            'msg_type': 'testing_config',
+                            f'{prefix}_SERVER_URI': 'ldap://directory.example.test:389',
+                            f'{prefix}_SEARCH_OU': 'dc=example,dc=test',
+                            f'{prefix}_SEARCH_FILTER': '(uid=%(user)s)',
+                            f'{prefix}_USER_ATTR_MAP': {
+                                'username': 'uid', 'name': 'cn', 'email': 'mail',
+                            },
+                        })
+                        response = await socket.receive_json_from()
+                        self.assertEqual(response, {'ok': False, 'msg': 'Test result'})
+                        test_util.return_value.test_config.assert_called_once_with()
+                        self.assertEqual(test_util.call_args.kwargs['category'], category)
+                    finally:
+                        await socket.disconnect()

@@ -29,6 +29,16 @@ def allow_access(private_file):
         return False
     if not path_perm:
         return False
+    if path_base == 'playbooks':
+        from django.db.models import Q
+        from ops.const import Scope
+        from ops.models import Playbook
+
+        if not request.user.is_authenticated or not request.user.has_perms([path_perm]):
+            return False
+        return Playbook.objects.filter(path=private_file.relative_name).filter(
+            Q(creator=request.user) | Q(scope=Scope.public)
+        ).exists()
     if path_perm == 'none' or request.user.has_perms([path_perm]):
         # 不需要权限检查，任何人都可以访问
         return True
