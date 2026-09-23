@@ -80,6 +80,22 @@ def get_parent_keys(key, include_self=True):
     return keys
 
 
+def sanitize_job_extra_vars(extra_vars):
+    """Drop Ansible connection overrides from job extra vars.
+
+    Extra vars outrank inventory, so ansible_* keys would redirect
+    execution or managed credentials. Job user params are namespaced
+    as jms_*; this is a fail-closed filter at the runner boundary.
+    """
+    if not extra_vars or not isinstance(extra_vars, dict):
+        return extra_vars or {}
+    return {
+        key: value
+        for key, value in extra_vars.items()
+        if not str(key).lower().startswith('ansible_')
+    }
+
+
 class JMSPermedInventory(JMSInventory):
     def __init__(self,
                  assets,
@@ -379,9 +395,9 @@ class JobExecution(JMSOrgBaseModel):
         if isinstance(self.parameters, str):
             extra_vars = json.loads(self.parameters)
         else:
-            extra_vars = self.parameters if self.parameters else {}
-        static_variables = self.gather_static_variables()
-        extra_vars.update(static_variables)
+            extra_vars = dict(self.parameters) if self.parameters else {}
+        extra_vars = sanitize_job_extra_vars(extra_vars)
+        extra_vars.update(self.gather_static_variables())
 
         if self.current_job.type == Types.adhoc:
             module, args = self.compile_shell()
