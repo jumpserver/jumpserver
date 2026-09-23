@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import io
 import os
+import posixpath
 
 import paramiko
 
@@ -40,8 +41,12 @@ class SFTPStorage(ObjectStorage):
 
     def upload(self, src, target):
         local_file = src
-        remote_file = os.path.join(self.sftp_root_path, target)
         try:
+            if (not isinstance(target, str) or not target or posixpath.isabs(target)
+                    or '..' in target.split('/') or '\\' in target or '\x00' in target
+                    or posixpath.normpath(target) == '.'):
+                raise ValueError('Invalid SFTP storage key')
+            remote_file = posixpath.join(self.sftp_root_path, target)
             self.confirm_connected()
             mode = os.stat(local_file).st_mode
             remote_dir = os.path.dirname(remote_file)
