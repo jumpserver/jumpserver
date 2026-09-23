@@ -25,7 +25,11 @@ class ConfirmReLogin(BaseConfirm):
         msg = RELOGIN_ERROR
         if not login_time:
             return False, msg
-        login_time = datetime.strptime(login_time, '%Y-%m-%d %H:%M:%S')
-        if (now - login_time).seconds >= SPECIFIED_TIME * 60:
+        try:
+            login_time = datetime.strptime(login_time, '%Y-%m-%d %H:%M:%S')
+        except (TypeError, ValueError):
+            return False, msg
+        elapsed = (now - login_time).total_seconds()
+        if not 0 <= elapsed < SPECIFIED_TIME * 60:
             return False, msg
         return True, ''
