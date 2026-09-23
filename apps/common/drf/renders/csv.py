@@ -28,7 +28,7 @@ class CSVFileRenderer(BaseFileRenderer):
     def __render_row(self, row):
         row_escape = []
         for d in row:
-            if isinstance(d, str) and d.strip().startswith(self.escape_chars):
+            if isinstance(d, str) and (d.startswith(self.escape_chars) or d.lstrip().startswith(self.escape_chars)):
                 d = "'{}".format(d)
             row_escape.append(d)
         return row_escape
