@@ -2,12 +2,21 @@ import argparse
 import asyncio
 import errno
 import socket
+import threading
 import time
 
 from common.utils.timezone import local_now_display
 from settings.utils import generate_ips
 
 _SCANNER_VERSION = '1.0'
+_MAX_HOSTS = 256
+_MAX_PORTS = 4096
+_MAX_PROBES = 65536
+_PORT_CONCURRENCY = 32
+_MAX_CONNECT_TIMEOUT = 10
+_SCAN_TIMEOUT = 120
+# Shared by requests in this process; do not queue excess scans.
+_SCAN_SLOTS = threading.BoundedSemaphore(2)
 
 # Fallback service name table for platforms where getservbyport is unavailable
 _KNOWN_SERVICES = {
@@ -27,15 +36,42 @@ def _parse_ports(ports_str):
         # mirror nmap's default: the 1000 most common ports; use 1-1024 as a
         # reasonable approximation without requiring root privileges.
         return list(range(1, 1025))
-    ports = []
-    for part in ports_str.split(','):
+    if not isinstance(ports_str, str) or len(ports_str) > _MAX_PORTS * 12:
+        raise ValueError('Invalid port specification')
+    parts = ports_str.split(',')
+    if len(parts) > _MAX_PORTS:
+        raise ValueError(f'At most {_MAX_PORTS} ports may be scanned')
+
+    ranges = []
+    for part in parts:
         part = part.strip()
         if '-' in part:
-            start, end = part.split('-', 1)
-            ports.extend(range(int(start), int(end) + 1))
+            start, end = map(int, part.split('-', 1))
         else:
-            ports.append(int(part))
-    return sorted(set(ports))
+            start = end = int(part)
+        if not 1 <= start <= end <= 65535:
+            raise ValueError('Ports must be between 1 and 65535 in ascending order')
+        ranges.append((start, end))
+
+    ports, last_end = [], 0
+    for start, end in sorted(ranges):
+        start = max(start, last_end + 1)
+        if start > end:
+            continue
+        if len(ports) + end - start + 1 > _MAX_PORTS:
+            raise ValueError(f'At most {_MAX_PORTS} ports may be scanned')
+        ports.extend(range(start, end + 1))
+        last_end = end
+    return ports
+
+
+def _parse_timeout(timeout):
+    timeout = float(timeout) if timeout else 1.0
+    if not 0 < timeout <= _MAX_CONNECT_TIMEOUT:
+        raise ValueError(
+            f'Connection timeout must be greater than 0 and at most {_MAX_CONNECT_TIMEOUT} seconds'
+        )
+    return timeout
 
 
 def _service_name(port: int, proto: str = 'tcp') -> str:
@@ -53,9 +89,12 @@ async def _scan_tcp_port(ip: str, port: int, timeout: float) -> tuple[str, bool]
         )
         writer.close()
         try:
-            await writer.wait_closed()
+            await asyncio.wait_for(writer.wait_closed(), timeout=1)
+        except asyncio.CancelledError:
+            writer.transport.abort()
+            raise
         except Exception:
-            pass
+            writer.transport.abort()
         return 'open', True
     except ConnectionRefusedError:
         return 'closed', True
@@ -71,12 +110,17 @@ async def _scan_tcp_port(ip: str, port: int, timeout: float) -> tuple[str, bool]
 
 async def get_nmap_result(ip: str, ports_str, timeout) -> tuple[list[str], bool]:
     """Scan *ip* and return formatted result lines plus host reachability."""
-    timeout = float(timeout) if timeout else 1.0
+    timeout = _parse_timeout(timeout)
     ports = _parse_ports(ports_str)
 
-    states = await asyncio.gather(
-        *[_scan_tcp_port(ip, p, timeout) for p in ports]
-    )
+    states = []
+    for offset in range(0, len(ports), _PORT_CONCURRENCY):
+        async with asyncio.TaskGroup() as group:
+            tasks = [
+                group.create_task(_scan_tcp_port(ip, port, timeout))
+                for port in ports[offset:offset + _PORT_CONCURRENCY]
+            ]
+        states.extend(task.result() for task in tasks)
 
     lines = ['PORT\tSTATE\tSERVICE']
     for port, (state, _) in zip(ports, states):
@@ -101,20 +145,38 @@ async def verbose_nmap(dest_ips, dest_ports=None, timeout=None, display=None):
     if not display:
         return
 
-    ips = generate_ips(dest_ips)
-    dest_port = ','.join(list(dest_ports)) if dest_ports else None
+    if not _SCAN_SLOTS.acquire(blocking=False):
+        await display('Error: Too many active scans; please try again later')
+        return
 
-    success_num, start_time = 0, time.time()
-    await display(f'[Summary] Nmap (v{_SCANNER_VERSION}): {len(ips)} addresses were scanned')
-    for ip in ips:
-        ok = await once_nmap(str(ip), dest_port, timeout, display)
-        if ok:
-            success_num += 1
-        await display()
-    await display(
-        f'[Done] Nmap: {len(ips)} IP addresses ({success_num} hosts up) '
-        f'scanned in {round(time.time() - start_time, 2)} seconds'
-    )
+    try:
+        if dest_ports and (len(dest_ports) > _MAX_PORTS or any(len(p) > 32 for p in dest_ports)):
+            raise ValueError('Port specification is too large')
+        dest_port = ','.join(list(dest_ports)) if dest_ports else None
+        ports = _parse_ports(dest_port)
+        timeout = _parse_timeout(timeout)
+        ips = generate_ips(dest_ips, max_count=_MAX_HOSTS)
+        if len(ips) * len(ports) > _MAX_PROBES:
+            raise ValueError(f'At most {_MAX_PROBES} address/port pairs may be scanned')
+
+        success_num, start_time = 0, time.monotonic()
+        async with asyncio.timeout(_SCAN_TIMEOUT):
+            await display(f'[Summary] Nmap (v{_SCANNER_VERSION}): {len(ips)} addresses were scanned')
+            for ip in ips:
+                ok = await once_nmap(str(ip), dest_port, timeout, display)
+                if ok:
+                    success_num += 1
+                await display()
+            await display(
+                f'[Done] Nmap: {len(ips)} IP addresses ({success_num} hosts up) '
+                f'scanned in {round(time.monotonic() - start_time, 2)} seconds'
+            )
+    except asyncio.TimeoutError:
+        await display(f'Error: Scan exceeded {_SCAN_TIMEOUT} seconds')
+    except (TypeError, ValueError) as err:
+        await display(f'Error: {err}')
+    finally:
+        _SCAN_SLOTS.release()
 
 
 async def _main():
