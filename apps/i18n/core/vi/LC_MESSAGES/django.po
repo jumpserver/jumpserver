@@ -9890,6 +9890,10 @@ msgstr "SMTP"
 msgid "Microsoft Exchange Server"
 msgstr "Máy chủ Microsoft Exchange"
 
+#: settings/serializers/tls.py:9
+msgid "Use default trust store (compatible)"
+msgstr "Sử dụng kho tin cậy mặc định (tương thích)"
+
 #: settings/serializers/msg.py:31
 msgid "Use system trust store"
 msgstr "Sử dụng kho tin cậy hệ thống"

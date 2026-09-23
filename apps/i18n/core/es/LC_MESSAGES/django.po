@@ -10038,6 +10038,10 @@ msgstr "SMTP"
 msgid "Microsoft Exchange Server"
 msgstr "Servidor de Microsoft Exchange"
 
+#: settings/serializers/tls.py:9
+msgid "Use default trust store (compatible)"
+msgstr "Usar el almacén de confianza predeterminado (compatible)"
+
 #: settings/serializers/msg.py:31
 msgid "Use system trust store"
 msgstr "Usar el almacén de confianza del sistema"

@@ -9976,6 +9976,10 @@ msgstr "SMTP"
 msgid "Microsoft Exchange Server"
 msgstr "Сервер Microsoft Exchange"
 
+#: settings/serializers/tls.py:9
+msgid "Use default trust store (compatible)"
+msgstr "Использовать хранилище доверия по умолчанию (совместимый режим)"
+
 #: settings/serializers/msg.py:31
 msgid "Use system trust store"
 msgstr "Использовать системное хранилище доверия"

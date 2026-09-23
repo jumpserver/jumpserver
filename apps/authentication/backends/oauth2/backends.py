@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import base64
-import ssl
 
 import requests
 
@@ -13,6 +12,7 @@ from django.urls import reverse
 
 from common.utils import get_logger
 from users.utils import construct_user_email
+from authentication.backends.http import TLSConfigurationError
 from authentication.utils import build_absolute_uri
 from common.exceptions import JMSException
 
@@ -137,8 +137,8 @@ class OAuth2Backend(RedirectAuthBackend):
         }
         try:
             session = create_oauth2_session()
-        except (ssl.SSLError, ValueError):
-            logger.error('OAuth2 custom CA configuration is invalid')
+        except TLSConfigurationError:
+            logger.error('OAuth2 TLS configuration is invalid')
             return None
 
         with session:

@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 
 class CertificateVerifyMode(models.TextChoices):
+    default = 'default', _('Use default trust store (compatible)')
     system = 'system', _('Use system trust store')
     custom_ca = 'custom_ca', _('Use custom CA certificate')
     none = 'none', _('Ignore certificate verification (insecure)')

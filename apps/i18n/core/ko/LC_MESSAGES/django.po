@@ -9807,6 +9807,10 @@ msgstr "SMTP"
 msgid "Microsoft Exchange Server"
 msgstr "Microsoft Exchange 서버"
 
+#: settings/serializers/tls.py:9
+msgid "Use default trust store (compatible)"
+msgstr "기본 신뢰 저장소 사용(호환)"
+
 #: settings/serializers/msg.py:31
 msgid "Use system trust store"
 msgstr "시스템 신뢰 저장소 사용"

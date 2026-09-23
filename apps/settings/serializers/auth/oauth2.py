@@ -53,7 +53,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
     )
     AUTH_OAUTH2_CERT_VERIFY_MODE = serializers.ChoiceField(
         choices=CertificateVerifyMode.choices,
-        default=CertificateVerifyMode.system,
+        default=CertificateVerifyMode.default,
         label=_('Certificate verification'),
         help_text=_('Controls verification of OAuth2 server TLS certificates')
     )
