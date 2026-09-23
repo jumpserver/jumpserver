@@ -30,6 +30,10 @@ class AccountHistoricalRecords(HistoricalRecords):
             return
         if not self.included_fields:
             return super().post_save(instance, created, using=using, **kwargs)
+        update_fields = kwargs.get('update_fields')
+        credential_fields = set(self.included_fields) - {'id', 'version'}
+        if not created and update_fields is not None and not credential_fields.intersection(update_fields):
+            return
 
         # self.updated_version = 0
         if created:
@@ -150,6 +154,8 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             instance._loaded_template_state = tuple(
                 instance.__dict__[field] for field in cls.TEMPLATE_STATE_FIELDS
             )
+        if '_secret' in field_names:
+            instance._loaded_secret = instance.__dict__['_secret']
         return instance
 
     @property
@@ -254,28 +260,54 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             self.__dict__.pop('_create_vault_on_detach', None)
 
     def _can_skip_template_transition(self, update_fields):
-        if self._state.adding or update_fields is None:
+        if self._state.adding:
+            return not self.follow_template
+        if getattr(self, '_secret_explicitly_set', False):
             return False
         protected = {*self.TEMPLATE_STATE_FIELDS, 'secret', '_secret'}
-        if protected.intersection(update_fields) or getattr(self, '_secret_explicitly_set', False):
+        if update_fields is not None and protected.intersection(update_fields):
             return False
-        # Only skip for a loaded, unchanged relationship. An in-memory opt-out
-        # still needs validation even when follow_template is missing from update_fields.
+        # A full save can also be metadata-only, provided the loaded credential
+        # and relationship are unchanged. Deferred values never trigger a read here.
         state = tuple(self.__dict__.get(field) for field in self.TEMPLATE_STATE_FIELDS)
-        return getattr(self, '_loaded_template_state', None) == state
+        if getattr(self, '_loaded_template_state', None) != state:
+            return False
+        if update_fields is None:
+            return ('_loaded_secret' in self.__dict__ and '_secret' in self.__dict__
+                    and self._loaded_secret == self.__dict__['_secret'])
+        return True
 
-    def save(self, *args, **kwargs):
+    def _prepare_save_kwargs(self, kwargs):
         self._set_save_org()
-        update_fields = kwargs.get('update_fields')
-        if update_fields is not None:
-            update_fields = kwargs['update_fields'] = frozenset(update_fields)
-        if self._can_skip_template_transition(update_fields):
-            return super().save(*args, **kwargs)
+        if kwargs.get('update_fields') is not None:
+            # VaultModelMixin maps the public secret name to the stored field.
+            kwargs['update_fields'] = list(kwargs['update_fields'])
+
+    def _save_without_template_transition(self, *args, **kwargs):
+        if not self._state.adding and kwargs.get('update_fields') is None:
+            # Do not write stale template/credential values during a metadata edit.
+            protected = {*self.TEMPLATE_STATE_FIELDS, '_secret', 'version'}
+            kwargs['update_fields'] = [
+                field.attname for field in self._meta.concrete_fields
+                if not field.primary_key and field.attname not in protected
+                and field.attname in self.__dict__
+            ]
+        result = super().save(*args, **kwargs)
+        self.__dict__.pop('_secret_explicitly_set', None)
+        return result
+
+    def _save_template_transition(self, *args, **kwargs):
         using = kwargs.get('using') or self._state.db or 'default'
         # Keep the credential snapshot and opt-out in the same database transaction.
         with transaction.atomic(using=using):
             previous = self._get_previous_for_update(using)
             return self._save_with_locked_previous(previous, *args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self._prepare_save_kwargs(kwargs)
+        if self._can_skip_template_transition(kwargs.get('update_fields')):
+            return self._save_without_template_transition(*args, **kwargs)
+        return self._save_template_transition(*args, **kwargs)
 
     def __str__(self):
         if self.asset_id:

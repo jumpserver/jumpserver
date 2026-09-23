@@ -96,7 +96,15 @@ class VaultSignalHandler(object):
             if created or getattr(instance, '_create_vault_on_detach', False):
                 vault_client.create(instance)
             else:
-                vault_client.update(instance)
+                update_fields = kwargs.get('update_fields')
+                credential_fields = {'secret', '_secret', 'secret_type'}
+                if (isinstance(instance, Account) and update_fields is not None
+                        and not credential_fields.intersection(update_fields)):
+                    # Metadata edits must not rewrite a concurrently changed credential.
+                    if instance.is_sync_metadata:
+                        vault_client.save_metadata(vault_client.build_entry(instance))
+                else:
+                    vault_client.update(instance)
         except Exception as e:
             logger.exception('Vault save failed: %s', e)
             raise VaultException()

@@ -363,3 +363,86 @@ class TemplateSavePerformanceTests(SimpleTestCase):
     def test_deferred_template_state_keeps_transition_checks(self):
         account = Account.from_db('default', ['follow_template'], [True])
         self.assertFalse(account._can_skip_template_transition(['comment']))
+
+    @staticmethod
+    def loaded_account(**kwargs):
+        original = Account(org_id='org', **kwargs)
+        fields = [field.attname for field in Account._meta.concrete_fields]
+        account = Account.from_db('default', fields, [original.__dict__[field] for field in fields])
+        account._set_save_org = Mock()
+        return account
+
+    @patch('accounts.models.account.BaseAccount.save')
+    @patch('accounts.models.account.transaction.atomic')
+    @patch.object(Account, '_get_previous_for_update')
+    @patch.object(Account, 'get_source_template')
+    def test_full_metadata_save_excludes_credentials_without_extra_queries(self, template, previous, atomic, save):
+        for source, follows in (('local', False), ('template', False), ('template', True)):
+            with self.subTest(source=source, follows=follows):
+                account = self.loaded_account(source=source, source_id='template-id', follow_template=follows)
+                account.name = 'updated'
+                account.comment = 'note'
+                account.save()
+                fields = set(save.call_args.kwargs['update_fields'])
+                self.assertTrue({'name', 'comment', 'date_updated'}.issubset(fields))
+                self.assertFalse(fields.intersection({*Account.TEMPLATE_STATE_FIELDS, '_secret', 'id'}))
+        template.assert_not_called()
+        previous.assert_not_called()
+        atomic.assert_not_called()
+
+    @patch('accounts.models.account.BaseAccount.save')
+    @patch('accounts.models.account.transaction.atomic')
+    @patch.object(Account, 'get_source_template')
+    def test_independent_creation_skips_template_processing(self, template, atomic, save):
+        for source in ('local', 'template'):
+            account = Account(source=source, follow_template=False)
+            account.secret = 'initial-credential'
+            account.save()
+            self.assertEqual(account._secret, 'initial-credential')
+            self.assertFalse(getattr(account, '_secret_explicitly_set', False))
+        self.assertEqual(save.call_count, 2)
+        template.assert_not_called()
+        atomic.assert_not_called()
+
+    @patch('accounts.models.account.BaseAccount.save')
+    @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
+    @patch.object(Account, '_get_previous_for_update', return_value=None)
+    def test_full_credential_edits_still_use_locked_path(self, previous, atomic, save):
+        for field, value in (('secret', 'replacement'), ('_secret', 'replacement'),
+                             ('secret_type', 'ssh_key'), ('source_id', 'new-template')):
+            with self.subTest(field=field):
+                account = self.loaded_account(source='template', source_id='template-id', follow_template=False)
+                setattr(account, field, value)
+                previous.reset_mock()
+                account.save()
+                previous.assert_called_once()
+
+    def test_full_save_with_deferred_secret_keeps_transition_checks(self):
+        account = Account.from_db('default', list(Account.TEMPLATE_STATE_FIELDS),
+                                  [False, 'local', None, 'password', 'org'])
+        self.assertFalse(account._can_skip_template_transition(None))
+
+    @patch('accounts.signal_handlers.vault_client')
+    def test_metadata_save_only_updates_vault_metadata(self, vault):
+        from accounts.signal_handlers import VaultSignalHandler
+        account = self.loaded_account(source='local')
+        VaultSignalHandler.save_to_vault(Account, account, False, update_fields={'name', 'comment'})
+        vault.create.assert_not_called()
+        vault.update.assert_not_called()
+        vault.save_metadata.assert_called_once_with(vault.build_entry.return_value)
+
+    @patch('simple_history.models.HistoricalRecords.post_save')
+    def test_metadata_save_skips_credential_history_lookup(self, post_save):
+        from accounts.models.account import AccountHistoricalRecords
+        account = self.loaded_account(source='local')
+        history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'])
+        with patch.object(account.history, 'first', side_effect=AssertionError('No credential history read')):
+            history.post_save(account, False, update_fields={'name', 'comment', 'date_updated', 'version'})
+        post_save.assert_not_called()
+
+    @patch('accounts.signal_handlers.vault_client')
+    def test_credential_save_still_updates_vault(self, vault):
+        from accounts.signal_handlers import VaultSignalHandler
+        account = self.loaded_account(source='local')
+        VaultSignalHandler.save_to_vault(Account, account, False, update_fields={'_secret'})
+        vault.update.assert_called_once_with(account)
