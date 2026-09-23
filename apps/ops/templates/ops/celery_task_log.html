@@ -81,7 +81,7 @@
 
         body {
             padding: 10px 16px 14px;
-            background: #f6f8fa;
+            background: #fff;
             color: #24292f;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
         }
@@ -102,16 +102,22 @@
         .header {
             flex: 0 0 auto;
             min-width: 0;
-            min-height: 28px;
-            display: grid;
-            grid-template-columns: minmax(180px, auto) 1fr;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 2px 4px 4px;
+        }
+
+        .header-main {
+            display: flex;
             align-items: center;
-            column-gap: 20px;
-            padding: 0 4px;
+            gap: 20px;
+            min-width: 0;
         }
 
         .task-type {
             display: block;
+            flex: 1;
             min-width: 0;
             color: #1f2328;
             font-size: 16px;
@@ -233,16 +239,21 @@
             cursor: grabbing;
         }
 
-        .info {
+        .info,
+        .task-summary {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            gap: 6px 18px;
+            gap: 20px;
             padding: 0;
             margin: 0;
         }
 
-        .info .item {
+        .task-summary {
+            flex: none;
+            gap: 16px;
+        }
+
+        .header .item {
             min-width: 0;
             display: flex;
             align-items: center;
@@ -251,26 +262,55 @@
             font-size: 12px;
             line-height: 20px;
             list-style: none;
+            white-space: nowrap;
         }
 
-        .info .item + .item {
-            padding-left: 18px;
-            border-left: 1px solid #d8dee4;
+        .header .item[hidden] {
+            display: none;
         }
 
-        .info .item .label {
+        .header .item .label {
+            flex: none;
             font-weight: 400;
             color: #6e7781;
         }
 
-        .info .item .value {
+        .header .item .value {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-weight: 400;
             color: #424a53;
+        }
+
+        .info .task-id-item {
+            flex: 0 1 auto;
+        }
+
+        .info .task-start-item,
+        .info .task-published-item {
+            flex: none;
         }
 
         .info .task-id {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 11px;
+        }
+
+        .task-summary .task-state {
+            padding: 1px 8px;
+            border-radius: 4px;
+            background: #f0f3f6;
+            color: #424a53;
+        }
+
+        .task-summary .task-state.is-running {
+            color: #117a65;
+            background: #e8f7f2;
+        }
+
+        .task-duration {
+            font-variant-numeric: tabular-nums;
         }
 
         .terminal-actions {
@@ -326,15 +366,22 @@
             }
 
             .header {
-                min-height: 0;
-                display: block;
                 padding: 0;
             }
 
+            .header-main {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .task-type {
+                flex-basis: 100%;
+            }
+
             .info {
+                flex-direction: column;
                 align-items: flex-start;
-                gap: 0;
-                padding-top: 2px;
+                gap: 4px;
             }
 
             .info .item {
@@ -342,24 +389,29 @@
                 overflow: hidden;
             }
 
-            .info .item + .item {
-                padding-left: 0;
-                border-left: 0;
-            }
-
-            .info .value {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+            .info .label {
+                min-width: 76px;
             }
         }
     </style>
 </head>
 <div class="container">
     <div class="header">
-        <span class="task-type"></span>
+        <div class="header-main">
+            <span class="task-type"></span>
+            <ul class="task-summary">
+                <li class="item">
+                    <span class="label">{% trans 'Status' %}</span>
+                    <span class="value task-state"></span>
+                </li>
+                <li class="item task-duration-item">
+                    <span class="label">{% trans 'Duration' %}</span>
+                    <span class="value task-duration"></span>
+                </li>
+            </ul>
+        </div>
         <ul class="info">
-            <li class="item">
+            <li class="item task-id-item">
                 <span class="label">ID</span>
                 <span class="value task-id"></span>
             </li>
@@ -367,17 +419,9 @@
                 <span class="label">{% trans 'Date start' %}</span>
                 <span class="value date-start"></span>
             </li>
-            <li class="item">
-                <span class="label">{% trans 'Status' %}</span>
-                <span class="value task-state"></span>
-            </li>
             <li class="item task-published-item" hidden>
                 <span class="label">{% trans 'Date published' %}</span>
                 <span class="value date-published"></span>
-            </li>
-            <li class="item task-duration-item">
-                <span class="label">{% trans 'Duration' %}</span>
-                <span class="value task-duration"></span>
             </li>
         </ul>
     </div>
@@ -790,7 +834,9 @@
             return;
         }
         displayedTaskState = state;
-        $('.task-state').text(getTaskStateLabel(state));
+        $('.task-state')
+            .text(getTaskStateLabel(state))
+            .toggleClass('is-running', state === 'RUNNING');
         const isQueued = state === 'PENDING';
         $('.task-start-item').prop('hidden', isQueued && !taskStartedAt);
         $('.task-published-item, .task-duration-item').prop('hidden', false);
@@ -873,8 +919,8 @@
             method: "GET",
             flash_message: false,
             success(data) {
-                $('.task-id').html(data.id);
-                $('.task-type').html(data.task_name);
+                $('.task-id').text(data.id || taskId).attr('title', data.id || taskId);
+                $('.task-type').text(data.task_name || '').attr('title', data.task_name || '');
                 updateTaskTiming(data);
                 updateTaskState(data.state);
                 document.title = data.task_name || document.title;

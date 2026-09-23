@@ -87,12 +87,21 @@ class PlaybookViewSet(JMSBulkModelViewSet):
             dest_path = safe_join(base_path, str(instance.id))
 
             try:
-                unzip_playbook(src_path, dest_path)
-            except RuntimeError:
-                raise JMSException(code='invalid_playbook_file', detail={"msg": "Unzip failed"})
+                try:
+                    unzip_playbook(src_path, dest_path)
+                except RuntimeError:
+                    raise JMSException(code='invalid_playbook_file', detail={"msg": "Unzip failed"})
 
-            if 'main.yml' not in os.listdir(dest_path):
-                raise PlaybookNoValidEntry
+                if 'main.yml' not in os.listdir(dest_path):
+                    raise PlaybookNoValidEntry
+            except Exception:
+                # The request transaction rolls back the model, but not files.
+                try:
+                    if os.path.exists(dest_path):
+                        shutil.rmtree(dest_path)
+                finally:
+                    instance.path.delete(save=False)
+                raise
 
         elif instance.create_method == 'blank':
             dest_path = safe_join(base_path, str(instance.id))

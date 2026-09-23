@@ -21,6 +21,11 @@ class UserConfirmation(permissions.BasePermission):
             return True
 
         session = getattr(request, 'session', {})
+        if not request.user.is_authenticated or \
+                session.get('CONFIRM_USER_ID') != str(request.user.pk):
+            for key in ('CONFIRM_LEVEL', 'CONFIRM_TYPE', 'CONFIRM_TIME', 'CONFIRM_USER_ID'):
+                session.pop(key, None)
+            raise UserConfirmRequired(code=self.min_type)
         confirm_level = session.get('CONFIRM_LEVEL')
         confirm_type = session.get('CONFIRM_TYPE')
         confirm_time = session.get('CONFIRM_TIME')
@@ -52,8 +57,12 @@ class UserConfirmation(permissions.BasePermission):
 
 class IsValidUserOrConnectionToken(IsValidUser):
     def has_permission(self, request, view):
-        return super().has_permission(request, view) \
-            or self.is_valid_connection_token(request)
+        if super().has_permission(request, view):
+            return True
+        # Connection tokens are bootstrap capabilities, not a user session.
+        if request.method not in permissions.SAFE_METHODS:
+            return False
+        return self.is_valid_connection_token(request)
 
     @staticmethod
     def is_valid_connection_token(request):

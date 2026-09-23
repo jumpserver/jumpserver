@@ -3,10 +3,10 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin
 
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from common.api import JMSGenericViewSet
 from terminal.serializers import SessionSerializer
-from tickets.models import TicketSession
+from tickets.models import Ticket, TicketSession
 from tickets.serializers import TicketSessionRelationSerializer
 
 
@@ -22,6 +22,19 @@ class TicketSessionApi(views.APIView):
         '*': ['tickets.view_ticket']
     }
 
+    @staticmethod
+    def has_session_permission(user, ticket_id, session):
+        if Ticket.get_user_related_tickets(user).filter(id=ticket_id).exists():
+            return True
+
+        org = session.org
+        if org is None:
+            return False
+        with tmp_to_org(org):
+            # user.perms is cached for the request organization. Recompute
+            # permissions in the session organization for audit access.
+            return 'terminal.view_session' in user.get_all_permissions()
+
     def get(self, request, *args, **kwargs):
         with tmp_to_root_org():
             tid = self.kwargs['ticket_id']
@@ -30,5 +43,7 @@ class TicketSessionApi(views.APIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
             session = ticket_session.session
+            if not self.has_session_permission(request.user, tid, session):
+                return Response(status=status.HTTP_404_NOT_FOUND)
             serializer = SessionSerializer(session)
             return Response(serializer.data)

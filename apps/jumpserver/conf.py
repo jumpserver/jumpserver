@@ -291,6 +291,9 @@ class Config(dict):
         'VAULT_OPENBAO_TOKEN': '',
         'VAULT_OPENBAO_MOUNT_POINT': 'pam',
         'VAULT_OPENBAO_TIMEOUT': 10,
+        'VAULT_OPENBAO_VERIFY_TLS': True,
+        'VAULT_OPENBAO_CACERT_CONTENT': '',
+        'VAULT_OPENBAO_CACERT_FILE': '',
 
         # OpenBao SSH CA uses an independent endpoint and credential so it can
         # be deployed in a separate security/failure domain from Vault KV.
@@ -304,6 +307,7 @@ class Config(dict):
         'SSH_CA_OPENBAO_TTL': 300,
         'SSH_CA_OPENBAO_TIMEOUT': 10,
         'SSH_CA_OPENBAO_VERIFY_TLS': True,
+        'SSH_CA_OPENBAO_CACERT_FILE': '',
         'SSH_CA_OPENBAO_SOURCE_ADDRESS': '',
 
         'VAULT_HCP_HOST': '',

@@ -273,11 +273,10 @@ class JMSInventory:
         if protocol.name == 'winrm':
             if protocol.setting.get('use_ssl', False):
                 ansible_config['ansible_winrm_scheme'] = 'https'
-                ansible_config['ansible_winrm_transport'] = 'ssl'
                 ansible_config['ansible_winrm_server_cert_validation'] = 'ignore'
             else:
                 ansible_config['ansible_winrm_scheme'] = 'http'
-                ansible_config['ansible_winrm_transport'] = 'ntlm'
+            ansible_config['ansible_winrm_transport'] = 'ntlm'
             ansible_config['ansible_winrm_connection_timeout'] = 120
         return ansible_config
 

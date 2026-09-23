@@ -1,4 +1,8 @@
 name: Translate README
+
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:

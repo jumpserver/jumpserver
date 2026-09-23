@@ -7,6 +7,9 @@ on:
 
 name: JumpServer repos generic handler
 
+permissions:
+  contents: read
+
 jobs:
   handle_pull_request:
     if: github.event_name == 'pull_request'

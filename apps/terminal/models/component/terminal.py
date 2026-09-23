@@ -148,7 +148,8 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_command_storage_setting())
         configs.update(self.get_replay_storage_setting())
         configs.update(self.get_login_title_setting())
-        configs.update(self.get_chat_ai_setting())
+        if self.type == TypeChoices.kael:
+            configs.update(self.get_chat_ai_setting())
         configs.update(self.get_xpack_license())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,

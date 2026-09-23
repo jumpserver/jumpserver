@@ -38,7 +38,7 @@ urlpatterns = [
     path('dingtalk/bind/start/', views.DingTalkEnableStartView.as_view(), name='dingtalk-bind-start'),
     path('dingtalk/qr/bind/', views.DingTalkQRBindView.as_view(), name='dingtalk-qr-bind'),
     path('dingtalk/qr/login/', views.DingTalkQRLoginView.as_view(), name='dingtalk-qr-login'),
-    path('dingtalk/qr/bind/<uuid:user_id>/callback/', views.DingTalkQRBindCallbackView.as_view(),
+    path('dingtalk/qr/bind/callback/', views.DingTalkQRBindCallbackView.as_view(),
          name='dingtalk-qr-bind-callback'),
     path('dingtalk/qr/login/callback/', views.DingTalkQRLoginCallbackView.as_view(), name='dingtalk-qr-login-callback'),
     path('dingtalk/oauth/login/', views.DingTalkOAuthLoginView.as_view(), name='dingtalk-oauth-login'),

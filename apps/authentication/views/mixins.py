@@ -34,5 +34,9 @@ class FlashMessageMixin:
 
     def verify_state_with_session_key(self, session_key):
         state = self.request.GET.get('state')
-        expected = self.request.session.pop(session_key, None)
-        return bool(state and expected and constant_time_compare(state, expected))
+        session_state = self.request.session.pop(session_key, None)
+        if not isinstance(state, str) or not isinstance(session_state, str):
+            return False
+        if not state or not session_state:
+            return False
+        return constant_time_compare(state, session_state)

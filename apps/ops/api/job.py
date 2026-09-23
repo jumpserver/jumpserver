@@ -104,9 +104,6 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
         self._parameters = serializer.validated_data.pop('parameters', None)
-        nodes = serializer.validated_data.pop('nodes', [])
-        assets = serializer.validated_data.get('assets', [])
-        assets = merge_nodes_and_assets(nodes, assets, self.request.user)
         instance = serializer.save()
 
         if instance.instant or run_after_save:

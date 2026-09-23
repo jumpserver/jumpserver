@@ -303,13 +303,30 @@ class CustomAutoSchema(AutoSchema):
         required_permissions, permission_dynamic = self.get_chat_ai_permission_metadata()
         operation['x-jms-required-permissions'] = list(required_permissions)
         operation['x-jms-permission-dynamic'] = permission_dynamic
+
+        action = getattr(self.view, 'action', '')
+        guidance = getattr(self.view, 'chat_ai_operation_guidance', {})
+        if isinstance(guidance, dict):
+            guidance = guidance.get(action)
+        if isinstance(guidance, str) and guidance.strip():
+            operation['x-jms-ai-guidance'] = guidance.strip()
+
+        reuse_policy = getattr(self.view, 'chat_ai_create_reuse', None)
+        if (
+            action == 'create' and self.method == 'POST' and
+            isinstance(reuse_policy, dict)
+        ):
+            operation['x-jms-create-reuse'] = reuse_policy
         return operation
 
 # 添加自定义字段的 OpenAPI 扩展
 from drf_spectacular.extensions import OpenApiSerializerFieldExtension
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.plumbing import build_basic_type
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField, BitChoicesField
+from common.serializers.fields import (
+    BitChoicesField, JSONManyToManyField, LabeledChoiceField,
+    ObjectRelatedField,
+)
 
 
 class ObjectRelatedFieldExtension(OpenApiSerializerFieldExtension):
@@ -320,6 +337,74 @@ class ObjectRelatedFieldExtension(OpenApiSerializerFieldExtension):
 
     def map_serializer_field(self, auto_schema, direction):
         return self.target.get_schema()
+
+
+class JSONManyToManyFieldExtension(OpenApiSerializerFieldExtension):
+    """Describe the selector shapes accepted by JSONManyToManyField."""
+    target_class = JSONManyToManyField
+
+    def map_serializer_field(self, auto_schema, direction):
+        field = self.target
+        common = {
+            'type': 'object',
+            'additionalProperties': False,
+        }
+        return {
+            'type': 'object',
+            'oneOf': [
+                {
+                    **common,
+                    'properties': {
+                        'type': {'type': 'string', 'enum': ['all']},
+                    },
+                    'required': ['type'],
+                },
+                {
+                    **common,
+                    'properties': {
+                        'type': {'type': 'string', 'enum': ['ids']},
+                        'ids': {
+                            'type': 'array',
+                            'items': {'type': 'string'},
+                            'minItems': 1,
+                        },
+                    },
+                    'required': ['type', 'ids'],
+                },
+                {
+                    **common,
+                    'properties': {
+                        'type': {'type': 'string', 'enum': ['attrs']},
+                        'attrs': {
+                            'type': 'array',
+                            'minItems': 1,
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'name': {'type': 'string'},
+                                    'match': {
+                                        'type': 'string',
+                                        'enum': [
+                                            'exact', 'in', 'contains',
+                                            'startswith', 'endswith', 'regex',
+                                            'not', 'gte', 'lte', 'gt', 'lt',
+                                            'ip_in', 'm2m_all', 'm2m_any',
+                                        ],
+                                        'default': 'exact',
+                                    },
+                                    'value': {},
+                                },
+                                'required': ['name', 'value'],
+                                'additionalProperties': False,
+                            },
+                        },
+                    },
+                    'required': ['type', 'attrs'],
+                },
+            ],
+            'description': getattr(field, 'help_text', '') or '',
+            'title': getattr(field, 'label', '') or '',
+        }
 
 
 class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):

@@ -389,7 +389,7 @@ REDIS_SSL_KEY = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), No
 REDIS_SSL_CERT = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
 REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
 REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA)
-REDIS_SSL_REQUIRED = 'none'
+REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
 REDIS_PROTOCOL = 'rediss' if REDIS_USE_SSL else 'redis'
 # Cache use sentinel

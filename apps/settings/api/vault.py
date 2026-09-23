@@ -29,11 +29,13 @@ class VaultTestingAPI(GenericAPIView):
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        for k, v in data.items():
-            if v:
+        for name in serializer.fields:
+            if name in data and data[name] not in ('', None):
                 continue
-            # 页面没有传递值, 从 settings 中获取
-            data[k] = getattr(settings, k, None)
+            # 页面没有传递值, 从 settings 中获取。False 是有效的开关值。
+            data[name] = getattr(settings, name, None)
+        if backend == 'openbao':
+            data['VAULT_OPENBAO_CACERT_FILE'] = settings.VAULT_OPENBAO_CACERT_FILE
         return data
 
     def post(self, request, backend):

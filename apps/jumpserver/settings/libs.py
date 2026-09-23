@@ -84,6 +84,7 @@ SPECTACULAR_SETTINGS = {
     # 添加自定义字段扩展
     'SERIALIZER_EXTENSIONS': [
         'jumpserver.views.schema.ObjectRelatedFieldExtension',
+        'jumpserver.views.schema.JSONManyToManyFieldExtension',
         'jumpserver.views.schema.LabeledChoiceFieldExtension',
         'jumpserver.views.schema.BitChoicesFieldExtension',
         'jumpserver.views.schema.LabelRelatedFieldExtension',

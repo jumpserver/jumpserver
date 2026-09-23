@@ -1,18 +1,44 @@
 # -*- coding: utf-8 -*-
 #
+from ipaddress import ip_network
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from .gateway import GatewayWithAccountSecretSerializer
 from ..models import Zone, Gateway
 
-__all__ = ['ZoneSerializer', 'ZoneWithGatewaySerializer', 'ZoneListSerializer']
+__all__ = ['ZoneSerializer', 'ZoneListSerializer', 'CIDRListField']
+
+
+class CIDRListField(serializers.ListField):
+    child = serializers.CharField(max_length=64)
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('max_length', 100)
+        super().__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        values = super().to_internal_value(data)
+        if self.max_length is not None and len(values) > self.max_length:
+            self.fail('max_length', max_length=self.max_length)
+        networks = []
+        for value in values:
+            try:
+                if '/' not in value:
+                    raise ValueError
+                network = str(ip_network(value, strict=False))
+            except ValueError:
+                raise serializers.ValidationError(_('Invalid CIDR: %s') % value)
+            if network not in networks:
+                networks.append(network)
+        return networks
 
 
 class ZoneSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
+    cidrs = CIDRListField(required=False, label=_('CIDR ranges'))
     gateways = ObjectRelatedField(
         many=True, required=False, label=_('Gateway'), queryset=Gateway.objects,
         help_text=_(
@@ -24,7 +50,7 @@ class ZoneSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = Zone
         fields_mini = ['id', 'name']
-        fields_small = fields_mini + ['comment']
+        fields_small = fields_mini + ['comment', 'cidrs', 'auto_assign']
         relation_count_fields = {
             'assets_amount': {
                 'relation': 'assets',
@@ -38,6 +64,16 @@ class ZoneSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'assets': {'required': False, 'label': _('Assets')},
         }
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        auto_assign = attrs.get('auto_assign', getattr(self.instance, 'auto_assign', False))
+        cidrs = attrs.get('cidrs', getattr(self.instance, 'cidrs', []))
+        if auto_assign and not cidrs:
+            raise serializers.ValidationError({
+                'cidrs': _('At least one CIDR is required when auto assignment is enabled.')
+            })
+        return attrs
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -64,11 +100,3 @@ class ZoneSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
 class ZoneListSerializer(ZoneSerializer):
     class Meta(ZoneSerializer.Meta):
         fields = list(set(ZoneSerializer.Meta.fields + ZoneSerializer.Meta.amount_fields) - {'assets'})
-
-
-class ZoneWithGatewaySerializer(serializers.ModelSerializer):
-    gateways = GatewayWithAccountSecretSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Zone
-        fields = '__all__'

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+from tempfile import NamedTemporaryFile
 from urllib.parse import quote
 
 import requests
@@ -19,12 +20,19 @@ class OpenBaoAPIError(Exception):
 class OpenBaoKVClient(object):
     max_versions = 20
 
-    def __init__(self, addr=None, token='', mount_point='pam', timeout=10, verify_tls=False):
+    def __init__(
+            self, addr=None, token='', mount_point='pam', timeout=10,
+            verify_tls=True, ca_cert='', ca_cert_file='',
+    ):
         self.addr = (addr or 'http://127.0.0.1:8200').rstrip('/')
         self.token = token or ''
         self.mount_point = (mount_point or 'pam').strip('/')
         self.timeout = int(timeout or 10)
         self.verify_tls = self._normalize_bool(verify_tls, default=True)
+        self.ca_cert = ca_cert or ''
+        self.ca_cert_file = ca_cert_file or ''
+        if self.ca_cert_file and self.addr == 'http://openbao:8200':
+            self.addr = 'https://openbao:8200'
         self.session = requests.Session()
 
     def is_active(self):
@@ -231,11 +239,22 @@ class OpenBaoKVClient(object):
             request_headers.update(headers)
 
         url = f'{self.addr}{path}'
-        try:
+
+        def send(verify):
             return self.session.request(
                 method, url, headers=request_headers,
-                timeout=self.timeout, verify=self.verify_tls, **kwargs
+                timeout=self.timeout, verify=verify, **kwargs
             )
+
+        try:
+            if self.verify_tls and self.ca_cert:
+                with NamedTemporaryFile(mode='w', suffix='.pem') as ca_file:
+                    ca_file.write(self.ca_cert)
+                    ca_file.flush()
+                    return send(ca_file.name)
+            if self.verify_tls and self.ca_cert_file:
+                return send(self.ca_cert_file)
+            return send(self.verify_tls)
         except request_exceptions.RequestException as e:
             raise OpenBaoAPIError(e)
 

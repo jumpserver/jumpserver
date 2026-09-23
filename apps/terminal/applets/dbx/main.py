@@ -1,3 +1,4 @@
+import os
 import sys
 
 from common import (block_input, unblock_input)
@@ -6,7 +7,10 @@ from app import AppletApplication
 
 
 def main():
-    base64_str = sys.argv[1]
+    if len(sys.argv) > 1:
+        base64_str = sys.argv[1]
+    else:
+        base64_str = os.getenv("JMS_APP_BASE64_ARG", "")
     data = convert_base64_to_dict(base64_str)
     applet_app = AppletApplication(**data)
     block_input()

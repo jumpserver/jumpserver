@@ -41,11 +41,6 @@ class ZoneViewSet(OrgBulkModelViewSet):
         'list': serializers.ZoneListSerializer,
     }
 
-    def get_serializer_class(self):
-        if self.request.query_params.get('gateway'):
-            return serializers.ZoneWithGatewaySerializer
-        return super().get_serializer_class()
-
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)

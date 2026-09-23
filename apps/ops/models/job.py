@@ -6,7 +6,7 @@ import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta, datetime
-from functools import partial
+from functools import cached_property, partial
 
 from celery import current_task
 from django.conf import settings
@@ -78,6 +78,22 @@ def get_parent_keys(key, include_self=True):
     if not include_self:
         keys.pop()
     return keys
+
+
+def sanitize_job_extra_vars(extra_vars):
+    """Drop Ansible connection overrides from job extra vars.
+
+    Extra vars outrank inventory, so ansible_* keys would redirect
+    execution or managed credentials. Job user params are namespaced
+    as jms_*; this is a fail-closed filter at the runner boundary.
+    """
+    if not extra_vars or not isinstance(extra_vars, dict):
+        return extra_vars or {}
+    return {
+        key: value
+        for key, value in extra_vars.items()
+        if not str(key).lower().startswith('ansible_')
+    }
 
 
 class JMSPermedInventory(JMSInventory):
@@ -165,7 +181,7 @@ class JMSPermedInventory(JMSInventory):
             for my_asset in node_asset_map[node_key]:
                 asset_permed_accounts_mapper[my_asset].update(accounts)
 
-        accounts = Account.objects.filter(asset__in=asset_ids)
+        accounts = Account.objects.filter(asset__in=asset_ids, is_active=True)
         for account in accounts:
             if account.asset_id not in asset_permed_accounts_mapper:
                 continue
@@ -303,6 +319,10 @@ class JobExecution(JMSOrgBaseModel):
             return self.job.get_history(self.job_version)
         return self.job
 
+    @cached_property
+    def inventory(self):
+        return self.current_job.inventory
+
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
@@ -364,7 +384,7 @@ class JobExecution(JMSOrgBaseModel):
         return module, shell
 
     def get_runner(self):
-        inv = self.current_job.inventory
+        inv = self.inventory
         inv.write_to_file(self.inventory_path)
         self.summary = self.result = {"excludes": {}}
         if len(inv.exclude_hosts) > 0:
@@ -375,9 +395,9 @@ class JobExecution(JMSOrgBaseModel):
         if isinstance(self.parameters, str):
             extra_vars = json.loads(self.parameters)
         else:
-            extra_vars = self.parameters if self.parameters else {}
-        static_variables = self.gather_static_variables()
-        extra_vars.update(static_variables)
+            extra_vars = dict(self.parameters) if self.parameters else {}
+        extra_vars = sanitize_job_extra_vars(extra_vars)
+        extra_vars.update(self.gather_static_variables())
 
         if self.current_job.type == Types.adhoc:
             module, args = self.compile_shell()
@@ -494,7 +514,7 @@ class JobExecution(JMSOrgBaseModel):
                     print("\033[31mcommand \'{}\' on asset {}({}) is rejected by acl {}\033[0m"
                           .format(self.current_job.args, asset.name, asset.address, acl))
                     CommandExecutionAlert({
-                        "assets": self.current_job.assets.all(),
+                        "assets": self.inventory.assets,
                         "input": self.material,
                         "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
@@ -520,7 +540,7 @@ class JobExecution(JMSOrgBaseModel):
         return False
 
     def check_command_acl(self):
-        for asset in self.current_job.assets.all():
+        for asset in self.inventory.assets:
             acls = CommandFilterACL.filter_queryset(
                 user=self.creator,
                 asset=asset,
@@ -532,7 +552,7 @@ class JobExecution(JMSOrgBaseModel):
         command = self.current_job.args
         if command and set(command.split()).intersection(set(settings.SECURITY_COMMAND_BLACKLIST)):
             CommandExecutionAlert({
-                "assets": self.current_job.assets.all(),
+                "assets": self.inventory.assets,
                 "input": self.material,
                 "risk_level": RiskLevelChoices.reject,
                 "user": self.creator,
@@ -549,11 +569,12 @@ class JobExecution(JMSOrgBaseModel):
             raise Exception("Playbook contains dangerous keywords")
 
     def check_assets_perms(self):
+        assets = self.inventory.assets
         all_permed_assets = UserPermAssetUtil(self.creator).get_all_assets()
-        has_permed_assets = set(self.current_job.assets.all()) & set(all_permed_assets)
+        has_permed_assets = set(assets) & set(all_permed_assets)
 
         error_assets_count = 0
-        for asset in self.current_job.assets.all():
+        for asset in assets:
             if asset not in has_permed_assets:
                 print("\033[31mAsset {}({}) has no access permission\033[0m".format(asset.name, asset.address))
                 error_assets_count += 1
@@ -562,7 +583,7 @@ class JobExecution(JMSOrgBaseModel):
             raise Exception("You do not have access rights to {} assets".format(error_assets_count))
 
     def check_data_masking_rules_acls(self):
-        for asset in self.current_job.assets.all():
+        for asset in self.inventory.assets:
             acls = DataMaskingRule.filter_queryset(
                 user=self.creator,
                 asset=asset,
