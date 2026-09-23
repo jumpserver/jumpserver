@@ -180,43 +180,64 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         VaultModelMixin.secret.fset(self, value)
         self._secret_explicitly_set = True
 
-    def save(self, *args, **kwargs):
+    def _set_save_org(self):
         # Match OrgModelMixin before resolving the organization-scoped template.
         from orgs.utils import get_current_org
         org = get_current_org()
         if not org.is_root():
             self.org_id = org.id
-        # Keep the credential snapshot and opt-out in the same database transaction.
+
+    def _get_previous_for_update(self, using):
+        if self._state.adding:
+            return None
+        return type(self)._base_manager.using(using).select_for_update().filter(pk=self.pk).first()
+
+    def _validate_template_transition(self, previous):
+        if not previous or not previous.follows_template:
+            return
+        if self.source != previous.source or self.source_id != previous.source_id:
+            raise ValidationError({'source_id': _('Disable template following before changing the source.')})
+        if self.follow_template and self.secret_type != previous.secret_type:
+            raise ValidationError({'secret_type': _('Disable template following before changing the secret type.')})
+
+    def _prepare_template_detach(self, previous, update_fields):
+        """Keep an explicit new credential, otherwise snapshot the template credential."""
+        if not previous or not previous.follows_template or self.follow_template:
+            return update_fields
+        if update_fields is not None and 'follow_template' not in update_fields:
+            raise ValidationError({'follow_template': _('Save the following state with the credential snapshot.')})
+        if not getattr(self, '_secret_explicitly_set', False):
+            if self.secret_type != previous.secret_type:
+                raise ValidationError({'secret': _('Provide credentials when changing the secret type.')})
+            self.secret = previous.secret
+        self._create_vault_on_detach = True
+        if update_fields is not None:
+            update_fields = list(set(update_fields) | {'_secret'})
+        return update_fields
+
+    def _prepare_template_following(self, update_fields):
+        """Validate the template reference and discard independent credentials."""
+        if not self.follow_template:
+            return update_fields
+        if not self.follows_template:
+            raise ValidationError({'follow_template': _('Only template accounts can follow a template.')})
+        self.get_source_template()
+        self._secret = None
+        if update_fields is not None and 'follow_template' in update_fields:
+            update_fields = list(set(update_fields) | {'_secret'})
+        return update_fields
+
+    def save(self, *args, **kwargs):
+        self._set_save_org()
         using = kwargs.get('using') or self._state.db or 'default'
+        # Keep the credential snapshot and opt-out in the same database transaction.
         with transaction.atomic(using=using):
-            previous = None
-            if not self._state.adding:
-                previous = type(self)._base_manager.using(using).select_for_update().filter(pk=self.pk).first()
-            update_fields = kwargs.get('update_fields')
-            if previous and previous.follows_template:
-                if self.source != previous.source or self.source_id != previous.source_id:
-                    raise ValidationError({'source_id': _('Disable template following before changing the source.')})
-                if self.follow_template and self.secret_type != previous.secret_type:
-                    raise ValidationError({'secret_type': _('Disable template following before changing the secret type.')})
-                if not self.follow_template:
-                    if update_fields is not None and 'follow_template' not in update_fields:
-                        raise ValidationError({'follow_template': _('Save the following state with the credential snapshot.')})
-                    has_new_secret = getattr(self, '_secret_explicitly_set', False)
-                    if not has_new_secret:
-                        if self.secret_type != previous.secret_type:
-                            raise ValidationError({'secret': _('Provide credentials when changing the secret type.')})
-                        self.secret = previous.secret
-                    self._create_vault_on_detach = True
-                    if update_fields is not None:
-                        kwargs['update_fields'] = list(set(update_fields) | {'_secret'})
-            if self.follow_template:
-                if not self.follows_template:
-                    raise ValidationError({'follow_template': _('Only template accounts can follow a template.')})
-                self.get_source_template()
-                # Do not retain an independent current credential while following.
-                self._secret = None
-                if update_fields is not None and 'follow_template' in update_fields:
-                    kwargs['update_fields'] = list(set(kwargs['update_fields']) | {'_secret'})
+            previous = self._get_previous_for_update(using)
+            self._validate_template_transition(previous)
+            update_fields = self._prepare_template_detach(previous, kwargs.get('update_fields'))
+            update_fields = self._prepare_template_following(update_fields)
+            if update_fields is not None:
+                kwargs['update_fields'] = update_fields
             try:
                 result = super().save(*args, **kwargs)
                 self.__dict__.pop('_secret_explicitly_set', None)
