@@ -290,6 +290,9 @@ class Config(dict):
         'VAULT_OPENBAO_TOKEN': '',
         'VAULT_OPENBAO_MOUNT_POINT': 'pam',
         'VAULT_OPENBAO_TIMEOUT': 10,
+        'VAULT_OPENBAO_VERIFY_TLS': True,
+        'VAULT_OPENBAO_CACERT_CONTENT': '',
+        'VAULT_OPENBAO_CACERT_FILE': '',
 
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',

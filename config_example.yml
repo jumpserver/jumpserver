@@ -122,6 +122,14 @@ REDIS_PORT: 6379
 # VAULT_OPENBAO_MOUNT_POINT: pam
 # VAULT_OPENBAO_TOKEN:
 # VAULT_OPENBAO_TIMEOUT: 10
+# VAULT_OPENBAO_VERIFY_TLS: true
+# Optional CA file mounted into the Core and Celery containers by the installer.
+# VAULT_OPENBAO_CACERT_FILE: /opt/jumpserver/data/certs/openbao/ca.crt
+# Optional PEM CA certificate used to verify the OpenBao server.
+# VAULT_OPENBAO_CACERT_CONTENT: |
+#   -----BEGIN CERTIFICATE-----
+#   ...
+#   -----END CERTIFICATE-----
 
 # LDAP/AD settings
 # LDAP 搜索分页数量
