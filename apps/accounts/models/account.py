@@ -141,6 +141,17 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             ('view_accountactivity', _('Can view activity')),
         ]
 
+    TEMPLATE_STATE_FIELDS = ('follow_template', 'source', 'source_id', 'secret_type', 'org_id')
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        if set(cls.TEMPLATE_STATE_FIELDS).issubset(field_names):
+            instance._loaded_template_state = tuple(
+                instance.__dict__[field] for field in cls.TEMPLATE_STATE_FIELDS
+            )
+        return instance
+
     @property
     def follows_template(self):
         return self.source == Source.TEMPLATE and self.follow_template
@@ -227,23 +238,44 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             update_fields = list(set(update_fields) | {'_secret'})
         return update_fields
 
+    def _save_with_locked_previous(self, previous, *args, **kwargs):
+        """Save a transition inside the transaction that locked ``previous``."""
+        self._set_save_org()
+        self._validate_template_transition(previous)
+        update_fields = self._prepare_template_detach(previous, kwargs.get('update_fields'))
+        update_fields = self._prepare_template_following(update_fields)
+        if update_fields is not None:
+            kwargs['update_fields'] = update_fields
+        try:
+            result = super().save(*args, **kwargs)
+            self.__dict__.pop('_secret_explicitly_set', None)
+            return result
+        finally:
+            self.__dict__.pop('_create_vault_on_detach', None)
+
+    def _can_skip_template_transition(self, update_fields):
+        if self._state.adding or update_fields is None:
+            return False
+        protected = {*self.TEMPLATE_STATE_FIELDS, 'secret', '_secret'}
+        if protected.intersection(update_fields) or getattr(self, '_secret_explicitly_set', False):
+            return False
+        # Only skip for a loaded, unchanged relationship. An in-memory opt-out
+        # still needs validation even when follow_template is missing from update_fields.
+        state = tuple(self.__dict__.get(field) for field in self.TEMPLATE_STATE_FIELDS)
+        return getattr(self, '_loaded_template_state', None) == state
+
     def save(self, *args, **kwargs):
         self._set_save_org()
+        update_fields = kwargs.get('update_fields')
+        if update_fields is not None:
+            update_fields = kwargs['update_fields'] = frozenset(update_fields)
+        if self._can_skip_template_transition(update_fields):
+            return super().save(*args, **kwargs)
         using = kwargs.get('using') or self._state.db or 'default'
         # Keep the credential snapshot and opt-out in the same database transaction.
         with transaction.atomic(using=using):
             previous = self._get_previous_for_update(using)
-            self._validate_template_transition(previous)
-            update_fields = self._prepare_template_detach(previous, kwargs.get('update_fields'))
-            update_fields = self._prepare_template_following(update_fields)
-            if update_fields is not None:
-                kwargs['update_fields'] = update_fields
-            try:
-                result = super().save(*args, **kwargs)
-                self.__dict__.pop('_secret_explicitly_set', None)
-                return result
-            finally:
-                self.__dict__.pop('_create_vault_on_detach', None)
+            return self._save_with_locked_previous(previous, *args, **kwargs)
 
     def __str__(self):
         if self.asset_id:

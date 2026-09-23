@@ -1,3 +1,5 @@
+from copy import copy
+
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -189,12 +191,13 @@ class AccountViewSet(OrgBulkModelViewSet):
             if not detach and any(account.follows_template for account in accounts):
                 raise TemplateFollowingConflict()
             for account in accounts:
+                previous = copy(account)
                 update_fields = ['secret']
                 if account.follows_template:
                     account.follow_template = False
                     update_fields.append('follow_template')
                 account.secret = None
-                account.save(update_fields=update_fields)
+                account._save_with_locked_previous(previous, update_fields=update_fields)
         return Response(status=HTTP_200_OK)
 
     def _copy_or_move_to_assets(self, request, move=False):

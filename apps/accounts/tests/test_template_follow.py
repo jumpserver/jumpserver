@@ -68,12 +68,9 @@ class TemplateFollowTests(SimpleTestCase):
             accounts.return_value.values_list.return_value = ['account-id']
             locked.return_value.filter.return_value.first.return_value = account
             template_sync_related_accounts.run('template-id')
-            accounts.assert_called_once_with(
-                source='template', source_id='template-id', follow_template=True,
-            )
-            locked.return_value.filter.assert_called_once_with(
-                id='account-id', source='template', source_id='template-id', follow_template=True,
-            )
+            templates.assert_not_called()
+            accounts.assert_not_called()
+            locked.assert_not_called()
 
     def test_sync_preserves_credentials_and_authentication_identity(self):
         account = Account(name='old', username='original', secret_type='ssh_key',
@@ -97,7 +94,7 @@ class TemplateFollowTests(SimpleTestCase):
         self.assertEqual(self.account.source_id, 'template-id')
         self.assertTrue(self.account.follow_template)
 
-    def test_queued_sync_respects_opt_out(self):
+    def test_empty_sync_does_not_query_templates_or_accounts(self):
         self.run_sync(None)
 
     @patch('accounts.serializers.account.template.BaseAccountSerializer.update')
@@ -307,3 +304,62 @@ class TemplateCredentialTests(SimpleTestCase):
         })
         self.assertFalse(account.follow_template)
         self.assertEqual(account.secret, 'new-user-password')
+
+
+class TemplateSavePerformanceTests(SimpleTestCase):
+    @patch('accounts.models.account.BaseAccount.save')
+    @patch('accounts.models.account.transaction.atomic')
+    @patch.object(Account, '_get_previous_for_update')
+    @patch.object(Account, 'get_source_template')
+    def test_partial_metadata_save_skips_template_queries_and_transaction(self, template, previous, atomic, save):
+        for follows in (False, True):
+            account = Account.from_db('default', list(Account.TEMPLATE_STATE_FIELDS),
+                                      [follows, 'template', 'template-id', 'password', 'org'])
+            account._set_save_org = Mock()
+            account.save(update_fields=['change_secret_status', 'date_updated'])
+        self.assertEqual(save.call_count, 2)
+        template.assert_not_called()
+        previous.assert_not_called()
+        atomic.assert_not_called()
+
+    @patch('accounts.models.account.BaseAccount.save')
+    @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
+    @patch.object(Account, '_get_previous_for_update', return_value=None)
+    def test_credential_fields_and_full_saves_still_lock(self, previous, atomic, save):
+        account = Account(source='local')
+        account._state.adding = False
+        for fields in (None, ['follow_template'], ['secret'], ['_secret'], ['secret_type'],
+                       ['source'], ['source_id'], ['org_id']):
+            with self.subTest(fields=fields):
+                previous.reset_mock()
+                account.save(update_fields=fields)
+                previous.assert_called_once()
+
+    @patch('accounts.models.account.BaseAccount.save')
+    @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
+    @patch.object(Account, '_get_previous_for_update')
+    def test_pending_credential_detach_cannot_use_metadata_fast_path(self, previous, atomic, save):
+        previous.return_value = Account(source='template', source_id='template-id', follow_template=True)
+        account = Account(source='template', source_id='template-id', follow_template=False)
+        account._state.adding = False
+        account.secret = 'replacement'
+        with self.assertRaises(serializers.ValidationError):
+            account.save(update_fields=['comment'])
+        save.assert_not_called()
+
+    @patch('accounts.models.account.BaseAccount.save')
+    @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
+    @patch.object(Account, '_get_previous_for_update')
+    def test_opt_out_without_explicit_secret_cannot_use_metadata_fast_path(self, previous, atomic, save):
+        account = Account.from_db('default', list(Account.TEMPLATE_STATE_FIELDS),
+                                  [True, 'template', 'template-id', 'password', 'org'])
+        account._set_save_org = Mock()
+        previous.return_value = Account(source='template', source_id='template-id', follow_template=True)
+        account.follow_template = False
+        with self.assertRaises(serializers.ValidationError):
+            account.save(update_fields=['comment'])
+        save.assert_not_called()
+
+    def test_deferred_template_state_keeps_transition_checks(self):
+        account = Account.from_db('default', ['follow_template'], [True])
+        self.assertFalse(account._can_skip_template_transition(['comment']))

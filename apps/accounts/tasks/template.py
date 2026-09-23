@@ -19,6 +19,9 @@ logger = get_logger(__name__)
 def template_sync_related_accounts(template_id, user_id=None):
     from accounts.models import Account, AccountTemplate
 
+    if not Account.TEMPLATE_SYNC_FIELDS:
+        return
+
     with tmp_to_root_org():
         template = AccountTemplate.objects.filter(id=template_id).first()
     if template is None:
