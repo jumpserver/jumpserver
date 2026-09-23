@@ -211,7 +211,7 @@ def authenticate(request=None, **credentials):
                     ''' The administrator has enabled 'Only allow login from user source'. 
                     The current user source is {}. Please contact the administrator. '''
                 ).format(source_display)
-            return temp_user
+            # A backend that rejects the user's source must never authenticate them.
 
     # The credentials supplied are invalid to all backends, fire signal
     user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
