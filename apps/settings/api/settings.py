@@ -81,7 +81,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     rbac_category_permissions = {
         'basic': 'settings.change_basic',
-        'tool': 'rbac.view_systemtools',
+        'tool': 'settings.change_systemtools',
         'terminal': 'settings.change_terminal',
         'luna': 'settings.change_terminal',
         'ops': 'settings.change_ops',
@@ -134,11 +134,11 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         return Setting.objects.all()
 
     def check_permissions(self, request):
-        ok = RoleBinding.is_org_admin(request.user)
         category = request.query_params.get('category', 'basic')
         perm_required = self.rbac_category_permissions.get(category)
 
-        if ok and perm_required == 'settings.view_setting':
+        if perm_required == 'settings.view_setting' and \
+                RoleBinding.is_org_admin(request.user):
             return True
 
         has = request.user.has_perm(perm_required)
