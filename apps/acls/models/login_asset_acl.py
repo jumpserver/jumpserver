@@ -23,17 +23,19 @@ class LoginAssetACL(UserAssetAccountBaseACL):
     @transaction.atomic
     def create_login_asset_review_ticket(cls, user, asset, account_username, assignees, org_id, workflow=None):
         from tickets.const import TicketType
-        from tickets.models import ApplyLoginAssetTicket
+        from tickets.models import Ticket
         title = _('Login asset confirm') + ' ({})'.format(user)
         data = {
             'title': title,
             'org_id': org_id,
             'applicant': user,
-            'apply_login_user': user,
-            'apply_login_asset': asset,
-            'apply_login_account': account_username,
             'type': TicketType.login_asset_confirm,
+            'request_data': {
+                'apply_login_user': str(user.pk),
+                'apply_login_asset': str(asset.pk),
+                'apply_login_account': account_username,
+            },
         }
-        ticket = ApplyLoginAssetTicket.objects.create(**data)
+        ticket = Ticket.objects.create(**data)
         ticket.open_by_system(assignees, workflow=workflow)
         return ticket

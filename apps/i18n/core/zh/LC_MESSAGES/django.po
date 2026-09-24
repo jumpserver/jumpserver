@@ -14096,3 +14096,39 @@ msgstr "审批任务"
 
 msgid "Workflow event"
 msgstr "流程事件"
+
+#: tickets/plugins
+msgid "View account password"
+msgstr "查看账号密码"
+
+#: tickets/plugins
+msgid "Change account password"
+msgstr "账号改密"
+
+#: tickets/plugins
+msgid "File upload / download"
+msgstr "文件上传下载"
+
+#: tickets/plugins
+msgid "Download session recording"
+msgstr "会话录屏下载"
+
+#: tickets/plugins
+msgid "Authorized users"
+msgstr "授权用户"
+
+#: tickets/plugins
+msgid "Request parameters"
+msgstr "申请参数"
+
+#: tickets/plugins
+msgid "Validity (seconds)"
+msgstr "有效时长（秒）"
+
+#: tickets/plugins
+msgid "File paths"
+msgstr "文件路径"
+
+#: tickets/plugins
+msgid "Direction"
+msgstr "方向"

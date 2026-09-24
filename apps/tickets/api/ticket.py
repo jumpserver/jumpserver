@@ -16,25 +16,19 @@ from rbac.permissions import RBACPermission
 from tickets import filters
 from tickets import serializers
 from tickets.reporting import TicketReportExporter
-from tickets.models import (
-    Ticket, ApplyAssetTicket, ApplyLoginTicket,
-    ApplyLoginAssetTicket, ApplyCommandTicket
-)
+from tickets.models import Ticket
 from tickets.permissions.ticket import IsAssignee, IsApplicant
 from tickets.errors import AlreadyClosed
 from ..const import TicketAction
 
-__all__ = [
-    'TicketViewSet', 'ApplyAssetTicketViewSet',
-    'ApplyLoginTicketViewSet', 'ApplyLoginAssetTicketViewSet',
-    'ApplyCommandTicketViewSet'
-]
+__all__ = ['TicketViewSet']
 
 
 class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketSerializer
     serializer_classes = {
-        'approve': serializers.TicketApproveSerializer
+        'approve': serializers.TicketApproveSerializer,
+        'open': serializers.PluginTicketApplySerializer,
     }
     model = Ticket
     report_exporter_class = TicketReportExporter
@@ -44,13 +38,19 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
         'title', 'type', 'status'
     ]
     ordering_fields = [
-        'title', 'serial_num', 'type', 'state', 'status', 'applicant',
+        'title', 'serial_num', 'type', 'state', 'status', 'origin', 'applicant',
         'date_created',
     ]
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',
     }
+
+    def get_serializer_class(self):
+        if (getattr(self, 'action', None) != 'open' and self.request.method in ('OPTIONS', 'POST')
+                and self.request.query_params.get('type') == 'apply_asset'):
+            return serializers.ApplyAssetSerializer
+        return super().get_serializer_class()
 
     def retrieve(self, request, *args, **kwargs):
         with tmp_to_root_org():
@@ -68,10 +68,6 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
 
-    def ticket_not_allowed(self):
-        if self.model == Ticket:
-            raise MethodNotAllowed(self.action)
-
     def get_queryset(self):
         with tmp_to_root_org():
             queryset = self.model.get_user_related_tickets(self.request.user)
@@ -85,8 +81,6 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
     def open(self, request, *args, **kwargs):
-        if self.model is not ApplyAssetTicket:
-            raise MethodNotAllowed(request.method, detail='Review tickets are created by their ACL business entrypoints.')
         with tmp_to_root_org():
             return super().create(request, *args, **kwargs)
 
@@ -124,31 +118,3 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=[PUT], permission_classes=[IsAuthenticated, ])
     def bulk(self, request, *args, **kwargs):
         raise MethodNotAllowed(request.method, detail='Use exact approval-task IDs.')
-
-
-class ApplyAssetTicketViewSet(TicketViewSet):
-    model = ApplyAssetTicket
-    filterset_class = filters.ApplyAssetTicketFilter
-    serializer_class = serializers.ApplyAssetSerializer
-    serializer_classes = {
-        'open': serializers.ApplyAssetSerializer,
-        'approve': serializers.ApproveAssetSerializer
-    }
-
-
-class ApplyLoginTicketViewSet(TicketViewSet):
-    model = ApplyLoginTicket
-    filterset_class = filters.ApplyLoginTicketFilter
-    serializer_class = serializers.LoginReviewSerializer
-
-
-class ApplyLoginAssetTicketViewSet(TicketViewSet):
-    model = ApplyLoginAssetTicket
-    filterset_class = filters.ApplyLoginAssetTicketFilter
-    serializer_class = serializers.LoginAssetReviewSerializer
-
-
-class ApplyCommandTicketViewSet(TicketViewSet):
-    model = ApplyCommandTicket
-    filterset_class = filters.ApplyCommandTicketFilter
-    serializer_class = serializers.ApplyCommandReviewSerializer

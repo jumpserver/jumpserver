@@ -555,13 +555,13 @@ class AuthACLMixin:
             raise errors.LoginConfirmOtherError(ticket_id, status, username)
 
     def get_ticket(self):
-        from tickets.models import ApplyLoginTicket
+        from tickets.models import Ticket
         ticket_id = self.request.session.get("auth_ticket_id")
         logger.debug('Login confirm ticket id: {}'.format(ticket_id))
         if not ticket_id:
             ticket = None
         else:
-            ticket = ApplyLoginTicket.all().filter(id=ticket_id).first()
+            ticket = Ticket.all().filter(id=ticket_id, type='login_confirm').first()
         return ticket
 
 

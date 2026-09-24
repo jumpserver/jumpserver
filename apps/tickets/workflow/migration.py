@@ -27,7 +27,7 @@ def legacy_ticket_data(ticket):
     edges.append([previous, 'end'])
     warnings = []
     try:
-        context = build_context(ticket.spec_ticket)
+        context = build_context(ticket)
     except (WorkflowConfigurationError, AttributeError) as exc:
         warnings.append(str(exc))
         context = {'applicant': user_snapshot(ticket.applicant), 'request': {'type': ticket.type, 'title': ticket.title}}

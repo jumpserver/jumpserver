@@ -6,6 +6,7 @@ class NodeType(TextChoices):
     start = 'start', _('Start')
     approval = 'approval', _('Approval')
     condition = 'condition', _('Condition')
+    cc = 'cc', _('CC')
     end = 'end', _('End')
 
 

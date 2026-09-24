@@ -3,14 +3,21 @@ from django.db.models import Max
 from django.utils import timezone
 
 from tickets.models import Workflow, WorkflowVersion, WorkflowNode, WorkflowEdge
+from .approvers import available_users
 from .definition import validate_definition
-from .errors import WorkflowConflict
+from .errors import WorkflowConfigurationError, WorkflowConflict
 
 
 @transaction.atomic
 def publish_workflow(workflow, definition, *, actor=None, expected_version=None):
     definition = validate_definition(definition)
     workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
+    cc_user_ids = {user_id for node in definition['nodes'] if node['type'] == 'cc'
+                   for user_id in node['config']['users']}
+    if cc_user_ids:
+        valid_ids = {str(pk) for pk in available_users(workflow.org_id).filter(pk__in=cc_user_ids).values_list('pk', flat=True)}
+        if valid_ids != cc_user_ids:
+            raise WorkflowConfigurationError('CC recipients must be active organization members.')
     current = workflow.active_version.number if workflow.active_version_id else 0
     if expected_version is not None and expected_version != current:
         raise WorkflowConflict('A newer version was published. Reload before publishing.')

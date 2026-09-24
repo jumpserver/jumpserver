@@ -103,6 +103,17 @@ class WorkflowDefinitionTests(SimpleTestCase):
         with self.assertRaises(WorkflowConfigurationError):
             validate_definition(branch)
 
+    def test_cc_node_requires_user_ids_and_preserves_position(self):
+        graph = deepcopy(self.definition)
+        graph['nodes'].insert(1, {'id': 'cc', 'type': 'cc', 'config': {'users': [str(uuid4())]}})
+        graph['edges'] = [['start', 'cc'], ['cc', 'approval_0'], ['approval_0', 'end']]
+        self.assertEqual(validate_definition(graph)['nodes'][1]['type'], 'cc')
+        for config in ({'users': []}, {'users': ['bad']}, {'users': [str(uuid4())], 'script': 'x'}):
+            invalid = deepcopy(graph)
+            invalid['nodes'][1]['config'] = config
+            with self.subTest(config=config), self.assertRaises(WorkflowConfigurationError):
+                validate_definition(invalid)
+
     def test_conditions_use_domain_types_and_explicit_collection_semantics(self):
         context = {'assets': [{'labels': {'env': 'test'}}, {'labels': {'env': 'prod'}}],
                    'request': {'duration': 36000}, 'risk_level': 'critical', 'actions': ['connect']}

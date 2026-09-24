@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from orgs.mixins.models import JMSOrgBaseModel
-from tickets.const import TicketType
+from tickets.plugins import ticket_type_choices
 from tickets.workflow.const import NodeType
 
 __all__ = ['Workflow', 'WorkflowVersion', 'WorkflowNode', 'WorkflowEdge']
@@ -14,10 +14,9 @@ __all__ = ['Workflow', 'WorkflowVersion', 'WorkflowNode', 'WorkflowEdge']
 
 class Workflow(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    type = models.CharField(max_length=64, choices=TicketType.choices, verbose_name=_('Type'))
+    type = models.CharField(max_length=64, choices=ticket_type_choices, verbose_name=_('Type'))
     enabled = models.BooleanField(default=False, verbose_name=_('Enabled'))
     is_system = models.BooleanField(default=False, editable=False)
-    cc_users = models.ManyToManyField('users.User', blank=True, related_name='+', verbose_name=_('CC users'))
     active_version = models.ForeignKey(
         'WorkflowVersion', null=True, blank=True, on_delete=models.PROTECT,
         related_name='+', editable=False,

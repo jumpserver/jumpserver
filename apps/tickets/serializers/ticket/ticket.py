@@ -7,9 +7,10 @@ from rest_framework import serializers
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
-from tickets.const import TicketType, TicketStatus, TicketState
+from tickets.const import TicketType, TicketStatus, TicketState, TicketOrigin
 from tickets.models import Ticket, TicketAssignee, Workflow
 from users.models import User
+from tickets.plugins import get_ticket_plugin, ticket_type_choices
 
 __all__ = [
     'TicketApplySerializer', 'TicketApproveSerializer', 'TicketSerializer',
@@ -24,6 +25,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         label=_('Ticket status'),
         help_text=_('Indicates whether the ticket is open or finished')
     )
+    origin = LabeledChoiceField(choices=TicketOrigin.choices, read_only=True, label=_('Ticket origin'))
     state = LabeledChoiceField(
         choices=TicketState.choices, read_only=True,
         label=_('Approval result'),
@@ -42,6 +44,21 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
 
     workflow_instance = serializers.SerializerMethodField()
     my_tasks = serializers.SerializerMethodField()
+    request_items = serializers.SerializerMethodField()
+    execution_mode = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_request_items(obj):
+        return get_ticket_plugin(obj.type).request_items(obj)
+
+    @staticmethod
+    def get_execution_mode(obj):
+        instance = getattr(obj, 'workflow_instance', None)
+        if instance:
+            mode = instance.context.get('plugin', {}).get('execution_mode')
+            if mode:
+                return mode
+        return get_ticket_plugin(obj.type).execution_mode
 
     @staticmethod
     def get_workflow_instance(obj):
@@ -63,8 +80,9 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         fields_m2m = ['cc_users']
         read_only_fields = [
             'serial_num', 'process_map', 'approval_step', 'type',
-            'state', 'applicant', 'status', 'date_created',
-            'date_updated', 'org_name', 'rel_snapshot', 'workflow_instance', 'my_tasks'
+            'state', 'applicant', 'status', 'origin', 'date_created',
+            'date_updated', 'org_name', 'rel_snapshot', 'workflow_instance', 'my_tasks',
+            'request_data', 'request_items', 'execution_mode'
         ]
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
@@ -77,7 +95,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         tp = self.fields.get('type')
         if not tp:
             return
-        choices = tp.choices
+        choices = dict(ticket_type_choices())
         choices.pop(TicketType.general, None)
         tp.choices = choices.items()
 
@@ -118,8 +136,8 @@ class TicketApplySerializer(TicketSerializer):
             raise serializers.ValidationError({'org_id': 'Select a concrete organization.'})
         user = self.context['request'].user
         applicant_id = attrs.pop('applicant_id', user.pk)
-        if applicant_id != user.pk and not user.has_perm('tickets.add_superticket'):
-            raise PermissionDenied('Submitting for another user requires super-ticket permission.')
+        if applicant_id != user.pk:
+            raise PermissionDenied('The applicant must be the submitting user. Select authorized users in the request parameters.')
         applicant = available_users(org_id).filter(pk=applicant_id).first()
         if not applicant:
             raise serializers.ValidationError({'applicant': 'Select an active member of this organization.'})

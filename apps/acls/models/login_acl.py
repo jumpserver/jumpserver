@@ -31,7 +31,7 @@ class LoginACL(UserBaseACL):
     @transaction.atomic
     def create_confirm_ticket(self, request, user):
         from tickets import const
-        from tickets.models import ApplyLoginTicket
+        from tickets.models import Ticket
         from orgs.models import Organization
         title = _('Login confirm') + ' {}'.format(user)
         login_ip = get_request_ip(request) if request else ''
@@ -41,13 +41,15 @@ class LoginACL(UserBaseACL):
         data = {
             'title': title,
             'applicant': user,
-            'apply_login_ip': login_ip,
             'org_id': Organization.ROOT_ID,
-            'apply_login_city': login_city,
-            'apply_login_datetime': login_datetime,
             'type': const.TicketType.login_confirm,
+            'request_data': {
+                'apply_login_ip': login_ip,
+                'apply_login_city': login_city,
+                'apply_login_datetime': login_datetime.isoformat(),
+            },
         }
-        ticket = ApplyLoginTicket.objects.create(**data)
+        ticket = Ticket.objects.create(**data)
         assignees = self.reviewers.all()
         ticket.open_by_system(assignees, workflow=self.workflow)
         return ticket
