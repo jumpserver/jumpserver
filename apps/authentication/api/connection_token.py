@@ -31,6 +31,7 @@ from accounts.personal_credentials import (
     validate_personal_credential_secret_type,
 )
 from accounts.utils import validate_account_username, validate_ssh_key
+from acls.models import ConnectMethodACL
 from acls.notifications import AssetLoginReminderMsg
 from assets.const import Protocol
 from assets.models import Asset
@@ -902,6 +903,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             self, user, asset, account_alias, protocol, connect_method,
             permed_account=None,
     ):
+        if not ConnectMethodACL.is_method_allowed(user, asset, connect_method, protocol):
+            raise JMSException(
+                code='connect_method_rejected',
+                detail=_('Connect method is not allowed for this asset')
+            )
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
@@ -1187,9 +1193,8 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             "expired": instance.is_expired
         }
         try:
-            if instance.personal_credential_id:
-                instance.is_valid()
-            else:
+            instance.is_valid()
+            if not instance.personal_credential_id:
                 self._validate_perm(
                     instance.user,
                     instance.asset,

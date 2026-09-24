@@ -196,6 +196,11 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset or not self.asset.is_active:
             error = _('No asset or inactive asset')
             raise PermissionDenied(error)
+        from acls.models import ConnectMethodACL
+        if not ConnectMethodACL.is_method_allowed(
+            self.user, self.asset, self.connect_method, self.protocol
+        ):
+            raise PermissionDenied(_('Connect method is not allowed for this asset'))
         if self.protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
             config = self.asset.spec_info or {}
             protocol = self.platform.protocols.filter(name=self.protocol).first()
