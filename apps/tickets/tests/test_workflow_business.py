@@ -252,10 +252,26 @@ class WorkflowBusinessTests(TestCase):
         self.assertEqual(denied.status_code, 403)
 
     def test_cc_can_read_instance_but_cannot_decide(self):
-        workflow = self.workflow()
-        workflow.cc_users.add(self.carol)
+        definition = approval_definition([self.alice], levels=2)
+        definition['nodes'].insert(2, {'id': 'notify', 'type': 'cc', 'config': {
+            'users': [str(self.carol.pk)],
+        }})
+        definition['edges'] = [['start', 'approval_0'], ['approval_0', 'notify'],
+                               ['notify', 'approval_1'], ['approval_1', 'end']]
+        workflow = self.workflow(definition=definition)
         ticket = self.ticket(workflow)
         instance = submit_ticket(ticket)
+        self.assertFalse(ticket.cc_users.filter(pk=self.carol.pk).exists())
+        before = self.api_request(WorkflowInstanceViewSet, 'retrieve', self.carol, pk=instance.pk)
+        self.assertEqual(before.status_code, 404)
+        self.engine.approve(self.task(instance), self.alice)
+        self.assertTrue(ticket.cc_users.filter(pk=self.carol.pk).exists())
+        cc_event = instance.events.get(type='cc.added')
+        self.assertEqual([item['id'] for item in cc_event.data['recipients']], [str(self.carol.pk)])
+        from tickets.workflow.business import deliver_event
+        with patch('tickets.notifications.TicketUpdatedToCcUserMessage.publish_async') as notify:
+            deliver_event(cc_event.pk)
+            notify.assert_called_once()
         allowed = self.api_request(WorkflowInstanceViewSet, 'retrieve', self.carol, pk=instance.pk)
         self.assertEqual(allowed.status_code, 200, allowed.data)
         denied = self.api_request(ApprovalTaskViewSet, 'approve', self.carol, pk=self.task(instance).pk, method='post')

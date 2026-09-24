@@ -28,6 +28,11 @@ class TicketStatus(TextChoices):
     closed = 'closed', _("Ticket finished")
 
 
+class TicketOrigin(TextChoices):
+    manual = 'manual', _("Manual request")
+    system = 'system', _("System triggered")
+
+
 class StepState(TextChoices):
     pending = 'pending', _('Step pending')
     closed = 'closed', _("Step closed")

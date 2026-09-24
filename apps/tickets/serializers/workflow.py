@@ -1,20 +1,23 @@
 from django.db import transaction
 from rest_framework import serializers
-from common.serializers.fields import ObjectRelatedField
-from users.models import User
 
 from orgs.utils import current_org
 from tickets.models import Workflow, WorkflowVersion, WorkflowInstance, WorkflowNodeInstance, ApprovalTask, WorkflowEvent
 from tickets.workflow.definition import validate_definition
+from tickets.plugins import ticket_plugins
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
-    cc_users = ObjectRelatedField(queryset=User.objects, many=True, required=False, attrs=('id', 'name', 'username'))
+    type_label = serializers.CharField(source='get_type_display', read_only=True)
     active_version_number = serializers.IntegerField(source='active_version.number', read_only=True, default=None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['type'].choices = [(p.type, p.label) for p in ticket_plugins.all(visible=True)]
 
     class Meta:
         model = Workflow
-        fields = ['id', 'name', 'type', 'enabled', 'comment', 'org_id', 'active_version', 'cc_users',
+        fields = ['id', 'name', 'type', 'type_label', 'enabled', 'comment', 'org_id', 'active_version',
                   'active_version_number', 'legacy_flow_id', 'migration_notes', 'created_by', 'date_created', 'date_updated']
         read_only_fields = ['org_id', 'active_version', 'legacy_flow_id', 'migration_notes',
                             'created_by', 'date_created', 'date_updated']
@@ -22,12 +25,6 @@ class WorkflowSerializer(serializers.ModelSerializer):
         validators = []
 
     def validate(self, attrs):
-        from tickets.workflow.approvers import available_users
-        if 'cc_users' in attrs:
-            org_id = self.instance.org_id if self.instance else str(current_org.id)
-            ids = {user.pk for user in attrs['cc_users']}
-            if available_users(org_id).filter(pk__in=ids).count() != len(ids):
-                raise serializers.ValidationError({'cc_users': 'Select active organization members.'})
         if self.instance and 'type' in attrs and attrs['type'] != self.instance.type and self.instance.versions.exists():
             raise serializers.ValidationError({'type': 'A published workflow cannot change ticket type.'})
         if attrs.get('enabled') and (not self.instance or not self.instance.active_version_id):

@@ -62,6 +62,15 @@ def validate_approval(config):
         raise WorkflowConfigurationError('Timeout action must be expire or reject.')
 
 
+def validate_cc(config):
+    if set(config) != {'users'} or not isinstance(config['users'], list) or not 1 <= len(config['users']) <= 1000:
+        raise WorkflowConfigurationError('A CC node requires between 1 and 1000 user IDs.')
+    try:
+        config['users'] = list(dict.fromkeys(str(UUID(value)) for value in config['users']))
+    except (ValueError, TypeError, AttributeError):
+        raise WorkflowConfigurationError('CC user IDs must be UUIDs.')
+
+
 def validate_definition(definition):
     """Return a canonical, bounded, exclusive-branch DAG; never execute source code."""
     definition = json_snapshot(definition)
@@ -79,7 +88,7 @@ def validate_definition(definition):
         key, kind = node.get('id'), node.get('type')
         if not isinstance(key, str) or not re.fullmatch(r'[\w-]{1,64}', key) or key in by_id:
             raise WorkflowConfigurationError('Node IDs must be unique strings of up to 64 letters, digits, underscores or hyphens.')
-        if kind not in ('start', 'approval', 'condition', 'end'):
+        if kind not in ('start', 'approval', 'condition', 'cc', 'end'):
             raise WorkflowConfigurationError('Unsupported node type.')
         node.setdefault('name', key)
         if not isinstance(node['name'], str) or len(node['name']) > 128:
@@ -91,6 +100,8 @@ def validate_definition(definition):
             validate_approval(config)
         elif kind == 'condition':
             validate_condition(config)
+        elif kind == 'cc':
+            validate_cc(config)
         elif config:
             raise WorkflowConfigurationError('Start and end nodes do not accept configuration.')
         position = node.setdefault('position', {'x': 0, 'y': 0})
