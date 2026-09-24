@@ -217,6 +217,12 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
         'FavoriteAsset', 'FavoriteFolder', 'ChangeSecretRecord', 'AppProvider',
         'Variable', 'LeakPasswords',
+        # Audit records and delivery bookkeeping are not administrator resource changes.
+        'ApplicationAudit', 'ApplicationEventDelivery', 'ApplicationEventAttempt',
+        # Webhook targets and headers are encrypted application secrets.
+        'ApplicationWebhook',
+        # Current client credential state is derived operational bookkeeping.
+        'CredentialClientStatus',
         # OAuth authorization codes are short-lived protocol artifacts.
         'Grant',
     }

@@ -311,7 +311,7 @@ class TemplateSavePerformanceTests(SimpleTestCase):
     @patch('accounts.models.account.transaction.atomic')
     @patch.object(Account, '_get_previous_for_update')
     @patch.object(Account, 'get_source_template')
-    def test_partial_metadata_save_skips_template_queries_and_transaction(self, template, previous, atomic, save):
+    def test_partial_metadata_save_keeps_transaction_without_template_queries(self, template, previous, atomic, save):
         for follows in (False, True):
             account = Account.from_db('default', list(Account.TEMPLATE_STATE_FIELDS),
                                       [follows, 'template', 'template-id', 'password', 'org'])
@@ -319,8 +319,8 @@ class TemplateSavePerformanceTests(SimpleTestCase):
             account.save(update_fields=['change_secret_status', 'date_updated'])
         self.assertEqual(save.call_count, 2)
         template.assert_not_called()
-        previous.assert_not_called()
-        atomic.assert_not_called()
+        self.assertEqual(previous.call_count, 2)
+        self.assertEqual(atomic.call_count, 2)
 
     @patch('accounts.models.account.BaseAccount.save')
     @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
@@ -376,7 +376,7 @@ class TemplateSavePerformanceTests(SimpleTestCase):
     @patch('accounts.models.account.transaction.atomic')
     @patch.object(Account, '_get_previous_for_update')
     @patch.object(Account, 'get_source_template')
-    def test_full_metadata_save_excludes_credentials_without_extra_queries(self, template, previous, atomic, save):
+    def test_full_metadata_save_excludes_credentials_and_keeps_transaction(self, template, previous, atomic, save):
         for source, follows in (('local', False), ('template', False), ('template', True)):
             with self.subTest(source=source, follows=follows):
                 account = self.loaded_account(source=source, source_id='template-id', follow_template=follows)
@@ -387,8 +387,8 @@ class TemplateSavePerformanceTests(SimpleTestCase):
                 self.assertTrue({'name', 'comment', 'date_updated'}.issubset(fields))
                 self.assertFalse(fields.intersection({*Account.TEMPLATE_STATE_FIELDS, '_secret', 'id'}))
         template.assert_not_called()
-        previous.assert_not_called()
-        atomic.assert_not_called()
+        self.assertEqual(previous.call_count, 3)
+        self.assertEqual(atomic.call_count, 3)
 
     @patch('accounts.models.account.BaseAccount.save')
     @patch('accounts.models.account.transaction.atomic')
@@ -402,7 +402,7 @@ class TemplateSavePerformanceTests(SimpleTestCase):
             self.assertFalse(getattr(account, '_secret_explicitly_set', False))
         self.assertEqual(save.call_count, 2)
         template.assert_not_called()
-        atomic.assert_not_called()
+        self.assertEqual(atomic.call_count, 2)
 
     @patch('accounts.models.account.BaseAccount.save')
     @patch('accounts.models.account.transaction.atomic', return_value=nullcontext())
