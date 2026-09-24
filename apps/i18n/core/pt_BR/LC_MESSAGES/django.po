@@ -14553,3 +14553,37 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "Não é possível verificar as credenciais porque a ACL de login do ativo exige uma ação adicional."
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "Responsável pelo ativo"
+
+msgid "Manager"
+msgstr "Manager"
+
+msgid "Workflow"
+msgstr "Workflow"
+
+msgid "Approval workflow"
+msgstr "Approval workflow"
+
+msgid "Workflow version"
+msgstr "Workflow version"
+
+msgid "Workflow instance"
+msgstr "Workflow instance"
+
+msgid "Workflow node"
+msgstr "Workflow node"
+
+msgid "Workflow edge"
+msgstr "Workflow edge"
+
+msgid "Workflow node instance"
+msgstr "Workflow node instance"
+
+msgid "Approval task"
+msgstr "Approval task"
+
+msgid "Workflow event"
+msgstr "Workflow event"

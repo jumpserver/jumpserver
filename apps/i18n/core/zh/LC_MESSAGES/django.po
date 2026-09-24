@@ -14074,3 +14074,73 @@ msgstr "无效的 CIDR：%s"
 
 msgid "At least one CIDR is required when auto assignment is enabled."
 msgstr "启用自动纳入时，至少需要配置一个 CIDR 网段。"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "资产负责人"
+
+msgid "Manager"
+msgstr "直属负责人"
+
+msgid "Workflow"
+msgstr "审批流程"
+
+msgid "Approval workflow"
+msgstr "审批流程"
+
+msgid "Workflow version"
+msgstr "流程版本"
+
+msgid "Workflow instance"
+msgstr "流程实例"
+
+msgid "Workflow node"
+msgstr "流程节点"
+
+msgid "Workflow edge"
+msgstr "流程连线"
+
+msgid "Workflow node instance"
+msgstr "节点实例"
+
+msgid "Approval task"
+msgstr "审批任务"
+
+msgid "Workflow event"
+msgstr "流程事件"
+
+#: tickets/plugins
+msgid "View account password"
+msgstr "查看账号密码"
+
+#: tickets/plugins
+msgid "Change account password"
+msgstr "账号改密"
+
+#: tickets/plugins
+msgid "File upload / download"
+msgstr "文件上传下载"
+
+#: tickets/plugins
+msgid "Download session recording"
+msgstr "会话录屏下载"
+
+#: tickets/plugins
+msgid "Authorized users"
+msgstr "授权用户"
+
+#: tickets/plugins
+msgid "Request parameters"
+msgstr "申请参数"
+
+#: tickets/plugins
+msgid "Validity (seconds)"
+msgstr "有效时长（秒）"
+
+#: tickets/plugins
+msgid "File paths"
+msgstr "文件路径"
+
+#: tickets/plugins
+msgid "Direction"
+msgstr "方向"

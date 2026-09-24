@@ -42,7 +42,9 @@ class TicketReportExporter(BaseListReportExporter):
             type_counter[str(ticket.get_type_display())] += 1
             state_counter[str(ticket.get_state_display())] += 1
             status_counter[str(ticket.get_status_display())] += 1
-            approval_step_counter[str(ticket.approval_step)] += 1
+            instance = getattr(ticket, 'workflow_instance', None)
+            step_count = instance.node_instances.filter(node__type='approval').exclude(state='skipped').count() if instance else ticket.approval_step
+            approval_step_counter[str(step_count)] += 1
 
             org_name = getattr(ticket, 'org_name', None)
             if org_name:

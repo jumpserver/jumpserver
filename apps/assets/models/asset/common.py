@@ -210,6 +210,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     platform = models.ForeignKey(
         Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets'
     )
+    owner = models.ForeignKey(
+        'users.User', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='owned_assets', verbose_name=_('Asset owner'),
+    )
     zone = models.ForeignKey(
         "assets.Zone", null=True, blank=True, related_name='assets',
         verbose_name=_("Zone"), on_delete=models.SET_NULL

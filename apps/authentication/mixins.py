@@ -524,7 +524,7 @@ class AuthACLMixin:
             return
         if not acl.is_action(acl.ActionChoices.review):
             return
-        if acl.is_user_in_reviewers(user):
+        if not acl.workflow_id and acl.is_user_in_reviewers(user):
             # 如果用户在审核人列表中，则不需要审核，直接通过
             # 避免管理员admin创建一条针对所有用户的复核规则导致admin自己也无法登录了
             return
@@ -555,13 +555,13 @@ class AuthACLMixin:
             raise errors.LoginConfirmOtherError(ticket_id, status, username)
 
     def get_ticket(self):
-        from tickets.models import ApplyLoginTicket
+        from tickets.models import Ticket
         ticket_id = self.request.session.get("auth_ticket_id")
         logger.debug('Login confirm ticket id: {}'.format(ticket_id))
         if not ticket_id:
             ticket = None
         else:
-            ticket = ApplyLoginTicket.all().filter(id=ticket_id).first()
+            ticket = Ticket.all().filter(id=ticket_id, type='login_confirm').first()
         return ticket
 
 

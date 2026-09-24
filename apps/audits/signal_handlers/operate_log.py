@@ -213,8 +213,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'TicketAssignee',
         'SuperTicket', 'SuperConnectionToken', 'AdminConnectionToken', 'PermNode',
         'PermedAsset', 'PermedAccount', 'MenuPermission',
-        'Permission', 'TicketSession', 'ApplyLoginTicket',
-        'ApplyCommandTicket', 'ApplyLoginAssetTicket',
+        'Permission', 'TicketSession',
         'FavoriteAsset', 'FavoriteFolder', 'ChangeSecretRecord', 'AppProvider',
         'Variable', 'LeakPasswords',
         # OAuth authorization codes are short-lived protocol artifacts.
