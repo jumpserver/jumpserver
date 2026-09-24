@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Prefetch, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -449,7 +450,10 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def command_filter_acls(self):
+        from acls.const import ActionChoices as ACLActionChoices
         from acls.models import CommandFilterACL
+        from users.models import User
+
         kwargs = {
             'user': self.user,
             'asset': self.asset,
@@ -457,6 +461,16 @@ class ConnectionToken(JMSOrgBaseModel):
         }
         with tmp_to_org(self.asset.org_id):
             acls = CommandFilterACL.filter_queryset(**kwargs).valid()
+            # Bound M2M prefetch batches; only review actions need reviewers.
+            acls = list(acls.only(
+                'id', 'name', 'action', 'priority', 'is_active'
+            ).prefetch_related('command_groups').iterator(chunk_size=1000))
+            review_acls = [acl for acl in acls if acl.action == ACLActionChoices.review]
+            if review_acls:
+                prefetch_related_objects(
+                    review_acls,
+                    Prefetch('reviewers', queryset=User.objects.only('id', 'name')),
+                )
         return acls
 
     @lazyproperty
