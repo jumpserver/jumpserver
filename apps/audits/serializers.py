@@ -123,7 +123,7 @@ class OperateLogSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def get_resource_type(instance) -> str:
-        return _(instance.resource_type)
+        return instance.resource_type_display
 
     @staticmethod
     def get_resource(instance) -> str:

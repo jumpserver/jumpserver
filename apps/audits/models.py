@@ -1,15 +1,17 @@
 import os
 import uuid
 from datetime import timedelta, datetime
+from functools import lru_cache
 from importlib import import_module
 
+from django.apps import apps
 from django.conf import settings
 from django.core.cache import caches
 from django.db import models
 from django.db.models import Q, CharField, F, Value
 from django.db.models.functions import Cast, Coalesce, Concat
 from django.utils import timezone
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, override
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.sessions.cache import user_session_manager
@@ -44,6 +46,17 @@ def _get_city_display(ip, city='') -> str:
         return get_ip_city(ip) or (gettext(city) if city else '')
     except Exception:
         return gettext(city) if city else ''
+
+
+@lru_cache(maxsize=1)
+def get_english_resource_type_names():
+    # Operation logs may store the English translation of a model's verbose name
+    # instead of its msgid (for example, "Operation Log" vs "Operate log").
+    with override('en'):
+        return {
+            str(model._meta.verbose_name): model._meta.verbose_name_raw
+            for model in apps.get_models()
+        }
 
 
 class JobLog(JobExecution):
@@ -121,7 +134,11 @@ class OperateLog(OrgModelMixin):
 
     @lazyproperty
     def resource_type_display(self):
-        return gettext(self.resource_type)
+        translated = gettext(self.resource_type)
+        if translated != self.resource_type:
+            return translated
+        msgid = get_english_resource_type_names().get(self.resource_type, self.resource_type)
+        return gettext(msgid)
 
     def save(self, *args, **kwargs):
         if current_org.is_root() and not self.org_id:
