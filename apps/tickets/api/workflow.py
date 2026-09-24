@@ -17,6 +17,7 @@ from tickets.serializers.workflow import (
 from tickets.workflow.approvers import available_users
 from tickets.workflow.engine import WorkflowEngine
 from tickets.workflow.publication import publish_workflow
+from tickets.plugins import get_ticket_plugin
 
 __all__ = ['WorkflowViewSet', 'WorkflowInstanceViewSet', 'ApprovalTaskViewSet']
 
@@ -39,8 +40,9 @@ class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets
     def options_list(self, request, **kwargs):
         org_id = request.query_params.get('org_id', str(current_org.id))
         ticket_type = request.query_params.get('type', 'apply_asset')
+        plugin = get_ticket_plugin(ticket_type)
         if org_id == Organization.ROOT_ID:
-            if ticket_type != 'login_confirm' or not request.user.has_perm('acls.change_loginacl'):
+            if not plugin.allow_global or not plugin.global_options_permission or not request.user.has_perm(plugin.global_options_permission):
                 raise PermissionDenied()
         elif not Organization.objects.filter(pk=org_id).exists() or not (
             available_users(org_id).filter(pk=request.user.pk).exists() or request.user.is_superuser
@@ -49,9 +51,7 @@ class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets
         with tmp_to_root_org():
             workflows = Workflow.objects.filter(org_id__in=[org_id, Organization.ROOT_ID], type=ticket_type, is_system=False,
                                                  enabled=True, active_version__published_at__isnull=False)
-            members = available_users(org_id)
-            return Response([{'id': str(workflow.pk), 'name': workflow.name, 'type': workflow.type,
-                              'cc_users': list(workflow.cc_users.filter(pk__in=members.values('pk')).values('id', 'name', 'username'))}
+            return Response([{'id': str(workflow.pk), 'name': workflow.name, 'type': workflow.type}
                              for workflow in workflows])
 
     @action(detail=True, methods=['post'])

@@ -12,6 +12,11 @@ from tickets.workflow.publication import publish_workflow
 def convert_flow(flow):
     nodes = [{'id': 'start', 'type': 'start'}]
     edges, previous, notes = [], 'start', []
+    cc_user_ids = [str(pk) for pk in flow.cc_users.values_list('pk', flat=True)]
+    if cc_user_ids:
+        nodes.append({'id': 'cc_legacy', 'type': 'cc', 'name': 'CC', 'config': {'users': cc_user_ids}})
+        edges.append([previous, 'cc_legacy'])
+        previous = 'cc_legacy'
     rules = list(flow.rules.order_by('level', 'id'))
     if not rules:
         raise WorkflowConfigurationError('The legacy flow has no approval rules.')
@@ -29,7 +34,7 @@ def convert_flow(flow):
     nodes.append({'id': 'end', 'type': 'end'})
     edges.append([previous, 'end'])
     return validate_definition({'nodes': nodes, 'edges': edges}), {
-        'rules': notes, 'cc_user_ids': [str(pk) for pk in flow.cc_users.values_list('pk', flat=True)],
+        'rules': notes, 'cc_user_ids': cc_user_ids,
         'requires_review': True,
         'notice': 'Legacy selectors were resolved to fixed users. Review organization scope, applicant exclusion and CC before enabling.',
     }
@@ -69,11 +74,11 @@ class Command(BaseCommand):
                                 legacy_flow_id=flow.pk, migration_notes=notes, enabled=False,
                                 created_by='Legacy workflow import',
                             )
-                            workflow.cc_users.set(flow.cc_users.all())
                             publish_workflow(workflow, definition, expected_version=0)
                         imported += 1
                         mode = 'IMPORTED (disabled)' if options['apply'] else 'WOULD IMPORT'
-                        self.stdout.write(f'{mode} {flow.pk}: {len(definition["nodes"]) - 2} approval nodes; review fixed user selectors and CC')
+                        approvals = sum(node['type'] == 'approval' for node in definition['nodes'])
+                        self.stdout.write(f'{mode} {flow.pk}: {approvals} approval nodes; review fixed user selectors and CC')
                 except WorkflowConfigurationError as exc:
                     failed += 1
                     self.stderr.write(f'FAILED {flow_id}: {exc.detail}')

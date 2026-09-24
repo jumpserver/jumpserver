@@ -22,6 +22,7 @@ from .const import InstanceState, NodeState, TaskState
 from .definition import json_snapshot
 from .errors import WorkflowConfigurationError, WorkflowConflict
 from .signals import workflow_event
+from tickets.plugins import get_ticket_plugin
 
 
 class WorkflowEngine:
@@ -43,10 +44,10 @@ class WorkflowEngine:
 
     @transaction.atomic
     def start(self, ticket, workflow, context):
-        self._check_org(ticket.org_id, allow_root=ticket.type == 'login_confirm')
+        self._check_org(ticket.org_id, allow_root=get_ticket_plugin(ticket.type).allow_global)
         # Serialize duplicate submission independently of which definition was selected.
         ticket = Ticket.objects.select_for_update().get(pk=ticket.pk)
-        self._check_org(ticket.org_id, allow_root=ticket.type == 'login_confirm')
+        self._check_org(ticket.org_id, allow_root=get_ticket_plugin(ticket.type).allow_global)
         existing = WorkflowInstance.objects.filter(ticket=ticket).first()
         if existing:
             if existing.version.workflow_id != workflow.pk:
@@ -86,7 +87,7 @@ class WorkflowEngine:
 
     def _lock_instance(self, instance_id):
         instance = WorkflowInstance.objects.select_for_update().get(pk=instance_id)
-        self._check_org(instance.org_id, allow_root=instance.ticket.type == 'login_confirm')
+        self._check_org(instance.org_id, allow_root=get_ticket_plugin(instance.ticket.type).allow_global)
         return instance
 
     def _lock_task(self, task, actor):
@@ -133,6 +134,15 @@ class WorkflowEngine:
                 result = evaluate_condition(node.config, instance.context)
                 run.result = {'condition': node.config, 'result': result}
                 self._event(instance, 'condition.evaluated', node=run, **run.result)
+            elif node.type == 'cc':
+                configured = node.config['users']
+                users = list(available_users(instance.org_id).filter(pk__in=configured).order_by('id'))
+                existing = set(instance.ticket.cc_users.values_list('pk', flat=True))
+                added = [user for user in users if user.pk not in existing]
+                if added:
+                    instance.ticket.cc_users.add(*added)
+                run.result = {'recipients': [user_snapshot(user) for user in added]}
+                self._event(instance, 'cc.added', node=run, **run.result)
             self._complete_node(instance, run)
             if node.type == 'end':
                 self._finish(instance, InstanceState.approved)

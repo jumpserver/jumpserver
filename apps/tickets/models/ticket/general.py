@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-import json
 from typing import Callable
 
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields import related
 from django.db.utils import IntegrityError
-from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AliasAccount
 from common.db.encoder import ModelJSONFieldEncoder
 from common.db.models import JMSBaseModel
 from common.exceptions import JMSException
@@ -20,11 +17,11 @@ from common.utils.timezone import as_current_tz
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from tickets.const import (
-    TicketType, TicketStatus, TicketState,
+    TicketType, TicketStatus, TicketState, TicketOrigin,
     TicketLevel, StepState, StepStatus
 )
 from tickets.errors import AlreadyClosed, TicketStateChanged
-from tickets.handlers import get_ticket_handler
+from tickets.plugins import ticket_type_choices
 from ..flow import TicketFlow
 
 logger = get_logger(__file__)
@@ -222,10 +219,6 @@ class StatusMixin:
         return result
 
     @property
-    def handler(self):
-        return get_ticket_handler(ticket=self)
-
-    @property
     def legacy_process_map(self):
         process_map = []
         for step in self.ticket_steps.all():
@@ -271,7 +264,7 @@ class StatusMixin:
 class Ticket(StatusMixin, JMSBaseModel):
     title = models.CharField(max_length=256, verbose_name=_('Title'))
     type = models.CharField(
-        max_length=64, choices=TicketType.choices,
+        max_length=64, choices=ticket_type_choices,
         default=TicketType.general, verbose_name=_('Type')
     )
     state = models.CharField(
@@ -281,6 +274,10 @@ class Ticket(StatusMixin, JMSBaseModel):
     status = models.CharField(
         max_length=16, choices=TicketStatus.choices,
         default=TicketStatus.open, verbose_name=_('Status')
+    )
+    origin = models.CharField(
+        max_length=16, choices=TicketOrigin.choices,
+        default=TicketOrigin.manual, verbose_name=_('Ticket origin'),
     )
     # 申请人
     applicant = models.ForeignKey(
@@ -306,6 +303,7 @@ class Ticket(StatusMixin, JMSBaseModel):
     rel_snapshot = models.JSONField(verbose_name=_('Relation snapshot'), default=dict)
     serial_num = models.CharField(_('Serial number'), max_length=128, null=True)
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
+    request_data = models.JSONField(default=dict, blank=True, verbose_name=_('Request parameters'))
     org_id = models.CharField(
         max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
     )
@@ -323,20 +321,9 @@ class Ticket(StatusMixin, JMSBaseModel):
         return '{}({})'.format(self.title, self.applicant)
 
     def save(self, *args, **kwargs):
-        self.type = self.TICKET_TYPE
+        if self.TICKET_TYPE != TicketType.general:
+            self.type = self.TICKET_TYPE
         super().save(*args, **kwargs)
-
-    @property
-    def spec_ticket(self):
-        if self.type == TicketType.general:
-            return self
-        attr = {
-            TicketType.apply_asset: 'applyassetticket',
-            TicketType.login_confirm: 'applyloginticket',
-            TicketType.login_asset_confirm: 'applyloginassetticket',
-            TicketType.command_confirm: 'applycommandticket',
-        }[self.type]
-        return getattr(self, attr)
 
     @property
     def name(self):
@@ -453,33 +440,12 @@ class Ticket(StatusMixin, JMSBaseModel):
                 value = self.rel_snapshot[name]
             elif isinstance(self.rel_snapshot[name], list):
                 value = ','.join(self.rel_snapshot[name])
-        elif name == 'apply_accounts':
-            new_values = []
-            for account in value:
-                alias = dict(AliasAccount.choices).get(account)
-                new_value = alias if alias else account
-                new_values.append(str(new_value))
-            value = ', '.join(new_values)
         elif name == 'org_id':
             org = Organization.get_instance(value)
             value = org.name if org else ''
         elif isinstance(value, list):
             value = ', '.join(value)
         return value
-
-    def get_local_snapshot(self):
-        snapshot = {}
-        excludes = ['ticket_ptr']
-        fields = self._meta._forward_fields_map
-        json_data = json.dumps(model_to_dict(self), cls=ModelJSONFieldEncoder)
-        data = json.loads(json_data)
-        local_fields = self._meta.local_fields + self._meta.local_many_to_many
-        item_names = [field.name for field in local_fields if field.name not in excludes]
-        for name in item_names:
-            field = fields[name]
-            value = self.get_field_display(name, field, data)
-            snapshot[field.verbose_name] = value
-        return snapshot
 
     def get_extra_info_of_review(self, user=None):
         if user and user.is_service_account:
