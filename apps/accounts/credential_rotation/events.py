@@ -57,10 +57,11 @@ def receive(client_id, org_id, event_id):
     return False
 
 
-def timeline(credential):
+def timeline(credential, rotation_id=None):
     if credential.mode == ApplicationCredential.Mode.subscription:
         return _subscription_timeline(credential)
-    rotation = credential.rotation_records.first()
+    rotations = credential.rotation_records.all()
+    rotation = rotations.filter(id=rotation_id).first() if rotation_id else rotations.first()
     if not rotation:
         return {'rotation_id': None, 'status': None, 'events': [], 'instances': []}
     events = list(rotation.events.all())
@@ -76,7 +77,7 @@ def timeline(credential):
     return _build_timeline(events, instances, rotation.org_id, rotation.id, rotation.status)
 
 
-def _subscription_timeline(credential):
+def subscription_events(credential):
     configurations = ClientAccessConfiguration.objects.filter(
         credentials=credential,
     )
@@ -93,10 +94,15 @@ def _subscription_timeline(credential):
         ),
         org_id=credential.org_id,
     ).values('id').distinct()
-    events = list(CredentialRotationEvent.objects.filter(
+    return CredentialRotationEvent.objects.filter(
         rotation__isnull=True, source_event_id__in=source_events,
         event__in=SUBSCRIPTION_EVENTS, org_id=credential.org_id,
-    ).order_by('published_at', 'id'))
+    )
+
+
+def _subscription_timeline(credential):
+    configurations = ClientAccessConfiguration.objects.filter(credentials=credential)
+    events = list(subscription_events(credential).order_by('published_at', 'id'))
     clients = CredentialClientInstance.objects.filter(
         configuration__in=configurations,
         application__credential_bindings__credential=credential,

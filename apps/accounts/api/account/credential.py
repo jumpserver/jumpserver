@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, AuthenticationFailed, ValidationError, PermissionDenied
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework import serializers as drf_serializers
 
 from accounts import serializers
 from accounts.const import AuditEvent
@@ -46,6 +47,16 @@ CREDENTIAL_CLIENT_SIGNATURE_HEADERS = [
     '(request-target)', 'date', 'digest', 'x-jms-request-id', 'x-jms-client-version',
     'x-jms-protocol-version', 'x-jms-config-schema-version',
 ]
+
+
+class CredentialEventQuerySerializer(drf_serializers.Serializer):
+    client_id = drf_serializers.UUIDField(required=False)
+    rotation_id = drf_serializers.UUIDField(required=False)
+    limit = drf_serializers.IntegerField(default=20, min_value=1, max_value=100)
+    offset = drf_serializers.IntegerField(default=0, min_value=0)
+    client_search = drf_serializers.CharField(default='', allow_blank=True, max_length=128)
+    client_type = drf_serializers.ChoiceField(choices=['', 'sdk', 'agent'], default='')
+    state = drf_serializers.ChoiceField(choices=['', 'online', 'offline', 'inactive'], default='')
 
 
 class CredentialClientSignatureAuthenticationMixin:
@@ -129,6 +140,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'cancel_rotation': 'accounts.change_applicationcredential',
         'rotation_status': 'accounts.view_applicationcredential',
         'rotation_events': 'accounts.view_applicationcredential',
+        'event_history': 'accounts.view_applicationcredential',
         'retry_change': ['accounts.change_applicationcredential', 'accounts.add_changesecretexecution'],
     }
 
@@ -186,7 +198,22 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     @action(methods=['get'], detail=True, url_path='rotation-events')
     def rotation_events(self, request, *args, **kwargs):
         from accounts.credential_rotation.events import timeline
-        return Response(timeline(self.get_object()))
+        query = CredentialEventQuerySerializer(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        return Response(timeline(self.get_object(), query.validated_data.get('rotation_id')))
+
+    @action(methods=['get'], detail=True, url_path='event-history')
+    def event_history(self, request, *args, **kwargs):
+        from accounts.credential_rotation.history import directory, client_history
+        credential = self.get_object()
+        query = CredentialEventQuerySerializer(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        data = query.validated_data
+        limit, offset = data['limit'], data['offset']
+        if data.get('client_id'):
+            return Response(client_history(credential, data['client_id'], limit, offset))
+        clients = directory(credential, data['client_search'], data['client_type'], data['state'])
+        return Response({'count': len(clients), 'results': clients[offset:offset + limit]})
 
     @action(methods=['post'], detail=True, url_path='check-secret-change')
     def check_secret_change(self, request, *args, **kwargs):
