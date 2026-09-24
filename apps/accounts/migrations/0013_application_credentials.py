@@ -11,7 +11,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0011_personalassetcredential'),
+        ('accounts', '0012_account_follow_template'),
     ]
 
     operations = [
