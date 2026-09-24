@@ -110,6 +110,9 @@ def refresh_settings(event):
     elif event_name == SYSLOG_CONFIG_UPDATED:
         Setting.refresh_syslog_settings(event['values'])
         setting_changed.send(sender=Setting, name='SYSLOG_CONFIG')
+    elif event_name == 'UKEY_CONFIG_UPDATED':
+        from authentication.backends.ukey.configuration import refresh_config
+        refresh_config()
 
 
 def update_site_url():

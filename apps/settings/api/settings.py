@@ -152,6 +152,9 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         return fields
 
     def get_object(self):
+        if self.request.query_params.get('category') == 'ukey':
+            from authentication.backends.ukey.configuration import get_snapshot
+            return dict(get_snapshot())
         items = self.get_fields().keys()
         obj = {}
         for item in items:
@@ -181,12 +184,26 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         category_setting_updated.send(sender=self.__class__, category=category, serializer=serializer)
 
     def perform_update(self, serializer):
+        from authentication.backends.ukey.configuration import REVISION, get_snapshot, save_settings
+        if self.request.query_params.get('category') == 'ukey':
+            serializer._data = save_settings(self.request.data, serializers.UKeySettingSerializer)
+            self.send_signal(serializer)
+            return
         post_data_names = list(self.request.data.keys())
         settings_items = [
             item for item in self.parse_serializer_data(serializer)
             if item['name'] in post_data_names
         ]
         serializer_data = getattr(serializer, 'data', {})
+        # The authentication overview only toggles AUTH_UKEY, without validating
+        # provider configuration. Keep revision updates to invalidate old challenges.
+        ukey_items = [item for item in settings_items if item['name'].startswith('AUTH_UKEY')]
+        if ukey_items:
+            data = {item['name']: item['value'] for item in ukey_items}
+            data[REVISION] = get_snapshot()[REVISION]
+            saved = save_settings(data, serializers.AuthSettingSerializer)
+            serializer_data.update({name: saved[name] for name in data if name in saved})
+            settings_items = [item for item in settings_items if item not in ukey_items]
         syslog_items = [
             item for item in settings_items
             if item['name'] in SYSLOG_SETTING_NAMES

@@ -13182,3 +13182,325 @@ msgstr "라이센스가 유효하지 않습니다."
 
 #~ msgid "Closed"
 #~ msgstr "닫기"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey vendor"
+msgstr "UKey 제조사"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Longmai"
+msgstr "Longmai"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "JIT"
+msgstr "JIT"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Unsupported UKey vendor. Select a supported vendor in UKey settings."
+msgstr "지원하지 않는 UKey 제조사입니다. UKey 설정에서 지원하는 제조사를 선택하세요."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "This certificate authentication method does not support the selected UKey vendor."
+msgstr "이 인증서 인증 방식은 선택한 UKey 제조사를 지원하지 않습니다."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Select the vendor of your UKey. After switching, refresh UKey pages and restart unfinished operations."
+msgstr "사용하는 UKey 제조사를 선택하세요. 변경 후 UKey 페이지를 새로 고치고 완료되지 않은 작업을 다시 시작하세요."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey settings have changed. Refresh the page and try again."
+msgstr "UKey 설정이 변경되었습니다. 페이지를 새로 고친 후 다시 시도하세요."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "This address is not allowed. Use an address on a trusted service network."
+msgstr "사용할 수 없는 주소입니다. 신뢰할 수 있는 서비스 네트워크의 주소를 입력하세요."
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Login certificate"
+msgstr "로그인 인증서"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select a certificate for login"
+msgstr "로그인에 사용할 인증서 선택"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select the certificate linked to your account."
+msgstr "현재 계정에 연결된 인증서를 선택하세요."
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "UKey settings have changed or the service is unavailable. Refresh the page and try again."
+msgstr "UKey 설정이 변경되었거나 서비스를 사용할 수 없습니다. 페이지를 새로 고친 후 다시 시도하세요."
+
+#: authentication/backends/ukey/views.py
+msgid "UKey login is temporarily unavailable. Try again later or use another login method."
+msgstr "일시적으로 UKey 로그인을 사용할 수 없습니다. 나중에 다시 시도하거나 다른 로그인 방법을 사용하세요."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Cannot connect to the Fisherman signature verification service or obtain random data. Check the settings and try again."
+msgstr "Fisherman 서명 검증 서비스에 연결하거나 난수를 가져올 수 없습니다. 설정을 확인하고 다시 시도하세요."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Fisherman signature verification service connection and random-data checks passed. UKey login and certificate verification have not been tested. Settings were not saved."
+msgstr "Fisherman 서명 검증 서비스 연결 및 난수 가져오기에 성공했습니다. UKey 로그인 및 인증서 검증은 테스트하지 않았습니다. 설정은 저장되지 않았습니다."
+
+#: settings/serializers/auth/ukey.py
+msgid "Fisherman signature verification service URL"
+msgstr "Fisherman 서명 검증 서비스 URL"
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter the full HTTP or HTTPS URL, for example https://svs.example.com:8443. Do not include an API path or use the password management platform address."
+msgstr "전체 HTTP 또는 HTTPS URL을 입력하세요 (예: https://svs.example.com:8443). API 경로를 포함하거나 비밀번호 관리 플랫폼 주소를 사용하지 마세요."
+
+#: settings/serializers/auth/ukey.py
+msgid "Certificate verification"
+msgstr "인증서 검증"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use system trust store"
+msgstr "시스템 신뢰 저장소 사용"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use custom CA certificate"
+msgstr "사용자 지정 CA 인증서 사용"
+
+#: settings/serializers/auth/ukey.py
+msgid "Ignore certificate verification (unsafe)"
+msgstr "인증서 검증 무시 (안전하지 않음)"
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "A CA certificate is required."
+msgstr "CA 인증서를 제공해야 합니다."
+
+#: settings/serializers/auth/ukey.py
+msgid "HTTPS CA certificate"
+msgstr "HTTPS CA 인증서"
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."
+msgstr "Fisherman HTTPS 서비스의 PEM 형식 CA 인증서 또는 인증서 체인을 개인 키 없이 업로드하세요 (최대 64 KB). 비워 두면 저장된 인증서를 유지합니다. UKey 인증서 검증에는 영향을 주지 않습니다."
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter a valid HTTP or HTTPS service URL without credentials, an API path, query parameters or a fragment."
+msgstr "인증 정보, API 경로, 쿼리 매개변수 또는 프래그먼트가 없는 유효한 HTTP 또는 HTTPS 서비스 URL을 입력하세요."
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a valid PEM CA certificate for the HTTPS service (maximum 64 KB), without a private key."
+msgstr "HTTPS 서비스의 유효한 PEM 형식 CA 인증서를 개인 키 없이 업로드하세요 (최대 64 KB)."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Check the Fisherman signature verification service URL and HTTPS certificate settings."
+msgstr "Fisherman 서명 검증 서비스 URL과 HTTPS 인증서 설정을 확인하세요."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "CRL verification: revoked"
+msgstr "CRL 검증: 폐기됨"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Cannot resolve signature verification service address"
+msgstr "서명 검증 서비스 주소를 확인할 수 없습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has been revoked"
+msgstr "인증서가 폐기되었습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has expired"
+msgstr "인증서가 만료되었습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate is not yet valid"
+msgstr "인증서가 아직 유효하지 않습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate parsing failed"
+msgstr "인증서 구문 분석에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection failed or timed out"
+msgstr "인증서 서비스 연결에 실패했거나 시간이 초과되었습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection or TLS verification failed"
+msgstr "인증서 서비스 연결 또는 TLS 검증에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service rejected the request"
+msgstr "인증서 서비스가 요청을 거부했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service request is too large"
+msgstr "인증서 서비스 요청이 너무 큽니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response is too large"
+msgstr "인증서 서비스 응답이 너무 큽니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response timed out"
+msgstr "인증서 서비스 응답 시간이 초과되었습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service returned an unexpected HTTP response"
+msgstr "인증서 서비스가 예상치 못한 HTTP 응답을 반환했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(name)s, %(code)s)."
+msgstr "Fisherman 서비스 오류: %(message)s (%(name)s, %(code)s)."
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(code)s)."
+msgstr "Fisherman 서비스 오류: %(message)s (%(code)s)."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Hash calculation failed"
+msgstr "해시 계산에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Incomplete certificate service response"
+msgstr "인증서 서비스 응답이 불완전합니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid DER data"
+msgstr "유효하지 않은 DER 데이터입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid HTTPS certificate verification mode"
+msgstr "유효하지 않은 HTTPS 인증서 검증 모드입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid OCSP request"
+msgstr "유효하지 않은 OCSP 요청입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate"
+msgstr "유효하지 않은 인증서입니다"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate data"
+msgstr "유효하지 않은 인증서 데이터입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate identifier"
+msgstr "유효하지 않은 인증서 식별자입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate information type"
+msgstr "유효하지 않은 인증서 정보 유형입니다"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate serial number"
+msgstr "유효하지 않은 인증서 일련번호입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service connection parameters"
+msgstr "유효하지 않은 인증서 서비스 연결 매개변수입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service response"
+msgstr "유효하지 않은 인증서 서비스 응답입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid data format"
+msgstr "유효하지 않은 데이터 형식입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid encoded data"
+msgstr "유효하지 않은 인코딩 데이터입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key index"
+msgstr "유효하지 않은 키 인덱스입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key value"
+msgstr "유효하지 않은 키 값입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid or missing certificate"
+msgstr "인증서가 유효하지 않거나 누락되었습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid parameters"
+msgstr "유효하지 않은 매개변수입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature"
+msgstr "유효하지 않은 서명입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature method"
+msgstr "유효하지 않은 서명 방식입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Key generation failed"
+msgstr "키 생성에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "No OCSP response"
+msgstr "OCSP 응답이 없습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not authorized"
+msgstr "OCSP 요청이 승인되지 않았습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not signed"
+msgstr "OCSP 요청에 서명이 없습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP responder internal error"
+msgstr "OCSP 응답자 내부 오류입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP service is temporarily unavailable. Try again later"
+msgstr "OCSP 서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "P7 signing failed"
+msgstr "P7 서명에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA certificate not found"
+msgstr "루트 CA 인증서를 찾을 수 없습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA signature verification failed"
+msgstr "루트 CA 서명 검증에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Service connection failed"
+msgstr "서비스 연결에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification failed"
+msgstr "서명 검증에 실패했습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification service resolution timed out"
+msgstr "서명 검증 서비스 주소 확인 시간이 초과되었습니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "System error"
+msgstr "시스템 오류입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unexpected error"
+msgstr "예기치 않은 오류입니다"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unknown error code"
+msgstr "알 수 없는 오류 코드입니다"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey certificate. Contact the administrator."
+msgstr "UKey 인증서를 해석할 수 없습니다. 관리자에게 문의하세요."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey signature. Contact the administrator."
+msgstr "UKey 서명을 해석할 수 없습니다. 관리자에게 문의하세요."
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "Xinjiang CA"
+msgstr "신장 CA"

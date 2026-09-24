@@ -272,6 +272,13 @@ class Config(dict):
 
         'AUTH_UKEY': False,
         'AUTH_UKEY_VENDOR': 'long_mai',
+        'AUTH_UKEY_CA_PROVIDER': 'builtin',
+        'AUTH_UKEY_CONFIG_REVISION': '0',
+        'AUTH_UKEY_XJCA_SVS_URL': '',
+        'AUTH_UKEY_XJCA_TLS_VERIFY': 'system',
+        'AUTH_UKEY_XJCA_TLS_CA_CERT': '',
+        'AUTH_UKEY_XJCA_CONNECT_TIMEOUT': 3,
+        'AUTH_UKEY_XJCA_READ_TIMEOUT': 5,
         'AUTH_UKEY_ENROLL_ENABLED': True,
         'AUTH_UKEY_ENROLL_VALIDITY_DAYS': 365,
         'AUTH_UKEY_CHALLENGE_TTL': 300,

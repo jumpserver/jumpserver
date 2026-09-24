@@ -259,6 +259,9 @@ class CommonMixin:
         auth_ukey_ok = self.request.session.get('auth_ukey')
         if auth_ukey_ok:
             user = get_object_or_404(User, pk=user_id)
+            if 'auth_ukey_state' in self.request.session:
+                from authentication.backends.ukey.pending import validate_pending_user
+                validate_pending_user(self.request, user)
             user.backend = self.request.session.get("auth_backend")
             return user
 
@@ -688,6 +691,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         return user
     
     def mark_password_ok(self, user, auto_login=False, auth_backend=None):
+        if 'auth_ukey_state' in self.request.session:
+            self.request.session.pop('auth_ukey', None)
+            self.request.session.pop('auth_ukey_state', None)
         request = self.request
         request.session['auth_password'] = 1
         request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
@@ -737,7 +743,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
             'auth_password', 'user_id', 'auth_confirm_required',
             'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
             'user_session_id', 'user_log_id', 'can_send_notifications',
-            'auth_ukey'
+            'auth_ukey', 'auth_ukey_state'
         ]
         for k in keys:
             self.request.session.pop(k, '')

@@ -273,17 +273,26 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         return url
 
     def login_it(self, user):
-        auth_login(self.request, user)
+        if self.request.session.get('auth_ukey') and 'auth_ukey_state' in self.request.session:
+            from authentication.backends.ukey.pending import final_login
+            with final_login(self.request, user, self.get_request_ip()) as current_user:
+                current_user.backend = user.backend
+                auth_login(self.request, current_user)
+        else:
+            auth_login(self.request, user)
         # 如果设置了自动登录，那需要设置 session_id cookie 的有效期
         if self.request.session.get('auto_login'):
             age = self.request.session.get_expiry_age()
             self.request.session.set_expiry(age)
 
     def get_redirect_url(self, *args, **kwargs):
+        certificate_login = self.request.session.get('auth_ukey') and 'auth_ukey_state' in self.request.session
         try:
             user = self.get_user_from_session()
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
+            if certificate_login:
+                self.login_it(user)
         except (errors.CredentialError, errors.SessionEmptyError) as e:
             return self.format_redirect_url(self.login_url)
         except errors.MFARequiredError:
@@ -295,7 +304,8 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         except errors.PasswordTooSimple as e:
             return e.url
         else:
-            self.login_it(user)
+            if not certificate_login:
+                self.login_it(user)
             self.send_auth_signal(success=True, user=user)
             self.clear_auth_mark()
             url = redirect_user_first_login_or_index(

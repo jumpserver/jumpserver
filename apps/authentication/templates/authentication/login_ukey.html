@@ -216,6 +216,11 @@
                    style="background-color:#f7f7f7; cursor:default; color:#555;">
         </div>
         {# PIN is only used for client-side UKey verification, not submitted to backend #}
+        <div class="form-group" id="ukey-container-group" style="display:none">
+            <label for="ukey-container">{% trans 'Login certificate' %}</label>
+            <select id="ukey-container" class="form-control" aria-describedby="ukey-container-help"></select>
+            <small id="ukey-container-help" class="help-block">{% trans 'Select the certificate linked to your account.' %}</small>
+        </div>
         <div class="form-group">
             <input type="password" id="id_pin" class="form-control"
                    placeholder="PIN" autocomplete="off">
@@ -235,12 +240,14 @@
 </body>
 {% include '_foot_js.html' %}
 
+{% trans "UKey settings have changed. Refresh the page and try again." as ukey_settings_changed %}
 <script>
 (function () {
     'use strict';
 
     /* ── i18n strings (rendered server-side) ───────────────── */
     var MSG = {
+        configChanged: '{{ ukey_settings_changed|escapejs }}',
         loading:      '{% trans "Loading UKey SDK..." %}',
         detecting:    '{% trans "Detecting UKey..." %}',
         inserted:     '{% trans "UKey connected" %}',
@@ -375,6 +382,12 @@
         /* when: skip step if condition is false */
         if (step.when !== undefined && !evalWhen(step.when, ctx)) {
             return Promise.resolve(null);
+        }
+
+        if (step.type === 'select_certificate') {
+            return ctx.selectCertificate().then(function () {
+                return runStep(Object.assign({}, step, { type: 'ukey' }), api, ctx);
+            });
         }
 
         /* api: HTTP request */
@@ -547,9 +560,17 @@
                     return { code: code, code_base64: code_base64, length: code.length };
                 }())
             };
+            var usesCertificateBinding = (ctx.config.capabilities || {}).binding_mode === 'certificate';
+            if (usesCertificateBinding) ctx.challenge.id = '{{ challenge_id|default:""|escapejs }}';
+            if (!ctx.challenge.code ||
+                (usesCertificateBinding && ctx.config.revision !== '{{ ukey_revision|default:""|escapejs }}') ||
+                ctx.config.provider !== '{{ ukey_provider|default:""|escapejs }}') {
+                throw new Error('{% trans "UKey settings have changed or the service is unavailable. Refresh the page and try again." %}');
+            }
 
-            // 4. Run sdk.setup.steps
+            // 4. Providers with retryable device setup run it during detection instead.
             var setupSteps = ((sdkConfig.sdk || {}).setup || {}).steps || [];
+            if (((sdkConfig.login || {}).detect || {}).setup) setupSteps = [];
             return runSteps(setupSteps, api, ctx).then(function () {
                 return { sdkConfig: sdkConfig, api: api, ctx: ctx };
             });
@@ -561,6 +582,70 @@
 
             var usernameDisplay = document.getElementById('username-display');
             var lastCN = null;
+            var submitting = false;
+            var polling = false;
+            var refreshRequired = false;
+            var pollTimer = null;
+            var containerSelect = document.getElementById('ukey-container');
+            var containerGroup = document.getElementById('ukey-container-group');
+            var certificateSelection = null;
+            var selectsCertificate = (ctx.config.capabilities || {}).requires_certificate_selection;
+            // External certificates are read after PIN verification, not during detection.
+            if (selectsCertificate) usernameDisplay.parentElement.style.display = 'none';
+            function checkConfig() {
+                if (refreshRequired) return Promise.reject(new Error(MSG.configChanged));
+                if ((ctx.config.capabilities || {}).binding_mode !== 'certificate') return Promise.resolve();
+                return fetch(API_CONFIG + '?revision_only=1', { cache: 'no-store' }).then(function (response) {
+                    if (!response.ok) throw new Error(MSG.sdkError);
+                    return response.json();
+                }).then(function (latest) {
+                    if (latest.revision !== ctx.config.revision || latest.vendor !== ctx.config.vendor ||
+                        latest.provider !== ctx.config.provider) {
+                        refreshRequired = true;
+                        clearInterval(pollTimer);
+                        containerSelect.disabled = true;
+                        document.getElementById('id_pin').value = '';
+                        throw new Error(MSG.configChanged);
+                    }
+                });
+            }
+            function updateContainers() {
+                if (!(ctx.config.capabilities || {}).requires_certificate_selection) return;
+                containerGroup.style.display = submitting && (api.signingContainers || []).length > 1 ? '' : 'none';
+                containerSelect.textContent = '';
+                var placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = '{% trans "Select a certificate for login" %}';
+                containerSelect.appendChild(placeholder);
+                (api.signingContainers || []).forEach(function (item) {
+                    var option = document.createElement('option');
+                    option.value = item.name;
+                    option.textContent = item.label;
+                    containerSelect.appendChild(option);
+                });
+                containerSelect.value = api.signingContainer || '';
+            }
+            containerSelect.addEventListener('change', function () {
+                if (certificateSelection) {
+                    if (!(api.signingContainers || []).some(function (item) { return item.name === containerSelect.value; })) return;
+                    api.signingContainer = containerSelect.value;
+                    containerSelect.disabled = true;
+                    var resolveSelection = certificateSelection;
+                    certificateSelection = null;
+                    resolveSelection();
+                    return;
+                }
+            });
+            ctx.selectCertificate = function () {
+                updateContainers();
+                if (!(api.signingContainers || []).length) return Promise.reject(new Error(MSG.certFail));
+                if (api.signingContainer) return Promise.resolve();
+                if (document.getElementById('id_pin')) document.getElementById('id_pin').value = '';
+                setStatus('loading', '{% trans "Select a certificate for login" %}');
+                containerSelect.disabled = false;
+                containerSelect.focus();
+                return new Promise(function (resolve) { certificateSelection = resolve; }).then(checkConfig);
+            };
 
             function setUsername(cn) {
                 if (cn === lastCN) return;
@@ -569,15 +654,27 @@
             }
 
             // 5. Poll: run login.detect.steps → read ukey.certCN → update UI
-            var detectSteps = (((sdkConfig.login || {}).detect || {}).steps) || [];
+            var detectConfig = (sdkConfig.login || {}).detect || {};
+            var setupSteps = detectConfig.setup ? (((sdkConfig.sdk || {}).setup || {}).steps || []) : [];
+            var detectSteps = setupSteps.concat(detectConfig.steps || []);
 
             function poll() {
+                if (refreshRequired || submitting || polling) return;
+                polling = true;
                 var pollCtx = Object.assign({}, ctx, { vars: {} });
-                runSteps(detectSteps, api, pollCtx).then(function () {
+                checkConfig().then(function () {
+                    return runSteps(detectSteps, api, pollCtx);
+                }).then(function () {
                     // All detect steps passed
                     setUsername(ukey.certCN || null);
                     setStatus('inserted', MSG.inserted);
+                    updateContainers();
                 }).catch(function (err) {
+                    if (refreshRequired) {
+                        setStatus('error', MSG.configChanged);
+                        return;
+                    }
+                    updateContainers();
                     setUsername(null);
                     if (err && err.isCheckFailure) {
                         // A step's check expr failed — show its message
@@ -586,44 +683,52 @@
                         // Device not reachable / method threw
                         setStatus('not-inserted', MSG.notInserted);
                     }
-                });
+                }).then(function () { polling = false; });
             }
 
             poll();
-            setInterval(poll, 5000);
+            pollTimer = setInterval(poll, 5000);
 
             // 6. Form submit: run login.steps from config
             document.getElementById('ukey-login-form').addEventListener('submit', function (evt) {
                 evt.preventDefault();
+                if (refreshRequired || submitting || polling) return;
+                submitting = true;
+                containerSelect.disabled = true;
                 var pinInput = document.getElementById('id_pin');
                 var pinValue = pinInput ? pinInput.value : '';
 
                 setStatus('loading', MSG.pinChecking);
 
-                var loginSteps = ((sdkConfig.login || {}).steps) || [];
+                // Refresh the device and serial before PIN verification and signing.
+                var loginSteps = setupSteps.concat((sdkConfig.login || {}).steps || []);
                 var loginCtx = Object.assign({}, ctx, {
                     vars:  {},
                     input: { pin: pinValue }
                 });
 
-                runSteps(loginSteps, api, loginCtx, function (label) {
-                    setStatus('loading', label);
+                checkConfig().then(function () {
+                    return runSteps(loginSteps, api, loginCtx, function (label) {
+                        setStatus('loading', label);
+                    });
                 }).then(function () {
                     setStatus('inserted', MSG.pinOk);
                 }).catch(function (err) {
+                    submitting = false;
+                    certificateSelection = null;
+                    containerSelect.disabled = refreshRequired;
+                    updateContainers();
                     if (pinInput) { pinInput.value = ''; pinInput.focus(); }
-                    console.log('....', err);
                     setStatus(
                         'error', 
                         err.message || 
                         MSG.pinFail
                     );
-                    loginBtn.disabled = false;
+                    loginBtn.disabled = refreshRequired;
                 });
             });
 
         }).catch(function (err) {
-            console.error('[UKeyLogin] init error:', err);
             setStatus('error', MSG.sdkError + ': ' + err.message);
         });
     });

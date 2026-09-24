@@ -1,46 +1,76 @@
+from uuid import uuid4
 
-import base64
-import os
-import subprocess
-import tempfile
-from django.utils.translation import gettext_lazy as _
-
-import yaml
 from django.conf import settings
+from django.db import IntegrityError, transaction
 from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_control
-from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
+from rest_framework import generics, serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
-from common.permissions import OnlySuperUser
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.views import APIView
+
 from common.utils import get_logger
-from .sdk import ukey_sdk_config
-from .utils import is_sm2_pem
+from rbac.permissions import RBACPermission
+from users.api.mixins import UserQuerysetMixin
+from users.models import User, UKeyCertificateBinding
+from users.permissions import UserObjectPermission
+from . import challenges
+from .binding import binding_version, record_change, verify_identity
+from .configuration import REVISION, ensure_enabled, get_revision_snapshot, get_snapshot, locked_snapshot
+from .exceptions import UKeyAuthError
+from .providers import get_provider
+from .sdk import UKeySDKConfig
 
 
-__all__ = ['UKeySDKScriptFileAPIView', 'UKeySDKConfigFileAPIView']
+__all__ = [
+    'UKeySDKScriptFileAPIView', 'UKeySDKConfigFileAPIView',
+    'UKeyCertEnrollAPIView', 'UKeyCertificateBindingAPI',
+]
 
 logger = get_logger(__name__)
 
 
+@method_decorator(never_cache, name='dispatch')
 class UKeySDKScriptFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
-        content = ukey_sdk_config.load_sdk_script_content()
+        snapshot = get_snapshot()
+        sdk = UKeySDKConfig(snapshot)
+        # Builtin clients may use the original URL without version parameters.
+        # When supplied, still reject a driver from another configuration.
+        versioned = sdk.provider.binding_mode == 'certificate' or any(
+            name in request.query_params for name in ('vendor', 'revision')
+        )
+        if versioned and (request.query_params.get('vendor') != snapshot['AUTH_UKEY_VENDOR']
+                          or request.query_params.get('revision') != snapshot[REVISION]):
+            return Response({'detail': _('UKey settings have changed. Refresh the page and try again.')}, status=409)
+        content = sdk.load_sdk_script_content()
         if content is None:
             raise Http404
         return HttpResponse(content, content_type='application/javascript')
 
 
+@method_decorator(never_cache, name='dispatch')
 class UKeySDKConfigFileAPIView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
+        if request.query_params.get('revision_only') == '1':
+            snapshot = get_revision_snapshot()
+            return Response({
+                'provider': snapshot['AUTH_UKEY_CA_PROVIDER'],
+                'vendor': snapshot['AUTH_UKEY_VENDOR'], 'revision': snapshot[REVISION],
+            })
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
-        data = ukey_sdk_config.get_sdk_config(lang=lang)
+        sdk = UKeySDKConfig(get_snapshot())
+        admin = request.user.is_authenticated and request.user.has_perm('users.change_user')
+        data = sdk.get_sdk_config(lang=lang, include_admin_pin=admin)
         return Response(data)
 
 
@@ -50,7 +80,9 @@ class UKeyCertEnrollAPIView(APIView):
     }
 
     def post(self, request):
-        if not ukey_sdk_config.enroll_enabled:
+        snapshot = get_snapshot()
+        provider = get_provider(snapshot)
+        if not provider.supports_enrollment or not snapshot['AUTH_UKEY_ENROLL_ENABLED']:
             data = {'error': _('Certificate enrollment is not enabled')}
             return Response(data=data, status=400)
 
@@ -60,175 +92,113 @@ class UKeyCertEnrollAPIView(APIView):
             return Response(data=data, status=400)
 
         try:
-            singed_cert = self.sign_cert(csr_raw)
-        except Exception as e:
-            error = '{}: {}'.format(_('Certificate signing failed'), str(e))
-            logger.error(error, exc_info=True)
+            signed_cert = provider.enroll(csr_raw)
+        except Exception as exc:
+            error = _('Certificate signing failed; check the configuration and retry')
+            logger.error('UKey certificate signing failed: exception=%s', type(exc).__name__)
             return Response(data={'error': error}, status=400)
+        return Response(data={'signed_cert': signed_cert}, status=200)
 
-        data = {'signed_cert': singed_cert}
-        return Response(data=data, status=200)
 
-    def sign_cert(self, csr_raw):
-        # 记录输入是否含 PEM 头，用于决定输出格式
-        if isinstance(csr_raw, bytes):
-            has_pem_header = csr_raw.lstrip().startswith(b'-----BEGIN')
-        else:
-            has_pem_header = csr_raw.strip().startswith('-----BEGIN')
+class UKeyManagementThrottle(UserRateThrottle):
+    rate = '10/min'
+    scope = 'ukey_management'
 
-        csr_pem = self._normalize_csr_to_pem(csr_raw)
-        if self._is_sm2_csr(csr_pem):
-            singed_cert = self.sign_cert_by_gmssl(csr_pem)
-        else:
-            singed_cert = self.sign_cert_by_other(csr_pem)
 
-        # 输入不含 PEM 头时，返回裸 base64（去掉首尾标识行）
-        if not has_pem_header:
-            lines = singed_cert.strip().splitlines()
-            singed_cert = ''.join(
-                ln for ln in lines if not ln.startswith('-----')
-            )
-        return singed_cert
+class UKeyCertificateBindingSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(choices=['challenge', 'bind', 'unbind'])
+    revision = serializers.CharField(max_length=32)
+    challenge_id = serializers.CharField(max_length=43, required=False)
+    cert = serializers.CharField(max_length=21848, required=False, trim_whitespace=False, write_only=True)
+    signature = serializers.CharField(max_length=4096, required=False, trim_whitespace=False, write_only=True)
+    hardware_serial = serializers.CharField(max_length=128, required=False)
+    binding_version = serializers.CharField(max_length=36, required=False, allow_blank=True)
 
-    def _normalize_csr_to_pem(self, csr_data):
-        """
-        将 SDK 返回的 CSR 统一转换成标准 PEM 字符串。
-        支持三种输入格式：
-          1. 已经是标准 PEM（含 -----BEGIN CERTIFICATE REQUEST----- 头）
-          2. 裸 base64 字符串（无 PEM 头，国密 USB Key SDK 常见）
-          3. 原始 DER 二进制 bytes
-        """
-        if isinstance(csr_data, bytes):
-            if csr_data.lstrip().startswith(b'-----BEGIN'):
-                return csr_data.decode('utf-8')
-            b64 = base64.b64encode(csr_data).decode('ascii')
-        else:
-            csr_data = csr_data.strip()
-            if csr_data.startswith('-----BEGIN'):
-                return csr_data
-            # 裸 base64：去除空白后校验并重新分行
-            b64 = ''.join(csr_data.split())
-            base64.b64decode(b64, validate=True)
+    def validate(self, attrs):
+        if attrs['action'] == 'bind':
+            for key in ('challenge_id', 'cert', 'signature', 'hardware_serial'):
+                if not attrs.get(key):
+                    raise serializers.ValidationError({key: 'This field is required.'})
+        elif attrs['action'] == 'unbind' and 'binding_version' not in attrs:
+            raise serializers.ValidationError({'binding_version': 'Reload the binding before unbinding.'})
+        return attrs
 
-        lines = [b64[i:i + 64] for i in range(0, len(b64), 64)]
-        return (
-            '-----BEGIN CERTIFICATE REQUEST-----\n'
-            + '\n'.join(lines)
-            + '\n-----END CERTIFICATE REQUEST-----\n'
-        )
 
-    def _is_sm2_csr(self, csr_pem):
-        """通过查找 SM2 曲线 OID 字节序列判断 CSR 是否使用 SM2 算法。"""
-        return is_sm2_pem(csr_pem)
+@method_decorator(never_cache, name='dispatch')
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+class UKeyCertificateBindingAPI(UserQuerysetMixin, generics.GenericAPIView):
+    permission_classes = [RBACPermission, UserObjectPermission]
+    rbac_perms = {'GET': 'users.change_user', 'POST': 'users.change_user',
+                  'partial_update': 'users.change_user'}
+    # Preserve the existing user-management superuser/object restriction.
+    action = 'partial_update'
+    lookup_url_kwarg = 'user_id'
+    serializer_class = UKeyCertificateBindingSerializer
+    throttle_classes = [UKeyManagementThrottle]
 
-    def sign_cert_by_other(self, csr_pem):
-        import datetime
-        from cryptography import x509
-        from cryptography.hazmat.primitives import hashes, serialization
-        from cryptography.hazmat.primitives.asymmetric import ec, rsa
+    def get_throttles(self):
+        return [] if self.request.method == 'GET' else super().get_throttles()
 
-        csr = x509.load_pem_x509_csr(csr_pem.encode())
-        pub_key = csr.public_key()
+    def get(self, request, *args, **kwargs):
+        user = self.get_object()
+        return Response(self.binding_data(user.pk, get_provider(get_snapshot()).id))
 
-        if isinstance(pub_key, ec.EllipticCurvePublicKey):
-            raise NotImplementedError('ECDSA certificate signing is not supported')
-        if not isinstance(pub_key, rsa.RSAPublicKey):
-            raise ValueError('Unsupported key type: {}'.format(type(pub_key).__name__))
+    @staticmethod
+    def binding_data(user_id, provider):
+        binding = UKeyCertificateBinding.objects.filter(user_id=user_id, provider=provider).first()
+        if not binding:
+            return {'bound': False, 'binding_version': '', 'hardware_serial': ''}
+        return {
+            'bound': True, 'binding_version': str(binding.version),
+            'hardware_serial': binding.hardware_serial,
+            'certificate_fingerprint': binding.certificate_fingerprint,
+        }
 
-        ca_key_content = ukey_sdk_config.ca_key_content
-        ca_cert_content = ukey_sdk_config.ca_cert_content
-        ca_key_pass = ukey_sdk_config.ca_key_pass
-        if not ca_key_content:
-            raise ValueError('AUTH_UKEY_CA_KEY_CONTENT not configured')
-        if not ca_cert_content:
-            raise ValueError('AUTH_UKEY_CA_CERT_CONTENT not configured')
-
-        ca_cert = x509.load_pem_x509_certificate(ca_cert_content.encode())
-        password = ca_key_pass.encode() if ca_key_pass else None
-        ca_key = serialization.load_pem_private_key(ca_key_content.encode(), password=password)
-
-        validity_days = ukey_sdk_config.enroll_validity_days
-        now = datetime.datetime.now(datetime.timezone.utc)
-        cert = (
-            x509.CertificateBuilder()
-            .subject_name(csr.subject)
-            .issuer_name(ca_cert.subject)
-            .public_key(pub_key)
-            .serial_number(x509.random_serial_number())
-            .not_valid_before(now)
-            .not_valid_after(now + datetime.timedelta(days=validity_days))
-            .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)
-            .sign(ca_key, hashes.SHA256())
-        )
-        return cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
-
-    def sign_cert_by_gmssl(self, csr_pem):
-        """
-        使用 gmssl reqsign 签发 SM2 证书。
-        命令示例：
-          gmssl reqsign -in user.csr -days 365 -cacert root.crt -key root.key -pass 123456 -out user.crt
-        """
-        gmssl_bin = ukey_sdk_config.gmssl_bin
-        ca_key_content = ukey_sdk_config.ca_key_content
-        ca_cert_content = ukey_sdk_config.ca_cert_content
-        ca_key_pass = ukey_sdk_config.ca_key_pass
-        if not ca_key_content:
-            raise ValueError('AUTH_UKEY_CA_KEY_CONTENT not configured')
-        if not ca_cert_content:
-            raise ValueError('AUTH_UKEY_CA_CERT_CONTENT not configured')
-
-        validity_days = str(ukey_sdk_config.enroll_validity_days)
-
-        csr_file = ca_cert_file = ca_key_file = cert_file = None
+    def post(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
         try:
-            with tempfile.NamedTemporaryFile(
-                suffix='.csr', mode='w', delete=False, encoding='utf-8'
-            ) as f:
-                f.write(csr_pem)
-                csr_file = f.name
-
-            with tempfile.NamedTemporaryFile(
-                suffix='.crt', mode='w', delete=False, encoding='utf-8'
-            ) as f:
-                f.write(ca_cert_content)
-                ca_cert_file = f.name
-
-            with tempfile.NamedTemporaryFile(
-                suffix='.key', mode='w', delete=False, encoding='utf-8'
-            ) as f:
-                f.write(ca_key_content)
-                ca_key_file = f.name
-
-            fd, cert_file = tempfile.mkstemp(suffix='.crt')
-            os.close(fd)
-
-            # https://github.com/GmSSL/GmSSL-Python#sm2数字证书
-            # gmssl_python 只支持SM2证书的解析和验证等功能，不支持SM2证书的签发和生成，
-            # 所以还是需要使用 gmssl bin 来执行 reqsign 命令行工具进行签发。虽然增加了对外部命令的依赖，
-            # 但这是目前最简单可靠的方案。
-            cmd = [
-                gmssl_bin, 'reqsign',
-                '-in', csr_file,
-                '-days', validity_days,
-                '-cacert', ca_cert_file,
-                '-key', ca_key_file,
-                '-out', cert_file,
-            ]
-            if ca_key_pass:
-                cmd += ['-pass', ca_key_pass]
-
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
-            if result.returncode != 0:
-                raise RuntimeError('gmssl reqsign failed: {}'.format(result.stderr.strip()))
-
-            with open(cert_file, 'r', encoding='utf-8') as f:
-                return f.read()
-        finally:
-            for path in (csr_file, ca_cert_file, ca_key_file, cert_file):
-                if path and os.path.exists(path):
-                    os.unlink(path)
+            snapshot = get_snapshot()
+            provider = ensure_enabled(snapshot)
+            if provider.binding_mode != 'certificate':
+                raise UKeyAuthError('Certificate binding is not supported by this CA provider')
+            if data['revision'] != snapshot[REVISION]:
+                raise UKeyAuthError('UKey configuration changed; refresh and retry')
+            action = data['action']
+            if action == 'challenge':
+                return Response(challenges.issue(request, 'bind', user.pk, binding_version(user.pk, provider.id)))
+            if action == 'bind':
+                record, snapshot = challenges.consume(request, data['challenge_id'], 'bind', user.pk)
+                identity = verify_identity(snapshot, record['code'], data['cert'], data['signature'])
+                expected_binding = record['binding_version']
+            else:
+                expected_binding = data['binding_version']
+            with locked_snapshot(snapshot[REVISION]) as current:
+                ensure_enabled(current, provider.id)
+                # Keep DISTINCT in the scope subquery; lock only the parent user row.
+                allowed_users = self.get_queryset().values('pk')
+                locked_user = (
+                    User.objects.filter(pk__in=allowed_users)
+                    .select_for_update()
+                    .get(pk=user.pk)
+                )
+                self.check_object_permissions(request, locked_user)
+                if binding_version(user.pk, provider.id) != expected_binding:
+                    raise UKeyAuthError('Certificate binding changed; refresh and retry')
+                if action == 'bind':
+                    UKeyCertificateBinding.objects.update_or_create(user=locked_user, defaults={
+                        **identity, 'hardware_serial': data['hardware_serial'], 'version': uuid4(),
+                    })
+                else:
+                    UKeyCertificateBinding.objects.filter(user=locked_user, provider=provider.id).delete()
+                transaction.on_commit(lambda: record_change(user, action, provider.id), robust=True)
+                result = self.binding_data(user.pk, provider.id)
+            return Response(result)
+        except IntegrityError:
+            raise ValidationError('Certificate is already bound to another user') from None
+        except User.DoesNotExist:
+            raise ValidationError('Target user is no longer available') from None
+        except UKeyAuthError as exc:
+            raise ValidationError(str(exc)) from None

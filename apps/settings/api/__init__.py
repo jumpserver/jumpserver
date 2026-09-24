@@ -12,5 +12,6 @@ from .settings import *
 from .slack import *
 from .sms import *
 from .syslog import *
+from .ukey import *
 from .vault import *
 from .wecom import *

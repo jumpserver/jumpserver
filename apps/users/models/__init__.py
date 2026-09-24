@@ -6,3 +6,4 @@ from .group import *
 from .preference import *
 from .user import *
 from .utils import *
+from .ukey import UKeyCertificateBinding

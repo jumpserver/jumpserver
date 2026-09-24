@@ -13364,3 +13364,325 @@ msgstr "Giấy phép không hợp lệ"
 
 #~ msgid "Closed"
 #~ msgstr "Đóng"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey vendor"
+msgstr "Nhà sản xuất UKey"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Longmai"
+msgstr "Longmai"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "JIT"
+msgstr "JIT"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Unsupported UKey vendor. Select a supported vendor in UKey settings."
+msgstr "Nhà sản xuất UKey không được hỗ trợ. Chọn nhà sản xuất được hỗ trợ trong cài đặt UKey."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "This certificate authentication method does not support the selected UKey vendor."
+msgstr "Phương thức xác thực bằng chứng thư này không hỗ trợ nhà sản xuất UKey đã chọn."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Select the vendor of your UKey. After switching, refresh UKey pages and restart unfinished operations."
+msgstr "Chọn nhà sản xuất UKey đang sử dụng. Sau khi đổi, tải lại trang UKey và bắt đầu lại các thao tác chưa hoàn tất."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey settings have changed. Refresh the page and try again."
+msgstr "Cài đặt UKey đã thay đổi. Tải lại trang rồi thử lại."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "This address is not allowed. Use an address on a trusted service network."
+msgstr "Không được phép dùng địa chỉ này. Hãy dùng địa chỉ thuộc mạng dịch vụ đáng tin cậy."
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Login certificate"
+msgstr "Chứng thư đăng nhập"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select a certificate for login"
+msgstr "Chọn chứng thư để đăng nhập"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select the certificate linked to your account."
+msgstr "Chọn chứng thư đã liên kết với tài khoản của bạn."
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "UKey settings have changed or the service is unavailable. Refresh the page and try again."
+msgstr "Cài đặt UKey đã thay đổi hoặc dịch vụ không khả dụng. Tải lại trang rồi thử lại."
+
+#: authentication/backends/ukey/views.py
+msgid "UKey login is temporarily unavailable. Try again later or use another login method."
+msgstr "Tạm thời không thể đăng nhập bằng UKey. Hãy thử lại sau hoặc dùng cách đăng nhập khác."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Cannot connect to the Fisherman signature verification service or obtain random data. Check the settings and try again."
+msgstr "Không thể kết nối dịch vụ xác minh chữ ký Fisherman hoặc lấy dữ liệu ngẫu nhiên. Kiểm tra cài đặt và thử lại."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Fisherman signature verification service connection and random-data checks passed. UKey login and certificate verification have not been tested. Settings were not saved."
+msgstr "Kết nối dịch vụ xác minh chữ ký Fisherman và lấy dữ liệu ngẫu nhiên thành công. Chưa kiểm tra đăng nhập UKey và xác minh chứng thư. Cài đặt chưa được lưu."
+
+#: settings/serializers/auth/ukey.py
+msgid "Fisherman signature verification service URL"
+msgstr "URL dịch vụ xác minh chữ ký Fisherman"
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter the full HTTP or HTTPS URL, for example https://svs.example.com:8443. Do not include an API path or use the password management platform address."
+msgstr "Nhập URL HTTP hoặc HTTPS đầy đủ, ví dụ https://svs.example.com:8443. Không bao gồm đường dẫn API hoặc dùng địa chỉ nền tảng quản lý mật khẩu."
+
+#: settings/serializers/auth/ukey.py
+msgid "Certificate verification"
+msgstr "Xác minh chứng thư"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use system trust store"
+msgstr "Sử dụng kho tin cậy của hệ thống"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use custom CA certificate"
+msgstr "Sử dụng chứng thư CA tùy chỉnh"
+
+#: settings/serializers/auth/ukey.py
+msgid "Ignore certificate verification (unsafe)"
+msgstr "Bỏ qua xác minh chứng thư (không an toàn)"
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "A CA certificate is required."
+msgstr "Phải cung cấp chứng chỉ CA."
+
+#: settings/serializers/auth/ukey.py
+msgid "HTTPS CA certificate"
+msgstr "Chứng thư CA cho HTTPS"
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."
+msgstr "Tải lên chứng thư CA hoặc chuỗi chứng thư định dạng PEM cho dịch vụ HTTPS Fisherman, không kèm khóa riêng (tối đa 64 KB). Để trống để giữ chứng thư đã lưu. Không ảnh hưởng đến xác minh chứng thư UKey."
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter a valid HTTP or HTTPS service URL without credentials, an API path, query parameters or a fragment."
+msgstr "Nhập URL dịch vụ HTTP hoặc HTTPS hợp lệ, không chứa thông tin đăng nhập, đường dẫn API, tham số truy vấn hoặc phần fragment."
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a valid PEM CA certificate for the HTTPS service (maximum 64 KB), without a private key."
+msgstr "Tải lên chứng thư CA định dạng PEM hợp lệ cho dịch vụ HTTPS (tối đa 64 KB), không kèm khóa riêng."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Check the Fisherman signature verification service URL and HTTPS certificate settings."
+msgstr "Kiểm tra URL dịch vụ xác minh chữ ký Fisherman và cài đặt chứng thư HTTPS."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "CRL verification: revoked"
+msgstr "Xác minh CRL: đã thu hồi"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Cannot resolve signature verification service address"
+msgstr "Không thể phân giải địa chỉ dịch vụ xác minh chữ ký"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has been revoked"
+msgstr "Chứng chỉ đã bị thu hồi"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has expired"
+msgstr "Chứng chỉ đã hết hạn"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate is not yet valid"
+msgstr "Chứng chỉ chưa có hiệu lực"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate parsing failed"
+msgstr "Không thể phân tích chứng chỉ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection failed or timed out"
+msgstr "Kết nối đến dịch vụ chứng chỉ không thành công hoặc đã hết thời gian chờ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection or TLS verification failed"
+msgstr "Kết nối đến dịch vụ chứng chỉ hoặc xác minh TLS không thành công"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service rejected the request"
+msgstr "Dịch vụ chứng chỉ đã từ chối yêu cầu"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service request is too large"
+msgstr "Yêu cầu gửi đến dịch vụ chứng chỉ quá lớn"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response is too large"
+msgstr "Phản hồi từ dịch vụ chứng chỉ quá lớn"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response timed out"
+msgstr "Đã hết thời gian chờ phản hồi từ dịch vụ chứng chỉ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service returned an unexpected HTTP response"
+msgstr "Dịch vụ chứng chỉ trả về phản hồi HTTP không mong đợi"
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(name)s, %(code)s)."
+msgstr "Lỗi dịch vụ Fisherman: %(message)s (%(name)s, %(code)s)."
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(code)s)."
+msgstr "Lỗi dịch vụ Fisherman: %(message)s (%(code)s)."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Hash calculation failed"
+msgstr "Tính toán giá trị băm không thành công"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Incomplete certificate service response"
+msgstr "Phản hồi từ dịch vụ chứng chỉ không đầy đủ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid DER data"
+msgstr "Dữ liệu DER không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid HTTPS certificate verification mode"
+msgstr "Chế độ xác minh chứng chỉ HTTPS không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid OCSP request"
+msgstr "Yêu cầu OCSP không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate"
+msgstr "Chứng chỉ không hợp lệ"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate data"
+msgstr "Dữ liệu chứng chỉ không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate identifier"
+msgstr "Mã định danh chứng chỉ không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate information type"
+msgstr "Loại thông tin chứng chỉ không hợp lệ"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate serial number"
+msgstr "Số sê-ri chứng chỉ không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service connection parameters"
+msgstr "Tham số kết nối dịch vụ chứng chỉ không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service response"
+msgstr "Phản hồi từ dịch vụ chứng chỉ không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid data format"
+msgstr "Định dạng dữ liệu không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid encoded data"
+msgstr "Dữ liệu mã hóa không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key index"
+msgstr "Chỉ mục khóa không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key value"
+msgstr "Giá trị khóa không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid or missing certificate"
+msgstr "Chứng chỉ không hợp lệ hoặc bị thiếu"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid parameters"
+msgstr "Tham số không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature"
+msgstr "Chữ ký không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature method"
+msgstr "Phương thức ký không hợp lệ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Key generation failed"
+msgstr "Tạo khóa không thành công"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "No OCSP response"
+msgstr "Không có phản hồi OCSP"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not authorized"
+msgstr "Yêu cầu OCSP không được cấp phép"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not signed"
+msgstr "Yêu cầu OCSP chưa được ký"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP responder internal error"
+msgstr "Lỗi nội bộ của máy chủ phản hồi OCSP"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP service is temporarily unavailable. Try again later"
+msgstr "Dịch vụ OCSP tạm thời không khả dụng. Vui lòng thử lại sau"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "P7 signing failed"
+msgstr "Ký P7 không thành công"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA certificate not found"
+msgstr "Không tìm thấy chứng chỉ CA gốc"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA signature verification failed"
+msgstr "Xác minh chữ ký CA gốc không thành công"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Service connection failed"
+msgstr "Kết nối đến dịch vụ không thành công"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification failed"
+msgstr "Xác minh chữ ký không thành công"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification service resolution timed out"
+msgstr "Đã hết thời gian chờ phân giải địa chỉ dịch vụ xác minh chữ ký"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "System error"
+msgstr "Lỗi hệ thống"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unexpected error"
+msgstr "Lỗi không mong đợi"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unknown error code"
+msgstr "Mã lỗi không xác định"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey certificate. Contact the administrator."
+msgstr "Không thể phân tích chứng thư UKey. Vui lòng liên hệ quản trị viên."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey signature. Contact the administrator."
+msgstr "Không thể phân tích chữ ký UKey. Vui lòng liên hệ quản trị viên."
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "Xinjiang CA"
+msgstr "CA Tân Cương"

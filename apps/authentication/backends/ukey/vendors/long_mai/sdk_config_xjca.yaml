@@ -1,0 +1,189 @@
+# 新疆 CA 兼容配置：复用 sdk_config.yaml 的设备初始化和证书信息展示。
+# 外部证书只做持有证明、绑定与解绑，不提供签发、删除或 PIN 管理操作。
+sdk:
+  create:
+    constructor: ExternalCertificateUKey
+  setup:
+    steps:
+      - name: getDevSN
+        label: "{{ '获取设备序列号' | trans }}"
+        call: JMS_EnumDevice
+        args: []
+        register: ukey.devSN
+      - name: getUserCert
+        label: "{{ '获取证书' | trans }}"
+        call: JMS_GetCachedCertificate
+        args: []
+        register: ukey.cert
+
+info:
+  when: "{{ mode === 'admin' }}"
+  device:
+    - key: userUKeySN
+      value: "{{ ukey.binding.hardware_serial }}"
+
+login:
+  detect:
+    # Detection initializes the device, but never exports certificates before PIN login.
+    setup: true
+    steps: []
+  steps:
+    - &verify_pin
+      name: verifyPin
+      label: "{{ '验证 PIN' | trans }}"
+      call: JMS_Login
+      args: ["{{ input.pin }}"]
+      check:
+        expr: "{{ result === 0 }}"
+        message: "{{ 'PIN 验证失败，错误码: {{ result }}' | trans }}"
+    - &read_signing_certificate
+      name: getUserCert
+      label: "{{ '获取证书' | trans }}"
+      call: JMS_ReadSigningCertificate
+      args: []
+      register: ukey.cert
+    - &select_signing_certificate
+      <<: *read_signing_certificate
+      type: select_certificate
+      check:
+        expr: "{{ result != null && result !== '' }}"
+        message: "{{ 'Select a certificate for login' | trans }}"
+    - &set_digest_method
+      name: setDigestMethod
+      label: "{{ '设置摘要算法' | trans }}"
+      call: SOF_SetDigestMethod
+      args: ["{{ config.digestMethod }}"]
+      check:
+        expr: "{{ result === 0 }}"
+        message: "{{ '设置摘要算法失败，错误码: {{ result }}' | trans }}"
+    - &set_user_id
+      name: setUserID
+      label: "{{ '设置用户 ID' | trans }}"
+      call: SOF_SetUserID
+      args: ["1234567812345678"]
+      check:
+        expr: "{{ result === 0 }}"
+        message: "{{ '设置用户 ID 失败，错误码: {{ result }}' | trans }}"
+    - &sign_challenge
+      name: signChallenge
+      label: "{{ '签名挑战码' | trans }}"
+      call: SOF_SignData
+      args:
+        - "{{ instance.signingContainer }}"
+        - "{{ config.keySpec }}"
+        - "{{ challenge.code_base64 }}"
+        - "{{ challenge.length }}"
+        - "{{ config.signChallengeMode }}"
+      register: vars.signature
+      check:
+        expr: "{{ result !== null && result !== '' }}"
+        message: "{{ '签名失败' | trans }}"
+    - name: submit
+      label: "{{ '提交登录' | trans }}"
+      type: submit
+      fields:
+        signature: "{{ vars.signature }}"
+        cert: "{{ ukey.cert }}"
+        username: ''
+        ukey_sn: "{{ ukey.devSN.0 }}"
+        challenge_id: "{{ challenge.id }}"
+
+operations:
+  when: "{{ mode === 'admin' }}"
+  items:
+    - key: bindUserUKeySN
+      label: "{{ '绑定设备' | trans }}"
+      hint: "{{ 'Bind this UKey certificate to the user. No new certificate will be issued.' | trans }}"
+      btnType: primary
+      scope: admin
+      event: [refresh.info.device, refresh.info.cert]
+      disabled: "{{ !ukey.devSN || ukey.devSN.length !== 1 }}"
+      steps:
+        - <<: *verify_pin
+          input:
+            title: "{{ '验证用户 PIN' | trans }}"
+            fields:
+              - {key: pin, label: PIN, type: password, required: true}
+        - *read_signing_certificate
+        - *select_signing_certificate
+        - type: api
+          method: post
+          url: &binding_url "{{ config.api.certificate_binding_url }}"
+          url_format: &binding_target {user_id: "{{ user.id }}"}
+          body: {action: challenge, revision: "{{ config.revision }}"}
+          register: vars.challenge
+        - *set_digest_method
+        - *set_user_id
+        - <<: *sign_challenge
+          args:
+            - "{{ instance.signingContainer }}"
+            - "{{ config.keySpec }}"
+            - "{{ vars.challenge.code_base64 }}"
+            - "{{ vars.challenge.length }}"
+            - "{{ config.signChallengeMode }}"
+        - type: api
+          method: post
+          url: *binding_url
+          url_format: *binding_target
+          body:
+            action: bind
+            revision: "{{ config.revision }}"
+            challenge_id: "{{ vars.challenge.id }}"
+            cert: "{{ ukey.cert }}"
+            signature: "{{ vars.signature }}"
+            hardware_serial: "{{ ukey.devSN.0 }}"
+          register: ukey.binding
+    - key: unbindUserUKeySN
+      label: "{{ '解绑设备' | trans }}"
+      hint: "{{ 'This only removes the link to the user. Certificates and private keys on the UKey are kept.' | trans }}"
+      btnType: danger
+      scope: admin
+      requires_device: false
+      confirm:
+        title: "{{ '解绑设备确认' | trans }}"
+        message: "{{ '确认要解绑 UKey 设备吗？' | trans }}"
+        type: warning
+      event: refresh.info.device
+      disabled: "{{ !ukey.binding.bound }}"
+      steps:
+        - type: api
+          method: post
+          url: *binding_url
+          url_format: *binding_target
+          body:
+            action: unbind
+            revision: "{{ config.revision }}"
+            binding_version: "{{ ukey.binding.binding_version }}"
+          register: ukey.binding
+
+i18n:
+  "Select a certificate for login":
+    en: "Select a certificate for login"
+    zh: "选择登录用的证书"
+    zh_hant: "選擇登入用的憑證"
+    ja: "ログイン用の証明書を選択"
+    es: "Seleccione un certificado para iniciar sesión"
+    pt_br: "Selecione um certificado para entrar"
+    ru: "Выберите сертификат для входа"
+    ko: "로그인에 사용할 인증서 선택"
+    vi: "Chọn chứng thư để đăng nhập"
+  "Bind this UKey certificate to the user. No new certificate will be issued.":
+    en: "Bind this UKey certificate to the user. No new certificate will be issued."
+    zh: "将此 UKey 的证书绑定到当前用户，不会签发新证书。"
+    zh_hant: "將此 UKey 的憑證綁定至目前使用者，不會簽發新憑證。"
+    ja: "この UKey の証明書を対象ユーザーに紐付けます。新しい証明書は発行しません。"
+    es: "Vincula el certificado de este UKey al usuario. No se emitirá un certificado nuevo."
+    pt_br: "Vincula o certificado deste UKey ao usuário. Nenhum novo certificado será emitido."
+    ru: "Сертификат этого UKey будет привязан к пользователю. Новый сертификат не выпускается."
+    ko: "이 UKey의 인증서를 해당 사용자에게 연결합니다. 새 인증서는 발급하지 않습니다."
+    vi: "Liên kết chứng thư của UKey này với người dùng. Không cấp chứng thư mới."
+  "This only removes the link to the user. Certificates and private keys on the UKey are kept.":
+    en: "This only removes the link to the user. Certificates and private keys on the UKey are kept."
+    zh: "仅解除与当前用户的绑定，不会删除 UKey 内的证书和私钥。"
+    zh_hant: "僅解除與目前使用者的綁定，不會刪除 UKey 內的憑證和私密金鑰。"
+    ja: "対象ユーザーとの紐付けのみ解除します。UKey 内の証明書や秘密鍵は削除しません。"
+    es: "Solo se elimina el vínculo con el usuario. Se conservan los certificados y las claves privadas del UKey."
+    pt_br: "Remove apenas o vínculo com o usuário. Os certificados e as chaves privadas do UKey são mantidos."
+    ru: "Удаляется только привязка к пользователю. Сертификаты и закрытые ключи на UKey сохраняются."
+    ko: "사용자와의 연결만 해제합니다. UKey의 인증서와 개인 키는 삭제하지 않습니다."
+    vi: "Chỉ xóa liên kết với người dùng. Chứng thư và khóa riêng trên UKey được giữ nguyên."

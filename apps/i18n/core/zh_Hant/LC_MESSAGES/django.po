@@ -18,6 +18,332 @@ msgstr ""
 "X-Generator: Poedit 2.4.3\n"
 "X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://zhconvert.org\n"
 
+#: authentication/backends/ukey/providers/builtin.py
+msgid "Builtin CA"
+msgstr "內建 CA"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unexpected error"
+msgstr "異常錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate identifier"
+msgstr "憑證識別碼錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate information type"
+msgstr "憑證資訊類型錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Service connection failed"
+msgstr "服務連接失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature method"
+msgstr "簽章方法錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key index"
+msgstr "金鑰索引錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key value"
+msgstr "金鑰錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid or missing certificate"
+msgstr "憑證錯誤或憑證為空"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate parsing failed"
+msgstr "憑證解析失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has expired"
+msgstr "憑證已過期"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate is not yet valid"
+msgstr "憑證尚未生效"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has been revoked"
+msgstr "憑證已被撤銷"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature"
+msgstr "無效的簽章"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid data format"
+msgstr "無效的資料格式"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "System error"
+msgstr "系統異常錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid parameters"
+msgstr "參數錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification failed"
+msgstr "驗簽失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "P7 signing failed"
+msgstr "P7 簽章失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Key generation failed"
+msgstr "金鑰產生失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Hash calculation failed"
+msgstr "雜湊計算失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "No OCSP response"
+msgstr "OCSP 未回應"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid OCSP request"
+msgstr "OCSP 請求無效"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP responder internal error"
+msgstr "OCSP 回應服務內部錯誤"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP service is temporarily unavailable. Try again later"
+msgstr "OCSP 服務暫時無法使用，請稍後重試"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not signed"
+msgstr "OCSP 請求未簽章"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not authorized"
+msgstr "OCSP 請求未授權"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA certificate not found"
+msgstr "根憑證不存在"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA signature verification failed"
+msgstr "根憑證驗簽失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "CRL verification: revoked"
+msgstr "CRL 驗證已註銷"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unknown error code"
+msgstr "未知錯誤碼"
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(name)s, %(code)s)."
+msgstr "驗簽異常：%(message)s (%(name)s, %(code)s)。"
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(code)s)."
+msgstr "驗簽異常：%(message)s (%(code)s)。"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid DER data"
+msgstr "無效的 DER 資料"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid encoded data"
+msgstr "無效的編碼資料"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate"
+msgstr "無效的憑證"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid HTTPS certificate verification mode"
+msgstr "無效的 HTTPS 憑證驗證方式"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service connection parameters"
+msgstr "漁翁驗簽服務連接參數無效"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Cannot resolve signature verification service address"
+msgstr "無法解析漁翁驗簽服務位址"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification service resolution timed out"
+msgstr "漁翁驗簽服務位址解析逾時"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection or TLS verification failed"
+msgstr "漁翁驗簽服務連接或 TLS 憑證驗證失敗"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service request is too large"
+msgstr "傳送至漁翁驗簽服務的請求過大"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service returned an unexpected HTTP response"
+msgstr "漁翁驗簽服務傳回異常的 HTTP 回應"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response timed out"
+msgstr "漁翁驗簽服務回應逾時"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response is too large"
+msgstr "漁翁驗簽服務傳回的資料過大"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Incomplete certificate service response"
+msgstr "漁翁驗簽服務傳回的資料不完整"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection failed or timed out"
+msgstr "漁翁驗簽服務連接失敗或逾時"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service response"
+msgstr "漁翁驗簽服務傳回的資料無效"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service rejected the request"
+msgstr "漁翁驗簽服務拒絕了請求"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate serial number"
+msgstr "無效的憑證序號"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate data"
+msgstr "無效的憑證資料"
+
+#: settings/serializers/auth/ukey.py
+msgid "Fisherman signature verification service URL"
+msgstr "漁翁驗簽服務位址"
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter the full HTTP or HTTPS URL, for example https://svs.example.com:8443. Do not include an API path or use the password management platform address."
+msgstr "填寫完整的 HTTP 或 HTTPS 位址，例如 https://svs.example.com:8443。不要填寫介面路徑或密碼管理中台位址。"
+
+#: settings/serializers/auth/ukey.py
+msgid "Certificate verification"
+msgstr "憑證校驗"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use system trust store"
+msgstr "使用系統信任庫"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use custom CA certificate"
+msgstr "使用自訂 CA 憑證"
+
+#: settings/serializers/auth/ukey.py
+msgid "Ignore certificate verification (unsafe)"
+msgstr "忽略憑證校驗 (不安全)"
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "A CA certificate is required."
+msgstr "必須提供 CA 憑證"
+
+#: settings/serializers/auth/ukey.py
+msgid "HTTPS CA certificate"
+msgstr "HTTPS CA 憑證"
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."
+msgstr "上傳漁翁 HTTPS 服務的 PEM 格式 CA 憑證或憑證鏈，不要包含私鑰 (最大 64 KB)。留空保留已儲存的憑證，不影響 UKey 憑證驗簽。"
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter a valid HTTP or HTTPS service URL without credentials, an API path, query parameters or a fragment."
+msgstr "請輸入有效的 HTTP 或 HTTPS 服務位址，不要包含帳號密碼、介面路徑、查詢參數或片段。"
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a valid PEM CA certificate for the HTTPS service (maximum 64 KB), without a private key."
+msgstr "請上傳 HTTPS 服務的有效 PEM 格式 CA 憑證 (最大 64 KB)，不要包含私鑰。"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Check the Fisherman signature verification service URL and HTTPS certificate settings."
+msgstr "請檢查漁翁驗簽服務位址和 HTTPS 憑證設定。"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey certificate. Contact the administrator."
+msgstr "無法解析 UKey 憑證，請聯絡管理員。"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey signature. Contact the administrator."
+msgstr "無法解析 UKey 簽章，請聯絡管理員。"
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "Xinjiang CA"
+msgstr "新疆 CA"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey vendor"
+msgstr "UKey 廠商"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Longmai"
+msgstr "龍脈"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "JIT"
+msgstr "吉大正元"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Unsupported UKey vendor. Select a supported vendor in UKey settings."
+msgstr "不支援此 UKey 廠商，請在 UKey 設定中選擇支援的廠商。"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "This certificate authentication method does not support the selected UKey vendor."
+msgstr "目前的憑證驗證方式不支援所選 UKey 廠商，請調整廠商或驗證方式。"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Select the vendor of your UKey. After switching, refresh UKey pages and restart unfinished operations."
+msgstr "選擇實際使用的 UKey 廠商。切換後，請重新整理 UKey 頁面並重新開始未完成的操作。"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey settings have changed. Refresh the page and try again."
+msgstr "UKey 設定已變更，請重新整理頁面後重試。"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "This address is not allowed. Use an address on a trusted service network."
+msgstr "此位址不允許使用，請填寫可信服務網路中的位址。"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Login certificate"
+msgstr "登入憑證"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select a certificate for login"
+msgstr "選擇登入用的憑證"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select the certificate linked to your account."
+msgstr "請選擇與目前帳戶綁定的憑證。"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "UKey settings have changed or the service is unavailable. Refresh the page and try again."
+msgstr "UKey 設定已變更或服務暫時無法使用，請重新整理頁面後重試。"
+
+#: authentication/backends/ukey/views.py
+msgid "UKey login is temporarily unavailable. Try again later or use another login method."
+msgstr "暫時無法使用 UKey 登入，請稍後重試或使用其他登入方式。"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Cannot connect to the Fisherman signature verification service or obtain random data. Check the settings and try again."
+msgstr "無法連接漁翁驗簽服務或取得隨機數，請檢查設定後重試。"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Fisherman signature verification service connection and random-data checks passed. UKey login and certificate verification have not been tested. Settings were not saved."
+msgstr "漁翁驗簽服務連接和隨機數取得成功，尚未測試 UKey 登入及憑證驗證。本次測試不會儲存設定。"
+
 #: settings/serializers/security.py
 msgid "Allow viewing asset account passwords"
 msgstr "允許檢視資產帳號密碼"

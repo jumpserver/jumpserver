@@ -12,6 +12,10 @@ class UKeyAuthError(Exception):
         super().__init__(str(self.msg))
 
 
+class UKeyServiceError(UKeyAuthError):
+    """A localized, payload-free service error safe to show on the login page."""
+
+
 class UKeyUserNotFoundError(UKeyAuthError):
     default_msg = _('User does not exist')
 

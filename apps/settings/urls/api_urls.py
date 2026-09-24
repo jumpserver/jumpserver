@@ -11,6 +11,7 @@ router.register(r'chatai-prompts', api.ChatPromptViewSet, 'chatai-prompt')
 router.register(r'leak-passwords', api.LeakPasswordViewSet, 'leak-passwords')
 
 urlpatterns = [
+    path('ukey/testing/', api.UKeyTestingAPI.as_view(), name='ukey-testing'),
     path('mail/testing/', api.MailTestingAPI.as_view(), name='mail-testing'),
     path('syslog/testing/', api.SyslogTestingAPI.as_view(), name='syslog-testing'),
     path('syslog/doc/download/', api.SyslogDocDownloadAPI.as_view(), name='syslog-doc-download'),

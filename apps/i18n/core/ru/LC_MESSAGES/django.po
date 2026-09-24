@@ -21,6 +21,208 @@ msgstr ""
 "X-Crowdin-Project-ID: 832018\n"
 "X-Generator: Poedit 2.4.3\n"
 
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "CRL verification: revoked"
+msgstr "Проверка CRL: отозван"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Cannot resolve signature verification service address"
+msgstr "Не удалось разрешить адрес службы проверки подписей"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has been revoked"
+msgstr "Сертификат отозван"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate has expired"
+msgstr "Срок действия сертификата истёк"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate is not yet valid"
+msgstr "Срок действия сертификата ещё не наступил"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate parsing failed"
+msgstr "Не удалось разобрать сертификат"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection failed or timed out"
+msgstr "Не удалось подключиться к службе сертификатов или истекло время ожидания"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service connection or TLS verification failed"
+msgstr "Ошибка подключения к службе сертификатов или проверки TLS"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service rejected the request"
+msgstr "Служба сертификатов отклонила запрос"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service request is too large"
+msgstr "Запрос к службе сертификатов слишком велик"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response is too large"
+msgstr "Ответ службы сертификатов слишком велик"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service response timed out"
+msgstr "Истекло время ожидания ответа службы сертификатов"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Certificate service returned an unexpected HTTP response"
+msgstr "Служба сертификатов вернула неожиданный HTTP-ответ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(name)s, %(code)s)."
+msgstr "Ошибка службы Fisherman: %(message)s (%(name)s, %(code)s)."
+
+#: authentication/backends/ukey/clients/fisherman.py
+#, python-format
+msgid "Fisherman service error: %(message)s (%(code)s)."
+msgstr "Ошибка службы Fisherman: %(message)s (%(code)s)."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Hash calculation failed"
+msgstr "Ошибка вычисления хеша"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Incomplete certificate service response"
+msgstr "Неполный ответ службы сертификатов"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid DER data"
+msgstr "Недопустимые данные DER"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid HTTPS certificate verification mode"
+msgstr "Недопустимый режим проверки сертификата HTTPS"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid OCSP request"
+msgstr "Недопустимый запрос OCSP"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate"
+msgstr "Недопустимый сертификат"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate data"
+msgstr "Недопустимые данные сертификата"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate identifier"
+msgstr "Недопустимый идентификатор сертификата"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate information type"
+msgstr "Недопустимый тип информации о сертификате"
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Invalid certificate serial number"
+msgstr "Недопустимый серийный номер сертификата"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service connection parameters"
+msgstr "Недопустимые параметры подключения к службе сертификатов"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid certificate service response"
+msgstr "Недопустимый ответ службы сертификатов"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid data format"
+msgstr "Недопустимый формат данных"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid encoded data"
+msgstr "Недопустимые закодированные данные"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key index"
+msgstr "Недопустимый индекс ключа"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid key value"
+msgstr "Недопустимое значение ключа"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid or missing certificate"
+msgstr "Сертификат недопустим или отсутствует"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid parameters"
+msgstr "Недопустимые параметры"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature"
+msgstr "Недопустимая подпись"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Invalid signature method"
+msgstr "Недопустимый метод подписи"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Key generation failed"
+msgstr "Ошибка создания ключа"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "No OCSP response"
+msgstr "Нет ответа OCSP"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not authorized"
+msgstr "Запрос OCSP не авторизован"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP request is not signed"
+msgstr "Запрос OCSP не подписан"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP responder internal error"
+msgstr "Внутренняя ошибка ответчика OCSP"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "OCSP service is temporarily unavailable. Try again later"
+msgstr "Служба OCSP временно недоступна. Повторите попытку позже"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "P7 signing failed"
+msgstr "Ошибка создания подписи P7"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA certificate not found"
+msgstr "Корневой сертификат УЦ не найден"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Root CA signature verification failed"
+msgstr "Ошибка проверки подписи корневого УЦ"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Service connection failed"
+msgstr "Не удалось подключиться к службе"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification failed"
+msgstr "Ошибка проверки подписи"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Signature verification service resolution timed out"
+msgstr "Истекло время ожидания разрешения адреса службы проверки подписей"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "System error"
+msgstr "Системная ошибка"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unexpected error"
+msgstr "Непредвиденная ошибка"
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "Unknown error code"
+msgstr "Неизвестный код ошибки"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -9493,7 +9695,7 @@ msgstr "Указанный порт не используется службой
 #: settings/utils/ldap.py:547
 #, python-brace-format
 msgid "Please add certificate: {}"
-msgstr "Пожалуйста, добавьте сертификат"
+msgstr "Пожалуйста, добавьте сертификат: {}"
 
 #: settings/utils/ldap.py:551 settings/utils/ldap.py:578
 #: settings/utils/ldap.py:608 settings/utils/ldap.py:636
@@ -13413,3 +13615,123 @@ msgstr "Если лицензия отсутствует, RDS будет раб�
 
 #~ msgid "Closed"
 #~ msgstr "Закрыто"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey vendor"
+msgstr "Производитель UKey"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Longmai"
+msgstr "Longmai"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "JIT"
+msgstr "JIT"
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Unsupported UKey vendor. Select a supported vendor in UKey settings."
+msgstr "Производитель UKey не поддерживается. Выберите поддерживаемого производителя в настройках UKey."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "This certificate authentication method does not support the selected UKey vendor."
+msgstr "Этот способ входа по сертификату не поддерживает выбранного производителя UKey."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "Select the vendor of your UKey. After switching, refresh UKey pages and restart unfinished operations."
+msgstr "Выберите производителя вашего UKey. После смены обновите страницы UKey и начните незавершённые операции заново."
+
+#: authentication/backends/ukey/vendors/__init__.py settings/serializers/auth/ukey.py
+msgid "UKey settings have changed. Refresh the page and try again."
+msgstr "Настройки UKey изменились. Обновите страницу и повторите попытку."
+
+#: authentication/backends/ukey/clients/fisherman.py
+msgid "This address is not allowed. Use an address on a trusted service network."
+msgstr "Этот адрес не разрешён. Используйте адрес доверенной сети сервисов."
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Login certificate"
+msgstr "Сертификат для входа"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select a certificate for login"
+msgstr "Выберите сертификат для входа"
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "Select the certificate linked to your account."
+msgstr "Выберите сертификат, привязанный к вашей учётной записи."
+
+#: authentication/templates/authentication/login_ukey.html
+msgid "UKey settings have changed or the service is unavailable. Refresh the page and try again."
+msgstr "Настройки UKey изменились или сервис недоступен. Обновите страницу и повторите попытку."
+
+#: authentication/backends/ukey/views.py
+msgid "UKey login is temporarily unavailable. Try again later or use another login method."
+msgstr "Вход через UKey временно недоступен. Повторите попытку позже или используйте другой способ входа."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Cannot connect to the Fisherman signature verification service or obtain random data. Check the settings and try again."
+msgstr "Не удалось подключиться к службе проверки подписей Fisherman или получить случайные данные. Проверьте настройки и повторите попытку."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Fisherman signature verification service connection and random-data checks passed. UKey login and certificate verification have not been tested. Settings were not saved."
+msgstr "Подключение к службе проверки подписей Fisherman и получение случайных данных проверены. Вход с UKey и проверка сертификатов не тестировались. Настройки не сохранены."
+
+#: settings/serializers/auth/ukey.py
+msgid "Fisherman signature verification service URL"
+msgstr "URL службы проверки подписей Fisherman"
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter the full HTTP or HTTPS URL, for example https://svs.example.com:8443. Do not include an API path or use the password management platform address."
+msgstr "Введите полный URL HTTP или HTTPS, например https://svs.example.com:8443. Не указывайте путь API или адрес платформы управления паролями."
+
+#: settings/serializers/auth/ukey.py
+msgid "Certificate verification"
+msgstr "Проверка сертификатов"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use system trust store"
+msgstr "Использовать системное хранилище доверия"
+
+#: settings/serializers/auth/ukey.py
+msgid "Use custom CA certificate"
+msgstr "Использовать пользовательский сертификат CA"
+
+#: settings/serializers/auth/ukey.py
+msgid "Ignore certificate verification (unsafe)"
+msgstr "Игнорировать проверку сертификатов (небезопасно)"
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "A CA certificate is required."
+msgstr "Необходимо предоставить сертификат ЦС."
+
+#: settings/serializers/auth/ukey.py
+msgid "HTTPS CA certificate"
+msgstr "Сертификат CA для HTTPS"
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."
+msgstr "Загрузите сертификат CA или цепочку сертификатов в формате PEM для службы HTTPS Fisherman, без закрытого ключа (не более 64 КБ). Оставьте поле пустым, чтобы сохранить ранее загруженный сертификат. Это не влияет на проверку сертификатов UKey."
+
+#: settings/serializers/auth/ukey.py
+msgid "Enter a valid HTTP or HTTPS service URL without credentials, an API path, query parameters or a fragment."
+msgstr "Введите допустимый URL службы HTTP или HTTPS без учётных данных, пути API, параметров запроса или фрагмента."
+
+#: settings/serializers/auth/ukey.py
+msgid "Upload a valid PEM CA certificate for the HTTPS service (maximum 64 KB), without a private key."
+msgstr "Загрузите действительный сертификат CA в формате PEM для службы HTTPS (не более 64 КБ), без закрытого ключа."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Check the Fisherman signature verification service URL and HTTPS certificate settings."
+msgstr "Проверьте URL службы проверки подписей Fisherman и настройки сертификата HTTPS."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey certificate. Contact the administrator."
+msgstr "Не удалось разобрать сертификат UKey. Обратитесь к администратору."
+
+#: authentication/backends/ukey/verifiers/fisherman.py
+msgid "Unable to parse the UKey signature. Contact the administrator."
+msgstr "Не удалось разобрать подпись UKey. Обратитесь к администратору."
+
+#: authentication/backends/ukey/providers/xjca.py
+msgid "Xinjiang CA"
+msgstr "УЦ Синьцзяна"
