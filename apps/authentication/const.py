@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 USER_LOGIN_GUARD_VIEW_REDIRECT_FIELD = 'next'
+CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY = 'custom_sso_first_login'
 
 RSA_PRIVATE_KEY = 'rsa_private_key'
 RSA_PUBLIC_KEY = 'rsa_public_key'

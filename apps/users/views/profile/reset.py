@@ -5,16 +5,20 @@ from __future__ import unicode_literals
 import time
 
 from django.conf import settings
+from django.contrib.auth import login
 from django.core.cache import cache
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView
 
+from authentication.const import CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY
 from authentication.errors import IntervalTooShort
+from authentication.signals import post_auth_success
 from authentication.utils import check_user_property_is_correct
 from common.const.choices import COUNTRY_CALLING_CODES
-from common.utils import FlashMessageUtil, get_object_or_none, random_string
+from common.utils import FlashMessageUtil, get_object_or_none, random_string, safe_next_url
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from users.notifications import ResetPasswordSuccessMsg
 from users.serializers import SmsUserSerializer
@@ -200,12 +204,25 @@ class UserResetPasswordView(FormView):
             form.add_error('new_password', error)
             return self.form_invalid(form)
 
+        pending = self.request.session.get(CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY) or {}
+        is_custom_sso_first_login = pending.get('token') == token
+        if is_custom_sso_first_login and (
+            not settings.AUTH_CUSTOM_SSO or
+            pending.get('user_id') != str(user.id) or
+            not user.is_valid or not user.is_first_login
+        ):
+            return HttpResponseForbidden()
+
         if not user.can_update_password():
             error = _('User auth from {}, go there change password')
             form.add_error('new_password', error.format(user.get_source_display()))
             return self.form_invalid(form)
 
         password = form.cleaned_data['new_password']
+        if is_custom_sso_first_login and user.check_password(password):
+            form.add_error('new_password', _('The new password must differ from the current password'))
+            return self.form_invalid(form)
+
         is_ok = check_password_rules(password, is_org_admin=user.is_org_admin)
         if not is_ok:
             error = _('* Your password does not meet the requirements')
@@ -229,8 +246,16 @@ class UserResetPasswordView(FormView):
         User.expired_reset_password_token(token)
 
         ResetPasswordSuccessMsg(user, self.request).publish_async()
-        url = self.get_redirect_url()
-        return redirect(url)
+        if is_custom_sso_first_login:
+            user.is_first_login = False
+            user.save(update_fields=['is_first_login'])
+
+            login(self.request, user, backend=settings.AUTH_BACKEND_CUSTOM_SSO)
+            self.request.session.pop(CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY, None)
+            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
+            return redirect(safe_next_url(pending.get('next_url'), request=self.request))
+
+        return redirect(self.get_redirect_url())
 
     @staticmethod
     def get_redirect_url():

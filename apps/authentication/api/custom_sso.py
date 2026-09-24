@@ -1,17 +1,20 @@
-from django.utils.module_loading import import_string
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.core.exceptions import ValidationError
 from django.http.response import HttpResponseRedirect
-
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.response import Response
+from django.urls import reverse
+from django.utils.module_loading import import_string
 from rest_framework import status
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
-from rbac.models import SystemRole, SystemRoleBinding
+from authentication.const import CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY
 from common.utils import get_logger
+from rbac.models import SystemRole, SystemRoleBinding
 from users.validators import get_validation_error_message
 from ..mixins import AuthMixin
 
@@ -55,6 +58,23 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
 
         user, error = self.authenticate(**query_params)
         if user:
+            if user.is_first_login:
+                if not user.can_update_password():
+                    error = 'First login password change is unavailable for this user.'
+                    self.send_auth_signal(success=False, reason=error)
+                    return Response({'detail': error}, status=status.HTTP_403_FORBIDDEN)
+
+                if request.user.is_authenticated:
+                    logout(request)
+                token = user.generate_reset_token()
+                request.session[CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY] = {
+                    'user_id': str(user.id),
+                    'token': token,
+                    'next_url': self.next_url,
+                }
+                reset_url = reverse('authentication:reset-password')
+                return HttpResponseRedirect(f'{reset_url}?{urlencode({"token": token})}')
+
             login(request, user, backend=settings.AUTH_BACKEND_CUSTOM_SSO)
             self.send_auth_signal(success=True, user=user)
             return HttpResponseRedirect(self.next_url)
