@@ -460,6 +460,8 @@ class Config(dict):
         },
         'SAML2_IDP_METADATA_URL': '',
         'SAML2_IDP_METADATA_XML': '',
+        'SAML2_IDP_METADATA_CERT_VERIFY_MODE': 'system',
+        'SAML2_IDP_METADATA_CACERT_CONTENT': '',
         'SAML2_SP_KEY_CONTENT': '',
         'SAML2_SP_CERT_CONTENT': '',
         'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
