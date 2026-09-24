@@ -15,7 +15,10 @@ from accounts.credential_client.audit import record
 from accounts.credential_client.events import configuration_group
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.models import CredentialClientInstance
+from common.utils import get_logger
 from orgs.utils import tmp_to_org
+
+logger = get_logger(__name__)
 
 
 class CredentialClientAuthMiddleware:
@@ -57,6 +60,10 @@ class CredentialClientAuthMiddleware:
                     request.headers.get('X-JMS-Client-Version', ''),
                     int(request.headers.get('X-JMS-Protocol-Version', 0)),
                     int(request.headers.get('X-JMS-Config-Schema-Version', 0)),
+                )
+                supports_receipts = request.headers.get('X-JMS-Event-Receipts') == '1'
+                CredentialClientInstance.objects.filter(id=manager.client.id).update(
+                    event_receipts_supported=supports_receipts,
                 )
                 return {
                     'credential_client': manager.client,
@@ -137,9 +144,24 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
             return {'event': 'snapshot', 'credentials': items}
 
     async def receive_json(self, content, **kwargs):
+        if not isinstance(content, dict):
+            return
         if content.get('event') == 'ping':
             await self.touch()
             await self.send_json({'event': 'pong'})
+        elif content.get('event') == 'received':
+            await self.receive_event(content.get('event_id'))
+
+    @database_sync_to_async
+    def receive_event(self, event_id):
+        from accounts.credential_rotation.events import receive
+        try:
+            with tmp_to_org(self.org_id):
+                receive(self.client.id, self.org_id, event_id)
+        except Exception:
+            logger.warning('Cannot record event receipt for client %s.', self.client.id)
 
     async def credential_event(self, event):
+        if 'recipient_ids' in event and str(self.client.id) not in event['recipient_ids']:
+            return
         await self.send_json(event['payload'])

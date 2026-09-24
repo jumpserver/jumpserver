@@ -1,12 +1,17 @@
 import uuid
 
 from celery import shared_task
+from django.utils.translation import gettext_lazy as _
+
 from assets.tasks.common import generate_automation_execution_data
 from common.const.choices import Trigger
 from orgs.utils import tmp_to_org
 
 
-@shared_task(queue='ansible', soft_time_limit=600, time_limit=660)
+@shared_task(
+    queue='ansible', soft_time_limit=600, time_limit=660,
+    verbose_name=_('Credential rotation precheck'),
+)
 def execute_credential_precheck(execution_id, org_id):
     from accounts.credential_rotation.preflight import run
     with tmp_to_org(org_id):
@@ -28,7 +33,7 @@ def quickstart_automation_by_snapshot(task_name, tp, task_snapshot=None):
     return execution
 
 
-@shared_task(queue='ansible')
+@shared_task(queue='ansible', verbose_name=_('Execute credential rotation secret change'))
 def execute_credential_change(execution_id, org_id):
     from accounts.models import AutomationExecution, Account, ChangeSecretRecord
     from accounts.credential_rotation.execution import locked_rotation, reconcile

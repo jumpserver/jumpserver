@@ -128,6 +128,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'complete_rotation': 'accounts.change_applicationcredential',
         'cancel_rotation': 'accounts.change_applicationcredential',
         'rotation_status': 'accounts.view_applicationcredential',
+        'rotation_events': 'accounts.view_applicationcredential',
         'retry_change': ['accounts.change_applicationcredential', 'accounts.add_changesecretexecution'],
     }
 
@@ -181,6 +182,11 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     def rotation_status(self, request, *args, **kwargs):
         from accounts.credential_rotation.participants import build
         return Response(build(self.get_object()))
+
+    @action(methods=['get'], detail=True, url_path='rotation-events')
+    def rotation_events(self, request, *args, **kwargs):
+        from accounts.credential_rotation.events import timeline
+        return Response(timeline(self.get_object()))
 
     @action(methods=['post'], detail=True, url_path='check-secret-change')
     def check_secret_change(self, request, *args, **kwargs):

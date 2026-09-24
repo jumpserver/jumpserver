@@ -12,13 +12,13 @@ from .application import IntegrationApplication
 __all__ = [
     'ApplicationCredential', 'CredentialApplicationBinding',
     'CredentialClientInstance', 'CredentialClientStatus',
-    'ClientAccessConfiguration', 'CredentialRotationRecord',
+    'ClientAccessConfiguration', 'CredentialRotationRecord', 'CredentialRotationEvent',
 ]
 
 
 class ApplicationCredential(JMSOrgBaseModel):
     class Mode(models.TextChoices):
-        subscription = 'subscription', _('Credential update subscription')
+        subscription = 'subscription', _('Credential change subscription')
         alternating_rotation = 'alternating_rotation', _('Alternating dual-account rotation')
 
     class Status(models.TextChoices):
@@ -185,6 +185,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
     sync_error = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Sync error'))
     date_last_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last synced'))
     date_last_seen = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last seen'))
+    event_receipts_supported = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
     class Meta:
@@ -340,3 +341,22 @@ class CredentialRotationRecord(JMSOrgBaseModel):
     class Meta:
         ordering = ['-date_created']
         verbose_name = _('Credential rotation record')
+
+
+class CredentialRotationEvent(JMSOrgBaseModel):
+    rotation = models.ForeignKey(
+        CredentialRotationRecord, on_delete=models.CASCADE, related_name='events',
+        null=True, blank=True,
+    )
+    source_event_id = models.UUIDField(unique=True)
+    event = models.CharField(max_length=64)
+    sequence = models.PositiveIntegerField()
+    published_at = models.DateTimeField(default=timezone.now)
+    revision = models.PositiveIntegerField(null=True)
+    recipients = models.JSONField(default=list)
+
+    class Meta:
+        ordering = ['sequence']
+        constraints = [models.UniqueConstraint(
+            fields=['rotation', 'sequence'], name='unique_credential_rotation_event_sequence',
+        )]

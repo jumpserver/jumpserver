@@ -376,7 +376,7 @@ class Agent:
             if key not in self.authorized_keys:
                 raise KeyError(f'Credential not authorized: {key}')
             if key not in getattr(self, 'confirmation_keys', self.authorized_keys):
-                raise ValueError('Credential update subscriptions do not require confirmation.')
+                raise ValueError('Credential change subscriptions do not require confirmation.')
             item = self.credentials.get(key)
             if not item:
                 raise KeyError(f'Credential not found: {key}')

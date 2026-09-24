@@ -529,8 +529,13 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.assertIn(f'--app-user {shlex.quote(app_user)}', data['install_command'])
         self.assertIn(
             'pip install --upgrade jms-pam',
-            data['install_command'],
+            data['preparation_command'],
         )
+        self.assertEqual(
+            data['install_command'],
+            f"{data['preparation_command']} && {data['registration_command']}",
+        )
+        self.assertIn(f'--app-user {shlex.quote(app_user)}', data['registration_command'])
         self.assertNotIn('--find-links', data['install_command'])
 
     def create_configuration(self, kind='sdk'):

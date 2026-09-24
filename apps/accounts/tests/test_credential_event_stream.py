@@ -1,13 +1,16 @@
 from unittest.mock import AsyncMock, Mock, patch
 
 from asgiref.sync import async_to_sync
+from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
+from django.db import transaction
 from django.test import TransactionTestCase, override_settings
 
 from accounts.demos.python.jms_pam.common.credential import Credential
 from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
 from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
 from accounts.credential_client.events import _publish_stream
+from accounts.credential_rotation.manager import CredentialRotationManager
 from accounts.models import (
     Account, ApplicationAudit, ApplicationCredential, ClientAccessConfiguration,
     CredentialApplicationBinding, CredentialClientInstance, IntegrationApplication,
@@ -16,7 +19,7 @@ from accounts.ws import CredentialClientAuthMiddleware, CredentialEventConsumer
 from assets.const import Category
 from assets.models import Asset, Platform
 from orgs.models import Organization
-from orgs.utils import set_current_org, set_to_root_org
+from orgs.utils import set_current_org, set_to_root_org, tmp_to_org
 
 
 @override_settings(CHANNEL_LAYERS={
@@ -64,6 +67,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         async_to_sync(self._run_connection)()
         client = CredentialClientInstance.objects.get(instance_id='stream-instance')
         self.assertIsNotNone(client.date_last_seen)
+        self.assertTrue(client.event_receipts_supported)
         self.assertTrue(ApplicationAudit.objects.filter(
             service_id=self.application.id, configuration_id=self.configuration.id,
             instance_id=client.instance_id, event='credential_stream_connected',
@@ -75,6 +79,42 @@ class CredentialEventStreamTests(TransactionTestCase):
 
     def test_unsigned_connection_is_rejected(self):
         async_to_sync(self._run_unsigned_connection)()
+
+    def test_signed_connection_reports_rotation_receipts(self):
+        alternate = Account.objects.create(
+            name='alternate', username='alternate', asset=self.account.asset, secret='alternate-secret',
+        )
+        self.application.accounts = {'type': 'ids', 'ids': [str(self.account.id), str(alternate.id)]}
+        self.application.save()
+        self.credential.mode = ApplicationCredential.Mode.alternating_rotation
+        self.credential.account = self.account
+        self.credential.active_account = self.account
+        self.credential.alternate_account = alternate
+        self.credential.save()
+        async_to_sync(self._receive_rotation)()
+        events = list(self.credential.rotation_records.first().events.all())
+        self.assertEqual(len(events), 3)
+        for event in events:
+            self.assertEqual(len(event.recipients), 1)
+            self.assertIsNotNone(event.recipients[0]['received_at'])
+            self.assertEqual(event.recipients[0]['instance_id'], 'stream-instance')
+
+    async def _receive_rotation(self):
+        communicator = await self._connect()
+        await communicator.receive_json_from()  # Initial snapshot is not a receipt.
+
+        @database_sync_to_async
+        def start():
+            with tmp_to_org(self.org), transaction.atomic():
+                CredentialRotationManager(self.credential.id)._publish(self.credential)
+
+        await start()
+        for _ in range(3):
+            event = await communicator.receive_json_from()
+            await communicator.send_json_to({'event': 'received', 'event_id': event['event_id']})
+        await communicator.send_json_to({'event': 'ping'})
+        self.assertEqual(await communicator.receive_json_from(), {'event': 'pong'})
+        await communicator.disconnect()
 
     def test_published_event_includes_subscription_selector(self):
         event = ApplicationAudit.objects.create(
@@ -101,7 +141,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         self.assertFalse(connected)
         self.assertEqual(code, 4401)
 
-    async def _run_connection(self):
+    async def _connect(self):
         sdk = CredentialClient(
             Credential(str(self.application.id), self.application.secret),
             'stream-instance',
@@ -122,6 +162,10 @@ class CredentialEventStreamTests(TransactionTestCase):
         communicator = WebsocketCommunicator(app, path, headers=headers)
         connected, _ = await communicator.connect()
         self.assertTrue(connected)
+        return communicator
+
+    async def _run_connection(self):
+        communicator = await self._connect()
         snapshot = await communicator.receive_json_from()
         self.assertEqual(snapshot, {
             'event': 'snapshot',

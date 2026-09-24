@@ -65,11 +65,12 @@ Find `<configuration-id>` in the access configuration detail. The installation p
 
 ### Install the Agent
 
-1. Open the Agent access configuration and select **Generate installation command**.
-2. Copy the complete command to the application host and run it within ten minutes. The registration material can be used only once.
-3. The command creates a Python virtual environment, installs `jms-pam` from PyPI, registers the Agent, and starts a dedicated systemd service.
+1. On a Linux application host with systemd, Python 3.9+, and the configured application user, open the Agent access configuration and select **Generate**.
+2. Copy and run **Install Agent** on that host. This creates a Python virtual environment and installs `jms-pam` from PyPI.
+3. Copy and run **Register and start** on the same host within ten minutes. The registration code is single-use; this step starts the dedicated systemd service.
+4. Return to the client instance list and confirm the instance is **Online** and **Synced**.
 
-Do not assemble or retain the command manually because it contains single-use registration material.
+Do not retain or share the registration command because it contains single-use registration material. Generate a new command if it expires or has already been used.
 
 Check the installed service:
 
@@ -216,7 +217,7 @@ An SDK access configuration accepts one policy mode. Create separate configurati
 
 ### Prerequisites
 
-1. Create a **Credential update subscription** or **Alternating dual-account rotation** policy under **PAM Integration > Credential Policies** and bind the application. A subscription automatically covers every account authorized to that application; only alternating rotation selects two asset accounts on the policy.
+1. Create a **Credential change subscription** or **Alternating dual-account rotation** policy under **PAM Integration > Credential Policies** and bind the application. A subscription automatically covers every account authorized to that application; only alternating rotation selects two asset accounts on the policy.
 2. Create or open the target application and authorize its asset accounts from the **Accounts** page. For alternating rotation, authorize both policy accounts.
 3. Open **Access configurations** in the target credential policy, create an SDK configuration, and select policies of the same mode. The current policy is selected automatically.
 4. Open the SDK configuration, select **Generate**, download `jms_pam_config.py`, and protect it as secret material.
@@ -233,7 +234,7 @@ python3 -m pip install --upgrade jms-pam
 
 Place `jms_pam_config.py` where the application can import it. It contains application identity material; never commit it to source control or write it to logs.
 
-### Credential update subscription
+### Credential change subscription
 
 Look up an account ID under Application Management, then fetch any authorized account directly:
 
@@ -340,6 +341,8 @@ The synchronous client provides these common methods:
 - `GetCredential`: use `Key` for alternating rotation or `AccountId` for update subscriptions; provide exactly one.
 - `ConfirmCredential`: for alternating rotation only, confirm that the application has validated and is using a revision.
 - `WatchCredentialEvents`: block while listening for credential events and reconnect snapshots.
+
+Before yielding a business event, the SDK automatically sends a best-effort receipt. The receipt only means the SDK/Agent has read the event; it does not mean credentials were fetched or applied, and it does not replace `ConfirmCredential`. Receipt failures do not prevent event processing. Update and restart existing SDK/Agent deployments to report receipts. Reconnect snapshots restore current credential versions; they do not replay past events or create receipts for them.
 
 WebSocket Ping/Pong maintains connection liveness; there is no HTTP heartbeat endpoint. Keep low-frequency revision reconciliation only as a recovery path.
 

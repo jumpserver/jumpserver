@@ -70,12 +70,12 @@ class CredentialRotationManager:
             'date_rotation_started', 'date_updated', 'change_execution',
         ])
         event = record(AuditEvent.ROTATION_STARTED, credential=credential, operator=operator)
-        enqueue(event, ApplicationEvent.ROTATION_STARTED)
+        enqueue(event, ApplicationEvent.ROTATION_STARTED, rotation=rotation)
         waiting = record(
             AuditEvent.ROTATION_STEP, credential=credential, operator=operator,
             summary='Waiting for clients to apply the target account.',
         )
-        enqueue(waiting, ApplicationEvent.ROTATION_WAITING)
+        enqueue(waiting, ApplicationEvent.ROTATION_WAITING, rotation=rotation)
         CredentialClientStatus.objects.filter(id__in=[state.id for state in states]).update(
             required_revision=credential.revision, is_rotation_participant=True,
         )
@@ -140,7 +140,7 @@ class CredentialRotationManager:
             AuditEvent.SECRET_CHANGE_COMPLETED, credential=credential,
             summary=f'Execution {credential.change_execution_id} completed.',
         )
-        enqueue(event, ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED, rotation=rotation)
         return self._finish(credential, rotation, 'success')
 
     def _finish(self, credential, rotation, status):
@@ -165,7 +165,7 @@ class CredentialRotationManager:
         ).update(required_revision=None, is_rotation_participant=False)
         if status == 'success':
             event = record(AuditEvent.ROTATION_STEP, credential=credential, summary='Rotation completed.')
-            enqueue(event, ApplicationEvent.ROTATION_COMPLETED)
+            enqueue(event, ApplicationEvent.ROTATION_COMPLETED, rotation=rotation)
         return credential
 
     @transaction.atomic
@@ -202,7 +202,7 @@ class CredentialRotationManager:
         credential.save(update_fields=[
             'revision', 'active_account', 'status', 'rotation_cancelled', 'date_updated',
         ])
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED, rotation=rotation)
         CredentialClientStatus.objects.filter(
             binding__credential=credential, is_rotation_participant=True,
         ).update(required_revision=credential.revision)

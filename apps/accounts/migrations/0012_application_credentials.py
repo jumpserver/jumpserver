@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
                 ('date_rotation_started', models.DateTimeField(blank=True, null=True, verbose_name='Date rotation started')),
                 ('date_last_rotated', models.DateTimeField(blank=True, null=True, verbose_name='Date last rotated')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Active')),
-                ('mode', models.CharField(choices=[('subscription', 'Credential update subscription'), ('alternating_rotation', 'Alternating dual-account rotation')], default='subscription', max_length=32, verbose_name='Mode')),
+                ('mode', models.CharField(choices=[('subscription', 'Credential change subscription'), ('alternating_rotation', 'Alternating dual-account rotation')], default='subscription', max_length=32, verbose_name='Mode')),
                 ('alternate_account', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='alternate_application_credentials', to='accounts.account', verbose_name='Alternate account')),
                 ('change_execution', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='accounts.automationexecution', verbose_name='Change secret execution')),
                 ('account', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='application_credentials', to='accounts.account', verbose_name='Account')),
@@ -158,6 +158,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CredentialClientInstance',
             fields=[
+                ('event_receipts_supported', models.BooleanField(default=False)),
                 ('created_by', models.CharField(blank=True, max_length=128, null=True, verbose_name='Created by')),
                 ('updated_by', models.CharField(blank=True, max_length=128, null=True, verbose_name='Updated by')),
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
@@ -261,6 +262,29 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Credential rotation record',
                 'ordering': ['-date_created'],
+            },
+        ),
+        migrations.CreateModel(
+            name='CredentialRotationEvent',
+            fields=[
+                ('created_by', models.CharField(blank=True, max_length=128, null=True, verbose_name='Created by')),
+                ('updated_by', models.CharField(blank=True, max_length=128, null=True, verbose_name='Updated by')),
+                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
+                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
+                ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('source_event_id', models.UUIDField(unique=True)),
+                ('event', models.CharField(max_length=64)),
+                ('sequence', models.PositiveIntegerField()),
+                ('published_at', models.DateTimeField(default=django.utils.timezone.now)),
+                ('revision', models.PositiveIntegerField(null=True)),
+                ('recipients', models.JSONField(default=list)),
+                ('rotation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='events', to='accounts.credentialrotationrecord')),
+            ],
+            options={
+                'ordering': ['sequence'],
+                'constraints': [models.UniqueConstraint(fields=('rotation', 'sequence'), name='unique_credential_rotation_event_sequence')],
             },
         ),
         migrations.CreateModel(

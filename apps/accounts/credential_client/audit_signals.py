@@ -178,14 +178,23 @@ def get_audit_event(instance, created, before, after):
 
 
 def notify_model_change(instance, event, changes):
+    rotation = None
+    if (
+        isinstance(instance, ApplicationCredential)
+        and instance.mode == ApplicationCredential.Mode.alternating_rotation
+        and instance.status != ApplicationCredential.Status.idle
+    ):
+        rotation = instance.rotation_records.filter(
+            status='running', date_finished__isnull=True,
+        ).first()
     if event.event == AuditEvent.CREDENTIAL_PUBLISHED:
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED, rotation=rotation)
     elif event.event == AuditEvent.ROTATION_STEP:
         if instance.status in (
             ApplicationCredential.Status.change_failed,
             ApplicationCredential.Status.recovery_required,
         ):
-            enqueue(event, ApplicationEvent.ROTATION_FAILED)
+            enqueue(event, ApplicationEvent.ROTATION_FAILED, rotation=rotation)
     elif isinstance(instance, ClientAccessConfiguration):
         enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED)
     elif isinstance(instance, IntegrationApplication) and any(change['field'] == 'accounts' for change in changes):

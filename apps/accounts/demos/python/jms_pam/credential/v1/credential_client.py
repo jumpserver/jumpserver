@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 from email.utils import formatdate
 from urllib.parse import urlencode, urlsplit, urlunsplit
@@ -11,6 +12,7 @@ from ...common.abstract_client import AbstractClient
 from . import models
 
 CLIENT_PATH = '/api/v1/accounts/credential-client'
+logger = logging.getLogger(__name__)
 
 
 class CredentialClient(AbstractClient):
@@ -38,7 +40,7 @@ class CredentialClient(AbstractClient):
         )
 
     def WatchCredentialEvents(self, stop_event=None):
-        """Yield Credential Event Stream messages, reconnecting with bounded backoff."""
+        """Acknowledge business events before yielding; reconnect with bounded backoff."""
         delay = 1
         while not stop_event or not stop_event.is_set():
             connection = None
@@ -48,21 +50,31 @@ class CredentialClient(AbstractClient):
                     header=self._event_stream_headers(),
                     timeout=self.profile.Timeout,
                 )
-                connection.settimeout(30)
+                connection.settimeout(10)
                 delay = 1
                 while not stop_event or not stop_event.is_set():
                     try:
                         payload = connection.recv()
                     except websocket.WebSocketTimeoutException:
-                        connection.ping()
+                        connection.send(json.dumps({'event': 'ping'}))
                         continue
                     if not payload:
+                        logger.warning('Credential event stream closed by server.')
                         break
                     event = json.loads(payload)
                     if not isinstance(event, dict) or 'event' not in event:
                         raise ValueError('Invalid credential event message.')
+                    if event['event'] == 'pong':
+                        continue
+                    event_id = event.get('event_id')
+                    if event['event'] != 'snapshot' and event_id:
+                        try:
+                            connection.send(json.dumps({'event': 'received', 'event_id': event_id}))
+                        except (OSError, websocket.WebSocketException):
+                            pass  # Receipts must not prevent the caller from processing the event.
                     yield event
-            except (OSError, ValueError, websocket.WebSocketException):
+            except (OSError, ValueError, websocket.WebSocketException) as error:
+                logger.warning('Credential event stream disconnected: %s', error)
                 if stop_event and stop_event.wait(delay):
                     return
                 if not stop_event:
@@ -88,6 +100,7 @@ class CredentialClient(AbstractClient):
             'X-JMS-ORG': self.profile.OrgId,
             'X-Source': self.profile.Source,
             'X-JMS-Client-Version': __version__,
+            'X-JMS-Event-Receipts': '1',
             'X-JMS-Protocol-Version': str(PROTOCOL_VERSION),
             'X-JMS-Config-Schema-Version': (
                 str(CONFIG_SCHEMA_VERSION) if self.profile.Source == 'jms-pam-agent' else '0'

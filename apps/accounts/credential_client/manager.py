@@ -111,7 +111,7 @@ class CredentialClientManager:
         ).order_by('key').first()
         if not credential:
             raise PermissionDenied(
-                _('The client access configuration does not include an active credential update subscription.'),
+                _('The client access configuration does not include an active credential change subscription.'),
                 code='credential_not_selected',
             )
         account = self.application.get_accounts().select_related(
@@ -183,7 +183,7 @@ class CredentialClientManager:
     def confirm(self, key, revision, account_id):
         credential, account = self._get_credential(key)
         if credential.mode == ApplicationCredential.Mode.subscription:
-            raise ValidationError(_('Credential update subscriptions do not require confirmation.'))
+            raise ValidationError(_('Credential change subscriptions do not require confirmation.'))
         state = CredentialClientStatus.objects.select_related(
             'binding__credential'
         ).filter(
@@ -471,9 +471,11 @@ class ClientAccessConfigurationManager:
             'nonce': random_string(24),
         }, salt='credential-agent-register')
         path = configuration.install_path.rstrip('/')
-        command = (
+        preparation_command = (
             f'sudo python3 -m venv {shlex.quote(path + "/venv")} && '
-            f'sudo {shlex.quote(path + "/venv/bin/pip")} install --upgrade jms-pam && '
+            f'sudo {shlex.quote(path + "/venv/bin/pip")} install --upgrade jms-pam'
+        )
+        registration_command = (
             f'sudo {shlex.quote(path + "/venv/bin/jms-pam-agent")} install --endpoint {shlex.quote(endpoint)} '
             f'--token {shlex.quote(token)} --instance-id "$(hostname)" '
             f'--configuration-id {shlex.quote(str(configuration.id))} '
@@ -481,5 +483,8 @@ class ClientAccessConfigurationManager:
             f'--install-path {shlex.quote(path)}'
         )
         return {
-            'type': 'agent', 'expires_in': 600, 'install_command': command,
+            'type': 'agent', 'expires_in': 600,
+            'preparation_command': preparation_command,
+            'registration_command': registration_command,
+            'install_command': f'{preparation_command} && {registration_command}',
         }

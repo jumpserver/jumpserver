@@ -127,7 +127,10 @@ def _complete_webhook(attempt_id, status_code=None, reason='', retryable=True):
         )
 
 
-@shared_task(soft_time_limit=15, time_limit=20)
+@shared_task(
+    soft_time_limit=15, time_limit=20,
+    verbose_name=_('Deliver application webhook'),
+)
 def deliver_application_webhook(delivery_id, org_id):
     from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
 
@@ -151,7 +154,7 @@ def deliver_application_webhook(delivery_id, org_id):
             _complete_webhook(claimed['attempt_id'], status_code=status_code)
 
 
-@shared_task
+@shared_task(verbose_name=_('Expire application event deliveries'))
 @register_as_period_task(interval=60)
 def expire_application_event_deliveries():
     from accounts.models import ApplicationEventDelivery

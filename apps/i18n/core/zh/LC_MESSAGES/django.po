@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 15:30+0800\n"
+"POT-Creation-Date: 2026-09-23 10:10+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -36,21 +36,21 @@ msgstr "凭据策略目前仅支持 Python SDK。"
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: accounts/api/account/application.py:144
+#: accounts/api/account/application.py:143
 msgid "Select a supported webhook event."
 msgstr "请选择受支持的 Webhook 事件。"
 
-#: accounts/api/account/application.py:147
-#: accounts/serializers/account/credential.py:144
+#: accounts/api/account/application.py:146
+#: accounts/serializers/account/credential.py:143
 #: accounts/serializers/account/service.py:185
 msgid "Select at least one application."
 msgstr "请至少选择一个应用。"
 
-#: accounts/api/account/application.py:169
+#: accounts/api/account/application.py:164
 msgid "URL is required to test the webhook."
 msgstr "测试 Webhook 时 URL 为必填项。"
 
-#: accounts/api/account/application.py:171
+#: accounts/api/account/application.py:166
 msgid "Select one of the subscribed webhook events."
 msgstr "请选择已订阅的 Webhook 事件。"
 
@@ -884,7 +884,7 @@ msgid "An active rotation task or execution cannot be deleted."
 msgstr "不能删除进行中的轮换任务或执行记录。"
 
 #: accounts/credential_client/audit_signals.py:250
-#: accounts/serializers/account/credential.py:521
+#: accounts/serializers/account/credential.py:520
 msgid "Explain why the rotating credential should stop participating."
 msgstr "请说明轮换中的凭据停止参与的原因。"
 
@@ -929,13 +929,13 @@ msgstr "企业应用未授权所选应用凭据关联的全部账号。"
 
 #: accounts/credential_client/manager.py:114
 msgid ""
-"The client access configuration does not include an active credential update "
+"The client access configuration does not include an active credential change "
 "subscription."
-msgstr "客户端接入配置未包含启用的凭据更新订阅。"
+msgstr "客户端接入配置未包含启用的凭据变更订阅。"
 
 #: accounts/credential_client/manager.py:186
-msgid "Credential update subscriptions do not require confirmation."
-msgstr "凭据更新订阅不需要确认。"
+msgid "Credential change subscriptions do not require confirmation."
+msgstr "凭据变更订阅不需要确认。"
 
 #: accounts/credential_client/manager.py:195
 #: accounts/credential_client/manager.py:199
@@ -978,7 +978,7 @@ msgid "The client access configuration is disabled."
 msgstr "客户端接入配置已禁用。"
 
 #: accounts/credential_client/manager.py:437
-#: accounts/serializers/account/credential.py:552
+#: accounts/serializers/account/credential.py:551
 msgid "SDK access configurations cannot mix credential policy modes."
 msgstr "SDK 接入配置不能混合选择不同模式的凭据策略。"
 
@@ -1277,7 +1277,7 @@ msgstr "任务名称"
 #: accounts/models/personal.py:21 accounts/personal_credentials.py:108
 #: accounts/serializers/account/account.py:228
 #: accounts/serializers/account/account.py:296
-#: accounts/serializers/account/credential.py:67
+#: accounts/serializers/account/credential.py:66
 #: accounts/serializers/account/personal.py:24
 #: accounts/serializers/automations/change_secret.py:215
 #: accounts/serializers/automations/change_secret.py:249
@@ -1352,7 +1352,7 @@ msgstr "改密状态"
 #: accounts/models/account.py:120
 #: accounts/models/automations/check_account.py:64
 #: accounts/models/credential.py:42 accounts/serializers/account/account.py:297
-#: accounts/serializers/account/credential.py:57
+#: accounts/serializers/account/credential.py:56
 #: accounts/serializers/account/service.py:22
 #: accounts/serializers/automations/change_secret.py:217
 #: accounts/serializers/automations/change_secret.py:250
@@ -1504,7 +1504,7 @@ msgid "Integration App"
 msgstr "集成应用"
 
 #: accounts/models/application.py:93 accounts/models/credential.py:73
-#: accounts/serializers/account/credential.py:72
+#: accounts/serializers/account/credential.py:71
 #: accounts/serializers/account/service.py:128
 msgid "Integration applications"
 msgstr "集成应用"
@@ -1894,8 +1894,8 @@ msgid "Is active"
 msgstr "激活"
 
 #: accounts/models/credential.py:21
-msgid "Credential update subscription"
-msgstr "凭据更新订阅"
+msgid "Credential change subscription"
+msgstr "凭据变更订阅"
 
 #: accounts/models/credential.py:22
 msgid "Alternating dual-account rotation"
@@ -1935,12 +1935,12 @@ msgid "Mode"
 msgstr "模式"
 
 #: accounts/models/credential.py:47
-#: accounts/serializers/account/credential.py:61
+#: accounts/serializers/account/credential.py:60
 msgid "Alternate account"
 msgstr "交替账号"
 
 #: accounts/models/credential.py:52
-#: accounts/serializers/account/credential.py:65
+#: accounts/serializers/account/credential.py:64
 msgid "Active account"
 msgstr "当前账号"
 
@@ -1962,15 +1962,15 @@ msgstr "创建改密执行"
 
 #: accounts/models/credential.py:79 accounts/models/credential.py:144
 #: accounts/models/credential.py:314
-#: accounts/serializers/account/credential.py:281
-#: accounts/serializers/account/credential.py:404
+#: accounts/serializers/account/credential.py:280
+#: accounts/serializers/account/credential.py:403
 msgid "Credential policy"
 msgstr "凭据策略"
 
 #: accounts/models/credential.py:148 accounts/models/credential.py:169
 #: accounts/models/credential.py:272
-#: accounts/serializers/account/credential.py:307
-#: accounts/serializers/account/credential.py:408
+#: accounts/serializers/account/credential.py:306
+#: accounts/serializers/account/credential.py:407
 msgid "Integration application"
 msgstr "集成应用"
 
@@ -2064,7 +2064,7 @@ msgid "Applied revision"
 msgstr "已应用版本"
 
 #: accounts/models/credential.py:237
-#: accounts/serializers/account/credential.py:283
+#: accounts/serializers/account/credential.py:282
 msgid "Applied account"
 msgstr "已应用账号"
 
@@ -2550,89 +2550,89 @@ msgstr ""
 "提示: 如果认证时不需要用户名，可填写为 null, 如果是 AD 账号，格式为 "
 "username@domain"
 
-#: accounts/serializers/account/credential.py:69
+#: accounts/serializers/account/credential.py:68
 msgid "Blockers"
 msgstr "阻塞项"
 
-#: accounts/serializers/account/credential.py:153
+#: accounts/serializers/account/credential.py:152
 #, python-brace-format
 msgid ""
 "These applications are not authorized for every credential account: {names}"
 msgstr "以下应用未获授权访问全部凭据账号：{names}"
 
-#: accounts/serializers/account/credential.py:162
+#: accounts/serializers/account/credential.py:161
 msgid "Remove this credential from the application access configuration first."
 msgstr "请先从应用接入配置中移除此凭据策略。"
 
-#: accounts/serializers/account/credential.py:170
-#: accounts/serializers/account/credential.py:174
+#: accounts/serializers/account/credential.py:169
+#: accounts/serializers/account/credential.py:173
 msgid "Credential settings cannot be changed during rotation."
 msgstr "轮换期间不能修改凭据设置。"
 
-#: accounts/serializers/account/credential.py:176
+#: accounts/serializers/account/credential.py:175
 msgid "The credential policy mode cannot be changed."
 msgstr "凭据策略模式不能修改。"
 
-#: accounts/serializers/account/credential.py:187
-#: accounts/serializers/account/credential.py:191
+#: accounts/serializers/account/credential.py:186
+#: accounts/serializers/account/credential.py:190
 msgid "This field is required for alternating dual-account rotation."
 msgstr "双账号交替轮换必须填写此字段。"
 
-#: accounts/serializers/account/credential.py:196
+#: accounts/serializers/account/credential.py:195
 msgid "The initial and alternate accounts must be different."
 msgstr "初始账号和交替账号必须不同。"
 
-#: accounts/serializers/account/credential.py:198
+#: accounts/serializers/account/credential.py:197
 msgid "The initial and alternate accounts must belong to the same asset."
 msgstr "初始账号和交替账号必须属于同一资产。"
 
-#: accounts/serializers/account/credential.py:200
+#: accounts/serializers/account/credential.py:199
 msgid ""
 "The initial and alternate accounts must belong to the same organization."
 msgstr "初始账号和交替账号必须属于同一组织。"
 
-#: accounts/serializers/account/credential.py:202
+#: accounts/serializers/account/credential.py:201
 msgid "The initial and alternate accounts must use the same secret type."
 msgstr "初始账号和交替账号必须使用相同的凭据类型。"
 
-#: accounts/serializers/account/credential.py:309
+#: accounts/serializers/account/credential.py:308
 msgid "Online"
 msgstr "在线"
 
-#: accounts/serializers/account/credential.py:367
+#: accounts/serializers/account/credential.py:366
 msgid "Explain why the rotating client should be excluded."
 msgstr "请说明将该客户端排除出当前轮换的原因。"
 
-#: accounts/serializers/account/credential.py:429
+#: accounts/serializers/account/credential.py:428
 msgid "Provide exactly one of key or account_id."
 msgstr "请且仅请提供 key 或 account_id 其中一个。"
 
-#: accounts/serializers/account/credential.py:513
+#: accounts/serializers/account/credential.py:512
 msgid "The application and access type cannot be changed."
 msgstr "应用和接入类型不能修改。"
 
-#: accounts/serializers/account/credential.py:531
+#: accounts/serializers/account/credential.py:530
 msgid "Select at least one credential."
 msgstr "请至少选择一个凭据策略。"
 
-#: accounts/serializers/account/credential.py:536
+#: accounts/serializers/account/credential.py:535
 msgid "The selected credential policy is not bound to this application."
 msgstr "所选凭据策略未绑定到此应用。"
 
-#: accounts/serializers/account/credential.py:544
+#: accounts/serializers/account/credential.py:543
 msgid ""
 "The application is not authorized for every selected credential account."
 msgstr "企业应用未授权所选应用凭据关联的全部账号。"
 
-#: accounts/serializers/account/credential.py:557
+#: accounts/serializers/account/credential.py:556
 msgid "This field is required for Agent access."
 msgstr "Agent 接入必须填写此字段。"
 
-#: accounts/serializers/account/credential.py:560
+#: accounts/serializers/account/credential.py:559
 msgid "Enter an absolute installation directory."
 msgstr "请输入绝对安装目录。"
 
-#: accounts/serializers/account/credential.py:568
+#: accounts/serializers/account/credential.py:567
 msgid "Enter one systemd .service unit name."
 msgstr "请输入一个 systemd .service 单元名称。"
 
@@ -2914,11 +2914,19 @@ msgstr "添加账号: %s"
 msgid "Delete account: %s"
 msgstr "删除账号: %s"
 
-#: accounts/tasks/application_events.py:179
+#: accounts/tasks/application_events.py:132
+msgid "Deliver application webhook"
+msgstr "发送应用 Webhook 通知"
+
+#: accounts/tasks/application_events.py:157
+msgid "Expire application event deliveries"
+msgstr "处理过期的应用事件通知"
+
+#: accounts/tasks/application_events.py:182
 msgid "Clean application records"
 msgstr "清理应用记录"
 
-#: accounts/tasks/application_events.py:180
+#: accounts/tasks/application_events.py:183
 msgid ""
 "Clean expired application audits and completed webhook delivery records."
 msgstr "清理过期的应用审计记录和已完成的 Webhook 投递记录。"
@@ -2987,6 +2995,14 @@ msgstr ""
 "无效。因此，为了保持数据库的整洁和高效运行，根据系统配置文件 config.txt 中 "
 "PERM_EXPIRED_CHECK_PERIODIC 的时间间隔对于超出时间的于每天凌晨2点进行清理。这"
 "种定期清理机制不仅有助于释放存储空间，还能提高数据管理的安全和整体性能"
+
+#: accounts/tasks/common.py:13
+msgid "Credential rotation precheck"
+msgstr "凭据轮换预检查"
+
+#: accounts/tasks/common.py:36
+msgid "Execute credential rotation secret change"
+msgstr "执行凭据轮换改密"
 
 #: accounts/tasks/push_account.py:40 accounts/tasks/push_account.py:54
 msgid "Push accounts to assets"

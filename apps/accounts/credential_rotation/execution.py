@@ -117,7 +117,7 @@ def execute(rotation_id, operator='', previous_execution_id=None, reason=''):
         AuditEvent.SECRET_CHANGE_STARTED, credential=credential, operator=operator,
         summary=f'Change execution {execution.id}. {reason.strip()}',
     )
-    enqueue(event, ApplicationEvent.CREDENTIAL_CHANGE_STARTED)
+    enqueue(event, ApplicationEvent.CREDENTIAL_CHANGE_STARTED, rotation=rotation)
     transaction.on_commit(lambda: dispatch(execution.id, credential.org_id))
     return execution
 
@@ -190,7 +190,7 @@ def reconcile(execution_id):
             AuditEvent.SECRET_CHANGE_FAILED, credential=credential,
             result='failed', summary=f'Execution {execution.id}: {result}',
         )
-        enqueue(event, ApplicationEvent.CREDENTIAL_CHANGE_FAILED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_CHANGE_FAILED, rotation=rotation)
 
 
 def execution_info(credential):

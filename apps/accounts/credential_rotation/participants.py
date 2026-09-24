@@ -43,6 +43,7 @@ def _participant(state, joined_during_rotation=False):
         'configuration': {'id': str(configuration.id), 'name': configuration.name},
         'client': {
             'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
+            'supports_receipts': client.event_receipts_supported,
         },
         'joined_at': _date(timezone.now()),
         'joined_during_rotation': joined_during_rotation,
