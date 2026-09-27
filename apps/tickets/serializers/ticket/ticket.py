@@ -46,6 +46,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     my_tasks = serializers.SerializerMethodField()
     request_items = serializers.SerializerMethodField()
     execution_mode = serializers.SerializerMethodField()
+    available_actions = serializers.SerializerMethodField()
 
     @staticmethod
     def get_request_items(obj):
@@ -59,6 +60,13 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             if mode:
                 return mode
         return get_ticket_plugin(obj.type).execution_mode
+
+    def get_available_actions(self, obj):
+        view = self.context.get('view')
+        if not view or view.action != 'retrieve':
+            return []
+        request = self.context.get('request')
+        return get_ticket_plugin(obj.type).get_available_actions(obj, request.user if request else None)
 
     @staticmethod
     def get_workflow_instance(obj):
@@ -82,7 +90,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'serial_num', 'process_map', 'approval_step', 'type',
             'state', 'applicant', 'status', 'origin', 'date_created',
             'date_updated', 'org_name', 'rel_snapshot', 'workflow_instance', 'my_tasks',
-            'request_data', 'request_items', 'execution_mode'
+            'request_data', 'request_items', 'execution_mode', 'available_actions'
         ]
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}

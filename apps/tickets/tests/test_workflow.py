@@ -430,6 +430,7 @@ class WorkflowTests(TestCase):
         ).values_list('codename', flat=True))
         self.assertEqual(permissions, {
             'add_workflow', 'change_workflow', 'view_workflow', 'view_workflowinstance',
+            'apply_asset_for_others',
         })
 
     def test_asset_owner_api_validation_and_snapshot_survive_owner_change(self):

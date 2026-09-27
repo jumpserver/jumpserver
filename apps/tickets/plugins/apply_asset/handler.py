@@ -58,6 +58,7 @@ def build_context(ticket):
     context['request'].update({
         'permission_name': data.get('apply_permission_name') or f'Ticket {ticket.pk}',
         'users': [user_snapshot(user) for user in users],
+        'is_on_behalf': len(users) != 1 or users[0].pk != ticket.applicant_id,
         'account_selectors': grant_accounts,
         'actions': actions,
         'date_start': date_start.isoformat(),
@@ -66,6 +67,10 @@ def build_context(ticket):
     })
     context['assets'] = snapshot_assets(assets, ticket.org_id)
     return context
+
+
+def permission_resource(permission):
+    return {'type': 'asset_permission', 'id': str(permission.pk), 'name': permission.name}
 
 
 def on_approved(instance, ticket):
@@ -104,4 +109,5 @@ def on_approved(instance, ticket):
         # Never grant a live node selection: its membership can grow after approval.
         permission.assets.set(assets)
         permission.users.set(users)
-    return {'action': ticket.type, 'ticket': str(ticket.pk)}
+    return {'action': ticket.type, 'ticket': str(ticket.pk),
+            'resources': [permission_resource(permission)]}

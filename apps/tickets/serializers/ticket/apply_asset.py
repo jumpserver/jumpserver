@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
 from assets.models import Asset, Node
 from common.serializers.fields import ObjectRelatedField
@@ -8,7 +9,8 @@ from orgs.utils import tmp_to_org
 from perms.models import AssetPermission
 from perms.serializers.permission import ActionChoicesField
 from perms.utils.expire_soon_notice import sync_ticket_expire_soon_notice
-from tickets.models import Ticket
+from tickets.models import Ticket, TicketBeneficiary
+from tickets.plugins.apply_asset.policy import supports_delegated_request
 from .common import AssetRequestValidationMixin
 from .ticket import TicketApplySerializer
 
@@ -23,7 +25,7 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
     """Keep the rich asset form while storing its fields on the base ticket."""
     apply_users = serializers.ListField(
         child=serializers.UUIDField(), required=False, allow_empty=False,
-        max_length=100, write_only=True, label=_('Authorized users'),
+        max_length=1, write_only=True, label=_('Authorized user'),
     )
     apply_assets = ObjectRelatedField(
         queryset=Asset.objects, many=True, required=False, write_only=True,
@@ -62,9 +64,17 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
         attrs['type'] = 'apply_asset'
         attrs = super().validate(attrs)
         from tickets.workflow.approvers import available_users
-        users = list(dict.fromkeys(attrs.pop('apply_users', [attrs['applicant'].pk])))
+        users = attrs.pop('apply_users', [attrs['applicant'].pk])
         if available_users(attrs['org_id']).filter(pk__in=users).count() != len(users):
-            raise serializers.ValidationError({'apply_users': _('Select active organization members.')})
+            raise serializers.ValidationError({'apply_users': _('Select one active organization member.')})
+        if users[0] != attrs['applicant'].pk:
+            with tmp_to_org(attrs['org_id']):
+                if not self.context['request'].user.has_perm('tickets.apply_asset_for_others'):
+                    raise PermissionDenied(_('You cannot apply for asset access on behalf of another user.'))
+            if not supports_delegated_request(attrs['workflow'].active_version):
+                raise serializers.ValidationError({
+                    'workflow_id': _('Requests for another user require organization administrator approval on every path.'),
+                })
         try:
             sync_ticket_expire_soon_notice(None, attrs)
         except DjangoValidationError as exc:
@@ -100,4 +110,5 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
                 raise serializers.ValidationError(_('Permission named `{}` already exists').format(name))
         ticket.request_data['apply_permission_name'] = name
         ticket.save(update_fields=['request_data'])
+        TicketBeneficiary.objects.create(ticket=ticket, user_id=ticket.request_data['apply_users'][0])
         return ticket

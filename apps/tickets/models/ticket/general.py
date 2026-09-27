@@ -348,7 +348,8 @@ class Ticket(StatusMixin, JMSBaseModel):
             Q(applicant=user) |
             Q(ticket_steps__ticket_assignees__assignee=user) |
             Q(workflow_instance__node_instances__tasks__assignee=user) |
-            Q(cc_users=user)
+            Q(cc_users=user) |
+            Q(beneficiaries__user=user)
         )
         return cls.objects.filter(queries).distinct()
 

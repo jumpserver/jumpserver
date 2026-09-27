@@ -33,6 +33,10 @@ router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
 
 urlpatterns = [
+    path('accounts/<uuid:pk>/reveal-by-ticket/', api.AccountTicketSecretAPI.as_view(),
+         name='account-ticket-secret'),
+    path('accounts/<uuid:pk>/request-secret-ticket/', api.AccountTicketSecretRequestAPI.as_view(),
+         name='account-ticket-secret-request'),
     path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),
     path('accounts/tasks/', api.AccountsTaskCreateAPI.as_view(), name='account-task-create'),
     path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(),

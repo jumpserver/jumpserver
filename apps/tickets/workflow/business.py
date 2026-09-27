@@ -36,6 +36,7 @@ def submit_ticket(ticket):
     ticket.set_serial_num()
     ticket.set_rel_snapshot()
     context = build_context(ticket)
+    get_ticket_plugin(ticket.type).validate_submission(ticket, context)
     instance = WorkflowEngine().start(ticket, ticket.workflow, context)
     # Configuration failures on submission must not leave unusable open tickets.
     if instance.state == 'error':
@@ -122,6 +123,7 @@ def deliver_event(event_id):
             else:
                 if ticket.applicant_id:
                     send_ticket_processed_mail_to_applicant(ticket, event.actor or ticket.processor)
+                get_ticket_plugin(ticket.type).notify_processed(ticket, event.actor or ticket.processor)
                 send_ticket_updated_mail_to_cc_users(ticket)
 
 

@@ -47,9 +47,14 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     }
 
     def get_serializer_class(self):
+        ticket_type = self.request.query_params.get('type')
         if (getattr(self, 'action', None) != 'open' and self.request.method in ('OPTIONS', 'POST')
-                and self.request.query_params.get('type') == 'apply_asset'):
-            return serializers.ApplyAssetSerializer
+                and ticket_type):
+            from django.utils.module_loading import import_string
+            from tickets.plugins import get_ticket_plugin
+            plugin = get_ticket_plugin(ticket_type)
+            if plugin.apply_serializer:
+                return import_string(plugin.apply_serializer)
         return super().get_serializer_class()
 
     def retrieve(self, request, *args, **kwargs):

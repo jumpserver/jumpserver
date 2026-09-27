@@ -14,7 +14,7 @@ from tickets.serializers.workflow import (
     WorkflowInstanceSerializer, WorkflowInstanceDetailSerializer, WorkflowEventSerializer,
     ApprovalTaskSerializer, WorkflowDecisionSerializer, WorkflowReassignSerializer,
 )
-from tickets.workflow.approvers import available_users
+from tickets.workflow.approvers import available_users, excluded_approver_ids
 from tickets.workflow.engine import WorkflowEngine
 from tickets.workflow.publication import publish_workflow
 from tickets.plugins import get_ticket_plugin
@@ -51,6 +51,7 @@ class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets
         with tmp_to_root_org():
             workflows = Workflow.objects.filter(org_id__in=[org_id, Organization.ROOT_ID], type=ticket_type, is_system=False,
                                                  enabled=True, active_version__published_at__isnull=False)
+            workflows = plugin.filter_workflow_options(request, org_id, workflows)
             return Response([{'id': str(workflow.pk), 'name': workflow.name, 'type': workflow.type}
                              for workflow in workflows])
 
@@ -81,7 +82,8 @@ class WorkflowInstanceViewSet(viewsets.ReadOnlyModelViewSet):
         qs = WorkflowInstance.objects.select_related('version').all()
         if not self.request.user.has_perm('tickets.view_workflowinstance'):
             qs = qs.filter(Q(applicant=self.request.user) | Q(node_instances__tasks__assignee=self.request.user) |
-                           Q(ticket__cc_users=self.request.user)).distinct()
+                           Q(ticket__cc_users=self.request.user) |
+                           Q(ticket__beneficiaries__user=self.request.user)).distinct()
         return qs
 
     def get_serializer_class(self):
@@ -91,9 +93,11 @@ class WorkflowInstanceViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=['get'])
     def events(self, request, **kwargs):
-        events = self.get_object().events.all()
+        instance = self.get_object()
+        events = instance.events.all()
         page = self.paginate_queryset(events)
-        data = WorkflowEventSerializer(page if page is not None else events, many=True).data
+        context = {**self.get_serializer_context(), 'workflow_instance': instance}
+        data = WorkflowEventSerializer(page if page is not None else events, many=True, context=context).data
         return self.get_paginated_response(data) if page is not None else Response(data)
 
     @action(detail=True, methods=['post'])
@@ -138,8 +142,10 @@ class ApprovalTaskViewSet(viewsets.ReadOnlyModelViewSet):
         users = available_users(task.node_instance.instance.org_id).exclude(
             pk__in=task.node_instance.tasks.filter(assignee__isnull=False).values('assignee_id')
         )
-        if task.node_instance.node.config['exclude_applicant']:
-            users = users.exclude(pk=task.node_instance.instance.applicant_id)
+        instance = task.node_instance.instance
+        excluded = excluded_approver_ids(task.node_instance.node.config, instance.context, instance.applicant_id)
+        if excluded:
+            users = users.exclude(pk__in=excluded)
         search = request.query_params.get('search', '')[:128]
         if search:
             users = users.filter(Q(name__icontains=search) | Q(username__icontains=search))

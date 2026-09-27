@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from ..base import TicketPlugin
+from .policy import supports_delegated_request
 
 
 class Plugin(TicketPlugin):
@@ -17,6 +18,68 @@ class Plugin(TicketPlugin):
     def on_approved(self, instance, ticket):
         from .handler import on_approved
         return on_approved(instance, ticket)
+
+    def get_result_resources(self, instance, event, user):
+        from orgs.utils import tmp_to_org
+        from perms.models import AssetPermission
+        from .handler import permission_resource
+
+        resources = super().get_result_resources(instance, event, user)
+        with tmp_to_org(instance.org_id):
+            permissions = AssetPermission.objects.filter(org_id=instance.org_id)
+            # Older action events only recorded the ticket ID. Resolve the
+            # existing grant without replaying the handler or rewriting history.
+            if 'resources' not in event.data:
+                permission = permissions.filter(pk=instance.ticket_id, from_ticket=True).first()
+                resources = [permission_resource(permission)] if permission else []
+            # User.perms is cached on the user object and may belong to the
+            # organization used to read the timeline (for example root).
+            can_view = (user is not None and user.is_active and
+                        'perms.view_assetpermission' in user.get_all_permissions())
+            ids = [resource['id'] for resource in resources if resource.get('type') == 'asset_permission']
+            existing = set(str(pk) for pk in permissions.filter(pk__in=ids).values_list('pk', flat=True)) if can_view else set()
+        for resource in resources:
+            if resource.get('type') != 'asset_permission':
+                continue
+            resource['label'] = str(_('Asset permission'))
+            if resource['id'] in existing:
+                resource['url'] = (
+                    f"/ui/#/console/perms/asset-permissions/{resource['id']}?oid={instance.org_id}"
+                )
+        return resources
+
+    def validate_submission(self, ticket, context):
+        from tickets.workflow.errors import WorkflowConfigurationError
+        if context['request'].get('is_on_behalf') and not supports_delegated_request(ticket.workflow.active_version):
+            raise WorkflowConfigurationError(
+                'Requests for another user require organization administrator approval on every path.'
+            )
+
+    def filter_workflow_options(self, request, org_id, workflows):
+        from rest_framework.exceptions import PermissionDenied
+        from orgs.utils import tmp_to_org
+        beneficiary = request.query_params.get('beneficiary')
+        if not beneficiary or beneficiary == str(request.user.pk):
+            return workflows
+        with tmp_to_org(org_id):
+            if not request.user.has_perm('tickets.apply_asset_for_others'):
+                raise PermissionDenied()
+        return [workflow for workflow in workflows.select_related('active_version')
+                if supports_delegated_request(workflow.active_version)]
+
+    def excluded_approver_ids(self, context, applicant_id):
+        ids = {str(applicant_id)}
+        ids.update(str(user['id']) for user in context.get('request', {}).get('users', [])
+                   if isinstance(user, dict) and user.get('id'))
+        return ids
+
+    def notify_processed(self, ticket, processor):
+        from tickets.utils import send_ticket_processed_mail_to_beneficiaries
+        send_ticket_processed_mail_to_beneficiaries(ticket, processor)
+
+    def allow_direct_approval(self, ticket):
+        data = ticket.request_data
+        return bool((data.get('apply_assets') or data.get('apply_nodes')) and data.get('apply_accounts'))
 
     def request_items(self, ticket):
         from assets.models import Asset, Node
@@ -74,6 +137,8 @@ class Plugin(TicketPlugin):
         from django.db.models import Q
         from tickets.workflow.approvers import available_users
         users = available_users(org_id)
+        if not request.user.has_perm('tickets.apply_asset_for_others'):
+            users = users.filter(pk=request.user.pk)
         search = request.query_params.get('search', '')[:128]
         if search:
             users = users.filter(Q(name__icontains=search) | Q(username__icontains=search))
