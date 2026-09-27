@@ -28,6 +28,7 @@ class Workflow(JMSOrgBaseModel):
     class Meta:
         verbose_name = _('Approval workflow')
         default_permissions = ('add', 'change', 'view')
+        permissions = [('apply_asset_for_others', _('Apply for asset access on behalf of another user'))]
         ordering = ['name', 'id']
         constraints = [
             models.UniqueConstraint(fields=['org_id', 'type', 'name'], name='tickets_workflow_org_name_uniq'),

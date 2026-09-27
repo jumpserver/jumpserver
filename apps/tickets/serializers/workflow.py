@@ -116,9 +116,20 @@ class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
 
 
 class WorkflowEventSerializer(serializers.ModelSerializer):
+    resources = serializers.SerializerMethodField()
+
+    def get_resources(self, event):
+        if event.type != 'action.executed':
+            return []
+        instance = self.context.get('workflow_instance') or event.instance
+        plugin_type = instance.context.get('plugin', {}).get('type') or instance.ticket.type
+        request = self.context.get('request')
+        plugin = ticket_plugins.get(plugin_type)
+        return plugin.get_result_resources(instance, event, request.user if request else None)
+
     class Meta:
         model = WorkflowEvent
-        fields = ['id', 'instance', 'node_instance', 'task', 'type', 'actor', 'actor_snapshot', 'data', 'date_created']
+        fields = ['id', 'instance', 'node_instance', 'task', 'type', 'actor', 'actor_snapshot', 'data', 'resources', 'date_created']
         read_only_fields = fields
 
 

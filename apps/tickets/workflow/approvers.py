@@ -35,6 +35,15 @@ def snapshot_ids(values):
         raise WorkflowConfigurationError('Invalid approver IDs in the snapshot.')
 
 
+def excluded_approver_ids(config, context, applicant_id):
+    from tickets.plugins import get_ticket_plugin
+    ids = {str(applicant_id)} if config['exclude_applicant'] else set()
+    ticket_type = context.get('plugin', {}).get('type') or context.get('request', {}).get('type')
+    if ticket_type:
+        ids.update(get_ticket_plugin(ticket_type).excluded_approver_ids(context, applicant_id))
+    return ids
+
+
 def resolve_approvers(config, context, org_id, applicant_id):
     spec = config['approvers']
     kind = spec['type']
@@ -70,8 +79,9 @@ def resolve_approvers(config, context, org_id, applicant_id):
         users = users.filter(pk__in=explicit_ids)
         if {str(pk) for pk in users.values_list('pk', flat=True)} != explicit_ids:
             raise WorkflowConfigurationError('A configured approver is inactive, missing, or outside the organization.')
-    if config['exclude_applicant']:
-        users = users.exclude(pk=applicant_id)
+    excluded = excluded_approver_ids(config, context, applicant_id)
+    if excluded:
+        users = users.exclude(pk__in=excluded)
     result = list(users.distinct().order_by('id')[:1001])
     if not result or len(result) > 1000:
         raise WorkflowConfigurationError('An approval node must resolve between 1 and 1000 eligible approvers.')
