@@ -16,7 +16,7 @@ from orgs.utils import current_org, tmp_to_org
 from tickets.models import (
     Ticket, Workflow, WorkflowInstance, WorkflowNodeInstance, ApprovalTask, WorkflowEvent,
 )
-from .approvers import available_users, resolve_approvers, user_snapshot
+from .approvers import available_users, resolve_approvers, user_snapshot, excluded_approver_ids
 from .conditions import evaluate_condition
 from .const import InstanceState, NodeState, TaskState
 from .definition import json_snapshot
@@ -99,6 +99,9 @@ class WorkflowEngine:
             raise WorkflowConflict()
         if not actor or task.assignee_id != actor.pk or not available_users(instance.org_id).filter(pk=actor.pk).exists():
             raise PermissionDenied('Only the assigned, active organization member may process this task.')
+        excluded = excluded_approver_ids(task.node_instance.node.config, instance.context, instance.applicant_id)
+        if str(actor.pk) in excluded:
+            raise PermissionDenied('This user cannot process this approval task.')
         if task.node_instance.state != NodeState.running:
             raise WorkflowConflict()
         return instance, task
@@ -244,8 +247,9 @@ class WorkflowEngine:
     def _target_user(self, instance, run, target):
         if not available_users(instance.org_id).filter(pk=target.pk).exists():
             raise WorkflowConfigurationError('The target must be an active member of this organization.')
-        if run.node.config['exclude_applicant'] and target.pk == instance.applicant_id:
-            raise WorkflowConfigurationError('The applicant cannot approve this node.')
+        excluded = excluded_approver_ids(run.node.config, instance.context, instance.applicant_id)
+        if str(target.pk) in excluded:
+            raise WorkflowConfigurationError('This user cannot approve this node.')
         if run.tasks.filter(assignee=target).exists():
             raise WorkflowConfigurationError('The target already participated in this approval node.')
         if run.tasks.count() >= 1000:

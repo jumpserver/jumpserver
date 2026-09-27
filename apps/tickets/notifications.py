@@ -129,14 +129,9 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         return title
 
     def get_ticket_approval_url(self, external=True):
-        if self.ticket.type == 'apply_asset':
-            data = self.ticket.request_data
-            no_assets = not data.get('apply_assets')
-            no_nodes = not data.get('apply_nodes')
-            no_accounts = not data.get('apply_accounts')
-
-            if (no_assets and no_nodes) or no_accounts:
-                return None
+        from tickets.plugins import get_ticket_plugin
+        if not get_ticket_plugin(self.ticket.type).allow_direct_approval(self.ticket):
+            return None
 
         url = reverse('tickets:direct-approve', kwargs={'token': self.token})
         if not external:
@@ -188,6 +183,12 @@ class TicketProcessedToApplicantMessage(BaseTicketMessage):
         user = User.objects.first()
         processor = User.objects.last()
         return cls(user, ticket, processor)
+
+
+class TicketProcessedToBeneficiaryMessage(TicketProcessedToApplicantMessage):
+    @property
+    def content_title(self):
+        return _('An asset authorization request for you has been processed')
 
 
 class TicketUpdatedToCcUserMessage(BaseTicketMessage):

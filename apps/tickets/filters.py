@@ -16,10 +16,16 @@ class TicketFilter(BaseFilterSet):
     applicant = filters.UUIDFilter(
         field_name='applicant_id', label=_('Applicant ID')
     )
+    beneficiary = filters.UUIDFilter(
+        field_name='beneficiaries__user_id', label=_('Beneficiary ID')
+    )
     assignees__id = filters.UUIDFilter(
         method='filter_assignees_id', label=_('Assignee ID')
     )
     processed_by = filters.UUIDFilter(method='filter_processed_by', label=_('Assignee ID'))
+    cc_users__id = filters.UUIDFilter(
+        field_name='cc_users__id', label=_('CC users'), distinct=True,
+    )
     relevant_asset = filters.CharFilter(
         method='filter_relevant_asset',
         label=_('Relevant asset name or address')
@@ -49,11 +55,13 @@ class TicketFilter(BaseFilterSet):
         model = Ticket
         fields = (
             'id', 'title', 'serial_num', 'type', 'state', 'status', 'origin',
-            'applicant', 'applicant_username_name', 'assignees__id', 'processed_by',
+            'applicant', 'beneficiary', 'applicant_username_name', 'assignees__id', 'processed_by',
+            'cc_users__id',
             'relevant_asset', 'relevant_command', 'org_name', 'org_id',
         )
         fields_operator = {
             'assignees__id': ('exact',),
+            'cc_users__id': ('exact',),
             'org_id': ('exact', 'in'),
             'state': ('exact',),
             'status': ('exact',),
