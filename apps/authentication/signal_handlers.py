@@ -1,15 +1,38 @@
 from django.conf import settings
 from django.contrib.auth import user_logged_in, user_logged_out, BACKEND_SESSION_KEY
 from django.core.cache import cache
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
 from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from audits.models import UserSession
 from common.sessions.cache import user_session_manager
+from .models import AccessKey, Passkey, PrivateToken, SSHKey, TempToken
+from .notifications import publish_credential_created
 from .signals import post_auth_failed, backend_auth_failed
 
 from .backends.oauth2_provider.signal_handlers import *
+
+
+@receiver(post_save, sender=AccessKey)
+@receiver(post_save, sender=TempToken)
+@receiver(post_save, sender=PrivateToken)
+@receiver(post_save, sender=Passkey)
+@receiver(post_save, sender=SSHKey)
+def on_credential_created(sender, instance, created, raw=False, **kwargs):
+    if not created or raw:
+        return
+    credential_type = {
+        AccessKey: 'access_key',
+        TempToken: 'temp_token',
+        PrivateToken: 'private_token',
+        Passkey: 'passkey',
+        SSHKey: 'ssh_key',
+    }[sender]
+    # PrivateToken's primary key is the secret itself.
+    identifier = '' if sender is PrivateToken else instance.pk
+    publish_credential_created(instance.user, credential_type, identifier)
 
 
 @receiver(user_logged_in)

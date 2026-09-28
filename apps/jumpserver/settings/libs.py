@@ -36,7 +36,7 @@ REST_FRAMEWORK = {
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        'authentication.backends.drf.OAuth2Authentication',
         'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_THROTTLE_CLASSES': (

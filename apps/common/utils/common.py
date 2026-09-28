@@ -474,7 +474,6 @@ def is_macos():
 
 def convert_html_to_markdown(html_str, **options):
     markdown = markdownify(html_str, **options)
-    markdown = markdown.replace('\n\n', '\n')
     markdown = markdown.replace('\n ', '\n')
     return markdown
 

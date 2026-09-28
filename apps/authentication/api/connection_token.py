@@ -1323,6 +1323,8 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
                 org_id=token.org_id,
             )
 
+        ConnectionToken.objects.filter(pk=token.pk).update(date_last_used=timezone.now())
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='applet-option')
