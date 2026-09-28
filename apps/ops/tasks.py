@@ -37,10 +37,10 @@ def job_task_activity_callback(self, job_id, *args, **kwargs):
     return resource_ids, org_id
 
 
-def _run_ops_job_execution(execution):
+def _run_ops_job_execution(execution, check_login_acl=False):
     try:
         with tmp_to_org(execution.org):
-            execution.start()
+            execution.start(check_login_acl=check_login_acl)
     except SoftTimeLimitExceeded:
         execution.set_error('Run timeout')
         logger.error("Run adhoc timeout")
@@ -71,7 +71,7 @@ def run_ops_job(job_id):
         execution.creator = job.creator
         if job.periodic_variable:
             execution.parameters = JobExecutionSerializer().validate_parameters(job.periodic_variable)
-        _run_ops_job_execution(execution)
+        _run_ops_job_execution(execution, check_login_acl=True)
 
 
 def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
