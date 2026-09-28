@@ -64,6 +64,7 @@ class ConnectionToken(JMSOrgBaseModel):
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     is_reusable = models.BooleanField(default=False, verbose_name=_("Reusable"))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
+    date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_("Date last used"))
     from_ticket = models.OneToOneField(
         'tickets.ApplyLoginAssetTicket', related_name='connection_token',
         on_delete=models.SET_NULL, null=True, blank=True,

@@ -342,9 +342,10 @@ msgstr "密码"
 msgid "SSH key"
 msgstr "SSH 密钥"
 
-#: accounts/const/account.py:8 authentication/models/access_key.py:45
+#: accounts/const/account.py:9 authentication/models/access_key.py:45
+#: authentication/notifications.py:15
 msgid "Access key"
-msgstr "Access key"
+msgstr "访问密钥"
 
 #: accounts/const/account.py:9 authentication/backends/passkey/models.py:16
 #: authentication/models/sso_token.py:14
@@ -4417,8 +4418,8 @@ msgid "Temporary token"
 msgstr "临时密码"
 
 #: audits/auth_backends.py:26 authentication/const.py:41
-#: authentication/utils.py:144 rbac/tree.py:207
-#: settings/serializers/auth/passkey.py:8
+#: authentication/notifications.py:14 authentication/utils.py:161
+#: rbac/tree.py:210 settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
 msgstr "Passkey"
@@ -5722,7 +5723,8 @@ msgstr "可以失效连接令牌"
 msgid "Can reuse connection token"
 msgstr "可以复用连接令牌"
 
-#: authentication/models/connection_token.py:77
+#: authentication/models/connection_token.py:89
+#: authentication/notifications.py:17
 msgid "Connection token"
 msgstr "连接令牌"
 
@@ -5782,6 +5784,74 @@ msgstr "SSO token"
 #: authentication/models/temp_token.py:12
 msgid "Verified"
 msgstr "已校验"
+
+#: authentication/notifications.py:16
+msgid "Temporary password"
+msgstr "临时密码"
+
+#: authentication/notifications.py:19
+msgid "Private token"
+msgstr "私有令牌"
+
+#: authentication/notifications.py:40
+msgid "Credential created reminder"
+msgstr "凭据创建提醒"
+
+#: authentication/notifications.py:44
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:7
+#: authentication/templates/authentication/_msg_credential_created.html:5
+msgid "Credential type"
+msgstr "凭据类型"
+
+#: authentication/notifications.py:45
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:8
+#: authentication/templates/authentication/_msg_credential_created.html:6
+msgid "Identifier"
+msgstr "标识"
+
+#: authentication/notifications.py:72
+msgid "Credential activity summary"
+msgstr "凭据活动摘要"
+
+#: authentication/notifications.py:76
+msgid "Credential activity"
+msgstr "凭据活动"
+
+#: authentication/tasks.py:43
+msgid "Send credential activity summary"
+msgstr "发送凭据活动摘要"
+
+#: authentication/tasks.py:44
+msgid ""
+"Send users a summary of credential creation and successful use in the past "
+"24 hours"
+msgstr "向用户发送过去 24 小时内凭据创建和成功使用情况的摘要"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:2
+#: authentication/templates/authentication/_msg_credential_created.html:2
+#, python-format
+msgid "Hello %(name)s,"
+msgstr "您好，%(name)s："
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:3
+msgid "The following credential activity occurred in the past 24 hours."
+msgstr "以下是您过去 24 小时内的凭据活动情况。"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:24
+msgid ""
+"If you do not recognize this activity, revoke the credential and contact "
+"your administrator immediately."
+msgstr "如发现非本人操作，请立即撤销相关凭据并联系管理员。"
+
+#: authentication/templates/authentication/_msg_credential_created.html:3
+msgid "A new credential was created for your account."
+msgstr "您的账号已创建新的凭据。"
+
+#: authentication/templates/authentication/_msg_credential_created.html:10
+msgid ""
+"If this was not you, revoke the credential and contact your administrator "
+"immediately."
+msgstr "如非本人操作，请立即撤销该凭据并联系管理员。"
 
 #: authentication/notifications.py:12
 msgid "Different city login reminder"
@@ -8267,7 +8337,7 @@ msgstr "一般设置"
 msgid "View permission tree"
 msgstr "查看授权树"
 
-#: rbac/tree.py:208
+#: authentication/notifications.py:18 rbac/tree.py:211
 msgid "Access token"
 msgstr "访问令牌"
 
