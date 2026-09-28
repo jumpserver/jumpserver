@@ -26,8 +26,10 @@ from orgs.utils import tmp_to_org
 class CredentialClientManager:
     activity_write_interval = timedelta(seconds=60)
 
-    def __init__(self, user, configuration_id=None, instance_id='', audit_context=None):
+    def __init__(self, user, configuration_id=None, instance_id='', audit_context=None,
+                 client_type='sdk'):
         self.configuration_id = configuration_id
+        self.client_type = client_type
         self.audit_context = audit_context
         self.application, self.client = self._get_application_and_client(
             user, instance_id
@@ -44,26 +46,32 @@ class CredentialClientManager:
             self.configuration = user.configuration
             return user.application, user
 
-        if not self.configuration_id:
-            raise ValidationError({'configuration_id': _('This field is required for SDK access.')})
         if not instance_id:
             raise ValidationError({
-                'instance_id': _('This field is required for SDK access.')
+                'instance_id': _('This field is required for client access.')
             })
-        self.configuration = ClientAccessConfiguration.objects.filter(
-            id=self.configuration_id, application=user,
-            type=CredentialClientInstance.Type.sdk, is_active=True,
-        ).first()
+        if not user.is_active:
+            raise PermissionDenied(_('The application is disabled.'), code=AuditEvent.CLIENT_DISABLED)
+        if self.configuration_id:
+            self.configuration = ClientAccessConfiguration.objects.filter(
+                id=self.configuration_id, application=user,
+                type=self.client_type, is_active=True,
+            ).first()
+        elif self.client_type == CredentialClientInstance.Type.sdk:
+            from .access import subscription_scope
+            self.configuration = subscription_scope(user)
+        else:
+            raise ValidationError({'configuration_id': _('This field is required for Agent access.')})
         if not self.configuration:
             raise PermissionDenied(_('The SDK client access configuration is disabled or invalid.'), code='configuration_disabled')
         client = CredentialClientInstance.objects.get_or_create(
             configuration=self.configuration,
             application=user,
             instance_id=instance_id,
-            defaults={'type': CredentialClientInstance.Type.sdk},
+            defaults={'type': self.client_type},
         )[0]
-        if client.type != CredentialClientInstance.Type.sdk or not client.is_active:
-            raise PermissionDenied(_('The SDK client instance is disabled.'), code=AuditEvent.CLIENT_DISABLED)
+        if client.type != self.client_type or not client.is_active:
+            raise PermissionDenied(_('The client instance is disabled.'), code=AuditEvent.CLIENT_DISABLED)
         return user, client
 
     def _get_credential(self, key, lock=True):
@@ -139,6 +147,7 @@ class CredentialClientManager:
             key = credential.account_key(account.id)
         else:
             credential, account = self._get_credential(key)
+        secret = account.secret
         revision = (
             account.version if credential.mode == ApplicationCredential.Mode.subscription
             else credential.current_revision
@@ -167,6 +176,8 @@ class CredentialClientManager:
             )
         if self.audit_context is not None:
             self.audit_context.set_fetch_result(revision, revision_changed)
+        from accounts.credential_rotation.preparation import record_secret_access
+        record_secret_access(account, self.application)
         return {
             'key': key,
             'revision': revision,
@@ -186,7 +197,7 @@ class CredentialClientManager:
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
-                'secret': account.secret,
+                'secret': secret,
             },
         }
 
@@ -221,6 +232,9 @@ class CredentialClientManager:
             record(AuditEvent.CREDENTIAL_CONFIRMED, credential=credential, client=self.client)
             values['date_applied'] = now
         self._save_status(state, now, values)
+
+        from accounts.credential_rotation.preparation import refresh
+        refresh(credential)
 
     def _save_status(self, state, now, values, fetched=False):
         changed = {field: value for field, value in values.items() if getattr(state, field) != value}

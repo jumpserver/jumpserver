@@ -183,12 +183,17 @@ class Agent:
         self.capabilities = self.config['capabilities']
         self.configuration = self.config['configuration']
         validate_configuration(self.configuration, self.capabilities)
+        application_access = 'app_id' in self.config
         self.remote = credential_client.CredentialClient(
-            credential.Credential(self.config['agent_id'], self.config['agent_secret']),
-            self.config.get('instance_id', self.config['agent_id']),
+            credential.Credential(
+                self.config['app_id'] if application_access else self.config['agent_id'],
+                self.config['app_secret'] if application_access else self.config['agent_secret'],
+            ),
+            self.config.get('instance_id') or self.config.get('agent_id'),
             client_profile.ClientProfile(
                 endpoint=self.config['endpoint'], org_id=self.config['org_id'],
                 source='jms-pam-agent',
+                configuration_id=self.config.get('configuration_id') if application_access else None,
             ),
         )
         self.state = read_json(self.config.get('state_file', STATE_FILE))
@@ -295,7 +300,7 @@ class Agent:
             atomic_write_json(self.delivery_file, delivered)
             self.delivered = delivered
 
-    def sync(self):
+    def sync(self, refresh_keys=()):
         with self.lock:
             known = [
                 models.KnownCredentialRevision(Key=key, Revision=item.get('revision', 0))
@@ -326,7 +331,8 @@ class Agent:
             keys = [
                 key for key, item in metadata.items()
                 if item['available'] and (
-                    item['changed'] or self.credentials.get(key, {}).get('revision') != item['revision']
+                    key in refresh_keys or item['changed']
+                    or self.credentials.get(key, {}).get('revision') != item['revision']
                 )
             ]
             self.fetch(keys)
@@ -369,6 +375,64 @@ class Agent:
             except (JumpServerPAMSDKException, OSError):
                 continue
 
+    def finish_switch_command(self, event):
+        key = event['credential_key']
+        with self.lock:
+            applied = dict(self.state.get(key, {}))
+        if applied.get('revision') == event['revision'] and applied.get('account_id') == event['account_id']:
+            self.report_confirmations()
+            self.remote.ReportApplicationCommandResult(models.ApplicationCommandResultRequest(
+                CommandId=event['command_id'], Status='success',
+            ))
+
+    def handle_command(self, event):
+        request = models.ApplicationCommandResultRequest
+        claim = self.remote.ReportApplicationCommandResult(request(
+            CommandId=event['command_id'], Status='running',
+        ))
+        if not claim.Accepted:
+            if claim.Status == 'running' and event['event'] == 'credential.switch.requested':
+                self.finish_switch_command(event)
+            return
+        try:
+            if event['event'] == 'application.restart.requested':
+                # Only the service and action allowed by the local bootstrap can run.
+                validate_configuration(self.configuration, self.capabilities)
+                if self.configuration['delivery_mode'] != 'environment' or self.configuration['systemd_action'] != 'restart':
+                    raise ValueError('Application restart is not configured')
+                subprocess.run(
+                    ['systemctl', 'restart', self.configuration['systemd_unit']], check=True,
+                    timeout=120, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+                subprocess.run(
+                    ['systemctl', 'is-active', '--quiet', self.configuration['systemd_unit']], check=True,
+                    timeout=30, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+                self.remote.ReportApplicationCommandResult(request(CommandId=event['command_id'], Status='success'))
+            elif event['event'] == 'credential.switch.requested':
+                with self.sync_lock:
+                    self.sync()
+                    key = event['credential_key']
+                    if key not in self.authorized_keys:
+                        raise PermissionError('Credential access was revoked')
+                    self.fetch([key])
+                    item = self.credentials.get(key, {})
+                    if item.get('revision') != event['revision'] or item.get('account_id') != event['account_id']:
+                        raise ValueError('Requested account version is superseded')
+                    self.deliver({key})
+                self.finish_switch_command(event)
+            else:
+                raise ValueError('Unsupported application command')
+        except Exception:
+            self.remote.ReportApplicationCommandResult(request(
+                CommandId=event['command_id'], Status='failed', ErrorCode='execution_failed',
+            ))
+            raise
+
+    def process_commands(self):
+        for event in self.remote.ListApplicationCommands().Commands:
+            self.handle_command(event)
+
     def confirm(self, key, revision):
         with self.lock:
             if self.access_denied:
@@ -397,11 +461,11 @@ class Agent:
             status = 'pending'
         return {**state[key], 'status': status}
 
-    def safe_sync(self):
+    def safe_sync(self, refresh_keys=()):
         if not self.sync_lock.acquire(blocking=False):
             return
         try:
-            self.sync()
+            self.sync(refresh_keys=refresh_keys)
         finally:
             self.sync_lock.release()
 
@@ -485,6 +549,7 @@ class Agent:
             while not stop.wait(reconcile_interval):
                 try:
                     self.safe_sync()
+                    self.process_commands()
                 except Exception as error:
                     print(f'JumpServer PAM Agent: reconcile: {type(error).__name__}', file=sys.stderr)
 
@@ -492,12 +557,19 @@ class Agent:
         try:
             try:
                 self.safe_sync()
+                self.process_commands()
             except Exception as error:
                 print(f'JumpServer PAM Agent: initial sync: {type(error).__name__}', file=sys.stderr)
             actionable = {'snapshot', 'credential.updated', 'credential.revoked', 'configuration.updated'}
             for event in self.remote.WatchCredentialEvents(stop):
-                if event.get('event') in actionable:
-                    self.safe_sync()
+                if event.get('command_id'):
+                    try:
+                        self.handle_command(event)
+                    except Exception as error:
+                        print(f'JumpServer PAM Agent: command: {type(error).__name__}', file=sys.stderr)
+                elif event.get('event') in actionable:
+                    keys = [event['credential_key']] if event.get('event') == 'credential.updated' and event.get('credential_key') else []
+                    self.safe_sync(refresh_keys=keys)
                 else:
                     print(
                         f"JumpServer PAM Agent: {event.get('event', 'unknown')}: "
@@ -518,6 +590,19 @@ class Agent:
 
 
 def register(args):
+    bootstrap = read_json(args.bootstrap) if getattr(args, 'bootstrap', '') else None
+    if bootstrap is not None:
+        for name in ('endpoint', 'configuration_id', 'app_user', 'install_path'):
+            if not bootstrap.get(name):
+                raise ValueError(f'Missing Agent bootstrap field: {name}')
+            setattr(args, name, bootstrap[name])
+        for name in ('app_id', 'app_secret', 'org_id'):
+            if not bootstrap.get(name):
+                raise ValueError(f'Missing Agent bootstrap field: {name}')
+    elif not all(getattr(args, name, None) for name in (
+        'endpoint', 'token', 'configuration_id', 'app_user', 'install_path',
+    )):
+        raise ValueError('Use --bootstrap from the application access wizard.')
     configuration_id = str(uuid.UUID(args.configuration_id))
     base = Path(args.install_path) / configuration_id
     secure_root(base, 0o700)
@@ -530,15 +615,75 @@ def register(args):
     config_file = str(config_path)
     existing = read_json(config_file)
     if existing:
+        if bootstrap is not None and existing.get('app_id') != bootstrap['app_id']:
+            raise ValueError('Existing Agent belongs to another identity. Use a separate installation path.')
         agent = Agent(config_file)
         try:
             agent.sync()
         finally:
             agent.remote.close()
-        print('Existing Agent identity verified and reused; registration token was not submitted.')
+        print('Existing Agent identity verified and reused.')
         return config_file
 
     pwd.getpwnam(args.app_user)
+    if bootstrap is not None:
+        remote = credential_client.CredentialClient(
+            credential.Credential(bootstrap['app_id'], bootstrap['app_secret']), args.instance_id,
+            client_profile.ClientProfile(
+                endpoint=args.endpoint, org_id=bootstrap['org_id'],
+                configuration_id=configuration_id, source='jms-pam-agent',
+            ),
+        )
+        try:
+            result = remote.SyncAgent(models.AgentSyncRequest(
+                Credentials=[], DeliveredCredentials=[], ConfigDigest='',
+            ))._serialize()
+        finally:
+            remote.close()
+        identity = {
+            'configuration_id': configuration_id, 'org_id': bootstrap['org_id'],
+            'configuration': result['configuration'], 'config_digest': result['config_digest'],
+        }
+    else:
+        identity = register_legacy(args)
+    configuration = identity['configuration']
+    if identity['configuration_id'] != configuration_id:
+        raise ValueError('Registration belongs to another subscription scope.')
+    if configuration['app_user'] != args.app_user:
+        raise ValueError('Application user does not match the server configuration.')
+    expected_root = str(Path(args.install_path) / 'credentials' / configuration_id)
+    if configuration['delivery_root'] != expected_root:
+        raise ValueError('Install path does not match the server configuration.')
+    capabilities = {
+        key: configuration.get(key, '') for key in (
+            'delivery_root', 'socket_path', 'app_user', 'systemd_unit', 'systemd_action',
+        )
+    }
+    validate_configuration(configuration, capabilities)
+    secure_root(configuration['delivery_root'])
+    config = {
+        'endpoint': args.endpoint.rstrip('/'), 'org_id': identity['org_id'],
+        'configuration_id': identity['configuration_id'], 'instance_id': args.instance_id,
+        'configuration': configuration, 'capabilities': capabilities,
+        'config_digest': identity['config_digest'],
+        'authorized_keys': configuration['credential_keys'],
+        'credential_file': str(base / 'credentials.json'),
+        'delivery_file': str(base / 'delivered.json'),
+        'state_file': str(base / 'state.json'), 'poll_interval': 30,
+        'sync_status': '', 'sync_error': '', 'access_denied': False,
+    }
+    if bootstrap is not None:
+        config.update(app_id=bootstrap['app_id'], app_secret=bootstrap['app_secret'])
+    else:
+        config.update(agent_id=identity['agent_id'], agent_secret=identity['agent_secret'])
+    atomic_write_json(config_file, config)
+    atomic_write_json(config['credential_file'], {})
+    atomic_write_json(config['delivery_file'], {})
+    atomic_write_json(config['state_file'], {})
+    return config_file
+
+
+def register_legacy(args):
     response = requests.post(
         f"{args.endpoint.rstrip('/')}{CLIENT_PATH}/register-agent/",
         json={
@@ -554,38 +699,7 @@ def register(args):
         identity = response.json()
     except (requests.RequestException, ValueError) as error:
         raise RuntimeError('Agent registration failed; the local configuration was not replaced.') from error
-    configuration = identity['configuration']
-    if identity['configuration_id'] != configuration_id:
-        raise ValueError('Registration token belongs to another access configuration.')
-    if configuration['app_user'] != args.app_user:
-        raise ValueError('Application user does not match the server configuration.')
-    expected_root = str(Path(args.install_path) / 'credentials' / configuration_id)
-    if configuration['delivery_root'] != expected_root:
-        raise ValueError('Install path does not match the server configuration.')
-    capabilities = {
-        key: configuration.get(key, '') for key in (
-            'delivery_root', 'socket_path', 'app_user', 'systemd_unit', 'systemd_action',
-        )
-    }
-    validate_configuration(configuration, capabilities)
-    secure_root(configuration['delivery_root'])
-    config = {
-        'endpoint': args.endpoint.rstrip('/'), 'org_id': identity['org_id'],
-        'agent_id': identity['agent_id'], 'agent_secret': identity['agent_secret'],
-        'configuration_id': identity['configuration_id'], 'instance_id': args.instance_id,
-        'configuration': configuration, 'capabilities': capabilities,
-        'config_digest': identity['config_digest'],
-        'authorized_keys': configuration['credential_keys'],
-        'credential_file': str(base / 'credentials.json'),
-        'delivery_file': str(base / 'delivered.json'),
-        'state_file': str(base / 'state.json'), 'poll_interval': 30,
-        'sync_status': '', 'sync_error': '', 'access_denied': False,
-    }
-    atomic_write_json(config_file, config)
-    atomic_write_json(config['credential_file'], {})
-    atomic_write_json(config['delivery_file'], {})
-    atomic_write_json(config['state_file'], {})
-    return config_file
+    return identity
 
 
 def install(args):
@@ -634,12 +748,13 @@ def build_parser():
     commands = parser.add_subparsers(dest='command', required=True)
 
     def add_registration_arguments(command):
-        command.add_argument('--endpoint', required=True)
-        command.add_argument('--token', required=True)
+        command.add_argument('--bootstrap', default='')
+        command.add_argument('--endpoint')
+        command.add_argument('--token')
         command.add_argument('--instance-id', required=True)
-        command.add_argument('--configuration-id', required=True)
-        command.add_argument('--app-user', required=True)
-        command.add_argument('--install-path', required=True)
+        command.add_argument('--configuration-id')
+        command.add_argument('--app-user')
+        command.add_argument('--install-path')
         command.add_argument('--name')
         command.add_argument('--config', default='')
 

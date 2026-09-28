@@ -14096,3 +14096,59 @@ msgstr "無效的 CIDR：%s"
 
 msgid "At least one CIDR is required when auto assignment is enabled."
 msgstr "啟用自動納入時，至少需要設定一個 CIDR 網段。"
+
+#: accounts/notifications.py
+msgid "Account rotation preparation is ready"
+msgstr "帳號輪換準備已就緒"
+
+#: accounts/notifications.py
+msgid "Credential policy \"{name}\" is aligned. No application has requested the standby account Secret for {days} days. Sign in and manually start account switching."
+msgstr "憑據策略「{name}」已完成帳號對齊，備用帳號已連續 {days} 天沒有被應用呼叫 API 取得憑據。請登入系統，手動發起帳號切換。"
+
+#: accounts/credential_client/commands.py
+msgid "Select enabled connection instances belonging to this application."
+msgstr "請選擇屬於目前應用且已啟用的連線實例。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an authorized account rotation policy for this application."
+msgstr "請選擇目前應用已授權的帳號輪換策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an account rotation policy."
+msgstr "請選擇帳號輪換策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Wait for the account secret change to finish."
+msgstr "請等待帳號改密完成。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected connection instances do not all have access to this credential."
+msgstr "部分所選連線實例沒有該憑據的接入權限。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected Agent must be configured to restart its application service."
+msgstr "所選 Agent 必須已設定為允許重新啟動應用服務。"
+
+#: accounts/credential_client/commands.py
+msgid "Claim the event before reporting an execution result."
+msgstr "請先申請執行事件，再回報執行結果。"
+
+#: accounts/credential_client/commands.py
+msgid "Confirm the requested account version before reporting success."
+msgstr "請先確認實際使用請求中的帳號版本，再回報成功。"
+
+#: accounts/credential_client/commands.py
+msgid "Invalid command ID."
+msgstr "無效的事件執行編號。"
+
+msgid "Only active, idle policies can start a new cycle."
+msgstr "只有已啟用且閒置的策略才能發起新週期。"
+
+msgid "No authorized subscription accounts are available for notification."
+msgstr "沒有可通知的已授權訂閱帳號。"
+
+msgid "Wait for the current account secret changes to finish before republishing."
+msgstr "請等待目前帳號改密結束後，再重新發佈憑據通知。"
+
+msgid "Credential notification republished"
+msgstr "重新發佈憑據通知"

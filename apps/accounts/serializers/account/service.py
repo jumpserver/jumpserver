@@ -75,12 +75,14 @@ class IntegrationApplicationDetailSerializer(IntegrationApplicationSerializer):
             if account_id
         }
         clients = CredentialClientInstance.objects.filter(
-            application=instance, configuration__is_active=True, is_active=True,
+            application=instance,
         ).aggregate(
             instances_amount=Count('id', distinct=True),
+            active_instances_amount=Count('id', filter=Q(configuration__is_active=True, is_active=True), distinct=True),
             online_instances_amount=Count(
                 'id', filter=Q(
-                    date_last_seen__gte=timezone.now() - timedelta(minutes=2)
+                    date_last_seen__gte=timezone.now() - timedelta(minutes=2),
+                    configuration__is_active=True, is_active=True, application__is_active=True,
                 ), distinct=True,
             ),
             last_fetched=Max('credential_statuses__date_fetched'),
@@ -90,7 +92,8 @@ class IntegrationApplicationDetailSerializer(IntegrationApplicationSerializer):
             'authorized_accounts_amount': len(allowed_ids),
             'active_configurations_amount': len(configurations),
             'missing_authorized_accounts_amount': len(required_ids - allowed_ids),
-            'active_instances_amount': clients['instances_amount'],
+            'instances_amount': clients['instances_amount'],
+            'active_instances_amount': clients['active_instances_amount'],
             'online_instances_amount': clients['online_instances_amount'],
             'last_fetched': clients['last_fetched'],
             'configuration': (

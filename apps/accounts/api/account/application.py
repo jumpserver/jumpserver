@@ -1,12 +1,13 @@
 import os
 import zipfile
+from uuid import UUID
 from io import BytesIO
 
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _, get_language
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -47,6 +48,10 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'get_account_secret': 'accounts.view_integrationapplication',
         'get_sdks_info': 'accounts.view_integrationapplication',
         'credential_events': 'accounts.view_integrationapplication',
+        'access_materials': 'accounts.change_integrationapplication',
+        'send_event_options': 'accounts.change_integrationapplication',
+        'send_event': 'accounts.change_integrationapplication',
+        'manual_events': 'accounts.view_integrationapplication',
     }
 
     def read_file(self, path):
@@ -54,6 +59,57 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             with open(path, 'r', encoding='utf-8') as file:
                 return file.read()
         return ''
+
+    @action(['GET'], detail=True, url_path='send-event-options')
+    def send_event_options(self, request, *args, **kwargs):
+        from accounts.credential_client.commands import options
+        return Response(options(self.get_object()))
+
+    @action(['POST'], detail=True, url_path='send-event')
+    def send_event(self, request, *args, **kwargs):
+        from accounts.credential_client.commands import detail, send, SWITCH
+        serializer = serializers.ApplicationCommandSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        if data['event'] == SWITCH and not request.user.has_perm('accounts.change_applicationcredential'):
+            raise PermissionDenied()
+        application = self.get_object()
+        self.start_audit(AuditEvent.COMMAND_REQUESTED, application=application)
+        command = send(application, data, request.user.name)
+        return Response(detail(command), status=201)
+
+    @action(['GET'], detail=True, url_path='manual-events')
+    def manual_events(self, request, *args, **kwargs):
+        from accounts.credential_client.commands import detail
+        try:
+            limit = min(max(int(request.query_params.get('limit', 30)), 1), 100)
+            offset = max(int(request.query_params.get('offset', 0)), 0)
+        except (TypeError, ValueError):
+            raise ValidationError(_('Invalid pagination parameters.'))
+        commands = self.get_object().commands.select_related('source_event')
+        if request.query_params.get('command_id'):
+            try:
+                commands = commands.filter(id=UUID(request.query_params['command_id']))
+            except (TypeError, ValueError):
+                raise ValidationError(_('Invalid command ID.'))
+        return Response({'count': commands.count(), 'results': [detail(command) for command in commands[offset:offset + limit]]})
+
+    @action(
+        ['POST'], detail=True, url_path='access-materials',
+        permission_classes=[RBACPermission, UserConfirmation.require(ConfirmType.MFA)],
+    )
+    def access_materials(self, request, *args, **kwargs):
+        from accounts.credential_client.access import materials
+        application = self.get_object()
+        params = serializers.CredentialAccessWizardSerializer(
+            data=request.data, context={'application': application},
+        )
+        params.is_valid(raise_exception=True)
+        data = materials(application, params.validated_data, request.build_absolute_uri('/').rstrip('/'))
+        record(AuditEvent.CONFIGURATION_UPDATED, application=application, summary='Generated application access materials.')
+        response = Response(data)
+        response['Cache-Control'] = 'no-store'
+        return response
 
     @action(
         ['GET'], detail=False, url_path='sdks',
@@ -155,11 +211,14 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         if not account:
             msg = _('Account not found')
             raise JMSException(code='Not found', detail='%s' % msg)
-        record(AuditEvent.CREDENTIAL_FETCHED, application=service, remote_addr=get_request_ip(request),
-               summary='Legacy account-secret access.')
-        
         # 根据配置决定是否返回密码
         secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
+        record(AuditEvent.CREDENTIAL_FETCHED, application=service, account=account,
+               remote_addr=get_request_ip(request), result='success' if secret is not None else 'failed',
+               summary='Legacy account-secret access.')
+        if secret is not None:
+            from accounts.credential_rotation.preparation import record_secret_access
+            record_secret_access(account, service)
         response = Response(data={'id': request.user.id, 'secret': secret})
         response['X-API-Deprecated'] = 'true'
         response['Warning'] = '299 JumpServer "Use /api/v1/accounts/credential-client/credential/ instead."'

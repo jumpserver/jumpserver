@@ -9,13 +9,15 @@ from accounts.models import (
 from assets.const import Category
 from assets.models import Asset, Platform
 from orgs.models import Organization
-from orgs.utils import set_current_org
+from orgs.utils import set_current_org, set_to_root_org
 from users.models import User
 
 
 class CredentialTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
+        # TestCase rolls back organization rows but not the process-local mapping.
+        Organization.expire_orgs_mapping()
         self.org = Organization.default()
         set_current_org(self.org)
         self.admin = User.objects.create_superuser(
@@ -66,6 +68,18 @@ class CredentialTestCase(TestCase):
         )
         self.precheck_patch.start()
         self.addCleanup(self.precheck_patch.stop)
+        # Existing rotation-state tests start after preparation; preparation itself
+        # is exercised without this patch in test_credential_preparation.py.
+        self.preparation_patch = patch('accounts.credential_rotation.preparation.require_ready')
+        self.preparation_patch.start()
+        self.addCleanup(self.preparation_patch.stop)
+
+    def _post_teardown(self):
+        try:
+            super()._post_teardown()
+        finally:
+            Organization.expire_orgs_mapping()
+            set_to_root_org()
 
     def request(self, method, path, data=None, user=None):
         if isinstance(user, IntegrationApplication):

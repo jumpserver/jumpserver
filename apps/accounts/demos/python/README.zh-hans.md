@@ -1,6 +1,32 @@
 # JumpServer PAM Python SDK 与 Agent
 
-应用可以使用 Python SDK 直接连接 JumpServer，也可以在应用主机部署 Linux Agent。客户端启动时获取轮换凭据，并通过签名认证的凭据事件流 WebSocket 接收订阅账号快照和后续更新；只有 `credential.updated` 或重连快照中的新版本会触发取密。
+应用可以使用 Python SDK 直接连接 JumpServer，也可以在应用主机部署 Linux Agent。客户端启动时获取轮换凭据，并通过签名认证的凭据事件流 WebSocket 接收订阅账号快照和后续更新；`credential.updated`、重连快照中的新版本以及管理员手动发送的账号切换请求会触发取密。
+
+## 手动发起策略新周期
+
+在凭据策略详情的“基本设置”或“事件接收”中点击“发起新周期”。发起后会打开新周期的时间线：
+
+- 凭据变更订阅：为当前有应用授权的订阅账号重新发布 `credential.updated`，共用一个新的 `operation_id`。密码和版本不变，不生成改密开始、成功或失败事件。SDK 按事件 key 获取当前凭据；Agent 收到更新通知后也会重新取密，同版本不重复交付或重启服务。回执仅表示收到通知。离线客户端重连时通过快照获取当前凭据。
+- 账号轮换：上一周期完成或取消后，从准备阶段发起新的周期。应用对齐当前账号后，等待备用账号连续无取密流量达到配置时长（默认 7 天），再由管理员发起切换。准备、切换与改密共用一个周期。
+
+管理 API：`POST /api/v1/accounts/application-credentials/<policy-id>/start-cycle/`，需要策略修改权限，返回 `credential` 和 `cycle_id`。策略停用、轮换未结束时不能发起新周期；订阅账号正在改密时须等待改密结束再重新发布。
+
+## 手动发送应用事件
+
+在应用列表的“更多 > 发送事件”，或应用详情的“事件处理 > 发送事件”中，选择事件类型、目标连接实例和有效期。
+
+- `credential.switch.requested`：要求应用切换到策略当前发布的账号和版本。该请求不会更换策略的发布账号；更换发布账号应在轮换策略中操作。应用取密后必须校验请求中的账号和版本，完成连接切换并调用 `ConfirmCredential`，再回报成功。
+- `application.restart.requested`：SDK 应用调用自己实现的重启处理函数，并在健康检查成功后回报结果。Agent 仅支持接入时配置为 EnvironmentFile + restart 的 systemd 服务，先重启，再检查服务状态。
+
+WebSocket 的 `received` 回执表示收到请求，不表示执行成功。SDK 的 `ExecuteApplicationCommand(event, handler)` 会先向 Core 申请执行，只有 `accepted: true` 才调用处理函数；重复投递不会再次执行。处理函数正常返回后报告成功，异常则报告失败。应用自行负责处理函数中的业务幂等和健康检查。Agent 的账号切换请求在应用确认实际使用版本后才报告成功。
+
+离线实例可在有效期内重新连接接收请求。无法使用 WebSocket 的 API 应用也可通过 AK/SK 签名轮询，使用固定的 `instance_id`；首次轮询会登记实例，之后管理员便可选择该实例发送事件：
+
+1. `GET /api/v1/accounts/credential-client/commands/?instance_id=<instance-id>` 获取待处理请求（SDK 对应 `ListApplicationCommands()`）。使用与凭据客户端相同的签名头，协议版本为 1。
+2. `POST /api/v1/accounts/credential-client/command-result/`，提交 `instance_id`、`command_id` 和 `status: running`。只有响应 `accepted: true` 才执行。
+3. 执行结束后向同一接口提交 `status: success` 或 `status: failed`；失败可附带不含敏感数据的 `error_code`。SDK 对应 `ReportApplicationCommandResult()`。
+
+请求超过有效期会显示超时，不能再申请执行。已申请执行的重启若因进程退出而无法回报，需检查应用状态后由管理员决定是否重新发送。普通旧取密 API 保持不变，仅调用取密接口不会接收手动事件。
 
 ## 选择接入方式
 
@@ -37,14 +63,14 @@
 2. 在应用详情的“账号授权”页面授权凭据策略使用的资产账号。
 3. 使用交替轮换时，两个账号都必须授权。
 
-在“接入配置”中选择凭据不会自动增加账号授权。授权不完整时，Agent 无法获取凭据。
+应用接入不会自动增加账号授权。授权不完整时，Agent 无法获取凭据。
 
-### 创建 Agent 接入配置
+### 使用应用接入向导
 
-1. 打开目标凭据策略详情的“接入配置”，点击“创建”。
-2. 选择已绑定的应用和“Agent 接入”。当前凭据策略会自动选中，也可以加入该应用已绑定的其他策略。
+1. 打开应用详情的“接入与连接实例”，点击“接入向导”。
+2. 选择“Agent 接入”。所有绑定到应用的有效策略会自动加入，无需选择策略。
 3. 填写应用运行用户和安装路径。默认安装路径为 `/opt/jumpserver-pam`。
-4. 选择凭据交付方式并保存。
+4. 选择凭据交付方式，生成并下载接入材料。
 
 | 交付方式 | Agent 行为 | 应用行为 |
 | --- | --- | --- |
@@ -61,16 +87,15 @@ EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-
 
 默认选择 `restart`。只有应用的 reload 处理程序会主动重新读取 EnvironmentFile 时才选择 `reload`；systemd reload 本身不会把新环境变量重新注入已运行进程。
 
-`<configuration-id>` 可以在接入配置详情中查看。安装路径、应用用户、Socket 路径以及可操作的 systemd 服务会在安装时固定；扩大这些权限需要重新安装 Agent。
+`<configuration-id>` 可以在下载的引导文件中查看 `configuration_id` 字段。安装路径、应用用户、Socket 路径以及可操作的 systemd 服务会在安装时固定；扩大这些权限需要重新安装 Agent。
 
 ### 安装 Agent
 
-1. 准备使用 systemd、Python 3.9+ 且已创建应用运行用户的 Linux 应用主机，在 Agent 接入配置详情点击“生成”。
-2. 在该主机复制并执行“安装 Agent”，创建 Python 虚拟环境并从 PyPI 安装 `jms-pam`。
-3. 在同一主机于 10 分钟内复制并执行“注册并启动”，使用一次性注册码注册 Agent 并启动独立的 systemd 服务。
-4. 回到客户端实例列表，确认实例显示“在线”和“已同步”。
+1. 准备使用 systemd、Python 3.9+ 且已创建应用运行用户的 Linux 应用主机。
+2. 将下载的 `jms_pam_agent.json` 放到主机，在文件所在目录运行向导中的安装命令。Agent 使用应用的 AK/SK 签名访问 API 与 WebSocket。
+3. 回到应用的“接入与连接实例”，确认实例显示“在线”。
 
-注册命令包含一次性注册材料，请勿保存或转发。过期或使用后需重新生成。
+下载文件包含应用的 AK/SK，请限制文件访问权限，安装后删除下载的引导文件。Agent 安装后的配置文件仅允许 root 读取。
 
 安装后检查服务：
 
@@ -78,7 +103,7 @@ EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-
 sudo systemctl status jms-pam-agent-<configuration-id>.service --no-pager
 ```
 
-使用接入配置中的应用运行用户检查本机接口：
+使用向导中填写的应用运行用户检查本机接口：
 
 ```bash
 sudo -u <app-user> curl --fail --silent --show-error \
@@ -92,7 +117,7 @@ sudo -u <app-user> curl --fail --silent --show-error \
 {"status":"ok","sync_status":"success"}
 ```
 
-回到 JumpServer 的凭据策略详情，在“接入配置”中确认实例显示“Agent 在线”且配置状态为“已同步”。Agent 启动时立即同步，收到凭据事件时实时同步，并保留低频全量对账作为断线兜底。
+回到应用详情的“接入与连接实例”查看连接状态。Agent 启动时立即同步，收到凭据事件时实时同步，并保留低频全量对账作为断线兜底。
 
 ### 让应用使用并确认凭据
 
@@ -124,7 +149,7 @@ sudo -u <app-user> /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
 
 下面继续使用已经接入的双账号交替轮换策略。
 
-1. 进入“PAM 集成 > 凭据策略”，打开目标策略并点击“开始轮换”。
+1. 进入“PAM 集成 > 凭据策略”，打开目标策略并点击“发起新周期”。所有应用对齐到当前账号后，观察备用账号连续无取密流量的时长（默认 7 天，可配置）。达标会通知发起管理员，再由管理员点击“开始轮换”。
 2. JumpServer 发布另一个账号并发送 `credential.updated`。
 3. 每个启用的 Agent 实例取密并交付；应用切换成功后确认该 revision。
 4. 所有参与实例确认后，为被替换的账号创建并执行改密任务。
@@ -138,7 +163,7 @@ sudo -u <app-user> /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
 
 ## Agent 本机接口
 
-Agent 只在受保护的 Unix Socket 上提供本机接口，不监听 TCP 端口。Socket 默认属于接入配置中的应用运行用户，权限为 `0600`。
+Agent 只在受保护的 Unix Socket 上提供本机接口，不监听 TCP 端口。Socket 默认属于向导中填写的应用运行用户，权限为 `0600`。
 
 ### 健康检查
 
@@ -205,7 +230,7 @@ sudo /opt/jumpserver-pam/venv/bin/pip install --upgrade jms-pam
 sudo systemctl restart jms-pam-agent-<configuration-id>.service
 ```
 
-网络暂时不可达时，Agent 会继续保留最后一次有效缓存并重试。接入配置被禁用、授权被撤销或 Core 返回升级要求时，Agent 会停止通过 Socket 返回密码，但不会自动删除已经写入的文件。
+网络暂时不可达时，Agent 会继续保留最后一次有效缓存并重试。应用或实例被禁用、授权被撤销或 Core 返回升级要求时，Agent 会停止通过 Socket 返回密码，但不会自动删除已经写入的文件。
 
 <!-- agent-doc:end -->
 
@@ -215,14 +240,14 @@ sudo systemctl restart jms-pam-agent-<configuration-id>.service
 
 仓库另附两个可独立运行的文件配置 Demo：`file_apps.subscription` 和 `file_apps.rotation`。它们使用本节生成的 SDK 配置，接收事件后更新本地 JSON；运行命令和轮换确认条件见 `apps/accounts/demos/python/file_apps/README.zh-hans.md`。
 
-SDK 接入配置只能选择同一种策略模式。订阅和轮换需要分别创建接入配置，生成的代码也各自独立。
+SDK 使用应用的 AK/SK，自动接收所有绑定到应用的有效策略。一条连接可同时处理订阅和轮换，接入向导提供按策略模式处理的通用示例。策略绑定变化自动生效。
 
 ### 接入前准备
 
 1. 在“PAM 集成 > 凭据策略”创建“凭据变更订阅”或“账号轮换”策略并绑定应用。订阅策略明确选择要通知的账号；账号轮换当前选择同一资产上的两个账号。
 2. 创建或打开目标应用，在“账号授权”页面授权应用可使用的资产账号。交替轮换必须授权策略中的两个账号。
-3. 打开目标凭据策略详情的“接入配置”，创建 SDK 配置并选择同模式的策略。当前策略会自动选中。
-4. 打开 SDK 配置详情，点击“生成”，下载 `jms_pam_config.py` 并妥善保管。
+3. 打开应用详情的“接入与连接实例”，点击“接入向导”，选择“SDK 接入”。
+4. 生成并下载 `jms_pam_config.py`，使用向导中的示例代码。无需配置 ID 或策略列表。
 
 每个应用进程或连接池都必须使用稳定且唯一的 `instance_id`。重新部署同一实例时应复用原标识，不同实例不能共享标识。
 
@@ -290,29 +315,26 @@ with credential_client.CredentialClient(
 
 ### 双账号交替轮换
 
-轮换配置包含唯一策略 Key。启动时获取当前账号，收到更新或重连快照后再次取密；只有应用验证新连接并切换成功后才能确认：
+事件快照提供每条轮换策略的唯一 Key。收到首次快照时获取当前账号，收到更新或重连快照后再次取密；只有应用验证新连接并切换成功后才能确认：
 
 ```python
 from jms_pam.credential.v1 import credential_client, models
-from jms_pam_config import confirmation_keys, cred, credential_keys, profile
+from jms_pam_config import cred, profile
 
 
 def switch_credential(client, key):
     response = client.GetCredential(models.GetCredentialRequest(Key=key))
     # 使用返回的资产、账号和密码建立连接，验证成功后切换应用连接池。
-    if key in confirmation_keys:
-        client.ConfirmCredential(models.ConfirmCredentialRequest(
-            Key=response.Key,
-            Revision=response.Revision,
-            AccountId=response.Account.Id,
-        ))
+    client.ConfirmCredential(models.ConfirmCredentialRequest(
+        Key=response.Key,
+        Revision=response.Revision,
+        AccountId=response.Account.Id,
+    ))
 
 
 with credential_client.CredentialClient(
     cred, instance_id='order-service-node-1', profile=profile,
 ) as client:
-    for key in credential_keys:
-        switch_credential(client, key)
     for event in client.WatchCredentialEvents():
         if event.get('event') == 'snapshot':
             updates = event.get('credentials', [])
@@ -322,7 +344,7 @@ with credential_client.CredentialClient(
             continue
         for update in updates:
             key = update.get('credential_key') or update.get('key')
-            if key in credential_keys:
+            if key and update.get('credential_mode') == 'alternating_rotation':
                 switch_credential(client, key)
 ```
 
@@ -330,7 +352,7 @@ with credential_client.CredentialClient(
 
 ### 完成一次凭据轮换
 
-1. 在“PAM 集成 > 凭据策略”中打开目标策略并点击“开始轮换”。
+1. 在“PAM 集成 > 凭据策略”中打开目标策略并点击“发起新周期”。应用确认当前账号后，等待备用账号连续无取密流量达到配置时长（默认 7 天）；收到就绪通知后，由管理员点击“开始轮换”。
 2. JumpServer 切换当前生效账号并发送 `credential.updated`。
 3. 应用按事件中的 key 调用 `GetCredential`，使用新账号建立并验证连接，切换成功后调用 `ConfirmCredential`；生命周期事件只记录状态，不触发取密。
 4. 所有参与实例确认后点击“继续轮换”，创建并执行原账号的改密任务。

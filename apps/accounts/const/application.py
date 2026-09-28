@@ -10,6 +10,8 @@ class AuditSource(TextChoices):
 
 
 class AuditEvent(TextChoices):
+    COMMAND_REQUESTED = 'command_requested', _('Application command requested')
+    COMMAND_RESULT = 'command_result', _('Application command result')
     CONFIGURATION_CREATED = 'configuration_created', _('Configuration created')
     CONFIGURATION_UPDATED = 'configuration_updated', _('Configuration updated')
     CONFIGURATION_DELETED = 'configuration_deleted', _('Configuration deleted')
@@ -21,6 +23,7 @@ class AuditEvent(TextChoices):
     CREDENTIAL_FETCHED = 'credential_fetched', _('Credential fetched')
     CREDENTIAL_CONFIRMED = 'credential_confirmed', _('Credential confirmed')
     CREDENTIAL_PUBLISHED = 'credential_published', _('Credential published')
+    CREDENTIAL_REPUBLISHED = 'credential_republished', _('Credential notification republished')
     CREDENTIAL_STREAM_CONNECTED = 'credential_stream_connected', _('Credential stream connected')
     CREDENTIAL_STREAM_DISCONNECTED = 'credential_stream_disconnected', _('Credential stream disconnected')
     SECRET_CHANGE_STARTED = 'secret_change_started', _('Secret change started')
@@ -34,6 +37,11 @@ class AuditEvent(TextChoices):
 
 
 class ApplicationEvent(TextChoices):
+    ROTATION_PREPARATION_STARTED = 'rotation.preparation.started', _('Rotation preparation started')
+    ROTATION_ACCOUNTS_ALIGNED = 'rotation.accounts.aligned', _('Rotation accounts aligned')
+    ROTATION_STANDBY_WAITING = 'rotation.standby.waiting', _('Observing standby account usage')
+    ROTATION_PREPARATION_READY = 'rotation.preparation.ready', _('Rotation preparation ready')
+    ROTATION_PREPARATION_CANCELLED = 'rotation.preparation.cancelled', _('Rotation preparation cancelled')
     CREDENTIAL_UPDATED = 'credential.updated', _('Credential updated')
     CREDENTIAL_REVOKED = 'credential.revoked', _('Credential revoked')
     CONFIGURATION_UPDATED = 'configuration.updated', _('Configuration updated')
@@ -44,6 +52,11 @@ class ApplicationEvent(TextChoices):
     ROTATION_WAITING = 'rotation.waiting_for_application', _('Rotation waiting for application')
     ROTATION_COMPLETED = 'rotation.completed', _('Rotation completed')
     ROTATION_FAILED = 'rotation.failed', _('Rotation failed')
+
+
+class ApplicationCommandEvent(TextChoices):
+    ACCOUNT_SWITCH_REQUESTED = 'credential.switch.requested', _('Account switch requested')
+    APPLICATION_RESTART_REQUESTED = 'application.restart.requested', _('Application restart requested')
 
 
 class WebhookRequestMethod(TextChoices):

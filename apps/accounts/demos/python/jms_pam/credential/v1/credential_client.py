@@ -39,6 +39,37 @@ class CredentialClient(AbstractClient):
             models.AgentSyncResponse,
         )
 
+    def ListApplicationCommands(self):
+        return self._call(
+            'GET', 'commands', models.ListApplicationCommandsRequest(),
+            models.ListApplicationCommandsRequest, models.ListApplicationCommandsResponse, query=True,
+        )
+
+    def ReportApplicationCommandResult(self, request):
+        return self._call(
+            'POST', 'command-result', request, models.ApplicationCommandResultRequest,
+            models.ApplicationCommandResultResponse,
+        )
+
+    def ExecuteApplicationCommand(self, event, handler):
+        """Claim once, run an application handler, then report its actual result."""
+        command_id = event['command_id']
+        claim = self.ReportApplicationCommandResult(models.ApplicationCommandResultRequest(
+            CommandId=command_id, Status='running',
+        ))
+        if not claim.Accepted:
+            return claim
+        try:
+            handler(event)
+        except Exception:
+            self.ReportApplicationCommandResult(models.ApplicationCommandResultRequest(
+                CommandId=command_id, Status='failed', ErrorCode='execution_failed',
+            ))
+            raise
+        return self.ReportApplicationCommandResult(models.ApplicationCommandResultRequest(
+            CommandId=command_id, Status='success',
+        ))
+
     def WatchCredentialEvents(self, stop_event=None):
         """Acknowledge business events before yielding; reconnect with bounded backoff."""
         delay = 1
@@ -87,10 +118,11 @@ class CredentialClient(AbstractClient):
     def _event_stream_url(self):
         endpoint = urlsplit(self.profile.Endpoint)
         scheme = 'wss' if endpoint.scheme == 'https' else 'ws'
-        query = urlencode({
-            'configuration_id': self.profile.ConfigurationId or '',
-            'instance_id': self.instance_id,
-        })
+        params = {}
+        if self.profile.ConfigurationId:
+            params['configuration_id'] = self.profile.ConfigurationId
+        params['instance_id'] = self.instance_id
+        query = urlencode(params)
         return urlunsplit((scheme, endpoint.netloc, '/ws/accounts/credential-events/', query, ''))
 
     def _event_stream_headers(self):

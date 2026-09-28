@@ -8,7 +8,8 @@ from django.core.handlers.asgi import ASGIRequest
 from django.utils import timezone
 
 from accounts.api.account.credential import (
-    CredentialClientAgentAuthentication, CredentialClientServiceAuthentication,
+    CredentialClientApplicationAgentAuthentication,
+    CredentialClientServiceAuthentication,
 )
 from accounts.const import AuditEvent
 from accounts.credential_client.audit import record
@@ -42,7 +43,7 @@ class CredentialClientAuthMiddleware:
             with tmp_to_org(org_id):
                 result = None
                 for backend in (
-                    CredentialClientAgentAuthentication(),
+                    CredentialClientApplicationAgentAuthentication(),
                     CredentialClientServiceAuthentication(),
                 ):
                     result = backend.authenticate(request)
@@ -51,16 +52,25 @@ class CredentialClientAuthMiddleware:
                 if not result:
                     return None
                 user, _ = result
+                client_type = 'agent' if request.headers.get('X-Source') == 'jms-pam-agent' else 'sdk'
+                protocol = int(request.headers.get('X-JMS-Protocol-Version', 0))
+                schema = int(request.headers.get('X-JMS-Config-Schema-Version', 0))
+                if protocol != 1 or (client_type == 'agent' and schema != 1):
+                    return None
                 manager = CredentialClientManager(
                     user,
                     (params.get('configuration_id') or [''])[0],
                     (params.get('instance_id') or [''])[0],
+                    client_type=client_type,
                 )
                 manager.update_client_metadata(
                     request.headers.get('X-JMS-Client-Version', ''),
-                    int(request.headers.get('X-JMS-Protocol-Version', 0)),
-                    int(request.headers.get('X-JMS-Config-Schema-Version', 0)),
+                    protocol, schema,
                 )
+                if manager.client.protocol_version != 1 or (
+                    manager.client.type == 'agent' and manager.client.config_schema_version != 1
+                ):
+                    return None
                 supports_receipts = request.headers.get('X-JMS-Event-Receipts') == '1'
                 CredentialClientInstance.objects.filter(id=manager.client.id).update(
                     event_receipts_supported=supports_receipts,
@@ -87,7 +97,15 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
         await self.touch(AuditEvent.CREDENTIAL_STREAM_CONNECTED)
         await self.send_json(await self.snapshot())
+        for command in await self.pending_commands():
+            await self.send_json(command)
         self.touch_task = asyncio.create_task(self.keep_online())
+
+    @database_sync_to_async
+    def pending_commands(self):
+        from accounts.credential_client.commands import pending
+        with tmp_to_org(self.org_id):
+            return pending(self.client)
 
     async def disconnect(self, close_code):
         task = getattr(self, 'touch_task', None)
@@ -162,7 +180,9 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         from accounts.credential_rotation.events import receive
         try:
             with tmp_to_org(self.org_id):
-                receive(self.client.id, self.org_id, event_id)
+                if not receive(self.client.id, self.org_id, event_id):
+                    from accounts.credential_client.commands import receive as receive_command
+                    receive_command(self.client, event_id)
         except Exception:
             logger.warning('Cannot record event receipt for client %s.', self.client.id)
 
@@ -170,3 +190,9 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         if 'recipient_ids' in event and str(self.client.id) not in event['recipient_ids']:
             return
         await self.send_json(event['payload'])
+        if event['payload']['event'] in ('configuration.updated', 'credential.revoked') or (
+            event['payload']['event'] == 'credential.updated'
+            and event['payload'].get('credential_mode') == 'subscription'
+            and not event['payload'].get('account_id')
+        ):
+            await self.send_json(await self.snapshot())

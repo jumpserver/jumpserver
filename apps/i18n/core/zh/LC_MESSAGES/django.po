@@ -15594,3 +15594,59 @@ msgstr "无效的 CIDR：%s"
 
 msgid "At least one CIDR is required when auto assignment is enabled."
 msgstr "启用自动纳入时，至少需要配置一个 CIDR 网段。"
+
+#: accounts/notifications.py
+msgid "Account rotation preparation is ready"
+msgstr "账号轮换准备已就绪"
+
+#: accounts/notifications.py
+msgid "Credential policy \"{name}\" is aligned. No application has requested the standby account Secret for {days} days. Sign in and manually start account switching."
+msgstr "凭据策略“{name}”已完成账号对齐，备用账号已连续 {days} 天没有被应用调用 API 获取凭据。请登录系统，手动发起账号切换。"
+
+#: accounts/credential_client/commands.py
+msgid "Select enabled connection instances belonging to this application."
+msgstr "请选择属于当前应用且已启用的连接实例。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an authorized account rotation policy for this application."
+msgstr "请选择当前应用已授权的账号轮换策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an account rotation policy."
+msgstr "请选择账号轮换策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Wait for the account secret change to finish."
+msgstr "请等待账号改密完成。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected connection instances do not all have access to this credential."
+msgstr "部分所选连接实例没有该凭据的接入权限。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected Agent must be configured to restart its application service."
+msgstr "所选 Agent 必须已配置为允许重启应用服务。"
+
+#: accounts/credential_client/commands.py
+msgid "Claim the event before reporting an execution result."
+msgstr "请先申请执行事件，再回报执行结果。"
+
+#: accounts/credential_client/commands.py
+msgid "Confirm the requested account version before reporting success."
+msgstr "请先确认实际使用请求中的账号版本，再回报成功。"
+
+#: accounts/credential_client/commands.py
+msgid "Invalid command ID."
+msgstr "无效的事件执行编号。"
+
+msgid "Only active, idle policies can start a new cycle."
+msgstr "只有已启用且空闲的策略才能发起新周期。"
+
+msgid "No authorized subscription accounts are available for notification."
+msgstr "没有可通知的已授权订阅账号。"
+
+msgid "Wait for the current account secret changes to finish before republishing."
+msgstr "请等待当前账号改密结束后，再重新发布凭据通知。"
+
+msgid "Credential notification republished"
+msgstr "重新发布凭据通知"

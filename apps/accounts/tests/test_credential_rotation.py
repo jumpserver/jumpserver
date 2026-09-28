@@ -819,8 +819,10 @@ class CredentialRotationTestCase(CredentialTestCase):
         serializer = ApplicationCredentialSerializer(
             policy, data={'applications': [str(second.id)]}, partial=True,
         )
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('applications', serializer.errors)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+        self.assertFalse(configuration.credentials.filter(id=policy.id).exists())
+        self.assertSetEqual(set(policy.applications.values_list('id', flat=True)), {second.id})
 
     @override_language('en')
     def test_serializer_names_credential_using_the_account(self):

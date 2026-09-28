@@ -52,7 +52,7 @@ def check(credential):
     if (
         not credential.is_active
         or credential.mode != ApplicationCredential.Mode.alternating_rotation
-        or credential.status != ApplicationCredential.Status.idle
+        or credential.status not in (ApplicationCredential.Status.idle, ApplicationCredential.Status.ready_to_switch)
     ):
         raise JMSException(_('Only active, idle alternating rotation policies can start rotation.'))
     accounts = [credential.account, credential.alternate_account]
@@ -91,6 +91,7 @@ def fingerprint(credential):
     accounts = [credential.account, credential.alternate_account]
     return {
         'credential_id': str(credential.id), 'revision': credential.revision,
+        'standby_no_traffic_days': credential.standby_no_traffic_days,
         'credential_updated': credential.date_updated.isoformat(),
         'accounts': [
             [str(a.id), a.version, a.username, a.secret_type, str(a.asset_id),
@@ -124,7 +125,7 @@ def latest(credential):
 
 def info(credential):
     execution = latest(credential)
-    if not execution or credential.status != 'idle':
+    if not execution or credential.status not in ('idle', 'ready_to_switch'):
         return None
     state = (execution.summary or {}).get('precheck_status', 'checking')
     code = (execution.summary or {}).get('precheck_error', '')
@@ -233,6 +234,8 @@ def finish(execution_id):
                 id__in=[credential.account_id, credential.alternate_account_id],
             ).order_by('id'))
             credential.refresh_from_db()
+            from .preparation import require_ready
+            require_ready(credential)
             check(credential)
             if fingerprint(credential) != expected:
                 return fail(execution.id, 'changed')

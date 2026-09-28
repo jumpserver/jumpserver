@@ -60,7 +60,9 @@ def _configurations(event, code):
     configurations = ClientAccessConfiguration.objects.filter(
         org_id=event.org_id, is_active=True, application__is_active=True,
     )
-    if code == 'credential.revoked' and event.service_id and event.credential_id:
+    if code == 'credential.revoked' and event.configuration_id:
+        configurations = configurations.filter(id=event.configuration_id)
+    elif code == 'credential.revoked' and event.service_id and event.credential_id:
         configurations = configurations.filter(
             application_id=event.service_id, credentials=event.credential_id,
         )
@@ -101,6 +103,7 @@ def _track_rotation(event, code, rotation):
     previous = rotation.events.order_by('-sequence').first()
     rotation.events.create(
         source_event_id=event.id, event=code, revision=event.revision,
+        cycle_id=rotation.id,
         sequence=previous.sequence + 1 if previous else 1,
         recipients=_recipients(event, code), org_id=event.org_id,
     )
@@ -109,12 +112,13 @@ def _track_rotation(event, code, rotation):
 def _track_non_rotation(event, code):
     if code not in TRACKED_NON_ROTATION_EVENTS:
         return
-    if not _configurations(event, code).exists() or CredentialRotationEvent.objects.filter(
+    if (not event.credential_id and not _configurations(event, code).exists()) or CredentialRotationEvent.objects.filter(
         source_event_id=event.id,
     ).exists():
         return
     CredentialRotationEvent.objects.create(
         rotation=None, source_event_id=event.id, event=code, sequence=1,
+        cycle_id=event.operation_id or event.id,
         revision=event.revision, recipients=_recipients(event, code), org_id=event.org_id,
     )
 
@@ -151,7 +155,7 @@ def _send_stream(event_id, code):
         'credential_key': event.credential_key or None,
         'revision': event.revision,
         'account_id': str(event.account_id) if event.account_id else None,
-        'operation_id': str(event.rotation_id) if event.rotation_id else None,
+        'operation_id': str(event.operation_id or event.rotation_id) if (event.operation_id or event.rotation_id) else None,
         'result': event.result,
     }
     try:

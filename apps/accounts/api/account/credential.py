@@ -5,7 +5,8 @@ import uuid
 from email.utils import parsedate_to_datetime
 
 from django.core.cache import cache
-from django.db.models import Count
+from django.db import transaction
+from django.db.models import Count, Max, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import mixins, status
@@ -52,6 +53,7 @@ CREDENTIAL_CLIENT_SIGNATURE_HEADERS = [
 class CredentialEventQuerySerializer(drf_serializers.Serializer):
     client_id = drf_serializers.UUIDField(required=False)
     rotation_id = drf_serializers.UUIDField(required=False)
+    cycle_id = drf_serializers.UUIDField(required=False)
     limit = drf_serializers.IntegerField(default=20, min_value=1, max_value=100)
     offset = drf_serializers.IntegerField(default=0, min_value=0)
     client_search = drf_serializers.CharField(default='', allow_blank=True, max_length=128)
@@ -119,6 +121,22 @@ class CredentialClientServiceAuthentication(
     required_headers = CREDENTIAL_CLIENT_SIGNATURE_HEADERS
 
 
+class CredentialClientApplicationAgentAuthentication(CredentialClientServiceAuthentication):
+    source = 'jms-pam-agent'
+
+    def get_object(self, key_id):
+        return super().get_object(key_id) or CredentialAgentAuthentication.get_object(self, key_id)
+
+    @staticmethod
+    def get_ip_group(obj):
+        return obj.application.ip_group if isinstance(obj, CredentialClientInstance) else obj.ip_group
+
+    def after_authenticate_update_date(self, user):
+        if isinstance(user, CredentialClientInstance):
+            return CredentialAgentAuthentication.after_authenticate_update_date(self, user)
+        return super().after_authenticate_update_date(user)
+
+
 class CredentialClientAgentAuthentication(
     CredentialClientSignatureAuthenticationMixin, CredentialAgentAuthentication,
 ):
@@ -132,6 +150,9 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     search_fields = ('name', 'key', 'comment')
     ordering_fields = ('name', 'status', 'date_last_rotated', 'date_created')
     rbac_perms = {
+        'start_cycle': 'accounts.change_applicationcredential',
+        'prepare_rotation': 'accounts.change_applicationcredential',
+        'check_preparation': 'accounts.change_applicationcredential',
         'start_rotation': 'accounts.change_applicationcredential',
         'check_usage': 'accounts.change_applicationcredential',
         'check_secret_change': 'accounts.change_applicationcredential',
@@ -141,15 +162,65 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'rotation_status': 'accounts.view_applicationcredential',
         'rotation_events': 'accounts.view_applicationcredential',
         'event_history': 'accounts.view_applicationcredential',
+        'event_cycles': 'accounts.view_applicationcredential',
+        'access_applications': 'accounts.view_applicationcredential',
         'retry_change': ['accounts.change_applicationcredential', 'accounts.add_changesecretexecution'],
     }
 
+    @transaction.atomic
     def perform_destroy(self, instance):
         if instance.status != ApplicationCredential.Status.idle:
             raise ValidationError(_('A rotating credential policy cannot be deleted.'))
-        if instance.access_configurations.exists():
-            raise ValidationError(_('Remove this credential from client access configurations before deleting it.'))
+        for configuration in instance.access_configurations.all():
+            configuration.credentials.remove(instance)
         return super().perform_destroy(instance)
+
+    @action(methods=['get'], detail=True, url_path='access-applications')
+    def access_applications(self, request, *args, **kwargs):
+        credential = self.get_object()
+        scope = Q(credential_clients__configuration__credentials=credential)
+        online = scope & Q(
+            is_active=True, credential_clients__is_active=True,
+            credential_clients__configuration__is_active=True,
+            credential_clients__date_last_seen__gte=timezone.now() - timezone.timedelta(minutes=2),
+        )
+        applications = credential.applications.annotate(
+            instances_amount=Count('credential_clients', filter=scope, distinct=True),
+            online_instances_amount=Count('credential_clients', filter=online, distinct=True),
+            last_reported=Max('credential_clients__date_last_seen', filter=scope),
+        ).order_by('name', 'id')
+        results = [{
+            'id': str(item.id), 'name': item.name, 'is_active': item.is_active,
+            'instances_amount': item.instances_amount,
+            'online_instances_amount': item.online_instances_amount,
+            'last_reported': item.last_reported,
+        } for item in applications]
+        return Response({
+            'applications_amount': len(results),
+            'instances_amount': sum(item['instances_amount'] for item in results),
+            'online_instances_amount': sum(item['online_instances_amount'] for item in results),
+            'results': results,
+        })
+
+    @action(methods=['post'], detail=True, url_path='start-cycle')
+    def start_cycle(self, request, *args, **kwargs):
+        from accounts.credential_rotation.manual_cycles import start
+        credential, cycle_id = start(self.get_object().id, request.user.name, request.user.id)
+        return Response({
+            'credential': self.get_serializer(credential).data,
+            'cycle_id': str(cycle_id),
+        }, status=status.HTTP_201_CREATED)
+
+    @action(methods=['post'], detail=True, url_path='prepare')
+    def prepare_rotation(self, request, *args, **kwargs):
+        credential = CredentialRotationManager(self.get_object().id).prepare(request.user.name, request.user.id)
+        return Response(self.get_serializer(credential).data)
+
+    @action(methods=['post'], detail=True, url_path='check-preparation')
+    def check_preparation(self, request, *args, **kwargs):
+        from accounts.credential_rotation.preparation import check
+        credential = check(self.get_object().id)
+        return Response(self.get_serializer(credential).data)
 
     @action(methods=['post'], detail=True, url_path='start')
     def start_rotation(self, request, *args, **kwargs):
@@ -214,6 +285,17 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             return Response(client_history(credential, data['client_id'], limit, offset))
         clients = directory(credential, data['client_search'], data['client_type'], data['state'])
         return Response({'count': len(clients), 'results': clients[offset:offset + limit]})
+
+    @action(methods=['get'], detail=True, url_path='event-cycles')
+    def event_cycles(self, request, *args, **kwargs):
+        from accounts.credential_rotation.cycles import cycle_detail, cycle_directory
+        query = CredentialEventQuerySerializer(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        data = query.validated_data
+        credential = self.get_object()
+        if data.get('cycle_id'):
+            return Response(cycle_detail(credential, data['cycle_id']))
+        return Response(cycle_directory(credential, data['limit'], data['offset']))
 
     @action(methods=['post'], detail=True, url_path='check-secret-change')
     def check_secret_change(self, request, *args, **kwargs):
@@ -296,7 +378,7 @@ class CredentialClientInstanceViewSet(
         )
         credential = self.request.query_params.get('credential')
         if credential:
-            queryset = queryset.filter(credential_statuses__binding__credential=credential).distinct()
+            queryset = queryset.filter(configuration__credentials=credential).distinct()
         return queryset
 
     def perform_destroy(self, instance):
@@ -313,18 +395,22 @@ class CredentialClientInstanceViewSet(
 
 class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
     authentication_classes = [
-        CredentialClientAgentAuthentication, CredentialClientServiceAuthentication,
+        CredentialClientApplicationAgentAuthentication,
+        CredentialClientServiceAuthentication,
     ]
     permission_classes = [IsCredentialClient]
     client_audit_events = {
         'credential': AuditEvent.CREDENTIAL_FETCHED,
         'confirm': AuditEvent.CREDENTIAL_CONFIRMED,
+        'command_result': AuditEvent.COMMAND_RESULT,
     }
     serializer_classes = {
         'credential': serializers.CredentialFetchSerializer,
         'confirm': serializers.CredentialConfirmSerializer,
         'register_agent': serializers.CredentialAgentRegisterSerializer,
         'sync_agent': serializers.CredentialAgentSyncSerializer,
+        'commands': serializers.ApplicationCommandPollSerializer,
+        'command_result': serializers.ApplicationCommandResultSerializer,
     }
 
     class ClientUpgradeRequired(APIException):
@@ -349,7 +435,7 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         schema = self._version(request.headers.get('X-JMS-Config-Schema-Version'))
         if protocol != 1:
             raise self.ClientUpgradeRequired()
-        if isinstance(request.user, CredentialClientInstance) and schema != 1:
+        if (isinstance(request.user, CredentialClientInstance) or request.headers.get('X-Source') == 'jms-pam-agent') and schema != 1:
             raise self.ClientUpgradeRequired()
 
     def get_client_manager(self, data):
@@ -359,6 +445,8 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
             self._version(self.request.headers.get('X-JMS-Protocol-Version')),
             self._version(self.request.headers.get('X-JMS-Config-Schema-Version')),
         )
+        if manager.client.type == CredentialClientInstance.Type.agent and manager.client.config_schema_version != 1:
+            raise self.ClientUpgradeRequired()
         return manager
 
     @action(methods=['get'], detail=False, url_path='credential')
@@ -383,6 +471,25 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
             data['key'], data['revision'], data['account_id']
         ))
 
+    @action(methods=['get'], detail=False, url_path='commands')
+    def commands(self, request, *args, **kwargs):
+        from accounts.credential_client.commands import pending
+        serializer = self.get_serializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        manager = self.get_client_manager(serializer.validated_data)
+        response = Response({'commands': pending(manager.client)})
+        response['Cache-Control'] = 'no-store'
+        return response
+
+    @action(methods=['post'], detail=False, url_path='command-result')
+    def command_result(self, request, *args, **kwargs):
+        from accounts.credential_client.commands import report
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        manager = self.get_client_manager(data)
+        return Response(report(manager.client, data['command_id'], data['status'], data['error_code']))
+
     @action(
         methods=['post'], detail=False, url_path='register-agent',
         authentication_classes=[], permission_classes=[AllowAny],
@@ -405,7 +512,9 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         manager = self.get_client_manager(data)
-        response = Response(manager.sync_agent(**data))
+        response = Response(manager.sync_agent(**{
+            key: value for key, value in data.items() if key not in ('configuration_id', 'instance_id')
+        }))
         response['Cache-Control'] = 'no-store'
         return response
 

@@ -3,6 +3,7 @@ from .base import *
 from .service import *
 from .credential import *
 from .application_audit import *
+from .application_command import *
 from .template import *
 from .virtual import *
 from .personal import *

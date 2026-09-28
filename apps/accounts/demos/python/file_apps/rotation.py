@@ -41,7 +41,7 @@ def handle_event(client, output, event, keys, confirm=False):
         updates = [event]
     elif event.get('event') == 'credential.revoked':
         key = event.get('credential_key')
-        if key in keys:
+        if key and (keys is None or key in keys):
             current = load_local(output, KIND)
             if current['credentials'].pop(key, None):
                 save_local(output, current)
@@ -53,7 +53,7 @@ def handle_event(client, output, event, keys, confirm=False):
         if update.get('credential_mode') != KIND:
             continue
         key = update.get('credential_key') or update.get('key')
-        if key in keys:
+        if key and (keys is None or key in keys):
             update_credential(client, output, key, confirm=confirm)
     if event.get('event') == 'snapshot':
         present = {
@@ -73,8 +73,8 @@ def main():
     args = arguments('JumpServer alternating credential rotation demo', rotation=True)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     config = load_sdk_config(args.config)
-    keys = set(config.credential_keys)
-    if not keys:
+    keys = set(config.credential_keys) if hasattr(config, 'credential_keys') else None
+    if keys == set():
         raise ValueError('The SDK configuration has no alternating rotation policy keys')
     while True:
         try:

@@ -1,6 +1,6 @@
 import socket
 from datetime import timedelta
-from unittest.mock import Mock, call, patch
+from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
@@ -158,8 +158,8 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
                     )
 
         self.assertEqual(
-            dispatch.call_args_list,
-            [call(delivery.id, self.org.id, 5), call(delivery.id, self.org.id, 15)],
+            [(args[0], str(args[1]), args[2]) for args, _kwargs in dispatch.call_args_list],
+            [(delivery.id, str(self.org.id), 5), (delivery.id, str(self.org.id), 15)],
         )
         delivery.refresh_from_db()
         delivery.audit.refresh_from_db()

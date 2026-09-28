@@ -131,6 +131,28 @@ class AgentInstallTests(SimpleTestCase):
             post.assert_not_called()
             agent.return_value.sync.assert_called_once()
 
+    def test_application_bootstrap_registers_with_application_ak_sk(self):
+        bootstrap = self.root / 'bootstrap.json'
+        bootstrap.write_text(json.dumps({
+            'endpoint': self.args.endpoint, 'org_id': 'org',
+            'app_id': 'application', 'app_secret': 'application-secret',
+            'configuration_id': self.args.configuration_id,
+            'app_user': self.user, 'install_path': str(self.root),
+        }))
+        self.args.bootstrap = str(bootstrap)
+        with patch('accounts.demos.python.jms_pam.agent.credential_client.CredentialClient') as remote, \
+                patch('accounts.demos.python.jms_pam.agent.requests.post') as post, \
+                patch('accounts.demos.python.jms_pam.agent.secure_root', side_effect=lambda path, mode=0o711: Path(path)):
+            remote.return_value.SyncAgent.return_value._serialize.return_value = self.identity
+            config = read_json(register(self.args))
+        post.assert_not_called()
+        self.assertEqual(config['app_id'], 'application')
+        self.assertEqual(config['app_secret'], 'application-secret')
+        self.assertNotIn('agent_secret', config)
+        self.assertEqual(remote.call_args.args[0].AppId, 'application')
+        self.assertEqual(remote.call_args.args[2].Source, 'jms-pam-agent')
+        remote.return_value.close.assert_called_once()
+
     def test_install_uses_one_service_per_configuration(self):
         with patch('accounts.demos.python.jms_pam.agent.register', return_value=self.args.config), \
                 patch('accounts.demos.python.jms_pam.agent.shutil.which', return_value='/usr/bin/jms-pam-agent'), \
@@ -318,6 +340,18 @@ class AgentDeliveryTests(SimpleTestCase):
             self.agent.sync()
         fetch.assert_called_once_with([])
         deliver.assert_called_once_with({'db'})
+
+    def test_notification_refetches_current_revision_without_repeating_delivery(self):
+        self.agent.delivered = {'db': {'key': 'db', 'revision': 2}}
+        self.agent.remote.SyncAgent.return_value._serialize.return_value = {
+            'config_digest': 'digest',
+            'credentials': [{'key': 'db', 'revision': 2, 'available': True, 'changed': False}],
+            'removed_keys': [], 'date_last_synced': 'now',
+        }
+        with patch.object(self.agent, 'fetch') as fetch, patch.object(self.agent, 'deliver') as deliver:
+            self.agent.sync(refresh_keys=['db', 'unauthorized'])
+        fetch.assert_called_once_with(['db'])
+        deliver.assert_called_once_with(set())
 
     def test_delivery_refuses_to_replace_symlink(self):
         victim = self.root / 'victim.json'

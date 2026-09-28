@@ -145,10 +145,15 @@ class CredentialChangeExecutionTests(CredentialTestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.data, expected)
             view = ApplicationCredentialViewSet.as_view({'post': 'change_secret'})
-            with transaction.atomic():
+            blocked_status = {'blockers': [{'reason': 'offline', 'client': {'instance_id': 'test-sdk'}}]}
+            with transaction.atomic(), patch(
+                'accounts.credential_rotation.participants.build', return_value=blocked_status,
+            ):
                 response = view(self.request('post', '/'), pk=self.credential.id)
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.data, expected)
+            self.assertEqual(response.status_code, 409)
+            self.assertEqual(response.data, {
+                'blockers': blocked_status['blockers'], 'rotation_status': blocked_status,
+            })
             dispatch.assert_not_called()
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.status, 'ready_for_change')

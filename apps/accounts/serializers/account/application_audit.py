@@ -16,7 +16,7 @@ class ApplicationAuditSerializer(serializers.ModelSerializer):
             'id', 'event', 'result', 'service', 'service_id', 'credential', 'credential_id',
             'credential_key', 'account', 'account_id',
             'configuration', 'configuration_id', 'instance_id',
-            'source', 'operator', 'remote_addr', 'revision', 'rotation_id', 'summary',
+            'source', 'operator', 'remote_addr', 'revision', 'rotation_id', 'operation_id', 'summary',
             'changes', 'datetime', 'notification',
         ]
         read_only_fields = fields

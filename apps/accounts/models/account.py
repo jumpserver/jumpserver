@@ -105,6 +105,10 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         using = kwargs.get('using') or self._state.db or 'default'
         with transaction.atomic(using=using):
             previous = self._get_previous_for_update(using)
+            if previous:
+                # Secret API access tracking owns this field; preserve newer
+                # accesses when saving an account loaded before the request.
+                self.date_last_secret_access = previous.date_last_secret_access
             self._prepare_save_kwargs(kwargs)
             if self._can_skip_template_transition(kwargs.get('update_fields')):
                 return self._save_without_template_transition(*args, **kwargs)
@@ -132,6 +136,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     TEMPLATE_SYNC_FIELDS = ()
 
     date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
+    date_last_secret_access = models.DateTimeField(null=True, blank=True, verbose_name=_('Last application Secret API access'))
     login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
     change_secret_status = models.CharField(

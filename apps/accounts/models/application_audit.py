@@ -23,6 +23,7 @@ class ApplicationAudit(JMSOrgBaseModel):
     remote_addr = models.GenericIPAddressField(null=True)
     revision = models.PositiveIntegerField(null=True)
     rotation_id = models.UUIDField(null=True)
+    operation_id = models.UUIDField(null=True, db_index=True)
     summary = models.CharField(max_length=512, blank=True)
     changes = models.JSONField(default=list)
 

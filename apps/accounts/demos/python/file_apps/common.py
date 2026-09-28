@@ -26,8 +26,6 @@ def load_sdk_config(path):
         raise ValueError('Cannot load the generated SDK configuration')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    if not getattr(module.profile, 'ConfigurationId', None):
-        raise ValueError('The SDK configuration must contain a configuration ID')
     return module
 
 

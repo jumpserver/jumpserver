@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -23,6 +24,9 @@ class ApplicationCredential(JMSOrgBaseModel):
 
     class Status(models.TextChoices):
         idle = 'idle', _('Idle')
+        preparing = 'preparing', _('Aligning accounts')
+        waiting_standby = 'waiting_standby', _('Observing standby account usage')
+        ready_to_switch = 'ready_to_switch', _('Ready for account switch')
         waiting_switch = 'waiting_switch', _('Waiting for account switch')
         ready_for_change = 'ready_for_change', _('Ready for secret change')
         changing_secret = 'changing_secret', _('Changing secret')
@@ -52,6 +56,10 @@ class ApplicationCredential(JMSOrgBaseModel):
         related_name='active_application_credentials', verbose_name=_('Active account')
     )
     revision = models.PositiveIntegerField(default=1, verbose_name=_('Revision'))
+    standby_no_traffic_days = models.PositiveIntegerField(
+        default=7, validators=[MinValueValidator(1), MaxValueValidator(3650)],
+        verbose_name=_('Standby account no-traffic duration (days)'),
+    )
     status = models.CharField(
         max_length=32, choices=Status.choices, default=Status.idle,
         verbose_name=_('Status')
@@ -336,6 +344,7 @@ class CredentialRotationRecord(JMSOrgBaseModel):
         verbose_name=_('Account version at start')
     )
     status = models.CharField(max_length=16, default='running', choices=[
+        ('preparing', _('Preparing')),
         ('running', _('Running')), ('success', _('Success')),
         ('failed', _('Failed')), ('cancelled', _('Cancelled')),
     ], verbose_name=_('Status'))
@@ -355,6 +364,7 @@ class CredentialRotationEvent(JMSOrgBaseModel):
         null=True, blank=True,
     )
     source_event_id = models.UUIDField(unique=True)
+    cycle_id = models.UUIDField(null=True, db_index=True)
     event = models.CharField(max_length=64)
     sequence = models.PositiveIntegerField()
     published_at = models.DateTimeField(default=timezone.now)

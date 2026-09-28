@@ -50,6 +50,7 @@ class ApplicationAuditMixin:
         return CredentialClientManager(
             self.request.user, data.get('configuration_id'), data.get('instance_id', ''),
             audit_context=context,
+            client_type=('agent' if self.request.headers.get('X-Source') == 'jms-pam-agent' else 'sdk'),
         )
 
     def start_client_audit(self, event, track_fetch=False):
@@ -64,7 +65,7 @@ class ApplicationAuditMixin:
         else:
             context = self.start_audit(event, application=user)
             application = user
-            client_type = 'sdk'
+            client_type = 'agent' if self.request.headers.get('X-Source') == 'jms-pam-agent' else 'sdk'
             configuration_id = params.get('configuration_id', '')
             instance_id = params.get('instance_id', '')
 

@@ -1,7 +1,9 @@
 """Observe committed domain changes using the project's model signal entry points."""
+from uuid import uuid4
+
 from django.db import transaction
 from django.db.models import F, Q
-from django.db.models.signals import pre_save, post_save, pre_delete, m2m_changed
+from django.db.models.signals import pre_save, post_save, pre_delete, post_delete, m2m_changed
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
@@ -12,6 +14,7 @@ from accounts.models import (
     ApplicationCredential, ClientAccessConfiguration, CredentialClientInstance,
     CredentialClientStatus, IntegrationApplication, ChangeSecretRecord, Account,
     CredentialRotationRecord, ChangeSecretAutomation, AutomationExecution,
+    CredentialApplicationBinding,
 )
 from assets.models import BaseAutomation, AutomationExecution as AssetAutomationExecution
 from .audit import record
@@ -91,6 +94,8 @@ def record_secret_change(instance, before, after):
         return
     credentials, applications = subscription_targets(instance.account)
     if instance.status in ('pending', 'running'):
+        if before.get('status') in ('pending', 'running'):
+            return  # Queueing and execution are the same change-start stage.
         audit_event = AuditEvent.SECRET_CHANGE_STARTED
         application_event = ApplicationEvent.CREDENTIAL_CHANGE_STARTED
         result = 'pending'
@@ -111,14 +116,16 @@ def record_secret_change(instance, before, after):
             applications=targets, result=result,
             credential_key=credential.account_key(instance.account_id),
             revision=instance.account.version,
+            operation_id=instance.id,
         )
         enqueue(event, application_event)
     if instance.status == ChangeSecretRecordStatusChoice.success:
-        publish_subscription_credentials_for_account(instance.account)
+        publish_subscription_credentials_for_account(instance.account, operation_id=instance.id)
 
 
-def publish_subscription_credentials_for_account(account, revision=None):
+def publish_subscription_credentials_for_account(account, revision=None, operation_id=None):
     account = Account.objects.get(pk=account.pk)
+    operation_id = operation_id or uuid4()
     revision = account.version if revision is None else revision
     credentials, applications = subscription_targets(account, lock=True)
     for credential in credentials:
@@ -131,6 +138,7 @@ def publish_subscription_credentials_for_account(account, revision=None):
             AuditEvent.CREDENTIAL_PUBLISHED, credential=credential, account=account,
             applications=targets, credential_key=credential.account_key(account.id),
             revision=revision,
+            operation_id=operation_id,
         )
         enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
 
@@ -187,7 +195,7 @@ def notify_model_change(instance, event, changes):
         and instance.status != ApplicationCredential.Status.idle
     ):
         rotation = instance.rotation_records.filter(
-            status='running', date_finished__isnull=True,
+            status__in=('running', 'preparing'), date_finished__isnull=True,
         ).first()
     if event.event == AuditEvent.CREDENTIAL_PUBLISHED:
         enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED, rotation=rotation)
@@ -199,6 +207,8 @@ def notify_model_change(instance, event, changes):
             enqueue(event, ApplicationEvent.ROTATION_FAILED, rotation=rotation)
     elif isinstance(instance, ClientAccessConfiguration):
         enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED)
+    elif isinstance(instance, ApplicationCredential) and any(change['field'] == 'is_active' for change in changes):
+        enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED if instance.is_active else ApplicationEvent.CREDENTIAL_REVOKED)
     elif isinstance(instance, IntegrationApplication) and any(change['field'] == 'accounts' for change in changes):
         enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED)
         notify_revoked_credentials(instance)
@@ -286,12 +296,21 @@ def credentials_changed(sender, instance, action, reverse, pk_set, **kwargs):
             enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
 
 
+def application_binding_changed(sender, instance, **kwargs):
+    from .access import refresh_application_scopes
+    application = IntegrationApplication.objects.filter(pk=instance.application_id).first()
+    if application:
+        refresh_application_scopes(application)
+
+
 for model in MODEL_AUDIT_FIELDS:
     pre_save.connect(before_save, sender=model)
     post_save.connect(after_save, sender=model)
     if model not in (Account, ChangeSecretRecord):
         pre_delete.connect(before_delete, sender=model)
 m2m_changed.connect(credentials_changed, sender=ClientAccessConfiguration.credentials.through)
+post_save.connect(application_binding_changed, sender=CredentialApplicationBinding)
+post_delete.connect(application_binding_changed, sender=CredentialApplicationBinding)
 post_create_historical_record.connect(publish_subscription_credentials, sender=Account.history.model)
 for model in (BaseAutomation, ChangeSecretAutomation, AutomationExecution, AssetAutomationExecution):
     pre_delete.connect(protect_rotation_execution, sender=model)

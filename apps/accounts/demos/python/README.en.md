@@ -1,6 +1,32 @@
 # JumpServer PAM Python SDK and Agent
 
-Applications can connect to JumpServer directly with the Python SDK or run a Linux Agent on the application host. Clients fetch rotation credentials at startup and keep a signed Credential Event Stream WebSocket open for subscription-account snapshots and later updates. Only `credential.updated` or a newer reconnect snapshot triggers a fetch.
+Applications can connect to JumpServer directly with the Python SDK or run a Linux Agent on the application host. Clients fetch rotation credentials at startup and keep a signed Credential Event Stream WebSocket open for subscription-account snapshots and later updates. Credential updates, newer reconnect snapshots and manual account switch requests trigger a fetch.
+
+## Manually start a policy cycle
+
+Use **Start new cycle** in the policy's Basic settings or Event reception. The new cycle's timeline opens automatically:
+
+- Credential subscriptions publish `credential.updated` again for currently authorized accounts, sharing a new `operation_id`. Passwords and revisions stay unchanged, and no secret-change start, success or failure events are generated. SDK clients fetch using the event key. The Agent also refetches unchanged revisions without repeating delivery or restarting services. Receipts indicate notification reception. Offline clients obtain the current snapshot when reconnecting.
+- Account rotation starts a new preparation cycle after the previous cycle has completed or been cancelled. Align the current account, observe the configured standby no-traffic period (7 days by default), then let the administrator initiate switching. Preparation, switching and secret changes share the same cycle.
+
+Administrator API: `POST /api/v1/accounts/application-credentials/<policy-id>/start-cycle/` requires policy change permission and returns `credential` and `cycle_id`. Disabled policies and unfinished rotations cannot start another cycle. Subscription accounts must finish any running secret changes before republishing.
+
+## Manually send application events
+
+Use **More > Send event** in the application list or **Event processing > Send event** in application details. Select the event, connection instances and deadline.
+
+- `credential.switch.requested` asks an application to apply the currently published account and version. It does not change the policy's active account; use the rotation workflow for that. Fetch the credential, verify the requested account and revision, apply it, call `ConfirmCredential`, then report success.
+- `application.restart.requested` invokes an SDK application's own restart handler and health check. The Agent only restarts the systemd service configured for EnvironmentFile delivery with the restart action, then checks that it is active.
+
+The WebSocket receipt means received, not executed. `ExecuteApplicationCommand(event, handler)` claims the request before calling the handler. Only an `accepted: true` claim runs it; duplicate delivery never repeats the handler. A normal return reports success; an exception reports failure. Implement application-level idempotency and health checks in the handler. Agent switch requests succeed only after the application confirms the actual account version.
+
+Offline instances receive requests on reconnect before their deadline. API applications can instead poll with AK/SK signatures and a stable `instance_id`; the first poll registers an instance that administrators can subsequently target:
+
+1. `GET /api/v1/accounts/credential-client/commands/?instance_id=<instance-id>` returns outstanding requests (`ListApplicationCommands()` in the SDK). Use the credential client's signed headers and protocol version 1.
+2. `POST /api/v1/accounts/credential-client/command-result/` with `instance_id`, `command_id` and `status: running`. Execute only when the response says `accepted: true`.
+3. Report `status: success` or `status: failed` to the same endpoint, optionally including a non-sensitive `error_code` (`ReportApplicationCommandResult()` in the SDK).
+
+Expired requests cannot be claimed. If a restart terminates the reporting process, check the application's state before an administrator sends another request. The existing Secret API remains unchanged and does not itself receive manual events.
 
 ## Choose an integration
 
@@ -37,14 +63,14 @@ Confirm the following before starting:
 2. Authorize the asset accounts used by the credential policy from the application's **Accounts** page.
 3. For alternating rotation, authorize both accounts.
 
-Selecting a credential in an access configuration does not add account authorization. The Agent cannot fetch a credential while authorization is incomplete.
+Application access does not add account authorization. The Agent cannot fetch a credential while authorization is incomplete.
 
-### Create an Agent access configuration
+### Use the application access wizard
 
-1. Open **Access configurations** in the target credential policy and select **Create**.
-2. Select a bound application and **Agent access**. The current policy is selected automatically; you can also add other policies bound to that application.
+1. Open the application's **Access and connections** page and select **Access wizard**.
+2. Select **Agent access**. Every active policy bound to the application is included automatically; no policy selection is required.
 3. Enter the application runtime user and installation path. The default path is `/opt/jumpserver-pam`.
-4. Select one delivery mode and save.
+4. Select one delivery mode, then generate and download the installation materials.
 
 | Delivery mode | Agent behavior | Application behavior |
 | --- | --- | --- |
@@ -61,16 +87,15 @@ EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-
 
 Prefer `restart`. Use `reload` only when the application's reload handler explicitly rereads the EnvironmentFile; a systemd reload does not inject new environment variables into an already running process.
 
-Find `<configuration-id>` in the access configuration detail. The installation path, application user, socket path, and allowed systemd operation are pinned during installation. Expanding these permissions requires reinstalling the Agent.
+Find `<configuration-id>` in the downloaded bootstrap file’s `configuration_id` field. The installation path, application user, socket path, and allowed systemd operation are pinned during installation. Expanding these permissions requires reinstalling the Agent.
 
 ### Install the Agent
 
-1. On a Linux application host with systemd, Python 3.9+, and the configured application user, open the Agent access configuration and select **Generate**.
-2. Copy and run **Install Agent** on that host. This creates a Python virtual environment and installs `jms-pam` from PyPI.
-3. Copy and run **Register and start** on the same host within ten minutes. The registration code is single-use; this step starts the dedicated systemd service.
-4. Return to the client instance list and confirm the instance is **Online** and **Synced**.
+1. Prepare a Linux host with systemd, Python 3.9+, and the application runtime user.
+2. Copy the downloaded `jms_pam_agent.json` to that host and run the wizard's installation command from its directory. The Agent signs API and WebSocket requests with the application's AK/SK.
+3. Return to the application's **Access and connections** page and verify the instance is **Online**.
 
-Do not retain or share the registration command because it contains single-use registration material. Generate a new command if it expires or has already been used.
+The download contains the application's AK/SK. Restrict its permissions and delete the bootstrap download after installation. The installed Agent keeps its configuration readable by root only.
 
 Check the installed service:
 
@@ -92,7 +117,7 @@ Example healthy response:
 {"status":"ok","sync_status":"success"}
 ```
 
-Return to **Access configurations** in the credential policy detail. The instance should show **Agent online** and **Synced**. The Agent synchronizes at startup, reacts immediately to credential events, and performs a low-frequency reconciliation as a disconnect fallback.
+Return to the application’s **Access and connections** page to check its instances. The Agent synchronizes at startup, reacts immediately to credential events, and performs a low-frequency reconciliation as a disconnect fallback.
 
 ### Load and confirm the first credential
 
@@ -124,7 +149,7 @@ A successful response contains `key`, `revision`, `account_id`, and `status: con
 
 Continue with the alternating rotation policy already connected above.
 
-1. Open the policy under **PAM Integration > Credential Policies** and select **Start rotation**.
+1. Open the policy under **PAM Integration > Credential Policies** and select **Start new cycle**. After applications align on the current account, observe the configured standby interval without Secret API access (7 days by default). The initiating administrator receives a readiness notification and manually selects **Start rotation**.
 2. JumpServer publishes the other account and sends `credential.updated`.
 3. Every enabled Agent instance fetches, delivers, and confirms that revision after the application switches successfully.
 4. After all participating instances confirm, create and run the password-change task for the account that was replaced.
@@ -205,7 +230,7 @@ sudo /opt/jumpserver-pam/venv/bin/pip install --upgrade jms-pam
 sudo systemctl restart jms-pam-agent-<configuration-id>.service
 ```
 
-During a temporary network outage, the Agent retains its last valid cache and retries. If the access configuration is disabled, authorization is revoked, or Core requires an upgrade, the Agent stops returning passwords through the socket but does not delete previously written files.
+During a temporary network outage, the Agent retains its last valid cache and retries. If the application or instance is disabled, authorization is revoked, or Core requires an upgrade, the Agent stops returning passwords through the socket but does not delete previously written files.
 
 <!-- agent-doc:end -->
 
@@ -213,14 +238,14 @@ During a temporary network outage, the Agent retains its last valid cache and re
 
 ## Complete Python SDK integration
 
-An SDK access configuration accepts one policy mode. Create separate configurations for subscriptions and rotation; each generates its own focused example.
+The SDK uses the application’s AK/SK and receives every active policy bound to that application. One connection can handle both subscriptions and rotation. The application access wizard provides an example that dispatches by policy mode; binding changes take effect automatically.
 
 ### Prerequisites
 
 1. Create a **Credential change subscription** or **Account rotation** policy under **PAM Integration > Credential Policies** and bind the application. Select the accounts that should trigger subscription notifications; account rotation currently selects two accounts on the same asset.
 2. Create or open the target application and authorize its asset accounts from the **Accounts** page. For alternating rotation, authorize both policy accounts.
-3. Open **Access configurations** in the target credential policy, create an SDK configuration, and select policies of the same mode. The current policy is selected automatically.
-4. Open the SDK configuration, select **Generate**, download `jms_pam_config.py`, and protect it as secret material.
+3. Open the application’s **Access and connections** page, select **Access wizard**, and choose **SDK access**.
+4. Generate and download `jms_pam_config.py` and use the example code. No configuration ID or policy list is required.
 
 Every application process or connection pool must use a stable, unique `instance_id`. Reuse the identifier when redeploying the same instance; never share one identifier across instances.
 
@@ -288,29 +313,26 @@ Subscriptions need neither `credential_keys` nor `ConfirmCredential`. Lifecycle 
 
 ### Alternating dual-account rotation
 
-A rotation configuration contains one stable key per policy. Fetch at startup and after update events or reconnect snapshots. Confirm only after the application validates and activates the new connection:
+The event snapshot supplies one stable key per rotation policy. Fetch after the initial snapshot and after update events or reconnect snapshots. Confirm only after the application validates and activates the new connection:
 
 ```python
 from jms_pam.credential.v1 import credential_client, models
-from jms_pam_config import confirmation_keys, cred, credential_keys, profile
+from jms_pam_config import cred, profile
 
 
 def switch_credential(client, key):
     response = client.GetCredential(models.GetCredentialRequest(Key=key))
     # Build and validate a connection, then switch the application connection pool.
-    if key in confirmation_keys:
-        client.ConfirmCredential(models.ConfirmCredentialRequest(
-            Key=response.Key,
-            Revision=response.Revision,
-            AccountId=response.Account.Id,
-        ))
+    client.ConfirmCredential(models.ConfirmCredentialRequest(
+        Key=response.Key,
+        Revision=response.Revision,
+        AccountId=response.Account.Id,
+    ))
 
 
 with credential_client.CredentialClient(
     cred, instance_id='order-service-node-1', profile=profile,
 ) as client:
-    for key in credential_keys:
-        switch_credential(client, key)
     for event in client.WatchCredentialEvents():
         if event.get('event') == 'snapshot':
             updates = event.get('credentials', [])
@@ -320,7 +342,7 @@ with credential_client.CredentialClient(
             continue
         for update in updates:
             key = update.get('credential_key') or update.get('key')
-            if key in credential_keys:
+            if key and update.get('credential_mode') == 'alternating_rotation':
                 switch_credential(client, key)
 ```
 
@@ -328,7 +350,7 @@ with credential_client.CredentialClient(
 
 ### Complete one credential rotation
 
-1. Open the policy under **PAM Integration > Credential Policies** and select **Start rotation**.
+1. Open the policy under **PAM Integration > Credential Policies** and select **Start new cycle**. Applications confirm the current account, then wait for the standby account to receive no Secret API access for the configured interval (7 days by default). After the readiness notification, the administrator manually selects **Start rotation**.
 2. JumpServer switches the active account and sends `credential.updated`.
 3. Call `GetCredential` for the event key, build and validate a connection with the new account, switch successfully, then call `ConfirmCredential`. Lifecycle events are informational and do not trigger a fetch.
 4. After every participating instance confirms, select **Continue rotation**, then create and run the password-change task for the previous account.

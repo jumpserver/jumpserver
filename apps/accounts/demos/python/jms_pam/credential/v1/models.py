@@ -61,6 +61,28 @@ class ConfirmCredentialResponse(AbstractModel):
     _required = ('Key', 'Revision')
 
 
+class ListApplicationCommandsRequest(AbstractModel):
+    pass
+
+
+class ListApplicationCommandsResponse(AbstractModel):
+    _fields = {'Commands': ('commands', None)}
+    _required = ('Commands',)
+
+
+class ApplicationCommandResultRequest(AbstractModel):
+    _fields = {
+        'CommandId': ('command_id', None), 'Status': ('status', None),
+        'ErrorCode': ('error_code', None),
+    }
+    _required = ('CommandId', 'Status')
+
+
+class ApplicationCommandResultResponse(AbstractModel):
+    _fields = {'Accepted': ('accepted', None), 'Status': ('status', None)}
+    _required = ('Accepted', 'Status')
+
+
 class CredentialRevision(AbstractModel):
     _fields = {
         'Key': ('key', None), 'Revision': ('revision', None),

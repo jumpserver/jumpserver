@@ -22,10 +22,18 @@ class CredentialRotationManager:
         ).get(pk=self.credential_id)
 
     @transaction.atomic
+    def prepare(self, operator='', operator_id=None):
+        from . import preparation, preflight
+        credential = self._get_locked_credential()
+        with preflight.account_locks(credential):
+            return preparation.start(credential, operator, operator_id)
+
+    @transaction.atomic
     def start(self, operator='', operator_id=None):
-        from . import preflight
+        from . import preflight, preparation
 
         credential = self._get_locked_credential()
+        preparation.require_ready(credential)
         preflight.check(credential)
         with preflight.account_locks(credential):
             return preflight.start(credential, operator, operator_id)
@@ -51,14 +59,29 @@ class CredentialRotationManager:
         if not target:
             raise JMSException(_('The alternating account configuration is incomplete.'))
 
-        rotation = CredentialRotationRecord.objects.create(
-            credential=credential,
-            source_account=source,
-            target_account=target,
-            change_account=source,
-            change_account_version_at_start=source.version,
-            created_by=operator,
-        )
+        rotation = credential.rotation_records.filter(status='preparing').first()
+        if rotation:
+            from .preparation import _alignment
+            from accounts.models import ApplicationAudit
+            from django.utils.dateparse import parse_datetime
+            legacy_ids = {str(value) for value in ApplicationAudit.objects.filter(
+                event=AuditEvent.CREDENTIAL_FETCHED, result='success', credential_id__isnull=True,
+                service_id__in=credential.applications.values('id'),
+                account_id__in=(source.id, target.id),
+                date_created__gte=parse_datetime(rotation.participant_snapshot['preparation']['started_at']),
+            ).values_list('service_id', flat=True)}
+            rotation.participant_snapshot['legacy_applications'] = [
+                app for app in _alignment(credential, rotation) if app['type'] == 'api' or app['id'] in legacy_ids
+            ]
+            rotation.participant_snapshot['legacy_switch_started_at'] = timezone.now().isoformat()
+            rotation.status = 'running'
+            rotation.save(update_fields=['status', 'participant_snapshot'])
+        else:
+            rotation = CredentialRotationRecord.objects.create(
+                credential=credential, source_account=source, target_account=target,
+                change_account=source, change_account_version_at_start=source.version,
+                created_by=operator,
+            )
         credential.revision += 1
         credential.active_account = target
         credential.status = ApplicationCredential.Status.waiting_switch
@@ -79,7 +102,8 @@ class CredentialRotationManager:
         CredentialClientStatus.objects.filter(id__in=[state.id for state in states]).update(
             required_revision=credential.revision, is_rotation_participant=True,
         )
-        initialize(rotation, states)
+        if not rotation.participant_snapshot:
+            initialize(rotation, states)
         return credential
 
     @transaction.atomic
@@ -182,8 +206,15 @@ class CredentialRotationManager:
     @transaction.atomic
     def cancel(self, reason=''):
         from .execution import outcome
+        from .preparation import PHASES, _emit
 
         credential = self._get_locked_credential()
+        if credential.status in PHASES:
+            rotation = credential.rotation_records.filter(status='preparing').first()
+            if not rotation:
+                raise JMSException(_('No rotation preparation is running.'))
+            _emit(credential, rotation, ApplicationEvent.ROTATION_PREPARATION_CANCELLED, reason)
+            return self._finish(credential, rotation, 'cancelled')
         if credential.status == ApplicationCredential.Status.change_failed:
             if not reason.strip() or outcome(credential, credential.change_execution) != 'unchanged':
                 raise JMSException(_('Verify that the secret is unchanged and provide a cancellation reason.'))
@@ -198,6 +229,9 @@ class CredentialRotationManager:
         credential.active_account = rotation.source_account
         credential.status = ApplicationCredential.Status.waiting_revert
         credential.rotation_cancelled = True
+        if rotation.participant_snapshot.get('legacy_applications'):
+            rotation.participant_snapshot['legacy_switch_started_at'] = timezone.now().isoformat()
+            rotation.save(update_fields=['participant_snapshot'])
         event = record(AuditEvent.ROTATION_CANCELLED, credential=credential, summary=reason)
         credential.save(update_fields=[
             'revision', 'active_account', 'status', 'rotation_cancelled', 'date_updated',
