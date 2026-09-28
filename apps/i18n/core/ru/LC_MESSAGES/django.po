@@ -10046,6 +10046,10 @@ msgstr "Проверка сертификата"
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "Управление проверкой TLS-сертификата SMTP"
 
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "Управляет проверкой TLS-сертификатов сервера OAuth2"
+
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
 msgstr ""

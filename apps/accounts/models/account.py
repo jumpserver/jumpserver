@@ -1,4 +1,6 @@
-from django.db import models
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import models, transaction
+from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
@@ -24,8 +26,14 @@ class AccountHistoricalRecords(HistoricalRecords):
 
     def post_save(self, instance, created, using=None, **kwargs):
         self.updated_version = None
+        if getattr(instance, "follows_template", False) and not created:
+            return
         if not self.included_fields:
             return super().post_save(instance, created, using=using, **kwargs)
+        update_fields = kwargs.get('update_fields')
+        credential_fields = set(self.included_fields) - {'id', 'version'}
+        if not created and update_fields is not None and not credential_fields.intersection(update_fields):
+            return
 
         # self.updated_version = 0
         if created:
@@ -49,7 +57,13 @@ class AccountHistoricalRecords(HistoricalRecords):
         return super().post_save(instance, created, using=using, **kwargs)
 
     def create_historical_record(self, instance, history_type, using=None):
-        super().create_historical_record(instance, history_type, using=using)
+        local_secret = instance._secret
+        try:
+            if getattr(instance, 'follows_template', False) and history_type != '-':
+                instance._secret = instance.secret
+            super().create_historical_record(instance, history_type, using=using)
+        finally:
+            instance._secret = local_secret
         # Ignore deletion history_type: -
         if self.updated_version is not None and history_type != '-':
             type(instance)._base_manager.db_manager(using=using).filter(
@@ -102,6 +116,11 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
     secret_reset = models.BooleanField(default=True, verbose_name=_('Secret reset'))
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
+    follow_template = models.BooleanField(default=False, verbose_name=_('Follow template'))
+    # Credentials are referenced dynamically; only these properties are copied.
+    # Credentials are resolved dynamically; account metadata remains independent.
+    TEMPLATE_SYNC_FIELDS = ()
+
     date_last_login = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last access'))
     login_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Access by'))
     date_change_secret = models.DateTimeField(null=True, blank=True, verbose_name=_('Date change secret'))
@@ -125,6 +144,170 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             ('view_accountsession', _('Can view session')),
             ('view_accountactivity', _('Can view activity')),
         ]
+
+    TEMPLATE_STATE_FIELDS = ('follow_template', 'source', 'source_id', 'secret_type', 'org_id')
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        if set(cls.TEMPLATE_STATE_FIELDS).issubset(field_names):
+            instance._loaded_template_state = tuple(
+                instance.__dict__[field] for field in cls.TEMPLATE_STATE_FIELDS
+            )
+        if '_secret' in field_names:
+            instance._loaded_secret = instance.__dict__['_secret']
+        return instance
+
+    @property
+    def follows_template(self):
+        return self.source == Source.TEMPLATE and self.follow_template
+
+    def get_source_template(self):
+        from .template import AccountTemplate
+        from orgs.utils import tmp_to_org
+
+        with tmp_to_org(self.org_id):
+            try:
+                template = AccountTemplate.objects.filter(
+                    id=self.source_id, org_id=self.org_id,
+                ).first() if self.source_id else None
+            except (DjangoValidationError, ValueError, TypeError):
+                template = None
+        if template is None:
+            raise ValidationError({'source_id': _('The source account template is unavailable.')})
+        if template.secret_type != self.secret_type:
+            raise ValidationError({'secret_type': _('Account and template secret types must match.')})
+        return template
+
+    @property
+    def secret(self):
+        if self.follows_template:
+            template = self.get_source_template()
+            secret = template.secret
+            if template.secret_has_save_to_vault and not secret:
+                from accounts.exceptions import VaultSecretNotFoundException
+                raise VaultSecretNotFoundException()
+            return secret
+        return VaultModelMixin.secret.fget(self)
+
+    @secret.setter
+    def secret(self, value):
+        if self.follows_template:
+            raise ValidationError({'secret': _('Disable template following before editing credentials.')})
+        VaultModelMixin.secret.fset(self, value)
+        self._secret_explicitly_set = True
+
+    def _set_save_org(self):
+        # Match OrgModelMixin before resolving the organization-scoped template.
+        from orgs.utils import get_current_org
+        org = get_current_org()
+        if not org.is_root():
+            self.org_id = org.id
+
+    def _get_previous_for_update(self, using):
+        if self._state.adding:
+            return None
+        return type(self)._base_manager.using(using).select_for_update().filter(pk=self.pk).first()
+
+    def _validate_template_transition(self, previous):
+        if not previous or not previous.follows_template:
+            return
+        if self.source != previous.source or self.source_id != previous.source_id:
+            raise ValidationError({'source_id': _('Disable template following before changing the source.')})
+        if self.follow_template and self.secret_type != previous.secret_type:
+            raise ValidationError({'secret_type': _('Disable template following before changing the secret type.')})
+
+    def _prepare_template_detach(self, previous, update_fields):
+        """Keep an explicit new credential, otherwise snapshot the template credential."""
+        if not previous or not previous.follows_template or self.follow_template:
+            return update_fields
+        if update_fields is not None and 'follow_template' not in update_fields:
+            raise ValidationError({'follow_template': _('Save the following state with the credential snapshot.')})
+        if not getattr(self, '_secret_explicitly_set', False):
+            if self.secret_type != previous.secret_type:
+                raise ValidationError({'secret': _('Provide credentials when changing the secret type.')})
+            self.secret = previous.secret
+        self._create_vault_on_detach = True
+        if update_fields is not None:
+            update_fields = list(set(update_fields) | {'_secret'})
+        return update_fields
+
+    def _prepare_template_following(self, update_fields):
+        """Validate the template reference and discard independent credentials."""
+        if not self.follow_template:
+            return update_fields
+        if not self.follows_template:
+            raise ValidationError({'follow_template': _('Only template accounts can follow a template.')})
+        self.get_source_template()
+        self._secret = None
+        if update_fields is not None and 'follow_template' in update_fields:
+            update_fields = list(set(update_fields) | {'_secret'})
+        return update_fields
+
+    def _save_with_locked_previous(self, previous, *args, **kwargs):
+        """Save a transition inside the transaction that locked ``previous``."""
+        self._set_save_org()
+        self._validate_template_transition(previous)
+        update_fields = self._prepare_template_detach(previous, kwargs.get('update_fields'))
+        update_fields = self._prepare_template_following(update_fields)
+        if update_fields is not None:
+            kwargs['update_fields'] = update_fields
+        try:
+            result = super().save(*args, **kwargs)
+            self.__dict__.pop('_secret_explicitly_set', None)
+            return result
+        finally:
+            self.__dict__.pop('_create_vault_on_detach', None)
+
+    def _can_skip_template_transition(self, update_fields):
+        if self._state.adding:
+            return not self.follow_template
+        if getattr(self, '_secret_explicitly_set', False):
+            return False
+        protected = {*self.TEMPLATE_STATE_FIELDS, 'secret', '_secret'}
+        if update_fields is not None and protected.intersection(update_fields):
+            return False
+        # A full save can also be metadata-only, provided the loaded credential
+        # and relationship are unchanged. Deferred values never trigger a read here.
+        state = tuple(self.__dict__.get(field) for field in self.TEMPLATE_STATE_FIELDS)
+        if getattr(self, '_loaded_template_state', None) != state:
+            return False
+        if update_fields is None:
+            return ('_loaded_secret' in self.__dict__ and '_secret' in self.__dict__
+                    and self._loaded_secret == self.__dict__['_secret'])
+        return True
+
+    def _prepare_save_kwargs(self, kwargs):
+        self._set_save_org()
+        if kwargs.get('update_fields') is not None:
+            # VaultModelMixin maps the public secret name to the stored field.
+            kwargs['update_fields'] = list(kwargs['update_fields'])
+
+    def _save_without_template_transition(self, *args, **kwargs):
+        if not self._state.adding and kwargs.get('update_fields') is None:
+            # Do not write stale template/credential values during a metadata edit.
+            protected = {*self.TEMPLATE_STATE_FIELDS, '_secret', 'version'}
+            kwargs['update_fields'] = [
+                field.attname for field in self._meta.concrete_fields
+                if not field.primary_key and field.attname not in protected
+                and field.attname in self.__dict__
+            ]
+        result = super().save(*args, **kwargs)
+        self.__dict__.pop('_secret_explicitly_set', None)
+        return result
+
+    def _save_template_transition(self, *args, **kwargs):
+        using = kwargs.get('using') or self._state.db or 'default'
+        # Keep the credential snapshot and opt-out in the same database transaction.
+        with transaction.atomic(using=using):
+            previous = self._get_previous_for_update(using)
+            return self._save_with_locked_previous(previous, *args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self._prepare_save_kwargs(kwargs)
+        if self._can_skip_template_transition(kwargs.get('update_fields')):
+            return self._save_without_template_transition(*args, **kwargs)
+        return self._save_template_transition(*args, **kwargs)
 
     def __str__(self):
         if self.asset_id:

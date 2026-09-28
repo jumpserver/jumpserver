@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
 from accounts.const import AutomationTypes, Source
+from accounts.permissions import check_risk_action_permissions
 from accounts.models import (
     GatheredAccount,
     AccountRisk,
@@ -35,6 +36,7 @@ class RiskHandler:
         self.risk = risk
 
     def handle(self, tp, risk=""):
+        check_risk_action_permissions(self.request, tp)
         self.risk = risk
         attr = f"handle_{tp}"
 

@@ -42,3 +42,11 @@ class SSHCertificateSigningException(JMSException):
     default_detail = _(
         'SSH certificate signing is unavailable. Please retry or contact your administrator.'
     )
+
+
+class TemplateFollowingConflict(JMSException):
+    status_code = status.HTTP_409_CONFLICT
+    default_code = 'account_template_following'
+    default_detail = _(
+        'This account follows template credentials. Confirm to stop following and modify its credentials.'
+    )

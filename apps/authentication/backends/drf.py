@@ -7,6 +7,8 @@ from django.core.cache import cache
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication as BaseOAuth2Authentication
+from oauth2_provider.models import get_access_token_model
 
 from accounts.models import IntegrationApplication
 from common.auth import signature
@@ -14,6 +16,8 @@ from common.decorators import merge_delay_run
 from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip, get_request_ip
 from users.models import User
 from ..models import AccessKey, PrivateToken
+
+OAuthAccessToken = get_access_token_model()
 
 
 def date_more_than(d, seconds):
@@ -24,10 +28,13 @@ def date_more_than(d, seconds):
 def update_token_last_used(tokens=()):
     access_keys_ids = [token.id for token in tokens if isinstance(token, AccessKey)]
     private_token_keys = [token.key for token in tokens if isinstance(token, PrivateToken)]
+    oauth_token_ids = [token.id for token in tokens if isinstance(token, OAuthAccessToken)]
     if len(access_keys_ids) > 0:
         AccessKey.objects.filter(id__in=access_keys_ids).update(date_last_used=timezone.now())
     if len(private_token_keys) > 0:
         PrivateToken.objects.filter(key__in=private_token_keys).update(date_last_used=timezone.now())
+    if len(oauth_token_ids) > 0:
+        OAuthAccessToken.objects.filter(id__in=oauth_token_ids).update(updated=timezone.now())
 
 
 @merge_delay_run(ttl=60)
@@ -103,6 +110,15 @@ class PrivateTokenAuthentication(authentication.TokenAuthentication):
         return user, token
 
 
+class OAuth2Authentication(BaseOAuth2Authentication):
+    def authenticate(self, request):
+        user_token = super().authenticate(request)
+        if user_token:
+            _, token = user_token
+            update_token_last_used.delay(tokens=(token,))
+        return user_token
+
+
 class SessionAuthentication(authentication.SessionAuthentication):
     def authenticate(self, request):
         """
@@ -136,6 +152,7 @@ class SignatureAuthentication(signature.SignatureAuthentication):
     # will be what the client has sent, in the case that both RSA
     # and HMAC are supported at your site (and also for expansion).
     model = get_user_model()
+    access_key = None
 
     def fetch_user_data(self, key_id, algorithm="hmac-sha256"):
         # ...
@@ -145,10 +162,14 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             if not key.is_valid:
                 return None, None
             user, secret = key.user, str(key.secret)
-            after_authenticate_update_date(user, key)
+            self.access_key = key
             return user, secret
         except (AccessKey.DoesNotExist, exceptions.ValidationError):
             return None, None
+
+    def after_authenticate_update_date(self, user):
+        # Key lookup precedes IP/signature checks; only this success hook records usage.
+        after_authenticate_update_date(user, self.access_key)
 
     def is_ip_allow(self, key_id, request):
         try:

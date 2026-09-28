@@ -1,6 +1,7 @@
 import uuid
 from copy import deepcopy
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Q
@@ -10,8 +11,9 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
 
 from accounts.const import SecretType, Source, AccountInvalidPolicy
+from accounts.exceptions import TemplateFollowingConflict
 from accounts.models import Account, AccountTemplate, GatheredAccount
-from accounts.tasks import push_accounts_to_assets_task
+from accounts.tasks import push_accounts_to_assets_task, template_sync_related_accounts
 from assets.const import Category, AllTypes
 from assets.models import Asset
 from common.serializers import SecretReadableMixin, SecretReadableCheckMixin, CommonBulkModelSerializer
@@ -81,10 +83,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         initial_data['name'] = name
 
     @staticmethod
-    def get_template_attr_for_account(template):
+    def get_template_attr_for_account(template, follow_template=False):
         field_names = [
             'name', 'username',
-            'secret_type', 'secret',
+            'secret_type',
             'privileged', 'is_active'
         ]
 
@@ -104,7 +106,8 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             attr_name = field_map.get(name, name)
             attrs[attr_name] = value
 
-        attrs['secret'] = template.get_secret()
+        if not follow_template:
+            attrs['secret'] = template.get_secret()
         return attrs
 
     def from_template_if_need(self, initial_data):
@@ -123,8 +126,16 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             raise serializers.ValidationError({'template': 'Template not found'})
 
         self._template = template
-        attrs = self.get_template_attr_for_account(template)
+        try:
+            following = serializers.BooleanField().run_validation(initial_data.get('follow_template', True))
+        except serializers.ValidationError as exc:
+            raise serializers.ValidationError({'follow_template': exc.detail}) from exc
+        attrs = self.get_template_attr_for_account(template, follow_template=following)
+        if following:
+            initial_data.pop('secret', None)
+            initial_data.pop('passphrase', None)
         initial_data.update(attrs)
+        initial_data.setdefault('follow_template', True)
         initial_data.update({
             'source': Source.TEMPLATE,
             'source_id': str(template.id)
@@ -134,6 +145,52 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             return
         asset = get_object_or_404(Asset, pk=asset_id)
         initial_data['su_from'] = template.get_su_from_account(asset)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        instance = self.instance
+        following = attrs.get('follow_template', getattr(instance, 'follow_template', False))
+        if not following:
+            return attrs
+        if instance and instance.follow_template and (
+            'secret' in attrs or bool(attrs.get('passphrase'))
+            or ('secret_type' in attrs and attrs['secret_type'] != instance.secret_type)
+        ):
+            raise TemplateFollowingConflict()
+        source = attrs.get('source', getattr(instance, 'source', None))
+        source_id = attrs.get('source_id', getattr(instance, 'source_id', None))
+        try:
+            template = (AccountTemplate.objects.filter(id=source_id).first()
+                        if source == Source.TEMPLATE and source_id else None)
+        except (ValueError, TypeError, DjangoValidationError):
+            template = None
+        owner = instance or attrs.get('asset')
+        if source != Source.TEMPLATE or template is None or (
+            owner and template.org_id != owner.org_id
+        ):
+            raise serializers.ValidationError({
+                'follow_template': _('Following requires a valid account template in the same organization.')
+            })
+        secret_type = attrs.get('secret_type', getattr(instance, 'secret_type', template.secret_type))
+        if secret_type != template.secret_type:
+            raise serializers.ValidationError({'secret_type': _('Account and template secret types must match.')})
+        if 'secret' in attrs:
+            raise serializers.ValidationError({'secret': _('Following accounts use template credentials.')})
+        if instance:
+            for field in Account.TEMPLATE_SYNC_FIELDS:
+                if field in attrs and attrs[field] != getattr(instance, field):
+                    raise serializers.ValidationError({
+                        field: _('Disable template following before editing this field.')
+                    })
+        return attrs
+
+    def clean_auth_fields(self, validated_data):
+        following = validated_data.get('follow_template', getattr(self.instance, 'follow_template', False))
+        if following:
+            validated_data.pop('secret', None)
+            validated_data.pop('passphrase', None)
+            return
+        super().clean_auth_fields(validated_data)
 
     def push_account_if_need(self, instance, push_now, params, stat):
         if not push_now or stat not in ['created', 'updated']:
@@ -196,8 +253,15 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         validated_data.pop('on_invalid', None)
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
-        validated_data['source_id'] = None
+        start_following = validated_data.get('follow_template', False) and not instance.follow_template
+        if instance.follow_template and validated_data.get('follow_template') is False:
+            # DRF assigns fields in order; detach before invoking the secret setter.
+            validated_data = {'follow_template': False, **validated_data}
+            validated_data.setdefault('secret_type', instance.secret_type)
         instance = super().update(instance, validated_data)
+        if start_following and Account.TEMPLATE_SYNC_FIELDS:
+            template_id = instance.source_id
+            transaction.on_commit(lambda: template_sync_related_accounts.delay(template_id))
         self.push_account_if_need(instance, push_now, params, 'updated')
         return instance
 
@@ -245,7 +309,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         ]
         fields = BaseAccountSerializer.Meta.fields + [
             'su_from', 'asset', 'asset_address', 'version', 'ds',
-            'source', 'source_id', 'secret_reset',
+            'source', 'source_id', 'follow_template', 'secret_reset',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields + automation_fields
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + automation_fields + ['asset_address']
         fields = [f for f in fields if f not in ['spec_info']]
@@ -253,6 +317,9 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False},
             'source_id': {'required': False, 'allow_null': True},
+            'follow_template': {
+                'help_text': _('Only applies to template accounts. Credentials are read from the current template.')
+            },
         }
         fields_unimport_template = ['params', 'asset_address']
         # 手动判断唯一性校验
@@ -281,15 +348,31 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
                 msg_template = _('Account already exists. Field(s): {fields} must be unique.')
                 field_errors[_fields[0]] = msg_template.format(fields=verbose_names)
                 raise serializers.ValidationError(field_errors)
-        return attrs
+        return super().validate(attrs)
 
 
 class AccountDetailSerializer(AccountSerializer):
+    source_template = serializers.SerializerMethodField(label=_('Source template'))
+
+    @staticmethod
+    def get_source_template(obj):
+        if obj.source != Source.TEMPLATE or not obj.source_id:
+            return None
+        try:
+            template = AccountTemplate.objects.filter(
+                id=obj.source_id, org_id=obj.org_id,
+            ).values('id', 'name').first()
+        except (DjangoValidationError, ValueError, TypeError):
+            return None
+        if template is None:
+            return None
+        return {'id': str(template['id']), 'name': template['name']}
+
     has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
 
     class Meta(AccountSerializer.Meta):
         model = Account
-        fields = AccountSerializer.Meta.fields + ['has_secret', 'spec_info']
+        fields = AccountSerializer.Meta.fields + ['has_secret', 'spec_info', 'source_template']
         read_only_fields = AccountSerializer.Meta.read_only_fields + ['has_secret']
 
 
@@ -315,13 +398,16 @@ class AssetAccountBulkSerializer(
             'name', 'username', 'secret', 'secret_type', 'secret_reset',
             'passphrase', 'privileged', 'is_active', 'comment', 'template',
             'on_invalid', 'push_now', 'params',
-            'su_from_username', 'source', 'source_id',
+            'su_from_username', 'source', 'source_id', 'follow_template',
         ]
         extra_kwargs = {
             'name': {'required': False},
             'secret_type': {'required': False},
             'source': {'required': False, 'allow_null': True},
             'source_id': {'required': False, 'allow_null': True},
+            'follow_template': {
+                'help_text': _('Only applies to template accounts. Credentials are read from the current template.')
+            },
         }
 
     def set_initial_value(self):

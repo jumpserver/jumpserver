@@ -8200,6 +8200,10 @@ msgstr "審計台"
 msgid "System setting"
 msgstr "系統設置"
 
+#: rbac/tree.py
+msgid "System tools"
+msgstr "系統工具"
+
 #: rbac/tree.py:38
 msgid "Session audits"
 msgstr "會話審計"
@@ -8446,6 +8450,10 @@ msgstr "自訂 DeepSeek 模型"
 #: settings/models.py:41 users/models/preference.py:14
 msgid "Encrypted"
 msgstr "加密的"
+
+#: settings/models.py
+msgid "Can change system tools setting"
+msgstr "可以修改系統工具設置"
 
 #: settings/models.py:168
 msgid "Can change email setting"
@@ -9679,6 +9687,10 @@ msgstr "憑證驗證"
 #: settings/serializers/msg.py:71
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "控制是否驗證 SMTP TLS 憑證"
+
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "控制是否驗證 OAuth2 伺服器的 TLS 憑證"
 
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"

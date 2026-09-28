@@ -6,11 +6,11 @@ from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
 from django.utils.module_loading import import_string
-from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 
 from authentication.backends.drf import (
     SignatureAuthentication,
-    AccessTokenAuthentication
+    AccessTokenAuthentication,
+    OAuth2Authentication,
 )
 from notifications.urls.ws_urls import urlpatterns as notifications_urlpatterns
 from ops.urls.ws_urls import urlpatterns as ops_urlpatterns

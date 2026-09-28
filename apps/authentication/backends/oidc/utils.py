@@ -8,7 +8,6 @@
 
 import datetime as dt
 from calendar import timegm
-from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -71,9 +70,8 @@ def _validate_claims(id_token, nonce=None, validate_nonce=True):
     log_prompt = "Validate claims: {}"
     logger.debug(log_prompt.format('Start'))
 
-    iss_parsed_url = urlparse(id_token['iss'])
-    provider_parsed_url = urlparse(settings.AUTH_OPENID_PROVIDER_ENDPOINT)
-    if iss_parsed_url.netloc != provider_parsed_url.netloc:
+    issuer = id_token.get('iss')
+    if not isinstance(issuer, str) or not issuer or issuer != settings.AUTH_OPENID_PROVIDER_ENDPOINT:
         logger.debug(log_prompt.format('Invalid issuer'))
         raise SuspiciousOperation('Invalid issuer')
 

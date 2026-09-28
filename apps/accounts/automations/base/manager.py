@@ -567,7 +567,15 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         should_sync_candidate = self.should_sync_candidate(
             inconclusive_probe
         )
-        if hasattr(record, 'new_secret') and should_sync_candidate:
+        if (
+            hasattr(record, 'new_secret') and should_sync_candidate
+            and (not account.follows_template or str(self.method_type()) == 'change_secret')
+        ):
+            if account.follows_template:
+                # Detach together with the confirmed new credential. Failed or
+                # unconfirmed changes must keep using the template credential.
+                account.follow_template = False
+                update_fields.append('follow_template')
             account.secret = record.new_secret
             update_fields.insert(0, 'secret')
         account.date_updated = timezone.now()

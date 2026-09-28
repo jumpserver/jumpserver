@@ -47,6 +47,11 @@
                   return $random
               }
               $targetPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
+              $activeKeyPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\.access_key"
+              if (Test-Path -Path $activeKeyPath) {
+                Write-Output "Tinker already has an active access key"
+                return
+              }
               if (Test-Path -Path $targetPath) {
                 Write-Output "access_key already exists at $targetPath"
                 return
@@ -62,6 +67,7 @@
                 "name" = "[Tinker]-{{ HOST_NAME }}-$randomStr"
                 "comment" = "tinker"
                 "type" = "tinker"
+                "host_id" = "{{ HOST_ID }}"
                 }| ConvertTo-Json
               $headers = @{
                   "Authorization" = "BootstrapToken {{ BOOTSTRAP_TOKEN }}"
@@ -246,11 +252,13 @@
               $source = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
               $destination = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\.access_key"
               if (Test-Path $destination) {
-                $timestamp = Get-Date -Format "yyyyMMddHHmmss"
-                  Rename-Item -Path $destination -NewName (Split-Path -Leaf "$destination.bak.$timestamp" )
+                  Write-Output "Preserving the existing Tinker access key"
+                  return
               }
               if (Test-Path $source) {
                   Rename-Item -Path $source -NewName (Split-Path -Leaf $destination)
+              } else {
+                  throw "Tinker access key is missing"
               }
 
         - name: Install tinkerd service

@@ -12,6 +12,7 @@ from accounts.const import AutomationTypes
 from accounts.filters import GatheredAccountFilterSet, NodeFilterBackend
 from accounts.models import GatherAccountsAutomation, AutomationExecution, Account
 from accounts.models import GatheredAccount
+from accounts.permissions import check_risk_action_permissions
 from assets.models import Asset
 from common.const import ConfirmOrIgnore
 from common.utils.http import is_true
@@ -117,8 +118,15 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         params = request.query_params
         is_delete_remote = params.get("is_delete_remote")
         is_delete_account = params.get("is_delete_account")
-        asset_id = params.get("asset")
-        username = params.get("username")
+        # The authorized discovered account determines the target, not query parameters.
+        asset_id = instance.asset_id
+        username = instance.username
+        if is_true(is_delete_remote) and is_true(is_delete_account):
+            check_risk_action_permissions(request, 'delete_both')
+        elif is_true(is_delete_remote):
+            check_risk_action_permissions(request, 'delete_remote')
+        elif is_true(is_delete_account):
+            check_risk_action_permissions(request, 'delete_account')
         if is_true(is_delete_remote):
             self._delete_remote(asset_id, username)
         if is_true(is_delete_account):

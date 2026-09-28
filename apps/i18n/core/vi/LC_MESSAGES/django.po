@@ -9962,6 +9962,10 @@ msgstr "Xác minh chứng chỉ"
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "Kiểm soát việc xác minh chứng chỉ TLS SMTP"
 
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "Kiểm soát việc xác minh chứng chỉ TLS của máy chủ OAuth2"
+
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
 msgstr "Chứng chỉ CA PEM được tin cậy thêm ngoài kho tin cậy hệ thống"

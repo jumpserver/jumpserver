@@ -22,6 +22,16 @@ logger = get_logger(__file__)
 
 
 class BaseAccountQuerySet(VaultQuerySetMixin, models.QuerySet):
+    def update(self, **kwargs):
+        if self.model._meta.model_name == 'account':
+            from rest_framework.exceptions import ValidationError
+            if 'follow_template' in kwargs:
+                raise ValidationError(_('Update template following through account save to preserve credentials.'))
+            protected = {'secret', '_secret', 'secret_type', 'source', 'source_id'}
+            if protected.intersection(kwargs) and self.filter(source='template', follow_template=True).exists():
+                raise ValidationError(_('Disable template following before editing credentials or their source.'))
+        return super().update(**kwargs)
+
     def active(self):
         return self.filter(is_active=True)
 

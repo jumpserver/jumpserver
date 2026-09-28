@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Prefetch, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -63,6 +64,7 @@ class ConnectionToken(JMSOrgBaseModel):
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     is_reusable = models.BooleanField(default=False, verbose_name=_("Reusable"))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
+    date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_("Date last used"))
     from_ticket = models.OneToOneField(
         'tickets.ApplyLoginAssetTicket', related_name='connection_token',
         on_delete=models.SET_NULL, null=True, blank=True,
@@ -196,6 +198,11 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset or not self.asset.is_active:
             error = _('No asset or inactive asset')
             raise PermissionDenied(error)
+        from acls.models import ConnectMethodACL
+        if not ConnectMethodACL.is_method_allowed(
+            self.user, self.asset, self.connect_method, self.protocol
+        ):
+            raise PermissionDenied(_('Connect method is not allowed for this asset'))
         if self.protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
             config = self.asset.spec_info or {}
             protocol = self.platform.protocols.filter(name=self.protocol).first()
@@ -444,7 +451,10 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def command_filter_acls(self):
+        from acls.const import ActionChoices as ACLActionChoices
         from acls.models import CommandFilterACL
+        from users.models import User
+
         kwargs = {
             'user': self.user,
             'asset': self.asset,
@@ -452,6 +462,16 @@ class ConnectionToken(JMSOrgBaseModel):
         }
         with tmp_to_org(self.asset.org_id):
             acls = CommandFilterACL.filter_queryset(**kwargs).valid()
+            # Bound M2M prefetch batches; only review actions need reviewers.
+            acls = list(acls.only(
+                'id', 'name', 'action', 'priority', 'is_active'
+            ).prefetch_related('command_groups').iterator(chunk_size=1000))
+            review_acls = [acl for acl in acls if acl.action == ACLActionChoices.review]
+            if review_acls:
+                prefetch_related_objects(
+                    review_acls,
+                    Prefetch('reviewers', queryset=User.objects.only('id', 'name')),
+                )
         return acls
 
     @lazyproperty

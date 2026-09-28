@@ -245,20 +245,10 @@ class ConnectMethodUtil:
         return methods
 
     @classmethod
-    def get_user_allowed_connect_methods(cls, os, user):
+    def get_user_allowed_connect_methods(cls, os, user, asset=None):
         from acls.models import ConnectMethodACL
         methods = cls.get_filtered_protocols_connect_methods(os)
-        accept_methods = set(itertools.chain.from_iterable(
-            ConnectMethodACL.get_user_acls(user)
-            .filter(action=ConnectMethodACL.ActionChoices.accept)
-            .values_list('connect_methods', flat=True)
-        ))
-        # 在禁用的基础上放行一些连接方法
-        disabled_connect_methods = set(itertools.chain.from_iterable(
-            ConnectMethodACL.get_user_acls(user)
-            .filter(action=ConnectMethodACL.ActionChoices.reject)
-            .values_list('connect_methods', flat=True)
-        )) - accept_methods
+        disabled_connect_methods = ConnectMethodACL.get_user_disabled_methods(user, asset)
 
         new_queryset = {}
         for protocol, methods in methods.items():

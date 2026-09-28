@@ -9879,6 +9879,10 @@ msgstr "인증서 검증"
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "SMTP TLS 인증서 검증 여부 제어"
 
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "OAuth2 서버 TLS 인증서 검증 여부를 제어합니다"
+
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
 msgstr "시스템 신뢰 저장소 외에 추가로 신뢰하는 PEM CA 인증서"
