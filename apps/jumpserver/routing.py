@@ -15,6 +15,7 @@ from notifications.urls.ws_urls import urlpatterns as notifications_urlpatterns
 from ops.urls.ws_urls import urlpatterns as ops_urlpatterns
 from settings.urls.ws_urls import urlpatterns as setting_urlpatterns
 from terminal.urls.ws_urls import urlpatterns as terminal_urlpatterns
+from accounts.ws_urls import urlpatterns as accounts_urlpatterns
 from common.utils import get_logger
 import socket
 
@@ -22,7 +23,8 @@ logger = get_logger(__name__)
 
 __all__ = ['urlpatterns', 'application']
 
-urlpatterns = ops_urlpatterns + \
+urlpatterns = accounts_urlpatterns + \
+              ops_urlpatterns + \
               notifications_urlpatterns + \
               setting_urlpatterns + \
               terminal_urlpatterns

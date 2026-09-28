@@ -233,14 +233,14 @@ class RedisChannelLayer(_RedisChannelLayer):
         async with self.connection(index) as connection:
             # 部分云厂商的 Redis 此操作会报错(不支持，比如阿里云有限制)
             try:
-                await connection.eval(cleanup_script, keys=[], args=[channel, backup_queue])
+                await connection.eval(cleanup_script, 0, channel, backup_queue)
             except:
                 pass
             result = await connection.bzpopmin(channel, timeout=timeout)
 
             if result is not None:
                 _, member, timestamp = result
-                await connection.zadd(backup_queue, float(timestamp), member)
+                await connection.zadd(backup_queue, {member: float(timestamp)})
             else:
                 member = None
             return member

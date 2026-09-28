@@ -2,12 +2,24 @@ import ssl
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from django.conf import settings
 from django.test import SimpleTestCase, override_settings
 
+from jumpserver.conf import Config
 from jumpserver.rewriting.smtp import EmailBackend
 from settings.api.ldap import LDAPUserListApi
 from settings.serializers.feature import ChatAISettingSerializer
+from settings.serializers.cleaning import CleaningSerializer
 from settings.serializers.msg import EmailSettingSerializer
+
+
+class CleaningSerializerTestCase(SimpleTestCase):
+    def test_application_record_retention_defaults_and_limits(self):
+        field = CleaningSerializer().fields['APPLICATION_RECORD_KEEP_DAYS']
+
+        self.assertEqual(Config.defaults['APPLICATION_RECORD_KEEP_DAYS'], 180)
+        self.assertEqual(field.min_value, settings.LOG_KEEP_MIN_DAYS)
+        self.assertEqual(field.max_value, 9999)
 
 
 class SMTPEmailBackendTestCase(SimpleTestCase):

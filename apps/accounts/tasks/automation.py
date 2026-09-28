@@ -380,8 +380,14 @@ def clean_change_secret_and_push_record_period():
         null_related_q = Q(execution__isnull=True) | Q(asset__isnull=True) | Q(account__isnull=True)
         expired_q = Q(date_updated__lt=expired_time)
 
-        ChangeSecretRecord.objects.filter(null_related_q).delete()
-        ChangeSecretRecord.objects.filter(expired_q).delete()
+        from accounts.models import CredentialRotationRecord
+        active_execution_ids = CredentialRotationRecord.objects.filter(
+            status='running', date_finished__isnull=True,
+            change_execution_id__isnull=False,
+        ).values_list('change_execution_id', flat=True)
+        removable_changes = ChangeSecretRecord.objects.exclude(execution_id__in=active_execution_ids)
+        removable_changes.filter(null_related_q).delete()
+        removable_changes.filter(expired_q).delete()
 
         PushSecretRecord.objects.filter(null_related_q).delete()
         PushSecretRecord.objects.filter(expired_q).delete()

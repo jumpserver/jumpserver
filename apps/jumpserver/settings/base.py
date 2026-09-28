@@ -187,6 +187,7 @@ MIDDLEWARE = [
     'jumpserver.middleware.RefererCheckMiddleware',
     'jumpserver.middleware.SQLCountMiddleware',
     'orgs.middleware.OrgMiddleware',
+    'accounts.middleware.ApplicationAuditMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
     'authentication.middleware.MFAMiddleware',

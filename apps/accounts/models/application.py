@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from private_storage.fields import PrivateImageField
 
+from accounts.const import ApplicationEvent, WebhookRequestMethod
 from accounts.models import Account
 from common.db import fields
 from common.db.fields import JSONManyToManyField, RelatedManager
@@ -66,3 +67,43 @@ class IntegrationApplication(JMSOrgBaseModel):
                 qs = qs.filter(asset__name=asset)
         query = RelatedManager.get_to_filter_qs(self.accounts.value, Account)
         return qs.filter(*query).distinct().first()
+
+
+def default_application_webhook_events():
+    return list(ApplicationEvent.values)
+
+
+def default_application_webhook_template():
+    return {
+        'event_id': '{{ event.id }}',
+        'event': '{{ event.code }}',
+        'result': '{{ event.result }}',
+        'application': '{{ application.name }}',
+        'credential_key': '{{ credential.key }}',
+        'credential_revision': '{{ credential.revision }}',
+        'summary': '{{ event.summary }}',
+        'occurred_at': '{{ event.occurred_at }}',
+    }
+
+
+class ApplicationWebhook(JMSOrgBaseModel):
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    applications = models.ManyToManyField(
+        IntegrationApplication, related_name='webhook_rules',
+        verbose_name=_('Integration applications'),
+    )
+    is_active = models.BooleanField(default=False, verbose_name=_('Active'))
+    url = fields.EncryptTextField(default='', blank=True, max_length=2048, verbose_name=_('URL'))
+    method = models.CharField(
+        max_length=8, choices=WebhookRequestMethod.choices,
+        default=WebhookRequestMethod.POST, verbose_name=_('Request method'),
+    )
+    headers = fields.EncryptJsonDictTextField(default=dict, blank=True, verbose_name=_('Request headers'))
+    events = models.JSONField(default=default_application_webhook_events, verbose_name=_('Events'))
+    body_template = models.JSONField(
+        default=default_application_webhook_template, verbose_name=_('Body template'),
+    )
+
+    class Meta:
+        unique_together = [('org_id', 'name')]
+        verbose_name = _('Application webhook')

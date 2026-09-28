@@ -14,7 +14,7 @@ from orgs.utils import current_org
 from .auth_backends import get_auth_backend_choices
 from .const import LoginTypeChoices, MFAChoices
 from .models import (
-    FTPLog, IntegrationApplicationLog, JobLog, OperateLog,
+    FTPLog, JobLog, OperateLog,
     PasswordChangeLog, UserLoginLog, UserSession,
 )
 
@@ -187,17 +187,6 @@ class OperateLogFilterSet(BaseFilterSet):
         fields_operator = {
             'resource_type': ('exact',),
         }
-
-
-class ServiceAccessLogFilterSet(BaseFilterSet):
-    service_id = drf_filters.UUIDFilter(label=_("Application ID"))
-
-    class Meta:
-        model = IntegrationApplicationLog
-        fields = [
-            "id", "service", "service_id", "asset", "account",
-            "remote_addr",
-        ]
 
 
 class JobLogFilterSet(BaseFilterSet):
