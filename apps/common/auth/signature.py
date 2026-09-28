@@ -1,5 +1,7 @@
+import hashlib
 from email.utils import parsedate_to_datetime
 
+from django.core.cache import cache
 from django.utils import timezone
 from rest_framework import authentication
 from rest_framework import exceptions
@@ -134,6 +136,13 @@ class SignatureAuthentication(authentication.BaseAuthentication):
 
         # All of that just to get to this.
         if not verified:
+            raise FAILED
+
+        signature = fields.get('signature') or ''
+        replay_key = 'http_sig:%s:%s' % (
+            key_id, hashlib.sha256(signature.encode('utf-8')).hexdigest()
+        )
+        if not cache.add(replay_key, True, timeout=self.max_clock_skew):
             raise FAILED
 
         self.after_authenticate_update_date(user)

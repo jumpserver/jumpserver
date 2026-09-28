@@ -48,14 +48,20 @@ def build_allowed_origins(configured, site_url, domains):
 
     # Use operator-configured domains, not ALLOWED_HOSTS or implicit debug hosts.
     values = [site_url] if site_url else []
+    site_scheme = urlsplit(site_url).scheme if site_url else ''
+    if site_scheme not in ('http', 'https'):
+        site_scheme = 'https'
     for domain in (domains or '').split(','):
         domain = domain.strip()
         if not domain or '*' in domain or domain.startswith('.'):
             continue
         if '://' in domain:
             values.append(domain)
-        else:
-            values.extend((f'https://{domain}', f'http://{domain}'))
+            continue
+        values.append(f'{site_scheme}://{domain}')
+        host = domain.split(':')[0].strip('[]').lower()
+        if host in {'localhost', '127.0.0.1', '::1'} and site_scheme == 'https':
+            values.append(f'http://{domain}')
     try:
         return sorted({normalize_origin(value, allow_path=True) for value in values})
     except (TypeError, ValueError) as exc:

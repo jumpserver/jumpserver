@@ -55,9 +55,9 @@ WS_LISTEN_PORT: 8070
 # explicit DOMAINS entries; wildcard domains and implicit debug hosts are excluded.
 # Override with the full list when Lina/Luna is served from another origin.
 # WebSocket 浏览器来源白名单，默认从 SITE_URL 和明确的 DOMAINS 生成。
-# DOMAINS 未带协议时允许该主机和端口的 HTTP/HTTPS 来源；带协议时按指定协议匹配。
-# 不支持通配符；显式配置会替换默认列表。开发时需加入实际前端地址和端口。
-# 反向代理必须保留原始 Origin，不能统一改写为后端地址。
+# DOMAINS 未带协议时跟随 SITE_URL 的协议（默认 https）；localhost/127.0.0.1/::1 额外允许 http。
+# 带协议时按指定协议匹配。不支持通配符；显式配置会替换默认列表。
+# 开发时需加入实际前端地址和端口。反向代理必须保留原始 Origin。
 # 缺少 Origin 的组件连接须通过有效的 Authorization 签名或 Bearer 认证。
 # WS_ALLOWED_ORIGINS:
 #   - https://jumpserver.example.com

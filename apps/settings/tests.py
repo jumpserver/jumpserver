@@ -170,6 +170,16 @@ class LDAPWebsocketPermissionTest(SimpleTestCase):
         super().setUp()
         self.enterContext(patch.object(User, 'lang', new_callable=PropertyMock, return_value='en'))
 
+        def has_system_permissions(socket, permissions):
+            user = socket.scope.get('user')
+            if user is None or not getattr(user, 'is_authenticated', False):
+                return False
+            return set(permissions).issubset(set(getattr(user, 'perms', [])))
+
+        self.enterContext(patch.object(
+            LdapWebsocket, 'has_system_permissions', has_system_permissions
+        ))
+
     @staticmethod
     def make_user(*perms):
         user = User(username='ldap-test-user', is_active=True)

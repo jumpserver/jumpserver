@@ -8,7 +8,7 @@ from defusedxml.ElementTree import iterparse
 from django.utils.translation import gettext as _
 from openpyxl.utils.cell import coordinate_to_tuple, range_boundaries
 
-from common.utils.zip import validate_zip_file
+from common.utils.zip import ZipSecurityError, validate_zip_file
 
 from .base import BaseFileParser
 
@@ -113,7 +113,10 @@ class ExcelFileParser(BaseFileParser):
                         raise ValueError(_('Excel workbook exceeds import limits'))
 
     def generate_rows(self, stream_data):
-        self.validate_workbook(stream_data)
+        try:
+            self.validate_workbook(stream_data)
+        except ZipSecurityError as exc:
+            raise ValueError(_('Invalid excel file')) from exc
         try:
             workbook = pyexcel.get_book(file_type='xlsx', file_content=stream_data)
         except Exception:
