@@ -21,7 +21,7 @@ from .audit import record
 
 logger = get_logger(__name__)
 
-SUBSCRIPTION_EVENTS = {
+TRACKED_NON_ROTATION_EVENTS = {
     ApplicationEvent.CREDENTIAL_CHANGE_STARTED,
     ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED,
     ApplicationEvent.CREDENTIAL_CHANGE_FAILED,
@@ -42,7 +42,7 @@ def enqueue(event, code, rotation=None):
             if rotation is not None:
                 _track_rotation(event, code, rotation)
             else:
-                _track_subscription(event, code)
+                _track_non_rotation(event, code)
     except Exception as exc:
         logger.warning('Cannot record credential event %s (%s).', event.id, type(exc).__name__)
     transaction.on_commit(lambda: _publish_stream(event.id, code))
@@ -106,18 +106,10 @@ def _track_rotation(event, code, rotation):
     )
 
 
-def _track_subscription(event, code):
-    if code not in SUBSCRIPTION_EVENTS:
+def _track_non_rotation(event, code):
+    if code not in TRACKED_NON_ROTATION_EVENTS:
         return
-    if event.credential_id:
-        subscribed = ApplicationCredential.objects.filter(
-            id=event.credential_id, mode=ApplicationCredential.Mode.subscription,
-        ).exists()
-    else:
-        subscribed = _configurations(event, code).filter(
-            credentials__mode=ApplicationCredential.Mode.subscription,
-        ).exists()
-    if not subscribed or CredentialRotationEvent.objects.filter(
+    if not _configurations(event, code).exists() or CredentialRotationEvent.objects.filter(
         source_event_id=event.id,
     ).exists():
         return

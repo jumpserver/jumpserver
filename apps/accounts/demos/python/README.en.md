@@ -217,7 +217,7 @@ An SDK access configuration accepts one policy mode. Create separate configurati
 
 ### Prerequisites
 
-1. Create a **Credential change subscription** or **Alternating dual-account rotation** policy under **PAM Integration > Credential Policies** and bind the application. A subscription automatically covers every account authorized to that application; only alternating rotation selects two asset accounts on the policy.
+1. Create a **Credential change subscription** or **Account rotation** policy under **PAM Integration > Credential Policies** and bind the application. Select the accounts that should trigger subscription notifications; account rotation currently selects two accounts on the same asset.
 2. Create or open the target application and authorize its asset accounts from the **Accounts** page. For alternating rotation, authorize both policy accounts.
 3. Open **Access configurations** in the target credential policy, create an SDK configuration, and select policies of the same mode. The current policy is selected automatically.
 4. Open the SDK configuration, select **Generate**, download `jms_pam_config.py`, and protect it as secret material.

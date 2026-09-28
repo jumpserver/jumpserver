@@ -19,7 +19,7 @@ __all__ = [
 class ApplicationCredential(JMSOrgBaseModel):
     class Mode(models.TextChoices):
         subscription = 'subscription', _('Credential change subscription')
-        alternating_rotation = 'alternating_rotation', _('Alternating dual-account rotation')
+        alternating_rotation = 'alternating_rotation', _('Account rotation')
 
     class Status(models.TextChoices):
         idle = 'idle', _('Idle')
@@ -72,6 +72,12 @@ class ApplicationCredential(JMSOrgBaseModel):
         'accounts.IntegrationApplication', through='accounts.CredentialApplicationBinding',
         related_name='application_credentials', verbose_name=_('Integration applications')
     )
+    subscription_accounts = models.ManyToManyField(
+        'accounts.Account', blank=True, related_name='subscribed_application_credentials',
+        verbose_name=_('Subscribed accounts'),
+    )
+    # Existing policies keep their original scope until an administrator selects accounts.
+    subscription_all_authorized = models.BooleanField(default=False, editable=False)
 
     class Meta:
         unique_together = [('org_id', 'name')]

@@ -14,7 +14,10 @@ from rest_framework.views import APIView
 from accounts import serializers
 from accounts.const import ApplicationEvent, AuditEvent
 from accounts.filters import IntegrationApplicationFilterSet
-from accounts.models import ApplicationWebhook, IntegrationApplication
+from accounts.models import (
+    ApplicationAudit, ApplicationWebhook, CredentialRotationEvent,
+    IntegrationApplication,
+)
 from accounts.models.application import default_application_webhook_template
 from accounts.webhooks import (
     WebhookValidationError, render_webhook_template, sample_webhook_context,
@@ -43,6 +46,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'reset_secret': 'accounts.change_integrationapplication',
         'get_account_secret': 'accounts.view_integrationapplication',
         'get_sdks_info': 'accounts.view_integrationapplication',
+        'credential_events': 'accounts.view_integrationapplication',
     }
 
     def read_file(self, path):
@@ -68,6 +72,54 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         demo_content = self.read_file(demo_path)
 
         return Response(data={'readme': readme_content, 'code': demo_content})
+
+    @action(['GET'], detail=True, url_path='credential-events')
+    def credential_events(self, request, *args, **kwargs):
+        application = self.get_object()
+        try:
+            limit = min(max(int(request.query_params.get('limit', 30)), 1), 100)
+            offset = max(int(request.query_params.get('offset', 0)), 0)
+        except (TypeError, ValueError):
+            raise ValidationError(_('Invalid pagination parameters.'))
+        application_id = str(application.id)
+        events = CredentialRotationEvent.objects.filter(
+            org_id=application.org_id,
+            recipients__contains=[{'application': {'id': application_id}}],
+        ).order_by('-published_at', '-id')
+        count = events.count()
+        page = list(events[offset:offset + limit])
+        audits = {
+            str(audit.id): audit for audit in ApplicationAudit.objects.filter(
+                id__in=[event.source_event_id for event in page],
+                org_id=application.org_id,
+            )
+        }
+        results = []
+        for event in page:
+            audit = audits.get(str(event.source_event_id))
+            recipients = [
+                {
+                    'instance_id': recipient['instance_id'],
+                    'type': recipient['type'],
+                    'configuration': recipient['configuration']['name'],
+                    'publish_result': recipient['publish_result'],
+                    'received_at': recipient['received_at'],
+                }
+                for recipient in event.recipients
+                if recipient['application']['id'] == application_id
+            ]
+            results.append({
+                'id': str(event.source_event_id),
+                'event': event.event,
+                'published_at': event.published_at,
+                'revision': event.revision,
+                'rotation_id': str(event.rotation_id) if event.rotation_id else None,
+                'credential_id': str(audit.credential_id) if audit and audit.credential_id else None,
+                'credential': audit.credential if audit else '',
+                'account': audit.account if audit else '',
+                'recipients': recipients,
+            })
+        return Response({'count': count, 'results': results})
 
     @action(
         ['GET'], detail=True, url_path='secret',

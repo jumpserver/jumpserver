@@ -6,6 +6,7 @@ from django.test import SimpleTestCase
 from django.utils import timezone
 
 from accounts.api.account.credential import ApplicationCredentialViewSet
+from accounts.api.account.application import IntegrationApplicationViewSet
 from accounts.const import AuditEvent, ApplicationEvent, ChangeSecretRecordStatusChoice
 from accounts.credential_client.audit import record
 from accounts.credential_client.events import _publish_stream, enqueue
@@ -46,6 +47,23 @@ class RotationEventTests(CredentialTestCase):
             for event in self.rotation.events.all():
                 _publish_stream(event.source_event_id, event.event)
         return layer
+
+    def test_application_history_includes_instance_receipts_and_configuration_events(self):
+        audit = record(AuditEvent.CONFIGURATION_UPDATED, configuration=self.configuration)
+        enqueue(audit, ApplicationEvent.CONFIGURATION_UPDATED)
+        self.assertTrue(receive(self.client.id, self.org.id, audit.id))
+        view = IntegrationApplicationViewSet.as_view({'get': 'credential_events'})
+        response = view(
+            self.request('get', '/credential-events/'), pk=self.application.id,
+        )
+        self.assertEqual(response.status_code, 200)
+        update = next(item for item in response.data['results'] if item['id'] == str(audit.id))
+        self.assertEqual(update['event'], 'configuration.updated')
+        recipient = next(
+            item for item in update['recipients'] if item['instance_id'] == self.client.instance_id
+        )
+        self.assertIsNotNone(recipient['received_at'])
+        self.assertNotIn(self.primary.secret, str(response.data))
 
     def test_order_and_gap_do_not_infer_receipt_from_a_later_event(self):
         self.publish()
@@ -191,6 +209,7 @@ class SubscriptionEventTests(CredentialTestCase):
         super().setUp()
         self.credential.mode = self.credential.Mode.subscription
         self.credential.save(update_fields=['mode'])
+        self.credential.subscription_accounts.add(self.primary)
         self.configuration = ClientAccessConfiguration.objects.create(
             application=self.application, name='Subscription SDK', type='sdk',
         )

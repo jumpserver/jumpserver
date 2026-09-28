@@ -551,6 +551,7 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.credential.alternate_account = None
         self.credential.active_account = None
         self.credential.save()
+        self.credential.subscription_accounts.add(self.primary)
         self.application.accounts = {'type': 'ids', 'ids': [str(self.primary.id)]}
         self.application.save()
         configuration = self.create_configuration()
@@ -582,6 +583,7 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.credential.alternate_account = None
         self.credential.active_account = None
         self.credential.save()
+        self.credential.subscription_accounts.add(self.primary)
         configuration = self.create_configuration()
         manager = CredentialClientManager(self.application, configuration.id, 'subscription-client')
         configuration.credentials.clear()
@@ -599,6 +601,7 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.credential.alternate_account = None
         self.credential.active_account = None
         self.credential.save()
+        self.credential.subscription_accounts.add(self.primary)
         response = self.client_action(
             'credential', method='get',
             data={'account_id': str(self.primary.id), 'instance_id': 'subscription-sdk'},
@@ -781,8 +784,15 @@ class CredentialRotationTestCase(CredentialTestCase):
         serializer = ApplicationCredentialSerializer(data={
             **data, 'applications': [str(self.application.id)],
         })
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('subscription_accounts', serializer.errors)
+        serializer = ApplicationCredentialSerializer(data={
+            **data, 'applications': [str(self.application.id)],
+            'subscription_accounts': [str(self.backup.id)],
+        })
         self.assertTrue(serializer.is_valid(), serializer.errors)
         policy = serializer.save()
+        self.assertEqual(list(policy.subscription_accounts.all()), [self.backup])
         self.assertIsNone(policy.account_id)
         self.assertIsNone(policy.alternate_account_id)
         self.assertIsNone(policy.active_account_id)
@@ -1125,6 +1135,7 @@ class CredentialClientStateWriteTests(CredentialTestCase):
         self.credential.alternate_account = None
         self.credential.active_account = None
         self.credential.save()
+        self.credential.subscription_accounts.add(self.primary)
         manager = self.manager('sdk')
         key = self.credential.account_key(self.primary.id)
         manager.fetch(key, '127.0.0.1')

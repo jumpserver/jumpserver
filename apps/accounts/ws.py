@@ -127,12 +127,17 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
             items = []
             for credential in credentials:
                 if credential.mode == credential.Mode.subscription:
+                    accounts = configuration.application.get_accounts().order_by('id')
+                    if not credential.subscription_all_authorized:
+                        accounts = accounts.filter(
+                            id__in=credential.subscription_accounts.values('id')
+                        )
                     items.extend({
                         'key': credential.account_key(account.id),
                         'account_id': str(account.id),
                         'credential_mode': credential.mode,
                         'revision': account.version,
-                    } for account in configuration.application.get_accounts().order_by('id'))
+                    } for account in accounts)
                 elif credential.authorized_applications().filter(
                     id=configuration.application_id,
                 ).exists():

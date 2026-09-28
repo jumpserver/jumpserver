@@ -222,6 +222,7 @@ class ApplicationAuditTests(CredentialTestCase):
         self.credential.alternate_account = None
         self.credential.active_account = None
         self.credential.save()
+        self.credential.subscription_accounts.add(self.primary)
         self.primary.secret = 'new-test-secret'
         self.primary.save()
         event = ApplicationAudit.objects.filter(

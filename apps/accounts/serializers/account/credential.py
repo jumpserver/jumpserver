@@ -70,6 +70,10 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         queryset=IntegrationApplication.objects, many=True, required=True,
         attrs=('id', 'name'), label=_('Integration applications')
     )
+    subscription_accounts = ObjectRelatedField(
+        queryset=Account.objects, many=True, required=False,
+        attrs=('id', 'name', 'username', 'asset_id'), label=_('Subscribed accounts'),
+    )
     last_fetched = serializers.DateTimeField(read_only=True)
     change_execution = ObjectRelatedField(read_only=True, attrs=('id', 'status', 'date_finished'))
 
@@ -77,7 +81,8 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         model = ApplicationCredential
         fields_mini = ['id', 'name', 'key']
         fields_small = fields_mini + [
-            'mode', 'asset', 'account', 'alternate_account',
+            'mode', 'asset', 'account', 'alternate_account', 'subscription_accounts',
+            'subscription_all_authorized',
             'active_account', 'revision', 'status', 'is_active',
             'last_fetched', 'date_last_rotated', 'applications_amount',
         ]
@@ -89,6 +94,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = [
             'key', 'active_account', 'revision', 'status',
             'applications_amount', 'blockers',
+            'subscription_all_authorized',
             'rotation_cancelled', 'date_rotation_started', 'date_last_rotated',
         ]
 
@@ -96,7 +102,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     def setup_eager_loading(cls, queryset):
         return queryset.select_related(
             'account__asset__platform', 'alternate_account', 'active_account', 'change_execution'
-        ).prefetch_related('applications').annotate(
+        ).prefetch_related('applications', 'subscription_accounts').annotate(
             applications_amount=Count('applications', distinct=True),
             last_fetched=Max('application_bindings__client_statuses__date_fetched'),
         )
@@ -141,6 +147,33 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             applications = list(self.instance.applications.all())
         if not applications:
             raise serializers.ValidationError({'applications': _('Select at least one application.')})
+        if mode == ApplicationCredential.Mode.subscription:
+            selected = attrs.get('subscription_accounts')
+            if selected is None and self.instance:
+                selected = list(self.instance.subscription_accounts.all())
+            if not selected and not (
+                self.instance and self.instance.subscription_all_authorized
+                and 'subscription_accounts' not in attrs
+            ):
+                raise serializers.ValidationError({'subscription_accounts': _(
+                    'Select at least one account to subscribe to.'
+                )})
+            if selected:
+                required = {item.id for item in selected}
+                unauthorized = [
+                    application.name for application in applications
+                    if not required.issubset(set(application.get_accounts().values_list('id', flat=True)))
+                ]
+                if unauthorized:
+                    raise serializers.ValidationError({'subscription_accounts': _(
+                        'These applications are not authorized for every subscribed account: {names}'
+                    ).format(names=', '.join(unauthorized))})
+            if 'subscription_accounts' in attrs:
+                attrs['subscription_all_authorized'] = False
+        elif attrs.get('subscription_accounts'):
+            raise serializers.ValidationError({'subscription_accounts': _(
+                'Subscribed accounts are only available for credential change subscriptions.'
+            )})
         if mode == ApplicationCredential.Mode.alternating_rotation:
             required = {item.id for item in accounts if item}
             unauthorized = [
@@ -257,6 +290,8 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         self.instance = instance
         validated_data = self.validate(validated_data)
         applications = validated_data.pop('applications', None)
+        previous_accounts = set(instance.subscription_accounts.values_list('id', flat=True))
+        previous_all = instance.subscription_all_authorized
         account = validated_data.get('account', instance.account)
         accounts = [account, validated_data.get('alternate_account', instance.alternate_account)]
         # Existing bindings already exclude competing claims. Lock only newly
@@ -273,6 +308,15 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         instance = super().update(instance, validated_data)
         if applications is not None:
             self.sync_applications(instance, applications)
+        if instance.mode == ApplicationCredential.Mode.subscription and (
+            previous_all != instance.subscription_all_authorized
+            or previous_accounts != set(instance.subscription_accounts.values_list('id', flat=True))
+        ):
+            from accounts.const import ApplicationEvent, AuditEvent
+            from accounts.credential_client.audit import record
+            from accounts.credential_client.events import enqueue
+            event = record(AuditEvent.CONFIGURATION_UPDATED, credential=instance)
+            enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED)
         return instance
 
 
@@ -296,7 +340,7 @@ class CredentialClientStatusSerializer(serializers.ModelSerializer):
         credential = instance.binding.credential
         return {
             'id': str(credential.id), 'name': credential.name,
-            'key': credential.key, 'status': credential.status,
+            'key': credential.key, 'status': credential.status, 'mode': credential.mode,
         }
 
 
@@ -380,7 +424,7 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
                 id__in=credential_ids,
             ).order_by('id')
             credentials = {credential.id: credential for credential in locked_credentials}
-            states = list(CredentialClientStatus.objects.select_for_update().select_related(
+            states = list(CredentialClientStatus.objects.select_for_update(of=('self',)).select_related(
                 'binding__credential', 'binding__application', 'client__configuration',
                 'applied_account',
             ).filter(client=instance, binding__credential_id__in=credentials))

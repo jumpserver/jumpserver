@@ -1,6 +1,6 @@
 """Observe committed domain changes using the project's model signal entry points."""
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.db.models.signals import pre_save, post_save, pre_delete, m2m_changed
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -143,6 +143,8 @@ def subscription_targets(account, lock=False):
         applications__in=applications,
         mode=ApplicationCredential.Mode.subscription,
         is_active=True,
+    ).filter(
+        Q(subscription_all_authorized=True) | Q(subscription_accounts=account),
     ).distinct().order_by('key')
     if lock:
         ids = credentials.values('id')

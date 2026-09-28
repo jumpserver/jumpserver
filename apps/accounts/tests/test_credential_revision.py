@@ -24,6 +24,54 @@ class CredentialRevisionTests(CredentialTestCase):
         self.credential.active_account = None
         self.credential.revision = 8
         self.credential.save()
+        self.credential.subscription_accounts.set([self.primary, self.backup])
+
+    def test_only_selected_account_publishes_and_can_be_fetched(self):
+        from rest_framework.exceptions import PermissionDenied
+
+        self.credential.subscription_accounts.set([self.primary])
+        configuration = ClientAccessConfiguration.objects.create(
+            application=self.application, name='Selected SDK', type='sdk',
+        )
+        configuration.credentials.add(self.credential)
+        manager = CredentialClientManager(self.application, configuration.id, 'selected-client')
+        self.assertEqual(
+            CredentialClientManager.credential_keys(configuration),
+            [self.credential.account_key(self.primary.id)],
+        )
+        with self.assertRaises(PermissionDenied):
+            manager.fetch('', '127.0.0.1', self.backup.id)
+        with self.assertRaises(PermissionDenied):
+            manager.fetch(self.credential.account_key(self.backup.id), '127.0.0.1')
+        before = self.credential.revision
+        self.backup.secret = 'unsubscribed-change'
+        self.backup.save()
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.revision, before)
+
+    def test_changing_selected_accounts_notifies_connected_configuration(self):
+        from accounts.models import CredentialRotationEvent
+
+        configuration = ClientAccessConfiguration.objects.create(
+            application=self.application, name='Update SDK', type='sdk',
+        )
+        configuration.credentials.add(self.credential)
+        serializer = ApplicationCredentialSerializer(
+            self.credential,
+            data={'subscription_accounts': [str(self.primary.id)]}, partial=True,
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+        self.assertEqual(
+            list(self.credential.subscription_accounts.values_list('id', flat=True)),
+            [self.primary.id],
+        )
+        self.assertTrue(CredentialRotationEvent.objects.filter(
+            event='configuration.updated', rotation__isnull=True,
+            source_event_id__in=ApplicationAudit.objects.filter(
+                credential_id=self.credential.id,
+            ).values('id'),
+        ).exists())
 
     def test_password_update_publishes_once(self):
         ApplicationAudit.objects.filter(

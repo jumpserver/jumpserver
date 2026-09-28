@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from django.core import signing
 from django.core.cache import cache
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -85,6 +86,12 @@ class CredentialClientManager:
         if credential.mode == ApplicationCredential.Mode.subscription:
             if not separator or not account_id:
                 raise JMSException(_('Credential policy not found.'), code='credential_not_found')
+            if not credential.subscription_all_authorized and not credential.subscription_accounts.filter(
+                id=account_id
+            ).exists():
+                raise PermissionDenied(_(
+                    'This account is not selected by the credential change subscription.'
+                ), code='credential_not_selected')
             account = self.application.get_accounts().select_related(
                 'asset__platform'
             ).filter(id=account_id).first()
@@ -108,6 +115,9 @@ class CredentialClientManager:
             applications=self.application,
             mode=ApplicationCredential.Mode.subscription,
             is_active=True,
+        ).filter(
+            Q(subscription_all_authorized=True) |
+            Q(subscription_accounts__id=account_id),
         ).order_by('key').first()
         if not credential:
             raise PermissionDenied(
@@ -235,7 +245,10 @@ class CredentialClientManager:
             if credential.mode == ApplicationCredential.Mode.subscription:
                 if accounts is None:
                     accounts = configuration.application.get_accounts().order_by('id')
-                for account in accounts:
+                selected = accounts if credential.subscription_all_authorized else accounts.filter(
+                    id__in=credential.subscription_accounts.values('id')
+                )
+                for account in selected:
                     keys.append(credential.account_key(account.id))
             elif credential.authorized_applications().filter(
                 id=configuration.application_id

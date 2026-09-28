@@ -46,6 +46,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         self.credential = ApplicationCredential.objects.create(
             name='Stream policy', mode=ApplicationCredential.Mode.subscription,
         )
+        self.credential.subscription_accounts.add(self.account)
         CredentialApplicationBinding.objects.create(
             credential=self.credential, application=self.application,
         )
