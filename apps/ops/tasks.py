@@ -37,10 +37,10 @@ def job_task_activity_callback(self, job_id, *args, **kwargs):
     return resource_ids, org_id
 
 
-def _run_ops_job_execution(execution, check_login_acl=False):
+def _run_ops_job_execution(execution):
     try:
         with tmp_to_org(execution.org):
-            execution.start(check_login_acl=check_login_acl)
+            execution.start()
     except SoftTimeLimitExceeded:
         execution.set_error('Run timeout')
         logger.error("Run adhoc timeout")
@@ -71,7 +71,15 @@ def run_ops_job(job_id):
         execution.creator = job.creator
         if job.periodic_variable:
             execution.parameters = JobExecutionSerializer().validate_parameters(job.periodic_variable)
-        _run_ops_job_execution(execution, check_login_acl=True)
+        try:
+            execution.set_celery_id()
+            execution.save()
+            execution.check_login_asset_acls()
+        except Exception as e:
+            execution.set_error(e)
+            logger.error("Start adhoc execution error: {}".format(e))
+            return
+        _run_ops_job_execution(execution)
 
 
 def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):

@@ -638,13 +638,11 @@ class JobExecution(JMSOrgBaseModel):
         self.check_assets_perms()
         self.check_assets_acls()
 
-    def start(self, check_login_acl=False, **kwargs):
+    def start(self, **kwargs):
         self.date_start = timezone.now()
         self.set_celery_id()
         self.save()
         self.before_start()
-        if check_login_acl:
-            self.check_login_asset_acls()
 
         runner = self.get_runner()
         runner.cb = TaskLogCallback(self.task_id)
