@@ -58,10 +58,13 @@ def build_allowed_origins(configured, site_url, domains):
         if '://' in domain:
             values.append(domain)
             continue
-        values.append(f'{site_scheme}://{domain}')
-        host = domain.split(':')[0].strip('[]').lower()
+        netloc = domain
+        if domain.count(':') > 1 and not domain.startswith('['):
+            netloc = f'[{domain}]'
+        values.append(f'{site_scheme}://{netloc}')
+        host = (urlsplit(f'{site_scheme}://{netloc}').hostname or '').lower()
         if host in {'localhost', '127.0.0.1', '::1'} and site_scheme == 'https':
-            values.append(f'http://{domain}')
+            values.append(f'http://{netloc}')
     try:
         return sorted({normalize_origin(value, allow_path=True) for value in values})
     except (TypeError, ValueError) as exc:

@@ -142,7 +142,11 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         replay_key = 'http_sig:%s:%s' % (
             key_id, hashlib.sha256(signature.encode('utf-8')).hexdigest()
         )
-        if not cache.add(replay_key, True, timeout=self.max_clock_skew):
+        try:
+            stored = cache.add(replay_key, True, timeout=2 * self.max_clock_skew)
+        except Exception:
+            raise FAILED from None
+        if not stored:
             raise FAILED
 
         self.after_authenticate_update_date(user)
