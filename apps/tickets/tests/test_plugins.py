@@ -157,15 +157,35 @@ class TicketPluginTests(TestCase):
     def create_account(self):
         return Account.objects.create(asset=self.asset, name='root', username='root', secret='never-in-ticket')
 
+    def replay_ticket(self, *, approved=True, mode='automatic'):
+        session = Session.objects.create(user_id=str(self.applicant.pk), user='Applicant',
+                                         asset_id=str(self.asset.pk), asset='Recorded asset', account='root',
+                                         has_replay=True, is_finished=True)
+        serializer = self.serializer(self.payload('download_replay', session=str(session.pk), duration=600))
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        ticket = serializer.save()
+        with patch.object(get_ticket_plugin('download_replay'), 'execution_mode', mode):
+            instance = submit_ticket(ticket)
+        if approved:
+            self.engine.approve(self.task(instance), self.alice)
+            instance.refresh_from_db()
+            ticket.refresh_from_db()
+            self.assertEqual(instance.state, 'approved', list(instance.events.values('type', 'data')))
+        return session, ticket, instance
+
+    def replay_download(self, ticket, user=None):
+        request = APIRequestFactory().get('/')
+        force_authenticate(request, user or self.applicant)
+        with transaction.atomic():
+            return TicketViewSet.as_view({'get': 'download_replay'},
+                                        **TicketViewSet.download_replay.kwargs)(request, pk=ticket.pk)
+
     def test_common_plugins_submit_approve_and_do_not_claim_execution(self):
         self.create_account()
-        session = Session.objects.create(user_id=str(self.applicant.pk), user='Applicant',
-                                         asset_id=str(self.asset.pk), asset='Asset', account='root', org_id=self.org.id)
         for ticket_type, parameters in [
             ('change_secret', {'asset': str(self.asset.pk), 'accounts': ['root']}),
             ('file_transfer', {'asset': str(self.asset.pk), 'accounts': ['root'],
                                'direction': 'download', 'paths': ['/var/log/app.log']}),
-            ('download_replay', {'session': str(session.pk)}),
         ]:
             with self.subTest(ticket_type=ticket_type):
                 serializer = self.serializer(self.payload(ticket_type, **parameters))
@@ -212,6 +232,320 @@ class TicketPluginTests(TestCase):
         serializer = self.serializer(self.payload('download_replay', session=str(session.pk)))
         with patch.object(type(self.applicant), 'has_perm', return_value=False):
             self.assertFalse(serializer.is_valid())
+
+    def test_replay_approval_grants_frozen_access_only_on_ticket_detail(self):
+        session, ticket, instance = self.replay_ticket(approved=False)
+        plugin = get_ticket_plugin('download_replay')
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'pending'}))
+        self.assertEqual(self.replay_download(ticket).status_code, 403)
+        self.engine.approve(self.task(instance), self.alice)
+        ticket.refresh_from_db()
+        instance.refresh_from_db()
+        self.assertEqual(instance.state, 'approved', list(instance.events.values('type', 'data')))
+        expires_at = instance.date_finished + timedelta(seconds=600)
+        expected = [{'type': 'download_replay', 'session_id': str(session.pk),
+                     'expires_at': expires_at.isoformat()}]
+        self.assertEqual(instance.context['plugin']['execution_mode'], 'automatic')
+        self.assertEqual(instance.events.get(type='action.executed').data['action'], 'grant_replay_download')
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant),
+                         (expected, {'state': 'available', 'expires_at': expires_at.isoformat()}))
+        context = {'request': SimpleNamespace(user=self.applicant), 'view': SimpleNamespace(action='retrieve')}
+        with patch.object(plugin, 'get_replay_access', wraps=plugin.get_replay_access) as access:
+            detail = TicketSerializer(ticket, context=context).data
+            self.assertEqual(detail['available_actions'], expected)
+            self.assertEqual(detail['replay_access_status']['state'], 'available')
+            access.assert_called_once()
+        context['view'].action = 'list'
+        with patch.object(plugin, 'get_replay_access') as access:
+            listing = TicketSerializer(ticket, context=context).data
+            self.assertIsNone(listing['replay_access_status'])
+            self.assertEqual(listing['available_actions'], [])
+            access.assert_not_called()
+        Ticket.objects.filter(pk=ticket.pk).update(request_data={'session': str(uuid4()), 'duration': 86400})
+        ticket.refresh_from_db()
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant)[0], expected)
+        with patch('django.utils.timezone.now', return_value=expires_at):
+            self.assertEqual(plugin.get_replay_access(ticket, self.applicant),
+                             ([], {'state': 'expired', 'expires_at': expires_at.isoformat()}))
+            self.assertEqual(self.replay_download(ticket).status_code, 403)
+
+    def test_replay_access_rejects_other_users_unavailable_resources_and_missing_workflow(self):
+        session, ticket, instance = self.replay_ticket()
+        plugin = get_ticket_plugin('download_replay')
+        self.assertEqual(plugin.get_replay_access(ticket, self.alice), ([], {'state': 'not_applicant'}))
+        self.assertEqual(self.replay_download(ticket, self.alice).status_code, 403)
+        self.assertIn(self.replay_download(ticket, self.bob).status_code, (403, 404))
+        for state in ('rejected', 'closed', 'expired', 'error'):
+            ticket.state = state
+            self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unapproved'}))
+        ticket.refresh_from_db()
+        for active in (False, True):
+            User.objects.filter(pk=self.applicant.pk).update(is_active=active)
+            if not active:
+                self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+                self.assertEqual(self.replay_download(ticket).status_code, 403)
+        with tmp_to_org(self.other_org):
+            self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+            self.assertEqual(self.replay_download(ticket).status_code, 403)
+        RoleBinding.objects_raw.filter(user=self.applicant, org=self.org).delete()
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+        self.assertEqual(self.replay_download(ticket).status_code, 403)
+        RoleBinding.objects_raw.create(user=self.applicant, role=self.role, org=self.org, scope='org')
+        instance.state = 'running'
+        instance.save(update_fields=['state'])
+        ticket.refresh_from_db()
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unapproved'}))
+        instance.state = 'approved'
+        instance.save(update_fields=['state'])
+        ticket.refresh_from_db()
+        Session.objects.filter(pk=session.pk).update(org_id=self.other_org.id)
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+        self.assertEqual(self.replay_download(ticket).status_code, 403)
+        with tmp_to_root_org():
+            Session.objects.filter(pk=session.pk).update(org_id=self.org.id)
+        Session.objects.filter(pk=session.pk).update(has_replay=False)
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+        session.delete()
+        self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+        unbacked = Ticket.objects.create(title='Unbacked replay request', type='download_replay',
+                                         applicant=self.applicant, org_id=self.org.id, state='approved',
+                                         status='closed', request_data=ticket.request_data)
+        self.assertEqual(plugin.get_replay_access(unbacked, self.applicant), ([], {'state': 'unavailable'}))
+        self.assertEqual(self.replay_download(unbacked).status_code, 403)
+
+    def test_replay_access_and_execution_follow_the_current_plugin_mode(self):
+        from django.http import HttpResponse
+        from terminal.api.session.session import SessionViewSet
+
+        plugin = get_ticket_plugin('download_replay')
+        for mode in ('approval_only', None):
+            with self.subTest(snapshot_mode=mode):
+                session, ticket, instance = self.replay_ticket(mode=mode)
+                self.assertEqual(instance.context['plugin']['execution_mode'], mode)
+                self.assertEqual(instance.events.get(type='action.executed').data['action'], 'grant_replay_download')
+                actions, status = plugin.get_replay_access(ticket, self.applicant)
+                self.assertEqual(status['state'], 'available')
+                self.assertEqual(actions[0]['session_id'], str(session.pk))
+                self.assertEqual(TicketSerializer(ticket).data['execution_mode'], 'automatic')
+                with patch.object(SessionViewSet, 'build_replay_download_response', return_value=HttpResponse()) as response:
+                    self.assertEqual(self.replay_download(ticket).status_code, 200)
+                    response.assert_called_once()
+
+    def test_ticket_replay_download_reuses_both_formats_and_preserves_terminal_rbac(self):
+        import json
+        import tarfile
+        import tempfile
+        from io import BytesIO
+        from pathlib import Path
+        from terminal.api.session.session import SessionViewSet
+
+        session, ticket, instance = self.replay_ticket()
+        with tempfile.TemporaryDirectory() as directory, override_settings(MEDIA_ROOT=directory, DEBUG_DEV=False), \
+                patch('terminal.api.session.session.ReplayStorageHandler') as storage, \
+                patch.object(SessionViewSet, 'prepare_offline_file', wraps=SessionViewSet.prepare_offline_file) as regular, \
+                patch('terminal.api.session.session.SessionPartReplayStorageHandler') as parts, \
+                patch('terminal.api.session.session.record_operate_log_and_activity_log'):
+            recording = Path(directory, 'replay/source.cast.gz')
+            recording.parent.mkdir()
+            recording.write_bytes(b'fake recording bytes')
+            output = str(recording.parent / f'{session.pk}.tar')
+            parts.return_value.prepare_offline_tar_file.return_value = output
+            for suffix in ('.cast.gz', '.replay.json'):
+                storage.return_value.get_file_path_url.return_value = ('replay/source' + suffix, '/source' + suffix)
+                response = self.replay_download(ticket)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn('X-Accel-Redirect', response)
+                self.assertEqual(response.content, b'')
+                self.assertIn(str(session.pk) + '.tar', response['Content-Disposition'])
+                self.assertIn('no-store', response['Cache-Control'])
+            regular.assert_called_once()
+            parts.return_value.prepare_offline_tar_file.assert_called_once()
+            with tarfile.open(output) as archive:
+                self.assertEqual(archive.extractfile('source.cast.gz').read(), b'fake recording bytes')
+                metadata = json.load(archive.extractfile(f'{session.pk}.json'))
+                self.assertEqual(metadata['id'], str(session.pk))
+                self.assertEqual(metadata['account'], 'root')
+            self.assertEqual(instance.events.filter(type='replay.downloaded', actor=self.applicant).count(), 2)
+            request = APIRequestFactory().get('/')
+            force_authenticate(request, self.applicant)
+            endpoint = SessionViewSet.as_view({'get': 'download'}, **SessionViewSet.download.kwargs)
+            self.assertEqual(endpoint(request, pk=session.pk).status_code, 403)
+            permission = Permission.objects.get(codename='download_sessionreplay', content_type__app_label='terminal')
+            role = Role.objects.create(name=str(uuid4()), scope='org')
+            role.permissions.add(permission)
+            RoleBinding.objects_raw.create(user=self.applicant, role=role, org=self.org, scope='org')
+            self.applicant.expire_rbac_perms_cache()
+            user = User.objects.get(pk=self.applicant.pk)
+            request = APIRequestFactory().get('/')
+            force_authenticate(request, user)
+            self.assertEqual(endpoint(request, pk=session.pk).status_code, 200)
+            storage.return_value.get_file_path_url.return_value = ('replay/source.cast.gz', '/source.cast.gz')
+            with override_settings(DEBUG_DEV=True):
+                response = self.replay_download(ticket)
+                try:
+                    self.assertEqual(response.status_code, 200)
+                    self.assertNotIn('X-Accel-Redirect', response)
+                    self.assertIn(str(session.pk) + '.tar', response['Content-Disposition'])
+                    self.assertIn('no-store', response['Cache-Control'])
+                    body = b''.join(response.streaming_content)
+                    self.assertTrue(body)
+                    with tarfile.open(fileobj=BytesIO(body)) as archive:
+                        self.assertEqual(archive.extractfile('source.cast.gz').read(), b'fake recording bytes')
+                        metadata = json.load(archive.extractfile(f'{session.pk}.json'))
+                        self.assertEqual(metadata['id'], str(session.pk))
+                finally:
+                    response.close()
+
+    def test_ticket_replay_download_checks_expiry_again_after_packaging_and_handles_missing_files(self):
+        from django.core.files.storage import default_storage
+        from terminal.api.session.session import SessionViewSet
+
+        session, ticket, instance = self.replay_ticket()
+        now = [timezone.now()]
+
+        def finish_after_expiry(*args):
+            now[0] = instance.date_finished + timedelta(seconds=600)
+            return default_storage.path(f'replay/{session.pk}.tar')
+
+        with patch('terminal.api.session.session.ReplayStorageHandler') as storage, \
+                patch.object(SessionViewSet, 'prepare_offline_file', side_effect=finish_after_expiry), \
+                patch('terminal.api.session.session.record_operate_log_and_activity_log') as audit, \
+                patch('django.utils.timezone.now', side_effect=lambda: now[0]):
+            storage.return_value.get_file_path_url.return_value = (None, 'Replay not found')
+            self.assertEqual(self.replay_download(ticket).status_code, 404)
+            storage.return_value.get_file_path_url.return_value = ('replay/source.cast.gz', '/source.cast.gz')
+            response = self.replay_download(ticket)
+            self.assertEqual(response.status_code, 403)
+            self.assertNotIn('X-Accel-Redirect', response)
+            with override_settings(DEBUG_DEV=True):
+                now[0] = instance.date_finished + timedelta(seconds=1)
+                response = self.replay_download(ticket)
+                self.assertEqual(response.status_code, 403)
+                self.assertNotIn('X-Accel-Redirect', response)
+            audit.assert_not_called()
+        self.assertFalse(instance.events.filter(type='replay.downloaded').exists())
+
+    def test_replay_details_keep_frozen_session_information_after_changes_and_deletion(self):
+        started = timezone.now()
+        session = Session.objects.create(user_id=str(self.applicant.pk), user='Applicant',
+                                         asset_id=str(self.asset.pk), asset='Original asset', account='root',
+                                         date_start=started, has_replay=True)
+        serializer = self.serializer(self.payload('download_replay', session=str(session.pk)))
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        ticket = serializer.save()
+        instance = submit_ticket(ticket)
+        expected = {'session_asset': 'Original asset', 'session_account': 'root',
+                    'session_user': 'Applicant', 'session_date_start': started.isoformat(), 'duration': 3600}
+        self.assertEqual(instance.context['request']['session'], str(session.pk))
+        for name, value in expected.items():
+            self.assertEqual(instance.context['request'][name], value)
+        plugin = get_ticket_plugin('download_replay')
+        Session.objects.filter(pk=session.pk).update(asset='Renamed asset', account='changed', user='Renamed user',
+                                                    date_start=started + timedelta(days=1))
+        Ticket.objects.filter(pk=ticket.pk).update(request_data={'session': str(uuid4()), 'duration': 60})
+        ticket.refresh_from_db()
+        self.assertEqual({item['name']: item['value'] for item in plugin.request_items(ticket)}, expected)
+        session.delete()
+        self.assertEqual({item['name']: item['value'] for item in plugin.request_items(ticket)}, expected)
+
+    def test_replay_details_use_only_the_frozen_request_without_database_lookups(self):
+        values = {'session_asset': 'Snapshot asset', 'session_account': 'snapshot-account',
+                  'session_user': 'Snapshot user', 'session_date_start': timezone.now().isoformat(), 'duration': 7200}
+        context = {'request': {'session': str(uuid4()), **values}, 'accounts': [{'username': 'not-the-request'}]}
+        ticket = SimpleNamespace(org_id=self.org.id, request_data={'session': str(uuid4()), 'duration': 60},
+                                 workflow_instance=SimpleNamespace(context=context))
+        plugin = get_ticket_plugin('download_replay')
+        with self.assertNumQueries(0):
+            self.assertEqual({item['name']: item['value'] for item in plugin.request_items(ticket)}, values)
+            context['request'] = {'session': str(uuid4()), 'duration': 7200}
+            self.assertEqual({item['name']: item['value'] for item in plugin.request_items(ticket)}, {'duration': 7200})
+            ticket.workflow_instance = None
+            self.assertEqual(plugin.request_items(ticket), [])
+
+    def test_replay_options_follow_session_scope_without_changing_submission_rules(self):
+        own = Session.objects.create(user_id=str(self.applicant.pk), user='Applicant', asset='Own', has_replay=True)
+        no_replay = Session.objects.create(user_id=str(self.applicant.pk), user='Applicant', asset='No replay')
+        another = Session.objects.create(user_id=str(self.bob.pk), user='Bob', asset='Another', has_replay=True)
+        with tmp_to_org(self.other_org):
+            foreign = Session.objects.create(user_id=str(self.applicant.pk), user='Applicant', asset='Foreign', has_replay=True)
+        permission = Permission.objects.get(codename='view_session', content_type__app_label='terminal')
+        role = Role.objects.create(name=str(uuid4()), scope='org')
+        role.permissions.add(permission)
+        RoleBinding.objects_raw.create(user=self.alice, role=role, org=self.org, scope='org')
+        self.alice.expire_rbac_perms_cache()
+        self.alice = User.objects.get(pk=self.alice.pk)
+        plugin = get_ticket_plugin('download_replay')
+
+        def options(user, org_id=self.org.id):
+            request = APIRequestFactory().get('/', {'org_id': org_id})
+            force_authenticate(request, user)
+            return TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='download_replay')
+
+        self.assertFalse(self.applicant.has_perm('terminal.view_session'))
+        self.assertTrue(self.alice.has_perm('terminal.view_session'))
+        response = options(self.applicant)
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual([row['id'] for row in response.data['results']], [own.pk])
+        self.assertEqual(set(response.data['results'][0]),
+                         {'id', 'asset', 'account', 'user', 'protocol', 'date_start', 'is_finished'})
+        audited = options(self.alice)
+        self.assertEqual(audited.status_code, 200, audited.data)
+        self.assertEqual({row['id'] for row in audited.data['results']}, {own.pk, another.pk})
+        for user in (self.applicant, self.alice):
+            self.assertEqual(options(user, self.other_org.id).status_code, 403)
+            context = {'request': SimpleNamespace(user=user), 'org_id': self.org.id}
+            with self.assertRaises(serializers.ValidationError):
+                plugin.get_request_serializer(context=context).validate_session(foreign.pk)
+        context = {'request': SimpleNamespace(user=self.applicant), 'org_id': self.org.id}
+        request_serializer = plugin.get_request_serializer(context=context)
+        self.assertEqual(request_serializer.validate_session(no_replay.pk), no_replay.pk)
+        with self.assertRaises(serializers.ValidationError):
+            request_serializer.validate_session(another.pk)
+        context['request'] = SimpleNamespace(user=self.alice)
+        self.assertEqual(plugin.get_request_serializer(context=context).validate_session(another.pk), another.pk)
+        field = next(field for field in plugin.metadata()['fields'] if field['name'] == 'session')
+        self.assertEqual(field['resource'], 'session')
+
+    def test_replay_options_search_and_bounded_stable_pagination(self):
+        from urllib.parse import parse_qs, urlparse
+
+        now = timezone.now()
+        sessions = [Session(user_id=str(self.applicant.pk), user='Applicant', asset=f'node-{index}',
+                            account=f'svc-{index}', date_start=now, has_replay=True) for index in range(105)]
+        sessions[0].asset = 'Database edge'
+        sessions[0].protocol = 'rdp'
+        sessions[0].user = 'Unique applicant'
+        sessions[0].date_start = now + timedelta(seconds=1)
+        sessions[-1].asset = 'x' * 128
+        Session.objects.bulk_create(sessions)
+        ordered = sorted(sessions, key=lambda session: (session.date_start, session.pk), reverse=True)
+
+        def options(**params):
+            request = APIRequestFactory().get('/', {'org_id': self.org.id, **params})
+            force_authenticate(request, self.applicant)
+            response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='download_replay')
+            self.assertEqual(response.status_code, 200, response.data)
+            return response.data
+
+        first = options()
+        self.assertEqual(first['count'], 105)
+        self.assertEqual([row['id'] for row in first['results']], [session.pk for session in ordered[:20]])
+        self.assertIsNone(first['previous'])
+        next_params = {key: values[0] for key, values in parse_qs(urlparse(first['next']).query).items()}
+        second = options(**next_params)
+        self.assertEqual([row['id'] for row in second['results']], [session.pk for session in ordered[20:40]])
+        self.assertIsNotNone(second['previous'])
+        self.assertEqual(len(options(limit=999)['results']), 100)
+        self.assertEqual(len(options(limit=100, offset=100)['results']), 5)
+        self.assertEqual(options(offset=105)['results'], [])
+        for search, session in [('DATABASE', sessions[0]), ('svc-43', sessions[43]),
+                                ('Unique applicant', sessions[0]), ('rdp', sessions[0]),
+                                (str(sessions[72].pk), sessions[72]), ('x' * 133, sessions[-1])]:
+            with self.subTest(search=search):
+                matches = options(search=search)
+                self.assertEqual(matches['count'], 1)
+                self.assertEqual([row['id'] for row in matches['results']], [session.pk])
+        self.assertEqual(options(search='not-a-valid-uuid')['results'], [])
 
     def test_uniform_endpoint_persists_type_and_scoped_payload(self):
         self.create_account()
@@ -453,18 +787,25 @@ class TicketPluginTests(TestCase):
         items = {item['name']: item['value'] for item in get_ticket_plugin(ticket.type).request_items(ticket)}
         self.assertEqual(items['accounts'], ['root'])
 
-    def test_enabling_handler_does_not_execute_existing_approval_only_requests(self):
-        self.create_account()
+    def test_current_password_handler_executes_regardless_of_snapshot_mode(self):
+        account = self.create_account()
         serializer = self.serializer(self.payload(asset=str(self.asset.pk), accounts=['root']))
         self.assertTrue(serializer.is_valid(), serializer.errors)
         ticket = serializer.save()
         plugin = get_ticket_plugin('view_secret')
         with patch.object(plugin, 'execution_mode', 'approval_only'):
             instance = submit_ticket(ticket)
-        with patch.object(plugin, 'on_approved') as handler:
+        with patch.object(plugin, 'on_approved', wraps=plugin.on_approved) as handler:
             self.engine.approve(self.task(instance), self.alice)
-            handler.assert_not_called()
-        self.assertFalse(instance.events.filter(type='action.executed').exists())
+            handler.assert_called_once()
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.state, 'approved')
+        self.assertEqual(instance.events.get(type='action.executed').data['action'], 'grant_secret_access')
+        grant = TicketSecretAccess.objects.get(ticket=ticket, account_id=account.pk)
+        self.assertEqual((grant.user_id, grant.org_id), (self.applicant.pk, self.org.id))
+        self.assertTrue(grant.is_active)
+        self.assertGreater(grant.expires_at, timezone.now())
+        self.assertEqual(TicketSerializer(ticket).data['execution_mode'], 'automatic')
 
     def test_view_secret_approval_creates_scoped_grant_and_reveals_only_to_applicant(self):
         account = self.create_account()
