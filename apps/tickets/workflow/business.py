@@ -89,11 +89,8 @@ def apply_approved_effect(instance, ticket):
     if not available_users(instance.org_id).filter(pk=instance.applicant_id).exists():
         raise WorkflowConfigurationError('The applicant is no longer eligible for access.')
     plugin = get_ticket_plugin(ticket.type)
-    mode = instance.context.get('plugin', {}).get('execution_mode', plugin.execution_mode)
-    if mode == 'approval_only':
+    if plugin.execution_mode == 'approval_only':
         return None
-    if mode != plugin.execution_mode:
-        raise WorkflowConfigurationError('The ticket execution mode changed. Submit a new request.')
     with tmp_to_org(instance.org_id):
         return plugin.on_approved(instance, ticket)
 
