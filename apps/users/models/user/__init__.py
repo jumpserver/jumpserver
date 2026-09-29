@@ -65,6 +65,10 @@ class User(
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))
+    manager = models.ForeignKey(
+        'self', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='direct_reports', verbose_name=_("Manager"),
+    )
     email = fields.EncryptCharField(max_length=128, unique=True, verbose_name=_("Email"))
     email_lookup = models.CharField(
         max_length=128, blank=True, null=True, verbose_name=_("Email lookup")

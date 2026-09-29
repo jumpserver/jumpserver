@@ -1,3 +1,4 @@
+from .workflow import WorkflowACLSerializerMixin
 from django.utils.translation import gettext as _
 
 from common.serializers import CommonBulkModelSerializer
@@ -12,12 +13,12 @@ __all__ = ["LoginACLSerializer"]
 common_help_text = _("With * indicating a match all. ")
 
 
-class LoginACLSerializer(BaseUserACLSerializer, CommonBulkModelSerializer):
+class LoginACLSerializer(WorkflowACLSerializerMixin, BaseUserACLSerializer, CommonBulkModelSerializer):
     rules = MethodSerializer(label=_('Rule'))
 
     class Meta(BaseUserACLSerializer.Meta):
         model = LoginACL
-        fields = list((set(BaseUserACLSerializer.Meta.fields) | {'rules'}))
+        fields = list((set(BaseUserACLSerializer.Meta.fields) | {'rules', 'workflow'}))
         action_choices_exclude = [
             ActionChoices.warning,
             ActionChoices.notify_and_warn,

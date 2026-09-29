@@ -1,3 +1,4 @@
+from .workflow import WorkflowACLSerializerMixin
 from django.utils.translation import gettext_lazy as _
 
 from common.serializers import MethodSerializer
@@ -9,12 +10,12 @@ from ..models import LoginAssetACL
 __all__ = ["LoginAssetACLSerializer"]
 
 
-class LoginAssetACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
+class LoginAssetACLSerializer(WorkflowACLSerializerMixin, BaseSerializer, BulkOrgResourceModelSerializer):
     rules = MethodSerializer(label=_('Rule'))
 
     class Meta(BaseSerializer.Meta):
         model = LoginAssetACL
-        fields = BaseSerializer.Meta.fields + ['rules']
+        fields = BaseSerializer.Meta.fields + ['rules', 'workflow']
 
     def get_rules_serializer(self):
         return RuleSerializer()

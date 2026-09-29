@@ -173,6 +173,18 @@ class UserSerializer(
         label=_("Allowed MFA types"),
         help_text=_("Leave empty to inherit the global MFA methods"),
     )
+    manager = ObjectRelatedField(
+        queryset=User.objects, required=False, allow_null=True,
+        attrs=("id", "name", "username"), label=_("Manager"),
+    )
+
+    def validate_manager(self, manager):
+        from tickets.workflow.approvers import available_users
+        from orgs.utils import current_org
+        if manager and (manager == self.instance or not available_users(str(current_org.id)).filter(pk=manager.pk).exists()):
+            raise serializers.ValidationError("Select another active user in this organization.")
+        return manager
+
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
         "org_roles": [BuiltinRole.org_user],
@@ -223,7 +235,7 @@ class UserSerializer(
                 ]
         )
         # 外键的字段
-        fields_fk = []
+        fields_fk = ["manager"]
         # 多对多字段
         fields_m2m = ["groups", "system_roles", "org_roles", "orgs_roles", "labels"]
         # 在serializer 上定义的字段
@@ -240,7 +252,7 @@ class UserSerializer(
             "date_api_key_last_used",
         ]
         fields_only_root_org = ["orgs_roles"]
-        disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
+        disallow_self_update_fields = ["is_active", "system_roles", "org_roles", "manager"]
         extra_kwargs = {
             "name": {
                 "help_text": _("Full name"),

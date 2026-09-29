@@ -14303,3 +14303,37 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "자산 로그인 ACL에서 추가 작업을 요구하므로 자격 증명을 검증할 수 없습니다."
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "자산 담당자"
+
+msgid "Manager"
+msgstr "Manager"
+
+msgid "Workflow"
+msgstr "Workflow"
+
+msgid "Approval workflow"
+msgstr "Approval workflow"
+
+msgid "Workflow version"
+msgstr "Workflow version"
+
+msgid "Workflow instance"
+msgstr "Workflow instance"
+
+msgid "Workflow node"
+msgstr "Workflow node"
+
+msgid "Workflow edge"
+msgstr "Workflow edge"
+
+msgid "Workflow node instance"
+msgstr "Workflow node instance"
+
+msgid "Approval task"
+msgstr "Approval task"
+
+msgid "Workflow event"
+msgstr "Workflow event"

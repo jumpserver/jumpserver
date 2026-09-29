@@ -64,7 +64,7 @@ class BaseACL(JMSBaseModel):
             return
 
         for acl in acl_qs:
-            if acl.is_action(ActionChoices.review) and not acl.reviewers.exists():
+            if acl.is_action(ActionChoices.review) and not getattr(acl, 'workflow_id', None) and not acl.reviewers.exists():
                 continue
             ip_group = acl.rules.get('ip_group')
             time_periods = acl.rules.get('time_period')
