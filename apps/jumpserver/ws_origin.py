@@ -48,9 +48,12 @@ def build_allowed_origins(configured, site_url, domains):
 
     # Use operator-configured domains, not ALLOWED_HOSTS or implicit debug hosts.
     values = [site_url] if site_url else []
-    site_scheme = urlsplit(site_url).scheme if site_url else ''
+    site = urlsplit(site_url) if site_url else None
+    site_scheme = site.scheme if site else ''
     if site_scheme not in ('http', 'https'):
         site_scheme = 'https'
+    loopback_hosts = {'localhost', '127.0.0.1', '::1'}
+    site_is_loopback = site and (site.hostname or '').lower() in loopback_hosts
     for domain in (domains or '').split(','):
         domain = domain.strip()
         if not domain or '*' in domain or domain.startswith('.'):
@@ -61,9 +64,11 @@ def build_allowed_origins(configured, site_url, domains):
         netloc = domain
         if domain.count(':') > 1 and not domain.startswith('['):
             netloc = f'[{domain}]'
-        values.append(f'{site_scheme}://{netloc}')
-        host = (urlsplit(f'{site_scheme}://{netloc}').hostname or '').lower()
-        if host in {'localhost', '127.0.0.1', '::1'} and site_scheme == 'https':
+        host = (urlsplit(f'https://{netloc}').hostname or '').lower()
+        # The default loopback SITE_URL is for local access; public domains use HTTPS.
+        domain_scheme = 'https' if site_is_loopback and host not in loopback_hosts else site_scheme
+        values.append(f'{domain_scheme}://{netloc}')
+        if host in loopback_hosts and domain_scheme == 'https':
             values.append(f'http://{netloc}')
     try:
         return sorted({normalize_origin(value, allow_path=True) for value in values})
