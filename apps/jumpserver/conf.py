@@ -486,8 +486,7 @@ class Config(dict):
         'AUTH_OAUTH2_CERT_VERIFY_MODE': 'system',
         'AUTH_OAUTH2_CACERT_CONTENT': '',
         'AUTH_OAUTH2_USER_ATTR_MAP': {
-            'name': 'name', 'username': 'username', 'email': 'email',
-            'groups': 'groups',
+            'name': 'name', 'username': 'username', 'email': 'email'
         },
         'OAUTH2_ORG_IDS': [DEFAULT_ID],
 

@@ -49,7 +49,7 @@ def check_only_allow_exist_user_auth(created):
 
 def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
     if not check_only_allow_exist_user_auth(created):
-        return False
+        return
 
     if created:
         logger.debug(f'Receive user created signal: {user}, Set user source is: {source}')
@@ -63,7 +63,7 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
             bind_user_to_group(org_ids, group_names, user)
 
     if not attrs:
-        return True
+        return
 
     always_update = getattr(settings, 'AUTH_%s_ALWAYS_UPDATE_USER' % source.upper(), False)
     if not created and always_update:
@@ -78,7 +78,6 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
             if key in attr_whitelist and value:
                 setattr(user, key, value)
         user.save()
-    return True
 
 
 def set_user_email_lookup(user):
@@ -179,8 +178,8 @@ def on_oauth2_create_or_update_user(sender, user, created, attrs, **kwargs):
     attrs = attrs or {}
     user_attrs = attrs.copy()
     group_names = user_attrs.pop('groups', None)
-    handled = user_authenticated_handle(user, created, source, user_attrs, **kwargs)
-    if handled and 'groups' in attrs:
+    user_authenticated_handle(user, created, source, user_attrs, **kwargs)
+    if 'groups' in attrs and not (created and settings.ONLY_ALLOW_EXIST_USER_AUTH):
         sync_oauth2_user_groups(user, group_names)
 
 
@@ -313,14 +312,14 @@ def bind_user_to_group(org_ids, group_names, user, ignore_conflicts=False):
 
 def sync_oauth2_user_groups(user, group_names):
     if isinstance(group_names, str):
-        group_names = [group_names]
+        group_names = [group_names] if group_names.strip() else []
     if not isinstance(group_names, list) or any(
         not isinstance(name, str) or not name.strip() for name in group_names
     ):
         logger.warning('Skip OAuth2 user group sync: invalid groups attribute')
         return
 
-    prefix = 'OAuth2 '
+    prefix = 'OAuth2_'
     names = {prefix + name.strip() for name in group_names}
     if any(len(name) > UserGroup._meta.get_field('name').max_length for name in names):
         logger.warning('Skip OAuth2 user group sync: group name is too long')

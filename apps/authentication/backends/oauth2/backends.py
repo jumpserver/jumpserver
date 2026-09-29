@@ -49,8 +49,8 @@ class OAuth2Backend(RedirectAuthBackend):
             if field == 'groups':
                 continue
             user_attrs[field] = userinfo.get(attr, '')
-        group_attr = attr_map.get('groups', 'groups')
-        if group_attr in userinfo:
+        group_attr = attr_map.get('groups')
+        if isinstance(group_attr, str) and group_attr and group_attr in userinfo:
             user_attrs['groups'] = userinfo[group_attr]
 
         username = user_attrs.get('username')
