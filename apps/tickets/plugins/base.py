@@ -90,4 +90,9 @@ class TicketPlugin:
 
     def options(self, request, org_id):
         from rest_framework.exceptions import ValidationError
+        from .resources import AssetAccountRequestSerializer
+        if self.request_serializer:
+            serializer = self.get_request_serializer(context={'request': request, 'org_id': org_id})
+            if isinstance(serializer, AssetAccountRequestSerializer):
+                return serializer.account_options(request.query_params.get('asset'))
         raise ValidationError('This ticket type has no resource options.')

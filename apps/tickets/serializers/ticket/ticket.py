@@ -47,6 +47,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     request_items = serializers.SerializerMethodField()
     execution_mode = serializers.SerializerMethodField()
     available_actions = serializers.SerializerMethodField()
+    secret_access_status = serializers.SerializerMethodField()
 
     @staticmethod
     def get_request_items(obj):
@@ -65,8 +66,26 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         view = self.context.get('view')
         if not view or view.action != 'retrieve':
             return []
+        if obj.type == 'view_secret':
+            return self._get_secret_access(obj)[0]
         request = self.context.get('request')
         return get_ticket_plugin(obj.type).get_available_actions(obj, request.user if request else None)
+
+    def get_secret_access_status(self, obj):
+        view = self.context.get('view')
+        if obj.type != 'view_secret' or not view or view.action != 'retrieve':
+            return None
+        return self._get_secret_access(obj)[1]
+
+    def _get_secret_access(self, obj):
+        if not hasattr(self, '_secret_access_results'):
+            self._secret_access_results = {}
+        if obj.pk not in self._secret_access_results:
+            request = self.context.get('request')
+            self._secret_access_results[obj.pk] = get_ticket_plugin('view_secret').get_secret_access(
+                obj, request.user if request else None,
+            )
+        return self._secret_access_results[obj.pk]
 
     @staticmethod
     def get_workflow_instance(obj):
@@ -90,7 +109,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'serial_num', 'process_map', 'approval_step', 'type',
             'state', 'applicant', 'status', 'origin', 'date_created',
             'date_updated', 'org_name', 'rel_snapshot', 'workflow_instance', 'my_tasks',
-            'request_data', 'request_items', 'execution_mode', 'available_actions'
+            'request_data', 'request_items', 'execution_mode', 'available_actions', 'secret_access_status'
         ]
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
