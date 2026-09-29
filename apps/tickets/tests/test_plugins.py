@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
@@ -32,6 +33,7 @@ from tickets.plugins.resources import RequestSerializer
 from tickets.serializers.plugin import PluginTicketApplySerializer
 from tickets.serializers.workflow import WorkflowEventSerializer
 from tickets.serializers.ticket.apply_asset import ApplyAssetSerializer
+from tickets.serializers.ticket.ticket import TicketSerializer
 from tickets.tests.test_workflow import WorkflowTests, approval_definition
 from tickets.workflow.business import submit_ticket
 from tickets.workflow.engine import WorkflowEngine
@@ -281,6 +283,59 @@ class TicketPluginTests(TestCase):
         allowed = self.serializer(data)
         self.assertTrue(allowed.is_valid(), allowed.errors)
 
+    @override_settings(TICKET_APPLY_ASSET_SCOPE='all')
+    def test_account_options_match_asset_and_submission_rules(self):
+        from accounts.const import SecretType
+        self.create_account()
+        Account.objects.create(asset=self.asset, name='Other root', username='root', secret_type=SecretType.SSH_KEY)
+        Account.objects.create(asset=self.asset, name='Disabled', username='disabled', is_active=False)
+        Account.objects.create(asset=self.asset, name='Key only', username='key-only', secret_type=SecretType.SSH_KEY)
+        for index in range(12):
+            Account.objects.create(asset=self.asset, name=f'Account {index}', username=f'user-{index:02}')
+        other = Asset.objects.create(name='Another asset', address='192.0.2.11', platform=self.platform)
+        Account.objects.create(asset=other, name='Other account', username='other-asset')
+        factory = APIRequestFactory()
+        for ticket_type in ('change_secret', 'file_transfer', 'view_secret'):
+            request = factory.get('/', {'org_id': self.org.id, 'asset': self.asset.id})
+            force_authenticate(request, self.applicant)
+            response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk=ticket_type)
+            expected = ['root'] + [f'user-{index:02}' for index in range(12)]
+            if ticket_type != 'view_secret':
+                expected += ['disabled', 'key-only']
+            self.assertEqual(response.status_code, 200, response.data)
+            self.assertEqual(response.data, sorted(expected))
+            metadata = get_ticket_plugin(ticket_type).metadata()
+            field = next(field for field in metadata['fields'] if field['name'] == 'accounts')
+            self.assertEqual(field['resource'], 'account')
+            serializer = get_ticket_plugin(ticket_type).get_request_serializer(
+                context={'request': SimpleNamespace(user=self.applicant), 'org_id': self.org.id})
+            self.assertEqual(serializer.validate({'asset': self.asset.id, 'accounts': response.data})['accounts'], response.data)
+        request = factory.get('/', {'org_id': self.org.id, 'asset': other.id})
+        force_authenticate(request, self.applicant)
+        response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='change_secret')
+        self.assertEqual(response.data, ['other-asset'])
+
+    @override_settings(TICKET_APPLY_ASSET_SCOPE='all')
+    def test_account_options_reject_unavailable_assets_and_organizations(self):
+        with tmp_to_org(self.other_org):
+            other_asset = Asset.objects.create(name='Outside org', address='192.0.2.12', platform=self.platform)
+        factory = APIRequestFactory()
+        cases = [({'org_id': self.org.id}, 400),
+                 ({'org_id': self.org.id, 'asset': 'invalid'}, 400),
+                 ({'org_id': self.org.id, 'asset': str(uuid4())}, 400),
+                 ({'org_id': self.org.id, 'asset': other_asset.id}, 400),
+                 ({'org_id': self.other_org.id, 'asset': other_asset.id}, 403)]
+        for params, expected_status in cases:
+            request = factory.get('/', params)
+            force_authenticate(request, self.applicant)
+            response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='change_secret')
+            self.assertEqual(response.status_code, expected_status, response.data)
+        with override_settings(TICKET_APPLY_ASSET_SCOPE='permed_valid'):
+            request = factory.get('/', {'org_id': self.org.id, 'asset': self.asset.id})
+            force_authenticate(request, self.applicant)
+            response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='change_secret')
+            self.assertEqual(response.status_code, 400, response.data)
+
     def test_user_options_and_delegated_workflows_follow_permission(self):
         factory = APIRequestFactory()
         request = factory.get('/', {'org_id': self.org.id})
@@ -478,9 +533,79 @@ class TicketPluginTests(TestCase):
         detail = TicketViewSet.as_view({'get': 'retrieve'})(detail_request, pk=ticket.pk)
         self.assertEqual(detail.status_code, 200, detail.data)
         self.assertEqual([item['account_id'] for item in detail.data['available_actions']], [str(account.pk)])
+        self.assertEqual(detail.data['secret_access_status']['state'], 'available')
         with override_settings(SECURITY_DISABLE_VIEW_SECRET=True):
             hidden = TicketViewSet.as_view({'get': 'retrieve'})(detail_request, pk=ticket.pk)
             self.assertEqual(hidden.data['available_actions'], [])
+            self.assertEqual(hidden.data['secret_access_status'], {'state': 'disabled'})
+
+    def test_secret_access_status_uses_real_grants_and_distinguishes_unavailable_reasons(self):
+        account = self.create_account()
+        serializer = self.serializer(self.payload(asset=str(self.asset.pk), accounts=['root'], duration=600))
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        ticket = serializer.save()
+        instance = submit_ticket(ticket)
+        plugin = get_ticket_plugin('view_secret')
+        self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'pending'}))
+        for state in ('rejected', 'closed', 'expired', 'error'):
+            ticket.state = state
+            self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'unapproved'}))
+        self.engine.approve(self.task(instance), self.alice)
+        ticket.refresh_from_db()
+        grant = TicketSecretAccess.objects.get(ticket=ticket, account_id=account.pk)
+        with CaptureQueriesContext(connection) as queries:
+            actions, status = plugin.get_secret_access(ticket, self.applicant)
+        self.assertEqual(status, {'state': 'available', 'expires_at': grant.expires_at.isoformat()})
+        self.assertEqual([action['account_id'] for action in actions], [str(account.pk)])
+        self.assertFalse(any('"accounts_account"."secret"' in query['sql'] for query in queries))
+        self.assertEqual(plugin.get_secret_access(ticket, self.alice), ([], {'state': 'not_applicant'}))
+        with override_settings(SECURITY_DISABLE_VIEW_SECRET=True):
+            self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'disabled'}))
+            self.assertEqual(plugin.get_secret_access(ticket, self.alice), ([], {'state': 'not_applicant'}))
+
+        expired_at = timezone.now() - timedelta(seconds=1)
+        TicketSecretAccess.objects.filter(pk=grant.pk).update(expires_at=expired_at)
+        self.assertEqual(plugin.get_secret_access(ticket, self.applicant),
+                         ([], {'state': 'expired', 'expires_at': expired_at.isoformat()}))
+        for changes in ({'is_active': False}, {'user_id': self.bob.pk}, {'org_id': self.other_org.id}):
+            with self.subTest(changes=changes):
+                TicketSecretAccess.objects.filter(pk=grant.pk).update(**changes)
+                self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+                TicketSecretAccess.objects.filter(pk=grant.pk).update(
+                    is_active=True, user_id=self.applicant.pk, org_id=self.org.id,
+                )
+        Account.objects.filter(pk=account.pk).update(is_active=False)
+        self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+        Account.objects.filter(pk=account.pk).update(is_active=True)
+        self.asset.is_active = False
+        self.asset.save(update_fields=['is_active'])
+        self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+        self.asset.is_active = True
+        self.asset.save(update_fields=['is_active'])
+        User.objects.filter(pk=self.applicant.pk).update(is_active=False)
+        self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+        User.objects.filter(pk=self.applicant.pk).update(is_active=True)
+        grant.delete()
+        self.assertEqual(plugin.get_secret_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
+
+    def test_secret_access_status_only_serializes_on_password_ticket_detail_and_reuses_queries(self):
+        self.create_account()
+        serializer = self.serializer(self.payload(asset=str(self.asset.pk), accounts=['root']))
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        ticket = serializer.save()
+        context = {'request': SimpleNamespace(user=self.applicant), 'view': SimpleNamespace(action='retrieve')}
+        plugin = get_ticket_plugin('view_secret')
+        with patch.object(plugin, 'get_secret_access', wraps=plugin.get_secret_access) as access:
+            data = TicketSerializer(ticket, context=context).data
+            self.assertEqual(data['secret_access_status'], {'state': 'pending'})
+            self.assertEqual(data['available_actions'], [])
+            access.assert_called_once_with(ticket, self.applicant)
+            access.reset_mock()
+            data = TicketSerializer(ticket, context={**context, 'view': SimpleNamespace(action='list')}).data
+            self.assertIsNone(data['secret_access_status'])
+            self.assertEqual(data['available_actions'], [])
+            self.assertIsNone(TicketSerializer(self.ticket(), context=context).data['secret_access_status'])
+            access.assert_not_called()
 
     def test_authorized_users_are_plugin_parameters_and_granted_from_snapshot(self):
         ticket = self.ticket(self.delegated_workflow())

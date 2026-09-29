@@ -13,7 +13,8 @@ class RequestSerializer(serializers.Serializer):
 class AssetAccountRequestSerializer(RequestSerializer):
     asset = serializers.UUIDField(label=_('Asset'), style={'resource': 'asset'})
     accounts = serializers.ListField(child=serializers.CharField(max_length=128), allow_empty=False,
-                                    max_length=100, label=_('Accounts'))
+                                    max_length=100, label=_('Accounts'), style={'resource': 'account'})
+    invalid_accounts_message = 'Select existing accounts on the requested asset.'
 
     def validate_asset(self, value):
         from assets.models import Asset
@@ -32,15 +33,23 @@ class AssetAccountRequestSerializer(RequestSerializer):
                 raise serializers.ValidationError('Select an asset available for application in this organization.')
         return value
 
-    def validate(self, attrs):
+    def get_accounts(self, asset_id):
         from accounts.models import Account
+        return Account.objects.filter(asset_id=asset_id, asset__org_id=self.context['org_id'])
+
+    def account_options(self, asset_id):
+        asset_id = self.validate_asset(self.fields['asset'].run_validation(asset_id))
+        return list(self.get_accounts(asset_id).exclude(username='').order_by('username')
+                    .values_list('username', flat=True).distinct())
+
+    def validate(self, attrs):
         from orgs.utils import tmp_to_org
         names = list(dict.fromkeys(attrs['accounts']))
         with tmp_to_org(self.context['org_id']):
-            existing = set(Account.objects.filter(asset_id=attrs['asset'], asset__org_id=self.context['org_id'],
-                                                 username__in=names).values_list('username', flat=True))
+            existing = set(self.get_accounts(attrs['asset']).filter(username__in=names)
+                           .values_list('username', flat=True))
         if set(names) != existing:
-            raise serializers.ValidationError({'accounts': 'Select existing accounts on the requested asset.'})
+            raise serializers.ValidationError({'accounts': self.invalid_accounts_message})
         attrs['accounts'] = names
         return attrs
 
