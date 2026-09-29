@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 #
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import MethodNotAllowed, PermissionDenied, NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 
 from audits.handler import create_or_update_operate_log
 from common.api import CommonApiMixin, ReportExportMixin
 from common.const.http import POST, PUT, PATCH
+from common.drf.throttling import FileTransferThrottle
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
 from tickets import filters
@@ -63,6 +66,46 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
             serializer = self.get_serializer(instance)
             data = serializer.data
         return Response(data)
+
+    @action(detail=True, methods=['get'], url_path='replay/download',
+            permission_classes=[IsAuthenticated], throttle_classes=[FileTransferThrottle],
+            renderer_classes=[JSONRenderer])
+    def download_replay(self, request, *args, **kwargs):
+        from terminal.api.session.session import SessionViewSet
+        from terminal.models import Session
+        from tickets.models import WorkflowEvent
+        from tickets.plugins import get_ticket_plugin
+        from tickets.workflow.approvers import user_snapshot
+
+        plugin = get_ticket_plugin('download_replay')
+
+        def authorize():
+            with tmp_to_root_org():
+                ticket = self.get_object()
+            actions, status = plugin.get_replay_access(ticket, request.user)
+            if not actions:
+                raise PermissionDenied({'detail': _('No active approval for this session recording.'),
+                                        'state': status['state']})
+            return ticket, actions[0]
+
+        ticket, access = authorize()
+
+        def before_send():
+            current_ticket, current_access = authorize()
+            if current_access['session_id'] != access['session_id'] or current_ticket.org_id != ticket.org_id:
+                raise PermissionDenied(_('The approved session recording changed.'))
+            WorkflowEvent.objects.create(
+                instance=current_ticket.workflow_instance, type='replay.downloaded', actor=request.user,
+                actor_snapshot=user_snapshot(request.user),
+                data={'session_id': access['session_id'], 'expires_at': current_access['expires_at']},
+            )
+
+        with tmp_to_org(ticket.org_id):
+            session = get_object_or_404(Session, pk=access['session_id'], org_id=ticket.org_id, has_replay=True)
+            try:
+                return SessionViewSet.build_replay_download_response(session, request, before_send=before_send)
+            except (OSError, ValueError) as exc:
+                raise NotFound(_('The requested session recording is no longer available.')) from exc
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)

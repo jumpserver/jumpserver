@@ -155,6 +155,10 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
             url_name='replay-download')
     def download(self, request, *args, **kwargs):
         session = self.get_object()
+        return self.build_replay_download_response(session, request)
+
+    @classmethod
+    def build_replay_download_response(cls, session, request, before_send=None):
         storage = ReplayStorageHandler(session)
         local_path, url = storage.get_file_path_url()
         if local_path is None:
@@ -167,19 +171,25 @@ class SessionViewSet(ReportExportMixin, OrgBulkModelViewSet):
             part_storage = SessionPartReplayStorageHandler(session)
             offline_abs_path = part_storage.prepare_offline_tar_file()
         else:
-            offline_abs_path = self.prepare_offline_file(session, local_path)
-        media_root = default_storage.base_location
-        relative_path = os.path.relpath(offline_abs_path, media_root)
-        internal_url = os.path.join(settings.PRIVATE_STORAGE_INTERNAL_URL, relative_path)
-        internal_url = escape_uri_path(internal_url)
-        response = HttpResponse()
-        response['X-Accel-Redirect'] = internal_url
+            offline_abs_path = cls.prepare_offline_file(session, local_path)
+        if before_send:
+            before_send()
+        if settings.DEBUG_DEV:
+            response = FileResponse(open(offline_abs_path, 'rb'), as_attachment=True, filename=f'{session.id}.tar')
+        else:
+            media_root = default_storage.base_location
+            relative_path = os.path.relpath(offline_abs_path, media_root)
+            internal_url = os.path.join(settings.PRIVATE_STORAGE_INTERNAL_URL, relative_path)
+            internal_url = escape_uri_path(internal_url)
+            response = HttpResponse()
+            response['X-Accel-Redirect'] = internal_url
         response['Content-Type'] = 'application/octet-stream'
         filename = escape_uri_path('{}.tar'.format(session.id))
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
+        response['Cache-Control'] = 'no-store'
         detail = i18n_fmt(
-            REPLAY_OP, self.request.user, _('Download'), str(session)
+            REPLAY_OP, request.user, _('Download'), str(session)
         )
         record_operate_log_and_activity_log(
             [session.asset_id], ActionChoices.download, detail, Session,
