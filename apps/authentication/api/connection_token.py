@@ -1199,7 +1199,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             "expired": instance.is_expired
         }
         try:
-            instance.is_valid()
+            # Components check established sessions after the one-time token
+            # has been consumed. Revalidate access without reviving that token.
+            instance.is_valid(check_expiration=False)
             if not instance.personal_credential_id:
                 self._validate_perm(
                     instance.user,

@@ -146,8 +146,6 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         name = cleaned_data.get('name', getattr(self.instance, 'name', None))
         if name in ('http', 'https') and web_xpack_fields(cleaned_data.get('setting', {})):
             raise serializers.ValidationError({'setting': _('A valid enterprise license is required.')})
-        if name in ['winrm']:
-            cleaned_data['public'] = False
         return cleaned_data
 
     def to_file_representation(self, data):
