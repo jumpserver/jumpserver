@@ -48,6 +48,8 @@ def verify_delegation(token):
             return None
         encoded, supplied_signature = token.split('.', 1)
         payload = json.loads(_decode(encoded))
+        if not isinstance(payload, dict):
+            return None
         key_id = str(payload.get('key_id') or '')
         if not hmac.compare_digest(supplied_signature, _signature(encoded, key_id)):
             return None

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.crypto import constant_time_compare
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -38,10 +39,9 @@ class OAuth2AuthRequestView(View):
             'redirect_uri': redirect_uri
         }
 
-        if settings.AUTH_OAUTH2_USE_STATE:
-            state = uuid.uuid4()
-            request.session['oauth2_state'] = state
-            query_dict['state'] = state
+        state = str(uuid.uuid4())
+        request.session['oauth2_state'] = state
+        query_dict['state'] = state
 
         if '?' in settings.AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT:
             separator = '&'
@@ -66,15 +66,16 @@ class OAuth2AuthCallbackView(View, FlashMessageMixin):
         logger.debug(log_prompt.format('Start'))
         callback_params = request.GET
 
-        state = None
-        if settings.AUTH_OAUTH2_USE_STATE:
-            state = callback_params.get('state')
-            session_state = request.session.get('oauth2_state')
-            if not state or not session_state or session_state != state:
-                logger.error("Invalid state parameter")
-                response = self.get_failed_response('/', title=_('OAuth2 Error'), msg="Invalid state parameter")
-                return response
-            request.session.pop('oauth2_state', None)
+        state = callback_params.get('state')
+        session_state = request.session.get('oauth2_state')
+        if (
+            not isinstance(state, str) or not isinstance(session_state, str)
+            or not state or not session_state
+            or not constant_time_compare(state, session_state)
+        ):
+            logger.error("Invalid state parameter")
+            return self.get_failed_response('/', title=_('OAuth2 Error'), msg="Invalid state parameter")
+        # The authentication backend consumes the state before exchanging the code.
 
         if 'code' in callback_params:
             logger.debug(log_prompt.format('Process authenticate'))

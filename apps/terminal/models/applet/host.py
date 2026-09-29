@@ -48,6 +48,8 @@ class AppletHost(Host):
         request_terminal = getattr(request.user, 'terminal', None)
         if not request_terminal:
             raise ValidationError('Request user has no terminal')
+        if request_terminal.type != 'tinker':
+            raise ValidationError('Only Tinker terminals can bind an applet host')
 
         # A service credential must not be able to claim another host at startup.
         if self.terminal_id != request_terminal.pk:

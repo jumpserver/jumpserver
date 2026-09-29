@@ -26,8 +26,8 @@ class HealthCheckView(HealthApiMixin):
             ok = User.objects.first() is not None
             t2 = time.time()
             return ok, t2 - t1
-        except Exception as e:
-            return False, str(e)
+        except Exception:
+            return False, time.time() - t1
 
     @staticmethod
     def get_redis_status():
@@ -42,9 +42,9 @@ class HealthCheckView(HealthApiMixin):
 
             if value == got:
                 return True, t2 - t1
-            return False, 'Value not match'
-        except Exception as e:
-            return False, str(e)
+            return False, t2 - t1
+        except Exception:
+            return False, time.time() - t1
 
     def get(self, request):
         redis_status, redis_time = self.get_redis_status()

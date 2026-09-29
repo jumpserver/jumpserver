@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils.translation import gettext_lazy as _
+from django.utils.crypto import constant_time_compare
 from common.utils import FlashMessageUtil
 from common.utils import safe_next_url
 
@@ -38,4 +39,4 @@ class FlashMessageMixin:
             return False
         if not state or not session_state:
             return False
-        return state == session_state
+        return constant_time_compare(state, session_state)

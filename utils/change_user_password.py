@@ -1,4 +1,6 @@
 #!/usr/bin/python
+import argparse
+import getpass
 import os
 import sys
 
@@ -50,15 +52,25 @@ def change_user_password(username, old_password, new_password):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python change_user_password.py <username> <old_password> <new_password>")
-        sys.exit(EXIT_USAGE_ERROR)
+    parser = argparse.ArgumentParser(description='Change a local user password.')
+    parser.add_argument('username')
+    parser.add_argument('--stdin', action='store_true', help='Read old and new passwords from two stdin lines')
+    args = parser.parse_args()
 
     try:
-        username = sys.argv[1]
-        old_password = sys.argv[2]
-        new_password = sys.argv[3]
-        sys.exit(change_user_password(username, old_password, new_password))
+        if args.stdin:
+            old_password = sys.stdin.readline().rstrip('\r\n')
+            new_password = sys.stdin.readline().rstrip('\r\n')
+        else:
+            if not sys.stdin.isatty():
+                parser.error('Use --stdin for non-interactive password input')
+            old_password = getpass.getpass('Old password: ')
+            new_password = getpass.getpass('New password: ')
+            if new_password != getpass.getpass('Confirm new password: '):
+                parser.error('New passwords do not match')
+        if not old_password or not new_password:
+            parser.error('Passwords must not be empty')
+        sys.exit(change_user_password(args.username, old_password, new_password))
     except Exception as exc:
         print("Change user password failed:", exc)
         sys.exit(EXIT_UNEXPECTED_ERROR)

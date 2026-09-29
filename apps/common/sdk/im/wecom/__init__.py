@@ -2,8 +2,8 @@ from typing import Iterable, AnyStr
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
+from django.utils.crypto import constant_time_compare
 from rest_framework.exceptions import APIException
 
 from common.sdk.im.mixin import RequestMixin, BaseRequest
@@ -191,7 +191,6 @@ class WeCom(RequestMixin):
 
 class WeComTool(object):
     WECOM_STATE_SESSION_KEY = '_wecom_state'
-    WECOM_STATE_VALUE = 'wecom'
     WECOM_STATE_NEXT_URL_KEY = 'wecom_oauth_next_url'
 
     @lazyproperty
@@ -199,30 +198,22 @@ class WeComTool(object):
         return reverse('authentication:wecom-qr-login-callback', external=True)
 
     def gen_state(self, request=None):
+        if request is None:
+            raise ValueError('WeCom state requires an initiating browser session')
         state = random_string(16)
-        if not request:
-            cache.set(state, self.WECOM_STATE_VALUE, timeout=60 * 60 * 24)
-        else:
-            request.session[self.WECOM_STATE_SESSION_KEY] = state
+        request.session[self.WECOM_STATE_SESSION_KEY] = state
         return state
 
-    def check_state(self, state):
-        if not isinstance(state, str) or not state:
+    def check_state(self, state, request=None):
+        if request is None:
             return False
-        if cache.get(state) != self.WECOM_STATE_VALUE:
-            return False
-        cache.delete(state)
-        return True
+        expected = request.session.pop(self.WECOM_STATE_SESSION_KEY, None)
+        return bool(state and expected and constant_time_compare(state, expected))
 
     def wrap_redirect_url(self, next_url):
-        params = {
-            'appid': settings.WECOM_CORPID,
-            'agentid': settings.WECOM_AGENTID,
-            'state': self.gen_state(),
-            'redirect_uri': f'{self.qr_cb_url}?next={next_url}',
-            'response_type': 'code', 'scope': 'snsapi_base',
-        }
-        return URL.OAUTH_CONNECT + '?' + urlencode(params) + '#wechat_redirect'
+        # Notification links must establish state in the browser that opens them.
+        login_url = reverse('authentication:wecom-oauth-login', external=True)
+        return login_url + '?' + urlencode({'next': next_url})
 
 
 wecom_tool = WeComTool()

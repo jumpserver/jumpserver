@@ -282,9 +282,9 @@ class CMPPClient(object):
             self._cmpp_connect()
             self._cmpp_send_sms(dest, sign_name, template_code, template_param)
         except Exception as e:
-            logger.error('CMPPv2.0 Error: %s', e)
+            logger.error('CMPPv2.0 SMS failed: %s', type(e).__name__)
             self.close()
-            raise JMSException(e)
+            raise JMSException('CMPPv2.0 SMS sending failed') from None
 
 
 class CMPP2SMS(BaseSMSClient):
@@ -314,11 +314,7 @@ class CMPP2SMS(BaseSMSClient):
 
     def send_sms(self, phone_numbers: list, sign_name: str, template_code: str, template_param: dict, **kwargs):
         try:
-            logger.info(f'CMPPv2.0 sms send: '
-                        f'phone_numbers={phone_numbers} '
-                        f'sign_name={sign_name} '
-                        f'template_code={template_code} '
-                        f'template_param={template_param}')
+            logger.info('CMPPv2.0 SMS send: recipients=%s', len(phone_numbers))
             self.client.send_sms(phone_numbers, sign_name, template_code, template_param)
         except Exception as e:
             raise JMSException(e)

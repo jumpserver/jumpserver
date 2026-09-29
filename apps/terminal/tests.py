@@ -30,6 +30,7 @@ from authentication.serializers.connect_token_secret import ConnectTokenVirtualA
 from common.drf.metadata import SimpleMetadataWithFilters
 from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_builtin_org
+from terminal.api.applet.host import AppletHostDeploymentViewSet
 from terminal.api.virtualapp.provider import AppProviderDeploymentViewSet, AppProviderViewSet
 from terminal.automations.deploy_app_provider import (
     DeployAppProviderManager, default_panda_image, stage_resources,
@@ -46,6 +47,91 @@ from terminal.tasks import (
     AppProviderDeploymentError, run_app_provider_deployment, run_app_provider_deployments,
 )
 from terminal.utils import virtualapp as image_archives
+
+
+@override_settings(DEBUG_DEV=False)
+class AppletHostDeploymentPermissionTests(SimpleTestCase):
+    def setUp(self):
+        from terminal.models import AppletHost, AppletHostDeployment
+
+        self.factory = APIRequestFactory()
+        self.host = AppletHost(name='applet-permission-test')
+        self.host_filter = self.enterContext(patch.object(AppletHost.objects, 'filter'))
+        self.host_filter.return_value.exists.return_value = True
+        self.host_filter.return_value.__iter__.return_value = [self.host]
+        self.bulk_create = self.enterContext(patch.object(
+            AppletHostDeployment.objects, 'bulk_create', side_effect=lambda objs: objs,
+        ))
+        self.deployment_filter = self.enterContext(patch.object(
+            AppletHostDeployment.objects, 'filter',
+        ))
+        self.on_commit = self.enterContext(patch('terminal.api.applet.host.transaction.on_commit'))
+        self.install_task = self.enterContext(patch(
+            'terminal.api.applet.host.run_applet_host_deployment_install_applet.apply_async',
+        ))
+
+    def request(self, permissions, applet_data=None):
+        user = SimpleNamespace(
+            is_anonymous=False,
+            has_perms=lambda required: set(required).issubset(permissions),
+        )
+        if applet_data is None:
+            incoming = self.factory.get('/api/v1/terminal/applet-host-deployments/')
+            actions = {'get': 'list'}
+        else:
+            incoming = self.factory.post(
+                '/api/v1/terminal/applet-host-deployments/applets/',
+                {'hosts': [str(self.host.id)], **applet_data}, format='json',
+            )
+            actions = {'post': 'applets'}
+        force_authenticate(incoming, user=user)
+        view = AppletHostDeploymentViewSet.as_view(actions, throttle_classes=[])
+        return view(incoming)
+
+    def test_view_only_user_cannot_install_single_or_all_applets(self):
+        for data in ({'applet_id': '00000000-0000-0000-0000-000000000001'},
+                     {'applet_id': ''}, {}):
+            with self.subTest(data=data):
+                response = self.request({'terminal.view_applethostdeployment'}, data)
+
+                self.assertEqual(response.status_code, 403)
+                self.host_filter.assert_not_called()
+                self.bulk_create.assert_not_called()
+                self.deployment_filter.assert_not_called()
+                self.on_commit.assert_not_called()
+                self.install_task.assert_not_called()
+
+    def assert_install_allowed(self, data):
+        response = self.request({'terminal.change_applethost'}, data)
+
+        self.assertEqual(response.status_code, 201)
+        self.bulk_create.assert_called_once()
+        deployments = self.bulk_create.call_args.args[0]
+        self.assertEqual([deployment.host for deployment in deployments], [self.host])
+        self.on_commit.assert_called_once()
+        self.install_task.assert_not_called()
+        self.on_commit.call_args.args[0]()
+        self.install_task.assert_called_once_with(
+            ([str(deployments[0].id)], data.get('applet_id', '')),
+            task_id=response.data['task'],
+        )
+
+    def test_host_editor_can_install_single_applet(self):
+        self.assert_install_allowed({'applet_id': '00000000-0000-0000-0000-000000000001'})
+
+    def test_host_editor_can_install_all_with_empty_applet_id(self):
+        self.assert_install_allowed({'applet_id': ''})
+
+    def test_host_editor_can_install_all_with_omitted_applet_id(self):
+        self.assert_install_allowed({})
+
+    def test_view_only_user_can_still_list_deployments(self):
+        with patch.object(AppletHostDeploymentViewSet, 'filter_queryset', return_value=[]), \
+                patch.object(AppletHostDeploymentViewSet, 'paginate_queryset', return_value=None):
+            response = self.request({'terminal.view_applethostdeployment'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
 
 
 class SessionErrorReasonSerializerTests(SimpleTestCase):

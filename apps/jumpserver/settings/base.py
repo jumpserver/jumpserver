@@ -52,6 +52,7 @@ DEBUG_ANSIBLE = CONFIG.DEBUG_ANSIBLE
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
+WS_ALLOWED_ORIGINS = CONFIG.WS_ALLOWED_ORIGINS
 
 # Absolute url for downloading applet
 APPLET_DOWNLOAD_HOST = CONFIG.APPLET_DOWNLOAD_HOST

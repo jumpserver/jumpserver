@@ -1,7 +1,6 @@
-import os
 import stat
-import hashlib
 import shutil
+from contextlib import nullcontext
 from pathlib import Path
 from rest_framework.exceptions import ValidationError
 from zipfile import ZipFile, BadZipFile
@@ -56,9 +55,53 @@ def _verify_signature(zip_path: Path, sig_path: Path, public_key_pem: bytes):
     )
 
 
-# -------------------------
-# 主函数
-# -------------------------
+def validate_zip_file(
+    zip_file,
+    *,
+    max_files=MAX_FILES,
+    max_single_file_size=MAX_SINGLE_FILE_SIZE,
+    max_total_size=MAX_TOTAL_SIZE,
+    max_compression_ratio=MAX_COMPRESSION_RATIO,
+):
+    """Validate a ZIP path, binary stream or open ZipFile without extracting it."""
+    try:
+        archive = nullcontext(zip_file) if isinstance(zip_file, ZipFile) else ZipFile(zip_file)
+        with archive as zf:
+            infos = zf.infolist()
+            if len(infos) > max_files:
+                raise ZipSecurityError("Too many files in zip")
+
+            total_size = 0
+            names = set()
+            for info in infos:
+                name = info.filename
+                if name.startswith(("/", "\\")):
+                    raise ZipSecurityError(f"Absolute path not allowed: {name}")
+                if ".." in Path(name).parts:
+                    raise ZipSecurityError(f"Path traversal detected: {name}")
+                if _is_symlink(info):
+                    raise ZipSecurityError(f"Symlink not allowed: {name}")
+                if name in names:
+                    raise ZipSecurityError(f"Duplicate file in zip: {name}")
+                names.add(name)
+                if info.file_size > max_single_file_size:
+                    raise ZipSecurityError(f"File too large: {name}")
+                total_size += info.file_size
+                if total_size > max_total_size:
+                    raise ZipSecurityError("Total extracted size exceeded")
+                if info.file_size and not info.compress_size:
+                    raise ZipSecurityError(f"Invalid compressed size: {name}")
+                if info.compress_size:
+                    ratio = info.file_size / info.compress_size
+                    if ratio > max_compression_ratio:
+                        raise ZipSecurityError(
+                            f"Suspicious compression ratio ({ratio:.1f}): {name}"
+                        )
+            return infos
+    except BadZipFile as exc:
+        raise ZipSecurityError("Invalid zip file") from exc
+
+
 def safe_extract_zip(
     zip_path: str | Path,
     extract_dir: str | Path,
@@ -92,43 +135,10 @@ def safe_extract_zip(
 
     try:
         with ZipFile(zip_path) as zf:
-            infos = zf.infolist()
-
-            # 2️⃣ 条目数量限制
-            if len(infos) > MAX_FILES:
-                raise ZipSecurityError("Too many files in zip")
-
-            total_size = 0
+            infos = validate_zip_file(zf)
 
             for info in infos:
                 name = info.filename
-
-                # 3️⃣ 基础文件名校验
-                if name.startswith(("/", "\\")):
-                    raise ZipSecurityError(f"Absolute path not allowed: {name}")
-
-                if ".." in Path(name).parts:
-                    raise ZipSecurityError(f"Path traversal detected: {name}")
-
-                # 4️⃣ 软链接检测
-                if _is_symlink(info):
-                    raise ZipSecurityError(f"Symlink not allowed: {name}")
-
-                # 5️⃣ 文件大小限制
-                if info.file_size > MAX_SINGLE_FILE_SIZE:
-                    raise ZipSecurityError(f"File too large: {name}")
-
-                total_size += info.file_size
-                if total_size > MAX_TOTAL_SIZE:
-                    raise ZipSecurityError("Total extracted size exceeded")
-
-                # 6️⃣ 压缩比校验（防 zip bomb）
-                if info.compress_size > 0:
-                    ratio = info.file_size / info.compress_size
-                    if ratio > MAX_COMPRESSION_RATIO:
-                        raise ZipSecurityError(
-                            f"Suspicious compression ratio ({ratio:.1f}): {name}"
-                        )
 
                 # 7️⃣ 最终路径校验
                 target_path = extract_dir / name

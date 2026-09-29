@@ -1,6 +1,7 @@
 from channels.auth import AuthMiddlewareStack
 from channels.db import database_sync_to_async
 from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import WebsocketDenier
 from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
@@ -16,6 +17,7 @@ from ops.urls.ws_urls import urlpatterns as ops_urlpatterns
 from settings.urls.ws_urls import urlpatterns as setting_urlpatterns
 from terminal.urls.ws_urls import urlpatterns as terminal_urlpatterns
 from common.utils import get_logger
+from .ws_origin import build_allowed_origins, normalize_origin
 import socket
 
 logger = get_logger(__name__)
@@ -59,9 +61,34 @@ def get_signature_user(scope):
 class WsSignatureAuthMiddleware:
     def __init__(self, app):
         self.app = app
+        self.allowed_origins = None
+        if settings.WS_ALLOWED_ORIGINS is not None:
+            self.allowed_origins = build_allowed_origins(settings.WS_ALLOWED_ORIGINS, '', '')
 
     async def __call__(self, scope, receive, send):
+        origins = [value for name, value in scope.get('headers', []) if name == b'origin']
+        if origins:
+            allowed_origins = self.allowed_origins
+            if allowed_origins is None:
+                # SITE_URL can be updated from database settings after startup.
+                allowed_origins = build_allowed_origins(None, settings.SITE_URL, settings.CONFIG.DOMAINS)
+            try:
+                valid_origin = (
+                    len(origins) == 1
+                    and normalize_origin(origins[0].decode('ascii')) in allowed_origins
+                )
+            except (UnicodeDecodeError, ValueError):
+                valid_origin = False
+            if not valid_origin:
+                return await WebsocketDenier()(scope, receive, send)
+
         user = await get_signature_user(scope)
+        if user and (not user.is_authenticated or not user.is_valid):
+            user = None
+        # Native clients may omit Origin, but a browser session cookie is not
+        # sufficient: only successful header authentication can use this path.
+        if not origins and not user:
+            return await WebsocketDenier()(scope, receive, send)
         if user:
             scope['user'] = user
         return await self.app(scope, receive, send)
