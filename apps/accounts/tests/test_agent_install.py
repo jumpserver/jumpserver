@@ -16,11 +16,12 @@ from rest_framework.permissions import AllowAny
 
 from accounts.api.account.credential import CredentialClientViewSet
 from accounts.credential_client.manager import CredentialClientManager
-from accounts.demos.python.jms_pam.agent import Agent, install, read_json, register
-from accounts.demos.python.jms_pam.common.credential import Credential as PAMCredential
-from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
-from accounts.demos.python.jms_pam.credential.v1 import models
+from accounts.clients.python.jms_pam.agent import Agent, install, read_json, register
+from accounts.clients.python.jms_pam.models import AgentSync
+from accounts.clients.python.jms_pam.common.credential import Credential as PAMCredential
+from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.clients.python.jms_pam.credential.v1.credential_client import CredentialClient
+from accounts.clients.python.jms_pam.credential.v1 import models
 from accounts.models import (
     ClientAccessConfiguration, CredentialClientInstance, CredentialClientStatus,
 )
@@ -112,8 +113,8 @@ class AgentInstallTests(SimpleTestCase):
     def first_install(self):
         response = Mock()
         response.json.return_value = self.identity
-        with patch('accounts.demos.python.jms_pam.agent.requests.post', return_value=response), \
-                patch('accounts.demos.python.jms_pam.agent.secure_root', side_effect=lambda path, mode=0o711: Path(path)):
+        with patch('accounts.clients.python.jms_pam._agent.install.requests.post', return_value=response), \
+                patch('accounts.clients.python.jms_pam._agent.install.secure_root', side_effect=lambda path, mode=0o711: Path(path)):
             return register(self.args)
 
     def test_registration_pins_server_capabilities(self):
@@ -124,9 +125,9 @@ class AgentInstallTests(SimpleTestCase):
 
     def test_reinstall_reuses_identity_and_syncs(self):
         config_file = self.first_install()
-        with patch('accounts.demos.python.jms_pam.agent.requests.post') as post, \
-                patch('accounts.demos.python.jms_pam.agent.secure_root'), \
-                patch('accounts.demos.python.jms_pam.agent.Agent') as agent:
+        with patch('accounts.clients.python.jms_pam._agent.install.requests.post') as post, \
+                patch('accounts.clients.python.jms_pam._agent.install.secure_root'), \
+                patch('accounts.clients.python.jms_pam._agent.install.Agent') as agent:
             self.assertEqual(register(self.args), config_file)
             post.assert_not_called()
             agent.return_value.sync.assert_called_once()
@@ -140,24 +141,26 @@ class AgentInstallTests(SimpleTestCase):
             'app_user': self.user, 'install_path': str(self.root),
         }))
         self.args.bootstrap = str(bootstrap)
-        with patch('accounts.demos.python.jms_pam.agent.credential_client.CredentialClient') as remote, \
-                patch('accounts.demos.python.jms_pam.agent.requests.post') as post, \
-                patch('accounts.demos.python.jms_pam.agent.secure_root', side_effect=lambda path, mode=0o711: Path(path)):
-            remote.return_value.SyncAgent.return_value._serialize.return_value = self.identity
+        with patch('accounts.clients.python.jms_pam._agent.install.Client') as remote, \
+                patch('accounts.clients.python.jms_pam._agent.install.requests.post') as post, \
+                patch('accounts.clients.python.jms_pam._agent.install.secure_root', side_effect=lambda path, mode=0o711: Path(path)):
+            remote.return_value.sync_agent.return_value = AgentSync.from_dict({
+                **self.identity, 'credentials': [], 'removed_keys': [], 'date_last_synced': 'now',
+            })
             config = read_json(register(self.args))
         post.assert_not_called()
         self.assertEqual(config['app_id'], 'application')
         self.assertEqual(config['app_secret'], 'application-secret')
         self.assertNotIn('agent_secret', config)
-        self.assertEqual(remote.call_args.args[0].AppId, 'application')
-        self.assertEqual(remote.call_args.args[2].Source, 'jms-pam-agent')
+        self.assertEqual(remote.call_args.kwargs['app_id'], 'application')
+        self.assertEqual(remote.call_args.kwargs['source'], 'jms-pam-agent')
         remote.return_value.close.assert_called_once()
 
     def test_install_uses_one_service_per_configuration(self):
-        with patch('accounts.demos.python.jms_pam.agent.register', return_value=self.args.config), \
-                patch('accounts.demos.python.jms_pam.agent.shutil.which', return_value='/usr/bin/jms-pam-agent'), \
-                patch('accounts.demos.python.jms_pam.agent.atomic_write'), \
-                patch('accounts.demos.python.jms_pam.agent.subprocess.run') as run:
+        with patch('accounts.clients.python.jms_pam._agent.install.register', return_value=self.args.config), \
+                patch('accounts.clients.python.jms_pam._agent.install.shutil.which', return_value='/usr/bin/jms-pam-agent'), \
+                patch('accounts.clients.python.jms_pam._agent.install.atomic_write'), \
+                patch('accounts.clients.python.jms_pam._agent.install.subprocess.run') as run:
             install(self.args)
         service = f'jms-pam-agent-{self.args.configuration_id}.service'
         self.assertEqual([call.args[0] for call in run.call_args_list], [
@@ -268,6 +271,7 @@ class AgentDeliveryTests(SimpleTestCase):
         self.agent.authorized_keys = {'db'}
         self.agent.access_denied = False
         self.agent.lock = threading.Lock()
+        self.agent.sync_lock = threading.RLock()
         self.agent.remote = Mock()
         self.agent.config_file = str(self.root / 'agent.json')
         self.agent.config = {
@@ -288,36 +292,36 @@ class AgentDeliveryTests(SimpleTestCase):
         return status, json.loads(body)
 
     def test_json_delivery_writes_one_file_without_confirming(self):
-        with patch('accounts.demos.python.jms_pam.agent.secure_root', return_value=self.root):
+        with patch('accounts.clients.python.jms_pam._agent.delivery.secure_root', return_value=self.root):
             self.agent.deliver({'db'})
         self.assertEqual(read_json(self.root / 'db.json')['revision'], 2)
         self.assertEqual(read_json(self.agent.delivery_file)['db']['revision'], 2)
-        self.agent.remote.ConfirmCredential.assert_not_called()
+        self.agent.remote.confirm_credential.assert_not_called()
 
     def test_environment_delivery_runs_only_pinned_systemd_action(self):
         self.agent.configuration.update({
             'delivery_mode': 'environment', 'systemd_unit': 'orders.service',
             'systemd_action': 'reload',
         })
-        with patch('accounts.demos.python.jms_pam.agent.secure_root', return_value=self.root), \
-                patch('accounts.demos.python.jms_pam.agent.subprocess.run') as run:
+        with patch('accounts.clients.python.jms_pam._agent.delivery.secure_root', return_value=self.root), \
+                patch('accounts.clients.python.jms_pam._agent.delivery.subprocess.run') as run:
             self.agent.deliver({'db'})
         self.assertIn('JMS_PAM_SECRET="new-secret"', (self.root / 'db.env').read_text())
         run.assert_called_once_with(
-            ['systemctl', 'reload', 'orders.service'], check=True,
+            ['systemctl', 'reload', 'orders.service'], check=True, timeout=120,
             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
         self.assertEqual(read_json(self.agent.delivery_file)['db']['revision'], 2)
-        self.agent.remote.ConfirmCredential.assert_not_called()
+        self.agent.remote.confirm_credential.assert_not_called()
 
     def test_failed_systemd_action_does_not_mark_delivery(self):
         self.agent.configuration.update({
             'delivery_mode': 'environment', 'systemd_unit': 'orders.service',
             'systemd_action': 'restart',
         })
-        with patch('accounts.demos.python.jms_pam.agent.secure_root', return_value=self.root), \
+        with patch('accounts.clients.python.jms_pam._agent.delivery.secure_root', return_value=self.root), \
                 patch(
-                    'accounts.demos.python.jms_pam.agent.subprocess.run',
+                    'accounts.clients.python.jms_pam._agent.delivery.subprocess.run',
                     side_effect=subprocess.CalledProcessError(1, 'systemctl'),
                 ):
             with self.assertRaises(subprocess.CalledProcessError):
@@ -326,15 +330,14 @@ class AgentDeliveryTests(SimpleTestCase):
         self.assertFalse(Path(self.agent.delivery_file).exists())
 
     def test_sync_retries_fetched_revision_until_delivered(self):
-        response = Mock()
-        response._serialize.return_value = {
+        response = AgentSync.from_dict({
             'config_digest': 'digest',
             'credentials': [{
                 'key': 'db', 'revision': 2, 'available': True, 'changed': False,
             }],
             'removed_keys': [], 'date_last_synced': 'now',
-        }
-        self.agent.remote.SyncAgent.return_value = response
+        })
+        self.agent.remote.sync_agent.return_value = response
         with patch.object(self.agent, 'fetch') as fetch, \
                 patch.object(self.agent, 'deliver') as deliver:
             self.agent.sync()
@@ -343,11 +346,11 @@ class AgentDeliveryTests(SimpleTestCase):
 
     def test_notification_refetches_current_revision_without_repeating_delivery(self):
         self.agent.delivered = {'db': {'key': 'db', 'revision': 2}}
-        self.agent.remote.SyncAgent.return_value._serialize.return_value = {
+        self.agent.remote.sync_agent.return_value = AgentSync.from_dict({
             'config_digest': 'digest',
             'credentials': [{'key': 'db', 'revision': 2, 'available': True, 'changed': False}],
             'removed_keys': [], 'date_last_synced': 'now',
-        }
+        })
         with patch.object(self.agent, 'fetch') as fetch, patch.object(self.agent, 'deliver') as deliver:
             self.agent.sync(refresh_keys=['db', 'unauthorized'])
         fetch.assert_called_once_with(['db'])
@@ -357,15 +360,15 @@ class AgentDeliveryTests(SimpleTestCase):
         victim = self.root / 'victim.json'
         victim.write_text('keep-me\n')
         (self.root / 'db.json').symlink_to(victim)
-        with patch('accounts.demos.python.jms_pam.agent.secure_root', return_value=self.root):
+        with patch('accounts.clients.python.jms_pam._agent.delivery.secure_root', return_value=self.root):
             with self.assertRaises(ValueError):
                 self.agent.deliver({'db'})
         self.assertEqual(victim.read_text(), 'keep-me\n')
 
     def test_unix_socket_serves_credentials_and_explicit_confirmation(self):
-        with patch('accounts.demos.python.jms_pam.agent.secure_root', return_value=self.root), \
-                patch('accounts.demos.python.jms_pam.agent.os.chown'), \
-                patch('accounts.demos.python.jms_pam.agent.os.chmod'):
+        with patch('accounts.clients.python.jms_pam._agent.server.secure_root', return_value=self.root), \
+                patch('accounts.clients.python.jms_pam._agent.server.os.chown'), \
+                patch('accounts.clients.python.jms_pam._agent.server.os.chmod'):
             server = self.agent.start_local_server()
         self.addCleanup(server.server_close)
         self.addCleanup(server.shutdown)
@@ -383,8 +386,8 @@ class AgentDeliveryTests(SimpleTestCase):
         status, payload = self.socket_request(request)
         self.assertEqual((status, payload['revision'], payload['status']), (200, 2, 'confirmed'))
         self.assertEqual(read_json(self.agent.state_file)['db']['revision'], 2)
-        confirmation = self.agent.remote.ConfirmCredential.call_args.args[0]
-        self.assertEqual((confirmation.Key, confirmation.Revision), ('db', 2))
+        confirmation = self.agent.remote.confirm_credential.call_args.kwargs
+        self.assertEqual((confirmation['key'], confirmation['revision']), ('db', 2))
 
         self.agent.access_denied = True
         status, payload = self.socket_request(

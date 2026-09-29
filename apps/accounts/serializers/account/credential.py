@@ -15,7 +15,8 @@ from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 __all__ = [
-    'ApplicationCredentialSerializer', 'CredentialApplicationBindingSerializer',
+    'ApplicationCredentialSerializer', 'ApplicationCredentialListSerializer',
+    'CredentialApplicationBindingSerializer',
     'CredentialClientInstanceSerializer', 'CredentialClientStatusSerializer',
     'CredentialFetchSerializer',
     'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer',
@@ -95,7 +96,6 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         queryset=Account.objects, many=True, required=False,
         attrs=('id', 'name', 'username', 'asset_id'), label=_('Subscribed accounts'),
     )
-    last_fetched = serializers.DateTimeField(read_only=True)
     change_execution = ObjectRelatedField(read_only=True, attrs=('id', 'status', 'date_finished'))
 
     class Meta:
@@ -105,7 +105,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             'mode', 'asset', 'account', 'alternate_account', 'subscription_accounts',
             'subscription_all_authorized',
             'active_account', 'revision', 'status', 'is_active', 'standby_no_traffic_days',
-            'last_fetched', 'date_last_rotated', 'applications_amount',
+            'date_last_rotated', 'applications_amount',
         ]
         fields = fields_small + [
             'applications', 'change_execution', 'rotation', 'precheck', 'preparation', 'blockers',
@@ -128,7 +128,6 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             Prefetch('subscription_accounts', queryset=Account.objects.select_related('asset')),
         ).annotate(
             applications_amount=Count('applications', distinct=True),
-            last_fetched=Max('application_bindings__client_statuses__date_fetched'),
         )
 
     @staticmethod
@@ -340,6 +339,45 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             event = record(AuditEvent.CONFIGURATION_UPDATED, credential=instance)
             enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED)
         return instance
+
+
+class ApplicationCredentialListSerializer(ApplicationCredentialSerializer):
+    subscription_accounts_amount = serializers.IntegerField(read_only=True)
+    subscription_assets_amount = serializers.IntegerField(read_only=True)
+    subscription_accounts_preview = SubscribedAccountField(
+        read_only=True, many=True, attrs=('id', 'name', 'username', 'asset_id'),
+    )
+
+    class Meta(ApplicationCredentialSerializer.Meta):
+        fields_small = [
+            field for field in ApplicationCredentialSerializer.Meta.fields_small
+            if field != 'subscription_accounts'
+        ] + [
+            'subscription_accounts_amount', 'subscription_assets_amount',
+            'subscription_accounts_preview',
+        ]
+        fields = fields_small
+        relation_count_fields = {'applications_amount': 'applications'}
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        # Keep the list payload bounded: count the scope and fetch at most three
+        # accounts per policy. Application counts use the batch helper.
+        return queryset.select_related(
+            'account__asset__platform', 'alternate_account', 'active_account',
+        ).prefetch_related(
+            Prefetch(
+                'subscription_accounts',
+                queryset=Account.objects.select_related('asset').only(
+                    'id', 'name', 'username', 'asset_id',
+                    'asset__id', 'asset__name', 'asset__address',
+                ).order_by('name', 'username', 'id')[:3],
+                to_attr='subscription_accounts_preview',
+            ),
+        ).annotate(
+            subscription_accounts_amount=Count('subscription_accounts', distinct=True),
+            subscription_assets_amount=Count('subscription_accounts__asset_id', distinct=True),
+        )
 
 
 class CredentialClientStatusSerializer(serializers.ModelSerializer):

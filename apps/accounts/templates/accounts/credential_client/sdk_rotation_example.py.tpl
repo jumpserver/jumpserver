@@ -1,39 +1,34 @@
-from jms_pam.credential.v1 import credential_client, models
-from jms_pam_config import confirmation_keys, cred, credential_keys, profile
+from jms_pam import Client
+from jms_pam_config import client_options, confirmation_keys, credential_keys
+
+
+def apply_credential(credential):
+    # Build and verify a new connection, switch the application to it,
+    # then release the old connection. Never log credential.account.secret.
+    raise NotImplementedError("Implement the application connection update first")
 
 
 def switch_credential(client, key):
-    response = client.GetCredential(models.GetCredentialRequest(Key=key))
-
-    address = response.Asset.Address
-    username = response.Account.Username
-    secret_type = response.Account.SecretType
-    secret = response.Account.Secret
-
-    # Build and verify a new connection, switch the application to it,
-    # then release the old connection. Never write secret to logs.
+    response = client.get_credential(key=key)
+    apply_credential(response)
 
     if key in confirmation_keys:
-        client.ConfirmCredential(models.ConfirmCredentialRequest(
-            Key=response.Key,
-            Revision=response.Revision,
-            AccountId=response.Account.Id,
-        ))
+        client.confirm_credential(
+            key=response.key, revision=response.revision, account_id=response.account.id
+        )
 
 
-with credential_client.CredentialClient(
-    cred, instance_id='order-service-node-1', profile=profile,
-) as client:
+with Client(instance_id="order-service-node-1", **client_options) as client:
     for key in credential_keys:
         switch_credential(client, key)
-    for event in client.WatchCredentialEvents():
-        if event.get('event') == 'snapshot':
-            updates = event.get('credentials', [])
-        elif event.get('event') == 'credential.updated':
+    for event in client.watch_credential_events():
+        if event.get("event") == "snapshot":
+            updates = event.get("credentials", [])
+        elif event.get("event") == "credential.updated":
             updates = [event]
         else:
             continue
         for update in updates:
-            key = update.get('credential_key') or update.get('key')
+            key = update.get("credential_key") or update.get("key")
             if key in credential_keys:
                 switch_credential(client, key)

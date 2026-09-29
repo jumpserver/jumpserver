@@ -6,9 +6,9 @@ from channels.testing import WebsocketCommunicator
 from django.db import transaction
 from django.test import TransactionTestCase, override_settings
 
-from accounts.demos.python.jms_pam.common.credential import Credential
-from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
+from accounts.clients.python.jms_pam.common.credential import Credential
+from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.clients.python.jms_pam.credential.v1.credential_client import CredentialClient
 from accounts.credential_client.events import _publish_stream
 from accounts.credential_rotation.manager import CredentialRotationManager
 from accounts.models import (

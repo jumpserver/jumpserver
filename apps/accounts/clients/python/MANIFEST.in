@@ -1,0 +1,3 @@
+include README.*.md
+include .ruff.toml
+recursive-include file_apps *.md

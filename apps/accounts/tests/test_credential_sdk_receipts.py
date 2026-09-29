@@ -4,9 +4,9 @@ from unittest.mock import Mock, patch
 
 import websocket
 
-from accounts.demos.python.jms_pam.common.credential import Credential
-from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.demos.python.jms_pam.credential.v1 import credential_client
+from accounts.clients.python.jms_pam.common.credential import Credential
+from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.clients.python.jms_pam.credential.v1 import credential_client
 
 
 class CredentialSDKReceiptTests(TestCase):

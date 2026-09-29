@@ -146,6 +146,7 @@ class CredentialClientAgentAuthentication(
 class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     model = ApplicationCredential
     serializer_class = serializers.ApplicationCredentialSerializer
+    serializer_classes = {'list': serializers.ApplicationCredentialListSerializer}
     filterset_fields = ('id', 'name', 'key', 'mode', 'status', 'is_active', 'applications')
     search_fields = ('name', 'key', 'comment')
     ordering_fields = ('name', 'status', 'date_last_rotated', 'date_created')

@@ -1,3 +1,0 @@
-include README.en.md
-include README.zh-hans.md
-recursive-include file_apps *.md

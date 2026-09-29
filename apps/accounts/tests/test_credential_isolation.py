@@ -9,9 +9,10 @@ from rest_framework.test import force_authenticate
 
 from accounts.api.account.credential import CredentialClientViewSet
 from accounts.credential_client.manager import CredentialClientManager
-from accounts.demos.python.jms_pam.agent import Agent, read_json
-from accounts.demos.python.jms_pam.common.exception import JumpServerPAMSDKException
-from accounts.demos.python.jms_pam.credential.v1 import models
+from accounts.clients.python.jms_pam.agent import Agent, read_json
+from accounts.clients.python.jms_pam.models import Account, Asset, Credential, Platform
+from accounts.clients.python.jms_pam.common.exception import JumpServerPAMSDKException
+from accounts.clients.python.jms_pam.credential.v1 import models
 from accounts.models import ClientAccessConfiguration, CredentialClientStatus
 from accounts.tests.base import CredentialTestCase
 
@@ -33,6 +34,7 @@ class ClientIsolationTests(SimpleTestCase):
         }
         self.agent.config_file = str(Path(directory.name) / 'agent.json')
         self.agent.lock = threading.Lock()
+        self.agent.sync_lock = threading.RLock()
         self.agent.credentials = {
             key: {'key': key, 'revision': 1, 'account_id': key, 'secret': 'old'}
             for key in 'abc'
@@ -45,16 +47,18 @@ class ClientIsolationTests(SimpleTestCase):
 
     @staticmethod
     def fetched(key):
-        return models.GetCredentialResponse()._deserialize({'key': key, 'revision': 2,
-                'asset': {'id': 'asset', 'name': 'asset', 'address': '127.0.0.1'},
-                'account': {'id': key, 'name': key, 'username': key, 'secret_type': 'password', 'secret': 'new'}})
+        return Credential(
+            key=key, revision=2,
+            asset=Asset('asset', 'asset', '127.0.0.1', Platform('platform', 'db', 'database', 'mysql')),
+            account=Account(key, key, key, 'password', 'new'),
+        )
 
     def test_partial_fetch_preserves_failed_item_and_writes_successes(self):
-        self.agent.remote.GetCredential.side_effect = [self.fetched('a'), http_error('credential_not_selected'), self.fetched('c')]
-        with patch('sys.stderr') as stderr:
+        self.agent.remote.get_credential.side_effect = [self.fetched('a'), http_error('credential_not_selected'), self.fetched('c')]
+        with self.assertLogs('accounts.clients.python.jms_pam._agent.runtime', level='WARNING') as logs:
             changed = self.agent.fetch(['a', 'b', 'c'])
         self.assertEqual(changed, {'a', 'c'})
-        self.assertNotIn('DO_NOT_LOG_SECRET', str(stderr.write.call_args_list))
+        self.assertNotIn('DO_NOT_LOG_SECRET', str(logs.output))
         persisted = read_json(self.agent.credential_file)
         self.assertEqual(set(persisted), {'a', 'b', 'c'})
         self.assertEqual(persisted['a']['revision'], 2)
@@ -68,7 +72,7 @@ class ClientIsolationTests(SimpleTestCase):
             http_error('credential_changing', 400), http_error('credential_not_found', 500),
         ):
             with self.subTest(error=type(error).__name__):
-                self.agent.remote.GetCredential.side_effect = [self.fetched('a'), error, self.fetched('c')]
+                self.agent.remote.get_credential.side_effect = [self.fetched('a'), error, self.fetched('c')]
                 self.agent.fetch(['a', 'b', 'c'])
                 self.assertEqual(self.agent.credentials['b']['revision'], 1)
                 self.assertEqual(self.agent.credentials['c']['revision'], 2)
@@ -76,17 +80,17 @@ class ClientIsolationTests(SimpleTestCase):
     def test_identity_failure_does_not_commit_partial_batch(self):
         for status, code in ((401, 'authentication_failed'), (403, 'client_disabled'), (403, 'configuration_disabled')):
             with self.subTest(code=code):
-                self.agent.remote.GetCredential.reset_mock()
-                self.agent.remote.GetCredential.side_effect = [self.fetched('a'), http_error(code, status), self.fetched('c')]
+                self.agent.remote.get_credential.reset_mock()
+                self.agent.remote.get_credential.side_effect = [self.fetched('a'), http_error(code, status), self.fetched('c')]
                 with self.assertRaises(JumpServerPAMSDKException):
                     self.agent.fetch(['a', 'b', 'c'])
                 self.assertEqual(self.agent.credentials['a']['revision'], 1)
-                self.assertEqual(self.agent.remote.GetCredential.call_count, 2)
+                self.assertEqual(self.agent.remote.get_credential.call_count, 2)
 
     def test_confirmation_reporting_only_uses_authorized_credentials(self):
         self.agent.authorized_keys = {'a'}
         self.agent.report_confirmations()
-        request = self.agent.remote.ConfirmCredential.call_args.args[0]._serialize()
+        request = self.agent.remote.confirm_credential.call_args.kwargs
         self.assertEqual(request['key'], 'a')
         self.assertIn('b', self.agent.credentials)
         self.assertIn('b', self.agent.state)
@@ -94,13 +98,13 @@ class ClientIsolationTests(SimpleTestCase):
     def test_event_listener_syncs_only_actionable_events(self):
         self.agent.start_local_server = Mock(return_value=Mock())
         self.agent.safe_sync = Mock()
-        self.agent.remote.WatchCredentialEvents.return_value = iter([
+        self.agent.remote.watch_credential_events.return_value = iter([
             {'event': 'credential.change.started'},
             {'event': 'credential.updated'},
         ])
         self.agent.remote.close = Mock()
-        with patch('accounts.demos.python.jms_pam.agent.threading.Thread'):
-            self.agent.run()
+        self.agent.remote.list_application_commands.return_value = []
+        self.agent.run()
         self.assertEqual(self.agent.safe_sync.call_count, 2)
 
 

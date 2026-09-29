@@ -1,8 +1,10 @@
 import shlex
 import threading
 import json
+import zipfile
 from datetime import timedelta
 from email.utils import formatdate
+from io import BytesIO
 from unittest.mock import Mock, patch
 
 import requests
@@ -17,7 +19,7 @@ from django.utils import timezone
 from django.utils.translation import override as override_language
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.permissions import AllowAny
-from rest_framework.test import force_authenticate
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.credential_client.manager import ClientAccessConfigurationManager, CredentialClientManager
 from accounts.credential_rotation import CredentialRotationManager
@@ -29,15 +31,16 @@ from accounts.api.account.credential import (
     CredentialClientInstanceViewSet, CredentialClientViewSet,
     ApplicationCredentialViewSet, ClientAccessConfigurationViewSet,
 )
-from accounts.api.account.application import IntegrationApplicationViewSet
+from accounts.api.account.application import IntegrationApplicationViewSet, PythonSDKDownloadAPI
 from accounts.const import ChangeSecretRecordStatusChoice
-from accounts.demos.python.jms_pam.agent import Agent
-from accounts.demos.python.jms_pam.common.abstract_client import HTTPSignatureAuth
-from accounts.demos.python.jms_pam.common.credential import Credential as PAMCredential
-from accounts.demos.python.jms_pam.common.exception import JumpServerPAMSDKException
-from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.demos.python.jms_pam.credential.v1 import models
-from accounts.demos.python.jms_pam.credential.v1.credential_client import CLIENT_PATH, CredentialClient
+from accounts.clients.python.jms_pam import Client
+from accounts.clients.python.jms_pam.agent import Agent
+from accounts.clients.python.jms_pam.common.abstract_client import HTTPSignatureAuth
+from accounts.clients.python.jms_pam.common.credential import Credential as PAMCredential
+from accounts.clients.python.jms_pam.common.exception import JumpServerPAMSDKException
+from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.clients.python.jms_pam.credential.v1 import models
+from accounts.clients.python.jms_pam.credential.v1.credential_client import CLIENT_PATH, CredentialClient
 from accounts.models import (
     Account, AutomationExecution, ChangeSecretRecord, ApplicationCredential, IntegrationApplication,
     ApplicationAudit, ClientAccessConfiguration,
@@ -561,8 +564,8 @@ class CredentialRotationTestCase(CredentialTestCase):
         config = materials['config']
         self.assertNotIn(key, config)
         self.assertNotIn('credential_keys', config)
-        self.assertIn('GetCredentialRequest(AccountId=account_id)', materials['code'])
-        self.assertNotIn('ConfirmCredential', materials['code'])
+        self.assertIn('get_credentialRequest(AccountId=account_id)', materials['code'])
+        self.assertNotIn('confirm_credential', materials['code'])
         self.assertNotIn('Revision', materials['code'])
         first = manager.fetch('', '127.0.0.1', self.primary.id)
         self.assertEqual(first['account']['secret'], self.primary.secret)
@@ -873,7 +876,7 @@ class CredentialRotationTestCase(CredentialTestCase):
             'limit': 10, 'fields_size': 'small',
         }))
         self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.data['results'][0]['last_fetched'])
+        self.assertNotIn('last_fetched', response.data['results'][0])
         self.assertEqual(response.data['results'][0]['applications_amount'], 1)
 
     def test_materials_require_permission_and_user_confirmation(self):
@@ -1216,6 +1219,59 @@ class CredentialClientInstanceDeletionTestCase(SimpleTestCase):
 
 
 class PythonSDKTestCase(SimpleTestCase):
+    def test_generated_config_constructs_the_python_client(self):
+        for configuration_id in (None, 'configuration'):
+            with self.subTest(configuration_id=configuration_id):
+                context = {
+                    name: json.dumps(value) for name, value in {
+                        'app_id': 'application', 'app_secret': "secret'\\\n",
+                        'endpoint': 'https://testserver', 'org_id': 'org',
+                    }.items()
+                }
+                if configuration_id:
+                    context['configuration_id'] = json.dumps(configuration_id)
+                code = render_to_string(
+                    'accounts/credential_client/sdk_config.py.tpl', context,
+                )
+                namespace = {}
+                exec(compile(code, 'jms_pam_config.py', 'exec'), namespace)
+                with Client(instance_id='worker', **namespace['client_options']) as client:
+                    self.assertEqual(client.configuration_id, configuration_id)
+                    self.assertEqual(client.org_id, 'org')
+
+    def test_download_includes_sdk_agent_and_examples(self):
+        response = PythonSDKDownloadAPI.as_view()(APIRequestFactory().get('/api/v1/accounts/python-sdk/'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+        with zipfile.ZipFile(BytesIO(response.content)) as archive:
+            self.assertIsNone(archive.testzip())
+            self.assertTrue({
+                'setup.py', 'README.en.md', 'README.zh-hans.md',
+                'jms_pam/agent.py', 'jms_pam/credential/v1/credential_client.py',
+                'jms_pam/_transport.py', 'jms_pam/_events.py', 'jms_pam/py.typed',
+                'jms_pam/_agent/runtime.py', 'jms_pam/_agent/install.py',
+                'demo.py', 'file_apps/rotation.py', 'file_apps/subscription.py',
+            }.issubset(archive.namelist()))
+            from accounts.credential_client.documentation import DOCUMENTATION_LANGUAGES
+            self.assertTrue({f'README.{locale}.md' for locale in DOCUMENTATION_LANGUAGES}.issubset(archive.namelist()))
+            self.assertTrue(all(
+                not any(part in ('__pycache__', '.ruff_cache', 'build', 'dist')
+                        or part.endswith('.egg-info') for part in name.split('/'))
+                and not name.endswith(('.pyc', '.pyo'))
+                for name in archive.namelist()
+            ))
+
+    def test_sdk_instructions_read_client_sources(self):
+        request = APIRequestFactory().get('/api/v1/accounts/integration-applications/sdks/')
+        with override_language('zh-hans'):
+            response = IntegrationApplicationViewSet.as_view(
+                {'get': 'get_sdks_info'}, authentication_classes=[], permission_classes=[AllowAny],
+            )(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('apps/accounts/clients/python', response.data['readme'])
+        self.assertIn('watch_credential_events', response.data['code'])
+        compile(response.data['code'], 'downloaded_sdk_example.py', 'exec')
+
     def test_rotation_record_api_is_not_exposed(self):
         with self.assertRaises(Resolver404):
             resolve('/api/v1/accounts/credential-rotation-records/')
@@ -1230,14 +1286,14 @@ class PythonSDKTestCase(SimpleTestCase):
 
         compile(subscription, 'sdk_subscription_example.py', 'exec')
         compile(rotation, 'sdk_rotation_example.py', 'exec')
-        self.assertIn('WatchCredentialEvents', subscription)
-        self.assertIn('GetCredentialRequest(AccountId=account_id)', subscription)
-        self.assertNotIn('ConfirmCredential', subscription)
+        self.assertIn('watch_credential_events', subscription)
+        self.assertIn('get_credential(account_id=account_id)', subscription)
+        self.assertNotIn('confirm_credential', subscription)
         self.assertNotIn('Revision', subscription)
-        self.assertIn('WatchCredentialEvents', rotation)
-        self.assertIn('GetCredentialRequest(Key=key)', rotation)
-        self.assertIn('client.ConfirmCredential(', rotation)
-        self.assertNotIn('AccountId=account_id', rotation)
+        self.assertIn('watch_credential_events', rotation)
+        self.assertIn('get_credential(key=key)', rotation)
+        self.assertIn('client.confirm_credential(', rotation)
+        self.assertNotIn('account_id=account_id', rotation)
         self.assertNotIn('Heartbeat', subscription + rotation)
 
     def test_http_signature(self):
@@ -1363,10 +1419,13 @@ class PythonSDKTestCase(SimpleTestCase):
         agent = Agent.__new__(Agent)
         agent.config = {'credential_file': '/unused/credentials.json'}
         agent.remote = Mock()
-        agent.remote.GetCredential.return_value = models.GetCredentialResponse()._deserialize({
+        from accounts.clients.python.jms_pam.models import Credential
+        agent.remote.get_credential.return_value = Credential.from_dict({
             'key': 'database',
             'revision': 2,
-            'asset': {'id': 'asset', 'name': 'db', 'address': '127.0.0.1'},
+            'asset': {'id': 'asset', 'name': 'db', 'address': '127.0.0.1', 'platform': {
+                'id': 'platform', 'name': 'db', 'category': 'database', 'type': 'mysql',
+            }},
             'account': {
                 'id': 'account', 'name': 'db-user', 'username': 'db-user',
                 'secret_type': 'password', 'secret': 'new-secret',
@@ -1377,7 +1436,7 @@ class PythonSDKTestCase(SimpleTestCase):
         agent.lock = threading.Lock()
 
         with patch(
-            'accounts.demos.python.jms_pam.agent.atomic_write_json',
+            'accounts.clients.python.jms_pam._agent.runtime.atomic_write_json',
             side_effect=OSError('disk full'),
         ), self.assertRaisesRegex(OSError, 'disk full'):
             agent.fetch(['database'])

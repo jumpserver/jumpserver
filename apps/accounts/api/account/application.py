@@ -54,12 +54,6 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'manual_events': 'accounts.view_integrationapplication',
     }
 
-    def read_file(self, path):
-        if os.path.exists(path):
-            with open(path, 'r', encoding='utf-8') as file:
-                return file.read()
-        return ''
-
     @action(['GET'], detail=True, url_path='send-event-options')
     def send_event_options(self, request, *args, **kwargs):
         from accounts.credential_client.commands import options
@@ -115,19 +109,9 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         ['GET'], detail=False, url_path='sdks',
     )
     def get_sdks_info(self, request, *args, **kwargs):
+        from accounts.credential_client.documentation import get_sdk_documentation
         sdk_language = request.query_params.get('language', 'python')
-        if sdk_language != 'python':
-            raise ValidationError(_('Credential policies currently support the Python SDK only.'))
-        sdk_path = os.path.join(settings.APPS_DIR, 'accounts', 'demos', sdk_language)
-        readme_path = os.path.join(sdk_path, f'README.{get_language()}.md')
-        demo_path = os.path.join(sdk_path, 'demo.py')
-
-        readme_content = self.read_file(readme_path)
-        if not readme_content:
-            readme_content = self.read_file(os.path.join(sdk_path, 'README.en.md'))
-        demo_content = self.read_file(demo_path)
-
-        return Response(data={'readme': readme_content, 'code': demo_content})
+        return Response(get_sdk_documentation(sdk_language, get_language()))
 
     @action(['GET'], detail=True, url_path='credential-events')
     def credential_events(self, request, *args, **kwargs):
@@ -183,7 +167,13 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     )
     def get_once_secret(self, request, *args, **kwargs):
         instance = self.get_object()
-        return Response(data={'id': instance.id, 'secret': instance.secret})
+        response = Response(data={
+            'id': instance.id, 'secret': instance.secret,
+            'org_id': str(instance.org_id),
+            'endpoint': request.build_absolute_uri('/').rstrip('/'),
+        })
+        response['Cache-Control'] = 'no-store'
+        return response
     
     @action(
         ['POST'], detail=True, url_path='reset-secret',
@@ -299,11 +289,15 @@ class PythonSDKDownloadAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        package_dir = os.path.join(settings.APPS_DIR, 'accounts', 'demos', 'python')
+        package_dir = os.path.join(settings.APPS_DIR, 'accounts', 'clients', 'python')
         buffer = BytesIO()
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as archive:
             for root, dirs, files in os.walk(package_dir):
-                dirs[:] = [name for name in dirs if name != '__pycache__']
+                dirs[:] = [
+                    name for name in dirs
+                    if name not in ('__pycache__', '.ruff_cache', 'build', 'dist')
+                    and not name.endswith('.egg-info')
+                ]
                 for filename in files:
                     if filename.endswith(('.pyc', '.pyo')):
                         continue

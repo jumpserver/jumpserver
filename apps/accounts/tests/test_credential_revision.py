@@ -4,8 +4,9 @@ from unittest.mock import Mock, patch
 from django.db import transaction
 
 from accounts.credential_client.manager import CredentialClientManager
-from accounts.demos.python.jms_pam.agent import Agent
-from accounts.demos.python.jms_pam.credential.v1 import models
+from accounts.clients.python.jms_pam.agent import Agent
+from accounts.clients.python.jms_pam.models import Credential
+from accounts.clients.python.jms_pam.credential.v1 import models
 from accounts.models import (
     Account, ApplicationAudit, ApplicationCredential, AutomationExecution,
     ChangeSecretRecord, ClientAccessConfiguration,
@@ -178,11 +179,11 @@ class CredentialRevisionTests(CredentialTestCase):
         agent.credentials = {}
         agent.state = {}
         agent.remote = Mock()
-        agent.remote.GetCredential.side_effect = [
-            models.GetCredentialResponse()._deserialize(item)
+        agent.remote.get_credential.side_effect = [
+            Credential.from_dict(item)
             for item in (first, second, second)
         ]
-        with patch('accounts.demos.python.jms_pam.agent.atomic_write_json') as write:
+        with patch('accounts.clients.python.jms_pam._agent.runtime.atomic_write_json') as write:
             agent.fetch([primary_key])
             agent.fetch([primary_key])
             agent.fetch([primary_key])

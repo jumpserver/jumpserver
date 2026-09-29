@@ -19,10 +19,10 @@ from accounts.api.account.credential import (
 )
 from accounts.credential_client.access import materials, subscription_scope
 from accounts.credential_client.manager import CredentialClientManager
-from accounts.demos.python.jms_pam.common.abstract_client import HTTPSignatureAuth
-from accounts.demos.python.jms_pam.common.credential import Credential
-from accounts.demos.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.demos.python.jms_pam.credential.v1.credential_client import CredentialClient
+from accounts.clients.python.jms_pam.common.abstract_client import HTTPSignatureAuth
+from accounts.clients.python.jms_pam.common.credential import Credential
+from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.clients.python.jms_pam.credential.v1.credential_client import CredentialClient
 from accounts.models import (
     ApplicationCredential, ClientAccessConfiguration, CredentialApplicationBinding,
     CredentialClientInstance, IntegrationApplication,
