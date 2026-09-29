@@ -1,8 +1,3 @@
-import hashlib
-from email.utils import parsedate_to_datetime
-
-from django.core.cache import cache
-from django.utils import timezone
 from rest_framework import authentication
 from rest_framework import exceptions
 
@@ -44,7 +39,6 @@ class SignatureAuthentication(authentication.BaseAuthentication):
     source = ''
     www_authenticate_realm = "api"
     required_headers = ["(request-target)", "date"]
-    max_clock_skew = 300
 
     def fetch_user_data(self, key_id, algorithm=None):
         """Returns a tuple (User, secret) or (None, None)."""
@@ -97,15 +91,6 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         if len({"keyid", "algorithm", "signature"} - set(fields.keys())) > 0:
             raise FAILED
 
-        try:
-            signed_at = parsedate_to_datetime(request.headers.get('Date', ''))
-            if timezone.is_naive(signed_at):
-                raise ValueError('Date must include a timezone')
-            if abs((timezone.now() - signed_at).total_seconds()) > self.max_clock_skew:
-                raise ValueError('Date is outside the accepted clock skew')
-        except (TypeError, ValueError, OverflowError):
-            raise FAILED from None
-
         key_id = fields["keyid"]
         # Fetch the secret associated with the keyid
         user, secret = self.fetch_user_data(
@@ -136,17 +121,6 @@ class SignatureAuthentication(authentication.BaseAuthentication):
 
         # All of that just to get to this.
         if not verified:
-            raise FAILED
-
-        signature = fields.get('signature') or ''
-        replay_key = 'http_sig:%s:%s' % (
-            key_id, hashlib.sha256(signature.encode('utf-8')).hexdigest()
-        )
-        try:
-            stored = cache.add(replay_key, True, timeout=2 * self.max_clock_skew)
-        except Exception:
-            raise FAILED from None
-        if not stored:
             raise FAILED
 
         self.after_authenticate_update_date(user)
