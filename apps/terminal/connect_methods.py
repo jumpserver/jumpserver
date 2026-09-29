@@ -158,7 +158,7 @@ class ConnectMethodUtil:
                 'web_methods': [WebMethod.web_cli],
                 'listen': [Protocol.http, Protocol.ssh, Protocol.sftp],
                 'support': [
-                    Protocol.ssh, Protocol.telnet, Protocol.sftp,
+                    Protocol.ssh, Protocol.telnet, Protocol.winrm, Protocol.sftp,
                     Protocol.redis, Protocol.mongodb,
                     Protocol.k8s, Protocol.clickhouse,
                     Protocol.http,

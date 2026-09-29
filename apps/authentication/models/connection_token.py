@@ -184,12 +184,12 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire_at(self):
         return self.permed_account.date_expired.timestamp()
 
-    def is_valid(self, include_personal_secret=False) -> bool:
+    def is_valid(self, include_personal_secret=False, *, check_expiration=True) -> bool:
         if not self.is_active:
             error = _('Connection token inactive')
             raise PermissionDenied(error)
 
-        if self.is_expired:
+        if check_expiration and self.is_expired:
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
             raise PermissionDenied(error)
         if not self.user or not self.user.is_valid:
@@ -572,9 +572,10 @@ class AdminConnectionToken(ConnectionToken):
     def expire_at(self):
         return (timezone.now() + timezone.timedelta(days=365)).timestamp()
 
-    def is_valid(self, include_personal_secret=False):
+    def is_valid(self, include_personal_secret=False, *, check_expiration=True):
         return super().is_valid(
-            include_personal_secret=include_personal_secret
+            include_personal_secret=include_personal_secret,
+            check_expiration=check_expiration,
         )
 
     @classmethod
