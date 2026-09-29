@@ -77,7 +77,9 @@ class OAuth2SettingSerializer(serializers.Serializer):
         required=True, label=_('User attribute'),
         help_text=_(
             'User attribute mapping, where the `key` is this system user attribute name and the '
-            '`value` is the OAuth2 service user attribute name'
+            '`value` is the OAuth2 service user attribute name. The `groups` attribute accepts '
+            'a group name or a list of group names; synchronized groups use the OAuth2 prefix. '
+            'An empty list removes existing OAuth2 groups on login.'
         )
     )
     AUTH_OAUTH2_ALWAYS_UPDATE_USER = serializers.BooleanField(

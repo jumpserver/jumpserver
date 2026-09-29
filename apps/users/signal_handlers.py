@@ -3,6 +3,8 @@
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_out
+from django.core.cache import cache
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -47,7 +49,7 @@ def check_only_allow_exist_user_auth(created):
 
 def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
     if not check_only_allow_exist_user_auth(created):
-        return
+        return False
 
     if created:
         logger.debug(f'Receive user created signal: {user}, Set user source is: {source}')
@@ -61,7 +63,7 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
             bind_user_to_group(org_ids, group_names, user)
 
     if not attrs:
-        return
+        return True
 
     always_update = getattr(settings, 'AUTH_%s_ALWAYS_UPDATE_USER' % source.upper(), False)
     if not created and always_update:
@@ -76,6 +78,7 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
             if key in attr_whitelist and value:
                 setattr(user, key, value)
         user.save()
+    return True
 
 
 def set_user_email_lookup(user):
@@ -173,7 +176,12 @@ def on_saml2_create_or_update_user(sender, user, created, attrs, **kwargs):
 @receiver(oauth2_create_or_update_user)
 def on_oauth2_create_or_update_user(sender, user, created, attrs, **kwargs):
     source = User.Source.oauth2.value
-    user_authenticated_handle(user, created, source, attrs, **kwargs)
+    attrs = attrs or {}
+    user_attrs = attrs.copy()
+    group_names = user_attrs.pop('groups', None)
+    handled = user_authenticated_handle(user, created, source, user_attrs, **kwargs)
+    if handled and 'groups' in attrs:
+        sync_oauth2_user_groups(user, group_names)
 
 
 @receiver(radius_create_user)
@@ -259,7 +267,7 @@ def bind_user_to_org_role(user):
     return org_ids
 
 
-def bind_user_to_group(org_ids, group_names, user):
+def bind_user_to_group(org_ids, group_names, user, ignore_conflicts=False):
     if isinstance(group_names, str):
         group_names = [group_names]
 
@@ -284,7 +292,7 @@ def bind_user_to_group(org_ids, group_names, user):
                 UserGroup(org_id=org_id, name=name) for name in new_group_names
             )
 
-        UserGroup.objects.bulk_create(groups_to_create)
+        UserGroup.objects.bulk_create(groups_to_create, ignore_conflicts=ignore_conflicts)
         user_groups = UserGroup.objects.filter(org_id__in=org_ids, name__in=group_names)
 
         user_group_ids = set(user_groups.values_list('id', flat=True))
@@ -301,3 +309,45 @@ def bind_user_to_group(org_ids, group_names, user):
 
         if user_group_links:
             User.groups.through.objects.bulk_create(user_group_links, ignore_conflicts=True)
+
+
+def sync_oauth2_user_groups(user, group_names):
+    if isinstance(group_names, str):
+        group_names = [group_names]
+    if not isinstance(group_names, list) or any(
+        not isinstance(name, str) or not name.strip() for name in group_names
+    ):
+        logger.warning('Skip OAuth2 user group sync: invalid groups attribute')
+        return
+
+    prefix = 'OAuth2 '
+    names = {prefix + name.strip() for name in group_names}
+    if any(len(name) > UserGroup._meta.get_field('name').max_length for name in names):
+        logger.warning('Skip OAuth2 user group sync: group name is too long')
+        return
+
+    org_ids = settings.OAUTH2_ORG_IDS or [Organization.DEFAULT_ID]
+    org_ids = [str(org_id) for org_id in org_ids if org_id]
+    if not org_ids:
+        return
+
+    bind_user_to_group(org_ids, list(names), user, ignore_conflicts=True)
+    with tmp_to_root_org():
+        stale_groups = list(
+            UserGroup.objects.filter(
+                org_id__in=org_ids, name__startswith=prefix, users=user
+            ).exclude(name__in=names)
+        )
+        if stale_groups:
+            user.groups.remove(*stale_groups)
+
+    cache_org_ids = set(org_ids) | {Organization.ROOT_ID, None}
+    cache_keys = [
+        f'perms:{kind}:{user.id}:{org_id}'
+        for org_id in cache_org_ids
+        for kind in (
+            'user-permission-ids', 'user-permission-node-keys',
+            'user-direct-asset-node-keys',
+        )
+    ]
+    transaction.on_commit(lambda: cache.delete_many(cache_keys), robust=True)
