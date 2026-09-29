@@ -14,7 +14,7 @@ class LoginAssetACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
 
     class Meta(BaseSerializer.Meta):
         model = LoginAssetACL
-        fields = BaseSerializer.Meta.fields + ['rules']
+        fields = BaseSerializer.Meta.fields + ['rules', 'review_duration']
 
     def get_rules_serializer(self):
         return RuleSerializer()
