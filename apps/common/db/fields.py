@@ -556,8 +556,9 @@ class JSONManyToManyDescriptor:
 
 
 class JSONManyToManyField(models.JSONField):
-    def __init__(self, to, *args, **kwargs):
+    def __init__(self, to, *args, allow_empty_ids=False, **kwargs):
         self.to = to
+        self.allow_empty_ids = allow_empty_ids
         super().__init__(*args, **kwargs)
 
     def contribute_to_class(self, cls, name, **kwargs):
@@ -567,10 +568,12 @@ class JSONManyToManyField(models.JSONField):
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         kwargs['to'] = self.to
+        if self.allow_empty_ids:
+            kwargs['allow_empty_ids'] = True
         return name, path, args, kwargs
 
     @staticmethod
-    def check_value(val):
+    def check_value(val, allow_empty_ids=False):
         if not val:
             return val
         e = ValueError(_(
@@ -585,7 +588,7 @@ class JSONManyToManyField(models.JSONField):
         if val["type"] == "ids":
             if not isinstance(val["ids"], list):
                 raise ValueError(_("Invalid ids for ids, should be a list"))
-            if not val["ids"]:
+            if not val["ids"] and not allow_empty_ids:
                 raise ValueError(_("This field is required."))
         elif val["type"] == "attrs":
             if not isinstance(val["attrs"], list):
@@ -609,4 +612,4 @@ class JSONManyToManyField(models.JSONField):
         super().validate(value, model_instance)
         if not isinstance(value, dict):
             raise ValidationError("Invalid JSON data for JSONManyToManyField.")
-        self.check_value(value)
+        self.check_value(value, self.allow_empty_ids)

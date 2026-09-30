@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from accounts.const import ApplicationEvent, AuditEvent
 from accounts.models import (
-    ApplicationAudit, ApplicationCredential, ClientAccessConfiguration,
+    ApplicationAudit, ApplicationCredential,
     CredentialClientInstance, CredentialRotationEvent,
 )
 
@@ -31,7 +31,6 @@ def receive(client_id, org_id, event_id):
     client = CredentialClientInstance.objects.filter(
         id=client_id, org_id=org_id, is_active=True,
         application__is_active=True, application__org_id=org_id,
-        configuration__is_active=True, configuration__org_id=org_id,
     ).first()
     if not client:
         return False
@@ -44,7 +43,6 @@ def receive(client_id, org_id, event_id):
         if (
             recipient['id'] != str(client.id)
             or recipient['application']['id'] != str(client.application_id)
-            or recipient['configuration']['id'] != str(client.configuration_id)
         ):
             continue
         if recipient['received_at'] is None:
@@ -70,7 +68,6 @@ def timeline(credential, rotation_id=None):
         instances[participant['client']['id']] = {
             **participant['client'],
             'application': participant['application'],
-            'configuration': participant['configuration'],
             'supports_receipts': participant['client'].get('supports_receipts', False),
             'receipts': [],
         }
@@ -78,16 +75,12 @@ def timeline(credential, rotation_id=None):
 
 
 def subscription_events(credential):
-    configurations = ClientAccessConfiguration.objects.filter(
-        credentials=credential,
-    )
     applications = credential.applications.values('id')
     source_events = ApplicationAudit.objects.filter(
         Q(credential_id=credential.id) |
         (
             Q(event=AuditEvent.CONFIGURATION_UPDATED) &
             (
-                Q(configuration_id__in=configurations.values('id')) |
                 Q(service_id__in=applications) |
                 Q(application_relations__application_id__in=applications)
             )
@@ -101,18 +94,15 @@ def subscription_events(credential):
 
 
 def _subscription_timeline(credential):
-    configurations = ClientAccessConfiguration.objects.filter(credentials=credential)
     events = list(subscription_events(credential).order_by('published_at', 'id'))
     clients = CredentialClientInstance.objects.filter(
-        configuration__in=configurations,
         application__credential_bindings__credential=credential,
         org_id=credential.org_id,
-    ).select_related('application', 'configuration').distinct()
+    ).select_related('application').distinct()
     instances = {
         str(client.id): {
             'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
             'application': {'id': str(client.application_id), 'name': client.application.name},
-            'configuration': {'id': str(client.configuration_id), 'name': client.configuration.name},
             'supports_receipts': client.event_receipts_supported, 'receipts': [],
         }
         for client in clients
@@ -125,7 +115,7 @@ def _build_timeline(events, instances, org_id, rotation_id=None, status=None):
         for recipient in event.recipients:
             instance = instances.setdefault(recipient['id'], {
                 key: recipient[key] for key in (
-                    'id', 'instance_id', 'type', 'application', 'configuration',
+                    'id', 'instance_id', 'type', 'application',
                     'supports_receipts',
                 )
             })
@@ -138,7 +128,7 @@ def _build_timeline(events, instances, org_id, rotation_id=None, status=None):
     live_clients = {
         str(client.id): client for client in CredentialClientInstance.objects.filter(
             id__in=instances, org_id=org_id,
-        ).select_related('application', 'configuration')
+        ).select_related('application')
     }
     for instance in instances.values():
         client = live_clients.get(instance['id'])
@@ -163,6 +153,6 @@ def _build_timeline(events, instances, org_id, rotation_id=None, status=None):
             'revision': event.revision,
         } for sequence, event in enumerate(events, start=1)],
         'instances': sorted(instances.values(), key=lambda item: (
-            item['application']['name'], item['configuration']['name'], item['instance_id'],
+            item['application']['name'], item['type'], item['instance_id'],
         )),
     }

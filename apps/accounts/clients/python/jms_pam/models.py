@@ -97,6 +97,7 @@ class Credential:
     revision: int
     asset: Asset
     account: Account
+    from_local: bool = field(default=False, compare=False)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Credential":
@@ -110,7 +111,9 @@ class Credential:
 
     def to_dict(self) -> dict[str, Any]:
         """Return delivery data, including the secret; never log this mapping."""
-        return asdict(self)
+        data = asdict(self)
+        data.pop("from_local")
+        return data
 
 
 @dataclass(frozen=True)
@@ -166,7 +169,7 @@ class AgentSync:
     credentials: list[CredentialRevision]
     removed_keys: list[str]
     date_last_synced: str
-    configuration: Optional[dict[str, Any]] = None
+    scope: Optional[dict[str, Any]] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "AgentSync":
@@ -179,9 +182,9 @@ class AgentSync:
             raise TypeError("Credential revisions and removed keys must be lists")
         if not all(isinstance(key, str) and key for key in data["removed_keys"]):
             raise TypeError("Removed keys must be non-empty strings")
-        configuration = data.get("configuration")
-        if configuration is not None and not isinstance(configuration, dict):
-            raise TypeError("Agent configuration must be an object")
+        scope = data.get("scope")
+        if scope is not None and not isinstance(scope, dict):
+            raise TypeError("Agent scope must be an object")
         credentials = [
             CredentialRevision.from_dict(item) for item in data["credentials"]
         ]
@@ -192,7 +195,7 @@ class AgentSync:
             credentials,
             list(data["removed_keys"]),
             _string(data, "date_last_synced"),
-            configuration,
+            scope,
         )
 
     def to_dict(self) -> dict[str, Any]:

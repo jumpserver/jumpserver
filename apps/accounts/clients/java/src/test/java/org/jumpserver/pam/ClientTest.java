@@ -30,7 +30,6 @@ class ClientTest {
     return new Client(
         new Client.Options(endpoint, "contract-app", "contract-secret", instance)
             .orgId("contract-org")
-            .configurationId("configuration")
             .source(source));
   }
 
@@ -79,7 +78,7 @@ class ClientTest {
       List<KnownRevision> known = List.of(new KnownRevision("db", 2));
       AgentSync sync = sdk.syncAgent(known, List.of(), "", "", "");
       assertFalse(sync.getCredentials().get(0).isChanged());
-      assertEquals("socket", sync.getConfiguration().get("delivery_mode"));
+      assertEquals(List.of("db"), sync.getScope().get("credential_keys"));
       assertEquals(
           "ResponseError",
           assertThrows(

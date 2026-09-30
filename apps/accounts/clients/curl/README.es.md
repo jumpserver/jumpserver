@@ -43,7 +43,7 @@ Para 401, compruebe AK/SK, organización, hora del equipo y URL firmada. Para 40
 
 ## Acceso a políticas de credenciales
 
-Los detalles de firma y la tabla de protocolo siguientes son referencias de diagnóstico. Use métodos del SDK para las políticas de credenciales o Python Agent mediante archivos JSON, EnvironmentFile o Unix Socket.
+Los detalles de firma y la tabla de protocolo siguientes son referencias de diagnóstico. Use métodos del SDK para las políticas de credenciales o Go jms-pam-agent mediante archivos JSON, EnvironmentFile o Unix Socket.
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

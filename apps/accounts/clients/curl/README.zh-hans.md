@@ -43,7 +43,7 @@ GET /api/v1/accounts/integration-applications/account-secret/?asset=ubuntu_docke
 
 ## 凭据策略接入
 
-下方签名细节和协议表供调试参考。凭据策略接入通过 SDK 方法完成，也可通过 Python Agent 的 JSON 文件、EnvironmentFile 或 Unix Socket 接入。
+下方签名细节和协议表供调试参考。凭据策略接入通过 SDK 方法完成，也可通过 Go jms-pam-agent 的 JSON 文件、EnvironmentFile 或 Unix Socket 接入。
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

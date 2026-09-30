@@ -1,40 +1,36 @@
-import threading
 from datetime import timedelta
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from django.test import SimpleTestCase
-from django.db import transaction
-from django.utils import timezone
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
-
 from accounts.api.account.application import IntegrationApplicationViewSet
 from accounts.api.account.credential import CredentialClientViewSet
-from accounts.credential_client import commands
-from accounts.credential_client.manager import CredentialClientManager
-from accounts.clients.python.jms_pam.agent import Agent
 from accounts.clients.python.jms_pam.common.credential import Credential
 from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.clients.python.jms_pam.credential.v1.credential_client import CredentialClient
+from accounts.clients.python.jms_pam.credential.v1.credential_client import (
+    CredentialClient,
+)
+from accounts.credential_client import commands
+from accounts.credential_client.manager import CredentialClientManager
 from accounts.models import (
-    ApplicationCommand, ClientAccessConfiguration, CredentialClientInstance, IntegrationApplication,
+    ApplicationCommand,
+    CredentialClientInstance,
+    IntegrationApplication,
 )
 from accounts.tests.base import CredentialTestCase
+from django.db import transaction
+from django.test import SimpleTestCase
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 
 class ApplicationCommandTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
-        self.configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Test SDK', type='sdk',
-        )
-        self.configuration.credentials.add(self.credential)
         self.client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='sdk-one', type='sdk', protocol_version=1,
         )
         self.other_client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='sdk-two', type='sdk', protocol_version=1,
         )
 
@@ -102,7 +98,7 @@ class ApplicationCommandTests(CredentialTestCase):
         commands.report(self.client, command.id, 'running')
         with self.assertRaises(ValidationError):
             commands.report(self.client, command.id, 'success')
-        manager = CredentialClientManager(self.application, self.configuration.id, self.client.instance_id)
+        manager = CredentialClientManager(self.application, instance_id=self.client.instance_id)
         manager.fetch(self.credential.key, '127.0.0.1')
         manager.confirm(self.credential.key, self.credential.revision, self.primary.id)
         self.assertTrue(commands.report(self.client, command.id, 'success')['accepted'])
@@ -117,22 +113,18 @@ class ApplicationCommandTests(CredentialTestCase):
 
     def test_wrong_application_disabled_or_unsupported_targets_are_rejected(self):
         app = IntegrationApplication.objects.create(name='Other app')
-        config = ClientAccessConfiguration.objects.create(application=app, name='Other SDK', type='sdk')
-        outsider = CredentialClientInstance.objects.create(application=app, configuration=config, instance_id='other')
+        outsider = CredentialClientInstance.objects.create(application=app, instance_id='other')
         with self.assertRaises(ValidationError):
             self.send(clients=[outsider.id])
         self.client.is_active = False
         self.client.save()
         with self.assertRaises(ValidationError):
             self.send()
-        agent_config = ClientAccessConfiguration.objects.create(application=self.application, name='Agent', type='agent')
-        agent = CredentialClientInstance.objects.create(application=self.application, configuration=agent_config, instance_id='agent', type='agent')
+        agent = CredentialClientInstance.objects.create(application=self.application, instance_id='agent', type='agent')
         with self.assertRaises(ValidationError):
             self.send(clients=[agent.id])
-        agent_config.delivery_mode = 'environment'
-        agent_config.systemd_unit = 'example.service'
-        agent_config.systemd_action = 'restart'
-        agent_config.save()
+        agent.restart_supported = True
+        agent.save(update_fields=['restart_supported'])
         self.assertEqual(self.send(clients=[agent.id]).event, commands.RESTART)
 
     def test_failed_stream_delivery_remains_pollable(self):
@@ -222,33 +214,3 @@ class ApplicationCommandSDKTests(SimpleTestCase):
         result = self.client.ReportApplicationCommandResult.call_args.args[0]
         self.assertEqual(result.Status, 'failed')
         self.assertEqual(result.ErrorCode, 'execution_failed')
-
-    def agent(self):
-        agent = object.__new__(Agent)
-        agent.configuration = {'delivery_mode': 'environment', 'systemd_action': 'restart', 'systemd_unit': 'example.service'}
-        agent.capabilities = {}
-        agent.remote = Mock()
-        agent.sync_lock = threading.RLock()
-        agent.remote.report_application_command_result.return_value = SimpleNamespace(accepted=True)
-        return agent
-
-    def test_agent_restarts_only_configured_service_and_checks_it(self):
-        agent = self.agent()
-        with patch('accounts.clients.python.jms_pam._agent.runtime.validate_configuration'), patch('accounts.clients.python.jms_pam._agent.runtime.subprocess.run') as run:
-            agent.handle_command({'command_id': 'command', 'event': commands.RESTART, 'systemd_unit': 'untrusted.service'})
-        self.assertEqual(run.call_args_list[0].args[0], ['systemctl', 'restart', 'example.service'])
-        self.assertEqual(run.call_args_list[1].args[0], ['systemctl', 'is-active', '--quiet', 'example.service'])
-        self.assertEqual(agent.remote.report_application_command_result.call_args.kwargs['status'], 'success')
-
-    def test_agent_ignores_duplicate_restart_and_rejects_unconfigured_restart(self):
-        agent = self.agent()
-        agent.remote.report_application_command_result.return_value = SimpleNamespace(accepted=False, status='running')
-        with patch('accounts.clients.python.jms_pam._agent.runtime.subprocess.run') as run:
-            agent.handle_command({'command_id': 'command', 'event': commands.RESTART})
-            run.assert_not_called()
-        agent.remote.report_application_command_result.return_value = SimpleNamespace(accepted=True)
-        agent.configuration['systemd_action'] = 'reload'
-        with patch('accounts.clients.python.jms_pam._agent.runtime.validate_configuration'), patch('accounts.clients.python.jms_pam._agent.runtime.subprocess.run') as run:
-            with self.assertRaises(ValueError):
-                agent.handle_command({'command_id': 'command', 'event': commands.RESTART})
-            run.assert_not_called()

@@ -1,25 +1,25 @@
-import ast
 from contextlib import nullcontext
 from unittest.mock import Mock, patch
 
-from django.core.cache.backends.locmem import LocMemCache
-from django.db import transaction
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.test import force_authenticate
-from redis.exceptions import ConnectionError as RedisConnectionError
-
-from accounts.tests.base import CredentialTestCase
-from accounts.models import (
-    ApplicationAudit, ApplicationCredential, ClientAccessConfiguration,
-    CredentialClientInstance,
-)
-from accounts.credential_client.manager import CredentialClientManager
-from accounts.credential_client.audit import record
-from accounts.middleware import ApplicationAuditMiddleware
 from accounts.api.account.application_audit import ApplicationAuditViewSet
 from accounts.api.account.credential import CredentialClientViewSet
-from orgs.utils import tmp_to_org
+from accounts.credential_client.audit import record
+from accounts.credential_client.manager import CredentialClientManager
+from accounts.middleware import ApplicationAuditMiddleware
+from accounts.models import (
+    ApplicationAudit,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    CredentialClientInstance,
+)
+from accounts.tests.base import CredentialTestCase
+from django.core.cache.backends.locmem import LocMemCache
+from django.db import transaction
 from orgs.models import Organization
+from orgs.utils import tmp_to_org
+from redis.exceptions import ConnectionError as RedisConnectionError
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.test import force_authenticate
 
 
 class ApplicationAuditTests(CredentialTestCase):
@@ -34,34 +34,21 @@ class ApplicationAuditTests(CredentialTestCase):
         return ApplicationAuditMiddleware(get_response)(request)
 
     def manager(self, instance='one'):
-        configuration, _ = ClientAccessConfiguration.objects.get_or_create(
-            application=self.application, name='Events SDK',
-            defaults={'type': 'sdk'},
-        )
-        configuration.credentials.add(self.credential)
-        manager = CredentialClientManager(self.application, configuration.id, instance)
-        return manager, None
+        return CredentialClientManager(self.application, instance_id=instance), None
 
-    def test_authorization_removal_disables_fetch_and_preserves_sibling(self):
+    def test_authorization_removal_disables_fetch_for_all_application_instances(self):
         manager, _ = self.manager()
         manager.fetch(self.credential.key, '127.0.0.1')
-        sibling_configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Sibling SDK', type='sdk',
-        )
-        sibling_configuration.credentials.add(self.credential)
-        sibling = CredentialClientManager(
-            self.application, sibling_configuration.id, 'sibling',
-        )
+        sibling = CredentialClientManager(self.application, instance_id='sibling')
         sibling.fetch(self.credential.key, '127.0.0.1')
         manager, _ = self.manager()
-        configuration = manager.configuration
-        configuration.credentials.remove(self.credential)
+        self.credential.applications.remove(self.application)
         self.assertFalse(
             manager.client.credential_statuses.filter(
                 binding__credential=self.credential,
             ).exists()
         )
-        self.assertTrue(
+        self.assertFalse(
             sibling.client.credential_statuses.filter(
                 binding__credential=self.credential,
             ).exists()
@@ -71,10 +58,9 @@ class ApplicationAuditTests(CredentialTestCase):
         manager.client.is_active = False
         manager.client.save(update_fields=['is_active'])
         with self.assertRaises(PermissionDenied):
-            CredentialClientManager(self.application, configuration.id, 'one')
+            CredentialClientManager(self.application, instance_id='one')
         audit = ApplicationAudit.objects.filter(event='client_disabled').get()
         self.assertEqual(audit.instance_id, 'one')
-        self.assertEqual(audit.configuration_id, configuration.id)
 
     def test_audit_org_scope_pagination_and_retained_history(self):
         record('credential_fetched', application=self.application)
@@ -102,61 +88,34 @@ class ApplicationAuditTests(CredentialTestCase):
         audit = ApplicationAudit.objects.get(event='credential_fetched', result='failed')
         self.assertEqual(audit.instance_id, 'rolled-back')
 
-    def test_client_validation_failure_is_audited_before_manager_creation(self):
-        request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
-            'key': self.credential.key, 'configuration_id': 'invalid-uuid', 'instance_id': 'invalid-request',
-        }, HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
-            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
-        force_authenticate(request, user=self.application)
-        response = self.client_response(request, 'credential')
-        self.assertEqual(response.status_code, 400)
-        audit = ApplicationAudit.objects.get(event='credential_fetched', result='failed')
-        self.assertEqual(audit.service_id, self.application.id)
-        self.assertEqual(audit.summary, 'invalid')
-        self.assertFalse(CredentialClientInstance.objects.filter(instance_id='invalid-request').exists())
-
-    def test_client_resolution_failure_keeps_validated_identity(self):
+    def test_disabled_instance_failure_keeps_request_identity(self):
         manager, _ = self.manager()
-        configuration = manager.configuration
-        configuration.is_active = False
-        configuration.save(update_fields=['is_active'])
+        manager.client.is_active = False
+        manager.client.save(update_fields=['is_active'])
         request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
-            'key': self.credential.key, 'configuration_id': str(configuration.id), 'instance_id': 'one',
+            'key': self.credential.key, 'instance_id': 'one',
         }, HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
             HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
         force_authenticate(request, user=self.application)
         response = self.client_response(request, 'credential')
         self.assertEqual(response.status_code, 403)
         audit = ApplicationAudit.objects.get(event='credential_fetched', result='failed')
-        self.assertEqual(audit.configuration_id, configuration.id)
         self.assertEqual(audit.instance_id, 'one')
         self.assertEqual(audit.credential_key, self.credential.key)
 
     def test_confirmation_failure_keeps_resolved_client(self):
         manager, _ = self.manager()
         request = self.factory.post('/api/v1/accounts/credential-client/confirm/', {
-            'key': self.credential.key, 'configuration_id': str(manager.configuration.id),
-            'instance_id': 'one', 'revision': self.credential.revision, 'account_id': str(self.primary.id),
+            'key': self.credential.key, 'instance_id': 'one',
+            'revision': self.credential.revision, 'account_id': str(self.primary.id),
         }, format='json', HTTP_X_JMS_CLIENT_VERSION='1.0.0',
             HTTP_X_JMS_PROTOCOL_VERSION='1', HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0')
         force_authenticate(request, user=self.application)
         response = self.client_response(request, 'confirm')
         self.assertEqual(response.status_code, 400)
         audit = ApplicationAudit.objects.get(event='credential_confirmed', result='failed')
-        self.assertEqual(audit.configuration_id, manager.configuration.id)
         self.assertEqual(audit.instance_id, manager.client.instance_id)
         self.assertEqual(audit.credential_key, self.credential.key)
-
-    def test_configuration_audit_only_records_changed_fields(self):
-        manager, _ = self.manager()
-        configuration = manager.configuration
-        audits = ApplicationAudit.objects.filter(event='configuration_updated', configuration_id=configuration.id)
-        configuration.save(update_fields=['name'])
-        self.assertFalse(audits.exists())
-        previous = configuration.name
-        configuration.name = 'Renamed SDK'
-        configuration.save(update_fields=['name'])
-        self.assertEqual(audits.get().changes, [{'field': 'name', 'before': previous, 'after': 'Renamed SDK'}])
 
     def test_revision_publication_takes_precedence_over_rotation_step(self):
         self.credential.revision += 1
@@ -183,37 +142,6 @@ class ApplicationAuditTests(CredentialTestCase):
         self.assertEqual(audit.operator, self.admin.name)
         self.assertEqual(audit.instance_id, 'one')
 
-    def test_generated_sdk_code_uses_event_stream_without_heartbeat(self):
-        from accounts.credential_client.manager import ClientAccessConfigurationManager
-        manager, _ = self.manager()
-        self.application.secret = "secret'\n__import__('os').system('should-not-run')"
-        self.application.save(update_fields=['secret'])
-        materials = ClientAccessConfigurationManager(manager.configuration).materials('http://localhost')
-        code = materials['code']
-        compile(code, 'generated-sdk.py', 'exec')
-        compile(materials['config'], materials['filename'], 'exec')
-        config_tree = ast.parse(materials['config'])
-        self.assertTrue(all(
-            isinstance(node, (ast.ImportFrom, ast.Assign))
-            for node in config_tree.body
-        ))
-        self.assertIn('WatchCredentialEvents', code)
-        self.assertIn('GetCredential', code)
-        self.assertIn('response.Asset.Address', code)
-        self.assertIn('response.Account.Username', code)
-        self.assertIn('response.Account.Secret', code)
-        self.assertIn('confirmation_keys', code)
-        self.assertIn('GetCredentialRequest(Key=key)', code)
-        self.assertNotIn('GetCredentialRequest(AccountId=', code)
-        self.assertNotIn("credential_mode') == 'subscription'", code)
-        self.assertIn("event.get('event') == 'snapshot'", code)
-        self.assertNotIn('Heartbeat', code)
-        self.assertNotIn(self.application.secret, code)
-        constants = [
-            node.value for node in ast.walk(config_tree)
-            if isinstance(node, ast.Constant)
-        ]
-        self.assertIn(self.application.secret, constants)
 
     def test_subscription_secret_publication(self):
         self.manager()
@@ -249,21 +177,16 @@ class CredentialFetchAuditTestsMixin:
         self.addCleanup(cache_patch.stop)
 
     def create_client(self, instance_id):
-        configuration, _ = ClientAccessConfiguration.objects.get_or_create(
-            application=self.application, name=self.client_type, defaults={'type': self.client_type},
-        )
-        configuration.credentials.add(self.credential)
         return CredentialClientInstance.objects.create(
-            application=self.application, configuration=configuration,
+            application=self.application,
             instance_id=instance_id, type=self.client_type,
         )
 
     def fetch(self, expected_status, key=None, client=None):
         client = client or self.client
-        client = CredentialClientInstance.objects.select_related('application', 'configuration').get(pk=client.pk)
+        client = CredentialClientInstance.objects.select_related('application').get(pk=client.pk)
         request = self.factory.get('/api/v1/accounts/credential-client/credential/', {
-            'key': key or self.credential.key,
-            'configuration_id': str(client.configuration_id), 'instance_id': client.instance_id,
+            'key': key or self.credential.key, 'instance_id': client.instance_id,
         }, HTTP_X_JMS_CLIENT_VERSION='1.0.0', HTTP_X_JMS_PROTOCOL_VERSION='1',
             HTTP_X_JMS_CONFIG_SCHEMA_VERSION='1' if self.client_type == 'agent' else '0')
         user = self.application if self.client_type == 'sdk' else client
@@ -300,18 +223,17 @@ class CredentialFetchAuditTestsMixin:
         self.assertEqual(set(self.fetch_audits().values_list('instance_id', flat=True)), {'one', 'two'})
         self.assertEqual(self.fetch_audits().count(), 2)
 
-    def test_disabled_configuration_failure_can_recover(self):
+    def test_revoked_binding_failure_can_fetch_after_regrant(self):
         self.fetch(200)
-        configuration = self.client.configuration
-        configuration.is_active = False
-        configuration.save(update_fields=['is_active'])
+        self.credential.applications.remove(self.application)
         self.fetch(403)
         self.fetch(403)
         self.assertEqual(self.fetch_audits(result='failed').count(), 1)
-        configuration.is_active = True
-        configuration.save(update_fields=['is_active'])
+        CredentialApplicationBinding.objects.create(
+            credential=self.credential, application=self.application, org_id=self.org.id,
+        )
         self.fetch(200)
-        self.assertEqual(self.fetch_audits(summary='Credential access recovered.').count(), 1)
+        self.assertEqual(self.fetch_audits(result='success').count(), 2)
 
     def test_cache_outage_preserves_failures_and_success_responses(self):
         self.fetch(200)

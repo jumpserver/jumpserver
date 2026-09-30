@@ -18,7 +18,7 @@ func contractClient(t *testing.T, instance, source string) *Client {
 	if endpoint == "" {
 		t.Skip("Run clients/tests/run.py to start the shared protocol fixture")
 	}
-	client, err := NewClient(Options{Endpoint: endpoint, AppID: "contract-app", AppSecret: "contract-secret", InstanceID: instance, OrgID: "contract-org", ConfigurationID: "configuration", Source: source})
+	client, err := NewClient(Options{Endpoint: endpoint, AppID: "contract-app", AppSecret: "contract-secret", InstanceID: instance, OrgID: "contract-org", Source: source})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func TestSynchronization(t *testing.T) {
 	client := contractClient(t, "go-agent", "jms-pam-agent")
 	options := AgentSyncOptions{Credentials: []KnownRevision{{Key: "db", Revision: 2}}}
 	sync, err := client.SyncAgent(context.Background(), options)
-	if err != nil || sync.Credentials[0].Changed || sync.Configuration["delivery_mode"] != "socket" {
+	if err != nil || sync.Credentials[0].Changed || len(sync.Scope.Keys) != 1 || sync.Scope.Keys[0] != "db" {
 		t.Fatalf("Sync failed: %v", err)
 	}
 	options.SyncError = "invalid-flag"

@@ -9,7 +9,7 @@ SDK này theo chức năng của SDK chính sách thông tin xác thực Python:
 
 ## Cấu hình và chạy
 
-Cài SDK nguồn và cấu hình bên dưới. Cấp quyền tài khoản và gắn chính sách trong quản lý ứng dụng; lấy AK/SK và ID tổ chức từ tài liệu kết nối. Thay các giá trị mẫu và bảo vệ bí mật triển khai. Mỗi bản sao cần ID ổn định và duy nhất. Chỉ dùng một bộ chọn: ID tài khoản hoặc key chính sách.
+Cài SDK nguồn và cấu hình bên dưới. Cấp quyền tài khoản cho pull trong quản lý ứng dụng; chỉ gắn chính sách khi cần push hoặc luân phiên thông tin xác thực. Lấy AK/SK và ID tổ chức từ tài liệu kết nối. Thay các giá trị mẫu và bảo vệ bí mật triển khai. Mỗi bản sao cần ID ổn định và duy nhất. Chỉ dùng một bộ chọn: ID tài khoản hoặc key chính sách.
 
 ```bash
 cd apps/accounts/clients/node
@@ -68,9 +68,86 @@ if (require.main === module)
   })
 ```
 
+## Hàm xử lý sự kiện
+
+Khởi tạo trạng thái cục bộ trước khi lắng nghe. Python và Node.js dùng lớp con, Go dùng EventHandlers, Java dùng CredentialEventListener. Hãy triển khai việc chuyển kết nối thật trong ví dụ. API cũ vẫn được giữ lại.
+
+```javascript
+'use strict'
+const { Client } = require('./index')
+
+class MyClient extends Client {
+  constructor(options) {
+    super(options)
+    this.credentials = new Map()
+    this.modes = new Map()
+  }
+  async onEvent(event) {
+    if (event.event === 'snapshot') {
+      this.modes.clear()
+      for (const update of event.credentials || [])
+        this.modes.set(update.credentialKey || update.key, update.credentialMode)
+      for (const key of this.credentials.keys())
+        if (!this.modes.has(key)) this.credentials.delete(key) // Also release connections.
+    } else if (event.event === 'credential.updated') {
+      this.modes.set(event.credentialKey || event.key, event.credentialMode)
+    }
+    // Use executeApplicationCommand for command events; see events.js.
+  }
+  async onCredentialChanged(credential, { signal }) {
+    await this.applyCredential(credential, { signal })
+    if (this.modes.get(credential.key) === 'alternating_rotation')
+      await this.confirmCredential({ key: credential.key, revision: credential.revision,
+        accountId: credential.account.id, signal })
+    this.credentials.set(credential.key, credential)
+  }
+  async applyCredential(credential, { signal }) {
+    throw new Error('Implement connection validation, pool switching and old connection cleanup')
+  }
+  async onCredentialRevoked(event) {
+    this.credentials.delete(event.credentialKey || event.key) // Also release affected connections.
+  }
+}
+
+async function main() {
+  const client = new MyClient({ endpoint: process.env.JMS_ENDPOINT, appId: process.env.JMS_APP_ID,
+    appSecret: process.env.JMS_APP_SECRET, instanceId: process.env.JMS_INSTANCE_ID, orgId: process.env.JMS_ORG_ID })
+  const stop = () => client.close()
+  process.once('SIGINT', stop); process.once('SIGTERM', stop)
+  try { await client.watchEvents() }
+  finally {
+    client.close(); await client.stopEvents()
+    process.removeListener('SIGINT', stop); process.removeListener('SIGTERM', stop)
+  }
+}
+if (require.main === module) main().catch((error) => {
+  console.error(error.code || error.name); process.exitCode = 1
+})
+module.exports = { MyClient }
+```
+
+snapshot ban đầu, khi kết nối lại và credential.updated lấy thông tin theo chế độ rồi gọi hàm xử lý tuần tự. Bộ đọc dùng hàng đợi giới hạn 128 sự kiện; khi đầy sẽ tạo áp lực ngược. Lỗi lấy hoặc áp dụng được thử lại với thời gian chờ tăng theo hàm mũ 1–30 giây, mỗi lần đều lấy lại. Sự kiện mới thay thế lần thử của cùng mục tiêu; snapshot đặt lại phạm vi, thu hồi và thay đổi cấu hình hủy các lần thử. Hàm xử lý phải gọi lặp lại an toàn. Hàm quan sát và thu hồi không tự thử lại; lệnh phải được nhận quyền thực thi. received chỉ nghĩa là đã đọc; SDK không tự xác nhận luân chuyển. Sự kiện phiên bản cũ không hủy lần lấy lại đang chờ cho phiên bản mới hơn.
+
+`watchEvents({signal})` / `startEvents({signal})`; `stopEvents()` / `await subscription.stop()` / `await subscription.done`
+
+watchEvents không chặn vòng lặp sự kiện; startEvents không đảm bảo đồng bộ ban đầu. Một bộ lắng nghe mỗi client. Hàm async được await tuần tự và nhận AbortSignal. close yêu cầu hủy; chờ stop() hoặc done bên ngoài. Không chờ done của chính mình. clone trả về Client.
+
+### Thông tin xác thực mới nhất và lỗi máy chủ
+
+Luôn gọi API trước. Kết quả thành công thay thế giá trị đang giữ; phiên bản cũ không ghi đè bản mới và không có thời hạn hết hiệu lực theo thời gian. Chỉ hết thời gian chờ, lỗi mạng hoặc HTTP 5xx mới trả về giá trị thành công gần nhất của cùng bộ chọn với cờ nguồn cục bộ. Chưa có giá trị thì báo lỗi gốc. SDK giữ trong bộ nhớ client đến khi cập nhật, thu hồi hoặc đóng; clone và khởi động lại bắt đầu trống. Agent dùng trạng thái cục bộ được bảo vệ sẵn có. HTTP 401/403/404 hoặc client_upgrade_required xóa giá trị SDK rồi báo lỗi; phản hồi thành công không hợp lệ cũng báo lỗi. Thu hồi xóa mục liên quan, snapshot xóa mục ngoài quyền. Thay đổi cấu hình giữ giá trị đến khi kiểm tra snapshot tiếp theo. Agent áp dụng thu hồi rõ ràng và thu hẹp phạm vi snapshot trước khi đồng bộ HTTP, lưu phạm vi đó và chặn các lần lấy cục bộ liên quan ngay cả khi máy chủ lỗi hoặc sau khi khởi động lại. Phản hồi credential_not_found (HTTP 400) cũng xóa giá trị SDK được giữ lại. Pull trực tiếp bằng account_id luôn cần phản hồi API trực tiếp; snapshot push không xác nhận quyền dùng giá trị pull đã lưu.
+
+- `credential.fromLocal`
+- `getCredential({key, allowLocalFallback: false})` / `getCredential({accountId, allowLocalFallback: false})`
+
+Khi bật lắng nghe được quản lý, snapshot và credential.updated tự lấy dữ liệu, thay thế giá trị và gọi hàm nghiệp vụ. Lỗi cập nhật giữ bản trước và thử lại. Agent cũng lấy lại theo thông báo, giữ dữ liệu khi máy chủ lỗi. Dùng lời gọi bắt buộc API bên dưới để cập nhật hay chuyển kết nối; giá trị đang giữ không phải phiên bản vừa lấy và không tự xác nhận luân chuyển.
+
+Khi nhàn rỗi gửi ping mỗi 10 giây; khoảng 30 giây không có tin nhắn sẽ kết nối lại, chờ tăng theo hàm mũ 1–30 giây và ký mới. snapshot khôi phục trạng thái hiện tại, không phát lại lịch sử.
+
+
+
 ## Sự kiện và áp dụng thông tin xác thực
 
-Xử lý snapshot đầu tiên/kết nối lại và credential.updated. Ví dụ đầy đủ xử lý subscription, alternating_rotation và lệnh. Triển khai kiểm tra kết nối thực, chuyển nhóm kết nối và giải phóng kết nối cũ. Hàm mẫu ném lỗi để ngăn xác nhận trước khi áp dụng. Xóa khỏi bộ nhớ đệm các tài khoản không còn trong snapshot và xử lý thu hồi.
+Xử lý snapshot đầu tiên/kết nối lại và credential.updated. Ví dụ đầy đủ xử lý subscription, alternating_rotation và lệnh. Triển khai kiểm tra kết nối thực, chuyển nhóm kết nối và giải phóng kết nối cũ. Hàm mẫu ném lỗi để ngăn xác nhận trước khi áp dụng. Xóa khỏi trạng thái ứng dụng các tài khoản không còn trong snapshot và xử lý thu hồi.
 
 ```javascript
 'use strict'
@@ -87,7 +164,7 @@ async function handleCommand(client, event) {
   if (event.event === 'application.restart.requested') return restartApplication()
   if (event.event !== 'credential.switch.requested')
     throw new Error('Unsupported application command')
-  const credential = await client.getCredential({ key: event.credentialKey })
+  const credential = await client.getCredential({ key: event.credentialKey, allowLocalFallback: false })
   if (credential.revision !== event.revision || credential.account.id !== event.accountId)
     throw new Error('Requested account version is superseded')
   await applyCredential(credential)
@@ -129,10 +206,12 @@ async function main() {
         const mode = update.credentialMode
         const key = update.credentialKey || update.key
         let credential
-        if (mode === 'subscription' && update.accountId)
-          credential = await client.getCredential({ accountId: update.accountId })
+        if (mode === 'subscription' && update.accountId && key) {
+          const subscriptionKey = key.endsWith(`:${update.accountId}`) ? key : `${key}:${update.accountId}`
+          credential = await client.getCredential({ key: subscriptionKey, allowLocalFallback: false })
+        }
         else if (mode === 'alternating_rotation' && key)
-          credential = await client.getCredential({ key })
+          credential = await client.getCredential({ key, allowLocalFallback: false })
         else continue
         await applyCredential(credential)
         if (mode === 'alternating_rotation')
@@ -166,8 +245,11 @@ Thăm dò, nhận quyền thực thi và báo cáo kết quả dùng phương th
 
 - `getCredential({key})`
 - `getCredential({accountId})`
+- `getCredential({key, allowLocalFallback: false})`
 - `confirmCredential({key, revision, accountId})`
 - `watchCredentialEvents({signal})`
+- `watchEvents({signal}) / startEvents({signal}) / stopEvents()`
+- `EventSubscription.stop() / done`
 - `listApplicationCommands()`
 - `reportApplicationCommandResult({commandId, status, errorCode})`
 - `executeApplicationCommand(event, handler)`
@@ -182,6 +264,74 @@ Lỗi HTTP, mạng, xác thực và giải mã dùng kiểu lỗi SDK với mã 
 
 Mọi SDK dùng giao thức phiên bản 1; Agent dùng lược đồ cấu hình phiên bản 1. Khi nhận client_upgrade_required (HTTP 426), kiểm tra tương thích và nâng cấp. Cho phép trường tùy chọn và thông báo chưa biết; không áp dụng hay xác nhận chính sách chưa hỗ trợ. Biên nhận được gửi tự động và không chứng minh đã áp dụng thông tin xác thực.
 
-## Tích hợp Linux Agent
+## Tích hợp Go Agent
 
-Đồng bộ phục vụ triển khai Agent. Cần danh tính hoặc source Agent và ID cấu hình, dùng KnownRevision cho phiên bản đệm và đã chuyển giao. Cài đặt Linux, chuyển giao tệp và API cục bộ hiện do Python Agent cung cấp, ứng dụng mọi ngôn ngữ đều có thể dùng.
+Danh tính dùng app_id, app_secret, org_id và instance_id ổn định; quyền theo chính sách gắn với ứng dụng. Đường dẫn và thao tác dịch vụ đều ở máy cục bộ: state_file giữ mật khẩu mới nhất, event_file ghi sự kiện không có bí mật, delivery chọn đầu ra mặc định, rules đặt tệp, mẫu và reload/restart hoặc tập lệnh cố định. Khi nhận thông báo, Agent lấy và lưu mật khẩu hiện tại, thay tệp nguyên tử rồi chạy thao tác; lỗi sẽ được thử lại. Dùng credentials[].key từ get_accounts cho rules; key đăng ký chứa ID tài khoản. rules rỗng ghi một tệp cho mỗi key.
+
+rules cục bộ cấu hình tệp, JSON/EnvironmentFile hoặc mẫu tin cậy cùng systemd reload/restart hoặc chương trình cố định. Script nhận JSON qua stdin, dùng đối số cố định và giới hạn thời gian, rồi kiểm tra ứng dụng trước khi báo thành công. Core không được mở rộng quyền này. Khởi động lại Agent sau khi sửa cấu hình riêng tư.
+
+Danh tính dùng app_id, app_secret, org_id và instance_id ổn định; quyền theo chính sách gắn với ứng dụng. Đường dẫn và thao tác dịch vụ đều ở máy cục bộ: state_file giữ mật khẩu mới nhất, event_file ghi sự kiện không có bí mật, delivery chọn đầu ra mặc định, rules đặt tệp, mẫu và reload/restart hoặc tập lệnh cố định. Khi nhận thông báo, Agent lấy và lưu mật khẩu hiện tại, thay tệp nguyên tử rồi chạy thao tác; lỗi sẽ được thử lại. Dùng credentials[].key từ get_accounts cho rules; key đăng ký chứa ID tài khoản. rules rỗng ghi một tệp cho mỗi key.
+
+```json
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
+```
+
+`rules`:
+
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
+```
+
+`/etc/jms-pam-agent/orders-db.tmpl`:
+
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
+
+```bash
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
+```

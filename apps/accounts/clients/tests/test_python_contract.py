@@ -54,13 +54,13 @@ class PythonContractTests(unittest.TestCase):
                 client.get_credential(key="db", account_id="account")
 
     def test_agent_sync(self):
-        with self.client(source="jms-pam-agent", configuration_id="config") as client:
+        with self.client(source="jms-pam-agent") as client:
             result = client.sync_agent(
                 credentials=[KnownRevision("db", 1)],
                 delivered_credentials=[KnownRevision("db", 1)],
             )
             self.assertTrue(result.credentials[0].available)
-            self.assertEqual(result.configuration["delivery_mode"], "socket")
+            self.assertEqual(result.scope["credential_keys"], ["db"])
             with self.assertRaises(PAMError):
                 client.sync_agent(
                     credentials=[],

@@ -1,15 +1,17 @@
-from django.test import TestCase
 from unittest.mock import patch
-from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import (
-    Account, ApplicationCredential, ClientAccessConfiguration,
-    CredentialApplicationBinding, IntegrationApplication,
+    Account,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    IntegrationApplication,
 )
 from assets.const import Category
 from assets.models import Asset, Platform
+from django.test import TestCase
 from orgs.models import Organization
 from orgs.utils import set_current_org, set_to_root_org
+from rest_framework.test import APIRequestFactory, force_authenticate
 from users.models import User
 
 
@@ -82,12 +84,6 @@ class CredentialTestCase(TestCase):
             set_to_root_org()
 
     def request(self, method, path, data=None, user=None):
-        if isinstance(user, IntegrationApplication):
-            configuration, _ = ClientAccessConfiguration.objects.get_or_create(
-                application=user, name='Test SDK', defaults={'type': 'sdk'},
-            )
-            configuration.credentials.add(self.credential)
-            data = dict(data or {}, configuration_id=str(configuration.id))
         creator = getattr(self.factory, method)
         request = creator(
             path, data=data or {}, format='json',

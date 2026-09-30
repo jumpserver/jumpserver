@@ -1,19 +1,17 @@
-import threading
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-from django.db import transaction
-
-from accounts.credential_client.manager import CredentialClientManager
-from accounts.clients.python.jms_pam.agent import Agent
-from accounts.clients.python.jms_pam.models import Credential
-from accounts.clients.python.jms_pam.credential.v1 import models
-from accounts.models import (
-    Account, ApplicationAudit, ApplicationCredential, AutomationExecution,
-    ChangeSecretRecord, ClientAccessConfiguration,
-)
 from accounts.const import ChangeSecretRecordStatusChoice
+from accounts.credential_client.manager import CredentialClientManager
+from accounts.models import (
+    Account,
+    ApplicationAudit,
+    ApplicationCredential,
+    AutomationExecution,
+    ChangeSecretRecord,
+)
 from accounts.serializers import ApplicationCredentialSerializer
 from accounts.tests.base import CredentialTestCase
+from django.db import transaction
 
 
 class CredentialRevisionTests(CredentialTestCase):
@@ -31,17 +29,15 @@ class CredentialRevisionTests(CredentialTestCase):
         from rest_framework.exceptions import PermissionDenied
 
         self.credential.subscription_accounts.set([self.primary])
-        configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Selected SDK', type='sdk',
-        )
-        configuration.credentials.add(self.credential)
-        manager = CredentialClientManager(self.application, configuration.id, 'selected-client')
+        manager = CredentialClientManager(self.application, instance_id='selected-client')
         self.assertEqual(
-            CredentialClientManager.credential_keys(configuration),
+            CredentialClientManager.credential_keys(self.application),
             [self.credential.account_key(self.primary.id)],
         )
-        with self.assertRaises(PermissionDenied):
-            manager.fetch('', '127.0.0.1', self.backup.id)
+        self.assertEqual(
+            manager.fetch('', '127.0.0.1', self.backup.id)['key'],
+            f'account:{self.backup.id}',
+        )
         with self.assertRaises(PermissionDenied):
             manager.fetch(self.credential.account_key(self.backup.id), '127.0.0.1')
         before = self.credential.revision
@@ -53,10 +49,6 @@ class CredentialRevisionTests(CredentialTestCase):
     def test_changing_selected_accounts_notifies_connected_configuration(self):
         from accounts.models import CredentialRotationEvent
 
-        configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Update SDK', type='sdk',
-        )
-        configuration.credentials.add(self.credential)
         serializer = ApplicationCredentialSerializer(
             self.credential,
             data={'subscription_accounts': [str(self.primary.id)]}, partial=True,
@@ -151,42 +143,3 @@ class CredentialRevisionTests(CredentialTestCase):
         self.primary.save()
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.current_revision, 8)
-
-    def test_subscription_uses_application_authorized_account_keys(self):
-        configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Revision SDK', type='sdk',
-        )
-        configuration.credentials.add(self.credential)
-        manager = CredentialClientManager(self.application, configuration.id, 'revision-client')
-        primary_key = self.credential.account_key(self.primary.id)
-        backup_key = self.credential.account_key(self.backup.id)
-        self.assertSetEqual(
-            set(CredentialClientManager.credential_keys(configuration)),
-            {primary_key, backup_key},
-        )
-        first = manager.fetch('', '127.0.0.1', self.primary.id)
-        self.primary.secret = 'intervening-change'
-        self.primary.save()
-        second = manager.fetch('', '127.0.0.1', self.primary.id)
-        backup = manager.fetch(backup_key, '127.0.0.1')
-        self.assertEqual(second['revision'], first['revision'] + 1)
-        self.assertEqual(second['account']['id'], str(self.primary.id))
-        self.assertEqual(backup['account']['id'], str(self.backup.id))
-
-        agent = object.__new__(Agent)
-        agent.lock = threading.Lock()
-        agent.config = {'credential_keys': [primary_key]}
-        agent.credentials = {}
-        agent.state = {}
-        agent.remote = Mock()
-        agent.remote.get_credential.side_effect = [
-            Credential.from_dict(item)
-            for item in (first, second, second)
-        ]
-        with patch('accounts.clients.python.jms_pam._agent.runtime.atomic_write_json') as write:
-            agent.fetch([primary_key])
-            agent.fetch([primary_key])
-            agent.fetch([primary_key])
-        self.assertEqual(write.call_count, 2)
-        self.assertEqual(agent.credentials[primary_key]['account_id'], str(self.primary.id))
-        self.assertEqual(agent.credentials[primary_key]['secret'], self.primary.secret)

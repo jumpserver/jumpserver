@@ -141,7 +141,6 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
                 {
                     'instance_id': recipient['instance_id'],
                     'type': recipient['type'],
-                    'configuration': recipient['configuration']['name'],
                     'publish_result': recipient['publish_result'],
                     'received_at': recipient['received_at'],
                 }

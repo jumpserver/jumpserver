@@ -20,7 +20,6 @@ function client(instanceId = 'node', source = 'jms-pam') {
     appSecret: 'contract-secret',
     instanceId,
     orgId: 'contract-org',
-    configurationId: 'configuration',
     source,
   })
 }
@@ -91,7 +90,7 @@ test('synchronization validates revisions and boolean flags', async () => {
   try {
     const sync = await sdk.syncAgent(options)
     assert.equal(sync.credentials[0].changed, false)
-    assert.equal(sync.configuration.delivery_mode, 'socket')
+    assert.deepEqual(sync.scope.credential_keys, ['db'])
     await assert.rejects(
       sdk.syncAgent({ ...options, syncError: 'invalid-flag' }),
       (error) => error.code === 'ResponseError',

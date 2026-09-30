@@ -12,7 +12,7 @@ async function handleCommand(client, event) {
   if (event.event === 'application.restart.requested') return restartApplication()
   if (event.event !== 'credential.switch.requested')
     throw new Error('Unsupported application command')
-  const credential = await client.getCredential({ key: event.credentialKey })
+  const credential = await client.getCredential({ key: event.credentialKey, allowLocalFallback: false })
   if (credential.revision !== event.revision || credential.account.id !== event.accountId)
     throw new Error('Requested account version is superseded')
   await applyCredential(credential)
@@ -54,10 +54,12 @@ async function main() {
         const mode = update.credentialMode
         const key = update.credentialKey || update.key
         let credential
-        if (mode === 'subscription' && update.accountId)
-          credential = await client.getCredential({ accountId: update.accountId })
+        if (mode === 'subscription' && update.accountId && key) {
+          const subscriptionKey = key.endsWith(`:${update.accountId}`) ? key : `${key}:${update.accountId}`
+          credential = await client.getCredential({ key: subscriptionKey, allowLocalFallback: false })
+        }
         else if (mode === 'alternating_rotation' && key)
-          credential = await client.getCredential({ key })
+          credential = await client.getCredential({ key, allowLocalFallback: false })
         else continue
         await applyCredential(credential)
         if (mode === 'alternating_rotation')

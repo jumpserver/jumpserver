@@ -9,7 +9,7 @@ This SDK follows the Python credential-policy SDK. It retrieves authorized accou
 
 ## Configure and run
 
-Install the source SDK and use the configuration below. Authorize accounts and bind policies in Application Management; obtain the application AK/SK and organization ID from its access materials. Replace placeholders and keep identity material in deployment secrets. Use a stable, unique instance ID for each replica. Fetch with exactly one selector: account ID or policy key.
+Install the source SDK and use the configuration below. Authorize accounts for pull in Application Management; bind policies only when push or rotation is needed. Obtain the application AK/SK and organization ID from its access materials. Replace placeholders and keep identity material in deployment secrets. Use a stable, unique instance ID for each replica. Fetch with exactly one selector: account ID or policy key.
 
 ```bash
 cd apps/accounts/clients/go
@@ -70,9 +70,9 @@ func main() {
 }
 ```
 
-## Events and credential application
+## Event handlers
 
-Process initial/reconnect snapshots and credential.updated. The complete event example below handles subscription and alternating_rotation, plus application commands. Replace the credential-application hook: validate a real connection, switch the pool and release old connections. The placeholder throws so an unapplied revision cannot be confirmed. Reconcile removed accounts in snapshots and revocation events in the application cache.
+Initialize local account or pool state, then explicitly start listening. Python and Node.js use subclass hooks, Go uses EventHandlers, and Java uses CredentialEventListener. The example deliberately fails until real connection switching is implemented. The existing iterator/callback API remains available.
 
 ```go
 package main
@@ -89,6 +89,111 @@ import (
 	pam "github.com/jumpserver/jumpserver/apps/accounts/clients/go"
 )
 
+type application struct {
+	client      *pam.Client
+	credentials map[string]pam.Credential
+	modes       map[string]string
+}
+
+func (a *application) observe(ctx context.Context, event pam.Event) error {
+	updates := []pam.Event{event}
+	if event.Event == "snapshot" {
+		clear(a.modes)
+		updates = event.Credentials
+	}
+	for _, update := range updates {
+		key := update.CredentialKey
+		if key == "" {
+			key = update.Key
+		}
+		if key != "" && (event.Event == "snapshot" || event.Event == "credential.updated") {
+			a.modes[key] = update.CredentialMode
+		}
+	}
+	if event.Event == "snapshot" {
+		for key := range a.credentials {
+			if _, ok := a.modes[key]; !ok {
+				delete(a.credentials, key) /* Also release connections. */
+			}
+		}
+	}
+	// Use ExecuteApplicationCommand for command events; see cmd/events/main.go.
+	return nil
+}
+func applyCredential(ctx context.Context, credential pam.Credential) error {
+	return fmt.Errorf("implement connection validation, pool switching and old connection cleanup")
+}
+func (a *application) changed(ctx context.Context, credential pam.Credential) error {
+	if err := applyCredential(ctx, credential); err != nil {
+		return err
+	}
+	if a.modes[credential.Key] == "alternating_rotation" {
+		if _, err := a.client.ConfirmCredential(ctx, credential.Key, credential.Revision, credential.Account.ID); err != nil {
+			return err
+		}
+	}
+	a.credentials[credential.Key] = credential
+	return nil
+}
+func (a *application) revoked(ctx context.Context, event pam.Event) error {
+	delete(a.credentials, event.CredentialKey) // Also release affected connections.
+	return nil
+}
+func main() {
+	client, err := pam.NewClient(pam.Options{Endpoint: os.Getenv("JMS_ENDPOINT"), AppID: os.Getenv("JMS_APP_ID"), AppSecret: os.Getenv("JMS_APP_SECRET"), InstanceID: os.Getenv("JMS_INSTANCE_ID"), OrgID: os.Getenv("JMS_ORG_ID")})
+	if err != nil {
+		log.Fatal("Invalid SDK configuration")
+	}
+	defer client.Close()
+	app := &application{client: client, credentials: make(map[string]pam.Credential), modes: make(map[string]string)}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	err = client.WatchEvents(ctx, pam.EventHandlers{OnEvent: app.observe, OnCredentialChanged: app.changed, OnCredentialRevoked: app.revoked})
+	if err != nil && !errors.Is(err, context.Canceled) {
+		log.Printf("Event processing failed: %T", err)
+	}
+}
+```
+
+Initial and reconnect snapshots and credential.updated fetch by policy mode and invoke one serial credential handler. A reader and a bounded queue of 128 events separate reception from business work; a full queue applies backpressure. Fetch or credential-handler failures retry at 1–30 seconds with exponential backoff, fetching again each time. New updates replace pending retries for the same selector; snapshots reset retry scope, and revocation/configuration changes cancel pending retries. Make handlers idempotent. Raw-event and revocation hooks report errors without automatic retries; command events still require the command claim API. A received receipt means read; the SDK never automatically confirms rotation. Older revision events do not cancel a pending refresh for a newer revision.
+
+`WatchEvents(ctx, handlers)` / `StartEvents(ctx, handlers)`; `Stop()` / `Wait()`; `context.CancelFunc`
+
+WatchEvents waits in the calling goroutine. StartEvents returns before initial synchronization is complete. One managed listener is allowed per client. Stop and Client.Close request cancellation; call Wait externally to join handlers. Do not call Wait from a handler, and make long operations honor the context.
+
+### Latest credentials and backend outages
+
+Credential getters always request the API first. A successful fetch replaces the retained latest credential; older revisions never overwrite a newer one. The retained value has no time expiry. Only a timeout, network failure or HTTP 5xx may return this value for the same selector, marked as coming from local state. Without a previously fetched value, the original error is raised. SDK values stay in the current client’s memory until replacement, revocation or close; clones and process restarts start empty. The Agent retains its latest credentials in its existing protected local state. HTTP 401/403/404 or client_upgrade_required clear SDK retained values and raise; malformed successful responses also raise. Explicit revocations remove affected credentials, and snapshots remove push entries outside the subscribed scope. A configuration notification retains existing values until the following snapshot reconciles scope. The Agent applies explicit revocation and reduced snapshot scope before HTTP synchronization, persists the reduced scope, and blocks affected local reads even during a backend outage or after restart. A credential_not_found response (HTTP 400) also clears retained SDK values. Direct account_id pull always requires a live API response; push snapshots do not authorize cached pull values.
+
+- `credential.FromLocal`
+- `GetCredentialFresh(ctx, selector)`
+
+With managed event listening enabled, snapshot and credential.updated automatically fetch the current credential, replace the retained value and then invoke the business hook. A failed refresh leaves the previous value in place and retries. The Agent also refetches on update notifications and retains its previous credentials during backend outages. Refresh and manual switching use the live-only calls below; a retained password must not be treated as a newly fetched revision or automatically confirmed.
+
+Event connections send application ping messages at 10-second intervals while idle and reconnect after approximately 30 seconds without messages. Reconnect uses 1–30 second exponential backoff and fresh signatures. Reconnect snapshots restore current state; past events are not replayed.
+
+
+
+## Events and credential application
+
+Process initial/reconnect snapshots and credential.updated. The complete event example below handles subscription and alternating_rotation, plus application commands. Replace the credential-application hook: validate a real connection, switch the pool and release old connections. The placeholder throws so an unapplied revision cannot be confirmed. Reconcile removed accounts in snapshots and revocation events in the application state.
+
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
+
+	pam "github.com/jumpserver/jumpserver/apps/accounts/clients/go"
+)
+
 func applyCredential(credential pam.Credential) error {
 	return fmt.Errorf("implement connection validation, pool switching and old connection cleanup")
 }
@@ -100,7 +205,7 @@ func handleCommand(ctx context.Context, client *pam.Client, event pam.Event) err
 	if event.Event != "credential.switch.requested" {
 		return fmt.Errorf("unsupported application command")
 	}
-	credential, err := client.GetCredential(ctx, pam.CredentialSelector{Key: event.CredentialKey})
+	credential, err := client.GetCredentialFresh(ctx, pam.CredentialSelector{Key: event.CredentialKey})
 	if err != nil {
 		return err
 	}
@@ -139,14 +244,17 @@ func main() {
 				key = update.Key
 			}
 			selector := pam.CredentialSelector{}
-			if update.CredentialMode == "subscription" && update.AccountID != "" {
-				selector.AccountID = update.AccountID
+			if update.CredentialMode == "subscription" && update.AccountID != "" && key != "" {
+				if !strings.HasSuffix(key, ":"+update.AccountID) {
+					key += ":" + update.AccountID
+				}
+				selector.Key = key
 			} else if update.CredentialMode == "alternating_rotation" && key != "" {
 				selector.Key = key
 			} else {
 				continue
 			}
-			credential, err := client.GetCredential(ctx, selector)
+			credential, err := client.GetCredentialFresh(ctx, selector)
 			if err != nil {
 				return err
 			}
@@ -177,7 +285,10 @@ Polling, command claiming and outcome reporting are SDK methods. Execute a handl
 
 - `GetCredential(ctx, CredentialSelector{Key: ...})`
 - `GetCredential(ctx, CredentialSelector{AccountID: ...})`
+- `GetCredentialFresh(ctx, selector)`
 - `ConfirmCredential(ctx, key, revision, accountID)`
+- `WatchEvents(ctx, EventHandlers{...}) / StartEvents(ctx, handlers)`
+- `EventWatcher.Stop() / EventWatcher.Wait()`
 - `WatchCredentialEvents(ctx, handler)`
 - `ListApplicationCommands(ctx)`
 - `ReportApplicationCommandResult(ctx, commandID, status, errorCode)`
@@ -193,6 +304,74 @@ HTTP, network, authentication and response decoding failures use the SDK excepti
 
 All SDKs use protocol version 1; Agent configuration uses schema version 1. A client_upgrade_required response (HTTP 426) requires checking compatibility and upgrading. Unknown optional fields and notification events are tolerated; unsupported policy modes must not be applied or confirmed. Received event receipts are sent automatically and do not prove credential application.
 
-## Linux Agent integration
+## Go Agent integration
 
-Agent synchronization is exposed for Agent implementations. It requires Agent identity/source and a configuration ID, and accepts cached and delivered KnownRevision values. Linux installation, file delivery and local API are currently provided by the Python Agent; applications of any language can use that Agent.
+Agent identity uses app_id, app_secret, org_id and a stable instance_id. Application authorization controls pull; policy bindings control push. All file paths and service actions are local: state_file retains the latest passwords, event_file appends metadata without secrets, delivery selects default output, and rules configure files, templates and reload/restart or fixed scripts. On an update notification the Agent fetches the current password, persists it, atomically replaces output files, then runs the configured action. Failed delivery is retried. Use credentials[].key from get_accounts in rules; subscription push keys are account:<account-id>, independent of the selecting policy. Empty rules write one file per key by default.
+
+Local rules configure target files, JSON/EnvironmentFile rendering or trusted templates, and an optional systemd reload/restart or fixed executable. Scripts receive credential JSON on stdin, use fixed arguments, have a bounded timeout and must validate their application before returning success. Core cannot add script paths or expand local capabilities. Restart the Agent after editing its private configuration.
+
+Agent identity uses app_id, app_secret, org_id and a stable instance_id. Application authorization controls pull; policy bindings control push. All file paths and service actions are local: state_file retains the latest passwords, event_file appends metadata without secrets, delivery selects default output, and rules configure files, templates and reload/restart or fixed scripts. On an update notification the Agent fetches the current password, persists it, atomically replaces output files, then runs the configured action. Failed delivery is retried. Use credentials[].key from get_accounts in rules; subscription push keys are account:<account-id>, independent of the selecting policy. Empty rules write one file per key by default.
+
+```json
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
+```
+
+`rules`:
+
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
+```
+
+`/etc/jms-pam-agent/orders-db.tmpl`:
+
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
+
+```bash
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
+```

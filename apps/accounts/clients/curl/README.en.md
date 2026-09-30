@@ -43,7 +43,7 @@ For 401, check AK/SK, organization, host time and the signed URL. For 403, check
 
 ## Credential policy access
 
-The signature details and protocol table below are diagnostic references. Use SDK methods for credential policies, or use the Python Agent through JSON files, EnvironmentFile or Unix Socket.
+The signature details and protocol table below are diagnostic references. Use SDK methods for credential policies, or use the Go jms-pam-agent through JSON files, EnvironmentFile or Unix Socket.
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

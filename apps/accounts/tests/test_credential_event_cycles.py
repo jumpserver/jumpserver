@@ -13,7 +13,7 @@ from accounts.credential_rotation.cycles import cycle_directory, cycle_detail
 from accounts.credential_rotation.events import receive
 from accounts.credential_rotation.manager import CredentialRotationManager
 from accounts.models import (
-    ApplicationCredential, AutomationExecution, ChangeSecretRecord, ClientAccessConfiguration,
+    ApplicationCredential, AutomationExecution, ChangeSecretRecord,
     CredentialApplicationBinding,
     CredentialClientInstance, CredentialRotationEvent,
 )
@@ -23,12 +23,8 @@ from accounts.tests.base import CredentialTestCase
 class CredentialEventCycleTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
-        self.configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Cycle SDK', type='sdk',
-        )
-        self.configuration.credentials.add(self.credential)
         self.client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='cycle-sdk', type='sdk', event_receipts_supported=True,
             date_last_seen=timezone.now(),
         )
@@ -98,11 +94,10 @@ class CredentialEventCycleTests(CredentialTestCase):
     def test_scope_excludes_application_wide_and_other_policy_events(self):
         self.subscription()
         change = self.change()
-        global_event = record(AuditEvent.CONFIGURATION_UPDATED, configuration=self.configuration)
+        global_event = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
         enqueue(global_event, ApplicationEvent.CONFIGURATION_UPDATED)
         other = ApplicationCredential.objects.create(name='Other subscription', mode='subscription')
         CredentialApplicationBinding.objects.create(credential=other, application=self.application)
-        self.configuration.credentials.add(other)
         foreign = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=other)
         enqueue(foreign, ApplicationEvent.CREDENTIAL_UPDATED)
         self.assertEqual(cycle_directory(self.credential)['count'], 1)
@@ -122,7 +117,6 @@ class CredentialEventCycleTests(CredentialTestCase):
     def test_cycles_without_clients_still_include_emitted_events(self):
         self.subscription()
         self.client.delete()
-        self.configuration.credentials.clear()
         CredentialRotationEvent.objects.all().delete()
         change = self.change(status='failed')
         detail = cycle_detail(self.credential, change.id)
@@ -155,7 +149,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         detail = cycle_detail(self.credential, rotation.id)
         self.assertEqual(detail['events'][0]['received_count'], 1)
         self.assertEqual(detail['events'][0]['confirmed_count'], 0)
-        client_manager = CredentialClientManager(self.application, self.configuration.id, self.client.instance_id)
+        client_manager = CredentialClientManager(self.application, instance_id=self.client.instance_id)
         client_manager.fetch(self.credential.key, '127.0.0.1')
         client_manager.confirm(self.credential.key, self.credential.revision, self.credential.active_account_id)
         detail = cycle_detail(self.credential, rotation.id)
@@ -163,12 +157,31 @@ class CredentialEventCycleTests(CredentialTestCase):
         self.assertIsNotNone(detail['events'][0]['recipients'][0]['confirmed_at'])
         self.assertTrue(all(not event['requires_confirmation'] for event in detail['events'][1:]))
 
+    def test_sdk_and_agent_with_same_instance_id_confirm_independently(self):
+        agent = CredentialClientInstance.objects.create(
+            application=self.application, instance_id=self.client.instance_id, type='agent',
+        )
+        CredentialRotationManager(self.credential.id).start()
+        self.credential.refresh_from_db()
+        rotation = self.credential.rotation_records.first()
+        sdk = CredentialClientManager(self.application, instance_id=self.client.instance_id)
+        sdk.fetch(self.credential.key, '127.0.0.1')
+        sdk.confirm(self.credential.key, self.credential.revision, self.credential.active_account_id)
+        recipients = cycle_detail(self.credential, rotation.id)['events'][0]['recipients']
+        self.assertIsNotNone(next(row for row in recipients if row['type'] == 'sdk')['confirmed_at'])
+        self.assertIsNone(next(row for row in recipients if row['type'] == 'agent')['confirmed_at'])
+        agent_manager = CredentialClientManager(agent)
+        agent_manager.fetch(self.credential.key, '127.0.0.1')
+        agent_manager.confirm(self.credential.key, self.credential.revision, self.credential.active_account_id)
+        recipients = cycle_detail(self.credential, rotation.id)['events'][0]['recipients']
+        self.assertTrue(all(row['confirmed_at'] for row in recipients))
+
     def test_historical_confirmation_and_receipt_survive_client_deletion_and_later_rotation(self):
         manager = CredentialRotationManager(self.credential.id)
         manager.start()
         self.credential.refresh_from_db()
         first = self.credential.rotation_records.first()
-        client_manager = CredentialClientManager(self.application, self.configuration.id, self.client.instance_id)
+        client_manager = CredentialClientManager(self.application, instance_id=self.client.instance_id)
         client_manager.fetch(self.credential.key, '127.0.0.1')
         client_manager.confirm(self.credential.key, self.credential.revision, self.credential.active_account_id)
         receive(self.client.id, self.org.id, first.events.first().source_event_id)
@@ -201,7 +214,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         manager.start()
         self.credential.refresh_from_db()
         rotation = self.credential.rotation_records.first()
-        client_manager = CredentialClientManager(self.application, self.configuration.id, self.client.instance_id)
+        client_manager = CredentialClientManager(self.application, instance_id=self.client.instance_id)
         client_manager.fetch(self.credential.key, '127.0.0.1')
         client_manager.confirm(self.credential.key, self.credential.revision, self.credential.active_account_id)
         manager._finish(self.credential, rotation, 'success')
@@ -216,7 +229,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         manager.start()
         self.credential.refresh_from_db()
         rotation = self.credential.rotation_records.first()
-        client_manager = CredentialClientManager(self.application, self.configuration.id, self.client.instance_id)
+        client_manager = CredentialClientManager(self.application, instance_id=self.client.instance_id)
         client_manager.fetch(self.credential.key, '127.0.0.1')
         client_manager.confirm(self.credential.key, self.credential.revision, self.credential.active_account_id)
         manager._finish(self.credential, rotation, 'success')

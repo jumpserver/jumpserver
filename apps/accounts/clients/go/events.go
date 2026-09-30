@@ -7,10 +7,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync/atomic"
 	"time"
 
 	"github.com/coder/websocket"
 )
+
+const eventPingInterval = 10 * time.Second
+const eventLivenessTimeout = 30 * time.Second
 
 // WatchCredentialEvents reconciles reconnect snapshots, sends received receipts,
 // and calls handler sequentially. A receipt does not confirm application use.
@@ -42,9 +46,6 @@ func (c *Client) WatchCredentialEvents(ctx context.Context, handler func(Event) 
 		}
 		query := endpoint.Query()
 		query.Set("instance_id", c.options.InstanceID)
-		if c.options.ConfigurationID != "" {
-			query.Set("configuration_id", c.options.ConfigurationID)
-		}
 		endpoint.RawQuery = query.Encode()
 		request, err := http.NewRequest(http.MethodGet, endpoint.String(), nil)
 		if err != nil {
@@ -88,18 +89,28 @@ func (c *Client) readEvents(ctx context.Context, connection *websocket.Conn, han
 	connection.SetReadLimit(16 * 1024 * 1024)
 	pingCtx, pingCancel := context.WithCancel(ctx)
 	pingDone := make(chan struct{})
+	var lastMessage atomic.Int64
+	started := time.Now()
 	go func() {
 		defer close(pingDone)
-		ticker := time.NewTicker(10 * time.Second)
+		ticker := time.NewTicker(eventPingInterval)
 		defer ticker.Stop()
 		for {
 			select {
 			case <-pingCtx.Done():
 				return
 			case <-ticker.C:
+				if time.Since(started)-time.Duration(lastMessage.Load()) >= eventLivenessTimeout {
+					connection.CloseNow()
+					return
+				}
 				writeCtx, done := context.WithTimeout(pingCtx, c.options.Timeout)
-				connection.Write(writeCtx, websocket.MessageText, []byte(`{"event":"ping"}`))
+				err := connection.Write(writeCtx, websocket.MessageText, []byte(`{"event":"ping"}`))
 				done()
+				if err != nil {
+					connection.CloseNow()
+					return
+				}
 			}
 		}
 	}()
@@ -118,6 +129,7 @@ func (c *Client) readEvents(ctx context.Context, connection *websocket.Conn, han
 			break
 		}
 		received = true
+		lastMessage.Store(time.Since(started).Nanoseconds())
 		if event.Event == "pong" {
 			continue
 		}
@@ -127,6 +139,7 @@ func (c *Client) readEvents(ctx context.Context, connection *websocket.Conn, han
 			connection.Write(writeCtx, websocket.MessageText, receipt)
 			done()
 		}
+		c.reconcileLatestCredentials(event)
 		if err = handler(event); err != nil {
 			break
 		}

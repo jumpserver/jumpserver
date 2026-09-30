@@ -1,16 +1,16 @@
-# JumpServer PAM Python SDK and Agent
+# JumpServer PAM Python SDK and Go Agent
 
-Applications can connect to JumpServer directly with the Python SDK or run a Linux Agent on the application host. Clients fetch rotation credentials at startup and keep a signed Credential Event Stream WebSocket open for subscription-account snapshots and later updates. Credential updates, newer reconnect snapshots and manual account switch requests trigger a fetch.
+Applications can connect to JumpServer directly with the Python SDK or run the Go Agent on the application host. The Agent runs in the foreground on Linux, macOS and Windows; its built-in systemd installer is Linux-only. Clients fetch rotation credentials at startup and keep a signed Credential Event Stream WebSocket open for subscription-account snapshots and later updates. Credential updates, newer reconnect snapshots and manual account switch requests trigger a fetch.
 
 ## Source and local installation
 
-The Python SDK and Linux Agent are maintained together in `apps/accounts/clients/python` and distributed as `jms-pam`:
+The Python SDK is distributed as `jms-pam`. The standalone Go Agent is maintained under `apps/accounts/clients/go`:
 
 - `jms_pam/client.py`: public SDK operations for credentials, synchronization and commands.
 - `jms_pam/_transport.py`, `_events.py`, and `_commands.py`: HTTP session ownership, event streams and command execution.
 - `jms_pam/models.py`: typed dataclass responses with `snake_case` fields.
 - `jms_pam/exceptions.py`: the common `PAMError` exception.
-- `jms_pam/agent.py`: the `jms-pam-agent` entry point; runtime code lives in `jms_pam/_agent/`.
+- `../go/cmd/jms-pam-agent`: the standalone Go Agent entry point; runtime code lives in `../go/agent`.
 - `demo.py`, `postgresql_app.py`, and `file_apps/`: example applications that use the SDK or Agent.
 
 Install from the repository root:
@@ -41,28 +41,9 @@ with Client(
 
 The original request-object API under `jms_pam.credential.v1` remains available for compatibility and emits `DeprecationWarning`. New integrations use the `Client` API shown here. Regenerate SDK access configuration when migrating to it.
 
-## Internal architecture and execution
+## Architecture
 
-The SDK decodes and validates responses at the network boundary. Business code uses dataclasses directly; file and local API delivery project them to the delivery format. Compatibility APIs reuse the same HTTP, event stream and command lifecycle.
-
-The Agent separates responsibilities under `jms_pam/_agent/`:
-
-| Module | Responsibility |
-| --- | --- |
-| `runtime.py` | Reconcile authorization and revisions, process events and commands, retain application confirmations |
-| `config.py` | Validate remote configuration against installed capabilities without creating directories |
-| `storage.py` | Private state, atomic writes and protected paths |
-| `delivery.py` | JSON, EnvironmentFile and Socket delivery data |
-| `server.py` | Local HTTP API over a Unix socket |
-| `install.py` | Bootstrap registration and systemd installation |
-
-The event reader sends receipts and queues messages. One runtime thread performs synchronization, delivery and commands in order. The bounded queue waits when reconciliation is busy. By default, reconciliation and command polling also run every 300 seconds. A failed event or command does not stop later work.
-
-Reconciliation reads the authorized scope and revisions, validates configuration, fetches and caches credentials, delivers a stable snapshot, then records delivered revisions. Explicit application confirmation stores the applied revision and reports it to Core; subsequent synchronization retries pending confirmations. Cached, delivered and applied revisions remain separate. Failed writes or service actions do not mark delivery complete.
-
-Each `Client` owns one HTTP session and serializes its requests. Use `clone()` for an independent session. `close()` also closes active event streams; a closed client cannot be reused. Event listeners accept a `threading.Event` for cancellation. Both normal and abnormal disconnects close the old connection before reconnecting with a 1–30 second backoff. SIGINT and SIGTERM stop the Agent's connections, local server and reader thread.
-
-Temporary network failures retain previously authorized cache access. Disabled identities or rejected authorization snapshots disable local credential access until a successful signed sync. Logs record error codes or exception types, avoiding credential data in server exception messages.
+The Python SDK owns its HTTP session, signatures, event reader and hooks. The standalone Go Agent is built from `go/cmd/jms-pam-agent`; its configuration, delivery, runtime and local API live in `go/agent`. Local rules select templates, file targets and bounded service or script actions. Latest credentials, delivered revisions and explicit application confirmations are persisted separately.
 
 ## Manually start a policy cycle
 
@@ -95,204 +76,141 @@ Expired requests cannot be claimed. If a restart terminates the reporting proces
 | Method | Use when | Application responsibility |
 | --- | --- | --- |
 | Python SDK | The application can change Python code and reach JumpServer directly | Listen for events, fetch changed credentials, switch connections, and confirm revisions |
-| Linux Agent | The application should not store JumpServer keys, or needs file, EnvironmentFile, or Unix Socket delivery | Load and validate Agent-delivered credentials, then confirm the revision actually in use |
+| Go Agent | The application should not store JumpServer keys, or needs file, EnvironmentFile, or local Socket delivery | Load and validate Agent-delivered credentials, then confirm the revision actually in use |
 
 <!-- agent-doc:start -->
 
-## Complete Linux Agent setup
+## Go Agent integration
 
-This walkthrough uses alternating dual-account rotation with JSON file delivery. It starts with data preparation and finishes with Agent installation, the first credential fetch, and one complete credential rotation.
+The built-in service installer requires Linux and root. Download `jms_pam_agent.json` from the Agent access wizard and install the Go binary with a stable instance ID. Linux service configuration is `/etc/jms-pam-agent/agent.json`; the fixed service is `jms-pam-agent`.
 
-### Prerequisites
+```bash
+cd apps/accounts/clients/go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o jms-pam-agent ./cmd/jms-pam-agent
+sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent
+chmod 0600 ./jms_pam_agent.json
+sudo /usr/local/bin/jms-pam-agent install \
+  --bootstrap ./jms_pam_agent.json --instance-id app-node-1
+```
 
-Confirm the following before starting:
+For macOS, non-root Linux or Windows foreground use, select JSON or Socket delivery in the wizard and follow its `init-local` and `run --local --config` commands. Initialize only once, then reuse the generated local configuration on restart. Foreground mode uses the current user and does not perform systemd actions; Windows files use private ACLs instead of POSIX mode bits.
 
-- The Agent host uses systemd, has Python 3.9 or later, and can reach the JumpServer Core address.
-- You have `sudo` access on the Agent host and the application runtime user already exists.
-- JumpServer can connect to the target asset and account.
-- The application and Agent run on the same host. A containerized application must share the Agent Unix socket directory and use a matching application-user UID.
+`/etc/jms-pam-agent/agent.json`: `0600`; `state_file`, `event_file`, `delivery.delivery_root`, `delivery.socket_path`.
 
-### Create a credential policy
+- JSON: `/opt/jumpserver-pam/credentials/<credential-key>.json`
+- EnvironmentFile: `/opt/jumpserver-pam/credentials/<credential-key>.env`
+- Unix Socket: `/run/jms-pam-agent/agent.sock`
 
-1. Open **PAM Integration > Credential Policies** and create a credential policy.
-2. Select **Alternating dual-account rotation**.
-3. Select the initial account, alternate account, and one or more bound applications, then save.
-4. Record the **Credential key** from the detail page. Commands use this value, not the credential name.
-
-### Authorize application accounts
-
-1. Open or create the target application under **Application Management**.
-2. Authorize the asset accounts used by the credential policy from the application's **Accounts** page.
-3. For alternating rotation, authorize both accounts.
-
-Application access does not add account authorization. The Agent cannot fetch a credential while authorization is incomplete.
-
-### Use the application access wizard
-
-1. Open the application's **Access and connections** page and select **Access wizard**.
-2. Select **Agent access**. Every active policy bound to the application is included automatically; no policy selection is required.
-3. Enter the application runtime user and installation path. The default path is `/opt/jumpserver-pam`.
-4. Select one delivery mode, then generate and download the installation materials.
-
-| Delivery mode | Agent behavior | Application behavior |
-| --- | --- | --- |
-| JSON file | Writes one `<credential-key>.json` file per credential | Watch or periodically read the file, validate a new connection, then confirm the revision |
-| systemd EnvironmentFile | Writes `<credential-key>.env`, then runs the configured `reload` or `restart` | Reference the file from the systemd service, then confirm after startup or reload and connection validation succeed |
-| Unix Socket | Keeps the credential in memory and serves it over a local socket | Fetch from the local endpoint, validate a new connection, then call the confirmation endpoint |
-
-EnvironmentFile delivery requires the application systemd unit to reference the generated file in advance:
+Choose JSON for files, EnvironmentFile for a pinned systemd service, or Unix Socket for local API access. The Agent records delivered revisions after delivery succeeds; the application validates and applies credentials before recording an applied revision. The socket belongs to the configured application user with mode 0600; make local requests as that user.
 
 ```ini
 [Service]
-EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.env
+EnvironmentFile=-/opt/jumpserver-pam/credentials/<credential-key>.env
 ```
 
-Prefer `restart`. Use `reload` only when the application's reload handler explicitly rereads the EnvironmentFile; a systemd reload does not inject new environment variables into an already running process.
+The systemd unit must reference the EnvironmentFile. Use reload only if the application rereads it; reload does not inject new environment variables into a running process. Installation pins the allowed paths, user, service and action; expanding them requires reinstallation.
 
-Find `<configuration-id>` in the downloaded bootstrap file’s `configuration_id` field. The installation path, application user, socket path, and allowed systemd operation are pinned during installation. Expanding these permissions requires reinstalling the Agent.
+Local rules configure target files, JSON/EnvironmentFile rendering or trusted templates, and an optional systemd reload/restart or fixed executable. Scripts receive credential JSON on stdin, use fixed arguments, have a bounded timeout and must validate their application before returning success. Core cannot add script paths or expand local capabilities. Restart the Agent after editing its private configuration.
 
-### Install the Agent
-
-1. Prepare a Linux host with systemd, Python 3.9+, and the application runtime user.
-2. Copy the downloaded `jms_pam_agent.json` to that host and run the wizard's installation command from its directory. The Agent signs API and WebSocket requests with the application's AK/SK.
-3. Return to the application's **Access and connections** page and verify the instance is **Online**.
-
-The download contains the application's AK/SK. Restrict its permissions and delete the bootstrap download after installation. The installed Agent keeps its configuration readable by root only.
-
-Check the installed service:
-
-```bash
-sudo systemctl status 'jms-pam-agent-<configuration-id>.service' --no-pager
-```
-
-Use the configured application runtime user to check the local endpoint:
-
-```bash
-sudo -u '<app-user>' curl --fail --silent --show-error \
-  --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \
-  http://localhost/v1/health
-```
-
-Example healthy response:
+Agent identity uses app_id, app_secret, org_id and a stable instance_id. Application authorization controls pull; policy bindings control push. All file paths and service actions are local: state_file retains the latest passwords, event_file appends metadata without secrets, delivery selects default output, and rules configure files, templates and reload/restart or fixed scripts. On an update notification the Agent fetches the current password, persists it, atomically replaces output files, then runs the configured action. Failed delivery is retried. Use credentials[].key from get_accounts in rules; subscription push keys are account:<account-id>, independent of the selecting policy. Empty rules write one file per key by default.
 
 ```json
-{"status":"ok","sync_status":"success"}
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
 ```
 
-Return to the application’s **Access and connections** page to check its instances. The Agent synchronizes at startup, reacts immediately to credential events, and performs a low-frequency reconciliation as a disconnect fallback.
+`rules`:
 
-### Load and confirm the first credential
-
-The default JSON file path is:
-
-```text
-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.json
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
 ```
 
-The file has a fixed schema containing `key`, `revision`, asset and account metadata, `username`, `secret_type`, and `secret`. The application must process it in this order:
+`/etc/jms-pam-agent/orders-db.tmpl`:
 
-1. Read the complete file and compare its `revision` with the current revision.
-2. Create a connection with the new credential and run a real, low-impact check such as database `SELECT 1`.
-3. Atomically switch the connection pool or application configuration.
-4. Confirm the revision only after the switch succeeds.
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
 
 ```bash
-sudo -u '<app-user>' /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
-  '<credential-key>' \
-  --revision '<revision>' \
-  --socket '/run/jumpserver-pam/<configuration-id>/agent.sock'
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
 ```
 
-Production applications should call the local confirmation endpoint automatically after validating a real connection and completing the switch. The command above is primarily for diagnostics and manual recovery. The Agent persists the confirmation locally first, reports it through the confirmation API, and retries during later reconciliation if Core is temporarily unavailable.
 
-A successful response contains `key`, `revision`, `account_id`, and `status: confirmed` (or `pending` while Core is unavailable). Confirmation is idempotent. Never confirm merely because a file was written, a service restarted, or an event arrived.
-
-## Complete example: rotate one credential
-
-Continue with the alternating rotation policy already connected above.
-
-1. Open the policy under **PAM Integration > Credential Policies** and select **Start new cycle**. After applications align on the current account, observe the configured standby interval without Secret API access (7 days by default). The initiating administrator receives a readiness notification and manually selects **Start rotation**.
-2. JumpServer publishes the other account and sends `credential.updated`.
-3. Every enabled Agent instance fetches, delivers, and confirms that revision after the application switches successfully.
-4. After all participating instances confirm, create and run the password-change task for the account that was replaced.
-5. Check the password-change result. The other account remains active when the rotation completes; the next rotation switches in the opposite direction.
-
-Do not copy a revision from this document. Confirm the revision actually loaded by the application; the Agent rejects stale revisions.
-
-If password change fails before the password is modified, fix the network, port, or execution environment and select **Retry**. If the status is **Password verification required**, test the candidate credential from **Password change result** before continuing.
-
-An enabled instance whose WebSocket is offline or that has not confirmed the target revision blocks password change. Give every application instance a stable, unique instance identifier.
-
-## Agent local endpoints
-
-The Agent exposes local operations only on a protected Unix socket and does not listen on a TCP port. The socket is owned by the configured application runtime user and has `0600` permissions by default.
-
-### Health check
-
-```bash
-curl --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \
-  http://localhost/v1/health
-```
-
-- `status: ok`: the Agent permits local credential access.
-- `status: denied`: the Agent identity is disabled or its protocol version is unsupported; local credential access is denied.
-- `sync_status: success`: the most recent configuration and credential synchronization succeeded.
-
-### Fetch a credential
-
-With Unix Socket delivery, fetch the current cache by credential key:
+### Local API and confirmation
 
 ```bash
 curl --fail --silent --show-error \
-  --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \
+  --unix-socket '/run/jms-pam-agent/agent.sock' \
+  http://localhost/v1/health
+
+curl --fail --silent --show-error \
+  --unix-socket '/run/jms-pam-agent/agent.sock' \
   'http://localhost/v1/credentials/<credential-key>'
 ```
 
-The response contains the password. Never write the response, request debug output, or credential files to logs.
-
-### Confirm a credential
-
-Only alternating dual-account rotation requires confirmation. Production applications should call the local endpoint after the new credential passes a real connection check and the switch completes. The installed command is for diagnostics and manual recovery; the application does not need to store Agent keys:
+For alternating rotation, validate a real connection, switch the application connection pool and release old connections before confirming the exact key, revision and account_id. Credential change subscriptions require no confirmation. A failed connection check must prevent confirmation.
 
 ```bash
-/opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
-  '<credential-key>' \
+/usr/local/bin/jms-pam-agent confirm '<credential-key>' \
   --revision '<revision>' \
-  --socket '/run/jumpserver-pam/<configuration-id>/agent.sock'
+  --socket '/run/jms-pam-agent/agent.sock'
 ```
 
-The equivalent local request is:
+Only alternating rotation uses confirm. A local confirmation is persisted first; status confirmed means Core accepted it, while pending means it will be retried. Do not confirm merely because a file was written or a service restarted.
 
-```http
-POST /v1/confirm
-Content-Type: application/json
-
-{"key":"<credential-key>","revision":<revision>}
-```
-
-A successful local response means the confirmation is durably stored. The Agent reports it through the confirmation API and retries it during later reconciliation, so a temporary Core outage does not block local confirmation.
-
-## Common Agent commands
+### Troubleshooting
 
 ```bash
-# Check status
-sudo systemctl status 'jms-pam-agent-<configuration-id>.service' --no-pager
-
-# Show recent logs
-sudo journalctl -u 'jms-pam-agent-<configuration-id>.service' -n 100 --no-pager
-
-# Follow logs
-sudo journalctl -u 'jms-pam-agent-<configuration-id>.service' -f
-
-# Restart; startup performs an immediate synchronization
-sudo systemctl restart 'jms-pam-agent-<configuration-id>.service'
-
-# Install the new downloaded SDK directory, then restart the Agent
-sudo /opt/jumpserver-pam/venv/bin/pip install --upgrade '<sdk-directory>'
-sudo systemctl restart 'jms-pam-agent-<configuration-id>.service'
+sudo systemctl start jms-pam-agent
+sudo systemctl status jms-pam-agent --no-pager
+sudo journalctl -u jms-pam-agent -n 100 --no-pager
+sudo systemctl restart jms-pam-agent
 ```
 
-During a temporary network outage, the Agent retains its last valid cache and retries. If the application or instance is disabled, authorization is revoked, or Core requires an upgrade, the Agent stops returning passwords through the socket but does not delete previously written files.
+The Agent reconciles on startup, on relevant events and every 300 seconds. Network failures retain the latest authorized credentials. Identity or authorization rejection blocks socket retrieval; successful signed synchronization restores it. Previously written files remain. SIGINT/SIGTERM closes the server, connections and reader thread.
 
 <!-- agent-doc:end -->
 
@@ -309,7 +227,7 @@ The SDK uses the application’s AK/SK and receives every active policy bound to
 3. Open the application’s **Access and connections** page, select **Access wizard**, and choose **SDK access**.
 4. Generate and download `jms_pam_config.py` and use the example code. No configuration ID or policy list is required.
 
-Every application process or connection pool must use a stable, unique `instance_id`. Reuse the identifier when redeploying the same instance; never share one identifier across instances.
+The wizard writes a generated `instance_id` into `jms_pam_config.py`. Reuse that file when recreating a container to preserve its identity. Generate separate materials for each replica, or set a distinct, stable `JMS_INSTANCE_ID` for each one.
 
 ### Install and configure
 
@@ -319,7 +237,45 @@ The SDK requires Python 3.9 or later. Download and extract the SDK archive from 
 python3 -m pip install .
 ```
 
-Place `jms_pam_config.py` where the application can import it. It contains application identity material; never commit it to source control or write it to logs.
+Place `jms_pam_config.py` where the application can import it. It contains application identity material and the generated instance ID; never commit it to source control or write it to logs.
+
+### Subclass event handlers
+
+Applications with account mappings or connection pools can subclass `Client` and override its hooks. Keep `__init__` for local state; `watch_events()` receives the initial snapshot, fetches credentials by policy mode and calls `on_credential_changed`. Updates and reconnect snapshots use the same hook.
+
+```python
+from jms_pam import Client
+from jms_pam_config import client_options, instance_id
+
+
+class MyClient(Client):
+    def __init__(self, *args, **options):
+        super().__init__(*args, **options)
+        self.credentials = {}
+
+    def on_credential_changed(self, credential):
+        # Validate the new connection and switch the application's connection pool.
+        raise NotImplementedError("Implement the application connection update first")
+        # Save after a successful switch: self.credentials[credential.key] = credential
+
+    def on_credential_revoked(self, event):
+        # Release affected connections; the next snapshot reconciles the full scope.
+        self.credentials.pop(event.get("credential_key"), None)
+
+
+with MyClient(instance_id=instance_id, **client_options) as client:
+    client.watch_events()  # Blocks until stopped; dispatches to the subclass hooks.
+```
+
+Use `start_events()` instead to start a background listener and return immediately. `stop_events()` stops the listener and waits for an active hook, while leaving the HTTP client usable. Exiting `with` or calling `close()` stops event streams and waits for hooks before closing HTTP resources. Each client allows one hook listener; it can restart after `stop_events()`. Hooks may also stop or close their own client.
+
+The reader and serial hook worker use a bounded queue of 128 events. Slow hooks do not immediately pause reading; a full queue applies backpressure. Failed credential fetches or `on_credential_changed` calls retry with 1–30 second exponential backoff, fetching the current credential again. Newer updates replace pending retries for the same account or key. Snapshots replace the retry scope; revocation/configuration changes clear pending retries until the following snapshot. Handlers must be idempotent, and reconnect snapshots may call them again even at the same revision.
+
+`on_event(event)` observes each raw event before credential hooks. Override it for snapshot state reconciliation, configuration/lifecycle events or commands; command handlers must still use `execute_application_command`. `on_credential_revoked(event)` handles revocation. `on_event_error(error, event)` receives failures, with `event=None` for a fatal reader error; its default logs only the exception type. Observer and revocation hooks are not automatically retried. See `subclass_demo.py` for snapshot state reconciliation.
+
+`start_events()` returning does not mean initial credentials are ready. If startup depends on them, use a `threading.Event` in the subclass and wait before serving requests. Background hooks run concurrently with the main application; protect shared application state as needed. The SDK never automatically confirms rotation: call `confirm_credential` inside your successful business handler only for rotation policies. `clone()` constructs fresh subclass state with an independent HTTP session; override it if your subclass requires additional constructor arguments.
+
+The existing `watch_credential_events(stop_event=...)` iterator remains available with its original receipts, blocking and cancellation semantics. The examples below retain that calling style.
 
 ### Credential change subscription
 
@@ -327,10 +283,10 @@ Look up an account ID under Application Management, then fetch any authorized ac
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
-with Client(instance_id="order-service-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     response = client.get_credential(
         account_id="<account-id>",
     )
@@ -341,11 +297,11 @@ Long-running applications listen to the Credential Event Stream. Initial and rec
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
-def fetch_credential(client, account_id):
-    response = client.get_credential(account_id=account_id)
+def fetch_credential(client, key):
+    response = client.get_credential(key=key, allow_local_fallback=False)
     address = response.asset.address
     username = response.account.username
     secret_type = response.account.secret_type
@@ -353,7 +309,7 @@ def fetch_credential(client, account_id):
     # Update the application connection with the new credential. Never log secret.
 
 
-with Client(instance_id="order-service-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     for event in client.watch_credential_events():
         if event.get("event") == "snapshot":
             updates = event.get("credentials", [])
@@ -363,8 +319,11 @@ with Client(instance_id="order-service-node-1", **client_options) as client:
             continue
         for update in updates:
             account_id = update.get("account_id")
-            if update.get("credential_mode") == "subscription" and account_id:
-                fetch_credential(client, account_id)
+            key = update.get("credential_key") or update.get("key")
+            if update.get("credential_mode") == "subscription" and account_id and key:
+                if not key.endswith(f":{account_id}"):
+                    key = f"{key}:{account_id}"
+                fetch_credential(client, key)
 ```
 
 Subscriptions need neither `credential_keys` nor `confirm_credential`. Lifecycle events are informational and do not trigger a fetch.
@@ -375,7 +334,7 @@ The event snapshot supplies one stable key per rotation policy. Fetch after the 
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
 def apply_credential(credential):
@@ -383,7 +342,7 @@ def apply_credential(credential):
 
 
 def switch_credential(client, key):
-    response = client.get_credential(key=key)
+    response = client.get_credential(key=key, allow_local_fallback=False)
     apply_credential(response)
     client.confirm_credential(
         key=response.key,
@@ -392,7 +351,7 @@ def switch_credential(client, key):
     )
 
 
-with Client(instance_id="order-service-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     for event in client.watch_credential_events():
         if event.get("event") == "snapshot":
             updates = event.get("credentials", [])
@@ -424,11 +383,12 @@ Use `list_application_commands()` to poll outstanding requests and `execute_appl
 
 The synchronous client provides these common methods:
 
-- `get_credential`: use `key` for alternating rotation or `account_id` for update subscriptions; provide exactly one.
+- `get_credential`: use `account_id` for application-authorized pull, `key=account:<account-id>` for push subscriptions, or a policy key for alternating rotation; provide exactly one selector.
 - `confirm_credential`: for alternating rotation only, confirm that the application has validated and is using a revision.
+- `watch_events` / `start_events` / `stop_events`: run subclass hooks in the foreground or background and stop them.
 - `watch_credential_events`: block while listening for credential events and reconnect snapshots.
 - `list_application_commands` / `execute_application_command`: poll, claim and report application commands.
-- `sync_agent`: reconcile cached and delivered `KnownRevision` values with Core.
+- `sync_agent`: reconcile retained and delivered `KnownRevision` values with Core.
 - `clone`: create an independent HTTP session; `close` or a `with` statement releases sessions and event streams.
 
 Before yielding a business event, the SDK automatically sends a best-effort receipt. The receipt only means the SDK/Agent has read the event; it does not mean credentials were fetched or applied, and it does not replace `confirm_credential`. Receipt failures do not prevent event processing. Update and restart existing SDK/Agent deployments to report receipts. Reconnect snapshots restore current credential versions; they do not replay past events or create receipts for them.
@@ -436,5 +396,16 @@ Before yielding a business event, the SDK automatically sends a best-effort rece
 WebSocket Ping/Pong maintains connection liveness; there is no HTTP heartbeat endpoint. Keep low-frequency revision reconciliation only as a recovery path.
 
 HTTP, authentication, network, and response parsing failures are raised as `jms_pam.PAMError`. Use its `code`, `status_code`, `detail`, and `original_error` fields at the application's retry boundary. Never log credentials or authentication headers.
+
+### Latest credentials and backend outages
+
+Credential getters always request the API first. A successful fetch replaces the retained latest credential; older revisions never overwrite a newer one. The retained value has no time expiry. Only a timeout, network failure or HTTP 5xx may return this value for the same selector, marked as coming from local state. Without a previously fetched value, the original error is raised. SDK values stay in the current client’s memory until replacement, revocation or close; clones and process restarts start empty. The Agent retains its latest credentials in its existing protected local state. HTTP 401/403/404 or client_upgrade_required clear SDK retained values and raise; malformed successful responses also raise. Explicit revocations remove affected credentials, and snapshots remove push entries outside the subscribed scope. A configuration notification retains existing values until the following snapshot reconciles scope. The Agent applies explicit revocation and reduced snapshot scope before HTTP synchronization, persists the reduced scope, and blocks affected local reads even during a backend outage or after restart. A credential_not_found response (HTTP 400) also clears retained SDK values. Direct account_id pull always requires a live API response; push snapshots do not authorize cached pull values.
+
+- `credential.from_local`
+- `get_credential(key=..., allow_local_fallback=False)` / `get_credential(account_id=..., allow_local_fallback=False)`
+
+With managed event listening enabled, snapshot and credential.updated automatically fetch the current credential, replace the retained value and then invoke the business hook. A failed refresh leaves the previous value in place and retries. The Agent also refetches on update notifications and retains its previous credentials during backend outages. Refresh and manual switching use the live-only calls below; a retained password must not be treated as a newly fetched revision or automatically confirmed.
+
+Event connections send application ping messages at 10-second intervals while idle and reconnect after approximately 30 seconds without messages. Reconnect uses 1–30 second exponential backoff and fresh signatures. Reconnect snapshots restore current state; past events are not replayed.
 
 <!-- sdk-doc:end -->

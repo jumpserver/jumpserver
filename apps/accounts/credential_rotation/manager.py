@@ -42,8 +42,6 @@ class CredentialRotationManager:
         from .participants import initialize
 
         clients = CredentialClientInstance.objects.filter(
-            configuration__credentials=credential,
-            configuration__is_active=True,
             application__credential_bindings__credential=credential,
             application__is_active=True,
             is_active=True,

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	pam "github.com/jumpserver/jumpserver/apps/accounts/clients/go"
@@ -23,7 +24,7 @@ func handleCommand(ctx context.Context, client *pam.Client, event pam.Event) err
 	if event.Event != "credential.switch.requested" {
 		return fmt.Errorf("unsupported application command")
 	}
-	credential, err := client.GetCredential(ctx, pam.CredentialSelector{Key: event.CredentialKey})
+	credential, err := client.GetCredentialFresh(ctx, pam.CredentialSelector{Key: event.CredentialKey})
 	if err != nil {
 		return err
 	}
@@ -62,14 +63,17 @@ func main() {
 				key = update.Key
 			}
 			selector := pam.CredentialSelector{}
-			if update.CredentialMode == "subscription" && update.AccountID != "" {
-				selector.AccountID = update.AccountID
+			if update.CredentialMode == "subscription" && update.AccountID != "" && key != "" {
+				if !strings.HasSuffix(key, ":"+update.AccountID) {
+					key += ":" + update.AccountID
+				}
+				selector.Key = key
 			} else if update.CredentialMode == "alternating_rotation" && key != "" {
 				selector.Key = key
 			} else {
 				continue
 			}
-			credential, err := client.GetCredential(ctx, selector)
+			credential, err := client.GetCredentialFresh(ctx, selector)
 			if err != nil {
 				return err
 			}

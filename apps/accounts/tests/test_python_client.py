@@ -18,7 +18,6 @@ class PythonClientTests(TestCase):
             app_id="application",
             app_secret="app-secret",
             instance_id="orders-worker-1",
-            configuration_id="configuration",
         )
         self.addCleanup(self.client.close)
         self.payload = {
@@ -65,7 +64,6 @@ class PythonClientTests(TestCase):
             {
                 "key": "database",
                 "instance_id": "orders-worker-1",
-                "configuration_id": "configuration",
             },
         )
         self.respond({"key": "database", "revision": 2})
@@ -82,7 +80,6 @@ class PythonClientTests(TestCase):
                 "revision": 2,
                 "account_id": "account",
                 "instance_id": "orders-worker-1",
-                "configuration_id": "configuration",
             },
         )
 
@@ -142,7 +139,7 @@ class PythonClientTests(TestCase):
         self.respond(
             {
                 "config_digest": "digest",
-                "configuration": {"delivery_mode": "json"},
+                "scope": {"credential_keys": ["db"], "confirmation_keys": ["db"]},
                 "credentials": [
                     {
                         "key": "database",
@@ -224,7 +221,6 @@ class PythonClientTests(TestCase):
         with self.client.clone() as cloned:
             self.assertIsNot(cloned.session, self.client.session)
             self.assertEqual(cloned.instance_id, self.client.instance_id)
-            self.assertEqual(cloned.configuration_id, self.client.configuration_id)
             cloned.session.close = Mock()
         cloned.session.close.assert_called_once()
 

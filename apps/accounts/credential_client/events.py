@@ -9,7 +9,7 @@ from django.utils import timezone
 from accounts.const import ApplicationEvent, AuditEvent
 from accounts.models import (
     ApplicationCredential, ApplicationEventDelivery, ApplicationWebhook,
-    ClientAccessConfiguration, CredentialClientInstance, CredentialRotationEvent,
+    CredentialClientInstance, CredentialRotationEvent,
     CredentialRotationRecord, IntegrationApplication,
 )
 from accounts.webhooks import (
@@ -31,8 +31,8 @@ TRACKED_NON_ROTATION_EVENTS = {
 }
 
 
-def configuration_group(configuration_id):
-    return f'credential-config-{configuration_id}'
+def application_group(application_id):
+    return f'credential-app-{application_id}'
 
 
 def enqueue(event, code, rotation=None):
@@ -56,38 +56,23 @@ def _application_ids(event):
     return ids
 
 
-def _configurations(event, code):
-    configurations = ClientAccessConfiguration.objects.filter(
-        org_id=event.org_id, is_active=True, application__is_active=True,
+def _clients(event, code):
+    clients = CredentialClientInstance.objects.filter(
+        application_id__in=_application_ids(event), application__is_active=True,
+        is_active=True, org_id=event.org_id,
     )
-    if code == 'credential.revoked' and event.configuration_id:
-        configurations = configurations.filter(id=event.configuration_id)
-    elif code == 'credential.revoked' and event.service_id and event.credential_id:
-        configurations = configurations.filter(
-            application_id=event.service_id, credentials=event.credential_id,
-        )
-    elif event.credential_id:
-        configurations = configurations.filter(
-            credentials=event.credential_id,
+    if event.credential_id and code != 'credential.revoked':
+        clients = clients.filter(
             application__credential_bindings__credential_id=event.credential_id,
-            application_id__in=_application_ids(event),
         )
-    elif event.configuration_id:
-        configurations = configurations.filter(id=event.configuration_id)
-    else:
-        configurations = configurations.filter(application_id__in=_application_ids(event))
-    return configurations.distinct()
+    return clients.distinct()
 
 
 def _recipients(event, code):
-    clients = CredentialClientInstance.objects.filter(
-        configuration__in=_configurations(event, code), is_active=True,
-        org_id=event.org_id,
-    ).select_related('application', 'configuration').order_by('id')
+    clients = _clients(event, code).select_related('application').order_by('id')
     return [{
         'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
         'application': {'id': str(client.application_id), 'name': client.application.name},
-        'configuration': {'id': str(client.configuration_id), 'name': client.configuration.name},
         'supports_receipts': client.event_receipts_supported,
         'publish_result': 'pending', 'received_at': None,
     } for client in clients]
@@ -112,7 +97,7 @@ def _track_rotation(event, code, rotation):
 def _track_non_rotation(event, code):
     if code not in TRACKED_NON_ROTATION_EVENTS:
         return
-    if (not event.credential_id and not _configurations(event, code).exists()) or CredentialRotationEvent.objects.filter(
+    if (not event.credential_id and not _clients(event, code).exists()) or CredentialRotationEvent.objects.filter(
         source_event_id=event.id,
     ).exists():
         return
@@ -139,7 +124,7 @@ def _send_stream(event_id, code):
     credential_mode = ApplicationCredential.objects.filter(
         id=event.credential_id,
     ).values_list('mode', flat=True).first()
-    configurations = _configurations(event, code)
+    application_ids = set(_clients(event, code).values_list('application_id', flat=True))
     try:
         tracked = CredentialRotationEvent.objects.filter(
             source_event_id=event_id, org_id=event.org_id,
@@ -162,25 +147,25 @@ def _send_stream(event_id, code):
         channel_layer = get_channel_layer()
     except Exception:
         channel_layer = None
-    for configuration_id in configurations.values_list('id', flat=True).distinct():
+    for application_id in application_ids:
         message = {'type': 'credential.event', 'payload': payload}
         if tracked is not None:
             # Match actual delivery to the same frozen identities that can ACK it.
             message['recipient_ids'] = [
                 recipient['id'] for recipient in tracked.recipients
-                if recipient['configuration']['id'] == str(configuration_id)
+                if recipient['application']['id'] == str(application_id)
             ]
         result = 'published'
         try:
             if channel_layer is None:
                 raise RuntimeError('Credential event channel is unavailable')
             async_to_sync(channel_layer.group_send)(
-                configuration_group(configuration_id),
+                application_group(application_id),
                 message,
             )
         except Exception:
             result = 'failed'
-            logger.warning('Cannot publish credential event %s to %s.', event_id, configuration_id)
+            logger.warning('Cannot publish credential event %s to %s.', event_id, application_id)
         try:
             with transaction.atomic():
                 publication = CredentialRotationEvent.objects.select_for_update().filter(
@@ -188,7 +173,7 @@ def _send_stream(event_id, code):
                 ).first()
                 if publication:
                     for recipient in publication.recipients:
-                        if recipient['configuration']['id'] == str(configuration_id):
+                        if recipient['application']['id'] == str(application_id):
                             if not recipient['received_at']:
                                 recipient['publish_result'] = result
                     publication.save(update_fields=['recipients', 'date_updated'])

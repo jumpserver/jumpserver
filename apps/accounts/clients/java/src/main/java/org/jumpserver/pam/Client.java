@@ -62,13 +62,15 @@ public final class Client implements AutoCloseable {
   private final HttpClient http;
   private final Set<CompletableFuture<?>> requests = ConcurrentHashMap.newKeySet();
   private final Set<EventStream> streams = ConcurrentHashMap.newKeySet();
-  private boolean closed;
+  private volatile boolean closed;
+  private EventSubscription subscription;
+  private final Object credentialsLock = new Object();
+  private final Map<String, Credential> latestCredentials = new LinkedHashMap<>();
+  private long credentialGeneration;
 
   public static final class Options {
     private final String endpoint, appId, appSecret, instanceId;
-    private String orgId = "00000000-0000-0000-0000-000000000002",
-        configurationId,
-        source = "jms-pam";
+    private String orgId = "00000000-0000-0000-0000-000000000002", source = "jms-pam";
     private Duration timeout = Duration.ofSeconds(10);
 
     public Options(String endpoint, String appId, String appSecret, String instanceId) {
@@ -80,11 +82,6 @@ public final class Client implements AutoCloseable {
 
     public Options orgId(String value) {
       if (value != null && !value.isEmpty()) orgId = value;
-      return this;
-    }
-
-    public Options configurationId(String value) {
-      configurationId = value;
       return this;
     }
 
@@ -101,7 +98,6 @@ public final class Client implements AutoCloseable {
     private Options copy() {
       return new Options(endpoint, appId, appSecret, instanceId)
           .orgId(orgId)
-          .configurationId(configurationId)
           .source(source)
           .timeout(timeout);
     }
@@ -142,8 +138,6 @@ public final class Client implements AutoCloseable {
   private Map<String, Object> identity(Map<String, Object> fields) {
     Map<String, Object> data = new LinkedHashMap<>(fields);
     data.put("instance_id", options.instanceId);
-    if (options.configurationId != null && !options.configurationId.isEmpty())
-      data.put("configuration_id", options.configurationId);
     return data;
   }
 
@@ -254,6 +248,15 @@ public final class Client implements AutoCloseable {
       future.cancel(true);
       throw new PAMException("NetworkError", 0, "HTTP request failed", null, error);
     }
+    if (response.statusCode() == 401
+        || response.statusCode() == 403
+        || response.statusCode() == 404
+        || response.statusCode() == 426) {
+      synchronized (credentialsLock) {
+        latestCredentials.clear();
+        credentialGeneration++;
+      }
+    }
     JsonNode payload;
     try {
       payload = Models.object(mapper.readTree(response.body()));
@@ -269,6 +272,12 @@ public final class Client implements AutoCloseable {
               : "HTTP request failed";
       String requestId =
           payload.path("request_id").isTextual() ? payload.get("request_id").asText() : null;
+      if (response.statusCode() == 400 && code.equals("credential_not_found")) {
+        synchronized (credentialsLock) {
+          latestCredentials.clear();
+          credentialGeneration++;
+        }
+      }
       throw new PAMException(
           code.isEmpty() ? "HTTPError" : code, response.statusCode(), detail, requestId, null);
     }
@@ -285,15 +294,108 @@ public final class Client implements AutoCloseable {
   }
 
   public Credential getCredential(String key) {
-    return request("GET", "/credential/", Map.of("key", nonempty(key, "key")), Credential::new);
+    return getCredential(key, true);
+  }
+
+  public Credential getCredential(String key, boolean allowLocalFallback) {
+    return fetchCredential("key", nonempty(key, "key"), allowLocalFallback);
   }
 
   public Credential getCredentialByAccountId(String accountId) {
-    return request(
-        "GET",
-        "/credential/",
-        Map.of("account_id", nonempty(accountId, "accountId")),
-        Credential::new);
+    return getCredentialByAccountId(accountId, true);
+  }
+
+  public Credential getCredentialByAccountId(String accountId, boolean allowLocalFallback) {
+    return fetchCredential("account_id", nonempty(accountId, "accountId"), allowLocalFallback);
+  }
+
+  private Credential fetchCredential(String field, String value, boolean allowLocalFallback) {
+    String selector = field + ":" + value;
+    long generation;
+    synchronized (credentialsLock) {
+      generation = credentialGeneration;
+    }
+    try {
+      Credential credential = request("GET", "/credential/", Map.of(field, value), Credential::new);
+      synchronized (credentialsLock) {
+        if (!closed && generation == credentialGeneration) {
+          Credential latest = latestCredentials.get(selector);
+          if (latest != null && credential.getRevision() < latest.getRevision())
+            throw new PAMException(
+                "ResponseError", 200, "Credential revision moved backwards", null, null);
+          latestCredentials.put(selector, credential);
+        }
+      }
+      return credential;
+    } catch (PAMException error) {
+      boolean denied =
+          error.getStatusCode() == 401
+              || error.getStatusCode() == 403
+              || error.getStatusCode() == 404
+              || error.getCode().equals("client_upgrade_required")
+              || (error.getStatusCode() == 400 && error.getCode().equals("credential_not_found"));
+      boolean temporary =
+          error.getCode().equals("NetworkError")
+              || (error.getStatusCode() >= 500 && error.getStatusCode() < 600);
+      synchronized (credentialsLock) {
+        if (denied) {
+          latestCredentials.clear();
+          credentialGeneration++;
+        }
+        Credential latest = latestCredentials.get(selector);
+        if (allowLocalFallback
+            && field.equals("key")
+            && temporary
+            && !denied
+            && !closed
+            && !Thread.currentThread().isInterrupted()
+            && latest != null) return latest.localCopy();
+      }
+      throw error;
+    }
+  }
+
+  void reconcileLatestCredentials(Event event) {
+    String name = event.getEvent();
+    if (!name.equals("snapshot")
+        && !name.equals("credential.revoked")
+        && !name.equals("configuration.updated")) return;
+    synchronized (credentialsLock) {
+      credentialGeneration++;
+      if (name.equals("configuration.updated")) return;
+      if (!name.equals("snapshot")) {
+        String key = event.getKey(), accountId = event.getAccountId();
+        if (key.isEmpty() && accountId.isEmpty()) latestCredentials.clear();
+        else
+          latestCredentials
+              .entrySet()
+              .removeIf(
+                  item ->
+                      (!key.isEmpty()
+                              && (item.getKey().equals("key:" + key)
+                                  || item.getValue().getKey().equals(key)
+                                  || item.getValue().getKey().startsWith(key + ":")))
+                          || (!accountId.isEmpty()
+                              && (key.isEmpty() || key.startsWith("account:"))
+                              && (item.getKey().equals("account_id:" + accountId)
+                                  || item.getValue().getAccount().getId().equals(accountId))));
+        return;
+      }
+      java.util.Set<String> keys = new java.util.HashSet<>();
+      try {
+        for (Event item : event.getCredentials()) {
+          keys.add(item.getKey());
+        }
+      } catch (RuntimeException error) {
+        latestCredentials.clear();
+        return;
+      }
+      latestCredentials
+          .keySet()
+          .removeIf(
+              selector ->
+                  selector.startsWith("key:") && !keys.contains(selector.substring(4)));
+    }
   }
 
   public CredentialConfirmation confirmCredential(String key, long revision, String accountId) {
@@ -380,6 +482,23 @@ public final class Client implements AutoCloseable {
     return stream;
   }
 
+  /** Start serial business hooks in the background. Initial credentials may not be ready yet. */
+  public synchronized EventSubscription startEvents(CredentialEventListener listener) {
+    if (closed) throw new IllegalStateException("Client is closed");
+    if (subscription != null && subscription.isRunning())
+      throw new IllegalStateException("An event listener is already running");
+    subscription = new EventSubscription(this, listener);
+    subscription.start();
+    return subscription;
+  }
+
+  /** Block until the listener stops; credential failures are reported and retried. */
+  public void watchEvents(CredentialEventListener listener) throws InterruptedException {
+    try (EventSubscription events = startEvents(listener)) {
+      events.awaitTermination();
+    }
+  }
+
   CompletableFuture<WebSocket> connectEvents(WebSocket.Listener listener) {
     URI httpUrl = url("/ws/accounts/credential-events/", identity(Collections.emptyMap()));
     URI url =
@@ -403,13 +522,20 @@ public final class Client implements AutoCloseable {
   @Override
   public void close() {
     List<EventStream> activeStreams;
+    EventSubscription activeSubscription;
     synchronized (this) {
-      if (closed) return;
       closed = true;
       activeStreams = new ArrayList<>(streams);
+      activeSubscription = subscription;
     }
+    if (activeSubscription != null) activeSubscription.stop();
     for (EventStream stream : activeStreams) stream.close();
     for (CompletableFuture<?> request : requests) request.cancel(true);
     executor.shutdownNow();
+    synchronized (credentialsLock) {
+      latestCredentials.clear();
+      credentialGeneration++;
+    }
+    if (activeSubscription != null) activeSubscription.close();
   }
 }

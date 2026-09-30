@@ -235,10 +235,6 @@ def build_webhook_context(event, application=None, code=None):
             'name': event.credential or None, 'key': event.credential_key or None,
             'revision': event.revision,
         },
-        'configuration': {
-            'id': str(event.configuration_id) if event.configuration_id else None,
-            'name': event.configuration or None,
-        },
         'client': {'instance_id': event.instance_id or None},
         'source': event.source or None,
         'operator': event.operator or None,

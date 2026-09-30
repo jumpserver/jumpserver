@@ -1,16 +1,16 @@
-# JumpServer PAM Python SDK 与 Agent
+# JumpServer PAM Python SDK 与 Go Agent
 
-应用可以使用 Python SDK 直接连接 JumpServer，也可以在应用主机部署 Linux Agent。客户端启动时获取轮换凭据，并通过签名认证的凭据事件流 WebSocket 接收订阅账号快照和后续更新；`credential.updated`、重连快照中的新版本以及管理员手动发送的账号切换请求会触发取密。
+应用可以使用 Python SDK 直接连接 JumpServer，也可以在应用主机运行 Go Agent。Agent 可在 Linux、macOS 和 Windows 前台运行；内置 systemd 安装仅支持 Linux。客户端启动时获取轮换凭据，并通过签名认证的凭据事件流 WebSocket 接收订阅账号快照和后续更新；`credential.updated`、重连快照中的新版本以及管理员手动发送的账号切换请求会触发取密。
 
 ## 源码与本地安装
 
-Python SDK 和 Linux Agent 一起维护在 `apps/accounts/clients/python`，可安装包名为 `jms-pam`：
+Python SDK 位于 `apps/accounts/clients/python`，分发包为 `jms-pam`；独立 Go Agent 位于 `apps/accounts/clients/go`：
 
 - `jms_pam/client.py`：SDK 公共接口，负责凭据、同步和应用指令操作。
 - `jms_pam/_transport.py`、`_events.py`、`_commands.py`：HTTP 会话、事件流和命令执行流程。
 - `jms_pam/models.py`：使用 `snake_case` 字段的 dataclass 响应模型。
 - `jms_pam/exceptions.py`：统一的 `PAMError` 异常。
-- `jms_pam/agent.py`：`jms-pam-agent` 命令入口；运行逻辑位于 `jms_pam/_agent/`。
+- `../go/cmd/jms-pam-agent`：独立 Go Agent 入口，运行逻辑位于 `../go/agent`。
 - `demo.py`、`postgresql_app.py`、`file_apps/`：使用 SDK 或 Agent 的示例应用。
 
 从仓库根目录安装：
@@ -43,26 +43,7 @@ with Client(
 
 ## 内部架构与执行流程
 
-SDK 在网络边界解析和校验响应，业务代码直接使用 dataclass；只有写入文件或返回本地 API 时才转换为交付数据。兼容接口复用同一套 HTTP、事件流和命令执行逻辑。
-
-Agent 按职责组织在 `jms_pam/_agent/`：
-
-| 模块 | 职责 |
-| --- | --- |
-| `runtime.py` | 同步授权范围与版本、处理通知与命令、保存应用确认 |
-| `config.py` | 校验服务端配置是否符合安装时固定的能力，校验本身不创建目录 |
-| `storage.py` | 私有状态文件、原子写入和路径保护 |
-| `delivery.py` | JSON、EnvironmentFile 与 Socket 交付数据 |
-| `server.py` | 本地 Unix Socket HTTP API |
-| `install.py` | 引导注册与 systemd 安装 |
-
-事件读取线程只负责回执和入队；同步、文件交付和应用指令由同一个运行线程依次处理。队列有容量限制，同步繁忙时通知会等待处理；默认每 300 秒同步授权范围与版本并轮询待处理命令。一次通知或命令失败不会阻止后续处理。
-
-同步过程依次完成：读取服务端授权范围与版本 → 校验配置 → 取密并保存缓存 → 交付稳定快照 → 保存交付版本。应用调用本地确认接口后，Agent 保存生效版本并向 Core 确认；失败的确认会在后续同步中重试。缓存、交付、生效分别记录，文件写入或服务动作失败时不标记交付完成。
-
-每个 `Client` 拥有一个 HTTP 会话，其请求串行执行；需要独立会话时使用 `clone()`。`close()` 同时关闭活动事件流，关闭后的客户端不能继续使用。事件监听可传入 `threading.Event` 取消；正常断开与异常断开均在关闭旧连接后按 1–30 秒退避重连。Agent 收到 SIGINT 或 SIGTERM 后关闭连接、本地服务与读取线程。
-
-网络暂时不可用时保留已授权缓存；身份停用或授权快照被拒绝时阻断本地取密，成功完成签名同步后恢复。日志仅记录错误码或异常类型，避免输出服务器异常中可能包含的凭据。
+Python SDK 管理 HTTP 会话、签名、事件读取和钩子。独立 Go Agent 入口为 `go/cmd/jms-pam-agent`，配置、交付、运行和本地接口位于 `go/agent`。本机规则选择模板、目标文件和有超时的服务或脚本动作；最新凭据、交付版本和显式业务生效确认分别持久化。
 
 ## 手动发起策略新周期
 
@@ -95,204 +76,141 @@ WebSocket 的 `received` 回执表示收到请求，不表示执行成功。SDK 
 | 方式 | 适用场景 | 应用需要完成的工作 |
 | --- | --- | --- |
 | Python SDK | 应用可以修改 Python 代码并直接访问 JumpServer | 监听事件、拉取变化的凭据、切换连接并确认版本 |
-| Linux Agent | 不希望应用保存 JumpServer 密钥，或需要文件、EnvironmentFile、Unix Socket 交付 | 加载并验证 Agent 交付的凭据，再确认实际使用的版本 |
+| Go Agent | 不希望应用保存 JumpServer 密钥，或需要文件、EnvironmentFile、本地 Socket 交付 | 加载并验证 Agent 交付的凭据，再确认实际使用的版本 |
 
 <!-- agent-doc:start -->
 
-## Linux Agent 完整接入
+## Go Agent 接入
 
-下面以“双账号交替轮换 + JSON 文件交付”为例。从准备数据开始，完成 Agent 安装、首次取密和一次完整的凭据轮换。
+内置服务安装需要 Linux/root。从应用 Agent 接入向导下载 `jms_pam_agent.json`，构建或获取 Go 二进制，并使用稳定且唯一的实例 ID。Linux 服务配置为 `/etc/jms-pam-agent/agent.json`，服务名固定为 `jms-pam-agent`。
 
-### 接入前准备
+```bash
+cd apps/accounts/clients/go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o jms-pam-agent ./cmd/jms-pam-agent
+sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent
+chmod 0600 ./jms_pam_agent.json
+sudo /usr/local/bin/jms-pam-agent install \
+  --bootstrap ./jms_pam_agent.json --instance-id app-node-1
+```
 
-确认以下条件已经满足：
+macOS、非 root Linux 或 Windows 前台运行时，在向导中选择 JSON 或 Socket 交付，按照对应的 `init-local` 和 `run --local --config` 命令操作。只初始化一次，重启时复用生成的本机配置。前台模式以当前用户运行，不执行 systemd 动作；Windows 使用私有 ACL 而不是 POSIX 权限位。
 
-- Agent 主机使用 systemd，已安装 Python 3.9 或更高版本，并能访问 JumpServer Core 地址。
-- 你可以在 Agent 主机使用 `sudo`，而且应用运行用户已经存在。
-- 目标资产和账号可以从 JumpServer 正常连接。
-- 应用与 Agent 位于同一主机；容器化应用需要共享 Agent 的 Unix Socket 目录，并使用匹配的应用用户 UID。
+`/etc/jms-pam-agent/agent.json`: `0600`; `state_file`, `event_file`, `delivery.delivery_root`, `delivery.socket_path`.
 
-### 创建凭据策略
+- JSON: `/opt/jumpserver-pam/credentials/<credential-key>.json`
+- EnvironmentFile: `/opt/jumpserver-pam/credentials/<credential-key>.env`
+- Unix Socket: `/run/jms-pam-agent/agent.sock`
 
-1. 进入“PAM 集成 > 凭据策略”，创建一个凭据策略。
-2. 模式选择“双账号交替轮换”。
-3. 选择初始账号、交替账号和一个或多个绑定应用，然后保存。
-4. 记下凭据详情中的“接入标识”，后续命令使用的是这个值，而不是凭据名称。
-
-### 授权应用账号
-
-1. 进入“应用管理”，创建或打开目标应用。
-2. 在应用详情的“账号授权”页面授权凭据策略使用的资产账号。
-3. 使用交替轮换时，两个账号都必须授权。
-
-应用接入不会自动增加账号授权。授权不完整时，Agent 无法获取凭据。
-
-### 使用应用接入向导
-
-1. 打开应用详情的“接入与连接实例”，点击“接入向导”。
-2. 选择“Agent 接入”。所有绑定到应用的有效策略会自动加入，无需选择策略。
-3. 填写应用运行用户和安装路径。默认安装路径为 `/opt/jumpserver-pam`。
-4. 选择凭据交付方式，生成并下载接入材料。
-
-| 交付方式 | Agent 行为 | 应用行为 |
-| --- | --- | --- |
-| JSON 文件 | 每个凭据写入一个 `<credential-key>.json` 文件 | 监听或定时读取文件，验证新连接后确认版本 |
-| systemd EnvironmentFile | 写入 `<credential-key>.env`，然后执行配置的 `reload` 或 `restart` | systemd 服务引用该文件，启动或重载成功并验证连接后确认版本 |
-| Unix Socket | 不生成业务凭据文件，通过本机 Socket 返回当前缓存 | 调用本机取密接口，验证新连接后调用确认接口 |
-
-EnvironmentFile 模式要求应用的 systemd unit 提前引用对应文件，例如：
+JSON 交付文件，EnvironmentFile 对接固定 systemd 服务，Unix Socket 提供本地 API。Agent 在交付成功后保存交付版本，应用验证并使用后才保存生效版本。Socket 归配置的应用用户所有，权限为 0600，本地请求应以该用户执行。
 
 ```ini
 [Service]
-EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.env
+EnvironmentFile=-/opt/jumpserver-pam/credentials/<credential-key>.env
 ```
 
-默认选择 `restart`。只有应用的 reload 处理程序会主动重新读取 EnvironmentFile 时才选择 `reload`；systemd reload 本身不会把新环境变量重新注入已运行进程。
+systemd unit 必须引用 EnvironmentFile。
 
-`<configuration-id>` 可以在下载的引导文件中查看 `configuration_id` 字段。安装路径、应用用户、Socket 路径以及可操作的 systemd 服务会在安装时固定；扩大这些权限需要重新安装 Agent。
+本机 rules 配置目标文件、JSON/EnvironmentFile 或可信模板，以及可选的 systemd reload/restart 或固定可执行脚本。脚本通过标准输入接收凭据 JSON，参数固定、有超时，并应在验证业务生效后返回成功。Core 不能新增脚本路径或扩大本机能力。修改私有配置后重启 Agent。
 
-### 安装 Agent
-
-1. 准备使用 systemd、Python 3.9+ 且已创建应用运行用户的 Linux 应用主机。
-2. 将下载的 `jms_pam_agent.json` 放到主机，在文件所在目录运行向导中的安装命令。Agent 使用应用的 AK/SK 签名访问 API 与 WebSocket。
-3. 回到应用的“接入与连接实例”，确认实例显示“在线”。
-
-下载文件包含应用的 AK/SK，请限制文件访问权限，安装后删除下载的引导文件。Agent 安装后的配置文件仅允许 root 读取。
-
-安装后检查服务：
-
-```bash
-sudo systemctl status 'jms-pam-agent-<configuration-id>.service' --no-pager
-```
-
-使用向导中填写的应用运行用户检查本机接口：
-
-```bash
-sudo -u '<app-user>' curl --fail --silent --show-error \
-  --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \
-  http://localhost/v1/health
-```
-
-正常响应示例：
+身份只需要 app_id、app_secret、org_id 和稳定的 instance_id；应用授权控制 pull 范围，绑定策略控制 push 范围。文件路径和服务动作全部在本机配置：state_file 始终保留最新密码，event_file 追加不含密码的事件元数据，delivery 定义默认交付，rules 定义文件、模板及 reload/restart 或固定脚本。收到更新通知后主动取最新密码，先持久化，再原子替换文件，最后执行动作；交付失败会重试。规则使用 get_accounts 返回的 credentials[].key，订阅 push 的 key 为 account:<account-id>，不包含策略 key。rules 为空时默认按 key 写文件。
 
 ```json
-{"status":"ok","sync_status":"success"}
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
 ```
 
-回到应用详情的“接入与连接实例”查看连接状态。Agent 启动时立即同步，收到凭据事件时实时同步，并保留低频全量对账作为断线兜底。
+`rules`:
 
-### 让应用使用并确认凭据
-
-JSON 文件默认位于：
-
-```text
-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.json
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
 ```
 
-文件包含固定字段：`key`、`revision`、资产信息、账号信息、`username`、`secret_type` 和 `secret`。应用应按以下顺序处理：
+`/etc/jms-pam-agent/orders-db.tmpl`:
 
-1. 读取完整文件，并比较 `revision` 是否变化。
-2. 使用新凭据创建连接并执行真实的轻量验证，例如数据库 `SELECT 1`。
-3. 原子切换连接池或应用配置。
-4. 只有切换成功后，才确认应用实际使用的版本。
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
 
 ```bash
-sudo -u '<app-user>' /opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
-  '<credential-key>' \
-  --revision '<revision>' \
-  --socket '/run/jumpserver-pam/<configuration-id>/agent.sock'
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
 ```
 
-生产应用应在真实连接验证和切换成功后自动调用本机确认接口；上述命令主要用于调试和人工兜底。Agent 会先在本机持久化确认状态，再通过确认接口上报；Core 暂时不可达时会在后续对账中重试。
 
-成功响应包含 `key`、`revision`、`account_id` 和 `status: confirmed`（Core 暂不可达时为 `pending`）。确认接口是幂等的。不要因为文件写入、服务重启或事件送达就自动确认。
-
-## 完整示例：完成一次凭据轮换
-
-下面继续使用已经接入的双账号交替轮换策略。
-
-1. 进入“PAM 集成 > 凭据策略”，打开目标策略并点击“发起新周期”。所有应用对齐到当前账号后，观察备用账号连续无取密流量的时长（默认 7 天，可配置）。达标会通知发起管理员，再由管理员点击“开始轮换”。
-2. JumpServer 发布另一个账号并发送 `credential.updated`。
-3. 每个启用的 Agent 实例取密并交付；应用切换成功后确认该 revision。
-4. 所有参与实例确认后，为被替换的账号创建并执行改密任务。
-5. 检查改密结果。轮换完成后另一个账号继续作为当前账号；下一轮按相反方向切换。
-
-不要复制文档示例中的 revision。必须确认应用实际加载的 revision；确认旧版本会被 Agent 拒绝。
-
-如果改密在真正修改密码前失败，修复网络、端口或执行环境后点击“重试”。如果状态为“密码需要核验”，先在“改密结果”中测试候选密码，再根据结果继续处理。
-
-任一启用实例的 WebSocket 离线或未确认目标 revision，都会阻止改密。确认每个应用实例都有稳定且唯一的实例标识。
-
-## Agent 本机接口
-
-Agent 只在受保护的 Unix Socket 上提供本机接口，不监听 TCP 端口。Socket 默认属于向导中填写的应用运行用户，权限为 `0600`。
-
-### 健康检查
-
-```bash
-curl --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \
-  http://localhost/v1/health
-```
-
-- `status: ok`：Agent 允许本机取密。
-- `status: denied`：Agent 身份已禁用或协议版本不受支持，本机取密会被拒绝。
-- `sync_status: success`：最近一次配置与凭据同步成功。
-
-### 获取凭据
-
-Unix Socket 交付模式下，应用按凭据接入标识获取当前缓存：
+### 本地 API 与确认
 
 ```bash
 curl --fail --silent --show-error \
-  --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \
+  --unix-socket '/run/jms-pam-agent/agent.sock' \
+  http://localhost/v1/health
+
+curl --fail --silent --show-error \
+  --unix-socket '/run/jms-pam-agent/agent.sock' \
   'http://localhost/v1/credentials/<credential-key>'
 ```
 
-响应包含密码。不要把响应、请求调试信息或凭据文件写入日志。
-
-### 确认凭据
-
-只有双账号交替轮换需要确认。生产应用应在新凭据通过真实连接验证并完成切换后调用本机接口。随 Agent 安装的命令用于调试和人工兜底，应用不需要保存 Agent 密钥：
+交替轮换需要先验证真实连接、切换应用连接池并释放旧连接，再确认准确的 key、revision 和 account_id。凭据变更订阅无需确认，连接验证失败时不得确认。
 
 ```bash
-/opt/jumpserver-pam/venv/bin/jms-pam-agent confirm \
-  '<credential-key>' \
+/usr/local/bin/jms-pam-agent confirm '<credential-key>' \
   --revision '<revision>' \
-  --socket '/run/jumpserver-pam/<configuration-id>/agent.sock'
+  --socket '/run/jms-pam-agent/agent.sock'
 ```
 
-本机接口等价请求为：
+只有交替轮换需要 confirm。本地确认先持久化；confirmed 表示 Core 已接受，pending 表示之后重试。不能因为文件写入成功或服务重启就确认。
 
-```http
-POST /v1/confirm
-Content-Type: application/json
-
-{"key":"<credential-key>","revision":<revision>}
-```
-
-本机接口成功即表示确认状态已安全落盘；Agent 会通过确认接口上报，并在后续对账中重试。Core 短暂不可达不影响应用完成本机确认。
-
-## Agent 常用命令
+### 排查问题
 
 ```bash
-# 查看状态
-sudo systemctl status 'jms-pam-agent-<configuration-id>.service' --no-pager
-
-# 查看最近日志
-sudo journalctl -u 'jms-pam-agent-<configuration-id>.service' -n 100 --no-pager
-
-# 持续查看日志
-sudo journalctl -u 'jms-pam-agent-<configuration-id>.service' -f
-
-# 重启；启动后会立即执行一次同步
-sudo systemctl restart 'jms-pam-agent-<configuration-id>.service'
-
-# 安装新下载的 SDK 目录后重启 Agent
-sudo /opt/jumpserver-pam/venv/bin/pip install --upgrade '<sdk-directory>'
-sudo systemctl restart 'jms-pam-agent-<configuration-id>.service'
+sudo systemctl start jms-pam-agent
+sudo systemctl status jms-pam-agent --no-pager
+sudo journalctl -u jms-pam-agent -n 100 --no-pager
+sudo systemctl restart jms-pam-agent
 ```
 
-网络暂时不可达时，Agent 会继续保留最后一次有效缓存并重试。应用或实例被禁用、授权被撤销或 Core 返回升级要求时，Agent 会停止通过 Socket 返回密码，但不会自动删除已经写入的文件。
+Agent 在启动、相关事件和每 300 秒进行同步。网络故障保留已获取的最新授权凭据；身份或授权被拒绝时阻断 Socket 取密，成功签名同步后恢复。已交付文件保留。SIGINT/SIGTERM 会关闭服务、连接和事件读取线程。
 
 <!-- agent-doc:end -->
 
@@ -311,7 +229,7 @@ SDK 使用应用的 AK/SK，自动接收所有绑定到应用的有效策略。�
 3. 打开应用详情的“接入与连接实例”，点击“接入向导”，选择“SDK 接入”。
 4. 生成并下载 `jms_pam_config.py`，使用向导中的示例代码。无需配置 ID 或策略列表。
 
-每个应用进程或连接池都必须使用稳定且唯一的 `instance_id`。重新部署同一实例时应复用原标识，不同实例不能共享标识。
+向导会把生成的 `instance_id` 写入 `jms_pam_config.py`。容器重建时复用该文件以保持实例身份；多个副本应分别生成材料，或为每个副本设置稳定且不同的 `JMS_INSTANCE_ID`。
 
 ### 安装与配置
 
@@ -321,7 +239,45 @@ SDK 需要 Python 3.9 及以上。从 JumpServer 下载并解压 SDK 源码包�
 python3 -m pip install .
 ```
 
-将 `jms_pam_config.py` 放入应用可以导入的位置。该文件包含应用身份信息，不要提交到代码仓库或输出到日志。
+将 `jms_pam_config.py` 放入应用可以导入的位置。该文件包含应用身份信息和生成的实例 ID，不要提交到代码仓库或输出到日志。
+
+### 子类事件处理
+
+需要维护账号映射、连接池等状态的应用可以继承 `Client` 并重写钩子方法。`__init__` 初始化本地状态；`watch_events()` 收到首次快照后，按策略类型取密，再调用 `on_credential_changed`。后续更新和重连快照也使用同一个钩子。
+
+```python
+from jms_pam import Client
+from jms_pam_config import client_options, instance_id
+
+
+class MyClient(Client):
+    def __init__(self, *args, **options):
+        super().__init__(*args, **options)
+        self.credentials = {}
+
+    def on_credential_changed(self, credential):
+        # 验证新连接并切换应用连接池。
+        raise NotImplementedError("请实现应用连接切换")
+        # 切换成功后再保存：self.credentials[credential.key] = credential
+
+    def on_credential_revoked(self, event):
+        # 释放受影响的连接；随后的快照会重新核对完整授权范围。
+        self.credentials.pop(event.get("credential_key"), None)
+
+
+with MyClient(instance_id=instance_id, **client_options) as client:
+    client.watch_events()  # 阻塞运行，事件交给子类钩子处理。
+```
+
+嵌入现有服务时使用 `start_events()`，启动后台监听后立即返回。`stop_events()` 停止监听并等待当前钩子结束，HTTP 客户端仍可使用。退出 `with` 或调用 `close()` 会停止事件流，等待钩子结束，再释放 HTTP 资源。每个客户端只允许一个钩子监听器；停止后可以重新启动。钩子内也可以停止或关闭自己的客户端。
+
+读取线程和串行处理线程之间使用容量为 128 的有界队列。慢钩子不会立即暂停读取；队列满时产生背压。取密或 `on_credential_changed` 失败后按 1–30 秒指数退避重试，每次重新获取当前凭据。同一账号或 key 的新更新替换待重试项；快照重新确定重试范围，撤销或配置变更会清除待重试项，等待随后的快照。处理函数须支持重复调用；重连快照即使版本相同也可能再次触发钩子。
+
+`on_event(event)` 在凭据钩子前观察原始事件，可处理快照状态核对、配置变更、生命周期事件及应用指令；指令仍须通过 `execute_application_command` 认领和上报。`on_credential_revoked(event)` 处理撤销。`on_event_error(error, event)` 接收错误，读取线程发生不可恢复错误时 `event=None`，默认只记录异常类型。原始事件和撤销钩子不会自动重试。完整快照状态核对示例见 `subclass_demo.py`。
+
+`start_events()` 返回不代表首次凭据初始化完成；如果服务启动依赖凭据，可在子类中使用 `threading.Event`，完成初始化后再对外服务。后台钩子与主服务并行运行，共享业务状态须由应用按需保护。SDK 不会自动确认轮换，只有轮换策略的业务连接切换成功后才显式调用 `confirm_credential`。`clone()` 创建独立 HTTP 会话和全新的子类状态；子类构造函数有额外必填参数时须重写该方法。
+
+原有 `watch_credential_events(stop_event=...)` 迭代器继续保留，回执、阻塞和取消语义不变。下面的示例仍使用原来的调用方式。
 
 ### 凭据变更订阅
 
@@ -329,10 +285,10 @@ python3 -m pip install .
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
-with Client(instance_id="order-service-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     response = client.get_credential(
         account_id="<account-id>",
     )
@@ -343,11 +299,11 @@ with Client(instance_id="order-service-node-1", **client_options) as client:
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
-def fetch_credential(client, account_id):
-    response = client.get_credential(account_id=account_id)
+def fetch_credential(client, key):
+    response = client.get_credential(key=key, allow_local_fallback=False)
     address = response.asset.address
     username = response.account.username
     secret_type = response.account.secret_type
@@ -355,7 +311,7 @@ def fetch_credential(client, account_id):
     # 使用新凭据更新应用连接；不要记录 secret。
 
 
-with Client(instance_id="order-service-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     for event in client.watch_credential_events():
         if event.get("event") == "snapshot":
             updates = event.get("credentials", [])
@@ -365,8 +321,11 @@ with Client(instance_id="order-service-node-1", **client_options) as client:
             continue
         for update in updates:
             account_id = update.get("account_id")
-            if update.get("credential_mode") == "subscription" and account_id:
-                fetch_credential(client, account_id)
+            key = update.get("credential_key") or update.get("key")
+            if update.get("credential_mode") == "subscription" and account_id and key:
+                if not key.endswith(f":{account_id}"):
+                    key = f"{key}:{account_id}"
+                fetch_credential(client, key)
 ```
 
 订阅不需要 `credential_keys` 或 `confirm_credential`。生命周期事件只用于观察状态，不触发取密。
@@ -377,7 +336,7 @@ with Client(instance_id="order-service-node-1", **client_options) as client:
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
 def apply_credential(credential):
@@ -385,7 +344,7 @@ def apply_credential(credential):
 
 
 def switch_credential(client, key):
-    response = client.get_credential(key=key)
+    response = client.get_credential(key=key, allow_local_fallback=False)
     apply_credential(response)
     client.confirm_credential(
         key=response.key,
@@ -394,7 +353,7 @@ def switch_credential(client, key):
     )
 
 
-with Client(instance_id="order-service-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     for event in client.watch_credential_events():
         if event.get("event") == "snapshot":
             updates = event.get("credentials", [])
@@ -426,11 +385,12 @@ with Client(instance_id="order-service-node-1", **client_options) as client:
 
 同步客户端提供以下常用方法：
 
-- `get_credential`：交替轮换使用 `key`，凭据变更订阅使用 `account_id`，两者必须且只能提供一个。
+- `get_credential`：按应用授权账号 pull 使用 `account_id`；push 订阅使用 `key=account:<account-id>`，交替轮换使用策略 key。必须且只能提供一种选择参数。
 - `confirm_credential`：仅用于交替轮换，确认应用已经验证并使用指定 revision。
+- `watch_events` / `start_events` / `stop_events`：前台或后台运行子类钩子，并停止监听。
 - `watch_credential_events`：阻塞监听凭据事件和重连快照。
 - `list_application_commands` / `execute_application_command`：轮询、认领和上报应用指令。
-- `sync_agent`：使用 `KnownRevision` 对账缓存版本和已交付版本。
+- `sync_agent`：使用 `KnownRevision` 对账保留版本和已交付版本。
 - `clone`：创建独立 HTTP 会话；`close` 或 `with` 语句释放会话和事件流。
 
 SDK 在将业务事件交给调用方前自动尽力发送接收回执。回执仅表示 SDK/Agent 已读取该事件，不表示已取密或应用凭据，也不能代替 `confirm_credential`；回执发送失败不影响事件处理。已有 SDK/Agent 部署需要更新并重启后才能上报回执。重连快照用于恢复当前凭据版本，不会重放历史事件或补报历史回执。
@@ -438,5 +398,16 @@ SDK 在将业务事件交给调用方前自动尽力发送接收回执。回执�
 连接在线状态由 WebSocket Ping/Pong 维护，不再提供 HTTP 心跳接口。应用只需保留低频版本对账作为恢复路径。
 
 HTTP、鉴权、网络和响应解析错误统一抛出 `jms_pam.PAMError`。业务重试边界可以读取 `code`、`status_code`、`detail` 和 `original_error`。日志中不要记录凭据或认证请求头。
+
+### 最新凭据与后端不可用
+
+取密始终先请求 API。成功获取新凭据后替换本地保留值，更旧版本不会覆盖已获取的新版本；保留值不按时间过期。只有 API 超时、网络故障或 HTTP 5xx 时，才返回相同查询条件下已获取的最新凭据，并设置本地来源标记。首次获取失败且没有保留值时，抛出原始错误。SDK 在当前客户端内存中保留这些值，直到更新、撤销或关闭；clone 和进程重启从空状态开始。Agent 通过已有受保护的本地状态保留最新凭据。HTTP 401/403/404、client_upgrade_required 清空 SDK 的保留值并报错，成功响应格式错误也会报错。明确撤销删除相应凭据，push 快照移除订阅范围外的 push 项；配置变更通知先保留已有值，由后续快照核对授权范围。Agent 在 HTTP 同步前先执行明确撤销或快照授权范围缩小并保存范围，后端故障期间或重启后也会阻止相应本地取密。credential_not_found（HTTP 400）同样清除 SDK 保留值。 按 account_id 直接 pull 始终需要实时 API 响应；push 快照不能证明缓存的 pull 凭据仍获授权。
+
+- `credential.from_local`
+- `get_credential(key=..., allow_local_fallback=False)` / `get_credential(account_id=..., allow_local_fallback=False)`
+
+启用高层事件监听后，snapshot、credential.updated 会自动获取当前凭据并替换本地保留值，再调用业务处理函数。刷新失败时保留上一份凭据并重试。Agent 同样在更新通知后主动取密，后端故障期间保留已有凭据。事件刷新和手动切换使用下方必须实时获取的调用；保留的密码不能被当成刚获取的新版本，也不会自动确认轮换。
+
+事件连接空闲时每 10 秒发送应用层 ping，约 30 秒收不到消息则重连。重连采用 1–30 秒指数退避并重新签名。重连快照恢复当前状态，不重放历史事件。
 
 <!-- sdk-doc:end -->

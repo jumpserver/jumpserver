@@ -13,7 +13,7 @@ from .application import IntegrationApplication
 __all__ = [
     'ApplicationCredential', 'CredentialApplicationBinding',
     'CredentialClientInstance', 'CredentialClientStatus',
-    'ClientAccessConfiguration', 'CredentialRotationRecord', 'CredentialRotationEvent',
+    'CredentialRotationRecord', 'CredentialRotationEvent',
 ]
 
 
@@ -104,8 +104,9 @@ class ApplicationCredential(JMSOrgBaseModel):
     def asset(self):
         return self.account.asset if self.account_id else None
 
-    def account_key(self, account_id):
-        return f'{self.key}:{account_id}'
+    @staticmethod
+    def account_key(account_id):
+        return f'account:{account_id}'
 
     @property
     def target_account(self):
@@ -134,9 +135,7 @@ class ApplicationCredential(JMSOrgBaseModel):
         return CredentialClientStatus.objects.filter(
             binding__credential=self,
             binding__application__in=self.authorized_applications(),
-            client__configuration__credentials=self,
             client__is_active=True,
-            client__configuration__is_active=True,
             client__application__is_active=True,
         )
 
@@ -182,10 +181,6 @@ class CredentialClientInstance(JMSOrgBaseModel):
         'accounts.IntegrationApplication', on_delete=models.CASCADE,
         related_name='credential_clients', verbose_name=_('Integration application')
     )
-    configuration = models.ForeignKey(
-        'accounts.ClientAccessConfiguration', on_delete=models.CASCADE,
-        related_name='instances', verbose_name=_('Client access configuration')
-    )
     type = models.CharField(max_length=16, choices=Type.choices, verbose_name=_('Type'))
     instance_id = models.CharField(max_length=128, verbose_name=_('Instance ID'))
     secret = fields.EncryptTextField(default='', blank=True, verbose_name=_('Secret'))
@@ -195,6 +190,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
         null=True, blank=True, verbose_name=_('Configuration schema version')
     )
     config_digest = models.CharField(max_length=64, blank=True, default='', verbose_name=_('Configuration digest'))
+    restart_supported = models.BooleanField(default=False)
     sync_status = models.CharField(max_length=32, blank=True, default='', verbose_name=_('Sync status'))
     sync_error = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Sync error'))
     date_last_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last synced'))
@@ -203,7 +199,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
     class Meta:
-        unique_together = [('configuration', 'instance_id')]
+        unique_together = [('application', 'type', 'instance_id')]
         ordering = ['application__name', 'instance_id']
         verbose_name = _('Credential client instance')
 
@@ -220,7 +216,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
 
     @property
     def is_valid(self):
-        return self.is_active and self.application.is_active and self.configuration.is_active
+        return self.is_active and self.application.is_active
 
     @property
     def online(self):
@@ -269,48 +265,6 @@ class CredentialClientStatus(JMSOrgBaseModel):
 
     def __str__(self):
         return f'{self.client} - {self.binding.credential.key}'
-
-
-class ClientAccessConfiguration(JMSOrgBaseModel):
-    class DeliveryMode(models.TextChoices):
-        json = 'json', _('JSON files')
-        environment = 'environment', _('Environment files')
-        socket = 'socket', _('Unix socket')
-
-    class SystemdAction(models.TextChoices):
-        reload = 'reload', _('Reload')
-        restart = 'restart', _('Restart')
-
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
-    application = models.ForeignKey(
-        'accounts.IntegrationApplication', on_delete=models.CASCADE,
-        related_name='access_configurations', verbose_name=_('Integration application')
-    )
-    type = models.CharField(max_length=16, choices=CredentialClientInstance.Type.choices, verbose_name=_('Type'))
-    credentials = models.ManyToManyField(
-        ApplicationCredential, related_name='access_configurations', verbose_name=_('Credential policies')
-    )
-    language = models.CharField(max_length=16, default='python', choices=[('python', 'Python')], verbose_name=_('Language'))
-    app_user = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Application user'))
-    install_path = models.CharField(max_length=256, default='/opt/jumpserver-pam', verbose_name=_('Install path'))
-    delivery_mode = models.CharField(
-        max_length=16, choices=DeliveryMode.choices,
-        default=DeliveryMode.json, verbose_name=_('Delivery mode'),
-    )
-    systemd_unit = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Systemd unit'))
-    systemd_action = models.CharField(
-        max_length=16, choices=SystemdAction.choices,
-        default=SystemdAction.restart, verbose_name=_('Systemd action'),
-    )
-    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-
-    class Meta:
-        unique_together = [('application', 'name')]
-        ordering = ['name']
-        verbose_name = _('Client access configuration')
-
-    def __str__(self):
-        return self.name
 
 
 class CredentialRotationRecord(JMSOrgBaseModel):

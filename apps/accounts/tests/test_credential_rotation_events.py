@@ -13,7 +13,7 @@ from accounts.credential_client.events import _publish_stream, enqueue
 from accounts.credential_rotation.events import timeline, receive
 from accounts.credential_rotation.manager import CredentialRotationManager
 from accounts.models import (
-    AutomationExecution, ChangeSecretRecord, ClientAccessConfiguration,
+    AutomationExecution, ChangeSecretRecord,
     CredentialClientInstance, CredentialRotationEvent, IntegrationApplication,
 )
 from accounts.tests.base import CredentialTestCase
@@ -23,17 +23,13 @@ from accounts.ws import CredentialEventConsumer
 class RotationEventTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
-        self.configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Rotation SDK', type='sdk',
-        )
-        self.configuration.credentials.add(self.credential)
         self.client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='sdk-one', type='sdk', event_receipts_supported=True,
             date_last_seen=timezone.now(),
         )
         self.old_client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='sdk-old', type='sdk',
         )
         self.manager = CredentialRotationManager(self.credential.id)
@@ -49,7 +45,7 @@ class RotationEventTests(CredentialTestCase):
         return layer
 
     def test_application_history_includes_instance_receipts_and_configuration_events(self):
-        audit = record(AuditEvent.CONFIGURATION_UPDATED, configuration=self.configuration)
+        audit = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
         enqueue(audit, ApplicationEvent.CONFIGURATION_UPDATED)
         self.assertTrue(receive(self.client.id, self.org.id, audit.id))
         view = IntegrationApplicationViewSet.as_view({'get': 'credential_events'})
@@ -90,18 +86,12 @@ class RotationEventTests(CredentialTestCase):
         for event_id in ('invalid', None, str(uuid4())):
             self.assertFalse(receive(self.client.id, self.org.id, event_id))
         self.assertFalse(receive(self.client.id, str(uuid4()), event.source_event_id))
-        other_configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Other configuration', type='sdk',
-        )
-        CredentialClientInstance.objects.filter(id=self.client.id).update(configuration=other_configuration)
-        self.assertFalse(receive(self.client.id, self.org.id, event.source_event_id))
-        CredentialClientInstance.objects.filter(id=self.client.id).update(configuration=self.configuration)
         other_application = IntegrationApplication.objects.create(name='Other application')
         CredentialClientInstance.objects.filter(id=self.client.id).update(application=other_application)
         self.assertFalse(receive(self.client.id, self.org.id, event.source_event_id))
         CredentialClientInstance.objects.filter(id=self.client.id).update(application=self.application)
         outsider = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='joined-after-publication', type='sdk',
         )
         self.assertFalse(receive(outsider.id, self.org.id, event.source_event_id))
@@ -167,7 +157,7 @@ class RotationEventTests(CredentialTestCase):
 
     def test_only_targeted_events_count_for_late_joiners(self):
         late = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='late-client', type='sdk',
         )
         audit = record(AuditEvent.SECRET_CHANGE_STARTED, credential=self.credential)
@@ -178,7 +168,7 @@ class RotationEventTests(CredentialTestCase):
 
     def test_instance_registered_between_tracking_and_send_is_not_a_recipient(self):
         late = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='connected-before-send', type='sdk',
         )
         layer = self.publish()
@@ -210,12 +200,8 @@ class SubscriptionEventTests(CredentialTestCase):
         self.credential.mode = self.credential.Mode.subscription
         self.credential.save(update_fields=['mode'])
         self.credential.subscription_accounts.add(self.primary)
-        self.configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Subscription SDK', type='sdk',
-        )
-        self.configuration.credentials.add(self.credential)
         self.client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='sdk-one', type='sdk', event_receipts_supported=True,
         )
 
@@ -232,7 +218,7 @@ class SubscriptionEventTests(CredentialTestCase):
         self.assertEqual(result['instances'][0]['received_count'], 1)
 
     def test_configuration_event_is_included(self):
-        audit = record(AuditEvent.CONFIGURATION_UPDATED, configuration=self.configuration)
+        audit = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
         enqueue(audit, ApplicationEvent.CONFIGURATION_UPDATED)
 
         result = timeline(self.credential)

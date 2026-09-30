@@ -4,12 +4,14 @@ export interface ClientOptions {
   appSecret: string
   instanceId: string
   orgId?: string
-  configurationId?: string
   timeout?: number
   source?: string
 }
 export interface RequestOptions {
   signal?: AbortSignal
+}
+export interface EventHandlerOptions {
+  readonly signal: AbortSignal
 }
 export interface KnownRevision {
   key: string
@@ -18,6 +20,8 @@ export interface KnownRevision {
 export interface Credential {
   key: string
   revision: number
+  /** True only when an unavailable backend required using the latest retained credential. */
+  readonly fromLocal: boolean
   asset: {
     id: string
     name: string
@@ -47,12 +51,17 @@ export interface CommandResult {
   accepted: boolean
   status: string
 }
+export interface EventSubscription {
+  readonly done: Promise<void>
+  readonly running: boolean
+  stop(): Promise<void>
+}
 export interface AgentSync {
   configDigest: string
   dateLastSynced: string
   credentials: Array<KnownRevision & { available: boolean; changed: boolean }>
   removedKeys: string[]
-  configuration?: Record<string, unknown> | null
+  scope?: Record<string, unknown> | null
 }
 export class PAMError extends Error {
   code: string
@@ -63,13 +72,20 @@ export class PAMError extends Error {
 export class Client {
   constructor(options: ClientOptions)
   getCredential(
-    options: RequestOptions &
+    options: RequestOptions & { allowLocalFallback?: boolean } &
       ({ key: string; accountId?: never } | { key?: never; accountId: string }),
   ): Promise<Credential>
   confirmCredential(
     options: RequestOptions & { key: string; revision: number; accountId: string },
   ): Promise<CredentialConfirmation>
   watchCredentialEvents(options?: RequestOptions): AsyncGenerator<Event>
+  watchEvents(options?: RequestOptions): Promise<void>
+  startEvents(options?: RequestOptions): EventSubscription
+  stopEvents(): Promise<void>
+  onEvent(event: Event, options: EventHandlerOptions): void | Promise<void>
+  onCredentialChanged(credential: Credential, options: EventHandlerOptions): void | Promise<void>
+  onCredentialRevoked(event: Event, options: EventHandlerOptions): void | Promise<void>
+  onEventError(error: unknown, event?: Event): void | Promise<void>
   listApplicationCommands(options?: RequestOptions): Promise<Event[]>
   reportApplicationCommandResult(
     options: RequestOptions & {

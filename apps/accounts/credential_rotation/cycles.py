@@ -13,7 +13,7 @@ def policy_events(credential):
     source_ids = ApplicationAudit.objects.filter(
         credential_id=credential.id, org_id=credential.org_id,
     ).values('id')
-    # Application-wide configuration events belong to the application's history,
+    # Application-wide scope events belong to the application's history,
     # not to the timeline of events emitted by this particular policy.
     return CredentialRotationEvent.objects.filter(
         Q(rotation__credential=credential) | Q(source_event_id__in=source_ids),
@@ -129,7 +129,7 @@ def cycle_detail(credential, cycle_id):
         str(client.id): client for client in CredentialClientInstance.objects.filter(
             id__in={row['id'] for event in events for row in event.recipients},
             org_id=credential.org_id,
-        ).select_related('application', 'configuration')
+        ).select_related('application')
     }
     confirmations = ApplicationAudit.objects.filter(
         credential_id=credential.id, org_id=credential.org_id,
@@ -140,7 +140,7 @@ def cycle_detail(credential, cycle_id):
         confirmations = confirmations.filter(rotation_id=events[0].rotation_id)
     confirmed = {}
     for audit in confirmations:
-        identity = (str(audit.service_id), str(audit.configuration_id), audit.instance_id, audit.revision)
+        identity = (str(audit.service_id), audit.source.lower(), audit.instance_id, audit.revision)
         confirmed.setdefault(identity, audit.date_created.isoformat())
     rows = []
     for sequence, event in enumerate(events, start=1):
@@ -155,11 +155,9 @@ def cycle_detail(credential, cycle_id):
             active = bool(
                 client and client.is_valid
                 and str(client.application_id) == recipient['application']['id']
-                and str(client.configuration_id) == recipient['configuration']['id']
             )
             identity = (
-                recipient['application']['id'], recipient['configuration']['id'],
-                recipient['instance_id'], event.revision,
+                recipient['application']['id'], recipient['type'], recipient['instance_id'], event.revision,
             )
             recipients.append({
                 **recipient, 'is_active': active, 'online': bool(active and client.online),

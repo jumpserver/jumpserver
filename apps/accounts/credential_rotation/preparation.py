@@ -74,15 +74,14 @@ def start(credential, operator='', operator_id=None):
         raise JMSException(_('Only idle policies can start rotation preparation.'))
     check(credential)
     clients = CredentialClientInstance.objects.filter(
-        configuration__credentials=credential, configuration__is_active=True,
         application__credential_bindings__credential=credential,
         application__is_active=True, is_active=True,
-    ).select_related('application', 'configuration').distinct()
+    ).select_related('application').distinct()
     for client in clients:
         binding = CredentialApplicationBinding.objects.get(credential=credential, application=client.application)
         CredentialClientStatus.objects.get_or_create(binding=binding, client=client)
     states = list(credential.rotation_statuses().select_for_update(of=('self',)).select_related(
-        'client__configuration', 'binding__application',
+        'binding__application',
     ))
     rotation = CredentialRotationRecord.objects.create(
         credential=credential, source_account=credential.active_account,

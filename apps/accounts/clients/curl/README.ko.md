@@ -43,7 +43,7 @@ id는 애플리케이션을 식별하며 계정 리비전이 아닙니다. secre
 
 ## 자격 증명 정책 연동
 
-아래 서명 정보와 프로토콜 표는 진단 참고 자료입니다. 자격 증명 정책에는 SDK 메서드를 사용하거나 Python Agent의 JSON 파일, EnvironmentFile 또는 Unix Socket을 사용하세요.
+아래 서명 정보와 프로토콜 표는 진단 참고 자료입니다. 자격 증명 정책에는 SDK 메서드를 사용하거나 Go jms-pam-agent의 JSON 파일, EnvironmentFile 또는 Unix Socket을 사용하세요.
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

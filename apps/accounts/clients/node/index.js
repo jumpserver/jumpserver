@@ -2,8 +2,10 @@
 
 const crypto = require('node:crypto')
 const { inspect } = require('node:util')
+const { performance } = require('node:perf_hooks')
 const { setTimeout: wait } = require('node:timers/promises')
 const { WebSocket, createWebSocketStream } = require('ws')
+const { EventSubscription } = require('./event-dispatcher')
 
 const VERSION = '1.0.0'
 const PROTOCOL_VERSION = 1
@@ -72,6 +74,16 @@ function credential(data) {
     for (const name of names) requiredString(item[name], name)
   }
   const result = camelize(data)
+  result.fromLocal = false
+  Object.defineProperty(result.account, inspect.custom, {
+    value: () => ({ ...result.account, secret: '[REDACTED]' }),
+  })
+  return result
+}
+
+function copyCredential(value, fromLocal) {
+  const result = structuredClone(value)
+  result.fromLocal = fromLocal
   Object.defineProperty(result.account, inspect.custom, {
     value: () => ({ ...result.account, secret: '[REDACTED]' }),
   })
@@ -89,6 +101,9 @@ class Client {
   #options
   #closed = new AbortController()
   #streams = new Set()
+  #eventSubscription
+  #latestCredentials = new Map()
+  #credentialGeneration = 0
 
   constructor({
     endpoint,
@@ -96,10 +111,11 @@ class Client {
     appSecret,
     instanceId,
     orgId = '00000000-0000-0000-0000-000000000002',
-    configurationId,
     timeout = 10000,
     source = 'jms-pam',
   }) {
+    if (Object.hasOwn(arguments[0], 'configurationId'))
+      throw new TypeError('configurationId was removed; use application identity and instanceId')
     requiredString(endpoint, 'endpoint')
     const url = new URL(endpoint)
     if (
@@ -124,7 +140,6 @@ class Client {
       appSecret,
       instanceId,
       orgId,
-      configurationId,
       timeout,
       source,
     }
@@ -140,7 +155,6 @@ class Client {
 
   #identity(data) {
     const result = { ...data, instance_id: this.#options.instanceId }
-    if (this.#options.configurationId) result.configuration_id = this.#options.configurationId
     return result
   }
 
@@ -195,16 +209,33 @@ class Client {
     } catch (cause) {
       throw new PAMError('NetworkError', 'HTTP request failed', { cause })
     }
+    if ([401, 403, 404, 426].includes(response.status)) {
+      this.#latestCredentials.clear()
+      this.#credentialGeneration++
+    }
     let dataObject
     try {
-      dataObject = object(await response.json())
+      dataObject = await response.json()
     } catch (cause) {
-      throw new PAMError('ResponseError', 'The server returned invalid JSON', {
+      // A timeout or dropped connection can occur after the response headers.
+      const invalid = cause instanceof SyntaxError
+      throw new PAMError(invalid ? 'ResponseError' : 'NetworkError',
+        invalid ? 'The server returned invalid JSON' : 'HTTP response failed', {
         statusCode: response.status,
         cause,
       })
     }
+    try {
+      dataObject = object(dataObject)
+    } catch (cause) {
+      throw new PAMError('ResponseError', 'The server response must be a JSON object', {
+        statusCode: response.status, cause,
+      })
+    }
     if (!response.ok) {
+      if (response.status === 400 && dataObject.code === 'credential_not_found') {
+        this.#latestCredentials.clear(); this.#credentialGeneration++
+      }
       throw new PAMError(
         typeof dataObject.code === 'string' && dataObject.code ? dataObject.code : 'HTTPError',
         'HTTP request failed',
@@ -225,13 +256,63 @@ class Client {
     }
   }
 
-  getCredential({ key, accountId, signal } = {}) {
+  getCredential({ key, accountId, signal, allowLocalFallback = true } = {}) {
     if ((key === undefined) === (accountId === undefined))
       throw new TypeError('Exactly one of key or accountId is required')
     requiredString(key === undefined ? accountId : key, 'selector')
-    return this.#request('GET', '/credential/', { key, account_id: accountId }, credential, {
-      signal,
-    })
+    if (typeof allowLocalFallback !== 'boolean') throw new TypeError('allowLocalFallback must be boolean')
+    return this.#getCredential({ key, accountId, signal, allowLocalFallback })
+  }
+
+  async #getCredential({ key, accountId, signal, allowLocalFallback }) {
+    const selector = key === undefined ? `account:${accountId}` : `key:${key}`
+    const generation = this.#credentialGeneration
+    try {
+      const value = await this.#request('GET', '/credential/', { key, account_id: accountId }, credential, { signal })
+      if (!this.#closed.signal.aborted && generation === this.#credentialGeneration) {
+        const latest = this.#latestCredentials.get(selector)
+        if (latest && value.revision < latest.revision)
+          throw new PAMError('ResponseError', 'Credential revision moved backwards', { statusCode: 200 })
+        this.#latestCredentials.set(selector, copyCredential(value, false))
+      }
+      return value
+    } catch (error) {
+      const denied = [401, 403, 404].includes(error.statusCode) || error.code === 'client_upgrade_required'
+        || (error.statusCode === 400 && error.code === 'credential_not_found')
+      const temporary = error instanceof PAMError && (error.code === 'NetworkError'
+        || (error.statusCode >= 500 && error.statusCode < 600))
+      if (denied) { this.#latestCredentials.clear(); this.#credentialGeneration++ }
+      const latest = this.#latestCredentials.get(selector)
+      if (allowLocalFallback && key !== undefined && temporary && !denied && !signal?.aborted && !this.#closed.signal.aborted && latest)
+        return copyCredential(latest, true)
+      throw error
+    }
+  }
+
+  #reconcileLatestCredentials(event) {
+    if (!['snapshot', 'credential.revoked', 'configuration.updated'].includes(event.event)) return
+    this.#credentialGeneration++
+    if (event.event === 'configuration.updated') return
+    if (event.event !== 'snapshot') {
+      const rawKey = event.credentialKey || event.key
+      const key = typeof rawKey === 'string' && rawKey ? rawKey : undefined
+      const accountId = typeof event.accountId === 'string' && event.accountId ? event.accountId : undefined
+      if (!key && !accountId) this.#latestCredentials.clear()
+      else for (const [selector, credential] of this.#latestCredentials)
+        if ((key && (selector === `key:${key}` || credential.key === key || credential.key.startsWith(`${key}:`)))
+          || (accountId && (!key || key.startsWith('account:'))
+            && (selector === `account:${accountId}` || credential.account.id === accountId)))
+          this.#latestCredentials.delete(selector)
+      return
+    }
+    if (!Array.isArray(event.credentials)) {
+      this.#latestCredentials.clear()
+      return
+    }
+    const keys = new Set(event.credentials.map((item) => item?.credentialKey || item?.key))
+    for (const selector of this.#latestCredentials.keys())
+      if (selector.startsWith('key:') && !keys.has(selector.slice(4)))
+        this.#latestCredentials.delete(selector)
   }
 
   confirmCredential({ key, revision: value, accountId, signal }) {
@@ -290,10 +371,10 @@ class Client {
         if (new Set(data.credentials.map((item) => item.key)).size !== data.credentials.length)
           throw new TypeError('Duplicate revision keys')
         data.removed_keys.forEach((key) => requiredString(key, 'removed key'))
-        if (data.configuration !== undefined && data.configuration !== null)
-          object(data.configuration)
-        // Agent configuration uses protocol field names, matching Python's configuration mapping.
-        return { ...camelize(data), configuration: data.configuration }
+        if (data.scope !== undefined && data.scope !== null)
+          object(data.scope)
+        // Agent scope uses protocol field names, matching Python's scope mapping.
+        return { ...camelize(data), scope: data.scope }
       },
       { signal },
     )
@@ -353,6 +434,28 @@ class Client {
     })
   }
 
+  startEvents({ signal } = {}) {
+    if (this.#closed.signal.aborted) throw new Error('Client is closed')
+    if (this.#eventSubscription?.running) throw new Error('An event listener is already running')
+    this.#eventSubscription = new EventSubscription(this, { signal, clientSignal: this.#closed.signal })
+    return this.#eventSubscription
+  }
+
+  async watchEvents(options = {}) {
+    await this.startEvents(options).done
+  }
+
+  async stopEvents() {
+    await this.#eventSubscription?.stop()
+  }
+
+  onEvent(event, options) {}
+  onCredentialChanged(credential, options) {}
+  onCredentialRevoked(event, options) {}
+  onEventError(error, event) {
+    console.warn('Credential event handler failed:', error?.constructor?.name || 'Error')
+  }
+
   async *watchCredentialEvents({ signal } = {}) {
     if (this.#closed.signal.aborted) throw new Error('Client is closed')
     const stop = new AbortController()
@@ -378,9 +481,13 @@ class Client {
         const terminate = () => socket.terminate()
         combined.addEventListener('abort', terminate, { once: true })
         if (combined.aborted) terminate()
-        let lastMessage = Date.now()
+        let lastMessage = performance.now()
+        const received = () => { lastMessage = performance.now() }
+        socket.on('message', received)
         const ping = setInterval(() => {
-          if (socket.readyState === WebSocket.OPEN && Date.now() - lastMessage >= 10000) {
+          if (socket.readyState === WebSocket.OPEN && performance.now() - lastMessage >= 30000) {
+            socket.terminate()
+          } else if (socket.readyState === WebSocket.OPEN && performance.now() - lastMessage >= 10000) {
             socket.send(JSON.stringify({ event: 'ping' }), () => {})
           }
         }, 10000)
@@ -389,7 +496,6 @@ class Client {
             if (combined.aborted) break
             const event = object(JSON.parse(frame.toString()))
             requiredString(event.event, 'event')
-            lastMessage = Date.now()
             delay = 1000
             if (event.event === 'pong') continue
             if (
@@ -403,12 +509,15 @@ class Client {
                 ),
               )
             }
-            yield camelize(event)
+            const message = camelize(event)
+            this.#reconcileLatestCredentials(message)
+            yield message
           }
         } catch {
           // Reconnect without logging response bodies, URLs or authorization material.
         } finally {
           clearInterval(ping)
+          socket.off('message', received)
           combined.removeEventListener('abort', terminate)
           stream.destroy()
           socket.terminate()
@@ -433,6 +542,8 @@ class Client {
   close() {
     this.#closed.abort()
     for (const stream of this.#streams) stream.abort()
+    this.#latestCredentials.clear()
+    this.#credentialGeneration++
   }
 }
 

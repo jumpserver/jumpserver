@@ -16,22 +16,24 @@ import (
 
 // Options identify a stable application replica. Timeout applies to HTTP calls and WS handshakes.
 type Options struct {
-	Endpoint        string
-	AppID           string
-	AppSecret       string
-	InstanceID      string
-	OrgID           string
-	ConfigurationID string
-	Timeout         time.Duration
-	Source          string
+	Endpoint   string
+	AppID      string
+	AppSecret  string
+	InstanceID string
+	OrgID      string
+	Timeout    time.Duration
+	Source     string
 }
 type Client struct {
-	options Options
-	http    *http.Client
-	mu      sync.Mutex
-	closed  bool
-	stop    context.Context
-	cancel  context.CancelFunc
+	options              Options
+	http                 *http.Client
+	mu                   sync.Mutex
+	closed               bool
+	stop                 context.Context
+	cancel               context.CancelFunc
+	watcher              *EventWatcher
+	latestCredentials    map[CredentialSelector]Credential
+	credentialGeneration uint64
 }
 
 func NewClient(options Options) (*Client, error) {
@@ -57,7 +59,7 @@ func NewClient(options Options) (*Client, error) {
 	options.Endpoint = strings.TrimRight(options.Endpoint, "/")
 	stop, cancel := context.WithCancel(context.Background())
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	return &Client{options: options, stop: stop, cancel: cancel, http: &http.Client{Transport: transport, Timeout: options.Timeout, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+	return &Client{options: options, stop: stop, cancel: cancel, latestCredentials: make(map[CredentialSelector]Credential), http: &http.Client{Transport: transport, Timeout: options.Timeout, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
 }
 func (c *Client) Clone() (*Client, error) { return NewClient(c.options) }
 func (c *Client) Close() error {
@@ -67,6 +69,8 @@ func (c *Client) Close() error {
 		c.closed = true
 		c.cancel()
 		c.http.CloseIdleConnections()
+		clear(c.latestCredentials)
+		c.credentialGeneration++
 	}
 	return nil
 }
@@ -82,9 +86,6 @@ func (c *Client) request(ctx context.Context, method, path string, data map[stri
 	release := context.AfterFunc(c.stop, cancel)
 	defer release()
 	data["instance_id"] = c.options.InstanceID
-	if c.options.ConfigurationID != "" {
-		data["configuration_id"] = c.options.ConfigurationID
-	}
 	endpoint, err := url.Parse(c.options.Endpoint + clientPath + path)
 	if err != nil {
 		return err
@@ -117,6 +118,12 @@ func (c *Client) request(ctx context.Context, method, path string, data map[stri
 		return &PAMError{Code: "NetworkError", Detail: "HTTP request failed", Err: err}
 	}
 	defer response.Body.Close()
+	if response.StatusCode == 401 || response.StatusCode == 403 || response.StatusCode == 404 || response.StatusCode == 426 {
+		c.mu.Lock()
+		clear(c.latestCredentials)
+		c.credentialGeneration++
+		c.mu.Unlock()
+	}
 	raw, err := io.ReadAll(io.LimitReader(response.Body, 16*1024*1024+1))
 	if err != nil {
 		return &PAMError{Code: "NetworkError", StatusCode: response.StatusCode, Detail: "HTTP response failed", Err: err}
@@ -136,6 +143,12 @@ func (c *Client) request(ctx context.Context, method, path string, data map[stri
 			detail = value
 		}
 		json.Unmarshal(payload["request_id"], &requestID)
+		if response.StatusCode == 400 && code == "credential_not_found" {
+			c.mu.Lock()
+			clear(c.latestCredentials)
+			c.credentialGeneration++
+			c.mu.Unlock()
+		}
 		return &PAMError{Code: code, StatusCode: response.StatusCode, Detail: detail, RequestID: requestID}
 	}
 	if validate != nil {
@@ -150,6 +163,76 @@ func (c *Client) request(ctx context.Context, method, path string, data map[stri
 	return nil
 }
 func (c *Client) GetCredential(ctx context.Context, selector CredentialSelector) (Credential, error) {
+	return c.getCredential(ctx, selector, true)
+}
+
+func (c *Client) ListAuthorizedAccounts(ctx context.Context) ([]AuthorizedAccount, error) {
+	accounts := []AuthorizedAccount{}
+	seen := map[string]bool{}
+	for {
+		page, count, err := c.ListAuthorizedAccountsPage(ctx, 200, len(accounts), "")
+		if err != nil {
+			return nil, err
+		}
+		if len(page) == 0 && len(accounts) < count {
+			return nil, &PAMError{Code: "ResponseError", Detail: "Incomplete account list"}
+		}
+		for _, account := range page {
+			if seen[account.ID] {
+				return nil, &PAMError{Code: "ResponseError", Detail: "Duplicate account in paginated list"}
+			}
+			seen[account.ID] = true
+			accounts = append(accounts, account)
+		}
+		if len(accounts) >= count {
+			return accounts, nil
+		}
+	}
+}
+
+func (c *Client) ListAuthorizedAccountsPage(ctx context.Context, limit, offset int, search string) ([]AuthorizedAccount, int, error) {
+	if limit < 1 || limit > 500 || offset < 0 {
+		return nil, 0, fmt.Errorf("invalid account page")
+	}
+	var value struct {
+		Count    int                 `json:"count"`
+		Accounts []AuthorizedAccount `json:"accounts"`
+	}
+	err := c.request(ctx, http.MethodGet, "/accounts/", map[string]any{"limit": limit, "offset": offset, "search": search}, &value, func(data map[string]json.RawMessage) error {
+		if err := required(data, "count", "accounts"); err != nil {
+			return err
+		}
+		var count int
+		if err := json.Unmarshal(data["count"], &count); err != nil || count < 0 {
+			return fmt.Errorf("invalid account count")
+		}
+		var accounts []AuthorizedAccount
+		if err := json.Unmarshal(data["accounts"], &accounts); err != nil || accounts == nil {
+			return fmt.Errorf("invalid accounts metadata")
+		}
+		seen := map[string]bool{}
+		for _, account := range accounts {
+			if account.ID == "" || account.Asset.ID == "" || seen[account.ID] {
+				return fmt.Errorf("invalid authorized account")
+			}
+			seen[account.ID] = true
+			for _, policy := range account.Credentials {
+				if policy.Key == "" || policy.Revision < 0 || (policy.Mode != "subscription" && policy.Mode != "alternating_rotation") {
+					return fmt.Errorf("invalid account policy")
+				}
+			}
+		}
+		return nil
+	})
+	return value.Accounts, value.Count, err
+}
+
+// GetCredentialFresh requires a live backend response; use it for business switches.
+func (c *Client) GetCredentialFresh(ctx context.Context, selector CredentialSelector) (Credential, error) {
+	return c.getCredential(ctx, selector, false)
+}
+
+func (c *Client) getCredential(ctx context.Context, selector CredentialSelector, allowLocalFallback bool) (Credential, error) {
 	if (selector.Key == "") == (selector.AccountID == "") {
 		return Credential{}, fmt.Errorf("exactly one of Key or AccountID is required")
 	}
@@ -160,7 +243,36 @@ func (c *Client) GetCredential(ctx context.Context, selector CredentialSelector)
 		data["account_id"] = selector.AccountID
 	}
 	var value Credential
+	c.mu.Lock()
+	generation := c.credentialGeneration
+	c.mu.Unlock()
 	err := c.request(ctx, http.MethodGet, "/credential/", data, &value, validCredential)
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if err == nil {
+		if !c.closed && generation == c.credentialGeneration {
+			if latest, found := c.latestCredentials[selector]; found && value.Revision < latest.Revision {
+				return Credential{}, &PAMError{Code: "ResponseError", StatusCode: 200, Detail: "Credential revision moved backwards"}
+			}
+			c.latestCredentials[selector] = value
+		}
+		return value, nil
+	}
+	var failure *PAMError
+	if errors.As(err, &failure) {
+		denied := failure.StatusCode == 401 || failure.StatusCode == 403 || failure.StatusCode == 404 || failure.Code == "client_upgrade_required" || (failure.StatusCode == 400 && failure.Code == "credential_not_found")
+		if denied {
+			clear(c.latestCredentials)
+			c.credentialGeneration++
+		}
+		temporary := failure.Code == "NetworkError" || (failure.StatusCode >= 500 && failure.StatusCode < 600)
+		latest, found := c.latestCredentials[selector]
+		if allowLocalFallback && selector.Key != "" && temporary && !denied && !c.closed && ctx.Err() == nil && found {
+			value = latest
+			value.FromLocal = true
+			return value, nil
+		}
+	}
 	return value, err
 }
 func (c *Client) ConfirmCredential(ctx context.Context, key string, revision int64, accountID string) (CredentialConfirmation, error) {
@@ -189,7 +301,7 @@ func (c *Client) SyncAgent(ctx context.Context, options AgentSyncOptions) (Agent
 		options.DeliveredCredentials = []KnownRevision{}
 	}
 	var value AgentSync
-	err := c.request(ctx, http.MethodPost, "/agent/sync/", map[string]any{"credentials": options.Credentials, "delivered_credentials": options.DeliveredCredentials, "config_digest": options.ConfigDigest, "sync_status": options.SyncStatus, "sync_error": options.SyncError}, &value, func(data map[string]json.RawMessage) error {
+	err := c.request(ctx, http.MethodPost, "/agent/sync/", map[string]any{"credentials": options.Credentials, "delivered_credentials": options.DeliveredCredentials, "config_digest": options.ConfigDigest, "sync_status": options.SyncStatus, "sync_error": options.SyncError, "restart_supported": options.RestartSupported}, &value, func(data map[string]json.RawMessage) error {
 		if err := required(data, "config_digest", "credentials", "removed_keys", "date_last_synced"); err != nil {
 			return err
 		}

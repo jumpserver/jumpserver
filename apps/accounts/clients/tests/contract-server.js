@@ -24,6 +24,9 @@ async function startServer() {
   const connections = new Map();
   const ids = new Set();
   const sockets = new Set();
+  const credentialRequests = new Map();
+  const controls = new Map();
+  const instanceSockets = new Map();
   function authenticate(request, body) {
     const headers = request.headers;
     const auth = Object.fromEntries(
@@ -70,6 +73,22 @@ async function startServer() {
   }
   const server = http.createServer(async (request, response) => {
     const url = new URL(request.url, "http://localhost");
+    if (url.pathname === "/__control") {
+      const instance = url.searchParams.get("instance");
+      const control = controls.get(instance) || {};
+      if (url.searchParams.has("revision")) control.revision = Number(url.searchParams.get("revision"));
+      if (url.searchParams.has("fault")) control.fault = Number(url.searchParams.get("fault"));
+      for (const field of ["delivery_root", "socket_path", "app_user", "delivery_mode"])
+        if (url.searchParams.has(field)) control[field] = url.searchParams.get(field);
+      controls.set(instance, control);
+      const event = url.searchParams.get("event");
+      if (event) for (const socket of instanceSockets.get(instance) || []) socket.send(JSON.stringify({
+        event, event_id: "controlled-" + control.revision, credential_mode: "alternating_rotation",
+        credential_key: "db", revision: control.revision, account_id: "account",
+      }));
+      response.end("{}");
+      return;
+    }
     if (url.pathname === "/__stats") {
       response.setHeader("Content-Type", "application/json");
       response.end(
@@ -100,9 +119,38 @@ async function startServer() {
       const route = url.pathname
         .replace(/^\/prefix/, "")
         .replace("/api/v1/accounts/credential-client", "");
+      const agentControl = data.instance_id.startsWith("agent-native-") ? controls.get(data.instance_id) : undefined;
+      if (agentControl?.fault) {
+        response.statusCode = agentControl.fault;
+        response.end(JSON.stringify({code: "unavailable"}));
+        return;
+      }
       let result;
       if (route === "/credential/") {
         assert.equal(Boolean(data.key) !== Boolean(data.account_id), true);
+        const control = controls.get(data.instance_id);
+        if (control?.fault) {
+          response.statusCode = control.fault;
+          response.end(JSON.stringify({ code: "unavailable" }));
+          return;
+        }
+        const selector = `${data.instance_id}:${data.key || data.account_id}`;
+        const attempts = (credentialRequests.get(selector) || 0) + 1;
+        credentialRequests.set(selector, attempts);
+        if (data.key?.startsWith("cache-") && attempts > 1) {
+          const fault = data.key.slice(6);
+          if (fault === "timeout") {
+            // Headers arrive, but the body never completes. Client timeout must cancel it.
+            response.writeHead(200);
+            response.flushHeaders();
+            return;
+          }
+          if (fault === "invalid") { response.end("invalid"); return; }
+          if (fault === "revoked") { response.statusCode = 400; response.end(JSON.stringify({ code: "credential_not_found" })); return; }
+          response.statusCode = Number(fault);
+          response.end(JSON.stringify({ code: fault === "426" ? "client_upgrade_required" : "unavailable" }));
+          return;
+        }
         if (data.key === "forbidden" || data.key === "upgrade") {
           response.statusCode = data.key === "forbidden" ? 403 : 426;
           result = {
@@ -120,8 +168,9 @@ async function startServer() {
           result = { detail: "Redirect" };
         } else {
           result = {
-            key: data.key || "db",
-            revision: data.key === "invalid-revision" ? true : 2,
+            key: data.account_id ? `account:${data.account_id}` : data.key,
+            revision: control?.revision ?? (data.key === "invalid-revision" ? true
+              : data.instance_id.startsWith("hooks-") ? (connections.get(data.instance_id) || 1) + 1 : 2),
             asset: {
               id: "asset",
               name: "database",
@@ -138,11 +187,18 @@ async function startServer() {
               name: "db-user",
               username: "app",
               secret_type: "password",
-              secret: "DO_NOT_LOG_SECRET",
+              secret: control?.revision ? "LATEST_SECRET_" + control.revision : "DO_NOT_LOG_SECRET",
             },
             future_optional_field: "ignored",
           };
         }
+      } else if (route === "/accounts/") {
+        const control = controls.get(data.instance_id);
+        result = {count: 1, accounts: [{
+          id: "account", name: "db-user", username: "app", secret_type: "password",
+          asset: {id: "asset", name: "database", address: "127.0.0.1", platform: {id: "platform", name: "PostgreSQL", category: "database", type: "postgresql"}},
+          credentials: [{key: "db", mode: "alternating_rotation", revision: control?.revision || 2}],
+        }]};
       } else if (route === "/confirm/") {
         assert.equal(data.account_id, "account");
         assert.equal(data.revision, 2);
@@ -155,9 +211,13 @@ async function startServer() {
           date_last_synced: "now",
           removed_keys: [],
           credentials: [{ key: "db", revision: 2, available: true, changed: false }],
-          configuration: { delivery_mode: "socket", credential_keys: ["db"] },
+          scope: { credential_keys: ["db"], confirmation_keys: ["db"] },
         };
         if (data.sync_error === "invalid-flag") result.credentials[0].available = "false";
+        if (agentControl) {
+          result.credentials[0].revision = agentControl.revision || 2;
+          result.scope = { credential_keys: ["db"], confirmation_keys: ["db"] };
+        }
       } else if (route === "/commands/") {
         result = {
           commands: [
@@ -168,6 +228,7 @@ async function startServer() {
             },
           ],
         };
+        if (agentControl) result.commands = [];
       } else if (route === "/command-result/") {
         assert.ok(["running", "success", "failed"].includes(data.status));
         if (data.command_id === "report-failure" && data.status === "failed") {
@@ -206,6 +267,9 @@ async function startServer() {
     socket.on("close", () => sockets.delete(socket));
     const url = new URL(request.url, "http://localhost");
     const instance = url.searchParams.get("instance_id");
+    if (!instanceSockets.has(instance)) instanceSockets.set(instance, new Set());
+    instanceSockets.get(instance).add(socket);
+    socket.on("close", () => instanceSockets.get(instance).delete(socket));
     const count = (connections.get(instance) || 0) + 1;
     connections.set(instance, count);
     socket.send(JSON.stringify({ event: "pong" }));
@@ -215,6 +279,7 @@ async function startServer() {
         credentials: [{ key: "db", credential_mode: "alternating_rotation", revision: count + 1 }],
       }),
     );
+    if (instance.startsWith("retry-")) return;
     socket.send(
       JSON.stringify({
         event: "credential.updated",

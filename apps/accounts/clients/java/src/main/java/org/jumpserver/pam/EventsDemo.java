@@ -22,7 +22,7 @@ public final class EventsDemo {
     }
     if (!event.getEvent().equals("credential.switch.requested"))
       throw new IllegalArgumentException("Unsupported application command");
-    Credential credential = client.getCredential(event.getKey());
+    Credential credential = client.getCredential(event.getKey(), false);
     if (credential.getRevision() != event.getRevision()
         || !credential.getAccount().getId().equals(event.getAccountId()))
       throw new IllegalArgumentException("Requested account version is superseded");
@@ -59,10 +59,14 @@ public final class EventsDemo {
           for (Event update : updates) {
             Credential credential;
             if (update.getCredentialMode().equals("subscription")
-                && !update.getAccountId().isEmpty())
-              credential = client.getCredentialByAccountId(update.getAccountId());
+                && !update.getAccountId().isEmpty() && !update.getKey().isEmpty()) {
+              String key = update.getKey();
+              if (!key.endsWith(":" + update.getAccountId())) key += ":" + update.getAccountId();
+              credential = client.getCredential(key, false);
+            }
             else if (update.getCredentialMode().equals("alternating_rotation")
-                && !update.getKey().isEmpty()) credential = client.getCredential(update.getKey());
+                && !update.getKey().isEmpty())
+              credential = client.getCredential(update.getKey(), false);
             else continue;
             applyCredential(credential);
             if (update.getCredentialMode().equals("alternating_rotation"))

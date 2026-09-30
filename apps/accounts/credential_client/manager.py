@@ -1,34 +1,29 @@
 import hashlib
 import json
-import shlex
 from datetime import timedelta
+from uuid import UUID
 
-from django.core import signing
-from django.core.cache import cache
+from accounts.const import AuditEvent
+from accounts.models import (
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    CredentialClientInstance,
+    CredentialClientStatus,
+)
+from common.exceptions import JMSException
 from django.db.models import Q
-from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from accounts.const import AuditEvent
-from accounts.models import (
-    CredentialApplicationBinding, CredentialClientInstance,
-    CredentialClientStatus, ApplicationCredential, IntegrationApplication,
-    ClientAccessConfiguration,
-)
 from .audit import record
-from common.utils import random_string
-from common.exceptions import JMSException
-from orgs.utils import tmp_to_org
 
 
 class CredentialClientManager:
     activity_write_interval = timedelta(seconds=60)
 
-    def __init__(self, user, configuration_id=None, instance_id='', audit_context=None,
+    def __init__(self, user, instance_id='', audit_context=None,
                  client_type='sdk'):
-        self.configuration_id = configuration_id
         self.client_type = client_type
         self.audit_context = audit_context
         self.application, self.client = self._get_application_and_client(
@@ -43,7 +38,6 @@ class CredentialClientManager:
         if isinstance(user, CredentialClientInstance):
             if not user.is_valid or user.type != CredentialClientInstance.Type.agent:
                 raise PermissionDenied(_('The Agent client instance is disabled.'), code=AuditEvent.CLIENT_DISABLED)
-            self.configuration = user.configuration
             return user.application, user
 
         if not instance_id:
@@ -52,23 +46,8 @@ class CredentialClientManager:
             })
         if not user.is_active:
             raise PermissionDenied(_('The application is disabled.'), code=AuditEvent.CLIENT_DISABLED)
-        if self.configuration_id:
-            self.configuration = ClientAccessConfiguration.objects.filter(
-                id=self.configuration_id, application=user,
-                type=self.client_type, is_active=True,
-            ).first()
-        elif self.client_type == CredentialClientInstance.Type.sdk:
-            from .access import subscription_scope
-            self.configuration = subscription_scope(user)
-        else:
-            raise ValidationError({'configuration_id': _('This field is required for Agent access.')})
-        if not self.configuration:
-            raise PermissionDenied(_('The SDK client access configuration is disabled or invalid.'), code='configuration_disabled')
         client = CredentialClientInstance.objects.get_or_create(
-            configuration=self.configuration,
-            application=user,
-            instance_id=instance_id,
-            defaults={'type': self.client_type},
+            application=user, type=self.client_type, instance_id=instance_id,
         )[0]
         if client.type != self.client_type or not client.is_active:
             raise PermissionDenied(_('The client instance is disabled.'), code=AuditEvent.CLIENT_DISABLED)
@@ -85,13 +64,13 @@ class CredentialClientManager:
         if not credential:
             raise JMSException(_('Credential policy not found.'), code='credential_not_found')
 
-        if not self.configuration.credentials.filter(id=credential.id).exists():
-            raise PermissionDenied(_('The client access configuration does not include this credential.'), code='credential_not_selected')
         if not credential.applications.filter(id=self.application.id).exists():
             raise PermissionDenied(_(
                 'The credential policy is not bound to this application.'
             ), code='credential_not_bound')
         if credential.mode == ApplicationCredential.Mode.subscription:
+            # Accept pre-account-key selectors during client upgrades. New push
+            # scopes and events use account:<uuid> and never emit this alias.
             if not separator or not account_id:
                 raise JMSException(_('Credential policy not found.'), code='credential_not_found')
             if not credential.subscription_all_authorized and not credential.subscription_accounts.filter(
@@ -114,24 +93,8 @@ class CredentialClientManager:
             ), code='credential_not_authorized')
         return credential, credential.active_account
 
-    def _get_subscription_credential(self, account_id, lock=True):
-        queryset = ApplicationCredential.objects.all()
-        if lock:
-            queryset = queryset.select_for_update(of=('self',))
-        credential = queryset.filter(
-            id__in=self.configuration.credentials.values('id'),
-            applications=self.application,
-            mode=ApplicationCredential.Mode.subscription,
-            is_active=True,
-        ).filter(
-            Q(subscription_all_authorized=True) |
-            Q(subscription_accounts__id=account_id),
-        ).order_by('key').first()
-        if not credential:
-            raise PermissionDenied(
-                _('The client access configuration does not include an active credential change subscription.'),
-                code='credential_not_selected',
-            )
+    def _subscription_credentials(self, account_id, lock=True):
+        """Find the push subscriptions covering one application-authorized account."""
         account = self.application.get_accounts().select_related(
             'asset__platform'
         ).filter(id=account_id).first()
@@ -139,19 +102,88 @@ class CredentialClientManager:
             raise PermissionDenied(_(
                 'The application is not authorized for this credential account.'
             ), code='credential_not_authorized')
-        return credential, account
+        credentials = ApplicationCredential.objects.filter(
+            applications=self.application,
+            mode=ApplicationCredential.Mode.subscription,
+            is_active=True,
+        ).filter(
+            Q(subscription_all_authorized=True) | Q(subscription_accounts=account)
+        ).distinct().order_by('key')
+        if lock:
+            credentials = ApplicationCredential.objects.filter(
+                id__in=credentials.values('id')
+            ).select_for_update(of=('self',)).order_by('key')
+        credentials = list(credentials)
+        if not credentials:
+            raise PermissionDenied(_(
+                'The application does not include an active credential change subscription.'
+            ), code='credential_not_selected')
+        return credentials, account
+
+    def fetch_account(self, account_id, remote_addr):
+        """Pull access is granted by the application, independently of push policies."""
+        account = self.application.get_accounts().select_related(
+            'asset__platform'
+        ).filter(id=account_id).first()
+        if not account:
+            raise PermissionDenied(_(
+                'The application is not authorized for this credential account.'
+            ), code='credential_not_authorized')
+        revision = account.version
+        key = f'account:{account.id}'
+        payload = self._account_payload(key, revision, account)
+        record(
+            AuditEvent.CREDENTIAL_FETCHED, client=self.client, account=account,
+            credential_key=key, revision=revision, remote_addr=remote_addr,
+        )
+        if self.audit_context is not None:
+            self.audit_context.set_fetch_result(revision, True)
+        from accounts.credential_rotation.preparation import record_secret_access
+        record_secret_access(account, self.application)
+        return payload
 
     def fetch(self, key, remote_addr, account_id=None):
         if account_id:
-            credential, account = self._get_subscription_credential(account_id)
-            key = credential.account_key(account.id)
-        else:
-            credential, account = self._get_credential(key)
-        secret = account.secret
+            return self.fetch_account(account_id, remote_addr)
+        if key.startswith('account:'):
+            try:
+                push_account_id = UUID(key.removeprefix('account:'))
+            except ValueError:
+                raise JMSException(_('Credential account not found.'), code='credential_not_found')
+            if key != ApplicationCredential.account_key(push_account_id):
+                raise JMSException(_('Credential account not found.'), code='credential_not_found')
+            credentials, account = self._subscription_credentials(push_account_id)
+            revision = account.version
+            payload = self._account_payload(key, revision, account)
+            now = timezone.now()
+            any_revision_changed = False
+            for credential in credentials:
+                binding = CredentialApplicationBinding.objects.get(
+                    credential=credential, application=self.application,
+                )
+                state = CredentialClientStatus.objects.get_or_create(
+                    binding=binding, client=self.client,
+                )[0]
+                revision_changed = state.date_fetched is None or state.fetched_revision != revision
+                any_revision_changed |= revision_changed
+                self._save_status(state, now, {'fetched_revision': revision}, fetched=True)
+                if revision_changed:
+                    record(
+                        AuditEvent.CREDENTIAL_FETCHED, credential=credential,
+                        client=self.client, applications=[self.application], account=account,
+                        credential_key=key, revision=revision, remote_addr=remote_addr,
+                    )
+            if self.audit_context is not None:
+                self.audit_context.set_fetch_result(revision, any_revision_changed)
+            from accounts.credential_rotation.preparation import record_secret_access
+            record_secret_access(account, self.application)
+            return payload
+        credential, account = self._get_credential(key)
         revision = (
             account.version if credential.mode == ApplicationCredential.Mode.subscription
             else credential.current_revision
         )
+        payload = self._account_payload(key, revision, account)
         now = timezone.now()
         binding = CredentialApplicationBinding.objects.get(
             credential=credential, application=self.application
@@ -167,7 +199,6 @@ class CredentialClientManager:
         if credential.status != ApplicationCredential.Status.idle:
             from accounts.credential_rotation.participants import ensure_participant
             ensure_participant(credential, state)
-        asset = account.asset
         if revision_changed:
             record(
                 AuditEvent.CREDENTIAL_FETCHED, credential=credential, client=self.client,
@@ -178,18 +209,22 @@ class CredentialClientManager:
             self.audit_context.set_fetch_result(revision, revision_changed)
         from accounts.credential_rotation.preparation import record_secret_access
         record_secret_access(account, self.application)
+        return payload
+
+    @staticmethod
+    def _account_payload(key, revision, account):
         return {
             'key': key,
             'revision': revision,
             'asset': {
-                'id': str(asset.id),
-                'name': asset.name,
-                'address': asset.address,
+                'id': str(account.asset.id),
+                'name': account.asset.name,
+                'address': account.asset.address,
                 'platform': {
-                    'id': str(asset.platform_id),
-                    'name': asset.platform.name,
-                    'category': asset.platform.category,
-                    'type': asset.platform.type,
+                    'id': str(account.asset.platform_id),
+                    'name': account.asset.platform.name,
+                    'category': account.asset.platform.category,
+                    'type': account.asset.platform.type,
                 },
             },
             'account': {
@@ -197,9 +232,62 @@ class CredentialClientManager:
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
-                'secret': secret,
+                'secret': account.secret,
             },
         }
+
+    def authorized_accounts(self, limit=200, offset=0, search=''):
+        """List the current scope without reading secrets or recording a fetch."""
+        queryset = self.application.get_accounts().select_related('asset__platform')
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) | Q(username__icontains=search) |
+                Q(asset__name__icontains=search) | Q(asset__address__icontains=search)
+            )
+        count = queryset.count()
+        ordered = queryset.order_by('id')
+        page = list(ordered[offset:offset + limit])
+        page_by_id = {account.id: account for account in page}
+        accounts = {}
+        for account in page:
+            account_id = str(account.id)
+            asset = account.asset
+            accounts[account.id] = {
+                'id': account_id, 'name': account.name,
+                'username': account.username, 'secret_type': account.secret_type,
+                'asset': {
+                    'id': str(asset.id), 'name': asset.name, 'address': asset.address,
+                    'platform': {
+                        'id': str(asset.platform_id), 'name': asset.platform.name,
+                        'category': asset.platform.category, 'type': asset.platform.type,
+                    },
+                },
+                'credentials': [],
+            }
+        subscribed = set()
+        for credential in ApplicationCredential.objects.filter(
+            is_active=True, applications=self.application,
+        ).distinct().order_by('key'):
+            if credential.mode == ApplicationCredential.Mode.subscription:
+                selected = set(accounts) if credential.subscription_all_authorized else set(
+                    credential.subscription_accounts.filter(id__in=accounts).values_list('id', flat=True)
+                )
+                for account_id in selected:
+                    subscribed.add(account_id)
+            elif credential.authorized_applications().filter(id=self.application.id).exists():
+                account = accounts.get(credential.active_account_id)
+                if account:
+                    account['credentials'].append({
+                        'key': credential.key, 'mode': credential.mode,
+                        'revision': credential.current_revision,
+                    })
+        for account_id in subscribed:
+            accounts[account_id]['credentials'].append({
+                'key': ApplicationCredential.account_key(account_id),
+                'mode': ApplicationCredential.Mode.subscription,
+                'revision': page_by_id[account_id].version,
+            })
+        return {'count': count, 'accounts': list(accounts.values())}
 
     def confirm(self, key, revision, account_id):
         credential, account = self._get_credential(key)
@@ -251,50 +339,46 @@ class CredentialClientManager:
         state.save(update_fields=[*changed, 'date_updated'])
 
     @staticmethod
-    def credential_keys(configuration):
-        keys = []
+    def credential_keys(application):
+        keys = set()
         accounts = None
-        credentials = configuration.credentials.filter(is_active=True).order_by('key')
+        credentials = ApplicationCredential.objects.filter(
+            applications=application, is_active=True,
+        ).order_by('key')
         for credential in credentials:
             if credential.mode == ApplicationCredential.Mode.subscription:
                 if accounts is None:
-                    accounts = configuration.application.get_accounts().order_by('id')
+                    accounts = application.get_accounts().order_by('id')
                 selected = accounts if credential.subscription_all_authorized else accounts.filter(
                     id__in=credential.subscription_accounts.values('id')
                 )
                 for account in selected:
-                    keys.append(credential.account_key(account.id))
+                    keys.add(credential.account_key(account.id))
             elif credential.authorized_applications().filter(
-                id=configuration.application_id
+                id=application.id
             ).exists():
-                keys.append(credential.key)
-        return keys
+                keys.add(credential.key)
+        return sorted(keys)
 
     @staticmethod
-    def confirmation_keys(configuration):
-        return list(configuration.credentials.filter(
+    def confirmation_keys(application):
+        return list(ApplicationCredential.objects.filter(
             is_active=True,
             mode=ApplicationCredential.Mode.alternating_rotation,
-            applications=configuration.application,
+            applications=application,
         ).order_by('key').values_list('key', flat=True))
 
     @classmethod
-    def agent_configuration(cls, configuration):
-        root = configuration.install_path.rstrip('/')
+    def agent_configuration(cls, application):
+        keys = cls.credential_keys(application)
         return {
-            'delivery_mode': configuration.delivery_mode,
-            'credential_keys': cls.credential_keys(configuration),
-            'confirmation_keys': cls.confirmation_keys(configuration),
-            'delivery_root': f'{root}/credentials/{configuration.id}',
-            'socket_path': f'/run/jumpserver-pam/{configuration.id}/agent.sock',
-            'app_user': configuration.app_user,
-            'systemd_unit': configuration.systemd_unit,
-            'systemd_action': configuration.systemd_action,
+            'credential_keys': keys,
+            'confirmation_keys': [key for key in cls.confirmation_keys(application) if key in keys],
         }
 
     @classmethod
-    def agent_configuration_digest(cls, configuration):
-        payload = cls.agent_configuration(configuration)
+    def agent_configuration_digest(cls, application):
+        payload = cls.agent_configuration(application)
         encoded = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
         return hashlib.sha256(encoded).hexdigest()
 
@@ -316,22 +400,23 @@ class CredentialClientManager:
 
     def sync_agent(
         self, config_digest='', credentials=None, delivered_credentials=None,
-        sync_status='', sync_error='',
+        sync_status='', sync_error='', restart_supported=False,
     ):
         if self.client.type != CredentialClientInstance.Type.agent:
             raise PermissionDenied(_('Agent synchronization requires an Agent client.'))
         now = timezone.now()
         self._record_delivered(delivered_credentials or [], now)
-        desired = self.agent_configuration(self.configuration)
-        desired_digest = self.agent_configuration_digest(self.configuration)
+        desired = self.agent_configuration(self.application)
+        desired_digest = self.agent_configuration_digest(self.application)
         known = {item['key']: item['revision'] for item in credentials or []}
         metadata = []
         for key in desired['credential_keys']:
-            credential, account = self._get_credential(key, lock=False)
-            revision = (
-                account.version if credential.mode == ApplicationCredential.Mode.subscription
-                else credential.current_revision
-            )
+            if key.startswith('account:'):
+                _, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
+                revision = account.version
+            else:
+                credential, _ = self._get_credential(key, lock=False)
+                revision = credential.current_revision
             metadata.append({
                 'key': key,
                 'revision': revision,
@@ -342,6 +427,7 @@ class CredentialClientManager:
             'config_digest': config_digest,
             'sync_status': sync_status,
             'sync_error': sync_error[:128],
+            'restart_supported': restart_supported,
             'date_last_synced': now,
         }
         CredentialClientInstance.objects.filter(id=self.client.id).update(**values)
@@ -349,16 +435,44 @@ class CredentialClientManager:
             setattr(self.client, key, value)
         response = {
             'config_digest': desired_digest,
+            'scope': desired,
             'credentials': metadata,
             'removed_keys': sorted(set(known) - set(desired['credential_keys'])),
             'date_last_synced': now,
         }
-        if config_digest != desired_digest:
-            response['configuration'] = desired
         return response
 
     def _record_delivered(self, credentials, now):
         revisions = {item['key']: item['revision'] for item in credentials}
+        if not revisions:
+            return
+        subscription_revisions = {}
+        for key, revision in revisions.items():
+            if key.startswith('account:'):
+                try:
+                    account_id = UUID(key.removeprefix('account:'))
+                except ValueError:
+                    continue
+                if key == ApplicationCredential.account_key(account_id):
+                    subscription_revisions[account_id] = revision
+        for account_id, revision in subscription_revisions.items():
+            try:
+                policies, account = self._subscription_credentials(account_id, lock=False)
+            except PermissionDenied:
+                continue
+            if account.version != revision:
+                continue
+            states = CredentialClientStatus.objects.filter(
+                binding__application=self.application,
+                binding__credential__in=policies,
+                client=self.client,
+            )
+            for state in states:
+                if revision == state.fetched_revision and revision != state.delivered_revision:
+                    self._save_status(state, now, {
+                        'delivered_revision': revision, 'date_delivered': now,
+                    })
+        revisions = {key: revision for key, revision in revisions.items() if not key.startswith('account:')}
         if not revisions:
             return
         states = CredentialClientStatus.objects.select_related(
@@ -378,140 +492,3 @@ class CredentialClientManager:
                 self._save_status(state, now, {
                     'delivered_revision': revision, 'date_delivered': now,
                 })
-
-    @staticmethod
-    def register_agent(
-        token, instance_id, name='', client_version='',
-        protocol_version=1, config_schema_version=1,
-    ):
-        try:
-            payload = signing.loads(
-                token, salt='credential-agent-register', max_age=600
-            )
-        except signing.BadSignature as exc:
-            raise ValidationError({
-                'token': _('Invalid or expired registration token.')
-            }) from exc
-
-        used_key = f"credential-agent-register-used:{payload['nonce']}"
-        with tmp_to_org(payload['org_id']):
-            application = IntegrationApplication.objects.filter(
-                id=payload['application_id'], is_active=True,
-            ).first()
-            configuration = ClientAccessConfiguration.objects.select_for_update().filter(
-                id=payload.get('configuration_id'), application=application,
-                type=CredentialClientInstance.Type.agent, is_active=True,
-            ).first()
-            if not application or not configuration:
-                raise ValidationError({
-                    'token': _('Client access configuration not found.')
-                })
-            if CredentialClientInstance.objects.filter(
-                configuration=configuration, instance_id=instance_id,
-            ).exists():
-                raise JMSException(code='client_instance_exists', detail=_(
-                    'This client instance already exists. Reuse its local configuration. '
-                    'If that configuration was lost, review and remove the unused instance '
-                    'or choose a different instance ID; registration will not replace its identity.'
-                ))
-            if not cache.add(used_key, True, timeout=600):
-                raise JMSException(code='registration_token_used', detail=_(
-                    'Registration token has already been used. Check whether the instance '
-                    'was created before generating a new token.'
-                ))
-
-            secret = random_string(48)
-            client = CredentialClientInstance.objects.create(
-                configuration=configuration,
-                instance_id=instance_id,
-                application=application,
-                type=CredentialClientInstance.Type.agent,
-                secret=secret,
-                client_version=client_version,
-                protocol_version=protocol_version,
-                config_schema_version=config_schema_version,
-                is_active=True,
-                comment=name,
-            )
-            desired = CredentialClientManager.agent_configuration(configuration)
-            desired_digest = CredentialClientManager.agent_configuration_digest(configuration)
-        return {
-            'agent_id': str(client.id),
-            'agent_secret': secret,
-            'application_id': str(application.id),
-            'configuration_id': str(configuration.id),
-            'credential_keys': desired['credential_keys'],
-            'configuration': desired,
-            'config_digest': desired_digest,
-            'org_id': application.org_id,
-            'protocol_version': 1,
-            'config_schema_version': 1,
-        }
-
-
-class ClientAccessConfigurationManager:
-    def __init__(self, configuration):
-        self.configuration = configuration
-
-    def materials(self, endpoint):
-        configuration = self.configuration
-        if not configuration.is_active or not configuration.application.is_active:
-            raise ValidationError(_('The client access configuration is disabled.'))
-        if configuration.type == CredentialClientInstance.Type.sdk:
-            modes = set(configuration.credentials.values_list('mode', flat=True))
-            if len(modes) != 1:
-                raise ValidationError({
-                    'credentials': _('SDK access configurations cannot mix credential policy modes.')
-                })
-            mode = modes.pop()
-            keys = CredentialClientManager.confirmation_keys(configuration)
-            app_secret = IntegrationApplication.objects.values_list(
-                'secret', flat=True,
-            ).get(id=configuration.application_id)
-            if mode == ApplicationCredential.Mode.subscription:
-                code = render_to_string(
-                    'accounts/credential_client/sdk_subscription_example.py.tpl'
-                )
-                keys = None
-            else:
-                code = render_to_string(
-                    'accounts/credential_client/sdk_rotation_example.py.tpl'
-                )
-            config = render_to_string('accounts/credential_client/sdk_config.py.tpl', {
-                'endpoint': repr(endpoint),
-                'app_id': repr(str(configuration.application_id)),
-                'app_secret': repr(app_secret),
-                'org_id': repr(str(configuration.org_id)),
-                'configuration_id': repr(str(configuration.id)),
-                'include_keys': keys is not None,
-                'credential_keys': repr(keys) if keys is not None else None,
-                'confirmation_keys': repr(keys) if keys is not None else None,
-            })
-            return {
-                'type': 'sdk', 'config': config, 'code': code, 'filename': 'jms_pam_config.py',
-                'install_command': 'python3 -m pip install --upgrade jms-pam',
-            }
-        token = signing.dumps({
-            'application_id': str(configuration.application_id),
-            'configuration_id': str(configuration.id),
-            'org_id': str(configuration.org_id),
-            'nonce': random_string(24),
-        }, salt='credential-agent-register')
-        path = configuration.install_path.rstrip('/')
-        preparation_command = (
-            f'sudo python3 -m venv {shlex.quote(path + "/venv")} && '
-            f'sudo {shlex.quote(path + "/venv/bin/pip")} install --upgrade jms-pam'
-        )
-        registration_command = (
-            f'sudo {shlex.quote(path + "/venv/bin/jms-pam-agent")} install --endpoint {shlex.quote(endpoint)} '
-            f'--token {shlex.quote(token)} --instance-id "$(hostname)" '
-            f'--configuration-id {shlex.quote(str(configuration.id))} '
-            f'--app-user {shlex.quote(configuration.app_user)} '
-            f'--install-path {shlex.quote(path)}'
-        )
-        return {
-            'type': 'agent', 'expires_in': 600,
-            'preparation_command': preparation_command,
-            'registration_command': registration_command,
-            'install_command': f'{preparation_command} && {registration_command}',
-        }

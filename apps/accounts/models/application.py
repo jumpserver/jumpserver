@@ -11,6 +11,13 @@ from common.utils import random_string
 from orgs.mixins.models import JMSOrgBaseModel
 
 
+def empty_application_accounts():
+    return {'type': 'ids', 'ids': []}
+
+
+MAX_APPLICATION_PULL_ACCOUNTS = 10
+
+
 class IntegrationApplication(JMSOrgBaseModel):
     is_anonymous = False
 
@@ -19,7 +26,10 @@ class IntegrationApplication(JMSOrgBaseModel):
         upload_to='images', max_length=128, verbose_name=_('Logo')
     )
     secret = fields.EncryptTextField(default='', verbose_name=_('Secret'))
-    accounts = JSONManyToManyField('accounts.Account', default=dict, verbose_name=_('Accounts'))
+    accounts = JSONManyToManyField(
+        'accounts.Account', default=empty_application_accounts,
+        allow_empty_ids=True, verbose_name=_('Accounts'),
+    )
     ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
     date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last used'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
@@ -29,7 +39,7 @@ class IntegrationApplication(JMSOrgBaseModel):
         verbose_name = _('Integration App')
 
     def get_accounts(self):
-        qs = Account.objects.all()
+        qs = Account.objects.filter(org_id=self.org_id)
         query = RelatedManager.get_to_filter_qs(self.accounts.value, Account)
         return qs.filter(*query)
 
@@ -56,7 +66,7 @@ class IntegrationApplication(JMSOrgBaseModel):
         return self.secret
 
     def get_account(self, asset='', asset_id='', account='', account_id=''):
-        qs = Account.objects.all()
+        qs = Account.objects.filter(org_id=self.org_id)
         if account_id:
             qs = qs.filter(id=account_id)
         elif account:

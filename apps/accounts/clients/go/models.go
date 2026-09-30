@@ -32,10 +32,11 @@ func (a Account) String() string {
 func (a Account) GoString() string { return a.String() }
 
 type Credential struct {
-	Key      string  `json:"key"`
-	Revision int64   `json:"revision"`
-	Asset    Asset   `json:"asset"`
-	Account  Account `json:"account"`
+	Key       string  `json:"key"`
+	Revision  int64   `json:"revision"`
+	Asset     Asset   `json:"asset"`
+	Account   Account `json:"account"`
+	FromLocal bool    `json:"-"`
 }
 
 func (c Credential) String() string {
@@ -46,6 +47,23 @@ func (c Credential) GoString() string { return c.String() }
 type CredentialSelector struct {
 	Key       string
 	AccountID string
+}
+
+// AuthorizedAccount contains metadata for an application's pull scope.
+// Credentials lists push policies, and may be empty for pull-only accounts.
+type AuthorizedAccount struct {
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Username    string          `json:"username"`
+	SecretType  string          `json:"secret_type"`
+	Asset       Asset           `json:"asset"`
+	Credentials []AccountPolicy `json:"credentials"`
+}
+
+type AccountPolicy struct {
+	Key      string `json:"key"`
+	Mode     string `json:"mode"`
+	Revision int64  `json:"revision"`
 }
 type CredentialConfirmation struct {
 	Key      string `json:"key"`
@@ -61,12 +79,16 @@ type CredentialRevision struct {
 	Available bool   `json:"available"`
 	Changed   bool   `json:"changed"`
 }
+type AgentScope struct {
+	Keys             []string `json:"credential_keys"`
+	ConfirmationKeys []string `json:"confirmation_keys"`
+}
 type AgentSync struct {
 	ConfigDigest   string               `json:"config_digest"`
 	Credentials    []CredentialRevision `json:"credentials"`
 	RemovedKeys    []string             `json:"removed_keys"`
 	DateLastSynced string               `json:"date_last_synced"`
-	Configuration  map[string]any       `json:"configuration,omitempty"`
+	Scope          AgentScope           `json:"scope"`
 }
 type AgentSyncOptions struct {
 	Credentials          []KnownRevision
@@ -74,6 +96,7 @@ type AgentSyncOptions struct {
 	ConfigDigest         string
 	SyncStatus           string
 	SyncError            string
+	RestartSupported     bool
 }
 type CommandResult struct {
 	Accepted bool   `json:"accepted"`

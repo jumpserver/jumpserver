@@ -9,7 +9,7 @@ from accounts.credential_client.manager import CredentialClientManager
 from accounts.credential_rotation import CredentialRotationManager, preparation
 from accounts.credential_rotation.cycles import cycle_detail
 from accounts.models import (
-    Account, ClientAccessConfiguration, CredentialClientInstance,
+    Account, CredentialClientInstance,
     CredentialApplicationBinding, IntegrationApplication,
 )
 from accounts.serializers import ApplicationCredentialSerializer
@@ -206,9 +206,7 @@ class CredentialPreparationTests(CredentialTestCase):
         self.assertIn('rotation.started', [event['event'] for event in detail['events']])
 
     def test_sdk_alignment_requires_apply_confirmation_and_every_fetch_counts(self):
-        configuration = ClientAccessConfiguration.objects.create(application=self.application, name='Prep SDK', type='sdk')
-        configuration.credentials.add(self.credential)
-        client = CredentialClientManager(self.application, configuration.id, 'prep-sdk')
+        client = CredentialClientManager(self.application, instance_id='prep-sdk')
         self.manager.prepare(self.admin.name, self.admin.id)
         with patch('accounts.credential_rotation.preparation.timezone.now', return_value=self.started):
             client.fetch(self.credential.key, '127.0.0.1')
@@ -225,15 +223,15 @@ class CredentialPreparationTests(CredentialTestCase):
 
     def test_failed_sdk_secret_read_is_not_traffic(self):
         from accounts.exceptions import VaultSecretNotFoundException
-        configuration = ClientAccessConfiguration.objects.create(application=self.application, name='Prep SDK', type='sdk')
-        configuration.credentials.add(self.credential)
-        client = CredentialClientManager(self.application, configuration.id, 'prep-sdk')
+        client = CredentialClientManager(self.application, instance_id='prep-sdk')
         self.manager.prepare(self.admin.name, self.admin.id)
+        self.primary.refresh_from_db()
+        last_secret_access = self.primary.date_last_secret_access
         with patch.object(Account, 'secret', new_callable=PropertyMock, side_effect=VaultSecretNotFoundException):
             with self.assertRaises(VaultSecretNotFoundException):
                 client.fetch(self.credential.key, '127.0.0.1')
         self.primary.refresh_from_db()
-        self.assertIsNone(self.primary.date_last_secret_access)
+        self.assertEqual(self.primary.date_last_secret_access, last_secret_access)
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.status, 'preparing')
 
@@ -276,9 +274,7 @@ class CredentialPreparationTests(CredentialTestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_mixed_legacy_and_sdk_requests_are_checked_after_switching(self):
-        configuration = ClientAccessConfiguration.objects.create(application=self.application, name='Mixed SDK', type='sdk')
-        configuration.credentials.add(self.credential)
-        client = CredentialClientManager(self.application, configuration.id, 'mixed-sdk')
+        client = CredentialClientManager(self.application, instance_id='mixed-sdk')
         with patch('accounts.credential_rotation.preparation.timezone.now', return_value=self.started):
             self.manager.prepare(self.admin.name, self.admin.id)
             self.legacy_fetch(self.primary)

@@ -21,17 +21,14 @@ logger = get_logger(__name__)
 
 def record(
     event, *, application=None, applications=None, account=None,
-    credential=None, client=None, configuration=None, **values,
+    credential=None, client=None, **values,
 ):
     if client:
-        application, configuration = client.application, client.configuration
+        application = client.application
         values.update(instance_id=client.instance_id)
-    obj = application or credential or configuration
+    obj = application or credential
     if obj is None:
         raise ValueError('Audit requires a trusted organization context')
-    if configuration:
-        application = configuration.application
-        values.update(configuration=configuration.name, configuration_id=configuration.id)
     related_applications = {}
     if applications is not None:
         related_applications.update({item.id: item.name for item in applications})
@@ -92,7 +89,6 @@ class ApplicationAuditContext:
             credential_key=data.get('key', ''),
             account_id=data.get('account_id'),
             instance_id=data.get('instance_id', ''),
-            configuration_id=data.get('configuration_id'),
         )
 
     def set_client(self, client):

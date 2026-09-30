@@ -43,7 +43,7 @@ GET /api/v1/accounts/integration-applications/account-secret/?asset=ubuntu_docke
 
 ## 憑證策略接入
 
-下方簽章細節和協定表供偵錯參考。憑證策略透過 SDK 方法整合，也可透過 Python Agent 的 JSON 檔案、EnvironmentFile 或 Unix Socket 整合。
+下方簽章細節和協定表供偵錯參考。憑證策略透過 SDK 方法整合，也可透過 Go jms-pam-agent 的 JSON 檔案、EnvironmentFile 或 Unix Socket 整合。
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

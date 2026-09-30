@@ -8,8 +8,8 @@ def apply_credential(credential):
     raise NotImplementedError("Implement the application connection update first")
 
 
-def fetch_credential(client, account_id):
-    credential = client.get_credential(account_id=account_id)
+def fetch_credential(client, key):
+    credential = client.get_credential(key=key, allow_local_fallback=False)
     apply_credential(credential)
 
 
@@ -23,5 +23,8 @@ with Client(instance_id="order-service-node-1", **client_options) as client:
             continue
         for update in updates:
             account_id = update.get("account_id")
-            if update.get("credential_mode") == "subscription" and account_id:
-                fetch_credential(client, account_id)
+            key = update.get("credential_key") or update.get("key")
+            if update.get("credential_mode") == "subscription" and account_id and key:
+                if not key.endswith(f":{account_id}"):
+                    key = f"{key}:{account_id}"
+                fetch_credential(client, key)

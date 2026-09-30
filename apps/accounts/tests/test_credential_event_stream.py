@@ -1,23 +1,28 @@
 from unittest.mock import AsyncMock, Mock, patch
 
+from accounts.clients.python.jms_pam.common.credential import Credential
+from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
+from accounts.clients.python.jms_pam.credential.v1.credential_client import (
+    CredentialClient,
+)
+from accounts.credential_client.events import _publish_stream
+from accounts.credential_rotation.manager import CredentialRotationManager
+from accounts.models import (
+    Account,
+    ApplicationAudit,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    CredentialClientInstance,
+    IntegrationApplication,
+)
+from accounts.ws import CredentialClientAuthMiddleware, CredentialEventConsumer
 from asgiref.sync import async_to_sync
+from assets.const import Category
+from assets.models import Asset, Platform
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.db import transaction
 from django.test import TransactionTestCase, override_settings
-
-from accounts.clients.python.jms_pam.common.credential import Credential
-from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.clients.python.jms_pam.credential.v1.credential_client import CredentialClient
-from accounts.credential_client.events import _publish_stream
-from accounts.credential_rotation.manager import CredentialRotationManager
-from accounts.models import (
-    Account, ApplicationAudit, ApplicationCredential, ClientAccessConfiguration,
-    CredentialApplicationBinding, CredentialClientInstance, IntegrationApplication,
-)
-from accounts.ws import CredentialClientAuthMiddleware, CredentialEventConsumer
-from assets.const import Category
-from assets.models import Asset, Platform
 from orgs.models import Organization
 from orgs.utils import set_current_org, set_to_root_org, tmp_to_org
 
@@ -50,10 +55,6 @@ class CredentialEventStreamTests(TransactionTestCase):
         CredentialApplicationBinding.objects.create(
             credential=self.credential, application=self.application,
         )
-        self.configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Stream SDK', type='sdk',
-        )
-        self.configuration.credentials.add(self.credential)
 
     def tearDown(self):
         set_to_root_org()
@@ -70,11 +71,11 @@ class CredentialEventStreamTests(TransactionTestCase):
         self.assertIsNotNone(client.date_last_seen)
         self.assertTrue(client.event_receipts_supported)
         self.assertTrue(ApplicationAudit.objects.filter(
-            service_id=self.application.id, configuration_id=self.configuration.id,
+            service_id=self.application.id,
             instance_id=client.instance_id, event='credential_stream_connected',
         ).exists())
         self.assertTrue(ApplicationAudit.objects.filter(
-            service_id=self.application.id, configuration_id=self.configuration.id,
+            service_id=self.application.id,
             instance_id=client.instance_id, event='credential_stream_disconnected',
         ).exists())
 
@@ -118,6 +119,9 @@ class CredentialEventStreamTests(TransactionTestCase):
         await communicator.disconnect()
 
     def test_published_event_includes_subscription_selector(self):
+        CredentialClientInstance.objects.create(
+            application=self.application, instance_id='publisher', type='sdk',
+        )
         event = ApplicationAudit.objects.create(
             event='credential_published', service_id=self.application.id,
             credential_id=self.credential.id,
@@ -136,7 +140,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         communicator = WebsocketCommunicator(
             app,
             '/ws/accounts/credential-events/'
-            f'?configuration_id={self.configuration.id}&instance_id=unsigned',
+            '?instance_id=unsigned',
         )
         connected, code = await communicator.connect()
         self.assertFalse(connected)
@@ -148,7 +152,6 @@ class CredentialEventStreamTests(TransactionTestCase):
             'stream-instance',
             ClientProfile(
                 endpoint='http://testserver', org_id=str(self.org.id),
-                configuration_id=str(self.configuration.id),
             ),
         )
         headers = []
@@ -157,7 +160,7 @@ class CredentialEventStreamTests(TransactionTestCase):
             headers.append((name.lower().encode(), value.encode()))
         path = (
             '/ws/accounts/credential-events/'
-            f'?configuration_id={self.configuration.id}&instance_id=stream-instance'
+            '?instance_id=stream-instance'
         )
         app = CredentialClientAuthMiddleware(CredentialEventConsumer.as_asgi())
         communicator = WebsocketCommunicator(app, path, headers=headers)

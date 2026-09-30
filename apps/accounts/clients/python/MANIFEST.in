@@ -1,3 +1,4 @@
 include README.*.md
 include .ruff.toml
+include demo.py subclass_demo.py
 recursive-include file_apps *.md

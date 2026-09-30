@@ -9,7 +9,7 @@
 
 ## 설정 및 실행
 
-소스 SDK를 설치하고 아래 설정을 입력하세요. 애플리케이션 관리에서 계정을 허용하고 정책을 연결한 뒤 접속 자료에서 AK/SK와 조직 ID를 가져옵니다. 자리표시자를 교체하고 인증 자료를 안전하게 보관하세요. 복제본마다 안정적이고 고유한 인스턴스 ID를 사용하며 계정 ID 또는 정책 key 중 하나만 지정합니다.
+소스 SDK를 설치하고 아래 설정을 입력하세요. 애플리케이션 관리에서 pull 대상 계정을 허용하고, push 또는 순환이 필요한 경우에만 정책을 연결합니다. 접속 자료에서 AK/SK와 조직 ID를 가져옵니다. 자리표시자를 교체하고 인증 자료를 안전하게 보관하세요. 복제본마다 안정적이고 고유한 인스턴스 ID를 사용하며 계정 ID 또는 정책 key 중 하나만 지정합니다.
 
 ```bash
 cd apps/accounts/clients/go
@@ -70,9 +70,9 @@ func main() {
 }
 ```
 
-## 이벤트 및 자격 증명 적용
+## 이벤트 처리기
 
-최초/재연결 snapshot과 credential.updated를 처리합니다. 아래 전체 예제는 subscription, alternating_rotation 및 애플리케이션 명령을 처리합니다. 실제 연결 검증, 연결 풀 전환과 이전 연결 해제를 적용 함수에 구현하세요. 미구현 함수는 예외를 발생시켜 적용하지 않은 버전의 확인을 막습니다. 스냅샷에서 제거된 계정과 권한 취소 이벤트도 애플리케이션 캐시에 반영해야 합니다.
+로컬 상태를 초기화한 뒤 감시를 시작합니다. Python과 Node.js는 서브클래스, Go는 EventHandlers, Java는 CredentialEventListener를 사용합니다. 예제의 실제 연결 전환을 구현해야 합니다. 기존 API도 유지됩니다.
 
 ```go
 package main
@@ -89,6 +89,111 @@ import (
 	pam "github.com/jumpserver/jumpserver/apps/accounts/clients/go"
 )
 
+type application struct {
+	client      *pam.Client
+	credentials map[string]pam.Credential
+	modes       map[string]string
+}
+
+func (a *application) observe(ctx context.Context, event pam.Event) error {
+	updates := []pam.Event{event}
+	if event.Event == "snapshot" {
+		clear(a.modes)
+		updates = event.Credentials
+	}
+	for _, update := range updates {
+		key := update.CredentialKey
+		if key == "" {
+			key = update.Key
+		}
+		if key != "" && (event.Event == "snapshot" || event.Event == "credential.updated") {
+			a.modes[key] = update.CredentialMode
+		}
+	}
+	if event.Event == "snapshot" {
+		for key := range a.credentials {
+			if _, ok := a.modes[key]; !ok {
+				delete(a.credentials, key) /* Also release connections. */
+			}
+		}
+	}
+	// Use ExecuteApplicationCommand for command events; see cmd/events/main.go.
+	return nil
+}
+func applyCredential(ctx context.Context, credential pam.Credential) error {
+	return fmt.Errorf("implement connection validation, pool switching and old connection cleanup")
+}
+func (a *application) changed(ctx context.Context, credential pam.Credential) error {
+	if err := applyCredential(ctx, credential); err != nil {
+		return err
+	}
+	if a.modes[credential.Key] == "alternating_rotation" {
+		if _, err := a.client.ConfirmCredential(ctx, credential.Key, credential.Revision, credential.Account.ID); err != nil {
+			return err
+		}
+	}
+	a.credentials[credential.Key] = credential
+	return nil
+}
+func (a *application) revoked(ctx context.Context, event pam.Event) error {
+	delete(a.credentials, event.CredentialKey) // Also release affected connections.
+	return nil
+}
+func main() {
+	client, err := pam.NewClient(pam.Options{Endpoint: os.Getenv("JMS_ENDPOINT"), AppID: os.Getenv("JMS_APP_ID"), AppSecret: os.Getenv("JMS_APP_SECRET"), InstanceID: os.Getenv("JMS_INSTANCE_ID"), OrgID: os.Getenv("JMS_ORG_ID")})
+	if err != nil {
+		log.Fatal("Invalid SDK configuration")
+	}
+	defer client.Close()
+	app := &application{client: client, credentials: make(map[string]pam.Credential), modes: make(map[string]string)}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	err = client.WatchEvents(ctx, pam.EventHandlers{OnEvent: app.observe, OnCredentialChanged: app.changed, OnCredentialRevoked: app.revoked})
+	if err != nil && !errors.Is(err, context.Canceled) {
+		log.Printf("Event processing failed: %T", err)
+	}
+}
+```
+
+초기 및 재연결 snapshot과 credential.updated는 모드별로 자격 증명을 조회하고 처리기를 순차 호출합니다. 읽기와 업무 처리는 최대 128개 큐를 사용하며 가득 차면 역압력이 발생합니다. 조회 또는 적용 실패는 1–30초 지수 백오프로 재시도하며 매번 다시 조회합니다. 같은 대상의 새 이벤트는 재시도를 대체하고, snapshot은 범위를 재설정하며 취소와 구성 변경은 재시도를 제거합니다. 처리는 반복 가능해야 합니다. 관찰 및 취소 훅은 자동 재시도하지 않으며 명령은 실행 권한을 먼저 요청해야 합니다. received는 수신만 의미하며 SDK는 회전을 자동 확인하지 않습니다.이전 버전의 이벤트는 최신 버전 조회의 대기 중인 재시도를 취소하지 않습니다.
+
+`WatchEvents(ctx, handlers)` / `StartEvents(ctx, handlers)`; `Stop()` / `Wait()`; `context.CancelFunc`
+
+WatchEvents는 호출 goroutine에서 기다립니다. StartEvents는 초기 동기화 완료를 보장하지 않습니다. 감시는 하나만 허용됩니다. Stop과 Close로 취소하고 처리기 밖에서 Wait하세요. context 취소를 처리해야 합니다.
+
+### 최신 자격 증명과 백엔드 장애
+
+먼저 API를 요청합니다. 성공하면 보유한 최신 값을 교체하며 오래된 버전으로 새 값을 덮어쓰지 않고 시간 만료도 없습니다. 시간 초과, 네트워크 오류 또는 HTTP 5xx일 때만 같은 선택자의 마지막 성공 값을 로컬 표시와 함께 반환합니다. 이전 값이 없으면 원래 오류입니다. SDK는 업데이트, 취소 또는 종료까지 클라이언트 메모리에 보유하며 clone과 재시작은 빈 상태로 시작합니다. Agent는 기존의 보호된 로컬 상태에 저장합니다. HTTP 401/403/404 또는 client_upgrade_required는 SDK 값을 삭제하고 실패하며 잘못된 성공 응답도 실패합니다. 취소는 해당 값을, snapshot은 권한 범위 밖 값을 삭제합니다. 구성 변경은 다음 snapshot으로 범위를 확인할 때까지 보유합니다.Agent는 HTTP 동기화 전에 명시적 취소와 snapshot 범위 축소를 적용하고 저장하며, 백엔드 장애 중이나 재시작 후에도 해당 로컬 조회를 차단합니다.credential_not_found(HTTP 400) 응답도 SDK 보관 값을 삭제합니다. account_id로 직접 pull하려면 항상 실시간 API 응답이 필요합니다. push 스냅샷은 캐시된 pull 권한을 증명하지 않습니다.
+
+- `credential.FromLocal`
+- `GetCredentialFresh(ctx, selector)`
+
+관리된 감시를 켜면 snapshot과 credential.updated가 자동 조회하고 보유 값을 교체한 뒤 업무 훅을 호출합니다. 실패하면 이전 값을 유지하고 재시도합니다. Agent도 업데이트 알림으로 조회하며 장애 시 이전 값을 유지합니다. 업데이트와 수동 전환에는 아래 API 조회 필수 호출을 사용하세요. 보유 값은 새로 조회한 버전이 아니며 회전을 자동 확인하지 않습니다.
+
+유휴 시 10초마다 ping을 보내고 약 30초간 메시지가 없으면 재연결합니다. 1–30초 지수 백오프와 새 서명을 사용합니다. snapshot은 현재 상태를 복원하며 과거 이벤트를 재생하지 않습니다.
+
+
+
+## 이벤트 및 자격 증명 적용
+
+최초/재연결 snapshot과 credential.updated를 처리합니다. 아래 전체 예제는 subscription, alternating_rotation 및 애플리케이션 명령을 처리합니다. 실제 연결 검증, 연결 풀 전환과 이전 연결 해제를 적용 함수에 구현하세요. 미구현 함수는 예외를 발생시켜 적용하지 않은 버전의 확인을 막습니다. 스냅샷에서 제거된 계정과 권한 취소 이벤트도 애플리케이션 상태에 반영해야 합니다.
+
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
+
+	pam "github.com/jumpserver/jumpserver/apps/accounts/clients/go"
+)
+
 func applyCredential(credential pam.Credential) error {
 	return fmt.Errorf("implement connection validation, pool switching and old connection cleanup")
 }
@@ -100,7 +205,7 @@ func handleCommand(ctx context.Context, client *pam.Client, event pam.Event) err
 	if event.Event != "credential.switch.requested" {
 		return fmt.Errorf("unsupported application command")
 	}
-	credential, err := client.GetCredential(ctx, pam.CredentialSelector{Key: event.CredentialKey})
+	credential, err := client.GetCredentialFresh(ctx, pam.CredentialSelector{Key: event.CredentialKey})
 	if err != nil {
 		return err
 	}
@@ -139,14 +244,17 @@ func main() {
 				key = update.Key
 			}
 			selector := pam.CredentialSelector{}
-			if update.CredentialMode == "subscription" && update.AccountID != "" {
-				selector.AccountID = update.AccountID
+			if update.CredentialMode == "subscription" && update.AccountID != "" && key != "" {
+				if !strings.HasSuffix(key, ":"+update.AccountID) {
+					key += ":" + update.AccountID
+				}
+				selector.Key = key
 			} else if update.CredentialMode == "alternating_rotation" && key != "" {
 				selector.Key = key
 			} else {
 				continue
 			}
-			credential, err := client.GetCredential(ctx, selector)
+			credential, err := client.GetCredentialFresh(ctx, selector)
 			if err != nil {
 				return err
 			}
@@ -177,7 +285,10 @@ func main() {
 
 - `GetCredential(ctx, CredentialSelector{Key: ...})`
 - `GetCredential(ctx, CredentialSelector{AccountID: ...})`
+- `GetCredentialFresh(ctx, selector)`
 - `ConfirmCredential(ctx, key, revision, accountID)`
+- `WatchEvents(ctx, EventHandlers{...}) / StartEvents(ctx, handlers)`
+- `EventWatcher.Stop() / EventWatcher.Wait()`
 - `WatchCredentialEvents(ctx, handler)`
 - `ListApplicationCommands(ctx)`
 - `ReportApplicationCommandResult(ctx, commandID, status, errorCode)`
@@ -193,6 +304,74 @@ HTTP, 네트워크, 인증 및 디코딩 실패는 코드와 HTTP 상태를 포�
 
 모든 SDK는 프로토콜 버전 1을, Agent 설정은 스키마 버전 1을 사용합니다. client_upgrade_required(HTTP 426)를 받으면 호환성을 확인하고 업그레이드하세요. 알 수 없는 선택 필드와 알림 이벤트는 허용하지만 지원하지 않는 정책은 적용하거나 확인하면 안 됩니다. 수신 확인은 자동 전송되며 자격 증명 적용을 증명하지 않습니다.
 
-## Linux Agent 연동
+## Go Agent 연동
 
-Agent 동기화 메서드는 Agent 구현을 위한 것입니다. Agent 신원 또는 source와 설정 ID가 필요하며 KnownRevision으로 캐시 및 전달 버전을 보고합니다. Linux 설치, 파일 전달과 로컬 API는 현재 Python Agent가 제공하며 모든 언어의 애플리케이션에서 사용할 수 있습니다.
+인증에는 app_id, app_secret, org_id 및 안정적인 instance_id를 사용하며 권한은 애플리케이션에 연결된 정책을 따릅니다. 경로와 서비스 동작은 모두 로컬 설정입니다. state_file은 최신 암호를 유지하고 event_file은 비밀 없는 이벤트 정보를 추가합니다. delivery는 기본 출력을, rules는 파일, 템플릿 및 reload/restart 또는 고정 스크립트를 지정합니다. 업데이트 알림을 받으면 최신 암호를 가져와 저장하고 파일을 원자적으로 교체한 뒤 동작을 실행합니다. 실패는 재시도합니다. rules에는 get_accounts의 credentials[].key를 사용합니다. 구독 key에는 계정 ID가 포함됩니다. rules가 비어 있으면 key별 기본 파일을 씁니다.
+
+로컬 rules에 파일, JSON/EnvironmentFile 또는 신뢰할 수 있는 템플릿과 systemd reload/restart 또는 고정 실행 파일을 설정합니다. 스크립트는 표준 입력으로 자격 증명 JSON을 받고 고정 인수와 제한 시간을 사용하며 적용을 검증한 후 성공합니다. Core는 실행 경로나 권한을 확장할 수 없습니다. 구성을 수정한 후 Agent를 재시작합니다.
+
+인증에는 app_id, app_secret, org_id 및 안정적인 instance_id를 사용하며 권한은 애플리케이션에 연결된 정책을 따릅니다. 경로와 서비스 동작은 모두 로컬 설정입니다. state_file은 최신 암호를 유지하고 event_file은 비밀 없는 이벤트 정보를 추가합니다. delivery는 기본 출력을, rules는 파일, 템플릿 및 reload/restart 또는 고정 스크립트를 지정합니다. 업데이트 알림을 받으면 최신 암호를 가져와 저장하고 파일을 원자적으로 교체한 뒤 동작을 실행합니다. 실패는 재시도합니다. rules에는 get_accounts의 credentials[].key를 사용합니다. 구독 key에는 계정 ID가 포함됩니다. rules가 비어 있으면 key별 기본 파일을 씁니다.
+
+```json
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
+```
+
+`rules`:
+
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
+```
+
+`/etc/jms-pam-agent/orders-db.tmpl`:
+
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
+
+```bash
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
+```

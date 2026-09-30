@@ -11,7 +11,15 @@ LOG = logging.getLogger(__name__)
 KIND = "subscription"
 
 
-def update_account(client, output, account_id, expected_revision=None):
+def subscription_key(event):
+    account_id = event.get("account_id")
+    key = event.get("credential_key") or event.get("key")
+    if not account_id or not key:
+        return None
+    return key if key.endswith(f":{account_id}") else f"{key}:{account_id}"
+
+
+def update_account(client, output, account_id, key, expected_revision=None):
     current = load_local(output, KIND)
     existing = current["credentials"].get(account_id)
     if (
@@ -20,7 +28,7 @@ def update_account(client, output, account_id, expected_revision=None):
         and existing["revision"] >= expected_revision
     ):
         return False
-    response = client.get_credential(account_id=account_id)
+    response = client.get_credential(key=key, allow_local_fallback=False)
     if existing and existing["revision"] >= response.revision:
         return False
     current["credentials"][account_id] = credential_data(response)
@@ -32,12 +40,12 @@ def update_account(client, output, account_id, expected_revision=None):
 def handle_event(client, output, event):
     if event.get("event") == "snapshot":
         subscriptions = {
-            item["account_id"]: item["revision"]
+            item["account_id"]: (subscription_key(item), item["revision"])
             for item in event.get("credentials", [])
-            if item.get("credential_mode") == KIND and item.get("account_id")
+            if item.get("credential_mode") == KIND and subscription_key(item)
         }
-        for account_id, revision in subscriptions.items():
-            update_account(client, output, account_id, revision)
+        for account_id, (key, revision) in subscriptions.items():
+            update_account(client, output, account_id, key, revision)
         current = load_local(output, KIND)
         stale = set(current["credentials"]) - set(subscriptions)
         if stale:
@@ -52,8 +60,9 @@ def handle_event(client, output, event):
         and event.get("credential_mode") == KIND
     ):
         account_id = event.get("account_id")
-        if account_id:
-            update_account(client, output, account_id, event.get("revision"))
+        key = subscription_key(event)
+        if key:
+            update_account(client, output, account_id, key, event.get("revision"))
     elif event.get("event") == "credential.revoked":
         policy_key = event.get("credential_key")
         if policy_key:

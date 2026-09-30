@@ -34,7 +34,6 @@ router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
 router.register(r'application-webhooks', api.ApplicationWebhookViewSet, 'application-webhook')
 router.register(r'application-credentials', api.ApplicationCredentialViewSet, 'application-credential')
-router.register(r'client-access-configurations', api.ClientAccessConfigurationViewSet, 'client-access-configuration')
 router.register(
     r'credential-application-bindings',
     api.CredentialApplicationBindingViewSet,

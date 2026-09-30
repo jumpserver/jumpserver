@@ -4,8 +4,8 @@
 
 | 目录 | 当前能力 | 接入文档 |
 | --- | --- | --- |
-| `python/` | 完整 SDK、Linux Agent；Python 3.9+ | [中文](python/README.zh-hans.md) / [English](python/README.en.md) |
-| `go/` | 完整 SDK；Go 1.23+ | [中文](go/README.zh-hans.md) / [English](go/README.en.md) |
+| `python/` | 完整 SDK；Python 3.9+ | [中文](python/README.zh-hans.md) / [English](python/README.en.md) |
+| `go/` | 完整 SDK、跨平台前台 Agent 与 Linux systemd 安装；Go 1.23+ | [中文](go/README.zh-hans.md) / [English](go/README.en.md) |
 | `java/` | 完整 SDK；Java 11+ | [中文](java/README.zh-hans.md) / [English](java/README.en.md) |
 | `node/` | 完整 SDK、TypeScript 类型声明；Node.js 20.3+ | [中文](node/README.zh-hans.md) / [English](node/README.en.md) |
 | `curl/` | 旧账号取密接口的协议调试脚本 | [中文](curl/README.zh-hans.md) / [English](curl/README.en.md) |
@@ -20,6 +20,8 @@
 | 按策略取密 | `get_credential(key=...)` | `GetCredential(ctx, CredentialSelector{Key: ...})` | `getCredential(key)` | `getCredential({key})` |
 | 确认生效版本 | `confirm_credential(...)` | `ConfirmCredential(...)` | `confirmCredential(...)` | `confirmCredential({...})` |
 | 监听事件及重连快照 | `watch_credential_events(...)` | `WatchCredentialEvents(ctx, handler)` | `watchCredentialEvents()` | `watchCredentialEvents({...})` |
+| 高层事件处理 | `watch_events()` / `start_events()` | `WatchEvents(ctx, handlers)` / `StartEvents(ctx, handlers)` | `watchEvents(listener)` / `startEvents(listener)` | `watchEvents()` / `startEvents()` |
+| 强制实时取密 | `get_credential(..., allow_local_fallback=False)` | `GetCredentialFresh(ctx, selector)` | `getCredential(key, false)` | `getCredential({...selector, allowLocalFallback: false})` |
 | 查询待处理指令 | `list_application_commands()` | `ListApplicationCommands(ctx)` | `listApplicationCommands()` | `listApplicationCommands()` |
 | 认领并执行指令 | `execute_application_command(event, handler)` | `ExecuteApplicationCommand(ctx, event, handler)` | `executeApplicationCommand(event, handler)` | `executeApplicationCommand(event, handler)` |
 | 上报指令结果 | `report_application_command_result(...)` | `ReportApplicationCommandResult(...)` | `reportApplicationCommandResult(...)` | `reportApplicationCommandResult({...})` |
@@ -30,9 +32,13 @@
 
 各 SDK 使用协议版本 1，Agent 配置版本为 1。遇到 `client_upgrade_required`（HTTP 426）需检查兼容性并升级；未知可选字段和通知事件可以传给应用，未实现的策略类型不得应用或确认。
 
+四种 SDK 均支持事件处理函数、首次与重连快照同步、串行处理及失败退避重试，原有调用形式保留。启用高层监听后，凭据更新事件会自动取密，成功后替换本地保留的最新凭据。保留值不按时间过期；普通取密先请求 API，只有超时、网络故障或 HTTP 5xx 时才返回本地值，并标记来源。权限拒绝或明确撤销后停止使用相应凭据。Agent 自动更新并保存最新凭据，后端故障期间保留已有值。轮换切换仍要求实时获取并显式确认。接口与生命周期对照见 [事件处理接口](EVENT_HANDLERS.md)。
+
 ## 在应用中安装 SDK
 
 当前通过本仓库源码安装；以下路径替换为本地绝对路径。这些包尚未发布到公共包仓库。
+
+在应用详情的接入向导中选择 SDK 语言，可下载当前应用的身份配置并查看对应事件处理示例；完整安装和接口说明在文档中心。向导为 SDK 生成实例 ID 并写入下载文件。部署时复用该文件以保持身份稳定；多个副本应分别生成材料，或为每个副本设置不同且可复用的 `JMS_INSTANCE_ID`。
 
 ### Python
 
@@ -51,7 +57,7 @@ go mod edit -replace=github.com/jumpserver/jumpserver/apps/accounts/clients/go=/
 go get github.com/jumpserver/jumpserver/apps/accounts/clients/go@v0.0.0
 ```
 
-导入：`import pam "github.com/jumpserver/jumpserver/apps/accounts/clients/go"`。示例位于 `go/cmd/demo/` 和 `go/cmd/events/`。
+导入：`import pam "github.com/jumpserver/jumpserver/apps/accounts/clients/go"`。示例位于 `go/cmd/demo/`、`go/cmd/events/` 和 `go/cmd/hooks/`。
 
 ### Java
 
@@ -71,7 +77,7 @@ mvn -f /path/to/jumpserver/apps/accounts/clients/java/pom.xml install
 </dependency>
 ```
 
-导入：`import org.jumpserver.pam.Client;`。示例为 `Demo.java` 和 `EventsDemo.java`。
+导入：`import org.jumpserver.pam.Client;`。示例为 `Demo.java`、`EventsDemo.java` 和 `HooksDemo.java`。
 
 ### Node.js
 
@@ -79,7 +85,7 @@ mvn -f /path/to/jumpserver/apps/accounts/clients/java/pom.xml install
 npm install /path/to/jumpserver/apps/accounts/clients/node
 ```
 
-导入：`const { Client } = require('@jumpserver/pam')`，ESM 可以使用 `import { Client } from '@jumpserver/pam'`。示例为 `node/demo.js` 和 `node/events.js`。
+导入：`const { Client } = require('@jumpserver/pam')`，ESM 可以使用 `import { Client } from '@jumpserver/pam'`。示例为 `node/demo.js`、`node/events.js` 和 `node/hooks.js`。
 
 ## 文档语言
 
@@ -87,12 +93,12 @@ npm install /path/to/jumpserver/apps/accounts/clients/node
 
 文档中心可以选择编程语言，正文跟随界面语言；地区别名会映射到对应文档，未知或缺失的语言回退到英文。API 路径、配置字段和代码标识符保持原名。维护与生成方法见 [文档维护](docs/README.md)。
 
-## Python SDK 与 Agent
+## Python SDK 与 Go Agent
 
 - SDK 入口：`python/jms_pam/client.py`。
 - 响应模型：`python/jms_pam/models.py`，使用带类型提示的 dataclass。
-- Agent 命令入口：`python/jms_pam/agent.py`；运行、交付、本地 API 和安装源码位于 `python/jms_pam/_agent/`，复用同包内的 SDK。
-- 分发包：`jms-pam`，安装后通过 `jms_pam` 导入 SDK，通过 `jms-pam-agent` 启动 Agent。
+- Agent 命令入口：`go/cmd/jms-pam-agent`；配置、交付、本地 API 和安装源码位于 `go/agent`，复用 Go SDK。
+- Python 分发包：`jms-pam`，通过 `jms_pam` 导入 SDK。Agent 为独立 Go 二进制 `jms-pam-agent`，固定服务名 `jms-pam-agent.service`。
 - 示例应用：`python/demo.py`、`python/postgresql_app.py`、`python/file_apps/`。
 
 从仓库根目录安装：
@@ -114,6 +120,8 @@ python3 -m pip install -e ./apps/accounts/clients/python
 
 Python 的原始 `credential.v1` 请求对象接口作为兼容入口保留；新接入统一使用 `from jms_pam import Client`。
 
-## 后续 Go Agent
+## Go Agent
 
-Go Agent 可在 `go/agent/` 下实现，按独立可执行文件构建和分发。该目录当前尚未提供 Go Agent。不同语言的 Agent 应复用 Core 的凭据客户端协议、事件流、应用生效确认和安装能力约束。
+以 `/etc/jms-pam-agent/agent.json` 为核心，支持默认 JSON 文件、EnvironmentFile、本机模板、systemd reload/restart、固定脚本及 Unix Socket。通知触发实时取密，保留最新成功值并在交付失败时重试。服务通过 `systemctl start jms-pam-agent` 启动；身份仅使用应用 AK/SK 与稳定的 `instance_id`，账号范围随应用授权，交付和服务动作由本机配置决定。详见 [配置与安装](go/agent/README.zh-hans.md) / [English](go/agent/README.en.md)。
+
+CLI 提供 `get_accounts` 和 `get_secret ACCOUNT_ID`，通过运行中的 Agent 查询，并标明 API / 本地最新值来源。macOS / Linux 开发可用 `init-local` 和 `run --local` 前台运行，记录私有 `events.jsonl` 并原子更新最新凭据文件；生产配置也支持可选的 `event_file`。

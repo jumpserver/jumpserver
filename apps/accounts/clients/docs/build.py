@@ -26,7 +26,10 @@ NATIVE_METHODS = {
     "go": [
         "GetCredential(ctx, CredentialSelector{Key: ...})",
         "GetCredential(ctx, CredentialSelector{AccountID: ...})",
+        "GetCredentialFresh(ctx, selector)",
         "ConfirmCredential(ctx, key, revision, accountID)",
+        "WatchEvents(ctx, EventHandlers{...}) / StartEvents(ctx, handlers)",
+        "EventWatcher.Stop() / EventWatcher.Wait()",
         "WatchCredentialEvents(ctx, handler)",
         "ListApplicationCommands(ctx)",
         "ReportApplicationCommandResult(ctx, commandID, status, errorCode)",
@@ -37,8 +40,11 @@ NATIVE_METHODS = {
     "java": [
         "getCredential(key)",
         "getCredentialByAccountId(accountId)",
+        "getCredential(key, false) / getCredentialByAccountId(accountId, false)",
         "confirmCredential(key, revision, accountId)",
         "watchCredentialEvents()",
+        "watchEvents(listener) / startEvents(listener)",
+        "EventSubscription.stop() / close() / awaitTermination()",
         "listApplicationCommands()",
         "reportApplicationCommandResult(commandId, status, errorCode)",
         "executeApplicationCommand(event, handler)",
@@ -48,8 +54,11 @@ NATIVE_METHODS = {
     "node": [
         "getCredential({key})",
         "getCredential({accountId})",
+        "getCredential({key, allowLocalFallback: false})",
         "confirmCredential({key, revision, accountId})",
         "watchCredentialEvents({signal})",
+        "watchEvents({signal}) / startEvents({signal}) / stopEvents()",
+        "EventSubscription.stop() / done",
         "listApplicationCommands()",
         "reportApplicationCommandResult({commandId, status, errorCode})",
         "executeApplicationCommand(event, handler)",
@@ -66,6 +75,64 @@ NATIVE_EXAMPLES = {
     ),
     "node": ("javascript", "demo.js", "events.js"),
 }
+HOOK_EXAMPLES = {
+    "python": ("python", "subclass_demo.py"),
+    "go": ("go", "cmd/hooks/main.go"),
+    "java": ("java", "src/main/java/org/jumpserver/pam/HooksDemo.java"),
+    "node": ("javascript", "hooks.js"),
+}
+LATEST_CREDENTIAL_APIS = {
+    "python": """- `credential.from_local`
+- `get_credential(key=..., allow_local_fallback=False)` / `get_credential(account_id=..., allow_local_fallback=False)`""",
+    "go": """- `credential.FromLocal`
+- `GetCredentialFresh(ctx, selector)`""",
+    "java": """- `credential.isFromLocal()`
+- `getCredential(key, false)` / `getCredentialByAccountId(accountId, false)`""",
+    "node": """- `credential.fromLocal`
+- `getCredential({key, allowLocalFallback: false})` / `getCredential({accountId, allowLocalFallback: false})`""",
+}
+
+LIFECYCLES = {
+    "python": "`watch_events(stop_event=...)` / `start_events(stop_event=...)`; `stop_events()` / `close()`",
+    "go": "`WatchEvents(ctx, handlers)` / `StartEvents(ctx, handlers)`; `Stop()` / `Wait()`; `context.CancelFunc`",
+    "java": "`watchEvents(listener)` / `startEvents(listener)`; `stop()` / `close()` / `awaitTermination()`",
+    "node": "`watchEvents({signal})` / `startEvents({signal})`; `stopEvents()` / `await subscription.stop()` / `await subscription.done`",
+}
+
+
+def latest_credentials_section(language, texts):
+    return f"""### {texts["latest_credentials_title"]}
+
+{texts["latest_credentials_behavior"]}
+
+{LATEST_CREDENTIAL_APIS[language]}
+
+{texts["live_refresh"]}
+
+{texts["event_liveness"]}
+"""
+
+
+def managed_section(language, texts):
+    syntax, example = HOOK_EXAMPLES[language]
+    return f"""## {texts["managed_title"]}
+
+{texts["managed_intro"]}
+
+```{syntax}
+{(CLIENTS / language / example).read_text(encoding="utf-8").rstrip()}
+```
+
+{texts["managed_behavior"]}
+
+{LIFECYCLES[language]}
+
+{texts[f"managed_lifecycle_{language}"]}
+
+{latest_credentials_section(language, texts)}
+"""
+
+
 NATIVE_INSTALL = {
     "go": """```bash
 go mod edit -replace=github.com/jumpserver/jumpserver/apps/accounts/clients/go=/path/to/jumpserver/apps/accounts/clients/go
@@ -219,6 +286,8 @@ cd apps/accounts/clients/{language}
 {(directory / quickstart).read_text(encoding="utf-8").rstrip()}
 ```
 
+{managed_section(language, texts)}
+
 ## {texts["events"]}
 
 {texts["native_events"]}
@@ -248,6 +317,45 @@ cd apps/accounts/clients/{language}
 ## {texts["agent_title"]}
 
 {texts["native_agent"]}
+
+{texts["agent_rules"]}
+
+{agent_configuration_section(texts)}
+"""
+
+
+AGENT_SAMPLE = {'endpoint': 'https://jumpserver.example.com', 'app_id': '<application-id>', 'app_secret': '<application-secret>', 'org_id': '<org-id>', 'instance_id': 'orders-node-1', 'state_file': '/var/lib/jms-pam-agent/state.json', 'event_file': '/var/lib/jms-pam-agent/events.jsonl', 'reconcile_interval': 300, 'delivery': {'delivery_mode': 'json', 'delivery_root': '/opt/jumpserver-pam/credentials', 'socket_path': '/run/jms-pam-agent/agent.sock', 'app_user': 'orders', 'systemd_unit': '', 'systemd_action': ''}, 'rules': []}
+AGENT_RULE = {'keys': ['<credential-key>'], 'files': [{'path': '/etc/order-service/database.json', 'format': 'template', 'template_file': '/etc/jms-pam-agent/orders-db.tmpl', 'owner': 'orders'}], 'action': {'type': 'systemd', 'unit': 'order-service.service', 'operation': 'reload', 'timeout_seconds': 30}}
+
+
+def agent_configuration_section(texts):
+    return f"""{texts['agent_config']}
+
+```json
+{json.dumps(AGENT_SAMPLE, indent=2)}
+```
+
+`rules`:
+
+```json
+{json.dumps([AGENT_RULE], indent=2)}
+```
+
+`/etc/jms-pam-agent/orders-db.tmpl`:
+
+```gotemplate
+{{
+  "username": {{{{json (index .Credentials "<credential-key>").Username}}}},
+  "password": {{{{json (index .Credentials "<credential-key>").Secret}}}}
+}}
+```
+
+```bash
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
+```
 """
 
 
@@ -263,45 +371,53 @@ def python_guide(texts):
 {texts["agent_setup"]}
 
 ```bash
-sudo python3 -m venv /opt/jumpserver-pam/venv
-sudo /opt/jumpserver-pam/venv/bin/python -m pip install '<sdk-directory>'
-sudo /opt/jumpserver-pam/venv/bin/jms-pam-agent install \\
+cd apps/accounts/clients/go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o jms-pam-agent ./cmd/jms-pam-agent
+sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent
+chmod 0600 ./jms_pam_agent.json
+sudo /usr/local/bin/jms-pam-agent install \\
   --bootstrap ./jms_pam_agent.json --instance-id app-node-1
 ```
 
+{texts["agent_portable"]}
+
 {texts["agent_paths"]}
 
-- JSON: `/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.json`
-- EnvironmentFile: `/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.env`
-- Unix Socket: `/run/jumpserver-pam/<configuration-id>/agent.sock`
+- JSON: `/opt/jumpserver-pam/credentials/<credential-key>.json`
+- EnvironmentFile: `/opt/jumpserver-pam/credentials/<credential-key>.env`
+- Unix Socket: `/run/jms-pam-agent/agent.sock`
 
 {texts["agent_delivery"]}
 
 ```ini
 [Service]
-EnvironmentFile=-/opt/jumpserver-pam/credentials/<configuration-id>/<credential-key>.env
+EnvironmentFile=-/opt/jumpserver-pam/credentials/<credential-key>.env
 ```
 
 {texts["agent_environment"]}
+
+{texts["agent_rules"]}
+
+{agent_configuration_section(texts)}
 
 ### {texts["local_api"]}
 
 ```bash
 curl --fail --silent --show-error \\
-  --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \\
+  --unix-socket '/run/jms-pam-agent/agent.sock' \\
   http://localhost/v1/health
 
 curl --fail --silent --show-error \\
-  --unix-socket '/run/jumpserver-pam/<configuration-id>/agent.sock' \\
+  --unix-socket '/run/jms-pam-agent/agent.sock' \\
   'http://localhost/v1/credentials/<credential-key>'
 ```
 
 {texts["confirmation"]}
 
 ```bash
-/opt/jumpserver-pam/venv/bin/jms-pam-agent confirm '<credential-key>' \\
+/usr/local/bin/jms-pam-agent confirm '<credential-key>' \\
   --revision '<revision>' \\
-  --socket '/run/jumpserver-pam/<configuration-id>/agent.sock'
+  --socket '/run/jms-pam-agent/agent.sock'
 ```
 
 {texts["agent_confirm"]}
@@ -309,9 +425,10 @@ curl --fail --silent --show-error \\
 ### {texts["troubleshooting"]}
 
 ```bash
-sudo systemctl status 'jms-pam-agent-<configuration-id>.service' --no-pager
-sudo journalctl -u 'jms-pam-agent-<configuration-id>.service' -n 100 --no-pager
-sudo systemctl restart 'jms-pam-agent-<configuration-id>.service'
+sudo systemctl start jms-pam-agent
+sudo systemctl status jms-pam-agent --no-pager
+sudo journalctl -u jms-pam-agent -n 100 --no-pager
+sudo systemctl restart jms-pam-agent
 ```
 
 {texts["recovery"]}
@@ -332,10 +449,10 @@ python3 -m pip install ./apps/accounts/clients/python
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
-with Client(instance_id="app-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     credential = client.get_credential(account_id="<account-id>")
     username = credential.account.username
     secret = credential.account.secret
@@ -347,14 +464,14 @@ with Client(instance_id="app-node-1", **client_options) as client:
 
 ```python
 from jms_pam import Client
-from jms_pam_config import client_options
+from jms_pam_config import client_options, instance_id
 
 
 def apply_credential(credential):
     raise NotImplementedError({texts["apply_error"]!r})
 
 
-with Client(instance_id="app-node-1", **client_options) as client:
+with Client(instance_id=instance_id, **client_options) as client:
     for event in client.watch_credential_events():
         if event.get("event") == "snapshot":
             updates = event.get("credentials", [])
@@ -366,10 +483,11 @@ with Client(instance_id="app-node-1", **client_options) as client:
             mode = update.get("credential_mode")
             key = update.get("credential_key") or update.get("key")
             account_id = update.get("account_id")
-            if mode == "subscription" and account_id:
-                credential = client.get_credential(account_id=account_id)
+            if mode == "subscription" and account_id and key:
+                policy_key = key if key.endswith(f":{{account_id}}") else f"{{key}}:{{account_id}}"
+                credential = client.get_credential(key=policy_key, allow_local_fallback=False)
             elif mode == "alternating_rotation" and key:
-                credential = client.get_credential(key=key)
+                credential = client.get_credential(key=key, allow_local_fallback=False)
             else:
                 continue
             apply_credential(credential)
@@ -385,6 +503,8 @@ with Client(instance_id="app-node-1", **client_options) as client:
 
 {texts["sdk_receipts"]}
 
+{managed_section("python", texts)}
+
 ### {texts["commands"]}
 
 {texts["command_processing"]}
@@ -394,6 +514,7 @@ with Client(instance_id="app-node-1", **client_options) as client:
 - `get_credential(key=...)` / `get_credential(account_id=...)`
 - `confirm_credential(key=..., revision=..., account_id=...)`
 - `watch_credential_events(stop_event=...)`
+- `watch_events(stop_event=...)` / `start_events(stop_event=...)` / `stop_events()`
 - `list_application_commands()`
 - `report_application_command_result(command_id=..., status=...)`
 - `execute_application_command(event, handler)`
@@ -431,6 +552,7 @@ def main():
         if locale not in ("en", "zh-hans"):
             documents[CLIENTS / "python" / f"README.{locale}.md"] = python_guide(texts)
         for path, content in documents.items():
+            content = content.rstrip() + "\n"
             if args.check:
                 if not path.is_file() or path.read_text(encoding="utf-8") != content:
                     differences.append(str(path.relative_to(CLIENTS)))

@@ -9,7 +9,7 @@ SDK соответствует функциям Python SDK политик учё
 
 ## Настройка и запуск
 
-Установите исходный SDK и задайте параметры ниже. Разрешите аккаунты и привяжите политики в управлении приложениями; получите AK/SK и ID организации из материалов подключения. Замените шаблонные значения и защитите секреты развёртывания. Каждой реплике нужен стабильный уникальный ID. Укажите только один селектор: ID аккаунта или key политики.
+Установите исходный SDK и задайте параметры ниже. Разрешите аккаунты для pull в управлении приложениями; привязывайте политики только при необходимости push или ротации. Получите AK/SK и ID организации из материалов подключения. Замените шаблонные значения и защитите секреты развёртывания. Каждой реплике нужен стабильный уникальный ID. Укажите только один селектор: ID аккаунта или key политики.
 
 ```bash
 cd apps/accounts/clients/java
@@ -69,9 +69,108 @@ public final class Demo {
 }
 ```
 
+## Обработчики событий
+
+Инициализируйте локальное состояние перед запуском подписки. Python и Node.js используют подкласс, Go — EventHandlers, Java — CredentialEventListener. Реализуйте переключение соединений в примере. Прежний API сохранён.
+
+```java
+package org.jumpserver.pam;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.jumpserver.pam.Models.Credential;
+import org.jumpserver.pam.Models.Event;
+
+/** Replace the business hook before running. Listener methods run serially. */
+public final class HooksDemo implements CredentialEventListener {
+  private final Client client;
+  private final Map<String, Credential> credentials = new HashMap<>();
+  private final Map<String, String> modes = new HashMap<>();
+
+  public HooksDemo(Client client) {
+    this.client = client;
+  }
+
+  @Override
+  public void onEvent(Event event) {
+    List<Event> updates = List.of(event);
+    if (event.getEvent().equals("snapshot")) {
+      modes.clear();
+      updates = event.getCredentials();
+    }
+    if (event.getEvent().equals("snapshot") || event.getEvent().equals("credential.updated"))
+      for (Event update : updates) modes.put(update.getKey(), update.getCredentialMode());
+    if (event.getEvent().equals("snapshot"))
+      credentials.keySet().removeIf(key -> !modes.containsKey(key)); // Also release connections.
+    // Use executeApplicationCommand for commands; see EventsDemo.
+  }
+
+  @Override
+  public void onCredentialChanged(Credential credential) {
+    applyCredential(credential);
+    if ("alternating_rotation".equals(modes.get(credential.getKey())))
+      client.confirmCredential(
+          credential.getKey(), credential.getRevision(), credential.getAccount().getId());
+    credentials.put(credential.getKey(), credential);
+  }
+
+  private void applyCredential(Credential credential) {
+    throw new UnsupportedOperationException(
+        "Implement connection validation, pool switching and old connection cleanup");
+  }
+
+  @Override
+  public void onCredentialRevoked(Event event) {
+    credentials.remove(event.getKey()); // Also release affected connections.
+  }
+
+  public static void main(String[] args) throws InterruptedException {
+    Client.Options options =
+        new Client.Options(
+                System.getenv("JMS_ENDPOINT"),
+                System.getenv("JMS_APP_ID"),
+                System.getenv("JMS_APP_SECRET"),
+                System.getenv("JMS_INSTANCE_ID"))
+            .orgId(System.getenv("JMS_ORG_ID"));
+    try (Client client = new Client(options)) {
+      Thread stop = new Thread(client::close, "jms-pam-shutdown");
+      Runtime.getRuntime().addShutdownHook(stop);
+      try {
+        client.watchEvents(new HooksDemo(client));
+      } finally {
+        try {
+          Runtime.getRuntime().removeShutdownHook(stop);
+        } catch (IllegalStateException ignored) {
+        }
+      }
+    }
+  }
+}
+```
+
+Начальный snapshot, snapshot после переподключения и credential.updated получают данные по режиму политики и последовательно вызывают обработчик. Чтение использует очередь на 128 событий; заполнение создаёт обратное давление. Ошибки получения и применения повторяются с экспоненциальной задержкой 1–30 секунд и новым запросом. Новое событие заменяет повтор для той же цели; snapshot обновляет область, отзыв и изменение конфигурации отменяют повторы. Обработчики должны быть идемпотентными. Наблюдатели и отзыв автоматически не повторяются; команды требуют захвата выполнения. received означает чтение; SDK не подтверждает ротацию автоматически. События старых ревизий не отменяют ожидающее получение более новой ревизии.
+
+`watchEvents(listener)` / `startEvents(listener)`; `stop()` / `close()` / `awaitTermination()`
+
+watchEvents ждёт в вызывающем потоке; startEvents не гарантирует синхронизацию. Один слушатель на клиент. close ждёт обработчик, который может закрыть свой клиент. awaitTermination вызывается извне.
+
+### Последние учётные данные и недоступность сервера
+
+Сначала выполняется запрос API. Успешный ответ заменяет сохранённые последние данные; старая версия не заменяет новую, срок истечения по времени отсутствует. Только тайм-аут, сетевой сбой или HTTP 5xx позволяют вернуть последний успешный результат того же селектора с признаком локального источника. Без прежнего значения возвращается исходная ошибка. SDK хранит данные в памяти клиента до обновления, отзыва или закрытия; clone и перезапуск начинают с пустого состояния. Agent использует защищённое локальное состояние. HTTP 401/403/404 или client_upgrade_required очищают данные SDK и вызывают ошибку; некорректный успешный ответ также ошибочен. Отзыв удаляет соответствующие данные, snapshot — данные вне разрешений. Изменение конфигурации сохраняет значения до проверки следующего snapshot. Agent применяет явный отзыв и сокращение области snapshot до HTTP-синхронизации, сохраняет эту область и блокирует соответствующую локальную выдачу даже при сбое сервера или после перезапуска. Ответ credential_not_found (HTTP 400) также удаляет сохранённые значения SDK. Прямой pull по account_id всегда требует ответа API; снимок push не подтверждает право на кешированное значение pull.
+
+- `credential.isFromLocal()`
+- `getCredential(key, false)` / `getCredentialByAccountId(accountId, false)`
+
+При управляемой подписке snapshot и credential.updated автоматически получают данные, заменяют локальное значение и вызывают обработчик. Ошибка обновления сохраняет прежнее значение и запускает повтор. Agent также получает данные по уведомлениям и сохраняет их при сбоях сервера. Для обновления и ручного переключения используйте вызовы с обязательным запросом API ниже. Сохранённое значение не считается новой полученной версией и не подтверждает ротацию автоматически.
+
+При простое ping отправляется каждые 10 секунд. Около 30 секунд без сообщений вызывают переподключение с задержкой 1–30 секунд и новой подписью. snapshot восстанавливает текущее состояние без воспроизведения истории.
+
+
+
 ## События и применение учётных данных
 
-Обрабатывайте начальный snapshot, снимки переподключения и credential.updated. Полный пример поддерживает subscription, alternating_rotation и команды. Реализуйте проверку реального подключения, переключение пула и освобождение прежних соединений. Заглушка вызывает исключение и запрещает подтверждение до применения. Удаляйте из кеша отсутствующие в снимках аккаунты и обрабатывайте отзыв доступа.
+Обрабатывайте начальный snapshot, снимки переподключения и credential.updated. Полный пример поддерживает subscription, alternating_rotation и команды. Реализуйте проверку реального подключения, переключение пула и освобождение прежних соединений. Заглушка вызывает исключение и запрещает подтверждение до применения. Удаляйте из состояния приложения отсутствующие в снимках аккаунты и обрабатывайте отзыв доступа.
 
 ```java
 package org.jumpserver.pam;
@@ -98,7 +197,7 @@ public final class EventsDemo {
     }
     if (!event.getEvent().equals("credential.switch.requested"))
       throw new IllegalArgumentException("Unsupported application command");
-    Credential credential = client.getCredential(event.getKey());
+    Credential credential = client.getCredential(event.getKey(), false);
     if (credential.getRevision() != event.getRevision()
         || !credential.getAccount().getId().equals(event.getAccountId()))
       throw new IllegalArgumentException("Requested account version is superseded");
@@ -135,10 +234,14 @@ public final class EventsDemo {
           for (Event update : updates) {
             Credential credential;
             if (update.getCredentialMode().equals("subscription")
-                && !update.getAccountId().isEmpty())
-              credential = client.getCredentialByAccountId(update.getAccountId());
+                && !update.getAccountId().isEmpty() && !update.getKey().isEmpty()) {
+              String key = update.getKey();
+              if (!key.endsWith(":" + update.getAccountId())) key += ":" + update.getAccountId();
+              credential = client.getCredential(key, false);
+            }
             else if (update.getCredentialMode().equals("alternating_rotation")
-                && !update.getKey().isEmpty()) credential = client.getCredential(update.getKey());
+                && !update.getKey().isEmpty())
+              credential = client.getCredential(update.getKey(), false);
             else continue;
             applyCredential(credential);
             if (update.getCredentialMode().equals("alternating_rotation"))
@@ -168,8 +271,11 @@ public final class EventsDemo {
 
 - `getCredential(key)`
 - `getCredentialByAccountId(accountId)`
+- `getCredential(key, false) / getCredentialByAccountId(accountId, false)`
 - `confirmCredential(key, revision, accountId)`
 - `watchCredentialEvents()`
+- `watchEvents(listener) / startEvents(listener)`
+- `EventSubscription.stop() / close() / awaitTermination()`
 - `listApplicationCommands()`
 - `reportApplicationCommandResult(commandId, status, errorCode)`
 - `executeApplicationCommand(event, handler)`
@@ -184,6 +290,74 @@ public final class EventsDemo {
 
 Все SDK используют протокол версии 1; конфигурация Agent — схему версии 1. Ответ client_upgrade_required (HTTP 426) требует проверки совместимости и обновления. Неизвестные необязательные поля и уведомления допустимы; неподдерживаемые политики нельзя применять или подтверждать. Квитанции отправляются автоматически и не доказывают применение учётных данных.
 
-## Подключение Linux Agent
+## Подключение Go Agent
 
-Синхронизация предназначена для реализаций Agent. Нужны идентификатор или source Agent и ID конфигурации; KnownRevision передаёт кешированные и доставленные версии. Установка Linux, выдача файлов и локальный API сейчас реализованы Python Agent, доступным приложениям на любом языке.
+Идентификация использует app_id, app_secret, org_id и стабильный instance_id; доступ определяется политиками приложения. Пути и действия задаются локально: state_file хранит последние пароли, event_file добавляет события без секретов, delivery задаёт вывод, rules — файлы, шаблоны и reload/restart либо фиксированные скрипты. После уведомления Agent получает и сохраняет актуальный пароль, атомарно заменяет файлы, затем выполняет действие. При сбое доставка повторяется. В rules используйте credentials[].key из get_accounts; ключ подписки включает ID аккаунта. Пустой rules записывает файл для каждого ключа.
+
+Локальные rules задают файлы, JSON/EnvironmentFile или доверенные шаблоны и действие systemd reload/restart либо фиксированный исполняемый файл. Скрипты получают JSON через stdin, используют фиксированные аргументы и таймаут и проверяют применение перед успешным завершением. Core не расширяет эти возможности. После изменения приватной конфигурации перезапустите Agent.
+
+Идентификация использует app_id, app_secret, org_id и стабильный instance_id; доступ определяется политиками приложения. Пути и действия задаются локально: state_file хранит последние пароли, event_file добавляет события без секретов, delivery задаёт вывод, rules — файлы, шаблоны и reload/restart либо фиксированные скрипты. После уведомления Agent получает и сохраняет актуальный пароль, атомарно заменяет файлы, затем выполняет действие. При сбое доставка повторяется. В rules используйте credentials[].key из get_accounts; ключ подписки включает ID аккаунта. Пустой rules записывает файл для каждого ключа.
+
+```json
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
+```
+
+`rules`:
+
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
+```
+
+`/etc/jms-pam-agent/orders-db.tmpl`:
+
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
+
+```bash
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
+```

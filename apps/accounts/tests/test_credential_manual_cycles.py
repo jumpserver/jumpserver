@@ -10,7 +10,7 @@ from accounts.credential_rotation.events import receive
 from accounts.credential_rotation.manual_cycles import start
 from accounts.credential_rotation.manager import CredentialRotationManager
 from accounts.models import (
-    ApplicationAudit, ApplicationCredential, AutomationExecution, ChangeSecretRecord, ClientAccessConfiguration,
+    ApplicationAudit, ApplicationCredential, AutomationExecution, ChangeSecretRecord,
     CredentialApplicationBinding, CredentialClientInstance, CredentialRotationEvent, IntegrationApplication,
 )
 from accounts.tests.base import CredentialTestCase
@@ -20,12 +20,8 @@ from common.exceptions import JMSException
 class CredentialManualCycleTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
-        self.configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='Manual cycle SDK', type='sdk',
-        )
-        self.configuration.credentials.add(self.credential)
         self.client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='manual-cycle-sdk', type='sdk', event_receipts_supported=True,
         )
         CredentialRotationEvent.objects.all().delete()
@@ -95,9 +91,7 @@ class CredentialManualCycleTests(CredentialTestCase):
             name='Restricted subscriber', accounts={'type': 'ids', 'ids': [str(self.primary.id)]},
         )
         CredentialApplicationBinding.objects.create(credential=self.credential, application=other)
-        config = ClientAccessConfiguration.objects.create(application=other, name='Restricted SDK', type='sdk')
-        config.credentials.add(self.credential)
-        client = CredentialClientInstance.objects.create(application=other, configuration=config, instance_id='restricted')
+        client = CredentialClientInstance.objects.create(application=other, instance_id='restricted')
         _, cycle_id = start(self.credential.id)
         for event in cycle_detail(self.credential, cycle_id)['events']:
             ids = {row['id'] for row in event['recipients']}

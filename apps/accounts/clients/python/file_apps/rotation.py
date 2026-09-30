@@ -19,7 +19,7 @@ KIND = "alternating_rotation"
 
 
 def update_credential(client, output, key, confirm=False):
-    response = client.get_credential(key=key)
+    response = client.get_credential(key=key, allow_local_fallback=False)
     current = load_local(output, KIND)
     existing = current["credentials"].get(key)
     if not existing or existing["revision"] < response.revision:

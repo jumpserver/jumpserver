@@ -43,6 +43,7 @@ class FileApplicationTests(unittest.TestCase):
             "credentials": [
                 {
                     "credential_mode": "subscription",
+                    "credential_key": "policy",
                     "account_id": "account-1",
                     "revision": 1,
                 },
@@ -51,6 +52,9 @@ class FileApplicationTests(unittest.TestCase):
         handle_subscription(client, self.output, snapshot)
         self.assertEqual(os.stat(self.output).st_mode & 0o777, 0o600)
         self.assertEqual(client.get_credential.call_count, 1)
+        client.get_credential.assert_called_with(
+            key="policy:account-1", allow_local_fallback=False
+        )
         handle_subscription(client, self.output, snapshot)
         self.assertEqual(client.get_credential.call_count, 1)
 
@@ -60,9 +64,13 @@ class FileApplicationTests(unittest.TestCase):
             {
                 "event": "credential.updated",
                 "credential_mode": "subscription",
+                "credential_key": "policy",
                 "account_id": "account-2",
                 "revision": 2,
             },
+        )
+        client.get_credential.assert_called_with(
+            key="policy:account-2", allow_local_fallback=False
         )
         self.assertEqual(
             set(load_local(self.output, "subscription")["credentials"]),

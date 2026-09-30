@@ -1,14 +1,14 @@
-from rest_framework.response import Response
-from rest_framework import status
-from django.db.models import Model
-from django.utils import translation
-
-from audits.const import ActionChoices
-from audits.handler import create_or_update_operate_log
 from accounts.const import AuditEvent
 from accounts.credential_client.audit import ApplicationAuditContext
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.models import CredentialClientInstance
+from audits.const import ActionChoices
+from audits.handler import create_or_update_operate_log
+from django.db.models import Model
+from django.utils import translation
+from rest_framework import status
+from rest_framework.response import Response
+
 from common.utils import get_request_ip
 
 
@@ -48,7 +48,7 @@ class ApplicationAuditMixin:
         if context is not None:
             context.set_request_data(data)
         return CredentialClientManager(
-            self.request.user, data.get('configuration_id'), data.get('instance_id', ''),
+            self.request.user, instance_id=data.get('instance_id', ''),
             audit_context=context,
             client_type=('agent' if self.request.headers.get('X-Source') == 'jms-pam-agent' else 'sdk'),
         )
@@ -60,20 +60,18 @@ class ApplicationAuditMixin:
             context = self.start_audit(event, client=user)
             application = user.application
             client_type = user.type
-            configuration_id = str(user.configuration_id)
             instance_id = user.instance_id
         else:
             context = self.start_audit(event, application=user)
             application = user
             client_type = 'agent' if self.request.headers.get('X-Source') == 'jms-pam-agent' else 'sdk'
-            configuration_id = params.get('configuration_id', '')
             instance_id = params.get('instance_id', '')
 
         if track_fetch:
             # An SDK instance created by a failed first fetch is rolled back; its PK is not stable.
             context.fetch_identity = [
                 str(application.org_id), str(application.id), client_type,
-                configuration_id, instance_id, params.get('key', ''),
+                instance_id, params.get('key', ''),
                 params.get('account_id', ''), get_request_ip(self.request),
             ]
         return context

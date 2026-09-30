@@ -1,13 +1,16 @@
 from datetime import timedelta
+from uuid import UUID
 
 from django.db.models import Count, Max, Q
 from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from accounts.const import ApplicationEvent, WebhookRequestMethod
 from accounts.models import ApplicationWebhook, CredentialClientInstance, IntegrationApplication
+from accounts.models.application import MAX_APPLICATION_PULL_ACCOUNTS, empty_application_accounts
 from accounts.webhooks import (
     WebhookValidationError, mask_webhook_url, validate_webhook_headers,
     validate_webhook_template, validate_webhook_url,
@@ -19,7 +22,10 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
 class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
-    accounts = JSONManyToManyField(label=_('Account'))
+    accounts = JSONManyToManyField(
+        label=_('Account'), required=False,
+        allow_empty_ids=True,
+    )
     ip_group = serializers.ListField(
         default=['*'], label=_('Access IP'), help_text=ip_group_help_text,
         child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
@@ -42,6 +48,12 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
             'logo': {'required': False},
         }
 
+    def set_fields_default_value(self):
+        super().set_fields_default_value()
+        # Omitted accounts must preserve an existing scope on full updates.
+        # The model default already gives new applications an empty scope.
+        self.fields['accounts'].default = empty
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if not data.get('logo'):
@@ -53,6 +65,26 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         instance.refresh_secret()
         return instance
 
+    @staticmethod
+    def validate_accounts(value):
+        value = value or empty_application_accounts()
+        if value.get('type') != 'ids':
+            raise serializers.ValidationError(_(
+                'Select specific accounts for application pull access.'
+            ))
+        try:
+            ids = [str(UUID(str(account_id))) for account_id in value['ids']]
+        except (TypeError, ValueError, AttributeError) as exc:
+            raise serializers.ValidationError(_('Invalid account ID.')) from exc
+        if len(ids) > MAX_APPLICATION_PULL_ACCOUNTS:
+            raise serializers.ValidationError(_(
+                'An application can be authorized for at most 10 accounts.'
+            ))
+        if len(set(ids)) != len(ids):
+            raise serializers.ValidationError(_('Duplicate accounts are not allowed.'))
+        value['ids'] = ids
+        return value
+
 
 class IntegrationApplicationDetailSerializer(IntegrationApplicationSerializer):
     access_readiness = serializers.SerializerMethodField()
@@ -62,15 +94,11 @@ class IntegrationApplicationDetailSerializer(IntegrationApplicationSerializer):
 
     @staticmethod
     def get_access_readiness(instance):
-        configurations = list(
-            instance.access_configurations.filter(is_active=True)
-            .prefetch_related('credentials')
-        )
+        credentials = list(instance.application_credentials.all())
         allowed_ids = set(instance.get_accounts().values_list('id', flat=True))
         required_ids = {
             account_id
-            for configuration in configurations
-            for credential in configuration.credentials.all()
+            for credential in credentials
             for account_id in (credential.account_id, credential.alternate_account_id)
             if account_id
         }
@@ -78,28 +106,22 @@ class IntegrationApplicationDetailSerializer(IntegrationApplicationSerializer):
             application=instance,
         ).aggregate(
             instances_amount=Count('id', distinct=True),
-            active_instances_amount=Count('id', filter=Q(configuration__is_active=True, is_active=True), distinct=True),
+            active_instances_amount=Count('id', filter=Q(is_active=True), distinct=True),
             online_instances_amount=Count(
                 'id', filter=Q(
                     date_last_seen__gte=timezone.now() - timedelta(minutes=2),
-                    configuration__is_active=True, is_active=True, application__is_active=True,
+                    is_active=True, application__is_active=True,
                 ), distinct=True,
             ),
             last_fetched=Max('credential_statuses__date_fetched'),
         )
-        first_configuration = configurations[0] if configurations else None
         return {
             'authorized_accounts_amount': len(allowed_ids),
-            'active_configurations_amount': len(configurations),
             'missing_authorized_accounts_amount': len(required_ids - allowed_ids),
             'instances_amount': clients['instances_amount'],
             'active_instances_amount': clients['active_instances_amount'],
             'online_instances_amount': clients['online_instances_amount'],
             'last_fetched': clients['last_fetched'],
-            'configuration': (
-                {'id': first_configuration.id, 'name': first_configuration.name}
-                if first_configuration else None
-            ),
         }
 
 

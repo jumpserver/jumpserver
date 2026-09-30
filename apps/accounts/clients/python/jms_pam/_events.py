@@ -9,6 +9,8 @@ from typing import Any, Callable, Iterator, Optional
 import websocket
 
 logger = logging.getLogger(__name__)
+PING_INTERVAL = 10
+LIVENESS_TIMEOUT = 30
 
 
 class EventStream:
@@ -57,15 +59,18 @@ class EventStream:
                     if self._stopped(stop_event):
                         return
                     connection.settimeout(min(self.timeout, 1))
-                    next_ping = 0
+                    last_message = monotonic()
+                    next_ping = last_message + PING_INTERVAL
                     while not self._stopped(stop_event):
                         try:
                             payload = connection.recv()
                         except websocket.WebSocketTimeoutException:
                             now = monotonic()
+                            if now - last_message >= LIVENESS_TIMEOUT:
+                                raise websocket.WebSocketTimeoutException()
                             if now >= next_ping:
                                 connection.send(json.dumps({"event": "ping"}))
-                                next_ping = now + 10
+                                next_ping = now + PING_INTERVAL
                             continue
                         if not payload:
                             break
@@ -76,6 +81,7 @@ class EventStream:
                             raise ValueError("Invalid credential event message")
                         # Reset only after a valid message, not an immediately closed connection.
                         delay = 1
+                        last_message = monotonic()
                         if event["event"] == "pong":
                             continue
                         if event["event"] != "snapshot" and event.get("event_id"):

@@ -43,7 +43,7 @@ Pour 401, vérifiez AK/SK, organisation, heure de l’hôte et URL signée. Pour
 
 ## Accès aux politiques d’identifiants
 
-Les détails de signature et le tableau du protocole ci-dessous servent de référence pour le diagnostic. Utilisez les méthodes du SDK pour les politiques d’identifiants, ou Python Agent via des fichiers JSON, EnvironmentFile ou Unix Socket.
+Les détails de signature et le tableau du protocole ci-dessous servent de référence pour le diagnostic. Utilisez les méthodes du SDK pour les politiques d’identifiants, ou Go jms-pam-agent via des fichiers JSON, EnvironmentFile ou Unix Socket.
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

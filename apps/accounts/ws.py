@@ -2,22 +2,22 @@ import asyncio
 from io import BytesIO
 from urllib.parse import parse_qs
 
-from channels.db import database_sync_to_async
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.core.handlers.asgi import ASGIRequest
-from django.utils import timezone
-
 from accounts.api.account.credential import (
     CredentialClientApplicationAgentAuthentication,
     CredentialClientServiceAuthentication,
 )
 from accounts.const import AuditEvent
 from accounts.credential_client.audit import record
-from accounts.credential_client.events import configuration_group
+from accounts.credential_client.events import application_group
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.models import CredentialClientInstance
-from common.utils import get_logger
+from channels.db import database_sync_to_async
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.core.handlers.asgi import ASGIRequest
+from django.utils import timezone
 from orgs.utils import tmp_to_org
+
+from common.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -59,8 +59,7 @@ class CredentialClientAuthMiddleware:
                     return None
                 manager = CredentialClientManager(
                     user,
-                    (params.get('configuration_id') or [''])[0],
-                    (params.get('instance_id') or [''])[0],
+                    instance_id=(params.get('instance_id') or [''])[0],
                     client_type=client_type,
                 )
                 manager.update_client_metadata(
@@ -92,7 +91,7 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         if not self.client:
             await self.close(code=4401)
             return
-        self.group = configuration_group(self.client.configuration_id)
+        self.group = application_group(self.client.application_id)
         await self.channel_layer.group_add(self.group, self.channel_name)
         await self.accept()
         await self.touch(AuditEvent.CREDENTIAL_STREAM_CONNECTED)
@@ -137,27 +136,30 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def snapshot(self):
         with tmp_to_org(self.org_id):
-            configuration = self.client.configuration
-            credentials = configuration.credentials.filter(
+            credentials = self.client.application.application_credentials.filter(
                 is_active=True,
-                applications=configuration.application,
             ).order_by('key')
             items = []
+            subscribed_accounts = set()
             for credential in credentials:
                 if credential.mode == credential.Mode.subscription:
-                    accounts = configuration.application.get_accounts().order_by('id')
+                    accounts = self.client.application.get_accounts().order_by('id')
                     if not credential.subscription_all_authorized:
                         accounts = accounts.filter(
                             id__in=credential.subscription_accounts.values('id')
                         )
-                    items.extend({
-                        'key': credential.account_key(account.id),
-                        'account_id': str(account.id),
-                        'credential_mode': credential.mode,
-                        'revision': account.version,
-                    } for account in accounts)
+                    for account in accounts:
+                        if account.id in subscribed_accounts:
+                            continue
+                        subscribed_accounts.add(account.id)
+                        items.append({
+                            'key': credential.account_key(account.id),
+                            'account_id': str(account.id),
+                            'credential_mode': credential.mode,
+                            'revision': account.version,
+                        })
                 elif credential.authorized_applications().filter(
-                    id=configuration.application_id,
+                    id=self.client.application_id,
                 ).exists():
                     items.append({
                         'key': credential.key,
@@ -181,7 +183,9 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         try:
             with tmp_to_org(self.org_id):
                 if not receive(self.client.id, self.org_id, event_id):
-                    from accounts.credential_client.commands import receive as receive_command
+                    from accounts.credential_client.commands import (
+                        receive as receive_command,
+                    )
                     receive_command(self.client, event_id)
         except Exception:
             logger.warning('Cannot record event receipt for client %s.', self.client.id)

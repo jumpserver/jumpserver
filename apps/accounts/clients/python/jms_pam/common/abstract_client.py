@@ -25,7 +25,6 @@ class AbstractClient(Client):
             app_secret=cred.AppSecret,
             instance_id=instance_id,
             org_id=profile.OrgId,
-            configuration_id=profile.ConfigurationId,
             timeout=profile.Timeout,
             source=profile.Source,
         )
@@ -59,14 +58,6 @@ class AbstractClient(Client):
     @org_id.setter
     def org_id(self, value):
         self.profile.OrgId = value
-
-    @property
-    def configuration_id(self):
-        return self.profile.ConfigurationId
-
-    @configuration_id.setter
-    def configuration_id(self, value):
-        self.profile.ConfigurationId = value
 
     @property
     def timeout(self):

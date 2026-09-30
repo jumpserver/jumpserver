@@ -122,7 +122,7 @@ class AgentSyncRequest(AbstractModel):
 class AgentSyncResponse(AbstractModel):
     _fields = {
         "ConfigDigest": ("config_digest", None),
-        "Configuration": ("configuration", None),
+        "Scope": ("scope", None),
         "Credentials": ("credentials", [CredentialRevision]),
         "RemovedKeys": ("removed_keys", None),
         "DateLastSynced": ("date_last_synced", None),

@@ -9,7 +9,7 @@ This SDK follows the Python credential-policy SDK. It retrieves authorized accou
 
 ## Configure and run
 
-Install the source SDK and use the configuration below. Authorize accounts and bind policies in Application Management; obtain the application AK/SK and organization ID from its access materials. Replace placeholders and keep identity material in deployment secrets. Use a stable, unique instance ID for each replica. Fetch with exactly one selector: account ID or policy key.
+Install the source SDK and use the configuration below. Authorize accounts for pull in Application Management; bind policies only when push or rotation is needed. Obtain the application AK/SK and organization ID from its access materials. Replace placeholders and keep identity material in deployment secrets. Use a stable, unique instance ID for each replica. Fetch with exactly one selector: account ID or policy key.
 
 ```bash
 cd apps/accounts/clients/node
@@ -68,9 +68,86 @@ if (require.main === module)
   })
 ```
 
+## Event handlers
+
+Initialize local account or pool state, then explicitly start listening. Python and Node.js use subclass hooks, Go uses EventHandlers, and Java uses CredentialEventListener. The example deliberately fails until real connection switching is implemented. The existing iterator/callback API remains available.
+
+```javascript
+'use strict'
+const { Client } = require('./index')
+
+class MyClient extends Client {
+  constructor(options) {
+    super(options)
+    this.credentials = new Map()
+    this.modes = new Map()
+  }
+  async onEvent(event) {
+    if (event.event === 'snapshot') {
+      this.modes.clear()
+      for (const update of event.credentials || [])
+        this.modes.set(update.credentialKey || update.key, update.credentialMode)
+      for (const key of this.credentials.keys())
+        if (!this.modes.has(key)) this.credentials.delete(key) // Also release connections.
+    } else if (event.event === 'credential.updated') {
+      this.modes.set(event.credentialKey || event.key, event.credentialMode)
+    }
+    // Use executeApplicationCommand for command events; see events.js.
+  }
+  async onCredentialChanged(credential, { signal }) {
+    await this.applyCredential(credential, { signal })
+    if (this.modes.get(credential.key) === 'alternating_rotation')
+      await this.confirmCredential({ key: credential.key, revision: credential.revision,
+        accountId: credential.account.id, signal })
+    this.credentials.set(credential.key, credential)
+  }
+  async applyCredential(credential, { signal }) {
+    throw new Error('Implement connection validation, pool switching and old connection cleanup')
+  }
+  async onCredentialRevoked(event) {
+    this.credentials.delete(event.credentialKey || event.key) // Also release affected connections.
+  }
+}
+
+async function main() {
+  const client = new MyClient({ endpoint: process.env.JMS_ENDPOINT, appId: process.env.JMS_APP_ID,
+    appSecret: process.env.JMS_APP_SECRET, instanceId: process.env.JMS_INSTANCE_ID, orgId: process.env.JMS_ORG_ID })
+  const stop = () => client.close()
+  process.once('SIGINT', stop); process.once('SIGTERM', stop)
+  try { await client.watchEvents() }
+  finally {
+    client.close(); await client.stopEvents()
+    process.removeListener('SIGINT', stop); process.removeListener('SIGTERM', stop)
+  }
+}
+if (require.main === module) main().catch((error) => {
+  console.error(error.code || error.name); process.exitCode = 1
+})
+module.exports = { MyClient }
+```
+
+Initial and reconnect snapshots and credential.updated fetch by policy mode and invoke one serial credential handler. A reader and a bounded queue of 128 events separate reception from business work; a full queue applies backpressure. Fetch or credential-handler failures retry at 1–30 seconds with exponential backoff, fetching again each time. New updates replace pending retries for the same selector; snapshots reset retry scope, and revocation/configuration changes cancel pending retries. Make handlers idempotent. Raw-event and revocation hooks report errors without automatic retries; command events still require the command claim API. A received receipt means read; the SDK never automatically confirms rotation. Older revision events do not cancel a pending refresh for a newer revision.
+
+`watchEvents({signal})` / `startEvents({signal})`; `stopEvents()` / `await subscription.stop()` / `await subscription.done`
+
+watchEvents awaits completion without blocking the event loop; startEvents returns before initial synchronization is complete. One managed listener is allowed per client. Async hooks are awaited serially and receive an AbortSignal. close requests cancellation synchronously; externally await subscription.stop() or done to join. A hook may await stopEvents, but must not await its own done. clone returns a new base Client.
+
+### Latest credentials and backend outages
+
+Credential getters always request the API first. A successful fetch replaces the retained latest credential; older revisions never overwrite a newer one. The retained value has no time expiry. Only a timeout, network failure or HTTP 5xx may return this value for the same selector, marked as coming from local state. Without a previously fetched value, the original error is raised. SDK values stay in the current client’s memory until replacement, revocation or close; clones and process restarts start empty. The Agent retains its latest credentials in its existing protected local state. HTTP 401/403/404 or client_upgrade_required clear SDK retained values and raise; malformed successful responses also raise. Explicit revocations remove affected credentials, and snapshots remove push entries outside the subscribed scope. A configuration notification retains existing values until the following snapshot reconciles scope. The Agent applies explicit revocation and reduced snapshot scope before HTTP synchronization, persists the reduced scope, and blocks affected local reads even during a backend outage or after restart. A credential_not_found response (HTTP 400) also clears retained SDK values. Direct account_id pull always requires a live API response; push snapshots do not authorize cached pull values.
+
+- `credential.fromLocal`
+- `getCredential({key, allowLocalFallback: false})` / `getCredential({accountId, allowLocalFallback: false})`
+
+With managed event listening enabled, snapshot and credential.updated automatically fetch the current credential, replace the retained value and then invoke the business hook. A failed refresh leaves the previous value in place and retries. The Agent also refetches on update notifications and retains its previous credentials during backend outages. Refresh and manual switching use the live-only calls below; a retained password must not be treated as a newly fetched revision or automatically confirmed.
+
+Event connections send application ping messages at 10-second intervals while idle and reconnect after approximately 30 seconds without messages. Reconnect uses 1–30 second exponential backoff and fresh signatures. Reconnect snapshots restore current state; past events are not replayed.
+
+
+
 ## Events and credential application
 
-Process initial/reconnect snapshots and credential.updated. The complete event example below handles subscription and alternating_rotation, plus application commands. Replace the credential-application hook: validate a real connection, switch the pool and release old connections. The placeholder throws so an unapplied revision cannot be confirmed. Reconcile removed accounts in snapshots and revocation events in the application cache.
+Process initial/reconnect snapshots and credential.updated. The complete event example below handles subscription and alternating_rotation, plus application commands. Replace the credential-application hook: validate a real connection, switch the pool and release old connections. The placeholder throws so an unapplied revision cannot be confirmed. Reconcile removed accounts in snapshots and revocation events in the application state.
 
 ```javascript
 'use strict'
@@ -87,7 +164,7 @@ async function handleCommand(client, event) {
   if (event.event === 'application.restart.requested') return restartApplication()
   if (event.event !== 'credential.switch.requested')
     throw new Error('Unsupported application command')
-  const credential = await client.getCredential({ key: event.credentialKey })
+  const credential = await client.getCredential({ key: event.credentialKey, allowLocalFallback: false })
   if (credential.revision !== event.revision || credential.account.id !== event.accountId)
     throw new Error('Requested account version is superseded')
   await applyCredential(credential)
@@ -129,10 +206,12 @@ async function main() {
         const mode = update.credentialMode
         const key = update.credentialKey || update.key
         let credential
-        if (mode === 'subscription' && update.accountId)
-          credential = await client.getCredential({ accountId: update.accountId })
+        if (mode === 'subscription' && update.accountId && key) {
+          const subscriptionKey = key.endsWith(`:${update.accountId}`) ? key : `${key}:${update.accountId}`
+          credential = await client.getCredential({ key: subscriptionKey, allowLocalFallback: false })
+        }
         else if (mode === 'alternating_rotation' && key)
-          credential = await client.getCredential({ key })
+          credential = await client.getCredential({ key, allowLocalFallback: false })
         else continue
         await applyCredential(credential)
         if (mode === 'alternating_rotation')
@@ -166,8 +245,11 @@ Polling, command claiming and outcome reporting are SDK methods. Execute a handl
 
 - `getCredential({key})`
 - `getCredential({accountId})`
+- `getCredential({key, allowLocalFallback: false})`
 - `confirmCredential({key, revision, accountId})`
 - `watchCredentialEvents({signal})`
+- `watchEvents({signal}) / startEvents({signal}) / stopEvents()`
+- `EventSubscription.stop() / done`
 - `listApplicationCommands()`
 - `reportApplicationCommandResult({commandId, status, errorCode})`
 - `executeApplicationCommand(event, handler)`
@@ -182,6 +264,74 @@ HTTP, network, authentication and response decoding failures use the SDK excepti
 
 All SDKs use protocol version 1; Agent configuration uses schema version 1. A client_upgrade_required response (HTTP 426) requires checking compatibility and upgrading. Unknown optional fields and notification events are tolerated; unsupported policy modes must not be applied or confirmed. Received event receipts are sent automatically and do not prove credential application.
 
-## Linux Agent integration
+## Go Agent integration
 
-Agent synchronization is exposed for Agent implementations. It requires Agent identity/source and a configuration ID, and accepts cached and delivered KnownRevision values. Linux installation, file delivery and local API are currently provided by the Python Agent; applications of any language can use that Agent.
+Agent identity uses app_id, app_secret, org_id and a stable instance_id. Application authorization controls pull; policy bindings control push. All file paths and service actions are local: state_file retains the latest passwords, event_file appends metadata without secrets, delivery selects default output, and rules configure files, templates and reload/restart or fixed scripts. On an update notification the Agent fetches the current password, persists it, atomically replaces output files, then runs the configured action. Failed delivery is retried. Use credentials[].key from get_accounts in rules; subscription push keys are account:<account-id>, independent of the selecting policy. Empty rules write one file per key by default.
+
+Local rules configure target files, JSON/EnvironmentFile rendering or trusted templates, and an optional systemd reload/restart or fixed executable. Scripts receive credential JSON on stdin, use fixed arguments, have a bounded timeout and must validate their application before returning success. Core cannot add script paths or expand local capabilities. Restart the Agent after editing its private configuration.
+
+Agent identity uses app_id, app_secret, org_id and a stable instance_id. Application authorization controls pull; policy bindings control push. All file paths and service actions are local: state_file retains the latest passwords, event_file appends metadata without secrets, delivery selects default output, and rules configure files, templates and reload/restart or fixed scripts. On an update notification the Agent fetches the current password, persists it, atomically replaces output files, then runs the configured action. Failed delivery is retried. Use credentials[].key from get_accounts in rules; subscription push keys are account:<account-id>, independent of the selecting policy. Empty rules write one file per key by default.
+
+```json
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
+```
+
+`rules`:
+
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
+```
+
+`/etc/jms-pam-agent/orders-db.tmpl`:
+
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
+
+```bash
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
+```

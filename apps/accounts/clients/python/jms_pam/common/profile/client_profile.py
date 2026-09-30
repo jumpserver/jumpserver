@@ -6,7 +6,6 @@ class ClientProfile:
         self,
         endpoint="",
         org_id=DEFAULT_ORG_ID,
-        configuration_id=None,
         timeout=10,
         source="jms-pam",
     ):
@@ -14,6 +13,5 @@ class ClientProfile:
             raise ValueError("endpoint is required")
         self.Endpoint = endpoint.rstrip("/")
         self.OrgId = org_id
-        self.ConfigurationId = configuration_id
         self.Timeout = timeout
         self.Source = source

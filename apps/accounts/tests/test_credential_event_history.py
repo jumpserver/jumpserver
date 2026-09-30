@@ -9,19 +9,15 @@ from accounts.credential_client.events import enqueue
 from accounts.credential_rotation.events import receive, timeline
 from accounts.credential_rotation.history import directory, client_history
 from accounts.credential_rotation.manager import CredentialRotationManager
-from accounts.models import ClientAccessConfiguration, CredentialClientInstance
+from accounts.models import CredentialClientInstance
 from accounts.tests.base import CredentialTestCase
 
 
 class CredentialEventHistoryTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
-        self.configuration = ClientAccessConfiguration.objects.create(
-            application=self.application, name='History SDK', type='sdk',
-        )
-        self.configuration.credentials.add(self.credential)
         self.client = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='history-client', type='sdk', event_receipts_supported=True,
         )
         manager = CredentialRotationManager(self.credential.id)
@@ -66,7 +62,7 @@ class CredentialEventHistoryTests(CredentialTestCase):
         receive(self.client.id, self.org.id, audit.id)
         before = client_history(self.credential, self.client.id, 30, 0)
         self.assertEqual(before['latest_event']['event'], 'credential.change.started')
-        self.configuration.credentials.remove(self.credential)
+        self.credential.applications.remove(self.application)
         result = client_history(self.credential, self.client.id, 30, 0)
         self.assertEqual(result['count'], before['count'] + 1)
         self.assertEqual(result['results'][0]['event'], 'credential.revoked')
@@ -77,7 +73,7 @@ class CredentialEventHistoryTests(CredentialTestCase):
 
     def test_new_client_has_empty_history_without_inheriting_earlier_events(self):
         late = CredentialClientInstance.objects.create(
-            application=self.application, configuration=self.configuration,
+            application=self.application,
             instance_id='late-agent', type='agent',
         )
         result = client_history(self.credential, late.id, 30, 0)
@@ -95,7 +91,7 @@ class CredentialEventHistoryTests(CredentialTestCase):
         with transaction.atomic():
             response = view(self.request('get', '/event-history/', {'client_id': str(uuid4())}), pk=self.credential.id)
         self.assertEqual(response.status_code, 404)
-        response = view(self.request('get', '/event-history/', {'client_search': 'History SDK', 'limit': 1}), pk=self.credential.id)
+        response = view(self.request('get', '/event-history/', {'client_search': 'history-client', 'limit': 1}), pk=self.credential.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(len(response.data['results']), 1)

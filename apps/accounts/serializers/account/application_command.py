@@ -21,7 +21,6 @@ class ApplicationCommandSerializer(serializers.Serializer):
 
 
 class ApplicationCommandPollSerializer(serializers.Serializer):
-    configuration_id = serializers.UUIDField(required=False)
     instance_id = serializers.CharField(max_length=128, required=False)
 
 

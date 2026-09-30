@@ -53,6 +53,8 @@ public final class EventStream implements Iterable<Event>, AutoCloseable {
             break;
           }
           while (!closed.get() && !listener.disconnected.await(10, TimeUnit.SECONDS)) {
+            if (System.nanoTime() - listener.lastMessage >= TimeUnit.SECONDS.toNanos(30))
+              throw new java.util.concurrent.TimeoutException("Event connection timed out");
             connection
                 .sendText("{\"event\":\"ping\"}", true)
                 .get(timeout.toMillis(), TimeUnit.MILLISECONDS);
@@ -84,6 +86,7 @@ public final class EventStream implements Iterable<Event>, AutoCloseable {
   }
 
   private final class Listener implements WebSocket.Listener {
+    private volatile long lastMessage = System.nanoTime();
     private final StringBuilder message = new StringBuilder();
     private final CountDownLatch disconnected = new CountDownLatch(1);
 
@@ -103,6 +106,7 @@ public final class EventStream implements Iterable<Event>, AutoCloseable {
           message.setLength(0);
           String name = Models.string(data, "event");
           validMessage = true;
+          lastMessage = System.nanoTime();
           if (!name.equals("pong")) {
             if (!name.equals("snapshot")
                 && data.path("event_id").isTextual()
@@ -116,6 +120,7 @@ public final class EventStream implements Iterable<Event>, AutoCloseable {
                   .exceptionally(error -> null);
             }
             Event event = new Event(data);
+            client.reconcileLatestCredentials(event);
             while (!closed.get() && !events.offer(event, 100, TimeUnit.MILLISECONDS)) {}
           }
         }
@@ -173,6 +178,15 @@ public final class EventStream implements Iterable<Event>, AutoCloseable {
         return event;
       }
     };
+  }
+
+  Event poll(long timeoutMillis) throws InterruptedException {
+    Object value = events.poll(timeoutMillis, TimeUnit.MILLISECONDS);
+    return value instanceof Event ? (Event) value : null;
+  }
+
+  boolean isClosed() {
+    return closed.get();
   }
 
   @Override

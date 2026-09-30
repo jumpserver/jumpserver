@@ -3,7 +3,6 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 
 import websocket
-
 from accounts.clients.python.jms_pam.common.credential import Credential
 from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
 from accounts.clients.python.jms_pam.credential.v1 import credential_client
@@ -13,7 +12,7 @@ class CredentialSDKReceiptTests(TestCase):
     def setUp(self):
         self.client = credential_client.CredentialClient(
             Credential('application', 'test-secret'), 'instance',
-            ClientProfile(endpoint='https://testserver', configuration_id='configuration'),
+            ClientProfile(endpoint='https://testserver'),
         )
         self.addCleanup(self.client.close)
 
@@ -66,7 +65,8 @@ class CredentialSDKReceiptTests(TestCase):
             json.dumps({'event': 'pong'}),
             json.dumps({'event': 'credential.updated', 'event_id': 'event-id'}),
         ]
-        with patch.object(credential_client.websocket, 'create_connection', return_value=connection):
+        with patch.object(credential_client.websocket, 'create_connection', return_value=connection), \
+                patch('accounts.clients.python.jms_pam._events.monotonic', side_effect=[0, 10, 10, 10]):
             stream = self.client.WatchCredentialEvents()
             try:
                 self.assertEqual(next(stream)['event'], 'credential.updated')

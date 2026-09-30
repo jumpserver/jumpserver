@@ -3,7 +3,7 @@ from accounts.models import ApplicationCredential, CredentialClientInstance, Cre
 from .events import subscription_events
 
 
-IDENTITY_FIELDS = ('id', 'instance_id', 'type', 'application', 'configuration', 'supports_receipts')
+IDENTITY_FIELDS = ('id', 'instance_id', 'type', 'application', 'supports_receipts')
 
 
 def events_for(credential):
@@ -29,7 +29,6 @@ def client_data(client):
     return {
         'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
         'application': {'id': str(client.application_id), 'name': client.application.name},
-        'configuration': {'id': str(client.configuration_id), 'name': client.configuration.name},
         'supports_receipts': client.event_receipts_supported,
         'is_active': client.is_valid, 'online': bool(client.is_valid and client.online),
     }
@@ -52,13 +51,13 @@ def directory(credential, search='', client_type='', state=''):
             ):
                 row['latest_received_event'] = event_data(event, recipient)
     live = CredentialClientInstance.objects.filter(
-        configuration__credentials=credential, application__credential_bindings__credential=credential,
+        application__credential_bindings__credential=credential,
         org_id=credential.org_id,
-    ).select_related('application', 'configuration').distinct()
+    ).select_related('application').distinct()
     # Keep removed bindings/instances in history, but show their current state when still present.
     historical = CredentialClientInstance.objects.filter(
         id__in=rows, org_id=credential.org_id,
-    ).select_related('application', 'configuration')
+    ).select_related('application')
     for client in list(historical) + list(live):
         row = rows.setdefault(str(client.id), {'latest_event': None, 'latest_received_event': None})
         row.update(client_data(client))
@@ -66,7 +65,7 @@ def directory(credential, search='', client_type='', state=''):
     result = []
     for row in rows.values():
         if search and not any(search in value.casefold() for value in (
-            row['instance_id'], row['application']['name'], row['configuration']['name'],
+            row['instance_id'], row['application']['name'],
         )):
             continue
         if client_type and row['type'] != client_type:
@@ -79,7 +78,7 @@ def directory(credential, search='', client_type='', state=''):
             continue
         result.append(row)
     return sorted(result, key=lambda row: (
-        row['application']['name'], row['configuration']['name'], row['instance_id'], row['id'],
+        row['application']['name'], row['type'], row['instance_id'], row['id'],
     ))
 
 
@@ -95,9 +94,9 @@ def client_history(credential, client_id, limit, offset):
     clients = CredentialClientInstance.objects.filter(id=client_id, org_id=credential.org_id)
     if not latest:
         clients = clients.filter(
-            configuration__credentials=credential, application__credential_bindings__credential=credential,
+            application__credential_bindings__credential=credential,
         )
-    client = clients.select_related('application', 'configuration').first()
+    client = clients.select_related('application').first()
     if not latest and not client:
         from rest_framework.exceptions import NotFound
         raise NotFound()

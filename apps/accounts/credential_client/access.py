@@ -1,88 +1,111 @@
-"""Application-owned access materials and automatic client subscription scopes."""
-import hashlib
+"""Application-owned access materials and policy scope notifications."""
 import json
-import shlex
+from shlex import quote
+from uuid import uuid4
 
-from django.db import transaction
+from accounts.const import ApplicationEvent, AuditEvent
 from django.template.loader import render_to_string
-from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import PermissionDenied
 
-from accounts.models import ClientAccessConfiguration
-from accounts.const import AuditEvent, ApplicationEvent
-from accounts.credential_rotation.participants import enroll_client
 from .audit import record
+from .documentation import SDK_INSTALL_COMMANDS, sdk_example
 from .events import enqueue
 
-AUTOMATIC_SCOPE_PREFIX = 'application-access-'
 
-
-@transaction.atomic
-def refresh_application_scopes(application):
-    credentials = list(application.application_credentials.order_by('id'))
-    for scope in application.access_configurations.filter(name__startswith=AUTOMATIC_SCOPE_PREFIX):
-        if set(scope.credentials.values_list('id', flat=True)) == {item.id for item in credentials}:
-            continue
-        scope.credentials.set(credentials)
-        if scope.is_active and application.is_active:
-            for client in scope.instances.filter(is_active=True):
-                enroll_client(client)
-        enqueue(
-            record(AuditEvent.CONFIGURATION_UPDATED, configuration=scope),
-            ApplicationEvent.CONFIGURATION_UPDATED,
-        )
-
-
-@transaction.atomic
-def subscription_scope(application, access_type='sdk', **settings):
-    if not application.is_active:
-        raise PermissionDenied(_('The application is disabled.'))
-    payload = {'type': access_type, **settings}
-    digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:24]
-    # The scope stores deployment settings; policies always follow application bindings.
-    scope, _created = ClientAccessConfiguration.objects.get_or_create(
-        application=application, name=f'{AUTOMATIC_SCOPE_PREFIX}{access_type}-{digest}',
-        defaults={'type': access_type, **settings, 'org_id': application.org_id},
+def publish_application_scope(application):
+    enqueue(
+        record(AuditEvent.CONFIGURATION_UPDATED, application=application),
+        ApplicationEvent.CONFIGURATION_UPDATED,
     )
-    if not scope.is_active:
-        raise PermissionDenied(_('The client access configuration is disabled.'))
-    scope.credentials.set(application.application_credentials.order_by('id'))
-    return scope
 
 
 def materials(application, params, endpoint):
     if params['type'] == 'sdk':
-        config = render_to_string('accounts/credential_client/sdk_config.py.tpl', {
-            'endpoint': repr(endpoint), 'app_id': repr(str(application.id)),
-            'app_secret': repr(application.secret), 'org_id': repr(str(application.org_id)),
-        })
+        instance_id = uuid4().hex
+        language = params.get('sdk_language', 'python')
+        if language == 'python':
+            config = render_to_string('accounts/credential_client/sdk_config.py.tpl', {
+                'endpoint': repr(endpoint), 'app_id': repr(str(application.id)),
+                'app_secret': repr(application.secret), 'org_id': repr(str(application.org_id)),
+                'instance_id': repr(instance_id),
+            })
+            filename = 'jms_pam_config.py'
+            code = render_to_string('accounts/credential_client/sdk_application_example.py.tpl')
+        else:
+            values = {
+                'JMS_ENDPOINT': endpoint, 'JMS_APP_ID': str(application.id),
+                'JMS_APP_SECRET': application.secret, 'JMS_ORG_ID': str(application.org_id),
+            }
+            config = (
+                '# Reuse this file to keep the instance ID stable. Set JMS_INSTANCE_ID to override it.\n'
+                + '\n'.join(f'export {name}={quote(value)}' for name, value in values.items()) + '\n'
+                + f'export JMS_INSTANCE_ID="${{JMS_INSTANCE_ID:-{instance_id}}}"\n'
+            )
+            filename = 'jms_pam_config.sh'
+            code = sdk_example(language)
+            if language == 'node':
+                code = code.replace("require('./index')", "require('@jumpserver/pam')")
+        install_command = SDK_INSTALL_COMMANDS[language]
+        if language == 'python':
+            install_command = f'chmod 0600 {filename}\n{install_command}'
+        else:
+            install_command = f'chmod 0600 {filename}\n. ./{filename}\n{install_command}'
         return {
-            'type': 'sdk', 'config': config, 'filename': 'jms_pam_config.py',
-            'code': render_to_string('accounts/credential_client/sdk_application_example.py.tpl'),
-            'install_command': 'python3 -m pip install --upgrade jms-pam',
+            'type': 'sdk', 'sdk_language': language,
+            'instance_id': instance_id,
+            'config': config, 'filename': filename, 'code': code,
+            'install_command': install_command,
         }
     settings = {name: params[name] for name in (
         'app_user', 'install_path', 'delivery_mode', 'systemd_unit', 'systemd_action',
     )}
-    scope = subscription_scope(application, 'agent', **settings)
+    install_path = settings['install_path'].rstrip('/')
     bootstrap = {
         'endpoint': endpoint, 'org_id': str(application.org_id),
         'app_id': str(application.id), 'app_secret': application.secret,
-        'configuration_id': str(scope.id),
-        'app_user': scope.app_user, 'install_path': scope.install_path,
+        'instance_id': '<instance-id>',
+        'state_file': '/var/lib/jms-pam-agent/state.json',
+        'event_file': '/var/lib/jms-pam-agent/events.jsonl',
+        'reconcile_interval': 300,
+        'delivery': {
+            'delivery_mode': settings['delivery_mode'],
+            'delivery_root': f'{install_path}/credentials',
+            'socket_path': '/run/jms-pam-agent/agent.sock',
+            'app_user': settings['app_user'],
+            'systemd_unit': settings['systemd_unit'],
+            'systemd_action': settings['systemd_action'],
+        },
+        'rules': [],
     }
-    root = scope.install_path.rstrip('/')
     filename = 'jms_pam_agent.json'
-    preparation = (
-        f'sudo python3 -m venv {shlex.quote(root + "/venv")} && '
-        f'sudo {shlex.quote(root + "/venv/bin/pip")} install --upgrade jms-pam'
-    )
+    preparation = 'sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
     installation = (
-        f'sudo {shlex.quote(root + "/venv/bin/jms-pam-agent")} install '
+        f'chmod 0600 {filename} && '
+        'sudo /usr/local/bin/jms-pam-agent install '
         f'--bootstrap {filename} --instance-id "$(hostname)"'
     )
+    foreground_unix = foreground_windows = ''
+    if settings['delivery_mode'] != 'environment':
+        short_id = str(application.id).replace('-', '')[:12]
+        directory = f'$HOME/.jms-pam-agent/{short_id}'
+        foreground_unix = (
+            f'# Initialize once\nchmod 0600 {filename}\n'
+            f'./jms-pam-agent init-local --bootstrap ./{filename} '
+            f'--directory "{directory}" --instance-id "$(hostname)"\n'
+            f'# Start or restart\n./jms-pam-agent run --local --config "{directory}/agent.json"'
+        )
+        foreground_windows = (
+            f"$agentDir = Join-Path $HOME '.jms-pam-agent\\{short_id}'\n"
+            '# Initialize once\n'
+            f".\\jms-pam-agent.exe init-local --bootstrap (Join-Path $PWD '{filename}') "
+            '--directory $agentDir --instance-id $env:COMPUTERNAME\n'
+            '# Start or restart\n'
+            ".\\jms-pam-agent.exe run --local --config (Join-Path $agentDir 'agent.json')"
+        )
     return {
         'type': 'agent', 'config': json.dumps(bootstrap, indent=2), 'filename': filename,
         'preparation_command': preparation, 'registration_command': installation,
         'install_command': f'{preparation} && {installation}',
+        'foreground_unix_command': foreground_unix,
+        'foreground_windows_command': foreground_windows,
+        'service_name': 'jms-pam-agent', 'agent_language': 'go',
     }

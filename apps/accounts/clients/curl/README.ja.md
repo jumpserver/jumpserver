@@ -43,7 +43,7 @@ id はアプリケーションの識別子で、アカウントのリビジョ�
 
 ## 認証情報ポリシーへの接続
 
-以下の署名とプロトコル表は診断用の参考資料です。認証情報ポリシーは SDK メソッドで扱うか、Python Agent の JSON ファイル、EnvironmentFile、Unix Socket を使用してください。
+以下の署名とプロトコル表は診断用の参考資料です。認証情報ポリシーは SDK メソッドで扱うか、Go jms-pam-agent の JSON ファイル、EnvironmentFile、Unix Socket を使用してください。
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

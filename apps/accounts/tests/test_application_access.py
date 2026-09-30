@@ -1,39 +1,53 @@
 import json
 from datetime import timedelta
 from email.utils import formatdate
+from shlex import split
 from unittest.mock import patch
 from urllib.parse import urlsplit
+from uuid import uuid4
 
 import requests
-from asgiref.sync import async_to_sync
-from channels.testing import WebsocketCommunicator
-from channels.db import database_sync_to_async
-from django.db import transaction
-from django.test import TransactionTestCase, override_settings
-from django.utils import timezone
-from rest_framework.permissions import AllowAny
-
 from accounts.api.account.application import IntegrationApplicationViewSet
 from accounts.api.account.credential import (
-    ApplicationCredentialViewSet, CredentialClientInstanceViewSet, CredentialClientViewSet,
+    ApplicationCredentialViewSet,
+    CredentialClientInstanceViewSet,
+    CredentialClientViewSet,
 )
-from accounts.credential_client.access import materials, subscription_scope
-from accounts.credential_client.manager import CredentialClientManager
 from accounts.clients.python.jms_pam.common.abstract_client import HTTPSignatureAuth
 from accounts.clients.python.jms_pam.common.credential import Credential
 from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.clients.python.jms_pam.credential.v1.credential_client import CredentialClient
-from accounts.models import (
-    ApplicationCredential, ClientAccessConfiguration, CredentialApplicationBinding,
-    CredentialClientInstance, IntegrationApplication,
+from accounts.clients.python.jms_pam.credential.v1.credential_client import (
+    CredentialClient,
 )
-from accounts.serializers.account.credential import CredentialAccessWizardSerializer
-from accounts.serializers.account.credential import ApplicationCredentialSerializer
-from accounts.tests.base import CredentialTestCase
+from accounts.credential_client.access import materials
+from accounts.credential_client.documentation import sdk_example
+from accounts.credential_client.manager import CredentialClientManager
+from accounts.models import (
+    Account,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    CredentialClientInstance,
+    IntegrationApplication,
+)
+from accounts.serializers.account.credential import (
+    ApplicationCredentialSerializer,
+    CredentialAccessWizardSerializer,
+)
+from accounts.serializers.account.service import IntegrationApplicationSerializer
 from accounts.tests import test_credential_event_stream as stream_tests
+from accounts.tests.base import CredentialTestCase
 from accounts.ws import CredentialClientAuthMiddleware, CredentialEventConsumer
+from asgiref.sync import async_to_sync
+from assets.models import Asset
+from channels.db import database_sync_to_async
+from channels.testing import WebsocketCommunicator
+from django.db import transaction
+from django.test import TransactionTestCase, override_settings
+from django.utils import timezone
 from orgs.models import Organization
 from orgs.utils import set_to_root_org, tmp_to_org
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import AllowAny
 
 
 class ApplicationAccessTests(CredentialTestCase):
@@ -47,7 +61,7 @@ class ApplicationAccessTests(CredentialTestCase):
 
     def signed_request(self, action, params, source='jms-pam', identity=None, secret=None, schema=None):
         method = 'POST' if action == 'sync_agent' else 'GET'
-        path = 'agent/sync' if action == 'sync_agent' else 'credential'
+        path = {'sync_agent': 'agent/sync', 'accounts': 'accounts'}.get(action, 'credential')
         prepared = requests.Request(
             method, f'http://testserver/api/v1/accounts/credential-client/{path}/',
             params=params if method == 'GET' else None,
@@ -73,10 +87,64 @@ class ApplicationAccessTests(CredentialTestCase):
     def test_sdk_materials_require_no_configuration_and_create_no_instance(self):
         data = materials(self.application, self.parameters(), 'http://testserver')
         compile(data['config'], data['filename'], 'exec')
+        compile(data['code'], 'application_example.py', 'exec')
+        self.assertEqual(data['sdk_language'], 'python')
+        self.assertIn('pip install /path/to/jumpserver/apps/accounts/clients/python', data['install_command'])
+        self.assertNotIn('pip install --upgrade jms-pam', data['install_command'])
+        self.assertIn('instance_id=instance_id', data['code'])
+        self.assertRegex(data['instance_id'], r'^[0-9a-f]{32}$')
+        config_globals = {}
+        exec(data['config'], config_globals)
+        self.assertEqual(config_globals['instance_id'], data['instance_id'])
+        reused_config = {}
+        exec(data['config'], reused_config)
+        self.assertEqual(reused_config['instance_id'], data['instance_id'])
+        generated_again = materials(self.application, self.parameters(), 'http://testserver')
+        self.assertNotEqual(generated_again['instance_id'], data['instance_id'])
+        with patch.dict('os.environ', {'JMS_INSTANCE_ID': 'explicit-instance'}):
+            overridden = {}
+            exec(data['config'], overridden)
+        self.assertEqual(overridden['instance_id'], 'explicit-instance')
         self.assertNotIn('credential_ids', data['config'])
-        self.assertNotIn('configuration_id', data['config'])
-        self.assertEqual(ClientAccessConfiguration.objects.count(), 0)
         self.assertEqual(CredentialClientInstance.objects.count(), 0)
+
+    def test_sdk_wizard_generates_language_specific_identity_and_example(self):
+        for language in ('go', 'java', 'node'):
+            with self.subTest(language=language):
+                data = materials(
+                    self.application, self.parameters(sdk_language=language),
+                    'http://testserver',
+                )
+                self.assertEqual(data['sdk_language'], language)
+                self.assertEqual(data['filename'], 'jms_pam_config.sh')
+                exports = {
+                    name.removeprefix('export '): split(value)[0]
+                    for name, value in (
+                        line.split('=', 1) for line in data['config'].splitlines()
+                        if line.startswith('export ') and not line.startswith('export JMS_INSTANCE_ID=')
+                    )
+                }
+                self.assertEqual(exports['JMS_APP_ID'], str(self.application.id))
+                self.assertEqual(exports['JMS_APP_SECRET'], self.application.secret)
+                self.assertRegex(data['instance_id'], r'^[0-9a-f]{32}$')
+                self.assertIn(
+                    f'export JMS_INSTANCE_ID="${{JMS_INSTANCE_ID:-{data["instance_id"]}}}"',
+                    data['config'],
+                )
+                self.assertIn('. ./jms_pam_config.sh', data['install_command'])
+                expected_code = sdk_example(language)
+                if language == 'node':
+                    expected_code = expected_code.replace("require('./index')", "require('@jumpserver/pam')")
+                self.assertEqual(data['code'], expected_code)
+                self.assertFalse(CredentialClientInstance.objects.exists())
+
+    def test_sdk_wizard_rejects_unsupported_language(self):
+        serializer = CredentialAccessWizardSerializer(
+            data={'type': 'sdk', 'sdk_language': 'curl'},
+            context={'application': self.application},
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('sdk_language', serializer.errors)
 
     def test_signed_sdk_registers_automatically_and_reuses_instance(self):
         params = {
@@ -86,7 +154,6 @@ class ApplicationAccessTests(CredentialTestCase):
             response = self.signed_request('credential', params)
             self.assertEqual(response.status_code, 200, response.data)
             self.assertEqual(response.data['account']['secret'], self.primary.secret)
-        self.assertEqual(ClientAccessConfiguration.objects.count(), 1)
         self.assertEqual(CredentialClientInstance.objects.count(), 1)
 
         client = CredentialClientInstance.objects.get()
@@ -98,26 +165,25 @@ class ApplicationAccessTests(CredentialTestCase):
 
     def test_api_binding_update_changes_existing_scope_without_new_client(self):
         manager = CredentialClientManager(self.application, instance_id='sdk')
-        legacy = ClientAccessConfiguration.objects.create(application=self.application, name='Legacy SDK', type='sdk')
-        legacy.credentials.add(self.credential)
         replacement = IntegrationApplication.objects.create(name='Replacement application', accounts=self.application.accounts.value)
         serializer = ApplicationCredentialSerializer(
             self.credential, data={'applications': [str(replacement.id)]}, partial=True,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        self.assertFalse(manager.configuration.credentials.exists())
-        self.assertFalse(legacy.credentials.exists())
+        self.assertFalse(manager.application.application_credentials.exists())
+        with self.assertRaises(PermissionDenied):
+            manager._get_credential(self.credential.key)
         self.assertEqual(CredentialClientInstance.objects.count(), 1)
 
     def test_automatic_scope_follows_all_application_bindings(self):
         manager = CredentialClientManager(self.application, instance_id='sdk')
         other = ApplicationCredential.objects.create(name='New policy', mode='subscription')
-        self.assertNotIn(other, manager.configuration.credentials.all())
+        self.assertNotIn(other, manager.application.application_credentials.all())
         binding = CredentialApplicationBinding.objects.create(credential=other, application=self.application)
-        self.assertSetEqual(set(manager.configuration.credentials.all()), {self.credential, other})
+        self.assertSetEqual(set(manager.application.application_credentials.all()), {self.credential, other})
         binding.delete()
-        self.assertEqual(list(manager.configuration.credentials.all()), [self.credential])
+        self.assertEqual(list(manager.application.application_credentials.all()), [self.credential])
         self.assertEqual(CredentialClientInstance.objects.count(), 1)
 
     def test_automatic_scope_does_not_grant_unbound_policy_access(self):
@@ -125,49 +191,155 @@ class ApplicationAccessTests(CredentialTestCase):
         response = self.signed_request('credential', {'key': other.key, 'instance_id': 'sdk'})
         self.assertEqual(response.status_code, 403)
 
+    def test_pull_access_does_not_require_a_push_policy(self):
+        self.application.credential_bindings.all().delete()
+        response = self.signed_request('credential', {
+            'account_id': str(self.backup.id), 'instance_id': 'pull-only',
+        })
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['key'], f'account:{self.backup.id}')
+        self.assertEqual(response.data['account']['secret'], self.backup.secret)
+        self.assertEqual(response.data['revision'], self.backup.version)
+
+        response = self.signed_request('accounts', {
+            'instance_id': 'pull-only', 'limit': 1, 'offset': 1,
+        })
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(len(response.data['accounts']), 1)
+        self.assertEqual(response.data['accounts'][0]['credentials'], [])
+        self.assertNotIn('secret', response.data['accounts'][0])
+
+    def test_pull_rejects_accounts_outside_application_authorization(self):
+        self.application.accounts = {'type': 'ids', 'ids': [str(self.primary.id)]}
+        self.application.save(update_fields=['accounts'])
+        response = self.signed_request('credential', {
+            'account_id': str(self.backup.id), 'instance_id': 'restricted-pull',
+        })
+        self.assertEqual(response.status_code, 403)
+
+    def test_new_application_has_no_implicit_pull_access(self):
+        application = IntegrationApplication.objects.create(name='Empty pull scope')
+        self.assertEqual(application.accounts.value, {'type': 'ids', 'ids': []})
+        self.assertFalse(application.get_accounts().exists())
+
+        serializer = IntegrationApplicationSerializer(data={'name': 'API empty pull scope'})
+        serializer.is_valid(raise_exception=True)
+        created = serializer.save()
+        self.assertEqual(created.accounts.value, {'type': 'ids', 'ids': []})
+        self.assertFalse(created.get_accounts().exists())
+
+        serializer = IntegrationApplicationSerializer(data={
+            'name': 'Explicit empty pull scope', 'accounts': {'type': 'ids', 'ids': []},
+        })
+        serializer.is_valid(raise_exception=True)
+        self.assertFalse(serializer.save().get_accounts().exists())
+
+    def test_application_pull_scope_requires_at_most_ten_explicit_accounts(self):
+        rejected_scopes = [
+            {'type': 'all'},
+            {'type': 'attrs', 'attrs': [{'name': 'name', 'match': 'exact', 'value': 'admin'}]},
+            {'type': 'ids', 'ids': [str(uuid4()) for _ in range(11)]},
+            {'type': 'ids', 'ids': [str(self.primary.id)] * 2},
+        ]
+        for scope in rejected_scopes:
+            with self.subTest(scope=scope):
+                serializer = IntegrationApplicationSerializer(data={
+                    'name': 'Restricted pull scope', 'accounts': scope,
+                })
+                self.assertFalse(serializer.is_valid())
+                self.assertIn('accounts', serializer.errors)
+
+        serializer = IntegrationApplicationSerializer(data={
+            'name': 'Ten account pull scope',
+            'accounts': {'type': 'ids', 'ids': [str(uuid4()) for _ in range(10)]},
+        })
+        serializer.is_valid(raise_exception=True)
+
+    def test_existing_all_scope_is_preserved_when_other_fields_change(self):
+        self.application.accounts = {'type': 'all'}
+        self.application.save(update_fields=['accounts'])
+        serializer = IntegrationApplicationSerializer(
+            self.application, data={'name': 'Renamed application'},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        self.assertEqual(self.application.accounts.value, {'type': 'all'})
+
+    def test_all_pull_scope_stays_within_application_organization(self):
+        other_org = Organization.objects.create(name='Other pull scope org')
+        with tmp_to_org(other_org):
+            other_asset = Asset.objects.create(
+                name='other-pull-asset', address='127.0.0.2', platform=self.platform,
+            )
+            other_account = Account.objects.create(
+                name='other-pull-account', username='other', asset=other_asset,
+                secret='other-secret',
+            )
+        self.application.accounts = {'type': 'all'}
+        self.application.save(update_fields=['accounts'])
+        with tmp_to_org(Organization.root()):
+            ids = set(self.application.get_accounts().values_list('id', flat=True))
+            self.assertSetEqual(ids, {self.primary.id, self.backup.id})
+            self.assertIsNone(self.application.get_account(account_id=other_account.id))
+
     def test_wizard_allows_application_without_policy_bindings(self):
         self.application.credential_bindings.all().delete()
         data = materials(self.application, self.parameters(), 'http://testserver')
         self.assertEqual(data['type'], 'sdk')
         manager = CredentialClientManager(self.application, instance_id='sdk')
-        self.assertFalse(manager.configuration.credentials.exists())
+        self.assertFalse(manager.application.application_credentials.exists())
 
-    def test_agent_materials_use_application_credentials_and_reuse_scope(self):
+    def test_agent_materials_use_local_delivery_without_creating_scope(self):
         params = self.parameters(type='agent', app_user='app')
         first = materials(self.application, params, 'http://testserver')
         second = materials(self.application, params, 'http://testserver')
         self.assertEqual(first, second)
         bootstrap = json.loads(first['config'])
+        self.assertEqual(bootstrap['instance_id'], '<instance-id>')
+        self.assertIn('--instance-id "$(hostname)"', first['install_command'])
         self.assertEqual(bootstrap['app_id'], str(self.application.id))
         self.assertEqual(bootstrap['app_secret'], self.application.secret)
         self.assertIn('--bootstrap jms_pam_agent.json', first['install_command'])
         self.assertNotIn('--token', first['install_command'])
-        self.assertEqual(ClientAccessConfiguration.objects.count(), 1)
+        self.assertNotIn('python', first['install_command'])
+        self.assertNotIn('/venv/', first['install_command'])
+        self.assertEqual(first['service_name'], 'jms-pam-agent')
+        self.assertEqual(first['agent_language'], 'go')
+        self.assertIn('init-local', first['foreground_unix_command'])
+        self.assertIn('run --local --config', first['foreground_unix_command'])
+        self.assertIn('init-local', first['foreground_windows_command'])
+        self.assertIn('run --local --config', first['foreground_windows_command'])
+        self.assertIn('$env:COMPUTERNAME', first['foreground_windows_command'])
         self.assertFalse(CredentialClientInstance.objects.exists())
         changed = self.parameters(type='agent', app_user='other')
-        self.assertNotEqual(json.loads(materials(self.application, changed, 'http://testserver')['config'])['configuration_id'], bootstrap['configuration_id'])
+        self.assertIn('event_file', bootstrap)
+        self.assertEqual(bootstrap['rules'], [])
+        self.assertEqual(json.loads(materials(self.application, changed, 'http://testserver')['config'])['delivery']['app_user'], 'other')
+        environment = self.parameters(
+            type='agent', app_user='app', delivery_mode='environment',
+            systemd_unit='app.service',
+        )
+        self.assertFalse(materials(self.application, environment, 'http://testserver')['foreground_windows_command'])
 
     def test_agent_application_signature_syncs_and_sdk_cannot_use_agent_scope(self):
-        scope = subscription_scope(self.application, 'agent', app_user='app')
-        params = {'configuration_id': str(scope.id), 'instance_id': 'application-agent', 'credentials': []}
+        params = {'instance_id': 'application-agent', 'credentials': []}
         response = self.signed_request('sync_agent', params, 'jms-pam-agent')
         self.assertEqual(response.status_code, 200, response.data)
-        self.assertEqual(response.data['configuration']['credential_keys'], [self.credential.key])
+        self.assertEqual(response.data['scope']['credential_keys'], [self.credential.key])
         self.assertEqual(CredentialClientInstance.objects.get().type, 'agent')
         response = self.signed_request('credential', {**params, 'key': self.credential.key})
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(CredentialClientInstance.objects.count(), 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(CredentialClientInstance.objects.count(), 2)
 
-    def test_legacy_agent_signature_remains_supported(self):
-        scope = subscription_scope(self.application, 'agent', app_user='app')
-        client = CredentialClientInstance.objects.create(application=self.application, configuration=scope, instance_id='legacy', type='agent', secret='legacy-secret')
+    def test_legacy_agent_signature_is_rejected(self):
+        client = CredentialClientInstance.objects.create(application=self.application, instance_id='legacy', type='agent', secret='legacy-secret')
         response = self.signed_request('sync_agent', {}, 'jms-pam-agent', identity=str(client.id), secret=client.secret)
-        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.status_code, 401, response.data)
         self.assertEqual(CredentialClientInstance.objects.count(), 1)
 
     def test_wrong_agent_secret_and_old_schema_do_not_register_instance(self):
-        scope = subscription_scope(self.application, 'agent', app_user='app')
-        params = {'configuration_id': str(scope.id), 'instance_id': 'bad-agent'}
+        params = {'instance_id': 'bad-agent'}
         self.assertEqual(self.signed_request('sync_agent', params, 'jms-pam-agent', secret='wrong').status_code, 401)
         self.assertEqual(self.signed_request('sync_agent', params, 'jms-pam-agent', schema='0').status_code, 426)
         self.assertFalse(CredentialClientInstance.objects.exists())
@@ -178,22 +350,28 @@ class ApplicationAccessTests(CredentialTestCase):
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response['Cache-Control'], 'no-store')
         self.assertEqual(response.data['filename'], 'jms_pam_config.py')
+        self.assertRegex(response.data['instance_id'], r'^[0-9a-f]{32}$')
+        self.assertIn(response.data['instance_id'], response.data['config'])
+        request = self.request('post', '/', {'type': 'sdk', 'sdk_language': 'go'})
+        response = IntegrationApplicationViewSet.as_view({'post': 'access_materials'}, permission_classes=[AllowAny])(request, pk=self.application.id)
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['sdk_language'], 'go')
+        self.assertEqual(response.data['filename'], 'jms_pam_config.sh')
+        self.assertRegex(response.data['instance_id'], r'^[0-9a-f]{32}$')
+        self.assertIn(response.data['instance_id'], response.data['config'])
+        self.assertEqual(response['Cache-Control'], 'no-store')
 
     def test_policy_application_counts_include_unfetched_instances_and_zero_connections(self):
         empty = IntegrationApplication.objects.create(name='No connections')
         CredentialApplicationBinding.objects.create(credential=self.credential, application=empty)
-        scope = subscription_scope(self.application)
         for name, active, last_seen in (
             ('online', True, timezone.now()),
             ('offline', True, timezone.now() - timedelta(minutes=3)),
             ('disabled', False, timezone.now()),
         ):
-            CredentialClientInstance.objects.create(application=self.application, configuration=scope, instance_id=name, type='sdk', is_active=active, date_last_seen=last_seen)
+            CredentialClientInstance.objects.create(application=self.application, instance_id=name, type='sdk', is_active=active, date_last_seen=last_seen)
         other = ApplicationCredential.objects.create(name='Other policy', mode='subscription')
         CredentialApplicationBinding.objects.create(credential=other, application=self.application)
-        unrelated = ClientAccessConfiguration.objects.create(application=self.application, name='Legacy other policy', type='sdk')
-        unrelated.credentials.add(other)
-        CredentialClientInstance.objects.create(application=self.application, configuration=unrelated, instance_id='unrelated', type='sdk', date_last_seen=timezone.now())
         response = ApplicationCredentialViewSet.as_view({'get': 'access_applications'})(self.request('get', '/'), pk=self.credential.id)
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data['applications_amount'], 2)
@@ -204,15 +382,14 @@ class ApplicationAccessTests(CredentialTestCase):
         self.assertEqual(response.data['count'], 3)
         self.assertIn(str(self.credential.id), {str(item['id']) for item in response.data['results'][0]['credentials']})
         response = IntegrationApplicationViewSet.as_view({'get': 'retrieve'})(self.request('get', '/'), pk=self.application.id)
-        self.assertEqual(response.data['access_readiness']['instances_amount'], 4)
-        self.assertEqual(response.data['access_readiness']['online_instances_amount'], 2)
+        self.assertEqual(response.data['access_readiness']['instances_amount'], 3)
+        self.assertEqual(response.data['access_readiness']['online_instances_amount'], 1)
 
 
 @override_settings(CHANNEL_LAYERS={'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'}})
 class ApplicationAccessStreamTests(TransactionTestCase):
     def setUp(self):
         stream_tests.CredentialEventStreamTests.setUp(self)
-        self.configuration.delete()
 
     def tearDown(self):
         set_to_root_org()
@@ -223,11 +400,10 @@ class ApplicationAccessStreamTests(TransactionTestCase):
         Organization.expire_orgs_mapping()
         set_to_root_org()
 
-    async def connect(self, source='jms-pam', configuration_id=None, schema=None, after_connect=None):
+    async def connect(self, source='jms-pam', schema=None, after_connect=None):
         sdk = CredentialClient(
             Credential(str(self.application.id), self.application.secret), 'automatic-stream',
-            ClientProfile(endpoint='http://testserver', org_id=str(self.org.id), source=source,
-                          configuration_id=configuration_id),
+            ClientProfile(endpoint='http://testserver', org_id=str(self.org.id), source=source),
         )
         if schema is not None:
             prepared = requests.Request('GET', sdk._event_stream_url().replace('ws://', 'http://'), headers={
@@ -255,7 +431,7 @@ class ApplicationAccessStreamTests(TransactionTestCase):
         client = CredentialClientInstance.objects.get()
         self.assertEqual(client.type, 'sdk')
         self.assertTrue(client.online)
-        self.assertEqual(list(client.configuration.credentials.all()), [self.credential])
+        self.assertEqual(list(client.application.application_credentials.all()), [self.credential])
 
     def test_existing_websocket_receives_new_bindings_and_revocations(self):
         @database_sync_to_async
@@ -269,11 +445,12 @@ class ApplicationAccessStreamTests(TransactionTestCase):
                     self.application.credential_bindings.filter(credential__name='New bound policy').delete()
 
         async def observe(communicator):
-            for added, expected in ((True, 2), (False, 1)):
+            for added, expected in ((True, 1), (False, 1)):
                 await bind(added)
                 for _ in range(8):
                     event = await communicator.receive_json_from()
                     if event['event'] == 'snapshot' and len(event['credentials']) == expected:
+                        self.assertEqual(event['credentials'][0]['key'], f'account:{self.account.id}')
                         break
                 else:
                     self.fail('Application binding did not update the live snapshot')
@@ -282,11 +459,9 @@ class ApplicationAccessStreamTests(TransactionTestCase):
         self.assertEqual(CredentialClientInstance.objects.count(), 1)
 
     def test_agent_websocket_authenticates_with_application_ak_sk(self):
-        scope = subscription_scope(self.application, 'agent', app_user='app')
-        self.assertTrue(async_to_sync(self.connect)('jms-pam-agent', str(scope.id))[0])
+        self.assertTrue(async_to_sync(self.connect)('jms-pam-agent')[0])
         self.assertEqual(CredentialClientInstance.objects.get().type, 'agent')
 
     def test_invalid_agent_schema_rejects_connection_without_creating_instance(self):
-        scope = subscription_scope(self.application, 'agent', app_user='app')
-        self.assertEqual(async_to_sync(self.connect)('jms-pam-agent', str(scope.id), '0'), (False, 4401))
+        self.assertEqual(async_to_sync(self.connect)('jms-pam-agent', schema='0'), (False, 4401))
         self.assertFalse(CredentialClientInstance.objects.exists())

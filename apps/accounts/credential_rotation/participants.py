@@ -8,7 +8,7 @@ from django.db.models import Max
 
 from accounts.const import AuditEvent
 from accounts.models import (
-    ApplicationAudit, ApplicationCredential, ClientAccessConfiguration, CredentialApplicationBinding,
+    ApplicationAudit, ApplicationCredential, CredentialApplicationBinding,
     CredentialClientStatus,
 )
 
@@ -43,10 +43,8 @@ def _account(account):
 def _participant(state, joined_during_rotation=False):
     client = state.client
     application = state.binding.application
-    configuration = client.configuration
     return {
         'application': {'id': str(application.id), 'name': application.name},
-        'configuration': {'id': str(configuration.id), 'name': configuration.name},
         'client': {
             'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
             'supports_receipts': client.event_receipts_supported,
@@ -103,7 +101,7 @@ def ensure_participant(credential, state):
 @transaction.atomic
 def enroll_client(client):
     credentials = ApplicationCredential.objects.select_for_update().filter(
-        access_configurations=client.configuration,
+        applications=client.application,
     ).exclude(status=ApplicationCredential.Status.idle).order_by('id')
     for credential in credentials:
         binding = CredentialApplicationBinding.objects.filter(
@@ -208,19 +206,15 @@ def _state(credential, rotation, participant, state, now):
 
 def _warnings(credential):
     warnings = []
-    configurations = ClientAccessConfiguration.objects.filter(
-        credentials=credential, is_active=True, application__is_active=True,
-    ).select_related('application').distinct()
-    for configuration in configurations:
-        if configuration.instances.filter(is_active=True).exists():
+    for application in credential.applications.filter(is_active=True):
+        if application.credential_clients.filter(is_active=True).exists():
             continue
         warnings.append({
             'code': 'no_active_instance',
             'application': {
-                'id': str(configuration.application_id),
-                'name': configuration.application.name,
+                'id': str(application.id),
+                'name': application.name,
             },
-            'configuration': {'id': str(configuration.id), 'name': configuration.name},
         })
     return warnings
 
@@ -284,7 +278,6 @@ def _legacy_instances(credential, rotation):
         switched = bool(target_access and (not source_access or target_access > source_access))
         instances.append({
             'application': {'id': app['id'], 'name': app['name']},
-            'configuration': {'id': '', 'name': 'API'},
             'client': {'id': f"api:{app['id']}", 'instance_id': 'API', 'type': 'api'},
             'status': 'switched' if switched else 'using_source',
             'applied_account': _account(desired if switched else source),
@@ -308,7 +301,7 @@ def build(credential, rotation=None, now=None):
         binding__credential=credential,
         client_id__in=[item['client']['id'] for item in participants],
     ).select_related(
-        'binding__application', 'client__configuration', 'applied_account',
+        'binding__application', 'applied_account',
     )
     by_client = {str(state.client_id): state for state in states}
     instances = [

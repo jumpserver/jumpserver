@@ -139,12 +139,30 @@ public final class Models {
     private final long revision;
     private final Asset asset;
     private final Account account;
+    private final boolean fromLocal;
 
     Credential(JsonNode value) {
       key = string(value, "key");
       revision = revision(value);
       asset = new Asset(value.get("asset"));
       account = new Account(value.get("account"));
+      fromLocal = false;
+    }
+
+    private Credential(Credential value) {
+      key = value.key;
+      revision = value.revision;
+      asset = value.asset;
+      account = value.account;
+      fromLocal = true;
+    }
+
+    Credential localCopy() {
+      return new Credential(this);
+    }
+
+    public boolean isFromLocal() {
+      return fromLocal;
     }
 
     public String getKey() {
@@ -240,7 +258,7 @@ public final class Models {
     private final String configDigest, dateLastSynced;
     private final List<CredentialRevision> credentials;
     private final List<String> removedKeys;
-    private final Map<String, Object> configuration;
+    private final Map<String, Object> scope;
 
     AgentSync(JsonNode value, ObjectMapper mapper) {
       configDigest = string(value, "config_digest");
@@ -262,8 +280,8 @@ public final class Models {
         removed.add(key.asText());
       }
       removedKeys = Collections.unmodifiableList(removed);
-      JsonNode config = value.get("configuration");
-      configuration =
+      JsonNode config = value.get("scope");
+      scope =
           config == null || config.isNull()
               ? null
               : Collections.unmodifiableMap(
@@ -286,8 +304,8 @@ public final class Models {
       return removedKeys;
     }
 
-    public Map<String, Object> getConfiguration() {
-      return configuration;
+    public Map<String, Object> getScope() {
+      return scope;
     }
   }
 

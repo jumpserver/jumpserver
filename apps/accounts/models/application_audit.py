@@ -15,8 +15,6 @@ class ApplicationAudit(JMSOrgBaseModel):
     credential_key = models.CharField(max_length=64, blank=True)
     account = models.CharField(max_length=128, blank=True)
     account_id = models.UUIDField(null=True)
-    configuration = models.CharField(max_length=128, blank=True)
-    configuration_id = models.UUIDField(null=True)
     instance_id = models.CharField(max_length=128, blank=True)
     source = models.CharField(max_length=16, default=AuditSource.JUMPSERVER)
     operator = models.CharField(max_length=128, blank=True)

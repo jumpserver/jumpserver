@@ -43,7 +43,7 @@ Với 401, kiểm tra AK/SK, tổ chức, giờ máy chủ và URL đã ký. V�
 
 ## Tích hợp chính sách thông tin xác thực
 
-Chi tiết chữ ký và bảng giao thức dưới đây dùng để chẩn đoán. Dùng phương thức SDK cho chính sách thông tin xác thực hoặc Python Agent qua tệp JSON, EnvironmentFile hay Unix Socket.
+Chi tiết chữ ký và bảng giao thức dưới đây dùng để chẩn đoán. Dùng phương thức SDK cho chính sách thông tin xác thực hoặc Go jms-pam-agent qua tệp JSON, EnvironmentFile hay Unix Socket.
 
 | HTTP | API | JSON / query |
 | --- | --- | --- |

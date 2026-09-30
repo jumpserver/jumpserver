@@ -2,6 +2,12 @@
 from datetime import timedelta
 from uuid import UUID
 
+from accounts.const import ApplicationCommandEvent, AuditEvent
+from accounts.models import (
+    ApplicationCommand,
+    ApplicationCredential,
+    CredentialClientInstance,
+)
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db import transaction
@@ -9,11 +15,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
-from accounts.const import ApplicationCommandEvent, AuditEvent
-from accounts.models import ApplicationCommand, ApplicationCredential, CredentialClientInstance
 from common.utils import get_logger
+
 from .audit import record
-from .events import configuration_group
+from .events import application_group
 
 SWITCH = ApplicationCommandEvent.ACCOUNT_SWITCH_REQUESTED
 RESTART = ApplicationCommandEvent.APPLICATION_RESTART_REQUESTED
@@ -24,15 +29,11 @@ logger = get_logger(__name__)
 def clients_for(application):
     return CredentialClientInstance.objects.filter(
         application=application, org_id=application.org_id, is_active=True,
-        configuration__is_active=True, configuration__org_id=application.org_id,
-    ).select_related('configuration').order_by('instance_id', 'id')
+    ).order_by('instance_id', 'id')
 
 
 def restart_supported(client):
-    config = client.configuration
-    return client.type == 'sdk' or (
-        config.delivery_mode == 'environment' and config.systemd_unit and config.systemd_action == 'restart'
-    )
+    return client.type == 'sdk' or (client.type == 'agent' and client.restart_supported)
 
 
 def credentials_for(application):
@@ -50,7 +51,7 @@ def options(application):
             'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
             'online': bool(client.date_last_seen and client.date_last_seen >= timezone.now() - timedelta(minutes=2)),
             'restart_supported': bool(restart_supported(client)),
-            'credential_ids': [str(value) for value in client.configuration.credentials.values_list('id', flat=True)],
+            'credential_ids': [str(value) for value in application.application_credentials.values_list('id', flat=True)],
         } for client in clients],
         'credentials': [{
             'id': str(credential.id), 'name': credential.name, 'key': credential.key,
@@ -110,8 +111,6 @@ def send(application, data, operator):
             raise PermissionDenied(_('Select an authorized account rotation policy for this application.'))
         if credential.status == 'changing_secret':
             raise ValidationError(_('Wait for the account secret change to finish.'))
-        if any(not client.configuration.credentials.filter(id=credential.id).exists() for client in clients):
-            raise ValidationError(_('The selected connection instances do not all have access to this credential.'))
         payload = {
             'credential_key': credential.key, 'revision': credential.revision,
             'account_id': str(credential.active_account_id), 'credential_mode': credential.mode,
@@ -129,7 +128,7 @@ def send(application, data, operator):
         expires_at=timezone.now() + timedelta(minutes=data['timeout_minutes']),
         recipients=[{
             'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
-            'configuration_id': str(client.configuration_id), 'status': 'pending',
+            'status': 'pending',
             'publish_result': 'pending', 'received_at': None, 'started_at': None,
             'finished_at': None, 'error_code': '',
         } for client in clients],
@@ -144,15 +143,12 @@ def publish(command_id):
     command = ApplicationCommand.objects.select_related('application').filter(id=command_id).first()
     if not command or not command.application or not command.application.is_active or timezone.now() >= command.expires_at:
         return
-    configurations = {}
     active = {str(client.id) for client in clients_for(command.application)}
-    for recipient in command.recipients:
-        if recipient['id'] in active:
-            configurations.setdefault(recipient['configuration_id'], []).append(recipient['id'])
-    for configuration_id, client_ids in configurations.items():
+    client_ids = [recipient['id'] for recipient in command.recipients if recipient['id'] in active]
+    if client_ids:
         result = 'published'
         try:
-            async_to_sync(get_channel_layer().group_send)(configuration_group(configuration_id), {
+            async_to_sync(get_channel_layer().group_send)(application_group(command.application_id), {
                 'type': 'credential.event', 'payload': envelope(command), 'recipient_ids': client_ids,
             })
         except Exception:
@@ -169,9 +165,8 @@ def publish(command_id):
 def _valid_client(client):
     if not CredentialClientInstance.objects.filter(
         id=client.id, org_id=client.org_id, application_id=client.application_id,
-        configuration_id=client.configuration_id, is_active=True,
+        is_active=True,
         application__is_active=True, application__org_id=client.org_id,
-        configuration__is_active=True, configuration__org_id=client.org_id,
     ).exists():
         raise PermissionDenied(_('The client instance is disabled.'))
 
@@ -180,7 +175,7 @@ def _recipient(command, client, validate=True):
     if validate:
         _valid_client(client)
     for recipient in command.recipients:
-        if recipient['id'] == str(client.id) and recipient['configuration_id'] == str(client.configuration_id):
+        if recipient['id'] == str(client.id):
             return recipient
     raise NotFound()
 
@@ -236,7 +231,7 @@ def report(client, command_id, status, error_code=''):
         if command.event == SWITCH:
             credential = ApplicationCredential.objects.filter(
                 key=command.payload['credential_key'], is_active=True,
-                applications=client.application, access_configurations=client.configuration,
+                applications=client.application,
             ).first()
             if not credential or credential.revision != command.payload['revision'] or str(credential.active_account_id) != command.payload['account_id']:
                 recipient.update(status='failed', error_code='superseded', finished_at=now)

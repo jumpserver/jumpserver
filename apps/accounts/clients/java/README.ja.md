@@ -9,7 +9,7 @@
 
 ## 設定と実行
 
-ソース SDK をインストールし、下記を設定します。アプリケーション管理でアカウントを許可しポリシーを関連付け、接続資料から AK/SK と組織 ID を取得してください。プレースホルダーを置き換え、認証資料を安全に保管します。各レプリカには安定した一意のインスタンス ID を使い、取得にはアカウント ID またはポリシー key の一方だけを指定します。
+ソース SDK をインストールし、下記を設定します。アプリケーション管理で pull 対象のアカウントを許可し、push またはローテーションが必要な場合だけポリシーを関連付けます。接続資料から AK/SK と組織 ID を取得してください。プレースホルダーを置き換え、認証資料を安全に保管します。各レプリカには安定した一意のインスタンス ID を使い、取得にはアカウント ID またはポリシー key の一方だけを指定します。
 
 ```bash
 cd apps/accounts/clients/java
@@ -69,9 +69,108 @@ public final class Demo {
 }
 ```
 
+## イベントハンドラー
+
+ローカル状態を初期化してから監視を開始します。Python と Node.js はサブクラス、Go は EventHandlers、Java は CredentialEventListener を使用します。例の接続切替処理を実装してください。従来の API も利用できます。
+
+```java
+package org.jumpserver.pam;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.jumpserver.pam.Models.Credential;
+import org.jumpserver.pam.Models.Event;
+
+/** Replace the business hook before running. Listener methods run serially. */
+public final class HooksDemo implements CredentialEventListener {
+  private final Client client;
+  private final Map<String, Credential> credentials = new HashMap<>();
+  private final Map<String, String> modes = new HashMap<>();
+
+  public HooksDemo(Client client) {
+    this.client = client;
+  }
+
+  @Override
+  public void onEvent(Event event) {
+    List<Event> updates = List.of(event);
+    if (event.getEvent().equals("snapshot")) {
+      modes.clear();
+      updates = event.getCredentials();
+    }
+    if (event.getEvent().equals("snapshot") || event.getEvent().equals("credential.updated"))
+      for (Event update : updates) modes.put(update.getKey(), update.getCredentialMode());
+    if (event.getEvent().equals("snapshot"))
+      credentials.keySet().removeIf(key -> !modes.containsKey(key)); // Also release connections.
+    // Use executeApplicationCommand for commands; see EventsDemo.
+  }
+
+  @Override
+  public void onCredentialChanged(Credential credential) {
+    applyCredential(credential);
+    if ("alternating_rotation".equals(modes.get(credential.getKey())))
+      client.confirmCredential(
+          credential.getKey(), credential.getRevision(), credential.getAccount().getId());
+    credentials.put(credential.getKey(), credential);
+  }
+
+  private void applyCredential(Credential credential) {
+    throw new UnsupportedOperationException(
+        "Implement connection validation, pool switching and old connection cleanup");
+  }
+
+  @Override
+  public void onCredentialRevoked(Event event) {
+    credentials.remove(event.getKey()); // Also release affected connections.
+  }
+
+  public static void main(String[] args) throws InterruptedException {
+    Client.Options options =
+        new Client.Options(
+                System.getenv("JMS_ENDPOINT"),
+                System.getenv("JMS_APP_ID"),
+                System.getenv("JMS_APP_SECRET"),
+                System.getenv("JMS_INSTANCE_ID"))
+            .orgId(System.getenv("JMS_ORG_ID"));
+    try (Client client = new Client(options)) {
+      Thread stop = new Thread(client::close, "jms-pam-shutdown");
+      Runtime.getRuntime().addShutdownHook(stop);
+      try {
+        client.watchEvents(new HooksDemo(client));
+      } finally {
+        try {
+          Runtime.getRuntime().removeShutdownHook(stop);
+        } catch (IllegalStateException ignored) {
+        }
+      }
+    }
+  }
+}
+```
+
+初回・再接続の snapshot と credential.updated はモード別に認証情報を取得し、ハンドラーを順番に呼び出します。受信と処理は上限 128 件のキューで接続され、満杯時は受信を待機します。取得・適用の失敗は 1–30 秒の指数バックオフで再試行し、毎回取得し直します。同じ対象の更新は再試行を置換し、snapshot は範囲を更新、失効・設定変更は再試行を解除します。処理は繰り返し可能にしてください。観測・失効フックは自動再試行しません。コマンドは実行権の取得が必要です。received は受信のみを示し、SDK はローテーションを自動確認しません。古いリビジョンのイベントは、新しいリビジョンの取得の再試行を取り消しません。
+
+`watchEvents(listener)` / `startEvents(listener)`; `stop()` / `close()` / `awaitTermination()`
+
+watchEvents は呼出元スレッドで待ちます。startEvents は同期完了を保証しません。監視は 1 つです。close は処理終了を待ち、ハンドラー自身からも close できます。awaitTermination は外部から呼びます。
+
+### 最新の認証情報とバックエンド障害
+
+取得はまず API を呼びます。取得成功時に保持値を更新し、古いバージョンで新しい値を上書きせず、時間による有効期限も設けません。タイムアウト、ネットワーク障害、HTTP 5xx の場合だけ、同じ検索条件の最後に取得した値をローカル由来のフラグ付きで返します。保持値がなければ元のエラーです。SDK は更新・失効・終了までクライアントのメモリに保持し、clone や再起動は空から始まります。Agent は保護された既存のローカル状態に保存します。HTTP 401/403/404 または client_upgrade_required は SDK の保持値を消去して失敗し、不正な成功応答も失敗します。失効は対象を、snapshot は認可範囲外を削除します。設定変更時は次の snapshot で範囲を確認するまで保持します。Agent は HTTP 同期の前に明示的な取り消しと snapshot の範囲縮小を適用して保存し、バックエンド障害中や再起動後も該当するローカル取得を停止します。credential_not_found（HTTP 400）でも SDK の保持値を削除します。 account_id による直接 pull には常にライブ API 応答が必要です。push の snapshot はキャッシュされた pull 認可を示しません。
+
+- `credential.isFromLocal()`
+- `getCredential(key, false)` / `getCredentialByAccountId(accountId, false)`
+
+管理された監視を有効にすると、snapshot と credential.updated が自動で取得し、保持値を更新してから業務フックを呼びます。更新失敗時は前の値を保持し再試行します。Agent も更新通知で取得し、障害時は既存値を保持します。更新や手動切替には下記の API 取得必須の呼び出しを使用してください。保持値を新しく取得したバージョンと見なしたり、ローテーションを自動確認したりしません。
+
+アイドル時は 10 秒ごとに ping を送り、約 30 秒メッセージがなければ再接続します。待機は 1–30 秒の指数バックオフで毎回再署名します。snapshot は現在の状態を復元し、履歴イベントは再送しません。
+
+
+
 ## イベントと認証情報の適用
 
-初回・再接続 snapshot と credential.updated を処理します。下記の完全な例は subscription、alternating_rotation、アプリケーションコマンドを扱います。実接続の検証、接続プールの切替、旧接続の解放を適用関数に実装してください。未実装関数は例外を投げ、未適用版の確認を防ぎます。快照から削除されたアカウントや取り消しイベントをアプリケーションのキャッシュにも反映します。
+初回・再接続 snapshot と credential.updated を処理します。下記の完全な例は subscription、alternating_rotation、アプリケーションコマンドを扱います。実接続の検証、接続プールの切替、旧接続の解放を適用関数に実装してください。未実装関数は例外を投げ、未適用版の確認を防ぎます。快照から削除されたアカウントや取り消しイベントをアプリケーションの状態にも反映します。
 
 ```java
 package org.jumpserver.pam;
@@ -98,7 +197,7 @@ public final class EventsDemo {
     }
     if (!event.getEvent().equals("credential.switch.requested"))
       throw new IllegalArgumentException("Unsupported application command");
-    Credential credential = client.getCredential(event.getKey());
+    Credential credential = client.getCredential(event.getKey(), false);
     if (credential.getRevision() != event.getRevision()
         || !credential.getAccount().getId().equals(event.getAccountId()))
       throw new IllegalArgumentException("Requested account version is superseded");
@@ -135,10 +234,14 @@ public final class EventsDemo {
           for (Event update : updates) {
             Credential credential;
             if (update.getCredentialMode().equals("subscription")
-                && !update.getAccountId().isEmpty())
-              credential = client.getCredentialByAccountId(update.getAccountId());
+                && !update.getAccountId().isEmpty() && !update.getKey().isEmpty()) {
+              String key = update.getKey();
+              if (!key.endsWith(":" + update.getAccountId())) key += ":" + update.getAccountId();
+              credential = client.getCredential(key, false);
+            }
             else if (update.getCredentialMode().equals("alternating_rotation")
-                && !update.getKey().isEmpty()) credential = client.getCredential(update.getKey());
+                && !update.getKey().isEmpty())
+              credential = client.getCredential(update.getKey(), false);
             else continue;
             applyCredential(credential);
             if (update.getCredentialMode().equals("alternating_rotation"))
@@ -168,8 +271,11 @@ public final class EventsDemo {
 
 - `getCredential(key)`
 - `getCredentialByAccountId(accountId)`
+- `getCredential(key, false) / getCredentialByAccountId(accountId, false)`
 - `confirmCredential(key, revision, accountId)`
 - `watchCredentialEvents()`
+- `watchEvents(listener) / startEvents(listener)`
+- `EventSubscription.stop() / close() / awaitTermination()`
 - `listApplicationCommands()`
 - `reportApplicationCommandResult(commandId, status, errorCode)`
 - `executeApplicationCommand(event, handler)`
@@ -184,6 +290,74 @@ HTTP、ネットワーク、認証、デコードの失敗はエラーコード�
 
 全 SDK はプロトコル版 1、Agent 設定はスキーマ版 1 を使用します。client_upgrade_required（HTTP 426）を受けたら互換性を確認し更新してください。未知の任意フィールドや通知イベントは許容しますが、未対応ポリシーは適用・確認できません。受領通知は自動送信され、認証情報の適用を証明しません。
 
-## Linux Agent の接続
+## Go Agent の接続
 
-Agent 同期メソッドは Agent 実装用です。Agent の識別情報または source と設定 ID が必要で、KnownRevision によりキャッシュ版と配布版を報告します。Linux インストール、ファイル配布、ローカル API は現在 Python Agent が提供し、任意の言語のアプリケーションから利用できます。
+認証には app_id、app_secret、org_id と安定した instance_id を使用し、認可範囲はアプリケーションに関連付けたポリシーに従います。すべてのパスとサービス操作はローカル設定です。state_file は最新パスワードを保持し、event_file は秘密を含まないイベント情報を追記します。delivery は既定の出力、rules はファイル、テンプレートと reload/restart または固定スクリプトを指定します。更新通知で最新値を取得・保存し、ファイルを原子的に置き換えてから操作を実行します。失敗は再試行します。rules の key には get_accounts の credentials[].key を使用します。購読 key にはアカウント ID が含まれます。空の rules は key ごとの既定ファイルを出力します。
+
+ローカル rules でファイル、JSON/EnvironmentFile または信頼済みテンプレートと、systemd reload/restart や固定実行ファイルを設定します。スクリプトは標準入力で認証情報 JSON を受け取り、固定引数とタイムアウトを使い、適用を検証してから成功を返します。Core は実行パスや権限を拡張できません。設定変更後に Agent を再起動します。
+
+認証には app_id、app_secret、org_id と安定した instance_id を使用し、認可範囲はアプリケーションに関連付けたポリシーに従います。すべてのパスとサービス操作はローカル設定です。state_file は最新パスワードを保持し、event_file は秘密を含まないイベント情報を追記します。delivery は既定の出力、rules はファイル、テンプレートと reload/restart または固定スクリプトを指定します。更新通知で最新値を取得・保存し、ファイルを原子的に置き換えてから操作を実行します。失敗は再試行します。rules の key には get_accounts の credentials[].key を使用します。購読 key にはアカウント ID が含まれます。空の rules は key ごとの既定ファイルを出力します。
+
+```json
+{
+  "endpoint": "https://jumpserver.example.com",
+  "app_id": "<application-id>",
+  "app_secret": "<application-secret>",
+  "org_id": "<org-id>",
+  "instance_id": "orders-node-1",
+  "state_file": "/var/lib/jms-pam-agent/state.json",
+  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
+  "reconcile_interval": 300,
+  "delivery": {
+    "delivery_mode": "json",
+    "delivery_root": "/opt/jumpserver-pam/credentials",
+    "socket_path": "/run/jms-pam-agent/agent.sock",
+    "app_user": "orders",
+    "systemd_unit": "",
+    "systemd_action": ""
+  },
+  "rules": []
+}
+```
+
+`rules`:
+
+```json
+[
+  {
+    "keys": [
+      "<credential-key>"
+    ],
+    "files": [
+      {
+        "path": "/etc/order-service/database.json",
+        "format": "template",
+        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
+        "owner": "orders"
+      }
+    ],
+    "action": {
+      "type": "systemd",
+      "unit": "order-service.service",
+      "operation": "reload",
+      "timeout_seconds": 30
+    }
+  }
+]
+```
+
+`/etc/jms-pam-agent/orders-db.tmpl`:
+
+```gotemplate
+{
+  "username": {{json (index .Credentials "<credential-key>").Username}},
+  "password": {{json (index .Credentials "<credential-key>").Secret}}
+}
+```
+
+```bash
+jms-pam-agent get_accounts
+jms-pam-agent get_secret '<account-id>'
+sudo jms-pam-agent check-config
+sudo systemctl restart jms-pam-agent
+```

@@ -7,8 +7,10 @@
   "files": [
     "index.js",
     "index.d.ts",
+    "event-dispatcher.js",
     "demo.js",
     "events.js",
+    "hooks.js",
     "README.*.md"
   ],
   "engines": {

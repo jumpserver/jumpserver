@@ -9,7 +9,7 @@ def apply_credential(credential):
 
 
 def switch_credential(client, key):
-    response = client.get_credential(key=key)
+    response = client.get_credential(key=key, allow_local_fallback=False)
     apply_credential(response)
 
     if key in confirmation_keys:

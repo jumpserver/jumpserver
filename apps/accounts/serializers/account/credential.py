@@ -1,33 +1,37 @@
 import re
 
+from accounts.credential_client.documentation import sdk_languages
+from accounts.models import (
+    Account,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    CredentialClientInstance,
+    CredentialClientStatus,
+    IntegrationApplication,
+)
+from common.serializers.fields import ObjectRelatedField
 from django.db import transaction
 from django.db.models import Count, Max, Prefetch, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
-
-from accounts.models import (
-    Account, CredentialApplicationBinding, CredentialClientInstance,
-    CredentialClientStatus, ApplicationCredential, IntegrationApplication,
-    ClientAccessConfiguration,
-)
-from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from rest_framework import serializers
 
 __all__ = [
     'ApplicationCredentialSerializer', 'ApplicationCredentialListSerializer',
     'CredentialApplicationBindingSerializer',
     'CredentialClientInstanceSerializer', 'CredentialClientStatusSerializer',
-    'CredentialFetchSerializer',
+    'CredentialFetchSerializer', 'AuthorizedAccountsSerializer',
     'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer',
     'CredentialAgentSyncSerializer',
-    'ClientAccessConfigurationSerializer',
     'CredentialAccessWizardSerializer',
     'CredentialChangeRetrySerializer', 'CredentialRotationReasonSerializer',
 ]
 
 
 SYSTEMD_UNIT = re.compile(r'^[A-Za-z0-9_.@:-]+\.service$')
+DELIVERY_MODES = [('json', _('JSON files')), ('environment', _('Environment files')), ('socket', _('Unix socket'))]
+SYSTEMD_ACTIONS = [('reload', _('Reload')), ('restart', _('Restart'))]
 
 
 class CredentialRotationReasonSerializer(serializers.Serializer):
@@ -258,10 +262,6 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         removed = list(instance.application_bindings.exclude(
             application_id__in=wanted
         ).select_related('application'))
-        for configuration in instance.access_configurations.filter(
-            application_id__in=[item.application_id for item in removed],
-        ):
-            configuration.credentials.remove(instance)
         instance.application_bindings.filter(id__in=[item.id for item in removed]).delete()
         existing = set(instance.application_bindings.values_list('application_id', flat=True))
         added = [
@@ -271,15 +271,9 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             for application_id, application in wanted.items() if application_id not in existing
         ]
         CredentialApplicationBinding.objects.bulk_create(added)
-        from accounts.credential_client.access import refresh_application_scopes
-        for application in instance.applications.all():
-            refresh_application_scopes(application)
-        for binding in removed:
-            event = record(
-                AuditEvent.AUTHORIZATION_REVOKED, credential=instance,
-                application=binding.application,
-            )
-            enqueue(event, ApplicationEvent.CREDENTIAL_REVOKED)
+        from accounts.credential_client.access import publish_application_scope
+        for application in (binding.application for binding in added):
+            publish_application_scope(application)
         for binding in added:
             event = record(
                 AuditEvent.AUTHORIZATION_GRANTED, credential=instance,
@@ -405,9 +399,8 @@ class CredentialClientStatusSerializer(serializers.ModelSerializer):
 
 
 class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
-    configuration = ObjectRelatedField(read_only=True, attrs=('id', 'name'))
     credentials = ObjectRelatedField(
-        source='configuration.credentials', many=True, read_only=True, attrs=('id', 'name'),
+        source='application.application_credentials', many=True, read_only=True, attrs=('id', 'name'),
     )
     application = ObjectRelatedField(
         read_only=True, attrs=('id', 'name'), label=_('Integration application')
@@ -424,7 +417,7 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
         model = CredentialClientInstance
         fields_mini = ['id', 'instance_id', 'type']
         fields_small = fields_mini + [
-            'application', 'configuration', 'online', 'date_last_seen', 'is_active',
+            'application', 'online', 'date_last_seen', 'is_active',
         ]
         fields = fields_small + [
             'client_version', 'protocol_version', 'config_schema_version',
@@ -450,7 +443,7 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
             return None
         from accounts.credential_client.manager import CredentialClientManager
         return instance.config_digest == CredentialClientManager.agent_configuration_digest(
-            instance.configuration
+            instance.application
         )
 
     @staticmethod
@@ -488,7 +481,7 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
             ).order_by('id')
             credentials = {credential.id: credential for credential in locked_credentials}
             states = list(CredentialClientStatus.objects.select_for_update(of=('self',)).select_related(
-                'binding__credential', 'binding__application', 'client__configuration',
+                'binding__credential', 'binding__application',
                 'applied_account',
             ).filter(client=instance, binding__credential_id__in=credentials))
             for credential_id, credential in credentials.items():
@@ -527,13 +520,19 @@ class CredentialApplicationBindingSerializer(BulkOrgResourceModelSerializer):
 class CredentialFetchSerializer(serializers.Serializer):
     key = serializers.CharField(max_length=64, required=False)
     account_id = serializers.UUIDField(required=False)
-    configuration_id = serializers.UUIDField(required=False)
     instance_id = serializers.CharField(max_length=128, required=False)
 
     def validate(self, attrs):
         if bool(attrs.get('key')) == bool(attrs.get('account_id')):
             raise serializers.ValidationError(_('Provide exactly one of key or account_id.'))
         return attrs
+
+
+class AuthorizedAccountsSerializer(serializers.Serializer):
+    instance_id = serializers.CharField(max_length=128, required=False)
+    limit = serializers.IntegerField(min_value=1, max_value=500, default=200)
+    offset = serializers.IntegerField(min_value=0, default=0)
+    search = serializers.CharField(max_length=128, required=False, allow_blank=True)
 
 
 class CredentialStateSerializer(serializers.Serializer):
@@ -543,7 +542,6 @@ class CredentialStateSerializer(serializers.Serializer):
 
 
 class CredentialConfirmSerializer(CredentialStateSerializer):
-    configuration_id = serializers.UUIDField(required=False)
     instance_id = serializers.CharField(max_length=128, required=False)
 
 
@@ -562,7 +560,7 @@ class CredentialRevisionSerializer(serializers.Serializer):
 
 
 class CredentialAgentSyncSerializer(serializers.Serializer):
-    configuration_id = serializers.UUIDField(required=False)
+    restart_supported = serializers.BooleanField(required=False, default=False)
     instance_id = serializers.CharField(max_length=128, required=False)
     config_digest = serializers.CharField(max_length=64, required=False, allow_blank=True)
     credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
@@ -573,130 +571,19 @@ class CredentialAgentSyncSerializer(serializers.Serializer):
     sync_error = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
 
 
-class ClientAccessConfigurationSerializer(BulkOrgResourceModelSerializer):
-    application = ObjectRelatedField(queryset=IntegrationApplication.objects, attrs=('id', 'name'))
-    credentials = ObjectRelatedField(
-        queryset=ApplicationCredential.objects, many=True,
-        attrs=('id', 'name', 'key', 'mode', 'status'),
-    )
-    removal_reason = serializers.CharField(
-        write_only=True, required=False, allow_blank=True, max_length=512,
-    )
-    instances_amount = serializers.IntegerField(read_only=True)
-    online_instances_amount = serializers.IntegerField(read_only=True)
-    last_reported = serializers.DateTimeField(read_only=True)
-
-    class Meta:
-        model = ClientAccessConfiguration
-        fields_mini = ['id', 'name', 'type']
-        fields_small = fields_mini + [
-            'application', 'credentials', 'is_active', 'instances_amount',
-            'online_instances_amount', 'last_reported',
-        ]
-        fields = fields_small + [
-            'language', 'app_user', 'install_path', 'delivery_mode',
-            'systemd_unit', 'systemd_action',
-            'removal_reason', 'date_created', 'date_updated', 'created_by', 'comment',
-        ]
-        read_only_fields = ['instances_amount', 'online_instances_amount']
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        online_after = timezone.now() - timezone.timedelta(minutes=2)
-        return queryset.select_related('application').prefetch_related('credentials').annotate(
-            instances_amount=Count('instances', distinct=True),
-            last_reported=Max('instances__date_last_seen'),
-            online_instances_amount=Count(
-                'instances', filter=Q(
-                    instances__is_active=True, is_active=True, application__is_active=True,
-                    instances__date_last_seen__gte=online_after,
-                ), distinct=True,
-            ),
-        )
-
-    def validate(self, attrs):
-        if self.instance:
-            for field in ('application', 'type'):
-                if field in attrs and attrs[field] != getattr(self.instance, field):
-                    raise serializers.ValidationError(_('The application and access type cannot be changed.'))
-            if 'credentials' in attrs:
-                old = set(self.instance.credentials.values_list('id', flat=True))
-                new = {credential.id for credential in attrs['credentials']}
-                rotating = self.instance.credentials.filter(id__in=old - new).exclude(status='idle')
-                if rotating.exists() and not attrs.get('removal_reason', '').strip():
-                    raise serializers.ValidationError({
-                        'removal_reason': _(
-                            'Explain why the rotating credential should stop participating.'
-                        )
-                    })
-        else:
-            attrs.pop('removal_reason', None)
-        application = attrs.get('application') or getattr(self.instance, 'application', None)
-        credentials = attrs.get('credentials')
-        if credentials is None:
-            credentials = getattr(self.instance, 'credentials', ApplicationCredential.objects.none()).all()
-        if not credentials:
-            raise serializers.ValidationError({'credentials': _('Select at least one credential.')})
-        allowed_ids = set(application.get_accounts().values_list('id', flat=True)) if application else set()
-        for credential in credentials:
-            if not credential.applications.filter(id=application.id).exists():
-                raise serializers.ValidationError({
-                    'credentials': _('The selected credential policy is not bound to this application.')
-                })
-            required = {credential.account_id, credential.alternate_account_id} - {None}
-            if (
-                credential.mode == ApplicationCredential.Mode.alternating_rotation
-                and not required.issubset(allowed_ids)
-            ):
-                raise serializers.ValidationError({
-                    'credentials': _('The application is not authorized for every selected credential account.')
-                })
-        access_type = attrs.get('type', getattr(self.instance, 'type', None))
-        if (
-            access_type == CredentialClientInstance.Type.sdk
-            and len({credential.mode for credential in credentials}) > 1
-        ):
-            raise serializers.ValidationError({
-                'credentials': _('SDK access configurations cannot mix credential policy modes.')
-            })
-        if access_type == CredentialClientInstance.Type.sdk:
-            attrs['language'] = 'python'
-        elif not attrs.get('app_user', getattr(self.instance, 'app_user', '')):
-            raise serializers.ValidationError({'app_user': _('This field is required for Agent access.')})
-        path = attrs.get('install_path', getattr(self.instance, 'install_path', '/opt/jumpserver-pam'))
-        if not path.startswith('/') or path == '/' or any(char in path for char in '\n\r\x00'):
-            raise serializers.ValidationError({'install_path': _('Enter an absolute installation directory.')})
-        delivery_mode = attrs.get(
-            'delivery_mode', getattr(self.instance, 'delivery_mode', ClientAccessConfiguration.DeliveryMode.json)
-        )
-        systemd_unit = attrs.get('systemd_unit', getattr(self.instance, 'systemd_unit', '')).strip()
-        if access_type == CredentialClientInstance.Type.agent and delivery_mode == ClientAccessConfiguration.DeliveryMode.environment:
-            if not SYSTEMD_UNIT.fullmatch(systemd_unit):
-                raise serializers.ValidationError({
-                    'systemd_unit': _('Enter one systemd .service unit name.')
-                })
-        else:
-            attrs['systemd_unit'] = ''
-        return attrs
-
-    def update(self, instance, validated_data):
-        instance._credential_removal_reason = validated_data.pop('removal_reason', '').strip()
-        try:
-            return super().update(instance, validated_data)
-        finally:
-            del instance._credential_removal_reason
-
-
 class CredentialAccessWizardSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=CredentialClientInstance.Type.choices)
+    sdk_language = serializers.ChoiceField(
+        choices=[item['value'] for item in sdk_languages()], default='python',
+    )
     app_user = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
     install_path = serializers.CharField(max_length=256, required=False, default='/opt/jumpserver-pam')
     delivery_mode = serializers.ChoiceField(
-        choices=ClientAccessConfiguration.DeliveryMode.choices, default='json',
+        choices=DELIVERY_MODES, default='json',
     )
     systemd_unit = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
     systemd_action = serializers.ChoiceField(
-        choices=ClientAccessConfiguration.SystemdAction.choices, default='restart',
+        choices=SYSTEMD_ACTIONS, default='restart',
     )
 
     def validate(self, attrs):
