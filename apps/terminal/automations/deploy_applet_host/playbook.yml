@@ -15,8 +15,6 @@
     RDS_RemoteAppLogoffTimeLimit: 0
     INSTALL_APPLETS: true
     PYTHON_VERSION: 3.11.11
-    # WebLite MSI requires Tinker with %ProgramFiles%/JumpServer/ executable support.
-    TINKER_VERSION: v0.3.0
 
   tasks:
     - block:
@@ -34,6 +32,24 @@
             msg: "CORE_HOST {{ CORE_HOST }} is redirecting to {{ core_host_redirects.location }}, please use the final url"
           when: core_host_redirects.status_code >= 300 and core_host_redirects.status_code < 400
 
+        - name: Download Tinker installer
+          ansible.windows.win_get_url:
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/Tinker_Installer_{{ TINKER_VERSION }}.exe"
+            dest: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
+            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
+
+        - name: Download python-{{ PYTHON_VERSION }}
+          ansible.windows.win_get_url:
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
+            dest: "{{ ansible_env.TEMP }}\\jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
+            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
+
+      tags: [prepare]
+      rescue:
+        - fail:
+            msg: "Failed to prepare applet host; existing Tinker was not stopped"
+
+    - block:
         - name: Create Tinker keyfile
           ansible.windows.win_powershell:
             script: |
@@ -49,15 +65,6 @@
                   return $random
               }
               $targetPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
-              $activeKeyPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\.access_key"
-              if (Test-Path -Path $activeKeyPath) {
-                Write-Output "Tinker already has an active access key"
-                return
-              }
-              if (Test-Path -Path $targetPath) {
-                Write-Output "access_key already exists at $targetPath"
-                return
-                }
               $randomStr = New-RandomString -Length 7
               $dir = [System.IO.Path]::GetDirectoryName($targetPath)
               if (-not (Test-Path -Path $dir)) {
@@ -76,7 +83,6 @@
                   "Content-Type"  = "application/json"
               }
               $response = Invoke-RestMethod -Uri $url -Method Post -Body $body -Headers $headers
-              Write-Output "Response: $($response | ConvertTo-Json -Depth 5)"
               $accessKey = $response.service_account.access_key.id
               $accessSecret = $response.service_account.access_key.secret
               if ($accessKey -and $accessSecret) {
@@ -143,12 +149,6 @@
                $Ansible.Changed = $false
               }
 
-        - name: Download Tinker installer
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/Tinker_Installer_{{ TINKER_VERSION }}.exe"
-            dest: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-
         - name: Install Tinker
           ansible.windows.win_package:
             path: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
@@ -163,12 +163,6 @@
             elements:
               - '%USERPROFILE%\AppData\Local\Programs\Tinker\'
             scope: user
-
-        - name: Download python-{{ PYTHON_VERSION }}
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
-            dest: "{{ ansible_env.TEMP }}\\jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
         - name: Install the python-{{ PYTHON_VERSION }}
           community.windows.win_unzip:
@@ -297,6 +291,7 @@
           register: sync_remote_applets
           when: INSTALL_APPLETS
 
+      tags: [deploy]
       rescue:
         - debug:
             var: ansible_failed_result
