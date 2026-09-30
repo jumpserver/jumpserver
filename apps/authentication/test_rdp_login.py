@@ -4,23 +4,23 @@ import json
 import secrets
 from contextlib import nullcontext
 from datetime import timedelta
+from dataclasses import replace
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from uuid import UUID, uuid4
 
-from django.db import IntegrityError
-from django.http import Http404
 from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from authentication.api import rdp_login as api
+from authentication.api import connection_token as token_api
 from authentication.api.connection_token import SuperConnectionTokenViewSet
 from authentication.const import ConnectionTokenType
-from authentication.models import ConnectionToken, RDPLoginTicket
-from authentication.serializers.rdp_login import (
-    RDPLoginPrepareSerializer, RDPLoginRedeemSerializer, RDPLoginLaunchSerializer,
-)
+from authentication.models import ConnectionToken
+from authentication.services import connection_token as token_service
+from authentication.services.rdp_login import RDPLoginTicket, TicketCacheUnavailable
+from authentication.serializers.rdp_login import RDPLoginRedeemSerializer
 from perms.const import ActionChoices
 from terminal.models import Applet, AppletHost
 from terminal.serializers.applet_host import DeployOptionsSerializer
@@ -45,9 +45,20 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             deploy_options={}, tinker_version='v0.3.1',
             terminal=SimpleNamespace(user_id=self.service.id, type='tinker'),
             address='publish.example.test', get_protocol_port=lambda protocol: 3389,
+            zone=None, org_id=uuid4(), category='host', type='windows',
+            info={}, secret_info={}, spec_info={},
+            protocols=[SimpleNamespace(name='rdp', port=3389)],
+            platform=SimpleNamespace(
+                id=1, name='Windows', category='host', type='windows', package_id=None,
+                protocols=[SimpleNamespace(
+                    name='rdp', port=3389, primary=True, public=True, required=True,
+                    setting={'ad_domain': 'example.org', 'security': 'nla', 'console': False},
+                )],
+            ),
         )
         self.service.terminal = self.host.terminal
         self.service.terminal.applet_host = self.host
+        self.razor = SimpleNamespace(**{**vars(self.service), 'terminal': SimpleNamespace(type='razor')})
         self.applet.filter_available_hosts.return_value = [self.host]
         self.applet.select_host.return_value = self.host
         self.token = Mock(
@@ -69,6 +80,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.token.asset.id = self.token.asset_id
         self.password = secrets.token_urlsafe(32)
         self.ticket = RDPLoginTicket(
+            id=uuid4(), connection_id=uuid4(),
             connection_token_id=self.token.id, org_id=self.token.org_id,
             user_id=self.user.id, asset_id=self.token.asset_id,
             host_id=self.host.id, app_id=self.applet.id, app_name=self.applet.name,
@@ -76,19 +88,24 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             password_hash=api.digest('jlt_abcdefghijklmnop\0' + self.password),
             expires_at=self.now + timedelta(minutes=5),
         )
-        self.ticket.save = Mock()
-        self.broker_id = uuid4()
         self.redeem_request = {
             'username': self.ticket.username, 'password': self.password,
-            'redemption_id': str(uuid4()), 'broker_instance_id': str(self.broker_id),
-            'windows_session_id': 7,
         }
         self.connection_data = {
             'id': str(self.token.id), 'org_id': str(self.token.org_id),
             'user': {'id': str(self.user.id)}, 'asset': {'id': str(self.token.asset_id)},
+            'account': {'username': 'target-user', 'secret': 'target-secret'},
+            'expire_at': int(self.account.date_expired.timestamp()),
         }
+        self.cache = Mock()
+        self.cache.add.return_value = True
+        self.cache.get.side_effect = lambda username: (self.ticket, b'cached-ticket')
+        self.cache.consume.side_effect = lambda *args: self.consume_ticket()
+        self.consumed = False
         for context in [
+            patch.object(api, 'ticket_cache', self.cache),
             patch.object(api, 'tmp_to_root_org', side_effect=nullcontext),
+            patch.object(token_api, 'tmp_to_root_org', side_effect=nullcontext),
             patch.object(api.transaction, 'atomic', side_effect=nullcontext),
             patch.object(api.timezone, 'now', return_value=self.now),
         ]:
@@ -103,29 +120,24 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         view.check_permissions(request)
         return view.post.__wrapped__(view, request)
 
+    def consume_ticket(self):
+        if self.consumed:
+            return False
+        self.consumed = True
+        return True
+
     def redeem(self, user=None, data=None):
-        with patch.object(api, 'lock_authorization', return_value=(self.token, self.ticket)), \
-                patch.object(api, 'get_object_or_404', side_effect=[self.applet, self.host]):
+        with patch.object(api, 'get_object_or_404', side_effect=[self.token, self.applet, self.host]), \
+                patch.object(api, 'ConnectionTokenSecretSerializer') as serializer, \
+                patch.object(ConnectionToken.objects, 'filter'):
+            serializer.return_value.data = self.connection_data
             return self.invoke(api.RDPLoginRedeemApi, user or self.service, data or self.redeem_request)
 
-    def launch_request(self):
-        response = self.redeem()
-        return {
-            'launch_grant': response.data['launch_grant'], 'token_id': str(self.token.id),
-            'connection_id': str(self.ticket.connection_id), 'attempt_id': str(self.ticket.id),
-            'request_id': str(uuid4()), 'broker_instance_id': str(self.broker_id),
-            'windows_session_id': 7, 'local_sid': 'S-1-5-21-1-2-3-1001', 'logon_id': '00000000:00000400',
-        }
-
-    def launch(self, data, user=None):
-        with patch.object(api, 'lock_authorization', return_value=(self.token, self.ticket)), \
-                patch.object(api, 'get_object_or_404', side_effect=[self.applet, self.host]), \
-                patch.object(api, 'ConnectionTokenSecretSerializer') as serializer, \
-                patch.object(api.ConnectionToken.objects, 'filter') as query:
-            serializer.return_value.data = self.connection_data
-            response = self.invoke(api.RDPLoginLaunchApi, user or self.service, data)
-            query.return_value.update.assert_called_once_with(date_last_used=self.now)
-            return response
+    def applet_option(self, user=None, data=None):
+        request = SimpleNamespace(user=user or self.razor, data=data or {'id': str(self.token.id)})
+        with patch.object(token_api, 'get_object_or_404', return_value=self.token), \
+                patch.object(api, 'get_object_or_404', return_value=self.applet):
+            return SuperConnectionTokenViewSet().get_applet_info(request)
 
     def test_only_full_v2_credentials_are_accepted(self):
         for username, password in [
@@ -146,13 +158,10 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.validated_data['username'], self.ticket.username)
 
-    def test_missing_or_zero_binding_ids_are_rejected(self):
-        for key in ['redemption_id', 'broker_instance_id', 'windows_session_id']:
-            for value in [None, 0, str(UUID(int=0))]:
-                with self.subTest(key=key, value=value):
-                    serializer = RDPLoginRedeemSerializer(data={**self.redeem_request, key: value})
-                    self.assertFalse(serializer.is_valid())
-        self.assertFalse(RDPLoginPrepareSerializer(data={'connection_token_id': str(UUID(int=0))}).is_valid())
+    def test_missing_or_zero_connection_token_ids_are_rejected(self):
+        for value in [None, '', 'invalid', str(UUID(int=0))]:
+            with self.subTest(value=value), self.assertRaises(ValidationError):
+                self.applet_option(data={'id': value})
 
     def test_permission_is_rechecked_even_for_recent_tokens(self):
         self.token.get_permed_account.return_value = None
@@ -172,56 +181,113 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         with self.assertRaises(PermissionDenied):
             api.check_connection(self.token)
 
-    def test_prepare_returns_v2_credentials_and_existing_applet_arguments(self):
-        def create(**values):
-            values.pop('connection_token')
-            return RDPLoginTicket(connection_token_id=self.token.id, **values)
-        with patch.object(api, 'get_object_or_404', side_effect=[self.token, self.applet]) as get, \
-                patch.object(api.RDPLoginTicket.objects, 'create', side_effect=create) as create_mock:
-            response = self.invoke(api.RDPLoginPrepareApi, self.user, {'connection_token_id': str(self.token.id)})
-        self.assertEqual(get.call_args_list[0].kwargs, {'id': self.token.id, 'user': self.user})
+    def test_applet_option_returns_ticket_in_existing_account_and_keeps_routing(self):
+        self.host.zone = SimpleNamespace(select_gateway=lambda: SimpleNamespace(
+            id=uuid4(), name='gateway', address='gateway.example.test', protocols=[], select_account=None,
+        ))
+        response = self.applet_option()
         self.assertEqual(response['Cache-Control'], 'no-store')
-        self.assertEqual(response.data['credential']['mode'], 'tinker_ticket_v2')
-        credential = response.data['credential']
-        validator = RDPLoginRedeemSerializer(data={**self.redeem_request, **credential})
+        self.assertEqual(set(response.data), {
+            'id', 'applet', 'host', 'gateway', 'platform', 'account', 'remote_app_option',
+        })
+        credential = response.data['account']
+        validator = RDPLoginRedeemSerializer(data={
+            **self.redeem_request, 'username': credential['username'], 'password': credential['secret'],
+        })
         self.assertTrue(validator.is_valid(), validator.errors)
-        stored = create_mock.call_args.kwargs
-        self.assertEqual(stored['password_hash'], api.digest(credential['username'] + '\0' + credential['password']))
-        self.assertNotIn('password', stored)
-        ids = [response.data[name] for name in ['attempt_id', 'connection_id', 'token_id']]
-        self.assertEqual(len(set(ids)), 3)
-        args = json.loads(base64.b64decode(response.data['remote_app']['args']))
+        stored = self.cache.add.call_args.args[0]
+        self.assertEqual(stored.password_hash, api.digest(credential['username'] + '\0' + credential['secret']))
+        self.assertNotIn('password', vars(stored))
+        self.assertNotEqual(response.data['id'], str(self.token.id))
+        self.assertEqual(response.data['host']['id'], str(self.host.id))
+        self.assertEqual(response.data['host']['protocols'], [{'name': 'rdp', 'port': 3389}])
+        self.assertEqual(response.data['gateway']['address'], 'gateway.example.test')
+        self.assertEqual(response.data['platform']['protocols'][0]['setting'], {
+            'ad_domain': 'localhost', 'security': 'tls', 'console': False,
+        })
+        self.assertEqual(self.host.platform.protocols[0].setting['security'], 'nla')
+        args = json.loads(base64.b64decode(response.data['remote_app_option']['remoteapplicationcmdline:s']))
         self.assertEqual(args['token_id'], str(self.token.id))
         self.assertEqual(args['app_name'], self.applet.name)
         self.applet.select_host.assert_called_once_with(self.user, self.token.asset)
 
-    def test_prepare_is_restricted_to_token_owner_or_authorized_razor(self):
-        for user in [self.service, SimpleNamespace(**{**vars(self.user), 'has_perm': lambda name: False})]:
-            with self.subTest(user=user), patch.object(api, 'get_object_or_404') as get, self.assertRaises(PermissionDenied):
-                self.invoke(api.RDPLoginPrepareApi, user, {'connection_token_id': str(self.token.id)})
-            get.assert_not_called()
-        razor = SimpleNamespace(**{**vars(self.service), 'terminal': SimpleNamespace(type='razor')})
-        with patch.object(api, 'get_object_or_404', side_effect=[self.token, self.applet]) as get, \
-                patch.object(api.RDPLoginTicket.objects, 'create', return_value=self.ticket):
-            self.invoke(api.RDPLoginPrepareApi, razor, {'connection_token_id': str(self.token.id)})
-        self.assertEqual(get.call_args_list[0].kwargs, {'id': self.token.id})
+    def test_applet_option_requires_an_authorized_connection_component(self):
+        denied = SimpleNamespace(**{**vars(self.razor), 'has_perm': lambda name: False})
+        for user in [self.user, self.service, denied]:
+            with self.subTest(user=user), self.assertRaises(PermissionDenied):
+                self.applet_option(user=user)
+        self.cache.add.assert_not_called()
+        for component in ['razor', 'koko', 'lion']:
+            user = SimpleNamespace(**{**vars(self.razor), 'terminal': SimpleNamespace(type=component)})
+            with self.subTest(component=component):
+                self.assertEqual(self.applet_option(user=user).status_code, 200)
 
-    def test_prepare_caps_validity_at_current_permission_expiration(self):
+    def test_ticket_validity_is_capped_at_current_permission_expiration(self):
         self.account.date_expired = self.now + timedelta(seconds=20)
-        with patch.object(api, 'get_object_or_404', side_effect=[self.token, self.applet]), \
-                patch.object(api.RDPLoginTicket.objects, 'create', return_value=self.ticket) as create:
-            response = self.invoke(api.RDPLoginPrepareApi, self.user, {'connection_token_id': str(self.token.id)})
-        self.assertEqual(create.call_args.kwargs['expires_at'], self.account.date_expired)
-        self.assertEqual(response.data['credential']['expires_at'], self.account.date_expired.isoformat())
+        self.applet_option()
+        self.assertEqual(self.cache.add.call_args.args[0].expires_at, self.account.date_expired)
+
+    def test_ticket_can_be_redeemed_just_before_five_minutes(self):
+        response = self.applet_option()
+        self.ticket = self.cache.add.call_args.args[0]
+        self.assertEqual(self.ticket.expires_at, self.now + timedelta(minutes=5))
+        # Use the issued account fields, as Razor forwards them to Tinker.
+        request = {'username': response.data['account']['username'],
+                   'password': response.data['account']['secret']}
+        received_at = self.ticket.expires_at - timedelta(microseconds=1)
+        with patch.object(api.timezone, 'now', return_value=received_at):
+            redeemed = self.redeem(data=request)
+        self.assertEqual(redeemed.status_code, 200)
+        self.assertEqual(redeemed.data['connection'], self.connection_data)
+        self.assertTrue(self.consumed)
+
+    def test_ticket_rejects_exchange_at_or_after_five_minutes(self):
+        response = self.applet_option()
+        self.ticket = self.cache.add.call_args.args[0]
+        request = {'username': response.data['account']['username'],
+                   'password': response.data['account']['secret']}
+        for delay in [timedelta(minutes=5), timedelta(minutes=5, microseconds=1)]:
+            with self.subTest(delay=delay), patch.object(api.timezone, 'now', return_value=self.now + delay):
+                with patch.object(api, 'get_connection_token_secret') as secret, self.assertRaises(PermissionDenied):
+                    self.redeem(data=request)
+                secret.assert_not_called()
+        self.cache.consume.assert_not_called()
+
+    def test_successful_exchange_does_not_inherit_ticket_or_token_expiry(self):
+        self.token.date_expired = self.now + timedelta(seconds=1)
+        self.ticket = replace(self.ticket, expires_at=self.token.date_expired)
+        response = self.redeem()
+        self.assertNotIn('login_deadline', response.data)
+        self.assertEqual(response.data['launch_deadline'], self.account.date_expired.isoformat())
+
+    def test_post_exchange_authorization_still_respects_asset_permission_expiry(self):
+        self.account.date_expired = self.now + timedelta(seconds=20)
+        response = self.redeem()
+        self.assertNotIn('login_deadline', response.data)
+        self.assertEqual(response.data['launch_deadline'], self.account.date_expired.isoformat())
+
+    def test_ticket_expiring_during_validation_does_not_disclose_secrets(self):
+        self.cache.consume.side_effect = None
+        self.cache.consume.return_value = False
+        with patch.object(api, 'get_connection_token_secret') as secret, self.assertRaises(PermissionDenied):
+            self.redeem()
+        secret.assert_not_called()
 
     def test_ticket_index_collision_is_retried(self):
-        with patch.object(api, 'get_object_or_404', side_effect=[self.token, self.applet]), \
-                patch.object(api.RDPLoginTicket.objects, 'create', side_effect=[IntegrityError(), self.ticket]) as create, \
-                patch.object(api.RDPLoginTicket.objects, 'filter') as query:
-            query.return_value.exists.return_value = True
-            self.invoke(api.RDPLoginPrepareApi, self.user, {'connection_token_id': str(self.token.id)})
-        self.assertEqual(create.call_count, 2)
-        self.assertNotEqual(create.call_args_list[0].kwargs['username'], create.call_args_list[1].kwargs['username'])
+        self.cache.add.side_effect = [False, True]
+        self.applet_option()
+        self.assertEqual(self.cache.add.call_count, 2)
+        self.assertNotEqual(self.cache.add.call_args_list[0].args[0].username,
+                            self.cache.add.call_args_list[1].args[0].username)
+
+    def test_cache_failure_does_not_return_a_credential(self):
+        self.cache.add.side_effect = TicketCacheUnavailable()
+        with self.assertRaises(TicketCacheUnavailable):
+            self.applet_option()
+        self.cache.consume.side_effect = TicketCacheUnavailable()
+        with patch.object(api, 'get_connection_token_secret') as secret, self.assertRaises(TicketCacheUnavailable):
+            self.redeem()
+        secret.assert_not_called()
 
     def test_redeem_returns_tinker_context_and_nested_user(self):
         response = self.redeem()
@@ -235,22 +301,23 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             'id': str(self.user.id), 'name': self.user.name,
             'username': self.user.username, 'email': self.user.email,
         })
-        self.assertEqual(self.ticket.grant_hash, api.digest(response.data['launch_grant']))
-        self.assertEqual(self.ticket.login_deadline, self.now + timedelta(seconds=90))
-        self.assertEqual(self.ticket.launch_deadline, self.now + timedelta(minutes=5))
-        self.assertNotIn('connection', response.data)
-        self.assertNotIn('grant', response.data)
+        self.assertNotIn('login_deadline', response.data)
+        self.assertEqual(response.data['launch_deadline'], self.account.date_expired.isoformat())
+        self.assertEqual(response.data['connection'], self.connection_data)
+        self.assertNotIn('launch_grant', response.data)
         self.assertEqual(response['Pragma'], 'no-cache')
+        self.assertTrue(self.consumed)
 
-    def test_redeem_does_not_release_a_second_grant(self):
+    def test_redeem_never_discloses_secrets_twice(self):
         self.redeem()
-        with self.assertRaises(PermissionDenied):
+        with patch.object(api, 'get_connection_token_secret') as secret, self.assertRaises(PermissionDenied):
             self.redeem()
+        secret.assert_not_called()
 
     def test_bad_password_does_not_consume_the_ticket(self):
         with self.assertRaises(PermissionDenied):
             self.redeem(data={**self.redeem_request, 'password': secrets.token_urlsafe(32)})
-        self.assertIsNone(self.ticket.redeemed_at)
+        self.assertFalse(self.consumed)
         self.redeem()
 
     def test_host_binding_and_supported_version_are_required(self):
@@ -261,124 +328,124 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.host.tinker_version = 'v0.3.0'
         with self.assertRaises(PermissionDenied):
             self.redeem()
-        self.assertIsNone(self.ticket.redeemed_at)
+        self.assertFalse(self.consumed)
 
     def test_changed_application_user_asset_or_organization_is_rejected(self):
+        original = self.ticket
         for key in ['app_id', 'asset_id', 'user_id', 'org_id']:
-            with self.subTest(key=key), patch.object(self.ticket, key, uuid4()), self.assertRaises(PermissionDenied):
+            self.ticket = replace(original, **{key: uuid4()})
+            with self.subTest(key=key), self.assertRaises(PermissionDenied):
                 self.redeem()
-        self.assertIsNone(self.ticket.redeemed_at)
-
-    def test_duplicate_redemption_context_is_rejected(self):
-        self.ticket.save.side_effect = IntegrityError()
-        with self.assertRaises(PermissionDenied):
-            self.redeem()
+        self.assertFalse(self.consumed)
 
     def test_user_cannot_call_component_endpoints(self):
-        for view in [api.RDPLoginRedeemApi, api.RDPLoginLaunchApi]:
-            with self.subTest(view=view), self.assertRaises(PermissionDenied):
-                self.invoke(view, self.user, {})
+        with self.assertRaises(PermissionDenied):
+            self.invoke(api.RDPLoginRedeemApi, self.user, {})
+        with patch.object(self.service, 'has_perm', return_value=False), self.assertRaises(PermissionDenied):
+            self.redeem()
+        self.assertFalse(self.consumed)
 
-    def test_expired_ticket_never_redeems(self):
-        self.ticket.expires_at = self.now
+    def test_missing_or_expired_ticket_never_redeems(self):
+        self.ticket = replace(self.ticket, expires_at=self.now)
         with self.assertRaises(PermissionDenied):
             self.redeem()
-
-    def test_launch_rejects_mismatched_session_and_authorization_ids(self):
-        data = self.launch_request()
-        for key, value in {
-            'token_id': str(uuid4()), 'connection_id': str(uuid4()),
-            'broker_instance_id': str(uuid4()), 'windows_session_id': 8,
-            'launch_grant': 'jmsg2_' + secrets.token_urlsafe(32),
-        }.items():
-            with self.subTest(key=key), self.assertRaises(PermissionDenied):
-                self.launch({**data, key: value})
-        self.assertIsNone(self.ticket.launched_at)
-        self.token.expire.assert_not_called()
-
-    def test_launch_requires_real_local_windows_identity(self):
-        data = self.launch_request()
-        for key, value in [('local_sid', 'S-1-5-18'), ('local_sid', ''), ('logon_id', ''), ('logon_id', '\n')]:
-            serializer = RDPLoginLaunchSerializer(data={**data, key: value})
-            self.assertFalse(serializer.is_valid(), (key, value))
-
-    def test_expired_launch_grant_never_returns_secrets(self):
-        data = self.launch_request()
-        self.ticket.launch_deadline = self.now
+        self.cache.get.side_effect = None
+        self.cache.get.return_value = None
         with self.assertRaises(PermissionDenied):
-            self.launch(data)
+            self.redeem()
+        self.assertFalse(self.consumed)
         self.token.expire.assert_not_called()
 
-    def test_launch_rechecks_permissions_before_disclosing_credentials(self):
-        data = self.launch_request()
+    def test_redeem_rechecks_permissions_before_disclosing_credentials(self):
         self.token.get_permed_account.return_value = None
         with self.assertRaises(PermissionDenied):
-            self.launch(data)
+            self.redeem()
         self.token.expire.assert_not_called()
-        self.assertIsNone(self.ticket.launched_at)
+        self.assertFalse(self.consumed)
 
     @override_settings(CONNECTION_TOKEN_REUSABLE=True)
-    def test_launch_consumes_one_time_token_and_returns_matching_tinker_payload(self):
-        data = self.launch_request()
-        response = self.launch(data)
-        self.assertEqual(response.data, {
-            'attempt_id': str(self.ticket.id), 'app_id': str(self.applet.id),
-            'app_name': self.applet.name, 'connection': self.connection_data,
-        })
+    def test_redeem_consumes_one_time_token_and_returns_matching_tinker_payload(self):
+        response = self.redeem()
+        self.assertEqual(response.data['connection'], self.connection_data)
         self.token.expire.assert_called_once()
         self.token.is_valid.assert_called_with(include_personal_secret=True)
-        self.assertIsNone(self.ticket.grant_hash)
-        self.assertEqual(self.ticket.request_id, UUID(data['request_id']))
-        self.assertEqual(self.ticket.local_sid, data['local_sid'])
-        self.assertEqual(self.ticket.logon_id, data['logon_id'])
-        with self.assertRaises(PermissionDenied):
-            self.launch(data)
+        self.assertTrue(self.consumed)
 
     @override_settings(CONNECTION_TOKEN_REUSABLE=True)
     def test_reusable_token_survives_consumption_of_one_connection(self):
         self.token.is_reusable = True
-        data = self.launch_request()
-        self.launch(data)
+        self.redeem()
         self.token.expire.assert_not_called()
-        self.assertIsNotNone(self.ticket.launched_at)
+        self.assertTrue(self.consumed)
 
     @override_settings(CONNECTION_TOKEN_REUSABLE=False)
     def test_global_policy_overrides_token_reuse(self):
         self.token.is_reusable = True
-        self.launch(self.launch_request())
+        self.redeem()
         self.token.expire.assert_called_once()
 
+    def test_tinker_cannot_skip_consumption_with_expire_now_false(self):
+        self.redeem(data={**self.redeem_request, 'expire_now': False})
+        self.token.expire.assert_called_once()
+        self.assertTrue(self.consumed)
+
+    def test_secret_failure_never_reopens_consumed_ticket(self):
+        with patch.object(api, 'get_connection_token_secret', side_effect=PermissionDenied), self.assertRaises(PermissionDenied):
+            self.redeem()
+        self.assertTrue(self.consumed)
+        with patch.object(api, 'get_connection_token_secret') as secret, self.assertRaises(PermissionDenied):
+            self.redeem()
+        secret.assert_not_called()
+
+    def test_existing_component_secret_response_and_reuse_policy_are_preserved(self):
+        request = SimpleNamespace(user=self.razor, data={'id': str(self.token.id), 'expire_now': False})
+        with patch.object(ConnectionToken, 'get_typed_connection_token', return_value=self.token), \
+                patch.object(SuperConnectionTokenViewSet, 'get_serializer') as serializer, \
+                patch.object(ConnectionToken.objects, 'filter'):
+            serializer.return_value.data = self.connection_data
+            response = SuperConnectionTokenViewSet().get_secret_detail(request)
+        self.assertEqual(response.data, self.connection_data)
+        self.assertNotIn('rdp_login', response.data)
+        self.token.expire.assert_not_called()
+
+    def test_only_redemption_has_a_new_rdp_login_route(self):
+        from authentication.urls.api_urls import urlpatterns
+        routes = [str(pattern.pattern) for pattern in urlpatterns
+                  if str(pattern.pattern).startswith('rdp-login/')]
+        self.assertEqual(routes, ['rdp-login/redeem/'])
+
+    @override_settings(CONNECTION_TOKEN_REUSABLE=True)
+    def test_personal_credential_is_audited_and_consumed_even_on_reusable_token(self):
+        self.token.personal_credential_id = uuid4()
+        self.token.is_reusable = True
+        with patch.object(token_service, 'record_personal_credential_audit') as audit:
+            self.redeem()
+        self.token.expire.assert_called_once()
+        self.token.is_valid.assert_called_with(include_personal_secret=True)
+        self.assertEqual(audit.call_args.kwargs['result'], 'success')
+        self.assertEqual(audit.call_args.kwargs['credential_id'], self.token.personal_credential_id)
+
     def test_each_connection_has_independent_authorization(self):
-        other = RDPLoginTicket(connection_token_id=self.token.id)
-        self.assertNotEqual(self.ticket.id, other.id)
-        self.assertNotEqual(self.ticket.connection_id, other.connection_id)
-        field = RDPLoginTicket._meta.get_field('connection_token')
-        self.assertFalse(field.unique)
+        self.applet_option()
+        self.applet_option()
+        first, second = (call.args[0] for call in self.cache.add.call_args_list)
+        self.assertEqual(first.connection_token_id, second.connection_token_id)
+        self.assertNotEqual(first.id, second.id)
+        self.assertNotEqual(first.connection_id, second.connection_id)
+        self.assertNotEqual(first.username, second.username)
 
-    def test_locks_connection_before_ticket_for_both_lookup_modes(self):
-        for lookup in [{'username': self.ticket.username}, {'id': self.ticket.id}]:
-            with patch.object(api, 'get_object_or_404', side_effect=[self.ticket, self.token, self.ticket]) as get:
-                self.assertEqual(api.lock_authorization(**lookup), (self.token, self.ticket))
-                self.assertEqual(get.call_args_list[1].kwargs, {'id': self.token.id})
-                self.assertEqual(get.call_args_list[2].kwargs, {**lookup, 'id': self.ticket.id})
-        with patch.object(api, 'get_object_or_404', side_effect=[self.ticket, self.token, Http404]):
-            with self.assertRaises(Http404):
-                api.lock_authorization(username=self.ticket.username)
-
-    def test_ticket_host_cannot_use_legacy_secret_endpoint(self):
+    def test_ticket_host_cannot_fetch_secrets_with_only_token_id(self):
         view = SuperConnectionTokenViewSet()
         request = SimpleNamespace(user=self.service, data={'id': str(self.token.id)})
         with patch.object(ConnectionToken, 'get_typed_connection_token') as get, self.assertRaises(PermissionDenied):
             view.get_secret_detail(request)
         get.assert_not_called()
-        api.check_legacy_secret_access(self.user)
-        razor = SimpleNamespace(**{**vars(self.service), 'terminal': SimpleNamespace(type='razor')})
-        api.check_legacy_secret_access(razor)
+        self.assertFalse(api.is_tinker(self.user))
+        self.assertFalse(api.is_tinker(self.razor))
 
-    def test_old_applet_account_endpoints_request_migration(self):
+    def test_old_account_release_is_compatible_but_generation_is_retired(self):
         from terminal.api.applet.host import AppletHostViewSet
-        self.assertEqual(SuperConnectionTokenViewSet().get_applet_info().status_code, 410)
-        self.assertEqual(SuperConnectionTokenViewSet().release_applet_account().status_code, 410)
+        self.assertEqual(SuperConnectionTokenViewSet().release_applet_account().status_code, 200)
         self.assertEqual(AppletHostViewSet().generate_accounts(None).status_code, 410)
 
     @override_settings(DEBUG_DEV=False)
@@ -403,7 +470,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
                     api.check_host(self.host, self.applet, self.service)
         api.check_host(self.host, self.applet, self.service)
 
-    def test_enabled_deployment_requires_verified_https(self):
+    def test_deployment_requires_verified_https(self):
         for url, skip in [('http://core', False), ('https://core', True), ('https://[', False), ('https://@core', False)]:
             with self.subTest(url=url, skip=skip):
                 serializer = DeployOptionsSerializer(data={
@@ -415,18 +482,3 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         })
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertNotIn('RDP_TOKEN_LOGIN', serializer.fields)
-
-    def test_model_matches_migration_and_graph_has_one_leaf(self):
-        from django.apps import apps
-        from django.db.migrations.loader import MigrationLoader
-        from django.db.migrations.state import ProjectState
-        loader = MigrationLoader(None, ignore_no_migrations=True)
-        self.assertFalse(loader.detect_conflicts())
-        migrated = loader.project_state()
-        current = ProjectState.from_apps(apps)
-        key = ('authentication', 'rdploginticket')
-        self.assertEqual(migrated.models[key], current.models[key])
-        self.assertEqual(
-            migrated.models[('terminal', 'applethost')].fields['tinker_version'].deconstruct(),
-            current.models[('terminal', 'applethost')].fields['tinker_version'].deconstruct(),
-        )

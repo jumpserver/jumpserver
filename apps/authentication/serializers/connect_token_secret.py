@@ -19,7 +19,7 @@ from ..utils import get_effective_connect_options
 
 __all__ = [
     'ConnectionTokenSecretSerializer',
-    'ConnectTokenVirtualAppOptionSerializer',
+    'ConnectTokenAppletOptionSerializer', 'ConnectTokenVirtualAppOptionSerializer',
 ]
 
 
@@ -230,6 +230,27 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
                 'file_size_limit': getattr(acl, config['file_size_limit_field'], 0) if acl else 0,
             }
         return policy
+
+
+class ConnectTokenAppletOptionSerializer(serializers.Serializer):
+    id = serializers.CharField(label=_('ID'))
+    applet = ObjectRelatedField(read_only=True)
+    host = _ConnectionTokenAssetSerializer(read_only=True)
+    account = _ConnectionTokenAccountSerializer(read_only=True)
+    gateway = _ConnectionTokenGatewaySerializer(read_only=True)
+    platform = _ConnectionTokenPlatformSerializer(read_only=True)
+    remote_app_option = serializers.JSONField(read_only=True)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # CP receives the ticket before local Windows authentication. Do not
+        # send a virtual ticket to an AD domain or try to use it for NLA.
+        for protocol in data['platform']['protocols']:
+            if protocol['name'] == 'rdp':
+                protocol['setting'] = {
+                    **(protocol.get('setting') or {}), 'ad_domain': 'localhost', 'security': 'tls',
+                }
+        return data
 
 
 class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):
