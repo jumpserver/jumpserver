@@ -6,6 +6,7 @@ import requests
 
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.utils.crypto import constant_time_compare
 from django.utils.http import urlencode
 from django.conf import settings
@@ -36,14 +37,21 @@ class OAuth2Backend(RedirectAuthBackend):
     def is_enabled():
         return settings.AUTH_OAUTH2
 
+    @transaction.atomic
     def get_or_create_user_from_userinfo(self, request, userinfo):
         log_prompt = "Get or Create user [OAuth2Backend]: {}"
         logger.debug(log_prompt.format('start'))
 
         # Construct user attrs value
         user_attrs = {}
-        for field, attr in settings.AUTH_OAUTH2_USER_ATTR_MAP.items():
+        attr_map = settings.AUTH_OAUTH2_USER_ATTR_MAP
+        for field, attr in attr_map.items():
+            if field == 'groups':
+                continue
             user_attrs[field] = userinfo.get(attr, '')
+        group_attr = attr_map.get('groups')
+        if isinstance(group_attr, str) and group_attr and group_attr in userinfo:
+            user_attrs['groups'] = userinfo[group_attr]
 
         username = user_attrs.get('username')
         if not username:
@@ -55,15 +63,20 @@ class OAuth2Backend(RedirectAuthBackend):
         email = construct_user_email(user_attrs.get('username'), email)
         user_attrs.update({'email': email})
 
+        groups_present = 'groups' in user_attrs
+        groups = user_attrs.pop('groups', None)
         logger.debug(log_prompt.format(user_attrs))
         user, created = get_user_model().objects.get_or_create(
             username=username, defaults=user_attrs
         )
+        signal_attrs = user_attrs.copy()
+        if groups_present:
+            signal_attrs['groups'] = groups
         logger.debug(log_prompt.format("user: {}|created: {}".format(user, created)))
         logger.debug(log_prompt.format("Send signal => oauth2 create or update user"))
         oauth2_create_or_update_user.send(
             sender=self.__class__, request=request, user=user, created=created,
-            attrs=user_attrs
+            attrs=signal_attrs
         )
         return user, created
 
