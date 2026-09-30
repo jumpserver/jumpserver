@@ -41,7 +41,7 @@ def parse_to_url(url):
     url = url.replace('(?P<res_type>.*)', '1')
     url = url.replace('(?P<name>[\\w.@]+)', '')
     url = url.replace('<str:name>', 'zh-hans')
-    url = url.replace('\.', '')
+    url = url.replace('\\.', '')
     url = url.replace('//', '/')
     url = url.strip('$')
     url = re.sub(path_uuid_pattern, uid, url)
