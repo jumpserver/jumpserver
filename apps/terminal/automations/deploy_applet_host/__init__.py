@@ -14,6 +14,7 @@ from common.utils import get_logger, random_string
 from ops.ansible import SuperPlaybookRunner, JMSInventory
 from terminal.const import TINKER_TARGET_VERSION
 from terminal.models import Applet, AppletHostDeployment
+from terminal.utils.tinker import parse_tinker_version
 
 logger = get_logger(__name__)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -52,14 +53,27 @@ class DeployAppletHostManager:
         # Open the registration window only after all downloads have completed.
         cache.set('APPLET_HOST_DELOYING', str(self.deployment.id), timeout=300)
         # The runner removes its workspace after each phase.
-        return self._run_playbook(self.generate_initial_playbook, tags='deploy', **kwargs)
+        deployed = self._run_playbook(self.generate_initial_playbook, tags='deploy', **kwargs)
+        if deployed.status == 'success':
+            host = self.deployment.host
+            host.refresh_from_db(fields=['tinker_version', 'date_synced'])
+            if (not host.date_synced
+                    or parse_tinker_version(host.tinker_version) != parse_tinker_version(TINKER_TARGET_VERSION)):
+                raise RuntimeError(
+                    f'Tinker did not report the target version {TINKER_TARGET_VERSION}; '
+                    f'reported version: {host.tinker_version or "unknown"}. '
+                    'Check the applet host and redeploy.'
+                )
+        return deployed
 
     def detach_terminal(self):
         host = self.deployment.host
-        if host.terminal:
-            terminal = host.terminal
-            host.terminal = None
-            host.save(update_fields=['terminal'])
+        terminal = host.terminal
+        host.terminal = None
+        host.tinker_version = ''
+        host.date_synced = None
+        host.save(update_fields=['terminal', 'tinker_version', 'date_synced'])
+        if terminal:
             terminal.delete()
 
     def _run_install_applet(self, **kwargs):
@@ -77,13 +91,19 @@ class DeployAppletHostManager:
         return self._run_playbook(generate_playbook, **kwargs)
 
     def generate_initial_playbook(self):
+        from terminal.serializers.applet_host import DeployOptionsSerializer
+
         site_url = settings.SITE_URL
         download_host = settings.APPLET_DOWNLOAD_HOST
         bootstrap_token = settings.BOOTSTRAP_TOKEN
         host_id = str(self.deployment.host.id)
         if not site_url:
             site_url = "http://localhost:8080"
-        options = self.deployment.host.deploy_options
+        options = dict(self.deployment.host.deploy_options)
+        options.setdefault('CORE_HOST', site_url)
+        serializer = DeployOptionsSerializer(data=options)
+        serializer.is_valid(raise_exception=True)
+        options = serializer.validated_data
         core_host = options.get("CORE_HOST", site_url)
         core_host = core_host.rstrip("/")
         if not download_host:

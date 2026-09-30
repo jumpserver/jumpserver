@@ -13,7 +13,7 @@ from common.validators import ProjectUniqueValidator
 from .applet import AppletSerializer
 from .. import const
 from ..models import AppletHost, AppletHostDeployment
-from ..utils.tinker import get_tinker_version_status
+from ..utils.tinker import get_tinker_version_status, get_tinker_upgrade_message
 
 __all__ = [
     'AppletHostSerializer', 'AppletHostDeploymentSerializer',
@@ -23,10 +23,6 @@ __all__ = [
 
 
 class DeployOptionsSerializer(serializers.Serializer):
-    RDP_TOKEN_LOGIN = serializers.BooleanField(
-        default=False, label=_("RDP token login (experimental)"),
-        help_text=_("Create persistent Windows runtime accounts locally on first use; requires the Tinker credential provider."),
-    )
     LICENSE_MODE_CHOICES = (
         (2, _('Per Device (Device number limit)')),
         (4, _('Per User (User number limit)')),
@@ -50,7 +46,7 @@ class DeployOptionsSerializer(serializers.Serializer):
         eg: https://172.16.10.110 or https://dev.example.com
         """)
     )
-    IGNORE_VERIFY_CERTS = serializers.BooleanField(default=True, label=_("Ignore Certificate Verification"))
+    IGNORE_VERIFY_CERTS = serializers.BooleanField(default=False, label=_("Ignore Certificate Verification"))
     RDS_Licensing = serializers.BooleanField(
         default=False, label=_("Existing RDS license"),
         help_text=_(
@@ -86,22 +82,23 @@ class DeployOptionsSerializer(serializers.Serializer):
     def validate(self, attrs):
         instance = getattr(self.parent, 'instance', None)
         options = {**(getattr(instance, 'deploy_options', None) or {}), **attrs}
-        if options.get('RDP_TOKEN_LOGIN'):
-            try:
-                core = urlsplit(options.get('CORE_HOST', settings.SITE_URL))
-            except ValueError:
-                raise serializers.ValidationError(_('Invalid Core URL.'))
-            if (core.scheme != 'https' or not core.netloc or core.username
-                    or core.query or core.fragment or options.get('IGNORE_VERIFY_CERTS', True)):
-                raise serializers.ValidationError(_(
-                    'RDP token login requires an HTTPS Core URL and certificate verification.'
-                ))
+        try:
+            core = urlsplit(options.get('CORE_HOST', settings.SITE_URL))
+        except ValueError:
+            raise serializers.ValidationError(_('Invalid Core URL.'))
+        if (core.scheme != 'https' or not core.netloc or core.username is not None
+                or core.query or core.fragment or options.get('IGNORE_VERIFY_CERTS', False)):
+            raise serializers.ValidationError(_(
+                'Tinker requires an HTTPS Core URL and certificate verification.'
+            ))
         return attrs
 
 
 class AppletHostSerializer(HostSerializer):
+    tinker_min_version = serializers.SerializerMethodField()
     tinker_target_version = serializers.SerializerMethodField()
     tinker_version_status = serializers.SerializerMethodField()
+    tinker_upgrade_message = serializers.SerializerMethodField()
     deploy_options = DeployOptionsSerializer(required=False, label=_("Deploy options"))
     load = LabeledChoiceField(
         read_only=True, label=_('Load status'), choices=const.ComponentLoad.choices,
@@ -110,37 +107,27 @@ class AppletHostSerializer(HostSerializer):
     class Meta(HostSerializer.Meta):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
-            'auto_create_accounts', 'accounts_create_amount',
-            'load', 'date_synced', 'deploy_options', 'using_same_account',
+            'load', 'date_synced', 'deploy_options',
             'tinker_version', 'tinker_target_version', 'tinker_version_status',
+            'tinker_min_version', 'tinker_upgrade_message',
         ]
         extra_kwargs = {
             **HostSerializer.Meta.extra_kwargs,
             'date_synced': {'read_only': True},
             'tinker_version': {'read_only': True},
-            'auto_create_accounts': {
-                'help_text': _(
-                    'These accounts are used to connect to the published application, '
-                    'the account is now divided into two types, one is dedicated to each account, '
-                    'each user has a private account, the other is public, '
-                    'when the application does not support multiple open and the special has been used, '
-                    'the public account will be used to connect'
-                )
-            },
-            'accounts_create_amount': {'help_text': _('The number of public accounts created automatically')},
-            'using_same_account': {
-                'help_text': _(
-                    'Connect to the host using the same account first. For security reasons, please set the '
-                    'configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and restart the service to enable it.'
-                )
-            }
         }
+
+    def get_tinker_min_version(self, obj):
+        return const.TINKER_MIN_VERSION
 
     def get_tinker_target_version(self, obj):
         return const.TINKER_TARGET_VERSION
 
     def get_tinker_version_status(self, obj):
         return get_tinker_version_status(obj.tinker_version)
+
+    def get_tinker_upgrade_message(self, obj):
+        return get_tinker_upgrade_message(obj.tinker_version)
 
     def __init__(self, *args, data=None, **kwargs):
         if data:

@@ -5,7 +5,7 @@ from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
 from .. import api
-from ..api.rdp_login import RDPLoginIssueApi, RDPLoginRedeemApi, RDPLoginLaunchApi
+from ..api.rdp_login import RDPLoginPrepareApi, RDPLoginRedeemApi, RDPLoginLaunchApi
 from ..backends.passkey.urls import urlpatterns as passkey_urlpatterns
 
 app_name = 'authentication'
@@ -21,7 +21,7 @@ router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
 
 urlpatterns = [
-    path('rdp-login/issue/', RDPLoginIssueApi.as_view(), name='rdp-login-issue'),
+    path('rdp-login/prepare/', RDPLoginPrepareApi.as_view(), name='rdp-login-prepare'),
     path('rdp-login/redeem/', RDPLoginRedeemApi.as_view(), name='rdp-login-redeem'),
     path('rdp-login/launch/', RDPLoginLaunchApi.as_view(), name='rdp-login-launch'),
     path('<str:backend>/qr/unbind/', api.QRUnBindForUserApi.as_view(), name='qr-unbind'),

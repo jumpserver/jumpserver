@@ -20,12 +20,12 @@ from assets.validators import web_xpack_fields
 from authentication.const import ConnectionTokenType
 from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
-from common.utils import lazyproperty, pretty_string, bulk_get, is_uuid
+from common.utils import lazyproperty, pretty_string, is_uuid
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.utils import tmp_to_org
 from perms.const import ActionChoices
-from terminal.models import Applet, VirtualApp
+from terminal.models import VirtualApp
 
 
 def date_expired_default():
@@ -352,40 +352,6 @@ class ConnectionToken(JMSOrgBaseModel):
             'image_protocol': virtual_app.image_protocol,
             'provider': provider,
         }
-
-    def get_applet_option(self):
-        method = self.connect_method_object
-        if not method or method.get('type') != 'applet' or method.get('disabled', False):
-            return None
-
-        applet = Applet.objects.filter(name=method.get('value')).first()
-        if not applet:
-            return None
-
-        host_account = applet.select_host_account(self.user, self.asset)
-        if not host_account:
-            raise JMSException({'error': 'No host account available, please check the applet, host and account'})
-
-        host, account, lock_key = bulk_get(host_account, ('host', 'account', 'lock_key'))
-        gateway = host.zone.select_gateway() if host.zone else None
-        platform = host.platform
-
-        data = {
-            'id': lock_key,
-            'applet': applet,
-            'host': host,
-            'gateway': gateway,
-            'platform': platform,
-            'account': account,
-            'remote_app_option': self.get_remote_app_option()
-        }
-        return data
-
-    @staticmethod
-    def release_applet_account(lock_key):
-        if lock_key:
-            cache.delete(lock_key)
-            return True
 
     def set_ad_domain_if_need(self, account):
         if not self.protocol == 'rdp':

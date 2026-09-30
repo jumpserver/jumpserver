@@ -2,7 +2,7 @@
 - hosts: all
   vars:
     APPLET_DOWNLOAD_HOST: https://demo.example.com
-    IGNORE_VERIFY_CERTS: true
+    IGNORE_VERIFY_CERTS: false
     HOST_NAME: test
     HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.example.com
@@ -240,7 +240,7 @@
         - name: Generate tinkerd component config
           ansible.windows.win_powershell:
             script: |
-              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs={{ IGNORE_VERIFY_CERTS | bool | lower }} --rdp-token-login={{ RDP_TOKEN_LOGIN | default(false) | bool | lower }}
+              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs=false --rdp-token-login=true
 
         - name: Rename tinkerd keyfile
           ansible.windows.win_powershell:

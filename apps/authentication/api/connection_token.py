@@ -59,7 +59,7 @@ from ..utils import (
 )
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
+    SuperConnectionTokenSerializer,
     ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer,
     AdminConnectionTokenSerializer,
 )
@@ -1257,6 +1257,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         if not request.user.has_perm(rbac_perm):
             raise PermissionDenied('Not allow to view secret')
 
+        from .rdp_login import check_legacy_secret_access
+        check_legacy_secret_access(request.user)
+
         token_id = request.data.get('id') or ''
         token = ConnectionToken.get_typed_connection_token(token_id)
         if not token:
@@ -1342,13 +1345,10 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
     @action(methods=['POST'], detail=False, url_path='applet-option')
     def get_applet_info(self, *args, **kwargs):
-        token_id = self.request.data.get('id')
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        if token.is_expired:
-            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
-        data = token.get_applet_option()
-        serializer = ConnectTokenAppletOptionSerializer(data)
-        return Response(serializer.data)
+        return Response(
+            {'detail': 'Use POST /api/v1/authentication/rdp-login/prepare/ before connecting.'},
+            status=status.HTTP_410_GONE,
+        )
 
     @action(methods=['POST'], detail=False, url_path='virtual-app-option')
     def get_virtual_app_info(self, *args, **kwargs):
@@ -1362,15 +1362,10 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):
-        lock_key = self.request.data.get('id')
-        released = ConnectionToken.release_applet_account(lock_key)
-
-        if released:
-            logger.debug('Release applet account success: {}'.format(lock_key))
-            return Response({'msg': 'released'})
-        else:
-            logger.error('Release applet account error: {}'.format(lock_key))
-            return Response({'error': 'not found or expired'}, status=400)
+        return Response(
+            {'detail': 'Windows runtime accounts are managed locally by Tinker.'},
+            status=status.HTTP_410_GONE,
+        )
 
 
 class AdminConnectionTokenViewSet(ConnectionTokenViewSet):

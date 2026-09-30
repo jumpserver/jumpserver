@@ -74,9 +74,10 @@ class AppletHostViewSet(JMSBulkModelViewSet):
 
     @action(methods=['put'], detail=True, url_path='generate-accounts')
     def generate_accounts(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.generate_accounts()
-        return Response({'msg': 'ok'})
+        return Response(
+            {'detail': 'Windows runtime accounts are managed locally by Tinker.'},
+            status=status.HTTP_410_GONE,
+        )
 
 
 class AppletHostDeploymentViewSet(viewsets.ModelViewSet):

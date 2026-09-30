@@ -1,5 +1,7 @@
 import re
 
+from django.utils.translation import gettext_lazy as _
+
 from terminal import const
 
 
@@ -23,3 +25,12 @@ def get_tinker_version_status(value):
     if version > target:
         return 'newer'
     return 'ok'
+
+
+def get_tinker_upgrade_message(value):
+    if get_tinker_version_status(value) not in ('unknown', 'unsupported'):
+        return ''
+    return _('Tinker version %(version)s is unavailable for connections. '
+             'Upgrade and redeploy this applet host with Tinker %(minimum)s or later.') % {
+        'version': value or _('not reported'), 'minimum': const.TINKER_MIN_VERSION,
+    }

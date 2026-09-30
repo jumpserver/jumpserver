@@ -18,7 +18,7 @@ from ..models import ConnectionToken
 from ..utils import get_effective_connect_options
 
 __all__ = [
-    'ConnectionTokenSecretSerializer', 'ConnectTokenAppletOptionSerializer',
+    'ConnectionTokenSecretSerializer',
     'ConnectTokenVirtualAppOptionSerializer',
 ]
 
@@ -230,16 +230,6 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
                 'file_size_limit': getattr(acl, config['file_size_limit_field'], 0) if acl else 0,
             }
         return policy
-
-
-class ConnectTokenAppletOptionSerializer(serializers.Serializer):
-    id = serializers.CharField(label=_('ID'))
-    applet = ObjectRelatedField(read_only=True)
-    host = _ConnectionTokenAssetSerializer(read_only=True)
-    account = _ConnectionTokenAccountSerializer(read_only=True)
-    gateway = _ConnectionTokenGatewaySerializer(read_only=True)
-    platform = _ConnectionTokenPlatformSerializer(read_only=True)
-    remote_app_option = serializers.JSONField(read_only=True)
 
 
 class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):
