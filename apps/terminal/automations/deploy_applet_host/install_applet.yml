@@ -8,7 +8,7 @@
     - name: Install applet
       ansible.windows.win_powershell:
         script: |
-          tinkerd install --name {{ applet_name }}
+          & "$env:ProgramFiles\Tinker\tinkerd.exe" install --name {{ applet_name }}
           $exitCode = $LASTEXITCODE
           if ($exitCode -ne 0) {
               Write-Host "Failed to install {{ applet_name }}"

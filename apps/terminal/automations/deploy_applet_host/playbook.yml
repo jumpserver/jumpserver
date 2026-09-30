@@ -50,48 +50,33 @@
             msg: "Failed to prepare applet host; existing Tinker was not stopped"
 
     - block:
-        - name: Create Tinker keyfile
+        - name: Register Tinker for this applet host
           ansible.windows.win_powershell:
+            parameters:
+              CoreHost: "{{ CORE_HOST }}"
+              HostName: "{{ HOST_NAME }}"
+              HostId: "{{ HOST_ID }}"
+              BootstrapToken: "{{ BOOTSTRAP_TOKEN }}"
             script: |
-              if ({{ IGNORE_VERIFY_CERTS | bool | ternary('$true', '$false') }}) {
-                [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
-              }
-              function New-RandomString {
-                  param (
-                      [int]$Length = 16
-                  )
-                  $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-                  $random = -join ((1..$Length) | ForEach-Object { $chars[(Get-Random -Maximum $chars.Length)] })
-                  return $random
-              }
-              $targetPath = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
-              $randomStr = New-RandomString -Length 7
-              $dir = [System.IO.Path]::GetDirectoryName($targetPath)
-              if (-not (Test-Path -Path $dir)) {
-                New-Item -ItemType Directory -Path $dir -Force | Out-Null
-              }
-              $url = "{{ CORE_HOST }}/api/v1/terminal/terminal-registrations/"
-
+              param([string]$CoreHost, [string]$HostName, [string]$HostId, [string]$BootstrapToken)
+              $ErrorActionPreference = 'Stop'
               $body = @{
-                "name" = "[Tinker]-{{ HOST_NAME }}-$randomStr"
-                "comment" = "tinker"
-                "type" = "tinker"
-                "host_id" = "{{ HOST_ID }}"
-                }| ConvertTo-Json
+                name = "[Tinker]-$HostName"
+                comment = 'tinker'
+                type = 'tinker'
+                host_id = $HostId
+              } | ConvertTo-Json
               $headers = @{
-                  "Authorization" = "BootstrapToken {{ BOOTSTRAP_TOKEN }}"
-                  "Content-Type"  = "application/json"
+                Authorization = "BootstrapToken $BootstrapToken"
+                'Content-Type' = 'application/json; charset=utf-8'
               }
-              $response = Invoke-RestMethod -Uri $url -Method Post -Body $body -Headers $headers
-              $accessKey = $response.service_account.access_key.id
-              $accessSecret = $response.service_account.access_key.secret
-              if ($accessKey -and $accessSecret) {
-                  $utf8NoBOM = New-Object System.Text.UTF8Encoding($false)
-                  [System.IO.File]::WriteAllText($targetPath, "${accessKey}:${accessSecret}", $utf8NoBOM)
-                  Write-Output "access_key save to $targetPath"
-              } else {
-                  Write-Error "Failed to get access_key or access_secret。"
-              }
+              $response = Invoke-RestMethod -Uri "$CoreHost/api/v1/terminal/terminal-registrations/" -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($body)) -Headers $headers
+              $key = $response.service_account.access_key
+              if (-not $key.id -or -not $key.secret) { throw 'Core returned no Tinker component credentials.' }
+              $Ansible.Result = @{ access_key = "$($key.id):$($key.secret)" }
+          register: tinker_registration
+          no_log: true
+
         - name: Install RDS-RD-Server (RDS)
           ansible.windows.win_feature:
             name: RDS-RD-Server
@@ -99,70 +84,17 @@
             include_management_tools: yes
           register: rds_install
 
-        - name: Stop Tinkerd service first
-          ansible.windows.win_powershell:
-            script: |
-              $serviceName = "JumpServer Tinker"
-              $eventLogKey = "HKLM:\SYSTEM\CurrentControlSet\Services\EventLog\Application\$serviceName"
-              $svc = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
-              if ($svc) {
-                  Write-Output "Service found: $serviceName"
-                  try {
-                      sc.exe config "$serviceName" start= disabled | Out-Null
-                      Write-Output "Service disabled"
-                  } catch {
-                      Write-Output "Disable failed, continue..."
-                  }
-                  if ($svc.Status -ne 'Stopped') {
-                      try {
-                          Stop-Service -Name $serviceName -Force -ErrorAction Stop
-                          Write-Output "Service stopped"
-                      } catch {
-                          Write-Output "Stop-Service failed, continue..."
-                      }
-                      $timeout = 10
-                      while ($timeout -gt 0) {
-                          $current = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
-                          if (!$current -or $current.Status -eq 'Stopped') { break }
-                          Start-Sleep -Seconds 1
-                          $timeout--
-                      }
-                  }
-                  try {
-                      sc.exe delete "$serviceName" | Out-Null
-                      Write-Output "Service deleted"
-                  } catch {
-                      Write-Output "Delete failed, continue..."
-                  }
-              }
-              if (Test-Path $eventLogKey) {
-                  Remove-Item -Path $eventLogKey -Recurse -Force
-                  Write-Output "EventLog source registry key deleted."
-              }
-        - name: Stop Tinker before install
-          ansible.windows.win_powershell:
-            script: |
-              if (Get-Process -Name 'tinker' -ErrorAction SilentlyContinue) {
-                TASKKILL /F /IM tinker.exe /T
-              }
-              else {
-               $Ansible.Changed = $false
-              }
-
+        # Run setup on every deployment, including a repair of the same version.
+        # The installer owns service/file cleanup and leaves the service stopped
+        # until the freshly registered credentials have been imported.
         - name: Install Tinker
-          ansible.windows.win_package:
-            path: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
-            arguments:
+          ansible.windows.win_command:
+            argv:
+              - "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
               - /VERYSILENT
               - /SUPPRESSMSGBOXES
               - /NORESTART
-            state: present
-
-        - name: Set Tinkerd on the global system path
-          ansible.windows.win_path:
-            elements:
-              - '%USERPROFILE%\AppData\Local\Programs\Tinker\'
-            scope: user
+              - /NOSTART=1
 
         - name: Install the python-{{ PYTHON_VERSION }}
           community.windows.win_unzip:
@@ -237,35 +169,44 @@
             data: "{{ RDS_RemoteAppLogoffTimeLimit }}"
             type: dword
 
-        - name: Generate tinkerd component config
+        - name: Configure Tinker and import its component key
           ansible.windows.win_powershell:
+            parameters:
+              Configuration: >-
+                {{ {'name': HOST_NAME, 'core_host': CORE_HOST,
+                    'host_id': HOST_ID,
+                    'access_key': tinker_registration.result.access_key} | to_json }}
             script: |
-              tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs=false
-
-        - name: Rename tinkerd keyfile
-          ansible.windows.win_powershell:
-            script: |
-              $source = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\access_key"
-              $destination = "$env:USERPROFILE\AppData\Local\Programs\Tinker\data\keys\.access_key"
-              if (Test-Path $destination) {
-                  Write-Output "Preserving the existing Tinker access key"
-                  return
-              }
-              if (Test-Path $source) {
-                  Rename-Item -Path $source -NewName (Split-Path -Leaf $destination)
-              } else {
-                  throw "Tinker access key is missing"
-              }
+              param([string]$Configuration)
+              $ErrorActionPreference = 'Stop'
+              $process = [Diagnostics.Process]::new()
+              $process.StartInfo.FileName = Join-Path $env:ProgramFiles 'Tinker\tinkerd.exe'
+              $process.StartInfo.Arguments = 'config --stdin'
+              $process.StartInfo.UseShellExecute = $false
+              $process.StartInfo.CreateNoWindow = $true
+              $process.StartInfo.RedirectStandardInput = $true
+              $process.StartInfo.RedirectStandardError = $true
+              try {
+                if (-not $process.Start()) { throw 'Unable to start Tinker configuration.' }
+                $process.StandardInput.Write($Configuration)
+                $process.StandardInput.Close()
+                $details = $process.StandardError.ReadToEnd()
+                $process.WaitForExit()
+                if ($process.ExitCode -ne 0) { throw "Tinker configuration failed: $details" }
+              } finally { $process.Dispose() }
+          no_log: true
 
         - name: Install tinkerd service
           ansible.windows.win_powershell:
             script: |
-              tinkerd service install
+              & "$env:ProgramFiles\Tinker\tinkerd.exe" service install
+              if ($LASTEXITCODE -ne 0) { throw "Tinker service installation failed: $LASTEXITCODE" }
 
         - name: Start tinkerd service
           ansible.windows.win_powershell:
             script: |
-              tinkerd service start
+              & "$env:ProgramFiles\Tinker\tinkerd.exe" service start
+              if ($LASTEXITCODE -ne 0) { throw "Tinker service startup failed: $LASTEXITCODE" }
 
         - name: Wait Tinker api health
           ansible.windows.win_uri:
@@ -280,7 +221,7 @@
         - name: Sync all remote applets
           ansible.windows.win_powershell:
             script: |
-              tinkerd install all
+              & "$env:ProgramFiles\Tinker\tinkerd.exe" install all
               $exitCode = $LASTEXITCODE
               if ($exitCode -ne 0) {
                   Write-Output "Failed to install applets"
@@ -293,7 +234,5 @@
 
       tags: [deploy]
       rescue:
-        - debug:
-            var: ansible_failed_result
         - fail:
             msg: "Failed to deploy applet host"

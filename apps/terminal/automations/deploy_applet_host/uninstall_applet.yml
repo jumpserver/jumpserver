@@ -8,7 +8,7 @@
     - name: uninstall applet
       ansible.windows.win_powershell:
         script: |
-          tinkerd uninstall --name {{ applet_name }}
+          & "$env:ProgramFiles\Tinker\tinkerd.exe" uninstall --name {{ applet_name }}
           $exitCode = $LASTEXITCODE
           if ($exitCode -ne 0) {
               Write-Host "Failed to uninstall {{ applet_name }}"
