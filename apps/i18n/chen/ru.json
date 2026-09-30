@@ -1,5 +1,5 @@
 {
-    "ACLRejectError": "Выполнение команды запрещено правилом",
+    "ACLRejectError": " Выполнение команды запрещено правилом",
     "AffectedRows": "Затронутые строки",
     "AlreadyFirstPageError": "Это первая страница",
     "AlreadyLastPageError": "Это последняя страница",
