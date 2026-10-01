@@ -3,17 +3,18 @@ import os
 import re
 import shutil
 import uuid
+from functools import partial
 
 import yaml
 from django.conf import settings
-from django.core.cache import cache
+from django.db import transaction
 from django.utils import timezone
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger, random_string
 from ops.ansible import SuperPlaybookRunner, JMSInventory
 from terminal.const import TINKER_TARGET_VERSION
-from terminal.models import Applet, AppletHostDeployment
+from terminal.models import Applet, AppletHost, AppletHostDeployment
 from terminal.utils.tinker import parse_tinker_version
 
 logger = get_logger(__name__)
@@ -45,15 +46,19 @@ class DeployAppletHostManager:
         self._run(self._run_uninstall_applet, **kwargs)
 
     def _run_initial_deploy(self, **kwargs):
-        prepared = self._run_playbook(self.generate_initial_playbook, tags='prepare', **kwargs)
-        if prepared.status != 'success':
-            return prepared
+        # Keep the old component identity until Windows has accepted and
+        # completed setup, including any required reboot. An occupied profile
+        # or failed installer must not revoke the still-installed service key.
+        for phase in ('prepare', 'install'):
+            result = self._run_playbook(self.generate_initial_playbook, tags=phase, **kwargs)
+            if result.status != 'success':
+                return result
 
-        self.detach_terminal()
-        # Open the registration window only after all downloads have completed.
-        cache.set('APPLET_HOST_DELOYING', str(self.deployment.id), timeout=300)
+        credentials = self.create_tinker_credentials()
         # The runner removes its workspace after each phase.
-        deployed = self._run_playbook(self.generate_initial_playbook, tags='deploy', **kwargs)
+        deployed = self._run_playbook(
+            partial(self.generate_initial_playbook, credentials=credentials), tags='deploy', **kwargs,
+        )
         if deployed.status == 'success':
             host = self.deployment.host
             host.refresh_from_db(fields=['tinker_version', 'date_synced'])
@@ -66,15 +71,35 @@ class DeployAppletHostManager:
                 )
         return deployed
 
-    def detach_terminal(self):
-        host = self.deployment.host
-        terminal = host.terminal
-        host.terminal = None
-        host.tinker_version = ''
-        host.date_synced = None
-        host.save(update_fields=['terminal', 'tinker_version', 'date_synced'])
-        if terminal:
-            terminal.delete()
+    def create_tinker_credentials(self):
+        from terminal.serializers import TerminalRegistrationSerializer
+
+        # Administrator-initiated deployment creates the component locally;
+        # public registration permissions and bootstrap tokens do not apply.
+        with transaction.atomic():
+            host = AppletHost.objects.select_for_update().get(pk=self.deployment.host.pk)
+            old_terminal = host.terminal
+            if old_terminal and old_terminal.type != 'tinker':
+                raise ValueError('Applet host terminal must be Tinker')
+            name = re.sub(r'\W', '_', host.name, flags=re.UNICODE)[:100]
+            serializer = TerminalRegistrationSerializer(data={
+                'name': f'[Tinker]-{name}-{random_string(7)}',
+                'type': 'tinker',
+                'comment': 'tinker',
+            })
+            serializer.is_valid(raise_exception=True)
+            terminal = serializer.save()
+            key = terminal.user.access_key
+            if not key or not key.is_active:
+                raise RuntimeError('Tinker component has no active access key')
+            credentials = {'name': terminal.name, 'access_key': key.get_full_value()}
+            host.terminal = terminal
+            host.tinker_version = ''
+            host.date_synced = None
+            host.save(update_fields=['terminal', 'tinker_version', 'date_synced'])
+            if old_terminal:
+                old_terminal.delete()
+        return credentials
 
     def _run_install_applet(self, **kwargs):
         if self.applet:
@@ -90,12 +115,11 @@ class DeployAppletHostManager:
             raise ValueError("applet is required for uninstall_applet")
         return self._run_playbook(generate_playbook, **kwargs)
 
-    def generate_initial_playbook(self):
+    def generate_initial_playbook(self, credentials=None):
         from terminal.serializers.applet_host import DeployOptionsSerializer
 
         site_url = settings.SITE_URL
         download_host = settings.APPLET_DOWNLOAD_HOST
-        bootstrap_token = settings.BOOTSTRAP_TOKEN
         host_id = str(self.deployment.host.id)
         if not site_url:
             site_url = "http://localhost:8080"
@@ -111,18 +135,16 @@ class DeployAppletHostManager:
         download_host = download_host.rstrip("/")
 
         def handler(plays):
-            # 替换所有的特殊字符为下划线 _ , 防止因主机名称造成任务执行失败
-            applet_host_name = re.sub(r'\W', '_', self.deployment.host.name, flags=re.UNICODE)
-            hostname = '{}-{}'.format(applet_host_name, random_string(7))
             for play in plays:
                 play["vars"].update(options)
                 play["vars"]["APPLET_DOWNLOAD_HOST"] = download_host
                 play["vars"]["CORE_HOST"] = core_host
-                play["vars"]["BOOTSTRAP_TOKEN"] = bootstrap_token
                 play["vars"]["HOST_ID"] = host_id
-                play["vars"]["HOST_NAME"] = hostname
                 play["vars"]["INSTALL_APPLETS"] = self.install_applets
                 play["vars"]["TINKER_VERSION"] = TINKER_TARGET_VERSION
+                if credentials is not None:
+                    play["vars"]["HOST_NAME"] = credentials['name']
+                    play["vars"]["TINKER_ACCESS_KEY"] = credentials['access_key']
             return plays
 
         return self._generate_playbook("playbook.yml", handler)
@@ -170,31 +192,34 @@ class DeployAppletHostManager:
             plays = plays_handler(plays)
         playbook_dir = os.path.join(self.run_dir, "playbook")
         playbook_dst = os.path.join(playbook_dir, "main.yml")
-        os.makedirs(playbook_dir, exist_ok=True)
+        os.makedirs(playbook_dir, mode=0o700, exist_ok=True)
         with open(playbook_dst, "w") as f:
+            os.fchmod(f.fileno(), 0o600)
             yaml.safe_dump(plays, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
         return playbook_dst
 
     def _run_playbook(self, generate_playbook: callable, **kwargs):
-        inventory = self.generate_inventory()
-        playbook = generate_playbook()
-        runner = SuperPlaybookRunner(
-            inventory=inventory,
-            playbook=playbook,
-            project_dir=self.run_dir,
-            safety_mode="playbook_unsafe",
-            inventory_safety="json_escape",
-        )
-        # Unlike asset automations, applet host deployments do not have a
-        # callback that writes user-oriented progress. Keep Ansible's output
-        # enabled so the Celery task log shown by the deployment page is not
-        # empty.
-        kwargs.setdefault("quiet", False)
-        return runner.run(**kwargs)
+        os.makedirs(self.run_dir, mode=0o700, exist_ok=True)
+        os.chmod(self.run_dir, 0o700)
+        try:
+            inventory = self.generate_inventory()
+            playbook = generate_playbook()
+            runner = SuperPlaybookRunner(
+                inventory=inventory,
+                playbook=playbook,
+                project_dir=self.run_dir,
+                safety_mode="playbook_unsafe",
+                inventory_safety="json_escape",
+            )
+            # Keep task progress visible; the credential import uses no_log.
+            kwargs.setdefault("quiet", False)
+            return runner.run(**kwargs)
+        finally:
+            self.delete_runtime_dir()
 
     def delete_runtime_dir(self):
-        if settings.DEBUG_DEV:
-            return
+        # The generated playbook contains a component key, including in debug
+        # mode. Do not retain it or the inventory after success or failure.
         shutil.rmtree(self.run_dir, ignore_errors=True)
 
     def _run(self, cb_func: callable, **kwargs):

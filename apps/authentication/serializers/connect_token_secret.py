@@ -243,12 +243,13 @@ class ConnectTokenAppletOptionSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        # CP receives the ticket before local Windows authentication. Do not
-        # send a virtual ticket to an AD domain or try to use it for NLA.
+        # Route virtual tickets to the local CP, not the host's AD domain.
+        # The Tinker installer configures the server's NLA requirement; leave
+        # transport negotiation to the existing platform/client settings.
         for protocol in data['platform']['protocols']:
             if protocol['name'] == 'rdp':
                 protocol['setting'] = {
-                    **(protocol.get('setting') or {}), 'ad_domain': 'localhost', 'security': 'tls',
+                    **(protocol.get('setting') or {}), 'ad_domain': 'localhost',
                 }
         return data
 

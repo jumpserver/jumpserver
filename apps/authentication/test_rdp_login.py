@@ -212,7 +212,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.assertEqual(response.data['host']['protocols'], [{'name': 'rdp', 'port': 3389}])
         self.assertEqual(response.data['gateway']['address'], 'gateway.example.test')
         self.assertEqual(response.data['platform']['protocols'][0]['setting'], {
-            'ad_domain': 'localhost', 'security': 'tls', 'console': False,
+            'ad_domain': 'localhost', 'security': 'nla', 'console': False,
         })
         self.assertEqual(self.host.platform.protocols[0].setting['security'], 'nla')
         options = response.data['remote_app_option']
@@ -221,6 +221,13 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.assertNotIn('remoteapplicationprogram:s', options)
         self.assertNotIn('remoteapplicationcmdline:s', options)
         self.applet.select_host.assert_called_once_with(self.user, self.token.asset)
+
+    def test_applet_option_does_not_add_transport_security_setting(self):
+        self.host.platform.protocols[0].setting.pop('security')
+        response = self.applet_option()
+        self.assertEqual(response.data['platform']['protocols'][0]['setting'], {
+            'ad_domain': 'localhost', 'console': False,
+        })
 
     def test_applet_option_requires_an_authorized_connection_component(self):
         denied = SimpleNamespace(**{**vars(self.razor), 'has_perm': lambda name: False})
