@@ -158,8 +158,10 @@ class RDPLoginRedeemApi(APIView):
                 raise PermissionDenied('RDP login ticket has already been used')
             # The ticket is consumed before secrets are disclosed. An uncertain
             # outcome requires a new connection; it never reopens this ticket.
+            # Request normal token consumption without accepting client overrides;
+            # reusable-token and Kubernetes exceptions follow the shared policy.
             connection = get_connection_token_secret(
-                request, token, ConnectionTokenSecretSerializer, rdp_login=True,
+                token, ConnectionTokenSecretSerializer, expire_now=True,
             )
             return private_response({
                 'attempt_id': str(ticket.id), 'connection_id': str(ticket.connection_id),

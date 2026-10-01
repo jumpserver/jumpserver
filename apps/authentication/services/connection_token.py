@@ -14,10 +14,11 @@ from .ssh_certificate import sign_connection_token_ssh_certificate
 logger = get_logger(__name__)
 
 
-def get_connection_token_secret(request, token, serializer_factory, *, rdp_login=False):
-    requested_expire_now = True if rdp_login else request.data.get('expire_now', True)
+def get_connection_token_secret(token, serializer_factory, *, expire_now=True, public_key=''):
+    """Return credentials using the shared token validation and consumption rules."""
+    requested_expire_now = expire_now
     try:
-        if token.personal_credential_id or rdp_login:
+        if token.personal_credential_id:
             # Validate permissions and fetch the exact-version secret once.
             # account_object reuses it on this request-local token instance.
             token.is_valid(include_personal_secret=True)
@@ -44,9 +45,7 @@ def get_connection_token_secret(request, token, serializer_factory, *, rdp_login
             )
         raise
     if account and account.secret_type == SecretType.SSH_CERTIFICATE:
-        certificate = sign_connection_token_ssh_certificate(
-            token, request.data.get('public_key', '')
-        )
+        certificate = sign_connection_token_ssh_certificate(token, public_key)
         # The certificate is public material, but returning it through the
         # existing account credential field keeps the component contract
         # compact. Koko pairs it with the private key generated in memory.
@@ -61,11 +60,10 @@ def get_connection_token_secret(request, token, serializer_factory, *, rdp_login
     expire_now = requested_expire_now
     asset_type = token.asset.type
     # 设置默认值
-    if not rdp_login and asset_type in ['k8s', 'kubernetes']:
+    if asset_type in ['k8s', 'kubernetes']:
         expire_now = False
 
-    if (token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE
-            and not (rdp_login and token.personal_credential_id)):
+    if token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
         logger.debug('Token is reusable, not expire now')
     elif is_false(expire_now):
         logger.debug('API specified, do not expire now')

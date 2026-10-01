@@ -13,6 +13,7 @@ from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
+from accounts.const import SecretType
 from authentication.api import rdp_login as api
 from authentication.api import connection_token as token_api
 from authentication.api.connection_token import SuperConnectionTokenViewSet
@@ -138,6 +139,16 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         with patch.object(token_api, 'get_object_or_404', return_value=self.token), \
                 patch.object(api, 'get_object_or_404', return_value=self.applet):
             return SuperConnectionTokenViewSet().get_applet_info(request)
+
+    def secret(self, data=None):
+        request = SimpleNamespace(
+            user=self.razor, data={'id': str(self.token.id), **(data or {})},
+        )
+        with patch.object(ConnectionToken, 'get_typed_connection_token', return_value=self.token), \
+                patch.object(SuperConnectionTokenViewSet, 'get_serializer') as serializer, \
+                patch.object(ConnectionToken.objects, 'filter'):
+            serializer.return_value.data = self.connection_data
+            return SuperConnectionTokenViewSet().get_secret_detail(request)
 
     def test_only_full_v2_credentials_are_accepted(self):
         for username, password in [
@@ -368,7 +379,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         response = self.redeem()
         self.assertEqual(response.data['connection'], self.connection_data)
         self.token.expire.assert_called_once()
-        self.token.is_valid.assert_called_with(include_personal_secret=True)
+        self.token.is_valid.assert_called_with()
         self.assertTrue(self.consumed)
 
     @override_settings(CONNECTION_TOKEN_REUSABLE=True)
@@ -389,6 +400,18 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.token.expire.assert_called_once()
         self.assertTrue(self.consumed)
 
+    def test_kubernetes_retains_token_but_cannot_reuse_login_ticket(self):
+        for asset_type in ['k8s', 'kubernetes']:
+            with self.subTest(asset_type=asset_type):
+                self.consumed = False
+                self.token.asset.type = asset_type
+                response = self.redeem()
+                self.assertEqual(response.data['connection'], self.connection_data)
+                self.token.expire.assert_not_called()
+                self.assertTrue(self.consumed)
+                with self.assertRaises(PermissionDenied):
+                    self.redeem()
+
     def test_secret_failure_never_reopens_consumed_ticket(self):
         with patch.object(api, 'get_connection_token_secret', side_effect=PermissionDenied), self.assertRaises(PermissionDenied):
             self.redeem()
@@ -398,15 +421,32 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         secret.assert_not_called()
 
     def test_existing_component_secret_response_and_reuse_policy_are_preserved(self):
-        request = SimpleNamespace(user=self.razor, data={'id': str(self.token.id), 'expire_now': False})
-        with patch.object(ConnectionToken, 'get_typed_connection_token', return_value=self.token), \
-                patch.object(SuperConnectionTokenViewSet, 'get_serializer') as serializer, \
-                patch.object(ConnectionToken.objects, 'filter'):
-            serializer.return_value.data = self.connection_data
-            response = SuperConnectionTokenViewSet().get_secret_detail(request)
+        response = self.secret(data={'expire_now': False})
         self.assertEqual(response.data, self.connection_data)
         self.assertNotIn('rdp_login', response.data)
         self.token.expire.assert_not_called()
+
+    def test_existing_component_secret_consumes_token_by_default(self):
+        self.secret()
+        self.token.expire.assert_called_once()
+
+    def test_existing_component_secret_forwards_ssh_public_key(self):
+        public_key = 'synthetic-public-key'
+        self.token.account_object.secret_type = SecretType.SSH_CERTIFICATE
+        certificate = {'signed_key': 'synthetic-certificate', 'serial_number': '1'}
+        with patch.object(token_service, 'sign_connection_token_ssh_certificate', return_value=certificate) as sign:
+            self.secret(data={'public_key': public_key})
+        sign.assert_called_once_with(self.token, public_key)
+        self.assertEqual(self.token.account_object.secret, certificate['signed_key'])
+        self.assertEqual(self.token.ssh_certificate, {'serial_number': '1'})
+
+    def test_personal_credential_inspection_keeps_existing_audit_semantics(self):
+        self.token.personal_credential_id = uuid4()
+        with patch.object(token_service, 'record_personal_credential_audit') as audit:
+            self.secret(data={'expire_now': False})
+        self.token.expire.assert_not_called()
+        self.token.is_valid.assert_called_once_with(include_personal_secret=True)
+        self.assertEqual(audit.call_args.kwargs['result'], 'inspected')
 
     def test_only_redemption_has_a_new_rdp_login_route(self):
         from authentication.urls.api_urls import urlpatterns
@@ -415,15 +455,25 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.assertEqual(routes, ['rdp-login/redeem/'])
 
     @override_settings(CONNECTION_TOKEN_REUSABLE=True)
-    def test_personal_credential_is_audited_and_consumed_even_on_reusable_token(self):
+    def test_personal_credential_uses_shared_reuse_policy_and_audit(self):
         self.token.personal_credential_id = uuid4()
-        self.token.is_reusable = True
-        with patch.object(token_service, 'record_personal_credential_audit') as audit:
-            self.redeem()
-        self.token.expire.assert_called_once()
-        self.token.is_valid.assert_called_with(include_personal_secret=True)
-        self.assertEqual(audit.call_args.kwargs['result'], 'success')
-        self.assertEqual(audit.call_args.kwargs['credential_id'], self.token.personal_credential_id)
+        # Creation/update already prohibit reusable personal tokens. The secret
+        # API follows the shared dev policy even for a legacy inconsistent flag.
+        for reusable in [False, True]:
+            with self.subTest(reusable=reusable):
+                self.consumed = False
+                self.token.expire.reset_mock()
+                self.token.is_reusable = reusable
+                with patch.object(token_service, 'record_personal_credential_audit') as audit:
+                    self.redeem()
+                if reusable:
+                    self.token.expire.assert_not_called()
+                else:
+                    self.token.expire.assert_called_once()
+                self.assertTrue(self.consumed)
+                self.token.is_valid.assert_called_with(include_personal_secret=True)
+                self.assertEqual(audit.call_args.kwargs['result'], 'success')
+                self.assertEqual(audit.call_args.kwargs['credential_id'], self.token.personal_credential_id)
 
     def test_each_connection_has_independent_authorization(self):
         self.applet_option()

@@ -1265,7 +1265,11 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token = ConnectionToken.get_typed_connection_token(token_id)
         if not token:
             raise PermissionDenied('Token {} is not valid'.format(token))
-        return Response(get_connection_token_secret(request, token, self.get_serializer))
+        return Response(get_connection_token_secret(
+            token, self.get_serializer,
+            expire_now=request.data.get('expire_now', True),
+            public_key=request.data.get('public_key', ''),
+        ))
 
     @action(methods=['POST'], detail=False, url_path='applet-option')
     def get_applet_info(self, request, *args, **kwargs):
