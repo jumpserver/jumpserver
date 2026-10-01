@@ -16,7 +16,6 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from acls.models import LoginAssetACL
 from assets.const import Protocol
 from assets.models import Asset
 from common.const.http import POST
@@ -27,7 +26,7 @@ from ops.celery import app
 from ops.const import Types
 from ops.filters import JobExecutionFilterSet, JobFilterSet
 from ops.models import Job, JobExecution, JMSPermedInventory
-from ops.models.job import check_upload_permission
+from ops.models.job import check_upload_permission, match_rejected_login_asset_acl
 from ops.serializers.job import (
     JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 )
@@ -57,16 +56,14 @@ def set_task_to_serializer_data(serializer, task_id):
 class LoginAssetACLCheckMixin:
 
     def check_login_asset_acls(self, user, assets, account, ip):
-        for asset in assets:
-            kwargs = {'user': user, 'asset': asset, 'account_username': account}
-            acls = LoginAssetACL.filter_queryset(**kwargs)
-            acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
-            if not acl:
-                return
-            if not acl.is_action(acl.ActionChoices.accept):
-                raise PermissionDenied(_(
-                    "Login to asset {}({}) is rejected by login asset ACL ({})".format(asset.name, asset.address, acl)
-                ))
+        asset, acl = match_rejected_login_asset_acl(user, assets, account, ip)
+        if not asset:
+            return
+        raise PermissionDenied(_(
+            "Login to asset {}({}) is rejected by login asset ACL ({})".format(
+                asset.name, asset.address, acl
+            )
+        ))
 
 
 class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
