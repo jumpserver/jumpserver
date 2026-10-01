@@ -1,6 +1,4 @@
 """Core/Tinker v2 authorization decisions, without a Windows host or database."""
-import base64
-import json
 import secrets
 from contextlib import nullcontext
 from datetime import timedelta
@@ -217,9 +215,11 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             'ad_domain': 'localhost', 'security': 'tls', 'console': False,
         })
         self.assertEqual(self.host.platform.protocols[0].setting['security'], 'nla')
-        args = json.loads(base64.b64decode(response.data['remote_app_option']['remoteapplicationcmdline:s']))
-        self.assertEqual(args['token_id'], str(self.token.id))
-        self.assertEqual(args['app_name'], self.applet.name)
+        options = response.data['remote_app_option']
+        self.assertEqual(options['remoteapplicationmode:i'], '0')
+        self.assertEqual(options['alternate shell:s'], '')
+        self.assertNotIn('remoteapplicationprogram:s', options)
+        self.assertNotIn('remoteapplicationcmdline:s', options)
         self.applet.select_host.assert_called_once_with(self.user, self.token.asset)
 
     def test_applet_option_requires_an_authorized_connection_component(self):

@@ -313,25 +313,16 @@ class ConnectionToken(JMSOrgBaseModel):
         return method
 
     def get_remote_app_option(self):
-        cmdline = {
-            'app_name': self.connect_method,
-            'user_id': str(self.user.id),
-            'asset_id': str(self.asset.id),
-            'token_id': str(self.id)
-        }
-        cmdline_b64 = base64.b64encode(json.dumps(cmdline).encode()).decode()
-        app = '||tinker'
-        options = {
-            'remoteapplicationmode:i': '1',
-            'remoteapplicationprogram:s': app,
-            'remoteapplicationname:s': app,
-            'alternate shell:s': app,
-            'remoteapplicationcmdline:s': cmdline_b64,
+        # Keep the existing response field for connection components. A ticket
+        # now opens ordinary RDP; the protected server-side Tinker shell chooses
+        # the application from the authenticated Windows session binding.
+        return {
+            'remoteapplicationmode:i': '0',
+            'alternate shell:s': '',
             'disableconnectionsharing:i': '1',
-            'bitmapcachepersistenable:i': '0',  # 图缓存相关设置,便于录像审计
+            'bitmapcachepersistenable:i': '0',
             'bitmapcachesize:i': '1500',
         }
-        return options
 
     def get_virtual_app_option(self):
         method = self.connect_method_object
