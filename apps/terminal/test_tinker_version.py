@@ -4,8 +4,10 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from uuid import uuid4
 
+import yaml
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
+from jinja2 import Environment
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from terminal import const
@@ -82,12 +84,32 @@ class TinkerDeploymentTests(SimpleTestCase):
         self.assertNotIn('RDP_TOKEN_LOGIN', variables)
         self.assertNotIn('BOOTSTRAP_TOKEN', variables)
         self.assertNotIn('TINKER_ACCESS_KEY', variables)
-        self.assertFalse(variables['IGNORE_VERIFY_CERTS'])
+        self.assertTrue(variables['IGNORE_VERIFY_CERTS'])
 
     def test_invalid_core_url_is_rejected_before_deployment(self):
-        self.host.deploy_options = {'CORE_HOST': 'http://core.example.test'}
+        self.host.deploy_options = {'CORE_HOST': 'ftp://core.example.test'}
         with self.assertRaises(ValidationError):
             self.manager.generate_initial_playbook()
+
+    def test_deployment_passes_core_connection_options_to_tinker(self):
+        env = Environment()
+        credentials = {'name': '[Tinker]-publish-host', 'access_key': 'id:test-secret'}
+        with TemporaryDirectory() as directory:
+            self.manager.run_dir = directory
+            for url, skip in [('http://core.example.test', True), ('https://core.example.test', True),
+                              ('https://core.example.test', False)]:
+                with self.subTest(url=url, skip=skip):
+                    self.host.deploy_options = {'CORE_HOST': url, 'IGNORE_VERIFY_CERTS': skip}
+                    path = self.manager.generate_initial_playbook(credentials)
+                    play = yaml.safe_load(Path(path).read_text())[0]
+                    deploy = next(block for block in play['tasks'] if block['tags'] == ['deploy'])
+                    parameters = deploy['block'][0]['ansible.windows.win_powershell']['parameters']
+                    config = {name: env.from_string(value).render(play['vars'])
+                              for name, value in parameters.items()}
+                    self.assertEqual(config['CORE_HOST'], url)
+                    self.assertEqual(config['IGNORE_VERIFY_CERTS'], str(skip).lower())
+                    self.assertEqual(config['HOST_ID'], str(self.host.id))
+                    self.assertEqual(config['ComponentKey'], credentials['access_key'])
 
     def test_download_or_install_failure_keeps_component_identity_and_version(self):
         old_terminal = self.host.terminal

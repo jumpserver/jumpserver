@@ -527,15 +527,17 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
                     api.check_host(self.host, self.applet, self.service)
         api.check_host(self.host, self.applet, self.service)
 
-    def test_deployment_requires_verified_https(self):
-        for url, skip in [('http://core', False), ('https://core', True), ('https://[', False), ('https://@core', False)]:
-            with self.subTest(url=url, skip=skip):
-                serializer = DeployOptionsSerializer(data={
-                    'CORE_HOST': url, 'IGNORE_VERIFY_CERTS': skip,
-                })
+    def test_deployment_uses_existing_core_connection_options(self):
+        for url in ['ftp://core', 'https://[', 'https://@core', 'https://core?token=secret']:
+            with self.subTest(url=url):
+                serializer = DeployOptionsSerializer(data={'CORE_HOST': url})
                 self.assertFalse(serializer.is_valid())
-        serializer = DeployOptionsSerializer(data={
-            'CORE_HOST': 'https://core', 'IGNORE_VERIFY_CERTS': False,
-        })
-        self.assertTrue(serializer.is_valid(), serializer.errors)
+        for url in ['http://core', 'https://core']:
+            for skip in [False, True]:
+                with self.subTest(url=url, skip=skip):
+                    options = {'CORE_HOST': url, 'IGNORE_VERIFY_CERTS': skip}
+                    serializer = DeployOptionsSerializer(data=options)
+                    self.assertTrue(serializer.is_valid(), serializer.errors)
+                    for field, value in options.items():
+                        self.assertEqual(serializer.validated_data[field], value)
         self.assertNotIn('RDP_TOKEN_LOGIN', serializer.fields)

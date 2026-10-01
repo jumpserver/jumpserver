@@ -2,7 +2,7 @@
 - hosts: all
   vars:
     APPLET_DOWNLOAD_HOST: https://demo.example.com
-    IGNORE_VERIFY_CERTS: false
+    IGNORE_VERIFY_CERTS: true
     HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.example.com
     RDS_Licensing: false
@@ -106,7 +106,7 @@
             script: |
               $ErrorActionPreference = 'Stop'
               & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass `
-                -File "$env:ProgramFiles\Tinker\native\rdp-settings.ps1"
+                -File "$env:SystemRoot\System32\config\systemprofile\AppData\Local\Tinker\native\rdp-settings.ps1"
               if ($LASTEXITCODE -ne 0) { throw 'Unable to configure RDP for Tinker ticket login after reboot.' }
           when: rds_install.reboot_required
 
@@ -158,34 +158,25 @@
         - name: Configure Tinker and import its component key
           ansible.windows.win_powershell:
             parameters:
-              Configuration: >-
-                {{ {'name': HOST_NAME, 'core_host': CORE_HOST,
-                    'host_id': HOST_ID,
-                    'access_key': TINKER_ACCESS_KEY} | to_json }}
+              NAME: "{{ HOST_NAME }}"
+              CORE_HOST: "{{ CORE_HOST }}"
+              HOST_ID: "{{ HOST_ID }}"
+              IGNORE_VERIFY_CERTS: "{{ IGNORE_VERIFY_CERTS | string | lower }}"
+              ComponentKey: "{{ TINKER_ACCESS_KEY }}"
             script: |
-              param([string]$Configuration)
+              param([string]$NAME, [string]$CORE_HOST, [string]$HOST_ID,
+                    [string]$IGNORE_VERIFY_CERTS, [string]$ComponentKey)
               $ErrorActionPreference = 'Stop'
-              $process = [Diagnostics.Process]::new()
-              $process.StartInfo.FileName = Join-Path $env:ProgramFiles 'Tinker\tinkerd.exe'
-              $process.StartInfo.Arguments = 'config --stdin'
-              $process.StartInfo.UseShellExecute = $false
-              $process.StartInfo.CreateNoWindow = $true
-              $process.StartInfo.RedirectStandardInput = $true
-              $process.StartInfo.RedirectStandardError = $true
-              try {
-                if (-not $process.Start()) { throw 'Unable to start Tinker configuration.' }
-                $process.StandardInput.Write($Configuration)
-                $process.StandardInput.Close()
-                $details = $process.StandardError.ReadToEnd()
-                $process.WaitForExit()
-                if ($process.ExitCode -ne 0) { throw "Tinker configuration failed: $details" }
-              } finally { $process.Dispose() }
+              $ComponentKey | & "$env:SystemRoot\System32\config\systemprofile\AppData\Local\Tinker\tinkerd.exe" config `
+                --hostname $NAME --core_host $CORE_HOST --host_id $HOST_ID `
+                "--ignore-verify-certs=$IGNORE_VERIFY_CERTS" --stdin
+              if ($LASTEXITCODE -ne 0) { throw "Tinker configuration failed: $LASTEXITCODE" }
           no_log: true
 
         - name: Start tinkerd service
           ansible.windows.win_powershell:
             script: |
-              & "$env:ProgramFiles\Tinker\tinkerd.exe" service start
+              & "$env:SystemRoot\System32\config\systemprofile\AppData\Local\Tinker\tinkerd.exe" service start
               if ($LASTEXITCODE -ne 0) { throw "Tinker service startup failed: $LASTEXITCODE" }
 
         - name: Wait Tinker api health
@@ -201,7 +192,7 @@
         - name: Sync all remote applets
           ansible.windows.win_powershell:
             script: |
-              & "$env:ProgramFiles\Tinker\tinkerd.exe" install all
+              & "$env:SystemRoot\System32\config\systemprofile\AppData\Local\Tinker\tinkerd.exe" install all
               $exitCode = $LASTEXITCODE
               if ($exitCode -ne 0) {
                   Write-Output "Failed to install applets"

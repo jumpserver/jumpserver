@@ -6,5 +6,5 @@
     - name: Install all applets
       ansible.windows.win_powershell:
         script: |
-          & "$env:ProgramFiles\Tinker\tinkerd.exe" install all
+          & "$env:SystemRoot\System32\config\systemprofile\AppData\Local\Tinker\tinkerd.exe" install all
           if ($LASTEXITCODE -ne 0) { throw "Tinker applet installation failed: $LASTEXITCODE" }

@@ -46,7 +46,7 @@ class DeployOptionsSerializer(serializers.Serializer):
         eg: https://172.16.10.110 or https://dev.example.com
         """)
     )
-    IGNORE_VERIFY_CERTS = serializers.BooleanField(default=False, label=_("Ignore Certificate Verification"))
+    IGNORE_VERIFY_CERTS = serializers.BooleanField(default=True, label=_("Ignore Certificate Verification"))
     RDS_Licensing = serializers.BooleanField(
         default=False, label=_("Existing RDS license"),
         help_text=_(
@@ -86,10 +86,10 @@ class DeployOptionsSerializer(serializers.Serializer):
             core = urlsplit(options.get('CORE_HOST', settings.SITE_URL))
         except ValueError:
             raise serializers.ValidationError(_('Invalid Core URL.'))
-        if (core.scheme != 'https' or not core.netloc or core.username is not None
-                or core.query or core.fragment or options.get('IGNORE_VERIFY_CERTS', False)):
+        if (core.scheme not in ('http', 'https') or not core.netloc or core.username is not None
+                or core.query or core.fragment):
             raise serializers.ValidationError(_(
-                'Tinker requires an HTTPS Core URL and certificate verification.'
+                'Invalid Core URL.'
             ))
         return attrs
 
