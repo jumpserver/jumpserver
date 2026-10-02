@@ -64,6 +64,118 @@ class TinkerVersionTests(SimpleTestCase):
         candidates.filter.assert_called_once_with(tinker_version__in=['', 'v0.3.0', 'v0.3.10'])
 
 
+@override_settings(SITE_URL='https://core.example.test')
+class AppletHostDeployOptionsTests(TestCase):
+    retired_options = {
+        'RDS_Licensing': True,
+        'RDS_LicenseServer': 'license.example.test',
+        'RDS_LicensingMode': 4,
+        'RDS_fSingleSessionPerUser': 0,
+        'RDS_MaxDisconnectionTime': 120000,
+        'RDS_RemoteAppLogoffTimeLimit': 60000,
+    }
+
+    def setUp(self):
+        from assets.models import Platform
+        from orgs.utils import tmp_to_builtin_org
+
+        self.enterContext(tmp_to_builtin_org(system=1))
+        self.platform, _ = Platform.objects.get_or_create(
+            name='RemoteAppHost', defaults={'category': 'host', 'type': 'windows'},
+        )
+        self.options = {
+            'CORE_HOST': 'https://saved-core.example.test', 'IGNORE_VERIFY_CERTS': False,
+            'RDS_LICENSE_SERVER': 'current-license.example.test',
+            **self.retired_options,
+        }
+
+    def test_new_host_ignores_retired_options_and_does_not_expose_them(self):
+        serializer = AppletHostSerializer(data={
+            'name': 'new-publish-host', 'address': '192.0.2.11', 'deploy_options': self.options.copy(),
+        })
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        host = serializer.save()
+        host.refresh_from_db()
+        expected = {key: value for key, value in self.options.items() if key not in self.retired_options}
+        self.assertEqual(host.deploy_options, expected)
+        self.assertEqual(serializer.data['deploy_options'], expected)
+        for field in self.retired_options:
+            self.assertNotIn(field, serializer.fields['deploy_options'].fields)
+
+    def test_new_host_defaults_to_existing_windows_license_configuration(self):
+        for options in ({}, {'RDS_LICENSE_SERVER': ''}, {'RDS_LICENSE_SERVER': '   '}):
+            with self.subTest(options=options):
+                serializer = AppletHostSerializer(data={
+                    'name': f'publish-host-{uuid4()}', 'address': '192.0.2.14',
+                    'deploy_options': {**self.retired_options, **options},
+                })
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+                host = serializer.save()
+                host.refresh_from_db()
+                self.assertEqual(host.deploy_options['RDS_LICENSE_SERVER'], '')
+                self.assertEqual(serializer.data['deploy_options']['RDS_LICENSE_SERVER'], '')
+                for field in self.retired_options:
+                    self.assertNotIn(field, host.deploy_options)
+
+    def test_update_preserves_historical_options_and_ignores_old_client_changes(self):
+        legacy_options = self.options.copy()
+        legacy_options.pop('RDS_LICENSE_SERVER')
+        host = AppletHost.objects.create(
+            name='existing-publish-host', address='192.0.2.12', platform=self.platform,
+            deploy_options=legacy_options,
+        )
+        self.assertEqual(AppletHostSerializer(host).data['deploy_options']['RDS_LICENSE_SERVER'], '')
+        self.assertNotIn('RDS_LICENSE_SERVER', host.deploy_options)
+        for partial in (True, False):
+            with self.subTest(partial=partial):
+                serializer = AppletHostSerializer(host, data={
+                    'name': host.name, 'address': host.address,
+                    'deploy_options': {
+                        **self.options, 'CORE_HOST': 'https://new-core.example.test',
+                        'IGNORE_VERIFY_CERTS': True,
+                        **dict.fromkeys(self.retired_options, 999),
+                    },
+                }, partial=partial)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+                serializer.save()
+                host.refresh_from_db()
+                self.assertEqual(host.deploy_options, {
+                    **self.options, 'CORE_HOST': 'https://new-core.example.test',
+                    'IGNORE_VERIFY_CERTS': True,
+                })
+                for field in self.retired_options:
+                    self.assertNotIn(field, serializer.data['deploy_options'])
+
+    def test_updates_keep_omitted_connection_and_historical_options(self):
+        host = AppletHost.objects.create(
+            name='partial-publish-host', address='192.0.2.13', platform=self.platform,
+            deploy_options=self.options.copy(),
+        )
+        expected = self.options.copy()
+        for partial in (True, False):
+            for options in (
+                {'RDS_LICENSE_SERVER': 'new-license.example.test'},
+                {'IGNORE_VERIFY_CERTS': False},
+                {'CORE_HOST': 'https://new-core.example.test'},
+                {'RDS_LICENSE_SERVER': ''},
+            ):
+                with self.subTest(partial=partial, options=options):
+                    serializer = AppletHostSerializer(host, data={
+                        'name': host.name, 'address': host.address, 'deploy_options': options,
+                    }, partial=partial)
+                    self.assertTrue(serializer.is_valid(), serializer.errors)
+                    serializer.save()
+                    host.refresh_from_db()
+                    expected.update(options)
+                    self.assertEqual(host.deploy_options, expected)
+
+        serializer = AppletHostSerializer(host, data={'comment': 'Updated description'}, partial=True)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+        host.refresh_from_db()
+        self.assertEqual(host.deploy_options, expected)
+
+
 @override_settings(SITE_URL='https://core.example.test', APPLET_DOWNLOAD_HOST='https://downloads.example.test')
 class TinkerDeploymentTests(SimpleTestCase):
     def setUp(self):
@@ -90,6 +202,70 @@ class TinkerDeploymentTests(SimpleTestCase):
         self.host.deploy_options = {'CORE_HOST': 'ftp://core.example.test'}
         with self.assertRaises(ValidationError):
             self.manager.generate_initial_playbook()
+
+    def test_retired_options_never_reach_initial_or_applet_playbooks(self):
+        retired = AppletHostDeployOptionsTests.retired_options
+        options = {
+            **retired, 'CORE_HOST': 'https://saved-core.example.test', 'IGNORE_VERIFY_CERTS': False,
+        }
+        self.host.deploy_options = options.copy()
+        self.manager.applet = SimpleNamespace(name='weblite')
+        generators = (
+            self.manager.generate_initial_playbook,
+            self.manager.generate_install_applet_playbook,
+            self.manager.generate_install_all_playbook,
+            self.manager.generate_uninstall_applet_playbook,
+        )
+        with TemporaryDirectory() as directory:
+            self.manager.run_dir = directory
+            for generate in generators:
+                with self.subTest(playbook=generate.__name__):
+                    text = Path(generate()).read_text()
+                    for field in retired:
+                        self.assertNotIn(field, text)
+                    play = yaml.safe_load(text)[0]
+                    if generate == self.manager.generate_initial_playbook:
+                        self.assertEqual(play['vars']['CORE_HOST'], options['CORE_HOST'])
+                        self.assertFalse(play['vars']['IGNORE_VERIFY_CERTS'])
+                        install = next(block for block in play['tasks'] if block['tags'] == ['install'])
+                        features = [task['ansible.windows.win_feature'] for task in install['block']
+                                    if 'ansible.windows.win_feature' in task]
+                        self.assertIn({'name': 'RDS-RD-Server', 'state': 'present',
+                                       'include_management_tools': True}, features)
+                    elif generate == self.manager.generate_install_applet_playbook:
+                        self.assertEqual(play['vars']['applet_name'], 'weblite')
+        self.assertEqual(self.host.deploy_options, options)
+
+    def test_license_server_write_requires_the_new_explicit_option(self):
+        env = Environment()
+        cases = (
+            ({}, ''),
+            ({'RDS_LICENSE_SERVER': ''}, ''),
+            ({'RDS_LICENSE_SERVER': '  '}, ''),
+            ({'RDS_LICENSE_SERVER': ' license.example.test '}, 'license.example.test'),
+            ({'RDS_LICENSE_SERVER': '127.0.0.1'}, '127.0.0.1'),
+        )
+        with TemporaryDirectory() as directory:
+            self.manager.run_dir = directory
+            for legacy_enabled in (None, False, True):
+                legacy = {**AppletHostDeployOptionsTests.retired_options, 'RDS_LicenseServer': '127.0.0.1'}
+                if legacy_enabled is None:
+                    legacy.pop('RDS_Licensing')
+                else:
+                    legacy['RDS_Licensing'] = legacy_enabled
+                for options, server in cases:
+                    with self.subTest(legacy_enabled=legacy_enabled, options=options):
+                        self.host.deploy_options = {**legacy, **options}
+                        play = yaml.safe_load(Path(self.manager.generate_initial_playbook()).read_text())[0]
+                        install = next(block for block in play['tasks'] if block['tags'] == ['install'])
+                        writes = [task for task in install['block'] if 'ansible.windows.win_regedit' in task]
+                        self.assertEqual(len(writes), 1)
+                        task = writes[0]
+                        self.assertEqual(task['ansible.windows.win_regedit']['name'], 'LicenseServers')
+                        self.assertEqual(bool(env.compile_expression(task['when'])(**play['vars'])), bool(server))
+                        configured = env.from_string(task['ansible.windows.win_regedit']['data']).render(play['vars'])
+                        self.assertEqual(configured, server)
+                        self.assertEqual(self.host.deploy_options, {**legacy, **options})
 
     def test_deployment_passes_core_connection_options_to_tinker(self):
         env = Environment()

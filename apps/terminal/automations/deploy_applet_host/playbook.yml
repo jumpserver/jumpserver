@@ -5,12 +5,7 @@
     IGNORE_VERIFY_CERTS: true
     HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.example.com
-    RDS_Licensing: false
-    RDS_LicenseServer: 127.0.0.1
-    RDS_LicensingMode: 4
-    RDS_fSingleSessionPerUser: 1
-    RDS_MaxDisconnectionTime: 60000
-    RDS_RemoteAppLogoffTimeLimit: 0
+    RDS_LICENSE_SERVER: ''
     INSTALL_APPLETS: true
     PYTHON_VERSION: 3.11.11
 
@@ -110,44 +105,46 @@
               if ($LASTEXITCODE -ne 0) { throw 'Unable to configure RDP for Tinker ticket login after reboot.' }
           when: rds_install.reboot_required
 
-        - name: Set RDS LicenseServer (regedit)
+        - name: Check RDS session host connection capacity
+          ansible.windows.win_powershell:
+            script: |
+              $ErrorActionPreference = 'Stop'
+              $Ansible.Changed = $false
+              $namespace = 'root/cimv2/terminalservices'
+              $server = @(Get-CimInstance -Namespace $namespace -ClassName Win32_TerminalServiceSetting)
+              if ($server.Count -ne 1 -or $server[0].TerminalServerMode -notin @(0, 1)) {
+                  throw 'Cannot read the effective RDS Session Host operating mode.'
+              }
+              if ($server[0].TerminalServerMode -ne 1) {
+                  throw 'RDS Session Host is not active. Check role installation and any pending reboot.'
+              }
+              $listener = @(Get-CimInstance -Namespace $namespace -ClassName Win32_TSNetworkAdapterSetting `
+                  -Filter "TerminalName='RDP-Tcp'")
+              if ($listener.Count -ne 1 -or $null -eq $listener[0].MaximumConnections -or
+                  $null -eq $listener[0].PolicySourceMaximumConnections) {
+                  throw 'Cannot read the effective RDP-Tcp connection limit or its policy source.'
+              }
+              $policySource = $listener[0].PolicySourceMaximumConnections
+              $source = switch ($policySource) {
+                  0 { 'Server' }
+                  1 { 'Group Policy' }
+                  2 { 'Default' }
+                  default { "Unknown ($policySource)" }
+              }
+              $maximum = $listener[0].MaximumConnections
+              $Ansible.Result = @{ MaximumConnections = $maximum; PolicySource = $source }
+              Write-Output "RDP-Tcp MaximumConnections=$maximum; source=$source. Existing Windows settings are retained."
+              if ($listener[0].PolicySourceMaximumConnections -eq 1) {
+                  Write-Output 'Review the effective Limit number of connections policy if more concurrent sessions are needed.'
+              }
+
+        - name: Set explicitly configured RDS license server
           ansible.windows.win_regedit:
             path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
             name: LicenseServers
-            data: "{{ RDS_LicenseServer }}"
+            data: "{{ RDS_LICENSE_SERVER }}"
             type: string
-          when: RDS_Licensing
-
-        - name: Set RDS LicensingMode (regedit)
-          ansible.windows.win_regedit:
-            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-            name: LicensingMode
-            data: "{{ RDS_LicensingMode }}"
-            type: dword
-          when: RDS_Licensing
-
-        - name: Set RDS fSingleSessionPerUser (regedit)
-          ansible.windows.win_regedit:
-            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-            name: fSingleSessionPerUser
-            data: "{{ RDS_fSingleSessionPerUser }}"
-            type: dword
-          when: RDS_Licensing
-
-        - name: Set RDS MaxDisconnectionTime (regedit)
-          ansible.windows.win_regedit:
-            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-            name: MaxDisconnectionTime
-            data: "{{ RDS_MaxDisconnectionTime }}"
-            type: dword
-          when: RDS_MaxDisconnectionTime >= 60000
-
-        - name: Set RDS RemoteAppLogoffTimeLimit (regedit)
-          ansible.windows.win_regedit:
-            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-            name: RemoteAppLogoffTimeLimit
-            data: "{{ RDS_RemoteAppLogoffTimeLimit }}"
-            type: dword
+          when: RDS_LICENSE_SERVER | default('') | trim | length > 0
 
       tags: [install]
       rescue:

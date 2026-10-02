@@ -23,19 +23,6 @@ __all__ = [
 
 
 class DeployOptionsSerializer(serializers.Serializer):
-    LICENSE_MODE_CHOICES = (
-        (2, _('Per Device (Device number limit)')),
-        (4, _('Per User (User number limit)')),
-    )
-
-    # 单用户单会话，
-    # 默认值为1，表示启用状态（组策略默认值），此时单用户只能有一个会话连接
-    # 如果改为 0 ，表示禁用状态，此时可以单用户多会话连接
-    SESSION_PER_USER = (
-        (0, _("Disabled")),
-        (1, _("Enabled")),
-    )
-
     CORE_HOST = serializers.CharField(
         default=settings.SITE_URL, label=_('Core API'), max_length=1024,
         help_text=_(""" 
@@ -47,37 +34,17 @@ class DeployOptionsSerializer(serializers.Serializer):
         """)
     )
     IGNORE_VERIFY_CERTS = serializers.BooleanField(default=True, label=_("Ignore Certificate Verification"))
-    RDS_Licensing = serializers.BooleanField(
-        default=False, label=_("Existing RDS license"),
-        help_text=_(
-            'If not exist, the RDS will be in trial mode, and the trial period is 120 days. <a '
-            'href="https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/rds-client-access'
-            '-license" target="_blank">Detail</a>'
-        )
+    RDS_LICENSE_SERVER = serializers.CharField(
+        default='', allow_blank=True, label=_('RDS License Server'), max_length=1024,
     )
-    RDS_LicenseServer = serializers.CharField(default='127.0.0.1', label=_('RDS License Server'), max_length=1024)
-    RDS_LicensingMode = serializers.ChoiceField(
-        choices=LICENSE_MODE_CHOICES, default=2, label=_('RDS Licensing Mode'),
-    )
-    RDS_fSingleSessionPerUser = serializers.ChoiceField(
-        choices=SESSION_PER_USER, default=1, label=_("RDS Single Session Per User"),
-        help_text=_('Tips: A RDS user can have only one session at a time. If set, when next login connected, '
-                    'previous session will be disconnected.')
-    )
-    RDS_MaxDisconnectionTime = serializers.IntegerField(
-        default=60000, label=_("RDS Max Disconnection Time (ms)"),
-        help_text=_(
-            'Tips: Set the maximum duration for keeping a disconnected session active on the server (log off the '
-            'session after 60000 milliseconds).'
-        )
-    )
-    RDS_RemoteAppLogoffTimeLimit = serializers.IntegerField(
-        default=0, label=_("RDS Remote App Logoff Time Limit (ms)"),
-        help_text=_(
-            'Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp programs (0 milliseconds, '
-            'log off the session immediately).'
-        )
-    )
+
+    def to_internal_value(self, data):
+        instance = getattr(self.parent, 'instance', None)
+        if instance is not None and isinstance(data, dict):
+            # Keep saved connection settings before PUT defaults are applied.
+            # The declared serializer fields still filter out retired options.
+            data = {**(instance.deploy_options or {}), **data}
+        return super().to_internal_value(data)
 
     def validate(self, attrs):
         instance = getattr(self.parent, 'instance', None)
@@ -128,6 +95,15 @@ class AppletHostSerializer(HostSerializer):
 
     def get_tinker_upgrade_message(self, obj):
         return get_tinker_upgrade_message(obj.tinker_version)
+
+    def update(self, instance, validated_data):
+        if 'deploy_options' in validated_data:
+            # Retired options remain historical data, but only declared fields
+            # from the request may change the stored deployment configuration.
+            validated_data['deploy_options'] = {
+                **(instance.deploy_options or {}), **validated_data['deploy_options'],
+            }
+        return super().update(instance, validated_data)
 
     def __init__(self, *args, data=None, **kwargs):
         if data:

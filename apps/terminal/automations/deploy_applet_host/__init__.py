@@ -154,11 +154,9 @@ class DeployAppletHostManager:
 
     def generate_install_applet_playbook(self):
         applet_name = self.applet.name
-        options = self.deployment.host.deploy_options
 
         def handler(plays):
             for play in plays:
-                play["vars"].update(options)
                 play["vars"]["applet_name"] = applet_name
             return plays
 
