@@ -210,8 +210,10 @@ class Applet(JMSBaseModel):
             return None
         return hosts
 
-    def select_host(self, user, asset):
+    def select_host(self, user, asset, *, rdp_token_login=False):
         hosts = self.filter_available_hosts()
+        if rdp_token_login:
+            hosts = [h for h in (hosts or []) if h.deploy_options.get('RDP_TOKEN_LOGIN') is True]
         if not hosts:
             return None
 
@@ -240,7 +242,7 @@ class Applet(JMSBaseModel):
 
         prefer_key = self.host_prefer_key_tpl.format(user.id)
         prefer_host_id = cache.get(prefer_key, None)
-        pref_host = [host for host in hosts if host.id == prefer_host_id]
+        pref_host = [host for host in hosts if str(host.id) == str(prefer_host_id)]
 
         if pref_host:
             host = pref_host[0]
