@@ -188,6 +188,11 @@ class TinkerDeploymentTests(SimpleTestCase):
         self.manager.deployment = Mock(id=uuid4(), host=self.host)
         self.manager.install_applets = True
 
+    @staticmethod
+    def install_tasks(play):
+        return [task for block in play['tasks'] if 'install' in block.get('tags', [])
+                for task in block['block']]
+
     def test_installer_uses_target_version_and_no_host_auth_switch(self):
         self.host.deploy_options = {'TINKER_VERSION': 'v0.1.0', 'RDP_TOKEN_LOGIN': False}
         self.manager._generate_playbook = lambda name, handler: handler([{'vars': {}}])
@@ -227,8 +232,7 @@ class TinkerDeploymentTests(SimpleTestCase):
                     if generate == self.manager.generate_initial_playbook:
                         self.assertEqual(play['vars']['CORE_HOST'], options['CORE_HOST'])
                         self.assertFalse(play['vars']['IGNORE_VERIFY_CERTS'])
-                        install = next(block for block in play['tasks'] if block['tags'] == ['install'])
-                        features = [task['ansible.windows.win_feature'] for task in install['block']
+                        features = [task['ansible.windows.win_feature'] for task in self.install_tasks(play)
                                     if 'ansible.windows.win_feature' in task]
                         self.assertIn({'name': 'RDS-RD-Server', 'state': 'present',
                                        'include_management_tools': True}, features)
@@ -257,8 +261,7 @@ class TinkerDeploymentTests(SimpleTestCase):
                     with self.subTest(legacy_enabled=legacy_enabled, options=options):
                         self.host.deploy_options = {**legacy, **options}
                         play = yaml.safe_load(Path(self.manager.generate_initial_playbook()).read_text())[0]
-                        install = next(block for block in play['tasks'] if block['tags'] == ['install'])
-                        writes = [task for task in install['block'] if 'ansible.windows.win_regedit' in task]
+                        writes = [task for task in self.install_tasks(play) if 'ansible.windows.win_regedit' in task]
                         self.assertEqual(len(writes), 1)
                         task = writes[0]
                         self.assertEqual(task['ansible.windows.win_regedit']['name'], 'LicenseServers')
@@ -290,22 +293,23 @@ class TinkerDeploymentTests(SimpleTestCase):
     def test_download_or_install_failure_keeps_component_identity_and_version(self):
         old_terminal = self.host.terminal
         old_report = self.host.date_synced
-        success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
-        for results, phases in [([failed], ['prepare']), ([success, failed], ['prepare', 'install'])]:
-            with self.subTest(phases=phases), patch.object(self.manager, 'create_tinker_credentials') as create:
-                self.manager._run_playbook = Mock(side_effect=results)
-                self.assertIs(self.manager._run_initial_deploy(), failed)
-                self.assertEqual([call.kwargs['tags'] for call in self.manager._run_playbook.call_args_list], phases)
-                create.assert_not_called()
-                self.assertIs(self.host.terminal, old_terminal)
-                self.assertEqual(self.host.tinker_version, const.TINKER_TARGET_VERSION)
-                self.assertEqual(self.host.date_synced, old_report)
-                old_terminal.delete.assert_not_called()
-                self.host.save.assert_not_called()
+        failed = SimpleNamespace(status='failed')
+        self.manager._run_playbook = Mock(return_value=failed)
+        with patch.object(self.manager, 'create_tinker_credentials') as create:
+            self.assertIs(self.manager._run_initial_deploy(), failed)
+        self.manager._run_playbook.assert_called_once_with(
+            self.manager.generate_initial_playbook, tags='install',
+        )
+        create.assert_not_called()
+        self.assertIs(self.host.terminal, old_terminal)
+        self.assertEqual(self.host.tinker_version, const.TINKER_TARGET_VERSION)
+        self.assertEqual(self.host.date_synced, old_report)
+        old_terminal.delete.assert_not_called()
+        self.host.save.assert_not_called()
 
     def test_install_exception_keeps_component_identity(self):
         old_terminal = self.host.terminal
-        self.manager._run_playbook = Mock(side_effect=[SimpleNamespace(status='success'), RuntimeError('installer failed')])
+        self.manager._run_playbook = Mock(side_effect=RuntimeError('installer failed'))
         with patch.object(self.manager, 'create_tinker_credentials') as create, \
                 self.assertRaisesMessage(RuntimeError, 'installer failed'):
             self.manager._run_initial_deploy()
@@ -338,7 +342,7 @@ class TinkerDeploymentTests(SimpleTestCase):
                 patch.object(self.manager, 'verify_tinker_startup'), \
                 patch.object(self.manager, 'retire_replaced_terminal'):
             self.assertEqual(self.manager._run_initial_deploy().status, 'success')
-        self.assertEqual(phases, ['prepare', 'install', 'deploy'])
+        self.assertEqual(phases, ['install', 'deploy'])
 
     def test_deployment_requires_a_fresh_target_version_report(self):
         cutoff = timezone.now()
@@ -360,7 +364,7 @@ class TinkerDeploymentTests(SimpleTestCase):
 
     def test_optional_applications_run_only_after_verified_tinker_startup(self):
         success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
-        for install, expected_count in ((False, 3), (True, 4)):
+        for install, expected_count in ((False, 2), (True, 3)):
             with self.subTest(install_applets=install):
                 self.manager.install_applets = install
                 events = []
@@ -377,11 +381,12 @@ class TinkerDeploymentTests(SimpleTestCase):
                         patch.object(self.manager, 'retire_replaced_terminal', side_effect=lambda: events.append('retired')):
                     result = self.manager._run_initial_deploy()
                 self.assertIs(result, failed if install else success)
+                self.assertEqual(events, ['verified', 'retired'])
                 self.assertEqual(self.manager._run_playbook.call_count, expected_count)
 
     def test_configuration_failure_does_not_retire_identity_or_install_applications(self):
         success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
-        self.manager._run_playbook = Mock(side_effect=[success, success, failed])
+        self.manager._run_playbook = Mock(side_effect=[success, failed])
         with patch.object(self.manager, 'create_tinker_credentials', return_value={}), \
                 patch.object(self.manager, 'verify_tinker_startup') as verify, \
                 patch.object(self.manager, 'retire_replaced_terminal') as retire, \
@@ -399,7 +404,7 @@ class TinkerDeploymentTests(SimpleTestCase):
                 patch.object(self.manager, 'discard_unconfirmed_terminal') as discard, \
                 self.assertRaisesMessage(RuntimeError, 'stale report'):
             self.manager._run_initial_deploy()
-        self.assertEqual(self.manager._run_playbook.call_count, 3)
+        self.assertEqual(self.manager._run_playbook.call_count, 2)
         retire.assert_not_called()
         discard.assert_called_once_with()
 
@@ -409,36 +414,30 @@ class TinkerDeploymentTests(SimpleTestCase):
         self.manager._run_install_applet()
         self.manager._run_playbook.assert_called_once_with(self.manager.generate_install_all_playbook)
 
-    def test_installer_always_refreshes_same_version_and_verifies_published_hash(self):
-        from ansible.plugins.test.core import TestModule
-
+    def test_installer_refreshes_same_version_without_a_checksum_sidecar(self):
         with TemporaryDirectory() as directory:
             self.manager.run_dir = directory
             play = yaml.safe_load(Path(self.manager.generate_initial_playbook()).read_text())[0]
-        prepare = next(block for block in play['tasks'] if block['tags'] == ['prepare'])['block']
-        checksum = next(task for task in prepare if task.get('register') == 'tinker_checksum')
-        self.assertEqual(checksum['ansible.windows.win_uri']['status_code'], [200, 404])
-        self.assertTrue(checksum['ansible.windows.win_uri']['return_content'])
-        installer = next(task['ansible.windows.win_get_url'] for task in prepare
-                         if task['name'] == 'Download current Tinker installer')
+        tasks = self.install_tasks(play)
+        core_check = next(task['ansible.windows.win_uri'] for task in tasks
+                          if 'ansible.windows.win_uri' in task)
+        self.assertEqual(core_check['status_code'], 200)
+        self.assertEqual(core_check['follow_redirects'], 'none')
+        download = next(task for task in tasks if task.get('register') == 'tinker_installer')
+        installer = download['ansible.windows.win_get_url']
         self.assertTrue(installer['force'])
         self.assertIn('deployment={{ DEPLOYMENT_ID }}', installer['url'])
         self.assertEqual(installer['checksum_algorithm'], 'sha256')
-        env = Environment()
-        env.tests.update(TestModule().tests())
-        render = env.from_string(installer['checksum'])
+        self.assertNotIn('checksum', installer)
+        self.assertNotIn('.exe.sha256', str(tasks))
         digest = 'abcdef01' * 8
-        self.assertEqual(render.render(tinker_checksum={'status_code': 200, 'content': digest.upper() + '  installer.exe\n'}), digest)
-        self.assertEqual(render.render(tinker_checksum={'status_code': 404}, omit='OMIT'), 'OMIT')
-        validation = next(task for task in prepare if task['name'] == 'Validate published Tinker installer checksum')
-        check = env.compile_expression(validation['ansible.builtin.assert']['that'][0])
-        for value in (digest, digest.upper() + '  Tinker_Installer_dev.exe\r\n'):
-            self.assertTrue(check(tinker_checksum={'content': value}))
-        for value in ('', '<html>not found</html>', digest[:-1], digest + '0', digest + '\nanother digest'):
-            self.assertFalse(check(tinker_checksum={'content': value}))
+        record = next(task['ansible.builtin.debug']['msg'] for task in tasks
+                      if 'ansible.builtin.debug' in task)
+        self.assertIn(digest, Environment().from_string(record).render(
+            tinker_installer={'checksum_dest': digest},
+        ))
         self.assertEqual(play['vars']['DEPLOYMENT_ID'], str(self.manager.deployment.id))
-        deploy = next(block for block in play['tasks'] if block['tags'] == ['deploy'])
-        self.assertNotIn('install all', str(deploy))
+        self.assertNotIn('INSTALL_APPLETS', play['vars'])
 
     @override_settings(DEBUG_DEV=True)
     def test_private_credential_playbook_is_removed_even_after_runner_failure(self):
@@ -555,7 +554,7 @@ class TinkerCredentialCreationTests(TestCase):
             for attempt in range(3):
                 with self.subTest(failure=failure, attempt=attempt):
                     manager = DeployAppletHostManager(Mock(host=self.host))
-                    results = [success, success, failed if failure == 'configuration' else success]
+                    results = [success, failed if failure == 'configuration' else success]
                     if failure == 'runner':
                         results[-1] = RuntimeError('runner failed')
                     manager._run_playbook = Mock(side_effect=results)
@@ -590,7 +589,7 @@ class TinkerCredentialCreationTests(TestCase):
         from authentication.models import AccessKey
 
         success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
-        self.manager._run_playbook = Mock(side_effect=[success, success, success, failed])
+        self.manager._run_playbook = Mock(side_effect=[success, success, failed])
         with patch.object(self.manager, 'verify_tinker_startup'):
             self.assertIs(self.manager._run_initial_deploy(), failed)
         self.host.refresh_from_db()

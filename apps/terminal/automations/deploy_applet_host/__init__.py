@@ -50,11 +50,10 @@ class DeployAppletHostManager:
         # Keep the old component identity until Windows has accepted and
         # completed full reinstallation, including any required reboot. Download
         # or installer failure must not replace the Core component identity.
-        for phase in ('prepare', 'install'):
-            logger.info('Tinker deployment phase: %s', phase)
-            result = self._run_playbook(self.generate_initial_playbook, tags=phase, **kwargs)
-            if result.status != 'success':
-                return result
+        logger.info('Tinker deployment phase: install')
+        result = self._run_playbook(self.generate_initial_playbook, tags='install', **kwargs)
+        if result.status != 'success':
+            return result
 
         credentials = self.create_tinker_credentials()
         startup_after = timezone.now()
@@ -206,7 +205,6 @@ class DeployAppletHostManager:
                 play["vars"]["CORE_HOST"] = core_host
                 play["vars"]["HOST_ID"] = host_id
                 play["vars"]["DEPLOYMENT_ID"] = str(self.deployment.id)
-                play["vars"]["INSTALL_APPLETS"] = self.install_applets
                 play["vars"]["TINKER_VERSION"] = TINKER_TARGET_VERSION
                 if credentials is not None:
                     play["vars"]["HOST_NAME"] = credentials['name']

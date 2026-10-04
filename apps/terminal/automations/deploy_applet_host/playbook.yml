@@ -6,42 +6,17 @@
     HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.example.com
     RDS_LICENSE_SERVER: ''
-    INSTALL_APPLETS: true
     PYTHON_VERSION: 3.11.11
 
   tasks:
     - block:
-        - name: Check if CORE_HOST is redirects
+        - name: Check CORE_HOST without redirects
           ansible.windows.win_uri:
             url: "{{ CORE_HOST }}"
             method: GET
             follow_redirects: none
-            status_code: [ 200, 301, 302, 303, 307, 308 ]
+            status_code: 200
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-          register: core_host_redirects
-
-        - name: Check failed
-          fail:
-            msg: "CORE_HOST {{ CORE_HOST }} is redirecting to {{ core_host_redirects.location }}, please use the final url"
-          when: core_host_redirects.status_code >= 300 and core_host_redirects.status_code < 400
-
-        - name: Read Tinker installer checksum if published
-          ansible.windows.win_uri:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/Tinker_Installer_{{ TINKER_VERSION }}.exe.sha256?deployment={{ DEPLOYMENT_ID }}"
-            method: GET
-            status_code: [200, 404]
-            return_content: true
-            headers:
-              Cache-Control: no-cache
-            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-          register: tinker_checksum
-
-        - name: Validate published Tinker installer checksum
-          ansible.builtin.assert:
-            that:
-              - "tinker_checksum.content | trim is match('^[a-fA-F0-9]{64}(?:[ \\t]+[^\\r\\n]+)?$')"
-            fail_msg: "The published Tinker installer SHA256 is invalid; existing Tinker was not stopped"
-          when: tinker_checksum.status_code == 200
 
         - name: Download current Tinker installer
           ansible.windows.win_get_url:
@@ -49,19 +24,12 @@
             dest: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
             force: true
             checksum_algorithm: sha256
-            checksum: "{{ (tinker_checksum.content | trim).split()[0] | lower if tinker_checksum.status_code == 200 else omit }}"
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-
-        - name: Read downloaded Tinker installer SHA256
-          ansible.windows.win_stat:
-            path: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
-            get_checksum: true
-            checksum_algorithm: sha256
           register: tinker_installer
 
         - name: Record Tinker installer SHA256
           ansible.builtin.debug:
-            msg: "Tinker installer SHA256={{ tinker_installer.stat.checksum }}; published checksum verified={{ tinker_checksum.status_code == 200 }}"
+            msg: "Tinker installer SHA256={{ tinker_installer.checksum_dest }}"
 
         - name: Download python-{{ PYTHON_VERSION }}
           ansible.windows.win_get_url:
@@ -69,7 +37,7 @@
             dest: "{{ ansible_env.TEMP }}\\jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
-      tags: [prepare]
+      tags: [install]
       rescue:
         - fail:
             msg: "Failed to prepare applet host; existing Tinker was not stopped"
