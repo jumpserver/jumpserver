@@ -40,7 +40,9 @@
       tags: [install]
       rescue:
         - fail:
-            msg: "Failed to prepare applet host; existing Tinker was not stopped"
+            msg: >-
+              Deployment precheck or download failed at "{{ ansible_failed_task.name }}".
+              Resolve the task error and redeploy.
 
     - block:
         - name: Install RDS-RD-Server (RDS)
@@ -91,13 +93,13 @@
               - '%ProgramFiles%\JumpServer\applications\Python\packages'
               - '%ProgramFiles%\JumpServer\applications\Python\Lib\site-packages'
 
-        - name: Reboot if installing requires it
+        - name: Reboot after RDS role installation if required
           ansible.windows.win_reboot:
             post_reboot_delay: 10
             test_command: whoami
           when: rds_install.reboot_required
 
-        - name: Verify Tinker RDP settings after reboot
+        - name: Configure Tinker RDP settings after reboot
           ansible.windows.win_powershell:
             script: |
               $ErrorActionPreference = 'Stop'
@@ -134,7 +136,7 @@
               }
               $maximum = $listener[0].MaximumConnections
               $Ansible.Result = @{ MaximumConnections = $maximum; PolicySource = $source }
-              Write-Output "RDP-Tcp MaximumConnections=$maximum; source=$source. Existing Windows settings are retained."
+              Write-Output "RDP-Tcp MaximumConnections=$maximum; source=$source. The RDP connection limit is unchanged."
               if ($listener[0].PolicySourceMaximumConnections -eq 1) {
                   Write-Output 'Review the effective Limit number of connections policy if more concurrent sessions are needed.'
               }
@@ -150,7 +152,9 @@
       tags: [install]
       rescue:
         - fail:
-            msg: "Failed to install Tinker; existing Core component credentials were retained. Check the installer log and retry."
+            msg: >-
+              Applet host installation or runtime configuration failed at "{{ ansible_failed_task.name }}".
+              Resolve the task error and redeploy.
 
     - block:
         - name: Configure Tinker and import its component key
@@ -190,4 +194,6 @@
       tags: [deploy]
       rescue:
         - fail:
-            msg: "Failed to deploy applet host"
+            msg: >-
+              Tinker configuration, startup or health check failed at "{{ ansible_failed_task.name }}".
+              Resolve the task error and redeploy.
