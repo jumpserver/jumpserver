@@ -333,23 +333,112 @@ class TinkerDeploymentTests(SimpleTestCase):
             return SimpleNamespace(status='success')
 
         self.manager._run_playbook = run_playbook
-        with patch.object(self.manager, 'create_tinker_credentials', return_value=credentials) as create:
+        self.manager.install_applets = False
+        with patch.object(self.manager, 'create_tinker_credentials', return_value=credentials) as create, \
+                patch.object(self.manager, 'verify_tinker_startup'), \
+                patch.object(self.manager, 'retire_replaced_terminal'):
             self.assertEqual(self.manager._run_initial_deploy().status, 'success')
         self.assertEqual(phases, ['prepare', 'install', 'deploy'])
 
     def test_deployment_requires_a_fresh_target_version_report(self):
-        success = SimpleNamespace(status='success')
-        self.manager._run_playbook = Mock(return_value=success)
-        with patch.object(self.manager, 'create_tinker_credentials', return_value={}):
-            for version, report_time in [('', None), ('v0.3.0', timezone.now()), ('v0.3.1', None)]:
+        cutoff = timezone.now()
+        self.manager._expected_terminal_id = self.host.terminal_id
+        with patch('terminal.automations.deploy_applet_host.time.sleep'):
+            for version, report_time in [('', None), ('v0.3.0', cutoff), ('v0.3.1', None),
+                                         ('v0.3.1', cutoff - timezone.timedelta(seconds=1))]:
                 self.host.tinker_version, self.host.date_synced = version, report_time
                 with self.subTest(version=version, report_time=report_time), \
                         self.assertRaisesMessage(RuntimeError, 'redeploy'):
-                    self.manager._run_initial_deploy()
+                    self.manager.verify_tinker_startup(cutoff)
             self.host.tinker_version = const.TINKER_TARGET_VERSION
-            self.host.date_synced = timezone.now()
-            self.assertIs(self.manager._run_initial_deploy(), success)
-        self.host.refresh_from_db.assert_called_with(fields=['tinker_version', 'date_synced'])
+            self.host.date_synced = cutoff
+            self.manager.verify_tinker_startup(cutoff)
+            self.host.terminal_id = uuid4()
+            with self.assertRaisesMessage(RuntimeError, 'fresh startup report'):
+                self.manager.verify_tinker_startup(cutoff)
+        self.host.refresh_from_db.assert_called_with(fields=['terminal', 'tinker_version', 'date_synced'])
+
+    def test_optional_applications_run_only_after_verified_tinker_startup(self):
+        success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
+        for install, expected_count in ((False, 3), (True, 4)):
+            with self.subTest(install_applets=install):
+                self.manager.install_applets = install
+                events = []
+
+                def run(generate, **kwargs):
+                    if generate == self.manager.generate_install_all_playbook:
+                        self.assertEqual(events, ['verified', 'retired'])
+                        return failed
+                    return success
+
+                self.manager._run_playbook = Mock(side_effect=run)
+                with patch.object(self.manager, 'create_tinker_credentials', return_value={}), \
+                        patch.object(self.manager, 'verify_tinker_startup', side_effect=lambda _: events.append('verified')), \
+                        patch.object(self.manager, 'retire_replaced_terminal', side_effect=lambda: events.append('retired')):
+                    result = self.manager._run_initial_deploy()
+                self.assertIs(result, failed if install else success)
+                self.assertEqual(self.manager._run_playbook.call_count, expected_count)
+
+    def test_configuration_failure_does_not_retire_identity_or_install_applications(self):
+        success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
+        self.manager._run_playbook = Mock(side_effect=[success, success, failed])
+        with patch.object(self.manager, 'create_tinker_credentials', return_value={}), \
+                patch.object(self.manager, 'verify_tinker_startup') as verify, \
+                patch.object(self.manager, 'retire_replaced_terminal') as retire, \
+                patch.object(self.manager, 'discard_unconfirmed_terminal') as discard:
+            self.assertIs(self.manager._run_initial_deploy(), failed)
+        verify.assert_not_called()
+        retire.assert_not_called()
+        discard.assert_called_once_with()
+
+    def test_failed_startup_does_not_retire_identity_or_install_applications(self):
+        self.manager._run_playbook = Mock(return_value=SimpleNamespace(status='success'))
+        with patch.object(self.manager, 'create_tinker_credentials', return_value={}), \
+                patch.object(self.manager, 'verify_tinker_startup', side_effect=RuntimeError('stale report')), \
+                patch.object(self.manager, 'retire_replaced_terminal') as retire, \
+                patch.object(self.manager, 'discard_unconfirmed_terminal') as discard, \
+                self.assertRaisesMessage(RuntimeError, 'stale report'):
+            self.manager._run_initial_deploy()
+        self.assertEqual(self.manager._run_playbook.call_count, 3)
+        retire.assert_not_called()
+        discard.assert_called_once_with()
+
+    def test_application_retry_runs_only_application_playbook(self):
+        self.manager.applet = None
+        self.manager._run_playbook = Mock(return_value=SimpleNamespace(status='success'))
+        self.manager._run_install_applet()
+        self.manager._run_playbook.assert_called_once_with(self.manager.generate_install_all_playbook)
+
+    def test_installer_always_refreshes_same_version_and_verifies_published_hash(self):
+        from ansible.plugins.test.core import TestModule
+
+        with TemporaryDirectory() as directory:
+            self.manager.run_dir = directory
+            play = yaml.safe_load(Path(self.manager.generate_initial_playbook()).read_text())[0]
+        prepare = next(block for block in play['tasks'] if block['tags'] == ['prepare'])['block']
+        checksum = next(task for task in prepare if task.get('register') == 'tinker_checksum')
+        self.assertEqual(checksum['ansible.windows.win_uri']['status_code'], [200, 404])
+        self.assertTrue(checksum['ansible.windows.win_uri']['return_content'])
+        installer = next(task['ansible.windows.win_get_url'] for task in prepare
+                         if task['name'] == 'Download current Tinker installer')
+        self.assertTrue(installer['force'])
+        self.assertIn('deployment={{ DEPLOYMENT_ID }}', installer['url'])
+        self.assertEqual(installer['checksum_algorithm'], 'sha256')
+        env = Environment()
+        env.tests.update(TestModule().tests())
+        render = env.from_string(installer['checksum'])
+        digest = 'abcdef01' * 8
+        self.assertEqual(render.render(tinker_checksum={'status_code': 200, 'content': digest.upper() + '  installer.exe\n'}), digest)
+        self.assertEqual(render.render(tinker_checksum={'status_code': 404}, omit='OMIT'), 'OMIT')
+        validation = next(task for task in prepare if task['name'] == 'Validate published Tinker installer checksum')
+        check = env.compile_expression(validation['ansible.builtin.assert']['that'][0])
+        for value in (digest, digest.upper() + '  Tinker_Installer_dev.exe\r\n'):
+            self.assertTrue(check(tinker_checksum={'content': value}))
+        for value in ('', '<html>not found</html>', digest[:-1], digest + '0', digest + '\nanother digest'):
+            self.assertFalse(check(tinker_checksum={'content': value}))
+        self.assertEqual(play['vars']['DEPLOYMENT_ID'], str(self.manager.deployment.id))
+        deploy = next(block for block in play['tasks'] if block['tags'] == ['deploy'])
+        self.assertNotIn('install all', str(deploy))
 
     @override_settings(DEBUG_DEV=True)
     def test_private_credential_playbook_is_removed_even_after_runner_failure(self):
@@ -395,37 +484,146 @@ class TinkerCredentialCreationTests(TestCase):
         self.host.save()
         self.manager = DeployAppletHostManager(Mock(host=self.host))
 
-    def test_core_creates_bound_key_with_public_registration_disabled(self):
+    def test_full_redeploy_creates_fresh_key_and_retires_old_only_after_startup(self):
         from authentication.models import AccessKey
         from common.permissions import WithBootstrapToken
         from rbac.builtin import BuiltinRole
 
         self.assertFalse(WithBootstrapToken().check_can_register())
+
         credentials = self.manager.create_tinker_credentials()
         self.host.refresh_from_db()
         terminal = self.host.terminal
-        self.assertEqual(terminal.type, 'tinker')
+        self.assertNotEqual(terminal.pk, self.old_terminal.pk)
         self.assertTrue(terminal.user.is_service_account)
         self.assertTrue(terminal.user.system_roles.filter(id=BuiltinRole.system_component.id).exists())
+        self.assertNotEqual(terminal.user.access_key.pk, self.old_key.pk)
         self.assertEqual(credentials, {'name': terminal.name, 'access_key': terminal.user.access_key.get_full_value()})
         self.assertEqual(self.host.tinker_version, '')
         self.assertIsNone(self.host.date_synced)
-        self.assertFalse(AccessKey.objects.filter(pk=self.old_key.pk).exists())
+        self.assertTrue(AccessKey.objects.filter(pk=self.old_key.pk, is_active=True).exists())
         self.host.check_terminal_binding(Mock(user=terminal.user), tinker_version=const.TINKER_TARGET_VERSION)
+        self.manager.retire_replaced_terminal()
+        self.assertFalse(AccessKey.objects.filter(pk=self.old_key.pk).exists())
         self.assertFalse(WithBootstrapToken().check_can_register())
+
+    def test_repeated_successful_reinstallation_rotates_identity_without_extra_live_components(self):
+        from authentication.models import AccessKey
+        from users.models import User
+
+        before = (Terminal.objects.filter(is_deleted=False).count(), User.objects.count(), AccessKey.objects.count())
+        previous_terminal_id, previous_key_id = self.old_terminal.pk, self.old_key.pk
+        for _ in range(10):
+            manager = DeployAppletHostManager(Mock(host=self.host))
+            manager.create_tinker_credentials()
+            self.host.refresh_from_db()
+            current_key_id = self.host.terminal.user.access_key.pk
+            self.assertNotEqual(self.host.terminal_id, previous_terminal_id)
+            self.assertNotEqual(current_key_id, previous_key_id)
+            self.host.check_terminal_binding(Mock(user=self.host.terminal.user), tinker_version=const.TINKER_TARGET_VERSION)
+            manager.retire_replaced_terminal()
+            self.assertFalse(AccessKey.objects.filter(pk=previous_key_id).exists())
+            self.assertEqual((Terminal.objects.filter(is_deleted=False).count(), User.objects.count(), AccessKey.objects.count()), before)
+            previous_terminal_id, previous_key_id = self.host.terminal_id, current_key_id
+
+    def test_invalid_key_is_replaced_and_retired_only_after_startup(self):
+        from authentication.models import AccessKey
+        from rbac.builtin import BuiltinRole
+
+        self.old_key.is_active = False
+        self.old_key.save(update_fields=['is_active'])
+        credentials = self.manager.create_tinker_credentials()
+        self.host.refresh_from_db()
+        terminal = self.host.terminal
+        self.assertNotEqual(terminal.pk, self.old_terminal.pk)
+        self.assertTrue(terminal.user.is_service_account)
+        self.assertTrue(terminal.user.system_roles.filter(id=BuiltinRole.system_component.id).exists())
+        self.assertEqual(credentials['access_key'], terminal.user.access_key.get_full_value())
+        self.assertEqual(self.host.tinker_version, '')
+        self.assertIsNone(self.host.date_synced)
+        self.assertTrue(AccessKey.objects.filter(pk=self.old_key.pk).exists())
+        self.manager.retire_replaced_terminal()
+        self.assertFalse(AccessKey.objects.filter(pk=self.old_key.pk).exists())
+
+    def test_failed_configuration_and_startup_retries_leave_no_extra_live_identity(self):
+        from authentication.models import AccessKey
+        from users.models import User
+
+        before = (Terminal.objects.filter(is_deleted=False).count(), User.objects.count(), AccessKey.objects.count())
+        success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
+        for failure in ('configuration', 'runner', 'startup'):
+            for attempt in range(3):
+                with self.subTest(failure=failure, attempt=attempt):
+                    manager = DeployAppletHostManager(Mock(host=self.host))
+                    results = [success, success, failed if failure == 'configuration' else success]
+                    if failure == 'runner':
+                        results[-1] = RuntimeError('runner failed')
+                    manager._run_playbook = Mock(side_effect=results)
+                    with patch.object(manager, 'verify_tinker_startup', side_effect=RuntimeError('startup failed')):
+                        if failure == 'configuration':
+                            self.assertIs(manager._run_initial_deploy(), failed)
+                        else:
+                            with self.assertRaises(RuntimeError):
+                                manager._run_initial_deploy()
+                    self.host.refresh_from_db()
+                    self.assertEqual(self.host.terminal_id, self.old_terminal.pk)
+                    self.assertIsNone(self.host.date_synced)
+                    self.assertEqual(self.host.tinker_version, '')
+                    self.assertTrue(AccessKey.objects.filter(pk=self.old_key.pk).exists())
+                    self.assertEqual((Terminal.objects.filter(is_deleted=False).count(), User.objects.count(), AccessKey.objects.count()), before)
+
+    def test_initial_install_failure_discards_new_identity_without_an_old_binding(self):
+        from authentication.models import AccessKey
+
+        self.host.terminal = None
+        self.host.save(update_fields=['terminal'])
+        self.manager.create_tinker_credentials()
+        self.host.refresh_from_db()
+        created_key_id = self.host.terminal.user.access_key.pk
+        self.manager.discard_unconfirmed_terminal()
+        self.host.refresh_from_db()
+        self.assertIsNone(self.host.terminal_id)
+        self.assertIsNone(self.host.date_synced)
+        self.assertFalse(AccessKey.objects.filter(pk=created_key_id).exists())
+
+    def test_application_failure_keeps_confirmed_new_identity(self):
+        from authentication.models import AccessKey
+
+        success, failed = SimpleNamespace(status='success'), SimpleNamespace(status='failed')
+        self.manager._run_playbook = Mock(side_effect=[success, success, success, failed])
+        with patch.object(self.manager, 'verify_tinker_startup'):
+            self.assertIs(self.manager._run_initial_deploy(), failed)
+        self.host.refresh_from_db()
+        self.assertNotEqual(self.host.terminal_id, self.old_terminal.pk)
+        self.assertTrue(self.host.terminal.user.access_key.is_active)
+        self.assertFalse(AccessKey.objects.filter(pk=self.old_key.pk).exists())
+
+    def test_repair_of_non_service_identity_never_deletes_ordinary_user(self):
+        from users.models import User
+
+        user = self.old_terminal.user
+        user.is_service_account = False
+        user.save(update_fields=['is_service_account'])
+        self.manager.create_tinker_credentials()
+        self.manager.retire_replaced_terminal()
+        self.host.refresh_from_db()
+        self.assertNotEqual(self.host.terminal_id, self.old_terminal.pk)
+        self.assertTrue(User.objects.filter(pk=user.pk).exists())
 
     def test_binding_failure_rolls_back_new_key_and_preserves_old_identity(self):
         from authentication.models import AccessKey
         from users.models import User
 
         before = (Terminal.objects.count(), User.objects.count(), AccessKey.objects.count())
-        # Fail after creating the new terminal/user/key and saving its host binding.
-        with patch.object(Terminal, 'delete', side_effect=RuntimeError('retire failed')), \
-                self.assertRaisesMessage(RuntimeError, 'retire failed'):
+        self.old_key.is_active = False
+        self.old_key.save(update_fields=['is_active'])
+        # Fail after creating the new terminal/user/key, before committing its binding.
+        with patch.object(AppletHost, 'save', side_effect=RuntimeError('binding failed')), \
+                self.assertRaisesMessage(RuntimeError, 'binding failed'):
             self.manager.create_tinker_credentials()
         self.host.refresh_from_db()
         self.assertEqual(self.host.terminal_id, self.old_terminal.pk)
         self.assertEqual(self.host.tinker_version, const.TINKER_TARGET_VERSION)
         self.assertIsNotNone(self.host.date_synced)
-        self.assertTrue(AccessKey.objects.filter(pk=self.old_key.pk, is_active=True).exists())
+        self.assertTrue(AccessKey.objects.filter(pk=self.old_key.pk, is_active=False).exists())
         self.assertEqual((Terminal.objects.count(), User.objects.count(), AccessKey.objects.count()), before)

@@ -25,11 +25,43 @@
             msg: "CORE_HOST {{ CORE_HOST }} is redirecting to {{ core_host_redirects.location }}, please use the final url"
           when: core_host_redirects.status_code >= 300 and core_host_redirects.status_code < 400
 
-        - name: Download Tinker installer
-          ansible.windows.win_get_url:
-            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/Tinker_Installer_{{ TINKER_VERSION }}.exe"
-            dest: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
+        - name: Read Tinker installer checksum if published
+          ansible.windows.win_uri:
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/Tinker_Installer_{{ TINKER_VERSION }}.exe.sha256?deployment={{ DEPLOYMENT_ID }}"
+            method: GET
+            status_code: [200, 404]
+            return_content: true
+            headers:
+              Cache-Control: no-cache
             validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
+          register: tinker_checksum
+
+        - name: Validate published Tinker installer checksum
+          ansible.builtin.assert:
+            that:
+              - "tinker_checksum.content | trim is match('^[a-fA-F0-9]{64}(?:[ \\t]+[^\\r\\n]+)?$')"
+            fail_msg: "The published Tinker installer SHA256 is invalid; existing Tinker was not stopped"
+          when: tinker_checksum.status_code == 200
+
+        - name: Download current Tinker installer
+          ansible.windows.win_get_url:
+            url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/Tinker_Installer_{{ TINKER_VERSION }}.exe?deployment={{ DEPLOYMENT_ID }}"
+            dest: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
+            force: true
+            checksum_algorithm: sha256
+            checksum: "{{ (tinker_checksum.content | trim).split()[0] | lower if tinker_checksum.status_code == 200 else omit }}"
+            validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
+
+        - name: Read downloaded Tinker installer SHA256
+          ansible.windows.win_stat:
+            path: "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
+            get_checksum: true
+            checksum_algorithm: sha256
+          register: tinker_installer
+
+        - name: Record Tinker installer SHA256
+          ansible.builtin.debug:
+            msg: "Tinker installer SHA256={{ tinker_installer.stat.checksum }}; published checksum verified={{ tinker_checksum.status_code == 200 }}"
 
         - name: Download python-{{ PYTHON_VERSION }}
           ansible.windows.win_get_url:
@@ -50,10 +82,11 @@
             include_management_tools: yes
           register: rds_install
 
-        # Run setup on every deployment, including a repair of the same version.
-        # The installer owns service/file cleanup and leaves the service stopped
-        # until the Core-created credentials have been imported.
-        - name: Install Tinker
+        # The new installer ends Tinker-managed sessions, uninstalls the old
+        # Tinker and clears its managed runtime state before installing afresh.
+        # Ordinary administrator sessions and installed applications are retained.
+        # Leave the new service stopped until fresh Core credentials are imported.
+        - name: Fully reinstall Tinker
           ansible.windows.win_command:
             argv:
               - "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
@@ -185,20 +218,6 @@
           until: _result.status_code == 200
           retries: 30
           delay: 5
-
-        - name: Sync all remote applets
-          ansible.windows.win_powershell:
-            script: |
-              & "$env:SystemRoot\System32\config\systemprofile\AppData\Local\Tinker\tinkerd.exe" install all
-              $exitCode = $LASTEXITCODE
-              if ($exitCode -ne 0) {
-                  Write-Output "Failed to install applets"
-                  Write-Output "Exit code: $exitCode"
-                  $Ansible.Failed = $true
-                  exit 1
-              }
-          register: sync_remote_applets
-          when: INSTALL_APPLETS
 
       tags: [deploy]
       rescue:
