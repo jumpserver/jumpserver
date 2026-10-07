@@ -47,7 +47,7 @@ class CommandGroup(JMSOrgBaseModel):
         for _cmd in content.split('\n'):
             cmd = re.sub(r'\s+', ' ', _cmd)
             cmd = re.escape(cmd)
-            cmd = cmd.replace('\\ ', '\s+')
+            cmd = cmd.replace('\\ ', '\\s+')
 
             # 有空格就不能 铆钉单词了
             if ' ' in _cmd:

@@ -30,7 +30,7 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = CeleryPeriodTaskSerializer
     http_method_names = ('get', 'head', 'options', 'patch')
     lookup_field = 'name'
-    lookup_value_regex = '[\w.@]+'
+    lookup_value_regex = '[\\w.@]+'
 
     def get_object(self):
         name = self.kwargs.get('name')
