@@ -270,7 +270,7 @@ if (require.main === module)
 
 Локальные rules задают файлы, JSON/EnvironmentFile или доверенные шаблоны и действие systemd reload/restart либо фиксированный исполняемый файл. Скрипты получают JSON через stdin, используют фиксированные аргументы и таймаут и проверяют применение перед успешным завершением. Core не расширяет эти возможности. После изменения приватной конфигурации перезапустите Agent.
 
-Идентификация использует app_id, app_secret, org_id и стабильный instance_id; доступ определяется политиками приложения. Пути и действия задаются локально: state_file хранит последние пароли, event_file добавляет события без секретов, delivery задаёт вывод, rules — файлы, шаблоны и reload/restart либо фиксированные скрипты. После уведомления Agent получает и сохраняет актуальный пароль, атомарно заменяет файлы, затем выполняет действие. При сбое доставка повторяется. В rules используйте credentials[].key из get_accounts; ключ подписки включает ID аккаунта. Пустой rules записывает файл для каждого ключа.
+Загруженная конфигурация уже содержит идентификацию Agent и параметры доставки. В rules укажите ID учётных записей приложения, обновление конфигурации, применение изменений и проверку рабочего соединения. allow_account_switch использует одно правило для ротации A/B в обоих направлениях. Необязательный credential_check проверяет новый вход до изменения файлов. Для путей состояния, событий, Socket и интервала сверки 300 секунд есть значения по умолчанию. Пустой rules создаёт файл для каждой учётной записи.
 
 ```json
 {
@@ -279,16 +279,10 @@ if (require.main === module)
   "app_secret": "<application-secret>",
   "org_id": "<org-id>",
   "instance_id": "orders-node-1",
-  "state_file": "/var/lib/jms-pam-agent/state.json",
-  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
-  "reconcile_interval": 300,
   "delivery": {
     "delivery_mode": "json",
     "delivery_root": "/opt/jumpserver-pam/credentials",
-    "socket_path": "/run/jms-pam-agent/agent.sock",
-    "app_user": "orders",
-    "systemd_unit": "",
-    "systemd_action": ""
+    "app_user": "orders"
   },
   "rules": []
 }
@@ -299,34 +293,29 @@ if (require.main === module)
 ```json
 [
   {
-    "keys": [
-      "<credential-key>"
-    ],
-    "files": [
+    "accounts": [
       {
-        "path": "/etc/order-service/database.json",
-        "format": "template",
-        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
-        "owner": "orders"
+        "account_id": "<primary-account-id>",
+        "allow_account_switch": true
       }
     ],
-    "action": {
-      "type": "systemd",
+    "config_update": {
+      "file": "/etc/order-service/config.yml",
+      "fields_map": {
+        "DB_USER": "username",
+        "DB_PASSWORD": "secret"
+      }
+    },
+    "service_action": {
       "unit": "order-service.service",
-      "operation": "reload",
-      "timeout_seconds": 30
+      "operation": "restart"
+    },
+    "application_check": {
+      "path": "/usr/local/libexec/jms-pam/check-running-db",
+      "confirm_on_success": true
     }
   }
 ]
-```
-
-`/etc/jms-pam-agent/orders-db.tmpl`:
-
-```gotemplate
-{
-  "username": {{json (index .Credentials "<credential-key>").Username}},
-  "password": {{json (index .Credentials "<credential-key>").Secret}}
-}
 ```
 
 ```bash

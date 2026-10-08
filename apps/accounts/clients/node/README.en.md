@@ -270,7 +270,7 @@ Agent identity uses app_id, app_secret, org_id and a stable instance_id. Applica
 
 Local rules configure target files, JSON/EnvironmentFile rendering or trusted templates, and an optional systemd reload/restart or fixed executable. Scripts receive credential JSON on stdin, use fixed arguments, have a bounded timeout and must validate their application before returning success. Core cannot add script paths or expand local capabilities. Restart the Agent after editing its private configuration.
 
-Agent identity uses app_id, app_secret, org_id and a stable instance_id. Application authorization controls pull; policy bindings control push. All file paths and service actions are local: state_file retains the latest passwords, event_file appends metadata without secrets, delivery selects default output, and rules configure files, templates and reload/restart or fixed scripts. On an update notification the Agent fetches the current password, persists it, atomically replaces output files, then runs the configured action. Failed delivery is retried. Use credentials[].key from get_accounts in rules; subscription push keys are account:<account-id>, independent of the selecting policy. Empty rules write one file per key by default.
+The downloaded bootstrap contains Agent identity and delivery settings. Edit rules to declare the account IDs used by the business, update its configuration, activate the change and verify the running connection. An account selector with allow_account_switch also follows A/B rotation in either direction. Optional credential_check validates the new login before file changes. The Agent supplies default state, event and socket paths and a 300-second reconciliation interval. Empty rules write one default file per delivered credential.
 
 ```json
 {
@@ -279,16 +279,10 @@ Agent identity uses app_id, app_secret, org_id and a stable instance_id. Applica
   "app_secret": "<application-secret>",
   "org_id": "<org-id>",
   "instance_id": "orders-node-1",
-  "state_file": "/var/lib/jms-pam-agent/state.json",
-  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
-  "reconcile_interval": 300,
   "delivery": {
     "delivery_mode": "json",
     "delivery_root": "/opt/jumpserver-pam/credentials",
-    "socket_path": "/run/jms-pam-agent/agent.sock",
-    "app_user": "orders",
-    "systemd_unit": "",
-    "systemd_action": ""
+    "app_user": "orders"
   },
   "rules": []
 }
@@ -299,34 +293,29 @@ Agent identity uses app_id, app_secret, org_id and a stable instance_id. Applica
 ```json
 [
   {
-    "keys": [
-      "<credential-key>"
-    ],
-    "files": [
+    "accounts": [
       {
-        "path": "/etc/order-service/database.json",
-        "format": "template",
-        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
-        "owner": "orders"
+        "account_id": "<primary-account-id>",
+        "allow_account_switch": true
       }
     ],
-    "action": {
-      "type": "systemd",
+    "config_update": {
+      "file": "/etc/order-service/config.yml",
+      "fields_map": {
+        "DB_USER": "username",
+        "DB_PASSWORD": "secret"
+      }
+    },
+    "service_action": {
       "unit": "order-service.service",
-      "operation": "reload",
-      "timeout_seconds": 30
+      "operation": "restart"
+    },
+    "application_check": {
+      "path": "/usr/local/libexec/jms-pam/check-running-db",
+      "confirm_on_success": true
     }
   }
 ]
-```
-
-`/etc/jms-pam-agent/orders-db.tmpl`:
-
-```gotemplate
-{
-  "username": {{json (index .Credentials "<credential-key>").Username}},
-  "password": {{json (index .Credentials "<credential-key>").Secret}}
-}
 ```
 
 ```bash

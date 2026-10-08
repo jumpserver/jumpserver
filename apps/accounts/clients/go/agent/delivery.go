@@ -116,7 +116,7 @@ func environment(c Credential) ([]byte, error) {
 }
 
 func render(file File, payload Payload) ([]byte, error) {
-	switch file.Format {
+	switch file.format() {
 	case "json":
 		if len(payload.Credentials) == 1 {
 			for _, value := range payload.Credentials {
@@ -161,7 +161,7 @@ func execute(ctx context.Context, action Action, payload Payload) error {
 	}
 	var path string
 	var args []string
-	if action.Type == "script" {
+	if action.kind() == "script" {
 		if err := securePath(action.Path); err != nil {
 			return err
 		}
@@ -175,7 +175,7 @@ func execute(ctx context.Context, action Action, payload Payload) error {
 		path, args = action.Path, action.Args
 	} else {
 		path = "/usr/bin/systemctl"
-		args = []string{action.Operation, action.Unit}
+		args = []string{action.operation(), action.Unit}
 	}
 	bounded, cancel := context.WithTimeout(ctx, action.timeout())
 	defer cancel()
@@ -190,7 +190,7 @@ func execute(ctx context.Context, action Action, payload Payload) error {
 	if err = command.Run(); err != nil {
 		return errors.New("credential action failed or timed out")
 	}
-	if action.Type == "systemd" {
+	if action.kind() == "systemd" {
 		return checkService(ctx, action.Unit)
 	}
 	return nil
@@ -216,11 +216,17 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 		}
 	}
 	type write struct {
-		file File
-		data []byte
+		file     File
+		data     []byte
+		preserve bool
+		mode     os.FileMode
+		uid, gid int
+		mapping  *ConfigUpdate
+		account  AccountSelector
 	}
 	type job struct {
 		writes           []write
+		backupTargets    []string
 		credentialCheck  *Action
 		updateScript     *Action
 		serviceAction    *Action
@@ -249,7 +255,19 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 		if rule.ConfigUpdate != nil {
 			files = rule.ConfigUpdate.Files
 			item.updateScript = rule.ConfigUpdate.Script
-			for _, path := range rule.ConfigUpdate.Targets {
+			item.backupTargets = append(item.backupTargets, rule.ConfigUpdate.targetPaths()...)
+			if rule.ConfigUpdate.File != "" {
+				data, mode, uid, gid, err := renderMappedConfig(*rule.ConfigUpdate, rule.Accounts[0], payload)
+				if err != nil {
+					return err
+				}
+				item.writes = append(item.writes, write{
+					file: File{Path: rule.ConfigUpdate.File}, data: data,
+					preserve: true, mode: mode, uid: uid, gid: gid,
+					mapping: rule.ConfigUpdate, account: rule.Accounts[0],
+				})
+			}
+			for _, path := range rule.ConfigUpdate.targetPaths() {
 				if err := secureTarget(path); err != nil {
 					return err
 				}
@@ -266,7 +284,7 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 			if err != nil {
 				return err
 			}
-			item.writes = append(item.writes, write{file, data})
+			item.writes = append(item.writes, write{file: file, data: data})
 		}
 		for _, key := range matched {
 			covered[key] = true
@@ -288,33 +306,66 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 			}
 		}
 	}
+	// Preserve the original contents before any update script or file write.
+	// One delivery can update the same file through several account rules.
+	if len(config.Rules) > 0 {
+		var targets []string
+		for _, job := range jobs {
+			targets = append(targets, job.backupTargets...)
+			for _, item := range job.writes {
+				targets = append(targets, item.file.Path)
+			}
+		}
+		if err := backupTargets(config.StateFile, targets); err != nil {
+			return fmt.Errorf("business configuration backup failed: %w", err)
+		}
+	}
 	for _, job := range jobs {
 		if job.updateScript != nil {
 			if err := execute(ctx, *job.updateScript, job.payload); err != nil {
 				return fmt.Errorf("config_update failed: %w", err)
 			}
 		}
+	}
+	for _, job := range jobs {
 		for _, item := range job.writes {
+			if item.mapping != nil {
+				var err error
+				item.data, item.mode, item.uid, item.gid, err = renderMappedConfig(*item.mapping, item.account, job.payload)
+				if err != nil {
+					return err
+				}
+			}
 			if err := preparePrivateDirectory(filepath.Dir(item.file.Path), 0711); err != nil {
 				return err
 			}
-			owner := item.file.Owner
-			if owner == "" {
-				owner = config.Delivery.User
+			mode, uid, gid := os.FileMode(0600), item.uid, item.gid
+			if item.preserve {
+				mode = item.mode
+			} else {
+				owner := item.file.Owner
+				if owner == "" {
+					owner = config.Delivery.User
+				}
+				var err error
+				uid, gid, err = ownerIDs(owner)
+				if err != nil {
+					return err
+				}
 			}
-			uid, gid, err := ownerIDs(owner)
-			if err != nil {
-				return err
-			}
-			if err = atomicWrite(item.file.Path, item.data, 0600, uid, gid); err != nil {
+			if err := atomicWrite(item.file.Path, item.data, mode, uid, gid); err != nil {
 				return err
 			}
 		}
+	}
+	for _, job := range jobs {
 		if job.serviceAction != nil {
 			if err := execute(ctx, *job.serviceAction, job.payload); err != nil {
 				return fmt.Errorf("service_action failed: %w", err)
 			}
 		}
+	}
+	for _, job := range jobs {
 		if job.applicationCheck != nil {
 			if err := execute(ctx, job.applicationCheck.Action, job.payload); err != nil {
 				return fmt.Errorf("application_check failed: %w", err)

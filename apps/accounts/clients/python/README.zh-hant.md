@@ -36,7 +36,7 @@ systemd unit 必須引用 EnvironmentFile。
 
 本機 rules 設定目標檔案、JSON/EnvironmentFile 或可信範本，以及可選的 systemd reload/restart 或固定可執行腳本。腳本透過標準輸入接收憑據 JSON，參數固定、有逾時，並應在驗證業務生效後回報成功。Core 不能新增腳本路徑或擴大本機能力。修改私有設定後重新啟動 Agent。
 
-身分只需要 app_id、app_secret、org_id 和穩定的 instance_id；授權範圍跟隨應用程式綁定的策略。檔案路徑及服務動作全部在本機設定：state_file 保留最新密碼，event_file 追加不含密碼的事件資料，delivery 定義預設交付，rules 定義檔案、範本及 reload/restart 或固定腳本。收到更新通知後取得最新密碼，先持久化，再原子替換檔案，最後執行動作；交付失敗會重試。規則使用 get_accounts 回傳的 credentials[].key，訂閱 key 包含帳號 ID。rules 為空時預設依 key 寫檔。
+下載的引導設定已包含 Agent 身分與交付設定。只需在 rules 中宣告業務使用的帳號 ID，再設定更新業務檔案、生效動作及執行中連線驗證。帳號設定 allow_account_switch 後可沿用同一規則處理 A/B 雙向輪換；可選 credential_check 於修改檔案前驗證新帳號。狀態、事件、Socket 路徑及 300 秒對帳週期皆有預設值。rules 為空時依憑據寫入預設檔案。
 
 ```json
 {
@@ -45,16 +45,10 @@ systemd unit 必須引用 EnvironmentFile。
   "app_secret": "<application-secret>",
   "org_id": "<org-id>",
   "instance_id": "orders-node-1",
-  "state_file": "/var/lib/jms-pam-agent/state.json",
-  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
-  "reconcile_interval": 300,
   "delivery": {
     "delivery_mode": "json",
     "delivery_root": "/opt/jumpserver-pam/credentials",
-    "socket_path": "/run/jms-pam-agent/agent.sock",
-    "app_user": "orders",
-    "systemd_unit": "",
-    "systemd_action": ""
+    "app_user": "orders"
   },
   "rules": []
 }
@@ -65,34 +59,29 @@ systemd unit 必須引用 EnvironmentFile。
 ```json
 [
   {
-    "keys": [
-      "<credential-key>"
-    ],
-    "files": [
+    "accounts": [
       {
-        "path": "/etc/order-service/database.json",
-        "format": "template",
-        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
-        "owner": "orders"
+        "account_id": "<primary-account-id>",
+        "allow_account_switch": true
       }
     ],
-    "action": {
-      "type": "systemd",
+    "config_update": {
+      "file": "/etc/order-service/config.yml",
+      "fields_map": {
+        "DB_USER": "username",
+        "DB_PASSWORD": "secret"
+      }
+    },
+    "service_action": {
       "unit": "order-service.service",
-      "operation": "reload",
-      "timeout_seconds": 30
+      "operation": "restart"
+    },
+    "application_check": {
+      "path": "/usr/local/libexec/jms-pam/check-running-db",
+      "confirm_on_success": true
     }
   }
 ]
-```
-
-`/etc/jms-pam-agent/orders-db.tmpl`:
-
-```gotemplate
-{
-  "username": {{json (index .Credentials "<credential-key>").Username}},
-  "password": {{json (index .Credentials "<credential-key>").Secret}}
-}
 ```
 
 ```bash

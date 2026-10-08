@@ -385,14 +385,21 @@ class ApplicationAccessTests(CredentialTestCase):
         self.assertIn('$env:COMPUTERNAME', first['foreground_windows_command'])
         self.assertFalse(CredentialClientInstance.objects.exists())
         changed = self.parameters(type='agent', app_user='other')
-        self.assertIn('event_file', bootstrap)
+        self.assertNotIn('event_file', bootstrap)
+        self.assertNotIn('state_file', bootstrap)
+        self.assertNotIn('socket_path', bootstrap['delivery'])
         self.assertEqual(bootstrap['rules'], [])
         self.assertEqual(json.loads(materials(self.application, changed, 'http://testserver')['config'])['delivery']['app_user'], 'other')
         environment = self.parameters(
             type='agent', app_user='app', delivery_mode='environment',
             systemd_unit='app.service',
         )
-        self.assertFalse(materials(self.application, environment, 'http://testserver')['foreground_windows_command'])
+        environment_materials = materials(self.application, environment, 'http://testserver')
+        self.assertFalse(environment_materials['foreground_windows_command'])
+        self.assertEqual(
+            json.loads(environment_materials['config'])['delivery']['systemd_unit'],
+            'app.service',
+        )
 
     def test_agent_application_signature_syncs_and_sdk_cannot_use_agent_scope(self):
         params = {'instance_id': 'application-agent', 'credentials': []}

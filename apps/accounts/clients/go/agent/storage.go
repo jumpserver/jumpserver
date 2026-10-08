@@ -148,6 +148,31 @@ func ownerIDs(username string) (int, int, error) {
 	return accountIDs(account.Uid, account.Gid)
 }
 
+func fileOwner(info os.FileInfo) (int, int, error) {
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return 0, 0, errors.New("cannot read business configuration ownership")
+	}
+	return int(stat.Uid), int(stat.Gid), nil
+}
+
 func preparePrivateDirectory(path string, mode os.FileMode) error {
 	return os.MkdirAll(path, mode)
+}
+
+func privateBackupDirectory(path string) error {
+	if err := preparePrivateDirectory(path, 0700); err != nil {
+		return err
+	}
+	if err := securePath(path); err != nil {
+		return err
+	}
+	info, err := os.Lstat(path)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() || info.Mode().Perm()&0077 != 0 {
+		return errors.New("backup directory must be private")
+	}
+	return nil
 }

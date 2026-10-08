@@ -270,7 +270,7 @@ HTTP, 네트워크, 인증 및 디코딩 실패는 코드와 HTTP 상태를 포�
 
 로컬 rules에 파일, JSON/EnvironmentFile 또는 신뢰할 수 있는 템플릿과 systemd reload/restart 또는 고정 실행 파일을 설정합니다. 스크립트는 표준 입력으로 자격 증명 JSON을 받고 고정 인수와 제한 시간을 사용하며 적용을 검증한 후 성공합니다. Core는 실행 경로나 권한을 확장할 수 없습니다. 구성을 수정한 후 Agent를 재시작합니다.
 
-인증에는 app_id, app_secret, org_id 및 안정적인 instance_id를 사용하며 권한은 애플리케이션에 연결된 정책을 따릅니다. 경로와 서비스 동작은 모두 로컬 설정입니다. state_file은 최신 암호를 유지하고 event_file은 비밀 없는 이벤트 정보를 추가합니다. delivery는 기본 출력을, rules는 파일, 템플릿 및 reload/restart 또는 고정 스크립트를 지정합니다. 업데이트 알림을 받으면 최신 암호를 가져와 저장하고 파일을 원자적으로 교체한 뒤 동작을 실행합니다. 실패는 재시도합니다. rules에는 get_accounts의 credentials[].key를 사용합니다. 구독 key에는 계정 ID가 포함됩니다. rules가 비어 있으면 key별 기본 파일을 씁니다.
+다운로드한 설정에는 Agent 인증 정보와 전달 설정이 포함됩니다. rules에 업무에서 사용하는 계정 ID, 설정 갱신, 적용 동작, 실행 중인 연결 확인을 지정합니다. allow_account_switch를 설정하면 동일한 규칙으로 A/B 양방향 교체를 처리합니다. 선택적 credential_check는 파일 변경 전에 새 로그인을 검증합니다. 상태, 이벤트, Socket 경로와 300초 조정 간격에는 기본값이 있습니다. rules가 비어 있으면 자격 증명별 기본 파일을 기록합니다.
 
 ```json
 {
@@ -279,16 +279,10 @@ HTTP, 네트워크, 인증 및 디코딩 실패는 코드와 HTTP 상태를 포�
   "app_secret": "<application-secret>",
   "org_id": "<org-id>",
   "instance_id": "orders-node-1",
-  "state_file": "/var/lib/jms-pam-agent/state.json",
-  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
-  "reconcile_interval": 300,
   "delivery": {
     "delivery_mode": "json",
     "delivery_root": "/opt/jumpserver-pam/credentials",
-    "socket_path": "/run/jms-pam-agent/agent.sock",
-    "app_user": "orders",
-    "systemd_unit": "",
-    "systemd_action": ""
+    "app_user": "orders"
   },
   "rules": []
 }
@@ -299,34 +293,29 @@ HTTP, 네트워크, 인증 및 디코딩 실패는 코드와 HTTP 상태를 포�
 ```json
 [
   {
-    "keys": [
-      "<credential-key>"
-    ],
-    "files": [
+    "accounts": [
       {
-        "path": "/etc/order-service/database.json",
-        "format": "template",
-        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
-        "owner": "orders"
+        "account_id": "<primary-account-id>",
+        "allow_account_switch": true
       }
     ],
-    "action": {
-      "type": "systemd",
+    "config_update": {
+      "file": "/etc/order-service/config.yml",
+      "fields_map": {
+        "DB_USER": "username",
+        "DB_PASSWORD": "secret"
+      }
+    },
+    "service_action": {
       "unit": "order-service.service",
-      "operation": "reload",
-      "timeout_seconds": 30
+      "operation": "restart"
+    },
+    "application_check": {
+      "path": "/usr/local/libexec/jms-pam/check-running-db",
+      "confirm_on_success": true
     }
   }
 ]
-```
-
-`/etc/jms-pam-agent/orders-db.tmpl`:
-
-```gotemplate
-{
-  "username": {{json (index .Credentials "<credential-key>").Username}},
-  "password": {{json (index .Credentials "<credential-key>").Secret}}
-}
 ```
 
 ```bash

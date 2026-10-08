@@ -71,7 +71,7 @@ func Prepare(ctx context.Context, options InstallOptions) (Config, error) {
 	if err = verifyAccess(ctx, config); err != nil {
 		return Config{}, err
 	}
-	if err = writeJSON(options.ConfigFile, config); err != nil {
+	if err = writeJSON(options.ConfigFile, config.compactDefaults()); err != nil {
 		return Config{}, err
 	}
 	return config, nil

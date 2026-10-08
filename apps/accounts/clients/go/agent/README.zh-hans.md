@@ -30,10 +30,11 @@ sudo systemctl start jms-pam-agent
 
 ## 运行流程
 
-`更新通知 / 首次及重连快照 → 签名核对授权与版本 → 实时取密 → 保存最新凭据 → 渲染并原子替换文件 → 执行动作 → 保存交付版本`
+`更新通知 / 首次及重连快照 → 签名核对授权与版本 → 实时取密 → 保存最新凭据 → 渲染 → 备份现有业务配置 → 原子替换文件 → 执行动作 → 保存交付版本`
 
 - 默认按 key 写 JSON 文件，也支持 EnvironmentFile 和 Unix Socket。默认目录及 socket 路径由本机文件指定，具体值在本机 `delivery` 中。
 - 本机 `rules` 可以指定其他服务的配置路径、可信模板，以及 reload/restart 或固定脚本。
+- 更新业务配置前，Agent 将现有目标文件备份到 `state_file` 所在目录的 `backups/`，按目标路径分别存放，文件名带 UTC 日期时间；每个目标最多保留最近 10 份。备份目录仅 Agent 可访问，备份文件为 `0600`。相同内容不会重复备份。备份失败会阻止本次更新；新建文件没有旧内容可备份。超过 32 MiB 的目标文件需要由业务自行管理备份。
 - 同一版本成功交付后跳过重复动作；初次交付、新版本和失败重试执行动作。通知仍会主动取密。
 - 获取或交付失败按 1–30 秒指数退避重试，并每 300 秒对账。读取器使用有界队列，业务动作串行执行；WebSocket 心跳与重连由 Go SDK 管理。
 - 最新成功获取的密码不按时间过期，刷新失败不丢失，Agent 重启可恢复。更旧的 API 响应不会覆盖新版本。
@@ -42,7 +43,7 @@ sudo systemctl start jms-pam-agent
 
 ## 本机配置
 
-下载文件就是完整的本机配置，安装时仅设置稳定的实例 ID。以下示例替换应用身份和业务路径后即可使用；不需要在后端管理接入配置。`rules` 是本机管理员配置，Core 不能通过事件添加脚本、参数、目标文件或扩展已固定的交付能力。
+从应用接入向导下载配置，安装时指定稳定的实例 ID。通常只需编辑 `rules`：一个规则声明业务实际使用的账号，以及如何更新配置、让服务重新读取配置、验证运行中的连接。Core 不能通过事件修改本机脚本和目标路径。
 
 ```json
 {
@@ -51,114 +52,82 @@ sudo systemctl start jms-pam-agent
   "app_secret": "<application-secret>",
   "org_id": "<org-id>",
   "instance_id": "orders-node-1",
-  "state_file": "/var/lib/jms-pam-agent/state.json",
-  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
-  "reconcile_interval": 300,
   "delivery": {
     "delivery_mode": "json",
     "delivery_root": "/opt/jumpserver-pam/credentials",
-    "socket_path": "/run/jms-pam-agent/agent.sock",
-    "app_user": "orders",
-    "systemd_unit": "",
-    "systemd_action": ""
+    "app_user": "orders"
   },
   "rules": [
     {
-      "keys": ["orders-db"],
-      "files": [
+      "accounts": [
         {
-          "path": "/etc/order-service/database.json",
-          "format": "template",
-          "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
-          "owner": "orders"
+          "account_id": "<主库账号 A ID>",
+          "allow_account_switch": true
         }
       ],
-      "action": {
-        "type": "systemd",
-        "unit": "order-service.service",
-        "operation": "reload",
-        "timeout_seconds": 30
+      "config_update": {
+        "file": "/opt/jumpserver/config/config.txt",
+        "fields_map": {"DB_USER": "username", "DB_PASSWORD": "secret"}
+      },
+      "service_action": {"path": "/usr/local/libexec/jms-pam/recreate-jumpserver"},
+      "application_check": {
+        "path": "/usr/local/libexec/jms-pam/check-running-db",
+        "confirm_on_success": true
       }
     }
   ]
 }
 ```
 
-`orders-db` 是轮换策略 key 的示例。订阅 push 的凭据 key 为 `account:<account-id>`，与选中账号的策略无关；多条策略命中同一账号也只交付一份。先运行 `get_accounts`，复制输出的 `credentials[].key` 到规则和模板。业务文件可在本机 `rules.files.path` 指定可读的固定路径。
+`account_id` 是 JumpServer 账号 ID，不是数据库用户名或凭据策略 ID。使用 `config_update.file` 时，一条规则只声明一个账号；`fields_map` 直接指定文件字段如何取值：上例把当前生效账号的 `username`、`secret` 写入 `DB_USER`、`DB_PASSWORD`。`allow_account_switch` 允许该账号参与 A/B 轮换：事件声明 A、B 后，Agent 在 A→B、B→A，以及首次同步已选中 B 时，均使用 A 的规则，把当前账号的值写到同一组字段。普通账号省略 `allow_account_switch`。
 
-从旧版 `策略 key:账号 ID` 升级时，首次成功在线同步会取得新 key，清理 Agent 状态里的旧订阅项。未配置自定义 `rules` 时还会删除当前交付目录中的旧默认文件。使用自定义规则的主机需在重启前把 `rules.keys` 和模板中的旧 key 改成 `account:<account-id>`；自定义目标文件及曾使用过的交付目录需要单独检查。
+调试文件若有 `VERSION` 字段，可在 `fields_map` 中增加 `"VERSION":"revision"`，随凭据版本自动更新。这里的 `revision` 是凭据策略的交付版本，不是账号密码历史版本；正式业务文件没有该字段时不需要添加。
 
-`rules` 为空或省略时，默认 JSON 模式写 `delivery_root/<key>.json`；`state_file` 始终保留最近成功获取的密码。
+规则按以下顺序执行。只有业务实际使用新连接后，`application_check` 才应成功；`confirm_on_success` 才会确认准确的轮换版本。失败会保留待交付状态并重试。
 
-`keys` 可指定多项凭据，使脚本或完整配置模板获得同一交付快照。显式配置 `rules` 时，每个待交付 key 都必须被规则覆盖；多项规则应支持重试。文件格式支持 `json`、`environment`、`template`；EnvironmentFile 规则限一项凭据。单项 JSON 输出扁平凭据，多项 JSON 输出按 key 组织的对象。
+| 配置块 | 作用 |
+| --- | --- |
+| `credential_check`（可选） | 在改业务配置前，尝试用新账号连接目标数据库。 |
+| `config_update` | 按 `fields_map` 定点修改现有文件；复杂格式可改用模板或脚本。 |
+| `service_action` | 执行固定脚本，或对固定 systemd unit 执行 reload/restart。 |
+| `application_check` | 验证运行中的业务已经通过新账号完成真实数据库操作。 |
 
-这里的 `rules[].keys` **是 JumpServer 下发凭据的标识列表**，不是业务配置中的 `DB_USER`、`DB_PASSWORD`，也不是数据库用户名。它只回答“这条规则使用哪几份凭据”；`config_update` 的模板或脚本才决定“把用户名和密码写到哪些配置字段”。在 `jms-pam-agent get_accounts` 输出中，找到所需账号的 `credentials[].key` 后填入这里：普通订阅通常是 `account:<账号 ID>`；A/B 双账号轮换是一个固定的策略 key（例如 `cred-...`），切换 A→B 时 key 不变，凭据中的 `account_id`、`username` 和 `secret` 更新。若主库和报表库同时使用，规则列出两个不同的 key；若 A/B 只是同一主库连接的交替账号，规则只列出一个轮换 key。
+上例适用于安装器的 `config.txt`：Agent 只改现有的 `DB_USER`、`DB_PASSWORD`，保留其他设置和文件权限；生效脚本重建读取环境变量的 Core、Celery 容器。直接部署的扁平 `config.yml` 只需把 `file` 改成该 YAML 文件，随后重启实际读取它的进程。Agent 根据 `.txt` / `.yml` 扩展名识别格式，也可显式指定 `format: "env"` 或 `format: "yaml"`。映射的字段必须已存在且不能重复；复杂或嵌套格式使用脚本。安装器 `config.txt` 的密码不能含引号，遇到此类值 Agent 会失败而不会写入可能无法读取的配置。两种部署都要验证真实数据库连接，进程存活不足以确认切换。
 
-新配置推荐使用 `rules[].accounts`，按实际使用的账号 ID 声明规则，不用在 Agent 配置中保存策略 key。轮换账号设置 `allow_account_switch: true`；Core 在事件、首次连接快照、同步结果和凭据响应中提供 `account_switch.account_ids`。只要声明的账号属于该轮换组，Agent 就使用这条规则，并写入本次生效账号的用户名和密码。A→B、B→A 以及首次接入时已在 B 都复用同一规则。`allow_account_switch` 按账号设置，因此同一文件可同时使用轮换账号和普通订阅账号：
+如果业务使用两个账号，分别写两条规则，各自声明一个账号和对应的 `fields_map`。两条规则可以指向同一文件，但字段不能重叠，文件格式和 `owner` 也必须相同。例如第二条规则使用 `{"accounts":[{"account_id":"<报表库账号 ID>"}],"config_update":{"file":"/opt/jumpserver/config/config.txt","fields_map":{"REPORT_DB_USER":"username","REPORT_DB_PASSWORD":"secret"}}}`。同一次交付涉及两条规则时，Agent 依次基于文件最新内容更新各自字段，全部文件更新后再执行服务动作和业务验证。
+
+特殊格式可将 `config_update` 改为 `{"target":"/path/config","script":{"path":"/usr/local/libexec/jms-pam/update-config"}}`。脚本修改多个文件时使用 `targets` 列出全部目标。声明目标用于路径安全与冲突检查，Agent 不会把路径自动作为脚本参数传入。
+
+更新、重启和检查脚本都从标准输入读取 JSON，例如：
 
 ```json
 {
-  "accounts": [
-    {"account_id": "<主库账号 A ID>", "allow_account_switch": true},
-    {"account_id": "<报表库账号 ID>"}
-  ],
-  "config_update": {
-    "targets": ["/etc/order-service/database.yml"],
-    "script": {"type": "script", "path": "/usr/local/libexec/jms-pam/update-business-config"}
-  },
-  "service_action": {"type": "script", "path": "/usr/local/libexec/jms-pam/recreate-business"},
-  "application_check": {
-    "type": "script", "path": "/usr/local/libexec/jms-pam/check-running-business",
-    "confirm_on_success": true
+  "event": "credentials.updated",
+  "credentials": {
+    "<主库账号 A ID>": {
+      "account_id": "<当前账号 B ID>",
+      "username": "db_user_b",
+      "secret": "<latest-password>"
+    }
   }
 }
 ```
 
-脚本的 `credentials` 对象以**本机声明的账号 ID**为键；轮换后该项的 `account_id` 是实际生效账号 B。模板和脚本无需改索引。Agent 会向 Core 申报这些账号，只接收相关策略；轮换进行中不能通过删除本机规则退出该轮换。若多个策略同时匹配同一账号规则，或缺少轮换组信息，交付失败且不会确认。旧 `keys` 规则继续支持，但同一条规则不能混用 `keys` 和 `accounts`。
+脚本必须按声明的账号 ID 读取 `credentials`，不能依赖数组位置。它没有隐式参数；需要固定参数时在 `args` 中声明。密码不放在参数、环境变量或日志中。脚本须支持重复执行，失败时以非零状态退出。Agent 会在调用更新脚本前备份其声明的 `target` / `targets`；脚本修改声明范围外的文件由脚本自行负责。写入业务文件后若启动或检查失败，Agent 会重试，但不会自动回滚该文件；恢复备份后仍需让业务重新读取配置，并验证连接。默认超时 120 秒，可用 `timeout_seconds` 调整，最大 300 秒。脚本路径及其父目录必须可信，目标目录也须受保护且不能使用符号链接。
 
-### 分阶段适配业务配置
-
-新规则可将职责分成四个本机配置块。执行顺序为 `credential_check → config_update → service_action → application_check`。检查脚本和更新脚本都从 stdin 接收同一份按 key 组织的凭据 JSON。`config_update` 选择 `files`（完整文件模板/JSON/EnvironmentFile）或 `script`（定点修改现有配置），不能同时设置。`service_action` 支持固定脚本或 systemd reload/restart；两个检查块只接受固定脚本。旧规则的 `files`/`action` 仍可继续使用，但不能和新块混用。
-
-例如同一应用同时使用主库和报表库账号，且两个账号写入同一个配置文件：
+如果业务文件由 Agent 完整生成，`config_update` 可改为模板：
 
 ```json
 {
-  "keys": ["<primary-key>", "<report-key>"],
-  "credential_check": {
-    "type": "script", "path": "/usr/local/libexec/jms-pam/check-db-login"
-  },
-  "config_update": {
-    "targets": ["/etc/order-service/database.yml"],
-    "script": {"type": "script", "path": "/usr/local/libexec/jms-pam/update-business-config"}
-  },
-  "service_action": {
-    "type": "script", "path": "/usr/local/libexec/jms-pam/recreate-business"
-  },
-  "application_check": {
-    "type": "script", "path": "/usr/local/libexec/jms-pam/check-running-business",
-    "confirm_on_success": true
-  }
+  "files": [
+    {"path": "/etc/order-service/database.json", "template_file": "/etc/jms-pam-agent/orders-db.tmpl"}
+  ]
 }
 ```
 
-把这条规则放入 `rules` 数组。脚本更新必须声明 `targets`，以检查同一文件是否被多条规则占用；脚本实际写入范围仍由本机管理员负责。四个脚本由本机管理员提供，路径和参数不能由 Core 事件改变。`credential_check` 应使用新账号实际连接目标数据库，失败时不修改文件；`config_update` 应仅修改绑定字段并保留其他账号与设置；`service_action` 应让业务重新读取配置；`application_check` 应验证运行中的业务已经用新账号完成数据库操作。脚本非零退出会阻止该版本完成交付并触发重试。更新或启动失败后的配置回退由本机脚本负责，Agent 不会自动回滚业务文件。
+模板中的账号索引为本机声明的 ID，例如 `{{json (index .Credentials "<主库账号 A ID>").Secret}}`。模板会替换整个文件；需要保留其他配置项时优先使用上述字段映射，复杂格式再使用更新脚本。`service_action` 也可写成 `{"unit":"order-service.service"}`，默认 restart；需要 reload 时显式设置 `operation: "reload"`。只读取启动环境的服务应选择 restart。
 
-同一目标文件只能属于一条规则；多个账号共用文件时应放在同一 `keys` 中，以最新可用凭据快照更新一次。缺少任何必需 key 时，Agent 不会运行此规则。`confirm_on_success` 只对轮换 key 生效，且该 key 的每条规则都必须通过应用检查并显式开启，才会持久化准确版本的生效确认；Core 暂不可用时稍后重报。不要用单纯的进程存活检查冒充业务连接验证。JumpServer installer 的 `config.txt` 需用更新脚本定点修改 `DB_USER`/`DB_PASSWORD`，并重建读取环境变量的 Core、Celery 容器；直接使用 `config.yml` 的部署应更新对应 YAML 字段并重启实际读取它的进程。两种场景均需独立验证新账号和切换后的真实数据库连接。
-
-本机模板 `/etc/jms-pam-agent/orders-db.tmpl`：
-
-```gotemplate
-{
-  "address": {{json (index .Credentials "orders-db").Address}},
-  "username": {{json (index .Credentials "orders-db").Username}},
-  "password": {{json (index .Credentials "orders-db").Secret}}
-}
-```
-
-`json` 函数完成 JSON 转义。其他业务格式需要使用该格式正确的转义规则，复杂更新可交给脚本。所有文件先渲染成功才开始写入，逐文件原子替换；多文件和后续动作不构成一个事务。动作失败时保留最新凭据，交付版本不前进，之后重试。
-
-更新本机配置后：
+`state_file`、`event_file`、`reconcile_interval`、`delivery.socket_path` 均有内置默认值，只有需要调整时才填写。`rules` 为空时，Agent 默认按凭据 key 在 `delivery_root` 写 JSON 文件；此模式不负责修改业务配置。修改配置后检查并重启 Agent：
 
 ```bash
 sudo chmod 0600 /etc/jms-pam-agent/agent.json
@@ -166,40 +135,7 @@ sudo jms-pam-agent check-config
 sudo systemctl restart jms-pam-agent
 ```
 
-EnvironmentFile 更新需要应用重新读取配置。systemd `reload` 不会替换运行中进程的环境变量；只读取启动环境的服务应选择 `restart`。systemd 动作完成后会检查服务是否 active；应用层数据库连接是否切换仍由应用验证。
-
-## 复杂场景使用脚本
-
-替换规则中的 `action`，也可以省略 `files`，由脚本负责更新完整配置：
-
-```json
-{
-  "type": "script",
-  "path": "/usr/local/libexec/jms-pam/apply-orders",
-  "args": ["--config", "/etc/order-service/database.json"],
-  "timeout_seconds": 60
-}
-```
-
-Agent 直接运行固定可执行文件，不拼接 shell 命令。脚本通过标准输入接收 JSON：
-
-```json
-{
-  "event": "credentials.updated",
-  "credentials": {
-    "orders-db": {
-      "key": "orders-db",
-      "revision": 3,
-      "username": "orders",
-      "secret": "<latest-password>"
-    }
-  }
-}
-```
-
-实际凭据还包含账号、资产、地址等字段。密码不放进参数、环境变量或 Agent 日志。脚本自身也应避免输出密码；Agent 丢弃脚本 stdout/stderr。退出码 0 表示动作完成，非零或超时进入重试。脚本必须先验证配置、完成 reload/restart 和健康检查，再返回成功，并支持重复执行。默认超时 120 秒，上限 300 秒；超时或服务停止会终止脚本进程组。
-
-服务、模板、脚本和目标文件的父目录必须由 root 管理，不允许组或其他用户写入，也不允许符号链接。脚本必须是本机可信普通可执行文件，不允许 setuid/setgid。交付文件为 `0600`，按规则 owner 或配置的 app_user 设置归属；Core 无法扩大这些本机执行能力。
+轮换流程中，先验证备用账号，再下发切换并等待各 Agent 的业务验证；之后根据 JumpServer 取密记录判断旧账号已无流量，才允许修改旧账号密码。`application_check` 只证明对应应用副本已切到新连接，不能代替旧账号无流量的门槛。
 
 ## 本地 API 与生效确认
 

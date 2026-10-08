@@ -63,19 +63,17 @@ def materials(application, params, endpoint):
         'endpoint': endpoint, 'org_id': str(application.org_id),
         'app_id': str(application.id), 'app_secret': application.secret,
         'instance_id': '<instance-id>',
-        'state_file': '/var/lib/jms-pam-agent/state.json',
-        'event_file': '/var/lib/jms-pam-agent/events.jsonl',
-        'reconcile_interval': 300,
         'delivery': {
             'delivery_mode': settings['delivery_mode'],
             'delivery_root': f'{install_path}/credentials',
-            'socket_path': '/run/jms-pam-agent/agent.sock',
             'app_user': settings['app_user'],
-            'systemd_unit': settings['systemd_unit'],
-            'systemd_action': settings['systemd_action'],
         },
         'rules': [],
     }
+    if settings['systemd_unit']:
+        bootstrap['delivery']['systemd_unit'] = settings['systemd_unit']
+    if settings['systemd_action']:
+        bootstrap['delivery']['systemd_action'] = settings['systemd_action']
     filename = 'jms_pam_agent.json'
     preparation = 'sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
     installation = (

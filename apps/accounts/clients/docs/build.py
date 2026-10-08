@@ -324,8 +324,20 @@ cd apps/accounts/clients/{language}
 """
 
 
-AGENT_SAMPLE = {'endpoint': 'https://jumpserver.example.com', 'app_id': '<application-id>', 'app_secret': '<application-secret>', 'org_id': '<org-id>', 'instance_id': 'orders-node-1', 'state_file': '/var/lib/jms-pam-agent/state.json', 'event_file': '/var/lib/jms-pam-agent/events.jsonl', 'reconcile_interval': 300, 'delivery': {'delivery_mode': 'json', 'delivery_root': '/opt/jumpserver-pam/credentials', 'socket_path': '/run/jms-pam-agent/agent.sock', 'app_user': 'orders', 'systemd_unit': '', 'systemd_action': ''}, 'rules': []}
-AGENT_RULE = {'keys': ['<credential-key>'], 'files': [{'path': '/etc/order-service/database.json', 'format': 'template', 'template_file': '/etc/jms-pam-agent/orders-db.tmpl', 'owner': 'orders'}], 'action': {'type': 'systemd', 'unit': 'order-service.service', 'operation': 'reload', 'timeout_seconds': 30}}
+AGENT_SAMPLE = {'endpoint': 'https://jumpserver.example.com', 'app_id': '<application-id>', 'app_secret': '<application-secret>', 'org_id': '<org-id>', 'instance_id': 'orders-node-1', 'delivery': {'delivery_mode': 'json', 'delivery_root': '/opt/jumpserver-pam/credentials', 'app_user': 'orders'}, 'rules': []}
+AGENT_RULE = {
+    'accounts': [{
+        'account_id': '<primary-account-id>', 'allow_account_switch': True,
+    }],
+    'config_update': {
+        'file': '/etc/order-service/config.yml',
+        'fields_map': {'DB_USER': 'username', 'DB_PASSWORD': 'secret'},
+    },
+    'service_action': {'unit': 'order-service.service', 'operation': 'restart'},
+    'application_check': {
+        'path': '/usr/local/libexec/jms-pam/check-running-db', 'confirm_on_success': True,
+    },
+}
 
 
 def agent_configuration_section(texts):
@@ -339,15 +351,6 @@ def agent_configuration_section(texts):
 
 ```json
 {json.dumps([AGENT_RULE], indent=2)}
-```
-
-`/etc/jms-pam-agent/orders-db.tmpl`:
-
-```gotemplate
-{{
-  "username": {{{{json (index .Credentials "<credential-key>").Username}}}},
-  "password": {{{{json (index .Credentials "<credential-key>").Secret}}}}
-}}
 ```
 
 ```bash

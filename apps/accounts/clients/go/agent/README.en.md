@@ -18,27 +18,17 @@ New applications and account-scope updates may select specific accounts, all acc
 
 Update notifications and initial/reconnect snapshots trigger signed reconciliation and live credential retrieval. The Agent retains the latest successful credential without expiry, renders and atomically replaces files, executes configured actions, then records delivered revisions. Failed retrieval or delivery retries with 1–30 second backoff; periodic reconciliation defaults to 300 seconds. Retained credentials survive outages and process restarts. Explicit revocation reduces persisted authorization before HTTP synchronization.
 
-Default delivery writes one JSON file per credential. Local `rules` can select credential keys, JSON or EnvironmentFile targets, trusted `template_file` rendering, and a bounded systemd reload/restart or fixed executable. Templates receive `.Credentials` and provide a `json` helper. Rendered files are 0600 and belong to the configured application user or explicit file owner. Every changed key must be covered when explicit rules are configured.
+Default delivery writes one JSON file per credential. For a business application, edit only the local `rules`: select the account IDs it uses, update its configuration, activate the change, and verify the running connection. Paths, scripts and service actions are fixed locally; Core cannot add them through events. Generated state, event and socket paths and the reconciliation interval have defaults.
 
-`rules[].keys` lists JumpServer credential identifiers, not business configuration fields such as `DB_USER` or database usernames. It selects which credentials trigger a rule and appear in its payload; the `config_update` template or script maps their values to business fields. Copy the needed `credentials[].key` values from `jms-pam-agent get_accounts`: subscriptions use `account:<account-id>`, while an alternating A/B rotation uses one stable policy key (for example `cred-...`) as the account ID, username and secret change. Two simultaneous roles need two keys; A/B alternatives for one role need one rotation key.
+A rule can select `"accounts":[{"account_id":"<account-A-id>","allow_account_switch":true}]` and map fields with `"config_update":{"file":"/path/config.txt","fields_map":{"DB_USER":"username","DB_PASSWORD":"secret"}}`. For an A/B rotation, the same rule applies in either direction, including a first sync that starts on B. The declared fields receive the active account's username and secret. Use a second rule with its own account and field mapping when one business file uses two accounts. Rules sharing a file must map distinct fields with the same format and owner.
 
-Scripts receive `{"event":"credentials.updated","credentials":{...}}` as JSON on stdin, with fixed arguments and no secrets in arguments or environment. stdout/stderr are discarded. Scripts must validate and apply configuration, check application health, then return success; they must be idempotent for retries. Default timeout is 120 seconds, maximum 300 seconds. On Unix, cancellation terminates the process group; Windows supports trusted `.exe` actions and terminates the direct process on timeout. Script and template paths and writable targets require trusted ownership, protected parent directories and no symlinks. Core cannot introduce scripts, arguments, files or expanded local capabilities.
+The execution order is optional `credential_check`, backup of existing business configuration targets, `config_update`, `service_action`, then `application_check`. Backups are stored privately under `backups/` next to `state_file`, grouped by target path and named with a UTC timestamp. The Agent keeps at most 10 per target, skips identical consecutive contents, and stops delivery if backup fails. Targets larger than 32 MiB need their own backup handling. Restoring a backup and reloading the application are explicit operator actions. `config_update.file` edits declared top-level fields in an existing flat `.txt`, `.env`, `.yml` or `.yaml` file, preserving unrelated settings, permissions and ownership. Every mapped field must already exist exactly once. Use `files` with `template_file` to render a complete file, or `script` for complex formats. A fixed script receives `{"event":"credentials.updated","credentials":{...}}` on stdin. It has no implicit arguments; `args` supplies fixed ones. Script updates declare their destination with `target` or `targets`; neither is passed automatically. Actions infer script from `path` and systemd from `unit`, so `type` can be omitted.
 
-A successful file write, script or service action alone does not confirm business application. After validating and switching the real connection, the application can explicitly confirm the exact alternating-rotation revision using the protected Unix socket (`/v1/confirm` or `jms-pam-agent confirm KEY --revision N --socket PATH`). A staged `application_check` may instead set `confirm_on_success` after its trusted script verifies the running application; that synchronous script must not call the Agent confirmation socket itself. Confirmations persist before reporting and retry if Core is unavailable. Subscription credentials require no confirmation.
+The `application_check` must prove the running business uses the new database account, rather than just checking process liveness. Set `confirm_on_success` to confirm the exact alternating-rotation revision after this check. A failed step leaves delivery pending for retry; the Agent does not automatically roll business files back after an activation or check failure. JumpServer installer `config.txt` needs recreation of the readers, including Core and Celery containers. Direct `config.yml` deployment needs restart of its actual readers. The installer format cannot represent passwords containing quotes; such credentials require a custom updater. Old-account password changes must wait until JumpServer credential retrieval records show no old-account traffic after switching.
 
-Staged local rules can separate `credential_check`, `config_update`, `service_action`, and `application_check`, in that execution order. `config_update` accepts either `files` for complete rendered files or a fixed `script` for targeted edits of an existing business configuration. The checks require fixed scripts; `service_action` accepts a fixed script or systemd reload/restart. Legacy `files`/`action` rules remain valid but cannot mix with staged blocks. Every script receives the current credentials grouped by key on stdin. A failed credential check leaves business files untouched; later failures leave delivery pending for retry. Local scripts must restore previous business configuration when an update or activation fails; the Agent does not roll business files back automatically.
+Scripts must be idempotent, use protected paths, and keep secrets out of arguments, environment variables and logs. The default action timeout is 120 seconds, with a maximum of 300 seconds. To apply changed local rules, run `sudo jms-pam-agent check-config` and restart the fixed service. An active systemd service alone does not prove the business database connection changed.
 
-New rules can select accounts without storing a policy key: `"accounts":[{"account_id":"<account-A-id>","allow_account_switch":true}]`. Core supplies `account_switch.account_ids` in events, initial snapshots, Agent sync metadata, and fetched credentials. The same local account rule applies A→B, B→A, and a first sync that begins at B; the payload remains keyed by the configured account A ID while its `account_id`, username, and secret contain the currently selected account. `allow_account_switch` belongs to each account selector, so one rule can also include an ordinary subscription account. The Agent advertises its selected accounts to Core and receives only matching push policies. A participant cannot remove an account rule during an active rotation. Ambiguous policy matches and missing switch metadata fail delivery without confirmation. Existing `keys` rules remain valid; a single rule cannot mix `keys` and `accounts`.
-
-For an application that uses two accounts in one configuration file, put both keys in one rule. Script updates must declare `targets` so the Agent can detect shared destinations; the local administrator remains responsible for what the script actually writes. One target file cannot belong to multiple rules, and an unavailable required key prevents that rule from running. For example, use `{"keys":["<primary-key>","<report-key>"],"credential_check":{"type":"script","path":"/usr/local/libexec/jms-pam/check-db-login"},"config_update":{"targets":["/etc/order-service/database.yml"],"script":{"type":"script","path":"/usr/local/libexec/jms-pam/update-business-config"}},"service_action":{"type":"script","path":"/usr/local/libexec/jms-pam/recreate-business"},"application_check":{"type":"script","path":"/usr/local/libexec/jms-pam/check-running-business","confirm_on_success":true}}`. The last script must verify that the running application uses the new account. Only then can the Agent persist and report exact alternating-rotation confirmations; each rule for that key must explicitly enable this behavior. A simple active-process check is insufficient. JumpServer installer `config.txt` needs targeted `DB_USER`/`DB_PASSWORD` edits and recreation of Core and Celery containers; direct `config.yml` deployments need a YAML update and restart of their actual readers. Both require live database-connection verification.
-
-After editing local configuration, run `sudo jms-pam-agent check-config` and restart the fixed service. A systemd reload does not inject updated environment variables into a running process; services that read only their startup environment need restart. Completed systemd actions are followed by an active-state check. Real application connection switching still requires application validation.
-
-The Go Agent uses its own state format. Existing Python services and state are not automatically deleted. When migrating an installed host, stop its old Agent and complete the first online synchronization before handing over the same delivery paths.
-
-When upgrading from policy-prefixed subscription keys, the first successful online synchronization fetches the account key and removes old subscription entries from Agent state. With default delivery and no custom rules, it also removes old default files in the current delivery root. Update local `rules.keys` and any template references from `<policy-key>:<account-id>` to `account:<account-id>` before restarting an Agent that uses custom rules. Review custom file destinations and any previous delivery root separately.
-
-See the [complete configuration, template and script examples](README.zh-hans.md). Local tests cover updates, retained-state recovery, revocation, templates, scripts, failure paths, confirmation and socket lifecycle. Linux systemd installation and real service actions need target-host validation.
+See the [complete configuration and script contract](README.zh-hans.md). Local tests cover updates, retained-state recovery, revocation, templates, scripts, failure paths, confirmation and socket lifecycle. Linux systemd installation and real service actions need target-host validation.
 
 ## CLI and local foreground development
 
@@ -74,60 +64,25 @@ Initialize once and reuse `agent.json` for later starts. The bootstrap and all W
 
 ## Local configuration and update flow
 
-Agent identity uses app_id, app_secret, org_id and a stable instance_id. Authorization follows application policy bindings. All file paths and service actions are local: state_file retains the latest passwords, event_file appends metadata without secrets, delivery selects default output, and rules configure files, templates and reload/restart or fixed scripts. On an update notification the Agent fetches the current password, persists it, atomically replaces output files, then runs the configured action. Failed delivery is retried. Use credentials[].key from get_accounts in rules; subscription keys include the account ID. Empty rules write one file per key by default.
+The downloaded bootstrap is already a complete configuration. Keep its identity and delivery fields, then add a rule such as:
 
 ```json
 {
-  "endpoint": "https://jumpserver.example.com",
-  "app_id": "<application-id>",
-  "app_secret": "<application-secret>",
-  "org_id": "<org-id>",
-  "instance_id": "orders-node-1",
-  "state_file": "/var/lib/jms-pam-agent/state.json",
-  "event_file": "/var/lib/jms-pam-agent/events.jsonl",
-  "reconcile_interval": 300,
-  "delivery": {
-    "delivery_mode": "json",
-    "delivery_root": "/opt/jumpserver-pam/credentials",
-    "socket_path": "/run/jms-pam-agent/agent.sock",
-    "app_user": "orders",
-    "systemd_unit": "",
-    "systemd_action": ""
+  "accounts": [{"account_id": "<primary-account-id>", "allow_account_switch": true}],
+  "config_update": {
+    "file": "/opt/jumpserver/config/config.txt",
+    "fields_map": {"DB_USER": "username", "DB_PASSWORD": "secret"}
   },
-  "rules": []
+  "service_action": {"path": "/usr/local/libexec/jms-pam/recreate-jumpserver"},
+  "application_check": {
+    "path": "/usr/local/libexec/jms-pam/check-running-db",
+    "confirm_on_success": true
+  }
 }
 ```
 
-Replace `rules` with this template/reload rule when the service needs its own configuration:
+Put this object inside `rules`. The Agent edits only `DB_USER` and `DB_PASSWORD` and preserves other settings. The activation script makes the actual processes reread them. The final check must perform a real database operation through the running application. To precheck the new credential, add `"credential_check":{"path":"/usr/local/libexec/jms-pam/check-db-login"}`. For a systemd service use `"service_action":{"unit":"order-service.service"}`, which defaults to restart; set `operation` to `reload` only when the service rereads its configuration. A complete generated file can use `"config_update":{"files":[{"path":"/etc/order-service/database.json","template_file":"/etc/jms-pam-agent/orders-db.tmpl"}]}`.
 
-```json
-[
-  {
-    "keys": [
-      "<credential-key>"
-    ],
-    "files": [
-      {
-        "path": "/etc/order-service/database.json",
-        "format": "template",
-        "template_file": "/etc/jms-pam-agent/orders-db.tmpl",
-        "owner": "orders"
-      }
-    ],
-    "action": {
-      "type": "systemd",
-      "unit": "order-service.service",
-      "operation": "reload",
-      "timeout_seconds": 30
-    }
-  }
-]
-```
+For a test file that already contains `VERSION`, add `"VERSION":"revision"` to `fields_map` to keep the delivered policy revision visible. This is the credential delivery revision, not an account password history version.
 
-Template `/etc/jms-pam-agent/orders-db.tmpl`:
-
-```gotemplate
-{"username": {{json (index .Credentials "<credential-key>").Username}}, "password": {{json (index .Credentials "<credential-key>").Secret}}}
-```
-
-Use `operation: "restart"` for services that read startup environment only. For complex deployments, replace `action` with `{"type":"script","path":"/usr/local/libexec/jms-pam/apply-orders","args":["--config","/etc/order-service/database.json"],"timeout_seconds":60}`. Scripts receive current credentials on stdin and must be idempotent.
+To update two accounts in one file, write two rules, each with one account and its own flat `config_update.fields_map`. Their mapped fields must not overlap. The Agent applies all file updates before service actions and application checks. For a custom update script, stdin `credentials` is keyed by the configured account ID even when the active account changes. Check the [Chinese Agent guide](README.zh-hans.md) for full `config.txt` and `config.yml` behavior and the script input example.

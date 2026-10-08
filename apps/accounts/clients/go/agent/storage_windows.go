@@ -208,6 +208,20 @@ func preparePrivateDirectory(path string, mode os.FileMode) error {
 	return securePath(path)
 }
 
+func privateBackupDirectory(path string) error {
+	if err := preparePrivateDirectory(path, 0700); err != nil {
+		return err
+	}
+	info, err := os.Lstat(path)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return errors.New("backup directory must be private")
+	}
+	return securePath(path)
+}
+
 func atomicWrite(path string, data []byte, mode os.FileMode, uid, gid int) error {
 	if uid >= 0 || gid >= 0 {
 		return errors.New("Windows Agent delivery can only use the current user")
@@ -264,5 +278,9 @@ func ownerIDs(username string) (int, int, error) {
 	if account.Uid != current.Uid {
 		return 0, 0, errors.New("Windows Agent delivery requires the current user")
 	}
+	return -1, -1, nil
+}
+
+func fileOwner(info os.FileInfo) (int, int, error) {
 	return -1, -1, nil
 }

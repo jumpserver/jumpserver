@@ -30,8 +30,9 @@ class SDKDocumentationTests(SimpleTestCase):
         import json
         config = json.loads(result['config'])
         self.assertEqual(config['delivery']['app_user'], 'orders')
-        self.assertIn('state_file', config)
-        self.assertIn('event_file', config)
+        self.assertNotIn('state_file', config)
+        self.assertNotIn('event_file', config)
+        self.assertNotIn('socket_path', config['delivery'])
         self.assertIn('rules', config)
         self.assertEqual(result['service_name'], 'jms-pam-agent')
         self.assertEqual(result['agent_language'], 'go')
