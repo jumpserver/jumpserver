@@ -1,5 +1,6 @@
 import json
 
+import ldap
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -93,8 +94,17 @@ class Setting(models.Model):
         setting_changed.send(sender=cls, name=name, item=item)
 
     def refresh_setting(self):
-        setattr(settings, self.name, self.cleaned_value)
+        value = self.cleaned_value
+        setattr(settings, self.name, value)
+        self.refresh_ldap_timeout_if_need(value)
         self.refresh_keycloak_to_openid_if_need()
+
+    def refresh_ldap_timeout_if_need(self, value):
+        if self.name not in ('AUTH_LDAP_CONNECT_TIMEOUT', 'AUTH_LDAP_HA_CONNECT_TIMEOUT'):
+            return
+        options = getattr(settings, self.name.replace('CONNECT_TIMEOUT', 'CONNECTION_OPTIONS'))
+        # Update in place: LDAP backends may already hold this dictionary.
+        options.update({ldap.OPT_TIMEOUT: value, ldap.OPT_NETWORK_TIMEOUT: value})
 
     def refresh_keycloak_to_openid_if_need(self):
         watch_config_names = [
