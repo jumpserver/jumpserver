@@ -107,7 +107,7 @@ dependencies = [
     'python-redis-lock==4.0.0',
     'pyopenssl==26.0.0',
     'redis',
-    'pymongo==4.6.3',
+    'pymongo==4.18.2',
     'pyfreerdp==0.0.4',
     'hvac==1.1.1',
     'pyhcl==0.4.4',
