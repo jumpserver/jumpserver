@@ -760,21 +760,19 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 'Personal credentials can only be managed by their owner'
             ))
 
-        if account_name != AliasAccount.INPUT and (credential_id or save_credential):
-            raise ValidationError({
-                'personal_credential_id': _(
-                    'Personal credentials can only be used with the manual account'
-                )
-            })
+        if credential_id or save_credential:
+            personal_permission_context = get_personal_credential_permission_context(
+                user, asset, protocol, account_alias=account_name,
+            )
+            if save_credential and account_name != AliasAccount.INPUT:
+                # A hosted account fixes the username, regardless of client input.
+                data['input_username'] = personal_permission_context[1].full_username
 
         if save_credential and not data.get('input_username'):
             raise ValidationError({'input_username': _('This field is required.')})
         if save_credential and not data.get('input_secret'):
             raise ValidationError({'input_secret': _('This field is required.')})
         if save_credential:
-            personal_permission_context = get_personal_credential_permission_context(
-                user, asset, protocol
-            )
             platform_protocol, __ = personal_permission_context
             input_secret_type = (
                 data.get('input_secret_type') or SecretType.PASSWORD
@@ -809,11 +807,6 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                         'Do not submit a username or secret when using a saved credential'
                     )
                 })
-            personal_permission_context = (
-                get_personal_credential_permission_context(
-                    user, asset, protocol
-                )
-            )
             credential = get_personal_credential_for_use(
                 user, asset, protocol, credential_id,
                 version=credential_version,
@@ -851,7 +844,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 user=user,
                 asset=asset,
                 protocol=protocol,
-                username=data.get('input_username', ''),
+                username=(
+                    personal_permission_account.full_username
+                    if account_name != AliasAccount.INPUT
+                    else data.get('input_username', '')
+                ),
                 secret=data.get('input_secret', ''),
                 secret_type=data.get('input_secret_type') or SecretType.PASSWORD,
                 credential_id=credential_id,
@@ -927,7 +924,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
 
         if account_alias != AliasAccount.INPUT and account_alias != AliasAccount.USER:
             data['input_username'] = ''
-            data['input_secret_type'] = ''
+            if account.has_secret:
+                data['input_secret_type'] = ''
 
         ticket = self._validate_acl(user, asset, account, connect_method, protocol)
         if ticket:

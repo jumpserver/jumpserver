@@ -8,6 +8,7 @@ from rest_framework.exceptions import APIException, NotFound, PermissionDenied
 
 from accounts.const import AliasAccount, SecretType
 from accounts.utils import validate_account_username, validate_ssh_key
+from common.utils import is_uuid
 from assets.const import AllTypes, Connectivity, Protocol
 from assets.models import Asset
 from orgs.utils import tmp_to_org
@@ -197,7 +198,9 @@ class PersonalCredentialVersionConflict(APIException):
     default_code = 'personal_credential_version_conflict'
 
 
-def get_personal_credential_permission_context(user, asset, protocol):
+def get_personal_credential_permission_context(
+        user, asset, protocol, account_alias=AliasAccount.INPUT,
+):
     if not user or not user.is_valid:
         raise PermissionDenied(_('Invalid user'), code='invalid_user')
     if not asset or not asset.is_active:
@@ -212,20 +215,44 @@ def get_personal_credential_permission_context(user, asset, protocol):
     if not asset_protocol_exists or not platform_protocol:
         raise serializers.ValidationError({'protocol': _('Protocol is not supported by this asset')})
 
+    if account_alias != AliasAccount.INPUT and not is_uuid(account_alias):
+        raise PermissionDenied(
+            _('Personal credentials require a manual or empty-secret asset account'),
+            code='personal_credential_account_denied',
+        )
     try:
         account = PermAssetDetailUtil(user, asset).validate_permission(
-            AliasAccount.INPUT, protocol
+            account_alias, protocol
         )
     except Asset.DoesNotExist:
         account = None
     if not account or not ActionChoices.contains(account.actions, ActionChoices.connect):
         raise PermissionDenied(
-            _('You do not have manual account permission for this asset'),
+            _('You do not have account permission for this asset'),
             code='manual_account_permission_denied',
         )
     if account.date_expired < timezone.now():
         raise PermissionDenied(_('Permission expired'), code='permission_expired')
+    if account_alias != AliasAccount.INPUT and (
+        account.has_secret or not account.username
+        or account.secret_type == SecretType.SSH_CERTIFICATE
+    ):
+        raise PermissionDenied(
+            _('Personal credentials require an empty-secret asset account'),
+            code='personal_credential_account_denied',
+        )
     return platform_protocol, account
+
+
+def validate_personal_credential_username(permission_account, username):
+    if (
+        permission_account.alias != AliasAccount.INPUT
+        and username != permission_account.full_username
+    ):
+        raise PermissionDenied(
+            _('Personal credential username must match the asset account'),
+            code='personal_credential_username_mismatch',
+        )
 
 
 def validate_personal_credential_test_acl(
@@ -338,7 +365,7 @@ def get_personal_credential_for_use(
         permission_context = get_personal_credential_permission_context(
             user, asset, protocol
         )
-    platform_protocol, __ = permission_context
+    platform_protocol, permission_account = permission_context
     with tmp_to_org(asset.org_id):
         queryset = PersonalAssetCredential.objects.filter(
             id=credential_id,
@@ -357,6 +384,7 @@ def get_personal_credential_for_use(
             _('Personal credential not found'),
             code='personal_credential_not_found',
         )
+    validate_personal_credential_username(permission_account, credential.username)
     validate_personal_credential_secret_type(
         platform_protocol, credential.secret_type
     )
@@ -372,8 +400,9 @@ def save_personal_credential(
         permission_context = get_personal_credential_permission_context(
             user, asset, protocol
         )
-    platform_protocol, __ = permission_context
+    platform_protocol, permission_account = permission_context
     username = validate_account_username(username)
+    validate_personal_credential_username(permission_account, username)
     if not username:
         raise serializers.ValidationError({'input_username': _('This field is required.')})
     if not secret:
@@ -393,6 +422,7 @@ def save_personal_credential(
                     _('Personal credential not found'),
                     code='personal_credential_not_found',
                 )
+            validate_personal_credential_username(permission_account, credential.username)
             if version is None or credential.version != version:
                 is_idempotent_retry = (
                     version is not None

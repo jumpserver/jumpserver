@@ -214,10 +214,6 @@ class ConnectionToken(JMSOrgBaseModel):
             raise PermissionDenied(error)
 
         if self.personal_credential_id:
-            if self.account != AliasAccount.INPUT:
-                raise PermissionDenied(_(
-                    'Personal credentials can only be used with the manual account'
-                ))
             self.validate_personal_credential(
                 include_secret=include_personal_secret
             )
@@ -242,7 +238,7 @@ class ConnectionToken(JMSOrgBaseModel):
         )
 
         permission_context = get_personal_credential_permission_context(
-            self.user, self.asset, self.protocol
+            self.user, self.asset, self.protocol, account_alias=self.account,
         )
         # Reuse this account only on the request-local model instance. A token
         # loaded for a later request still performs the complete dynamic check.
@@ -279,7 +275,14 @@ class ConnectionToken(JMSOrgBaseModel):
             if cached is not None:
                 return cached
 
-        from accounts.personal_credentials import get_personal_credential_for_use
+        from accounts.personal_credentials import (
+            get_personal_credential_for_use,
+            get_personal_credential_permission_context,
+        )
+        if permission_context is None:
+            permission_context = get_personal_credential_permission_context(
+                self.user, self.asset, self.protocol, account_alias=self.account,
+            )
         try:
             credential = get_personal_credential_for_use(
                 self.user, self.asset, self.protocol, self.personal_credential_id,
@@ -424,7 +427,13 @@ class ConnectionToken(JMSOrgBaseModel):
             )
         else:
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
-            if (
+            if self.personal_credential_id:
+                credential = self.get_personal_credential(include_secret=True)
+                if not account or account.secret or account.full_username != credential.username:
+                    raise PermissionDenied(_('Personal credential no longer matches the asset account'))
+                account.secret = credential.secret
+                account.secret_type = credential.secret_type
+            elif (
                 account.secret_type != SecretType.SSH_CERTIFICATE
                 and not account.secret and self.input_secret
             ):
