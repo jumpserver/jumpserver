@@ -193,7 +193,13 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     @action(methods=['post'], detail=True, url_path='start-cycle')
     def start_cycle(self, request, *args, **kwargs):
         from accounts.credential_rotation.manual_cycles import start
-        credential, cycle_id = start(self.get_object().id, request.user.name, request.user.id)
+        credential = self.get_object()
+        if (
+            credential.mode == ApplicationCredential.Mode.alternating_rotation
+            and not request.user.has_perm('accounts.verify_account')
+        ):
+            raise PermissionDenied()
+        credential, cycle_id = start(credential.id, request.user.name, request.user.id)
         return Response({
             'credential': self.get_serializer(credential).data,
             'cycle_id': str(cycle_id),
@@ -201,13 +207,16 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
 
     @action(methods=['post'], detail=True, url_path='prepare')
     def prepare_rotation(self, request, *args, **kwargs):
+        if not request.user.has_perm('accounts.verify_account'):
+            raise PermissionDenied()
         credential = CredentialRotationManager(self.get_object().id).prepare(request.user.name, request.user.id)
         return Response(self.get_serializer(credential).data)
 
     @action(methods=['post'], detail=True, url_path='check-preparation')
     def check_preparation(self, request, *args, **kwargs):
-        from accounts.credential_rotation.preparation import check
-        credential = check(self.get_object().id)
+        # Compatibility endpoint for older clients. New cycles use preflight
+        # verification followed by source traffic observation after switching.
+        credential = self.get_object()
         return Response(self.get_serializer(credential).data)
 
     @action(methods=['post'], detail=True, url_path='start')
@@ -225,13 +234,19 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         try:
             credential = CredentialRotationManager(credential_id).change_secret()
         except JMSException as exc:
-            if exc.get_codes() != 'credential_rotation_clients_not_ready':
+            if exc.get_codes() not in (
+                'credential_rotation_clients_not_ready', 'credential_rotation_source_active',
+            ):
                 raise
             from accounts.credential_rotation.participants import build
+            from accounts.credential_rotation.source_traffic import blocker
             credential = ApplicationCredential.objects.get(pk=credential_id)
             rotation_status = build(credential)
+            blockers = rotation_status['blockers']
+            if exc.get_codes() == 'credential_rotation_source_active':
+                blockers.append(blocker(rotation_status['source_traffic']))
             return Response({
-                'blockers': rotation_status['blockers'],
+                'blockers': blockers,
                 'rotation_status': rotation_status,
             }, status=status.HTTP_409_CONFLICT)
         serializer = self.get_serializer(credential)

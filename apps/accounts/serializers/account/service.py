@@ -1,6 +1,8 @@
+import re
 from datetime import timedelta
 from uuid import UUID
 
+from django.conf import settings
 from django.db.models import Count, Max, Q
 from django.templatetags.static import static
 from django.utils import timezone
@@ -9,16 +11,18 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 
 from accounts.const import ApplicationEvent, WebhookRequestMethod
-from accounts.models import ApplicationWebhook, CredentialClientInstance, IntegrationApplication
-from accounts.models.application import MAX_APPLICATION_PULL_ACCOUNTS, empty_application_accounts
+from accounts.models import Account, ApplicationWebhook, CredentialClientInstance, IntegrationApplication
+from accounts.models.application import empty_application_accounts
 from accounts.webhooks import (
     WebhookValidationError, mask_webhook_url, validate_webhook_headers,
     validate_webhook_template, validate_webhook_url,
 )
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
+from common.db.fields import RelatedManager
 from common.serializers.fields import JSONManyToManyField, ListMultipleChoiceField, ObjectRelatedField
 from common.utils import random_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from orgs.utils import get_current_org_id
 
 
 class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
@@ -65,24 +69,63 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         instance.refresh_secret()
         return instance
 
-    @staticmethod
-    def validate_accounts(value):
+    def update(self, instance, validated_data):
+        changed = 'accounts' in validated_data and validated_data['accounts'] != instance.accounts.value
+        if changed and not instance.enforce_account_limit:
+            validated_data['enforce_account_limit'] = True
+        return super().update(instance, validated_data)
+
+    def validate_accounts(self, value):
         value = value or empty_application_accounts()
-        if value.get('type') != 'ids':
+        if self.instance and value == self.instance.accounts.value:
+            return value
+        if value['type'] == 'ids':
+            try:
+                ids = [str(UUID(str(account_id))) for account_id in value['ids']]
+            except (TypeError, ValueError, AttributeError) as exc:
+                raise serializers.ValidationError(_('Invalid account ID.')) from exc
+            if len(set(ids)) != len(ids):
+                raise serializers.ValidationError(_('Duplicate accounts are not allowed.'))
+            value['ids'] = ids
+        elif value['type'] == 'attrs':
+            matches = {
+                'name': {'exact', 'not', 'in', 'contains', 'startswith', 'endswith', 'regex'},
+                'asset': {'m2m', 'm2m_all'},
+            }
+            for attr in value['attrs']:
+                name, match, selected = attr.get('name'), attr.get('match', 'exact'), attr.get('value')
+                if (
+                    match not in matches.get(name, set()) or selected in (None, '', '*', [])
+                    or isinstance(selected, list) and (not selected or '*' in selected)
+                ):
+                    raise serializers.ValidationError(_('Invalid application account attribute.'))
+                if match in {'in', 'm2m', 'm2m_all'} and not isinstance(selected, list):
+                    raise serializers.ValidationError(_('Invalid application account attribute.'))
+                if match not in {'in', 'm2m', 'm2m_all'} and not isinstance(selected, str):
+                    raise serializers.ValidationError(_('Invalid application account attribute.'))
+                if isinstance(selected, list) and not all(isinstance(item, str) and item for item in selected):
+                    raise serializers.ValidationError(_('Invalid application account attribute.'))
+                if name == 'asset':
+                    try:
+                        attr['value'] = [str(UUID(item)) for item in selected]
+                    except ValueError as exc:
+                        raise serializers.ValidationError(_('Invalid application account attribute.')) from exc
+                if match == 'regex':
+                    try:
+                        re.compile(selected)
+                    except re.error as exc:
+                        raise serializers.ValidationError(_('Invalid application account attribute.')) from exc
+        limit = settings.APPLICATION_ACCOUNT_SCOPE_LIMIT
+        if value['type'] == 'ids':
+            count = len(value['ids'])
+        else:
+            org_id = self.instance.org_id if self.instance else get_current_org_id()
+            query = RelatedManager.get_to_filter_qs(value, Account)
+            count = Account.objects.filter(org_id=org_id).filter(*query).distinct().count()
+        if count > limit:
             raise serializers.ValidationError(_(
-                'Select specific accounts for application pull access.'
-            ))
-        try:
-            ids = [str(UUID(str(account_id))) for account_id in value['ids']]
-        except (TypeError, ValueError, AttributeError) as exc:
-            raise serializers.ValidationError(_('Invalid account ID.')) from exc
-        if len(ids) > MAX_APPLICATION_PULL_ACCOUNTS:
-            raise serializers.ValidationError(_(
-                'An application can be authorized for at most 10 accounts.'
-            ))
-        if len(set(ids)) != len(ids):
-            raise serializers.ValidationError(_('Duplicate accounts are not allowed.'))
-        value['ids'] = ids
+                'The application account scope has %(count)s accounts; the configured limit is %(limit)s.'
+            ) % {'count': count, 'limit': limit})
         return value
 
 

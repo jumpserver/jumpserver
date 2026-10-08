@@ -136,8 +136,9 @@ class CredentialEventCycleTests(CredentialTestCase):
         self.assertEqual(latest['count'], 2)
         self.assertEqual(latest['results'][0]['id'], str(second.id))
         self.assertEqual(older['results'][0]['id'], str(first.id))
-        self.assertEqual(cycle_detail(self.credential, first.id)['event_count'], 4)
+        self.assertEqual(cycle_detail(self.credential, first.id)['event_count'], 5)
         self.assertIsNone(cycle_detail(self.credential, first.id)['preparation'])
+        self.assertIsNotNone(cycle_detail(self.credential, first.id)['source_traffic'])
 
     def test_event_receipt_is_separate_from_application_confirmation(self):
         manager = CredentialRotationManager(self.credential.id)

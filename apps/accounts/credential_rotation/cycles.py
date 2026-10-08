@@ -114,6 +114,7 @@ def cycle_directory(credential, limit=20, offset=0):
 
 def cycle_detail(credential, cycle_id):
     from .preparation import cycle_info
+    from .source_traffic import info as source_traffic_info
     events = _ordered(list(policy_events(credential).filter(
         cycle_key=cycle_id,
     ).select_related('rotation')))
@@ -125,6 +126,9 @@ def cycle_detail(credential, cycle_id):
     preparation = cycle_info(credential, rotation)
     observations = (rotation.participant_snapshot.get('preparation', {}).get('event_observations', {})
                     if rotation else {})
+    traffic_snapshot = (rotation.participant_snapshot.get('source_traffic', {}) if rotation else {})
+    source_traffic = (source_traffic_info(credential, rotation) if rotation else None) or traffic_snapshot.get('final')
+    traffic_observations = traffic_snapshot.get('event_observations', {})
     clients = {
         str(client.id): client for client in CredentialClientInstance.objects.filter(
             id__in={row['id'] for event in events for row in event.recipients},
@@ -170,10 +174,11 @@ def cycle_detail(credential, cycle_id):
             'account_id': str(audit.account_id) if audit and audit.account_id else None,
             'account': accounts.get(audit.account_id) if audit else None,
             'preparation': observations.get(str(event.source_event_id)),
+            'source_traffic': traffic_observations.get(str(event.source_event_id)),
             'requires_confirmation': requires_confirmation,
             'recipient_count': len(recipients),
             'received_count': sum(bool(item['received_at']) for item in recipients),
             'confirmed_count': sum(bool(item['confirmed_at']) for item in recipients),
             'recipients': recipients,
         })
-    return {**summary, 'preparation': preparation, 'events': rows}
+    return {**summary, 'preparation': preparation, 'source_traffic': source_traffic, 'events': rows}

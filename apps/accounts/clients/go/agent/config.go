@@ -11,6 +11,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 )
@@ -46,11 +47,37 @@ type Action struct {
 	TimeoutSeconds int      `json:"timeout_seconds,omitempty"`
 }
 
+// ConfigUpdate owns one complete business-file update. A trusted script can
+// replace built-in file rendering when the application's format needs it.
+type ConfigUpdate struct {
+	Files   []File   `json:"files,omitempty"`
+	Script  *Action  `json:"script,omitempty"`
+	Targets []string `json:"targets,omitempty"`
+}
+
+// An application check may opt into confirming an alternating rotation only
+// after its trusted local script has verified the running application.
+type ApplicationCheck struct {
+	Action
+	ConfirmOnSuccess bool `json:"confirm_on_success,omitempty"`
+}
+
+type AccountSelector struct {
+	AccountID          string `json:"account_id"`
+	AllowAccountSwitch bool   `json:"allow_account_switch,omitempty"`
+}
+
 // Rules and their file/script paths are trusted local configuration. Core cannot supply them.
 type Rule struct {
-	Keys   []string `json:"keys"`
-	Files  []File   `json:"files,omitempty"`
-	Action *Action  `json:"action,omitempty"`
+	Keys             []string          `json:"keys"`
+	Accounts         []AccountSelector `json:"accounts,omitempty"`
+	ConfigUpdate     *ConfigUpdate     `json:"config_update,omitempty"`
+	CredentialCheck  *Action           `json:"credential_check,omitempty"`
+	ServiceAction    *Action           `json:"service_action,omitempty"`
+	ApplicationCheck *ApplicationCheck `json:"application_check,omitempty"`
+	// Files and Action are retained for existing local configurations.
+	Files  []File  `json:"files,omitempty"`
+	Action *Action `json:"action,omitempty"`
 }
 
 type Config struct {
@@ -127,20 +154,67 @@ func (c Config) Validate() error {
 	if c.EventFile != "" && (!absolute(c.EventFile) || c.EventFile == c.StateFile || c.EventFile == c.Delivery.Socket || c.EventFile == c.Delivery.Root || strings.HasPrefix(c.EventFile, c.Delivery.Root+string(filepath.Separator))) {
 		return errors.New("event_file must be separate from state, socket and credential files")
 	}
+	targets := map[string]bool{}
 	for _, rule := range c.Rules {
-		if len(rule.Keys) == 0 || (len(rule.Files) == 0 && rule.Action == nil) {
-			return errors.New("delivery rules require keys and files or an action")
+		if (len(rule.Keys) == 0) == (len(rule.Accounts) == 0) {
+			return errors.New("delivery rules require either keys or accounts")
 		}
+		modern := rule.ConfigUpdate != nil || rule.CredentialCheck != nil || rule.ServiceAction != nil || rule.ApplicationCheck != nil
+		if modern && (len(rule.Files) > 0 || rule.Action != nil) {
+			return errors.New("legacy files/action cannot be mixed with staged delivery blocks")
+		}
+		if !modern && len(rule.Files) == 0 && rule.Action == nil {
+			return errors.New("delivery rules require files or an action")
+		}
+		if modern && rule.ConfigUpdate == nil && rule.ServiceAction == nil {
+			return errors.New("staged delivery requires config_update or service_action")
+		}
+		keys := map[string]bool{}
 		for _, key := range rule.Keys {
-			if !validKey(key) {
-				return errors.New("invalid rule key")
+			if !validKey(key) || keys[key] {
+				return errors.New("invalid or duplicate rule key")
+			}
+			keys[key] = true
+		}
+		for _, account := range rule.Accounts {
+			if !validKey(account.AccountID) || keys[account.AccountID] {
+				return errors.New("invalid or duplicate rule account_id")
+			}
+			keys[account.AccountID] = true
+		}
+		files := rule.Files
+		if rule.ConfigUpdate != nil {
+			if (len(rule.ConfigUpdate.Files) == 0) == (rule.ConfigUpdate.Script == nil) {
+				return errors.New("config_update requires files or one script")
+			}
+			files = rule.ConfigUpdate.Files
+			if rule.ConfigUpdate.Script != nil && rule.ConfigUpdate.Script.Type != "script" {
+				return errors.New("config_update script must be a fixed local executable")
+			}
+			if rule.ConfigUpdate.Script != nil && len(rule.ConfigUpdate.Targets) == 0 {
+				return errors.New("config_update scripts must declare their target paths")
+			}
+			if len(files) > 0 && len(rule.ConfigUpdate.Targets) > 0 {
+				return errors.New("config_update files already declare their target paths")
 			}
 		}
-		for _, file := range rule.Files {
+		if rule.ConfigUpdate != nil {
+			for _, path := range rule.ConfigUpdate.Targets {
+				if !absolute(path) || path == c.StateFile || path == c.EventFile || path == c.Delivery.Socket || targets[path] {
+					return errors.New("invalid or duplicate config_update target path")
+				}
+				targets[path] = true
+			}
+		}
+		for _, file := range files {
 			if !absolute(file.Path) || file.Path == c.StateFile || file.Path == c.EventFile || file.Path == c.Delivery.Socket || (file.Format != "json" && file.Format != "environment" && file.Format != "template") {
 				return errors.New("invalid delivery file path or format")
 			}
-			if file.Format == "environment" && len(rule.Keys) != 1 {
+			if targets[file.Path] {
+				return errors.New("a delivery target must belong to one rule")
+			}
+			targets[file.Path] = true
+			if file.Format == "environment" && len(rule.Keys)+len(rule.Accounts) != 1 {
 				return errors.New("EnvironmentFile rules require exactly one credential key")
 			}
 			if file.Format == "template" && !absolute(file.Template) {
@@ -150,16 +224,62 @@ func (c Config) Validate() error {
 				return errors.New("local files must belong to the current user")
 			}
 		}
-		if rule.Action != nil {
-			if c.Local && rule.Action.Type == "systemd" {
+		for _, action := range []*Action{rule.Action, rule.CredentialCheck, rule.ServiceAction} {
+			if action == nil {
+				continue
+			}
+			if c.Local && action.Type == "systemd" {
 				return errors.New("systemd actions require the Linux service")
 			}
-			if err := rule.Action.Validate(); err != nil {
+			if err := action.Validate(); err != nil {
+				return err
+			}
+		}
+		if rule.CredentialCheck != nil && rule.CredentialCheck.Type != "script" {
+			return errors.New("credential checks require fixed local scripts")
+		}
+		if rule.ApplicationCheck != nil {
+			if rule.ApplicationCheck.Type != "script" {
+				return errors.New("application checks require fixed local scripts")
+			}
+			if err := rule.ApplicationCheck.Action.Validate(); err != nil {
+				return err
+			}
+		}
+		if rule.ConfigUpdate != nil && rule.ConfigUpdate.Script != nil {
+			if err := rule.ConfigUpdate.Script.Validate(); err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+// Local rules advertise which authorized credentials this instance can use.
+// An empty rules list retains legacy delivery of every application binding.
+func (c Config) DeliveryScope() *pam.DeliveryScope {
+	if len(c.Rules) == 0 {
+		return nil
+	}
+	keys, accounts := map[string]bool{}, map[string]bool{}
+	for _, rule := range c.Rules {
+		for _, key := range rule.Keys {
+			keys[key] = true
+		}
+		for _, account := range rule.Accounts {
+			accounts[account.AccountID] = true
+		}
+	}
+	scope := &pam.DeliveryScope{Keys: make([]string, 0, len(keys)), AccountIDs: make([]string, 0, len(accounts))}
+	for key := range keys {
+		scope.Keys = append(scope.Keys, key)
+	}
+	for id := range accounts {
+		scope.AccountIDs = append(scope.AccountIDs, id)
+	}
+	sort.Strings(scope.Keys)
+	sort.Strings(scope.AccountIDs)
+	return scope
 }
 
 func validateDelivery(d DeliveryConfiguration) error {

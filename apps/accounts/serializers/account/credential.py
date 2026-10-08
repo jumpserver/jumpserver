@@ -61,6 +61,10 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     rotation = serializers.SerializerMethodField()
     precheck = serializers.SerializerMethodField()
     preparation = serializers.SerializerMethodField()
+    standby_no_traffic_days = serializers.IntegerField(
+        source='source_no_traffic_days', min_value=1, max_value=3650,
+        required=False, help_text=_('Deprecated alias for source_no_traffic_days.'),
+    )
 
     @staticmethod
     def get_preparation(instance):
@@ -108,7 +112,8 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
             'mode', 'asset', 'account', 'alternate_account', 'subscription_accounts',
             'subscription_all_authorized',
-            'active_account', 'revision', 'status', 'is_active', 'standby_no_traffic_days',
+            'active_account', 'revision', 'status', 'is_active',
+            'source_no_traffic_days', 'standby_no_traffic_days',
             'date_last_rotated', 'applications_amount',
         ]
         fields = fields_small + [
@@ -158,6 +163,11 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         return instance.get_blockers()
 
     def validate(self, attrs):
+        initial = getattr(self, 'initial_data', {})
+        if 'source_no_traffic_days' in initial and 'standby_no_traffic_days' in initial:
+            raise serializers.ValidationError({
+                'source_no_traffic_days': _('Use only one no-secret-fetch duration field.'),
+            })
         from accounts.credential_rotation.preflight import check_ownership
         attrs = self.validate_accounts(attrs)
         accounts = [
@@ -215,7 +225,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
 
     def validate_accounts(self, attrs):
         if self.instance and self.instance.status != ApplicationCredential.Status.idle:
-            for field in ('account', 'alternate_account', 'is_active', 'standby_no_traffic_days'):
+            for field in ('account', 'alternate_account', 'is_active', 'source_no_traffic_days'):
                 if field in attrs and attrs[field] != getattr(self.instance, field):
                     raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
             if 'applications' in attrs and {
@@ -443,7 +453,7 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
             return None
         from accounts.credential_client.manager import CredentialClientManager
         return instance.config_digest == CredentialClientManager.agent_configuration_digest(
-            instance.application
+            instance.application, instance.delivery_scope
         )
 
     @staticmethod
@@ -559,12 +569,25 @@ class CredentialRevisionSerializer(serializers.Serializer):
     revision = serializers.IntegerField(min_value=0)
 
 
+class CredentialDeliveryScopeSerializer(serializers.Serializer):
+    keys = serializers.ListField(child=serializers.CharField(max_length=128), max_length=200)
+    account_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200)
+
+    def validate(self, attrs):
+        keys = attrs['keys']
+        accounts = [str(value) for value in attrs['account_ids']]
+        if len(keys) != len(set(keys)) or len(accounts) != len(set(accounts)):
+            raise serializers.ValidationError(_('Duplicate delivery selectors are not allowed.'))
+        return {'keys': sorted(keys), 'account_ids': sorted(accounts)}
+
+
 class CredentialAgentSyncSerializer(serializers.Serializer):
     restart_supported = serializers.BooleanField(required=False, default=False)
     instance_id = serializers.CharField(max_length=128, required=False)
     config_digest = serializers.CharField(max_length=64, required=False, allow_blank=True)
     credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
     delivered_credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
+    delivery_scope = CredentialDeliveryScopeSerializer(required=False, allow_null=True)
     sync_status = serializers.ChoiceField(
         choices=['', 'success', 'error'], required=False, default='', allow_blank=True,
     )

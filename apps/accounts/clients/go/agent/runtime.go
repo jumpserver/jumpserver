@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -241,7 +242,7 @@ func (a *Agent) Sync(ctx context.Context) error {
 func (a *Agent) synchronize(ctx context.Context) error {
 	a.mu.Lock()
 	legacyConfirmationKeys := append([]string(nil), a.state.Scope.ConfirmationKeys...)
-	options := pam.AgentSyncOptions{ConfigDigest: a.state.Digest, SyncStatus: a.state.Status, RestartSupported: a.Config.Delivery.Mode == "environment" && a.Config.Delivery.Operation == "restart"}
+	options := pam.AgentSyncOptions{ConfigDigest: a.state.Digest, SyncStatus: a.state.Status, DeliveryScope: a.Config.DeliveryScope(), RestartSupported: a.Config.Delivery.Mode == "environment" && a.Config.Delivery.Operation == "restart"}
 	for key, value := range a.state.Latest {
 		options.Credentials = append(options.Credentials, pam.KnownRevision{Key: key, Revision: value.Revision})
 	}
@@ -259,6 +260,9 @@ func (a *Agent) synchronize(ctx context.Context) error {
 	for _, item := range response.Credentials {
 		if !validKey(item.Key) {
 			return a.failure(errors.New("invalid credential metadata key"), false)
+		}
+		if err := validateAccountSwitch(item.AccountSwitch, ""); err != nil {
+			return a.failure(err, false)
 		}
 		metadata[item.Key] = item
 	}
@@ -308,7 +312,7 @@ func (a *Agent) synchronize(ctx context.Context) error {
 		if item.Revision > expected {
 			expected = item.Revision
 		}
-		if exists && !item.Changed && !wanted && previous.Revision == item.Revision {
+		if exists && !item.Changed && !wanted && previous.Revision == item.Revision && sameSwitch(previous.AccountSwitch, item.AccountSwitch) {
 			continue
 		}
 		value, fetchErr := a.remote.GetCredentialFresh(ctx, pam.CredentialSelector{Key: key})
@@ -332,11 +336,15 @@ func (a *Agent) synchronize(ctx context.Context) error {
 			fetchFailed = true
 			continue
 		}
-		if value.Key != key || value.Revision < expected || value.Revision < previous.Revision {
+		if value.Key != key || value.Revision < expected || value.Revision < previous.Revision ||
+			!sameSwitch(value.AccountSwitch, item.AccountSwitch) || validateAccountSwitch(value.AccountSwitch, value.Account.ID) != nil {
 			fetchFailed = true
 			continue
 		}
 		a.mu.Lock()
+		if previous.AccountID != value.Account.ID || !sameSwitch(previous.AccountSwitch, value.AccountSwitch) {
+			delete(a.state.Delivered, key)
+		}
 		a.state.Latest[key] = flatten(value)
 		a.state.Authorized[key] = true
 		delete(a.state.Wanted, key)
@@ -371,9 +379,17 @@ func (a *Agent) synchronize(ctx context.Context) error {
 		if err = a.deliver(ctx, deliveryConfig, latest, changed); err != nil {
 			return a.failure(err, false)
 		}
+		verified := autoConfirmKeys(deliveryConfig.Rules, latest, changed)
 		a.mu.Lock()
 		for key := range changed {
 			a.state.Delivered[key] = latest[key].Revision
+			if verified[key] && contains(a.state.Scope.ConfirmationKeys, key) {
+				value := latest[key]
+				previous := a.state.Applied[key]
+				if previous.Revision != value.Revision || previous.AccountID != value.AccountID {
+					a.state.Applied[key] = Applied{Key: key, Revision: value.Revision, AccountID: value.AccountID}
+				}
+			}
 		}
 		err = a.persist()
 		a.mu.Unlock()
@@ -404,6 +420,54 @@ func (a *Agent) synchronize(ctx context.Context) error {
 		return err
 	}
 	return a.reportPending(ctx)
+}
+
+// Every destination for a key must explicitly verify application use before
+// a completed delivery can also count as an applied rotation revision.
+func autoConfirmKeys(rules []Rule, latest map[string]Credential, changed map[string]bool) map[string]bool {
+	verified := map[string]bool{}
+	for key := range changed {
+		seen, ready := false, true
+		for _, rule := range rules {
+			_, matched, complete, err := resolveRule(rule, latest)
+			if err != nil || !complete || !contains(matched, key) {
+				continue
+			}
+			seen = true
+			if rule.ApplicationCheck == nil || !rule.ApplicationCheck.ConfirmOnSuccess {
+				ready = false
+			}
+		}
+		verified[key] = seen && ready
+	}
+	return verified
+}
+
+func sameSwitch(a, b *pam.AccountSwitch) bool {
+	if a == nil || b == nil {
+		return a == nil && b == nil
+	}
+	return slices.Equal(a.AccountIDs, b.AccountIDs)
+}
+
+func validateAccountSwitch(value *pam.AccountSwitch, active string) error {
+	if value == nil {
+		return nil
+	}
+	if len(value.AccountIDs) < 2 {
+		return errors.New("account switch requires at least two accounts")
+	}
+	seen := map[string]bool{}
+	for _, id := range value.AccountIDs {
+		if !validKey(id) || seen[id] {
+			return errors.New("invalid account switch account_ids")
+		}
+		seen[id] = true
+	}
+	if active != "" && !seen[active] {
+		return errors.New("active account is not in account switch")
+	}
+	return nil
 }
 
 // Retire pre-account-key subscription state after the signed scope and new

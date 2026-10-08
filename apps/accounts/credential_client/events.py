@@ -121,9 +121,8 @@ def _send_stream(event_id, code):
     event = ApplicationAudit.objects.filter(id=event_id).first()
     if not event:
         return
-    credential_mode = ApplicationCredential.objects.filter(
-        id=event.credential_id,
-    ).values_list('mode', flat=True).first()
+    credential = ApplicationCredential.objects.filter(id=event.credential_id).first()
+    credential_mode = credential.mode if credential else None
     application_ids = set(_clients(event, code).values_list('application_id', flat=True))
     try:
         tracked = CredentialRotationEvent.objects.filter(
@@ -139,10 +138,17 @@ def _send_stream(event_id, code):
         'credential_mode': credential_mode,
         'credential_key': event.credential_key or None,
         'revision': event.revision,
-        'account_id': str(event.account_id) if event.account_id else None,
+        # Lifecycle audits may refer to the source account; the stream selector
+        # always names the account currently published for an alternating policy.
+        'account_id': (
+            str(credential.active_account_id) if credential and credential.account_switch
+            else str(event.account_id) if event.account_id else None
+        ),
         'operation_id': str(event.operation_id or event.rotation_id) if (event.operation_id or event.rotation_id) else None,
         'result': event.result,
     }
+    if credential and credential.account_switch:
+        payload['account_switch'] = credential.account_switch
     try:
         channel_layer = get_channel_layer()
     except Exception:

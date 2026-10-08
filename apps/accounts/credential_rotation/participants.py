@@ -100,10 +100,14 @@ def ensure_participant(credential, state):
 
 @transaction.atomic
 def enroll_client(client):
+    from accounts.credential_client.manager import client_uses_credential
+
     credentials = ApplicationCredential.objects.select_for_update().filter(
         applications=client.application,
     ).exclude(status=ApplicationCredential.Status.idle).order_by('id')
     for credential in credentials:
+        if not client_uses_credential(client, credential):
+            continue
         binding = CredentialApplicationBinding.objects.filter(
             credential=credential, application=client.application,
         ).first()
@@ -291,6 +295,8 @@ def _legacy_instances(credential, rotation):
 
 
 def build(credential, rotation=None, now=None):
+    from .source_traffic import info as source_traffic_info
+
     now = now or timezone.now()
     rotation = rotation or credential.rotation_records.select_related(
         'source_account', 'target_account', 'change_account',
@@ -343,6 +349,7 @@ def build(credential, rotation=None, now=None):
         'target_account': _account(rotation.target_account) if rotation else None,
         'desired_account': _account(credential.active_account),
         'change_account': _account(rotation.change_account) if rotation else None,
+        'source_traffic': source_traffic_info(credential, rotation, now),
         'required_revision': credential.revision,
         'summary': summary,
         'applications': _application_summary(instances, warnings),
@@ -364,6 +371,8 @@ def finalize(credential, rotation):
     snapshot['warnings'] = status['warnings']
     snapshot['summary'] = status['summary']
     snapshot['applications'] = status['applications']
+    if status['source_traffic'] and snapshot.get('source_traffic'):
+        snapshot['source_traffic']['final'] = status['source_traffic']
     rotation.participant_snapshot = snapshot
     rotation.save(update_fields=['participant_snapshot', 'date_updated'])
     return status

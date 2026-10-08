@@ -70,6 +70,7 @@ def cycle_info(credential, rotation):
 def start(credential, operator='', operator_id=None):
     from .participants import initialize
     from .preflight import check
+    from accounts.credential_client.manager import client_uses_credential
     if credential.status != credential.Status.idle:
         raise JMSException(_('Only idle policies can start rotation preparation.'))
     check(credential)
@@ -78,11 +79,15 @@ def start(credential, operator='', operator_id=None):
         application__is_active=True, is_active=True,
     ).select_related('application').distinct()
     for client in clients:
+        if not client_uses_credential(client, credential):
+            continue
         binding = CredentialApplicationBinding.objects.get(credential=credential, application=client.application)
         CredentialClientStatus.objects.get_or_create(binding=binding, client=client)
-    states = list(credential.rotation_statuses().select_for_update(of=('self',)).select_related(
-        'binding__application',
-    ))
+    states = [
+        state for state in credential.rotation_statuses().select_for_update(of=('self',)).select_related(
+            'binding__application', 'client',
+        ) if client_uses_credential(state.client, credential) or state.is_rotation_participant
+    ]
     rotation = CredentialRotationRecord.objects.create(
         credential=credential, source_account=credential.active_account,
         target_account=credential.target_account, change_account=credential.active_account,
@@ -220,13 +225,39 @@ def info(credential):
 
 @transaction.atomic
 def record_secret_access(account, application=None):
-    # Serialize legacy API traffic with both readiness checks and switch publication.
+    # Every successful fetch, including unchanged-revision SDK pulls, resets
+    # the source-account observation window. The policy lock serializes it
+    # with readiness checks and execution dispatch.
     policies = list(ApplicationCredential.objects.select_for_update(of=('self',)).filter(
         Q(account=account) | Q(alternate_account=account), mode='alternating_rotation',
     ).select_related('account', 'alternate_account', 'active_account').order_by('id'))
+    for credential in policies:
+        if credential.active_account_id != account.id and credential.status in (
+            credential.Status.changing_secret, credential.Status.recovery_required,
+        ):
+            raise JMSException(
+                _('The source account secret is being changed; fetch the active account instead.'),
+                code='credential_rotation_source_unavailable',
+            )
     now = timezone.now()
     Account.objects.filter(id=account.id).update(date_last_secret_access=now)
     for credential in policies:
+        rotation = credential.rotation_records.select_for_update().filter(
+            status='running', date_finished__isnull=True,
+        ).first()
+        if (
+            rotation and rotation.source_account_id == account.id
+            and credential.status == credential.Status.ready_for_change
+        ):
+            credential.status = credential.Status.waiting_switch
+            credential.save(update_fields=['status', 'date_updated'])
+            event = record(
+                AuditEvent.ROTATION_STEP, credential=credential, account=account,
+                summary='Source account secret was fetched; the no-fetch observation window restarted.',
+            )
+            from .source_traffic import info as source_traffic_info, remember
+            remember(rotation, event, source_traffic_info(credential, rotation, now))
+            enqueue(event, ApplicationEvent.ROTATION_SOURCE_WAITING, rotation=rotation)
         if application:
             rotation = credential.rotation_records.select_for_update().filter(status__in=('preparing', 'running')).first()
             if rotation:

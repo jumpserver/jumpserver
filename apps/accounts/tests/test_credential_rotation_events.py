@@ -44,6 +44,18 @@ class RotationEventTests(CredentialTestCase):
                 _publish_stream(event.source_event_id, event.event)
         return layer
 
+    def test_source_observation_event_keeps_active_account_selector(self):
+        audit = record(
+            AuditEvent.ROTATION_STEP, credential=self.credential, account=self.primary,
+        )
+        enqueue(audit, ApplicationEvent.ROTATION_SOURCE_READY, rotation=self.rotation)
+        layer = Mock(group_send=AsyncMock())
+        with patch('accounts.credential_client.events.get_channel_layer', return_value=layer):
+            _publish_stream(audit.id, ApplicationEvent.ROTATION_SOURCE_READY)
+        payload = layer.group_send.call_args.args[1]['payload']
+        self.assertEqual(payload['account_id'], str(self.backup.id))
+        self.assertEqual(payload['account_switch'], self.credential.account_switch)
+
     def test_application_history_includes_instance_receipts_and_configuration_events(self):
         audit = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
         enqueue(audit, ApplicationEvent.CONFIGURATION_UPDATED)
@@ -66,14 +78,15 @@ class RotationEventTests(CredentialTestCase):
         events = list(self.rotation.events.all())
         self.assertEqual([event.event for event in events], [
             'credential.updated', 'rotation.started', 'rotation.waiting_for_application',
+            'rotation.source.waiting',
         ])
-        self.assertEqual([event.sequence for event in events], [1, 2, 3])
+        self.assertEqual([event.sequence for event in events], [1, 2, 3, 4])
         self.assertTrue(receive(self.client.id, self.org.id, events[2].source_event_id))
         self.assertTrue(receive(self.client.id, self.org.id, events[0].source_event_id))
         result = timeline(self.credential)
         client = next(row for row in result['instances'] if row['id'] == str(self.client.id))
         self.assertEqual(client['latest_event_id'], str(events[2].source_event_id))
-        self.assertEqual((client['received_count'], client['event_count'], client['missing_count']), (2, 3, 1))
+        self.assertEqual((client['received_count'], client['event_count'], client['missing_count']), (2, 4, 1))
         self.assertIsNone(client['receipts'][1]['received_at'])
         old = next(row for row in result['instances'] if row['id'] == str(self.old_client.id))
         self.assertFalse(old['supports_receipts'])
@@ -152,7 +165,7 @@ class RotationEventTests(CredentialTestCase):
         self.manager.start()
         current = self.credential.rotation_records.first()
         self.assertNotEqual(current.id, self.rotation.id)
-        self.assertEqual(current.events.count(), 3)
+        self.assertEqual(current.events.count(), 4)
         self.assertEqual(self.rotation.events.count(), count)
 
     def test_only_targeted_events_count_for_late_joiners(self):

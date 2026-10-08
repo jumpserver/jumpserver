@@ -95,7 +95,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         self.credential.save()
         async_to_sync(self._receive_rotation)()
         events = list(self.credential.rotation_records.first().events.all())
-        self.assertEqual(len(events), 3)
+        self.assertEqual(len(events), 4)
         for event in events:
             self.assertEqual(len(event.recipients), 1)
             self.assertIsNotNone(event.recipients[0]['received_at'])
@@ -103,7 +103,9 @@ class CredentialEventStreamTests(TransactionTestCase):
 
     async def _receive_rotation(self):
         communicator = await self._connect()
-        await communicator.receive_json_from()  # Initial snapshot is not a receipt.
+        snapshot = await communicator.receive_json_from()  # Initial snapshot is not a receipt.
+        self.assertEqual(snapshot['credentials'][0]['account_switch'], self.credential.account_switch)
+        self.assertEqual(snapshot['credentials'][0]['account_id'], str(self.account.id))
 
         @database_sync_to_async
         def start():
@@ -111,8 +113,10 @@ class CredentialEventStreamTests(TransactionTestCase):
                 CredentialRotationManager(self.credential.id)._publish(self.credential)
 
         await start()
-        for _ in range(3):
+        for _ in range(4):
             event = await communicator.receive_json_from()
+            self.assertEqual(event['account_switch'], self.credential.account_switch)
+            self.assertEqual(event['account_id'], str(self.credential.alternate_account_id))
             await communicator.send_json_to({'event': 'received', 'event_id': event['event_id']})
         await communicator.send_json_to({'event': 'ping'})
         self.assertEqual(await communicator.receive_json_from(), {'event': 'pong'})

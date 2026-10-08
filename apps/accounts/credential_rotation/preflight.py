@@ -9,9 +9,13 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import AuditEvent
+from accounts.const import ApplicationEvent, AuditEvent
+from accounts.credential_client.events import enqueue
 from accounts.credential_client.audit import record
-from accounts.models import Account, ApplicationCredential, AutomationExecution, VerifyAccountAutomation
+from accounts.models import (
+    Account, ApplicationCredential, AutomationExecution, CredentialRotationRecord,
+    VerifyAccountAutomation,
+)
 from common.const import Status
 from common.exceptions import JMSException
 from common.utils import get_logger
@@ -22,6 +26,7 @@ ERRORS = {
     'timeout': _('Target account verification timed out. Retry verification; rotation has not started.'),
     'changed': _('The account or credential changed during verification. Start verification again.'),
     'dispatch_failed': _('Unable to dispatch target account verification. Please retry.'),
+    'cancelled': _('Backup account verification was cancelled.'),
 }
 
 
@@ -91,7 +96,7 @@ def fingerprint(credential):
     accounts = [credential.account, credential.alternate_account]
     return {
         'credential_id': str(credential.id), 'revision': credential.revision,
-        'standby_no_traffic_days': credential.standby_no_traffic_days,
+        'source_no_traffic_days': credential.source_no_traffic_days,
         'credential_updated': credential.date_updated.isoformat(),
         'accounts': [
             [str(a.id), a.version, a.username, a.secret_type, str(a.asset_id),
@@ -146,6 +151,13 @@ def start(credential, operator='', operator_id=None):
     current = info(credential)
     if current and current['status'] == 'checking':
         return credential
+    stale = credential.rotation_records.filter(
+        status='preparing', date_finished__isnull=True,
+    ).first()
+    if stale and not (stale.participant_snapshot or {}).get('preparation'):
+        stale.status = 'failed'
+        stale.date_finished = timezone.now()
+        stale.save(update_fields=['status', 'date_finished'])
     task, created = VerifyAccountAutomation.objects.get_or_create(
         name=task_name(credential), type='verify_account',
         defaults={'params': {'credential_precheck': str(credential.id)}, 'is_periodic': False},
@@ -154,18 +166,32 @@ def start(credential, operator='', operator_id=None):
         raise JMSException(_('The verification task name is already in use.'))
     task = VerifyAccountAutomation.objects.select_for_update().get(pk=task.pk)
     account = credential.target_account
+    rotation = None
+    if credential.status == credential.Status.ready_to_switch:
+        rotation = credential.rotation_records.filter(
+            status='preparing', date_finished__isnull=True,
+        ).first()
+    if rotation is None:
+        rotation = CredentialRotationRecord.objects.create(
+            credential=credential, source_account=credential.active_account,
+            target_account=account, change_account=credential.active_account,
+            change_account_version_at_start=credential.active_account.version,
+            status='preparing', created_by=operator,
+        )
     tp = 'verify_gateway_account' if account.asset.is_gateway else 'verify_account'
     execution = AutomationExecution.objects.create(
         automation=task, type=tp,
         snapshot={
             'name': task.name, 'type': tp, 'org_id': str(credential.org_id),
             'assets': [str(account.asset_id)], 'accounts': [str(account.id)], 'nodes': [],
-            'pam_precheck': fingerprint(credential), 'operator': operator,
+            'pam_precheck': fingerprint(credential), 'rotation_id': str(rotation.id),
+            'operator': operator,
             'operator_id': str(operator_id) if operator_id else None,
         },
     )
-    record(AuditEvent.ROTATION_STEP, credential=credential, operator=operator,
-           summary=f'Backup verification queued: {execution.id}')
+    event = record(AuditEvent.ROTATION_STEP, credential=credential, operator=operator,
+                   summary=f'Backup verification queued: {execution.id}')
+    enqueue(event, ApplicationEvent.ROTATION_VERIFICATION_STARTED, rotation=rotation)
     transaction.on_commit(lambda: dispatch(execution.id, credential.org_id))
     return credential
 
@@ -196,10 +222,28 @@ def fail(execution_id, code, detail=None):
             task.params['precheck_rejected'] = {'id': str(execution.id), 'code': code, 'detail': str(detail or '')}
             task.save(update_fields=['params'])
         credential_id = execution.snapshot['pam_precheck']['credential_id']
+        rotation_id = execution.snapshot.get('rotation_id')
+        if rotation_id:
+            rotation = CredentialRotationRecord.objects.filter(
+                pk=rotation_id, status='preparing', date_finished__isnull=True,
+            ).first()
+            if rotation and not (rotation.participant_snapshot or {}).get('preparation'):
+                rotation.status = 'cancelled' if code == 'cancelled' else 'failed'
+                rotation.date_finished = timezone.now()
+                rotation.save(update_fields=['status', 'date_finished'])
         credential = ApplicationCredential.objects.filter(pk=credential_id).first()
         if credential:
-            record(AuditEvent.ROTATION_STEP, credential=credential, result='failed',
-                   summary=str(detail or ERRORS.get(code, ERRORS['failed'])))
+            event = record(AuditEvent.ROTATION_STEP, credential=credential,
+                           result='success' if code == 'cancelled' else 'failed',
+                           summary=str(detail or ERRORS.get(code, ERRORS['failed'])))
+            if rotation_id:
+                rotation = CredentialRotationRecord.objects.filter(pk=rotation_id).first()
+                if rotation:
+                    event_code = (
+                        ApplicationEvent.ROTATION_VERIFICATION_CANCELLED if code == 'cancelled'
+                        else ApplicationEvent.ROTATION_VERIFICATION_FAILED
+                    )
+                    enqueue(event, event_code, rotation=rotation)
 
 
 @transaction.atomic
@@ -234,14 +278,20 @@ def finish(execution_id):
                 id__in=[credential.account_id, credential.alternate_account_id],
             ).order_by('id'))
             credential.refresh_from_db()
-            from .preparation import require_ready
-            require_ready(credential)
             check(credential)
+            rotation_id = execution.snapshot.get('rotation_id')
+            if rotation_id and not CredentialRotationRecord.objects.filter(
+                pk=rotation_id, credential=credential, status='preparing', date_finished__isnull=True,
+            ).exists():
+                return fail(execution.id, 'changed')
             if fingerprint(credential) != expected:
                 return fail(execution.id, 'changed')
             if not authorized(execution):
                 return fail(execution.id, 'changed')
-            CredentialRotationManager(credential.id)._publish(credential, execution.snapshot.get('operator', ''))
+            CredentialRotationManager(credential.id)._publish(
+                credential, execution.snapshot.get('operator', ''), rotation_id,
+                execution.snapshot.get('operator_id'),
+            )
             execution.summary.update(precheck_status='passed')
             execution.save(update_fields=['summary'])
     except JMSException as exc:

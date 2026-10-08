@@ -56,6 +56,7 @@ class CredentialTestCase(TestCase):
             account=self.primary,
             alternate_account=self.backup,
             active_account=self.primary,
+            source_no_traffic_days=0,
         )
         CredentialApplicationBinding.objects.create(
             credential=self.credential, application=self.application,
@@ -70,11 +71,6 @@ class CredentialTestCase(TestCase):
         )
         self.precheck_patch.start()
         self.addCleanup(self.precheck_patch.stop)
-        # Existing rotation-state tests start after preparation; preparation itself
-        # is exercised without this patch in test_credential_preparation.py.
-        self.preparation_patch = patch('accounts.credential_rotation.preparation.require_ready')
-        self.preparation_patch.start()
-        self.addCleanup(self.preparation_patch.stop)
 
     def _post_teardown(self):
         try:

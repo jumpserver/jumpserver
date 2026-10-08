@@ -27,6 +27,24 @@ class CredentialPreparationReadyMsg(UserMessage):
         }
 
 
+class CredentialSourceReadyMsg(UserMessage):
+    subject = _('Account rotation is ready for source secret change')
+
+    def __init__(self, user, credential):
+        self.credential = credential
+        super().__init__(user)
+
+    def get_html_msg(self):
+        return {
+            'subject': str(self.subject),
+            'message': format_html('<p>{}</p>', _(
+                'Credential policy "{name}" has switched to the backup account. '
+                'Required client confirmations are complete, and the original account had no successful '
+                'JumpServer secret fetch for {days} days. The original account secret can now be changed.'
+            ).format(name=self.credential.name, days=self.credential.source_no_traffic_days)),
+        }
+
+
 class AccountBackupExecutionTaskMsg:
     subject = _('Notification of account backup route task results')
 

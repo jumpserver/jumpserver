@@ -95,6 +95,8 @@ def execute(rotation_id, operator='', previous_execution_id=None, reason=''):
         raise JMSException(_('The rotation task is inactive or belongs to another organization.'))
     validate_parameters(credential, {}, automation, rotation)
     account = Account.objects.select_for_update().get(pk=rotation.change_account_id)
+    from .source_traffic import require_idle
+    require_idle(credential, rotation)
     check_secret_reset(account)
     if account.version != rotation.change_account_version_at_start:
         raise JMSException(_('The account version changed outside this rotation; verification is required.'))

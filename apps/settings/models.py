@@ -91,6 +91,9 @@ class Setting(models.Model):
         setting_changed.send(sender=cls, name=name, item=item)
 
     def refresh_setting(self):
+        # This limit is configured in config.yml; an old UI setting must not override it.
+        if self.name == 'APPLICATION_ACCOUNT_SCOPE_LIMIT':
+            return
         setattr(settings, self.name, self.cleaned_value)
         self.refresh_keycloak_to_openid_if_need()
 

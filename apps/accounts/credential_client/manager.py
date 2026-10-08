@@ -19,6 +19,23 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from .audit import record
 
 
+def scope_uses_credential(scope, credential):
+    if scope is None:
+        return True
+    if credential.key in scope['keys']:
+        return True
+    return bool(set(scope['account_ids']) & {
+        str(credential.account_id), str(credential.alternate_account_id),
+    })
+
+
+def client_uses_credential(client, credential):
+    if client.type == CredentialClientInstance.Type.agent and not client.date_last_synced:
+        return False
+    scope = client.delivery_scope if client.type == CredentialClientInstance.Type.agent else None
+    return scope_uses_credential(scope, credential)
+
+
 class CredentialClientManager:
     activity_write_interval = timedelta(seconds=60)
 
@@ -30,7 +47,8 @@ class CredentialClientManager:
             user, instance_id
         )
         from accounts.credential_rotation.participants import enroll_client
-        enroll_client(self.client)
+        if self.client.type != CredentialClientInstance.Type.agent:
+            enroll_client(self.client)
         if self.audit_context is not None:
             self.audit_context.set_client(self.client)
 
@@ -132,17 +150,18 @@ class CredentialClientManager:
         revision = account.version
         key = f'account:{account.id}'
         payload = self._account_payload(key, revision, account)
+        from accounts.credential_rotation.preparation import record_secret_access
+        record_secret_access(account, self.application)
         record(
             AuditEvent.CREDENTIAL_FETCHED, client=self.client, account=account,
             credential_key=key, revision=revision, remote_addr=remote_addr,
         )
         if self.audit_context is not None:
             self.audit_context.set_fetch_result(revision, True)
-        from accounts.credential_rotation.preparation import record_secret_access
-        record_secret_access(account, self.application)
         return payload
 
     def fetch(self, key, remote_addr, account_id=None):
+        self.application.assert_account_limit()
         if account_id:
             return self.fetch_account(account_id, remote_addr)
         if key.startswith('account:'):
@@ -155,6 +174,8 @@ class CredentialClientManager:
             credentials, account = self._subscription_credentials(push_account_id)
             revision = account.version
             payload = self._account_payload(key, revision, account)
+            from accounts.credential_rotation.preparation import record_secret_access
+            record_secret_access(account, self.application)
             now = timezone.now()
             any_revision_changed = False
             for credential in credentials:
@@ -175,8 +196,6 @@ class CredentialClientManager:
                     )
             if self.audit_context is not None:
                 self.audit_context.set_fetch_result(revision, any_revision_changed)
-            from accounts.credential_rotation.preparation import record_secret_access
-            record_secret_access(account, self.application)
             return payload
         credential, account = self._get_credential(key)
         revision = (
@@ -184,6 +203,10 @@ class CredentialClientManager:
             else credential.current_revision
         )
         payload = self._account_payload(key, revision, account)
+        if credential.account_switch:
+            payload['account_switch'] = credential.account_switch
+        from accounts.credential_rotation.preparation import record_secret_access
+        record_secret_access(account, self.application)
         now = timezone.now()
         binding = CredentialApplicationBinding.objects.get(
             credential=credential, application=self.application
@@ -207,8 +230,6 @@ class CredentialClientManager:
             )
         if self.audit_context is not None:
             self.audit_context.set_fetch_result(revision, revision_changed)
-        from accounts.credential_rotation.preparation import record_secret_access
-        record_secret_access(account, self.application)
         return payload
 
     @staticmethod
@@ -238,6 +259,7 @@ class CredentialClientManager:
 
     def authorized_accounts(self, limit=200, offset=0, search=''):
         """List the current scope without reading secrets or recording a fetch."""
+        self.application.assert_account_limit()
         queryset = self.application.get_accounts().select_related('asset__platform')
         if search:
             queryset = queryset.filter(
@@ -280,6 +302,7 @@ class CredentialClientManager:
                     account['credentials'].append({
                         'key': credential.key, 'mode': credential.mode,
                         'revision': credential.current_revision,
+                        'account_switch': credential.account_switch,
                     })
         for account_id in subscribed:
             accounts[account_id]['credentials'].append({
@@ -339,9 +362,12 @@ class CredentialClientManager:
         state.save(update_fields=[*changed, 'date_updated'])
 
     @staticmethod
-    def credential_keys(application):
+    def credential_keys(application, delivery_scope=None):
+        application.assert_account_limit()
         keys = set()
         accounts = None
+        selected_keys = set(delivery_scope['keys']) if delivery_scope is not None else None
+        selected_accounts = set(delivery_scope['account_ids']) if delivery_scope is not None else None
         credentials = ApplicationCredential.objects.filter(
             applications=application, is_active=True,
         ).order_by('key')
@@ -353,11 +379,16 @@ class CredentialClientManager:
                     id__in=credential.subscription_accounts.values('id')
                 )
                 for account in selected:
-                    keys.add(credential.account_key(account.id))
+                    key = credential.account_key(account.id)
+                    if selected_keys is None or key in selected_keys or str(account.id) in selected_accounts:
+                        keys.add(key)
             elif credential.authorized_applications().filter(
                 id=application.id
             ).exists():
-                keys.add(credential.key)
+                if selected_keys is None or credential.key in selected_keys or bool(
+                    selected_accounts & {str(credential.account_id), str(credential.alternate_account_id)}
+                ):
+                    keys.add(credential.key)
         return sorted(keys)
 
     @staticmethod
@@ -369,16 +400,16 @@ class CredentialClientManager:
         ).order_by('key').values_list('key', flat=True))
 
     @classmethod
-    def agent_configuration(cls, application):
-        keys = cls.credential_keys(application)
+    def agent_configuration(cls, application, delivery_scope=None):
+        keys = cls.credential_keys(application, delivery_scope)
         return {
             'credential_keys': keys,
             'confirmation_keys': [key for key in cls.confirmation_keys(application) if key in keys],
         }
 
     @classmethod
-    def agent_configuration_digest(cls, application):
-        payload = cls.agent_configuration(application)
+    def agent_configuration_digest(cls, application, delivery_scope=None):
+        payload = cls.agent_configuration(application, delivery_scope)
         encoded = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
         return hashlib.sha256(encoded).hexdigest()
 
@@ -400,14 +431,21 @@ class CredentialClientManager:
 
     def sync_agent(
         self, config_digest='', credentials=None, delivered_credentials=None,
-        sync_status='', sync_error='', restart_supported=False,
+        sync_status='', sync_error='', restart_supported=False, delivery_scope=None,
     ):
         if self.client.type != CredentialClientInstance.Type.agent:
             raise PermissionDenied(_('Agent synchronization requires an Agent client.'))
+        # A participant cannot evade an in-progress rotation by narrowing its
+        # local selectors. It must finish or the operator must cancel the cycle.
+        active = CredentialClientStatus.objects.filter(
+            client=self.client, is_rotation_participant=True,
+        ).exclude(binding__credential__status=ApplicationCredential.Status.idle).select_related('binding__credential')
+        if any(not scope_uses_credential(delivery_scope, state.binding.credential) for state in active):
+            raise ValidationError(_('Finish or cancel the current rotation before removing an Agent account rule.'))
         now = timezone.now()
         self._record_delivered(delivered_credentials or [], now)
-        desired = self.agent_configuration(self.application)
-        desired_digest = self.agent_configuration_digest(self.application)
+        desired = self.agent_configuration(self.application, delivery_scope)
+        desired_digest = self.agent_configuration_digest(self.application, delivery_scope)
         known = {item['key']: item['revision'] for item in credentials or []}
         metadata = []
         for key in desired['credential_keys']:
@@ -417,13 +455,17 @@ class CredentialClientManager:
             else:
                 credential, _ = self._get_credential(key, lock=False)
                 revision = credential.current_revision
-            metadata.append({
+            item = {
                 'key': key,
                 'revision': revision,
                 'available': True,
                 'changed': known.get(key) != revision,
-            })
+            }
+            if not key.startswith('account:') and credential.account_switch:
+                item['account_switch'] = credential.account_switch
+            metadata.append(item)
         values = {
+            'delivery_scope': delivery_scope,
             'config_digest': config_digest,
             'sync_status': sync_status,
             'sync_error': sync_error[:128],
@@ -433,6 +475,8 @@ class CredentialClientManager:
         CredentialClientInstance.objects.filter(id=self.client.id).update(**values)
         for key, value in values.items():
             setattr(self.client, key, value)
+        from accounts.credential_rotation.participants import enroll_client
+        enroll_client(self.client)
         response = {
             'config_digest': desired_digest,
             'scope': desired,

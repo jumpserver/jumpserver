@@ -202,12 +202,12 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             raise JMSException(code='Not found', detail='%s' % msg)
         # 根据配置决定是否返回密码
         secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
-        record(AuditEvent.CREDENTIAL_FETCHED, application=service, account=account,
-               remote_addr=get_request_ip(request), result='success' if secret is not None else 'failed',
-               summary='Legacy account-secret access.')
         if secret is not None:
             from accounts.credential_rotation.preparation import record_secret_access
             record_secret_access(account, service)
+        record(AuditEvent.CREDENTIAL_FETCHED, application=service, account=account,
+               remote_addr=get_request_ip(request), result='success' if secret is not None else 'failed',
+               summary='Legacy account-secret access.')
         response = Response(data={'id': request.user.id, 'secret': secret})
         response['X-API-Deprecated'] = 'true'
         response['Warning'] = '299 JumpServer "Use /api/v1/accounts/credential-client/credential/ instead."'

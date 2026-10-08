@@ -56,9 +56,9 @@ class ApplicationCredential(JMSOrgBaseModel):
         related_name='active_application_credentials', verbose_name=_('Active account')
     )
     revision = models.PositiveIntegerField(default=1, verbose_name=_('Revision'))
-    standby_no_traffic_days = models.PositiveIntegerField(
+    source_no_traffic_days = models.PositiveIntegerField(
         default=7, validators=[MinValueValidator(1), MaxValueValidator(3650)],
-        verbose_name=_('Standby account no-traffic duration (days)'),
+        verbose_name=_('Source account no-secret-fetch duration (days)'),
     )
     status = models.CharField(
         max_length=32, choices=Status.choices, default=Status.idle,
@@ -115,6 +115,21 @@ class ApplicationCredential(JMSOrgBaseModel):
         if self.active_account_id == self.account_id:
             return self.alternate_account
         return self.account
+
+    @property
+    def account_switch(self):
+        if self.mode != self.Mode.alternating_rotation or not self.account_id or not self.alternate_account_id:
+            return None
+        return {'account_ids': sorted((str(self.account_id), str(self.alternate_account_id)))}
+
+    @property
+    def standby_no_traffic_days(self):
+        # Compatibility for older API clients and historical preparation records.
+        return self.source_no_traffic_days
+
+    @standby_no_traffic_days.setter
+    def standby_no_traffic_days(self, value):
+        self.source_no_traffic_days = value
 
     @property
     def current_revision(self):
@@ -190,6 +205,9 @@ class CredentialClientInstance(JMSOrgBaseModel):
         null=True, blank=True, verbose_name=_('Configuration schema version')
     )
     config_digest = models.CharField(max_length=64, blank=True, default='', verbose_name=_('Configuration digest'))
+    # None preserves the legacy all-bound-policies behavior. Explicit local
+    # rules advertise only the accounts/keys this Agent can apply.
+    delivery_scope = models.JSONField(null=True, blank=True, default=None)
     restart_supported = models.BooleanField(default=False)
     sync_status = models.CharField(max_length=32, blank=True, default='', verbose_name=_('Sync status'))
     sync_error = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Sync error'))

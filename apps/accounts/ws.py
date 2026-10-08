@@ -16,6 +16,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.handlers.asgi import ASGIRequest
 from django.utils import timezone
 from orgs.utils import tmp_to_org
+from rest_framework.exceptions import PermissionDenied
 
 from common.utils import get_logger
 
@@ -136,6 +137,10 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def snapshot(self):
         with tmp_to_org(self.org_id):
+            try:
+                self.client.application.assert_account_limit()
+            except PermissionDenied:
+                return {'event': 'snapshot', 'credentials': []}
             credentials = self.client.application.application_credentials.filter(
                 is_active=True,
             ).order_by('key')
@@ -161,11 +166,15 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
                 elif credential.authorized_applications().filter(
                     id=self.client.application_id,
                 ).exists():
-                    items.append({
+                    item = {
                         'key': credential.key,
                         'credential_mode': credential.mode,
                         'revision': credential.current_revision,
-                    })
+                    }
+                    if credential.account_switch:
+                        item['account_switch'] = credential.account_switch
+                        item['account_id'] = str(credential.active_account_id)
+                    items.append(item)
             return {'event': 'snapshot', 'credentials': items}
 
     async def receive_json(self, content, **kwargs):

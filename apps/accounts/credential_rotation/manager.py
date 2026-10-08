@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -23,23 +25,22 @@ class CredentialRotationManager:
 
     @transaction.atomic
     def prepare(self, operator='', operator_id=None):
-        from . import preparation, preflight
-        credential = self._get_locked_credential()
-        with preflight.account_locks(credential):
-            return preparation.start(credential, operator, operator_id)
+        # Retain the old endpoint as an alias. New cycles never align accounts
+        # or observe the standby account before publishing the switch.
+        return self.start(operator, operator_id)
 
     @transaction.atomic
     def start(self, operator='', operator_id=None):
-        from . import preflight, preparation
+        from . import preflight
 
         credential = self._get_locked_credential()
-        preparation.require_ready(credential)
         preflight.check(credential)
         with preflight.account_locks(credential):
             return preflight.start(credential, operator, operator_id)
 
-    def _publish(self, credential, operator=''):
+    def _publish(self, credential, operator='', rotation_id=None, operator_id=None):
         from .participants import initialize
+        from accounts.credential_client.manager import client_uses_credential
 
         clients = CredentialClientInstance.objects.filter(
             application__credential_bindings__credential=credential,
@@ -47,18 +48,26 @@ class CredentialRotationManager:
             is_active=True,
         ).select_related('application').distinct()
         for client in clients:
+            if not client_uses_credential(client, credential):
+                continue
             binding = CredentialApplicationBinding.objects.get(
                 credential=credential, application=client.application,
             )
             CredentialClientStatus.objects.get_or_create(binding=binding, client=client)
-        states = list(credential.rotation_statuses().select_for_update(of=('self',)))
+        states = [
+            state for state in credential.rotation_statuses().select_for_update(of=('self',)).select_related('client')
+            if client_uses_credential(state.client, credential) or state.is_rotation_participant
+        ]
         source = credential.active_account
         target = credential.target_account
         if not target:
             raise JMSException(_('The alternating account configuration is incomplete.'))
 
-        rotation = credential.rotation_records.filter(status='preparing').first()
-        if rotation:
+        prepared = credential.rotation_records.filter(status='preparing', date_finished__isnull=True)
+        rotation = prepared.filter(pk=rotation_id).first() if rotation_id else prepared.first()
+        if rotation_id and not rotation:
+            raise JMSException(_('The verified rotation cycle is no longer available.'))
+        if rotation and (rotation.participant_snapshot or {}).get('preparation'):
             from .preparation import _alignment
             from accounts.models import ApplicationAudit
             from django.utils.dateparse import parse_datetime
@@ -74,18 +83,48 @@ class CredentialRotationManager:
             rotation.participant_snapshot['legacy_switch_started_at'] = timezone.now().isoformat()
             rotation.status = 'running'
             rotation.save(update_fields=['status', 'participant_snapshot'])
+        elif rotation:
+            rotation.status = 'running'
+            rotation.save(update_fields=['status'])
         else:
             rotation = CredentialRotationRecord.objects.create(
                 credential=credential, source_account=source, target_account=target,
                 change_account=source, change_account_version_at_start=source.version,
                 created_by=operator,
             )
+        if 'participants' not in rotation.participant_snapshot:
+            initialize(rotation, states)
+        switched_at = timezone.now()
+        if not rotation.participant_snapshot.get('preparation'):
+            # Older account-secret API users cannot confirm a policy revision.
+            # Require recent source-secret users to fetch the backup after
+            # publication before declaring the switch applied.
+            from accounts.models import ApplicationAudit
+            legacy_ids = ApplicationAudit.objects.filter(
+                event=AuditEvent.CREDENTIAL_FETCHED, result='success',
+                credential_id__isnull=True, account_id=source.id,
+                service_id__in=credential.applications.values('id'),
+                date_created__gte=switched_at - timedelta(days=credential.source_no_traffic_days),
+            ).values('service_id')
+            rotation.participant_snapshot['legacy_applications'] = [
+                {'id': str(app.id), 'name': app.name, 'type': 'api'}
+                for app in credential.applications.filter(
+                    is_active=True, id__in=legacy_ids,
+                )
+            ]
+            rotation.participant_snapshot['legacy_switch_started_at'] = switched_at.isoformat()
+        rotation.participant_snapshot['source_traffic'] = {
+            'started_at': switched_at.isoformat(),
+            'no_traffic_days': credential.source_no_traffic_days,
+            'operator_id': str(operator_id) if operator_id else None,
+        }
+        rotation.save(update_fields=['participant_snapshot'])
         credential.revision += 1
         credential.active_account = target
         credential.status = ApplicationCredential.Status.waiting_switch
         credential.change_execution = None
         credential.rotation_cancelled = False
-        credential.date_rotation_started = timezone.now()
+        credential.date_rotation_started = switched_at
         credential.save(update_fields=[
             'revision', 'active_account', 'status', 'rotation_cancelled',
             'date_rotation_started', 'date_updated', 'change_execution',
@@ -94,30 +133,52 @@ class CredentialRotationManager:
         enqueue(event, ApplicationEvent.ROTATION_STARTED, rotation=rotation)
         waiting = record(
             AuditEvent.ROTATION_STEP, credential=credential, operator=operator,
-            summary='Waiting for clients to apply the target account.',
+            summary='Waiting for clients to apply the target account and for source secret fetches to stop.',
         )
         enqueue(waiting, ApplicationEvent.ROTATION_WAITING, rotation=rotation)
+        from .source_traffic import info as source_traffic_info, remember
+        source_waiting = record(
+            AuditEvent.ROTATION_STEP, credential=credential, operator=operator,
+            summary='Observing JumpServer secret fetches for the source account.',
+        )
+        remember(rotation, source_waiting, source_traffic_info(credential, rotation, switched_at))
+        enqueue(source_waiting, ApplicationEvent.ROTATION_SOURCE_WAITING, rotation=rotation)
         CredentialClientStatus.objects.filter(id__in=[state.id for state in states]).update(
             required_revision=credential.revision, is_rotation_participant=True,
         )
-        if not rotation.participant_snapshot:
-            initialize(rotation, states)
         return credential
 
     @transaction.atomic
     def check_usage(self):
+        from .source_traffic import blocker, info as source_traffic_info, notify_ready, remember
+
         credential = self._get_locked_credential()
         if credential.status != ApplicationCredential.Status.waiting_switch:
             raise JMSException(_('The credential policy is not waiting for the account switch.'))
         blockers = credential.get_blockers()
+        traffic = source_traffic_info(credential)
+        if not traffic or not traffic['ready']:
+            blockers.append(blocker(traffic))
         if blockers:
             return credential, blockers
         credential.status = ApplicationCredential.Status.ready_for_change
         credential.save(update_fields=['status', 'date_updated'])
+        rotation = credential.rotation_records.filter(status='running', date_finished__isnull=True).first()
+        event = record(
+            AuditEvent.ROTATION_STEP, credential=credential, account=rotation.source_account,
+            summary='Source account no-secret-fetch window completed; secret change is ready.',
+        )
+        remember(rotation, event, traffic)
+        enqueue(event, ApplicationEvent.ROTATION_SOURCE_READY, rotation=rotation)
+        operator_id = rotation.participant_snapshot['source_traffic'].get('operator_id')
+        if operator_id:
+            transaction.on_commit(lambda: notify_ready(credential.id, operator_id))
         return credential, []
 
     @transaction.atomic
     def change_secret(self):
+        from .source_traffic import require_idle
+
         credential = self._get_locked_credential()
         if credential.status != ApplicationCredential.Status.ready_for_change:
             raise JMSException(_('The credential policy is not ready for secret change.'))
@@ -126,6 +187,7 @@ class CredentialRotationManager:
                 detail=_('Wait for all enabled clients to apply the target account.'),
                 code='credential_rotation_clients_not_ready',
             )
+        require_idle(credential)
         return credential
 
     @transaction.atomic
@@ -205,8 +267,14 @@ class CredentialRotationManager:
     def cancel(self, reason=''):
         from .execution import outcome
         from .preparation import PHASES, _emit
+        from . import preflight
 
         credential = self._get_locked_credential()
+        if credential.status == ApplicationCredential.Status.idle:
+            current = preflight.info(credential)
+            if current and current['status'] == 'checking':
+                preflight.fail(current['execution_id'], 'cancelled', reason)
+                return credential
         if credential.status in PHASES:
             rotation = credential.rotation_records.filter(status='preparing').first()
             if not rotation:

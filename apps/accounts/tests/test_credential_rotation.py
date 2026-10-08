@@ -497,6 +497,9 @@ class CredentialRotationTestCase(CredentialTestCase):
         )
         sdk = CredentialClientManager(self.application, instance_id='sdk')
         agent_manager = CredentialClientManager(agent)
+        agent_manager.sync_agent(delivery_scope={
+            'keys': [self.credential.key], 'account_ids': [],
+        })
         self.assertEqual(sdk.fetch(self.credential.key, '127.0.0.1')['key'], self.credential.key)
         self.assertEqual(agent_manager.fetch(self.credential.key, '127.0.0.1')['key'], self.credential.key)
         CredentialRotationManager(self.credential.id).start()

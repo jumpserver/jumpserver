@@ -26,17 +26,22 @@ type Account struct {
 	Secret     string `json:"secret"`
 }
 
+type AccountSwitch struct {
+	AccountIDs []string `json:"account_ids"`
+}
+
 func (a Account) String() string {
 	return fmt.Sprintf("Account{ID:%q Username:%q Secret:[REDACTED]}", a.ID, a.Username)
 }
 func (a Account) GoString() string { return a.String() }
 
 type Credential struct {
-	Key       string  `json:"key"`
-	Revision  int64   `json:"revision"`
-	Asset     Asset   `json:"asset"`
-	Account   Account `json:"account"`
-	FromLocal bool    `json:"-"`
+	Key           string         `json:"key"`
+	Revision      int64          `json:"revision"`
+	Asset         Asset          `json:"asset"`
+	Account       Account        `json:"account"`
+	AccountSwitch *AccountSwitch `json:"account_switch,omitempty"`
+	FromLocal     bool           `json:"-"`
 }
 
 func (c Credential) String() string {
@@ -61,9 +66,10 @@ type AuthorizedAccount struct {
 }
 
 type AccountPolicy struct {
-	Key      string `json:"key"`
-	Mode     string `json:"mode"`
-	Revision int64  `json:"revision"`
+	Key           string         `json:"key"`
+	Mode          string         `json:"mode"`
+	Revision      int64          `json:"revision"`
+	AccountSwitch *AccountSwitch `json:"account_switch,omitempty"`
 }
 type CredentialConfirmation struct {
 	Key      string `json:"key"`
@@ -74,10 +80,15 @@ type KnownRevision struct {
 	Revision int64  `json:"revision"`
 }
 type CredentialRevision struct {
-	Key       string `json:"key"`
-	Revision  int64  `json:"revision"`
-	Available bool   `json:"available"`
-	Changed   bool   `json:"changed"`
+	Key           string         `json:"key"`
+	Revision      int64          `json:"revision"`
+	Available     bool           `json:"available"`
+	Changed       bool           `json:"changed"`
+	AccountSwitch *AccountSwitch `json:"account_switch,omitempty"`
+}
+type DeliveryScope struct {
+	Keys       []string `json:"keys"`
+	AccountIDs []string `json:"account_ids"`
 }
 type AgentScope struct {
 	Keys             []string `json:"credential_keys"`
@@ -93,6 +104,7 @@ type AgentSync struct {
 type AgentSyncOptions struct {
 	Credentials          []KnownRevision
 	DeliveredCredentials []KnownRevision
+	DeliveryScope        *DeliveryScope
 	ConfigDigest         string
 	SyncStatus           string
 	SyncError            string
@@ -113,6 +125,7 @@ type Event struct {
 	CredentialKey  string                     `json:"credential_key"`
 	CredentialMode string                     `json:"credential_mode"`
 	AccountID      string                     `json:"account_id"`
+	AccountSwitch  *AccountSwitch             `json:"account_switch,omitempty"`
 	Revision       int64                      `json:"revision"`
 	Credentials    []Event                    `json:"credentials"`
 	Data           map[string]json.RawMessage `json:"-"`

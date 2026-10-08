@@ -18,7 +18,7 @@ def start(credential_id, operator='', operator_id=None):
         raise JMSException(_('Only active, idle policies can start a new cycle.'))
     if credential.mode == credential.Mode.alternating_rotation:
         from .manager import CredentialRotationManager
-        credential = CredentialRotationManager(credential.id).prepare(operator, operator_id)
+        credential = CredentialRotationManager(credential.id).start(operator, operator_id)
         return credential, credential.rotation_records.first().id
 
     applications = list(credential.applications.filter(is_active=True, org_id=credential.org_id))

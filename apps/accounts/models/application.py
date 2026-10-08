@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from private_storage.fields import PrivateImageField
+from rest_framework.exceptions import PermissionDenied
 
 from accounts.const import ApplicationEvent, WebhookRequestMethod
 from accounts.models import Account
@@ -15,9 +17,6 @@ def empty_application_accounts():
     return {'type': 'ids', 'ids': []}
 
 
-MAX_APPLICATION_PULL_ACCOUNTS = 10
-
-
 class IntegrationApplication(JMSOrgBaseModel):
     is_anonymous = False
 
@@ -30,6 +29,7 @@ class IntegrationApplication(JMSOrgBaseModel):
         'accounts.Account', default=empty_application_accounts,
         allow_empty_ids=True, verbose_name=_('Accounts'),
     )
+    enforce_account_limit = models.BooleanField(default=True, editable=False)
     ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
     date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last used'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
@@ -42,6 +42,16 @@ class IntegrationApplication(JMSOrgBaseModel):
         qs = Account.objects.filter(org_id=self.org_id)
         query = RelatedManager.get_to_filter_qs(self.accounts.value, Account)
         return qs.filter(*query)
+
+    def assert_account_limit(self):
+        if not self.enforce_account_limit:
+            return
+        limit = settings.APPLICATION_ACCOUNT_SCOPE_LIMIT
+        if self.get_accounts().distinct().values_list('id', flat=True)[:limit + 1].count() > limit:
+            raise PermissionDenied(
+                _('The application account scope exceeds the configured limit.'),
+                code='application_account_limit_exceeded',
+            )
 
     @property
     def accounts_amount(self) -> int:
@@ -66,6 +76,7 @@ class IntegrationApplication(JMSOrgBaseModel):
         return self.secret
 
     def get_account(self, asset='', asset_id='', account='', account_id=''):
+        self.assert_account_limit()
         qs = Account.objects.filter(org_id=self.org_id)
         if account_id:
             qs = qs.filter(id=account_id)

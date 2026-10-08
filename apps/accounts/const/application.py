@@ -37,6 +37,9 @@ class AuditEvent(TextChoices):
 
 
 class ApplicationEvent(TextChoices):
+    ROTATION_VERIFICATION_STARTED = 'rotation.verification.started', _('Backup account verification started')
+    ROTATION_VERIFICATION_FAILED = 'rotation.verification.failed', _('Backup account verification failed')
+    ROTATION_VERIFICATION_CANCELLED = 'rotation.verification.cancelled', _('Backup account verification cancelled')
     ROTATION_PREPARATION_STARTED = 'rotation.preparation.started', _('Rotation preparation started')
     ROTATION_ACCOUNTS_ALIGNED = 'rotation.accounts.aligned', _('Rotation accounts aligned')
     ROTATION_STANDBY_WAITING = 'rotation.standby.waiting', _('Observing standby account usage')
@@ -50,6 +53,8 @@ class ApplicationEvent(TextChoices):
     CREDENTIAL_CHANGE_FAILED = 'credential.change.failed', _('Credential change failed')
     ROTATION_STARTED = 'rotation.started', _('Rotation started')
     ROTATION_WAITING = 'rotation.waiting_for_application', _('Rotation waiting for application')
+    ROTATION_SOURCE_WAITING = 'rotation.source.waiting', _('Observing source account secret fetches')
+    ROTATION_SOURCE_READY = 'rotation.source.ready', _('Source account secret fetch window completed')
     ROTATION_COMPLETED = 'rotation.completed', _('Rotation completed')
     ROTATION_FAILED = 'rotation.failed', _('Rotation failed')
 

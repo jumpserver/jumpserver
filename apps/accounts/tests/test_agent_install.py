@@ -1,7 +1,7 @@
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.models import (
-    CredentialClientInstance,
-    CredentialClientStatus,
+    Account, ApplicationCredential, CredentialApplicationBinding,
+    CredentialClientInstance, CredentialClientStatus,
 )
 from accounts.tests.base import CredentialTestCase
 
@@ -54,3 +54,46 @@ class AgentSyncTests(CredentialTestCase):
         self.assertEqual(state.delivered_revision, fetched['revision'])
         self.assertIsNotNone(state.date_delivered)
         self.assertEqual(state.applied_revision, 0)
+
+    def test_account_rule_scope_exposes_switch_group_and_excludes_other_rotation(self):
+        third = Account.objects.create(name='third', username='third', asset=self.asset, secret='third-secret')
+        fourth = Account.objects.create(name='fourth', username='fourth', asset=self.asset, secret='fourth-secret')
+        self.application.accounts = {
+            'type': 'ids', 'ids': [str(value.id) for value in (self.primary, self.backup, third, fourth)],
+        }
+        self.application.save()
+        other = ApplicationCredential.objects.create(
+            name='Other database', mode='alternating_rotation', account=third,
+            alternate_account=fourth, active_account=third,
+        )
+        CredentialApplicationBinding.objects.create(credential=other, application=self.application)
+        manager = CredentialClientManager(self.client)
+        scope = {'keys': [], 'account_ids': [str(self.primary.id)]}
+        result = manager.sync_agent(delivery_scope=scope)
+        self.assertEqual(result['scope']['credential_keys'], [self.credential.key])
+        self.assertEqual(result['credentials'][0]['account_switch'], self.credential.account_switch)
+        self.client.refresh_from_db()
+        self.assertEqual(self.client.delivery_scope, scope)
+        fetched = manager.fetch(self.credential.key, '127.0.0.1')
+        self.assertEqual(fetched['account_switch'], self.credential.account_switch)
+        accounts = manager.authorized_accounts()['accounts']
+        active = next(item for item in accounts if item['id'] == str(self.primary.id))
+        self.assertEqual(active['credentials'][0]['account_switch'], self.credential.account_switch)
+        from accounts.credential_rotation.manager import CredentialRotationManager
+        CredentialRotationManager(other.id)._publish(other)
+        self.assertFalse(CredentialClientStatus.objects.filter(
+            client=self.client, binding__credential=other, is_rotation_participant=True,
+        ).exists())
+        CredentialRotationManager(self.credential.id)._publish(self.credential)
+        self.assertTrue(CredentialClientStatus.objects.filter(
+            client=self.client, binding__credential=self.credential, is_rotation_participant=True,
+        ).exists())
+        with self.assertRaises(Exception):
+            manager.sync_agent(delivery_scope={'keys': [], 'account_ids': [str(third.id)]})
+
+    def test_unsynchronized_agent_does_not_join_rotation_before_declaring_accounts(self):
+        from accounts.credential_rotation.manager import CredentialRotationManager
+        CredentialRotationManager(self.credential.id)._publish(self.credential)
+        self.assertFalse(CredentialClientStatus.objects.filter(
+            client=self.client, binding__credential=self.credential, is_rotation_participant=True,
+        ).exists())

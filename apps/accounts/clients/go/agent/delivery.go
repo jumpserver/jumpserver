@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,16 +18,17 @@ import (
 )
 
 type Credential struct {
-	Key        string `json:"key"`
-	Revision   int64  `json:"revision"`
-	AssetID    string `json:"asset_id"`
-	Asset      string `json:"asset"`
-	Address    string `json:"address"`
-	AccountID  string `json:"account_id"`
-	Account    string `json:"account"`
-	Username   string `json:"username"`
-	SecretType string `json:"secret_type"`
-	Secret     string `json:"secret"`
+	Key           string             `json:"key"`
+	Revision      int64              `json:"revision"`
+	AssetID       string             `json:"asset_id"`
+	Asset         string             `json:"asset"`
+	Address       string             `json:"address"`
+	AccountID     string             `json:"account_id"`
+	Account       string             `json:"account"`
+	Username      string             `json:"username"`
+	SecretType    string             `json:"secret_type"`
+	Secret        string             `json:"secret"`
+	AccountSwitch *pam.AccountSwitch `json:"account_switch,omitempty"`
 }
 
 func (c Credential) String() string {
@@ -34,12 +36,62 @@ func (c Credential) String() string {
 }
 func (c Credential) GoString() string { return c.String() }
 func flatten(c pam.Credential) Credential {
-	return Credential{c.Key, c.Revision, c.Asset.ID, c.Asset.Name, c.Asset.Address, c.Account.ID, c.Account.Name, c.Account.Username, c.Account.SecretType, c.Account.Secret}
+	return Credential{Key: c.Key, Revision: c.Revision, AssetID: c.Asset.ID, Asset: c.Asset.Name, Address: c.Asset.Address, AccountID: c.Account.ID, Account: c.Account.Name, Username: c.Account.Username, SecretType: c.Account.SecretType, Secret: c.Account.Secret, AccountSwitch: c.AccountSwitch}
 }
 
 type Payload struct {
 	Event       string                `json:"event"`
 	Credentials map[string]Credential `json:"credentials"`
+}
+
+// Rule payload keys are the administrator's selectors. For an account rule the
+// selector stays A even when the server selects B as the current account.
+func resolveRule(rule Rule, latest map[string]Credential) (Payload, []string, bool, error) {
+	payload := Payload{Event: "credentials.updated", Credentials: map[string]Credential{}}
+	matched := []string{}
+	complete := true
+	selectors := make([]AccountSelector, 0, len(rule.Keys)+len(rule.Accounts))
+	for _, key := range rule.Keys {
+		selectors = append(selectors, AccountSelector{AccountID: key})
+	}
+	selectors = append(selectors, rule.Accounts...)
+	for _, account := range selectors {
+		selector := account.AccountID
+		if len(rule.Keys) > 0 {
+			value, ok := latest[selector]
+			if !ok {
+				complete = false
+				continue
+			}
+			payload.Credentials[selector] = value
+			matched = append(matched, selector)
+			continue
+		}
+		candidate := ""
+		for key, value := range latest {
+			matches := value.AccountID == selector
+			if account.AllowAccountSwitch {
+				matches = value.AccountSwitch != nil && contains(value.AccountSwitch.AccountIDs, selector)
+			}
+			if !matches {
+				continue
+			}
+			if candidate != "" {
+				return Payload{}, nil, false, errors.New("account rule matches multiple credentials")
+			}
+			candidate = key
+			payload.Credentials[selector] = value
+		}
+		if candidate == "" {
+			complete = false
+			continue
+		}
+		if contains(matched, candidate) {
+			return Payload{}, nil, false, errors.New("one rotating credential matches multiple account selectors")
+		}
+		matched = append(matched, candidate)
+	}
+	return payload, matched, complete, nil
 }
 
 func environment(c Credential) ([]byte, error) {
@@ -168,30 +220,45 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 		data []byte
 	}
 	type job struct {
-		writes  []write
-		action  *Action
-		payload Payload
+		writes           []write
+		credentialCheck  *Action
+		updateScript     *Action
+		serviceAction    *Action
+		applicationCheck *ApplicationCheck
+		payload          Payload
 	}
 	var jobs []job
 	covered := map[string]bool{}
 	for _, rule := range rules {
+		payload, matched, complete, err := resolveRule(rule, latest)
+		if err != nil {
+			return err
+		}
 		relevant := false
-		for _, key := range rule.Keys {
+		for _, key := range matched {
 			relevant = relevant || changed[key]
 		}
 		if !relevant {
 			continue
 		}
-		payload := Payload{Event: "credentials.updated", Credentials: map[string]Credential{}}
-		for _, key := range rule.Keys {
-			value, ok := latest[key]
-			if !ok {
-				return errors.New("delivery rule references an unavailable credential")
-			}
-			payload.Credentials[key] = value
+		if !complete {
+			return errors.New("delivery rule references an unavailable credential")
 		}
-		item := job{action: rule.Action, payload: payload}
-		for _, file := range rule.Files {
+		item := job{serviceAction: rule.Action, credentialCheck: rule.CredentialCheck, applicationCheck: rule.ApplicationCheck, payload: payload}
+		files := rule.Files
+		if rule.ConfigUpdate != nil {
+			files = rule.ConfigUpdate.Files
+			item.updateScript = rule.ConfigUpdate.Script
+			for _, path := range rule.ConfigUpdate.Targets {
+				if err := secureTarget(path); err != nil {
+					return err
+				}
+			}
+		}
+		if rule.ServiceAction != nil {
+			item.serviceAction = rule.ServiceAction
+		}
+		for _, file := range files {
 			if err := secureTarget(file.Path); err != nil {
 				return err
 			}
@@ -201,7 +268,7 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 			}
 			item.writes = append(item.writes, write{file, data})
 		}
-		for _, key := range rule.Keys {
+		for _, key := range matched {
 			covered[key] = true
 		}
 		jobs = append(jobs, item)
@@ -213,7 +280,20 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 			}
 		}
 	}
+	// Verify every candidate credential before changing any business file.
 	for _, job := range jobs {
+		if job.credentialCheck != nil {
+			if err := execute(ctx, *job.credentialCheck, job.payload); err != nil {
+				return fmt.Errorf("credential_check failed: %w", err)
+			}
+		}
+	}
+	for _, job := range jobs {
+		if job.updateScript != nil {
+			if err := execute(ctx, *job.updateScript, job.payload); err != nil {
+				return fmt.Errorf("config_update failed: %w", err)
+			}
+		}
 		for _, item := range job.writes {
 			if err := preparePrivateDirectory(filepath.Dir(item.file.Path), 0711); err != nil {
 				return err
@@ -230,9 +310,14 @@ func Deliver(ctx context.Context, config Config, latest map[string]Credential, c
 				return err
 			}
 		}
-		if job.action != nil {
-			if err := execute(ctx, *job.action, job.payload); err != nil {
-				return err
+		if job.serviceAction != nil {
+			if err := execute(ctx, *job.serviceAction, job.payload); err != nil {
+				return fmt.Errorf("service_action failed: %w", err)
+			}
+		}
+		if job.applicationCheck != nil {
+			if err := execute(ctx, job.applicationCheck.Action, job.payload); err != nil {
+				return fmt.Errorf("application_check failed: %w", err)
 			}
 		}
 	}

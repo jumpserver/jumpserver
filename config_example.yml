@@ -276,6 +276,11 @@ REDIS_PORT: 6379
 # 仅允许已存在的用户登录，不允许第三方认证后，自动创建用户
 # ONLY_ALLOW_EXIST_USER_AUTH: False
 
+# 应用授权账号数上限，默认 10；具体账号、全部账号和按属性选择均受此限制。
+# 旧授权在修改范围前保持可用；新授权的动态范围超限后会拒绝取密。
+# 修改后重启 Core，使配置生效。
+# APPLICATION_ACCOUNT_SCOPE_LIMIT: 10
+
 # 人脸识别默认关闭。下载模型后再显式设为 true：
 # uv run python requirements/download_face_models.py
 #FACE_RECOGNITION_ENABLED: false

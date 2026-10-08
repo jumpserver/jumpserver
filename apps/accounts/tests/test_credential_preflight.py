@@ -44,7 +44,10 @@ class CredentialPreflightTests(CredentialTestCase):
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.active_account_id, self.primary.id)
         self.assertEqual(self.credential.revision, 1)
-        self.assertFalse(self.credential.rotation_records.exists())
+        rotation = self.credential.rotation_records.get()
+        self.assertEqual(rotation.status, 'preparing')
+        self.assertEqual(rotation.source_account_id, self.primary.id)
+        self.assertEqual(rotation.events.first().event, 'rotation.verification.started')
         self.assertEqual(preflight.info(ApplicationCredential.objects.get(pk=self.credential.pk))['status'], 'checking')
 
     def test_success_publishes_once_and_runs_existing_verifier(self):
@@ -184,8 +187,9 @@ class CredentialPreflightTests(CredentialTestCase):
         original = User.has_perm
         with patch.object(User, 'has_perm', lambda user, perm, *args, **kwargs:
                           perm != 'accounts.verify_account' and original(user, perm, *args, **kwargs)):
-            view = ApplicationCredentialViewSet.as_view({'post': 'start_rotation'})
-            with transaction.atomic():
-                response = view(self.request('post', '/'), pk=self.credential.id)
-            self.assertEqual(response.status_code, 403)
+            for action in ('start_rotation', 'start_cycle', 'prepare_rotation'):
+                view = ApplicationCredentialViewSet.as_view({'post': action})
+                with transaction.atomic():
+                    response = view(self.request('post', '/'), pk=self.credential.id)
+                self.assertEqual(response.status_code, 403, action)
         self.assertFalse(AutomationExecution.objects.exists())

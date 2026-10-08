@@ -57,7 +57,7 @@ func (a *Agent) accounts(ctx context.Context) (AccountsResult, error) {
 			if contains(a.state.Scope.ConfirmationKeys, key) {
 				mode = "alternating_rotation"
 			}
-			account.Credentials = append(account.Credentials, pam.AccountPolicy{Key: key, Revision: value.Revision, Mode: mode})
+			account.Credentials = append(account.Credentials, pam.AccountPolicy{Key: key, Revision: value.Revision, Mode: mode, AccountSwitch: value.AccountSwitch})
 		}
 		result := AccountsResult{Accounts: []pam.AuthorizedAccount{}, Source: "local"}
 		for _, value := range byAccount {

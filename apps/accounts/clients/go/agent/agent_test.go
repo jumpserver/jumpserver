@@ -35,7 +35,7 @@ func (f *fakeRemote) SyncAgent(context.Context, pam.AgentSyncOptions) (pam.Agent
 	if f.unsubscribed {
 		return pam.AgentSync{ConfigDigest: "digest", Scope: pam.AgentScope{Keys: []string{}, ConfirmationKeys: []string{}}, Credentials: []pam.CredentialRevision{}}, f.fault
 	}
-	return pam.AgentSync{ConfigDigest: "digest", Scope: pam.AgentScope{Keys: []string{f.value.Key}, ConfirmationKeys: []string{f.value.Key}}, Credentials: []pam.CredentialRevision{{Key: f.value.Key, Revision: f.metadata, Available: true}}}, f.fault
+	return pam.AgentSync{ConfigDigest: "digest", Scope: pam.AgentScope{Keys: []string{f.value.Key}, ConfirmationKeys: []string{f.value.Key}}, Credentials: []pam.CredentialRevision{{Key: f.value.Key, Revision: f.metadata, Available: true, AccountSwitch: f.value.AccountSwitch}}}, f.fault
 }
 func (f *fakeRemote) ListAuthorizedAccounts(context.Context) ([]pam.AuthorizedAccount, error) {
 	return []pam.AuthorizedAccount{{ID: f.value.Account.ID, Name: f.value.Account.Name, Username: f.value.Account.Username, SecretType: f.value.Account.SecretType, Asset: f.value.Asset, Credentials: []pam.AccountPolicy{{Key: f.value.Key, Revision: f.metadata, Mode: "alternating_rotation"}}}}, f.fault
@@ -517,6 +517,310 @@ func TestFileTemplateAndScriptDelivery(t *testing.T) {
 	value.Revision = 4
 	if err = Deliver(context.Background(), config, map[string]Credential{"db": value}, map[string]bool{"db": true}); err != nil {
 		t.Fatal("atomic update failed", err)
+	}
+}
+
+func TestStagedMultiAccountDeliveryAndCheckOrder(t *testing.T) {
+	config, _, _ := fixture(t)
+	root := filepath.Dir(config.StateFile)
+	templatePath := filepath.Join(root, "business.tmpl")
+	target := filepath.Join(root, "business.json")
+	script := filepath.Join(root, "stage.sh")
+	trace := filepath.Join(root, "stages.txt")
+	_ = os.WriteFile(templatePath, []byte(`{"primary":{{json (index .Credentials "primary").Username}},"report":{{json (index .Credentials "report").Username}}}`), 0600)
+	_ = os.WriteFile(target, []byte("old"), 0600)
+	_ = os.WriteFile(script, []byte("#!/bin/sh\nif [ \"$1\" = credential ] && [ -e \"$3\" ]; then exit 1; fi\nif [ \"$1\" = service ] && ! grep -q primary-user \"$3\"; then exit 1; fi\nprintf '%s\\n' \"$1\" >> \"$2\"\ncat >/dev/null\n"), 0700)
+	stage := func(name string) *Action {
+		return &Action{Type: "script", Path: script, Args: []string{name, trace, target}}
+	}
+	config.Rules = []Rule{{
+		Keys:             []string{"primary", "report"},
+		CredentialCheck:  stage("credential"),
+		ConfigUpdate:     &ConfigUpdate{Files: []File{{Path: target, Format: "template", Template: templatePath}}},
+		ServiceAction:    stage("service"),
+		ApplicationCheck: &ApplicationCheck{Action: *stage("application")},
+	}}
+	if err := config.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	latest := map[string]Credential{
+		"primary": {Key: "primary", Username: "primary-user", Secret: "primary-secret"},
+		"report":  {Key: "report", Username: "report-user", Secret: "report-secret"},
+	}
+	if err := Deliver(context.Background(), config, latest, map[string]bool{"primary": true}); err == nil {
+		t.Fatal("credential check ran after configuration mutation")
+	}
+	if raw, _ := os.ReadFile(target); string(raw) != "old" {
+		t.Fatal("failed precheck changed configuration")
+	}
+	if err := os.Remove(target); err != nil {
+		t.Fatal(err)
+	}
+	if err := Deliver(context.Background(), config, latest, map[string]bool{"primary": true}); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var rendered map[string]string
+	if json.Unmarshal(raw, &rendered) != nil || rendered["primary"] != "primary-user" || rendered["report"] != "report-user" {
+		t.Fatal("grouped update omitted an unchanged account")
+	}
+	raw, _ = os.ReadFile(trace)
+	if string(raw) != "credential\nservice\napplication\n" {
+		t.Fatalf("unexpected stage order: %s", raw)
+	}
+}
+
+func TestStagedRulesRejectSharedTargets(t *testing.T) {
+	config, _, _ := fixture(t)
+	target := filepath.Join(filepath.Dir(config.StateFile), "business.json")
+	config.Rules = []Rule{
+		{Keys: []string{"primary"}, ConfigUpdate: &ConfigUpdate{Files: []File{{Path: target, Format: "json"}}}},
+		{Keys: []string{"report"}, ConfigUpdate: &ConfigUpdate{Files: []File{{Path: target, Format: "json"}}}},
+	}
+	if config.Validate() == nil {
+		t.Fatal("two rules can overwrite one business file")
+	}
+	config.Rules[1].ConfigUpdate.Files[0].Path = filepath.Join(filepath.Dir(target), "report.json")
+	config.Rules[1].CredentialCheck = &Action{Type: "systemd", Unit: "business.service", Operation: "reload"}
+	if config.Validate() == nil {
+		t.Fatal("systemd action accepted as credential check")
+	}
+}
+
+func TestStagedScriptUpdateDeclaresTargetsAndParsesJSON(t *testing.T) {
+	config, _, _ := fixture(t)
+	root := filepath.Dir(config.StateFile)
+	target := filepath.Join(root, "business.json")
+	script := filepath.Join(root, "update.sh")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\ncat > \"$1\"\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	config.Rules = []Rule{{
+		Keys: []string{"primary", "report"},
+		ConfigUpdate: &ConfigUpdate{
+			Targets: []string{target},
+			Script:  &Action{Type: "script", Path: script, Args: []string{target}},
+		},
+	}}
+	raw, err := json.Marshal(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	parsed, err := decodeConfig(raw)
+	if err != nil || parsed.Validate() != nil {
+		t.Fatal("staged JSON configuration could not be parsed", err)
+	}
+	latest := map[string]Credential{
+		"primary": {Key: "primary", Username: "primary-user"},
+		"report":  {Key: "report", Username: "report-user"},
+	}
+	if err = Deliver(context.Background(), parsed, latest, map[string]bool{"report": true}); err != nil {
+		t.Fatal(err)
+	}
+	raw, err = os.ReadFile(target)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var payload Payload
+	if json.Unmarshal(raw, &payload) != nil || len(payload.Credentials) != 2 {
+		t.Fatal("script did not receive the complete multi-account snapshot")
+	}
+	link := filepath.Join(root, "business-link.json")
+	if err := os.Symlink(target, link); err != nil {
+		t.Fatal(err)
+	}
+	parsed.Rules[0].ConfigUpdate.Targets = []string{link}
+	if err := Deliver(context.Background(), parsed, latest, map[string]bool{"report": true}); err == nil {
+		t.Fatal("script target symlink accepted")
+	}
+	parsed.Rules[0].ConfigUpdate.Targets = nil
+	if parsed.Validate() == nil {
+		t.Fatal("undeclared script targets accepted")
+	}
+}
+
+func TestApplicationCheckControlsAutomaticConfirmation(t *testing.T) {
+	config, remote, _ := fixture(t)
+	root := filepath.Dir(config.StateFile)
+	check := filepath.Join(root, "check.sh")
+	if err := os.WriteFile(check, []byte("#!/bin/sh\ncat >/dev/null\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	config.Rules = []Rule{{
+		Keys:             []string{"db"},
+		ConfigUpdate:     &ConfigUpdate{Files: []File{{Path: filepath.Join(root, "business.json"), Format: "json"}}},
+		ApplicationCheck: &ApplicationCheck{Action: Action{Type: "script", Path: check}, ConfirmOnSuccess: true},
+	}}
+	raw, err := json.Marshal(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	config, err = decodeConfig(raw)
+	if err != nil || !config.Rules[0].ApplicationCheck.ConfirmOnSuccess {
+		t.Fatal("application confirmation block did not decode", err)
+	}
+	service, err := New(config, remote)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = service.Sync(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if remote.confirmed != 1 || !service.state.Applied["db"].Confirmed {
+		t.Fatal("successful application check did not confirm the exact revision")
+	}
+	if err = os.WriteFile(check, []byte("#!/bin/sh\nexit 1\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	remote.metadata++
+	remote.value.Revision++
+	restarted, err := New(config, remote)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = restarted.Sync(context.Background()); err == nil {
+		t.Fatal("failed application check accepted")
+	}
+	if remote.confirmed != 1 || restarted.state.Delivered["db"] == remote.metadata {
+		t.Fatal("failed application check confirmed or completed delivery")
+	}
+}
+
+func TestAutomaticConfirmationRequiresEveryDestination(t *testing.T) {
+	rules := []Rule{
+		{Keys: []string{"primary", "report"}, ApplicationCheck: &ApplicationCheck{ConfirmOnSuccess: true}},
+		{Keys: []string{"primary"}},
+	}
+	latest := map[string]Credential{"primary": {Key: "primary"}, "report": {Key: "report"}}
+	verified := autoConfirmKeys(rules, latest, map[string]bool{"primary": true, "report": true})
+	if verified["primary"] || !verified["report"] {
+		t.Fatal("a partially checked rotation was confirmed")
+	}
+}
+
+func TestAccountSwitchRuleAppliesAtoBtoAAndFirstSnapshotAtB(t *testing.T) {
+	config, remote, _ := fixture(t)
+	root := filepath.Dir(config.StateFile)
+	check := filepath.Join(root, "check-switch.sh")
+	if err := os.WriteFile(check, []byte("#!/bin/sh\ncat >/dev/null\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	target := filepath.Join(root, "database.json")
+	config.Rules = []Rule{{
+		Accounts:         []AccountSelector{{AccountID: "account-a", AllowAccountSwitch: true}},
+		ConfigUpdate:     &ConfigUpdate{Files: []File{{Path: target, Format: "json"}}},
+		ApplicationCheck: &ApplicationCheck{Action: Action{Type: "script", Path: check}, ConfirmOnSuccess: true},
+	}}
+	if err := config.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	if scope := config.DeliveryScope(); scope == nil || len(scope.AccountIDs) != 1 || scope.AccountIDs[0] != "account-a" || len(scope.Keys) != 0 {
+		t.Fatal("account rule was not advertised without a policy key")
+	}
+	remote.value.AccountSwitch = &pam.AccountSwitch{AccountIDs: []string{"account-a", "account-b"}}
+	for index, accountID := range []string{"account-a", "account-b", "account-a"} {
+		remote.value.Account.ID = accountID
+		remote.value.Account.Username = accountID
+		remote.value.Account.Secret = "secret-" + accountID
+		remote.value.Revision = int64(index + 2)
+		remote.metadata = remote.value.Revision
+		service, err := New(config, remote)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err = service.Sync(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		raw, err := os.ReadFile(target)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var applied Credential
+		if json.Unmarshal(raw, &applied) != nil || applied.AccountID != accountID || applied.Secret != "secret-"+accountID ||
+			service.state.Applied["db"].AccountID != accountID || !service.state.Applied["db"].Confirmed {
+			t.Fatalf("rotation step %d did not apply and confirm %s", index, accountID)
+		}
+	}
+	if remote.confirmed != 3 {
+		t.Fatal("each applied revision must be confirmed exactly once")
+	}
+	// A newly installed Agent can start at B without seeing the earlier A event.
+	config.StateFile = filepath.Join(root, "fresh-state.json")
+	remote.value.Account.ID = "account-b"
+	remote.value.Account.Username = "account-b"
+	remote.value.Account.Secret = "fresh-b"
+	remote.value.Revision = 8
+	remote.metadata = 8
+	fresh, err := New(config, remote)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = fresh.Sync(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if fresh.state.Applied["db"].AccountID != "account-b" || !fresh.state.Applied["db"].Confirmed {
+		t.Fatal("first snapshot at B did not use the A account rule")
+	}
+}
+
+func TestAccountSwitchRuleRejectsMissingGroupAndAmbiguousPolicy(t *testing.T) {
+	config, _, _ := fixture(t)
+	config.Rules = []Rule{{Accounts: []AccountSelector{{AccountID: "account-a", AllowAccountSwitch: true}},
+		ConfigUpdate: &ConfigUpdate{Files: []File{{Path: filepath.Join(filepath.Dir(config.StateFile), "business.json"), Format: "json"}}}}}
+	if err := config.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	latest := map[string]Credential{"policy": {Key: "policy", AccountID: "account-b"}}
+	if err := Deliver(context.Background(), config, latest, map[string]bool{"policy": true}); err == nil {
+		t.Fatal("switch without the server-provided account group was accepted")
+	}
+	latest["policy"], latest["other"] = Credential{Key: "policy", AccountID: "account-b", AccountSwitch: &pam.AccountSwitch{AccountIDs: []string{"account-a", "account-b"}}},
+		Credential{Key: "other", AccountID: "account-a", AccountSwitch: &pam.AccountSwitch{AccountIDs: []string{"account-a", "account-c"}}}
+	if err := Deliver(context.Background(), config, latest, map[string]bool{"policy": true}); err == nil {
+		t.Fatal("one account rule silently chose between two rotation policies")
+	}
+}
+
+func TestAccountRuleGroupsRotatingAndSubscriptionCredentials(t *testing.T) {
+	config, _, _ := fixture(t)
+	root := filepath.Dir(config.StateFile)
+	templatePath := filepath.Join(root, "mixed.tmpl")
+	target := filepath.Join(root, "mixed.json")
+	content := `{"main":{{json (index .Credentials "account-a").Username}},"report":{{json (index .Credentials "report").Username}}}`
+	if err := os.WriteFile(templatePath, []byte(content), 0600); err != nil {
+		t.Fatal(err)
+	}
+	config.Rules = []Rule{{
+		Accounts: []AccountSelector{
+			{AccountID: "account-a", AllowAccountSwitch: true},
+			{AccountID: "report"},
+		},
+		ConfigUpdate: &ConfigUpdate{Files: []File{{Path: target, Format: "template", Template: templatePath}}},
+	}}
+	if err := config.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	latest := map[string]Credential{
+		"policy":         {Key: "policy", AccountID: "account-b", Username: "new-main", AccountSwitch: &pam.AccountSwitch{AccountIDs: []string{"account-a", "account-b"}}},
+		"account:report": {Key: "account:report", AccountID: "report", Username: "report-user"},
+	}
+	if err := Deliver(context.Background(), config, latest, map[string]bool{"policy": true}); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var value map[string]string
+	if json.Unmarshal(raw, &value) != nil || value["main"] != "new-main" || value["report"] != "report-user" {
+		t.Fatal("mixed account rule did not apply the complete current snapshot")
+	}
+	config.Rules[0].Accounts[0].AllowAccountSwitch = false
+	if err := Deliver(context.Background(), config, latest, map[string]bool{"policy": true}); err == nil {
+		t.Fatal("rule without switch permission applied the alternate account")
 	}
 }
 

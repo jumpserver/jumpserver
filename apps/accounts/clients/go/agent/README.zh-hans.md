@@ -11,7 +11,7 @@ journalctl -u jms-pam-agent
 
 服务固定为 `jms-pam-agent.service`。身份使用应用 AK/SK 和稳定的 `instance_id`。应用授权账号决定按需 pull 范围；应用绑定的凭据策略决定主动同步和推送范围。每个业务副本使用稳定、唯一的 `instance_id`。
 
-新建应用或修改账号授权时，只能显式授权最多 10 个账号。已有的“全部账号”或动态授权不会自动截断；管理员需要逐个审查并收窄，保存新范围后 Agent 按下一次同步结果撤销不再授权的账号 push key。
+新建应用或修改账号授权时，可以选择具体账号、全部账号或按属性选择账号。匹配的账号数受系统全局上限约束，默认 10 个；在 Core 的 `config.yml` 中通过 `APPLICATION_ACCOUNT_SCOPE_LIMIT` 调整，修改后需重启 Core。已有授权在修改账号范围前保留原有取密能力。新授权的动态范围日后超过上限时，账号列表与取密请求会失败，直到缩小范围或调高上限；服务端不会任意截取前 10 个账号。保存新范围后，Agent 按下一次同步结果撤销不再授权的账号 push key。
 
 ## 安装
 
@@ -38,7 +38,7 @@ sudo systemctl start jms-pam-agent
 - 获取或交付失败按 1–30 秒指数退避重试，并每 300 秒对账。读取器使用有界队列，业务动作串行执行；WebSocket 心跳与重连由 Go SDK 管理。
 - 最新成功获取的密码不按时间过期，刷新失败不丢失，Agent 重启可恢复。更旧的 API 响应不会覆盖新版本。
 - 明确撤销或授权快照缩小会先停用相应本地取密并保存范围，再尝试 HTTP 同步；HTTP 身份拒绝阻断本地访问。已写入业务文件不会因网络错误被删除。
-- `received`、保存最新值、文件交付和业务生效分别记录。文件写入、脚本退出或服务重启不会自动确认轮换。
+- `received`、保存最新值、文件交付和业务生效分别记录。文件写入、脚本退出或服务重启本身不会确认轮换；只有本机 `application_check` 显式配置 `confirm_on_success` 且成功验证运行中的应用，Agent 才确认准确版本。
 
 ## 本机配置
 
@@ -91,6 +91,60 @@ sudo systemctl start jms-pam-agent
 `rules` 为空或省略时，默认 JSON 模式写 `delivery_root/<key>.json`；`state_file` 始终保留最近成功获取的密码。
 
 `keys` 可指定多项凭据，使脚本或完整配置模板获得同一交付快照。显式配置 `rules` 时，每个待交付 key 都必须被规则覆盖；多项规则应支持重试。文件格式支持 `json`、`environment`、`template`；EnvironmentFile 规则限一项凭据。单项 JSON 输出扁平凭据，多项 JSON 输出按 key 组织的对象。
+
+这里的 `rules[].keys` **是 JumpServer 下发凭据的标识列表**，不是业务配置中的 `DB_USER`、`DB_PASSWORD`，也不是数据库用户名。它只回答“这条规则使用哪几份凭据”；`config_update` 的模板或脚本才决定“把用户名和密码写到哪些配置字段”。在 `jms-pam-agent get_accounts` 输出中，找到所需账号的 `credentials[].key` 后填入这里：普通订阅通常是 `account:<账号 ID>`；A/B 双账号轮换是一个固定的策略 key（例如 `cred-...`），切换 A→B 时 key 不变，凭据中的 `account_id`、`username` 和 `secret` 更新。若主库和报表库同时使用，规则列出两个不同的 key；若 A/B 只是同一主库连接的交替账号，规则只列出一个轮换 key。
+
+新配置推荐使用 `rules[].accounts`，按实际使用的账号 ID 声明规则，不用在 Agent 配置中保存策略 key。轮换账号设置 `allow_account_switch: true`；Core 在事件、首次连接快照、同步结果和凭据响应中提供 `account_switch.account_ids`。只要声明的账号属于该轮换组，Agent 就使用这条规则，并写入本次生效账号的用户名和密码。A→B、B→A 以及首次接入时已在 B 都复用同一规则。`allow_account_switch` 按账号设置，因此同一文件可同时使用轮换账号和普通订阅账号：
+
+```json
+{
+  "accounts": [
+    {"account_id": "<主库账号 A ID>", "allow_account_switch": true},
+    {"account_id": "<报表库账号 ID>"}
+  ],
+  "config_update": {
+    "targets": ["/etc/order-service/database.yml"],
+    "script": {"type": "script", "path": "/usr/local/libexec/jms-pam/update-business-config"}
+  },
+  "service_action": {"type": "script", "path": "/usr/local/libexec/jms-pam/recreate-business"},
+  "application_check": {
+    "type": "script", "path": "/usr/local/libexec/jms-pam/check-running-business",
+    "confirm_on_success": true
+  }
+}
+```
+
+脚本的 `credentials` 对象以**本机声明的账号 ID**为键；轮换后该项的 `account_id` 是实际生效账号 B。模板和脚本无需改索引。Agent 会向 Core 申报这些账号，只接收相关策略；轮换进行中不能通过删除本机规则退出该轮换。若多个策略同时匹配同一账号规则，或缺少轮换组信息，交付失败且不会确认。旧 `keys` 规则继续支持，但同一条规则不能混用 `keys` 和 `accounts`。
+
+### 分阶段适配业务配置
+
+新规则可将职责分成四个本机配置块。执行顺序为 `credential_check → config_update → service_action → application_check`。检查脚本和更新脚本都从 stdin 接收同一份按 key 组织的凭据 JSON。`config_update` 选择 `files`（完整文件模板/JSON/EnvironmentFile）或 `script`（定点修改现有配置），不能同时设置。`service_action` 支持固定脚本或 systemd reload/restart；两个检查块只接受固定脚本。旧规则的 `files`/`action` 仍可继续使用，但不能和新块混用。
+
+例如同一应用同时使用主库和报表库账号，且两个账号写入同一个配置文件：
+
+```json
+{
+  "keys": ["<primary-key>", "<report-key>"],
+  "credential_check": {
+    "type": "script", "path": "/usr/local/libexec/jms-pam/check-db-login"
+  },
+  "config_update": {
+    "targets": ["/etc/order-service/database.yml"],
+    "script": {"type": "script", "path": "/usr/local/libexec/jms-pam/update-business-config"}
+  },
+  "service_action": {
+    "type": "script", "path": "/usr/local/libexec/jms-pam/recreate-business"
+  },
+  "application_check": {
+    "type": "script", "path": "/usr/local/libexec/jms-pam/check-running-business",
+    "confirm_on_success": true
+  }
+}
+```
+
+把这条规则放入 `rules` 数组。脚本更新必须声明 `targets`，以检查同一文件是否被多条规则占用；脚本实际写入范围仍由本机管理员负责。四个脚本由本机管理员提供，路径和参数不能由 Core 事件改变。`credential_check` 应使用新账号实际连接目标数据库，失败时不修改文件；`config_update` 应仅修改绑定字段并保留其他账号与设置；`service_action` 应让业务重新读取配置；`application_check` 应验证运行中的业务已经用新账号完成数据库操作。脚本非零退出会阻止该版本完成交付并触发重试。更新或启动失败后的配置回退由本机脚本负责，Agent 不会自动回滚业务文件。
+
+同一目标文件只能属于一条规则；多个账号共用文件时应放在同一 `keys` 中，以最新可用凭据快照更新一次。缺少任何必需 key 时，Agent 不会运行此规则。`confirm_on_success` 只对轮换 key 生效，且该 key 的每条规则都必须通过应用检查并显式开启，才会持久化准确版本的生效确认；Core 暂不可用时稍后重报。不要用单纯的进程存活检查冒充业务连接验证。JumpServer installer 的 `config.txt` 需用更新脚本定点修改 `DB_USER`/`DB_PASSWORD`，并重建读取环境变量的 Core、Celery 容器；直接使用 `config.yml` 的部署应更新对应 YAML 字段并重启实际读取它的进程。两种场景均需独立验证新账号和切换后的真实数据库连接。
 
 本机模板 `/etc/jms-pam-agent/orders-db.tmpl`：
 
@@ -157,7 +211,7 @@ curl --unix-socket '<socket-path>' http://localhost/v1/credentials/orders-db
 jms-pam-agent confirm orders-db --revision 3 --socket '<socket-path>'
 ```
 
-应用验证真实连接并成功切换后，才显式确认准确版本。交替轮换需要确认，凭据订阅无需确认。确认先持久化，Core 不可用时返回 `pending` 并重试；Core 接受后为 `confirmed`。手动切换指令只在相应版本已确认生效后报告成功。重启指令只操作本机已经固定为 restart 的 systemd 服务。
+应用验证真实连接并成功切换后，才确认准确版本：业务可通过本机接口显式确认，也可使用通过检查脚本验证的 `confirm_on_success`。同步运行的检查脚本不应反向调用 Agent 的确认接口。交替轮换需要确认，凭据订阅无需确认。确认先持久化，Core 不可用时返回 `pending` 并重试；Core 接受后为 `confirmed`。手动切换指令只在相应版本已确认生效后报告成功。重启指令只操作本机已经固定为 restart 的 systemd 服务。
 
 旧 Python Agent 和旧配置格式已移除。修改旧安装时先停止旧进程，按新格式重新生成配置并完成在线同步，再接管交付位置；旧状态不自动转换。
 

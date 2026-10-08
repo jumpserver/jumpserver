@@ -301,7 +301,7 @@ func (c *Client) SyncAgent(ctx context.Context, options AgentSyncOptions) (Agent
 		options.DeliveredCredentials = []KnownRevision{}
 	}
 	var value AgentSync
-	err := c.request(ctx, http.MethodPost, "/agent/sync/", map[string]any{"credentials": options.Credentials, "delivered_credentials": options.DeliveredCredentials, "config_digest": options.ConfigDigest, "sync_status": options.SyncStatus, "sync_error": options.SyncError, "restart_supported": options.RestartSupported}, &value, func(data map[string]json.RawMessage) error {
+	err := c.request(ctx, http.MethodPost, "/agent/sync/", map[string]any{"credentials": options.Credentials, "delivered_credentials": options.DeliveredCredentials, "delivery_scope": options.DeliveryScope, "config_digest": options.ConfigDigest, "sync_status": options.SyncStatus, "sync_error": options.SyncError, "restart_supported": options.RestartSupported}, &value, func(data map[string]json.RawMessage) error {
 		if err := required(data, "config_digest", "credentials", "removed_keys", "date_last_synced"); err != nil {
 			return err
 		}

@@ -235,12 +235,10 @@ class ApplicationAccessTests(CredentialTestCase):
         serializer.is_valid(raise_exception=True)
         self.assertFalse(serializer.save().get_accounts().exists())
 
-    def test_application_pull_scope_requires_at_most_ten_explicit_accounts(self):
+    def test_application_pull_scope_limit_applies_to_every_scope_type(self):
         rejected_scopes = [
-            {'type': 'all'},
-            {'type': 'attrs', 'attrs': [{'name': 'name', 'match': 'exact', 'value': 'admin'}]},
-            {'type': 'ids', 'ids': [str(uuid4()) for _ in range(11)]},
             {'type': 'ids', 'ids': [str(self.primary.id)] * 2},
+            {'type': 'attrs', 'attrs': [{'name': 'name', 'value': None}]},
         ]
         for scope in rejected_scopes:
             with self.subTest(scope=scope):
@@ -250,21 +248,95 @@ class ApplicationAccessTests(CredentialTestCase):
                 self.assertFalse(serializer.is_valid())
                 self.assertIn('accounts', serializer.errors)
 
-        serializer = IntegrationApplicationSerializer(data={
-            'name': 'Ten account pull scope',
-            'accounts': {'type': 'ids', 'ids': [str(uuid4()) for _ in range(10)]},
-        })
-        serializer.is_valid(raise_exception=True)
+        scopes = [
+            {'type': 'ids', 'ids': [str(self.primary.id), str(self.backup.id)]},
+            {'type': 'all'},
+            {'type': 'attrs', 'attrs': [{'name': 'name', 'match': 'startswith', 'value': 'account-'}]},
+        ]
+        with override_settings(APPLICATION_ACCOUNT_SCOPE_LIMIT=1):
+            for scope in scopes:
+                with self.subTest(scope=scope):
+                    serializer = IntegrationApplicationSerializer(data={
+                        'name': 'Restricted scope', 'accounts': scope,
+                    })
+                    self.assertFalse(serializer.is_valid())
+                    self.assertIn('accounts', serializer.errors)
+
+        with override_settings(APPLICATION_ACCOUNT_SCOPE_LIMIT=2):
+            for scope in scopes:
+                with self.subTest(scope=scope):
+                    serializer = IntegrationApplicationSerializer(data={
+                        'name': 'Allowed scope', 'accounts': scope,
+                    })
+                    serializer.is_valid(raise_exception=True)
+
+        with override_settings(APPLICATION_ACCOUNT_SCOPE_LIMIT=101):
+            serializer = IntegrationApplicationSerializer(data={
+                'name': 'Large account pull scope',
+                'accounts': {'type': 'ids', 'ids': [str(uuid4()) for _ in range(101)]},
+            })
+            serializer.is_valid(raise_exception=True)
 
     def test_existing_all_scope_is_preserved_when_other_fields_change(self):
         self.application.accounts = {'type': 'all'}
-        self.application.save(update_fields=['accounts'])
-        serializer = IntegrationApplicationSerializer(
-            self.application, data={'name': 'Renamed application'},
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        self.application.enforce_account_limit = False
+        self.application.save(update_fields=['accounts', 'enforce_account_limit'])
+        with override_settings(APPLICATION_ACCOUNT_SCOPE_LIMIT=1):
+            serializer = IntegrationApplicationSerializer(
+                self.application, data={'name': 'Renamed application', 'accounts': {'type': 'all'}},
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            self.assertFalse(self.application.enforce_account_limit)
+            response = self.signed_request('credential', {
+                'account_id': str(self.primary.id), 'instance_id': 'legacy-all',
+            })
+            self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(self.application.accounts.value, {'type': 'all'})
+
+    def test_existing_all_scope_is_limited_when_authorization_changes(self):
+        self.application.accounts = {'type': 'all'}
+        self.application.enforce_account_limit = False
+        self.application.save(update_fields=['accounts', 'enforce_account_limit'])
+        with override_settings(APPLICATION_ACCOUNT_SCOPE_LIMIT=1):
+            serializer = IntegrationApplicationSerializer(self.application, data={
+                'accounts': {'type': 'attrs', 'attrs': [
+                    {'name': 'name', 'match': 'startswith', 'value': 'account-'}
+                ]},
+            }, partial=True)
+            self.assertFalse(serializer.is_valid())
+            self.assertIn('accounts', serializer.errors)
+
+            serializer = IntegrationApplicationSerializer(self.application, data={
+                'accounts': {'type': 'ids', 'ids': [str(self.primary.id)]},
+            }, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            self.assertTrue(self.application.enforce_account_limit)
+
+    def test_dynamic_scope_stops_secret_access_if_it_grows_past_limit(self):
+        self.application.accounts = {'type': 'attrs', 'attrs': [
+            {'name': 'name', 'match': 'startswith', 'value': 'account-a'}
+        ]}
+        self.application.save(update_fields=['accounts'])
+        with override_settings(APPLICATION_ACCOUNT_SCOPE_LIMIT=1):
+            response = self.signed_request('credential', {
+                'account_id': str(self.primary.id), 'instance_id': 'within-limit',
+            })
+            self.assertEqual(response.status_code, 200, response.data)
+            Account.objects.create(
+                name='account-a-new', username='account-a-new', asset=self.asset,
+                secret='new-secret',
+            )
+            response = self.signed_request('credential', {
+                'account_id': str(self.primary.id), 'instance_id': 'over-limit',
+            })
+            self.assertEqual(response.status_code, 403, response.data)
+            self.assertEqual(response.data['code'], 'application_account_limit_exceeded')
+            response = self.signed_request('accounts', {'instance_id': 'over-limit'})
+            self.assertEqual(response.status_code, 403, response.data)
+            with self.assertRaises(PermissionDenied):
+                CredentialClientManager.credential_keys(self.application)
 
     def test_all_pull_scope_stays_within_application_organization(self):
         other_org = Organization.objects.create(name='Other pull scope org')
@@ -328,6 +400,11 @@ class ApplicationAccessTests(CredentialTestCase):
         self.assertEqual(response.status_code, 200, response.data)
         self.assertEqual(response.data['scope']['credential_keys'], [self.credential.key])
         self.assertEqual(CredentialClientInstance.objects.get().type, 'agent')
+        scoped_params = {**params, 'delivery_scope': {'keys': [], 'account_ids': [str(self.primary.id)]}}
+        response = self.signed_request('sync_agent', scoped_params, 'jms-pam-agent')
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['credentials'][0]['account_switch'], self.credential.account_switch)
+        self.assertEqual(CredentialClientInstance.objects.get().delivery_scope, scoped_params['delivery_scope'])
         response = self.signed_request('credential', {**params, 'key': self.credential.key})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CredentialClientInstance.objects.count(), 2)
