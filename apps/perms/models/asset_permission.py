@@ -177,6 +177,8 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
         q = Q(asset_id__in=asset_ids)
         if AliasAccount.ALL not in self.accounts:
             q &= Q(username__in=self.accounts)
+        excluded_usernames = [alias.lstrip('!') for alias in self.accounts if alias.startswith('!')]
+        q &= ~Q(username__in=excluded_usernames)
         accounts = Account.objects.filter(q).order_by('asset__name', 'name', 'username')
         if not flat:
             return accounts
