@@ -11,3 +11,4 @@ apps/xpack/.git
 .idea
 .venv/
 .env
+apps/accounts/clients/.git

@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: org.jumpserver.pam.ClientTest
--------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.796 s -- in org.jumpserver.pam.ClientTest

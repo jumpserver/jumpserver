@@ -14,14 +14,14 @@ SDK_LANGUAGES = {
     'curl': {'label': 'cURL', 'example': 'demo.sh', 'runtime': 'Bash / cURL / OpenSSL', 'credential_policies': False},
 }
 SDK_INSTALL_COMMANDS = {
-    'python': 'python3 -m pip install /path/to/jumpserver/apps/accounts/clients/python',
+    'python': 'python3 -m pip install /path/to/pam-clients/python',
     'go': (
-        'go mod edit -replace=github.com/jumpserver/jumpserver/apps/accounts/clients/go='
-        '/path/to/jumpserver/apps/accounts/clients/go\n'
-        'go get github.com/jumpserver/jumpserver/apps/accounts/clients/go@v0.0.0'
+        'go mod edit -replace=github.com/jumpserver/pam-clients/go='
+        '/path/to/pam-clients/go\n'
+        'go get github.com/jumpserver/pam-clients/go@v0.0.0'
     ),
-    'java': 'mvn -f /path/to/jumpserver/apps/accounts/clients/java/pom.xml install',
-    'node': 'npm install /path/to/jumpserver/apps/accounts/clients/node',
+    'java': 'mvn -f /path/to/pam-clients/java/pom.xml install',
+    'node': 'npm install /path/to/pam-clients/node',
 }
 DOCUMENTATION_LANGUAGES = ('en', 'zh-hans', 'zh-hant', 'ja', 'ko', 'pt-br', 'ru', 'vi', 'es', 'fr')
 LANGUAGE_ALIASES = {
