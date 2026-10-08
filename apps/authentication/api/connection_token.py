@@ -1284,7 +1284,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             raise PermissionDenied()
         token_id = NonzeroUUIDField().run_validation(request.data.get('id'))
         with transaction.atomic(), tmp_to_root_org():
-            token = get_object_or_404(ConnectionToken.objects.select_for_update(), pk=token_id)
+            token = ConnectionToken.get_typed_connection_token(token_id)
+            if token is None:
+                raise PermissionDenied('Invalid connection token')
             data = issue_applet_ticket(token)
             return private_response(ConnectTokenAppletOptionSerializer(data).data)
 

@@ -38,8 +38,8 @@ def digest(value):
 
 def check_connection(token):
     token.is_valid(include_personal_secret=False)
-    if token.type != ConnectionTokenType.USER:
-        raise PermissionDenied('Only user connection tokens support RDP token login')
+    if token.type not in (ConnectionTokenType.USER, ConnectionTokenType.ADMIN):
+        raise PermissionDenied('Only user and admin connection tokens support RDP token login')
     if token.face_monitor_token:
         raise PermissionDenied('Direct RDP token login does not support face monitoring')
     # Recheck even when is_valid takes its recent-token shortcut.
@@ -91,7 +91,7 @@ def private_response(data):
 
 
 def issue_applet_ticket(token):
-    """Build the existing applet-option payload while its token row is locked."""
+    """Build the existing applet-option payload with one-use RDP credentials."""
     applet = check_connection(token)
     host = applet.select_host(token.user, token.asset)
     if host is None:
@@ -141,9 +141,9 @@ class RDPLoginRedeemApi(APIView):
             if cached is None:
                 raise PermissionDenied('Invalid or expired RDP login authorization')
             ticket, encoded = cached
-            token = get_object_or_404(
-                ConnectionToken.objects.select_for_update(), id=ticket.connection_token_id,
-            )
+            token = ConnectionToken.get_typed_connection_token(ticket.connection_token_id)
+            if token is None:
+                raise PermissionDenied('Invalid connection token')
             now = timezone.now()
             password_hash = digest(data['username'] + '\0' + data['password'])
             if (ticket.expires_at <= now

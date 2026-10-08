@@ -12,17 +12,20 @@ from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from accounts.const import SecretType
+from assets.models import Asset, Platform
 from authentication.api import rdp_login as api
 from authentication.api import connection_token as token_api
 from authentication.api.connection_token import SuperConnectionTokenViewSet
 from authentication.const import ConnectionTokenType
-from authentication.models import ConnectionToken
+from authentication.models import AdminConnectionToken, ConnectionToken
+from authentication.serializers import ConnectionTokenSecretSerializer
 from authentication.services import connection_token as token_service
 from authentication.services.rdp_login import RDPLoginTicket, TicketCacheUnavailable
 from authentication.serializers.rdp_login import RDPLoginRedeemSerializer
 from perms.const import ActionChoices
 from terminal.models import Applet, AppletHost
 from terminal.serializers.applet_host import DeployOptionsSerializer
+from users.models import User
 
 
 class RDPLoginAuthorizationTests(SimpleTestCase):
@@ -112,8 +115,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             self.addCleanup(context.stop)
 
     def invoke(self, view_type, user, data):
-        # Production endpoints retain atomic row locking. These tests isolate
-        # authorization decisions; SQL concurrency needs PostgreSQL/MySQL.
+        # These tests isolate authorization decisions without a database.
         view = view_type()
         request = SimpleNamespace(user=user, data=data, authenticators=[])
         view.check_permissions(request)
@@ -125,18 +127,26 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.consumed = True
         return True
 
-    def redeem(self, user=None, data=None):
-        with patch.object(api, 'get_object_or_404', side_effect=[self.token, self.applet, self.host]), \
+    def redeem(self, user=None, data=None, serializer_factory=None):
+        with patch.object(ConnectionToken, 'get_typed_connection_token', return_value=self.token) as get_token, \
+                patch.object(api, 'get_object_or_404', side_effect=[self.applet, self.host]), \
                 patch.object(api, 'ConnectionTokenSecretSerializer') as serializer, \
                 patch.object(ConnectionToken.objects, 'filter'):
             serializer.return_value.data = self.connection_data
-            return self.invoke(api.RDPLoginRedeemApi, user or self.service, data or self.redeem_request)
+            if serializer_factory is not None:
+                serializer.side_effect = serializer_factory
+            response = self.invoke(api.RDPLoginRedeemApi, user or self.service, data or self.redeem_request)
+            get_token.assert_called_once_with(self.ticket.connection_token_id)
+            serializer.assert_called_once_with(instance=self.token)
+            return response
 
     def applet_option(self, user=None, data=None):
         request = SimpleNamespace(user=user or self.razor, data=data or {'id': str(self.token.id)})
-        with patch.object(token_api, 'get_object_or_404', return_value=self.token), \
+        with patch.object(ConnectionToken, 'get_typed_connection_token', return_value=self.token) as get_token, \
                 patch.object(api, 'get_object_or_404', return_value=self.applet):
-            return SuperConnectionTokenViewSet().get_applet_info(request)
+            response = SuperConnectionTokenViewSet().get_applet_info(request)
+            get_token.assert_called_once_with(self.token.id)
+            return response
 
     def secret(self, data=None):
         request = SimpleNamespace(
@@ -178,9 +188,9 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             api.check_connection(self.token)
         self.token.is_valid.assert_called_once_with(include_personal_secret=False)
 
-    def test_expired_permission_admin_token_and_monitoring_are_rejected(self):
+    def test_expired_permission_unsupported_token_and_monitoring_are_rejected(self):
         for changes in [
-            {'type': ConnectionTokenType.ADMIN}, {'face_monitor_token': 'monitor'},
+            {'type': ConnectionTokenType.SUPER}, {'face_monitor_token': 'monitor'},
             {'connect_method_object': {'type': 'native'}},
             {'connect_method_object': {'type': 'applet', 'disabled': True}},
         ]:
@@ -189,6 +199,83 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.account.date_expired = self.now
         with self.assertRaises(PermissionDenied):
             api.check_connection(self.token)
+
+    def use_admin_token(self):
+        self.user = User(
+            id=self.user.id, name='管理员', username='admin', email='admin@example.test',
+            is_active=True, date_expired=self.now + timedelta(days=1),
+        )
+        asset = Asset(
+            id=self.token.asset_id, name='application', is_active=True,
+            platform=Platform(id=1, name='Windows', category='host', type='windows'),
+        )
+        self.token = AdminConnectionToken(
+            id=self.token.id, type=ConnectionTokenType.ADMIN, org_id=self.token.org_id,
+            user=self.user, asset=asset, account='administrator', protocol='ssh',
+            connect_method='weblite', date_created=self.now - timedelta(minutes=2),
+            date_expired=self.now + timedelta(minutes=10),
+        )
+        self.account = SimpleNamespace(
+            id=uuid4(), name='administrator', full_username='Administrator',
+            secret_type='password', secret='target-secret', privileged=False,
+        )
+        self.token.__dict__.update(
+            connect_method_object={'type': 'applet', 'value': 'weblite'},
+            account_object=self.account,
+            org=SimpleNamespace(name='test organization'),
+        )
+        for context in [
+            patch.object(AdminConnectionToken, 'get_asset_accounts_by_alias', return_value=self.account),
+            patch('acls.models.ConnectMethodACL.is_method_allowed', return_value=True),
+            patch.object(self.token, 'save'),
+        ]:
+            context.start()
+            self.addCleanup(context.stop)
+        permission = patch.object(ConnectionToken, 'get_user_permed_account', return_value=None)
+        self.user_permission = permission.start()
+        self.addCleanup(permission.stop)
+
+    def test_admin_can_issue_applet_ticket_without_user_asset_permission(self):
+        self.use_admin_token()
+        response = self.applet_option()
+        self.assertEqual(response.status_code, 200)
+        issued = self.cache.add.call_args.args[0]
+        self.assertEqual(issued.connection_token_id, self.token.id)
+        self.assertEqual(issued.expires_at, self.now + timedelta(minutes=5))
+        self.assertEqual(self.token.permed_account.actions, ActionChoices.all())
+        self.user_permission.assert_not_called()
+
+    def test_admin_redeem_preserves_permission_overrides_and_credentials(self):
+        class AdminSecretSerializer(ConnectionTokenSecretSerializer):
+            class Meta(ConnectionTokenSecretSerializer.Meta):
+                fields = ['account', 'actions', 'expire_at']
+
+        self.use_admin_token()
+        response = self.redeem(serializer_factory=AdminSecretSerializer)
+        connection = response.data['connection']
+        self.assertEqual({action['value'] for action in connection['actions']},
+                         {action.name for action in ActionChoices})
+        self.assertEqual(connection['expire_at'], int((self.now + timedelta(days=365)).timestamp()))
+        self.assertEqual(connection['account']['username'], 'Administrator')
+        self.assertEqual(connection['account']['secret'], 'target-secret')
+        self.assertEqual(response.data['launch_deadline'], (self.now + timedelta(days=5)).isoformat())
+        self.assertTrue(self.consumed)
+        self.token.save.assert_called_once_with(update_fields=['date_expired'])
+        self.user_permission.assert_not_called()
+
+    def test_admin_still_requires_an_active_unexpired_token_and_existing_account(self):
+        self.use_admin_token()
+        for changes in [
+            {'date_expired': self.now - timedelta(seconds=1)}, {'is_active': False},
+        ]:
+            with self.subTest(changes=changes), patch.multiple(self.token, **changes), self.assertRaises(PermissionDenied):
+                self.applet_option()
+        with patch.object(AdminConnectionToken, 'get_asset_accounts_by_alias', return_value=None), \
+                self.assertRaises(PermissionDenied):
+            self.redeem()
+        self.cache.add.assert_not_called()
+        self.assertFalse(self.consumed)
+        self.token.save.assert_not_called()
 
     def test_applet_option_returns_ticket_in_existing_account_and_keeps_routing(self):
         self.host.zone = SimpleNamespace(select_gateway=lambda: SimpleNamespace(
