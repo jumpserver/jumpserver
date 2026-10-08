@@ -14,7 +14,7 @@ SDK_LANGUAGES = {
     'curl': {'label': 'cURL', 'example': 'demo.sh', 'runtime': 'Bash / cURL / OpenSSL', 'credential_policies': False},
 }
 SDK_INSTALL_COMMANDS = {
-    'python': 'python3 -m pip install /path/to/pam-clients/python',
+    'python': 'python3 -m pip install jms-pam',
     'go': (
         'go mod edit -replace=github.com/jumpserver/pam-clients/go='
         '/path/to/pam-clients/go\n'
