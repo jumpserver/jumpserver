@@ -29,7 +29,7 @@ def materials(application, params, endpoint):
                 'instance_id': repr(instance_id),
             })
             filename = 'jms_pam_config.py'
-            code = render_to_string('accounts/credential_client/sdk_application_example.py.tpl')
+            code = sdk_example(language)
         else:
             values = {
                 'JMS_ENDPOINT': endpoint, 'JMS_APP_ID': str(application.id),

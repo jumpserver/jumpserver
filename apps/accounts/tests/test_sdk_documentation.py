@@ -19,6 +19,15 @@ from rest_framework.test import APIRequestFactory
 
 
 class SDKDocumentationTests(SimpleTestCase):
+    def test_python_wizard_and_guides_share_the_event_example(self):
+        application = SimpleNamespace(id='application', secret='secret', org_id='org')
+        result = materials(application, {'type': 'sdk', 'sdk_language': 'python'}, 'https://example.com')
+        for locale in DOCUMENTATION_LANGUAGES:
+            with self.subTest(locale=locale):
+                data = get_sdk_documentation('python', locale)
+                self.assertEqual(result['code'], data['code'])
+                self.assertIn(result['code'].rstrip(), data['readme'])
+
     def test_agent_materials_install_go_binary_with_fixed_service(self):
         application = SimpleNamespace(id='application', secret='secret', org_id='org')
         scope = SimpleNamespace(id='scope', app_user='orders', install_path='/opt/jumpserver-pam')
