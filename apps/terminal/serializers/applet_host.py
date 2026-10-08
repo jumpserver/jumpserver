@@ -13,7 +13,7 @@ from common.validators import ProjectUniqueValidator
 from .applet import AppletSerializer
 from .. import const
 from ..models import AppletHost, AppletHostDeployment
-from ..utils.tinker import get_tinker_version_status, get_tinker_upgrade_message
+from ..utils.tinker import get_tinker_version_status
 
 __all__ = [
     'AppletHostSerializer', 'AppletHostDeploymentSerializer',
@@ -62,10 +62,7 @@ class DeployOptionsSerializer(serializers.Serializer):
 
 
 class AppletHostSerializer(HostSerializer):
-    tinker_min_version = serializers.SerializerMethodField()
-    tinker_target_version = serializers.SerializerMethodField()
     tinker_version_status = serializers.SerializerMethodField()
-    tinker_upgrade_message = serializers.SerializerMethodField()
     deploy_options = DeployOptionsSerializer(required=False, label=_("Deploy options"))
     load = LabeledChoiceField(
         read_only=True, label=_('Load status'), choices=const.ComponentLoad.choices,
@@ -75,8 +72,7 @@ class AppletHostSerializer(HostSerializer):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
             'load', 'date_synced', 'deploy_options',
-            'tinker_version', 'tinker_target_version', 'tinker_version_status',
-            'tinker_min_version', 'tinker_upgrade_message',
+            'tinker_version', 'tinker_version_status',
         ]
         extra_kwargs = {
             **HostSerializer.Meta.extra_kwargs,
@@ -84,17 +80,8 @@ class AppletHostSerializer(HostSerializer):
             'tinker_version': {'read_only': True},
         }
 
-    def get_tinker_min_version(self, obj):
-        return const.TINKER_MIN_VERSION
-
-    def get_tinker_target_version(self, obj):
-        return const.TINKER_TARGET_VERSION
-
     def get_tinker_version_status(self, obj):
         return get_tinker_version_status(obj.tinker_version)
-
-    def get_tinker_upgrade_message(self, obj):
-        return get_tinker_upgrade_message(obj.tinker_version)
 
     def update(self, instance, validated_data):
         if 'deploy_options' in validated_data:

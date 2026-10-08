@@ -45,14 +45,15 @@ class TinkerVersionTests(SimpleTestCase):
         with self.assertRaises(ValidationError):
             host.check_terminal_binding(request, tinker_version='v99.0.0')
 
-    def test_host_api_exposes_versions_and_upgrade_instruction(self):
+    def test_host_api_exposes_version_and_compatibility_status(self):
         host = AppletHost(tinker_version='v0.3.0')
         serializer = AppletHostSerializer()
-        self.assertEqual(serializer.get_tinker_min_version(host), const.TINKER_MIN_VERSION)
-        self.assertEqual(serializer.get_tinker_target_version(host), const.TINKER_TARGET_VERSION)
-        self.assertEqual(serializer.get_tinker_version_status(host), 'unsupported')
-        self.assertIn('redeploy', serializer.get_tinker_upgrade_message(host))
-        for field in ['auto_create_accounts', 'accounts_create_amount', 'using_same_account']:
+        self.assertTrue(serializer.fields['tinker_version'].read_only)
+        self.assertEqual(serializer.fields['tinker_version_status'].to_representation(host), 'unsupported')
+        for field in [
+            'tinker_target_version', 'tinker_min_version', 'tinker_upgrade_message',
+            'auto_create_accounts', 'accounts_create_amount', 'using_same_account',
+        ]:
             self.assertNotIn(field, serializer.fields)
 
     def test_needs_attention_filter_includes_missing_reports_and_old_versions(self):
