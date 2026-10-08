@@ -9,17 +9,13 @@ from rest_framework.exceptions import ValidationError
 SDK_LANGUAGES = {
     'python': {'label': 'Python', 'example': 'subclass_demo.py', 'runtime': 'Python 3.9+', 'credential_policies': True},
     'go': {'label': 'Go', 'example': 'cmd/hooks/main.go', 'runtime': 'Go 1.23+', 'credential_policies': True},
-    'java': {'label': 'Java', 'example': 'src/main/java/org/jumpserver/pam/HooksDemo.java', 'runtime': 'Java 11+', 'credential_policies': True},
+    'java': {'label': 'Java', 'example': 'src/main/java/org/jumpserver/pam/EventsDemo.java', 'runtime': 'Java 11+', 'credential_policies': True},
     'node': {'label': 'Node.js', 'example': 'hooks.js', 'runtime': 'Node.js 20.3+', 'credential_policies': True},
     'curl': {'label': 'cURL', 'example': 'demo.sh', 'runtime': 'Bash / cURL / OpenSSL', 'credential_policies': False},
 }
 SDK_INSTALL_COMMANDS = {
     'python': 'python3 -m pip install jms-pam',
-    'go': (
-        'go mod edit -replace=github.com/jumpserver/pam-clients/go='
-        '/path/to/pam-clients/go\n'
-        'go get github.com/jumpserver/pam-clients/go@v0.0.0'
-    ),
+    'go': 'go get github.com/jumpserver/pam-clients/go@v1.0.2',
     'java': 'mvn -f /path/to/pam-clients/java/pom.xml install',
     'node': 'npm install /path/to/pam-clients/node',
 }

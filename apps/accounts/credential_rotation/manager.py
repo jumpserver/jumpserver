@@ -72,7 +72,7 @@ class CredentialRotationManager:
             from accounts.models import ApplicationAudit
             from django.utils.dateparse import parse_datetime
             legacy_ids = {str(value) for value in ApplicationAudit.objects.filter(
-                event=AuditEvent.CREDENTIAL_FETCHED, result='success', credential_id__isnull=True,
+                event=AuditEvent.CREDENTIAL_FETCHED, result='success', credential_id__isnull=True, instance_id='',
                 service_id__in=credential.applications.values('id'),
                 account_id__in=(source.id, target.id),
                 date_created__gte=parse_datetime(rotation.participant_snapshot['preparation']['started_at']),
@@ -102,7 +102,7 @@ class CredentialRotationManager:
             from accounts.models import ApplicationAudit
             legacy_ids = ApplicationAudit.objects.filter(
                 event=AuditEvent.CREDENTIAL_FETCHED, result='success',
-                credential_id__isnull=True, account_id=source.id,
+                credential_id__isnull=True, instance_id='', account_id=source.id,
                 service_id__in=credential.applications.values('id'),
                 date_created__gte=switched_at - timedelta(days=credential.source_no_traffic_days),
             ).values('service_id')

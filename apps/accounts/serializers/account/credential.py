@@ -22,7 +22,7 @@ __all__ = [
     'CredentialApplicationBindingSerializer',
     'CredentialClientInstanceSerializer', 'CredentialClientStatusSerializer',
     'CredentialFetchSerializer', 'AuthorizedAccountsSerializer',
-    'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer',
+    'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer', 'CredentialEventResultSerializer',
     'CredentialAgentSyncSerializer',
     'CredentialAccessWizardSerializer',
     'CredentialChangeRetrySerializer', 'CredentialRotationReasonSerializer',
@@ -552,6 +552,13 @@ class CredentialStateSerializer(serializers.Serializer):
 
 
 class CredentialConfirmSerializer(CredentialStateSerializer):
+    instance_id = serializers.CharField(max_length=128, required=False)
+
+
+class CredentialEventResultSerializer(serializers.Serializer):
+    event_id = serializers.UUIDField()
+    status = serializers.ChoiceField(choices=('success', 'failed'), default='success')
+    error_code = serializers.CharField(max_length=128, required=False, allow_blank=True, default='')
     instance_id = serializers.CharField(max_length=128, required=False)
 
 

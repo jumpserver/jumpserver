@@ -96,12 +96,16 @@ class ApplicationCommandTests(CredentialTestCase):
         self.assertEqual(self.credential.active_account_id, self.primary.id)
         self.assertFalse(self.credential.rotation_records.exists())
         commands.report(self.client, command.id, 'running')
-        with self.assertRaises(ValidationError):
-            commands.report(self.client, command.id, 'success')
         manager = CredentialClientManager(self.application, instance_id=self.client.instance_id)
-        manager.fetch(self.credential.key, '127.0.0.1')
-        manager.confirm(self.credential.key, self.credential.revision, self.primary.id)
-        self.assertTrue(commands.report(self.client, command.id, 'success')['accepted'])
+        manager.fetch('', '127.0.0.1', account_id=self.primary.id)
+        from accounts.models import CredentialClientStatus
+        state = CredentialClientStatus.objects.get(client=self.client, binding__credential=self.credential)
+        self.assertEqual(state.applied_revision, 0)
+        from accounts.credential_client.event_results import report
+        self.assertTrue(report(self.client, command.source_event_id)['accepted'])
+        state.refresh_from_db()
+        self.assertEqual(state.applied_revision, command.payload['revision'])
+        self.assertEqual(state.applied_account_id, self.primary.id)
 
     def test_outdated_switch_request_is_rejected_before_execution(self):
         command = self.send(commands.SWITCH, credential_id=self.credential.id)

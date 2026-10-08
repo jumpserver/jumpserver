@@ -344,43 +344,34 @@ class PythonEventHookTests(TestCase):
                 self.assertIsNone(clone._event_dispatcher)
                 self.assertIsNot(clone.session, client.session)
 
-    def test_application_example_confirms_only_after_successful_rotation_switch(self):
-        path = (
-            Path(__file__).parents[1]
-            / "templates/accounts/credential_client/sdk_application_example.py.tpl"
-        )
+    def test_application_example_confirms_event_only_after_successful_apply(self):
+        from types import SimpleNamespace
+        path = Path(__file__).parents[1] / "clients/python/subclass_demo.py"
         module = ast.parse(path.read_text())
-        # Load the downloadable example's definitions without starting its listener.
-        module.body = [
-            node
-            for node in module.body
-            if not isinstance(node, (ast.ImportFrom, ast.With))
-        ]
+        module.body = [node for node in module.body if not isinstance(node, (ast.ImportFrom, ast.With))]
         namespace = {"Client": Client}
         exec(compile(module, str(path), "exec"), namespace)  # noqa: S102
-        namespace["apply_credential"] = Mock()
+        namespace["apply_account"] = Mock()
         with namespace["ApplicationClient"](
-            "https://testserver",
-            app_id="app",
-            app_secret="secret",
-            instance_id="worker",
+            "https://testserver", app_id="app", app_secret="secret", instance_id="worker",
         ) as client:
-            client.confirm_credential = Mock()
-            for mode in ("subscription", "alternating_rotation"):
-                client.on_event(
-                    {
-                        "event": "snapshot",
-                        "credentials": [{"key": "database", "credential_mode": mode}],
-                    }
-                )
-                client.on_credential_changed(self.credential)
-                if mode == "subscription":
-                    client.confirm_credential.assert_not_called()
-            client.confirm_credential.assert_called_once_with(
-                key="database", revision=2, account_id="account"
-            )
-            client.confirm_credential.reset_mock()
-            namespace["apply_credential"].side_effect = RuntimeError("switch failed")
+            account = SimpleNamespace(id="account", revision=2)
+            client.get_account = Mock(return_value=account)
+            client.confirm_event = Mock()
+            update = {"event_id": "event-one", "account_id": "account", "account_revision": 2}
+            client.handle_event(update)
+            client.get_account.assert_called_once_with(account_id="account", allow_local_fallback=False)
+            namespace["apply_account"].assert_called_once_with(account)
+            client.confirm_event.assert_called_once_with(event_id="event-one")
+            client.confirm_event.reset_mock()
+            namespace["apply_account"].side_effect = RuntimeError("switch failed")
             with self.assertRaises(RuntimeError):
-                client.on_credential_changed(self.credential)
-            client.confirm_credential.assert_not_called()
+                client.handle_event(update)
+            client.confirm_event.assert_called_once_with(
+                event_id="event-one", status="failed", error_code="application_failed",
+            )
+            namespace["apply_account"].reset_mock(side_effect=True)
+            account.revision = 3
+            with self.assertRaises(ValueError):
+                client.handle_event(update)
+            namespace["apply_account"].assert_not_called()

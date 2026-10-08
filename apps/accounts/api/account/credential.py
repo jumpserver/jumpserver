@@ -411,6 +411,7 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         'sync_agent': serializers.CredentialAgentSyncSerializer,
         'commands': serializers.ApplicationCommandPollSerializer,
         'command_result': serializers.ApplicationCommandResultSerializer,
+        'event_result': serializers.CredentialEventResultSerializer,
     }
 
     class ClientUpgradeRequired(APIException):
@@ -480,6 +481,15 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         return Response(manager.confirm(
             data['key'], data['revision'], data['account_id']
         ))
+
+    @action(methods=['post'], detail=False, url_path='event-result')
+    def event_result(self, request, *args, **kwargs):
+        from accounts.credential_client.event_results import report
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        manager = self.get_client_manager(data)
+        return Response(report(manager.client, data['event_id'], data['status'], data['error_code']))
 
     @action(methods=['get'], detail=False, url_path='commands')
     def commands(self, request, *args, **kwargs):

@@ -43,13 +43,16 @@ class PythonLatestCredentialTests(TestCase):
             with self.subTest(options=options), self.assertRaises(PAMError):
                 self.client.get_credential(**options)
 
-    def test_application_pull_never_uses_cached_secret_during_outage(self):
+    def test_account_cache_fallback_can_be_disabled_and_scope_changes_clear_it(self):
         self.respond({**self.payload, "key": "account:account"})
-        self.client.get_credential(account_id="account")
-        self.client._reconcile_latest_credentials({"event": "snapshot", "credentials": []})
+        self.client.get_account(account_id="account")
         self.outage()
+        self.assertTrue(self.client.get_account(account_id="account").from_local)
         with self.assertRaises(PAMError):
-            self.client.get_credential(account_id="account")
+            self.client.get_account(account_id="account", allow_local_fallback=False)
+        self.client._reconcile_latest_credentials({"event": "configuration.updated"})
+        with self.assertRaises(PAMError):
+            self.client.get_account(account_id="account")
 
     def test_latest_credential_does_not_expire(self):
         self.prime()

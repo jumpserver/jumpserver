@@ -68,13 +68,25 @@ def _clients(event, code):
     return clients.distinct()
 
 
+def event_account_version(event):
+    from accounts.models import Account
+    return Account.objects.filter(id=event.account_id).values_list('version', flat=True).first()
+
+
 def _recipients(event, code):
+    from accounts.models import Account
+    credential = ApplicationCredential.objects.filter(id=event.credential_id).first()
+    target_id = credential.active_account_id if credential and credential.mode == 'alternating_rotation' else event.account_id
+    target_version = (event.revision if credential and credential.mode == 'subscription'
+                      else Account.objects.filter(id=target_id).values_list('version', flat=True).first())
     clients = _clients(event, code).select_related('application').order_by('id')
     return [{
         'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
         'application': {'id': str(client.application_id), 'name': client.application.name},
         'supports_receipts': client.event_receipts_supported,
         'publish_result': 'pending', 'received_at': None,
+        'account_id': str(target_id) if target_id else None, 'account_revision': target_version,
+        'status': 'pending', 'finished_at': None, 'error_code': '',
     } for client in clients]
 
 
@@ -138,10 +150,13 @@ def _send_stream(event_id, code):
         'credential_mode': credential_mode,
         'credential_key': event.credential_key or None,
         'revision': event.revision,
+        'account_revision': (tracked.recipients[0].get('account_revision')
+                             if tracked and tracked.recipients else event_account_version(event)),
         # Lifecycle audits may refer to the source account; the stream selector
         # always names the account currently published for an alternating policy.
         'account_id': (
-            str(credential.active_account_id) if credential and credential.account_switch
+            tracked.recipients[0].get('account_id') if tracked and tracked.recipients
+            else str(credential.active_account_id) if credential and credential.account_switch
             else str(event.account_id) if event.account_id else None
         ),
         'operation_id': str(event.operation_id or event.rotation_id) if (event.operation_id or event.rotation_id) else None,

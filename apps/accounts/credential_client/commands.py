@@ -114,6 +114,7 @@ def send(application, data, operator):
         payload = {
             'credential_key': credential.key, 'revision': credential.revision,
             'account_id': str(credential.active_account_id), 'credential_mode': credential.mode,
+            'account_revision': credential.active_account.version,
         }
     elif any(not restart_supported(client) for client in clients):
         raise ValidationError(_('The selected Agent must be configured to restart its application service.'))
@@ -242,12 +243,9 @@ def report(client, command_id, status, error_code=''):
         if recipient['status'] != 'running':
             raise ValidationError(_('Claim the event before reporting an execution result.'))
         if status == 'success' and command.event == SWITCH:
-            from accounts.models import CredentialClientStatus
-            if not CredentialClientStatus.objects.filter(
-                client=client, binding__credential__key=command.payload['credential_key'],
-                applied_revision=command.payload['revision'], applied_account_id=command.payload['account_id'],
-            ).exists():
-                raise ValidationError(_('Confirm the requested account version before reporting success.'))
+            from .event_results import apply_rotation_result
+            apply_rotation_result(client, command.source_event, command.payload['account_id'],
+                                  command.payload.get('account_revision'))
         recipient.update(status=status, finished_at=now, error_code=error_code if status == 'failed' else '')
     command.save(update_fields=['recipients', 'date_updated'])
     record(AuditEvent.COMMAND_RESULT, application=client.application, client=client,

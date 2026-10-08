@@ -175,6 +175,8 @@ class CredentialEventStreamTests(TransactionTestCase):
     async def _run_connection(self):
         communicator = await self._connect()
         snapshot = await communicator.receive_json_from()
+        self.assertTrue(snapshot['credentials'][0].pop('event_id'))
+        self.assertEqual(snapshot['credentials'][0].pop('account_revision'), self.account.version)
         self.assertEqual(snapshot, {
             'event': 'snapshot',
             'credentials': [{

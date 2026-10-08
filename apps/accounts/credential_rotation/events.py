@@ -124,6 +124,9 @@ def _build_timeline(events, instances, org_id, rotation_id=None, status=None):
                 'event_id': str(event.source_event_id),
                 'received_at': recipient['received_at'],
                 'publish_result': recipient['publish_result'],
+                'status': recipient.get('status', 'pending'),
+                'finished_at': recipient.get('finished_at'),
+                'error_code': recipient.get('error_code', ''),
             })
     live_clients = {
         str(client.id): client for client in CredentialClientInstance.objects.filter(

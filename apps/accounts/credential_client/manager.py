@@ -150,8 +150,18 @@ class CredentialClientManager:
         revision = account.version
         key = f'account:{account.id}'
         payload = self._account_payload(key, revision, account)
+        for binding in CredentialApplicationBinding.objects.filter(
+            application=self.application, credential__is_active=True,
+            credential__active_account=account, credential__mode='alternating_rotation',
+        ).select_related('credential'):
+            if not binding.credential.authorized_applications().filter(id=self.application.id).exists() or not client_uses_credential(self.client, binding.credential):
+                continue
+            state, _ = CredentialClientStatus.objects.get_or_create(binding=binding, client=self.client)
+            self._save_status(state, timezone.now(), {
+                'fetched_revision': binding.credential.current_revision,
+            }, fetched=True)
         from accounts.credential_rotation.preparation import record_secret_access
-        record_secret_access(account, self.application)
+        record_secret_access(account)
         record(
             AuditEvent.CREDENTIAL_FETCHED, client=self.client, account=account,
             credential_key=key, revision=revision, remote_addr=remote_addr,
@@ -254,6 +264,7 @@ class CredentialClientManager:
                 'username': account.username,
                 'secret_type': account.secret_type,
                 'secret': account.secret,
+                'revision': account.version,
             },
         }
 
@@ -450,10 +461,11 @@ class CredentialClientManager:
         metadata = []
         for key in desired['credential_keys']:
             if key.startswith('account:'):
-                _, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
+                subscriptions, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
+                credential = subscriptions[0]
                 revision = account.version
             else:
-                credential, _ = self._get_credential(key, lock=False)
+                credential, account = self._get_credential(key, lock=False)
                 revision = credential.current_revision
             item = {
                 'key': key,
@@ -463,6 +475,9 @@ class CredentialClientManager:
             }
             if not key.startswith('account:') and credential.account_switch:
                 item['account_switch'] = credential.account_switch
+            from .event_results import snapshot_result_event
+            item.update(account_id=str(account.id), account_revision=account.version,
+                        event_id=snapshot_result_event(self.client, credential, account, revision))
             metadata.append(item)
         values = {
             'delivery_scope': delivery_scope,

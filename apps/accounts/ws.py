@@ -144,6 +144,7 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
             credentials = self.client.application.application_credentials.filter(
                 is_active=True,
             ).order_by('key')
+            from accounts.credential_client.event_results import snapshot_result_event
             items = []
             subscribed_accounts = set()
             for credential in credentials:
@@ -162,6 +163,8 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
                             'account_id': str(account.id),
                             'credential_mode': credential.mode,
                             'revision': account.version,
+                            'account_revision': account.version,
+                            'event_id': snapshot_result_event(self.client, credential, account, account.version),
                         })
                 elif credential.authorized_applications().filter(
                     id=self.client.application_id,
@@ -174,6 +177,10 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
                     if credential.account_switch:
                         item['account_switch'] = credential.account_switch
                         item['account_id'] = str(credential.active_account_id)
+                    item['account_revision'] = credential.active_account.version
+                    item['event_id'] = snapshot_result_event(
+                        self.client, credential, credential.active_account, credential.current_revision,
+                    )
                     items.append(item)
             return {'event': 'snapshot', 'credentials': items}
 

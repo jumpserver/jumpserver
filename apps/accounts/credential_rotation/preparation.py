@@ -138,7 +138,7 @@ def _alignment(credential, rotation):
     legacy = {str(row['service_id']): row['latest'] for row in ApplicationAudit.objects.filter(
         event=AuditEvent.CREDENTIAL_FETCHED, result='success',
         service_id__in=meta['applications'], account_id=credential.active_account_id,
-        credential_id__isnull=True, date_created__gte=parse_datetime(meta['started_at']),
+        credential_id__isnull=True, instance_id='', date_created__gte=parse_datetime(meta['started_at']),
     ).values('service_id').annotate(latest=Max('date_created'))}
     applications = list(credential.applications.all())
     return [{
