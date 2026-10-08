@@ -11,6 +11,6 @@ telnetlib3==4.0.2
 mysqlclient==2.2.4
 psycopg2-binary==2.9.12
 pymssql==2.3.10
-pymongo==4.6.3
+pymongo==4.18.2
 oracledb==3.4.2
 pyfreerdp==0.0.4
