@@ -142,6 +142,7 @@ class LDAPConfig(object):
         self.attr_map = None
         self.auth_ldap = None
         self.category = category
+        self.connect_timeout = getattr(settings, f'AUTH_{category.upper()}_CONNECT_TIMEOUT')
         if isinstance(config, dict):
             self.load_from_config(config)
         else:
@@ -156,6 +157,7 @@ class LDAPConfig(object):
         self.search_filter = config.get('search_filter')
         self.attr_map = config.get('attr_map')
         self.auth_ldap = config.get('auth_ldap')
+        self.connect_timeout = config.get('connect_timeout', self.connect_timeout)
 
     def load_from_settings(self):
         prefix = 'AUTH_LDAP' if self.category == User.Source.ldap.value else 'AUTH_LDAP_HA'
@@ -173,7 +175,7 @@ class LDAPServerUtil(object):
 
     def __init__(self, config=None, category=User.Source.ldap.value):
         if isinstance(config, dict):
-            self.config = LDAPConfig(config=config)
+            self.config = LDAPConfig(config=config, category=category)
         elif isinstance(config, LDAPConfig):
             self.config = config
         else:
@@ -201,11 +203,13 @@ class LDAPServerUtil(object):
         server_uri = self.config.server_uri or ''
         use_ldaps = server_uri.lower().startswith('ldaps://')
         tls = self._get_tls()
-        server = Server(server_uri, use_ssl=use_ldaps, tls=tls)
+        server = Server(
+            server_uri, use_ssl=use_ldaps, tls=tls, connect_timeout=self.config.connect_timeout
+        )
         conn = Connection(
             server, user=user or self.config.bind_dn,
             password=password if password is not None else self.config.password,
-            authentication=authentication
+            authentication=authentication, receive_timeout=self.config.connect_timeout
         )
         conn.open(read_server_info=False)
         if not use_ldaps and self.config.start_tls:

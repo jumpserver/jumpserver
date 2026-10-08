@@ -164,6 +164,9 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
         config = {
             'server_uri': serializer.validated_data.get(f"{prefix}SERVER_URI"),
+            'connect_timeout': serializer.validated_data.get(
+                f'{prefix}CONNECT_TIMEOUT', getattr(settings, f'{prefix}CONNECT_TIMEOUT')
+            ),
             'bind_dn': serializer.validated_data.get(f"{prefix}BIND_DN"),
             'start_tls': serializer.validated_data.get(f"{prefix}START_TLS", False),
             'cacert_content': serializer.validated_data.get(f"{prefix}CACERT_CONTENT"),
