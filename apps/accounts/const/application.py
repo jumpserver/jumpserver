@@ -55,6 +55,7 @@ class ApplicationEvent(TextChoices):
     ROTATION_WAITING = 'rotation.waiting_for_application', _('Rotation waiting for application')
     ROTATION_SOURCE_WAITING = 'rotation.source.waiting', _('Observing source account secret fetches')
     ROTATION_SOURCE_READY = 'rotation.source.ready', _('Source account secret fetch window completed')
+    ROTATION_FORCE_STOPPED = 'rotation.force_stopped', _('Rotation forcibly stopped')
     ROTATION_COMPLETED = 'rotation.completed', _('Rotation completed')
     ROTATION_FAILED = 'rotation.failed', _('Rotation failed')
 

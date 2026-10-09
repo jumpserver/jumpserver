@@ -156,7 +156,7 @@ class CredentialClientManager:
         ).select_related('credential'):
             if not binding.credential.authorized_applications().filter(id=self.application.id).exists() or not client_uses_credential(self.client, binding.credential):
                 continue
-            state, _ = CredentialClientStatus.objects.get_or_create(binding=binding, client=self.client)
+            state, _created = CredentialClientStatus.objects.get_or_create(binding=binding, client=self.client)
             self._save_status(state, timezone.now(), {
                 'fetched_revision': binding.credential.current_revision,
             }, fetched=True)

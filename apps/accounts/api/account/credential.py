@@ -150,6 +150,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'change_secret': 'accounts.change_applicationcredential',
         'complete_rotation': 'accounts.change_applicationcredential',
         'cancel_rotation': 'accounts.change_applicationcredential',
+        'force_stop_rotation': 'accounts.change_applicationcredential',
         'rotation_status': 'accounts.view_applicationcredential',
         'rotation_events': 'accounts.view_applicationcredential',
         'event_history': 'accounts.view_applicationcredential',
@@ -325,6 +326,15 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         credential = CredentialRotationManager(self.get_object().id).cancel(**params.validated_data)
         serializer = self.get_serializer(credential)
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=True, url_path='force-stop')
+    def force_stop_rotation(self, request, *args, **kwargs):
+        params = serializers.CredentialRotationForceStopSerializer(data=request.data)
+        params.is_valid(raise_exception=True)
+        credential = CredentialRotationManager(self.get_object().id).force_stop(
+            params.validated_data['reason'], request.user.name,
+        )
+        return Response(self.get_serializer(credential).data)
 
     @action(methods=['post'], detail=True, url_path='retry-change')
     def retry_change(self, request, *args, **kwargs):

@@ -921,7 +921,7 @@ class PythonSDKTestCase(SimpleTestCase):
         context = {
             name: json.dumps(value) for name, value in {
                 'app_id': 'application', 'app_secret': "secret'\\\n",
-                'endpoint': 'https://testserver', 'org_id': 'org',
+                'endpoint': 'https://testserver', 'org_id': 'org', 'instance_id': 'worker',
             }.items()
         }
         code = render_to_string(
@@ -940,34 +940,26 @@ class PythonSDKTestCase(SimpleTestCase):
                 {'get': 'get_sdks_info'}, authentication_classes=[], permission_classes=[AllowAny],
             )(request)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('apps/accounts/clients/python', response.data['readme'])
-        self.assertIn('client.watch_events()', response.data['code'])
-        self.assertIn('def on_credential_changed', response.data['code'])
+        self.assertIn('python3 -m pip install jms-pam', response.data['readme'])
+        self.assertIn('self.watch_credential_events', response.data['code'])
+        self.assertIn('self.get_account(', response.data['code'])
+        self.assertIn('self.confirm_event(', response.data['code'])
         compile(response.data['code'], 'downloaded_sdk_example.py', 'exec')
 
     def test_rotation_record_api_is_not_exposed(self):
         with self.assertRaises(Resolver404):
             resolve('/api/v1/accounts/credential-rotation-records/')
 
-    def test_generated_examples_are_mode_specific(self):
-        subscription = render_to_string(
-            'accounts/credential_client/sdk_subscription_example.py.tpl'
-        )
-        rotation = render_to_string(
-            'accounts/credential_client/sdk_rotation_example.py.tpl'
-        )
+    def test_generated_example_uses_accounts_and_event_results(self):
+        from accounts.credential_client.documentation import sdk_example
 
-        compile(subscription, 'sdk_subscription_example.py', 'exec')
-        compile(rotation, 'sdk_rotation_example.py', 'exec')
-        self.assertIn('watch_credential_events', subscription)
-        self.assertIn('get_credential(account_id=account_id)', subscription)
-        self.assertNotIn('confirm_credential', subscription)
-        self.assertNotIn('Revision', subscription)
-        self.assertIn('watch_credential_events', rotation)
-        self.assertIn('get_credential(key=key, allow_local_fallback=False)', rotation)
-        self.assertIn('client.confirm_credential(', rotation)
-        self.assertNotIn('account_id=account_id', rotation)
-        self.assertNotIn('Heartbeat', subscription + rotation)
+        example = sdk_example('python')
+        compile(example, 'sdk_example.py', 'exec')
+        self.assertIn('allow_local_fallback=False', example)
+        self.assertIn('event["account_revision"]', example)
+        self.assertIn('self.confirm_event(event_id=event_id)', example)
+        self.assertNotIn('get_credential(', example)
+        self.assertNotIn('confirm_credential(', example)
 
     def test_http_signature(self):
         request = requests.Request(

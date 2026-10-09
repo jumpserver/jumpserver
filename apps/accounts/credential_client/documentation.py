@@ -16,8 +16,16 @@ SDK_LANGUAGES = {
 SDK_INSTALL_COMMANDS = {
     'python': 'python3 -m pip install jms-pam',
     'go': 'go get github.com/jumpserver/pam-clients/go@v1.0.2',
-    'java': 'mvn -f /path/to/pam-clients/java/pom.xml install',
-    'node': 'npm install /path/to/pam-clients/node',
+    'java': (
+        'curl -fLO https://github.com/jumpserver/pam-clients/releases/download/v1.0.2/jms-pam-java.tar.gz\n'
+        'tar -xzf jms-pam-java.tar.gz\n'
+        'mvn -f ./java/pom.xml install'
+    ),
+    'node': (
+        'curl -fLO https://github.com/jumpserver/pam-clients/releases/download/v1.0.2/jms-pam-node.tar.gz\n'
+        'tar -xzf jms-pam-node.tar.gz\n'
+        'npm install ./node'
+    ),
 }
 DOCUMENTATION_LANGUAGES = ('en', 'zh-hans', 'zh-hant', 'ja', 'ko', 'pt-br', 'ru', 'vi', 'es', 'fr')
 LANGUAGE_ALIASES = {

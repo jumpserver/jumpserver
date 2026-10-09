@@ -264,6 +264,28 @@ class CredentialRotationManager:
         return self._finish(credential, rotation, 'cancelled'), []
 
     @transaction.atomic
+    def force_stop(self, reason, operator=''):
+        credential = self._get_locked_credential()
+        if not reason.strip():
+            raise JMSException(_('Provide a reason for forcibly stopping the rotation.'))
+        if credential.status != ApplicationCredential.Status.waiting_revert:
+            raise JMSException(_('Only rotations waiting for account reversion can be forcibly stopped.'))
+        rotation = credential.rotation_records.filter(status='running', date_finished__isnull=True).first()
+        if not rotation:
+            raise JMSException(_('No active rotation.'))
+        rotation.participant_snapshot['force_stop'] = {
+            'reason': reason.strip(), 'operator': operator,
+            'stopped_at': timezone.now().isoformat(),
+        }
+        rotation.save(update_fields=['participant_snapshot'])
+        event = record(
+            AuditEvent.ROTATION_CANCELLED, credential=credential, operator=operator,
+            summary=f'Rotation forcibly stopped without client recovery confirmation: {reason.strip()}',
+        )
+        enqueue(event, ApplicationEvent.ROTATION_FORCE_STOPPED, rotation=rotation)
+        return self._finish(credential, rotation, 'cancelled')
+
+    @transaction.atomic
     def cancel(self, reason=''):
         from .execution import outcome
         from .preparation import PHASES, _emit

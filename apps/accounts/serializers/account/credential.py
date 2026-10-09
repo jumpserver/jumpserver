@@ -26,6 +26,7 @@ __all__ = [
     'CredentialAgentSyncSerializer',
     'CredentialAccessWizardSerializer',
     'CredentialChangeRetrySerializer', 'CredentialRotationReasonSerializer',
+    'CredentialRotationForceStopSerializer',
 ]
 
 
@@ -36,6 +37,10 @@ SYSTEMD_ACTIONS = [('reload', _('Reload')), ('restart', _('Restart'))]
 
 class CredentialRotationReasonSerializer(serializers.Serializer):
     reason = serializers.CharField(max_length=512, required=False, default='', allow_blank=True)
+
+
+class CredentialRotationForceStopSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=512, allow_blank=False)
 
 
 class CredentialChangeRetrySerializer(CredentialRotationReasonSerializer):
