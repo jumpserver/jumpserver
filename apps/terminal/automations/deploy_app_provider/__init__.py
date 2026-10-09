@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
-from ops.ansible import JMSInventory, SuperPlaybookRunner
+from ops.ansible import JMSInventory, SuperPlaybookRunner, escape_jinja2_syntax
 from terminal.const import PublishStatus
 from terminal.models import AppProvider, VirtualAppPublication
 from terminal.utils.virtualapp import stage_image_archives
@@ -140,7 +140,7 @@ class DeployAppProviderManager:
                 host['ansible_become_method'] = 'sudo'
                 host['ansible_become_user'] = 'root'
                 if account.secret_type == 'password':
-                    host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
+                    host['ansible_become_password'] = escape_jinja2_syntax(account.secret)
         return host
 
     @transaction.atomic

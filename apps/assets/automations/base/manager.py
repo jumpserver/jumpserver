@@ -22,7 +22,7 @@ from common.db.utils import safe_atomic_db_connection
 from common.tasks import send_mail_async
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from libs.ansible.modules_utils.ssh_tunnel import TimeoutSSHTunnelForwarder
-from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner
+from ops.ansible import JMSInventory, DefaultCallback, SuperPlaybookRunner, escape_jinja2_syntax
 from ops.ansible.interface import interface
 from users.utils import activate_user_language
 
@@ -415,8 +415,6 @@ class PlaybookPrepareMixin:
         raise NotImplementedError
 
     def get_params(self, automation, method_type):
-        from accounts.models import Account
-
         method_attr = "{}_method".format(method_type)
         method_params = "{}_params".format(method_type)
         method_id = getattr(automation, method_attr)
@@ -433,7 +431,7 @@ class PlaybookPrepareMixin:
 
         # JSON inventory cannot preserve Ansible unsafe wrappers. Escape after
         # serialization so task parameters and platform defaults stay literal.
-        return Account.escape_jinja2_syntax(params)
+        return escape_jinja2_syntax(params)
 
     @property
     def platform_automation_methods(self):

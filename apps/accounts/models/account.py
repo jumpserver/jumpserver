@@ -387,7 +387,9 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         if not su_from.secret:
             return var
         if su_from.secret_type == SecretType.PASSWORD:
-            var['ansible_password'] = self.escape_jinja2_syntax(
+            from ops.ansible.utils import escape_jinja2_syntax
+
+            var['ansible_password'] = escape_jinja2_syntax(
                 su_from.secret
             )
         elif su_from.secret_type == SecretType.SSH_KEY:
@@ -420,38 +422,12 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         auth['ansible_become_method'] = become_method
         auth['ansible_become_user'] = self.username
         if password:
+            from ops.ansible.utils import escape_jinja2_syntax
+
             auth['ansible_become_password'] = (
-                self.escape_jinja2_syntax(password)
+                escape_jinja2_syntax(password)
             )
         return auth
-
-    @staticmethod
-    def escape_jinja2_syntax(value):
-        if isinstance(value, dict):
-            return {
-                key: Account.escape_jinja2_syntax(item)
-                for key, item in value.items()
-            }
-        if isinstance(value, list):
-            return [Account.escape_jinja2_syntax(item) for item in value]
-        if not isinstance(value, str):
-            return value
-
-        has_overrides = value.startswith('#jinja2:')
-        if not has_overrides and not any(
-                delimiter in value for delimiter in ('{{', '{%', '{#')
-        ):
-            return value
-
-        # Escape every opening brace to prevent adjacent delimiters from
-        # forming new expressions. A single pass also preserves literal text
-        # that happens to contain the old temporary marker strings.
-        escaped = value.replace('{', '{{ "{" }}')
-        # Ansible parses this header before rendering and can change the
-        # delimiters. Keep it literal so only the default syntax is active.
-        if has_overrides:
-            escaped = '{{ "#" }}' + escaped[1:]
-        return escaped
 
     def update_last_login_date(self):
         Account.objects.filter(pk=self.pk).update(date_last_login=timezone.now())
