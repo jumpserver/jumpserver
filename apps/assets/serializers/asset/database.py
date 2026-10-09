@@ -70,7 +70,7 @@ class DatabaseSerializer(AssetSerializer):
             return
 
         if platform.type in [
-            'mysql', 'mariadb', 'oracle', 'sqlserver',
+            'mysql', 'mariadb', 'sqlserver',
             'db2', 'dameng', 'clickhouse', 'redis'
         ]:
             db_field.required = False
