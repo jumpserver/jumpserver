@@ -2661,7 +2661,7 @@ msgstr "Без названия платформы"
 
 #: assets/api/asset/asset.py:61 perms/filters.py:26
 msgid "Zone name or ID"
-msgstr "Имя домена или ID"
+msgstr "Имя зоны или ID"
 
 #: assets/api/asset/asset.py:69
 msgid "Exclude platform type"
@@ -2754,11 +2754,11 @@ msgstr "Имена папок одного уровня не могут повт
 
 #: assets/api/zone.py:22
 msgid "Zone ID"
-msgstr "ID домена"
+msgstr "ID зоны"
 
 #: assets/api/zone.py:25
 msgid "Zone name"
-msgstr "Имя домена"
+msgstr "Имя зоны"
 
 #: assets/api/zone.py:84
 msgid "Number required"

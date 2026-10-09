@@ -3679,7 +3679,7 @@ msgstr "Nền tảng"
 #: assets/models/asset/common.py:206 assets/models/zone.py:22
 #: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:403
 msgid "Zone"
-msgstr "Tên miền"
+msgstr "Miền"
 
 #: assets/models/asset/common.py:209 assets/serializers/asset/common.py:181
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
@@ -4369,11 +4369,11 @@ msgstr ""
 
 #: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
-msgstr "Tài sản có thể kết nối qua cổng khu vực"
+msgstr "Tài sản có thể kết nối qua cổng của miền"
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"
-msgstr "Tên miền mặc định"
+msgstr "Miền mặc định"
 
 #: assets/serializers/platform.py:241
 msgid "type is required"
@@ -8001,7 +8001,7 @@ msgstr "Số lượng nhóm người dùng"
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
-msgstr "Zones amount"
+msgstr "Số lượng miền"
 
 #: orgs/serializers.py:16
 msgid "Gateways amount"

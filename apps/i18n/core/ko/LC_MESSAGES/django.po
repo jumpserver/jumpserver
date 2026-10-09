@@ -4322,7 +4322,7 @@ msgstr ""
 
 #: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
-msgstr "자산은 지역 게이트웨이를 통해 연결할 수 있습니다."
+msgstr "자산은 도메인 게이트웨이를 통해 연결할 수 있습니다."
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"

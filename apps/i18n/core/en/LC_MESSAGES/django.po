@@ -2641,7 +2641,7 @@ msgstr "Excluding platform name"
 
 #: assets/api/asset/asset.py:61 perms/filters.py:26
 msgid "Zone name or ID"
-msgstr "Domain name or ID"
+msgstr "Zone name or ID"
 
 #: assets/api/asset/asset.py:69
 msgid "Exclude platform type"
@@ -2654,7 +2654,7 @@ msgstr "Excluding platform category"
 #: assets/api/asset/asset.py:86 assets/models/platform.py:392
 #: assets/serializers/platform.py:211
 msgid "Gateway enabled"
-msgstr "Enable Domain Gateway"
+msgstr "Enable Zone Gateway"
 
 #: assets/api/asset/asset.py:90 assets/models/platform.py:325
 #: assets/serializers/platform.py:36
@@ -2733,11 +2733,11 @@ msgstr "Node names at the same level cannot be duplicated"
 
 #: assets/api/zone.py:22
 msgid "Zone ID"
-msgstr "Domain ID"
+msgstr "Zone ID"
 
 #: assets/api/zone.py:25
 msgid "Zone name"
-msgstr "Domain Name"
+msgstr "Zone name"
 
 #: assets/api/zone.py:84
 msgid "Number required"
@@ -3675,7 +3675,7 @@ msgstr "Platform"
 #: assets/models/asset/common.py:206 assets/models/zone.py:22
 #: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:403
 msgid "Zone"
-msgstr "Domain"
+msgstr "Zone"
 
 #: assets/models/asset/common.py:209 assets/serializers/asset/common.py:181
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
@@ -4251,8 +4251,8 @@ msgid ""
 "A gateway is a network proxy for a zone, and when connecting assets within "
 "the zone, the connection is routed through the gateway."
 msgstr ""
-"The gateway is the network proxy for the domain. When connecting to assets "
-"within the domain, the connection will be routed through the gateway."
+"The gateway is the network proxy for the zone. When connecting to assets "
+"within the zone, the connection will be routed through the gateway."
 
 #: assets/serializers/gateway.py:19
 msgid "The platform must start with Gateway"
@@ -4363,11 +4363,11 @@ msgstr ""
 
 #: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
-msgstr "The asset can be connected using a regional gateway."
+msgstr "The asset can be connected using a zone gateway."
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"
-msgstr "Default Domain"
+msgstr "Default zone"
 
 #: assets/serializers/platform.py:241
 msgid "type is required"
@@ -4474,7 +4474,7 @@ msgid ""
 "When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
 "be executed"
 msgstr ""
-"Execute this task when testing connection in Domain Details - Gateway - Test "
+"Execute this task when testing connection in Zone Details - Gateway - Test "
 "Connection"
 
 #: assets/tasks/utils.py:16
