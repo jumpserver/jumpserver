@@ -4456,7 +4456,7 @@ msgid ""
 " be executed"
 msgstr ""
 "Cette tâche sera exécutée en cliquant sur « Tester la connexion » dans « "
-"Détails du domaine - Passerelle »"
+"Détails de la zone - Passerelle »"
 
 #: assets/tasks/utils.py:16
 msgid "Asset has been disabled, skipped: {}"
@@ -7941,7 +7941,7 @@ msgstr "Nombre de groupes d'utilisateurs"
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
-msgstr "Nombre de domaines"
+msgstr "Nombre de zones"
 
 #: orgs/serializers.py:16
 msgid "Gateways amount"

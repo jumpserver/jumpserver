@@ -2688,7 +2688,7 @@ msgstr "Excluir categoría de plataforma"
 #: assets/api/asset/asset.py:86 assets/models/platform.py:392
 #: assets/serializers/platform.py:211
 msgid "Gateway enabled"
-msgstr "Activar gateway de zona"
+msgstr "Activar gateway de dominio"
 
 #: assets/api/asset/asset.py:90 assets/models/platform.py:325
 #: assets/serializers/platform.py:36
@@ -4430,7 +4430,8 @@ msgstr ""
 
 #: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
-msgstr "Los activos pueden conectarse a través de una puerta de enlace local."
+msgstr ""
+"Los activos pueden conectarse a través de una puerta de enlace del dominio."
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"

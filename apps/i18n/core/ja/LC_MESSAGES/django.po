@@ -2629,7 +2629,7 @@ msgstr "プラットフォーム名を含まない"
 
 #: assets/api/asset/asset.py:61 perms/filters.py:26
 msgid "Zone name or ID"
-msgstr "ドメイン名または ID"
+msgstr "ゾーン名または ID"
 
 #: assets/api/asset/asset.py:69
 msgid "Exclude platform type"
@@ -2724,11 +2724,11 @@ msgstr "同じレベルのノード名を同じにすることはできません
 
 #: assets/api/zone.py:22
 msgid "Zone ID"
-msgstr "ドメイン ID"
+msgstr "ゾーン ID"
 
 #: assets/api/zone.py:25
 msgid "Zone name"
-msgstr "ドメイン名"
+msgstr "ゾーン名"
 
 #: assets/api/zone.py:84
 msgid "Number required"
@@ -4246,9 +4246,7 @@ msgstr "タイプ"
 msgid ""
 "A gateway is a network proxy for a zone, and when connecting assets within "
 "the zone, the connection is routed through the gateway."
-msgstr ""
-"ゲートウェイはドメインのネットワーク代理であり、ドメイン内のリソースに接続す"
-"る際には、接続はゲートウェイを通してルーティングされます。"
+msgstr "ゲートウェイはゾーンのネットワーク代理であり、ゾーン内のリソースに接続する際には、接続はゲートウェイを通してルーティングされます。"
 
 #: assets/serializers/gateway.py:19
 msgid "The platform must start with Gateway"
@@ -4363,7 +4361,7 @@ msgstr "資産はゾーンゲートウェイを使用して接続できます"
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"
-msgstr "デフォルトドメイン"
+msgstr "デフォルトゾーン"
 
 #: assets/serializers/platform.py:241
 msgid "type is required"
@@ -4470,9 +4468,7 @@ msgstr "ゲートウェイ接続のテスト。"
 msgid ""
 "When clicking 'Test Connection' in 'Domain Details - Gateway' this task will "
 "be executed"
-msgstr ""
-"ネットワーク詳細-ゲートウェイ-接続テストを実行する際に、このタスクを実行しま"
-"す"
+msgstr "ゾーンの詳細 - ゲートウェイで接続テストを実行する際に、このタスクを実行します"
 
 #: assets/tasks/utils.py:16
 msgid "Asset has been disabled, skipped: {}"
@@ -7972,7 +7968,7 @@ msgstr "ユーザーグループの数"
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
-msgstr "コマンド量"
+msgstr "ゾーン数"
 
 #: orgs/serializers.py:16
 msgid "Gateways amount"
