@@ -40,8 +40,6 @@ def check_connection(token):
     token.is_valid(include_personal_secret=False)
     if token.type not in (ConnectionTokenType.USER, ConnectionTokenType.ADMIN):
         raise PermissionDenied('Only user and admin connection tokens support RDP token login')
-    if token.face_monitor_token:
-        raise PermissionDenied('Direct RDP token login does not support face monitoring')
     # Recheck even when is_valid takes its recent-token shortcut.
     account = token.get_permed_account()
     if (not account or account.date_expired <= timezone.now()

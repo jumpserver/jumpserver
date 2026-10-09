@@ -188,9 +188,9 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             api.check_connection(self.token)
         self.token.is_valid.assert_called_once_with(include_personal_secret=False)
 
-    def test_expired_permission_unsupported_token_and_monitoring_are_rejected(self):
+    def test_expired_permission_and_unsupported_connections_are_rejected(self):
         for changes in [
-            {'type': ConnectionTokenType.SUPER}, {'face_monitor_token': 'monitor'},
+            {'type': ConnectionTokenType.SUPER},
             {'connect_method_object': {'type': 'native'}},
             {'connect_method_object': {'type': 'applet', 'disabled': True}},
         ]:
