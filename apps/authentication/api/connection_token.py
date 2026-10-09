@@ -41,10 +41,10 @@ from common.utils import (
     random_string, get_logger, get_request_ip_or_data, is_uuid,
 )
 from common.utils.django import get_request_os
-from common.utils.http import is_true, is_false
+from common.utils.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
 from orgs.models import Organization
-from orgs.utils import get_org_from_request, tmp_to_org
+from orgs.utils import get_org_from_request, tmp_to_org, tmp_to_root_org
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
@@ -53,7 +53,7 @@ from .face import FaceMonitorContext
 from ..const import ConnectionTokenType
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
-from ..services import sign_connection_token_ssh_certificate
+from ..services.connection_token import get_connection_token_secret
 from ..utils import (
     get_effective_connect_options, should_use_oracle_sysdba,
 )
@@ -1255,98 +1255,38 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         if not request.user.has_perm(rbac_perm):
             raise PermissionDenied('Not allow to view secret')
 
+        from .rdp_login import is_tinker
+        if is_tinker(request.user):
+            raise PermissionDenied('Tinker must redeem its RDP login ticket to obtain credentials')
+
         token_id = request.data.get('id') or ''
         token = ConnectionToken.get_typed_connection_token(token_id)
         if not token:
             raise PermissionDenied('Token {} is not valid'.format(token))
-        requested_expire_now = request.data.get('expire_now', True)
-        try:
-            if token.personal_credential_id:
-                # Validate permissions and fetch the exact-version secret once.
-                # account_object reuses it on this request-local token instance.
-                token.is_valid(include_personal_secret=True)
-            else:
-                token.is_valid()
-            account = token.account_object
-        except Exception as error:
-            if token.personal_credential_id:
-                if isinstance(error, APIException):
-                    reason = get_personal_credential_failure_reason(error)
-                else:
-                    reason = error.__class__.__name__
-                record_personal_credential_audit(
-                    operation='use',
-                    result='failed',
-                    failure_reason=reason,
-                    user=token.user,
-                    asset=token.asset,
-                    credential_id=token.personal_credential_id,
-                    username=token.input_username,
-                    secret_type=token.input_secret_type,
-                    remote_addr=token.remote_addr,
-                    org_id=token.org_id,
-                )
-            raise
-        if account and account.secret_type == SecretType.SSH_CERTIFICATE:
-            certificate = sign_connection_token_ssh_certificate(
-                token, request.data.get('public_key', '')
-            )
-            # The certificate is public material, but returning it through the
-            # existing account credential field keeps the component contract
-            # compact. Koko pairs it with the private key generated in memory.
-            account.secret = certificate['signed_key']
-            token.ssh_certificate = {
-                key: value for key, value in certificate.items()
-                if key != 'signed_key'
-            }
-
-        serializer = self.get_serializer(instance=token)
-
-        expire_now = requested_expire_now
-        asset_type = token.asset.type
-        # 设置默认值
-        if asset_type in ['k8s', 'kubernetes']:
-            expire_now = False
-
-        if token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
-            logger.debug('Token is reusable, not expire now')
-        elif is_false(expire_now):
-            logger.debug('API specified, do not expire now')
-        else:
-            token.expire()
-
-        # expire_now=false still returns the secret. Audit every disclosure,
-        # while distinguishing Koko's inspection phase from final consumption.
-        if token.personal_credential_id:
-            record_personal_credential_audit(
-                operation='use',
-                result=(
-                    'inspected'
-                    if is_false(requested_expire_now)
-                    else 'success'
-                ),
-                user=token.user,
-                asset=token.asset,
-                credential_id=token.personal_credential_id,
-                username=token.input_username,
-                secret_type=token.input_secret_type,
-                remote_addr=token.remote_addr,
-                org_id=token.org_id,
-            )
-
-        ConnectionToken.objects.filter(pk=token.pk).update(date_last_used=timezone.now())
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(get_connection_token_secret(
+            token, self.get_serializer,
+            expire_now=request.data.get('expire_now', True),
+            public_key=request.data.get('public_key', ''),
+        ))
 
     @action(methods=['POST'], detail=False, url_path='applet-option')
-    def get_applet_info(self, *args, **kwargs):
-        token_id = self.request.data.get('id')
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        if token.is_expired:
-            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
-        data = token.get_applet_option()
-        serializer = ConnectTokenAppletOptionSerializer(data)
-        return Response(serializer.data)
+    def get_applet_info(self, request, *args, **kwargs):
+        from .rdp_login import issue_applet_ticket, private_response
+        from ..serializers.rdp_login import NonzeroUUIDField
+
+        user = request.user
+        terminal = getattr(user, 'terminal', None)
+        if (not user.is_service_account or not terminal
+                or terminal.type not in ('razor', 'koko', 'lion')
+                or not user.has_perm('authentication.view_superconnectiontoken')):
+            raise PermissionDenied()
+        token_id = NonzeroUUIDField().run_validation(request.data.get('id'))
+        with transaction.atomic(), tmp_to_root_org():
+            token = ConnectionToken.get_typed_connection_token(token_id)
+            if token is None:
+                raise PermissionDenied('Invalid connection token')
+            data = issue_applet_ticket(token)
+            return private_response(ConnectTokenAppletOptionSerializer(data).data)
 
     @action(methods=['POST'], detail=False, url_path='virtual-app-option')
     def get_virtual_app_info(self, *args, **kwargs):
@@ -1360,15 +1300,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):
-        lock_key = self.request.data.get('id')
-        released = ConnectionToken.release_applet_account(lock_key)
-
-        if released:
-            logger.debug('Release applet account success: {}'.format(lock_key))
-            return Response({'msg': 'released'})
-        else:
-            logger.error('Release applet account error: {}'.format(lock_key))
-            return Response({'error': 'not found or expired'}, status=400)
+        # Older components still send this after disconnect. Account ownership
+        # and safe reuse now follow the actual Windows session in Tinker.
+        return Response({'msg': 'released'})
 
 
 class AdminConnectionTokenViewSet(ConnectionTokenViewSet):

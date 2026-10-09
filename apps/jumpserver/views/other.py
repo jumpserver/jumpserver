@@ -79,10 +79,11 @@ class ResourceDownload(TemplateView):
     @lazyproperty
     def versions_content(self):
         more_downloads = os.environ.get('MORE_DOWNLOADS_URL', '')
-        default_versions = """
+        from terminal.const import TINKER_TARGET_VERSION
+        default_versions = f"""
         MRD_VERSION=10.6.7
         OPENSSH_VERSION=v9.4.0.0
-        TINKER_VERSION=v0.1.6
+        TINKER_VERSION={TINKER_TARGET_VERSION}
         VIDEO_PLAYER_VERSION=0.5.2
         CLIENT_VERSION=5.0.0
         """

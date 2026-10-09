@@ -5,6 +5,10 @@ from django.db.models import TextChoices, IntegerChoices
 from django.utils.translation import gettext_lazy as _
 
 
+TINKER_MIN_VERSION = 'v0.3.1'
+TINKER_TARGET_VERSION = 'v0.3.1'
+
+
 class RiskLevelChoices(IntegerChoices):
     accept = 0, _('Accept')
     warning = 4, _('Warning')

@@ -18,8 +18,8 @@ from ..models import ConnectionToken
 from ..utils import get_effective_connect_options
 
 __all__ = [
-    'ConnectionTokenSecretSerializer', 'ConnectTokenAppletOptionSerializer',
-    'ConnectTokenVirtualAppOptionSerializer',
+    'ConnectionTokenSecretSerializer',
+    'ConnectTokenAppletOptionSerializer', 'ConnectTokenVirtualAppOptionSerializer',
 ]
 
 
@@ -240,6 +240,18 @@ class ConnectTokenAppletOptionSerializer(serializers.Serializer):
     gateway = _ConnectionTokenGatewaySerializer(read_only=True)
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
     remote_app_option = serializers.JSONField(read_only=True)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Route virtual tickets to the local CP, not the host's AD domain.
+        # The Tinker installer configures the server's NLA requirement; leave
+        # transport negotiation to the existing platform/client settings.
+        for protocol in data['platform']['protocols']:
+            if protocol['name'] == 'rdp':
+                protocol['setting'] = {
+                    **(protocol.get('setting') or {}), 'ad_domain': 'localhost',
+                }
+        return data
 
 
 class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):

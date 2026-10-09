@@ -1,15 +1,19 @@
 import uuid
 
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
+from django_filters import rest_framework as filters
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.api import JMSBulkModelViewSet
+from common.drf.filters import BaseFilterSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
 from terminal.models import AppletHost, AppletHostDeployment
+from terminal.utils.tinker import get_tinker_version_status
 from terminal.serializers import (
     AppletHostSerializer, AppletHostDeploymentSerializer,
     AppletHostStartupSerializer, AppletSetupSerializer
@@ -23,10 +27,29 @@ from terminal.tasks import (
 __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 
 
+class AppletHostFilterSet(BaseFilterSet):
+    needs_attention = filters.BooleanFilter(method='filter_needs_attention', label=_('Needs attention'))
+
+    class Meta:
+        model = AppletHost
+        fields = ['name', 'address']
+
+    @staticmethod
+    def filter_needs_attention(queryset, name, value):
+        candidates = queryset.filter(is_active=True, date_synced__isnull=False)
+        versions = candidates.order_by().values_list('tinker_version', flat=True).distinct()
+        attention_versions = [
+            version for version in versions.iterator(chunk_size=200)
+            if get_tinker_version_status(version) in ('unknown', 'unsupported', 'newer')
+        ]
+        candidates = candidates.filter(tinker_version__in=attention_versions)
+        return candidates if value else queryset.exclude(pk__in=candidates.values('pk'))
+
+
 class AppletHostViewSet(JMSBulkModelViewSet):
     serializer_class = AppletHostSerializer
     queryset = AppletHost.objects.all()
-    filterset_fields = ['name', 'address']
+    filterset_class = AppletHostFilterSet
     search_fields = ['name', 'address']
     rbac_perms = {
         'generate_accounts': 'terminal.change_applethost',
@@ -46,14 +69,15 @@ class AppletHostViewSet(JMSBulkModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        instance.check_terminal_binding(request)
+        instance.check_terminal_binding(request, tinker_version=serializer.validated_data['version'])
         return Response({'msg': 'ok'})
 
     @action(methods=['put'], detail=True, url_path='generate-accounts')
     def generate_accounts(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.generate_accounts()
-        return Response({'msg': 'ok'})
+        return Response(
+            {'detail': 'Windows runtime accounts are managed locally by Tinker.'},
+            status=status.HTTP_410_GONE,
+        )
 
 
 class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
