@@ -437,13 +437,21 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         if not isinstance(value, str):
             return value
 
-        if not any(delimiter in value for delimiter in ('{{', '{%', '{#')):
+        has_overrides = value.startswith('#jinja2:')
+        if not has_overrides and not any(
+                delimiter in value for delimiter in ('{{', '{%', '{#')
+        ):
             return value
 
         # Escape every opening brace to prevent adjacent delimiters from
         # forming new expressions. A single pass also preserves literal text
         # that happens to contain the old temporary marker strings.
-        return value.replace('{', '{{ "{" }}')
+        escaped = value.replace('{', '{{ "{" }}')
+        # Ansible parses this header before rendering and can change the
+        # delimiters. Keep it literal so only the default syntax is active.
+        if has_overrides:
+            escaped = '{{ "#" }}' + escaped[1:]
+        return escaped
 
     def update_last_login_date(self):
         Account.objects.filter(pk=self.pk).update(date_last_login=timezone.now())
