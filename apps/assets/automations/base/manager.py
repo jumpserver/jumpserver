@@ -415,6 +415,8 @@ class PlaybookPrepareMixin:
         raise NotImplementedError
 
     def get_params(self, automation, method_type):
+        from accounts.models import Account
+
         method_attr = "{}_method".format(method_type)
         method_params = "{}_params".format(method_type)
         method_id = getattr(automation, method_attr)
@@ -428,7 +430,17 @@ class PlaybookPrepareMixin:
         if not data:
             data = automation_params.get(method_id, {})
         params = serializer(data).data
-        return params
+
+        def escape(value):
+            if isinstance(value, dict):
+                return {key: escape(item) for key, item in value.items()}
+            if isinstance(value, list):
+                return [escape(item) for item in value]
+            return Account.escape_jinja2_syntax(value)
+
+        # JSON inventory cannot preserve Ansible unsafe wrappers. Escape after
+        # serialization so task parameters and platform defaults stay literal.
+        return escape(params)
 
     @property
     def platform_automation_methods(self):

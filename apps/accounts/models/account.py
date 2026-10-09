@@ -430,16 +430,13 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         if not isinstance(value, str):
             return value
 
-        def escape(v):
-            v = v.replace('{{', '__TEMP_OPEN_BRACES__') \
-                .replace('}}', '__TEMP_CLOSE_BRACES__')
+        if not any(delimiter in value for delimiter in ('{{', '{%', '{#')):
+            return value
 
-            v = v.replace('__TEMP_OPEN_BRACES__', '{{ "{{" }}') \
-                .replace('__TEMP_CLOSE_BRACES__', '{{ "}}" }}')
-
-            return v.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
-
-        return escape(value)
+        # Escape every opening brace to prevent adjacent delimiters from
+        # forming new expressions. A single pass also preserves literal text
+        # that happens to contain the old temporary marker strings.
+        return value.replace('{', '{{ "{" }}')
 
     def update_last_login_date(self):
         Account.objects.filter(pk=self.pk).update(date_last_login=timezone.now())
