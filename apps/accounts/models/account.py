@@ -427,6 +427,13 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
 
     @staticmethod
     def escape_jinja2_syntax(value):
+        if isinstance(value, dict):
+            return {
+                key: Account.escape_jinja2_syntax(item)
+                for key, item in value.items()
+            }
+        if isinstance(value, list):
+            return [Account.escape_jinja2_syntax(item) for item in value]
         if not isinstance(value, str):
             return value
 

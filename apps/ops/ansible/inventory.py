@@ -304,7 +304,8 @@ class JMSInventory:
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': tp, 'category': category,
                 'protocol': protocol.name, 'port': protocol.port,
-                'spec_info': asset.spec_info, 'secret_info': secret_info,
+                'spec_info': account.escape_jinja2_syntax(asset.spec_info),
+                'secret_info': secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
                 'origin_address': asset.address
             },

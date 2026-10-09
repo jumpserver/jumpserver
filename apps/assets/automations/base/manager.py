@@ -431,16 +431,9 @@ class PlaybookPrepareMixin:
             data = automation_params.get(method_id, {})
         params = serializer(data).data
 
-        def escape(value):
-            if isinstance(value, dict):
-                return {key: escape(item) for key, item in value.items()}
-            if isinstance(value, list):
-                return [escape(item) for item in value]
-            return Account.escape_jinja2_syntax(value)
-
         # JSON inventory cannot preserve Ansible unsafe wrappers. Escape after
         # serialization so task parameters and platform defaults stay literal.
-        return escape(params)
+        return Account.escape_jinja2_syntax(params)
 
     @property
     def platform_automation_methods(self):
