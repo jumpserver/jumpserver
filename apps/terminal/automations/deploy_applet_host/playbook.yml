@@ -52,60 +52,10 @@
             include_management_tools: yes
           register: rds_install
 
-        # The new installer ends Tinker-managed sessions, uninstalls the old
-        # Tinker and clears its managed runtime state before installing afresh.
-        # Ordinary administrator sessions and installed applications are retained.
-        # Leave the new service stopped until fresh Core credentials are imported.
-        - name: Fully reinstall Tinker
-          ansible.windows.win_command:
-            argv:
-              - "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
-              - /VERYSILENT
-              - /SUPPRESSMSGBOXES
-              - /NORESTART
-              - /NOSTART=1
-
-        - name: Install the python-{{ PYTHON_VERSION }}
-          community.windows.win_unzip:
-            src: "{{ ansible_env.TEMP }}\\jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
-            dest: "%ProgramFiles%\\JumpServer\\applications"
-
-        - name: Check and Clean global system path (Python)
-          ansible.windows.win_path:
-            elements:
-              - 'C:\Program Files\Python310\Scripts'
-              - 'C:\Program Files\Python310'
-              - 'C:\Program Files\Python311\Scripts'
-              - 'C:\Program Files\Python311'
-            state: absent
-
-        - name: Set python-{{ PYTHON_VERSION }} on the global system path
-          ansible.windows.win_path:
-            elements:
-              - '%ProgramFiles%\JumpServer\applications\Python'
-              - '%ProgramFiles%\JumpServer\applications\Python\Scripts'
-
-        - name: Set python-{{ PYTHON_VERSION }} on the global system python path
-          ansible.windows.win_path:
-            name: PYTHONPATH
-            scope: machine
-            elements:
-              - '%ProgramFiles%\JumpServer\applications\Python\packages'
-              - '%ProgramFiles%\JumpServer\applications\Python\Lib\site-packages'
-
         - name: Reboot after RDS role installation if required
           ansible.windows.win_reboot:
             post_reboot_delay: 10
             test_command: whoami
-          when: rds_install.reboot_required
-
-        - name: Configure Tinker RDP settings after reboot
-          ansible.windows.win_powershell:
-            script: |
-              $ErrorActionPreference = 'Stop'
-              & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass `
-                -File "$env:SystemRoot\System32\config\systemprofile\AppData\Local\Tinker\native\rdp-settings.ps1"
-              if ($LASTEXITCODE -ne 0) { throw 'Unable to configure RDP for Tinker ticket login after reboot.' }
           when: rds_install.reboot_required
 
         - name: Check RDS session host connection capacity
@@ -140,6 +90,53 @@
               if ($listener[0].PolicySourceMaximumConnections -eq 1) {
                   Write-Output 'Review the effective Limit number of connections policy if more concurrent sessions are needed.'
               }
+          register: rds_ready
+          until: rds_ready is succeeded
+          retries: 30
+          delay: 10
+
+        # The new installer ends Tinker-managed sessions, uninstalls the old
+        # Tinker and clears its managed runtime state before installing afresh.
+        # Ordinary administrator sessions and installed applications are retained.
+        # Leave the new service stopped until fresh Core credentials are imported.
+        - name: Fully reinstall Tinker
+          ansible.windows.win_command:
+            argv:
+              - "{{ ansible_env.TEMP }}\\Tinker_Installer_{{ TINKER_VERSION }}.exe"
+              - /VERYSILENT
+              - /SUPPRESSMSGBOXES
+              - /NORESTART
+              - /NOSTART=1
+          async: 1200
+          poll: 5
+
+        - name: Install the python-{{ PYTHON_VERSION }}
+          community.windows.win_unzip:
+            src: "{{ ansible_env.TEMP }}\\jumpserver-tinker-python-{{ PYTHON_VERSION }}-win64.zip"
+            dest: "%ProgramFiles%\\JumpServer\\applications"
+
+        - name: Check and Clean global system path (Python)
+          ansible.windows.win_path:
+            elements:
+              - 'C:\Program Files\Python310\Scripts'
+              - 'C:\Program Files\Python310'
+              - 'C:\Program Files\Python311\Scripts'
+              - 'C:\Program Files\Python311'
+            state: absent
+
+        - name: Set python-{{ PYTHON_VERSION }} on the global system path
+          ansible.windows.win_path:
+            elements:
+              - '%ProgramFiles%\JumpServer\applications\Python'
+              - '%ProgramFiles%\JumpServer\applications\Python\Scripts'
+
+        - name: Set python-{{ PYTHON_VERSION }} on the global system python path
+          ansible.windows.win_path:
+            name: PYTHONPATH
+            scope: machine
+            elements:
+              - '%ProgramFiles%\JumpServer\applications\Python\packages'
+              - '%ProgramFiles%\JumpServer\applications\Python\Lib\site-packages'
 
         - name: Set explicitly configured RDS license server
           ansible.windows.win_regedit:
