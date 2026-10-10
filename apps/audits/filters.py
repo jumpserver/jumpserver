@@ -171,12 +171,12 @@ class OperateLogFilterSet(BaseFilterSet):
 
     @staticmethod
     def filter_resource_type(queryset, name, resource_type):
-        current_lang = translation.get_language()
-        with translation.override(current_lang):
-            mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
-        tp = mapper.get(resource_type)
-        queryset = queryset.filter(resource_type__in=[tp, resource_type])
-        return queryset
+        mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
+        raw_type = mapper.get(resource_type, resource_type)
+        # Logs may store the English translation rather than the msgid.
+        with translation.override('en'):
+            english_type = translation.gettext(raw_type)
+        return queryset.filter(resource_type__in=[raw_type, english_type, resource_type])
 
     class Meta:
         model = OperateLog
