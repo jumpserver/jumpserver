@@ -8321,6 +8321,10 @@ msgstr "许可证"
 msgid "Job audit"
 msgstr "作业审计"
 
+#: audits/models.py
+msgid "Ticket audit"
+msgstr "工单审计"
+
 #: rbac/tree.py:138
 msgid "JDMC console"
 msgstr "JDMC 控制台"

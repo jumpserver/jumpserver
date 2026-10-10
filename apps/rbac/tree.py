@@ -126,6 +126,7 @@ special_pid_mapper = {
     "report_node": "view_audit",
     "rbac.view_pam": "view_pam",
     'audits.usersession': 'view_audit',
+    'audits.ticketaudit': 'view_audit',
     "rbac.view_workbench": "view_workbench",
     "rbac.view_webterminal": "view_workbench",
     "rbac.view_filemanager": "view_workbench",
@@ -215,6 +216,7 @@ verbose_name_mapper = {
 
 xpack_nodes = [
     'xpack', 'tickets', 'gather_account_node',
+    'audits.ticketaudit',
     'applications.remoteapp', "assets.accountbackupplan",
     "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",
