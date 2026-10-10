@@ -1,23 +1,26 @@
 ARG VERSION=dev
+ARG MODELS_TAG=latest
 FROM jumpserver/gmssl:3.1.1-trixie AS gmssl-builder
 
+FROM registry.fit2cloud.com/jumpserver/core-models:${MODELS_TAG} AS build-models
 FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} AS build-xpack
 FROM jumpserver/core:${VERSION}-ce
 
 ARG INSIGHTFACE_MODEL_ROOT=/root/.insightface/models
-ARG INSIGHTFACE_MODEL_URL=https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip
 ENV INSIGHTFACE_MODEL_ROOT=${INSIGHTFACE_MODEL_ROOT}
 
 COPY requirements/download_face_models.py /opt/jumpserver/requirements/download_face_models.py
 
-RUN set -ex \
+# Copy in one layer, preserving both supported model-root directory layouts.
+RUN --mount=type=bind,from=build-models,source=/root/.insightface/models,target=/tmp/insightface-models \
+    set -ex \
+    && python -c 'import os, shutil, sys; from pathlib import Path; \
+sys.path.insert(0, "/opt/jumpserver/requirements"); \
+from download_face_models import model_directory; \
+shutil.copytree("/tmp/insightface-models", model_directory(Path(os.environ["INSIGHTFACE_MODEL_ROOT"])).parent, dirs_exist_ok=True)' \
     && python /opt/jumpserver/requirements/download_face_models.py \
         --model-root "${INSIGHTFACE_MODEL_ROOT}" \
-        --url "${INSIGHTFACE_MODEL_URL}" \
-    && python /opt/jumpserver/requirements/download_face_models.py \
-        --model-root "${INSIGHTFACE_MODEL_ROOT}" \
-        --check \
-    && rm -f "${INSIGHTFACE_MODEL_ROOT}/buffalo_l.zip"
+        --check
 
 COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
