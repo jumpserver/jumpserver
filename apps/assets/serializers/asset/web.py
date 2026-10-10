@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Web
-from assets.validators import normalize_web_origin, validate_web_script, web_xpack_fields
+from assets.const.web import WEB_ADVANCED_FIELDS
+from assets.validators import normalize_web_origin, validate_web_script
 from .common import AssetSerializer
 
 __all__ = ['WebSerializer']
@@ -57,15 +58,14 @@ class WebSerializer(AssetSerializer):
             fields['autofill'].choices = [
                 (key, label) for key, label in fields['autofill'].choices.items() if key != 'script'
             ]
+            for name in WEB_ADVANCED_FIELDS:
+                fields[name].read_only = True
         return fields
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        restricted = web_xpack_fields(attrs)
-        if restricted:
-            raise serializers.ValidationError({
-                field: _('A valid enterprise license is required.') for field in restricted
-            })
+        if not settings.XPACK_LICENSE_IS_VALID:
+            return attrs
         interactive = attrs.get('interactive_selector', getattr(self.instance, 'interactive_selector', ''))
         if interactive:
             kind, separator, value = interactive.partition('=')
@@ -76,7 +76,11 @@ class WebSerializer(AssetSerializer):
         return attrs
 
     def validate_script(self, value):
-        validate_web_script(value)
+        autofill = getattr(self, 'initial_data', {}).get(
+            'autofill', getattr(self.instance, 'autofill', 'basic')
+        )
+        if autofill == 'script':
+            validate_web_script(value)
         return value
 
     def to_internal_value(self, data):

@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from assets.models import Asset
-from assets.validators import web_xpack_fields
+from assets.const.web import WEB_ADVANCED_FIELDS
 from common.serializers import (
     WritableNestedModelSerializer, type_field_map, MethodSerializer,
     DictSerializer, create_serializer_class, ResourceLabelsMixin,
@@ -13,7 +13,7 @@ from common.serializers import (
 )
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import lazyproperty
-from ..const import Category, AllTypes, Protocol, SuMethodChoices
+from ..const import Category, AllTypes, Protocol, SuMethodChoices, FillType
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
 __all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer", "PlatformListSerializer"]
@@ -135,17 +135,36 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
             return default_field
 
         setting_fields = [{'name': k, **v} for k, v in setting_fields.items()]
-        if protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
-            for field in setting_fields:
-                if field['name'] == 'autofill':
-                    field['choices'] = [(key, label) for key, label in field['choices'] if key != 'script']
         name = '{}ProtocolSettingSerializer'.format(protocol.capitalize())
-        return create_serializer_class(name, setting_fields)()
+        serializer = create_serializer_class(name, setting_fields)()
+        if protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
+            serializer.fields['autofill'].choices = [
+                (key, label) for key, label in FillType.choices if key != 'script'
+            ]
+            for field in WEB_ADVANCED_FIELDS:
+                if field in serializer.fields:
+                    serializer.fields[field].read_only = True
+        return serializer
 
     def validate(self, cleaned_data):
         name = cleaned_data.get('name', getattr(self.instance, 'name', None))
-        if name in ('http', 'https') and web_xpack_fields(cleaned_data.get('setting', {})):
-            raise serializers.ValidationError({'setting': _('A valid enterprise license is required.')})
+        if settings.XPACK_LICENSE_IS_VALID or name not in ('http', 'https') or 'setting' not in cleaned_data:
+            return cleaned_data
+        value = cleaned_data['setting'].copy()
+        if 'autofill' in value:
+            field = serializers.ChoiceField(choices=[
+                (key, label) for key, label in FillType.choices if key != 'script'
+            ])
+            try:
+                field.run_validation(value['autofill'])
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({'setting': {'autofill': exc.detail}})
+        existing = getattr(self.instance, 'setting', {}) or {}
+        for field in WEB_ADVANCED_FIELDS:
+            value.pop(field, None)
+            if field in existing:
+                value[field] = existing[field]
+        cleaned_data['setting'] = value
         return cleaned_data
 
     def to_file_representation(self, data):
