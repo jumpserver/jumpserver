@@ -1,0 +1,35 @@
+# Build from the core repository root:
+# docker build -f Dockerfile-models -t jumpserver/core-models:buffalo_l-v0.7 .
+ARG ALPINE_VERSION=3.22
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS download-models
+
+ARG INSIGHTFACE_MODEL_URL=https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip
+ENV INSIGHTFACE_MODEL_ROOT=/root/.insightface/models
+
+RUN apk add --no-cache ca-certificates python3
+
+COPY requirements/download_face_models.py /tmp/download_face_models.py
+
+RUN set -eu; \
+    for attempt in 1 2 3; do \
+        if python3 /tmp/download_face_models.py \
+            --model-root "${INSIGHTFACE_MODEL_ROOT}" \
+            --url "${INSIGHTFACE_MODEL_URL}"; then \
+            break; \
+        fi; \
+        if [ "${attempt}" -eq 3 ]; then exit 1; fi; \
+        echo "Model download failed (attempt ${attempt}/3); retrying in 5 seconds"; \
+        sleep 5; \
+    done; \
+    python3 /tmp/download_face_models.py \
+        --model-root "${INSIGHTFACE_MODEL_ROOT}" --check; \
+    rm -f "${INSIGHTFACE_MODEL_ROOT}/buffalo_l.zip"; \
+    chmod -R a+rX "${INSIGHTFACE_MODEL_ROOT}"
+
+# Keep only the models and Alpine's basic file tools in the final image.
+# Dockerfile-ee can copy /root/.insightface/models from this image.
+FROM alpine:${ALPINE_VERSION}
+
+ENV INSIGHTFACE_MODEL_ROOT=/root/.insightface/models
+
+COPY --from=download-models /root/.insightface/models/ /root/.insightface/models/
