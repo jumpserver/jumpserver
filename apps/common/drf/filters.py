@@ -994,8 +994,8 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
             instance_model_class = apps.get_model(instance_app, instance_model)
             instance = instance_model_class.objects.get(id=instance_id)
             field_name = f"{to_model.__name__.lower()}s"  # eg: assets, users
-            queryset = getattr(instance, field_name).all()  # eg: login_asset_acl.users.all()
-            return queryset
+            related_queryset = getattr(instance, field_name).all()  # eg: login_asset_acl.users.all()
+            return queryset.filter(pk__in=related_queryset.values('pk'))
         except Exception as e:
             error = f"AttrRulesFilterBackend get_queryset_by_attr_rules_instance error: {e}"
             logger.error(error)

@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#. Django's single-field uniqueness validation message.
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(field_label)sが同じ%(model_name)sがすでに存在します。%(field_label)sを変更してください。"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -2215,6 +2220,10 @@ msgstr "資産名、アドレス、または ID"
 #: acls/api/connect_method.py:16 acls/models/connect_method.py:10
 msgid "Connect methods"
 msgstr "接続方法"
+
+#: acls/serializers/connect_method.py
+msgid "Select at least one connection method"
+msgstr "接続方法を少なくとも1つ選択してください"
 
 #: acls/apps.py:7
 msgid "App Acls"
