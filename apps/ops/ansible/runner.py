@@ -21,10 +21,11 @@ from .docker import (
 )
 from .exception import CommandInBlackListException
 from .interface import interface
+from .utils import escape_jinja2_syntax
 
 __all__ = [
     'AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner',
-    'neutralize_jinja2_syntax',
+    'escape_jinja2_syntax', 'neutralize_jinja2_syntax',
 ]
 
 

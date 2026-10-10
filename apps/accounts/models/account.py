@@ -387,7 +387,9 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         if not su_from.secret:
             return var
         if su_from.secret_type == SecretType.PASSWORD:
-            var['ansible_password'] = self.escape_jinja2_syntax(
+            from ops.ansible.utils import escape_jinja2_syntax
+
+            var['ansible_password'] = escape_jinja2_syntax(
                 su_from.secret
             )
         elif su_from.secret_type == SecretType.SSH_KEY:
@@ -420,26 +422,12 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         auth['ansible_become_method'] = become_method
         auth['ansible_become_user'] = self.username
         if password:
+            from ops.ansible.utils import escape_jinja2_syntax
+
             auth['ansible_become_password'] = (
-                self.escape_jinja2_syntax(password)
+                escape_jinja2_syntax(password)
             )
         return auth
-
-    @staticmethod
-    def escape_jinja2_syntax(value):
-        if not isinstance(value, str):
-            return value
-
-        def escape(v):
-            v = v.replace('{{', '__TEMP_OPEN_BRACES__') \
-                .replace('}}', '__TEMP_CLOSE_BRACES__')
-
-            v = v.replace('__TEMP_OPEN_BRACES__', '{{ "{{" }}') \
-                .replace('__TEMP_CLOSE_BRACES__', '{{ "}}" }}')
-
-            return v.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
-
-        return escape(value)
 
     def update_last_login_date(self):
         Account.objects.filter(pk=self.pk).update(date_last_login=timezone.now())

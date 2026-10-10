@@ -19,6 +19,7 @@ from assets.const import HostTypes
 from common.const import Status
 from common.db.utils import safe_atomic_db_connection
 from common.utils import get_logger
+from ops.ansible.utils import escape_jinja2_syntax
 
 logger = get_logger(__name__)
 
@@ -297,7 +298,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             'username': account.username,
             'full_username': account.full_username,
             'secret_type': secret_type,
-            'secret': account.escape_jinja2_syntax(new_secret),
+            'secret': escape_jinja2_syntax(new_secret),
             'private_key_path': private_key_path,
             'become': account.get_ansible_become_auth(),
         }
