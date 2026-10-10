@@ -51,9 +51,9 @@ RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=requirements/collections.yml,target=collections.yml \
     --mount=type=bind,source=requirements/static_files.sh,target=utils/static_files.sh \
     set -ex \
-    && pip install uv -i${PIP_MIRROR} \
+    && pip install uv -i${PIP_MIRROR} --extra-index-url https://pypi.org/simple/ \
     && uv venv \
-    && uv pip install -i${PIP_MIRROR} -r pyproject.toml \
+    && uv pip install -i${PIP_MIRROR} --extra-index-url https://pypi.org/simple/ -r pyproject.toml \
     && ln -sf $(pwd)/.venv /opt/py3 \
     && ansible-galaxy collection install -r collections.yml --force --ignore-certs \
     && bash utils/static_files.sh \

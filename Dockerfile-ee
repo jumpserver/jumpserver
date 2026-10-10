@@ -42,7 +42,7 @@ WORKDIR /opt/jumpserver
 ARG PIP_MIRROR=https://pypi.org/simple
 
 RUN set -ex \
-    && uv pip install -i${PIP_MIRROR} --group xpack \
+    && uv pip install -i${PIP_MIRROR} --extra-index-url https://pypi.org/simple/ --group xpack \
     && python -c "import cv2" \
     && rm -rf /root/.cache/
 
