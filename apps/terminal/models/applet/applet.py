@@ -62,9 +62,12 @@ class Applet(JMSBaseModel):
     @property
     def path(self) -> str:
         if self.builtin:
-            return os.path.join(settings.APPS_DIR, 'terminal', 'applets', self.name)
-        else:
-            return default_storage.path('applets/{}'.format(self.name))
+            path = os.path.join(settings.APPS_DIR, 'terminal', 'applets', self.name)
+            if os.path.isdir(path):
+                return path
+        # Builtin applets removed from a release may still be published on
+        # existing hosts. install_from_dir persists their packages in storage.
+        return default_storage.path('applets/{}'.format(self.name))
 
     @lazyproperty
     def readme(self) -> str:
