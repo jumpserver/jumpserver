@@ -90,10 +90,7 @@ class DownloadUploadMixin:
     @action(detail=True, methods=['get'])
     def download(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.builtin:
-            path = os.path.join(settings.APPS_DIR, 'terminal', 'applets', instance.name)
-        else:
-            path = default_storage.path('applets/{}'.format(instance.name))
+        path = instance.path
         if not os.path.exists(path):
             raise ValidationError({'error': _('Applet not found in path: {}').format(path)})
         zip_path = shutil.make_archive(path, 'zip', path)
