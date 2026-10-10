@@ -4497,6 +4497,10 @@ msgstr "查看"
 msgid "Create"
 msgstr "创建"
 
+#: audits/const.py
+msgid "Create file"
+msgstr "创建文件"
+
 #: audits/const.py:27 templates/_csv_import_export.html:8
 msgid "Export"
 msgstr "导出"
