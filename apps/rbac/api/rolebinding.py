@@ -54,7 +54,13 @@ class OrgRoleBindingViewSet(RoleBindingViewSet):
     permission_classes = [RBACPermission, IsValidLicenseForWriteAction]
 
     def _get_queryset(self):
-        return OrgRoleBinding.objects.root_all()
+        return OrgRoleBinding.objects.root_all().filter(scope='org')
+
+    def _get_page_again(self, page, model):
+        # The default manager excludes org bindings in the root organization.
+        ids = [str(obj.id) for obj in page]
+        queryset = self.get_queryset().filter(id__in=ids)
+        return queryset, ids
 
     def perform_bulk_create(self, serializer):
         validated_data = serializer.validated_data
