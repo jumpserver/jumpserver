@@ -79,8 +79,11 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         if model is None:
             return queryset
 
+        filterset_class = self.get_filterset_class(view, queryset)
         for param, values in request.query_params.lists():
             if "__" not in param:
+                continue
+            if filterset_class and param in filterset_class.base_filters:
                 continue
 
             field_name, lookup = param.rsplit("__", 1)

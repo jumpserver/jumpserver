@@ -159,6 +159,7 @@ class PasswordChangeLogFilterSet(BaseFilterSet):
 
 
 class OperateLogFilterSet(BaseFilterSet):
+    resource__icontains = drf_filters.CharFilter(field_name='resource', method='filter_resource')
     user = drf_filters.CharFilter(
         lookup_expr='iexact', label=_('User name')
     )
@@ -168,6 +169,14 @@ class OperateLogFilterSet(BaseFilterSet):
     resource_type = drf_filters.CharFilter(
         method='filter_resource_type', label=_('Resource type')
     )
+
+    @staticmethod
+    def filter_resource(queryset, name, value):
+        query = Q(resource__icontains=value)
+        for raw in ('Export all', 'Export only selected items', 'Export filtered'):
+            if value.casefold() in translation.gettext(raw).casefold():
+                query |= Q(resource=raw)
+        return queryset.filter(query)
 
     @staticmethod
     def filter_resource_type(queryset, name, resource_type):
