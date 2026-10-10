@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
-from rest_framework.exceptions import ValidationError
 
 from assets.const.web import WEB_ADVANCED_FIELDS
 from assets.models import Web, PlatformProtocol
@@ -46,55 +45,37 @@ class WebLicenseTests(SimpleTestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.validated_data, {'autofill': 'no'})
 
-    def test_platform_ignores_advanced_fields_and_preserves_existing_values(self):
-        invalid = {field: {'legacy': True} for field in WEB_ADVANCED_FIELDS}
+    def test_platform_accepts_advanced_configuration_without_license(self):
+        config = {'autofill': 'script', **self.advanced}
         for protocol in ('http', 'https'):
-            for existing in (None, PlatformProtocol(name=protocol, setting=self.advanced.copy())):
-                for with_request in (False, True):
-                    with self.subTest(protocol=protocol, existing=bool(existing), request=with_request):
-                        context = {'request': SimpleNamespace(query_params={'name': protocol})} if with_request else {}
-                        serializer = PlatformProtocolSerializer(
-                            instance=existing,
-                            data={'name': protocol, 'setting': {'autofill': 'no', **invalid}},
-                            context=context, partial=True,
-                        )
-                        self.assertTrue(serializer.is_valid(), serializer.errors)
-                        setting = serializer.validated_data['setting']
-                        self.assertEqual(setting['autofill'], 'no')
-                        for field in WEB_ADVANCED_FIELDS:
-                            if existing:
-                                self.assertEqual(setting[field], self.advanced[field])
-                            else:
-                                self.assertNotIn(field, setting)
+            for instance in (None, PlatformProtocol(name=protocol, setting={})):
+                with self.subTest(protocol=protocol, update=instance is not None):
+                    serializer = PlatformProtocolSerializer(
+                        instance=instance, data={'name': protocol, 'setting': config}, partial=True
+                    )
+                    self.assertTrue(serializer.is_valid(), serializer.errors)
+                    self.assertEqual(serializer.validated_data['setting'], config)
+        serializer = PlatformProtocolSerializer(
+            data=[{'name': 'http', 'setting': config}], many=True, partial=True
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data[0]['setting'], config)
 
-    def test_script_choice_is_rejected_without_license(self):
+    def test_platform_setting_choices_follow_license(self):
+        for licensed in (False, True, False):
+            with self.subTest(licensed=licensed), override_settings(XPACK_LICENSE_IS_VALID=licensed):
+                serializer = PlatformProtocolSerializer(context={
+                    'request': SimpleNamespace(query_params={'name': 'http'})
+                }).get_setting_serializer()
+                expected = {'no', 'basic', 'script'} if licensed else {'no', 'basic'}
+                self.assertEqual(set(serializer.fields['autofill'].choices), expected)
+                for name in ('script', 'success_selector', 'interactive_selector'):
+                    self.assertFalse(serializer.fields[name].read_only)
+
+    def test_asset_script_choice_is_rejected_without_license(self):
         serializer = WebSerializer(instance=Web(), data={'autofill': 'script'}, partial=True)
         self.assertFalse(serializer.is_valid())
         self.assertEqual(serializer.errors['autofill'][0].code, 'invalid_choice')
-        for protocol in ('http', 'https'):
-            serializer = PlatformProtocolSerializer(
-                data={'name': protocol, 'setting': {'autofill': 'script'}}, partial=True
-            )
-            self.assertFalse(serializer.is_valid())
-            self.assertEqual(serializer.errors['setting']['autofill'][0].code, 'invalid_choice')
-        serializer = PlatformProtocolSerializer(context={
-            'request': SimpleNamespace(query_params={'name': 'http'})
-        }).get_setting_serializer()
-        with self.assertRaises(ValidationError) as exc:
-            serializer.fields['autofill'].run_validation('script')
-        self.assertEqual(exc.exception.detail[0].code, 'invalid_choice')
-
-    def test_nested_platform_protocols_ignore_fields_and_reject_script_choice(self):
-        serializer = PlatformProtocolSerializer(data=[{
-            'name': 'http', 'setting': {'autofill': 'no', **self.advanced},
-        }], many=True, partial=True)
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        self.assertEqual(serializer.validated_data[0]['setting'], {'autofill': 'no'})
-        serializer = PlatformProtocolSerializer(data=[{
-            'name': 'http', 'setting': {'autofill': 'script', **self.advanced},
-        }], many=True, partial=True)
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(serializer.errors[0]['setting']['autofill'][0].code, 'invalid_choice')
 
     @override_settings(XPACK_LICENSE_IS_VALID=True)
     def test_licensed_asset_still_validates_and_accepts_advanced_fields(self):
