@@ -27,6 +27,13 @@ def escape_jinja2_syntax(value):
     return escaped
 
 
+def neutralize_jinja2_syntax(value):
+    """Treat user-supplied Ansible args as data, not templates."""
+    if not isinstance(value, str):
+        return value
+    return value.replace('{{', '{ {').replace('{%', '{ %')
+
+
 def get_ansible_task_log_path(task_id, create=True):
     from ops.utils import get_task_log_path
     return get_task_log_path(

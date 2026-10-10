@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from accounts.const import AutomationTypes
 from accounts.models import GatheredAccount, Account, AccountRisk, RiskChoice
+from accounts.utils import is_account_username_valid
 from common.const import ConfirmOrIgnore
 from common.decorators import bulk_create_decorator, bulk_update_decorator
 from common.utils import get_logger
@@ -346,6 +347,14 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         accounts = []
 
         for username, info in result.items():
+            # 源头过滤：远端采回的用户名可能包含 Jinja2 语法等非法字符，
+            # 直接丢弃，避免其入库后被账号自动化当作模板渲染（RCE）
+            if not is_account_username_valid(username):
+                logger.warning(
+                    "Drop gathered account with illegal username: "
+                    "asset=%s username=%r", asset.id, username
+                )
+                continue
             self.asset_usernames_mapper[str(asset.id)].add(username)
 
             d = {"asset": asset, "username": username, "remote_present": True, **info}

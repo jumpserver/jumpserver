@@ -21,19 +21,12 @@ from .docker import (
 )
 from .exception import CommandInBlackListException
 from .interface import interface
-from .utils import escape_jinja2_syntax
+from .utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 
 __all__ = [
     'AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner',
     'escape_jinja2_syntax', 'neutralize_jinja2_syntax',
 ]
-
-
-def neutralize_jinja2_syntax(value):
-    """Treat user-supplied Ansible args as data, not templates."""
-    if not isinstance(value, str):
-        return value
-    return value.replace('{{', '{ {').replace('{%', '{ %')
 
 
 class AdHocRunner:

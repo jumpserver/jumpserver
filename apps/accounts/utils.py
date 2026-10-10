@@ -80,6 +80,14 @@ def validate_account_username(value):
     return value
 
 
+def is_account_username_valid(value):
+    """采集等内部路径使用的布尔版用户名校验，不抛异常"""
+    if value is None:
+        return True
+    forbidden = get_account_username_forbidden_chars()
+    return not any(char in value for char in forbidden)
+
+
 def validate_ssh_key(ssh_key, passphrase=None):
     valid = validate_ssh_private_key(ssh_key, password=passphrase)
     if not valid:

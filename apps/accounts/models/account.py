@@ -381,14 +381,14 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
     def make_account_ansible_vars(self, su_from):
+        from ops.ansible.utils import escape_jinja2_syntax
+
         var = {
-            'ansible_user': su_from.username,
+            'ansible_user': escape_jinja2_syntax(su_from.username),
         }
         if not su_from.secret:
             return var
         if su_from.secret_type == SecretType.PASSWORD:
-            from ops.ansible.utils import escape_jinja2_syntax
-
             var['ansible_password'] = escape_jinja2_syntax(
                 su_from.secret
             )
@@ -420,10 +420,10 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             )
         auth['ansible_become'] = True
         auth['ansible_become_method'] = become_method
-        auth['ansible_become_user'] = self.username
-        if password:
-            from ops.ansible.utils import escape_jinja2_syntax
+        from ops.ansible.utils import escape_jinja2_syntax
 
+        auth['ansible_become_user'] = escape_jinja2_syntax(self.username)
+        if password:
             auth['ansible_become_password'] = (
                 escape_jinja2_syntax(password)
             )
