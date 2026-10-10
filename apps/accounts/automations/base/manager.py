@@ -19,7 +19,7 @@ from assets.const import HostTypes
 from common.const import Status
 from common.db.utils import safe_atomic_db_connection
 from common.utils import get_logger
-from ops.ansible.utils import escape_jinja2_syntax
+from ops.ansible.utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 
 logger = get_logger(__name__)
 
@@ -294,9 +294,9 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         secret_type = account.secret_type
         h['ssh_params'].update(self.get_ssh_params(new_secret, secret_type))
         h['account'] = {
-            'name': account.name,
-            'username': account.username,
-            'full_username': account.full_username,
+            'name': escape_jinja2_syntax(account.name),
+            'username': escape_jinja2_syntax(account.username),
+            'full_username': escape_jinja2_syntax(account.full_username),
             'secret_type': secret_type,
             'secret': escape_jinja2_syntax(new_secret),
             'private_key_path': private_key_path,
@@ -357,11 +357,11 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         for account in accounts:
             h = deepcopy(host)
-            h['name'] += '(' + account.username + ')'  # To distinguish different accounts
+            h['name'] += '(' + neutralize_jinja2_syntax(account.username) + ')'  # To distinguish different accounts
             self.inventory_account_mapper[h['name']] = account
             h['account'] = {
-                'username': account.username,
-                'full_username': account.full_username,
+                'username': escape_jinja2_syntax(account.username),
+                'full_username': escape_jinja2_syntax(account.full_username),
             }
 
             try:

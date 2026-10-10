@@ -108,7 +108,7 @@ class JMSInventory:
     def make_account_ansible_vars(self, asset, account, path_dir):
         username = self.get_username(asset, account)
         var = {
-            'ansible_user': username,
+            'ansible_user': escape_jinja2_syntax(username),
         }
         if not account.secret:
             return var
@@ -312,8 +312,8 @@ class JMSInventory:
             },
             'jms_account': {
                 'id': str(account.id),
-                'name': account.name,
-                'username': username,
+                'name': escape_jinja2_syntax(account.name),
+                'username': escape_jinja2_syntax(username),
                 'privileged': account.privileged,
                 'secret': escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
