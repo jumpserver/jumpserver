@@ -19,6 +19,11 @@ msgstr ""
 "X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://"
 "zhconvert.org\n"
 
+#. Django's single-field uniqueness validation message.
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "已存在相同%(field_label)s的%(model_name)s，請修改%(field_label)s。"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -2176,6 +2181,10 @@ msgstr "資產名稱、地址或 ID"
 #: acls/api/connect_method.py:16 acls/models/connect_method.py:10
 msgid "Connect methods"
 msgstr "連接方式"
+
+#: acls/serializers/connect_method.py
+msgid "Select at least one connection method"
+msgstr "請至少選擇一種連接方式"
 
 #: acls/apps.py:7
 msgid "App Acls"

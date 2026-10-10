@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from common.serializers.fields import JSONManyToManyField
 from common.serializers.mixin import CommonBulkModelSerializer
@@ -11,6 +12,14 @@ __all__ = ["ConnectMethodACLSerializer"]
 
 class ConnectMethodACLSerializer(BaseSerializer, CommonBulkModelSerializer):
     assets = JSONManyToManyField(label=_('Asset'), required=False)
+    connect_methods = serializers.ListField(
+        child=serializers.CharField(), required=True, allow_empty=False,
+        label=_('Connect methods'),
+        error_messages={
+            'required': _('Select at least one connection method'),
+            'empty': _('Select at least one connection method'),
+        },
+    )
 
     class Meta(BaseSerializer.Meta):
         model = ConnectMethodACL
