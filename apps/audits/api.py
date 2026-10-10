@@ -34,7 +34,10 @@ from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices, ActionChoices
-from .filters import UserSessionFilterSet, OperateLogFilterSet
+from .filters import (
+    UserLoginLogFilterSet, UserSessionFilterSet,
+    OperateLogFilterSet, ServiceAccessLogFilterSet,
+)
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession, IntegrationApplicationLog,
@@ -174,7 +177,7 @@ class UserLoginCommonMixin(ReportExportMixin):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['id', 'username', 'ip', 'city', 'type', 'status', 'mfa']
+    filterset_class = UserLoginLogFilterSet
     search_fields = ['id', 'username', 'ip', 'city']
 
 
@@ -362,8 +365,8 @@ class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['account', 'remote_addr', 'service_id']
-    search_fields = filterset_fields
+    filterset_class = ServiceAccessLogFilterSet
+    search_fields = ['account', 'remote_addr', 'service_id']
     ordering = ['-datetime']
 
 

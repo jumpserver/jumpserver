@@ -7,7 +7,9 @@ from rest_framework.compat import coreapi, coreschema
 from common.drf.filters import BaseFilterSet
 from common.sessions.cache import user_session_manager
 from orgs.utils import current_org
-from .models import UserSession, OperateLog
+from .models import (
+    UserLoginLog, UserSession, OperateLog, IntegrationApplicationLog,
+)
 
 __all__ = ['CurrentOrgMembersFilter']
 
@@ -37,6 +39,14 @@ class CurrentOrgMembersFilter(filters.BaseFilterBackend):
         return queryset
 
 
+class UserLoginLogFilterSet(drf_filters.FilterSet):
+    ip__icontains = drf_filters.CharFilter(field_name='ip', lookup_expr='icontains')
+
+    class Meta:
+        model = UserLoginLog
+        fields = ['id', 'username', 'ip', 'city', 'type', 'status', 'mfa']
+
+
 class UserSessionFilterSet(BaseFilterSet):
     is_active = drf_filters.BooleanFilter(method='filter_is_active')
     ip__icontains = drf_filters.CharFilter(method='filter_ip_contains')
@@ -57,6 +67,14 @@ class UserSessionFilterSet(BaseFilterSet):
     class Meta:
         model = UserSession
         fields = ['id', 'ip', 'city', 'type']
+
+
+class ServiceAccessLogFilterSet(drf_filters.FilterSet):
+    remote_addr__icontains = drf_filters.CharFilter(field_name='remote_addr', lookup_expr='icontains')
+
+    class Meta:
+        model = IntegrationApplicationLog
+        fields = ['account', 'remote_addr', 'service_id']
 
 
 class OperateLogFilterSet(BaseFilterSet):
