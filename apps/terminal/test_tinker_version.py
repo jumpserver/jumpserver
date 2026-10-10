@@ -409,6 +409,21 @@ class TinkerDeploymentTests(SimpleTestCase):
         retire.assert_not_called()
         discard.assert_called_once_with()
 
+    def test_rds_is_ready_before_provider_installation(self):
+        play = yaml.safe_load(Path(__file__).with_name('automations').joinpath('deploy_applet_host/playbook.yml').read_text())[0]
+        tasks = self.install_tasks(play)
+        names = [task.get('name', '') for task in tasks]
+        installer = names.index('Fully reinstall Tinker')
+        self.assertLess(names.index('Reboot after RDS role installation if required'), installer)
+        self.assertLess(names.index('Check RDS session host connection capacity'), installer)
+        rds = tasks[names.index('Check RDS session host connection capacity')]
+        self.assertEqual(rds['until'], f"{rds['register']} is succeeded")
+        self.assertGreater(rds['retries'], 0)
+        self.assertGreater(rds['delay'], 0)
+        self.assertLessEqual(rds['retries'] * rds['delay'], 300)
+        self.assertFalse(rds.get('ignore_errors', False))
+        self.assertGreaterEqual(tasks[installer]['async'], 1200)
+
     def test_application_retry_runs_only_application_playbook(self):
         self.manager.applet = None
         self.manager._run_playbook = Mock(return_value=SimpleNamespace(status='success'))
