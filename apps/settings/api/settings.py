@@ -287,6 +287,22 @@ class SettingsLogoApi(APIView):
         return serve(request, logo_path, document_root=document_root)
 
 
+class ClientCompatibilityView(APIView):
+    # This endpoint is used before login; stale cookies/tokens must not require authentication.
+    authentication_classes = ()
+    permission_classes = (AllowAny,)
+    throttle_classes = ()
+
+    def get(self, request, *args, **kwargs):
+        response = Response({
+            'schema_version': 1,
+            'core_version': settings.VERSION,
+            'min_client_version': settings.MIN_CLIENT_VERSION,
+        })
+        response['Cache-Control'] = 'no-store'
+        return response
+
+
 class ClientVersionView(APIView):
     permission_classes = (AllowAny,)
 
