@@ -20,7 +20,7 @@ __all__ = ["Job", "JobExecution", "JMSPermedInventory"]
 from simple_history.models import HistoricalRecords
 
 from accounts.models import Account
-from acls.models import CommandFilterACL, DataMaskingRule
+from acls.models import CommandFilterACL, DataMaskingRule, LoginAssetACL
 from assets.const import Protocol
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
@@ -68,6 +68,19 @@ def check_upload_permission(host, *, user, asset, account, **kwargs):
             'Asset ({asset}) authorization lacks upload permissions'
         ).format(asset=asset.name)
     return host
+
+
+def match_rejected_login_asset_acl(user, assets, account, ip=None):
+    for asset in assets:
+        acls = LoginAssetACL.filter_queryset(
+            user=user, asset=asset, account_username=account
+        )
+        acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
+        if not acl:
+            continue
+        if not acl.is_action(acl.ActionChoices.accept):
+            return asset, acl
+    return None, None
 
 
 def get_parent_keys(key, include_self=True):
@@ -604,6 +617,22 @@ class JobExecution(JMSOrgBaseModel):
             self.check_danger_keywords()
         if self.current_job.type == 'adhoc':
             self.check_command_acl()
+
+    def check_login_asset_acls(self, ip=None):
+        asset, acl = match_rejected_login_asset_acl(
+            self.creator, self.inventory.assets, self.current_job.runas, ip
+        )
+        if not asset:
+            return
+        print(
+            "\033[31mLogin to asset {}({}) is rejected by login asset ACL ({})\033[0m"
+            .format(asset.name, asset.address, acl)
+        )
+        raise Exception(
+            "Login to asset {}({}) is rejected by login asset ACL ({})".format(
+                asset.name, asset.address, acl
+            )
+        )
 
     def before_start(self):
         self.check_assets_perms()
