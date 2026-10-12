@@ -519,6 +519,11 @@ class JobExecution(JMSOrgBaseModel):
                         "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
                     }).publish_async()
+                    self.summary.update({
+                        'unexecuted': len(self.inventory.assets),
+                        'error_code': 'command_acl_rejected',
+                    })
+                    self.save(update_fields=['summary'])
                     raise Exception("command is rejected by ACL")
                 elif acl.is_action(CommandFilterACL.ActionChoices.warning):
                     command = {
