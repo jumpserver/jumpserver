@@ -14317,3 +14317,7 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "자산 로그인 ACL에서 추가 작업을 요구하므로 자격 증명을 검증할 수 없습니다."
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "알림 시간은 현재 시간보다 이후여야 합니다."

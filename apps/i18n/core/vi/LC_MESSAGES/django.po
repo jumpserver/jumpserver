@@ -14456,3 +14456,7 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "Không thể xác minh thông tin xác thực vì ACL đăng nhập tài sản yêu cầu một thao tác bổ sung."
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "Thời gian thông báo phải sau thời điểm hiện tại."
