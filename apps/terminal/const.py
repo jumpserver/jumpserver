@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 TINKER_MIN_VERSION = 'v0.3.1'
-TINKER_TARGET_VERSION = 'v0.3.1'
+TINKER_TARGET_VERSION = 'v0.3.2'
 
 
 class RiskLevelChoices(IntegerChoices):
