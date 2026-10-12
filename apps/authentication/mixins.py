@@ -726,7 +726,8 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
         LoginBlockUtil(user.username, ip).clean_failed_count()
         LoginIpBlockUtil(ip).clean_block_if_need()
-        MFABlockUtils(user.username, ip).clean_failed_count()
+        # A successful first factor must not reset failed MFA confirmation.
+        # mark_mfa_ok clears this state after an actual successful MFA check.
 
         self.mark_password_ok(user, False, auth_backend)
         return user
