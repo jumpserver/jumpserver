@@ -67,10 +67,13 @@ class AssetReviewExemptionTests(SimpleTestCase):
             with patch('time.time', return_value=started):
                 with transaction.atomic():
                     LoginAssetACL.cache_approved_review(self.ticket)
-            self.acl.review_duration = 0
             with patch('time.time', return_value=started + 7199):
                 self.assertTrue(self.acl.is_review_exempt(self.user, self.asset, 'root'))
+                self.acl.review_duration = 0
+                self.assertEqual(cache.get(self.key), str(self.ticket.id))
+                self.assertFalse(self.acl.is_review_exempt(self.user, self.asset, 'root'))
             with patch('time.time', return_value=started + 7200):
+                self.assertIsNone(cache.get(self.key))
                 self.assertFalse(self.acl.is_review_exempt(self.user, self.asset, 'root'))
 
     def test_cache_is_scoped_to_org_acl_user_asset_and_actual_username(self):
