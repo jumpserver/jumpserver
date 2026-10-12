@@ -46,7 +46,7 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
                  TicketApplySerializer.Meta.fields_m2m + writeable_fields + read_only_fields
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
-            'apply_accounts': {'required': False},
+            'apply_accounts': {'required': True},
             'apply_date_start': {'required': True, 'allow_null': False},
             'apply_date_expired': {'required': True, 'allow_null': False},
         }
