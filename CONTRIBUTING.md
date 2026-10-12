@@ -29,3 +29,28 @@ When reporting issues, always include:
 Because the issues are open to the public, when submitting files, be sure to remove any sensitive information, e.g. user name, password, IP address, and company name. You can
 replace those parts with "REDACTED" or other strings like "****".
 
+
+## Desktop client compatibility
+
+Core represents the entire server release: Koko, Chen and Kael ship together with it.
+Before changing a desktop-facing API, authentication, session, protocol or connector
+contract, the developer must decide whether old clients still work and the reviewer
+must check that decision. A breaking change in any server component raises
+`MIN_CLIENT_VERSION` in `apps/jumpserver/settings/base.py`; ordinary compatible
+releases leave it unchanged. Luna similarly maintains `MIN_CORE_VERSION`.
+Both initial minimums are `v5.1.0` and both comparisons must pass before connecting.
+Do not reuse an already released version number to claim the new mechanism exists.
+
+Anonymous `GET /api/v1/settings/client/compatibility/` returns schema version 1,
+the build-injected `settings.VERSION`, and `MIN_CLIENT_VERSION`, with `no-store`.
+Define and inject version values with a single `v` prefix. The API returns them
+unchanged, including patch, prerelease and LTS suffixes.
+Keep `/api/v1/settings/client/versions/` unchanged for legacy clients. Display
+versions (`CURRENT_VERSION`) and download metadata (`CLIENT_VERSION`) are not
+compatibility versions. Core's development version defaults to `v5.1.0`; Luna's
+package versions remain `5.1.0`. Release builds still inject their actual versions.
+No per-component matrix, automatic updater or automated compatibility gate is used.
+
+Run `python apps/manage.py test jumpserver.tests.test_client_compatibility` in the
+configured development environment. Review the matching Luna desktop checks and
+verify both version boundaries when changing either minimum.
