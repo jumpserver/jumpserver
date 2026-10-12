@@ -377,8 +377,8 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         return self.history.count()
 
     def get_su_from_accounts(self):
-        """ 排除自己和以自己为 su-from 的账号 """
-        return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
+        """ 资产账号及加入的目录服务账号，排除自己和以自己为 su-from 的账号 """
+        return self.asset.all_accounts.exclude(id=self.id).exclude(su_from=self)
 
     def make_account_ansible_vars(self, su_from):
         from ops.ansible.utils import escape_jinja2_syntax

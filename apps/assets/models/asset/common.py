@@ -311,6 +311,16 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
         queryset = self.accounts.model.objects.filter(asset__in=[*self.joined_dir_svcs])
         return queryset
 
+    def find_account(self, username, secret_type=None):
+        """ 按用户名查找可用账号，同名时优先资产自身账号，其次是加入的目录服务账号 """
+        lookup = {'username': username}
+        if secret_type:
+            lookup['secret_type'] = secret_type
+        account = self.accounts.filter(**lookup).first()
+        if account is None:
+            account = self.dc_accounts.filter(**lookup).first()
+        return account
+
     @lazyproperty
     def all_valid_accounts(self):
         queryset = (self.all_accounts.filter(is_active=True)

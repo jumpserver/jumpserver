@@ -149,7 +149,7 @@ class AccountViewSet(OrgBulkModelViewSet):
             accounts = account.get_su_from_accounts()
         elif asset_id:
             asset = get_object_or_404(Asset, pk=asset_id)
-            accounts = asset.accounts.all()
+            accounts = asset.all_accounts
         else:
             accounts = Account.objects.none()
         accounts = self.filter_queryset(accounts)

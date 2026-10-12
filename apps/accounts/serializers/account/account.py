@@ -459,7 +459,7 @@ class AssetAccountBulkSerializer(
         if template:
             su_from = template.get_su_from_account(asset)
         elif su_from_username:
-            su_from = asset.accounts.filter(username=su_from_username).first()
+            su_from = asset.find_account(su_from_username)
         validated_data['su_from'] = su_from
 
     def perform_create(self, vd, handler):
