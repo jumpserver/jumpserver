@@ -14643,3 +14643,12 @@ msgstr "La vérification des identifiants est indisponible car l’ACL de connex
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "L’heure de notification doit être postérieure à l’heure actuelle."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "L’autorisation d’accès à l’actif va bientôt expirer"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Date et heure d’expiration"

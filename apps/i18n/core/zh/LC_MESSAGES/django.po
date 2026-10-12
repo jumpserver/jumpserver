@@ -14198,3 +14198,12 @@ msgstr "仅适用于从模板创建的账号，凭据从当前模板读取。"
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "提醒时间必须晚于当前时间。"
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "资产授权即将到期"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "到期时间"

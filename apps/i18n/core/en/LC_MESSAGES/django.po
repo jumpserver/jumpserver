@@ -14443,3 +14443,12 @@ msgstr "Credential verification is unavailable because the asset login ACL requi
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "The notice time must be in the future."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "Asset permission is about to expire"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Expiration time"

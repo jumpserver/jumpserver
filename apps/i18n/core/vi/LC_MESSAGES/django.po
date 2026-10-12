@@ -14460,3 +14460,12 @@ msgstr "Không thể xác minh thông tin xác thực vì ACL đăng nhập tài
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "Thời gian thông báo phải sau thời điểm hiện tại."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "Quyền truy cập tài sản sắp hết hạn"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Thời gian hết hạn"
