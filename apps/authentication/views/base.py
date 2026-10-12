@@ -57,10 +57,17 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
                 username=user_attr['username'], defaults=user_attr
             )
 
+            identity_field = f'{self.user_type}_id'
+            if not create and getattr(user, identity_field, None) != user_id:
+                return None, (
+                    self.msg_client_err,
+                    _('This username already exists. Please bind the account after logging in.')
+                )
+
             if not check_only_allow_exist_user_auth(create):
                 return user, (self.msg_client_err, self.request.error_message)
 
-            setattr(user, f'{self.user_type}_id', user_id)
+            setattr(user, identity_field, user_id)
             if create:
                 setattr(user, 'source', self.user_type)
                 bind_user_to_org_role(user)
