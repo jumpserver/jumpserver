@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from types import SimpleNamespace
+
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
@@ -189,6 +191,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         self.prepare_openbao_mount_change(serializer)
+        self.prepare_ssh_ca_config(serializer)
         post_data_names = list(self.request.data.keys())
         settings_items = self.parse_serializer_data(serializer)
         serializer_data = getattr(serializer, 'data', {})
@@ -207,6 +210,24 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         self.send_signal(serializer)
         if self.request.query_params.get('category') == User.Source.ldap.value:
             self.clean_ldap_user_dn_cache()
+
+    def prepare_ssh_ca_config(self, serializer):
+        if self.request.query_params.get('category') != 'ssh_ca':
+            return
+
+        data = {**self.get_object(), **serializer.validated_data}
+        if not data.get('SSH_CA_ENABLED'):
+            return
+        if not data.get('SSH_CA_OPENBAO_TOKEN'):
+            data['SSH_CA_OPENBAO_TOKEN'] = settings.SSH_CA_OPENBAO_TOKEN
+        data['SSH_CA_OPENBAO_CACERT_FILE'] = settings.SSH_CA_OPENBAO_CACERT_FILE
+
+        from authentication.services import get_ssh_ca_client
+
+        client = get_ssh_ca_client(SimpleNamespace(**data))
+        ok, error = client.is_active(ttl=data['SSH_CA_OPENBAO_TTL'])
+        if not ok:
+            raise ValidationError({'SSH_CA_OPENBAO_MOUNT_POINT': error})
 
     def prepare_openbao_mount_change(self, serializer):
         if self.request.query_params.get('category') != 'openbao':

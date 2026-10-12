@@ -38,8 +38,9 @@ class SSHCAOpenBaoTestingAPI(GenericAPIView):
         return SimpleNamespace(**data)
 
     def post(self, request):
-        client = get_ssh_ca_client(self.get_config(request))
-        ok, error = client.is_active()
+        config = self.get_config(request)
+        client = get_ssh_ca_client(config)
+        ok, error = client.is_active(ttl=config.SSH_CA_OPENBAO_TTL)
         if not ok:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
