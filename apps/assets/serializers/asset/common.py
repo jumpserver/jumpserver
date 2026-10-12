@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.conf import settings
 from django.db.models import F
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _
@@ -124,6 +125,30 @@ class AssetAccountSerializer(AccountSerializer):
 
 
 class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
+    def to_representation(self, instance):
+        from authentication.const import ConfirmType
+        from authentication.permissions import UserConfirmation
+        from common.exceptions import UserConfirmRequired
+
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        allowed = bool(user and user.is_authenticated and user.is_valid
+                       and user.has_perm('accounts.view_accountsecret')
+                       and not getattr(settings, 'SECURITY_DISABLE_VIEW_SECRET', False))
+        # Authenticated component accounts need this credential to open gateway
+        # connections; interactive users follow the dedicated secret-read policy.
+        if allowed and not user.is_service_account:
+            allowed = settings.SECURITY_ACCOUNT_SECRET_READ
+            if allowed:
+                try:
+                    allowed = UserConfirmation.require(ConfirmType.MFA)().has_permission(request, None)
+                except UserConfirmRequired:
+                    allowed = False
+        data = super().to_representation(instance)
+        if not allowed and 'secret' in data:
+            data['secret'] = '<REDACTED>'
+        return data
+
     class Meta:
         model = Account
         fields = [
