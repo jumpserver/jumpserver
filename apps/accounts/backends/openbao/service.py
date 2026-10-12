@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import hashlib
 import time
 from tempfile import NamedTemporaryFile
 from urllib.parse import quote
@@ -291,7 +292,7 @@ class OpenBaoSSHCAClient(OpenBaoKVClient):
 
     def __init__(
             self, addr=None, token='', mount_point='ssh-client-signer',
-            role='jumpserver', timeout=10, verify_tls=True,
+            role='jumpserver', timeout=10, verify_tls=True, ca_cert_file='',
     ):
         super().__init__(
             addr=addr,
@@ -299,22 +300,129 @@ class OpenBaoSSHCAClient(OpenBaoKVClient):
             mount_point=mount_point,
             timeout=timeout,
             verify_tls=verify_tls,
+            ca_cert_file=ca_cert_file,
         )
         self.role = (role or 'jumpserver').strip('/')
 
-    def is_active(self):
+    def is_active(self, ttl=300):
         try:
             self._check_health()
             self._request(
                 'GET', '/v1/auth/token/lookup-self', expected_statuses=(200,)
             )
-            public_key = self.get_public_key()
+            public_key = self.ensure_configured(ttl=ttl)
             if not public_key:
                 raise OpenBaoAPIError('OpenBao SSH CA public key is empty')
         except Exception as e:
             logger.error(str(e))
             return False, f'OpenBao SSH CA is not available: {e}'
         return True, ''
+
+    def ensure_configured(self, ttl=300):
+        """Initialize missing SSH mounts, CAs and roles without replacing them."""
+        from common.utils.lock import DistributedLock
+
+        key = hashlib.sha256(f'{self.addr}\0{self.mount_point}'.encode()).hexdigest()
+        lock = DistributedLock(f'openbao-ssh-ca:{key}')
+        if not lock.acquire(timeout=self.timeout):
+            raise OpenBaoAPIError('Another request is initializing this OpenBao SSH CA')
+        try:
+            return self._ensure_configured(ttl)
+        finally:
+            lock.release()
+
+    def _get_existing_public_key(self):
+        try:
+            return self.get_public_key()
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) == 404 or (
+                getattr(e, 'status_code', None) == 400 and
+                str(e) == 'no default issuer currently configured'
+            ):
+                return ''
+            raise
+
+    def _ensure_configured(self, ttl):
+        mount_point = quote(self.mount_point, safe='')
+        role = quote(self.role, safe='')
+        public_key = self._get_existing_public_key()
+
+        if not public_key:
+            try:
+                mount = self._configuration_request('GET', f'/v1/sys/mounts/{mount_point}')
+            except OpenBaoAPIError as e:
+                missing = (
+                    getattr(e, 'status_code', None) == 404 or
+                    (getattr(e, 'status_code', None) == 400 and
+                     str(e).startswith('No secret engine mount at '))
+                )
+                if not missing:
+                    raise
+                self._configuration_request(
+                    'POST', f'/v1/sys/mounts/{mount_point}',
+                    json={'type': 'ssh'}, expected_statuses=(200, 204),
+                )
+            else:
+                if mount.get('data', {}).get('type') != 'ssh':
+                    raise OpenBaoAPIError(
+                        f'The mount point {self.mount_point} is not an SSH secrets engine'
+                    )
+
+            # Recheck before generating a CA, so a retry keeps any existing key.
+            public_key = self._get_existing_public_key()
+            if not public_key:
+                try:
+                    issuers = self._configuration_request('LIST', f'/v1/{mount_point}/issuers')
+                except OpenBaoAPIError as e:
+                    if getattr(e, 'status_code', None) != 404:
+                        raise
+                    issuers = {}
+                if issuers.get('data', {}).get('keys'):
+                    raise OpenBaoAPIError(
+                        f'The SSH mount {self.mount_point} already has CA issuers. '
+                        'Configure a default issuer before using it.'
+                    )
+                self._configuration_request(
+                    'POST', f'/v1/{mount_point}/config/ca',
+                    json={'generate_signing_key': True},
+                )
+                public_key = self.get_public_key()
+
+        try:
+            self._configuration_request('GET', f'/v1/{mount_point}/roles/{role}')
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) != 404:
+                raise
+            self._configuration_request(
+                'POST', f'/v1/{mount_point}/roles/{role}',
+                json={
+                    'key_type': 'ca',
+                    'algorithm_signer': 'default',
+                    'allow_user_certificates': True,
+                    'allowed_users': '*',
+                    'allow_user_key_ids': True,
+                    'allowed_extensions': 'permit-pty,permit-port-forwarding',
+                    'allowed_critical_options': 'source-address',
+                    'ttl': f'{int(ttl)}s',
+                    'max_ttl': '1h',
+                }, expected_statuses=(200, 204),
+            )
+        return public_key
+
+    def _configuration_request(self, method, path, **kwargs):
+        try:
+            return self._request(method, path, **kwargs)
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) != 403:
+                raise
+            error = OpenBaoAPIError(
+                f'The OpenBao token cannot initialize SSH CA at {self.mount_point}. '
+                f'Grant read/create/update access to sys/mounts/{self.mount_point}, '
+                f'{self.mount_point}/config/ca and {self.mount_point}/roles/{self.role}, '
+                f'and list access to {self.mount_point}/issuers.'
+            )
+            error.status_code = 403
+            raise error from e
 
     def get_public_key(self):
         mount_point = quote(self.mount_point, safe='')

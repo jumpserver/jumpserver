@@ -239,6 +239,12 @@ REDIS_PORT: 6379
 # SSH_CA_ENABLED: false
 # SSH_CA_OPENBAO_ADDR: http://openbao:8200
 # SSH_CA_OPENBAO_TOKEN:
+# Testing or saving enabled SSH CA settings creates missing SSH engines, CAs
+# and signing roles. The token needs read/create/update access to
+# sys/mounts/<mount>, <mount>/config/ca and <mount>/roles/<role>, as well as
+# list access to <mount>/issuers, read to auth/token/lookup-self, and
+# create/update to <mount>/sign/<role>.
+# Existing CAs and roles are preserved. Trust a newly created CA on target hosts.
 # SSH_CA_OPENBAO_MOUNT_POINT: ssh-client-signer
 # SSH_CA_OPENBAO_ROLE: jumpserver
 # SSH_CA_OPENBAO_TTL: 300
