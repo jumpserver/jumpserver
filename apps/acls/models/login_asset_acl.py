@@ -33,6 +33,8 @@ class LoginAssetACL(UserAssetAccountBaseACL):
     def is_review_exempt(self, user, asset, account_username):
         if not self.is_active or not self.is_action(self.ActionChoices.review):
             return False
+        if not self.review_duration:
+            return False
         key = self.get_review_cache_key(user.id, asset.id, account_username)
         try:
             return cache.get(key) is not None
