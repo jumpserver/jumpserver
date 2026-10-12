@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 import datetime
+import json
 from typing import Callable
 
 import sshpubkeys
@@ -287,7 +288,7 @@ class AuthMixin:
         return False
 
     def cache_login_password_if_need(self, password):
-        from common.utils import signer
+        from common.utils.crypto import get_aes_crypto
 
         if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
             return
@@ -300,19 +301,50 @@ class AuthMixin:
         ttl = settings.CACHE_LOGIN_PASSWORD_TTL
         if not isinstance(ttl, int) or ttl <= 0:
             return
-        secret = signer.sign(password)
-        cache.set(key, secret, ttl)
+        payload = json.dumps({'user_id': str(self.id), 'password': password})
+        secret = 'aes-gcm:v1:' + get_aes_crypto(mode='GCM').encrypt(payload)
+        with cache.lock(f'login-password-{self.id}', expire=10, auto_renewal=True):
+            cache.set(key, secret, ttl)
 
     def get_cached_password_if_has(self):
         from common.utils import signer
+        from common.utils.crypto import get_aes_crypto
 
         if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
             return ""
         key = self.sect_cache_tpl.format(self.id)
+        with cache.lock(f'login-password-{self.id}', expire=10, auto_renewal=True):
+            return self._get_cached_password(key, signer, get_aes_crypto(mode='GCM'))
+
+    def _get_cached_password(self, key, signer, cipher):
         secret = cache.get(key)
         if not secret:
             return ""
+        if isinstance(secret, str) and secret.startswith('aes-gcm:v1:'):
+            try:
+                payload = json.loads(cipher.decrypt(secret[len('aes-gcm:v1:'):]))
+                if payload.get('user_id') == str(self.id) and isinstance(payload.get('password'), str):
+                    return payload['password']
+            except Exception:
+                pass
+            cache.delete(key)
+            return ''
+
+        # Preserve existing dynamic-account sessions while upgrading old signed
+        # entries in place. Keep their remaining TTL rather than extending it.
+        if not isinstance(secret, str):
+            cache.delete(key)
+            return ''
         password = signer.unsign(secret)
+        if not isinstance(password, str):
+            cache.delete(key)
+            return ''
+        ttl = cache.ttl(key)
+        if ttl is None or ttl <= 0:
+            cache.delete(key)
+            return ''
+        payload = json.dumps({'user_id': str(self.id), 'password': password})
+        cache.set(key, 'aes-gcm:v1:' + cipher.encrypt(payload), ttl)
         return password
 
     @staticmethod
