@@ -199,6 +199,11 @@ msgstr ""
 "Không tìm thấy tài khoản, tài khoản không hoạt động hoặc không đủ điều kiện "
 "cho tác vụ này"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "Không thể xác định tên đăng nhập (ID tài khoản: %(account_id)s)"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""

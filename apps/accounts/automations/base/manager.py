@@ -393,18 +393,44 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         missing_account_ids = (
             set(map(str, self.account_ids)) - self.found_account_ids
         )
+        if not missing_account_ids:
+            return runners
+
+        # Resolve display metadata without the eligibility filters that
+        # excluded these accounts from the inventory.
+        missing_accounts = {
+            str(account.id): account
+            for account in Account.objects.filter(
+                id__in=missing_account_ids
+            ).select_related('asset').only(
+                'id', 'username', 'asset__name', 'asset__address'
+            )
+        }
         for account_id in sorted(missing_account_ids):
             self.clear_account_queue_status(account_id)
+            account = missing_accounts.get(account_id)
+            username = account.username if account else ''
+            account_label = username or str(_(
+                'Unable to resolve username (account ID: %(account_id)s)'
+            ) % {'account_id': account_id})
+            host_label = account_label
+            if account:
+                host_label = (
+                    f'{self.format_asset_label(account.asset)} / {account_label}'
+                )
+            if username:
+                host_label += f' (ID: {account_id})'
             error = str(_(
                 'Account not found, inactive, or not eligible for this task'
             ))
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
-                'asset': '',
-                'username': account_id,
+                'asset': str(account.asset) if account else '',
+                'username': account_label,
+                'account_id': account_id,
                 'error': error,
             })
-            self.print_inventory_host_error(account_id, error)
+            self.print_inventory_host_error(host_label, error)
         return runners
 
     @staticmethod

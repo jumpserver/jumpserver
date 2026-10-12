@@ -197,6 +197,11 @@ msgstr "Le compte est déjà en cours de traitement, ignoré : %(account)s"
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "Compte introuvable, inactif, ou non éligible pour cette tâche"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "Impossible de déterminer le nom d'utilisateur (ID du compte : %(account_id)s)"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""

@@ -200,6 +200,11 @@ msgstr ""
 "Account does not exist, is disabled, or does not meet the conditions for "
 "this task"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "Unable to resolve username (account ID: %(account_id)s)"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
