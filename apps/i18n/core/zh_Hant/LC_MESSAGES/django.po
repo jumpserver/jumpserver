@@ -199,6 +199,11 @@ msgstr "帳號正在處理中，已跳過：%(account)s"
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "帳號不存在、已停用或不符合此任務的條件"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "無法解析使用者名稱（帳號 ID：%(account_id)s）"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
