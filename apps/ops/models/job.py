@@ -518,6 +518,9 @@ class JobExecution(JMSOrgBaseModel):
                         "input": self.material,
                         "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
+                        "source": _('Quick command') if self.current_job.instant else _('Job'),
+                        "reason": _('Matched a command filter policy'),
+                        "_cmd_filter_acl": acl,
                     }).publish_async()
                     self.summary.update({
                         'unexecuted': len(self.inventory.assets),
@@ -561,6 +564,8 @@ class JobExecution(JMSOrgBaseModel):
                 "input": self.material,
                 "risk_level": RiskLevelChoices.reject,
                 "user": self.creator,
+                "source": _('Quick command') if self.current_job.instant else _('Job'),
+                "reason": _('Matched the job center command blacklist'),
             }).publish_async()
             raise CommandInBlackListException(
                 "Command is rejected by black list: {}".format(self.current_job.args))

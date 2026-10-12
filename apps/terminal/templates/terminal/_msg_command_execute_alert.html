@@ -1,16 +1,15 @@
 {% load i18n %}
+{% spaceless %}
 
 <div>
 {% for item, value in items.items %}
-    <span class="cmd-item">
-        <b>{{ item }}:</b> {{ value }}
-    </span>
+    {% if value %}
+    <span class="cmd-item"><b>{{ item }}:</b> {{ value }}</span>
     <br />
+    {% endif %}
 {% endfor %}
     <b>{% trans 'Command' %}: </b><br />
-    <pre>
-{{ command }}
-    </pre>
+    <span style="white-space: pre-wrap;">{{ command|linebreaksbr }}</span>
 </div>
 <div>
     <b>{% trans 'Assets' %}:</b><br>
@@ -22,3 +21,4 @@
         {% endfor %}
     </ul>
 </div>
+{% endspaceless %}
