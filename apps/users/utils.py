@@ -116,6 +116,21 @@ def check_password_rules(password, is_org_admin=False):
     return bool(match_obj)
 
 
+def incr_failed_count_atomic(key, timeout):
+    # Keep the existing sliding expiry without a read/modify/write counter race.
+    for attempt in range(3):
+        cache.add(key, 0, timeout)
+        try:
+            count = cache.incr(key)
+        except ValueError:
+            # Expiry or a concurrent successful authentication may remove the key.
+            if attempt == 2:
+                raise
+            continue
+        cache.touch(key, timeout)
+        return count
+
+
 class BlockUtil:
     BLOCK_KEY_TMPL: str
 
@@ -151,9 +166,7 @@ class BlockUtilBase:
 
     def incr_failed_count(self) -> int:
         limit_key = self.limit_key
-        count = cache.get(limit_key, 0)
-        count += 1
-        cache.set(limit_key, count, self.key_ttl)
+        count = incr_failed_count_atomic(limit_key, self.key_ttl)
 
         limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
         if count >= limit_count:
@@ -218,9 +231,7 @@ class BlockGlobalIpUtilBase:
     def set_block_if_need(self):
         if self.ip_in_white_list or self.ip_in_black_list:
             return
-        count = cache.get(self.limit_key, 0)
-        count += 1
-        cache.set(self.limit_key, count, self.key_ttl)
+        count = incr_failed_count_atomic(self.limit_key, self.key_ttl)
 
         limit_count = settings.SECURITY_LOGIN_IP_LIMIT_COUNT
         if count < limit_count:
