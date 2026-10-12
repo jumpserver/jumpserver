@@ -14571,3 +14571,12 @@ msgstr "Não é possível verificar as credenciais porque a ACL de login do ativ
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "O horário da notificação deve ser posterior ao horário atual."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "A permissão de acesso ao ativo está prestes a expirar"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Data e hora de expiração"

@@ -14666,3 +14666,12 @@ msgstr "No se pueden verificar las credenciales porque la ACL de inicio de sesi�
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "La hora de la notificación debe ser posterior a la hora actual."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "El permiso de acceso al activo está a punto de caducar"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Fecha y hora de caducidad"

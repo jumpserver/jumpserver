@@ -14390,3 +14390,12 @@ msgstr "資産ログイン ACL で追加の操作が必要なため、認証情�
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "通知時刻は現在より後に設定してください。"
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "資産権限の有効期限が近づいています"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "有効期限"

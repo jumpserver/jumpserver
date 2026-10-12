@@ -14321,3 +14321,12 @@ msgstr "자산 로그인 ACL에서 추가 작업을 요구하므로 자격 증�
 #: perms/utils/expire_soon_notice.py:36
 msgid "The notice time must be in the future."
 msgstr "알림 시간은 현재 시간보다 이후여야 합니다."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "자산 권한이 곧 만료됩니다"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "만료 시간"
