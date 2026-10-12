@@ -14174,3 +14174,15 @@ msgstr "无效的 CIDR：%s"
 
 msgid "At least one CIDR is required when auto assignment is enabled."
 msgstr "启用自动纳入时，至少需要配置一个 CIDR 网段。"
+
+#: ops/models/job.py
+msgid "Quick command"
+msgstr "快捷命令"
+
+#: ops/models/job.py
+msgid "Matched a command filter policy"
+msgstr "命中命令过滤策略"
+
+#: ops/models/job.py
+msgid "Matched the job center command blacklist"
+msgstr "命中作业中心命令黑名单"
