@@ -10,7 +10,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice, \
+from accounts.const import AutomationTypes, SSHKeyStrategy, SecretStrategy, SecretType, ChangeSecretRecordStatusChoice, \
     ChangeSecretAccountStatus
 from accounts.models import Account
 from accounts.utils import SecretGenerator, account_secret_task_status
@@ -232,8 +232,10 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
 
         accounts = Account.objects.filter(
             id__in=self.account_ids,
-            secret_reset=True,
-        )
+        ).exclude(secret_type=SecretType.SSH_CERTIFICATE)
+        # Permission to rotate credentials must not prevent account provisioning.
+        if self.method_type() == AutomationTypes.change_secret:
+            accounts = accounts.filter(secret_reset=True)
         if self.secret_type:
             accounts = accounts.filter(secret_type=self.secret_type)
         if settings.CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED:
