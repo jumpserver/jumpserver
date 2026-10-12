@@ -840,6 +840,10 @@ msgstr "可改密"
 msgid "Source ID"
 msgstr "来源 ID"
 
+#: accounts/models/account.py:119
+msgid "Follow template"
+msgstr "跟随模板"
+
 #: accounts/models/account.py:105
 msgid "Date last access"
 msgstr "上次访问日期"
