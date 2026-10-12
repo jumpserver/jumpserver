@@ -14567,3 +14567,7 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "Não é possível verificar as credenciais porque a ACL de login do ativo exige uma ação adicional."
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "O horário da notificação deve ser posterior ao horário atual."

@@ -14110,3 +14110,7 @@ msgstr "無效的 CIDR：%s"
 
 msgid "At least one CIDR is required when auto assignment is enabled."
 msgstr "啟用自動納入時，至少需要設定一個 CIDR 網段。"
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "提醒時間必須晚於目前時間。"
