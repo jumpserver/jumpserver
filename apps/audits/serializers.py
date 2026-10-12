@@ -75,7 +75,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
     mfa = LabeledChoiceField(choices=MFAChoices.choices, label=_("MFA"))
-    type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))
+    type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Login type"))
     status = LabeledChoiceField(choices=LoginStatusChoices.choices, label=_("Status"))
     city = serializers.ReadOnlyField(source='city_display', label=_("Login city"))
 
