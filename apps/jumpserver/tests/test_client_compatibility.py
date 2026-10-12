@@ -7,7 +7,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 from settings.api.settings import ClientCompatibilityView, ClientVersionView
 
 
-@override_settings(VERSION='v5.1.0-rc1', MIN_CLIENT_VERSION='5.1.0')
+@override_settings(VERSION='v5.1.0-rc1', MIN_CLIENT_VERSION='v5.1.0')
 class ClientCompatibilityTests(SimpleTestCase):
     def test_anonymous_response_uses_runtime_version_and_minimum(self):
         request = APIRequestFactory().get('/api/v1/settings/client/compatibility/')
@@ -15,7 +15,7 @@ class ClientCompatibilityTests(SimpleTestCase):
             response = ClientCompatibilityView.as_view()(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
-            'schema_version': 1, 'core_version': 'v5.1.0-rc1', 'min_client_version': '5.1.0',
+            'schema_version': 1, 'core_version': 'v5.1.0-rc1', 'min_client_version': 'v5.1.0',
         })
         self.assertEqual(response['Cache-Control'], 'no-store')
 
@@ -25,15 +25,22 @@ class ClientCompatibilityTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_source_version_is_not_replaced_with_target_release(self):
-        with self.settings(VERSION='2.0.0'):
+        with self.settings(VERSION='v2.0.0'):
             response = ClientCompatibilityView.as_view()(APIRequestFactory().get('/'))
-        self.assertEqual(response.data['core_version'], '2.0.0')
+        self.assertEqual(response.data['core_version'], 'v2.0.0')
 
     def test_minimum_changes_independently_of_runtime_version(self):
-        with self.settings(VERSION='5.2.3', MIN_CLIENT_VERSION='5.1.4'):
+        with self.settings(VERSION='v5.2.3', MIN_CLIENT_VERSION='v5.1.4'):
             response = ClientCompatibilityView.as_view()(APIRequestFactory().get('/'))
-        self.assertEqual(response.data['core_version'], '5.2.3')
-        self.assertEqual(response.data['min_client_version'], '5.1.4')
+        self.assertEqual(response.data['core_version'], 'v5.2.3')
+        self.assertEqual(response.data['min_client_version'], 'v5.1.4')
+
+    def test_versions_preserve_patch_prerelease_and_lts(self):
+        for version in ('v5.1.0', 'v5.1.2', 'v5.1.0-rc1', 'v5.1.0-rc1+build.9', 'v5.1.0-lts', 'v5.1.0-lts+build.1'):
+            with self.subTest(version=version), self.settings(VERSION=version, MIN_CLIENT_VERSION=version):
+                response = ClientCompatibilityView.as_view()(APIRequestFactory().get('/'))
+                self.assertEqual(response.data['core_version'], version)
+                self.assertEqual(response.data['min_client_version'], version)
 
     def test_endpoint_is_read_only(self):
         for method in ('post', 'put', 'patch', 'delete'):
