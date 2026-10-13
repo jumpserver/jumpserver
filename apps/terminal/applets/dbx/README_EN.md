@@ -4,10 +4,11 @@ Lightweight cross-platform database client, supports MySQL, MariaDB, PostgreSQL,
 
 ### Components
 
-The application and the drivers ship in one package, extracted to `C:\Program Files\DBX`:
+The application, the drivers and the WebView2 installer ship in one package, extracted to `C:\Program Files\DBX`:
 
 - Application: `C:\Program Files\DBX\DBX.exe`, use the global environment variable `DBX_HOME` to specify another install directory
 - Drivers: `C:\Program Files\DBX\agents`, contains JRE 21 and the Oracle, Dameng drivers, use the global environment variable `DBX_DRIVERS_HOME` to specify another directory
+- WebView2: `C:\Program Files\DBX\webview2`, the offline installer of the Microsoft Edge WebView2 Runtime that DBX depends on, run automatically when the applet is deployed with its log written to `install.log` in the same directory, so the host needs no separate install; hosts that already have a usable runtime, including a newer one, are unaffected
 
 MySQL, MariaDB, PostgreSQL, SQLServer, ClickHouse, MongoDB and Redis use the drivers built into DBX and need no extra component. For Oracle and Dameng, the driver is copied from the install directory into the current session user directory on connect and the JRE is used in place, no internet access required.
 
