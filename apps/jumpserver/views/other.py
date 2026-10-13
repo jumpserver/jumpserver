@@ -85,7 +85,6 @@ class ResourceDownload(TemplateView):
         OPENSSH_VERSION=v9.4.0.0
         TINKER_VERSION={TINKER_TARGET_VERSION}
         VIDEO_PLAYER_VERSION=0.5.2
-        CLIENT_VERSION=5.0.0
         """
         version_file = os.path.join(settings.DATA_DIR, 'version.txt')
         try:
@@ -94,13 +93,8 @@ class ResourceDownload(TemplateView):
         except OSError:
             versions = default_versions
 
-        client_version = os.environ.get('CLIENT_VERSION', '')
-        client_version_override = (
-            f'CLIENT_VERSION={client_version}' if client_version else ''
-        )
         return f"""
         {versions}
-        {client_version_override}
         VENDOR={settings.VENDOR}
         MORE_DOWNLOADS_URL={more_downloads}
         """
@@ -115,6 +109,16 @@ class ResourceDownload(TemplateView):
                 continue
             key, value = line.split('=', 1)
             meta[key] = value
+
+        client_version = ''
+        core_version = settings.VERSION.strip().removeprefix('v').split('-', 1)[0]
+        if core_version != 'dev':
+            for version in (meta.get('CLIENT_VERSION', ''), settings.VERSION):
+                version = version.strip().removeprefix('v').split('-', 1)[0]
+                if re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', version):
+                    client_version = version
+                    break
+        meta['CLIENT_VERSION'] = client_version
         return meta
 
     def get_context_data(self, **kwargs):
