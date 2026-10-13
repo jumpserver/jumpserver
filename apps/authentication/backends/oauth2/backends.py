@@ -37,6 +37,20 @@ class OAuth2Backend(RedirectAuthBackend):
     def is_enabled():
         return settings.AUTH_OAUTH2
 
+    @staticmethod
+    def get_userinfo_attr(userinfo, attr, default=''):
+        if not isinstance(userinfo, dict) or not isinstance(attr, str):
+            return default
+        # Keep literal top-level keys (including dots) compatible with existing mappings.
+        if attr in userinfo:
+            return userinfo[attr]
+        value = userinfo
+        for key in attr.split('.'):
+            if not isinstance(value, dict) or key not in value:
+                return default
+            value = value[key]
+        return value
+
     @transaction.atomic
     def get_or_create_user_from_userinfo(self, request, userinfo):
         log_prompt = "Get or Create user [OAuth2Backend]: {}"
@@ -48,10 +62,13 @@ class OAuth2Backend(RedirectAuthBackend):
         for field, attr in attr_map.items():
             if field == 'groups':
                 continue
-            user_attrs[field] = userinfo.get(attr, '')
+            user_attrs[field] = self.get_userinfo_attr(userinfo, attr)
         group_attr = attr_map.get('groups')
-        if isinstance(group_attr, str) and group_attr and group_attr in userinfo:
-            user_attrs['groups'] = userinfo[group_attr]
+        if isinstance(group_attr, str) and group_attr:
+            missing = object()
+            groups = self.get_userinfo_attr(userinfo, group_attr, default=missing)
+            if groups is not missing:
+                user_attrs['groups'] = groups
 
         username = user_attrs.get('username')
         if not username:
