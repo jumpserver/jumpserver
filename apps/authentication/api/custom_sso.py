@@ -7,9 +7,11 @@ from django.core.exceptions import ValidationError
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.module_loading import import_string
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
 
 from authentication.const import CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY
@@ -37,23 +39,48 @@ if settings.AUTH_CUSTOM_SSO:
 class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
 
     permission_classes = [AllowAny]
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
 
     next_url = '/'
+
+    def get_error_response(self, message, status_code):
+        headers = {'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer'}
+        if self.request.accepted_renderer.format != 'html':
+            return Response({'detail': message}, status=status_code, headers=headers)
+
+        context = {
+            'title': _('Single sign-on failed'),
+            'message': message,
+            'help_text': _(
+                'Return to the platform that opened this link and start sign-in again. '
+                'If the problem persists, contact the administrator.'
+            ),
+            'login_url': reverse('authentication:login') + '?admin=1',
+            'login_label': _('Back to login'),
+        }
+        return Response(
+            context, status=status_code, headers=headers,
+            template_name='authentication/custom_sso_error.html',
+        )
 
     def is_enabled(self):
         return settings.AUTH_CUSTOM_SSO and callable(custom_sso_authenticate_method)
 
     def retrieve(self, request, *args, **kwargs):
         if not self.is_enabled():
-            error = 'Custom SSO authentication is disabled.'
-            return Response({'detail': error}, status=status.HTTP_403_FORBIDDEN)
+            return self.get_error_response(
+                _('Single sign-on is currently unavailable. Please contact the administrator or use another sign-in method.'),
+                status.HTTP_403_FORBIDDEN,
+            )
 
         query_params = {}
         for param in settings.AUTH_CUSTOM_SSO_QUERY_PARAMS:
             value = self.request.query_params.get(param)
             if not value:
-                error = f'Missing required query parameter: {param}'
-                return Response({'detail': error}, status=status.HTTP_400_BAD_REQUEST)
+                return self.get_error_response(
+                    _('The single sign-on link is incomplete. Please start sign-in again from the original platform.'),
+                    status.HTTP_400_BAD_REQUEST,
+                )
             query_params[param] = value
 
         user, error = self.authenticate(**query_params)
@@ -62,7 +89,10 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
                 if not user.can_update_password():
                     error = 'First login password change is unavailable for this user.'
                     self.send_auth_signal(success=False, reason=error)
-                    return Response({'detail': error}, status=status.HTTP_403_FORBIDDEN)
+                    return self.get_error_response(
+                        _('First login password change is unavailable for this user. Please contact the administrator.'),
+                        status.HTTP_403_FORBIDDEN,
+                    )
 
                 if request.user.is_authenticated:
                     logout(request)
@@ -80,7 +110,11 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
             return HttpResponseRedirect(self.next_url)
         else:
             self.send_auth_signal(success=False, reason=error)
-            return Response({'detail': error}, status=status.HTTP_401_UNAUTHORIZED)
+            logger.warning('Custom SSO login failed: %s', error)
+            return self.get_error_response(
+                _('Unable to complete single sign-on. The login link may have expired or already been used.'),
+                status.HTTP_401_UNAUTHORIZED,
+            )
 
     def authenticate(self, **query_params):
         try:

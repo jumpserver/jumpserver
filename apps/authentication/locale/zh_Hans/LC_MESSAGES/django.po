@@ -1,0 +1,40 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: JumpServer\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Single sign-on failed"
+msgstr "单点登录失败"
+
+msgid ""
+"Unable to complete single sign-on. The login link may have expired or "
+"already been used."
+msgstr "未能完成单点登录，登录链接可能已过期或已使用。"
+
+msgid ""
+"Return to the platform that opened this link and start sign-in again. If the"
+" problem persists, contact the administrator."
+msgstr "请返回发起登录的平台，重新发起单点登录。如仍无法登录，请联系管理员。"
+
+msgid ""
+"The single sign-on link is incomplete. Please start sign-in again from the "
+"original platform."
+msgstr "登录链接不完整，请从原平台重新发起单点登录。"
+
+msgid ""
+"Single sign-on is currently unavailable. Please contact the administrator or"
+" use another sign-in method."
+msgstr "单点登录暂不可用，请联系管理员，或使用其他方式登录。"
+
+msgid "Back to login"
+msgstr "返回登录"
+
+msgid ""
+"First login password change is unavailable for this user. Please contact "
+"the administrator."
+msgstr "当前账号无法完成首次登录的密码设置，请联系管理员。"
