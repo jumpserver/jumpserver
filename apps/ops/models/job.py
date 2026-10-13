@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import shlex
 import sys
 import uuid
@@ -27,7 +28,7 @@ from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import (
     JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
-    neutralize_jinja2_syntax,
+    escape_jinja2_syntax, neutralize_jinja2_syntax,
 )
 
 """stop all ssh child processes of the given ansible process pid."""
@@ -323,12 +324,34 @@ class JobExecution(JMSOrgBaseModel):
     def inventory(self):
         return self.current_job.inventory
 
+    @cached_property
+    def extra_vars(self):
+        if isinstance(self.parameters, str):
+            parameters = json.loads(self.parameters)
+        else:
+            parameters = dict(self.parameters) if self.parameters else {}
+        parameters = sanitize_job_extra_vars(parameters)
+        parameters.update(self.gather_static_variables())
+        return parameters
+
+    @cached_property
+    def rendered_args(self):
+        def replace_variable(match):
+            name = match.group(1)
+            if name not in self.extra_vars:
+                raise ValueError(_('Undefined job variable: {name}').format(name=name))
+            value = self.extra_vars[name]
+            return '' if value is None else str(value)
+
+        # Substitute plain names once; never evaluate user-supplied Jinja expressions.
+        return re.sub(r'{{\s*(jms_\w+)\s*}}', replace_variable, self.current_job.args or '')
+
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
 
         module = self.current_job.module
-        args = neutralize_jinja2_syntax(self.current_job.args or '')
+        args = escape_jinja2_syntax(self.rendered_args)
 
         db_modules = ('mysql', 'postgresql', 'sqlserver', 'oracle')
         db_module_name_map = {
@@ -392,12 +415,7 @@ class JobExecution(JMSOrgBaseModel):
             self.result.update({"excludes": inv.exclude_hosts})
             self.save()
 
-        if isinstance(self.parameters, str):
-            extra_vars = json.loads(self.parameters)
-        else:
-            extra_vars = dict(self.parameters) if self.parameters else {}
-        extra_vars = sanitize_job_extra_vars(extra_vars)
-        extra_vars.update(self.gather_static_variables())
+        extra_vars = self.extra_vars
 
         if self.current_job.type == Types.adhoc:
             module, args = self.compile_shell()
@@ -510,14 +528,14 @@ class JobExecution(JMSOrgBaseModel):
 
     def match_command_group(self, acl, asset):
         for cg in acl.command_groups.all():
-            matched, __ = cg.match(self.current_job.args)
+            matched, __ = cg.match(self.rendered_args)
             if matched:
                 if acl.is_action(CommandFilterACL.ActionChoices.accept):
                     return True
                 elif acl.is_action(CommandFilterACL.ActionChoices.reject) or acl.is_action(
                         CommandFilterACL.ActionChoices.review):
                     print("\033[31mcommand \'{}\' on asset {}({}) is rejected by acl {}\033[0m"
-                          .format(self.current_job.args, asset.name, asset.address, acl))
+                          .format(self.rendered_args, asset.name, asset.address, acl))
                     CommandExecutionAlert({
                         "assets": self.inventory.assets,
                         "input": self.material,
@@ -562,7 +580,7 @@ class JobExecution(JMSOrgBaseModel):
             for acl in acls:
                 if self.match_command_group(acl, asset):
                     break
-        command = self.current_job.args
+        command = self.rendered_args
         if command and set(command.split()).intersection(set(settings.SECURITY_COMMAND_BLACKLIST)):
             CommandExecutionAlert({
                 "assets": self.inventory.assets,
@@ -573,7 +591,7 @@ class JobExecution(JMSOrgBaseModel):
                 "reason": _('Matched the job center command blacklist'),
             }).publish_async()
             raise CommandInBlackListException(
-                "Command is rejected by black list: {}".format(self.current_job.args))
+                "Command is rejected by black list: {}".format(command))
 
     def check_danger_keywords(self):
         lines = self.job.playbook.check_dangerous_keywords()
