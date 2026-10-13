@@ -111,11 +111,14 @@ class ResourceDownload(TemplateView):
             meta[key] = value
 
         client_version = ''
-        core_version = settings.VERSION.strip().removeprefix('v').split('-', 1)[0]
+        core_version = settings.VERSION.strip().removeprefix('v')
         if core_version != 'dev':
             for version in (meta.get('CLIENT_VERSION', ''), settings.VERSION):
-                version = version.strip().removeprefix('v').split('-', 1)[0]
-                if re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', version):
+                version = version.strip().removeprefix('v')
+                if re.fullmatch(
+                    r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)'
+                    r'(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?', version
+                ):
                     client_version = version
                     break
         meta['CLIENT_VERSION'] = client_version
