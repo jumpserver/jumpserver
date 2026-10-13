@@ -2,6 +2,7 @@
 #
 
 from django.contrib.auth import BACKEND_SESSION_KEY
+from django.db import transaction
 from django.dispatch import receiver
 from django.utils import timezone, translation
 from rest_framework.request import Request
@@ -13,6 +14,7 @@ from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
 from common.utils import get_request_ip_or_data, get_logger
 from audits.auth_backends import AUTH_BACKEND_LABEL_MAPPING
+from users.models import User
 from ..const import LoginTypeChoices
 from ..models import UserSession
 from ..utils import write_login_log
@@ -57,7 +59,9 @@ def create_user_session(request, user_id, instance: UserLoginLog):
     # TODO 目前只记录 web 登录的 session
     if instance.type != LoginTypeChoices.web:
         return
-    session_key = request.session.session_key or '-'
+    session_key = request.session.session_key
+    if not session_key:
+        return
 
     online_session_data = {
         'user_id': user_id,
@@ -69,7 +73,18 @@ def create_user_session(request, user_id, instance: UserLoginLog):
         'user_agent': instance.user_agent,
         'date_created': instance.datetime,
     }
-    user_session = UserSession.objects.create(**online_session_data)
+    with transaction.atomic():
+        # Concurrent CAS callbacks can all report success for the same session.
+        # Lock an existing user row, including when no session row exists yet.
+        User.objects.select_for_update().only('id').get(id=user_id)
+        sessions = UserSession.objects.select_for_update().filter(
+            user_id=user_id, key=session_key,
+        )
+        user_session = sessions.first()
+        if user_session is None:
+            user_session = UserSession.objects.create(**online_session_data)
+        else:
+            sessions.exclude(id=user_session.id).delete()
     request.session['user_session_id'] = str(user_session.id)
 
 
