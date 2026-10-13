@@ -51,6 +51,9 @@ class ApplicationAuditMixin:
             self.request.user, instance_id=data.get('instance_id', ''),
             audit_context=context,
             client_type=('agent' if self.request.headers.get('X-Source') == 'jms-pam-agent' else 'sdk'),
+            enroll_rotation=getattr(self, 'action', None) not in {
+                'application', 'client', 'policies', 'policy', 'accounts', 'report_status',
+            },
         )
 
     def start_client_audit(self, event, track_fetch=False):

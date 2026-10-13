@@ -11,10 +11,10 @@ from accounts.models import (
     CredentialClientStatus,
 )
 from common.exceptions import JMSException
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from .audit import record
 
@@ -30,6 +30,8 @@ def scope_uses_credential(scope, credential):
 
 
 def client_uses_credential(client, credential):
+    if client.type == CredentialClientInstance.Type.sdk and not client.rotation_enabled:
+        return False
     if client.type == CredentialClientInstance.Type.agent and not client.date_last_synced:
         return False
     scope = client.delivery_scope if client.type == CredentialClientInstance.Type.agent else None
@@ -40,14 +42,15 @@ class CredentialClientManager:
     activity_write_interval = timedelta(seconds=60)
 
     def __init__(self, user, instance_id='', audit_context=None,
-                 client_type='sdk'):
+                 client_type='sdk', enroll_rotation=True):
         self.client_type = client_type
+        self.enroll_rotation = enroll_rotation
         self.audit_context = audit_context
         self.application, self.client = self._get_application_and_client(
             user, instance_id
         )
         from accounts.credential_rotation.participants import enroll_client
-        if self.client.type != CredentialClientInstance.Type.agent:
+        if enroll_rotation and self.client.type != CredentialClientInstance.Type.agent:
             enroll_client(self.client)
         if self.audit_context is not None:
             self.audit_context.set_client(self.client)
@@ -66,9 +69,13 @@ class CredentialClientManager:
             raise PermissionDenied(_('The application is disabled.'), code=AuditEvent.CLIENT_DISABLED)
         client = CredentialClientInstance.objects.get_or_create(
             application=user, type=self.client_type, instance_id=instance_id,
+            defaults={'rotation_enabled': self.enroll_rotation or self.client_type == 'agent'},
         )[0]
         if client.type != self.client_type or not client.is_active:
             raise PermissionDenied(_('The client instance is disabled.'), code=AuditEvent.CLIENT_DISABLED)
+        if self.enroll_rotation and not client.rotation_enabled:
+            CredentialClientInstance.objects.filter(id=client.id).update(rotation_enabled=True)
+            client.rotation_enabled = True
         return user, client
 
     def _get_credential(self, key, lock=True):
@@ -267,6 +274,95 @@ class CredentialClientManager:
                 'revision': account.version,
             },
         }
+
+    def _visible_policies(self):
+        self.application.assert_account_limit()
+        authorized = self.application.get_accounts().values('id')
+        return ApplicationCredential.objects.filter(
+            org_id=self.application.org_id, applications=self.application,
+        ).filter(
+            Q(mode=ApplicationCredential.Mode.subscription) |
+            Q(mode=ApplicationCredential.Mode.alternating_rotation,
+              account_id__in=authorized, alternate_account_id__in=authorized,
+              active_account_id__in=authorized),
+        ).annotate(
+            authorized_accounts_count=Count(
+                'subscription_accounts',
+                filter=Q(subscription_accounts__id__in=authorized), distinct=True,
+            ),
+        ).order_by('id')
+
+    def application_info(self):
+        """Only metadata about the authenticated application, without its secret."""
+        policies = self._visible_policies()
+        return {
+            'id': str(self.application.id), 'name': self.application.name,
+            'org_id': str(self.application.org_id), 'is_active': self.application.is_active,
+            'accounts_count': self.application.get_accounts().distinct().count(),
+            'policies_count': policies.count(),
+        }
+
+    def client_info(self):
+        client = self.client
+        return {
+            'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
+            'is_active': client.is_active, 'client_version': client.client_version,
+            'protocol_version': client.protocol_version,
+            'config_schema_version': client.config_schema_version,
+            'application_status': client.application_status or None,
+            'date_status_reported': client.date_status_reported,
+        }
+
+    def report_status(self, status, account_ids, error_code=''):
+        """Record self-reported usage, without fetching or confirming credentials."""
+        if account_ids:
+            self.application.assert_account_limit()
+            authorized = set(self.application.get_accounts().filter(id__in=account_ids).values_list('id', flat=True))
+            if authorized != set(account_ids):
+                raise PermissionDenied(_('The application is not authorized for every reported account.'),
+                                       code='credential_not_authorized')
+        now = timezone.now()
+        values = {
+            'application_status': {
+                'status': status, 'account_ids': [str(value) for value in account_ids],
+                'error_code': error_code,
+            },
+            'date_status_reported': now, 'date_last_seen': now,
+        }
+        CredentialClientInstance.objects.filter(id=self.client.id).update(**values)
+        for key, value in values.items():
+            setattr(self.client, key, value)
+        return {'accepted': True}
+
+    def _policy_metadata(self, policy, accounts_count):
+        rotation = policy.mode == ApplicationCredential.Mode.alternating_rotation
+        return {
+            'id': str(policy.id), 'key': policy.key, 'name': policy.name,
+            'mode': policy.mode, 'is_active': policy.is_active, 'status': policy.status,
+            'revision': policy.current_revision,
+            'accounts_count': (2 if rotation else accounts_count if policy.subscription_all_authorized
+                               else policy.authorized_accounts_count),
+            'subscription_all_authorized': policy.subscription_all_authorized,
+            'active_account_id': str(policy.active_account_id) if rotation else None,
+            'account_switch': policy.account_switch if rotation else None,
+        }
+
+    def policies(self, search=''):
+        policies = self._visible_policies()
+        if search:
+            policies = policies.filter(Q(name__icontains=search) | Q(key__icontains=search))
+        accounts_count = self.application.get_accounts().distinct().count()
+        return {'policies': [
+            self._policy_metadata(policy, accounts_count)
+            for policy in policies
+        ]}
+
+    def policy_info(self, key=None, policy_id=None):
+        policies = self._visible_policies()
+        policy = policies.filter(id=policy_id).first() if policy_id else policies.filter(key=key).first()
+        if policy is None:
+            raise NotFound(_('Credential policy not found.'))
+        return self._policy_metadata(policy, self.application.get_accounts().distinct().count())
 
     def authorized_accounts(self, limit=200, offset=0, search=''):
         """List the current scope without reading secrets or recording a fetch."""

@@ -211,7 +211,7 @@ def _state(credential, rotation, participant, state, now):
 def _warnings(credential):
     warnings = []
     for application in credential.applications.filter(is_active=True):
-        if application.credential_clients.filter(is_active=True).exists():
+        if application.credential_clients.filter(is_active=True).exclude(type='sdk', rotation_enabled=False).exists():
             continue
         warnings.append({
             'code': 'no_active_instance',

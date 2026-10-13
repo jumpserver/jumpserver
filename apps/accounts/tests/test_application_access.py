@@ -60,8 +60,8 @@ class ApplicationAccessTests(CredentialTestCase):
         return serializer.validated_data
 
     def signed_request(self, action, params, source='jms-pam', identity=None, secret=None, schema=None):
-        method = 'POST' if action == 'sync_agent' else 'GET'
-        path = {'sync_agent': 'agent/sync', 'accounts': 'accounts'}.get(action, 'credential')
+        method = 'POST' if action in ('sync_agent', 'report_status') else 'GET'
+        path = {'sync_agent': 'agent/sync', 'report_status': 'status'}.get(action, action)
         prepared = requests.Request(
             method, f'http://testserver/api/v1/accounts/credential-client/{path}/',
             params=params if method == 'GET' else None,
@@ -89,7 +89,7 @@ class ApplicationAccessTests(CredentialTestCase):
         compile(data['config'], data['filename'], 'exec')
         compile(data['code'], 'application_example.py', 'exec')
         self.assertEqual(data['sdk_language'], 'python')
-        self.assertIn('pip install /path/to/jumpserver/apps/accounts/clients/python', data['install_command'])
+        self.assertIn('python3 -m pip install jms-pam', data['install_command'])
         self.assertNotIn('pip install --upgrade jms-pam', data['install_command'])
         self.assertIn('instance_id=instance_id', data['code'])
         self.assertRegex(data['instance_id'], r'^[0-9a-f]{32}$')

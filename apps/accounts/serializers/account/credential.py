@@ -11,8 +11,7 @@ from accounts.models import (
 )
 from common.serializers.fields import ObjectRelatedField
 from django.db import transaction
-from django.db.models import Count, Max, Prefetch, Q
-from django.utils import timezone
+from django.db.models import Count, Prefetch
 from django.utils.translation import gettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from rest_framework import serializers
@@ -22,6 +21,8 @@ __all__ = [
     'CredentialApplicationBindingSerializer',
     'CredentialClientInstanceSerializer', 'CredentialClientStatusSerializer',
     'CredentialFetchSerializer', 'AuthorizedAccountsSerializer',
+    'CredentialClientInfoSerializer', 'CredentialPolicyQuerySerializer', 'ApplicationStatusReportSerializer',
+    'CredentialPolicyListSerializer',
     'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer', 'CredentialEventResultSerializer',
     'CredentialAgentSyncSerializer',
     'CredentialAccessWizardSerializer',
@@ -414,6 +415,7 @@ class CredentialClientStatusSerializer(serializers.ModelSerializer):
 
 
 class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
+    reported_accounts = serializers.SerializerMethodField()
     credentials = ObjectRelatedField(
         source='application.application_credentials', many=True, read_only=True, attrs=('id', 'name'),
     )
@@ -433,6 +435,8 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
         fields_mini = ['id', 'instance_id', 'type']
         fields_small = fields_mini + [
             'application', 'online', 'date_last_seen', 'is_active',
+            'application_status', 'date_status_reported',
+            'reported_accounts',
         ]
         fields = fields_small + [
             'client_version', 'protocol_version', 'config_schema_version',
@@ -446,7 +450,38 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
             'config_digest', 'configuration_current', 'upgrade_required',
             'sync_status', 'sync_error', 'date_last_synced',
             'date_last_seen', 'credential_statuses', 'date_created', 'date_updated',
+            'application_status', 'date_status_reported',
+            'reported_accounts',
         ]
+
+    def get_reported_accounts(self, instance):
+        # Resolve names once for the entire page. Historical reports remain
+        # snapshots; missing accounts fall back to their reported IDs in the UI.
+        if not hasattr(self, '_reported_accounts'):
+            instances = getattr(self.parent, 'instance', None)
+            if instances is None:
+                instances = [instance]
+            ids, org_ids = set(), set()
+            for client in instances:
+                ids.update((client.application_status or {}).get('account_ids', []))
+                org_ids.add(client.org_id)
+            self._reported_accounts = {
+                str(account.id): account for account in Account.objects.filter(
+                    id__in=ids, org_id__in=org_ids,
+                ).select_related('asset').only(
+                    'id', 'name', 'username', 'org_id', 'asset_id', 'asset__id', 'asset__name',
+                )
+            }
+        result = []
+        for account_id in (instance.application_status or {}).get('account_ids', []):
+            account = self._reported_accounts.get(account_id)
+            if account is None or account.org_id != instance.org_id:
+                continue
+            result.append({
+                'id': str(account.id), 'name': account.name, 'username': account.username,
+                'asset': {'id': str(account.asset_id), 'name': account.asset.name},
+            })
+        return result
 
     @staticmethod
     def get_online(instance):
@@ -548,6 +583,35 @@ class AuthorizedAccountsSerializer(serializers.Serializer):
     limit = serializers.IntegerField(min_value=1, max_value=500, default=200)
     offset = serializers.IntegerField(min_value=0, default=0)
     search = serializers.CharField(max_length=128, required=False, allow_blank=True)
+
+
+class CredentialClientInfoSerializer(serializers.Serializer):
+    instance_id = serializers.CharField(max_length=128, required=False)
+
+
+class ApplicationStatusReportSerializer(CredentialClientInfoSerializer):
+    status = serializers.ChoiceField(choices=('starting', 'running', 'degraded', 'stopping', 'stopped', 'error'))
+    account_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200, default=list)
+    error_code = serializers.RegexField(r'^[A-Za-z0-9_.:-]*$', max_length=128, allow_blank=True, default='')
+
+    def validate_account_ids(self, values):
+        if len(values) != len(set(values)):
+            raise serializers.ValidationError(_('Duplicate account IDs are not allowed.'))
+        return values
+
+
+class CredentialPolicyListSerializer(CredentialClientInfoSerializer):
+    search = serializers.CharField(max_length=128, default='', allow_blank=True)
+
+
+class CredentialPolicyQuerySerializer(CredentialClientInfoSerializer):
+    key = serializers.CharField(max_length=64, required=False)
+    policy_id = serializers.UUIDField(required=False)
+
+    def validate(self, attrs):
+        if bool(attrs.get('key')) == bool(attrs.get('policy_id')):
+            raise serializers.ValidationError(_('Provide exactly one of key or policy_id.'))
+        return attrs
 
 
 class CredentialStateSerializer(serializers.Serializer):

@@ -214,6 +214,11 @@ class CredentialClientInstance(JMSOrgBaseModel):
     date_last_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last synced'))
     date_last_seen = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last seen'))
     event_receipts_supported = models.BooleanField(default=False)
+    # Existing clients remain consumers; newly created diagnostic/report-only
+    # SDK instances opt in when they fetch credentials or start an event stream.
+    rotation_enabled = models.BooleanField(default=True, editable=False)
+    application_status = models.JSONField(default=dict, blank=True, verbose_name=_('Application status'))
+    date_status_reported = models.DateTimeField(null=True, blank=True, verbose_name=_('Status reported at'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
 
     class Meta:

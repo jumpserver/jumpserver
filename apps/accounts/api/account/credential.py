@@ -415,6 +415,10 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         'command_result': AuditEvent.COMMAND_RESULT,
     }
     serializer_classes = {
+        'application': serializers.CredentialClientInfoSerializer,
+        'client': serializers.CredentialClientInfoSerializer,
+        'policies': serializers.CredentialPolicyListSerializer,
+        'policy': serializers.CredentialPolicyQuerySerializer,
         'accounts': serializers.AuthorizedAccountsSerializer,
         'credential': serializers.CredentialFetchSerializer,
         'confirm': serializers.CredentialConfirmSerializer,
@@ -422,6 +426,7 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         'commands': serializers.ApplicationCommandPollSerializer,
         'command_result': serializers.ApplicationCommandResultSerializer,
         'event_result': serializers.CredentialEventResultSerializer,
+        'report_status': serializers.ApplicationStatusReportSerializer,
     }
 
     class ClientUpgradeRequired(APIException):
@@ -457,6 +462,42 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
         if manager.client.type == CredentialClientInstance.Type.agent and manager.client.config_schema_version != 1:
             raise self.ClientUpgradeRequired()
         return manager
+
+    def metadata_response(self, method):
+        serializer = self.get_serializer(data=self.request.query_params)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        manager = self.get_client_manager(data)
+        params = {key: value for key, value in data.items() if key != 'instance_id'}
+        response = Response(getattr(manager, method)(**params))
+        response['Cache-Control'] = 'no-store'
+        return response
+
+    @action(methods=['get'], detail=False, url_path='application')
+    def application(self, request, *args, **kwargs):
+        return self.metadata_response('application_info')
+
+    @action(methods=['get'], detail=False, url_path='client')
+    def client(self, request, *args, **kwargs):
+        return self.metadata_response('client_info')
+
+    @action(methods=['post'], detail=False, url_path='status')
+    def report_status(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        manager = self.get_client_manager(data)
+        response = Response(manager.report_status(data['status'], data['account_ids'], data['error_code']))
+        response['Cache-Control'] = 'no-store'
+        return response
+
+    @action(methods=['get'], detail=False, url_path='policies')
+    def policies(self, request, *args, **kwargs):
+        return self.metadata_response('policies')
+
+    @action(methods=['get'], detail=False, url_path='policy')
+    def policy(self, request, *args, **kwargs):
+        return self.metadata_response('policy_info')
 
     @action(methods=['get'], detail=False, url_path='credential')
     def credential(self, request, *args, **kwargs):
