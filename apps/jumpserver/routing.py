@@ -75,7 +75,10 @@ class WsSignatureAuthMiddleware:
             try:
                 valid_origin = (
                     len(origins) == 1
-                    and normalize_origin(origins[0].decode('ascii')) in allowed_origins
+                    and (
+                        '*' in allowed_origins
+                        or normalize_origin(origins[0].decode('ascii')) in allowed_origins
+                    )
                 )
             except (UnicodeDecodeError, ValueError):
                 valid_origin = False

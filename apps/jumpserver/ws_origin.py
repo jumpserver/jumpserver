@@ -46,6 +46,10 @@ def build_allowed_origins(configured, site_url, domains):
                 'WS_ALLOWED_ORIGINS requires explicit HTTP/HTTPS origins without wildcards or paths'
             ) from exc
 
+    # An explicit DOMAINS='*' opts out of Origin restrictions, not authentication.
+    if '*' in {domain.strip() for domain in (domains or '').split(',')}:
+        return ['*']
+
     # Use operator-configured domains, not ALLOWED_HOSTS or implicit debug hosts.
     values = [site_url] if site_url else []
     site = urlsplit(site_url) if site_url else None
