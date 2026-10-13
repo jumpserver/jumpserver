@@ -491,6 +491,11 @@ class JobExecution(JMSOrgBaseModel):
         else:
             this.result = cb.result
         this.result = json.loads(json.dumps(this.result).replace('\\u0000', ''))
+        # Ansible may preserve non-UTF-8 bytes as surrogates, which PostgreSQL JSON rejects.
+        for field in ('result', 'summary'):
+            value = json.dumps(getattr(this, field), ensure_ascii=False)
+            value = value.encode('utf-8', errors='replace').decode('utf-8')
+            setattr(this, field, json.loads(value))
         this.finish_task()
 
     def finish_task(self):
