@@ -20,6 +20,7 @@ logger = get_logger(__name__)
 
 class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     disconnected = False
+    log_task = None
     user_tasks = (
         'ops.tasks.run_ops_job',
         'ops.tasks.run_ops_job_execution',
@@ -87,7 +88,26 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
         task_type = content.get('type', 'celery')
         log_path = self.get_log_path(task_id, task_type)
-        await self.async_handle_task(task_id, log_path, task_type)
+        await self.cancel_log_task()
+        self.log_task = asyncio.create_task(
+            self.async_handle_task(task_id, log_path, task_type)
+        )
+        self.log_task.add_done_callback(self.on_log_task_done)
+
+    @staticmethod
+    def on_log_task_done(task):
+        if task.cancelled():
+            return
+        error = task.exception()
+        if error:
+            logger.error('Task log streaming failed', exc_info=error)
+
+    async def cancel_log_task(self):
+        if self.log_task is None:
+            return
+        self.log_task.cancel()
+        await asyncio.gather(self.log_task, return_exceptions=True)
+        self.log_task = None
 
     async def async_handle_task(
             self, task_id, log_path, log_type='celery'
@@ -162,4 +182,5 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
     async def disconnect(self, close_code):
         self.disconnected = True
+        await self.cancel_log_task()
         close_old_connections()
