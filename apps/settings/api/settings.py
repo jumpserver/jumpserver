@@ -220,6 +220,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             return
         if not data.get('SSH_CA_OPENBAO_TOKEN'):
             data['SSH_CA_OPENBAO_TOKEN'] = settings.SSH_CA_OPENBAO_TOKEN
+        if not data.get('SSH_CA_OPENBAO_CACERT_CONTENT'):
+            data['SSH_CA_OPENBAO_CACERT_CONTENT'] = settings.SSH_CA_OPENBAO_CACERT_CONTENT
         data['SSH_CA_OPENBAO_CACERT_FILE'] = settings.SSH_CA_OPENBAO_CACERT_FILE
 
         from authentication.services import get_ssh_ca_client

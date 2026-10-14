@@ -307,6 +307,7 @@ class Config(dict):
         'SSH_CA_OPENBAO_TTL': 300,
         'SSH_CA_OPENBAO_TIMEOUT': 10,
         'SSH_CA_OPENBAO_VERIFY_TLS': True,
+        'SSH_CA_OPENBAO_CACERT_CONTENT': '',
         'SSH_CA_OPENBAO_CACERT_FILE': '',
         'SSH_CA_OPENBAO_SOURCE_ADDRESS': '',
 

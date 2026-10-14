@@ -23,9 +23,10 @@ class SSHCAOpenBaoTestingAPI(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
         data = {}
+        retained_fields = ('SSH_CA_OPENBAO_TOKEN', 'SSH_CA_OPENBAO_CACERT_CONTENT')
         for name in serializer.fields:
             value = validated_data.get(name, getattr(settings, name, None))
-            if name == 'SSH_CA_OPENBAO_TOKEN' and value in ('', None):
+            if name in retained_fields and value in ('', None):
                 value = getattr(settings, name, None)
             data[name] = value
         data['SSH_CA_OPENBAO_CACERT_FILE'] = settings.SSH_CA_OPENBAO_CACERT_FILE
