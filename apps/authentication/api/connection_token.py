@@ -55,7 +55,8 @@ from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from ..services.connection_token import get_connection_token_secret
 from ..utils import (
-    get_effective_connect_options, should_use_oracle_sysdba,
+    build_absolute_uri, get_effective_connect_options,
+    should_use_oracle_sysdba,
 )
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -439,6 +440,8 @@ class RDPFileClientProtocolURLMixin:
             'value': token.value,  # 兼容老的，未来几个版本删掉
             'name': self.escape_name(name),
             'protocol': token.protocol,
+            'site_url': build_absolute_uri(self.request, '/').rstrip('/'),
+            'org_id': str(token.org_id),
             'token': {
                 'id': str(token.id),
                 'value': token.value,
