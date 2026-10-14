@@ -19,6 +19,11 @@ def validate_asset_address(value):
             _('The address cannot contain leading or trailing whitespace')
         )
 
+    if value.startswith('#jinja2:'):
+        raise ValidationError(
+            _('The address cannot contain Ansible template override syntax')
+        )
+
     if _JINJA_DELIMITER_RE.search(value):
         raise ValidationError(
             _('The address cannot contain template syntax')
