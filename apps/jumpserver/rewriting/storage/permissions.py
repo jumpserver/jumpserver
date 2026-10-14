@@ -17,10 +17,11 @@ path_perms_map = {
 
 
 def allow_replay_access(private_file):
+    from orgs.utils import tmp_to_org, tmp_to_root_org
     from terminal.models import Session
 
     request = private_file.request
-    if not request.user.is_authenticated or not request.user.has_perm('terminal.view_sessionreplay'):
+    if not request.user.is_authenticated or not request.user.is_active:
         return False
 
     # Authorize the actual storage key, including split recordings and index files.
@@ -37,10 +38,17 @@ def allow_replay_access(private_file):
     except ValueError:
         return False
 
-    # OrgManager must be invoked inside the current request's organization.
-    session = Session.objects.filter(id=session_id).first()
+    # Media requests do not carry the replay API's organization header.
+    with tmp_to_root_org():
+        session = Session.objects.filter(id=session_id).first()
     if session is None or parts[1] != session.date_start.strftime('%Y-%m-%d'):
         return False
+    org = session.org
+    if org is None:
+        return False
+    with tmp_to_org(org):
+        if not request.user.has_perm('terminal.view_sessionreplay'):
+            return False
     if len(parts) == 4:
         return parts[2] == str(session.id)
     suffixes = {*Session.SUFFIX_MAP.values(), '.gz', '.json', '.tar'}
