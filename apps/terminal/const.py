@@ -88,6 +88,7 @@ class PublishStatus(TextChoices):
 
 class SessionType(TextChoices):
     normal = 'normal', _('Normal')
+    web_proxy = 'web_proxy', _('Built-in browser')
     tunnel = 'tunnel', _('Tunnel')
     command = 'command', _('Command')
     sftp = 'sftp', _('SFTP')

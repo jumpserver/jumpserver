@@ -35,10 +35,10 @@ from terminal.api.virtualapp.provider import AppProviderDeploymentViewSet, AppPr
 from terminal.automations.deploy_app_provider import (
     DeployAppProviderManager, default_panda_image, stage_resources,
 )
-from terminal.const import ComponentLoad, SessionErrorReason
+from terminal.const import ComponentLoad, SessionErrorReason, SessionType
 from terminal.connect_methods import ConnectMethodUtil, NativeClient
 from terminal.models import (
-    Applet, AppProvider, AppProviderDeployment, Endpoint, Terminal, VirtualApp,
+    Applet, AppProvider, AppProviderDeployment, Endpoint, Session, Terminal, VirtualApp,
     VirtualAppPublication,
 )
 from terminal.serializers import AppProviderSerializer, SessionSerializer
@@ -132,6 +132,27 @@ class AppletHostDeploymentPermissionTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, [])
+
+
+class WebProxySessionCapabilityTests(SimpleTestCase):
+    def test_builtin_browser_type_is_accepted(self):
+        serializer = SessionSerializer(data={'type': SessionType.web_proxy}, partial=True)
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data['type'], 'web_proxy')
+
+    def test_only_builtin_browser_loses_monitoring(self):
+        for terminal_type in ('koko', 'lion'):
+            for protocol in ('http', 'https'):
+                for session_type in (SessionType.normal, SessionType.web_proxy):
+                    with self.subTest(terminal=terminal_type, protocol=protocol, type=session_type):
+                        session = Session(
+                            terminal=Terminal(type=terminal_type), protocol=protocol,
+                            type=session_type, is_finished=False, has_replay=True,
+                        )
+                        self.assertEqual(session.can_join, session_type == SessionType.normal)
+                        self.assertTrue(session.can_terminate)
+                        self.assertTrue(session.can_replay())
 
 
 class SessionErrorReasonSerializerTests(SimpleTestCase):
