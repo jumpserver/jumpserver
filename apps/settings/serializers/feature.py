@@ -54,6 +54,20 @@ def validate_secret_destination(attrs, secret_field, destination_fields):
         })
 
 
+def validate_openbao_ca_certificate(value):
+    if not value:
+        return value
+    if 'PRIVATE KEY-----' in value:
+        raise serializers.ValidationError(
+            _('A CA certificate must not contain a private key')
+        )
+    try:
+        ssl.create_default_context(cadata=value)
+    except (ValueError, ssl.SSLError):
+        raise serializers.ValidationError(_('Invalid PEM CA certificate'))
+    return value
+
+
 def validate_ssh_ca_openbao_address(value):
     try:
         parsed = urlsplit(value)
@@ -175,21 +189,9 @@ class OpenBaoSerializer(BaseVaultSettingSerializer, serializers.Serializer):
         allow_blank=True, required=False, write_only=True,
         max_length=1024 * 1024,
         label=_('CA certificate'),
-        help_text=_('PEM CA certificate used to verify the OpenBao server')
+        help_text=_('PEM CA certificate used to verify the OpenBao server'),
+        validators=[validate_openbao_ca_certificate],
     )
-
-    def validate_VAULT_OPENBAO_CACERT_CONTENT(self, value):
-        if not value:
-            return value
-        if 'PRIVATE KEY-----' in value:
-            raise serializers.ValidationError(
-                _('A CA certificate must not contain a private key')
-            )
-        try:
-            ssl.create_default_context(cadata=value)
-        except (ValueError, ssl.SSLError):
-            raise serializers.ValidationError(_('Invalid PEM CA certificate'))
-        return value
 
     def validate(self, attrs):
         validate_secret_destination(attrs, 'VAULT_OPENBAO_TOKEN', ('VAULT_OPENBAO_ADDR',))
@@ -222,6 +224,13 @@ class SSHCAOpenBaoSerializer(serializers.Serializer):
     )
     SSH_CA_OPENBAO_VERIFY_TLS = serializers.BooleanField(
         required=False, label=_('Verify TLS certificate')
+    )
+    SSH_CA_OPENBAO_CACERT_CONTENT = EncryptedField(
+        allow_blank=True, required=False, write_only=True,
+        max_length=1024 * 1024,
+        label=_('CA certificate'),
+        help_text=_('PEM CA certificate used to verify the OpenBao server'),
+        validators=[validate_openbao_ca_certificate],
     )
     SSH_CA_OPENBAO_SOURCE_ADDRESS = serializers.CharField(
         max_length=1024, allow_blank=True, required=False,

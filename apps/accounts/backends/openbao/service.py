@@ -292,7 +292,7 @@ class OpenBaoSSHCAClient(OpenBaoKVClient):
 
     def __init__(
             self, addr=None, token='', mount_point='ssh-client-signer',
-            role='jumpserver', timeout=10, verify_tls=True, ca_cert_file='',
+            role='jumpserver', timeout=10, verify_tls=True, ca_cert_file='', ca_cert='',
     ):
         super().__init__(
             addr=addr,
@@ -300,6 +300,7 @@ class OpenBaoSSHCAClient(OpenBaoKVClient):
             mount_point=mount_point,
             timeout=timeout,
             verify_tls=verify_tls,
+            ca_cert=ca_cert,
             ca_cert_file=ca_cert_file,
         )
         self.role = (role or 'jumpserver').strip('/')
