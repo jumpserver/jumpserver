@@ -106,9 +106,18 @@
               - /VERYSILENT
               - /SUPPRESSMSGBOXES
               - /NORESTART
+              - /RESTARTEXITCODE=3010
               - /NOSTART=1
           async: 1200
           poll: 5
+          register: tinker_install
+          failed_when: (tinker_install.rc | default(-1)) not in [0, 3010]
+
+        - name: Reboot after Tinker installation if required and wait for Windows
+          ansible.windows.win_reboot:
+            reboot_timeout: 600
+            post_reboot_delay: 10
+          when: tinker_install.rc == 3010
 
         - name: Install the python-{{ PYTHON_VERSION }}
           community.windows.win_unzip:
@@ -188,9 +197,133 @@
           retries: 30
           delay: 5
 
+        - name: Record running services that depend on Remote Desktop Services
+          ansible.windows.win_powershell:
+            script: |
+              $ErrorActionPreference = 'Stop'
+              $Ansible.Changed = $false
+              function Get-RunningDependents($Service) {
+                  foreach ($dependent in $Service.DependentServices) {
+                      if ($dependent.Status -eq 'Running') {
+                          $dependent.Name
+                          Get-RunningDependents $dependent
+                      }
+                  }
+              }
+              $Ansible.Result = @{ Running = @(Get-RunningDependents (Get-Service -Name TermService)) }
+          register: rdp_dependents
+
+        # Restart exactly once. Only the read-only readiness check below retries.
+        - name: Refresh Remote Desktop Services after Tinker is ready
+          ansible.windows.win_service:
+            name: TermService
+            state: restarted
+            force_dependent_services: true
+          async: 120
+          poll: 5
+
+        - name: Restore Remote Desktop dependent services
+          ansible.windows.win_service:
+            name: "{{ item }}"
+            state: started
+          loop: "{{ (rdp_dependents.result.Running + ['UmRdpService']) | unique }}"
+
+        - name: Verify NLA and RDP listener after the service refresh
+          ansible.windows.win_powershell:
+            script: |
+              $ErrorActionPreference = 'Stop'
+              $Ansible.Changed = $false
+              $namespace = 'root/cimv2/terminalservices'
+              $listenerPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'
+              function Assert-NLADisabled {
+                  $policyPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
+                  if (Test-Path -LiteralPath $policyPath) {
+                      $policy = Get-ItemProperty -LiteralPath $policyPath
+                      if ($policy.UserAuthentication -eq 1) { throw 'Group Policy still requires NLA.' }
+                  }
+                  $local = Get-ItemProperty -LiteralPath $listenerPath
+                  $effective = @(Get-CimInstance -Namespace $namespace -ClassName Win32_TSGeneralSetting `
+                      -Filter "TerminalName='RDP-Tcp'")
+                  if ($local.UserAuthentication -ne 0 -or $effective.Count -ne 1 -or
+                      $effective[0].UserAuthenticationRequired -ne 0) {
+                      throw "NLA is not disabled: registry=$($local.UserAuthentication), WMI=$($effective.UserAuthenticationRequired)."
+                  }
+                  return $local
+              }
+              $services = @(Get-Service -Name Tinker,TermService,UmRdpService)
+              if (@($services | Where-Object Status -ne 'Running').Count) {
+                  throw 'Tinker, TermService and UmRdpService must all be running.'
+              }
+              $local = Assert-NLADisabled
+              $server = @(Get-CimInstance -Namespace $namespace -ClassName Win32_TerminalServiceSetting)
+              if ($server.Count -ne 1 -or $server[0].AllowTSConnections -ne 1) {
+                  throw 'Remote Desktop connections are not allowed.'
+              }
+              $port = $local.PortNumber
+              if ($null -eq $port -or $port -lt 1 -or $port -gt 65535) {
+                  throw 'Cannot read a valid RDP-Tcp port.'
+              }
+              function Read-RdpBytes([IO.Stream]$Stream, [int]$Length, [Diagnostics.Stopwatch]$Clock) {
+                  $buffer = New-Object byte[] $Length
+                  $offset = 0
+                  while ($offset -lt $Length) {
+                      $remaining = 5000 - [int]$Clock.ElapsedMilliseconds
+                      if ($remaining -le 0) { throw 'RDP negotiation timed out.' }
+                      $Stream.ReadTimeout = $remaining
+                      $read = $Stream.Read($buffer, $offset, $Length - $offset)
+                      if ($read -eq 0) { throw 'RDP listener closed an incomplete negotiation response.' }
+                      $offset += $read
+                  }
+                  return ,$buffer
+              }
+              $client = [Net.Sockets.TcpClient]::new()
+              $stream = $null
+              $waitHandle = $null
+              $clock = [Diagnostics.Stopwatch]::StartNew()
+              try {
+                  $pending = $client.BeginConnect('127.0.0.1', [int]$port, $null, $null)
+                  $waitHandle = $pending.AsyncWaitHandle
+                  if (-not $waitHandle.WaitOne(5000)) { throw 'RDP listener connection timed out.' }
+                  $client.EndConnect($pending)
+                  $stream = $client.GetStream()
+                  $stream.WriteTimeout = [Math]::Max(1, 5000 - [int]$clock.ElapsedMilliseconds)
+                  # Request TLS without CredSSP to verify that NLA is not required.
+                  [byte[]]$request = 3,0,0,19,14,224,0,0,0,0,0,1,0,8,0,1,0,0,0
+                  $stream.Write($request, 0, $request.Length)
+                  $header = Read-RdpBytes $stream 4 $clock
+                  $length = ([int]$header[2] -shl 8) -bor [int]$header[3]
+                  if ($header[0] -ne 3 -or $header[1] -ne 0 -or $length -lt 19 -or $length -gt 4096) {
+                      throw 'Invalid RDP TPKT response.'
+                  }
+                  $reply = Read-RdpBytes $stream ($length - 4) $clock
+                  if ($reply[0] -ne ($length - 5) -or $reply[1] -ne 208 -or
+                      [BitConverter]::ToUInt16($reply, 9) -ne 8) {
+                      throw 'Invalid RDP negotiation response.'
+                  }
+                  $protocol = [BitConverter]::ToUInt32($reply, 11)
+                  if ($reply[7] -eq 3) {
+                      if ($protocol -eq 5) { throw 'RDP listener still requires NLA (HYBRID_REQUIRED_BY_SERVER).' }
+                      throw "RDP negotiation failed with code $protocol."
+                  }
+                  if ($reply[7] -ne 2 -or $protocol -ne 1) {
+                      throw 'RDP listener did not accept TLS without NLA.'
+                  }
+              } finally {
+                  if ($stream) { $stream.Dispose() }
+                  if ($waitHandle) { $waitHandle.Close() }
+                  $client.Dispose()
+              }
+              Start-Sleep -Seconds 2
+              $null = Assert-NLADisabled
+              $Ansible.Result = @{ Port = $port; NLARequired = $false; NegotiatedProtocol = 'TLS' }
+          register: rdp_ready
+          until: rdp_ready is succeeded
+          retries: 6
+          delay: 5
+
       tags: [deploy]
       rescue:
         - fail:
             msg: >-
-              Tinker configuration, startup or health check failed at "{{ ansible_failed_task.name }}".
+              Tinker configuration, startup, health or RDP readiness check failed at "{{ ansible_failed_task.name }}".
               Resolve the task error and redeploy.

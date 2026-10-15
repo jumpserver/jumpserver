@@ -148,7 +148,7 @@ INSTALLED_APPS = [
     'chat_ai.apps.ChatAIConfig',
     'rest_framework',
     'drf_spectacular',
-    'drf_spectacular_sidecar', 
+    'drf_spectacular_sidecar',
     'django_cas_ng',
     'channels',
     'django_filters',
