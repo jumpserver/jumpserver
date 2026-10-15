@@ -7,6 +7,7 @@ from uuid import UUID
 
 from django.core.cache import cache
 from django.utils import timezone
+from django.utils.translation import gettext_lazy
 from django_redis import get_redis_connection
 from redis.exceptions import RedisError
 from rest_framework.exceptions import APIException
@@ -14,7 +15,7 @@ from rest_framework.exceptions import APIException
 
 class TicketCacheUnavailable(APIException):
     status_code = 503
-    default_detail = 'RDP login ticket cache is unavailable'
+    default_detail = gettext_lazy('RDP login ticket cache is unavailable')
 
 
 @dataclass(frozen=True)

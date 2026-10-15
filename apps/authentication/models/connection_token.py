@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import Prefetch, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 from accounts.const import AliasAccount, SecretType
@@ -222,7 +222,7 @@ class ConnectionToken(JMSOrgBaseModel):
             raise PermissionDenied(msg)
 
         if permed_account.date_expired < timezone.now():
-            raise PermissionDenied('Expired')
+            raise PermissionDenied(gettext('Expired'))
         return True
 
     def validate_personal_credential(self, include_secret=False):
@@ -330,7 +330,7 @@ class ConnectionToken(JMSOrgBaseModel):
         provider = virtual_app.select_provider(self.user)
         if provider is None:
             raise JMSException({
-                'error': 'No provider available, please check the virtual app publication and provider status'
+                'error': gettext('No provider available, please check the virtual app publication and provider status')
             })
         return {
             'name': virtual_app.name,

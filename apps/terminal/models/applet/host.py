@@ -1,7 +1,7 @@
 from collections import defaultdict
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from assets.models import Host
@@ -47,13 +47,13 @@ class AppletHost(Host):
     def check_terminal_binding(self, request, tinker_version=''):
         request_terminal = getattr(request.user, 'terminal', None)
         if not request_terminal:
-            raise ValidationError('Request user has no terminal')
+            raise ValidationError(gettext('Request user has no terminal'))
         if request_terminal.type != 'tinker':
-            raise ValidationError('Only Tinker terminals can bind an applet host')
+            raise ValidationError(gettext('Only Tinker terminals can bind an applet host'))
 
         # A service credential must not be able to claim another host at startup.
         if self.terminal_id != request_terminal.pk:
-            raise PermissionDenied('Terminal is not bound to this applet host')
+            raise PermissionDenied(gettext('Terminal is not bound to this applet host'))
         self.date_synced = timezone.now()
         self.tinker_version = tinker_version
         self.save(update_fields=['date_synced', 'tinker_version'])

@@ -63,7 +63,7 @@ def common_exception_handler(exc, context):
         if request and request.get_preferred_type(['text/html', 'application/json']) == 'application/json':
             set_rollback()
             return JsonResponse({
-                'detail': 'Server internal error',
+                'detail': gettext('Server internal error'),
                 'code': 'internal_error',
             }, status=500)
 

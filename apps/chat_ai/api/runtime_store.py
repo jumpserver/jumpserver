@@ -7,6 +7,7 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.utils.dateparse import parse_datetime
+from django.utils.translation import gettext, gettext_lazy
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, serializers, status
 from rest_framework.exceptions import APIException, AuthenticationFailed, ParseError
@@ -35,7 +36,7 @@ PAGE_RECEIPT_PURPOSE = 'kael-runtime-store-page-v1'
 
 class RuntimeStorePayloadTooLarge(APIException):
     status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
-    default_detail = 'The runtime store request exceeds the 64 MiB record limit.'
+    default_detail = gettext_lazy('The runtime store request exceeds the 64 MiB record limit.')
     default_code = 'runtime_store_payload_too_large'
 
 
@@ -54,11 +55,11 @@ class RuntimeStoreJSONParser(JSONParser):
                 object_pairs_hook=_object_without_duplicate_keys,
             )
         except (UnicodeDecodeError, ValueError) as exc:
-            raise ParseError(f'JSON parse error - {exc}') from exc
+            raise ParseError(gettext('JSON parse error - %(error)s') % {'error': exc}) from exc
 
 
 class IsKaelTerminal(permissions.BasePermission):
-    message = 'Only a Kael terminal service account may access the runtime store.'
+    message = gettext_lazy('Only a Kael terminal service account may access the runtime store.')
 
     def has_permission(self, request, view):
         try:
@@ -71,11 +72,11 @@ class IsKaelTerminal(permissions.BasePermission):
 class StrictSerializer(serializers.Serializer):
     def to_internal_value(self, data):
         if not isinstance(data, dict):
-            raise serializers.ValidationError('A JSON object is required.')
+            raise serializers.ValidationError(gettext('A JSON object is required.'))
         unknown = set(data) - set(self.fields)
         if unknown:
             names = ', '.join(sorted(str(item) for item in unknown))
-            raise serializers.ValidationError(f'Unknown field(s): {names}.')
+            raise serializers.ValidationError(gettext('Unknown field(s): %(fields)s.') % {'fields': names})
         return super().to_internal_value(data)
 
 
@@ -104,57 +105,57 @@ class RuntimeStoreAppendSerializer(StrictSerializer):
     def to_internal_value(self, data):
         if isinstance(data, dict):
             if 'commit_id' in data and not isinstance(data['commit_id'], str):
-                raise serializers.ValidationError({'commit_id': 'A UUID string is required.'})
+                raise serializers.ValidationError({'commit_id': gettext('A UUID string is required.')})
             if isinstance(data.get('expected_revision'), bool):
                 raise serializers.ValidationError({
-                    'expected_revision': 'A non-negative integer is required.'
+                    'expected_revision': gettext('A non-negative integer is required.')
                 })
             if 'snapshot' in data and not isinstance(data['snapshot'], bool):
-                raise serializers.ValidationError({'snapshot': 'A boolean is required.'})
+                raise serializers.ValidationError({'snapshot': gettext('A boolean is required.')})
             if 'record' in data and not isinstance(data['record'], str):
-                raise serializers.ValidationError({'record': 'A string is required.'})
+                raise serializers.ValidationError({'record': gettext('A string is required.')})
             if 'integrity' in data and not isinstance(data['integrity'], str):
-                raise serializers.ValidationError({'integrity': 'A hexadecimal string is required.'})
+                raise serializers.ValidationError({'integrity': gettext('A hexadecimal string is required.')})
         return super().to_internal_value(data)
 
     @staticmethod
     def validate_record(value):
         if len(value.encode('utf-8')) > MAX_RECORD_BYTES:
-            raise serializers.ValidationError('The journal record exceeds the 64 MiB limit.')
+            raise serializers.ValidationError(gettext('The journal record exceeds the 64 MiB limit.'))
 
         line = value[:-1] if value.endswith('\n') else value
         if not line or '\n' in line or '\r' in line or line.strip() != line:
-            raise serializers.ValidationError('The journal record must contain exactly one JSON line.')
+            raise serializers.ValidationError(gettext('The journal record must contain exactly one JSON line.'))
         try:
             envelope = json.loads(line, object_pairs_hook=_object_without_duplicate_keys)
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
-            raise serializers.ValidationError('The journal record is not valid JSON.') from exc
+            raise serializers.ValidationError(gettext('The journal record is not valid JSON.')) from exc
         if not isinstance(envelope, dict) or set(envelope) != JOURNAL_RECORD_FIELDS:
             raise serializers.ValidationError(
-                'The journal record must contain version, created_at, payload, and checksum.'
+                gettext('The journal record must contain version, created_at, payload, and checksum.')
             )
         version = envelope.get('version')
         if isinstance(version, bool) or version != 1:
-            raise serializers.ValidationError('Unsupported journal record version.')
+            raise serializers.ValidationError(gettext('Unsupported journal record version.'))
         created_at = envelope.get('created_at')
         if (
             not isinstance(created_at, str)
             or len(created_at) > 64
             or parse_datetime(created_at) is None
         ):
-            raise serializers.ValidationError('The journal record created_at is invalid.')
+            raise serializers.ValidationError(gettext('The journal record created_at is invalid.'))
         payload = envelope.get('payload')
         checksum = envelope.get('checksum')
         if not isinstance(payload, str) or not isinstance(checksum, str) or len(checksum) != 64:
-            raise serializers.ValidationError('The journal record payload or checksum is invalid.')
+            raise serializers.ValidationError(gettext('The journal record payload or checksum is invalid.'))
         try:
             raw = base64.b64decode(payload, validate=True)
             supplied = bytes.fromhex(checksum)
         except (ValueError, binascii.Error) as exc:
-            raise serializers.ValidationError('The journal record payload or checksum is invalid.') from exc
+            raise serializers.ValidationError(gettext('The journal record payload or checksum is invalid.')) from exc
         digest = hashlib.sha256(raw).digest()
         if not hmac.compare_digest(digest, supplied):
-            raise serializers.ValidationError('The journal record checksum does not match its payload.')
+            raise serializers.ValidationError(gettext('The journal record checksum does not match its payload.'))
         return value
 
 
@@ -230,7 +231,7 @@ def _request_access_key_secret(request):
         user_id=request.user.pk,
     ).first()
     if not access_key or not access_key.is_valid:
-        raise AuthenticationFailed('Invalid runtime store access key.')
+        raise AuthenticationFailed(gettext('Invalid runtime store access key.'))
     return str(access_key.secret).encode('utf-8')
 
 
@@ -307,7 +308,7 @@ class RuntimeStoreView(APIView):
         if not hmac.compare_digest(
             expected_integrity, serializer.validated_data['integrity'].lower(),
         ):
-            raise AuthenticationFailed('Invalid runtime store commit integrity.')
+            raise AuthenticationFailed(gettext('Invalid runtime store commit integrity.'))
 
         with transaction.atomic():
             store = _locked_runtime_store()
@@ -357,7 +358,7 @@ class RuntimeStoreView(APIView):
         return Response(
             {
                 'code': 'runtime_store_revision_conflict',
-                'detail': 'The runtime store revision has changed.',
+                'detail': gettext('The runtime store revision has changed.'),
                 'current_revision': current_revision,
             },
             status=status.HTTP_409_CONFLICT,

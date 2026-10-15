@@ -8,7 +8,7 @@ from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _, gettext_lazy
+from django.utils.translation import gettext, gettext as _, gettext_lazy
 from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -140,7 +140,7 @@ class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
 
     def perform_destroy(self, instance):
         if not instance.name:
-            raise ValidationError('Applet is not null')
+            raise ValidationError(gettext('Applet is not null'))
         path = default_storage.path('applets/{}'.format(instance.name))
         if os.path.exists(path):
             shutil.rmtree(path)

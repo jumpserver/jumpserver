@@ -3,7 +3,7 @@
 from django.db import transaction
 from django.db.models import Max, Q, Subquery, OuterRef
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -136,7 +136,7 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
         records = self.get_queryset().filter(id__in=record_ids)
         if not records.exists():
             return Response(
-                {'detail': 'No valid records found'},
+                {'detail': gettext('No valid records found')},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

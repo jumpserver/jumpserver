@@ -8,8 +8,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
-from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView
+from django.utils.translation import gettext as _
 
 from authentication.errors import IntervalTooShort
 from authentication.utils import check_user_property_is_correct
@@ -131,7 +131,7 @@ class UserForgotPasswordView(FormView):
 
         if token_verified_times >= 3:
             cache.delete(token)
-            raise ValueError('Verification code has been used more than 3 times, please re-verify')
+            raise ValueError(_('Verification code has been used more than 3 times, please re-verify'))
         cache.set(token_verified_key, token_verified_times + 1, 5 * 60)
         sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
         return sender_util.verify(code)

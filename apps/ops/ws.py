@@ -4,6 +4,7 @@ import os
 import aiofiles
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.utils.translation import gettext
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
@@ -67,7 +68,7 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         task_id = content.get('task')
         task = await self.get_task(task_id)
         if not task:
-            await self.send_json({'message': 'Task not found', 'task': task_id})
+            await self.send_json({'message': gettext('Task not found'), 'task': task_id})
             return
 
         admin_auditor_role_ids = {
@@ -83,7 +84,7 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         user_can_view = task.creator == user or (task.name in self.user_tasks and has_perms)
         # (有管理员或审计员角色) 或者 (任务是用户自己创建的 或者 有查看任务日志权限), 其他情况没有权限
         if not (has_admin_auditor_role or user_can_view):
-            await self.send_json({'message': 'No permission', 'task': task_id})
+            await self.send_json({'message': gettext('No permission'), 'task': task_id})
             return
 
         task_type = content.get('type', 'celery')

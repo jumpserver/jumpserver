@@ -13,7 +13,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import status, serializers
 from rest_framework.decorators import action
 from rest_framework.settings import api_settings
@@ -1243,7 +1243,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token = get_object_or_404(ConnectionToken, pk=token_id)
         date_expired = as_current_tz(token.date_expired)
         if token.is_expired:
-            raise PermissionDenied('Token is expired at: {}'.format(date_expired))
+            raise PermissionDenied(gettext('Token is expired at: {}').format(date_expired))
         token.renewal()
         data = {
             'ok': True,
@@ -1256,16 +1256,16 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
         rbac_perm = 'authentication.view_superconnectiontokensecret'
         if not request.user.has_perm(rbac_perm):
-            raise PermissionDenied('Not allow to view secret')
+            raise PermissionDenied(gettext('Not allow to view secret'))
 
         from .rdp_login import is_tinker
         if is_tinker(request.user):
-            raise PermissionDenied('Tinker must redeem its RDP login ticket to obtain credentials')
+            raise PermissionDenied(gettext('Tinker must redeem its RDP login ticket to obtain credentials'))
 
         token_id = request.data.get('id') or ''
         token = ConnectionToken.get_typed_connection_token(token_id)
         if not token:
-            raise PermissionDenied('Token {} is not valid'.format(token))
+            raise PermissionDenied(gettext('Token {} is not valid').format(token))
         return Response(get_connection_token_secret(
             token, self.get_serializer,
             expire_now=request.data.get('expire_now', True),
@@ -1287,7 +1287,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         with transaction.atomic(), tmp_to_root_org():
             token = ConnectionToken.get_typed_connection_token(token_id)
             if token is None:
-                raise PermissionDenied('Invalid connection token')
+                raise PermissionDenied(gettext('Invalid connection token'))
             data = issue_applet_ticket(token)
             return private_response(ConnectTokenAppletOptionSerializer(data).data)
 
@@ -1296,7 +1296,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token_id = self.request.data.get('id')
         token = get_object_or_404(ConnectionToken, pk=token_id)
         if token.is_expired:
-            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': gettext('Token expired')}, status=status.HTTP_400_BAD_REQUEST)
         data = token.get_virtual_app_option()
         serializer = ConnectTokenVirtualAppOptionSerializer(data)
         return Response(serializer.data)

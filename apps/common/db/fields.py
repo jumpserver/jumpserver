@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q, Manager, QuerySet
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.utils import contains_ip
@@ -608,5 +608,5 @@ class JSONManyToManyField(models.JSONField):
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
         if not isinstance(value, dict):
-            raise ValidationError("Invalid JSON data for JSONManyToManyField.")
+            raise ValidationError(gettext("Invalid JSON data for JSONManyToManyField."))
         self.check_value(value)

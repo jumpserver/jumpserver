@@ -16,7 +16,7 @@ from django.core.exceptions import (
 )
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.fields import DateTimeField
@@ -1008,11 +1008,11 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
         try:
             json_data = base64.b64decode(json_base64.encode("utf-8"))
         except Exception:
-            raise ValidationError({"attr_rules": "attr_rules should be base64"})
+            raise ValidationError({"attr_rules": gettext("attr_rules should be base64")})
         try:
             data = json.loads(json_data)
         except Exception:
-            raise ValidationError({"attr_rules": "attr_rules should be json"})
+            raise ValidationError({"attr_rules": gettext("attr_rules should be json")})
 
         logger.debug("AttrRulesFilterBackend json_base64 data: %s", data)
         return data
