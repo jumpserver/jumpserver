@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from authentication.password_reset import validate_target
 from common.serializers.fields import EncryptedField
 
 __all__ = [
@@ -15,22 +17,17 @@ class ResetPasswordCodeSerializer(serializers.Serializer):
     form_type = serializers.ChoiceField(
         choices=[('sms', _('SMS')), ('email', _('Email'))], default='email'
     )
-    email = serializers.CharField(allow_blank=True)
-    sms = serializers.CharField(allow_blank=True)
+    email = serializers.CharField(required=False, allow_blank=True, max_length=254)
+    sms = serializers.CharField(required=False, allow_blank=True, max_length=32)
 
-    def create(self, attrs):
-        error = []
-        validate_backends = {
-            'email': _('Email'), 'sms': _('SMS')
-        }
-        form_type = attrs.get('form_type', 'email')
-        validate_backend_input = attrs.get(form_type)
-        if not validate_backend_input:
-            error.append(_('The {} cannot be empty').format(
-                validate_backends.get(validate_backend_input))
-            )
-        if error:
-            raise serializers.ValidationError(error)
+    def validate(self, attrs):
+        form_type = attrs['form_type']
+        target = attrs.get(form_type, '')
+        try:
+            validate_target(form_type, target)
+        except ValidationError as exc:
+            raise serializers.ValidationError({'error': exc.messages[0]})
+        return attrs
 
 
 class PasswordVerifySerializer(serializers.Serializer):

@@ -13686,3 +13686,55 @@ msgstr "Không thể phân tích chữ ký UKey. Vui lòng liên hệ quản tr�
 #: authentication/backends/ukey/providers/xjca.py
 msgid "Xinjiang CA"
 msgstr "CA Tân Cương"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter your username."
+msgstr "Nhập tên người dùng."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the email address linked to your account."
+msgstr "Nhập email liên kết với tài khoản."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the phone number linked to your account."
+msgstr "Nhập số điện thoại liên kết với tài khoản."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Once your information is verified, we will send you a verification code."
+msgstr "Sau khi thông tin được xác minh, chúng tôi sẽ gửi mã xác minh cho bạn."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Verification failed. Check your information or get a new code."
+msgstr "Xác minh không thành công. Kiểm tra thông tin hoặc lấy mã mới."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Image CAPTCHA is incorrect or expired. Please try again."
+msgstr "Mã xác minh hình ảnh không đúng hoặc đã hết hạn. Vui lòng thử lại."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This page has expired. Please start again."
+msgstr "Trang đã hết hạn. Vui lòng bắt đầu lại."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Too many requests. Try again in {seconds} seconds."
+msgstr "Thao tác quá thường xuyên. Thử lại sau {seconds} giây."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Password reset successfully. Please log in again."
+msgstr "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This verification method is unavailable."
+msgstr "Phương thức xác minh này không khả dụng."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter a valid phone number including the country code."
+msgstr "Nhập số điện thoại hợp lệ kèm mã quốc gia."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "The verification code is valid for {seconds} seconds."
+msgstr "Mã xác minh có hiệu lực trong {seconds} giây."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Service unavailable. Please try again later."
+msgstr "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau."

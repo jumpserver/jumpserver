@@ -67,10 +67,16 @@ class TokenMixin:
     def access_key(self):
         return self.access_keys.first()
 
-    def generate_reset_token(self):
+    def generate_reset_token(self, *, for_password_reset=False):
         token = random_string(50)
         key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-        cache.set(key, {"id": self.id, "email": self.email}, 3600)
+        value = {"id": self.id, "email": self.email}
+        timeout = 3600
+        if for_password_reset:
+            from authentication.password_reset import FLOW_TTL, key as recovery_key
+            value['password_fingerprint'] = recovery_key('password', self.password)
+            timeout = FLOW_TTL
+        cache.set(key, value, timeout)
         return token
 
     @classmethod
@@ -86,6 +92,13 @@ class TokenMixin:
             email = value.get("email", "")
             email_lookup = text_hmac_sha256(email)
             user = cls.objects.get(id=user_id, email_lookup=email_lookup)
+            if value.get('password_fingerprint'):
+                from authentication.password_reset import key as recovery_key
+                from django.utils.crypto import constant_time_compare
+                if not constant_time_compare(
+                    value['password_fingerprint'], recovery_key('password', user.password)
+                ):
+                    return None
             return user
         except (AttributeError, cls.DoesNotExist) as e:
             logger.error(e, exc_info=True)

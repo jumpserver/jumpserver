@@ -13504,3 +13504,55 @@ msgstr "UKey 서명을 해석할 수 없습니다. 관리자에게 문의하세�
 #: authentication/backends/ukey/providers/xjca.py
 msgid "Xinjiang CA"
 msgstr "신장 CA"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter your username."
+msgstr "사용자 이름을 입력하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the email address linked to your account."
+msgstr "계정에 연결된 이메일 주소를 입력하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the phone number linked to your account."
+msgstr "계정에 연결된 전화번호를 입력하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Once your information is verified, we will send you a verification code."
+msgstr "입력하신 정보가 확인되면 인증 코드를 보내드립니다."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Verification failed. Check your information or get a new code."
+msgstr "인증에 실패했습니다. 정보를 확인하거나 새 코드를 받으세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Image CAPTCHA is incorrect or expired. Please try again."
+msgstr "이미지 인증 코드가 잘못되었거나 만료되었습니다. 다시 시도하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This page has expired. Please start again."
+msgstr "페이지가 만료되었습니다. 다시 시작하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Too many requests. Try again in {seconds} seconds."
+msgstr "요청이 너무 많습니다. {seconds}초 후에 다시 시도하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Password reset successfully. Please log in again."
+msgstr "비밀번호가 재설정되었습니다. 다시 로그인하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This verification method is unavailable."
+msgstr "이 인증 방법을 사용할 수 없습니다."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter a valid phone number including the country code."
+msgstr "국가 코드를 포함한 올바른 전화번호를 입력하세요."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "The verification code is valid for {seconds} seconds."
+msgstr "인증 코드는 {seconds}초 동안 유효합니다."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Service unavailable. Please try again later."
+msgstr "서비스를 사용할 수 없습니다. 나중에 다시 시도하세요."

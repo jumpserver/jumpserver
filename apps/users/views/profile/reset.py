@@ -2,26 +2,22 @@
 
 from __future__ import unicode_literals
 
-import time
-
 from django.conf import settings
 from django.contrib.auth import login
-from django.core.cache import cache
+from django.db import transaction
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView
 
 from authentication.const import CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY
-from authentication.errors import IntervalTooShort
+from authentication import password_reset
 from authentication.signals import post_auth_success
-from authentication.utils import check_user_property_is_correct
 from common.const.choices import COUNTRY_CALLING_CODES
-from common.utils import FlashMessageUtil, get_object_or_none, random_string, safe_next_url
-from common.utils.verify_code import SendAndVerifyCodeUtil
+from common.utils import FlashMessageUtil, safe_next_url
 from users.notifications import ResetPasswordSuccessMsg
-from users.serializers import SmsUserSerializer
 from ... import forms
 from ...models import User
 from ...utils import check_password_rules, get_password_check_rules
@@ -39,143 +35,94 @@ class UserLoginView(RedirectView):
     query_string = True
 
 
-class UserForgotPasswordPreviewingView(FormView):
+class PasswordRecoveryHeadersMixin:
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        response['Cache-Control'] = 'no-store'
+        response['Referrer-Policy'] = 'no-referrer'
+        return response
+
+
+class UserForgotPasswordPreviewingView(PasswordRecoveryHeadersMixin, FormView):
     template_name = 'users/forgot_password_previewing.html'
     form_class = forms.UserForgotPasswordPreviewingForm
 
-    @staticmethod
-    def get_redirect_url(token):
-        return reverse('authentication:forgot-password') + '?token=%s' % token
-
-    @staticmethod
-    def generate_previewing_token(user):
-        sent_ttl = 60
-        token_sent_at_key = '{}_send_at'.format(user.username)
-        token_sent_at = cache.get(token_sent_at_key, 0)
-
-        if token_sent_at:
-            raise IntervalTooShort(sent_ttl)
-        token = random_string(36)
-        cache.set(token, SmsUserSerializer(user).data, 5 * 60)
-        cache.set(token_sent_at_key, time.time(), sent_ttl)
-        return token
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.session.pop('password_recovery_expired', False):
+            context['errors'] = _('This page has expired. Please start again.')
+        return context
 
     def form_valid(self, form):
-        username = form.cleaned_data['username']
-        user = get_object_or_none(User, username=username)
-        if not user:
-            form.add_error('username', _('User does not exist: {}').format(username))
-            return super().form_invalid(form)
-        if settings.ONLY_ALLOW_AUTH_FROM_SOURCE and not user.is_local:
-            error = _('Non-local users can log in only from third-party platforms '
-                      'and cannot change their passwords: {}').format(username)
-            form.add_error('username', error)
-            return super().form_invalid(form)
-
         try:
-            token = self.generate_previewing_token(user)
-        except IntervalTooShort as e:
-            form.add_error('username', e)
-            return super().form_invalid(form)
-        return redirect(self.get_redirect_url(token))
+            token = password_reset.issue(self.request, form.cleaned_data['username'])
+        except password_reset.RecoveryThrottled as exc:
+            form.add_error(None, str(exc))
+            response = self.form_invalid(form)
+            response.status_code = 429
+            response['Retry-After'] = str(exc.wait)
+            return response
+        return redirect(reverse('authentication:forgot-password') + '?token=' + token)
 
 
-class UserForgotPasswordView(FormView):
+class UserForgotPasswordView(PasswordRecoveryHeadersMixin, FormView):
     template_name = 'users/forgot_password.html'
     form_class = forms.UserForgotPasswordForm
 
-    def get(self, request, *args, **kwargs):
-        token = self.request.GET.get('token')
-        userinfo = cache.get(token)
-        if not userinfo:
-            return redirect(self.get_redirect_url(return_previewing=True))
-        else:
-            context = self.get_context_data(has_phone=bool(userinfo['phone']))
-            return self.render_to_response(context)
+    def dispatch(self, request, *args, **kwargs):
+        self.token = request.GET.get('token')
+        self.flow = password_reset.get_flow(request, self.token)
+        if not self.flow:
+            request.session['password_recovery_expired'] = True
+            response = redirect(reverse('authentication:forgot-previewing'))
+            response['Cache-Control'] = 'no-store'
+            response['Referrer-Policy'] = 'no-referrer'
+            return response
+        return super().dispatch(request, *args, **kwargs)
 
-    @staticmethod
-    def get_validate_backends_context(has_phone):
-        validate_backends = [{'name': _('Email'), 'is_active': True, 'value': 'email'}]
-        if settings.XPACK_LICENSE_IS_VALID:
-            if settings.SMS_ENABLED and has_phone:
-                is_active = True
-            else:
-                is_active = False
-            sms_backend = {'name': _('SMS'), 'is_active': is_active, 'value': 'sms'}
-            validate_backends.append(sms_backend)
-        return {'validate_backends': validate_backends}
-
-    def get_context_data(self, has_phone=False, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = context['form']
-
-        cleaned_data = getattr(form, 'cleaned_data', {})
-        for k, v in cleaned_data.items():
-            if v:
-                context[k] = v
+        data = getattr(context['form'], 'cleaned_data', {})
+        context.update({k: v for k, v in data.items() if k in ('email', 'sms', 'country_code')})
         context['countries'] = COUNTRY_CALLING_CODES
-        context['form_type'] = 'email'
-        context['XPACK_ENABLED'] = settings.XPACK_ENABLED
-        validate_backends = self.get_validate_backends_context(has_phone)
-        context.update(validate_backends)
+        context['form_type'] = data.get('form_type', 'email')
+        backends = [{'name': _('Email'), 'is_active': True, 'value': 'email'}]
+        if settings.XPACK_LICENSE_IS_VALID:
+            backends.append({'name': _('SMS'), 'is_active': settings.SMS_ENABLED, 'value': 'sms'})
+        context['validate_backends'] = backends
         return context
 
-    @staticmethod
-    def get_redirect_url(user=None, return_previewing=False):
-        if not user and return_previewing:
-            return reverse('authentication:forgot-previewing')
-        query_params = '?token=%s' % user.generate_reset_token()
-        reset_password_url = reverse('authentication:reset-password')
-        return reset_password_url + query_params
-
-    @staticmethod
-    def safe_verify_code(token, target, form_type, code):
-        token_verified_key = '{}_verified'.format(token)
-        token_verified_times = cache.get(token_verified_key, 0)
-
-        if token_verified_times >= 3:
-            cache.delete(token)
-            raise ValueError('Verification code has been used more than 3 times, please re-verify')
-        cache.set(token_verified_key, token_verified_times + 1, 5 * 60)
-        sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
-        return sender_util.verify(code)
-
     def form_valid(self, form):
-        token = self.request.GET.get('token')
-        user_info = cache.get(token)
-        if not user_info:
-            return redirect(self.get_redirect_url(return_previewing=True))
-
-        username = user_info.get('username')
         form_type = form.cleaned_data['form_type']
         target = form.cleaned_data[form_type]
-        code = form.cleaned_data['code']
-        country_code = form.cleaned_data.get('country_code', '')
-
-        query_key = form_type
         if form_type == 'sms':
-            query_key = 'phone'
-            target = '{}{}'.format(country_code, target)
-
+            target = form.cleaned_data['country_code'] + target
         try:
-            self.safe_verify_code(token, target, form_type, code)
-        except ValueError as e:
-            return redirect(self.get_redirect_url(return_previewing=True))
-        except Exception as e:
-            form.add_error('code', str(e))
-            return super().form_invalid(form)
+            user = password_reset.verify(
+                self.request, self.token, self.flow, form_type, target, form.cleaned_data['code']
+            )
+        except password_reset.RecoveryError as exc:
+            form.add_error('code', str(exc))
+            response = self.form_invalid(form)
+            if isinstance(exc, password_reset.RecoveryThrottled):
+                response.status_code = 429
+                response['Retry-After'] = str(exc.wait)
+            return response
+        token = user.generate_reset_token(for_password_reset=True)
+        return redirect(reverse('authentication:reset-password') + '?token=' + token)
 
-        user = check_user_property_is_correct(username, **{query_key: target})
-        if not user:
-            form.add_error('code', _('No user matched'))
-            return super().form_invalid(form)
 
-        return redirect(self.get_redirect_url(user))
-
-
-class UserResetPasswordView(FormView):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class UserResetPasswordView(PasswordRecoveryHeadersMixin, FormView):
     template_name = 'users/reset_password.html'
     form_class = forms.UserTokenResetPasswordForm
+
+    def dispatch(self, request, *args, **kwargs):
+        # Own the transaction so the recovery lock encloses the actual commit,
+        # rather than being released before ATOMIC_REQUESTS commits the response.
+        token = request.GET.get('token') if request.method == 'POST' else None
+        with password_reset.reset_token_lock(token) as self.is_password_recovery, transaction.atomic():
+            return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
@@ -243,7 +190,10 @@ class UserResetPasswordView(FormView):
             return self.form_invalid(form)
 
         user.reset_password(password)
-        User.expired_reset_password_token(token)
+        if self.is_password_recovery:
+            transaction.on_commit(lambda: User.expired_reset_password_token(token), robust=True)
+        else:
+            User.expired_reset_password_token(token)
 
         ResetPasswordSuccessMsg(user, self.request).publish_async()
         if is_custom_sso_first_login:
@@ -261,7 +211,7 @@ class UserResetPasswordView(FormView):
     def get_redirect_url():
         message_data = {
             'title': _('Reset password success'),
-            'message': _('Reset password success, return to login page'),
+            'message': _('Password reset successfully. Please log in again.'),
             'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,
         }

@@ -15,6 +15,15 @@ from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_root_org
 
 
+@shared_task(ignore_result=True)
+def send_password_reset_code(token, request_id, form_type, target, language):
+    from django.utils.translation import override
+    from authentication.password_reset import deliver_code
+
+    with override(language):
+        deliver_code(token, request_id, form_type, target)
+
+
 @shared_task(
     verbose_name=_('Clean expired session'),
     description=_(

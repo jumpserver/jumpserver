@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_ssh_public_key
 from authentication.forms import EncryptedField, CaptchaMixin
+from authentication.password_reset import validate_target
 from ..models import User
 
 __all__ = [
@@ -98,23 +99,42 @@ class UserTokenResetPasswordForm(forms.Form):
 
 
 class UserForgotPasswordForm(forms.Form):
-    email = forms.CharField(label=_("Email"), required=False)
-    country_code = forms.CharField(required=False)
+    email = forms.CharField(label=_("Email"), required=False, max_length=254)
+    country_code = forms.CharField(required=False, max_length=8)
     sms = forms.CharField(
-        label=_('SMS'), required=False,
+        label=_('SMS'), required=False, max_length=24,
         help_text=_('The phone number must contain an area code, for example, +86')
     )
     code = forms.CharField(
-        label=_('Verify code'), max_length=settings.SMS_CODE_LENGTH, required=False
+        label=_('Verify code'), max_length=max(6, settings.SMS_CODE_LENGTH), required=True
     )
     form_type = forms.ChoiceField(
         choices=[('sms', _('SMS')), ('email', _('Email'))],
         widget=forms.HiddenInput({'value': 'email'})
     )
 
+    def clean(self):
+        data = super().clean()
+        form_type = data.get('form_type')
+        if form_type and form_type not in self.errors:
+            target = data.get(form_type, '')
+            if form_type == 'sms' and target:
+                target = data.get('country_code', '') + target
+            try:
+                validate_target(form_type, target)
+            except forms.ValidationError as exc:
+                self.add_error(form_type, exc)
+        return data
+
 
 class UserForgotPasswordPreviewingForm(CaptchaMixin):
-    username = forms.CharField(label=_("Username"))
+    username = forms.CharField(label=_("Username"), max_length=128)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['captcha'].error_messages['invalid'] = _(
+            'Image CAPTCHA is incorrect or expired. Please try again.'
+        )
 
 
 class UserPasswordForm(UserTokenResetPasswordForm):

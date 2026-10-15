@@ -1,97 +1,54 @@
-import time
-
-from django.conf import settings
-from django.core.cache import cache
-from django.http import HttpResponseRedirect
-from django.shortcuts import reverse
-from django.template.loader import render_to_string
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from authentication import errors
-from authentication.errors import IntervalTooShort
-from authentication.mixins import AuthMixin
-from authentication.mixins import authenticate
-from authentication.serializers import (
-    PasswordVerifySerializer, ResetPasswordCodeSerializer
-)
-from authentication.utils import check_user_property_is_correct
+from authentication import errors, password_reset
+from authentication.mixins import AuthMixin, authenticate
+from authentication.serializers import PasswordVerifySerializer, ResetPasswordCodeSerializer
+from authentication.tasks import send_password_reset_code
 from common.permissions import IsValidUser
-from common.utils.random import random_string
-from common.utils.verify_code import SendAndVerifyCodeUtil
-from settings.utils import get_login_title
+from common.utils import get_logger
 from users.utils import LoginBlockUtil, LoginIpBlockUtil
+
+logger = get_logger(__name__)
 
 
 class UserResetPasswordSendCodeApi(CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = ResetPasswordCodeSerializer
 
-    @staticmethod
-    def is_valid_user(username, **properties):
-        user = check_user_property_is_correct(username, **properties)
-        if not user:
-            err_msg = _('User does not exist: {}').format(_("No user matched"))
-            return None, err_msg
-        if not user.is_local:
-            err_msg = _(
-                'The user is from {}, please go to the corresponding system to change the password'
-            ).format(user.get_source_display())
-            return None, err_msg
-        return user, None
-
-    @staticmethod
-    def safe_send_code(token, code, target, form_type, content, user_info):
-        token_sent_key = '{}_send_at'.format(token)
-        token_send_at = cache.get(token_sent_key, 0)
-        if token_send_at:
-            raise IntervalTooShort(60)
-        tooler = SendAndVerifyCodeUtil(
-            target, code, backend=form_type, user_info=user_info, **content
-        )
-        tooler.gen_and_send_async()
-        cache.set(token_sent_key, int(time.time()), 60)
-
-    def prepare_code_data(self, user_info, serializer):
-        username = user_info.get('username')
-        form_type = serializer.validated_data['form_type']
-
-        target = serializer.validated_data[form_type]
-        if form_type == 'sms':
-            query_key = 'phone'
-        else:
-            query_key = form_type
-        user, err = self.is_valid_user(username=username, **{query_key: target})
-        if not user:
-            raise ValueError(err)
-
-        code = random_string(settings.SMS_CODE_LENGTH, lower=False, upper=False)
-        subject = '%s: %s' % (get_login_title(), _('Forgot password'))
-        tip = _('The validity period of the verification code is {} minute').format(settings.VERIFY_CODE_TTL // 60)
-        context = {
-            'user': user, 'title': subject, 'code': code, 'tip': tip,
-        }
-        message = render_to_string('authentication/_msg_reset_password_code.html', context)
-        content = {'subject': subject, 'message': message}
-        return code, target, form_type, content
-
     def create(self, request, *args, **kwargs):
         token = request.GET.get('token')
-        user_info = cache.get(token)
-        if not user_info:
-            return HttpResponseRedirect(reverse('authentication:forgot-previewing'))
-
+        flow = password_reset.get_flow(request, token)
+        if not flow:
+            return Response({
+                'error': _('This page has expired. Please start again.'),
+                'code': 'password_reset_expired',
+            }, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        form_type = serializer.validated_data['form_type']
+        target = serializer.validated_data[form_type]
         try:
-            code, target, form_type, content = self.prepare_code_data(user_info, serializer)
-        except ValueError as e:
-            return Response({'error': str(e)}, status=400)
-        self.safe_send_code(token, code, target, form_type, content, user_info)
-        return Response({'data': 'ok'}, status=200)
+            request_id = password_reset.reserve_send(request, token, flow, form_type, target)
+        except password_reset.RecoveryThrottled as exc:
+            return Response({'error': str(exc), 'retry_after': exc.wait},
+                            status=status.HTTP_429_TOO_MANY_REQUESTS,
+                            headers={'Retry-After': str(exc.wait)})
+        # Queue all well-formed requests, including unknown accounts. Account lookup
+        # and delivery do not affect the public response or its processing time.
+        try:
+            send_password_reset_code.apply_async(
+                args=(token, request_id, form_type, target, get_language()),
+                argsrepr='(<redacted>)', priority=100,
+            )
+        except Exception:
+            logger.error('Unable to enqueue password recovery request')
+            return Response({'error': _('Service unavailable. Please try again later.')},
+                            status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response({'data': 'ok', 'retry_after': password_reset.SEND_INTERVAL})
 
 
 class UserPasswordVerifyApi(AuthMixin, CreateAPIView):

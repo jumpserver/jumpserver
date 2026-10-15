@@ -13128,3 +13128,55 @@ msgstr "Delete"
 #~| msgid "App Authentication"
 #~ msgid "Certificate Auth"
 #~ msgstr "Authentication"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter your username."
+msgstr "Enter your username."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the email address linked to your account."
+msgstr "Enter the email address linked to your account."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the phone number linked to your account."
+msgstr "Enter the phone number linked to your account."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Once your information is verified, we will send you a verification code."
+msgstr "Once your information is verified, we will send you a verification code."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Verification failed. Check your information or get a new code."
+msgstr "Verification failed. Check your information or get a new code."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Image CAPTCHA is incorrect or expired. Please try again."
+msgstr "Image CAPTCHA is incorrect or expired. Please try again."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This page has expired. Please start again."
+msgstr "This page has expired. Please start again."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Too many requests. Try again in {seconds} seconds."
+msgstr "Too many requests. Try again in {seconds} seconds."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Password reset successfully. Please log in again."
+msgstr "Password reset successfully. Please log in again."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This verification method is unavailable."
+msgstr "This verification method is unavailable."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter a valid phone number including the country code."
+msgstr "Enter a valid phone number including the country code."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "The verification code is valid for {seconds} seconds."
+msgstr "The verification code is valid for {seconds} seconds."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Service unavailable. Please try again later."
+msgstr "Service unavailable. Please try again later."

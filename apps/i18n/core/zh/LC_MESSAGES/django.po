@@ -13270,3 +13270,55 @@ msgstr "删除"
 
 #~ msgid "Offline video player"
 #~ msgstr "离线录像播放器"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter your username."
+msgstr "请输入用户名。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the email address linked to your account."
+msgstr "请输入账号绑定的邮箱。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the phone number linked to your account."
+msgstr "请输入账号绑定的手机号。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Once your information is verified, we will send you a verification code."
+msgstr "信息核验通过后，将向您发送验证码。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Verification failed. Check your information or get a new code."
+msgstr "验证未通过，请检查信息或重新获取验证码。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Image CAPTCHA is incorrect or expired. Please try again."
+msgstr "图形验证码错误或已过期，请重试。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This page has expired. Please start again."
+msgstr "页面已过期，请重新开始。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Too many requests. Try again in {seconds} seconds."
+msgstr "操作频繁，请在 {seconds} 秒后重试。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Password reset successfully. Please log in again."
+msgstr "密码重置成功，请重新登录。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This verification method is unavailable."
+msgstr "该验证方式不可用。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter a valid phone number including the country code."
+msgstr "请输入包含国家区号的有效手机号。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "The verification code is valid for {seconds} seconds."
+msgstr "验证码有效期为 {seconds} 秒。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Service unavailable. Please try again later."
+msgstr "服务暂不可用，请稍后重试。"

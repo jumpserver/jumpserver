@@ -13558,3 +13558,55 @@ msgstr "ライセンスが無効です"
 
 #~ msgid "Closed"
 #~ msgstr "クローズ"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter your username."
+msgstr "ユーザー名を入力してください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the email address linked to your account."
+msgstr "アカウントに登録されたメールアドレスを入力してください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the phone number linked to your account."
+msgstr "アカウントに登録された電話番号を入力してください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Once your information is verified, we will send you a verification code."
+msgstr "入力情報を確認できた場合、確認コードを送信します。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Verification failed. Check your information or get a new code."
+msgstr "認証できませんでした。情報を確認するか、確認コードを再取得してください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Image CAPTCHA is incorrect or expired. Please try again."
+msgstr "画像認証コードが正しくないか、有効期限が切れています。もう一度お試しください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This page has expired. Please start again."
+msgstr "ページの有効期限が切れました。最初からやり直してください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Too many requests. Try again in {seconds} seconds."
+msgstr "リクエストが多すぎます。{seconds} 秒後にお試しください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Password reset successfully. Please log in again."
+msgstr "パスワードを再設定しました。再度ログインしてください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This verification method is unavailable."
+msgstr "この認証方法は利用できません。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter a valid phone number including the country code."
+msgstr "国番号を含む有効な電話番号を入力してください。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "The verification code is valid for {seconds} seconds."
+msgstr "確認コードの有効期限は {seconds} 秒です。"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Service unavailable. Please try again later."
+msgstr "サービスを利用できません。しばらくしてからお試しください。"

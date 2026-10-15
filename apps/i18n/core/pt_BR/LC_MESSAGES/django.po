@@ -13640,3 +13640,55 @@ msgstr "Não foi possível analisar a assinatura UKey. Entre em contato com o ad
 #: authentication/backends/ukey/providers/xjca.py
 msgid "Xinjiang CA"
 msgstr "AC de Xinjiang"
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter your username."
+msgstr "Digite seu nome de usuário."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the email address linked to your account."
+msgstr "Digite o e-mail vinculado à sua conta."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter the phone number linked to your account."
+msgstr "Digite o telefone vinculado à sua conta."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Once your information is verified, we will send you a verification code."
+msgstr "Após a verificação dos seus dados, enviaremos um código de verificação."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Verification failed. Check your information or get a new code."
+msgstr "A verificação falhou. Confira os dados ou solicite outro código."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Image CAPTCHA is incorrect or expired. Please try again."
+msgstr "O código da imagem está incorreto ou expirou. Tente novamente."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This page has expired. Please start again."
+msgstr "Esta página expirou. Comece novamente."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Too many requests. Try again in {seconds} seconds."
+msgstr "Muitas solicitações. Tente novamente em {seconds} segundos."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Password reset successfully. Please log in again."
+msgstr "Senha redefinida. Entre novamente."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "This verification method is unavailable."
+msgstr "Este método de verificação está indisponível."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Enter a valid phone number including the country code."
+msgstr "Digite um telefone válido com o código do país."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "The verification code is valid for {seconds} seconds."
+msgstr "O código é válido por {seconds} segundos."
+
+#: authentication/password_reset.py users/templates/users/forgot_password.html
+msgid "Service unavailable. Please try again later."
+msgstr "Serviço indisponível. Tente novamente mais tarde."
