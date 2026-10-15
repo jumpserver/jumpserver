@@ -20,7 +20,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
@@ -608,7 +608,7 @@ class AuthFaceMixin:
         from authentication.const import FACE_SESSION_KEY
         token = self.request.session.get(FACE_SESSION_KEY)
         if not token:
-            raise ValueError("Face recognition token is missing from the session.")
+            raise ValueError(gettext("Face recognition token is missing from the session."))
         return token
 
     def get_face_verify_context(self):
@@ -616,14 +616,14 @@ class AuthFaceMixin:
         cache_key = self._get_face_cache_key(token)
         context = cache.get(cache_key)
         if not context:
-            raise ValueError(f"Face recognition context does not exist for token: {token}")
+            raise ValueError(gettext('Face recognition context does not exist for token: %(token)s') % {'token': token})
         return context
 
     def get_face_code(self):
         context = self.get_face_verify_context()
 
         if not self._is_context_finished(context):
-            raise RuntimeError("Face recognition is not yet completed.")
+            raise RuntimeError(gettext("Face recognition is not yet completed."))
 
         if not self._is_context_success(context):
             msg = context.get('error_message', '')
@@ -631,7 +631,7 @@ class AuthFaceMixin:
 
         face_code = context.get('face_code')
         if not face_code:
-            raise ValueError("Face code is missing from the context.")
+            raise ValueError(gettext("Face code is missing from the context."))
         return face_code
 
 

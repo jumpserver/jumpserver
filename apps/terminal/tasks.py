@@ -8,7 +8,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.files.storage import default_storage
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from common.storage.replay import ReplayStorageHandler
 from ops.celery.decorator import (
@@ -154,7 +154,7 @@ def run_app_provider_deployment(did):
         deployment = AppProviderDeployment.objects.get(id=did)
         deployment.start()
         if deployment.status != 'success':
-            raise AppProviderDeploymentError('Application provider deployment failed; see the Ansible task log')
+            raise AppProviderDeploymentError(gettext('Application provider deployment failed; see the Ansible task log'))
 
 
 @shared_task(

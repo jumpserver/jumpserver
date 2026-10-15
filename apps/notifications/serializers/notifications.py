@@ -1,4 +1,5 @@
 from django.template import Engine, TemplateSyntaxError
+from django.utils.translation import gettext
 from rest_framework import serializers
 
 from common.serializers import BulkModelSerializer
@@ -53,5 +54,7 @@ class TemplateEditSerializer(serializers.Serializer):
         try:
             safe_engine.from_string(value)
         except TemplateSyntaxError as e:
-            raise serializers.ValidationError(f'Template syntax error at: {e.token.lineno}')
+            raise serializers.ValidationError(
+                gettext('Template syntax error at line: %(line)s') % {'line': e.token.lineno}
+            )
         return value

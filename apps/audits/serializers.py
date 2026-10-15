@@ -54,7 +54,7 @@ class JobsAuditSerializer(JobSerializer):
         invalid_fields = submitted_fields - allowed_fields
         if invalid_fields:
             raise serializers.ValidationError(
-                f"Updating  {', '.join(invalid_fields)} fields is not allowed"
+                _('Updating %(fields)s fields is not allowed') % {'fields': ', '.join(invalid_fields)}
             )
         return attrs
 

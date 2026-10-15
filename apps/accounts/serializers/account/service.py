@@ -54,7 +54,8 @@ class IntegrationAccountSecretSerializer(serializers.Serializer):
     def _valid_at_least_one(attrs, fields):
         if not any(attrs.get(field) for field in fields):
             raise serializers.ValidationError(
-                f"At least one of the following fields must be provided: {', '.join(fields)}."
+                _('At least one of the following fields must be provided: %(fields)s.')
+                % {'fields': ', '.join(fields)}
             )
 
     def validate(self, attrs):

@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 
 from common.api.generic import JMSBulkModelViewSet
@@ -25,6 +24,7 @@ __all__ = ["PlaybookViewSet", "PlaybookFileBrowserAPIView"]
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils._os import safe_join
+from django.utils.translation import gettext, gettext_lazy as _
 
 
 def unzip_playbook(src, dest):
@@ -74,11 +74,11 @@ class PlaybookViewSet(JMSBulkModelViewSet):
             queryset = self.get_queryset()
             clone_from = queryset.filter(id=clone_id).first()
             if not clone_from:
-                raise JMSException(code='invalid_clone_id', detail={"msg": "Invalid clone_from id"})
+                raise JMSException(code='invalid_clone_id', detail={"msg": gettext("Invalid clone_from id")})
             src_path = safe_join(base_path, clone_id)
             dest_path = safe_join(base_path, str(instance.id))
             if not os.path.exists(src_path):
-                raise JMSException(code='invalid_playbook_id', detail={"msg": "clone playbook file not found"})
+                raise JMSException(code='invalid_playbook_id', detail={"msg": gettext("clone playbook file not found")})
             shutil.copytree(src_path, dest_path)
             return
 
@@ -90,7 +90,7 @@ class PlaybookViewSet(JMSBulkModelViewSet):
                 try:
                     unzip_playbook(src_path, dest_path)
                 except RuntimeError:
-                    raise JMSException(code='invalid_playbook_file', detail={"msg": "Unzip failed"})
+                    raise JMSException(code='invalid_playbook_file', detail={"msg": gettext("Unzip failed")})
 
                 if 'main.yml' not in os.listdir(dest_path):
                     raise PlaybookNoValidEntry

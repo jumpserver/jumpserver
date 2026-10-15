@@ -10,6 +10,7 @@ import yaml
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from django.utils.translation import gettext
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger, random_string
@@ -107,7 +108,7 @@ class DeployAppletHostManager:
             host = AppletHost.objects.select_for_update().get(pk=self.deployment.host.pk)
             old_terminal = host.terminal
             if old_terminal and old_terminal.type != 'tinker':
-                raise ValueError('Applet host terminal must be Tinker')
+                raise ValueError(gettext('Applet host terminal must be Tinker'))
             name = re.sub(r'\W', '_', host.name, flags=re.UNICODE)[:100]
             serializer = TerminalRegistrationSerializer(data={
                 'name': f'[Tinker]-{name}-{random_string(7)}',
@@ -118,7 +119,7 @@ class DeployAppletHostManager:
             terminal = serializer.save()
             key = terminal.user.access_key
             if not key or not key.is_active:
-                raise RuntimeError('Tinker component has no active access key')
+                raise RuntimeError(gettext('Tinker component has no active access key'))
             credentials = {'name': terminal.name, 'access_key': key.get_full_value()}
             host.terminal = terminal
             host.tinker_version = ''
@@ -136,14 +137,14 @@ class DeployAppletHostManager:
         with transaction.atomic():
             host = AppletHost.objects.select_for_update().get(pk=self.deployment.host.pk)
             if host.terminal_id != self._expected_terminal_id:
-                raise RuntimeError('Tinker component binding changed during deployment')
+                raise RuntimeError(gettext('Tinker component binding changed during deployment'))
             host.terminal_id = self._retire_terminal_id
             host.tinker_version = ''
             host.date_synced = None
             host.save(update_fields=['terminal', 'tinker_version', 'date_synced'])
             terminal = Terminal.objects.get(pk=self._expected_terminal_id)
             if not terminal.user or not terminal.user.is_service_account:
-                raise RuntimeError('Unconfirmed Tinker component is not a service account')
+                raise RuntimeError(gettext('Unconfirmed Tinker component is not a service account'))
             terminal.delete()
         logger.info('Discarded the unconfirmed Tinker component and key; retry full reinstallation')
 
@@ -154,7 +155,7 @@ class DeployAppletHostManager:
         with transaction.atomic():
             host = AppletHost.objects.select_for_update().get(pk=self.deployment.host.pk)
             if host.terminal_id != self._expected_terminal_id:
-                raise RuntimeError('Tinker component binding changed during deployment')
+                raise RuntimeError(gettext('Tinker component binding changed during deployment'))
             previous = Terminal.objects.filter(pk=previous_id).first()
             if previous and previous.user and not previous.user.is_service_account:
                 # Terminal.delete() also deletes its user. Never remove an ordinary
@@ -176,7 +177,7 @@ class DeployAppletHostManager:
         if self.applet:
             generate_playbook = self.generate_uninstall_applet_playbook
         else:
-            raise ValueError("applet is required for uninstall_applet")
+            raise ValueError(gettext("applet is required for uninstall_applet"))
         return self._run_playbook(generate_playbook, **kwargs)
 
     def generate_initial_playbook(self, credentials=None):

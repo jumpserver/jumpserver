@@ -38,7 +38,7 @@ __all__ = [
 class TicketStep(JMSBaseModel):
     ticket = models.ForeignKey(
         'Ticket', related_name='ticket_steps',
-        on_delete=models.CASCADE, verbose_name='Ticket'
+        on_delete=models.CASCADE, verbose_name=_('Ticket')
     )
     level = models.SmallIntegerField(
         default=TicketLevel.one, choices=TicketLevel.choices,
@@ -96,7 +96,7 @@ class TicketAssigneeQuerySet(models.QuerySet):
 class TicketAssignee(JMSBaseModel):
     assignee = models.ForeignKey(
         'users.User', related_name='ticket_assignees',
-        on_delete=models.SET_NULL, null=True, verbose_name='Assignee'
+        on_delete=models.SET_NULL, null=True, verbose_name=_('Assignee')
     )
     state = models.CharField(
         choices=TicketState.choices, max_length=64,

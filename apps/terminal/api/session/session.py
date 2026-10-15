@@ -11,7 +11,7 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import translation
 from django.utils.encoding import escape_uri_path
-from django.utils.translation import gettext_noop, gettext as _, gettext_lazy
+from django.utils.translation import gettext, gettext as _, gettext_lazy, gettext_noop
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import viewsets, views
@@ -359,13 +359,13 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         try:
             content = storage.get_verified_index_bytes()
         except FileNotFoundError:
-            return Response({'error': 'Replay index not found.'}, status=404)
+            return Response({'error': gettext('Replay index not found.')}, status=404)
         except ValueError as exc:
             logger.warning('Invalid replay index for session %s: %s', session.id, exc)
-            return Response({'error': 'Replay index is invalid.'}, status=422)
+            return Response({'error': gettext('Replay index is invalid.')}, status=422)
         except OSError as exc:
             logger.warning('Could not read replay index for session %s: %s', session.id, exc)
-            return Response({'error': 'Replay index is unavailable.'}, status=503)
+            return Response({'error': gettext('Replay index is unavailable.')}, status=503)
         self._record_replay_view(session)
         response = HttpResponse(
             content, content_type=storage.INDEX_MEDIA_TYPE

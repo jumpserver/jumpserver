@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -111,7 +111,7 @@ class VariableFormDataSerializer(serializers.Serializer):
         playbook = params.get('playbook')
 
         if not any([job, adhoc, playbook]):
-            raise ValidationError("One of 'job', 'adhoc', or 'playbook' is required.")
+            raise ValidationError(gettext("One of 'job', 'adhoc', or 'playbook' is required."))
 
         try:
             variables = Variable.objects.filter(
@@ -120,7 +120,7 @@ class VariableFormDataSerializer(serializers.Serializer):
                 playbook=playbook if playbook else None
             ).all()
         except ObjectDoesNotExist:
-            raise ValidationError("Invalid job, adhoc, or playbook ID.")
+            raise ValidationError(gettext("Invalid job, adhoc, or playbook ID."))
 
         dynamic_fields = [var.form_data for var in variables]
 
@@ -152,7 +152,7 @@ class VariableFormDataSerializer(serializers.Serializer):
         try:
             options_data = {option.split(':')[0]: option.split(':')[1] for option in options}
         except Exception as e:
-            raise ValidationError(f"Invalid options format: {str(e)}")
+            raise ValidationError(gettext('Invalid options format: %(error)s') % {'error': str(e)})
 
         DynamicFieldType = models.TextChoices('DynamicFieldType', options_data)
         self.fields[var_name] = LabeledChoiceField(

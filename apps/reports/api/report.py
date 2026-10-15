@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -129,26 +130,26 @@ class ReportSerializer(serializers.ModelSerializer):
 
     def validate_tp(self, value):
         if value not in CREATABLE_REPORT_TYPES:
-            raise serializers.ValidationError('Unsupported report type')
+            raise serializers.ValidationError(gettext('Unsupported report type'))
         if self.instance and self.instance.tp != value:
-            raise serializers.ValidationError('Report type can not be modified')
+            raise serializers.ValidationError(gettext('Report type can not be modified'))
         return value
 
     def validate_days(self, value):
         try:
             normalized = int(value)
         except (TypeError, ValueError):
-            raise serializers.ValidationError('Invalid days')
+            raise serializers.ValidationError(gettext('Invalid days'))
         if normalized not in ALLOWED_REPORT_DAYS:
-            raise serializers.ValidationError('Days must be one of: 1, 7, 30')
+            raise serializers.ValidationError(gettext('Days must be one of: 1, 7, 30'))
         return normalized
 
     def validate_filters(self, value):
         if not isinstance(value, dict):
-            raise serializers.ValidationError('Filters must be a dict')
+            raise serializers.ValidationError(gettext('Filters must be a dict'))
         validate_report_payload(self.initial_data.get('tp') or getattr(self.instance, 'tp', ''), value)
         if value.get('asset_id') and not Asset.objects.filter(id=str(value.get('asset_id'))).exists():
-            raise serializers.ValidationError({'filters': {'asset_id': 'Asset not found'}})
+            raise serializers.ValidationError({'filters': {'asset_id': gettext('Asset not found')}})
         return value
 
     def to_representation(self, instance):
@@ -229,12 +230,12 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         if serializer.instance.is_builtin:
-            raise serializers.ValidationError({'is_builtin': 'Builtin report template can not be modified'})
+            raise serializers.ValidationError({'is_builtin': gettext('Builtin report template can not be modified')})
         serializer.save()
 
     def perform_destroy(self, instance):
         if instance.is_builtin:
-            raise serializers.ValidationError({'is_builtin': 'Builtin report template can not be deleted'})
+            raise serializers.ValidationError({'is_builtin': gettext('Builtin report template can not be deleted')})
         instance.delete()
 
     @action(methods=['get'], detail=False, url_path='templates')

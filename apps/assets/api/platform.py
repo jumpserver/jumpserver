@@ -4,7 +4,7 @@ import shutil
 from django.core.files.storage import default_storage
 from django.db.models import Subquery, OuterRef, Count, Value
 from django.db.models.functions import Coalesce
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import serializers
@@ -117,7 +117,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
     def check_object_permissions(self, request, obj):
         if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
             self.permission_denied(
-                request, message={"detail": "Internal platform"}
+                request, message={"detail": gettext("Internal platform")}
             )
         return super().check_object_permissions(request, obj)
 
@@ -166,7 +166,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
             tmp_dir = locate_package_root(extract_to, file.name, 'platform.yml')
             data = PlatformPackage.validate(tmp_dir)
             if not data:
-                raise ValidationError({'error': 'Missing platform.yml in package'})
+                raise ValidationError({'error': gettext('Missing platform.yml in package')})
             name = data['name']
             instance = Platform.objects.filter(name=name).first()
             platform = PlatformPackage.sync_platform(

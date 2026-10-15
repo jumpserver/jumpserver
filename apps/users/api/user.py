@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 from django.core.cache import cache
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext as _
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -184,7 +184,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     @action(methods=['post'], detail=False)
     def invite(self, request):
         if not current_org or current_org.is_root():
-            error = {"error": "Not a valid org"}
+            error = {"error": gettext("Not a valid org")}
             return Response(error, status=400)
 
         serializer_cls = self.get_serializer_class()

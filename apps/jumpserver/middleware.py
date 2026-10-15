@@ -16,6 +16,7 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext
 from rest_framework import status
 
 from common.utils import get_logger
@@ -153,8 +154,8 @@ class EndMiddleware:
         if isinstance(exception, OperationalError):
             logger.debug("Database operational error: %s", exception)
             return JsonResponse({
-                'error': 'Service temporarily unavailable',
-                'message': 'Database operation failed, please try again later.',
+                'error': gettext('Service temporarily unavailable'),
+                'message': gettext('Database operation failed, please try again later.'),
                 'code': 'DB_ERROR'
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         return None

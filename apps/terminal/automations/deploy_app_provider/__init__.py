@@ -11,6 +11,7 @@ import yaml
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from django.utils.translation import gettext
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
@@ -31,7 +32,7 @@ def load_manifest():
     except FileNotFoundError:
         return {}
     if not isinstance(manifest, dict):
-        raise ValueError('Invalid virtual application offline manifest')
+        raise ValueError(gettext('Invalid virtual application offline manifest'))
     for name in ('panda', 'docker'):
         if name in manifest and not isinstance(manifest[name], dict):
             raise ValueError(f'Invalid {name} offline resource')
@@ -65,7 +66,7 @@ def stage_resources(run_dir, image):
         if not resource.get('architecture'):
             raise ValueError(f'Missing {name} offline architecture')
         if name == 'panda' and not re.fullmatch(r'sha256:[a-f0-9]{64}', resource.get('image_id', '')):
-            raise ValueError('Invalid Panda offline image ID')
+            raise ValueError(gettext('Invalid Panda offline image ID'))
         files = {'file': resource.get('file', '')}
         if name == 'docker':
             files['service'] = 'docker.service'
@@ -123,10 +124,10 @@ class DeployAppProviderManager:
         with open(path) as stream:
             hosts = json.load(stream)['all']['hosts']
         if len(hosts) != 1 or inventory.exclude_hosts:
-            raise ValueError('No deployable SSH host: check the privileged account and platform automation')
+            raise ValueError(gettext('No deployable SSH host: check the privileged account and platform automation'))
         host = next(iter(hosts.values()))
         if host.get('ansible_connection') != 'ssh':
-            raise ValueError('Application provider deployment requires SSH')
+            raise ValueError(gettext('Application provider deployment requires SSH'))
         return path
 
     @staticmethod
@@ -150,7 +151,7 @@ class DeployAppProviderManager:
         provider = AppProvider.objects.select_for_update().get(pk=self.provider.pk)
         terminal = provider.terminal
         if terminal and terminal.type != 'panda':
-            raise ValueError('Provider terminal must be Panda')
+            raise ValueError(gettext('Provider terminal must be Panda'))
         if not terminal or not terminal.user:
             if terminal:
                 provider.terminal = None

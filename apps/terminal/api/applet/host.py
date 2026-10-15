@@ -1,7 +1,7 @@
 import uuid
 
 from django.db import transaction
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework import status
 from rest_framework import viewsets
@@ -75,7 +75,7 @@ class AppletHostViewSet(JMSBulkModelViewSet):
     @action(methods=['put'], detail=True, url_path='generate-accounts')
     def generate_accounts(self, request, *args, **kwargs):
         return Response(
-            {'detail': 'Windows runtime accounts are managed locally by Tinker.'},
+            {'detail': gettext('Windows runtime accounts are managed locally by Tinker.')},
             status=status.HTTP_410_GONE,
         )
 

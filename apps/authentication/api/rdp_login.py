@@ -9,7 +9,7 @@ from uuid import uuid4
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -39,39 +39,39 @@ def digest(value):
 def check_connection(token):
     token.is_valid(include_personal_secret=False)
     if token.type not in (ConnectionTokenType.USER, ConnectionTokenType.ADMIN):
-        raise PermissionDenied('Only user and admin connection tokens support RDP token login')
+        raise PermissionDenied(gettext('Only user and admin connection tokens support RDP token login'))
     # Recheck even when is_valid takes its recent-token shortcut.
     account = token.get_permed_account()
     if (not account or account.date_expired <= timezone.now()
             or not ActionChoices.contains(account.actions, ActionChoices.connect)):
-        raise PermissionDenied('Connection permission is no longer valid')
+        raise PermissionDenied(gettext('Connection permission is no longer valid'))
     token.__dict__['permed_account'] = account
     method = token.connect_method_object or {}
     if method.get('type') != 'applet' or method.get('disabled'):
-        raise PermissionDenied('An enabled Applet connection is required')
+        raise PermissionDenied(gettext('An enabled Applet connection is required'))
     return get_object_or_404(Applet, name=method.get('value'), is_active=True)
 
 
 def check_host(host, applet, user=None):
     if not host.is_active or not host.terminal or host.terminal.type != 'tinker':
-        raise PermissionDenied('A Tinker component must be bound to this host')
+        raise PermissionDenied(gettext('A Tinker component must be bound to this host'))
     upgrade_message = get_tinker_upgrade_message(host.tinker_version)
     if upgrade_message:
         raise PermissionDenied(upgrade_message)
     available = applet.filter_available_hosts() or []
     if not any(item.id == host.id for item in available):
-        raise PermissionDenied('Applet is not available on this host')
+        raise PermissionDenied(gettext('Applet is not available on this host'))
     if user is not None:
         if (not user.is_service_account or host.terminal.user_id != user.id
                 or not user.has_perm('authentication.view_superconnectiontokensecret')):
-            raise PermissionDenied('This component is not authorized for the host')
+            raise PermissionDenied(gettext('This component is not authorized for the host'))
 
 
 def check_binding(ticket, token, applet, user):
     if (ticket.user_id != token.user_id or str(ticket.org_id) != str(token.org_id)
             or ticket.asset_id != token.asset_id
             or ticket.app_id != applet.id or ticket.app_name != applet.name):
-        raise PermissionDenied('The connection authorization has changed')
+        raise PermissionDenied(gettext('The connection authorization has changed'))
     host = get_object_or_404(AppletHost, id=ticket.host_id)
     check_host(host, applet, user)
 
@@ -112,7 +112,7 @@ def issue_applet_ticket(token):
         if ticket_cache.add(ticket):
             break
     else:
-        raise PermissionDenied('Unable to issue an RDP login credential')
+        raise PermissionDenied(gettext('Unable to issue an RDP login credential'))
     # A transport credential, never a Core-managed or real Windows account.
     account = SimpleNamespace(
         id=ticket.id, name=username, full_username=username,
@@ -137,23 +137,23 @@ class RDPLoginRedeemApi(APIView):
         with tmp_to_root_org():
             cached = ticket_cache.get(data['username'])
             if cached is None:
-                raise PermissionDenied('Invalid or expired RDP login authorization')
+                raise PermissionDenied(gettext('Invalid or expired RDP login authorization'))
             ticket, encoded = cached
             token = ConnectionToken.get_typed_connection_token(ticket.connection_token_id)
             if token is None:
-                raise PermissionDenied('Invalid connection token')
+                raise PermissionDenied(gettext('Invalid connection token'))
             now = timezone.now()
             password_hash = digest(data['username'] + '\0' + data['password'])
             if (ticket.expires_at <= now
                     or not secrets.compare_digest(ticket.password_hash, password_hash)):
-                raise PermissionDenied('Invalid or expired RDP login authorization')
+                raise PermissionDenied(gettext('Invalid or expired RDP login authorization'))
             applet = check_connection(token)
             check_binding(ticket, token, applet, request.user)
             # The ticket/token deadline only governs this exchange. Once it
             # succeeds, local login and launch use the asset permission expiry.
             deadline = token.permed_account.date_expired
             if not ticket_cache.consume(data['username'], encoded):
-                raise PermissionDenied('RDP login ticket has already been used')
+                raise PermissionDenied(gettext('RDP login ticket has already been used'))
             # The ticket is consumed before secrets are disclosed. An uncertain
             # outcome requires a new connection; it never reopens this ticket.
             # Request normal token consumption without accepting client overrides;
