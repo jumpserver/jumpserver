@@ -14123,3 +14123,21 @@ msgstr "資產授權即將到期"
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "到期時間"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "SSH 憑證簽發服務無法使用：%(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "請輸入 OpenBao 服務權杖。"
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "服務權杖無效、已過期或權限不足，請檢查服務權杖及存取原則。"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "服務權杖無權存取 %(resource)s，請為該路徑授予 %(capability)s 權限。"

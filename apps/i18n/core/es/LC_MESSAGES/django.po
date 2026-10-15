@@ -14675,3 +14675,21 @@ msgstr "El permiso de acceso al activo está a punto de caducar"
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "Fecha y hora de caducidad"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "El servicio de firma de certificados SSH de OpenBao no está disponible: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "Introduzca un token de servicio de OpenBao."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "El token de servicio de OpenBao no es válido, ha caducado o no tiene los permisos necesarios. Compruebe el token y su política de acceso."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "El token de servicio de OpenBao no tiene acceso a %(resource)s. Conceda el permiso %(capability)s para esta ruta."

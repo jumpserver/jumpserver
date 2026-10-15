@@ -14580,3 +14580,21 @@ msgstr "A permissão de acesso ao ativo está prestes a expirar"
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "Data e hora de expiração"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "O serviço de emissão de certificados SSH do OpenBao está indisponível: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "Insira um token de serviço do OpenBao."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "O token de serviço do OpenBao é inválido, expirou ou não tem as permissões necessárias. Verifique o token e sua política de acesso."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "O token de serviço do OpenBao não tem acesso a %(resource)s. Conceda a permissão %(capability)s para esse caminho."
