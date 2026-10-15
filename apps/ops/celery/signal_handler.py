@@ -33,6 +33,29 @@ def on_app_ready(sender=None, headers=None, **kwargs):
         subtask(task).delay()
 
 
+@worker_ready.connect
+def clean_orphan_ansible_executor_containers(sender=None, **kwargs):
+    """
+    When the worker that spawned Docker-isolated ansible jobs dies abruptly
+    (SIGKILL / OOM / host reboot) the `docker run --rm` client dies with it but
+    dockerd keeps the executor container running.  Clean those up as soon as
+    the ansible worker comes back.
+
+    Only the worker consuming the ``ansible`` queue may do this: the ``default``
+    worker in the same container is ready at a slightly different time and
+    must not remove containers the ansible worker has just started.
+    """
+    hostname = getattr(sender, 'hostname', '') or ''
+    worker_name = hostname.split('@', 1)[0]
+    if 'ansible' not in worker_name.split(','):
+        return
+    try:
+        from ops.ansible.docker import remove_orphan_executor_containers
+        remove_orphan_executor_containers()
+    except Exception as e:
+        logger.warning('Clean orphan ansible executor containers failed: %s', e)
+
+
 @worker_shutdown.connect
 def after_app_shutdown_periodic_tasks(sender=None, **kwargs):
     if cache.get("CELERY_APP_SHUTDOWN", 0) == 1:

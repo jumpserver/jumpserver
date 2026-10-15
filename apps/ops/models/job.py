@@ -27,6 +27,7 @@ from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import (
     JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
 )
+from ops.ansible.runner import mark_job_execution_canceled
 
 """stop all ssh child processes of the given ansible process pid."""
 from ops.ansible.exception import CommandInBlackListException
@@ -386,6 +387,7 @@ class JobExecution(JMSOrgBaseModel):
                 pattern="all",
                 project_dir=self.private_dir,
                 extra_vars=extra_vars,
+                execution_id=self.id,
             )
         elif self.current_job.type == Types.playbook:
             runner = PlaybookRunner(
@@ -393,12 +395,17 @@ class JobExecution(JMSOrgBaseModel):
                 self.current_job.playbook.entry,
                 self.private_dir,
                 extra_vars=extra_vars,
+                timeout=self.current_job.timeout,
+                execution_id=self.id,
             )
         elif self.current_job.type == Types.upload_file:
             job_id = self.current_job.id
             args = json.loads(self.current_job.args)
             dst_path = args.get('dst_path', '/')
-            runner = UploadFileRunner(self.inventory_path, self.private_dir, job_id, dst_path)
+            runner = UploadFileRunner(
+                self.inventory_path, self.private_dir, job_id, dst_path,
+                execution_id=self.id,
+            )
         else:
             raise Exception("unsupported job type")
         return runner
@@ -457,6 +464,9 @@ class JobExecution(JMSOrgBaseModel):
     def set_result(self, cb):
         status_mapper = {
             'successful': JobStatus.success,
+            # ansible-runner reports "canceled" after a user stop; JobStatus has
+            # no such value, so persist it as failed (summary keeps the reason).
+            'canceled': JobStatus.failed,
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
@@ -610,6 +620,14 @@ class JobExecution(JMSOrgBaseModel):
             ssh_tunnel.local_gateway_clean(runner)
 
     def stop(self):
+        # Set a cancel flag that the running ansible-runner polls via
+        # ``cancel_callback``; ansible-runner then kills the executor container
+        # (Docker isolation) or the whole process group (bwrap) by itself.
+        # Killing by pid from here does not work because the child runs in a
+        # separate pid namespace.
+        mark_job_execution_canceled(self.id)
+
+        # Keep the legacy pid broadcast for workers that have not been upgraded yet.
         from ops.signal_handlers import job_execution_stop_pub_sub
         pid_path = os.path.join(self.private_dir, "local.pid")
         if os.path.exists(pid_path):

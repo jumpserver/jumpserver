@@ -3,9 +3,10 @@ import shutil
 import uuid
 
 from django.conf import settings
+from django.core.cache import cache
 from django.utils._os import safe_join
 
-from common.utils import is_macos
+from common.utils import is_macos, get_logger
 from common.utils.yml import sanitize_ansible_inventory_json, sanitize_ansible_playbook
 
 from ..utils import get_ansible_log_verbosity
@@ -23,13 +24,53 @@ from .interface import interface
 
 __all__ = ['AdHocRunner', 'PlaybookRunner', 'SuperPlaybookRunner', 'UploadFileRunner']
 
+logger = get_logger(__name__)
 
-class AdHocRunner:
+JOB_EXECUTION_CANCEL_KEY = 'ops:job_execution:cancel:{}'
+JOB_EXECUTION_CANCEL_TTL = 24 * 3600
+
+
+def mark_job_execution_canceled(execution_id):
+    cache.set(JOB_EXECUTION_CANCEL_KEY.format(execution_id), 1, JOB_EXECUTION_CANCEL_TTL)
+
+
+class CancelableRunnerMixin:
+    """
+    Let ansible-runner itself handle cancel / timeout.
+
+    ansible-runner polls ``cancel_callback`` in its main loop and, when it
+    returns True, calls ``kill_container()`` (docker kill ansible_runner_<ident>)
+    and ``handle_termination()`` (killpg SIGKILL).  This works for both Docker
+    isolation and bwrap isolation, unlike killing by pid which fails once the
+    child lives in another pid namespace.
+    """
+    execution_id = None
+
+    def _cancel_callback(self):
+        if not self.execution_id:
+            return False
+        try:
+            return bool(cache.get(JOB_EXECUTION_CANCEL_KEY.format(self.execution_id)))
+        except Exception as e:  # never let a cache hiccup abort the job
+            logger.warning('Check job execution cancel flag failed: %s', e)
+            return False
+
+    def cancel_kwargs(self):
+        """Extra kwargs for ansible_runner.run(); empty when not bound to a JobExecution."""
+        if not self.execution_id:
+            return {}
+        return {
+            'ident': str(self.execution_id),
+            'cancel_callback': self._cancel_callback,
+        }
+
+
+class AdHocRunner(CancelableRunnerMixin):
     cmd_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
     need_local_connection_modules_choices = ("mysql", "postgresql", "sqlserver", "huawei")
 
     def __init__(self, inventory, job_module, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars=None,
-                 dry_run=False, timeout=-1):
+                 dry_run=False, timeout=-1, execution_id=None):
         if extra_vars is None:
             extra_vars = {}
         self.id = uuid.uuid4()
@@ -44,6 +85,7 @@ class AdHocRunner:
         self.extra_vars = extra_vars
         self.dry_run = dry_run
         self.timeout = timeout
+        self.execution_id = execution_id
         self.envs = {}
 
     def check_module(self):
@@ -83,6 +125,7 @@ class AdHocRunner:
             'verbosity': verbosity,
             'event_handler': self.cb.event_handler,
             'status_handler': self.cb.status_handler,
+            **self.cancel_kwargs(),
             **kwargs,
         }
         if use_ansible_docker_isolation():
@@ -92,10 +135,10 @@ class AdHocRunner:
         return self.cb
 
 
-class PlaybookRunner:
+class PlaybookRunner(CancelableRunnerMixin):
     def __init__(
             self, inventory, playbook, project_dir='/tmp/', callback=None, extra_vars=None,
-            safety_mode=None, inventory_safety=None,
+            safety_mode=None, inventory_safety=None, timeout=-1, execution_id=None,
     ):
 
         self.id = uuid.uuid4()
@@ -112,6 +155,8 @@ class PlaybookRunner:
         self.extra_vars = extra_vars
         self.safety_mode = safety_mode
         self.inventory_safety = inventory_safety
+        self.timeout = timeout
+        self.execution_id = execution_id
 
     def copy_playbook(self):
         entry = os.path.basename(self.playbook)
@@ -162,20 +207,25 @@ class PlaybookRunner:
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
+        run_kwargs = dict(
+            private_data_dir=self.project_dir,
+            inventory=inventory,
+            playbook=self.playbook,
+            verbosity=verbosity,
+            event_handler=self.cb.event_handler,
+            status_handler=self.cb.status_handler,
+            # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
+            host_cwd=self.playbook_project_dir,
+            envvars=self.envs,
+            extravars=docker_extravars(self.extra_vars),
+        )
+        if self.timeout and self.timeout > 0:
+            run_kwargs['timeout'] = self.timeout
+        run_kwargs.update(self.cancel_kwargs())
+        run_kwargs.update(kwargs)
+
         try:
-            interface.run(
-                private_data_dir=self.project_dir,
-                inventory=inventory,
-                playbook=self.playbook,
-                verbosity=verbosity,
-                event_handler=self.cb.event_handler,
-                status_handler=self.cb.status_handler,
-                # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
-                host_cwd=self.playbook_project_dir,
-                envvars=self.envs,
-                extravars=docker_extravars(self.extra_vars),
-                **kwargs
-            )
+            interface.run(**run_kwargs)
         finally:
             close_callback = getattr(self.cb, 'close', None)
             if close_callback:
@@ -197,15 +247,16 @@ class SuperPlaybookRunner(PlaybookRunner):
         return super().run(*args, **kwargs)
 
 
-class UploadFileRunner:
+class UploadFileRunner(CancelableRunnerMixin):
     UPLOAD_STAGING_DIR = 'upload'
 
-    def __init__(self, inventory, project_dir, job_id, dest_path, callback=None):
+    def __init__(self, inventory, project_dir, job_id, dest_path, callback=None, execution_id=None):
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.project_dir = project_dir
         self.cb = DefaultCallback()
         self.envs = {}
+        self.execution_id = execution_id
         upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file')
         self.share_src_dir = safe_join(upload_file_dir, str(job_id))
         self.dest_path = safe_join("/tmp", dest_path)
@@ -239,6 +290,7 @@ class UploadFileRunner:
             'status_handler': self.cb.status_handler,
             'container_workdir': self.project_dir,
             'envvars': self.envs,
+            **self.cancel_kwargs(),
             **kwargs,
         }
         if use_ansible_docker_isolation():
