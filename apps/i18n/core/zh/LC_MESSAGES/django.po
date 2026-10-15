@@ -16028,3 +16028,18 @@ msgstr "邮件主题"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "邮件正文"
+
+#: terminal/session_lifecycle.py
+#, python-format
+msgid "Connect to asset %s success (direct connection)"
+msgstr "连接资产 %s 成功（直连）"
+
+#: terminal/session_lifecycle.py
+#, python-format
+msgid "Connect to asset %s success (SSH gateway forwarding)"
+msgstr "连接资产 %s 成功（已通过 SSH 网关转发）"
+
+#: terminal/session_lifecycle.py
+#, python-format
+msgid "Connect to asset %s success (SSH gateway forwarding; configured gateways: %s)"
+msgstr "连接资产 %s 成功（已通过 SSH 网关转发；配置网关：%s）"
