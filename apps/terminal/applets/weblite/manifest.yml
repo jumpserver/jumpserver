@@ -1,6 +1,6 @@
 name: weblite
 display_name: JumpServer WebLite
-version: 5.1.0-rc3
+version: 5.1.0
 comment: Managed browser with shared autofill and interactive verification
 author: JumpServer Team
 exec_type: exe
