@@ -112,7 +112,11 @@ class AccountSecretTaskStatus:
         self.queue_status_timeout = queue_status_timeout
         self.default_timeout = default_timeout
         self.delayed_task_countdown = delayed_task_countdown
-        self.enabled = getattr(settings, 'CHANGE_SECRET_AFTER_SESSION_END', False)
+
+    @property
+    def enabled(self):
+        # Settings from the database load after this module and can change at runtime.
+        return getattr(settings, 'CHANGE_SECRET_AFTER_SESSION_END', False)
 
     def _key(self, identifier):
         return f"{self.prefix}{identifier}"
