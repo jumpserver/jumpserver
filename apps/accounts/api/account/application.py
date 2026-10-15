@@ -1,7 +1,7 @@
 import os
 
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _, get_language
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -76,7 +76,7 @@ class IntegrationApplicationViewSet(OrgBulkModelViewSet):
     def refresh_secret(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.refresh_secret()
-        return Response(data={'id': instance.id, 'msg': 'Successfully refreshed secret'})
+        return Response(data={'id': instance.id, 'msg': gettext('Successfully refreshed secret')})
 
     @action(['GET'], detail=False, url_path='account-secret',
             permission_classes=[RBACPermission])

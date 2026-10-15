@@ -5,6 +5,10 @@ from django.db.models import TextChoices, IntegerChoices
 from django.utils.translation import gettext_lazy as _
 
 
+TINKER_MIN_VERSION = 'v0.3.1'
+TINKER_TARGET_VERSION = 'v0.3.2'
+
+
 class RiskLevelChoices(IntegerChoices):
     accept = 0, _('Accept')
     warning = 4, _('Warning')
@@ -84,6 +88,7 @@ class PublishStatus(TextChoices):
 
 class SessionType(TextChoices):
     normal = 'normal', _('Normal')
+    web_proxy = 'web_proxy', _('Built-in browser')
     tunnel = 'tunnel', _('Tunnel')
     command = 'command', _('Command')
     sftp = 'sftp', _('SFTP')

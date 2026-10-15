@@ -24,13 +24,10 @@ class MFAMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        # 没有校验
-        if not request.session.get('auth_mfa_required'):
-            return response
-        # 没有认证过，证明不是从 第三方 来的
-        if request.user.is_anonymous:
-            return response
+        # 必须先拦截再进 view。第三方登录可能已经 login()，MFA 尚未完成，
+        # 若先执行 view，拒绝响应返回时写操作已经提交。
+        if not request.session.get('auth_mfa_required') or request.user.is_anonymous:
+            return self.get_response(request)
 
         # 这个是 mfa 登录页需要的请求, 也得放出来, 用户其实已经在 CAS/OIDC 中完成登录了
         white_urls = [
@@ -39,7 +36,7 @@ class MFAMiddleware:
         ]
         for url in white_urls:
             if request.path.find(url) > -1:
-                return response
+                return self.get_response(request)
 
         # 因为使用 CAS/OIDC 登录的，不小心去了别的页面就回不来了
         if request.path.find('users/profile') > -1:
@@ -56,12 +53,9 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        # 没有认证过，证明不是从 第三方 来的
-        if request.user.is_anonymous:
-            return response
-        if not request.session.get('auth_third_party_required'):
-            return response
+        # 必须先做登录 ACL / 复核判断再进 view，否则拒绝或待审时写操作已经提交。
+        if request.user.is_anonymous or not request.session.get('auth_third_party_required'):
+            return self.get_response(request)
         white_urls = [
             'jsi18n/', '/static/',
             'login/guard', 'login/wait-confirm',
@@ -71,7 +65,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         ]
         for url in white_urls:
             if request.path.find(url) > -1:
-                return response
+                return self.get_response(request)
 
         ip = get_request_ip(request)
         try:
@@ -97,20 +91,18 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 'redirect_url': reverse('authentication:login') + '?admin=1',
                 'auto_redirect': True,
             }
-            response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
-            return response
+            return render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
         else:
             if self.request.session.get('auth_confirm_required'):
                 guard_url = reverse('authentication:login-guard')
                 args = request.META.get('QUERY_STRING', '')
                 if args:
                     guard_url = "%s?%s" % (guard_url, args)
-                response = redirect(guard_url)
-                return response
-            else:
-                self.send_auth_signal(success=True, user=request.user, request=request)
-                self.request.session.pop('auth_third_party_required', '')
-                return response
+                return redirect(guard_url)
+            response = self.get_response(request)
+            self.send_auth_signal(success=True, user=request.user, request=request)
+            self.request.session.pop('auth_third_party_required', '')
+            return response
         finally:
             if request.session.get('can_send_notifications') and \
                     self.request.session.get('auth_notice_required'):

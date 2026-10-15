@@ -1,9 +1,9 @@
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.db.utils import OperationalError, ProgrammingError
 from django.dispatch import receiver
 from django.conf import settings
 
-from oauth2_provider.models import get_application_model
+from oauth2_provider.models import get_access_token_model, get_application_model
 
 from common.signals import django_ready
 from common.utils import get_logger
@@ -19,6 +19,7 @@ __all__ = [
 
 
 Application = get_application_model()
+AccessToken = get_access_token_model()
 logger = get_logger(__name__)
 
 
@@ -36,3 +37,9 @@ def on_django_ready_refresh_oauth2_provider_client(sender, **kwargs):
 def on_oauth2_provider_application_deleted(sender, instance, **kwargs):
     if instance.name == settings.OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME:
         clear_oauth2_authorization_server_view_cache()
+
+
+@receiver(post_save, sender=AccessToken)
+def on_oauth2_access_token_created(sender, instance, created=False, **kwargs):
+    if created and instance.updated != instance.created:
+        AccessToken.objects.filter(pk=instance.pk).update(updated=instance.created)

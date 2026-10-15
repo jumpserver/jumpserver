@@ -8,12 +8,21 @@ from django.utils.translation import gettext_noop
 
 from assets.models import Asset, Node, Host, Database, Device, Web, Cloud
 from assets.tasks import test_assets_connectivity_task, gather_assets_facts_task
+from assets.utils.cidr import assign_assets_to_zones
 from common.const.signals import OP_LOG_SKIP_SIGNAL, POST_REMOVE, PRE_REMOVE
 from common.decorators import on_transaction_commit, merge_delay_run, key_by_org
 from common.utils import get_logger
 from orgs.utils import current_org
 
 logger = get_logger(__file__)
+
+
+@receiver(pre_save)
+def on_asset_create_assign_zone(sender, instance, raw=False, **kwargs):
+    # Listen for every Asset subtype, including custom assets and proxy models.
+    if raw or not isinstance(instance, Asset) or not instance._state.adding:
+        return
+    assign_assets_to_zones([instance])
 
 
 @receiver(pre_save, sender=Node)

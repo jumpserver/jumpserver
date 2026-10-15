@@ -1,4 +1,5 @@
 import re
+import ssl
 import uuid
 from ipaddress import ip_network
 from urllib.parse import urlsplit
@@ -39,6 +40,32 @@ def validate_chat_ai_base_url(value):
     if not value.isascii():
         raise ValidationError(message)
     URLValidator(schemes=['http', 'https'], message=message)(value)
+
+
+def validate_secret_destination(attrs, secret_field, destination_fields):
+    if attrs.get(secret_field) or not getattr(settings, secret_field, ''):
+        return
+    if any(
+        name in attrs and (attrs[name] or '') != (getattr(settings, name, '') or '')
+        for name in destination_fields
+    ):
+        raise serializers.ValidationError({
+            secret_field: _('Enter a new credential when changing its destination.')
+        })
+
+
+def validate_openbao_ca_certificate(value):
+    if not value:
+        return value
+    if 'PRIVATE KEY-----' in value:
+        raise serializers.ValidationError(
+            _('A CA certificate must not contain a private key')
+        )
+    try:
+        ssl.create_default_context(cadata=value)
+    except (ValueError, ssl.SSLError):
+        raise serializers.ValidationError(_('Invalid PEM CA certificate'))
+    return value
 
 
 def validate_ssh_ca_openbao_address(value):
@@ -155,6 +182,20 @@ class OpenBaoSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     VAULT_OPENBAO_TIMEOUT = serializers.IntegerField(
         max_value=120, min_value=1, required=False, label=_('Timeout')
     )
+    VAULT_OPENBAO_VERIFY_TLS = serializers.BooleanField(
+        required=False, label=_('Verify TLS certificate')
+    )
+    VAULT_OPENBAO_CACERT_CONTENT = EncryptedField(
+        allow_blank=True, required=False, write_only=True,
+        max_length=1024 * 1024,
+        label=_('CA certificate'),
+        help_text=_('PEM CA certificate used to verify the OpenBao server'),
+        validators=[validate_openbao_ca_certificate],
+    )
+
+    def validate(self, attrs):
+        validate_secret_destination(attrs, 'VAULT_OPENBAO_TOKEN', ('VAULT_OPENBAO_ADDR',))
+        return attrs
 
 
 class SSHCAOpenBaoSerializer(serializers.Serializer):
@@ -184,6 +225,13 @@ class SSHCAOpenBaoSerializer(serializers.Serializer):
     SSH_CA_OPENBAO_VERIFY_TLS = serializers.BooleanField(
         required=False, label=_('Verify TLS certificate')
     )
+    SSH_CA_OPENBAO_CACERT_CONTENT = EncryptedField(
+        allow_blank=True, required=False, write_only=True,
+        max_length=1024 * 1024,
+        label=_('CA certificate'),
+        help_text=_('PEM CA certificate used to verify the OpenBao server'),
+        validators=[validate_openbao_ca_certificate],
+    )
     SSH_CA_OPENBAO_SOURCE_ADDRESS = serializers.CharField(
         max_length=1024, allow_blank=True, required=False,
         label=_('Allowed source addresses'),
@@ -203,6 +251,10 @@ class HashicorpKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
     VAULT_HCP_MOUNT_POINT = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Mount Point')
     )
+
+    def validate(self, attrs):
+        validate_secret_destination(attrs, 'VAULT_HCP_TOKEN', ('VAULT_HCP_HOST',))
+        return attrs
 
 
 class AzureKVSerializer(BaseVaultSettingSerializer, serializers.Serializer):
@@ -268,6 +320,9 @@ class ChatAISettingSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
+        validate_secret_destination(
+            attrs, 'CHAT_AI_API_KEY', ('CHAT_AI_BASE_URL', 'CHAT_AI_PROXY')
+        )
         enabled = attrs.get('CHAT_AI_ENABLED', settings.CHAT_AI_ENABLED)
         method = attrs.get('CHAT_AI_METHOD', settings.CHAT_AI_METHOD)
         if not enabled:

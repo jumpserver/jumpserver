@@ -8,7 +8,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.files.storage import default_storage
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from common.storage.replay import ReplayStorageHandler
 from ops.celery.decorator import (
@@ -19,7 +19,7 @@ from .backends import server_replay_storage
 from .const import ReplayStorageType, CommandStorageType
 from .models import (
     Status, Session, Task, AppletHostDeployment,
-    AppletHost, AppProviderDeployment, ReplayStorage, CommandStorage
+    AppProviderDeployment, ReplayStorage, CommandStorage
 )
 from .notifications import StorageConnectivityMessage
 
@@ -154,7 +154,7 @@ def run_app_provider_deployment(did):
         deployment = AppProviderDeployment.objects.get(id=did)
         deployment.start()
         if deployment.status != 'success':
-            raise AppProviderDeploymentError('Application provider deployment failed; see the Ansible task log')
+            raise AppProviderDeploymentError(gettext('Application provider deployment failed; see the Ansible task log'))
 
 
 @shared_task(
@@ -214,23 +214,6 @@ def run_applet_host_deployment_uninstall_applet(ids, applet_id):
         for did in ids:
             deployment = AppletHostDeployment.objects.get(id=did)
             deployment.uninstall_applet(applet_id)
-
-
-@shared_task(
-    verbose_name=_('Generate applet host accounts'),
-    activity_callback=lambda self, host_id, *args, **kwargs: ([host_id],),
-    description=_(
-        """When a remote publishing server is created and an account needs to be created 
-        automatically, this task will be executed"""
-    )
-)
-def applet_host_generate_accounts(host_id):
-    applet_host = AppletHost.objects.filter(id=host_id).first()
-    if not applet_host:
-        return
-
-    with tmp_to_builtin_org(system=1):
-        applet_host.generate_accounts()
 
 
 @shared_task(

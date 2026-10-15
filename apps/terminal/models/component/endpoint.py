@@ -38,7 +38,7 @@ class Endpoint(JMSBaseModel):
         magnus_protocols = {
             Protocol.mysql, Protocol.mariadb, Protocol.postgresql,
             Protocol.redis, Protocol.sqlserver, Protocol.oracle,
-            Protocol.mongodb,
+            Protocol.mongodb, Protocol.dameng,
         }
         if protocol in magnus_protocols:
             return self.magnus_port

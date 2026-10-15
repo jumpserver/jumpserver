@@ -1,10 +1,12 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <title>Not found</title>
+    <title>{% trans 'Not found' %}</title>
 </head>
 <body>
-<h1>Not found</h1>
+<h1>{% trans 'Not found' %}</h1>
 </body>
 </html>

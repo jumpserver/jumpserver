@@ -12,6 +12,10 @@ class LanguageChoiceFieldTest(SimpleTestCase):
 
     def test_representation_normalizes_language_aliases(self):
         aliases = {
+            'fr-FR': 'fr',
+            'fr-CA': 'fr',
+            'fr-BE': 'fr',
+            'fr-CH': 'fr',
             'zh': 'zh-hans',
             'zh-cn': 'zh-hans',
             'zh-tw': 'zh-hant',
@@ -23,6 +27,8 @@ class LanguageChoiceFieldTest(SimpleTestCase):
                 self.assertEqual(self.field.to_representation(alias), expected)
 
     def test_input_normalizes_language_aliases(self):
+        self.assertEqual(self.field.run_validation('fr'), 'fr')
+        self.assertEqual(self.field.run_validation('fr-CA'), 'fr')
         self.assertEqual(self.field.run_validation('zh-cn'), 'zh-hans')
         self.assertEqual(self.field.run_validation('zh-tw'), 'zh-hant')
 
@@ -35,6 +41,7 @@ class LunaPreferenceSectionLabelTest(SimpleTestCase):
     def test_labels_match_luna_navigation(self):
         expected = {
             'en': ('General', 'GUI', 'CLI'),
+            'fr': ('Général', 'Interface graphique', 'Ligne de commande'),
             'zh-hans': ('基本配置', '图形化', '命令行'),
             'zh-hant': ('基本配置', '圖形化', '命令行'),
             'ja': ('基本構成', 'グラフィカル', 'コマンドライン'),

@@ -36,7 +36,7 @@ REST_FRAMEWORK = {
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        'authentication.backends.drf.OAuth2Authentication',
         'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_THROTTLE_CLASSES': (
@@ -84,6 +84,7 @@ SPECTACULAR_SETTINGS = {
     # 添加自定义字段扩展
     'SERIALIZER_EXTENSIONS': [
         'jumpserver.views.schema.ObjectRelatedFieldExtension',
+        'jumpserver.views.schema.JSONManyToManyFieldExtension',
         'jumpserver.views.schema.LabeledChoiceFieldExtension',
         'jumpserver.views.schema.BitChoicesFieldExtension',
         'jumpserver.views.schema.LabelRelatedFieldExtension',

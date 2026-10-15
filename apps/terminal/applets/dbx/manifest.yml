@@ -1,0 +1,32 @@
+name: dbx
+display_name: "{{ 'DBX' | trans }}"
+comment: "{{ 'Lightweight cross-platform database client, connection management, SQL editing, data grids and schema tools in one product.' | trans }}"
+version: 0.2.2
+exec_type: python
+author: JumpServer Team
+type: general
+update_policy: always
+can_concurrent: false
+tags:
+  - database
+protocols:
+  - mysql
+  - mariadb
+  - postgresql
+  - oracle
+  - sqlserver
+  - dameng
+  - clickhouse
+  - mongodb
+  - redis
+
+i18n:
+  DBX:
+    en: DBX
+    zh: DBX
+    ja: DBX
+
+  Lightweight cross-platform database client, connection management, SQL editing, data grids and schema tools in one product.:
+    en: Lightweight cross-platform database client, connection management, SQL editing, data grids and schema tools in one product.
+    zh: 轻量级跨平台数据库客户端，将连接管理、SQL 编辑、数据表格和结构工具集成在一个产品中。
+    ja: 軽量なクロスプラットフォームデータベースクライアント。接続管理、SQL編集、データグリッド、スキーマツールを1つの製品に統合しています。

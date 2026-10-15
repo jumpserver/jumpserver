@@ -9,4 +9,6 @@ class Handler(BaseHandler):
         is_finished = super()._on_step_approved(step)
         if is_finished:
             self.ticket.activate_connection_token_if_need()
+            from acls.models import LoginAssetACL
+            LoginAssetACL.cache_approved_review(self.ticket)
         return is_finished

@@ -2,7 +2,9 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
+from django.utils import translation
 from rest_framework.exceptions import NotFound
+from rest_framework.test import APIRequestFactory
 
 from authentication.api.face import FaceContextApi
 from authentication.api.connection_token import ConnectionTokenViewSet
@@ -11,6 +13,32 @@ from authentication.mixins import AuthFaceMixin
 
 
 class FaceContextApiTest(SimpleTestCase):
+    @patch("authentication.api.face.cache")
+    def test_status_localizes_capture_timeout_errors_in_chinese(self, cache):
+        messages = {
+            "Face verification timed out": "人脸验证超时，请重试。",
+            "The liveness action was not completed in time": "未在规定时间内完成活体动作，请重试。",
+        }
+        token = "c" * 32
+        request = APIRequestFactory().get("/api/v1/authentication/face/context/", {"token": token})
+        request.session = {FACE_SESSION_KEY: token}
+        view = FaceContextApi.as_view(authentication_classes=[])
+
+        for message, translated in messages.items():
+            with self.subTest(message=message), translation.override("zh-hans"):
+                cache.get.return_value = {
+                    "is_finished": True,
+                    "success": False,
+                    "error_message": message,
+                }
+
+                response = view(request)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data["error_message"], translated)
+                self.assertTrue(response.data["is_finished"])
+                self.assertFalse(response.data["success"])
+
     @patch("authentication.api.face.cache")
     def test_status_rejects_token_from_an_older_capture(self, cache):
         view = FaceContextApi()

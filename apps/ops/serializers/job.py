@@ -88,7 +88,7 @@ class JobTaskStopSerializer(serializers.Serializer):
 
 class JobExecutionSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
-    job_type = serializers.ReadOnlyField(label=_("Job type"))
+    job_type = serializers.ReadOnlyField(source='get_job_type_display', label=_("Job type"))
     material = serializers.ReadOnlyField(label=_("Command"))
     is_success = serializers.ReadOnlyField(label=_("Is success"))
     is_finished = serializers.ReadOnlyField(label=_("Is finished"))

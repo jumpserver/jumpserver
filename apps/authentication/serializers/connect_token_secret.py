@@ -18,8 +18,8 @@ from ..models import ConnectionToken
 from ..utils import get_effective_connect_options
 
 __all__ = [
-    'ConnectionTokenSecretSerializer', 'ConnectTokenAppletOptionSerializer',
-    'ConnectTokenVirtualAppOptionSerializer',
+    'ConnectionTokenSecretSerializer',
+    'ConnectTokenAppletOptionSerializer', 'ConnectTokenVirtualAppOptionSerializer',
 ]
 
 
@@ -100,15 +100,22 @@ class _ConnectionTokenCommandFilterACLSerializer(serializers.ModelSerializer):
         attrs=('id', 'name', 'type', 'content', 'ignore_case', 'pattern'),
         label=_('Command group')
     )
-    reviewers = ObjectRelatedField(
-        many=True, queryset=User.objects, label=_("Reviewers"), required=False
-    )
+    reviewers = serializers.SerializerMethodField(label=_("Reviewers"))
 
     class Meta:
         model = CommandFilterACL
         fields = [
             'id', 'name', 'command_groups', 'action',
             'reviewers', 'priority', 'is_active'
+        ]
+
+    @staticmethod
+    def get_reviewers(acl):
+        if acl.action != ACLActionChoices.review:
+            return []
+        return [
+            {'id': reviewer.id, 'name': reviewer.name}
+            for reviewer in acl.reviewers.all()
         ]
 
 
@@ -233,6 +240,18 @@ class ConnectTokenAppletOptionSerializer(serializers.Serializer):
     gateway = _ConnectionTokenGatewaySerializer(read_only=True)
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
     remote_app_option = serializers.JSONField(read_only=True)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Route virtual tickets to the local CP, not the host's AD domain.
+        # The Tinker installer configures the server's NLA requirement; leave
+        # transport negotiation to the existing platform/client settings.
+        for protocol in data['platform']['protocols']:
+            if protocol['name'] == 'rdp':
+                protocol['setting'] = {
+                    **(protocol.get('setting') or {}), 'ad_domain': 'localhost',
+                }
+        return data
 
 
 class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):

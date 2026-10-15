@@ -5,15 +5,68 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from common.utils.timezone import dt_formatter, dt_parser
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
-from tickets.const import TicketType, TicketStatus, TicketState
+from tickets.const import TicketType, TicketStatus, TicketState, TicketLevel, StepState
 from tickets.models import Ticket, TicketAssignee, TicketFlow
 from users.models import User
 
 __all__ = [
     'TicketApplySerializer', 'TicketApproveSerializer', 'TicketSerializer',
 ]
+
+
+class TicketFlowField(ObjectRelatedField):
+    def to_representation(self, value):
+        data = super().to_representation(value)
+        data['name'] = str(value)
+        return data
+
+
+class TicketProcessMapField(serializers.JSONField):
+    def to_file_representation(self, value):
+        rows = []
+        for step in value:
+            state = step.get('state')
+            date = step.get('approval_date')
+            if date and state != StepState.pending:
+                date = dt_formatter(dt_parser(date))
+            else:
+                date = None
+            details = [
+                (_('Approve level'), dict(TicketLevel.choices).get(step.get('approval_level'))),
+                (_('Reviewers'), ', '.join(step.get('assignees_display') or [])),
+                (_('Processor'), step.get('processor_display')),
+                (_('State'), dict(StepState.choices).get(state, state)),
+                (_('Date'), date),
+            ]
+            rows.append('; '.join(f'{label}: {content or "-"}' for label, content in details))
+        return '\n'.join(rows) or '-'
+
+
+class TicketSnapshotField(serializers.JSONField):
+    def to_file_representation(self, value):
+        labels = {
+            'applicant': _('Applicant'),
+            'cc_users': _('CC users'),
+            'apply_nodes': _('Apply nodes'),
+            'apply_assets': _('Apply assets'),
+            'apply_login_user': _('Login user'),
+            'apply_login_asset': _('Login asset'),
+            'apply_run_user': _('Run user'),
+            'apply_from_session': _('Session'),
+            'apply_from_cmd_filter_acl': _('Command filter acl'),
+        }
+        rows = []
+        for name, label in labels.items():
+            if name not in value:
+                continue
+            content = value[name]
+            if isinstance(content, list):
+                content = ', '.join(str(item) for item in content)
+            rows.append(f'{label}: {content or "-"}')
+        return '\n'.join(rows) or '-'
 
 
 class TicketSerializer(OrgResourceModelSerializerMixin):
@@ -31,11 +84,12 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'approved, or rejected'
         )
     )
-    process_map = serializers.JSONField(read_only=True, default=list, label=_('Process map'))
+    process_map = TicketProcessMapField(read_only=True, default=list, label=_('Process map'))
+    rel_snapshot = TicketSnapshotField(read_only=True, label=_('Relation snapshot'))
     cc_users = ObjectRelatedField(
         many=True, read_only=True, attrs=('id', 'name', 'username'), label=_('CC users')
     )
-    flow = ObjectRelatedField(
+    flow = TicketFlowField(
         read_only=True, attrs=('id', 'name'), label=_('Ticket flow')
     )
 

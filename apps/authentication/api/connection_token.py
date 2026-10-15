@@ -13,7 +13,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import status, serializers
 from rest_framework.decorators import action
 from rest_framework.settings import api_settings
@@ -31,6 +31,7 @@ from accounts.personal_credentials import (
     validate_personal_credential_secret_type,
 )
 from accounts.utils import validate_account_username, validate_ssh_key
+from acls.models import ConnectMethodACL
 from acls.notifications import AssetLoginReminderMsg
 from assets.const import Protocol
 from assets.models import Asset
@@ -40,20 +41,22 @@ from common.utils import (
     random_string, get_logger, get_request_ip_or_data, is_uuid,
 )
 from common.utils.django import get_request_os
-from common.utils.http import is_true, is_false
+from common.utils.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
 from orgs.models import Organization
-from orgs.utils import get_org_from_request, tmp_to_org
+from orgs.utils import get_org_from_request, tmp_to_org, tmp_to_root_org
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
 from users.models import Preference
 from .face import FaceMonitorContext
+from ..const import ConnectionTokenType
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
-from ..services import sign_connection_token_ssh_certificate
+from ..services.connection_token import get_connection_token_secret
 from ..utils import (
-    get_effective_connect_options, should_use_oracle_sysdba,
+    build_absolute_uri, get_effective_connect_options,
+    should_use_oracle_sysdba,
 )
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -437,6 +440,8 @@ class RDPFileClientProtocolURLMixin:
             'value': token.value,  # 兼容老的，未来几个版本删掉
             'name': self.escape_name(name),
             'protocol': token.protocol,
+            'site_url': build_absolute_uri(self.request, '/').rstrip('/'),
+            'org_id': str(token.org_id),
             'token': {
                 'id': str(token.id),
                 'value': token.value,
@@ -758,21 +763,19 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 'Personal credentials can only be managed by their owner'
             ))
 
-        if account_name != AliasAccount.INPUT and (credential_id or save_credential):
-            raise ValidationError({
-                'personal_credential_id': _(
-                    'Personal credentials can only be used with the manual account'
-                )
-            })
+        if credential_id or save_credential:
+            personal_permission_context = get_personal_credential_permission_context(
+                user, asset, protocol, account_alias=account_name,
+            )
+            if save_credential and account_name != AliasAccount.INPUT:
+                # A hosted account fixes the username, regardless of client input.
+                data['input_username'] = personal_permission_context[1].full_username
 
         if save_credential and not data.get('input_username'):
             raise ValidationError({'input_username': _('This field is required.')})
         if save_credential and not data.get('input_secret'):
             raise ValidationError({'input_secret': _('This field is required.')})
         if save_credential:
-            personal_permission_context = get_personal_credential_permission_context(
-                user, asset, protocol
-            )
             platform_protocol, __ = personal_permission_context
             input_secret_type = (
                 data.get('input_secret_type') or SecretType.PASSWORD
@@ -807,11 +810,6 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                         'Do not submit a username or secret when using a saved credential'
                     )
                 })
-            personal_permission_context = (
-                get_personal_credential_permission_context(
-                    user, asset, protocol
-                )
-            )
             credential = get_personal_credential_for_use(
                 user, asset, protocol, credential_id,
                 version=credential_version,
@@ -849,7 +847,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 user=user,
                 asset=asset,
                 protocol=protocol,
-                username=data.get('input_username', ''),
+                username=(
+                    personal_permission_account.full_username
+                    if account_name != AliasAccount.INPUT
+                    else data.get('input_username', '')
+                ),
                 secret=data.get('input_secret', ''),
                 secret_type=data.get('input_secret_type') or SecretType.PASSWORD,
                 credential_id=credential_id,
@@ -901,6 +903,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             self, user, asset, account_alias, protocol, connect_method,
             permed_account=None,
     ):
+        if not ConnectMethodACL.is_method_allowed(user, asset, connect_method, protocol):
+            raise JMSException(
+                code='connect_method_rejected',
+                detail=_('Connect method is not allowed for this asset')
+            )
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
@@ -920,7 +927,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
 
         if account_alias != AliasAccount.INPUT and account_alias != AliasAccount.USER:
             data['input_username'] = ''
-            data['input_secret_type'] = ''
+            if account.has_secret:
+                data['input_secret_type'] = ''
 
         ticket = self._validate_acl(user, asset, account, connect_method, protocol)
         if ticket:
@@ -937,8 +945,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     def get_permed_account(user, asset, account_alias, protocol):
         return ConnectionToken.get_user_permed_account(user, asset, account_alias, protocol)
 
-    def _validate_perm(self, user, asset, account_alias, protocol):
-        account = self.get_permed_account(user, asset, account_alias, protocol)
+    def _validate_perm(self, user, asset, account_alias, protocol, token_type=None):
+        get_permed_account = self.get_permed_account
+        if token_type == ConnectionTokenType.ADMIN:
+            get_permed_account = AdminConnectionToken.get_user_permed_account
+        account = get_permed_account(user, asset, account_alias, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
@@ -979,12 +990,18 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             msg = _('ACL action is reject: {}({})'.format(acl.name, acl.id))
             raise JMSException(code='acl_reject', detail=msg)
         if acl.is_action(acl.ActionChoices.review):
+            account_username = (
+                self.input_username if account.username == AliasAccount.INPUT else account.username
+            )
+            if acl.is_review_exempt(user, asset, account_username):
+                self._record_operate_log(acl, asset)
+                return
             if not self.request.query_params.get('create_ticket'):
                 msg = _('ACL action is review')
                 raise JMSException(code='acl_review', detail=msg)
             self._record_operate_log(acl, asset)
-            ticket = LoginAssetACL.create_login_asset_review_ticket(
-                user=user, asset=asset, account_username=self.input_username,
+            ticket = acl.create_login_asset_review_ticket(
+                user=user, asset=asset, account_username=account_username,
                 assignees=acl.reviewers.all(), org_id=asset.org_id
             )
             return ticket
@@ -1183,14 +1200,16 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             "expired": instance.is_expired
         }
         try:
-            if instance.personal_credential_id:
-                instance.is_valid()
-            else:
+            # Components check established sessions after the one-time token
+            # has been consumed. Revalidate access without reviving that token.
+            instance.is_valid(check_expiration=False)
+            if not instance.personal_credential_id:
                 self._validate_perm(
                     instance.user,
                     instance.asset,
                     instance.account,
-                    instance.protocol
+                    instance.protocol,
+                    token_type=instance.type,
                 )
         except JMSException as e:
             data['code'] = e.detail.code
@@ -1224,7 +1243,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token = get_object_or_404(ConnectionToken, pk=token_id)
         date_expired = as_current_tz(token.date_expired)
         if token.is_expired:
-            raise PermissionDenied('Token is expired at: {}'.format(date_expired))
+            raise PermissionDenied(gettext('Token is expired at: {}').format(date_expired))
         token.renewal()
         data = {
             'ok': True,
@@ -1237,120 +1256,56 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
         rbac_perm = 'authentication.view_superconnectiontokensecret'
         if not request.user.has_perm(rbac_perm):
-            raise PermissionDenied('Not allow to view secret')
+            raise PermissionDenied(gettext('Not allow to view secret'))
+
+        from .rdp_login import is_tinker
+        if is_tinker(request.user):
+            raise PermissionDenied(gettext('Tinker must redeem its RDP login ticket to obtain credentials'))
 
         token_id = request.data.get('id') or ''
         token = ConnectionToken.get_typed_connection_token(token_id)
         if not token:
-            raise PermissionDenied('Token {} is not valid'.format(token))
-        requested_expire_now = request.data.get('expire_now', True)
-        try:
-            if token.personal_credential_id:
-                # Validate permissions and fetch the exact-version secret once.
-                # account_object reuses it on this request-local token instance.
-                token.is_valid(include_personal_secret=True)
-            else:
-                token.is_valid()
-            account = token.account_object
-        except Exception as error:
-            if token.personal_credential_id:
-                if isinstance(error, APIException):
-                    reason = get_personal_credential_failure_reason(error)
-                else:
-                    reason = error.__class__.__name__
-                record_personal_credential_audit(
-                    operation='use',
-                    result='failed',
-                    failure_reason=reason,
-                    user=token.user,
-                    asset=token.asset,
-                    credential_id=token.personal_credential_id,
-                    username=token.input_username,
-                    secret_type=token.input_secret_type,
-                    remote_addr=token.remote_addr,
-                    org_id=token.org_id,
-                )
-            raise
-        if account and account.secret_type == SecretType.SSH_CERTIFICATE:
-            certificate = sign_connection_token_ssh_certificate(
-                token, request.data.get('public_key', '')
-            )
-            # The certificate is public material, but returning it through the
-            # existing account credential field keeps the component contract
-            # compact. Koko pairs it with the private key generated in memory.
-            account.secret = certificate['signed_key']
-            token.ssh_certificate = {
-                key: value for key, value in certificate.items()
-                if key != 'signed_key'
-            }
-
-        serializer = self.get_serializer(instance=token)
-
-        expire_now = requested_expire_now
-        asset_type = token.asset.type
-        # 设置默认值
-        if asset_type in ['k8s', 'kubernetes']:
-            expire_now = False
-
-        if token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
-            logger.debug('Token is reusable, not expire now')
-        elif is_false(expire_now):
-            logger.debug('API specified, do not expire now')
-        else:
-            token.expire()
-
-        # expire_now=false still returns the secret. Audit every disclosure,
-        # while distinguishing Koko's inspection phase from final consumption.
-        if token.personal_credential_id:
-            record_personal_credential_audit(
-                operation='use',
-                result=(
-                    'inspected'
-                    if is_false(requested_expire_now)
-                    else 'success'
-                ),
-                user=token.user,
-                asset=token.asset,
-                credential_id=token.personal_credential_id,
-                username=token.input_username,
-                secret_type=token.input_secret_type,
-                remote_addr=token.remote_addr,
-                org_id=token.org_id,
-            )
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            raise PermissionDenied(gettext('Token {} is not valid').format(token))
+        return Response(get_connection_token_secret(
+            token, self.get_serializer,
+            expire_now=request.data.get('expire_now', True),
+            public_key=request.data.get('public_key', ''),
+        ))
 
     @action(methods=['POST'], detail=False, url_path='applet-option')
-    def get_applet_info(self, *args, **kwargs):
-        token_id = self.request.data.get('id')
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        if token.is_expired:
-            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
-        data = token.get_applet_option()
-        serializer = ConnectTokenAppletOptionSerializer(data)
-        return Response(serializer.data)
+    def get_applet_info(self, request, *args, **kwargs):
+        from .rdp_login import issue_applet_ticket, private_response
+        from ..serializers.rdp_login import NonzeroUUIDField
+
+        user = request.user
+        terminal = getattr(user, 'terminal', None)
+        if (not user.is_service_account or not terminal
+                or terminal.type not in ('razor', 'koko', 'lion')
+                or not user.has_perm('authentication.view_superconnectiontoken')):
+            raise PermissionDenied()
+        token_id = NonzeroUUIDField().run_validation(request.data.get('id'))
+        with transaction.atomic(), tmp_to_root_org():
+            token = ConnectionToken.get_typed_connection_token(token_id)
+            if token is None:
+                raise PermissionDenied(gettext('Invalid connection token'))
+            data = issue_applet_ticket(token)
+            return private_response(ConnectTokenAppletOptionSerializer(data).data)
 
     @action(methods=['POST'], detail=False, url_path='virtual-app-option')
     def get_virtual_app_info(self, *args, **kwargs):
         token_id = self.request.data.get('id')
         token = get_object_or_404(ConnectionToken, pk=token_id)
         if token.is_expired:
-            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': gettext('Token expired')}, status=status.HTTP_400_BAD_REQUEST)
         data = token.get_virtual_app_option()
         serializer = ConnectTokenVirtualAppOptionSerializer(data)
         return Response(serializer.data)
 
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):
-        lock_key = self.request.data.get('id')
-        released = ConnectionToken.release_applet_account(lock_key)
-
-        if released:
-            logger.debug('Release applet account success: {}'.format(lock_key))
-            return Response({'msg': 'released'})
-        else:
-            logger.error('Release applet account error: {}'.format(lock_key))
-            return Response({'error': 'not found or expired'}, status=400)
+        # Older components still send this after disconnect. Account ownership
+        # and safe reuse now follow the actual Windows session in Tinker.
+        return Response({'msg': 'released'})
 
 
 class AdminConnectionTokenViewSet(ConnectionTokenViewSet):

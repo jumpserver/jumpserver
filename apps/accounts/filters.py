@@ -194,7 +194,7 @@ class AccountFilterSet(UUIDFilterMixin, BaseFilterSet):
             "address", "asset_name", "asset_id", "connectivity",
             "privileged", "is_active",
             "secret_type", "category", "type", "platform",
-            "secret_reset", "source", "source_id",
+            "secret_reset", "source", "source_id", "follow_template",
             "has_secret", "risk", "integrationapplication",
             "latest_discovery", "latest_accessed", "latest_updated",
             "latest_secret_changed", "latest_secret_change_failed",

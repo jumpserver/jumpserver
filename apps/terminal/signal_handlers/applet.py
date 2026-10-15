@@ -2,8 +2,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
-from accounts.const import AliasAccount
-from accounts.models import Account, VirtualAccount
+from accounts.models import Account
 from common.decorators import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
@@ -11,7 +10,6 @@ from common.utils.connection import RedisPubSub
 from orgs.utils import tmp_to_builtin_org
 from users.models import User
 from ..models import Applet, AppletHost
-from ..tasks import applet_host_generate_accounts
 
 logger = get_logger(__file__)
 
@@ -26,38 +24,6 @@ def on_applet_host_create(sender, instance, created=False, **kwargs):
     applets = Applet.objects.all()
     instance.applets.set(applets)
     applet_host_change_pub_sub.publish(True)
-
-
-@receiver(post_save, sender=AppletHost)
-@on_transaction_commit
-def on_applet_host_update_or_create(sender, instance, created=False, **kwargs):
-    if instance.auto_create_accounts:
-        applet_host_generate_accounts.delay(instance.id)
-
-    # 使用同名账号的，直接给他打开登录那项吧
-    if instance.using_same_account:
-        alias = AliasAccount.USER.value
-        same_account, __ = VirtualAccount.objects.get_or_create(
-            alias=alias, defaults={'alias': alias, 'secret_from_login': True}
-        )
-        if same_account.secret_from_login:
-            return
-        same_account.secret_from_login = True
-        same_account.save(update_fields=['secret_from_login'])
-
-
-@receiver(post_save, sender=User)
-def on_user_create_create_account(sender, instance: User, created=False, **kwargs):
-    if not created:
-        return
-    if instance.is_service_account:
-        return
-    with tmp_to_builtin_org(system=1):
-        applet_hosts = AppletHost.objects.all()
-        for host in applet_hosts:
-            if not host.auto_create_accounts:
-                continue
-            host.generate_private_accounts_by_usernames([instance.username])
 
 
 @receiver(post_delete, sender=User)

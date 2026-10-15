@@ -166,6 +166,13 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        # Components initially mark a replay as unsupported until upload completes.
+        if (
+                validated_data.get('has_replay') is True and
+                instance.error_reason == SessionErrorReason.replay_unsupported and
+                'error_reason' not in validated_data
+        ):
+            validated_data['error_reason'] = ''
         is_finished = validated_data.get('is_finished')
         if (
                 instance.protocol != 'vnc' and  # VNC sessions do not require secret change

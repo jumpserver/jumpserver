@@ -1,8 +1,9 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
-from common.utils import reverse, lazyproperty
-from orgs.utils import tmp_to_org
+from common.exceptions import JMSException
+from common.utils import reverse, lazyproperty, get_request_ip_or_data
 from .. import serializers
 from ..models import LoginAssetACL
 
@@ -33,19 +34,20 @@ class LoginAssetCheckAPI(CreateAPIView):
         user = self.serializer.user
         asset = self.serializer.asset
 
-        # 用户满足的 acls
-        queryset = LoginAssetACL.objects.all()
-        q = LoginAssetACL.users.get_filter_q(LoginAssetACL, 'users', user)
-        queryset = queryset.filter(q)
-        q = LoginAssetACL.assets.get_filter_q(LoginAssetACL, 'assets', asset)
-        queryset = queryset.filter(q)
         account_username = self.serializer.validated_data.get('account_username')
-        queryset = queryset.filter(accounts__contains=account_username)
+        queryset = LoginAssetACL.filter_queryset(
+            user=user, asset=asset, account_username=account_username,
+        )
+        acl = LoginAssetACL.get_match_rule_acls(
+            user, get_request_ip_or_data(self.request), queryset,
+        )
+        if acl and acl.is_action(acl.ActionChoices.reject):
+            raise JMSException(
+                code='acl_reject', detail=_('ACL action is reject: {}({})').format(acl.name, acl.id),
+            )
 
-        with tmp_to_org(self.serializer.asset.org):
-            acl = queryset.valid().first()
-
-        if acl:
+        if (acl and acl.is_action(acl.ActionChoices.review)
+                and not acl.is_review_exempt(user, asset, account_username)):
             need_review = True
             response_data = self._get_response_data_of_need_review(acl)
         else:
@@ -55,7 +57,7 @@ class LoginAssetCheckAPI(CreateAPIView):
         return response_data
 
     def _get_response_data_of_need_review(self, acl) -> dict:
-        ticket = LoginAssetACL.create_login_asset_review_ticket(
+        ticket = acl.create_login_asset_review_ticket(
             user=self.serializer.user,
             asset=self.serializer.asset,
             account_username=self.serializer.validated_data.get('account_username'),

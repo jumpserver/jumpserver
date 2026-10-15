@@ -23,11 +23,13 @@ class SSHCAOpenBaoTestingAPI(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
         data = {}
+        retained_fields = ('SSH_CA_OPENBAO_TOKEN', 'SSH_CA_OPENBAO_CACERT_CONTENT')
         for name in serializer.fields:
             value = validated_data.get(name, getattr(settings, name, None))
-            if name == 'SSH_CA_OPENBAO_TOKEN' and value in ('', None):
+            if name in retained_fields and value in ('', None):
                 value = getattr(settings, name, None)
             data[name] = value
+        data['SSH_CA_OPENBAO_CACERT_FILE'] = settings.SSH_CA_OPENBAO_CACERT_FILE
 
         address_field = 'SSH_CA_OPENBAO_ADDR'
         if not data[address_field]:
@@ -37,8 +39,9 @@ class SSHCAOpenBaoTestingAPI(GenericAPIView):
         return SimpleNamespace(**data)
 
     def post(self, request):
-        client = get_ssh_ca_client(self.get_config(request))
-        ok, error = client.is_active()
+        config = self.get_config(request)
+        client = get_ssh_ca_client(config)
+        ok, error = client.is_active(ttl=config.SSH_CA_OPENBAO_TTL)
         if not ok:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,

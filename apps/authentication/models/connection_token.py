@@ -6,25 +6,25 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Prefetch, prefetch_related_objects
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 from accounts.const import AliasAccount, SecretType
 from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
-from assets.validators import web_xpack_fields
 from authentication.const import ConnectionTokenType
 from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
-from common.utils import lazyproperty, pretty_string, bulk_get, is_uuid
+from common.utils import lazyproperty, pretty_string, is_uuid
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.utils import tmp_to_org
 from perms.const import ActionChoices
-from terminal.models import Applet, VirtualApp
+from terminal.models import VirtualApp
 
 
 def date_expired_default():
@@ -63,6 +63,7 @@ class ConnectionToken(JMSOrgBaseModel):
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     is_reusable = models.BooleanField(default=False, verbose_name=_("Reusable"))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
+    date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_("Date last used"))
     from_ticket = models.OneToOneField(
         'tickets.ApplyLoginAssetTicket', related_name='connection_token',
         on_delete=models.SET_NULL, null=True, blank=True,
@@ -182,12 +183,12 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire_at(self):
         return self.permed_account.date_expired.timestamp()
 
-    def is_valid(self, include_personal_secret=False) -> bool:
+    def is_valid(self, include_personal_secret=False, *, check_expiration=True) -> bool:
         if not self.is_active:
             error = _('Connection token inactive')
             raise PermissionDenied(error)
 
-        if self.is_expired:
+        if check_expiration and self.is_expired:
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
             raise PermissionDenied(error)
         if not self.user or not self.user.is_valid:
@@ -196,21 +197,16 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset or not self.asset.is_active:
             error = _('No asset or inactive asset')
             raise PermissionDenied(error)
-        if self.protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
-            config = self.asset.spec_info or {}
-            protocol = self.platform.protocols.filter(name=self.protocol).first()
-            login = config if config.get('autofill') else (protocol.setting if protocol else {})
-            if web_xpack_fields(config) or web_xpack_fields(login):
-                raise PermissionDenied(_('A valid enterprise license is required.'))
+        from acls.models import ConnectMethodACL
+        if not ConnectMethodACL.is_method_allowed(
+            self.user, self.asset, self.connect_method, self.protocol
+        ):
+            raise PermissionDenied(_('Connect method is not allowed for this asset'))
         if not self.account:
             error = _('No account')
             raise PermissionDenied(error)
 
         if self.personal_credential_id:
-            if self.account != AliasAccount.INPUT:
-                raise PermissionDenied(_(
-                    'Personal credentials can only be used with the manual account'
-                ))
             self.validate_personal_credential(
                 include_secret=include_personal_secret
             )
@@ -226,7 +222,7 @@ class ConnectionToken(JMSOrgBaseModel):
             raise PermissionDenied(msg)
 
         if permed_account.date_expired < timezone.now():
-            raise PermissionDenied('Expired')
+            raise PermissionDenied(gettext('Expired'))
         return True
 
     def validate_personal_credential(self, include_secret=False):
@@ -235,7 +231,7 @@ class ConnectionToken(JMSOrgBaseModel):
         )
 
         permission_context = get_personal_credential_permission_context(
-            self.user, self.asset, self.protocol
+            self.user, self.asset, self.protocol, account_alias=self.account,
         )
         # Reuse this account only on the request-local model instance. A token
         # loaded for a later request still performs the complete dynamic check.
@@ -272,7 +268,14 @@ class ConnectionToken(JMSOrgBaseModel):
             if cached is not None:
                 return cached
 
-        from accounts.personal_credentials import get_personal_credential_for_use
+        from accounts.personal_credentials import (
+            get_personal_credential_for_use,
+            get_personal_credential_permission_context,
+        )
+        if permission_context is None:
+            permission_context = get_personal_credential_permission_context(
+                self.user, self.asset, self.protocol, account_alias=self.account,
+            )
         try:
             credential = get_personal_credential_for_use(
                 self.user, self.asset, self.protocol, self.personal_credential_id,
@@ -306,25 +309,16 @@ class ConnectionToken(JMSOrgBaseModel):
         return method
 
     def get_remote_app_option(self):
-        cmdline = {
-            'app_name': self.connect_method,
-            'user_id': str(self.user.id),
-            'asset_id': str(self.asset.id),
-            'token_id': str(self.id)
-        }
-        cmdline_b64 = base64.b64encode(json.dumps(cmdline).encode()).decode()
-        app = '||tinker'
-        options = {
-            'remoteapplicationmode:i': '1',
-            'remoteapplicationprogram:s': app,
-            'remoteapplicationname:s': app,
-            'alternate shell:s': app,
-            'remoteapplicationcmdline:s': cmdline_b64,
+        # Keep the existing response field for connection components. A ticket
+        # now opens ordinary RDP; the protected server-side Tinker shell chooses
+        # the application from the authenticated Windows session binding.
+        return {
+            'remoteapplicationmode:i': '0',
+            'alternate shell:s': '',
             'disableconnectionsharing:i': '1',
-            'bitmapcachepersistenable:i': '0',  # 图缓存相关设置,便于录像审计
+            'bitmapcachepersistenable:i': '0',
             'bitmapcachesize:i': '1500',
         }
-        return options
 
     def get_virtual_app_option(self):
         method = self.connect_method_object
@@ -336,7 +330,7 @@ class ConnectionToken(JMSOrgBaseModel):
         provider = virtual_app.select_provider(self.user)
         if provider is None:
             raise JMSException({
-                'error': 'No provider available, please check the virtual app publication and provider status'
+                'error': gettext('No provider available, please check the virtual app publication and provider status')
             })
         return {
             'name': virtual_app.name,
@@ -345,40 +339,6 @@ class ConnectionToken(JMSOrgBaseModel):
             'image_protocol': virtual_app.image_protocol,
             'provider': provider,
         }
-
-    def get_applet_option(self):
-        method = self.connect_method_object
-        if not method or method.get('type') != 'applet' or method.get('disabled', False):
-            return None
-
-        applet = Applet.objects.filter(name=method.get('value')).first()
-        if not applet:
-            return None
-
-        host_account = applet.select_host_account(self.user, self.asset)
-        if not host_account:
-            raise JMSException({'error': 'No host account available, please check the applet, host and account'})
-
-        host, account, lock_key = bulk_get(host_account, ('host', 'account', 'lock_key'))
-        gateway = host.zone.select_gateway() if host.zone else None
-        platform = host.platform
-
-        data = {
-            'id': lock_key,
-            'applet': applet,
-            'host': host,
-            'gateway': gateway,
-            'platform': platform,
-            'account': account,
-            'remote_app_option': self.get_remote_app_option()
-        }
-        return data
-
-    @staticmethod
-    def release_applet_account(lock_key):
-        if lock_key:
-            cache.delete(lock_key)
-            return True
 
     def set_ad_domain_if_need(self, account):
         if not self.protocol == 'rdp':
@@ -417,7 +377,13 @@ class ConnectionToken(JMSOrgBaseModel):
             )
         else:
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
-            if (
+            if self.personal_credential_id:
+                credential = self.get_personal_credential(include_secret=True)
+                if not account or account.secret or account.full_username != credential.username:
+                    raise PermissionDenied(_('Personal credential no longer matches the asset account'))
+                account.secret = credential.secret
+                account.secret_type = credential.secret_type
+            elif (
                 account.secret_type != SecretType.SSH_CERTIFICATE
                 and not account.secret and self.input_secret
             ):
@@ -444,7 +410,10 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def command_filter_acls(self):
+        from acls.const import ActionChoices as ACLActionChoices
         from acls.models import CommandFilterACL
+        from users.models import User
+
         kwargs = {
             'user': self.user,
             'asset': self.asset,
@@ -452,6 +421,16 @@ class ConnectionToken(JMSOrgBaseModel):
         }
         with tmp_to_org(self.asset.org_id):
             acls = CommandFilterACL.filter_queryset(**kwargs).valid()
+            # Bound M2M prefetch batches; only review actions need reviewers.
+            acls = list(acls.only(
+                'id', 'name', 'action', 'priority', 'is_active'
+            ).prefetch_related('command_groups').iterator(chunk_size=1000))
+            review_acls = [acl for acl in acls if acl.action == ACLActionChoices.review]
+            if review_acls:
+                prefetch_related_objects(
+                    review_acls,
+                    Prefetch('reviewers', queryset=User.objects.only('id', 'name')),
+                )
         return acls
 
     @lazyproperty
@@ -552,9 +531,10 @@ class AdminConnectionToken(ConnectionToken):
     def expire_at(self):
         return (timezone.now() + timezone.timedelta(days=365)).timestamp()
 
-    def is_valid(self, include_personal_secret=False):
+    def is_valid(self, include_personal_secret=False, *, check_expiration=True):
         return super().is_valid(
-            include_personal_secret=include_personal_secret
+            include_personal_secret=include_personal_secret,
+            check_expiration=check_expiration,
         )
 
     @classmethod

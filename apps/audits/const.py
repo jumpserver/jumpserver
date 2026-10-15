@@ -9,6 +9,7 @@ MODELS_NEED_RECORD = set()
 
 
 class OperateChoices(TextChoices):
+    create = "create", _("Create file")
     mkdir = "mkdir", _("Mkdir")
     rmdir = "rmdir", _("Rmdir")
     delete = "delete", _("Delete")

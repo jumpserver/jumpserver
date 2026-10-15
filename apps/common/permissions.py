@@ -4,7 +4,6 @@ import hmac
 import time
 
 from django.conf import settings
-from django.core.cache import cache
 from rest_framework import permissions
 
 
@@ -39,8 +38,6 @@ class WithBootstrapToken(permissions.BasePermission):
     def check_can_register(self):
         enabled = settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION
         if enabled == 'auto':
-            if cache.get(f'APPLET_HOST_DELOYING'):
-                return True
             return time.time() - settings.JUMPSERVER_UPTIME < 300
         elif enabled:
             return True

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils.translation import gettext_lazy as _
+from django.utils.crypto import constant_time_compare
 from common.utils import FlashMessageUtil
 from common.utils import safe_next_url
 
@@ -32,4 +33,10 @@ class FlashMessageMixin:
         return self.get_failed_response(redirect_uri, msg, msg)
 
     def verify_state_with_session_key(self, session_key):
-        return self.request.GET.get('state') == self.request.session.get(session_key)
+        state = self.request.GET.get('state')
+        session_state = self.request.session.pop(session_key, None)
+        if not isinstance(state, str) or not isinstance(session_state, str):
+            return False
+        if not state or not session_state:
+            return False
+        return constant_time_compare(state, session_state)

@@ -291,6 +291,9 @@ class Config(dict):
         'VAULT_OPENBAO_TOKEN': '',
         'VAULT_OPENBAO_MOUNT_POINT': 'pam',
         'VAULT_OPENBAO_TIMEOUT': 10,
+        'VAULT_OPENBAO_VERIFY_TLS': True,
+        'VAULT_OPENBAO_CACERT_CONTENT': '',
+        'VAULT_OPENBAO_CACERT_FILE': '',
 
         # OpenBao SSH CA uses an independent endpoint and credential so it can
         # be deployed in a separate security/failure domain from Vault KV.
@@ -304,6 +307,8 @@ class Config(dict):
         'SSH_CA_OPENBAO_TTL': 300,
         'SSH_CA_OPENBAO_TIMEOUT': 10,
         'SSH_CA_OPENBAO_VERIFY_TLS': True,
+        'SSH_CA_OPENBAO_CACERT_CONTENT': '',
+        'SSH_CA_OPENBAO_CACERT_FILE': '',
         'SSH_CA_OPENBAO_SOURCE_ADDRESS': '',
 
         'VAULT_HCP_HOST': '',
@@ -456,6 +461,8 @@ class Config(dict):
         },
         'SAML2_IDP_METADATA_URL': '',
         'SAML2_IDP_METADATA_XML': '',
+        'SAML2_IDP_METADATA_CERT_VERIFY_MODE': 'system',
+        'SAML2_IDP_METADATA_CACERT_CONTENT': '',
         'SAML2_SP_KEY_CONTENT': '',
         'SAML2_SP_CERT_CONTENT': '',
         'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
@@ -466,7 +473,7 @@ class Config(dict):
         'AUTH_OAUTH2': False,
         'AUTH_OAUTH2_LOGO_PATH': 'img/login_oauth2_logo.png',
         'AUTH_OAUTH2_PROVIDER': 'OAuth2',
-        'AUTH_OAUTH2_USE_STATE': False,
+        'AUTH_OAUTH2_USE_STATE': True,
         'AUTH_OAUTH2_ALWAYS_UPDATE_USER': True,
         'AUTH_OAUTH2_CLIENT_ID': 'client-id',
         'AUTH_OAUTH2_SCOPE': '',
@@ -477,6 +484,8 @@ class Config(dict):
         'AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT': 'https://oauth2.example.com/logout',
         'AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT': 'https://oauth2.example.com/access_token',
         'AUTH_OAUTH2_ACCESS_TOKEN_METHOD': 'GET',
+        'AUTH_OAUTH2_CERT_VERIFY_MODE': 'system',
+        'AUTH_OAUTH2_CACERT_CONTENT': '',
         'AUTH_OAUTH2_USER_ATTR_MAP': {
             'name': 'name', 'username': 'username', 'email': 'email'
         },
@@ -760,6 +769,7 @@ class Config(dict):
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
         'DOMAINS': '',
+        'WS_ALLOWED_ORIGINS': None,
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
         'SESSION_ENGINE': 'cache',
@@ -915,8 +925,8 @@ class Config(dict):
                 'AUTH_OPENID_KEYCLOAK': False
             })
 
-        if auth_openid_realm_name is None:
-            return
+        if not auth_openid_realm_name:
+            return openid_config
 
         # # convert key # #
         compatible_config = {
@@ -950,6 +960,10 @@ class Config(dict):
             value = build_absolute_uri(base, value)
             openid_config[key] = value
 
+        # The issuer is the realm URL, not the Keycloak server's base URL.
+        openid_config['AUTH_OPENID_PROVIDER_ENDPOINT'] = (
+            auth_openid_server_url.rstrip('/') + '/realms/' + auth_openid_realm_name
+        )
         return openid_config
 
     def get_keycloak_config(self):

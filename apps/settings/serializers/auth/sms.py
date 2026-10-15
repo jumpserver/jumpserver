@@ -47,25 +47,25 @@ class BaseSMSSettingSerializer(serializers.Serializer):
 
 
 class AlibabaSMSSettingSerializer(BaseSMSSettingSerializer):
-    ALIBABA_ACCESS_KEY_ID = serializers.CharField(max_length=256, required=True, label='Access Key ID')
+    ALIBABA_ACCESS_KEY_ID = serializers.CharField(max_length=256, required=True, label=_('Access Key ID'))
     ALIBABA_ACCESS_KEY_SECRET = EncryptedField(
-        max_length=256, required=False, label='Access Key Secret',
+        max_length=256, required=False, label=_('Access Key Secret'),
     )
     ALIBABA_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     ALIBABA_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))
 
 
 class TencentSMSSettingSerializer(BaseSMSSettingSerializer):
-    TENCENT_SECRET_ID = serializers.CharField(max_length=256, required=True, label='Secret ID')
-    TENCENT_SECRET_KEY = EncryptedField(max_length=256, required=False, label='Secret Key')
-    TENCENT_SDKAPPID = serializers.CharField(max_length=256, required=True, label='SDK APP ID')
+    TENCENT_SECRET_ID = serializers.CharField(max_length=256, required=True, label=_('Secret ID'))
+    TENCENT_SECRET_KEY = EncryptedField(max_length=256, required=False, label=_('Secret Key'))
+    TENCENT_SDKAPPID = serializers.CharField(max_length=256, required=True, label=_('SDK APP ID'))
     TENCENT_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     TENCENT_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))
 
 
 class HuaweiSMSSettingSerializer(BaseSMSSettingSerializer):
-    HUAWEI_APP_KEY = serializers.CharField(max_length=256, required=True, label='App Key')
-    HUAWEI_APP_SECRET = EncryptedField(max_length=256, required=False, label='App Secret')
+    HUAWEI_APP_KEY = serializers.CharField(max_length=256, required=True, label=_('App Key'))
+    HUAWEI_APP_SECRET = EncryptedField(max_length=256, required=False, label=_('App Secret'))
     HUAWEI_SMS_ENDPOINT = serializers.CharField(max_length=1024, required=True, label=_('App Access Address'))
     HUAWEI_SIGN_CHANNEL_NUM = serializers.CharField(max_length=1024, required=True, label=_('Signature channel number'))
     HUAWEI_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))

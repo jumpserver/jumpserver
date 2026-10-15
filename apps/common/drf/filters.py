@@ -16,7 +16,7 @@ from django.core.exceptions import (
 )
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.fields import DateTimeField
@@ -79,8 +79,11 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         if model is None:
             return queryset
 
+        filterset_class = self.get_filterset_class(view, queryset)
         for param, values in request.query_params.lists():
             if "__" not in param:
+                continue
+            if filterset_class and param in filterset_class.base_filters:
                 continue
 
             field_name, lookup = param.rsplit("__", 1)
@@ -994,8 +997,8 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
             instance_model_class = apps.get_model(instance_app, instance_model)
             instance = instance_model_class.objects.get(id=instance_id)
             field_name = f"{to_model.__name__.lower()}s"  # eg: assets, users
-            queryset = getattr(instance, field_name).all()  # eg: login_asset_acl.users.all()
-            return queryset
+            related_queryset = getattr(instance, field_name).all()  # eg: login_asset_acl.users.all()
+            return queryset.filter(pk__in=related_queryset.values('pk'))
         except Exception as e:
             error = f"AttrRulesFilterBackend get_queryset_by_attr_rules_instance error: {e}"
             logger.error(error)
@@ -1005,11 +1008,11 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
         try:
             json_data = base64.b64decode(json_base64.encode("utf-8"))
         except Exception:
-            raise ValidationError({"attr_rules": "attr_rules should be base64"})
+            raise ValidationError({"attr_rules": gettext("attr_rules should be base64")})
         try:
             data = json.loads(json_data)
         except Exception:
-            raise ValidationError({"attr_rules": "attr_rules should be json"})
+            raise ValidationError({"attr_rules": gettext("attr_rules should be json")})
 
         logger.debug("AttrRulesFilterBackend json_base64 data: %s", data)
         return data

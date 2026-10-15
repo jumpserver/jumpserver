@@ -7,7 +7,7 @@ from common.serializers.fields import LabeledChoiceField
 from common.utils import get_request_ip, pretty_string, is_uuid
 from users.serializers import ServiceAccountSerializer
 from .. import const
-from ..models import Terminal, Status, Task, CommandStorage, ReplayStorage, AppProvider
+from ..models import Terminal, Status, Task, CommandStorage, ReplayStorage, AppProvider, AppletHost
 
 
 class StatSerializer(serializers.ModelSerializer):
@@ -98,12 +98,13 @@ class TaskSerializer(BulkModelSerializer):
 class TerminalRegistrationSerializer(serializers.ModelSerializer):
     service_account = ServiceAccountSerializer(read_only=True)
     provider_id = serializers.UUIDField(required=False, write_only=True)
+    host_id = serializers.UUIDField(required=False, write_only=True)
 
     class Meta:
         model = Terminal
         fields = [
             'name', 'type', 'comment', 'service_account', 'remote_addr',
-            'provider_id',
+            'provider_id', 'host_id',
         ]
         extra_kwargs = {
             'name': {'max_length': 1024},
@@ -130,6 +131,14 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         provider_id = validated_data.pop('provider_id', None)
+        host_id = validated_data.pop('host_id', None)
+        host = None
+        if host_id:
+            if validated_data.get('type') != const.TerminalType.tinker or provider_id:
+                raise serializers.ValidationError({'host_id': _('Only Tinker can bind an applet host')})
+            host = AppletHost.objects.select_for_update().filter(id=host_id).first()
+            if host is None or host.terminal_id is not None:
+                raise serializers.ValidationError({'host_id': _('Applet host is missing or already bound')})
         instance = super().create(validated_data)
         request = self.context.get('request')
         instance.is_accepted = True
@@ -141,6 +150,10 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         instance.command_storage = CommandStorage.default().name
         instance.replay_storage = ReplayStorage.default().name
         instance.save()
+        if host is not None:
+            # This endpoint requires the bootstrap token, not a service account key.
+            host.terminal = instance
+            host.save(update_fields=['terminal'])
         if provider_id:
             try:
                 provider = AppProvider.objects.get(id=provider_id)

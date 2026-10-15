@@ -82,6 +82,12 @@ class AssetAccountSerializer(AccountSerializer):
     asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, required=False, write_only=True)
     clone_id = None
 
+    def validate_push_now(self, value):
+        request = self.context.get('request')
+        if not request or not request.user.has_perm('accounts.push_account'):
+            return False
+        return value
+
     def to_internal_value(self, data):
         # 导入时，data有时为str
         if isinstance(data, str):
@@ -202,7 +208,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
             accounts = data.pop('accounts')
 
         validated_data = super().to_internal_value(data)
-        if accounts is not serializers.empty:
+        request = self.context.get('request')
+        can_add_account = request and request.user.has_perm('accounts.add_account')
+        if accounts is not serializers.empty and can_add_account:
             # Accounts need the asset instance, so validate and save them after
             # the asset itself has been created or updated.
             validated_data['accounts'] = accounts
@@ -414,7 +422,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         if not accounts_data:
             return
 
-        s = AssetAccountSerializer(data=accounts_data, many=True)
+        s = AssetAccountSerializer(data=accounts_data, many=True, context=self.context)
         s.is_valid(raise_exception=True)
         accounts = s.save()
         self.update_account_su_from(accounts, su_from_map)
@@ -442,6 +450,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
                 instance=account,
                 data=data,
                 partial=account is not None,
+                context=self.context,
             )
             serializer.is_valid(raise_exception=True)
             accounts.append(serializer.save())

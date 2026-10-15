@@ -19,7 +19,7 @@ class AccessKey(models.Model):
     id = models.UUIDField(verbose_name='AccessKeyID', primary_key=True, default=uuid.uuid4, editable=False)
     secret = EncryptTextField(verbose_name='AccessKeySecret', default=default_secret)
     ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User',
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'),
                              on_delete=common.db.models.CASCADE_SIGNAL_SKIP, related_name='access_keys')
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last used'))

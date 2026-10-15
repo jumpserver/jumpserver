@@ -16,7 +16,7 @@ class WebLoginScriptTests(SimpleTestCase):
                 normalize_web_origin(value)
 
     def test_asset_script_validation_allows_sso_without_extra_fields(self):
-        serializer = WebSerializer()
+        serializer = WebSerializer(data={'autofill': 'script'})
         script = [{'step': 1, 'command': 'type', 'target': 'id=password',
                    'value': '{SECRET}', 'origin': 'https://sso.example.com'}]
         self.assertEqual(serializer.validate_script(script), script)

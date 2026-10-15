@@ -65,6 +65,7 @@ extra_nodes_data = [
     {'id': "remote_app", "name": _("Applet"), "pId": "view_setting"},
     {'id': "security", "name": _("Security"), "pId": "view_setting"},
     {'id': "appearance", "name": _("Appearance"), "pId": "view_setting"},
+    {'id': "system_tools", "name": _("System tools"), "pId": "view_setting"},
     {'id': "tasks", "name": _("Task"), "pId": "view_setting"},
     {'id': "license", "name": _("License"), "pId": "view_setting"},
     {'id': "other", "name": _("Other"), "pId": "view_setting"},
@@ -125,6 +126,7 @@ special_pid_mapper = {
     "report_node": "view_audit",
     "rbac.view_pam": "view_pam",
     'audits.usersession': 'view_audit',
+    'audits.ticketaudit': 'view_audit',
     "rbac.view_workbench": "view_workbench",
     "rbac.view_webterminal": "view_workbench",
     "rbac.view_filemanager": "view_workbench",
@@ -194,6 +196,7 @@ special_setting_pid_mapper = {
     'orgs.organization': 'view_setting',
     "settings.view_setting": "view_setting",
     "settings.change_basic": "view_setting",
+    "settings.change_systemtools": "system_tools",
     "settings.change_other": "other",
 }
 
@@ -213,6 +216,7 @@ verbose_name_mapper = {
 
 xpack_nodes = [
     'xpack', 'tickets', 'gather_account_node',
+    'audits.ticketaudit',
     'applications.remoteapp', "assets.accountbackupplan",
     "assets.accountbackupplanexecution",
     "rbac.orgrole", "rbac.orgrolebinding",

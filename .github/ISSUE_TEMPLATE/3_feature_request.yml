@@ -3,7 +3,6 @@ description: 'Suggest an idea'
 title: '[Feature] '
 labels: ['⭐️ Feature Request']
 assignees: 
-  - baijiangjie
   - ibuler
 body:
   - type: input

@@ -35,9 +35,12 @@ class BaseFileParser(BaseParser):
             logger.error(msg)
             raise FileContentOverflowedError(msg)
 
-    @staticmethod
-    def get_stream_data(stream):
-        stream_data = stream.read()
+    @classmethod
+    def get_stream_data(cls, stream):
+        stream_data = stream.read(cls.FILE_CONTENT_MAX_LENGTH + 1)
+        if len(stream_data) > cls.FILE_CONTENT_MAX_LENGTH:
+            msg = FileContentOverflowedError.default_detail.format(cls.FILE_CONTENT_MAX_LENGTH)
+            raise FileContentOverflowedError(msg)
         stream_data = stream_data.strip(codecs.BOM_UTF8)
         return stream_data
 

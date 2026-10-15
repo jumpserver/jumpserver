@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+#. Django's single-field uniqueness validation message.
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "Já existe um registro de %(model_name)s com o mesmo valor em %(field_label)s. Altere o valor de %(field_label)s."
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -192,6 +197,11 @@ msgstr "A conta já está sendo processada; ignorando: %(account)s"
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "Conta não encontrada, inativa ou não elegível para esta tarefa"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "Não foi possível determinar o nome de usuário (ID da conta: %(account_id)s)"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
@@ -351,7 +361,7 @@ msgstr "Chave SSH"
 
 #: accounts/const/account.py:8 authentication/models/access_key.py:45
 msgid "Access key"
-msgstr "Access key"
+msgstr "Chave de acesso"
 
 #: accounts/const/account.py:9 authentication/backends/passkey/models.py:16
 #: authentication/models/sso_token.py:14
@@ -362,7 +372,7 @@ msgstr "Token"
 
 #: accounts/const/account.py:10
 msgid "API key"
-msgstr "API key"
+msgstr "Chave de API"
 
 #: accounts/const/account.py:14 common/db/fields.py:230 perms/filters.py:79
 #: settings/serializers/terminal.py:14 tickets/const.py:17
@@ -2237,6 +2247,10 @@ msgstr "Nome do ativo, endereço ou ID"
 msgid "Connect methods"
 msgstr "Modo de conexão"
 
+#: acls/serializers/connect_method.py
+msgid "Select at least one connection method"
+msgstr "Selecione pelo menos um método de conexão"
+
 #: acls/apps.py:7
 msgid "App Acls"
 msgstr "Controle de acesso"
@@ -2667,7 +2681,7 @@ msgstr "Não incluir categoria de plataforma"
 #: assets/api/asset/asset.py:86 assets/models/platform.py:392
 #: assets/serializers/platform.py:211
 msgid "Gateway enabled"
-msgstr "Ativar zone gateway"
+msgstr "Ativar gateway de domínio"
 
 #: assets/api/asset/asset.py:90 assets/models/platform.py:325
 #: assets/serializers/platform.py:36
@@ -4392,7 +4406,7 @@ msgstr ""
 
 #: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
-msgstr "O ativo pode se conectar através do gateway regional"
+msgstr "O ativo pode se conectar através do gateway do domínio"
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"
@@ -8073,11 +8087,11 @@ msgstr "Conexão (Todos os Protocolos)"
 
 #: perms/const.py:13
 msgid "Upload (RDP, SFTP)"
-msgstr "Upload (RDP, SFTP)"
+msgstr "Enviar (RDP, SFTP)"
 
 #: perms/const.py:14
 msgid "Download (RDP, SFTP)"
-msgstr "Download (RDP, SFTP)"
+msgstr "Baixar (RDP, SFTP)"
 
 #: perms/const.py:15
 msgid "Copy (RDP, VNC)"
@@ -8236,7 +8250,7 @@ msgid "Send asset permission expired notification"
 msgstr "Enviar notificações de expiração de permissões de ativos"
 
 #: perms/tasks.py:52
-#, fuzzy
+
 #| msgid ""
 #| "Check every day at 10 a.m. and send a notification message to users "
 #| "associated with \n"
@@ -9350,7 +9364,7 @@ msgstr "Endereço do IDP Metadata"
 
 #: settings/serializers/auth/saml2.py:21
 msgid "IDP Metadata XML"
-msgstr "IDP Metadata XML"
+msgstr "XML de metadados IDP"
 
 #: settings/serializers/auth/saml2.py:24
 msgid "SP advanced settings"
@@ -9768,7 +9782,7 @@ msgstr "Segredo da chave de acesso (SK)"
 
 #: settings/serializers/feature.py:151 settings/serializers/feature.py:154
 msgid "Chat AI"
-msgstr "Chat AI"
+msgstr "Chat com IA"
 
 #: chat_ai/models.py
 msgid "Can use Chat AI"
@@ -9791,7 +9805,7 @@ msgstr "Endereço básico do serviço de chat. "
 #: settings/serializers/feature.py:173 settings/serializers/feature.py:188
 #: templates/_header_bar.html:96
 msgid "API Key"
-msgstr "Chave API"
+msgstr "Chave de API"
 
 #: settings/serializers/feature.py:177 settings/serializers/feature.py:192
 msgid ""
@@ -10033,6 +10047,10 @@ msgstr "Verificação de certificado"
 #: settings/serializers/msg.py:71
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "Controla a verificação do certificado TLS do SMTP"
+
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "Controla a verificação dos certificados TLS do servidor OAuth2"
 
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
@@ -14217,11 +14235,11 @@ msgstr "Exibição do provedor de serviços"
 
 #: xpack/plugins/cloud/serializers/account.py:135
 msgid "Regions must be a JSON object."
-msgstr ""
+msgstr "As regiões devem ser um objeto JSON."
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:32
 msgid "Access key id"
-msgstr "Access key id"
+msgstr "ID da chave de acesso"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:59
 msgid "Subscription ID"
@@ -14257,7 +14275,7 @@ msgstr "Domínio do usuário"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:157
 msgid "Project ID"
-msgstr "projeto"
+msgstr "ID do projeto"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:164
 msgid "Cert File"
@@ -14328,7 +14346,7 @@ msgstr "Tempo limite de teste"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:261
 msgid "Project"
-msgstr "projeto"
+msgstr "Projeto"
 
 #: xpack/plugins/cloud/serializers/task.py:168
 msgid "History count"
@@ -14535,3 +14553,2030 @@ msgstr "A versão informada não corresponde à versão atual do aplicativo"
 #: terminal/models/virtualapp/virtualapp.py
 msgid "Published version"
 msgstr "Versão publicada"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "Este ativo não oferece suporte a este protocolo"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "Este ativo não oferece suporte à verificação de credenciais"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "Não é possível verificar as credenciais porque a ACL de login do ativo exige uma ação adicional."
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "O horário da notificação deve ser posterior ao horário atual."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "A permissão de acesso ao ativo está prestes a expirar"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Data e hora de expiração"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "O serviço de emissão de certificados SSH do OpenBao está indisponível: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "Insira um token de serviço do OpenBao."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "O token de serviço do OpenBao é inválido, expirou ou não tem as permissões necessárias. Verifique o token e sua política de acesso."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "O token de serviço do OpenBao não tem acesso a %(resource)s. Conceda a permissão %(capability)s para esse caminho."
+
+#: accounts/api/account/application.py:79
+msgid "Successfully refreshed secret"
+msgstr "Segredo atualizado com sucesso"
+
+#: accounts/api/account/personal.py:93
+msgid "Inactive personal credentials cannot be tested"
+msgstr "Não é possível testar credenciais pessoais inativas"
+
+#: accounts/automations/change_secret/manager.py:43
+msgid "The currently managed password is required when Oracle password changes use the REPLACE clause"
+msgstr "A senha gerenciada atual é necessária para alterar senhas Oracle com a cláusula REPLACE"
+
+#: accounts/automations/verify_account/manager.py:137
+#, python-format
+msgid "Targets: %(credentials)s personal credential(s) on %(assets)s asset(s)"
+msgstr "Destinos: %(credentials)s credenciais pessoais em %(assets)s ativos"
+
+#: accounts/const/account.py:8
+msgid "SSH certificate"
+msgstr "Certificado SSH"
+
+#: accounts/exceptions.py:43
+msgid "SSH certificate signing is unavailable. Please retry or contact your administrator."
+msgstr "A assinatura de certificados SSH está indisponível. Tente novamente ou contate o administrador."
+
+#: accounts/exceptions.py:51
+msgid "This account follows template credentials. Confirm to stop following and modify its credentials."
+msgstr "Esta conta segue as credenciais do modelo. Confirme para parar de seguir e alterar as credenciais."
+
+#: accounts/models/account.py:119
+msgid "Follow template"
+msgstr "Seguir modelo"
+
+#: accounts/models/account.py:177
+msgid "The source account template is unavailable."
+msgstr "O modelo de conta de origem está indisponível."
+
+#: accounts/models/account.py:179
+#: accounts/serializers/account/account.py:176
+msgid "Account and template secret types must match."
+msgstr "Os tipos de segredo da conta e do modelo devem corresponder."
+
+#: accounts/models/account.py:196
+msgid "Disable template following before editing credentials."
+msgstr "Desative o seguimento do modelo antes de editar as credenciais."
+
+#: accounts/models/account.py:216
+msgid "Disable template following before changing the source."
+msgstr "Desative o seguimento do modelo antes de alterar a origem."
+
+#: accounts/models/account.py:218
+msgid "Disable template following before changing the secret type."
+msgstr "Desative o seguimento do modelo antes de alterar o tipo de segredo."
+
+#: accounts/models/account.py:225
+msgid "Save the following state with the credential snapshot."
+msgstr "Salve o estado de seguimento junto com o instantâneo das credenciais."
+
+#: accounts/models/account.py:228
+msgid "Provide credentials when changing the secret type."
+msgstr "Forneça credenciais ao alterar o tipo de segredo."
+
+#: accounts/models/account.py:240
+msgid "Only template accounts can follow a template."
+msgstr "Apenas contas de modelo podem seguir um modelo."
+
+#: accounts/models/base.py:29
+msgid "Update template following through account save to preserve credentials."
+msgstr "Atualize o seguimento salvando a conta para preservar as credenciais."
+
+#: accounts/models/base.py:32
+msgid "Disable template following before editing credentials or their source."
+msgstr "Desative o seguimento antes de editar as credenciais ou sua origem."
+
+#: accounts/models/personal.py:17
+msgid "Owner"
+msgstr "Proprietário"
+
+#: accounts/models/personal.py:36
+#: accounts/personal_credentials.py:144
+#: accounts/personal_credentials.py:180
+msgid "Personal asset credential"
+msgstr "Credencial pessoal de ativo"
+
+#: accounts/models/template.py:102
+msgid "Disable account template following before changing the secret type."
+msgstr "Desative o seguimento do modelo de conta antes de alterar o tipo de segredo."
+
+#: accounts/personal_credentials.py:162
+msgid "Operation"
+msgstr "Operação"
+
+#: accounts/personal_credentials.py:170
+msgid "Failure reason"
+msgstr "Motivo da falha"
+
+#: accounts/personal_credentials.py:196
+msgid "The personal credential has been updated. Please refresh and try again."
+msgstr "A credencial pessoal foi atualizada. Atualize a página e tente novamente."
+
+#: accounts/personal_credentials.py:204
+msgid "Invalid user"
+msgstr "Usuário inválido"
+
+#: accounts/personal_credentials.py:206
+msgid "Asset is inactive"
+msgstr "O ativo está inativo"
+
+#: accounts/personal_credentials.py:209
+msgid "Protocol is not supported for personal credentials"
+msgstr "Protocolo não suportado para credenciais pessoais"
+
+#: accounts/personal_credentials.py:219
+msgid "Personal credentials require a manual or empty-secret asset account"
+msgstr "Credenciais pessoais exigem uma conta de ativo manual ou sem segredo"
+
+#: accounts/personal_credentials.py:230
+msgid "You do not have account permission for this asset"
+msgstr "Você não tem permissão de conta para este ativo"
+
+#: accounts/personal_credentials.py:240
+msgid "Personal credentials require an empty-secret asset account"
+msgstr "Credenciais pessoais exigem uma conta de ativo sem segredo"
+
+#: accounts/personal_credentials.py:252
+msgid "Personal credential username must match the asset account"
+msgstr "O usuário da credencial pessoal deve corresponder à conta do ativo"
+
+#: accounts/personal_credentials.py:301
+msgid "Credential verification method is unavailable"
+msgstr "O método de verificação de credenciais está indisponível"
+
+#: accounts/personal_credentials.py:307
+msgid "Personal credential verification does not allow custom automation methods"
+msgstr "A verificação de credenciais pessoais não permite métodos de automação personalizados"
+
+#: accounts/personal_credentials.py:338
+msgid "The configured credential verification method does not support this protocol"
+msgstr "O método de verificação configurado não suporta este protocolo"
+
+#: accounts/personal_credentials.py:355
+msgid "Secret type is not supported by this protocol"
+msgstr "O protocolo não suporta este tipo de segredo"
+
+#: accounts/personal_credentials.py:383
+#: accounts/personal_credentials.py:421
+#: accounts/serializers/account/personal.py:188
+msgid "Personal credential not found"
+msgstr "Credencial pessoal não encontrada"
+
+#: accounts/personal_credentials.py:450
+#: accounts/personal_credentials.py:469
+#: accounts/serializers/account/personal.py:169
+#: accounts/serializers/account/personal.py:211
+msgid "A personal credential with these fields already exists"
+msgstr "Já existe uma credencial pessoal com estes campos"
+
+#: accounts/risk_handlers.py:44
+#, python-format
+msgid "Invalid risk type: %(type)s"
+msgstr "Tipo de risco inválido: %(type)s"
+
+#: accounts/serializers/account/account.py:126
+msgid "Template not found"
+msgstr "Modelo não encontrado"
+
+#: accounts/serializers/account/account.py:172
+msgid "Following requires a valid account template in the same organization."
+msgstr "Para seguir, é necessário um modelo de conta válido na mesma organização."
+
+#: accounts/serializers/account/account.py:178
+msgid "Following accounts use template credentials."
+msgstr "Contas que seguem o modelo usam as credenciais dele."
+
+#: accounts/serializers/account/account.py:183
+msgid "Disable template following before editing this field."
+msgstr "Desative o seguimento do modelo antes de editar este campo."
+
+#: accounts/serializers/account/account.py:293
+msgid "Asset IP"
+msgstr "IP do ativo"
+
+#: accounts/serializers/account/account.py:321
+#: accounts/serializers/account/account.py:409
+msgid "Only applies to template accounts. Credentials are read from the current template."
+msgstr "Apenas para contas de modelo. As credenciais são lidas do modelo atual."
+
+#: accounts/serializers/account/account.py:355
+msgid "Source template"
+msgstr "Modelo de origem"
+
+#: accounts/serializers/account/base.py:68
+msgid "SSH certificate accounts cannot push or rotate credentials"
+msgstr "Contas com certificado SSH não permitem envio ou rotação de credenciais"
+
+#: accounts/serializers/account/personal.py:48
+msgid "Expected version"
+msgstr "Versão esperada"
+
+#: accounts/serializers/account/personal.py:74
+#: assets/serializers/node.py:196
+#: settings/api/ssh_ca.py:37
+msgid "This field may not be blank."
+msgstr "Este campo não pode ficar em branco."
+
+#: accounts/serializers/account/personal.py:91
+msgid "Username cannot be changed"
+msgstr "O nome de usuário não pode ser alterado"
+
+#: accounts/serializers/account/personal.py:96
+msgid "Asset cannot be changed"
+msgstr "O ativo não pode ser alterado"
+
+#: accounts/serializers/account/personal.py:98
+msgid "Protocol cannot be changed"
+msgstr "O protocolo não pode ser alterado"
+
+#: accounts/serializers/account/personal.py:106
+msgid "This field is only valid when updating"
+msgstr "Este campo é válido apenas na atualização"
+
+#: accounts/serializers/account/personal.py:112
+#: accounts/serializers/account/personal.py:149
+#: accounts/serializers/account/personal.py:181
+msgid "Asset is not in the current organization"
+msgstr "O ativo não pertence à organização atual"
+
+#: accounts/serializers/account/personal.py:128
+msgid "A new secret is required when changing the secret type"
+msgstr "Um novo segredo é necessário ao alterar o tipo de segredo"
+
+#: accounts/serializers/account/service.py:57
+#, python-format
+msgid "At least one of the following fields must be provided: %(fields)s."
+msgstr "Forneça pelo menos um destes campos: %(fields)s."
+
+#: accounts/tasks/template.py:16
+msgid "Synchronize template properties to following accounts without changing credentials."
+msgstr "Sincronize as propriedades do modelo com as contas que o seguem sem alterar as credenciais."
+
+#: accounts/tasks/verify_account.py:69
+#: accounts/tasks/verify_account.py:88
+msgid "Verify personal credential connectivity"
+msgstr "Verificar conectividade da credencial pessoal"
+
+#: accounts/tasks/verify_account.py:70
+msgid "Verify a user's personal asset credential"
+msgstr "Verificar a credencial pessoal de ativo de um usuário"
+
+#: accounts/tasks/verify_account.py:106
+msgid "Personal credential verification failed"
+msgstr "Falha ao verificar a credencial pessoal"
+
+#: accounts/templates/accounts/gather_account_report.html:76
+#: accounts/templates/accounts/gather_account_report.html:116
+msgid "No."
+msgstr "Nº"
+
+#: acls/models/login_asset_acl.py:18
+msgid "Review exemption duration (hours)"
+msgstr "Duração da dispensa de aprovação (horas)"
+
+#: acls/models/login_asset_acl.py:19
+msgid "0 means approval is required for every connection."
+msgstr "0 exige aprovação em cada conexão."
+
+#: acls/serializers/base.py:114
+msgid "Account usernames, or @ALL to match all accounts."
+msgstr "Nomes de usuário das contas, ou @ALL para todas as contas."
+
+#: acls/serializers/command_acl.py:24
+msgid "Use \"command\" for literal command names. Each line matches that command as a standalone word anywhere in the input, so \"rm\" also matches \"rm -rf\" and \"sudo rm\". Use \"regex\" only for custom patterns."
+msgstr "Use \"command\" para nomes literais de comandos. Cada linha busca o comando como palavra inteira em qualquer parte da entrada: \"rm\" também corresponde a \"rm -rf\" e \"sudo rm\". Use \"regex\" apenas para padrões personalizados."
+
+#: assets/api/asset/asset.py:51
+#: assets/models/zone.py:20
+#: assets/serializers/domain.py:41
+msgid "CIDR ranges"
+msgstr "Intervalos CIDR"
+
+#: assets/api/asset/asset.py:52
+msgid "Exclude zone"
+msgstr "Zona excluída"
+
+#: assets/api/favorite_asset.py:133
+msgid "Some assets are not authorized for this user."
+msgstr "Alguns ativos não estão autorizados para este usuário."
+
+#: assets/api/platform.py:120
+msgid "Internal platform"
+msgstr "Plataforma interna"
+
+#: assets/api/platform.py:169
+msgid "Missing platform.yml in package"
+msgstr "Falta platform.yml no pacote"
+
+#: assets/const/protocol.py:150
+msgid "Allow invalid certificate"
+msgstr "Permitir certificado inválido"
+
+#: assets/const/protocol.py:333
+#: assets/models/asset/web.py:22
+msgid "Interactive selector"
+msgstr "Seletor interativo"
+
+#: assets/const/protocol.py:334
+#: assets/models/asset/web.py:23
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "Área opcional de verificação interativa, ex.: css=#mfa-dialog. Exclua credenciais e controles de exibição de senha."
+
+#: assets/const/protocol.py:342
+#: assets/models/asset/web.py:17
+msgid "Selector for an element that appears only after a successful login, e.g. css=#dashboard. Required for basic autofill."
+msgstr "Seletor de elemento exibido apenas após login bem-sucedido, ex.: css=#dashboard. Obrigatório para o preenchimento automático básico."
+
+#: assets/models/asset/web.py:9
+#: assets/serializers/asset/web.py:16
+msgid "Allowed sites"
+msgstr "Sites permitidos"
+
+#: assets/models/zone.py:21
+msgid "Auto assign new assets"
+msgstr "Atribuir novos ativos automaticamente"
+
+#: assets/serializers/asset/web.py:75
+msgid "Invalid selector"
+msgstr "Seletor inválido"
+
+#: assets/serializers/domain.py:34
+#, python-format
+msgid "Invalid CIDR: %s"
+msgstr "CIDR inválido: %s"
+
+#: assets/serializers/domain.py:74
+msgid "At least one CIDR is required when auto assignment is enabled."
+msgstr "É necessário ao menos um CIDR para habilitar a atribuição automática."
+
+#: assets/serializers/favorite_asset.py:35
+#: assets/serializers/favorite_asset.py:82
+#: assets/serializers/favorite_asset.py:148
+msgid "Invalid favorite folder."
+msgstr "Pasta de favoritos inválida."
+
+#: assets/serializers/favorite_asset.py:40
+msgid "A folder cannot be moved below itself."
+msgstr "Não é possível mover uma pasta para dentro dela mesma."
+
+#: assets/serializers/favorite_asset.py:58
+msgid "A folder with this name already exists under the parent folder."
+msgstr "Já existe uma pasta com este nome na pasta pai."
+
+#: assets/serializers/favorite_asset.py:96
+msgid "Asset is not authorized for this user."
+msgstr "O ativo não está autorizado para este usuário."
+
+#: assets/validators.py:24
+msgid "The address cannot contain Ansible template override syntax"
+msgstr "O endereço não pode conter sintaxe de substituição de modelo Ansible"
+
+#: assets/validators.py:64
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "Informe uma origem HTTP/HTTPS sem caminho, credenciais ou curingas."
+
+#: assets/validators.py:88
+msgid "Enter at most 128 script steps."
+msgstr "Informe no máximo 128 etapas de script."
+
+#: assets/validators.py:92
+#: assets/validators.py:101
+msgid "Invalid script step."
+msgstr "Etapa de script inválida."
+
+#: assets/validators.py:95
+msgid "Script step numbers must be unique positive integers."
+msgstr "Os números das etapas devem ser inteiros positivos únicos."
+
+#: assets/validators.py:98
+msgid "Unsupported script command."
+msgstr "Comando de script não suportado."
+
+#: assets/validators.py:105
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "O tempo limite da etapa deve ser entre 1 e 180 segundos."
+
+#: assets/validators.py:109
+msgid "The success command must be the last step."
+msgstr "O comando de sucesso deve ser a última etapa."
+
+#: audits/const.py:12
+msgid "Create file"
+msgstr "Criar arquivo"
+
+#: audits/models.py:78
+msgid "Ticket audit"
+msgstr "Auditoria de chamados"
+
+#: audits/serializers.py:57
+#, python-format
+msgid "Updating %(fields)s fields is not allowed"
+msgstr "Não é permitido atualizar os campos %(fields)s"
+
+#: authentication/api/connection_token.py:532
+#: authentication/serializers/connection_token.py:96
+msgid "Personal credential connection tokens cannot be reusable"
+msgstr "Tokens de conexão com credenciais pessoais não podem ser reutilizáveis"
+
+#: authentication/api/connection_token.py:763
+msgid "Personal credentials can only be managed by their owner"
+msgstr "Somente o proprietário pode gerenciar suas credenciais pessoais"
+
+#: authentication/api/connection_token.py:802
+msgid "A personal credential ID is required when a version is provided"
+msgstr "O ID da credencial pessoal é necessário ao fornecer uma versão"
+
+#: authentication/api/connection_token.py:810
+msgid "Do not submit a username or secret when using a saved credential"
+msgstr "Não envie usuário nem segredo ao usar credenciais salvas"
+
+#: authentication/api/connection_token.py:909
+#: authentication/models/connection_token.py:204
+msgid "Connect method is not allowed for this asset"
+msgstr "O método de conexão não é permitido para este ativo"
+
+#: authentication/api/connection_token.py:1246
+msgid "Token is expired at: {}"
+msgstr "O token expirou em: {}"
+
+#: authentication/api/connection_token.py:1259
+msgid "Not allow to view secret"
+msgstr "Não é permitido visualizar o segredo"
+
+#: authentication/api/connection_token.py:1263
+msgid "Tinker must redeem its RDP login ticket to obtain credentials"
+msgstr "O Tinker deve resgatar seu tíquete RDP para obter credenciais"
+
+#: authentication/api/connection_token.py:1268
+msgid "Token {} is not valid"
+msgstr "O token {} é inválido"
+
+#: authentication/api/connection_token.py:1290
+#: authentication/api/rdp_login.py:144
+msgid "Invalid connection token"
+msgstr "Token de conexão inválido"
+
+#: authentication/api/connection_token.py:1299
+msgid "Token expired"
+msgstr "Token expirado"
+
+#: authentication/api/face.py:55
+msgid "missing field 'face_code'"
+msgstr "Falta o campo 'face_code'"
+
+#: authentication/api/face.py:70
+msgid "token not exists or expired"
+msgstr "O token não existe ou expirou"
+
+#: authentication/api/face.py:129
+msgid "Token does not belong to the current face capture."
+msgstr "O token não pertence à captura facial atual."
+
+#: authentication/api/face.py:135
+msgid "Token does not exist or has expired."
+msgstr "O token não existe ou expirou."
+
+#: authentication/api/face.py:246
+msgid "face codes not matched"
+msgstr "Os dados faciais não correspondem"
+
+#: authentication/api/rdp_login.py:42
+msgid "Only user and admin connection tokens support RDP token login"
+msgstr "Somente tokens de conexão de usuário e administrador permitem login RDP por token"
+
+#: authentication/api/rdp_login.py:47
+msgid "Connection permission is no longer valid"
+msgstr "A permissão de conexão não é mais válida"
+
+#: authentication/api/rdp_login.py:51
+msgid "An enabled Applet connection is required"
+msgstr "É necessária uma conexão de aplicativo remoto habilitada"
+
+#: authentication/api/rdp_login.py:57
+msgid "A Tinker component must be bound to this host"
+msgstr "Um componente Tinker deve ser vinculado a este host"
+
+#: authentication/api/rdp_login.py:63
+msgid "Applet is not available on this host"
+msgstr "O aplicativo remoto está indisponível neste host"
+
+#: authentication/api/rdp_login.py:67
+msgid "This component is not authorized for the host"
+msgstr "O componente não está autorizado para este host"
+
+#: authentication/api/rdp_login.py:74
+msgid "The connection authorization has changed"
+msgstr "A autorização de conexão foi alterada"
+
+#: authentication/api/rdp_login.py:97
+#, python-format
+msgid "No compatible Applet host is available. Upgrade and redeploy an applet host with Tinker %(minimum)s or later."
+msgstr "Nenhum host de aplicativos compatível está disponível. Atualize e reimplante um host com Tinker %(minimum)s ou superior."
+
+#: authentication/api/rdp_login.py:115
+msgid "Unable to issue an RDP login credential"
+msgstr "Não é possível emitir uma credencial de login RDP"
+
+#: authentication/api/rdp_login.py:140
+#: authentication/api/rdp_login.py:149
+msgid "Invalid or expired RDP login authorization"
+msgstr "Autorização de login RDP inválida ou expirada"
+
+#: authentication/api/rdp_login.py:156
+msgid "RDP login ticket has already been used"
+msgstr "O tíquete de login RDP já foi usado"
+
+#: authentication/api/sso.py:90
+msgid "authkey is required"
+msgstr "authkey é obrigatório"
+
+#: authentication/api/token.py:46
+msgid "MFA unset, please set first"
+msgstr "A autenticação multifator não está configurada; configure-a primeiro"
+
+#: authentication/backends/drf.py:94
+msgid "User is inactive or expired."
+msgstr "O usuário está inativo ou expirado."
+
+#: authentication/backends/ldap.py:192
+msgid "failed to map the username to a DN."
+msgstr "Não foi possível mapear o usuário para um DN."
+
+#: authentication/backends/ldap.py:201
+msgid "user DN/password rejected by LDAP server."
+msgstr "O servidor LDAP rejeitou o DN ou a senha."
+
+#: authentication/backends/passkey/fido.py:108
+#: authentication/backends/passkey/fido.py:146
+msgid "No state found"
+msgstr "Estado não encontrado"
+
+#: authentication/backends/token.py:25
+msgid "Token is invalid, expired at {}"
+msgstr "O token é inválido; expirou em {}"
+
+#: authentication/errors/mfa.py:13
+msgid "Code invalid, can not get user info"
+msgstr "Código inválido; não é possível obter os dados do usuário"
+
+#: authentication/mixins.py:611
+msgid "Face recognition token is missing from the session."
+msgstr "Falta o token de reconhecimento facial na sessão."
+
+#: authentication/mixins.py:619
+#, python-format
+msgid "Face recognition context does not exist for token: %(token)s"
+msgstr "Não há contexto de reconhecimento facial para o token: %(token)s"
+
+#: authentication/mixins.py:626
+msgid "Face recognition is not yet completed."
+msgstr "O reconhecimento facial ainda não foi concluído."
+
+#: authentication/mixins.py:634
+msgid "Face code is missing from the context."
+msgstr "Faltam os dados faciais no contexto."
+
+#: authentication/models/connection_token.py:54
+msgid "Personal credential ID"
+msgstr "ID da credencial pessoal"
+
+#: authentication/models/connection_token.py:57
+#: authentication/serializers/connection_token.py:31
+msgid "Personal credential version"
+msgstr "Versão da credencial pessoal"
+
+#: authentication/models/connection_token.py:255
+msgid "Personal credential version is missing"
+msgstr "Falta a versão da credencial pessoal"
+
+#: authentication/models/connection_token.py:287
+msgid "Personal credential is no longer available"
+msgstr "A credencial pessoal não está mais disponível"
+
+#: authentication/models/connection_token.py:333
+msgid "No provider available, please check the virtual app publication and provider status"
+msgstr "Nenhum provedor disponível; verifique a publicação do aplicativo virtual e o estado do provedor"
+
+#: authentication/models/connection_token.py:383
+msgid "Personal credential no longer matches the asset account"
+msgstr "A credencial pessoal não corresponde mais à conta do ativo"
+
+#: authentication/notifications.py:17
+msgid "Temporary password"
+msgstr "Senha temporária"
+
+#: authentication/notifications.py:20
+msgid "Private token"
+msgstr "Token privado"
+
+#: authentication/notifications.py:41
+msgid "Credential created reminder"
+msgstr "Aviso de criação de credencial"
+
+#: authentication/notifications.py:45
+#: authentication/templates/authentication/_msg_credential_created.html:5
+msgid "Credential type"
+msgstr "Tipo de credencial"
+
+#: authentication/notifications.py:46
+#: authentication/templates/authentication/_msg_credential_created.html:6
+msgid "Identifier"
+msgstr "Identificador"
+
+#: authentication/notifications.py:73
+msgid "Credential activity summary"
+msgstr "Resumo de atividade das credenciais"
+
+#: authentication/notifications.py:77
+msgid "Credential activity"
+msgstr "Atividade das credenciais"
+
+#: authentication/serializers/connect_token_secret.py:164
+msgid "SSH public key"
+msgstr "Chave pública SSH"
+
+#: authentication/serializers/connect_token_secret.py:268
+msgid "Virtual app provider is required"
+msgstr "É necessário um provedor de aplicativos virtuais"
+
+#: authentication/serializers/connect_token_secret.py:270
+msgid "Virtual app provider requires an SSH host"
+msgstr "O provedor de aplicativos virtuais exige um host SSH"
+
+#: authentication/serializers/connect_token_secret.py:273
+msgid "Virtual app provider requires an active SSH account"
+msgstr "O provedor de aplicativos virtuais exige uma conta SSH ativa"
+
+#: authentication/serializers/connection_token.py:27
+msgid "Save personal credential"
+msgstr "Salvar credencial pessoal"
+
+#: authentication/serializers/rdp_login.py:22
+#: authentication/serializers/rdp_login.py:27
+#: authentication/serializers/rdp_login.py:30
+msgid "Invalid login credential"
+msgstr "Credencial de login inválida"
+
+#: authentication/serializers/token.py:67
+msgid "user id {} not exist"
+msgstr "O ID de usuário {} não existe"
+
+#: authentication/services/rdp_login.py:18
+msgid "RDP login ticket cache is unavailable"
+msgstr "O cache de tíquetes de login RDP está indisponível"
+
+#: authentication/services/ssh_certificate.py:47
+msgid "SSH public key is too long"
+msgstr "A chave pública SSH é longa demais"
+
+#: authentication/services/ssh_certificate.py:53
+msgid "An SSH certificate cannot be signed again"
+msgstr "Um certificado SSH não pode ser assinado novamente"
+
+#: authentication/services/ssh_certificate.py:64
+msgid "Asset permission has expired"
+msgstr "A permissão do ativo expirou"
+
+#: authentication/services/ssh_certificate.py:74
+msgid "The account does not use SSH certificate authentication"
+msgstr "A conta não usa autenticação por certificado SSH"
+
+#: authentication/services/ssh_certificate.py:76
+msgid "Virtual accounts cannot use SSH certificate authentication"
+msgstr "Contas virtuais não podem usar autenticação por certificado SSH"
+
+#: authentication/services/ssh_certificate.py:78
+msgid "SSH certificate accounts require a username"
+msgstr "Contas com certificado SSH exigem um nome de usuário"
+
+#: authentication/services/ssh_certificate.py:80
+msgid "SSH certificates only support SSH and SFTP protocols"
+msgstr "Certificados SSH suportam apenas SSH e SFTP"
+
+#: authentication/tasks.py:43
+msgid "Send credential activity summary"
+msgstr "Enviar resumo de atividade das credenciais"
+
+#: authentication/tasks.py:44
+msgid "Send users a summary of credential creation and successful use in the past 24 hours"
+msgstr "Enviar aos usuários um resumo das credenciais criadas e usadas com sucesso nas últimas 24 horas"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:2
+#: authentication/templates/authentication/_msg_credential_created.html:2
+#, python-format
+msgid "Hello %(name)s,"
+msgstr "Olá, %(name)s,"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:3
+msgid "The following credential activity occurred in the past 24 hours."
+msgstr "A seguinte atividade de credenciais ocorreu nas últimas 24 horas."
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:16
+msgid "If you do not recognize this activity, revoke the credential and contact your administrator immediately."
+msgstr "Se não reconhecer esta atividade, revogue a credencial e contate imediatamente o administrador."
+
+#: authentication/templates/authentication/_msg_credential_created.html:3
+msgid "A new credential was created for your account."
+msgstr "Uma nova credencial foi criada para sua conta."
+
+#: authentication/templates/authentication/_msg_credential_created.html:10
+msgid "If this was not you, revoke the credential and contact your administrator immediately."
+msgstr "Se não foi você, revogue a credencial e contate imediatamente o administrador."
+
+#: authentication/templates/authentication/face_capture.html:60
+#: authentication/templates/authentication/face_capture.html:145
+msgid "Face recognition failed"
+msgstr "Falha no reconhecimento facial"
+
+#: authentication/templates/authentication/face_capture.html:93
+msgid "Failed to start face recognition"
+msgstr "Não foi possível iniciar o reconhecimento facial"
+
+#: authentication/templates/authentication/face_capture.html:129
+msgid "Face capture expired. Please retry."
+msgstr "A captura facial expirou. Tente novamente."
+
+#: authentication/templates/authentication/passkey.html:8
+msgid "Login passkey"
+msgstr "Login com chave de acesso"
+
+#: authentication/views/base.py:61
+msgid "A local account with the same username already exists. Please log in with another authentication method and bind this account before using it to log in."
+msgstr "Já existe uma conta local com esse usuário. Entre com outro método e vincule esta conta antes de usá-la para entrar."
+
+#: chat_ai/api/runtime_store.py:39
+msgid "The runtime store request exceeds the 64 MiB record limit."
+msgstr "A solicitação do armazenamento de execução excede o limite de 64 MiB por registro."
+
+#: chat_ai/api/runtime_store.py:58
+#, python-format
+msgid "JSON parse error - %(error)s"
+msgstr "Erro de análise JSON: %(error)s"
+
+#: chat_ai/api/runtime_store.py:62
+msgid "Only a Kael terminal service account may access the runtime store."
+msgstr "Somente uma conta de serviço de terminal Kael pode acessar o armazenamento de execução."
+
+#: chat_ai/api/runtime_store.py:75
+msgid "A JSON object is required."
+msgstr "É necessário um objeto JSON."
+
+#: chat_ai/api/runtime_store.py:79
+#, python-format
+msgid "Unknown field(s): %(fields)s."
+msgstr "Campos desconhecidos: %(fields)s."
+
+#: chat_ai/api/runtime_store.py:108
+msgid "A UUID string is required."
+msgstr "É necessária uma string UUID."
+
+#: chat_ai/api/runtime_store.py:111
+msgid "A non-negative integer is required."
+msgstr "É necessário um inteiro não negativo."
+
+#: chat_ai/api/runtime_store.py:114
+msgid "A boolean is required."
+msgstr "É necessário um valor booleano."
+
+#: chat_ai/api/runtime_store.py:116
+msgid "A string is required."
+msgstr "É necessária uma string."
+
+#: chat_ai/api/runtime_store.py:118
+msgid "A hexadecimal string is required."
+msgstr "É necessária uma string hexadecimal."
+
+#: chat_ai/api/runtime_store.py:124
+msgid "The journal record exceeds the 64 MiB limit."
+msgstr "O registro do diário excede o limite de 64 MiB."
+
+#: chat_ai/api/runtime_store.py:128
+msgid "The journal record must contain exactly one JSON line."
+msgstr "O registro deve conter exatamente uma linha JSON."
+
+#: chat_ai/api/runtime_store.py:132
+msgid "The journal record is not valid JSON."
+msgstr "O registro do diário não é um JSON válido."
+
+#: chat_ai/api/runtime_store.py:135
+msgid "The journal record must contain version, created_at, payload, and checksum."
+msgstr "O registro deve conter version, created_at, payload e checksum."
+
+#: chat_ai/api/runtime_store.py:139
+msgid "Unsupported journal record version."
+msgstr "Versão de registro não suportada."
+
+#: chat_ai/api/runtime_store.py:146
+msgid "The journal record created_at is invalid."
+msgstr "O campo created_at do registro é inválido."
+
+#: chat_ai/api/runtime_store.py:150
+#: chat_ai/api/runtime_store.py:155
+msgid "The journal record payload or checksum is invalid."
+msgstr "O payload ou checksum do registro é inválido."
+
+#: chat_ai/api/runtime_store.py:158
+msgid "The journal record checksum does not match its payload."
+msgstr "A soma de verificação não corresponde ao conteúdo do registro."
+
+#: chat_ai/api/runtime_store.py:234
+msgid "Invalid runtime store access key."
+msgstr "Chave de acesso ao armazenamento de execução inválida."
+
+#: chat_ai/api/runtime_store.py:311
+msgid "Invalid runtime store commit integrity."
+msgstr "Integridade da confirmação do armazenamento de execução inválida."
+
+#: chat_ai/api/runtime_store.py:361
+msgid "The runtime store revision has changed."
+msgstr "A revisão do armazenamento de execução foi alterada."
+
+#: chat_ai/authentication.py:21
+msgid "Invalid Chat AI delegation credential."
+msgstr "Credencial de delegação do chat de IA inválida."
+
+#: chat_ai/authentication.py:25
+msgid "Chat AI delegation operation mismatch."
+msgstr "A operação de delegação do chat de IA não corresponde."
+
+#: chat_ai/authentication.py:27
+msgid "Chat AI delegation organization mismatch."
+msgstr "A organização de delegação do chat de IA não corresponde."
+
+#: chat_ai/authentication.py:30
+msgid "Chat AI delegation organization context mismatch."
+msgstr "O contexto de organização da delegação do chat de IA não corresponde."
+
+#: chat_ai/authentication.py:32
+msgid "Chat AI delegation request mismatch."
+msgstr "A solicitação de delegação do chat de IA não corresponde."
+
+#: chat_ai/authentication.py:41
+msgid "Chat AI delegation request could not be verified."
+msgstr "Não foi possível verificar a solicitação de delegação do chat de IA."
+
+#: chat_ai/authentication.py:43
+msgid "Chat AI delegation request body mismatch."
+msgstr "O corpo da solicitação de delegação do chat de IA não corresponde."
+
+#: chat_ai/authentication.py:48
+msgid "Chat AI delegation replay protection is unavailable."
+msgstr "A proteção contra repetição da delegação do chat de IA está indisponível."
+
+#: chat_ai/authentication.py:50
+msgid "Chat AI delegation credential was already used."
+msgstr "A credencial de delegação do chat de IA já foi usada."
+
+#: chat_ai/authentication.py:53
+msgid "Chat AI delegation user is invalid."
+msgstr "O usuário de delegação do chat de IA é inválido."
+
+#: chat_ai/models.py:20
+msgid "Chat AI runtime store"
+msgstr "Armazenamento de execução do chat de IA"
+
+#: chat_ai/models.py:28
+msgid "Runtime store"
+msgstr "Armazenamento de execução"
+
+#: chat_ai/models.py:51
+msgid "Chat AI runtime store record"
+msgstr "Registro do armazenamento de execução do chat de IA"
+
+#: common/auth/signature.py:13
+msgid "Invalid signature."
+msgstr "Assinatura inválida."
+
+#: common/auth/signature.py:14
+msgid "Ip is not in access ip list."
+msgstr "O IP não está na lista de acesso permitido."
+
+#: common/db/fields.py:611
+msgid "Invalid JSON data for JSONManyToManyField."
+msgstr "Dados JSON inválidos para JSONManyToManyField."
+
+#: common/drf/exc_handlers.py:66
+#: jumpserver/views/error_views.py:20
+msgid "Server internal error"
+msgstr "Erro interno do servidor"
+
+#: common/drf/filters.py:1011
+msgid "attr_rules should be base64"
+msgstr "attr_rules deve estar codificado em Base64"
+
+#: common/drf/filters.py:1015
+msgid "attr_rules should be json"
+msgstr "attr_rules deve ser JSON"
+
+#: common/drf/parsers/excel.py:43
+#: common/drf/parsers/excel.py:70
+#: common/drf/parsers/excel.py:80
+msgid "Excel worksheet exceeds import limits"
+msgstr "A planilha do Excel excede os limites de importação"
+
+#: common/drf/parsers/excel.py:62
+#: common/drf/parsers/excel.py:64
+msgid "Invalid excel worksheet range"
+msgstr "Intervalo de planilha do Excel inválido"
+
+#: common/drf/parsers/excel.py:74
+#: common/drf/parsers/excel.py:107
+msgid "Too many excel worksheets"
+msgstr "Planilhas do Excel em excesso"
+
+#: common/drf/parsers/excel.py:113
+msgid "Excel workbook exceeds import limits"
+msgstr "A pasta de trabalho do Excel excede os limites de importação"
+
+#: common/sdk/im/exceptions.py:8
+msgid "HTTP status is not 200"
+msgstr "O status HTTP não é 200"
+
+#: common/sdk/im/exceptions.py:13
+msgid "Error code is not 0"
+msgstr "O código de erro não é 0"
+
+#: common/sdk/im/exceptions.py:18
+msgid "Response data key error"
+msgstr "Erro de chave nos dados da resposta"
+
+#: common/sdk/sms/custom_file.py:48
+msgid "Custom file SMS sending failed"
+msgstr "Falha no envio de SMS por arquivo personalizado"
+
+#: common/serializers/mixin.py:190
+msgid "id or pk not in data"
+msgstr "Falta id ou pk nos dados"
+
+#: jumpserver/middleware.py:157
+msgid "Service temporarily unavailable"
+msgstr "Serviço temporariamente indisponível"
+
+#: jumpserver/middleware.py:158
+msgid "Database operation failed, please try again later."
+msgstr "Falha na operação do banco de dados. Tente novamente mais tarde."
+
+#: notifications/api/notifications.py:218
+msgid "template_name is required"
+msgstr "template_name é obrigatório"
+
+#: notifications/serializers/notifications.py:58
+#, python-format
+msgid "Template syntax error at line: %(line)s"
+msgstr "Erro de sintaxe do modelo na linha: %(line)s"
+
+#: ops/api/playbook.py:77
+msgid "Invalid clone_from id"
+msgstr "ID clone_from inválido"
+
+#: ops/api/playbook.py:81
+msgid "clone playbook file not found"
+msgstr "Arquivo Playbook a clonar não encontrado"
+
+#: ops/api/playbook.py:93
+msgid "Unzip failed"
+msgstr "Falha ao descompactar"
+
+#: ops/models/job.py:342
+#, python-brace-format
+msgid "Undefined job variable: {name}"
+msgstr "Variável de tarefa indefinida: {name}"
+
+#: ops/models/job.py:544
+#: ops/models/job.py:590
+msgid "Quick command"
+msgstr "Comando rápido"
+
+#: ops/models/job.py:545
+msgid "Matched a command filter policy"
+msgstr "Corresponde a uma política de filtro de comandos"
+
+#: ops/models/job.py:591
+msgid "Matched the job center command blacklist"
+msgstr "Corresponde à lista de bloqueio de comandos da central de tarefas"
+
+#: ops/serializers/variable.py:114
+msgid "One of 'job', 'adhoc', or 'playbook' is required."
+msgstr "É necessário 'job', 'adhoc' ou 'playbook'."
+
+#: ops/serializers/variable.py:123
+msgid "Invalid job, adhoc, or playbook ID."
+msgstr "ID de job, adhoc ou playbook inválido."
+
+#: ops/serializers/variable.py:155
+#, python-format
+msgid "Invalid options format: %(error)s"
+msgstr "Formato de opções inválido: %(error)s"
+
+#: ops/ws.py:71
+msgid "Task not found"
+msgstr "Tarefa não encontrada"
+
+#: ops/ws.py:87
+msgid "No permission"
+msgstr "Sem permissão"
+
+#: perms/filters.py:93
+msgid "Include inherited permissions"
+msgstr "Incluir permissões herdadas"
+
+#: perms/filters.py:180
+#: users/tree.py:107
+msgid "Ungrouped users"
+msgstr "Usuários sem grupo"
+
+#: perms/models/asset_permission.py:83
+#: tickets/models/ticket/apply_asset.py:23
+msgid "Expiration-soon notice minutes"
+msgstr "Antecedência do aviso de expiração (minutos)"
+
+#: perms/models/asset_permission.py:86
+msgid "Expiration-soon notice time"
+msgstr "Horário do aviso de expiração próxima"
+
+#: perms/models/asset_permission.py:89
+msgid "Expiration-soon notice sent time"
+msgstr "Horário de envio do aviso de expiração próxima"
+
+#: perms/serializers/tree.py:44
+msgid "This list may not be empty."
+msgstr "Esta lista não pode ficar vazia."
+
+#: perms/tasks.py:131
+msgid "Send asset permission expiration-soon notification"
+msgstr "Enviar aviso de expiração próxima de permissões de ativos"
+
+#: perms/tasks.py:133
+msgid "Check due asset permission expiration-soon notices every minute and enqueue notifications"
+msgstr "Verificar a cada minuto os avisos pendentes de expiração de permissões e colocá-los na fila"
+
+#: perms/utils/expire_soon_notice.py:28
+msgid "Ensure this value is greater than 0."
+msgstr "Certifique-se de que o valor seja maior que 0."
+
+#: rbac/serializers/rolebinding.py:57
+msgid "Only organization roles can be bound"
+msgstr "Somente funções de organização podem ser vinculadas"
+
+#: rbac/tree.py:68
+msgid "System tools"
+msgstr "Ferramentas do sistema"
+
+#: reports/api/report.py:133
+msgid "Unsupported report type"
+msgstr "Tipo de relatório não suportado"
+
+#: reports/api/report.py:135
+msgid "Report type can not be modified"
+msgstr "O tipo de relatório não pode ser alterado"
+
+#: reports/api/report.py:142
+msgid "Invalid days"
+msgstr "Número de dias inválido"
+
+#: reports/api/report.py:144
+msgid "Days must be one of: 1, 7, 30"
+msgstr "O número de dias deve ser 1, 7 ou 30"
+
+#: reports/api/report.py:149
+msgid "Filters must be a dict"
+msgstr "Os filtros devem ser um dicionário"
+
+#: reports/api/report.py:233
+msgid "Builtin report template can not be modified"
+msgstr "O modelo de relatório integrado não pode ser alterado"
+
+#: reports/api/report.py:238
+msgid "Builtin report template can not be deleted"
+msgstr "O modelo de relatório integrado não pode ser excluído"
+
+#: settings/api/chat.py:149
+msgid "Unable to connect to the model provider"
+msgstr "Não é possível conectar ao provedor do modelo"
+
+#: settings/api/chat.py:199
+msgid "Please select or enter a model first"
+msgstr "Primeiro selecione ou informe um modelo"
+
+#: settings/api/chat.py:240
+msgid "The provider is reachable, but the selected model does not support the required tool calls"
+msgstr "O provedor está acessível, mas o modelo selecionado não suporta as chamadas de ferramentas necessárias"
+
+#: settings/models.py:176
+msgid "Can change basic setting"
+msgstr "Pode alterar as configurações básicas"
+
+#: settings/models.py:177
+msgid "Can change system tools setting"
+msgstr "Pode alterar as configurações de ferramentas do sistema"
+
+#: settings/serializers/auth/dingtalk.py:13
+msgid "Agent ID"
+msgstr "ID do agente"
+
+#: settings/serializers/auth/dingtalk.py:14
+#: settings/serializers/auth/sms.py:67
+msgid "App Key"
+msgstr "Chave do aplicativo"
+
+#: settings/serializers/auth/dingtalk.py:15
+#: settings/serializers/auth/feishu.py:16
+#: settings/serializers/auth/lark.py:15
+#: settings/serializers/auth/sms.py:68
+#: settings/serializers/auth/wecom.py:15
+msgid "App Secret"
+msgstr "Segredo do aplicativo"
+
+#: settings/serializers/auth/feishu.py:15
+#: settings/serializers/auth/lark.py:14
+msgid "App ID"
+msgstr "ID do aplicativo"
+
+#: settings/serializers/auth/oauth2.py:79
+msgid "User attribute mapping, where the `key` is this system user attribute name and the `value` is the OAuth2 service user attribute name. Use dot-separated paths for nested attributes, e.g. `attributes.account_no`"
+msgstr "Mapeamento de atributos de usuário: `key` é o atributo deste sistema e `value` o do serviço OAuth2. Use caminhos separados por pontos para atributos aninhados, ex.: `attributes.account_no`"
+
+#: settings/serializers/auth/saml2.py:30
+msgid "Controls verification when downloading IDP Metadata"
+msgstr "Controla a verificação ao baixar metadados do IDP"
+
+#: settings/serializers/auth/slack.py:16
+msgid "Client bot Token"
+msgstr "Token do bot cliente"
+
+#: settings/serializers/auth/sms.py:50
+msgid "Access Key ID"
+msgstr "ID da chave de acesso"
+
+#: settings/serializers/auth/sms.py:52
+msgid "Access Key Secret"
+msgstr "Segredo da chave de acesso"
+
+#: settings/serializers/auth/sms.py:59
+msgid "Secret ID"
+msgstr "ID do segredo"
+
+#: settings/serializers/auth/sms.py:60
+msgid "Secret Key"
+msgstr "Chave secreta"
+
+#: settings/serializers/auth/sms.py:61
+msgid "SDK APP ID"
+msgstr "ID do aplicativo SDK"
+
+#: settings/serializers/auth/wecom.py:13
+msgid "Corporation ID"
+msgstr "ID da empresa"
+
+#: settings/serializers/auth/wecom.py:14
+msgid "App Agent ID"
+msgstr "ID do agente do aplicativo"
+
+#: settings/serializers/feature.py:39
+msgid "Enter a valid HTTP or HTTPS URL."
+msgstr "Informe uma URL HTTP ou HTTPS válida."
+
+#: settings/serializers/feature.py:53
+msgid "Enter a new credential when changing its destination."
+msgstr "Informe uma nova credencial ao alterar seu destino."
+
+#: settings/serializers/feature.py:186
+#: settings/serializers/feature.py:226
+msgid "Verify TLS certificate"
+msgstr "Verificar certificado TLS"
+
+#: settings/serializers/feature.py:192
+#: settings/serializers/feature.py:232
+msgid "PEM CA certificate used to verify the OpenBao server"
+msgstr "Certificado CA PEM para verificar o servidor OpenBao"
+
+#: settings/serializers/feature.py:202
+msgid "OpenBao SSH CA"
+msgstr "CA SSH do OpenBao"
+
+#: settings/serializers/feature.py:220
+msgid "Certificate validity (seconds)"
+msgstr "Validade do certificado (segundos)"
+
+#: settings/serializers/feature.py:237
+msgid "Allowed source addresses"
+msgstr "Endereços de origem permitidos"
+
+#: settings/serializers/feature.py:238
+msgid "Comma-separated CIDRs seen by the target SSH server"
+msgstr "CIDRs vistos pelo servidor SSH de destino, separados por vírgulas"
+
+#: settings/serializers/feature.py:297
+msgid "Built-in API"
+msgstr "API integrada"
+
+#: settings/serializers/feature.py:297
+msgid "iframe embed"
+msgstr "Incorporação iframe"
+
+#: settings/serializers/feature.py:301
+msgid "iframe URL"
+msgstr "URL do iframe"
+
+#: settings/serializers/feature.py:302
+msgid "The page URL loaded in the isolated AI assistant iframe."
+msgstr "URL da página carregada no iframe isolado do assistente de IA."
+
+#: settings/serializers/feature.py:308
+msgid "OpenAI-compatible API base URL, usually ending in /v1."
+msgstr "URL base da API compatível com OpenAI, geralmente terminada em /v1."
+
+#: settings/serializers/feature.py:315
+msgid "HTTP proxy used to reach the model provider. For example: http://ip:port"
+msgstr "Proxy HTTP para acessar o provedor do modelo. Exemplo: http://ip:port"
+
+#: settings/serializers/feature.py:319
+msgid "Discover models from the provider or enter a model ID manually."
+msgstr "Busque modelos no provedor ou informe um ID manualmente."
+
+#: settings/utils/ldap.py:90
+msgid "Invalid LDAP distinguishedName encoding"
+msgstr "Codificação de distinguishedName do LDAP inválida"
+
+#: settings/utils/ldap.py:97
+msgid "LDAP user distinguishedName is empty, cannot map OU group"
+msgstr "O distinguishedName do usuário LDAP está vazio; não é possível mapear o grupo OU"
+
+#: settings/utils/ldap.py:103
+msgid "Invalid LDAP distinguishedName: {}"
+msgstr "distinguishedName do LDAP inválido: {}"
+
+#: settings/utils/ldap.py:111
+msgid "LDAP distinguishedName has no OU, cannot map user group: {}"
+msgstr "O distinguishedName do LDAP não contém OU; não é possível mapear o grupo: {}"
+
+#: settings/utils/ldap.py:121
+msgid "LDAP distinguishedName has no OU, cannot map user group"
+msgstr "O distinguishedName do LDAP não contém OU; não é possível mapear o grupo"
+
+#: settings/utils/ldap.py:126
+msgid "LDAP OU group name exceeds {} characters: {}"
+msgstr "O nome do grupo OU do LDAP excede {} caracteres: {}"
+
+#: settings/utils/ldap.py:561
+msgid "LDAP user groups must be a list"
+msgstr "Os grupos de usuários LDAP devem ser uma lista"
+
+#: settings/utils/ldap.py:573
+msgid "Failed to map LDAP user group from distinguishedName: no OU found"
+msgstr "Falha ao mapear o grupo LDAP a partir de distinguishedName: OU não encontrada"
+
+#: settings/ws.py:299
+msgid "Invalid organization IDs"
+msgstr "IDs de organização inválidos"
+
+#: settings/ws.py:302
+msgid "Invalid target organizations"
+msgstr "Organizações de destino inválidas"
+
+#: settings/ws.py:306
+msgid "A target organization is required"
+msgstr "É necessária uma organização de destino"
+
+#: templates/500.html:7
+msgid "Server error"
+msgstr "Erro do servidor"
+
+#: templates/500.html:10
+msgid "Server error occur, contact administrator"
+msgstr "Erro do servidor; contate o administrador"
+
+#: templates/_copyright.html:3
+msgid "Copyright"
+msgstr "Direitos autorais"
+
+#: terminal/api/applet/applet.py:143
+msgid "Applet is not null"
+msgstr "O aplicativo remoto não pode estar vazio"
+
+#: terminal/api/applet/host.py:31
+msgid "Needs attention"
+msgstr "Requer atenção"
+
+#: terminal/api/applet/host.py:78
+msgid "Windows runtime accounts are managed locally by Tinker."
+msgstr "As contas de execução do Windows são gerenciadas localmente pelo Tinker."
+
+#: terminal/api/session/session.py:362
+msgid "Replay index not found."
+msgstr "Índice da gravação não encontrado."
+
+#: terminal/api/session/session.py:365
+msgid "Replay index is invalid."
+msgstr "O índice da gravação é inválido."
+
+#: terminal/api/session/session.py:368
+msgid "Replay index is unavailable."
+msgstr "O índice da gravação está indisponível."
+
+#: terminal/api/virtualapp/provider.py:93
+msgid "Wait for the current deployment to finish before deleting the provider"
+msgstr "Aguarde o fim da implantação antes de excluir o provedor"
+
+#: terminal/api/virtualapp/provider.py:182
+msgid "A deployment is already pending or running for this provider"
+msgstr "O provedor já tem uma implantação pendente ou em execução"
+
+#: terminal/api/virtualapp/virtualapp.py:115
+msgid "Image architecture is required"
+msgstr "A arquitetura da imagem é obrigatória"
+
+#: terminal/automations/deploy_app_provider/__init__.py:35
+msgid "Invalid virtual application offline manifest"
+msgstr "Manifesto offline de aplicativo virtual inválido"
+
+#: terminal/automations/deploy_app_provider/__init__.py:69
+msgid "Invalid Panda offline image ID"
+msgstr "ID de imagem Panda offline inválido"
+
+#: terminal/automations/deploy_app_provider/__init__.py:127
+msgid "No deployable SSH host: check the privileged account and platform automation"
+msgstr "Nenhum host SSH disponível para implantação: verifique a conta privilegiada e a automação da plataforma"
+
+#: terminal/automations/deploy_app_provider/__init__.py:130
+msgid "Application provider deployment requires SSH"
+msgstr "A implantação do provedor de aplicativos exige SSH"
+
+#: terminal/automations/deploy_app_provider/__init__.py:154
+msgid "Provider terminal must be Panda"
+msgstr "O terminal do provedor deve ser Panda"
+
+#: terminal/automations/deploy_applet_host/__init__.py:111
+msgid "Applet host terminal must be Tinker"
+msgstr "O terminal do host de aplicativos deve ser Tinker"
+
+#: terminal/automations/deploy_applet_host/__init__.py:122
+msgid "Tinker component has no active access key"
+msgstr "O componente Tinker não tem chave de acesso ativa"
+
+#: terminal/automations/deploy_applet_host/__init__.py:140
+#: terminal/automations/deploy_applet_host/__init__.py:158
+msgid "Tinker component binding changed during deployment"
+msgstr "O vínculo do componente Tinker mudou durante a implantação"
+
+#: terminal/automations/deploy_applet_host/__init__.py:147
+msgid "Unconfirmed Tinker component is not a service account"
+msgstr "O componente Tinker não confirmado não é uma conta de serviço"
+
+#: terminal/automations/deploy_applet_host/__init__.py:180
+msgid "applet is required for uninstall_applet"
+msgstr "applet é obrigatório para uninstall_applet"
+
+#: terminal/const.py:91
+msgid "Built-in browser"
+msgstr "Navegador integrado"
+
+#: terminal/models/applet/applet.py:115
+#: terminal/models/virtualapp/virtualapp.py:80
+msgid "Missing name in manifest.yml"
+msgstr "Falta o nome em manifest.yml"
+
+#: terminal/models/applet/host.py:16
+msgid "Tinker version"
+msgstr "Versão do Tinker"
+
+#: terminal/models/applet/host.py:50
+#: terminal/models/virtualapp/provider.py:55
+msgid "Request user has no terminal"
+msgstr "O usuário solicitante não tem terminal"
+
+#: terminal/models/applet/host.py:52
+msgid "Only Tinker terminals can bind an applet host"
+msgstr "Somente terminais Tinker podem vincular um host de aplicativos"
+
+#: terminal/models/applet/host.py:56
+msgid "Terminal is not bound to this applet host"
+msgstr "O terminal não está vinculado a este host de aplicativos"
+
+#: terminal/models/component/endpoint.py:18
+msgid "Web proxy port"
+msgstr "Porta do proxy web"
+
+#: terminal/models/session/sharing.py:172
+msgid "Session sharing or user does not exist"
+msgstr "O compartilhamento de sessão ou o usuário não existe"
+
+#: terminal/models/virtualapp/provider.py:57
+msgid "Only Panda terminals can bind an application provider"
+msgstr "Somente terminais Panda podem vincular um provedor de aplicativos"
+
+#: terminal/models/virtualapp/provider.py:62
+msgid "Provider is already bound to another terminal"
+msgstr "O provedor já está vinculado a outro terminal"
+
+#: terminal/models/virtualapp/provider.py:69
+msgid "Terminal is already bound to another provider"
+msgstr "O terminal já está vinculado a outro provedor"
+
+#: terminal/models/virtualapp/provider.py:109
+msgid "Provider host is required before deployment"
+msgstr "É necessário um host do provedor antes da implantação"
+
+#: terminal/models/virtualapp/provider.py:111
+msgid "Provider deployment requires a Linux host"
+msgstr "A implantação do provedor exige um host Linux"
+
+#: terminal/models/virtualapp/provider.py:114
+msgid "A valid SSH port different from the Panda API port is required"
+msgstr "É necessária uma porta SSH válida diferente da porta da API Panda"
+
+#: terminal/models/virtualapp/provider.py:117
+msgid "An active root or privileged SSH account with a password or private key is required"
+msgstr "É necessária uma conta SSH root ou privilegiada ativa com senha ou chave privada"
+
+#: terminal/models/virtualapp/provider.py:120
+msgid "Disable the provider and wait for all containers to exit before deployment"
+msgstr "Desabilite o provedor e aguarde todos os contêineres encerrarem antes da implantação"
+
+#: terminal/models/virtualapp/provider.py:124
+#, python-format
+msgid "Invalid offline deployment resources: %s"
+msgstr "Recursos de implantação offline inválidos: %s"
+
+#: terminal/models/virtualapp/provider.py:130
+msgid "Select a Panda image already loaded on the provider or prepare the Installer offline resources"
+msgstr "Selecione uma imagem Panda já carregada no provedor ou prepare os recursos offline do instalador"
+
+#: terminal/models/virtualapp/provider.py:135
+msgid "Container port range must not include the SSH port"
+msgstr "O intervalo de portas dos contêineres não deve incluir a porta SSH"
+
+#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:59
+msgid "Invalid Core URL."
+msgstr "URL do Core inválida."
+
+#: terminal/serializers/terminal.py:138
+msgid "Only Tinker can bind an applet host"
+msgstr "Somente o Tinker pode vincular um host de aplicativos"
+
+#: terminal/serializers/terminal.py:141
+msgid "Applet host is missing or already bound"
+msgstr "O host de aplicativos não existe ou já está vinculado"
+
+#: terminal/serializers/terminal.py:162
+msgid "App provider not found"
+msgstr "Provedor de aplicativos não encontrado"
+
+#: terminal/serializers/virtualapp_provider.py:57
+msgid "Enter a valid HTTP or HTTPS Core URL"
+msgstr "Informe uma URL HTTP ou HTTPS do Core válida"
+
+#: terminal/serializers/virtualapp_provider.py:71
+msgid "Enter a valid Docker image reference"
+msgstr "Informe uma referência de imagem Docker válida"
+
+#: terminal/serializers/virtualapp_provider.py:79
+msgid "Use a port range between 1 and 65535, excluding the Panda API port 9001"
+msgstr "Use portas entre 1 e 65535, excluindo a porta 9001 da API Panda"
+
+#: terminal/serializers/virtualapp_provider.py:181
+msgid "The provider host cannot be removed"
+msgstr "O host do provedor não pode ser removido"
+
+#: terminal/serializers/virtualapp_provider.py:188
+msgid "Host name and address are required"
+msgstr "O nome e o endereço do host são obrigatórios"
+
+#: terminal/serializers/virtualapp_provider.py:195
+msgid "An application provider with this name already exists"
+msgstr "Já existe um provedor de aplicativos com este nome"
+
+#: terminal/serializers/virtualapp_provider.py:200
+msgid "Application provider host is required"
+msgstr "É necessário um host de provedor de aplicativos"
+
+#: terminal/serializers/virtualapp_provider.py:216
+msgid "Wait for the current deployment to finish before editing the provider"
+msgstr "Aguarde o fim da implantação antes de editar o provedor"
+
+#: terminal/serializers/virtualapp_provider.py:261
+msgid "Use the application publication API to publish images"
+msgstr "Use a API de publicação de aplicativos para publicar imagens"
+
+#: terminal/tasks.py:157
+msgid "Application provider deployment failed; see the Ansible task log"
+msgstr "Falha na implantação do provedor; consulte o log da tarefa Ansible"
+
+#: terminal/utils/tinker.py:33
+#, python-format
+msgid "Tinker version %(version)s is unavailable for connections. Upgrade and redeploy this applet host with Tinker %(minimum)s or later."
+msgstr "Tinker %(version)s não permite conexões. Atualize e reimplante este host com Tinker %(minimum)s ou superior."
+
+#: terminal/utils/tinker.py:35
+msgid "not reported"
+msgstr "Não informado"
+
+#: terminal/utils/virtualapp.py:52
+msgid "Unsafe path in application image archive"
+msgstr "Caminho inseguro no arquivo de imagem do aplicativo"
+
+#: terminal/utils/virtualapp.py:64
+msgid "Invalid application image archive read size"
+msgstr "Tamanho de leitura do arquivo de imagem inválido"
+
+#: terminal/utils/virtualapp.py:66
+msgid "Application image archive validation timed out"
+msgstr "Tempo limite de validação do arquivo de imagem excedido"
+
+#: terminal/utils/virtualapp.py:70
+msgid "Application image archive exceeds the unpacked size limit"
+msgstr "O arquivo de imagem excede o limite de tamanho descompactado"
+
+#: terminal/utils/virtualapp.py:77
+msgid "Invalid or sparse entry in application image archive"
+msgstr "Entrada inválida ou esparsa no arquivo de imagem"
+
+#: terminal/utils/virtualapp.py:81
+msgid "Sparse entries are not supported in application image archives"
+msgstr "Arquivos de imagem não suportam entradas esparsas"
+
+#: terminal/utils/virtualapp.py:94
+msgid "Application image archive has oversized tar metadata"
+msgstr "Os metadados tar do arquivo de imagem são grandes demais"
+
+#: terminal/utils/virtualapp.py:115
+msgid "Duplicate or too many entries in application image archive"
+msgstr "Entradas duplicadas ou excessivas no arquivo de imagem"
+
+#: terminal/utils/virtualapp.py:117
+msgid "Application image archive contains an unsupported entry"
+msgstr "O arquivo de imagem contém uma entrada não suportada"
+
+#: terminal/utils/virtualapp.py:129
+msgid "Invalid Docker image manifest"
+msgstr "Manifesto de imagem Docker inválido"
+
+#: terminal/utils/virtualapp.py:135
+msgid "Too many image configurations in application image archive"
+msgstr "Configurações de imagem em excesso no arquivo"
+
+#: terminal/utils/virtualapp.py:144
+msgid "Invalid or too many OCI manifests in application image archive"
+msgstr "Manifestos OCI inválidos ou excessivos no arquivo"
+
+#: terminal/utils/virtualapp.py:149
+msgid "Invalid application image archive"
+msgstr "Arquivo de imagem de aplicativo inválido"
+
+#: terminal/utils/virtualapp.py:151
+msgid "Upload a Docker save archive containing one application image"
+msgstr "Envie um arquivo Docker save com uma única imagem de aplicativo"
+
+#: terminal/utils/virtualapp.py:155
+msgid "Application image archive does not contain the configured image name and tag"
+msgstr "O arquivo não contém o nome e a tag de imagem configurados"
+
+#: terminal/utils/virtualapp.py:158
+msgid "Application image archive has no valid image configuration"
+msgstr "O arquivo não contém uma configuração de imagem válida"
+
+#: terminal/utils/virtualapp.py:164
+msgid "Application image archive is missing image layers"
+msgstr "Faltam camadas de imagem no arquivo"
+
+#: terminal/utils/virtualapp.py:167
+msgid "Application image archive must contain one Linux platform"
+msgstr "O arquivo deve conter uma única plataforma Linux"
+
+#: terminal/utils/virtualapp.py:219
+msgid "Invalid application image archive metadata"
+msgstr "Metadados do arquivo de imagem inválidos"
+
+#: terminal/utils/virtualapp.py:251
+msgid "Virtual application no longer exists"
+msgstr "O aplicativo virtual não existe mais"
+
+#: terminal/utils/virtualapp.py:253
+msgid "Virtual application changed; upload or publish its current image again"
+msgstr "O aplicativo virtual mudou; envie ou publique novamente sua imagem atual"
+
+#: terminal/utils/virtualapp.py:260
+msgid "Upload a Docker save image as .tar, .tar.zst or .zst"
+msgstr "Envie uma imagem Docker save em .tar, .tar.zst ou .zst"
+
+#: terminal/utils/virtualapp.py:262
+#: terminal/utils/virtualapp.py:274
+msgid "Application image archive must be no larger than 10 GiB"
+msgstr "O arquivo de imagem não deve exceder 10 GiB"
+
+#: terminal/utils/virtualapp.py:304
+msgid "No application image archive for this architecture"
+msgstr "Não há arquivo de imagem para esta arquitetura"
+
+#: terminal/utils/virtualapp.py:324
+msgid "Invalid offline application image archive path"
+msgstr "Caminho de arquivo de imagem offline inválido"
+
+#: terminal/utils/virtualapp.py:340
+msgid "Offline application image cannot be staged; upload it again"
+msgstr "Não é possível preparar a imagem offline; envie-a novamente"
+
+#: tickets/api/flow.py:32
+msgid "Inherited ticket flows cannot be deleted"
+msgstr "Fluxos de chamados herdados não podem ser excluídos"
+
+#: tickets/models/ticket/general.py:99
+msgid "Assignee"
+msgstr "Responsável"
+
+#: users/api/user.py:187
+msgid "Not a valid org"
+msgstr "Organização inválida"
+
+#: users/models/user/_face.py:24
+#: users/models/user/_face.py:34
+msgid "Face vector is not set."
+msgstr "Os dados faciais não estão configurados."
+
+#: users/models/user/_face.py:27
+#: users/models/user/_face.py:37
+msgid "Face recognition backend is not available."
+msgstr "O backend de reconhecimento facial está indisponível."
+
+#: users/serializers/tree.py:37
+msgid "parent_type and parent_id must be provided together."
+msgstr "parent_type e parent_id devem ser fornecidos juntos."
+
+#: users/serializers/tree.py:41
+msgid "Search and parent parameters cannot be used together."
+msgstr "Parâmetros de pesquisa e de pai não podem ser combinados."
+
+#: users/serializers/tree.py:45
+msgid "Offset is only supported when loading children."
+msgstr "O deslocamento só é suportado ao carregar itens filhos."
+
+#: users/serializers/tree.py:52
+msgid "Enter a valid UUID."
+msgstr "Informe um UUID válido."
+
+#: users/views/profile/reset.py:134
+msgid "Verification code has been used more than 3 times, please re-verify"
+msgstr "O código foi usado mais de 3 vezes; verifique novamente"
+
+#: xpack/plugins/cloud/api.py:161
+msgid "Query params account_id is not uuid"
+msgstr "O parâmetro account_id não é um UUID válido"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:81
+msgid "eg. https://IP:9440/api/nutanix/v3/"
+msgstr "Ex.: https://IP:9440/api/nutanix/v3/"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "SC domain name"
+msgstr "Nome de domínio SC"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:136
+msgid "eg. http://IP:8080/zstack"
+msgstr "Ex.: http://IP:8080/zstack"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:144
+msgid "eg. http://CLOUDTOWER_IP"
+msgstr "Ex.: http://CLOUDTOWER_IP"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:151
+msgid "eg. https://IP:8006/api2/json"
+msgstr "Ex.: https://IP:8006/api2/json"
+
+#: xpack/plugins/facelive/backend.py:29
+msgid "Face recognition dependencies are unavailable; run uv sync --group xpack"
+msgstr "Dependências de reconhecimento facial indisponíveis; execute uv sync --group xpack"
+
+#: xpack/plugins/facelive/backend.py:72
+msgid "OpenCV image must be a BGR image"
+msgstr "A imagem OpenCV deve ter formato BGR"
+
+#: xpack/plugins/facelive/backend.py:74
+#: xpack/plugins/facelive/backend.py:111
+msgid "Camera frame resolution is too low"
+msgstr "A resolução da câmera é baixa demais"
+
+#: xpack/plugins/facelive/backend.py:97
+#: xpack/plugins/facelive/backend.py:104
+msgid "Invalid camera frame"
+msgstr "Quadro de câmera inválido"
+
+#: xpack/plugins/facelive/backend.py:100
+msgid "Camera frame is empty or too large"
+msgstr "O quadro da câmera está vazio ou grande demais"
+
+#: xpack/plugins/facelive/backend.py:106
+msgid "Camera frame is too large"
+msgstr "O quadro da câmera é grande demais"
+
+#: xpack/plugins/facelive/backend.py:109
+msgid "Unable to decode camera frame"
+msgstr "Não é possível decodificar o quadro da câmera"
+
+#: xpack/plugins/facelive/backend.py:183
+msgid "Multiple similar faces detected; keep only one person in view"
+msgstr "Vários rostos semelhantes detectados; mantenha apenas uma pessoa na imagem"
+
+#: xpack/plugins/facelive/backend.py:193
+msgid "None of FACE_RECOGNITION_PROVIDERS are available"
+msgstr "Nenhum backend de FACE_RECOGNITION_PROVIDERS está disponível"
+
+#: xpack/plugins/facelive/backend.py:209
+msgid "FACE_RECOGNITION_DEVICE is gpu but no accelerated ONNX provider is available"
+msgstr "FACE_RECOGNITION_DEVICE é gpu, mas não há backend ONNX acelerado"
+
+#: xpack/plugins/facelive/challenge.py:16
+msgid "Turn your head left and right, then face forward"
+msgstr "Vire a cabeça para os dois lados e depois olhe para a frente"
+
+#: xpack/plugins/facelive/challenge.py:17
+msgid "Nod once, then face forward"
+msgstr "Acene com a cabeça uma vez e depois olhe para a frente"
+
+#: xpack/plugins/facelive/challenge.py:18
+msgid "Open and close your mouth"
+msgstr "Abra e feche a boca"
+
+#: xpack/plugins/facelive/challenge.py:65
+msgid "Look straight at the camera"
+msgstr "Olhe diretamente para a câmera"
+
+#: xpack/plugins/facelive/codec.py:27
+msgid "Face vector is invalid"
+msgstr "Vetor facial inválido"
+
+#: xpack/plugins/facelive/codec.py:30
+msgid "Face vector magnitude is zero"
+msgstr "A magnitude do vetor facial é zero"
+
+#: xpack/plugins/facelive/codec.py:38
+#: xpack/plugins/facelive/codec.py:53
+msgid "Face vector has an invalid dimension"
+msgstr "A dimensão do vetor facial é inválida"
+
+#: xpack/plugins/facelive/codec.py:45
+msgid "Face vector is missing"
+msgstr "Falta o vetor facial"
+
+#: xpack/plugins/facelive/codec.py:50
+msgid "Face vector has an invalid size"
+msgstr "O tamanho do vetor facial é inválido"
+
+#: xpack/plugins/facelive/codec.py:60
+msgid "Face vector has an unsupported format"
+msgstr "Formato de vetor facial não suportado"
+
+#: xpack/plugins/facelive/codec.py:71
+msgid "Face vectors use different dimensions"
+msgstr "Os vetores faciais têm dimensões diferentes"
+
+#: xpack/plugins/facelive/codec.py:105
+msgid "Face vector is not valid base64"
+msgstr "O vetor facial não é um Base64 válido"
+
+#: xpack/plugins/facelive/consumer.py:62
+msgid "Unsupported message type"
+msgstr "Tipo de mensagem não suportado"
+
+#: xpack/plugins/facelive/consumer.py:73
+msgid "Camera frame is missing"
+msgstr "Falta o quadro da câmera"
+
+#: xpack/plugins/facelive/consumer.py:113
+msgid "Face recognition service is unavailable"
+msgstr "O serviço de reconhecimento facial está indisponível"
+
+#: xpack/plugins/facelive/context.py:40
+msgid "Invalid face capture token"
+msgstr "Token de captura facial inválido"
+
+#: xpack/plugins/facelive/context.py:48
+msgid "Face capture token does not exist or has expired"
+msgstr "O token de captura facial não existe ou expirou"
+
+#: xpack/plugins/facelive/context.py:50
+msgid "Face capture has already finished"
+msgstr "A captura facial já foi concluída"
+
+#: xpack/plugins/facelive/context.py:60
+msgid "Face capture token does not belong to this session"
+msgstr "O token de captura facial não pertence a esta sessão"
+
+#: xpack/plugins/facelive/context.py:62
+msgid "Face capture context has no target user"
+msgstr "O contexto de captura facial não tem usuário de destino"
+
+#: xpack/plugins/facelive/context.py:66
+msgid "Face capture target user does not exist"
+msgstr "O usuário de destino da captura facial não existe"
+
+#: xpack/plugins/facelive/context.py:69
+#: xpack/plugins/facelive/context.py:86
+msgid "No face feature is bound for this user"
+msgstr "Este usuário não tem dados faciais vinculados"
+
+#: xpack/plugins/facelive/context.py:78
+msgid "Authentication is required for online face monitoring"
+msgstr "É necessária autenticação para o monitoramento facial online"
+
+#: xpack/plugins/facelive/context.py:81
+msgid "Face monitor token does not exist or has expired"
+msgstr "O token de monitoramento facial não existe ou expirou"
+
+#: xpack/plugins/facelive/context.py:83
+msgid "Face monitor token belongs to another user"
+msgstr "O token de monitoramento facial pertence a outro usuário"
+
+#: xpack/plugins/facelive/context.py:98
+msgid "Face capture token expired before completion"
+msgstr "O token de captura facial expirou antes da conclusão"
+
+#: xpack/plugins/facelive/context.py:139
+msgid "Connection token no longer exists"
+msgstr "O token de conexão não existe mais"
+
+#: xpack/plugins/facelive/context.py:146
+msgid "Face recognition is disabled"
+msgstr "O reconhecimento facial está desabilitado"
+
+#: xpack/plugins/facelive/liveness.py:67
+msgid "FACE_LIVENESS_MODEL_PATH must reference a validated anti-spoof ONNX model"
+msgstr "FACE_LIVENESS_MODEL_PATH deve apontar para um modelo ONNX antisspoofing validado"
+
+#: xpack/plugins/facelive/liveness.py:72
+msgid "ONNX Runtime is unavailable"
+msgstr "ONNX Runtime está indisponível"
+
+#: xpack/plugins/facelive/liveness.py:92
+msgid "GPU liveness was requested but no accelerated ONNX provider is available"
+msgstr "Foi solicitada detecção de vivacidade por GPU, mas não há backend ONNX acelerado"
+
+#: xpack/plugins/facelive/liveness.py:115
+msgid "FACE_LIVENESS_LIVE_INDEX is outside model output"
+msgstr "FACE_LIVENESS_LIVE_INDEX está fora da saída do modelo"
+
+#: xpack/plugins/facelive/liveness.py:128
+msgid "Anti-spoof ONNX input must have four dimensions"
+msgstr "A entrada ONNX antisspoofing deve ter quatro dimensões"
+
+#: xpack/plugins/facelive/liveness.py:134
+msgid "Anti-spoof ONNX input must be RGB"
+msgstr "A entrada ONNX antisspoofing deve ser RGB"
+
+#: xpack/plugins/facelive/liveness.py:189
+#, python-format
+msgid "Unknown liveness mode: %(mode)s"
+msgstr "Modo de detecção de vivacidade desconhecido: %(mode)s"
+
+#: xpack/plugins/facelive/monitor.py:128
+msgid "Camera monitoring connection closed"
+msgstr "Conexão de monitoramento da câmera encerrada"
+
+#: xpack/plugins/facelive/monitor.py:135
+msgid "Face monitor state is unavailable"
+msgstr "O estado de monitoramento facial está indisponível"
+
+#: xpack/plugins/facelive/monitor.py:237
+msgid "Face monitor timed out"
+msgstr "Tempo limite de monitoramento facial excedido"
+
+#: xpack/plugins/facelive/sessions.py:67
+msgid "Face flow has already finished"
+msgstr "O processo facial já foi concluído"
+
+#: xpack/plugins/facelive/sessions.py:83
+msgid "Face verification timed out"
+msgstr "Tempo limite de verificação facial excedido"
+
+#: xpack/plugins/facelive/sessions.py:85
+msgid "The liveness action was not completed in time"
+msgstr "A ação de detecção de vivacidade não foi concluída a tempo"
+
+#: xpack/plugins/facelive/sessions.py:96
+msgid "Place one face fully inside the camera area"
+msgstr "Coloque um único rosto inteiramente na área da câmera"
+
+#: xpack/plugins/facelive/sessions.py:103
+msgid "Move closer to the camera"
+msgstr "Aproxime-se da câmera"
+
+#: xpack/plugins/facelive/sessions.py:109
+msgid "Frozen or replayed camera frames detected"
+msgstr "Quadros congelados ou reproduzidos detectados"
+
+#: xpack/plugins/facelive/sessions.py:121
+msgid "The stored face template uses a different model; bind the face again"
+msgstr "O modelo facial salvo usa outro modelo; vincule o rosto novamente"
+
+#: xpack/plugins/facelive/sessions.py:124
+msgid "The current face does not match the selected user"
+msgstr "O rosto atual não corresponde ao usuário selecionado"
+
+#: xpack/plugins/facelive/sessions.py:126
+msgid "The face changed during enrollment"
+msgstr "O rosto mudou durante o registro"
+
+#: xpack/plugins/facelive/sessions.py:152
+msgid "Liveness passed once; online face monitoring is now active"
+msgstr "Detecção de vivacidade aprovada; monitoramento facial online ativado"
+
+#: xpack/plugins/facelive/sessions.py:216
+#, python-format
+msgid "Captured %(count)s face samples"
+msgstr "Foram capturadas %(count)s amostras faciais"
+
+#: xpack/plugins/facelive/sessions.py:223
+msgid "Checking liveness; keep your face clear and well lit"
+msgstr "Verificando vivacidade; mantenha o rosto nítido e bem iluminado"
+
+#: xpack/plugins/facelive/sessions.py:228
+#, python-format
+msgid "Capturing face samples %(count)s/%(total)s"
+msgstr "Capturando amostras faciais %(count)s/%(total)s"
+
+#: xpack/plugins/facelive/sessions.py:256
+msgid "Face identity, liveness, and action challenge passed"
+msgstr "Identidade facial, vivacidade e desafio de ação aprovados"
+
+#: xpack/plugins/facelive/sessions.py:273
+#, python-format
+msgid "%(name)s is in the camera area"
+msgstr "%(name)s está na área da câmera"
+
+#: xpack/plugins/facelive/sessions.py:277
+msgid "Target face is not visible"
+msgstr "O rosto alvo não está visível"
+
+#: xpack/plugins/facelive/sessions.py:279
+msgid "Target face does not match"
+msgstr "O rosto alvo não corresponde"
+
+#: xpack/plugins/facelive/sessions.py:285
+msgid "The monitored session has been paused"
+msgstr "A sessão monitorada foi pausada"
+
+#: xpack/plugins/facelive/sessions.py:287
+#, python-format
+msgid "Target left the camera area; callback in %(seconds)ss"
+msgstr "O alvo saiu da área da câmera; retorno em %(seconds)s s"
+
+#: xpack/plugins/facelive/sessions.py:324
+#: xpack/plugins/facelive/sessions.py:330
+#: xpack/plugins/facelive/sessions.py:337
+msgid "Repeated camera frame detected"
+msgstr "Quadro de câmera repetido detectado"
+
+#: xpack/plugins/facelive/sessions.py:480
+msgid "Waiting for the selected face to match"
+msgstr "Aguardando correspondência com o rosto selecionado"
+
+#: xpack/plugins/facelive/sessions.py:482
+msgid "Checking liveness; move naturally and keep the image clear"
+msgstr "Verificando vivacidade; mova-se naturalmente e mantenha a imagem nítida"
+
+#: xpack/plugins/facelive/sessions.py:485
+msgid "Finalizing face verification"
+msgstr "Finalizando a verificação facial"
+
+#: xpack/plugins/jdmc/api/mail.py:30
+msgid "Mail sent successfully"
+msgstr "E-mail enviado com sucesso"
+
+#: xpack/plugins/jdmc/serializers.py:6
+msgid "Email addresses of the recipients"
+msgstr "Endereços de e-mail dos destinatários"
+
+#: xpack/plugins/jdmc/serializers.py:7
+msgid "Subject of the mail"
+msgstr "Assunto do e-mail"
+
+#: xpack/plugins/jdmc/serializers.py:8
+msgid "Message of the email"
+msgstr "Mensagem do e-mail"

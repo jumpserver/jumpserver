@@ -1,10 +1,12 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <title>Server error</title>
+    <title>{% trans 'Server error' %}</title>
 </head>
 <body>
-<h1>Server error occur, contact administrator</h1>
+<h1>{% trans 'Server error occur, contact administrator' %}</h1>
 </body>
 </html>

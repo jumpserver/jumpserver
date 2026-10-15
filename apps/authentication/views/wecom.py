@@ -42,7 +42,9 @@ class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashM
             )
 
     def verify_state(self):
-        return wecom_tool.check_state(self.request.GET.get('state'), self.request)
+        return self.verify_state_with_session_key(
+            wecom_tool.WECOM_STATE_SESSION_KEY
+        )
 
     def get_already_bound_response(self, redirect_url):
         msg = _('WeCom is already bound')
@@ -146,7 +148,7 @@ class WeComOAuthLoginView(WeComOAuthMixin, View):
 
     @pre_save_next_to_session()
     def get(self, request: HttpRequest):
-        redirect_url = request.GET.get('redirect_url')
+        redirect_url = request.GET.get('redirect_url') or request.GET.get('next')
         redirect_uri = reverse('authentication:wecom-oauth-login-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
         url = self.get_oauth_url(redirect_uri)

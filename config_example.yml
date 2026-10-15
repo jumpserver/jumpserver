@@ -51,6 +51,25 @@ HTTP_BIND_HOST: 0.0.0.0
 HTTP_LISTEN_PORT: 8080
 WS_LISTEN_PORT: 8070
 
+# WebSocket browser origins (scheme + host + port). Defaults to SITE_URL and
+# explicit DOMAINS entries; a loopback SITE_URL makes scheme-less public domains
+# use HTTPS. A standalone '*' in DOMAINS allows any Origin unless overridden
+# by WS_ALLOWED_ORIGINS. This disables Origin-based cross-site protection;
+# authentication and permissions still apply. Other wildcards and implicit debug hosts are excluded.
+# An explicit list (including []) replaces these defaults and does not support wildcards.
+# WebSocket 浏览器来源白名单，默认从 SITE_URL 和明确的 DOMAINS 生成。
+# DOMAINS 未带协议时跟随 SITE_URL 的协议；若 SITE_URL 是本地回环地址，外部域名默认 https。
+# localhost/127.0.0.1/::1 支持本地 http。
+# 未配置 WS_ALLOWED_ORIGINS 且 DOMAINS 包含独立的 * 时，允许任意 Origin（包括 null）。
+# 这会关闭 Origin 的跨站 WebSocket 劫持防护，身份认证和权限检查仍然生效。
+# 带协议时按指定协议匹配。WS_ALLOWED_ORIGINS 不支持通配符，显式列表（包括 []）覆盖默认规则。
+# 开发或跨域部署可配置实际前端地址和端口。反向代理必须保留原始 Origin。
+# 缺少 Origin 的组件连接须通过有效的 Authorization 签名或 Bearer 认证。
+# WS_ALLOWED_ORIGINS:
+#   - https://jumpserver.example.com
+#   - http://localhost:3000
+#   - http://localhost:9528
+
 # Ansible 单批次超时（一次 ansible-runner 执行，单位：秒）
 # 当前资产自动化会按每 80 个资产分批；每批只启动一个 ansible-runner，
 # 各批次按顺序执行。一个资产有多个目标账号时，该批实际执行的账号数会更多。
@@ -210,17 +229,41 @@ REDIS_PORT: 6379
 # VAULT_OPENBAO_MOUNT_POINT: pam
 # VAULT_OPENBAO_TOKEN:
 # VAULT_OPENBAO_TIMEOUT: 10
+# VAULT_OPENBAO_VERIFY_TLS: true
+# Optional CA file mounted into the Core and Celery containers by the installer.
+# VAULT_OPENBAO_CACERT_FILE: /opt/jumpserver/data/certs/openbao/ca.crt
+# Optional PEM CA certificate used to verify the OpenBao server.
+# VAULT_OPENBAO_CACERT_CONTENT: |
+#   -----BEGIN CERTIFICATE-----
+#   ...
+#   -----END CERTIFICATE-----
 
 # OpenBao SSH CA has an independent address, token and mount. The address may
 # point to the same OpenBao cluster as Vault KV or to a separate cluster.
 # SSH_CA_ENABLED: false
 # SSH_CA_OPENBAO_ADDR: http://openbao:8200
 # SSH_CA_OPENBAO_TOKEN:
+# For an existing SSH CA and signing role, the token needs read access to
+# auth/token/lookup-self, <mount>/public_key and <mount>/roles/<role>, and
+# create/update access to <mount>/sign/<role>.
+# Testing or saving enabled SSH CA settings also creates missing SSH engines,
+# CAs and signing roles. Automatic initialization additionally needs
+# read/create/update access to sys/mounts/<mount>, <mount>/config/ca and
+# <mount>/roles/<role>, plus list access to <mount>/issuers.
+# Existing CAs and roles are preserved. Trust a newly created CA on target hosts.
 # SSH_CA_OPENBAO_MOUNT_POINT: ssh-client-signer
 # SSH_CA_OPENBAO_ROLE: jumpserver
 # SSH_CA_OPENBAO_TTL: 300
 # SSH_CA_OPENBAO_TIMEOUT: 10
 # SSH_CA_OPENBAO_VERIFY_TLS: true
+# Optional PEM CA certificate used to verify an external OpenBao server.
+# SSH_CA_OPENBAO_CACERT_CONTENT: |
+#   -----BEGIN CERTIFICATE-----
+#   ...
+#   -----END CERTIFICATE-----
+# The built-in OpenBao address also uses VAULT_OPENBAO_CACERT_FILE when this
+# independent SSH CA file is not configured.
+# SSH_CA_OPENBAO_CACERT_FILE: /opt/jumpserver/data/certs/openbao/ca.crt
 # Optional: comma-separated CIDRs seen by the target sshd (Koko or gateway egress)
 # SSH_CA_OPENBAO_SOURCE_ADDRESS:
 

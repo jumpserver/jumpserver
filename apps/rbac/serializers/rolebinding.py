@@ -4,7 +4,7 @@ from rest_framework import serializers
 from common.serializers.fields import ObjectRelatedField
 from users.models import User
 from orgs.serializers import CurrentOrgDefault
-from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
+from ..models import Role, RoleBinding, SystemRoleBinding, OrgRoleBinding
 
 __all__ = [
     'RoleBindingSerializer', 'OrgRoleBindingSerializer', 'SystemRoleBindingSerializer'
@@ -47,6 +47,15 @@ class OrgRoleBindingSerializer(RoleBindingSerializer):
     class Meta(RoleBindingSerializer.Meta):
         model = OrgRoleBinding
         validators = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['role'].queryset = Role.org_roles.all()
+
+    def validate_role(self, role):
+        if role.scope != Role.Scope.org:
+            raise serializers.ValidationError(_('Only organization roles can be bound'))
+        return role
 
     def validate(self, attrs):
         data = self.initial_data

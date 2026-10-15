@@ -24,23 +24,135 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import Account
+from assets.const import Protocol
 from assets.utils.platform_package import locate_package_root
 from authentication.serializers.connect_token_secret import ConnectTokenVirtualAppOptionSerializer
 from common.drf.metadata import SimpleMetadataWithFilters
 from ops.models import CeleryTaskExecution
 from orgs.utils import tmp_to_builtin_org
+from terminal.api.applet.host import AppletHostDeploymentViewSet
 from terminal.api.virtualapp.provider import AppProviderDeploymentViewSet, AppProviderViewSet
 from terminal.automations.deploy_app_provider import (
     DeployAppProviderManager, default_panda_image, stage_resources,
 )
-from terminal.const import ComponentLoad, SessionErrorReason
-from terminal.models import Applet, AppProvider, AppProviderDeployment, Terminal, VirtualApp, VirtualAppPublication
+from terminal.const import ComponentLoad, SessionErrorReason, SessionType
+from terminal.connect_methods import ConnectMethodUtil, NativeClient
+from terminal.models import (
+    Applet, AppProvider, AppProviderDeployment, Endpoint, Session, Terminal, VirtualApp,
+    VirtualAppPublication,
+)
 from terminal.serializers import AppProviderSerializer, SessionSerializer
 from terminal.serializers.virtualapp_provider import AppProviderDeployOptionsSerializer
 from terminal.tasks import (
     AppProviderDeploymentError, run_app_provider_deployment, run_app_provider_deployments,
 )
 from terminal.utils import virtualapp as image_archives
+
+
+@override_settings(DEBUG_DEV=False)
+class AppletHostDeploymentPermissionTests(SimpleTestCase):
+    def setUp(self):
+        from terminal.models import AppletHost, AppletHostDeployment
+
+        self.factory = APIRequestFactory()
+        self.host = AppletHost(name='applet-permission-test')
+        self.host_filter = self.enterContext(patch.object(AppletHost.objects, 'filter'))
+        self.host_filter.return_value.exists.return_value = True
+        self.host_filter.return_value.__iter__.return_value = [self.host]
+        self.bulk_create = self.enterContext(patch.object(
+            AppletHostDeployment.objects, 'bulk_create', side_effect=lambda objs: objs,
+        ))
+        self.deployment_filter = self.enterContext(patch.object(
+            AppletHostDeployment.objects, 'filter',
+        ))
+        self.on_commit = self.enterContext(patch('terminal.api.applet.host.transaction.on_commit'))
+        self.install_task = self.enterContext(patch(
+            'terminal.api.applet.host.run_applet_host_deployment_install_applet.apply_async',
+        ))
+
+    def request(self, permissions, applet_data=None):
+        user = SimpleNamespace(
+            is_anonymous=False,
+            has_perms=lambda required: set(required).issubset(permissions),
+        )
+        if applet_data is None:
+            incoming = self.factory.get('/api/v1/terminal/applet-host-deployments/')
+            actions = {'get': 'list'}
+        else:
+            incoming = self.factory.post(
+                '/api/v1/terminal/applet-host-deployments/applets/',
+                {'hosts': [str(self.host.id)], **applet_data}, format='json',
+            )
+            actions = {'post': 'applets'}
+        force_authenticate(incoming, user=user)
+        view = AppletHostDeploymentViewSet.as_view(actions, throttle_classes=[])
+        return view(incoming)
+
+    def test_view_only_user_cannot_install_single_or_all_applets(self):
+        for data in ({'applet_id': '00000000-0000-0000-0000-000000000001'},
+                     {'applet_id': ''}, {}):
+            with self.subTest(data=data):
+                response = self.request({'terminal.view_applethostdeployment'}, data)
+
+                self.assertEqual(response.status_code, 403)
+                self.host_filter.assert_not_called()
+                self.bulk_create.assert_not_called()
+                self.deployment_filter.assert_not_called()
+                self.on_commit.assert_not_called()
+                self.install_task.assert_not_called()
+
+    def assert_install_allowed(self, data):
+        response = self.request({'terminal.change_applethost'}, data)
+
+        self.assertEqual(response.status_code, 201)
+        self.bulk_create.assert_called_once()
+        deployments = self.bulk_create.call_args.args[0]
+        self.assertEqual([deployment.host for deployment in deployments], [self.host])
+        self.on_commit.assert_called_once()
+        self.install_task.assert_not_called()
+        self.on_commit.call_args.args[0]()
+        self.install_task.assert_called_once_with(
+            ([str(deployments[0].id)], data.get('applet_id', '')),
+            task_id=response.data['task'],
+        )
+
+    def test_host_editor_can_install_single_applet(self):
+        self.assert_install_allowed({'applet_id': '00000000-0000-0000-0000-000000000001'})
+
+    def test_host_editor_can_install_all_with_empty_applet_id(self):
+        self.assert_install_allowed({'applet_id': ''})
+
+    def test_host_editor_can_install_all_with_omitted_applet_id(self):
+        self.assert_install_allowed({})
+
+    def test_view_only_user_can_still_list_deployments(self):
+        with patch.object(AppletHostDeploymentViewSet, 'filter_queryset', return_value=[]), \
+                patch.object(AppletHostDeploymentViewSet, 'paginate_queryset', return_value=None):
+            response = self.request({'terminal.view_applethostdeployment'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+
+
+class WebProxySessionCapabilityTests(SimpleTestCase):
+    def test_builtin_browser_type_is_accepted(self):
+        serializer = SessionSerializer(data={'type': SessionType.web_proxy}, partial=True)
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data['type'], 'web_proxy')
+
+    def test_only_builtin_browser_loses_monitoring(self):
+        for terminal_type in ('koko', 'lion'):
+            for protocol in ('http', 'https'):
+                for session_type in (SessionType.normal, SessionType.web_proxy):
+                    with self.subTest(terminal=terminal_type, protocol=protocol, type=session_type):
+                        session = Session(
+                            terminal=Terminal(type=terminal_type), protocol=protocol,
+                            type=session_type, is_finished=False, has_replay=True,
+                        )
+                        self.assertEqual(session.can_join, session_type == SessionType.normal)
+                        self.assertTrue(session.can_terminate)
+                        self.assertTrue(session.can_replay())
 
 
 class SessionErrorReasonSerializerTests(SimpleTestCase):
@@ -134,7 +246,7 @@ class WebAppletDefaultsTests(SimpleTestCase):
         self.assertEqual(uninstall['type'], 'msi')
         self.assertEqual(uninstall['product_name'], installer)
 
-    def test_builtin_install_skips_chrome_and_includes_web_applet(self):
+    def test_builtin_install_excludes_chrome_and_includes_web_applet(self):
         from unittest.mock import patch
         from terminal.applets import install_or_update_builtin_applets
 
@@ -228,6 +340,26 @@ class WebsiteConnectMethodTests(SimpleTestCase):
             'label': 'Built-in Browser',
         }])
         self.assertEqual(web_proxy, methods['http'][0])
+
+
+class DamengConnectMethodTests(SimpleTestCase):
+    @override_settings(VENDOR='jumpserver')
+    def test_dameng_uses_oracle_enterprise_connection_paths(self):
+        components = ConnectMethodUtil.components()
+
+        self.assertIn(Protocol.dameng, components['koko']['support'])
+        self.assertIn(Protocol.dameng, components['chen']['support'])
+        self.assertIn(Protocol.dameng, components['magnus']['support'])
+        self.assertEqual(
+            NativeClient.get_native_clients()[Protocol.dameng],
+            [NativeClient.db_client, NativeClient.db_guide],
+        )
+        self.assertTrue(Protocol.database_protocols()[Protocol.dameng]['xpack'])
+
+    def test_dameng_uses_shared_magnus_port(self):
+        endpoint = Endpoint(magnus_port=15525)
+
+        self.assertEqual(endpoint.get_port(None, Protocol.dameng), 15525)
 
 class VirtualAppProviderSelectionTests(SimpleTestCase):
     def setUp(self):

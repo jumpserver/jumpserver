@@ -1,23 +1,17 @@
+from django.utils.translation import gettext, gettext_noop
 from rest_framework import authentication
 from rest_framework import exceptions
 
 from httpsig import HeaderVerifier, utils
 
 """
-Reusing failure exceptions serves several purposes:
-
-    1. Lack of useful information regarding the failure inhibits attackers
-    from learning about valid keyIDs or other forms of information leakage.
-    Using the same actual object for any failure makes preventing such
-    leakage through mistakenly-distinct error messages less likely.
-
-    2. In an API scenario, the object is created once and raised many times
-    rather than generated on every failure, which could lead to higher loads
-    or memory usage in high-volume attack scenarios.
+Using the same failure message prevents disclosure of valid key IDs or
+other authentication details. Translate it when authentication fails so
+the response uses the current request's language.
 
 """
-FAILED = exceptions.AuthenticationFailed('Invalid signature.')
-IP_NOT_ALLOW = exceptions.AuthenticationFailed('Ip is not in access ip list.')
+FAILED = gettext_noop('Invalid signature.')
+IP_NOT_ALLOW = gettext_noop('Ip is not in access ip list.')
 
 
 class SignatureAuthentication(authentication.BaseAuthentication):
@@ -74,7 +68,7 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         try:
             method, fields = utils.parse_authorization_header(auth_header)
         except Exception:
-            raise FAILED from None
+            raise exceptions.AuthenticationFailed(gettext(FAILED)) from None
 
         # Ignore foreign Authorization headers.
         if method.lower() != 'signature':
@@ -85,11 +79,11 @@ class SignatureAuthentication(authentication.BaseAuthentication):
 
         # Verify basic header structure.
         if len(fields) == 0:
-            raise FAILED
+            raise exceptions.AuthenticationFailed(gettext(FAILED))
 
         # Ensure all required fields were included.
         if len({"keyid", "algorithm", "signature"} - set(fields.keys())) > 0:
-            raise FAILED
+            raise exceptions.AuthenticationFailed(gettext(FAILED))
 
         key_id = fields["keyid"]
         # Fetch the secret associated with the keyid
@@ -99,10 +93,10 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         )
 
         if not (user and secret):
-            raise FAILED
+            raise exceptions.AuthenticationFailed(gettext(FAILED))
 
         if not self.is_ip_allow(key_id, request):
-            raise IP_NOT_ALLOW
+            raise exceptions.AuthenticationFailed(gettext(IP_NOT_ALLOW))
 
         headers = request.headers
 
@@ -117,11 +111,11 @@ class SignatureAuthentication(authentication.BaseAuthentication):
             )
             verified = hs.verify()
         except Exception:
-            raise FAILED from None
+            raise exceptions.AuthenticationFailed(gettext(FAILED)) from None
 
         # All of that just to get to this.
         if not verified:
-            raise FAILED
+            raise exceptions.AuthenticationFailed(gettext(FAILED))
 
         self.after_authenticate_update_date(user)
         return user, fields["keyid"]

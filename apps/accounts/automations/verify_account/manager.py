@@ -18,6 +18,7 @@ from accounts.personal_credentials import (
 )
 from common.const import Status
 from common.utils import get_logger
+from ops.ansible.utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 from users.models import User
 from ..base.manager import AccountBasePlaybookManager
 
@@ -63,10 +64,6 @@ class PersonalCredentialAccount:
     @property
     def su_from(self):
         return None
-
-    @staticmethod
-    def escape_jinja2_syntax(value):
-        return Account.escape_jinja2_syntax(value)
 
     @staticmethod
     def get_ansible_become_auth():
@@ -291,11 +288,11 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             else:
                 self.found_account_ids.add(account_id)
             h = deepcopy(host)
-            h['name'] += '(' + account.username + ')'
+            h['name'] += '(' + neutralize_jinja2_syntax(account.username) + ')'
             self.host_account_mapper[h['name']] = account
             h['account'] = {
-                'username': account.username,
-                'full_username': account.full_username,
+                'username': escape_jinja2_syntax(account.username),
+                'full_username': escape_jinja2_syntax(account.full_username),
             }
             record = self.get_recovery_record(asset.id, account.id)
             if self.recovery_record_map and not record:
@@ -319,12 +316,12 @@ class VerifyAccountManager(AccountBasePlaybookManager):
 
             h['secret_type'] = account.secret_type
             h['account'] = {
-                'name': account.name,
-                'username': account.username,
-                'full_username': account.full_username,
+                'name': escape_jinja2_syntax(account.name),
+                'username': escape_jinja2_syntax(account.username),
+                'full_username': escape_jinja2_syntax(account.full_username),
                 'privileged': account.privileged,
                 'secret_type': account.secret_type,
-                'secret': account.escape_jinja2_syntax(secret),
+                'secret': escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,
                 'become': account.get_ansible_become_auth(),
             }

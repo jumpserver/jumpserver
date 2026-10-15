@@ -15,6 +15,7 @@ from common.const import Status
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_filename
+from ops.ansible.utils import escape_jinja2_syntax
 from ..base.manager import BaseChangeSecretPushManager
 
 logger = get_logger(__name__)
@@ -42,7 +43,7 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
                     'The currently managed password is required when Oracle '
                     'password changes use the REPLACE clause'
                 ))
-            h['account']['old_secret'] = account.escape_jinja2_syntax(
+            h['account']['old_secret'] = escape_jinja2_syntax(
                 record.old_secret
             )
         return h, record

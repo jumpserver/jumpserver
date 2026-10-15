@@ -4,6 +4,7 @@ from uuid import UUID
 from django.conf import settings
 from django.contrib.auth import login
 from django.http.response import HttpResponseRedirect
+from django.utils.translation import gettext
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.decorators import action
@@ -86,7 +87,7 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
 
         try:
             if not authkey:
-                raise serializers.ValidationError("authkey is required")
+                raise serializers.ValidationError(gettext("authkey is required"))
 
             authkey = UUID(authkey)
             token = SSOToken.objects.get(authkey=authkey, expired=False)

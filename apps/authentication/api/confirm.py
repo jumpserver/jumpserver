@@ -72,5 +72,6 @@ class UserConfirmationViewSet(JMSGenericViewSet):
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index(confirm_type) + 1
             request.session['CONFIRM_TYPE'] = confirm_type
             request.session['CONFIRM_TIME'] = int(time.time())
+            request.session['CONFIRM_USER_ID'] = str(request.user.pk)
             return Response('ok')
         return Response({'error': msg}, status=400)

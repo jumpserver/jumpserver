@@ -1,67 +1,61 @@
-from datetime import datetime
-
 from celery import shared_task
-from django.shortcuts import get_object_or_404
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
+from accounts.const import Source
+from common.utils import get_logger
 from orgs.utils import tmp_to_root_org, tmp_to_org
+
+logger = get_logger(__name__)
 
 
 @shared_task(
     verbose_name=_('Template sync info to related accounts'),
     activity_callback=lambda self, template_id, *args, **kwargs: (template_id, None),
     description=_(
-        """When clicking 'Sync new secret to accounts' in 'Console - Account - Templates - 
-        Accounts' this task will be executed"""
-    )
+        'Synchronize template properties to following accounts without changing credentials.'
+    ),
 )
 def template_sync_related_accounts(template_id, user_id=None):
     from accounts.models import Account, AccountTemplate
-    with tmp_to_root_org():
-        template = get_object_or_404(AccountTemplate, id=template_id)
-    org_id = template.org_id
 
-    with tmp_to_org(org_id):
-        accounts = Account.objects.filter(source_id=template_id)
-    if not accounts:
-        print('\033[35m>>> 没有需要同步的账号, 结束任务')
-        print('\033[0m')
+    if not Account.TEMPLATE_SYNC_FIELDS:
         return
 
-    failed, succeeded = 0, 0
-    succeeded_account_ids = []
-    name = template.name
-    username = template.username
-    secret_type = template.secret_type
-    privileged = template.privileged
-    print(
-        f'\033[32m>>> 开始同步模板名称、用户名、密钥类型到相关联的账号 ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
-    with tmp_to_org(org_id):
-        for account in accounts:
-            account.name = name
-            account.username = username
-            account.secret_type = secret_type
-            account.privileged = privileged
-            try:
-                account.save(update_fields=['name', 'username', 'secret_type', 'privileged'])
-                succeeded += 1
-                succeeded_account_ids.append(account.id)
-            except Exception as e:
-                account.source_id = None
-                account.save(update_fields=['source_id'])
-                print(f'\033[31m- 同步失败: [{account}] 原因: [{e}]')
-                failed += 1
-        accounts = Account.objects.filter(id__in=succeeded_account_ids)
-        if accounts:
-            print(f'\033[33m>>> 批量更新账号密文 ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
-            template.bulk_sync_account_secret(accounts, user_id)
+    with tmp_to_root_org():
+        template = AccountTemplate.objects.filter(id=template_id).first()
+    if template is None:
+        return
 
-    total = succeeded + failed
-    print(
-        f'\033[33m>>> 同步完成:, '
-        f'共计: {total}, '
-        f'成功: {succeeded}, '
-        f'失败: {failed}, '
-        f'({datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) '
-    )
-    print('\033[0m')
+    succeeded, failed = 0, 0
+    with tmp_to_org(template.org_id):
+        account_ids = list(Account.objects.filter(
+            source=Source.TEMPLATE, source_id=template_id, follow_template=True,
+        ).values_list('id', flat=True))
+        for account_id in account_ids:
+            try:
+                with transaction.atomic():
+                    # Recheck following after locking: a queued task must respect opt-outs.
+                    account = Account.objects.select_for_update().filter(
+                        id=account_id, source=Source.TEMPLATE,
+                        source_id=template_id, follow_template=True,
+                    ).first()
+                    if account is None:
+                        continue
+                    changed = []
+                    for field in Account.TEMPLATE_SYNC_FIELDS:
+                        value = getattr(template, field)
+                        if getattr(account, field) != value:
+                            setattr(account, field, value)
+                            changed.append(field)
+                    if changed:
+                        # Property synchronization must not read or write external secrets.
+                        account.skip_vault_when_saving = True
+                        account.skip_history_when_saving = True
+                        account.save(update_fields=changed)
+                    succeeded += 1
+            except Exception:
+                # Preserve provenance and following so a failed account can be retried.
+                logger.exception('Template sync failed for account %s', account_id)
+                failed += 1
+    print(f'Template sync completed: succeeded={succeeded}, failed={failed}')

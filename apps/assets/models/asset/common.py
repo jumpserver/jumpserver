@@ -65,6 +65,15 @@ class AssetManager(OrgManager):
 
 
 class AssetQuerySet(models.QuerySet):
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False, **kwargs):
+        from assets.utils.cidr import assign_assets_to_zones
+
+        objs = list(objs)
+        assign_assets_to_zones(objs)
+        return super().bulk_create(
+            objs, batch_size=batch_size, ignore_conflicts=ignore_conflicts, **kwargs
+        )
+
     def active(self):
         return self.filter(is_active=True)
 

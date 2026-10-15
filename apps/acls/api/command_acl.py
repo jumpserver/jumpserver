@@ -10,7 +10,29 @@ __all__ = ['CommandFilterACLViewSet', 'CommandGroupViewSet']
 
 class CommandGroupViewSet(OrgBulkModelViewSet):
     model = models.CommandGroup
-    filterset_fields = ('name', 'command_filters')
+    chat_ai_create_reuse = {
+        'lookup_operation_id': 'acls_command_groups_list',
+        'fields': [
+            {
+                'body_field': 'type',
+                'query_parameter': 'type',
+                'unwrap': 'value',
+                'default': models.CommandGroup.TypeChoices.command,
+            },
+            {
+                'body_field': 'content',
+                'query_parameter': 'content',
+            },
+            {
+                'body_field': 'ignore_case',
+                'query_parameter': 'ignore_case',
+                'default': True,
+            },
+        ],
+    }
+    filterset_fields = (
+        'name', 'type', 'content', 'ignore_case', 'command_filters'
+    )
     search_fields = ('name',)
     serializer_class = serializers.CommandGroupSerializer
 

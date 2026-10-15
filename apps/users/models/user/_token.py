@@ -95,4 +95,3 @@ class TokenMixin:
     def expired_reset_password_token(cls, token):
         key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
         cache.delete(key)
-
