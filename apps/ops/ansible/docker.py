@@ -1,18 +1,27 @@
 import os
 import shutil
+import socket
+import subprocess
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
+from common.utils import get_logger
 from common.utils.safe import safe_run_cmd
 from .exception import AnsibleDockerImageNotFound
 
+logger = get_logger(__name__)
+
 ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor:latest'
 ANSIBLE_EE_PYTHON_INTERPRETER = '/usr/bin/python3.14'
+# Label stamped on every executor container so a restarted worker can find and
+# remove containers orphaned by a previous (crashed / SIGKILLed) worker.
+ANSIBLE_EE_CONTAINER_LABEL = 'io.jumpserver.ansible-executor'
 
 __all__ = [
     'ANSIBLE_EE_IMAGE',
     'ANSIBLE_EE_PYTHON_INTERPRETER',
+    'ANSIBLE_EE_CONTAINER_LABEL',
     'use_ansible_docker_isolation',
     'docker_extravars',
     'docker_isolation_kwargs',
@@ -20,11 +29,19 @@ __all__ = [
     'prepare_isolated_ansible_runtime',
     'stage_inventory_for_docker',
     'ensure_ansible_docker_image',
+    'executor_owner_label',
+    'remove_orphan_executor_containers',
 ]
 
 
 def use_ansible_docker_isolation():
     return settings.ANSIBLE_DOCKER_ENABLED
+
+
+def executor_owner_label():
+    # Each worker only cleans up containers it started itself, so several
+    # workers sharing one Docker daemon never kill each other's jobs.
+    return f'{ANSIBLE_EE_CONTAINER_LABEL}={socket.gethostname()}'
 
 
 def docker_extravars(extra_vars):
@@ -39,9 +56,38 @@ def docker_isolation_kwargs(project_dir):
         'process_isolation': True,
         'process_isolation_executable': 'docker',
         'container_image': ANSIBLE_EE_IMAGE,
-        'container_options': ['--network=jms_net'],
+        'container_options': ['--network=jms_net', '--label', executor_owner_label()],
         'container_volume_mounts': [f'{project_dir}:{project_dir}:Z'],
     }
+
+
+def remove_orphan_executor_containers():
+    """
+    Remove executor containers left behind by a previous worker on this host.
+
+    Called on worker startup: at that moment this worker has not started any
+    job yet, so every container carrying our owner label belongs to a dead
+    worker and would otherwise keep running until its playbook ends (or forever).
+    """
+    if not use_ansible_docker_isolation():
+        return 0
+    try:
+        result = subprocess.run(
+            ['docker', 'ps', '-aq', '--filter', f'label={executor_owner_label()}'],
+            shell=False, capture_output=True, timeout=30,
+        )
+    except Exception as e:
+        logger.warning('List orphan ansible executor containers failed: %s', e)
+        return 0
+    if result.returncode != 0:
+        return 0
+    container_ids = result.stdout.decode(errors='ignore').split()
+    if not container_ids:
+        return 0
+    safe_run_cmd(['docker', 'rm', '-f', *container_ids], quiet=True)
+    logger.info('Removed %s orphan ansible executor container(s): %s',
+                len(container_ids), ' '.join(container_ids))
+    return len(container_ids)
 
 
 def prepare_isolated_ansible_cfg(project_dir):
