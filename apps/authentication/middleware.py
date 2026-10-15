@@ -53,9 +53,11 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         self.get_response = get_response
 
     def __call__(self, request):
+        # Third-party callbacks authenticate inside the view; finish before redirecting to the UI.
+        response = self.get_response(request) if request.user.is_anonymous else None
         # 必须先做登录 ACL / 复核判断再进 view，否则拒绝或待审时写操作已经提交。
         if request.user.is_anonymous or not request.session.get('auth_third_party_required'):
-            return self.get_response(request)
+            return response if response is not None else self.get_response(request)
         white_urls = [
             'jsi18n/', '/static/',
             'login/guard', 'login/wait-confirm',
@@ -65,7 +67,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         ]
         for url in white_urls:
             if request.path.find(url) > -1:
-                return self.get_response(request)
+                return response if response is not None else self.get_response(request)
 
         ip = get_request_ip(request)
         try:
@@ -99,9 +101,10 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 if args:
                     guard_url = "%s?%s" % (guard_url, args)
                 return redirect(guard_url)
-            response = self.get_response(request)
+            if response is None:
+                response = self.get_response(request)
             self.send_auth_signal(success=True, user=request.user, request=request)
-            self.request.session.pop('auth_third_party_required', '')
+            request.session.pop('auth_third_party_required', '')
             return response
         finally:
             if request.session.get('can_send_notifications') and \
