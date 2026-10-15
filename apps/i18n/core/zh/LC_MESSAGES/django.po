@@ -15927,14 +15927,6 @@ msgstr "人脸监控超时"
 msgid "Face flow has already finished"
 msgstr "人脸识别流程已结束"
 
-#: xpack/plugins/facelive/sessions.py:83
-msgid "Face verification timed out"
-msgstr "人脸验证超时"
-
-#: xpack/plugins/facelive/sessions.py:85
-msgid "The liveness action was not completed in time"
-msgstr "未在规定时间内完成活体检测动作"
-
 #: xpack/plugins/facelive/sessions.py:96
 msgid "Place one face fully inside the camera area"
 msgstr "请将一张人脸完整置于摄像头画面内"
