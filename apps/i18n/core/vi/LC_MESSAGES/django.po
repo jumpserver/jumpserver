@@ -14469,3 +14469,21 @@ msgstr "Quyền truy cập tài sản sắp hết hạn"
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "Thời gian hết hạn"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "Dịch vụ cấp chứng chỉ SSH của OpenBao không khả dụng: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "Nhập mã thông báo dịch vụ OpenBao."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "Mã thông báo dịch vụ OpenBao không hợp lệ, đã hết hạn hoặc thiếu quyền cần thiết. Kiểm tra mã thông báo và chính sách truy cập."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "Mã thông báo dịch vụ OpenBao không có quyền truy cập %(resource)s. Cấp quyền %(capability)s cho đường dẫn này."

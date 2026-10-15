@@ -14330,3 +14330,21 @@ msgstr "자산 권한이 곧 만료됩니다"
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "만료 시간"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "OpenBao SSH 인증서 발급 서비스를 사용할 수 없습니다: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "OpenBao 서비스 토큰을 입력하세요."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "OpenBao 서비스 토큰이 유효하지 않거나 만료되었거나 필요한 권한이 없습니다. 토큰과 액세스 정책을 확인하세요."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "OpenBao 서비스 토큰에 %(resource)s 접근 권한이 없습니다. 이 경로에 %(capability)s 권한을 부여하세요."

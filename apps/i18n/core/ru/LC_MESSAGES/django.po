@@ -14598,3 +14598,21 @@ msgstr "Срок действия разрешения на доступ к ак
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "Время истечения срока действия"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "Сервис выдачи SSH-сертификатов OpenBao недоступен: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "Введите служебный токен OpenBao."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "Служебный токен OpenBao недействителен, срок его действия истёк или у него недостаточно прав. Проверьте токен и его политику доступа."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "Служебный токен OpenBao не имеет доступа к %(resource)s. Предоставьте право %(capability)s для этого пути."

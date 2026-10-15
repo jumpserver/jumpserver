@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 from urllib.parse import quote
 
 import requests
+from django.utils.translation import gettext as _
 from requests import exceptions as request_exceptions
 
 from common.utils import get_logger, random_string
@@ -308,16 +309,31 @@ class OpenBaoSSHCAClient(OpenBaoKVClient):
     def is_active(self, ttl=300):
         try:
             self._check_health()
-            self._request(
-                'GET', '/v1/auth/token/lookup-self', expected_statuses=(200,)
-            )
+            self._check_token()
             public_key = self.ensure_configured(ttl=ttl)
             if not public_key:
                 raise OpenBaoAPIError('OpenBao SSH CA public key is empty')
         except Exception as e:
             logger.error(str(e))
-            return False, f'OpenBao SSH CA is not available: {e}'
+            return False, _('OpenBao SSH CA is not available: %(error)s') % {'error': str(e)}
         return True, ''
+
+    def _check_token(self):
+        if not self.token:
+            raise OpenBaoAPIError(_('Enter an OpenBao service token.'))
+        try:
+            self._request(
+                'GET', '/v1/auth/token/lookup-self', expected_statuses=(200,)
+            )
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) not in (401, 403):
+                raise
+            error = OpenBaoAPIError(_(
+                'The OpenBao service token is invalid, expired, or lacks permission. '
+                'Check the token and its access policy.'
+            ))
+            error.status_code = e.status_code
+            raise error from e
 
     def ensure_configured(self, ttl=300):
         """Initialize missing SSH mounts, CAs and roles without replacing them."""
@@ -416,12 +432,12 @@ class OpenBaoSSHCAClient(OpenBaoKVClient):
         except OpenBaoAPIError as e:
             if getattr(e, 'status_code', None) != 403:
                 raise
-            error = OpenBaoAPIError(
-                f'The OpenBao token cannot initialize SSH CA at {self.mount_point}. '
-                f'Grant read/create/update access to sys/mounts/{self.mount_point}, '
-                f'{self.mount_point}/config/ca and {self.mount_point}/roles/{self.role}, '
-                f'and list access to {self.mount_point}/issuers.'
-            )
+            resource = path.removeprefix('/v1/')
+            capability = {'GET': 'read', 'LIST': 'list'}.get(method, 'create/update')
+            error = OpenBaoAPIError(_(
+                'The OpenBao service token cannot access %(resource)s. '
+                'Grant %(capability)s permission for this path.'
+            ) % {'resource': resource, 'capability': capability})
             error.status_code = 403
             raise error from e
 

@@ -14399,3 +14399,21 @@ msgstr "資産権限の有効期限が近づいています"
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "有効期限"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "OpenBao の SSH 証明書発行サービスを利用できません：%(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "OpenBao のサービストークンを入力してください。"
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "OpenBao のサービストークンが無効か、有効期限が切れているか、必要な権限がありません。トークンとアクセスポリシーを確認してください。"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "OpenBao のサービストークンには %(resource)s へのアクセス権限がありません。このパスに %(capability)s 権限を付与してください。"
