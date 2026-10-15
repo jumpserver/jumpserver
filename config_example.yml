@@ -291,6 +291,10 @@ REDIS_PORT: 6379
 # OTP_VALID_WINDOW: 0
 # OTP_ISSUER_NAME: JumpServer
 
+# 是否始终要求登录验证码，默认 False，登录失败后才要求验证码
+# 仅在 SECURITY_LOGIN_CAPTCHA_ENABLED 开启且未启用登录页动态口令或 MFA 时生效
+# SECURITY_LOGIN_CAPTCHA_ALWAYS_REQUIRED: False
+
 # 启用定时任务
 # PERIOD_TASK_ENABLED: True
 #

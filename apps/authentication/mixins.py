@@ -664,6 +664,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
 
     def check_is_need_captcha(self):
+        if settings.SECURITY_LOGIN_CAPTCHA_ALWAYS_REQUIRED:
+            return True
+
         # 最近有登录失败时需要填写验证码
         ip = get_request_ip(self.request)
         need = cache.get(self.key_prefix_captcha.format(ip))
