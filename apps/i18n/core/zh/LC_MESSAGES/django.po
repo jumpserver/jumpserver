@@ -14207,3 +14207,13 @@ msgstr "资产授权即将到期"
 #: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
 msgid "Expiration time"
 msgstr "到期时间"
+
+#. Error returned by the face liveness service and translated by FaceContextApi.
+#: authentication/api/face.py
+msgid "Face verification timed out"
+msgstr "人脸验证超时，请重试。"
+
+#. Error returned by the face liveness service and translated by FaceContextApi.
+#: authentication/api/face.py
+msgid "The liveness action was not completed in time"
+msgstr "未在规定时间内完成活体动作，请重试。"
