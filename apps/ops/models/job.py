@@ -28,7 +28,7 @@ from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import (
     JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
-    escape_jinja2_syntax, neutralize_jinja2_syntax,
+    escape_jinja2_syntax, neutralize_jinja2_syntax, quote_ansible_module_arg,
 )
 
 """stop all ssh child processes of the given ansible process pid."""
@@ -382,7 +382,11 @@ class JobExecution(JMSOrgBaseModel):
             if module == 'mssql_script':
                 login_args += "encryption={{jms_asset.encryption | default(None) }} " \
                               "tds_version={{jms_asset.tds_version | default(None) }} "
-            shell = "{} {}=\"{}\" ".format(login_args, query_token, args)
+            # Keep user SQL inside query/script, then set login_* so injected
+            # connection keys cannot override inventory.
+            shell = '{}="{}" {}'.format(
+                query_token, quote_ansible_module_arg(args), login_args
+            )
             return module, shell
 
         if module == 'win_shell':
@@ -402,7 +406,7 @@ class JobExecution(JMSOrgBaseModel):
 
         if module == JobModules.huawei.value:
             module = 'ce_command'
-            shell = "commands=\"{}\" ".format(args)
+            shell = 'commands="{}" '.format(quote_ansible_module_arg(args))
 
         return module, shell
 
