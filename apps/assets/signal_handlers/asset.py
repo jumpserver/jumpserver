@@ -9,7 +9,7 @@ from django.utils.translation import gettext_noop
 from assets.models import Asset, Node, Host, Database, Device, Web, Cloud
 from assets.tasks import test_assets_connectivity_task, gather_assets_facts_task
 from assets.utils.cidr import assign_assets_to_zones
-from common.const.signals import OP_LOG_SKIP_SIGNAL, POST_REMOVE, PRE_REMOVE
+from common.const.signals import OP_LOG_SKIP_SIGNAL, POST_CLEAR, POST_REMOVE, PRE_REMOVE
 from common.decorators import on_transaction_commit, merge_delay_run, key_by_org
 from common.utils import get_logger
 from orgs.utils import current_org
@@ -111,6 +111,27 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
             sender=Asset.nodes.through, instance=instance, reverse=False,
             model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
         )
+
+
+@receiver(m2m_changed, sender=Asset.directory_services.through)
+def on_asset_directory_services_changed(sender, instance, action, reverse, **kwargs):
+    """ 资产退出目录服务后，清除其账号指向该目录服务账号的 su-from """
+    if action not in (POST_REMOVE, POST_CLEAR):
+        return
+    from accounts.models import Account
+
+    if reverse:
+        # instance 是目录服务
+        accounts = Account.objects.filter(su_from__asset=instance) \
+            .exclude(asset=instance) \
+            .exclude(asset__directory_services=instance)
+    else:
+        valid_ids = [instance.pk, *instance.directory_services.values_list('pk', flat=True)]
+        accounts = instance.accounts.filter(su_from__asset__ds__isnull=False) \
+            .exclude(su_from__asset__in=valid_ids)
+    count = accounts.update(su_from=None)
+    if count:
+        logger.debug("Clear su-from of {} accounts after leaving directory service".format(count))
 
 
 @on_transaction_commit
