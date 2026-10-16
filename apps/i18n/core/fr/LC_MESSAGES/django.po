@@ -9829,6 +9829,10 @@ msgstr "Disposition du clavier"
 msgid "RDP client option"
 msgstr "Option du client RDP"
 
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "Redirection des imprimantes"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "Qualité de couleur RDP"

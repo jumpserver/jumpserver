@@ -9853,6 +9853,10 @@ msgstr "Bố cục bàn phím"
 msgid "RDP client option"
 msgstr "Tùy chọn khách hàng RDP"
 
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "Chuyển hướng máy in"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "Chất lượng màu RDP"

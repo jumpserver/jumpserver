@@ -9770,6 +9770,10 @@ msgstr "키보드 레이아웃"
 msgid "RDP client option"
 msgstr "RDP 클라이언트 옵션"
 
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "프린터 리디렉션"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "RDP 색상 품질"
