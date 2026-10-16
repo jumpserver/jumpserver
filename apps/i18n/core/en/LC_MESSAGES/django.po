@@ -9846,6 +9846,10 @@ msgstr "Keyboard layout"
 msgid "RDP client option"
 msgstr "RDP client options"
 
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "Printer redirection"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "RDP color quality"

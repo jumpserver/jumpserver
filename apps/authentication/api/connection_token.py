@@ -294,6 +294,18 @@ class RDPFileClientProtocolURLMixin:
         if multi_mon:
             rdp_options['use multimon:i'] = '1'
 
+        # 设置打印机重定向
+        printers_redirect_value = self.request.query_params.get('printers_redirect')
+        if printers_redirect_value is None:
+            printers_redirect_value = token.user.preference.get_value(
+                'printers_redirect', category='luna', default=False
+            )
+            # Boolean preferences are stored as "True"/"False" in a TextField.
+            if isinstance(printers_redirect_value, str):
+                printers_redirect_value = printers_redirect_value.lower()
+        if is_true(printers_redirect_value):
+            rdp_options['redirectprinters:i'] = '1'
+
         # 设置磁盘挂载
         drives_redirect_value = self.request.query_params.get('drives_redirect')
         drives_redirect = (
