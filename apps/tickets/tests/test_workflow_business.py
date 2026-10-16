@@ -6,7 +6,7 @@ from uuid import uuid4
 from django.db import transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from acls.models import LoginACL, LoginAssetACL, CommandFilterACL
@@ -210,6 +210,106 @@ class WorkflowBusinessTests(TestCase):
         self.engine.approve(self.task(instance, self.bob), self.bob)
         self.assertTrue(AssetPermission.objects.filter(pk=ticket.pk).exists())
         self.assertEqual(import_ticket(ticket.pk, apply=True)[0], 'SKIP')
+
+    def test_legacy_self_assignee_can_approve_or_reject_with_original_policy(self):
+        for operation, expected in [('approve', 'approved'), ('reject', 'rejected')]:
+            with self.subTest(operation=operation):
+                ticket = self.ticket()
+                step = TicketStep.objects.create(ticket=ticket, state='pending', status='active')
+                TicketAssignee.objects.create(step=step, assignee=self.applicant)
+                self.assertEqual(import_ticket(ticket.pk, apply=True), ('IMPORTED (running)', []))
+                instance = WorkflowInstance.objects.get(ticket=ticket)
+                task = self.task(instance, self.applicant)
+                with self.assertRaises(PermissionDenied):
+                    self.engine.approve(task, self.alice)
+                User.objects.filter(pk=self.applicant.pk).update(is_active=False)
+                with self.assertRaises(PermissionDenied):
+                    self.engine.approve(task, self.applicant)
+                User.objects.filter(pk=self.applicant.pk).update(is_active=True)
+                getattr(self.engine, operation)(task, self.applicant)
+                ticket.refresh_from_db()
+                self.assertEqual((ticket.state, ticket.status), (expected, 'closed'))
+                self.assertEqual(AssetPermission.objects.filter(pk=ticket.pk).exists(), operation == 'approve')
+
+    def test_legacy_future_step_preserves_applicant_and_any_approval_strategy(self):
+        ticket = self.ticket()
+        first = TicketStep.objects.create(ticket=ticket, level=1, state='pending', status='active')
+        TicketAssignee.objects.create(step=first, assignee=self.alice)
+        second = TicketStep.objects.create(ticket=ticket, level=2, state='pending')
+        for user in (self.applicant, self.bob):
+            TicketAssignee.objects.create(step=second, assignee=user)
+        import_ticket(ticket.pk, apply=True)
+        instance = WorkflowInstance.objects.get(ticket=ticket)
+        self.engine.approve(self.task(instance), self.alice)
+        self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
+        self.engine.approve(self.task(instance, self.applicant), self.applicant)
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.state, 'approved')
+        self.assertTrue(AssetPermission.objects.filter(pk=ticket.pk).exists())
+        self.assertEqual(ApprovalTask.objects.get(node_instance__instance=instance, assignee=self.bob).state,
+                         'cancelled')
+
+    def test_new_asset_request_cannot_opt_into_legacy_approval_policy(self):
+        ticket = self.ticket(self.workflow(definition=approval_definition(
+            [self.applicant, self.alice], exclude_applicant=False)))
+        ticket.request_data['legacy'] = {'state': 'pending'}
+        ticket.save(update_fields=['request_data'])
+        instance = submit_ticket(ticket)
+        self.assertNotIn('legacy', instance.context)
+        self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance,
+                                                    assignee=self.applicant).exists())
+        old_task = ApprovalTask.objects.create(node_instance=self.task(instance).node_instance,
+                                              assignee=self.applicant)
+        for operation in ('approve', 'reject'):
+            with self.assertRaises(PermissionDenied):
+                getattr(self.engine, operation)(old_task, self.applicant)
+
+    def test_legacy_incomplete_context_keeps_request_details_and_export(self):
+        from perms.const import ActionChoices
+        from tickets.serializers.ticket.ticket import TicketSerializer, TicketRequestItemsField
+        for missing in ('applicant', 'asset'):
+            with self.subTest(missing=missing):
+                ticket = self.ticket()
+                ticket.request_data.update(apply_assets=[str(uuid4())], apply_accounts=['@ALL'],
+                                           apply_actions=0, apply_expire_soon_notice_minutes=0)
+                ticket.state, ticket.status = 'approved', 'closed'
+                ticket.rel_snapshot = {'applicant': 'Former applicant', 'apply_assets': ['Deleted host'],
+                                       'apply_nodes': ['Original node']}
+                if missing == 'applicant':
+                    ticket.applicant = None
+                ticket.save()
+                result, warnings = import_ticket(ticket.pk, apply=True)
+                self.assertEqual(result, 'IMPORTED (approved)')
+                self.assertTrue(warnings)
+                Ticket.objects.filter(pk=ticket.pk).update(rel_snapshot={})
+                ticket.refresh_from_db()
+                items = TicketSerializer.get_request_items(ticket)
+                values = {item['name']: item['value'] for item in items}
+                self.assertEqual(values, {
+                    'apply_users': ['Former applicant'], 'apply_assets': ['Deleted host'],
+                    'apply_nodes': ['Original node'], 'apply_accounts': ['@ALL'],
+                    'apply_actions': ActionChoices.display(0),
+                    'apply_date_start': ticket.request_data['apply_date_start'],
+                    'apply_date_expired': ticket.request_data['apply_date_expired'],
+                    'apply_expire_soon_notice_minutes': 0,
+                })
+                exported = TicketRequestItemsField().to_file_representation(items)
+                for value in ('Former applicant', 'Deleted host', 'Original node', '@ALL',
+                              ticket.request_data['apply_date_start'], ': 0'):
+                    self.assertIn(value, exported)
+                self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
+
+    def test_asset_request_details_keep_complete_snapshot_after_payload_changes(self):
+        from tickets.serializers.ticket.ticket import TicketSerializer
+        ticket = self.ticket()
+        submit_ticket(ticket)
+        ticket.refresh_from_db()
+        expected = TicketSerializer.get_request_items(ticket)
+        Ticket.objects.filter(pk=ticket.pk).update(request_data={}, rel_snapshot={'apply_nodes': ['Changed']})
+        ticket.refresh_from_db()
+        self.assertEqual(TicketSerializer.get_request_items(ticket), expected)
+        self.assertIsNone(next(item['value'] for item in expected
+                               if item['name'] == 'apply_expire_soon_notice_minutes'))
 
     def test_completed_migration_never_regrants_access(self):
         ticket = self.ticket()
