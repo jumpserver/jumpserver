@@ -24,7 +24,7 @@ class JobExecutionSchemaTests(SimpleTestCase):
         self.assertTrue({'job', 'parameters'} <= set(body['properties']))
 
     def test_list_supports_job_filter_and_detail(self):
-        self.assertIn('job', {parameter['name'] for parameter in self.collection['get']['parameters']})
+        self.assertIn('job_id', {parameter['name'] for parameter in self.collection['get']['parameters']})
         detail = self.schema['paths']['/api/v1/ops/job-executions/{id}/']
         self.assertEqual(detail['get']['operationId'], 'ops_job_executions_retrieve')
 
