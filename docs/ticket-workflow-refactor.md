@@ -23,11 +23,11 @@
 
 `workflow/engine.py` 只负责审批状态推进，通过同步领域信号通知 `workflow/business.py`。业务效果和实例终态位于同一数据库事务内；通知只在事务提交后发送。
 
-资产申请提交时必须填写资源、账号、动作和有效期。服务器展开节点为具体资产，记录资产标签、平台、负责人及账号元信息，不读取或保存密码、私钥等凭据。`@ALL` 在提交时展开为当时存在的账号用户名；手工输入等无法预知的用户名在快照中为 null，涉及具体用户名的条件因此失败关闭，而不会当作低风险账号绕过审批。
+资产申请提交时必须填写资源、账号、动作和有效期。提交后冻结申请内容，审批人不能修改资源、权限、有效期或到期提醒；需要调整时拒绝或由申请人撤回，再重新申请。服务器展开节点为具体资产，记录资产标签、平台、负责人及账号元信息，不读取或保存密码、私钥等凭据。`@ALL` 在提交时展开为当时存在的账号用户名；手工输入等无法预知的用户名在快照中为 null，涉及具体用户名的条件因此失败关闭，而不会当作低风险账号绕过审批。
 
 最终通过后，只按快照创建 `AssetPermission`，使用工单 ID 保证幂等，不再把原始资产节点加入授权规则。审批期间新增到节点的资产、后续出现的新账号名不会被这张工单额外授权。原有虚拟账号选择器（例如 `@INPUT`、`@USER`）仍保留其明确的授权语义。申请人失效、请求资产已删除/移出组织、请求有效期已结束时，流程进入异常且不授予权限。普通存储错误会回滚决定，允许重试。
 
-资产登录最终通过后激活对应连接令牌；系统登录和命令复核通过统一 Ticket 状态向原有业务消费者返回结果。ACL 可选择同类型已发布流程；未选择时，原审核人配置自动生成使用同一新引擎的单节点版本。自动生成的定义和历史工单专用定义不出现在流程配置列表中。
+资产登录最终通过后激活对应连接令牌，并在事务提交后按 ACL 的 `review_duration` 写入登录审批豁免。豁免按组织、ACL、申请人、资产和实际账号用户名隔离，命中不续期；配置为 0、禁用规则或改为非审批动作后不再生效。中间审批节点、拒绝、撤回、过期和失败均不授予豁免，后续连接仍检查当前 IP、时间段等规则。资产登录无连接令牌时仍可在最终通过后产生豁免；系统登录和命令复核通过统一 Ticket 状态向原有业务消费者返回结果。ACL 可选择同类型已发布流程；未选择时，原审核人配置自动生成使用同一新引擎的单节点版本。自动生成的定义和历史工单专用定义不出现在流程配置列表中。
 
 工单邮件操作链接固定到具体 ApprovalTask，不能使用旧节点邮件批准同一用户之后收到的节点。抄送者只能阅读，不能处理审批任务。
 
@@ -64,7 +64,7 @@
 | `approval-tasks/{id}/candidates/` | 当前任务可选择的有效组织成员 |
 | `tickets/?processed_by={user_id}` | 已处理的相关工单 |
 
-实例仅申请人、任务参与者、抄送人可读；拥有 `tickets.view_workflowinstance` 的审计员可读当前组织全部实例。任务操作只允许受理人。旧 `flows/` 路由已经移除；按 Ticket ID 进行的 approve/reject/bulk 接口拒绝写入，统一改用任务接口。工单查看、业务状态查询、申请人关闭请求和评论入口保留。
+实例允许申请人、任务参与者、抄送人和授权受益人读取；拥有 `tickets.view_workflowinstance` 或 dev 的 `audits.view_ticketaudit` 权限者可读当前组织实例。`audits.view_ticketaudit` 同时允许读取当前组织工单详情和事件，根组织仍要求系统范围权限。审计权限不授予审批、撤回、密码查看或录像下载能力；任务操作只允许受理人。旧 `flows/` 路由已经移除；按 Ticket ID 进行的 approve/reject/bulk 接口拒绝写入，统一改用任务接口。工单查看、业务状态查询、申请人关闭请求和评论入口保留。
 
 发布例子：
 
@@ -100,7 +100,7 @@
 代码没有在开发/生产业务数据库上执行迁移。部署时按以下顺序处理：
 
 1. 备份数据库，暂停产生新工单的入口和审批操作，停止旧版本服务/任务消费者。
-2. 部署后端代码，执行 `python apps/manage.py migrate`，包括 assets 0031、users 0008、tickets 0010–0014、acls 0005。
+2. 部署后端代码，执行 `python apps/manage.py migrate`，保留全部 dev 迁移后，依次由依赖图执行 authentication 0012、tickets 0010，以及 assets 0032、users 0008、acls 0007。每个 app 的重构模型变更保留一个迁移文件。
 3. 先预览定义迁移，再执行；导入流程默认禁用，逐个检查审批人、组织和抄送配置后启用。
 4. 预览并导入历史及未完成工单，检查所有错误和告警；最后同步部署 Lina、重启 Web/Celery/Beat 并恢复入口。
 
@@ -111,11 +111,13 @@ python apps/manage.py migrate_ticket_instances
 python apps/manage.py migrate_ticket_instances --apply
 ```
 
-两个命令均支持 `--org-id`；定义命令支持 `--flow-id`，实例命令支持 `--ticket-id`。默认不写入；每个对象单独原子提交，可幂等重跑。四种旧专用工单表在 `tickets.0016_merge_ticket_models` 迁移中搬迁业务字段后删除；历史工单由通用 `Ticket` 和插件读取。
+本迁移链以 dev 为基线，不替代已执行过开发版 tickets 0010–0018 的数据库历史；这类预览环境应从 dev 数据库备份恢复后升级，不能直接 fake 新迁移。结构迁移会删除旧子表，无法直接反向回滚；回退须恢复升级前完整备份及配套前后端代码。
+
+两个命令均支持 `--org-id`；定义命令支持 `--flow-id`，实例命令支持 `--ticket-id`。默认不写入；每个对象单独原子提交，可幂等重跑。四种旧专用工单表在 `tickets.0010_ticket_workflow_refactor` 迁移中搬迁业务字段后删除；历史工单由通用 `Ticket` 和插件读取。
 
 定义迁移把旧选择器当时匹配的用户转成固定用户，并记录原规则，便于管理员改成组/角色等动态规则。实例迁移保留原审批人和状态、已完成决定、原时间和删除用户的显示名；历史终态绝不重放授权、令牌激活或通知。未完成工单从原当前步骤继续，后续步骤使用迁移定义。
 
-`tickets 0014` 将已有流程的全局抄送配置转成起始位置的抄送节点并发布新版本，原发布版本及运行中实例不改动；这些实例的抄送人已在提交时保存到工单。未发布的草稿若曾单独配置全局抄送，原用户 ID 保存在 `migration_notes.unpublished_cc_user_ids`，升级后需在设计器中添加抄送节点再发布。
+旧 TicketFlow 的抄送配置由 `migrate_ticket_workflows` 转换为起始位置的抄送节点；历史工单已有的抄送关系保留。新结构不再经过开发期间的全局抄送字段。
 
 旧系统没有完整上下文快照，因此无法还原当时的资产标签/负责人/账号等数据。实例迁移明确记录“迁移时采集”的时间、原关系快照和告警。缺少资源或有效审批人的未完成工单转为 error，必须修正后重新申请，不会被静默通过。迁移告警不代表已完成的历史授权被撤销。
 
@@ -131,10 +133,9 @@ sys.argv = ['workflow-tests', 'check']
 import django
 django.setup()
 from django.core.management import call_command
-call_command('test', 'tickets.tests.test_workflow', 'tickets.tests.test_workflow_business',
-             'tickets.tests.test_workflow_concurrency', 'tickets.tests.test_flow_serializer',
-             'tickets.tests.test_deleted_user_history', interactive=False, verbosity=1)
+call_command('test', 'tickets.tests', 'acls.tests', 'audits.tests',
+             interactive=False, verbosity=1)
 PY
 ```
 
-覆盖 DSL 校验、8 级审批、分支、版本与快照不可变性、跨组织权限、全部策略、转交/加签/超时、用户删除、四类业务入口、授权快照、令牌激活、历史迁移、邮件任务绑定和真实数据库并发。另运行 Django system check、迁移一致性检查，以及 Lina `yarn lint`、`yarn test`、`yarn build:prod`。
+覆盖 DSL 校验、8 级审批、分支、版本与快照不可变性、跨组织权限、全部策略、转交/加签/超时、用户删除、四类业务入口、授权快照、令牌激活、登录豁免的最终提交/回滚/固定过期时间、审计详情与报表的组织隔离、历史迁移、邮件任务绑定和真实数据库并发。升级演练还应在独立 PostgreSQL 数据库中先应用 dev 迁移，写入四类旧工单、关联关系和连接令牌，再执行新迁移；确认 UUID、业务字段、评论和审批历史、dev 新字段均保留，且不重放业务效果。另运行 Django system check、迁移一致性检查，以及 Lina `yarn lint`、`yarn test`、`yarn build:prod`。

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets
@@ -14,7 +15,7 @@ from audits.handler import create_or_update_operate_log
 from common.api import CommonApiMixin, ReportExportMixin
 from common.const.http import POST, PUT, PATCH
 from common.drf.throttling import FileTransferThrottle
-from orgs.utils import tmp_to_root_org, tmp_to_org
+from orgs.utils import current_org, tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
 from tickets import filters
 from tickets import serializers
@@ -47,6 +48,7 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',
+        'retrieve': 'tickets.view_ticket | audits.view_ticketaudit',
     }
 
     def get_serializer_class(self):
@@ -61,10 +63,9 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
         return super().get_serializer_class()
 
     def retrieve(self, request, *args, **kwargs):
-        with tmp_to_root_org():
-            instance = self.get_object()
-            serializer = self.get_serializer(instance)
-            data = serializer.data
+        instance = self.get_object()
+        with tmp_to_org(instance.org_id):
+            data = self.get_serializer(instance).data
         return Response(data)
 
     @action(detail=True, methods=['get'], url_path='replay/download',
@@ -117,8 +118,17 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
         raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
+        can_audit = self.action == 'retrieve' and self.request.user.has_perm('audits.view_ticketaudit')
+        audit_org_id = None if current_org.is_root() else str(current_org.id)
         with tmp_to_root_org():
             queryset = self.model.get_user_related_tickets(self.request.user)
+            if can_audit:
+                if audit_org_id is None:
+                    return self.model.objects.all()
+                # Auditing one organization must not hide the user's own tickets elsewhere.
+                return self.model.objects.filter(
+                    Q(org_id=audit_org_id) | Q(pk__in=queryset.values('pk')),
+                )
         return queryset
 
     @transaction.atomic

@@ -5,6 +5,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.signals import request_finished
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
@@ -16,7 +17,7 @@ from accounts.models import Account
 from accounts.api.account.ticket_secret import AccountTicketSecretAPI, AccountTicketSecretRequestAPI
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from django.apps import apps as django_apps
-from django.db import connection, transaction
+from django.db import close_old_connections, connection, transaction
 from perms.models import AssetPermission
 from rbac.builtin import BuiltinRole
 from rbac.models import Permission, Role, RoleBinding
@@ -394,7 +395,12 @@ class TicketPluginTests(TestCase):
                         metadata = json.load(archive.extractfile(f'{session.pk}.json'))
                         self.assertEqual(metadata['id'], str(session.pk))
                 finally:
-                    response.close()
+                    # APIRequestFactory has no request cycle; preserve TestCase's transaction.
+                    request_finished.disconnect(close_old_connections)
+                    try:
+                        response.close()
+                    finally:
+                        request_finished.connect(close_old_connections)
 
     def test_ticket_replay_download_checks_expiry_again_after_packaging_and_handles_missing_files(self):
         from django.core.files.storage import default_storage
@@ -757,7 +763,7 @@ class TicketPluginTests(TestCase):
         ticket = self.ticket()
         ticket.request_data['apply_users'] = [str(self.bob.pk), str(self.carol.pk)]
         ticket.save(update_fields=['request_data'])
-        migration = import_module('tickets.migrations.0017_single_asset_beneficiary')
+        migration = import_module('tickets.migrations.0010_ticket_workflow_refactor')
         migration.backfill_beneficiaries(django_apps, SimpleNamespace(connection=connection))
         self.assertEqual(set(ticket.beneficiaries.values_list('user_id', flat=True)),
                          {self.bob.pk, self.carol.pk})

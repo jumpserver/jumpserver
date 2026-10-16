@@ -1,4 +1,5 @@
 from importlib import import_module
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.apps import apps
@@ -101,12 +102,11 @@ class DeletedUserHistoryTests(TestCase):
     def test_backfill_existing_rows(self):
         for model, prefix in [(TicketAssignee, 'assignee'), (SessionSharing, 'creator'), (SessionJoinRecord, 'joiner')]:
             model.objects.update(**{f'{prefix}_display': ''})
-        with connection.schema_editor(atomic=False) as editor:
-            for module in [
-                'tickets.migrations.0009_ticketassignee_assignee_display_and_more',
-                'terminal.migrations.0015_sessionjoinrecord_joiner_display_and_more',
-            ]:
-                import_module(module).backfill_identity_snapshots(apps, editor)
+        for module in [
+            'tickets.migrations.0009_ticketassignee_assignee_display_and_more',
+            'terminal.migrations.0015_sessionjoinrecord_joiner_display_and_more',
+        ]:
+            import_module(module).backfill_identity_snapshots(apps, SimpleNamespace(connection=connection))
         self.assignee.refresh_from_db()
         self.sharing.refresh_from_db()
         self.record.refresh_from_db()

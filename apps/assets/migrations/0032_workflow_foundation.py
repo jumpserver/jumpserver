@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0030_zone_cidrs_auto_assign'),
+        ('assets', '0031_winrm_terminal_access'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

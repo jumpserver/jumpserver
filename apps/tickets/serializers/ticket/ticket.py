@@ -12,6 +12,7 @@ from tickets.const import TicketType, TicketStatus, TicketState, TicketOrigin, T
 from tickets.models import Ticket, TicketAssignee, Workflow
 from users.models import User
 from tickets.plugins import get_ticket_plugin, ticket_type_choices
+from tickets.workflow.const import NodeState
 
 __all__ = [
     'TicketApplySerializer', 'TicketApproveSerializer', 'TicketSerializer',
@@ -36,10 +37,10 @@ class TicketProcessMapField(serializers.JSONField):
             else:
                 date = None
             details = [
-                (_('Approve level'), dict(TicketLevel.choices).get(step.get('approval_level'))),
+                (_('Approve level'), step.get('name') or dict(TicketLevel.choices).get(step.get('approval_level'), step.get('approval_level'))),
                 (_('Reviewers'), ', '.join(step.get('assignees_display') or [])),
                 (_('Processor'), step.get('processor_display')),
-                (_('State'), dict(StepState.choices).get(state, state)),
+                (_('State'), {**dict(NodeState.choices), **dict(StepState.choices)}.get(state, state)),
                 (_('Date'), date),
             ]
             rows.append('; '.join(f'{label}: {content or "-"}' for label, content in details))
@@ -67,6 +68,19 @@ class TicketSnapshotField(serializers.JSONField):
             if isinstance(content, list):
                 content = ', '.join(str(item) for item in content)
             rows.append(f'{label}: {content or "-"}')
+        return '\n'.join(rows) or '-'
+
+
+class TicketRequestItemsField(serializers.SerializerMethodField):
+    def to_file_representation(self, value):
+        rows = []
+        for item in value:
+            content = item['value']
+            if isinstance(content, list):
+                content = ', '.join(str(part) for part in content)
+            if content is None or content == '':
+                content = '-'
+            rows.append(f"{item['label']}: {content}")
         return '\n'.join(rows) or '-'
 
 
@@ -98,7 +112,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
 
     workflow_instance = serializers.SerializerMethodField()
     my_tasks = serializers.SerializerMethodField()
-    request_items = serializers.SerializerMethodField()
+    request_items = TicketRequestItemsField(label=_('Request parameters'))
     execution_mode = serializers.SerializerMethodField()
     available_actions = serializers.SerializerMethodField()
     secret_access_status = serializers.SerializerMethodField()

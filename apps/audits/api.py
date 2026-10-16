@@ -32,6 +32,7 @@ from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
 from terminal.models import default_storage
 from tickets.filters import TicketFilter
+from tickets.reporting import TicketReportExporter
 from tickets.serializers.ticket import TicketSerializer
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
@@ -335,8 +336,9 @@ class PasswordChangeLogViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
         return self.model.filter_queryset_by_org(queryset)
 
 
-class TicketAuditViewSet(OrgReadonlyModelViewSet):
+class TicketAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
     model = TicketAudit
+    report_exporter_class = TicketReportExporter
     serializer_class = TicketSerializer
     filterset_class = TicketFilter
     extra_filter_backends = [DatetimeRangeFilterBackend]
