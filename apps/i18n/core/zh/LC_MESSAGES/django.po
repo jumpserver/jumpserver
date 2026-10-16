@@ -9654,6 +9654,10 @@ msgstr "键盘布局"
 msgid "RDP client option"
 msgstr "RDP 客户端选项"
 
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "打印机重定向"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "RDP 颜色质量"
