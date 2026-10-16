@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.com" target="_blank"><img src="assets/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## 開源特權存取管理（PAM）平台（堡壘機）
 
@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -40,28 +40,28 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 ## 畫面截圖
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="JumpServer 特權存取管理儀表板" width="49%" />
-  <img src="assets/screenshot-02.png" alt="JumpServer 資產管理" width="49%" />
+  <img src="assets/screenshot-01.png" alt="JumpServer 特權存取管理儀表板" title="JumpServer 特權存取管理儀表板" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer 資產管理" title="JumpServer 資產管理" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-03.png" alt="JumpServer SSH 連線對話方塊" width="49%" />
-  <img src="assets/screenshot-04.png" alt="JumpServer 終端機 AI 提問" width="49%" />
+  <img src="assets/screenshot-03.png" alt="JumpServer SSH 連線對話方塊" title="JumpServer SSH 連線對話方塊" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer 終端機 AI 提問" title="JumpServer 終端機 AI 提問" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="JumpServer AI 助理" width="49%" />
-  <img src="assets/screenshot-06.png" alt="JumpServer 遠端桌面工作階段" width="49%" />
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 助理" title="JumpServer AI 助理" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer 遠端桌面工作階段" title="JumpServer 遠端桌面工作階段" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="JumpServer 淺色主題終端機資產面板" width="49%" />
-  <img src="assets/screenshot-08.png" alt="JumpServer 淺色主題 SSH 工作階段" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-09.png" alt="JumpServer 深色主題終端機資產面板" width="49%" />
-  <img src="assets/screenshot-10.png" alt="JumpServer 深色主題 SSH 工作階段" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## 元件

@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.com" target="_blank"><img src="assets/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## Plataforma PAM de código abierto (bastión)
 
@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -40,28 +40,28 @@ Abra JumpServer en el navegador en `http://your-jumpserver-ip/`
 ## Capturas de pantalla
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="Panel de PAM de JumpServer" width="49%" />
-  <img src="assets/screenshot-02.png" alt="Gestión de activos de JumpServer" width="49%" />
+  <img src="assets/screenshot-01.png" alt="Panel de PAM de JumpServer" title="Panel de PAM de JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Gestión de activos de JumpServer" title="Gestión de activos de JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-03.png" alt="Diálogo de conexión SSH de JumpServer" width="49%" />
-  <img src="assets/screenshot-04.png" alt="Consulta a la IA desde el terminal de JumpServer" width="49%" />
+  <img src="assets/screenshot-03.png" alt="Diálogo de conexión SSH de JumpServer" title="Diálogo de conexión SSH de JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Consulta a la IA desde el terminal de JumpServer" title="Consulta a la IA desde el terminal de JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="Asistente de IA de JumpServer" width="49%" />
-  <img src="assets/screenshot-06.png" alt="Sesión de escritorio remoto de JumpServer" width="49%" />
+  <img src="assets/screenshot-05.png" alt="Asistente de IA de JumpServer" title="Asistente de IA de JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Sesión de escritorio remoto de JumpServer" title="Sesión de escritorio remoto de JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="Panel de activos del terminal de JumpServer en tema claro" width="49%" />
-  <img src="assets/screenshot-08.png" alt="Sesión SSH de JumpServer en tema claro" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-09.png" alt="Panel de activos del terminal de JumpServer en tema oscuro" width="49%" />
-  <img src="assets/screenshot-10.png" alt="Sesión SSH de JumpServer en tema oscuro" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## Componentes
