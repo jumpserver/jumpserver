@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiTypes
 from rest_framework import status
 
 from common.api.generic import JMSBulkModelViewSet
@@ -17,7 +18,7 @@ from rbac.permissions import RBACPermission
 from ..const import Scope
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
-from ..serializers.playbook import PlaybookSerializer
+from ..serializers.playbook import PlaybookSerializer, PlaybookFileCreateSerializer, PlaybookFileUpdateSerializer
 
 __all__ = ["PlaybookViewSet", "PlaybookFileBrowserAPIView"]
 
@@ -31,6 +32,10 @@ def unzip_playbook(src, dest):
     safe_extract_zip(src, dest)
 
 
+@extend_schema_view(
+    create=extend_schema(parameters=[OpenApiParameter('clone_from', OpenApiTypes.UUID)]),
+    list=extend_schema(parameters=[OpenApiParameter('only_mine', OpenApiTypes.BOOL)]),
+)
 class PlaybookViewSet(JMSBulkModelViewSet):
     serializer_class = PlaybookSerializer
     permission_classes = (RBACPermission, IsOwnerOrAdminWritable)
@@ -110,6 +115,12 @@ class PlaybookViewSet(JMSBulkModelViewSet):
                 f.write('## write your playbook here')
 
 
+@extend_schema_view(
+    get=extend_schema(parameters=[OpenApiParameter('key', str), OpenApiParameter('expand', str)]),
+    post=extend_schema(request=PlaybookFileCreateSerializer),
+    patch=extend_schema(request=PlaybookFileUpdateSerializer),
+    delete=extend_schema(parameters=[OpenApiParameter('key', str, required=True)]),
+)
 class PlaybookFileBrowserAPIView(APIView):
     permission_classes = (RBACPermission,)
     rbac_perms = {
