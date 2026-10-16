@@ -22,7 +22,7 @@
 
 JumpServer là nền tảng quản lý truy cập đặc quyền (PAM) mã nguồn mở có tích hợp AI. Nền tảng cung cấp cho các nhóm DevOps và CNTT một không gian làm việc thống nhất để truy cập an toàn vào SSH, RDP, Kubernetes, cơ sở dữ liệu, trang web, RemoteApp, VirtualApp và nhiều tài nguyên khác.
 
-<img alt="Sơ đồ kiến trúc JumpServer" src="assets/jumpserver-architecture.png" />
+<img alt="Sơ đồ kiến trúc JumpServer" src="assets/jumpserver-architecture.gif" />
 
 ## Bắt đầu nhanh
 

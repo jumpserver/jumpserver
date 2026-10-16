@@ -22,7 +22,7 @@
 
 JumpServer 是具备 AI 能力的开源特权访问管理（PAM）平台，为 DevOps 和 IT 团队提供统一的工作空间，安全访问 SSH、RDP、Kubernetes、数据库、网站、RemoteApp、VirtualApp 等资源。
 
-<img alt="JumpServer 架构图" src="assets/jumpserver-architecture.png" />
+<img alt="JumpServer 架构图" src="assets/jumpserver-architecture.gif" />
 
 ## 快速开始
 
