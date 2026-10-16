@@ -21,7 +21,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin, W
     assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True, required=False)
     nodes = ObjectRelatedField(label=_('Nodes'), queryset=Node.objects, many=True, required=False)
     variable = JobVariableSerializer(many=True, required=False, allow_null=True, label=_('Variable'))
-    parameters = serializers.JSONField(label=_('Parameters'), default={}, write_only=True, required=False,
+    parameters = serializers.DictField(label=_('Parameters'), default=dict, write_only=True, required=False,
                                        allow_null=True)
 
     def to_internal_value(self, data):
@@ -87,6 +87,7 @@ class JobTaskStopSerializer(serializers.Serializer):
 
 
 class JobExecutionSerializer(BulkOrgResourceModelSerializer):
+    parameters = serializers.DictField(label=_('Parameters'), required=False, default=dict)
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     job_type = serializers.ReadOnlyField(source='get_job_type_display', label=_("Job type"))
     material = serializers.ReadOnlyField(label=_("Command"))
