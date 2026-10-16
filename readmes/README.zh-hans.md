@@ -32,7 +32,7 @@ JumpServer 是具备 AI 能力的开源特权访问管理（PAM）平台，为 D
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-在浏览器中访问 JumpServer： `http://your-jumpserver-ip/`
+在浏览器中打开 `https://<jumpserver-host>/`，将 `<jumpserver-host>` 替换为运行 JumpServer 的主机 IP 地址或域名。
 
 - 用户名: `admin`
 - 密码: `ChangeMe`

@@ -32,7 +32,7 @@ JumpServer — платформа управления привилегиров�
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Откройте JumpServer в браузере по адресу `http://your-jumpserver-ip/`
+Откройте `https://<jumpserver-host>/` в браузере, заменив `<jumpserver-host>` на IP-адрес или доменное имя хоста, на котором работает JumpServer.
 
 - Имя пользователя: `admin`
 - Пароль: `ChangeMe`

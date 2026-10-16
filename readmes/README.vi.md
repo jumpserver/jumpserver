@@ -32,7 +32,7 @@ Chuẩn bị một máy chủ Linux 64 bit mới, có ít nhất 4 nhân CPU và
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Mở JumpServer trong trình duyệt tại `http://your-jumpserver-ip/`
+Mở `https://<jumpserver-host>/` trong trình duyệt và thay `<jumpserver-host>` bằng địa chỉ IP hoặc tên miền của máy chủ đang chạy JumpServer.
 
 - Tên đăng nhập: `admin`
 - Mật khẩu: `ChangeMe`

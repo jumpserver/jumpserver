@@ -32,7 +32,7 @@ Prepare un servidor Linux de 64 bits limpio, con al menos 4 núcleos de CPU y 8 
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-Abra JumpServer en el navegador en `http://your-jumpserver-ip/`
+Abra `https://<jumpserver-host>/` en el navegador y sustituya `<jumpserver-host>` por la dirección IP o el nombre de dominio del host donde se ejecuta JumpServer.
 
 - Usuario: `admin`
 - Contraseña: `ChangeMe`
