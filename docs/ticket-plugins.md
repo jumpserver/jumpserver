@@ -127,10 +127,10 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 `view_secret` 审批完成后，handler 只创建数据库中的 `TicketSecretAccess` 授权，绑定工单、账号 UUID、申请人、组织与过期时间。详情的 `available_actions` 只向符合条件的申请人展示查看按钮；点击时专用账号 API 重新检查工单状态、授权时效、组织成员、账号有效性及全局禁止查看密码配置。若启用了查看密码 MFA 设置，专用 API 仍要求 MFA。密码从当前账号读取，不写入工单、事件、缓存或访问链接；审批后轮换密码时读到的是新密码。授权记录是唯一的权威状态，未来可加短时缓存加速，但撤销、过期和全局禁止策略必须保持实时有效。
 
-`tickets.0016_merge_ticket_models` 将四种旧多表继承工单的业务字段和关联 UUID 搬入通用 `request_data`，再删除子表。连接令牌的 `from_ticket` 先由 `authentication.0011_connection_token_ticket` 改为指向 `Ticket`，原 ID 不变。部署时后端与 Lina 需同时切换；旧的四类专用工单地址不再提供。
+`tickets.0010_ticket_workflow_refactor` 将四种旧多表继承工单的业务字段和关联 UUID 搬入通用 `request_data`，再删除子表。连接令牌的 `from_ticket` 先由 `authentication.0012_connection_token_ticket` 改为指向 `Ticket`，原 ID 不变。部署时后端与 Lina 需同时切换；旧的四类专用工单地址不再提供。
 
 ## 部署和验证
 
-需要部署后端及 Lina，并执行 `tickets.0013_ticket_plugins`、`tickets.0014_workflow_cc_nodes`、`tickets.0015_ticket_origin`、`authentication.0011_connection_token_ticket`、`tickets.0016_merge_ticket_models`、`tickets.0017_single_asset_beneficiary` 和 `tickets.0018_ticket_secret_access` 迁移。`0017` 增加代申请权限并为历史资产授权工单补建授权用户关联；`0018` 增加密码查看授权表。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。为新增类型创建并发布流程后，用户才能提交该类申请。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
+需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0032_workflow_foundation`、`users.0008_ticket_workflow_integration` 和 `acls.0007_ticket_workflow_integration`。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。为新增类型创建并发布流程后，用户才能提交该类申请。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
 
 在 `tickets.tests.settings` 隔离环境运行 `tickets.tests.test_plugins` 及既有工作流测试。历史迁移和并发测试使用文档 `ticket-workflow-refactor.md` 中的独立 PostgreSQL 测试库，避免 SQLite 的 schema editor 限制。

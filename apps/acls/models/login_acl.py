@@ -45,7 +45,7 @@ class LoginACL(UserBaseACL):
             'type': const.TicketType.login_confirm,
             'request_data': {
                 'apply_login_ip': login_ip,
-                'apply_login_city': login_city,
+                'apply_login_city': str(login_city),
                 'apply_login_datetime': login_datetime.isoformat(),
             },
         }

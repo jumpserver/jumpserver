@@ -80,7 +80,10 @@ class WorkflowInstanceViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         qs = WorkflowInstance.objects.select_related('version').all()
-        if not self.request.user.has_perm('tickets.view_workflowinstance'):
+        if not current_org.is_root():
+            qs = qs.filter(org_id=str(current_org.id))
+        if not (self.request.user.has_perm('tickets.view_workflowinstance') or
+                self.request.user.has_perm('audits.view_ticketaudit')):
             qs = qs.filter(Q(applicant=self.request.user) | Q(node_instances__tasks__assignee=self.request.user) |
                            Q(ticket__cc_users=self.request.user) |
                            Q(ticket__beneficiaries__user=self.request.user)).distinct()

@@ -4,7 +4,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.db import transaction
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -18,7 +18,7 @@ from orgs.utils import tmp_to_org, tmp_to_root_org
 from perms.models import AssetPermission
 from terminal.models import Session
 from tickets.api.workflow import WorkflowViewSet, WorkflowInstanceViewSet, ApprovalTaskViewSet
-from tickets.models import ApplyAssetTicket, Ticket, TicketStep, TicketAssignee, Workflow, WorkflowInstance, ApprovalTask
+from tickets.models import Ticket, TicketStep, TicketAssignee, Workflow, WorkflowInstance, ApprovalTask
 from tickets.serializers.ticket.apply_asset import ApplyAssetSerializer
 from tickets.tests import test_workflow as fixtures
 from tickets.tests.test_workflow import approval_definition
@@ -58,14 +58,16 @@ class WorkflowBusinessTests(TestCase):
         return flow
 
     def ticket(self, workflow=None, **kwargs):
-        ticket = ApplyAssetTicket.objects.create(
-            title='Access request', applicant=self.applicant, org_id=self.org.id,
-            workflow=workflow or self.workflow(), apply_permission_name=str(uuid4()),
-            apply_accounts=['root'], apply_actions=2, apply_date_start=timezone.now(),
-            apply_date_expired=timezone.now() + timedelta(hours=2), **kwargs,
+        return Ticket.objects.create(
+            type='apply_asset', title='Access request', applicant=self.applicant, org_id=self.org.id,
+            workflow=workflow or self.workflow(), request_data={
+                'apply_permission_name': str(uuid4()), 'apply_nodes': [str(self.node.pk)],
+                'apply_accounts': ['root'], 'apply_actions': 2,
+                'apply_date_start': timezone.now().isoformat(),
+                'apply_date_expired': (timezone.now() + timedelta(hours=2)).isoformat(),
+                'apply_expire_soon_notice_minutes': None,
+            }, **kwargs,
         )
-        ticket.apply_nodes.add(self.node)
-        return ticket
 
     def task(self, instance, user=None):
         return ApprovalTask.objects.get(node_instance__instance=instance, assignee=user or self.alice, state='pending')
@@ -77,7 +79,8 @@ class WorkflowBusinessTests(TestCase):
         self.engine.approve(self.task(instance), self.alice)
         self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
         self.later_asset.nodes.add(self.node)
-        ApplyAssetTicket.objects.filter(pk=ticket.pk).update(apply_accounts=['administrator'], apply_actions=128)
+        Ticket.objects.filter(pk=ticket.pk).update(
+            request_data={**ticket.request_data, 'apply_accounts': ['administrator'], 'apply_actions': 128})
         self.engine.approve(self.task(instance), self.alice)
         ticket.refresh_from_db()
         self.assertEqual((ticket.state, ticket.status), ('approved', 'closed'))
@@ -151,7 +154,8 @@ class WorkflowBusinessTests(TestCase):
         self.assertFalse(ticket.ticket_steps.exists())
 
     def test_login_asset_acl_activates_connection_token(self):
-        ticket = LoginAssetACL.create_login_asset_review_ticket(
+        acl = LoginAssetACL.objects.create(name='Asset review', action='review', review_duration=2)
+        ticket = acl.create_login_asset_review_ticket(
             self.applicant, self.asset, 'root', [self.alice], self.org.id,
             workflow=self.workflow('login_asset_confirm'),
         )
@@ -306,19 +310,20 @@ class WorkflowBusinessTests(TestCase):
         self.assertEqual(acl.workflow_id, workflow.pk)
         self.assertEqual(serializer.data['workflow'], str(workflow.pk))
 
-    def test_all_ticket_serializers_expose_instance_and_exact_tasks(self):
-        from tickets.serializers import TicketSerializer, LoginAssetReviewSerializer
-        ticket = LoginAssetACL.create_login_asset_review_ticket(self.applicant, self.asset, 'root', [self.alice], self.org.id)
+    def test_ticket_serializer_exposes_instance_and_exact_tasks(self):
+        from tickets.serializers import TicketSerializer
+        acl = LoginAssetACL.objects.create(name='Asset review', action='review', review_duration=2)
+        ticket = acl.create_login_asset_review_ticket(self.applicant, self.asset, 'root', [self.alice], self.org.id)
         context = {'request': SimpleNamespace(user=self.alice)}
-        for serializer in [TicketSerializer, LoginAssetReviewSerializer]:
-            data = serializer(ticket, context=context).data
-            self.assertEqual(data['workflow_instance'], str(WorkflowInstance.objects.get(ticket=ticket).pk))
-            self.assertEqual(len(data['my_tasks']), 1)
-            self.assertEqual(str(data['workflow']['id']), str(ticket.workflow_id))
+        data = TicketSerializer(ticket, context=context).data
+        self.assertEqual(data['workflow_instance'], str(WorkflowInstance.objects.get(ticket=ticket).pk))
+        self.assertEqual(len(data['my_tasks']), 1)
+        self.assertEqual(str(data['workflow']['id']), str(ticket.workflow_id))
 
     def test_invalid_legacy_pending_ticket_is_closed_without_effects(self):
         ticket = self.ticket()
-        ticket.apply_nodes.clear()
+        ticket.request_data['apply_nodes'] = []
+        ticket.save(update_fields=['request_data'])
         step = TicketStep.objects.create(ticket=ticket, state='pending', status='active')
         TicketAssignee.objects.create(step=step, assignee=self.alice)
         result, warnings = import_ticket(ticket.pk, apply=True)
@@ -329,21 +334,23 @@ class WorkflowBusinessTests(TestCase):
         self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
 
     def test_submit_endpoint_is_atomic_and_old_decision_endpoint_disabled(self):
-        from tickets.api.ticket import ApplyAssetTicketViewSet
+        from tickets.api.ticket import TicketViewSet
         workflow = self.workflow()
-        payload = {'title': 'API request', 'workflow_id': str(workflow.pk), 'org_id': self.org.id,
-                   'apply_assets': [str(self.asset.pk)], 'apply_accounts': ['root'], 'apply_actions': ['connect'],
-                   'apply_date_start': timezone.now(), 'apply_date_expired': timezone.now() + timedelta(hours=1)}
-        response = self.api_request(ApplyAssetTicketViewSet, 'open', self.applicant, data=payload, method='post', can_audit=True)
+        payload = {'type': 'apply_asset', 'title': 'API request', 'workflow_id': str(workflow.pk), 'org_id': self.org.id,
+                   'request_data': {
+                       'apply_assets': [str(self.asset.pk)], 'apply_accounts': ['root'], 'apply_actions': ['connect'],
+                       'apply_date_start': timezone.now(), 'apply_date_expired': timezone.now() + timedelta(hours=1),
+                   }}
+        response = self.api_request(TicketViewSet, 'open', self.applicant, data=payload, method='post', can_audit=True)
         self.assertEqual(response.status_code, 201, response.data)
-        ticket = ApplyAssetTicket.objects.get(pk=response.data['id'])
+        ticket = Ticket.objects.get(pk=response.data['id'])
         self.assertEqual(response.data['workflow_instance'], str(ticket.workflow_instance.pk))
-        denied = self.api_request(ApplyAssetTicketViewSet, 'approve', self.alice, pk=ticket.pk, method='put', data={'apply_accounts': ['administrator']})
+        denied = self.api_request(TicketViewSet, 'approve', self.alice, pk=ticket.pk, method='put', data={'apply_accounts': ['administrator']})
         self.assertEqual(denied.status_code, 405, denied.data)
         invalid = self.workflow(approvers={'type': 'asset_owner'})
         Asset.objects.filter(pk=self.asset.pk).update(owner=None)
         previous = Ticket.objects.count()
-        response = self.api_request(ApplyAssetTicketViewSet, 'open', self.applicant, data={**payload, 'workflow_id': str(invalid.pk)}, method='post', can_audit=True)
+        response = self.api_request(TicketViewSet, 'open', self.applicant, data={**payload, 'workflow_id': str(invalid.pk)}, method='post', can_audit=True)
         self.assertEqual(response.status_code, 400, response.data)
         self.assertEqual(Ticket.objects.count(), previous)
 
@@ -352,8 +359,8 @@ class WorkflowBusinessTests(TestCase):
         from tickets.workflow.conditions import evaluate_condition
         Account.objects.create(asset=self.asset, name='root', username='root', secret='workflow-test-secret')
         ticket = self.ticket()
-        ticket.apply_accounts = ['@ALL']
-        ticket.save(update_fields=['apply_accounts'])
+        ticket.request_data['apply_accounts'] = ['@ALL']
+        ticket.save(update_fields=['request_data'])
         instance = submit_ticket(ticket)
         self.assertTrue(evaluate_condition({'field': 'account.username', 'operator': 'eq', 'value': 'root'}, instance.context))
         import json
@@ -365,8 +372,81 @@ class WorkflowBusinessTests(TestCase):
     def test_manual_username_cannot_skip_username_policy(self):
         from tickets.workflow.conditions import evaluate_condition
         ticket = self.ticket()
-        ticket.apply_accounts = ['@INPUT']
-        ticket.save(update_fields=['apply_accounts'])
+        ticket.request_data['apply_accounts'] = ['@INPUT']
+        ticket.save(update_fields=['request_data'])
         instance = submit_ticket(ticket)
         with self.assertRaises(WorkflowConfigurationError):
             evaluate_condition({'field': 'account.username', 'operator': 'eq', 'value': 'root'}, instance.context)
+
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}})
+    def test_login_exemption_starts_only_after_final_commit(self):
+        from django.core.cache import cache
+        cache.clear()
+        acl = LoginAssetACL.objects.create(name='Two approvals', action='review', review_duration=2)
+        ticket = acl.create_login_asset_review_ticket(
+            self.applicant, self.asset, 'root', [], self.org.id,
+            workflow=self.workflow('login_asset_confirm', levels=2),
+        )
+        instance = WorkflowInstance.objects.get(ticket=ticket)
+        self.assertNotIn('login_asset_review', instance.context)
+        with self.captureOnCommitCallbacks(execute=True):
+            self.engine.approve(self.task(instance), self.alice)
+        self.assertFalse(acl.is_review_exempt(self.applicant, self.asset, 'root'))
+        with self.captureOnCommitCallbacks(execute=True):
+            self.engine.approve(self.task(instance), self.alice)
+            self.assertFalse(acl.is_review_exempt(self.applicant, self.asset, 'root'))
+        self.assertTrue(acl.is_review_exempt(self.applicant, self.asset, 'root'))
+        self.assertFalse(acl.is_review_exempt(self.applicant, self.asset, 'admin'))
+        acl.review_duration = 0
+        acl.save(update_fields=['review_duration'])
+        self.assertFalse(acl.is_review_exempt(self.applicant, self.asset, 'root'))
+
+    def test_auditor_can_read_ticket_and_events_only_in_authorized_org(self):
+        from audits.api import TicketAuditViewSet
+        from rbac.models import Permission, Role, RoleBinding
+        from tickets.api.ticket import TicketViewSet
+        ticket = self.ticket()
+        instance = submit_ticket(ticket)
+        permission = Permission.objects.get(content_type__app_label='audits', codename='view_ticketaudit')
+        role = Role.objects.create(name='Ticket auditor', scope='org')
+        role.permissions.add(permission)
+        RoleBinding.objects_raw.create(user=self.carol, role=role, org=self.org, scope='org')
+        self.carol.expire_rbac_perms_cache()
+
+        def request(view, action, pk=None, method='get', data=None):
+            user = User.objects.get(pk=self.carol.pk)
+            req = getattr(APIRequestFactory(), method)('/api/v1/tickets/', data or {}, format='json')
+            force_authenticate(req, user)
+            return view.as_view({method: action}, **getattr(getattr(view, action), 'kwargs', {}))(
+                req, **({'pk': str(pk)} if pk else {}))
+
+        self.assertEqual(request(TicketAuditViewSet, 'list').status_code, 200)
+        detail = request(TicketViewSet, 'retrieve', ticket.pk)
+        self.assertEqual(detail.status_code, 200, detail.data)
+        self.assertEqual(detail.data['my_tasks'], [])
+        self.assertEqual(detail.data['available_actions'], [])
+        self.assertEqual(request(WorkflowInstanceViewSet, 'retrieve', instance.pk).status_code, 200)
+        self.assertEqual(request(WorkflowInstanceViewSet, 'events', instance.pk).status_code, 200)
+        self.assertEqual(request(ApprovalTaskViewSet, 'approve', self.task(instance).pk, 'post').status_code, 404)
+        self.assertEqual(request(WorkflowInstanceViewSet, 'cancel', instance.pk, 'post').status_code, 403)
+
+        with tmp_to_org(self.other_org):
+            other = Ticket.objects.create(type='general', title='Other organization', applicant=self.outsider)
+            own = Ticket.objects.create(type='general', title='Own request elsewhere', applicant=self.carol)
+        self.assertEqual(request(TicketViewSet, 'retrieve', other.pk).status_code, 404)
+        self.assertEqual(request(TicketViewSet, 'retrieve', own.pk).status_code, 200)
+        report = request(TicketAuditViewSet, 'list', data={'format': 'xlsx', 'export_mode': 'report'})
+        self.assertEqual(report.status_code, 200)
+        from io import BytesIO
+        from openpyxl import load_workbook
+        workbook = load_workbook(BytesIO(report.content), read_only=True)
+        cells = [str(cell) for sheet in workbook for row in sheet.values for cell in row]
+        workbook.close()
+        self.assertIn(ticket.title, cells)
+        self.assertNotIn(other.title, cells)
+        self.assertNotIn(own.title, cells)
+
+        with tmp_to_org(self.other_org):
+            self.assertIn(request(TicketViewSet, 'retrieve', ticket.pk).status_code, (403, 404))
+            self.assertEqual(request(WorkflowInstanceViewSet, 'retrieve', instance.pk).status_code, 404)
+            self.assertEqual(request(WorkflowInstanceViewSet, 'events', instance.pk).status_code, 404)

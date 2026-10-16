@@ -31,7 +31,7 @@ class TicketFlowApproveSerializerTestCase(SimpleTestCase):
 
         self.assertFalse(serializer.is_valid())
         self.assertIn('users', serializer.errors)
-        self.assertIn('No approvers matched', str(serializer.errors['users']))
+        self.assertEqual(serializer.errors['users'][0].code, 'invalid')
         get_assignees.assert_called_once_with(org_id=get_current_org_id.return_value)
 
     @patch('tickets.serializers.flow.get_current_org_id')

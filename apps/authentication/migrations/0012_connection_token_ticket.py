@@ -4,8 +4,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('authentication', '0010_connectiontoken_personal_credential_id'),
-        ('tickets', '0015_ticket_origin'),
+        ('authentication', '0011_connectiontoken_date_last_used'),
+        ('tickets', '0009_ticketassignee_assignee_display_and_more'),
     ]
 
     operations = [
