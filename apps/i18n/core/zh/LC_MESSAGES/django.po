@@ -16043,3 +16043,25 @@ msgstr "连接资产 %s 成功（已通过 SSH 网关转发）"
 #, python-format
 msgid "Connect to asset %s success (SSH gateway forwarding; configured gateways: %s)"
 msgstr "连接资产 %s 成功（已通过 SSH 网关转发；配置网关：%s）"
+
+#: authentication/notifications.py
+msgid "Login failure alert"
+msgstr "登录失败告警"
+
+#: authentication/notifications.py
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "Lockout type"
+msgstr "锁定类型"
+
+#: authentication/notifications.py
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "Lockout duration (minutes)"
+msgstr "锁定时长（分钟）"
+
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "The maximum number of failed login attempts has been reached. Login has been temporarily blocked."
+msgstr "登录失败次数已达到上限，登录已被临时锁定。"
+
+#: authentication/templates/authentication/_msg_login_blocked.html
+msgid "Please review the login logs and check for suspicious activity."
+msgstr "请查看登录日志，排查是否存在可疑活动。"

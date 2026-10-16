@@ -6,7 +6,8 @@ from common.utils import get_logger, get_request_ip
 from common.utils.timezone import local_now_display
 from common.views.template import custom_render_to_string
 from jumpserver.utils import get_current_request
-from notifications.notifications import UserMessage
+from notifications.backends import BACKEND
+from notifications.notifications import SystemMessage, UserMessage
 
 logger = get_logger(__file__)
 
@@ -35,6 +36,67 @@ def publish_credential_created(user, credential_type, identifier='', request=Non
     transaction.on_commit(lambda: CredentialCreatedMessage(
         user, credential_type, identifier, remote_addr
     ).publish_async())
+
+
+def publish_login_blocked(block_type, username, ip, count, lock_minutes):
+    try:
+        LoginBlockedMessage(block_type, username, ip, count, lock_minutes).publish_async()
+    except Exception:
+        logger.exception('Failed to publish login failure alert')
+
+
+class LoginBlockedMessage(SystemMessage):
+    category = 'Authentication'
+    category_label = _('Authentication')
+    message_type_label = _('Login failure alert')
+    subject = message_type_label
+    template_name = 'authentication/_msg_login_blocked.html'
+    contexts = [
+        {"name": "block_type", "label": _('Lockout type'), "default": "User"},
+        {"name": "username", "label": _('Username'), "default": "john"},
+        {"name": "ip", "label": _('IP'), "default": "192.0.2.10"},
+        {"name": "count", "label": _('Login failures count'), "default": 7},
+        {"name": "lock_minutes", "label": _('Lockout duration (minutes)'), "default": 30},
+        {"name": "time", "label": _('Time'), "default": "2025-01-01 12:00:00"},
+    ]
+
+    def __init__(self, block_type, username, ip, count, lock_minutes):
+        self.block_type = block_type
+        self.username = username
+        self.ip = ip
+        self.count = count
+        self.lock_minutes = lock_minutes
+        self.time = local_now_display()
+
+    def get_html_msg(self):
+        block_types = {'user': _('User'), 'ip': _('IP'), 'mfa': _('MFA')}
+        context = {
+            'block_type': block_types[self.block_type],
+            'username': self.username,
+            'ip': self.ip,
+            'count': self.count,
+            'lock_minutes': self.lock_minutes,
+            'time': self.time,
+        }
+        return {
+            'subject': str(self.subject),
+            'message': custom_render_to_string(self.template_name, context),
+        }
+
+    @classmethod
+    def post_insert_to_db(cls, subscription):
+        from rbac.models import Role, RoleBinding
+        from users.models import User
+
+        admin_role = Role.BuiltinRole.system_admin.get_role()
+        admin_ids = RoleBinding.objects.filter(role=admin_role).values_list('user_id', flat=True)
+        subscription.users.add(*User.objects.filter(id__in=admin_ids))
+        subscription.receive_backends = [BACKEND.EMAIL]
+        subscription.save()
+
+    @classmethod
+    def gen_test_msg(cls):
+        return cls('user', 'john', '192.0.2.10', 7, 30)
 
 
 class CredentialCreatedMessage(UserMessage):
