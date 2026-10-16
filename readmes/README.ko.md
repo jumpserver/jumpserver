@@ -32,7 +32,7 @@ CPU 코어 4개 이상, 메모리 8 GB 이상을 갖춘 깨끗한 64비트 Linux
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-브라우저에서 JumpServer에 접속하세요: `http://your-jumpserver-ip/`
+브라우저에서 `https://<jumpserver-host>/`을 열고, `<jumpserver-host>`을 JumpServer가 실행 중인 호스트의 IP 주소 또는 도메인 이름으로 바꾸세요.
 
 - 사용자 이름: `admin`
 - 비밀번호: `ChangeMe`
