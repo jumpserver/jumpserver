@@ -22,7 +22,7 @@
 
 JumpServer — платформа управления привилегированным доступом (PAM) с открытым исходным кодом и возможностями ИИ. Она предоставляет командам DevOps и ИТ единое рабочее пространство для безопасного доступа к SSH, RDP, Kubernetes, базам данных, веб-сайтам, RemoteApp, VirtualApp и другим ресурсам.
 
-<img alt="Схема архитектуры JumpServer" src="assets/jumpserver-architecture.png" />
+<img alt="Схема архитектуры JumpServer" src="assets/jumpserver-architecture.gif" />
 
 ## Быстрый старт
 
