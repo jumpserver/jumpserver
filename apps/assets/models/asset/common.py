@@ -43,6 +43,7 @@ SUPPORTED_ICON_SKINS = {
     'sqlserver',
     'db2',
     'dameng',
+    'oceanbase',
     'website',
     'chatgpt',
     'clickhouse',

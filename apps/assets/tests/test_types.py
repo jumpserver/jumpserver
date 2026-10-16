@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from assets.const.host import HostTypes
+from assets.const.database import DatabaseTypes
 from assets.const.types import AllTypes
 
 
@@ -78,4 +79,21 @@ class HostTypesInternalPlatformsTestCase(SimpleTestCase):
         self.assertEqual(
             virtual_app_host['automation']['ansible_config'],
             {'ansible_connection': 'ssh'},
+        )
+
+
+class OceanBaseTypeTestCase(SimpleTestCase):
+    def test_oceanbase_is_enterprise_only_and_uses_mysql_wire(self):
+        self.assertNotIn(DatabaseTypes.OCEANBASE, DatabaseTypes.get_community_types())
+        self.assertEqual(
+            DatabaseTypes._get_protocol_constrains()[DatabaseTypes.OCEANBASE],
+            {'choices': ['mysql']},
+        )
+
+    def test_internal_platforms_select_tenant_mode_explicitly(self):
+        platforms = DatabaseTypes.internal_platforms()[DatabaseTypes.OCEANBASE]
+        self.assertEqual([p['name'] for p in platforms], ['OceanBase-MySQL', 'OceanBase-Oracle'])
+        self.assertEqual(
+            [p['protocols_setting']['mysql']['tenant_mode'] for p in platforms],
+            ['mysql', 'oracle'],
         )
