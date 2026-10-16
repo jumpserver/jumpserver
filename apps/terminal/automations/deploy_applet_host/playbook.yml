@@ -95,6 +95,26 @@
           retries: 30
           delay: 10
 
+        - name: Read the NLA Group Policy setting
+          ansible.windows.win_reg_stat:
+            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+            name: UserAuthentication
+          register: nla_policy
+
+        - name: Check that Group Policy permits disabling NLA
+          ansible.builtin.assert:
+            that:
+              - not nla_policy.exists or (nla_policy.type == 'REG_DWORD' and nla_policy.value == 0)
+            fail_msg: Disable the Require user authentication using NLA policy for this host, apply it, and redeploy.
+
+        - name: Disable NLA for the RDP-Tcp listener
+          ansible.windows.win_regedit:
+            path: HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp
+            name: UserAuthentication
+            data: 0
+            type: dword
+            state: present
+
         # The new installer ends Tinker-managed sessions, uninstalls the old
         # Tinker and clears its managed runtime state before installing afresh.
         # Ordinary administrator sessions and installed applications are retained.
@@ -197,21 +217,14 @@
           retries: 30
           delay: 5
 
-        - name: Record running services that depend on Remote Desktop Services
-          ansible.windows.win_powershell:
-            script: |
-              $ErrorActionPreference = 'Stop'
-              $Ansible.Changed = $false
-              function Get-RunningDependents($Service) {
-                  foreach ($dependent in $Service.DependentServices) {
-                      if ($dependent.Status -eq 'Running') {
-                          $dependent.Name
-                          Get-RunningDependents $dependent
-                      }
-                  }
-              }
-              $Ansible.Result = @{ Running = @(Get-RunningDependents (Get-Service -Name TermService)) }
-          register: rdp_dependents
+        # Installation/startup may replace the pre-install listener setting.
+        - name: Persist the disabled NLA setting before refreshing Remote Desktop Services
+          ansible.windows.win_regedit:
+            path: HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp
+            name: UserAuthentication
+            data: 0
+            type: dword
+            state: present
 
         # Restart exactly once. Only the read-only readiness check below retries.
         - name: Refresh Remote Desktop Services after Tinker is ready
@@ -222,11 +235,10 @@
           async: 120
           poll: 5
 
-        - name: Restore Remote Desktop dependent services
+        - name: Ensure Remote Desktop Services UserMode Port Redirector is running
           ansible.windows.win_service:
-            name: "{{ item }}"
+            name: UmRdpService
             state: started
-          loop: "{{ (rdp_dependents.result.Running + ['UmRdpService']) | unique }}"
 
         - name: Verify NLA and RDP listener after the service refresh
           ansible.windows.win_powershell:
