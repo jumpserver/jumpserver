@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -40,28 +40,28 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 ## Снимки экрана
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="Панель PAM JumpServer" width="49%" />
-  <img src="assets/screenshot-02.png" alt="Управление активами JumpServer" width="49%" />
+  <img src="assets/screenshot-01.png" alt="Панель PAM JumpServer" title="Панель PAM JumpServer" width="49%" />
+  <img src="assets/screenshot-02.png" alt="Управление активами JumpServer" title="Управление активами JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-03.png" alt="Диалог подключения по SSH в JumpServer" width="49%" />
-  <img src="assets/screenshot-04.png" alt="Запрос к ИИ из терминала JumpServer" width="49%" />
+  <img src="assets/screenshot-03.png" alt="Диалог подключения по SSH в JumpServer" title="Диалог подключения по SSH в JumpServer" width="49%" />
+  <img src="assets/screenshot-04.png" alt="Запрос к ИИ из терминала JumpServer" title="Запрос к ИИ из терминала JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="ИИ-ассистент JumpServer" width="49%" />
-  <img src="assets/screenshot-06.png" alt="Сеанс удалённого рабочего стола JumpServer" width="49%" />
+  <img src="assets/screenshot-05.png" alt="ИИ-ассистент JumpServer" title="ИИ-ассистент JumpServer" width="49%" />
+  <img src="assets/screenshot-06.png" alt="Сеанс удалённого рабочего стола JumpServer" title="Сеанс удалённого рабочего стола JumpServer" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="Панель активов терминала JumpServer в светлой теме" width="49%" />
-  <img src="assets/screenshot-08.png" alt="Сеанс SSH JumpServer в светлой теме" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-09.png" alt="Панель активов терминала JumpServer в тёмной теме" width="49%" />
-  <img src="assets/screenshot-10.png" alt="Сеанс SSH JumpServer в тёмной теме" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## Компоненты
