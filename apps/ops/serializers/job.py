@@ -79,6 +79,12 @@ class FileSerializer(serializers.Serializer):
         ref_name = "JobFileSerializer"
 
 
+class JobExecutionResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobExecution
+        fields = read_only_fields = ['id', 'result']
+
+
 class JobTaskStopSerializer(serializers.Serializer):
     task_id = serializers.CharField(max_length=128)
 

@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -28,13 +29,13 @@ from ops.filters import JobExecutionFilterSet, JobFilterSet
 from ops.models import Job, JobExecution, JMSPermedInventory
 from ops.models.job import check_upload_permission, match_rejected_login_asset_acl
 from ops.serializers.job import (
-    JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
+    JobSerializer, JobExecutionSerializer, JobExecutionResultSerializer, FileSerializer, JobTaskStopSerializer
 )
 from ops.utils import merge_nodes_and_assets
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI',
-    'ClassifiedHostsAPI'
+    'ClassifiedHostsAPI', 'JobExecutionResultAPIView'
 ]
 
 from ops.tasks import run_ops_job_execution
@@ -305,6 +306,22 @@ class JobExecutionTaskDetail(APIView):
             'job_id': execution.job.id,
             'summary': execution.summary
         })
+
+
+class JobExecutionResultAPIView(RetrieveAPIView):
+    """Read the stored per-host result of an execution owned by the caller."""
+
+    serializer_class = JobExecutionResultSerializer
+    perm_model = JobExecution
+    rbac_perms = {'GET': ['ops.view_jobexecution']}
+
+    def get_object(self):
+        with tmp_to_org(get_current_org()):
+            execution = get_object_or_404(
+                JobExecution, pk=str(self.kwargs['task_id']), creator=self.request.user
+            )
+        self.check_object_permissions(self.request, execution)
+        return execution
 
 
 class JobRunVariableHelpAPIView(APIView):
