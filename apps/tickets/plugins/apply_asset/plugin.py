@@ -68,6 +68,9 @@ class Plugin(TicketPlugin):
                 if supports_delegated_request(workflow.active_version)]
 
     def excluded_approver_ids(self, context, applicant_id):
+        # Only the server-side legacy importer preserves the old self-approval policy.
+        if 'legacy' in context:
+            return set()
         ids = {str(applicant_id)}
         ids.update(str(user['id']) for user in context.get('request', {}).get('users', [])
                    if isinstance(user, dict) and user.get('id'))
@@ -86,9 +89,9 @@ class Plugin(TicketPlugin):
         from perms.const import ActionChoices
         data = ticket.request_data
         instance = getattr(ticket, 'workflow_instance', None)
-        if instance:
-            context = instance.context
-            requested = context.get('request', {})
+        context = instance.context if instance else {}
+        requested = context.get('request', {})
+        if 'account_selectors' in requested:
             users = [user['name'] or user['username'] for user in requested.get('users', [])]
             assets = [f"{asset['name']} ({asset['address']})" for asset in context.get('assets', [])]
             nodes = [node['name'] for node in context.get('nodes', [])]
@@ -98,6 +101,8 @@ class Plugin(TicketPlugin):
             date_expired = requested.get('date_expired')
             notice = requested.get('expire_soon_notice_minutes')
         else:
+            # Failed legacy context capture must still display the original request.
+            relations = context.get('legacy', {}).get('rel_snapshot', ticket.rel_snapshot)
             asset_ids = data.get('apply_assets') or []
             node_ids = data.get('apply_nodes') or []
             asset_names = {str(asset.pk): f'{asset.name} ({asset.address})' for asset in Asset.objects.filter(
@@ -106,9 +111,10 @@ class Plugin(TicketPlugin):
             node_names = {str(node.pk): node.value for node in Node.objects.filter(
                 pk__in=node_ids, org_id=ticket.org_id,
             )}
-            users = data.get('apply_users', [])
-            assets = [asset_names.get(pk, pk) for pk in asset_ids]
-            nodes = [node_names.get(pk, pk) for pk in node_ids]
+            applicant = relations.get('applicant') or (str(ticket.applicant) if ticket.applicant else '')
+            users = data.get('apply_users', [applicant] if applicant else [])
+            assets = relations.get('apply_assets', [asset_names.get(pk, pk) for pk in asset_ids])
+            nodes = relations.get('apply_nodes', [node_names.get(pk, pk) for pk in node_ids])
             accounts = data.get('apply_accounts') or []
             actions = data.get('apply_actions') or 0
             date_start = data.get('apply_date_start')
