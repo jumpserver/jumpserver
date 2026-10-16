@@ -142,6 +142,7 @@ class BlockUtil:
 class BlockUtilBase:
     LIMIT_KEY_TMPL: str
     BLOCK_KEY_TMPL: str
+    block_type = 'user'
 
     def __init__(self, username, ip):
         username = username.lower() if username else ''
@@ -165,7 +166,13 @@ class BlockUtilBase:
 
         limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
         if count >= limit_count:
+            newly_blocked = cache.add(self.block_key, True, self.key_ttl)
             cache.set(self.block_key, True, self.key_ttl)
+            if newly_blocked:
+                from authentication.notifications import publish_login_blocked
+                publish_login_blocked(
+                    self.block_type, self.username, self.ip, count, self.key_ttl // 60,
+                )
         return limit_count - count
 
     def get_failed_count(self):
@@ -233,7 +240,11 @@ class BlockGlobalIpUtilBase:
         limit_count = settings.SECURITY_LOGIN_IP_LIMIT_COUNT
         if count < limit_count:
             return
+        newly_blocked = cache.add(self.block_key, True, self.key_ttl)
         cache.set(self.block_key, True, self.key_ttl)
+        if newly_blocked:
+            from authentication.notifications import publish_login_blocked
+            publish_login_blocked('ip', '', self.ip, count, self.key_ttl // 60)
 
     def clean_block_if_need(self):
         cache.delete(self.limit_key)
@@ -255,6 +266,7 @@ class LoginBlockUtil(BlockUtilBase):
 class MFABlockUtils(BlockUtilBase):
     LIMIT_KEY_TMPL = "_MFA_LIMIT_{}"
     BLOCK_KEY_TMPL = "_MFA_BLOCK_{}"
+    block_type = 'mfa'
 
 
 class LoginIpBlockUtil(BlockGlobalIpUtilBase):
