@@ -12,7 +12,7 @@ from common.sdk.im.wecom import wecom_tool
 from common.utils import get_logger, random_string, reverse
 from notifications.notifications import UserMessage
 from . import const
-from .models import Ticket, ApplyAssetTicket
+from .models import Ticket
 
 logger = get_logger(__file__)
 
@@ -102,16 +102,17 @@ class BaseTicketMessage(UserMessage):
 
     @property
     def spec_items(self):
-        fields = self.ticket._meta.local_fields + self.ticket._meta.local_many_to_many
-        excludes = ['ticket_ptr', 'flow']
-        item_names = [field.name for field in fields if field.name not in excludes]
-        return self._get_fields_items(item_names)
+        from tickets.plugins import get_ticket_plugin
+        plugin = get_ticket_plugin(self.ticket.type)
+        return [{'name': item['name'], 'title': item['label'], 'value': item['value']}
+                for item in plugin.request_items(self.ticket) if item['value'] not in (None, '', [])]
 
 
 class TicketAppliedToAssigneeMessage(BaseTicketMessage):
-    def __init__(self, user, ticket):
+    def __init__(self, user, ticket, task_id=None):
         self.token = random_string(32)
         self.ticket = ticket
+        self.task_id = str(task_id) if task_id else None
         super().__init__(user)
 
     @property
@@ -128,13 +129,9 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         return title
 
     def get_ticket_approval_url(self, external=True):
-        if isinstance(self.ticket, ApplyAssetTicket):
-            no_assets = not self.ticket.apply_assets.exists()
-            no_nodes = not self.ticket.apply_nodes.exists()
-            no_accounts = not self.ticket.apply_accounts
-
-            if (no_assets and no_nodes) or no_accounts:
-                return None
+        from tickets.plugins import get_ticket_plugin
+        if not get_ticket_plugin(self.ticket.type).allow_direct_approval(self.ticket):
+            return None
 
         url = reverse('tickets:direct-approve', kwargs={'token': self.token})
         if not external:
@@ -147,6 +144,7 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         data = {
             'ticket_id': self.ticket.id,
             'approver_id': self.user.id, 'content': self.content,
+            'task_id': self.task_id,
         }
         cache.set(self.token, data, 3600)
         return context
@@ -185,6 +183,12 @@ class TicketProcessedToApplicantMessage(BaseTicketMessage):
         user = User.objects.first()
         processor = User.objects.last()
         return cls(user, ticket, processor)
+
+
+class TicketProcessedToBeneficiaryMessage(TicketProcessedToApplicantMessage):
+    @property
+    def content_title(self):
+        return _('An asset authorization request for you has been processed')
 
 
 class TicketUpdatedToCcUserMessage(BaseTicketMessage):
