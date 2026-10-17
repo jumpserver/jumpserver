@@ -321,12 +321,13 @@ class UsernameHintsAPI(APIView):
 
     @staticmethod
     def get_permed_account_usernames(
-        user, assets, action_required, protocols_required=None,
+        user, assets, action_required, protocols_required=None, query=None,
     ):
-        return PermAssetAccountsBatchUtil(
-            user
-        ).get_permitted_account_usernames(
-            assets, action_required, protocols_required,
+        return PermAssetAccountsBatchUtil(user).get_permitted_account_usernames(
+            assets,
+            action_required,
+            protocols_required=protocols_required,
+            query=query,
         )
 
     def post(self, request, **kwargs):
@@ -349,14 +350,9 @@ class UsernameHintsAPI(APIView):
             request.user,
             assets,
             action_required,
-            protocols_required,
+            protocols_required=protocols_required,
+            query=query,
         )
-        if query:
-            query = str(query).lower()
-            usernames = [
-                username for username in usernames
-                if query in username.lower()
-            ]
 
         counts = Counter(usernames)
         top_accounts = [
