@@ -37,14 +37,15 @@ class PlaybookSerializer(ScopeSerializerMixin, CommonBulkModelSerializer, Writab
 
 
 class PlaybookFileCreateSerializer(serializers.Serializer):
-    key = serializers.CharField(required=False, allow_blank=True, help_text='Parent directory relative to the Playbook')
-    name = serializers.CharField(required=False, allow_blank=True)
+    key = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False,
+                                help_text='Parent directory relative to the Playbook')
+    name = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
     is_directory = serializers.BooleanField(required=False, default=False)
     content = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
 
 
 class PlaybookFileUpdateSerializer(serializers.Serializer):
-    key = serializers.CharField(help_text='File path relative to the Playbook')
-    new_name = serializers.CharField(required=False, allow_blank=True)
+    key = serializers.CharField(trim_whitespace=False, help_text='File path relative to the Playbook')
+    new_name = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
     is_directory = serializers.BooleanField(required=False, default=False)
     content = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
