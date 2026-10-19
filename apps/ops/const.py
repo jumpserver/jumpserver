@@ -67,6 +67,7 @@ class AdHocModules(models.TextChoices):
     postgresql = 'postgresql', _('PostgreSQL')
     sqlserver = 'sqlserver', _('SQLServer')
     oracle = 'oracle', _('Oracle')
+    dameng = 'dameng', _('Dameng')
     raw = 'raw', _('Raw')
 
 
