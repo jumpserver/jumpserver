@@ -155,6 +155,18 @@ def on_celery_task_revoked(request=None, **kwargs):
     close_old_connections()
 
 
+def _can_bind_task_creator(request):
+    if not request or not getattr(request.user, 'is_authenticated', False):
+        return False
+    match = getattr(request, 'resolver_match', None)
+    if match and getattr(match, 'url_name', None) == 'reset-password-code':
+        return False
+    path = getattr(request, 'path', '') or ''
+    if 'password/reset-code' in path:
+        return False
+    return True
+
+
 @signals.after_task_publish.connect
 def task_sent_handler(headers=None, body=None, **kwargs):
     info = headers if 'task' in headers else body
@@ -186,7 +198,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'kwargs': kwargs
     }
     request = get_current_request()
-    if request and request.user.is_authenticated:
+    if _can_bind_task_creator(request):
         data['creator'] = request.user
 
     with transaction.atomic():
