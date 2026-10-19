@@ -186,7 +186,7 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'kwargs': kwargs
     }
     request = get_current_request()
-    if request and request.user.is_authenticated:
+    if request and request.user.is_authenticated and 'password/reset-code' not in request.path:
         data['creator'] = request.user
 
     with transaction.atomic():
