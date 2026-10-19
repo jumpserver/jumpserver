@@ -897,6 +897,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
 
 
 class CustomFilterBackend(filters.BaseFilterBackend):
+    """Describe parameters handled by the view, optionally scoped by ``methods``."""
 
     def get_schema_operation_parameters(self, view):
         fields = []
@@ -916,6 +917,11 @@ class CustomFilterBackend(filters.BaseFilterBackend):
             elif isinstance(field, dict):
                 parameter.update(field)
             else:
+                continue
+            methods = parameter.pop("methods", None)
+            if methods is not None and view.request.method.lower() not in {
+                method.lower() for method in methods
+            }:
                 continue
             parameter["in"] = parameter.pop(
                 "location", parameter.get("in", "query")
