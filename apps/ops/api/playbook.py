@@ -1,6 +1,5 @@
 import os
 import shutil
-import stat
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
@@ -305,16 +304,7 @@ class PlaybookFileBrowserAPIView(APIView):
         # edit content
         else:
             if not is_directory:
-                file_mode = None
-                if os.path.exists(file_path):
-                    file_mode = stat.S_IMODE(os.stat(file_path, follow_symlinks=False).st_mode)
-
-                def write_content(stream):
-                    stream.write(content)
-                    if file_mode is not None:
-                        os.fchmod(stream.fileno(), file_mode)
-
-                atomic_dump_text(file_path, write_content)
+                atomic_dump_text(file_path, lambda stream: stream.write(content))
         return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, **kwargs):
