@@ -11,14 +11,15 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
+from rest_framework import mixins
 from rest_framework.decorators import action
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from assets.const import Protocol
 from assets.models import Asset
+from common.api.generic import JMSGenericViewSet
 from common.const.http import POST
 from common.drf.throttling import FileTransferThrottle
 from common.permissions import IsValidUser
@@ -35,7 +36,7 @@ from ops.utils import merge_nodes_and_assets
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobExecutionTaskDetail', 'UsernameHintsAPI',
-    'ClassifiedHostsAPI', 'JobExecutionResultAPIView'
+    'ClassifiedHostsAPI', 'JobExecutionResultViewSet'
 ]
 
 from ops.tasks import run_ops_job_execution
@@ -308,12 +309,11 @@ class JobExecutionTaskDetail(APIView):
         })
 
 
-class JobExecutionResultAPIView(RetrieveAPIView):
-    """Read the stored per-host result of an execution owned by the caller."""
-
+class JobExecutionResultViewSet(mixins.RetrieveModelMixin, JMSGenericViewSet):
     serializer_class = JobExecutionResultSerializer
     perm_model = JobExecution
-    rbac_perms = {'GET': ['ops.view_jobexecution']}
+    http_method_names = ['get', 'head', 'options']
+    rbac_perms = {'retrieve': 'ops.view_jobexecution'}
 
     def get_object(self):
         with tmp_to_org(get_current_org()):
