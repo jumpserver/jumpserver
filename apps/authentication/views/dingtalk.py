@@ -1,8 +1,6 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib.auth import logout as auth_logout
-from django.db.utils import IntegrityError
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
@@ -13,17 +11,15 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
-from authentication.notifications import OAuthBindMessage
 from authentication.permissions import UserConfirmation
 from common.sdk.im.dingtalk import URL, DingTalk
 from common.utils import get_logger
-from common.utils.common import get_request_ip
 from common.utils.django import get_object_or_none, reverse, safe_next_url
 from common.utils.random import random_string
 from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from users.models import User
 from users.views import UserVerifyPasswordView
-from .base import BaseLoginCallbackView
+from .base import BaseBindCallbackView, BaseLoginCallbackView
 from .mixins import METAMixin, FlashMessageMixin
 
 logger = get_logger(__file__)
@@ -96,65 +92,25 @@ class DingTalkQRBindView(DingTalkQRMixin, View):
     permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.RELOGIN))
 
     def get(self, request: HttpRequest):
-        user = request.user
         redirect_url = request.GET.get('redirect_url')
 
-        redirect_uri = reverse('authentication:dingtalk-qr-bind-callback', kwargs={'user_id': user.id}, external=True)
+        redirect_uri = reverse('authentication:dingtalk-qr-bind-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
 
         url = self.get_qr_url(redirect_uri)
         return HttpResponseRedirect(url)
 
 
-class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
+class DingTalkQRBindCallbackView(DingTalkQRMixin, BaseBindCallbackView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request: HttpRequest, user_id):
-        code = request.GET.get('code')
-        redirect_url = request.GET.get('redirect_url')
-
-        if not self.verify_state():
-            return self.get_verify_state_failed_response(redirect_url)
-
-        user = get_object_or_none(User, id=user_id)
-        if user is None:
-            logger.error(f'DingTalkQR bind callback error, user_id invalid: user_id={user_id}')
-            msg = _('Invalid user_id')
-            response = self.get_failed_response(redirect_url, msg, msg)
-            return response
-
-        if user.dingtalk_id:
-            response = self.get_already_bound_response(redirect_url)
-            return response
-
-        dingtalk = DingTalk(
-            appid=settings.DINGTALK_APPKEY,
-            appsecret=settings.DINGTALK_APPSECRET,
-            agentid=settings.DINGTALK_AGENTID
-        )
-        userid, __ = dingtalk.get_user_id_by_code(code)
-
-        if not userid:
-            msg = _('DingTalk query user failed')
-            response = self.get_failed_response(redirect_url, msg, msg)
-            return response
-
-        try:
-            user.dingtalk_id = userid
-            user.save()
-        except IntegrityError as e:
-            if e.args[0] == 1062:
-                msg = _('The DingTalk is already bound to another user')
-                response = self.get_failed_response(redirect_url, msg, msg)
-                return response
-            raise e
-
-        ip = get_request_ip(request)
-        OAuthBindMessage(user, ip, _('DingTalk'), user_id).publish_async()
-        msg = _('Binding DingTalk successfully')
-        auth_logout(request)
-        response = self.get_success_response(redirect_url, msg, msg)
-        return response
+    client_type_path = 'common.sdk.im.dingtalk.DingTalk'
+    client_auth_params = {
+        'appid': 'DINGTALK_APPKEY', 'appsecret': 'DINGTALK_APPSECRET',
+        'agentid': 'DINGTALK_AGENTID'
+    }
+    auth_type = 'dingtalk'
+    auth_type_label = _('DingTalk')
 
 
 class DingTalkEnableStartView(UserVerifyPasswordView):
