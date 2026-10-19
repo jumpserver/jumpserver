@@ -184,6 +184,8 @@ class UserOtpEnableBindView(OTPBindMFACheckMixin, TemplateView, FormView):
         user = get_user_or_pre_auth_user(self.request)
         user.otp_secret_key = otp_secret_key
         user.save(update_fields=['otp_secret_key'])
+        # Binding confirmed, drop the flow-scoped pending secret
+        self.request.session.pop('otp_secret_key', None)
 
     def get_success_url(self):
         message_data = {
@@ -197,8 +199,16 @@ class UserOtpEnableBindView(OTPBindMFACheckMixin, TemplateView, FormView):
 
     def get_context_data(self, **kwargs):
         user = get_user_or_pre_auth_user(self.request)
-        otp_uri, otp_secret_key = generate_otp_uri(user.username)
-        self.request.session['otp_secret_key'] = otp_secret_key
+        # Reuse the secret generated in this binding flow. Regenerating it on
+        # every render (form_invalid/refresh/back) silently replaces the QR
+        # code the user has already scanned, so the phone lags one key behind
+        # and verification can never succeed again.
+        otp_secret_key = self.request.session.get('otp_secret_key')
+        if not otp_secret_key:
+            otp_uri, otp_secret_key = generate_otp_uri(user.username)
+            self.request.session['otp_secret_key'] = otp_secret_key
+        else:
+            otp_uri, _ = generate_otp_uri(user.username, otp_secret_key=otp_secret_key)
         context = {
             'otp_uri': otp_uri,
             'otp_secret_key': otp_secret_key,
