@@ -11,7 +11,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema, extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -197,9 +196,6 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
         return Response({'task_id': serializer.data.get('task_id')}, status=201)
 
 
-@extend_schema_view(list=extend_schema(parameters=[
-    OpenApiParameter('job_id', OpenApiTypes.UUID, OpenApiParameter.QUERY, description='Filter by saved job ID'),
-]))
 class JobExecutionViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     serializer_class = JobExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
