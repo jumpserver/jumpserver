@@ -63,8 +63,8 @@ def validate_approval(config):
 
 
 def validate_cc(config):
-    if set(config) != {'users'} or not isinstance(config['users'], list) or not 1 <= len(config['users']) <= 1000:
-        raise WorkflowConfigurationError('A CC node requires between 1 and 1000 user IDs.')
+    if set(config) != {'users'} or not isinstance(config['users'], list) or len(config['users']) > 1000:
+        raise WorkflowConfigurationError('A CC node accepts a list of up to 1000 user IDs.')
     try:
         config['users'] = list(dict.fromkeys(str(UUID(value)) for value in config['users']))
     except (ValueError, TypeError, AttributeError):

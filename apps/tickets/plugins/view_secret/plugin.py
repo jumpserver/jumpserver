@@ -12,6 +12,7 @@ class Plugin(TicketPlugin):
     creation_modes = ('manual', 'operation')
     execution_mode = 'automatic'
     request_serializer = 'tickets.plugins.view_secret.serializer.RequestSerializer'
+    actions = {'view_secret': 'tickets.plugins.view_secret.actions.ViewSecret'}
 
     def build_context(self, ticket):
         from ..resources import account_context
@@ -55,8 +56,9 @@ class Plugin(TicketPlugin):
                 'resources': [{'type': 'account', 'id': str(account.pk), 'name': account.name}
                               for account in accounts]}
 
-    def get_available_actions(self, ticket, user):
-        return self.get_secret_access(ticket, user)[0]
+    def get_result(self, ticket, user):
+        actions, status = self.get_secret_access(ticket, user)
+        return {**status, 'actions': actions}
 
     def get_secret_access(self, ticket, user):
         """Return usable actions and an explanation without loading account secrets."""

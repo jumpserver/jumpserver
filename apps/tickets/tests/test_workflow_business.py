@@ -517,14 +517,16 @@ class WorkflowBusinessTests(TestCase):
             user = User.objects.get(pk=self.carol.pk)
             req = getattr(APIRequestFactory(), method)('/api/v1/tickets/', data or {}, format='json')
             force_authenticate(req, user)
-            return view.as_view({method: action}, **getattr(getattr(view, action), 'kwargs', {}))(
-                req, **({'pk': str(pk)} if pk else {}))
+            # Match ATOMIC_REQUESTS so a rejected request cannot roll back the test fixture.
+            with transaction.atomic():
+                return view.as_view({method: action}, **getattr(getattr(view, action), 'kwargs', {}))(
+                    req, **({'pk': str(pk)} if pk else {}))
 
         self.assertEqual(request(TicketAuditViewSet, 'list').status_code, 200)
         detail = request(TicketViewSet, 'retrieve', ticket.pk)
         self.assertEqual(detail.status_code, 200, detail.data)
         self.assertEqual(detail.data['my_tasks'], [])
-        self.assertEqual(detail.data['available_actions'], [])
+        self.assertEqual(detail.data['result']['actions'], [])
         self.assertEqual(request(WorkflowInstanceViewSet, 'retrieve', instance.pk).status_code, 200)
         self.assertEqual(request(WorkflowInstanceViewSet, 'events', instance.pk).status_code, 200)
         self.assertEqual(request(ApprovalTaskViewSet, 'approve', self.task(instance).pk, 'post').status_code, 404)

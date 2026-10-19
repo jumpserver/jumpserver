@@ -20,7 +20,7 @@ def build_context(ticket):
         context = plugin.build_context(ticket)
     context.setdefault('request', {}).update(type=ticket.type, title=ticket.title)
     context['applicant'] = applicant
-    context['plugin'] = {'type': plugin.type, 'execution_mode': plugin.execution_mode}
+    context['plugin'] = {'type': plugin.type}
     for key in ('assets', 'accounts', 'nodes'):
         context.setdefault(key, [])
     return context
@@ -89,9 +89,12 @@ def apply_approved_effect(instance, ticket):
     if not available_users(instance.org_id).filter(pk=instance.applicant_id).exists():
         raise WorkflowConfigurationError('The applicant is no longer eligible for access.')
     plugin = get_ticket_plugin(ticket.type)
-    if plugin.execution_mode == 'approval_only':
-        return None
     with tmp_to_org(instance.org_id):
+        mode = plugin.get_execution_mode(ticket)
+        if mode == 'approval_only':
+            return None
+        if mode not in ('automatic', 'external'):
+            raise WorkflowConfigurationError('Invalid ticket execution mode.')
         return plugin.on_approved(instance, ticket)
 
 

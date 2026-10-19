@@ -103,12 +103,15 @@ class WorkflowDefinitionTests(SimpleTestCase):
         with self.assertRaises(WorkflowConfigurationError):
             validate_definition(branch)
 
-    def test_cc_node_requires_user_ids_and_preserves_position(self):
+    def test_cc_node_allows_empty_recipients_but_validates_user_ids(self):
         graph = deepcopy(self.definition)
         graph['nodes'].insert(1, {'id': 'cc', 'type': 'cc', 'config': {'users': [str(uuid4())]}})
         graph['edges'] = [['start', 'cc'], ['cc', 'approval_0'], ['approval_0', 'end']]
         self.assertEqual(validate_definition(graph)['nodes'][1]['type'], 'cc')
-        for config in ({'users': []}, {'users': ['bad']}, {'users': [str(uuid4())], 'script': 'x'}):
+        graph['nodes'][1]['config']['users'] = []
+        self.assertEqual(validate_definition(graph)['nodes'][1]['config'], {'users': []})
+        for config in ({}, {'users': None}, {'users': str(uuid4())}, {'users': ['bad']},
+                       {'users': [str(uuid4())] * 1001}, {'users': [str(uuid4())], 'script': 'x'}):
             invalid = deepcopy(graph)
             invalid['nodes'][1]['config'] = config
             with self.subTest(config=config), self.assertRaises(WorkflowConfigurationError):
@@ -413,6 +416,51 @@ class WorkflowTests(TestCase):
         self.assertEqual(self.request(ApprovalTaskViewSet, 'approve', self.bob, task.pk).status_code, 404)
         self.assertEqual(self.request(ApprovalTaskViewSet, 'approve', self.alice, task.pk).status_code, 200)
         self.assertEqual(self.request(ApprovalTaskViewSet, 'approve', self.alice, task.pk).status_code, 409)
+
+    def test_empty_cc_nodes_publish_and_advance_without_recipients_or_notifications(self):
+        from tickets.workflow.business import deliver_event
+
+        definition = approval_definition([self.alice])
+        definition['nodes'].extend([
+            {'id': key, 'type': 'cc', 'config': {'users': []}}
+            for key in ('cc_before', 'cc_after')
+        ])
+        definition['edges'] = [['start', 'cc_before'], ['cc_before', 'approval_0'],
+                               ['approval_0', 'cc_after'], ['cc_after', 'end']]
+        workflow = Workflow.objects.create(name='Optional CC', type='general')
+        with patch.object(User, 'has_perms', return_value=True):
+            response = self.request(WorkflowViewSet, 'publish', self.alice, workflow.pk, {
+                'expected_version': 0, 'definition': definition,
+            })
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual([node['config']['users'] for node in response.data['definition']['nodes']
+                          if node['type'] == 'cc'], [[], []])
+        workflow.refresh_from_db()
+        workflow.enabled = True
+        workflow.save(update_fields=['enabled'])
+        instance = self.start(workflow)
+        self.assertFalse(instance.ticket.cc_users.exists())
+        self.assertEqual(self.task(instance, self.alice).node_instance.node.key, 'approval_0')
+        with patch('tickets.notifications.TicketUpdatedToCcUserMessage') as notify:
+            deliver_event(instance.events.get(type='cc.added').pk)
+            notify.assert_not_called()
+        self.assertEqual(self.engine.approve(self.task(instance, self.alice), self.alice).state, 'approved')
+        self.assertFalse(instance.ticket.cc_users.exists())
+        self.assertEqual(list(instance.events.filter(type='cc.added').values_list('data', flat=True)),
+                         [{'recipients': []}, {'recipients': []}])
+
+    def test_configured_cc_recipients_must_still_be_active_organization_members(self):
+        definition = approval_definition([self.alice])
+        definition['nodes'].insert(1, {'id': 'cc', 'type': 'cc', 'config': {'users': []}})
+        definition['edges'] = [['start', 'cc'], ['cc', 'approval_0'], ['approval_0', 'end']]
+        self.carol.is_active = False
+        self.carol.save(update_fields=['is_active'])
+        workflow = Workflow.objects.create(name='Validate CC recipients', type='general')
+        for user in (self.outsider, self.carol):
+            definition['nodes'][1]['config']['users'] = [str(user.pk)]
+            with self.subTest(user=user.username), self.assertRaises(WorkflowConfigurationError):
+                publish_workflow(workflow, definition)
+        self.assertFalse(workflow.versions.exists())
 
     def test_publish_requires_permission_and_matching_version(self):
         workflow = self.create_workflow()

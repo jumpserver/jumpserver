@@ -302,7 +302,7 @@ class PermAssetDetailUtil:
             protocols = self.get_permed_protocols_for_user(only_name=True)
             if 'all' not in protocols and protocol not in protocols:
                 return None
-            permed_accounts = self.get_permed_accounts_for_user()
+            permed_accounts = self.get_permed_accounts_for_user(protocol=protocol)
             accounts_mapper = {account.alias: account for account in permed_accounts}
             account = accounts_mapper.get(account_alias)
             return account
@@ -313,11 +313,12 @@ class PermAssetDetailUtil:
         perms = perm_util.get_permissions_for_user_asset(self.user, self.asset_id)
         return perms
 
-    def get_permed_accounts_for_user(self):
+    def get_permed_accounts_for_user(self, protocol=None):
         """ 获取授权给用户某个资产的账号 """
-        perms = self.user_asset_perms
+        from tickets.plugins.file_transfer.permissions import add_transfer_actions
+        perms = list(self.user_asset_perms)
         permed_accounts = self.get_permed_accounts_from_perms(perms, self.user, self.asset)
-        return permed_accounts
+        return add_transfer_actions(self.user, self.asset, permed_accounts, perms, protocol)
 
     def get_permed_protocols_for_user(self, only_name=False):
         """ 获取授权给用户某个资产的账号 """

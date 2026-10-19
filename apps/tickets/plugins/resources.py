@@ -13,7 +13,8 @@ class RequestSerializer(serializers.Serializer):
 class AssetAccountRequestSerializer(RequestSerializer):
     asset = serializers.UUIDField(label=_('Asset'), style={'resource': 'asset'})
     accounts = serializers.ListField(child=serializers.CharField(max_length=128), allow_empty=False,
-                                    max_length=100, label=_('Accounts'), style={'resource': 'account'})
+                                    max_length=100, label=_('Accounts'),
+                                    style={'resource': 'account', 'depends_on': 'asset'})
     invalid_accounts_message = 'Select existing accounts on the requested asset.'
 
     def validate_asset(self, value):

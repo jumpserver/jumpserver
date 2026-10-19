@@ -11,11 +11,11 @@
 | `login_asset_confirm` 资产登录复核 | ACL 触发 | 激活原连接令牌 |
 | `command_confirm` 命令复核 | ACL 触发 | 原命令入口读取审批结果 |
 | `view_secret` 查看账号密码 | 用户申请或账号页操作触发 | 按账号、申请人和组织创建限时查看授权；在工单详情按需取密 |
-| `file_transfer` 文件上传下载 | 用户申请 | 仅审批与留痕 |
-| `download_replay` 录屏下载 | 用户申请 | 仅审批与留痕 |
+| `file_transfer` 文件上传下载 | 用户申请 | 新工单审批通过后，为已有账号访问追加指定方向的限时传输权限 |
+| `download_replay` 录屏下载 | 用户申请 | 审批后允许申请人在有效期内下载指定会话录屏 |
 | `change_secret` 账号改密 | 用户申请 | 仅审批与留痕 |
 
-`view_secret` 已接入授权 handler 和专用取密 API；审批时不读取或保存密码。`file_transfer`、`download_replay`、`change_secret` 尚未接入执行 handler，也未改变现有业务 API 的权限。后续按业务逐类接入，不能把 approved 直接解释为操作已经执行。
+`view_secret` 已接入授权 handler 和插件动作入口；审批时不读取或保存密码。`file_transfer` 和 `download_replay` 已接入对应授权；`change_secret` 仍仅审批与留痕，未接入改密执行。后续按业务逐类接入，不能把 approved 直接解释为操作已经执行。
 
 `applicant` 始终是实际提交者。资产授权插件使用 `request_data.apply_users` 保存单个授权用户 UUID 的列表，省略时默认申请人自己。代他人申请需要本组织的 `tickets.apply_asset_for_others` 权限，并且选用的流程每条路径都必须经过组织管理员审批。申请人和授权用户都不能审批该工单，包括转交和加签。受理前后均检查组织和用户有效性；`@USER` 的上下文和授权校验针对授权用户。旧工单没有该参数时仍给原申请人授权。历史多人授权工单保持原有快照和授权，不重新执行。
 
@@ -52,9 +52,9 @@ class Plugin(TicketPlugin):
     request_serializer = 'tickets.plugins.example.serializer.Parameters'
 ```
 
-这样即可使用统一接口和前端申请页，不必新增 TicketType 枚举成员、模型、迁移、ViewSet 或 URL。点击“申请工单”会从 `/ticket-types/` 加载可自助申请的类型，在抽屉中选择后打开对应表单；新增类型自动出现在抽屉中。表单支持文本、列表、选项、整数、日期及资产选择。复杂表单仍可编写专用组件；当前资产授权保留专用表单，数据统一保存在 `Ticket.request_data`。
+这样即可使用统一接口和前端申请页，不必新增 TicketType 枚举成员、模型、迁移、ViewSet 或 URL。点击“申请工单”会从 `/ticket-types/` 加载可自助申请的类型，在抽屉中选择后打开对应表单；新增类型自动出现在抽屉中。表单支持文本/UUID、文本列表、单选、多选、布尔、整数、日期时间及资产/账号/会话选择。DictField、嵌套 Serializer 和非文本列表等不支持的字段会在启动时明确报错；复杂表单声明 `custom_form = True`，并在 Lina 注册专用组件。当前资产授权保留专用表单，数据统一保存在 `Ticket.request_data`。
 
-插件发现期间不要导入模型或 Serializer，使用字符串路径及方法内导入，避免 Django 初始化循环。注册表检测重复或非法标识并阻止启动。移除插件前应处理历史工单和在途实例，不能直接删除仍被引用的类型。
+插件发现期间不要导入模型或 Serializer，使用字符串路径及方法内导入，避免 Django 初始化循环。注册表检测重复/非法标识、执行模式、申请入口和动作映射；模型加载完成后统一检查 Serializer、表单字段、动作处理器及其权限/限流类，配置错误阻止启动。移除插件前应处理历史工单和在途实例，不能直接删除仍被引用的类型。
 
 ### 插件接口
 
@@ -69,9 +69,39 @@ class Plugin(TicketPlugin):
 - `notify_processed(ticket, processor)`：发送该类型的额外结果通知；资产授权在这里通知授权用户。
 - `allow_direct_approval(ticket)`：控制通知中的直接审批链接是否可用。
 - `on_approved(instance, ticket)`：可选。默认无操作；自动执行的插件显式声明 `execution_mode = 'automatic'`，成功后返回事件数据，框架才记录 `action.executed`。读取 `instance.context`，不重新读取可变的申请参数作为授权依据。
-- `get_available_actions(ticket, user)`：可选。详情页当前用户可用的工单动作；每次读取时检查授权、对象和时效，动作 API 再次独立校验。
+- `get_result(ticket, user)`：返回详情中的实时 `result`，至少包含 `state` 和 `actions`；按类型追加非敏感的资源说明、有效期等。每次读取时检查当前查看者、授权、对象和时效，绝不返回密码或持久化此结果。列表返回 `result: null`，不执行该查询。
+- `actions`：动作名到 `TicketAction` 子类的导入路径映射。新增动作不需要新增 ViewSet 或 URL；处理器声明 `method`（GET/POST）、`permission_classes`、`throttle_classes`，实现 `execute(ticket, request)`。
+- `get_execution_mode(ticket)`：详情展示和最终审批执行共同使用的判断入口。默认返回当前插件的 `execution_mode`；需要历史策略时，在插件内根据服务端快照判断。`approval_only` 不调用 `on_approved`，未知模式阻止执行。
+- `custom_form`：复杂申请参数使用专用前端表单；仍必须配置服务端 Serializer 验证参数。
+- `options(request, org_id)`：按 `field` 查询参数返回指定资源字段的选项；所有范围与依赖都须在服务端重新验证。
 - `get_result_resources(instance, event, user)`：可选。展示业务动作产生的对象，默认读取事件中的 `resources` 快照并返回纯文本；插件可增加本地化 `label` 和当前用户有权访问的站内 `url`。统一活动列表直接渲染，无需按工单类型增加前端分支。
 - `execution_mode = 'external'`：由现有业务入口消费审批结果，例如登录和命令复核。
+
+### 实时结果、动作和前端扩展
+
+审批副作用、实时状态和用户动作分开：
+
+1. `on_approved` 创建授权或业务任务，记录 `action.executed` 历史事件。
+2. `get_result` 描述当前用户此刻能做什么。例如查看密码工单：
+   ```json
+   {"state": "available", "expires_at": "...", "actions": [
+     {"type": "view_secret", "account_id": "...", "name": "root", "expires_at": "..."}
+   ]}
+   ```
+3. 用户点击后调用 `tickets/{id}/actions/{action}/`。公共入口核对工单可见性、当前组织和有效成员身份，并在工单组织内执行动作的 DRF 权限及对象权限；标准限流与动作限流叠加。处理器重新核验业务授权，返回 JSON 或文件响应，统一禁止缓存。
+
+`account_id` 等客户端字段只是选择器，不是授权依据：必须属于该工单冻结的对象或已生成的授权。密码读取复用 `accounts.ticket_secret.reveal_ticket_secret`，录像复用 `SessionViewSet.build_replay_download_response`；不能直接调用另一个 APIView 的方法来绕过它的权限、MFA、限流或审计。复杂任务使用已有业务任务机制，不在请求中阻塞等待。
+
+Lina 的 `src/views/tickets/plugins/registry.js` 是唯一的类型扩展配置入口，按需配置：
+
+- `form` / `createRoute`：专用申请表单或已有申请路由；普通类型直接用元数据表单。
+- `requestComponent` / `resultComponent`：申请信息及实时结果组件，接收完整 `object`，读取 `object.result`。复用现有组件时只增加注册配置；全新交互需要新增组件。
+- `fields`、`requestLabels`、`requestChoices`、`dateFields`：本地化字段说明及展示。
+- `detailRoute`：保留 dev 既有详情入口；新类型默认通用详情。
+
+后端只返回数据，不能指定任意 Vue 文件路径或动态执行脚本。注册表中的组件随前端发布；后端声明了专用表单但前端未注册时，显示明确提示，不允许提交缺失参数的通用表单。新类型一般只需后端类型目录；有特殊交互时再增加前端组件及这一处注册，不再修改公共详情序列化器或公共详情页的类型分支。
+
+`get_result_resources` 只负责历史事件中的业务对象展示；历史“执行成功”不代表当前授权仍有效，不能用它替代 `get_result`。
 
 ### 业务结果与详情跳转
 
@@ -99,7 +129,11 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 以下路径均以 `/api/v1/tickets/` 开头。
 
-- `GET ticket-types/`：类型名称、申请方式、执行模式和参数描述。
+- `GET ticket-types/`：类型名称、申请方式、执行模式、`custom_form` 和参数描述。
+- `GET tickets/{id}/`：在已有详情响应中返回 `result`，无需额外的 result 轮询接口。
+- `POST tickets/{id}/actions/view_secret/`：传 `account_id`，在 MFA 和实时授权检查后读取当前密码。
+- `GET tickets/{id}/actions/download_replay/`：限流后下载已批准会话的录屏，打包完成、发送文件前再次检查授权。
+- `GET ticket-types/{type}/options/?org_id=...&field=accounts&asset=...`：账号字段选项；账号字段通过 `style={\"resource\": \"account\", \"depends_on\": \"asset\"}` 声明依赖。多个账号/资产字段分别加载、分别清空；自定义字段名或依赖由插件的 `options()` 实现。
 - `POST tickets/open/`：统一申请入口。
 - `GET ticket-types/apply_asset/options/?org_id=...&search=...`：本组织有效授权用户选项。
 - `GET workflows/options/?type=apply_asset&org_id=...&beneficiary=...`：代申请时只返回每条路径均有组织管理员审批的流程。
@@ -107,7 +141,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 - 工单读取结果新增 `request_data`、`request_items`、`execution_mode` 和只读 `origin`，列表可用 `origin=manual|system`、`status=open|closed` 筛选；审批任务、撤回、评论等 API 不变。
 - `GET /api/v1/accounts/accounts/{account_id}/request-secret-ticket/`：账号页获取本组织可选的已发布密码查看流程。
 - `POST /api/v1/accounts/accounts/{account_id}/request-secret-ticket/`：传 `workflow_id`、`duration` 和可选 `comment`，创建 `origin=system` 的 `view_secret` 工单并返回工单 ID。服务端从账号对象确定资产、用户名和组织，不接受客户端指定授权对象。
-- `POST /api/v1/accounts/accounts/{account_id}/reveal-by-ticket/`：传 `ticket_id`；仅审批通过、未过期、未撤销授权的申请人可读取该账号**当前**密码。响应禁止缓存，读取写审计事件和操作日志。
+- `POST /api/v1/accounts/accounts/{account_id}/reveal-by-ticket/`：账号业务入口保留的薄适配器，和插件动作复用同一取密服务及 MFA；工单页面统一使用 actions 接口。
 
 ```json
 {
@@ -123,14 +157,42 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 }
 ```
 
-资产授权在 `request_data` 内填写原 `apply_assets`、`apply_accounts`、`apply_actions`、日期等字段以及可选 `apply_users`（只能有一个 UUID）。申请人不能通过传入别人的 applicant 来代申请，应填写 apply_users。执行模式随提交上下文冻结，升级 handler 不会让已经提交的 approval_only 工单开始自动执行，也不会把历史审批工单展示成已自动执行。
+资产授权在 `request_data` 内填写原 `apply_assets`、`apply_accounts`、`apply_actions`、日期等字段以及可选 `apply_users`（只能有一个 UUID）。申请人不能通过传入别人的 applicant 来代申请，应填写 apply_users。提交上下文记录插件类型，不再保存不参与执行的 `execution_mode` 副本。展示和执行都以 `get_execution_mode(ticket)` 为准，特殊历史策略由各插件处理。文件传输通过服务端快照版本标记保持历史工单仅审批，不因升级而补发授权；密码查看和录屏下载按对应插件的现行授权校验处理。
 
-`view_secret` 审批完成后，handler 只创建数据库中的 `TicketSecretAccess` 授权，绑定工单、账号 UUID、申请人、组织与过期时间。详情的 `available_actions` 只向符合条件的申请人展示查看按钮；点击时专用账号 API 重新检查工单状态、授权时效、组织成员、账号有效性及全局禁止查看密码配置。若启用了查看密码 MFA 设置，专用 API 仍要求 MFA。密码从当前账号读取，不写入工单、事件、缓存或访问链接；审批后轮换密码时读到的是新密码。授权记录是唯一的权威状态，未来可加短时缓存加速，但撤销、过期和全局禁止策略必须保持实时有效。
+`view_secret` 审批完成后，handler 只创建数据库中的 `TicketSecretAccess` 授权，绑定工单、账号 UUID、申请人、组织与过期时间。详情的 `result.actions` 只向符合条件的申请人展示查看按钮；点击时插件动作及账号取密服务 重新检查工单状态、授权时效、组织成员、账号有效性及全局禁止查看密码配置。若启用了查看密码 MFA 设置，动作入口仍要求 MFA。密码从当前账号读取，不写入工单、事件、缓存或访问链接；审批后轮换密码时读到的是新密码。授权记录是唯一的权威状态，未来可加短时缓存加速，但撤销、过期和全局禁止策略必须保持实时有效。
 
 `tickets.0010_ticket_workflow_refactor` 将四种旧多表继承工单的业务字段和关联 UUID 搬入通用 `request_data`，再删除子表。连接令牌的 `from_ticket` 先由 `authentication.0012_connection_token_ticket` 改为指向 `Ticket`，原 ID 不变。部署时后端与 Lina 需同时切换；旧的四类专用工单地址不再提供。
 
 ## 部署和验证
 
+本轮插件接口整理不新增模型或迁移。重构分支的 `available_actions`、`secret_access_status`、`replay_access_status`、`file_transfer_status` 合并为 `result`，原录屏工单下载路径替换为 actions 路径；Core 和 Lina 必须同步部署，不保留这部分试验接口的双写/双读。dev 的四类旧工单、UUID、审批策略、授权记录和迁移导入继续保留，读详情不会补跑业务效果。
+
+插件接入回归包括：新类型无需修改枚举/模型/路由即可申请、审批、读取结果并执行动作；Boolean/MultipleChoice 参数往返；未知动作和错误 HTTP 方法拒绝；查看者与执行者权限隔离；MFA、限流、过期、跨组织及资源变更拒绝；列表不查询实时授权。Lina 覆盖多个账号依赖字段隔离、组织切换丢弃旧响应、结果刷新、过期和专用表单缺失提示。
+
 需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0032_workflow_foundation`、`users.0008_ticket_workflow_integration` 和 `acls.0007_ticket_workflow_integration`。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。为新增类型创建并发布流程后，用户才能提交该类申请。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
 
 在 `tickets.tests.settings` 隔离环境运行 `tickets.tests.test_plugins` 及既有工作流测试。历史迁移和并发测试使用文档 `ticket-workflow-refactor.md` 中的独立 PostgreSQL 测试库，避免 SQLite 的 schema editor 限制。
+
+
+## 文件上传下载授权
+
+只对包含服务端 `file_transfer_version=1` 快照的新工单启用。升级前已创建的工单，无论是否结束，都保持仅审批，不补发权限。
+
+申请人必须是组织有效成员，且对所选资产账号已有有效连接权限。申请及最终审批均检查访问范围；冻结具体账号 ID、用户名和已有 SSH/SFTP/RDP 协议。账号删除重建、停用、跨组织移动或基础权限失效后，工单不能单独提供访问权限。新增基础授权也不会扩大工单冻结的协议范围。权限排除规则和连接 ACL 继续生效。
+
+审批通过创建工单 ID 对应的 `AssetPermission`，只包含上传或下载方向，不增加连接、删除、剪贴板权限。该记录不参与基础权限合并，仅在文件管理和连接令牌的账号解析中追加动作；不额外授权作业中心的批量文件分发任务。重复处理不续期。有效期从最终审批通过开始，默认 3600 秒，可选 60–86400 秒。
+
+路径仅作为申请用途说明，不限制实际传输路径。授权到期后，新建连接和令牌兑换不再获得这张工单追加的动作；其他独立授权不受影响。已有会话沿用执行端原策略，可能在到期后继续使用，不承诺即时中断。
+
+文件传输工单详情的 `result.state` 返回 `approval_only`、`pending`、`available`、`expired` 或 `unavailable`，以及方向、账号、协议、生效时间和到期时间。审批通过后，申请人须通过现有文件管理入口新建连接使用授权。该状态只表示此工单的授权，不能代替连接时的实时权限检查。
+
+### 手工验收
+
+1. 给测试申请人配置一个资产账号的 SSH/SFTP 基础连接权限，不授予上传、下载、删除；准备对应文件传输审批流程。
+2. 新建文件上传工单，选择该资产账号，填写路径说明，将有效期设为 60 秒。待审批时新建文件管理连接，确认仍无上传权限。
+3. 审批通过后检查工单显示已授权、方向和截止时间；以申请人重新建立文件管理连接，确认可以上传，不能下载或删除。另建下载工单验证反向隔离。
+4. 等待有效期结束后重新建立连接，确认此工单提供的方向不再可用；已有连接不作为到期验收依据。
+5. 在授权有效期内撤销基础账号访问权限，重新连接应失败；其他账号、其他用户及未获批协议不得获得该工单的权限。
+6. 检查拒绝、撤回和历史工单均不生成授权；已有独立上传／下载授权不被工单到期影响。
+
+自动回归：后端 `tickets.tests.test_file_transfer`；前端 `yarn test` 包含状态到期、组织切换、审批刷新和表单说明测试。还需结合实际部署的 Koko/RDP 执行端完成上述真实文件验收。

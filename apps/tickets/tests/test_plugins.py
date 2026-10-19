@@ -11,11 +11,13 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission
+from rest_framework.response import Response
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import Account
 from accounts.api.account.ticket_secret import AccountTicketSecretAPI, AccountTicketSecretRequestAPI
-from orgs.utils import tmp_to_org, tmp_to_root_org
+from orgs.utils import current_org, tmp_to_org, tmp_to_root_org
 from django.apps import apps as django_apps
 from django.db import close_old_connections, connection, transaction
 from perms.models import AssetPermission
@@ -29,6 +31,8 @@ from tickets.api.workflow import WorkflowViewSet
 from tickets.models import Ticket, TicketBeneficiary, TicketSecretAccess, Workflow, ApprovalTask
 from tickets.plugins import get_ticket_plugin, ticket_plugins
 from tickets.plugins.base import TicketPlugin
+from tickets.plugins.actions import TicketAction
+from tickets.plugins.schema import request_fields
 from tickets.plugins.registry import TicketPluginRegistry
 from tickets.plugins.resources import RequestSerializer
 from tickets.serializers.plugin import PluginTicketApplySerializer
@@ -48,7 +52,55 @@ class ExampleParameters(RequestSerializer):
     reason = serializers.CharField()
 
 
+class ExtensionParameters(ExampleParameters):
+    enabled = serializers.BooleanField()
+    scopes = serializers.MultipleChoiceField(choices=['one', 'two'])
+
+
+class ExtensionPermission(BasePermission):
+    def has_object_permission(self, request, view, ticket):
+        return ticket.state == 'approved' and request.user.pk == ticket.applicant_id
+
+
+class ExtensionAction(TicketAction):
+    permission_classes = (ExtensionPermission,)
+
+    def execute(self, ticket, request):
+        parameters = RequestSerializer(data=request.data)
+        parameters.is_valid(raise_exception=True)
+        return Response({'reason': ticket.workflow_instance.context['request']['reason']})
+
+
 class PluginRegistryTests(SimpleTestCase):
+    def test_invalid_definitions_fail_at_registration_or_startup(self):
+        for attrs in ({'execution_mode': 'typo'}, {'self_service': True},
+                      {'actions': {'../secret': 'invalid'}}, {'creation_modes': ['unknown']}):
+            plugin = type('InvalidPlugin', (TicketPlugin,), {'type': 'test_invalid', **attrs})()
+            with self.subTest(attrs=attrs), self.assertRaises(ImproperlyConfigured):
+                TicketPluginRegistry().register(plugin)
+        registry = TicketPluginRegistry()
+        plugin = type('InvalidPlugin', (TicketPlugin,), {
+            'type': 'test_invalid', 'request_serializer': 'tickets.plugins.missing.Serializer',
+        })()
+        registry.register(plugin)
+        with self.assertRaisesMessage(ImproperlyConfigured, 'test_invalid'):
+            registry.validate()
+        ticket_plugins.validate()
+
+    def test_schema_preserves_boolean_multiple_choices_and_rejects_complex_fields(self):
+        fields = {field['name']: field for field in request_fields(ExtensionParameters())}
+        self.assertEqual(fields['enabled']['type'], 'boolean')
+        self.assertEqual(fields['scopes']['type'], 'multiple_choice')
+        self.assertEqual([item['value'] for item in fields['scopes']['choices']], ['one', 'two'])
+        for field in (serializers.DictField(), serializers.ListField(child=serializers.DictField())):
+            serializer = type('ComplexParameters', (RequestSerializer,), {'details': field})()
+            with self.assertRaisesMessage(ImproperlyConfigured, 'details'):
+                request_fields(serializer)
+        serializer = type('MissingDependency', (RequestSerializer,), {
+            'accounts': serializers.CharField(style={'resource': 'account'}),
+        })()
+        with self.assertRaisesMessage(ImproperlyConfigured, 'depends_on'):
+            request_fields(serializer)
     def test_default_result_resources_are_linkless_snapshots(self):
         resource = {'type': 'example', 'id': '123', 'name': 'Original', 'url': '/stale-link'}
         event = SimpleNamespace(data={'resources': [resource]})
@@ -178,15 +230,77 @@ class TicketPluginTests(TestCase):
         request = APIRequestFactory().get('/')
         force_authenticate(request, user or self.applicant)
         with transaction.atomic():
-            return TicketViewSet.as_view({'get': 'download_replay'},
-                                        **TicketViewSet.download_replay.kwargs)(request, pk=ticket.pk)
+            return TicketViewSet.as_view({'get': 'perform_action'},
+                                        **TicketViewSet.perform_action.kwargs)(
+                                            request, pk=ticket.pk, action_name='download_replay')
+
+    def plugin_action(self, ticket, name, *, user=None, data=None, method='post'):
+        request = getattr(APIRequestFactory(), method)('/', data or {}, format='json')
+        force_authenticate(request, user or self.applicant)
+        # DRF marks the request transaction for rollback on an expected 4xx.
+        with transaction.atomic():
+            return TicketViewSet.as_view({method: 'perform_action'}, **TicketViewSet.perform_action.kwargs)(
+                request, pk=ticket.pk, action_name=name,
+            )
+
+    def test_password_action_dispatch_preserves_mfa_scope_and_expiry(self):
+        account = self.create_account()
+        serializer = self.serializer(self.payload(asset=str(self.asset.pk), accounts=['root']))
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        ticket = serializer.save()
+        instance = submit_ticket(ticket)
+        data = {'account_id': str(account.pk)}
+        with override_settings(SECURITY_VIEW_AUTH_NEED_MFA=False):
+            self.assertEqual(self.plugin_action(ticket, 'view_secret', data=data).status_code, 403)
+        self.engine.approve(self.task(instance), self.alice)
+        with override_settings(SECURITY_VIEW_AUTH_NEED_MFA=True):
+            response = self.plugin_action(ticket, 'view_secret', data=data)
+            self.assertEqual(response.status_code, 412)
+            self.assertNotIn('secret', response.data)
+        with override_settings(SECURITY_VIEW_AUTH_NEED_MFA=False):
+            self.assertEqual(self.plugin_action(ticket, 'view_secret', user=self.alice, data=data).status_code, 403)
+            self.assertEqual(self.plugin_action(ticket, 'view_secret', data={'account_id': str(uuid4())}).status_code, 403)
+            self.assertEqual(self.plugin_action(ticket, 'view_secret', data={**data, 'ticket_id': str(uuid4())}).status_code, 400)
+            with tmp_to_org(self.other_org):
+                self.assertEqual(self.plugin_action(ticket, 'view_secret', data=data).status_code, 404)
+            response = self.plugin_action(ticket, 'view_secret', data=data)
+            self.assertEqual(response.status_code, 200, response.data)
+            self.assertEqual(response.data['secret'], 'never-in-ticket')
+            self.assertEqual(response['Cache-Control'], 'no-store')
+            self.assertNotIn('never-in-ticket', str(list(instance.events.values_list('data', flat=True))))
+            TicketSecretAccess.objects.filter(ticket=ticket).update(expires_at=timezone.now() - timedelta(seconds=1))
+            self.assertEqual(self.plugin_action(ticket, 'view_secret', data=data).status_code, 403)
+
+    def test_action_dispatch_preserves_replay_throttle_and_rejects_unknown_actions_and_methods(self):
+        from common.drf.throttling import FileTransferThrottle
+        from terminal.api.session.session import SessionViewSet
+        session, ticket, instance = self.replay_ticket()
+        with patch.object(FileTransferThrottle, 'allow_request', return_value=False), \
+                patch.object(FileTransferThrottle, 'wait', return_value=1), \
+                patch.object(SessionViewSet, 'build_replay_download_response') as download:
+            self.assertEqual(self.replay_download(ticket).status_code, 429)
+            download.assert_not_called()
+        self.assertEqual(self.plugin_action(ticket, 'missing').status_code, 404)
+        self.assertEqual(self.plugin_action(ticket, 'download_replay').status_code, 405)
+
+    def test_execution_mode_hook_controls_both_display_and_dispatch(self):
+        account = self.create_account()
+        serializer = self.serializer(self.payload(asset=str(self.asset.pk), accounts=['root']))
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        ticket = serializer.save()
+        instance = submit_ticket(ticket)
+        plugin = get_ticket_plugin(ticket.type)
+        with patch.object(plugin, 'get_execution_mode', return_value='approval_only'), \
+                patch.object(plugin, 'on_approved') as effect:
+            self.assertEqual(TicketSerializer(ticket).data['execution_mode'], 'approval_only')
+            self.engine.approve(self.task(instance), self.alice)
+            effect.assert_not_called()
+        self.assertFalse(TicketSecretAccess.objects.filter(ticket=ticket, account_id=account.pk).exists())
 
     def test_common_plugins_submit_approve_and_do_not_claim_execution(self):
         self.create_account()
         for ticket_type, parameters in [
             ('change_secret', {'asset': str(self.asset.pk), 'accounts': ['root']}),
-            ('file_transfer', {'asset': str(self.asset.pk), 'accounts': ['root'],
-                               'direction': 'download', 'paths': ['/var/log/app.log']}),
         ]:
             with self.subTest(ticket_type=ticket_type):
                 serializer = self.serializer(self.payload(ticket_type, **parameters))
@@ -246,21 +360,20 @@ class TicketPluginTests(TestCase):
         expires_at = instance.date_finished + timedelta(seconds=600)
         expected = [{'type': 'download_replay', 'session_id': str(session.pk),
                      'expires_at': expires_at.isoformat()}]
-        self.assertEqual(instance.context['plugin']['execution_mode'], 'automatic')
+        self.assertEqual(instance.context['plugin'], {'type': 'download_replay'})
         self.assertEqual(instance.events.get(type='action.executed').data['action'], 'grant_replay_download')
         self.assertEqual(plugin.get_replay_access(ticket, self.applicant),
                          (expected, {'state': 'available', 'expires_at': expires_at.isoformat()}))
         context = {'request': SimpleNamespace(user=self.applicant), 'view': SimpleNamespace(action='retrieve')}
         with patch.object(plugin, 'get_replay_access', wraps=plugin.get_replay_access) as access:
             detail = TicketSerializer(ticket, context=context).data
-            self.assertEqual(detail['available_actions'], expected)
-            self.assertEqual(detail['replay_access_status']['state'], 'available')
+            self.assertEqual(detail['result']['actions'], expected)
+            self.assertEqual(detail['result']['state'], 'available')
             access.assert_called_once()
         context['view'].action = 'list'
         with patch.object(plugin, 'get_replay_access') as access:
             listing = TicketSerializer(ticket, context=context).data
-            self.assertIsNone(listing['replay_access_status'])
-            self.assertEqual(listing['available_actions'], [])
+            self.assertIsNone(listing['result'])
             access.assert_not_called()
         Ticket.objects.filter(pk=ticket.pk).update(request_data={'session': str(uuid4()), 'duration': 86400})
         ticket.refresh_from_db()
@@ -287,7 +400,7 @@ class TicketPluginTests(TestCase):
                 self.assertEqual(self.replay_download(ticket).status_code, 403)
         with tmp_to_org(self.other_org):
             self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
-            self.assertEqual(self.replay_download(ticket).status_code, 403)
+            self.assertEqual(self.replay_download(ticket).status_code, 404)
         RoleBinding.objects_raw.filter(user=self.applicant, org=self.org).delete()
         self.assertEqual(plugin.get_replay_access(ticket, self.applicant), ([], {'state': 'unavailable'}))
         self.assertEqual(self.replay_download(ticket).status_code, 403)
@@ -322,7 +435,7 @@ class TicketPluginTests(TestCase):
         for mode in ('approval_only', None):
             with self.subTest(snapshot_mode=mode):
                 session, ticket, instance = self.replay_ticket(mode=mode)
-                self.assertEqual(instance.context['plugin']['execution_mode'], mode)
+                self.assertEqual(instance.context['plugin'], {'type': 'download_replay'})
                 self.assertEqual(instance.events.get(type='action.executed').data['action'], 'grant_replay_download')
                 actions, status = plugin.get_replay_access(ticket, self.applicant)
                 self.assertEqual(status['state'], 'available')
@@ -370,7 +483,8 @@ class TicketPluginTests(TestCase):
             request = APIRequestFactory().get('/')
             force_authenticate(request, self.applicant)
             endpoint = SessionViewSet.as_view({'get': 'download'}, **SessionViewSet.download.kwargs)
-            self.assertEqual(endpoint(request, pk=session.pk).status_code, 403)
+            with transaction.atomic():
+                self.assertEqual(endpoint(request, pk=session.pk).status_code, 403)
             permission = Permission.objects.get(codename='download_sessionreplay', content_type__app_label='terminal')
             role = Role.objects.create(name=str(uuid4()), scope='org')
             role.permissions.add(permission)
@@ -485,7 +599,8 @@ class TicketPluginTests(TestCase):
         def options(user, org_id=self.org.id):
             request = APIRequestFactory().get('/', {'org_id': org_id})
             force_authenticate(request, user)
-            return TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='download_replay')
+            with transaction.atomic():
+                return TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='download_replay')
 
         self.assertFalse(self.applicant.has_perm('terminal.view_session'))
         self.assertTrue(self.alice.has_perm('terminal.view_session'))
@@ -635,7 +750,7 @@ class TicketPluginTests(TestCase):
         other = Asset.objects.create(name='Another asset', address='192.0.2.11', platform=self.platform)
         Account.objects.create(asset=other, name='Other account', username='other-asset')
         factory = APIRequestFactory()
-        for ticket_type in ('change_secret', 'file_transfer', 'view_secret'):
+        for ticket_type in ('change_secret', 'view_secret'):
             request = factory.get('/', {'org_id': self.org.id, 'asset': self.asset.id})
             force_authenticate(request, self.applicant)
             response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk=ticket_type)
@@ -668,7 +783,8 @@ class TicketPluginTests(TestCase):
         for params, expected_status in cases:
             request = factory.get('/', params)
             force_authenticate(request, self.applicant)
-            response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='change_secret')
+            with transaction.atomic():
+                response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk='change_secret')
             self.assertEqual(response.status_code, expected_status, response.data)
         with override_settings(TICKET_APPLY_ASSET_SCOPE='permed_valid'):
             request = factory.get('/', {'org_id': self.org.id, 'asset': self.asset.id})
@@ -826,13 +942,14 @@ class TicketPluginTests(TestCase):
         grant = TicketSecretAccess.objects.get(ticket=ticket, account_id=account.pk)
         self.assertEqual((grant.user_id, grant.org_id), (self.applicant.pk, self.org.id))
         self.assertTrue(instance.events.filter(type='action.executed').exists())
-        self.assertEqual(len(get_ticket_plugin('view_secret').get_available_actions(ticket, self.applicant)), 1)
-        self.assertEqual(get_ticket_plugin('view_secret').get_available_actions(ticket, self.alice), [])
+        self.assertEqual(len(get_ticket_plugin('view_secret').get_result(ticket, self.applicant)['actions']), 1)
+        self.assertEqual(get_ticket_plugin('view_secret').get_result(ticket, self.alice)['actions'], [])
 
         def reveal(user, account_id=account.pk):
             request = APIRequestFactory().post('/', {'ticket_id': str(ticket.pk)}, format='json')
             force_authenticate(request, user)
-            return AccountTicketSecretAPI.as_view()(request, pk=account_id)
+            with transaction.atomic():
+                return AccountTicketSecretAPI.as_view()(request, pk=account_id)
 
         with override_settings(SECURITY_VIEW_AUTH_NEED_MFA=False):
             self.assertEqual(reveal(self.bob).status_code, 403)
@@ -879,12 +996,12 @@ class TicketPluginTests(TestCase):
         force_authenticate(detail_request, self.applicant)
         detail = TicketViewSet.as_view({'get': 'retrieve'})(detail_request, pk=ticket.pk)
         self.assertEqual(detail.status_code, 200, detail.data)
-        self.assertEqual([item['account_id'] for item in detail.data['available_actions']], [str(account.pk)])
-        self.assertEqual(detail.data['secret_access_status']['state'], 'available')
+        self.assertEqual([item['account_id'] for item in detail.data['result']['actions']], [str(account.pk)])
+        self.assertEqual(detail.data['result']['state'], 'available')
         with override_settings(SECURITY_DISABLE_VIEW_SECRET=True):
             hidden = TicketViewSet.as_view({'get': 'retrieve'})(detail_request, pk=ticket.pk)
-            self.assertEqual(hidden.data['available_actions'], [])
-            self.assertEqual(hidden.data['secret_access_status'], {'state': 'disabled'})
+            self.assertEqual(hidden.data['result']['actions'], [])
+            self.assertEqual(hidden.data['result'], {'state': 'disabled', 'actions': []})
 
     def test_secret_access_status_uses_real_grants_and_distinguishes_unavailable_reasons(self):
         account = self.create_account()
@@ -944,14 +1061,13 @@ class TicketPluginTests(TestCase):
         plugin = get_ticket_plugin('view_secret')
         with patch.object(plugin, 'get_secret_access', wraps=plugin.get_secret_access) as access:
             data = TicketSerializer(ticket, context=context).data
-            self.assertEqual(data['secret_access_status'], {'state': 'pending'})
-            self.assertEqual(data['available_actions'], [])
+            self.assertEqual(data['result'], {'state': 'pending', 'actions': []})
+            self.assertEqual(data['result']['actions'], [])
             access.assert_called_once_with(ticket, self.applicant)
             access.reset_mock()
             data = TicketSerializer(ticket, context={**context, 'view': SimpleNamespace(action='list')}).data
-            self.assertIsNone(data['secret_access_status'])
-            self.assertEqual(data['available_actions'], [])
-            self.assertIsNone(TicketSerializer(self.ticket(), context=context).data['secret_access_status'])
+            self.assertIsNone(data['result'])
+            self.assertEqual(TicketSerializer(self.ticket(), context=context).data['result']['actions'], [])
             access.assert_not_called()
 
     def test_authorized_users_are_plugin_parameters_and_granted_from_snapshot(self):
@@ -1094,18 +1210,38 @@ class TicketPluginTests(TestCase):
     def test_new_plugin_needs_no_enum_model_or_route(self):
         class ExamplePlugin(TicketPlugin):
             type, label, self_service = 'test_example', 'Example', True
-            request_serializer = 'tickets.tests.test_plugins.ExampleParameters'
+            request_serializer = 'tickets.tests.test_plugins.ExtensionParameters'
+            actions = {'read_reason': 'tickets.tests.test_plugins.ExtensionAction'}
+
+            def get_result(self, ticket, user):
+                actions = [{'type': 'read_reason'}] if ticket.state == 'approved' and user.pk == ticket.applicant_id else []
+                return {'state': ticket.state, 'actions': actions}
 
         ticket_plugins.register(ExamplePlugin())
         self.addCleanup(ticket_plugins._plugins.pop, 'test_example')
         self.assertEqual(get_ticket_plugin('test_example').metadata()['fields'][0]['name'], 'reason')
-        serializer = self.serializer(self.payload('test_example', reason='Need access'))
+        ticket_plugins.validate()
+        serializer = self.serializer(self.payload('test_example', reason='Need access', enabled=False, scopes=['two', 'one']))
         self.assertTrue(serializer.is_valid(), serializer.errors)
         ticket = serializer.save()
         instance = submit_ticket(ticket)
+        self.assertFalse(instance.context['request']['enabled'])
+        self.assertEqual(set(instance.context['request']['scopes']), {'one', 'two'})
+        self.assertEqual(self.plugin_action(ticket, 'read_reason').status_code, 403)
         self.engine.approve(self.task(instance), self.alice)
         ticket.refresh_from_db()
         self.assertEqual((ticket.type, ticket.state), ('test_example', 'approved'))
+        context = {'request': SimpleNamespace(user=self.applicant), 'view': SimpleNamespace(action='retrieve')}
+        self.assertEqual(TicketSerializer(ticket, context=context).data['result'], {
+            'state': 'approved', 'actions': [{'type': 'read_reason'}],
+        })
+        self.assertEqual(self.plugin_action(ticket, 'read_reason', user=self.alice).status_code, 403)
+        with tmp_to_root_org(), patch.object(ExtensionPermission, 'has_permission',
+                side_effect=lambda request, view: str(current_org.id) == str(ticket.org_id)):
+            self.assertEqual(self.plugin_action(ticket, 'read_reason').status_code, 200)
+        Ticket.objects.filter(pk=ticket.pk).update(request_data={'reason': 'Forged after approval'})
+        self.assertEqual(self.plugin_action(ticket, 'read_reason').data, {'reason': 'Need access'})
+        self.assertEqual(self.plugin_action(ticket, 'read_reason', data={'reason': 'Forged from client'}).status_code, 400)
 
     def test_catalogue_and_user_options(self):
         factory = APIRequestFactory()

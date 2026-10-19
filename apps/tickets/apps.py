@@ -9,6 +9,7 @@ class TicketsConfig(AppConfig):
     def ready(self):
         from .plugins import ticket_plugins
         ticket_plugins.discover()
+        ticket_plugins.validate()
         from . import signal_handlers  # noqa
         from . import notifications  # noqa
         return super().ready()

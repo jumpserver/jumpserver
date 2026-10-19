@@ -9,6 +9,7 @@ class Plugin(TicketPlugin):
     self_service = True
     execution_mode = 'automatic'
     request_serializer = 'tickets.plugins.download_replay.serializer.RequestSerializer'
+    actions = {'download_replay': 'tickets.plugins.download_replay.actions.DownloadReplay'}
 
     @staticmethod
     def _replay_parameters(instance):
@@ -45,8 +46,9 @@ class Plugin(TicketPlugin):
         return {'action': 'grant_replay_download', 'session_id': str(session_id),
                 'expires_at': expires_at.isoformat()}
 
-    def get_available_actions(self, ticket, user):
-        return self.get_replay_access(ticket, user)[0]
+    def get_result(self, ticket, user):
+        actions, status = self.get_replay_access(ticket, user)
+        return {**status, 'actions': actions}
 
     def get_replay_access(self, ticket, user):
         from django.utils import timezone
@@ -91,6 +93,10 @@ class Plugin(TicketPlugin):
         from uuid import UUID
         from django.db.models import Q
         from jumpserver.rewriting.pagination import MaxLimitOffsetPagination
+        from rest_framework.exceptions import ValidationError
+
+        if request.query_params.get('field', 'session') != 'session':
+            raise ValidationError({'field': 'Unknown resource field.'})
 
         serializer = self.get_request_serializer(context={'request': request, 'org_id': org_id})
         sessions = serializer.get_sessions().filter(has_replay=True)

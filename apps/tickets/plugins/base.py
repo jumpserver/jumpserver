@@ -12,6 +12,8 @@ class TicketPlugin:
     execution_mode = 'approval_only'
     apply_serializer = None
     request_serializer = None
+    custom_form = False
+    actions = {}
 
     def get_request_serializer(self, **kwargs):
         return import_string(self.request_serializer)(**kwargs)
@@ -57,9 +59,19 @@ class TicketPlugin:
         return [{key: resource[key] for key in ('type', 'id', 'name') if key in resource}
                 for resource in event.data.get('resources', [])]
 
-    def get_available_actions(self, ticket, user):
-        """Return only operations the current user may perform now."""
-        return []
+    def get_execution_mode(self, ticket):
+        return self.execution_mode
+
+    def get_result(self, ticket, user):
+        """Live, non-secret state; action handlers must authorize again on use."""
+        return {'state': ticket.state, 'actions': []}
+
+    def get_action(self, name):
+        from rest_framework.exceptions import NotFound
+        handler = self.actions.get(name)
+        if not handler:
+            raise NotFound('Unknown ticket action.')
+        return import_string(handler)()
 
     def request_items(self, ticket):
         if not self.request_serializer:
@@ -85,7 +97,8 @@ class TicketPlugin:
             'type': self.type, 'label': str(self.label), 'self_service': self.self_service,
             'creation_modes': list(self.creation_modes or (('manual',) if self.self_service else ('system',))),
             'execution_mode': self.execution_mode,
-            'fields': request_fields(self.get_request_serializer()) if self.request_serializer else [],
+            'custom_form': self.custom_form,
+            'fields': request_fields(self.get_request_serializer()) if self.request_serializer and not self.custom_form else [],
         }
 
     def options(self, request, org_id):
@@ -94,5 +107,8 @@ class TicketPlugin:
         if self.request_serializer:
             serializer = self.get_request_serializer(context={'request': request, 'org_id': org_id})
             if isinstance(serializer, AssetAccountRequestSerializer):
+                field = request.query_params.get('field', 'accounts')
+                if field != 'accounts':
+                    raise ValidationError({'field': 'Unknown resource field.'})
                 return serializer.account_options(request.query_params.get('asset'))
         raise ValidationError('This ticket type has no resource options.')

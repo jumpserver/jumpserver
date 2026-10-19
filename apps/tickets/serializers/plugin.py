@@ -1,5 +1,8 @@
+import json
+
 from django.utils.module_loading import import_string
 from rest_framework import serializers
+from rest_framework.renderers import JSONRenderer
 
 from tickets.models import Ticket
 from tickets.plugins import get_ticket_plugin
@@ -36,7 +39,7 @@ class PluginTicketApplySerializer(TicketApplySerializer):
         serializer = plugin.get_request_serializer(data=payload, context=with_context)
         if not serializer.is_valid():
             raise serializers.ValidationError({'request_data': serializer.errors})
-        attrs['request_data'] = json_snapshot(dict(serializer.data))
+        attrs['request_data'] = json_snapshot(json.loads(JSONRenderer().render(serializer.data)))
         return attrs
 
     def create(self, validated_data):

@@ -8,6 +8,7 @@ class Plugin(TicketPlugin):
     type = 'apply_asset'
     label = _('Apply for asset')
     self_service = True
+    custom_form = True
     execution_mode = 'automatic'
     apply_serializer = 'tickets.serializers.ticket.apply_asset.ApplyAssetSerializer'
 
