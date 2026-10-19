@@ -12,6 +12,7 @@ from common.api.generic import JMSBulkModelViewSet
 from common.exceptions import JMSException
 from common.permissions import IsOwnerOrAdminWritable
 from common.utils.http import is_true
+from common.utils.yml import atomic_dump_text
 from common.utils.zip import safe_extract_zip
 from ops.filters import PlaybookFilterSet
 from rbac.permissions import RBACPermission
@@ -33,7 +34,10 @@ def unzip_playbook(src, dest):
 
 
 @extend_schema_view(
-    create=extend_schema(parameters=[OpenApiParameter('clone_from', OpenApiTypes.UUID)]),
+    create=extend_schema(parameters=[OpenApiParameter(
+        'clone_from', OpenApiTypes.UUID,
+        description='Clone a visible Playbook; inherit its scope when scope is omitted.',
+    )]),
     list=extend_schema(parameters=[OpenApiParameter('only_mine', OpenApiTypes.BOOL)]),
 )
 class PlaybookViewSet(JMSBulkModelViewSet):
@@ -71,7 +75,6 @@ class PlaybookViewSet(JMSBulkModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        instance = serializer.save()
         base_path = safe_join(settings.DATA_DIR, "ops", "playbook")
         clone_id = self.request.query_params.get('clone_from')
 
@@ -80,13 +83,30 @@ class PlaybookViewSet(JMSBulkModelViewSet):
             clone_from = queryset.filter(id=clone_id).first()
             if not clone_from:
                 raise JMSException(code='invalid_clone_id', detail={"msg": gettext("Invalid clone_from id")})
-            src_path = safe_join(base_path, clone_id)
+            clone_options = {} if 'scope' in self.request.data else {'scope': clone_from.scope}
+            instance = serializer.save(**clone_options)
+            src_path = safe_join(base_path, str(clone_from.id))
             dest_path = safe_join(base_path, str(instance.id))
             if not os.path.exists(src_path):
                 raise JMSException(code='invalid_playbook_id', detail={"msg": gettext("clone playbook file not found")})
-            shutil.copytree(src_path, dest_path)
+
+            def reject_symlinks(directory, names):
+                if os.path.islink(directory) or any(
+                    os.path.islink(os.path.join(directory, name)) for name in names
+                ):
+                    raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+                return []
+
+            destination_exists = os.path.lexists(dest_path)
+            try:
+                shutil.copytree(src_path, dest_path, ignore=reject_symlinks)
+            except Exception:
+                if not destination_exists and os.path.isdir(dest_path):
+                    shutil.rmtree(dest_path)
+                raise
             return
 
+        instance = serializer.save()
         if 'multipart/form-data' in self.request.headers['Content-Type']:
             src_path = safe_join(settings.MEDIA_ROOT, instance.path.name)
             dest_path = safe_join(base_path, str(instance.id))
@@ -129,7 +149,44 @@ class PlaybookFileBrowserAPIView(APIView):
         'DELETE': 'ops.change_playbook',
         'PATCH': 'ops.change_playbook',
     }
-    protected_files = ['root', 'main.yml']
+    protected_files = {'main.yml', 'main.yaml', 'main'}
+
+    @staticmethod
+    def resolve_file_path(work_path, key, allow_root=False):
+        if not isinstance(key, str) or '\x00' in key or '\\' in key or os.path.isabs(key):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        if key == 'root':
+            key = ''
+        elif key.startswith('root/'):
+            key = key[5:]
+
+        try:
+            root_path = os.path.abspath(work_path)
+            file_path = safe_join(root_path, key)
+        except (SuspiciousFileOperation, ValueError):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+
+        relative_path = os.path.relpath(file_path, root_path)
+        if relative_path == '.' and not allow_root:
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+
+        # Check each component because safe_join only checks the lexical path.
+        current = root_path
+        if os.path.islink(current):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        for part in relative_path.split(os.sep):
+            current = os.path.join(current, part)
+            if os.path.islink(current):
+                raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        real_root = os.path.realpath(root_path)
+        if os.path.commonpath((real_root, os.path.realpath(file_path))) != real_root:
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
+        return file_path
+
+    @staticmethod
+    def validate_file_name(name):
+        if name in {'.', '..', 'root'} or any(char in name for char in ('/', '\\', '\x00')):
+            raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
 
     def get_playbook(self, playbook_id):
         playbook = get_object_or_404(Playbook, id=playbook_id, creator=self.request.user)
@@ -143,7 +200,7 @@ class PlaybookFileBrowserAPIView(APIView):
         file_key = request.query_params.get('key', '')
         if file_key:
             try:
-                file_path = safe_join(work_path, file_key)
+                file_path = self.resolve_file_path(work_path, file_key)
                 with open(file_path, 'r') as f:
                     content = f.read()
             except UnicodeDecodeError:
@@ -152,6 +209,7 @@ class PlaybookFileBrowserAPIView(APIView):
                 raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
             return Response({'content': content})
         else:
+            self.resolve_file_path(work_path, '', allow_root=True)
             expand_key = request.query_params.get('expand', '')
             nodes = self.generate_tree(playbook, work_path, expand_key)
             return Response(nodes)
@@ -161,17 +219,15 @@ class PlaybookFileBrowserAPIView(APIView):
         playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
 
-        parent_key = request.data.get('key', '')
-        if parent_key == 'root':
-            parent_key = ''
-        if os.path.dirname(parent_key) == 'root':
-            parent_key = os.path.basename(parent_key)
+        serializer = PlaybookFileCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        full_path = self.resolve_file_path(work_path, data.get('key', ''), allow_root=True)
 
-        full_path = safe_join(work_path, parent_key)
-
-        is_directory = request.data.get('is_directory', False)
-        content = request.data.get('content', '')
-        name = request.data.get('name', '')
+        is_directory = data.get('is_directory', False)
+        content = data.get('content', '')
+        name = data.get('name', '')
+        self.validate_file_name(name)
 
         def find_new_name(p, is_file=False):
             if not p:
@@ -192,8 +248,11 @@ class PlaybookFileBrowserAPIView(APIView):
                 os.makedirs(new_file_path)
             else:
                 new_file_path = find_new_name(name, True)
-                with open(new_file_path, 'w') as f:
+                self.resolve_file_path(work_path, os.path.relpath(new_file_path, work_path))
+                with open(new_file_path, 'x') as f:
                     f.write(content)
+        except FileExistsError:
+            raise JMSException(code='file_already_exists', detail={"msg": _("File already exists")})
         except SuspiciousFileOperation:
             raise JMSException(code='invalid_file_path', detail={"msg": _("Invalid file path")})
 
@@ -201,11 +260,9 @@ class PlaybookFileBrowserAPIView(APIView):
         new_node = {
             "name": os.path.basename(new_file_path),
             "title": os.path.basename(new_file_path),
-            "id": safe_join(relative_path, os.path.basename(new_file_path))
-            if not safe_join(relative_path, os.path.basename(new_file_path)).startswith('.')
-            else os.path.basename(new_file_path),
+            "id": os.path.relpath(new_file_path, work_path),
             "isParent": is_directory,
-            "pId": relative_path if not relative_path.startswith('.') else 'root',
+            "pId": relative_path if relative_path != '.' else 'root',
             "open": True,
         }
         if not is_directory:
@@ -217,21 +274,19 @@ class PlaybookFileBrowserAPIView(APIView):
         playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
 
-        file_key = request.data.get('key', '')
-        new_name = request.data.get('new_name', '')
+        serializer = PlaybookFileUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        file_path = self.resolve_file_path(work_path, data['key'])
+        file_key = os.path.relpath(file_path, work_path)
+        new_name = data.get('new_name', '')
+        self.validate_file_name(new_name)
 
-        if file_key in self.protected_files and new_name:
+        if file_key.casefold() in self.protected_files and new_name:
             raise JMSException(code='this_file_can_not_be_rename', detail={"msg": _("This file can not be rename")})
 
-        if os.path.dirname(file_key) == 'root':
-            file_key = os.path.basename(file_key)
-
-        content = request.data.get('content', '')
-        is_directory = request.data.get('is_directory', False)
-
-        if not file_key or file_key == 'root':
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        file_path = safe_join(work_path, file_key)
+        content = data.get('content', '')
+        is_directory = data.get('is_directory', False)
 
         # rename
         if new_name:
@@ -239,7 +294,8 @@ class PlaybookFileBrowserAPIView(APIView):
                 new_file_path = safe_join(os.path.dirname(file_path), new_name)
                 if new_file_path == file_path:
                     return Response(status=status.HTTP_200_OK)
-                if os.path.exists(new_file_path):
+                self.resolve_file_path(work_path, os.path.relpath(new_file_path, work_path))
+                if os.path.lexists(new_file_path):
                     raise JMSException(code='file_already exists', detail={"msg": _("File already exists")})
                 os.rename(file_path, new_file_path)
             except SuspiciousFileOperation:
@@ -248,8 +304,7 @@ class PlaybookFileBrowserAPIView(APIView):
         # edit content
         else:
             if not is_directory:
-                with open(file_path, 'w') as f:
-                    f.write(content)
+                atomic_dump_text(file_path, lambda stream: stream.write(content))
         return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, **kwargs):
@@ -260,9 +315,10 @@ class PlaybookFileBrowserAPIView(APIView):
         if not file_key:
             raise JMSException(code='file_key_is_required', detail={"msg": _("File key is required")})
 
-        if file_key in self.protected_files:
+        file_path = self.resolve_file_path(work_path, file_key)
+        file_key = os.path.relpath(file_path, work_path)
+        if file_key.casefold() in self.protected_files:
             raise JMSException(code='This file can not be delete', detail={"msg": _("This file can not be delete")})
-        file_path = safe_join(work_path, file_key)
         if os.path.isdir(file_path):
             shutil.rmtree(file_path)
         else:
