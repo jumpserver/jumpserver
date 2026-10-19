@@ -73,7 +73,8 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
             raise PermissionDenied(_('Auth failed'))
 
         if request.method == 'GET':
-            auth_data = auth_begin(request)
+            # MFA 确认与登录保持一致：使用可发现凭证（空 allowCredentials）
+            auth_data = auth_begin(request, discoverable=bool(confirm_user_id))
             return JsonResponse(dict(auth_data))
 
         try:
@@ -85,6 +86,7 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
             return self.redirect_to_error(_('Auth failed'))
 
         if confirm_user_id:
+            # 可发现凭证可能选到其他用户的钥匙，必须校验归属当前登录用户
             if user.pk != request.user.pk:
                 return self.redirect_to_error(_('Auth failed'))
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
