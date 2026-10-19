@@ -36,6 +36,8 @@
                     <i class="fa fa-globe"></i>
                     {% if request.COOKIES.django_language == 'en' %}
                         <span class="m-r-sm text-muted welcome-message">English<b class="caret"></b></span>
+                    {% elif request.COOKIES.django_language == 'fr' %}
+                        <span class="m-r-sm text-muted welcome-message">Français<b class="caret"></b></span>
                     {% else %}
                         <span class="m-r-sm text-muted welcome-message">中文<b class="caret"></b></span>
                     {% endif %}
@@ -52,6 +54,12 @@
                         <a id="switch_hant" href="{% url 'i18n-switch' lang='zh-hant' %}">
                             <i class="fa fa-flag"></i>
                             <span> 中文(繁體)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a id="switch_fr" href="{% url 'i18n-switch' lang='fr' %}">
+                            <i class="fa fa-flag-checkered"></i>
+                            <span> Français</span>
                         </a>
                     </li>
                     <li>

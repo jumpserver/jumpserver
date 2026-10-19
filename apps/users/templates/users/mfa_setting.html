@@ -143,6 +143,15 @@
             <h2>{% trans 'MFA setting' %}</h2>
         </div>
         <hr>
+        {% if unavailable_mfa_methods %}
+            <div class="alert alert-warning" role="alert">
+                {% blocktrans with methods=unavailable_mfa_methods %}The following MFA methods are not enabled in system settings and cannot be used: {{ methods }}. Please contact your administrator.{% endblocktrans %}
+            </div>
+        {% elif not mfa_backends %}
+            <div class="alert alert-warning" role="alert">
+                {% trans 'No available MFA method. Please contact your administrator.' %}
+            </div>
+        {% endif %}
         {% for b in mfa_backends %}
             <div class="section">
                 <div class="title">{{ b.display_name }}</div>

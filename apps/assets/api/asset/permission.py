@@ -34,8 +34,15 @@ class BaseAssetPermUserOrUserGroupListApi(ListAPIView):
     def get_asset_related_perms(self):
         asset = self.get_object()
         nodes = asset.get_all_nodes(flat=True)
-        perms = AssetPermission.objects.filter(Q(assets=asset) | Q(nodes__in=nodes))
-        return perms
+        direct_perm_ids = AssetPermission.assets.through.objects.filter(
+            asset_id=asset.id
+        ).values_list('assetpermission_id', flat=True)
+        node_perm_ids = AssetPermission.nodes.through.objects.filter(
+            node_id__in=nodes
+        ).values_list('assetpermission_id', flat=True)
+        return AssetPermission.objects.filter(
+            Q(id__in=direct_perm_ids) | Q(id__in=node_perm_ids)
+        )
 
 
 class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
@@ -47,11 +54,20 @@ class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
     }
 
     def get_queryset(self):
-        perms = self.get_asset_related_perms()
-        users = User.get_queryset().filter(
-            Q(assetpermissions__in=perms) | Q(groups__assetpermissions__in=perms)
-        ).distinct()
-        return users
+        perm_ids = self.get_asset_related_perms().order_by().values_list('id', flat=True)
+        direct_user_ids = AssetPermission.users.through.objects.filter(
+            assetpermission_id__in=perm_ids
+        ).values_list('user_id', flat=True)
+        group_ids = AssetPermission.user_groups.through.objects.filter(
+            assetpermission_id__in=perm_ids
+        ).values_list('usergroup_id', flat=True)
+        group_user_ids = User.groups.through.objects.filter(
+            usergroup_id__in=group_ids
+        ).values_list('user_id', flat=True)
+
+        return User.get_queryset().filter(
+            Q(id__in=direct_user_ids) | Q(id__in=group_user_ids)
+        )
 
 
 class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
@@ -59,9 +75,11 @@ class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
     queryset = UserGroup.objects.none()
 
     def get_queryset(self):
-        perms = self.get_asset_related_perms()
-        user_groups = UserGroup.objects.filter(assetpermissions__in=perms).distinct()
-        return user_groups
+        perm_ids = self.get_asset_related_perms().order_by().values_list('id', flat=True)
+        group_ids = AssetPermission.user_groups.through.objects.filter(
+            assetpermission_id__in=perm_ids
+        ).values_list('usergroup_id', flat=True)
+        return UserGroup.objects.filter(id__in=group_ids)
 
 
 class BaseAssetRelatedPermissionListApi(generics.ListAPIView):

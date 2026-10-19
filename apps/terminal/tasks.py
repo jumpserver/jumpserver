@@ -8,7 +8,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.files.storage import default_storage
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from common.storage.replay import ReplayStorageHandler
 from ops.celery.decorator import (
@@ -19,13 +19,17 @@ from .backends import server_replay_storage
 from .const import ReplayStorageType, CommandStorageType
 from .models import (
     Status, Session, Task, AppletHostDeployment,
-    AppletHost, ReplayStorage, CommandStorage
+    AppProviderDeployment, ReplayStorage, CommandStorage
 )
 from .notifications import StorageConnectivityMessage
 
 CACHE_REFRESH_INTERVAL = 10
 RUNNING = False
 logger = get_task_logger(__name__)
+
+
+class AppProviderDeploymentError(RuntimeError):
+    """Deployment failure whose details are already included in the task log."""
 
 
 @shared_task(
@@ -134,6 +138,55 @@ def run_applet_host_deployment(did, install_applets):
 
 
 @shared_task(
+    verbose_name=_('Run app provider deployment'),
+    activity_callback=lambda self, did, *args, **kwargs: ([did],),
+    description=_('Deploy the Panda runtime on an application provider host'),
+    soft_time_limit=1860, time_limit=1920,
+    throws=(AppProviderDeploymentError,),
+)
+def run_app_provider_deployment(did):
+    with tmp_to_builtin_org(system=1):
+        claimed = AppProviderDeployment.objects.filter(pk=did, status='pending').update(
+            status='running', date_start=timezone.now(), date_updated=timezone.now(),
+        )
+        if not claimed:
+            return
+        deployment = AppProviderDeployment.objects.get(id=did)
+        deployment.start()
+        if deployment.status != 'success':
+            raise AppProviderDeploymentError(gettext('Application provider deployment failed; see the Ansible task log'))
+
+
+@shared_task(
+    verbose_name=_('Publish all virtual apps'),
+    activity_callback=lambda self, ids, *args, **kwargs: (ids,),
+    description=_('Publish all virtual applications on an application provider'),
+    throws=(AppProviderDeploymentError,),
+)
+def run_app_provider_deployments(ids):
+    with tmp_to_builtin_org(system=1):
+        deployments = AppProviderDeployment.objects.filter(id__in=ids).select_related(
+            'provider', 'publication', 'publication__app'
+        )
+        deployments_by_id = {str(item.id): item for item in deployments}
+        failed = []
+        for deployment_id in ids:
+            deployment = deployments_by_id.get(str(deployment_id))
+            if not deployment:
+                continue
+            claimed = AppProviderDeployment.objects.filter(pk=deployment.pk, status='pending').update(
+                status='running', date_start=timezone.now(), date_updated=timezone.now(),
+            )
+            if not claimed:
+                continue
+            deployment.start()
+            if deployment.status != 'success':
+                failed.append(str(deployment.pk))
+        if failed:
+            raise AppProviderDeploymentError('Virtual application publication failed: ' + ', '.join(failed))
+
+
+@shared_task(
     verbose_name=_('Install applet'),
     activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,),
     description=_(
@@ -161,23 +214,6 @@ def run_applet_host_deployment_uninstall_applet(ids, applet_id):
         for did in ids:
             deployment = AppletHostDeployment.objects.get(id=did)
             deployment.uninstall_applet(applet_id)
-
-
-@shared_task(
-    verbose_name=_('Generate applet host accounts'),
-    activity_callback=lambda self, host_id, *args, **kwargs: ([host_id],),
-    description=_(
-        """When a remote publishing server is created and an account needs to be created 
-        automatically, this task will be executed"""
-    )
-)
-def applet_host_generate_accounts(host_id):
-    applet_host = AppletHost.objects.filter(id=host_id).first()
-    if not applet_host:
-        return
-
-    with tmp_to_builtin_org(system=1):
-        applet_host.generate_accounts()
 
 
 @shared_task(

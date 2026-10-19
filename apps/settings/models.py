@@ -1,5 +1,6 @@
 import json
 
+import ldap
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -9,10 +10,8 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
-from common.db.models import JMSBaseModel
 from common.db.utils import Encryptor
 from common.utils import get_logger
-from .const import ChatAITypeChoices
 from .signals import setting_changed
 
 
@@ -93,8 +92,17 @@ class Setting(models.Model):
         setting_changed.send(sender=cls, name=name, item=item)
 
     def refresh_setting(self):
-        setattr(settings, self.name, self.cleaned_value)
+        value = self.cleaned_value
+        setattr(settings, self.name, value)
+        self.refresh_ldap_timeout_if_need(value)
         self.refresh_keycloak_to_openid_if_need()
+
+    def refresh_ldap_timeout_if_need(self, value):
+        if self.name not in ('AUTH_LDAP_CONNECT_TIMEOUT', 'AUTH_LDAP_HA_CONNECT_TIMEOUT'):
+            return
+        options = getattr(settings, self.name.replace('CONNECT_TIMEOUT', 'CONNECTION_OPTIONS'))
+        # Update in place: LDAP backends may already hold this dictionary.
+        options.update({ldap.OPT_TIMEOUT: value, ldap.OPT_NETWORK_TIMEOUT: value})
 
     def refresh_keycloak_to_openid_if_need(self):
         watch_config_names = [
@@ -166,6 +174,7 @@ class Setting(models.Model):
         verbose_name = _("System setting")
         permissions = [
             ('change_basic', _('Can change basic setting')),
+            ('change_systemtools', _('Can change system tools setting')),
             ('change_email', _('Can change email setting')),
             ('change_auth', _('Can change auth setting')),
             ('change_ops', _('Can change auth ops')),
@@ -185,32 +194,13 @@ class Setting(models.Model):
         ]
 
 
-class ChatPrompt(JMSBaseModel):
-    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
-    content = models.TextField(blank=False, null=False, verbose_name=_('Content'))
-    builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
-
-    class Meta:
-        verbose_name = _("Chat prompt")
-
-    def __str__(self):
-        return self.name
-
-
-def get_chatai_data():
-    data = {
-        'url': settings.GPT_BASE_URL,
-        'api_key': settings.GPT_API_KEY,
-        'proxy': settings.GPT_PROXY,
-        'model': settings.GPT_MODEL if settings.GPT_MODEL != 'custom' else settings.CUSTOM_GPT_MODEL,
+def get_chat_ai_config():
+    return {
+        'base_url': settings.CHAT_AI_BASE_URL or '',
+        'api_key': settings.CHAT_AI_API_KEY or '',
+        'proxy': settings.CHAT_AI_PROXY or '',
+        'model': settings.CHAT_AI_MODEL or '',
     }
-    if settings.CHAT_AI_TYPE != ChatAITypeChoices.gpt:
-        data['url'] = settings.DEEPSEEK_BASE_URL
-        data['api_key'] = settings.DEEPSEEK_API_KEY
-        data['proxy'] = settings.DEEPSEEK_PROXY
-        data['model'] = settings.DEEPSEEK_MODEL if settings.DEEPSEEK_MODEL != 'custom' else settings.CUSTOM_DEEPSEEK_MODEL
-
-    return data
 
 
 class LeakPasswords(models.Model):

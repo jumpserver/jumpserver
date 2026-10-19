@@ -16,3 +16,4 @@ def quickstart_automation_by_snapshot(task_name, tp, task_snapshot=None):
         type=tp, trigger=Trigger.manual, **data
     )
     execution.start()
+    return execution

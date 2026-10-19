@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import gettext
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
@@ -42,6 +43,6 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
         except errors.MFAUnsetError:
-            return Response({'error': 'MFA unset, please set first'}, status=400)
+            return Response({'error': gettext('MFA unset, please set first')}, status=400)
         except Exception as e:
             return Response({"error": str(e)}, status=400)

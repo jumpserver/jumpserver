@@ -1,19 +1,23 @@
 from channels.auth import AuthMiddlewareStack
 from channels.db import database_sync_to_async
 from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import WebsocketDenier
 from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
+from django.utils.module_loading import import_string
 
 from authentication.backends.drf import (
     SignatureAuthentication,
-    AccessTokenAuthentication
+    AccessTokenAuthentication,
+    OAuth2Authentication,
 )
 from notifications.urls.ws_urls import urlpatterns as notifications_urlpatterns
 from ops.urls.ws_urls import urlpatterns as ops_urlpatterns
 from settings.urls.ws_urls import urlpatterns as setting_urlpatterns
 from terminal.urls.ws_urls import urlpatterns as terminal_urlpatterns
 from common.utils import get_logger
+from .ws_origin import build_allowed_origins, normalize_origin
 import socket
 
 logger = get_logger(__name__)
@@ -26,9 +30,7 @@ urlpatterns = ops_urlpatterns + \
               terminal_urlpatterns
 
 if settings.XPACK_ENABLED:
-    from xpack.plugins.cloud.urls.ws_urls import urlpatterns as xcloud_urlpatterns
-
-    urlpatterns += xcloud_urlpatterns
+    urlpatterns += import_string('xpack.urls.ws_urls.urlpatterns')
 
 
 @database_sync_to_async
@@ -41,23 +43,55 @@ def get_signature_user(scope):
     # 因为 ws 使用的是 scope，所以需要转换成 request 对象，用于认证校验
     request = ASGIRequest(scope, None)
     backends = [SignatureAuthentication(),
-                AccessTokenAuthentication()]
+                AccessTokenAuthentication(),
+                OAuth2Authentication()]
     for backend in backends:
         try:
-            user, _ = backend.authenticate(request)
+            result = backend.authenticate(request)
+            if not result:
+                continue
+            user, _ = result
             if user:
                 return user
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.debug('WebSocket authentication failed for %s', backend.__class__.__name__)
     return None
 
 
 class WsSignatureAuthMiddleware:
     def __init__(self, app):
         self.app = app
+        self.allowed_origins = None
+        if settings.WS_ALLOWED_ORIGINS is not None:
+            self.allowed_origins = build_allowed_origins(settings.WS_ALLOWED_ORIGINS, '', '')
 
     async def __call__(self, scope, receive, send):
+        origins = [value for name, value in scope.get('headers', []) if name == b'origin']
+        if origins:
+            allowed_origins = self.allowed_origins
+            if allowed_origins is None:
+                # SITE_URL can be updated from database settings after startup.
+                allowed_origins = build_allowed_origins(None, settings.SITE_URL, settings.CONFIG.DOMAINS)
+            try:
+                valid_origin = (
+                    len(origins) == 1
+                    and (
+                        '*' in allowed_origins
+                        or normalize_origin(origins[0].decode('ascii')) in allowed_origins
+                    )
+                )
+            except (UnicodeDecodeError, ValueError):
+                valid_origin = False
+            if not valid_origin:
+                return await WebsocketDenier()(scope, receive, send)
+
         user = await get_signature_user(scope)
+        if user and (not user.is_authenticated or not user.is_valid):
+            user = None
+        # Native clients may omit Origin, but a browser session cookie is not
+        # sufficient: only successful header authentication can use this path.
+        if not origins and not user:
+            return await WebsocketDenier()(scope, receive, send)
         if user:
             scope['user'] = user
         return await self.app(scope, receive, send)

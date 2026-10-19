@@ -130,7 +130,7 @@ class CheckAccountEngine(JMSBaseModel):
             {
                 "id": "00000000-0000-0000-0000-000000000002",
                 "slug": "check_account_secret",
-                "name": _("Check the strength of your account and password"),
+                "name": _("Check account password strength"),
                 "comment": _(
                     "Perform checks and analyses based on the security of account passwords, "
                     "including password strength, leakage, etc."
@@ -139,7 +139,7 @@ class CheckAccountEngine(JMSBaseModel):
             {
                 "id": "00000000-0000-0000-0000-000000000003",
                 "slug": "check_account_repeat",
-                "name": _("Check if the account and password are repeated"),
+                "name": _("Check whether account passwords are duplicated"),
                 "comment": _("Check if the account is the same as other accounts.")
             },
             {

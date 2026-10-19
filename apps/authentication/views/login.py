@@ -16,6 +16,7 @@ from django.http import HttpRequest
 from django.shortcuts import reverse, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.html import format_html
 from django.utils.translation import gettext as _, get_language, get_language_from_request
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -96,6 +97,11 @@ class UserLoginContextMixin:
 
     def set_csrf_error_if_need(self, context):
         if not self.request.GET.get('csrf_failure'):
+            return context
+
+        if self.request.GET.get('csrf_reason') == 'cookie':
+            context['csrf_cookie_error'] = True
+            context['session_cookie_domain'] = settings.SESSION_COOKIE_DOMAIN
             return context
 
         http_origin = self.request.META.get('HTTP_ORIGIN')
@@ -335,8 +341,10 @@ class UserLoginWaitConfirmView(TemplateView):
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id, type=ticket.type)
             assignees_display = ', '.join([str(assignee) for assignee in ticket.current_assignees])
-            msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
-                  Don't close this page""").format(assignees_display)
+            msg = format_html(
+                _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
+                  Don't close this page"""), assignees_display
+            )
         else:
             timestamp_created = 0
             ticket_detail_url = ''

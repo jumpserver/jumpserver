@@ -11,7 +11,9 @@ from sshtunnel import (
     BaseSSHTunnelForwarderError, HandlerSSHTunnelForwarderError,
 )
 
-from assets.automations.base.manager import print_automation_log
+from assets.automations.base.manager import (
+    BasePlaybookManager, print_automation_log,
+)
 from assets.const import AutomationTypes, Connectivity
 from assets.models import Gateway
 from common.const import Status
@@ -45,6 +47,19 @@ class PingGatewayManager:
         if username:
             name = f'{name} / {username}'
         return str(name)
+
+    @staticmethod
+    def format_execution_account(account):
+        if not account:
+            return ''
+        detail = {
+            'name': account.name,
+            'username': account.username,
+            'privileged': account.privileged,
+        }
+        return BasePlaybookManager.format_execution_account_label(
+            account.username, {}, detail
+        )
 
     @classmethod
     def method_type(cls):
@@ -152,8 +167,12 @@ class PingGatewayManager:
         )
 
         print_automation_log(
-            _("Checking SSH login and tunnel forwarding: %(gateway)s") % {
+            _(
+                "Checking SSH login and tunnel forwarding: %(gateway)s; "
+                "execution account: %(account)s"
+            ) % {
                 'gateway': self.format_gateway_target(gateway, account),
+                'account': self.format_execution_account(account),
             },
             'progress',
         )

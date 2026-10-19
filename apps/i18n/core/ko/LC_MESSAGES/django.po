@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#. Django's single-field uniqueness validation message.
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "동일한 %(field_label)s 값을 가진 %(model_name)s 항목이 이미 존재합니다. %(field_label)s 값을 변경해 주세요."
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -191,6 +196,11 @@ msgstr "계정이 이미 처리 중이므로 건너뜁니다: %(account)s"
 #: accounts/automations/base/manager.py:396
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "계정을 찾을 수 없거나 비활성 상태이거나 이 작업의 대상이 아닙니다"
+
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "사용자 이름을 확인할 수 없습니다 (계정 ID: %(account_id)s)"
 
 #: accounts/automations/base/manager.py:516
 #, python-format
@@ -1249,7 +1259,7 @@ msgid "Check engine"
 msgstr "검출 엔진"
 
 #: accounts/models/automations/check_account.py:133
-msgid "Check the strength of your account and password"
+msgid "Check account password strength"
 msgstr "귀하의 계정 및 비밀번호 강도 점검"
 
 #: accounts/models/automations/check_account.py:135
@@ -1260,7 +1270,7 @@ msgstr ""
 "계정 비밀번호의 보안성을 점검하고 분석, 비밀번호 강도, 유출 상황 등을 포함"
 
 #: accounts/models/automations/check_account.py:142
-msgid "Check if the account and password are repeated"
+msgid "Check whether account passwords are duplicated"
 msgstr "계정과 비밀번호의 중복 여부 점검"
 
 #: accounts/models/automations/check_account.py:143
@@ -2177,9 +2187,7 @@ msgstr "미검증 계정이 없습니다"
 msgid ""
 "If the password starts with {{` and ends with }} `, then the password is not "
 "allowed."
-msgstr ""
-"비밀번호가 `{{`로 시작하고 `}}`로 끝나는 경우, 해당 비밀번호는 허용되지 않습"
-"니다."
+msgstr "비밀번호는 `{{`로 시작하고 `}}`로 끝날 수 없습니다."
 
 #: accounts/utils.py:76
 #, python-format
@@ -2206,6 +2214,10 @@ msgstr "자산 이름, 주소 또는 ID"
 #: acls/api/connect_method.py:16 acls/models/connect_method.py:10
 msgid "Connect methods"
 msgstr "연결 방식"
+
+#: acls/serializers/connect_method.py
+msgid "Select at least one connection method"
+msgstr "연결 방식을 하나 이상 선택해 주세요"
 
 #: acls/apps.py:7
 msgid "App Acls"
@@ -2768,6 +2780,21 @@ msgstr "자동화 작업 실행"
 msgid "Stage: %(stage)s"
 msgstr "▶ 단계: %(stage)s"
 
+#: assets/automations/base/manager.py
+#, python-format
+msgid "• %(host)s: processing; execution account: %(account)s"
+msgstr "• %(host)s: 처리 중; 실행 계정: %(account)s"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(account)s (login: %(login)s, %(method)s → %(become)s)"
+msgstr "%(account)s (로그인: %(login)s, %(method)s → %(become)s)"
+
+#: assets/automations/base/manager.py
+#, python-format
+msgid "%(name)s (username: %(username)s, privileged: %(privileged)s)"
+msgstr "%(name)s (사용자 이름: %(username)s, 특권 계정: %(privileged)s)"
+
 #: assets/automations/base/manager.py:239
 #: assets/automations/base/manager.py:1072
 #, python-format
@@ -3191,6 +3218,11 @@ msgstr "계정이 없습니다."
 msgid "Checking SSH login and tunnel forwarding: %(gateway)s"
 msgstr "게이트웨이 로그인 및 SSH 터널 전달을 확인하는 중: %(gateway)s"
 
+#: assets/automations/ping_gateway/manager.py
+#, python-format
+msgid "Checking SSH login and tunnel forwarding: %(gateway)s; execution account: %(account)s"
+msgstr "게이트웨이 로그인 및 SSH 터널 전달을 확인하는 중: %(gateway)s; 실행 계정: %(account)s"
+
 #: assets/automations/ping_gateway/manager.py:239
 #, python-format
 msgid "✓ %(gateway)s: SSH login and tunnel forwarding are available"
@@ -3479,6 +3511,18 @@ msgstr "SYSDBA 역할로 연결"
 msgid "Connect as SYSDBA"
 msgstr "SQL Server 버전, 각기 다른 버전마다 연결 드라이버가 다릅니다"
 
+#: assets/const/protocol.py:186
+msgid "Use old password when changing password"
+msgstr "비밀번호 변경 시 이전 비밀번호 사용"
+
+#: assets/const/protocol.py:188
+msgid ""
+"Use the currently managed password in the Oracle REPLACE clause when "
+"changing passwords"
+msgstr ""
+"비밀번호를 변경할 때 Oracle REPLACE 절에 현재 관리 중인 비밀번호를 "
+"사용합니다"
+
 #: assets/const/protocol.py:196
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
@@ -3554,6 +3598,10 @@ msgstr "비밀번호 선택기"
 #: assets/const/protocol.py:313 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "확인 버튼 선택기"
+
+#: assets/const/protocol.py assets/models/asset/web.py
+msgid "Success selector"
+msgstr "로그인 성공 선택기"
 
 #: assets/const/protocol.py:336
 msgid "API mode"
@@ -4288,7 +4336,7 @@ msgstr ""
 
 #: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
-msgstr "자산은 지역 게이트웨이를 통해 연결할 수 있습니다."
+msgstr "자산은 도메인 게이트웨이를 통해 연결할 수 있습니다."
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"
@@ -4462,7 +4510,7 @@ msgstr "슬랙"
 #: settings/serializers/auth/dingtalk.py:11 users/models/user/__init__.py:138
 #: users/models/user/_source.py:22
 msgid "DingTalk"
-msgstr "딩딩"
+msgstr "DingTalk"
 
 #: audits/auth_backends.py:25 authentication/models/temp_token.py:17
 msgid "Temporary token"
@@ -5199,15 +5247,15 @@ msgstr "권한이 만료되었습니다."
 
 #: authentication/api/connection_token.py:756
 msgid "ACL action is reject: {}({})"
-msgstr "ACL Action은 거부: {}({})입니다."
+msgstr "ACL 동작은 거부: {}({})입니다."
 
 #: authentication/api/connection_token.py:760
 msgid "ACL action is review"
-msgstr "ACL Action은 재검토입니다."
+msgstr "ACL 동작은 재검토입니다."
 
 #: authentication/api/connection_token.py:770
 msgid "ACL action is face verify"
-msgstr "ACL Action은 얼굴 인식입니다."
+msgstr "ACL 동작은 얼굴 인식입니다."
 
 #: authentication/api/connection_token.py:775
 msgid "ACL action not supported for this asset"
@@ -5215,7 +5263,7 @@ msgstr "자산 로그인 규칙은 현재 자산을 지원하지 않습니다."
 
 #: authentication/api/connection_token.py:782
 msgid "ACL action is face online"
-msgstr "ACL Action은 온라인 얼굴 인식입니다."
+msgstr "ACL 동작은 온라인 얼굴 인식입니다."
 
 #: authentication/api/connection_token.py:807
 msgid "No available face feature"
@@ -5553,7 +5601,7 @@ msgstr "기업 위챗이 연결되지 않았습니다"
 #: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:205
 #: authentication/views/dingtalk.py:249
 msgid "DingTalk is not bound"
-msgstr "딩딩이 연결되지 않았습니다"
+msgstr "DingTalk이 연결되지 않았습니다"
 
 #: authentication/errors/mfa.py:33 authentication/views/feishu.py:136
 msgid "FeiShu is not bound"
@@ -5872,7 +5920,7 @@ msgstr "OAuth 이름"
 
 #: authentication/notifications.py:59
 msgid "OAuth ID"
-msgstr "OAuth ID"
+msgstr "OAuth 식별자"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
@@ -5927,7 +5975,11 @@ msgstr "작업 정보"
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
 msgid "Actions"
-msgstr "Action"
+msgstr "동작"
+
+#: authentication/services/ssh_certificate.py:61
+msgid "SSH certificate signing is disabled"
+msgstr "SSH 인증서 서명이 비활성화되었습니다"
 
 #: authentication/serializers/connection_token.py:47 perms/filters.py:68
 #: perms/serializers/permission.py:66 perms/serializers/permission.py:93
@@ -6207,6 +6259,31 @@ msgstr "당신이 관리자라면, 설정 항목을 업데이트하여 문제를
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "다른 통로로 로그인"
 
+#: authentication/templates/authentication/login.html:319
+msgid ""
+"The browser did not carry the CSRF cookie and cannot be logged in. Please "
+"contact the administrator"
+msgstr "브라우저가 CSRF 쿠키를 전송하지 않아 로그인할 수 없습니다. 관리자에게 문의하세요"
+
+#: authentication/templates/authentication/login.html:320
+msgid ""
+"If you are administrator, check whether SESSION_COOKIE_DOMAIN is "
+"misconfigured: the domain you are accessing must be it or its subdomain, "
+"otherwise the browser will not save the cookie, fix or remove it"
+msgstr ""
+"관리자인 경우 SESSION_COOKIE_DOMAIN 설정이 잘못되었는지 확인하세요. 접속 도메인은 해당 값 또는 그 하위 도메인이어야 "
+"하며, 그렇지 않으면 브라우저가 쿠키를 저장하지 않습니다. 설정을 수정하거나 삭제하세요"
+
+#: authentication/templates/authentication/login.html:321
+msgid "not set"
+msgstr "설정되지 않음"
+
+#: authentication/templates/authentication/login.html:322
+msgid ""
+"Please make sure cookies are enabled in your browser, clear the site cookies "
+"and try again"
+msgstr "브라우저에서 쿠키가 활성화되어 있는지 확인하고 사이트 쿠키를 삭제한 후 다시 시도하세요"
+
 #: authentication/templates/authentication/login.html:423
 msgid "More login options"
 msgstr "기타 로그인 방법"
@@ -6353,15 +6430,15 @@ msgstr "%s 바인딩 성공"
 
 #: authentication/views/dingtalk.py:43
 msgid "DingTalk Error, Please contact your system administrator"
-msgstr "딩딩 오류, 시스템 관리자에게 문의해 주세요."
+msgstr "DingTalk 오류입니다. 시스템 관리자에게 문의해 주세요."
 
 #: authentication/views/dingtalk.py:46 authentication/views/dingtalk.py:204
 msgid "DingTalk Error"
-msgstr "딩딩 오류"
+msgstr "DingTalk 오류"
 
 #: authentication/views/dingtalk.py:54
 msgid "DingTalk is already bound"
-msgstr "딩딩이 이미 바인딩되었습니다"
+msgstr "DingTalk이 이미 바인딩되었습니다"
 
 #: authentication/views/dingtalk.py:123
 msgid "Invalid user_id"
@@ -6369,23 +6446,23 @@ msgstr "유효하지 않은 user_id"
 
 #: authentication/views/dingtalk.py:139
 msgid "DingTalk query user failed"
-msgstr "딩딩 사용자 조회 실패"
+msgstr "DingTalk 사용자 조회 실패"
 
 #: authentication/views/dingtalk.py:147
 msgid "The DingTalk is already bound to another user"
-msgstr "해당 딩딩은 다른 사용자와 바인딩되었습니다"
+msgstr "해당 DingTalk은 다른 사용자와 바인딩되었습니다"
 
 #: authentication/views/dingtalk.py:154
 msgid "Binding DingTalk successfully"
-msgstr "딩딩 바인딩 성공"
+msgstr "DingTalk 바인딩 성공"
 
 #: authentication/views/dingtalk.py:206 authentication/views/dingtalk.py:243
 msgid "Failed to get user from DingTalk"
-msgstr "딩딩에서 사용자 정보를 가져오는 데 실패했습니다"
+msgstr "DingTalk에서 사용자 정보를 가져오는 데 실패했습니다"
 
 #: authentication/views/dingtalk.py:250
 msgid "Please login with a password and then bind the DingTalk"
-msgstr "비밀번호로 로그인한 후 딩딩을 바인딩해 주세요"
+msgstr "비밀번호로 로그인한 후 DingTalk을 바인딩해 주세요"
 
 #: authentication/views/feishu.py:44 authentication/views/feishu.py:135
 msgid "FeiShu Error"
@@ -6959,6 +7036,15 @@ msgstr "발송 이메일"
 msgid "This task will be executed when sending email notifications"
 msgstr "이메일 메시지를 전송할 때 이 작업을 수행합니다"
 
+#: common/tasks.py:67
+#, python-format
+msgid ""
+"Sending email: subject=%(subject)r, "
+"recipients=%(recipients)r"
+msgstr ""
+"이메일 전송 중: 제목=%(subject)r, "
+"수신자=%(recipients)r"
+
 #: common/tasks.py:81
 msgid "Send email attachment"
 msgstr "이메일 첨부 파일 전송"
@@ -6987,9 +7073,25 @@ msgstr "계정 백업을 수행할 때 외부 저장소(sftp)에 이 작업을 �
 msgid "Invalid ip"
 msgstr "유효하지 않은 IP"
 
-#: common/utils/ip/utils.py:98
+#: assets/validators.py:16 common/utils/ip/utils.py:98
 msgid "Invalid address"
 msgstr "유효하지 않은 주소"
+
+#: assets/validators.py:20
+msgid "The address cannot contain leading or trailing whitespace"
+msgstr "주소의 앞뒤에 공백을 포함할 수 없습니다"
+
+#: assets/validators.py:25
+msgid "The address cannot contain template syntax"
+msgstr "주소에 템플릿 구문을 포함할 수 없습니다"
+
+#: assets/validators.py:30
+msgid "The address cannot contain control characters"
+msgstr "주소에 제어 문자를 포함할 수 없습니다"
+
+#: assets/validators.py:43 assets/validators.py:48 assets/validators.py:56
+msgid "Enter a valid IP address or hostname"
+msgstr "유효한 IP 주소 또는 호스트 이름을 입력하세요"
 
 #: common/utils/translate.py:46
 #, python-format
@@ -7533,7 +7635,7 @@ msgstr "생성 방식"
 
 #: ops/models/playbook.py:35
 msgid "VCS URL"
-msgstr "VCS URL"
+msgstr "버전 관리 URL"
 
 #: ops/models/variable.py:11 ops/serializers/variable.py:22
 msgid "Variable name"
@@ -8026,7 +8128,7 @@ msgid "Send asset permission expired notification"
 msgstr "자산 권한 만료 알림 전송"
 
 #: perms/tasks.py:52
-#, fuzzy
+
 #| msgid ""
 #| "Check every day at 10 a.m. and send a notification message to users "
 #| "associated with \n"
@@ -8425,6 +8527,62 @@ msgstr "메일 전송 성공"
 msgid "Chat AI is not enabled"
 msgstr "채팅 AI가 활성화되어 있지 않습니다"
 
+#: settings/api/chat.py
+msgid "The connection to the model provider timed out. Please check the Base URL, proxy, and network."
+msgstr "모델 공급자 연결 시간이 초과되었습니다. 기본 URL, 프록시 및 네트워크를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider certificate verification failed. Please check its HTTPS certificate."
+msgstr "모델 공급자의 인증서 검증에 실패했습니다. HTTPS 인증서를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider hostname could not be resolved. Please check the Base URL and DNS settings."
+msgstr "모델 공급자의 호스트 이름을 확인할 수 없습니다. 기본 URL과 DNS 설정을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider refused the connection. Please check the Base URL, port, and service status."
+msgstr "모델 공급자가 연결을 거부했습니다. 기본 URL, 포트 및 서비스 상태를 확인하세요."
+
+#: settings/api/chat.py
+msgid "Unable to connect to the model provider. Please check the Base URL, proxy, and network."
+msgstr "모델 공급자에 연결할 수 없습니다. 기본 URL, 프록시 및 네트워크를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider account has insufficient balance. Please recharge it and try again."
+msgstr "모델 공급자 계정의 잔액이 부족합니다. 충전한 후 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "Authentication with the model provider failed. Please check the API key."
+msgstr "모델 공급자 인증에 실패했습니다. API 키를 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider denied access. Please check the API key permissions."
+msgstr "모델 공급자가 액세스를 거부했습니다. API 키 권한을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The selected model does not exist or is unavailable. Please check the model and Base URL."
+msgstr "선택한 모델이 존재하지 않거나 사용할 수 없습니다. 모델과 기본 URL을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider endpoint was not found. Please check the Base URL."
+msgstr "모델 공급자의 엔드포인트를 찾을 수 없습니다. 기본 URL을 확인하세요."
+
+#: settings/api/chat.py
+msgid "The model provider request limit was exceeded. Please try again later."
+msgstr "모델 공급자의 요청 한도를 초과했습니다. 나중에 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "The model provider service is temporarily unavailable. Please try again later."
+msgstr "모델 공급자 서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요."
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code}): {detail}"
+msgstr "모델 공급자 요청에 실패했습니다(HTTP {status_code}): {detail}"
+
+#: settings/api/chat.py
+msgid "Model provider request failed (HTTP {status_code})."
+msgstr "모델 공급자 요청에 실패했습니다(HTTP {status_code})."
+
 #: settings/api/chat.py:91 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:39 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:50 settings/api/wecom.py:37
@@ -8536,10 +8694,6 @@ msgstr "단말기 설정"
 msgid "Can change other setting"
 msgstr "기타 설정"
 
-#: settings/models.py:193
-msgid "Chat prompt"
-msgstr "채팅 프롬프트"
-
 #: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "동기화된 LDAP 사용자 작업 결과 알림"
@@ -8574,7 +8728,7 @@ msgstr "RADIUS 인증"
 
 #: settings/serializers/auth/base.py:20
 msgid "DingTalk Auth"
-msgstr "딩딩 인증"
+msgstr "DingTalk 인증"
 
 #: settings/serializers/auth/base.py:21
 msgid "FeiShu Auth"
@@ -8697,14 +8851,14 @@ msgstr ""
 
 #: settings/serializers/auth/dingtalk.py:16
 msgid "Dingtalk"
-msgstr "딩딩 인증 활성화"
+msgstr "DingTalk 인증 활성화"
 
 #: settings/serializers/auth/dingtalk.py:20
 msgid ""
 "User attribute mapping, where the `key` is this system user attribute name "
 "and the `value` is the DingTalk service user attribute name"
 msgstr ""
-"사용자 속성 매핑에서 `key`는 이 시스템 사용자 속성 이름이고, `value`는 딩딩 "
+"사용자 속성 매핑에서 `key`는 이 시스템 사용자 속성 이름이고, `value`는 DingTalk "
 "서비스의 사용자 속성 이름입니다."
 
 #: settings/serializers/auth/feishu.py:20
@@ -9481,6 +9635,10 @@ msgstr "액세스 키 비밀(SK)"
 msgid "Chat AI"
 msgstr "채팅 AI"
 
+#: chat_ai/models.py
+msgid "Can use Chat AI"
+msgstr "Chat AI 사용 가능"
+
 #: settings/serializers/feature.py:158
 msgid "Method"
 msgstr "생성 방법"
@@ -9612,6 +9770,10 @@ msgstr "키보드 레이아웃"
 msgid "RDP client option"
 msgstr "RDP 클라이언트 옵션"
 
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "프린터 리디렉션"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "RDP 색상 품질"
@@ -9734,6 +9896,10 @@ msgstr "인증서 검증"
 #: settings/serializers/msg.py:71
 msgid "Controls verification of the SMTP TLS certificate"
 msgstr "SMTP TLS 인증서 검증 여부 제어"
+
+#: settings/serializers/auth/oauth2.py
+msgid "Controls verification of OAuth2 server TLS certificates"
+msgstr "OAuth2 서버 TLS 인증서 검증 여부를 제어합니다"
 
 #: settings/serializers/msg.py:77
 msgid "PEM certificate used in addition to the system trust store"
@@ -9950,6 +10116,18 @@ msgstr "관리자만"
 #: settings/serializers/security.py:136
 msgid "Global MFA"
 msgstr "전체적으로 MFA 인증 활성화"
+
+#: settings/serializers/security.py:142
+msgid "Allowed MFA methods"
+msgstr "허용된 MFA 방식"
+
+#: settings/serializers/security.py:143
+msgid "Select one or more MFA methods that users can bind and use"
+msgstr "사용자가 바인딩하고 사용할 수 있는 MFA 방식을 하나 이상 선택하세요"
+
+#: settings/serializers/security.py:207
+msgid "Select at least one MFA method"
+msgstr "MFA 방식을 하나 이상 선택하세요"
 
 #: settings/serializers/security.py:140
 msgid "Third-party login MFA"
@@ -10575,7 +10753,7 @@ msgstr ""
 "클라이언트, 현재 특정 클라이언트 프로그램을 호출하여 자산에 연결하고 있습니다"
 
 #: templates/resource_download.html:32
-msgid "More download"
+msgid "More downloads"
 msgstr "추가 다운로드"
 
 #: templates/resource_download.html:34
@@ -11056,7 +11234,7 @@ msgstr "세션 종료 가능"
 
 #: terminal/models/session/session.py:323
 msgid "Can validate session action perm"
-msgstr "세션 Action 권한 검증 가능"
+msgstr "세션 동작 권한 검증 가능"
 
 #: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
@@ -11250,6 +11428,14 @@ msgstr ""
 #: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:207
 msgid "Ignore Certificate Verification"
 msgstr "인증서 인증 무시"
+
+#: terminal/serializers/virtualapp_provider.py:31
+msgid "Panda image"
+msgstr "Panda 이미지"
+
+#: terminal/serializers/virtualapp_provider.py:34
+msgid "Container port range"
+msgstr "컨테이너 포트 범위"
 
 #: terminal/serializers/applet_host.py:48
 msgid "Existing RDS license"
@@ -11919,6 +12105,10 @@ msgstr "변경 후"
 msgid "{} {} the ticket"
 msgstr "{} {} 작업 요청"
 
+#: tickets/handlers/base.py:105
+msgid "{} submitted the ticket"
+msgstr "{} 님이 작업 요청을 제출했습니다"
+
 #: tickets/models/comment.py:14
 msgid "common"
 msgstr "자주 묻는 질문"
@@ -12189,7 +12379,7 @@ msgstr "신청 노드"
 
 #: tickets/serializers/ticket/apply_asset.py:28
 msgid "Apply actions"
-msgstr "신청 Action"
+msgstr "신청 동작"
 
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:91
@@ -12257,7 +12447,7 @@ msgstr "인증이 성공적으로 완료되면, 작업 요청이 직접 승인�
 
 #: tickets/views/approve.py:105
 msgid "Illegal approval action"
-msgstr "유효하지 않은 승인 Action"
+msgstr "유효하지 않은 승인 동작"
 
 #: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"
@@ -12765,6 +12955,14 @@ msgstr "프로필 사진 경로"
 #: users/serializers/user.py:273
 msgid "MFA level"
 msgstr "MFA"
+
+#: users/models/user/__init__.py:95 users/serializers/user.py:173
+msgid "Allowed MFA types"
+msgstr "허용된 MFA 유형"
+
+#: users/serializers/user.py:174
+msgid "Leave empty to inherit the global MFA methods"
+msgstr "비워 두면 전역 MFA 방식을 상속합니다"
 
 #: users/serializers/user.py:274
 msgid "Multi-Factor Authentication"
@@ -13796,11 +13994,11 @@ msgstr "서비스 제공자 표시"
 
 #: xpack/plugins/cloud/serializers/account.py:135
 msgid "Regions must be a JSON object."
-msgstr ""
+msgstr "리전은 JSON 객체여야 합니다."
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:32
 msgid "Access key id"
-msgstr "Access key id"
+msgstr "접근 키 ID"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:59
 msgid "Subscription ID"
@@ -13836,7 +14034,7 @@ msgstr "사용자 도메인"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:157
 msgid "Project ID"
-msgstr "프로젝트"
+msgstr "프로젝트 ID"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:164
 msgid "Cert File"
@@ -13906,7 +14104,7 @@ msgstr "테스트 타임아웃"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:261
 msgid "Project"
-msgstr "project"
+msgstr "프로젝트"
 
 #: xpack/plugins/cloud/serializers/task.py:168
 msgid "History count"
@@ -14039,3 +14237,2100 @@ msgstr "라이센스가 유효하지 않습니다."
 
 #~ msgid "Ticket already closed"
 #~ msgstr "작업 요청이 종료되었습니다"
+
+#: templates/resource_download.html
+#, python-format
+msgid "Download %(vendor)s Client"
+msgstr "%(vendor)s 클라이언트 다운로드"
+
+#: templates/resource_download.html
+msgid "Choose the installer for your operating system."
+msgstr "운영 체제에 맞는 설치 프로그램을 선택하세요."
+
+#: templates/resource_download.html
+msgid "Find Linux, macOS Intel and other versions on GitHub."
+msgstr "Linux, macOS Intel 및 기타 버전은 GitHub에서 다운로드할 수 있습니다."
+
+#: templates/resource_download.html
+msgid "View on GitHub"
+msgstr "GitHub에서 보기"
+
+#: authentication/mixins.py
+msgid "MFA unavailable"
+msgstr "MFA를 사용할 수 없음"
+
+#: authentication/mixins.py users/templates/users/mfa_setting.html
+msgid "No available MFA method. Please contact your administrator."
+msgstr "사용 가능한 MFA 방식이 없습니다. 관리자에게 문의하세요."
+
+#: users/templates/users/mfa_setting.html
+#, python-format
+msgid "The following MFA methods are not enabled in system settings and cannot be used: %(methods)s. Please contact your administrator."
+msgstr "다음 MFA 방식은 시스템 설정에서 활성화되지 않아 사용할 수 없습니다: %(methods)s. 관리자에게 문의하세요."
+
+#: terminal/tasks.py
+msgid "Run app provider deployment"
+msgstr "애플리케이션 제공자 배포 실행"
+
+#: terminal/tasks.py
+msgid "Deploy the Panda runtime on an application provider host"
+msgstr "애플리케이션 제공자 호스트에 Panda 실행 환경 배포"
+
+#: terminal/tasks.py
+msgid "Publish all virtual apps"
+msgstr "모든 가상 애플리케이션 배포"
+
+#: terminal/tasks.py
+msgid "Publish all virtual applications on an application provider"
+msgstr "애플리케이션 제공자에 모든 가상 애플리케이션 배포"
+
+#: terminal/models/virtualapp/provider.py
+msgid "App Provider deployment"
+msgstr "애플리케이션 제공자 배포"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment"
+msgstr "배포"
+
+#: terminal/serializers/virtualapp_provider.py
+msgid "Deployment error"
+msgstr "배포 오류"
+
+#: terminal/serializers/virtualapp.py
+msgid "Changing the image requires a different application version"
+msgstr "이미지를 변경할 때는 애플리케이션 버전도 변경해야 합니다"
+
+#: terminal/serializers/virtualapp.py
+msgid "Reported version does not match the current application version"
+msgstr "보고된 버전이 현재 애플리케이션 버전과 일치하지 않습니다"
+
+#: terminal/models/virtualapp/virtualapp.py
+msgid "Published version"
+msgstr "배포된 버전"
+
+#: accounts/personal_credentials.py:213
+msgid "Protocol is not supported by this asset"
+msgstr "이 자산은 이 프로토콜을 지원하지 않습니다"
+
+#: accounts/personal_credentials.py:264
+msgid "Credential verification is not supported by this asset"
+msgstr "이 자산은 자격 증명 검증을 지원하지 않습니다"
+
+#: accounts/personal_credentials.py:248
+msgid ""
+"Credential verification is unavailable because the asset login "
+"ACL requires an additional action"
+msgstr "자산 로그인 ACL에서 추가 작업을 요구하므로 자격 증명을 검증할 수 없습니다."
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "알림 시간은 현재 시간보다 이후여야 합니다."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "자산 권한이 곧 만료됩니다"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "만료 시간"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "OpenBao SSH 인증서 발급 서비스를 사용할 수 없습니다: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "OpenBao 서비스 토큰을 입력하세요."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "OpenBao 서비스 토큰이 유효하지 않거나 만료되었거나 필요한 권한이 없습니다. 토큰과 액세스 정책을 확인하세요."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "OpenBao 서비스 토큰에 %(resource)s 접근 권한이 없습니다. 이 경로에 %(capability)s 권한을 부여하세요."
+
+#: accounts/api/account/application.py:79
+msgid "Successfully refreshed secret"
+msgstr "비밀 정보를 갱신했습니다"
+
+#: accounts/api/account/personal.py:93
+msgid "Inactive personal credentials cannot be tested"
+msgstr "비활성 개인 자격 증명은 테스트할 수 없습니다"
+
+#: accounts/automations/change_secret/manager.py:43
+msgid "The currently managed password is required when Oracle password changes use the REPLACE clause"
+msgstr "Oracle 비밀번호 변경 시 REPLACE 절을 사용하려면 현재 관리 중인 비밀번호가 필요합니다"
+
+#: accounts/automations/verify_account/manager.py:137
+#, python-format
+msgid "Targets: %(credentials)s personal credential(s) on %(assets)s asset(s)"
+msgstr "대상: 자산 %(assets)s개의 개인 자격 증명 %(credentials)s개"
+
+#: accounts/const/account.py:8
+msgid "SSH certificate"
+msgstr "SSH 인증서"
+
+#: accounts/exceptions.py:43
+msgid "SSH certificate signing is unavailable. Please retry or contact your administrator."
+msgstr "SSH 인증서 서명을 사용할 수 없습니다. 다시 시도하거나 관리자에게 문의하세요."
+
+#: accounts/exceptions.py:51
+msgid "This account follows template credentials. Confirm to stop following and modify its credentials."
+msgstr "이 계정은 템플릿 자격 증명을 따릅니다. 따르기를 중지하고 자격 증명을 변경하려면 확인하세요."
+
+#: accounts/models/account.py:119
+msgid "Follow template"
+msgstr "템플릿 따르기"
+
+#: accounts/models/account.py:177
+msgid "The source account template is unavailable."
+msgstr "원본 계정 템플릿을 사용할 수 없습니다."
+
+#: accounts/models/account.py:179
+#: accounts/serializers/account/account.py:176
+msgid "Account and template secret types must match."
+msgstr "계정과 템플릿의 비밀 정보 유형이 일치해야 합니다."
+
+#: accounts/models/account.py:196
+msgid "Disable template following before editing credentials."
+msgstr "자격 증명을 수정하기 전에 템플릿 따르기를 중지하세요."
+
+#: accounts/models/account.py:216
+msgid "Disable template following before changing the source."
+msgstr "원본을 변경하기 전에 템플릿 따르기를 중지하세요."
+
+#: accounts/models/account.py:218
+msgid "Disable template following before changing the secret type."
+msgstr "비밀 정보 유형을 변경하기 전에 템플릿 따르기를 중지하세요."
+
+#: accounts/models/account.py:225
+msgid "Save the following state with the credential snapshot."
+msgstr "따르기 상태와 자격 증명 스냅샷을 함께 저장하세요."
+
+#: accounts/models/account.py:228
+msgid "Provide credentials when changing the secret type."
+msgstr "비밀 정보 유형을 변경할 때 자격 증명을 제공하세요."
+
+#: accounts/models/account.py:240
+msgid "Only template accounts can follow a template."
+msgstr "템플릿 계정만 템플릿을 따를 수 있습니다."
+
+#: accounts/models/base.py:29
+msgid "Update template following through account save to preserve credentials."
+msgstr "자격 증명을 유지하려면 계정 저장을 통해 템플릿 따르기 상태를 갱신하세요."
+
+#: accounts/models/base.py:32
+msgid "Disable template following before editing credentials or their source."
+msgstr "자격 증명이나 원본을 수정하기 전에 템플릿 따르기를 중지하세요."
+
+#: accounts/models/personal.py:17
+msgid "Owner"
+msgstr "소유자"
+
+#: accounts/models/personal.py:36
+#: accounts/personal_credentials.py:144
+#: accounts/personal_credentials.py:180
+msgid "Personal asset credential"
+msgstr "개인 자산 자격 증명"
+
+#: accounts/models/template.py:102
+msgid "Disable account template following before changing the secret type."
+msgstr "비밀 정보 유형을 변경하기 전에 계정 템플릿 따르기를 중지하세요."
+
+#: accounts/personal_credentials.py:162
+msgid "Operation"
+msgstr "작업"
+
+#: accounts/personal_credentials.py:170
+msgid "Failure reason"
+msgstr "실패 사유"
+
+#: accounts/personal_credentials.py:196
+msgid "The personal credential has been updated. Please refresh and try again."
+msgstr "개인 자격 증명이 갱신되었습니다. 새로 고친 후 다시 시도하세요."
+
+#: accounts/personal_credentials.py:204
+msgid "Invalid user"
+msgstr "유효하지 않은 사용자"
+
+#: accounts/personal_credentials.py:206
+msgid "Asset is inactive"
+msgstr "자산이 비활성 상태입니다"
+
+#: accounts/personal_credentials.py:209
+msgid "Protocol is not supported for personal credentials"
+msgstr "개인 자격 증명에서 지원하지 않는 프로토콜입니다"
+
+#: accounts/personal_credentials.py:219
+msgid "Personal credentials require a manual or empty-secret asset account"
+msgstr "개인 자격 증명에는 수동 입력 또는 비밀 정보가 비어 있는 자산 계정이 필요합니다"
+
+#: accounts/personal_credentials.py:230
+msgid "You do not have account permission for this asset"
+msgstr "이 자산에 대한 계정 권한이 없습니다"
+
+#: accounts/personal_credentials.py:240
+msgid "Personal credentials require an empty-secret asset account"
+msgstr "개인 자격 증명에는 비밀 정보가 비어 있는 자산 계정이 필요합니다"
+
+#: accounts/personal_credentials.py:252
+msgid "Personal credential username must match the asset account"
+msgstr "개인 자격 증명의 사용자 이름은 자산 계정과 일치해야 합니다"
+
+#: accounts/personal_credentials.py:301
+msgid "Credential verification method is unavailable"
+msgstr "자격 증명 검증 방법을 사용할 수 없습니다"
+
+#: accounts/personal_credentials.py:307
+msgid "Personal credential verification does not allow custom automation methods"
+msgstr "개인 자격 증명 검증에는 사용자 정의 자동화 방법을 사용할 수 없습니다"
+
+#: accounts/personal_credentials.py:338
+msgid "The configured credential verification method does not support this protocol"
+msgstr "설정된 자격 증명 검증 방법이 이 프로토콜을 지원하지 않습니다"
+
+#: accounts/personal_credentials.py:355
+msgid "Secret type is not supported by this protocol"
+msgstr "이 프로토콜은 해당 비밀 정보 유형을 지원하지 않습니다"
+
+#: accounts/personal_credentials.py:383
+#: accounts/personal_credentials.py:421
+#: accounts/serializers/account/personal.py:188
+msgid "Personal credential not found"
+msgstr "개인 자격 증명을 찾을 수 없습니다"
+
+#: accounts/personal_credentials.py:450
+#: accounts/personal_credentials.py:469
+#: accounts/serializers/account/personal.py:169
+#: accounts/serializers/account/personal.py:211
+msgid "A personal credential with these fields already exists"
+msgstr "동일한 필드의 개인 자격 증명이 이미 존재합니다"
+
+#: accounts/risk_handlers.py:44
+#, python-format
+msgid "Invalid risk type: %(type)s"
+msgstr "유효하지 않은 위험 유형: %(type)s"
+
+#: accounts/serializers/account/account.py:126
+msgid "Template not found"
+msgstr "템플릿을 찾을 수 없습니다"
+
+#: accounts/serializers/account/account.py:172
+msgid "Following requires a valid account template in the same organization."
+msgstr "따르기에는 동일 조직의 유효한 계정 템플릿이 필요합니다."
+
+#: accounts/serializers/account/account.py:178
+msgid "Following accounts use template credentials."
+msgstr "템플릿을 따르는 계정은 템플릿 자격 증명을 사용합니다."
+
+#: accounts/serializers/account/account.py:183
+msgid "Disable template following before editing this field."
+msgstr "이 필드를 수정하기 전에 템플릿 따르기를 중지하세요."
+
+#: accounts/serializers/account/account.py:293
+msgid "Asset IP"
+msgstr "자산 IP"
+
+#: accounts/serializers/account/account.py:321
+#: accounts/serializers/account/account.py:409
+msgid "Only applies to template accounts. Credentials are read from the current template."
+msgstr "템플릿 계정에만 적용됩니다. 자격 증명은 현재 템플릿에서 읽습니다."
+
+#: accounts/serializers/account/account.py:355
+msgid "Source template"
+msgstr "원본 템플릿"
+
+#: accounts/serializers/account/base.py:68
+msgid "SSH certificate accounts cannot push or rotate credentials"
+msgstr "SSH 인증서 계정은 자격 증명 푸시나 순환을 지원하지 않습니다"
+
+#: accounts/serializers/account/personal.py:48
+msgid "Expected version"
+msgstr "예상 버전"
+
+#: accounts/serializers/account/personal.py:74
+#: assets/serializers/node.py:196
+#: settings/api/ssh_ca.py:37
+msgid "This field may not be blank."
+msgstr "이 필드는 비워 둘 수 없습니다."
+
+#: accounts/serializers/account/personal.py:91
+msgid "Username cannot be changed"
+msgstr "사용자 이름은 변경할 수 없습니다"
+
+#: accounts/serializers/account/personal.py:96
+msgid "Asset cannot be changed"
+msgstr "자산은 변경할 수 없습니다"
+
+#: accounts/serializers/account/personal.py:98
+msgid "Protocol cannot be changed"
+msgstr "프로토콜은 변경할 수 없습니다"
+
+#: accounts/serializers/account/personal.py:106
+msgid "This field is only valid when updating"
+msgstr "이 필드는 갱신할 때만 유효합니다"
+
+#: accounts/serializers/account/personal.py:112
+#: accounts/serializers/account/personal.py:149
+#: accounts/serializers/account/personal.py:181
+msgid "Asset is not in the current organization"
+msgstr "자산이 현재 조직에 속하지 않습니다"
+
+#: accounts/serializers/account/personal.py:128
+msgid "A new secret is required when changing the secret type"
+msgstr "비밀 정보 유형을 변경할 때 새 비밀 정보가 필요합니다"
+
+#: accounts/serializers/account/service.py:57
+#, python-format
+msgid "At least one of the following fields must be provided: %(fields)s."
+msgstr "다음 필드 중 하나 이상을 제공해야 합니다: %(fields)s."
+
+#: accounts/tasks/template.py:16
+msgid "Synchronize template properties to following accounts without changing credentials."
+msgstr "자격 증명을 변경하지 않고 템플릿 속성을 따르는 계정에 동기화합니다."
+
+#: accounts/tasks/verify_account.py:69
+#: accounts/tasks/verify_account.py:88
+msgid "Verify personal credential connectivity"
+msgstr "개인 자격 증명 연결 확인"
+
+#: accounts/tasks/verify_account.py:70
+msgid "Verify a user's personal asset credential"
+msgstr "사용자의 개인 자산 자격 증명 확인"
+
+#: accounts/tasks/verify_account.py:106
+msgid "Personal credential verification failed"
+msgstr "개인 자격 증명 검증 실패"
+
+#: accounts/templates/accounts/gather_account_report.html:76
+#: accounts/templates/accounts/gather_account_report.html:116
+msgid "No."
+msgstr "번호"
+
+#: acls/models/login_asset_acl.py:18
+msgid "Review exemption duration (hours)"
+msgstr "승인 면제 시간(시간)"
+
+#: acls/models/login_asset_acl.py:19
+msgid "0 means approval is required for every connection."
+msgstr "0이면 연결할 때마다 승인이 필요합니다."
+
+#: acls/serializers/base.py:114
+msgid "Account usernames, or @ALL to match all accounts."
+msgstr "계정 사용자 이름 또는 모든 계정에 해당하는 @ALL을 입력하세요."
+
+#: acls/serializers/command_acl.py:24
+msgid "Use \"command\" for literal command names. Each line matches that command as a standalone word anywhere in the input, so \"rm\" also matches \"rm -rf\" and \"sudo rm\". Use \"regex\" only for custom patterns."
+msgstr "명령 이름을 그대로 일치시키려면 \"command\"를 사용하세요. 각 줄은 입력의 어느 위치에서든 독립된 단어인 명령과 일치하므로 \"rm\"은 \"rm -rf\", \"sudo rm\"에도 일치합니다. 사용자 정의 패턴에만 \"regex\"를 사용하세요."
+
+#: assets/api/asset/asset.py:51
+#: assets/models/zone.py:20
+#: assets/serializers/domain.py:41
+msgid "CIDR ranges"
+msgstr "CIDR 범위"
+
+#: assets/api/asset/asset.py:52
+msgid "Exclude zone"
+msgstr "제외 영역"
+
+#: assets/api/favorite_asset.py:133
+msgid "Some assets are not authorized for this user."
+msgstr "일부 자산이 이 사용자에게 허가되지 않았습니다."
+
+#: assets/api/platform.py:120
+msgid "Internal platform"
+msgstr "내장 플랫폼"
+
+#: assets/api/platform.py:169
+msgid "Missing platform.yml in package"
+msgstr "패키지에 platform.yml이 없습니다"
+
+#: assets/const/protocol.py:150
+msgid "Allow invalid certificate"
+msgstr "유효하지 않은 인증서 허용"
+
+#: assets/const/protocol.py:333
+#: assets/models/asset/web.py:22
+msgid "Interactive selector"
+msgstr "상호작용 선택자"
+
+#: assets/const/protocol.py:334
+#: assets/models/asset/web.py:23
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "선택적 상호작용 검증 영역(예: css=#mfa-dialog)입니다. 자격 증명과 비밀번호 표시 제어는 제외하세요."
+
+#: assets/const/protocol.py:342
+#: assets/models/asset/web.py:17
+msgid "Selector for an element that appears only after a successful login, e.g. css=#dashboard. Required for basic autofill."
+msgstr "로그인 성공 후에만 나타나는 요소의 선택자(예: css=#dashboard)입니다. 기본 자동 입력에 필요합니다."
+
+#: assets/models/asset/web.py:9
+#: assets/serializers/asset/web.py:16
+msgid "Allowed sites"
+msgstr "허용된 사이트"
+
+#: assets/models/zone.py:21
+msgid "Auto assign new assets"
+msgstr "새 자산 자동 할당"
+
+#: assets/serializers/asset/web.py:75
+msgid "Invalid selector"
+msgstr "유효하지 않은 선택자"
+
+#: assets/serializers/domain.py:34
+#, python-format
+msgid "Invalid CIDR: %s"
+msgstr "유효하지 않은 CIDR: %s"
+
+#: assets/serializers/domain.py:74
+msgid "At least one CIDR is required when auto assignment is enabled."
+msgstr "자동 할당을 활성화하려면 CIDR이 하나 이상 필요합니다."
+
+#: assets/serializers/favorite_asset.py:35
+#: assets/serializers/favorite_asset.py:82
+#: assets/serializers/favorite_asset.py:148
+msgid "Invalid favorite folder."
+msgstr "유효하지 않은 즐겨찾기 폴더입니다."
+
+#: assets/serializers/favorite_asset.py:40
+msgid "A folder cannot be moved below itself."
+msgstr "폴더를 자기 자신의 하위로 이동할 수 없습니다."
+
+#: assets/serializers/favorite_asset.py:58
+msgid "A folder with this name already exists under the parent folder."
+msgstr "상위 폴더에 같은 이름의 폴더가 이미 있습니다."
+
+#: assets/serializers/favorite_asset.py:96
+msgid "Asset is not authorized for this user."
+msgstr "이 자산이 이 사용자에게 허가되지 않았습니다."
+
+#: assets/validators.py:24
+msgid "The address cannot contain Ansible template override syntax"
+msgstr "주소에 Ansible 템플릿 재정의 구문을 포함할 수 없습니다"
+
+#: assets/validators.py:64
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "경로, 자격 증명, 와일드카드가 없는 HTTP/HTTPS 출처를 입력하세요."
+
+#: assets/validators.py:88
+msgid "Enter at most 128 script steps."
+msgstr "스크립트 단계는 최대 128개까지 입력하세요."
+
+#: assets/validators.py:92
+#: assets/validators.py:101
+msgid "Invalid script step."
+msgstr "유효하지 않은 스크립트 단계입니다."
+
+#: assets/validators.py:95
+msgid "Script step numbers must be unique positive integers."
+msgstr "단계 번호는 중복되지 않는 양의 정수여야 합니다."
+
+#: assets/validators.py:98
+msgid "Unsupported script command."
+msgstr "지원하지 않는 스크립트 명령입니다."
+
+#: assets/validators.py:105
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "단계 제한 시간은 1~180초여야 합니다."
+
+#: assets/validators.py:109
+msgid "The success command must be the last step."
+msgstr "성공 명령은 마지막 단계여야 합니다."
+
+#: audits/const.py:12
+msgid "Create file"
+msgstr "파일 만들기"
+
+#: audits/models.py:78
+msgid "Ticket audit"
+msgstr "티켓 감사"
+
+#: audits/serializers.py:57
+#, python-format
+msgid "Updating %(fields)s fields is not allowed"
+msgstr "%(fields)s 필드는 갱신할 수 없습니다"
+
+#: authentication/api/connection_token.py:532
+#: authentication/serializers/connection_token.py:96
+msgid "Personal credential connection tokens cannot be reusable"
+msgstr "개인 자격 증명 연결 토큰은 재사용할 수 없습니다"
+
+#: authentication/api/connection_token.py:763
+msgid "Personal credentials can only be managed by their owner"
+msgstr "개인 자격 증명은 소유자만 관리할 수 있습니다"
+
+#: authentication/api/connection_token.py:802
+msgid "A personal credential ID is required when a version is provided"
+msgstr "버전을 제공할 때 개인 자격 증명 ID가 필요합니다"
+
+#: authentication/api/connection_token.py:810
+msgid "Do not submit a username or secret when using a saved credential"
+msgstr "저장된 자격 증명을 사용할 때 사용자 이름이나 비밀 정보를 제출하지 마세요"
+
+#: authentication/api/connection_token.py:909
+#: authentication/models/connection_token.py:204
+msgid "Connect method is not allowed for this asset"
+msgstr "이 자산에서 허용되지 않는 연결 방식입니다"
+
+#: authentication/api/connection_token.py:1246
+msgid "Token is expired at: {}"
+msgstr "토큰이 {}에 만료되었습니다"
+
+#: authentication/api/connection_token.py:1259
+msgid "Not allow to view secret"
+msgstr "비밀 정보 조회가 허용되지 않습니다"
+
+#: authentication/api/connection_token.py:1263
+msgid "Tinker must redeem its RDP login ticket to obtain credentials"
+msgstr "Tinker는 자격 증명을 얻으려면 RDP 로그인 티켓을 교환해야 합니다"
+
+#: authentication/api/connection_token.py:1268
+msgid "Token {} is not valid"
+msgstr "토큰 {}이 유효하지 않습니다"
+
+#: authentication/api/connection_token.py:1290
+#: authentication/api/rdp_login.py:144
+msgid "Invalid connection token"
+msgstr "유효하지 않은 연결 토큰"
+
+#: authentication/api/connection_token.py:1299
+msgid "Token expired"
+msgstr "토큰이 만료되었습니다"
+
+#: authentication/api/face.py:55
+msgid "missing field 'face_code'"
+msgstr "'face_code' 필드가 없습니다"
+
+#: authentication/api/face.py:70
+msgid "token not exists or expired"
+msgstr "토큰이 없거나 만료되었습니다"
+
+#: authentication/api/face.py:129
+msgid "Token does not belong to the current face capture."
+msgstr "토큰이 현재 얼굴 캡처에 속하지 않습니다."
+
+#: authentication/api/face.py:135
+msgid "Token does not exist or has expired."
+msgstr "토큰이 없거나 만료되었습니다."
+
+#: authentication/api/face.py:246
+msgid "face codes not matched"
+msgstr "얼굴 특징이 일치하지 않습니다"
+
+#: authentication/api/rdp_login.py:42
+msgid "Only user and admin connection tokens support RDP token login"
+msgstr "사용자 및 관리자 연결 토큰만 RDP 토큰 로그인을 지원합니다"
+
+#: authentication/api/rdp_login.py:47
+msgid "Connection permission is no longer valid"
+msgstr "연결 권한이 더 이상 유효하지 않습니다"
+
+#: authentication/api/rdp_login.py:51
+msgid "An enabled Applet connection is required"
+msgstr "활성화된 원격 앱 연결이 필요합니다"
+
+#: authentication/api/rdp_login.py:57
+msgid "A Tinker component must be bound to this host"
+msgstr "이 호스트에 Tinker 구성 요소를 연결해야 합니다"
+
+#: authentication/api/rdp_login.py:63
+msgid "Applet is not available on this host"
+msgstr "이 호스트에서 원격 앱을 사용할 수 없습니다"
+
+#: authentication/api/rdp_login.py:67
+msgid "This component is not authorized for the host"
+msgstr "이 구성 요소에 호스트 권한이 없습니다"
+
+#: authentication/api/rdp_login.py:74
+msgid "The connection authorization has changed"
+msgstr "연결 승인이 변경되었습니다"
+
+#: authentication/api/rdp_login.py:97
+#, python-format
+msgid "No compatible Applet host is available. Upgrade and redeploy an applet host with Tinker %(minimum)s or later."
+msgstr "호환되는 앱 호스트가 없습니다. Tinker %(minimum)s 이상으로 업그레이드한 후 앱 호스트를 다시 배포하세요."
+
+#: authentication/api/rdp_login.py:115
+msgid "Unable to issue an RDP login credential"
+msgstr "RDP 로그인 자격 증명을 발급할 수 없습니다"
+
+#: authentication/api/rdp_login.py:140
+#: authentication/api/rdp_login.py:149
+msgid "Invalid or expired RDP login authorization"
+msgstr "RDP 로그인 승인이 유효하지 않거나 만료되었습니다"
+
+#: authentication/api/rdp_login.py:156
+msgid "RDP login ticket has already been used"
+msgstr "RDP 로그인 티켓이 이미 사용되었습니다"
+
+#: authentication/api/sso.py:90
+msgid "authkey is required"
+msgstr "authkey가 필요합니다"
+
+#: authentication/api/token.py:46
+msgid "MFA unset, please set first"
+msgstr "다중 인증이 설정되지 않았습니다. 먼저 설정하세요"
+
+#: authentication/backends/drf.py:94
+msgid "User is inactive or expired."
+msgstr "사용자가 비활성 상태이거나 만료되었습니다."
+
+#: authentication/backends/ldap.py:192
+msgid "failed to map the username to a DN."
+msgstr "사용자 이름을 DN에 매핑할 수 없습니다."
+
+#: authentication/backends/ldap.py:201
+msgid "user DN/password rejected by LDAP server."
+msgstr "LDAP 서버가 사용자 DN 또는 비밀번호를 거부했습니다."
+
+#: authentication/backends/passkey/fido.py:108
+#: authentication/backends/passkey/fido.py:146
+msgid "No state found"
+msgstr "인증 상태를 찾을 수 없습니다"
+
+#: authentication/backends/token.py:25
+msgid "Token is invalid, expired at {}"
+msgstr "토큰이 유효하지 않으며 {}에 만료되었습니다"
+
+#: authentication/errors/mfa.py:13
+msgid "Code invalid, can not get user info"
+msgstr "코드가 유효하지 않아 사용자 정보를 가져올 수 없습니다"
+
+#: authentication/mixins.py:611
+msgid "Face recognition token is missing from the session."
+msgstr "세션에 얼굴 인식 토큰이 없습니다."
+
+#: authentication/mixins.py:619
+#, python-format
+msgid "Face recognition context does not exist for token: %(token)s"
+msgstr "토큰 %(token)s의 얼굴 인식 컨텍스트가 없습니다"
+
+#: authentication/mixins.py:626
+msgid "Face recognition is not yet completed."
+msgstr "얼굴 인식이 아직 완료되지 않았습니다."
+
+#: authentication/mixins.py:634
+msgid "Face code is missing from the context."
+msgstr "컨텍스트에 얼굴 특징이 없습니다."
+
+#: authentication/models/connection_token.py:54
+msgid "Personal credential ID"
+msgstr "개인 자격 증명 ID"
+
+#: authentication/models/connection_token.py:57
+#: authentication/serializers/connection_token.py:31
+msgid "Personal credential version"
+msgstr "개인 자격 증명 버전"
+
+#: authentication/models/connection_token.py:255
+msgid "Personal credential version is missing"
+msgstr "개인 자격 증명 버전이 없습니다"
+
+#: authentication/models/connection_token.py:287
+msgid "Personal credential is no longer available"
+msgstr "개인 자격 증명을 더 이상 사용할 수 없습니다"
+
+#: authentication/models/connection_token.py:333
+msgid "No provider available, please check the virtual app publication and provider status"
+msgstr "사용 가능한 공급자가 없습니다. 가상 앱 게시 상태와 공급자 상태를 확인하세요"
+
+#: authentication/models/connection_token.py:383
+msgid "Personal credential no longer matches the asset account"
+msgstr "개인 자격 증명이 자산 계정과 더 이상 일치하지 않습니다"
+
+#: authentication/notifications.py:17
+msgid "Temporary password"
+msgstr "임시 비밀번호"
+
+#: authentication/notifications.py:20
+msgid "Private token"
+msgstr "개인 토큰"
+
+#: authentication/notifications.py:41
+msgid "Credential created reminder"
+msgstr "자격 증명 생성 알림"
+
+#: authentication/notifications.py:45
+#: authentication/templates/authentication/_msg_credential_created.html:5
+msgid "Credential type"
+msgstr "자격 증명 유형"
+
+#: authentication/notifications.py:46
+#: authentication/templates/authentication/_msg_credential_created.html:6
+msgid "Identifier"
+msgstr "식별자"
+
+#: authentication/notifications.py:73
+msgid "Credential activity summary"
+msgstr "자격 증명 활동 요약"
+
+#: authentication/notifications.py:77
+msgid "Credential activity"
+msgstr "자격 증명 활동"
+
+#: authentication/serializers/connect_token_secret.py:164
+msgid "SSH public key"
+msgstr "SSH 공개 키"
+
+#: authentication/serializers/connect_token_secret.py:268
+msgid "Virtual app provider is required"
+msgstr "가상 앱 공급자가 필요합니다"
+
+#: authentication/serializers/connect_token_secret.py:270
+msgid "Virtual app provider requires an SSH host"
+msgstr "가상 앱 공급자에 SSH 호스트가 필요합니다"
+
+#: authentication/serializers/connect_token_secret.py:273
+msgid "Virtual app provider requires an active SSH account"
+msgstr "가상 앱 공급자에 활성 SSH 계정이 필요합니다"
+
+#: authentication/serializers/connection_token.py:27
+msgid "Save personal credential"
+msgstr "개인 자격 증명 저장"
+
+#: authentication/serializers/rdp_login.py:22
+#: authentication/serializers/rdp_login.py:27
+#: authentication/serializers/rdp_login.py:30
+msgid "Invalid login credential"
+msgstr "유효하지 않은 로그인 자격 증명"
+
+#: authentication/serializers/token.py:67
+msgid "user id {} not exist"
+msgstr "사용자 ID {}이 존재하지 않습니다"
+
+#: authentication/services/rdp_login.py:18
+msgid "RDP login ticket cache is unavailable"
+msgstr "RDP 로그인 티켓 캐시를 사용할 수 없습니다"
+
+#: authentication/services/ssh_certificate.py:47
+msgid "SSH public key is too long"
+msgstr "SSH 공개 키가 너무 깁니다"
+
+#: authentication/services/ssh_certificate.py:53
+msgid "An SSH certificate cannot be signed again"
+msgstr "SSH 인증서를 다시 서명할 수 없습니다"
+
+#: authentication/services/ssh_certificate.py:64
+msgid "Asset permission has expired"
+msgstr "자산 권한이 만료되었습니다"
+
+#: authentication/services/ssh_certificate.py:74
+msgid "The account does not use SSH certificate authentication"
+msgstr "이 계정은 SSH 인증서 인증을 사용하지 않습니다"
+
+#: authentication/services/ssh_certificate.py:76
+msgid "Virtual accounts cannot use SSH certificate authentication"
+msgstr "가상 계정은 SSH 인증서 인증을 사용할 수 없습니다"
+
+#: authentication/services/ssh_certificate.py:78
+msgid "SSH certificate accounts require a username"
+msgstr "SSH 인증서 계정에는 사용자 이름이 필요합니다"
+
+#: authentication/services/ssh_certificate.py:80
+msgid "SSH certificates only support SSH and SFTP protocols"
+msgstr "SSH 인증서는 SSH 및 SFTP만 지원합니다"
+
+#: authentication/tasks.py:43
+msgid "Send credential activity summary"
+msgstr "자격 증명 활동 요약 보내기"
+
+#: authentication/tasks.py:44
+msgid "Send users a summary of credential creation and successful use in the past 24 hours"
+msgstr "지난 24시간의 자격 증명 생성 및 사용 성공 내역 요약을 사용자에게 보냅니다"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:2
+#: authentication/templates/authentication/_msg_credential_created.html:2
+#, python-format
+msgid "Hello %(name)s,"
+msgstr "%(name)s님, 안녕하세요."
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:3
+msgid "The following credential activity occurred in the past 24 hours."
+msgstr "지난 24시간 동안 다음 자격 증명 활동이 있었습니다."
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:16
+msgid "If you do not recognize this activity, revoke the credential and contact your administrator immediately."
+msgstr "본인의 활동이 아니라면 자격 증명을 취소하고 즉시 관리자에게 문의하세요."
+
+#: authentication/templates/authentication/_msg_credential_created.html:3
+msgid "A new credential was created for your account."
+msgstr "계정에 새 자격 증명이 생성되었습니다."
+
+#: authentication/templates/authentication/_msg_credential_created.html:10
+msgid "If this was not you, revoke the credential and contact your administrator immediately."
+msgstr "본인이 수행하지 않았다면 자격 증명을 취소하고 즉시 관리자에게 문의하세요."
+
+#: authentication/templates/authentication/face_capture.html:60
+#: authentication/templates/authentication/face_capture.html:145
+msgid "Face recognition failed"
+msgstr "얼굴 인식 실패"
+
+#: authentication/templates/authentication/face_capture.html:93
+msgid "Failed to start face recognition"
+msgstr "얼굴 인식을 시작하지 못했습니다"
+
+#: authentication/templates/authentication/face_capture.html:129
+msgid "Face capture expired. Please retry."
+msgstr "얼굴 캡처가 만료되었습니다. 다시 시도하세요."
+
+#: authentication/templates/authentication/passkey.html:8
+msgid "Login passkey"
+msgstr "패스키 로그인"
+
+#: authentication/views/base.py:61
+msgid "A local account with the same username already exists. Please log in with another authentication method and bind this account before using it to log in."
+msgstr "같은 사용자 이름의 로컬 계정이 있습니다. 다른 인증 방법으로 로그인하여 이 계정을 연결한 후 사용하세요."
+
+#: chat_ai/api/runtime_store.py:39
+msgid "The runtime store request exceeds the 64 MiB record limit."
+msgstr "런타임 저장소 요청이 레코드 제한인 64 MiB를 초과합니다."
+
+#: chat_ai/api/runtime_store.py:58
+#, python-format
+msgid "JSON parse error - %(error)s"
+msgstr "JSON 구문 분석 오류: %(error)s"
+
+#: chat_ai/api/runtime_store.py:62
+msgid "Only a Kael terminal service account may access the runtime store."
+msgstr "Kael 터미널 서비스 계정만 런타임 저장소에 접근할 수 있습니다."
+
+#: chat_ai/api/runtime_store.py:75
+msgid "A JSON object is required."
+msgstr "JSON 객체가 필요합니다."
+
+#: chat_ai/api/runtime_store.py:79
+#, python-format
+msgid "Unknown field(s): %(fields)s."
+msgstr "알 수 없는 필드: %(fields)s."
+
+#: chat_ai/api/runtime_store.py:108
+msgid "A UUID string is required."
+msgstr "UUID 문자열이 필요합니다."
+
+#: chat_ai/api/runtime_store.py:111
+msgid "A non-negative integer is required."
+msgstr "0 이상의 정수가 필요합니다."
+
+#: chat_ai/api/runtime_store.py:114
+msgid "A boolean is required."
+msgstr "불리언 값이 필요합니다."
+
+#: chat_ai/api/runtime_store.py:116
+msgid "A string is required."
+msgstr "문자열이 필요합니다."
+
+#: chat_ai/api/runtime_store.py:118
+msgid "A hexadecimal string is required."
+msgstr "16진수 문자열이 필요합니다."
+
+#: chat_ai/api/runtime_store.py:124
+msgid "The journal record exceeds the 64 MiB limit."
+msgstr "저널 레코드가 64 MiB 제한을 초과합니다."
+
+#: chat_ai/api/runtime_store.py:128
+msgid "The journal record must contain exactly one JSON line."
+msgstr "저널 레코드에는 정확히 한 줄의 JSON이 있어야 합니다."
+
+#: chat_ai/api/runtime_store.py:132
+msgid "The journal record is not valid JSON."
+msgstr "저널 레코드가 유효한 JSON이 아닙니다."
+
+#: chat_ai/api/runtime_store.py:135
+msgid "The journal record must contain version, created_at, payload, and checksum."
+msgstr "저널 레코드에는 version, created_at, payload, checksum이 있어야 합니다."
+
+#: chat_ai/api/runtime_store.py:139
+msgid "Unsupported journal record version."
+msgstr "지원하지 않는 저널 레코드 버전입니다."
+
+#: chat_ai/api/runtime_store.py:146
+msgid "The journal record created_at is invalid."
+msgstr "저널 레코드의 created_at이 유효하지 않습니다."
+
+#: chat_ai/api/runtime_store.py:150
+#: chat_ai/api/runtime_store.py:155
+msgid "The journal record payload or checksum is invalid."
+msgstr "저널 레코드의 payload 또는 checksum이 유효하지 않습니다."
+
+#: chat_ai/api/runtime_store.py:158
+msgid "The journal record checksum does not match its payload."
+msgstr "저널 레코드의 체크섬이 데이터와 일치하지 않습니다."
+
+#: chat_ai/api/runtime_store.py:234
+msgid "Invalid runtime store access key."
+msgstr "런타임 저장소 접근 키가 유효하지 않습니다."
+
+#: chat_ai/api/runtime_store.py:311
+msgid "Invalid runtime store commit integrity."
+msgstr "런타임 저장소 커밋 무결성이 유효하지 않습니다."
+
+#: chat_ai/api/runtime_store.py:361
+msgid "The runtime store revision has changed."
+msgstr "런타임 저장소 버전이 변경되었습니다."
+
+#: chat_ai/authentication.py:21
+msgid "Invalid Chat AI delegation credential."
+msgstr "AI 채팅 위임 자격 증명이 유효하지 않습니다."
+
+#: chat_ai/authentication.py:25
+msgid "Chat AI delegation operation mismatch."
+msgstr "AI 채팅 위임 작업이 일치하지 않습니다."
+
+#: chat_ai/authentication.py:27
+msgid "Chat AI delegation organization mismatch."
+msgstr "AI 채팅 위임 조직이 일치하지 않습니다."
+
+#: chat_ai/authentication.py:30
+msgid "Chat AI delegation organization context mismatch."
+msgstr "AI 채팅 위임 조직 컨텍스트가 일치하지 않습니다."
+
+#: chat_ai/authentication.py:32
+msgid "Chat AI delegation request mismatch."
+msgstr "AI 채팅 위임 요청이 일치하지 않습니다."
+
+#: chat_ai/authentication.py:41
+msgid "Chat AI delegation request could not be verified."
+msgstr "AI 채팅 위임 요청을 검증할 수 없습니다."
+
+#: chat_ai/authentication.py:43
+msgid "Chat AI delegation request body mismatch."
+msgstr "AI 채팅 위임 요청 본문이 일치하지 않습니다."
+
+#: chat_ai/authentication.py:48
+msgid "Chat AI delegation replay protection is unavailable."
+msgstr "AI 채팅 위임 재전송 방지 기능을 사용할 수 없습니다."
+
+#: chat_ai/authentication.py:50
+msgid "Chat AI delegation credential was already used."
+msgstr "AI 채팅 위임 자격 증명이 이미 사용되었습니다."
+
+#: chat_ai/authentication.py:53
+msgid "Chat AI delegation user is invalid."
+msgstr "AI 채팅 위임 사용자가 유효하지 않습니다."
+
+#: chat_ai/models.py:20
+msgid "Chat AI runtime store"
+msgstr "AI 채팅 런타임 저장소"
+
+#: chat_ai/models.py:28
+msgid "Runtime store"
+msgstr "런타임 저장소"
+
+#: chat_ai/models.py:51
+msgid "Chat AI runtime store record"
+msgstr "AI 채팅 런타임 저장소 레코드"
+
+#: common/auth/signature.py:13
+msgid "Invalid signature."
+msgstr "유효하지 않은 서명입니다."
+
+#: common/auth/signature.py:14
+msgid "Ip is not in access ip list."
+msgstr "IP가 허용된 접근 목록에 없습니다."
+
+#: common/db/fields.py:611
+msgid "Invalid JSON data for JSONManyToManyField."
+msgstr "JSONManyToManyField의 JSON 데이터가 유효하지 않습니다."
+
+#: common/drf/exc_handlers.py:66
+#: jumpserver/views/error_views.py:20
+msgid "Server internal error"
+msgstr "서버 내부 오류"
+
+#: common/drf/filters.py:1011
+msgid "attr_rules should be base64"
+msgstr "attr_rules는 Base64로 인코딩해야 합니다"
+
+#: common/drf/filters.py:1015
+msgid "attr_rules should be json"
+msgstr "attr_rules는 JSON 형식이어야 합니다"
+
+#: common/drf/parsers/excel.py:43
+#: common/drf/parsers/excel.py:70
+#: common/drf/parsers/excel.py:80
+msgid "Excel worksheet exceeds import limits"
+msgstr "Excel 워크시트가 가져오기 제한을 초과합니다"
+
+#: common/drf/parsers/excel.py:62
+#: common/drf/parsers/excel.py:64
+msgid "Invalid excel worksheet range"
+msgstr "Excel 워크시트 범위가 유효하지 않습니다"
+
+#: common/drf/parsers/excel.py:74
+#: common/drf/parsers/excel.py:107
+msgid "Too many excel worksheets"
+msgstr "Excel 워크시트가 너무 많습니다"
+
+#: common/drf/parsers/excel.py:113
+msgid "Excel workbook exceeds import limits"
+msgstr "Excel 통합 문서가 가져오기 제한을 초과합니다"
+
+#: common/sdk/im/exceptions.py:8
+msgid "HTTP status is not 200"
+msgstr "HTTP 상태가 200이 아닙니다"
+
+#: common/sdk/im/exceptions.py:13
+msgid "Error code is not 0"
+msgstr "오류 코드가 0이 아닙니다"
+
+#: common/sdk/im/exceptions.py:18
+msgid "Response data key error"
+msgstr "응답 데이터 키 오류"
+
+#: common/sdk/sms/custom_file.py:48
+msgid "Custom file SMS sending failed"
+msgstr "사용자 정의 파일 SMS 전송 실패"
+
+#: common/serializers/mixin.py:190
+msgid "id or pk not in data"
+msgstr "데이터에 id 또는 pk가 없습니다"
+
+#: jumpserver/middleware.py:157
+msgid "Service temporarily unavailable"
+msgstr "서비스를 일시적으로 사용할 수 없습니다"
+
+#: jumpserver/middleware.py:158
+msgid "Database operation failed, please try again later."
+msgstr "데이터베이스 작업에 실패했습니다. 나중에 다시 시도하세요."
+
+#: notifications/api/notifications.py:218
+msgid "template_name is required"
+msgstr "template_name이 필요합니다"
+
+#: notifications/serializers/notifications.py:58
+#, python-format
+msgid "Template syntax error at line: %(line)s"
+msgstr "템플릿 %(line)s행 구문 오류"
+
+#: ops/api/playbook.py:77
+msgid "Invalid clone_from id"
+msgstr "유효하지 않은 clone_from ID"
+
+#: ops/api/playbook.py:81
+msgid "clone playbook file not found"
+msgstr "복제할 Playbook 파일을 찾을 수 없습니다"
+
+#: ops/api/playbook.py:93
+msgid "Unzip failed"
+msgstr "압축 해제 실패"
+
+#: ops/models/job.py:342
+#, python-brace-format
+msgid "Undefined job variable: {name}"
+msgstr "정의되지 않은 작업 변수: {name}"
+
+#: ops/models/job.py:544
+#: ops/models/job.py:590
+msgid "Quick command"
+msgstr "빠른 명령"
+
+#: ops/models/job.py:545
+msgid "Matched a command filter policy"
+msgstr "명령 필터 정책과 일치합니다"
+
+#: ops/models/job.py:591
+msgid "Matched the job center command blacklist"
+msgstr "작업 센터 명령 차단 목록과 일치합니다"
+
+#: ops/serializers/variable.py:114
+msgid "One of 'job', 'adhoc', or 'playbook' is required."
+msgstr "'job', 'adhoc', 'playbook' 중 하나가 필요합니다."
+
+#: ops/serializers/variable.py:123
+msgid "Invalid job, adhoc, or playbook ID."
+msgstr "job, adhoc 또는 playbook ID가 유효하지 않습니다."
+
+#: ops/serializers/variable.py:155
+#, python-format
+msgid "Invalid options format: %(error)s"
+msgstr "유효하지 않은 옵션 형식: %(error)s"
+
+#: ops/ws.py:71
+msgid "Task not found"
+msgstr "작업을 찾을 수 없습니다"
+
+#: ops/ws.py:87
+msgid "No permission"
+msgstr "권한이 없습니다"
+
+#: perms/filters.py:93
+msgid "Include inherited permissions"
+msgstr "상속된 권한 포함"
+
+#: perms/filters.py:180
+#: users/tree.py:107
+msgid "Ungrouped users"
+msgstr "그룹 없는 사용자"
+
+#: perms/models/asset_permission.py:83
+#: tickets/models/ticket/apply_asset.py:23
+msgid "Expiration-soon notice minutes"
+msgstr "만료 사전 알림(분)"
+
+#: perms/models/asset_permission.py:86
+msgid "Expiration-soon notice time"
+msgstr "만료 사전 알림 시각"
+
+#: perms/models/asset_permission.py:89
+msgid "Expiration-soon notice sent time"
+msgstr "만료 사전 알림 발송 시각"
+
+#: perms/serializers/tree.py:44
+msgid "This list may not be empty."
+msgstr "이 목록은 비워 둘 수 없습니다."
+
+#: perms/tasks.py:131
+msgid "Send asset permission expiration-soon notification"
+msgstr "자산 권한 만료 사전 알림 보내기"
+
+#: perms/tasks.py:133
+msgid "Check due asset permission expiration-soon notices every minute and enqueue notifications"
+msgstr "매분 전송할 자산 권한 만료 사전 알림을 확인하여 대기열에 추가합니다"
+
+#: perms/utils/expire_soon_notice.py:28
+msgid "Ensure this value is greater than 0."
+msgstr "값은 0보다 커야 합니다."
+
+#: rbac/serializers/rolebinding.py:57
+msgid "Only organization roles can be bound"
+msgstr "조직 역할만 연결할 수 있습니다"
+
+#: rbac/tree.py:68
+msgid "System tools"
+msgstr "시스템 도구"
+
+#: reports/api/report.py:133
+msgid "Unsupported report type"
+msgstr "지원하지 않는 보고서 유형입니다"
+
+#: reports/api/report.py:135
+msgid "Report type can not be modified"
+msgstr "보고서 유형은 변경할 수 없습니다"
+
+#: reports/api/report.py:142
+msgid "Invalid days"
+msgstr "유효하지 않은 일수입니다"
+
+#: reports/api/report.py:144
+msgid "Days must be one of: 1, 7, 30"
+msgstr "일수는 1, 7, 30 중 하나여야 합니다"
+
+#: reports/api/report.py:149
+msgid "Filters must be a dict"
+msgstr "필터는 딕셔너리여야 합니다"
+
+#: reports/api/report.py:233
+msgid "Builtin report template can not be modified"
+msgstr "내장 보고서 템플릿은 수정할 수 없습니다"
+
+#: reports/api/report.py:238
+msgid "Builtin report template can not be deleted"
+msgstr "내장 보고서 템플릿은 삭제할 수 없습니다"
+
+#: settings/api/chat.py:149
+msgid "Unable to connect to the model provider"
+msgstr "모델 공급자에 연결할 수 없습니다"
+
+#: settings/api/chat.py:199
+msgid "Please select or enter a model first"
+msgstr "먼저 모델을 선택하거나 입력하세요"
+
+#: settings/api/chat.py:240
+msgid "The provider is reachable, but the selected model does not support the required tool calls"
+msgstr "공급자에 연결할 수 있지만 선택한 모델이 필요한 도구 호출을 지원하지 않습니다"
+
+#: settings/models.py:176
+msgid "Can change basic setting"
+msgstr "기본 설정 변경 가능"
+
+#: settings/models.py:177
+msgid "Can change system tools setting"
+msgstr "시스템 도구 설정 변경 가능"
+
+#: settings/serializers/auth/dingtalk.py:13
+msgid "Agent ID"
+msgstr "에이전트 ID"
+
+#: settings/serializers/auth/dingtalk.py:14
+#: settings/serializers/auth/sms.py:67
+msgid "App Key"
+msgstr "앱 키"
+
+#: settings/serializers/auth/dingtalk.py:15
+#: settings/serializers/auth/feishu.py:16
+#: settings/serializers/auth/lark.py:15
+#: settings/serializers/auth/sms.py:68
+#: settings/serializers/auth/wecom.py:15
+msgid "App Secret"
+msgstr "앱 비밀 정보"
+
+#: settings/serializers/auth/feishu.py:15
+#: settings/serializers/auth/lark.py:14
+msgid "App ID"
+msgstr "앱 ID"
+
+#: settings/serializers/auth/oauth2.py:79
+msgid "User attribute mapping, where the `key` is this system user attribute name and the `value` is the OAuth2 service user attribute name. Use dot-separated paths for nested attributes, e.g. `attributes.account_no`"
+msgstr "사용자 속성 매핑: `key`는 이 시스템의 사용자 속성 이름이고 `value`는 OAuth2 서비스의 속성 이름입니다. 중첩 속성에는 `attributes.account_no`와 같은 점으로 구분한 경로를 사용하세요"
+
+#: settings/serializers/auth/saml2.py:30
+msgid "Controls verification when downloading IDP Metadata"
+msgstr "IDP 메타데이터 다운로드 시 검증을 제어합니다"
+
+#: settings/serializers/auth/slack.py:16
+msgid "Client bot Token"
+msgstr "클라이언트 봇 토큰"
+
+#: settings/serializers/auth/sms.py:50
+msgid "Access Key ID"
+msgstr "접근 키 ID"
+
+#: settings/serializers/auth/sms.py:52
+msgid "Access Key Secret"
+msgstr "접근 키 비밀 정보"
+
+#: settings/serializers/auth/sms.py:59
+msgid "Secret ID"
+msgstr "비밀 키 ID"
+
+#: settings/serializers/auth/sms.py:60
+msgid "Secret Key"
+msgstr "비밀 키"
+
+#: settings/serializers/auth/sms.py:61
+msgid "SDK APP ID"
+msgstr "SDK 앱 ID"
+
+#: settings/serializers/auth/wecom.py:13
+msgid "Corporation ID"
+msgstr "기업 ID"
+
+#: settings/serializers/auth/wecom.py:14
+msgid "App Agent ID"
+msgstr "앱 에이전트 ID"
+
+#: settings/serializers/feature.py:39
+msgid "Enter a valid HTTP or HTTPS URL."
+msgstr "유효한 HTTP 또는 HTTPS URL을 입력하세요."
+
+#: settings/serializers/feature.py:53
+msgid "Enter a new credential when changing its destination."
+msgstr "자격 증명의 대상을 변경할 때 새 자격 증명을 입력하세요."
+
+#: settings/serializers/feature.py:186
+#: settings/serializers/feature.py:226
+msgid "Verify TLS certificate"
+msgstr "TLS 인증서 검증"
+
+#: settings/serializers/feature.py:192
+#: settings/serializers/feature.py:232
+msgid "PEM CA certificate used to verify the OpenBao server"
+msgstr "OpenBao 서버 검증용 PEM CA 인증서"
+
+#: settings/serializers/feature.py:202
+msgid "OpenBao SSH CA"
+msgstr "OpenBao SSH 인증 기관"
+
+#: settings/serializers/feature.py:220
+msgid "Certificate validity (seconds)"
+msgstr "인증서 유효 기간(초)"
+
+#: settings/serializers/feature.py:237
+msgid "Allowed source addresses"
+msgstr "허용된 원본 주소"
+
+#: settings/serializers/feature.py:238
+msgid "Comma-separated CIDRs seen by the target SSH server"
+msgstr "대상 SSH 서버에서 보이는 원본 CIDR을 쉼표로 구분"
+
+#: settings/serializers/feature.py:297
+msgid "Built-in API"
+msgstr "내장 API"
+
+#: settings/serializers/feature.py:297
+msgid "iframe embed"
+msgstr "iframe 삽입"
+
+#: settings/serializers/feature.py:301
+msgid "iframe URL"
+msgstr "iframe URL"
+
+#: settings/serializers/feature.py:302
+msgid "The page URL loaded in the isolated AI assistant iframe."
+msgstr "분리된 AI 도우미 iframe에 로드할 페이지 URL입니다."
+
+#: settings/serializers/feature.py:308
+msgid "OpenAI-compatible API base URL, usually ending in /v1."
+msgstr "OpenAI 호환 API 기본 URL이며 일반적으로 /v1로 끝납니다."
+
+#: settings/serializers/feature.py:315
+msgid "HTTP proxy used to reach the model provider. For example: http://ip:port"
+msgstr "모델 공급자 연결에 사용할 HTTP 프록시입니다. 예: http://ip:port"
+
+#: settings/serializers/feature.py:319
+msgid "Discover models from the provider or enter a model ID manually."
+msgstr "공급자에서 모델을 가져오거나 모델 ID를 직접 입력하세요."
+
+#: settings/utils/ldap.py:90
+msgid "Invalid LDAP distinguishedName encoding"
+msgstr "LDAP distinguishedName 인코딩이 유효하지 않습니다"
+
+#: settings/utils/ldap.py:97
+msgid "LDAP user distinguishedName is empty, cannot map OU group"
+msgstr "LDAP 사용자 distinguishedName이 비어 있어 OU 그룹을 매핑할 수 없습니다"
+
+#: settings/utils/ldap.py:103
+msgid "Invalid LDAP distinguishedName: {}"
+msgstr "유효하지 않은 LDAP distinguishedName: {}"
+
+#: settings/utils/ldap.py:111
+msgid "LDAP distinguishedName has no OU, cannot map user group: {}"
+msgstr "LDAP distinguishedName에 OU가 없어 사용자 그룹을 매핑할 수 없습니다: {}"
+
+#: settings/utils/ldap.py:121
+msgid "LDAP distinguishedName has no OU, cannot map user group"
+msgstr "LDAP distinguishedName에 OU가 없어 사용자 그룹을 매핑할 수 없습니다"
+
+#: settings/utils/ldap.py:126
+msgid "LDAP OU group name exceeds {} characters: {}"
+msgstr "LDAP OU 그룹 이름이 {}자를 초과합니다: {}"
+
+#: settings/utils/ldap.py:561
+msgid "LDAP user groups must be a list"
+msgstr "LDAP 사용자 그룹은 목록이어야 합니다"
+
+#: settings/utils/ldap.py:573
+msgid "Failed to map LDAP user group from distinguishedName: no OU found"
+msgstr "distinguishedName에서 LDAP 사용자 그룹 매핑 실패: OU 없음"
+
+#: settings/ws.py:299
+msgid "Invalid organization IDs"
+msgstr "유효하지 않은 조직 ID"
+
+#: settings/ws.py:302
+msgid "Invalid target organizations"
+msgstr "유효하지 않은 대상 조직"
+
+#: settings/ws.py:306
+msgid "A target organization is required"
+msgstr "대상 조직이 필요합니다"
+
+#: templates/500.html:7
+msgid "Server error"
+msgstr "서버 오류"
+
+#: templates/500.html:10
+msgid "Server error occur, contact administrator"
+msgstr "서버 오류가 발생했습니다. 관리자에게 문의하세요"
+
+#: templates/_copyright.html:3
+msgid "Copyright"
+msgstr "저작권"
+
+#: terminal/api/applet/applet.py:143
+msgid "Applet is not null"
+msgstr "원격 앱은 비워 둘 수 없습니다"
+
+#: terminal/api/applet/host.py:31
+msgid "Needs attention"
+msgstr "조치 필요"
+
+#: terminal/api/applet/host.py:78
+msgid "Windows runtime accounts are managed locally by Tinker."
+msgstr "Windows 실행 계정은 Tinker가 로컬에서 관리합니다."
+
+#: terminal/api/session/session.py:362
+msgid "Replay index not found."
+msgstr "녹화 인덱스를 찾을 수 없습니다."
+
+#: terminal/api/session/session.py:365
+msgid "Replay index is invalid."
+msgstr "녹화 인덱스가 유효하지 않습니다."
+
+#: terminal/api/session/session.py:368
+msgid "Replay index is unavailable."
+msgstr "녹화 인덱스를 사용할 수 없습니다."
+
+#: terminal/api/virtualapp/provider.py:93
+msgid "Wait for the current deployment to finish before deleting the provider"
+msgstr "현재 배포가 완료된 후 공급자를 삭제하세요"
+
+#: terminal/api/virtualapp/provider.py:182
+msgid "A deployment is already pending or running for this provider"
+msgstr "이 공급자에 대기 중이거나 실행 중인 배포가 있습니다"
+
+#: terminal/api/virtualapp/virtualapp.py:115
+msgid "Image architecture is required"
+msgstr "이미지 아키텍처가 필요합니다"
+
+#: terminal/automations/deploy_app_provider/__init__.py:35
+msgid "Invalid virtual application offline manifest"
+msgstr "유효하지 않은 가상 앱 오프라인 매니페스트"
+
+#: terminal/automations/deploy_app_provider/__init__.py:69
+msgid "Invalid Panda offline image ID"
+msgstr "유효하지 않은 Panda 오프라인 이미지 ID"
+
+#: terminal/automations/deploy_app_provider/__init__.py:127
+msgid "No deployable SSH host: check the privileged account and platform automation"
+msgstr "배포 가능한 SSH 호스트가 없습니다. 특권 계정과 플랫폼 자동화를 확인하세요"
+
+#: terminal/automations/deploy_app_provider/__init__.py:130
+msgid "Application provider deployment requires SSH"
+msgstr "앱 공급자 배포에는 SSH가 필요합니다"
+
+#: terminal/automations/deploy_app_provider/__init__.py:154
+msgid "Provider terminal must be Panda"
+msgstr "공급자 터미널은 Panda여야 합니다"
+
+#: terminal/automations/deploy_applet_host/__init__.py:111
+msgid "Applet host terminal must be Tinker"
+msgstr "앱 호스트 터미널은 Tinker여야 합니다"
+
+#: terminal/automations/deploy_applet_host/__init__.py:122
+msgid "Tinker component has no active access key"
+msgstr "Tinker 구성 요소에 활성 접근 키가 없습니다"
+
+#: terminal/automations/deploy_applet_host/__init__.py:140
+#: terminal/automations/deploy_applet_host/__init__.py:158
+msgid "Tinker component binding changed during deployment"
+msgstr "배포 중 Tinker 구성 요소 연결이 변경되었습니다"
+
+#: terminal/automations/deploy_applet_host/__init__.py:147
+msgid "Unconfirmed Tinker component is not a service account"
+msgstr "미확인 Tinker 구성 요소가 서비스 계정이 아닙니다"
+
+#: terminal/automations/deploy_applet_host/__init__.py:180
+msgid "applet is required for uninstall_applet"
+msgstr "uninstall_applet에 applet이 필요합니다"
+
+#: terminal/const.py:91
+msgid "Built-in browser"
+msgstr "내장 브라우저"
+
+#: terminal/models/applet/applet.py:115
+#: terminal/models/virtualapp/virtualapp.py:80
+msgid "Missing name in manifest.yml"
+msgstr "manifest.yml에 이름이 없습니다"
+
+#: terminal/models/applet/host.py:16
+msgid "Tinker version"
+msgstr "Tinker 버전"
+
+#: terminal/models/applet/host.py:50
+#: terminal/models/virtualapp/provider.py:55
+msgid "Request user has no terminal"
+msgstr "요청 사용자에게 터미널이 없습니다"
+
+#: terminal/models/applet/host.py:52
+msgid "Only Tinker terminals can bind an applet host"
+msgstr "Tinker 터미널만 앱 호스트를 연결할 수 있습니다"
+
+#: terminal/models/applet/host.py:56
+msgid "Terminal is not bound to this applet host"
+msgstr "터미널이 이 앱 호스트에 연결되지 않았습니다"
+
+#: terminal/models/component/endpoint.py:18
+msgid "Web proxy port"
+msgstr "웹 프록시 포트"
+
+#: terminal/models/session/sharing.py:172
+msgid "Session sharing or user does not exist"
+msgstr "세션 공유 또는 사용자가 없습니다"
+
+#: terminal/models/virtualapp/provider.py:57
+msgid "Only Panda terminals can bind an application provider"
+msgstr "Panda 터미널만 앱 공급자를 연결할 수 있습니다"
+
+#: terminal/models/virtualapp/provider.py:62
+msgid "Provider is already bound to another terminal"
+msgstr "공급자가 이미 다른 터미널에 연결되어 있습니다"
+
+#: terminal/models/virtualapp/provider.py:69
+msgid "Terminal is already bound to another provider"
+msgstr "터미널이 이미 다른 공급자에 연결되어 있습니다"
+
+#: terminal/models/virtualapp/provider.py:109
+msgid "Provider host is required before deployment"
+msgstr "배포 전에 공급자 호스트가 필요합니다"
+
+#: terminal/models/virtualapp/provider.py:111
+msgid "Provider deployment requires a Linux host"
+msgstr "공급자 배포에는 Linux 호스트가 필요합니다"
+
+#: terminal/models/virtualapp/provider.py:114
+msgid "A valid SSH port different from the Panda API port is required"
+msgstr "Panda API 포트와 다른 유효한 SSH 포트가 필요합니다"
+
+#: terminal/models/virtualapp/provider.py:117
+msgid "An active root or privileged SSH account with a password or private key is required"
+msgstr "비밀번호 또는 개인 키가 있는 활성 root 또는 특권 SSH 계정이 필요합니다"
+
+#: terminal/models/virtualapp/provider.py:120
+msgid "Disable the provider and wait for all containers to exit before deployment"
+msgstr "공급자를 비활성화하고 모든 컨테이너가 종료된 후 배포하세요"
+
+#: terminal/models/virtualapp/provider.py:124
+#, python-format
+msgid "Invalid offline deployment resources: %s"
+msgstr "유효하지 않은 오프라인 배포 리소스: %s"
+
+#: terminal/models/virtualapp/provider.py:130
+msgid "Select a Panda image already loaded on the provider or prepare the Installer offline resources"
+msgstr "공급자에 로드된 Panda 이미지를 선택하거나 Installer 오프라인 리소스를 준비하세요"
+
+#: terminal/models/virtualapp/provider.py:135
+msgid "Container port range must not include the SSH port"
+msgstr "컨테이너 포트 범위에 SSH 포트를 포함할 수 없습니다"
+
+#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:59
+msgid "Invalid Core URL."
+msgstr "Core URL이 유효하지 않습니다."
+
+#: terminal/serializers/terminal.py:138
+msgid "Only Tinker can bind an applet host"
+msgstr "Tinker만 앱 호스트를 연결할 수 있습니다"
+
+#: terminal/serializers/terminal.py:141
+msgid "Applet host is missing or already bound"
+msgstr "앱 호스트가 없거나 이미 연결되어 있습니다"
+
+#: terminal/serializers/terminal.py:162
+msgid "App provider not found"
+msgstr "앱 공급자를 찾을 수 없습니다"
+
+#: terminal/serializers/virtualapp_provider.py:57
+msgid "Enter a valid HTTP or HTTPS Core URL"
+msgstr "유효한 HTTP 또는 HTTPS Core URL을 입력하세요"
+
+#: terminal/serializers/virtualapp_provider.py:71
+msgid "Enter a valid Docker image reference"
+msgstr "유효한 Docker 이미지 참조를 입력하세요"
+
+#: terminal/serializers/virtualapp_provider.py:79
+msgid "Use a port range between 1 and 65535, excluding the Panda API port 9001"
+msgstr "1~65535 범위에서 Panda API 포트 9001을 제외한 포트를 사용하세요"
+
+#: terminal/serializers/virtualapp_provider.py:181
+msgid "The provider host cannot be removed"
+msgstr "공급자 호스트는 제거할 수 없습니다"
+
+#: terminal/serializers/virtualapp_provider.py:188
+msgid "Host name and address are required"
+msgstr "호스트 이름과 주소가 필요합니다"
+
+#: terminal/serializers/virtualapp_provider.py:195
+msgid "An application provider with this name already exists"
+msgstr "이름이 같은 앱 공급자가 이미 있습니다"
+
+#: terminal/serializers/virtualapp_provider.py:200
+msgid "Application provider host is required"
+msgstr "앱 공급자 호스트가 필요합니다"
+
+#: terminal/serializers/virtualapp_provider.py:216
+msgid "Wait for the current deployment to finish before editing the provider"
+msgstr "현재 배포가 완료된 후 공급자를 수정하세요"
+
+#: terminal/serializers/virtualapp_provider.py:261
+msgid "Use the application publication API to publish images"
+msgstr "이미지를 게시하려면 앱 게시 API를 사용하세요"
+
+#: terminal/tasks.py:157
+msgid "Application provider deployment failed; see the Ansible task log"
+msgstr "앱 공급자 배포에 실패했습니다. Ansible 작업 로그를 확인하세요"
+
+#: terminal/utils/tinker.py:33
+#, python-format
+msgid "Tinker version %(version)s is unavailable for connections. Upgrade and redeploy this applet host with Tinker %(minimum)s or later."
+msgstr "Tinker %(version)s에서 연결할 수 없습니다. 이 앱 호스트를 Tinker %(minimum)s 이상으로 업그레이드하고 다시 배포하세요."
+
+#: terminal/utils/tinker.py:35
+msgid "not reported"
+msgstr "보고되지 않음"
+
+#: terminal/utils/virtualapp.py:52
+msgid "Unsafe path in application image archive"
+msgstr "앱 이미지 아카이브에 안전하지 않은 경로가 있습니다"
+
+#: terminal/utils/virtualapp.py:64
+msgid "Invalid application image archive read size"
+msgstr "앱 이미지 아카이브 읽기 크기가 유효하지 않습니다"
+
+#: terminal/utils/virtualapp.py:66
+msgid "Application image archive validation timed out"
+msgstr "앱 이미지 아카이브 검증 시간이 초과되었습니다"
+
+#: terminal/utils/virtualapp.py:70
+msgid "Application image archive exceeds the unpacked size limit"
+msgstr "앱 이미지 아카이브가 압축 해제 크기 제한을 초과합니다"
+
+#: terminal/utils/virtualapp.py:77
+msgid "Invalid or sparse entry in application image archive"
+msgstr "앱 이미지 아카이브에 유효하지 않거나 희소한 항목이 있습니다"
+
+#: terminal/utils/virtualapp.py:81
+msgid "Sparse entries are not supported in application image archives"
+msgstr "앱 이미지 아카이브는 희소 항목을 지원하지 않습니다"
+
+#: terminal/utils/virtualapp.py:94
+msgid "Application image archive has oversized tar metadata"
+msgstr "앱 이미지 아카이브의 tar 메타데이터가 너무 큽니다"
+
+#: terminal/utils/virtualapp.py:115
+msgid "Duplicate or too many entries in application image archive"
+msgstr "앱 이미지 아카이브에 중복되거나 너무 많은 항목이 있습니다"
+
+#: terminal/utils/virtualapp.py:117
+msgid "Application image archive contains an unsupported entry"
+msgstr "앱 이미지 아카이브에 지원하지 않는 항목이 있습니다"
+
+#: terminal/utils/virtualapp.py:129
+msgid "Invalid Docker image manifest"
+msgstr "유효하지 않은 Docker 이미지 매니페스트"
+
+#: terminal/utils/virtualapp.py:135
+msgid "Too many image configurations in application image archive"
+msgstr "앱 이미지 아카이브에 이미지 구성이 너무 많습니다"
+
+#: terminal/utils/virtualapp.py:144
+msgid "Invalid or too many OCI manifests in application image archive"
+msgstr "앱 이미지 아카이브의 OCI 매니페스트가 유효하지 않거나 너무 많습니다"
+
+#: terminal/utils/virtualapp.py:149
+msgid "Invalid application image archive"
+msgstr "유효하지 않은 앱 이미지 아카이브"
+
+#: terminal/utils/virtualapp.py:151
+msgid "Upload a Docker save archive containing one application image"
+msgstr "앱 이미지 하나가 포함된 Docker save 아카이브를 업로드하세요"
+
+#: terminal/utils/virtualapp.py:155
+msgid "Application image archive does not contain the configured image name and tag"
+msgstr "아카이브에 설정된 이미지 이름과 태그가 없습니다"
+
+#: terminal/utils/virtualapp.py:158
+msgid "Application image archive has no valid image configuration"
+msgstr "아카이브에 유효한 이미지 구성이 없습니다"
+
+#: terminal/utils/virtualapp.py:164
+msgid "Application image archive is missing image layers"
+msgstr "아카이브에 이미지 레이어가 없습니다"
+
+#: terminal/utils/virtualapp.py:167
+msgid "Application image archive must contain one Linux platform"
+msgstr "아카이브에는 하나의 Linux 플랫폼만 있어야 합니다"
+
+#: terminal/utils/virtualapp.py:219
+msgid "Invalid application image archive metadata"
+msgstr "앱 이미지 아카이브 메타데이터가 유효하지 않습니다"
+
+#: terminal/utils/virtualapp.py:251
+msgid "Virtual application no longer exists"
+msgstr "가상 앱이 더 이상 존재하지 않습니다"
+
+#: terminal/utils/virtualapp.py:253
+msgid "Virtual application changed; upload or publish its current image again"
+msgstr "가상 앱이 변경되었습니다. 현재 이미지를 다시 업로드하거나 게시하세요"
+
+#: terminal/utils/virtualapp.py:260
+msgid "Upload a Docker save image as .tar, .tar.zst or .zst"
+msgstr "Docker save 이미지를 .tar, .tar.zst 또는 .zst 형식으로 업로드하세요"
+
+#: terminal/utils/virtualapp.py:262
+#: terminal/utils/virtualapp.py:274
+msgid "Application image archive must be no larger than 10 GiB"
+msgstr "앱 이미지 아카이브는 10 GiB 이하여야 합니다"
+
+#: terminal/utils/virtualapp.py:304
+msgid "No application image archive for this architecture"
+msgstr "이 아키텍처용 앱 이미지 아카이브가 없습니다"
+
+#: terminal/utils/virtualapp.py:324
+msgid "Invalid offline application image archive path"
+msgstr "유효하지 않은 오프라인 앱 이미지 아카이브 경로"
+
+#: terminal/utils/virtualapp.py:340
+msgid "Offline application image cannot be staged; upload it again"
+msgstr "오프라인 앱 이미지를 준비할 수 없습니다. 다시 업로드하세요"
+
+#: tickets/api/flow.py:32
+msgid "Inherited ticket flows cannot be deleted"
+msgstr "상속된 티켓 흐름은 삭제할 수 없습니다"
+
+#: tickets/models/ticket/general.py:99
+msgid "Assignee"
+msgstr "담당자"
+
+#: users/api/user.py:187
+msgid "Not a valid org"
+msgstr "유효하지 않은 조직"
+
+#: users/models/user/_face.py:24
+#: users/models/user/_face.py:34
+msgid "Face vector is not set."
+msgstr "얼굴 특징이 설정되지 않았습니다."
+
+#: users/models/user/_face.py:27
+#: users/models/user/_face.py:37
+msgid "Face recognition backend is not available."
+msgstr "얼굴 인식 백엔드를 사용할 수 없습니다."
+
+#: users/serializers/tree.py:37
+msgid "parent_type and parent_id must be provided together."
+msgstr "parent_type과 parent_id를 함께 제공해야 합니다."
+
+#: users/serializers/tree.py:41
+msgid "Search and parent parameters cannot be used together."
+msgstr "검색 매개변수와 상위 매개변수를 함께 사용할 수 없습니다."
+
+#: users/serializers/tree.py:45
+msgid "Offset is only supported when loading children."
+msgstr "오프셋은 하위 항목을 로드할 때만 지원됩니다."
+
+#: users/serializers/tree.py:52
+msgid "Enter a valid UUID."
+msgstr "유효한 UUID를 입력하세요."
+
+#: users/views/profile/reset.py:134
+msgid "Verification code has been used more than 3 times, please re-verify"
+msgstr "인증 코드를 3회 넘게 사용했습니다. 다시 인증하세요"
+
+#: xpack/plugins/cloud/api.py:161
+msgid "Query params account_id is not uuid"
+msgstr "쿼리 매개변수 account_id가 UUID가 아닙니다"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:81
+msgid "eg. https://IP:9440/api/nutanix/v3/"
+msgstr "예: https://IP:9440/api/nutanix/v3/"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "SC domain name"
+msgstr "SC 도메인 이름"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:136
+msgid "eg. http://IP:8080/zstack"
+msgstr "예: http://IP:8080/zstack"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:144
+msgid "eg. http://CLOUDTOWER_IP"
+msgstr "예: http://CLOUDTOWER_IP"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:151
+msgid "eg. https://IP:8006/api2/json"
+msgstr "예: https://IP:8006/api2/json"
+
+#: xpack/plugins/facelive/backend.py:29
+msgid "Face recognition dependencies are unavailable; run uv sync --group xpack"
+msgstr "얼굴 인식 의존성을 사용할 수 없습니다. uv sync --group xpack을 실행하세요"
+
+#: xpack/plugins/facelive/backend.py:72
+msgid "OpenCV image must be a BGR image"
+msgstr "OpenCV 이미지는 BGR 형식이어야 합니다"
+
+#: xpack/plugins/facelive/backend.py:74
+#: xpack/plugins/facelive/backend.py:111
+msgid "Camera frame resolution is too low"
+msgstr "카메라 해상도가 너무 낮습니다"
+
+#: xpack/plugins/facelive/backend.py:97
+#: xpack/plugins/facelive/backend.py:104
+msgid "Invalid camera frame"
+msgstr "유효하지 않은 카메라 프레임"
+
+#: xpack/plugins/facelive/backend.py:100
+msgid "Camera frame is empty or too large"
+msgstr "카메라 프레임이 비어 있거나 너무 큽니다"
+
+#: xpack/plugins/facelive/backend.py:106
+msgid "Camera frame is too large"
+msgstr "카메라 프레임이 너무 큽니다"
+
+#: xpack/plugins/facelive/backend.py:109
+msgid "Unable to decode camera frame"
+msgstr "카메라 프레임을 디코딩할 수 없습니다"
+
+#: xpack/plugins/facelive/backend.py:183
+msgid "Multiple similar faces detected; keep only one person in view"
+msgstr "비슷한 얼굴이 여러 개 감지되었습니다. 화면에 한 사람만 나오게 하세요"
+
+#: xpack/plugins/facelive/backend.py:193
+msgid "None of FACE_RECOGNITION_PROVIDERS are available"
+msgstr "FACE_RECOGNITION_PROVIDERS의 사용 가능한 추론 백엔드가 없습니다"
+
+#: xpack/plugins/facelive/backend.py:209
+msgid "FACE_RECOGNITION_DEVICE is gpu but no accelerated ONNX provider is available"
+msgstr "FACE_RECOGNITION_DEVICE가 gpu이지만 ONNX 가속 백엔드가 없습니다"
+
+#: xpack/plugins/facelive/challenge.py:16
+msgid "Turn your head left and right, then face forward"
+msgstr "고개를 좌우로 돌린 후 정면을 바라보세요"
+
+#: xpack/plugins/facelive/challenge.py:17
+msgid "Nod once, then face forward"
+msgstr "한 번 고개를 끄덕인 후 정면을 바라보세요"
+
+#: xpack/plugins/facelive/challenge.py:18
+msgid "Open and close your mouth"
+msgstr "입을 벌린 후 다무세요"
+
+#: xpack/plugins/facelive/challenge.py:65
+msgid "Look straight at the camera"
+msgstr "카메라를 똑바로 바라보세요"
+
+#: xpack/plugins/facelive/codec.py:27
+msgid "Face vector is invalid"
+msgstr "얼굴 특징 벡터가 유효하지 않습니다"
+
+#: xpack/plugins/facelive/codec.py:30
+msgid "Face vector magnitude is zero"
+msgstr "얼굴 특징 벡터의 크기가 0입니다"
+
+#: xpack/plugins/facelive/codec.py:38
+#: xpack/plugins/facelive/codec.py:53
+msgid "Face vector has an invalid dimension"
+msgstr "얼굴 특징 벡터 차원이 유효하지 않습니다"
+
+#: xpack/plugins/facelive/codec.py:45
+msgid "Face vector is missing"
+msgstr "얼굴 특징 벡터가 없습니다"
+
+#: xpack/plugins/facelive/codec.py:50
+msgid "Face vector has an invalid size"
+msgstr "얼굴 특징 벡터 크기가 유효하지 않습니다"
+
+#: xpack/plugins/facelive/codec.py:60
+msgid "Face vector has an unsupported format"
+msgstr "지원하지 않는 얼굴 특징 벡터 형식입니다"
+
+#: xpack/plugins/facelive/codec.py:71
+msgid "Face vectors use different dimensions"
+msgstr "얼굴 특징 벡터의 차원이 다릅니다"
+
+#: xpack/plugins/facelive/codec.py:105
+msgid "Face vector is not valid base64"
+msgstr "얼굴 특징 벡터가 유효한 Base64가 아닙니다"
+
+#: xpack/plugins/facelive/consumer.py:62
+msgid "Unsupported message type"
+msgstr "지원하지 않는 메시지 유형입니다"
+
+#: xpack/plugins/facelive/consumer.py:73
+msgid "Camera frame is missing"
+msgstr "카메라 프레임이 없습니다"
+
+#: xpack/plugins/facelive/consumer.py:113
+msgid "Face recognition service is unavailable"
+msgstr "얼굴 인식 서비스를 사용할 수 없습니다"
+
+#: xpack/plugins/facelive/context.py:40
+msgid "Invalid face capture token"
+msgstr "유효하지 않은 얼굴 캡처 토큰"
+
+#: xpack/plugins/facelive/context.py:48
+msgid "Face capture token does not exist or has expired"
+msgstr "얼굴 캡처 토큰이 없거나 만료되었습니다"
+
+#: xpack/plugins/facelive/context.py:50
+msgid "Face capture has already finished"
+msgstr "얼굴 캡처가 이미 종료되었습니다"
+
+#: xpack/plugins/facelive/context.py:60
+msgid "Face capture token does not belong to this session"
+msgstr "얼굴 캡처 토큰이 이 세션에 속하지 않습니다"
+
+#: xpack/plugins/facelive/context.py:62
+msgid "Face capture context has no target user"
+msgstr "얼굴 캡처 컨텍스트에 대상 사용자가 없습니다"
+
+#: xpack/plugins/facelive/context.py:66
+msgid "Face capture target user does not exist"
+msgstr "얼굴 캡처 대상 사용자가 존재하지 않습니다"
+
+#: xpack/plugins/facelive/context.py:69
+#: xpack/plugins/facelive/context.py:86
+msgid "No face feature is bound for this user"
+msgstr "이 사용자에게 등록된 얼굴 특징이 없습니다"
+
+#: xpack/plugins/facelive/context.py:78
+msgid "Authentication is required for online face monitoring"
+msgstr "온라인 얼굴 모니터링에는 인증이 필요합니다"
+
+#: xpack/plugins/facelive/context.py:81
+msgid "Face monitor token does not exist or has expired"
+msgstr "얼굴 모니터링 토큰이 없거나 만료되었습니다"
+
+#: xpack/plugins/facelive/context.py:83
+msgid "Face monitor token belongs to another user"
+msgstr "얼굴 모니터링 토큰이 다른 사용자에게 속합니다"
+
+#: xpack/plugins/facelive/context.py:98
+msgid "Face capture token expired before completion"
+msgstr "완료 전에 얼굴 캡처 토큰이 만료되었습니다"
+
+#: xpack/plugins/facelive/context.py:139
+msgid "Connection token no longer exists"
+msgstr "연결 토큰이 더 이상 존재하지 않습니다"
+
+#: xpack/plugins/facelive/context.py:146
+msgid "Face recognition is disabled"
+msgstr "얼굴 인식이 비활성화되어 있습니다"
+
+#: xpack/plugins/facelive/liveness.py:67
+msgid "FACE_LIVENESS_MODEL_PATH must reference a validated anti-spoof ONNX model"
+msgstr "FACE_LIVENESS_MODEL_PATH는 검증된 위조 방지 ONNX 모델을 가리켜야 합니다"
+
+#: xpack/plugins/facelive/liveness.py:72
+msgid "ONNX Runtime is unavailable"
+msgstr "ONNX Runtime을 사용할 수 없습니다"
+
+#: xpack/plugins/facelive/liveness.py:92
+msgid "GPU liveness was requested but no accelerated ONNX provider is available"
+msgstr "GPU 생체 감지를 요청했지만 ONNX 가속 백엔드가 없습니다"
+
+#: xpack/plugins/facelive/liveness.py:115
+msgid "FACE_LIVENESS_LIVE_INDEX is outside model output"
+msgstr "FACE_LIVENESS_LIVE_INDEX가 모델 출력 범위를 벗어났습니다"
+
+#: xpack/plugins/facelive/liveness.py:128
+msgid "Anti-spoof ONNX input must have four dimensions"
+msgstr "위조 방지 ONNX 입력은 4차원이어야 합니다"
+
+#: xpack/plugins/facelive/liveness.py:134
+msgid "Anti-spoof ONNX input must be RGB"
+msgstr "위조 방지 ONNX 입력은 RGB여야 합니다"
+
+#: xpack/plugins/facelive/liveness.py:189
+#, python-format
+msgid "Unknown liveness mode: %(mode)s"
+msgstr "알 수 없는 생체 감지 모드: %(mode)s"
+
+#: xpack/plugins/facelive/monitor.py:128
+msgid "Camera monitoring connection closed"
+msgstr "카메라 모니터링 연결이 종료되었습니다"
+
+#: xpack/plugins/facelive/monitor.py:135
+msgid "Face monitor state is unavailable"
+msgstr "얼굴 모니터링 상태를 사용할 수 없습니다"
+
+#: xpack/plugins/facelive/monitor.py:237
+msgid "Face monitor timed out"
+msgstr "얼굴 모니터링 시간이 초과되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:67
+msgid "Face flow has already finished"
+msgstr "얼굴 인식 과정이 이미 종료되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:83
+msgid "Face verification timed out"
+msgstr "얼굴 검증 시간이 초과되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:85
+msgid "The liveness action was not completed in time"
+msgstr "제한 시간 내에 생체 감지 동작을 완료하지 못했습니다"
+
+#: xpack/plugins/facelive/sessions.py:96
+msgid "Place one face fully inside the camera area"
+msgstr "한 사람의 얼굴 전체가 카메라 영역 안에 들어오게 하세요"
+
+#: xpack/plugins/facelive/sessions.py:103
+msgid "Move closer to the camera"
+msgstr "카메라에 가까이 다가가세요"
+
+#: xpack/plugins/facelive/sessions.py:109
+msgid "Frozen or replayed camera frames detected"
+msgstr "정지되거나 재생된 카메라 프레임이 감지되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:121
+msgid "The stored face template uses a different model; bind the face again"
+msgstr "저장된 얼굴 템플릿이 다른 모델을 사용합니다. 얼굴을 다시 등록하세요"
+
+#: xpack/plugins/facelive/sessions.py:124
+msgid "The current face does not match the selected user"
+msgstr "현재 얼굴이 선택한 사용자와 일치하지 않습니다"
+
+#: xpack/plugins/facelive/sessions.py:126
+msgid "The face changed during enrollment"
+msgstr "등록 중 얼굴이 변경되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:152
+msgid "Liveness passed once; online face monitoring is now active"
+msgstr "생체 감지를 통과했습니다. 온라인 얼굴 모니터링이 활성화되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:216
+#, python-format
+msgid "Captured %(count)s face samples"
+msgstr "얼굴 샘플 %(count)s개를 캡처했습니다"
+
+#: xpack/plugins/facelive/sessions.py:223
+msgid "Checking liveness; keep your face clear and well lit"
+msgstr "생체 감지 중입니다. 얼굴이 선명하고 밝게 보이도록 하세요"
+
+#: xpack/plugins/facelive/sessions.py:228
+#, python-format
+msgid "Capturing face samples %(count)s/%(total)s"
+msgstr "얼굴 샘플 캡처 중 %(count)s/%(total)s"
+
+#: xpack/plugins/facelive/sessions.py:256
+msgid "Face identity, liveness, and action challenge passed"
+msgstr "얼굴 신원 확인, 생체 감지 및 동작 검증을 통과했습니다"
+
+#: xpack/plugins/facelive/sessions.py:273
+#, python-format
+msgid "%(name)s is in the camera area"
+msgstr "%(name)s님이 카메라 영역 안에 있습니다"
+
+#: xpack/plugins/facelive/sessions.py:277
+msgid "Target face is not visible"
+msgstr "대상 얼굴이 보이지 않습니다"
+
+#: xpack/plugins/facelive/sessions.py:279
+msgid "Target face does not match"
+msgstr "대상 얼굴이 일치하지 않습니다"
+
+#: xpack/plugins/facelive/sessions.py:285
+msgid "The monitored session has been paused"
+msgstr "모니터링 대상 세션이 일시 중지되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:287
+#, python-format
+msgid "Target left the camera area; callback in %(seconds)ss"
+msgstr "대상이 카메라 영역을 벗어났습니다. %(seconds)s초 후 콜백합니다"
+
+#: xpack/plugins/facelive/sessions.py:324
+#: xpack/plugins/facelive/sessions.py:330
+#: xpack/plugins/facelive/sessions.py:337
+msgid "Repeated camera frame detected"
+msgstr "반복된 카메라 프레임이 감지되었습니다"
+
+#: xpack/plugins/facelive/sessions.py:480
+msgid "Waiting for the selected face to match"
+msgstr "선택한 얼굴이 일치하기를 기다리는 중입니다"
+
+#: xpack/plugins/facelive/sessions.py:482
+msgid "Checking liveness; move naturally and keep the image clear"
+msgstr "생체 감지 중입니다. 자연스럽게 움직이고 화면을 선명하게 유지하세요"
+
+#: xpack/plugins/facelive/sessions.py:485
+msgid "Finalizing face verification"
+msgstr "얼굴 검증 마무리 중"
+
+#: xpack/plugins/jdmc/api/mail.py:30
+msgid "Mail sent successfully"
+msgstr "이메일을 보냈습니다"
+
+#: xpack/plugins/jdmc/serializers.py:6
+msgid "Email addresses of the recipients"
+msgstr "수신자 이메일 주소"
+
+#: xpack/plugins/jdmc/serializers.py:7
+msgid "Subject of the mail"
+msgstr "이메일 제목"
+
+#: xpack/plugins/jdmc/serializers.py:8
+msgid "Message of the email"
+msgstr "이메일 본문"

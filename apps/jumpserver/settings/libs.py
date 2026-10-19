@@ -31,11 +31,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
+        'chat_ai.authentication.ChatAIDelegationAuthentication',
         'authentication.backends.drf.ServiceAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        'authentication.backends.drf.OAuth2Authentication',
         'authentication.backends.drf.SessionAuthentication',
     ),
     'DEFAULT_THROTTLE_CLASSES': (
@@ -83,6 +84,7 @@ SPECTACULAR_SETTINGS = {
     # 添加自定义字段扩展
     'SERIALIZER_EXTENSIONS': [
         'jumpserver.views.schema.ObjectRelatedFieldExtension',
+        'jumpserver.views.schema.JSONManyToManyFieldExtension',
         'jumpserver.views.schema.LabeledChoiceFieldExtension',
         'jumpserver.views.schema.BitChoicesFieldExtension',
         'jumpserver.views.schema.LabelRelatedFieldExtension',
@@ -203,10 +205,11 @@ else:
     }
 CELERY_TIMEZONE = CONFIG.TIME_ZONE
 CELERY_ENABLE_UTC = False
-CELERY_TASK_SERIALIZER = 'pickle'
-CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_ACCEPT_CONTENT = ['json', 'pickle']
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_ACCEPT_CONTENT = ['json'] #结果也限定为json
 CELERY_RESULT_EXPIRES = 600
 CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime).19s %(message)s'
 CELERY_WORKER_LOG_FORMAT = '%(asctime).19s %(message)s'
@@ -245,12 +248,12 @@ JUMPSERVER_UPTIME = int(time.time())
 
 # OAuth2 Provider settings
 OAUTH2_PROVIDER = {
-    'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'jms'],
+    'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'jms2'],
     'PKCE_REQUIRED': True,
     'ACCESS_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS,
     'REFRESH_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS,
 }
-OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms://auth/callback'
+OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms2://auth/callback'
 OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME = 'JumpServer Client'
 
 if CONFIG.DEBUG_DEV:

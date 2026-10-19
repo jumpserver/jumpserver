@@ -22,6 +22,7 @@ __all__ = ['ChangeSecretDashboardApi']
 
 
 class ChangeSecretDashboardApi(APIView):
+    chat_ai_safe_sensitive_actions = ('GET',)
     http_method_names = ['get']
     rbac_perms = {
         'GET': 'accounts.view_changesecretautomation',

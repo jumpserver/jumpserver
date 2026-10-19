@@ -2,15 +2,43 @@ import re
 
 from django.apps import apps
 from django.conf import settings
+from drf_spectacular.contrib.django_filters import DjangoFilterExtension
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.generators import SchemaGenerator
+
+from rbac.permissions import RBACPermission
+
+
+CHAT_AI_PERMISSIONS_UNSET = object()
+
+
+class CustomDjangoFilterExtension(DjangoFilterExtension):
+    priority = 1
+
+    def _get_explicit_filter_choices(self, filter_field):
+        # drf-spectacular 0.29 assumes every choice field has django-filter's
+        # null-choice attributes. Django's TypedChoiceField does not.
+        if 'choices' not in filter_field.extra:
+            return None
+        choices = filter_field.extra['choices']
+        if callable(choices):
+            return []
+        values = [value for value, _ in choices]
+        if getattr(filter_field.field, 'null_label', None):
+            values.append(filter_field.field.null_value)
+        return values
 
 
 class CustomSchemaGenerator(SchemaGenerator):
     from_mcp = False
 
     def get_schema(self, request=None, public=False):
-        self.from_mcp = request.query_params.get('mcp') or request.path.endswith('swagger.json')
+        self.from_mcp = bool(
+            request and (
+                request.query_params.get('mcp') or
+                request.path.endswith('swagger.json')
+            )
+        )
         return super().get_schema(request, public)
 
 
@@ -71,6 +99,67 @@ class CustomAutoSchema(AutoSchema):
             tokenized_path.append('formatted')
 
         return '_'.join(tokenized_path + [action])
+
+    def get_chat_ai_permission_metadata(self):
+        """Return static requirements and whether Core enforces RBAC.
+
+        Dynamic RBAC actions are checked by Core against the actual request.
+        Non-RBAC actions must not become available through the AI gateway.
+        """
+        permission_classes = getattr(self.view, 'permission_classes', ()) or ()
+        rbac_permission_classes = []
+        for permission_class in permission_classes:
+            try:
+                if isinstance(permission_class, type) and issubclass(
+                    permission_class, RBACPermission
+                ):
+                    rbac_permission_classes.append(permission_class)
+            except TypeError:
+                continue
+        rbac_protected = bool(rbac_permission_classes)
+
+        explicit_permissions = getattr(
+            self.view, 'chat_ai_required_permissions', CHAT_AI_PERMISSIONS_UNSET
+        )
+        if explicit_permissions is not CHAT_AI_PERMISSIONS_UNSET:
+            if isinstance(explicit_permissions, str):
+                explicit_permissions = (explicit_permissions,)
+            elif not isinstance(
+                explicit_permissions, (list, tuple, set, frozenset)
+            ):
+                return (), True, rbac_protected
+            if any(
+                not isinstance(item, str) or not item
+                for item in explicit_permissions
+            ):
+                return (), True, rbac_protected
+            return tuple(sorted(set(explicit_permissions))), False, rbac_protected
+
+        if callable(getattr(self.view, 'get_rbac_perms', None)):
+            return (), True, rbac_protected
+
+        if not rbac_permission_classes:
+            return (), True, False
+
+        permissions = set()
+        try:
+            for permission_class in rbac_permission_classes:
+                required = permission_class().get_require_perms(
+                    self.view.request, self.view
+                )
+                if isinstance(required, str):
+                    required = (required,)
+                elif not isinstance(required, (list, tuple, set, frozenset)):
+                    return (), True, True
+                if any(not isinstance(item, str) or not item for item in required):
+                    return (), True, True
+                permissions.update(required)
+        except Exception:
+            return (), True, True
+        return tuple(sorted(permissions)), False, True
+
+    def is_chat_ai_schema(self):
+        return self.view.request.headers.get('X-JMS-AI-Schema') == '1'
 
     def get_description(self):
         description = super().get_description()
@@ -176,7 +265,7 @@ class CustomAutoSchema(AutoSchema):
                 'applet-host-deployments', 'virtual-apps', 'app-providers', 'virtual-app-publications',
                 'celery-period-tasks', 'task-executions', 'adhocs', 'playbooks', 'variables', 'ftp-logs',
                 'login-logs', 'operate-logs', 'password-change-logs', 'job-logs', 'jobs', 'user-sessions',
-                'service-access-logs', 'chatai-prompts', 'super-connection-tokens', 'flows',
+                'service-access-logs', 'super-connection-tokens', 'flows',
                 'apply-assets', 'apply-nodes', 'login-acls', 'login-asset-acls', 'command-filter-acls',
                 'clipboard-acls', 'command-groups', 'connect-method-acls', 'system-msg-subscriptions', 'roles', 'role-bindings',
                 'system-roles', 'system-role-bindings', 'org-roles', 'org-role-bindings', 'content-types',
@@ -189,6 +278,13 @@ class CustomAutoSchema(AutoSchema):
         return False
 
     def is_excluded(self):
+        if self.is_chat_ai_schema():
+            return False
+        # Only expose read-only job execution history in the standard/MCP schema.
+        if self.method == 'GET' and re.fullmatch(
+            r'/api/v1/ops/job-executions/(?:\{[^/]+\}/)?', self.path
+        ):
+            return False
         if self.exclude_some_paths(self.path):
             return True
         if self.exclude_some_app_model(self.path):
@@ -200,8 +296,13 @@ class CustomAutoSchema(AutoSchema):
         if not operation:
             return operation
 
+        if self.is_chat_ai_schema():
+            action = getattr(self.view, 'action', None) or self.method
+            if action in getattr(self.view, 'chat_ai_excluded_actions', ()):
+                return None
+
         operation_id = operation.get('operationId')
-        if 'bulk' in operation_id:
+        if 'bulk' in operation_id and not self.is_chat_ai_schema():
             return None
 
         if not operation.get('summary', ''):
@@ -211,15 +312,39 @@ class CustomAutoSchema(AutoSchema):
             'orgs_orgs_read', 'orgs_orgs_update', 'orgs_orgs_delete', 
             'orgs_orgs_create', 'orgs_orgs_partial_update',
         ]
-        if operation_id in exclude_operations:
+        if operation_id in exclude_operations and not self.is_chat_ai_schema():
             return None
+        required_permissions, permission_dynamic, rbac_protected = self.get_chat_ai_permission_metadata()
+        operation['x-jms-required-permissions'] = list(required_permissions)
+        operation['x-jms-permission-dynamic'] = permission_dynamic
+        operation['x-jms-rbac-protected'] = rbac_protected
+        safe_actions = getattr(self.view, 'chat_ai_safe_sensitive_actions', ())
+        action = getattr(self.view, 'action', None) or self.method
+        operation['x-jms-safe-sensitive-path'] = action in safe_actions
+
+        action = getattr(self.view, 'action', '')
+        guidance = getattr(self.view, 'chat_ai_operation_guidance', {})
+        if isinstance(guidance, dict):
+            guidance = guidance.get(action)
+        if isinstance(guidance, str) and guidance.strip():
+            operation['x-jms-ai-guidance'] = guidance.strip()
+
+        reuse_policy = getattr(self.view, 'chat_ai_create_reuse', None)
+        if (
+            action == 'create' and self.method == 'POST' and
+            isinstance(reuse_policy, dict)
+        ):
+            operation['x-jms-create-reuse'] = reuse_policy
         return operation
 
 # 添加自定义字段的 OpenAPI 扩展
 from drf_spectacular.extensions import OpenApiSerializerFieldExtension
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.plumbing import build_basic_type
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField, BitChoicesField
+from common.serializers.fields import (
+    BitChoicesField, JSONManyToManyField, LabeledChoiceField,
+    ObjectRelatedField,
+)
 
 
 class ObjectRelatedFieldExtension(OpenApiSerializerFieldExtension):
@@ -229,119 +354,75 @@ class ObjectRelatedFieldExtension(OpenApiSerializerFieldExtension):
     target_class = ObjectRelatedField
 
     def map_serializer_field(self, auto_schema, direction):
+        return self.target.get_schema()
+
+
+class JSONManyToManyFieldExtension(OpenApiSerializerFieldExtension):
+    """Describe the selector shapes accepted by JSONManyToManyField."""
+    target_class = JSONManyToManyField
+
+    def map_serializer_field(self, auto_schema, direction):
         field = self.target
-        
-        # 获取字段的基本信息
-        field_type = 'array' if field.many else 'object'
-        
-        if field_type == 'array':
-            # 如果是多对多关系
-            return {
-                'type': 'array',
-                'items': self._get_openapi_item_schema(field),
-                'description': getattr(field, 'help_text', ''),
-                'title': getattr(field, 'label', ''),
-            }
-        else:
-            # 如果是一对一关系
-            return {
-                'type': 'object',
-                'properties': self._get_openapi_properties_schema(field),
-                'description': getattr(field, 'help_text', ''),
-                'title': getattr(field, 'label', ''),
-            }
-
-    def _get_openapi_item_schema(self, field):
-        """
-        获取数组项的 OpenAPI schema
-        """
-        return self._get_openapi_object_schema(field)
-
-    def _get_openapi_object_schema(self, field):
-        """
-        获取对象的 OpenAPI schema
-        """
-        properties = {}
-        
-        # 动态分析 attrs 中的属性类型
-        for attr in field.attrs:
-            # 尝试从 queryset 的 model 中获取字段信息
-            field_type = self._infer_field_type(field, attr)
-            properties[attr] = {
-                'type': field_type,
-                'description': f'{attr} field'
-            }
-        
+        common = {
+            'type': 'object',
+            'additionalProperties': False,
+        }
         return {
             'type': 'object',
-            'properties': properties,
-            'required': ['id'] if 'id' in field.attrs else []
+            'oneOf': [
+                {
+                    **common,
+                    'properties': {
+                        'type': {'type': 'string', 'enum': ['all']},
+                    },
+                    'required': ['type'],
+                },
+                {
+                    **common,
+                    'properties': {
+                        'type': {'type': 'string', 'enum': ['ids']},
+                        'ids': {
+                            'type': 'array',
+                            'items': {'type': 'string'},
+                            'minItems': 1,
+                        },
+                    },
+                    'required': ['type', 'ids'],
+                },
+                {
+                    **common,
+                    'properties': {
+                        'type': {'type': 'string', 'enum': ['attrs']},
+                        'attrs': {
+                            'type': 'array',
+                            'minItems': 1,
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'name': {'type': 'string'},
+                                    'match': {
+                                        'type': 'string',
+                                        'enum': [
+                                            'exact', 'in', 'contains',
+                                            'startswith', 'endswith', 'regex',
+                                            'not', 'gte', 'lte', 'gt', 'lt',
+                                            'ip_in', 'm2m_all', 'm2m_any',
+                                        ],
+                                        'default': 'exact',
+                                    },
+                                    'value': {},
+                                },
+                                'required': ['name', 'value'],
+                                'additionalProperties': False,
+                            },
+                        },
+                    },
+                    'required': ['type', 'attrs'],
+                },
+            ],
+            'description': getattr(field, 'help_text', '') or '',
+            'title': getattr(field, 'label', '') or '',
         }
-
-    def _infer_field_type(self, field, attr_name):
-        """
-        智能推断字段类型
-        """
-        try:
-            # 如果有 queryset，尝试从 model 中获取字段信息
-            if hasattr(field, 'queryset') and field.queryset is not None:
-                model = field.queryset.model
-                if hasattr(model, '_meta') and hasattr(model._meta, 'fields'):
-                    model_field = model._meta.get_field(attr_name)
-                    if model_field:
-                        return self._map_django_field_type(model_field)
-        except Exception:
-            pass
-        
-        # 如果没有 queryset 或无法获取字段信息，使用启发式规则
-        return self._heuristic_field_type(attr_name)
-
-    def _map_django_field_type(self, model_field):
-        """
-        将 Django 字段类型映射到 OpenAPI 类型
-        """
-        field_type = type(model_field).__name__
-        
-        # 整数类型
-        if 'Integer' in field_type or 'BigInteger' in field_type or 'SmallInteger' in field_type:
-            return 'integer'
-        # 浮点数类型
-        elif 'Float' in field_type or 'Decimal' in field_type:
-            return 'number'
-        # 布尔类型
-        elif 'Boolean' in field_type:
-            return 'boolean'
-        # 日期时间类型
-        elif 'DateTime' in field_type or 'Date' in field_type or 'Time' in field_type:
-            return 'string'
-        # 文件类型
-        elif 'File' in field_type or 'Image' in field_type:
-            return 'string'
-        # 其他类型默认为字符串
-        else:
-            return 'string'
-
-    def _heuristic_field_type(self, attr_name):
-        """
-        启发式推断字段类型
-        """
-        # 基于属性名的启发式规则
-        
-        if attr_name in ['is_active', 'enabled', 'visible'] or attr_name.startswith('is_'):
-            return 'boolean'
-        elif attr_name in ['count', 'number', 'size', 'amount']:
-            return 'integer'
-        elif attr_name in ['price', 'rate', 'percentage']:
-            return 'number'
-        else:
-            # 默认返回字符串类型
-            return 'string'
-
-    def _get_openapi_properties_schema(self, field):
-        """
-        获取对象属性的 OpenAPI schema
-        """
-        return self._get_openapi_object_schema(field)['properties']
 
 
 class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
@@ -352,6 +433,13 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
 
     def map_serializer_field(self, auto_schema, direction):
         field = self.target
+        description = getattr(field, 'help_text', '') or ''
+        title = getattr(field, 'label', '') or ''
+        choices = list(field.choices)
+        value_schema = build_basic_type(type(next((value for value in choices if value is not None), '')))
+        value_schema['enum'] = choices
+        if None in choices:
+            value_schema['nullable'] = True
         
         if getattr(field, 'many', False):
             return {
@@ -359,22 +447,22 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
                 'items': {
                     'type': 'object',
                     'properties': {
-                        'value': {'type': 'string'},
+                        'value': value_schema,
                         'label': {'type': 'string'}
                     }
                 },
-                'description': getattr(field, 'help_text', ''),
-                'title': getattr(field, 'label', ''),
+                'description': description,
+                'title': title,
             }
         else:
             return {
                 'type': 'object',
                 'properties': {
-                    'value': {'type': 'string'},
+                    'value': value_schema,
                     'label': {'type': 'string'}
                 },
-                'description': getattr(field, 'help_text', ''),
-                'title': getattr(field, 'label', ''),
+                'description': description,
+                'title': title,
             }
 
 
@@ -386,6 +474,8 @@ class BitChoicesFieldExtension(OpenApiSerializerFieldExtension):
 
     def map_serializer_field(self, auto_schema, direction):
         field = self.target
+        description = getattr(field, 'help_text', '') or ''
+        title = getattr(field, 'label', '') or ''
         
         return {
             'type': 'array',
@@ -396,8 +486,8 @@ class BitChoicesFieldExtension(OpenApiSerializerFieldExtension):
                     'label': {'type': 'string'}
                 }
             },
-            'description': getattr(field, 'help_text', ''),
-            'title': getattr(field, 'label', ''),
+            'description': description,
+            'title': title,
         }
 
 
@@ -432,6 +522,6 @@ class LabelRelatedFieldExtension(OpenApiSerializerFieldExtension):
                 }
             },
             'required': ['id', 'name', 'value'],
-            'description': getattr(field, 'help_text', 'Label information'),
-            'title': getattr(field, 'label', 'Label'),
+            'description': getattr(field, 'help_text', '') or 'Label information',
+            'title': getattr(field, 'label', '') or 'Label',
         }

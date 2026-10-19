@@ -26,6 +26,8 @@ def parse_sentinels_host(sentinels_host):
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 VERSION = const.VERSION
+# Covers breaking changes across the whole server release, including Koko, Chen and Kael.
+MIN_CLIENT_VERSION = 'v5.1.0'
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
@@ -52,6 +54,7 @@ DEBUG_ANSIBLE = CONFIG.DEBUG_ANSIBLE
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
+WS_ALLOWED_ORIGINS = CONFIG.WS_ALLOWED_ORIGINS
 
 # Absolute url for downloading applet
 APPLET_DOWNLOAD_HOST = CONFIG.APPLET_DOWNLOAD_HOST
@@ -120,6 +123,7 @@ CSRF_FAILURE_VIEW = 'jumpserver.views.other.csrf_failure'
 # print('  - ' + origin)
 # Max post update field num
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+DATA_UPLOAD_MAX_MEMORY_SIZE = CONFIG.DATA_UPLOAD_MAX_MEMORY_SIZE
 
 # Application definition
 
@@ -141,9 +145,10 @@ INSTALLED_APPS = [
     'rbac.apps.RBACConfig',
     'labels.apps.LabelsConfig',
     'reports.apps.ReportsConfig',
+    'chat_ai.apps.ChatAIConfig',
     'rest_framework',
     'drf_spectacular',
-    'drf_spectacular_sidecar', 
+    'drf_spectacular_sidecar',
     'django_cas_ng',
     'channels',
     'django_filters',
@@ -386,7 +391,7 @@ REDIS_SSL_KEY = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), No
 REDIS_SSL_CERT = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
 REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
 REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA)
-REDIS_SSL_REQUIRED = 'none'
+REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
 REDIS_PROTOCOL = 'rediss' if REDIS_USE_SSL else 'redis'
 # Cache use sentinel

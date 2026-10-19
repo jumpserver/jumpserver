@@ -59,6 +59,12 @@ options:
       - The password to use for the user.
     type: str
     aliases: [pass]
+  old_password:
+    description:
+      - The user's current password.
+      - When provided during a password-only change, it is included in the
+        Oracle C(REPLACE) clause.
+    type: str
   password_only:
     description:
       - Change the password directly without querying C(DBA_USERS), creating the
@@ -147,7 +153,7 @@ def user_find(oracle_client, username):
     return rtn, None
 
 
-def get_identified_clause(auth_type, password):
+def get_identified_clause(auth_type, password, old_password=None):
     auth_type = auth_type.lower()
     if auth_type == 'external':
         return "IDENTIFIED EXTERNALLY"
@@ -159,19 +165,27 @@ def get_identified_clause(auth_type, password):
         if not password:
             raise ValueError("Password is required for 'password' authentication type")
         quote_password = password.replace('"', '""')
-        return f'IDENTIFIED BY "{quote_password}"'
+        clause = f'IDENTIFIED BY "{quote_password}"'
+        if old_password:
+            quote_old_password = old_password.replace('"', '""')
+            clause += f' REPLACE "{quote_old_password}"'
+        return clause
     else:
         raise ValueError(f"Unsupported authentication type: {auth_type}")
 
 
-def user_change_password(module, oracle_client, username, password):
+def user_change_password(
+        module, oracle_client, username, password, old_password=None
+):
     valid, msg = validate_identifier(username)
     if not valid:
         module.fail_json(msg=f"Invalid username: {msg}")
 
     username = username.upper()
     try:
-        identified_clause = get_identified_clause('password', password)
+        identified_clause = get_identified_clause(
+            'password', password, old_password
+        )
         _, err = oracle_client.execute(
             f"ALTER USER {username} {identified_clause}"
         )
@@ -320,6 +334,7 @@ def main():
         default_tablespace=dict(required=False, aliases=['db']),
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),
+        old_password=dict(no_log=True),
         password_only=dict(type='bool', default=False),
         state=dict(type='str', default='present', choices=['absent', 'present']),
         update_password=dict(default="always", choices=["always", "on_create"], no_log=False),
@@ -334,6 +349,7 @@ def main():
     default_tablespace = module.params['default_tablespace']
     user = module.params['name']
     password = module.params['password']
+    old_password = module.params['old_password']
     password_only = module.params['password_only']
     state = module.params['state']
     update_password = module.params['update_password']
@@ -348,7 +364,9 @@ def main():
     if state == 'present' and password_only:
         if not password:
             module.fail_json(msg='password parameter is required when password_only is enabled')
-        user_change_password(module, oracle_client, user, password)
+        user_change_password(
+            module, oracle_client, user, password, old_password
+        )
     elif state == 'present':
         if not password and update_password == 'always':
             module.fail_json(

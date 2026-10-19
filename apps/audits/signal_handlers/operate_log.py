@@ -55,6 +55,8 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         return
     if not instance:
         return
+    if getattr(instance, OP_LOG_SKIP_SIGNAL, False):
+        return
 
     with translation.override('en'):
         resource_type = instance._meta.verbose_name
@@ -206,8 +208,9 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
         'BaseAutomation', 'CeleryTask', 'Command', 'JobLog',
         'ConnectionToken', 'SessionJoinRecord', 'SessionSharing',
+        'PersonalAssetCredential',
         'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
-        'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',
+        'TicketAssignee',
         'SuperTicket', 'SuperConnectionToken', 'AdminConnectionToken', 'PermNode',
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',

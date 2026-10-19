@@ -55,7 +55,7 @@ class ApplyNodesViewSet(OrgReadonlyModelViewSet, SuggestionMixin):
             queryset = self.get_nodes()
         else:
             queryset = super().get_queryset()
-        return queryset
+        return queryset.with_realtime_assets_amount()
 
     def get_nodes(self, with_expired=False):
         perms = AssetPermissionUtil().get_permissions_for_user(

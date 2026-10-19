@@ -12,6 +12,11 @@ from users.models.user import User
 
 class UserFilter(BaseFilterSet):
     email = filters.CharFilter(method='filter_email', label=_('Email'))
+    mfa_level = filters.TypedChoiceFilter(
+        choices=User.MFA_LEVEL_CHOICES,
+        coerce=int,
+        method='filter_mfa_level',
+    )
     groups = filters.CharFilter(
         field_name="groups__name", lookup_expr='iexact',
         label=_('User group name')
@@ -60,6 +65,20 @@ class UserFilter(BaseFilterSet):
     def filter_email(self, queryset, name, value):
         q = Q(email_lookup=text_hmac_sha256(value))
         return queryset.filter(q)
+
+    @staticmethod
+    def filter_mfa_level(queryset, name, value):
+        queryset = queryset.filter(**{name: value})
+        if value != 0:
+            return queryset
+
+        force_level = settings.SECURITY_MFA_AUTH
+        if force_level in [True, 1]:
+            return queryset.none()
+        if force_level == 2:
+            admins = User.get_super_and_org_admins()
+            return queryset.exclude(id__in=admins)
+        return queryset
 
     def filter_is_blocked(self, queryset, name, value):
         from users.utils import LoginBlockUtil

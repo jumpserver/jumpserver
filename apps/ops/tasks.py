@@ -71,6 +71,14 @@ def run_ops_job(job_id):
         execution.creator = job.creator
         if job.periodic_variable:
             execution.parameters = JobExecutionSerializer().validate_parameters(job.periodic_variable)
+        try:
+            execution.set_celery_id()
+            execution.save()
+            execution.check_login_asset_acls()
+        except Exception as e:
+            execution.set_error(e)
+            logger.error("Start adhoc execution error: {}".format(e))
+            return
         _run_ops_job_execution(execution)
 
 

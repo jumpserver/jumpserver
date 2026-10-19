@@ -5,6 +5,7 @@ import ldap
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.utils.translation import gettext
 from django_auth_ldap.backend import _LDAPUser, LDAPBackend, valid_cache_key
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
@@ -99,27 +100,7 @@ class LDAPBaseBackend(LDAPBackend):
             return None
         user = self.authenticate_ldap_user(ldap_user, password)
         logger.info('Authenticate user: {}'.format(user))
-        if not user:
-            return None
-        if not self._is_same_login_user(username, user):
-            return None
         return user if self.user_can_authenticate(user) else None
-
-    def _is_same_login_user(self, submitted_username, user):
-        query_field = self.settings.USER_QUERY_FIELD or self.get_user_model().USERNAME_FIELD
-        submitted = self._normalize_login_identity(submitted_username)
-        authenticated = self._normalize_login_identity(getattr(user, query_field, None))
-        if not submitted or not authenticated:
-            return False
-        if submitted != authenticated:
-            return False
-        return True
-
-    @staticmethod
-    def _normalize_login_identity(value):
-        if value is None:
-            return ''
-        return str(value).strip().casefold()
 
     def pre_check(self, username, password):
         if not self.is_enabled():
@@ -208,7 +189,7 @@ class LDAPUser(_LDAPUser):
 
     def _authenticate_user_dn(self, password):
         if self.dn is None:
-            raise self.AuthenticationFailed("failed to map the username to a DN.")
+            raise self.AuthenticationFailed(gettext("failed to map the username to a DN."))
 
         self._connection = None
         self._connection_bound = False
@@ -217,7 +198,7 @@ class LDAPUser(_LDAPUser):
             sticky = self.settings.BIND_AS_AUTHENTICATING_USER
             self._bind_as(self.dn, password, sticky=sticky)
         except ldap.INVALID_CREDENTIALS:
-            raise self.AuthenticationFailed("user DN/password rejected by LDAP server.")
+            raise self.AuthenticationFailed(gettext("user DN/password rejected by LDAP server."))
 
     def _search_for_user_dn(self):
         """

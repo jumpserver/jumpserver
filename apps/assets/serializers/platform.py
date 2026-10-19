@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -133,14 +134,12 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
             return default_field
 
         setting_fields = [{'name': k, **v} for k, v in setting_fields.items()]
+        if protocol in ('http', 'https') and not settings.XPACK_LICENSE_IS_VALID:
+            for field in setting_fields:
+                if field['name'] == 'autofill':
+                    field['choices'] = [(key, label) for key, label in field['choices'] if key != 'script']
         name = '{}ProtocolSettingSerializer'.format(protocol.capitalize())
         return create_serializer_class(name, setting_fields)()
-
-    def validate(self, cleaned_data):
-        name = cleaned_data.get('name')
-        if name in ['winrm']:
-            cleaned_data['public'] = False
-        return cleaned_data
 
     def to_file_representation(self, data):
         return '{name}/{port}'.format(**data)

@@ -15,10 +15,11 @@ from perms.const import ActionChoices as PermActionChoices
 from perms.serializers.permission import ActionChoicesField
 from users.models import User
 from ..models import ConnectionToken
+from ..utils import get_effective_connect_options
 
 __all__ = [
-    'ConnectionTokenSecretSerializer', 'ConnectTokenAppletOptionSerializer',
-    'ConnectTokenVirtualAppOptionSerializer',
+    'ConnectionTokenSecretSerializer',
+    'ConnectTokenAppletOptionSerializer', 'ConnectTokenVirtualAppOptionSerializer',
 ]
 
 
@@ -99,15 +100,22 @@ class _ConnectionTokenCommandFilterACLSerializer(serializers.ModelSerializer):
         attrs=('id', 'name', 'type', 'content', 'ignore_case', 'pattern'),
         label=_('Command group')
     )
-    reviewers = ObjectRelatedField(
-        many=True, queryset=User.objects, label=_("Reviewers"), required=False
-    )
+    reviewers = serializers.SerializerMethodField(label=_("Reviewers"))
 
     class Meta:
         model = CommandFilterACL
         fields = [
             'id', 'name', 'command_groups', 'action',
             'reviewers', 'priority', 'is_active'
+        ]
+
+    @staticmethod
+    def get_reviewers(acl):
+        if acl.action != ACLActionChoices.review:
+            return []
+        return [
+            {'id': reviewer.id, 'name': reviewer.name}
+            for reviewer in acl.reviewers.all()
         ]
 
 
@@ -152,10 +160,15 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     clipboard_policy = serializers.SerializerMethodField()
     data_masking_rules = _ConnectionTokenDataMaskingRuleSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
+    public_key = serializers.CharField(
+        label=_('SSH public key'), write_only=True, required=False,
+        allow_blank=True, max_length=16384,
+    )
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
-    connect_options = serializers.JSONField(read_only=True)
+    connect_options = serializers.SerializerMethodField()
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
+    ssh_certificate = serializers.SerializerMethodField()
 
     class Meta:
         model = ConnectionToken
@@ -163,13 +176,23 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'clipboard_policy', 'data_masking_rules', 'protocol',
             'zone', 'gateway', 'actions', 'expire_at',
-            'from_ticket', 'expire_now', 'connect_method',
-            'connect_options', 'face_monitor_token'
+            'from_ticket', 'expire_now', 'public_key', 'connect_method',
+            'connect_options', 'face_monitor_token', 'ssh_certificate'
         ]
         extra_kwargs = {
             'face_monitor_token': {'read_only': True},
             'value': {'read_only': True},
         }
+
+    @staticmethod
+    def get_ssh_certificate(token):
+        return getattr(token, 'ssh_certificate', None)
+
+    @staticmethod
+    def get_connect_options(token):
+        return get_effective_connect_options(
+            token.connect_options, token.protocol
+        )
 
     @staticmethod
     def _get_clipboard_acl_for_operation(token, operation):
@@ -218,9 +241,44 @@ class ConnectTokenAppletOptionSerializer(serializers.Serializer):
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
     remote_app_option = serializers.JSONField(read_only=True)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Route virtual tickets to the local CP, not the host's AD domain.
+        # The Tinker installer configures the server's NLA requirement; leave
+        # transport negotiation to the existing platform/client settings.
+        for protocol in data['platform']['protocols']:
+            if protocol['name'] == 'rdp':
+                protocol['setting'] = {
+                    **(protocol.get('setting') or {}), 'ad_domain': 'localhost',
+                }
+        return data
+
 
 class ConnectTokenVirtualAppOptionSerializer(serializers.Serializer):
     name = serializers.CharField(label=_('Name'))
     image_name = serializers.CharField(label=_('Image name'))
     image_port = serializers.IntegerField(label=_('Image port'))
     image_protocol = serializers.CharField(label=_('Image protocol'))
+    provider = serializers.SerializerMethodField(label=_('App Provider'))
+
+    @staticmethod
+    def get_provider(instance):
+        provider = instance.get('provider')
+        if provider is None:
+            raise serializers.ValidationError(_('Virtual app provider is required'))
+        if not provider.host:
+            raise serializers.ValidationError(_('Virtual app provider requires an SSH host'))
+        account = provider.select_account()
+        if not account:
+            raise serializers.ValidationError(_('Virtual app provider requires an active SSH account'))
+        gateway = provider.select_gateway()
+        return {
+            'id': str(provider.id),
+            'name': provider.name,
+            'address': provider.address,
+            'host_id': str(provider.host_id) if provider.host_id else None,
+            'load': provider.load,
+            'host': _ConnectionTokenAssetSerializer(provider.host).data,
+            'account': _ConnectionTokenAccountSerializer(account).data,
+            'gateway': _ConnectionTokenGatewaySerializer(gateway).data if gateway else None,
+        }

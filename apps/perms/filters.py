@@ -3,21 +3,32 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
-from assets.const import AllTypes, GATEWAY_NAME
+from assets.const import AllTypes, Category, GATEWAY_NAME
 from assets.models import Node, Asset
 from common.drf.filters import BaseFilterSet
 from common.utils import get_object_or_none, is_uuid
 from perms.models import AssetPermission, AssetPermissionQuerySet
 from users.models import User, UserGroup
+from users.tree import get_ungrouped_users
 
 
 class PermedAssetFilterSet(BaseFilterSet):
+    user_name = filters.CharFilter(
+        field_name='user_custom__name', label=_('Custom Name')
+    )
+    user_comment = filters.CharFilter(
+        field_name='user_custom__comment', label=_('Custom Comment')
+    )
     platform = filters.CharFilter(
         method='filter_platform', label=_('Platform name or ID')
     )
     type = filters.ChoiceFilter(
         field_name='platform__type', choices=AllTypes.choices(),
         label=_('Platform type')
+    )
+    category = filters.ChoiceFilter(
+        field_name='platform__category', choices=Category.choices,
+        label=_('Platform category')
     )
     protocols = filters.CharFilter(
         method='filter_protocols', label=_('Protocols')
@@ -29,11 +40,12 @@ class PermedAssetFilterSet(BaseFilterSet):
     class Meta:
         model = Asset
         fields = [
-            'id', 'name', 'address', 'platform', 'type', 'protocols',
-            'zone', 'is_active', 'comment',
+            'id', 'name', 'address', 'platform', 'type', 'category', 'protocols',
+            'zone', 'is_active', 'comment', 'user_name', 'user_comment',
         ]
         fields_operator = {
             'platform': ('exact',),
+            'category': ('in',),
             'protocols': ('in',),
             'zone': ('icontains',),
         }
@@ -77,11 +89,14 @@ class PermissionBaseFilter(BaseFilterSet):
         label=_('User group name')
     )
     all = filters.BooleanFilter(method='do_nothing', label=_('All'))
+    include_inherited = filters.BooleanFilter(
+        method='do_nothing', label=_('Include inherited permissions')
+    )
 
     class Meta:
         fields = (
             'user_id', 'username', 'user_group_id', 'user_group', 'name',
-            'all', 'is_valid', 'is_expired',
+            'all', 'include_inherited', 'is_valid', 'is_expired',
         )
 
     @property
@@ -113,7 +128,9 @@ class PermissionBaseFilter(BaseFilterSet):
         return queryset
 
     def filter_user(self, queryset):
-        is_query_all = self.get_query_param('all', True)
+        is_query_all = self.get_query_param(
+            'include_inherited', self.get_query_param('all', True)
+        )
         user_id = self.get_query_param('user_id')
         username = self.get_query_param('username')
 
@@ -159,6 +176,9 @@ class PermissionBaseFilter(BaseFilterSet):
 
 
 class AssetPermissionFilter(PermissionBaseFilter):
+    ungrouped_users = filters.BooleanFilter(
+        method='filter_ungrouped_users', label=_('Ungrouped users')
+    )
     is_effective = filters.BooleanFilter(
         method='do_nothing', label=_('Is effective')
     )
@@ -180,8 +200,8 @@ class AssetPermissionFilter(PermissionBaseFilter):
     class Meta:
         model = AssetPermission
         fields = (
-            'id', 'name', 'all', 
-            'user_id', 'username', 'user_group_id', 'user_group',
+            'id', 'name', 'all', 'include_inherited',
+            'user_id', 'username', 'user_group_id', 'user_group', 'ungrouped_users',
             'node_id', 'node_name', 'asset_id', 'asset_name',
             'address', 'accounts',
             'is_active', 'is_valid', 'is_expired',
@@ -190,6 +210,12 @@ class AssetPermissionFilter(PermissionBaseFilter):
         fields_operator = {
             'accounts': ('in',),
         }
+
+    @staticmethod
+    def filter_ungrouped_users(queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(users__in=get_ungrouped_users()).distinct()
 
     @property
     def qs(self):
@@ -210,7 +236,9 @@ class AssetPermissionFilter(PermissionBaseFilter):
         return queryset
 
     def filter_node(self, queryset: QuerySet):
-        is_query_all = self.get_query_param('all', True)
+        is_query_all = self.get_query_param(
+            'include_inherited', self.get_query_param('all', True)
+        )
         node_id = self.get_query_param('node_id')
         node_name = self.get_query_param('node_name')
         if node_id:
@@ -234,7 +262,9 @@ class AssetPermissionFilter(PermissionBaseFilter):
         return queryset
 
     def filter_asset(self, queryset):
-        is_query_all = self.get_query_param('all', True)
+        is_query_all = self.get_query_param(
+            'include_inherited', self.get_query_param('all', True)
+        )
         asset_id = self.get_query_param('asset_id')
         asset_name = self.get_query_param('asset_name')
         address = self.get_query_param('address')

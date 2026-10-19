@@ -3,7 +3,7 @@
 from django.db import transaction
 from django.db.models import Max, Q, Subquery, OuterRef
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -39,6 +39,11 @@ __all__ = [
 
 
 class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
+    # The serializer keeps the credential write-only; these actions return
+    # automation metadata rather than account secrets.
+    chat_ai_safe_sensitive_actions = (
+        'list', 'retrieve', 'create', 'update', 'partial_update', 'destroy',
+    )
     model = ChangeSecretAutomation
     permission_classes = [RBACPermission, IsValidLicense]
     filterset_class = ChangeSecretAutomationFilterSet
@@ -50,6 +55,10 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
 
 
 class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
+    # The separate `secret` action exposes old/new values and stays blocked.
+    chat_ai_safe_sensitive_actions = (
+        'list', 'dashboard', 'ignore_fail', 'verify', 'restore',
+    )
     filterset_class = ChangeSecretRecordFilterSet
     permission_classes = [RBACPermission, IsValidLicense]
     search_fields = ('asset__address', 'account__username')
@@ -127,7 +136,7 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
         records = self.get_queryset().filter(id__in=record_ids)
         if not records.exists():
             return Response(
-                {'detail': 'No valid records found'},
+                {'detail': gettext('No valid records found')},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -275,6 +284,7 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
 
 
 class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
+    chat_ai_safe_sensitive_actions = ('list', 'retrieve', 'create')
     rbac_perms = (
         ("list", "accounts.view_changesecretexecution"),
         ("retrieve", "accounts.view_changesecretexecution"),
@@ -291,23 +301,30 @@ class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
 
 
 class ChangSecretAssetsListApi(AutomationAssetsListApi):
+    chat_ai_safe_sensitive_actions = ('GET',)
     model = ChangeSecretAutomation
 
 
 class ChangSecretRemoveAssetApi(AutomationRemoveAssetApi):
+    chat_ai_safe_sensitive_actions = ('PATCH',)
     model = ChangeSecretAutomation
     serializer_class = serializers.ChangeSecretUpdateAssetSerializer
 
 
 class ChangSecretAddAssetApi(AutomationAddAssetApi):
+    chat_ai_safe_sensitive_actions = ('PATCH',)
     model = ChangeSecretAutomation
     serializer_class = serializers.ChangeSecretUpdateAssetSerializer
 
 class ChangSecretNodeAddRemoveApi(AutomationNodeAddRemoveApi):
+    chat_ai_safe_sensitive_actions = ('PATCH',)
     model = ChangeSecretAutomation
     serializer_class = serializers.ChangeSecretUpdateNodeSerializer
 
 class ChangeSecretStatusViewSet(OrgBulkModelViewSet):
+    chat_ai_safe_sensitive_actions = (
+        'list', 'retrieve', 'destroy', 'bulk_destroy',
+    )
     perm_model = ChangeSecretAutomation
     filterset_class = ChangeSecretStatusFilterSet
     serializer_class = serializers.ChangeSecretAccountSerializer

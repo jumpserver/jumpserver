@@ -20,7 +20,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
@@ -32,7 +32,7 @@ from common.utils import (
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
-from .const import OTP_BIND_AFTER_MFA_SESSION_KEY
+from .const import MFAType, OTP_BIND_AFTER_MFA_SESSION_KEY
 from .signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
@@ -320,11 +320,25 @@ class MFAMixin:
     get_user_from_session: Callable
     get_request_ip: Callable
 
+    def _get_mfa_bind_url(self, user):
+        # Only OTP supports enrollment before login; profile pages require authentication.
+        otp_backend = user.get_mfa_backend_by_type(MFAType.OTP.value)
+        if otp_backend:
+            return otp_backend.get_enable_url()
+        message_data = {
+            'title': _('MFA unavailable'),
+            'error': _(
+                'No available MFA method. Please contact your administrator.'
+            ),
+            'redirect_url': reverse('authentication:login') + '?admin=1',
+            'auto_redirect': False,
+        }
+        return FlashMessageUtil.gen_message_url(message_data)
+
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper
         if not active_mfa_mapper:
-            set_url = reverse('authentication:user-otp-enable-start')
-            raise errors.MFAUnsetError(set_url, user, self.request)
+            raise errors.MFAUnsetError(self._get_mfa_bind_url(user), user, self.request)
 
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
@@ -568,12 +582,17 @@ class AuthFaceMixin:
     def _is_context_success(context):
         return context.get('success', False)
 
-    def create_face_verify_context(self, data=None):
+    def create_face_verify_context(self, data=None, *, user_id=None):
         token = uuid.uuid4().hex
+        if user_id is None:
+            try:
+                user_id = self.get_user_from_session().id
+            except errors.SessionEmptyError:
+                user_id = getattr(self.request.user, 'id', None)
         context_data = {
             "action": "mfa",
             "token": token,
-            "user_id": self.request.user.id,
+            "user_id": user_id,
             "is_finished": False
         }
         if data:
@@ -589,7 +608,7 @@ class AuthFaceMixin:
         from authentication.const import FACE_SESSION_KEY
         token = self.request.session.get(FACE_SESSION_KEY)
         if not token:
-            raise ValueError("Face recognition token is missing from the session.")
+            raise ValueError(gettext("Face recognition token is missing from the session."))
         return token
 
     def get_face_verify_context(self):
@@ -597,14 +616,14 @@ class AuthFaceMixin:
         cache_key = self._get_face_cache_key(token)
         context = cache.get(cache_key)
         if not context:
-            raise ValueError(f"Face recognition context does not exist for token: {token}")
+            raise ValueError(gettext('Face recognition context does not exist for token: %(token)s') % {'token': token})
         return context
 
     def get_face_code(self):
         context = self.get_face_verify_context()
 
         if not self._is_context_finished(context):
-            raise RuntimeError("Face recognition is not yet completed.")
+            raise RuntimeError(gettext("Face recognition is not yet completed."))
 
         if not self._is_context_success(context):
             msg = context.get('error_message', '')
@@ -612,7 +631,7 @@ class AuthFaceMixin:
 
         face_code = context.get('face_code')
         if not face_code:
-            raise ValueError("Face code is missing from the context.")
+            raise ValueError(gettext("Face code is missing from the context."))
         return face_code
 
 
@@ -645,6 +664,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
 
     def check_is_need_captcha(self):
+        if settings.SECURITY_LOGIN_CAPTCHA_ALWAYS_REQUIRED:
+            return True
+
         # 最近有登录失败时需要填写验证码
         ip = get_request_ip(self.request)
         need = cache.get(self.key_prefix_captcha.format(ip))

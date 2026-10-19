@@ -21,6 +21,9 @@ class Vault(BaseVault):
             token=kwargs.get('VAULT_OPENBAO_TOKEN'),
             mount_point=kwargs.get('VAULT_OPENBAO_MOUNT_POINT'),
             timeout=kwargs.get('VAULT_OPENBAO_TIMEOUT'),
+            verify_tls=kwargs.get('VAULT_OPENBAO_VERIFY_TLS', True),
+            ca_cert=kwargs.get('VAULT_OPENBAO_CACERT_CONTENT'),
+            ca_cert_file=kwargs.get('VAULT_OPENBAO_CACERT_FILE'),
         )
 
     def is_active(self):

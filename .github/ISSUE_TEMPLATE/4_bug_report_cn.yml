@@ -2,8 +2,6 @@ name: '🐛 反馈缺陷'
 description: '反馈一个缺陷'
 title: '[Bug] '
 labels: ['🐛 Bug']
-assignees: 
-  - baijiangjie
 body:
   - type: input
     attributes:

@@ -22,12 +22,22 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     )
     from_ticket_info = serializers.SerializerMethodField(label=_("Ticket info"))
     actions = ActionChoicesField(read_only=True, label=_("Actions"))
+    save_personal_credential = serializers.BooleanField(
+        required=False, default=False, write_only=True,
+        label=_("Save personal credential"),
+    )
+    personal_credential_version = serializers.IntegerField(
+        required=False, min_value=1, write_only=True,
+        label=_("Personal credential version"),
+    )
 
     class Meta:
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
             'user', 'asset', 'account', 'input_username', 'input_secret', 'input_secret_type',
+            'personal_credential_id', 'personal_credential_version',
+            'save_personal_credential',
             'connect_method', 'connect_options', 'protocol', 'actions',
             'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',
@@ -42,6 +52,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         fields = fields_small + read_only_fields
         extra_kwargs = {
             'face_monitor_token': {'read_only': True},
+            'personal_credential_id': {'required': False, 'allow_null': True},
             'from_ticket': {'read_only': True},
             'value': {'read_only': True},
             'is_expired': {'read_only': True, 'label': _('Is expired')},
@@ -75,6 +86,17 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
 
 
 class ConnectionTokenReusableSerializer(CommonModelSerializer):
+    def validate_is_reusable(self, value):
+        if (
+                value
+                and self.instance
+                and self.instance.personal_credential_id
+        ):
+            raise serializers.ValidationError(
+                _('Personal credential connection tokens cannot be reusable')
+            )
+        return value
+
     class Meta:
         model = ConnectionToken
         fields = ['id', 'date_expired', 'is_reusable']

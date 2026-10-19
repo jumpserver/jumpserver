@@ -17,6 +17,8 @@ __all__ = ['Zone']
 
 class Zone(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
+    cidrs = models.JSONField(default=list, blank=True, verbose_name=_('CIDR ranges'))
+    auto_assign = models.BooleanField(default=False, verbose_name=_('Auto assign new assets'))
 
     class Meta:
         verbose_name = _("Zone")

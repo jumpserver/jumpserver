@@ -10,6 +10,7 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View, TemplateView
 from rest_framework.views import APIView
@@ -33,6 +34,10 @@ class LunaView(View):
 class I18NView(View):
     def get(self, request, lang):
         referer_url = request.META.get('HTTP_REFERER', '/')
+        if not url_has_allowed_host_and_scheme(
+            referer_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            referer_url = '/'
         response = HttpResponseRedirect(referer_url)
         expires = timezone.now() + timezone.timedelta(days=365)
         response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang, expires=expires)
@@ -74,12 +79,22 @@ class ResourceDownload(TemplateView):
     @lazyproperty
     def versions_content(self):
         more_downloads = os.environ.get('MORE_DOWNLOADS_URL', '')
-        return f"""
+        from terminal.const import TINKER_TARGET_VERSION
+        default_versions = f"""
         MRD_VERSION=10.6.7
         OPENSSH_VERSION=v9.4.0.0
-        TINKER_VERSION=v0.1.6
+        TINKER_VERSION={TINKER_TARGET_VERSION}
         VIDEO_PLAYER_VERSION=0.5.2
-        CLIENT_VERSION=4.1.6
+        """
+        version_file = os.path.join(settings.DATA_DIR, 'version.txt')
+        try:
+            with open(version_file) as f:
+                versions = f.read()
+        except OSError:
+            versions = default_versions
+
+        return f"""
+        {versions}
         VENDOR={settings.VENDOR}
         MORE_DOWNLOADS_URL={more_downloads}
         """
@@ -92,8 +107,21 @@ class ResourceDownload(TemplateView):
             line = line.strip()
             if not line or line.startswith('#') or '=' not in line:
                 continue
-            key, value = line.split('=')
+            key, value = line.split('=', 1)
             meta[key] = value
+
+        client_version = ''
+        core_version = settings.VERSION.strip().removeprefix('v')
+        if core_version != 'dev':
+            for version in (meta.get('CLIENT_VERSION', ''), settings.VERSION):
+                version = version.strip().removeprefix('v')
+                if re.fullmatch(
+                    r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)'
+                    r'(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?', version
+                ):
+                    client_version = version
+                    break
+        meta['CLIENT_VERSION'] = client_version
         return meta
 
     def get_context_data(self, **kwargs):
@@ -105,7 +133,8 @@ class ResourceDownload(TemplateView):
 
 def csrf_failure(request, reason=""):
     from django.shortcuts import reverse
-    login_url = reverse('authentication:login') + '?csrf_failure=1&admin=1'
+    reason_type = 'cookie' if reason.startswith('CSRF') else 'origin'
+    login_url = reverse('authentication:login') + f'?csrf_failure=1&admin=1&csrf_reason={reason_type}'
     return redirect(login_url)
 
 
@@ -122,9 +151,12 @@ class RedirectConfirm(TemplateView):
     def is_valid_url(url):
         if not url:
             return False
-        parsed = urlparse(url)
+        try:
+            parsed = urlparse(url)
+        except ValueError:
+            return False
         if not parsed.scheme or not parsed.netloc:
             return False
-        if parsed.scheme not in ['http', 'https', 'jms']:
+        if parsed.scheme not in ['http', 'https', 'jms2']:
             return False
         return True

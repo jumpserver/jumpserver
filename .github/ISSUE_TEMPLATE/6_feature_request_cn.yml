@@ -3,7 +3,6 @@ description: '提出需求或建议'
 title: '[Feature] '
 labels: ['⭐️ Feature Request']
 assignees: 
-  - baijiangjie
   - ibuler
 body:
   - type: input

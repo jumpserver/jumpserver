@@ -5,7 +5,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title> {{ INTERFACE.login_title }} </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block html_title %}{{ INTERFACE.login_title }}{% endblock %}</title>
     <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
     {% include '_head_css_js.html' %}
     <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
@@ -21,31 +22,60 @@
             flex-direction: column;
         }
 
-        header {
+        body > header {
             width: 100%;
             flex-grow: 0;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
         }
 
         .wrapper {
             margin: auto;
         }
         
-        header .logo img {
-            margin-right: 8px;
-            vertical-align: middle;
+        body > header .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        body > header .logo a {
+            flex-shrink: 0;
+        }
+
+        body > header .logo img {
+            display: block;
+        }
+
+        body > header .logo span {
+            font-size: 21px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        body > header > div:last-child {
+            flex-shrink: 0;
+            padding-top: 0;
+        }
+
+        footer > div {
+            margin-top: 100px;
         }
     </style>
-
+    {% block custom_head_css_js %}{% endblock %}
 </head>
 
-<body style="background-color: #f3f3f4">
+<body class="{% block body_class %}{% endblock %}" style="background-color: #f3f3f4">
 <header>
     <div class="logo">
-        <a href="{% url 'index' %}">
+        <a href="{% url 'index' %}" aria-label="{% trans 'Home page' %}">
             <img src="{{ INTERFACE.logo_logout }}" alt="" width="50px" height="50px"/>
         </a>
-        <span style="font-size: 21px; line-height: 50px">{{ INTERFACE.login_title }}</span>
+        <span>{{ INTERFACE.login_title }}</span>
     </div>
     <div>
         <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
@@ -56,11 +86,10 @@
     {% endblock %}
 </div>
 <footer>
-    <div style="margin-top: 100px;">
+    <div>
         {% include '_copyright.html' %}
     </div>
 </footer>
 {% include '_foot_js.html' %}
 </body>
 </html>
-

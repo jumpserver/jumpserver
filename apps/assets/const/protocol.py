@@ -38,7 +38,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
         return {
             cls.ssh: {
                 'port': 22,
-                'secret_types': ['password', 'ssh_key'],
+                'secret_types': ['password', 'ssh_key', 'ssh_certificate'],
                 'setting': {
                     'old_ssh_version': {
                         'type': 'bool',
@@ -56,7 +56,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
             },
             cls.sftp: {
                 'port': 22,
-                'secret_types': ['password', 'ssh_key'],
+                'secret_types': ['password', 'ssh_key', 'ssh_certificate'],
                 'setting': {
                     'sftp_home': {
                         'type': 'str',
@@ -144,6 +144,11 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': False,
                         'label': _('Use SSL')
                     },
+                    'allow_invalid_cert': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Allow invalid certificate'),
+                    },
                 }
             },
         }
@@ -179,6 +184,15 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'default': False,
                         'label': _('SYSDBA'),
                         'help_text': _('Connect as SYSDBA')
+                    },
+                    'change_secret_with_old_password': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Use old password when changing password'),
+                        'help_text': _(
+                            'Use the currently managed password in the Oracle '
+                            'REPLACE clause when changing passwords'
+                        )
                     },
                 }
             },
@@ -280,7 +294,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.http: {
                 'port': 80,
                 'port_from_addr': True,
-                'secret_types': ['password'],
+                'secret_types': ['password', 'access_key'],
                 'setting': {
                     'safe_mode': {
                         'type': 'bool',
@@ -311,6 +325,23 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'type': 'str',
                         'default': 'type=submit',
                         'label': _('Submit selector')
+                    },
+                    'interactive_selector': {
+                        'type': 'str',
+                        'required': False,
+                        'default': '',
+                        'label': _('Interactive selector'),
+                        'help_text': _('Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls.')
+                    },
+                    'success_selector': {
+                        'type': 'str',
+                        'required': False,
+                        'default': '',
+                        'label': _('Success selector'),
+                        'help_text': _(
+                            'Selector for an element that appears only after a successful login, e.g. css=#dashboard. '
+                            'Required for basic autofill.'
+                        )
                     },
                     'script': {
                         'type': 'text',

@@ -37,7 +37,8 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
     can_terminate = serializers.BooleanField(read_only=True, label=_("Can terminate"))
     asset = serializers.CharField(label=_("Asset"), style={'base_template': 'textarea.html'})
     error_reason = LabeledChoiceField(
-        choices=SessionErrorReason.choices, label=_("Error reason"), required=False
+        choices=SessionErrorReason.choices, label=_("Error reason"),
+        required=False, allow_blank=True
     )
 
     class Meta:
@@ -165,6 +166,13 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        # Components initially mark a replay as unsupported until upload completes.
+        if (
+                validated_data.get('has_replay') is True and
+                instance.error_reason == SessionErrorReason.replay_unsupported and
+                'error_reason' not in validated_data
+        ):
+            validated_data['error_reason'] = ''
         is_finished = validated_data.get('is_finished')
         if (
                 instance.protocol != 'vnc' and  # VNC sessions do not require secret change

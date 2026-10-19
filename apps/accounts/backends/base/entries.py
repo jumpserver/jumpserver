@@ -44,6 +44,16 @@ class AccountEntry(BaseEntry):
         return path
 
 
+class PersonalAssetCredentialEntry(BaseEntry):
+    @property
+    def path_spec(self):
+        path = (
+            f'assets/{self.instance.asset_id}/personal-credentials/'
+            f'{self.instance.id}'
+        )
+        return path
+
+
 class AccountTemplateEntry(BaseEntry):
     @property
     def path_spec(self):

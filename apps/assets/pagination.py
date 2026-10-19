@@ -1,10 +1,17 @@
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import CursorPagination, LimitOffsetPagination
 from rest_framework.request import Request
 
-from assets.models import Node
 from common.utils import get_logger
 
 logger = get_logger(__name__)
+
+
+class NodeTreeCursorPagination(CursorPagination):
+    page_size = 100
+    page_size_query_param = 'node_limit'
+    max_page_size = 100
+    cursor_query_param = 'node_cursor'
+    ordering = ('value', 'id')
 
 
 class AssetPaginationBase(LimitOffsetPagination):
@@ -32,8 +39,10 @@ class AssetPaginationBase(LimitOffsetPagination):
         }
         for k, v in self._request.query_params.items():
             if k not in exclude_query_params and v is not None:
-                logger.warning(f'Not hit node.assets_amount because find a unknown query_param '
-                            f'`{k}` -> {self._request.get_full_path()}')
+                logger.debug(
+                    'Use exact asset count because query parameter `%s` is present -> %s',
+                    k, self._request.get_full_path()
+                )
                 return super().get_count(queryset)
         node_assets_count = self.get_count_from_nodes(queryset)
         if node_assets_count is None:
@@ -46,12 +55,6 @@ class AssetPaginationBase(LimitOffsetPagination):
 
 class NodeAssetTreePagination(AssetPaginationBase):
     def get_count_from_nodes(self, queryset):
-        is_query_all = self._view.is_query_node_all_assets
-        if not is_query_all:
-            return None
-        node = self._view.node
-        if not node:
-            node = Node.org_root()
-        if node:
-            logger.debug(f'Hit node assets_amount cache: [{node.assets_amount}]')
-        return node.assets_amount
+        # Node.assets_amount is no longer maintained. Let the filtered asset
+        # queryset execute an exact COUNT instead of returning a cached value.
+        return None

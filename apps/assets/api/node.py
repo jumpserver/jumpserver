@@ -5,29 +5,25 @@ from functools import partial
 from django.db.models.signals import m2m_changed
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from assets.models import Asset
 from common.api import SuggestionMixin
-from common.const.http import POST
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.exceptions import SomeoneIsDoingThis
 from common.utils import get_logger
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import current_org
 from rbac.permissions import RBACPermission
 from .. import serializers
 from ..models import Node
-from ..signal_handlers import update_nodes_assets_amount
 from ..tasks import (
     update_node_assets_hardware_info_manual,
     test_node_assets_connectivity_manual,
-    check_node_assets_amount_task
 )
+from .mixin import NodeAssetsAmountListMixin
 
 logger = get_logger(__file__)
 __all__ = [
@@ -37,20 +33,14 @@ __all__ = [
 ]
 
 
-class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
+class NodeViewSet(
+    NodeAssetsAmountListMixin, SuggestionMixin, OrgBulkModelViewSet
+):
     model = Node
     filterset_fields = ('value', 'key', 'id')
     search_fields = ('full_value',)
     serializer_class = serializers.NodeSerializer
-    rbac_perms = {
-        'match': 'assets.view_node',
-        'check_assets_amount_task': 'assets.change_node'
-    }
-
-    @action(methods=[POST], detail=False, url_path='check_assets_amount_task')
-    def check_assets_amount_task(self, request):
-        task = check_node_assets_amount_task.delay(current_org.id)
-        return Response(data={'task': task.id})
+    rbac_perms = {'match': 'assets.view_node'}
 
     def perform_update(self, serializer):
         node = self.get_object()
@@ -71,6 +61,7 @@ class NodeViewSet(SuggestionMixin, OrgBulkModelViewSet):
 
 
 class NodeAssetsApi(generics.ListAPIView):
+    perm_model = Asset
     serializer_class = serializers.AssetSerializer
 
     def get_queryset(self):
@@ -99,7 +90,6 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
                 error = _("Node {} is an ancestor of node {}, can't be added as its child".format(node.value, instance.value))
                 return Response(data={'error': error}, status=status.HTTP_400_BAD_REQUEST)
             node.parent = instance
-        update_nodes_assets_amount.delay(ttl=5, node_ids=(instance.id,))
         return Response("OK")
 
 

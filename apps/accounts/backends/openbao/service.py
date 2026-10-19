@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
+import hashlib
 import time
+from tempfile import NamedTemporaryFile
 from urllib.parse import quote
 
 import requests
+from django.utils.translation import gettext as _
 from requests import exceptions as request_exceptions
 
 from common.utils import get_logger, random_string
 
 logger = get_logger(__name__)
 
-__all__ = ['OpenBaoKVClient']
+__all__ = ['OpenBaoAPIError', 'OpenBaoKVClient', 'OpenBaoSSHCAClient']
 
 
 class OpenBaoAPIError(Exception):
@@ -19,12 +22,19 @@ class OpenBaoAPIError(Exception):
 class OpenBaoKVClient(object):
     max_versions = 20
 
-    def __init__(self, addr=None, token='', mount_point='pam', timeout=10, verify_tls=False):
+    def __init__(
+            self, addr=None, token='', mount_point='pam', timeout=10,
+            verify_tls=True, ca_cert='', ca_cert_file='',
+    ):
         self.addr = (addr or 'http://127.0.0.1:8200').rstrip('/')
         self.token = token or ''
         self.mount_point = (mount_point or 'pam').strip('/')
         self.timeout = int(timeout or 10)
         self.verify_tls = self._normalize_bool(verify_tls, default=True)
+        self.ca_cert = ca_cert or ''
+        self.ca_cert_file = ca_cert_file or ''
+        if self.ca_cert_file and self.addr == 'http://openbao:8200':
+            self.addr = 'https://openbao:8200'
         self.session = requests.Session()
 
     def is_active(self):
@@ -231,11 +241,22 @@ class OpenBaoKVClient(object):
             request_headers.update(headers)
 
         url = f'{self.addr}{path}'
-        try:
+
+        def send(verify):
             return self.session.request(
                 method, url, headers=request_headers,
-                timeout=self.timeout, verify=self.verify_tls, **kwargs
+                timeout=self.timeout, verify=verify, **kwargs
             )
+
+        try:
+            if self.verify_tls and self.ca_cert:
+                with NamedTemporaryFile(mode='w', suffix='.pem') as ca_file:
+                    ca_file.write(self.ca_cert)
+                    ca_file.flush()
+                    return send(ca_file.name)
+            if self.verify_tls and self.ca_cert_file:
+                return send(self.ca_cert_file)
+            return send(self.verify_tls)
         except request_exceptions.RequestException as e:
             raise OpenBaoAPIError(e)
 
@@ -261,3 +282,201 @@ class OpenBaoKVClient(object):
         error = OpenBaoAPIError(errors or response.reason)
         error.status_code = response.status_code
         return error
+
+
+class OpenBaoSSHCAClient(OpenBaoKVClient):
+    """Small client for OpenBao's SSH certificate signing endpoint.
+
+    It intentionally shares only the HTTP transport with the KV client. SSH CA
+    settings and credentials are kept separate from the account Vault backend.
+    """
+
+    def __init__(
+            self, addr=None, token='', mount_point='ssh-client-signer',
+            role='jumpserver', timeout=10, verify_tls=True, ca_cert_file='', ca_cert='',
+    ):
+        super().__init__(
+            addr=addr,
+            token=token,
+            mount_point=mount_point,
+            timeout=timeout,
+            verify_tls=verify_tls,
+            ca_cert=ca_cert,
+            ca_cert_file=ca_cert_file,
+        )
+        self.role = (role or 'jumpserver').strip('/')
+
+    def is_active(self, ttl=300):
+        try:
+            self._check_health()
+            self._check_token()
+            public_key = self.ensure_configured(ttl=ttl)
+            if not public_key:
+                raise OpenBaoAPIError('OpenBao SSH CA public key is empty')
+        except Exception as e:
+            logger.error(str(e))
+            return False, _('OpenBao SSH CA is not available: %(error)s') % {'error': str(e)}
+        return True, ''
+
+    def _check_token(self):
+        if not self.token:
+            raise OpenBaoAPIError(_('Enter an OpenBao service token.'))
+        try:
+            self._request(
+                'GET', '/v1/auth/token/lookup-self', expected_statuses=(200,)
+            )
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) not in (401, 403):
+                raise
+            error = OpenBaoAPIError(_(
+                'The OpenBao service token is invalid, expired, or lacks permission. '
+                'Check the token and its access policy.'
+            ))
+            error.status_code = e.status_code
+            raise error from e
+
+    def ensure_configured(self, ttl=300):
+        """Initialize missing SSH mounts, CAs and roles without replacing them."""
+        from common.utils.lock import DistributedLock
+
+        key = hashlib.sha256(f'{self.addr}\0{self.mount_point}'.encode()).hexdigest()
+        lock = DistributedLock(f'openbao-ssh-ca:{key}')
+        if not lock.acquire(timeout=self.timeout):
+            raise OpenBaoAPIError('Another request is initializing this OpenBao SSH CA')
+        try:
+            return self._ensure_configured(ttl)
+        finally:
+            lock.release()
+
+    def _get_existing_public_key(self):
+        try:
+            return self.get_public_key()
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) == 404 or (
+                getattr(e, 'status_code', None) == 400 and
+                str(e) == 'no default issuer currently configured'
+            ):
+                return ''
+            raise
+
+    def _ensure_configured(self, ttl):
+        mount_point = quote(self.mount_point, safe='')
+        role = quote(self.role, safe='')
+        public_key = self._get_existing_public_key()
+
+        if not public_key:
+            try:
+                mount = self._configuration_request('GET', f'/v1/sys/mounts/{mount_point}')
+            except OpenBaoAPIError as e:
+                missing = (
+                    getattr(e, 'status_code', None) == 404 or
+                    (getattr(e, 'status_code', None) == 400 and
+                     str(e).startswith('No secret engine mount at '))
+                )
+                if not missing:
+                    raise
+                self._configuration_request(
+                    'POST', f'/v1/sys/mounts/{mount_point}',
+                    json={'type': 'ssh'}, expected_statuses=(200, 204),
+                )
+            else:
+                if mount.get('data', {}).get('type') != 'ssh':
+                    raise OpenBaoAPIError(
+                        f'The mount point {self.mount_point} is not an SSH secrets engine'
+                    )
+
+            # Recheck before generating a CA, so a retry keeps any existing key.
+            public_key = self._get_existing_public_key()
+            if not public_key:
+                try:
+                    issuers = self._configuration_request('LIST', f'/v1/{mount_point}/issuers')
+                except OpenBaoAPIError as e:
+                    if getattr(e, 'status_code', None) != 404:
+                        raise
+                    issuers = {}
+                if issuers.get('data', {}).get('keys'):
+                    raise OpenBaoAPIError(
+                        f'The SSH mount {self.mount_point} already has CA issuers. '
+                        'Configure a default issuer before using it.'
+                    )
+                self._configuration_request(
+                    'POST', f'/v1/{mount_point}/config/ca',
+                    json={'generate_signing_key': True},
+                )
+                public_key = self.get_public_key()
+
+        try:
+            self._configuration_request('GET', f'/v1/{mount_point}/roles/{role}')
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) != 404:
+                raise
+            self._configuration_request(
+                'POST', f'/v1/{mount_point}/roles/{role}',
+                json={
+                    'key_type': 'ca',
+                    'algorithm_signer': 'default',
+                    'allow_user_certificates': True,
+                    'allowed_users': '*',
+                    'allow_user_key_ids': True,
+                    'allowed_extensions': 'permit-pty,permit-port-forwarding',
+                    'allowed_critical_options': 'source-address',
+                    'ttl': f'{int(ttl)}s',
+                    'max_ttl': '1h',
+                }, expected_statuses=(200, 204),
+            )
+        return public_key
+
+    def _configuration_request(self, method, path, **kwargs):
+        try:
+            return self._request(method, path, **kwargs)
+        except OpenBaoAPIError as e:
+            if getattr(e, 'status_code', None) != 403:
+                raise
+            resource = path.removeprefix('/v1/')
+            capability = {'GET': 'read', 'LIST': 'list'}.get(method, 'create/update')
+            error = OpenBaoAPIError(_(
+                'The OpenBao service token cannot access %(resource)s. '
+                'Grant %(capability)s permission for this path.'
+            ) % {'resource': resource, 'capability': capability})
+            error.status_code = 403
+            raise error from e
+
+    def get_public_key(self):
+        mount_point = quote(self.mount_point, safe='')
+        response = self._send('GET', f'/v1/{mount_point}/public_key')
+        if response.status_code != 200:
+            raise self._build_error(response)
+        return response.text.strip()
+
+    def sign(
+            self, public_key, valid_principals, ttl,
+            key_id='', extensions=None, critical_options=None,
+    ):
+        mount_point = quote(self.mount_point, safe='')
+        role = quote(self.role, safe='')
+        payload = {
+            'public_key': public_key,
+            'cert_type': 'user',
+            'valid_principals': valid_principals,
+            'ttl': f'{int(ttl)}s',
+        }
+        if key_id:
+            payload['key_id'] = key_id
+        if extensions:
+            payload['extensions'] = extensions
+        if critical_options:
+            payload['critical_options'] = critical_options
+
+        response = self._request(
+            'POST', f'/v1/{mount_point}/sign/{role}',
+            json=payload, expected_statuses=(200,)
+        )
+        data = response.get('data') or {}
+        signed_key = data.get('signed_key')
+        if not signed_key:
+            raise OpenBaoAPIError('OpenBao response does not contain signed_key')
+        return {
+            'signed_key': signed_key.strip(),
+            'serial_number': data.get('serial_number', ''),
+            'lease_duration': response.get('lease_duration') or int(ttl),
+        }

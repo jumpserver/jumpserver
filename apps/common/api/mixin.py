@@ -107,7 +107,7 @@ class QuerySetMixin:
 
     def limit_queryset_if_no_page(self, queryset):
         if self.request.query_params.get('format') in ['csv', 'xlsx']:
-            return queryset
+            return queryset[:settings.MAX_LIMIT_PER_PAGE]
         action = getattr(self, 'action', None)
         if action != 'list':
             return queryset

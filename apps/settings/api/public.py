@@ -2,6 +2,7 @@ from django.conf import settings
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
+from authentication.mfa.policy import get_mfa_method_status
 from authentication.permissions import IsValidUserOrConnectionToken
 from common.const.choices import Language
 from common.utils import get_logger, lazyproperty
@@ -50,6 +51,7 @@ class PublicSettingApi(OpenPublicSettingApi):
 
         values = super().get_object()
         values.update({
+            "MFA_METHODS_STATUS": get_mfa_method_status(),
             "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
             "XPACK_LICENSE_INFO": settings.XPACK_LICENSE_INFO,
             "PASSWORD_RULE": {

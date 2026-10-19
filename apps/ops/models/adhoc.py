@@ -20,7 +20,7 @@ class AdHoc(JMSBaseModel):
     pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
     module = models.CharField(max_length=128, choices=AdHocModules.choices, default=AdHocModules.shell,
                               verbose_name=_('Module'))
-    args = models.CharField(max_length=8192, default='', verbose_name=_('Args'))
+    args = models.TextField(max_length=65536, default='', verbose_name=_('Args'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
     scope = models.CharField(max_length=64, default=Scope.public, verbose_name=_('Scope'))

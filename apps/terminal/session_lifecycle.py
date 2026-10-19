@@ -1,3 +1,5 @@
+import json
+
 from django.utils.translation import gettext_noop
 
 from audits.const import ActivityChoices
@@ -30,7 +32,47 @@ class AssetConnectSuccess(SessionLifecycleEventBase):
     i18n_text = gettext_noop("Connect to asset %s success")
 
     def detail(self):
-        return i18n_fmt(self.i18n_text, self.session.asset)
+        route = self.connection_route()
+        if route is None:
+            return i18n_fmt(self.i18n_text, self.session.asset)
+        if route.get('route') == 'direct':
+            return i18n_fmt(
+                gettext_noop("Connect to asset %s success (direct connection)"),
+                self.session.asset,
+            )
+        gateways = route.get('configured_gateways')
+        names = []
+        if isinstance(gateways, list):
+            for gateway in gateways:
+                if not isinstance(gateway, dict):
+                    continue
+                name = gateway.get('name')
+                if not isinstance(name, str) or not name.strip():
+                    name = gateway.get('id')
+                if isinstance(name, str) and name.strip():
+                    names.append(' '.join(name.split()))
+        if names:
+            return i18n_fmt(
+                gettext_noop("Connect to asset %s success (SSH gateway forwarding; configured gateways: %s)"),
+                self.session.asset, '; '.join(names),
+            )
+        return i18n_fmt(
+            gettext_noop("Connect to asset %s success (SSH gateway forwarding)"),
+            self.session.asset,
+        )
+
+    def connection_route(self):
+        if not isinstance(self.reason, str):
+            return None
+        try:
+            route = json.loads(self.reason)
+        except (ValueError, RecursionError):
+            return None
+        # Only interpret the route contract. Historical/free-form reasons may
+        # contain credentials and must retain the previous display behavior.
+        if isinstance(route, dict) and route.get('route') in ('direct', 'ssh_gateway'):
+            return route
+        return None
 
 
 class AssetConnectFinished(SessionLifecycleEventBase):

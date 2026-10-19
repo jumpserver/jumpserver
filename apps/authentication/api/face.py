@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext as _
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
@@ -12,7 +12,13 @@ from orgs.utils import tmp_to_root_org
 from terminal.api.session.task import create_sessions_tasks
 from users.models import User
 from .. import serializers
-from ..const import FACE_CONTEXT_CACHE_KEY_PREFIX, FACE_SESSION_KEY, FACE_CONTEXT_CACHE_TTL, FaceMonitorActionChoices
+from ..const import (
+    FACE_CONTEXT_CACHE_KEY_PREFIX,
+    FACE_CONTEXT_CACHE_TTL,
+    FACE_MONITOR_CONTEXT_CACHE_TTL,
+    FACE_SESSION_KEY,
+    FaceMonitorActionChoices,
+)
 from ..mixins import AuthMixin
 from ..models import ConnectionToken
 from ..serializers.face import FaceMonitorCallbackSerializer, FaceMonitorContextSerializer
@@ -46,7 +52,7 @@ class FaceCallbackApi(AuthMixin, CreateAPIView):
         face_code = serializer.validated_data.get('face_code')
         if not face_code:
             self._update_context_with_error(context, "missing field 'face_code'")
-            raise ValidationError({'error': "missing field 'face_code'"})
+            raise ValidationError({'error': gettext("missing field 'face_code'")})
         try:
             self._handle_success(context, face_code)
         except Exception as e:
@@ -61,7 +67,7 @@ class FaceCallbackApi(AuthMixin, CreateAPIView):
         cache_key = self.get_face_cache_key(token)
         context = cache.get(cache_key)
         if not context:
-            raise ValidationError({'error': "token not exists or expired"})
+            raise ValidationError({'error': gettext("token not exists or expired")})
         return context
 
     def _update_context_with_error(self, context, error_message):
@@ -117,12 +123,16 @@ class FaceContextApi(AuthMixin, RetrieveAPIView, CreateAPIView):
         return Response({'token': token})
 
     def get(self, request, *args, **kwargs):
-        token = self.request.session.get(self.face_token_session_key)
+        session_token = self.request.session.get(self.face_token_session_key)
+        requested_token = self.request.query_params.get('token')
+        if requested_token and requested_token != session_token:
+            raise NotFound({'error': gettext("Token does not belong to the current face capture.")})
+        token = requested_token or session_token
 
         cache_key = self.get_face_cache_key(token)
         context = cache.get(cache_key)
         if not context:
-            raise NotFound({'error': "Token does not exist or has expired."})
+            raise NotFound({'error': gettext("Token does not exist or has expired.")})
 
         return Response({
             "is_finished": context.get('is_finished', False),
@@ -164,7 +174,7 @@ class FaceMonitorContext:
 
     def save(self):
         cache_key = self.get_cache_key(self.token)
-        cache.set(cache_key, self)
+        cache.set(cache_key, self, FACE_MONITOR_CONTEXT_CACHE_TTL)
 
     def close(self):
         self.terminal_sessions()
@@ -233,7 +243,7 @@ class FaceMonitorCallbackApi(CreateAPIView):
 
             if not face_codes or not self._check_face_codes(face_codes, user):
                 context.save()
-                return Response(data={'msg': 'face codes not matched'}, status=400)
+                return Response(data={'msg': gettext('face codes not matched')}, status=400)
 
         if action == FaceMonitorActionChoices.Pause:
             context.pause_sessions()

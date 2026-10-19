@@ -31,4 +31,4 @@ class SuperTicketSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_processor(instance) -> str:
-        return str(instance.processor) if instance.processor else ''
+        return instance.processor_display

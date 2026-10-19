@@ -5,10 +5,10 @@ from django.utils.translation import gettext_lazy as _
 
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
-from rest_framework.compat import coreapi, coreschema
-from common.drf.filters import BaseFilterSet
+from rest_framework.exceptions import ValidationError
+from common.drf.filters import BaseFilterSet, LookupFilterBackend
 from common.sessions.cache import user_session_manager
-from common.utils import is_uuid
+from common.utils import is_uuid, is_ip_address
 from ops.const import JobStatus
 from ops.models import Job
 from orgs.utils import current_org
@@ -23,15 +23,15 @@ __all__ = ['CurrentOrgMembersFilter']
 
 
 class CurrentOrgMembersFilter(filters.BaseFilterBackend):
-    def get_schema_fields(self, view):
+    def get_schema_operation_parameters(self, view):
         return [
-            coreapi.Field(
-                name='user', location='query', required=False, type='string',
-                schema=coreschema.String(
-                    title='user',
-                    description='user'
-                )
-            )
+            {
+                'name': 'user',
+                'in': 'query',
+                'required': False,
+                'description': 'user',
+                'schema': {'type': 'string', 'title': 'user'},
+            }
         ]
 
     def _get_user_list(self):
@@ -132,6 +132,19 @@ class UserLoginLogFilterSet(BaseFilterSet):
         choices=get_auth_backend_choices(), label=_('Auth backend')
     )
 
+    def filter_queryset(self, queryset):
+        for param in ('ip', 'ip!', 'ip__exact', 'ip__exact!', 'ip__in', 'ip__in!'):
+            values = [self.data.get(param, '')]
+            if hasattr(self.data, 'getlist'):
+                values = self.data.getlist(param)
+            if '__in' in param:
+                values = LookupFilterBackend.split_csv_values(values)
+            for value in values:
+                if value and not is_ip_address(value):
+                    msg = _('IP address invalid: `{}`').format(value)
+                    raise ValidationError({'ip': msg})
+        return super().filter_queryset(queryset)
+
     class Meta:
         model = UserLoginLog
         fields = [
@@ -160,6 +173,7 @@ class PasswordChangeLogFilterSet(BaseFilterSet):
 
 
 class OperateLogFilterSet(BaseFilterSet):
+    resource__icontains = drf_filters.CharFilter(field_name='resource', method='filter_resource')
     user = drf_filters.CharFilter(
         lookup_expr='iexact', label=_('User name')
     )
@@ -171,13 +185,21 @@ class OperateLogFilterSet(BaseFilterSet):
     )
 
     @staticmethod
+    def filter_resource(queryset, name, value):
+        query = Q(resource__icontains=value)
+        for raw in ('Export all', 'Export only selected items', 'Export filtered'):
+            if value.casefold() in translation.gettext(raw).casefold():
+                query |= Q(resource=raw)
+        return queryset.filter(query)
+
+    @staticmethod
     def filter_resource_type(queryset, name, resource_type):
-        current_lang = translation.get_language()
-        with translation.override(current_lang):
-            mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
-        tp = mapper.get(resource_type)
-        queryset = queryset.filter(resource_type__in=[tp, resource_type])
-        return queryset
+        mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
+        raw_type = mapper.get(resource_type, resource_type)
+        # Logs may store the English translation rather than the msgid.
+        with translation.override('en'):
+            english_type = translation.gettext(raw_type)
+        return queryset.filter(resource_type__in=[raw_type, english_type, resource_type])
 
     class Meta:
         model = OperateLog

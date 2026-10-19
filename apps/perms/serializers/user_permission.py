@@ -49,6 +49,14 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin, ResourceLabelsMixin
 
 
 class NodePermedSerializer(serializers.ModelSerializer):
+    assets_amount = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_assets_amount(obj):
+        return getattr(
+            obj, 'assets_amount_realtime', obj.assets_amount
+        )
+
     class Meta:
         model = Node
         fields = [

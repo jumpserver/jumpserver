@@ -54,7 +54,7 @@ class BaseApplyAssetSerializer(serializers.Serializer):
         return list(qs)
 
     def validate_apply_accounts(self, accounts):
-        if self.is_final_approval and not accounts:
+        if not accounts:
             raise serializers.ValidationError(_('This field is required.'))
         return accounts
 

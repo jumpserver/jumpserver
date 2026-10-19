@@ -6,6 +6,6 @@ __all__ = ['CeleryCombineService']
 class CeleryCombineService(CeleryDefaultService):
 
     def __init__(self, **kwargs):
-        kwargs['queue'] = 'ansible,celery'
+        kwargs['queue'] = 'ansible,celery,cloud_sync'
         super().__init__(**kwargs)
 

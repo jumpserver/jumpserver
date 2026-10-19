@@ -28,6 +28,7 @@ __all__ = ['MFAMixin', 'AuthMixin']
 class MFAMixin:
     mfa_level = 0
     otp_secret_key = ""
+    allowed_mfa_types = []
     MFA_LEVEL_CHOICES = (
         (0, _("Disabled")),
         (1, _("Enabled")),
@@ -80,11 +81,15 @@ class MFAMixin:
 
     @staticmethod
     def get_user_mfa_backends(user):
+        from authentication.mfa.policy import get_allowed_mfa_types
+
         backends = []
+        allowed = get_allowed_mfa_types(user)
         for cls in settings.MFA_BACKENDS:
             cls = import_string(cls)
-            if cls.global_enabled():
-                backends.append(cls(user))
+            if not cls.global_enabled() or cls.name not in allowed:
+                continue
+            backends.append(cls(user))
         return backends
 
     def get_active_mfa_backend_by_type(self, mfa_type):
@@ -135,7 +140,6 @@ class AuthMixin:
                 post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)  # noqa
             self._password_changed = True
-            self._jdmc_password_raw = raw_password
 
     def set_ssh_key(self, public_key, private_key, **kwargs):
         if self.can_update_ssh_key():

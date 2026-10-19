@@ -41,6 +41,12 @@ class UKeySDKConfigFileAPIView(APIView):
     def get(self, request):
         lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME) or settings.LANGUAGE_CODE
         data = ukey_sdk_config.get_sdk_config(lang=lang)
+        user = request.user
+        can_view_default_pin = (
+            user.is_authenticated and user.has_perm('users.change_user')
+        )
+        if not can_view_default_pin:
+            (data.get('config') or {}).pop('pin', None)
         return Response(data)
 
 

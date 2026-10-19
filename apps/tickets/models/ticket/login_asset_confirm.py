@@ -22,7 +22,7 @@ class ApplyLoginAssetTicket(Ticket):
     TICKET_TYPE = TicketType.login_asset_confirm
 
     def activate_connection_token_if_need(self):
-        if not self.connection_token:
+        if not hasattr(self, 'connection_token'):
             return
         self.connection_token.is_active = True
         self.connection_token.save(update_fields=['is_active'])

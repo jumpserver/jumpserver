@@ -1,8 +1,35 @@
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from common.utils import reverse as js_reverse
 from notifications.notifications import UserMessage
+
+
+class AssetPermissionWillExpireSoonUserMsg(UserMessage):
+    def __init__(self, user, permission):
+        super().__init__(user)
+        self.permission = permission
+
+    def get_html_msg(self) -> dict:
+        context = {
+            'name': self.user.name,
+            'permission_name': self.permission.name,
+            'org_name': self.permission.org.name,
+            'date_expired': timezone.localtime(self.permission.date_expired),
+        }
+        message = render_to_string('perms/_msg_asset_permission_expire_soon.html', context)
+        return {
+            'subject': _('Asset permission is about to expire'),
+            'message': message,
+        }
+
+    @classmethod
+    def gen_test_msg(cls):
+        from perms.models import AssetPermission
+        from users.models import User
+
+        return cls(User.objects.first(), AssetPermission.objects.first())
 
 
 class PermedAssetsWillExpireUserMsg(UserMessage):

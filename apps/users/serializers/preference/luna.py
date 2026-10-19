@@ -48,6 +48,9 @@ class GraphicsSerializer(serializers.Serializer):
         choices=RDPClientOption.choices, default={RDPClientOption.FULL_SCREEN},
         label=_('RDP client option'), required=False
     )
+    printers_redirect = serializers.BooleanField(
+        required=False, default=False, label=_('Printer redirection')
+    )
     rdp_color_quality = serializers.ChoiceField(
         choices=RDPColorQuality.choices, default=RDPColorQuality.HIGH,
         label=_('RDP color quality'), required=False

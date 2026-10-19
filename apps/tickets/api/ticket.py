@@ -111,7 +111,7 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
     def approve(self, request, *args, **kwargs):
         self.ticket_not_allowed()
 
-        partial = kwargs.pop('partial', False)
+        partial = request.method == PATCH
         with transaction.atomic():
             instance = self.get_object()
             instance = self.model.objects.select_for_update().get(pk=instance.pk)

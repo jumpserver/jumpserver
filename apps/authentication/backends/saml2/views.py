@@ -16,11 +16,13 @@ from onelogin.saml2.idp_metadata_parser import (
     dict_deep_merge
 )
 
+from authentication.backends.http import TLSConfigurationError, create_http_session
 from authentication.views.mixins import FlashMessageMixin
 from common.utils import get_logger, safe_next_url
 from .settings import JmsSaml2Settings
 
 logger = get_logger(__file__)
+SAML2_METADATA_HTTP_TIMEOUT = (5, 20)
 
 
 class PrepareRequestMixin:
@@ -60,13 +62,24 @@ class PrepareRequestMixin:
             logger.warning('Failed to get IDP Metadata XML settings, error: %s', str(err))
 
         url_idp_settings = None
-        try:
-            if idp_metadata_url.strip():
-                url_idp_settings = IdPMetadataParse.parse_remote(
-                    idp_metadata_url, timeout=20
+        if idp_metadata_url.strip():
+            try:
+                with create_http_session(
+                    settings.SAML2_IDP_METADATA_CERT_VERIFY_MODE,
+                    settings.SAML2_IDP_METADATA_CACERT_CONTENT,
+                ) as session:
+                    response = session.get(
+                        idp_metadata_url, timeout=SAML2_METADATA_HTTP_TIMEOUT
+                    )
+                    response.raise_for_status()
+                    url_idp_settings = IdPMetadataParse.parse(response.content)
+            except TLSConfigurationError:
+                logger.error('SAML2 Metadata TLS configuration is invalid')
+            except Exception as err:
+                logger.warning(
+                    'Failed to get IDP Metadata URL settings, error: %s',
+                    type(err).__name__
                 )
-        except Exception as err:
-            logger.warning('Failed to get IDP Metadata URL settings, error: %s', str(err))
 
         idp_settings = url_idp_settings or xml_idp_settings
 

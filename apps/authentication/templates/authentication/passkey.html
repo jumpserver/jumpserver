@@ -1,10 +1,11 @@
 {% load static %}
 {% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <title>Login passkey</title>
+    <title>{% trans 'Login passkey' %}</title>
     <script src="{% static 'js/jquery-3.6.1.min.js' %}?v=10"></script>
 </head>
 <body>

@@ -4,7 +4,6 @@ import hmac
 import time
 
 from django.conf import settings
-from django.core.cache import cache
 from rest_framework import permissions
 
 
@@ -29,12 +28,6 @@ class OnlyAdminSuperUser(IsValidUser):
             and request.user.username == 'admin'
 
 
-class CanViewJDMC(IsValidUser):
-    def has_permission(self, request, view):
-        return super().has_permission(request, view) \
-            and request.user.has_jdmc
-
-
 class IsServiceAccount(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
@@ -45,8 +38,6 @@ class WithBootstrapToken(permissions.BasePermission):
     def check_can_register(self):
         enabled = settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION
         if enabled == 'auto':
-            if cache.get(f'APPLET_HOST_DELOYING'):
-                return True
             return time.time() - settings.JUMPSERVER_UPTIME < 300
         elif enabled:
             return True

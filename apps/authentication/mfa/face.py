@@ -27,11 +27,12 @@ class MFAFace(BaseMFA, AuthFaceMixin):
     def is_active(self):
         if not self.is_authenticated():
             return True
-        return bool(self.user.face_vector)
+        return self.user.is_face_code_set
 
     @staticmethod
     def global_enabled():
         return (
+                settings.XPACK_ENABLED and
                 settings.XPACK_LICENSE_IS_VALID and
                 settings.FACE_RECOGNITION_ENABLED
         )

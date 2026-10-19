@@ -10,12 +10,15 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from common.api.mixin import CommonApiMixin
-from common.const.http import GET
+from common.const.http import GET, POST
 from common.drf.filters import BaseFilterSet
 from terminal import const
-from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
+from terminal.filters import CommandStorageFilter, CommandFilter
 from terminal.models import CommandStorage, ReplayStorage
-from terminal.serializers import CommandStorageSerializer, ReplayStorageSerializer
+from terminal.serializers import (
+    CommandStorageSerializer, CommandStorageTreeMetricsSerializer,
+    ReplayStorageSerializer,
+)
 
 __all__ = [
     'CommandStorageViewSet', 'CommandStorageTestConnectiveApi',
@@ -44,33 +47,21 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     serializer_class = CommandStorageSerializer
     filterset_class = CommandStorageFilter
     rbac_perms = {
-        'tree': 'terminal.view_commandstorage | terminal.view_command'
+        'tree': 'terminal.view_commandstorage | terminal.view_command',
+        'tree_metrics': 'terminal.view_commandstorage | terminal.view_command',
     }
 
-    @action(methods=[GET], detail=False, filterset_class=CommandFilterForStorageTree)
+    @action(methods=[GET], detail=False)
     def tree(self, request: Request):
         storage_qs = self.get_queryset().exclude(name='null')
-        storages_with_count = []
+        valid_storages = []
         invalid_storages = []
 
         for storage in storage_qs:
             if not storage.is_valid():
                 invalid_storages.append(storage)
                 continue
-
-            command_qs = storage.get_command_queryset()
-            filterset = CommandFilter(
-                data=request.query_params, queryset=command_qs,
-                request=request
-            )
-            if not filterset.is_valid():
-                raise utils.translate_validation(filterset.errors)
-            command_qs = filterset.qs
-            if storage.type == const.CommandStorageType.es:
-                command_count = command_qs.count(limit_to_max_result_window=False)
-            else:
-                command_count = command_qs.count()
-            storages_with_count.append((storage, command_count))
+            valid_storages.append(storage)
 
         root = {
             'id': 'root',
@@ -83,28 +74,63 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
 
         invalid = _('Invalid')
         nodes = [
-                    {
-                        'id': storage.id,
-                        'name': f'{storage.name}({storage.type}) ({command_count})',
-                        'title': f'{storage.name}({storage.type})',
-                        'pId': 'root',
-                        'isParent': False,
-                        'open': False,
-                        'valid': True,
-                    } for storage, command_count in storages_with_count
-                ] + [
-                    {
-                        'id': storage.id,
-                        'name': f'{storage.name}({storage.type}) *{invalid}',
-                        'title': f'{storage.name}({storage.type})',
-                        'pId': 'root',
-                        'isParent': False,
-                        'open': False,
-                        'valid': False,
-                    } for storage in invalid_storages
-                ]
+            {
+                'id': storage.id,
+                'name': f'{storage.name}({storage.type})',
+                'title': f'{storage.name}({storage.type})',
+                'pId': 'root',
+                'isParent': False,
+                'open': False,
+                'valid': True,
+            }
+            for storage in valid_storages
+        ]
+        nodes.extend([
+            {
+                'id': storage.id,
+                'name': f'{storage.name}({storage.type}) *{invalid}',
+                'title': f'{storage.name}({storage.type})',
+                'pId': 'root',
+                'isParent': False,
+                'open': False,
+                'valid': False,
+            }
+            for storage in invalid_storages
+        ])
         nodes.append(root)
         return Response(data=nodes)
+
+    @action(
+        methods=[POST], detail=False, url_path='tree-metrics',
+        serializer_class=CommandStorageTreeMetricsSerializer,
+    )
+    def tree_metrics(self, request: Request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        node_ids = serializer.validated_data['node_ids']
+        storages = self.get_queryset().exclude(name='null').filter(id__in=node_ids)
+        storage_by_id = {storage.id: storage for storage in storages}
+        results = []
+
+        for storage_id in node_ids:
+            storage = storage_by_id.get(storage_id)
+            if not storage or not storage.is_valid():
+                continue
+            command_qs = storage.get_command_queryset()
+            filterset = CommandFilter(
+                data=request.query_params, queryset=command_qs,
+                request=request
+            )
+            if not filterset.is_valid():
+                raise utils.translate_validation(filterset.errors)
+            command_qs = filterset.qs
+            if storage.type == const.CommandStorageType.es:
+                count = command_qs.count(limit_to_max_result_window=False)
+            else:
+                count = command_qs.count()
+            results.append({'id': str(storage.id), 'count': count})
+
+        return Response({'results': results})
 
 
 class ReplayStorageFilterSet(BaseFilterSet):

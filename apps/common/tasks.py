@@ -31,6 +31,40 @@ def task_activity_callback(self, subject, message, recipient_list, *args, **kwar
     return resource_ids,
 
 
+def deliver_mail(*args, **kwargs):
+    from users.utils import activate_user_language
+
+    if len(args) == 3:
+        args = list(args)
+        args[0] = (settings.EMAIL_SUBJECT_PREFIX or '') + args[0]
+        from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
+        args.insert(2, from_email)
+
+    args = tuple(args)
+
+    subject = args[0] if len(args) > 0 else kwargs.get('subject')
+    recipient_list = args[3] if len(args) > 3 else kwargs.get('recipient_list')
+    logger.info(
+        _(
+            "Sending email: subject=%(subject)r, "
+            "recipients=%(recipients)r"
+        ),
+        {
+            'subject': subject,
+            'recipients': recipient_list,
+        },
+    )
+
+    email_lookup_list = [text_hmac_sha256(email) for email in recipient_list]
+    users = User.objects.filter(email_lookup__in=email_lookup_list).all()
+    for user in users:
+        try:
+            with activate_user_language(user):
+                send_mail(connection=get_email_connection(), *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Sending mail to {user.email} error: {e}")
+
+
 @shared_task(
     verbose_name=_("Send email"),
     activity_callback=task_activity_callback,
@@ -51,30 +85,7 @@ def send_mail_async(*args, **kwargs):
     Example:
     send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
     """
-    from users.utils import activate_user_language
-
-    if len(args) == 3:
-        args = list(args)
-        args[0] = (settings.EMAIL_SUBJECT_PREFIX or '') + args[0]
-        from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
-        args.insert(2, from_email)
-
-    args = tuple(args)
-
-    subject = args[0] if len(args) > 0 else kwargs.get('subject')
-    recipient_list = args[3] if len(args) > 3 else kwargs.get('recipient_list')
-    logger.info(
-        "send_mail_async called with subject=%r, recipients=%r", subject, recipient_list
-    )
-
-    email_lookup_list = [text_hmac_sha256(email) for email in recipient_list]
-    users = User.objects.filter(email_lookup__in=email_lookup_list).all()
-    for user in users:
-        try:
-            with activate_user_language(user):
-                send_mail(connection=get_email_connection(), *args, **kwargs)
-        except Exception as e:
-            logger.error(f"Sending mail to {user.email} error: {e}")
+    deliver_mail(*args, **kwargs)
 
 
 @shared_task(

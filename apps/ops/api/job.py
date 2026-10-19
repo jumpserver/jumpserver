@@ -1,22 +1,23 @@
 import json
 import os
 import uuid
+from collections import Counter
 from functools import partial
 
 from celery.result import AsyncResult
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema, extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from acls.models import LoginAssetACL
+from assets.const import Protocol
 from assets.models import Asset
 from common.const.http import POST
 from common.drf.throttling import FileTransferThrottle
@@ -26,7 +27,7 @@ from ops.celery import app
 from ops.const import Types
 from ops.filters import JobExecutionFilterSet, JobFilterSet
 from ops.models import Job, JobExecution, JMSPermedInventory
-from ops.models.job import check_upload_permission
+from ops.models.job import check_upload_permission, match_rejected_login_asset_acl
 from ops.serializers.job import (
     JobSerializer, JobExecutionSerializer, FileSerializer, JobTaskStopSerializer
 )
@@ -42,7 +43,8 @@ from ops.variables import JMS_JOB_VARIABLE_HELP
 from ops.const import COMMAND_EXECUTION_DISABLED
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
-from accounts.models import Account
+from perms.const import ActionChoices
+from perms.utils.asset_perm import PermAssetAccountsBatchUtil
 from jumpserver.settings import get_file_md5
 
 
@@ -55,19 +57,18 @@ def set_task_to_serializer_data(serializer, task_id):
 class LoginAssetACLCheckMixin:
 
     def check_login_asset_acls(self, user, assets, account, ip):
-        for asset in assets:
-            kwargs = {'user': user, 'asset': asset, 'account_username': account}
-            acls = LoginAssetACL.filter_queryset(**kwargs)
-            acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
-            if not acl:
-                return
-            if not acl.is_action(acl.ActionChoices.accept):
-                raise PermissionDenied(_(
-                    "Login to asset {}({}) is rejected by login asset ACL ({})".format(asset.name, asset.address, acl)
-                ))
+        asset, acl = match_rejected_login_asset_acl(user, assets, account, ip)
+        if not asset:
+            return
+        raise PermissionDenied(_(
+            "Login to asset {}({}) is rejected by login asset ACL ({})".format(
+                asset.name, asset.address, acl
+            )
+        ))
 
 
 class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
+    perm_model = Job
     serializer_class = JobSerializer
     filterset_class = JobFilterSet
     search_fields = ('name', 'comment')
@@ -101,9 +102,6 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
         self._parameters = serializer.validated_data.pop('parameters', None)
-        nodes = serializer.validated_data.pop('nodes', [])
-        assets = serializer.validated_data.get('assets', [])
-        assets = merge_nodes_and_assets(nodes, assets, self.request.user)
         instance = serializer.save()
 
         if instance.instant or run_after_save:
@@ -199,6 +197,9 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
         return Response({'task_id': serializer.data.get('task_id')}, status=201)
 
 
+@extend_schema_view(list=extend_schema(parameters=[
+    OpenApiParameter('job_id', OpenApiTypes.UUID, OpenApiParameter.QUERY, description='Filter by saved job ID'),
+]))
 class JobExecutionViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     serializer_class = JobExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
@@ -320,6 +321,18 @@ class JobRunVariableHelpAPIView(APIView):
 class UsernameHintsAPI(APIView):
     permission_classes = [IsValidUser]
 
+    upload_protocols = {Protocol.ssh, Protocol.sftp, Protocol.winrm}
+
+    @staticmethod
+    def get_permed_account_usernames(
+        user, assets, action_required, protocols_required=None,
+    ):
+        return PermAssetAccountsBatchUtil(
+            user
+        ).get_permitted_account_usernames(
+            assets, action_required, protocols_required,
+        )
+
     def post(self, request, **kwargs):
         if settings.SAFE_MODE:
             return Response(data=[])
@@ -330,15 +343,34 @@ class UsernameHintsAPI(APIView):
         assets = list(Asset.objects.filter(id__in=asset_ids).all())
 
         assets = merge_nodes_and_assets(node_ids, assets, request.user)
+        is_upload = request.data.get('action') == 'upload'
+        action_required = (
+            ActionChoices.upload.value
+            if is_upload else ActionChoices.connect.value
+        )
+        protocols_required = self.upload_protocols if is_upload else None
+        usernames = self.get_permed_account_usernames(
+            request.user,
+            assets,
+            action_required,
+            protocols_required,
+        )
+        if query:
+            query = str(query).lower()
+            usernames = [
+                username for username in usernames
+                if query in username.lower()
+            ]
 
-        top_accounts = Account.objects \
-            .exclude(username__startswith='jms_') \
-            .exclude(username__startswith='js_') \
-            .filter(username__icontains=query) \
-            .filter(asset__in=assets) \
-            .values('username') \
-            .annotate(total=Count('username')) \
-            .order_by('-total', '-username')[:10]
+        counts = Counter(usernames)
+        top_accounts = [
+            {'username': username, 'total': total}
+            for username, total in sorted(
+                counts.items(),
+                key=lambda item: (item[1], item[0]),
+                reverse=True,
+            )[:10]
+        ]
         return Response(data=top_accounts)
 
 

@@ -21,6 +21,7 @@ configs = {k: v for k, v in settings.__dict__.items() if k.startswith('CELERY')}
 configs["CELERY_QUEUES"] = [
     Queue("celery", Exchange("celery"), routing_key="celery"),
     Queue("ansible", Exchange("ansible"), routing_key="ansible"),
+    Queue("cloud_sync", Exchange("cloud_sync"), routing_key="cloud_sync"),
 ]
 
 app.namespace = 'CELERY'

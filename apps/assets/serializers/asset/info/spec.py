@@ -19,8 +19,12 @@ class WebSpecSerializer(serializers.ModelSerializer):
         model = Web
         fields = [
             'autofill', 'username_selector', 'password_selector',
-            'submit_selector', 'script'
+            'submit_selector', 'success_selector', 'interactive_selector', 'script', 'allowed_urls'
         ]
+        extra_kwargs = {
+            'success_selector': {'required': False, 'allow_blank': True},
+            'interactive_selector': {'required': False, 'allow_blank': True},
+        }
 
     def get_fields(self):
         fields = super().get_fields()
@@ -38,7 +42,10 @@ class WebSpecSerializer(serializers.ModelSerializer):
 
     def pop_fields_if_need(self, fields):
         fields_script = ['script']
-        fields_basic = ['username_selector', 'password_selector', 'submit_selector']
+        fields_basic = [
+            'username_selector', 'password_selector',
+            'submit_selector', 'success_selector', 'interactive_selector'
+        ]
         autofill = self.parent.instance.web.autofill
         pop_fields_mapper = {
             FillType.no: fields_script + fields_basic,

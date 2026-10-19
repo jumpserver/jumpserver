@@ -43,6 +43,7 @@ SUPPORTED_ICON_SKINS = {
     'sqlserver',
     'db2',
     'dameng',
+    'oceanbase',
     'website',
     'chatgpt',
     'clickhouse',
@@ -65,6 +66,15 @@ class AssetManager(OrgManager):
 
 
 class AssetQuerySet(models.QuerySet):
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False, **kwargs):
+        from assets.utils.cidr import assign_assets_to_zones
+
+        objs = list(objs)
+        assign_assets_to_zones(objs)
+        return super().bulk_create(
+            objs, batch_size=batch_size, ignore_conflicts=ignore_conflicts, **kwargs
+        )
+
     def active(self):
         return self.filter(is_active=True)
 
@@ -301,6 +311,16 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     def dc_accounts(self):
         queryset = self.accounts.model.objects.filter(asset__in=[*self.joined_dir_svcs])
         return queryset
+
+    def find_account(self, username, secret_type=None):
+        """ 按用户名查找可用账号，同名时优先资产自身账号，其次是加入的目录服务账号 """
+        lookup = {'username': username}
+        if secret_type:
+            lookup['secret_type'] = secret_type
+        account = self.accounts.filter(**lookup).first()
+        if account is None:
+            account = self.dc_accounts.filter(**lookup).first()
+        return account
 
     @lazyproperty
     def all_valid_accounts(self):

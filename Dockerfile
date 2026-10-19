@@ -1,4 +1,4 @@
-FROM jumpserver/core-base:20260729_065854 AS stage-build
+FROM jumpserver/core-base:20261010_092945 AS stage-build
 
 ARG VERSION
 
@@ -14,7 +14,7 @@ RUN echo > /opt/jumpserver/config.yml \
 RUN set -ex \
     && export SECRET_KEY=$(head -c100 < /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 48) \
     && . /opt/py3/bin/activate \
-    && uv pip install -r pyproject.toml \
+    && uv pip install --extra-index-url https://pypi.org/simple/ -r pyproject.toml \
     && rm -rf /root/.cache/ \
     && cd apps \
     && python manage.py compilemessages
@@ -65,7 +65,7 @@ VOLUME /opt/jumpserver/data
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-EXPOSE 8080
+EXPOSE 8080 8088
 
 STOPSIGNAL SIGQUIT
 

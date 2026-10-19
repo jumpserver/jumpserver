@@ -1,11 +1,13 @@
 import json
 import logging
 import os
+import re
+import shlex
 import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta, datetime
-from functools import partial
+from functools import cached_property, partial
 
 from celery import current_task
 from django.conf import settings
@@ -19,13 +21,14 @@ __all__ = ["Job", "JobExecution", "JMSPermedInventory"]
 from simple_history.models import HistoricalRecords
 
 from accounts.models import Account
-from acls.models import CommandFilterACL, DataMaskingRule
+from acls.models import CommandFilterACL, DataMaskingRule, LoginAssetACL
 from assets.const import Protocol
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import (
     JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
+    escape_jinja2_syntax, neutralize_jinja2_syntax, quote_ansible_module_arg,
 )
 
 """stop all ssh child processes of the given ansible process pid."""
@@ -68,6 +71,19 @@ def check_upload_permission(host, *, user, asset, account, **kwargs):
     return host
 
 
+def match_rejected_login_asset_acl(user, assets, account, ip=None):
+    for asset in assets:
+        acls = LoginAssetACL.filter_queryset(
+            user=user, asset=asset, account_username=account
+        )
+        acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
+        if not acl:
+            continue
+        if not acl.is_action(acl.ActionChoices.accept):
+            return asset, acl
+    return None, None
+
+
 def get_parent_keys(key, include_self=True):
     keys = []
     split_keys = key.split(':')
@@ -76,6 +92,22 @@ def get_parent_keys(key, include_self=True):
     if not include_self:
         keys.pop()
     return keys
+
+
+def sanitize_job_extra_vars(extra_vars):
+    """Drop Ansible connection overrides from job extra vars.
+
+    Extra vars outrank inventory, so ansible_* keys would redirect
+    execution or managed credentials. Job user params are namespaced
+    as jms_*; this is a fail-closed filter at the runner boundary.
+    """
+    if not extra_vars or not isinstance(extra_vars, dict):
+        return extra_vars or {}
+    return {
+        key: value
+        for key, value in extra_vars.items()
+        if not str(key).lower().startswith('ansible_')
+    }
 
 
 class JMSPermedInventory(JMSInventory):
@@ -163,7 +195,7 @@ class JMSPermedInventory(JMSInventory):
             for my_asset in node_asset_map[node_key]:
                 asset_permed_accounts_mapper[my_asset].update(accounts)
 
-        accounts = Account.objects.filter(asset__in=asset_ids)
+        accounts = Account.objects.filter(asset__in=asset_ids, is_active=True)
         for account in accounts:
             if account.asset_id not in asset_permed_accounts_mapper:
                 continue
@@ -183,7 +215,7 @@ class JobHistoricalRecords(HistoricalRecords):
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
     instant = models.BooleanField(default=False)
-    args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
+    args = models.TextField(max_length=65536, default='', verbose_name=_('Args'), null=True, blank=True)
     module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell,
                               verbose_name=_('Module'), null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Run dir'), null=True, blank=True)
@@ -281,7 +313,7 @@ class JobExecution(JMSOrgBaseModel):
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
-    material = models.CharField(max_length=8192, default='', verbose_name=_('Material'), null=True, blank=True)
+    material = models.TextField(default='', verbose_name=_('Material'), null=True, blank=True)
     job_type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc,
                                 verbose_name=_("Material Type"))
 
@@ -301,11 +333,38 @@ class JobExecution(JMSOrgBaseModel):
             return self.job.get_history(self.job_version)
         return self.job
 
+    @cached_property
+    def inventory(self):
+        return self.current_job.inventory
+
+    @cached_property
+    def extra_vars(self):
+        if isinstance(self.parameters, str):
+            parameters = json.loads(self.parameters)
+        else:
+            parameters = dict(self.parameters) if self.parameters else {}
+        parameters = sanitize_job_extra_vars(parameters)
+        parameters.update(self.gather_static_variables())
+        return parameters
+
+    @cached_property
+    def rendered_args(self):
+        def replace_variable(match):
+            name = match.group(1)
+            if name not in self.extra_vars:
+                raise ValueError(_('Undefined job variable: {name}').format(name=name))
+            value = self.extra_vars[name]
+            return '' if value is None else str(value)
+
+        # Substitute plain names once; never evaluate user-supplied Jinja expressions.
+        return re.sub(r'{{\s*(jms_\w+)\s*}}', replace_variable, self.current_job.args or '')
+
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
 
         module = self.current_job.module
+        args = escape_jinja2_syntax(self.rendered_args)
 
         db_modules = ('mysql', 'postgresql', 'sqlserver', 'oracle')
         db_module_name_map = {
@@ -336,7 +395,11 @@ class JobExecution(JMSOrgBaseModel):
             if module == 'mssql_script':
                 login_args += "encryption={{jms_asset.encryption | default(None) }} " \
                               "tds_version={{jms_asset.tds_version | default(None) }} "
-            shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
+            # Keep user SQL inside query/script, then set login_* so injected
+            # connection keys cannot override inventory.
+            shell = '{}="{}" {}'.format(
+                query_token, quote_ansible_module_arg(args), login_args
+            )
             return module, shell
 
         if module == 'win_shell':
@@ -345,21 +408,23 @@ class JobExecution(JMSOrgBaseModel):
         if self.current_job.module in ['python']:
             module = "shell"
 
-        shell = self.current_job.args
+        shell = args
         if self.current_job.chdir:
             if module == "shell":
-                shell += " chdir={}".format(self.current_job.chdir)
+                shell += " chdir={}".format(
+                    shlex.quote(neutralize_jinja2_syntax(self.current_job.chdir))
+                )
         if self.current_job.module in ['python']:
             shell += " executable={}".format(self.current_job.module)
 
         if module == JobModules.huawei.value:
             module = 'ce_command'
-            shell = "commands=\"{}\" ".format(self.current_job.args)
+            shell = 'commands="{}" '.format(quote_ansible_module_arg(args))
 
         return module, shell
 
     def get_runner(self):
-        inv = self.current_job.inventory
+        inv = self.inventory
         inv.write_to_file(self.inventory_path)
         self.summary = self.result = {"excludes": {}}
         if len(inv.exclude_hosts) > 0:
@@ -367,12 +432,7 @@ class JobExecution(JMSOrgBaseModel):
             self.result.update({"excludes": inv.exclude_hosts})
             self.save()
 
-        if isinstance(self.parameters, str):
-            extra_vars = json.loads(self.parameters)
-        else:
-            extra_vars = self.parameters if self.parameters else {}
-        static_variables = self.gather_static_variables()
-        extra_vars.update(static_variables)
+        extra_vars = self.extra_vars
 
         if self.current_job.type == Types.adhoc:
             module, args = self.compile_shell()
@@ -466,6 +526,11 @@ class JobExecution(JMSOrgBaseModel):
         else:
             this.result = cb.result
         this.result = json.loads(json.dumps(this.result).replace('\\u0000', ''))
+        # Ansible may preserve non-UTF-8 bytes as surrogates, which PostgreSQL JSON rejects.
+        for field in ('result', 'summary'):
+            value = json.dumps(getattr(this, field), ensure_ascii=False)
+            value = value.encode('utf-8', errors='replace').decode('utf-8')
+            setattr(this, field, json.loads(value))
         this.finish_task()
 
     def finish_task(self):
@@ -480,20 +545,28 @@ class JobExecution(JMSOrgBaseModel):
 
     def match_command_group(self, acl, asset):
         for cg in acl.command_groups.all():
-            matched, __ = cg.match(self.current_job.args)
+            matched, __ = cg.match(self.rendered_args)
             if matched:
                 if acl.is_action(CommandFilterACL.ActionChoices.accept):
                     return True
                 elif acl.is_action(CommandFilterACL.ActionChoices.reject) or acl.is_action(
                         CommandFilterACL.ActionChoices.review):
                     print("\033[31mcommand \'{}\' on asset {}({}) is rejected by acl {}\033[0m"
-                          .format(self.current_job.args, asset.name, asset.address, acl))
+                          .format(self.rendered_args, asset.name, asset.address, acl))
                     CommandExecutionAlert({
-                        "assets": self.current_job.assets.all(),
+                        "assets": self.inventory.assets,
                         "input": self.material,
                         "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
+                        "source": _('Quick command') if self.current_job.instant else _('Job'),
+                        "reason": _('Matched a command filter policy'),
+                        "_cmd_filter_acl": acl,
                     }).publish_async()
+                    self.summary.update({
+                        'unexecuted': len(self.inventory.assets),
+                        'error_code': 'command_acl_rejected',
+                    })
+                    self.save(update_fields=['summary'])
                     raise Exception("command is rejected by ACL")
                 elif acl.is_action(CommandFilterACL.ActionChoices.warning):
                     command = {
@@ -515,7 +588,7 @@ class JobExecution(JMSOrgBaseModel):
         return False
 
     def check_command_acl(self):
-        for asset in self.current_job.assets.all():
+        for asset in self.inventory.assets:
             acls = CommandFilterACL.filter_queryset(
                 user=self.creator,
                 asset=asset,
@@ -524,16 +597,18 @@ class JobExecution(JMSOrgBaseModel):
             for acl in acls:
                 if self.match_command_group(acl, asset):
                     break
-        command = self.current_job.args
+        command = self.rendered_args
         if command and set(command.split()).intersection(set(settings.SECURITY_COMMAND_BLACKLIST)):
             CommandExecutionAlert({
-                "assets": self.current_job.assets.all(),
+                "assets": self.inventory.assets,
                 "input": self.material,
                 "risk_level": RiskLevelChoices.reject,
                 "user": self.creator,
+                "source": _('Quick command') if self.current_job.instant else _('Job'),
+                "reason": _('Matched the job center command blacklist'),
             }).publish_async()
             raise CommandInBlackListException(
-                "Command is rejected by black list: {}".format(self.current_job.args))
+                "Command is rejected by black list: {}".format(command))
 
     def check_danger_keywords(self):
         lines = self.job.playbook.check_dangerous_keywords()
@@ -544,11 +619,12 @@ class JobExecution(JMSOrgBaseModel):
             raise Exception("Playbook contains dangerous keywords")
 
     def check_assets_perms(self):
+        assets = self.inventory.assets
         all_permed_assets = UserPermAssetUtil(self.creator).get_all_assets()
-        has_permed_assets = set(self.current_job.assets.all()) & set(all_permed_assets)
+        has_permed_assets = set(assets) & set(all_permed_assets)
 
         error_assets_count = 0
-        for asset in self.current_job.assets.all():
+        for asset in assets:
             if asset not in has_permed_assets:
                 print("\033[31mAsset {}({}) has no access permission\033[0m".format(asset.name, asset.address))
                 error_assets_count += 1
@@ -557,7 +633,7 @@ class JobExecution(JMSOrgBaseModel):
             raise Exception("You do not have access rights to {} assets".format(error_assets_count))
 
     def check_data_masking_rules_acls(self):
-        for asset in self.current_job.assets.all():
+        for asset in self.inventory.assets:
             acls = DataMaskingRule.filter_queryset(
                 user=self.creator,
                 asset=asset,
@@ -578,6 +654,22 @@ class JobExecution(JMSOrgBaseModel):
             self.check_danger_keywords()
         if self.current_job.type == 'adhoc':
             self.check_command_acl()
+
+    def check_login_asset_acls(self, ip=None):
+        asset, acl = match_rejected_login_asset_acl(
+            self.creator, self.inventory.assets, self.current_job.runas, ip
+        )
+        if not asset:
+            return
+        print(
+            "\033[31mLogin to asset {}({}) is rejected by login asset ACL ({})\033[0m"
+            .format(asset.name, asset.address, acl)
+        )
+        raise Exception(
+            "Login to asset {}({}) is rejected by login asset ACL ({})".format(
+                asset.name, asset.address, acl
+            )
+        )
 
     def before_start(self):
         self.check_assets_perms()

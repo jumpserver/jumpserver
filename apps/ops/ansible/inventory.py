@@ -9,6 +9,7 @@ from collections import defaultdict
 from django.utils.translation import gettext as _
 
 from assets import const
+from .utils import escape_jinja2_syntax
 
 __all__ = ['JMSInventory']
 
@@ -25,7 +26,8 @@ class JMSInventory:
     def __init__(
             self, assets, account_policy='privileged_first',
             account_prefer='root,Administrator', host_callback=None,
-            exclude_localhost=False, task_type=None, protocol=None
+            exclude_localhost=False, task_type=None, protocol=None,
+            account_selector=None,
     ):
         """
         :param assets:
@@ -41,6 +43,7 @@ class JMSInventory:
         self.exclude_localhost = exclude_localhost
         self.task_type = task_type
         self.protocol = protocol
+        self.account_selector = account_selector
 
     @staticmethod
     def clean_assets(assets):
@@ -52,7 +55,9 @@ class JMSInventory:
 
     @staticmethod
     def get_username(asset, account):
-        if asset.category == const.Category.DS:
+        if asset.category == const.Category.DS or (
+                asset.type == const.HostTypes.WINDOWS and account.is_ds_account()
+        ):
             return account.full_username
         return account.username
 
@@ -103,13 +108,13 @@ class JMSInventory:
     def make_account_ansible_vars(self, asset, account, path_dir):
         username = self.get_username(asset, account)
         var = {
-            'ansible_user': username,
+            'ansible_user': escape_jinja2_syntax(username),
         }
         if not account.secret:
             return var
 
         if account.secret_type == 'password':
-            var['ansible_password'] = account.escape_jinja2_syntax(account.secret)
+            var['ansible_password'] = escape_jinja2_syntax(account.secret)
         elif account.secret_type == 'ssh_key':
             var['ansible_ssh_private_key_file'] = account.get_private_key_path(path_dir)
         return var
@@ -122,7 +127,7 @@ class JMSInventory:
         su_method = su_from_auth['ansible_become_method']
         su_from = account.su_from
         su_from_password = (
-            account.escape_jinja2_syntax(su_from.secret)
+            escape_jinja2_syntax(su_from.secret)
             if su_from.secret_type == 'password'
             else None
         )
@@ -157,6 +162,9 @@ class JMSInventory:
             if p.name == 'oracle':
                 setting = getattr(p, 'setting', {}) or {}
                 host['jms_asset']['oracle_sysdba'] = setting.get('sysdba', False)
+                host['jms_asset']['oracle_change_secret_with_old_password'] = (
+                    setting.get('change_secret_with_old_password', False)
+                )
             if p.name == 'mongodb':
                 setting = getattr(p, 'setting', {}) or {}
                 connection_options = {
@@ -225,7 +233,7 @@ class JMSInventory:
                         host['ansible_become_user'] = 'root'
                     if account.secret_type == 'password':
                         host['ansible_become_password'] = (
-                            account.escape_jinja2_syntax(account.secret)
+                            escape_jinja2_syntax(account.secret)
                         )
         else:
             host.update(self.make_account_ansible_vars(asset, account, path_dir))
@@ -266,11 +274,10 @@ class JMSInventory:
         if protocol.name == 'winrm':
             if protocol.setting.get('use_ssl', False):
                 ansible_config['ansible_winrm_scheme'] = 'https'
-                ansible_config['ansible_winrm_transport'] = 'ssl'
                 ansible_config['ansible_winrm_server_cert_validation'] = 'ignore'
             else:
                 ansible_config['ansible_winrm_scheme'] = 'http'
-                ansible_config['ansible_winrm_transport'] = 'ntlm'
+            ansible_config['ansible_winrm_transport'] = 'ntlm'
             ansible_config['ansible_winrm_connection_timeout'] = 120
         return ansible_config
 
@@ -298,14 +305,17 @@ class JMSInventory:
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': tp, 'category': category,
                 'protocol': protocol.name, 'port': protocol.port,
-                'spec_info': asset.spec_info, 'secret_info': secret_info,
+                'spec_info': escape_jinja2_syntax(asset.spec_info),
+                'secret_info': secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
                 'origin_address': asset.address
             },
             'jms_account': {
                 'id': str(account.id),
-                'username': username,
-                'secret': account.escape_jinja2_syntax(account.secret),
+                'name': escape_jinja2_syntax(account.name),
+                'username': escape_jinja2_syntax(username),
+                'privileged': account.privileged,
+                'secret': escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
             } if account else None
         })
@@ -361,6 +371,8 @@ class JMSInventory:
         return account
 
     def select_account(self, asset):
+        if self.account_selector is not None:
+            return self.account_selector(asset)
         accounts = self.get_asset_sorted_accounts(asset)
         if not accounts:
             return None

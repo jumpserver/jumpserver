@@ -2,8 +2,6 @@ name: '🤔 Question'
 description: 'Pose a question'
 title: '[Question] '
 labels: ['🤔 Question']
-assignees: 
-  - baijiangjie
 body:
   - type: input
     attributes:

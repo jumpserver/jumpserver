@@ -3,6 +3,8 @@
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_out
+from django.core.cache import cache
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -101,27 +103,10 @@ def save_user_email_lookup(sender, instance, **kwargs):
     set_user_email_lookup(instance)
 
 
-@on_transaction_commit
-def sync_jdmc_user_password(username, raw_password):
-    try:
-        from xpack.plugins.jdmc.utils import change_jdmc_user_password
-        change_jdmc_user_password(username, raw_password)
-    except Exception as e:
-        logger.error(
-            "Failed to change JDMC user password for %s: %s",
-            username, e
-        )
-
-
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
     if not getattr(instance, '_password_changed', False):
         return
-
-    raw_password = None
-    if hasattr(instance, '_jdmc_password_raw'):
-        raw_password = instance._jdmc_password_raw
-        delattr(instance, '_jdmc_password_raw')
 
     if instance.source != User.Source.local.value or not instance.password:
         instance._password_changed = False
@@ -140,9 +125,6 @@ def save_passwd_change(sender, instance: User, **kwargs):
             )
     finally:
         instance._password_changed = False
-
-    if settings.XPACK_ENABLED and settings.JDMC_ENABLED and raw_password:
-        sync_jdmc_user_password(instance.username, raw_password)
 
 
 def update_role_superuser_if_need(user):
@@ -193,7 +175,12 @@ def on_saml2_create_or_update_user(sender, user, created, attrs, **kwargs):
 @receiver(oauth2_create_or_update_user)
 def on_oauth2_create_or_update_user(sender, user, created, attrs, **kwargs):
     source = User.Source.oauth2.value
-    user_authenticated_handle(user, created, source, attrs, **kwargs)
+    attrs = attrs or {}
+    user_attrs = attrs.copy()
+    group_names = user_attrs.pop('groups', None)
+    user_authenticated_handle(user, created, source, user_attrs, **kwargs)
+    if 'groups' in attrs and not (created and settings.ONLY_ALLOW_EXIST_USER_AUTH):
+        sync_oauth2_user_groups(user, group_names)
 
 
 @receiver(radius_create_user)
@@ -221,7 +208,7 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
     if user and user.username not in ['admin']:
         exists = User.objects.filter(username=user.username).exists()
         if not exists:
-            user.source = user.Source.ldap.value
+            user.source = ldap_user.category
             user.save()
 
 
@@ -279,7 +266,7 @@ def bind_user_to_org_role(user):
     return org_ids
 
 
-def bind_user_to_group(org_ids, group_names, user):
+def bind_user_to_group(org_ids, group_names, user, ignore_conflicts=False):
     if isinstance(group_names, str):
         group_names = [group_names]
 
@@ -304,7 +291,7 @@ def bind_user_to_group(org_ids, group_names, user):
                 UserGroup(org_id=org_id, name=name) for name in new_group_names
             )
 
-        UserGroup.objects.bulk_create(groups_to_create)
+        UserGroup.objects.bulk_create(groups_to_create, ignore_conflicts=ignore_conflicts)
         user_groups = UserGroup.objects.filter(org_id__in=org_ids, name__in=group_names)
 
         user_group_ids = set(user_groups.values_list('id', flat=True))
@@ -321,3 +308,45 @@ def bind_user_to_group(org_ids, group_names, user):
 
         if user_group_links:
             User.groups.through.objects.bulk_create(user_group_links, ignore_conflicts=True)
+
+
+def sync_oauth2_user_groups(user, group_names):
+    if isinstance(group_names, str):
+        group_names = [group_names] if group_names.strip() else []
+    if not isinstance(group_names, list) or any(
+        not isinstance(name, str) or not name.strip() for name in group_names
+    ):
+        logger.warning('Skip OAuth2 user group sync: invalid groups attribute')
+        return
+
+    prefix = 'OAuth2_'
+    names = {prefix + name.strip() for name in group_names}
+    if any(len(name) > UserGroup._meta.get_field('name').max_length for name in names):
+        logger.warning('Skip OAuth2 user group sync: group name is too long')
+        return
+
+    org_ids = settings.OAUTH2_ORG_IDS or [Organization.DEFAULT_ID]
+    org_ids = [str(org_id) for org_id in org_ids if org_id]
+    if not org_ids:
+        return
+
+    bind_user_to_group(org_ids, list(names), user, ignore_conflicts=True)
+    with tmp_to_root_org():
+        stale_groups = list(
+            UserGroup.objects.filter(
+                org_id__in=org_ids, name__startswith=prefix, users=user
+            ).exclude(name__in=names)
+        )
+        if stale_groups:
+            user.groups.remove(*stale_groups)
+
+    cache_org_ids = set(org_ids) | {Organization.ROOT_ID, None}
+    cache_keys = [
+        f'perms:{kind}:{user.id}:{org_id}'
+        for org_id in cache_org_ids
+        for kind in (
+            'user-permission-ids', 'user-permission-node-keys',
+            'user-direct-asset-node-keys',
+        )
+    ]
+    transaction.on_commit(lambda: cache.delete_many(cache_keys), robust=True)

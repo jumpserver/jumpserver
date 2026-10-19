@@ -54,7 +54,7 @@ class JobsAuditSerializer(JobSerializer):
         invalid_fields = submitted_fields - allowed_fields
         if invalid_fields:
             raise serializers.ValidationError(
-                f"Updating  {', '.join(invalid_fields)} fields is not allowed"
+                _('Updating %(fields)s fields is not allowed') % {'fields': ', '.join(invalid_fields)}
             )
         return attrs
 
@@ -75,7 +75,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
     mfa = LabeledChoiceField(choices=MFAChoices.choices, label=_("MFA"))
-    type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))
+    type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Login type"))
     status = LabeledChoiceField(choices=LoginStatusChoices.choices, label=_("Status"))
     city = serializers.ReadOnlyField(source='city_display', label=_("Login city"))
 
@@ -123,7 +123,7 @@ class OperateLogSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def get_resource_type(instance) -> str:
-        return _(instance.resource_type)
+        return instance.resource_type_display
 
     @staticmethod
     def get_resource(instance) -> str:

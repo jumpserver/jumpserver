@@ -42,6 +42,8 @@ class SecretGenerator:
             secret = self.generate_ssh_key()
         elif self.secret_type == SecretType.PASSWORD:
             secret = self.generate_password()
+        elif self.secret_type == SecretType.SSH_CERTIFICATE:
+            secret = ''
         else:
             raise ValueError("Secret must be set")
         return secret
@@ -78,6 +80,14 @@ def validate_account_username(value):
     return value
 
 
+def is_account_username_valid(value):
+    """采集等内部路径使用的布尔版用户名校验，不抛异常"""
+    if value is None:
+        return True
+    forbidden = get_account_username_forbidden_chars()
+    return not any(char in value for char in forbidden)
+
+
 def validate_ssh_key(ssh_key, passphrase=None):
     valid = validate_ssh_private_key(ssh_key, password=passphrase)
     if not valid:
@@ -102,7 +112,11 @@ class AccountSecretTaskStatus:
         self.queue_status_timeout = queue_status_timeout
         self.default_timeout = default_timeout
         self.delayed_task_countdown = delayed_task_countdown
-        self.enabled = getattr(settings, 'CHANGE_SECRET_AFTER_SESSION_END', False)
+
+    @property
+    def enabled(self):
+        # Settings from the database load after this module and can change at runtime.
+        return getattr(settings, 'CHANGE_SECRET_AFTER_SESSION_END', False)
 
     def _key(self, identifier):
         return f"{self.prefix}{identifier}"

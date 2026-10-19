@@ -1,14 +1,17 @@
 # ~*~ coding: utf-8 ~*~
 from collections import defaultdict
 
-from django.utils.translation import gettext as _
+from django.core.cache import cache
+from django.utils.translation import gettext, gettext as _
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework_bulk.generics import BulkModelViewSet
 
+from authentication.permissions import UserConfirmation, ConfirmType
 from common.api import CommonApiMixin, SuggestionMixin
+from common.permissions import IsValidUser
 from common.drf.filters import AttrRulesFilterBackend
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
@@ -81,7 +84,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             and kwargs.get('many'):
             # 批量更新一些用户时，args[0] 是全量 queryset 速度极慢，所以只在 get list 的时候设置缓存
             queryset = self.set_users_roles_for_cache(args[0])
-            queryset = self.set_users_orgs_roles(args[0])
+            queryset = self.set_users_orgs_roles(queryset)
+            queryset = self.set_users_login_blocked(queryset)
             args = (queryset,)
         return super().get_serializer(*args, **kwargs)
 
@@ -90,7 +94,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         # Todo: 未来有机会用 SQL 实现
         queryset_list = queryset
         user_ids = [u.id for u in queryset_list]
-        role_bindings = RoleBinding.objects.filter(user__in=user_ids) \
+        role_bindings = RoleBinding.objects.filter(user_id__in=user_ids) \
             .values('user_id', 'role_id', 'scope')
 
         role_mapper = {r.id: r for r in Role.objects.all()}
@@ -116,8 +120,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     def set_users_orgs_roles(queryset):
         user_ids = [u.id for u in queryset]
         rbs = RoleBinding.objects_raw.filter(
-            user__in=user_ids, scope='org'
-        ).prefetch_related('user', 'role', 'org')
+            user_id__in=user_ids, scope='org'
+        ).select_related('role', 'org')
         user_rbs_mapper = defaultdict(set)
         for rb in rbs:
             user_rbs_mapper[rb.user_id].add(rb)
@@ -128,6 +132,27 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             for rb in user_rbs:
                 orgs_roles[rb.org_name].add(rb.role.display_name)
             setattr(u, 'orgs_roles', orgs_roles)
+        return queryset
+
+    @staticmethod
+    def set_users_login_blocked(queryset):
+        login_keys = {
+            u.id: LoginBlockUtil.get_user_block_key(u.username)
+            for u in queryset
+        }
+        mfa_keys = {
+            u.id: MFABlockUtils.get_user_block_key(u.username)
+            for u in queryset
+        }
+        if not login_keys:
+            return queryset
+        blocked = cache.get_many([*login_keys.values(), *mfa_keys.values()])
+
+        for u in queryset:
+            is_blocked = bool(
+                blocked.get(login_keys[u.id]) or blocked.get(mfa_keys[u.id])
+            )
+            setattr(u, 'login_blocked', is_blocked)
         return queryset
 
     def perform_create(self, serializer):
@@ -159,7 +184,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     @action(methods=['post'], detail=False)
     def invite(self, request):
         if not current_org or current_org.is_root():
-            error = {"error": "Not a valid org"}
+            error = {"error": gettext("Not a valid org")}
             return Response(error, status=400)
 
         serializer_cls = self.get_serializer_class()
@@ -214,6 +239,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
 
 
 class UserChangePasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
+    # The gateway collects the new password in its approval form and redacts
+    # the response before it reaches the model.
+    chat_ai_safe_sensitive_actions = ('PUT', 'PATCH')
     serializer_class = serializers.ChangeUserPasswordSerializer
 
     def perform_update(self, serializer):
@@ -232,14 +260,20 @@ class UserUnblockPKApi(UserQuerysetMixin, generics.UpdateAPIView):
         MFABlockUtils.unblock_user(username)
 
 
-class UserResetMFAApi(UserQuerysetMixin, generics.RetrieveAPIView):
+class UserResetMFAApi(UserQuerysetMixin, generics.GenericAPIView):
     serializer_class = serializers.ResetOTPSerializer
+    http_method_names = ['post', 'options']
+    permission_classes = [IsValidUser, RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    rbac_perms = {'POST': 'users.change_user'}
 
-    def retrieve(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         user = self.get_object() if kwargs.get('pk') else request.user
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
             return Response({"error": msg}, status=400)
+
+        if user.is_superuser and not request.user.is_superuser:
+            raise PermissionDenied()
 
         backends = user.active_mfa_backends_mapper
         for backend in backends.values():

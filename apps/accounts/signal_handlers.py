@@ -1,13 +1,14 @@
 from collections import defaultdict
 
-from django.db.models.signals import post_delete
+from django.db.models.deletion import ProtectedError
+from django.db.models.signals import pre_delete, post_delete
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 from django.utils.translation import gettext_noop
 
 from accounts.backends import vault_client, refresh_vault_client
-from accounts.const import Source
+from accounts.const import SecretType, Source
 from audits.const import ActivityChoices
 from audits.signal_handlers import create_activities
 from common.decorators import merge_delay_run
@@ -15,7 +16,7 @@ from common.signals import django_ready
 from common.utils import get_logger, i18n_fmt
 from common.utils.connection import RedisPubSub
 from .exceptions import VaultException
-from .models import Account, AccountTemplate
+from .models import Account, AccountTemplate, PersonalAssetCredential
 from .tasks.push_account import push_accounts_to_assets_task
 
 logger = get_logger(__name__)
@@ -63,6 +64,18 @@ def on_account_create_by_template(sender, instance, created=False, **kwargs):
     create_accounts_activities(instance, action='create')
 
 
+@receiver(pre_delete, sender=AccountTemplate)
+def protect_followed_account_template(sender, instance, **kwargs):
+    from orgs.utils import tmp_to_org
+    with tmp_to_org(instance.org_id):
+        accounts = Account.objects.filter(
+            org_id=instance.org_id, source=Source.TEMPLATE,
+            source_id=str(instance.id), follow_template=True,
+        )
+        if accounts.exists():
+            raise ProtectedError('Disable account template following before deleting the template.', accounts)
+
+
 @receiver(post_delete, sender=Account)
 def on_account_delete(sender, instance, **kwargs):
     create_accounts_activities(instance, action='delete')
@@ -73,19 +86,33 @@ class VaultSignalHandler(object):
 
     @staticmethod
     def save_to_vault(sender, instance, created, **kwargs):
+        if isinstance(instance, Account) and instance.follows_template:
+            return
+        if instance.secret_type == SecretType.SSH_CERTIFICATE:
+            return
         if getattr(instance, 'skip_vault_when_saving', False):
             return
         try:
-            if created:
+            if created or getattr(instance, '_create_vault_on_detach', False):
                 vault_client.create(instance)
             else:
-                vault_client.update(instance)
+                update_fields = kwargs.get('update_fields')
+                credential_fields = {'secret', '_secret', 'secret_type'}
+                if (isinstance(instance, Account) and update_fields is not None
+                        and not credential_fields.intersection(update_fields)):
+                    # Metadata edits must not rewrite a concurrently changed credential.
+                    if instance.is_sync_metadata:
+                        vault_client.save_metadata(vault_client.build_entry(instance))
+                else:
+                    vault_client.update(instance)
         except Exception as e:
             logger.exception('Vault save failed: %s', e)
             raise VaultException()
 
     @staticmethod
     def delete_to_vault(sender, instance, **kwargs):
+        if instance.secret_type == SecretType.SSH_CERTIFICATE:
+            return
         try:
             vault_client.delete(instance)
         except Exception as e:
@@ -93,7 +120,10 @@ class VaultSignalHandler(object):
             raise VaultException()
 
 
-for model in (Account, AccountTemplate, Account.history.model):
+for model in (
+        Account, AccountTemplate, Account.history.model,
+        PersonalAssetCredential,
+):
     post_save.connect(VaultSignalHandler.save_to_vault, sender=model)
     post_delete.connect(VaultSignalHandler.delete_to_vault, sender=model)
 

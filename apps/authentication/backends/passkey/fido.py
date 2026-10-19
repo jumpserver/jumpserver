@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 import fido2.features
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext, gettext as _
 from fido2.server import Fido2Server
 from fido2.utils import websafe_decode, websafe_encode
 from fido2.webauthn import PublicKeyCredentialRpEntity, AttestedCredentialData, PublicKeyCredentialUserEntity
@@ -105,7 +105,7 @@ def register_begin(request):
 
 def register_complete(request):
     if not request.session.get("fido2_state"):
-        raise ValidationError("No state found")
+        raise ValidationError(gettext("No state found"))
     data = request.data
     server = get_server(request)
     state = request.session.pop("fido2_state")
@@ -145,6 +145,9 @@ def auth_begin(request, discoverable=False):
 
 
 def auth_complete(request):
+    state = request.session.pop('fido2_state', None)
+    if not state:
+        raise ValueError(_('No state found'))
     server = get_server(request)
     data = request.data.get("passkeys")
     data = json.loads(data)
@@ -155,7 +158,6 @@ def auth_complete(request):
         raise ValueError(_("This key is not registered"))
 
     credentials = [AttestedCredentialData(websafe_decode(key.token))]
-    state = request.session.get('fido2_state')
     server.authenticate_complete(state, credentials=credentials, response=data)
 
     request.session["passkey"] = '{}_{}'.format(key.id, key.name)

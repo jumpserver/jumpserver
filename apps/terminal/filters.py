@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
@@ -9,6 +10,12 @@ from terminal.models import Command, CommandStorage, Session
 
 
 class CommandFilter(BaseFilterSet):
+    days = filters.NumberFilter(
+        method='filter_days', label=_('Created days')
+    )
+    days__lt = filters.NumberFilter(
+        method='filter_days', label=_('Created days less than')
+    )
     id = filters.UUIDFilter(
         method='filter_exact', label=_('Command ID')
     )
@@ -76,6 +83,18 @@ class CommandFilter(BaseFilterSet):
     def do_nothing(self, queryset, name, value):
         return queryset
 
+    @staticmethod
+    def filter_days(queryset, name, value):
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            return queryset.none()
+        timestamp = (
+            timezone.now() - timezone.timedelta(days=value)
+        ).timestamp()
+        lookup = 'timestamp__gte' if name == 'days' else 'timestamp__lt'
+        return queryset.filter(**{lookup: timestamp})
+
     @property
     def qs(self):
         qs = super().qs
@@ -107,22 +126,6 @@ class CommandFilter(BaseFilterSet):
             filters['session__in'] = list(session_ids)
         queryset = queryset.filter(**filters)
         return queryset
-
-
-class CommandFilterForStorageTree(CommandFilter):
-    asset = filters.CharFilter(method='do_nothing', label=_('Asset'))
-    account = filters.CharFilter(method='do_nothing', label=_('Account'))
-    session = filters.CharFilter(method='do_nothing', label=_('Session'))
-    risk_level = filters.NumberFilter(
-        method='do_nothing', label=_('Risk level')
-    )
-
-    class Meta:
-        model = CommandStorage
-        fields = [
-            'asset', 'account', 'user', 'session', 'risk_level', 'input',
-            'date_from', 'date_to', 'session_id', 'risk_level', 'command_storage_id',
-        ]
 
 
 class CommandStorageFilter(filters.FilterSet):

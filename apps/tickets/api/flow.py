@@ -1,12 +1,18 @@
+from uuid import UUID
+
+from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from tickets import serializers
-from tickets.models import TicketFlow
 from common.api import JMSBulkModelViewSet
 from common.const.http import GET
+from orgs.models import Organization
+from orgs.utils import get_current_org_id
+from tickets import serializers
+from tickets.models import ApprovalRule, TicketFlow
 
 __all__ = ['TicketFlowViewSet']
 
@@ -16,12 +22,52 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
     filterset_fields = ['id', 'name', 'type']
     search_fields = ['id', 'name', 'type']
 
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
+    @staticmethod
+    def check_destroy_permission(instance):
+        current_org_id = str(get_current_org_id())
+        if (
+            current_org_id != Organization.ROOT_ID and
+            instance.org_id != current_org_id
+        ):
+            error = _('Inherited ticket flows cannot be deleted')
+            raise PermissionDenied(error)
+
+    @staticmethod
+    def destroy_instances(instances):
+        rule_ids = []
+        for instance in instances:
+            rule_ids.extend(instance.rules.values_list('id', flat=True))
+            instance.delete()
+
+        ApprovalRule.objects.filter(
+            id__in=rule_ids, ticket_flows__isnull=True
+        ).delete()
+
+    def perform_destroy(self, instance):
+        self.check_destroy_permission(instance)
+        with transaction.atomic():
+            self.destroy_instances([instance])
+
+    def perform_bulk_destroy(self, objects):
+        instances = list(objects)
+        for instance in instances:
+            self.check_destroy_permission(instance)
+
+        with transaction.atomic():
+            self.destroy_instances(instances)
 
     def get_queryset(self):
         queryset = TicketFlow.get_org_related_flows()
         return queryset
+
+    @staticmethod
+    def check_org_access(user, org_id):
+        try:
+            org_id = UUID(org_id)
+        except (TypeError, ValueError, AttributeError):
+            raise PermissionDenied() from None
+        if not user.is_superuser and not user.orgs.filter(id=org_id).exists():
+            raise PermissionDenied()
 
     @action(
         detail=False, methods=[GET], permission_classes=[IsAuthenticated],
@@ -33,6 +79,7 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
         if not ticket_type or not org_id:
             return Response([])
 
+        self.check_org_access(request.user, org_id)
         flows = TicketFlow.get_org_related_flows(org_id=org_id).filter(
             type=ticket_type
         ).prefetch_related('cc_users').order_by('name', 'date_created')
@@ -49,6 +96,7 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
         if not ticket_type or not org_id:
             return Response([])
 
+        self.check_org_access(request.user, org_id)
         flow_id = request.query_params.get('flow_id')
         flows = TicketFlow.get_org_related_flows(org_id=org_id).filter(type=ticket_type)
         if flow_id:

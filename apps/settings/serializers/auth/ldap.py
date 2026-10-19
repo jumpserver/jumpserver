@@ -14,6 +14,7 @@ __all__ = [
 
 class LDAPTestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_SERVER_URI = serializers.CharField(max_length=1024)
+    AUTH_LDAP_CONNECT_TIMEOUT = serializers.IntegerField(min_value=1, max_value=300, required=False)
     AUTH_LDAP_BIND_DN = serializers.CharField(max_length=1024, required=False, allow_blank=True)
     AUTH_LDAP_BIND_PASSWORD = EncryptedField(required=False, allow_blank=True)
     AUTH_LDAP_SEARCH_OU = serializers.CharField()

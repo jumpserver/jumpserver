@@ -36,11 +36,6 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if not instance:
         return
     setting_pub_sub.publish(instance.name)
-    if instance.is_name('PERM_SINGLE_ASSET_TO_UNGROUP_NODE'):
-        """ 过期所有用户授权树 """
-        logger.debug('Expire all user perm tree')
-        from perms.utils import UserPermTreeExpireUtil
-        UserPermTreeExpireUtil().expire_perm_tree_for_all_user()
 
 
 @receiver(django_ready)
