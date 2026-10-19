@@ -56,6 +56,15 @@ class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
             "is_ansible_task",
         ]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        if not (user and getattr(user, 'is_superuser', False)):
+            data['args'] = []
+            data['kwargs'] = {}
+        return data
+
     @staticmethod
     def get_task_name(obj):
         from assets.const import AutomationTypes as AssetTypes

@@ -31,26 +31,7 @@ def task_activity_callback(self, subject, message, recipient_list, *args, **kwar
     return resource_ids,
 
 
-@shared_task(
-    verbose_name=_("Send email"),
-    activity_callback=task_activity_callback,
-    description=_(
-        "This task will be executed when sending email notifications"
-    )
-)
-def send_mail_async(*args, **kwargs):
-    """ Using celery to send email async
-
-    You can use it as django send_mail function
-
-    Example:
-    send_mail_sync.delay(subject, message, from_mail, recipient_list, fail_silently=False, html_message=None)
-
-    Also, you can ignore the from_mail, unlike django send_mail, from_email is not a required args:
-
-    Example:
-    send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
-    """
+def deliver_mail(*args, **kwargs):
     from users.utils import activate_user_language
 
     if len(args) == 3:
@@ -82,6 +63,29 @@ def send_mail_async(*args, **kwargs):
                 send_mail(connection=get_email_connection(), *args, **kwargs)
         except Exception as e:
             logger.error(f"Sending mail to {user.email} error: {e}")
+
+
+@shared_task(
+    verbose_name=_("Send email"),
+    activity_callback=task_activity_callback,
+    description=_(
+        "This task will be executed when sending email notifications"
+    )
+)
+def send_mail_async(*args, **kwargs):
+    """ Using celery to send email async
+
+    You can use it as django send_mail function
+
+    Example:
+    send_mail_sync.delay(subject, message, from_mail, recipient_list, fail_silently=False, html_message=None)
+
+    Also, you can ignore the from_mail, unlike django send_mail, from_email is not a required args:
+
+    Example:
+    send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
+    """
+    deliver_mail(*args, **kwargs)
 
 
 @shared_task(
