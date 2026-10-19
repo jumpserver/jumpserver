@@ -2629,7 +2629,7 @@ requires-dist = [
     { name = "uritemplate", specifier = "==4.1.1" },
     { name = "urllib3", specifier = "==2.8.0" },
     { name = "user-agents", specifier = ">=2.2.0" },
-    { name = "uvicorn", specifier = "==0.22.0" },
+    { name = "uvicorn", specifier = "==0.38.0" },
     { name = "vine", specifier = "==5.1.0" },
     { name = "websocket-client", specifier = "==1.6.1" },
     { name = "websockets", specifier = "==11.0.3" },
@@ -4978,15 +4978,15 @@ wheels = [
 
 [[package]]
 name = "uvicorn"
-version = "0.22.0"
+version = "0.38.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "click" },
     { name = "h11" },
 ]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/c6/dd/0d3bab50ab4ef8bec849f89fec2adc2fabcc397018c30e57d9f0d4009c5e/uvicorn-0.22.0.tar.gz", hash = "sha256:79277ae03db57ce7d9aa0567830bbb51d7a612f54d6e1e3e92da3ef24c2c8ed8" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/cb/ce/f06b84e2697fef4688ca63bdb2fdf113ca0a3be33f94488f2cadb690b0cf/uvicorn-0.38.0.tar.gz", hash = "sha256:fd97093bdd120a2609fc0d3afe931d4d4ad688b6e75f0f929fde1bc36fe0e91d" }
 wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/ad/bd/d47ee02312640fcf26c7e1c807402d5c5eab468571153a94ec8f7ada0e46/uvicorn-0.22.0-py3-none-any.whl", hash = "sha256:e9434d3bbf05f310e762147f769c9f21235ee118ba2d2bf1155a7196448bd996" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/ee/d9/d88e73ca598f4f6ff671fb5fde8a32925c2e08a637303a1d12883c7305fa/uvicorn-0.38.0-py3-none-any.whl", hash = "sha256:48c0afd214ceb59340075b4a052ea1ee91c16fbc2a9b1469cca0e54566977b02" },
 ]
 
 [[package]]
