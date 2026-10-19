@@ -86,7 +86,7 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
     def authenticate_credentials(token):
         model = get_user_model()
         if len(token) != 36:
-            raise exceptions.AuthenticationFailed(_('Invalid token.'))
+            return None, None
         user_id = cache.get(token)
         if not user_id:
             return None, None
