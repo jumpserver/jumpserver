@@ -52,7 +52,9 @@ class MFAEmail(BaseMFA):
 
     @staticmethod
     def global_enabled():
-        return settings.SECURITY_MFA_BY_EMAIL
+        if not settings.SECURITY_MFA_BY_EMAIL:
+            return False
+        return bool((settings.EMAIL_HOST or '').strip())
 
     def disable(self):
         return '/ui/#/profile/index'
