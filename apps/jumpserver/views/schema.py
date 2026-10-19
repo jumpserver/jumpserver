@@ -216,8 +216,6 @@ class CustomAutoSchema(AutoSchema):
 
     @staticmethod
     def exclude_some_paths(path):
-        if re.search(r'/ops/job-executions/(?:\{[^/]+\}/)?$', path):
-            return False
         # 这里可以对 paths 进行处理
         excludes = [
             '/report/', '/render-to-json/', '/suggestions/',
@@ -281,6 +279,11 @@ class CustomAutoSchema(AutoSchema):
 
     def is_excluded(self):
         if self.is_chat_ai_schema():
+            return False
+        # Only expose read-only job execution history in the standard/MCP schema.
+        if self.method == 'GET' and re.fullmatch(
+            r'/api/v1/ops/job-executions/(?:\{[^/]+\}/)?', self.path
+        ):
             return False
         if self.exclude_some_paths(self.path):
             return True
