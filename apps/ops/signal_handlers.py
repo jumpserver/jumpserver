@@ -182,8 +182,8 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'name': task,
         'state': 'PENDING',
         'is_finished': False,
-        'args': args,
-        'kwargs': kwargs
+        'args': [],
+        'kwargs': {},
     }
     request = get_current_request()
     if request and request.user.is_authenticated:
