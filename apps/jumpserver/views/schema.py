@@ -430,6 +430,11 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
         field = self.target
         description = getattr(field, 'help_text', '') or ''
         title = getattr(field, 'label', '') or ''
+        choices = list(field.choices)
+        value_schema = build_basic_type(type(next((value for value in choices if value is not None), '')))
+        value_schema['enum'] = choices
+        if None in choices:
+            value_schema['nullable'] = True
         
         if getattr(field, 'many', False):
             return {
@@ -437,7 +442,7 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
                 'items': {
                     'type': 'object',
                     'properties': {
-                        'value': {'type': 'string'},
+                        'value': value_schema,
                         'label': {'type': 'string'}
                     }
                 },
@@ -448,7 +453,7 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
             return {
                 'type': 'object',
                 'properties': {
-                    'value': {'type': 'string'},
+                    'value': value_schema,
                     'label': {'type': 'string'}
                 },
                 'description': description,
