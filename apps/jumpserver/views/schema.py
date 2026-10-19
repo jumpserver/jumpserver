@@ -216,8 +216,6 @@ class CustomAutoSchema(AutoSchema):
 
     @staticmethod
     def exclude_some_paths(path):
-        if re.search(r'/ops/job-executions/(?:\{[^/]+\}/)?$', path):
-            return False
         # 这里可以对 paths 进行处理
         excludes = [
             '/report/', '/render-to-json/', '/suggestions/',
