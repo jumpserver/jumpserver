@@ -61,6 +61,7 @@ def check_registered_tasks(*args, **kwargs):
         'ops.tasks.create_or_update_registered_periodic_tasks',
         'settings.tasks.ldap.import_ldap_user_periodic', 'users.tasks.check_password_expired_periodic',
         'common.utils.verify_code.send_sms_async',
+        'common.utils.verify_code.send_verify_mail_async',
         'users.tasks.check_user_expired', 'orgs.tasks.refresh_org_cache_task',
         'terminal.tasks.upload_session_replay_to_external_storage', 'terminal.tasks.clean_orphan_session',
         'terminal.tasks.upload_session_replay_file_to_external_storage',
