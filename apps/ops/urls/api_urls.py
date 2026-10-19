@@ -23,7 +23,9 @@ router.register(r'tasks', api.CeleryTaskViewSet, 'task')
 router.register(r'task-executions', api.CeleryTaskExecutionViewSet, 'task-executions')
 
 urlpatterns = [
-    path('playbook/<uuid:pk>/file/', api.PlaybookFileBrowserAPIView.as_view(), name='playbook-file'),
+    path('playbook/<uuid:pk>/file/', api.PlaybookFileViewSet.as_view({
+        'get': 'retrieve', 'post': 'create', 'patch': 'partial_update', 'delete': 'destroy',
+    }), name='playbook-file'),
     path('variables/help/', api.JobRunVariableHelpAPIView.as_view(), name='variable-help'),
     path('job-execution/task-detail/<uuid:task_id>/', api.JobExecutionTaskDetail.as_view(), name='task-detail'),
     path('username-hints/', api.UsernameHintsAPI.as_view(), name='username-hints'),

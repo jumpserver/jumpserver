@@ -4,18 +4,22 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.urls import path
+from django.urls import path, resolve
 from drf_spectacular.generators import SchemaGenerator
 from rest_framework.test import APIRequestFactory
 
-from ops.api.playbook import PlaybookFileBrowserAPIView, PlaybookViewSet
+from ops.api.playbook import PlaybookFileViewSet, PlaybookViewSet
+from rbac.permissions import RBACPermission
+
+
+FILE_ACTIONS = {'get': 'retrieve', 'post': 'create', 'patch': 'partial_update', 'delete': 'destroy'}
 
 
 class PlaybookSchemaTests(SimpleTestCase):
     def setUp(self):
         patterns = [
             path('api/v1/ops/playbooks/', PlaybookViewSet.as_view({'get': 'list', 'post': 'create'})),
-            path('api/v1/ops/playbook/<uuid:pk>/file/', PlaybookFileBrowserAPIView.as_view()),
+            path('api/v1/ops/playbook/<uuid:pk>/file/', PlaybookFileViewSet.as_view(FILE_ACTIONS.copy())),
         ]
         self.schema = SchemaGenerator(patterns=patterns).get_schema(public=True)
         self.files = self.schema['paths']['/api/v1/ops/playbook/{id}/file/']
@@ -32,6 +36,19 @@ class PlaybookSchemaTests(SimpleTestCase):
         self.assertEqual(set(self.request_fields('patch')), {'key', 'new_name', 'is_directory', 'content'})
         self.assertEqual(self.request_fields('post')['content']['type'], 'string')
         self.assertEqual(self.files['patch']['operationId'], 'ops_playbook_file_partial_update')
+
+    def test_actions_preserve_route_operation_ids_and_permissions(self):
+        callback = resolve('/api/v1/ops/playbook/00000000-0000-0000-0000-000000000001/file/').func
+        self.assertIs(callback.cls, PlaybookFileViewSet)
+        for method, action in FILE_ACTIONS.items():
+            self.assertEqual(callback.actions[method], action)
+            self.assertEqual(self.files[method]['operationId'], f'ops_playbook_file_{action}')
+            view = PlaybookFileViewSet()
+            view.action = action
+            request = SimpleNamespace(method=method.upper())
+            permission = RBACPermission().get_require_perms(request, view)
+            expected = 'ops.view_playbook' if method == 'get' else 'ops.change_playbook'
+            self.assertEqual(permission, expected)
 
     def test_file_responses_do_not_expose_write_only_inputs(self):
         response = self.files['post']['responses']['200']['content']['application/json']['schema']
@@ -59,14 +76,15 @@ class PlaybookFileInputTests(SimpleTestCase):
         self.addCleanup(directory.cleanup)
         self.directory = Path(directory.name)
         self.factory = APIRequestFactory()
-        self.api = PlaybookFileBrowserAPIView.as_view(
+        self.api = PlaybookFileViewSet.as_view(
+            FILE_ACTIONS.copy(),
             authentication_classes=[], permission_classes=[], throttle_classes=[],
         )
         self.playbook = SimpleNamespace(work_dir=str(self.directory))
 
     def call(self, method, data):
         request = getattr(self.factory, method)('/', data, format='json')
-        with patch.object(PlaybookFileBrowserAPIView, 'get_playbook', return_value=self.playbook):
+        with patch.object(PlaybookFileViewSet, 'get_playbook', return_value=self.playbook):
             return self.api(request, pk='00000000-0000-0000-0000-000000000001')
 
     def test_create_and_edit_preserve_yaml_whitespace_and_response(self):
@@ -101,3 +119,16 @@ class PlaybookFileInputTests(SimpleTestCase):
         response = self.call('patch', {'content': 'missing path'})
         self.assertEqual(response.status_code, 400)
         self.assertIsNone(response.data)
+
+    def test_read_and_delete_keep_the_existing_file_behavior(self):
+        (self.directory / 'tasks.yml').write_text('tasks: []\n')
+        with patch('ops.api.playbook.get_object_or_404', return_value=self.playbook):
+            response = self.call('get', {'key': 'tasks.yml'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'content': 'tasks: []\n'})
+        request = self.factory.delete('/?key=tasks.yml')
+        with patch.object(PlaybookFileViewSet, 'get_playbook', return_value=self.playbook):
+            response = self.api(request, pk='00000000-0000-0000-0000-000000000001')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'msg': 'ok'})
+        self.assertFalse((self.directory / 'tasks.yml').exists())

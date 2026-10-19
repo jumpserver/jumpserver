@@ -7,8 +7,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
-from common.api.generic import JMSBulkModelViewSet
-from common.drf.filters import CustomFilterBackend
+from common.api.generic import JMSBulkModelViewSet, JMSGenericViewSet
 from common.exceptions import JMSException
 from common.permissions import IsOwnerOrAdminWritable
 from common.serializers import EmptySerializer
@@ -21,9 +20,8 @@ from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
 from ..serializers.playbook import PlaybookSerializer, PlaybookFileCreateSerializer, PlaybookFileUpdateSerializer
 
-__all__ = ["PlaybookViewSet", "PlaybookFileBrowserAPIView"]
+__all__ = ["PlaybookViewSet", "PlaybookFileViewSet"]
 
-from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from django.utils._os import safe_join
 from django.utils.translation import gettext, gettext_lazy as _
@@ -116,31 +114,30 @@ class PlaybookViewSet(JMSBulkModelViewSet):
                 f.write('## write your playbook here')
 
 
-class PlaybookFileBrowserAPIView(GenericAPIView):
+class PlaybookFileViewSet(JMSGenericViewSet):
     permission_classes = (RBACPermission,)
-    filter_backends = (CustomFilterBackend,)
-    serializer_class = EmptySerializer
+    serializer_classes = {
+        'default': EmptySerializer,
+        'create': PlaybookFileCreateSerializer,
+        'partial_update': PlaybookFileUpdateSerializer,
+    }
     custom_filter_fields = [
         {'name': 'key', 'methods': ['GET']},
         {'name': 'expand', 'methods': ['GET']},
         {'name': 'key', 'required': True, 'methods': ['DELETE']},
     ]
     rbac_perms = {
-        'GET': 'ops.view_playbook',
-        'POST': 'ops.change_playbook',
-        'DELETE': 'ops.change_playbook',
-        'PATCH': 'ops.change_playbook',
+        'retrieve': 'ops.view_playbook',
+        'create': 'ops.change_playbook',
+        'destroy': 'ops.change_playbook',
+        'partial_update': 'ops.change_playbook',
     }
     protected_files = ['root', 'main.yml']
 
-    def get_serializer_class(self):
-        return {
-            'POST': PlaybookFileCreateSerializer,
-            'PATCH': PlaybookFileUpdateSerializer,
-        }.get(self.request.method, self.serializer_class)
-
     def get_response_serializer(self):
-        if self.request.method == 'PATCH':
+        if self.action == 'create':
+            return {200: self.get_serializer()}
+        if self.action == 'partial_update':
             return None
         return self.get_serializer()
 
@@ -148,7 +145,7 @@ class PlaybookFileBrowserAPIView(GenericAPIView):
         playbook = get_object_or_404(Playbook, id=playbook_id, creator=self.request.user)
         return playbook
 
-    def get(self, request, **kwargs):
+    def retrieve(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
         user = self.request.user
         playbook = get_object_or_404(Playbook, Q(creator=user) | Q(scope=Scope.public), id=playbook_id)
@@ -169,7 +166,7 @@ class PlaybookFileBrowserAPIView(GenericAPIView):
             nodes = self.generate_tree(playbook, work_path, expand_key)
             return Response(nodes)
 
-    def post(self, request, **kwargs):
+    def create(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
         playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
@@ -228,7 +225,7 @@ class PlaybookFileBrowserAPIView(GenericAPIView):
             new_node['iconSkin'] = 'file'
         return Response(self.get_serializer(new_node).data)
 
-    def patch(self, request, **kwargs):
+    def partial_update(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
         playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
@@ -273,7 +270,7 @@ class PlaybookFileBrowserAPIView(GenericAPIView):
                     f.write(content)
         return Response(status=status.HTTP_200_OK)
 
-    def delete(self, request, **kwargs):
+    def destroy(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
         playbook = self.get_playbook(playbook_id)
         work_path = playbook.work_dir
