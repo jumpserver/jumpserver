@@ -14,7 +14,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
 
-from authentication.const import CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY
+from authentication.const import (
+    CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY, CUSTOM_SSO_FIRST_PASSWORD_CHANGED_KEY,
+)
 from common.utils import get_logger
 from rbac.models import SystemRole, SystemRoleBinding
 from users.validators import get_validation_error_message
@@ -85,7 +87,14 @@ class CustomSSOLoginAPIView(AuthMixin, RetrieveAPIView):
 
         user, error = self.authenticate(**query_params)
         if user:
-            if user.is_first_login:
+            require_first_password_change = user.is_first_login
+            if require_first_password_change and settings.JDMC_ENABLED:
+                password_changed = user.preference.get_value(
+                    CUSTOM_SSO_FIRST_PASSWORD_CHANGED_KEY, category='authentication',
+                )
+                require_first_password_change = password_changed != '1'
+
+            if require_first_password_change:
                 if not user.can_update_password():
                     error = 'First login password change is unavailable for this user.'
                     self.send_auth_signal(success=False, reason=error)

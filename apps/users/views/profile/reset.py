@@ -12,7 +12,9 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView
 
-from authentication.const import CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY
+from authentication.const import (
+    CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY, CUSTOM_SSO_FIRST_PASSWORD_CHANGED_KEY,
+)
 from authentication import password_reset
 from authentication.signals import post_auth_success
 from common.const.choices import COUNTRY_CALLING_CODES
@@ -197,8 +199,14 @@ class UserResetPasswordView(PasswordRecoveryHeadersMixin, FormView):
 
         ResetPasswordSuccessMsg(user, self.request).publish_async()
         if is_custom_sso_first_login:
-            user.is_first_login = False
-            user.save(update_fields=['is_first_login'])
+            if settings.JDMC_ENABLED:
+                # Keep first-login onboarding pending until the user accepts the terms.
+                user.preference.set_value(
+                    CUSTOM_SSO_FIRST_PASSWORD_CHANGED_KEY, '1', category='authentication',
+                )
+            else:
+                user.is_first_login = False
+                user.save(update_fields=['is_first_login'])
 
             login(self.request, user, backend=settings.AUTH_BACKEND_CUSTOM_SSO)
             self.request.session.pop(CUSTOM_SSO_FIRST_LOGIN_SESSION_KEY, None)
