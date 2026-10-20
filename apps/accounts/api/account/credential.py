@@ -444,13 +444,21 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
             raise CredentialClientViewSet.ClientUpgradeRequired() from None
 
     def initial(self, request, *args, **kwargs):
+        from accounts.credential_client.protocol import supports_versions
+
         super().initial(request, *args, **kwargs)
         protocol = self._version(request.headers.get('X-JMS-Protocol-Version'))
         schema = self._version(request.headers.get('X-JMS-Config-Schema-Version'))
-        if protocol != 1:
+        is_agent = isinstance(request.user, CredentialClientInstance) or request.headers.get('X-Source') == 'jms-pam-agent'
+        if not supports_versions(protocol, schema, is_agent=is_agent):
             raise self.ClientUpgradeRequired()
-        if (isinstance(request.user, CredentialClientInstance) or request.headers.get('X-Source') == 'jms-pam-agent') and schema != 1:
-            raise self.ClientUpgradeRequired()
+
+    def handle_exception(self, exc):
+        response = super().handle_exception(exc)
+        if isinstance(exc, self.ClientUpgradeRequired):
+            from accounts.credential_client.protocol import supported_versions
+            response.data.update(supported_versions())
+        return response
 
     def get_client_manager(self, data):
         manager = super().get_client_manager(data)
@@ -459,7 +467,11 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
             self._version(self.request.headers.get('X-JMS-Protocol-Version')),
             self._version(self.request.headers.get('X-JMS-Config-Schema-Version')),
         )
-        if manager.client.type == CredentialClientInstance.Type.agent and manager.client.config_schema_version != 1:
+        from accounts.credential_client.protocol import supports_versions
+        if not supports_versions(
+            manager.client.protocol_version, manager.client.config_schema_version,
+            is_agent=manager.client.type == CredentialClientInstance.Type.agent,
+        ):
             raise self.ClientUpgradeRequired()
         return manager
 

@@ -10,6 +10,7 @@ from accounts.const import AuditEvent
 from accounts.credential_client.audit import record
 from accounts.credential_client.events import application_group
 from accounts.credential_client.manager import CredentialClientManager
+from accounts.credential_client.protocol import supports_versions
 from accounts.models import CredentialClientInstance
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
@@ -56,7 +57,7 @@ class CredentialClientAuthMiddleware:
                 client_type = 'agent' if request.headers.get('X-Source') == 'jms-pam-agent' else 'sdk'
                 protocol = int(request.headers.get('X-JMS-Protocol-Version', 0))
                 schema = int(request.headers.get('X-JMS-Config-Schema-Version', 0))
-                if protocol != 1 or (client_type == 'agent' and schema != 1):
+                if not supports_versions(protocol, schema, is_agent=client_type == 'agent'):
                     return None
                 manager = CredentialClientManager(
                     user,
@@ -67,8 +68,9 @@ class CredentialClientAuthMiddleware:
                     request.headers.get('X-JMS-Client-Version', ''),
                     protocol, schema,
                 )
-                if manager.client.protocol_version != 1 or (
-                    manager.client.type == 'agent' and manager.client.config_schema_version != 1
+                if not supports_versions(
+                    manager.client.protocol_version, manager.client.config_schema_version,
+                    is_agent=manager.client.type == CredentialClientInstance.Type.agent,
                 ):
                     return None
                 supports_receipts = request.headers.get('X-JMS-Event-Receipts') == '1'

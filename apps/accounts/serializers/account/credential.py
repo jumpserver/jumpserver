@@ -498,9 +498,10 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def get_upgrade_required(instance):
-        return instance.protocol_version != 1 or (
-            instance.type == CredentialClientInstance.Type.agent
-            and instance.config_schema_version != 1
+        from accounts.credential_client.protocol import supports_versions
+        return not supports_versions(
+            instance.protocol_version, instance.config_schema_version,
+            is_agent=instance.type == CredentialClientInstance.Type.agent,
         )
 
     def validate(self, attrs):

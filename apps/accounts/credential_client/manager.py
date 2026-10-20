@@ -303,6 +303,8 @@ class CredentialClientManager:
         }
 
     def client_info(self):
+        from .protocol import SERVER_CAPABILITIES
+
         client = self.client
         return {
             'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
@@ -311,6 +313,7 @@ class CredentialClientManager:
             'config_schema_version': client.config_schema_version,
             'application_status': client.application_status or None,
             'date_status_reported': client.date_status_reported,
+            'server_capabilities': list(SERVER_CAPABILITIES),
         }
 
     def report_status(self, status, account_ids, error_code=''):
@@ -550,16 +553,24 @@ class CredentialClientManager:
         if any(not scope_uses_credential(delivery_scope, state.binding.credential) for state in active):
             raise ValidationError(_('Finish or cancel the current rotation before removing an Agent account rule.'))
         now = timezone.now()
-        self._record_delivered(delivered_credentials or [], now)
         desired = self.agent_configuration(self.application, delivery_scope)
         desired_digest = self.agent_configuration_digest(self.application, delivery_scope)
         known = {item['key']: item['revision'] for item in credentials or []}
+        delivered = {item['key']: item['revision'] for item in delivered_credentials or []}
+        self._record_delivered([
+            item for item in delivered_credentials or []
+            if item['key'] in desired['credential_keys']
+        ], now)
         metadata = []
+        subscription_reports = {}
         for key in desired['credential_keys']:
             if key.startswith('account:'):
                 subscriptions, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
                 credential = subscriptions[0]
                 revision = account.version
+                for policy in subscriptions:
+                    reports = subscription_reports.setdefault(policy, [])
+                    reports.append((revision, known.get(key), delivered.get(key)))
             else:
                 credential, account = self._get_credential(key, lock=False)
                 revision = credential.current_revision
@@ -575,6 +586,7 @@ class CredentialClientManager:
             item.update(account_id=str(account.id), account_revision=account.version,
                         event_id=snapshot_result_event(self.client, credential, account, revision))
             metadata.append(item)
+        self._record_subscription_progress(subscription_reports, now)
         values = {
             'delivery_scope': delivery_scope,
             'config_digest': config_digest,
@@ -597,37 +609,50 @@ class CredentialClientManager:
         }
         return response
 
-    def _record_delivered(self, credentials, now):
-        revisions = {item['key']: item['revision'] for item in credentials}
-        if not revisions:
-            return
-        subscription_revisions = {}
-        for key, revision in revisions.items():
-            if key.startswith('account:'):
-                try:
-                    account_id = UUID(key.removeprefix('account:'))
-                except ValueError:
-                    continue
-                if key == ApplicationCredential.account_key(account_id):
-                    subscription_revisions[account_id] = revision
-        for account_id, revision in subscription_revisions.items():
-            try:
-                policies, account = self._subscription_credentials(account_id, lock=False)
-            except PermissionDenied:
-                continue
-            if account.version != revision:
-                continue
-            states = CredentialClientStatus.objects.filter(
-                binding__application=self.application,
-                binding__credential__in=policies,
-                client=self.client,
+    def _record_subscription_progress(self, policy_reports, now):
+        """Record the Agent's held/delivered version, never a fetch audit or ACK.
+
+        The caller has resolved this account through the current authorized
+        subscription and delivery scope. Metadata alone creates no progress.
+        """
+        for policy, reports in policy_reports.items():
+            reports = [(revision, known, delivered) for revision, known, delivered in reports
+                       if known is None or known == revision]
+            held = [revision for revision, known, _delivered in reports if known == revision]
+            binding = CredentialApplicationBinding.objects.get(
+                application=self.application, credential=policy,
             )
-            for state in states:
-                if revision == state.fetched_revision and revision != state.delivered_revision:
-                    self._save_status(state, now, {
-                        'delivered_revision': revision, 'date_delivered': now,
-                    })
-        revisions = {key: revision for key, revision in revisions.items() if not key.startswith('account:')}
+            if held:
+                state, _created = CredentialClientStatus.objects.get_or_create(
+                    binding=binding, client=self.client,
+                )
+            else:
+                # Older callers may report delivery after an explicit push-key
+                # fetch without including held versions in this synchronization.
+                state = CredentialClientStatus.objects.filter(
+                    binding=binding, client=self.client,
+                ).first()
+                if not state:
+                    continue
+            values = {}
+            # Existing policy-level revision fields remain summaries. Group all
+            # accounts first so differing account versions cannot oscillate the
+            # timestamps on every heartbeat; events retain per-account results.
+            if held and (state.date_fetched is None or state.fetched_revision != held[-1]):
+                values.update(fetched_revision=held[-1], date_fetched=now)
+            delivered = [revision for revision, known, delivered in reports
+                         if delivered == revision and (
+                             known == revision or (state.date_fetched is not None and state.fetched_revision == revision)
+                         )]
+            if delivered and (state.date_delivered is None or state.delivered_revision != delivered[-1]):
+                values.update(delivered_revision=delivered[-1], date_delivered=now)
+            # Repeated syncs are heartbeats, not additional password retrievals.
+            self._save_status(state, now, values)
+
+    def _record_delivered(self, credentials, now):
+        # Subscription versions are account versions and are recorded alongside
+        # the held versions above, after resolving the current delivery scope.
+        revisions = {item['key']: item['revision'] for item in credentials if not item['key'].startswith('account:')}
         if not revisions:
             return
         states = CredentialClientStatus.objects.select_related(

@@ -59,7 +59,8 @@ class ApplicationAccessTests(CredentialTestCase):
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
-    def signed_request(self, action, params, source='jms-pam', identity=None, secret=None, schema=None):
+    def signed_request(self, action, params, source='jms-pam', identity=None, secret=None, schema=None,
+                       protocol=1, client_version='1.0.0'):
         method = 'POST' if action in ('sync_agent', 'report_status') else 'GET'
         path = {'sync_agent': 'agent/sync', 'report_status': 'status'}.get(action, action)
         prepared = requests.Request(
@@ -69,7 +70,7 @@ class ApplicationAccessTests(CredentialTestCase):
             headers={
                 'Accept': 'application/json', 'Date': formatdate(usegmt=True),
                 'X-JMS-ORG': str(self.org.id), 'X-Source': source,
-                'X-JMS-Client-Version': '1.0.0', 'X-JMS-Protocol-Version': '1',
+                'X-JMS-Client-Version': client_version, 'X-JMS-Protocol-Version': str(protocol),
                 'X-JMS-Config-Schema-Version': schema or ('1' if source == 'jms-pam-agent' else '0'),
             },
             auth=HTTPSignatureAuth(identity or str(self.application.id), secret or self.application.secret),
