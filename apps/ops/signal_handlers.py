@@ -14,6 +14,7 @@ from rest_framework.utils.encoders import JSONEncoder
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
 from common.utils.connection import RedisPubSub
+from common.utils.verify_code import VERIFY_CODE_TASK_SAFE_FIELDS
 from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
 from .ansible.runner import interface
@@ -166,6 +167,13 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         return
 
     args, kwargs, __ = body
+
+    safe_fields = VERIFY_CODE_TASK_SAFE_FIELDS.get(task)
+    if safe_fields is not None:
+        # 序列化前先提取安全参数副本，保留原始 body，
+        # 避免影响资源活动回调等其他任务发布信号处理器。
+        args = args[:len(safe_fields)]
+        kwargs = {key: kwargs[key] for key in safe_fields if key in kwargs}
 
     try:
         args = json.loads(json.dumps(list(args), cls=JSONEncoder))
