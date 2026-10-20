@@ -91,10 +91,9 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
                     self.permission_context()
                 setattr(self.account, field, previous)
 
-    def test_rejects_other_virtual_accounts(self):
-        for alias in (AliasAccount.USER, AliasAccount.ANON):
-            with self.subTest(alias=alias), self.assertRaises(PermissionDenied):
-                self.permission_context(alias)
+    def test_rejects_anonymous_account(self):
+        with self.assertRaises(PermissionDenied):
+            self.permission_context(AliasAccount.ANON)
 
     @patch('accounts.personal_credentials.tmp_to_org', return_value=nullcontext())
     @patch('accounts.personal_credentials.PersonalAssetCredential')

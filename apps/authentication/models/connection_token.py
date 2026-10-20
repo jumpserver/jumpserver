@@ -127,8 +127,6 @@ class ConnectionToken(JMSOrgBaseModel):
         self.save(update_fields=['date_expired'])
 
     def set_reusable(self, is_reusable):
-        if self.personal_credential_id:
-            is_reusable = False
         if not settings.CONNECTION_TOKEN_REUSABLE:
             return
         self.is_reusable = is_reusable
@@ -259,11 +257,9 @@ class ConnectionToken(JMSOrgBaseModel):
         if force_refresh:
             self.__dict__.pop(metadata_cache_key, None)
             self.__dict__.pop(secret_cache_key, None)
-        elif include_secret and secret_cache_key in self.__dict__:
-            return self.__dict__[secret_cache_key]
-        elif not include_secret:
+        else:
             cached = self.__dict__.get(secret_cache_key)
-            if cached is None:
+            if cached is None and not include_secret:
                 cached = self.__dict__.get(metadata_cache_key)
             if cached is not None:
                 return cached
@@ -285,10 +281,8 @@ class ConnectionToken(JMSOrgBaseModel):
             )
         except NotFound as error:
             raise PermissionDenied(_('Personal credential is no longer available')) from error
-        if include_secret:
-            self.__dict__[secret_cache_key] = credential
-        else:
-            self.__dict__[metadata_cache_key] = credential
+        cache_key = secret_cache_key if include_secret else metadata_cache_key
+        self.__dict__[cache_key] = credential
         return credential
 
     @lazyproperty
@@ -360,36 +354,31 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset:
             return None
 
+        credential = self.get_personal_credential(include_secret=True)
         if self.account.startswith('@'):
-            credential = self.get_personal_credential(include_secret=True)
-            if credential:
-                input_username = credential.username
-                input_secret = credential.secret
-                input_secret_type = credential.secret_type
-            else:
-                input_username = self.input_username
-                input_secret = self.input_secret
-                input_secret_type = self.input_secret_type
             account = VirtualAccount.get_special_account(
-                self.account, self.user, self.asset, input_username=input_username,
-                input_secret=input_secret, input_secret_type=input_secret_type,
+                self.account, self.user, self.asset,
+                input_username=credential.username if credential else self.input_username,
+                input_secret=credential.secret if credential else self.input_secret,
+                input_secret_type=credential.secret_type if credential else self.input_secret_type,
                 from_permed=False
             )
         else:
             account = self.get_asset_accounts_by_alias(self.asset, self.account)
-            if self.personal_credential_id:
-                credential = self.get_personal_credential(include_secret=True)
+            if credential:
                 if not account or account.secret or account.full_username != credential.username:
                     raise PermissionDenied(_('Personal credential no longer matches the asset account'))
-                account.secret = credential.secret
-                account.secret_type = credential.secret_type
             elif (
                 account.secret_type != SecretType.SSH_CERTIFICATE
                 and not account.secret and self.input_secret
             ):
                 account.secret = self.input_secret
                 account.secret_type = self.input_secret_type
-        
+
+        if credential:
+            # Explicit personal credentials also override cached AD/LDAP passwords.
+            account.secret = credential.secret
+            account.secret_type = credential.secret_type
         self.set_ad_domain_if_need(account)
         return account
 

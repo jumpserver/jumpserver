@@ -86,17 +86,6 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
 
 
 class ConnectionTokenReusableSerializer(CommonModelSerializer):
-    def validate_is_reusable(self, value):
-        if (
-                value
-                and self.instance
-                and self.instance.personal_credential_id
-        ):
-            raise serializers.ValidationError(
-                _('Personal credential connection tokens cannot be reusable')
-            )
-        return value
-
     class Meta:
         model = ConnectionToken
         fields = ['id', 'date_expired', 'is_reusable']
