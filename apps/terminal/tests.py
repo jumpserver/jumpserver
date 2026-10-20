@@ -56,6 +56,8 @@ class AppletHostDeploymentPermissionTests(SimpleTestCase):
 
         self.factory = APIRequestFactory()
         self.host = AppletHost(name='applet-permission-test')
+        self.applet_filter = self.enterContext(patch.object(Applet.objects, 'filter'))
+        self.applet_filter.return_value.exists.return_value = False
         self.host_filter = self.enterContext(patch.object(AppletHost.objects, 'filter'))
         self.host_filter.return_value.exists.return_value = True
         self.host_filter.return_value.__iter__.return_value = [self.host]
@@ -96,6 +98,7 @@ class AppletHostDeploymentPermissionTests(SimpleTestCase):
 
                 self.assertEqual(response.status_code, 403)
                 self.host_filter.assert_not_called()
+                self.applet_filter.assert_not_called()
                 self.bulk_create.assert_not_called()
                 self.deployment_filter.assert_not_called()
                 self.on_commit.assert_not_called()
@@ -118,6 +121,20 @@ class AppletHostDeploymentPermissionTests(SimpleTestCase):
 
     def test_host_editor_can_install_single_applet(self):
         self.assert_install_allowed({'applet_id': '00000000-0000-0000-0000-000000000001'})
+
+    def test_retired_single_applet_is_rejected_before_creating_a_task(self):
+        self.applet_filter.return_value.exists.return_value = True
+
+        response = self.request(
+            {'terminal.change_applethost'},
+            {'applet_id': '00000000-0000-0000-0000-000000000001'},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('retired', str(response.data))
+        self.bulk_create.assert_not_called()
+        self.on_commit.assert_not_called()
+        self.install_task.assert_not_called()
 
     def test_host_editor_can_install_all_with_empty_applet_id(self):
         self.assert_install_allowed({'applet_id': ''})
@@ -255,6 +272,7 @@ class WebAppletDefaultsTests(SimpleTestCase):
         names = [os.path.basename(call.args[0]) for call in install.call_args_list]
         self.assertIn('weblite', names)
         self.assertNotIn('chrome', names)
+        self.assertNotIn('dbeaver', names)
 
     @override_settings(XPACK_LICENSE_IS_VALID=False)
     def test_applet_deployment_has_no_proxy_or_web_recording_options(self):
@@ -273,6 +291,152 @@ class WebAppletDefaultsTests(SimpleTestCase):
         playbook = (Path(__file__).parent / 'automations/deploy_applet_host/playbook.yml').read_text()
         for flag in ('--web-proxy-url', '--web-applet-recording'):
             self.assertNotIn(flag, playbook)
+
+
+class RetiredBuiltinAppletTests(TestCase):
+    def setUp(self):
+        from terminal.management.commands.install_builtin_applets import Command
+
+        self.command = Command()
+        self.enterContext(patch('terminal.applets.install_or_update_builtin_applets'))
+
+    def make_host(self, name='RetiredAppletTestHost'):
+        from assets.models import Platform
+        from terminal.models import AppletHost
+
+        platform = Platform.objects.create(name=name)
+        return AppletHost.objects.create(
+            name=name, address='192.0.2.1', platform=platform, auto_create_accounts=False,
+        )
+
+    def test_unpublished_retired_builtins_are_disabled_without_deletion(self):
+        applets = Applet.objects.bulk_create([
+            Applet(name=name, builtin=True) for name in ('chrome', 'dbeaver', 'weblite')
+        ])
+
+        self.command.handle()
+        self.command.handle()
+
+        for applet in applets:
+            applet.refresh_from_db()
+            self.assertEqual(applet.is_active, applet.name == 'weblite')
+
+    def test_existing_publications_protect_all_statuses(self):
+        from terminal.models import AppletPublication
+
+        host = self.make_host()
+        applets = Applet.objects.bulk_create([
+            Applet(name='chrome', builtin=True),
+            Applet(name='dbeaver', builtin=True, is_active=False),
+        ])
+        AppletPublication.objects.bulk_create([
+            AppletPublication(applet=applet, host=host) for applet in applets
+        ])
+        for status in ('pending', 'success', 'failed', 'mismatch', 'unknown'):
+            with self.subTest(status=status):
+                AppletPublication.objects.filter(host=host).update(status=status)
+
+                self.command.handle()
+
+                for applet in applets:
+                    applet.refresh_from_db()
+                    self.assertEqual(applet.is_active, applet.name == 'chrome')
+                self.assertEqual(AppletPublication.objects.filter(host=host, status=status).count(), 2)
+
+    def test_uploaded_applets_without_publications_remain_active(self):
+        applets = Applet.objects.bulk_create([
+            Applet(name=name, builtin=False) for name in ('chrome', 'dbeaver')
+        ])
+
+        self.command.handle()
+
+        for applet in applets:
+            applet.refresh_from_db()
+            self.assertTrue(applet.is_active)
+
+    def test_tinker_install_list_excludes_retired_builtins_but_admin_history_keeps_them(self):
+        from terminal.api.applet.applet import AppletPublicationViewSet
+        from terminal.api.applet.relation import AppletHostAppletViewSet
+        from terminal.models import AppletPublication
+
+        host = self.make_host()
+        applets = Applet.objects.bulk_create([
+            Applet(name=name, builtin=True) for name in ('chrome', 'dbeaver', 'weblite')
+        ])
+        AppletPublication.objects.bulk_create([
+            AppletPublication(applet=applet, host=host, status='success') for applet in applets
+        ])
+        view = AppletHostAppletViewSet()
+        with patch.object(view, 'self_host', return_value=host):
+            names = set(view.get_queryset().values_list('applet__name', flat=True))
+            self.assertEqual(names, {'weblite'})
+            view.kwargs = {'pk': 'chrome'}
+            self.assertEqual(view.get_object().applet.name, 'chrome')
+        self.assertEqual(host.publications.count(), 3)
+        self.assertEqual(
+            set(AppletPublicationViewSet().get_queryset().filter(host=host)
+                .values_list('applet__name', flat=True)),
+            {'chrome', 'dbeaver', 'weblite'},
+        )
+
+    def test_single_republication_rejects_retired_builtins_but_allows_uploaded_applets(self):
+        host = self.make_host()
+        applets = Applet.objects.bulk_create([
+            Applet(name=name, builtin=True) for name in ('chrome', 'dbeaver')
+        ])
+        user = SimpleNamespace(is_anonymous=False, has_perms=lambda permissions: True)
+        view = AppletHostDeploymentViewSet.as_view({'post': 'applets'}, throttle_classes=[])
+        for builtin in (True, False):
+            Applet.objects.filter(pk__in=[applet.pk for applet in applets]).update(builtin=builtin)
+            for applet in applets:
+                with self.subTest(name=applet.name, builtin=builtin):
+                    request = APIRequestFactory().post(
+                        '/api/v1/terminal/applet-host-deployments/applets/',
+                        {'hosts': [str(host.pk)], 'applet_id': str(applet.pk)}, format='json',
+                    )
+                    force_authenticate(request, user=user)
+
+                    with transaction.atomic():
+                        response = view(request)
+
+                    self.assertEqual(response.status_code, 400 if builtin else 201)
+
+    def test_publication_list_preserves_uploaded_same_name_applets(self):
+        from terminal.api.applet.relation import AppletHostAppletViewSet
+        from terminal.models import AppletPublication
+
+        host = self.make_host()
+        applets = Applet.objects.bulk_create([
+            Applet(name=name, builtin=False) for name in ('chrome', 'dbeaver')
+        ])
+        AppletPublication.objects.bulk_create([
+            AppletPublication(applet=applet, host=host) for applet in applets
+        ])
+        view = AppletHostAppletViewSet()
+        with patch.object(view, 'self_host', return_value=host):
+            self.assertEqual(
+                set(view.get_queryset().values_list('applet__name', flat=True)),
+                {'chrome', 'dbeaver'},
+            )
+
+    @patch('terminal.signal_handlers.applet.applet_host_change_pub_sub')
+    @patch('terminal.models.Applet.clear_host_prefer')
+    def test_new_host_does_not_associate_retired_builtins(self, clear_prefer, pub_sub):
+        from terminal.signal_handlers.applet import on_applet_host_create
+
+        Applet.objects.bulk_create([
+            Applet(name=name, builtin=True) for name in ('chrome', 'dbeaver', 'weblite')
+        ])
+        for builtin in (True, False):
+            with self.subTest(builtin=builtin):
+                Applet.objects.filter(name__in=('chrome', 'dbeaver')).update(builtin=builtin)
+                host = self.make_host(name=f'Host-{builtin}')
+                with self.captureOnCommitCallbacks(execute=True):
+                    on_applet_host_create(sender=None, instance=host, created=True)
+                self.assertEqual(
+                    set(host.applets.values_list('name', flat=True)),
+                    {'weblite'} if builtin else {'chrome', 'dbeaver', 'weblite'},
+                )
 
 
 class DeployAppletHostManagerTests(SimpleTestCase):

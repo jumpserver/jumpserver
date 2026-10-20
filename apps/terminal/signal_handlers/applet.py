@@ -21,7 +21,7 @@ def on_applet_host_create(sender, instance, created=False, **kwargs):
         return
     # 新建时，清除原来的首选，避免一直调度到一个上面
     Applet.clear_host_prefer()
-    applets = Applet.objects.all()
+    applets = Applet.objects.exclude(name__in=('chrome', 'dbeaver'), builtin=True)
     instance.applets.set(applets)
     applet_host_change_pub_sub.publish(True)
 
@@ -42,7 +42,7 @@ def on_applet_host_delete(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Applet)
 def on_applet_create(sender, instance, created=False, **kwargs):
-    if not created:
+    if not created or (instance.builtin and instance.name in ('chrome', 'dbeaver')):
         return
     hosts = AppletHost.objects.all()
     instance.hosts.set(hosts)
