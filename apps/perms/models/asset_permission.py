@@ -73,6 +73,9 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     )
     # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
     accounts = models.JSONField(default=list, verbose_name=_("Account"))
+    auto_push_same_name = models.BooleanField(
+        default=False, verbose_name=_('Auto push same-name account on first connection'),
+    )
     protocols = models.JSONField(default=default_protocols, verbose_name=_("Protocols"))
     actions = models.IntegerField(default=ActionChoices.connect, verbose_name=_("Actions"))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))

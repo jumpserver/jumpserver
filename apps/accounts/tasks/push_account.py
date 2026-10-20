@@ -11,8 +11,70 @@ from orgs.utils import tmp_to_org
 
 logger = get_logger(__file__)
 __all__ = [
-    'push_accounts_to_assets_task', 'change_secret_accounts_to_assets_task'
+    'push_accounts_to_assets_task', 'change_secret_accounts_to_assets_task',
+    'push_same_name_account_task',
 ]
+
+
+@shared_task(queue='ansible', soft_time_limit=600, time_limit=660,
+             verbose_name=_('Push same-name account on first connection'))
+def push_same_name_account_task(execution_id):
+    from django.db import transaction
+    from django.utils import timezone
+    from accounts.models import AccountProvisioning, AutomationExecution, PushSecretRecord
+    from accounts.provisioning import auto_push_enabled
+    from common.const import Status
+    from orgs.utils import tmp_to_root_org
+    from perms.const import ActionChoices
+    from perms.utils import PermAssetDetailUtil
+
+    with tmp_to_root_org():
+        execution = AutomationExecution.objects.filter(id=execution_id).first()
+    if not execution:
+        return
+    with tmp_to_org(execution.org_id):
+        with transaction.atomic():
+            provisioning = AccountProvisioning.objects.select_for_update().filter(
+                execution_id=execution_id,
+            ).first()
+            # Claim once, including broker redeliveries and late queued tasks.
+            claimed = AutomationExecution.objects.filter(
+                id=execution_id, status=Status.pending,
+            ).update(status=Status.running, date_start=timezone.now())
+            if not claimed:
+                return
+            if provisioning:
+                provisioning.status = 'running'
+                provisioning.save(update_fields=['status', 'date_updated'])
+        try:
+            if not provisioning or not provisioning.user or not provisioning.user.is_valid:
+                raise ValueError('Provisioning user is unavailable')
+            account = provisioning.account
+            asset = account.asset
+            permitted = PermAssetDetailUtil(provisioning.user, asset).validate_permission(
+                account.alias, provisioning.protocol,
+            )
+            if (not asset.is_active or not account.is_active
+                    or account.username != provisioning.user.username
+                    or not permitted or not permitted.actions & ActionChoices.connect
+                    or not auto_push_enabled(permitted, provisioning.protocol)):
+                raise ValueError('Provisioning permission is no longer valid')
+            execution.start()
+            execution.refresh_from_db()
+            verified = execution.is_success and PushSecretRecord.objects.filter(
+                execution=execution, account=account, status='success',
+            ).exists()
+            AccountProvisioning.objects.filter(execution=execution).update(
+                status='success' if verified else 'failed', date_updated=timezone.now(),
+            )
+        except Exception:
+            logger.exception('First-login account push failed: execution=%s', execution_id)
+            AutomationExecution.objects.filter(id=execution_id).update(
+                status=Status.failed, date_finished=timezone.now(),
+            )
+            AccountProvisioning.objects.filter(execution_id=execution_id).update(
+                status='failed', date_updated=timezone.now(),
+            )
 
 
 def _process_accounts(account_ids, automation_model, default_name, automation_type, snapshot=None):

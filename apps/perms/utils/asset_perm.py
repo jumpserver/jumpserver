@@ -305,6 +305,15 @@ class PermAssetDetailUtil:
             permed_accounts = self.get_permed_accounts_for_user()
             accounts_mapper = {account.alias: account for account in permed_accounts}
             account = accounts_mapper.get(account_alias)
+            if account is None and account_alias == AliasAccount.USER:
+                # A form opened before first-login provisioning still submits
+                # @USER after it has become a real account on another tab.
+                account = next((
+                    item for item in permed_accounts
+                    if item.username == self.user.username and (
+                        protocol in item.auto_push_protocols or 'all' in item.auto_push_protocols
+                    )
+                ), None)
             return account
 
     @lazyproperty
@@ -414,8 +423,16 @@ class PermAssetDetailUtil:
         )
         accounts = []
         virtual_accounts = []
+        auto_push_protocols = set()
+        for perm in perms:
+            if (perm.auto_push_same_name and AliasAccount.USER in perm.accounts
+                    and perm.actions & ActionChoices.connect):
+                auto_push_protocols.update(perm.protocols)
         for account, action_bit in cleaned_accounts_action_bit.items():
             account.actions = action_bit
+            account.auto_push_protocols = (
+                auto_push_protocols if account.username == user.username else set()
+            )
             all_date_expired = cleaned_accounts_expired[account]
             if not all_date_expired:
                 logger.warning(f"Account {account.username} has no date expired")

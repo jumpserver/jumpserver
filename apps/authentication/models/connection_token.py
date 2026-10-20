@@ -379,6 +379,9 @@ class ConnectionToken(JMSOrgBaseModel):
             # Explicit personal credentials also override cached AD/LDAP passwords.
             account.secret = credential.secret
             account.secret_type = credential.secret_type
+        if account:
+            from accounts.provisioning import check_account_ready
+            check_account_ready(self, account)
         self.set_ad_domain_if_need(account)
         return account
 

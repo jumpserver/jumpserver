@@ -16069,3 +16069,35 @@ msgstr "登录失败次数已达到上限，登录已被临时锁定。"
 #: authentication/templates/authentication/_msg_login_blocked.html
 msgid "Please review the login logs and check for suspicious activity."
 msgstr "请查看登录日志，排查是否存在可疑活动。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Permission to connect to this account is no longer available."
+msgstr "当前账号的连接授权已失效。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Prepare the same-name account before connecting."
+msgstr "请先完成同名账号准备，再连接资产。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Account preparation has not succeeded. Please retry."
+msgstr "账号准备尚未成功，请重试。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Automatic same-name account push is not authorized."
+msgstr "当前授权不允许自动推送同名账号。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "已有同名账号已禁用，请联系管理员。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "This username cannot be provisioned automatically."
+msgstr "该用户名不支持自动创建账号，请联系管理员。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Account push is not enabled for this asset platform."
+msgstr "该资产平台尚未启用账号推送，请联系管理员。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Select the same-name account before enabling automatic push."
+msgstr "请先选择同名账号，再开启自动推送。"
