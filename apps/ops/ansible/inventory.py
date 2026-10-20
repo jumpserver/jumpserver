@@ -4,6 +4,7 @@ import os
 import re
 import shlex
 import sys
+import tempfile
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
@@ -99,8 +100,14 @@ class JMSInventory:
             proxy_command_args.extend(["-W", "%h:%p", "-q", "--", gateway_target])
 
         if gateway.password:
-            password = escape_ssh_config_percent(gateway.password)
-            proxy_command_args = ["sshpass", "-p", password, *proxy_command_args]
+            # Keep secrets out of both sshpass and its parent SSH command line.
+            with tempfile.NamedTemporaryFile(
+                mode='w', encoding='utf-8', prefix='.gateway-password-', dir=path_dir, delete=False,
+            ) as password_file:
+                password_file.write(gateway.password)
+            proxy_command_args = [
+                "sshpass", "-f", escape_ssh_config_percent(password_file.name), *proxy_command_args,
+            ]
 
         proxy_command_value = "ProxyCommand=" + shell_join(proxy_command_args)
         return {"ansible_ssh_common_args": "-o " + shlex.quote(proxy_command_value)}

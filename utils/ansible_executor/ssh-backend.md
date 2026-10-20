@@ -8,9 +8,9 @@ Core/Celery 不需要 Docker socket，也不会调用本地 bwrap。SDK 源码�
 
 ## 配置
 
-先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/d5c174b36e340b792f49d502a648c0e8e51fb5e3/README.md)
+先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/a6a2881c6b6f50d76f77f2b5973c10da256bea89/README.md)
 构建并启动 `jumpserver/ansible-executor-ssh:latest`，生成每套部署独立的服务密钥。
-上述服务端提交补齐了业务依赖、账号自动化 SSH 包装脚本和网关私钥的路径转换，
+上述服务端提交补齐了业务依赖、账号自动化 SSH 包装脚本和网关私钥/密码文件的路径转换，
 兼容 Core 当前锁定的 SDK。任务目录 `/home/jms-executor` 使用 tmpfs 时需要
 `exec,nosuid,nodev`，否则随任务上传的脚本无法执行。
 执行容器所在 Linux 内核及 seccomp 策略需要允许 `pidfd_open` 和
@@ -43,6 +43,8 @@ ANSIBLE_EXECUTOR_CONNECT_TIMEOUT: 10
 inventory、资产私钥/证书、自定义模块和模块工具都必须在任务私有目录内；
 系统自动生成的凭据（包括切换账号使用的 `su_from` 私钥）已使用此布局。
 SSH 包装脚本在任务的私有临时目录创建锁，避免不同 UID 共用锁文件而被拒绝访问。
+密码网关通过 `sshpass -f` 读取任务目录内的 `0600` 文件，密码不再出现在
+SSH/sshpass 命令行中。账号模块读取同一文件；远端按任务 UID 隔离访问并在会话结束后清理。
 远端只迁移已知的执行路径，保留用户业务值和
 上传目的地址。项目 symlink / 特殊文件会被拒绝，输入文件总量上限为 128 MiB；
 大型上传需要另行设计分块传输。服务私钥和 Core 的其他目录不会自动打包。
@@ -84,6 +86,7 @@ worker 并发数控制调度并发；增加 Celery worker 时需按执行容器�
 
 `apps/ops/tests/test_ansible_ssh.py` 提供后端选择、原回调、取消和路径边界测试。
 `apps/accounts/tests/test_ansible_credential_paths.py` 覆盖切换账号的私钥与 SSH 锁路径。
+`apps/ops/tests/test_gateway_credentials.py` 覆盖网关密码文件权限、特殊字符和账号模块兼容。
 端到端用例默认跳过；对一个专用临时 executor 设置以下变量即可运行：
 
 ```sh
