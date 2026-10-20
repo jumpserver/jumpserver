@@ -71,7 +71,11 @@ class AppletHostAppletViewSet(HostMixin, JMSModelViewSet):
             return self.host.publications.get(pk=pk)
 
     def get_queryset(self):
-        queryset = self.host.publications.all()
+        # Tinker uses this list for install all. Admin history is served by
+        # AppletPublicationViewSet and retains every publication record.
+        queryset = self.host.publications.exclude(
+            applet__name__in=('chrome', 'dbeaver'), applet__builtin=True,
+        )
         return queryset
 
     def perform_create(self, serializer):
