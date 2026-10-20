@@ -8,10 +8,10 @@ Core/Celery 不需要 Docker socket，也不会调用本地 bwrap。SDK 源码�
 
 ## 配置
 
-先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/8e136705021dad09ad9a27414ba4feba8cf49370/README.md)
+先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/d5c174b36e340b792f49d502a648c0e8e51fb5e3/README.md)
 构建并启动 `jumpserver/ansible-executor-ssh:latest`，生成每套部署独立的服务密钥。
-上述服务端提交补齐了业务依赖和账号自动化 SSH 包装脚本的路径转换，兼容 Core
-当前锁定的 SDK。任务目录 `/home/jms-executor` 使用 tmpfs 时需要
+上述服务端提交补齐了业务依赖、账号自动化 SSH 包装脚本和网关私钥的路径转换，
+兼容 Core 当前锁定的 SDK。任务目录 `/home/jms-executor` 使用 tmpfs 时需要
 `exec,nosuid,nodev`，否则随任务上传的脚本无法执行。
 执行容器所在 Linux 内核及 seccomp 策略需要允许 `pidfd_open` 和
 `pidfd_send_signal`；不支持时服务端会拒绝创建会话。sshd 需要容器内 root，
@@ -41,7 +41,9 @@ ANSIBLE_EXECUTOR_CONNECT_TIMEOUT: 10
 
 任务通过 Runner transmit/worker 流协议传输，不使用 SFTP。上传文件、生成的
 inventory、资产私钥/证书、自定义模块和模块工具都必须在任务私有目录内；
-系统自动生成的凭据已使用此布局。远端只迁移已知的执行路径，保留用户业务值和
+系统自动生成的凭据（包括切换账号使用的 `su_from` 私钥）已使用此布局。
+SSH 包装脚本在任务的私有临时目录创建锁，避免不同 UID 共用锁文件而被拒绝访问。
+远端只迁移已知的执行路径，保留用户业务值和
 上传目的地址。项目 symlink / 特殊文件会被拒绝，输入文件总量上限为 128 MiB；
 大型上传需要另行设计分块传输。服务私钥和 Core 的其他目录不会自动打包。
 
@@ -69,7 +71,8 @@ worker 并发数控制调度并发；增加 Celery worker 时需按执行容器�
 
 已验证上游 Runner 2.4.0、Core Runner 2.4.0.2 客户端与执行端 Core Runner 2.4.0.2
 的流兼容，覆盖 AdHoc、Playbook、文件上传、自定义模块、事件流、失败 rc、取消和超时，
-并通过真实 Celery 账号发现流程验证。日志保留 Ansible 的 ANSI 颜色。
+并通过真实 Celery 账号发现、Linux 账号推送、改密/换钥和校验流程验证，
+包括密钥登录后切换账号、网关私钥和并发任务场景。日志保留 Ansible 的 ANSI 颜色。
 执行镜像使用 `requirements-runtime.txt` 提供业务所需的 Python 驱动和 Collections；
 升级 Ansible 或业务依赖后仍需回归对应 Playbook。
 
@@ -80,6 +83,7 @@ worker 并发数控制调度并发；增加 Celery worker 时需按执行容器�
 ## 验证
 
 `apps/ops/tests/test_ansible_ssh.py` 提供后端选择、原回调、取消和路径边界测试。
+`apps/accounts/tests/test_ansible_credential_paths.py` 覆盖切换账号的私钥与 SSH 锁路径。
 端到端用例默认跳过；对一个专用临时 executor 设置以下变量即可运行：
 
 ```sh
@@ -87,7 +91,7 @@ export JMS_EXECUTOR_TEST_HOST=127.0.0.1
 export JMS_EXECUTOR_TEST_PORT=2222
 export JMS_EXECUTOR_TEST_KEY=/absolute/path/to/test-client
 export JMS_EXECUTOR_TEST_KNOWN_HOSTS=/absolute/path/to/test-known_hosts
-python apps/manage.py test ops.tests.test_ansible_docker ops.tests.test_ansible_ssh
+python apps/manage.py test ops.tests.test_ansible_docker ops.tests.test_ansible_ssh accounts.tests.test_ansible_credential_paths
 ```
 
 端到端测试会执行 localhost 作业，只能指向测试执行容器。executor 仓库另有真实

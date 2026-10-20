@@ -208,7 +208,7 @@ class JMSInventory:
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
-            su_from_auth = account.get_ansible_become_auth()
+            su_from_auth = account.get_ansible_become_auth(path_dir=path_dir)
             host.update(su_from_auth)
             host.update(self.make_custom_become_ansible_vars(account, su_from_auth, path_dir))
         elif platform.su_enabled and not su_from and \

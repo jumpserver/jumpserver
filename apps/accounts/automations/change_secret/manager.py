@@ -31,7 +31,7 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
     def gen_account_inventory(self, account, asset, h, path_dir):
         record = self.get_or_create_record(asset, account, h['name'])
         new_secret, private_key_path = self.handle_ssh_secret(account.secret_type, record.new_secret, path_dir)
-        h = self.gen_inventory(h, account, new_secret, private_key_path, asset)
+        h = self.gen_inventory(h, account, new_secret, private_key_path, asset, path_dir)
         if (
                 asset.platform.type == 'oracle'
                 and h['jms_asset'].get(
