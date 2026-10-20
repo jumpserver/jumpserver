@@ -8,15 +8,19 @@ Core/Celery 不需要 Docker socket，也不会调用本地 bwrap。SDK 源码�
 
 ## 配置
 
-先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/d9406056475266a3342fa86be152435930ac1342/README.md)
-构建并启动镜像，使用与 SDK 锁定版本一致的 `d9406056475266a3342fa86be152435930ac1342`
-提交，生成每套部署独立的服务密钥。
+先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/8e136705021dad09ad9a27414ba4feba8cf49370/README.md)
+构建并启动 `jumpserver/ansible-executor-ssh:latest`，生成每套部署独立的服务密钥。
+上述服务端提交补齐了业务依赖和账号自动化 SSH 包装脚本的路径转换，兼容 Core
+当前锁定的 SDK。任务目录 `/home/jms-executor` 使用 tmpfs 时需要
+`exec,nosuid,nodev`，否则随任务上传的脚本无法执行。
 执行容器所在 Linux 内核及 seccomp 策略需要允许 `pidfd_open` 和
 `pidfd_send_signal`；不支持时服务端会拒绝创建会话。sshd 需要容器内 root，
 无需 privileged、SYS_ADMIN 或宿主机 PID namespace。
 将公钥挂载给 executor，只将私钥及可信取得的服务器 host key 挂载给 Celery。
 私钥不要放进任务目录、Playbook 或环境变量。`known_hosts` 中必须使用实际连接
 地址；非 22 端口的格式是 `[ansible-executor]:2222 ssh-ed25519 ...`。
+资产地址也必须能从执行容器访问；`127.0.0.1` 指向执行容器本身。
+Docker Desktop 本地测试可使用 `host.docker.internal` 访问宿主机映射的资产端口。
 
 在 Core/Celery 的 `config.yml` 中配置，并重启相关进程：
 
@@ -63,10 +67,11 @@ worker 并发数控制调度并发；增加 Celery worker 时需按执行容器�
 
 ## 兼容范围
 
-已验证 Core 的 Runner 2.4.0.2 与执行端上游 Runner 2.4.0 的流兼容，覆盖 AdHoc、
-Playbook、文件上传、自定义模块、事件流、失败 rc、取消和超时。
-通用执行镜像提供 Ansible 内置模块。数据库、WinRM 等业务需要的 Python 驱动、
-collections 及系统依赖请安装到派生镜像；升级 Ansible 后需要回归业务 Playbook。
+已验证上游 Runner 2.4.0、Core Runner 2.4.0.2 客户端与执行端 Core Runner 2.4.0.2
+的流兼容，覆盖 AdHoc、Playbook、文件上传、自定义模块、事件流、失败 rc、取消和超时，
+并通过真实 Celery 账号发现流程验证。日志保留 Ansible 的 ANSI 颜色。
+执行镜像使用 `requirements-runtime.txt` 提供业务所需的 Python 驱动和 Collections；
+升级 Ansible 或业务依赖后仍需回归对应 Playbook。
 
 这是同一 Linux 容器内的多 UID 隔离，共享内核、网络和整体资源上限。其他 UID
 通常仍能看到进程名称/命令行，秘密必须通过私有文件或环境传递。localhost 服务

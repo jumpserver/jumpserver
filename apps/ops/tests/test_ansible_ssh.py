@@ -92,6 +92,20 @@ class SSHBackendTest(SimpleTestCase):
     def test_canceling_unknown_or_finished_job_is_harmless(self):
         cancel_ssh_job(str(uuid.uuid4()))
 
+    @patch.dict(os.environ, {'ANSIBLE_FORCE_COLOR': 'True', 'SERVICE_SECRET': 'private'})
+    def test_remote_color_setting_preserves_task_override(self):
+        for color in (None, 'False'):
+            env = {'TASK_VALUE': 'kept'}
+            if color is not None:
+                env['ANSIBLE_FORCE_COLOR'] = color
+            with self.subTest(color=color), TemporaryDirectory() as root, \
+                    patch('jms_ansible_executor.client.run') as execute:
+                AnsibleSSHRunner(private_data_dir=root, envvars=env).run()
+                self.assertEqual(execute.call_args.kwargs['envvars'], {
+                    'ANSIBLE_FORCE_COLOR': color or 'True', 'TASK_VALUE': 'kept',
+                })
+                self.assertEqual(env.get('ANSIBLE_FORCE_COLOR'), color)
+
     def test_job_stop_persists_uuid_for_another_worker_process(self):
         from ops.models.job import JobExecution
         with TemporaryDirectory() as root:
@@ -198,6 +212,29 @@ m.exit_json(changed=False, msg='staged JumpServer runtime loaded')
             callback = runner.run(quiet=True)
         self.assertTrue(callback.is_success(), callback.result)
         self.assertFalse(source.exists())
+
+    def test_task_log_keeps_success_changed_and_failed_colors(self):
+        from ops.ansible.callback import TaskLogCallback
+        project = self.private / 'project'
+        project.mkdir()
+        playbook = project / 'main.yml'
+        playbook.write_text(json.dumps([{'hosts': 'all', 'gather_facts': False, 'tasks': [
+            {'ansible.builtin.debug': {'msg': 'COLOR_OK'}},
+            {'ansible.builtin.command': '/bin/true'},
+            {'ansible.builtin.command': '/bin/false'},
+        ]}]))
+        log = self.root / 'task.log'
+        runner = PlaybookRunner(
+            str(self.inventory), str(playbook), str(self.private),
+            callback=TaskLogCallback(str(uuid.uuid4())),
+        )
+        runner.envs['ANSIBLE_SUPER_MODE'] = '1'
+        with patch('ops.ansible.callback.get_ansible_task_log_path', return_value=str(log)):
+            callback = runner.run(quiet=True)
+        self.assertEqual(callback.status, 'failed')
+        output = log.read_text()
+        for color in ('32', '33', '31'):
+            self.assertIn(f'\x1b[0;{color}m', output)
 
     def test_job_stop_cancels_the_running_task_through_its_directory(self):
         from ops.models.job import JobExecution

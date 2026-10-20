@@ -46,6 +46,11 @@ class AnsibleSSHRunner(BaseRunner):
         job_id = str(uuid.uuid4())
         canceled = threading.Event()
         params = dict(self.runner_params)
+        # SSH workers do not inherit Core's forced-color setting.
+        params['envvars'] = {
+            'ANSIBLE_FORCE_COLOR': os.environ['ANSIBLE_FORCE_COLOR'],
+            **(params.get('envvars') or {}),
+        }
         event_handler = self.get_event_handler()
         status_handler = self.get_status_handler()
         params.pop('event_handler', None)
