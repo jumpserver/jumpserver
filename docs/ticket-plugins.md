@@ -54,6 +54,8 @@ class Plugin(TicketPlugin):
 
 这样即可使用统一接口和前端申请页，不必新增 TicketType 枚举成员、模型、迁移、ViewSet 或 URL。点击“申请工单”会从 `/ticket-types/` 加载可自助申请的类型，在抽屉中选择后打开对应表单；新增类型自动出现在抽屉中。表单支持文本/UUID、文本列表、单选、多选、布尔、整数、日期时间及资产/账号/会话选择。DictField、嵌套 Serializer 和非文本列表等不支持的字段会在启动时明确报错；复杂表单声明 `custom_form = True`，并在 Lina 注册专用组件。当前资产授权保留专用表单，数据统一保存在 `Ticket.request_data`。
 
+树形多选字段可复用 `TreeChoicesField`（例如资产授权的 `ActionChoicesField`）。字段描述保留 `multiple_choice` 类型和 `choices`，同时返回 `tree`；通用申请页与审批资源编辑据此复用 `BasicTree`，保留分组、勾选联动和协议提示。提交值仍为具体权限项列表，不包含分组节点。
+
 插件发现期间不要导入模型或 Serializer，使用字符串路径及方法内导入，避免 Django 初始化循环。注册表检测重复/非法标识、执行模式、申请入口和动作映射；模型加载完成后统一检查 Serializer、表单字段、动作处理器及其权限/限流类，配置错误阻止启动。移除插件前应处理历史工单和在途实例，不能直接删除仍被引用的类型。
 
 ### 插件接口
@@ -173,6 +175,30 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 在 `tickets.tests.settings` 隔离环境运行 `tickets.tests.test_plugins` 及既有工作流测试。历史迁移和并发测试使用文档 `ticket-workflow-refactor.md` 中的独立 PostgreSQL 测试库，避免 SQLite 的 schema editor 限制。
 
+
+## 资源说明与审批人调整
+
+首批支持 `apply_asset` 和 `view_secret`。插件声明 `resource_serializer` 和 `resources_pending(data)`；专用 serializer 只列出允许调整的资源、动作及有效期字段，不能修改申请人、受益人、组织、流程或原始用途说明。普通类型无需实现这些扩展。申请表单仍使用原有资产、节点和账号控件；资产授权保留代申请、动态账号、动作及到期提醒。
+
+- `GET ticket-types/{type}/options/?org_id=...&field=availability` 返回 `description_allowed`；查看密码可传 `asset`，资产授权可传逗号分隔的 `apply_assets`、`apply_nodes`。服务端按 `TICKET_APPLY_ASSET_SCOPE` 独立检查空资源条件，不能把网络失败、越权、搜索无匹配当作空列表。
+- 无可选资源时传 `resource_description`，以及已有资源和原表单的其他参数。资源未补齐时不会生成授权。若流程在到达审批节点前必须根据缺失的资源解析负责人或条件，提交会报配置错误；需要选择能先解析出审批人的流程，不会猜测资源或跳过条件。
+- 工作流详情新增 `resource_adjustment`，包含 `pending`、`revision`、`can_adjust`；当前有权限的审批人还会收到调整字段及当前值。被指定为审批人不会自动获得资源查询权限，须具有工单组织的 `assets.view_asset` 和 `accounts.view_account`；使用节点还需 `assets.view_node`。
+- `GET approval-tasks/{id}/resource-options/?resource=asset|account|node` 查询本组织资源，账号查询通过 `assets` 传资产 UUID。
+- `POST approval-tasks/{id}/adjust-resources/` 接受 `resources`、必填 `reason` 和 `expected_revision`。独立保存，不审批；失败全部回滚，重复旧版本请求返回 409。原说明一直保留，`resources.adjusted` 事件记录修改前后内容和调整原因，不包含密码。
+- `POST approval-tasks/{id}/approve/` 传 `expected_revision`。修改后需要重新核对详情，旧页面、旧邮件及不携带新版号的批量审批不能批准修改后的范围。已有投票或已走过条件分支时，重新执行同一个发布版本的流程，旧任务保留在历史中并作废未处理待办。新节点按原配置重新计时；没有投票或条件分支的首次补齐保留当前节点、转交／加签和截止时间。
+
+部署需执行 `tickets.0011_workflow_resource_amendments`，仅移除“一个节点只能运行一次”的约束，使重新审批保留旧节点与任务记录；不清理历史数据、不重放授权。
+
+手工验收：
+
+1. 设置可申请范围为 `permed_valid`，用尚无授权的普通用户分别打开资产授权、查看密码原表单；应出现用途说明，填写后可提交。切换组织会清理旧资源，接口失败时应重试，不出现可绕过校验的说明模式。
+2. 用无资产／账号查询权限的审批人打开，不能枚举或调整资源，资源不完整时不能同意；可按原流程配置拒绝或转交。
+3. 用有本组织查询权限的当前审批人，在原“申请信息”区域点击“编辑”，原位置切换为资源表单，补齐资产、账号、动作／有效期及原因；点击“保存修改”后恢复详情显示，工单仍待审批，尚无资产授权或密码查看授权。审批进度区域只保留原审批操作。
+4. 核对详情资源和原说明，再单独同意。申请人获得对应授权或密码查看按钮，原有时效、MFA、组织边界校验继续生效。
+5. 在多人或多级流程已有一票通过后调整范围；应从原流程重新审批，旧票不计数，旧页面提交应报冲突。活动记录可查看修改原因及前后内容。
+6. 验证正常资源可选的申请、节点／动态账号、代申请、到期提醒、拒绝和撤回，以及其他工单类型仍按原流程工作。
+
+自动回归见 `tickets.tests.test_resource_adjustment` 和 Lina `ticketResourceAdjustment.test.mjs`。
 
 ## 文件上传下载授权
 

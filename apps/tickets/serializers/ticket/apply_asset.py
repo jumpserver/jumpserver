@@ -31,12 +31,14 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
         queryset=Asset.objects, many=True, required=False, write_only=True,
         label=_('Apply assets'), help_text=apply_help_text,
     )
+    resource_description = serializers.CharField(required=False, max_length=4096, write_only=True,
+                                                label=_('Purpose and resource description'))
     apply_nodes = ObjectRelatedField(
         queryset=Node.objects, many=True, required=False, write_only=True,
         label=_('Apply nodes'), help_text=apply_help_text,
     )
     apply_accounts = serializers.ListField(
-        child=serializers.CharField(max_length=128), allow_empty=False,
+        child=serializers.CharField(max_length=128), allow_empty=True, required=False,
         write_only=True, label=_('Apply accounts'),
     )
     apply_actions = ActionChoicesField(required=True, allow_null=False, write_only=True, label=_('Apply actions'))
@@ -51,7 +53,7 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
         fields = TicketApplySerializer.Meta.fields + [
             'apply_users', 'apply_assets', 'apply_nodes', 'apply_accounts',
             'apply_actions', 'apply_date_start', 'apply_date_expired',
-            'apply_expire_soon_notice_minutes',
+            'apply_expire_soon_notice_minutes', 'resource_description',
         ]
 
     def validate_apply_nodes(self, nodes):
@@ -59,6 +61,11 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
 
     def validate_apply_assets(self, assets):
         return self.filter_many_to_many_field(Asset, assets)
+
+    def validate_apply_accounts(self, accounts):
+        if not accounts:
+            return accounts
+        return super().validate_apply_accounts(accounts)
 
     def validate(self, attrs):
         attrs['type'] = 'apply_asset'
@@ -85,21 +92,22 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
             raise serializers.ValidationError({
                 field_mapping.get(key, key): value for key, value in exc.message_dict.items()
             }) from exc
-        if not attrs.get('apply_nodes') and not attrs.get('apply_assets'):
-            raise serializers.ValidationError({
-                'apply_nodes': asset_or_node_help_text,
-                'apply_assets': asset_or_node_help_text,
-            })
+        from tickets.plugins import get_ticket_plugin
+        from tickets.workflow.resources import validate_description
+        validate_description(get_ticket_plugin('apply_asset'), attrs,
+                             {**self.context, 'org_id': attrs['org_id']})
         attrs['request_data'] = {
             'apply_users': [str(pk) for pk in users],
             'apply_assets': [str(pk) for pk in attrs.pop('apply_assets', [])],
             'apply_nodes': [str(pk) for pk in attrs.pop('apply_nodes', [])],
-            'apply_accounts': attrs.pop('apply_accounts'),
+            'apply_accounts': attrs.pop('apply_accounts', []),
             'apply_actions': attrs.pop('apply_actions'),
             'apply_date_start': attrs.pop('apply_date_start').isoformat(),
             'apply_date_expired': attrs.pop('apply_date_expired').isoformat(),
             'apply_expire_soon_notice_minutes': attrs.pop('apply_expire_soon_notice_minutes', None),
         }
+        if attrs.get('resource_description'):
+            attrs['request_data']['resource_description'] = attrs.pop('resource_description')
         return attrs
 
     def create(self, validated_data):

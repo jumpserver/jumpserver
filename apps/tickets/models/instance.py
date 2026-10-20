@@ -56,9 +56,7 @@ class WorkflowNodeInstance(JMSBaseModel):
         verbose_name = _('Workflow node instance')
         ordering = ['date_created', 'id']
         default_permissions = ()
-        constraints = [
-            models.UniqueConstraint(fields=['instance', 'node'], name='tickets_workflow_node_run_uniq'),
-        ]
+        # Resource amendments may run the published graph again; previous runs remain auditable.
 
 
 class ApprovalTask(JMSBaseModel):

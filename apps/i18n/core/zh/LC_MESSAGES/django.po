@@ -16191,3 +16191,8 @@ msgstr "文件路径"
 #: tickets/plugins
 msgid "Direction"
 msgstr "方向"
+
+#: tickets/serializers/ticket/ticket.py tickets/serializers/ticket/apply_asset.py
+#: tickets/plugins/view_secret/serializer.py
+msgid "Purpose and resource description"
+msgstr "申请用途／资源说明"

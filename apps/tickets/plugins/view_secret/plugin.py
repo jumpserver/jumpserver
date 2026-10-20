@@ -12,6 +12,10 @@ class Plugin(TicketPlugin):
     creation_modes = ('manual', 'operation')
     execution_mode = 'automatic'
     request_serializer = 'tickets.plugins.view_secret.serializer.RequestSerializer'
+    resource_serializer = 'tickets.plugins.view_secret.serializer.ResourceSerializer'
+
+    def resources_pending(self, data):
+        return not (data.get('asset') and data.get('accounts'))
     actions = {'view_secret': 'tickets.plugins.view_secret.actions.ViewSecret'}
 
     def build_context(self, ticket):

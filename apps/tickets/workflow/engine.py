@@ -205,11 +205,15 @@ class WorkflowEngine:
         return False
 
     @transaction.atomic
-    def approve(self, task, user, comment=''):
+    def approve(self, task, user, comment='', expected_revision=None):
         instance, task = self._lock_task(task, user)
         run = task.node_instance
         if self._expire_if_due(instance, run):
             return instance
+        from .resources import check_revision
+        check_revision(instance, expected_revision)
+        if instance.context.get('resources_pending'):
+            raise WorkflowConflict('Complete and save the requested resources before approval.')
         task.state, task.comment, task.date_finished = TaskState.approved, comment, timezone.now()
         task.save(update_fields=['state', 'comment', 'date_finished', 'date_updated'])
         self._event(instance, 'approval.approved', node=run, task=task, actor=user, comment=comment)
@@ -220,6 +224,12 @@ class WorkflowEngine:
             self._complete_node(instance, run)
             self._advance(instance, run.node.outgoing.get().target)
         return instance
+
+    @transaction.atomic
+    def adjust_resources(self, task, user, resources, reason, expected_revision):
+        from .resources import adjust_resources
+        instance, task = self._lock_task(task, user)
+        return adjust_resources(self, instance, task, user, resources, reason, expected_revision)
 
     @transaction.atomic
     def reject(self, task, user, comment=''):

@@ -24,4 +24,7 @@ class TicketTypeViewSet(viewsets.ViewSet):
         if not available_users(org_id).filter(pk=request.user.pk).exists():
             raise PermissionDenied()
         with tmp_to_org(org_id):
+            if request.query_params.get('field') == 'availability':
+                from tickets.workflow.resources import resource_availability
+                return Response(resource_availability(get_ticket_plugin(pk), request, org_id))
             return Response(get_ticket_plugin(pk).options(request, org_id))

@@ -11,6 +11,10 @@ class Plugin(TicketPlugin):
     custom_form = True
     execution_mode = 'automatic'
     apply_serializer = 'tickets.serializers.ticket.apply_asset.ApplyAssetSerializer'
+    resource_serializer = 'tickets.plugins.apply_asset.resources.ResourceSerializer'
+
+    def resources_pending(self, data):
+        return not ((data.get('apply_assets') or data.get('apply_nodes')) and data.get('apply_accounts'))
 
     def build_context(self, ticket):
         from .handler import build_context
@@ -83,7 +87,8 @@ class Plugin(TicketPlugin):
 
     def allow_direct_approval(self, ticket):
         data = ticket.request_data
-        return bool((data.get('apply_assets') or data.get('apply_nodes')) and data.get('apply_accounts'))
+        return super().allow_direct_approval(ticket) and bool(
+            (data.get('apply_assets') or data.get('apply_nodes')) and data.get('apply_accounts'))
 
     def request_items(self, ticket):
         from assets.models import Asset, Node

@@ -61,6 +61,10 @@ def account_context(ticket):
     from tickets.workflow.context import snapshot_assets
     from tickets.workflow.errors import WorkflowConfigurationError
     request = dict(ticket.request_data)
+    from tickets.plugins import get_ticket_plugin
+    if get_ticket_plugin(ticket.type).resources_pending(request):
+        assets = Asset.objects.filter(pk=request['asset'], org_id=ticket.org_id) if request.get('asset') else []
+        return {'request': request, 'assets': snapshot_assets(assets, ticket.org_id), 'accounts': []}
     asset = Asset.objects.filter(pk=request['asset'], org_id=ticket.org_id).first()
     if not asset:
         raise WorkflowConfigurationError('The requested asset no longer exists.')

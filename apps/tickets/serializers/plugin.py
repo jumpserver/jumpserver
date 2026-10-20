@@ -28,7 +28,8 @@ class PluginTicketApplySerializer(TicketApplySerializer):
         self.plugin = plugin
         if plugin.apply_serializer:
             serializer = import_string(plugin.apply_serializer)(context=self.context)
-            allowed = {name for name, field in serializer.fields.items() if name.startswith('apply_') and not field.read_only}
+            allowed = {name for name, field in serializer.fields.items()
+                       if (name.startswith('apply_') or name == 'resource_description') and not field.read_only}
             if payload.keys() - allowed:
                 raise serializers.ValidationError({'request_data': 'Unknown request parameters.'})
             self.delegate = type(serializer)(data={**payload, **attrs}, context=self.context)
@@ -40,6 +41,8 @@ class PluginTicketApplySerializer(TicketApplySerializer):
         if not serializer.is_valid():
             raise serializers.ValidationError({'request_data': serializer.errors})
         attrs['request_data'] = json_snapshot(json.loads(JSONRenderer().render(serializer.data)))
+        if serializer.validated_data.get('resource_description'):
+            attrs['request_data']['resource_description'] = serializer.validated_data['resource_description']
         return attrs
 
     def create(self, validated_data):

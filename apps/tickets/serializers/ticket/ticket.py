@@ -118,7 +118,12 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
 
     @staticmethod
     def get_request_items(obj):
-        return get_ticket_plugin(obj.type).request_items(obj)
+        items = get_ticket_plugin(obj.type).request_items(obj)
+        if obj.request_data.get('resource_description'):
+            items = [item for item in items if item['name'] != 'resource_description']
+            items.insert(0, {'name': 'resource_description', 'label': str(_('Purpose and resource description')),
+                             'value': obj.request_data['resource_description']})
+        return items
 
     @staticmethod
     def get_execution_mode(obj):

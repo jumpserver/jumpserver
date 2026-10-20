@@ -128,6 +128,9 @@ class ApprovalTaskViewSet(viewsets.ReadOnlyModelViewSet):
     def _decide(self, request, operation):
         task = self.get_object()
         serializer_class = WorkflowReassignSerializer if operation in ('transfer', 'add_approver') else WorkflowDecisionSerializer
+        if operation == 'approve':
+            from tickets.serializers.workflow import WorkflowApproveSerializer
+            serializer_class = WorkflowApproveSerializer
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
@@ -154,6 +157,20 @@ class ApprovalTaskViewSet(viewsets.ReadOnlyModelViewSet):
             users = users.filter(Q(name__icontains=search) | Q(username__icontains=search))
         page = self.paginate_queryset(users.order_by('name', 'id').values('id', 'name', 'username'))
         return self.get_paginated_response(page)
+
+    @action(detail=True, methods=['get'], url_path='resource-options')
+    def resource_options(self, request, **kwargs):
+        from tickets.workflow.resources import resource_options
+        task = self.get_object()
+        return Response(resource_options(task.node_instance.instance, task, request.user, request.query_params))
+
+    @action(detail=True, methods=['post'], url_path='adjust-resources')
+    def adjust_resources(self, request, **kwargs):
+        from tickets.serializers.workflow import WorkflowResourceSerializer
+        serializer = WorkflowResourceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = WorkflowEngine().adjust_resources(self.get_object(), request.user, **serializer.validated_data)
+        return Response(WorkflowInstanceSerializer(instance).data)
 
     @action(detail=True, methods=['post'])
     def approve(self, request, **kwargs):

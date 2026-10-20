@@ -109,9 +109,15 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
 
 class WorkflowInstanceDetailSerializer(WorkflowInstanceSerializer):
     nodes = WorkflowNodeInstanceSerializer(source='node_instances', many=True, read_only=True)
+    resource_adjustment = serializers.SerializerMethodField()
+
+    def get_resource_adjustment(self, instance):
+        from tickets.workflow.resources import adjustment_status
+        request = self.context.get('request')
+        return adjustment_status(instance, request.user if request else None)
 
     class Meta(WorkflowInstanceSerializer.Meta):
-        fields = WorkflowInstanceSerializer.Meta.fields + ['context', 'nodes']
+        fields = WorkflowInstanceSerializer.Meta.fields + ['context', 'nodes', 'resource_adjustment']
         read_only_fields = fields
 
 
@@ -139,3 +145,13 @@ class WorkflowDecisionSerializer(serializers.Serializer):
 
 class WorkflowReassignSerializer(WorkflowDecisionSerializer):
     target = serializers.UUIDField()
+
+
+class WorkflowApproveSerializer(WorkflowDecisionSerializer):
+    expected_revision = serializers.IntegerField(min_value=0, required=False)
+
+
+class WorkflowResourceSerializer(serializers.Serializer):
+    resources = serializers.DictField()
+    reason = serializers.CharField(max_length=4096)
+    expected_revision = serializers.IntegerField(min_value=0)

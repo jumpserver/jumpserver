@@ -40,7 +40,7 @@ class TicketPluginRegistry:
         from .actions import TicketAction
         for plugin in self._plugins.values():
             try:
-                for path in (plugin.request_serializer, plugin.apply_serializer):
+                for path in (plugin.request_serializer, plugin.apply_serializer, plugin.resource_serializer):
                     if path and not issubclass(import_string(path), BaseSerializer):
                         raise ValueError(f'Invalid serializer: {path}')
                 plugin.metadata()

@@ -14,6 +14,13 @@ class TicketPlugin:
     request_serializer = None
     custom_form = False
     actions = {}
+    resource_serializer = None
+
+    def resources_pending(self, data):
+        return False
+
+    def get_resource_serializer(self, **kwargs):
+        return import_string(self.resource_serializer)(**kwargs)
 
     def get_request_serializer(self, **kwargs):
         return import_string(self.request_serializer)(**kwargs)
@@ -38,7 +45,9 @@ class TicketPlugin:
 
     def allow_direct_approval(self, ticket):
         """Whether an approval notification may include a direct action link."""
-        return True
+        instance = getattr(ticket, 'workflow_instance', None)
+        return not self.resources_pending(ticket.request_data) and not (
+            instance and instance.context.get('resource_revision'))
 
     def on_approved(self, instance, ticket):
         """Optional synchronous, transactional effect. Return executed action data.
@@ -98,6 +107,7 @@ class TicketPlugin:
             'creation_modes': list(self.creation_modes or (('manual',) if self.self_service else ('system',))),
             'execution_mode': self.execution_mode,
             'custom_form': self.custom_form,
+            'resource_adjustment': bool(self.resource_serializer),
             'fields': request_fields(self.get_request_serializer()) if self.request_serializer and not self.custom_form else [],
         }
 

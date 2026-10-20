@@ -21,6 +21,8 @@ def build_context(ticket):
     context.setdefault('request', {}).update(type=ticket.type, title=ticket.title)
     context['applicant'] = applicant
     context['plugin'] = {'type': plugin.type}
+    if plugin.resource_serializer:
+        context['resources_pending'] = plugin.resources_pending(ticket.request_data)
     for key in ('assets', 'accounts', 'nodes'):
         context.setdefault(key, [])
     return context
@@ -91,6 +93,8 @@ def apply_approved_effect(instance, ticket):
     plugin = get_ticket_plugin(ticket.type)
     with tmp_to_org(instance.org_id):
         mode = plugin.get_execution_mode(ticket)
+        if instance.context.get('resources_pending'):
+            raise WorkflowConfigurationError('Complete and save the requested resources before approval.')
         if mode == 'approval_only':
             return None
         if mode not in ('automatic', 'external'):

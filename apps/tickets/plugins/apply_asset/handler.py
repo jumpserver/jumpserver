@@ -33,7 +33,8 @@ def build_context(ticket):
     accounts = data.get('apply_accounts') or []
     date_start = parse_datetime(data['apply_date_start']) if data.get('apply_date_start') else None
     date_expired = parse_datetime(data['apply_date_expired']) if data.get('apply_date_expired') else None
-    if len(assets) != len(ids) or not assets or not accounts:
+    pending = bool(data.get('resource_description')) and (not assets or not accounts)
+    if len(assets) != len(ids) or (not pending and (not assets or not accounts)):
         raise WorkflowConfigurationError('Select existing assets and accounts before submitting the request.')
     if not date_start or not date_expired or date_expired <= date_start:
         raise WorkflowConfigurationError('A valid access period is required.')
@@ -42,7 +43,8 @@ def build_context(ticket):
     context['accounts'] = []
     account_users = users if '@USER' in accounts else users[:1]
     seen = set()
-    for user in account_users:
+    grant_accounts = []
+    for user in ([] if pending else account_users):
         account_snapshots, grant_accounts = snapshot_accounts(accounts, assets, user, ticket.org_id)
         for account in account_snapshots:
             key = tuple(sorted(account.items()))

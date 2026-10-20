@@ -103,10 +103,9 @@ class BaseTicketMessage(UserMessage):
 
     @property
     def spec_items(self):
-        from tickets.plugins import get_ticket_plugin
-        plugin = get_ticket_plugin(self.ticket.type)
+        from tickets.serializers.ticket.ticket import TicketSerializer
         return [{'name': item['name'], 'title': item['label'], 'value': item['value']}
-                for item in plugin.request_items(self.ticket) if item['value'] not in (None, '', [])]
+                for item in TicketSerializer.get_request_items(self.ticket) if item['value'] not in (None, '', [])]
 
 
 class TicketAppliedToAssigneeMessage(BaseTicketMessage):
