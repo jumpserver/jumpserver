@@ -105,6 +105,21 @@ class SSHBackendTest(SimpleTestCase):
             notifications.publish.assert_called_once_with(metadata)
             job.set_error.assert_called_once()
 
+    def test_canceled_result_remains_a_finished_job(self):
+        from ops.const import JobStatus
+        from ops.models.job import JobExecution
+        execution = JobExecution(
+            status=JobStatus.failed, summary={'error': 'Job stop by "user cancel"'},
+        )
+        callback = SimpleNamespace(status='canceled', summary={}, result={})
+        with patch.object(JobExecution.objects, 'get', return_value=execution), \
+                patch.object(execution, 'save'):
+            execution.set_result(callback)
+        self.assertEqual(execution.status, JobStatus.failed)
+        self.assertTrue(execution.is_finished)
+        self.assertIsNotNone(execution.date_finished)
+        self.assertEqual(execution.summary['error'], 'Job stop by "user cancel"')
+
     def test_remote_task_paths_only_map_to_the_private_project(self):
         with TemporaryDirectory() as root:
             for path in ('/etc/shadow:1', '/remote/project/../../secret:2'):
@@ -134,15 +149,18 @@ class SSHRunnerIntegrationTest(SimpleTestCase):
         self.private.mkdir()
         # Same layout as JMSInventory.write_to_file: credentials alongside inventory.
         self.inventory = self.private / 'inventory.json'
-        self.inventory.write_text(json.dumps({'all': {'hosts': {'localhost': {
+        self.inventory.write_text(json.dumps({'all': {'hosts': {'executor_test': {
             'ansible_connection': 'local', 'ansible_python_interpreter': '/usr/bin/python3',
         }}}}))
 
     def test_current_adhoc_callback_receives_success_and_remote_pid_is_not_local(self):
-        callback = AdHocRunner(str(self.inventory), 'shell', 'command', 'id -u',
-                               project_dir=str(self.private)).run(quiet=True, clean_workspace=False)
+        runner = AdHocRunner(str(self.inventory), 'shell', 'command', 'id -u',
+                            project_dir=str(self.private))
+        # Core's Ansible fork requires explicit trusted mode for local fixtures.
+        runner.envs['ANSIBLE_SUPER_MODE'] = '1'
+        callback = runner.run(quiet=True, clean_workspace=False)
         self.assertTrue(callback.is_success(), callback.result)
-        self.assertTrue(callback.result['ok']['localhost'])
+        self.assertTrue(callback.result['ok']['executor_test'])
         self.assertFalse((self.private / 'local.pid').exists())
 
     def test_current_playbook_runner_custom_module_and_failed_status(self):
@@ -160,10 +178,12 @@ m.exit_json(changed=False, msg='staged JumpServer runtime loaded')
         playbook.write_text(json.dumps([{'hosts': 'all', 'gather_facts': False, 'tasks': [
             {'runtime_check': {}}, {'ansible.builtin.command': '/bin/false'},
         ]}]))
-        callback = PlaybookRunner(str(self.inventory), str(playbook), str(self.private)).run(quiet=True)
+        runner = PlaybookRunner(str(self.inventory), str(playbook), str(self.private))
+        runner.envs['ANSIBLE_SUPER_MODE'] = '1'
+        callback = runner.run(quiet=True)
         self.assertEqual(callback.status, 'failed')
-        self.assertTrue(callback.result['ok']['localhost'])
-        self.assertTrue(callback.result['failures']['localhost'])
+        self.assertTrue(callback.result['ok']['executor_test'])
+        self.assertTrue(callback.result['failures']['executor_test'])
         self.assertFalse(self.private.exists())
 
     def test_current_upload_runner_stages_files_and_returns_callback(self):
@@ -172,8 +192,10 @@ m.exit_json(changed=False, msg='staged JumpServer runtime loaded')
         source.mkdir(parents=True)
         (source / 'payload.txt').write_text('upload-test')
         with override_settings(SHARE_DIR=str(self.root)):
-            callback = UploadFileRunner(str(self.inventory), str(self.private), job_id,
-                                        'jms-upload-test-' + str(job_id)).run(quiet=True)
+            runner = UploadFileRunner(str(self.inventory), str(self.private), job_id,
+                                      'jms-upload-test-' + str(job_id))
+            runner.envs['ANSIBLE_SUPER_MODE'] = '1'
+            callback = runner.run(quiet=True)
         self.assertTrue(callback.is_success(), callback.result)
         self.assertFalse(source.exists())
 
@@ -181,6 +203,7 @@ m.exit_json(changed=False, msg='staged JumpServer runtime loaded')
         from ops.models.job import JobExecution
         runner = AdHocRunner(str(self.inventory), 'shell', 'command', 'sleep 60',
                              project_dir=str(self.private))
+        runner.envs['ANSIBLE_SUPER_MODE'] = '1'
         original = runner.cb.event_handler
         stopped = []
         def event_handler(data):

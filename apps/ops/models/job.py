@@ -517,6 +517,8 @@ class JobExecution(JMSOrgBaseModel):
     def set_result(self, cb):
         status_mapper = {
             'successful': JobStatus.success,
+            # stop() records user cancellation as a terminal failure.
+            'canceled': JobStatus.failed,
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
