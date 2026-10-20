@@ -198,7 +198,7 @@ class PersonalCredentialVersionConflict(APIException):
 
 
 def get_personal_credential_permission_context(
-        user, asset, protocol, account_alias=AliasAccount.INPUT,
+        user, asset, protocol, account_alias=None,
 ):
     if not user or not user.is_valid:
         raise PermissionDenied(_('Invalid user'), code='invalid_user')
@@ -214,15 +214,38 @@ def get_personal_credential_permission_context(
     if not asset_protocol_exists or not platform_protocol:
         raise serializers.ValidationError({'protocol': _('Protocol is not supported by this asset')})
 
-    if account_alias != AliasAccount.INPUT and not is_uuid(account_alias):
+    virtual_aliases = (AliasAccount.INPUT, AliasAccount.USER)
+    if account_alias is not None and account_alias not in virtual_aliases and not is_uuid(account_alias):
         raise PermissionDenied(
-            _('Personal credentials require a manual or empty-secret asset account'),
+            _('Account not found'),
             code='personal_credential_account_denied',
         )
     try:
-        account = PermAssetDetailUtil(user, asset).validate_permission(
-            account_alias, protocol
-        )
+        utility = PermAssetDetailUtil(user, asset)
+        if account_alias is None:
+            # Management requests have no selected account. Prefer manual
+            # permission, then same-name permission (including mapped accounts).
+            with tmp_to_org(asset.org_id):
+                protocols = utility.get_permed_protocols_for_user(only_name=True)
+                accounts = utility.get_permed_accounts_for_user() if (
+                    'all' in protocols or protocol in protocols
+                ) else []
+            candidates = [
+                account for alias in virtual_aliases for account in accounts
+                if account.alias == alias
+            ] + [
+                account for account in accounts
+                if not account.is_virtual() and account.username == user.username
+                and not account.has_secret
+                and account.secret_type != SecretType.SSH_CERTIFICATE
+            ]
+            account = next((
+                account for account in candidates
+                if ActionChoices.contains(account.actions, ActionChoices.connect)
+                and account.date_expired >= timezone.now()
+            ), None)
+        else:
+            account = utility.validate_permission(account_alias, protocol)
     except Asset.DoesNotExist:
         account = None
     if not account or not ActionChoices.contains(account.actions, ActionChoices.connect):
@@ -232,7 +255,12 @@ def get_personal_credential_permission_context(
         )
     if account.date_expired < timezone.now():
         raise PermissionDenied(_('Permission expired'), code='permission_expired')
-    if account_alias != AliasAccount.INPUT and (
+    if account.alias == AliasAccount.USER:
+        # Personal credentials supply the secret even when AD/LDAP login
+        # password reuse is enabled for the same-name virtual account.
+        account.secret = ''
+        account.__dict__.pop('has_secret', None)
+    if account.alias not in virtual_aliases and (
         account.has_secret or not account.username
         or account.secret_type == SecretType.SSH_CERTIFICATE
     ):

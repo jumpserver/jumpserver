@@ -473,7 +473,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         response = self.redeem()
         self.assertEqual(response.data['connection'], self.connection_data)
         self.token.expire.assert_called_once()
-        self.token.is_valid.assert_called_with()
+        self.token.is_valid.assert_called_with(include_personal_secret=True)
         self.assertTrue(self.consumed)
 
     @override_settings(CONNECTION_TOKEN_REUSABLE=True)
@@ -551,8 +551,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
     @override_settings(CONNECTION_TOKEN_REUSABLE=True)
     def test_personal_credential_uses_shared_reuse_policy_and_audit(self):
         self.token.personal_credential_id = uuid4()
-        # Creation/update already prohibit reusable personal tokens. The secret
-        # API follows the shared dev policy even for a legacy inconsistent flag.
+        # Personal tokens follow the shared reuse policy when disclosing secrets.
         for reusable in [False, True]:
             with self.subTest(reusable=reusable):
                 self.consumed = False

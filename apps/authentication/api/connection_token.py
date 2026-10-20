@@ -53,7 +53,9 @@ from .face import FaceMonitorContext
 from ..const import ConnectionTokenType
 from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
-from ..services.connection_token import get_connection_token_secret
+from ..services.connection_token import (
+    get_connection_token_secret, record_connection_token_credential_audit,
+)
 from ..utils import (
     build_absolute_uri, get_effective_connect_options,
     should_use_oracle_sysdba,
@@ -539,10 +541,6 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         response = HttpResponse(content, content_type='application/octet-stream')
 
         if is_true(request.query_params.get('reusable')):
-            if token.personal_credential_id:
-                raise ValidationError(
-                    _('Personal credential connection tokens cannot be reusable')
-                )
             token.set_reusable(True)
             filename = '{}-{}'.format(filename, token.date_expired.strftime('%Y%m%d_%H%M%S'))
 
@@ -592,19 +590,9 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         try:
             self.validate_exchange_token(instance)
         except APIException as error:
-            if instance.personal_credential_id:
-                record_personal_credential_audit(
-                    operation='use',
-                    result='failed',
-                    failure_reason=get_personal_credential_failure_reason(error),
-                    user=instance.user,
-                    asset=instance.asset,
-                    credential_id=instance.personal_credential_id,
-                    username=instance.input_username,
-                    secret_type=instance.input_secret_type,
-                    remote_addr=get_request_ip_or_data(request),
-                    org_id=instance.org_id,
-                )
+            record_connection_token_credential_audit(
+                instance, result='failed', error=error, request=request,
+            )
             raise
         instance.date_expired = date_expired_default()
         instance.save()
@@ -754,6 +742,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         credential_version = data.pop('personal_credential_version', None)
         credential_id = data.get('personal_credential_id')
         personal_permission_context = None
+        personal_permission_account = None
         if credential_id or save_credential:
             self.personal_credential_audit_context = {
                 'operation': (
@@ -770,25 +759,24 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             data['connect_options'], protocol
         )
 
-        if (credential_id or save_credential) and user != self.request.user:
-            raise PermissionDenied(_(
-                'Personal credentials can only be managed by their owner'
-            ))
-
         if credential_id or save_credential:
+            if user != self.request.user:
+                raise PermissionDenied(_(
+                    'Personal credentials can only be managed by their owner'
+                ))
             personal_permission_context = get_personal_credential_permission_context(
                 user, asset, protocol, account_alias=account_name,
             )
+            platform_protocol, personal_permission_account = personal_permission_context
             if save_credential and account_name != AliasAccount.INPUT:
-                # A hosted account fixes the username, regardless of client input.
-                data['input_username'] = personal_permission_context[1].full_username
+                # Same-name and hosted accounts fix the username.
+                data['input_username'] = personal_permission_account.full_username
 
-        if save_credential and not data.get('input_username'):
-            raise ValidationError({'input_username': _('This field is required.')})
-        if save_credential and not data.get('input_secret'):
-            raise ValidationError({'input_secret': _('This field is required.')})
         if save_credential:
-            platform_protocol, __ = personal_permission_context
+            if not data.get('input_username'):
+                raise ValidationError({'input_username': _('This field is required.')})
+            if not data.get('input_secret'):
+                raise ValidationError({'input_secret': _('This field is required.')})
             input_secret_type = (
                 data.get('input_secret_type') or SecretType.PASSWORD
             )
@@ -799,15 +787,10 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             )
             if input_secret_type == SecretType.SSH_KEY:
                 data['input_secret'] = validate_ssh_key(data['input_secret'])
-        if save_credential and credential_id and credential_version is None:
-            raise ValidationError({
-                'personal_credential_version': _('This field is required.')
-            })
-        if save_credential and credential_id:
-            get_personal_credential_for_use(
-                user, asset, protocol, credential_id,
-                permission_context=personal_permission_context,
-            )
+            if credential_id and credential_version is None:
+                raise ValidationError({
+                    'personal_credential_version': _('This field is required.')
+                })
         if credential_version is not None and not credential_id:
             raise ValidationError({
                 'personal_credential_version': _(
@@ -815,8 +798,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 )
             })
 
-        if credential_id and not save_credential:
-            if data.get('input_username') or data.get('input_secret'):
+        if credential_id:
+            if not save_credential and (data.get('input_username') or data.get('input_secret')):
                 raise ValidationError({
                     'personal_credential_id': _(
                         'Do not submit a username or secret when using a saved credential'
@@ -824,29 +807,26 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 })
             credential = get_personal_credential_for_use(
                 user, asset, protocol, credential_id,
-                version=credential_version,
+                # Updates check the submitted version under the write lock,
+                # including idempotent retries; use binds the exact version.
+                version=None if save_credential else credential_version,
                 permission_context=personal_permission_context,
             )
-            data['input_username'] = credential.username
-            data['input_secret'] = ''
-            data['input_secret_type'] = credential.secret_type
-            data['personal_credential_version'] = credential.version
-            data['is_reusable'] = False
-            self.personal_credential_audit_context.update({
-                'username': credential.username,
-                'secret_type': credential.secret_type,
-            })
+            if not save_credential:
+                data['input_username'] = credential.username
+                data['input_secret'] = ''
+                data['input_secret_type'] = credential.secret_type
+                data['personal_credential_version'] = credential.version
+                self.personal_credential_audit_context.update({
+                    'username': credential.username,
+                    'secret_type': credential.secret_type,
+                })
 
         self.input_username = self.get_input_username(data)
         if account_name == AliasAccount.INPUT:
             # Manual account input can reach Luna directly, so validate before ACL/token creation.
             self.input_username = validate_account_username(self.input_username)
             data['input_username'] = self.input_username
-        personal_permission_account = (
-            personal_permission_context[1]
-            if personal_permission_context is not None
-            else None
-        )
         _data = self._validate(
             user, asset, account_name, protocol, connect_method,
             permed_account=personal_permission_account,
@@ -859,11 +839,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 user=user,
                 asset=asset,
                 protocol=protocol,
-                username=(
-                    personal_permission_account.full_username
-                    if account_name != AliasAccount.INPUT
-                    else data.get('input_username', '')
-                ),
+                username=self.input_username,
                 secret=data.get('input_secret', ''),
                 secret_type=data.get('input_secret_type') or SecretType.PASSWORD,
                 credential_id=credential_id,
@@ -875,7 +851,6 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             data['input_username'] = credential.username
             data['input_secret'] = ''
             data['input_secret_type'] = credential.secret_type
-            data['is_reusable'] = False
             self.personal_credential_audit_context.update({
                 'credential_id': credential.id,
                 'username': credential.username,
@@ -901,7 +876,6 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             token.input_username = credential.username
             token.input_secret = ''
             token.input_secret_type = credential.secret_type
-            token.is_reusable = False
         _data = self._validate(
             user, asset, account_alias, token.protocol, token.connect_method,
             permed_account=personal_permission_account,
@@ -1230,19 +1204,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         except APIException as error:
             data['code'] = get_personal_credential_failure_reason(error)
             data['detail'] = str(error.detail)
-            if instance.personal_credential_id:
-                record_personal_credential_audit(
-                    operation='use',
-                    result='failed',
-                    failure_reason=data['code'],
-                    user=instance.user,
-                    asset=instance.asset,
-                    credential_id=instance.personal_credential_id,
-                    username=instance.input_username,
-                    secret_type=instance.input_secret_type,
-                    remote_addr=instance.remote_addr,
-                    org_id=instance.org_id,
-                )
+            record_connection_token_credential_audit(instance, result='failed', error=error)
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(data=data, status=status.HTTP_200_OK)

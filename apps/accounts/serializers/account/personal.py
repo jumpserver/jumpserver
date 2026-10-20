@@ -10,6 +10,7 @@ from accounts.personal_credentials import (
     PersonalCredentialVersionConflict,
     get_personal_credential_permission_context,
     validate_personal_credential_secret_type,
+    validate_personal_credential_username,
 )
 from accounts.utils import validate_account_username, validate_ssh_key
 from assets.const import Connectivity, Protocol
@@ -115,7 +116,9 @@ class PersonalAssetCredentialSerializer(CommonModelSerializer):
             user, asset, protocol
         )
         self._personal_permission_context = permission_context
-        platform_protocol, __ = permission_context
+        platform_protocol, permission_account = permission_context
+        username = instance.username if instance else attrs.get('username', '')
+        validate_personal_credential_username(permission_account, username)
         secret_type = attrs.get(
             'secret_type', instance.secret_type if instance else SecretType.PASSWORD
         )
@@ -159,7 +162,10 @@ class PersonalAssetCredentialSerializer(CommonModelSerializer):
                             user, asset, protocol
                         )
                     )
-                platform_protocol, __ = permission_context
+                platform_protocol, permission_account = permission_context
+                validate_personal_credential_username(
+                    permission_account, validated_data['username']
+                )
                 validate_personal_credential_secret_type(
                     platform_protocol, validated_data['secret_type']
                 )
@@ -193,7 +199,8 @@ class PersonalAssetCredentialSerializer(CommonModelSerializer):
                 permission_context = get_personal_credential_permission_context(
                     request.user, locked.asset, locked.protocol
                 )
-            platform_protocol, __ = permission_context
+            platform_protocol, permission_account = permission_context
+            validate_personal_credential_username(permission_account, locked.username)
             secret_type = validated_data.get('secret_type', locked.secret_type)
             validate_personal_credential_secret_type(
                 platform_protocol, secret_type
