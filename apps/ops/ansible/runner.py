@@ -21,6 +21,7 @@ from .docker import (
 )
 from .exception import CommandInBlackListException
 from .interface import interface
+from .execution import use_ansible_ssh_executor
 from .utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 
 __all__ = [
@@ -89,7 +90,7 @@ class AdHocRunner:
             'envvars': self.envs,
             'host_pattern': self.pattern,
             'private_data_dir': self.project_dir,
-            'inventory': self.inventory,
+            'inventory': stage_inventory_for_docker(self.project_dir, self.inventory),
             'module': self.module,
             'module_args': self.module_args,
             'verbosity': verbosity,
@@ -170,7 +171,7 @@ class PlaybookRunner:
         if use_ansible_docker_isolation():
             kwargs.update(docker_isolation_kwargs(self.project_dir))
             ensure_ansible_docker_image()
-        elif self.isolate and not is_macos():
+        elif self.isolate and not is_macos() and not use_ansible_ssh_executor():
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
@@ -243,7 +244,7 @@ class UploadFileRunner:
         run_kwargs = {
             'private_data_dir': self.project_dir,
             'host_pattern': "*",
-            'inventory': self.inventory,
+            'inventory': stage_inventory_for_docker(self.project_dir, self.inventory),
             'module': 'copy',
             'module_args': 'src={} dest={}'.format(
                 shlex.quote(src_path + '/'), shlex.quote(self.dest_path + '/')

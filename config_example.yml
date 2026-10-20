@@ -70,6 +70,17 @@ WS_LISTEN_PORT: 8070
 #   - http://localhost:3000
 #   - http://localhost:9528
 
+# Ansible 执行后端：留空延续 ANSIBLE_DOCKER_ENABLED；也可选 native / docker / ssh。
+# SSH 部署说明：utils/ansible_executor/ssh-backend.md
+# ANSIBLE_EXECUTION_BACKEND: ssh
+# ANSIBLE_EXECUTOR_HOST: ansible-executor
+# ANSIBLE_EXECUTOR_PORT: 2222
+# ANSIBLE_EXECUTOR_PRIVATE_KEY: /run/secrets/executor_client
+# ANSIBLE_EXECUTOR_KNOWN_HOSTS: /run/secrets/executor_known_hosts
+# ANSIBLE_EXECUTOR_CONNECT_TIMEOUT: 10
+# 网域隧道：执行容器可访问的 Celery 地址（使用网域时必填）。
+# ANSIBLE_EXECUTOR_GATEWAY_HOST: celery-ansible
+
 # Ansible 单批次超时（一次 ansible-runner 执行，单位：秒）
 # 当前资产自动化会按每 80 个资产分批；每批只启动一个 ansible-runner，
 # 各批次按顺序执行。一个资产有多个目标账号时，该批实际执行的账号数会更多。
