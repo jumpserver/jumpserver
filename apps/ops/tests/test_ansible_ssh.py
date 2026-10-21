@@ -56,7 +56,7 @@ class SSHBackendTest(SimpleTestCase):
 
     def test_isolation_uses_current_runtime_and_persistent_image(self):
         from settings.serializers.feature import OpsSettingSerializer
-        self.assertEqual(ANSIBLE_EE_IMAGE, 'jumpserver/ansible-executor-ssh:latest')
+        self.assertEqual(ANSIBLE_EE_IMAGE, 'jumpserver/ansible-executor')
         help_text = str(OpsSettingSerializer().fields['ANSIBLE_DOCKER_ENABLED'].help_text)
         self.assertIn(ANSIBLE_EE_IMAGE, help_text)
         self.assertNotIn('docker pull', help_text)

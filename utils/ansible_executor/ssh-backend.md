@@ -9,8 +9,10 @@ Core/Celery 不需要 Docker socket，也不会调用本地 bwrap。SDK 源码�
 
 ## 配置
 
-先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/a6a2881c6b6f50d76f77f2b5973c10da256bea89/README.md)
-构建并启动 `jumpserver/ansible-executor-ssh:latest`，生成每套部署独立的服务密钥。
+先按[配套 executor 说明](https://github.com/jumpserver/ansible-executor/blob/fa6aca21ae501da85e559b2d0dc1e0955be441e3/README.md)
+部署 `jumpserver/ansible-executor:<版本或分支>`，生成每套部署独立的服务密钥。
+正式版标签与 Core 版本一致，不带 `-ce` / `-ee`；开发版使用对应分支标签。
+`latest` 保留给旧版逐任务容器，不适用于 SSH 后端。
 上述服务端提交补齐了业务依赖、账号自动化 SSH 包装脚本和网关私钥/密码文件的路径转换，
 兼容 Core 当前锁定的 SDK。任务目录 `/home/jms-executor` 使用 tmpfs 时需要
 `exec,nosuid,nodev`，否则随任务上传的脚本无法执行。
@@ -41,7 +43,7 @@ installer 通过 `env_file` 传入自定义连接参数，Compose 仅分别指�
 连接参数的读取优先级为 `config.yml`、环境变量、Core 默认值。
 
 系统设置 > 功能设置 > 作业中心的「Ansible Docker 隔离」沿用原字段和已保存的值，
-无需迁移。开启使用 `jumpserver/ansible-executor-ssh:latest` 常驻容器；关闭后本地执行，
+无需迁移。开启使用 `jumpserver/ansible-executor` 常驻容器；关闭后本地执行，
 不再获得执行容器的 UID 和文件隔离。执行器连接失败会报错，不自动降级到本地。
 实验性配置 `ANSIBLE_EXECUTION_BACKEND` 已移除，不再覆盖这个开关。
 旧 `jumpserver/ansible-executor` 逐任务 Docker 执行方式已停用，不能只替换旧镜像的标签；

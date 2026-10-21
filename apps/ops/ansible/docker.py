@@ -5,7 +5,7 @@ from django.conf import settings
 
 from .execution import get_ansible_execution_backend, use_ansible_ssh_executor
 
-ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor-ssh:latest'
+ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor'
 
 __all__ = [
     'ANSIBLE_EE_IMAGE',
