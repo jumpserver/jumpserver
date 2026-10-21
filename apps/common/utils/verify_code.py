@@ -1,4 +1,5 @@
 from celery import shared_task
+from celery.worker.request import Request
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
@@ -13,12 +14,17 @@ from common.utils.random import random_string
 logger = get_logger(__file__)
 
 
-# 字段顺序对应新旧消息格式中位于开头的安全位置参数。
-# 执行记录去敏和历史重跑限制共用这两个任务名。
-VERIFY_CODE_TASK_SAFE_FIELDS = {
-    'common.utils.verify_code.send_sms_async': ('target',),
-    'common.utils.verify_code.send_verify_mail_async': ('subject', 'target'),
+# 验证码任务不保存执行参数，也不允许从历史记录重跑。
+VERIFY_CODE_TASKS = {
+    'common.utils.verify_code.send_sms_async',
+    'common.utils.verify_code.send_verify_mail_async',
 }
+
+
+class VerifyCodeTaskRequest(Request):
+    def info(self, safe=False):
+        # Flower 的 reserved/scheduled 查询会读取原始参数，仅清空监控返回值。
+        return {**super().info(safe=safe), 'args': [], 'kwargs': {}}
 
 
 class VerifyCodeDeliveryError(Exception):
@@ -32,6 +38,7 @@ def verify_mail_activity_callback(self, subject, target, *args, **kwargs):
 
 @shared_task(
     verbose_name=_('Send SMS code'),
+    Request=VerifyCodeTaskRequest,
     # 预期异常仍标记为 FAILURE，仅省略 Celery 的异常堆栈日志。
     throws=(VerifyCodeDeliveryError,),
     description=_(
@@ -50,6 +57,7 @@ def send_sms_async(target, *, code, user_info=None):
 
 @shared_task(
     verbose_name=_('Send verify code email'),
+    Request=VerifyCodeTaskRequest,
     activity_callback=verify_mail_activity_callback,
     throws=(VerifyCodeDeliveryError,),
     description=_(
@@ -124,12 +132,11 @@ class SendAndVerifyCodeUtil(object):
         return code
 
     def __send_with_sms(self):
-        # repr 选项只影响 Celery 展示，实际消息仍携带验证码；
-        # 执行记录由 task_sent_handler 另行筛选安全字段。
         send_sms_async.apply_async(  # type: ignore[attr-defined]
             args=(self.target,),
             kwargs={'code': self.code, 'user_info': self.user_info},
-            argsrepr=repr((self.target,)), kwargsrepr='{}', priority=100
+            # 隐藏 Celery 参数展示和事件中的验证码、用户信息，不改变实际发送参数。
+            kwargsrepr='{}', priority=100
         )
 
     def __send_with_email(self):
@@ -137,7 +144,8 @@ class SendAndVerifyCodeUtil(object):
         message = self.other_args.get('message', '')
         send_verify_mail_async.apply_async(  # type: ignore[attr-defined]
             args=(subject, self.target), kwargs={'message': message},
-            argsrepr=repr((subject, self.target)), kwargsrepr='{}', priority=100
+            # 隐藏 Celery 参数展示和事件中含验证码的正文，不改变实际发送参数。
+            kwargsrepr='{}', priority=100
         )
 
     def __send(self, code):

@@ -14,7 +14,7 @@ from common.api import CommonApiMixin
 from common.drf.filters import BaseFilterSet
 from common.exceptions import JMSException
 from common.utils.timezone import local_now
-from common.utils.verify_code import VERIFY_CODE_TASK_SAFE_FIELDS
+from common.utils.verify_code import VERIFY_CODE_TASKS
 from ops.celery import app
 from ..models import CeleryTaskExecution, CeleryTask
 from ..serializers import CeleryPeriodTaskSerializer
@@ -207,7 +207,7 @@ class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         execution = get_object_or_404(CeleryTaskExecution, id=form_id)
         # 按任务名拒绝重跑，覆盖旧记录和管理员；
         # 不能依赖去敏后参数缺失触发 TypeError 来阻止旧验证码重发。
-        if execution.name in VERIFY_CODE_TASK_SAFE_FIELDS:
+        if execution.name in VERIFY_CODE_TASKS:
             raise JMSException(
                 code='verify_code_task_rerun_forbidden',
                 detail=_(
