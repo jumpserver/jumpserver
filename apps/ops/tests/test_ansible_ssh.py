@@ -24,6 +24,25 @@ from ops.ansible.runner import AdHocRunner, PlaybookRunner, UploadFileRunner
 
 @override_settings(ANSIBLE_DOCKER_ENABLED=True, DEBUG_DEV=False)
 class SSHBackendTest(SimpleTestCase):
+    def test_executor_defaults_and_configuration_overrides(self):
+        from jumpserver.conf import Config
+        defaults = {
+            'ANSIBLE_EXECUTOR_HOST': 'ansible-executor',
+            'ANSIBLE_EXECUTOR_PORT': 2222,
+            'ANSIBLE_EXECUTOR_PRIVATE_KEY': '/run/jms-executor/client',
+            'ANSIBLE_EXECUTOR_KNOWN_HOSTS': '/run/jms-executor/known_hosts',
+        }
+        with patch.dict(os.environ, {}, clear=True):
+            config = Config()
+            for name, default in defaults.items():
+                with self.subTest(name=name):
+                    self.assertEqual(config.get(name), default)
+                    override = 2223 if name.endswith('_PORT') else '/custom/executor'
+                    with patch.dict(os.environ, {name: str(override)}):
+                        self.assertEqual(config.get(name), override)
+                        from_file = Config({name: default})
+                        self.assertEqual(from_file.get(name), default)
+
     def test_existing_isolation_setting_selects_ssh_or_native_dynamically(self):
         interface = RunnerInterface(AnsibleNativeRunner)
         self.assertEqual(get_ansible_execution_backend(), 'ssh')

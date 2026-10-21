@@ -23,18 +23,22 @@ Core/Celery 不需要 Docker socket，也不会调用本地 bwrap。SDK 源码�
 资产地址也必须能从执行容器访问；`127.0.0.1` 指向执行容器本身。
 Docker Desktop 本地测试可使用 `host.docker.internal` 访问宿主机映射的资产端口。
 
-在 Core/Celery 的 `config.yml` 中配置，并重启相关进程：
+以下连接参数已在 Core 中提供默认值，标准 installer 部署无需重复配置。
+自定义部署可在 Core/Celery 的 `config.yml` 中覆盖，并重启相关进程：
 
 ```yaml
 ANSIBLE_DOCKER_ENABLED: true
 ANSIBLE_EXECUTOR_HOST: ansible-executor
 ANSIBLE_EXECUTOR_PORT: 2222
-ANSIBLE_EXECUTOR_PRIVATE_KEY: /run/secrets/executor_client
-ANSIBLE_EXECUTOR_KNOWN_HOSTS: /run/secrets/executor_known_hosts
+ANSIBLE_EXECUTOR_PRIVATE_KEY: /run/jms-executor/client
+ANSIBLE_EXECUTOR_KNOWN_HOSTS: /run/jms-executor/known_hosts
 ANSIBLE_EXECUTOR_CONNECT_TIMEOUT: 10
 # 使用网域 SSH 隧道时，必须填执行容器可访问的当前 Core/Celery 节点地址。
 # ANSIBLE_EXECUTOR_GATEWAY_HOST: celery-ansible
 ```
+
+installer 通过 `env_file` 传入自定义连接参数，Compose 仅分别指定 Core/Celery 的网域隧道地址。
+连接参数的读取优先级为 `config.yml`、环境变量、Core 默认值。
 
 系统设置 > 功能设置 > 作业中心的「Ansible Docker 隔离」沿用原字段和已保存的值，
 无需迁移。开启使用 `jumpserver/ansible-executor-ssh:latest` 常驻容器；关闭后本地执行，
