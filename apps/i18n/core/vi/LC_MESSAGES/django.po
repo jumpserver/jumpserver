@@ -9893,6 +9893,22 @@ msgstr "Tùy chọn khách hàng RDP"
 msgid "Printer redirection"
 msgstr "Chuyển hướng máy in"
 
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Áp dụng tổ hợp phím Windows"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "Trên máy tính cục bộ"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "Trên máy tính từ xa"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "Chỉ khi sử dụng toàn màn hình"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "Chất lượng màu RDP"

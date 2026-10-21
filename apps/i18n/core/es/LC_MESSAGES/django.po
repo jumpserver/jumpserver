@@ -10041,6 +10041,22 @@ msgstr "Opciones del cliente RDP"
 msgid "Printer redirection"
 msgstr "Redirección de impresoras"
 
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Aplicar combinaciones de teclas de Windows"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "En el equipo local"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "En el equipo remoto"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "Solo al usar pantalla completa"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "Calidad de color RDP"

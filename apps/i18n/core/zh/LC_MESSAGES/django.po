@@ -9694,6 +9694,22 @@ msgstr "RDP 客户端选项"
 msgid "Printer redirection"
 msgstr "打印机重定向"
 
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Windows 组合键生效位置"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "在本地计算机上"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "在远程计算机上"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "仅在全屏显示时"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "RDP 颜色质量"
