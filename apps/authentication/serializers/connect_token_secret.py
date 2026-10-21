@@ -191,7 +191,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     @staticmethod
     def get_connect_options(token):
         return get_effective_connect_options(
-            token.connect_options, token.protocol
+            token.connect_options, token.protocol, token.asset
         )
 
     @staticmethod
