@@ -27,6 +27,13 @@ BOOTSTRAP_TOKEN:
 # 用于 Kael Runtime Store 请求封装。
 # DATA_UPLOAD_MAX_MEMORY_SIZE: 67117056
 
+# User profile initialization on first login (enabled by default).
+# 用户信息完善设置：默认 true，首次登录需完善个人信息并点击“我同意”。
+# 设置为 false 时仅跳过该步骤，不修改用户的首次登录状态。
+# 重新开启后，尚未完成初始化的用户仍会进入该流程。
+# 此开关不影响强制修改密码、MFA 和登录审批；修改后需重启 Core 服务。
+# USER_FIRST_LOGIN_ENABLED: false
+
 # Database setting, Support sqlite3, mysql, postgres ....
 # 数据库设置
 # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
