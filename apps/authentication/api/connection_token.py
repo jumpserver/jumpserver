@@ -48,6 +48,7 @@ from orgs.utils import get_org_from_request, tmp_to_org, tmp_to_root_org
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil, WebMethod
 from terminal.models import EndpointRule, Endpoint
+from users.const import RDPKeyboardHook
 from users.models import Preference
 from .face import FaceMonitorContext
 from ..const import ConnectionTokenType
@@ -307,6 +308,24 @@ class RDPFileClientProtocolURLMixin:
                 printers_redirect_value = printers_redirect_value.lower()
         if is_true(printers_redirect_value):
             rdp_options['redirectprinters:i'] = '1'
+
+        # Windows key combinations: this preference applies to desktop sessions.
+        if token.connect_method == NativeClient.mstsc:
+            keyboard_hook_value = self.request.query_params.get('rdp_keyboard_hook')
+            keyboard_hook = keyboard_hook_value
+            if keyboard_hook is None:
+                keyboard_hook = token.user.preference.get_value(
+                    'rdp_keyboard_hook', category='luna', default=RDPKeyboardHook.FULL_SCREEN
+                )
+            field = serializers.ChoiceField(choices=RDPKeyboardHook.choices)
+            try:
+                keyboard_hook = field.run_validation(keyboard_hook)
+            except ValidationError as exc:
+                if keyboard_hook_value is not None:
+                    raise ValidationError({'rdp_keyboard_hook': exc.detail})
+                # A stale or invalid stored preference must not prevent connecting.
+                keyboard_hook = RDPKeyboardHook.FULL_SCREEN
+            rdp_options['keyboardhook:i'] = keyboard_hook
 
         # 设置磁盘挂载
         drives_redirect_value = self.request.query_params.get('drives_redirect')
