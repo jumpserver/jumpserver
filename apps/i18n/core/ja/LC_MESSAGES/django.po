@@ -8609,6 +8609,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "モデルプロバイダーのエンドポイントが見つかりません。ベース URL を確認してください。"
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} プロバイダーは Responses API（/responses）をサポートしている必要があります。"
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "プロバイダーから Responses API のイベントストリームが返されませんでした。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Responses API のストリーミング応答に失敗しました：{detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Responses API のストリームは、正常な完了イベントを受信せずに終了しました。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Responses API のストリームから未完了の出力項目が返されました。"
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Responses API のテキストストリームの差分が欠落しているか、最終出力と一致しません。"
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Responses API のツール引数ストリームが最終的なツール呼び出しと一致しません。"
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API から無効なヘルスチェックツール呼び出しが返されました（名前、呼び出し ID、または引数）。"
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "モデルはツールの結果を受信した後、ヘルスチェック用の nonce を正しく返しませんでした。"
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "モデルプロバイダーのリクエスト制限を超えました。しばらくしてから再試行してください。"
 

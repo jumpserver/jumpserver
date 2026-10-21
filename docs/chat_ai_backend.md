@@ -44,7 +44,18 @@ Core 保留以下设置：
 
 Terminal 配置会把启用状态和 Provider 配置提供给 Kael。管理页面仍通过
 `POST /api/v1/settings/chatai/models/` 发现模型，通过
-`POST /api/v1/settings/chatai/testing/` 验证所选模型的工具调用能力。
+`POST /api/v1/settings/chatai/testing/` 验证所选模型与 Kael 的 Responses API 兼容性。
+测试不使用 Chat Completions，也不自动重试，按两轮流式请求验证：
+
+1. 模型通过 `response.output_item.done` 返回指定的 `function_call`，名称、`call_id`
+   和 JSON 参数有效；流必须以成功的 `response.completed` 事件完成。
+2. 保留第一轮的完整输出（包括 reasoning），以匹配的 `call_id` 回传
+   `function_call_output`，其中包含临时生成的随机 nonce。模型必须通过文本增量返回
+   该 nonce，且增量与最终内容一致，以确认模型实际接收并使用了工具结果。
+
+普通 JSON 响应、截断或失败的流、无效工具调用、错误的工具结果回传均不能通过测试。
+测试成功保留 `msg`、`model`、`tool_calls` 字段，并返回 `responses`、`streaming`、
+`tool_result` 为 `true`。这些检查验证模型端点的协议能力，不替代 Kael 运行环境的端到端检查。
 
 ## 用户委托与 Core RBAC
 

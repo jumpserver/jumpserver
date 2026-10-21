@@ -14494,6 +14494,42 @@ msgstr ""
 "l’URL de base."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} Le fournisseur doit prendre en charge l’API Responses (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "Le fournisseur n’a pas renvoyé de flux d’événements de l’API Responses."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Le flux de l’API Responses a échoué : {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Le flux de l’API Responses s’est terminé sans événement de fin réussie."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Le flux de l’API Responses a renvoyé un élément de sortie incomplet."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Les fragments du flux de texte de l’API Responses sont absents ou ne correspondent pas à la sortie finale."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Le flux des arguments de l’outil de l’API Responses ne correspond pas à l’appel final de l’outil."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "L’API Responses a renvoyé un appel d’outil de vérification de l’état non valide (nom, ID de l’appel ou arguments)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "Le modèle n’a pas renvoyé correctement le nonce de vérification de l’état après avoir reçu le résultat de l’outil."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr ""
 "La limite de requêtes du fournisseur du modèle a été dépassée. Réessayez "

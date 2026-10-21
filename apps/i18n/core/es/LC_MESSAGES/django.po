@@ -8750,6 +8750,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "No se encontró el punto de conexión del proveedor de modelos. Compruebe la URL base."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} El proveedor debe admitir la API Responses (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "El proveedor no devolvió un flujo de eventos de la API Responses."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "El flujo de la API Responses falló: {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "El flujo de la API Responses terminó sin un evento de finalización correcta."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "El flujo de la API Responses devolvió un elemento de salida incompleto."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Faltan los fragmentos del flujo de texto de la API Responses o no coinciden con la salida final."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "El flujo de argumentos de la herramienta de la API Responses no coincide con la llamada final a la herramienta."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "La API Responses devolvió una llamada no válida a la herramienta de comprobación de estado (nombre, ID de llamada o argumentos)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "El modelo no devolvió correctamente el nonce de comprobación de estado tras recibir el resultado de la herramienta."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "Se superó el límite de solicitudes del proveedor de modelos. Inténtelo de nuevo más tarde."
 
