@@ -89,6 +89,14 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
                 # 如果 node 是 instance 的祖先节点，则不能添加为 instance 的子节点，否则会形成环，出现断层
                 error = _("Node {} is an ancestor of node {}, can't be added as its child".format(node.value, instance.value))
                 return Response(data={'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        names = [node.value for node in children]
+        siblings = instance.get_children().exclude(id__in=node_ids)
+        if len(names) != len(set(names)) or siblings.filter(value__in=names).exists():
+            error = _('The same level node name cannot be the same')
+            return Response(data={'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        for node in children:
             node.parent = instance
         return Response("OK")
 
