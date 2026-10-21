@@ -1,5 +1,4 @@
 from celery import shared_task
-from celery.worker.request import Request
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
@@ -21,12 +20,6 @@ VERIFY_CODE_TASKS = {
 }
 
 
-class VerifyCodeTaskRequest(Request):
-    def info(self, safe=False):
-        # Flower 的 reserved/scheduled 查询会读取原始参数，仅清空监控返回值。
-        return {**super().info(safe=safe), 'args': [], 'kwargs': {}}
-
-
 class VerifyCodeDeliveryError(Exception):
     pass
 
@@ -38,7 +31,6 @@ def verify_mail_activity_callback(self, subject, target, *args, **kwargs):
 
 @shared_task(
     verbose_name=_('Send SMS code'),
-    Request=VerifyCodeTaskRequest,
     # 预期异常仍标记为 FAILURE，仅省略 Celery 的异常堆栈日志。
     throws=(VerifyCodeDeliveryError,),
     description=_(
@@ -57,7 +49,6 @@ def send_sms_async(target, *, code, user_info=None):
 
 @shared_task(
     verbose_name=_('Send verify code email'),
-    Request=VerifyCodeTaskRequest,
     activity_callback=verify_mail_activity_callback,
     throws=(VerifyCodeDeliveryError,),
     description=_(
