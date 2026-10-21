@@ -467,7 +467,7 @@ class RDPFileClientProtocolURLMixin:
         if token.protocol == Protocol.oracle:
             data['connect_options'] = {
                 'use_sysdba': should_use_oracle_sysdba(
-                    token.connect_options, token.protocol
+                    token.connect_options, token.protocol, token.asset
                 )
             }
 
@@ -756,7 +756,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 'secret_type': data.get('input_secret_type', ''),
             }
         data['connect_options'] = get_effective_connect_options(
-            data['connect_options'], protocol
+            data['connect_options'], protocol, asset
         )
 
         if credential_id or save_credential:
@@ -862,6 +862,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         return serializer
 
     def validate_exchange_token(self, token):
+        token.connect_options = get_effective_connect_options(
+            token.connect_options, token.protocol, token.asset
+        )
         user = token.user
         asset = token.asset
         account_alias = token.account
