@@ -1,17 +1,24 @@
 from collections import defaultdict
 
 from celery import shared_task
+from django.db import transaction
+from django.utils import timezone
 from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from accounts.const import AutomationTypes, ChangeSecretAccountStatus
 from accounts.tasks.common import quickstart_automation_by_snapshot
 from accounts.utils import account_secret_task_status
+from common.const import Status
 from common.utils import get_logger
 from orgs.utils import tmp_to_org
+from orgs.utils import tmp_to_root_org
+from perms.const import ActionChoices
+from users.models import User
 
 logger = get_logger(__file__)
 __all__ = [
-    'push_accounts_to_assets_task', 'change_secret_accounts_to_assets_task',
+    'push_accounts_to_assets_task',
+    'change_secret_accounts_to_assets_task',
     'push_same_name_account_task',
 ]
 
@@ -19,61 +26,60 @@ __all__ = [
 @shared_task(queue='ansible', soft_time_limit=600, time_limit=660,
              verbose_name=_('Push same-name account on first connection'))
 def push_same_name_account_task(execution_id):
-    from django.db import transaction
-    from django.utils import timezone
-    from accounts.models import AccountProvisioning, AutomationExecution, PushSecretRecord
-    from accounts.provisioning import auto_push_enabled
-    from common.const import Status
-    from orgs.utils import tmp_to_root_org
-    from perms.const import ActionChoices
     from perms.utils import PermAssetDetailUtil
-
+    from accounts.provisioning import auto_push_enabled
+    from accounts.models import AutomationExecution, PushSecretRecord
     with tmp_to_root_org():
         execution = AutomationExecution.objects.filter(id=execution_id).first()
     if not execution:
         return
     with tmp_to_org(execution.org_id):
         with transaction.atomic():
-            provisioning = AccountProvisioning.objects.select_for_update().filter(
-                execution_id=execution_id,
-            ).first()
             # Claim once, including broker redeliveries and late queued tasks.
             claimed = AutomationExecution.objects.filter(
-                id=execution_id, status=Status.pending,
+                id=execution_id, status=Status.pending, date_finished__isnull=True,
             ).update(status=Status.running, date_start=timezone.now())
             if not claimed:
                 return
-            if provisioning:
-                provisioning.status = 'running'
-                provisioning.save(update_fields=['status', 'date_updated'])
         try:
-            if not provisioning or not provisioning.user or not provisioning.user.is_valid:
+            record = PushSecretRecord.objects.select_related('account__asset').get(
+                execution_id=execution_id, is_first_login=True,
+            )
+            context = execution.snapshot.get('first_login', {})
+            user = User.objects.filter(id=context.get('user_id')).first()
+            protocol = context.get('protocol')
+            if not user or not user.is_valid or not record.account:
                 raise ValueError('Provisioning user is unavailable')
-            account = provisioning.account
+            account = record.account
             asset = account.asset
-            permitted = PermAssetDetailUtil(provisioning.user, asset).validate_permission(
-                account.alias, provisioning.protocol,
+            permitted = PermAssetDetailUtil(user, asset).validate_permission(
+                account.alias, protocol,
             )
             if (not asset.is_active or not account.is_active
-                    or account.username != provisioning.user.username
+                    or account.username != user.username
                     or not permitted or not permitted.actions & ActionChoices.connect
-                    or not auto_push_enabled(permitted, provisioning.protocol)):
+                    or permitted.date_expired <= timezone.now()
+                    or not auto_push_enabled(permitted, protocol)):
                 raise ValueError('Provisioning permission is no longer valid')
             execution.start()
             execution.refresh_from_db()
-            verified = execution.is_success and PushSecretRecord.objects.filter(
-                execution=execution, account=account, status='success',
-            ).exists()
-            AccountProvisioning.objects.filter(execution=execution).update(
-                status='success' if verified else 'failed', date_updated=timezone.now(),
-            )
+            record.refresh_from_db()
+            if execution.is_success and record.status != 'success':
+                AutomationExecution.objects.filter(id=execution_id).update(
+                    status=Status.failed, date_finished=timezone.now(),
+                )
         except Exception:
             logger.exception('First-login account push failed: execution=%s', execution_id)
-            AutomationExecution.objects.filter(id=execution_id).update(
+            AutomationExecution.objects.filter(
+                id=execution_id, status__in=[Status.pending, Status.running],
+            ).update(
                 status=Status.failed, date_finished=timezone.now(),
             )
-            AccountProvisioning.objects.filter(execution_id=execution_id).update(
-                status='failed', date_updated=timezone.now(),
+        finally:
+            # Permission/inventory failures may occur before the manager has
+            # loaded the pre-created record. Never leave it pending forever.
+            PushSecretRecord.objects.filter(execution_id=execution_id, status='pending').update(
+                status='failed', date_finished=timezone.now(), date_updated=timezone.now(),
             )
 
 

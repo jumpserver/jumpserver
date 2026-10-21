@@ -1,4 +1,5 @@
 from datetime import timedelta
+from uuid import uuid4
 
 from django.db import transaction
 from django.utils import timezone
@@ -6,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from accounts.const import AliasAccount, AutomationTypes, SecretStrategy, SecretType
-from accounts.models import Account, AccountProvisioning, AutomationExecution, PushSecretRecord
+from accounts.models import Account, AutomationExecution, PushSecretRecord
 from accounts.utils import SecretGenerator, validate_account_username
 from assets.models import Asset
 from assets.tasks.common import generate_automation_execution_data
@@ -26,9 +27,29 @@ def auto_push_enabled(account, protocol):
 def needs_account_preparation(account, protocol):
     if not auto_push_enabled(account, protocol):
         return False
-    return account.is_virtual() or AccountProvisioning.objects.filter(
-        account_id=account.pk,
-    ).exclude(status='success').exists()
+    if account.is_virtual():
+        return True
+    record = get_preparation_record(account)
+    return bool(record and get_preparation_status(record) != 'ready')
+
+
+def get_preparation_record(account):
+    return PushSecretRecord.objects.filter(
+        account=account, is_first_login=True,
+    ).select_related('execution').order_by('-date_created', '-id').first()
+
+
+def get_preparation_status(record):
+    execution = record.execution
+    if not execution:
+        return 'failed'
+    if execution.is_finished:
+        return 'ready' if execution.is_success and record.status == 'success' else 'failed'
+    if execution.status == Status.pending:
+        return 'queued'
+    if execution.status == Status.running:
+        return 'running'
+    return 'failed'
 
 
 def get_permitted_account(token):
@@ -54,24 +75,23 @@ def check_account_ready(token, account):
                 if auto_push_enabled(permitted, token.protocol):
                     raise PermissionDenied(_('Prepare the same-name account before connecting.'))
             return
-        if account.pk and AccountProvisioning.objects.filter(account_id=account.pk).exclude(
-            status='success',
-        ).exists():
+        record = get_preparation_record(account) if account.pk else None
+        if record and get_preparation_status(record) != 'ready':
             raise PermissionDenied(_('Account preparation has not succeeded. Please retry.'))
 
 
-def _response(provisioning):
-    status = provisioning.status
+def _response(record):
+    status = get_preparation_status(record)
     messages = {
         'queued': _('Waiting to push the same-name account.'),
         'running': _('Creating the account and configuring its login credentials.'),
         'failed': _('Account preparation failed. Retry or contact an administrator with the task ID.'),
-        'success': _('Account is ready. Connecting.'),
+        'ready': _('Account is ready. Connecting.'),
     }
     return {
-        'status': 'ready' if status == 'success' else status,
+        'status': status,
         'detail': str(messages[status]),
-        'execution_id': str(provisioning.execution_id or ''),
+        'execution_id': str(record.execution_id or ''),
     }
 
 
@@ -84,29 +104,54 @@ def _dispatch(execution_id):
         )
     except Exception:
         logger.exception('Queue first-login account push failed: execution=%s', execution_id)
-        AutomationExecution.objects.filter(id=execution_id, status=Status.pending).update(
+        failed = AutomationExecution.objects.filter(id=execution_id, status=Status.pending).update(
             status=Status.failed, date_finished=timezone.now(),
         )
-        AccountProvisioning.objects.filter(execution_id=execution_id).update(
-            status='failed', date_updated=timezone.now(),
-        )
+        if failed:
+            PushSecretRecord.objects.filter(execution_id=execution_id, status='pending').update(
+                status='failed', date_finished=timezone.now(), date_updated=timezone.now(),
+            )
 
 
-def _start(provisioning):
-    account = provisioning.account
+def _start(account, user, protocol):
+    record_id = uuid4()
     snapshot = {
         'accounts': [str(account.id)], 'assets': [str(account.asset_id)],
         'secret_type': account.secret_type, 'secret_strategy': SecretStrategy.custom,
         'check_conn_after_change': True, 'params': {},
+        'first_login': {'user_id': str(user.id), 'protocol': protocol},
+        'record_map': {f'{account.asset_id}-{account.id}': str(record_id)},
     }
     data = generate_automation_execution_data(
         str(_('First-login same-name account push')), AutomationTypes.push_account, snapshot,
     )
     execution = AutomationExecution.objects.create(type=AutomationTypes.push_account, **data)
-    provisioning.execution = execution
-    provisioning.status = 'queued'
-    provisioning.save()
+    # Persist the account/execution association before enqueueing. The push
+    # manager reuses this record even if inventory preparation fails early.
+    record = PushSecretRecord.objects.create(
+        id=record_id, account=account, asset=account.asset, execution=execution,
+        is_first_login=True, created_by=user.username,
+        comment=f'{account.username}@{account.asset.address}',
+    )
     transaction.on_commit(lambda: _dispatch(execution.id))
+    return record
+
+
+def _cancel_stale_queued_record(record):
+    execution = record.execution
+    if (not execution or execution.status != Status.pending or execution.is_finished
+            or execution.date_created >= timezone.now() - timedelta(minutes=5)):
+        return record
+    # The worker claims the same pending execution atomically. A late broker
+    # delivery cannot start this execution once a retry has replaced it.
+    canceled = AutomationExecution.objects.filter(
+        id=execution.id, status=Status.pending, date_finished__isnull=True,
+    ).update(status=Status.canceled, date_finished=timezone.now())
+    if canceled:
+        PushSecretRecord.objects.filter(id=record.id, status='pending').update(
+            status='failed', date_finished=timezone.now(), date_updated=timezone.now(),
+        )
+    return PushSecretRecord.objects.select_related('execution').get(id=record.id)
 
 
 @transaction.atomic
@@ -125,6 +170,10 @@ def prepare_account(token, *, retry=False):
                 '-is_active', 'secret_type', 'id',
             ).first()
         )
+        if account:
+            # Joined-directory accounts may be shared by multiple assets.
+            # Their retries must also serialize on the account itself.
+            account = Account.objects.select_for_update().get(id=account.id)
         if account and not account.is_active:
             raise ValidationError(_('The existing same-name account is inactive. Contact an administrator.'))
         if account is None:
@@ -144,42 +193,16 @@ def prepare_account(token, *, retry=False):
                 secret=SecretGenerator(SecretStrategy.random, SecretType.PASSWORD).get_secret(),
                 privileged=False, created_by=token.user.username,
             )
-            provisioning = AccountProvisioning.objects.create(
-                account=account, user=token.user, protocol=token.protocol,
-            )
-            _start(provisioning)
+            record = _start(account, token.user, token.protocol)
         else:
-            provisioning = AccountProvisioning.objects.select_for_update().filter(
-                account=account,
-            ).first()
-            if provisioning:
-                execution = provisioning.execution
-                if provisioning.status not in ('success', 'failed'):
-                    # Also reconcile worker termination via the existing
-                    # automation recovery process instead of assuming success.
-                    if not execution or execution.is_finished:
-                        verified = execution and execution.is_success and PushSecretRecord.objects.filter(
-                            execution=execution, account=account, status='success',
-                        ).exists()
-                        provisioning.status = 'success' if verified else 'failed'
-                        provisioning.save(update_fields=['status', 'date_updated'])
-                    elif execution.status == Status.pending and execution.date_created < (
-                        timezone.now() - timedelta(minutes=5)
-                    ):
-                        # A late broker delivery must not run alongside a retry.
-                        canceled = AutomationExecution.objects.filter(
-                            id=execution.id, status=Status.pending,
-                        ).update(status=Status.canceled, date_finished=timezone.now())
-                        if canceled:
-                            provisioning.status = 'failed'
-                            provisioning.save(update_fields=['status', 'date_updated'])
-                if retry and provisioning.status == 'failed':
-                    provisioning.user = token.user
-                    provisioning.protocol = token.protocol
-                    _start(provisioning)
+            record = get_preparation_record(account)
+            if record:
+                record = _cancel_stale_queued_record(record)
+                if retry and get_preparation_status(record) == 'failed':
+                    record = _start(account, token.user, token.protocol)
 
-        if provisioning and provisioning.status != 'success':
-            return _response(provisioning)
+        if record and get_preparation_status(record) != 'ready':
+            return _response(record)
 
         # Bind the previously virtual token to the managed account and its
         # verified credentials. Existing accounts are reused without a push.
