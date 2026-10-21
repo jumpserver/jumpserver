@@ -1,4 +1,6 @@
+import json
 import re
+import secrets
 
 import httpx
 import openai
@@ -190,6 +192,117 @@ class ChatAIModelsAPI(ChatAIProviderMixin, GenericAPIView):
 
 
 class ChatAITestingAPI(ChatAIProviderMixin, GenericAPIView):
+    tool_name = 'get_jumpserver_health_check_nonce'
+
+    @classmethod
+    def get_error_detail(cls, error):
+        detail = super().get_error_detail(error)
+        if isinstance(error, openai.APIStatusError) and error.status_code in (404, 405, 501):
+            return _(
+                '{detail} The provider must support the Responses API (/responses).'
+            ).format(detail=detail)
+        return detail
+
+    @staticmethod
+    def stream_response(client, model, inputs, tools):
+        output = {}
+        text_deltas = {}
+        argument_deltas = {}
+        completed = None
+        with client.responses.create(
+            model=model, input=inputs, tools=tools, stream=True, store=False,
+            include=['reasoning.encrypted_content'],
+        ) as stream:
+            content_type = stream.response.headers.get('content-type', '')
+            if content_type.split(';', 1)[0].strip().lower() != 'text/event-stream':
+                raise ValueError(_(
+                    'The provider did not return a Responses API event stream.'
+                ))
+
+            for event in stream:
+                if event.type == 'error':
+                    raise ValueError(_(
+                        'The Responses API stream failed: {detail}'
+                    ).format(detail=event.message))
+                if event.type in ('response.failed', 'response.incomplete'):
+                    error = getattr(event.response, 'error', None)
+                    incomplete = getattr(event.response, 'incomplete_details', None)
+                    detail = (
+                        getattr(error, 'message', None) or
+                        getattr(incomplete, 'reason', None) or event.type
+                    )
+                    raise ValueError(_(
+                        'The Responses API stream failed: {detail}'
+                    ).format(detail=detail))
+                if event.type == 'response.output_item.done':
+                    output[event.output_index] = event.item.model_dump(exclude_none=True)
+                elif event.type == 'response.output_text.delta':
+                    key = (event.output_index, event.content_index)
+                    text_deltas[key] = text_deltas.get(key, '') + event.delta
+                elif event.type == 'response.function_call_arguments.delta':
+                    key = event.output_index
+                    argument_deltas[key] = argument_deltas.get(key, '') + event.delta
+                elif event.type == 'response.completed':
+                    completed = event.response
+                    break
+
+        if (
+            completed is None or completed.status != 'completed' or
+            getattr(completed, 'error', None)
+        ):
+            raise ValueError(_(
+                'The Responses API stream ended without a successful completion event.'
+            ))
+
+        expected_text = {}
+        for index, item in output.items():
+            if item.get('status') not in (None, 'completed'):
+                raise ValueError(_(
+                    'The Responses API stream returned an incomplete output item.'
+                ))
+            if item['type'] == 'message':
+                for content_index, content in enumerate(item['content']):
+                    if content['type'] == 'output_text' and content['text']:
+                        expected_text[index, content_index] = content['text']
+
+        if expected_text != {key: value for key, value in text_deltas.items() if value}:
+            raise ValueError(_(
+                'The Responses API text stream is missing or does not match the final output.'
+            ))
+        for index, arguments in argument_deltas.items():
+            item = output.get(index, {})
+            if item.get('type') != 'function_call' or item.get('arguments') != arguments:
+                raise ValueError(_(
+                    'The Responses API tool argument stream does not match the final tool call.'
+                ))
+        return [output[index] for index in sorted(output)], ''.join(
+            expected_text[key] for key in sorted(expected_text)
+        )
+
+    @classmethod
+    def validate_tool_call(cls, output):
+        tool_calls = [item for item in output if item['type'] == 'function_call']
+        if not tool_calls:
+            raise ValueError(_(
+                'The provider is reachable, but the selected model '
+                'does not support the required tool calls'
+            ))
+        if len(tool_calls) == 1:
+            call = tool_calls[0]
+            try:
+                arguments = json.loads(call.get('arguments', ''))
+            except (TypeError, ValueError):
+                arguments = None
+            call_id = call.get('call_id')
+            if (
+                call.get('name') == cls.tool_name and
+                isinstance(call_id, str) and call_id.strip() and arguments == {}
+            ):
+                return call
+        raise ValueError(_(
+            'The Responses API returned an invalid health-check tool call '
+            '(name, call ID, or arguments).'
+        ))
 
     def post(self, request):
         config = self.get_config(request)
@@ -201,47 +314,49 @@ class ChatAITestingAPI(ChatAIProviderMixin, GenericAPIView):
 
         client = None
         try:
-            client = self.get_client(config)
-            response = client.chat.completions.create(
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': (
-                            'Call the provided tool to obtain the JumpServer '
-                            'health-check nonce. Do not answer without calling it.'
-                        ),
-                    }
-                ],
-                model=config['model'],
-                tools=[
-                    {
-                        'type': 'function',
-                        'function': {
-                            'name': 'get_jumpserver_health_check_nonce',
-                            'description': (
-                                'Return the private nonce required to complete '
-                                'the JumpServer model capability test.'
-                            ),
-                            'parameters': {
-                                'type': 'object',
-                                'properties': {},
-                                'additionalProperties': False,
-                            },
-                        },
-                    }
-                ],
-            )
-            tool_calls = response.choices[0].message.tool_calls
-            if not tool_calls:
-                return Response(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    data={
-                        'detail': _(
-                            'The provider is reachable, but the selected model '
-                            'does not support the required tool calls'
-                        )
-                    },
-                )
+            client = self.get_client(config).with_options(max_retries=0)
+            inputs = [{
+                'role': 'user',
+                'content': (
+                    'Call get_jumpserver_health_check_nonce exactly once with '
+                    'no arguments to obtain the JumpServer health-check nonce. '
+                    'Do not answer without calling it. After receiving the tool '
+                    'result, reply with only the exact value of result.nonce, '
+                    'without any other text, quotes, or formatting.'
+                ),
+            }]
+            tools = [{
+                'type': 'function',
+                'name': self.tool_name,
+                'description': (
+                    'Return the private nonce required to complete '
+                    'the JumpServer model capability test.'
+                ),
+                'parameters': {
+                    'type': 'object',
+                    'properties': {},
+                    'required': [],
+                    'additionalProperties': False,
+                },
+            }]
+            output, _text = self.stream_response(client, config['model'], inputs, tools)
+            call = self.validate_tool_call(output)
+
+            # Replay the complete output, including reasoning, as Kael/Codex does.
+            # Only the tool result contains the nonce, so an echo proves receipt.
+            nonce = secrets.token_hex(16)
+            inputs.extend(output)
+            inputs.append({
+                'type': 'function_call_output',
+                'call_id': call['call_id'],
+                'output': json.dumps({'status': 'success', 'result': {'nonce': nonce}}),
+            })
+            output, text = self.stream_response(client, config['model'], inputs, tools)
+            if any(item['type'] == 'function_call' for item in output) or text.strip() != nonce:
+                raise ValueError(_(
+                    'The model did not correctly return the health-check nonce '
+                    'after receiving the tool result.'
+                ))
         except Exception as error:
             return self.get_error_response(error)
         finally:
@@ -251,5 +366,8 @@ class ChatAITestingAPI(ChatAIProviderMixin, GenericAPIView):
         return Response({
             'msg': _('Test success'),
             'model': config['model'],
+            'responses': True,
             'tool_calls': True,
+            'streaming': True,
+            'tool_result': True,
         })

@@ -8643,6 +8643,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "Không tìm thấy điểm cuối của nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} Nhà cung cấp phải hỗ trợ Responses API (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "Nhà cung cấp không trả về luồng sự kiện Responses API."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Luồng Responses API không thành công: {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Luồng Responses API đã kết thúc mà không có sự kiện hoàn tất thành công."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Luồng Responses API trả về một mục đầu ra chưa hoàn tất."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Các đoạn văn bản trong luồng Responses API bị thiếu hoặc không khớp với đầu ra cuối cùng."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Luồng tham số công cụ của Responses API không khớp với lệnh gọi công cụ cuối cùng."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API trả về lệnh gọi công cụ kiểm tra tình trạng không hợp lệ (tên, ID lệnh gọi hoặc tham số)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "Mô hình không trả về đúng nonce kiểm tra tình trạng sau khi nhận được kết quả công cụ."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "Đã vượt quá giới hạn yêu cầu của nhà cung cấp mô hình. Vui lòng thử lại sau."
 

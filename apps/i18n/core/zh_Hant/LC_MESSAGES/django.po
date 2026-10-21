@@ -8403,6 +8403,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "找不到模型服務介面，請檢查服務位址。"
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} 模型服務商必須支援 Responses API（/responses）。"
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "模型服務商未返回 Responses API 事件流。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Responses API 串流回應失敗：{detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Responses API 串流已結束，但未收到成功完成事件。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Responses API 串流返回了未完成的輸出項。"
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Responses API 缺少文字串流增量，或增量與最終輸出不一致。"
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Responses API 的工具參數串流與最終工具呼叫不一致。"
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API 返回的健康檢查工具呼叫無效，請檢查工具名稱、呼叫 ID 或參數。"
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "模型收到工具結果後，未正確返回健康檢查隨機值。"
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "已超過模型服務商的請求頻率限制，請稍後重試。"
 

@@ -8636,6 +8636,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "The model provider endpoint was not found. Please check the Base URL."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} The provider must support the Responses API (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "The provider did not return a Responses API event stream."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "The Responses API stream failed: {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "The Responses API stream ended without a successful completion event."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "The Responses API stream returned an incomplete output item."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "The Responses API text stream is missing or does not match the final output."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "The Responses API tool argument stream does not match the final tool call."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "The model did not correctly return the health-check nonce after receiving the tool result."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "The model provider request limit was exceeded. Please try again later."
 

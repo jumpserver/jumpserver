@@ -8568,6 +8568,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "모델 공급자의 엔드포인트를 찾을 수 없습니다. 기본 URL을 확인하세요."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} 공급자는 Responses API(/responses)를 지원해야 합니다."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "공급자가 Responses API 이벤트 스트림을 반환하지 않았습니다."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Responses API 스트리밍 응답에 실패했습니다: {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "성공적인 완료 이벤트 없이 Responses API 스트림이 종료되었습니다."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Responses API 스트림이 완료되지 않은 출력 항목을 반환했습니다."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Responses API 텍스트 스트림의 증분 데이터가 없거나 최종 출력과 일치하지 않습니다."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Responses API 도구 인수 스트림이 최종 도구 호출과 일치하지 않습니다."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API가 유효하지 않은 상태 확인 도구 호출을 반환했습니다(이름, 호출 ID 또는 인수)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "모델이 도구 결과를 받은 후 상태 확인 nonce를 올바르게 반환하지 않았습니다."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "모델 공급자의 요청 한도를 초과했습니다. 나중에 다시 시도하세요."
 

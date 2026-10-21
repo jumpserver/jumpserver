@@ -8709,6 +8709,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "Конечная точка поставщика моделей не найдена. Проверьте базовый URL."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} Поставщик должен поддерживать Responses API (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "Поставщик не вернул поток событий Responses API."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Ошибка потока Responses API: {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Поток Responses API завершился без события успешного завершения."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Поток Responses API вернул незавершённый элемент вывода."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Фрагменты текстового потока Responses API отсутствуют или не соответствуют итоговому выводу."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Поток аргументов инструмента Responses API не соответствует итоговому вызову инструмента."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API вернул некорректный вызов инструмента проверки работоспособности (имя, ID вызова или аргументы)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "Модель не вернула правильный nonce проверки работоспособности после получения результата инструмента."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "Превышен лимит запросов поставщика моделей. Повторите попытку позже."
 
