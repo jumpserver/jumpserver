@@ -126,8 +126,6 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         include_assets = self.request.query_params.get('assets', '0') == '1'
         if not self.instance or not include_assets:
             return Asset.objects.none()
-        if not self.request.GET.get('search') and self.instance.is_org_root():
-            return Asset.objects.none()
         if query_all:
             assets = self.instance.get_all_assets()
         else:
@@ -142,6 +140,9 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         if search:
             q = Q(name__icontains=search) | Q(address__icontains=search)
             assets = assets.filter(q)
+        if self.instance and self.instance.is_org_root():
+            # 根节点资产在查询阶段限量，搜索过滤后再截取。
+            assets = assets.order_by('name', 'id')[:1000]
         return assets
 
     def list(self, request, *args, **kwargs):
