@@ -1,6 +1,7 @@
 # SSH Ansible executor
 
-Core 支持 `native`、`docker` 和 `ssh` 三种执行方式。SSH 后端复用现有
+Core 复用原 `ANSIBLE_DOCKER_ENABLED` 隔离开关：开启时使用常驻 SSH 执行器，
+关闭时在当前 Core/Celery 进程所在环境执行。SSH 后端复用现有
 AdHocRunner、PlaybookRunner、SuperPlaybookRunner、UploadFileRunner 和回调；
 Celery 将任务目录传给常驻的 OpenSSH 执行容器，任务以独立 UID 运行。
 Core/Celery 不需要 Docker socket，也不会调用本地 bwrap。SDK 源码和服务端在
@@ -16,7 +17,7 @@ Core/Celery 不需要 Docker socket，也不会调用本地 bwrap。SDK 源码�
 执行容器所在 Linux 内核及 seccomp 策略需要允许 `pidfd_open` 和
 `pidfd_send_signal`；不支持时服务端会拒绝创建会话。sshd 需要容器内 root，
 无需 privileged、SYS_ADMIN 或宿主机 PID namespace。
-将公钥挂载给 executor，只将私钥及可信取得的服务器 host key 挂载给 Celery。
+将公钥挂载给 executor，只将私钥及可信取得的服务器 host key 挂载给 Core/Celery。
 私钥不要放进任务目录、Playbook 或环境变量。`known_hosts` 中必须使用实际连接
 地址；非 22 端口的格式是 `[ansible-executor]:2222 ssh-ed25519 ...`。
 资产地址也必须能从执行容器访问；`127.0.0.1` 指向执行容器本身。
@@ -25,18 +26,22 @@ Docker Desktop 本地测试可使用 `host.docker.internal` 访问宿主机映�
 在 Core/Celery 的 `config.yml` 中配置，并重启相关进程：
 
 ```yaml
-ANSIBLE_EXECUTION_BACKEND: ssh
+ANSIBLE_DOCKER_ENABLED: true
 ANSIBLE_EXECUTOR_HOST: ansible-executor
 ANSIBLE_EXECUTOR_PORT: 2222
 ANSIBLE_EXECUTOR_PRIVATE_KEY: /run/secrets/executor_client
 ANSIBLE_EXECUTOR_KNOWN_HOSTS: /run/secrets/executor_known_hosts
 ANSIBLE_EXECUTOR_CONNECT_TIMEOUT: 10
-# 使用 Core 上的网域 SSH 隧道时，必须填执行容器可访问的 Celery 地址。
+# 使用网域 SSH 隧道时，必须填执行容器可访问的当前 Core/Celery 节点地址。
 # ANSIBLE_EXECUTOR_GATEWAY_HOST: celery-ansible
 ```
 
-`ANSIBLE_EXECUTION_BACKEND` 留空时继续按原 `ANSIBLE_DOCKER_ENABLED` 设置运行。
-显式配置 `ssh` 优先于该旧设置。设置 `native` 或 `docker` 可直接切回原执行方式。
+系统设置 > 功能设置 > 作业中心的「Ansible Docker 隔离」沿用原字段和已保存的值，
+无需迁移。开启使用 `jumpserver/ansible-executor-ssh:latest` 常驻容器；关闭后本地执行，
+不再获得执行容器的 UID 和文件隔离。执行器连接失败会报错，不自动降级到本地。
+实验性配置 `ANSIBLE_EXECUTION_BACKEND` 已移除，不再覆盖这个开关。
+旧 `jumpserver/ansible-executor` 逐任务 Docker 执行方式已停用，不能只替换旧镜像的标签；
+需按上文部署常驻 SSH 服务。旧镜像构建文件仅保留为历史参考，不再自动构建发布。
 部署这个后端时还需更新 Python 依赖（`uv sync --frozen`）。
 
 任务通过 Runner transmit/worker 流协议传输，不使用 SFTP。上传文件、生成的

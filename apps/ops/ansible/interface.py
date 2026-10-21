@@ -1,10 +1,7 @@
-from socket import gethostbyname, gethostname
-
 from django.conf import settings
 from django.utils.functional import LazyObject
 
 from ops.ansible import AnsibleNativeRunner
-from ops.ansible.docker import use_ansible_docker_isolation
 from ops.ansible.runners.base import BaseRunner
 from ops.ansible.execution import use_ansible_ssh_executor
 from ops.ansible.runners.ssh import AnsibleSSHRunner, cancel_ssh_job
@@ -39,8 +36,6 @@ class RunnerInterface:
             if not host or host in ('127.0.0.1', 'localhost', '::1'):
                 raise ValueError('ANSIBLE_EXECUTOR_GATEWAY_HOST must be reachable from the executor')
             return host
-        if use_ansible_docker_isolation() and self._gateway_proxy_host == '127.0.0.1':
-            return gethostbyname(gethostname())
         return self._gateway_proxy_host
 
     def get_runner_type(self):

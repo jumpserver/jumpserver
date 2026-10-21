@@ -660,8 +660,6 @@ class Config(dict):
         ],
         'SECURITY_COMMAND_EXECUTION': False,
         'ANSIBLE_DOCKER_ENABLED': True,
-        # Empty preserves the existing Docker feature setting.
-        'ANSIBLE_EXECUTION_BACKEND': '',
         'ANSIBLE_EXECUTOR_HOST': '',
         'ANSIBLE_EXECUTOR_PORT': 2222,
         'ANSIBLE_EXECUTOR_PRIVATE_KEY': '',

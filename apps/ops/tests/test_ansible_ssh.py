@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -12,7 +13,7 @@ from django.conf import settings
 from django.test import SimpleTestCase, override_settings
 
 from ops.ansible.docker import (
-    docker_extravars, prepare_isolated_ansible_runtime, use_ansible_docker_isolation,
+    ANSIBLE_EE_IMAGE, docker_extravars, prepare_isolated_ansible_runtime,
 )
 from ops.ansible.execution import get_ansible_execution_backend
 from ops.ansible.interface import RunnerInterface
@@ -21,17 +22,25 @@ from ops.ansible.runners.ssh import AnsibleSSHRunner, cancel_ssh_job, localize_e
 from ops.ansible.runner import AdHocRunner, PlaybookRunner, UploadFileRunner
 
 
-@override_settings(DEBUG_DEV=False)
+@override_settings(ANSIBLE_DOCKER_ENABLED=True, DEBUG_DEV=False)
 class SSHBackendTest(SimpleTestCase):
-    @override_settings(ANSIBLE_EXECUTION_BACKEND='', ANSIBLE_DOCKER_ENABLED=True)
-    def test_existing_docker_setting_remains_the_default(self):
-        self.assertEqual(get_ansible_execution_backend(), 'docker')
+    def test_existing_isolation_setting_selects_ssh_or_native_dynamically(self):
+        interface = RunnerInterface(AnsibleNativeRunner)
+        self.assertEqual(get_ansible_execution_backend(), 'ssh')
+        self.assertIs(interface.get_runner_type(), AnsibleSSHRunner)
         with override_settings(ANSIBLE_DOCKER_ENABLED=False):
             self.assertEqual(get_ansible_execution_backend(), 'native')
+            self.assertIs(interface.get_runner_type(), AnsibleNativeRunner)
+            self.assertEqual(interface.get_gateway_proxy_host(), '127.0.0.1')
+            self.assertEqual(docker_extravars({}), {})
+        self.assertIs(interface.get_runner_type(), AnsibleSSHRunner)
 
-    @override_settings(ANSIBLE_EXECUTION_BACKEND='ssh', ANSIBLE_DOCKER_ENABLED=True)
-    def test_ssh_overrides_docker_and_stages_current_runtime(self):
-        self.assertFalse(use_ansible_docker_isolation())
+    def test_isolation_uses_current_runtime_and_persistent_image(self):
+        from settings.serializers.feature import OpsSettingSerializer
+        self.assertEqual(ANSIBLE_EE_IMAGE, 'jumpserver/ansible-executor-ssh:latest')
+        help_text = str(OpsSettingSerializer().fields['ANSIBLE_DOCKER_ENABLED'].help_text)
+        self.assertIn(ANSIBLE_EE_IMAGE, help_text)
+        self.assertNotIn('docker pull', help_text)
         self.assertIs(RunnerInterface(AnsibleNativeRunner).get_runner_type(), AnsibleSSHRunner)
         self.assertEqual(docker_extravars({})['local_python_interpreter'], '/usr/bin/python3')
         with TemporaryDirectory() as root:
@@ -39,12 +48,22 @@ class SSHBackendTest(SimpleTestCase):
             self.assertTrue(Path(env['ANSIBLE_CONFIG']).is_file())
             self.assertTrue((Path(env['PYTHONPATH']) / 'libs/ansible/modules').is_dir())
 
-    @override_settings(ANSIBLE_EXECUTION_BACKEND='invalid')
-    def test_invalid_backend_fails_closed(self):
-        with self.assertRaises(ValueError):
-            get_ansible_execution_backend()
+    def test_retired_backend_option_does_not_override_isolation_setting(self):
+        for backend in ('ssh', 'docker', 'native'):
+            with self.subTest(backend=backend), override_settings(ANSIBLE_EXECUTION_BACKEND=backend):
+                self.assertEqual(get_ansible_execution_backend(), 'ssh')
+                with override_settings(ANSIBLE_DOCKER_ENABLED=False):
+                    self.assertEqual(get_ansible_execution_backend(), 'native')
 
-    @override_settings(ANSIBLE_EXECUTION_BACKEND='ssh', ANSIBLE_EXECUTOR_GATEWAY_HOST='')
+    def test_executor_failure_never_falls_back_to_local_execution(self):
+        with TemporaryDirectory() as root, \
+                patch('jms_ansible_executor.client.run', side_effect=ConnectionError), \
+                patch.object(AnsibleNativeRunner, 'run') as native:
+            with self.assertRaises(ConnectionError):
+                RunnerInterface(AnsibleNativeRunner).run(private_data_dir=root)
+            native.assert_not_called()
+
+    @override_settings(ANSIBLE_EXECUTOR_GATEWAY_HOST='')
     def test_gateway_requires_an_address_reachable_from_executor(self):
         interface = RunnerInterface(AnsibleNativeRunner)
         with self.assertRaises(ValueError):
@@ -53,7 +72,7 @@ class SSHBackendTest(SimpleTestCase):
             self.assertEqual(interface.get_gateway_proxy_host(), 'core.internal')
 
     @override_settings(
-        ANSIBLE_EXECUTION_BACKEND='ssh', ANSIBLE_EXECUTOR_HOST='executor',
+        ANSIBLE_EXECUTOR_HOST='executor',
         ANSIBLE_EXECUTOR_PORT=2222, ANSIBLE_EXECUTOR_PRIVATE_KEY='/service/key',
         ANSIBLE_EXECUTOR_KNOWN_HOSTS='/service/known_hosts',
         ANSIBLE_EXECUTOR_CONNECT_TIMEOUT=10, ANSIBLE_RUNNER_JOB_TIMEOUT=1800,
@@ -145,7 +164,7 @@ class SSHBackendTest(SimpleTestCase):
 
 
 @unittest.skipUnless(os.environ.get('JMS_EXECUTOR_TEST_HOST'), 'Requires a disposable SSH executor')
-@override_settings(ANSIBLE_EXECUTION_BACKEND='ssh', DEBUG_ANSIBLE=False, DEBUG_DEV=False)
+@override_settings(ANSIBLE_DOCKER_ENABLED=True, DEBUG_ANSIBLE=False, DEBUG_DEV=False)
 class SSHRunnerIntegrationTest(SimpleTestCase):
     def setUp(self):
         self.config = override_settings(
@@ -176,6 +195,28 @@ class SSHRunnerIntegrationTest(SimpleTestCase):
         self.assertTrue(callback.is_success(), callback.result)
         self.assertTrue(callback.result['ok']['executor_test'])
         self.assertFalse((self.private / 'local.pid').exists())
+
+    def test_isolation_toggle_changes_where_the_next_task_runs(self):
+        for index, enabled in enumerate((True, False, True)):
+            with self.subTest(enabled=enabled), override_settings(ANSIBLE_DOCKER_ENABLED=enabled):
+                directory = self.root / str(index)
+                directory.mkdir()
+                inventory = directory / 'inventory.json'
+                inventory.write_text(json.dumps({'all': {'hosts': {'executor_test': {
+                    'ansible_connection': 'local',
+                    'ansible_python_interpreter': '/usr/bin/python3' if enabled else sys.executable,
+                }}}}))
+                runner = AdHocRunner(str(inventory), 'shell', 'command', 'id -u',
+                                    project_dir=str(directory))
+                runner.envs['ANSIBLE_SUPER_MODE'] = '1'
+                callback = runner.run(quiet=True)
+                self.assertTrue(callback.is_success(), callback.result)
+                result = next(iter(callback.result['ok']['executor_test'].values()))
+                uid = int(result['stdout'])
+                if enabled:
+                    self.assertGreaterEqual(uid, 100001)
+                else:
+                    self.assertEqual(uid, os.getuid())
 
     def test_current_playbook_runner_custom_module_and_failed_status(self):
         source = self.root / 'source'

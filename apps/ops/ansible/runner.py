@@ -13,11 +13,8 @@ from ..utils import get_ansible_log_verbosity
 from .callback import DefaultCallback
 from .docker import (
     docker_extravars,
-    docker_isolation_kwargs,
-    ensure_ansible_docker_image,
     prepare_isolated_ansible_runtime,
     stage_inventory_for_docker,
-    use_ansible_docker_isolation,
 )
 from .exception import CommandInBlackListException
 from .interface import interface
@@ -98,9 +95,6 @@ class AdHocRunner:
             'status_handler': self.cb.status_handler,
             **kwargs,
         }
-        if use_ansible_docker_isolation():
-            run_kwargs.update(docker_isolation_kwargs(self.project_dir))
-            ensure_ansible_docker_image()
         interface.run(**run_kwargs)
         return self.cb
 
@@ -168,10 +162,7 @@ class PlaybookRunner:
         inventory = stage_inventory_for_docker(self.project_dir, self.inventory)
 
         kwargs = dict(kwargs)
-        if use_ansible_docker_isolation():
-            kwargs.update(docker_isolation_kwargs(self.project_dir))
-            ensure_ansible_docker_image()
-        elif self.isolate and not is_macos() and not use_ansible_ssh_executor():
+        if self.isolate and not is_macos() and not use_ansible_ssh_executor():
             kwargs['process_isolation'] = True
             kwargs['process_isolation_executable'] = 'bwrap'
 
@@ -183,7 +174,6 @@ class PlaybookRunner:
                 verbosity=verbosity,
                 event_handler=self.cb.event_handler,
                 status_handler=self.cb.status_handler,
-                # Docker EE workdir must be the staged playbook dir (not private_data_dir root).
                 host_cwd=self.playbook_project_dir,
                 envvars=self.envs,
                 extravars=docker_extravars(self.extra_vars),
@@ -224,7 +214,7 @@ class UploadFileRunner:
         self.dest_path = safe_join("/tmp", neutralize_jinja2_syntax(dest_path or ''))
 
     def stage_upload_files(self):
-        """Copy uploads into private_data_dir so Docker EE can read src for copy."""
+        """Keep upload sources inside the task directory sent to the executor."""
         if not os.path.isdir(self.share_src_dir):
             raise FileNotFoundError(f'Upload source directory not found: {self.share_src_dir}')
         staged_dir = os.path.join(self.project_dir, self.UPLOAD_STAGING_DIR)
@@ -252,13 +242,9 @@ class UploadFileRunner:
             'verbosity': verbosity,
             'event_handler': self.cb.event_handler,
             'status_handler': self.cb.status_handler,
-            'container_workdir': self.project_dir,
             'envvars': self.envs,
             **kwargs,
         }
-        if use_ansible_docker_isolation():
-            run_kwargs.update(docker_isolation_kwargs(self.project_dir))
-            ensure_ansible_docker_image()
         interface.run(**run_kwargs)
         try:
             shutil.rmtree(self.share_src_dir)
