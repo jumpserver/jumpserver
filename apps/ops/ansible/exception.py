@@ -1,9 +1,5 @@
-__all__ = ['CommandInBlackListException', 'AnsibleDockerImageNotFound']
+__all__ = ['CommandInBlackListException']
 
 
 class CommandInBlackListException(Exception):
-    pass
-
-
-class AnsibleDockerImageNotFound(Exception):
     pass

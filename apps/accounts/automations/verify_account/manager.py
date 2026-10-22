@@ -67,7 +67,7 @@ class PersonalCredentialAccount:
         return None
 
     @staticmethod
-    def get_ansible_become_auth():
+    def get_ansible_become_auth(path_dir=None):
         return {'ansible_become': False}
 
     def get_private_key_path(self, path):
@@ -325,7 +325,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 'secret_type': account.secret_type,
                 'secret': escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,
-                'become': account.get_ansible_become_auth(),
+                'become': account.get_ansible_become_auth(path_dir=path_dir),
             }
             if account.platform.type == 'oracle':
                 use_sysdba = (

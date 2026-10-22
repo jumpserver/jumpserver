@@ -660,6 +660,12 @@ class Config(dict):
         ],
         'SECURITY_COMMAND_EXECUTION': False,
         'ANSIBLE_DOCKER_ENABLED': True,
+        'ANSIBLE_EXECUTOR_HOST': 'ansible-executor',
+        'ANSIBLE_EXECUTOR_PORT': 2222,
+        'ANSIBLE_EXECUTOR_PRIVATE_KEY': '/run/jms-executor/client',
+        'ANSIBLE_EXECUTOR_KNOWN_HOSTS': '/run/jms-executor/known_hosts',
+        'ANSIBLE_EXECUTOR_CONNECT_TIMEOUT': 10,
+        'ANSIBLE_EXECUTOR_GATEWAY_HOST': '',
         'SECURITY_COMMAND_BLACKLIST': [
             'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
         ],

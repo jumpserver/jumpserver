@@ -517,6 +517,8 @@ class JobExecution(JMSOrgBaseModel):
     def set_result(self, cb):
         status_mapper = {
             'successful': JobStatus.success,
+            # stop() records user cancellation as a terminal failure.
+            'canceled': JobStatus.failed,
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
@@ -703,6 +705,25 @@ class JobExecution(JMSOrgBaseModel):
 
     def stop(self):
         from ops.signal_handlers import job_execution_stop_pub_sub
+        remote_path = os.path.join(self.private_dir, 'remote.json')
+        try:
+            with open(remote_path) as stream:
+                remote = json.load(stream)
+        except FileNotFoundError:
+            remote = {}
+        if remote.get('backend') == 'ssh':
+            job_id = str(uuid.UUID(remote['job_id']))
+            # Pub/sub listeners may live in Celery's parent process. Persist the
+            # request in the shared task directory so prefork workers see it too.
+            try:
+                cancel_path = os.path.join(self.private_dir, f'cancel-{job_id}')
+                fd = os.open(cancel_path, os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+                os.close(fd)
+            except FileNotFoundError:
+                pass  # The runner has already finished and cleaned its directory.
+            job_execution_stop_pub_sub.publish(remote)
+            self.set_error('Job stop by "user cancel"')
+            return
         pid_path = os.path.join(self.private_dir, "local.pid")
         if os.path.exists(pid_path):
             with open(pid_path) as f:

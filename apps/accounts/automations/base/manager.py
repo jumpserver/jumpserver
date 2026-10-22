@@ -292,7 +292,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             new_secret = self.generate_public_key(new_secret)
         return new_secret, private_key_path
 
-    def gen_inventory(self, h, account, new_secret, private_key_path, asset):
+    def gen_inventory(self, h, account, new_secret, private_key_path, asset, path_dir):
         secret_type = account.secret_type
         h['ssh_params'].update(self.get_ssh_params(new_secret, secret_type))
         h['account'] = {
@@ -302,7 +302,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             'secret_type': secret_type,
             'secret': escape_jinja2_syntax(new_secret),
             'private_key_path': private_key_path,
-            'become': account.get_ansible_become_auth(),
+            'become': account.get_ansible_become_auth(path_dir=path_dir),
         }
         if asset.platform.type == 'oracle':
             use_sysdba = (
