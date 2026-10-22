@@ -1,12 +1,23 @@
-from django.db.models import QuerySet
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
+from rest_framework.exceptions import ValidationError
 
 from common.drf.filters import BaseFilterSet
 from orgs.utils import filter_org_queryset
-from terminal.const import RiskLevelChoices
+from terminal.const import CommandSourceChoices, RiskLevelChoices
 from terminal.models import Command, CommandStorage, Session
+
+
+class CommandSourceFilter(filters.TypedChoiceFilter):
+    def filter_lookup(self, queryset, negate=False, **kwargs):
+        try:
+            value = self.field.clean(kwargs['source'])
+        except DjangoValidationError as exc:
+            raise ValidationError({'source': exc.messages}) from exc
+        return CommandFilter.filter_source(queryset, 'source', value, negate=negate)
 
 
 class CommandFilter(BaseFilterSet):
@@ -51,12 +62,16 @@ class CommandFilter(BaseFilterSet):
         method='filter_exact', choices=RiskLevelChoices.choices,
         label=_('Risk level')
     )
+    source = CommandSourceFilter(
+        method='filter_source', choices=CommandSourceChoices.choices,
+        coerce=int, label=_('Source'),
+    )
 
     class Meta:
         model = Command
         fields = [
             'id', 'user', 'asset', 'asset_id', 'account', 'input',
-            'risk_level', 'session',
+            'risk_level', 'session', 'source',
         ]
         fields_operator = {
             'id': ('exact',),
@@ -66,7 +81,19 @@ class CommandFilter(BaseFilterSet):
             'account': ('exact',),
             'input': ('icontains',),
             'session': ('exact',),
+            'source': ('exact',),
         }
+
+    @staticmethod
+    def filter_source(queryset, name, value, negate=False):
+        source = CommandSourceChoices.from_value(value)
+        if getattr(queryset, 'custom', False):
+            lookup = 'source__not' if negate else 'source'
+            return queryset.filter(Q(**{lookup: source}))
+        condition = Q(source=source)
+        if source == CommandSourceChoices.manual:
+            condition |= Q(source__isnull=True)
+        return queryset.exclude(condition) if negate else queryset.filter(condition)
 
     @staticmethod
     def filter_exact(queryset, name, value):

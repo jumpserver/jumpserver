@@ -197,6 +197,9 @@ class LookupFilterBackend(drf_filters.DjangoFilterBackend):
         should_exclude = bool(
             getattr(filter_field, "exclude", False)
         ) ^ negate
+        filter_lookup = getattr(filter_field, "filter_lookup", None)
+        if filter_lookup is not None:
+            return filter_lookup(queryset, negate=should_exclude, **kwargs)
         if should_exclude:
             return queryset.exclude(**kwargs)
         return queryset.filter(**kwargs)

@@ -6,6 +6,7 @@ import pytz
 
 from common.plugins.es import ES
 from common.utils import get_logger
+from terminal.const import CommandSourceChoices
 
 logger = get_logger(__file__)
 
@@ -13,6 +14,9 @@ logger = get_logger(__file__)
 class CommandStore(ES):
     def __init__(self, config):
         properties = {
+            "source": {
+                "type": "short"
+            },
             "session": {
                 "type": "keyword"
             },
@@ -42,8 +46,44 @@ class CommandStore(ES):
             session=command["session"], timestamp=command["timestamp"],
             org_id=command["org_id"]
         )
+        data['source'] = CommandSourceChoices.from_value(command.get('source'))
         data["date"] = datetime.fromtimestamp(command['timestamp'], tz=pytz.UTC)
         return data
+
+    def get_query_body(self, **kwargs):
+        source_lookups = {'source': False, 'source__exact': False, 'source__not': True}
+        source_conditions = [
+            (kwargs.pop(name), negate)
+            for name, negate in source_lookups.items() if name in kwargs
+        ]
+        search = []
+        for query in kwargs.pop('search', []):
+            query = query.copy()
+            for name, negate in source_lookups.items():
+                if name in query:
+                    source_conditions.append((query.pop(name), negate))
+            if query:
+                search.append(query)
+        body = super().get_query_body(search=search, **kwargs)
+        for value, negate in source_conditions:
+            if value is None or value == '':
+                continue
+            value = CommandSourceChoices.from_value(value)
+            condition = {'term': {'source': value}}
+            if value == CommandSourceChoices.manual:
+                condition = {
+                    'bool': {
+                        'should': [
+                            {'term': {'source': CommandSourceChoices.manual}},
+                            {'bool': {'must_not': [{'exists': {'field': 'source'}}]}},
+                        ],
+                        'minimum_should_match': 1,
+                    },
+                }
+            if negate:
+                condition = {'bool': {'must_not': [condition]}}
+            body['query']['bool']['filter'].append(condition)
+        return body
 
     @staticmethod
     def handler_time_field(data):

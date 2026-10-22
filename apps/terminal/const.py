@@ -23,6 +23,15 @@ class RiskLevelChoices(IntegerChoices):
         return label
 
 
+class CommandSourceChoices(IntegerChoices):
+    manual = 0, _('Manual execution')
+    ai = 1, _('AI Assistant')
+
+    @classmethod
+    def from_value(cls, value):
+        return cls.manual if value is None else cls(value)
+
+
 class ReplayStorageType(TextChoices):
     null = 'null', 'Null',
     server = 'server', 'Server'

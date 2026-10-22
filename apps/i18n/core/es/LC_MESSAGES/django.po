@@ -16731,3 +16731,11 @@ msgstr "Asunto del correo"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Mensaje del correo"
+
+#: terminal/const.py
+msgid "Manual execution"
+msgstr "Ejecución manual"
+
+#: terminal/const.py
+msgid "AI Assistant"
+msgstr "Asistente de IA"

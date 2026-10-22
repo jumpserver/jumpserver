@@ -16121,3 +16121,11 @@ msgstr "登录失败次数已达到上限，登录已被临时锁定。"
 #: authentication/templates/authentication/_msg_login_blocked.html
 msgid "Please review the login logs and check for suspicious activity."
 msgstr "请查看登录日志，排查是否存在可疑活动。"
+
+#: terminal/const.py
+msgid "Manual execution"
+msgstr "手动执行"
+
+#: terminal/const.py
+msgid "AI Assistant"
+msgstr "AI 助手"

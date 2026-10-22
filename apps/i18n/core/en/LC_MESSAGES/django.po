@@ -16508,3 +16508,11 @@ msgstr "Subject of the mail"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Message of the email"
+
+#: terminal/const.py
+msgid "Manual execution"
+msgstr "Manual execution"
+
+#: terminal/const.py
+msgid "AI Assistant"
+msgstr "AI Assistant"

@@ -16386,3 +16386,11 @@ msgstr "이메일 제목"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "이메일 본문"
+
+#: terminal/const.py
+msgid "Manual execution"
+msgstr "수동 실행"
+
+#: terminal/const.py
+msgid "AI Assistant"
+msgstr "AI 어시스턴트"

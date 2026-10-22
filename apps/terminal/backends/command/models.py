@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.utils.common import lazyproperty
 from orgs.mixins.models import OrgModelMixin
-from terminal.const import RiskLevelChoices
+from terminal.const import CommandSourceChoices, RiskLevelChoices
 
 
 class AbstractSessionCommand(OrgModelMixin):
@@ -19,6 +19,10 @@ class AbstractSessionCommand(OrgModelMixin):
     input = models.CharField(max_length=128, db_index=True, verbose_name=_("Input"))
     output = models.CharField(max_length=1024, blank=True, verbose_name=_("Output"))
     session = models.CharField(max_length=36, db_index=True, verbose_name=_("Session"))
+    source = models.SmallIntegerField(
+        choices=CommandSourceChoices.choices,
+        null=True, blank=True, verbose_name=_("Source"),
+    )
     risk_level = models.SmallIntegerField(
         default=RiskLevelChoices.accept, choices=RiskLevelChoices.choices, db_index=True,
         verbose_name=_("Action")
