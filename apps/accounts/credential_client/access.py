@@ -14,7 +14,7 @@ from .events import enqueue
 def publish_application_scope(application):
     enqueue(
         record(AuditEvent.CONFIGURATION_UPDATED, application=application),
-        ApplicationEvent.CONFIGURATION_UPDATED,
+        ApplicationEvent.APPLICATION_SCOPE_UPDATED,
     )
 
 
@@ -70,9 +70,32 @@ def materials(application, params, endpoint):
         },
         'rules': [],
     }
-    if settings['systemd_unit']:
+    setup = params.get('agent_setup', 'delivery')
+    if setup != 'delivery':
+        rule = {
+            'accounts': [{
+                'account_id': str(params['account_id']),
+                **({'allow_account_switch': True} if setup == 'rotation' else {}),
+            }],
+            'config_update': {
+                'file': params['config_file'], 'format': params['config_format'],
+                'fields_map': {params['username_field']: 'username', params['secret_field']: 'secret'},
+            },
+        }
+        if params['service_action_type'] == 'systemd':
+            rule['service_action'] = {
+                'unit': params['systemd_unit'], 'operation': params['systemd_action'],
+            }
+        elif params['service_action_type'] == 'script':
+            rule['service_action'] = {'path': params['service_script']}
+        if params['application_check']:
+            rule['application_check'] = {
+                'path': params['application_check'], 'confirm_on_success': True,
+            }
+        bootstrap['rules'] = [rule]
+    if setup == 'delivery' and settings['systemd_unit']:
         bootstrap['delivery']['systemd_unit'] = settings['systemd_unit']
-    if settings['systemd_action']:
+    if setup == 'delivery' and settings['systemd_action']:
         bootstrap['delivery']['systemd_action'] = settings['systemd_action']
     filename = 'jms_pam_agent.json'
     preparation = 'sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
@@ -82,7 +105,7 @@ def materials(application, params, endpoint):
         f'--bootstrap {filename} --instance-id "$(hostname)"'
     )
     foreground_unix = foreground_windows = ''
-    if settings['delivery_mode'] != 'environment':
+    if setup == 'delivery' and settings['delivery_mode'] != 'environment':
         short_id = str(application.id).replace('-', '')[:12]
         directory = f'$HOME/.jms-pam-agent/{short_id}'
         foreground_unix = (

@@ -27,7 +27,7 @@ TRACKED_NON_ROTATION_EVENTS = {
     ApplicationEvent.CREDENTIAL_CHANGE_FAILED,
     ApplicationEvent.CREDENTIAL_UPDATED,
     ApplicationEvent.CREDENTIAL_REVOKED,
-    ApplicationEvent.CONFIGURATION_UPDATED,
+    ApplicationEvent.APPLICATION_SCOPE_UPDATED,
 }
 
 

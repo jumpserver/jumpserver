@@ -200,9 +200,9 @@ def notify_model_change(instance, event, changes):
         ):
             enqueue(event, ApplicationEvent.ROTATION_FAILED, rotation=rotation)
     elif isinstance(instance, ApplicationCredential) and any(change['field'] == 'is_active' for change in changes):
-        enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED if instance.is_active else ApplicationEvent.CREDENTIAL_REVOKED)
+        enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED if instance.is_active else ApplicationEvent.CREDENTIAL_REVOKED)
     elif isinstance(instance, IntegrationApplication) and any(change['field'] == 'accounts' for change in changes):
-        enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED)
+        enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         notify_revoked_credentials(instance)
 
 

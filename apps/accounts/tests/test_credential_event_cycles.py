@@ -95,7 +95,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         self.subscription()
         change = self.change()
         global_event = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
-        enqueue(global_event, ApplicationEvent.CONFIGURATION_UPDATED)
+        enqueue(global_event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         other = ApplicationCredential.objects.create(name='Other subscription', mode='subscription')
         CredentialApplicationBinding.objects.create(credential=other, application=self.application)
         foreign = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=other)

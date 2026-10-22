@@ -31,7 +31,7 @@ class CredentialSDKReceiptTests(TestCase):
 
     def test_business_events_are_acknowledged_before_yield(self):
         for code in (
-            'credential.updated', 'credential.revoked', 'configuration.updated',
+            'credential.updated', 'credential.revoked', 'application.scope.updated',
             'credential.change.started', 'credential.change.completed', 'credential.change.failed',
             'rotation.started', 'rotation.waiting_for_application', 'rotation.completed',
         ):

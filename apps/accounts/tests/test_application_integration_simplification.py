@@ -1,0 +1,134 @@
+import json
+from uuid import uuid4
+
+from accounts.api.account.credential import ApplicationCredentialViewSet
+from accounts.credential_client.access import materials
+from accounts.credential_client.manager import CredentialClientManager
+from accounts.models import ApplicationCredential, IntegrationApplication
+from accounts.serializers.account.credential import (
+    ApplicationCredentialSerializer, CredentialAccessWizardSerializer,
+)
+from accounts.tests.base import CredentialTestCase
+
+
+class ApplicationIntegrationSimplificationTests(CredentialTestCase):
+    def subscription(self, **overrides):
+        serializer = ApplicationCredentialSerializer(data={
+            'name': 'All application accounts', 'mode': 'subscription',
+            'applications': [str(self.application.id)],
+            'subscription_all_authorized': True, **overrides,
+        })
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()
+
+    def wizard(self, **overrides):
+        serializer = CredentialAccessWizardSerializer(data={
+            'type': 'agent', 'app_user': 'orders', 'agent_setup': 'config_update',
+            'account_id': str(self.primary.id), 'config_file': '/etc/orders/config.yml',
+            'systemd_unit': 'orders.service', **overrides,
+        }, context={'application': self.application})
+        serializer.is_valid(raise_exception=True)
+        return json.loads(materials(self.application, serializer.validated_data, 'https://example.com')['config'])
+
+    def test_all_accounts_resolves_each_application_authorization_independently(self):
+        second = IntegrationApplication.objects.create(
+            name='another-app', accounts={'type': 'ids', 'ids': [str(self.backup.id)]},
+        )
+        policy = self.subscription(applications=[str(self.application.id), str(second.id)])
+        self.assertTrue(policy.subscription_all_authorized)
+        self.assertFalse(policy.subscription_accounts.exists())
+        self.assertEqual(CredentialClientManager.credential_keys(second), [f'account:{self.backup.id}'])
+        self.assertEqual(set(CredentialClientManager.credential_keys(self.application)), {
+            self.credential.key, f'account:{self.primary.id}', f'account:{self.backup.id}',
+        })
+
+    def test_all_accounts_follows_changed_pull_authorization(self):
+        self.subscription()
+        self.application.accounts = {'type': 'ids', 'ids': [str(self.backup.id)]}
+        self.application.save()
+        self.assertEqual(CredentialClientManager.credential_keys(self.application), [f'account:{self.backup.id}'])
+
+    def test_explicit_selection_can_replace_all_accounts(self):
+        policy = self.subscription()
+        serializer = ApplicationCredentialSerializer(policy, data={
+            'subscription_accounts': [str(self.primary.id)],
+        }, partial=True)
+        serializer.is_valid(raise_exception=True)
+        policy = serializer.save()
+        self.assertFalse(policy.subscription_all_authorized)
+        self.assertEqual(list(policy.subscription_accounts.all()), [self.primary])
+
+    def test_unrelated_patch_preserves_all_accounts(self):
+        policy = self.subscription()
+        serializer = ApplicationCredentialSerializer(policy, data={'name': 'Renamed'}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.assertTrue(serializer.save().subscription_all_authorized)
+
+    def test_empty_explicit_subscription_and_rotation_all_scope_are_rejected(self):
+        for data in (
+            {'name': 'Empty', 'mode': 'subscription', 'subscription_all_authorized': False},
+            {'subscription_all_authorized': True},
+        ):
+            serializer = ApplicationCredentialSerializer(
+                self.credential if 'name' not in data else None,
+                data={**data, 'applications': [str(self.application.id)]}, partial='name' not in data,
+            )
+            self.assertFalse(serializer.is_valid())
+
+    def test_config_wizard_generates_complete_update_and_service_rule(self):
+        config = self.wizard()
+        rule = config['rules'][0]
+        self.assertEqual(rule['accounts'], [{'account_id': str(self.primary.id)}])
+        self.assertEqual(rule['config_update'], {
+            'file': '/etc/orders/config.yml', 'format': 'auto',
+            'fields_map': {'DB_USER': 'username', 'DB_PASSWORD': 'secret'},
+        })
+        self.assertEqual(rule['service_action'], {'unit': 'orders.service', 'operation': 'restart'})
+        self.assertNotIn('systemd_unit', config['delivery'])
+
+    def test_generated_business_rules_do_not_offer_incompatible_foreground_installation(self):
+        serializer = CredentialAccessWizardSerializer(data={
+            'type': 'agent', 'app_user': 'orders', 'agent_setup': 'config_update',
+            'account_id': str(self.primary.id), 'config_file': '/etc/orders/config.yml',
+            'systemd_unit': 'orders.service',
+        }, context={'application': self.application})
+        serializer.is_valid(raise_exception=True)
+        result = materials(self.application, serializer.validated_data, 'https://example.com')
+        self.assertEqual(result['foreground_unix_command'], '')
+        self.assertEqual(result['foreground_windows_command'], '')
+
+    def test_rotation_wizard_requires_business_check_and_enables_switch(self):
+        config = self.wizard(agent_setup='rotation', application_check='/usr/local/libexec/check-orders')
+        rule = config['rules'][0]
+        self.assertTrue(rule['accounts'][0]['allow_account_switch'])
+        self.assertEqual(rule['application_check'], {
+            'path': '/usr/local/libexec/check-orders', 'confirm_on_success': True,
+        })
+        self.assertNotIn('application_check', self.wizard()['rules'][0])
+
+    def test_script_action_does_not_add_global_systemd_restart(self):
+        config = self.wizard(service_action_type='script', service_script='/usr/local/libexec/recreate-orders')
+        self.assertEqual(config['rules'][0]['service_action'], {'path': '/usr/local/libexec/recreate-orders'})
+        self.assertNotIn('systemd_unit', config['delivery'])
+
+    def test_invalid_wizard_materials_are_rejected(self):
+        for overrides in (
+            {'account_id': str(uuid4())}, {'config_file': 'config.yml'},
+            {'agent_setup': 'rotation'}, {'secret_field': 'DB_USER'},
+            {'service_action_type': 'script', 'service_script': 'relative/script'},
+        ):
+            with self.subTest(overrides=overrides):
+                serializer = CredentialAccessWizardSerializer(data={
+                    'type': 'agent', 'app_user': 'orders', 'agent_setup': 'config_update',
+                    'account_id': str(self.primary.id), 'config_file': '/etc/orders/config.yml',
+                    'systemd_unit': 'orders.service', **overrides,
+                }, context={'application': self.application})
+                self.assertFalse(serializer.is_valid())
+
+    def test_mode_filtered_lists_do_not_mix_subscriptions_and_rotations(self):
+        subscription = self.subscription()
+        view = ApplicationCredentialViewSet.as_view({'get': 'list'})
+        for mode, expected in (('subscription', subscription), ('alternating_rotation', self.credential)):
+            response = view(self.request('get', '/api/v1/accounts/application-credentials/', data={'mode': mode, 'limit': 10}))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual([str(row['id']) for row in response.data['results']], [str(expected.id)])

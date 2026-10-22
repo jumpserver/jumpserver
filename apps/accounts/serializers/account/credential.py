@@ -1,4 +1,5 @@
 import re
+from pathlib import PurePosixPath
 
 from accounts.credential_client.documentation import sdk_languages
 from accounts.models import (
@@ -67,6 +68,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     rotation = serializers.SerializerMethodField()
     precheck = serializers.SerializerMethodField()
     preparation = serializers.SerializerMethodField()
+    subscription_all_authorized = serializers.BooleanField(required=False)
     standby_no_traffic_days = serializers.IntegerField(
         source='source_no_traffic_days', min_value=1, max_value=3650,
         required=False, help_text=_('Deprecated alias for source_no_traffic_days.'),
@@ -130,7 +132,6 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = [
             'key', 'active_account', 'revision', 'status',
             'applications_amount', 'blockers',
-            'subscription_all_authorized',
             'rotation_cancelled', 'date_rotation_started', 'date_last_rotated',
         ]
 
@@ -191,13 +192,21 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         if not applications:
             raise serializers.ValidationError({'applications': _('Select at least one application.')})
         if mode == ApplicationCredential.Mode.subscription:
+            all_authorized = attrs.get(
+                'subscription_all_authorized',
+                bool(self.instance and self.instance.subscription_all_authorized),
+            )
             selected = attrs.get('subscription_accounts')
             if selected is None and self.instance:
                 selected = list(self.instance.subscription_accounts.all())
-            if not selected and not (
-                self.instance and self.instance.subscription_all_authorized
-                and 'subscription_accounts' not in attrs
-            ):
+            # Preserve clients that switch a legacy all-account subscription by
+            # submitting an explicit list without the new boolean field.
+            if 'subscription_accounts' in attrs and 'subscription_all_authorized' not in attrs:
+                all_authorized = False
+            if all_authorized:
+                attrs['subscription_accounts'] = []
+                selected = []
+            if not selected and not all_authorized:
                 raise serializers.ValidationError({'subscription_accounts': _(
                     'Select at least one account to subscribe to.'
                 )})
@@ -211,9 +220,8 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
                     raise serializers.ValidationError({'subscription_accounts': _(
                         'These applications are not authorized for every subscribed account: {names}'
                     ).format(names=', '.join(unauthorized))})
-            if 'subscription_accounts' in attrs:
-                attrs['subscription_all_authorized'] = False
-        elif attrs.get('subscription_accounts'):
+            attrs['subscription_all_authorized'] = all_authorized
+        elif attrs.get('subscription_accounts') or attrs.get('subscription_all_authorized'):
             raise serializers.ValidationError({'subscription_accounts': _(
                 'Subscribed accounts are only available for credential change subscriptions.'
             )})
@@ -347,7 +355,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             from accounts.credential_client.audit import record
             from accounts.credential_client.events import enqueue
             event = record(AuditEvent.CONFIGURATION_UPDATED, credential=instance)
-            enqueue(event, ApplicationEvent.CONFIGURATION_UPDATED)
+            enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         return instance
 
 
@@ -685,6 +693,29 @@ class CredentialAccessWizardSerializer(serializers.Serializer):
     systemd_action = serializers.ChoiceField(
         choices=SYSTEMD_ACTIONS, default='restart',
     )
+    agent_setup = serializers.ChoiceField(
+        choices=['delivery', 'config_update', 'rotation'], default='delivery',
+    )
+    account_id = serializers.UUIDField(required=False)
+    config_file = serializers.CharField(max_length=1024, required=False, default='', allow_blank=True)
+    config_format = serializers.ChoiceField(choices=['auto', 'env', 'yaml'], default='auto')
+    username_field = serializers.RegexField(
+        r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, required=False, default='DB_USER',
+    )
+    secret_field = serializers.RegexField(
+        r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, required=False, default='DB_PASSWORD',
+    )
+    service_action_type = serializers.ChoiceField(
+        choices=['systemd', 'script', 'none'], default='systemd',
+    )
+    service_script = serializers.CharField(max_length=1024, required=False, default='', allow_blank=True)
+    application_check = serializers.CharField(max_length=1024, required=False, default='', allow_blank=True)
+
+    @staticmethod
+    def validate_local_path(value, field):
+        if not value.startswith('/') or value == '/' or any(char in value for char in '\n\r\x00'):
+            raise serializers.ValidationError({field: _('Enter an absolute local file path.')})
+        return value
 
     def validate(self, attrs):
         application = self.context['application']
@@ -696,7 +727,31 @@ class CredentialAccessWizardSerializer(serializers.Serializer):
         if not path.startswith('/') or path == '/' or any(char in path for char in '\n\r\x00'):
             raise serializers.ValidationError({'install_path': _('Enter an absolute installation directory.')})
         unit = attrs['systemd_unit'].strip()
-        if attrs['type'] == 'agent' and attrs['delivery_mode'] == 'environment':
+        configured_rule = attrs['type'] == 'agent' and attrs['agent_setup'] != 'delivery'
+        if configured_rule:
+            application.assert_account_limit()
+            if 'account_id' not in attrs or not application.get_accounts().filter(id=attrs['account_id']).exists():
+                raise serializers.ValidationError({'account_id': _('Select an account authorized for this application.')})
+            self.validate_local_path(attrs['config_file'], 'config_file')
+            if attrs['config_format'] == 'auto' and PurePosixPath(attrs['config_file']).suffix.lower() not in (
+                '.txt', '.env', '.properties', '.yml', '.yaml',
+            ):
+                raise serializers.ValidationError({'config_file': _(
+                    'For other extensions, select env or yaml explicitly. Complex formats require a local template or script.'
+                )})
+            if attrs['username_field'] == attrs['secret_field']:
+                raise serializers.ValidationError({'secret_field': _('Username and secret fields must be different.')})
+            if attrs['service_action_type'] == 'script':
+                self.validate_local_path(attrs['service_script'], 'service_script')
+            if attrs['application_check'] or attrs['agent_setup'] == 'rotation':
+                self.validate_local_path(attrs['application_check'], 'application_check')
+            # Rules own business updates and actions. Do not also execute the
+            # default EnvironmentFile delivery's global systemd action.
+            attrs['delivery_mode'] = 'json'
+        if attrs['type'] == 'agent' and (
+            attrs['delivery_mode'] == 'environment'
+            or configured_rule and attrs['service_action_type'] == 'systemd'
+        ):
             if not SYSTEMD_UNIT.fullmatch(unit):
                 raise serializers.ValidationError({'systemd_unit': _('Enter one systemd .service unit name.')})
             attrs['systemd_unit'] = unit

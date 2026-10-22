@@ -58,7 +58,7 @@ class RotationEventTests(CredentialTestCase):
 
     def test_application_history_includes_instance_receipts_and_configuration_events(self):
         audit = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
-        enqueue(audit, ApplicationEvent.CONFIGURATION_UPDATED)
+        enqueue(audit, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         self.assertTrue(receive(self.client.id, self.org.id, audit.id))
         view = IntegrationApplicationViewSet.as_view({'get': 'credential_events'})
         response = view(
@@ -66,7 +66,7 @@ class RotationEventTests(CredentialTestCase):
         )
         self.assertEqual(response.status_code, 200)
         update = next(item for item in response.data['results'] if item['id'] == str(audit.id))
-        self.assertEqual(update['event'], 'configuration.updated')
+        self.assertEqual(update['event'], 'application.scope.updated')
         recipient = next(
             item for item in update['recipients'] if item['instance_id'] == self.client.instance_id
         )
@@ -232,11 +232,11 @@ class SubscriptionEventTests(CredentialTestCase):
 
     def test_configuration_event_is_included(self):
         audit = record(AuditEvent.CONFIGURATION_UPDATED, application=self.application)
-        enqueue(audit, ApplicationEvent.CONFIGURATION_UPDATED)
+        enqueue(audit, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
 
         result = timeline(self.credential)
 
-        self.assertEqual(result['events'][-1]['event'], 'configuration.updated')
+        self.assertEqual(result['events'][-1]['event'], 'application.scope.updated')
 
     def test_managed_password_change_tracks_events_and_receipts_without_rotation(self):
         previous_ids = list(CredentialRotationEvent.objects.values_list('id', flat=True))

@@ -47,7 +47,7 @@ class ApplicationEvent(TextChoices):
     ROTATION_PREPARATION_CANCELLED = 'rotation.preparation.cancelled', _('Rotation preparation cancelled')
     CREDENTIAL_UPDATED = 'credential.updated', _('Credential updated')
     CREDENTIAL_REVOKED = 'credential.revoked', _('Credential revoked')
-    CONFIGURATION_UPDATED = 'configuration.updated', _('Configuration updated')
+    APPLICATION_SCOPE_UPDATED = 'application.scope.updated', _('Application scope updated')
     CREDENTIAL_CHANGE_STARTED = 'credential.change.started', _('Credential change started')
     CREDENTIAL_CHANGE_COMPLETED = 'credential.change.completed', _('Credential change completed')
     CREDENTIAL_CHANGE_FAILED = 'credential.change.failed', _('Credential change failed')

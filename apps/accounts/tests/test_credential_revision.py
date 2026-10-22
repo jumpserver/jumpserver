@@ -60,7 +60,7 @@ class CredentialRevisionTests(CredentialTestCase):
             [self.primary.id],
         )
         self.assertTrue(CredentialRotationEvent.objects.filter(
-            event='configuration.updated', rotation__isnull=True,
+            event='application.scope.updated', rotation__isnull=True,
             source_event_id__in=ApplicationAudit.objects.filter(
                 credential_id=self.credential.id,
             ).values('id'),

@@ -90,7 +90,7 @@ class PythonEventHookTests(TestCase):
         self.watch(
             [
                 {"event": "credential.rotation.completed"},
-                {"event": "configuration.updated"},
+                {"event": "application.scope.updated"},
                 {**self.subscription, "account_id": None},
                 {**self.subscription, "command_id": "command"},
                 revoked,
@@ -176,7 +176,7 @@ class PythonEventHookTests(TestCase):
         for event in (
             {"event": "snapshot", "credentials": []},
             {"event": "credential.revoked"},
-            {"event": "configuration.updated"},
+            {"event": "application.scope.updated"},
         ):
             dispatcher._dispatch(self.subscription)
             self.assertTrue(dispatcher.pending)
@@ -344,34 +344,26 @@ class PythonEventHookTests(TestCase):
                 self.assertIsNone(clone._event_dispatcher)
                 self.assertIsNot(clone.session, client.session)
 
-    def test_application_example_confirms_event_only_after_successful_apply(self):
-        from types import SimpleNamespace
+    def test_application_example_does_not_confirm_unimplemented_business_logic(self):
         path = Path(__file__).parents[1] / "clients/python/subclass_demo.py"
         module = ast.parse(path.read_text())
         module.body = [node for node in module.body if not isinstance(node, (ast.ImportFrom, ast.With))]
         namespace = {"Client": Client}
         exec(compile(module, str(path), "exec"), namespace)  # noqa: S102
-        namespace["apply_account"] = Mock()
         with namespace["ApplicationClient"](
             "https://testserver", app_id="app", app_secret="secret", instance_id="worker",
         ) as client:
-            account = SimpleNamespace(id="account", revision=2)
-            client.get_account = Mock(return_value=account)
+            from types import SimpleNamespace
+            client.get_account = Mock(return_value=SimpleNamespace(id="account", revision=2))
             client.confirm_event = Mock()
-            update = {"event_id": "event-one", "account_id": "account", "account_revision": 2}
-            client.handle_event(update)
-            client.get_account.assert_called_once_with(account_id="account", allow_local_fallback=False)
-            namespace["apply_account"].assert_called_once_with(account)
-            client.confirm_event.assert_called_once_with(event_id="event-one")
-            client.confirm_event.reset_mock()
-            namespace["apply_account"].side_effect = RuntimeError("switch failed")
-            with self.assertRaises(RuntimeError):
-                client.handle_event(update)
+            client.report_accounts = Mock()
+            client.on_event_error = Mock()
+            dispatcher = EventDispatcher(client)
+            dispatcher._dispatch({
+                "event": "credential.updated", "event_id": "event-one", "account_id": "account",
+                "account_revision": 2, "credential_mode": "subscription",
+            })
             client.confirm_event.assert_called_once_with(
                 event_id="event-one", status="failed", error_code="application_failed",
             )
-            namespace["apply_account"].reset_mock(side_effect=True)
-            account.revision = 3
-            with self.assertRaises(ValueError):
-                client.handle_event(update)
-            namespace["apply_account"].assert_not_called()
+            self.assertTrue(dispatcher.pending)
