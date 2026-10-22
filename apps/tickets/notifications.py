@@ -7,6 +7,7 @@ from django.forms import model_to_dict
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
+from common.auth.cache import TICKET_DIRECT_APPROVE_KEY
 from common.db.encoder import ModelJSONFieldEncoder
 from common.sdk.im.wecom import wecom_tool
 from common.utils import get_logger, random_string, reverse
@@ -148,7 +149,7 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
             'ticket_id': self.ticket.id,
             'approver_id': self.user.id, 'content': self.content,
         }
-        cache.set(self.token, data, 3600)
+        cache.set(TICKET_DIRECT_APPROVE_KEY.format(token=self.token), data, 3600)
         return context
 
     @classmethod

@@ -13,6 +13,10 @@ from django.utils.translation import gettext as _
 
 from authentication.errors import IntervalTooShort
 from authentication.utils import check_user_property_is_correct
+from common.auth.cache import (
+    PASSWORD_PREVIEW_KEY, PASSWORD_PREVIEW_VERIFIED_KEY,
+    PASSWORD_PREVIEW_USER_SEND_AT_KEY, get_password_preview,
+)
 from common.const.choices import COUNTRY_CALLING_CODES
 from common.utils import FlashMessageUtil, get_object_or_none, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
@@ -46,13 +50,13 @@ class UserForgotPasswordPreviewingView(FormView):
     @staticmethod
     def generate_previewing_token(user):
         sent_ttl = 60
-        token_sent_at_key = '{}_send_at'.format(user.username)
+        token_sent_at_key = PASSWORD_PREVIEW_USER_SEND_AT_KEY.format(username=user.username)
         token_sent_at = cache.get(token_sent_at_key, 0)
 
         if token_sent_at:
             raise IntervalTooShort(sent_ttl)
         token = random_string(36)
-        cache.set(token, SmsUserSerializer(user).data, 5 * 60)
+        cache.set(PASSWORD_PREVIEW_KEY.format(token=token), SmsUserSerializer(user).data, 5 * 60)
         cache.set(token_sent_at_key, time.time(), sent_ttl)
         return token
 
@@ -82,7 +86,7 @@ class UserForgotPasswordView(FormView):
 
     def get(self, request, *args, **kwargs):
         token = self.request.GET.get('token')
-        userinfo = cache.get(token)
+        userinfo = get_password_preview(token)
         if not userinfo:
             return redirect(self.get_redirect_url(return_previewing=True))
         else:
@@ -126,11 +130,11 @@ class UserForgotPasswordView(FormView):
 
     @staticmethod
     def safe_verify_code(token, target, form_type, code):
-        token_verified_key = '{}_verified'.format(token)
+        token_verified_key = PASSWORD_PREVIEW_VERIFIED_KEY.format(token=token)
         token_verified_times = cache.get(token_verified_key, 0)
 
         if token_verified_times >= 3:
-            cache.delete(token)
+            cache.delete(PASSWORD_PREVIEW_KEY.format(token=token))
             raise ValueError(_('Verification code has been used more than 3 times, please re-verify'))
         cache.set(token_verified_key, token_verified_times + 1, 5 * 60)
         sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
@@ -138,7 +142,7 @@ class UserForgotPasswordView(FormView):
 
     def form_valid(self, form):
         token = self.request.GET.get('token')
-        user_info = cache.get(token)
+        user_info = get_password_preview(token)
         if not user_info:
             return redirect(self.get_redirect_url(return_previewing=True))
 
