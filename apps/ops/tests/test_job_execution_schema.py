@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from django.test import SimpleTestCase
 from django.urls import include, path
@@ -13,12 +14,10 @@ from ops.api.job import JobExecutionViewSet, JobViewSet
 
 class JobExecutionSchemaTests(SimpleTestCase):
     def generate_schema(self, *, from_mcp=False, ai=False):
-        class HistoryViewSet(JobExecutionViewSet):
-            schema = CustomAutoSchema()
-
-        HistoryViewSet.schema.from_mcp = from_mcp
+        schema = CustomAutoSchema()
+        schema.from_mcp = from_mcp
         router = SimpleRouter()
-        router.register('job-executions', HistoryViewSet, basename='job-executions')
+        router.register('job-executions', JobExecutionViewSet, basename='job-executions')
         patterns = [
             path('api/v1/ops/', include(router.urls)),
             path(
@@ -28,7 +27,8 @@ class JobExecutionSchemaTests(SimpleTestCase):
         ]
         headers = {'HTTP_X_JMS_AI_SCHEMA': '1'} if ai else {}
         request = Request(APIRequestFactory().get('/api/docs/', **headers))
-        return SchemaGenerator(patterns=patterns).get_schema(request=request, public=True)
+        with patch.object(JobExecutionViewSet, 'schema', schema):
+            return SchemaGenerator(patterns=patterns).get_schema(request=request, public=True)
 
     def test_only_read_only_history_is_discoverable(self):
         for from_mcp in (False, True):
@@ -54,7 +54,9 @@ class JobExecutionSchemaTests(SimpleTestCase):
                 schema = self.generate_schema(from_mcp=from_mcp)
                 operation = schema['paths']['/api/v1/ops/job-executions/']['get']
                 parameters = {parameter['name']: parameter for parameter in operation['parameters']}
-                self.assertEqual(parameters['job_id']['schema'], {'type': 'string', 'format': 'uuid'})
+                self.assertEqual(
+                    parameters['job_id']['schema'], {'type': 'string', 'format': 'uuid'}
+                )
                 self.assertIn('ops.view_jobexecution', operation['x-jms-required-permissions'])
                 self.assertTrue(operation['x-jms-rbac-protected'])
 
