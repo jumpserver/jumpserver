@@ -87,7 +87,7 @@ class PlaybookFileInputTests(SimpleTestCase):
             return self.api(request, pk='00000000-0000-0000-0000-000000000001')
 
     def test_create_and_edit_preserve_yaml_whitespace_and_response(self):
-        content = '\n  - name: example\n    value: yes\n\n'
+        content = '\n  - name: 示例\n    value: yes\n\n'
         response = self.call('post', {'name': 'tasks.yml', 'content': content})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {

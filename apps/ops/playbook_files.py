@@ -15,7 +15,11 @@ def _invalid_file_path():
 
 
 def resolve_playbook_path(work_path, key, *, allow_root=False):
-    if not isinstance(key, str) or any(char in key for char in ('\x00', '\\')) or os.path.isabs(key):
+    if (
+        not isinstance(key, str)
+        or any(char in key for char in ('\x00', '\\'))
+        or os.path.isabs(key)
+    ):
         raise _invalid_file_path()
     key = '' if key == 'root' else key.removeprefix('root/')
     root = Path(os.path.abspath(work_path))
@@ -51,6 +55,22 @@ def write_playbook_file(path, content):
     atomic_dump_text(path, write)
 
 
+def _file_tree_node(root_path, file_path, is_directory):
+    parent_key = os.path.relpath(file_path.parent, root_path)
+    node = {
+        'name': file_path.name,
+        'title': file_path.name,
+        'id': os.path.relpath(file_path, root_path),
+        'isParent': is_directory,
+        'open': is_directory,
+        'pId': parent_key if parent_key != '.' else 'root',
+        'temp': False,
+    }
+    if not is_directory:
+        node['iconSkin'] = 'file'
+    return node
+
+
 def generate_playbook_tree(playbook, root_path, expand_key=None):
     nodes = [
         {
@@ -65,24 +85,12 @@ def generate_playbook_tree(playbook, root_path, expand_key=None):
     ]
     for path, dirs, files in os.walk(root_path):
         dirs[:] = sorted(name for name in dirs if not Path(path, name).is_symlink())
-        relative_path = os.path.relpath(path, root_path)
         for name in [*dirs, *sorted(files)]:
-            if Path(path, name).is_symlink():
+            file_path = Path(path, name)
+            if file_path.is_symlink():
                 continue
-            file_id = os.path.relpath(os.path.join(path, name), root_path)
-            is_directory = name in dirs
-            node = {
-                'name': name,
-                'title': name,
-                'id': file_id,
-                'isParent': is_directory,
-                'open': is_directory,
-                'pId': relative_path if relative_path != '.' else 'root',
-                'temp': False,
-            }
-            if is_directory and expand_key == file_id:
+            node = _file_tree_node(root_path, file_path, name in dirs)
+            if node['isParent'] and expand_key == node['id']:
                 node['open'] = True
-            if not is_directory:
-                node['iconSkin'] = 'file'
             nodes.append(node)
     return nodes

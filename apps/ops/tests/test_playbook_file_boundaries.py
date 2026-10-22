@@ -14,9 +14,10 @@ from ops.models import Playbook
 
 class PlaybookFileBoundaryTests(SimpleTestCase):
     def setUp(self):
-        directory = TemporaryDirectory()
-        self.addCleanup(directory.cleanup)
-        self.base = Path(directory.name)
+        directory = self.enterContext(
+            TemporaryDirectory()  # pylint: disable=consider-using-with
+        )
+        self.base = Path(directory)
         self.directory = self.base / 'playbook'
         self.directory.mkdir()
         self.outside = self.base / 'outside.yml'
@@ -93,7 +94,9 @@ class PlaybookFileBoundaryTests(SimpleTestCase):
         for key in keys:
             for method in ('get', 'post', 'patch', 'delete'):
                 with self.subTest(key=key, method=method):
-                    response = self.call(method, {'key': key, 'name': 'new.yml', 'content': 'changed'})
+                    response = self.call(
+                        method, {'key': key, 'name': 'new.yml', 'content': 'changed'}
+                    )
                     self.assertEqual(response.status_code, 400)
                     self.assertEqual(self.outside.read_text(), 'outside')
         self.assertEqual(list(self.directory.iterdir()), [])
@@ -134,7 +137,9 @@ class PlaybookFileBoundaryTests(SimpleTestCase):
         ):
             for method in ('get', 'post', 'patch', 'delete'):
                 with self.subTest(key=key, method=method):
-                    response = self.call(method, {'key': key, 'name': 'new.yml', 'content': 'changed'})
+                    response = self.call(
+                        method, {'key': key, 'name': 'new.yml', 'content': 'changed'}
+                    )
                     self.assertEqual(response.status_code, 400)
         self.assertEqual(self.outside.read_text(), 'outside')
         self.assertEqual((self.directory / 'tasks.yml').read_text(), 'tasks')
@@ -222,10 +227,11 @@ class PlaybookFileBoundaryTests(SimpleTestCase):
         source = self.directory / 'tasks.yml'
         original_open = open
 
-        def create_concurrently(path, mode='r', *args, **kwargs):
+        def create_concurrently(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get('mode', 'r')
             if mode == 'x':
-                Path(path).write_text('concurrent content')
-            return original_open(path, mode, *args, **kwargs)
+                Path(path).write_text('concurrent content', encoding='utf-8')
+            return original_open(path, *args, **kwargs)
 
         with patch('builtins.open', side_effect=create_concurrently):
             response = self.call('post', {'name': source.name, 'content': 'updated'})

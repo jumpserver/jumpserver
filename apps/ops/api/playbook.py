@@ -121,7 +121,7 @@ class PlaybookViewSet(JMSBulkModelViewSet):
         elif instance.create_method == 'blank':
             dest_path = safe_join(base_path, str(instance.id))
             os.makedirs(dest_path)
-            with open(safe_join(dest_path, 'main.yml'), 'w') as f:
+            with open(safe_join(dest_path, 'main.yml'), 'w', encoding='utf-8') as f:
                 f.write('## write your playbook here')
 
 
@@ -165,7 +165,7 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         if file_key:
             try:
                 file_path = resolve_playbook_path(work_path, file_key)
-                with open(file_path, 'r') as f:
+                with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
             except UnicodeDecodeError:
                 content = _('Unsupported file content')
@@ -212,7 +212,7 @@ class PlaybookFileViewSet(JMSGenericViewSet):
                 os.mkdir(new_file_path)
             else:
                 new_file_path = find_new_name(name, True)
-                with open(new_file_path, 'x') as f:
+                with open(new_file_path, 'x', encoding='utf-8') as f:
                     f.write(content)
         except FileExistsError:
             raise JMSException(code='file_already_exists', detail={"msg": _("File already exists")})
@@ -256,7 +256,9 @@ class PlaybookFileViewSet(JMSGenericViewSet):
         if new_name:
             try:
                 new_file_path = safe_join(os.path.dirname(file_path), new_name)
-                new_file_path = resolve_playbook_path(work_path, os.path.relpath(new_file_path, work_path))
+                new_file_path = resolve_playbook_path(
+                    work_path, os.path.relpath(new_file_path, work_path)
+                )
                 if new_file_path == file_path:
                     return Response(status=status.HTTP_200_OK)
                 if os.path.lexists(new_file_path):
