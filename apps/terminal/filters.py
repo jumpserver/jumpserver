@@ -1,11 +1,11 @@
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
 from orgs.utils import filter_org_queryset
-from terminal.const import RiskLevelChoices
+from terminal.const import CommandSourceChoices, RiskLevelChoices
 from terminal.models import Command, CommandStorage, Session
 
 
@@ -51,12 +51,15 @@ class CommandFilter(BaseFilterSet):
         method='filter_exact', choices=RiskLevelChoices.choices,
         label=_('Risk level')
     )
+    source = filters.ChoiceFilter(
+        method='filter_source', choices=CommandSourceChoices.choices, label=_('Source')
+    )
 
     class Meta:
         model = Command
         fields = [
             'id', 'user', 'asset', 'asset_id', 'account', 'input',
-            'risk_level', 'session',
+            'risk_level', 'session', 'source',
         ]
         fields_operator = {
             'id': ('exact',),
@@ -67,6 +70,12 @@ class CommandFilter(BaseFilterSet):
             'input': ('icontains',),
             'session': ('exact',),
         }
+
+    @staticmethod
+    def filter_source(queryset, name, value):
+        if value == CommandSourceChoices.unknown and not getattr(queryset, 'custom', False):
+            return queryset.filter(Q(source__in=[value, '']) | Q(source__isnull=True))
+        return queryset.filter(source=value)
 
     @staticmethod
     def filter_exact(queryset, name, value):

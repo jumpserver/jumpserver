@@ -23,6 +23,12 @@ class RiskLevelChoices(IntegerChoices):
         return label
 
 
+class CommandSourceChoices(TextChoices):
+    unknown = 'unknown', _('Unknown')
+    manual = 'manual', _('Manual execution')
+    ai = 'ai', _('AI Assistant')
+
+
 class ReplayStorageType(TextChoices):
     null = 'null', 'Null',
     server = 'server', 'Server'

@@ -6,6 +6,7 @@ import pytz
 
 from common.plugins.es import ES
 from common.utils import get_logger
+from terminal.const import CommandSourceChoices
 
 logger = get_logger(__file__)
 
@@ -13,6 +14,9 @@ logger = get_logger(__file__)
 class CommandStore(ES):
     def __init__(self, config):
         properties = {
+            "source": {
+                "type": "keyword"
+            },
             "session": {
                 "type": "keyword"
             },
@@ -42,8 +46,26 @@ class CommandStore(ES):
             session=command["session"], timestamp=command["timestamp"],
             org_id=command["org_id"]
         )
+        data['source'] = command.get('source') or CommandSourceChoices.unknown
         data["date"] = datetime.fromtimestamp(command['timestamp'], tz=pytz.UTC)
         return data
+
+    def get_query_body(self, **kwargs):
+        source = kwargs.pop('source', None)
+        body = super().get_query_body(**kwargs)
+        if source == CommandSourceChoices.unknown:
+            body['query']['bool']['filter'].append({
+                'bool': {
+                    'should': [
+                        {'terms': {'source': [CommandSourceChoices.unknown, '']}},
+                        {'bool': {'must_not': [{'exists': {'field': 'source'}}]}},
+                    ],
+                    'minimum_should_match': 1,
+                },
+            })
+        elif source:
+            body['query']['bool']['filter'].append({'term': {'source': source}})
+        return body
 
     @staticmethod
     def handler_time_field(data):

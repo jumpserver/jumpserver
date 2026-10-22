@@ -4,11 +4,16 @@ from rest_framework import serializers
 
 from common.serializers.fields import LabeledChoiceField
 from common.utils import pretty_string, is_uuid, get_logger
-from terminal.const import RiskLevelChoices
+from terminal.const import CommandSourceChoices, RiskLevelChoices
 from terminal.models import Command
 
 logger = get_logger(__name__)
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
+
+
+class CommandSourceField(LabeledChoiceField):
+    def get_attribute(self, instance):
+        return super().get_attribute(instance) or CommandSourceChoices.unknown
 
 
 class SimpleSessionCommandSerializer(serializers.ModelSerializer):
@@ -17,6 +22,11 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
     asset = serializers.CharField(max_length=128, label=_("Asset"))
     input = serializers.CharField(label=_("Command"))
     session = serializers.CharField(max_length=36, label=_("Session"))
+    source = CommandSourceField(
+        choices=CommandSourceChoices.choices, required=False,
+        default=CommandSourceChoices.unknown, label=_("Source"),
+        allow_null=True, allow_blank=True,
+    )
     risk_level = LabeledChoiceField(
         choices=RiskLevelChoices.choices,
         required=False, label=_("Risk level"),
@@ -28,12 +38,15 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
     class Meta:
         # 继承 ModelSerializer 解决 swagger risk_level type 为 object 的问题
         model = Command
-        fields = ['user', 'asset', 'input', 'session', 'risk_level', 'org_id']
+        fields = ['user', 'asset', 'input', 'session', 'source', 'risk_level', 'org_id']
 
     def validate_user(self, value):
         if len(value) > 64:
             value = value[:32] + value[-32:]
         return value
+
+    def validate_source(self, value):
+        return value or CommandSourceChoices.unknown
 
 
 class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):

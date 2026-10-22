@@ -6,6 +6,7 @@ from django.db.utils import OperationalError
 from django.utils import timezone
 
 from common.utils.common import pretty_string
+from terminal.const import CommandSourceChoices
 from .base import CommandBase
 
 
@@ -24,6 +25,7 @@ class CommandStore(CommandBase):
             user=command["user"], asset=command["asset"],
             account=command["account"], input=cmd_input,
             output=command["output"], session=command["session"],
+            source=command.get("source") or CommandSourceChoices.unknown,
             risk_level=command.get("risk_level", 0), org_id=command["org_id"],
             timestamp=command["timestamp"]
         )
@@ -39,6 +41,7 @@ class CommandStore(CommandBase):
             _commands.append(self.model(
                 user=c["user"], asset=c["asset"], account=c["account"],
                 input=cmd_input, output=cmd_output, session=c["session"],
+                source=c.get("source") or CommandSourceChoices.unknown,
                 risk_level=c.get("risk_level", 0), org_id=c["org_id"],
                 timestamp=c["timestamp"]
             ))
