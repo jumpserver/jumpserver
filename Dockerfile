@@ -14,6 +14,9 @@ RUN echo > /opt/jumpserver/config.yml \
 RUN set -ex \
     && export SECRET_KEY=$(head -c100 < /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 48) \
     && . /opt/py3/bin/activate \
+    && unset SETUPTOOLS_SCM_PRETEND_VERSION \
+    && export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYTHON_LDAP=3.4.5 \
+    && uv cache clean ansible-runner \
     && uv pip install --extra-index-url https://pypi.org/simple/ -r pyproject.toml \
     && rm -rf /root/.cache/ \
     && cd apps \

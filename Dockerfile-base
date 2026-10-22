@@ -43,7 +43,7 @@ ENV ANSIBLE_COLLECTIONS_PATHS=/opt/py3/lib/python3.14/site-packages/ansible_coll
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
-ENV SETUPTOOLS_SCM_PRETEND_VERSION=3.4.5
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PYTHON_LDAP=3.4.5
 
 RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
@@ -53,6 +53,7 @@ RUN --mount=type=cache,target=/root/.cache \
     set -ex \
     && pip install uv -i${PIP_MIRROR} --extra-index-url https://pypi.org/simple/ \
     && uv venv \
+    && uv cache clean ansible-runner \
     && uv pip install -i${PIP_MIRROR} --extra-index-url https://pypi.org/simple/ -r pyproject.toml \
     && ln -sf $(pwd)/.venv /opt/py3 \
     && ansible-galaxy collection install -r collections.yml --force --ignore-certs \
