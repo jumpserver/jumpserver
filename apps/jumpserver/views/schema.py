@@ -281,6 +281,10 @@ class CustomAutoSchema(AutoSchema):
     def is_excluded(self):
         if self.is_chat_ai_schema():
             return False
+        if self.method == 'GET' and getattr(self.view, 'action', None) in getattr(
+            self.view, 'schema_included_actions', ()
+        ):
+            return False
         if self.exclude_some_paths(self.path):
             return True
         if self.exclude_some_app_model(self.path):

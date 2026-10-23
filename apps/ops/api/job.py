@@ -200,6 +200,7 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
 
 class JobExecutionViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
     serializer_class = JobExecutionSerializer
+    schema_included_actions = ('list', 'retrieve')
     http_method_names = ('get', 'post', 'head', 'options',)
     model = JobExecution
     search_fields = ('material',)
@@ -243,6 +244,8 @@ class JobExecutionViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if getattr(self, 'swagger_fake_view', False):
+            return queryset.none()
         queryset = queryset.filter(creator=self.request.user)
         return queryset
 
