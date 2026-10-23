@@ -15,6 +15,20 @@ class DeviceTypes(BaseType):
     FIREWALL = 'firewall', _("Firewall")
 
     @classmethod
+    def get_choices(cls):
+        choices = super().get_choices()
+        types = set(cls.get_community_types())
+        if len(choices) == len(types):
+            return choices
+        try:
+            from assets.models import Platform
+            types.update(Platform.objects.filter(category='device').values_list('type', flat=True))
+        except Exception:
+            # Models or their table may be unavailable during startup and migrations.
+            return choices
+        return [(value, label) for value, label in choices if value in types]
+
+    @classmethod
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
