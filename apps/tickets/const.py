@@ -19,11 +19,18 @@ class TicketState(TextChoices):
     closed = 'closed', _("Ticket closed")
     approved = 'approved', _('Ticket approved')
     rejected = 'rejected', _('Ticket rejected')
+    expired = 'expired', _('Expired')
+    error = 'error', _('Error')
 
 
 class TicketStatus(TextChoices):
     open = 'open', _("Ticket open")
     closed = 'closed', _("Ticket finished")
+
+
+class TicketOrigin(TextChoices):
+    manual = 'manual', _("Manual request")
+    system = 'system', _("System triggered")
 
 
 class StepState(TextChoices):

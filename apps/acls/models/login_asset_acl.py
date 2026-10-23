@@ -12,6 +12,10 @@ logger = get_logger(__name__)
 
 
 class LoginAssetACL(UserAssetAccountBaseACL):
+    workflow = models.ForeignKey(
+        'tickets.Workflow', null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+', verbose_name=_('Workflow'),
+    )
     # 规则, ip_group, time_period
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
     review_duration = models.PositiveIntegerField(
@@ -50,11 +54,11 @@ class LoginAssetACL(UserAssetAccountBaseACL):
             logger.exception('Failed to cache asset review exemption for ticket %s', ticket_id)
 
     @classmethod
-    def cache_approved_review(cls, ticket):
+    def cache_approved_review(cls, ticket, instance):
         from tickets.const import TicketState
 
         review = ticket.meta.get('login_asset_review')
-        if ticket.state != TicketState.approved or not review:
+        if instance.state != TicketState.approved or not review:
             return
         with tmp_to_org(ticket.org_id):
             acl = cls.objects.filter(
@@ -63,7 +67,8 @@ class LoginAssetACL(UserAssetAccountBaseACL):
         if not acl or not acl.review_duration:
             return
         key = acl.get_review_cache_key(
-            ticket.apply_login_user_id, ticket.apply_login_asset_id, ticket.apply_login_account,
+            instance.applicant_id, instance.context['assets'][0]['id'],
+            instance.context['accounts'][0]['username'],
         )
         if key != review.get('cache_key'):
             return
@@ -71,23 +76,26 @@ class LoginAssetACL(UserAssetAccountBaseACL):
         timeout = acl.review_duration * 3600
         transaction.on_commit(lambda: cls._cache_review(key, ticket_id, timeout))
 
-    def create_login_asset_review_ticket(self, user, asset, account_username, assignees, org_id):
+    @transaction.atomic
+    def create_login_asset_review_ticket(self, user, asset, account_username, assignees, org_id, workflow=None):
         from tickets.const import TicketType
-        from tickets.models import ApplyLoginAssetTicket
+        from tickets.models import Ticket
         title = _('Login asset confirm') + ' ({})'.format(user)
         data = {
             'title': title,
             'org_id': org_id,
             'applicant': user,
-            'apply_login_user': user,
-            'apply_login_asset': asset,
-            'apply_login_account': account_username,
             'type': TicketType.login_asset_confirm,
+            'request_data': {
+                'apply_login_user': str(user.pk),
+                'apply_login_asset': str(asset.pk),
+                'apply_login_account': account_username,
+            },
             'meta': {'login_asset_review': {
                 'acl_id': str(self.id),
                 'cache_key': self.get_review_cache_key(user.id, asset.id, account_username),
             }},
         }
-        ticket = ApplyLoginAssetTicket.objects.create(**data)
-        ticket.open_by_system(assignees)
+        ticket = Ticket.objects.create(**data)
+        ticket.open_by_system(assignees, workflow=workflow)
         return ticket
