@@ -6202,6 +6202,13 @@ msgstr "局域网"
 msgid "UKey"
 msgstr "UKey"
 
+#: authentication/views/base.py:60
+msgid ""
+"A local account with the same username already exists. "
+"Please log in with another authentication method and bind "
+"this account before using it to log in."
+msgstr "已存在同名的本地用户。请先通过其他认证方式登录并绑定此账号，再使用此账号登录。"
+
 #: authentication/views/base.py:72
 #: perms/templates/perms/_msg_permed_items_expire.html:18
 msgid "If you have any question, please contact the administrator"
