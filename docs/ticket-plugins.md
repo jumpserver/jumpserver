@@ -13,9 +13,9 @@
 | `view_secret` 查看账号密码 | 用户申请或账号页操作触发 | 按账号、申请人和组织创建限时查看授权；在工单详情按需取密 |
 | `file_transfer` 文件上传下载 | 用户申请 | 新工单审批通过后，为已有账号访问追加指定方向的限时传输权限 |
 | `download_replay` 录屏下载 | 用户申请 | 审批后允许申请人在有效期内下载指定会话录屏 |
-| `change_secret` 账号改密 | 用户申请 | 仅审批与留痕 |
+| `change_secret` 账号改密 | 用户申请 | 新工单通过后异步执行 PAM 随机密码改密，详情展示执行与核验结果 |
 
-`view_secret` 已接入授权 handler 和插件动作入口；审批时不读取或保存密码。`file_transfer` 和 `download_replay` 已接入对应授权；`change_secret` 仍仅审批与留痕，未接入改密执行。后续按业务逐类接入，不能把 approved 直接解释为操作已经执行。
+`view_secret` 已接入授权 handler 和插件动作入口；审批时不读取或保存密码。`file_transfer` 和 `download_replay` 已接入对应授权；`change_secret` 创建异步改密任务，审批结果与任务执行结果分开展示。不能把 approved 直接解释为操作已经执行。
 
 `applicant` 始终是实际提交者。资产授权插件使用 `request_data.apply_users` 保存单个授权用户 UUID 的列表，省略时默认申请人自己。代他人申请需要本组织的 `tickets.apply_asset_for_others` 权限，并且选用的流程每条路径都必须经过组织管理员审批。申请人和授权用户都不能审批该工单，包括转交和加签。受理前后均检查组织和用户有效性；`@USER` 的上下文和授权校验针对授权用户。旧工单没有该参数时仍给原申请人授权。历史多人授权工单保持原有快照和授权，不重新执行。
 
@@ -70,7 +70,7 @@ class Plugin(TicketPlugin):
 - `excluded_approver_ids(context, applicant_id)`：补充该类型禁止审批的用户；公共层另按节点的 `exclude_applicant` 配置排除申请人，并在创建任务、审批、转交和加签时统一使用。
 - `notify_processed(ticket, processor)`：发送该类型的额外结果通知；资产授权在这里通知授权用户。
 - `allow_direct_approval(ticket)`：控制通知中的直接审批链接是否可用。
-- `on_approved(instance, ticket)`：可选。默认无操作；自动执行的插件显式声明 `execution_mode = 'automatic'`，成功后返回事件数据，框架才记录 `action.executed`。读取 `instance.context`，不重新读取可变的申请参数作为授权依据。
+- `on_approved(instance, ticket)`：可选。默认无操作；自动执行的插件显式声明 `execution_mode = 'automatic'`，成功后返回事件数据，框架才记录 `action.executed`。异步任务提交返回 `pending: true`，改为记录 `action.submitted`，不宣称远程执行成功。读取 `instance.context`，不重新读取可变的申请参数作为授权依据。
 - `get_result(ticket, user)`：返回详情中的实时 `result`，至少包含 `state` 和 `actions`；按类型追加非敏感的资源说明、有效期等。每次读取时检查当前查看者、授权、对象和时效，绝不返回密码或持久化此结果。列表返回 `result: null`，不执行该查询。
 - `actions`：动作名到 `TicketAction` 子类的导入路径映射。新增动作不需要新增 ViewSet 或 URL；处理器声明 `method`（GET/POST）、`permission_classes`、`throttle_classes`，实现 `execute(ticket, request)`。
 - `get_execution_mode(ticket)`：详情展示和最终审批执行共同使用的判断入口。默认返回当前插件的 `execution_mode`；需要历史策略时，在插件内根据服务端快照判断。`approval_only` 不调用 `on_approved`，未知模式阻止执行。
@@ -83,8 +83,8 @@ class Plugin(TicketPlugin):
 
 审批副作用、实时状态和用户动作分开：
 
-1. `on_approved` 创建授权或业务任务，记录 `action.executed` 历史事件。
-2. `get_result` 描述当前用户此刻能做什么。例如查看密码工单：
+1. `on_approved` 创建授权或业务任务，分别记录 `action.executed` 或 `action.submitted` 历史事件。
+2. `get_result` 描述当前用户此刻能做什么；异步任务返回 `processing: true` 时，详情继续轮询直到结束。例如查看密码工单：
    ```json
    {"state": "available", "expires_at": "...", "actions": [
      {"type": "view_secret", "account_id": "...", "name": "root", "expires_at": "..."}
@@ -199,6 +199,20 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 6. 验证正常资源可选的申请、节点／动态账号、代申请、到期提醒、拒绝和撤回，以及其他工单类型仍按原流程工作。
 
 自动回归见 `tickets.tests.test_resource_adjustment` 和 Lina `ticketResourceAdjustment.test.mjs`。
+
+## 账号改密执行
+
+新申请在服务端快照中保存 `change_secret_version=1`。没有该标记的历史工单保持仅审批，即使尚未审批结束也不会因升级自动改密。
+
+仅接受本组织可申请资产上、有效且允许改密的密码账号。资产须有效，平台须启用 Ansible 和改密方法。申请、最终审批及异步执行前均检查许可证、申请人资格、资产范围及账号状态；按冻结的账号 UUID、用户名和密码类型核对，删除重建、改名、停用或移出组织后拒绝执行。沿用 PAM 安全模式对特权账号的限制。暂不支持 SSH 密钥轮换或申请人提交指定密码。
+
+最终审批在同一事务内，以工单 UUID 创建唯一的 `AutomationExecution`，只在提交后投递到 `ansible` 队列；事务回滚不会投递。复用 PAM 的随机密码规则、改密管理器、账号锁及改后验证，不将新旧密码写入工单参数、上下文、事件或结果。密码只由现有 PAM 凭据与执行记录机制管理。
+
+投递失败或进程退出留下的待执行记录由每分钟运行的 `dispatch_ticket_change_secrets` 补发，同一记录五分钟内最多投递一次。工作进程先锁定并领取未开始的执行；重复投递不能再次改密。已经开始的任务不会自动重跑，沿用 PAM 中断恢复、核验和管理员处理流程，避免密码状态不确定时再次轮换。
+
+详情通过现有工单接口返回排队、执行中、成功、失败和待核验状态及账号数量，不返回底层日志或密码。只有全部目标账号都有成功记录才显示成功；未执行的账号不能被误报为成功。任务启动后，有本组织改密执行查看权限的用户可通过 `log_task_id` 直接打开实际 Celery 任务的执行日志，日志页继续执行现有权限校验。其他工单查看者只看到非敏感的执行摘要。
+
+部署需要同时更新 Core、Celery worker/beat 和 Lina，无新增数据库迁移。自动回归见 `tickets.tests.test_change_secret`、Lina `ticketChangeSecretResult.test.mjs` 和 `workflowReassign.test.mjs`。真实资产验收需检查：审批前不改密；最终通过后每个账号仅执行一次；成功密码可登录；验证失败显示待核验；拒绝、撤回及历史工单不执行；账号状态变化或许可证失效阻止任务启动。
 
 ## 文件上传下载授权
 

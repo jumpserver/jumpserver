@@ -123,7 +123,9 @@ class PluginRegistryTests(SimpleTestCase):
         metadata = get_ticket_plugin('view_secret').metadata()
         self.assertEqual(metadata['execution_mode'], 'automatic')
         self.assertEqual(metadata['creation_modes'], ['manual', 'operation'])
-        self.assertEqual({f['name'] for f in metadata['fields']}, {'asset', 'accounts', 'duration'})
+        self.assertEqual({f['name'] for f in metadata['fields']},
+                         {'asset', 'accounts', 'duration', 'resource_description'})
+        self.assertEqual(get_ticket_plugin('change_secret').metadata()['execution_mode'], 'automatic')
         self.assertNotIn('apply_users', {field.name for field in Ticket._meta.fields})
 
     def test_delegated_workflow_rejects_a_branch_that_skips_organization_admin(self):
@@ -296,25 +298,6 @@ class TicketPluginTests(TestCase):
             self.engine.approve(self.task(instance), self.alice)
             effect.assert_not_called()
         self.assertFalse(TicketSecretAccess.objects.filter(ticket=ticket, account_id=account.pk).exists())
-
-    def test_common_plugins_submit_approve_and_do_not_claim_execution(self):
-        self.create_account()
-        for ticket_type, parameters in [
-            ('change_secret', {'asset': str(self.asset.pk), 'accounts': ['root']}),
-        ]:
-            with self.subTest(ticket_type=ticket_type):
-                serializer = self.serializer(self.payload(ticket_type, **parameters))
-                self.assertTrue(serializer.is_valid(), serializer.errors)
-                ticket = serializer.save()
-                instance = submit_ticket(ticket)
-                self.assertEqual(ticket.type, ticket_type)
-                self.assertNotIn('never-in-ticket', str(instance.context))
-                self.assertEqual(instance.context['request']['type'], ticket_type)
-                self.engine.approve(self.task(instance), self.alice)
-                ticket.refresh_from_db()
-                self.assertEqual(ticket.state, 'approved')
-                self.assertFalse(instance.events.filter(type='action.executed').exists())
-                self.assertEqual(PluginTicketApplySerializer(ticket).data['execution_mode'], 'approval_only')
 
     def test_payload_rejects_secrets_unknown_accounts_and_cross_org_assets(self):
         self.create_account()
@@ -738,9 +721,14 @@ class TicketPluginTests(TestCase):
         allowed = self.serializer(data)
         self.assertTrue(allowed.is_valid(), allowed.errors)
 
-    @override_settings(TICKET_APPLY_ASSET_SCOPE='all')
+    @override_settings(TICKET_APPLY_ASSET_SCOPE='all', XPACK_LICENSE_IS_VALID=True,
+                       CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED=False)
     def test_account_options_match_asset_and_submission_rules(self):
         from accounts.const import SecretType
+        from assets.models import PlatformAutomation
+        PlatformAutomation.objects.update_or_create(platform=self.platform, defaults={
+            'ansible_enabled': True, 'change_secret_enabled': True, 'change_secret_method': 'change_secret_posix',
+        })
         self.create_account()
         Account.objects.create(asset=self.asset, name='Other root', username='root', secret_type=SecretType.SSH_KEY)
         Account.objects.create(asset=self.asset, name='Disabled', username='disabled', is_active=False)
@@ -755,8 +743,6 @@ class TicketPluginTests(TestCase):
             force_authenticate(request, self.applicant)
             response = TicketTypeViewSet.as_view({'get': 'resource_options'})(request, pk=ticket_type)
             expected = ['root'] + [f'user-{index:02}' for index in range(12)]
-            if ticket_type != 'view_secret':
-                expected += ['disabled', 'key-only']
             self.assertEqual(response.status_code, 200, response.data)
             self.assertEqual(response.data, sorted(expected))
             metadata = get_ticket_plugin(ticket_type).metadata()

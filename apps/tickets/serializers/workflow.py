@@ -125,7 +125,7 @@ class WorkflowEventSerializer(serializers.ModelSerializer):
     resources = serializers.SerializerMethodField()
 
     def get_resources(self, event):
-        if event.type != 'action.executed':
+        if event.type not in ('action.executed', 'action.submitted'):
             return []
         instance = self.context.get('workflow_instance') or event.instance
         plugin_type = instance.context.get('plugin', {}).get('type') or instance.ticket.type

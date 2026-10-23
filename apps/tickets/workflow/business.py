@@ -143,7 +143,8 @@ def on_workflow_event(sender, instance, event, **kwargs):
         Ticket.objects.filter(pk=ticket.pk).update(state=state, status='closed', date_updated=timezone.now())
         if instance.state == 'approved' and effect is not None:
             from tickets.models import WorkflowEvent
-            WorkflowEvent.objects.create(instance=instance, type='action.executed',
+            event_type = 'action.submitted' if effect.pop('pending', False) else 'action.executed'
+            WorkflowEvent.objects.create(instance=instance, type=event_type,
                                          data=effect)
     if event.type in ('approval.created', 'cc.added', 'workflow.completed', 'workflow.cancelled', 'workflow.expired', 'workflow.error'):
         transaction.on_commit(lambda: deliver_event(event.pk), robust=True)
