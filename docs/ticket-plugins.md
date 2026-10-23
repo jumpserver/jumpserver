@@ -185,7 +185,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 - 工作流详情新增 `resource_adjustment`，包含 `pending`、`revision`、`can_adjust`；当前有权限的审批人还会收到调整字段及当前值。被指定为审批人不会自动获得资源查询权限，须具有工单组织的 `assets.view_asset` 和 `accounts.view_account`；使用节点还需 `assets.view_node`。
 - `GET approval-tasks/{id}/resource-options/?resource=asset|account|node` 查询本组织资源，账号查询通过 `assets` 传资产 UUID。
 - `POST approval-tasks/{id}/adjust-resources/` 接受 `resources`、必填 `reason` 和 `expected_revision`。独立保存，不审批；失败全部回滚，重复旧版本请求返回 409。原说明一直保留，`resources.adjusted` 事件记录修改前后内容和调整原因，不包含密码。
-- `POST approval-tasks/{id}/approve/` 传 `expected_revision`。修改后需要重新核对详情，旧页面、旧邮件及不携带新版号的批量审批不能批准修改后的范围。已有投票或已走过条件分支时，重新执行同一个发布版本的流程，旧任务保留在历史中并作废未处理待办。新节点按原配置重新计时；没有投票或条件分支的首次补齐保留当前节点、转交／加签和截止时间。
+- `POST approval-tasks/{id}/approve/` 传 `expected_revision`。修改后需要重新核对详情，旧页面、旧邮件及不携带新版号的批量审批不能批准修改后的范围。已有投票、已走过条件分支，或当前资产负责人审批节点的资产范围／负责人发生变化时，重新执行同一个发布版本的流程，旧任务保留在历史中并作废未处理待办。新节点按原配置重新计时、解析负责人；新资源缺少有效负责人时整次调整回滚。其他没有投票或条件分支的首次补齐保留当前节点、转交／加签和截止时间。
 
 部署需执行 `tickets.0011_workflow_resource_amendments`，仅移除“一个节点只能运行一次”的约束，使重新审批保留旧节点与任务记录；不清理历史数据、不重放授权。
 

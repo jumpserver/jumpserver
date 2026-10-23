@@ -153,6 +153,11 @@ def adjust_resources(engine, instance, task, user, data, reason, revision):
         context['applicant'] = instance.context['applicant']
         context['resource_revision'] = instance.context.get('resource_revision', 0) + 1
         plugin.validate_submission(ticket, context)
+        # An owner task only covers the assets and owners for which it was assigned.
+        owners_changed = task.node_instance.node.config['approvers']['type'] == 'asset_owner' and (
+            {asset['id']: asset['owner_ids'] for asset in instance.context['assets']} !=
+            {asset['id']: asset['owner_ids'] for asset in context['assets']}
+        )
         # The only mutation path for an instance snapshot: under its row lock, with a revision and audit event.
         qs = type(instance).objects.filter(pk=instance.pk, context=instance.context)
         if models.QuerySet.update(qs, context=json_snapshot(context)) != 1:
@@ -160,7 +165,7 @@ def adjust_resources(engine, instance, task, user, data, reason, revision):
         instance.context = context
         type(ticket).objects.filter(pk=ticket.pk).update(request_data=ticket.request_data, date_updated=timezone.now())
         instance.ticket = ticket
-    restarted = instance.node_instances.filter(tasks__state='approved').exists()
+    restarted = owners_changed or instance.node_instances.filter(tasks__state='approved').exists()
     # Conditions already traversed may depend on the amended scope even before a vote.
     restarted = restarted or instance.node_instances.filter(node__type='condition').exists()
     engine._event(instance, 'resources.adjusted', node=task.node_instance, task=task, actor=user,
