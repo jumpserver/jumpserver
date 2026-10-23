@@ -295,10 +295,6 @@ class Migration(migrations.Migration):
             name='active_version',
             field=models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='tickets.workflowversion'),
         ),
-        migrations.AddConstraint(
-            model_name='workflownodeinstance',
-            constraint=models.UniqueConstraint(fields=('instance', 'node'), name='tickets_workflow_node_run_uniq'),
-        ),
         migrations.AddIndex(
             model_name='approvaltask',
             index=models.Index(fields=['assignee', 'state'], name='tickets_task_assignee_state'),

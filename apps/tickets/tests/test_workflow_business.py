@@ -330,16 +330,18 @@ class WorkflowBusinessTests(TestCase):
                 deliver.assert_not_called()
             deliver.assert_called_once()
         task = self.task(instance)
+        from common.auth.cache import TICKET_DIRECT_APPROVE_KEY
         from tickets.notifications import TicketAppliedToAssigneeMessage
         from django.core.cache import cache
         message = TicketAppliedToAssigneeMessage(self.alice, ticket, task_id=task.pk)
         message.get_html_context()
-        self.assertEqual(cache.get(message.token)['task_id'], str(task.pk))
+        cache_key = TICKET_DIRECT_APPROVE_KEY.format(token=message.token)
+        self.assertEqual(cache.get(cache_key)['task_id'], str(task.pk))
         self.engine.approve(task, self.alice)
         with self.assertRaises(WorkflowConflict):
             ticket.approve(self.alice, task_id=task.pk)
         self.assertEqual(self.task(instance).state, 'pending')
-        cache.delete(message.token)
+        cache.delete(cache_key)
 
     def api_request(self, view, action, user, *, data=None, pk=None, method='get', can_audit=False):
         request = getattr(APIRequestFactory(), method)('/api/v1/tickets/', data or {}, format='json')

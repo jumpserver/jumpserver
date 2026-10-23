@@ -100,7 +100,7 @@
 代码没有在开发/生产业务数据库上执行迁移。部署时按以下顺序处理：
 
 1. 备份数据库，暂停产生新工单的入口和审批操作，停止旧版本服务/任务消费者。
-2. 部署后端代码，执行 `python apps/manage.py migrate`，保留全部 dev 迁移后，依次由依赖图执行 authentication 0012、tickets 0010，以及 assets 0032、users 0008、acls 0007。每个 app 的重构模型变更保留一个迁移文件。
+2. 部署后端代码，执行 `python apps/manage.py migrate`，保留全部 dev 迁移后，依次由依赖图执行 authentication 0012、tickets 0010，以及 assets 0033（依赖 dev 的 OceanBase 0032）、users 0008、acls 0007。每个 app 的重构模型变更保留一个迁移文件。
 3. 先预览定义迁移，再执行；导入流程默认禁用，逐个检查审批人、组织和抄送配置后启用。
 4. 预览并导入历史及未完成工单，检查所有错误和告警；最后同步部署 Lina、重启 Web/Celery/Beat 并恢复入口。
 

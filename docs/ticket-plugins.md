@@ -171,7 +171,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 插件接入回归包括：新类型无需修改枚举/模型/路由即可申请、审批、读取结果并执行动作；Boolean/MultipleChoice 参数往返；未知动作和错误 HTTP 方法拒绝；查看者与执行者权限隔离；MFA、限流、过期、跨组织及资源变更拒绝；列表不查询实时授权。Lina 覆盖多个账号依赖字段隔离、组织切换丢弃旧响应、结果刷新、过期和专用表单缺失提示。
 
-需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0032_workflow_foundation`、`users.0008_ticket_workflow_integration` 和 `acls.0007_ticket_workflow_integration`。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。为新增类型创建并发布流程后，用户才能提交该类申请。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
+需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0033_workflow_foundation`、`users.0008_ticket_workflow_integration` 和 `acls.0007_ticket_workflow_integration`。assets 0033 接在 dev 的 OceanBase 0032 之后。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。为新增类型创建并发布流程后，用户才能提交该类申请。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
 
 在 `tickets.tests.settings` 隔离环境运行 `tickets.tests.test_plugins` 及既有工作流测试。历史迁移和并发测试使用文档 `ticket-workflow-refactor.md` 中的独立 PostgreSQL 测试库，避免 SQLite 的 schema editor 限制。
 
@@ -187,7 +187,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 - `POST approval-tasks/{id}/adjust-resources/` 接受 `resources`、必填 `reason` 和 `expected_revision`。独立保存，不审批；失败全部回滚，重复旧版本请求返回 409。原说明一直保留，`resources.adjusted` 事件记录修改前后内容和调整原因，不包含密码。
 - `POST approval-tasks/{id}/approve/` 传 `expected_revision`。修改后需要重新核对详情，旧页面、旧邮件及不携带新版号的批量审批不能批准修改后的范围。已有投票、已走过条件分支，或当前资产负责人审批节点的资产范围／负责人发生变化时，重新执行同一个发布版本的流程，旧任务保留在历史中并作废未处理待办。新节点按原配置重新计时、解析负责人；新资源缺少有效负责人时整次调整回滚。其他没有投票或条件分支的首次补齐保留当前节点、转交／加签和截止时间。
 
-部署需执行 `tickets.0011_workflow_resource_amendments`，仅移除“一个节点只能运行一次”的约束，使重新审批保留旧节点与任务记录；不清理历史数据、不重放授权。
+资源调整的模型变更已合入 `tickets.0010_ticket_workflow_refactor`，不创建“一个节点只能运行一次”的约束，使重新审批保留旧节点与任务记录；不清理历史数据、不重放授权。已执行旧开发版 tickets 0010／0011 或 assets 0032 工单迁移的预览环境，应按升级说明从 dev 数据库备份恢复后验证，不能直接 fake 新迁移。
 
 手工验收：
 

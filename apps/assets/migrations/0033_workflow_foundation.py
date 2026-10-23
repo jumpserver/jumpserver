@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0031_winrm_terminal_access'),
+        ('assets', '0032_oceanbase_platforms'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
