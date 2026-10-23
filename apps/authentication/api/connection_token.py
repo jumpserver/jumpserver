@@ -300,12 +300,14 @@ class RDPFileClientProtocolURLMixin:
         # 设置打印机重定向
         printers_redirect_value = self.request.query_params.get('printers_redirect')
         if printers_redirect_value is None:
+            printers_redirect_value = token.connect_options.get('printers_redirect')
+        if printers_redirect_value is None:
             printers_redirect_value = token.user.preference.get_value(
                 'printers_redirect', category='luna', default=False
             )
-            # Boolean preferences are stored as "True"/"False" in a TextField.
-            if isinstance(printers_redirect_value, str):
-                printers_redirect_value = printers_redirect_value.lower()
+        # Boolean preferences are stored as "True"/"False" in a TextField.
+        if isinstance(printers_redirect_value, str):
+            printers_redirect_value = printers_redirect_value.lower()
         if is_true(printers_redirect_value):
             rdp_options['redirectprinters:i'] = '1'
 
@@ -695,12 +697,21 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 backspace_preference_name,
                 resolution_preference_name,
                 rdp_client_option_preference_name,
+                'printers_redirect',
             )
         ).values_list('name', 'value')
         preferences = dict(preferences_query)
         for name in default_name_opts.keys():
             value = preferences.get(name, default_name_opts[name])
             connect_options[name] = value
+
+        # Applet connections can also use RDP regardless of the asset protocol.
+        printers_redirect = connect_options.get('printers_redirect')
+        if printers_redirect is None:
+            printers_redirect = preferences.get('printers_redirect', False)
+        if isinstance(printers_redirect, str):
+            printers_redirect = printers_redirect.lower()
+        connect_options['printers_redirect'] = is_true(printers_redirect)
 
         # The advanced option submitted by Luna takes precedence.  When it is
         # absent, use the personal preference as the connection default.
