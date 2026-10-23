@@ -6388,6 +6388,13 @@ msgstr "Mạng nội bộ"
 msgid "UKey"
 msgstr "UKey"
 
+#: authentication/views/base.py:60
+msgid ""
+"A local account with the same username already exists. "
+"Please log in with another authentication method and bind "
+"this account before using it to log in."
+msgstr "Đã tồn tại tài khoản cục bộ có cùng tên người dùng. Vui lòng đăng nhập bằng phương thức xác thực khác và liên kết tài khoản này trước khi sử dụng để đăng nhập."
+
 #: authentication/views/base.py:72
 #: perms/templates/perms/_msg_permed_items_expire.html:18
 msgid "If you have any question, please contact the administrator"
