@@ -22,6 +22,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     )
     from_ticket_info = serializers.SerializerMethodField(label=_("Ticket info"))
     actions = ActionChoicesField(read_only=True, label=_("Actions"))
+    account_preparation_required = serializers.SerializerMethodField()
     save_personal_credential = serializers.BooleanField(
         required=False, default=False, write_only=True,
         label=_("Save personal credential"),
@@ -43,6 +44,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name', 'face_monitor_token',
             'remote_addr',
+            'account_preparation_required',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
@@ -63,6 +65,14 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         request = self.context.get('request')
         user = request.user if request else None
         return user
+
+    @staticmethod
+    def get_account_preparation_required(instance):
+        from accounts.provisioning import needs_account_preparation
+        return bool(
+            not instance.personal_credential_id
+            and needs_account_preparation(instance.permed_account, instance.protocol)
+        )
 
     def get_user(self, attrs):
         return self.get_request_user()

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from accounts.const import Source
+from accounts.const import AliasAccount, Source
 from accounts.models import AccountTemplate, Account
 from assets.models import Asset, Node
 from common.serializers import ResourceLabelsMixin
@@ -82,7 +82,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         }
         amount_fields = list(relation_count_fields)
         fields_generic = [
-            "accounts", "protocols", "actions",
+            "accounts", "protocols", "actions", "auto_push_same_name",
             "created_by", "date_created", "date_start", "date_expired", "is_active",
             "is_expired", "is_valid", "comment", "from_ticket",
             "expire_soon_notice_minutes", "expire_soon_notice_at",
@@ -201,6 +201,14 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
+        auto_push = attrs.get(
+            'auto_push_same_name', getattr(self.instance, 'auto_push_same_name', False)
+        )
+        accounts = attrs.get('accounts', getattr(self.instance, 'accounts', []))
+        if auto_push and AliasAccount.USER not in accounts:
+            raise serializers.ValidationError({
+                'auto_push_same_name': _('Select the same-name account before enabling automatic push.'),
+            })
         if self.instance is None:
             attrs.setdefault(
                 'date_start', AssetPermission._meta.get_field('date_start').get_default()

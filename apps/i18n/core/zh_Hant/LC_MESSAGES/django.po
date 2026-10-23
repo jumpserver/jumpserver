@@ -16083,3 +16083,35 @@ msgstr "郵件主題"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "郵件正文"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Permission to connect to this account is no longer available."
+msgstr "目前帳號的連線授權已失效。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Prepare the same-name account before connecting."
+msgstr "請先完成同名帳號準備，再連線資產。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Account preparation has not succeeded. Please retry."
+msgstr "帳號準備尚未成功，請重試。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Automatic same-name account push is not authorized."
+msgstr "目前授權不允許自動推送同名帳號。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "已有同名帳號已停用，請聯絡管理員。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "This username cannot be provisioned automatically."
+msgstr "此使用者名稱不支援自動建立帳號，請聯絡管理員。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Account push is not enabled for this asset platform."
+msgstr "此資產平台尚未啟用帳號推送，請聯絡管理員。"
+
+#: accounts/provisioning.py perms/serializers/permission.py
+msgid "Select the same-name account before enabling automatic push."
+msgstr "請先選擇同名帳號，再開啟自動推送。"

@@ -3,6 +3,7 @@ import json
 import os
 import urllib.parse
 from collections.abc import Mapping
+from datetime import timedelta
 from struct import pack
 
 from cryptography import x509
@@ -642,6 +643,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         'expire': 'authentication.expire_connectiontoken',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
+        'prepare_account': 'authentication.add_connectiontoken',
     }
     input_username = ''
     need_face_verify = False
@@ -657,6 +659,16 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
 
     def get_user(self, serializer):
         return self.request.user
+
+    @action(methods=['post'], detail=True, url_path='prepare-account')
+    def prepare_account(self, request, *args, **kwargs):
+        from accounts.provisioning import prepare_account
+
+        token = self.get_object()
+        token.is_valid()
+        retry = serializers.BooleanField().run_validation(request.data.get('retry', False))
+        result = prepare_account(token, retry=retry)
+        return Response(result)
 
     @transaction.atomic
     def perform_create(self, serializer):
@@ -853,6 +865,17 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         _data['remote_addr'] = get_request_ip_or_data(self.request)
         data.update(_data)
 
+        from accounts.provisioning import auto_push_enabled, needs_account_preparation
+        permitted = self.validated_account
+        if (account_name == AliasAccount.USER and permitted and not permitted.is_virtual()
+                and auto_push_enabled(permitted, protocol)):
+            data['account'] = permitted.alias
+        if (not credential_id and not save_credential
+                and needs_account_preparation(permitted, protocol)):
+            # Preparation runs after login approvals. Keep its token alive for
+            # a bounded wait; prepare-account restores the ordinary TTL.
+            data['date_expired'] = timezone.now() + timedelta(minutes=15)
+
         if save_credential:
             credential = save_personal_credential(
                 user=user,
@@ -929,6 +952,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             account = self._validate_perm(
                 user, asset, account_alias, protocol
             )
+        self.validated_account = account
         if account.has_secret:
             data['input_secret'] = ''
             data['input_secret_type'] = account.secret_type
