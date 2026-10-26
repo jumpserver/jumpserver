@@ -14,6 +14,7 @@ from rest_framework.utils.encoders import JSONEncoder
 from common.db.utils import close_old_connections, get_logger
 from common.signals import django_ready
 from common.utils.connection import RedisPubSub
+from common.utils.verify_code import VERIFY_CODE_TASKS
 from jumpserver.utils import get_current_request
 from orgs.utils import get_current_org_id, set_current_org
 from .ansible.runner import interface
@@ -166,6 +167,11 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         return
 
     args, kwargs, __ = body
+
+    if task in VERIFY_CODE_TASKS:
+        # 仅清空执行记录参数，保留原始 body 供活动回调使用。
+        args = []
+        kwargs = {}
 
     try:
         args = json.loads(json.dumps(list(args), cls=JSONEncoder))
