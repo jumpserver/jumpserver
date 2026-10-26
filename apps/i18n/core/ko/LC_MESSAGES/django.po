@@ -9810,6 +9810,22 @@ msgstr "RDP 클라이언트 옵션"
 msgid "Printer redirection"
 msgstr "프린터 리디렉션"
 
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Windows 키 조합 적용 위치"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "로컬 컴퓨터"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "원격 컴퓨터"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "전체 화면에서만"
+
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
 msgstr "RDP 색상 품질"
