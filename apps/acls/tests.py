@@ -1,7 +1,7 @@
 from contextlib import nullcontext
 from datetime import datetime
 from types import SimpleNamespace
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import Mock, patch
 from uuid import uuid4
 import time
 
@@ -35,7 +35,11 @@ class AssetReviewExemptionTests(SimpleTestCase):
         self.acl = LoginAssetACL(action='accept', review_enabled=True, review_duration=2, org_id=str(uuid4()))
         self.policy = LoginAssetPolicy((self.acl,))
         self.user = SimpleNamespace(id=uuid4())
-        self.asset = SimpleNamespace(id=uuid4(), org_id=self.acl.org_id)
+        asset_id = uuid4()
+        self.asset = SimpleNamespace(
+            id=asset_id, pk=asset_id, org_id=self.acl.org_id,
+            name='asset', address='192.0.2.10',
+        )
         self.key = self.acl.get_review_cache_key(self.user.id, self.asset.id, 'root')
         self.ticket = ApplyLoginAssetTicket(
             state=TicketState.approved, org_id=self.acl.org_id,
@@ -125,17 +129,18 @@ class AssetReviewExemptionTests(SimpleTestCase):
             log.assert_called_once()
 
     def test_only_final_approval_grants_exemption_without_a_token(self):
-        missing_token = ApplyLoginAssetTicket.connection_token.RelatedObjectDoesNotExist
         with patch.object(BaseHandler, '_on_step_approved', return_value=False) as finished, \
-                patch.object(ApplyLoginAssetTicket, 'connection_token', new_callable=PropertyMock,
-                             side_effect=missing_token), \
+                patch.object(ApplyLoginAssetTicket, 'connection_tokens') as tokens, \
                 patch.object(LoginAssetACL, 'cache_approved_review') as grant:
+            tokens.order_by.return_value = []
             handler = Handler(self.ticket)
             handler._on_step_approved(Mock())
             grant.assert_not_called()
+            tokens.order_by.assert_not_called()
             finished.return_value = True
             handler._on_step_approved(Mock())
             grant.assert_called_once_with(self.ticket)
+            tokens.order_by.assert_called_once_with('pk')
 
     def test_ticket_creation_saves_server_generated_match(self):
         with patch.object(ApplyLoginAssetTicket.objects, 'create') as create:
@@ -143,7 +148,14 @@ class AssetReviewExemptionTests(SimpleTestCase):
             ticket = self.acl.create_login_asset_review_ticket(
                 self.user, self.asset, 'root', reviewers, self.acl.org_id,
             )
-            self.assertEqual(create.call_args.kwargs['meta'], self.ticket.meta)
+            self.assertEqual(create.call_args.kwargs['meta'], {
+                **self.ticket.meta,
+                'login_asset_connections': [{
+                    'asset_id': str(self.asset.id), 'asset_name': self.asset.name,
+                    'asset_address': self.asset.address, 'account': 'root', 'reason': '',
+                    'reviews': self.ticket.meta['login_asset_reviews'],
+                }],
+            })
             self.assertEqual(create.call_args.kwargs['apply_login_account'], 'root')
             ticket.open_by_system.assert_called_once_with(reviewers)
 
