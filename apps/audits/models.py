@@ -353,6 +353,13 @@ class UserLoginLog(models.Model):
     class Meta:
         ordering = ["-datetime", "username"]
         verbose_name = _("User login log")
+        indexes = [
+            models.Index(fields=['username', 'datetime'], name='login_log_username_date_idx'),
+            models.Index(
+                fields=['username', 'status', 'city', 'datetime'],
+                name='login_log_username_city_idx',
+            ),
+        ]
 
 
 class UserSession(models.Model):
