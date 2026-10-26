@@ -11,12 +11,19 @@ class Plugin(TicketPlugin):
     type = 'file_transfer'
     label = _('File upload / download')
     self_service = True
-    execution_mode = 'automatic'
+    execution_mode = 'external'
     request_serializer = 'tickets.plugins.file_transfer.serializer.RequestSerializer'
+    actions = {
+        'execute_transfer': 'tickets.plugins.file_transfer.actions.ExecuteTransfer',
+        'download_transfer_file': 'tickets.plugins.file_transfer.actions.DownloadTransferFile',
+        'review_transfer_file': 'tickets.plugins.file_transfer.actions.ReviewTransferFile',
+    }
 
     def get_execution_mode(self, ticket):
         instance = getattr(ticket, 'workflow_instance', None)
-        return self.execution_mode if is_executable(instance) else 'approval_only'
+        if instance and instance.context.get('file_transfer_version') == 2:
+            return 'external'
+        return 'automatic' if is_executable(instance) else 'approval_only'
 
     def build_context(self, ticket):
         from assets.models import Asset
@@ -25,17 +32,37 @@ class Plugin(TicketPlugin):
         context = account_context(ticket)
         asset = Asset.objects.get(pk=context['request']['asset'], org_id=ticket.org_id)
         access = base_access(ticket.applicant, asset)
-        context['accounts'] = [a for a in context['accounts'] if a['id'] in access]
+        context['accounts'] = [a for a in context['accounts'] if a['id'] in access and
+                               a['secret_type'] in ('password', 'ssh_key') and
+                               {'ssh', 'sftp'} & set(access[a['id']]['protocols'])]
         if {a['username'] for a in context['accounts']} != set(context['request']['accounts']):
             raise WorkflowConfigurationError(_('Existing access to every requested account is required.'))
+        if len(context['accounts']) != 1 or asset.category != 'host' or asset.type != 'linux':
+            raise WorkflowConfigurationError(_('Select one Linux SSH/SFTP account.'))
+        from .storage import claim_files
+        account = context['accounts'][0]
+        protocol = 'sftp' if 'sftp' in access[account['id']]['protocols'] else 'ssh'
         context.update(
-            file_transfer_version=1, actions=[ticket.request_data['direction']],
+            file_transfer_version=2, actions=[ticket.request_data['direction']],
             duration=ticket.request_data['duration'],
-            transfer_protocols={a['id']: access[a['id']]['protocols'] for a in context['accounts']},
+            transfer_protocol=protocol, transfer_port=asset.protocols.get(name=protocol).port,
+            transfer_address=asset.address,
+            transfer_files=claim_files(ticket),
         )
         return context
 
     def on_approved(self, instance, ticket):
+        if instance.context.get('file_transfer_version') == 2:
+            from .policy import validate_context, expires_at
+            from tickets.models import TicketTransferFile
+            validate_context(ticket)
+            files = TicketTransferFile.objects.filter(ticket=ticket, kind='upload', purged_at__isnull=True,
+                                                       expires_at__gt=timezone.now())
+            if files.count() != len(instance.context['transfer_files']):
+                from tickets.workflow.errors import WorkflowConfigurationError
+                raise WorkflowConfigurationError(_('The uploaded files expired. Submit a new request.'))
+            files.update(expires_at=expires_at(ticket))
+            return None
         from assets.models import Asset
         from perms.const import ActionChoices
         from perms.models import AssetPermission
@@ -114,4 +141,11 @@ class Plugin(TicketPlugin):
             return status
 
     def get_result(self, ticket, user):
+        instance = getattr(ticket, 'workflow_instance', None)
+        if instance and instance.context.get('file_transfer_version') == 2:
+            from .execution import get_result
+            return get_result(ticket, user)
         return {**self.get_transfer_status(ticket), 'actions': []}
+
+    def request_items(self, ticket):
+        return [item for item in super().request_items(ticket) if item['name'] != 'files' and item['value'] not in ('', [])]

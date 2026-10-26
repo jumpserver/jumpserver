@@ -6,3 +6,4 @@ from .flow import *
 from .relation import *
 from .workflow import *
 from .instance import *
+from .file_transfer import *

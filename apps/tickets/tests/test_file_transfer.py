@@ -51,17 +51,30 @@ class FileTransferTests(TestCase):
         return grant
 
     def request_ticket(self, approved=True, **parameters):
+        from tickets.models import Ticket
         data = dict(asset=str(self.asset.pk), accounts=['root'], direction='upload', paths=['/tmp/file'], duration=600)
         data.update(parameters)
-        serializer = self.serializer(self.payload('file_transfer', **data))
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        ticket = serializer.save()
-        instance = submit_ticket(ticket)
+        # Version 1 is now historical: build persisted fixtures, not new API requests.
+        ticket = Ticket.objects.create(type='file_transfer', title='Legacy transfer', applicant=self.applicant,
+                                        org_id=self.org.pk, workflow=self.workflow('file_transfer'), request_data=data)
+        with patch.object(self.plugin, 'build_context', side_effect=self.legacy_context):
+            instance = submit_ticket(ticket)
         if approved:
             self.engine.approve(self.task(instance), self.alice)
         instance.refresh_from_db()
         ticket.refresh_from_db()
         return ticket, instance
+
+    def legacy_context(self, ticket):
+        from tickets.plugins.resources import account_context
+        from tickets.plugins.file_transfer.permissions import base_access
+        context = account_context(ticket)
+        access = base_access(ticket.applicant, self.asset)
+        context['accounts'] = [a for a in context['accounts'] if a['id'] in access]
+        context.update(file_transfer_version=1, actions=[ticket.request_data['direction']],
+                       duration=ticket.request_data['duration'],
+                       transfer_protocols={a['id']: access[a['id']]['protocols'] for a in context['accounts']})
+        return context
 
     def actions(self, account=None, protocol='ssh', user=None):
         permed = ConnectionToken.get_user_permed_account(user or self.applicant, self.asset,
@@ -189,12 +202,12 @@ class FileTransferTests(TestCase):
 
     def test_historical_pending_and_completed_tickets_stay_approval_only(self):
         for approved in (False, True):
-            original = self.plugin.build_context
+            original = self.legacy_context
             def legacy_context(ticket):
                 context = original(ticket)
                 context.pop('file_transfer_version')
                 return context
-            with patch.object(self.plugin, 'build_context', side_effect=legacy_context):
+            with patch.object(self, 'legacy_context', side_effect=legacy_context):
                 ticket, instance = self.request_ticket(approved=False)
             if approved:
                 self.engine.approve(self.task(instance), self.alice)

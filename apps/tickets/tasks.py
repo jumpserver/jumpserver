@@ -37,3 +37,16 @@ def dispatch_ticket_change_secrets():
     for execution_id in ids:
         dispatch_execution(execution_id)
     return len(ids)
+
+
+@shared_task(queue='ansible', soft_time_limit=900, time_limit=960)
+def execute_ticket_file_transfer(ticket_id):
+    from tickets.plugins.file_transfer.execution import execute
+    execute(ticket_id)
+
+
+@shared_task
+@register_as_period_task(interval=60)
+def maintain_ticket_file_transfers():
+    from tickets.plugins.file_transfer.execution import maintain
+    return maintain()

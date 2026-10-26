@@ -28,3 +28,24 @@ class TicketTypeViewSet(viewsets.ViewSet):
                 from tickets.workflow.resources import resource_availability
                 return Response(resource_availability(get_ticket_plugin(pk), request, org_id))
             return Response(get_ticket_plugin(pk).options(request, org_id))
+
+    @action(detail=True, methods=['post'], url_path='upload-file')
+    def upload_file(self, request, pk=None):
+        from common.drf.throttling import FileTransferThrottle
+        from tickets.plugins.file_transfer.storage import stage_upload
+        if pk != 'file_transfer':
+            raise ValidationError('This ticket type does not accept files.')
+        throttle = FileTransferThrottle()
+        if not throttle.allow_request(request, self):
+            self.throttled(request, throttle.wait())
+        org_id = str(request.data.get('org_id', current_org.id))
+        if org_id == Organization.ROOT_ID or not Organization.objects.filter(pk=org_id).exists():
+            raise ValidationError('Select a concrete organization.')
+        if not available_users(org_id).filter(pk=request.user.pk).exists():
+            raise PermissionDenied()
+        files = request.FILES.getlist('file')
+        if len(files) != 1:
+            raise ValidationError('Upload one file at a time.')
+        with tmp_to_org(org_id):
+            record = stage_upload(request.user, org_id, files[0])
+        return Response(record.summary(), status=201)
