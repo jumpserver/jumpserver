@@ -21,6 +21,16 @@ class PushAccountManager(BaseChangeSecretPushManager):
     def method_type(cls):
         return AutomationTypes.push_account
 
+    def should_update_account_on_success(self, result):
+        if not self.execution.snapshot.get('create_only'):
+            return True
+        tasks = (result or {}).get('ok', result or {})
+        existing = any(
+            task.get('res', {}).get('ansible_facts', {}).get('jms_account_existing') is True
+            for task in tasks.values()
+        )
+        return not existing
+
     def get_secret(self, account):
         secret = account.secret
         if not secret and not account.follows_template:
@@ -28,6 +38,12 @@ class PushAccountManager(BaseChangeSecretPushManager):
         return secret
 
     def gen_account_inventory(self, account, asset, h, path_dir):
+        create_only = self.execution.snapshot.get('create_only', False)
+        if create_only and asset.platform.automation.push_account_method not in {
+            'push_account_posix', 'push_account_aix', 'push_account_windows', 'push_account_local_windows',
+        }:
+            raise ValueError(_('This push method does not support create-only mode'))
+        h['jms_create_only'] = bool(create_only)
         secret = self.get_secret(account)
         secret_type = account.secret_type
         if not secret:

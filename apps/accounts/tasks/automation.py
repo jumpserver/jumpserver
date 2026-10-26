@@ -4,7 +4,7 @@ from collections import defaultdict
 from celery import shared_task
 from django.conf import settings
 from django.core.cache import cache
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop
 
@@ -383,5 +383,18 @@ def clean_change_secret_and_push_record_period():
         ChangeSecretRecord.objects.filter(null_related_q).delete()
         ChangeSecretRecord.objects.filter(expired_q).delete()
 
-        PushSecretRecord.objects.filter(null_related_q).delete()
-        PushSecretRecord.objects.filter(expired_q).delete()
+        # Keep the latest unsuccessful first-login result. Removing it would
+        # turn an unprepared account into an
+        # ordinary existing account and allow login without a verified push.
+        newer_first_login = PushSecretRecord.objects.filter(
+            account_id=OuterRef('account_id'), is_first_login=True,
+        ).filter(
+            Q(date_created__gt=OuterRef('date_created'))
+            | Q(date_created=OuterRef('date_created'), id__gt=OuterRef('id')),
+        )
+        protected_ids = list(PushSecretRecord.objects.filter(
+            is_first_login=True, account__isnull=False,
+        ).exclude(
+            status='success', execution__status='success', execution__date_finished__isnull=False,
+        ).filter(~Exists(newer_first_login)).values_list('id', flat=True))
+        PushSecretRecord.objects.filter(null_related_q | expired_q).exclude(id__in=protected_ids).delete()

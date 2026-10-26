@@ -79,7 +79,7 @@ def match_rejected_login_asset_acl(user, assets, account, ip=None):
         acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
         if not acl:
             continue
-        if not acl.is_action(acl.ActionChoices.accept):
+        if not acl.allows_noninteractive_for(user, account, asset):
             return asset, acl
     return None, None
 

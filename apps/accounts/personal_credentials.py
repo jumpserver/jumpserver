@@ -295,7 +295,7 @@ def validate_personal_credential_test_acl(
         account_username=username,
     )
     acl = LoginAssetACL.get_match_rule_acls(user, remote_addr, acls)
-    if not acl or acl.is_action(acl.ActionChoices.accept):
+    if not acl or acl.allows_noninteractive_for(user, permission_account, asset):
         return
     raise PermissionDenied(
         _(
