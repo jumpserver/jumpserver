@@ -24,3 +24,5 @@ LOGGING = deepcopy(LOGGING)
 for config in LOGGING.get('loggers', {}).values():
     config['level'] = 'ERROR'
 TEST_RUNNER = 'tickets.tests.runner.WorkflowTestRunner'
+# Local config.yml may restrict the asset scope; each test declares its own.
+TICKET_APPLY_ASSET_SCOPE = 'all'
