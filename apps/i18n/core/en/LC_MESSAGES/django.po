@@ -13241,3 +13241,68 @@ msgstr "Too many UKey challenges; try again later"
 
 msgid "VCTK_S random generation check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
 msgstr "VCTK_S random generation check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
+
+
+#: audits/const.py audits/backends/db.py
+msgid "Build primary/standby HA"
+msgstr "Build primary/standby HA"
+
+#: audits/const.py audits/backends/db.py
+msgid "Detach primary/standby HA"
+msgstr "Detach primary/standby HA"
+
+#: audits/const.py audits/backends/db.py
+msgid "Patch upgrade"
+msgstr "Patch upgrade"
+
+#: audits/const.py audits/backends/db.py
+msgid "System upgrade"
+msgstr "System upgrade"
+
+#: audits/const.py audits/backends/db.py
+msgid "HA"
+msgstr "HA"
+
+#: audits/const.py audits/backends/db.py
+msgid "Patch"
+msgstr "Patch"
+
+#: audits/const.py audits/backends/db.py
+msgid "patch_id"
+msgstr "Patch ID"
+
+#: audits/const.py audits/backends/db.py
+msgid "package_name"
+msgstr "Package name"
+
+#: audits/const.py audits/backends/db.py
+msgid "Primary node"
+msgstr "Primary node"
+
+#: audits/const.py audits/backends/db.py
+msgid "Standby node"
+msgstr "Standby node"
+
+#: audits/const.py audits/backends/db.py
+msgid "Virtual IP"
+msgstr "Virtual IP"
+
+#: audits/const.py audits/backends/db.py
+msgid "Task ID"
+msgstr "Task ID"
+
+#: audits/const.py audits/backends/db.py
+msgid "Execution mode"
+msgstr "Execution mode"
+
+#: audits/const.py audits/backends/db.py
+msgid "Request status"
+msgstr "Request status"
+
+#: audits/const.py audits/backends/db.py
+msgid "Single node"
+msgstr "Single node"
+
+#: audits/const.py audits/backends/db.py
+msgid "Submitted"
+msgstr "Submitted"

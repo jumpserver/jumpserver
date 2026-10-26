@@ -41,6 +41,12 @@ class ActionChoices(TextChoices):
     # Custom action
     finished = 'finished', _('Finished')
 
+    # Device management operations
+    ha_build = 'ha_build', _('Build primary/standby HA')
+    ha_detach = 'ha_detach', _('Detach primary/standby HA')
+    patch_upgrade = 'patch_upgrade', _('Patch upgrade')
+    system_upgrade = 'system_upgrade', _('System upgrade')
+
 
 class LoginTypeChoices(TextChoices):
     web = "W", _("Web")

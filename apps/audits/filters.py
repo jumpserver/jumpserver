@@ -85,6 +85,8 @@ class OperateLogFilterSet(BaseFilterSet):
         current_lang = translation.get_language()
         with translation.override(current_lang):
             mapper = {str(m._meta.verbose_name): m._meta.verbose_name_raw for m in apps.get_models()}
+            # JDMC resource types are stored directly, without Django models.
+            mapper.update({translation.gettext(value): value for value in ('HA', 'Patch', 'Upgrade')})
         tp = mapper.get(resource_type)
         queryset = queryset.filter(resource_type__in=[tp, resource_type])
         return queryset

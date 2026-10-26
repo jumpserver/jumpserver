@@ -13300,3 +13300,68 @@ msgstr "VCTK_S 隨機數介面檢查通過，尚未驗證 UKey 簽章及憑證�
 
 msgid "Certificate or UKey is not bound to a user"
 msgstr "憑證或 UKey 尚未綁定使用者"
+
+
+#: audits/const.py audits/backends/db.py
+msgid "Build primary/standby HA"
+msgstr "構建主備 HA"
+
+#: audits/const.py audits/backends/db.py
+msgid "Detach primary/standby HA"
+msgstr "解除主備 HA"
+
+#: audits/const.py audits/backends/db.py
+msgid "Patch upgrade"
+msgstr "補丁升級"
+
+#: audits/const.py audits/backends/db.py
+msgid "System upgrade"
+msgstr "系統升級"
+
+#: audits/const.py audits/backends/db.py
+msgid "HA"
+msgstr "主備 HA"
+
+#: audits/const.py audits/backends/db.py
+msgid "Patch"
+msgstr "補丁"
+
+#: audits/const.py audits/backends/db.py
+msgid "patch_id"
+msgstr "補丁編號"
+
+#: audits/const.py audits/backends/db.py
+msgid "package_name"
+msgstr "升級包名稱"
+
+#: audits/const.py audits/backends/db.py
+msgid "Primary node"
+msgstr "主節點"
+
+#: audits/const.py audits/backends/db.py
+msgid "Standby node"
+msgstr "備節點"
+
+#: audits/const.py audits/backends/db.py
+msgid "Virtual IP"
+msgstr "虛擬 IP"
+
+#: audits/const.py audits/backends/db.py
+msgid "Task ID"
+msgstr "任務編號"
+
+#: audits/const.py audits/backends/db.py
+msgid "Execution mode"
+msgstr "執行模式"
+
+#: audits/const.py audits/backends/db.py
+msgid "Request status"
+msgstr "請求狀態"
+
+#: audits/const.py audits/backends/db.py
+msgid "Single node"
+msgstr "單機"
+
+#: audits/const.py audits/backends/db.py
+msgid "Submitted"
+msgstr "已提交"

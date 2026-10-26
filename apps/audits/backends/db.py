@@ -83,6 +83,12 @@ class OperateLogStore(object):
         action = _("action")
         install = _("install")
         delete = _("delete")
+        jdmc_labels = (
+            _("HA"), _("Patch"), _("patch_id"), _("package_name"),
+            _("Primary node"), _("Standby node"), _("Virtual IP"),
+            _("Task ID"), _("Execution mode"), _("Request status"),
+            _("Single node"), _("Submitted"),
+        )
         handler = cls._get_special_handler(op_log.resource_type)
         for k, v in op_log.diff.items():
             before_value, after_value = cls.split_value(v)
