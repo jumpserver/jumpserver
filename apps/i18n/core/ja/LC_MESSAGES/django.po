@@ -6366,6 +6366,13 @@ msgstr "ローカルエリアネットワーク"
 msgid "UKey"
 msgstr "UKey"
 
+#: authentication/views/base.py:60
+msgid ""
+"A local account with the same username already exists. "
+"Please log in with another authentication method and bind "
+"this account before using it to log in."
+msgstr "同じユーザー名のローカルアカウントが既に存在します。別の認証方法でログインしてこのアカウントを連携してから、このアカウントでログインしてください。"
+
 #: authentication/views/base.py:72
 #: perms/templates/perms/_msg_permed_items_expire.html:18
 msgid "If you have any question, please contact the administrator"

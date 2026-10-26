@@ -21,18 +21,24 @@ from .notifications import DifferentCityLoginMessage
 logger = get_logger(__file__)
 
 
-def should_use_oracle_sysdba(connect_options, protocol):
-    return protocol == Protocol.oracle and is_true(
-        (connect_options or {}).get('use_sysdba', False)
-    )
+def should_use_oracle_sysdba(connect_options, protocol, asset=None):
+    if protocol != Protocol.oracle:
+        return False
+    if is_true((connect_options or {}).get('use_sysdba', False)):
+        return True
+    if asset is None:
+        return False
+    # A default false submitted by a client must not disable the platform role.
+    oracle = asset.platform.protocols.filter(name=Protocol.oracle).first()
+    return oracle is not None and is_true((oracle.setting or {}).get('sysdba', False))
 
 
-def get_effective_connect_options(connect_options, protocol):
+def get_effective_connect_options(connect_options, protocol, asset=None):
     options = dict(connect_options or {})
     if protocol != Protocol.oracle:
         options.pop('use_sysdba', None)
         return options
-    options['use_sysdba'] = should_use_oracle_sysdba(options, protocol)
+    options['use_sysdba'] = should_use_oracle_sysdba(options, protocol, asset)
     return options
 
 
