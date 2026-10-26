@@ -1,0 +1,9 @@
+{% load i18n %}
+{% if renewal_links %}
+<p>{% trans 'Apply for renewal' %}:</p>
+<ul>
+    {% for link in renewal_links %}
+    <li><a href="{{ link.url }}">{{ link.serial_num }} — {{ link.title }}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}

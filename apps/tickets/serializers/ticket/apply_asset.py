@@ -23,6 +23,7 @@ apply_help_text = _('Support fuzzy search, and display up to 10 items')
 
 class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
     """Keep the rich asset form while storing its fields on the base ticket."""
+    source_ticket_id = serializers.UUIDField(required=False, write_only=True)
     apply_users = serializers.ListField(
         child=serializers.UUIDField(), required=False, allow_empty=False,
         max_length=1, write_only=True, label=_('Authorized user'),
@@ -53,7 +54,7 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
         fields = TicketApplySerializer.Meta.fields + [
             'apply_users', 'apply_assets', 'apply_nodes', 'apply_accounts',
             'apply_actions', 'apply_date_start', 'apply_date_expired',
-            'apply_expire_soon_notice_minutes', 'resource_description',
+            'apply_expire_soon_notice_minutes', 'resource_description', 'source_ticket_id',
         ]
 
     def validate_apply_nodes(self, nodes):
@@ -68,6 +69,7 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
         return super().validate_apply_accounts(accounts)
 
     def validate(self, attrs):
+        source_id = attrs.pop('source_ticket_id', None)
         attrs['type'] = 'apply_asset'
         attrs = super().validate(attrs)
         from tickets.workflow.approvers import available_users
@@ -108,6 +110,9 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
         }
         if attrs.get('resource_description'):
             attrs['request_data']['resource_description'] = attrs.pop('resource_description')
+        if source_id:
+            from tickets.plugins.apply_asset.reapply import validate_reapplication
+            validate_reapplication(attrs, self.context['request'], source_id)
         return attrs
 
     def create(self, validated_data):

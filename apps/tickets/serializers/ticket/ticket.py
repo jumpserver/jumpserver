@@ -115,6 +115,34 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     request_items = TicketRequestItemsField(label=_('Request parameters'))
     execution_mode = serializers.SerializerMethodField()
     result = serializers.SerializerMethodField()
+    source_ticket = serializers.SerializerMethodField()
+    reapply_action = serializers.SerializerMethodField()
+
+    def get_reapply_action(self, obj):
+        view = self.context.get('view')
+        if not view or view.action not in ('list', 'retrieve'):
+            return None
+        from tickets.plugins.apply_asset.reapply import reapply_kind
+        user = getattr(self.context.get('request'), 'user', None)
+        return reapply_kind(obj, user, self.context.setdefault('reapply_memberships', {}))
+
+    def get_source_ticket(self, obj):
+        view = self.context.get('view')
+        if view and view.action != 'retrieve':
+            return None
+        source = obj.meta.get('source_ticket')
+        if not source:
+            return None
+        from tickets.models import Ticket
+        from orgs.utils import tmp_to_org
+        user = getattr(self.context.get('request'), 'user', None)
+        can_view = False
+        if user:
+            with tmp_to_org(source['org_id']):
+                can_view = Ticket.get_user_related_tickets(user).filter(pk=source['id']).exists()
+                if not can_view and 'audits.view_ticketaudit' in user.get_all_permissions():
+                    can_view = Ticket.objects.filter(pk=source['id'], org_id=source['org_id']).exists()
+        return {**source, 'can_view': can_view}
 
     @staticmethod
     def get_request_items(obj):
@@ -158,7 +186,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'serial_num', 'process_map', 'approval_step', 'type',
             'state', 'applicant', 'status', 'origin', 'date_created',
             'date_updated', 'org_name', 'rel_snapshot', 'workflow_instance', 'my_tasks',
-            'request_data', 'request_items', 'execution_mode', 'result'
+            'request_data', 'request_items', 'execution_mode', 'result', 'source_ticket', 'reapply_action'
         ]
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
@@ -183,7 +211,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
                 'ticket_steps__ticket_assignees',
                 queryset=ticket_assignees,
             ),
-            'cc_users',
+            'cc_users', 'beneficiaries',
         )
 
 

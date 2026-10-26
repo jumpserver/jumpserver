@@ -12,6 +12,7 @@ class Plugin(TicketPlugin):
     execution_mode = 'automatic'
     apply_serializer = 'tickets.serializers.ticket.apply_asset.ApplyAssetSerializer'
     resource_serializer = 'tickets.plugins.apply_asset.resources.ResourceSerializer'
+    actions = {'reapply_asset': 'tickets.plugins.apply_asset.reapply.ReapplyAsset'}
 
     def resources_pending(self, data):
         return not ((data.get('apply_assets') or data.get('apply_nodes')) and data.get('apply_accounts'))

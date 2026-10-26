@@ -16542,3 +16542,7 @@ msgstr "Approval task"
 
 msgid "Workflow event"
 msgstr "Workflow event"
+
+#: apps/perms/templates/perms/_asset_permission_renewal_links.html:3
+msgid "Apply for renewal"
+msgstr "Apply for renewal"

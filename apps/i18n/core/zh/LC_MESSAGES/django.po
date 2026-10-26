@@ -16196,3 +16196,7 @@ msgstr "方向"
 #: tickets/plugins/view_secret/serializer.py
 msgid "Purpose and resource description"
 msgstr "申请用途／资源说明"
+
+#: apps/perms/templates/perms/_asset_permission_renewal_links.html:3
+msgid "Apply for renewal"
+msgstr "申请续期"

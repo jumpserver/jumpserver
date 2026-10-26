@@ -14,9 +14,10 @@ class PluginTicketApplySerializer(TicketApplySerializer):
     """One submission envelope, with validation owned by the selected plugin."""
     type = serializers.ChoiceField(choices=[])
     request_data = serializers.JSONField(required=True)
+    source_ticket_id = serializers.UUIDField(required=False, write_only=True)
 
     class Meta(TicketApplySerializer.Meta):
-        fields = TicketApplySerializer.Meta.fields
+        fields = TicketApplySerializer.Meta.fields + ['source_ticket_id']
 
     def validate(self, attrs):
         plugin = get_ticket_plugin(attrs['type'])
@@ -26,6 +27,8 @@ class PluginTicketApplySerializer(TicketApplySerializer):
         if not isinstance(payload, dict):
             raise serializers.ValidationError({'request_data': 'Request parameters must be an object.'})
         self.plugin = plugin
+        if attrs.get('source_ticket_id') and plugin.type != 'apply_asset':
+            raise serializers.ValidationError({'source_ticket_id': 'Only asset requests support reapplication.'})
         if plugin.apply_serializer:
             serializer = import_string(plugin.apply_serializer)(context=self.context)
             allowed = {name for name, field in serializer.fields.items()
