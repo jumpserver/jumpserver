@@ -316,6 +316,8 @@ class RDPFileClientProtocolURLMixin:
             keyboard_hook_value = self.request.query_params.get('rdp_keyboard_hook')
             keyboard_hook = keyboard_hook_value
             if keyboard_hook is None:
+                keyboard_hook = token.connect_options.get('rdp_keyboard_hook')
+            if keyboard_hook is None:
                 keyboard_hook = token.user.preference.get_value(
                     'rdp_keyboard_hook', category='luna', default=RDPKeyboardHook.FULL_SCREEN
                 )
@@ -698,6 +700,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 resolution_preference_name,
                 rdp_client_option_preference_name,
                 'printers_redirect',
+                'rdp_keyboard_hook',
             )
         ).values_list('name', 'value')
         preferences = dict(preferences_query)
@@ -712,6 +715,20 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if isinstance(printers_redirect, str):
             printers_redirect = printers_redirect.lower()
         connect_options['printers_redirect'] = is_true(printers_redirect)
+
+        keyboard_hook_value = connect_options.get('rdp_keyboard_hook')
+        keyboard_hook = keyboard_hook_value
+        if keyboard_hook is None:
+            keyboard_hook = preferences.get('rdp_keyboard_hook', RDPKeyboardHook.FULL_SCREEN)
+        field = serializers.ChoiceField(choices=RDPKeyboardHook.choices)
+        try:
+            keyboard_hook = field.run_validation(keyboard_hook)
+        except ValidationError as exc:
+            if keyboard_hook_value is not None:
+                raise ValidationError({'connect_options': {'rdp_keyboard_hook': exc.detail}})
+            # A stale or invalid stored preference must not prevent connecting.
+            keyboard_hook = RDPKeyboardHook.FULL_SCREEN
+        connect_options['rdp_keyboard_hook'] = keyboard_hook
 
         # The advanced option submitted by Luna takes precedence.  When it is
         # absent, use the personal preference as the connection default.
