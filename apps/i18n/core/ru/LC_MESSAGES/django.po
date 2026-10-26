@@ -16654,3 +16654,298 @@ msgstr "Тема письма"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Текст письма"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100: чем меньше значение, тем выше приоритет.\n"
+"Из совпавших правил выбирается группа с наивысшим приоритетом. Если хотя бы одно правило запрещает подключение, оно блокируется; если все разрешают — включённые меры контроля объединяются."
+
+msgid "A valid license is required"
+msgstr "Требуется действующая лицензия."
+
+msgid "ACL changed; start a new connection"
+msgstr "ACL изменён. Начните новое подключение."
+
+msgid "Account is ready."
+msgstr "Учётная запись готова."
+
+msgid "Account permission is no longer available"
+msgstr "Разрешение для учётной записи больше недействительно."
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "Подготовка учётной записи не удалась. Обратитесь к администратору."
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr ""
+"Не удалось создать учётную запись на активе. Сообщите администратору ID "
+"задачи."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "Создание учётных записей не включено для этой платформы активов."
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"Имена пользователей или @ALL для всех учётных записей, @SPEC с указанными "
+"именами и @USER для учётной записи с именем текущего пользователя."
+
+msgid "Administrator permission is no longer available"
+msgstr "Разрешение администратора больше недействительно."
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"После согласования тот же пользователь может повторно подключаться по этому "
+"правилу к тому же активу и учётной записи в течение указанного числа часов. "
+"При 0 согласование требуется каждый раз. Изменения не влияют на действующие "
+"освобождения."
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr ""
+"Разрешение применяет меры контроля подключения; запрет блокирует "
+"подключение."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr ""
+"Автоматическое создание учётной записи с совпадающим именем не разрешено."
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"Автоматически создаёт только учётные записи с совпадающим именем перед "
+"первым подключением; существующие управляемые учётные записи используются "
+"повторно. Платформа актива должна поддерживать создание учётных записей."
+
+msgid "Cancel connections individually."
+msgstr "Отменяйте подключения по отдельности."
+
+msgid "Complete the current connection step first"
+msgstr "Сначала завершите текущий этап подключения."
+
+msgid "Connection ACL context"
+msgstr "Контекст ACL подключения"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "Проверки ACL подключения не завершены."
+
+msgid "Connection approval is no longer valid"
+msgstr "Согласование подключения больше недействительно."
+
+msgid "Connection details"
+msgstr "Сведения о подключении"
+
+msgid "Connection is no longer available"
+msgstr "Это подключение больше недоступно. Начните новое подключение."
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr ""
+"Параметры подключения нельзя изменить. Создайте новый токен подключения."
+
+msgid "Connection reason"
+msgstr "Причина подключения"
+
+msgid "Connection review was rejected or closed"
+msgstr "Запрос на согласование подключения отклонён или закрыт."
+
+msgid "Connection token does not match this session."
+msgstr "Токен подключения не соответствует этому сеансу."
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "Создаётся учётная запись и настраиваются её данные для входа."
+
+msgid "Duplicate connection tokens."
+msgstr "Обнаружены повторяющиеся токены подключения."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "Введите причину подключения (не более 4096 символов)."
+
+msgid "Enter a reason before connecting."
+msgstr "Перед подключением укажите причину."
+
+msgid "Exemption period"
+msgstr "Период без согласования"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "Контекст проверки присутствия лица принадлежит другому пользователю."
+
+msgid "Face monitoring does not belong to this session"
+msgstr "Проверка присутствия лица не относится к этому сеансу."
+
+msgid "Face verification"
+msgstr "Проверка лица"
+
+msgid "Face verification does not belong to this connection"
+msgstr "Проверка лица не относится к этому подключению."
+
+msgid "Face verification failed"
+msgstr "Проверка лица не пройдена."
+
+msgid "Face verification is no longer available"
+msgstr "Проверка лица больше недоступна."
+
+msgid "Face verification session expired; retry verification"
+msgstr "Срок действия сеанса проверки лица истёк. Повторите проверку."
+
+msgid "Face verification session is no longer current"
+msgstr "Сеанс проверки лица больше не является текущим."
+
+msgid "First-login same-name account push"
+msgstr "Создание учётной записи с совпадающим именем при первом подключении"
+
+msgid "MFA verification"
+msgstr "Проверка MFA"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "Нет доступных согласующих. Обратитесь к администратору."
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr ""
+"Уведомляет выбранных получателей, когда пользователь запрашивает подключение"
+" к активу. Уведомление не означает, что подключение успешно установлено."
+
+msgid "Online face monitoring context is no longer available"
+msgstr "Контекст постоянной проверки присутствия лица больше недоступен."
+
+msgid "Online face monitoring context is required"
+msgstr "Требуется контекст постоянной проверки присутствия лица."
+
+msgid "Online face verification requires Web Terminal"
+msgstr "Постоянная проверка лица требует веб-терминала."
+
+msgid "Permission to connect to this account is no longer available."
+msgstr ""
+"Разрешение на подключение с этой учётной записью больше недействительно."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "Подготовьте учётную запись с совпадающим именем перед подключением."
+
+msgid "Push same-name account on first connection"
+msgstr "Создавать учётную запись с совпадающим именем при первом подключении"
+
+msgid "Require approval"
+msgstr "Требовать согласование"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr ""
+"Требует согласования перед подключением, кроме действующего периода "
+"освобождения от согласования."
+
+msgid "Rotate password"
+msgstr "Смена пароля"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"Меняет секрет подключённой учётной записи после завершения сеанса. "
+"Необходимо включить смену после завершения сеанса в системе и автоматическую"
+" смену для активной учётной записи."
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr ""
+"При создании учётной записи с совпадающим именем используются данные для "
+"входа, управляемые сервером."
+
+msgid "Secret rotation after session end is disabled"
+msgstr "Смена секрета после завершения сеанса отключена."
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr ""
+"Выберите активный способ MFA. Если доступных способов нет, сначала настройте"
+" MFA."
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr ""
+"Выберите хотя бы одного активного согласующего из этой организации с "
+"действующей учётной записью."
+
+msgid "Select at least one notification recipient."
+msgstr "Выберите хотя бы одного получателя уведомления."
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr ""
+"При включении согласования выберите согласующих. Если доступных согласующих "
+"нет, подключения блокируются."
+
+msgid "Send notification"
+msgstr "Отправлять уведомление"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr ""
+"Существующая учётная запись с совпадающим именем неактивна. Обратитесь к "
+"администратору."
+
+msgid "The same-name account username is determined by the server."
+msgstr ""
+"Имя пользователя для учётной записи с совпадающим именем определяется "
+"сервером."
+
+msgid "This MFA method does not send a verification code"
+msgstr "Этот способ MFA не отправляет код подтверждения."
+
+msgid "This connection does not require this step"
+msgstr "Для этого подключения данный этап не требуется."
+
+msgid "This field cannot be submitted."
+msgstr "Это поле нельзя отправлять."
+
+msgid "This field does not belong to the current step."
+msgstr "Это поле не относится к текущему этапу."
+
+msgid "This push method does not support create-only mode"
+msgstr ""
+"Этот способ создания учётных записей не поддерживает режим «только "
+"создание»."
+
+msgid "This username cannot be provisioned automatically."
+msgstr "Учётную запись с этим именем нельзя создать автоматически."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Используйте веб-терминал для проверки лица."
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr ""
+"Проверяет код настроенного способа MFA перед подключением. Если способ MFA с"
+" кодом не настроен, подключения блокируются."
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr ""
+"Проверяет лицо пользователя перед подключением. Необходимо включить "
+"распознавание лиц в системе и зарегистрировать лицо."
+
+msgid "Waiting to push the same-name account."
+msgstr "Ожидание создания учётной записи с совпадающим именем."
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Только веб-терминал: проверяет лицо перед подключением и контролирует его "
+"присутствие в течение сеанса. Необходимо включить распознавание лиц в "
+"системе и зарегистрировать лицо."
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "Контроль присутствия лица"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "Создание учётной записи"

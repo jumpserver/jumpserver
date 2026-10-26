@@ -2519,7 +2519,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"使用 * 比對所有位址。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
 "db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -16083,3 +16083,310 @@ msgstr "郵件主題"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "郵件正文"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Only matching rules at the highest priority are applied. Any rejection at that priority denies access; otherwise their enabled controls are combined."
+msgstr "僅使用最高優先順序的符合規則；同優先順序中有拒絕則拒絕連線，全部允許時合併已啟用的控制項。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "The entire rule is skipped when approval is enabled but no reviewers are selected."
+msgstr "啟用審批且未選擇審批人時，略過整條規則。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Account usernames or @ALL (all accounts), @SPEC with specified usernames, and @USER (the current user's same-name account)."
+msgstr "填寫帳號使用者名稱，使用 @ALL 符合所有帳號，使用 @SPEC 加指定使用者名稱符合指定帳號，使用 @USER 符合目前使用者的同名帳號。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "0 means approval is required for every connection. After approval, the same user can reconnect to the same asset and account through this rule within the exemption period. Changing the duration does not alter existing exemptions."
+msgstr "0 表示每次連線都需要審批。審批通過後，同一使用者在免審期間內，可透過本規則再次連線至同一資產的同一帳號。修改時長不影響已有免審資格。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Users who receive connection notifications when notification is enabled. No notification is sent if no recipients are selected."
+msgstr "啟用通知後，向所選使用者傳送連線通知；接收人為空時不傳送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, a non-empty connection reason must be entered before connecting."
+msgstr "符合允許規則時，連線前必須填寫非空的連線原因，填寫後才能繼續。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, verify an enrolled code-based MFA method before connecting. Connections are blocked if none is enrolled."
+msgstr "符合允許規則時，連線前須通過已綁定的驗證碼型 MFA 驗證；未綁定可用方式時阻止連線。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, approval is required before connecting, unless a valid approval exemption applies. With no reviewers selected, the entire rule is skipped."
+msgstr "符合允許規則時，核准後才能連線；有效免審期間內可免審。審批人為空時略過整條規則。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, notify the selected recipients during connection request and token validation, without waiting for a successful connection. No notification is sent if no recipients are selected."
+msgstr "符合允許規則時，在連線申請、Token 驗證階段向所選接收人傳送通知，無需等待實際連線成功；接收人為空時不傳送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, face verification must pass before connecting. System face recognition must be enabled and the user must enroll a face."
+msgstr "符合允許規則時，連線前須通過人臉驗證。需啟用系統人臉辨識功能，並完成使用者人臉登錄。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, Web Terminal requires face verification before connecting and continues monitoring during the session. System face recognition and user face enrollment are required."
+msgstr "符合允許規則時，僅允許透過 Web 終端連線；連線前進行人臉驗證，工作階段期間持續偵測。需啟用系統人臉辨識並完成人臉登錄。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches a same-name account, generate managed credentials and provision the account before its first connection. Existing managed accounts are reused; ordinary accounts skip provisioning. The asset platform must support account provisioning."
+msgstr "符合允許規則且使用同名帳號時，首次連線前自動產生託管憑證並推送帳號；已有託管帳號直接重用，一般帳號不推送。需資產平台支援帳號推送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "At session end, a matching allow rule queues automatic secret rotation for the connected account. System rotation after session end must be enabled, and the account must be active with automatic secret rotation enabled."
+msgstr "工作階段結束時符合允許規則，則為本次連線帳號觸發自動改密。需系統啟用工作階段結束後改密，且帳號處於啟用狀態並已啟用自動改密。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Connection reason"
+msgstr "連線原因"
+
+#: acls/serializers/login_asset_acl.py
+msgid "MFA verification"
+msgstr "MFA 驗證"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Require approval"
+msgstr "需要審批"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Send notification"
+msgstr "發送通知"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Face verification"
+msgstr "人臉驗證"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "推送帳號"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Rotate password"
+msgstr "輪換密碼"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Exemption period"
+msgstr "免審時長"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "人臉在線"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100，數值越小，優先順序越高。\n"
+"從符合條件的規則中，選取優先順序最高的一組；組內任一規則拒絕則拒絕連線，全部允許則合併各規則啟用的連線控制。"
+
+msgid "A valid license is required"
+msgstr "需要有效的授權。"
+
+msgid "ACL changed; start a new connection"
+msgstr "存取規則已變更，請重新連線。"
+
+msgid "Account is ready."
+msgstr "帳號已準備完成。"
+
+msgid "Account permission is no longer available"
+msgstr "帳號權限已失效。"
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "帳號準備未成功，請聯絡管理員。"
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "帳號推送失敗，請將工作編號提供給管理員處理。"
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "此資產平台未啟用帳號推送。"
+
+msgid "Administrator permission is no longer available"
+msgstr "管理員權限已失效。"
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr "審批通過後，同一使用者在指定小時內透過本規則重新連線同一資產、帳號可免審。0 表示每次審批；修改時長不影響已有免審資格。"
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "允許時套用連線控制，拒絕時阻止連線。"
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "未授權自動推送同名帳號。"
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr "僅同名帳號首次連線前自動推送，已有託管帳號則重用而不推送；需資產平台支援帳號推送。"
+
+msgid "Cancel connections individually."
+msgstr "請逐一取消連線。"
+
+msgid "Complete the current connection step first"
+msgstr "請先完成目前的連線步驟。"
+
+msgid "Connection ACL context"
+msgstr "連線 ACL 上下文"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "連線 ACL 驗證尚未完成。"
+
+msgid "Connection approval is no longer valid"
+msgstr "連線審批已失效，請重新申請。"
+
+msgid "Connection details"
+msgstr "連線明細"
+
+msgid "Connection is no longer available"
+msgstr "本次連線已失效，請重新發起連線。"
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "連線參數不可修改，請建立新的連線 Token。"
+
+msgid "Connection review was rejected or closed"
+msgstr "連線審批已拒絕或關閉。"
+
+msgid "Connection token does not match this session."
+msgstr "連線 Token 與目前工作階段不符。"
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "正在建立帳號並設定登入憑證。"
+
+msgid "Duplicate connection tokens."
+msgstr "存在重複的連線 Token。"
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "請輸入連線原因，最多 4096 個字元。"
+
+msgid "Enter a reason before connecting."
+msgstr "連線前必須填寫原因。"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "人臉監測上下文屬於其他使用者。"
+
+msgid "Face monitoring does not belong to this session"
+msgstr "人臉在線監測與目前工作階段不符。"
+
+msgid "Face verification does not belong to this connection"
+msgstr "人臉驗證與目前連線不符。"
+
+msgid "Face verification failed"
+msgstr "人臉驗證失敗。"
+
+msgid "Face verification is no longer available"
+msgstr "目前連線無法繼續人臉驗證。"
+
+msgid "Face verification session expired; retry verification"
+msgstr "人臉驗證工作階段已過期，請重新驗證。"
+
+msgid "Face verification session is no longer current"
+msgstr "人臉驗證已失效，請重新驗證。"
+
+msgid "First-login same-name account push"
+msgstr "首次連線同名帳號推送"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "無可用的審批人，請聯絡管理員。"
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr "使用者發起資產連線時通知所選接收人，通知不代表連線成功。"
+
+msgid "Online face monitoring context is no longer available"
+msgstr "人臉在線監測已失效，請重新連線。"
+
+msgid "Online face monitoring context is required"
+msgstr "缺少人臉在線監測上下文。"
+
+msgid "Online face verification requires Web Terminal"
+msgstr "人臉在線驗證需要使用 Web 終端。"
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "連線此帳號的權限已失效。"
+
+msgid "Prepare the same-name account before connecting."
+msgstr "請先完成同名帳號準備再連線。"
+
+msgid "Push same-name account on first connection"
+msgstr "首次連線時推送同名帳號"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr "連線前須審批通過；有效免審期間內無需重複審批。"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr "工作階段結束後自動改密；需啟用系統「工作階段結束後改密」和帳號「自動改密」，且帳號已啟用。"
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "同名帳號推送使用伺服器管理的憑證。"
+
+msgid "Secret rotation after session end is disabled"
+msgstr "未啟用工作階段結束後改密。"
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "請選擇可用的 MFA 方式；若無可用方式，請先綁定 MFA。"
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "請至少選擇一名本組織內已啟用且未過期的審批人。"
+
+msgid "Select at least one notification recipient."
+msgstr "請至少選擇一名通知接收人。"
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr "啟用審批後必須選擇審批人；無可用審批人時無法連線。"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "已有同名帳號未啟用，請聯絡管理員。"
+
+msgid "The same-name account username is determined by the server."
+msgstr "同名帳號的使用者名稱由伺服器決定。"
+
+msgid "This MFA method does not send a verification code"
+msgstr "此 MFA 方式不發送驗證碼。"
+
+msgid "This connection does not require this step"
+msgstr "本次連線無需執行此步驟。"
+
+msgid "This field cannot be submitted."
+msgstr "不允許提交此欄位。"
+
+msgid "This field does not belong to the current step."
+msgstr "此欄位不屬於目前步驟。"
+
+msgid "This push method does not support create-only mode"
+msgstr "此推送方式不支援僅建立模式。"
+
+msgid "This username cannot be provisioned automatically."
+msgstr "此使用者名稱不支援自動推送。"
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "請使用 Web 終端完成人臉驗證。"
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr "連線前驗證已綁定的 MFA 驗證碼；未綁定驗證碼類型的 MFA 時無法連線。"
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr "連線前驗證人臉；需啟用系統人臉辨識並完成人臉登錄。"
+
+msgid "Waiting to push the same-name account."
+msgstr "等待推送同名帳號。"
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr "僅支援 Web 終端，連線前驗證人臉，工作階段期間持續監測；需啟用人臉辨識並完成人臉登錄。"

@@ -8,6 +8,7 @@ from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils.timezone import dt_formatter, dt_parser
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
+from orgs.utils import tmp_to_org
 from tickets.const import TicketType, TicketStatus, TicketState, TicketLevel, StepState
 from tickets.models import Ticket, TicketAssignee, TicketFlow
 from users.models import User
@@ -86,6 +87,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     )
     process_map = TicketProcessMapField(read_only=True, default=list, label=_('Process map'))
     rel_snapshot = TicketSnapshotField(read_only=True, label=_('Relation snapshot'))
+    login_asset_connections = serializers.SerializerMethodField(label=_('Connection details'))
     cc_users = ObjectRelatedField(
         many=True, read_only=True, attrs=('id', 'name', 'username'), label=_('CC users')
     )
@@ -101,7 +103,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         read_only_fields = [
             'serial_num', 'process_map', 'approval_step', 'type',
             'state', 'applicant', 'status', 'date_created',
-            'date_updated', 'org_name', 'rel_snapshot'
+            'date_updated', 'org_name', 'rel_snapshot', 'login_asset_connections'
         ]
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
@@ -117,6 +119,61 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         choices = tp.choices
         choices.pop(TicketType.general, None)
         tp.choices = choices.items()
+
+    @staticmethod
+    def get_login_asset_connections(instance):
+        if instance.type != TicketType.login_asset_confirm:
+            return []
+        entries = (instance.meta or {}).get('login_asset_connections')
+        complete = entries is not None and all(
+            all(key in entry for key in ('asset_name', 'asset_address', 'reason'))
+            for entry in entries
+        )
+        tokens = {}
+        ticket = None
+        if not complete:
+            from tickets.models import ApplyLoginAssetTicket
+            ticket = instance if isinstance(instance, ApplyLoginAssetTicket) else instance.applyloginassetticket
+            with tmp_to_org(instance.org_id):
+                if entries is None:
+                    asset = ticket.apply_login_asset
+                    return [{
+                        'asset': {
+                            'id': str(ticket.apply_login_asset_id or ''),
+                            'name': asset.name if asset else ticket.rel_snapshot.get('apply_login_asset', ''),
+                            'address': asset.address if asset else '',
+                        },
+                        'account': ticket.apply_login_account, 'reason': ticket.comment or '',
+                    }]
+                tokens = {str(token.pk): token for token in ticket.connection_tokens.select_related('asset')}
+        rows = []
+        for entry in entries:
+            token = tokens.get(entry.get('token_id'))
+            if token and (
+                    str(token.asset_id) != entry.get('asset_id')
+                    or (token.acl_context or {}).get('username') != entry.get('account')
+                    or str(token.user_id) != str(ticket.apply_login_user_id)
+            ):
+                token = None
+            if 'reason' not in entry and not token:
+                # Without the exact legacy token, an empty reason would hide
+                # the only surviving history in the ticket's combined comment.
+                # Let clients retain their original ticket display instead.
+                return []
+            asset = token.asset if token else None
+            reason = ((token.acl_context or {}).get('reason') or token.comment or '') if token else ''
+            rows.append({
+                'asset': {
+                    'id': entry.get('asset_id', ''),
+                    'name': entry.get('asset_name', asset.name if asset else entry.get('asset_id', '')),
+                    'address': entry.get('asset_address', asset.address if asset else ''),
+                },
+                'account': entry.get('account', ''),
+                # An old shared ticket's comment contains every connection's reason.
+                # Only its exact token may provide a missing per-connection reason.
+                'reason': entry.get('reason', reason),
+            })
+        return rows
 
     @classmethod
     def setup_eager_loading(cls, queryset):

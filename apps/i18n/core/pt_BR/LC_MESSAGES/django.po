@@ -2582,7 +2582,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* indica correspondência com todos. Por exemplo: 192.168.10.1, "
+"O caractere * indica correspondência com todos. Por exemplo: 192.168.10.1, "
 "192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -16636,3 +16636,297 @@ msgstr "Assunto do e-mail"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Mensagem do e-mail"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100; quanto menor o valor, maior a prioridade.\n"
+"Entre as regras correspondentes, selecione o grupo de maior prioridade. Se alguma regra negar a conexão, ela será bloqueada; se todas permitirem, os controles de conexão habilitados serão combinados."
+
+msgid "A valid license is required"
+msgstr "É necessária uma licença válida."
+
+msgid "ACL changed; start a new connection"
+msgstr "A ACL mudou; inicie uma nova conexão."
+
+msgid "Account is ready."
+msgstr "A conta está pronta."
+
+msgid "Account permission is no longer available"
+msgstr "A permissão da conta não está mais disponível."
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr ""
+"Não foi possível preparar a conta. Entre em contato com um administrador."
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr ""
+"O provisionamento da conta falhou. Informe o ID da tarefa a um "
+"administrador."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr ""
+"O provisionamento de contas não está habilitado para esta plataforma de "
+"ativos."
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"Nomes de usuário, @ALL para todas as contas, @SPEC junto com os nomes "
+"especificados e @USER para a conta com o mesmo nome do usuário atual."
+
+msgid "Administrator permission is no longer available"
+msgstr "A permissão de administrador não está mais disponível."
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"Após a aprovação, o mesmo usuário pode se reconectar ao mesmo ativo e conta "
+"por esta regra durante o número de horas indicado. 0 exige aprovação a cada "
+"conexão. As alterações não afetam as isenções existentes."
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "Permitir aplica os controles de conexão; Negar bloqueia a conexão."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr ""
+"O provisionamento automático de contas com o mesmo nome não está autorizado."
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"Provisiona automaticamente apenas contas com o mesmo nome antes da primeira "
+"conexão; reutiliza contas gerenciadas existentes sem provisioná-las "
+"novamente. A plataforma do ativo deve oferecer suporte ao provisionamento de"
+" contas."
+
+msgid "Cancel connections individually."
+msgstr "Cancele as conexões individualmente."
+
+msgid "Complete the current connection step first"
+msgstr "Conclua primeiro a etapa atual da conexão."
+
+msgid "Connection ACL context"
+msgstr "Contexto da ACL de conexão"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "As verificações da ACL de conexão não foram concluídas."
+
+msgid "Connection approval is no longer valid"
+msgstr "A aprovação da conexão não é mais válida."
+
+msgid "Connection details"
+msgstr "Detalhes da conexão"
+
+msgid "Connection is no longer available"
+msgstr "Esta conexão não está mais disponível. Inicie uma nova conexão."
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr ""
+"Os parâmetros de conexão não podem ser alterados; crie um novo token de "
+"conexão."
+
+msgid "Connection reason"
+msgstr "Motivo da conexão"
+
+msgid "Connection review was rejected or closed"
+msgstr "A solicitação de aprovação da conexão foi rejeitada ou encerrada."
+
+msgid "Connection token does not match this session."
+msgstr "O token de conexão não corresponde a esta sessão."
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "Criando a conta e configurando suas credenciais de acesso."
+
+msgid "Duplicate connection tokens."
+msgstr "Há tokens de conexão duplicados."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "Insira o motivo da conexão (até 4096 caracteres)."
+
+msgid "Enter a reason before connecting."
+msgstr "Insira um motivo antes de se conectar."
+
+msgid "Exemption period"
+msgstr "Período de isenção"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "O contexto de monitoramento facial pertence a outro usuário."
+
+msgid "Face monitoring does not belong to this session"
+msgstr "O monitoramento facial não pertence a esta sessão."
+
+msgid "Face verification"
+msgstr "Verificação facial"
+
+msgid "Face verification does not belong to this connection"
+msgstr "A verificação facial não pertence a esta conexão."
+
+msgid "Face verification failed"
+msgstr "A verificação facial falhou."
+
+msgid "Face verification is no longer available"
+msgstr "A verificação facial não está mais disponível."
+
+msgid "Face verification session expired; retry verification"
+msgstr "A sessão de verificação facial expirou; repita a verificação."
+
+msgid "Face verification session is no longer current"
+msgstr "A sessão de verificação facial não é mais a atual."
+
+msgid "First-login same-name account push"
+msgstr "Provisionamento de conta com o mesmo nome na primeira conexão"
+
+msgid "MFA verification"
+msgstr "Verificação MFA"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr ""
+"Não há aprovadores disponíveis. Entre em contato com um administrador."
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr ""
+"Notifica os destinatários selecionados quando um usuário solicita conexão a "
+"um ativo. A notificação não significa que a conexão foi bem-sucedida."
+
+msgid "Online face monitoring context is no longer available"
+msgstr "O contexto de monitoramento facial contínuo não está mais disponível."
+
+msgid "Online face monitoring context is required"
+msgstr "É necessário o contexto de monitoramento facial contínuo."
+
+msgid "Online face verification requires Web Terminal"
+msgstr "A verificação facial contínua requer o terminal Web."
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "A permissão para se conectar com esta conta não está mais disponível."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "Prepare a conta com o mesmo nome antes de se conectar."
+
+msgid "Push same-name account on first connection"
+msgstr "Provisionar conta com o mesmo nome na primeira conexão"
+
+msgid "Require approval"
+msgstr "Exigir aprovação"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr ""
+"Exige aprovação antes da conexão, exceto durante um período de isenção "
+"válido."
+
+msgid "Rotate password"
+msgstr "Alterar senha"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"Altera o segredo da conta conectada ao encerrar a sessão. Requer habilitar a"
+" rotação ao encerrar a sessão no sistema e a rotação automática em uma conta"
+" ativa."
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr ""
+"O provisionamento de contas com o mesmo nome usa credenciais gerenciadas "
+"pelo servidor."
+
+msgid "Secret rotation after session end is disabled"
+msgstr "A rotação de segredos ao encerrar a sessão está desabilitada."
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr ""
+"Selecione um método MFA ativo; se nenhum estiver disponível, configure o MFA"
+" primeiro."
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr ""
+"Selecione pelo menos um aprovador ativo e não expirado desta organização."
+
+msgid "Select at least one notification recipient."
+msgstr "Selecione pelo menos um destinatário de notificação."
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr ""
+"Selecione aprovadores ao habilitar a aprovação. As conexões serão bloqueadas"
+" se não houver aprovadores disponíveis."
+
+msgid "Send notification"
+msgstr "Enviar notificação"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr ""
+"A conta existente com o mesmo nome está inativa. Entre em contato com um "
+"administrador."
+
+msgid "The same-name account username is determined by the server."
+msgstr ""
+"O nome de usuário da conta com o mesmo nome é determinado pelo servidor."
+
+msgid "This MFA method does not send a verification code"
+msgstr "Este método MFA não envia código de verificação."
+
+msgid "This connection does not require this step"
+msgstr "Esta conexão não requer esta etapa."
+
+msgid "This field cannot be submitted."
+msgstr "Este campo não pode ser enviado."
+
+msgid "This field does not belong to the current step."
+msgstr "Este campo não pertence à etapa atual."
+
+msgid "This push method does not support create-only mode"
+msgstr ""
+"Este método de provisionamento não oferece suporte ao modo somente criação."
+
+msgid "This username cannot be provisioned automatically."
+msgstr "Este nome de usuário não pode ser provisionado automaticamente."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Use o terminal Web para concluir a verificação facial."
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr ""
+"Verifica um código MFA configurado antes da conexão. Bloqueia conexões se "
+"nenhum método MFA baseado em código estiver configurado."
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr ""
+"Verifica o rosto do usuário antes da conexão. Requer o reconhecimento facial"
+" do sistema e um rosto cadastrado."
+
+msgid "Waiting to push the same-name account."
+msgstr "Aguardando o provisionamento da conta com o mesmo nome."
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Somente terminal Web: verifica o rosto antes da conexão e o monitora durante"
+" toda a sessão. Requer o reconhecimento facial do sistema e um rosto "
+"cadastrado."
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "Monitoramento facial contínuo"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "Provisionar conta"

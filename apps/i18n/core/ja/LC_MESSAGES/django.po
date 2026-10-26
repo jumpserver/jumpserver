@@ -2559,7 +2559,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* はすべて一致することを示します。例: 192.168.10.1、192.168.1.0/24、"
+"記号 * はすべて一致することを示します。例: 192.168.10.1、192.168.1.0/24、"
 "10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -16455,3 +16455,260 @@ msgstr "メールの件名"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "メールの本文"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1～100。値が小さいほど優先度が高くなります。\n"
+"一致したルールから優先度が最も高いグループを選びます。拒否するルールが1つでもあれば接続を拒否し、すべて許可する場合は有効な接続制御を組み合わせます。"
+
+msgid "A valid license is required"
+msgstr "有効なライセンスが必要です。"
+
+msgid "ACL changed; start a new connection"
+msgstr "ACL が変更されました。新しい接続を開始してください。"
+
+msgid "Account is ready."
+msgstr "アカウントの準備が完了しました。"
+
+msgid "Account permission is no longer available"
+msgstr "アカウントの権限が失効しています。"
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "アカウントの準備に失敗しました。管理者にお問い合わせください。"
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "アカウントの配布に失敗しました。タスク ID を管理者にお知らせください。"
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "この資産プラットフォームではアカウント配布が有効になっていません。"
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"ユーザー名、全アカウントを表す @ALL、指定ユーザー名と組み合わせる @SPEC、現在のユーザーと同名のアカウントを表す @USER を使用できます。"
+
+msgid "Administrator permission is no longer available"
+msgstr "管理者権限が失効しています。"
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"承認後、指定した時間内は、同じユーザーがこのルールで同じ資産・アカウントに再接続する際の承認を免除します。0 "
+"は毎回承認が必要です。変更は既存の免除に影響しません。"
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "許可の場合は接続制御を適用し、拒否の場合は接続をブロックします。"
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "同名アカウントの自動配布は許可されていません。"
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"同名アカウントの初回接続前にのみ自動配布します。既存の管理対象アカウントは再配布せず再利用します。資産プラットフォームがアカウント配布に対応している必要があります。"
+
+msgid "Cancel connections individually."
+msgstr "接続を個別にキャンセルしてください。"
+
+msgid "Complete the current connection step first"
+msgstr "先に現在の接続ステップを完了してください。"
+
+msgid "Connection ACL context"
+msgstr "接続 ACL コンテキスト"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "接続 ACL の検証が完了していません。"
+
+msgid "Connection approval is no longer valid"
+msgstr "接続の承認が失効しています。"
+
+msgid "Connection details"
+msgstr "接続の詳細"
+
+msgid "Connection is no longer available"
+msgstr "この接続は無効になりました。接続を開始し直してください。"
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "接続パラメーターは変更できません。新しい接続トークンを作成してください。"
+
+msgid "Connection reason"
+msgstr "接続理由"
+
+msgid "Connection review was rejected or closed"
+msgstr "接続の承認申請が拒否または終了されました。"
+
+msgid "Connection token does not match this session."
+msgstr "接続トークンがこのセッションと一致しません。"
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "アカウントを作成し、ログイン資格情報を設定しています。"
+
+msgid "Duplicate connection tokens."
+msgstr "接続トークンが重複しています。"
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "接続理由を入力してください（最大 4096 文字）。"
+
+msgid "Enter a reason before connecting."
+msgstr "接続前に理由を入力してください。"
+
+msgid "Exemption period"
+msgstr "承認免除期間"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "顔監視コンテキストは別のユーザーに属しています。"
+
+msgid "Face monitoring does not belong to this session"
+msgstr "顔監視がこのセッションに対応していません。"
+
+msgid "Face verification"
+msgstr "顔認証"
+
+msgid "Face verification does not belong to this connection"
+msgstr "顔認証がこの接続に対応していません。"
+
+msgid "Face verification failed"
+msgstr "顔認証に失敗しました。"
+
+msgid "Face verification is no longer available"
+msgstr "顔認証は利用できなくなりました。"
+
+msgid "Face verification session expired; retry verification"
+msgstr "顔認証セッションの有効期限が切れました。再度認証してください。"
+
+msgid "Face verification session is no longer current"
+msgstr "顔認証セッションは現在のものではありません。"
+
+msgid "First-login same-name account push"
+msgstr "初回接続時の同名アカウント配布"
+
+msgid "MFA verification"
+msgstr "MFA 認証"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "利用可能な承認者がいません。管理者にお問い合わせください。"
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr "ユーザーが資産への接続を要求した際に、選択した通知先に通知します。通知は接続の成功を意味しません。"
+
+msgid "Online face monitoring context is no longer available"
+msgstr "継続的な顔監視のコンテキストが失効しています。"
+
+msgid "Online face monitoring context is required"
+msgstr "継続的な顔監視のコンテキストが必要です。"
+
+msgid "Online face verification requires Web Terminal"
+msgstr "継続的な顔認証には Web ターミナルが必要です。"
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "このアカウントで接続する権限が失効しています。"
+
+msgid "Prepare the same-name account before connecting."
+msgstr "接続前に同名アカウントの準備を完了してください。"
+
+msgid "Push same-name account on first connection"
+msgstr "初回接続時に同名アカウントを配布"
+
+msgid "Require approval"
+msgstr "承認が必要"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr "有効な承認免除期間中を除き、接続前に承認が必要です。"
+
+msgid "Rotate password"
+msgstr "パスワードを変更"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"セッション終了後に接続先アカウントのシークレットを変更します。システムのセッション終了後の変更と、有効なアカウントの自動変更を有効にする必要があります。"
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "同名アカウントの配布には、サーバーで管理する資格情報を使用します。"
+
+msgid "Secret rotation after session end is disabled"
+msgstr "セッション終了後のシークレット変更は無効になっています。"
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "利用可能な MFA 方式を選択してください。ない場合は先に MFA を登録してください。"
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "この組織の有効かつ期限切れでない承認者を1人以上選択してください。"
+
+msgid "Select at least one notification recipient."
+msgstr "通知先を1人以上選択してください。"
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr "承認を有効にする場合は承認者を選択してください。利用可能な承認者がいない場合、接続はブロックされます。"
+
+msgid "Send notification"
+msgstr "通知を送信"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "既存の同名アカウントは無効です。管理者にお問い合わせください。"
+
+msgid "The same-name account username is determined by the server."
+msgstr "同名アカウントのユーザー名はサーバーが決定します。"
+
+msgid "This MFA method does not send a verification code"
+msgstr "この MFA 方式では認証コードを送信しません。"
+
+msgid "This connection does not require this step"
+msgstr "この接続ではこのステップは不要です。"
+
+msgid "This field cannot be submitted."
+msgstr "このフィールドは送信できません。"
+
+msgid "This field does not belong to the current step."
+msgstr "このフィールドは現在のステップに属していません。"
+
+msgid "This push method does not support create-only mode"
+msgstr "この配布方式は新規作成のみのモードに対応していません。"
+
+msgid "This username cannot be provisioned automatically."
+msgstr "このユーザー名は自動配布できません。"
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Web ターミナルで顔認証を完了してください。"
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr "接続前に登録済みの MFA コードを検証します。コード方式の MFA が登録されていない場合、接続はブロックされます。"
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr "接続前にユーザーの顔を認証します。システムの顔認識を有効にし、顔を登録する必要があります。"
+
+msgid "Waiting to push the same-name account."
+msgstr "同名アカウントの配布を待っています。"
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Web ターミナル専用です。接続前に顔認証を行い、セッション中は継続的に監視します。システムの顔認識を有効にし、顔を登録する必要があります。"
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "継続的な顔監視"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "アカウントを配布"

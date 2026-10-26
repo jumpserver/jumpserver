@@ -22,10 +22,10 @@ class ApplyLoginAssetTicket(Ticket):
     TICKET_TYPE = TicketType.login_asset_confirm
 
     def activate_connection_token_if_need(self):
-        if not hasattr(self, 'connection_token'):
-            return
-        self.connection_token.is_active = True
-        self.connection_token.save(update_fields=['is_active'])
+        from orgs.utils import tmp_to_root_org
+        with tmp_to_root_org():
+            for token in self.connection_tokens.order_by('pk'):
+                token.complete_acl_requirement('review')
 
     class Meta:
         verbose_name = _('Apply Login Asset Ticket')

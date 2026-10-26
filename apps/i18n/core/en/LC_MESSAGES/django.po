@@ -2569,7 +2569,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* matches all. For example: 192.168.10.1, 192.168.1.0/24, "
+"Wildcard * matches all. For example: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -16508,3 +16508,316 @@ msgstr "Subject of the mail"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Message of the email"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Connection reason"
+msgstr "Connection reason"
+
+#: acls/serializers/login_asset_acl.py
+msgid "MFA verification"
+msgstr "MFA verification"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Require approval"
+msgstr "Require approval"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Send notification"
+msgstr "Send notification"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Face verification"
+msgstr "Face verification"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "Push account"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Rotate password"
+msgstr "Rotate password"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Exemption period"
+msgstr "Exemption period"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "Allow applies the connection controls; Reject blocks the connection."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+
+#: acls/serializers/login_asset_acl.py
+msgid "Select reviewers when approval is enabled. Connections are blocked if no reviewers are available."
+msgstr "Select reviewers when approval is enabled. Connections are blocked if no reviewers are available."
+
+#: acls/serializers/login_asset_acl.py
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "Select at least one active, unexpired reviewer from this organization."
+
+#: acls/models/login_asset_acl.py
+msgid "No available reviewers. Contact an administrator."
+msgstr "No available reviewers. Contact an administrator."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+
+#: acls/serializers/login_asset_acl.py
+msgid "Enter a reason before connecting."
+msgstr "Enter a reason before connecting."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr ""
+"Require approval before connecting, except during a valid exemption period."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "Face online"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Select at least one notification recipient."
+msgstr "Select at least one notification recipient."
+
+#: authentication/services/connection_acl.py
+msgid "This field cannot be submitted."
+msgstr "This field cannot be submitted."
+
+#: authentication/services/connection_acl.py
+msgid "This field does not belong to the current step."
+msgstr "This field does not belong to the current step."
+
+#: authentication/services/connection_acl.py
+msgid "The same-name account username is determined by the server."
+msgstr "The same-name account username is determined by the server."
+
+#: authentication/services/connection_acl.py
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "Same-name account provisioning uses server-managed credentials."
+
+#: authentication/services/connection_acl.py
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "Account push failed. Contact an administrator with the task ID."
+
+#: authentication/services/connection_acl.py
+msgid "Account is ready."
+msgstr "Account is ready."
+
+#: authentication/services/connection_acl.py
+msgid "Face verification session is no longer current"
+msgstr "Face verification session is no longer current"
+
+#: authentication/services/connection_acl.py
+msgid "Administrator permission is no longer available"
+msgstr "Administrator permission is no longer available"
+
+#: authentication/services/connection_acl.py
+msgid "Connection approval is no longer valid"
+msgstr "Connection approval is no longer valid"
+
+#: authentication/services/connection_acl.py
+msgid "Online face monitoring context is no longer available"
+msgstr "Online face monitoring context is no longer available"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification does not belong to this connection"
+msgstr "Face verification does not belong to this connection"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification is no longer available"
+msgstr "Face verification is no longer available"
+
+#: authentication/services/connection_acl.py
+msgid "ACL changed; start a new connection"
+msgstr "ACL changed; start a new connection"
+
+#: authentication/services/connection_acl.py
+msgid "Complete the current connection step first"
+msgstr "Complete the current connection step first"
+
+#: authentication/services/connection_acl.py
+msgid "Face monitoring does not belong to this session"
+msgstr "Face monitoring does not belong to this session"
+
+#: terminal/serializers/session.py
+msgid "Connection token does not match this session."
+msgstr "Connection token does not match this session."
+
+#: tickets/serializers/ticket/ticket.py
+msgid "Connection details"
+msgstr "Connection details"
+
+msgid "A valid license is required"
+msgstr "A valid license is required"
+
+msgid "Account permission is no longer available"
+msgstr "Account permission is no longer available"
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "Account preparation has not succeeded. Contact an administrator."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "Account push is not enabled for this asset platform."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "Automatic same-name account push is not authorized."
+
+msgid "Cancel connections individually."
+msgstr "Cancel connections individually."
+
+msgid "Connection ACL context"
+msgstr "Connection ACL context"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "Connection ACL requirements are incomplete"
+
+msgid "Connection is no longer available"
+msgstr "Connection is no longer available"
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr ""
+"Connection parameters cannot be changed; create a new connection token"
+
+msgid "Connection review was rejected or closed"
+msgstr "Connection review was rejected or closed"
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "Creating the account and configuring its login credentials."
+
+msgid "Duplicate connection tokens."
+msgstr "Duplicate connection tokens."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "Enter a connection reason (up to 4096 characters)."
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "Face monitoring context belongs to a different user"
+
+msgid "Face verification failed"
+msgstr "Face verification failed"
+
+msgid "Face verification session expired; retry verification"
+msgstr "Face verification session expired; retry verification"
+
+msgid "First-login same-name account push"
+msgstr "First-login same-name account push"
+
+msgid "Online face monitoring context is required"
+msgstr "Online face monitoring context is required"
+
+msgid "Online face verification requires Web Terminal"
+msgstr "Online face verification requires Web Terminal"
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "Permission to connect to this account is no longer available."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "Prepare the same-name account before connecting."
+
+msgid "Push same-name account on first connection"
+msgstr "Push same-name account on first connection"
+
+msgid "Secret rotation after session end is disabled"
+msgstr "Secret rotation after session end is disabled"
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "Select an active MFA method; enroll MFA first if none are available."
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "The existing same-name account is inactive. Contact an administrator."
+
+msgid "This MFA method does not send a verification code"
+msgstr "This MFA method does not send a verification code"
+
+msgid "This connection does not require this step"
+msgstr "This connection does not require this step"
+
+msgid "This push method does not support create-only mode"
+msgstr "This push method does not support create-only mode"
+
+msgid "This username cannot be provisioned automatically."
+msgstr "This username cannot be provisioned automatically."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Use Web Terminal to complete face verification"
+
+msgid "Waiting to push the same-name account."
+msgstr "Waiting to push the same-name account."

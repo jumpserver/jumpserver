@@ -2547,7 +2547,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 모든 것을 포함함을 나타냅니다. 예: 192.168.10.1, 192.168.1.0/24, "
+"기호 * 모든 것을 포함함을 나타냅니다. 예: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -16386,3 +16386,261 @@ msgstr "이메일 제목"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "이메일 본문"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100. 값이 작을수록 우선순위가 높습니다.\n"
+"일치하는 규칙 중 우선순위가 가장 높은 그룹을 선택합니다. 그룹 내에 거부 규칙이 하나라도 있으면 연결을 차단하고, 모두 허용하면 활성화된 연결 제어를 병합합니다."
+
+msgid "A valid license is required"
+msgstr "유효한 라이선스가 필요합니다."
+
+msgid "ACL changed; start a new connection"
+msgstr "ACL이 변경되었습니다. 새 연결을 시작하세요."
+
+msgid "Account is ready."
+msgstr "계정 준비가 완료되었습니다."
+
+msgid "Account permission is no longer available"
+msgstr "계정 권한이 더 이상 유효하지 않습니다."
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "계정 준비에 실패했습니다. 관리자에게 문의하세요."
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "계정 배포에 실패했습니다. 작업 ID를 관리자에게 전달하세요."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "이 자산 플랫폼에서 계정 배포가 활성화되어 있지 않습니다."
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"사용자 이름 또는 모든 계정을 나타내는 @ALL, 지정 사용자 이름과 함께 사용하는 @SPEC, 현재 사용자와 이름이 같은 계정을 "
+"나타내는 @USER를 사용합니다."
+
+msgid "Administrator permission is no longer available"
+msgstr "관리자 권한이 더 이상 유효하지 않습니다."
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"승인 후 지정한 시간 동안 동일 사용자가 이 규칙으로 동일 자산 및 계정에 다시 연결하면 승인을 면제합니다. 0이면 매번 승인이 "
+"필요합니다. 변경해도 기존 면제에는 영향을 주지 않습니다."
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "허용은 연결 제어를 적용하고, 거부는 연결을 차단합니다."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "동일 이름 계정의 자동 배포가 허가되지 않았습니다."
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"동일 이름 계정의 최초 연결 전에만 자동 배포합니다. 기존 관리 계정은 다시 배포하지 않고 재사용합니다. 자산 플랫폼이 계정 배포를 "
+"지원해야 합니다."
+
+msgid "Cancel connections individually."
+msgstr "연결을 개별적으로 취소하세요."
+
+msgid "Complete the current connection step first"
+msgstr "현재 연결 단계를 먼저 완료하세요."
+
+msgid "Connection ACL context"
+msgstr "연결 ACL 컨텍스트"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "연결 ACL 검증이 완료되지 않았습니다."
+
+msgid "Connection approval is no longer valid"
+msgstr "연결 승인이 더 이상 유효하지 않습니다."
+
+msgid "Connection details"
+msgstr "연결 세부 정보"
+
+msgid "Connection is no longer available"
+msgstr "이 연결은 더 이상 유효하지 않습니다. 새 연결을 시작하세요."
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "연결 매개변수를 변경할 수 없습니다. 새 연결 토큰을 생성하세요."
+
+msgid "Connection reason"
+msgstr "연결 사유"
+
+msgid "Connection review was rejected or closed"
+msgstr "연결 승인 요청이 거부되었거나 닫혔습니다."
+
+msgid "Connection token does not match this session."
+msgstr "연결 토큰이 이 세션과 일치하지 않습니다."
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "계정을 생성하고 로그인 자격 증명을 구성하고 있습니다."
+
+msgid "Duplicate connection tokens."
+msgstr "중복된 연결 토큰이 있습니다."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "연결 사유를 입력하세요(최대 4096자)."
+
+msgid "Enter a reason before connecting."
+msgstr "연결 전에 사유를 입력하세요."
+
+msgid "Exemption period"
+msgstr "승인 면제 기간"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "얼굴 모니터링 컨텍스트가 다른 사용자에게 속합니다."
+
+msgid "Face monitoring does not belong to this session"
+msgstr "얼굴 모니터링이 이 세션에 속하지 않습니다."
+
+msgid "Face verification"
+msgstr "얼굴 인증"
+
+msgid "Face verification does not belong to this connection"
+msgstr "얼굴 인증이 이 연결에 속하지 않습니다."
+
+msgid "Face verification failed"
+msgstr "얼굴 인증에 실패했습니다."
+
+msgid "Face verification is no longer available"
+msgstr "얼굴 인증을 더 이상 사용할 수 없습니다."
+
+msgid "Face verification session expired; retry verification"
+msgstr "얼굴 인증 세션이 만료되었습니다. 다시 인증하세요."
+
+msgid "Face verification session is no longer current"
+msgstr "얼굴 인증 세션이 더 이상 현재 세션이 아닙니다."
+
+msgid "First-login same-name account push"
+msgstr "최초 연결 시 동일 이름 계정 배포"
+
+msgid "MFA verification"
+msgstr "MFA 인증"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "사용 가능한 승인자가 없습니다. 관리자에게 문의하세요."
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr "사용자가 자산 연결을 요청하면 선택한 수신자에게 알립니다. 알림이 연결 성공을 의미하지는 않습니다."
+
+msgid "Online face monitoring context is no longer available"
+msgstr "지속적 얼굴 모니터링 컨텍스트가 더 이상 유효하지 않습니다."
+
+msgid "Online face monitoring context is required"
+msgstr "지속적 얼굴 모니터링 컨텍스트가 필요합니다."
+
+msgid "Online face verification requires Web Terminal"
+msgstr "지속적 얼굴 인증에는 웹 터미널이 필요합니다."
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "이 계정으로 연결할 수 있는 권한이 더 이상 유효하지 않습니다."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "연결 전에 동일 이름 계정 준비를 완료하세요."
+
+msgid "Push same-name account on first connection"
+msgstr "최초 연결 시 동일 이름 계정 배포"
+
+msgid "Require approval"
+msgstr "승인 필요"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr "유효한 승인 면제 기간을 제외하고 연결 전에 승인이 필요합니다."
+
+msgid "Rotate password"
+msgstr "비밀번호 변경"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"세션 종료 후 연결 계정의 자격 증명을 변경합니다. 시스템의 세션 종료 후 변경 기능과 활성 계정의 자동 변경 기능을 켜야 합니다."
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "동일 이름 계정 배포에는 서버에서 관리하는 자격 증명을 사용합니다."
+
+msgid "Secret rotation after session end is disabled"
+msgstr "세션 종료 후 자격 증명 변경이 비활성화되어 있습니다."
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "활성 MFA 방식을 선택하세요. 사용 가능한 방식이 없으면 먼저 MFA를 등록하세요."
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "이 조직에서 활성 상태이며 만료되지 않은 승인자를 한 명 이상 선택하세요."
+
+msgid "Select at least one notification recipient."
+msgstr "알림 수신자를 한 명 이상 선택하세요."
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr "승인을 활성화하면 승인자를 선택해야 합니다. 사용 가능한 승인자가 없으면 연결이 차단됩니다."
+
+msgid "Send notification"
+msgstr "알림 전송"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "기존 동일 이름 계정이 비활성 상태입니다. 관리자에게 문의하세요."
+
+msgid "The same-name account username is determined by the server."
+msgstr "동일 이름 계정의 사용자 이름은 서버에서 결정합니다."
+
+msgid "This MFA method does not send a verification code"
+msgstr "이 MFA 방식은 인증 코드를 전송하지 않습니다."
+
+msgid "This connection does not require this step"
+msgstr "이 연결에는 이 단계가 필요하지 않습니다."
+
+msgid "This field cannot be submitted."
+msgstr "이 필드는 제출할 수 없습니다."
+
+msgid "This field does not belong to the current step."
+msgstr "이 필드는 현재 단계에 속하지 않습니다."
+
+msgid "This push method does not support create-only mode"
+msgstr "이 배포 방식은 생성 전용 모드를 지원하지 않습니다."
+
+msgid "This username cannot be provisioned automatically."
+msgstr "이 사용자 이름은 자동 배포할 수 없습니다."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "웹 터미널에서 얼굴 인증을 완료하세요."
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr "연결 전에 등록된 MFA 코드를 확인합니다. 코드 기반 MFA 방식이 등록되어 있지 않으면 연결을 차단합니다."
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr "연결 전에 사용자 얼굴을 인증합니다. 시스템 얼굴 인식 기능과 얼굴 등록이 필요합니다."
+
+msgid "Waiting to push the same-name account."
+msgstr "동일 이름 계정 배포를 기다리는 중입니다."
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr "웹 터미널 전용: 연결 전에 얼굴을 인증하고 세션 내내 모니터링합니다. 시스템 얼굴 인식 기능과 얼굴 등록이 필요합니다."
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "지속적 얼굴 모니터링"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "계정 배포"

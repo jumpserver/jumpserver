@@ -2574,7 +2574,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* biểu thị cho việc khớp tất cả. Ví dụ: 192.168.10.1, 192.168.1.0/24, "
+"Ký tự * biểu thị cho việc khớp tất cả. Ví dụ: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -16525,3 +16525,286 @@ msgstr "Tiêu đề email"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Nội dung email"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100; giá trị càng nhỏ thì độ ưu tiên càng cao.\n"
+"Trong các quy tắc khớp, chọn nhóm có độ ưu tiên cao nhất. Chỉ cần một quy tắc từ chối là kết nối bị chặn; nếu tất cả đều cho phép, kết hợp các biện pháp kiểm soát kết nối đã bật."
+
+msgid "A valid license is required"
+msgstr "Cần có giấy phép hợp lệ."
+
+msgid "ACL changed; start a new connection"
+msgstr "ACL đã thay đổi; hãy bắt đầu kết nối mới."
+
+msgid "Account is ready."
+msgstr "Tài khoản đã sẵn sàng."
+
+msgid "Account permission is no longer available"
+msgstr "Quyền của tài khoản không còn hiệu lực."
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "Chuẩn bị tài khoản không thành công. Hãy liên hệ quản trị viên."
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr ""
+"Cấp phát tài khoản thất bại. Hãy cung cấp mã tác vụ cho quản trị viên."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "Nền tảng tài sản này chưa bật chức năng cấp phát tài khoản."
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"Tên người dùng hoặc @ALL cho mọi tài khoản, @SPEC kèm các tên được chỉ định "
+"và @USER cho tài khoản cùng tên với người dùng hiện tại."
+
+msgid "Administrator permission is no longer available"
+msgstr "Quyền quản trị viên không còn hiệu lực."
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"Sau khi được phê duyệt, cùng người dùng có thể kết nối lại cùng tài sản và "
+"tài khoản theo quy tắc này trong số giờ đã chỉ định. 0 yêu cầu phê duyệt mỗi"
+" lần. Thay đổi không ảnh hưởng đến các quyền miễn phê duyệt hiện có."
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr ""
+"Cho phép sẽ áp dụng các biện pháp kiểm soát kết nối; Từ chối sẽ chặn kết "
+"nối."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "Chưa được phép tự động cấp phát tài khoản cùng tên."
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"Chỉ tự động cấp phát tài khoản cùng tên trước lần kết nối đầu tiên; tái sử "
+"dụng tài khoản được quản lý hiện có mà không cấp phát lại. Nền tảng tài sản "
+"phải hỗ trợ cấp phát tài khoản."
+
+msgid "Cancel connections individually."
+msgstr "Hãy hủy từng kết nối riêng lẻ."
+
+msgid "Complete the current connection step first"
+msgstr "Hãy hoàn tất bước kết nối hiện tại trước."
+
+msgid "Connection ACL context"
+msgstr "Ngữ cảnh ACL kết nối"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "Chưa hoàn tất các bước kiểm tra ACL kết nối."
+
+msgid "Connection approval is no longer valid"
+msgstr "Phê duyệt kết nối không còn hiệu lực."
+
+msgid "Connection details"
+msgstr "Chi tiết kết nối"
+
+msgid "Connection is no longer available"
+msgstr "Kết nối này không còn hiệu lực. Hãy bắt đầu kết nối mới."
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "Không thể thay đổi tham số kết nối; hãy tạo token kết nối mới."
+
+msgid "Connection reason"
+msgstr "Lý do kết nối"
+
+msgid "Connection review was rejected or closed"
+msgstr "Yêu cầu phê duyệt kết nối đã bị từ chối hoặc đóng."
+
+msgid "Connection token does not match this session."
+msgstr "Token kết nối không khớp với phiên này."
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "Đang tạo tài khoản và cấu hình thông tin đăng nhập."
+
+msgid "Duplicate connection tokens."
+msgstr "Có token kết nối trùng lặp."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "Nhập lý do kết nối (tối đa 4096 ký tự)."
+
+msgid "Enter a reason before connecting."
+msgstr "Nhập lý do trước khi kết nối."
+
+msgid "Exemption period"
+msgstr "Thời gian miễn phê duyệt"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "Ngữ cảnh giám sát khuôn mặt thuộc về người dùng khác."
+
+msgid "Face monitoring does not belong to this session"
+msgstr "Giám sát khuôn mặt không thuộc phiên này."
+
+msgid "Face verification"
+msgstr "Xác minh khuôn mặt"
+
+msgid "Face verification does not belong to this connection"
+msgstr "Xác minh khuôn mặt không thuộc kết nối này."
+
+msgid "Face verification failed"
+msgstr "Xác minh khuôn mặt thất bại."
+
+msgid "Face verification is no longer available"
+msgstr "Không thể tiếp tục xác minh khuôn mặt."
+
+msgid "Face verification session expired; retry verification"
+msgstr "Phiên xác minh khuôn mặt đã hết hạn; hãy xác minh lại."
+
+msgid "Face verification session is no longer current"
+msgstr "Phiên xác minh khuôn mặt không còn là phiên hiện tại."
+
+msgid "First-login same-name account push"
+msgstr "Cấp phát tài khoản cùng tên khi kết nối lần đầu"
+
+msgid "MFA verification"
+msgstr "Xác minh MFA"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "Không có người phê duyệt khả dụng. Hãy liên hệ quản trị viên."
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr ""
+"Thông báo cho người nhận đã chọn khi người dùng yêu cầu kết nối tài sản. "
+"Thông báo không có nghĩa là kết nối đã thành công."
+
+msgid "Online face monitoring context is no longer available"
+msgstr "Ngữ cảnh giám sát khuôn mặt liên tục không còn hiệu lực."
+
+msgid "Online face monitoring context is required"
+msgstr "Cần có ngữ cảnh giám sát khuôn mặt liên tục."
+
+msgid "Online face verification requires Web Terminal"
+msgstr "Xác minh khuôn mặt liên tục yêu cầu Web Terminal."
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "Quyền kết nối bằng tài khoản này không còn hiệu lực."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "Hãy chuẩn bị tài khoản cùng tên trước khi kết nối."
+
+msgid "Push same-name account on first connection"
+msgstr "Cấp phát tài khoản cùng tên khi kết nối lần đầu"
+
+msgid "Require approval"
+msgstr "Yêu cầu phê duyệt"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr ""
+"Yêu cầu phê duyệt trước khi kết nối, trừ khi đang trong thời gian miễn phê "
+"duyệt hợp lệ."
+
+msgid "Rotate password"
+msgstr "Đổi mật khẩu"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"Đổi thông tin bí mật của tài khoản kết nối sau khi phiên kết thúc. Cần bật "
+"chức năng đổi sau khi kết thúc phiên trong hệ thống và đổi tự động trên tài "
+"khoản đang hoạt động."
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr ""
+"Việc cấp phát tài khoản cùng tên sử dụng thông tin đăng nhập do máy chủ quản"
+" lý."
+
+msgid "Secret rotation after session end is disabled"
+msgstr "Chức năng đổi thông tin bí mật sau khi kết thúc phiên đã bị tắt."
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr ""
+"Chọn phương thức MFA đang hoạt động; nếu chưa có, hãy đăng ký MFA trước."
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr ""
+"Chọn ít nhất một người phê duyệt đang hoạt động và chưa hết hạn trong tổ "
+"chức này."
+
+msgid "Select at least one notification recipient."
+msgstr "Chọn ít nhất một người nhận thông báo."
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr ""
+"Chọn người phê duyệt khi bật yêu cầu phê duyệt. Kết nối bị chặn nếu không có"
+" người phê duyệt khả dụng."
+
+msgid "Send notification"
+msgstr "Gửi thông báo"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr ""
+"Tài khoản cùng tên hiện có đang bị vô hiệu hóa. Hãy liên hệ quản trị viên."
+
+msgid "The same-name account username is determined by the server."
+msgstr "Tên người dùng của tài khoản cùng tên do máy chủ xác định."
+
+msgid "This MFA method does not send a verification code"
+msgstr "Phương thức MFA này không gửi mã xác minh."
+
+msgid "This connection does not require this step"
+msgstr "Kết nối này không cần bước này."
+
+msgid "This field cannot be submitted."
+msgstr "Không được gửi trường này."
+
+msgid "This field does not belong to the current step."
+msgstr "Trường này không thuộc bước hiện tại."
+
+msgid "This push method does not support create-only mode"
+msgstr "Phương thức cấp phát này không hỗ trợ chế độ chỉ tạo mới."
+
+msgid "This username cannot be provisioned automatically."
+msgstr "Không thể tự động cấp phát tài khoản với tên người dùng này."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Sử dụng Web Terminal để hoàn tất xác minh khuôn mặt."
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr ""
+"Xác minh mã MFA đã đăng ký trước khi kết nối. Chặn kết nối nếu chưa đăng ký "
+"phương thức MFA dùng mã."
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr ""
+"Xác minh khuôn mặt người dùng trước khi kết nối. Cần bật nhận diện khuôn mặt"
+" của hệ thống và đăng ký khuôn mặt."
+
+msgid "Waiting to push the same-name account."
+msgstr "Đang chờ cấp phát tài khoản cùng tên."
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Chỉ dành cho Web Terminal: xác minh khuôn mặt trước khi kết nối và giám sát "
+"suốt phiên. Cần bật nhận diện khuôn mặt của hệ thống và đăng ký khuôn mặt."
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "Giám sát khuôn mặt liên tục"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "Cấp phát tài khoản"

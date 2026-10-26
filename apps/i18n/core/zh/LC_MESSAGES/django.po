@@ -2230,6 +2230,10 @@ msgstr "人脸验证"
 msgid "Face online"
 msgstr "人脸在线"
 
+#: acls/serializers/login_asset_acl.py
+msgid "Select at least one notification recipient."
+msgstr "请至少选择一名通知接收人。"
+
 #: acls/const.py:14
 msgid "Secret rotation"
 msgstr "密码轮换"
@@ -2521,7 +2525,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"使用 * 匹配所有地址。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
 "db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -16121,3 +16125,291 @@ msgstr "登录失败次数已达到上限，登录已被临时锁定。"
 #: authentication/templates/authentication/_msg_login_blocked.html
 msgid "Please review the login logs and check for suspicious activity."
 msgstr "请查看登录日志，排查是否存在可疑活动。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Connection reason"
+msgstr "连接原因"
+
+#: acls/serializers/login_asset_acl.py
+msgid "MFA verification"
+msgstr "MFA 验证"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Require approval"
+msgstr "需要审批"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Send notification"
+msgstr "发送通知"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Face verification"
+msgstr "人脸验证"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "推送账号"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Rotate password"
+msgstr "轮换密码"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Exemption period"
+msgstr "免审时长"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "允许时应用连接控制，拒绝时阻止连接。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr "使用 @ALL 匹配全部账号，@SPEC 加用户名匹配指定账号，@USER 匹配当前用户的同名账号。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100，数值越小，优先级越高。\n"
+"从符合匹配条件的规则中，选取优先级最高的一组；组内任一规则拒绝则拒绝连接，全部允许则合并各规则启用的连接控制。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Select reviewers when approval is enabled. Connections are blocked if no reviewers are available."
+msgstr "开启审批后必须选择审批人；无可用审批人时无法连接。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "请至少选择一名本组织内已激活且未过期的审批人。"
+
+#: acls/models/login_asset_acl.py
+msgid "No available reviewers. Contact an administrator."
+msgstr "审批人不可用，请联系管理员。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr "审批通过后，同一用户在指定小时内通过本规则重连同一资产、账号可免审。0 表示每次审批；修改时长不影响已有免审资格。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Enter a reason before connecting."
+msgstr "连接前必须填写原因。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr "连接前验证已绑定的 MFA 验证码；未绑定时无法连接。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr "连接前验证人脸；需开启系统人脸识别并完成人脸录入。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr "连接前须审批通过；有效免审期内无需重复审批。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr "用户发起资产连接时通知所选接收人，通知不代表连接成功。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr "仅同名账号首次连接前自动推送，已有托管账号则复用不推送；需资产平台支持账号推送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr "仅支持 Web 终端，连接前验证人脸，会话期间持续检测；需开启人脸识别并完成人脸录入。"
+
+#: acls/serializers/login_asset_acl.py
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr "会话结束后自动改密；需开启系统“会话结束后改密”和账号“自动改密”，且账号已激活。"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "人脸在线"
+
+#: authentication/services/connection_acl.py
+msgid "This field cannot be submitted."
+msgstr "不允许提交此字段。"
+
+#: authentication/services/connection_acl.py
+msgid "This field does not belong to the current step."
+msgstr "此字段不属于当前步骤。"
+
+#: authentication/services/connection_acl.py
+msgid "The same-name account username is determined by the server."
+msgstr "同名账号的用户名由服务端确定。"
+
+#: authentication/services/connection_acl.py
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "同名账号推送使用服务端生成的凭据。"
+
+#: authentication/services/connection_acl.py
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "账号推送失败，请将任务编号提供给管理员处理。"
+
+#: authentication/services/connection_acl.py
+msgid "Account is ready."
+msgstr "账号已准备完成。"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification session is no longer current"
+msgstr "人脸验证已失效，请重新验证。"
+
+#: authentication/services/connection_acl.py
+msgid "Administrator permission is no longer available"
+msgstr "管理员权限已失效。"
+
+#: authentication/services/connection_acl.py
+msgid "Connection approval is no longer valid"
+msgstr "连接审批已失效，请重新申请。"
+
+#: authentication/services/connection_acl.py authentication/api/connection_token.py
+msgid "Connection is no longer available"
+msgstr "本次连接已失效，请重新发起连接。"
+
+#: authentication/services/connection_acl.py
+msgid "Online face monitoring context is no longer available"
+msgstr "人脸在线监测已失效，请重新连接。"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification does not belong to this connection"
+msgstr "人脸验证与当前连接不匹配。"
+
+#: authentication/services/connection_acl.py
+msgid "Face verification is no longer available"
+msgstr "当前连接无法继续人脸验证。"
+
+#: authentication/services/connection_acl.py
+msgid "ACL changed; start a new connection"
+msgstr "访问规则已变更，请重新连接。"
+
+#: authentication/services/connection_acl.py
+msgid "Complete the current connection step first"
+msgstr "请先完成当前连接步骤。"
+
+#: authentication/services/connection_acl.py
+msgid "Face monitoring does not belong to this session"
+msgstr "人脸在线监测与当前会话不匹配。"
+
+#: terminal/serializers/session.py
+msgid "Connection token does not match this session."
+msgstr "连接 Token 与当前会话不匹配。"
+
+#: tickets/serializers/ticket/ticket.py
+msgid "Connection details"
+msgstr "连接明细"
+
+msgid "A valid license is required"
+msgstr "需要有效的许可证。"
+
+msgid "Account permission is no longer available"
+msgstr "账号权限已失效。"
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "账号准备未成功，请联系管理员。"
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "此资产平台未启用账号推送。"
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "未授权自动推送同名账号。"
+
+msgid "Cancel connections individually."
+msgstr "请逐一取消连接。"
+
+msgid "Connection ACL context"
+msgstr "连接 ACL 上下文"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "连接 ACL 校验尚未完成。"
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "连接参数不可修改，请创建新的连接 Token。"
+
+msgid "Connection review was rejected or closed"
+msgstr "连接审批已拒绝或关闭。"
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "正在创建账号并配置登录凭据。"
+
+msgid "Duplicate connection tokens."
+msgstr "存在重复的连接 Token。"
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "请输入连接原因，最多 4096 个字符。"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "人脸监测上下文属于其他用户。"
+
+msgid "Face verification failed"
+msgstr "人脸验证失败。"
+
+msgid "Face verification session expired; retry verification"
+msgstr "人脸验证会话已过期，请重新验证。"
+
+msgid "First-login same-name account push"
+msgstr "首次连接同名账号推送"
+
+msgid "Online face monitoring context is required"
+msgstr "缺少人脸在线监测上下文。"
+
+msgid "Online face verification requires Web Terminal"
+msgstr "人脸在线验证需要使用 Web 终端。"
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "连接此账号的权限已失效。"
+
+msgid "Prepare the same-name account before connecting."
+msgstr "请先完成同名账号准备再连接。"
+
+msgid "Push same-name account on first connection"
+msgstr "首次连接时推送同名账号"
+
+msgid "Secret rotation after session end is disabled"
+msgstr "未启用会话结束后改密。"
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "请选择可用的 MFA 方式；若无可用方式，请先绑定 MFA。"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "已有同名账号未激活，请联系管理员。"
+
+msgid "This MFA method does not send a verification code"
+msgstr "此 MFA 方式不发送验证码。"
+
+msgid "This connection does not require this step"
+msgstr "本次连接无需执行此步骤。"
+
+msgid "This push method does not support create-only mode"
+msgstr "此推送方式不支持仅创建模式。"
+
+msgid "This username cannot be provisioned automatically."
+msgstr "此用户名不支持自动推送。"
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "请使用 Web 终端完成人脸验证。"
+
+msgid "Waiting to push the same-name account."
+msgstr "等待推送同名账号。"

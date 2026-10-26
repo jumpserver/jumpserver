@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import APIException
 
@@ -43,8 +44,12 @@ def record_connection_token_credential_audit(token, *, result, error=None, reque
     )
 
 
+@transaction.atomic
 def get_connection_token_secret(token, serializer_factory, *, expire_now=True, public_key=''):
     """Return credentials using the shared token validation and consumption rules."""
+    # Serialize credential release with cancellation and competing consumers;
+    # discard properties cached on the model before the lock was acquired.
+    token = type(token).objects.select_for_update().get(pk=token.pk)
     requested_expire_now = expire_now
     try:
         # Only personal tokens load a version-bound credential during validation.
