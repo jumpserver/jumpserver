@@ -213,6 +213,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
     sync_error = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Sync error'))
     date_last_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last synced'))
     date_last_seen = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last seen'))
+    remote_addr = models.GenericIPAddressField(null=True, blank=True, verbose_name=_('IP'))
     event_receipts_supported = models.BooleanField(default=False)
     # Existing clients remain consumers; newly created diagnostic/report-only
     # SDK instances opt in when they fetch credentials or start an event stream.

@@ -1,5 +1,6 @@
 import hashlib
 import json
+from ipaddress import ip_address
 from datetime import timedelta
 from uuid import UUID
 
@@ -523,12 +524,17 @@ class CredentialClientManager:
         encoded = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
         return hashlib.sha256(encoded).hexdigest()
 
-    def update_client_metadata(self, client_version='', protocol_version=1, config_schema_version=None):
+    def update_client_metadata(self, client_version='', protocol_version=1, config_schema_version=None, *, remote_addr=None):
         values = {
             'client_version': client_version,
             'protocol_version': protocol_version,
             'config_schema_version': config_schema_version,
         }
+        if remote_addr:
+            try:
+                values['remote_addr'] = str(ip_address(remote_addr.strip()))
+            except ValueError:
+                pass
         changed = {
             key: value for key, value in values.items()
             if value is not None and getattr(self.client, key) != value

@@ -7,7 +7,7 @@ from accounts.const import ApplicationEvent, AuditEvent
 from django.template.loader import render_to_string
 
 from .audit import record
-from .documentation import SDK_INSTALL_COMMANDS, sdk_example
+from .documentation import agent_build_command, sdk_install_commands, sdk_example
 from .events import enqueue
 
 
@@ -44,7 +44,7 @@ def materials(application, params, endpoint):
             code = sdk_example(language)
             if language == 'node':
                 code = code.replace("require('./index')", "require('@jumpserver/pam')")
-        install_command = SDK_INSTALL_COMMANDS[language]
+        install_command = sdk_install_commands(endpoint)[language]
         if language == 'python':
             install_command = f'chmod 0600 {filename}\n{install_command}'
         else:
@@ -98,7 +98,7 @@ def materials(application, params, endpoint):
     if setup == 'delivery' and settings['systemd_action']:
         bootstrap['delivery']['systemd_action'] = settings['systemd_action']
     filename = 'jms_pam_agent.json'
-    preparation = 'sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
+    preparation = f'{agent_build_command(endpoint)} &&\nsudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
     installation = (
         f'chmod 0600 {filename} && '
         'sudo /usr/local/bin/jms-pam-agent install '
@@ -125,7 +125,7 @@ def materials(application, params, endpoint):
     return {
         'type': 'agent', 'config': json.dumps(bootstrap, indent=2), 'filename': filename,
         'preparation_command': preparation, 'registration_command': installation,
-        'install_command': f'{preparation} && {installation}',
+        'install_command': f'{preparation} &&\n{installation}',
         'foreground_unix_command': foreground_unix,
         'foreground_windows_command': foreground_windows,
         'service_name': 'jms-pam-agent', 'agent_language': 'go',

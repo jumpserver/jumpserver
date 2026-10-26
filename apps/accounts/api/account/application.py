@@ -149,7 +149,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             ]
             results.append({
                 'id': str(event.source_event_id),
-                'event': event.event,
+                'event': ApplicationEvent.canonical(event.event),
                 'published_at': event.published_at,
                 'revision': event.revision,
                 'rotation_id': str(event.rotation_id) if event.rotation_id else None,
@@ -304,4 +304,16 @@ class PythonSDKDownloadAPI(APIView):
                     archive.write(path, os.path.relpath(path, package_dir))
         response = HttpResponse(buffer.getvalue(), content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename="jms-pam-python.zip"'
+        return response
+
+
+class PAMClientSourceDownloadAPI(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request, language, *args, **kwargs):
+        from accounts.credential_client.source import source_archive
+        response = HttpResponse(source_archive(language), content_type='application/gzip')
+        response['Content-Disposition'] = f'attachment; filename="jms-pam-{language}-source.tar.gz"'
+        response['Cache-Control'] = 'no-cache'
         return response

@@ -28,6 +28,7 @@ TRACKED_NON_ROTATION_EVENTS = {
     ApplicationEvent.CREDENTIAL_UPDATED,
     ApplicationEvent.CREDENTIAL_REVOKED,
     ApplicationEvent.APPLICATION_SCOPE_UPDATED,
+    ApplicationEvent.CONFIGURATION_UPDATED,
 }
 
 
@@ -216,7 +217,15 @@ def _enqueue_webhooks(event, code):
         for application in IntegrationApplication.objects.filter(id__in=application_ids)
     }
     for webhook in webhooks:
-        if code not in webhook.events:
+        # Keep the event code promised to existing receivers, including in the
+        # rendered body and durable delivery record. A rule subscribing to both aliases
+        # receives one delivery, using the canonical name.
+        delivery_code = code
+        if code == ApplicationEvent.APPLICATION_SCOPE_UPDATED and code not in webhook.events:
+            delivery_code = ApplicationEvent.CONFIGURATION_UPDATED
+        elif code == ApplicationEvent.CONFIGURATION_UPDATED and code not in webhook.events:
+            delivery_code = ApplicationEvent.APPLICATION_SCOPE_UPDATED
+        if delivery_code not in webhook.events:
             continue
         application = next((
             applications[item.id] for item in webhook.applications.all()
@@ -225,7 +234,7 @@ def _enqueue_webhooks(event, code):
         if not application:
             continue
         try:
-            context = build_webhook_context(event, application, code)
+            context = build_webhook_context(event, application, delivery_code)
             body = render_webhook_template(webhook.body_template, context)
         except WebhookValidationError:
             logger.warning('Skipping invalid application webhook %s.', webhook.id)
@@ -238,7 +247,7 @@ def _enqueue_webhooks(event, code):
                     summary='Waiting for webhook delivery.',
                 )
                 delivery = ApplicationEventDelivery.objects.create(
-                    event=event, audit=audit, webhook=webhook, code=code,
+                    event=event, audit=audit, webhook=webhook, code=delivery_code,
                     url=webhook.url, method=webhook.method, headers=webhook.headers,
                     body=body, org_id=event.org_id,
                     expires_at=timezone.now() + timedelta(seconds=90),

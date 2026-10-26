@@ -1,12 +1,13 @@
 """Policy-owned event cycles and their frozen, per-event recipient receipts."""
 from collections import defaultdict
 
-from django.db.models import Count, Max, Min, Q
-from django.db.models.functions import Coalesce
+from django.db.models import Case, CharField, Count, Exists, IntegerField, Max, Min, OuterRef, Q, Subquery, Value, When
+from django.db.models.functions import Cast, Coalesce
 from rest_framework.exceptions import NotFound
 
 from accounts.const import ApplicationEvent, AuditEvent
 from accounts.models import Account, ApplicationAudit, CredentialClientInstance, CredentialRotationEvent
+from common.utils import get_log_keep_day
 
 
 def policy_events(credential):
@@ -93,12 +94,56 @@ def _summary(events, audits, accounts):
     }
 
 
-def cycle_directory(credential, limit=20, offset=0):
+def cycle_directory(credential, limit=20, offset=0, *, kind='', status='', started_after=None, started_before=None):
     queryset = policy_events(credential)
     groups = queryset.values('cycle_key').annotate(
         date_started=Min('published_at'), date_last_event=Max('published_at'),
         event_count=Count('id'),
-    ).order_by('-date_last_event', '-cycle_key')
+        rotation_status=Max('rotation__status'),
+    )
+    related = queryset.filter(cycle_key=OuterRef('cycle_key')).order_by()
+    source = ApplicationAudit.objects.filter(id__in=queryset.filter(
+        cycle_key=OuterRef(OuterRef('cycle_key')),
+    ).order_by().values('source_event_id'))
+    # Keep correlated expressions inside aggregates: otherwise Django expands
+    # GROUP BY to the event's source ID and splits a cycle into individual rows.
+    groups = groups.annotate(
+        last_code=Max(Subquery(related.order_by('-sequence', '-published_at', '-id').values('event')[:1])),
+        has_change=Count('id', filter=Q(event__startswith='credential.change.')),
+        republished=Max(Cast(Exists(source.filter(event=AuditEvent.CREDENTIAL_REPUBLISHED)), IntegerField())),
+        has_operation=Max(Cast(Exists(source.filter(operation_id__isnull=False)), IntegerField())),
+    ).annotate(
+        kind=Case(
+            When(rotation_status__isnull=False, then=Value('rotation')),
+            When(republished=1, then=Value('subscription_refresh')),
+            When(has_change__gt=0, has_operation=1, then=Value('subscription')),
+            When(has_change__gt=0, then=Value('legacy')),
+            When(has_operation=1, then=Value('update')),
+            default=Value('event'), output_field=CharField(),
+        ),
+        status=Case(
+            When(rotation_status='running', last_code__in=(
+                ApplicationEvent.ROTATION_FAILED, ApplicationEvent.CREDENTIAL_CHANGE_FAILED,
+            ), then=Value('failed')),
+            When(rotation_status__isnull=False, then='rotation_status'),
+            When(republished=1, then=Value('published')),
+            When(has_change__gt=0, last_code=ApplicationEvent.CREDENTIAL_CHANGE_FAILED, then=Value('failed')),
+            When(has_change__gt=0, last_code__in=(
+                ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED, ApplicationEvent.CREDENTIAL_UPDATED,
+            ), then=Value('success')),
+            When(has_change__gt=0, then=Value('running')),
+            default=Value('published'), output_field=CharField(),
+        ),
+    )
+    if kind:
+        groups = groups.filter(kind=kind)
+    if status:
+        groups = groups.filter(status=status)
+    if started_after:
+        groups = groups.filter(date_started__gte=started_after)
+    if started_before:
+        groups = groups.filter(date_started__lte=started_before)
+    groups = groups.order_by('-date_started', '-cycle_key')
     count = groups.count()
     cycle_ids = [item['cycle_key'] for item in groups[offset:offset + limit]]
     events = list(queryset.filter(cycle_key__in=cycle_ids).select_related('rotation'))
@@ -106,9 +151,16 @@ def cycle_directory(credential, limit=20, offset=0):
     by_cycle = defaultdict(list)
     for event in events:
         by_cycle[event.cycle_key].append(event)
+    current_rotation = credential.rotation_records.filter(
+        status__in=('preparing', 'running'), date_finished__isnull=True,
+    ).first()
+    current = list(queryset.filter(rotation=current_rotation).select_related('rotation')) if current_rotation else []
+    current_audits, current_accounts = _context(current, credential.org_id) if current else ({}, {})
     return {
         'count': count,
         'results': [_summary(by_cycle[key], audits, accounts) for key in cycle_ids],
+        'current_cycle': _summary(current, current_audits, current_accounts) if current else None,
+        'retention_days': get_log_keep_day('APPLICATION_RECORD_KEEP_DAYS'),
     }
 
 

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
 
@@ -271,3 +272,43 @@ class CredentialEventCycleTests(CredentialTestCase):
         detail = cycle_detail(self.credential, audit.id)
         self.assertEqual(detail['kind'], 'legacy')
         self.assertEqual(detail['event_count'], 1)
+
+    def test_cycle_filters_apply_before_pagination_and_count(self):
+        self.subscription()
+        running = self.change()
+        failed = self.change(status='failed')
+        success = self.change(status='success')
+        for status, change in [('running', running), ('failed', failed), ('success', success)]:
+            result = cycle_directory(self.credential, limit=1, status=status, kind='subscription')
+            self.assertEqual(result['count'], 1)
+            self.assertEqual(result['results'][0]['id'], str(change.id))
+        self.assertEqual(cycle_directory(self.credential, kind='rotation')['count'], 0)
+        result = cycle_directory(self.credential, started_after=timezone.now() + timedelta(seconds=1))
+        self.assertEqual(result['count'], 0)
+        self.assertEqual(cycle_directory(self.credential, started_before=timezone.now())['count'], 3)
+
+    def test_current_cycle_is_available_outside_filtered_results(self):
+        CredentialRotationManager(self.credential.id).start()
+        rotation = self.credential.rotation_records.first()
+        result = cycle_directory(self.credential, status='success')
+        self.assertEqual(result['count'], 0)
+        self.assertEqual(result['current_cycle']['id'], str(rotation.id))
+        self.assertGreater(result['retention_days'], 0)
+
+    def test_api_rejects_unknown_filters_and_reversed_dates(self):
+        view = ApplicationCredentialViewSet.as_view({'get': 'event_cycles'})
+        for params in [
+            {'kind': 'unknown'}, {'cycle_status': 'unknown'}, {'started_after': 'invalid'},
+            {'started_after': '2026-10-26T00:00:00Z', 'started_before': '2026-10-25T00:00:00Z'},
+        ]:
+            response = view(self.request('get', '/event-cycles/', params), pk=self.credential.id)
+            self.assertEqual(response.status_code, 400)
+
+    def test_api_cycle_status_does_not_filter_the_policy_status(self):
+        self.subscription()
+        failed = self.change(status='failed')
+        view = ApplicationCredentialViewSet.as_view({'get': 'event_cycles'})
+        response = view(self.request('get', '/event-cycles/', {'cycle_status': 'failed'}), pk=self.credential.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['id'], str(failed.id))

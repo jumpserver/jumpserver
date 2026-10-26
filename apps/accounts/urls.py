@@ -47,6 +47,7 @@ router.register(
 router.register(r'credential-client', api.CredentialClientViewSet, 'credential-client')
 
 urlpatterns = [
+    path('client-source/<slug:language>/', api.PAMClientSourceDownloadAPI.as_view(), name='pam-client-source'),
     path('python-sdk/', api.PythonSDKDownloadAPI.as_view(), name='python-sdk-download'),
     path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),
     path('accounts/tasks/', api.AccountsTaskCreateAPI.as_view(), name='account-task-create'),

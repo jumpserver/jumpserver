@@ -48,6 +48,7 @@ class ApplicationEvent(TextChoices):
     CREDENTIAL_UPDATED = 'credential.updated', _('Credential updated')
     CREDENTIAL_REVOKED = 'credential.revoked', _('Credential revoked')
     APPLICATION_SCOPE_UPDATED = 'application.scope.updated', _('Application scope updated')
+    CONFIGURATION_UPDATED = 'configuration.updated', _('Application scope updated (legacy)')
     CREDENTIAL_CHANGE_STARTED = 'credential.change.started', _('Credential change started')
     CREDENTIAL_CHANGE_COMPLETED = 'credential.change.completed', _('Credential change completed')
     CREDENTIAL_CHANGE_FAILED = 'credential.change.failed', _('Credential change failed')
@@ -58,6 +59,10 @@ class ApplicationEvent(TextChoices):
     ROTATION_FORCE_STOPPED = 'rotation.force_stopped', _('Rotation forcibly stopped')
     ROTATION_COMPLETED = 'rotation.completed', _('Rotation completed')
     ROTATION_FAILED = 'rotation.failed', _('Rotation failed')
+
+    @classmethod
+    def canonical(cls, value):
+        return cls.APPLICATION_SCOPE_UPDATED if value == cls.CONFIGURATION_UPDATED else value
 
 
 class ApplicationCommandEvent(TextChoices):

@@ -442,7 +442,7 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
         model = CredentialClientInstance
         fields_mini = ['id', 'instance_id', 'type']
         fields_small = fields_mini + [
-            'application', 'online', 'date_last_seen', 'is_active',
+            'application', 'online', 'date_last_seen', 'remote_addr', 'is_active',
             'application_status', 'date_status_reported',
             'reported_accounts',
         ]
@@ -457,7 +457,7 @@ class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
             'client_version', 'protocol_version', 'config_schema_version',
             'config_digest', 'configuration_current', 'upgrade_required',
             'sync_status', 'sync_error', 'date_last_synced',
-            'date_last_seen', 'credential_statuses', 'date_created', 'date_updated',
+            'date_last_seen', 'remote_addr', 'credential_statuses', 'date_created', 'date_updated',
             'application_status', 'date_status_reported',
             'reported_accounts',
         ]

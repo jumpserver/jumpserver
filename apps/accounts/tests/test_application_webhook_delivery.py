@@ -12,6 +12,7 @@ from accounts.credential_client.events import enqueue
 from accounts.credential_client.webhook_delivery import WebhookRequestError, send_webhook
 from accounts.models import (
     ApplicationAudit, ApplicationEventAttempt, ApplicationEventDelivery, ApplicationWebhook,
+    CredentialRotationEvent,
 )
 from accounts.tasks.application_events import (
     clean_application_records_period, deliver_application_webhook,
@@ -45,6 +46,47 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         ) as dispatch, self.captureOnCommitCallbacks(execute=True):
             enqueue(event, code)
         return event, dispatch
+
+    def test_scope_event_keeps_legacy_webhook_body_and_delivery_code(self):
+        self.webhook.events = [ApplicationEvent.CONFIGURATION_UPDATED]
+        self.webhook.save(update_fields=['events'])
+        event, dispatch = self.enqueue_event(ApplicationEvent.APPLICATION_SCOPE_UPDATED)
+        delivery = ApplicationEventDelivery.objects.get(event=event, webhook=self.webhook)
+        self.assertEqual(delivery.code, 'configuration.updated')
+        self.assertEqual(delivery.body['event'], 'configuration.updated')
+        dispatch.assert_called_once()
+
+    def test_scope_event_aliases_do_not_duplicate_delivery(self):
+        self.webhook.events = [ApplicationEvent.CONFIGURATION_UPDATED, ApplicationEvent.APPLICATION_SCOPE_UPDATED]
+        self.webhook.save(update_fields=['events'])
+        event, dispatch = self.enqueue_event(ApplicationEvent.APPLICATION_SCOPE_UPDATED)
+        deliveries = ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook)
+        self.assertEqual(deliveries.count(), 1)
+        self.assertEqual(deliveries.get().body['event'], 'application.scope.updated')
+        dispatch.assert_called_once()
+
+    def test_legacy_scope_event_also_reaches_canonical_subscription(self):
+        self.webhook.events = [ApplicationEvent.APPLICATION_SCOPE_UPDATED]
+        self.webhook.save(update_fields=['events'])
+        event, _ = self.enqueue_event(ApplicationEvent.CONFIGURATION_UPDATED)
+        delivery = ApplicationEventDelivery.objects.get(event=event, webhook=self.webhook)
+        self.assertEqual(delivery.code, 'application.scope.updated')
+        self.assertEqual(delivery.body['event'], 'application.scope.updated')
+
+    def test_legacy_scope_history_remains_visible_with_the_current_label(self):
+        from accounts.credential_rotation.events import subscription_events, timeline
+        self.credential.mode = 'subscription'
+        self.credential.account = self.credential.alternate_account = self.credential.active_account = None
+        self.credential.save()
+        source = record(AuditEvent.CONFIGURATION_UPDATED, credential=self.credential)
+        event = CredentialRotationEvent.objects.create(
+            source_event_id=source.id, event='configuration.updated', sequence=1,
+            revision=1, recipients=[],
+        )
+        self.assertTrue(subscription_events(self.credential).filter(id=event.id).exists())
+        self.assertEqual(timeline(self.credential)['events'][0]['event'], 'application.scope.updated')
+        event.refresh_from_db()
+        self.assertEqual(event.event, 'configuration.updated')
 
     def test_selected_event_is_snapshotted_once_and_dispatched_after_commit(self):
         event, dispatch = self.enqueue_event()
@@ -214,6 +256,9 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
             pending_event.id, pending.audit_id,
         ]
         ApplicationAudit.objects.filter(id__in=old_ids).update(date_created=expired_at)
+        CredentialRotationEvent.objects.filter(source_event_id__in=old_ids).update(
+            published_at=expired_at,
+        )
         ApplicationEventDelivery.objects.filter(id__in=[completed.id, pending.id]).update(
             date_created=expired_at,
         )

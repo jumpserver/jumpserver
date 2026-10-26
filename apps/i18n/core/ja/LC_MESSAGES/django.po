@@ -14376,3 +14376,12 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "資産ログイン ACL で追加の操作が必要なため、認証情報を検証できません。"
+
+msgid "Completed policy cycles are retained from their end time. Active cycles, cycles requiring attention, and their dependent audit and confirmation records are preserved."
+msgstr "完了したサイクルの保持期間は終了時刻から計算されます。実行中および対応が必要なサイクルと、それらに必要な監査・アプリケーション確認記録は保持されます。"
+
+msgid "Clean expired application audits, completed policy cycles and webhook delivery records."
+msgstr "期限切れのアプリケーション監査、完了したポリシーサイクル、Webhook 配信記録を削除します。"
+
+msgid "The start time must be earlier than the end time."
+msgstr "開始時刻は終了時刻より前である必要があります。"

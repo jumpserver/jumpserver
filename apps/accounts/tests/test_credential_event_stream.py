@@ -69,10 +69,11 @@ class CredentialEventStreamTests(TransactionTestCase):
         async_to_sync(self._run_connection)()
         client = CredentialClientInstance.objects.get(instance_id='stream-instance')
         self.assertIsNotNone(client.date_last_seen)
+        self.assertEqual(client.remote_addr, '2001:db8::7')
         self.assertTrue(client.event_receipts_supported)
         self.assertTrue(ApplicationAudit.objects.filter(
             service_id=self.application.id,
-            instance_id=client.instance_id, event='credential_stream_connected',
+            instance_id=client.instance_id, event='credential_stream_connected', remote_addr='2001:db8::7',
         ).exists())
         self.assertTrue(ApplicationAudit.objects.filter(
             service_id=self.application.id,
@@ -162,6 +163,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         for header in sdk._event_stream_headers():
             name, value = header.split(': ', 1)
             headers.append((name.lower().encode(), value.encode()))
+        headers.append((b'x-forwarded-for', b'2001:db8::7'))
         path = (
             '/ws/accounts/credential-events/'
             '?instance_id=stream-instance'

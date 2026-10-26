@@ -1,6 +1,7 @@
 """SDK documentation selection, independent of programming and UI languages."""
 
 from pathlib import Path
+from shlex import quote
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -13,20 +14,33 @@ SDK_LANGUAGES = {
     'node': {'label': 'Node.js', 'example': 'hooks.js', 'runtime': 'Node.js 20.3+', 'credential_policies': True},
     'curl': {'label': 'cURL', 'example': 'demo.sh', 'runtime': 'Bash / cURL / OpenSSL', 'credential_policies': False},
 }
-SDK_INSTALL_COMMANDS = {
-    'python': 'python3 -m pip install jms-pam',
-    'go': 'go get github.com/jumpserver/pam-clients/go@v1.0.2',
-    'java': (
-        'curl -fLO https://github.com/jumpserver/pam-clients/releases/download/v1.0.2/jms-pam-java.tar.gz\n'
-        'tar -xzf jms-pam-java.tar.gz\n'
-        'mvn -f ./java/pom.xml install'
-    ),
-    'node': (
-        'curl -fLO https://github.com/jumpserver/pam-clients/releases/download/v1.0.2/jms-pam-node.tar.gz\n'
-        'tar -xzf jms-pam-node.tar.gz\n'
-        'npm install ./node'
-    ),
-}
+def client_source_command(language, endpoint='https://jumpserver.example.com'):
+    url = f'{endpoint.rstrip("/")}/api/v1/accounts/client-source/{language}/'
+    return f'curl -fL {quote(url)} -o jms-pam-clients.tar.gz &&\ntar -xzf jms-pam-clients.tar.gz'
+
+
+def sdk_install_commands(endpoint='https://jumpserver.example.com'):
+    commands = {
+        'python': 'python3 -m pip install --upgrade --force-reinstall ./jms-pam-clients/python',
+        'go': (
+            'go mod edit -replace github.com/jumpserver/pam-clients/go=./jms-pam-clients/go &&\n'
+            'go get github.com/jumpserver/pam-clients/go@v1.0.2'
+        ),
+        'java': 'mvn -f ./jms-pam-clients/java/pom.xml install',
+        'node': 'npm install ./jms-pam-clients/node',
+    }
+    return {language: f'{client_source_command(language, endpoint)} &&\n{command}'
+            for language, command in commands.items()}
+
+
+def agent_build_command(endpoint='https://jumpserver.example.com'):
+    return (
+        f'# Go 1.23+\n{client_source_command("agent", endpoint)} &&\n'
+        'go -C ./jms-pam-clients/agent build -trimpath -o ../../jms-pam-agent ./cmd/jms-pam-agent'
+    )
+
+
+SDK_INSTALL_COMMANDS = sdk_install_commands()
 DOCUMENTATION_LANGUAGES = ('en', 'zh-hans', 'zh-hant', 'ja', 'ko', 'pt-br', 'ru', 'vi', 'es', 'fr')
 LANGUAGE_ALIASES = {
     'zh': 'zh-hans', 'zh-cn': 'zh-hans', 'zh-sg': 'zh-hans',

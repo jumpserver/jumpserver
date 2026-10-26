@@ -19,6 +19,7 @@ SUBSCRIPTION_EVENTS = (
     ApplicationEvent.CREDENTIAL_UPDATED,
     ApplicationEvent.CREDENTIAL_REVOKED,
     ApplicationEvent.APPLICATION_SCOPE_UPDATED,
+    ApplicationEvent.CONFIGURATION_UPDATED,
 )
 
 
@@ -151,7 +152,7 @@ def _build_timeline(events, instances, org_id, rotation_id=None, status=None):
     return {
         'rotation_id': str(rotation_id) if rotation_id else None, 'status': status,
         'events': [{
-            'id': str(event.source_event_id), 'event': event.event,
+            'id': str(event.source_event_id), 'event': ApplicationEvent.canonical(event.event),
             'sequence': sequence, 'published_at': event.published_at.isoformat(),
             'revision': event.revision,
         } for sequence, event in enumerate(events, start=1)],
