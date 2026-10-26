@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 import ipaddress
-from datetime import datetime, timedelta
+from datetime import timedelta
 from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
 from django.shortcuts import reverse
 from django.templatetags.static import static
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from audits.models import UserLoginLog
@@ -52,20 +53,17 @@ def check_different_city_login_if_need(user, request):
     if is_private:
         return
     usernames = [user.username, f"{user.name}({user.username})"]
-    last_user_login = UserLoginLog.objects.exclude(
-        city__in=city_white
-    ).filter(username__in=usernames, status=True).first()
-    if not last_user_login:
+    login_logs = UserLoginLog.objects.filter(
+        username__in=usernames, status=True,
+    ).exclude(city__in=city_white)
+    if not login_logs.exists():
         return
 
     city = get_ip_city(ip)
-    last_cities = UserLoginLog.objects.filter(
-        datetime__gte=datetime.now() - timedelta(days=7),
-        username__in=usernames,
-        status=True
-    ).exclude(city__in=city_white).values_list('city', flat=True).distinct()
-
-    if city in last_cities:
+    if login_logs.filter(
+        datetime__gte=timezone.now() - timedelta(days=7),
+        city=city,
+    ).exists():
         return
 
     DifferentCityLoginMessage(user, ip, city).publish_async()
