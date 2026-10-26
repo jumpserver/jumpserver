@@ -24,6 +24,8 @@ dangerous_keywords = (
 
 
 class Playbook(JMSBaseModel):
+    entry_filenames = ('main.yml', 'main.yaml', 'main')
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
     path = PrivateFileField(upload_to='playbooks/')
@@ -73,9 +75,8 @@ class Playbook(JMSBaseModel):
     @property
     def entry(self):
         work_dir = self.work_dir
-        valid_entry = ('main.yml', 'main.yaml', 'main')
         for f in os.listdir(work_dir):
-            if f in valid_entry:
+            if f in self.entry_filenames:
                 return os.path.join(work_dir, f)
         raise PlaybookNoValidEntry
 
