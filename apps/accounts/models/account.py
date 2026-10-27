@@ -384,7 +384,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         from ops.ansible.utils import escape_jinja2_syntax
 
         var = {
-            'ansible_user': escape_jinja2_syntax(su_from.username),
+            'ansible_user': escape_jinja2_syntax(su_from.full_username),
         }
         if not su_from.secret:
             return var
