@@ -31,7 +31,7 @@ def task_activity_callback(self, subject, message, recipient_list, *args, **kwar
     return resource_ids,
 
 
-def deliver_mail(*args, **kwargs):
+def deliver_mail(*args, safe_errors=False, **kwargs):
     from users.utils import activate_user_language
 
     if len(args) == 3:
@@ -62,6 +62,10 @@ def deliver_mail(*args, **kwargs):
             with activate_user_language(user):
                 send_mail(connection=get_email_connection(), *args, **kwargs)
         except Exception as e:
+            if safe_errors:
+                # SMTP 异常可能回显正文，必须在此处打印日志前去敏；
+                # 仅在外层验证码任务捕获异常，无法阻止这里的日志泄露。
+                raise RuntimeError('Verification email delivery failed') from None
             logger.error(f"Sending mail to {user.email} error: {e}")
 
 

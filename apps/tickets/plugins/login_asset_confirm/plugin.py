@@ -13,26 +13,27 @@ class Plugin(TicketPlugin):
         from tickets.workflow.errors import WorkflowConfigurationError
         from assets.models import Asset
         data = ticket.request_data
-        asset_id = data.get('apply_login_asset')
-        if not asset_id:
+        connections = ticket.meta.get('login_asset_connections') or [{
+            'asset_id': data.get('apply_login_asset'), 'account': data.get('apply_login_account', ''),
+        }]
+        ids = {entry['asset_id'] for entry in connections}
+        assets = list(Asset.objects.filter(pk__in=ids, org_id=ticket.org_id))
+        if not ids or len(assets) != len(ids):
             raise WorkflowConfigurationError('The requested asset no longer exists.')
-        asset = Asset.objects.filter(pk=asset_id, org_id=ticket.org_id).first()
-        if not asset:
-            raise WorkflowConfigurationError('The requested asset no longer exists.')
-        return {'assets': snapshot_assets([asset], ticket.org_id),
-                'accounts': [{'username': data.get('apply_login_account', '')}]}
+        return {'assets': snapshot_assets(assets, ticket.org_id),
+                'accounts': [{'asset_id': entry['asset_id'], 'username': entry['account']} for entry in connections]}
 
     def on_approved(self, instance, ticket):
         from ..resources import validate_snapshot_assets
-        validate_snapshot_assets(instance)
-        token = getattr(ticket, 'connection_token', None)
-        if token:
-            from tickets.workflow.errors import WorkflowConfigurationError
-            if token.is_expired:
-                raise WorkflowConfigurationError('The connection token has expired. Request a new connection.')
-            token.is_active = True
-            token.save(update_fields=['is_active'])
+        from authentication.services.connection_acl import get_pending_review_assignees
         from acls.models import LoginAssetACL
+        validate_snapshot_assets(instance)
+        for token in ticket.connection_tokens.select_for_update().order_by('pk'):
+            if token.is_expired or token.acl_context.get('cancelled'):
+                continue
+            if token.acl_context.get('review_acls'):
+                get_pending_review_assignees(token)
+            token.complete_acl_requirement('review')
         LoginAssetACL.cache_approved_review(ticket, instance)
         return {'action': self.type, 'ticket': str(ticket.pk)}
 

@@ -528,3 +528,37 @@ class WorkflowTests(TestCase):
         self.assertEqual(workflow.versions.count(), 1)
         self.assertTrue(workflow.migration_notes['requires_review'])
         self.assertTrue(TicketFlow.objects.filter(pk=flow.pk).exists())
+
+
+class WorkflowCompositionTests(SimpleTestCase):
+    def test_chain_preserves_condition_branches_and_configuration(self):
+        from tickets.workflow.composition import chain_definitions
+        user = User(id=uuid4())
+        first = conditional_definition([user])
+        second = approval_definition([user], strategy='quorum', required=1, timeout=600, timeout_action='reject')
+        original = deepcopy([first, second])
+        combined = chain_definitions([first, second])
+        self.assertEqual([first, second], original)
+        condition = next(node for node in combined['nodes'] if node['type'] == 'condition')
+        next_approval = next(node for node in combined['nodes'] if node['config'].get('strategy') == 'quorum')
+        false_edge = next(edge for edge in combined['edges']
+                          if edge['source'] == condition['id'] and edge['condition'] is False)
+        self.assertEqual(false_edge['target'], next_approval['id'])
+        self.assertEqual(next_approval['config']['timeout_action'], 'reject')
+        self.assertEqual(next_approval['config']['timeout'], 600)
+
+    def test_chain_keeps_cc_and_accepts_empty_sections_without_extra_exits(self):
+        from tickets.workflow.composition import chain_definitions
+        user = User(id=uuid4())
+        empty = {'nodes': [{'id': 's', 'type': 'start'}, {'id': 'e', 'type': 'end'}], 'edges': [['s', 'e']]}
+        cc = {'nodes': [{'id': 's', 'type': 'start'}, {'id': 'cc', 'type': 'cc', 'config': {'users': [str(user.pk)]}},
+                        {'id': 'e', 'type': 'end'}], 'edges': [['s', 'cc'], ['cc', 'e']]}
+        combined = chain_definitions([empty, cc, empty, approval_definition([user]), empty])
+        self.assertEqual([node['type'] for node in combined['nodes']], ['start', 'end', 'cc', 'approval'])
+        self.assertEqual(len(combined['edges']), 3)
+
+    def test_chain_rejects_total_size_over_limit(self):
+        from tickets.workflow.composition import chain_definitions
+        user = User(id=uuid4())
+        with self.assertRaises(WorkflowConfigurationError):
+            chain_definitions([approval_definition([user], levels=64), approval_definition([user], levels=64)])

@@ -142,8 +142,8 @@ class FileTransferTests(TestCase):
         other = Account.objects.create(asset=self.asset, name='operator', username='operator')
         self.grant(accounts=['operator'], protocols=['rdp'])
         self.request_ticket(accounts=['root', 'operator'])
-        self.assertEqual(self.actions(protocol='rdp'), ActionChoices.connect)
-        self.assertEqual(self.actions(other, 'ssh'), ActionChoices.connect)
+        self.assertEqual(self.actions(protocol='rdp'), 0)
+        self.assertEqual(self.actions(other, 'ssh'), 0)
         self.assertEqual(self.actions(other, 'rdp'), ActionChoices.connect | ActionChoices.upload)
 
     def test_account_identity_and_membership_are_checked_on_each_connection(self):

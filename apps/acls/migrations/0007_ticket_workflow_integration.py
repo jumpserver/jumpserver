@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('acls', '0006_loginassetacl_review_duration'),
+        ('acls', '0007_loginassetacl_controls'),
         ('tickets', '0010_ticket_workflow_refactor'),
     ]
 

@@ -49,35 +49,37 @@ def submit_ticket(ticket):
 
 
 @transaction.atomic
-def submit_system_ticket(ticket, assignees, workflow=None):
-    """ACLs without a selected workflow get a versioned one-node definition.
-
-    Existing ACL reviewer configuration remains a useful simple authoring form;
-    it creates exactly the same task/instance model as the visual designer.
-    """
+def get_system_workflow(org_id, ticket_type, assignees):
+    """Keep simple ACL reviewers on the same versioned engine as designer workflows."""
     from .publication import publish_workflow
+    import hashlib
+    ids = sorted(str(user.pk) for user in assignees)
+    if not ids:
+        raise WorkflowConfigurationError('Configure reviewers or select a workflow on the ACL.')
+    digest = hashlib.sha256(','.join(ids).encode()).hexdigest()[:24]
+    with tmp_to_org(org_id):
+        workflow, _ = Workflow.objects.get_or_create(
+            org_id=org_id, type=ticket_type, name=f'ACL {ticket_type} {digest}',
+            defaults={'comment': 'Generated from ACL reviewers.', 'is_system': True},
+        )
+        workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
+        if not workflow.active_version_id:
+            publish_workflow(workflow, {'nodes': [
+                {'id': 'start', 'type': 'start'},
+                {'id': 'review', 'type': 'approval', 'name': 'Review', 'config': {
+                    'approvers': {'type': 'user', 'value': ids}, 'strategy': 'any',
+                }},
+                {'id': 'end', 'type': 'end'},
+            ], 'edges': [['start', 'review'], ['review', 'end']]})
+            Workflow.objects.filter(pk=workflow.pk).update(enabled=True)
+            workflow.refresh_from_db()
+    return workflow
+
+
+@transaction.atomic
+def submit_system_ticket(ticket, assignees, workflow=None):
     if workflow is None:
-        import hashlib
-        ids = sorted(str(user.pk) for user in assignees)
-        if not ids:
-            raise WorkflowConfigurationError('Configure reviewers or select a workflow on the ACL.')
-        digest = hashlib.sha256(','.join(ids).encode()).hexdigest()[:24]
-        with tmp_to_org(ticket.org_id):
-            workflow, _ = Workflow.objects.get_or_create(
-                org_id=ticket.org_id, type=ticket.type, name=f'ACL {ticket.type} {digest}',
-                defaults={'comment': 'Generated from ACL reviewers.', 'is_system': True},
-            )
-            workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
-            if not workflow.active_version_id:
-                publish_workflow(workflow, {'nodes': [
-                    {'id': 'start', 'type': 'start'},
-                    {'id': 'review', 'type': 'approval', 'name': 'Review', 'config': {
-                        'approvers': {'type': 'user', 'value': ids}, 'strategy': 'any',
-                    }},
-                    {'id': 'end', 'type': 'end'},
-                ], 'edges': [['start', 'review'], ['review', 'end']]})
-                Workflow.objects.filter(pk=workflow.pk).update(enabled=True)
-                workflow.refresh_from_db()
+        workflow = get_system_workflow(ticket.org_id, ticket.type, assignees)
     ticket.workflow = workflow
     ticket.origin = TicketOrigin.system
     ticket.save(update_fields=['workflow', 'origin'])

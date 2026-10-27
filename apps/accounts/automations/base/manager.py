@@ -546,6 +546,9 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             date_finished=record.date_finished,
         )
 
+    def should_update_account_on_success(self, result):
+        return True
+
     def on_host_success(self, host, result):
         record = self.name_record_mapper.get(host)
         if not record:
@@ -627,7 +630,8 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         with safe_atomic_db_connection():
             try:
                 with transaction.atomic():
-                    account.save(update_fields=update_fields)
+                    if self.should_update_account_on_success(result):
+                        account.save(update_fields=update_fields)
                     self.save_record(record)
             except Exception as error:
                 logger.exception(

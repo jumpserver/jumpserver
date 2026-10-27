@@ -70,14 +70,19 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
     username = serializers.CharField(source='full_username', read_only=True)
     date_expired = serializers.SerializerMethodField()
+    auto_push_protocols = serializers.SerializerMethodField()
 
     class Meta:
         model = Account
         fields = [
             'id', 'alias', 'name', 'username', 'has_username',
-            'has_secret', 'secret_type', 'actions', 'date_expired'
+            'has_secret', 'secret_type', 'actions', 'date_expired', 'auto_push_protocols'
         ]
         read_only_fields = fields
+
+    @staticmethod
+    def get_auto_push_protocols(obj):
+        return sorted(getattr(obj, 'auto_push_protocols', ()))
 
     def get_date_expired(self, obj) -> str:
         dt = obj.date_expired

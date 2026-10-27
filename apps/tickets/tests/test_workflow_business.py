@@ -154,7 +154,7 @@ class WorkflowBusinessTests(TestCase):
         self.assertFalse(ticket.ticket_steps.exists())
 
     def test_login_asset_acl_activates_connection_token(self):
-        acl = LoginAssetACL.objects.create(name='Asset review', action='review', review_duration=2)
+        acl = LoginAssetACL.objects.create(name='Asset review', action='accept', review_enabled=True, review_duration=2)
         ticket = acl.create_login_asset_review_ticket(
             self.applicant, self.asset, 'root', [self.alice], self.org.id,
             workflow=self.workflow('login_asset_confirm'),
@@ -402,7 +402,7 @@ class WorkflowBusinessTests(TestCase):
     def test_acl_serializer_accepts_workflow_without_reviewers(self):
         workflow = self.workflow('login_asset_confirm')
         serializer = LoginAssetACLSerializer(data={
-            'name': 'Selected workflow ACL', 'action': 'review', 'workflow': str(workflow.pk),
+            'name': 'Selected workflow ACL', 'action': 'accept', 'review_enabled': True, 'workflow': str(workflow.pk),
             'reviewers': [], 'rules': {}, 'users': {'type': 'all'}, 'assets': {'type': 'all'}, 'accounts': ['root'],
         })
         with patch('acls.serializers.base.settings.XPACK_LICENSE_IS_VALID', True):
@@ -414,7 +414,8 @@ class WorkflowBusinessTests(TestCase):
 
     def test_ticket_serializer_exposes_instance_and_exact_tasks(self):
         from tickets.serializers import TicketSerializer
-        acl = LoginAssetACL.objects.create(name='Asset review', action='review', review_duration=2)
+        acl = LoginAssetACL.objects.create(name='Asset review', action='accept', review_enabled=True, review_duration=2)
+        acl.reviewers.add(self.alice)
         ticket = acl.create_login_asset_review_ticket(self.applicant, self.asset, 'root', [self.alice], self.org.id)
         context = {'request': SimpleNamespace(user=self.alice)}
         data = TicketSerializer(ticket, context=context).data
@@ -484,7 +485,7 @@ class WorkflowBusinessTests(TestCase):
     def test_login_exemption_starts_only_after_final_commit(self):
         from django.core.cache import cache
         cache.clear()
-        acl = LoginAssetACL.objects.create(name='Two approvals', action='review', review_duration=2)
+        acl = LoginAssetACL.objects.create(name='Two approvals', action='accept', review_enabled=True, review_duration=2)
         ticket = acl.create_login_asset_review_ticket(
             self.applicant, self.asset, 'root', [], self.org.id,
             workflow=self.workflow('login_asset_confirm', levels=2),
@@ -554,3 +555,130 @@ class WorkflowBusinessTests(TestCase):
             self.assertIn(request(TicketViewSet, 'retrieve', ticket.pk).status_code, (403, 404))
             self.assertEqual(request(WorkflowInstanceViewSet, 'retrieve', instance.pk).status_code, 404)
             self.assertEqual(request(WorkflowInstanceViewSet, 'events', instance.pk).status_code, 404)
+
+    def test_asset_acl_combines_unique_workflows_before_releasing_connections(self):
+        from authentication.services.connection_acl_batch import create_batch_reviews
+        from tickets.serializers.ticket import TicketSerializer
+        first = self.workflow('login_asset_confirm')
+        second = self.workflow('login_asset_confirm', definition=approval_definition(
+            [self.bob], strategy='all', timeout=300, allow_transfer=True,
+        ))
+        rules = [LoginAssetACL.objects.create(
+            name=name, action='accept', review_enabled=True, workflow=workflow,
+        ) for name, workflow in [('A', first), ('B', first), ('C', second)]]
+        tokens = [ConnectionToken.objects.create(
+            user=self.applicant, asset=asset, account='root', protocol='ssh',
+            connect_method='web_cli', is_active=False,
+            acl_context={'username': 'root', 'review_acls': [str(rule.pk) for rule in rules],
+                         'requirements': {'review': 'pending', 'push_account': 'pending'}},
+        ) for asset in (self.asset, self.later_asset)]
+        create_batch_reviews(tokens)
+        for token in tokens:
+            token.refresh_from_db()
+        self.assertEqual(tokens[0].from_ticket_id, tokens[1].from_ticket_id)
+        ticket = tokens[0].from_ticket
+        instance = WorkflowInstance.objects.get(ticket=ticket)
+        self.assertEqual(instance.version.nodes.filter(type='approval').count(), 2)
+        self.assertEqual({asset['id'] for asset in instance.context['assets']},
+                         {str(self.asset.pk), str(self.later_asset.pk)})
+        self.assertEqual(len(TicketSerializer.get_login_asset_connections(ticket)), 2)
+        configs = list(instance.version.nodes.filter(type='approval').values_list('config', flat=True))
+        self.assertTrue(any(config['strategy'] == 'all' and config['timeout'] == 300 and config['allow_transfer']
+                            for config in configs))
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.state, 'pending')
+        for token in tokens:
+            token.refresh_from_db()
+            self.assertFalse(token.is_active)
+            self.assertEqual(token.acl_context['requirements']['review'], 'pending')
+        self.engine.approve(self.task(instance, self.bob), self.bob)
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.state, 'approved')
+        for token in tokens:
+            token.refresh_from_db()
+            self.assertEqual(token.acl_context['requirements'], {'review': 'passed', 'push_account': 'pending'})
+            self.assertFalse(token.is_active)
+        self.assertEqual(first.versions.count(), 1)
+        self.assertEqual(second.versions.count(), 1)
+
+    def test_asset_acl_mixed_workflow_and_fixed_reviewers_preserves_both(self):
+        workflow = self.workflow('login_asset_confirm')
+        first = LoginAssetACL.objects.create(name='A', action='accept', review_enabled=True, workflow=workflow)
+        second = LoginAssetACL.objects.create(name='B', action='accept', review_enabled=True)
+        second.reviewers.add(self.bob)
+        ticket = first.create_login_asset_review_ticket(
+            self.applicant, self.asset, 'root', [self.bob], self.org.id, review_acls=[first, second],
+        )
+        instance = WorkflowInstance.objects.get(ticket=ticket)
+        self.engine.approve(self.task(instance, self.alice), self.alice)
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.state, 'pending')
+        self.engine.reject(self.task(instance, self.bob), self.bob)
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.state, 'rejected')
+
+    def test_asset_acl_changed_workflow_cannot_reuse_existing_approval(self):
+        from authentication.services.connection_acl import get_pending_review_assignees
+        from authentication.services.connection_acl_batch import create_batch_reviews
+        flow = self.workflow('login_asset_confirm')
+        rule = LoginAssetACL.objects.create(name='Bound workflow', action='accept', review_enabled=True, workflow=flow)
+        token = ConnectionToken.objects.create(
+            user=self.applicant, asset=self.asset, account='root', protocol='ssh', connect_method='web_cli',
+            is_active=False, acl_context={'username': 'root', 'review_acls': [str(rule.pk)],
+                                         'requirements': {'review': 'pending'}},
+        )
+        create_batch_reviews([token])
+        self.assertEqual(token.from_ticket.workflow_id, flow.pk)
+        publish_workflow(flow, approval_definition([self.bob]))
+        with self.assertRaises(PermissionDenied):
+            get_pending_review_assignees(token)
+        token.refresh_from_db()
+        self.assertFalse(token.is_active)
+
+    def test_asset_acl_disabled_workflow_does_not_fall_back_to_reviewers(self):
+        flow = self.workflow('login_asset_confirm')
+        flow.enabled = False
+        flow.save(update_fields=['enabled'])
+        rule = LoginAssetACL.objects.create(name='Disabled workflow', action='accept', review_enabled=True, workflow=flow)
+        rule.reviewers.add(self.bob)
+        with self.assertRaises(WorkflowConfigurationError):
+            LoginAssetACL.get_review_assignees([rule])
+
+    def test_legacy_asset_review_uses_original_reviewer_check(self):
+        from authentication.services.connection_acl import get_pending_review_assignees
+        from authentication.services.connection_acl_batch import create_batch_reviews
+        rule = LoginAssetACL.objects.create(name='Fixed reviewers', action='accept', review_enabled=True)
+        rule.reviewers.add(self.alice)
+        token = ConnectionToken.objects.create(
+            user=self.applicant, asset=self.asset, account='root', protocol='ssh', connect_method='web_cli',
+            is_active=False, acl_context={'username': 'root', 'review_acls': [str(rule.pk)],
+                                         'requirements': {'review': 'pending'}},
+        )
+        create_batch_reviews([token])
+        ticket = token.from_ticket
+        ticket.meta.pop('login_asset_review_config')
+        ticket.save(update_fields=['meta'])
+        self.assertEqual(get_pending_review_assignees(token)[1], [self.alice])
+        rule.reviewers.set([self.bob])
+        with self.assertRaises(PermissionDenied):
+            get_pending_review_assignees(token)
+
+    def test_workflow_review_preview_and_batch_grouping_share_policy_identity(self):
+        from authentication.services.connection_acl import acl_state
+        from authentication.services.connection_acl_batch import create_batch_reviews
+        tokens = []
+        for user, workflow in [(self.applicant, self.workflow('login_asset_confirm')),
+                               (self.applicant, self.workflow('login_asset_confirm')),
+                               (self.bob, self.workflow('login_asset_confirm'))]:
+            rule = LoginAssetACL.objects.create(name=str(uuid4()), action='accept', review_enabled=True, workflow=workflow)
+            tokens.append(ConnectionToken.objects.create(
+                user=user, asset=self.asset, account='root', protocol='ssh', connect_method='web_cli',
+                is_active=False, acl_context={'username': 'root', 'review_acls': [str(rule.pk)],
+                                             'requirements': {'review': 'pending'}},
+            ))
+        groups = [acl_state(token)['review_group'] for token in tokens]
+        self.assertTrue(all(groups))
+        self.assertEqual(len(set(groups)), 3)
+        create_batch_reviews(tokens)
+        self.assertEqual(len({token.from_ticket_id for token in tokens}), 3)
