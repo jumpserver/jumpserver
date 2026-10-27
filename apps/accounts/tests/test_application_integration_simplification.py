@@ -77,14 +77,17 @@ class ApplicationIntegrationSimplificationTests(CredentialTestCase):
 
     def test_config_wizard_generates_complete_update_and_service_rule(self):
         config = self.wizard()
-        rule = config['rules'][0]
-        self.assertEqual(rule['accounts'], [{'account_id': str(self.primary.id)}])
+        rule = config['services'][0]
+        self.assertEqual(rule['accounts'], [{'account_id': str(self.primary.id), 'username': self.primary.username}])
+        self.assertEqual(rule['name'], 'sample-app')
+        self.assertTrue(rule['update_on_notification'])
         self.assertEqual(rule['config_update'], {
             'file': '/etc/orders/config.yml', 'format': 'auto',
             'fields_map': {'DB_USER': 'username', 'DB_PASSWORD': 'secret'},
         })
         self.assertEqual(rule['service_action'], {'unit': 'orders.service', 'operation': 'restart'})
-        self.assertNotIn('systemd_unit', config['delivery'])
+        self.assertNotIn('delivery', config)
+        self.assertNotIn('store', config)
 
     def test_generated_business_rules_do_not_offer_incompatible_foreground_installation(self):
         serializer = CredentialAccessWizardSerializer(data={
@@ -99,17 +102,18 @@ class ApplicationIntegrationSimplificationTests(CredentialTestCase):
 
     def test_rotation_wizard_requires_business_check_and_enables_switch(self):
         config = self.wizard(agent_setup='rotation', application_check='/usr/local/libexec/check-orders')
-        rule = config['rules'][0]
-        self.assertTrue(rule['accounts'][0]['allow_account_switch'])
+        rule = config['services'][0]
+        self.assertTrue(rule['allow_account_switch'])
         self.assertEqual(rule['application_check'], {
             'path': '/usr/local/libexec/check-orders', 'confirm_on_success': True,
         })
-        self.assertNotIn('application_check', self.wizard()['rules'][0])
+        self.assertNotIn('application_check', self.wizard()['services'][0])
 
     def test_script_action_does_not_add_global_systemd_restart(self):
         config = self.wizard(service_action_type='script', service_script='/usr/local/libexec/recreate-orders')
-        self.assertEqual(config['rules'][0]['service_action'], {'path': '/usr/local/libexec/recreate-orders'})
-        self.assertNotIn('systemd_unit', config['delivery'])
+        self.assertEqual(config['services'][0]['service_action'], {'path': '/usr/local/libexec/recreate-orders'})
+        self.assertNotIn('delivery', config)
+        self.assertNotIn('store', config)
 
     def test_invalid_wizard_materials_are_rejected(self):
         for overrides in (

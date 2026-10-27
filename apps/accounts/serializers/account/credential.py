@@ -657,13 +657,25 @@ class CredentialRevisionSerializer(serializers.Serializer):
 class CredentialDeliveryScopeSerializer(serializers.Serializer):
     keys = serializers.ListField(child=serializers.CharField(max_length=128), max_length=200)
     account_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200)
+    include_authorized = serializers.BooleanField(required=False)
+    all_authorized = serializers.BooleanField(required=False)
+    switch_account_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200, required=False)
 
     def validate(self, attrs):
         keys = attrs['keys']
         accounts = [str(value) for value in attrs['account_ids']]
         if len(keys) != len(set(keys)) or len(accounts) != len(set(accounts)):
             raise serializers.ValidationError(_('Duplicate delivery selectors are not allowed.'))
-        return {'keys': sorted(keys), 'account_ids': sorted(accounts)}
+        result = {'keys': sorted(keys), 'account_ids': sorted(accounts)}
+        if attrs.get('include_authorized'):
+            switching = [str(value) for value in attrs.get('switch_account_ids', [])]
+            if keys or len(switching) != len(set(switching)):
+                raise serializers.ValidationError(_('Use unique account selectors for Agent services.'))
+            result.update(include_authorized=True, all_authorized=attrs.get('all_authorized', False),
+                          switch_account_ids=sorted(switching))
+        elif attrs.get('all_authorized') or attrs.get('switch_account_ids'):
+            raise serializers.ValidationError(_('Authorized-account synchronization is required.'))
+        return result
 
 
 class CredentialAgentSyncSerializer(serializers.Serializer):
@@ -677,6 +689,13 @@ class CredentialAgentSyncSerializer(serializers.Serializer):
         choices=['', 'success', 'error'], required=False, default='', allow_blank=True,
     )
     sync_error = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
+
+
+class CredentialServiceAccountInputSerializer(serializers.Serializer):
+    account_id = serializers.UUIDField()
+    alias = serializers.RegexField(r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, required=False, allow_blank=True)
+    username_field = serializers.RegexField(r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128)
+    secret_field = serializers.RegexField(r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128)
 
 
 class CredentialAccessWizardSerializer(serializers.Serializer):
@@ -697,6 +716,13 @@ class CredentialAccessWizardSerializer(serializers.Serializer):
         choices=['delivery', 'config_update', 'rotation'], default='delivery',
     )
     account_id = serializers.UUIDField(required=False)
+    service_accounts = CredentialServiceAccountInputSerializer(many=True, required=False, allow_empty=False, max_length=20)
+    service_name = serializers.RegexField(r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$', default='sample-app')
+    allow_account_switch = serializers.BooleanField(default=False)
+    update_on_notification = serializers.BooleanField(default=True)
+    store_scope = serializers.ChoiceField(choices=['none', 'all', 'selected'], required=False)
+    store_accounts = serializers.ListField(child=serializers.UUIDField(), max_length=200, required=False)
+    store_format = serializers.ChoiceField(choices=['json', 'environment'], required=False)
     config_file = serializers.CharField(max_length=1024, required=False, default='', allow_blank=True)
     config_format = serializers.ChoiceField(choices=['auto', 'env', 'yaml'], default='auto')
     username_field = serializers.RegexField(
@@ -728,10 +754,48 @@ class CredentialAccessWizardSerializer(serializers.Serializer):
             raise serializers.ValidationError({'install_path': _('Enter an absolute installation directory.')})
         unit = attrs['systemd_unit'].strip()
         configured_rule = attrs['type'] == 'agent' and attrs['agent_setup'] != 'delivery'
+        if attrs['type'] == 'agent' and attrs.get('store_scope') == 'selected':
+            selected = attrs.get('store_accounts', [])
+            if not selected or len(set(selected)) != len(selected) or application.get_accounts().filter(id__in=selected).distinct().count() != len(selected):
+                raise serializers.ValidationError({'store_accounts': _('Select unique accounts authorized for this application.')})
         if configured_rule:
             application.assert_account_limit()
-            if 'account_id' not in attrs or not application.get_accounts().filter(id=attrs['account_id']).exists():
-                raise serializers.ValidationError({'account_id': _('Select an account authorized for this application.')})
+            selected = attrs.get('service_accounts')
+            if selected is None:
+                if 'account_id' not in attrs:
+                    raise serializers.ValidationError({'account_id': _('Select an account authorized for this application.')})
+                selected = [{'account_id': attrs['account_id'], 'username_field': attrs['username_field'], 'secret_field': attrs['secret_field']}]
+            ids, aliases, fields = set(), set(), set()
+            for item in selected:
+                account = application.get_accounts().filter(id=item['account_id']).first()
+                if not account or item['account_id'] in ids:
+                    raise serializers.ValidationError({'service_accounts': _('Select unique accounts authorized for this application.')})
+                ids.add(item['account_id'])
+                alias = item.get('alias', '')
+                if len(selected) > 1 and not alias or alias and alias in aliases:
+                    raise serializers.ValidationError({'service_accounts': _('Multiple accounts require unique aliases.')})
+                aliases.add(alias)
+                for name in ('username_field', 'secret_field'):
+                    if item[name] in fields:
+                        raise serializers.ValidationError({'service_accounts': _('Configuration fields must be unique across all accounts.')})
+                    fields.add(item[name])
+                item['username'] = account.username
+            attrs['service_accounts'] = selected
+            if attrs['agent_setup'] == 'rotation' or attrs['allow_account_switch']:
+                policies = list(ApplicationCredential.objects.filter(
+                    applications=application, is_active=True, mode='alternating_rotation',
+                ))
+                groups = set()
+                for item in selected:
+                    matches = [policy for policy in policies if item['account_id'] in (policy.account_id, policy.alternate_account_id)]
+                    if len(matches) > 1 or matches and matches[0].id in groups:
+                        raise serializers.ValidationError({'service_accounts': _('Declare one account per A/B pair and use an unambiguous policy.')})
+                    if matches:
+                        if not matches[0].authorized_applications().filter(id=application.id).exists():
+                            raise serializers.ValidationError({'service_accounts': _('Authorize both accounts of the A/B policy.')})
+                        groups.add(matches[0].id)
+                if attrs['agent_setup'] == 'rotation' and not groups:
+                    raise serializers.ValidationError({'service_accounts': _('Select an account associated with an A/B rotation policy.')})
             self.validate_local_path(attrs['config_file'], 'config_file')
             if attrs['config_format'] == 'auto' and PurePosixPath(attrs['config_file']).suffix.lower() not in (
                 '.txt', '.env', '.properties', '.yml', '.yaml',
@@ -748,10 +812,7 @@ class CredentialAccessWizardSerializer(serializers.Serializer):
             # Rules own business updates and actions. Do not also execute the
             # default EnvironmentFile delivery's global systemd action.
             attrs['delivery_mode'] = 'json'
-        if attrs['type'] == 'agent' and (
-            attrs['delivery_mode'] == 'environment'
-            or configured_rule and attrs['service_action_type'] == 'systemd'
-        ):
+        if attrs['type'] == 'agent' and configured_rule and attrs['service_action_type'] == 'systemd':
             if not SYSTEMD_UNIT.fullmatch(unit):
                 raise serializers.ValidationError({'systemd_unit': _('Enter one systemd .service unit name.')})
             attrs['systemd_unit'] = unit

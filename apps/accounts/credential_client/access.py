@@ -60,26 +60,43 @@ def materials(application, params, endpoint):
     )}
     install_path = settings['install_path'].rstrip('/')
     bootstrap = {
+        'config_version': 2,
         'endpoint': endpoint, 'org_id': str(application.org_id),
         'app_id': str(application.id), 'app_secret': application.secret,
-        'instance_id': '<instance-id>',
-        'delivery': {
-            'delivery_mode': settings['delivery_mode'],
-            'delivery_root': f'{install_path}/credentials',
-            'app_user': settings['app_user'],
-        },
-        'rules': [],
+        'instance_id': '<instance-id>', 'pull_interval': 300,
+        'local_api': {'owner': settings['app_user']},
     }
     setup = params.get('agent_setup', 'delivery')
+    store_scope = params.get('store_scope', 'all' if setup == 'delivery' else 'none')
+    store_format = params.get('store_format', settings['delivery_mode'])
+    if store_scope != 'none' and store_format != 'socket':
+        bootstrap['store'] = {
+            'accounts': ['all'] if store_scope == 'all' else [str(value) for value in params['store_accounts']],
+            'root': f'{install_path}/credentials', 'format': store_format,
+            'owner': settings['app_user'],
+        }
     if setup != 'delivery':
+        accounts = params.get('service_accounts') or [{
+            'account_id': params['account_id'], 'username_field': params['username_field'],
+            'secret_field': params['secret_field'],
+        }]
+        selectors, fields_map = [], {}
+        for account in accounts:
+            selector = {'account_id': str(account['account_id'])}
+            for name in ('alias', 'username'):
+                if account.get(name):
+                    selector[name] = account[name]
+            selectors.append(selector)
+            prefix = account.get('alias', '') + '.' if len(accounts) > 1 else ''
+            fields_map.update({account['username_field']: prefix + 'username', account['secret_field']: prefix + 'secret'})
         rule = {
-            'accounts': [{
-                'account_id': str(params['account_id']),
-                **({'allow_account_switch': True} if setup == 'rotation' else {}),
-            }],
+            'name': params.get('service_name', 'sample-app'),
+            'allow_account_switch': setup == 'rotation' or params.get('allow_account_switch', False),
+            'update_on_notification': params.get('update_on_notification', True),
+            'accounts': selectors,
             'config_update': {
                 'file': params['config_file'], 'format': params['config_format'],
-                'fields_map': {params['username_field']: 'username', params['secret_field']: 'secret'},
+                'fields_map': fields_map,
             },
         }
         if params['service_action_type'] == 'systemd':
@@ -92,11 +109,7 @@ def materials(application, params, endpoint):
             rule['application_check'] = {
                 'path': params['application_check'], 'confirm_on_success': True,
             }
-        bootstrap['rules'] = [rule]
-    if setup == 'delivery' and settings['systemd_unit']:
-        bootstrap['delivery']['systemd_unit'] = settings['systemd_unit']
-    if setup == 'delivery' and settings['systemd_action']:
-        bootstrap['delivery']['systemd_action'] = settings['systemd_action']
+        bootstrap['services'] = [rule]
     filename = 'jms_pam_agent.json'
     preparation = 'sudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
     installation = (

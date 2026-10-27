@@ -940,10 +940,10 @@ class PythonSDKTestCase(SimpleTestCase):
                 {'get': 'get_sdks_info'}, authentication_classes=[], permission_classes=[AllowAny],
             )(request)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('python3 -m pip install jms-pam', response.data['readme'])
-        self.assertIn('self.watch_credential_events', response.data['code'])
-        self.assertIn('self.get_account(', response.data['code'])
-        self.assertIn('self.confirm_event(', response.data['code'])
+        self.assertIn('/api/v1/accounts/client-source/python/', response.data['readme'])
+        self.assertIn('def on_account_changed(self, account):', response.data['code'])
+        self.assertIn('client.watch_events()', response.data['code'])
+        self.assertIn('raise NotImplementedError', response.data['code'])
         compile(response.data['code'], 'downloaded_sdk_example.py', 'exec')
 
     def test_rotation_record_api_is_not_exposed(self):
@@ -955,9 +955,10 @@ class PythonSDKTestCase(SimpleTestCase):
 
         example = sdk_example('python')
         compile(example, 'sdk_example.py', 'exec')
-        self.assertIn('allow_local_fallback=False', example)
-        self.assertIn('event["account_revision"]', example)
-        self.assertIn('self.confirm_event(event_id=event_id)', example)
+        self.assertIn('def on_account_changed(self, account):', example)
+        self.assertIn('def on_account_revoked(self, account_id):', example)
+        self.assertIn('client.watch_events()', example)
+        self.assertNotIn('self.confirm_event(', example)
         self.assertNotIn('get_credential(', example)
         self.assertNotIn('confirm_credential(', example)
 
