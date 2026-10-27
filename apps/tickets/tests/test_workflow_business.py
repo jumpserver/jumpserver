@@ -153,6 +153,84 @@ class WorkflowBusinessTests(TestCase):
         self.assertEqual(ticket.state, 'approved')
         self.assertFalse(ticket.ticket_steps.exists())
 
+    def test_login_poll_after_guard_preserves_authenticated_session(self):
+        import time
+        from django.conf import settings
+        from django.contrib.auth import SESSION_KEY
+        from django.urls import reverse
+
+        acl = LoginACL.objects.create(name='Login poll regression', action='review',
+                                      users={'type': 'ids', 'ids': [str(self.applicant.pk)]})
+        acl.reviewers.add(self.alice)
+        ticket = acl.create_confirm_ticket(None, self.applicant)
+        session = self.client.session
+        session.update({'auth_password': 1, 'user_id': str(self.applicant.pk),
+                        'auth_password_expired_at': time.time() + 600,
+                        'auth_backend': settings.AUTH_BACKEND_MODEL, 'auth_confirm_required': '1',
+                        'auth_acl_id': str(acl.pk), 'auth_ticket_id': str(ticket.pk)})
+        session.save()
+        url = reverse('api-auth:login-confirm-ticket-status')
+        self.assertEqual(self.client.get(url).json()['error'], 'login_confirm_wait')
+        with tmp_to_root_org():
+            self.engine.approve(self.task(WorkflowInstance.objects.get(ticket=ticket)), self.alice)
+        self.assertEqual(self.client.get(url).json(), {'msg': 'ok'})
+        self.assertEqual(self.client.get(reverse('authentication:login-guard')).status_code, 302)
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertNotIn('auth_ticket_id', self.client.session)
+        self.assertEqual(self.client.get(url).json(), {'msg': 'ok'})
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    def test_authenticated_login_poll_still_enforces_pending_review(self):
+        from django.contrib.auth import SESSION_KEY
+        from django.urls import reverse
+
+        acl = LoginACL.objects.create(name='Pending login review', action='review')
+        acl.reviewers.add(self.alice)
+        ticket = acl.create_confirm_ticket(None, self.applicant)
+        self.client.force_login(self.applicant)
+        session = self.client.session
+        session.update({'auth_ticket_id': str(ticket.pk), 'auth_confirm_required': '1'})
+        session.save()
+        url = reverse('api-auth:login-confirm-ticket-status')
+        self.assertEqual(self.client.get(url).json()['error'], 'login_confirm_wait')
+        with tmp_to_root_org():
+            self.engine.reject(self.task(WorkflowInstance.objects.get(ticket=ticket)), self.alice)
+        self.assertEqual(self.client.get(url).json()['error'], 'login_confirm_error')
+        self.assertNotIn(SESSION_KEY, self.client.session)
+        self.client.force_login(self.applicant)
+        session = self.client.session
+        session.pop('auth_ticket_id', None)
+        session['auth_confirm_required'] = '1'
+        session.save()
+        self.assertEqual(self.client.get(url).json()['error'], 'login_confirm_error')
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    def test_completed_asset_review_displays_actual_reviewers_from_snapshot(self):
+        from authentication.services.connection_acl import acl_state
+        from authentication.services.connection_acl_batch import create_batch_reviews
+
+        for operation in ('approve', 'reject'):
+            with self.subTest(operation=operation):
+                rule = LoginAssetACL.objects.create(name=str(uuid4()), action='accept', review_enabled=True)
+                rule.reviewers.add(self.alice)
+                token = ConnectionToken.objects.create(
+                    user=self.applicant, asset=self.asset, account='root', protocol='ssh', connect_method='web_cli',
+                    is_active=False, acl_context={'username': 'root', 'review_acls': [str(rule.pk)],
+                                                 'requirements': {'review': 'pending'}},
+                )
+                create_batch_reviews([token])
+                self.assertEqual(acl_state(token)['reviewers'][0]['id'], str(self.alice.pk))
+                task = self.task(WorkflowInstance.objects.get(ticket=token.from_ticket))
+                getattr(self.engine, operation)(task, self.alice)
+                rule.reviewers.set([self.bob])
+                token.refresh_from_db()
+                result = acl_state(token)
+                self.assertEqual(result['review_status'], 'approved' if operation == 'approve' else 'rejected')
+                self.assertEqual(result['reviewers'], [{
+                    'id': str(self.alice.pk), 'name': task.assignee_snapshot['name'],
+                    'username': task.assignee_snapshot['username'],
+                }])
+
     def test_login_asset_acl_activates_connection_token(self):
         acl = LoginAssetACL.objects.create(name='Asset review', action='accept', review_enabled=True, review_duration=2)
         ticket = acl.create_login_asset_review_ticket(

@@ -103,10 +103,12 @@
     var timestamp = '{{ timestamp }}';
     var progressBarRef = $(".progress-bar");
     var interval, checkInterval;
+    var authCompleted = false;
     var url = "{% url 'api-auth:login-confirm-ticket-status' %}";
     var successUrl = "{% url 'authentication:login-guard' %}";
 
     function doRequestAuth() {
+        if (authCompleted) return;
         requestApi({
             url: url,
             method: "GET",
@@ -114,10 +116,13 @@
                 "X-JMS-LOGIN-TYPE": "W"
             },
             success: function (data) {
+                if (authCompleted) return;
                 if (!data.error && data.msg === 'ok') {
-                    window.onbeforeunload = function () {
-                    };
-                    window.location = "{% url 'authentication:login-guard' %}"
+                    authCompleted = true;
+                    clearInterval(interval);
+                    clearInterval(checkInterval);
+                    cancelCloseConfirm();
+                    window.location = successUrl;
                 } else if (data.error !== "login_confirm_wait") {
                     if (!errorMsgShow) {
                         infoMsgRef.hide();

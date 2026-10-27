@@ -92,16 +92,26 @@ def acl_state(token):
     if 'review' in context.get('requirements', {}):
         try:
             with tmp_to_org(token.org_id):
-                rules, assignees = get_pending_review_assignees(token)
-                if token.from_ticket_id:
-                    review_status = token.from_ticket.state
-                    assigned_ids = {user.pk for user in token.from_ticket.current_assignees}
-                    assignees = [user for user in assignees if user.pk in assigned_ids]
-                review_group = get_review_group_key(token.org_id, assignees, rules, token.user_id)
-            reviewers = [
-                {'id': str(user.pk), 'name': user.name, 'username': user.username}
-                for user in sorted(assignees, key=lambda user: (user.name, user.username, str(user.pk)))
-            ]
+                ticket = token.from_ticket
+                review_status = ticket.state if ticket else ''
+                if review_status in ('approved', 'rejected'):
+                    # Finished reviews display their actors, not the now-empty pending task list.
+                    reviewers = [
+                        {'id': str(task.assignee_id or task.pk),
+                         'name': task.assignee_snapshot.get('name', ''),
+                         'username': task.assignee_snapshot.get('username', '')}
+                        for task in ticket.approval_tasks.filter(state__in=['approved', 'rejected'])
+                    ]
+                else:
+                    rules, assignees = get_pending_review_assignees(token)
+                    if ticket:
+                        assigned_ids = {user.pk for user in ticket.current_assignees}
+                        assignees = [user for user in assignees if user.pk in assigned_ids]
+                    review_group = get_review_group_key(token.org_id, assignees, rules, token.user_id)
+                    reviewers = [
+                        {'id': str(user.pk), 'name': user.name, 'username': user.username}
+                        for user in sorted(assignees, key=lambda user: (user.name, user.username, str(user.pk)))
+                    ]
         except APIException:
             # Presentation must not prevent cancelling an invalidated policy.
             # The advance/credential paths still enforce reviewer availability.
