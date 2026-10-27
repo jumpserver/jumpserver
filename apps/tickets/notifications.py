@@ -12,7 +12,7 @@ from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import get_logger, random_string
 from notifications.notifications import UserMessage
 from . import const
-from .models import Ticket
+from .models import Ticket, ApplyAssetTicket
 
 logger = get_logger(__file__)
 
@@ -114,6 +114,14 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
         return title
 
     def get_ticket_approval_url(self):
+        if isinstance(self.ticket, ApplyAssetTicket):
+            no_assets = not self.ticket.apply_assets.exists()
+            no_nodes = not self.ticket.apply_nodes.exists()
+            no_accounts = not self.ticket.apply_accounts
+
+            if (no_assets and no_nodes) or no_accounts:
+                return None
+
         url = reverse('tickets:direct-approve', kwargs={'token': self.token})
         return urljoin(settings.SITE_URL, url)
 

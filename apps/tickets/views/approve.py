@@ -117,6 +117,8 @@ class TicketDirectApproveView(TemplateView):
                 ticket = ticket_sub_model.objects.get(id=ticket_id)
             if not ticket.has_current_assignee(user):
                 raise JMSException(_("This user is not authorized to approve this ticket"))
+            if action == 'approve' and isinstance(ticket, ApplyAssetTicket):
+                ticket.validate_apply_assets()
             getattr(ticket, action)(user)
         except AlreadyClosed as e:
             self.clear(token)

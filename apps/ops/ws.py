@@ -7,6 +7,8 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
+from orgs.mixins.ws import OrgMixin
+from orgs.utils import tmp_to_org
 from rbac.builtin import BuiltinRole
 from .ansible.utils import get_ansible_task_log_path
 from .celery.utils import get_celery_task_log_path
@@ -16,7 +18,7 @@ from .models import CeleryTaskExecution
 logger = get_logger(__name__)
 
 
-class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
+class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     disconnected = False
     user_tasks = (
         'ops.tasks.run_ops_job',
@@ -32,6 +34,8 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         user = self.scope["user"]
         if user.is_authenticated:
             await self.accept()
+            self.cookie = self.get_cookie()
+            self.org = self.get_current_org()
         else:
             await self.close()
 
@@ -51,8 +55,9 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
 
     @sync_to_async
     def get_current_user_role_ids(self, user):
-        roles = user.system_roles.all() | user.org_roles.all()
-        user_role_ids = set(map(str, roles.values_list('id', flat=True)))
+        with tmp_to_org(self.org):
+            roles = user.system_roles.all() | user.org_roles.all()
+            user_role_ids = set(map(str, roles.values_list('id', flat=True)))
         return user_role_ids
 
     async def receive_json(self, content, **kwargs):
@@ -71,8 +76,10 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         user = self.scope['user']
         user_role_ids = await self.get_current_user_role_ids(user)
         has_admin_auditor_role = bool(admin_auditor_role_ids & user_role_ids)
-
-        if not has_admin_auditor_role and task.name in self.user_tasks and task.creator != user:
+        has_perms = await self.has_perms(user, ['audits.view_joblog'])
+        user_can_view = task.creator == user or (task.name in self.user_tasks and has_perms)
+        # 管理员、审计员、任务创建者或具有作业审计权限的用户可以查看日志。
+        if not (has_admin_auditor_role or user_can_view):
             await self.send_json({'message': 'No permission', 'task': task_id})
             return
 
