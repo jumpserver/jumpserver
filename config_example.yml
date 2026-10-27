@@ -150,6 +150,11 @@ REDIS_PORT: 6379
 # REDIS_PASSWORD:
 # REDIS_DB_CELERY: 3
 # REDIS_DB_CACHE: 4
+# Redis 建连和缓存、会话的读写超时（秒，必须大于 0，可使用小数）。
+# 订阅和阻塞锁使用独立连接池，保留原有的长时间等待行为；不影响 Celery 配置。
+# 超时后不会自动重放命令，避免重复写入；后续调用会重新建立连接。
+# REDIS_SOCKET_TIMEOUT: 5
+# REDIS_SOCKET_CONNECT_TIMEOUT: 5
 
 # Windows/RDP 录像与 Video Worker（以下均为示例，按组件分别配置）
 # Core 自身只使用录像存储配置；终端组件的录像存储也可以在管理界面配置。

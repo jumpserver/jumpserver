@@ -3,7 +3,7 @@ import threading
 import time
 
 import redis
-from django.core.cache import cache
+from django.core.cache import caches
 from redis.client import PubSub
 
 from common.db.utils import safe_db_connection
@@ -12,8 +12,8 @@ from common.utils import get_logger
 logger = get_logger(__name__)
 
 
-def get_redis_client(db=0):
-    client = cache.client.get_client()
+def get_redis_client(db=0, *, cache_alias='default'):
+    client = caches[cache_alias].client.get_client()
     assert isinstance(client, redis.Redis)
     return client
 
@@ -25,7 +25,7 @@ class RedisPubSub:
         self.redis = get_redis_client(db)
 
     def subscribe(self, _next, error=None, complete=None):
-        ps = self.redis.pubsub()
+        ps = get_redis_client(self.db, cache_alias='blocking').pubsub()
         ps.subscribe(self.ch)
         sub = Subscription(self, ps)
         sub.keep_handle_msg(_next, error, complete)
