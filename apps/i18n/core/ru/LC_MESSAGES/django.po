@@ -16654,3 +16654,888 @@ msgstr "Тема письма"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Текст письма"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "Управленческое резюме и рекомендации"
+
+#: reports/audit_contract.py
+msgid "Data Definitions and Limitations"
+msgstr "Определения и ограничения данных"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "Обзор основных показателей"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "Анализ операционной деятельности"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "Анализ событий безопасности"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "Обзор активов и учетных записей"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "Анализ операций с учетными записями"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "Комплексный отчет аудита"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "Резюме операционной деятельности, событий безопасности, активов и счетов для ежемесячных, квартальных или ежегодных аудитов."
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "Отчет об операционной деятельности"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "Проверьте, кто выполнял сессии, команди и файловые операции на каждом активе."
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "Отчет о событиях безопасности"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "Обзор команд высокого риска, аномалий входа и отклонений доступа, отличающих неудачи от событий безопасности."
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "Отчет об операциях с учетными записями"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "Обзор результатов и неудач задач автоматизации счетов."
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "Вы не имеете разрешения на просмотр данных для этой темы отчета."
+
+#: reports/api/audit.py
+msgid "Select an organization before saving a template. The all-organizations view supports previews only."
+msgstr "Выберите организацию, прежде чем сохранить шаблон. Посмотреть все организации поддерживает только прогнозы."
+
+#: reports/api/audit.py
+msgid "You do not have permission to save a template for this report theme."
+msgstr "Вы не имеете разрешения на сохранение шаблона для этой темы отчета."
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "Дата окончания не может быть раньше даты начала."
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "Отчет может охватывать не более 366 дней. Выберите более короткий период."
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "Дата окончания не может быть позже сегодняшнего дня. Для текущего периода укажите данные по сегодняшний день."
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "Главы дублируются или не относятся к выбранной теме отчета."
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "Выберите хотя бы одну главу, содержащую статистические данные."
+
+#: reports/api/audit.py
+msgid "The report theme of a template cannot be changed. Save a new template instead."
+msgstr "Тема отчета шаблона не может быть изменена. Вместо этого сохранить новый шаблон."
+
+#: reports/api/audit.py
+msgid "The template configuration must be an object."
+msgstr "Конфигурация шаблона должна быть объектом."
+
+#: reports/api/audit.py
+msgid "The template theme does not match its configuration."
+msgstr "Тема шаблона не соответствует ее конфигурации."
+
+#: reports/api/audit.py
+msgid "A template with this name already exists in the current organization. Choose another name."
+msgstr "Шаблон с этим названием уже существует в нынешней организации. Выберите другое имя."
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "Сеансы доступа к активам"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "Записи команд"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "Журналы входа"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "Журналы операций"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "Передачи файлов"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "Текущие активы"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "Текущие учетные записи"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "Задачи автоматизации учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "Журналы смены паролей пользователей платформы"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（доступные хранилища）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "Команды с предупреждением"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "Команды, заблокированные правилами"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "Команды, отклоненные при согласовании"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "Согласованные команды"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "Команды с отмененным согласованием"
+
+#: reports/services/audit_data.py
+msgid "Alerts, rule blocks, and approval rejections require review; a command name or numeric level alone does not establish an attack. Ordinary queries can also be rejected by policy."
+msgstr "Уведомления, правила блоков и отклонения одобрения требуют пересмотра; Только командное имя или цифровой уровень не устанавливает атаку. Обычные запросы также могут быть отклонены политикой."
+
+#: reports/services/audit_data.py
+msgid "Command retention follows the session log cleanup settings; external storage may have its own retention policy."
+msgstr "Поддержание команд следует настройкам очистки сеанса журнала; Внешнее хранилище может иметь собственную политику хранения."
+
+#: reports/services/audit_data.py
+msgid "Command logs do not store a unique approval ticket ID. \"Command Approval Clues from the Same Session\" lists tickets created during the period for sampled sessions that the current user can view. Match commands and times to verify the relationship."
+msgstr "Журналы команд не содержат уникальный ID заявки на согласование. В разделе «Сведения о согласовании команд в том же сеансе» приведены созданные за период заявки по выбранным сеансам, доступные текущему пользователю. Сопоставьте команды и время для проверки связи."
+
+#: reports/services/audit_data.py
+msgid "Login logs are matched to current organization members. Membership or name changes can affect historical attribution; attempts not associated with a member are excluded."
+msgstr "Входные записи совпадают с текущими членами организации. Членство или изменения фамилии могут повлиять на историческое назначение; Попытки, не связанные с одним членом, исключены."
+
+#: reports/services/audit_data.py
+msgid "Failures without a stable reason code in older versions remain in the failure count but cannot be reliably classified as lockouts or policy denials."
+msgstr "Неудачи без стабильного кода причины в более старых версиях остаются в перечислении неудач, но не могут быть надежно классифицированы как блокировки или отказ политики."
+
+#: reports/services/audit_data.py
+msgid "New-city clues are recalculated from saved city information using the seven days before the period as a baseline. Missing or deleted historical data may cause omissions."
+msgstr "Новый город-показания пересчитываются из сохранившейся городской информации с использованием семи дней до периода в качестве базовой линии. Отсутствие или удаление исторических данных может вызвать пропуски."
+
+#: reports/services/audit_data.py
+msgid "Task-level results differ from account-level results. A task may process multiple accounts; review each account in the execution details."
+msgstr "Результаты уровня заданий отличаются от результатов уровня учета. Задача может обрабатывать несколько счетов; Проверьте каждую учетную запись в деталях выполнения."
+
+#: reports/services/audit_data.py
+msgid "Original record links require sign-in and the relevant permissions. Tasks without a detail page retain their full execution ID; deleted records may no longer be available."
+msgstr "Оригинальные записные ссылки требуют регистрации и соответствующих разрешений. Задачи без подробной страницы сохраняют свой полный идентификатор исполнения; Изъятые записи уже не могут быть доступны."
+
+#: reports/services/audit_data.py
+msgid "Report Scope"
+msgstr "Область отчета"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "Неподдерживаемая тема отчета"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "Выберите даты начала и окончания"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "Дата начала не может быть позднее даты окончания, а отчет может быть покрыт до 366 дней."
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "Дата окончания не может быть позже сегодняшнего дня"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "Выберите разделы без повторений"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "Выбранные главы не относятся к теме этого отчета."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The report period or the seven-day baseline for new-city logins predates the %(days)s-day log retention period. Earlier records may have been deleted."
+msgstr "Период отчета или семидневная база для входов из нового города начинается раньше срока хранения журналов в %(days)s дней. Старые записи могли быть удалены."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The selected start date predates the %(days)s-day log retention period. Earlier records may have been deleted."
+msgstr "Выбранная дата начала раньше срока хранения журналов в %(days)s дней. Старые записи могли быть удалены."
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "Количество сеансов"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "раз"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "Активные пользователи"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "пользователей"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "Посещенные активы"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "активов"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "Ошибки подключения"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "Состояние записи сеанса"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "5 основных причин ошибок подключения"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "Рейтинг доступа по пользователям"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "Рейтинг доступа по активам"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "Распределение протоколов подключения"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "Типы операций сеанса"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "Распределение доступа по платформам"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "Динамика сеансов доступа по дням"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "Динамика сеансов доступа по неделям"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "Динамика сеансов доступа по месяцам"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "Последние сеансы доступа к активам"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "Записи, требующие проверки"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "записей"
+
+#: reports/services/audit_data.py
+msgid "Some command stores could not be read. The figures cover available stores only and are not a complete risk total."
+msgstr "Некоторые командные магазины не могут быть прочтены. Данные охватывают только доступные магазины и не являются полным риском."
+
+#: reports/services/audit_data.py
+msgid "Command approval tickets were not read: ticket view permission and access to the relevant tickets are required."
+msgstr "Билеты на одобрение заказа не читались: требуется разрешение на просмотр билетов и доступ к соответствующим билетам."
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "Сведения о согласовании команд в том же сеансе"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "Успешные входы"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "Неудачные входы"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "Записи ограниченных входов"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "Отказы политики входа"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "Последние неудачные входы"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "Признаки входа из нового города"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "Признаки входа из нового города для проверки"
+
+#: reports/services/audit_data.py
+msgid "Some requests with insufficient or expired permissions are not written to the operation log; this report cannot prove that no unauthorized attempts occurred."
+msgstr "Некоторые запросы с недостаточными или истекшими правами не попадают в журнал операций; отчет не может доказать отсутствие несанкционированных попыток."
+
+#: reports/services/audit_data.py
+msgid "Operation logs are read from the current storage configuration. If storage was changed, confirm that historical records were migrated."
+msgstr "Операционные записи читаются из текущей конфигурации хранения. Если хранилище было изменено, подтвердите, что исторические записи были мигрированы."
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "Типы операций с файлами"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "5 основных объектов, затронутых ошибками файловых операций"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "Последние неудачные операции с файлами"
+
+#: reports/services/audit_data.py
+msgid "File operation logs do not contain an error-reason field. Suspected permission or network problems are not presented as confirmed causes."
+msgstr "Файловые операционные записи не содержат поле по причине ошибки. Подозреваемые разрешения или проблемы с сетью не представлены в качестве подтвержденных причин."
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "Выполнения задач учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "Успешные выполнения"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "Неудачные выполнения и ошибки"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "Незавершенные выполнения"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "Типы и результаты задач учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "Последние неудачные задачи учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "Доля неудачных выполнений и ошибок задач"
+
+#: reports/services/audit_data.py
+msgid "Account-level password-change errors and impact were not read: permission to view password-change records is required."
+msgstr "Ошибки и последствия смены пароля на уровне учетной записи не читались: требуется разрешение на просмотр записей смены пароля."
+
+#: reports/services/audit_data.py
+msgid "No failed or unverified password-change account records are available for the selected tasks. This cannot establish causes or affected account counts for other tasks."
+msgstr "Никаких неудачных или неидентифицированных записей аккаунта по изменению пароля доступны для выбранных задач. Это не может установить причины или затрагиваемые счета для других задач."
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "5 основных признаков ошибок смены пароля"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "Учетные записи со сменой пароля, требующей проверки"
+
+#: reports/services/audit_data.py
+msgid "Platform user password-change logs are matched by current organization member display names; membership changes can affect historical attribution."
+msgstr "Записи обмена паролями пользователя платформы совпадают с именами текущих членов организации; Изменения в членстве могут повлиять на историческую принадлежность."
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "Были зарегистрированы ограниченные записи или отказ от политики. Проверьте, что ожидается источник, идентификация пользователя и политика доступа."
+
+#: reports/services/audit_data.py
+msgid "Some data was unavailable due to permissions, read failures, or retention limits. Conclusions use available records only; obtain missing data before finalizing them."
+msgstr "Некоторые данные были недоступны из-за разрешений, неисправности чтения или ограничений содержания. Заключения используют только имеющиеся записи; Получить пропущенные данные до их завершения."
+
+#: reports/services/audit_data.py
+msgid "Available records are insufficient for a specific conclusion. Review the report scope and audit details manually."
+msgstr "Доступных записей недостаточно для конкретного заключения. Проверьте объем отчета и подробности аудита вручную."
+
+#: reports/services/audit_data.py
+msgid "Data could not be read. Check the storage connection and regenerate the report; read failures are not treated as zero records."
+msgstr "Данные не могут быть прочтены. Проверьте соединение хранения и восстановите отчет; Неудачи в чтении не рассматриваются как нулевые записи."
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "Количество команд"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "Решения по командам, требующие проверки"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "Отдельная причина отклонения не сохранена; проверьте обсуждение заявки"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "Не записано"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "Записи входа с адреса loopback"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "отвергнуты"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "Количество операций платформы"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "Отказы политики операций"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "Подробности отказов политики"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "Количество операций с файлами"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "Неудачные операции с файлами"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "Доля ошибок операций с файлами"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "Текущее количество активов"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "Включенные активы"
+
+#: reports/services/audit_data.py
+msgid "Currently Connectable Assets"
+msgstr "Активы, доступные для подключения"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "Текущее распределение активов по платформам"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Accounts"
+msgstr "Текущие учетные записи активов"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "Включенные учетные записи"
+
+#: reports/services/audit_data.py
+msgid "Currently Connectable Accounts"
+msgstr "Учетные записи, доступные для подключения"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "Рейтинг активов по числу учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Account-level password-change details could not be read. Task totals remain available; check execution details for the affected scope."
+msgstr "Данные об изменении пароля на уровне учетной записи не могут быть прочтены. Все задания остаются доступными; Проверьте детали выполнения для затрагиваемой сферы."
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "Активы со сменой пароля, требующей проверки"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "Учетные записи со сменой пароля, требующей проверки"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "Актив удален"
+
+#: reports/services/audit_data.py
+msgid "Later success recorded; review required"
+msgstr "Зафиксирован последующий успех; требуется проверка"
+
+#: reports/services/audit_data.py
+msgid "No later success found; manual review required"
+msgstr "Последующий успех не найден; требуется ручная проверка"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "Смены паролей пользователей платформы"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "Последние смены паролей пользователей платформы"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(sessions)s asset sessions were recorded during the period, involving %(users)s users and %(assets)s assets."
+msgstr "За период записано %(sessions)s сеансов доступа к активам с участием %(users)s пользователей и %(assets)s активов."
+
+#: reports/services/audit_data.py
+msgid "Asset sessions are concentrated on one platform user. Verify whether this is a test scenario and whether production actions can be traced to individuals; one recorded user does not prove a shared account."
+msgstr "Сеансы доступа к активам сосредоточены у одного пользователя платформы. Проверьте, является ли среда тестовой и можно ли установить конкретных исполнителей действий в рабочей среде. Одна учетная запись в журнале не доказывает, что она общая."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform login records use loopback source addresses. Check local access or the proxy chain; this alone does not establish an incorrect client IP."
+msgstr "В %(count)s записях входа на платформу указан адрес loopback. Проверьте локальный доступ или цепочку прокси; само по себе это не доказывает ошибку в адресе клиента."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "Записано %(count)s команд с предупреждением или отклонением. Проверьте их назначение и основания согласования в контексте сеанса."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s new-city login clues were found. Check travel, proxies, or changes in city identification; a city change alone does not establish an attack."
+msgstr "Обнаружено %(count)s признаков входа из нового города. Проверьте поездки, прокси и изменения определения города; одна лишь смена города не доказывает атаку."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "Операционный дневник содержит %(count)s политических отклонений. Проверьте отверженные ресурсы и политики в аудиторских деталях."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s / %(total)s account task executions failed or errored (%(rate)s%%). Prioritize the password-change account review list. Accounts without a later success need manual review; check original execution logs for other task causes."
+msgstr "Ошибкой или сбоем завершилось %(failed)s из %(total)s выполнений задач учетных записей (%(rate)s%%). В первую очередь проверьте список учетных записей со сменой пароля. Записи без последующего успеха требуют ручной проверки; причины других задач ищите в исходных журналах."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "Были зафиксированы изменения пароля пользователя платформы %(count)s. Проверьте операторов и по мере необходимости меняйте обоснование."
+
+#: reports/services/audit_data.py
+msgid "You do not have permission to view this data, so it was not queried for this report."
+msgstr "Вы не имеете разрешения на просмотр этих данных, поэтому для этого отчета не было запрошено."
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "Состояние записи"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "Записанная причина"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "Количество ошибок"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "Время начала"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "Пользователь платформы"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "Учетная запись актива"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "Результат подключения"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "Причина ошибки подключения"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "Исходный сеанс"
+
+#: reports/services/audit_data.py
+msgid "Approval clues could not be read. Command outcomes remain available; review the approval basis on the ticket page."
+msgstr "Подтверждающие следы не могут быть прочитаны. Результаты команд остаются доступными; Проверьте основу одобрения на странице билета."
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "Ответственный не записан"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "Заявка на согласование"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "Время запроса"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "Запрошенная команда"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "Правило на тот момент"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "Ответственный"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "Причина отклонения"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "Связанный сеанс"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "IP-адрес источника"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "Город"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "Количество операций"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "Путь к файлу"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "Тип задачи"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "Количество выполнений"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "Исходная запись выполнения"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "Категория признака ошибки"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "Количество записей учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "Время записи"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "Признак ошибки"
+
+#: reports/services/audit_data.py
+msgid "Follow-up Record"
+msgstr "Последующая запись"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "Запись выполнения"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s / %(total)s file operations failed (%(rate)s%%). Prioritize affected assets, accounts, and paths; the log does not record a specific cause, so check session and component logs."
+msgstr "Ошибкой завершилось %(failed)s из %(total)s операций с файлами (%(rate)s%%). В первую очередь проверьте затронутые активы, учетные записи и пути. Конкретная причина в журнале не указана; проверьте журналы сеансов и компонентов."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s asset connections failed. Check network, credentials, and access conditions using connection failure reasons and original sessions; unsupported recording is not a connection failure."
+msgstr "Не удалось установить %(count)s подключений к активам. Проверьте сеть, учетные данные и условия доступа по причинам ошибок и исходным сеансам. Отсутствие поддержки записи не является ошибкой подключения."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage to avoid gaps in audit evidence."
+msgstr "Для %(count)s успешно завершенных сеансов требуется проверить запись. Проверьте создание, загрузку и хранение записей, чтобы избежать пробелов в аудиторских данных."
+
+#: reports/services/audit_data.py
+msgid "Data unavailable due to missing permissions or read errors is not displayed as zero. See the report coverage information."
+msgstr "Данные, недоступные из-за отсутствия разрешений или ошибок в чтении, не отображаются как нулевые. Смотреть информацию о докладе."
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "Актив удален или платформа не записана"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "Результат решения"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "Название исторического правила не записано"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "Количество активов"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "Количество учетных записей"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "Оператор"
+
+#: reports/services/audit_data.py
+msgid "The period includes the full start and end dates; today's data is counted through report generation time."
+msgstr "Срок включает в себя полные даты начала и окончания; Сегодняшние данные рассчитываются по времени генерации отчетов."
+
+#: reports/services/audit_data.py
+msgid "Log totals are counted by storage; details show up to the latest 20 records and rankings up to the top 10 items."
+msgstr "Общая сумма записей рассчитывается по хранению; Подробности показывают до последних 20 записей и рейтинги до топ-10."
+
+#: reports/services/audit_data.py
+msgid "Report Information"
+msgstr "Информация об отчете"
+
+#: reports/services/audit_data.py
+msgid "View permission unavailable"
+msgstr "Нет прав на просмотр"
+
+#: reports/services/audit_data.py
+msgid "Data incomplete or could not be read"
+msgstr "Данные неполные или не прочитаны"
+
+#: reports/services/audit_data.py
+msgid "Item"
+msgstr "Пункт"
+
+#: reports/services/audit_data.py
+msgid "Report Period"
+msgstr "Период отчета"
+
+#: reports/services/audit_data.py
+msgid "Reporting Time Zone"
+msgstr "Часовой пояс отчета"
+
+#: reports/services/audit_data.py
+msgid "Generation Time"
+msgstr "Время создания"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "Наличие записи отмечено"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "Запись не поддерживается"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "Сеанс выполняется"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "Ошибка создания записи"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "Ошибка загрузки записи"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "Ошибка преобразования записи"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "Отметка о записи отсутствует"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "Ошибка подключения; неприменимо"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "Ошибка подключения (подробная причина не записана)"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "Причина ошибки подключения не записана"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "Связано с аутентификацией"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "Истекло время выполнения или подключения"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "Связано с сетью или подключением"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "Связано с отказом в доступе"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "Цель отсутствует или недоступна"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "Связано с проверкой результата"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "Причина ошибки не записана"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "Другая ошибка (проверьте исходную запись)"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(source)s: %(message)s"
+msgstr "%(source)s: %(message)s"

@@ -548,7 +548,7 @@ msgstr "SFTP"
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
 #: tickets/views/approve.py:130
 msgid "Success"
-msgstr "Success"
+msgstr "Thành công"
 
 #: accounts/const/automation.py:117 common/const/choices.py:64
 #: common/const/choices.py:127 terminal/const.py:79
@@ -16525,3 +16525,888 @@ msgstr "Tiêu đề email"
 #: xpack/plugins/jdmc/serializers.py:8
 msgid "Message of the email"
 msgstr "Nội dung email"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "Tóm tắt quản trị và khuyến nghị"
+
+#: reports/audit_contract.py
+msgid "Data Definitions and Limitations"
+msgstr "Định nghĩa và giới hạn dữ liệu"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "Tổng quan chỉ số chính"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "Phân tích hoạt động vận hành"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "Phân tích sự kiện bảo mật"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "Tổng quan tài sản và tài khoản"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "Phân tích vận hành tài khoản"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "Báo cáo kiểm toán tổng hợp"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "Thu thập hoạt động hoạt động, sự kiện an ninh, tài sản và tài khoản cho các kiểm toán hàng tháng, hàng năm hoặc hàng năm."
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "Báo cáo hoạt động vận hành"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "Kiểm tra những người đã thực hiện các phiên, lệnh, và các hoạt động tệp trên mỗi tài sản."
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "Báo cáo sự kiện bảo mật"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "Kiểm tra các lệnh rủi ro cao, bất thường đăng nhập, và từ chối truy cập, phân biệt các thất bại từ các sự kiện bảo mật."
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "Báo cáo vận hành tài khoản"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "Xem xét kết quả và thất bại của các nhiệm vụ tự động hóa tài khoản."
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "Bạn không được phép xem dữ liệu cho chủ đề báo cáo này."
+
+#: reports/api/audit.py
+msgid "Select an organization before saving a template. The all-organizations view supports previews only."
+msgstr "Chọn một tổ chức trước khi tiết kiệm một mẫu. View All-Organization chỉ hỗ trợ các dự báo."
+
+#: reports/api/audit.py
+msgid "You do not have permission to save a template for this report theme."
+msgstr "Bạn không được phép lưu một mẫu cho chủ đề báo cáo này."
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "Ngày kết thúc không được trước ngày bắt đầu."
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "Báo cáo có thể bao gồm tối đa 366 ngày. Hãy chọn khoảng thời gian ngắn hơn."
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "Ngày kết thúc không được sau hôm nay. Với kỳ hiện tại, hãy thống kê đến hôm nay."
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "Các chương được duplicate hoặc không thuộc về chủ đề báo cáo được chọn."
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "Chọn ít nhất một chương chứa dữ liệu thống kê."
+
+#: reports/api/audit.py
+msgid "The report theme of a template cannot be changed. Save a new template instead."
+msgstr "Chủ đề báo cáo của một mẫu không thể thay đổi. Thay vào đó, hãy lưu một template mới."
+
+#: reports/api/audit.py
+msgid "The template configuration must be an object."
+msgstr "Định cấu hình mẫu phải là một đối tượng."
+
+#: reports/api/audit.py
+msgid "The template theme does not match its configuration."
+msgstr "Chủ đề mẫu không phù hợp với cấu hình của nó."
+
+#: reports/api/audit.py
+msgid "A template with this name already exists in the current organization. Choose another name."
+msgstr "Một mẫu có tên này đã tồn tại trong tổ chức hiện tại. Chọn tên khác"
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "Phiên truy cập tài sản"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "Bản ghi lệnh"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "Nhật ký đăng nhập"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "Nhật ký thao tác"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "Truyền tệp"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "Tài sản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "Tài khoản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "Tác vụ tự động hóa tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "Nhật ký đổi mật khẩu người dùng nền tảng"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（kho lưu trữ khả dụng）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "Lệnh bị cảnh báo"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "Lệnh bị chặn theo quy tắc"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "Lệnh bị từ chối phê duyệt"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "Lệnh đã được phê duyệt"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "Lệnh có phê duyệt bị hủy"
+
+#: reports/services/audit_data.py
+msgid "Alerts, rule blocks, and approval rejections require review; a command name or numeric level alone does not establish an attack. Ordinary queries can also be rejected by policy."
+msgstr "Cảnh báo, các khối quy tắc, và sự từ chối phê duyệt đòi hỏi phải được xem xét; Chỉ có một tên lệnh hoặc mức số không tạo ra một cuộc tấn công. Các truy vấn thường xuyên cũng có thể bị từ chối bởi chính sách."
+
+#: reports/services/audit_data.py
+msgid "Command retention follows the session log cleanup settings; external storage may have its own retention policy."
+msgstr "Giữ lệnh theo các cài đặt làm sạch sổ session; Lưu trữ bên ngoài có thể có chính sách lưu trữ riêng."
+
+#: reports/services/audit_data.py
+msgid "Command logs do not store a unique approval ticket ID. \"Command Approval Clues from the Same Session\" lists tickets created during the period for sampled sessions that the current user can view. Match commands and times to verify the relationship."
+msgstr "Nhật ký lệnh không lưu ID phiếu phê duyệt duy nhất. “Thông tin phê duyệt lệnh trong cùng phiên” liệt kê các phiếu được tạo trong kỳ cho các phiên mẫu mà người dùng hiện tại có thể xem. Đối chiếu lệnh và thời gian để xác minh mối liên hệ."
+
+#: reports/services/audit_data.py
+msgid "Login logs are matched to current organization members. Membership or name changes can affect historical attribution; attempts not associated with a member are excluded."
+msgstr "Logs login được phù hợp với các thành viên tổ chức hiện tại. Thành viên hoặc thay đổi tên có thể ảnh hưởng đến việc phân bổ lịch sử; Những nỗ lực không liên quan đến một thành viên bị loại trừ."
+
+#: reports/services/audit_data.py
+msgid "Failures without a stable reason code in older versions remain in the failure count but cannot be reliably classified as lockouts or policy denials."
+msgstr "Các thất bại mà không có mã lý do ổn định trong các phiên bản cũ vẫn còn trong số thất bại nhưng không thể được phân loại đáng tin cậy như khóa hoặc từ chối chính sách."
+
+#: reports/services/audit_data.py
+msgid "New-city clues are recalculated from saved city information using the seven days before the period as a baseline. Missing or deleted historical data may cause omissions."
+msgstr "Các dấu hiệu thành phố mới được tính lại từ thông tin thành phố được tiết kiệm bằng cách sử dụng bảy ngày trước thời gian như là một dòng cơ sở. Việc mất hoặc xóa dữ liệu lịch sử có thể gây ra sự thiếu hụt."
+
+#: reports/services/audit_data.py
+msgid "Task-level results differ from account-level results. A task may process multiple accounts; review each account in the execution details."
+msgstr "Kết quả cấp nhiệm vụ khác với kết quả cấp tài khoản. Một nhiệm vụ có thể xử lý nhiều tài khoản; xem xét mỗi tài khoản trong các chi tiết thực hiện."
+
+#: reports/services/audit_data.py
+msgid "Original record links require sign-in and the relevant permissions. Tasks without a detail page retain their full execution ID; deleted records may no longer be available."
+msgstr "Các liên kết bản ghi ban đầu đòi hỏi phải đăng nhập và các giấy phép liên quan. Các nhiệm vụ mà không có một trang chi tiết giữ lại ID thực hiện đầy đủ của họ; Các bản ghi bị xóa có thể không còn có sẵn nữa."
+
+#: reports/services/audit_data.py
+msgid "Report Scope"
+msgstr "Phạm vi báo cáo"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "Chủ đề báo cáo không được hỗ trợ"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "Chọn ngày bắt đầu và ngày kết thúc"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "Ngày bắt đầu không thể là muộn hơn ngày kết thúc, và báo cáo có thể bao gồm tối đa 366 ngày"
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "Ngày kết thúc không được sau hôm nay"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "Chọn các phần báo cáo không trùng lặp"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "Các chương được chọn không thuộc chủ đề báo cáo này"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The report period or the seven-day baseline for new-city logins predates the %(days)s-day log retention period. Earlier records may have been deleted."
+msgstr "Kỳ báo cáo hoặc bảy ngày cơ sở để xác định đăng nhập từ thành phố mới bắt đầu trước thời hạn lưu nhật ký %(days)s ngày. Bản ghi cũ có thể đã bị xóa."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The selected start date predates the %(days)s-day log retention period. Earlier records may have been deleted."
+msgstr "Ngày bắt đầu đã chọn sớm hơn thời hạn lưu nhật ký %(days)s ngày. Bản ghi cũ có thể đã bị xóa."
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "Số phiên"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "lần"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "Người dùng hoạt động"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "người dùng"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "Tài sản đã truy cập"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "tài sản"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "Kết nối thất bại"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "Trạng thái ghi hình phiên"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "5 nguyên nhân kết nối thất bại hàng đầu"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "Xếp hạng truy cập theo người dùng"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "Xếp hạng truy cập theo tài sản"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "Phân bố giao thức kết nối"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "Loại thao tác phiên"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "Phân bố truy cập theo nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "Xu hướng phiên tài sản theo ngày"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "Xu hướng phiên tài sản theo tuần"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "Xu hướng phiên tài sản theo tháng"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "Các phiên truy cập tài sản gần đây"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "Bản ghi cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "bản ghi"
+
+#: reports/services/audit_data.py
+msgid "Some command stores could not be read. The figures cover available stores only and are not a complete risk total."
+msgstr "Một số cửa hàng lệnh không thể đọc được. Các con số chỉ bao gồm các cửa hàng có sẵn và không phải là tổng rủi ro đầy đủ."
+
+#: reports/services/audit_data.py
+msgid "Command approval tickets were not read: ticket view permission and access to the relevant tickets are required."
+msgstr "Vé phê duyệt lệnh không được đọc: giấy phép xem vé và truy cập vào vé liên quan là cần thiết."
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "Thông tin phê duyệt lệnh trong cùng phiên"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "Đăng nhập thành công"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "Đăng nhập thất bại"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "Bản ghi đăng nhập bị hạn chế"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "Từ chối theo chính sách đăng nhập"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "Đăng nhập thất bại gần đây"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "Dấu hiệu đăng nhập từ thành phố mới"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "Dấu hiệu đăng nhập từ thành phố mới cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "Some requests with insufficient or expired permissions are not written to the operation log; this report cannot prove that no unauthorized attempts occurred."
+msgstr "Một số yêu cầu có quyền không đủ hoặc đã hết hạn không được ghi vào nhật ký thao tác; báo cáo không thể chứng minh không có nỗ lực trái phép."
+
+#: reports/services/audit_data.py
+msgid "Operation logs are read from the current storage configuration. If storage was changed, confirm that historical records were migrated."
+msgstr "Lịch hoạt động được đọc từ cấu hình lưu trữ hiện tại. Nếu lưu trữ đã được thay đổi, xác nhận rằng các hồ sơ lịch sử đã được di chuyển."
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "Loại thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "5 đối tượng chịu ảnh hưởng hàng đầu của lỗi thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "Thao tác tệp thất bại gần đây"
+
+#: reports/services/audit_data.py
+msgid "File operation logs do not contain an error-reason field. Suspected permission or network problems are not presented as confirmed causes."
+msgstr "Các hồ sơ hoạt động tệp không chứa một trường lý do lỗi. Các vấn đề về quyền hoặc mạng bị nghi ngờ không được trình bày như các nguyên nhân được xác nhận."
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "Lượt thực thi tác vụ tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "Thực thi thành công"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "Thực thi thất bại hoặc gặp lỗi"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "Thực thi chưa hoàn tất"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "Loại và kết quả tác vụ tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "Tác vụ tài khoản thất bại gần đây"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "Tỷ lệ tác vụ thất bại hoặc lỗi"
+
+#: reports/services/audit_data.py
+msgid "Account-level password-change errors and impact were not read: permission to view password-change records is required."
+msgstr "Các lỗi và tác động của việc thay đổi mật khẩu ở cấp tài khoản không được đọc: Giấy phép để xem hồ sơ thay đổi mật khẩu là cần thiết."
+
+#: reports/services/audit_data.py
+msgid "No failed or unverified password-change account records are available for the selected tasks. This cannot establish causes or affected account counts for other tasks."
+msgstr "Không có hồ sơ tài khoản thay đổi mật khẩu thất bại hoặc không được mã hóa có sẵn cho các nhiệm vụ được chọn. Điều này không thể xác định nguyên nhân hoặc tính toán bị ảnh hưởng cho các nhiệm vụ khác."
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "5 dấu hiệu lỗi đổi mật khẩu hàng đầu"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "Tài khoản đổi mật khẩu cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "Platform user password-change logs are matched by current organization member display names; membership changes can affect historical attribution."
+msgstr "Đăng ký thay đổi mật khẩu người dùng nền tảng được phù hợp với tên hiển thị hiện tại của thành viên tổ chức; Thay đổi thành viên có thể ảnh hưởng đến việc phân bổ lịch sử."
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "Đăng nhập hạn chế hoặc từ chối chính sách đã được ghi lại. Kiểm tra rằng nguồn, danh tính người dùng và chính sách truy cập được mong đợi."
+
+#: reports/services/audit_data.py
+msgid "Some data was unavailable due to permissions, read failures, or retention limits. Conclusions use available records only; obtain missing data before finalizing them."
+msgstr "Một số dữ liệu không có sẵn do giấy phép, lỗi đọc hoặc giới hạn lưu trữ. Các kết luận chỉ sử dụng các hồ sơ có sẵn; Nhận dữ liệu thiếu trước khi hoàn thành."
+
+#: reports/services/audit_data.py
+msgid "Available records are insufficient for a specific conclusion. Review the report scope and audit details manually."
+msgstr "Các hồ sơ có sẵn không đủ để đưa ra một kết luận cụ thể. Kiểm tra phạm vi báo cáo và chi tiết kiểm toán bằng tay."
+
+#: reports/services/audit_data.py
+msgid "Data could not be read. Check the storage connection and regenerate the report; read failures are not treated as zero records."
+msgstr "Dữ liệu không thể đọc được. Kiểm tra kết nối lưu trữ và tái tạo báo cáo; Những thất bại đọc không được xử lý như các bản ghi không."
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "Số lệnh"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "Kết quả xử lý lệnh cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "Không lưu lý do từ chối riêng; hãy xem thảo luận trong phiếu"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "Chưa được ghi nhận"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "Bản ghi đăng nhập từ địa chỉ loopback"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "từ chối"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "Số thao tác nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "Từ chối theo chính sách thao tác"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "Chi tiết từ chối theo chính sách"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "Số thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "Thao tác tệp thất bại"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "Tỷ lệ lỗi thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "Tổng tài sản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "Tài sản hiện đang bật"
+
+#: reports/services/audit_data.py
+msgid "Currently Connectable Assets"
+msgstr "Tài sản hiện có thể kết nối"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "Phân bố tài sản hiện tại theo nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Accounts"
+msgstr "Tài khoản tài sản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "Tài khoản hiện đang bật"
+
+#: reports/services/audit_data.py
+msgid "Currently Connectable Accounts"
+msgstr "Tài khoản hiện có thể kết nối"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "Xếp hạng tài sản theo số tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Account-level password-change details could not be read. Task totals remain available; check execution details for the affected scope."
+msgstr "Thông tin thay đổi mật khẩu cấp tài khoản không thể được đọc. Tổng số nhiệm vụ vẫn có sẵn; Kiểm tra chi tiết thực hiện cho phạm vi bị ảnh hưởng."
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "Tài sản đổi mật khẩu cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "Tài khoản đổi mật khẩu cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "Tài sản đã bị xóa"
+
+#: reports/services/audit_data.py
+msgid "Later success recorded; review required"
+msgstr "Có bản ghi thành công sau đó; cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "No later success found; manual review required"
+msgstr "Không tìm thấy bản ghi thành công sau đó; cần kiểm tra thủ công"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "Lượt đổi mật khẩu người dùng nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "Lượt đổi mật khẩu người dùng nền tảng gần đây"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(sessions)s asset sessions were recorded during the period, involving %(users)s users and %(assets)s assets."
+msgstr "Trong kỳ có %(sessions)s phiên truy cập tài sản, liên quan đến %(users)s người dùng và %(assets)s tài sản."
+
+#: reports/services/audit_data.py
+msgid "Asset sessions are concentrated on one platform user. Verify whether this is a test scenario and whether production actions can be traced to individuals; one recorded user does not prove a shared account."
+msgstr "Các phiên truy cập tài sản tập trung vào một người dùng nền tảng. Hãy xác minh đây có phải môi trường thử nghiệm và thao tác sản xuất có truy vết được đến từng cá nhân hay không; chỉ có một người dùng trong bản ghi không chứng minh tài khoản dùng chung."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform login records use loopback source addresses. Check local access or the proxy chain; this alone does not establish an incorrect client IP."
+msgstr "Có %(count)s bản ghi đăng nhập nền tảng sử dụng địa chỉ nguồn loopback. Kiểm tra truy cập cục bộ hoặc chuỗi proxy; chỉ riêng điều này không chứng minh IP máy khách được ghi sai."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "Có %(count)s lệnh bị cảnh báo hoặc từ chối. Kiểm tra mục đích và căn cứ phê duyệt trong ngữ cảnh của phiên."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s new-city login clues were found. Check travel, proxies, or changes in city identification; a city change alone does not establish an attack."
+msgstr "Tìm thấy %(count)s dấu hiệu đăng nhập từ thành phố mới. Kiểm tra việc đi công tác, proxy hoặc thay đổi nhận diện thành phố; chỉ đổi thành phố không chứng minh có tấn công."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "Lịch hoạt động chứa %(count)s từ chối chính sách. Kiểm tra các tài nguyên và chính sách bị từ chối trong chi tiết kiểm toán."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s / %(total)s account task executions failed or errored (%(rate)s%%). Prioritize the password-change account review list. Accounts without a later success need manual review; check original execution logs for other task causes."
+msgstr "Có %(failed)s / %(total)s lượt thực thi tác vụ tài khoản thất bại hoặc gặp lỗi (%(rate)s%%). Ưu tiên danh sách tài khoản đổi mật khẩu cần kiểm tra. Tài khoản không có lần thành công sau đó cần kiểm tra thủ công; xem nhật ký thực thi gốc để tìm nguyên nhân của các tác vụ khác."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "%(count)s thay đổi mật khẩu người dùng nền tảng đã được ghi lại. Kiểm tra các nhà khai thác và thay đổi lý luận khi cần thiết."
+
+#: reports/services/audit_data.py
+msgid "You do not have permission to view this data, so it was not queried for this report."
+msgstr "Bạn không được phép xem dữ liệu này, vì vậy nó không được yêu cầu cho báo cáo này."
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "Trạng thái ghi hình"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "Nguyên nhân đã ghi"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "Số lần thất bại"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "Thời gian bắt đầu"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "Người dùng nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "Tài khoản tài sản"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "Kết quả kết nối"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "Nguyên nhân kết nối thất bại"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "Phiên gốc"
+
+#: reports/services/audit_data.py
+msgid "Approval clues could not be read. Command outcomes remain available; review the approval basis on the ticket page."
+msgstr "Các dấu hiệu phê duyệt không thể đọc được. Kết quả lệnh vẫn có sẵn; xem xét cơ sở phê duyệt trên trang vé."
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "Chưa ghi người xử lý"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "Phiếu phê duyệt"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "Thời gian yêu cầu"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "Lệnh được yêu cầu"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "Quy tắc tại thời điểm đó"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "Người xử lý"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "Lý do từ chối"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "Phiên liên quan"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "IP nguồn"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "Thành phố"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "Số thao tác"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "Đường dẫn tệp"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "Loại tác vụ"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "Số lần thực thi"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "Bản ghi thực thi gốc"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "Loại dấu hiệu lỗi"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "Số bản ghi tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "Thời gian ghi"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "Dấu hiệu lỗi"
+
+#: reports/services/audit_data.py
+msgid "Follow-up Record"
+msgstr "Bản ghi tiếp theo"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "Bản ghi thực thi"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s / %(total)s file operations failed (%(rate)s%%). Prioritize affected assets, accounts, and paths; the log does not record a specific cause, so check session and component logs."
+msgstr "Có %(failed)s / %(total)s thao tác tệp thất bại (%(rate)s%%). Ưu tiên kiểm tra tài sản, tài khoản và đường dẫn bị ảnh hưởng; nhật ký không ghi nguyên nhân cụ thể, hãy kiểm tra nhật ký phiên và thành phần."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s asset connections failed. Check network, credentials, and access conditions using connection failure reasons and original sessions; unsupported recording is not a connection failure."
+msgstr "Có %(count)s kết nối đến tài sản thất bại. Kiểm tra mạng, thông tin xác thực và điều kiện truy cập qua nguyên nhân lỗi và phiên gốc; không hỗ trợ ghi hình không phải là lỗi kết nối."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage to avoid gaps in audit evidence."
+msgstr "Cần kiểm tra bản ghi của %(count)s phiên đã kết thúc thành công. Kiểm tra việc tạo, tải lên và lưu trữ bản ghi để tránh thiếu bằng chứng kiểm toán."
+
+#: reports/services/audit_data.py
+msgid "Data unavailable due to missing permissions or read errors is not displayed as zero. See the report coverage information."
+msgstr "Dữ liệu không sẵn dùng do thiếu giấy phép hoặc lỗi đọc không hiển thị như không. Xem thông tin báo cáo bao gồm."
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "Tài sản đã xóa hoặc nền tảng chưa được ghi"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "Kết quả xử lý"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "Chưa ghi tên quy tắc tại thời điểm đó"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "Số tài sản"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "Số tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "Người thao tác"
+
+#: reports/services/audit_data.py
+msgid "The period includes the full start and end dates; today's data is counted through report generation time."
+msgstr "Thời gian bao gồm các ngày bắt đầu và kết thúc đầy đủ; Dữ liệu ngày hôm nay được tính toán thông qua báo cáo thời gian sinh."
+
+#: reports/services/audit_data.py
+msgid "Log totals are counted by storage; details show up to the latest 20 records and rankings up to the top 10 items."
+msgstr "Tổng số hồ sơ được tính theo lưu trữ; chi tiết hiển thị lên đến 20 hồ sơ mới nhất và xếp hạng lên đến 10 mục hàng đầu."
+
+#: reports/services/audit_data.py
+msgid "Report Information"
+msgstr "Thông tin báo cáo"
+
+#: reports/services/audit_data.py
+msgid "View permission unavailable"
+msgstr "Không có quyền xem"
+
+#: reports/services/audit_data.py
+msgid "Data incomplete or could not be read"
+msgstr "Dữ liệu không đầy đủ hoặc không thể đọc"
+
+#: reports/services/audit_data.py
+msgid "Item"
+msgstr "Mục"
+
+#: reports/services/audit_data.py
+msgid "Report Period"
+msgstr "Kỳ báo cáo"
+
+#: reports/services/audit_data.py
+msgid "Reporting Time Zone"
+msgstr "Múi giờ báo cáo"
+
+#: reports/services/audit_data.py
+msgid "Generation Time"
+msgstr "Thời gian tạo"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "Đã đánh dấu có bản ghi"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "Không hỗ trợ ghi hình"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "Phiên đang diễn ra"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "Không thể tạo bản ghi"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "Không thể tải bản ghi lên"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "Không thể chuyển đổi bản ghi"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "Không có cờ ghi hình"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "Kết nối thất bại; không áp dụng"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "Kết nối thất bại (không ghi thêm nguyên nhân)"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "Chưa ghi nguyên nhân kết nối thất bại"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "Liên quan đến xác thực"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "Hết thời gian thực thi hoặc kết nối"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "Liên quan đến mạng hoặc kết nối"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "Liên quan đến từ chối quyền"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "Đối tượng không tồn tại hoặc không khả dụng"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "Liên quan đến xác minh kết quả"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "Chưa ghi nguyên nhân lỗi"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "Lỗi khác (xem bản ghi gốc)"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(source)s: %(message)s"
+msgstr "%(source)s: %(message)s"
