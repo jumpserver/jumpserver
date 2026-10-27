@@ -207,19 +207,11 @@ class BlockUtilBase:
 
     @classmethod
     def get_blocked_usernames(cls):
-        key = cls.BLOCK_KEY_TMPL.format('*')
-        keys = cache.keys(key)
-        
-        prefix = cls.BLOCK_KEY_TMPL.split('{')[0]
-        usernames = []
-        for key in keys:
-            if isinstance(key, bytes):
-                key = key.decode()
-            index = key.find(prefix)
-            if index == -1:
-                continue
-            usernames.append(key[index + len(prefix):])
-        return usernames
+        prefix = cls.BLOCK_KEY_TMPL.format('')
+        return [
+            key.removeprefix(prefix)
+            for key in cache.keys(cls.BLOCK_KEY_TMPL.format('*'))
+        ]
 
 
 class BlockGlobalIpUtilBase:
