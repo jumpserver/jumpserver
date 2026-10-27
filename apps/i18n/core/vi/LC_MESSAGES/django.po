@@ -16531,10 +16531,6 @@ msgid "Management Summary and Recommendations"
 msgstr "Tóm tắt quản trị và khuyến nghị"
 
 #: reports/audit_contract.py
-msgid "Data Definitions and Limitations"
-msgstr "Định nghĩa và giới hạn dữ liệu"
-
-#: reports/audit_contract.py
 msgid "Key Overview"
 msgstr "Tổng quan chỉ số chính"
 
@@ -16591,14 +16587,6 @@ msgid "You do not have permission to view data for this report theme."
 msgstr "Bạn không được phép xem dữ liệu cho chủ đề báo cáo này."
 
 #: reports/api/audit.py
-msgid "Select an organization before saving a template. The all-organizations view supports previews only."
-msgstr "Chọn một tổ chức trước khi tiết kiệm một mẫu. View All-Organization chỉ hỗ trợ các dự báo."
-
-#: reports/api/audit.py
-msgid "You do not have permission to save a template for this report theme."
-msgstr "Bạn không được phép lưu một mẫu cho chủ đề báo cáo này."
-
-#: reports/api/audit.py
 msgid "The end date cannot be earlier than the start date."
 msgstr "Ngày kết thúc không được trước ngày bắt đầu."
 
@@ -16617,22 +16605,6 @@ msgstr "Các chương được duplicate hoặc không thuộc về chủ đề 
 #: reports/api/audit.py
 msgid "Select at least one chapter containing statistical data."
 msgstr "Chọn ít nhất một chương chứa dữ liệu thống kê."
-
-#: reports/api/audit.py
-msgid "The report theme of a template cannot be changed. Save a new template instead."
-msgstr "Chủ đề báo cáo của một mẫu không thể thay đổi. Thay vào đó, hãy lưu một template mới."
-
-#: reports/api/audit.py
-msgid "The template configuration must be an object."
-msgstr "Định cấu hình mẫu phải là một đối tượng."
-
-#: reports/api/audit.py
-msgid "The template theme does not match its configuration."
-msgstr "Chủ đề mẫu không phù hợp với cấu hình của nó."
-
-#: reports/api/audit.py
-msgid "A template with this name already exists in the current organization. Choose another name."
-msgstr "Một mẫu có tên này đã tồn tại trong tổ chức hiện tại. Chọn tên khác"
 
 #: reports/services/audit_data.py
 msgid "Asset Sessions"
@@ -16695,42 +16667,6 @@ msgid "Approval-Canceled Commands"
 msgstr "Lệnh có phê duyệt bị hủy"
 
 #: reports/services/audit_data.py
-msgid "Alerts, rule blocks, and approval rejections require review; a command name or numeric level alone does not establish an attack. Ordinary queries can also be rejected by policy."
-msgstr "Cảnh báo, các khối quy tắc, và sự từ chối phê duyệt đòi hỏi phải được xem xét; Chỉ có một tên lệnh hoặc mức số không tạo ra một cuộc tấn công. Các truy vấn thường xuyên cũng có thể bị từ chối bởi chính sách."
-
-#: reports/services/audit_data.py
-msgid "Command retention follows the session log cleanup settings; external storage may have its own retention policy."
-msgstr "Giữ lệnh theo các cài đặt làm sạch sổ session; Lưu trữ bên ngoài có thể có chính sách lưu trữ riêng."
-
-#: reports/services/audit_data.py
-msgid "Command logs do not store a unique approval ticket ID. \"Command Approval Clues from the Same Session\" lists tickets created during the period for sampled sessions that the current user can view. Match commands and times to verify the relationship."
-msgstr "Nhật ký lệnh không lưu ID phiếu phê duyệt duy nhất. “Thông tin phê duyệt lệnh trong cùng phiên” liệt kê các phiếu được tạo trong kỳ cho các phiên mẫu mà người dùng hiện tại có thể xem. Đối chiếu lệnh và thời gian để xác minh mối liên hệ."
-
-#: reports/services/audit_data.py
-msgid "Login logs are matched to current organization members. Membership or name changes can affect historical attribution; attempts not associated with a member are excluded."
-msgstr "Logs login được phù hợp với các thành viên tổ chức hiện tại. Thành viên hoặc thay đổi tên có thể ảnh hưởng đến việc phân bổ lịch sử; Những nỗ lực không liên quan đến một thành viên bị loại trừ."
-
-#: reports/services/audit_data.py
-msgid "Failures without a stable reason code in older versions remain in the failure count but cannot be reliably classified as lockouts or policy denials."
-msgstr "Các thất bại mà không có mã lý do ổn định trong các phiên bản cũ vẫn còn trong số thất bại nhưng không thể được phân loại đáng tin cậy như khóa hoặc từ chối chính sách."
-
-#: reports/services/audit_data.py
-msgid "New-city clues are recalculated from saved city information using the seven days before the period as a baseline. Missing or deleted historical data may cause omissions."
-msgstr "Các dấu hiệu thành phố mới được tính lại từ thông tin thành phố được tiết kiệm bằng cách sử dụng bảy ngày trước thời gian như là một dòng cơ sở. Việc mất hoặc xóa dữ liệu lịch sử có thể gây ra sự thiếu hụt."
-
-#: reports/services/audit_data.py
-msgid "Task-level results differ from account-level results. A task may process multiple accounts; review each account in the execution details."
-msgstr "Kết quả cấp nhiệm vụ khác với kết quả cấp tài khoản. Một nhiệm vụ có thể xử lý nhiều tài khoản; xem xét mỗi tài khoản trong các chi tiết thực hiện."
-
-#: reports/services/audit_data.py
-msgid "Original record links require sign-in and the relevant permissions. Tasks without a detail page retain their full execution ID; deleted records may no longer be available."
-msgstr "Các liên kết bản ghi ban đầu đòi hỏi phải đăng nhập và các giấy phép liên quan. Các nhiệm vụ mà không có một trang chi tiết giữ lại ID thực hiện đầy đủ của họ; Các bản ghi bị xóa có thể không còn có sẵn nữa."
-
-#: reports/services/audit_data.py
-msgid "Report Scope"
-msgstr "Phạm vi báo cáo"
-
-#: reports/services/audit_data.py
 msgid "Unsupported report theme"
 msgstr "Chủ đề báo cáo không được hỗ trợ"
 
@@ -16753,16 +16689,6 @@ msgstr "Chọn các phần báo cáo không trùng lặp"
 #: reports/services/audit_data.py
 msgid "The selected chapters do not belong to this report theme"
 msgstr "Các chương được chọn không thuộc chủ đề báo cáo này"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "The report period or the seven-day baseline for new-city logins predates the %(days)s-day log retention period. Earlier records may have been deleted."
-msgstr "Kỳ báo cáo hoặc bảy ngày cơ sở để xác định đăng nhập từ thành phố mới bắt đầu trước thời hạn lưu nhật ký %(days)s ngày. Bản ghi cũ có thể đã bị xóa."
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "The selected start date predates the %(days)s-day log retention period. Earlier records may have been deleted."
-msgstr "Ngày bắt đầu đã chọn sớm hơn thời hạn lưu nhật ký %(days)s ngày. Bản ghi cũ có thể đã bị xóa."
 
 #: reports/services/audit_data.py
 msgid "Session Count"
@@ -16845,14 +16771,6 @@ msgid "records"
 msgstr "bản ghi"
 
 #: reports/services/audit_data.py
-msgid "Some command stores could not be read. The figures cover available stores only and are not a complete risk total."
-msgstr "Một số cửa hàng lệnh không thể đọc được. Các con số chỉ bao gồm các cửa hàng có sẵn và không phải là tổng rủi ro đầy đủ."
-
-#: reports/services/audit_data.py
-msgid "Command approval tickets were not read: ticket view permission and access to the relevant tickets are required."
-msgstr "Vé phê duyệt lệnh không được đọc: giấy phép xem vé và truy cập vào vé liên quan là cần thiết."
-
-#: reports/services/audit_data.py
 msgid "Command Approval Clues from the Same Session"
 msgstr "Thông tin phê duyệt lệnh trong cùng phiên"
 
@@ -16885,14 +16803,6 @@ msgid "New-City Login Review Clues"
 msgstr "Dấu hiệu đăng nhập từ thành phố mới cần kiểm tra"
 
 #: reports/services/audit_data.py
-msgid "Some requests with insufficient or expired permissions are not written to the operation log; this report cannot prove that no unauthorized attempts occurred."
-msgstr "Một số yêu cầu có quyền không đủ hoặc đã hết hạn không được ghi vào nhật ký thao tác; báo cáo không thể chứng minh không có nỗ lực trái phép."
-
-#: reports/services/audit_data.py
-msgid "Operation logs are read from the current storage configuration. If storage was changed, confirm that historical records were migrated."
-msgstr "Lịch hoạt động được đọc từ cấu hình lưu trữ hiện tại. Nếu lưu trữ đã được thay đổi, xác nhận rằng các hồ sơ lịch sử đã được di chuyển."
-
-#: reports/services/audit_data.py
 msgid "File Operation Types"
 msgstr "Loại thao tác tệp"
 
@@ -16903,10 +16813,6 @@ msgstr "5 đối tượng chịu ảnh hưởng hàng đầu của lỗi thao t�
 #: reports/services/audit_data.py
 msgid "Recent Failed File Operations"
 msgstr "Thao tác tệp thất bại gần đây"
-
-#: reports/services/audit_data.py
-msgid "File operation logs do not contain an error-reason field. Suspected permission or network problems are not presented as confirmed causes."
-msgstr "Các hồ sơ hoạt động tệp không chứa một trường lý do lỗi. Các vấn đề về quyền hoặc mạng bị nghi ngờ không được trình bày như các nguyên nhân được xác nhận."
 
 #: reports/services/audit_data.py
 msgid "Account Task Executions"
@@ -16937,14 +16843,6 @@ msgid "Task Failure or Error Rate"
 msgstr "Tỷ lệ tác vụ thất bại hoặc lỗi"
 
 #: reports/services/audit_data.py
-msgid "Account-level password-change errors and impact were not read: permission to view password-change records is required."
-msgstr "Các lỗi và tác động của việc thay đổi mật khẩu ở cấp tài khoản không được đọc: Giấy phép để xem hồ sơ thay đổi mật khẩu là cần thiết."
-
-#: reports/services/audit_data.py
-msgid "No failed or unverified password-change account records are available for the selected tasks. This cannot establish causes or affected account counts for other tasks."
-msgstr "Không có hồ sơ tài khoản thay đổi mật khẩu thất bại hoặc không được mã hóa có sẵn cho các nhiệm vụ được chọn. Điều này không thể xác định nguyên nhân hoặc tính toán bị ảnh hưởng cho các nhiệm vụ khác."
-
-#: reports/services/audit_data.py
 msgid "Top 5 Password-Change Error Clues"
 msgstr "5 dấu hiệu lỗi đổi mật khẩu hàng đầu"
 
@@ -16953,24 +16851,8 @@ msgid "Password-Change Accounts Requiring Review"
 msgstr "Tài khoản đổi mật khẩu cần kiểm tra"
 
 #: reports/services/audit_data.py
-msgid "Platform user password-change logs are matched by current organization member display names; membership changes can affect historical attribution."
-msgstr "Đăng ký thay đổi mật khẩu người dùng nền tảng được phù hợp với tên hiển thị hiện tại của thành viên tổ chức; Thay đổi thành viên có thể ảnh hưởng đến việc phân bổ lịch sử."
-
-#: reports/services/audit_data.py
 msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
 msgstr "Đăng nhập hạn chế hoặc từ chối chính sách đã được ghi lại. Kiểm tra rằng nguồn, danh tính người dùng và chính sách truy cập được mong đợi."
-
-#: reports/services/audit_data.py
-msgid "Some data was unavailable due to permissions, read failures, or retention limits. Conclusions use available records only; obtain missing data before finalizing them."
-msgstr "Một số dữ liệu không có sẵn do giấy phép, lỗi đọc hoặc giới hạn lưu trữ. Các kết luận chỉ sử dụng các hồ sơ có sẵn; Nhận dữ liệu thiếu trước khi hoàn thành."
-
-#: reports/services/audit_data.py
-msgid "Available records are insufficient for a specific conclusion. Review the report scope and audit details manually."
-msgstr "Các hồ sơ có sẵn không đủ để đưa ra một kết luận cụ thể. Kiểm tra phạm vi báo cáo và chi tiết kiểm toán bằng tay."
-
-#: reports/services/audit_data.py
-msgid "Data could not be read. Check the storage connection and regenerate the report; read failures are not treated as zero records."
-msgstr "Dữ liệu không thể đọc được. Kiểm tra kết nối lưu trữ và tái tạo báo cáo; Những thất bại đọc không được xử lý như các bản ghi không."
 
 #: reports/services/audit_data.py
 msgid "Command Count"
@@ -17029,16 +16911,8 @@ msgid "Currently Enabled Assets"
 msgstr "Tài sản hiện đang bật"
 
 #: reports/services/audit_data.py
-msgid "Currently Connectable Assets"
-msgstr "Tài sản hiện có thể kết nối"
-
-#: reports/services/audit_data.py
 msgid "Current Asset Distribution by Platform"
 msgstr "Phân bố tài sản hiện tại theo nền tảng"
-
-#: reports/services/audit_data.py
-msgid "Current Asset Accounts"
-msgstr "Tài khoản tài sản hiện tại"
 
 #: reports/services/audit_data.py
 msgid "accounts"
@@ -17049,16 +16923,8 @@ msgid "Currently Enabled Accounts"
 msgstr "Tài khoản hiện đang bật"
 
 #: reports/services/audit_data.py
-msgid "Currently Connectable Accounts"
-msgstr "Tài khoản hiện có thể kết nối"
-
-#: reports/services/audit_data.py
 msgid "Asset Account Count Ranking"
 msgstr "Xếp hạng tài sản theo số tài khoản"
-
-#: reports/services/audit_data.py
-msgid "Account-level password-change details could not be read. Task totals remain available; check execution details for the affected scope."
-msgstr "Thông tin thay đổi mật khẩu cấp tài khoản không thể được đọc. Tổng số nhiệm vụ vẫn có sẵn; Kiểm tra chi tiết thực hiện cho phạm vi bị ảnh hưởng."
 
 #: reports/services/audit_data.py
 msgid "Assets with Password Changes Requiring Review"
@@ -17073,14 +16939,6 @@ msgid "Asset deleted"
 msgstr "Tài sản đã bị xóa"
 
 #: reports/services/audit_data.py
-msgid "Later success recorded; review required"
-msgstr "Có bản ghi thành công sau đó; cần kiểm tra"
-
-#: reports/services/audit_data.py
-msgid "No later success found; manual review required"
-msgstr "Không tìm thấy bản ghi thành công sau đó; cần kiểm tra thủ công"
-
-#: reports/services/audit_data.py
 msgid "Platform User Password Changes"
 msgstr "Lượt đổi mật khẩu người dùng nền tảng"
 
@@ -17090,27 +16948,8 @@ msgstr "Lượt đổi mật khẩu người dùng nền tảng gần đây"
 
 #: reports/services/audit_data.py
 #, python-format
-msgid "%(sessions)s asset sessions were recorded during the period, involving %(users)s users and %(assets)s assets."
-msgstr "Trong kỳ có %(sessions)s phiên truy cập tài sản, liên quan đến %(users)s người dùng và %(assets)s tài sản."
-
-#: reports/services/audit_data.py
-msgid "Asset sessions are concentrated on one platform user. Verify whether this is a test scenario and whether production actions can be traced to individuals; one recorded user does not prove a shared account."
-msgstr "Các phiên truy cập tài sản tập trung vào một người dùng nền tảng. Hãy xác minh đây có phải môi trường thử nghiệm và thao tác sản xuất có truy vết được đến từng cá nhân hay không; chỉ có một người dùng trong bản ghi không chứng minh tài khoản dùng chung."
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s platform login records use loopback source addresses. Check local access or the proxy chain; this alone does not establish an incorrect client IP."
-msgstr "Có %(count)s bản ghi đăng nhập nền tảng sử dụng địa chỉ nguồn loopback. Kiểm tra truy cập cục bộ hoặc chuỗi proxy; chỉ riêng điều này không chứng minh IP máy khách được ghi sai."
-
-#: reports/services/audit_data.py
-#, python-format
 msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
 msgstr "Có %(count)s lệnh bị cảnh báo hoặc từ chối. Kiểm tra mục đích và căn cứ phê duyệt trong ngữ cảnh của phiên."
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s new-city login clues were found. Check travel, proxies, or changes in city identification; a city change alone does not establish an attack."
-msgstr "Tìm thấy %(count)s dấu hiệu đăng nhập từ thành phố mới. Kiểm tra việc đi công tác, proxy hoặc thay đổi nhận diện thành phố; chỉ đổi thành phố không chứng minh có tấn công."
 
 #: reports/services/audit_data.py
 #, python-format
@@ -17119,17 +16958,8 @@ msgstr "Lịch hoạt động chứa %(count)s từ chối chính sách. Kiểm 
 
 #: reports/services/audit_data.py
 #, python-format
-msgid "%(failed)s / %(total)s account task executions failed or errored (%(rate)s%%). Prioritize the password-change account review list. Accounts without a later success need manual review; check original execution logs for other task causes."
-msgstr "Có %(failed)s / %(total)s lượt thực thi tác vụ tài khoản thất bại hoặc gặp lỗi (%(rate)s%%). Ưu tiên danh sách tài khoản đổi mật khẩu cần kiểm tra. Tài khoản không có lần thành công sau đó cần kiểm tra thủ công; xem nhật ký thực thi gốc để tìm nguyên nhân của các tác vụ khác."
-
-#: reports/services/audit_data.py
-#, python-format
 msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
 msgstr "%(count)s thay đổi mật khẩu người dùng nền tảng đã được ghi lại. Kiểm tra các nhà khai thác và thay đổi lý luận khi cần thiết."
-
-#: reports/services/audit_data.py
-msgid "You do not have permission to view this data, so it was not queried for this report."
-msgstr "Bạn không được phép xem dữ liệu này, vì vậy nó không được yêu cầu cho báo cáo này."
 
 #: reports/services/audit_data.py
 msgid "Recording Status"
@@ -17166,10 +16996,6 @@ msgstr "Nguyên nhân kết nối thất bại"
 #: reports/services/audit_data.py
 msgid "Original Session"
 msgstr "Phiên gốc"
-
-#: reports/services/audit_data.py
-msgid "Approval clues could not be read. Command outcomes remain available; review the approval basis on the ticket page."
-msgstr "Các dấu hiệu phê duyệt không thể đọc được. Kết quả lệnh vẫn có sẵn; xem xét cơ sở phê duyệt trên trang vé."
 
 #: reports/services/audit_data.py
 msgid "No reviewer recorded"
@@ -17248,31 +17074,8 @@ msgid "Error Clue"
 msgstr "Dấu hiệu lỗi"
 
 #: reports/services/audit_data.py
-msgid "Follow-up Record"
-msgstr "Bản ghi tiếp theo"
-
-#: reports/services/audit_data.py
 msgid "Execution Record"
 msgstr "Bản ghi thực thi"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(failed)s / %(total)s file operations failed (%(rate)s%%). Prioritize affected assets, accounts, and paths; the log does not record a specific cause, so check session and component logs."
-msgstr "Có %(failed)s / %(total)s thao tác tệp thất bại (%(rate)s%%). Ưu tiên kiểm tra tài sản, tài khoản và đường dẫn bị ảnh hưởng; nhật ký không ghi nguyên nhân cụ thể, hãy kiểm tra nhật ký phiên và thành phần."
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s asset connections failed. Check network, credentials, and access conditions using connection failure reasons and original sessions; unsupported recording is not a connection failure."
-msgstr "Có %(count)s kết nối đến tài sản thất bại. Kiểm tra mạng, thông tin xác thực và điều kiện truy cập qua nguyên nhân lỗi và phiên gốc; không hỗ trợ ghi hình không phải là lỗi kết nối."
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage to avoid gaps in audit evidence."
-msgstr "Cần kiểm tra bản ghi của %(count)s phiên đã kết thúc thành công. Kiểm tra việc tạo, tải lên và lưu trữ bản ghi để tránh thiếu bằng chứng kiểm toán."
-
-#: reports/services/audit_data.py
-msgid "Data unavailable due to missing permissions or read errors is not displayed as zero. See the report coverage information."
-msgstr "Dữ liệu không sẵn dùng do thiếu giấy phép hoặc lỗi đọc không hiển thị như không. Xem thông tin báo cáo bao gồm."
 
 #: reports/services/audit_data.py
 msgid "Asset deleted or platform not recorded"
@@ -17297,42 +17100,6 @@ msgstr "Số tài khoản"
 #: reports/services/audit_data.py
 msgid "Operator"
 msgstr "Người thao tác"
-
-#: reports/services/audit_data.py
-msgid "The period includes the full start and end dates; today's data is counted through report generation time."
-msgstr "Thời gian bao gồm các ngày bắt đầu và kết thúc đầy đủ; Dữ liệu ngày hôm nay được tính toán thông qua báo cáo thời gian sinh."
-
-#: reports/services/audit_data.py
-msgid "Log totals are counted by storage; details show up to the latest 20 records and rankings up to the top 10 items."
-msgstr "Tổng số hồ sơ được tính theo lưu trữ; chi tiết hiển thị lên đến 20 hồ sơ mới nhất và xếp hạng lên đến 10 mục hàng đầu."
-
-#: reports/services/audit_data.py
-msgid "Report Information"
-msgstr "Thông tin báo cáo"
-
-#: reports/services/audit_data.py
-msgid "View permission unavailable"
-msgstr "Không có quyền xem"
-
-#: reports/services/audit_data.py
-msgid "Data incomplete or could not be read"
-msgstr "Dữ liệu không đầy đủ hoặc không thể đọc"
-
-#: reports/services/audit_data.py
-msgid "Item"
-msgstr "Mục"
-
-#: reports/services/audit_data.py
-msgid "Report Period"
-msgstr "Kỳ báo cáo"
-
-#: reports/services/audit_data.py
-msgid "Reporting Time Zone"
-msgstr "Múi giờ báo cáo"
-
-#: reports/services/audit_data.py
-msgid "Generation Time"
-msgstr "Thời gian tạo"
 
 #: reports/services/evidence.py
 msgid "Recording marked present"
@@ -17405,11 +17172,6 @@ msgstr "Chưa ghi nguyên nhân lỗi"
 #: reports/services/evidence.py
 msgid "Other error (review the original record)"
 msgstr "Lỗi khác (xem bản ghi gốc)"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(source)s: %(message)s"
-msgstr "%(source)s: %(message)s"
 
 msgid ""
 "1-100; lower values have higher priority.\n"
@@ -17693,3 +17455,347 @@ msgstr "Giám sát khuôn mặt liên tục"
 msgctxt "Asset connection ACL"
 msgid "Push account"
 msgstr "Cấp phát tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Account Health"
+msgstr "Tình trạng tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "Tác vụ tài khoản cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "Tài sản có rủi ro đang chờ xử lý"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "Đang chờ xem xét"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "Thông tin xác thực đề xuất đã được xác minh"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "Kiểm tra điều kiện kết nối và phiên gốc trước khi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "Kiểm tra việc tạo, tải lên và lưu trữ bản ghi hình của phiên gốc."
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "Quyết định xử lý lệnh cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "Đối chiếu thay đổi được phát hiện với quyền truy cập đã phê duyệt và xác nhận kết quả xử lý."
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "Xác nhận thông tin xác thực mới đã được đồng bộ và có thể truy cập."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "Xác nhận thay đổi vị trí có phù hợp với việc đi công tác, sử dụng proxy hoặc truy cập dự kiến hay không."
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "Bản ghi rủi ro đã xác nhận"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "Lần kết nối thất bại cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "Xác minh thông tin xác thực thất bại"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "Đang xác minh thông tin xác thực"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "Chi tiết rủi ro tài khoản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "Rủi ro tài khoản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "Bản ghi rủi ro hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "Lần đăng nhập thất bại cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "Thao tác tệp cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "Tiến độ xử lý"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "Bản ghi rủi ro đã bỏ qua"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "Vấn đề"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "Lần đổi mật khẩu sau đó đã thành công"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "Lần đăng nhập từ thành phố mới cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "Bước tiếp theo"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "Hiện không có bản ghi rủi ro tài khoản nào."
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "Bản ghi gốc"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "Bản ghi rủi ro đang chờ xử lý"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "Rủi ro đang chờ xử lý theo loại"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "Thao tác bị chính sách từ chối cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "Bản ghi hình cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "Danh sách kiểm tra khắc phục"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "Xem xét và đồng bộ thông tin xác thực đề xuất đã được xác minh; chỉ xác minh thành công chưa đủ để xác nhận đã khôi phục."
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "Xem xét mục đích của lệnh, quy tắc khớp và lịch sử phê duyệt trong phiên gốc."
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "Xem xét thao tác bị từ chối và xác nhận chính sách truy cập đúng như dự kiến."
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "Xem xét nhật ký thực thi và các đối tượng bị ảnh hưởng, khắc phục nguyên nhân rồi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "Xem xét đường dẫn tệp, quyền truy cập và phiên gốc trước khi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "Xem xét kết quả xác minh và bản ghi thực thi gốc trước khi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "Xem xét lý do bỏ qua lần thất bại này có còn phù hợp hay không."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "Xem xét lý do bỏ qua rủi ro này có còn phù hợp hay không."
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "Số lượng rủi ro"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "Thời gian cập nhật"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "Thời gian xác minh"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "Xác minh thông tin xác thực đề xuất và chỉ đồng bộ sau khi xác nhận có thể truy cập."
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "Xác minh nguồn đăng nhập và danh tính tài khoản, sau đó xem xét nhật ký xác thực."
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "Đợi quá trình xác minh hoàn tất trước khi quyết định có đồng bộ thông tin xác thực hay không."
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "Đọc được"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "ID bản ghi"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "Căn cứ"
+
+msgid "%(count)s account task executions were canceled."
+msgstr "Đã hủy %(count)s lượt thực thi tác vụ tài khoản."
+
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "Cần kiểm tra bản ghi của %(count)s phiên đã hoàn tất thành công. Hãy kiểm tra việc tạo, tải lên và lưu trữ bản ghi."
+
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "Cần xác minh danh tính người dùng và vị trí truy cập của %(count)s bản ghi đăng nhập từ thành phố mới."
+
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s bản ghi đăng nhập nền tảng sử dụng địa chỉ nguồn loopback. Hãy xác nhận đó là truy cập cục bộ hay yêu cầu được proxy chuyển tiếp."
+
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "Có %(count)s lượt đăng nhập nền tảng thất bại. Hãy kiểm tra người dùng liên quan, địa chỉ nguồn và lý do đã ghi nhận."
+
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "%(failed)s trên %(total)s thao tác tệp đã thất bại (%(rate)s%%). Hãy kiểm tra tài sản, tài khoản, đường dẫn tệp liên quan và các phiên gốc."
+
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "Đã ghi nhận %(sessions)s phiên tài sản: %(success)s kết nối thành công và %(failed)s kết nối thất bại, liên quan đến %(users)s người dùng và %(assets)s tài sản."
+
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "Đã thực thi %(total)s tác vụ tài khoản: %(success)s thành công, %(failed)s thất bại hoặc gặp lỗi và %(pending)s vẫn chưa hoàn tất."
+
+msgid "Account Risks to Review"
+msgstr "Rủi ro tài khoản cần xem xét"
+
+msgid "Accounts Identified in Pending Risks"
+msgstr "Tài khoản liên quan đến rủi ro đang chờ xử lý"
+
+msgid "Affected Accounts"
+msgstr "Tài khoản bị ảnh hưởng"
+
+msgid "Affected Assets"
+msgstr "Tài sản bị ảnh hưởng"
+
+msgid "Assets with Latest Check Successful"
+msgstr "Tài sản có lần kiểm tra gần nhất thành công"
+
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "Thiết lập thông tin xác thực riêng cho từng tài khoản bị ảnh hưởng, đồng bộ các dịch vụ phụ thuộc và xác minh quyền truy cập."
+
+msgid "Check Result"
+msgstr "Kết quả kiểm tra"
+
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "Đối chiếu các khóa được phép với các khóa đã phê duyệt và xóa khóa chưa được phê duyệt."
+
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "Đối chiếu thay đổi thành viên nhóm với quyền truy cập đã phê duyệt và thu hồi các đặc quyền chưa được phê duyệt."
+
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "Đối chiếu thay đổi quyền sudo với quyền truy cập đã phê duyệt và thu hồi các đặc quyền chưa được phê duyệt."
+
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "Xác nhận chủ sở hữu và mục đích của tài khoản, sau đó đưa tài khoản đã phê duyệt vào quản lý hoặc vô hiệu hóa tài khoản không được phép."
+
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "Xác nhận việc xóa đã được phê duyệt hay chưa, sau đó đối soát danh sách tài khoản được quản lý."
+
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "Xác nhận tài khoản còn cần thiết hay không, sau đó vô hiệu hóa tài khoản không sử dụng sau khi được phê duyệt."
+
+msgid "Current Managed Accounts"
+msgstr "Tài khoản hiện được quản lý"
+
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "Hiện có %(pending)s bản ghi rủi ro tài khoản đang chờ xử lý, liên quan đến %(accounts)s tài khoản riêng biệt trên %(assets)s tài sản. Hãy xem xét các tài khoản bị ảnh hưởng theo loại rủi ro."
+
+msgid "Latest Check Failed"
+msgstr "Lần kiểm tra gần nhất thất bại"
+
+msgid "Latest Check Successful"
+msgstr "Lần kiểm tra gần nhất thành công"
+
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "Tài khoản được quản lý có lần kiểm tra gần nhất thành công"
+
+msgid "Most Recent Stored Check"
+msgstr "Lần kiểm tra được ghi nhận gần nhất"
+
+msgid "No Check Result"
+msgstr "Chưa có kết quả kiểm tra"
+
+msgid "No listed security events were found in the available records for this period."
+msgstr "Không tìm thấy các sự kiện bảo mật đã liệt kê trong những bản ghi hiện có của kỳ này."
+
+msgid "Not Applicable"
+msgstr "Không áp dụng"
+
+msgid "Password Changes with Subsequent Progress"
+msgstr "Thay đổi mật khẩu đã có tiến triển tiếp theo"
+
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "Gia hạn thông tin xác thực đã hết hạn và kiểm tra các tác vụ phụ thuộc cũng như quyền truy cập tài khoản."
+
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "Thay mật khẩu yếu bằng một mật khẩu mạnh và riêng biệt, sau đó xác minh quyền truy cập tài khoản."
+
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "Kiểm tra các kết nối thất bại dựa trên tài sản, tài khoản liên quan và lý do đã ghi nhận."
+
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "Kiểm tra nhật ký tác vụ thất bại và các tài khoản bị ảnh hưởng; ưu tiên các mục chưa giải quyết trước những bản ghi đã có tiến triển tiếp theo."
+
+msgid "Review risks"
+msgstr "Xem xét rủi ro"
+
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "Xem xét phát hiện đã được xác nhận và kiểm tra trạng thái hiện tại của tài khoản."
+
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "Tài khoản có rủi ro khớp với tài khoản được quản lý"
+
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "Tài khoản có rủi ro không khớp với tài khoản được quản lý"
+
+msgid "Risk List"
+msgstr "Danh sách rủi ro"
+
+msgid "Risk Records"
+msgstr "Bản ghi rủi ro"
+
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "Thay đổi thông tin xác thực theo chính sách luân phiên và xác minh các dịch vụ phụ thuộc."
+
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "Thay đổi thông tin xác thực có thể đã bị lộ, xem xét các lượt truy cập gần đây và xác minh dịch vụ phụ thuộc."
+
+msgid "Stored Asset Connectivity Results"
+msgstr "Kết quả kiểm tra kết nối tài sản đã lưu"
+
+msgid "Stored Managed Account Connectivity Results"
+msgstr "Kết quả kiểm tra kết nối tài khoản được quản lý đã lưu"
+
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "Hiện có %(total)s tài sản, trong đó %(active)s tài sản được bật."
+
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "Hiện có %(total)s bản ghi tài khoản được quản lý, trong đó %(active)s được bật."
+
+msgid "There are currently no pending account risk records."
+msgstr "Hiện không có bản ghi rủi ro tài khoản nào đang chờ xử lý."

@@ -13,6 +13,7 @@ from assets.models import Asset
 from assets.utils import get_node_from_request, is_query_node_all_assets
 from common.utils.http import is_true
 from common.drf.filters import BaseFilterSet
+from common.const.choices import ConfirmOrIgnore
 from common.utils import get_logger
 from common.utils.timezone import local_zero_hour, local_now
 from .const.automation import (
@@ -99,6 +100,14 @@ class CheckAccountAutomationFilterSet(BaseFilterSet):
 
 
 class AccountRiskFilterSet(BaseFilterSet):
+    status = drf_filters.ChoiceFilter(choices=ConfirmOrIgnore.choices, method='filter_status')
+
+    @staticmethod
+    def filter_status(queryset, name, value):
+        if value == ConfirmOrIgnore.pending:
+            return queryset.filter(Q(status=value) | Q(status=''))
+        return queryset.filter(status=value)
+
     asset_id = drf_filters.UUIDFilter(
         field_name="asset__id", label=_("Asset ID")
     )

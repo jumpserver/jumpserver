@@ -16089,10 +16089,6 @@ msgid "Management Summary and Recommendations"
 msgstr "管理摘要與建議"
 
 #: reports/audit_contract.py
-msgid "Data Definitions and Limitations"
-msgstr "數據口徑與局限性"
-
-#: reports/audit_contract.py
 msgid "Key Overview"
 msgstr "關鍵概況"
 
@@ -16149,14 +16145,6 @@ msgid "You do not have permission to view data for this report theme."
 msgstr "當前用戶無權查看這個報告主題的數據。"
 
 #: reports/api/audit.py
-msgid "Select an organization before saving a template. The all-organizations view supports previews only."
-msgstr "請選擇具體組織後保存模板。全部組織視圖僅支持預覽。"
-
-#: reports/api/audit.py
-msgid "You do not have permission to save a template for this report theme."
-msgstr "當前用戶無權保存這個主題的模板。"
-
-#: reports/api/audit.py
 msgid "The end date cannot be earlier than the start date."
 msgstr "結束日期不能早於開始日期。"
 
@@ -16175,22 +16163,6 @@ msgstr "章節重復或不屬於所選報告主題。"
 #: reports/api/audit.py
 msgid "Select at least one chapter containing statistical data."
 msgstr "請至少選擇一個包含統計數據的章節。"
-
-#: reports/api/audit.py
-msgid "The report theme of a template cannot be changed. Save a new template instead."
-msgstr "不能更改模板的報告主題，請另存為新模板。"
-
-#: reports/api/audit.py
-msgid "The template configuration must be an object."
-msgstr "模板配置必須是一個對象。"
-
-#: reports/api/audit.py
-msgid "The template theme does not match its configuration."
-msgstr "模板主題與配置不一致。"
-
-#: reports/api/audit.py
-msgid "A template with this name already exists in the current organization. Choose another name."
-msgstr "當前組織中已有同名模板，請使用其他名稱。"
 
 #: reports/services/audit_data.py
 msgid "Asset Sessions"
@@ -16253,42 +16225,6 @@ msgid "Approval-Canceled Commands"
 msgstr "取消審批命令"
 
 #: reports/services/audit_data.py
-msgid "Alerts, rule blocks, and approval rejections require review; a command name or numeric level alone does not establish an attack. Ordinary queries can also be rejected by policy."
-msgstr "告警、規則阻斷和審批拒絕屬於需核查的處置記錄，不依據命令名稱或級別數字直接判定攻擊；普通查詢命令也可能被策略拒絕。"
-
-#: reports/services/audit_data.py
-msgid "Command retention follows the session log cleanup settings; external storage may have its own retention policy."
-msgstr "命令留存天數引用會話日誌清理設置；外部存儲還可能有獨立的清理策略。"
-
-#: reports/services/audit_data.py
-msgid "Command logs do not store a unique approval ticket ID. \"Command Approval Clues from the Same Session\" lists tickets created during the period for sampled sessions that the current user can view. Match commands and times to verify the relationship."
-msgstr "命令日誌未保存唯一審批單 ID；“同會話命令審批線索”僅列出樣本會話中、本週期創建且當前用戶可見的審批工單，須結合命令和時間復核對應關係。"
-
-#: reports/services/audit_data.py
-msgid "Login logs are matched to current organization members. Membership or name changes can affect historical attribution; attempts not associated with a member are excluded."
-msgstr "登錄日誌按當前組織成員匹配，成員調入、調出或改名可能影響歷史歸屬；未歸屬任何成員的嘗試不在此組織報告中。"
-
-#: reports/services/audit_data.py
-msgid "Failures without a stable reason code in older versions remain in the failure count but cannot be reliably classified as lockouts or policy denials."
-msgstr "舊版本沒有穩定原因編碼的失敗記錄仍計入失敗總數，但無法可靠歸為鎖定或策略拒絕。"
-
-#: reports/services/audit_data.py
-msgid "New-city clues are recalculated from saved city information using the seven days before the period as a baseline. Missing or deleted historical data may cause omissions."
-msgstr "新城市線索使用已保存的城市信息重新計算，需額外讀取週期開始前 7 天作為基線；歷史城市缺失或基線已清理時可能漏記。"
-
-#: reports/services/audit_data.py
-msgid "Task-level results differ from account-level results. A task may process multiple accounts; review each account in the execution details."
-msgstr "任務級結果與帳號級結果不同；一個任務可能處理多個帳號，請在任務執行詳情中復核各帳號結果。"
-
-#: reports/services/audit_data.py
-msgid "Original record links require sign-in and the relevant permissions. Tasks without a detail page retain their full execution ID; deleted records may no longer be available."
-msgstr "原始記錄鏈接需登錄並具備對應查看權限；無獨立詳情頁的任務保留完整執行記錄 ID，已清理的記錄可能無法再打開。"
-
-#: reports/services/audit_data.py
-msgid "Report Scope"
-msgstr "報告範圍"
-
-#: reports/services/audit_data.py
 msgid "Unsupported report theme"
 msgstr "不支持的報告主題"
 
@@ -16311,16 +16247,6 @@ msgstr "請選擇報告章節，且不要重復選擇"
 #: reports/services/audit_data.py
 msgid "The selected chapters do not belong to this report theme"
 msgstr "所選章節不屬於當前報告主題"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "The report period or the seven-day baseline for new-city logins predates the %(days)s-day log retention period. Earlier records may have been deleted."
-msgstr "報告日期或新城市登錄所需的前 7 天基線早於當前 %(days)s 天的日誌留存範圍，早期記錄可能已清理。"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "The selected start date predates the %(days)s-day log retention period. Earlier records may have been deleted."
-msgstr "所選開始日期早於當前 %(days)s 天的日誌留存範圍，早期記錄可能已清理。"
 
 #: reports/services/audit_data.py
 msgid "Session Count"
@@ -16403,14 +16329,6 @@ msgid "records"
 msgstr "條"
 
 #: reports/services/audit_data.py
-msgid "Some command stores could not be read. The figures cover available stores only and are not a complete risk total."
-msgstr "部分命令存儲讀取失敗，所示數字僅為可用存儲小計，不能作為完整風險總數。"
-
-#: reports/services/audit_data.py
-msgid "Command approval tickets were not read: ticket view permission and access to the relevant tickets are required."
-msgstr "未讀取命令審批工單：需要工單查看權限及對應工單的可見範圍。"
-
-#: reports/services/audit_data.py
 msgid "Command Approval Clues from the Same Session"
 msgstr "同會話命令審批線索"
 
@@ -16443,14 +16361,6 @@ msgid "New-City Login Review Clues"
 msgstr "新城市登錄復核線索"
 
 #: reports/services/audit_data.py
-msgid "Some requests with insufficient or expired permissions are not written to the operation log; this report cannot prove that no unauthorized attempts occurred."
-msgstr "部分權限不足或授權過期的請求未寫入操作日誌，報告不能據此證明沒有發生越權嘗試。"
-
-#: reports/services/audit_data.py
-msgid "Operation logs are read from the current storage configuration. If storage was changed, confirm that historical records were migrated."
-msgstr "操作日誌按當前配置的存儲讀取；切換過存儲時，請確認舊存儲中的歷史數據已遷移。"
-
-#: reports/services/audit_data.py
 msgid "File Operation Types"
 msgstr "文件操作類型"
 
@@ -16461,10 +16371,6 @@ msgstr "文件失敗影響範圍 Top 5"
 #: reports/services/audit_data.py
 msgid "Recent Failed File Operations"
 msgstr "最近失敗的文件操作"
-
-#: reports/services/audit_data.py
-msgid "File operation logs do not contain an error-reason field. Suspected permission or network problems are not presented as confirmed causes."
-msgstr "文件操作日誌沒有錯誤原因字段，不將權限不足、網絡故障等推測寫成已確認的原因。"
 
 #: reports/services/audit_data.py
 msgid "Account Task Executions"
@@ -16495,14 +16401,6 @@ msgid "Task Failure or Error Rate"
 msgstr "任務失敗或錯誤佔比"
 
 #: reports/services/audit_data.py
-msgid "Account-level password-change errors and impact were not read: permission to view password-change records is required."
-msgstr "未讀取改密帳號級錯誤與影響範圍：需要改密記錄查看權限。"
-
-#: reports/services/audit_data.py
-msgid "No failed or unverified password-change account records are available for the selected tasks. This cannot establish causes or affected account counts for other tasks."
-msgstr "所選任務下沒有可用的失敗或未驗證改密帳號記錄；無法據此推斷其他任務的失敗原因或影響帳號數。"
-
-#: reports/services/audit_data.py
 msgid "Top 5 Password-Change Error Clues"
 msgstr "改密錯誤線索 Top 5"
 
@@ -16511,24 +16409,8 @@ msgid "Password-Change Accounts Requiring Review"
 msgstr "改密帳號待核查清單"
 
 #: reports/services/audit_data.py
-msgid "Platform user password-change logs are matched by current organization member display names; membership changes can affect historical attribution."
-msgstr "平台用戶改密日誌按當前組織成員顯示名稱匹配，成員變更可能影響歷史歸屬。"
-
-#: reports/services/audit_data.py
 msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
 msgstr "存在登錄受限或策略拒絕記錄，建議核對訪問來源、用戶身份和訪問策略是否符合預期。"
-
-#: reports/services/audit_data.py
-msgid "Some data was unavailable due to permissions, read failures, or retention limits. Conclusions use available records only; obtain missing data before finalizing them."
-msgstr "部分數據缺少權限、讀取失敗或可能超出留存期，結論僅依據已取得的記錄；請補齊數據後再確認最終結論。"
-
-#: reports/services/audit_data.py
-msgid "Available records are insufficient for a specific conclusion. Review the report scope and audit details manually."
-msgstr "當前可用記錄尚不足以形成具體結論，請結合報告中的數據範圍和審計明細人工復核。"
-
-#: reports/services/audit_data.py
-msgid "Data could not be read. Check the storage connection and regenerate the report; read failures are not treated as zero records."
-msgstr "數據讀取失敗，請檢查存儲連接後重新生成；本報告不會把讀取失敗當作零條記錄。"
 
 #: reports/services/audit_data.py
 msgid "Command Count"
@@ -16587,16 +16469,8 @@ msgid "Currently Enabled Assets"
 msgstr "當前啓用資產"
 
 #: reports/services/audit_data.py
-msgid "Currently Connectable Assets"
-msgstr "當前可連接資產"
-
-#: reports/services/audit_data.py
 msgid "Current Asset Distribution by Platform"
 msgstr "當前平台資產分布"
-
-#: reports/services/audit_data.py
-msgid "Current Asset Accounts"
-msgstr "當前資產帳號"
 
 #: reports/services/audit_data.py
 msgid "accounts"
@@ -16607,16 +16481,8 @@ msgid "Currently Enabled Accounts"
 msgstr "當前啓用帳號"
 
 #: reports/services/audit_data.py
-msgid "Currently Connectable Accounts"
-msgstr "當前可連接帳號"
-
-#: reports/services/audit_data.py
 msgid "Asset Account Count Ranking"
 msgstr "資產帳號數量排行"
-
-#: reports/services/audit_data.py
-msgid "Account-level password-change details could not be read. Task totals remain available; check execution details for the affected scope."
-msgstr "改密帳號級明細讀取失敗；任務匯總仍可查看，請在執行詳情中復核影響範圍。"
 
 #: reports/services/audit_data.py
 msgid "Assets with Password Changes Requiring Review"
@@ -16631,14 +16497,6 @@ msgid "Asset deleted"
 msgstr "資產已刪除"
 
 #: reports/services/audit_data.py
-msgid "Later success recorded; review required"
-msgstr "有後續成功記錄，需復核"
-
-#: reports/services/audit_data.py
-msgid "No later success found; manual review required"
-msgstr "未發現後續成功，需人工核查"
-
-#: reports/services/audit_data.py
 msgid "Platform User Password Changes"
 msgstr "平台用戶改密次數"
 
@@ -16648,27 +16506,8 @@ msgstr "最近平台用戶密碼變更"
 
 #: reports/services/audit_data.py
 #, python-format
-msgid "%(sessions)s asset sessions were recorded during the period, involving %(users)s users and %(assets)s assets."
-msgstr "本週期共記錄 %(sessions)s 次資產會話，涉及 %(users)s 名用戶和 %(assets)s 台資產。"
-
-#: reports/services/audit_data.py
-msgid "Asset sessions are concentrated on one platform user. Verify whether this is a test scenario and whether production actions can be traced to individuals; one recorded user does not prove a shared account."
-msgstr "資產會話集中於一個平台用戶。請覈實是否為測試場景，並確認生產操作能追溯到實際人員；單一用戶記錄不能直接證明存在共享帳號。"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s platform login records use loopback source addresses. Check local access or the proxy chain; this alone does not establish an incorrect client IP."
-msgstr "有 %(count)s 條平台登錄記錄使用回環來源地址。請覈實本機訪問或代理轉發鏈路，不能僅據此確認客戶端 IP 記錄錯誤。"
-
-#: reports/services/audit_data.py
-#, python-format
 msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
 msgstr "記錄到 %(count)s 條告警或被拒絕的命令，請結合會話上下文復核命令用途與審批依據。"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s new-city login clues were found. Check travel, proxies, or changes in city identification; a city change alone does not establish an attack."
-msgstr "發現 %(count)s 條新城市登錄線索，請核對出差、代理網絡或城市識別變化，不能僅憑城市變化判定攻擊。"
 
 #: reports/services/audit_data.py
 #, python-format
@@ -16677,17 +16516,8 @@ msgstr "操作日誌包含 %(count)s 條策略拒絕記錄，請在審計明細�
 
 #: reports/services/audit_data.py
 #, python-format
-msgid "%(failed)s / %(total)s account task executions failed or errored (%(rate)s%%). Prioritize the password-change account review list. Accounts without a later success need manual review; check original execution logs for other task causes."
-msgstr "帳號任務失敗或錯誤 %(failed)s / %(total)s 次（%(rate)s%%）。優先檢查改密帳號待核查清單；沒有後續成功記錄的帳號需要人工核查，其他任務原因請查看原始執行日誌。"
-
-#: reports/services/audit_data.py
-#, python-format
 msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
 msgstr "本週期記錄 %(count)s 次平台用戶密碼變更，請按需核對操作人與變更依據。"
-
-#: reports/services/audit_data.py
-msgid "You do not have permission to view this data, so it was not queried for this report."
-msgstr "沒有此數據的查看權限，本報告未查詢該數據。"
 
 #: reports/services/audit_data.py
 msgid "Recording Status"
@@ -16724,10 +16554,6 @@ msgstr "連接失敗原因"
 #: reports/services/audit_data.py
 msgid "Original Session"
 msgstr "原始會話"
-
-#: reports/services/audit_data.py
-msgid "Approval clues could not be read. Command outcomes remain available; review the approval basis on the ticket page."
-msgstr "審批線索讀取失敗；命令處理結果仍可查看，請在工單頁面復核審批依據。"
 
 #: reports/services/audit_data.py
 msgid "No reviewer recorded"
@@ -16806,31 +16632,8 @@ msgid "Error Clue"
 msgstr "錯誤線索"
 
 #: reports/services/audit_data.py
-msgid "Follow-up Record"
-msgstr "後續記錄"
-
-#: reports/services/audit_data.py
 msgid "Execution Record"
 msgstr "執行記錄"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(failed)s / %(total)s file operations failed (%(rate)s%%). Prioritize affected assets, accounts, and paths; the log does not record a specific cause, so check session and component logs."
-msgstr "文件操作失敗 %(failed)s / %(total)s 次（%(rate)s%%）。優先核查失敗集中的資產、帳號與文件路徑；日誌未保存具體原因，請結合會話和組件日誌處理。"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s asset connections failed. Check network, credentials, and access conditions using connection failure reasons and original sessions; unsupported recording is not a connection failure."
-msgstr "有 %(count)s 次資產連接失敗。請從連接失敗原因和原始會話核查網絡、憑據與訪問條件；錄影不支持不計為連接失敗。"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage to avoid gaps in audit evidence."
-msgstr "有 %(count)s 次已結束且連接成功的會話需要核查錄影記錄。請確認錄影生成、上傳與存儲情況，避免審計追溯材料缺失。"
-
-#: reports/services/audit_data.py
-msgid "Data unavailable due to missing permissions or read errors is not displayed as zero. See the report coverage information."
-msgstr "缺少權限或讀取失敗的數據不會顯示為 0；請查看報告的數據覆蓋說明。"
 
 #: reports/services/audit_data.py
 msgid "Asset deleted or platform not recorded"
@@ -16855,42 +16658,6 @@ msgstr "帳號數"
 #: reports/services/audit_data.py
 msgid "Operator"
 msgstr "操作人"
-
-#: reports/services/audit_data.py
-msgid "The period includes the full start and end dates; today's data is counted through report generation time."
-msgstr "週期包含開始和結束日期的全天；當前日的數據統計到生成時。"
-
-#: reports/services/audit_data.py
-msgid "Log totals are counted by storage; details show up to the latest 20 records and rankings up to the top 10 items."
-msgstr "日誌總量由存儲端統計；明細最多展示最近 20 條，排行最多展示前 10 項。"
-
-#: reports/services/audit_data.py
-msgid "Report Information"
-msgstr "報告信息"
-
-#: reports/services/audit_data.py
-msgid "View permission unavailable"
-msgstr "沒有查看權限"
-
-#: reports/services/audit_data.py
-msgid "Data incomplete or could not be read"
-msgstr "數據不完整或讀取失敗"
-
-#: reports/services/audit_data.py
-msgid "Item"
-msgstr "項目"
-
-#: reports/services/audit_data.py
-msgid "Report Period"
-msgstr "報告週期"
-
-#: reports/services/audit_data.py
-msgid "Reporting Time Zone"
-msgstr "統計時區"
-
-#: reports/services/audit_data.py
-msgid "Generation Time"
-msgstr "生成時間"
 
 #: reports/services/evidence.py
 msgid "Recording marked present"
@@ -16963,11 +16730,6 @@ msgstr "未記錄錯誤原因"
 #: reports/services/evidence.py
 msgid "Other error (review the original record)"
 msgstr "其他錯誤（需查看原始記錄）"
-
-#: reports/services/audit_data.py
-#, python-format
-msgid "%(source)s: %(message)s"
-msgstr "%(source)s：%(message)s"
 
 #: acls/serializers/login_asset_acl.py
 msgid "Only matching rules at the highest priority are applied. Any rejection at that priority denies access; otherwise their enabled controls are combined."
@@ -17275,3 +17037,406 @@ msgid ""
 "throughout the session. Requires system face recognition and an enrolled "
 "face."
 msgstr "僅支援 Web 終端，連線前驗證人臉，工作階段期間持續監測；需啟用人臉辨識並完成人臉登錄。"
+
+#: reports/audit_contract.py reports/services/audit_data.py
+msgid "Account Health"
+msgstr "帳號健康"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "待查核帳號任務"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "存在待處理風險的資產"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "待查核"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "候選憑證驗證通過"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "重試前請檢查連線條件和原始工作階段。"
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "請檢查原始工作階段的錄影產生、上傳和儲存情況。"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "待查核命令處置"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "請將偵測到的變化與已核准的存取權限進行比較，並確認處置結果。"
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "請確認較新的憑證已同步且能夠正常存取。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "請確認地點變化是否符合出差、代理使用或預期存取情況。"
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "已確認風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "待查核連線失敗"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "憑證驗證失敗"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "憑證驗證中"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "目前帳號風險明細"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "目前帳號風險"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "目前風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "待查核登入失敗"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "待查核檔案操作"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "處置進度"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "已忽略風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "問題"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "後續改密成功"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "待查核異地登入"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "下一步操作"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "目前沒有可用的帳號風險記錄。"
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "原始記錄"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "待處理風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "待處理風險類型分布"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "待查核策略拒絕"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "待查核錄影"
+
+#: reports/audit_contract.py reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "異常處置清單"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "請查核並同步已通過驗證的候選憑證；僅驗證通過並不能確認已恢復。"
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "請在原始工作階段中查核命令用途、符合規則和審批記錄。"
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "請查核被拒絕的操作，確認存取策略符合預期。"
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "請查看執行日誌和受影響對象，修正原因後重試。"
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "重試前請查核檔案路徑、存取權限和原始工作階段。"
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "重試前請查核驗證結果和原始執行記錄。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "請查核忽略此次失敗的原因是否仍然適用。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "請查核忽略此風險的原因是否仍然適用。"
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "風險數量"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "更新時間"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "驗證時間"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "請驗證候選憑證，確認能夠正常存取後再同步。"
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "請核實登入來源及帳號身分，然後查看驗證日誌。"
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "請等待驗證完成，再決定是否同步憑證。"
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "可讀取"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "參考依據"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "記錄 ID"
+
+#: reports/services/audit_data.py
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "根據涉及的資產、帳號及記錄原因核查連線失敗。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "已結束且連線成功的工作階段中，有 %(count)s 次需要核查錄影。請檢查錄影產生、上傳及儲存。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "%(count)s 筆新城市登入記錄需要核查使用者身分和存取地點。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s 筆平台登入記錄使用回環來源位址。請確認是本機存取還是經代理轉送的請求。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "%(count)s 次平台登入失敗。請核查涉及的使用者、來源位址及記錄原因。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "%(total)s 次檔案操作中有 %(failed)s 次失敗（%(rate)s%%）。請核查涉及的資產、帳號、檔案路徑及原始工作階段。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "共記錄 %(sessions)s 次資產工作階段，其中 %(success)s 次連線成功、%(failed)s 次連線失敗，涉及 %(users)s 名使用者和 %(assets)s 台資產。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "共執行 %(total)s 次帳號工作，其中 %(success)s 次成功、%(failed)s 次失敗或錯誤，%(pending)s 次尚未完成。"
+
+#: reports/services/audit_data.py
+msgid "Account Risks to Review"
+msgstr "待處理帳號風險"
+
+#: reports/services/audit_data.py
+msgid "Accounts Identified in Pending Risks"
+msgstr "待處理風險涉及帳號"
+
+#: reports/services/audit_data.py
+msgid "Affected Accounts"
+msgstr "涉及帳號數"
+
+#: reports/services/audit_data.py
+msgid "Affected Assets"
+msgstr "涉及資產數"
+
+#: reports/services/audit_data.py
+msgid "Assets with Latest Check Successful"
+msgstr "最近檢測成功的資產"
+
+#: reports/services/audit_data.py
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "為每個受影響帳號設定獨立憑證，同步相依服務並驗證存取。"
+
+#: reports/services/audit_data.py
+msgid "Check Result"
+msgstr "檢測結果"
+
+#: reports/services/audit_data.py
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "核對授權金鑰與已核准金鑰，移除未經核准的金鑰。"
+
+#: reports/services/audit_data.py
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "對照已核准權限核查使用者群組變更，移除未經核准的權限。"
+
+#: reports/services/audit_data.py
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "對照已核准權限核查 sudo 權限變更，移除未經核准的權限。"
+
+#: reports/services/audit_data.py
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "確認帳號歸屬與用途，將已核准帳號納入管理，或停用未獲授權帳號。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "確認帳號刪除是否經過核准，再核對納管帳號清單。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "確認帳號是否仍需使用，經核准後停用閒置帳號。"
+
+#: reports/services/audit_data.py
+msgid "Current Managed Accounts"
+msgstr "目前納管帳號"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "目前 %(pending)s 筆待處理帳號風險記錄涉及 %(assets)s 台資產上的 %(accounts)s 個不同帳號。請按風險類型核查涉及的帳號。"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Failed"
+msgstr "最近檢測失敗"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Successful"
+msgstr "最近檢測成功"
+
+#: reports/services/audit_data.py
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "最近檢測成功的納管帳號"
+
+#: reports/services/audit_data.py
+msgid "Most Recent Stored Check"
+msgstr "最近記錄的檢測時間"
+
+#: reports/services/audit_data.py
+msgid "No Check Result"
+msgstr "無檢測結果"
+
+#: reports/services/audit_data.py
+msgid "No listed security events were found in the available records for this period."
+msgstr "本期可用記錄中未發現所列安全事件。"
+
+#: reports/services/audit_data.py
+msgid "Not Applicable"
+msgstr "不適用"
+
+#: reports/services/audit_data.py
+msgid "Password Changes with Subsequent Progress"
+msgstr "已有後續進展的改密記錄"
+
+#: reports/services/audit_data.py
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "更新已過期的憑證，並驗證相依工作及帳號存取。"
+
+#: reports/services/audit_data.py
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "將弱密碼更換為獨立的高強度密碼，再驗證帳號存取。"
+
+#: reports/services/audit_data.py
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "核查失敗工作日誌及涉及帳號，優先處理尚未解決的項目，再複核已有後續進展的記錄。"
+
+#: reports/services/audit_data.py
+msgid "Review risks"
+msgstr "查看風險"
+
+#: reports/services/audit_data.py
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "複核已確認的風險，並檢查帳號目前狀態。"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "已對應納管帳號的風險帳號"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "未對應納管帳號的風險帳號"
+
+#: reports/services/audit_data.py
+msgid "Risk List"
+msgstr "風險清單"
+
+#: reports/services/audit_data.py
+msgid "Risk Records"
+msgstr "風險記錄數"
+
+#: reports/services/audit_data.py
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "按輪替策略更換憑證，並驗證相依服務。"
+
+#: reports/services/audit_data.py
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "更換可能外洩的憑證，複核近期存取並驗證相依服務。"
+
+#: reports/services/audit_data.py
+msgid "Stored Asset Connectivity Results"
+msgstr "資產連線檢測結果"
+
+#: reports/services/audit_data.py
+msgid "Stored Managed Account Connectivity Results"
+msgstr "納管帳號連線檢測結果"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "目前共有 %(total)s 台資產，其中 %(active)s 台已啟用。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "目前共有 %(total)s 筆納管帳號記錄，其中 %(active)s 筆已啟用。"
+
+#: reports/services/audit_data.py
+msgid "There are currently no pending account risk records."
+msgstr "目前沒有待處理帳號風險記錄。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s account task executions were canceled."
+msgstr "%(count)s 次帳號工作執行已取消。"
