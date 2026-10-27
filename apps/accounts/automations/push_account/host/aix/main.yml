@@ -19,94 +19,104 @@
              (user_info.stdout_lines[1:]
               | map('regex_replace', ':.*$', '') | list) }}
 
-    - name: "Add {{ account.username }} user"
-      ansible.builtin.user:
-        name: "{{ account.username }}"
-        uid: "{{ params.uid | int if params.uid | length > 0 else omit }}"
-        shell: "{{ params.shell if params.shell | length > 0 else omit }}"
-        home: "{{ params.home if params.home | length > 0 else '/home/' + account.username }}"
-        group: "{{ params.group if params.group | length > 0 else omit }}"
-        groups: "{{ params.groups if params.groups | length > 0 else omit }}"
-        append: "{{ true if params.groups | length > 0 else false }}"
-        expires: -1
-        state: present
-      when: not user_exists
-
-    - name: "Set {{ account.username }} sudo setting"
-      ansible.builtin.lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: "^{{ account.username }} ALL="
-        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
-        validate: visudo -cf %s
-      when:
-        - not user_exists or params.modify_sudo
-        - params.sudo
-
-    - name: "Change {{ account.username }} password"
-      ansible.builtin.command: chpasswd -c
-      args:
-        stdin: "{{ account.username }}:{{ account.secret }}"
-      ignore_errors: true
-      register: change_secret_result
-      when: account.secret_type == "password"
-      no_log: true
-
-    - name: "Refresh passwd data for {{ account.username }}"
-      ansible.builtin.command:
-        argv:
-          - lsuser
-          - -c
-          - -a
-          - home
-          - pgrp
-          - "{{ account.username }}"
-      register: account_passwd
-      changed_when: false
-      when: account.secret_type == "ssh_key"
-
-    - name: "Record home and primary group for {{ account.username }}"
+    - name: Record existing account for connection provisioning
       ansible.builtin.set_fact:
-        account_home: >-
-          {{ account_passwd.stdout_lines[-1].split(':')[1] }}
-        account_primary_group: >-
-          {{ account_passwd.stdout_lines[-1].split(':')[2] }}
-      when: account.secret_type == "ssh_key"
-
-    - name: "Check if home directory exists for {{ account.username }}"
-      ansible.builtin.stat:
-        path: "{{ account_home }}"
-      register: home_dir_stat
-      when: account.secret_type == "ssh_key"
-
-    - name: "Ensure {{ account.username }} home directory exists"
-      ansible.builtin.file:
-        path: "{{ account_home }}"
-        state: directory
-        owner: "{{ account.username }}"
-        group: "{{ account_primary_group }}"
-        mode: '0750'
+        jms_account_existing: true
       when:
-        - account.secret_type == "ssh_key"
-        - not (home_dir_stat.stat.exists | default(false))
+        - jms_create_only | default(false) | bool
+        - user_exists
 
-    - name: Remove ssh key created by system
-      ansible.builtin.lineinfile:
-        dest: "{{ account_home }}/.ssh/authorized_keys"
-        regexp: "{{ ssh_params.regexp }}"
-        state: absent
-      when:
-        - account.secret_type == "ssh_key"
-        - ssh_params.strategy == "set_jms"
-      ignore_errors: yes
+    - name: Create and configure only missing accounts
+      when: not (jms_account_existing | default(false) | bool)
+      block:
+        - name: "Add {{ account.username }} user"
+          ansible.builtin.user:
+            name: "{{ account.username }}"
+            uid: "{{ params.uid | int if params.uid | length > 0 else omit }}"
+            shell: "{{ params.shell if params.shell | length > 0 else omit }}"
+            home: "{{ params.home if params.home | length > 0 else '/home/' + account.username }}"
+            group: "{{ params.group if params.group | length > 0 else omit }}"
+            groups: "{{ params.groups if params.groups | length > 0 else omit }}"
+            append: "{{ true if params.groups | length > 0 else false }}"
+            expires: -1
+            state: present
+          when: not user_exists
 
-    - name: "Change {{ account.username }} SSH key"
-      ansible.builtin.authorized_key:
-        user: "{{ account.username }}"
-        key: "{{ account.secret }}"
-        exclusive: "{{ ssh_params.exclusive }}"
-      register: change_secret_result
-      when: account.secret_type == "ssh_key"
+        - name: "Set {{ account.username }} sudo setting"
+          ansible.builtin.lineinfile:
+            dest: /etc/sudoers
+            state: present
+            regexp: "^{{ account.username }} ALL="
+            line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
+            validate: visudo -cf %s
+          when:
+            - not user_exists or params.modify_sudo
+            - params.sudo
+
+        - name: "Change {{ account.username }} password"
+          ansible.builtin.command: chpasswd -c
+          args:
+            stdin: "{{ account.username }}:{{ account.secret }}"
+          ignore_errors: true
+          register: change_secret_result
+          when: account.secret_type == "password"
+          no_log: true
+
+        - name: "Refresh passwd data for {{ account.username }}"
+          ansible.builtin.command:
+            argv:
+              - lsuser
+              - -c
+              - -a
+              - home
+              - pgrp
+              - "{{ account.username }}"
+          register: account_passwd
+          changed_when: false
+          when: account.secret_type == "ssh_key"
+
+        - name: "Record home and primary group for {{ account.username }}"
+          ansible.builtin.set_fact:
+            account_home: >-
+              {{ account_passwd.stdout_lines[-1].split(':')[1] }}
+            account_primary_group: >-
+              {{ account_passwd.stdout_lines[-1].split(':')[2] }}
+          when: account.secret_type == "ssh_key"
+
+        - name: "Check if home directory exists for {{ account.username }}"
+          ansible.builtin.stat:
+            path: "{{ account_home }}"
+          register: home_dir_stat
+          when: account.secret_type == "ssh_key"
+
+        - name: "Ensure {{ account.username }} home directory exists"
+          ansible.builtin.file:
+            path: "{{ account_home }}"
+            state: directory
+            owner: "{{ account.username }}"
+            group: "{{ account_primary_group }}"
+            mode: '0750'
+          when:
+            - account.secret_type == "ssh_key"
+            - not (home_dir_stat.stat.exists | default(false))
+
+        - name: Remove ssh key created by system
+          ansible.builtin.lineinfile:
+            dest: "{{ account_home }}/.ssh/authorized_keys"
+            regexp: "{{ ssh_params.regexp }}"
+            state: absent
+          when:
+            - account.secret_type == "ssh_key"
+            - ssh_params.strategy == "set_jms"
+          ignore_errors: yes
+
+        - name: "Change {{ account.username }} SSH key"
+          ansible.builtin.authorized_key:
+            user: "{{ account.username }}"
+            key: "{{ account.secret }}"
+            exclusive: "{{ ssh_params.exclusive }}"
+          register: change_secret_result
+          when: account.secret_type == "ssh_key"
 
     - name: "Verify {{ account.username }} password (paramiko)"
       ssh_ping:
@@ -126,7 +136,7 @@
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         auth_only: true
         fail_on_unknown: false
-        change_succeeded: "{{ not (change_secret_result.failed | default(false)) }}"
+        change_succeeded: "{{ not (jms_account_existing | default(false)) and not (change_secret_result.failed | default(false)) }}"
       when:
        - account.secret_type == "password"
        - check_conn_after_change or change_secret_result.failed | default(false)
@@ -145,7 +155,7 @@
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         auth_only: true
         fail_on_unknown: false
-        change_succeeded: "{{ not (change_secret_result.failed | default(false)) }}"
+        change_succeeded: "{{ not (jms_account_existing | default(false)) and not (change_secret_result.failed | default(false)) }}"
       when:
        - account.secret_type == "ssh_key"
        - check_conn_after_change or change_secret_result.failed | default(false)

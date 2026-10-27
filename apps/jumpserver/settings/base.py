@@ -1,5 +1,7 @@
 import os
 import re
+from copy import deepcopy
+from math import isfinite
 
 from django.urls import reverse_lazy
 from redis.sentinel import SentinelManagedSSLConnection
@@ -394,6 +396,14 @@ REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_S
 REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
 REDIS_PROTOCOL = 'rediss' if REDIS_USE_SSL else 'redis'
+REDIS_SOCKET_TIMEOUT = float(CONFIG.REDIS_SOCKET_TIMEOUT)
+REDIS_SOCKET_CONNECT_TIMEOUT = float(CONFIG.REDIS_SOCKET_CONNECT_TIMEOUT)
+for name, value in (
+    ('REDIS_SOCKET_TIMEOUT', REDIS_SOCKET_TIMEOUT),
+    ('REDIS_SOCKET_CONNECT_TIMEOUT', REDIS_SOCKET_CONNECT_TIMEOUT),
+):
+    if not isfinite(value) or value <= 0:
+        raise ValueError(f'{name} must be a positive finite number')
 # Cache use sentinel
 REDIS_SENTINEL_HOSTS = CONFIG.REDIS_SENTINEL_HOSTS
 REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS = parse_sentinels_host(REDIS_SENTINEL_HOSTS)
@@ -406,11 +416,13 @@ else:
 # Cache config
 
 REDIS_OPTIONS = {
-    "REDIS_CLIENT_KWARGS": {
-        "health_check_interval": 30
-    },
+    'SOCKET_TIMEOUT': REDIS_SOCKET_TIMEOUT,
+    'SOCKET_CONNECT_TIMEOUT': REDIS_SOCKET_CONNECT_TIMEOUT,
     "CONNECTION_POOL_KWARGS": {
         'max_connections': CONFIG.REDIS_MAX_CONNECTIONS,
+        'health_check_interval': 30,
+        'socket_keepalive': True,
+        'retry_on_timeout': False,
     }
 }
 if REDIS_USE_SSL:
@@ -435,7 +447,9 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
             "ssl_certfile": REDIS_SSL_CERT,
             "ssl_ca_certs": REDIS_SSL_CA,
             'password': REDIS_SENTINEL_PASSWORD,
-            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT or REDIS_SOCKET_TIMEOUT,
+            'socket_connect_timeout': REDIS_SOCKET_CONNECT_TIMEOUT,
+            'socket_keepalive': True,
         }
     })
     if REDIS_USE_SSL:
@@ -459,9 +473,20 @@ REDIS_CACHE_DEFAULT = {
 REDIS_CACHE_SESSION = dict(REDIS_CACHE_DEFAULT)
 REDIS_CACHE_SESSION['LOCATION'] = REDIS_LOCATION_NO_DB.format(CONFIG.REDIS_DB_SESSION)
 
+# Subscriptions and blocking locks share the cache database, but need a
+# separate pool without a read timeout so normal idle waits remain valid.
+REDIS_CACHE_BLOCKING = deepcopy(REDIS_CACHE_DEFAULT)
+REDIS_CACHE_BLOCKING['OPTIONS'].pop('SOCKET_TIMEOUT')
+REDIS_CACHE_BLOCKING['OPTIONS']['CONNECTION_FACTORY'] = (
+    'common.redis.BlockingSentinelConnectionFactory'
+    if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS
+    else 'common.redis.BlockingConnectionFactory'
+)
+
 CACHES = {
     'default': REDIS_CACHE_DEFAULT,
-    'session': REDIS_CACHE_SESSION
+    'session': REDIS_CACHE_SESSION,
+    'blocking': REDIS_CACHE_BLOCKING,
 }
 SESSION_CACHE_ALIAS = "session"
 

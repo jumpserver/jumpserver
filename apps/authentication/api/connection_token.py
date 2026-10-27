@@ -3,6 +3,7 @@ import json
 import os
 import urllib.parse
 from collections.abc import Mapping
+from datetime import timedelta
 from struct import pack
 
 from cryptography import x509
@@ -603,11 +604,13 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         return Response(data=serializer.data)
 
     @action(methods=['POST'], detail=False)
+    @transaction.atomic
     def exchange(self, request, *args, **kwargs):
         pk = request.data.get('id', None) or request.data.get('pk', None)
         # 只能兑换自己使用的 Token
         instance = get_object_or_404(ConnectionToken, pk=pk, user=request.user)
         instance.id = None
+        instance.from_ticket = None
         try:
             self.validate_exchange_token(instance)
         except APIException as error:
@@ -619,7 +622,7 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance.save()
         serializer = self.get_serializer(instance)
         response = Response(serializer.data, status=status.HTTP_201_CREATED)
-        if self.need_face_verify:
+        if self.need_face_verify and not is_true(request.query_params.get('acl_stepwise')):
             self.create_face_verify(response)
         return response
 
@@ -640,6 +643,8 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'exchange': 'authentication.add_connectiontoken',
+        'acl_controls': 'authentication.add_connectiontoken',
+        'acl_batch': 'authentication.add_connectiontoken',
         'reuse': 'authentication.reuse_connectiontoken',
         'expire': 'authentication.expire_connectiontoken',
         'get_rdp_file': 'authentication.add_connectiontoken',
@@ -652,9 +657,9 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     personal_credential_saved = None
 
     def get_queryset(self):
-        queryset = ConnectionToken.objects \
-            .filter(user=self.request.user) \
-            .filter(date_expired__gt=timezone.now())
+        queryset = ConnectionToken.objects.filter(user=self.request.user)
+        if self.action != 'acl_controls':
+            queryset = queryset.filter(date_expired__gt=timezone.now())
         return queryset
 
     def get_user(self, serializer):
@@ -863,6 +868,19 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         )
         _data['remote_addr'] = get_request_ip_or_data(self.request)
         data.update(_data)
+        if 'push_account' in data.get('acl_context', {}).get('requirements', {}):
+            supplied = {
+                field: _('Same-name account provisioning uses server-managed credentials.')
+                for field in ('input_username', 'input_secret', 'input_secret_type',
+                              'personal_credential_id', 'personal_credential_version', 'save_personal_credential')
+                if self.request.data.get(field)
+            }
+            if supplied:
+                raise ValidationError(supplied)
+            data['input_username'] = ''
+            data['input_secret'] = ''
+            data['date_expired'] = timezone.now() + timedelta(minutes=15)
+
 
         if save_credential:
             credential = save_personal_credential(
@@ -899,6 +917,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         asset = token.asset
         account_alias = token.account
         self.input_username = token.input_username
+        self.face_monitor_token = token.face_monitor_token or ''
         personal_permission_account = None
         if token.personal_credential_id:
             credential, permission_context = (
@@ -949,15 +968,15 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             if account.has_secret:
                 data['input_secret_type'] = ''
 
-        ticket = self._validate_acl(user, asset, account, connect_method, protocol)
-        if ticket:
-            data['from_ticket'] = ticket
-
-        if ticket or self.need_face_verify:
-            data['is_active'] = False
-        if self.face_monitor_token:
-            FaceMonitorContext.get_or_create_context(self.face_monitor_token, self.request.user.id)
+        data['acl_context'] = self._validate_acl(user, asset, account, connect_method, protocol)
+        data['is_active'] = not data['acl_context'].get('requirements')
+        if self.face_monitor_token and data['acl_context'].get('face_online'):
+            context = FaceMonitorContext.get_or_create_context(self.face_monitor_token, self.request.user.id)
+            if str(context.user_id) != str(user.id):
+                raise PermissionDenied(_('Face monitoring context belongs to a different user'))
             data['face_monitor_token'] = self.face_monitor_token
+        else:
+            data['face_monitor_token'] = ''
         return data
 
     @staticmethod
@@ -969,7 +988,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         if token_type == ConnectionTokenType.ADMIN:
             get_permed_account = AdminConnectionToken.get_user_permed_account
         account = get_permed_account(user, asset, account_alias, protocol)
-        if not account or not account.actions:
+        if not ConnectionToken.has_account_permission(account, protocol):
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
         if account.date_expired < timezone.now():
@@ -996,83 +1015,135 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         kwargs = {'user': user, 'asset': asset, 'account': account}
         if account.username == AliasAccount.INPUT:
             kwargs['account_username'] = self.input_username
-        acls = LoginAssetACL.filter_queryset(**kwargs)
         ip = get_request_ip_or_data(self.request)
-        acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
-        if not acl:
-            return
-        if acl.is_action(acl.ActionChoices.accept):
-            self._record_operate_log(acl, asset)
-            return
-        if acl.is_action(acl.ActionChoices.reject):
-            self._record_operate_log(acl, asset)
-            msg = _('ACL action is reject: {}({})'.format(acl.name, acl.id))
-            raise JMSException(code='acl_reject', detail=msg)
-        if acl.is_action(acl.ActionChoices.review):
-            account_username = (
-                self.input_username if account.username == AliasAccount.INPUT else account.username
-            )
-            if acl.is_review_exempt(user, asset, account_username):
-                self._record_operate_log(acl, asset)
-                return
-            if not self.request.query_params.get('create_ticket'):
-                msg = _('ACL action is review')
-                raise JMSException(code='acl_review', detail=msg)
-            self._record_operate_log(acl, asset)
-            ticket = acl.create_login_asset_review_ticket(
-                user=user, asset=asset, account_username=account_username,
-                assignees=acl.reviewers.all(), org_id=asset.org_id
-            )
-            return ticket
-        if acl.is_action(acl.ActionChoices.face_verify):
-            if not self.request.query_params.get('face_verify'):
-                msg = _('ACL action is face verify')
-                raise JMSException(code='acl_face_verify', detail=msg)
-            self.need_face_verify = True
-        if acl.is_action(acl.ActionChoices.face_online):
+        policy = LoginAssetACL.get_match_rule_acls(user, ip, LoginAssetACL.filter_queryset(**kwargs))
+        if not policy:
+            return {}
+        self._record_operate_log(policy.decision_rule, asset)
+        if policy.action == policy.ActionChoices.reject:
+            raise JMSException(code='acl_reject', detail=_('ACL action is reject: {}({})').format(policy.name, policy.id))
+        username = self.input_username if account.username == AliasAccount.INPUT else account.username
+        reviews = policy.pending_reviews(user, asset, username)
+        requirements = {}
+        for control in ('reason', 'mfa'):
+            if policy.enabled(f'{control}_enabled'):
+                requirements[control] = 'pending'
+        self.need_face_verify = policy.enabled('face_verify_enabled') or policy.enabled('face_online_enabled')
+        if self.need_face_verify:
+            if user != self.request.user:
+                raise JMSException(code='acl_face_verify', detail=_('Use Web Terminal to complete face verification'))
+            requirements['face'] = 'pending'
+        if reviews:
+            requirements['review'] = 'pending'
+        if policy.enabled('push_account_enabled') and LoginAssetACL.is_same_account(user, account, username):
+            from accounts.provisioning import needs_account_preparation
+            if needs_account_preparation(account):
+                requirements['push_account'] = 'pending'
+        if policy.enabled('face_online_enabled'):
             if connect_method not in [WebMethod.web_cli, WebMethod.web_gui]:
-                msg = _('ACL action not supported for this asset')
-                raise JMSException(detail=msg, code='acl_face_online_not_supported')
+                raise JMSException(code='acl_face_online_not_supported', detail=_('Online face verification requires Web Terminal'))
+            self.face_monitor_token = self.request.query_params.get('face_monitor_token', self.face_monitor_token)
+            if not self.face_monitor_token:
+                raise JMSException(code='acl_face_online', detail=_('Online face monitoring context is required'))
+            from authentication.serializers.face import FaceMonitorContextSerializer
+            try:
+                self.face_monitor_token = FaceMonitorContextSerializer().fields['face_monitor_token'].run_validation(self.face_monitor_token)
+            except ValidationError as error:
+                raise ValidationError({'face_monitor_token': error.detail}) from error
+        # Preserve the existing request/validation trigger, including while
+        # approval or face verification is still pending.
+        recipients = {}
+        for rule in policy.rules:
+            if rule.notice_enabled:
+                for recipient in rule.recipients.all():
+                    recipients.setdefault(recipient.pk, (recipient, rule))
+        os_name = get_request_os(self.request) if self.request else 'windows'
+        method = ConnectMethodUtil.get_connect_method(connect_method, protocol=protocol, os=os_name)
+        login_from = method['label'] if method else connect_method
+        for recipient, rule in recipients.values():
+            AssetLoginReminderMsg(recipient, asset, user, account, rule, ip, self.input_username, login_from).publish_async()
+        return {
+            'requirements': requirements, 'username': username,
+            'review_acls': [str(rule.id) for rule in reviews],
+            'face_online': policy.enabled('face_online_enabled'),
+        }
 
-            face_verify = self.request.query_params.get('face_verify')
-            face_monitor_token = self.request.query_params.get('face_monitor_token')
+    @action(methods=['GET', 'POST'], detail=True, url_path='acl')
+    @transaction.atomic
+    def acl_controls(self, request, *args, **kwargs):
+        from authentication.services.connection_acl import advance_acl
+        instance = self.get_object()
+        if request.method == 'GET':
+            return Response(self.get_serializer(instance).data)
+        token = advance_acl(instance, request)
+        response = Response(self.get_serializer(token).data)
+        if request.method == 'POST' and is_true(request.data.get('retry_face')) and not token.acl_context.get('cancelled') and token.acl_context.get('requirements', {}).get('face') == 'pending':
+            self.create_face_verify(response)
+        return response
 
-            if not face_verify or not face_monitor_token:
-                msg = _('ACL action is face online')
-                raise JMSException(code='acl_face_online', detail=msg)
+    @action(methods=['POST'], detail=False, url_path='acl/batch')
+    @transaction.atomic
+    def acl_batch(self, request, *args, **kwargs):
+        from authentication.serializers.connection_token import ConnectionACLBatchInputSerializer
+        from authentication.services.connection_acl_batch import advance_acl_batch
+        serializer = ConnectionACLBatchInputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        # Scope is server-derived. A token ID never grants access to another user or token type.
+        model = AdminConnectionToken if isinstance(self, AdminConnectionTokenViewSet) else ConnectionToken
+        with tmp_to_root_org():
+            tokens = list(model.objects.select_for_update().filter(
+                pk__in=data['token_ids'], user=request.user, type=model._type,
+            ).order_by('pk'))
+        if len(tokens) != len(data['token_ids']):
+            raise PermissionDenied(_('Connection is no longer available'), code='connection_unavailable')
+        for token in tokens:
+            with tmp_to_org(token.org_id):
+                self.check_permissions(request)
+        tokens = advance_acl_batch(tokens, request, data)
+        if data['step'] == 'face' and data.get('retry_face'):
+            pending = [token for token in tokens if token.acl_context['requirements'].get('face') == 'pending']
+            if pending:
+                response = Response(self.get_serializer(pending[0]).data)
+                with tmp_to_org(pending[0].org_id):
+                    self.create_face_verify(response, tokens=pending)
+                with tmp_to_root_org():
+                    tokens = [model.objects.get(pk=token.pk) for token in tokens]
+        return Response(self.get_serializer(tokens, many=True).data)
 
-            self.need_face_verify = True
-            self.face_monitor_token = face_monitor_token
-
-        if acl.is_action(acl.ActionChoices.notice):
-            reviewers = acl.reviewers.all()
-            if not reviewers:
-                return
-
-            self._record_operate_log(acl, asset)
-            os = get_request_os(self.request) if self.request else 'windows'
-            method = ConnectMethodUtil.get_connect_method(
-                connect_method, protocol=protocol, os=os
-            )
-            login_from = method['label'] if method else connect_method
-            for reviewer in reviewers:
-                AssetLoginReminderMsg(
-                    reviewer, asset, user, account, acl,
-                    ip, self.input_username, login_from
-                ).publish_async()
-
-    def create_face_verify(self, response):
+    def create_face_verify(self, response, *, tokens=None):
         if not self.request.user.is_face_code_set:
             raise JMSException(code='no_face_feature', detail=_('No available face feature'))
         connection_token_id = response.data.get('id')
+        with transaction.atomic():
+            token = ConnectionToken.objects.select_for_update().get(pk=connection_token_id)
+            states = token.acl_context.get('requirements', {})
+            if (token.acl_context.get('cancelled') or token.is_expired
+                    or token.user_id != self.request.user.id or states.get('face') != 'pending'):
+                raise PermissionDenied(_('Face verification is no longer available'))
+            if self.request.data.get('retry_face') and any(states.get(key, 'passed') != 'passed' for key in ('reason', 'mfa')):
+                raise ValidationError({'step': _('Complete the current connection step first')})
         context_data = {
             "action": "login_asset",
             "connection_token_id": connection_token_id,
         }
+        if tokens:
+            context_data['connection_token_ids'] = [str(item.pk) for item in tokens]
         face_verify_token = self.create_face_verify_context(
             context_data, user_id=self.request.user.id
         )
         response.data['face_token'] = face_verify_token
+        with transaction.atomic(), tmp_to_root_org():
+            for item in tokens or [token]:
+                item = ConnectionToken.objects.select_for_update().get(pk=item.pk)
+                if item.acl_context.get('cancelled'):
+                    raise PermissionDenied(_('Connection is no longer available'), code='connection_unavailable')
+                item.acl_context['face_token'] = face_verify_token
+                item.save(update_fields=['acl_context'])
+                if item.pk == token.pk:
+                    token = item
+        from authentication.services.connection_acl import acl_state
+        response.data['acl'] = acl_state(token)
 
     @staticmethod
     def serialize_validation_error(detail):
@@ -1139,7 +1210,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
             # If it fails, roll back both the token and any inline credential.
             with transaction.atomic():
                 response = super().create(request, *args, **kwargs)
-                if self.need_face_verify:
+                if self.need_face_verify and not is_true(request.query_params.get('acl_stepwise')):
                     self.create_face_verify(response)
         except JMSException as e:
             failure_reason = str(e.detail.code)
@@ -1188,6 +1259,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'list': 'authentication.view_superconnectiontoken',
         'check': 'authentication.view_superconnectiontoken',
         'retrieve': 'authentication.view_superconnectiontoken',
+        'acl_controls': 'authentication.add_superconnectiontoken',
         'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',

@@ -206,6 +206,8 @@ class Config(dict):
         'REDIS_SSL_CA': None,
         'REDIS_SSL_REQUIRED': 'none',
         'REDIS_MAX_CONNECTIONS': 100,
+        'REDIS_SOCKET_TIMEOUT': 5.0,
+        'REDIS_SOCKET_CONNECT_TIMEOUT': 5.0,
         # Redis Sentinel
         'REDIS_SENTINEL_HOSTS': '',
         'REDIS_SENTINEL_PASSWORD': '',

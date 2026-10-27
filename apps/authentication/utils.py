@@ -9,6 +9,7 @@ from django.shortcuts import reverse
 from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
 
 from audits.models import UserLoginLog
 from assets.const import Protocol
@@ -36,6 +37,14 @@ def should_use_oracle_sysdba(connect_options, protocol, asset=None):
 
 def get_effective_connect_options(connect_options, protocol, asset=None):
     options = dict(connect_options or {})
+    if protocol != Protocol.rdp:
+        options.pop('rdp_security', None)
+    elif 'rdp_security' in options and options['rdp_security'] not in (
+        'default', 'any', 'rdp', 'tls', 'nla',
+    ):
+        raise ValidationError({
+            'connect_options': {'rdp_security': _('Invalid RDP security layer.')},
+        })
     if protocol != Protocol.oracle:
         options.pop('use_sysdba', None)
         return options
