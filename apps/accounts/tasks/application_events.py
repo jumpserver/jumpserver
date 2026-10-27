@@ -180,29 +180,33 @@ def expire_application_event_deliveries():
 
 @shared_task(
     verbose_name=_('Clean application records'),
-    description=_('Clean expired application audits and completed webhook delivery records.'),
+    description=_('Clean expired application audits, completed policy cycles and webhook delivery records.'),
 )
 @register_as_period_task(crontab=CRONTAB_AT_AM_THREE)
 def clean_application_records_period():
     from accounts.models import ApplicationAudit, ApplicationEventAttempt, ApplicationEventDelivery
+    from accounts.credential_rotation.retention import clean_cycles, protected_audits
 
     days = get_log_keep_day('APPLICATION_RECORD_KEEP_DAYS')
     expired_at = timezone.now() - timedelta(days=days)
     with tmp_to_root_org():
+        cycle_counts = clean_cycles(expired_at)
+        retained = protected_audits().values('id')
         delivery_counts = _delete_in_batches(ApplicationEventDelivery.objects.filter(
             date_created__lt=expired_at,
             status__in=('success', 'failed'),
-        ))
+        ).exclude(event_id__in=retained).exclude(audit_id__in=retained))
         audit_counts = _delete_in_batches(ApplicationAudit.objects.filter(
             date_created__lt=expired_at,
             deliveries__isnull=True,
             delivery__isnull=True,
-        ))
+        ).exclude(id__in=retained))
 
     logger.info(
-        'Cleaned application records older than %s days: audits=%s, deliveries=%s, attempts=%s.',
+        'Cleaned application records older than %s days: audits=%s, deliveries=%s, attempts=%s, cycles=%s.',
         days,
         audit_counts.get(ApplicationAudit._meta.label, 0),
         delivery_counts.get(ApplicationEventDelivery._meta.label, 0),
         delivery_counts.get(ApplicationEventAttempt._meta.label, 0),
+        cycle_counts,
     )

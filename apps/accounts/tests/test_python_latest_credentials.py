@@ -61,15 +61,13 @@ class PythonLatestCredentialTests(TestCase):
             self.assertTrue(self.client.get_credential(key="database").from_local)
         self.assertTrue(self.client._latest_credentials)
 
-    def test_access_denial_and_upgrade_clear_retained_credentials(self):
-        for status in (400, 401, 403, 404, 426):
+    def test_access_denial_clears_retained_credentials(self):
+        for status in (400, 401, 403, 404):
             with self.subTest(status=status):
                 self.prime()
                 self.respond(
                     {
-                        "code": "client_upgrade_required"
-                        if status == 426
-                        else "credential_not_found"
+                        "code": "credential_not_found"
                         if status == 400
                         else "denied"
                     },
@@ -80,6 +78,16 @@ class PythonLatestCredentialTests(TestCase):
                 self.outage()
                 with self.assertRaises(PAMError):
                     self.client.get_credential(key="database")
+
+    def test_upgrade_required_preserves_cache_without_satisfying_a_live_fetch(self):
+        self.prime()
+        self.respond({'code': 'client_upgrade_required'}, 426)
+        with self.assertRaises(PAMError):
+            self.client.get_credential(key='database')
+        self.outage()
+        self.assertTrue(self.client.get_credential(key='database').from_local)
+        with self.assertRaises(PAMError):
+            self.client.get_credential(key='database', allow_local_fallback=False)
 
     def test_invalid_successful_response_does_not_use_cache(self):
         self.prime()

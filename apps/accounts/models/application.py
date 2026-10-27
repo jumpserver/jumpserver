@@ -91,7 +91,7 @@ class IntegrationApplication(JMSOrgBaseModel):
 
 
 def default_application_webhook_events():
-    return list(ApplicationEvent.values)
+    return [event for event in ApplicationEvent.values if event != ApplicationEvent.CONFIGURATION_UPDATED]
 
 
 def default_application_webhook_template():

@@ -125,6 +125,12 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
         })
         self.assertEqual(set(response.data['template_variables'][0]), {'name', 'label', 'default'})
 
+    def test_legacy_scope_event_can_still_be_saved_without_changing_its_wire_name(self):
+        response = self.create_webhook(events=['configuration.updated'])
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data['events'], ['configuration.updated'])
+        self.assertNotIn('configuration.updated', ApplicationWebhook().events)
+
     def test_sensitive_configuration_is_excluded_from_global_operate_logs(self):
         self.assertNotIn('ApplicationWebhook', MODELS_NEED_RECORD)
 
@@ -167,7 +173,7 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
         with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT url, headers FROM accounts_applicationwebhook WHERE id = %s',
-                [str(webhook.id)],
+                [webhook._meta.pk.get_db_prep_value(webhook.pk, connection)],
             )
             raw_url, raw_headers = cursor.fetchone()
         self.assertNotIn('private-token', raw_url)

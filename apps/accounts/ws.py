@@ -19,7 +19,7 @@ from django.utils import timezone
 from orgs.utils import tmp_to_org
 from rest_framework.exceptions import PermissionDenied
 
-from common.utils import get_logger
+from common.utils import get_logger, get_request_ip
 
 logger = get_logger(__name__)
 
@@ -67,6 +67,7 @@ class CredentialClientAuthMiddleware:
                 manager.update_client_metadata(
                     request.headers.get('X-JMS-Client-Version', ''),
                     protocol, schema,
+                    remote_addr=get_request_ip(request),
                 )
                 if not supports_versions(
                     manager.client.protocol_version, manager.client.config_schema_version,
@@ -134,7 +135,7 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
                 id=self.client.id, is_active=True,
             ).update(date_last_seen=now)
             if event:
-                record(event, client=self.client)
+                record(event, client=self.client, remote_addr=self.client.remote_addr)
 
     @database_sync_to_async
     def snapshot(self):
@@ -212,7 +213,7 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         if 'recipient_ids' in event and str(self.client.id) not in event['recipient_ids']:
             return
         await self.send_json(event['payload'])
-        if event['payload']['event'] in ('application.scope.updated', 'credential.revoked') or (
+        if event['payload']['event'] in ('application.scope.updated', 'configuration.updated', 'credential.revoked') or (
             event['payload']['event'] == 'credential.updated'
             and event['payload'].get('credential_mode') == 'subscription'
             and not event['payload'].get('account_id')

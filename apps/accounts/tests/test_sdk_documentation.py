@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from accounts.api.account.application import IntegrationApplicationViewSet
+from accounts.api.account.application import IntegrationApplicationViewSet, PAMClientSourceDownloadAPI
 from accounts.credential_client.access import materials
 from accounts.credential_client.documentation import (
     DOCUMENTATION_LANGUAGES,
@@ -19,6 +19,60 @@ from rest_framework.test import APIRequestFactory
 
 
 class SDKDocumentationTests(SimpleTestCase):
+    def test_wizard_installs_the_same_source_revision_as_managed_examples(self):
+        for command in SDK_INSTALL_COMMANDS.values():
+            self.assertIn('/api/v1/accounts/client-source/', command)
+            self.assertNotIn('/releases/download/v1.0.2/', command)
+        application = SimpleNamespace(id='application', secret='secret', org_id='org')
+        result = materials(application, {
+            'type': 'agent', 'app_user': 'orders', 'install_path': '/opt/jumpserver-pam',
+            'delivery_mode': 'json', 'systemd_unit': '', 'systemd_action': '',
+        }, 'https://example.com')
+        self.assertIn('https://example.com/api/v1/accounts/client-source/agent/', result['install_command'])
+        self.assertIn('go -C ', result['install_command'])
+        self.assertIn('&&\ntar -xzf ', result['install_command'])
+
+    def test_source_bundles_include_installable_packages_and_agent_sdk_dependency(self):
+        from io import BytesIO
+        import tarfile
+        expected = {
+            'python': ('python/setup.py', 'python/jms_pam/client.py'),
+            'go': ('go/go.mod', 'go/client.go'),
+            'java': ('java/pom.xml', 'java/src/main/java/org/jumpserver/pam/Client.java'),
+            'node': ('node/package.json', 'node/index.js'),
+            'agent': ('agent/go.mod', 'agent/cmd/jms-pam-agent/main.go', 'go/go.mod', 'go/client.go'),
+        }
+        for language, paths in expected.items():
+            request = APIRequestFactory().get(f'/api/v1/accounts/client-source/{language}/')
+            response = PAMClientSourceDownloadAPI.as_view()(request, language=language)
+            self.assertEqual(response.status_code, 200)
+            with tarfile.open(fileobj=BytesIO(response.content)) as archive:
+                names = archive.getnames()
+                for path in paths:
+                    self.assertIn(f'jms-pam-clients/{path}', names)
+                self.assertFalse(any('/.git' in name or '/node_modules/' in name or name.endswith('_test.go') for name in names))
+
+    def test_source_bundle_excludes_local_identity_files_and_symlinks(self):
+        from io import BytesIO
+        import tarfile
+        from accounts.credential_client.source import source_archive
+        with TemporaryDirectory() as directory:
+            python = Path(directory) / 'accounts' / 'clients' / 'python'
+            (python / 'jms_pam').mkdir(parents=True)
+            (python / 'jms_pam' / '__init__.py').write_text('# SDK')
+            secret = python / 'jms_pam_config.py'
+            secret.write_text('app_secret = "private"')
+            (python / 'jms_pam' / 'linked.py').symlink_to(secret)
+            with override_settings(APPS_DIR=directory):
+                with tarfile.open(fileobj=BytesIO(source_archive('python'))) as archive:
+                    self.assertEqual(archive.getnames(), ['jms-pam-clients/python/jms_pam/__init__.py'])
+
+    def test_unknown_source_language_is_not_a_filesystem_path(self):
+        request = APIRequestFactory().get('/api/v1/accounts/client-source/ruby/')
+        for language in ('ruby', '..', '../python', 'python/setup.py'):
+            response = PAMClientSourceDownloadAPI.as_view()(request, language=language)
+            self.assertEqual(response.status_code, 404)
+
     def test_python_wizard_and_guides_share_the_event_example(self):
         application = SimpleNamespace(id='application', secret='secret', org_id='org')
         result = materials(application, {'type': 'sdk', 'sdk_language': 'python'}, 'https://example.com')

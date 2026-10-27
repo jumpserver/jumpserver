@@ -54,6 +54,10 @@ class CleaningSerializer(serializers.Serializer):
     APPLICATION_RECORD_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
         label=_("Application record retention days"),
+        help_text=_(
+            'Completed policy cycles are retained from their end time. Active cycles, cycles requiring '
+            'attention, and their dependent audit and confirmation records are preserved.'
+        ),
     )
     AUDIT_REPORT_SEND_RECORD_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,

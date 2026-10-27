@@ -60,6 +60,19 @@ class CredentialEventQuerySerializer(drf_serializers.Serializer):
     client_search = drf_serializers.CharField(default='', allow_blank=True, max_length=128)
     client_type = drf_serializers.ChoiceField(choices=['', 'sdk', 'agent'], default='')
     state = drf_serializers.ChoiceField(choices=['', 'online', 'offline', 'inactive'], default='')
+    kind = drf_serializers.ChoiceField(
+        choices=['', 'rotation', 'subscription', 'subscription_refresh', 'update', 'event', 'legacy'], default='',
+    )
+    cycle_status = drf_serializers.ChoiceField(
+        choices=['', 'preparing', 'running', 'success', 'failed', 'cancelled', 'published'], default='',
+    )
+    started_after = drf_serializers.DateTimeField(required=False)
+    started_before = drf_serializers.DateTimeField(required=False)
+
+    def validate(self, attrs):
+        if attrs.get('started_after') and attrs.get('started_before') and attrs['started_after'] > attrs['started_before']:
+            raise drf_serializers.ValidationError(_('The start time must be earlier than the end time.'))
+        return attrs
 
 
 class CredentialClientSignatureAuthenticationMixin:
@@ -299,7 +312,11 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         credential = self.get_object()
         if data.get('cycle_id'):
             return Response(cycle_detail(credential, data['cycle_id']))
-        return Response(cycle_directory(credential, data['limit'], data['offset']))
+        return Response(cycle_directory(
+            credential, data['limit'], data['offset'],
+            status=data['cycle_status'],
+            **{key: data[key] for key in ('kind', 'started_after', 'started_before') if key in data},
+        ))
 
     @action(methods=['post'], detail=True, url_path='check-secret-change')
     def check_secret_change(self, request, *args, **kwargs):
@@ -379,8 +396,8 @@ class CredentialClientInstanceViewSet(
 ):
     model = CredentialClientInstance
     serializer_class = serializers.CredentialClientInstanceSerializer
-    filterset_fields = ('application', 'type', 'is_active')
-    search_fields = ('instance_id', 'application__name')
+    filterset_fields = ('application', 'type', 'is_active', 'remote_addr')
+    search_fields = ('instance_id', 'application__name', 'remote_addr')
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('application').prefetch_related(
@@ -466,6 +483,7 @@ class CredentialClientViewSet(ApplicationAuditMixin, JMSGenericViewSet):
             self.request.headers.get('X-JMS-Client-Version', ''),
             self._version(self.request.headers.get('X-JMS-Protocol-Version')),
             self._version(self.request.headers.get('X-JMS-Config-Schema-Version')),
+            remote_addr=get_request_ip(self.request),
         )
         from accounts.credential_client.protocol import supports_versions
         if not supports_versions(

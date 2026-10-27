@@ -15650,3 +15650,12 @@ msgstr "请等待当前账号改密结束后，再重新发布凭据通知。"
 
 msgid "Credential notification republished"
 msgstr "重新发布凭据通知"
+
+msgid "Completed policy cycles are retained from their end time. Active cycles, cycles requiring attention, and their dependent audit and confirmation records are preserved."
+msgstr "已结束周期从结束时间起计算保留期。进行中、需要处理的周期及其依赖的审计和应用确认记录将保留。"
+
+msgid "Clean expired application audits, completed policy cycles and webhook delivery records."
+msgstr "清理过期的应用审计、已结束的策略周期和 Webhook 投递记录。"
+
+msgid "The start time must be earlier than the end time."
+msgstr "开始时间必须早于结束时间。"
