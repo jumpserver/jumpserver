@@ -139,37 +139,36 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def snapshot(self):
+        return self.snapshot_payload()
+
+    def snapshot_payload(self):
         with tmp_to_org(self.org_id):
+            application = self.client.application
+            application.refresh_from_db(fields=[
+                'accounts', 'is_active', 'credential_notifications_enabled', 'enforce_account_limit',
+            ])
+            if not application.is_active:
+                return {'event': 'snapshot', 'credentials': [], 'authorized_account_ids': []}
             try:
-                self.client.application.assert_account_limit()
+                application.assert_account_limit()
             except PermissionDenied:
-                return {'event': 'snapshot', 'credentials': []}
+                return {'event': 'snapshot', 'credentials': [], 'authorized_account_ids': []}
             credentials = self.client.application.application_credentials.filter(
                 is_active=True,
             ).order_by('key')
             from accounts.credential_client.event_results import snapshot_result_event
             items = []
-            subscribed_accounts = set()
-            for credential in credentials:
-                if credential.mode == credential.Mode.subscription:
-                    accounts = self.client.application.get_accounts().order_by('id')
-                    if not credential.subscription_all_authorized:
-                        accounts = accounts.filter(
-                            id__in=credential.subscription_accounts.values('id')
-                        )
-                    for account in accounts:
-                        if account.id in subscribed_accounts:
-                            continue
-                        subscribed_accounts.add(account.id)
-                        items.append({
-                            'key': credential.account_key(account.id),
-                            'account_id': str(account.id),
-                            'credential_mode': credential.mode,
-                            'revision': account.version,
-                            'account_revision': account.version,
-                            'event_id': snapshot_result_event(self.client, credential, account, account.version),
-                        })
-                elif credential.authorized_applications().filter(
+            authorized_ids = [str(value) for value in application.get_accounts().values_list('id', flat=True)]
+            if application.credential_notifications_enabled:
+                for account in application.get_accounts().order_by('id'):
+                    items.append({
+                        'key': f'account:{account.id}', 'account_id': str(account.id),
+                        'credential_mode': 'subscription', 'revision': account.version,
+                        'account_revision': account.version,
+                        'event_id': snapshot_result_event(self.client, None, account, account.version),
+                    })
+            for credential in credentials.filter(mode='alternating_rotation'):
+                if credential.authorized_applications().filter(
                     id=self.client.application_id,
                 ).exists():
                     item = {
@@ -185,7 +184,7 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
                         self.client, credential, credential.active_account, credential.current_revision,
                     )
                     items.append(item)
-            return {'event': 'snapshot', 'credentials': items}
+            return {'event': 'snapshot', 'credentials': items, 'authorized_account_ids': authorized_ids}
 
     async def receive_json(self, content, **kwargs):
         if not isinstance(content, dict):

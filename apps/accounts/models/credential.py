@@ -348,6 +348,7 @@ class CredentialRotationEvent(JMSOrgBaseModel):
     published_at = models.DateTimeField(default=timezone.now)
     revision = models.PositiveIntegerField(null=True)
     recipients = models.JSONField(default=list)
+    notification_enabled = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['sequence']

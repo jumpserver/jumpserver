@@ -55,13 +55,7 @@ def service_metadata(manager, scope, known, delivered, now):
     blocked = {str(account_id) for policy in rotations if policy.status != 'idle'
                for account_id in (policy.account_id, policy.alternate_account_id)
                if account_id != policy.active_account_id}
-    subscriptions = list(ApplicationCredential.objects.filter(
-        applications=application, mode='subscription', is_active=True,
-    ).prefetch_related('subscription_accounts').order_by('key'))
-    covered = {policy: (set(accounts) if policy.subscription_all_authorized else
-                       {str(account.id) for account in policy.subscription_accounts.all()})
-               for policy in subscriptions}
-    metadata, reports = [], {}
+    metadata = []
     from .event_results import snapshot_result_event
     for account_id in sorted(requested & accounts.keys()):
         account = accounts[account_id]
@@ -72,11 +66,8 @@ def service_metadata(manager, scope, known, delivered, now):
             'available': account_id not in blocked and stored_credential_available(account),
             'changed': known.get(key) != account.version,
         }
-        policies = [policy for policy in subscriptions if account_id in covered[policy]]
-        if item['available'] and policies:
-            item['event_id'] = snapshot_result_event(manager.client, policies[0], account, account.version)
-            for policy in policies:
-                reports.setdefault(policy, []).append((account.version, known.get(key), delivered.get(key)))
+        if item['available']:
+            item['event_id'] = snapshot_result_event(manager.client, None, account, account.version)
         metadata.append(item)
     for key, policy in sorted(selected.items()):
         account = accounts[str(policy.active_account_id)]
@@ -89,7 +80,6 @@ def service_metadata(manager, scope, known, delivered, now):
         if item['available']:
             item['event_id'] = snapshot_result_event(manager.client, policy, account, policy.current_revision)
         metadata.append(item)
-    manager._record_subscription_progress(reports, now)
     desired = {'credential_keys': sorted(item['key'] for item in metadata),
                'confirmation_keys': sorted(selected)}
     return desired, metadata, unavailable

@@ -45,7 +45,7 @@ class CredentialEventStreamTests(TransactionTestCase):
             name='app', username='app', asset=asset, secret='secret',
         )
         self.application = IntegrationApplication.objects.create(
-            name='stream-app', secret='stream-secret',
+            name='stream-app', secret='stream-secret', credential_notifications_enabled=True,
             accounts={'type': 'ids', 'ids': [str(self.account.id)]},
         )
         self.credential = ApplicationCredential.objects.create(
@@ -87,6 +87,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         alternate = Account.objects.create(
             name='alternate', username='alternate', asset=self.account.asset, secret='alternate-secret',
         )
+        self.application.credential_notifications_enabled = False
         self.application.accounts = {'type': 'ids', 'ids': [str(self.account.id), str(alternate.id)]}
         self.application.save()
         self.credential.mode = ApplicationCredential.Mode.alternating_rotation
@@ -181,6 +182,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         self.assertEqual(snapshot['credentials'][0].pop('account_revision'), self.account.version)
         self.assertEqual(snapshot, {
             'event': 'snapshot',
+            'authorized_account_ids': [str(self.account.id)],
             'credentials': [{
                 'key': self.credential.account_key(self.account.id),
                 'account_id': str(self.account.id),

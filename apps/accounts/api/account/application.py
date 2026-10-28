@@ -122,9 +122,11 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         except (TypeError, ValueError):
             raise ValidationError(_('Invalid pagination parameters.'))
         application_id = str(application.id)
+        source_ids = ApplicationAudit.objects.filter(
+            org_id=application.org_id, application_relations__application_id=application.id,
+        ).values('id')
         events = CredentialRotationEvent.objects.filter(
-            org_id=application.org_id,
-            recipients__contains=[{'application': {'id': application_id}}],
+            org_id=application.org_id, source_event_id__in=source_ids,
         ).order_by('-published_at', '-id')
         count = events.count()
         page = list(events[offset:offset + limit])
@@ -143,6 +145,13 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
                     'type': recipient['type'],
                     'publish_result': recipient['publish_result'],
                     'received_at': recipient['received_at'],
+                    'status': recipient.get('status', 'pending'),
+                    'finished_at': recipient.get('finished_at'),
+                    'error_code': recipient.get('error_code', ''),
+                    'account_id': recipient.get('account_id'),
+                    'account_revision': recipient.get('account_revision'),
+                    'fetched_at': recipient.get('fetched_at'),
+                    'delivered_at': recipient.get('delivered_at'),
                 }
                 for recipient in event.recipients
                 if recipient['application']['id'] == application_id
@@ -150,6 +159,10 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             results.append({
                 'id': str(event.source_event_id),
                 'event': ApplicationEvent.canonical(event.event),
+                'notification_enabled': event.notification_enabled,
+                'operation_id': str(audit.operation_id) if audit and audit.operation_id else None,
+                'result': audit.result if audit else '',
+                'account_id': str(audit.account_id) if audit and audit.account_id else None,
                 'published_at': event.published_at,
                 'revision': event.revision,
                 'rotation_id': str(event.rotation_id) if event.rotation_id else None,

@@ -29,6 +29,10 @@ class IntegrationApplication(JMSOrgBaseModel):
         'accounts.Account', default=empty_application_accounts,
         allow_empty_ids=True, verbose_name=_('Accounts'),
     )
+    credential_notifications_enabled = models.BooleanField(
+        default=False, verbose_name=_('Account credential change notifications'),
+        help_text=_('Notify clients when any authorized account credential changes. Client configuration controls local updates.'),
+    )
     enforce_account_limit = models.BooleanField(default=True, editable=False)
     ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
     date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date last used'))

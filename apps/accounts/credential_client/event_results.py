@@ -80,19 +80,23 @@ def report(client, event_id, status='success', error_code=''):
 def snapshot_result_event(client, credential, account, revision):
     """Retain a durable per-instance target across disconnects and startup."""
     sources = ApplicationAudit.objects.filter(
-        credential_id=credential.id, revision=revision,
+        credential_id=credential.id if credential else None, revision=revision,
         org_id=client.org_id,
-    ).values('id')
+        application_relations__application_id=client.application_id,
+    )
+    if credential is None:
+        sources = sources.filter(account_id=account.id)
     for event in CredentialRotationEvent.objects.filter(
-        source_event_id__in=sources, event=ApplicationEvent.CREDENTIAL_UPDATED,
+        source_event_id__in=sources.values('id'), event=ApplicationEvent.CREDENTIAL_UPDATED,
         org_id=client.org_id,
     ).order_by('-published_at'):
         if any(item['id'] == str(client.id) and item.get('account_id') == str(account.id)
                and item.get('account_revision') == account.version for item in event.recipients):
             return str(event.source_event_id)
     source = record(AuditEvent.CREDENTIAL_REPUBLISHED, credential=credential, account=account,
-                    application=client.application, revision=revision)
-    rotation = credential.rotation_records.select_for_update().filter(date_finished__isnull=True).first()
+                    application=client.application, revision=revision,
+                    credential_key=credential.key if credential else f'account:{account.id}')
+    rotation = credential.rotation_records.select_for_update().filter(date_finished__isnull=True).first() if credential else None
     sequence = 1
     if rotation:
         from django.db.models import Max
@@ -110,3 +114,25 @@ def snapshot_result_event(client, credential, account, revision):
         }],
     )
     return str(source.id)
+
+
+@transaction.atomic
+def record_account_progress(client, account_id, revision, stage):
+    """Fetching or writing a file is progress, independently of business success."""
+    if stage not in ('fetched_at', 'delivered_at'):
+        raise ValueError('Unknown credential progress stage')
+    sources = ApplicationAudit.objects.filter(
+        account_id=account_id, revision=revision, credential_id__isnull=True,
+        org_id=client.org_id, application_relations__application_id=client.application_id,
+    ).values('id')
+    for event in CredentialRotationEvent.objects.select_for_update().filter(
+        source_event_id__in=sources, event=ApplicationEvent.CREDENTIAL_UPDATED, org_id=client.org_id,
+    ):
+        changed = False
+        for recipient in event.recipients:
+            if (recipient['id'] == str(client.id) and recipient.get('account_id') == str(account_id)
+                    and recipient.get('account_revision') == revision and not recipient.get(stage)):
+                recipient[stage] = timezone.now().isoformat()
+                changed = True
+        if changed:
+            event.save(update_fields=['recipients', 'date_updated'])

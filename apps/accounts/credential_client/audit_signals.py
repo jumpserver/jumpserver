@@ -2,7 +2,6 @@
 from uuid import uuid4
 
 from django.db import transaction
-from django.db.models import F, Q
 from django.db.models.signals import pre_save, post_save, pre_delete, post_delete
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -27,7 +26,7 @@ MODEL_AUDIT_FIELDS = {
         'status', 'revision', 'is_active',
     ),
     CredentialClientInstance: ('is_active',),
-    IntegrationApplication: ('name', 'is_active', 'accounts', 'ip_group'),
+    IntegrationApplication: ('name', 'is_active', 'accounts', 'ip_group', 'credential_notifications_enabled'),
     ChangeSecretRecord: ('status',),
 }
 
@@ -86,7 +85,7 @@ def record_secret_change(instance, before, after):
         return
     if CredentialRotationRecord.objects.filter(change_execution_id=instance.execution_id).exists():
         return
-    credentials, applications = subscription_targets(instance.account)
+    applications = account_applications(instance.account)
     if instance.status in ('pending', 'running'):
         if before.get('status') in ('pending', 'running'):
             return  # Queueing and execution are the same change-start stage.
@@ -103,16 +102,13 @@ def record_secret_change(instance, before, after):
         result = 'failed'
     else:
         return
-    for credential in credentials:
-        targets = list(applications.filter(application_credentials=credential))
+    for application in applications:
         event = record(
-            audit_event, credential=credential, account=instance.account,
-            applications=targets, result=result,
-            credential_key=credential.account_key(instance.account_id),
-            revision=instance.account.version,
-            operation_id=instance.id,
+            audit_event, application=application, account=instance.account,
+            result=result, credential_key=ApplicationCredential.account_key(instance.account_id),
+            revision=instance.account.version, operation_id=instance.id,
         )
-        enqueue(event, application_event)
+        enqueue(event, application_event, notify=application.credential_notifications_enabled)
     if instance.status == ChangeSecretRecordStatusChoice.success:
         publish_subscription_credentials_for_account(instance.account, operation_id=instance.id)
 
@@ -121,39 +117,20 @@ def publish_subscription_credentials_for_account(account, revision=None, operati
     account = Account.objects.get(pk=account.pk)
     operation_id = operation_id or uuid4()
     revision = account.version if revision is None else revision
-    credentials, applications = subscription_targets(account, lock=True)
-    for credential in credentials:
-        ApplicationCredential.objects.filter(pk=credential.pk).update(
-            revision=F('revision') + 1, date_updated=timezone.now(),
-        )
-        credential.refresh_from_db(fields=['revision', 'date_updated'])
-        targets = list(applications.filter(application_credentials=credential))
+    for application in account_applications(account):
         event = record(
-            AuditEvent.CREDENTIAL_PUBLISHED, credential=credential, account=account,
-            applications=targets, credential_key=credential.account_key(account.id),
-            revision=revision,
-            operation_id=operation_id,
+            AuditEvent.CREDENTIAL_PUBLISHED, application=application, account=account,
+            credential_key=ApplicationCredential.account_key(account.id),
+            revision=revision, operation_id=operation_id,
         )
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED,
+                notify=application.credential_notifications_enabled)
 
 
-def subscription_targets(account, lock=False):
-    applications = IntegrationApplication.objects.filter(
+def account_applications(account):
+    return IntegrationApplication.objects.filter(
         IntegrationApplication.accounts.get_filter_q(account), is_active=True,
     ).distinct()
-    credentials = ApplicationCredential.objects.filter(
-        applications__in=applications,
-        mode=ApplicationCredential.Mode.subscription,
-        is_active=True,
-    ).filter(
-        Q(subscription_all_authorized=True) | Q(subscription_accounts=account),
-    ).distinct().order_by('key')
-    if lock:
-        ids = credentials.values('id')
-        credentials = ApplicationCredential.objects.select_for_update(
-            of=('self',)
-        ).filter(id__in=ids).order_by('key')
-    return credentials, applications
 
 
 def publish_subscription_credentials(sender, instance, history_instance, **kwargs):
@@ -201,7 +178,7 @@ def notify_model_change(instance, event, changes):
             enqueue(event, ApplicationEvent.ROTATION_FAILED, rotation=rotation)
     elif isinstance(instance, ApplicationCredential) and any(change['field'] == 'is_active' for change in changes):
         enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED if instance.is_active else ApplicationEvent.CREDENTIAL_REVOKED)
-    elif isinstance(instance, IntegrationApplication) and any(change['field'] == 'accounts' for change in changes):
+    elif isinstance(instance, IntegrationApplication) and any(change['field'] in ('accounts', 'credential_notifications_enabled') for change in changes):
         enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         notify_revoked_credentials(instance)
 

@@ -36,18 +36,19 @@ def application_group(application_id):
     return f'credential-app-{application_id}'
 
 
-def enqueue(event, code, rotation=None):
+def enqueue(event, code, rotation=None, *, notify=True):
     """Publish one domain event; delivery never participates in the source transaction."""
     try:
         with transaction.atomic():
             if rotation is not None:
                 _track_rotation(event, code, rotation)
             else:
-                _track_non_rotation(event, code)
+                _track_non_rotation(event, code, notify)
     except Exception as exc:
         logger.warning('Cannot record credential event %s (%s).', event.id, type(exc).__name__)
-    transaction.on_commit(lambda: _publish_stream(event.id, code))
-    _enqueue_webhooks(event, code)
+    if notify:
+        transaction.on_commit(lambda: _publish_stream(event.id, code))
+        _enqueue_webhooks(event, code)
 
 
 def _application_ids(event):
@@ -62,6 +63,17 @@ def _clients(event, code):
         application_id__in=_application_ids(event), application__is_active=True,
         is_active=True, org_id=event.org_id,
     )
+    if event.account_id and not event.credential_id:
+        from accounts.models import Account
+        account = Account.objects.filter(id=event.account_id).first()
+        if not account:
+            return clients.none()
+        clients = clients.filter(
+            application__in=IntegrationApplication.objects.filter(
+                IntegrationApplication.accounts.get_filter_q(account),
+                credential_notifications_enabled=True,
+            ),
+        )
     if event.credential_id and code != 'credential.revoked':
         clients = clients.filter(
             application__credential_bindings__credential_id=event.credential_id,
@@ -78,7 +90,7 @@ def _recipients(event, code):
     from accounts.models import Account
     credential = ApplicationCredential.objects.filter(id=event.credential_id).first()
     target_id = credential.active_account_id if credential and credential.mode == 'alternating_rotation' else event.account_id
-    target_version = (event.revision if credential and credential.mode == 'subscription'
+    target_version = (event.revision if not credential or credential.mode == 'subscription'
                       else Account.objects.filter(id=target_id).values_list('version', flat=True).first())
     clients = _clients(event, code).select_related('application').order_by('id')
     return [{
@@ -107,17 +119,18 @@ def _track_rotation(event, code, rotation):
     )
 
 
-def _track_non_rotation(event, code):
+def _track_non_rotation(event, code, notify=True):
     if code not in TRACKED_NON_ROTATION_EVENTS:
         return
-    if (not event.credential_id and not _clients(event, code).exists()) or CredentialRotationEvent.objects.filter(
+    if not _application_ids(event) or CredentialRotationEvent.objects.filter(
         source_event_id=event.id,
     ).exists():
         return
     CredentialRotationEvent.objects.create(
         rotation=None, source_event_id=event.id, event=code, sequence=1,
         cycle_id=event.operation_id or event.id,
-        revision=event.revision, recipients=_recipients(event, code), org_id=event.org_id,
+        revision=event.revision, recipients=_recipients(event, code) if notify else [],
+        notification_enabled=notify, org_id=event.org_id,
     )
 
 
@@ -135,7 +148,7 @@ def _send_stream(event_id, code):
     if not event:
         return
     credential = ApplicationCredential.objects.filter(id=event.credential_id).first()
-    credential_mode = credential.mode if credential else None
+    credential_mode = credential.mode if credential else ('subscription' if event.account_id else None)
     application_ids = set(_clients(event, code).values_list('application_id', flat=True))
     try:
         tracked = CredentialRotationEvent.objects.filter(
@@ -170,7 +183,13 @@ def _send_stream(event_id, code):
     except Exception:
         channel_layer = None
     for application_id in application_ids:
-        message = {'type': 'credential.event', 'payload': payload}
+        application_payload = dict(payload)
+        if code == ApplicationEvent.APPLICATION_SCOPE_UPDATED:
+            application = IntegrationApplication.objects.get(id=application_id)
+            application_payload['authorized_account_ids'] = [
+                str(value) for value in application.get_accounts().values_list('id', flat=True)
+            ]
+        message = {'type': 'credential.event', 'payload': application_payload}
         if tracked is not None:
             # Match actual delivery to the same frozen identities that can ACK it.
             message['recipient_ids'] = [

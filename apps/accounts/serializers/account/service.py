@@ -42,7 +42,7 @@ class IntegrationApplicationSerializer(BulkOrgResourceModelSerializer):
         fields = fields_small + [
             'date_last_used', 'date_created', 'date_updated',
             'ip_group', 'accounts_amount',
-            'comment', 'is_active'
+            'comment', 'is_active', 'credential_notifications_enabled'
         ]
         extra_kwargs = {
             'comment': {'label': _('Comment')},

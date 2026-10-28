@@ -172,6 +172,9 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         'retry_change': ['accounts.change_applicationcredential', 'accounts.add_changesecretexecution'],
     }
 
+    def get_queryset(self):
+        return super().get_queryset().filter(mode='alternating_rotation')
+
     @transaction.atomic
     def perform_destroy(self, instance):
         if instance.status != ApplicationCredential.Status.idle:

@@ -401,34 +401,15 @@ class CredentialRotationTestCase(CredentialTestCase):
 
 
 
-    def test_subscription_push_requires_selection_while_pull_requires_application_authorization(self):
-        self.credential.mode = ApplicationCredential.Mode.subscription
-        self.credential.account = None
-        self.credential.alternate_account = None
-        self.credential.active_account = None
-        self.credential.save()
-        self.credential.subscription_accounts.add(self.primary)
-        manager = CredentialClientManager(self.application, instance_id='subscription-client')
-        self.credential.applications.remove(self.application)
-        self.assertEqual(
-            manager.fetch('', '127.0.0.1', self.primary.id)['key'],
-            f'account:{self.primary.id}',
-        )
-        with self.assertRaises(PermissionDenied):
-            manager.fetch(self.credential.account_key(self.primary.id), '127.0.0.1')
-        CredentialApplicationBinding.objects.create(
-            credential=self.credential, application=self.application, org_id=self.org.id,
-        )
-        self.assertEqual(
-            manager.fetch(self.credential.account_key(self.primary.id), '127.0.0.1')['key'],
-            f'account:{self.primary.id}',
-        )
+    def test_account_pull_is_independent_of_notification_settings(self):
+        manager = CredentialClientManager(self.application, instance_id='account-client')
+        key = f'account:{self.primary.id}'
+        self.assertFalse(self.application.credential_notifications_enabled)
+        self.assertEqual(manager.fetch(key, '127.0.0.1')['account']['id'], str(self.primary.id))
         self.application.accounts = {'type': 'ids', 'ids': [str(self.backup.id)]}
         self.application.save()
         with self.assertRaises(PermissionDenied):
-            manager.fetch('', '127.0.0.1', self.primary.id)
-        with self.assertRaises(PermissionDenied):
-            manager.fetch(self.credential.account_key(self.primary.id), '127.0.0.1')
+            manager.fetch(key, '127.0.0.1')
 
     def test_subscription_fetch_api_requires_exactly_one_selector(self):
         self.credential.mode = ApplicationCredential.Mode.subscription
@@ -566,53 +547,13 @@ class CredentialRotationTestCase(CredentialTestCase):
         self.assertIn(self.application, credential.applications.all())
 
 
-    def test_subscription_policy_requires_applications_and_syncs_bindings(self):
-        data = {
-            'name': 'Subscription policy',
-            'mode': ApplicationCredential.Mode.subscription,
-        }
-        serializer = ApplicationCredentialSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('applications', serializer.errors)
-
+    def test_subscription_policy_cannot_be_created(self):
         serializer = ApplicationCredentialSerializer(data={
-            **data, 'applications': [str(self.application.id)],
+            'name': 'Subscription policy', 'mode': 'subscription',
+            'applications': [str(self.application.id)],
         })
         self.assertFalse(serializer.is_valid())
-        self.assertIn('subscription_accounts', serializer.errors)
-        serializer = ApplicationCredentialSerializer(data={
-            **data, 'applications': [str(self.application.id)],
-            'subscription_accounts': [str(self.backup.id)],
-        })
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        policy = serializer.save()
-        self.assertEqual(list(policy.subscription_accounts.all()), [self.backup])
-        self.assertIsNone(policy.account_id)
-        self.assertIsNone(policy.alternate_account_id)
-        self.assertIsNone(policy.active_account_id)
-        second = IntegrationApplication.objects.create(
-            name='billing-service', secret='billing-secret',
-            accounts={'type': 'ids', 'ids': [str(self.backup.id)]},
-        )
-        serializer = ApplicationCredentialSerializer(
-            policy, data={
-                'applications': [str(self.application.id), str(second.id)],
-            }, partial=True,
-        )
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        policy = serializer.save()
-        self.assertSetEqual(
-            set(policy.applications.values_list('id', flat=True)),
-            {self.application.id, second.id},
-        )
-
-        serializer = ApplicationCredentialSerializer(
-            policy, data={'applications': [str(second.id)]}, partial=True,
-        )
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        serializer.save()
-        self.assertFalse(self.application.application_credentials.filter(id=policy.id).exists())
-        self.assertSetEqual(set(policy.applications.values_list('id', flat=True)), {second.id})
+        self.assertIn('mode', serializer.errors)
 
     @override_language('en')
     def test_serializer_names_credential_using_the_account(self):
@@ -831,25 +772,19 @@ class CredentialClientStateWriteTests(CredentialTestCase):
                 self.assertEqual(logs.count(), 2)
                 self.assertEqual(logs.first().revision, self.credential.revision)
 
-    def test_subscription_fetch_audit_tracks_credential_revision(self):
+    def test_account_fetch_audit_records_account_version(self):
         from accounts.models import ApplicationAudit
-        self.credential.mode = ApplicationCredential.Mode.subscription
-        self.credential.account = None
-        self.credential.alternate_account = None
-        self.credential.active_account = None
-        self.credential.save()
-        self.credential.subscription_accounts.add(self.primary)
         manager = self.manager('sdk')
-        key = self.credential.account_key(self.primary.id)
-        manager.fetch(key, '127.0.0.1')
+        key = f'account:{self.primary.id}'
         manager.fetch(key, '127.0.0.1')
         logs = ApplicationAudit.objects.filter(event='credential_fetched', instance_id='sdk')
         self.assertEqual(logs.count(), 1)
         self.primary.secret = 'new-audited-secret'
         self.primary.save()
-        manager.fetch(key, '127.0.0.1')
+        self.primary.refresh_from_db()
         manager.fetch(key, '127.0.0.1')
         self.assertEqual(logs.count(), 2)
+        self.assertEqual(logs.first().revision, self.primary.version)
 
     def test_fetch_and_confirm_do_not_mark_client_online(self):
         for kind in ('sdk', 'agent'):

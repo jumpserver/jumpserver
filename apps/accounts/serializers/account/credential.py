@@ -68,6 +68,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     rotation = serializers.SerializerMethodField()
     precheck = serializers.SerializerMethodField()
     preparation = serializers.SerializerMethodField()
+    mode = serializers.ChoiceField(choices=['alternating_rotation'], default='alternating_rotation')
     subscription_all_authorized = serializers.BooleanField(required=False)
     standby_no_traffic_days = serializers.IntegerField(
         source='source_no_traffic_days', min_value=1, max_value=3650,

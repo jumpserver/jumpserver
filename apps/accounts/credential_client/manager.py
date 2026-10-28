@@ -12,7 +12,7 @@ from accounts.models import (
     CredentialClientStatus,
 )
 from common.exceptions import JMSException
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
@@ -180,6 +180,8 @@ class CredentialClientManager:
             AuditEvent.CREDENTIAL_FETCHED, client=self.client, account=account,
             credential_key=key, revision=revision, remote_addr=remote_addr,
         )
+        from .event_results import record_account_progress
+        record_account_progress(self.client, account.id, revision, 'fetched_at')
         if self.audit_context is not None:
             self.audit_context.set_fetch_result(revision, True)
         return payload
@@ -195,31 +197,8 @@ class CredentialClientManager:
                 raise JMSException(_('Credential account not found.'), code='credential_not_found')
             if key != ApplicationCredential.account_key(push_account_id):
                 raise JMSException(_('Credential account not found.'), code='credential_not_found')
-            credentials, account = self._subscription_credentials(push_account_id)
-            revision = account.version
-            payload = self._account_payload(key, revision, account)
-            from accounts.credential_rotation.preparation import record_secret_access
-            record_secret_access(account, self.application)
-            now = timezone.now()
-            any_revision_changed = False
-            for credential in credentials:
-                binding = CredentialApplicationBinding.objects.get(
-                    credential=credential, application=self.application,
-                )
-                state = CredentialClientStatus.objects.get_or_create(
-                    binding=binding, client=self.client,
-                )[0]
-                revision_changed = state.date_fetched is None or state.fetched_revision != revision
-                any_revision_changed |= revision_changed
-                self._save_status(state, now, {'fetched_revision': revision}, fetched=True)
-                if revision_changed:
-                    record(
-                        AuditEvent.CREDENTIAL_FETCHED, credential=credential,
-                        client=self.client, applications=[self.application], account=account,
-                        credential_key=key, revision=revision, remote_addr=remote_addr,
-                    )
-            if self.audit_context is not None:
-                self.audit_context.set_fetch_result(revision, any_revision_changed)
+            payload = self.fetch_account(push_account_id, remote_addr)
+            payload['key'] = key
             return payload
         credential, account = self._get_credential(key)
         revision = (
@@ -287,16 +266,8 @@ class CredentialClientManager:
         authorized = self.application.get_accounts().values('id')
         return ApplicationCredential.objects.filter(
             org_id=self.application.org_id, applications=self.application,
-        ).filter(
-            Q(mode=ApplicationCredential.Mode.subscription) |
-            Q(mode=ApplicationCredential.Mode.alternating_rotation,
-              account_id__in=authorized, alternate_account_id__in=authorized,
-              active_account_id__in=authorized),
-        ).annotate(
-            authorized_accounts_count=Count(
-                'subscription_accounts',
-                filter=Q(subscription_accounts__id__in=authorized), distinct=True,
-            ),
+            mode='alternating_rotation', account_id__in=authorized,
+            alternate_account_id__in=authorized, active_account_id__in=authorized,
         ).order_by('id')
 
     def application_info(self):
@@ -307,6 +278,7 @@ class CredentialClientManager:
             'org_id': str(self.application.org_id), 'is_active': self.application.is_active,
             'accounts_count': self.application.get_accounts().distinct().count(),
             'policies_count': policies.count(),
+            'credential_notifications_enabled': self.application.credential_notifications_enabled,
         }
 
     def client_info(self):
@@ -403,30 +375,22 @@ class CredentialClientManager:
                 },
                 'credentials': [],
             }
-        subscribed = set()
         for credential in ApplicationCredential.objects.filter(
-            is_active=True, applications=self.application,
+            is_active=True, applications=self.application, mode='alternating_rotation',
         ).distinct().order_by('key'):
-            if credential.mode == ApplicationCredential.Mode.subscription:
-                selected = set(accounts) if credential.subscription_all_authorized else set(
-                    credential.subscription_accounts.filter(id__in=accounts).values_list('id', flat=True)
-                )
-                for account_id in selected:
-                    subscribed.add(account_id)
-            elif credential.authorized_applications().filter(id=self.application.id).exists():
+            if credential.authorized_applications().filter(id=self.application.id).exists():
                 account = accounts.get(credential.active_account_id)
                 if account:
                     account['credentials'].append({
                         'key': credential.key, 'mode': credential.mode,
-                        'revision': credential.current_revision,
-                        'account_switch': credential.account_switch,
+                        'revision': credential.current_revision, 'account_switch': credential.account_switch,
                     })
-        for account_id in subscribed:
-            accounts[account_id]['credentials'].append({
-                'key': ApplicationCredential.account_key(account_id),
-                'mode': ApplicationCredential.Mode.subscription,
-                'revision': page_by_id[account_id].version,
-            })
+        if self.application.credential_notifications_enabled:
+            for account_id in accounts:
+                accounts[account_id]['credentials'].append({
+                    'key': ApplicationCredential.account_key(account_id), 'mode': 'subscription',
+                    'revision': page_by_id[account_id].version,
+                })
         return {'count': count, 'accounts': list(accounts.values())}
 
     def confirm(self, key, revision, account_id):
@@ -482,26 +446,18 @@ class CredentialClientManager:
     def credential_keys(application, delivery_scope=None):
         application.assert_account_limit()
         keys = set()
-        accounts = None
         selected_keys = set(delivery_scope['keys']) if delivery_scope is not None else None
         selected_accounts = set(delivery_scope['account_ids']) if delivery_scope is not None else None
+        if application.credential_notifications_enabled:
+            for account_id in application.get_accounts().values_list('id', flat=True):
+                key = ApplicationCredential.account_key(account_id)
+                if selected_keys is None or key in selected_keys or str(account_id) in selected_accounts:
+                    keys.add(key)
         credentials = ApplicationCredential.objects.filter(
-            applications=application, is_active=True,
+            applications=application, is_active=True, mode='alternating_rotation',
         ).order_by('key')
         for credential in credentials:
-            if credential.mode == ApplicationCredential.Mode.subscription:
-                if accounts is None:
-                    accounts = application.get_accounts().order_by('id')
-                selected = accounts if credential.subscription_all_authorized else accounts.filter(
-                    id__in=credential.subscription_accounts.values('id')
-                )
-                for account in selected:
-                    key = credential.account_key(account.id)
-                    if selected_keys is None or key in selected_keys or str(account.id) in selected_accounts:
-                        keys.add(key)
-            elif credential.authorized_applications().filter(
-                id=application.id
-            ).exists():
+            if credential.authorized_applications().filter(id=application.id).exists():
                 if selected_keys is None or credential.key in selected_keys or bool(
                     selected_accounts & {str(credential.account_id), str(credential.alternate_account_id)}
                 ):
@@ -580,15 +536,11 @@ class CredentialClientManager:
             item for item in delivered_credentials or []
             if item['key'] in desired['credential_keys']
         ], now)
-        subscription_reports = {}
         for key in ([] if service_scope else desired['credential_keys']):
             if key.startswith('account:'):
-                subscriptions, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
-                credential = subscriptions[0]
+                account = self.application.get_accounts().get(id=UUID(key.removeprefix('account:')))
+                credential = None
                 revision = account.version
-                for policy in subscriptions:
-                    reports = subscription_reports.setdefault(policy, [])
-                    reports.append((revision, known.get(key), delivered.get(key)))
             else:
                 credential, account = self._get_credential(key, lock=False)
                 revision = credential.current_revision
@@ -604,7 +556,11 @@ class CredentialClientManager:
             item.update(account_id=str(account.id), account_revision=account.version,
                         event_id=snapshot_result_event(self.client, credential, account, revision))
             metadata.append(item)
-        self._record_subscription_progress(subscription_reports, now)
+        from .event_results import record_account_progress
+        for item in metadata:
+            key = item['key']
+            if key.startswith('account:') and delivered.get(key) == item['revision']:
+                record_account_progress(self.client, item['account_id'], item['revision'], 'delivered_at')
         values = {
             'delivery_scope': ({**delivery_scope, '_resolved_rotation_keys': desired['confirmation_keys']}
                                if service_scope else delivery_scope),
