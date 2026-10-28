@@ -23,6 +23,12 @@ from .audit import record
 def scope_uses_credential(scope, credential):
     if scope is None:
         return True
+    if scope.get('include_authorized'):
+        if '_resolved_rotation_keys' in scope:
+            return credential.key in scope['_resolved_rotation_keys']
+        return bool(set(scope.get('switch_account_ids', [])) & {
+            str(credential.account_id), str(credential.alternate_account_id),
+        })
     if credential.key in scope['keys']:
         return True
     return bool(set(scope['account_ids']) & {
@@ -563,13 +569,19 @@ class CredentialClientManager:
         desired_digest = self.agent_configuration_digest(self.application, delivery_scope)
         known = {item['key']: item['revision'] for item in credentials or []}
         delivered = {item['key']: item['revision'] for item in delivered_credentials or []}
+        service_scope = bool(delivery_scope and delivery_scope.get('include_authorized'))
+        unavailable = []
+        metadata = []
+        if service_scope:
+            from .service_scope import service_metadata
+            desired, metadata, unavailable = service_metadata(self, delivery_scope, known, delivered, now)
+            desired_digest = hashlib.sha256(json.dumps(desired, sort_keys=True).encode()).hexdigest()
         self._record_delivered([
             item for item in delivered_credentials or []
             if item['key'] in desired['credential_keys']
         ], now)
-        metadata = []
         subscription_reports = {}
-        for key in desired['credential_keys']:
+        for key in ([] if service_scope else desired['credential_keys']):
             if key.startswith('account:'):
                 subscriptions, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
                 credential = subscriptions[0]
@@ -594,7 +606,8 @@ class CredentialClientManager:
             metadata.append(item)
         self._record_subscription_progress(subscription_reports, now)
         values = {
-            'delivery_scope': delivery_scope,
+            'delivery_scope': ({**delivery_scope, '_resolved_rotation_keys': desired['confirmation_keys']}
+                               if service_scope else delivery_scope),
             'config_digest': config_digest,
             'sync_status': sync_status,
             'sync_error': sync_error[:128],
@@ -607,12 +620,17 @@ class CredentialClientManager:
         from accounts.credential_rotation.participants import enroll_client
         enroll_client(self.client)
         response = {
+            'config_schema_version': 1,
             'config_digest': desired_digest,
             'scope': desired,
             'credentials': metadata,
             'removed_keys': sorted(set(known) - set(desired['credential_keys'])),
             'date_last_synced': now,
         }
+        if service_scope:
+            from .protocol import SERVER_CAPABILITIES
+            response['server_capabilities'] = list(SERVER_CAPABILITIES)
+            response['unavailable_switch_account_ids'] = unavailable
         return response
 
     def _record_subscription_progress(self, policy_reports, now):

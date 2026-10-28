@@ -60,43 +60,41 @@ def materials(application, params, endpoint):
     )}
     install_path = settings['install_path'].rstrip('/')
     bootstrap = {
+        'config_version': 1,
         'endpoint': endpoint, 'org_id': str(application.org_id),
         'app_id': str(application.id), 'app_secret': application.secret,
         'instance_id': '<instance-id>',
-        'delivery': {
-            'delivery_mode': settings['delivery_mode'],
-            'delivery_root': f'{install_path}/credentials',
-            'app_user': settings['app_user'],
-        },
-        'rules': [],
+        'local_api': {'owner': settings['app_user']},
+        'services': [],
     }
+    if params['store_scope'] != 'none':
+        bootstrap['store'] = {
+            'accounts': ['all'] if params['store_scope'] == 'all' else [str(value) for value in params['store_accounts']],
+            'root': f'{install_path}/credentials', 'format': params['store_format'], 'owner': settings['app_user'],
+        }
     setup = params.get('agent_setup', 'delivery')
     if setup != 'delivery':
-        rule = {
-            'accounts': [{
-                'account_id': str(params['account_id']),
-                **({'allow_account_switch': True} if setup == 'rotation' else {}),
-            }],
-            'config_update': {
-                'file': params['config_file'], 'format': params['config_format'],
-                'fields_map': {params['username_field']: 'username', params['secret_field']: 'secret'},
-            },
+        selectors, fields = [], {}
+        for account in params['service_accounts']:
+            selectors.append({'id': str(account['account_id']),
+                              **({'alias': account['alias']} if account['alias'] else {})})
+            prefix = f"{account['alias']}." if account['alias'] else ''
+            fields[account['username_field']] = prefix + 'username'
+            fields[account['secret_field']] = prefix + 'secret'
+        service = {
+            'name': params['service_name'],
+            'accounts': selectors,
+            'allow_account_switch': params['allow_account_switch'],
+            'update_on_notification': params['update_on_notification'],
+            'update_config': {'file': params['config_file'], 'format': params['config_format'], 'fields_map': fields},
         }
         if params['service_action_type'] == 'systemd':
-            rule['service_action'] = {
-                'unit': params['systemd_unit'], 'operation': params['systemd_action'],
-            }
+            service['reload_service'] = {'unit': params['systemd_unit'], 'operation': params['systemd_action']}
         elif params['service_action_type'] == 'script':
-            rule['service_action'] = {'path': params['service_script']}
+            service['reload_service'] = {'path': params['service_script']}
         if params['application_check']:
-            rule['application_check'] = {
-                'path': params['application_check'], 'confirm_on_success': True,
-            }
-        bootstrap['rules'] = [rule]
-    if setup == 'delivery' and settings['systemd_unit']:
-        bootstrap['delivery']['systemd_unit'] = settings['systemd_unit']
-    if setup == 'delivery' and settings['systemd_action']:
-        bootstrap['delivery']['systemd_action'] = settings['systemd_action']
+            service['app_check'] = {'path': params['application_check'], 'confirm_on_success': True}
+        bootstrap['services'] = [service]
     filename = 'jms_pam_agent.json'
     preparation = f'{agent_build_command(endpoint)} &&\nsudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
     installation = (
@@ -105,7 +103,7 @@ def materials(application, params, endpoint):
         f'--bootstrap {filename} --instance-id "$(hostname)"'
     )
     foreground_unix = foreground_windows = ''
-    if setup == 'delivery' and settings['delivery_mode'] != 'environment':
+    if setup == 'delivery':
         short_id = str(application.id).replace('-', '')[:12]
         directory = f'$HOME/.jms-pam-agent/{short_id}'
         foreground_unix = (

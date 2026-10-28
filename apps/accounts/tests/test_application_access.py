@@ -90,8 +90,11 @@ class ApplicationAccessTests(CredentialTestCase):
         compile(data['config'], data['filename'], 'exec')
         compile(data['code'], 'application_example.py', 'exec')
         self.assertEqual(data['sdk_language'], 'python')
-        self.assertIn('python3 -m pip install jms-pam', data['install_command'])
-        self.assertNotIn('pip install --upgrade jms-pam', data['install_command'])
+        self.assertIn('http://testserver/api/v1/accounts/client-source/python/', data['install_command'])
+        self.assertIn(
+            'python3 -m pip install --upgrade --force-reinstall ./jms-pam-clients/python',
+            data['install_command'],
+        )
         self.assertIn('instance_id=instance_id', data['code'])
         self.assertRegex(data['instance_id'], r'^[0-9a-f]{32}$')
         config_globals = {}
@@ -388,18 +391,19 @@ class ApplicationAccessTests(CredentialTestCase):
         changed = self.parameters(type='agent', app_user='other')
         self.assertNotIn('event_file', bootstrap)
         self.assertNotIn('state_file', bootstrap)
-        self.assertNotIn('socket_path', bootstrap['delivery'])
-        self.assertEqual(bootstrap['rules'], [])
-        self.assertEqual(json.loads(materials(self.application, changed, 'http://testserver')['config'])['delivery']['app_user'], 'other')
+        self.assertNotIn('socket_path', bootstrap['local_api'])
+        self.assertEqual(bootstrap['services'], [])
+        self.assertEqual(bootstrap['config_version'], 1)
+        self.assertEqual(bootstrap['store']['accounts'], ['all'])
+        self.assertEqual(json.loads(materials(self.application, changed, 'http://testserver')['config'])['local_api']['owner'], 'other')
         environment = self.parameters(
-            type='agent', app_user='app', delivery_mode='environment',
-            systemd_unit='app.service',
+            type='agent', app_user='app', store_format='environment',
         )
         environment_materials = materials(self.application, environment, 'http://testserver')
-        self.assertFalse(environment_materials['foreground_windows_command'])
+        self.assertTrue(environment_materials['foreground_windows_command'])
         self.assertEqual(
-            json.loads(environment_materials['config'])['delivery']['systemd_unit'],
-            'app.service',
+            json.loads(environment_materials['config'])['store']['format'],
+            'environment',
         )
 
     def test_agent_application_signature_syncs_and_sdk_cannot_use_agent_scope(self):
