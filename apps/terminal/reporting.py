@@ -12,22 +12,24 @@ class SessionReportExporter(BaseListReportExporter):
 
     def get_summary_sections(self):
         sessions = self.records
-        success_sessions = [item for item in sessions if item.is_success]
-        failed_sessions = [item for item in sessions if not item.is_success]
-        finished_sessions = [item for item in sessions if item.is_finished]
-        active_sessions = [item for item in sessions if not item.is_finished]
-        replay_sessions = [item for item in sessions if item.has_replay]
-        command_sessions = [item for item in sessions if item.has_command]
+        success_count = finished_count = replay_count = command_count = 0
+        for item in sessions:
+            success_count += bool(item.is_success)
+            finished_count += bool(item.is_finished)
+            replay_count += bool(item.has_replay)
+            command_count += bool(item.has_command)
+        failed_count = len(sessions) - success_count
+        active_count = len(sessions) - finished_count
 
         overview = OrderedDict([
             (_('Total records'), len(sessions)),
-            (_('Successful sessions'), len(success_sessions)),
-            (_('Failed sessions'), len(failed_sessions)),
-            (_('Finished sessions'), len(finished_sessions)),
-            (_('Active sessions'), len(active_sessions)),
-            (_('Success rate'), self.format_percent(len(success_sessions), len(sessions))),
-            (_('Sessions with replay'), len(replay_sessions)),
-            (_('Sessions with commands'), len(command_sessions)),
+            (_('Successful sessions'), success_count),
+            (_('Failed sessions'), failed_count),
+            (_('Finished sessions'), finished_count),
+            (_('Active sessions'), active_count),
+            (_('Success rate'), self.format_percent(success_count, len(sessions))),
+            (_('Sessions with replay'), replay_count),
+            (_('Sessions with commands'), command_count),
             (_('Unique users'), len({item.user_id or item.user for item in sessions if item.user or item.user_id})),
             (_('Unique assets'), len({item.asset_id or item.asset for item in sessions if item.asset or item.asset_id})),
             (_('Unique terminals'), len({

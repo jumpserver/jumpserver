@@ -3,10 +3,8 @@ from itertools import chain
 from xml.etree.ElementTree import ParseError as XMLParseError
 from zipfile import ZipFile
 
-import pyexcel
 from defusedxml.ElementTree import iterparse
 from django.utils.translation import gettext as _
-from openpyxl.utils.cell import coordinate_to_tuple, range_boundaries
 
 from common.utils.zip import ZipSecurityError, validate_zip_file
 
@@ -26,6 +24,8 @@ class ExcelFileParser(BaseFileParser):
     MAX_XML_ELEMENTS = 1000000
 
     def validate_xml(self, events):
+        from openpyxl.utils.cell import coordinate_to_tuple, range_boundaries
+
         max_row = max_column = row = column = 0
         cells = merged_cells = elements = sheets = 0
         depth = 0
@@ -113,6 +113,8 @@ class ExcelFileParser(BaseFileParser):
                         raise ValueError(_('Excel workbook exceeds import limits'))
 
     def generate_rows(self, stream_data):
+        import pyexcel
+
         try:
             self.validate_workbook(stream_data)
         except ZipSecurityError as exc:

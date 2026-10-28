@@ -7255,10 +7255,6 @@ msgstr "Sua conta foi criada com sucesso"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer Open Fortress Machine"
 
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "Serviço Flower indisponível, por favor verifique"
-
 #: jumpserver/views/other.py:28
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "

@@ -7217,10 +7217,6 @@ msgstr "Tài khoản của bạn đã được tạo thành công"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer"
 
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "Dịch vụ Flower không khả dụng, vui lòng kiểm tra"
-
 #: jumpserver/views/other.py:28
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "

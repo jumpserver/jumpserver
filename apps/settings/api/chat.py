@@ -3,7 +3,6 @@ import re
 import secrets
 
 import httpx
-import openai
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
@@ -32,6 +31,8 @@ class ChatAIProviderMixin:
 
     @staticmethod
     def get_client(config):
+        import openai
+
         kwargs = {
             'base_url': config['base_url'],
             'api_key': config['api_key'] or 'not-required',
@@ -51,6 +52,8 @@ class ChatAIProviderMixin:
 
     @classmethod
     def get_error_detail(cls, error):
+        import openai
+
         if isinstance(error, openai.APITimeoutError):
             return _(
                 'The connection to the model provider timed out. Please check '
@@ -196,6 +199,8 @@ class ChatAITestingAPI(ChatAIProviderMixin, GenericAPIView):
 
     @classmethod
     def get_error_detail(cls, error):
+        import openai
+
         detail = super().get_error_detail(error)
         if isinstance(error, openai.APIStatusError) and error.status_code in (404, 405, 501):
             return _(

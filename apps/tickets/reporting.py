@@ -14,11 +14,11 @@ class TicketReportExporter(BaseListReportExporter):
         tickets = self.records
         overview = OrderedDict([
             (_('Total records'), len(tickets)),
-            (_('Open tickets'), len([item for item in tickets if item.status == 'open'])),
-            (_('Closed tickets'), len([item for item in tickets if item.status == 'closed'])),
-            (_('Pending tickets'), len([item for item in tickets if item.state == 'pending'])),
-            (_('Approved tickets'), len([item for item in tickets if item.state == 'approved'])),
-            (_('Rejected tickets'), len([item for item in tickets if item.state == 'rejected'])),
+            (_('Open tickets'), sum(1 for item in tickets if item.status == 'open')),
+            (_('Closed tickets'), sum(1 for item in tickets if item.status == 'closed')),
+            (_('Pending tickets'), sum(1 for item in tickets if item.state == 'pending')),
+            (_('Approved tickets'), sum(1 for item in tickets if item.state == 'approved')),
+            (_('Rejected tickets'), sum(1 for item in tickets if item.state == 'rejected')),
             (_('Unique applicants'), len({
                 item.applicant_id for item in tickets if getattr(item, 'applicant_id', None)
             })),
