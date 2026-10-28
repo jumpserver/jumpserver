@@ -757,7 +757,6 @@ class Config(dict):
         'PERM_EXPIRED_FIRST_NOTICE_DAYS': 3,
         'PERM_EXPIRED_DAILY_NOTICE_DAYS': 3,
         'PERM_TREE_REGEN_INTERVAL': 1,
-        'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
         # Luna user preference defaults
         'LUNA_DEFAULT_IS_ASYNC_ASSET_TREE': True,
@@ -890,7 +889,6 @@ class Config(dict):
         'JDMC_SOCK_PATH': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 
-        'FLOWER_ENABLED': True,
 
         # x-forwarded-for 相关
         'TRUSTED_IP_VERIFY_ENABLED': False,

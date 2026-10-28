@@ -7146,14 +7146,7 @@ msgstr "JumpServer 오픈소스 방화벽"
 
 #: jumpserver/context_processor.py:16
 msgid "JumpServer - An open-source PAM"
-msgstr "Flower 서비스가 사용 불가능합니다, 확인하십시오"
-
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr ""
-"<div>Luna는 독립적으로 배포된 프로그램으로, luna와 koko를 배포해야 합니다. </"
-"div><div>이 페이지를 보았다면, nginx가 수신하고 있는 포트에 접근하고 있지 않"
-"음을 의미합니다. 행운을 기원합니다</div>"
+msgstr "JumpServer - 오픈 소스 PAM"
 
 #: jumpserver/views/other.py:28
 msgid ""

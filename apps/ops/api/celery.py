@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 import re
-from collections import defaultdict
+from django.db.models import Count, F, Q, Window
+from django.db.models.functions import RowNumber
 
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _, gettext_lazy
 from django_celery_beat.models import PeriodicTask
 from django_filters import rest_framework as drf_filters
-from rest_framework import generics, viewsets, mixins, status
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from common.api import CommonApiMixin
 from common.drf.filters import BaseFilterSet
@@ -22,7 +24,7 @@ from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerial
 
 __all__ = [
     'CeleryPeriodTaskViewSet', 'CeleryTaskViewSet',
-    'CeleryTaskExecutionViewSet'
+    'CeleryTaskExecutionViewSet', 'CeleryMonitorAPIView'
 ]
 
 
@@ -31,7 +33,7 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = CeleryPeriodTaskSerializer
     http_method_names = ('get', 'head', 'options', 'patch')
     lookup_field = 'name'
-    lookup_value_regex = '[\w.@]+'
+    lookup_value_regex = r'[\w.@]+'
 
     def get_object(self):
         name = self.kwargs.get('name')
@@ -39,9 +41,14 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return obj
 
 
-class CelerySummaryAPIView(generics.RetrieveAPIView):
+class CeleryMonitorAPIView(APIView):
+    rbac_perms = {'GET': 'ops.view_taskmonitor', 'HEAD': 'ops.view_taskmonitor'}
+
     def get(self, request, *args, **kwargs):
-        pass
+        from ops.celery.monitor import get_monitor_snapshot
+        response = Response(get_monitor_snapshot())
+        response['Cache-Control'] = 'no-store'
+        return response
 
 
 class CeleryTaskFilterSet(BaseFilterSet):
@@ -108,38 +115,28 @@ class CeleryTaskViewSet(
 
     def generate_summary_state(self, execution_qs):
         model = self.get_queryset().model
-        executions = execution_qs.order_by('-date_published').values('name', 'state')
-        summary_state_dict = defaultdict(
-            lambda: {
-                'states': [], 'state': 'green',
-                'summary': {'total': 0, 'success': 0}
-            }
-        )
-        for execution in executions:
-            name = execution['name']
-            state = execution['state']
-
-            summary = summary_state_dict[name]['summary']
-
-            summary['total'] += 1
-            summary['success'] += 1 if state == 'SUCCESS' else 0
-
-            states = summary_state_dict[name].get('states')
-            if states is not None and len(states) >= 5:
-                color = model.compute_state_color(states)
-                summary_state_dict[name]['state'] = color
-                summary_state_dict[name].pop('states', None)
-            elif isinstance(states, list):
-                states.append(state)
-
-        return summary_state_dict
+        summaries = {
+            row['name']: {'summary': {'total': row['total'], 'success': row['success']},
+                          'state': 'green', 'states': []}
+            for row in execution_qs.order_by().values('name').annotate(
+                total=Count('id'), success=Count('id', filter=Q(state='SUCCESS')),
+            )
+        }
+        # Bound Python memory to five states per displayed task. Window filtering
+        # is supported by our Django and MariaDB/PostgreSQL minimum versions.
+        recent = execution_qs.filter(name__in=summaries).order_by().annotate(
+            position=Window(RowNumber(), partition_by=[F('name')],
+                            order_by=[F('date_published').desc(), F('id').desc()]),
+        ).filter(position__lte=5).order_by('name', 'position').values('name', 'state')
+        for row in recent:
+            summaries[row['name']]['states'].append(row['state'])
+        for summary in summaries.values():
+            summary['state'] = model.compute_state_color(summary.pop('states'))
+        return summaries
 
     def loading_summary_state(self, queryset):
-        if isinstance(queryset, list):
-            names = [i.name for i in queryset]
-            execution_qs = CeleryTaskExecution.objects.filter(name__in=names)
-        else:
-            execution_qs = CeleryTaskExecution.objects.all()
+        names = [i.name for i in queryset]
+        execution_qs = CeleryTaskExecution.objects.filter(name__in=names)
         summary_state_dict = self.generate_summary_state(execution_qs)
         for i in queryset:
             i.summary = summary_state_dict.get(i.name, {}).get('summary', {})

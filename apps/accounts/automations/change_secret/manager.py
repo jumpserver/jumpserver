@@ -3,7 +3,6 @@ import time
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from xlsxwriter import Workbook
 
 from accounts.const import (
     AutomationTypes, SecretStrategy, ChangeSecretRecordStatusChoice
@@ -158,21 +157,29 @@ class ChangeSecretManager(BaseChangeSecretPushManager):
 
     @staticmethod
     def create_file(records, filename):
-        serializer_cls = ChangeSecretRecordBackUpSerializer
-        serializer = serializer_cls(records, many=True)
+        from itertools import islice
+        from xlsxwriter import Workbook
 
-        header = [str(v.label) for v in serializer.child.fields.values()]
-        rows = [[str(i) for i in row.values()] for row in serializer.data]
-        if not rows:
+        serializer_cls = ChangeSecretRecordBackUpSerializer
+        records = iter(records)
+        batch = list(islice(records, 500))
+        if not batch:
             return False
 
-        rows.insert(0, header)
-        wb = Workbook(filename)
-        ws = wb.add_worksheet('Sheet1')
-        for row_index, row_data in enumerate(rows):
-            for col_index, col_data in enumerate(row_data):
-                ws.write_string(row_index, col_index, col_data)
-        wb.close()
+        with Workbook(filename, {'constant_memory': True}) as wb:
+            ws = wb.add_worksheet('Sheet1')
+            serializer = serializer_cls(batch, many=True)
+            header = [str(v.label) for v in serializer.child.fields.values()]
+            for col_index, value in enumerate(header):
+                ws.write_string(0, col_index, value)
+            row_index = 1
+            while batch:
+                serializer = serializer_cls(batch, many=True)
+                for row in serializer.data:
+                    for col_index, value in enumerate(row.values()):
+                        ws.write_string(row_index, col_index, str(value))
+                    row_index += 1
+                batch = list(islice(records, 500))
         return True
 
     def get_report_template(self):

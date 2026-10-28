@@ -8,7 +8,6 @@ from django.db.models.functions import Concat
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from openpyxl import Workbook
 from rest_framework.request import Request
 
 from accounts.const import AutomationTypes, Source as AccountSource
@@ -32,6 +31,7 @@ from common.utils.timezone import local_zero_hour, local_now
 from terminal.const import LoginFrom
 from terminal.models import Session
 from users.models import Source, User
+from .const import CREATABLE_REPORT_TYPES
 
 
 class DateRangeMixin:
@@ -83,16 +83,6 @@ DATE_PRESET_DAYS = {
     'last_half_year': 180,
     'last_year': 365,
 }
-
-CREATABLE_REPORT_TYPES = (
-    'UserLoginReport',
-    'UserChangePasswordReport',
-    'AssetStatistics',
-    'AssetReport',
-    'AccountStatistics',
-    'AccountAutomationReport',
-)
-
 
 def parse_date(raw):
     if not raw:
@@ -167,11 +157,24 @@ def export_table_response(table, export):
         content = buffer.getvalue().encode('utf-8-sig')
         response = HttpResponse(content, content_type='text/csv')
     else:
-        workbook = Workbook()
-        worksheet = workbook.active
-        worksheet.append(headers)
+        from openpyxl import Workbook
+        from openpyxl.cell import WriteOnlyCell
+
+        workbook = Workbook(write_only=True)
+        worksheet = workbook.create_sheet()
+
+        def append_row(values):
+            cells = []
+            for value in values:
+                cell = WriteOnlyCell(worksheet, value=value)
+                if isinstance(value, str):
+                    cell.data_type = 's'
+                cells.append(cell)
+            worksheet.append(cells)
+
+        append_row(headers)
         for row in table['rows']:
-            worksheet.append([row.get(key, '') for key in keys])
+            append_row(row.get(key, '') for key in keys)
         from openpyxl.writer.excel import save_virtual_workbook
         content = save_virtual_workbook(workbook)
         response = HttpResponse(

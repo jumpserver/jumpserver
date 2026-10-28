@@ -1,6 +1,7 @@
 import abc
 import io
 import re
+from collections.abc import Sequence
 from datetime import datetime
 
 import pyzipper
@@ -17,6 +18,26 @@ from common.utils import get_logger
 from .mixins import LogMixin
 
 logger = get_logger(__file__)
+
+
+class FileExportRows(Sequence):
+    """Normalize one row at a time without copying the complete response."""
+
+    def __init__(self, rows, limit):
+        self.rows = rows
+        self.limit = min(len(rows), limit)
+
+    def __len__(self):
+        return self.limit
+
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            return [self[i] for i in range(*index.indices(self.limit))]
+        if index < 0:
+            index += self.limit
+        if not 0 <= index < self.limit:
+            raise IndexError(index)
+        return json.loads(json.dumps(self.rows[index], cls=encoders.JSONEncoder))
 
 
 class BaseFileRenderer(LogMixin, BaseRenderer):
@@ -97,14 +118,10 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
         if isinstance(results, dict):
             results = [results]
 
-        if self.template == 'import':
-            results = [results[0]] if results else results
-        else:
-            # 限制数据数量
-            results = results[:settings.MAX_LIMIT_PER_PAGE]
-        # 会将一些 UUID 字段转化为 string
-        results = json.loads(json.dumps(results, cls=encoders.JSONEncoder))
-        return results
+        limit = 1 if self.template == 'import' else settings.MAX_LIMIT_PER_PAGE
+        # Preserve the JSON encoder's UUID/date conversion without retaining
+        # both a full JSON string and a second complete list of dictionaries.
+        return FileExportRows(results, limit)
 
     @staticmethod
     def to_id_name(value):
@@ -246,6 +263,9 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
     def after_render(self):
         pass
 
+    def close_writer(self):
+        pass
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if data is None:
             return bytes()
@@ -283,6 +303,8 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
             logger.debug(e, exc_info=True)
             value = 'Render error! ({})'.format(self.media_type).encode('utf-8')
             return value
+        finally:
+            self.close_writer()
 
         self.record_logs(request, view, data)
         return value
