@@ -190,16 +190,30 @@ def maintain():
                         item.update(state='unverified', error='interrupted')
                 execution.state, execution.date_finished = 'unverified', timezone.now()
                 execution.save(update_fields=['state', 'files', 'date_finished'])
+    return len(ids)
+
+
+def cleanup():
+    purged = 0
+    with tmp_to_root_org():
         files = TicketTransferFile.objects.filter(purged_at__isnull=True).filter(
             Q(expires_at__lte=timezone.now()) | Q(ticket__state__in=['rejected', 'closed', 'cancelled', 'expired', 'error'])
         ).exclude(ticket__transfer_execution__state='running')
-        for record in files.order_by('expires_at')[:100]:
-            with transaction.atomic():
-                record = TicketTransferFile.objects.select_for_update().filter(
-                    pk=record.pk, pk__in=files.values('pk'),
-                ).first()
-                if record:
-                    record.path.unlink(missing_ok=True)
-                    record.purged_at = timezone.now()
-                    record.save(update_fields=['purged_at'])
-    return len(ids)
+        remaining = files
+        while ids := list(remaining.order_by('pk').values_list('pk', flat=True)[:100]):
+            for pk in ids:
+                try:
+                    with transaction.atomic():
+                        record = TicketTransferFile.objects.select_for_update().filter(
+                            pk=pk, pk__in=files.values('pk'),
+                        ).first()
+                        if record:
+                            record.path.unlink(missing_ok=True)
+                            record.purged_at = timezone.now()
+                            record.save(update_fields=['purged_at'])
+                            purged += 1
+                except OSError as exc:
+                    logger.error('Unable to purge ticket transfer file %s (%s)', pk, type(exc).__name__)
+            # Advance past failed or no-longer-eligible files; retry failures on the next hourly run.
+            remaining = files.filter(pk__gt=ids[-1])
+    return purged

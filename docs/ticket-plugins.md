@@ -268,7 +268,7 @@ v2 不创建通用上传/下载 AssetPermission，也不放开 Koko 文件管理
 ### 部署与验收
 
 1. 应用 `tickets.0011_ticket_file_transfer`（仅新增文件元数据和单次执行记录两张表），同步部署 Core 与 Lina。API 与 worker 必须共享同一个私有 `SHARE_DIR`，不能由 Web 服务器公开。
-2. 更新并重启 Celery worker 与 beat，确保 worker 消费 `ansible` 队列。`execute_ticket_file_transfer` 执行传输；每分钟运行的 `maintain_ticket_file_transfers` 补发排队任务、标记中断和清理过期文件；同一排队记录五分钟内最多补发一次。
+2. 更新并重启 Celery worker 与 beat，确保 worker 消费 `ansible` 队列。`execute_ticket_file_transfer` 执行传输；`maintain_ticket_file_transfers` 每五分钟补发排队任务、标记中断，同一排队记录五分钟内最多补发一次。`cleanup_ticket_transfer_files` 每小时清理过期或工单已终止的文件，每批 100 个，在同一任务中连续处理所有符合条件的批次，不逐文件投递任务。删除失败的文件保留元数据、记录错误并留待下轮重试，不阻断其他文件清理；执行中的文件跳过，删除前再次检查清理条件。文件到期后立即禁止访问，物理删除通常在下一轮小时清理时完成（队列延迟、执行中或删除失败时可能更晚）。
 3. 使用隔离测试资产验收：申请上传→审批人核对附件→批准→申请人执行→核对远端文件及权限；再申请具体路径下载并核对内容。检查审批前、其他用户、不同组织、过期/权限撤销、同名目标、软链接、目录不存在、连接失败和部分文件失败。
 
 自动回归：后端 `tickets.tests.test_file_transfer_execution` 包含临时 SSH/SFTP 服务器协议读写、单次执行、审批快照、权限、附件访问及清理；`tickets.tests.test_file_transfer` 继续验证 v1。Lina 的 `ticketPluginForm.test.mjs`、`ticketFileTransferResult.test.mjs`、`ticketFileTransferAccess.test.mjs` 覆盖新旧表单、组织切换、按钮重复点击和文件领取权限。真实资产凭据、网关、部署目录挂载和断网场景仍需部署验收。

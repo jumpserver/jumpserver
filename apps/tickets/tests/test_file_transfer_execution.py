@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import timedelta
 from types import SimpleNamespace
 from unittest.mock import patch
+from uuid import UUID
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signals import request_finished
@@ -15,6 +16,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 from accounts.models import Account
 from assets.models import Protocol
+from orgs.utils import tmp_to_root_org
 from perms.models import AssetPermission
 from tickets.api.plugin import TicketTypeViewSet
 from tickets.api.ticket import TicketViewSet
@@ -189,14 +191,130 @@ class FileTransferExecutionTests(TestCase):
         TicketTransferFile.objects.filter(pk=record.pk).update(expires_at=timezone.now() - timedelta(seconds=1))
         TicketTransferExecution.objects.filter(ticket=ticket).update(state='running', date_started=timezone.now())
         execution.maintain()
+        self.assertEqual(execution.cleanup(), 0)
         self.assertTrue(record.path.exists())
         TicketTransferExecution.objects.filter(ticket=ticket).update(date_started=timezone.now() - timedelta(minutes=20))
         with patch.object(transport, 'connect') as connect:
             execution.maintain()
             execution.execute(ticket.pk)
         connect.assert_not_called()
-        self.assertEqual(TicketTransferExecution.objects.get(ticket=ticket).state, 'unverified')
+        job = TicketTransferExecution.objects.get(ticket=ticket)
+        self.assertEqual(job.state, 'unverified')
+        self.assertEqual(job.files[0]['error'], 'interrupted')
+        self.assertTrue(record.path.exists())
+        self.assertEqual(execution.cleanup(), 1)
         self.assertFalse(record.path.exists())
+
+    def test_recovery_redispatches_only_due_queued_transfers_without_cleaning_files(self):
+        ticket, _ = self.request_ticket()
+        self.action(ticket)
+        record = ticket.transfer_files.get()
+        TicketTransferFile.objects.filter(pk=record.pk).update(expires_at=timezone.now() - timedelta(seconds=1))
+        with patch('tickets.tasks.execute_ticket_file_transfer.delay') as delay:
+            self.assertEqual(execution.maintain(), 1)
+            self.assertEqual(execution.maintain(), 0)
+            delay.assert_called_once_with(str(ticket.pk))
+            TicketTransferExecution.objects.filter(ticket=ticket).update(
+                dispatch_after=timezone.now() - timedelta(seconds=1))
+            self.assertEqual(execution.maintain(), 1)
+            self.assertEqual(delay.call_count, 2)
+        self.assertTrue(record.path.exists())
+
+    def test_cleanup_drains_multiple_batches_across_organizations(self):
+        retained = self.upload()
+        with tmp_to_root_org():
+            files = TicketTransferFile.objects.bulk_create([
+                TicketTransferFile(id=UUID(int=i + 1), owner=self.applicant if i < 100 else self.alice,
+                                   org_id=self.org.pk if i % 2 else self.other_org.pk,
+                                   name=f'{i}.txt', kind='upload' if i % 2 else 'download',
+                                   expires_at=timezone.now() - timedelta(hours=1))
+                for i in range(205)
+            ])
+            self.assertEqual(TicketTransferFile.objects.values('org_id').distinct().count(), 2)
+        for record in files:
+            record.path.parent.mkdir(parents=True, exist_ok=True)
+            record.path.write_bytes(b'expired content')
+        self.assertEqual(execution.cleanup(), 205)
+        self.assertTrue(all(not record.path.exists() for record in files))
+        with tmp_to_root_org():
+            self.assertEqual(TicketTransferFile.objects.filter(purged_at__isnull=False).count(), 205)
+        self.assertTrue(retained.path.exists())
+        self.assertEqual(execution.cleanup(), 0)
+
+    def test_cleanup_retries_failed_deletions_and_tolerates_missing_files(self):
+        failed, missing, other = sorted([self.upload() for _ in range(3)], key=lambda record: record.pk)
+        TicketTransferFile.objects.update(expires_at=timezone.now() - timedelta(seconds=1))
+        missing.path.unlink()
+        unlink = Path.unlink
+
+        def delete(path, **kwargs):
+            if path == failed.path:
+                raise PermissionError('Cannot remove file')
+            return unlink(path, **kwargs)
+
+        with patch.object(Path, 'unlink', delete), self.assertLogs(execution.logger, level='ERROR'):
+            self.assertEqual(execution.cleanup(), 2)
+        failed.refresh_from_db()
+        self.assertIsNone(failed.purged_at)
+        self.assertTrue(failed.path.exists())
+        self.assertFalse(other.path.exists())
+        self.assertEqual(execution.cleanup(), 1)
+        self.assertFalse(failed.path.exists())
+        self.assertEqual(execution.cleanup(), 0)
+
+    def test_cleanup_removes_terminated_ticket_files_and_preserves_pending_files(self):
+        pending_ticket, _ = self.request_ticket(approved=False)
+        retained = pending_ticket.transfer_files.get()
+        for state in ('rejected', 'closed', 'cancelled', 'expired', 'error'):
+            with self.subTest(state=state):
+                ticket, _ = self.request_ticket(approved=False)
+                record = ticket.transfer_files.get()
+                ticket.state = state
+                ticket.save(update_fields=['state'])
+                self.assertEqual(execution.cleanup(), 1)
+                self.assertFalse(record.path.exists())
+                self.assertTrue(retained.path.exists())
+
+    def test_cleanup_rechecks_expiry_and_running_state_after_batch_selection(self):
+        select_for_update = TicketTransferFile.objects.select_for_update
+        for change in ('extend_expiry', 'start_transfer'):
+            with self.subTest(change=change):
+                ticket, _ = self.request_ticket()
+                self.action(ticket)
+                record = ticket.transfer_files.get()
+                TicketTransferFile.objects.filter(pk=record.pk).update(
+                    expires_at=timezone.now() - timedelta(seconds=1))
+
+                def update_before_lock():
+                    if change == 'extend_expiry':
+                        TicketTransferFile.objects.filter(pk=record.pk).update(
+                            expires_at=timezone.now() + timedelta(hours=1))
+                    else:
+                        TicketTransferExecution.objects.filter(ticket=ticket).update(
+                            state='running', date_started=timezone.now())
+                    return select_for_update()
+
+                with patch.object(TicketTransferFile.objects, 'select_for_update', side_effect=update_before_lock):
+                    self.assertEqual(execution.cleanup(), 0)
+                record.refresh_from_db()
+                self.assertIsNone(record.purged_at)
+                self.assertTrue(record.path.exists())
+
+    def test_periodic_registration_upgrades_recovery_and_adds_hourly_cleanup(self):
+        from django_celery_beat.models import PeriodicTask
+        from ops.celery.decorator import get_register_period_tasks
+        from ops.celery.utils import create_or_update_celery_periodic_tasks
+        from tickets.tasks import maintain_ticket_file_transfers, cleanup_ticket_transfer_files
+
+        recovery = maintain_ticket_file_transfers.name
+        cleanup = cleanup_ticket_transfer_files.name
+        create_or_update_celery_periodic_tasks({recovery: {'task': recovery, 'interval': 60}})
+        for definition in get_register_period_tasks():
+            if recovery in definition or cleanup in definition:
+                create_or_update_celery_periodic_tasks(definition)
+        self.assertEqual(PeriodicTask.objects.get(name=recovery).interval.every, 300)
+        self.assertEqual(PeriodicTask.objects.get(name=cleanup).interval.every, 3600)
+        self.assertEqual(PeriodicTask.objects.filter(name__in=[recovery, cleanup]).count(), 2)
 
     def test_download_only_exposes_successful_file_to_applicant_until_expiry(self):
         ticket, _ = self.request_ticket(direction='download')
@@ -219,7 +337,10 @@ class FileTransferExecutionTests(TestCase):
         self.assertEqual(self.action(ticket, 'download_transfer_file', user=self.alice,
                                      data={'file_id': str(record.pk)}, method='get').status_code, 403)
         TicketTransferFile.objects.filter(pk=record.pk).update(expires_at=timezone.now() - timedelta(seconds=1))
-        execution.maintain()
+        self.assertTrue(record.path.exists())
+        self.assertEqual(self.action(ticket, 'download_transfer_file',
+                                     data={'file_id': str(record.pk)}, method='get').status_code, 404)
+        execution.cleanup()
         self.assertFalse(record.path.exists())
 
     def test_upload_api_limits_membership_and_file_size(self):

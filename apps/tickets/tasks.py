@@ -46,7 +46,14 @@ def execute_ticket_file_transfer(ticket_id):
 
 
 @shared_task
-@register_as_period_task(interval=60)
+@register_as_period_task(interval=300)
 def maintain_ticket_file_transfers():
     from tickets.plugins.file_transfer.execution import maintain
     return maintain()
+
+
+@shared_task
+@register_as_period_task(interval=3600)
+def cleanup_ticket_transfer_files():
+    from tickets.plugins.file_transfer.execution import cleanup
+    return cleanup()
