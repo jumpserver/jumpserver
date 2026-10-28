@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView, Response
 
 from common.utils import get_logger
+from ..serializers import NasTestSerializer
+from ..connection_testing import get_test_config
 
 logger = get_logger(__file__)
 
@@ -18,21 +19,8 @@ class NasTestingAPI(APIView):
     }
 
     def post(self, request):
-        config = {
-            'nas_type': getattr(settings, 'NAS_TYPE', 'nfs'),
-            'nas_host': getattr(settings, 'NAS_HOST', ''),
-            'nas_port': getattr(settings, 'NAS_PORT', 0),
-            'nas_share_name': getattr(settings, 'NAS_SHARE_NAME', ''),
-            'nas_username': getattr(settings, 'NAS_USERNAME', ''),
-            'nas_password': getattr(settings, 'NAS_PASSWORD', ''),
-        }
-        for field, key in (
-            ('NAS_TYPE', 'nas_type'), ('NAS_HOST', 'nas_host'), ('NAS_PORT', 'nas_port'),
-            ('NAS_SHARE_NAME', 'nas_share_name'), ('NAS_USERNAME', 'nas_username'),
-            ('NAS_PASSWORD', 'nas_password'),
-        ):
-            if field in request.data:
-                config[key] = request.data[field]
+        data = get_test_config(NasTestSerializer, request.data)
+        config = {name.lower(): value for name, value in data.items()}
 
         from settings.tools.nas_mount import test_nas_connection
         ok, message = test_nas_connection(config)

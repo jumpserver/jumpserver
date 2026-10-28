@@ -11,6 +11,7 @@ from rest_framework.views import Response, APIView
 from common.tasks import get_email_connection as get_connection
 from common.utils import get_logger
 from .. import serializers
+from ..connection_testing import get_test_config
 
 logger = get_logger(__file__)
 
@@ -25,32 +26,22 @@ class MailTestingAPI(APIView):
     }
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # 测试邮件时，邮件服务器信息从配置中获取
-        email_host = settings.EMAIL_HOST
-        email_port = settings.EMAIL_PORT
-        email_host_user = settings.EMAIL_HOST_USER
-        email_host_password = settings.EMAIL_HOST_PASSWORD
-        email_from = serializer.validated_data.get('EMAIL_FROM')
-        email_use_ssl = settings.EMAIL_USE_SSL
-        email_use_tls = settings.EMAIL_USE_TLS
-        email_recipient = serializer.validated_data.get('EMAIL_RECIPIENT')
-
-        # 设置 settings 的值，会导致动态配置在当前进程失效
-        # for k, v in serializer.validated_data.items():
-        #     if k.startswith('EMAIL'):
-        #         setattr(settings, k, v)
+        config = get_test_config(self.serializer_class, request.data)
+        email_host_user = config.get('EMAIL_HOST_USER', '')
+        email_from = config.get('EMAIL_FROM')
+        email_recipient = config.get('EMAIL_RECIPIENT')
+        connection = None
         try:
             subject = settings.EMAIL_SUBJECT_PREFIX or '' + "Test"
             message = _("Test smtp setting")
             email_from = email_from or email_host_user
             email_recipient = email_recipient or email_from
             connection = get_connection(
-                host=email_host, port=email_port,
-                username=email_host_user, password=email_host_password,
-                use_tls=email_use_tls, use_ssl=email_use_ssl,
+                protocol=config['EMAIL_PROTOCOL'],
+                host=config['EMAIL_HOST'], port=config.get('EMAIL_PORT', 25),
+                username=email_host_user, password=config['EMAIL_HOST_PASSWORD'],
+                use_tls=config.get('EMAIL_USE_TLS', False),
+                use_ssl=config.get('EMAIL_USE_SSL', False),
                 timeout=30,
             )
             send_mail(
@@ -75,4 +66,7 @@ class MailTestingAPI(APIView):
             logger.error(e)
             hint = _("Failed to send test mail, please check the mail server configuration")
             return Response({"error": hint}, status=400)
+        finally:
+            if connection is not None:
+                connection.close()
         return Response({"msg": self.success_message.format(email_recipient)})
