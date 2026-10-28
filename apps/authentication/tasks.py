@@ -88,6 +88,7 @@ def send_credential_activity_summary():
 
     for token in ConnectionToken.objects.filter(
             Q(date_created__gte=start) | Q(date_last_used__gte=start),
+            is_reusable=True,
             user__isnull=False,
     ).select_related('user'):
         users[token.user_id] = token.user
