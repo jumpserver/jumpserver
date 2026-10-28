@@ -16387,6 +16387,653 @@ msgstr "이메일 제목"
 msgid "Message of the email"
 msgstr "이메일 본문"
 
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "관리 요약 및 권장 사항"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "주요 지표 개요"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "운영 활동 분석"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "보안 이벤트 분석"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "자산 및 계정 개요"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "계정 운영 분석"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "종합 감사 보고서"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "운영 활동, 보안 이벤트, 자산 및 매월, 분기 또는 연간 감사에 대한 보고서를 요약합니다."
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "운영 활동 보고서"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "각 자산에 세션, 명령 및 파일 작업을 수행 한 사람을 검토합니다."
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "보안 이벤트 보고서"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "높은 위험 명령, 로그인 변형 및 액세스 거부를 검토하여 실패와 보안 이벤트를 구별합니다."
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "계정 운영 보고서"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "계정 자동화 작업의 결과와 실패를 검토합니다."
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "이 보고서 테마에 대한 데이터를 볼 수 있는 권한이 없습니다."
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "종료 날짜는 시작 날짜보다 빠를 수 없습니다."
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "보고서 기간은 최대 366일입니다. 더 짧은 기간을 선택하세요."
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "종료 날짜는 오늘보다 늦을 수 없습니다. 현재 기간은 오늘까지 집계하세요."
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "장은 복제되거나 선택한 보고서 테마에 속하지 않습니다."
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "통계 데이터를 포함하는 적어도 하나의 장을 선택합니다."
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "자산 세션"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "명령 기록"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "로그인 로그"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "작업 로그"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "파일 전송"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "현재 자산"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "현재 계정"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "계정 자동화 작업"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "플랫폼 사용자 비밀번호 변경 로그"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（사용 가능한 저장소）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "경고 명령"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "규칙에 의해 차단된 명령"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "승인이 거부된 명령"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "승인된 명령"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "승인이 취소된 명령"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "지원되지 않는 보고서 주제"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "시작 날짜와 종료 날짜를 선택하세요"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "시작 날짜는 끝 날짜를 초과할 수 없으며, 보고서는 최대 366 일 동안 커버 할 수 있습니다."
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "종료 날짜는 오늘보다 늦을 수 없습니다"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "보고서 장을 중복 없이 선택하세요"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "선택된 장은 이 보고서의 주제에 속하지 않습니다."
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "세션 횟수"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "회"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "활성 사용자"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "명"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "접근한 자산"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "개"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "연결 실패"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "세션 녹화 상태"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "연결 실패 원인 상위 5개"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "사용자 접근 순위"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "자산 접근 순위"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "연결 프로토콜 분포"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "세션 작업 유형"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "플랫폼별 접근 분포"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "일별 자산 세션 추이"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "주별 자산 세션 추이"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "월별 자산 세션 추이"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "최근 자산 세션"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "확인이 필요한 녹화"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "건"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "동일 세션의 명령 승인 단서"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "성공한 로그인"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "실패한 로그인"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "로그인 제한 기록"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "로그인 정책 거부"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "최근 로그인 실패"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "새 도시 로그인 단서"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "새 도시 로그인 확인 단서"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "파일 작업 유형"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "파일 작업 실패 영향 대상 상위 5개"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "최근 실패한 파일 작업"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "계정 작업 실행 횟수"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "실행 성공"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "실행 실패 또는 오류"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "미완료 실행"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "계정 작업 유형 및 결과"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "최근 실패한 계정 작업"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "작업 실패 또는 오류 비율"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "비밀번호 변경 오류 단서 상위 5개"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "비밀번호 변경 확인이 필요한 계정"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "제한된 로그인 또는 정책 거부가 기록되었습니다. 출처, 사용자 정체성 및 액세스 정책이 예상되는지 확인합니다."
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "명령 횟수"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "확인이 필요한 명령 처리 기록"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "별도의 거부 사유가 저장되지 않았습니다. 티켓 토론을 확인하세요"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "기록되지 않음"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "루프백 주소 로그인 기록"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "거부"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "플랫폼 작업 횟수"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "작업 정책 거부"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "정책 거부 상세"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "파일 작업 횟수"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "실패한 파일 작업"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "파일 작업 실패율"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "현재 자산 총수"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "현재 활성 자산"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "플랫폼별 현재 자산 분포"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "개"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "현재 활성 계정"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "자산별 계정 수 순위"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "비밀번호 변경 확인이 필요한 자산"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "비밀번호 변경 확인이 필요한 계정"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "삭제된 자산"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "플랫폼 사용자 비밀번호 변경"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "최근 플랫폼 사용자 비밀번호 변경"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "경고 또는 거부된 명령 %(count)s건이 기록되었습니다. 세션 맥락을 살펴 명령의 목적과 승인 근거를 확인하세요."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "운영 기록에는 %(count)s 정책 거부가 포함되어 있습니다. 부정된 자원 및 정책을 감사 세부 사항에서 확인하십시오."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "%(count)s 플랫폼 사용자 암호 변경이 기록되었습니다. 운영자를 검토하고 필요한 경우 합리적으로 변경합니다."
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "녹화 상태"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "기록된 원인"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "실패 횟수"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "시작 시간"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "플랫폼 사용자"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "자산 계정"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "연결 결과"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "연결 실패 원인"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "원본 세션"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "처리 담당자가 기록되지 않음"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "승인 티켓"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "요청 시간"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "요청 명령"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "당시 규칙"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "처리 담당자"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "거부 사유"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "관련 세션"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "출발지 IP"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "도시"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "작업 횟수"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "파일 경로"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "작업 유형"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "실행 횟수"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "원본 실행 기록"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "오류 단서 분류"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "계정 기록 수"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "기록 시간"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "오류 단서"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "실행 기록"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "자산이 삭제되었거나 플랫폼이 기록되지 않음"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "처리 결과"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "당시 규칙 이름이 기록되지 않음"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "자산 수"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "계정 수"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "작업자"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "녹화 기록 있음"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "녹화 미지원"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "세션 진행 중"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "녹화 생성 실패"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "녹화 업로드 실패"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "녹화 변환 실패"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "녹화 표시 없음"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "연결 실패로 해당 없음"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "연결 실패（상세 원인이 기록되지 않음）"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "연결 실패 원인이 기록되지 않음"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "인증 관련"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "실행 또는 연결 시간 초과"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "네트워크 또는 연결 관련"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "권한 거부 관련"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "대상이 없거나 사용할 수 없음"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "결과 검증 관련"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "오류 원인이 기록되지 않음"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "기타 오류（원본 기록 확인）"
+
 msgid ""
 "1-100; lower values have higher priority.\n"
 "Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
@@ -16644,3 +17291,406 @@ msgstr "지속적 얼굴 모니터링"
 msgctxt "Asset connection ACL"
 msgid "Push account"
 msgstr "계정 배포"
+
+#: reports/services/audit_data.py
+msgid "Account Health"
+msgstr "계정 상태"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "검토할 계정 작업"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "처리 대기 위험이 있는 자산"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "검토 대기 중"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "후보 자격 증명 검증 성공"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "다시 시도하기 전에 연결 조건과 원본 세션을 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "원본 세션의 녹화 생성, 업로드 및 저장 상태를 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "검토할 명령 판정"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "감지된 변경 사항을 승인된 접근 권한과 비교하고 처리 결과를 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "새 자격 증명이 동기화되었으며 접근이 가능한지 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "접속 위치 변경이 출장, 프록시 사용 또는 예상된 접근에 따른 것인지 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "확인된 위험 기록"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "검토할 연결 실패"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "자격 증명 검증 실패"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "자격 증명 검증 중"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "현재 계정 위험 상세 정보"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "현재 계정 위험"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "현재 위험 기록"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "검토할 로그인 실패"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "검토할 파일 작업"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "처리 진행 상황"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "무시된 위험 기록"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "문제"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "이후 비밀번호 변경 성공"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "검토할 새 도시에서의 로그인"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "다음 조치"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "현재 계정 위험 기록이 없습니다."
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "원본 기록"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "처리 대기 위험 기록"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "유형별 처리 대기 위험"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "검토할 정책 거부"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "검토할 녹화"
+
+#: reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "조치 체크리스트"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "검증된 후보 자격 증명을 검토하고 동기화하세요. 검증만으로는 복구가 확인되지 않습니다."
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "원본 세션에서 명령의 목적, 일치한 규칙 및 승인 이력을 검토하세요."
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "거부된 작업을 검토하고 접근 정책이 의도한 대로인지 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "실행 로그와 영향을 받은 대상을 검토하고 원인을 해결한 뒤 다시 시도하세요."
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "다시 시도하기 전에 파일 경로, 접근 권한 및 원본 세션을 검토하세요."
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "다시 시도하기 전에 검증 결과와 원본 실행 기록을 검토하세요."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "이 실패를 무시한 사유가 여전히 유효한지 검토하세요."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "이 위험을 무시한 사유가 여전히 유효한지 검토하세요."
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "위험 수"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "업데이트 시간"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "검증 시간"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "후보 자격 증명을 검증하고 접근이 가능한지 확인한 후에만 동기화하세요."
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "로그인 출처와 계정 신원을 확인한 뒤 인증 로그를 검토하세요."
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "검증이 완료된 후 자격 증명을 동기화할지 결정하세요."
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "읽기 가능"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "참조 근거"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "기록 ID"
+
+#: reports/services/audit_data.py
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "관련 자산, 계정 및 기록된 사유를 바탕으로 연결 실패를 확인하세요."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "연결에 성공하고 종료된 세션 중 %(count)s건의 녹화 확인이 필요합니다. 녹화 생성, 업로드 및 저장 상태를 확인하세요."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "새로운 도시에서의 로그인 기록 %(count)s건에 대해 사용자 신원과 접속 위치를 확인해야 합니다."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "플랫폼 로그인 기록 %(count)s건이 루프백 출발지 주소를 사용합니다. 로컬 접속인지 프록시를 통해 전달된 요청인지 확인하세요."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "플랫폼 로그인이 %(count)s회 실패했습니다. 관련 사용자, 출발지 주소 및 기록된 사유를 확인하세요."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "파일 작업 %(total)s건 중 %(failed)s건이 실패했습니다(%(rate)s%%). 관련 자산, 계정, 파일 경로 및 원본 세션을 확인하세요."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "자산 세션 %(sessions)s건이 기록되었으며, 연결 성공 %(success)s건과 실패 %(failed)s건으로 사용자 %(users)s명과 자산 %(assets)s개가 관련되었습니다."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "계정 작업 %(total)s건이 실행되었으며, 성공 %(success)s건, 실패 또는 오류 %(failed)s건, 미완료 %(pending)s건입니다."
+
+#: reports/services/audit_data.py
+msgid "Account Risks to Review"
+msgstr "확인이 필요한 계정 위험"
+
+#: reports/services/audit_data.py
+msgid "Accounts Identified in Pending Risks"
+msgstr "미처리 위험에서 식별된 계정"
+
+#: reports/services/audit_data.py
+msgid "Affected Accounts"
+msgstr "영향받는 계정 수"
+
+#: reports/services/audit_data.py
+msgid "Affected Assets"
+msgstr "영향받는 자산 수"
+
+#: reports/services/audit_data.py
+msgid "Assets with Latest Check Successful"
+msgstr "최근 점검에 성공한 자산"
+
+#: reports/services/audit_data.py
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "영향받는 각 계정에 고유한 자격 증명을 설정하고, 종속 서비스와 동기화한 후 접근을 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Check Result"
+msgstr "점검 결과"
+
+#: reports/services/audit_data.py
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "인증 키를 승인된 키와 대조하고 승인되지 않은 키를 제거하세요."
+
+#: reports/services/audit_data.py
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "그룹 구성원 변경을 승인된 접근 권한과 대조하고 승인되지 않은 권한을 제거하세요."
+
+#: reports/services/audit_data.py
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "sudo 권한 변경을 승인된 접근 권한과 대조하고 승인되지 않은 권한을 제거하세요."
+
+#: reports/services/audit_data.py
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "계정 소유자와 용도를 확인한 후 승인된 계정을 관리 대상으로 등록하거나 승인되지 않은 계정을 비활성화하세요."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "삭제가 승인되었는지 확인한 후 관리 계정 목록을 대조하고 정리하세요."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "계정이 여전히 필요한지 확인하고 승인 후 미사용 계정을 비활성화하세요."
+
+#: reports/services/audit_data.py
+msgid "Current Managed Accounts"
+msgstr "현재 관리 계정"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "현재 미처리 계정 위험 기록 %(pending)s건은 자산 %(assets)s개의 서로 다른 계정 %(accounts)s개와 관련되어 있습니다. 위험 유형별로 관련 계정을 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Latest Check Failed"
+msgstr "최근 점검 실패"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Successful"
+msgstr "최근 점검 성공"
+
+#: reports/services/audit_data.py
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "최근 점검에 성공한 관리 계정"
+
+#: reports/services/audit_data.py
+msgid "Most Recent Stored Check"
+msgstr "최근 저장된 점검 시각"
+
+#: reports/services/audit_data.py
+msgid "No Check Result"
+msgstr "점검 결과 없음"
+
+#: reports/services/audit_data.py
+msgid "No listed security events were found in the available records for this period."
+msgstr "이 기간의 확인 가능한 기록에서 목록에 해당하는 보안 이벤트가 발견되지 않았습니다."
+
+#: reports/services/audit_data.py
+msgid "Not Applicable"
+msgstr "해당 없음"
+
+#: reports/services/audit_data.py
+msgid "Password Changes with Subsequent Progress"
+msgstr "후속 진행 사항이 있는 비밀번호 변경"
+
+#: reports/services/audit_data.py
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "만료된 자격 증명을 갱신하고 종속 작업과 계정 접근을 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "취약한 비밀번호를 강력하고 고유한 비밀번호로 변경한 후 계정 접근을 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "실패한 작업 로그와 관련 계정을 확인하고, 후속 진행 사항이 있는 기록보다 미해결 항목을 우선 처리하세요."
+
+#: reports/services/audit_data.py
+msgid "Review risks"
+msgstr "위험 확인"
+
+#: reports/services/audit_data.py
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "확인된 발견 사항을 검토하고 계정의 현재 상태를 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "관리 계정과 일치하는 위험 계정"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "관리 계정과 일치하지 않는 위험 계정"
+
+#: reports/services/audit_data.py
+msgid "Risk List"
+msgstr "위험 목록"
+
+#: reports/services/audit_data.py
+msgid "Risk Records"
+msgstr "위험 기록 수"
+
+#: reports/services/audit_data.py
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "교체 정책에 따라 자격 증명을 교체하고 종속 서비스를 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "노출되었을 가능성이 있는 자격 증명을 교체하고, 최근 접근을 검토한 후 종속 서비스를 확인하세요."
+
+#: reports/services/audit_data.py
+msgid "Stored Asset Connectivity Results"
+msgstr "저장된 자산 연결 점검 결과"
+
+#: reports/services/audit_data.py
+msgid "Stored Managed Account Connectivity Results"
+msgstr "저장된 관리 계정 연결 점검 결과"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "현재 자산은 %(total)s개이며, 이 중 %(active)s개가 활성화되어 있습니다."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "현재 관리 계정 기록은 %(total)s건이며, 이 중 %(active)s건이 활성화되어 있습니다."
+
+#: reports/services/audit_data.py
+msgid "There are currently no pending account risk records."
+msgstr "현재 미처리 계정 위험 기록이 없습니다."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s account task executions were canceled."
+msgstr "계정 작업 실행 %(count)s건이 취소되었습니다."

@@ -16732,6 +16732,653 @@ msgstr "Asunto del correo"
 msgid "Message of the email"
 msgstr "Mensaje del correo"
 
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "Resumen ejecutivo y recomendaciones"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "Resumen de indicadores"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "Análisis de actividades operativas"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "Análisis de eventos de seguridad"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "Resumen de activos y cuentas"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "Análisis de operaciones de cuentas"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "Informe integral de auditoría"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "Resumen de actividades de operaciones, eventos de seguridad, activos y cuentas para auditorios mensuales, trimestrales o anuales."
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "Informe de actividad operativa"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "Revisa quién realizó sesiones, comandos y operaciones de archivo en cada activo."
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "Informe de eventos de seguridad"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "Revisa los comandos de alto riesgo, las anomalías de login y las denegaciones de acceso, diferenciando los fallos de los eventos de seguridad."
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "Informe de operaciones de cuentas"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "Revisa los resultados y fallos de las tareas de automatización de cuentas."
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "Usted no tiene permiso para ver los datos para este tema del informe."
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "La fecha de fin no puede ser anterior a la fecha de inicio."
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "Un informe puede abarcar como máximo 366 días. Seleccione un período más corto."
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "La fecha de fin no puede ser posterior a hoy. Para el período actual, incluya datos hasta hoy."
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "Los capítulos se duplican o no pertenecen al tema del informe seleccionado."
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "Seleccione al menos un capítulo que contiene datos estadísticos."
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "Sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "Registros de comandos"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "Registros de inicio de sesión"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "Registros de operaciones"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "Transferencias de archivos"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "Activos actuales"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "Cuentas actuales"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "Tareas de automatización de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "Registros de cambio de contraseña de usuarios de la plataforma"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（almacenamientos disponibles）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "Comandos con alerta"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "Comandos bloqueados por reglas"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "Comandos rechazados en la aprobación"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "Comandos aprobados"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "Comandos con aprobación cancelada"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "Tema de informe no compatible"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "Seleccione una fecha de inicio y una de fin"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "La fecha de inicio no puede ser posterior a la fecha de final, y el informe puede cubrir hasta 366 días."
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "La fecha de fin no puede ser posterior a hoy"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "Seleccione las secciones sin duplicarlas"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "Los capítulos seleccionados no pertenecen al tema de este informe"
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "Número de sesiones"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "veces"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "Usuarios activos"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "usuarios"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "Activos visitados"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "activos"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "Fallos de conexión"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "Estado de grabación de la sesión"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "5 principales motivos de fallos de conexión"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "Clasificación de acceso por usuario"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "Clasificación de acceso por activo"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "Distribución de protocolos de conexión"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "Tipos de operación de sesión"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "Distribución de accesos por plataforma"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "Tendencia diaria de sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "Tendencia semanal de sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "Tendencia mensual de sesiones de activos"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "Sesiones recientes de activos"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "Grabaciones que requieren revisión"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "registros"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "Pistas de aprobación de comandos de la misma sesión"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "Inicios de sesión correctos"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "Inicios de sesión fallidos"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "Registros de acceso restringido"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "Rechazos de la política de inicio de sesión"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "Inicios de sesión fallidos recientes"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "Indicios de acceso desde una ciudad nueva"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "Indicios para revisar accesos desde ciudades nuevas"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "Tipos de operación de archivo"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "5 principales destinos afectados por fallos de archivo"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "Operaciones de archivo fallidas recientes"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "Ejecuciones de tareas de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "Ejecuciones correctas"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "Ejecuciones fallidas o con errores"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "Ejecuciones sin finalizar"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "Tipos y resultados de tareas de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "Tareas de cuentas fallidas recientes"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "Porcentaje de tareas fallidas o con errores"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "5 principales indicios de error al cambiar contraseñas"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "Cuentas con cambio de contraseña pendiente de revisión"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "Se registraron las entradas restringidas o las denegaciones de políticas. Verifique que se espera la fuente, la identidad del usuario y la política de acceso."
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "Número de comandos"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "Decisiones sobre comandos que requieren revisión"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "No se guardó un motivo de rechazo independiente; consulte la conversación del ticket"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "No registrado"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "Registros de acceso con dirección de bucle local"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "rechazado"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "Número de operaciones de la plataforma"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "Rechazos de la política de operaciones"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "Detalles de rechazos de política"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "Número de operaciones de archivo"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "Operaciones de archivo fallidas"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "Porcentaje de fallos en operaciones de archivo"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "Total actual de activos"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "Activos habilitados actualmente"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "Distribución actual de activos por plataforma"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "cuentas"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "Cuentas habilitadas actualmente"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "Clasificación de activos por número de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "Activos con cambios de contraseña pendientes de revisión"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "Cuentas con cambios de contraseña pendientes de revisión"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "Activo eliminado"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "Cambios de contraseña de usuarios de la plataforma"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "Cambios recientes de contraseña de usuarios de la plataforma"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "Se registraron %(count)s comandos con alerta o rechazados. Revise su finalidad y el fundamento de la aprobación en el contexto de la sesión."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "El log de operaciones contiene %(count)s deniales de políticas. Véase los recursos y políticas negados en los detalles de la auditoría."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "%(count)s cambios de contraseña de usuario de la plataforma se registraron. Revisa los operadores y cambia la razón cuando sea necesario."
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "Estado de grabación"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "Motivo registrado"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "Número de fallos"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "Hora de inicio"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "Usuario de la plataforma"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "Cuenta del activo"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "Resultado de conexión"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "Motivo del fallo de conexión"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "Sesión original"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "No se registró ningún responsable"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "Solicitud de aprobación"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "Hora de solicitud"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "Comando solicitado"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "Regla vigente en ese momento"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "Responsable"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "Motivo del rechazo"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "Sesión relacionada"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "IP de origen"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "Ciudad"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "Número de operaciones"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "Ruta del archivo"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "Tipo de tarea"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "Número de ejecuciones"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "Registro de ejecución original"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "Categoría del indicio de error"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "Número de registros de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "Hora del registro"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "Indicio de error"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "Registro de ejecución"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "Activo eliminado o plataforma no registrada"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "Resultado de la decisión"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "Nombre de la regla histórica no registrado"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "Número de activos"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "Número de cuentas"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "Operador"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "Grabación marcada como disponible"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "Grabación no compatible"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "Sesión en curso"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "Error al crear la grabación"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "Error al subir la grabación"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "Error al convertir la grabación"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "Sin marca de grabación"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "Conexión fallida; no aplicable"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "Conexión fallida (sin más detalles registrados)"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "Motivo del fallo de conexión no registrado"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "Relacionado con autenticación"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "Tiempo de espera de ejecución o conexión agotado"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "Relacionado con red o conexión"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "Relacionado con denegación de permisos"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "Destino inexistente o no disponible"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "Relacionado con la verificación del resultado"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "Motivo del error no registrado"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "Otro error (revise el registro original)"
+
 msgid ""
 "1-100; lower values have higher priority.\n"
 "Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
@@ -17028,3 +17675,347 @@ msgstr "Supervisión facial continua"
 msgctxt "Asset connection ACL"
 msgid "Push account"
 msgstr "Aprovisionar cuenta"
+
+#: reports/services/audit_data.py
+msgid "Account Health"
+msgstr "Estado de las cuentas"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "Tareas de cuentas por revisar"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "Activos con riesgos pendientes"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "Pendiente de revisión"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "Credencial candidata verificada"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "Compruebe las condiciones de conexión y la sesión original antes de volver a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "Compruebe la creación, la carga y el almacenamiento de la grabación de la sesión original."
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "Decisiones sobre comandos por revisar"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "Compare el cambio detectado con el acceso aprobado y confirme el resultado de la gestión."
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "Confirme que la credencial más reciente esté sincronizada y que el acceso funcione."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "Confirme si el cambio de ubicación corresponde a un viaje, al uso de un proxy o a un acceso previsto."
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "Registros de riesgos confirmados"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "Fallos de conexión por revisar"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "Error en la verificación de la credencial"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "Verificación de la credencial en curso"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "Detalles de los riesgos actuales de las cuentas"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "Riesgos actuales de las cuentas"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "Registros de riesgos actuales"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "Inicios de sesión fallidos por revisar"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "Operaciones de archivos por revisar"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "Progreso de la gestión"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "Registros de riesgos ignorados"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "Problema"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "Un cambio de contraseña posterior se completó correctamente"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "Inicios de sesión desde nuevas ciudades por revisar"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "Siguiente paso"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "Actualmente no hay registros de riesgos de cuentas disponibles."
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "Registro original"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "Registros de riesgos pendientes"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "Riesgos pendientes por tipo"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "Denegaciones por políticas por revisar"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "Grabaciones por revisar"
+
+#: reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "Lista de comprobación de medidas correctivas"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "Revise y sincronice la credencial candidata verificada; la verificación por sí sola no confirma la recuperación."
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "Revise el propósito del comando, la regla coincidente y el historial de aprobación en la sesión original."
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "Revise la operación denegada y confirme que la política de acceso sea la prevista."
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "Revise el registro de ejecución y los destinos afectados, corrija la causa y vuelva a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "Revise la ruta del archivo, los permisos de acceso y la sesión original antes de volver a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "Revise el resultado de la verificación y la ejecución original antes de volver a intentarlo."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "Revise si el motivo para ignorar este fallo sigue siendo válido."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "Revise si el motivo para ignorar este riesgo sigue siendo válido."
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "Número de riesgos"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "Actualizado"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "Hora de verificación"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "Verifique la credencial candidata y sincronícela solo después de confirmar que el acceso funciona."
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "Verifique el origen del inicio de sesión y la identidad de la cuenta; después, revise el registro de autenticación."
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "Espere a que finalice la verificación antes de decidir si sincronizar la credencial."
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "Legible"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "ID del registro"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "Referencia"
+
+msgid "%(count)s account task executions were canceled."
+msgstr "Se cancelaron %(count)s ejecuciones de tareas de cuentas."
+
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "%(count)s sesiones finalizadas correctamente requieren revisar la grabación. Compruebe su creación, carga y almacenamiento."
+
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "%(count)s registros de inicio de sesión desde una ciudad nueva requieren verificar la identidad del usuario y la ubicación de acceso."
+
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s registros de inicio de sesión en la plataforma utilizan direcciones de origen de bucle local. Confirme si son accesos locales o solicitudes reenviadas por un proxy."
+
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "Se produjeron %(count)s fallos de inicio de sesión en la plataforma. Revise los usuarios afectados, las direcciones de origen y los motivos registrados."
+
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "Fallaron %(failed)s de %(total)s operaciones de archivos (%(rate)s%%). Revise los activos, las cuentas y las rutas de archivo afectados, así como las sesiones originales."
+
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "Se registraron %(sessions)s sesiones de activos: %(success)s conexiones correctas y %(failed)s fallidas, con %(users)s usuarios y %(assets)s activos."
+
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "Se ejecutaron %(total)s tareas de cuentas: %(success)s correctas, %(failed)s fallidas o con errores y %(pending)s aún sin completar."
+
+msgid "Account Risks to Review"
+msgstr "Riesgos de cuentas por revisar"
+
+msgid "Accounts Identified in Pending Risks"
+msgstr "Cuentas identificadas en riesgos pendientes"
+
+msgid "Affected Accounts"
+msgstr "Cuentas afectadas"
+
+msgid "Affected Assets"
+msgstr "Activos afectados"
+
+msgid "Assets with Latest Check Successful"
+msgstr "Activos cuya última comprobación fue correcta"
+
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "Asigne una credencial única a cada cuenta afectada, sincronice los servicios dependientes y verifique el acceso."
+
+msgid "Check Result"
+msgstr "Resultado de la comprobación"
+
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "Compare las claves autorizadas con las aprobadas y elimine las que no estén aprobadas."
+
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "Compare los cambios de pertenencia a grupos con el acceso aprobado y retire los privilegios no aprobados."
+
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "Compare los cambios de permisos sudo con el acceso aprobado y retire los privilegios no aprobados."
+
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "Confirme el propietario y la finalidad de la cuenta; después, incorpore las cuentas aprobadas a la gestión o deshabilite las no autorizadas."
+
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "Confirme si la eliminación estaba aprobada y después actualice el inventario de cuentas gestionadas."
+
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "Confirme si la cuenta sigue siendo necesaria y deshabilite las cuentas sin uso tras obtener la aprobación."
+
+msgid "Current Managed Accounts"
+msgstr "Cuentas gestionadas actuales"
+
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "Actualmente, %(pending)s registros de riesgo de cuentas pendientes afectan a %(accounts)s cuentas distintas en %(assets)s activos. Revise las cuentas afectadas por tipo de riesgo."
+
+msgid "Latest Check Failed"
+msgstr "Última comprobación fallida"
+
+msgid "Latest Check Successful"
+msgstr "Última comprobación correcta"
+
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "Cuentas gestionadas cuya última comprobación fue correcta"
+
+msgid "Most Recent Stored Check"
+msgstr "Comprobación registrada más reciente"
+
+msgid "No Check Result"
+msgstr "Sin resultado de comprobación"
+
+msgid "No listed security events were found in the available records for this period."
+msgstr "No se encontraron los eventos de seguridad indicados en los registros disponibles de este período."
+
+msgid "Not Applicable"
+msgstr "No aplicable"
+
+msgid "Password Changes with Subsequent Progress"
+msgstr "Cambios de contraseña con avances posteriores"
+
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "Renueve la credencial caducada y verifique las tareas dependientes y el acceso a la cuenta."
+
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "Sustituya la contraseña débil por una contraseña segura y única, y después verifique el acceso a la cuenta."
+
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "Revise las conexiones fallidas a partir de los activos y las cuentas afectados y los motivos registrados."
+
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "Revise los registros de tareas fallidas y las cuentas afectadas; priorice los elementos sin resolver frente a los registros con avances posteriores."
+
+msgid "Review risks"
+msgstr "Revisar riesgos"
+
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "Revise el hallazgo confirmado y verifique el estado actual de la cuenta."
+
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "Cuentas con riesgo coincidentes con cuentas gestionadas"
+
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "Cuentas con riesgo sin coincidencia con cuentas gestionadas"
+
+msgid "Risk List"
+msgstr "Lista de riesgos"
+
+msgid "Risk Records"
+msgstr "Registros de riesgo"
+
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "Cambie la credencial conforme a la política de rotación y verifique los servicios dependientes."
+
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "Cambie la credencial posiblemente expuesta, revise los accesos recientes y verifique los servicios dependientes."
+
+msgid "Stored Asset Connectivity Results"
+msgstr "Resultados registrados de conectividad de activos"
+
+msgid "Stored Managed Account Connectivity Results"
+msgstr "Resultados registrados de conectividad de cuentas gestionadas"
+
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "Actualmente hay %(total)s activos, de los cuales %(active)s están habilitados."
+
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "Actualmente hay %(total)s registros de cuentas gestionadas, de los cuales %(active)s están habilitados."
+
+msgid "There are currently no pending account risk records."
+msgstr "Actualmente no hay registros de riesgo de cuentas pendientes."
