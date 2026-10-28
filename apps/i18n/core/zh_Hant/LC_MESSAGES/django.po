@@ -16460,3 +16460,12 @@ msgstr "檔案路徑"
 #: tickets/plugins
 msgid "Direction"
 msgstr "方向"
+
+msgid "WinRM file transfer root"
+msgstr "WinRM 檔案傳輸根目錄"
+
+msgid "Absolute Windows directory; home uses the connected account home directory."
+msgstr "Windows 絕對目錄；home 表示連線帳號的使用者目錄。"
+
+msgid "Select one Linux SSH/SFTP or Windows WinRM account."
+msgstr "請選擇一個 Linux SSH/SFTP 或 Windows WinRM 帳號。"

@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from ..base import TicketPlugin
-from .permissions import base_access, is_executable
+from .permissions import base_access, is_executable, executable_protocols
 
 
 class Plugin(TicketPlugin):
@@ -34,14 +34,16 @@ class Plugin(TicketPlugin):
         access = base_access(ticket.applicant, asset)
         context['accounts'] = [a for a in context['accounts'] if a['id'] in access and
                                a['secret_type'] in ('password', 'ssh_key') and
-                               {'ssh', 'sftp'} & set(access[a['id']]['protocols'])]
+                               executable_protocols(asset) & set(access[a['id']]['protocols']) and
+                               (asset.type != 'windows' or a['secret_type'] == 'password')]
         if {a['username'] for a in context['accounts']} != set(context['request']['accounts']):
             raise WorkflowConfigurationError(_('Existing access to every requested account is required.'))
-        if len(context['accounts']) != 1 or asset.category != 'host' or asset.type != 'linux':
-            raise WorkflowConfigurationError(_('Select one Linux SSH/SFTP account.'))
+        if len(context['accounts']) != 1 or not executable_protocols(asset):
+            raise WorkflowConfigurationError(_('Select one Linux SSH/SFTP or Windows WinRM account.'))
         from .storage import claim_files
         account = context['accounts'][0]
-        protocol = 'sftp' if 'sftp' in access[account['id']]['protocols'] else 'ssh'
+        protocol = ('winrm' if asset.type == 'windows' else
+                    'sftp' if 'sftp' in access[account['id']]['protocols'] else 'ssh')
         context.update(
             file_transfer_version=2, actions=[ticket.request_data['direction']],
             duration=ticket.request_data['duration'],

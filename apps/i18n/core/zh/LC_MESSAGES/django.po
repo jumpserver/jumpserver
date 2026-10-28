@@ -16493,3 +16493,12 @@ msgstr "申请用途／资源说明"
 #: apps/perms/templates/perms/_asset_permission_renewal_links.html:3
 msgid "Apply for renewal"
 msgstr "申请续期"
+
+msgid "WinRM file transfer root"
+msgstr "WinRM 文件传输根目录"
+
+msgid "Absolute Windows directory; home uses the connected account home directory."
+msgstr "Windows 绝对目录；home 表示连接账号的用户目录。"
+
+msgid "Select one Linux SSH/SFTP or Windows WinRM account."
+msgstr "请选择一个 Linux SSH/SFTP 或 Windows WinRM 账号。"

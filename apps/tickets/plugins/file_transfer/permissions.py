@@ -11,7 +11,13 @@ from perms.utils.permission import AssetPermissionUtil
 from tickets.models import Ticket
 from tickets.workflow.approvers import available_users
 
-TRANSFER_PROTOCOLS = {'ssh', 'sftp', 'rdp'}
+TRANSFER_PROTOCOLS = {'ssh', 'sftp', 'rdp', 'winrm'}
+
+
+def executable_protocols(asset):
+    if not asset or asset.category != 'host':
+        return set()
+    return {'linux': {'ssh', 'sftp'}, 'windows': {'winrm'}}.get(asset.type, set())
 
 
 def base_access(user, asset, permissions=None):

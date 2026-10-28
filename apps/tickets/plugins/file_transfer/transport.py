@@ -17,10 +17,8 @@ class TransferError(Exception):
 
 
 @contextmanager
-def connect(asset, account, port):
-    client, tunnel = paramiko.SSHClient(), None
-    # Match the existing asset automation SSH host-key policy.
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+def connection_address(asset, port):
+    tunnel = None
     timeout = min(max(int(settings.SSH_GATEWAY_CONNECT_TIMEOUT), 1), 30)
     host = asset.address
     try:
@@ -41,16 +39,28 @@ def connect(asset, account, port):
             )
             tunnel.start()
             host, port = '127.0.0.1', tunnel.local_bind_port
-        client.connect(host, port=port, username=account.username, password=account.password,
-                       pkey=account.private_key_obj, timeout=timeout, banner_timeout=timeout,
-                       auth_timeout=timeout, allow_agent=False, look_for_keys=False)
-        with client.open_sftp() as sftp:
-            sftp.get_channel().settimeout(30)
-            yield sftp
+        yield host, port
     finally:
-        client.close()
         if tunnel:
             tunnel.stop()
+
+
+@contextmanager
+def connect(asset, account, port):
+    client = paramiko.SSHClient()
+    # Match the existing asset automation SSH host-key policy.
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    timeout = min(max(int(settings.SSH_GATEWAY_CONNECT_TIMEOUT), 1), 30)
+    try:
+        with connection_address(asset, port) as (host, port):
+            client.connect(host, port=port, username=account.username, password=account.password,
+                           pkey=account.private_key_obj, timeout=timeout, banner_timeout=timeout,
+                           auth_timeout=timeout, allow_agent=False, look_for_keys=False)
+            with client.open_sftp() as sftp:
+                sftp.get_channel().settimeout(30)
+                yield sftp
+    finally:
+        client.close()
 
 
 def transfer_root(sftp, asset, account, user):

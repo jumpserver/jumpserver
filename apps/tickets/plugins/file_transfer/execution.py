@@ -1,5 +1,4 @@
 import logging
-import posixpath
 import time
 from datetime import timedelta
 
@@ -10,7 +9,7 @@ from django.utils import timezone
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from tickets.models import Ticket, TicketTransferExecution, TicketTransferFile, WorkflowEvent
 from tickets.workflow.approvers import user_snapshot
-from .policy import expires_at, validate_context
+from .policy import expires_at, validate_context, path_module
 from .transport import TransferError
 
 logger = logging.getLogger(__name__)
@@ -53,6 +52,8 @@ def execute(ticket_id):
     with tmp_to_org(execution.org_id):
         ticket = Ticket.objects.select_related('applicant', 'workflow_instance').get(pk=ticket_id)
         context = ticket.workflow_instance.context
+        if context['transfer_protocol'] == 'winrm':
+            from . import winrm as transport
         direction = context['request']['direction']
         started, last_check = time.monotonic(), 0
 
@@ -86,7 +87,7 @@ def execute(ticket_id):
                                 raise TransferError('source_changed')
                             transport.upload(sftp, root, record, item['path'], guard)
                         else:
-                            record = reserve_download(ticket, posixpath.basename(item['path']))
+                            record = reserve_download(ticket, path_module(context['transfer_protocol']).basename(item['path']))
                             transport.download(sftp, root, item['path'], record, guard)
                         item.update(record.summary(), state='success')
                     except Exception as exc:
@@ -135,13 +136,14 @@ def error_code(exc):
 def get_result(ticket, user):
     from .actions import can_review
     context = ticket.workflow_instance.context
+    paths = path_module(context['transfer_protocol'])
     result = {'version': 2, 'direction': context['request']['direction'], 'state': 'pending', 'actions': [],
               'files': context['transfer_files'], 'protocols': [context['transfer_protocol']]}
     if result['direction'] == 'upload':
-        result['files'] = [{**item, 'path': posixpath.join(context['request']['target_directory'], item['name'])}
+        result['files'] = [{**item, 'path': paths.join(context['request']['target_directory'], item['name'])}
                            for item in context['transfer_files']]
     else:
-        result['files'] = [{'name': posixpath.basename(path), 'path': path} for path in context['request']['paths']]
+        result['files'] = [{'name': paths.basename(path), 'path': path} for path in context['request']['paths']]
     if result['direction'] == 'upload' and can_review(ticket, user):
         result['reviewable_files'] = [str(pk) for pk in TicketTransferFile.objects.filter(
             ticket=ticket, kind='upload', purged_at__isnull=True, expires_at__gt=timezone.now(),

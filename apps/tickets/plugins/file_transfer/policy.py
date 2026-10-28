@@ -1,13 +1,31 @@
+import ntpath
 import posixpath
+import re
 from datetime import timedelta
 
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from .permissions import base_access
+from .permissions import base_access, executable_protocols
 
 
-def validate_path(path):
+def path_module(protocol):
+    return ntpath if protocol == 'winrm' else posixpath
+
+
+def validate_path(path, *, windows=False):
+    if windows:
+        path = path.replace('/', '\\')
+        parts = path[3:].rstrip('\\').split('\\')
+        if (not re.match(r'^[a-zA-Z]:\\', path) or
+                any(ord(c) < 32 or ord(c) == 127 for c in path) or
+                any(c in path[2:] for c in ':*?"<>|[]') or
+                any(part in ('.', '..') or part.endswith((' ', '.')) or
+                    re.match(r'^(CON|PRN|AUX|NUL|CONIN\$|CONOUT\$|COM[1-9¹²³]|LPT[1-9¹²³])$',
+                             part.split('.')[0].rstrip(' '), re.I)
+                    for part in parts if part)):
+            raise ValidationError('Use an absolute Windows drive path without device names, streams or wildcards.')
+        return ntpath.normpath(path)
     if (not path.startswith('/') or path.startswith('//') or '\\' in path or
             any(ord(c) < 32 or ord(c) == 127 for c in path) or
             any(part in ('.', '..') for part in path.split('/')) or any(c in path for c in '*?[]')):
@@ -40,7 +58,7 @@ def validate_context(ticket, *, approved=False, user=None, remote_addr=None):
                      not instance.date_finished or not instance.date_finished <= timezone.now() < expires_at(ticket)):
         raise PermissionDenied('No active file transfer approval.')
     asset = Asset.objects.filter(pk=context['request']['asset'], org_id=ticket.org_id,
-                                 is_active=True, platform__category='host', platform__type='linux').first()
+                                 is_active=True, platform__category='host', platform__type__in=['linux', 'windows']).first()
     if not asset or not ticket.applicant:
         raise PermissionDenied('The approved asset or applicant is no longer available.')
     access = base_access(ticket.applicant, asset)
@@ -48,7 +66,9 @@ def validate_context(ticket, *, approved=False, user=None, remote_addr=None):
     account = Account.objects.filter(pk=snapshot['id'], asset=asset, is_active=True,
                                      username=snapshot['username'], secret_type=snapshot['secret_type']).first()
     protocol = context['transfer_protocol']
-    if not account or protocol not in access.get(str(account.pk), {}).get('protocols', []):
+    if (not account or protocol not in executable_protocols(asset) or
+            (protocol == 'winrm' and account.secret_type != 'password') or
+            protocol not in access.get(str(account.pk), {}).get('protocols', [])):
         raise PermissionDenied('The approved account access changed.')
     if (asset.address != context['transfer_address'] or
             not asset.protocols.filter(name=protocol, port=context['transfer_port']).exists()):

@@ -1,5 +1,3 @@
-import posixpath
-
 from django.db import transaction
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -13,7 +11,7 @@ from common.utils import get_request_ip
 from tickets.models import Ticket, TicketTransferFile, TicketTransferExecution, WorkflowInstance, ApprovalTask
 from tickets.plugins.actions import TicketAction
 from .execution import dispatch, event, get_result
-from .policy import validate_context
+from .policy import validate_context, path_module
 
 
 def can_review(ticket, user):
@@ -51,11 +49,12 @@ class ExecuteTransfer(TicketAction):
             ip = get_request_ip(request)
             validate_context(ticket, approved=True, user=request.user, remote_addr=ip)
             context = ticket.workflow_instance.context
+            paths = path_module(context['transfer_protocol'])
             if context['request']['direction'] == 'upload':
-                files = [{**item, 'path': posixpath.join(context['request']['target_directory'], item['name']),
+                files = [{**item, 'path': paths.join(context['request']['target_directory'], item['name']),
                           'state': 'pending'} for item in context['transfer_files']]
             else:
-                files = [{'name': posixpath.basename(path), 'path': path, 'state': 'pending'}
+                files = [{'name': paths.basename(path), 'path': path, 'state': 'pending'}
                          for path in context['request']['paths']]
             _, created = TicketTransferExecution.objects.get_or_create(
                 ticket=ticket, org_id=ticket.org_id, defaults={'files': files, 'remote_addr': ip},
