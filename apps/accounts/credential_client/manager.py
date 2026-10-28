@@ -23,7 +23,9 @@ from .audit import record
 def scope_uses_credential(scope, credential):
     if scope is None:
         return True
-    if scope.get('include_authorized') and credential.mode == ApplicationCredential.Mode.alternating_rotation:
+    if scope.get('include_authorized'):
+        if '_resolved_rotation_keys' in scope:
+            return credential.key in scope['_resolved_rotation_keys']
         return bool(set(scope.get('switch_account_ids', [])) & {
             str(credential.account_id), str(credential.alternate_account_id),
         })
@@ -479,8 +481,6 @@ class CredentialClientManager:
     @staticmethod
     def credential_keys(application, delivery_scope=None):
         application.assert_account_limit()
-        if delivery_scope and delivery_scope.get('include_authorized'):
-            return CredentialClientManager.authorized_agent_keys(application, delivery_scope)
         keys = set()
         accounts = None
         selected_keys = set(delivery_scope['keys']) if delivery_scope is not None else None
@@ -507,35 +507,6 @@ class CredentialClientManager:
                 ):
                     keys.add(credential.key)
         return sorted(keys)
-
-    @staticmethod
-    def authorized_agent_keys(application, scope):
-        return CredentialClientManager.authorized_agent_selection(application, scope)[0]
-
-    @staticmethod
-    def authorized_agent_selection(application, scope):
-        """Local storage and business declarations, independent of subscriptions."""
-        authorized = {str(value) for value in application.get_accounts().values_list('id', flat=True)}
-        selected = authorized if scope.get('all_authorized') else authorized & set(scope['account_ids'])
-        keys = {ApplicationCredential.account_key(value) for value in selected}
-        rotations = list(ApplicationCredential.objects.filter(
-            applications=application, is_active=True, mode=ApplicationCredential.Mode.alternating_rotation,
-        ).select_related('account', 'alternate_account', 'active_account'))
-        blocked = []
-        for account_id in scope.get('switch_account_ids', []):
-            if account_id not in authorized:
-                blocked.append(account_id)
-                continue
-            matches = [policy for policy in rotations if account_id in {
-                str(policy.account_id), str(policy.alternate_account_id),
-            }]
-            if len(matches) > 1 or matches and not {
-                str(matches[0].account_id), str(matches[0].alternate_account_id),
-            } <= authorized:
-                blocked.append(account_id)
-                continue
-            keys.add(matches[0].key if matches else ApplicationCredential.account_key(account_id))
-        return sorted(keys), sorted(blocked)
 
     @staticmethod
     def confirmation_keys(application):
@@ -598,22 +569,22 @@ class CredentialClientManager:
         desired_digest = self.agent_configuration_digest(self.application, delivery_scope)
         known = {item['key']: item['revision'] for item in credentials or []}
         delivered = {item['key']: item['revision'] for item in delivered_credentials or []}
+        service_scope = bool(delivery_scope and delivery_scope.get('include_authorized'))
+        unavailable = []
+        metadata = []
+        if service_scope:
+            from .service_scope import service_metadata
+            desired, metadata, unavailable = service_metadata(self, delivery_scope, known, delivered, now)
+            desired_digest = hashlib.sha256(json.dumps(desired, sort_keys=True).encode()).hexdigest()
         self._record_delivered([
             item for item in delivered_credentials or []
             if item['key'] in desired['credential_keys']
         ], now)
-        metadata = []
         subscription_reports = {}
-        for key in desired['credential_keys']:
+        for key in ([] if service_scope else desired['credential_keys']):
             if key.startswith('account:'):
-                if delivery_scope and delivery_scope.get('include_authorized'):
-                    account = self.application.get_accounts().select_related('asset__platform').get(id=key.removeprefix('account:'))
-                    subscriptions = list(ApplicationCredential.objects.filter(
-                        applications=self.application, is_active=True, mode=ApplicationCredential.Mode.subscription,
-                    ).filter(Q(subscription_all_authorized=True) | Q(subscription_accounts=account)).distinct().order_by('key'))
-                else:
-                    subscriptions, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
-                credential = subscriptions[0] if subscriptions else None
+                subscriptions, account = self._subscription_credentials(UUID(key.removeprefix('account:')), lock=False)
+                credential = subscriptions[0]
                 revision = account.version
                 for policy in subscriptions:
                     reports = subscription_reports.setdefault(policy, [])
@@ -631,17 +602,12 @@ class CredentialClientManager:
                 item['account_switch'] = credential.account_switch
             from .event_results import snapshot_result_event
             item.update(account_id=str(account.id), account_revision=account.version,
-                        event_id=snapshot_result_event(self.client, credential, account, revision) if credential else '')
-            if key.startswith('account:'):
-                # Do not prefetch an inactive account while its password is being changed.
-                item['available'] = not ApplicationCredential.objects.filter(
-                    Q(account=account) | Q(alternate_account=account), mode='alternating_rotation',
-                    status__in=['changing_secret', 'recovery_required'],
-                ).exclude(active_account=account).exists()
+                        event_id=snapshot_result_event(self.client, credential, account, revision))
             metadata.append(item)
         self._record_subscription_progress(subscription_reports, now)
         values = {
-            'delivery_scope': delivery_scope,
+            'delivery_scope': ({**delivery_scope, '_resolved_rotation_keys': desired['confirmation_keys']}
+                               if service_scope else delivery_scope),
             'config_digest': config_digest,
             'sync_status': sync_status,
             'sync_error': sync_error[:128],
@@ -654,15 +620,17 @@ class CredentialClientManager:
         from accounts.credential_rotation.participants import enroll_client
         enroll_client(self.client)
         response = {
+            'config_schema_version': 1,
             'config_digest': desired_digest,
             'scope': desired,
             'credentials': metadata,
             'removed_keys': sorted(set(known) - set(desired['credential_keys'])),
             'date_last_synced': now,
         }
-        if delivery_scope and delivery_scope.get('include_authorized'):
-            response['config_schema_version'] = 2
-            response['unavailable_switch_account_ids'] = self.authorized_agent_selection(self.application, delivery_scope)[1]
+        if service_scope:
+            from .protocol import SERVER_CAPABILITIES
+            response['server_capabilities'] = list(SERVER_CAPABILITIES)
+            response['unavailable_switch_account_ids'] = unavailable
         return response
 
     def _record_subscription_progress(self, policy_reports, now):

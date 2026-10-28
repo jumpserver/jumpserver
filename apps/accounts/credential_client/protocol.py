@@ -7,7 +7,7 @@ SUPPORTED_AGENT_CONFIG_SCHEMA_VERSIONS = (1,)
 # authorization or permission to execute a command on a particular instance.
 SERVER_CAPABILITIES = (
     'account_lookup', 'account_list', 'credential_events', 'event_results',
-    'agent_sync', 'application_commands', 'metadata', 'application_status',
+    'agent_sync', 'agent_store_services', 'application_commands', 'metadata', 'application_status',
 )
 
 

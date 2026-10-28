@@ -90,8 +90,11 @@ class ApplicationAccessTests(CredentialTestCase):
         compile(data['config'], data['filename'], 'exec')
         compile(data['code'], 'application_example.py', 'exec')
         self.assertEqual(data['sdk_language'], 'python')
-        self.assertIn('python3 -m pip install jms-pam', data['install_command'])
-        self.assertNotIn('pip install --upgrade jms-pam', data['install_command'])
+        self.assertIn('http://testserver/api/v1/accounts/client-source/python/', data['install_command'])
+        self.assertIn(
+            'python3 -m pip install --upgrade --force-reinstall ./jms-pam-clients/python',
+            data['install_command'],
+        )
         self.assertIn('instance_id=instance_id', data['code'])
         self.assertRegex(data['instance_id'], r'^[0-9a-f]{32}$')
         config_globals = {}
@@ -389,17 +392,15 @@ class ApplicationAccessTests(CredentialTestCase):
         self.assertNotIn('event_file', bootstrap)
         self.assertNotIn('state_file', bootstrap)
         self.assertNotIn('socket_path', bootstrap['local_api'])
-        self.assertEqual(bootstrap['config_version'], 2)
+        self.assertEqual(bootstrap['services'], [])
+        self.assertEqual(bootstrap['config_version'], 1)
         self.assertEqual(bootstrap['store']['accounts'], ['all'])
-        self.assertNotIn('rules', bootstrap)
-        self.assertNotIn('delivery', bootstrap)
         self.assertEqual(json.loads(materials(self.application, changed, 'http://testserver')['config'])['local_api']['owner'], 'other')
         environment = self.parameters(
-            type='agent', app_user='app', delivery_mode='environment',
-            systemd_unit='app.service',
+            type='agent', app_user='app', store_format='environment',
         )
         environment_materials = materials(self.application, environment, 'http://testserver')
-        self.assertFalse(environment_materials['foreground_windows_command'])
+        self.assertTrue(environment_materials['foreground_windows_command'])
         self.assertEqual(
             json.loads(environment_materials['config'])['store']['format'],
             'environment',
@@ -419,19 +420,6 @@ class ApplicationAccessTests(CredentialTestCase):
         response = self.signed_request('credential', {**params, 'key': self.credential.key})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CredentialClientInstance.objects.count(), 2)
-
-    def test_signed_agent_v2_sync_uses_authorization_without_subscription(self):
-        response = self.signed_request('sync_agent', {
-            'instance_id': 'store-services-agent',
-            'delivery_scope': {'keys': [], 'account_ids': [], 'include_authorized': True,
-                               'all_authorized': True, 'switch_account_ids': []},
-        }, 'jms-pam-agent')
-        self.assertEqual(response.status_code, 200, response.data)
-        self.assertEqual(response.data['config_schema_version'], 2)
-        self.assertEqual(set(response.data['scope']['credential_keys']), {
-            f'account:{self.primary.id}', f'account:{self.backup.id}',
-        })
-        self.assertEqual(response.data['scope']['confirmation_keys'], [])
 
     def test_legacy_agent_signature_is_rejected(self):
         client = CredentialClientInstance.objects.create(application=self.application, instance_id='legacy', type='agent', secret='legacy-secret')
