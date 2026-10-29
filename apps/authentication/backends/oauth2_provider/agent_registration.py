@@ -28,7 +28,7 @@ REGISTRATION_LOCK = 'agent-oauth-client-registration'
 
 
 def configured_resource():
-    if not settings.MCP_DCR_ENABLED:
+    if not settings.MCP_ENABLED or not settings.MCP_DCR_ENABLED:
         return ''
     value = settings.MCP_PUBLIC_URL
     try:

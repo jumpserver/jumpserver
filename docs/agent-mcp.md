@@ -25,33 +25,39 @@ In Lina, open **System Settings > Feature Settings > Agent / MCP**. The page use
 
 | Core setting | Meaning |
 | --- | --- |
+| `MCP_ENABLED` | Defaults to `false`; controls MCP access on Koko through the component configuration. Disabling stops new MCP requests after Koko synchronizes, while accepted operations and audit delivery finish |
 | `MCP_PUBLIC_URL` | The exact external HTTP or HTTPS MCP URL; Core is the sole configuration source. A nonempty value must have a path, with no credentials, trailing slash, query or fragment |
-| `MCP_DCR_ENABLED` | Defaults to `false`; enables controlled automatic client registration. A valid nonempty MCP URL is required when enabled |
+| `MCP_DCR_ENABLED` | Defaults to `false`; allows controlled automatic client registration while MCP access is enabled. The preference can remain saved while MCP is disabled |
+| `SITE_URL` | The existing **Basic settings > Site URL**, set to the Core address reachable by client browsers. Its HTTP or HTTPS origin, including any port, is used for Agent OAuth and is sent to Koko as `MCP_AUTHORIZATION_SERVER`; a site path is not part of the origin |
 
 Configuration files and environment variables provide initial values. Page
 settings override them through Core's normal database settings mechanism, and
 Core workers receive updates through the existing settings notification path.
-The URL remains editable independently of registration. To clear it, disable
-automatic registration in the same request or beforehand.
+The URL remains editable independently of registration. Enabling MCP requires a
+valid nonempty MCP URL and an HTTP or HTTPS Site URL. To clear the MCP URL,
+disable MCP access in the same request or beforehand.
 Valid UTF-8 percent-encoded paths retain their exact resource identity. Both Core
 and Koko reject malformed escapes, decoded trailing slashes, control characters
 and backslashes. Koko constructs discovery URLs with URL encoding intact.
 
-Registered Koko components receive `MCP_PUBLIC_URL` from
+Registered Koko components receive `MCP_ENABLED`, `MCP_PUBLIC_URL` and the derived
+`MCP_AUTHORIZATION_SERVER` from
 `GET /api/v1/terminal/terminals/config/`, using existing component authentication
-and `terminal.view_terminalconfig`. The field is returned independently of the
-DCR switch and is not exposed to other component types. Koko reads it at startup
+and `terminal.view_terminalconfig`. These fields are returned independently of the
+DCR preference and are not exposed to other component types. The authorization
+origin is empty while disabled. Koko reads them at startup
 and every 60 seconds, replacing its HTTP configuration without recreating its
 execution runtime. Fetch failures, missing fields and invalid values preserve
-the last valid configuration; an explicitly empty value stops new MCP requests.
-No initial valid address leaves MCP waiting for configuration. Accepted work and
+the last valid configuration; an explicit disable stops new MCP requests.
+No initial enabled configuration leaves MCP waiting. Accepted work and
 audit storage remain subject to their normal authorization and lifecycle rules.
 
-Koko's enablement, public authorization-server origin and execution limits remain
-Koko deployment settings. TLS belongs to docker-web/Nginx; it may forward HTTP to
-Core and Koko. Preserve the external Host and `X-Forwarded-Proto` so Core publishes
-the correct OAuth issuer and endpoints. Clients must support the deployment's
-external protocol.
+Koko needs no MCP-specific deployment settings. It retains built-in capacity
+protection (128 sessions, 20 concurrent operations, 64 pending operations).
+Agent OAuth metadata and Koko use the same Site URL origin; the internal
+component `CORE_HOST` and incoming Host header do not select that origin.
+TLS belongs to docker-web/Nginx; it may forward HTTP to Core and Koko. Clients
+must support the deployment's external protocol.
 
 MCP and file streaming use Koko's ordinary Web terminal `ClientIP()` policy,
 without a separate proxy setting. In production, docker-web sanitizes forwarding
@@ -62,16 +68,16 @@ must not bypass it. Koko reports the resolved IP through component-authenticated
 execution requests for the shared connection policy and audit.
 
 Development clients may connect directly to Koko's HTTP port `5000`. Set
-`MCP_PUBLIC_URL` to the client-reachable Koko URL ending in `/koko/mcp`, while
-`MCP_AUTHORIZATION_SERVER` still points to Core's login and authorization origin.
+`MCP_PUBLIC_URL` to the client-reachable Koko URL ending in `/koko/mcp`, and set
+Core's Site URL to its client-reachable login and authorization address.
 No forwarding headers means the TCP peer IP is used. Keep direct access within
 trusted development networks: the shared policy also parses supplied forwarding
 headers. No proxy or development-mode switch is required.
 
 The public URL is also an OAuth resource identifier. Changing it does not rebind
-issued credentials or sessions. Finish important sessions, disable DCR, update
-the URL and proxy forwarding, and confirm Koko's resource metadata before
-re-enabling DCR. Clients then update their URL and register/authorize again. New
+issued credentials or sessions. Finish important sessions, disable MCP, update
+the URL and proxy forwarding, then re-enable MCP and confirm Koko's resource
+metadata. Clients then update their URL and register/authorize again. New
 clients cannot take over another client's sessions. Polling is not an atomic
 rollout or a one-minute guarantee during outages.
 
@@ -82,7 +88,7 @@ The public authorization-server metadata is at
 `/core/auth/oauth2-provider/` endpoints to Core. Koko's protected-resource metadata
 identifies the Core authorization server. Discovery responses are not cached.
 
-Core advertises `registration_endpoint` only when DCR is enabled. Registration
+Core advertises `registration_endpoint` only when MCP and DCR are enabled. Registration
 creates a public authorization-code client with no client secret and binds it to
 Core's configured MCP resource. The registration body and Host header cannot
 select that resource. Registration alone grants no asset access.

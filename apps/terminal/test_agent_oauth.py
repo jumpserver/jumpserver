@@ -188,7 +188,7 @@ class AgentOAuthOrganizationTests(TestCase):
     def test_registration_metadata_follows_current_configuration(self):
         view = AgentAuthorizationServerView.as_view()
         for enabled in (False, True, False):
-            with self.subTest(enabled=enabled), self.settings(MCP_DCR_ENABLED=enabled, MCP_PUBLIC_URL=self.resource):
+            with self.subTest(enabled=enabled), self.settings(MCP_ENABLED=True, MCP_DCR_ENABLED=enabled, MCP_PUBLIC_URL=self.resource):
                 response = view(self.factory.get('/.well-known/oauth-authorization-server'))
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual('registration_endpoint' in json.loads(response.content), enabled)

@@ -882,6 +882,7 @@ class Config(dict):
         # oauth2_provider settings 
         'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
         'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
+        'MCP_ENABLED': False,
         'MCP_DCR_ENABLED': False,
         'MCP_PUBLIC_URL': '',
         'VENDOR': 'JumpServer',

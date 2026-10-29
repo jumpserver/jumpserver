@@ -214,6 +214,10 @@ class AgentAwareAuthorizationView(AuthorizationView):
 
 
 class AgentAuthorizationServerView(OAuthAuthorizationServerView):
+    def get_base_url(self, request):
+        from common.utils.mcp import get_mcp_authorization_server
+        return get_mcp_authorization_server()
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         # DCR can be enabled/disabled independently; do not inherit the built-in

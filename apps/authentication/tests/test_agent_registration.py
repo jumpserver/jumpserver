@@ -22,7 +22,7 @@ from terminal.models import AgentApplication
 from users.models import User
 
 
-@override_settings(MCP_DCR_ENABLED=True, MCP_PUBLIC_URL='https://jumpserver.example/koko/mcp')
+@override_settings(MCP_ENABLED=True, MCP_DCR_ENABLED=True, MCP_PUBLIC_URL='https://jumpserver.example/koko/mcp')
 class AgentClientRegistrationTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -81,6 +81,9 @@ class AgentClientRegistrationTests(TestCase):
         with override_settings(MCP_DCR_ENABLED=False):
             self.assertEqual(self.register().status_code, 404)
             self.assertNotIn('registration_endpoint', AgentAuthorizationServerView().get_metadata(self.factory.get('/metadata')))
+        with override_settings(MCP_ENABLED=False):
+            self.assertEqual(self.register().status_code, 404)
+            self.assertNotIn('registration_endpoint', AgentAuthorizationServerView().get_metadata(self.factory.get('/metadata')))
         for resource in ('', 'https://host/mcp/', 'https://user@host/mcp', 'https://host/mcp?', 'https://host/mcp#'):
             with self.subTest(resource=resource), override_settings(MCP_PUBLIC_URL=resource):
                 with self.assertRaises(ImproperlyConfigured):
@@ -116,10 +119,10 @@ class AgentClientRegistrationTests(TestCase):
         read = request.read
 
         def read_and_disable(size):
-            settings.MCP_DCR_ENABLED = False
+            settings.MCP_ENABLED = False
             return read(size)
 
-        with override_settings(MCP_DCR_ENABLED=True), patch.object(request, 'read', side_effect=read_and_disable):
+        with override_settings(MCP_ENABLED=True), patch.object(request, 'read', side_effect=read_and_disable):
             response = self.view(request)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(self.Application.objects.count(), before)
