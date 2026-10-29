@@ -25,7 +25,7 @@ def reapply_kind(ticket, user, memberships=None):
     if ticket.state == 'approved' and (
             applicant or any(item.user_id == user.pk for item in ticket.beneficiaries.all())):
         kind = 'renew'
-    elif applicant and ticket.state in ('rejected', 'closed', 'expired', 'error'):
+    elif applicant and ticket.state in ('rejected', 'closed', 'expired', 'error', 'pending'):
         kind = 'reapply'
     else:
         return None
@@ -73,15 +73,15 @@ def validate_reapplication(attrs, request, source_id):
     if parse_datetime(attrs['request_data']['apply_date_expired']) <= timezone.now():
         raise ValidationError({'apply_date_expired': 'Select a future expiration time.'})
     attrs['meta'] = {'source_ticket': source_info(ticket, request.user)}
-    if org_id != ticket.org_id:
+    if ticket.applicant_id == request.user.pk or org_id != ticket.org_id:
         attrs['meta']['source_ticket']['kind'] = 'reapply'
 
 
 class ReapplyAsset(TicketAction):
     method = 'GET'
 
-    def execute(self, ticket, request):
-        kind = reapply_kind(ticket, request.user)
+    def execute(self, ticket, request, kind=None):
+        kind = kind or reapply_kind(ticket, request.user)
         if not kind:
             raise PermissionDenied('This request cannot be reapplied for by this user.')
         data = ticket.request_data
@@ -134,7 +134,7 @@ class ReapplyAsset(TicketAction):
             notice = None
         actions = approved.get('actions', data.get('apply_actions', 0))
         return Response({
-            'source_ticket': source_info(ticket, request.user),
+            'source_ticket': {**source_info(ticket, request.user), 'kind': kind},
             'title': ticket.title, 'comment': ticket.comment, 'org_id': ticket.org_id,
             'workflow_id': str(ticket.workflow_id) if ticket.workflow_id else '',
             'request_data': {
@@ -147,6 +147,7 @@ class ReapplyAsset(TicketAction):
                 **({'resource_description': data['resource_description']} if data.get('resource_description') else {}),
             },
             'warnings': warnings,
+            'assets': [{'id': str(asset.pk), 'name': asset.name, 'address': asset.address} for asset in assets],
             'users': valid_users,
         })
 

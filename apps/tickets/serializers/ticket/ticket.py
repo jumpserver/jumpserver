@@ -124,9 +124,9 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         view = self.context.get('view')
         if not view or view.action not in ('list', 'retrieve'):
             return None
-        from tickets.plugins.apply_asset.reapply import reapply_kind
+        from tickets.plugins.reapply import can_reapply
         user = getattr(self.context.get('request'), 'user', None)
-        return reapply_kind(obj, user, self.context.setdefault('reapply_memberships', {}))
+        return 'reapply' if can_reapply(obj, user, self.context.setdefault('reapply_memberships', {})) else None
 
     def get_source_ticket(self, obj):
         view = self.context.get('view')

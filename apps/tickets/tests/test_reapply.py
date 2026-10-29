@@ -76,7 +76,7 @@ class AssetReapplyTests(TestCase):
         source = self.source()
         TicketBeneficiary.objects.create(ticket=source, user=self.carol)
         source.cc_users.add(self.bob)
-        for user, action in ((self.applicant, 'renew'), (self.carol, 'renew'),
+        for user, action in ((self.applicant, 'reapply'), (self.carol, None),
                              (self.alice, None), (self.bob, None)):
             with self.subTest(user=user.username):
                 rows = self.listing(user, id=str(source.pk))
@@ -86,18 +86,18 @@ class AssetReapplyTests(TestCase):
             source.state = state
             source.save(update_fields=['state'])
             rows = self.listing(self.applicant, id=str(source.pk))
-            self.assertEqual(rows[0]['reapply_action'], None if state == 'pending' else 'reapply')
+            self.assertEqual(rows[0]['reapply_action'], 'reapply')
 
     def test_list_membership_checks_are_shared_only_within_one_request(self):
         source = self.source()
         second = self.ticket(workflow=source.workflow)
         second.state = 'rejected'
         second.save(update_fields=['state'])
-        with patch('tickets.plugins.apply_asset.reapply.available_users', wraps=available_users) as members:
+        with patch('tickets.plugins.reapply.available_users', wraps=available_users) as members:
             rows = self.listing(self.applicant)
-            self.assertEqual({row['reapply_action'] for row in rows}, {'renew', 'reapply'})
+            self.assertEqual({row['reapply_action'] for row in rows}, {'reapply'})
             members.assert_called_once_with(self.org.id)
-        with patch('tickets.plugins.apply_asset.reapply.available_users',
+        with patch('tickets.plugins.reapply.available_users',
                    return_value=type(self.applicant).objects.none()):
             self.assertTrue(all(row['reapply_action'] is None for row in self.listing(self.applicant)))
 
@@ -130,15 +130,15 @@ class AssetReapplyTests(TestCase):
         grant.refresh_from_db()
         self.assertEqual(grant.date_expired, original_expiry)
 
-    def test_rejected_requests_reset_dates_and_pending_requests_have_no_action(self):
+    def test_rejected_and_pending_requests_can_be_reapplied(self):
         source = self.source(approved=False)
         data = self.prefill(source).data
         self.assertEqual(data['source_ticket']['kind'], 'reapply')
         self.assertLess(abs((parse_datetime(data['request_data']['apply_date_start']) - timezone.now()).total_seconds()), 5)
         source.state = 'pending'
         source.save(update_fields=['state'])
-        self.assertIsNone(reapply_kind(source, self.applicant))
-        self.assertEqual(self.prefill(source).status_code, 403)
+        self.assertEqual(reapply_kind(source, self.applicant), 'reapply')
+        self.assertEqual(self.prefill(source).status_code, 200)
 
     def test_actor_and_organization_checks_apply_to_prefill_and_submission(self):
         source = self.source()

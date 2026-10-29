@@ -27,8 +27,6 @@ class PluginTicketApplySerializer(TicketApplySerializer):
         if not isinstance(payload, dict):
             raise serializers.ValidationError({'request_data': 'Request parameters must be an object.'})
         self.plugin = plugin
-        if attrs.get('source_ticket_id') and plugin.type != 'apply_asset':
-            raise serializers.ValidationError({'source_ticket_id': 'Only asset requests support reapplication.'})
         if plugin.apply_serializer:
             serializer = import_string(plugin.apply_serializer)(context=self.context)
             allowed = {name for name, field in serializer.fields.items()
@@ -38,7 +36,12 @@ class PluginTicketApplySerializer(TicketApplySerializer):
             self.delegate = type(serializer)(data={**payload, **attrs}, context=self.context)
             self.delegate.is_valid(raise_exception=True)
             return dict(self.delegate.validated_data)
+        source_id = attrs.pop('source_ticket_id', None)
         attrs = super().validate(attrs)
+        if source_id:
+            from tickets.plugins.reapply import source_ticket, source_info
+            source = source_ticket(source_id, self.context['request'].user, plugin.type)
+            attrs['meta'] = {'source_ticket': source_info(source)}
         with_context = {**self.context, 'org_id': attrs['org_id']}
         serializer = plugin.get_request_serializer(data=payload, context=with_context)
         if not serializer.is_valid():

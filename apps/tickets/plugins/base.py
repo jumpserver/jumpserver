@@ -77,6 +77,9 @@ class TicketPlugin:
 
     def get_action(self, name):
         from rest_framework.exceptions import NotFound
+        if name == 'reapply' and self.self_service:
+            from .reapply import Reapply
+            return Reapply()
         handler = self.actions.get(name)
         if not handler:
             raise NotFound('Unknown ticket action.')
