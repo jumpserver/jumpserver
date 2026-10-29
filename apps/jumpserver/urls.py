@@ -11,6 +11,7 @@ from django.urls import path, include, re_path
 from django.views.i18n import JavaScriptCatalog
 
 from . import views, api
+from authentication.backends.oauth2_provider.agent import AgentAuthorizationServerView
 
 resource_api = [
     path('index/', api.IndexApi.as_view()),
@@ -56,6 +57,7 @@ if settings.XPACK_ENABLED:
     )
 
 urlpatterns = [
+    path('.well-known/oauth-authorization-server', AgentAuthorizationServerView.as_view()),
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
     path('api/health/', api.HealthCheckView.as_view(), name="health"),

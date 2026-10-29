@@ -57,6 +57,8 @@ _auditor_perms = (
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
+    ('terminal', 'agentsession', 'view', 'agentsession'),
+    ('terminal', 'agentaction', 'view', 'agentaction'),
 )
 
 auditor_perms = user_perms + _auditor_perms

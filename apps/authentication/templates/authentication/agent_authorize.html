@@ -1,0 +1,22 @@
+{% extends "oauth2_provider/base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="block-center">
+    {% if not error %}
+    <form id="authorizationForm" method="post">
+        <h3 class="block-center-heading">{% trans "Authorize" %} {{ application.name }}?</h3>
+        {% csrf_token %}
+        {% for field in form %}{% if field.is_hidden %}{{ field }}{% endif %}{% endfor %}
+        <p>{% trans "Allow this application to access assets you are authorized to use in the selected organization." %}</p>
+        <p>{{ form.organization.label_tag }} {{ form.organization }}</p>
+        {{ form.errors }}
+        <div class="control-group"><div class="controls">
+            <input type="submit" class="btn btn-large" value="{% trans 'Cancel' %}"/>
+            <input type="submit" class="btn btn-large btn-primary" name="allow" value="{% trans 'Authorize' %}"/>
+        </div></div>
+    </form>
+    {% else %}
+    <h2>Error: {{ error.error }}</h2><p>{{ error.description }}</p>
+    {% endif %}
+</div>
+{% endblock %}

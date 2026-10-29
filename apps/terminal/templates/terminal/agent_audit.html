@@ -1,0 +1,23 @@
+{% extends '_base_only_content.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Agent operation audit' %}{% endblock %}
+{% block custom_head_css_js %}<style>.passwordBox{max-width:1100px}pre{white-space:pre-wrap;overflow-wrap:anywhere}</style>{% endblock %}
+{% block content %}
+<p><a href="/core/auth/agent/audit/sessions/?oid={{ audit_org_id }}">{% trans 'Sessions' %}</a> · <a href="/core/auth/agent/audit/actions/?oid={{ audit_org_id }}">{% trans 'Actions' %}</a></p>
+{% if item %}
+<p>{{ item.id }} · {{ item.status }} · {{ item.date_created }}</p>
+{% if kind == 'actions' %}
+<p>{% trans 'Immutable request hash' %}: {{ item.request_hash }}</p><pre>{{ item.display_request }}</pre>
+{% if item.ticket_id %}<p><a href="/ui/#/tickets/tickets/{{ item.ticket_id }}?type=command_confirm">{% trans 'Approval ticket' %}</a></p>{% endif %}
+{% if item.interactive_session_id %}<p>{% trans 'Controlled terminal session' %}: {{ item.interactive_session_id }}</p>{% endif %}
+<pre>{{ item.display_result }}</pre>
+{% for event in events %}<p>#{{ event.sequence }} · {{ event.state }} · {{ event.payload.stream }} · {{ event.date_received }}</p>{% if event.display_data != None %}<pre>{{ event.display_data }}</pre>{% endif %}<details><summary>{% trans 'Event details' %}</summary><pre>{{ event.display_payload }}</pre></details>{% endfor %}
+{% if next_events %}<a href="{{ next_events }}">{% trans 'Next events' %}</a>{% endif %}
+{% else %}<p>{% trans 'Terminal session' %}: {{ item.terminal_session_id }}</p>{% endif %}
+{% endif %}
+<table class="table"><thead><tr><th>{% trans 'Created' %}</th><th>{% trans 'Operation' %}</th><th>{% trans 'Status' %}</th></tr></thead><tbody>
+{% for row in items %}<tr><td>{{ row.date_created }}</td><td><a href="/core/auth/agent/audit/{% if row.kind %}actions{% else %}sessions{% endif %}/{{ row.id }}/?oid={{ row.org_id }}">{{ row.kind|default:row.id }}</a></td><td>{{ row.status }}</td></tr>{% empty %}<tr><td colspan="3">{% trans 'No more records' %}</td></tr>{% endfor %}
+</tbody></table>
+{% if previous_page %}<a href="{{ previous_page }}">{% trans 'Previous records' %}</a>{% endif %}
+{% if next_page %}<a href="{{ next_page }}">{% trans 'Next records' %}</a>{% endif %}
+{% endblock %}

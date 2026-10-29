@@ -151,7 +151,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             )
 
     @staticmethod
-    def get_connection_reason(token_id, validated_data, user, asset):
+    def get_connection_reason(token_id, validated_data, user, asset, *, verify_account=False):
         from authentication.models import ConnectionToken
 
         with tmp_to_org(asset.org_id):
@@ -167,7 +167,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             )):
                 raise invalid
             reason = (token.acl_context or {}).get('reason') or token.comment or ''
-            if not reason:
+            if not reason and not verify_account:
                 return ''
             # A one-time token is normally expired before the component creates
             # its session. Bind the audit reason without rechecking its expiry
@@ -236,7 +236,24 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
                 validated_data['comment'] = reason if not comment or comment == reason else '{}\n\n{}: {}'.format(
                     reason, _('Comment'), comment,
                 )
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+        if token_id:
+            from terminal.models import AgentAction
+            from terminal.agent_service import check_handoff_authority
+            from django.utils import timezone
+            # The existing token/session validation above proves owner, asset,
+            # account and protocol before associating this human handoff.
+            action = AgentAction.objects.select_for_update().filter(interactive_token_id=token_id).first()
+            if action:
+                check_handoff_authority(action.session)
+                if action.status not in ('dispatching', 'awaiting_input') or action.cancel_requested:
+                    raise serializers.ValidationError({'token_id': _('Agent terminal handoff is no longer available.')})
+                self.get_connection_reason(token_id, validated_data, user, asset, verify_account=True)
+                action.interactive_session = instance
+                action.status, action.date_finished = 'succeeded', timezone.now()
+                action.result = {'terminal_session_id': str(instance.id), 'handoff_completed': True}
+                action.save(update_fields=['interactive_session', 'status', 'date_finished', 'result'])
+        return instance
 
     def update(self, instance, validated_data):
         validated_data.pop('token_id', None)
