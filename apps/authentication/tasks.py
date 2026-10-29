@@ -31,12 +31,79 @@ def _add_activity(items, user, credential_type, identifier, created, used, start
     used = _recent(used, start)
     if not created and not used:
         return
-    items[user.id].append({
+    activity = {
         'credential_type': credential_type,
         'identifier': str(identifier) if identifier else '-',
         'date_created': created,
         'date_last_used': used,
-    })
+    }
+    items[user.id].append(activity)
+    return activity
+
+
+def _credential_activity_queries(start):
+    sources = (
+        ('access_key', AccessKey, 'date_created', 'date_last_used', {}),
+        ('passkey', Passkey, 'date_created', 'date_last_used', {}),
+        ('private_token', PrivateToken, 'created', 'date_last_used', {}),
+        ('temp_token', TempToken, 'date_created', 'date_verified', {}),
+        ('connection_token', ConnectionToken, 'date_created', 'date_last_used', {
+            'is_reusable': True, 'user__isnull': False,
+        }),
+        ('access_token', get_access_token_model(), 'created', 'updated', {
+            'user__isnull': False,
+        }),
+    )
+    return [
+        (credential_type, model.objects.filter(
+            Q(**{f'{created}__gte': start}) | Q(**{f'{used}__gte': start}),
+            **filters,
+        ), created, used)
+        for credential_type, model, created, used, filters in sources
+    ]
+
+
+def _iter_activity_user_batches(sources, batch_size=100):
+    recent_activity = Q(pk__in=[])
+    for credential_type, queryset, __, ___ in sources:
+        if credential_type == 'temp_token':
+            recent_activity |= Q(username__in=queryset.order_by().values('username'))
+        else:
+            recent_activity |= Q(pk__in=queryset.order_by().values('user_id'))
+    users = User.objects.filter(is_service_account=False).filter(recent_activity).only(
+        'id', 'name', 'username', 'is_service_account',
+    ).order_by('pk')
+    last_pk = None
+    while True:
+        page = users if last_pk is None else users.filter(pk__gt=last_pk)
+        batch = list(page[:batch_size])
+        if not batch:
+            return
+        last_pk = batch[-1].pk
+        yield batch
+        if len(batch) < batch_size:
+            return
+        del batch
+
+
+def _iter_credential_activity_rows(queryset, fields, *, cursor_field='pk', batch_size=500):
+    # SQL LIMIT bounds mysqlclient's result buffer too. A private token's
+    # primary key is its secret, so use its unique user_id as the cursor instead.
+    selected = tuple(dict.fromkeys((cursor_field, *fields)))
+    rows = queryset.order_by(cursor_field).values(*selected)
+    cursor = None
+    while True:
+        page = rows
+        if cursor is not None:
+            page = rows.filter(**{f'{cursor_field}__gt': cursor[cursor_field]})
+        batch = list(page[:batch_size])
+        if not batch:
+            return
+        cursor = batch[-1]
+        yield from batch
+        if len(batch) < batch_size:
+            return
+        del batch
 
 
 @shared_task(
@@ -47,72 +114,60 @@ def _add_activity(items, user, credential_type, identifier, created, used, start
 @tmp_to_root_org()
 def send_credential_activity_summary():
     start = timezone.now() - datetime.timedelta(hours=24)
-    items = defaultdict(list)
-    users = {}
+    sources = _credential_activity_queries(start)
+    category_order = {source[0]: index for index, source in enumerate(sources)}
+    for user_batch in _iter_activity_user_batches(sources):
+        users = {user.id: user for user in user_batch}
+        users_by_name = {user.username: user for user in user_batch}
+        items = defaultdict(list)
+        for credential_type, queryset, created_field, used_field in sources:
+            is_temporary = credential_type == 'temp_token'
+            owner_field = 'username' if is_temporary else 'user_id'
+            owner_values = users_by_name if is_temporary else users
+            queryset = queryset.filter(**{f'{owner_field}__in': owner_values})
+            cursor_field = 'user_id' if credential_type == 'private_token' else 'pk'
+            fields = (owner_field, created_field, used_field)
+            if credential_type == 'connection_token':
+                fields += ('date_expired',)
+            rows = _iter_credential_activity_rows(
+                queryset, fields,
+                cursor_field=cursor_field,
+            )
+            for row in rows:
+                # SQL collations may match different username spellings. Keep
+                # the old Python dictionary's exact match for temporary tokens.
+                user = owner_values.get(row[owner_field])
+                identifier = '' if credential_type == 'private_token' else row['pk']
+                if credential_type == 'connection_token':
+                    # The full ID is an authentication credential for bootstrap APIs.
+                    identifier = f'{str(identifier)[:8]}...{str(identifier)[-4:]}'
+                created, used = row[created_field], row[used_field]
+                if credential_type == 'access_token' and used <= created:
+                    used = None
+                activity = _add_activity(items, user, credential_type, identifier, created, used, start)
+                if activity is not None and credential_type == 'connection_token':
+                    activity['_date_expired'] = row['date_expired']
 
-    for key in AccessKey.objects.filter(
-            Q(date_created__gte=start) | Q(date_last_used__gte=start)
-    ).select_related('user'):
-        users[key.user_id] = key.user
-        _add_activity(items, key.user, 'access_key', key.id,
-                      key.date_created, key.date_last_used, start)
-
-    for key in Passkey.objects.filter(
-            Q(date_created__gte=start) | Q(date_last_used__gte=start)
-    ).select_related('user'):
-        users[key.user_id] = key.user
-        _add_activity(items, key.user, 'passkey', key.id,
-                      key.date_created, key.date_last_used, start)
-
-    for token in PrivateToken.objects.filter(
-            Q(created__gte=start) | Q(date_last_used__gte=start)
-    ).select_related('user'):
-        users[token.user_id] = token.user
-        _add_activity(items, token.user, 'private_token', '',
-                      token.created, token.date_last_used, start)
-
-    temp_tokens = list(TempToken.objects.filter(
-        Q(date_created__gte=start) | Q(date_verified__gte=start)
-    ))
-    temp_users = {
-        user.username: user for user in User.objects.filter(
-            username__in={token.username for token in temp_tokens}
-        )
-    }
-    for token in temp_tokens:
-        user = temp_users.get(token.username)
-        if user:
-            users[user.id] = user
-        _add_activity(items, user, 'temp_token', token.id,
-                      token.date_created, token.date_verified, start)
-
-    for token in ConnectionToken.objects.filter(
-            Q(date_created__gte=start) | Q(date_last_used__gte=start),
-            is_reusable=True,
-            user__isnull=False,
-    ).select_related('user'):
-        users[token.user_id] = token.user
-        # The full ID is an authentication credential for bootstrap APIs.
-        identifier = f'{str(token.id)[:8]}...{str(token.id)[-4:]}'
-        _add_activity(items, token.user, 'connection_token', identifier,
-                      token.date_created, token.date_last_used, start)
-
-    AccessToken = get_access_token_model()
-    for token in AccessToken.objects.filter(
-            Q(created__gte=start) | Q(updated__gte=start),
-            user__isnull=False,
-    ).select_related('user'):
-        users[token.user_id] = token.user
-        used = token.updated if token.updated > token.created else None
-        _add_activity(items, token.user, 'access_token', token.id,
-                      token.created, used, start)
-
-    for user_id, user_items in items.items():
-        user_items.sort(
-            key=lambda item: item['date_last_used'] or item['date_created'],
-            reverse=True,
-        )
-        CredentialActivityDigestMessage(users[user_id], user_items).publish_async()
+        # Gather every category before publishing: each user still receives one
+        # complete, sorted digest. Only this batch's activity stays in memory.
+        for user in user_batch:
+            user_items = items.pop(user.id, [])
+            if not user_items:
+                continue
+            user_items.sort(
+                key=lambda item: (
+                    item['date_last_used'] or item['date_created'],
+                    -category_order[item['credential_type']],
+                    item.get('_date_expired', start),
+                ),
+                reverse=True,
+            )
+            # Preserve ConnectionToken's default ordering for equal activity
+            # times without using its mutable expiry as a pagination cursor.
+            for item in user_items:
+                item.pop('_date_expired', None)
+            CredentialActivityDigestMessage(user, user_items).publish_async()
+        del users, users_by_name, owner_values, items, user_items, user_batch
 
 
 @shared_task(

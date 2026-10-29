@@ -3,8 +3,9 @@ import datetime
 import io
 from collections import OrderedDict, defaultdict
 
-from django.db.models import Count, F, Q, Value
-from django.db.models.functions import Concat
+from django.db import connections
+from django.db.models import CharField, Count, F, Func, Min, Q, Value
+from django.db.models.functions import Cast, Concat, Lower, Replace
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -185,6 +186,77 @@ def export_table_response(table, export):
     return response
 
 
+class ExactText(Func):
+    """Keep Python string-set semantics when counting text in the database."""
+    template = '%(expressions)s'
+    output_field = CharField()
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return self.as_sql(compiler, connection, template='CAST(%(expressions)s AS BINARY)', **extra_context)
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        return self.as_sql(compiler, connection, template='%(expressions)s COLLATE "C"', **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return self.as_sql(compiler, connection, template='%(expressions)s COLLATE BINARY', **extra_context)
+
+
+def aggregate_by_date(queryset, field_name, dates, *, localtime=False, **aggregates):
+    """Return small daily aggregates without materializing report source rows.
+
+    Explicit bounds preserve the caller's date basis and don't require MySQL's
+    named time-zone tables. Bound each SQL statement for long report ranges.
+    """
+    tz = timezone.get_current_timezone() if localtime else connections[queryset.db].timezone
+    results = {}
+    for offset in range(0, len(dates), 7):
+        batch = dates[offset:offset + 7]
+        expressions = {}
+        bounds = []
+        for index, day in enumerate(batch):
+            start = datetime.datetime.combine(day, datetime.time.min)
+            end = datetime.datetime.combine(day + datetime.timedelta(days=1), datetime.time.min)
+            if tz is not None:
+                start = timezone.make_aware(start, tz)
+                end = timezone.make_aware(end, tz)
+            bounds.append((start, end))
+            condition = Q(**{f'{field_name}__gte': start, f'{field_name}__lt': end})
+            for name, aggregate in aggregates.items():
+                expression = aggregate.copy()
+                expression.filter = condition & expression.filter if expression.filter is not None else condition
+                expressions[f'{name}_{index}'] = expression
+        counts = queryset.filter(**{
+            f'{field_name}__gte': bounds[0][0],
+            f'{field_name}__lt': bounds[-1][1],
+        }).order_by().aggregate(**expressions)
+        for index, day in enumerate(batch):
+            results[day] = {name: counts[f'{name}_{index}'] for name in aggregates}
+    return results
+
+
+def asset_type_category_counts(queryset):
+    category_map = Category.as_dict()
+    all_type_dict = dict(AllTypes.choices())
+    by_category = defaultdict(list)
+    grouped = queryset.order_by().annotate(
+        report_type=ExactText('platform__type'), report_category=ExactText('platform__category'),
+    ).values('report_type', 'report_category').annotate(total=Count('id', distinct=True))
+    for item in grouped:
+        category = item['report_category']
+        platform_type = item['report_type']
+        category = category.decode() if isinstance(category, bytes) else category
+        platform_type = platform_type.decode() if isinstance(platform_type, bytes) else platform_type
+        by_category[category_map.get(category, category)].append({
+            'label': all_type_dict.get(platform_type, platform_type),
+            'type': platform_type,
+            'total': item['total'],
+        })
+    return OrderedDict(
+        (str(item['label']), by_category.get(str(item['label']), []))
+        for item in AllTypes.categories()
+    )
+
+
 def build_user_login_report(filters=None, days=7):
     range_info = resolve_range(days=days)
     users = User.get_org_users()
@@ -196,33 +268,67 @@ def build_user_login_report(filters=None, days=7):
     source_map = Source.as_dict()
     source_map.update({'password': _('Password')})
     source_data = defaultdict(int)
-    for source in users.values_list('source', flat=True):
-        source_data[str(source_map.get(source, source))] += 1
+    sources = (
+        users.order_by().annotate(report_source=ExactText('source')).values('report_source')
+        .annotate(total=Count('id', distinct=True), first_username=Min('username'))
+        .order_by('first_username')
+    )
+    for item in sources:
+        source = item['report_source']
+        source = source.decode() if isinstance(source, bytes) else source
+        source_data[str(source_map.get(source, source))] += item['total']
 
-    success_data = defaultdict(set)
-    failed_data = defaultdict(set)
-    method_data = defaultdict(lambda: defaultdict(set))
-    methods = set()
-    for current_time, current_username, backend in success_qs.values_list('datetime', 'username', 'backend'):
-        success_data[str(current_time.date())].add(current_username)
-        backend_name = str(source_map.get(backend.lower(), backend))
-        method_data[str(current_time.date())][backend_name].add(current_username)
-        methods.add(backend_name)
-    for current_time, current_username in failed_qs.values_list('datetime', 'username'):
-        failed_data[str(current_time.date())].add(current_username)
+    dates = range_info['date_list']
+    failed_data = aggregate_by_date(failed_qs, 'datetime', dates, total=Count(ExactText('username'), distinct=True))
+    methods = defaultdict(list)
+    backends = (
+        success_qs.order_by().annotate(report_backend=ExactText('backend'))
+        .values_list('report_backend', flat=True).distinct()
+    )
+    for backend in backends:
+        backend = backend.decode() if isinstance(backend, bytes) else backend
+        methods[str(source_map.get(backend.lower(), backend))].append(backend)
+    # Labels can combine backend spellings. Aggregate each union together with
+    # the total so every batch scans successful logins only once.
+    success_counts = {'total': Count(ExactText('username'), distinct=True)}
+    for index, backends in enumerate(methods.values()):
+        success_counts[f'method_{index}'] = Count(
+            ExactText('username'), distinct=True, filter=Q(report_backend__in=backends),
+        )
+    success_data = aggregate_by_date(
+        success_qs.annotate(report_backend=ExactText('backend')), 'datetime', dates,
+        **success_counts,
+    )
+    method_metrics = {
+        method: [success_data[day][f'method_{index}'] for day in dates]
+        for index, method in enumerate(methods)
+    }
 
     time_buckets = ['00:00-06:00', '06:00-12:00', '12:00-18:00', '18:00-24:00']
-    time_metrics = {bucket: 0 for bucket in time_buckets}
-    for obj in success_qs.only('datetime'):
-        time_metrics[time_buckets[timezone.localtime(obj.datetime).hour // 6]] += 1
+    time_metrics = dict.fromkeys(time_buckets, 0)
+    tz = timezone.get_current_timezone()
+    for offset in range(0, len(dates), 7):
+        batch = dates[offset:offset + 7]
+        conditions = [Q(pk__in=[]) for _ in time_buckets]
+        for day in batch:
+            for index in range(4):
+                midnight = datetime.datetime.combine(day, datetime.time.min)
+                start = timezone.make_aware(midnight + datetime.timedelta(hours=index * 6), tz)
+                end = timezone.make_aware(midnight + datetime.timedelta(hours=(index + 1) * 6), tz)
+                conditions[index] |= Q(datetime__gte=start, datetime__lt=end)
+        batch_start = timezone.make_aware(datetime.datetime.combine(batch[0], datetime.time.min), tz)
+        batch_end = timezone.make_aware(
+            datetime.datetime.combine(batch[-1] + datetime.timedelta(days=1), datetime.time.min), tz,
+        )
+        counts = success_qs.filter(datetime__gte=batch_start, datetime__lt=batch_end).aggregate(**{
+            f'bucket_{index}': Count('id', filter=condition)
+            for index, condition in enumerate(conditions)
+        })
+        for index, bucket in enumerate(time_buckets):
+            time_metrics[bucket] += counts[f'bucket_{index}']
 
-    success_metrics = [len(success_data.get(str(item), set())) for item in range_info['date_list']]
-    failed_metrics = [len(failed_data.get(str(item), set())) for item in range_info['date_list']]
-    method_metrics = defaultdict(list)
-    for current_date in range_info['date_list']:
-        current_methods = method_data.get(str(current_date), {})
-        for method in methods:
-            method_metrics[method].append(len(current_methods.get(method, set())))
+    success_metrics = [success_data[day]['total'] for day in dates]
+    failed_metrics = [failed_data[day]['total'] for day in dates]
     rows = [{'date': label, 'success': success_metrics[index], 'failed': failed_metrics[index]}
             for index, label in enumerate(range_info['date_labels'])]
     payload = {
@@ -245,7 +351,9 @@ def build_user_login_report(filters=None, days=7):
         },
         'user_login_time_metrics': time_metrics,
     }
-    payload['user_stats']['valid'] = sum(1 for user in users if user.is_valid)
+    payload['user_stats']['valid'] = users.filter(is_active=True).filter(
+        Q(date_expired__isnull=True) | Q(date_expired__gte=timezone.now())
+    ).count()
     table = {
         'filename': 'user_login_report',
         'columns': [
@@ -262,10 +370,10 @@ def build_user_change_password_report(filters=None, days=7):
     range_info = resolve_range(days=days)
     queryset = PasswordChangeLog.filter_queryset_by_org(PasswordChangeLog.objects.all())
     queryset = filter_by_range(queryset, 'datetime', range_info)
-    metric_data = defaultdict(set)
-    for current_time, current_user in queryset.values_list('datetime', 'user'):
-        metric_data[str(current_time.date())].add(current_user)
-    metrics = [len(metric_data.get(str(item), set())) for item in range_info['date_list']]
+    metric_data = aggregate_by_date(
+        queryset, 'datetime', range_info['date_list'], total=Count(ExactText('user'), distinct=True),
+    )
+    metrics = [metric_data[day]['total'] for day in range_info['date_list']]
     rows = [{'date': label, 'count': metrics[index]} for index, label in enumerate(range_info['date_labels'])]
     payload = {
         'total_count_change_password': {
@@ -296,21 +404,25 @@ def build_asset_activity_report(filters=None, days=7):
     from reports.api.assets.base import group_stats
     queryset = Session.objects.all()
     queryset = filter_by_range(queryset, 'date_start', range_info)
-    metric_data = defaultdict(set)
-    for current_time, session_id in queryset.values_list('date_start', 'id'):
-        metric_data[str(current_time.date())].add(session_id)
-    metrics = [len(metric_data.get(str(item), set())) for item in range_info['date_list']]
-    active_users_metric = defaultdict(set)
-    active_assets_metric = defaultdict(set)
-    for current_time, user_id, current_asset_id in queryset.values_list('date_start', 'user_id', 'asset_id'):
-        report_date = str(current_time.date())
-        if user_id:
-            active_users_metric[report_date].add(user_id)
-        if current_asset_id:
-            active_assets_metric[report_date].add(current_asset_id)
+    activity_queryset = queryset.annotate(
+        report_user_id=ExactText('user_id'), report_asset_id=ExactText('asset_id'),
+    )
+    metric_data = aggregate_by_date(
+        activity_queryset, 'date_start', range_info['date_list'],
+        total=Count('id', distinct=True),
+        active_users=Count('report_user_id', distinct=True, filter=~Q(report_user_id='')),
+        active_assets=Count('report_asset_id', distinct=True, filter=~Q(report_asset_id='')),
+    )
+    metrics = [metric_data[day]['total'] for day in range_info['date_list']]
     rows = [{'date': label, 'count': metrics[index]} for index, label in enumerate(range_info['date_labels'])]
-    asset_ids = {str(asset_value) for asset_value in queryset.values_list('asset_id', flat=True).distinct()}
-    assets = Asset.objects.filter(id__in=asset_ids)
+    # Session IDs are text, whereas Asset IDs may use a native UUID column.
+    # Normalize both sides instead of loading every distinct ID into Python.
+    asset_ids = queryset.order_by().annotate(
+        report_asset_id=Lower(Replace('asset_id', Value('-'), Value(''))),
+    ).values('report_asset_id')
+    assets = Asset.objects.annotate(
+        report_asset_id=Lower(Replace(Cast('id', CharField()), Value('-'), Value(''))),
+    ).filter(report_asset_id__in=asset_ids)
     payload = {
         'session_stats': queryset.aggregate(
             total=Count(1),
@@ -327,10 +439,10 @@ def build_asset_activity_report(filters=None, days=7):
         'user_asset_activity_metrics': {
             'dates_metrics_date': range_info['date_labels'],
             'dates_metrics_total_count_active_users': [
-                len(active_users_metric.get(str(item), set())) for item in range_info['date_list']
+                metric_data[item]['active_users'] for item in range_info['date_list']
             ],
             'dates_metrics_total_count_active_assets': [
-                len(active_assets_metric.get(str(item), set())) for item in range_info['date_list']
+                metric_data[item]['active_assets'] for item in range_info['date_list']
             ],
         },
     }
@@ -354,9 +466,9 @@ def build_account_automation_report(filters=None, days=7):
         'collect': GatherAccountsAutomation.objects.all(),
         'change_secret': ChangeSecretAutomation.objects.all(),
     }
-    automation_ids = []
+    automation_filter = Q(pk__in=[])
     for queryset in querysets.values():
-        automation_ids.extend(list(queryset.values_list('id', flat=True)))
+        automation_filter |= Q(automation_id__in=queryset.order_by().values('id'))
     execution_queryset = AutomationExecution.objects.filter(type__in=(
         AutomationTypes.push_account,
         AutomationTypes.check_account,
@@ -364,11 +476,8 @@ def build_account_automation_report(filters=None, days=7):
         AutomationTypes.gather_accounts,
         AutomationTypes.change_secret,
     ))
-    execution_queryset = execution_queryset.filter(automation_id__in=automation_ids)
+    execution_queryset = execution_queryset.filter(automation_filter)
     execution_queryset = filter_by_range(execution_queryset, 'date_start', range_info)
-    grouped = defaultdict(lambda: defaultdict(int))
-    for execution in execution_queryset:
-        grouped[str(timezone.localtime(execution.date_start).date())][execution.type] += 1
     label_map = {
         AutomationTypes.push_account: str(AutomationTypes.push_account.label),
         AutomationTypes.check_account: str(AutomationTypes.check_account.label),
@@ -376,11 +485,15 @@ def build_account_automation_report(filters=None, days=7):
         AutomationTypes.gather_accounts: str(AutomationTypes.gather_accounts.label),
         AutomationTypes.change_secret: str(_('Account change secret')),
     }
+    grouped = aggregate_by_date(
+        execution_queryset, 'date_start', range_info['date_list'], localtime=True,
+        **{item: Count('id', filter=Q(type=item)) for item in label_map},
+    )
     metrics = {}
     rows = []
     for report_date, label in zip(range_info['date_list'], range_info['date_labels']):
         row = {'date': label}
-        current = grouped.get(str(report_date), {})
+        current = grouped.get(report_date, {})
         for item in label_map:
             value = current.get(item, 0)
             metrics.setdefault(label_map[item], []).append(value)
@@ -399,19 +512,16 @@ def build_account_automation_report(filters=None, days=7):
         },
     }
     change_secret_queryset = execution_queryset.filter(type=AutomationTypes.change_secret)
-    success_grouped = defaultdict(int)
-    failed_grouped = defaultdict(int)
-    for execution in change_secret_queryset:
-        report_date = str(timezone.localtime(execution.date_start).date())
-        if execution.status == Status.success:
-            success_grouped[report_date] += 1
-        elif execution.status == Status.failed:
-            failed_grouped[report_date] += 1
+    result_counts = aggregate_by_date(
+        change_secret_queryset, 'date_start', range_info['date_list'], localtime=True,
+        success=Count('id', filter=Q(status=Status.success)),
+        failed=Count('id', filter=Q(status=Status.failed)),
+    )
     payload['account_result_metrics']['dates_metrics_total_count_success'] = [
-        success_grouped.get(str(item), 0) for item in range_info['date_list']
+        result_counts[item]['success'] for item in range_info['date_list']
     ]
     payload['account_result_metrics']['dates_metrics_total_count_failed'] = [
-        failed_grouped.get(str(item), 0) for item in range_info['date_list']
+        result_counts[item]['failed'] for item in range_info['date_list']
     ]
     table = {
         'filename': 'account_automation_report',
@@ -432,8 +542,6 @@ def build_asset_statistics_report(filters=None, days=7):
     range_info = resolve_range(days=days)
     qs = Asset.objects.all()
 
-    all_type_dict = dict(AllTypes.choices())
-
     stats = qs.aggregate(
         total=Count(1),
         active=Count(1, filter=Q(is_active=True)),
@@ -442,37 +550,11 @@ def build_asset_statistics_report(filters=None, days=7):
         directory_services=Count(1, filter=Q(directory_services__isnull=False)),
     )
 
-    category_map = Category.as_dict()
-    category_type_map = defaultdict(list)
-    for item in AllTypes.types():
-        category_type_map[str(item['category'].label)].append(item['value'])
-
-    category_type_ids = defaultdict(lambda: defaultdict(set))
-    values = qs.select_related('platform').values_list('id', 'platform__type', 'platform__category')
-    for obj_id, platform_type, category in values:
-        category_label = category_map.get(category, category)
-        category_type_ids[category_label][platform_type].add(obj_id)
-
-    by_type_category = defaultdict(list)
-    for category_label, type_map in category_type_ids.items():
-        by_type_category[category_label] = [
-            {
-                'label': all_type_dict.get(platform_type, platform_type),
-                'type': platform_type,
-                'total': len(ids),
-            }
-            for platform_type, ids in type_map.items()
-        ]
-
-    sorted_category_assets = OrderedDict()
-    desired_order = [str(item['label']) for item in AllTypes.categories()]
-    for category_label in desired_order:
-        sorted_category_assets[category_label] = by_type_category.get(category_label, [])
-
+    sorted_category_assets = asset_type_category_counts(qs)
     filtered_created = filter_by_range(qs, 'date_created', range_info)
-    grouped_created = defaultdict(set)
-    for created_at, obj_id in filtered_created.values_list('date_created', 'id'):
-        grouped_created[str(created_at.date())].add(obj_id)
+    grouped_created = aggregate_by_date(
+        filtered_created, 'date_created', range_info['date_list'], total=Count('id', distinct=True),
+    )
 
     stats.update({
         'platform_count': Platform.objects.count(),
@@ -483,7 +565,7 @@ def build_asset_statistics_report(filters=None, days=7):
         'assets_by_type_category': sorted_category_assets,
         'added_asset_metrics': {
             'dates_metrics_date': range_info['date_labels'],
-            'dates_metrics_total': [len(grouped_created.get(str(item), set())) for item in range_info['date_list']],
+            'dates_metrics_total': [grouped_created[item]['total'] for item in range_info['date_list']],
         }
     }
 
@@ -552,9 +634,10 @@ def build_account_statistics_report(filters=None, days=30):
     )
 
     filtered_changed = filter_by_range(qs.exclude(date_change_secret__isnull=True), 'date_change_secret', range_info)
-    grouped_changed = defaultdict(set)
-    for changed_at, obj_id in filtered_changed.values_list('date_change_secret', 'id'):
-        grouped_changed[str(timezone.localtime(changed_at).date())].add(obj_id)
+    grouped_changed = aggregate_by_date(
+        filtered_changed, 'date_change_secret', range_info['date_list'],
+        localtime=True, total=Count('id', distinct=True),
+    )
 
     payload = {
         'account_stats': stats,
@@ -564,7 +647,7 @@ def build_account_statistics_report(filters=None, days=30):
         'by_connectivity': connectivity_data,
         'change_secret_account_metrics': {
             'dates_metrics_date': range_info['date_labels'],
-            'dates_metrics_total': [len(grouped_changed.get(str(item), set())) for item in range_info['date_list']],
+            'dates_metrics_total': [grouped_changed[item]['total'] for item in range_info['date_list']],
         }
     }
 
