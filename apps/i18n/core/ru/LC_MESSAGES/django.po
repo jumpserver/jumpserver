@@ -17958,8 +17958,8 @@ msgstr "Если включено, после завершения и повто
 msgid "Client login idle timeout (minute)"
 msgstr "Тайм-аут бездействия (минуты)"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "После отсутствия активности в клиенте в течение этого времени необходимо войти заново. Значение 0 отключает ограничение (по умолчанию). Учитываются только действия пользователя в настольном клиенте JumpServer; действия во внешних приложениях, например Xshell и MSTSC, не учитываются."
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "При достижении тайм-аута бездействия войдите снова. 0 отключает ограничение (по умолчанию). Реальные действия с клавиатурой и мышью в главном окне, отдельных окнах ресурсов и на встроенных веб-сайтах считаются активностью. Открытое соединение, фоновый вывод и автоматическое обновление не считаются активностью. Действия во внешних программах, например Xshell или MSTSC, и на некоторых встроенных страницах другого источника не могут быть зарегистрированы. Работа только в этих областях, длительный просмотр без действий или сбой отправки из-за проблем с сетью могут привести к тайм-ауту бездействия. Отсчёт ведётся от последней активности, подтверждённой сервером."
 
 msgid "Client login lifetime (minute)"
 msgstr "Срок действия входа (минуты)"

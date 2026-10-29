@@ -18017,8 +18017,8 @@ msgstr "Si cette option est activée, vous devez vous reconnecter après avoir q
 msgid "Client login idle timeout (minute)"
 msgstr "Délai d’inactivité (minutes)"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "Vous devez vous reconnecter après cette durée sans activité dans le client. 0 désactive la limite (valeur par défaut). Seules les actions de l’utilisateur dans le client de bureau JumpServer sont prises en compte ; celles effectuées dans des applications externes telles que Xshell et MSTSC ne le sont pas."
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Reconnectez-vous lorsque le délai d’inactivité est atteint. 0 désactive cette limite (par défaut). Les actions réelles au clavier et à la souris dans la fenêtre principale, les fenêtres de ressources séparées et les sites web intégrés comptent comme activité. Une connexion ouverte, les sorties en arrière-plan et l’actualisation automatique ne comptent pas. Les actions dans des logiciels externes comme Xshell ou MSTSC et dans certaines pages intégrées d’une autre origine ne peuvent pas être captées. Utiliser uniquement ces zones, regarder longtemps sans intervenir ou rencontrer un échec de transmission dû au réseau peut donc déclencher le délai d’inactivité. Le calcul part de la dernière activité confirmée par le serveur."
 
 msgid "Client login lifetime (minute)"
 msgstr "Durée de validité de la connexion (minutes)"

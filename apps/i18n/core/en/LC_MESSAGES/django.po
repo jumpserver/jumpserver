@@ -17877,8 +17877,8 @@ msgstr "When enabled, log in again after the desktop application exits and resta
 msgid "Client login idle timeout (minute)"
 msgstr "Idle timeout (minutes)"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
 
 msgid "Client login lifetime (minute)"
 msgstr "Login lifetime (minutes)"

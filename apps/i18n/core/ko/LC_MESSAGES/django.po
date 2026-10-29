@@ -17709,8 +17709,8 @@ msgstr "활성화하면 데스크톱 애플리케이션을 종료한 후 다시 
 msgid "Client login idle timeout (minute)"
 msgstr "유휴 시간 제한(분)"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "클라이언트에서 이 시간 동안 활동이 없으면 다시 로그인해야 합니다. 0은 제한 없음을 의미합니다(기본값). JumpServer 데스크톱 클라이언트 내의 사용자 입력만 활동으로 간주하며, Xshell 및 MSTSC 같은 외부 애플리케이션에서의 입력은 포함되지 않습니다."
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "유휴 시간 제한에 도달하면 다시 로그인해야 합니다. 0은 제한을 사용하지 않음(기본값)입니다. 기본 창, 별도 자산 창, 내장 웹사이트에서 실제로 수행한 키보드와 마우스 조작이 활동으로 기록됩니다. 연결 유지, 백그라운드 출력, 자동 새로고침은 활동에 포함되지 않습니다. Xshell, MSTSC 같은 외부 프로그램과 일부 교차 출처 내장 페이지의 조작은 수집할 수 없습니다. 이러한 영역에서만 조작하거나, 오랫동안 보기만 하거나, 네트워크 문제로 보고가 실패하면 유휴 시간 초과가 발생할 수 있습니다. 시간은 서버가 마지막으로 확인한 활동을 기준으로 계산됩니다."
 
 msgid "Client login lifetime (minute)"
 msgstr "로그인 유효 기간(분)"

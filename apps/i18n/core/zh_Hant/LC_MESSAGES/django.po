@@ -17458,8 +17458,8 @@ msgstr "啟用後，用戶端程序退出並重新啟動時需要重新登入。
 msgid "Client login idle timeout (minute)"
 msgstr "閒置逾時（分鐘）"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "用戶端連續無操作達到此時長後，登入失效，需重新登入。0 表示不限制（預設）。僅計入 JumpServer 用戶端內的使用者輸入；Xshell、MSTSC 等外部應用程式中的操作不計入活動。"
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "達到閒置逾時後需重新登入。0 表示不啟用（預設）。主視窗、獨立資產視窗及內建網站中的實際鍵盤、滑鼠操作會計入活動；連線在線、背景輸出和自動重新整理不算活動。Xshell、MSTSC 等外部軟體和部分跨來源內嵌頁面中的操作無法擷取。僅在這些區域操作、長時間只觀看，或網路異常導致回報失敗時，仍可能觸發閒置逾時；以伺服器最後確認的活動時間為準。"
 
 msgid "Client login lifetime (minute)"
 msgstr "登入有效期（分鐘）"

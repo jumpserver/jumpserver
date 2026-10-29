@@ -17939,8 +17939,8 @@ msgstr "Quando ativado, é necessário entrar novamente após encerrar e reinici
 msgid "Client login idle timeout (minute)"
 msgstr "Tempo limite de inatividade (minutos)"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "É necessário entrar novamente após este período sem atividade no cliente. 0 desativa o limite (padrão). Apenas as ações do usuário dentro do cliente de desktop JumpServer contam como atividade; ações em aplicativos externos, como Xshell e MSTSC, não são consideradas."
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Entre novamente quando o tempo limite de inatividade for atingido. 0 desativa o limite (padrão). Ações reais de teclado e mouse na janela principal, em janelas separadas de ativos e em sites integrados contam como atividade. Uma conexão aberta, saídas em segundo plano e atualizações automáticas não contam. Ações em programas externos como Xshell ou MSTSC e em algumas páginas incorporadas de outra origem não podem ser capturadas. Usar apenas essas áreas, apenas observar por muito tempo ou ter falhas no envio devido à rede ainda pode causar o tempo limite de inatividade. O tempo é contado a partir da última atividade confirmada pelo servidor."
 
 msgid "Client login lifetime (minute)"
 msgstr "Validade do login (minutos)"

@@ -17481,8 +17481,8 @@ msgstr "开启后，客户端进程退出并重新启动时需要重新登录。
 msgid "Client login idle timeout (minute)"
 msgstr "空闲超时 (分)"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "客户端连续无操作达到此时长后，登录失效，需重新登录。0 表示不限制（默认）。仅统计 JumpServer 客户端内的用户输入；Xshell、MSTSC 等外部应用中的操作不计入活动。"
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "达到空闲超时后需重新登录。0 表示不启用（默认）。主窗口、独立资产窗口及内置网站中的真实键盘、鼠标操作会计入活动；连接在线、后台输出和自动刷新不算活动。Xshell、MSTSC 等外部软件和部分跨域内嵌页面中的操作无法采集。仅在这些区域操作、长时间只观看，或网络异常导致上报失败时，仍可能触发空闲超时；以服务器最后确认的活动时间为准。"
 
 msgid "Client login lifetime (minute)"
 msgstr "登录有效期 (分)"

@@ -17817,8 +17817,8 @@ msgstr "Khi bật, bạn cần đăng nhập lại sau khi thoát và khởi đ�
 msgid "Client login idle timeout (minute)"
 msgstr "Thời gian chờ không hoạt động (phút)"
 
-msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
-msgstr "Bạn cần đăng nhập lại nếu không có hoạt động trong ứng dụng khách suốt khoảng thời gian này. Giá trị 0 tắt giới hạn (mặc định). Chỉ thao tác của người dùng trong ứng dụng khách JumpServer trên máy tính mới được tính là hoạt động; thao tác trong các ứng dụng bên ngoài như Xshell và MSTSC không được tính."
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Đăng nhập lại khi đạt thời gian chờ do không hoạt động. 0 tắt giới hạn này (mặc định). Thao tác bàn phím và chuột thực tế trong cửa sổ chính, cửa sổ tài sản riêng và các trang web tích hợp được tính là hoạt động. Kết nối đang mở, đầu ra nền và tự động làm mới không được tính. Không thể ghi nhận thao tác trong phần mềm bên ngoài như Xshell hoặc MSTSC và một số trang nhúng khác nguồn. Chỉ thao tác trong các khu vực này, chỉ xem trong thời gian dài hoặc gửi báo cáo thất bại do sự cố mạng vẫn có thể gây hết thời gian chờ do không hoạt động. Thời gian được tính từ hoạt động cuối cùng do máy chủ xác nhận."
 
 msgid "Client login lifetime (minute)"
 msgstr "Thời hạn đăng nhập (phút)"
