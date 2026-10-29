@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 from common.permissions import IsValidUser
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from terminal import agent_service as service
+from terminal.const import LoginFrom
 from terminal.models import AgentAction, AgentSession, Session
 
 
@@ -165,6 +166,7 @@ class AgentComponentAPI(APIView):
                 )
                 if session.terminal_session_id and session.terminal_session_id != terminal_session.id:
                     raise service.Conflict('Agent session is already bound to another terminal session')
+                Session.objects.filter(pk=terminal_session.pk).update(login_from=LoginFrom.AG)
                 session.terminal_session = terminal_session
                 session.save(update_fields=['terminal_session'])
             elif self.operation == 'credentials':

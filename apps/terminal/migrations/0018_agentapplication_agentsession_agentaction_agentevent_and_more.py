@@ -20,6 +20,16 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name='session',
+            name='login_from',
+            field=models.CharField(choices=[('ST', 'SSH Terminal'), ('RT', 'RDP Terminal'), ('WT', 'Web Terminal'), ('DT', 'DB Terminal'), ('VT', 'VNC Terminal'), ('AG', 'Agent')], default='ST', max_length=2, verbose_name='Login from'),
+        ),
+        migrations.AlterField(
+            model_name='sessionjoinrecord',
+            name='login_from',
+            field=models.CharField(choices=[('ST', 'SSH Terminal'), ('RT', 'RDP Terminal'), ('WT', 'Web Terminal'), ('DT', 'DB Terminal'), ('VT', 'VNC Terminal'), ('AG', 'Agent')], default='WT', max_length=2, verbose_name='Login from'),
+        ),
         migrations.CreateModel(
             name='AgentApplication',
             fields=[

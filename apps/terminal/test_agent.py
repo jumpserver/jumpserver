@@ -344,12 +344,14 @@ class AgentBoundaryTests(TestCase):
         session = AgentSession.objects.get(pk=first['id'])
         terminal = Session.objects.create(
             terminal=self.node, user_id=str(self.user.id), user=str(self.user), asset_id=str(asset.id),
-            asset=str(asset), account_id=str(account.id), account='root(root)', protocol='ssh',
+            asset=str(asset), account_id=str(account.id), account='root(root)', protocol='ssh', login_from='WT',
         )
         api.operation = 'bind'
         api.session_operation(self.node, first['id'], {
             'session_token': first['session_token'], 'terminal_session_id': str(terminal.id),
         })
+        terminal.refresh_from_db()
+        self.assertEqual(terminal.login_from, 'AG')
         connect = session.actions.get(kind='connect_asset')
         service.append_event(connect, {'session_token': first['session_token'], 'event_id': str(uuid.uuid4()),
                                        'sequence': 1, 'state': 'succeeded', 'payload': {}})
@@ -650,6 +652,15 @@ class AgentBoundaryTests(TestCase):
         self.action.refresh_from_db()
         self.assertEqual(self.action.status, 'succeeded')
         self.assertEqual(self.action.interactive_session_id, terminal.id)
+        self.assertEqual(terminal.login_from, 'AG')
+        self.assertEqual(terminal.get_login_from_display(), 'Agent')
+        self.assertEqual(SessionSerializer().fields['login_from'].run_validation('AG'), 'AG')
+        web_terminal = SessionSerializer().create({
+            'user_id': str(self.user.id), 'asset_id': str(asset.id), 'account_id': str(account.id),
+            'account': 'root(root)', 'protocol': 'ssh', 'terminal': self.node, 'org_id': str(self.org.id),
+            'login_from': 'WT',
+        })
+        self.assertEqual(web_terminal.login_from, 'WT')
 
     def test_live_monitor_policy_keeps_logical_session_and_gates_human_terminal(self):
         from unittest.mock import PropertyMock, patch

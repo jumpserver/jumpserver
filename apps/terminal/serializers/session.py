@@ -17,7 +17,7 @@ from orgs.utils import tmp_to_org
 from terminal.session_lifecycle import lifecycle_events_map
 from users.models import User
 from .terminal import TerminalSmallSerializer
-from ..const import SessionType, SessionErrorReason
+from ..const import SessionType, SessionErrorReason, LoginFrom
 from ..models import Session
 
 logger = get_logger(__file__)
@@ -249,6 +249,8 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
                 if action.status not in ('dispatching', 'awaiting_input') or action.cancel_requested:
                     raise serializers.ValidationError({'token_id': _('Agent terminal handoff is no longer available.')})
                 self.get_connection_reason(token_id, validated_data, user, asset, verify_account=True)
+                instance.login_from = LoginFrom.AG
+                instance.save(update_fields=['login_from'])
                 action.interactive_session = instance
                 action.status, action.date_finished = 'succeeded', timezone.now()
                 action.result = {'terminal_session_id': str(instance.id), 'handoff_completed': True}
