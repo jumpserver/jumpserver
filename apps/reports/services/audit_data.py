@@ -13,7 +13,7 @@ from importlib import import_module
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Exists, OuterRef, Q, Subquery, CharField, Case, When, IntegerField
-from django.db.models.functions import Cast, Coalesce, NullIf, Replace
+from django.db.models.functions import Cast, Coalesce, Concat, NullIf
 from django.db.models import Value
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -23,7 +23,6 @@ from accounts.models import Account, AccountRisk, AutomationExecution, ChangeSec
 from assets.const import Connectivity
 from assets.models import Asset
 from audits.models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
-from audits.utils import construct_userlogin_usernames
 from common.const.choices import ConfirmOrIgnore, Status
 from orgs.utils import current_org
 from reports.audit_contract import SOURCE_PERMISSIONS, THEMES
@@ -34,6 +33,7 @@ from .evidence import (
     reference, replay_expression, replay_labels, connection_reason,
     error_category_expression, error_category_labels,
 )
+from .queries import es_counts, session_platform_counts
 
 logger = logging.getLogger(__name__)
 SAMPLE_LIMIT = 20
@@ -111,6 +111,13 @@ class AuditReportBuilder:
 
     def sources_for_chapter(self, chapter):
         return tuple(key for key in CHAPTER_SOURCES[chapter] if key in THEMES[self.theme]['sources'])
+
+    @property
+    def needs_security_details(self):
+        chapters = getattr(self, 'topic_chapters', self.chapters)
+        if not set(chapters).intersection(CHAPTER_SOURCES):
+            chapters = THEME_CHAPTERS[self.theme]
+        return bool(set(chapters).intersection({'security', 'remediation'}))
 
     def evidence(self, value, path='', org_id=''):
         permissions = {
@@ -218,17 +225,11 @@ class AuditReportBuilder:
             rows = [{'name': str(labels.get(row[field], row[field])) or _('Not recorded'), 'count': row['count']} for row in grouped[:RANK_LIMIT]]
             tables.append(table(key, title, [('name', label), ('count', _('Session Count'))], rows,
                                 total=grouped.count(), limit=RANK_LIMIT))
-        # Session.asset_id is a text column. Cast the asset UUID, rather than casting
-        # historic session values (which may not be UUIDs) and failing the report.
-        platform = Asset.objects.annotate(
-            report_id=Replace(Cast('id', CharField()), Value('-'), Value('')),
-        ).filter(
-            report_id=Replace(OuterRef('asset_id'), Value('-'), Value('')),
-        ).values('platform__name')[:1]
-        grouped = qs.annotate(platform_name=Subquery(platform)).order_by().values('platform_name').annotate(count=Count('id')).order_by('-count')
+        platforms = session_platform_counts(qs, Asset.objects.all())
         tables.append(table('sessions_by_platform', _('Platform Access Distribution'), [('name', _('Platform')), ('count', _('Session Count'))],
-                            [{'name': row['platform_name'] or _('Asset deleted or platform not recorded'), 'count': row['count']} for row in grouped[:RANK_LIMIT]],
-                            total=grouped.count(), limit=RANK_LIMIT))
+                            [{'name': name or _('Asset deleted or platform not recorded'), 'count': count}
+                             for name, count in platforms.most_common(RANK_LIMIT)],
+                            total=len(platforms), limit=RANK_LIMIT))
         days_count = (self.end - self.start).days + 1
         interval = 'month' if days_count > 92 else 'week' if days_count > 31 else 'day'
         buckets = {}
@@ -274,7 +275,8 @@ class AuditReportBuilder:
             ('status', _('Connection Result')), ('replay', _('Recording Status')),
             ('reason', _('Connection Failure Reason')), ('evidence', _('Original Session')),
         ], rows, stats['total']))
-        missing = qs.filter(report_replay__in=['create_failed', 'upload_failed', 'convert_failed', 'unavailable']).count()
+        missing = sum(row['count'] for row in replay_counts
+                      if row['report_replay'] in {'create_failed', 'upload_failed', 'convert_failed', 'unavailable'})
         metrics.append(metric('replay_attention', _('Recordings Requiring Review'), missing,
                               unit=_('times')))
         actions = []
@@ -314,15 +316,6 @@ class AuditReportBuilder:
         if not current_org.is_root():
             filters.append(self.es_exact('org_id', str(current_org.id)))
         return filters
-
-    @staticmethod
-    def es_count(store, filters):
-        # ES.count() and ES.filter() intentionally swallow connection failures in
-        # interactive audit screens. A signed-off report must propagate them.
-        response = store.es.count(index=store.query_index, body={'query': {'bool': {'filter': filters}}})
-        if response.get('_shards', {}).get('failed', 0):
-            raise RuntimeError('Partial Elasticsearch count')
-        return response['count']
 
     @staticmethod
     def es_rows(store, filters, sort_field, limit=SAMPLE_LIMIT, fields=None):
@@ -368,8 +361,9 @@ class AuditReportBuilder:
                     raise ValueError('Unsupported command storage')
                 store = import_module(engine).CommandStore(storage.config)
                 filters = self.es_filters('timestamp', numeric=True)
-                storage_total = self.es_count(store, filters)
-                storage_counts = {str(level): self.es_count(store, filters + [{'term': {'risk_level': int(level)}}]) for level in levels}
+                storage_total, storage_counts = es_counts(store, filters, {
+                    str(level): {'term': {'risk_level': int(level)}} for level in levels
+                })
                 storage_rows = self.es_rows(store, filters + [{'terms': {'risk_level': [int(level) for level in risk_levels]}}], 'timestamp',
                                             fields=['id', 'timestamp', 'user', 'asset', 'account', 'input', 'risk_level', 'session', 'org_id'])
                 total += storage_total
@@ -472,18 +466,32 @@ class AuditReportBuilder:
         qs = UserLoginLog.objects.all()
         # Always scope non-root reports, including when enterprise features are off.
         if not current_org.is_root():
-            qs = qs.filter(username__in=construct_userlogin_usernames(current_org.get_members()))
+            members = current_org.get_members().order_by()
+            display_names = members.annotate(report_username=Concat(
+                'name', Value('('), 'username', Value(')'), output_field=CharField(),
+            )).values('report_username')
+            qs = qs.filter(Q(username__in=Subquery(members.values('username'))) |
+                           Q(username__in=Subquery(display_names)))
         return qs
 
     def collect_logins(self):
         from authentication.errors import const
         qs = self.between(self.login_queryset(), 'datetime')
+        loopback_q = Q(ip__startswith='127.') | Q(ip='::1') | Q(ip__startswith='::ffff:127.')
+        if not self.needs_security_details:
+            stats = qs.aggregate(success=Count('id', filter=Q(status=True)),
+                                 loopback=Count('id', filter=loopback_q))
+            metrics = [metric('login_success', _('Successful Logins'), stats['success'], unit=_('times'))]
+            if stats['loopback']:
+                metrics.append(metric('loopback_logins', _('Loopback Address Login Records'), stats['loopback'], unit=_('records')))
+            return source_result(metrics, actions=[])
         lock_codes = [const.reason_block_user_login, const.reason_block_ip_login, const.reason_block_mfa]
         # Old log versions put the stable code in reason, or use acl_error.
         lock_q = Q(reason_code__in=lock_codes) | Q(reason__in=lock_codes)
         acl_q = Q(reason_code__in=[const.reason_acl_not_allow, 'acl_error']) | Q(reason__in=[const.reason_acl_not_allow, 'acl_error'])
         stats = qs.aggregate(total=Count('id'), success=Count('id', filter=Q(status=True)), failed=Count('id', filter=Q(status=False)),
-                             locked=Count('id', filter=Q(status=False) & lock_q), denied=Count('id', filter=Q(status=False) & acl_q))
+                             locked=Count('id', filter=Q(status=False) & lock_q), denied=Count('id', filter=Q(status=False) & acl_q),
+                             loopback=Count('id', filter=loopback_q))
         metrics = [
             metric('login_success', _('Successful Logins'), stats['success'], unit=_('times')),
             metric('login_failed', _('Failed Logins'), stats['failed'], unit=_('times')),
@@ -496,7 +504,7 @@ class AuditReportBuilder:
                  'evidence': self.evidence(row.id, '/audit/audits/login-logs', current_org.id)}
                 for row in failures.only('datetime', 'username', 'ip', 'city', 'reason', 'reason_code', 'reason_params').order_by('-datetime')[:SAMPLE_LIMIT]]
         tables = [table('login_failures', _('Recent Failed Logins'), [('time', _('Time')), ('user', _('User')), ('ip', _('Source IP')), ('city', _('City')), ('reason', _('Reason')), ('evidence', _('Original Record'))], rows, stats['failed'])]
-        loopback_count = qs.filter(Q(ip__startswith='127.') | Q(ip='::1') | Q(ip__startswith='::ffff:127.')).count()
+        loopback_count = stats['loopback']
         if loopback_count:
             metrics.append(metric('loopback_logins', _('Loopback Address Login Records'), loopback_count,
                                   unit=_('records')))
@@ -542,17 +550,17 @@ class AuditReportBuilder:
             # Report generation is a read operation and must not do that.
             store = ES(config, properties={}, keyword_fields={'org_id', 'action'})
             filters = self.es_filters('datetime')
-            total = self.es_count(store, filters)
+            total, counts = es_counts(store, filters, {'denied': self.es_exact('action', 'reject')})
             denied_filters = filters + [self.es_exact('action', 'reject')]
-            denied = self.es_count(store, denied_filters)
+            denied = counts['denied']
             sample = self.es_rows(store, denied_filters, 'datetime', fields=['id', 'org_id', 'datetime', 'user', 'resource_type', 'resource'])
             rows = [{'time': row.get('datetime', ''), 'user': row.get('user', ''), 'action': _('Rejected'), 'type': row.get('resource_type', ''), 'resource': row.get('resource', ''),
                      'evidence': self.evidence(row.get('id'), '/audit/audits/operate-logs', row.get('org_id', current_org.id))} for row in sample]
         else:
             qs = self.between(OperateLog.objects.all(), 'datetime')
-            total = qs.count()
+            counts = qs.aggregate(total=Count('id'), denied=Count('id', filter=Q(action='reject')))
+            total, denied = counts['total'], counts['denied']
             rejected = qs.filter(action='reject')
-            denied = rejected.count()
             rows = [{'time': display_time(row.datetime), 'user': row.user, 'action': _('Rejected'), 'type': str(row.resource_type_display), 'resource': row.resource,
                      'evidence': self.evidence(row.id, '/audit/audits/operate-logs', row.org_id)}
                     for row in rejected.only('id', 'org_id', 'datetime', 'user', 'resource_type', 'resource').order_by('-datetime')[:SAMPLE_LIMIT]]
