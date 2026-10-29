@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 from rest_framework.decorators import action
@@ -15,6 +17,7 @@ from ..serializers import AccessTokenSerializer
 AccessToken = get_access_token_model()
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class AccessTokenViewSet(JMSModelViewSet):
     """
     OAuth2 Access Token 管理视图集
@@ -41,7 +44,17 @@ class AccessTokenViewSet(JMSModelViewSet):
             AccessToken.objects.filter(user=request.user),
             id=kwargs['pk']
         )
+        from oauth2_provider.models import get_refresh_token_model
+        from authentication.models import ClientLoginSession
+        from authentication.services.client_login_session import is_client_application, revoke_session
+        refresh = get_refresh_token_model().objects.filter(access_token_id=token.pk).first()
+        session = ClientLoginSession.objects.filter(
+            user_id=token.user_id, application_id=token.application_id, token_family=refresh.token_family,
+        ).first() if refresh and is_client_application(token.application) else None
+        if session:
+            revoke_session(session, 'security_revoke')
+            return Response(status=HTTP_204_NO_CONTENT)
         # 优先撤销 refresh token，会自动撤销关联的 access token
-        token_to_revoke = token.refresh_token if token.refresh_token else token
+        token_to_revoke = refresh or token
         token_to_revoke.revoke()
         return Response(status=HTTP_204_NO_CONTENT)

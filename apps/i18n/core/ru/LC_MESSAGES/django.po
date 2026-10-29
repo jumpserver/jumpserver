@@ -17936,3 +17936,48 @@ msgstr "Сейчас имеется %(total)s записей об управля
 
 msgid "There are currently no pending account risk records."
 msgstr "Сейчас нет записей о рисках учётных записей, ожидающих обработки."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Обновите клиент JumpServer, чтобы использовать настроенную политику входа."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "Срок действия сеанса клиента истёк. Пройдите аутентификацию повторно."
+
+msgid "Client login session belongs to a different user"
+msgstr "Сеанс входа клиента принадлежит другому пользователю"
+
+msgid "Client login session"
+msgstr "Сеанс входа клиента"
+
+msgid "Log in again after exiting the client"
+msgstr "Повторный вход после выхода из приложения"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "Если включено, после завершения и повторного запуска настольного приложения необходимо войти заново. Сворачивание или скрытие приложения не считается выходом. По умолчанию отключено."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Тайм-аут бездействия (минуты)"
+
+msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+msgstr "После отсутствия активности в клиенте в течение этого времени необходимо войти заново. Значение 0 отключает ограничение (по умолчанию). Учитываются только действия пользователя в настольном клиенте JumpServer; действия во внешних приложениях, например Xshell и MSTSC, не учитываются."
+
+msgid "Client login lifetime (minute)"
+msgstr "Срок действия входа (минуты)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "Отсчитывается с момента входа в клиент; активность и обновление токена его не продлевают. Значение 0 отключает ограничение срока действия (по умолчанию). Настройки выхода и тайм-аута бездействия продолжают действовать. По истечении срока необходимо войти заново."
+
+msgid "Client exit"
+msgstr "Выход из клиента"
+
+msgid "Idle timeout"
+msgstr "Тайм-аут бездействия"
+
+msgid "Maximum login time"
+msgstr "Максимальное время входа"
+
+msgid "Client login policy changed"
+msgstr "Политика входа в клиент изменена"
+
+msgid "Authorization revoked"
+msgstr "Авторизация отозвана"

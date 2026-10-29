@@ -219,6 +219,32 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySessionSerializer(serializers.Serializer):
+    SECURITY_CLIENT_REAUTH_ON_EXIT = serializers.BooleanField(
+        required=False, label=_('Log in again after exiting the client'),
+        help_text=_(
+            'When enabled, log in again after the desktop application exits and restarts. '
+            'Minimizing or hiding the application does not count as exiting. '
+            'Disabled by default.'
+        ),
+    )
+    SECURITY_CLIENT_MAX_SESSION_TIME = serializers.IntegerField(
+        min_value=0, max_value=99999, required=False,
+        label=_('Client login lifetime (minute)'),
+        help_text=_(
+            'Measured from client login; activity and token refresh do not extend it. '
+            '0 disables the lifetime limit (default). Exit and idle timeout settings still apply. '
+            'Log in again when the lifetime ends.'
+        ),
+    )
+    SECURITY_CLIENT_MAX_IDLE_TIME = serializers.IntegerField(
+        min_value=0, max_value=99999, required=False,
+        label=_('Client login idle timeout (minute)'),
+        help_text=_(
+            'Log in again after no client activity for this duration. '
+            '0 disables the limit (default). '
+            'Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count.'
+        ),
+    )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Watermark'),
     )

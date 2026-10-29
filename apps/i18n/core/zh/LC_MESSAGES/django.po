@@ -17459,3 +17459,48 @@ msgstr "当前没有待处理账号风险记录。"
 #, python-format
 msgid "%(count)s account task executions were canceled."
 msgstr "%(count)s 次账号任务执行已取消。"
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "请升级 JumpServer 客户端后使用当前登录策略。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "客户端登录已失效，请重新验证身份。"
+
+msgid "Client login session belongs to a different user"
+msgstr "客户端登录会话属于其他用户"
+
+msgid "Client login session"
+msgstr "客户端登录会话"
+
+msgid "Log in again after exiting the client"
+msgstr "退出后重新登录"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "开启后，客户端进程退出并重新启动时需要重新登录。最小化或隐藏窗口不属于退出。默认关闭。"
+
+msgid "Client login idle timeout (minute)"
+msgstr "空闲超时 (分)"
+
+msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+msgstr "客户端连续无操作达到此时长后，登录失效，需重新登录。0 表示不限制（默认）。仅统计 JumpServer 客户端内的用户输入；Xshell、MSTSC 等外部应用中的操作不计入活动。"
+
+msgid "Client login lifetime (minute)"
+msgstr "登录有效期 (分)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "从客户端登录开始计时，用户操作和令牌刷新均不延长有效期。0 表示不限制登录时长（默认），退出和空闲超时设置仍然生效。到期后需重新登录。"
+
+msgid "Client exit"
+msgstr "客户端退出"
+
+msgid "Idle timeout"
+msgstr "空闲超时"
+
+msgid "Maximum login time"
+msgstr "登录有效期结束"
+
+msgid "Client login policy changed"
+msgstr "客户端登录策略已变更"
+
+msgid "Authorization revoked"
+msgstr "授权已撤销"

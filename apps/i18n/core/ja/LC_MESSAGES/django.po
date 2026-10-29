@@ -17758,3 +17758,48 @@ msgstr "現在、未対応のアカウントリスク記録はありません。
 #, python-format
 msgid "%(count)s account task executions were canceled."
 msgstr "アカウントタスクの実行 %(count)s 件がキャンセルされました。"
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "設定されたログインポリシーを使用するには、JumpServer クライアントをアップグレードしてください。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "クライアントのログインセッションが失効しました。再認証してください。"
+
+msgid "Client login session belongs to a different user"
+msgstr "クライアントのログインセッションは別のユーザーに属しています"
+
+msgid "Client login session"
+msgstr "クライアントのログインセッション"
+
+msgid "Log in again after exiting the client"
+msgstr "終了後に再ログイン"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "有効にすると、デスクトップアプリケーションを終了して再起動した際に再ログインが必要になります。最小化や非表示は終了に含まれません。デフォルトでは無効です。"
+
+msgid "Client login idle timeout (minute)"
+msgstr "アイドルタイムアウト（分）"
+
+msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+msgstr "クライアントで操作がない状態がこの時間続くと、再ログインが必要になります。0 は制限なしです（デフォルト）。JumpServer デスクトップクライアント内のユーザー入力のみが操作として扱われ、Xshell や MSTSC などの外部アプリケーションでの入力は含まれません。"
+
+msgid "Client login lifetime (minute)"
+msgstr "ログイン有効期間（分）"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "クライアントへのログイン時から計測し、操作やトークンの更新では延長されません。0 は有効期間の制限なしです（デフォルト）。終了時とアイドルタイムアウトの設定は引き続き適用されます。有効期間が終了すると再ログインが必要になります。"
+
+msgid "Client exit"
+msgstr "クライアントの終了"
+
+msgid "Idle timeout"
+msgstr "アイドルタイムアウト"
+
+msgid "Maximum login time"
+msgstr "ログイン有効期間の終了"
+
+msgid "Client login policy changed"
+msgstr "クライアントのログインポリシーが変更されました"
+
+msgid "Authorization revoked"
+msgstr "認可が取り消されました"

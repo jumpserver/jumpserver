@@ -17917,3 +17917,48 @@ msgstr "Atualmente há %(total)s registros de contas gerenciadas, dos quais %(ac
 
 msgid "There are currently no pending account risk records."
 msgstr "Atualmente não há registros de risco de contas pendentes."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Atualize o cliente JumpServer para usar a política de login configurada."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "A sessão do cliente expirou. Autentique-se novamente."
+
+msgid "Client login session belongs to a different user"
+msgstr "A sessão do cliente pertence a outro usuário"
+
+msgid "Client login session"
+msgstr "Sessão do cliente"
+
+msgid "Log in again after exiting the client"
+msgstr "Entrar novamente após sair"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "Quando ativado, é necessário entrar novamente após encerrar e reiniciar o aplicativo de desktop. Minimizar ou ocultar o aplicativo não é considerado sair. Desativado por padrão."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Tempo limite de inatividade (minutos)"
+
+msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+msgstr "É necessário entrar novamente após este período sem atividade no cliente. 0 desativa o limite (padrão). Apenas as ações do usuário dentro do cliente de desktop JumpServer contam como atividade; ações em aplicativos externos, como Xshell e MSTSC, não são consideradas."
+
+msgid "Client login lifetime (minute)"
+msgstr "Validade do login (minutos)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "Contada a partir do login no cliente; atividades e renovações de token não a prolongam. 0 desativa o limite de validade (padrão). As configurações de saída e de tempo limite de inatividade continuam em vigor. É necessário entrar novamente ao término da validade."
+
+msgid "Client exit"
+msgstr "Saída do cliente"
+
+msgid "Idle timeout"
+msgstr "Tempo limite de inatividade"
+
+msgid "Maximum login time"
+msgstr "Tempo máximo de login"
+
+msgid "Client login policy changed"
+msgstr "A política de login do cliente foi alterada"
+
+msgid "Authorization revoked"
+msgstr "Autorização revogada"

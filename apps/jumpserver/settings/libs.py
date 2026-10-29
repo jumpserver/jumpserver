@@ -248,10 +248,12 @@ JUMPSERVER_UPTIME = int(time.time())
 
 # OAuth2 Provider settings
 OAUTH2_PROVIDER = {
+    'OAUTH2_VALIDATOR_CLASS': 'authentication.backends.oauth2_provider.validators.ClientOAuth2Validator',
     'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'jms2'],
     'PKCE_REQUIRED': True,
-    'ACCESS_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS,
-    'REFRESH_TOKEN_EXPIRE_SECONDS': CONFIG.OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS,
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
+    # Desktop login expiry is enforced by ClientLoginSession, not token cleanup.
+    'REFRESH_TOKEN_EXPIRE_SECONDS': None,
 }
 OAUTH2_PROVIDER_CLIENT_REDIRECT_URI = 'jms2://auth/callback'
 OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME = 'JumpServer Client'

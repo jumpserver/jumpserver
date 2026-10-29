@@ -17867,3 +17867,48 @@ msgstr "There are currently no pending account risk records."
 #, python-format
 msgid "%(count)s account task executions were canceled."
 msgstr "%(count)s account task executions were canceled."
+
+msgid "Log in again after exiting the client"
+msgstr "Log in again after exit"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Idle timeout (minutes)"
+
+msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+msgstr "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+
+msgid "Client login lifetime (minute)"
+msgstr "Login lifetime (minutes)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Please upgrade the JumpServer client to use the configured login policy."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "Client login session expired. Please authenticate again."
+
+msgid "Client login session belongs to a different user"
+msgstr "Client login session belongs to a different user"
+
+msgid "Client login session"
+msgstr "Client login session"
+
+msgid "Client exit"
+msgstr "Client exit"
+
+msgid "Idle timeout"
+msgstr "Idle timeout"
+
+msgid "Maximum login time"
+msgstr "Maximum login time"
+
+msgid "Client login policy changed"
+msgstr "Client login policy changed"
+
+msgid "Authorization revoked"
+msgstr "Authorization revoked"

@@ -17795,3 +17795,48 @@ msgstr "Hiện có %(total)s bản ghi tài khoản được quản lý, trong �
 
 msgid "There are currently no pending account risk records."
 msgstr "Hiện không có bản ghi rủi ro tài khoản nào đang chờ xử lý."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Vui lòng nâng cấp ứng dụng khách JumpServer để sử dụng chính sách đăng nhập đã cấu hình."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "Phiên đăng nhập của ứng dụng khách đã hết hạn. Vui lòng xác thực lại."
+
+msgid "Client login session belongs to a different user"
+msgstr "Phiên đăng nhập của ứng dụng khách thuộc về người dùng khác"
+
+msgid "Client login session"
+msgstr "Phiên đăng nhập của ứng dụng khách"
+
+msgid "Log in again after exiting the client"
+msgstr "Đăng nhập lại sau khi thoát"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "Khi bật, bạn cần đăng nhập lại sau khi thoát và khởi động lại ứng dụng máy tính. Thu nhỏ hoặc ẩn ứng dụng không được tính là thoát. Mặc định tắt."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Thời gian chờ không hoạt động (phút)"
+
+msgid "Log in again after no client activity for this duration. 0 disables the limit (default). Only user input inside the JumpServer desktop client counts as activity; input in external applications such as Xshell and MSTSC does not count."
+msgstr "Bạn cần đăng nhập lại nếu không có hoạt động trong ứng dụng khách suốt khoảng thời gian này. Giá trị 0 tắt giới hạn (mặc định). Chỉ thao tác của người dùng trong ứng dụng khách JumpServer trên máy tính mới được tính là hoạt động; thao tác trong các ứng dụng bên ngoài như Xshell và MSTSC không được tính."
+
+msgid "Client login lifetime (minute)"
+msgstr "Thời hạn đăng nhập (phút)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "Tính từ lúc đăng nhập vào ứng dụng khách; hoạt động và việc làm mới token không kéo dài thời hạn. Giá trị 0 tắt giới hạn thời hạn (mặc định). Các cài đặt về thoát ứng dụng và thời gian chờ không hoạt động vẫn áp dụng. Bạn cần đăng nhập lại khi hết thời hạn."
+
+msgid "Client exit"
+msgstr "Thoát ứng dụng khách"
+
+msgid "Idle timeout"
+msgstr "Hết thời gian chờ không hoạt động"
+
+msgid "Maximum login time"
+msgstr "Thời gian đăng nhập tối đa"
+
+msgid "Client login policy changed"
+msgstr "Chính sách đăng nhập của ứng dụng khách đã thay đổi"
+
+msgid "Authorization revoked"
+msgstr "Quyền truy cập đã bị thu hồi"

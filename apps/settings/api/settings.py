@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from contextlib import nullcontext
 from types import SimpleNamespace
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db import transaction
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.views.static import serve
 from rest_framework import generics
 from rest_framework import status
@@ -26,6 +29,7 @@ from ..utils import get_interface_setting_or_default
 logger = get_logger(__file__)
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class SettingsApi(generics.RetrieveUpdateAPIView):
     permission_classes = (RBACPermission,)
 
@@ -192,6 +196,25 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         self.prepare_openbao_mount_change(serializer)
         self.prepare_ssh_ca_config(serializer)
+        from authentication.services.client_login_session import (
+            client_login_policy, client_policy_lock, revoke_client_authorizations,
+        )
+
+        policy_fields = {
+            'SECURITY_CLIENT_REAUTH_ON_EXIT', 'SECURITY_CLIENT_MAX_IDLE_TIME',
+            'SECURITY_CLIENT_MAX_SESSION_TIME',
+        }
+        updating_policy = bool(policy_fields.intersection(self.request.data))
+        # Serialize policy writes with authorization, refresh and credential release.
+        # Read the database here: another worker's settings pub/sub may lag behind.
+        with client_policy_lock() if updating_policy else nullcontext():
+            with transaction.atomic():
+                old_policy = client_login_policy() if updating_policy else None
+                self.save_settings(serializer)
+                if updating_policy and old_policy != client_login_policy():
+                    revoke_client_authorizations(reason='policy_changed')
+
+    def save_settings(self, serializer):
         post_data_names = list(self.request.data.keys())
         settings_items = self.parse_serializer_data(serializer)
         serializer_data = getattr(serializer, 'data', {})
