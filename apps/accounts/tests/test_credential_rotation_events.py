@@ -66,7 +66,7 @@ class RotationEventTests(CredentialTestCase):
         )
         self.assertEqual(response.status_code, 200)
         update = next(item for item in response.data['results'] if item['id'] == str(audit.id))
-        self.assertEqual(update['event'], 'application.scope.updated')
+        self.assertEqual(update['event'], 'app.scope.updated')
         recipient = next(
             item for item in update['recipients'] if item['instance_id'] == self.client.instance_id
         )
@@ -77,7 +77,7 @@ class RotationEventTests(CredentialTestCase):
         self.publish()
         events = list(self.rotation.events.all())
         self.assertEqual([event.event for event in events], [
-            'credential.updated', 'rotation.started', 'rotation.waiting_for_application',
+            'credential.updated', 'rotation.started', 'rotation.waiting_for_app',
             'rotation.source.waiting',
         ])
         self.assertEqual([event.sequence for event in events], [1, 2, 3, 4])
@@ -236,9 +236,11 @@ class SubscriptionEventTests(CredentialTestCase):
 
         result = timeline(self.credential)
 
-        self.assertEqual(result['events'][-1]['event'], 'application.scope.updated')
+        self.assertEqual(result['events'][-1]['event'], 'app.scope.updated')
 
     def test_managed_password_change_tracks_events_and_receipts_without_rotation(self):
+        self.application.credential_notifications_enabled = True
+        self.application.save(update_fields=['credential_notifications_enabled'])
         previous_ids = list(CredentialRotationEvent.objects.values_list('id', flat=True))
         execution = AutomationExecution.objects.create(snapshot={}, org_id=self.org.id)
         change = ChangeSecretRecord.objects.create(
@@ -266,9 +268,20 @@ class SubscriptionEventTests(CredentialTestCase):
                 _publish_stream(event.source_event_id, event.event)
                 self.assertTrue(receive(self.client.id, self.org.id, event.source_event_id))
         self.assertEqual(layer.group_send.await_count, 3)
-        result = timeline(self.credential)
-        self.assertEqual([event['event'] for event in result['events'][-3:]], expected)
-        self.assertEqual(result['instances'][0]['received_count'], 3)
+        # Ordinary account notifications belong to the application history,
+        # independently of the retired subscription-policy timeline.
+        response = IntegrationApplicationViewSet.as_view({'get': 'credential_events'})(
+            self.request('get', '/credential-events/'), pk=self.application.id,
+        )
+        self.assertEqual(response.status_code, 200)
+        ids = {str(event.source_event_id) for event in events}
+        rows = [row for row in response.data['results'] if row['id'] in ids]
+        self.assertCountEqual([row['event'] for row in rows], expected)
+        for row in rows:
+            recipient = next(
+                item for item in row['recipients'] if item['instance_id'] == self.client.instance_id
+            )
+            self.assertIsNotNone(recipient['received_at'])
 
 
 class RotationReceiptConsumerTests(SimpleTestCase):

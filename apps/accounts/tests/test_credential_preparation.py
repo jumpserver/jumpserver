@@ -198,7 +198,7 @@ class CredentialSourceTrafficTests(CredentialTestCase):
             execution = preflight.latest(self.credential)
             rotation = self.credential.rotation_records.first()
             self.assertEqual(rotation.status, 'preparing')
-            self.assertIn('rotation.verification.started', [event['event'] for event in cycle_detail(
+            self.assertIn('rotation.verify.started', [event['event'] for event in cycle_detail(
                 self.credential, rotation.id,
             )['events']])
             execution.status = 'success'
@@ -220,7 +220,7 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         rotation = self.credential.rotation_records.get()
         self.assertEqual(response.data['cycle_id'], str(rotation.id))
         self.assertEqual(rotation.status, 'preparing')
-        self.assertIn('rotation.verification.started', [event['event'] for event in cycle_detail(
+        self.assertIn('rotation.verify.started', [event['event'] for event in cycle_detail(
             self.credential, rotation.id,
         )['events']])
 

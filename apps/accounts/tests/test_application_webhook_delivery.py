@@ -62,7 +62,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         event, dispatch = self.enqueue_event(ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         deliveries = ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook)
         self.assertEqual(deliveries.count(), 1)
-        self.assertEqual(deliveries.get().body['event'], 'application.scope.updated')
+        self.assertEqual(deliveries.get().body['event'], 'app.scope.updated')
         dispatch.assert_called_once()
 
     def test_legacy_scope_event_also_reaches_canonical_subscription(self):
@@ -70,8 +70,8 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.webhook.save(update_fields=['events'])
         event, _ = self.enqueue_event(ApplicationEvent.CONFIGURATION_UPDATED)
         delivery = ApplicationEventDelivery.objects.get(event=event, webhook=self.webhook)
-        self.assertEqual(delivery.code, 'application.scope.updated')
-        self.assertEqual(delivery.body['event'], 'application.scope.updated')
+        self.assertEqual(delivery.code, 'app.scope.updated')
+        self.assertEqual(delivery.body['event'], 'app.scope.updated')
 
     def test_legacy_scope_history_remains_visible_with_the_current_label(self):
         from accounts.credential_rotation.events import subscription_events, timeline
@@ -84,7 +84,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
             revision=1, recipients=[],
         )
         self.assertTrue(subscription_events(self.credential).filter(id=event.id).exists())
-        self.assertEqual(timeline(self.credential)['events'][0]['event'], 'application.scope.updated')
+        self.assertEqual(timeline(self.credential)['events'][0]['event'], 'app.scope.updated')
         event.refresh_from_db()
         self.assertEqual(event.event, 'configuration.updated')
 

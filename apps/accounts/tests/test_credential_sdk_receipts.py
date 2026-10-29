@@ -31,9 +31,9 @@ class CredentialSDKReceiptTests(TestCase):
 
     def test_business_events_are_acknowledged_before_yield(self):
         for code in (
-            'credential.updated', 'credential.revoked', 'application.scope.updated',
+            'credential.updated', 'credential.revoked', 'app.scope.updated',
             'credential.change.started', 'credential.change.completed', 'credential.change.failed',
-            'rotation.started', 'rotation.waiting_for_application', 'rotation.completed',
+            'rotation.started', 'rotation.waiting_for_app', 'rotation.completed',
         ):
             with self.subTest(event=code):
                 connection = self.read_event({'event': code, 'event_id': 'event-id'})

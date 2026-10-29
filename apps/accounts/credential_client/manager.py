@@ -18,6 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from .audit import record
+from .access_log import record_access
 
 
 def scope_uses_credential(scope, credential):
@@ -176,14 +177,16 @@ class CredentialClientManager:
             }, fetched=True)
         from accounts.credential_rotation.preparation import record_secret_access
         record_secret_access(account)
+        call = record_access(client=self.client, account=account, credential_key=key,
+                             revision=revision, remote_addr=remote_addr)
         record(
             AuditEvent.CREDENTIAL_FETCHED, client=self.client, account=account,
-            credential_key=key, revision=revision, remote_addr=remote_addr,
+            credential_key=key, revision=revision, remote_addr=remote_addr, id=call.id,
         )
         from .event_results import record_account_progress
         record_account_progress(self.client, account.id, revision, 'fetched_at')
         if self.audit_context is not None:
-            self.audit_context.set_fetch_result(revision, True)
+            self.audit_context.set_fetch_result(revision, True, call.id)
         return payload
 
     def fetch(self, key, remote_addr, account_id=None):
@@ -222,6 +225,8 @@ class CredentialClientManager:
         if credential.status != ApplicationCredential.Status.idle:
             values.update(is_rotation_participant=True, required_revision=credential.revision)
         self._save_status(state, now, values, fetched=True)
+        call = record_access(client=self.client, account=account, credential=credential,
+                             revision=revision, remote_addr=remote_addr)
         if credential.status != ApplicationCredential.Status.idle:
             from accounts.credential_rotation.participants import ensure_participant
             ensure_participant(credential, state)
@@ -230,9 +235,10 @@ class CredentialClientManager:
                 AuditEvent.CREDENTIAL_FETCHED, credential=credential, client=self.client,
                 applications=[self.application], account=account,
                 credential_key=key, revision=revision, remote_addr=remote_addr,
+                id=call.id,
             )
         if self.audit_context is not None:
-            self.audit_context.set_fetch_result(revision, revision_changed)
+            self.audit_context.set_fetch_result(revision, revision_changed, call.id)
         return payload
 
     @staticmethod

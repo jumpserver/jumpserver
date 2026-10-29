@@ -64,7 +64,7 @@ def options(application):
 def envelope(command):
     return {
         'event_id': str(command.source_event_id), 'command_id': str(command.id),
-        'event': command.event, 'occurred_at': command.date_created.isoformat(),
+        'event': ApplicationCommandEvent.canonical(command.event), 'occurred_at': command.date_created.isoformat(),
         'expires_at': command.expires_at.isoformat(), **command.payload,
     }
 

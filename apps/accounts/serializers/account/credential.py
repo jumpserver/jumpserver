@@ -122,7 +122,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             'mode', 'asset', 'account', 'alternate_account', 'subscription_accounts',
             'subscription_all_authorized',
             'active_account', 'revision', 'status', 'is_active',
-            'source_no_traffic_days', 'standby_no_traffic_days',
+            'source_no_traffic_days', 'standby_no_traffic_days', 'verify_before_switch',
             'date_last_rotated', 'applications_amount',
         ]
         fields = fields_small + [
@@ -239,8 +239,14 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         return attrs
 
     def validate_accounts(self, attrs):
+        if (self.instance and 'verify_before_switch' in attrs
+                and attrs['verify_before_switch'] != self.instance.verify_before_switch):
+            from accounts.credential_rotation.preflight import info
+            precheck = info(self.instance)
+            if precheck and precheck['status'] == 'checking':
+                raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
         if self.instance and self.instance.status != ApplicationCredential.Status.idle:
-            for field in ('account', 'alternate_account', 'is_active', 'source_no_traffic_days'):
+            for field in ('account', 'alternate_account', 'is_active', 'source_no_traffic_days', 'verify_before_switch'):
                 if field in attrs and attrs[field] != getattr(self.instance, field):
                     raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
             if 'applications' in attrs and {

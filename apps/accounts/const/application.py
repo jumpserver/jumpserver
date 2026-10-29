@@ -2,6 +2,18 @@ from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
 
+EVENT_NAME_ALIASES = {
+    'rotation.verification.skipped': 'rotation.verify.skipped',
+    'rotation.verification.started': 'rotation.verify.started',
+    'rotation.verification.failed': 'rotation.verify.failed',
+    'rotation.verification.cancelled': 'rotation.verify.cancelled',
+    'application.scope.updated': 'app.scope.updated',
+    'application.restart.requested': 'app.restart.requested',
+    'rotation.waiting_for_application': 'rotation.waiting_for_app',
+    'configuration.updated': 'app.scope.updated',
+}
+
+
 class AuditSource(TextChoices):
     ADMINISTRATOR = 'Administrator', _('Administrator')
     SDK = 'SDK', _('SDK')
@@ -37,23 +49,24 @@ class AuditEvent(TextChoices):
 
 
 class ApplicationEvent(TextChoices):
-    ROTATION_VERIFICATION_STARTED = 'rotation.verification.started', _('Backup account verification started')
-    ROTATION_VERIFICATION_FAILED = 'rotation.verification.failed', _('Backup account verification failed')
-    ROTATION_VERIFICATION_CANCELLED = 'rotation.verification.cancelled', _('Backup account verification cancelled')
+    ROTATION_VERIFICATION_STARTED = 'rotation.verify.started', _('Backup account verification started')
+    ROTATION_VERIFICATION_SKIPPED = 'rotation.verify.skipped', _('Backup account verification skipped by policy')
+    ROTATION_VERIFICATION_FAILED = 'rotation.verify.failed', _('Backup account verification failed')
+    ROTATION_VERIFICATION_CANCELLED = 'rotation.verify.cancelled', _('Backup account verification cancelled')
     ROTATION_PREPARATION_STARTED = 'rotation.preparation.started', _('Rotation preparation started')
     ROTATION_ACCOUNTS_ALIGNED = 'rotation.accounts.aligned', _('Rotation accounts aligned')
     ROTATION_STANDBY_WAITING = 'rotation.standby.waiting', _('Observing standby account usage')
     ROTATION_PREPARATION_READY = 'rotation.preparation.ready', _('Rotation preparation ready')
     ROTATION_PREPARATION_CANCELLED = 'rotation.preparation.cancelled', _('Rotation preparation cancelled')
     CREDENTIAL_UPDATED = 'credential.updated', _('Credential updated')
-    CREDENTIAL_REVOKED = 'credential.revoked', _('Credential revoked')
-    APPLICATION_SCOPE_UPDATED = 'application.scope.updated', _('Application scope updated')
+    CREDENTIAL_REVOKED = 'credential.revoked', _('Credential revoked (legacy)')
+    APPLICATION_SCOPE_UPDATED = 'app.scope.updated', _('Application scope updated')
     CONFIGURATION_UPDATED = 'configuration.updated', _('Application scope updated (legacy)')
     CREDENTIAL_CHANGE_STARTED = 'credential.change.started', _('Credential change started')
     CREDENTIAL_CHANGE_COMPLETED = 'credential.change.completed', _('Credential change completed')
     CREDENTIAL_CHANGE_FAILED = 'credential.change.failed', _('Credential change failed')
     ROTATION_STARTED = 'rotation.started', _('Rotation started')
-    ROTATION_WAITING = 'rotation.waiting_for_application', _('Rotation waiting for application')
+    ROTATION_WAITING = 'rotation.waiting_for_app', _('Rotation waiting for application')
     ROTATION_SOURCE_WAITING = 'rotation.source.waiting', _('Observing source account secret fetches')
     ROTATION_SOURCE_READY = 'rotation.source.ready', _('Source account secret fetch window completed')
     ROTATION_FORCE_STOPPED = 'rotation.force_stopped', _('Rotation forcibly stopped')
@@ -62,12 +75,17 @@ class ApplicationEvent(TextChoices):
 
     @classmethod
     def canonical(cls, value):
-        return cls.APPLICATION_SCOPE_UPDATED if value == cls.CONFIGURATION_UPDATED else value
+        return EVENT_NAME_ALIASES.get(value, value) if isinstance(value, str) else value
 
 
 class ApplicationCommandEvent(TextChoices):
     ACCOUNT_SWITCH_REQUESTED = 'credential.switch.requested', _('Account switch requested')
-    APPLICATION_RESTART_REQUESTED = 'application.restart.requested', _('Application restart requested')
+    APPLICATION_RESTART_REQUESTED = 'app.restart.requested', _('Application restart requested')
+
+    @classmethod
+    def canonical(cls, value):
+        return EVENT_NAME_ALIASES.get(value, value) if isinstance(value, str) else value
+
 
 
 class WebhookRequestMethod(TextChoices):

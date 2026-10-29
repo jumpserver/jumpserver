@@ -212,7 +212,7 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         if 'recipient_ids' in event and str(self.client.id) not in event['recipient_ids']:
             return
         await self.send_json(event['payload'])
-        if event['payload']['event'] in ('application.scope.updated', 'configuration.updated', 'credential.revoked') or (
+        if event['payload']['event'] in ('app.scope.updated', 'configuration.updated', 'credential.revoked') or (
             event['payload']['event'] == 'credential.updated'
             and event['payload'].get('credential_mode') == 'subscription'
             and not event['payload'].get('account_id')

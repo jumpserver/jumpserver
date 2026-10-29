@@ -143,18 +143,14 @@ class ApplicationAuditTests(CredentialTestCase):
         self.assertEqual(audit.instance_id, 'one')
 
 
-    def test_subscription_secret_publication(self):
+    def test_application_secret_publication(self):
         self.manager()
-        self.credential.mode = ApplicationCredential.Mode.subscription
-        self.credential.account = None
-        self.credential.alternate_account = None
-        self.credential.active_account = None
-        self.credential.save()
-        self.credential.subscription_accounts.add(self.primary)
+        self.application.credential_notifications_enabled = True
+        self.application.save(update_fields=['credential_notifications_enabled'])
         self.primary.secret = 'new-test-secret'
         self.primary.save()
         event = ApplicationAudit.objects.filter(
-            event='credential_published', credential_id=self.credential.id,
+            event='credential_published', service_id=self.application.id, credential_id__isnull=True,
             account_id=self.primary.id,
         ).first()
         self.assertIsNotNone(event)

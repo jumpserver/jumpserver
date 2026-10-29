@@ -213,6 +213,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         credential = self.get_object()
         if (
             credential.mode == ApplicationCredential.Mode.alternating_rotation
+            and credential.verify_before_switch
             and not request.user.has_perm('accounts.verify_account')
         ):
             raise PermissionDenied()
@@ -224,9 +225,10 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
 
     @action(methods=['post'], detail=True, url_path='prepare')
     def prepare_rotation(self, request, *args, **kwargs):
-        if not request.user.has_perm('accounts.verify_account'):
+        credential = self.get_object()
+        if credential.verify_before_switch and not request.user.has_perm('accounts.verify_account'):
             raise PermissionDenied()
-        credential = CredentialRotationManager(self.get_object().id).prepare(request.user.name, request.user.id)
+        credential = CredentialRotationManager(credential.id).prepare(request.user.name, request.user.id)
         return Response(self.get_serializer(credential).data)
 
     @action(methods=['post'], detail=True, url_path='check-preparation')
@@ -239,7 +241,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     @action(methods=['post'], detail=True, url_path='start')
     def start_rotation(self, request, *args, **kwargs):
         credential = self.get_object()
-        if not request.user.has_perm('accounts.verify_account'):
+        if credential.verify_before_switch and not request.user.has_perm('accounts.verify_account'):
             raise PermissionDenied()
         credential = CredentialRotationManager(credential.id).start(request.user.name, request.user.id)
         serializer = self.get_serializer(credential)

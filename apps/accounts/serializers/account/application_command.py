@@ -14,6 +14,11 @@ class ApplicationCommandSerializer(serializers.Serializer):
     credential_id = serializers.UUIDField(required=False)
     timeout_minutes = serializers.IntegerField(min_value=1, max_value=1440, default=30)
 
+    def to_internal_value(self, data):
+        if isinstance(data, dict) and 'event' in data:
+            data = {**data, 'event': ApplicationCommandEvent.canonical(data['event'])}
+        return super().to_internal_value(data)
+
     def validate(self, attrs):
         if attrs['event'] == ApplicationCommandEvent.ACCOUNT_SWITCH_REQUESTED and not attrs.get('credential_id'):
             raise serializers.ValidationError({'credential_id': _('Select an account rotation policy.')})

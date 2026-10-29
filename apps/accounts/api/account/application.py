@@ -25,6 +25,7 @@ from accounts.webhooks import (
     webhook_template_variables,
 )
 from accounts.credential_client.audit import record
+from accounts.credential_client.access_log import record_access
 from accounts.mixins import ApplicationAuditMixin
 from authentication.permissions import UserConfirmation, ConfirmType
 from common.exceptions import JMSException
@@ -203,7 +204,8 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     @action(['GET'], detail=False, url_path='account-secret',
             permission_classes=[RBACPermission])
     def get_account_secret(self, request, *args, **kwargs):
-        self.start_audit(AuditEvent.CREDENTIAL_FETCHED, application=request.user)
+        self.start_audit(AuditEvent.CREDENTIAL_FETCHED, application=request.user,
+                         remote_addr=get_request_ip(request))
         serializer = self.get_serializer(data=request.query_params)
         if not serializer.is_valid():
             return Response({'error': serializer.errors}, status=400)
@@ -218,9 +220,12 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         if secret is not None:
             from accounts.credential_rotation.preparation import record_secret_access
             record_secret_access(account, service)
+        call = record_access(application=service, account=account, remote_addr=get_request_ip(request),
+                             source='SDK', result='success' if secret is not None else 'failed',
+                             summary='Legacy account-secret access.')
         record(AuditEvent.CREDENTIAL_FETCHED, application=service, account=account,
                remote_addr=get_request_ip(request), result='success' if secret is not None else 'failed',
-               summary='Legacy account-secret access.')
+               summary='Legacy account-secret access.', id=call.id)
         response = Response(data={'id': request.user.id, 'secret': secret})
         response['X-API-Deprecated'] = 'true'
         response['Warning'] = '299 JumpServer "Use /api/v1/accounts/credential-client/credential/ instead."'

@@ -45,7 +45,7 @@ from .filters import (
 )
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
-    ActivityLog, JobLog, UserSession
+    ActivityLog, JobLog, UserSession, IntegrationApplicationLog
 )
 from .reporting import (
     FTPLogReportExporter, UserLoginLogReportExporter, PasswordChangeLogReportExporter,
@@ -57,11 +57,37 @@ from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
-    OperateLogFullSerializer
+    OperateLogFullSerializer, ServiceAccessLogSerializer
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
+
+
+class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
+    model = IntegrationApplicationLog
+    serializer_class = ServiceAccessLogSerializer
+    extra_filter_backends = [DatetimeRangeFilterBackend]
+    date_range_filter_fields = [('datetime', ('date_from', 'date_to'))]
+    filterset_fields = [
+        'id', 'service', 'service_id', 'asset', 'asset_id', 'account', 'account_id',
+        'remote_addr', 'instance_id', 'source', 'result', 'credential_id',
+        'credential_key', 'revision', 'summary',
+    ]
+    search_fields = ['id', 'service', 'service_id', 'asset', 'account', 'instance_id',
+                     'remote_addr', 'credential_key', 'summary']
+    ordering_fields = ['datetime']
+    ordering = ['-datetime', '-id']
+
+    def get_queryset(self):
+        from accounts.models import IntegrationApplication
+        queryset = super().get_queryset()
+        if not current_org.is_root():
+            application_ids = IntegrationApplication.objects.filter(org_id=str(current_org.id)).values('id')
+            queryset = queryset.filter(
+                Q(org_id=str(current_org.id)) | Q(org_id='', service_id__in=application_ids)
+            )
+        return queryset
 
 
 class JobLogAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):

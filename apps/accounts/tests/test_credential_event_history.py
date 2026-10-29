@@ -32,16 +32,17 @@ class CredentialEventHistoryTests(CredentialTestCase):
         receive(self.client.id, self.org.id, self.second_rotation.events.first().source_event_id)
         receive(self.client.id, self.org.id, first_event.source_event_id)
         result = client_history(self.credential, self.client.id, 2, 0)
-        self.assertEqual(result['count'], 7)
+        self.assertEqual(result['count'], 9)
         self.assertEqual(len(result['results']), 2)
         self.assertEqual(result['latest_event']['rotation_id'], str(self.second_rotation.id))
         self.assertEqual(result['latest_received_event']['id'], str(first_event.source_event_id))
         older = client_history(self.credential, self.client.id, 10, 2)
-        self.assertEqual(len(older['results']), 5)
+        self.assertEqual(len(older['results']), 7)
         self.assertNotIn(result['results'][0]['id'], [event['id'] for event in older['results']])
         comparison = timeline(self.credential, self.first_rotation.id)
         self.assertEqual(comparison['rotation_id'], str(self.first_rotation.id))
-        self.assertEqual(len(comparison['events']), 4)
+        self.assertEqual(len(comparison['events']), 5)
+        self.assertIn('rotation.source.waiting', [event['event'] for event in comparison['events']])
 
     def test_deleted_client_remains_in_directory_and_history(self):
         client_id = self.client.id
@@ -50,7 +51,7 @@ class CredentialEventHistoryTests(CredentialTestCase):
         self.assertEqual(len(rows), 1)
         self.assertFalse(rows[0]['is_active'])
         result = client_history(self.credential, client_id, 30, 0)
-        self.assertEqual(result['count'], 7)
+        self.assertEqual(result['count'], 9)
         self.assertFalse(result['client']['is_active'])
 
     def test_subscription_history_and_removed_binding_keep_existing_receipts(self):
@@ -65,7 +66,7 @@ class CredentialEventHistoryTests(CredentialTestCase):
         self.credential.applications.remove(self.application)
         result = client_history(self.credential, self.client.id, 30, 0)
         self.assertEqual(result['count'], before['count'] + 1)
-        self.assertEqual(result['results'][0]['event'], 'credential.revoked')
+        self.assertEqual(result['results'][0]['event'], 'app.scope.updated')
         self.assertEqual(result['results'][1:], before['results'])
         self.assertTrue(all(event['rotation_id'] is None for event in result['results']))
         self.assertEqual(result['client']['is_active'], directory(self.credential)[0]['is_active'])

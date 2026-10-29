@@ -9,13 +9,14 @@ from rest_framework.exceptions import NotFound
 
 GO_SOURCES = ('go/*.go', 'go/go.mod', 'go/go.sum')
 SOURCE_FILES = {
+    'socket': ('socket/python_example.py', 'socket/README.*.md'),
     'python': (
         'python/jms_pam/**/*.py', 'python/jms_pam/py.typed',
         'python/setup.py', 'python/pyproject.toml', 'python/README.*.md',
     ),
     'go': GO_SOURCES,
     'java': ('java/src/main/**/*.java', 'java/pom.xml'),
-    'node': ('node/index.js', 'node/index.d.ts', 'node/event-dispatcher.js', 'node/package.json', 'node/package-lock.json'),
+    'node': ('node/index.js', 'node/index.d.ts', 'node/event-dispatcher.js', 'node/event-names.js', 'node/package.json', 'node/package-lock.json'),
     'agent': GO_SOURCES + (
         'agent/cmd/**/*.go', 'agent/internal/**/*.go', 'agent/go.mod', 'agent/go.sum',
     ),

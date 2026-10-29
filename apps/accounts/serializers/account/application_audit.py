@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.utils.text import format_lazy
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import ApplicationAudit
 from accounts.webhooks import mask_webhook_url
@@ -20,6 +22,26 @@ class ApplicationAuditSerializer(serializers.ModelSerializer):
             'changes', 'datetime', 'notification',
         ]
         read_only_fields = fields
+        extra_kwargs = {
+            'id': {'label': _('ID')},
+            'event': {'label': _('Event')},
+            'service': {'label': _('Application')},
+            'service_id': {'label': _('Application ID')},
+            'credential': {'label': _('Credential policy')},
+            'credential_id': {'label': _('Credential ID')},
+            'credential_key': {'label': _('Credential key')},
+            'account': {'label': _('Account')},
+            'account_id': {'label': format_lazy('{} ID', _('Account'))},
+            'instance_id': {'label': _('Instance ID')},
+            'operator': {'label': _('Operator')},
+            'remote_addr': {'label': _('Remote Address')},
+            'source': {'label': _('Source')},
+            'result': {'label': _('Result')},
+            'revision': {'label': _('Revision')},
+            'rotation_id': {'label': _('Rotation ID')},
+            'operation_id': {'label': format_lazy('{} ID', _('Operation'))},
+            'summary': {'label': _('Detail')},
+        }
 
     def get_notification(self, instance):
         if self.context['view'].action != 'retrieve' or not hasattr(instance, 'delivery'):

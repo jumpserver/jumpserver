@@ -11,9 +11,9 @@ from .documentation import agent_build_command, sdk_install_commands, sdk_exampl
 from .events import enqueue
 
 
-def publish_application_scope(application):
+def publish_application_scope(application, *, credential=None, audit_event=AuditEvent.CONFIGURATION_UPDATED):
     enqueue(
-        record(AuditEvent.CONFIGURATION_UPDATED, application=application),
+        record(audit_event, application=application, credential=credential, applications=[application]),
         ApplicationEvent.APPLICATION_SCOPE_UPDATED,
     )
 

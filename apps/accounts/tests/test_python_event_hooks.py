@@ -90,7 +90,7 @@ class PythonEventHookTests(TestCase):
         self.watch(
             [
                 {"event": "credential.rotation.completed"},
-                {"event": "application.scope.updated"},
+                {"event": "app.scope.updated"},
                 {**self.subscription, "account_id": None},
                 {**self.subscription, "command_id": "command"},
                 revoked,
@@ -176,7 +176,7 @@ class PythonEventHookTests(TestCase):
         for event in (
             {"event": "snapshot", "credentials": []},
             {"event": "credential.revoked"},
-            {"event": "application.scope.updated"},
+            {"event": "app.scope.updated"},
         ):
             dispatcher._dispatch(self.subscription)
             self.assertTrue(dispatcher.pending)

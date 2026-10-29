@@ -97,6 +97,7 @@ def fingerprint(credential):
     return {
         'credential_id': str(credential.id), 'revision': credential.revision,
         'source_no_traffic_days': credential.source_no_traffic_days,
+        'verify_before_switch': credential.verify_before_switch,
         'credential_updated': credential.date_updated.isoformat(),
         'accounts': [
             [str(a.id), a.version, a.username, a.secret_type, str(a.asset_id),
@@ -129,6 +130,8 @@ def latest(credential):
 
 
 def info(credential):
+    if not credential.verify_before_switch:
+        return None
     execution = latest(credential)
     if not execution or credential.status not in ('idle', 'ready_to_switch'):
         return None
@@ -158,13 +161,6 @@ def start(credential, operator='', operator_id=None):
         stale.status = 'failed'
         stale.date_finished = timezone.now()
         stale.save(update_fields=['status', 'date_finished'])
-    task, created = VerifyAccountAutomation.objects.get_or_create(
-        name=task_name(credential), type='verify_account',
-        defaults={'params': {'credential_precheck': str(credential.id)}, 'is_periodic': False},
-    )
-    if task.params.get('credential_precheck') != str(credential.id):
-        raise JMSException(_('The verification task name is already in use.'))
-    task = VerifyAccountAutomation.objects.select_for_update().get(pk=task.pk)
     account = credential.target_account
     rotation = None
     if credential.status == credential.Status.ready_to_switch:
@@ -178,6 +174,23 @@ def start(credential, operator='', operator_id=None):
             change_account_version_at_start=credential.active_account.version,
             status='preparing', created_by=operator,
         )
+    if not credential.verify_before_switch:
+        from .manager import CredentialRotationManager
+        event = record(
+            AuditEvent.ROTATION_STEP, credential=credential, operator=operator,
+            summary='Backup account login verification skipped because it is disabled in the credential policy.',
+        )
+        enqueue(event, ApplicationEvent.ROTATION_VERIFICATION_SKIPPED, rotation=rotation)
+        return CredentialRotationManager(credential.id)._publish(
+            credential, operator, rotation.id, operator_id,
+        )
+    task, created = VerifyAccountAutomation.objects.get_or_create(
+        name=task_name(credential), type='verify_account',
+        defaults={'params': {'credential_precheck': str(credential.id)}, 'is_periodic': False},
+    )
+    if task.params.get('credential_precheck') != str(credential.id):
+        raise JMSException(_('The verification task name is already in use.'))
+    task = VerifyAccountAutomation.objects.select_for_update().get(pk=task.pk)
     tp = 'verify_gateway_account' if account.asset.is_gateway else 'verify_account'
     execution = AutomationExecution.objects.create(
         automation=task, type=tp,

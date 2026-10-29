@@ -50,7 +50,7 @@ class PythonLatestCredentialTests(TestCase):
         self.assertTrue(self.client.get_account(account_id="account").from_local)
         with self.assertRaises(PAMError):
             self.client.get_account(account_id="account", allow_local_fallback=False)
-        self.client._reconcile_latest_credentials({"event": "application.scope.updated"})
+        self.client._reconcile_latest_credentials({"event": "app.scope.updated"})
         with self.assertRaises(PAMError):
             self.client.get_account(account_id="account")
 
@@ -159,7 +159,7 @@ class PythonLatestCredentialTests(TestCase):
 
     def test_configuration_notice_keeps_latest_until_scope_is_reconciled(self):
         self.prime()
-        self.client._reconcile_latest_credentials({"event": "application.scope.updated"})
+        self.client._reconcile_latest_credentials({"event": "app.scope.updated"})
         self.outage()
         self.assertTrue(self.client.get_credential(key="database").from_local)
 

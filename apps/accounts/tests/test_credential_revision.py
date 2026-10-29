@@ -17,6 +17,8 @@ from django.db import transaction
 class CredentialRevisionTests(CredentialTestCase):
     def setUp(self):
         super().setUp()
+        self.application.credential_notifications_enabled = True
+        self.application.save(update_fields=['credential_notifications_enabled'])
         self.credential.mode = ApplicationCredential.Mode.subscription
         self.credential.account = None
         self.credential.alternate_account = None
@@ -25,21 +27,21 @@ class CredentialRevisionTests(CredentialTestCase):
         self.credential.save()
         self.credential.subscription_accounts.set([self.primary, self.backup])
 
-    def test_only_selected_account_publishes_and_can_be_fetched(self):
-        from rest_framework.exceptions import PermissionDenied
-
+    def test_application_authorization_defines_pull_scope(self):
         self.credential.subscription_accounts.set([self.primary])
         manager = CredentialClientManager(self.application, instance_id='selected-client')
         self.assertEqual(
-            CredentialClientManager.credential_keys(self.application),
-            [self.credential.account_key(self.primary.id)],
+            sorted(CredentialClientManager.credential_keys(self.application)),
+            sorted(self.credential.account_key(a.id) for a in (self.primary, self.backup)),
         )
         self.assertEqual(
             manager.fetch('', '127.0.0.1', self.backup.id)['key'],
             f'account:{self.backup.id}',
         )
-        with self.assertRaises(PermissionDenied):
-            manager.fetch(self.credential.account_key(self.backup.id), '127.0.0.1')
+        self.assertEqual(
+            manager.fetch(self.credential.account_key(self.backup.id), '127.0.0.1')['account']['id'],
+            str(self.backup.id),
+        )
         before = self.credential.revision
         self.backup.secret = 'unsubscribed-change'
         self.backup.save()
@@ -60,7 +62,7 @@ class CredentialRevisionTests(CredentialTestCase):
             [self.primary.id],
         )
         self.assertTrue(CredentialRotationEvent.objects.filter(
-            event='application.scope.updated', rotation__isnull=True,
+            event='app.scope.updated', rotation__isnull=True,
             source_event_id__in=ApplicationAudit.objects.filter(
                 credential_id=self.credential.id,
             ).values('id'),
@@ -68,14 +70,14 @@ class CredentialRevisionTests(CredentialTestCase):
 
     def test_password_update_publishes_once(self):
         ApplicationAudit.objects.filter(
-            credential_id=self.credential.id, event='credential_published',
+            service_id=self.application.id, event='credential_published',
         ).delete()
         self.primary.secret = 'first-change'
         self.primary.save()
         self.credential.refresh_from_db()
-        self.assertEqual(self.credential.current_revision, 9)
+        self.assertEqual(self.credential.current_revision, 8)
         event = ApplicationAudit.objects.get(
-            credential_id=self.credential.id, event='credential_published',
+            service_id=self.application.id, event='credential_published',
         )
         self.primary.refresh_from_db()
         self.assertEqual(event.credential_key, self.credential.account_key(self.primary.id))
@@ -83,7 +85,7 @@ class CredentialRevisionTests(CredentialTestCase):
         self.assertEqual(event.revision, self.primary.version)
 
     def test_managed_password_change_completes_before_publication(self):
-        ApplicationAudit.objects.filter(credential_id=self.credential.id).delete()
+        ApplicationAudit.objects.filter(service_id=self.application.id).delete()
         execution = AutomationExecution.objects.create(
             snapshot={}, org_id=self.credential.org_id,
         )
@@ -99,9 +101,9 @@ class CredentialRevisionTests(CredentialTestCase):
         record.status = ChangeSecretRecordStatusChoice.success
         record.save(update_fields=['status'])
         self.credential.refresh_from_db()
-        self.assertEqual(self.credential.revision, 9)
+        self.assertEqual(self.credential.revision, 8)
         events = list(ApplicationAudit.objects.filter(
-            credential_id=self.credential.id,
+            service_id=self.application.id,
             event__in=['secret_change_completed', 'credential_published'],
         ).order_by('date_created', 'id').values_list('event', flat=True))
         self.assertEqual(events, ['secret_change_completed', 'credential_published'])

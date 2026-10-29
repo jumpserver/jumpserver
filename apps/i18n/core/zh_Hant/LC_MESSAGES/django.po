@@ -14161,3 +14161,12 @@ msgstr "清理過期的應用稽核、已結束的策略週期和 Webhook 投遞
 
 msgid "The start time must be earlier than the end time."
 msgstr "開始時間必須早於結束時間。"
+
+msgid "Verify backup account before switching"
+msgstr "切換前驗證備用帳號"
+
+msgid "Verify the backup account from the server before switching. When disabled, ensure the backup account is usable yourself."
+msgstr "切換前由服務端驗證備用帳號；關閉後，請自行確保備用帳號可用。"
+
+msgid "Backup account verification skipped by policy"
+msgstr "已依策略跳過備用帳號驗證"

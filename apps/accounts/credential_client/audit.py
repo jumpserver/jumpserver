@@ -83,6 +83,7 @@ class ApplicationAuditContext:
     fetch_identity: list | None = None
     error_code: str = ''
     success_recorded: bool = False
+    call_record_id: object = None
 
     def set_request_data(self, data):
         self.values.update(
@@ -98,20 +99,47 @@ class ApplicationAuditContext:
             'account_id': self.values.get('account_id'),
         }
 
-    def set_fetch_result(self, revision, success_recorded):
+    def set_fetch_result(self, revision, success_recorded, call_id=None):
         self.values['revision'] = revision
         self.success_recorded = success_recorded
+        self.call_record_id = call_id
 
     def record_failure(self, status_code):
         summary = self.error_code or f'Request rejected (HTTP {status_code}).'
         with transaction.atomic():
-            record(self.event, **self.values, result='failed', summary=summary)
+            values = dict(self.values)
+            if self.call_record_id:
+                values['id'] = self.call_record_id
+            record(self.event, **values, result='failed', summary=summary)
+
+    def record_call_failure(self, status_code):
+        from accounts.const import AuditEvent
+        from .access_log import record_access
+        if self.event != AuditEvent.CREDENTIAL_FETCHED:
+            return
+        values = {key: value for key, value in self.values.items() if key in (
+            'application', 'client', 'account_id', 'credential_key', 'instance_id', 'revision', 'remote_addr',
+        )}
+        if self.fetch_identity is not None:
+            values.setdefault('source', AuditSource.AGENT if self.fetch_identity[2] == 'agent' else AuditSource.SDK)
+            values['remote_addr'] = self.fetch_identity[-1]
+        else:
+            request = get_current_request()
+            values.setdefault('remote_addr', get_request_ip(request) if request else None)
+            values.setdefault('source', AuditSource.SDK)
+        with transaction.atomic():
+            call = record_access(**values, result='failed',
+                                 summary=self.error_code or f'Request rejected (HTTP {status_code}).')
+            self.call_record_id = call.id
 
     def record_recovery(self):
         if self.success_recorded:
             return
         with transaction.atomic():
-            record(self.event, **self.values, result='success', summary='Credential access recovered.')
+            values = dict(self.values)
+            if self.call_record_id:
+                values['id'] = self.call_record_id
+            record(self.event, **values, result='success', summary='Credential access recovered.')
 
 
 class CredentialFetchAudit:

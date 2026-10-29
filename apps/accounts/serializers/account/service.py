@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from accounts.const import ApplicationEvent, WebhookRequestMethod
+from accounts.const import ApplicationEvent, EVENT_NAME_ALIASES, WebhookRequestMethod
 from accounts.models import Account, ApplicationWebhook, CredentialClientInstance, IntegrationApplication
 from accounts.models.application import empty_application_accounts
 from accounts.webhooks import (
@@ -203,7 +203,11 @@ class ApplicationWebhookSerializer(serializers.ModelSerializer):
         write_only=True, required=False,
     )
     method = serializers.ChoiceField(choices=WebhookRequestMethod.choices)
-    events = ListMultipleChoiceField(choices=ApplicationEvent.choices)
+    events = ListMultipleChoiceField(choices=[
+        *ApplicationEvent.choices,
+        *((name, name) for name, current in EVENT_NAME_ALIASES.items()
+          if current in ApplicationEvent.values and name not in ApplicationEvent.values),
+    ])
     body_template = serializers.JSONField()
     url_display = serializers.SerializerMethodField()
     header_names = serializers.SerializerMethodField()

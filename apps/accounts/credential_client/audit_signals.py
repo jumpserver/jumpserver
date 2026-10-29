@@ -177,7 +177,7 @@ def notify_model_change(instance, event, changes):
         ):
             enqueue(event, ApplicationEvent.ROTATION_FAILED, rotation=rotation)
     elif isinstance(instance, ApplicationCredential) and any(change['field'] == 'is_active' for change in changes):
-        enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED if instance.is_active else ApplicationEvent.CREDENTIAL_REVOKED)
+        enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
     elif isinstance(instance, IntegrationApplication) and any(change['field'] in ('accounts', 'credential_notifications_enabled') for change in changes):
         enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         notify_revoked_credentials(instance)
@@ -193,8 +193,10 @@ def notify_revoked_credentials(application):
             required_accounts = {credential.account_id, credential.alternate_account_id} - {None}
             if required_accounts.issubset(allowed_accounts):
                 continue
-            event = record(AuditEvent.AUTHORIZATION_REVOKED, credential=credential, application=application)
-            enqueue(event, ApplicationEvent.CREDENTIAL_REVOKED)
+            # The application's scope event already carries the authorization
+            # reduction. Retain the policy audit without another client event.
+            record(AuditEvent.AUTHORIZATION_REVOKED, credential=credential,
+                   application=application, applications=[application])
             CredentialClientStatus.objects.filter(
                 binding__credential=credential,
                 client__application=application,
@@ -231,16 +233,17 @@ def application_binding_changed(sender, instance, created=False, signal=None, **
         return
     for client in application.credential_clients.filter(is_active=True):
         enroll_client(client)
-    publish_application_scope(application)
     credential = ApplicationCredential.objects.filter(pk=instance.credential_id).first()
-    if not credential:
-        return
     if signal is post_delete:
-        event_name, event_code = AuditEvent.AUTHORIZATION_REVOKED, ApplicationEvent.CREDENTIAL_REVOKED
-    else:
-        event_name, event_code = AuditEvent.AUTHORIZATION_GRANTED, ApplicationEvent.CREDENTIAL_UPDATED
-    event = record(event_name, credential=credential, application=application)
-    enqueue(event, event_code)
+        publish_application_scope(
+            application, credential=credential, audit_event=AuditEvent.AUTHORIZATION_REVOKED,
+        )
+        return
+    publish_application_scope(application)
+    if credential:
+        event = record(AuditEvent.AUTHORIZATION_GRANTED, credential=credential,
+                       application=application, applications=[application])
+        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
 
 
 def before_application_binding_deleted(sender, instance, **kwargs):

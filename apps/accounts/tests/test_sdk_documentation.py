@@ -40,8 +40,9 @@ class SDKDocumentationTests(SimpleTestCase):
             'python': ('python/setup.py', 'python/jms_pam/client.py'),
             'go': ('go/go.mod', 'go/client.go'),
             'java': ('java/pom.xml', 'java/src/main/java/org/jumpserver/pam/Client.java'),
-            'node': ('node/package.json', 'node/index.js'),
+            'node': ('node/package.json', 'node/index.js', 'node/event-names.js'),
             'agent': ('agent/go.mod', 'agent/cmd/pam-agent/main.go', 'go/go.mod', 'go/client.go'),
+            'socket': ('socket/python_example.py', 'socket/README.en.md', 'socket/README.zh-hans.md'),
         }
         for language, paths in expected.items():
             request = APIRequestFactory().get(f'/api/v1/accounts/client-source/{language}/')
@@ -132,7 +133,7 @@ class SDKDocumentationTests(SimpleTestCase):
                     self.assertTrue(data['code'])
                     self.assertEqual({item['value'] for item in data['languages']}, set(SDK_LANGUAGES) - {'curl'})
                     if language == 'python':
-                        for tab in ('agent', 'sdk'):
+                        for tab in ('agent', 'sdk', 'socket'):
                             self.assertIn(f'<!-- {tab}-doc:start -->', data['readme'])
                             self.assertIn(f'<!-- {tab}-doc:end -->', data['readme'])
                         self.assertIn('from jms_pam_config import client_options, instance_id', data['readme'])

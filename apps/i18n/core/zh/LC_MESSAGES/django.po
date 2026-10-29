@@ -15659,3 +15659,12 @@ msgstr "清理过期的应用审计、已结束的策略周期和 Webhook 投递
 
 msgid "The start time must be earlier than the end time."
 msgstr "开始时间必须早于结束时间。"
+
+msgid "Verify backup account before switching"
+msgstr "切换前验证备用账号"
+
+msgid "Verify the backup account from the server before switching. When disabled, ensure the backup account is usable yourself."
+msgstr "切换前由服务端验证备用账号；关闭后，请自行确保备用账号可用。"
+
+msgid "Backup account verification skipped by policy"
+msgstr "已按策略跳过备用账号验证"

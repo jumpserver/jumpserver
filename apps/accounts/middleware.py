@@ -13,6 +13,8 @@ class ApplicationAuditMiddleware:
         if context is None:
             return response
 
+        if response.status_code >= 400:
+            context.record_call_failure(response.status_code)
         if context.fetch_identity is not None:
             CredentialFetchAudit(context).record_result(response.status_code)
         elif response.status_code >= 400:

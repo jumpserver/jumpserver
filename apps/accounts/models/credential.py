@@ -56,6 +56,13 @@ class ApplicationCredential(JMSOrgBaseModel):
         related_name='active_application_credentials', verbose_name=_('Active account')
     )
     revision = models.PositiveIntegerField(default=1, verbose_name=_('Revision'))
+    verify_before_switch = models.BooleanField(
+        default=True, verbose_name=_('Verify backup account before switching'),
+        help_text=_(
+            'Verify the backup account from the server before switching. '
+            'When disabled, ensure the backup account is usable yourself.'
+        ),
+    )
     source_no_traffic_days = models.PositiveIntegerField(
         default=7, validators=[MinValueValidator(1), MaxValueValidator(3650)],
         verbose_name=_('Source account no-secret-fetch duration (days)'),
