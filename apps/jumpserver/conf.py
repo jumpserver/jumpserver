@@ -217,6 +217,7 @@ class Config(dict):
         'REDIS_DB_CACHE': 4,
         'REDIS_DB_SESSION': 5,
         'REDIS_DB_WS': 6,
+        'CELERY_TASK_ROUTES': {},
 
         'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://127.0.0.1',
