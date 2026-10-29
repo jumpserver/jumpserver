@@ -1,16 +1,23 @@
 from django.db import transaction
+from django.db.models import CharField, F
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.permissions import BasePermission
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 
 from common.permissions import IsValidUser
+from common.drf.filters import DatetimeRangeFilterBackend, RewriteOrderingFilter, SearchFilter
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from terminal import agent_service as service
 from terminal.const import LoginFrom
 from terminal.models import AgentAction, AgentSession, Session
+from terminal.filters import AgentAuditFilterBackend, AgentActionAuditFilterSet, AgentSessionAuditFilterSet
+from terminal.serializers.agent import AgentActionAuditSerializer, AgentSessionAuditSerializer
 
 
 class IsAgentComponent(BasePermission):
@@ -254,13 +261,54 @@ class AgentComponentAPI(APIView):
                 'occurred_at': item['payload'].get('_executor_occurred_at') or item['date_received'].isoformat()}
 
 
-class AgentAuditAPI(APIView):
+class AgentAuditAPI(GenericAPIView):
     permission_classes = [IsValidUser]
     kind = 'sessions'
+    filter_backends = [AgentAuditFilterBackend, SearchFilter, RewriteOrderingFilter, DatetimeRangeFilterBackend]
+    date_range_filter_fields = [('date_created', ('date_from', 'date_to'))]
+    page_default_limit = 100
+    page_max_limit = 100
+    ordering = ('-date_created', '-id')
+
+    @property
+    def filterset_class(self):
+        return AgentSessionAuditFilterSet if self.kind == 'sessions' else AgentActionAuditFilterSet
+
+    @property
+    def search_fields(self):
+        fields = ['id', 'user_display', 'client_id', 'asset_id', 'account', 'protocol', 'status']
+        return fields if self.kind == 'sessions' else fields + ['kind']
+
+    @property
+    def ordering_fields(self):
+        fields = ['id', 'user_display', 'client_id', 'asset_id', 'account', 'protocol', 'status', 'date_created']
+        return fields if self.kind == 'sessions' else fields + ['kind', 'date_started', 'date_finished']
+
+    def get_serializer_class(self):
+        return AgentSessionAuditSerializer if self.kind == 'sessions' else AgentActionAuditSerializer
+
+    def get_queryset(self):
+        model = AgentSession if self.kind == 'sessions' else AgentAction
+        path = 'requested' if self.kind == 'sessions' else 'session__requested'
+        queryset = service.audit_queryset(self.request.user, model).select_related('application')
+        if self.kind == 'actions':
+            queryset = queryset.select_related('session')
+        return queryset.annotate(
+            client_id=F('application__client_id'),
+            **{field: Cast(KeyTextTransform(field, path), CharField())
+               for field in ('asset_id', 'account', 'protocol')},
+        ).order_by(*self.ordering)
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        ordering = queryset.query.order_by
+        if not any(field.lstrip('-') == 'id' for field in ordering):
+            queryset = queryset.order_by(*ordering, '-id')
+        return queryset
 
     def get(self, request, object_id=None):
-        model = AgentSession if self.kind == 'sessions' else AgentAction
-        queryset = service.audit_queryset(request.user, model).order_by('-date_created', '-id')
+        self.request = request
+        queryset = self.get_queryset()
         try:
             offset = service.integer(int(request.query_params.get('offset', 0)), 'offset', 0, 10000000)
         except (ValueError, TypeError):
@@ -285,24 +333,38 @@ class AgentAuditAPI(APIView):
                 result['actions'] = [service.action_data(action) for action in page[:100]]
                 result['next_offset'] = offset + 100 if len(page) > 100 else None
         else:
-            page = list(queryset[offset:offset + 101])
-            result = {'results': [self.serialize(item) for item in page[:100]],
-                      'next_offset': offset + 100 if len(page) > 100 else None}
+            queryset = self.filter_queryset(queryset)
+            page = self.paginate_queryset(queryset)
+            response = self.get_paginated_response([self.serialize(item) for item in page])
+            response.data['next_offset'] = (
+                self.paginator.offset + self.paginator.limit if response.data['next'] else None
+            )
+            response['Cache-Control'] = 'no-store'
+            return response
         response = Response(result)
         response['Cache-Control'] = 'no-store'
         return response
 
     @staticmethod
     def serialize(item):
+        parent = item if isinstance(item, AgentSession) else item.session
+        context = {
+            'client_id': item.application.client_id,
+            'asset_id': parent.requested.get('asset_id'),
+            'account': parent.requested.get('account'),
+            'protocol': parent.requested.get('protocol'),
+        }
         if isinstance(item, AgentAction):
-            return {**service.action_data(item), 'user_display': item.user_display}
+            return {
+                **service.action_data(item), **context, 'user_display': item.user_display,
+                'user_id': str(item.user_id) if item.user_id else None, 'org_id': item.org_id,
+            }
         # Never include a session capability or a connection credential in a
         # user-facing audit response.
         return {
             'id': str(item.id), 'user_id': str(item.user_id) if item.user_id else None,
             'user_display': item.user_display, 'org_id': item.org_id,
-            'client_id': item.application.client_id, 'asset_id': item.requested.get('asset_id'),
-            'account': item.requested.get('account'), 'protocol': item.requested.get('protocol'),
+            **context,
             'status': item.status, 'terminal_session_id': item.terminal_session_id,
             'date_created': item.date_created, 'date_expires': item.date_expires,
         }

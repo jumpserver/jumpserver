@@ -3,10 +3,44 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 
-from common.drf.filters import BaseFilterSet
+from common.drf.filters import BaseFilterSet, LookupFilterBackend
 from orgs.utils import filter_org_queryset
 from terminal.const import RiskLevelChoices
-from terminal.models import Command, CommandStorage, Session
+from terminal.models import AgentAction, AgentSession, Command, CommandStorage, Session
+from terminal.serializers.agent import (
+    ACTION_KIND_CHOICES, ACTION_STATUS_CHOICES, PROTOCOL_CHOICES, SESSION_STATUS_CHOICES,
+)
+
+
+class AgentAuditFilterBackend(LookupFilterBackend):
+    def resolve_model_field(self, model, field_path, queryset=None):
+        field = super().resolve_model_field(model, field_path, queryset)
+        annotation = getattr(getattr(queryset, 'query', None), 'annotations', {}).get(field_path)
+        return field if field is not None else getattr(annotation, 'output_field', None)
+
+
+class AgentSessionAuditFilterSet(BaseFilterSet):
+    user_id = filters.UUIDFilter(label=_('User ID'))
+    user_display = filters.CharFilter(lookup_expr='icontains', label=_('User'))
+    client_id = filters.CharFilter(lookup_expr='icontains', label=_('Client ID'))
+    asset_id = filters.CharFilter(lookup_expr='iexact', label=_('Asset ID'))
+    account = filters.CharFilter(lookup_expr='icontains', label=_('Account'))
+    protocol = filters.ChoiceFilter(choices=PROTOCOL_CHOICES, label=_('Protocol'))
+    status = filters.ChoiceFilter(choices=SESSION_STATUS_CHOICES, label=_('Status'))
+
+    class Meta:
+        model = AgentSession
+        fields = ['id', 'user_id', 'user_display', 'status', 'client_id', 'asset_id', 'account', 'protocol']
+
+
+class AgentActionAuditFilterSet(AgentSessionAuditFilterSet):
+    kind = filters.ChoiceFilter(choices=ACTION_KIND_CHOICES, label=_('Operation'))
+    status = filters.ChoiceFilter(choices=ACTION_STATUS_CHOICES, label=_('Status'))
+    session_id = filters.UUIDFilter(label=_('Session ID'))
+
+    class Meta:
+        model = AgentAction
+        fields = AgentSessionAuditFilterSet.Meta.fields + ['kind', 'session_id']
 
 
 class CommandFilter(BaseFilterSet):

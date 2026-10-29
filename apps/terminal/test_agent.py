@@ -6,7 +6,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 from django.test import TestCase, RequestFactory, override_settings
-from django.http import Http404
+from django.http import Http404, QueryDict
 from django.utils import timezone
 from oauthlib.common import Request as OAuthRequest
 from oauthlib.oauth2 import InvalidRequestError
@@ -855,18 +855,114 @@ class AgentBoundaryTests(TestCase):
         api = AgentAuditAPI(kind='actions')
         first = api.get(request).data
         self.assertEqual(len(first['results']), 100)
+        self.assertEqual(first['count'], 102)
         self.assertEqual(first['next_offset'], 100)
-        request.query_params = {'offset': '100'}
+        request.query_params = QueryDict('limit=10000')
+        self.assertEqual(len(api.get(request).data['results']), 100)
+        request.query_params = QueryDict('offset=100')
         second = api.get(request).data
         self.assertEqual(len(second['results']), 2)
         self.assertIsNone(second['next_offset'])
         self.assertFalse({item['id'] for item in first['results']} & {item['id'] for item in second['results']})
-        request.query_params = {}
+        request.query_params = QueryDict()
         session_page = AgentAuditAPI(kind='sessions').get(request, self.session.id).data
         self.assertEqual(len(session_page['actions']), 100)
         self.assertEqual(session_page['next_offset'], 100)
         page = AgentAuditView.as_view(kind='sessions')(request, object_id=self.session.id)
         self.assertContains(page, '?offset=100')
+
+    def audit_api(self, kind, params=None, method='get'):
+        from rest_framework.test import APIRequestFactory, force_authenticate
+        from terminal.api.agent import AgentAuditAPI
+        request = getattr(APIRequestFactory(), method)(
+            f'/api/v1/terminal/agent/audit/{kind}/', params or {},
+        )
+        force_authenticate(request, self.user)
+        response = AgentAuditAPI.as_view(kind=kind)(request)
+        self.assertEqual(response.status_code, 200, response.data)
+        return response.data
+
+    def test_audit_metadata_exposes_search_filters_and_sorting(self):
+        for kind in ('sessions', 'actions'):
+            data = self.audit_api(kind, method='options')
+            self.assertIn('status', data['filters'])
+            self.assertIn('account', data['filters'])
+            self.assertIn('icontains_any', data['filters']['account']['operators'])
+            self.assertTrue(data['filters']['status']['choices'])
+            self.assertEqual(data['search']['param'], 'search')
+            self.assertIn('date_created', [field['name'] for field in data['ordering']['fields']])
+            self.assertNotIn('capability', data['actions']['GET'])
+        self.assertIn('kind', data['filters'])
+        self.assertIn('session_id', data['filters'])
+
+    def test_audit_action_queries_filter_before_ordering_and_pagination(self):
+        older = timezone.now() - timedelta(days=2)
+        match = AgentAction.objects.create(
+            session=self.session, user=self.user, application=self.app, kind='file_read',
+            idempotency_key='audit-match', request_hash='2' * 64, status='succeeded', date_created=older,
+        )
+        AgentAction.objects.create(
+            session=self.session, user=self.user, application=self.app, kind='execute_command',
+            idempotency_key='audit-other-kind', request_hash='3' * 64, status='succeeded',
+        )
+        params = {
+            'kind': 'file_read', 'status__in': 'dispatching,succeeded',
+            'account__icontains_any': 'oot,deploy', 'protocol__in': 'ssh,sftp',
+            'user_display__icontains': self.user.username, 'search': self.app.client_id,
+            'session_id': str(self.session.id), 'order': 'date_created', 'limit': 1,
+        }
+        first = self.audit_api('actions', params)
+        self.assertEqual(first['count'], 2)
+        self.assertEqual([item['id'] for item in first['results']], [str(match.id)])
+        self.assertEqual(first['next_offset'], 1)
+        second = self.audit_api('actions', {**params, 'offset': 1})
+        self.assertEqual([item['id'] for item in second['results']], [str(self.action.id)])
+        self.assertIsNone(second['next_offset'])
+        by_date = self.audit_api('actions', {**params, 'date_to': older.isoformat()})
+        self.assertEqual(by_date['count'], 1)
+        by_search = self.audit_api('actions', {'search': 'execute_command'})
+        self.assertEqual(by_search['count'], 1)
+
+    def test_audit_session_queries_filter_requested_fields_and_dates(self):
+        older = timezone.now() - timedelta(days=2)
+        session = AgentSession.objects.create(
+            user=self.user, application=self.app, terminal=self.node, resource=self.resource,
+            idempotency_key='audit-sftp', request_hash='5' * 64, status='closed',
+            requested={'asset_id': str(uuid.uuid4()), 'protocol': 'sftp', 'account': 'deploy'},
+            date_created=older, date_expires=older + timedelta(hours=1),
+        )
+        params = {
+            'protocol__in': 'sftp', 'account__icontains_any': 'deploy,root', 'status': 'closed',
+            'asset_id': session.requested['asset_id'], 'search': 'deploy',
+            'date_to': older.isoformat(), 'order': 'account', 'limit': 15,
+        }
+        data = self.audit_api('sessions', params)
+        self.assertEqual(data['count'], 1)
+        self.assertEqual(data['results'][0]['id'], str(session.id))
+        self.assertEqual(self.audit_api('sessions', {**params, 'date_from': timezone.now().isoformat()})['count'], 0)
+
+    def test_audit_queries_preserve_owner_and_organization_scope(self):
+        other = User.objects.create(username='agent-audit-other')
+        self.org.add_member(other)
+        session = AgentSession.objects.create(
+            user=other, application=self.app, terminal=self.node, resource=self.resource,
+            idempotency_key='audit-other-owner', request_hash='6' * 64,
+            date_expires=timezone.now() + timedelta(hours=1),
+        )
+        AgentAction.objects.create(
+            session=session, user=other, application=self.app, kind='file_read',
+            idempotency_key='audit-other-owner', request_hash='7' * 64,
+        )
+        self.assertEqual(self.audit_api('sessions', {'id': str(session.id)})['count'], 0)
+        self.assertEqual(self.audit_api('actions', {'session_id': str(session.id)})['count'], 0)
+        other_org = Organization.objects.create(name='Agent audit other organization')
+        with tmp_to_org(other_org):
+            foreign = AgentSession.objects.create(
+                user=self.user, application=self.app, terminal=self.node, resource=self.resource,
+                idempotency_key='audit-other-org', request_hash='8' * 64,
+                date_expires=timezone.now() + timedelta(hours=1),
+            )
+        self.assertEqual(self.audit_api('sessions', {'id': str(foreign.id)})['count'], 0)
 
     def test_access_only_authorization_expires_without_refresh_family(self):
         self.refresh.delete()
