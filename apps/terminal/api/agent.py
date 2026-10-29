@@ -293,11 +293,12 @@ class AgentAuditAPI(APIView):
     @staticmethod
     def serialize(item):
         if isinstance(item, AgentAction):
-            return service.action_data(item)
+            return {**service.action_data(item), 'user_display': item.user_display}
         # Never include a session capability or a connection credential in a
         # user-facing audit response.
         return {
-            'id': str(item.id), 'user_id': str(item.user_id), 'org_id': item.org_id,
+            'id': str(item.id), 'user_id': str(item.user_id) if item.user_id else None,
+            'user_display': item.user_display, 'org_id': item.org_id,
             'client_id': item.application.client_id, 'asset_id': item.requested.get('asset_id'),
             'account': item.requested.get('account'), 'protocol': item.requested.get('protocol'),
             'status': item.status, 'terminal_session_id': item.terminal_session_id,

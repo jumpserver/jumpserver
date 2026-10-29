@@ -35,6 +35,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('user_display', models.CharField(blank=True, default='', editable=False, max_length=258)),
                 ('requested', models.JSONField(default=dict)),
                 ('oauth_family', models.UUIDField(null=True)),
                 ('resource', models.URLField(max_length=512)),
@@ -51,7 +52,7 @@ class Migration(migrations.Migration):
                 ('oauth_token', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL)),
                 ('terminal', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='terminal.terminal')),
                 ('terminal_session', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='terminal.session')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ('-date_created',),
@@ -62,6 +63,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('user_display', models.CharField(blank=True, default='', editable=False, max_length=258)),
                 ('kind', models.CharField(max_length=32)),
                 ('idempotency_key', models.CharField(max_length=128)),
                 ('request', models.JSONField(default=dict)),
@@ -79,7 +81,7 @@ class Migration(migrations.Migration):
                 ('interactive_session', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='agent_interactive_actions', to='terminal.session')),
                 ('interactive_token', models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='agent_interactive_action', to='authentication.connectiontoken')),
                 ('ticket', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='tickets.applycommandticket')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
                 ('session', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='actions', to='terminal.agentsession')),
             ],
             options={

@@ -193,6 +193,8 @@ def owned_session(node, session_id, capability, *, lock=False, check=True):
 
 
 def check_session_authority(session, *, connection=True):
+    if not session.user_id:
+        raise PermissionDenied('Agent session owner no longer exists')
     if session.date_closed or session.date_expires <= timezone.now():
         raise PermissionDenied('Agent session expired or closed')
     check_agent_organization(session.user, session.org_id)

@@ -61,6 +61,39 @@ class AgentBoundaryTests(TestCase):
             idempotency_key='read', request={'path': '/file'}, request_hash='1' * 64, status='dispatching',
         )
 
+    def test_user_deletion_preserves_audit_and_revokes_execution(self):
+        from terminal.api.agent import AgentAuditAPI
+        display = str(self.user)
+        User.objects.filter(pk=self.user.pk).delete()
+        self.session.refresh_from_db()
+        self.action.refresh_from_db()
+        for item in (self.session, self.action):
+            self.assertIsNone(item.user_id)
+            self.assertEqual(AgentAuditAPI.serialize(item)['user_display'], display)
+        self.assertIsNone(AgentAuditAPI.serialize(self.session)['user_id'])
+        with self.assertRaises(PermissionDenied):
+            service.check_session_authority(self.session, connection=False)
+        # Component-bound receipts still deliver evidence after the owner is gone.
+        receipt = service.owned_session(self.node, self.session.id, service.session_capability(self.session), check=False)
+        service.append_event(self.action, {'session_token': service.session_capability(receipt),
+            'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'failed', 'payload': {'error': 'owner deleted'}})
+        self.assertEqual(self.action.events.count(), 1)
+
+    def test_expired_agent_history_preserves_identity_after_rename_and_delete(self):
+        display = str(self.user)
+        User.objects.filter(pk=self.user.pk).update(name='Renamed')
+        self.session.refresh_from_db()
+        self.action.refresh_from_db()
+        self.session.date_closed = timezone.now()
+        self.session.date_expires = timezone.now() - timedelta(days=1)
+        self.session.save()
+        self.action.save()
+        self.user.delete()
+        for item in (self.session, self.action):
+            item.refresh_from_db()
+            self.assertIsNone(item.user_id)
+            self.assertEqual(item.user_display, display)
+
     def test_introspection_binds_resource_org_and_execution_node(self):
         result = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
         context, user = service.context_identity(self.node, result['context_token'])

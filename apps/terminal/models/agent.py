@@ -43,7 +43,8 @@ class AgentOAuthBinding(models.Model):
 
 class AgentSession(OrgModelMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    user_display = models.CharField(max_length=258, default='', blank=True, editable=False)
     application = models.ForeignKey('oauth2_provider.Application', on_delete=models.PROTECT)
     terminal = models.ForeignKey('terminal.Terminal', on_delete=models.PROTECT)
     connection_token = models.OneToOneField('authentication.ConnectionToken', null=True, on_delete=models.SET_NULL)
@@ -61,6 +62,11 @@ class AgentSession(OrgModelMixin):
     date_expires = models.DateTimeField()
     date_closed = models.DateTimeField(null=True)
 
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.user_id:
+            self.user_display = str(self.user)
+        return super().save(*args, **kwargs)
+
     class Meta:
         constraints = [models.UniqueConstraint(
             fields=('org_id', 'user', 'application', 'idempotency_key'), name='agent_session_idempotency',
@@ -71,7 +77,8 @@ class AgentSession(OrgModelMixin):
 class AgentAction(OrgModelMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     session = models.ForeignKey(AgentSession, on_delete=models.PROTECT, related_name='actions')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    user_display = models.CharField(max_length=258, default='', blank=True, editable=False)
     application = models.ForeignKey('oauth2_provider.Application', on_delete=models.PROTECT)
     kind = models.CharField(max_length=32)
     idempotency_key = models.CharField(max_length=128)
@@ -89,6 +96,11 @@ class AgentAction(OrgModelMixin):
     last_sequence = models.PositiveBigIntegerField(default=0)
     evidence_bytes = models.PositiveBigIntegerField(default=0)
     result = models.JSONField(default=dict)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.user_id:
+            self.user_display = str(self.user)
+        return super().save(*args, **kwargs)
 
     class Meta:
         constraints = [models.UniqueConstraint(
