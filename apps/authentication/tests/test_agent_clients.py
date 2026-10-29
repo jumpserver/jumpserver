@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 from unittest.mock import patch
 from urllib.parse import urlsplit
@@ -6,15 +7,20 @@ from django.db import transaction
 from django.test import TestCase
 from django.urls import resolve
 from django.utils import timezone
-from oauth2_provider.models import get_application_model, get_access_token_model
+from oauth2_provider.models import (
+    get_application_model, get_access_token_model, get_grant_model, get_refresh_token_model,
+)
+from oauthlib.common import Request as OAuthRequest
+from oauthlib.oauth2 import InvalidGrantError, InvalidScopeError
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from audits.models import OperateLog
+from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
 from authentication.services.agent_clients import AgentClientCleanupBusy, AgentClientCleanupUnavailable
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from rbac.models import Permission, Role
-from terminal.models import AgentApplication
+from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
 from users.models import User
 
 
@@ -69,6 +75,7 @@ class AgentClientManagementTests(TestCase):
             for method, path in (
                 ('get', self.url), ('options', self.url),
                 ('post', f'{self.url}{self.registration.pk}/disable/'), ('post', self.url + 'cleanup/'),
+                ('delete', f'{self.url}{self.registration.pk}/'),
             ):
                 with self.subTest(user=user, method=method, path=path):
                     self.assertIn(self.request(method, path, user).status_code, (401, 403))
@@ -86,9 +93,85 @@ class AgentClientManagementTests(TestCase):
         for terms, count in (('Agent,desktop', 1), ('Agent,missing', 0)):
             response = self.request('get', self.url + '?limit=10&search__icontains_all=' + terms, self.manager)
             self.assertEqual(response.data['count'], count)
-        for method in ('post', 'patch', 'delete'):
+        for method in ('post', 'patch'):
             path = self.url if method == 'post' else f'{self.url}{self.registration.pk}/'
             self.assertEqual(self.request(method, path, self.manager).status_code, 405)
+
+    def test_delete_unused_client_preserves_other_applications(self):
+        response = self.request('delete', f'{self.url}{self.registration.pk}/', self.manager)
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(get_application_model().objects.filter(pk=self.application.pk).exists())
+        self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())
+        self.assertEqual(self.request('delete', f'{self.url}{self.registration.pk}/', self.manager).status_code, 404)
+        self.assertTrue(get_application_model().objects.filter(pk=self.other.pk).exists())
+
+    def test_delete_revokes_grants_and_preserves_audit_in_other_org(self):
+        expires = timezone.now() + timedelta(minutes=5)
+        access = get_access_token_model().objects.create(
+            user=self.user, application=self.application, token='deleted-agent-access', scope='agent:access',
+            expires=expires,
+        )
+        refresh = get_refresh_token_model().objects.create(
+            user=self.user, application=self.application, access_token=access, token='deleted-agent-refresh',
+            token_family=uuid.uuid4(),
+        )
+        get_grant_model().objects.create(
+            user=self.user, application=self.application, code='deleted-agent-code', expires=expires,
+            redirect_uri='http://127.0.0.1/callback', scope='agent:access',
+        )
+        AgentOAuthBinding.objects.create(
+            user=self.user, application=self.application, org_id=self.org.pk, refresh_family=refresh.token_family,
+        )
+        with tmp_to_org(Organization.DEFAULT_ID):
+            session = AgentSession.objects.create(
+                user=self.user, application=self.application, terminal=Terminal.objects.create(name='deleted-client-node'),
+                oauth_token=access, resource=self.registration.resource, idempotency_key='client-delete-session',
+                request_hash='0' * 64, date_expires=expires,
+            )
+            action = AgentAction.objects.create(
+                session=session, user=self.user, application=self.application, kind='execute_command',
+                idempotency_key='client-delete-action', request_hash='1' * 64, status='succeeded',
+            )
+            event = AgentEvent.objects.create(
+                event_id=uuid.uuid4(), action=action, sequence=1, state='succeeded', payload_hash='2' * 64,
+            )
+        response = self.request('delete', f'{self.url}{self.registration.pk}/', self.manager)
+        self.assertEqual(response.status_code, 204)
+        for model in (get_access_token_model(), get_refresh_token_model(), get_grant_model(), AgentOAuthBinding):
+            self.assertFalse(model.objects.filter(application=self.application).exists())
+        self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())
+        self.application.refresh_from_db()
+        self.assertEqual(self.application.redirect_uris, '')
+        self.assertEqual(self.application.client_id, 'agent-desktop')
+        with tmp_to_root_org():
+            session.refresh_from_db()
+            self.assertIsNone(session.oauth_token_id)
+            self.assertEqual(AgentAction.objects.get(pk=action.pk).application_id, self.application.pk)
+            self.assertEqual(AgentEvent.objects.get(pk=event.pk).payload_hash, '2' * 64)
+            log = OperateLog.objects.get(resource_id=str(self.registration.pk), resource_type='Agent MCP client')
+            self.assertEqual(str(log.org_id), Organization.SYSTEM_ID)
+            self.assertEqual(log.user, str(self.manager))
+        # A refresh/code request may have validated before deletion took the lock.
+        request = OAuthRequest('http://localhost/token')
+        request.client = self.application
+        request.scopes = ['agent:access']
+        with self.assertRaises(InvalidGrantError):
+            AgentOAuth2Validator().save_bearer_token({'scope': 'agent:access'}, request)
+        with self.assertRaises(InvalidScopeError):
+            AgentOAuth2Validator().save_authorization_code(self.application.client_id, {'code': 'late-code'}, request)
+        self.assertEqual(self.request('get', self.url + '?limit=10', self.manager).data['count'], 0)
+        self.assertTrue(get_application_model().objects.filter(pk=self.other.pk).exists())
+
+    def test_delete_rolls_back_if_operation_audit_fails(self):
+        token = get_access_token_model().objects.create(
+            user=self.user, application=self.application, token='delete-rollback-access',
+            scope='agent:access', expires=timezone.now() + timedelta(minutes=5),
+        )
+        with patch('authentication.api.agent_client.record_client_operation', side_effect=RuntimeError('audit unavailable')):
+            with self.assertRaisesMessage(RuntimeError, 'audit unavailable'):
+                self.request('delete', f'{self.url}{self.registration.pk}/', self.manager)
+        self.assertTrue(AgentApplication.objects.get(pk=self.registration.pk).is_active)
+        self.assertTrue(get_access_token_model().objects.filter(pk=token.pk).exists())
 
     def test_disable_preserves_authority_records_and_audits_platform_actor(self):
         token = get_access_token_model().objects.create(

@@ -45,6 +45,8 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
 
     def save_authorization_code(self, client_id, code, request, *args, **kwargs):
         registration = self.registration(request.client)
+        if SCOPE in request.scopes and registration is None:
+            raise InvalidScopeError(request=request)
         if registration:
             if not registration.is_active or set(request.scopes) != {SCOPE}:
                 raise InvalidScopeError(request=request)
@@ -117,6 +119,12 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
 
     def _save_bearer_token(self, token, request, *args, **kwargs):
         # The provider wraps this hook in the same transaction as token rotation.
+        if SCOPE in token.get('scope', '').split():
+            # Lock before the provider locks token rows, matching client deletion.
+            # A request validated before deletion must not recreate its grants.
+            application = get_application_model().objects.select_for_update().filter(pk=request.client.pk).first()
+            if application is None or self.registration(application) is None:
+                raise InvalidGrantError(request=request)
         if not self.valid_organization_binding(request):
             raise InvalidGrantError(request=request)
         binding = self.organization_binding(request) if self.registration(request.client) else None

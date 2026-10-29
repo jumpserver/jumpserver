@@ -1,7 +1,10 @@
 from django.db import transaction
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
-from oauth2_provider.models import get_application_model
+from oauth2_provider.models import (
+    get_access_token_model, get_application_model, get_grant_model, get_refresh_token_model,
+)
 from rest_framework import mixins, serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -17,7 +20,7 @@ from common.permissions import IsValidUser
 from common.utils import get_request_ip
 from orgs.models import Organization
 from rbac.models import Role
-from terminal.models import AgentApplication
+from terminal.models import AgentApplication, AgentOAuthBinding
 
 __all__ = ['AgentClientViewSet']
 
@@ -64,10 +67,34 @@ class AgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, JMSGe
     queryset = AgentApplication.objects.select_related('application').order_by('-application__created', '-pk')
     serializer_class = AgentClientSerializer
     permission_classes = [AgentClientAdminPermission]
-    http_method_names = ['get', 'head', 'options', 'post']
+    http_method_names = ['get', 'head', 'options', 'post', 'delete']
     filter_backends = [LookupFilterBackend, SearchFilter]
     filterset_fields = ('is_active',)
     search_fields = ['application__name', 'application__client_id']
+
+    def destroy(self, request, *args, **kwargs):
+        registration = self.get_object()
+        with transaction.atomic():
+            # Serialize with authorization and token issuance before revoking grants.
+            application = get_object_or_404(
+                get_application_model().objects.select_for_update(), pk=registration.application_id,
+            )
+            registration = get_object_or_404(AgentApplication.objects.select_for_update(), pk=registration.pk)
+            client = {'id': registration.pk, 'name': application.name, 'client_id': application.client_id}
+            AgentApplication.objects.filter(pk=registration.pk).update(is_active=False)
+            for model in (get_refresh_token_model(), get_access_token_model(), get_grant_model(), AgentOAuthBinding):
+                model.objects.filter(application=application).delete()
+            try:
+                with transaction.atomic():
+                    application.delete()
+            except ProtectedError:
+                # Audit rows keep the OAuth application identity. Remove its
+                # registration and callbacks so it cannot authorize again.
+                application.redirect_uris = ''
+                application.save(update_fields=['redirect_uris'])
+                registration.delete()
+            record_client_operation(request, ActionChoices.delete, client, 'removed client and revoked authorizations')
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['post'], detail=True)
     def disable(self, request, *args, **kwargs):
