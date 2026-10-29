@@ -1,3 +1,5 @@
+from contextlib import nullcontext
+
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
@@ -44,9 +46,20 @@ def record_connection_token_credential_audit(token, *, result, error=None, reque
     )
 
 
-@transaction.atomic
 def get_connection_token_secret(token, serializer_factory, *, expire_now=True, public_key=''):
     """Return credentials using the shared token validation and consumption rules."""
+    from .client_login_session import client_policy_lock
+
+    with client_policy_lock() if token.client_login_session_id else nullcontext():
+        # Commit a discovered login timeout before the credential transaction.
+        token.validate_client_login_session(mutate=True)
+        return _get_connection_token_secret(
+            token, serializer_factory, expire_now=expire_now, public_key=public_key,
+        )
+
+
+@transaction.atomic
+def _get_connection_token_secret(token, serializer_factory, *, expire_now=True, public_key=''):
     # Serialize credential release with cancellation and competing consumers;
     # discard properties cached on the model before the lock was acquired.
     token = type(token).objects.select_for_update().get(pk=token.pk)

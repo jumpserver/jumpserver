@@ -206,5 +206,9 @@ def clean_expire_token():
 
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clear_oauth2_provider_expired_tokens():
+    """Reclaim obsolete credentials; request-time checks enforce login expiry."""
     from oauth2_provider.models import clear_expired
+    from authentication.services.client_login_session import clear_client_login_sessions
+
+    clear_client_login_sessions()
     clear_expired()

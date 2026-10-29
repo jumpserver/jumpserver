@@ -17436,3 +17436,48 @@ msgstr "目前沒有待處理帳號風險記錄。"
 #, python-format
 msgid "%(count)s account task executions were canceled."
 msgstr "%(count)s 次帳號工作執行已取消。"
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "請升級 JumpServer 用戶端後使用目前的登入策略。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "用戶端登入已失效，請重新驗證身分。"
+
+msgid "Client login session belongs to a different user"
+msgstr "用戶端登入工作階段屬於其他使用者"
+
+msgid "Client login session"
+msgstr "用戶端登入工作階段"
+
+msgid "Log in again after exiting the client"
+msgstr "退出後重新登入"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "啟用後，用戶端程序退出並重新啟動時需要重新登入。最小化或隱藏視窗不屬於退出。預設關閉。"
+
+msgid "Client login idle timeout (minute)"
+msgstr "閒置逾時（分鐘）"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "達到閒置逾時後需重新登入。0 表示不啟用（預設）。主視窗、獨立資產視窗及內建網站中的實際鍵盤、滑鼠操作會計入活動；連線在線、背景輸出和自動重新整理不算活動。Xshell、MSTSC 等外部軟體和部分跨來源內嵌頁面中的操作無法擷取。僅在這些區域操作、長時間只觀看，或網路異常導致回報失敗時，仍可能觸發閒置逾時；以伺服器最後確認的活動時間為準。"
+
+msgid "Client login lifetime (minute)"
+msgstr "登入有效期（分鐘）"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "從用戶端登入開始計時，使用者操作和權杖更新均不延長有效期。0 表示不限制登入時長（預設），退出和閒置逾時設定仍然生效。到期後需重新登入。"
+
+msgid "Client exit"
+msgstr "用戶端退出"
+
+msgid "Idle timeout"
+msgstr "閒置逾時"
+
+msgid "Maximum login time"
+msgstr "登入有效期結束"
+
+msgid "Client login policy changed"
+msgstr "用戶端登入策略已變更"
+
+msgid "Authorization revoked"
+msgstr "授權已撤銷"

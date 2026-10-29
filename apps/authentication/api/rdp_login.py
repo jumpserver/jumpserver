@@ -2,6 +2,7 @@
 import base64
 import hashlib
 import secrets
+from contextlib import nullcontext
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from uuid import uuid4
@@ -9,6 +10,7 @@ from uuid import uuid4
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -19,6 +21,7 @@ from authentication.models import ConnectionToken
 from authentication.serializers import ConnectionTokenSecretSerializer
 from authentication.serializers.connect_token_secret import _ConnectionTokenUserSerializer
 from authentication.services.connection_token import get_connection_token_secret
+from authentication.services.client_login_session import client_policy_lock
 from authentication.services.rdp_login import RDPLoginTicket, RDPLoginTicketCache
 from authentication.serializers.rdp_login import RDPLoginRedeemSerializer
 from common.permissions import IsServiceAccount
@@ -125,11 +128,11 @@ def issue_applet_ticket(token):
     }
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class RDPLoginRedeemApi(APIView):
     permission_classes = [IsServiceAccount]
     serializer_class = RDPLoginRedeemSerializer
 
-    @transaction.atomic
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -147,26 +150,33 @@ class RDPLoginRedeemApi(APIView):
             if (ticket.expires_at <= now
                     or not secrets.compare_digest(ticket.password_hash, password_hash)):
                 raise PermissionDenied(gettext('Invalid or expired RDP login authorization'))
-            applet = check_connection(token)
-            check_binding(ticket, token, applet, request.user)
-            # The ticket/token deadline only governs this exchange. Once it
-            # succeeds, local login and launch use the asset permission expiry.
-            if not ticket_cache.consume(data['username'], encoded):
-                raise PermissionDenied(gettext('RDP login ticket has already been used'))
-            # The ticket is consumed before secrets are disclosed. An uncertain
-            # outcome requires a new connection; it never reopens this ticket.
-            # Request normal token consumption without accepting client overrides;
-            # reusable-token and Kubernetes exceptions follow the shared policy.
-            connection = get_connection_token_secret(
-                token, ConnectionTokenSecretSerializer, expire_now=True,
-            )
-            # Use the final serialized authorization, including administrator overrides.
-            deadline = datetime.fromtimestamp(connection['expire_at'], tz=UTC)
-            return private_response({
-                'attempt_id': str(ticket.id), 'connection_id': str(ticket.connection_id),
-                'token_id': str(token.id), 'org_id': str(ticket.org_id),
-                'host_id': str(ticket.host_id), 'user': _ConnectionTokenUserSerializer(token.user).data,
-                'app_id': str(ticket.app_id), 'app_name': ticket.app_name,
-                'target_asset_id': str(ticket.asset_id), 'connection': connection,
-                'launch_deadline': deadline.isoformat(),
-            })
+            with client_policy_lock() if token.client_login_session_id else nullcontext():
+                token.validate_client_login_session(mutate=True)
+                # Credential consumption owns its DB transaction. Keeping an
+                # outer one here would roll back a subsequently discovered expiry.
+                return self.redeem(request, data, ticket, encoded, token)
+
+    def redeem(self, request, data, ticket, encoded, token):
+        applet = check_connection(token)
+        check_binding(ticket, token, applet, request.user)
+        # The ticket/token deadline only governs this exchange. Once it
+        # succeeds, local login and launch use the asset permission expiry.
+        if not ticket_cache.consume(data['username'], encoded):
+            raise PermissionDenied(gettext('RDP login ticket has already been used'))
+        # The ticket is consumed before secrets are disclosed. An uncertain
+        # outcome requires a new connection; it never reopens this ticket.
+        # Request normal token consumption without accepting client overrides;
+        # reusable-token and Kubernetes exceptions follow the shared policy.
+        connection = get_connection_token_secret(
+            token, ConnectionTokenSecretSerializer, expire_now=True,
+        )
+        # Use the final serialized authorization, including administrator overrides.
+        deadline = datetime.fromtimestamp(connection['expire_at'], tz=UTC)
+        return private_response({
+            'attempt_id': str(ticket.id), 'connection_id': str(ticket.connection_id),
+            'token_id': str(token.id), 'org_id': str(ticket.org_id),
+            'host_id': str(ticket.host_id), 'user': _ConnectionTokenUserSerializer(token.user).data,
+            'app_id': str(ticket.app_id), 'app_name': ticket.app_name,
+            'target_asset_id': str(ticket.asset_id), 'connection': connection,
+            'launch_deadline': deadline.isoformat(),
+        })

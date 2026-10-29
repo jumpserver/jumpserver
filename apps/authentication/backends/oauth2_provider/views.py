@@ -1,17 +1,20 @@
 from django.views.generic import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.urls import reverse
 from oauth2_provider.settings import oauth2_settings
 from typing import List, Dict, Any
-from .utils import get_or_create_jumpserver_client_application, CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX 
+from .utils import get_or_create_jumpserver_client_application
+from authentication.services.client_login_session import (
+    CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy,
+)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(cache_page(timeout=60 * 60 * 24, key_prefix=CACHE_OAUTH_SERVER_VIEW_KEY_PREFIX), name='dispatch')
+@method_decorator(never_cache, name='dispatch')
 class OAuthAuthorizationServerView(View):
     """
     OAuth 2.0 Authorization Server Metadata Endpoint
@@ -35,6 +38,8 @@ class OAuthAuthorizationServerView(View):
     def get_metadata(self, request) -> Dict[str, Any]:
         base_url = self.get_base_url(request)
         application = get_or_create_jumpserver_client_application()
+        policy = client_login_policy()
+        lifetime = client_login_lifetime(policy)
         metadata = {
             "issuer": base_url,
             "client_id": application.client_id if application else "Not found any application.",
@@ -50,12 +55,11 @@ class OAuthAuthorizationServerView(View):
             "revocation_endpoint_auth_methods_supported": ["none"],
             "code_challenge_methods_supported": ["S256"],
             "response_modes_supported": ["query"],
+            "client_login_policy": policy,
+            "client_login_expires_in": int(lifetime.total_seconds()) if lifetime else 0,
         }
-        if hasattr(oauth2_settings, 'ACCESS_TOKEN_EXPIRE_SECONDS'):
-            metadata["token_expires_in"] = oauth2_settings.ACCESS_TOKEN_EXPIRE_SECONDS
-        if hasattr(oauth2_settings, 'REFRESH_TOKEN_EXPIRE_SECONDS'):
-            if oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS:
-                metadata["refresh_token_expires_in"] = oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS
+        metadata["token_expires_in"] = CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS
+        metadata["refresh_token_expires_in"] = int(lifetime.total_seconds()) if lifetime else 0
         return metadata
     
     def get(self, request, *args, **kwargs):

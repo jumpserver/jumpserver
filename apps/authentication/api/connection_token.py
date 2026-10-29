@@ -3,6 +3,7 @@ import json
 import os
 import urllib.parse
 from collections.abc import Mapping
+from contextlib import nullcontext
 from datetime import timedelta
 from struct import pack
 
@@ -14,6 +15,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import status, serializers
 from rest_framework.decorators import action
@@ -57,6 +59,9 @@ from ..mixins import AuthFaceMixin
 from ..models import ConnectionToken, AdminConnectionToken, date_expired_default
 from ..services.connection_token import (
     get_connection_token_secret, record_connection_token_credential_audit,
+)
+from ..services.client_login_session import (
+    client_policy_lock, is_client_application, validate_access_token,
 )
 from ..utils import (
     build_absolute_uri, get_effective_connect_options,
@@ -604,11 +609,20 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         return Response(data=serializer.data)
 
     @action(methods=['POST'], detail=False)
-    @transaction.atomic
     def exchange(self, request, *args, **kwargs):
         pk = request.data.get('id', None) or request.data.get('pk', None)
         # 只能兑换自己使用的 Token
         instance = get_object_or_404(ConnectionToken, pk=pk, user=request.user)
+        with client_policy_lock():
+            # A browser login must not revive a ticket from an expired client login.
+            instance.validate_client_login_session(mutate=True)
+            session = validate_access_token(request.auth, mutate=True)
+            if session:
+                instance.client_login_session = session
+            with transaction.atomic():
+                return self.exchange_validated_token(instance, request)
+
+    def exchange_validated_token(self, instance, request):
         instance.id = None
         instance.from_ticket = None
         try:
@@ -627,6 +641,7 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         return response
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
     queryset = ConnectionToken.objects.none()
     filterset_fields = (
@@ -668,6 +683,11 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
     @transaction.atomic
     def perform_create(self, serializer):
         self.validate_serializer(serializer)
+        session = getattr(self, 'client_login_session', None)
+        if session:
+            if session.user_id != self.get_user(serializer).pk:
+                raise PermissionDenied(_('Client login session belongs to a different user'))
+            serializer.validated_data['client_login_session'] = session
         return super().perform_create(serializer)
 
     def record_personal_credential_failure(self, reason):
@@ -1208,10 +1228,13 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         try:
             # Face context creation is part of the connection/save operation.
             # If it fails, roll back both the token and any inline credential.
-            with transaction.atomic():
-                response = super().create(request, *args, **kwargs)
-                if self.need_face_verify and not is_true(request.query_params.get('acl_stepwise')):
-                    self.create_face_verify(response)
+            is_client = is_client_application(getattr(request.auth, 'application', None))
+            with client_policy_lock() if is_client else nullcontext():
+                self.client_login_session = validate_access_token(request.auth, mutate=True)
+                with transaction.atomic():
+                    response = super().create(request, *args, **kwargs)
+                    if self.need_face_verify and not is_true(request.query_params.get('acl_stepwise')):
+                        self.create_face_verify(response)
         except JMSException as e:
             failure_reason = str(e.detail.code)
             data = {'code': e.detail.code, 'detail': e.detail}
@@ -1363,12 +1386,15 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
                 or not user.has_perm('authentication.view_superconnectiontoken')):
             raise PermissionDenied()
         token_id = NonzeroUUIDField().run_validation(request.data.get('id'))
-        with transaction.atomic(), tmp_to_root_org():
+        with tmp_to_root_org():
             token = ConnectionToken.get_typed_connection_token(token_id)
             if token is None:
                 raise PermissionDenied(gettext('Invalid connection token'))
-            data = issue_applet_ticket(token)
-            return private_response(ConnectTokenAppletOptionSerializer(data).data)
+            with client_policy_lock() if token.client_login_session_id else nullcontext():
+                token.validate_client_login_session(mutate=True)
+                with transaction.atomic():
+                    data = issue_applet_ticket(token)
+                    return private_response(ConnectTokenAppletOptionSerializer(data).data)
 
     @action(methods=['POST'], detail=False, url_path='virtual-app-option')
     def get_virtual_app_info(self, *args, **kwargs):
@@ -1376,9 +1402,11 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token = get_object_or_404(ConnectionToken, pk=token_id)
         if token.is_expired:
             return Response({'error': gettext('Token expired')}, status=status.HTTP_400_BAD_REQUEST)
-        data = token.get_virtual_app_option()
-        serializer = ConnectTokenVirtualAppOptionSerializer(data)
-        return Response(serializer.data)
+        with client_policy_lock() if token.client_login_session_id else nullcontext():
+            token.validate_client_login_session(mutate=True)
+            data = token.get_virtual_app_option()
+            serializer = ConnectTokenVirtualAppOptionSerializer(data)
+            return Response(serializer.data)
 
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):

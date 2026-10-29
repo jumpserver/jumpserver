@@ -29,7 +29,7 @@ def parse_sentinels_host(sentinels_host):
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 VERSION = const.VERSION
 # Covers breaking changes across the whole server release, including Koko, Chen and Kael.
-MIN_CLIENT_VERSION = 'v5.1.0'
+MIN_CLIENT_VERSION = 'v5.2.0'
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
@@ -197,6 +197,7 @@ MIDDLEWARE = [
     'authentication.middleware.MFAMiddleware',
     'authentication.middleware.ThirdPartyLoginMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
+    'authentication.client_session_middleware.ClientLoginSessionExpiryMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     'jumpserver.middleware.SafeRedirectMiddleware',
     *POST_CUSTOM_MIDDLEWARES,

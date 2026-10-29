@@ -66,6 +66,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.token = Mock(
             id=uuid4(), pk=uuid4(), user=self.user, user_id=self.user.id,
             org_id=uuid4(), asset_id=uuid4(), is_reusable=False,
+            client_login_session_id=None,
             personal_credential_id=None, face_monitor_token='', type=ConnectionTokenType.USER,
             date_expired=self.now + timedelta(minutes=10),
             connect_method_object={'type': 'applet', 'value': 'weblite'},
@@ -110,8 +111,8 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             patch.object(token_api, 'tmp_to_root_org', side_effect=nullcontext),
             patch.object(api.transaction, 'atomic', side_effect=nullcontext),
             patch.object(api.timezone, 'now', return_value=self.now),
-            patch.object(api, 'get_connection_token_secret', token_service.get_connection_token_secret.__wrapped__),
-            patch.object(token_api, 'get_connection_token_secret', token_service.get_connection_token_secret.__wrapped__),
+            patch.object(token_service, '_get_connection_token_secret',
+                         token_service._get_connection_token_secret.__wrapped__),
         ]:
             context.start()
             self.addCleanup(context.stop)
@@ -121,7 +122,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         view = view_type()
         request = SimpleNamespace(user=user, data=data, authenticators=[])
         view.check_permissions(request)
-        return view.post.__wrapped__(view, request)
+        return view.post(request)
 
     def consume_ticket(self):
         if self.consumed:
