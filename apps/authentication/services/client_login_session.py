@@ -35,6 +35,25 @@ class ClientSessionExpired(AuthenticationFailed):
         super().__init__()
         self.session_id = session.pk if session else None
         self.client_login_reason = getattr(session, 'client_login_reason', None) or 'unknown'
+        self.client_login_session = client_login_session_data(session) if session else None
+
+
+def client_login_session_data(session, *, policy=None):
+    """Serialize the already validated session without another policy/session query."""
+    policy = policy if policy is not None else session.client_login_policy
+    idle_expires_at = (session.last_activity_at + timedelta(minutes=policy['max_idle_time'])
+                       if policy['max_idle_time'] else None)
+    if session.revoked_at is not None and session.revoke_reason == 'idle_timeout':
+        # The original idle policy is not stored. Only this validation can prove
+        # its deadline; historical revocations must not borrow a newer setting.
+        idle_expires_at = getattr(session, 'client_login_idle_expires_at', None)
+    return {
+        'authenticated_at': session.authenticated_at.isoformat(),
+        'expires_at': session.expires_at.isoformat() if session.expires_at else None,
+        'last_activity_at': session.last_activity_at.isoformat(),
+        'idle_expires_at': idle_expires_at.isoformat() if idle_expires_at else None,
+        'server_time': timezone.now().isoformat(),
+    }
 
 
 def client_session_receipt(application_id, token_family, token):
@@ -136,6 +155,7 @@ def revoke_session(session, reason='logout'):
 
 
 def _session_is_valid(session, policy, now, *, mutate=False):
+    session.client_login_policy = policy
     if session.revoked_at is not None:
         session.client_login_reason = (session.revoke_reason if session.revoke_reason in
                                        ClientLoginSession.RevokeReason.values else None)
@@ -153,6 +173,7 @@ def _session_is_valid(session, policy, now, *, mutate=False):
         reason = 'absolute_timeout'
     elif policy['max_idle_time'] and now >= session.last_activity_at + timedelta(minutes=policy['max_idle_time']):
         reason = 'idle_timeout'
+        session.client_login_idle_expires_at = session.last_activity_at + timedelta(minutes=policy['max_idle_time'])
     session.client_login_reason = reason
     if reason:
         if mutate:
@@ -190,10 +211,10 @@ def _validate_family(application, user_id, family, *, touch=False, mutate=False)
     session = queryset.filter(
         application=application, token_family=family,
     ).first() if family else None
-    if session is None:
+    if session is None or session.user_id != user_id:
         # Every desktop authorization needs its own server-owned login record.
         return None, False
-    valid = session.user_id == user_id and _session_is_valid(session, policy, timezone.now(), mutate=mutate)
+    valid = _session_is_valid(session, policy, timezone.now(), mutate=mutate)
     if valid and touch:
         # No client timestamp and no backdating. Validate BEFORE touching idle time.
         now = timezone.now()
@@ -223,7 +244,8 @@ def validate_refresh_token_session(refresh):
     if not is_client_application(refresh.application):
         return True
     with client_policy_lock(), transaction.atomic():
-        _, valid = _validate_family(refresh.application, refresh.user_id, refresh.token_family, mutate=True)
+        session, valid = _validate_family(refresh.application, refresh.user_id, refresh.token_family, mutate=True)
+        refresh.client_login_session = session
         return valid
 
 

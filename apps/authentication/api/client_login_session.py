@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from common.permissions import IsValidUser
 from authentication.backends.drf import OAuth2Authentication
 from authentication.services.client_login_session import (
-    is_client_application, revoke_session, validate_access_token,
+    client_login_session_data, is_client_application, revoke_session, validate_access_token,
 )
 
 
@@ -24,12 +24,15 @@ class ClientSessionActivityView(APIView):
         # Authentication validates the login, but only POST renews idle time.
         if not is_client_application(request.auth.application):
             return Response({'detail': 'Desktop client authorization required.'}, status=403)
-        return Response(status=204, headers={'Cache-Control': 'no-store'})
+        session = request.client_login_session
+        return Response({
+            'client_login_policy': session.client_login_policy,
+            'client_login_session': client_login_session_data(session),
+        }, headers={'Cache-Control': 'no-store'})
 
     def post(self, request):
-        if not is_client_application(request.auth.application):
-            return Response({'detail': 'Desktop client authorization required.'}, status=403)
-        return Response(status=204)
+        # ClientActivityAuthentication already validated and recorded this activity.
+        return self.get(request)
 
 
 class ClientSessionRevokeView(ClientSessionActivityView):

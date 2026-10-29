@@ -10,12 +10,24 @@ from oauthlib.oauth2 import InvalidGrantError, InvalidRequestError
 
 from authentication.models.client_login_session import ClientLoginSession
 from authentication.services.client_login_session import (
-    CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy, is_client_application,
-    revoke_session, validate_refresh_token_session, client_session_receipt,
+    CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy, client_login_session_data,
+    is_client_application, revoke_session, validate_refresh_token_session, client_session_receipt,
 )
 
 
 AUTHENTICATED_AT_CLAIM = '_jumpserver_client_authenticated_at'
+
+
+class ClientSessionInvalidGrant(InvalidGrantError):
+    def __init__(self, session):
+        super().__init__(description='Client login session expired.')
+        self.session = session
+
+    @property
+    def twotuples(self):
+        return [*super().twotuples,
+                ('client_login_reason', self.session.client_login_reason),
+                ('client_login_session', client_login_session_data(self.session))]
 
 
 class ClientOAuth2Validator(OAuth2Validator):
@@ -23,17 +35,18 @@ class ClientOAuth2Validator(OAuth2Validator):
         if not is_client_application(request.client):
             return super()._save_bearer_token(token, request, *args, **kwargs)
 
-        policy = client_login_policy()
         token['expires_in'] = CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS
-        lifetime = client_login_lifetime(policy)
         authenticated_at = getattr(request, 'client_authenticated_at', None)
         refresh = getattr(request, 'refresh_token_instance', None)
-        session = None
+        session = getattr(refresh, 'client_login_session', None)
         if refresh is not None:
-            session = ClientLoginSession.objects.filter(
-                application=request.client, token_family=refresh.token_family,
-            ).first()
+            if session is None:
+                session = ClientLoginSession.objects.filter(
+                    application=request.client, token_family=refresh.token_family,
+                ).first()
             authenticated_at = session.authenticated_at if session else None
+        policy = getattr(session, 'client_login_policy', None) or client_login_policy()
+        lifetime = client_login_lifetime(policy)
         # Freeze the page policy deadline at login. Editing a policy revokes the
         # existing sessions; automatic refresh never extends a login.
         expires_at = session.expires_at if session else None
@@ -68,8 +81,10 @@ class ClientOAuth2Validator(OAuth2Validator):
         token['client_login_expires_at'] = expires_at.isoformat() if expires_at else None
         # Return the policy used by this actual, serialized token issuance.
         token['client_login_policy'] = policy
+        session = session or request.client_login_session
+        token['client_login_session'] = client_login_session_data(session, policy=policy)
         token['client_login_session_receipt'] = client_session_receipt(
-            request.client.pk, session.token_family if session else request.client_login_token_family, token,
+            request.client.pk, session.token_family, token,
         )
         return result
 
@@ -110,7 +125,14 @@ class ClientOAuth2Validator(OAuth2Validator):
     def validate_refresh_token(self, refresh_token, client, request, *args, **kwargs):
         if not super().validate_refresh_token(refresh_token, client, request, *args, **kwargs):
             return False
-        return validate_refresh_token_session(request.refresh_token_instance)
+        refresh = request.refresh_token_instance
+        valid = validate_refresh_token_session(refresh)
+        session = getattr(refresh, 'client_login_session', None)
+        if not valid and session and session.client_login_reason:
+            # The valid credential already identified its session. Reuse it for
+            # the error detail instead of resolving the receipt a second time.
+            raise ClientSessionInvalidGrant(session)
+        return valid
 
     def _create_refresh_token(self, request, refresh_token_code, access_token, previous_refresh_token):
         refresh = super()._create_refresh_token(request, refresh_token_code, access_token, previous_refresh_token)
@@ -118,12 +140,11 @@ class ClientOAuth2Validator(OAuth2Validator):
             authenticated_at = getattr(request, 'client_authenticated_at', None)
             if authenticated_at is None:
                 raise InvalidGrantError(description='Client login authorization is required.')
-            ClientLoginSession.objects.create(
+            request.client_login_session = ClientLoginSession.objects.create(
                 user=request.user, application=request.client, token_family=refresh.token_family,
                 authenticated_at=authenticated_at, last_activity_at=authenticated_at,
                 expires_at=request.client_login_expires_at,
             )
-            request.client_login_token_family = refresh.token_family
         return refresh
 
     def revoke_token(self, token, token_type_hint, request, *args, **kwargs):

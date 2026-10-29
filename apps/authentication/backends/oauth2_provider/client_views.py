@@ -10,7 +10,8 @@ from oauth2_provider.models import get_application_model
 from oauth2_provider.views import AuthorizationView, RevokeTokenView, TokenView
 
 from authentication.services.client_login_session import (
-    client_policy_enabled, client_policy_lock, expired_session_from_receipt, is_client_application,
+    client_login_session_data, client_policy_enabled, client_policy_lock,
+    expired_session_from_receipt, is_client_application,
 )
 
 
@@ -55,13 +56,14 @@ class ClientTokenView(TokenView):
             response = super().post(request, *args, **kwargs)
             if response.status_code == 400 and request.POST.get('grant_type') == 'refresh_token':
                 data = json.loads(response.content)
-                if data.get('error') == 'invalid_grant':
+                if data.get('error') == 'invalid_grant' and not data.get('client_login_reason'):
                     session = expired_session_from_receipt(
                         request.POST.get('client_login_session_receipt'), request.POST.get('refresh_token'),
                         'refresh_token', client_id=request.POST.get('client_id', ''),
                     )
                     if session and session.client_login_reason:
                         data['client_login_reason'] = session.client_login_reason
+                        data['client_login_session'] = client_login_session_data(session)
                         response.content = json.dumps(data)
             return response
 
