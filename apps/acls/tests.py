@@ -51,8 +51,8 @@ class AssetReviewExemptionTests(SimpleTestCase):
         self.query.return_value.first.return_value = self.acl
         patch('acls.models.login_asset_acl.tmp_to_org', side_effect=lambda org: nullcontext()).start()
         patch.object(LoginAssetACL, 'get_review_assignees', return_value=[Mock()]).start()
-        patch('authentication.api.connection_token.get_request_os', return_value='linux').start()
-        patch('authentication.api.connection_token.ConnectMethodUtil.get_connect_method', return_value=None).start()
+        patch('authentication.services.connection_token.get_request_os', return_value='linux').start()
+        patch('authentication.services.connection_token.ConnectMethodUtil.get_connect_method', return_value=None).start()
         self.addCleanup(patch.stopall)
 
     def test_commit_rollback_and_fixed_expiry(self):
@@ -177,7 +177,7 @@ class AssetReviewExemptionTests(SimpleTestCase):
         account = SimpleNamespace(username='root')
         with patch.object(LoginAssetACL, 'filter_queryset'), \
                 patch.object(LoginAssetACL, 'get_match_rule_acls', return_value=self.policy) as match, \
-                patch('authentication.api.connection_token.get_request_ip_or_data', return_value='127.0.0.1'):
+                patch('authentication.services.connection_token.get_request_ip_or_data', return_value='127.0.0.1'):
             context = view._validate_acl(self.user, self.asset, account, 'web_cli', 'ssh')
             self.assertEqual(context['requirements'], {'review': 'pending'})
             self.assertEqual(context['review_acls'], [str(self.acl.pk)])
@@ -205,7 +205,7 @@ class AssetReviewExemptionTests(SimpleTestCase):
         view.request = SimpleNamespace(query_params={}, META={}, user=self.user)
         view._record_operate_log = Mock()
         with patch.object(LoginAssetACL, 'filter_queryset', return_value=[self.acl, reject]), \
-                patch('authentication.api.connection_token.get_request_ip_or_data') as request_ip, \
+                patch('authentication.services.connection_token.get_request_ip_or_data') as request_ip, \
                 patch('common.utils.timezone.local_now') as now:
             for ip, hour, allowed in [('192.0.2.10', 9, True), ('192.0.2.11', 9, False), ('192.0.2.10', 12, False)]:
                 request_ip.return_value = ip

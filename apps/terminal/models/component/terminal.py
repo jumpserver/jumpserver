@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from common.const.signals import OP_LOG_SKIP_SIGNAL
 from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
+from common.utils.mcp import get_mcp_authorization_server
 from orgs.utils import tmp_to_root_org
 from settings.models import get_chat_ai_config
 from terminal.const import TerminalType as TypeChoices
@@ -150,6 +151,12 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_login_title_setting())
         if self.type == TypeChoices.kael:
             configs.update(self.get_chat_ai_setting())
+        if self.type == TypeChoices.koko:
+            configs.update({
+                'MCP_ENABLED': settings.MCP_ENABLED,
+                'MCP_PUBLIC_URL': settings.MCP_PUBLIC_URL,
+                'MCP_AUTHORIZATION_SERVER': get_mcp_authorization_server() if settings.MCP_ENABLED else '',
+            })
         configs.update(self.get_xpack_license())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,

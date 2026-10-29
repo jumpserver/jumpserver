@@ -1,0 +1,73 @@
+{% extends '_base_only_content.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Agent connection authorization' %}{% endblock %}
+{% block content %}
+<p>{{ session.requested.asset_id }} · {{ session.requested.account }} · {{ session.requested.protocol }}</p>
+<p>{% trans 'Only your current asset permissions and connection policies apply. Complete the required steps here, then return to your Agent.' %}</p>
+{% if action %}<p>{% trans 'This opens a separate controlled terminal. Commands and recordings appear in the terminal session audit.' %}</p>{% endif %}
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if state.error %}<div class="alert alert-danger">{{ state.error }}</div>{% endif %}
+{% if terminal_url %}
+<p id="agent-monitor-status" data-failed-message="{% trans 'Monitoring stopped. Request a new controlled terminal to continue.' %}">{% trans 'Keep this page and camera open. The terminal starts after live monitoring is ready; monitoring failure closes the terminal.' %}</p>
+<iframe id="agent-face-monitor" title="{% trans 'Live face monitoring' %}" src="/luna/facelive/monitor?token={{ token.face_monitor_token }}" allow="camera" width="100%" height="420"></iframe>
+<iframe id="agent-human-terminal" title="{% trans 'Controlled terminal' %}" data-url="{{ terminal_url }}" width="100%" height="640"></iframe>
+<script>
+(function () {
+    const monitor = document.getElementById('agent-face-monitor');
+    const terminal = document.getElementById('agent-human-terminal');
+    let started = false, failed = false;
+    window.addEventListener('message', function (event) {
+        if (event.origin !== window.location.origin || event.source !== monitor.contentWindow) return;
+        const message = event.data;
+        if (!message || typeof message !== 'object' || message.source !== 'jumpserver-facelive' || message.mode !== 'monitor') return;
+        const flow = message.flow;
+        if (['client_error', 'monitor_init_failed', 'monitor_away_timeout'].includes(message.event) || (flow && flow.finished === true)) {
+            failed = true;
+            terminal.src = 'about:blank';
+            const status = document.getElementById('agent-monitor-status');
+            status.textContent = status.dataset.failedMessage;
+            return;
+        }
+        if (!started && !failed && message.event === 'monitor_started' && flow && flow.mode === 'monitor' && flow.phase === 'monitoring' && flow.finished !== true) {
+            started = true;
+            terminal.src = terminal.dataset.url;
+        }
+    });
+}());
+</script>
+{% else %}
+{% if not token %}
+<form method="post">{% csrf_token %}
+<input type="hidden" name="operation" value="credentials">
+{% if action %}<input type="hidden" name="action" value="{{ action.id }}">{% endif %}
+{% if session.requested.requires_credentials %}
+{% if session.requested.account == '@INPUT' %}<label>{% trans 'Username' %}<input class="form-control" name="input_username" autocomplete="username" maxlength="128"></label>{% endif %}
+<label>{% trans 'Password or private key' %}<textarea class="form-control" name="input_secret" autocomplete="off" maxlength="40960" required></textarea></label>
+<select class="form-control" name="input_secret_type"><option value="password">{% trans 'Password' %}</option><option value="ssh_key">{% trans 'SSH private key' %}</option></select>
+{% endif %}
+<button class="btn btn-primary" type="submit">{% trans 'Continue connection' %}</button>
+</form>
+{% else %}
+<p>{{ session.status }}</p>
+{% for step, status in state.requirements.items %}
+<p>{{ step }}: {{ status }}</p>
+{% if status == 'pending' %}
+<form method="post">{% csrf_token %}<input type="hidden" name="step" value="{{ step }}">
+{% if action %}<input type="hidden" name="action" value="{{ action.id }}">{% endif %}
+{% if step == 'reason' %}<textarea class="form-control" name="reason" maxlength="4096" required></textarea>{% endif %}
+{% if step == 'mfa' %}
+<select class="form-control" name="mfa_type">{% for method in state.mfa_methods %}<option value="{{ method.value }}">{{ method.label }}</option>{% endfor %}</select>
+<input class="form-control" name="mfa_code" autocomplete="one-time-code"><button class="btn btn-default" name="mfa_send" value="true">{% trans 'Send verification code' %}</button>
+{% endif %}
+{% if step == 'face' %}<button class="btn btn-default" name="retry_face" value="true">{% trans 'Start face verification' %}</button>{% if state.face_token %}<iframe title="{% trans 'Face verification' %}" src="/luna/facelive/capture?token={{ state.face_token }}" allow="camera" width="100%" height="360"></iframe>{% endif %}{% endif %}
+<button class="btn btn-primary" type="submit">{% trans 'Continue' %}</button>
+</form>
+{% endif %}
+{% endfor %}
+{% if token.from_ticket_id %}<a href="/ui/#/tickets/tickets/{{ token.from_ticket_id }}">{% trans 'Open approval ticket' %}</a>{% endif %}
+<form method="post">{% csrf_token %}{% if action %}<input type="hidden" name="action" value="{{ action.id }}">{% endif %}<button class="btn btn-default">{% trans 'Refresh authorization' %}</button></form>
+{% endif %}
+{% endif %}
+<form method="post">{% csrf_token %}<button class="btn btn-danger" name="operation" value="revoke">{% trans 'Revoke this Agent authorization' %}</button></form>
+<p><a href="/core/auth/agent/audit/sessions/{{ session.id }}/?oid={{ session.org_id }}">{% trans 'View audit' %}</a></p>
+{% endblock %}

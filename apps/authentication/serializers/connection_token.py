@@ -154,7 +154,11 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        if request:
+        if self.context.get('verified_remote_addr') is not None:
+            # Set only by the internal connection service after component
+            # authentication, never from a submitted serializer field.
+            validated_data['remote_addr'] = self.context['verified_remote_addr']
+        elif request:
             validated_data['remote_addr'] = get_request_ip_or_data(request)
         return super().create(validated_data)
 

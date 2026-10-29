@@ -20,6 +20,7 @@ router.register('admin-connection-token', api.AdminConnectionTokenViewSet, 'admi
 router.register('confirm', api.UserConfirmationViewSet, 'confirm')
 router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
+router.register('agent-clients', api.AgentClientViewSet, 'agent-client')
 
 urlpatterns = [
     path('client-login-session/activity/', ClientSessionActivityView.as_view(), name='client-login-session-activity'),

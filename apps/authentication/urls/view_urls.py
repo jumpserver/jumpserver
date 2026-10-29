@@ -7,10 +7,16 @@ from django.urls import path, include
 
 from users import views as users_view
 from .. import views
+from terminal.agent_views import AgentSessionView, AgentAuditView
 
 app_name = 'authentication'
 
 urlpatterns = [
+    path('agent/session/<uuid:session_id>/', AgentSessionView.as_view(), name='agent-session'),
+    path('agent/audit/sessions/', AgentAuditView.as_view(kind='sessions')),
+    path('agent/audit/sessions/<uuid:object_id>/', AgentAuditView.as_view(kind='sessions')),
+    path('agent/audit/actions/', AgentAuditView.as_view(kind='actions')),
+    path('agent/audit/actions/<uuid:object_id>/', AgentAuditView.as_view(kind='actions')),
     # login
     path('login/', non_atomic_requests(views.UserLoginView.as_view()), name='login'),
     path('login/mfa/', views.UserLoginMFAView.as_view(), name='login-mfa'),
