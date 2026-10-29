@@ -1,13 +1,11 @@
 import json
 import time
 from datetime import timedelta
-from io import StringIO
 from unittest.mock import patch
 
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import call_command
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import resolve, reverse
 from django.utils import timezone
@@ -17,6 +15,7 @@ from redis.exceptions import RedisError
 
 from authentication.backends.oauth2_provider import agent_registration as registration
 from authentication.backends.oauth2_provider.agent import AgentAuthorizationServerView
+from authentication.services import agent_clients
 from common.utils.lock import DistributedLock
 from terminal.models import AgentApplication
 from users.models import User
@@ -158,6 +157,49 @@ class AgentClientRegistrationTests(TestCase):
             application=referenced, user=User.objects.create(username='dcr-token-user'),
             token='dcr-cleanup-test', scope='agent:access', expires=timezone.now() + timedelta(minutes=5),
         )
-        call_command('cleanup_agent_oauth_clients', stdout=StringIO())
+        registration_id = unused.agent_registration.pk
+        deleted = []
+        result = agent_clients.cleanup_agent_oauth_clients(on_delete=deleted.append)
+        self.assertEqual(result, {'scanned': 1, 'deleted': 1, 'skipped': 0})
+        self.assertEqual(deleted, [{'id': registration_id, 'client_id': unused.client_id, 'name': unused.name}])
         self.assertFalse(self.Application.objects.filter(pk=unused.pk).exists())
         self.assertEqual(self.Application.objects.filter(pk__in=[authorized.pk, referenced.pk, other.pk, recent.pk]).count(), 4)
+
+    def test_cleanup_batch_skips_old_references_before_limiting(self):
+        referenced, first, second = [self.application() for _ in range(3)]
+        self.Application.objects.filter(pk=referenced.pk).update(created=timezone.now() - timedelta(days=10))
+        self.Application.objects.filter(pk__in=[first.pk, second.pk]).update(created=timezone.now() - timedelta(days=8))
+        get_access_token_model().objects.create(
+            application=referenced, user=User.objects.create(username='cleanup-limit-user'),
+            token='dcr-cleanup-limited', scope='agent:access', expires=timezone.now() + timedelta(minutes=5),
+        )
+        for _ in range(2):
+            self.assertEqual(agent_clients.cleanup_agent_oauth_clients(limit=1),
+                             {'scanned': 1, 'deleted': 1, 'skipped': 0})
+        self.assertTrue(self.Application.objects.filter(pk=referenced.pk).exists())
+        self.assertFalse(self.Application.objects.filter(pk__in=[first.pk, second.pk]).exists())
+
+    def test_cleanup_coordination_validation_and_callback_rollback(self):
+        unused = self.application()
+        self.Application.objects.filter(pk=unused.pk).update(created=timezone.now() - timedelta(days=8))
+        for kwargs in ({'limit': 0}, {'limit': 1001}, {'limit': True}, {'older_than_days': 0}, {'older_than_days': 3651}):
+            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                agent_clients.cleanup_agent_oauth_clients(**kwargs)
+        lock = DistributedLock(registration.REGISTRATION_LOCK, expire=5)
+        self.assertTrue(lock.acquire(blocking=False))
+        try:
+            with self.assertRaises(agent_clients.AgentClientCleanupBusy):
+                agent_clients.cleanup_agent_oauth_clients()
+        finally:
+            lock.release()
+        with patch.object(agent_clients, 'DistributedLock', side_effect=RedisError):
+            with self.assertRaises(agent_clients.AgentClientCleanupUnavailable):
+                agent_clients.cleanup_agent_oauth_clients()
+
+        def reject_audit(client):
+            self.assertEqual(client['client_id'], unused.client_id)
+            raise RuntimeError('audit unavailable')
+
+        with self.assertRaisesMessage(RuntimeError, 'audit unavailable'):
+            agent_clients.cleanup_agent_oauth_clients(on_delete=reject_audit)
+        self.assertTrue(self.Application.objects.filter(pk=unused.pk).exists())

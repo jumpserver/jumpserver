@@ -127,10 +127,14 @@ Agent access tokens are rejected as ordinary Core API bearer credentials.
 
 Disabling DCR stops new registrations and removes registration discovery. It does
 not revoke existing grants or stop the MCP service. Clients revoke their grants
-through the advertised OAuth revocation endpoint. Administrators can disable an
-Agent client using `python apps/manage.py disable_agent_oauth_client --client-id <CLIENT_ID>`.
+through the advertised OAuth revocation endpoint. In **System Settings > Feature
+Settings > Agent / MCP**, platform administrators can list and search clients,
+filter their status and disable a client. The list shows its name, client ID,
+registration time and first authorization time. Disabling affects all users of
+that client and preserves its authorization records and execution history.
 Disabled registrations cannot authorize further execution. This control is
-separate from cancelling an action or closing an asset session.
+separate from cancelling an action or closing an asset session; re-enabling and
+general-purpose client deletion are not exposed.
 Koko rechecks idle sessions too, including database connections with open
 transactions. Its maintenance loop starts batches at least five seconds apart,
 checks up to 16 sessions with one-second request and five-second batch budgets,
@@ -138,11 +142,26 @@ and closes connections on explicit authorization denial or missing sessions.
 Transient service failures are retried; new dispatch still requires Core.
 Batching and network delays mean this is not a five-second node-wide guarantee.
 
-Run `python apps/manage.py cleanup_agent_oauth_clients` to remove a bounded batch
-of never-authorized dynamic registrations. Defaults are at most 100 candidates
-older than seven days. Related grants, tokens, sessions or audit records prevent
-deletion. Authorized clients and execution history are retained. Scheduling this
-maintenance is a deployment responsibility.
+The page's **Clean up unused clients** action removes a bounded batch of
+never-authorized dynamic registrations older than seven days, considering at
+most 100 eligible clients per call. Related grants, tokens, sessions or audit
+records prevent deletion; the service rechecks these references under the same
+lock order used by authorization. Authorized clients and execution history are
+retained. The response reports scanned, deleted and skipped counts.
+
+The existing scheduled OAuth token cleanup also invokes this same maintenance
+service and records its summary in task logs. No extra deployment schedule or
+management command is needed. Registration coordination failures leave records
+for a later attempt.
+
+The management API is `/api/v1/authentication/agent-clients/`: GET lists clients,
+POST `{id}/disable/` disables one client and POST `cleanup/` runs the fixed cleanup
+batch. Listing supports pagination, `search` and `is_active` filters. All actions,
+including metadata, require `settings.change_auth` through a **system role**;
+an organization role or organization header cannot grant this global authority.
+Manual disable and cleanup record the operator, source IP, target client and
+result in system-organization operation logs. These APIs use normal Core user
+authentication, not Koko component credentials or Agent MCP tokens.
 
 ## Component authorization boundary
 

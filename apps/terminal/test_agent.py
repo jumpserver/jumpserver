@@ -214,20 +214,23 @@ class AgentBoundaryTests(TestCase):
             view.redirect(callback + '?code=not-issued', self.app)
 
     def test_disable_client_revokes_agent_access_without_touching_other_apps(self):
-        from io import StringIO
-        from django.core.management import call_command
-        from django.core.management.base import CommandError
+        from rest_framework.test import APIRequestFactory, force_authenticate
+        from authentication.api.agent_client import AgentClientViewSet
+        from rbac.models import Permission, Role
 
+        role = Role.objects.create(name='Agent boundary client manager', scope='system')
+        role.permissions.add(Permission.objects.get(content_type__app_label='settings', codename='change_auth'))
+        self.user.system_roles.add(role)
         other = get_application_model().objects.create(
             name='Other OAuth application', client_id='other-oauth', client_type='public',
             authorization_grant_type='authorization-code',
         )
-        for client_id in ('unknown-agent', other.client_id):
-            with self.subTest(client_id=client_id), self.assertRaises(CommandError):
-                call_command('disable_agent_oauth_client', client_id=client_id, stdout=StringIO())
-        self.assertTrue(AgentApplication.objects.get(application=self.app).is_active)
+        registration = AgentApplication.objects.get(application=self.app)
+        request = APIRequestFactory().post('/api/v1/authentication/agent-clients/disable/')
+        force_authenticate(request, user=self.user)
+        response = AgentClientViewSet.as_view({'post': 'disable'})(request, pk=str(registration.pk))
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(get_application_model().objects.filter(pk=other.pk).exists())
-        call_command('disable_agent_oauth_client', client_id=self.app.client_id, stdout=StringIO())
         with self.assertRaises(PermissionDenied):
             service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
         with self.assertRaises(PermissionDenied):

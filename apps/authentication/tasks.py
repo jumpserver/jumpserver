@@ -217,4 +217,14 @@ def clean_expire_token():
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clear_oauth2_provider_expired_tokens():
     from oauth2_provider.models import clear_expired
+    from authentication.services.agent_clients import (
+        AgentClientCleanupBusy, AgentClientCleanupUnavailable, cleanup_agent_oauth_clients,
+    )
+
     clear_expired()
+    try:
+        result = cleanup_agent_oauth_clients()
+    except (AgentClientCleanupBusy, AgentClientCleanupUnavailable) as exc:
+        logging.warning('Skipped unused Agent OAuth client cleanup: %s', exc)
+        return
+    logging.info('Unused Agent OAuth client cleanup: %s', result)
