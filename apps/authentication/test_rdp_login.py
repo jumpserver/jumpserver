@@ -1,7 +1,7 @@
 """Core/Tinker v2 authorization decisions, without a Windows host or database."""
 import secrets
 from contextlib import nullcontext
-from datetime import timedelta
+from datetime import datetime, timedelta
 from dataclasses import replace
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
@@ -110,6 +110,8 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             patch.object(token_api, 'tmp_to_root_org', side_effect=nullcontext),
             patch.object(api.transaction, 'atomic', side_effect=nullcontext),
             patch.object(api.timezone, 'now', return_value=self.now),
+            patch.object(api, 'get_connection_token_secret', token_service.get_connection_token_secret.__wrapped__),
+            patch.object(token_api, 'get_connection_token_secret', token_service.get_connection_token_secret.__wrapped__),
         ]:
             context.start()
             self.addCleanup(context.stop)
@@ -131,7 +133,9 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         with patch.object(ConnectionToken, 'get_typed_connection_token', return_value=self.token) as get_token, \
                 patch.object(api, 'get_object_or_404', side_effect=[self.applet, self.host]), \
                 patch.object(api, 'ConnectionTokenSecretSerializer') as serializer, \
+                patch.object(type(self.token), 'objects', create=True) as token_objects, \
                 patch.object(ConnectionToken.objects, 'filter'):
+            token_objects.select_for_update.return_value.get.return_value = self.token
             serializer.return_value.data = self.connection_data
             if serializer_factory is not None:
                 serializer.side_effect = serializer_factory
@@ -154,7 +158,9 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         )
         with patch.object(ConnectionToken, 'get_typed_connection_token', return_value=self.token), \
                 patch.object(SuperConnectionTokenViewSet, 'get_serializer') as serializer, \
+                patch.object(type(self.token), 'objects', create=True) as token_objects, \
                 patch.object(ConnectionToken.objects, 'filter'):
+            token_objects.select_for_update.return_value.get.return_value = self.token
             serializer.return_value.data = self.connection_data
             return SuperConnectionTokenViewSet().get_secret_detail(request)
 
@@ -205,6 +211,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             id=self.user.id, name='管理员', username='admin', email='admin@example.test',
             is_active=True, date_expired=self.now + timedelta(days=1),
         )
+        self.user._is_superuser = True
         asset = Asset(
             id=self.token.asset_id, name='application', is_active=True,
             platform=Platform(id=1, name='Windows', category='host', type='windows'),
@@ -227,6 +234,7 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         for context in [
             patch.object(AdminConnectionToken, 'get_asset_accounts_by_alias', return_value=self.account),
             patch('acls.models.ConnectMethodACL.is_method_allowed', return_value=True),
+            patch('authentication.services.connection_acl.validate_connection_policy'),
             patch.object(self.token, 'save'),
         ]:
             context.start()
@@ -258,7 +266,8 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.assertEqual(connection['expire_at'], int((self.now + timedelta(days=365)).timestamp()))
         self.assertEqual(connection['account']['username'], 'Administrator')
         self.assertEqual(connection['account']['secret'], 'target-secret')
-        self.assertEqual(response.data['launch_deadline'], (self.now + timedelta(days=5)).isoformat())
+        deadline = datetime.fromisoformat(response.data['launch_deadline'])
+        self.assertEqual(deadline.timestamp(), connection['expire_at'])
         self.assertTrue(self.consumed)
         self.token.save.assert_called_once_with(update_fields=['date_expired'])
         self.user_permission.assert_not_called()
@@ -363,13 +372,22 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
         self.ticket = replace(self.ticket, expires_at=self.token.date_expired)
         response = self.redeem()
         self.assertNotIn('login_deadline', response.data)
-        self.assertEqual(response.data['launch_deadline'], self.account.date_expired.isoformat())
+        deadline = datetime.fromisoformat(response.data['launch_deadline'])
+        self.assertEqual(deadline.timestamp(), self.connection_data['expire_at'])
 
     def test_post_exchange_authorization_still_respects_asset_permission_expiry(self):
         self.account.date_expired = self.now + timedelta(seconds=20)
+        self.connection_data['expire_at'] = int(self.account.date_expired.timestamp())
         response = self.redeem()
         self.assertNotIn('login_deadline', response.data)
-        self.assertEqual(response.data['launch_deadline'], self.account.date_expired.isoformat())
+        deadline = datetime.fromisoformat(response.data['launch_deadline'])
+        self.assertEqual(deadline.timestamp(), self.connection_data['expire_at'])
+
+    def test_launch_deadline_uses_final_connection_expiry(self):
+        self.connection_data['expire_at'] = int((self.now + timedelta(seconds=20)).timestamp())
+        response = self.redeem()
+        deadline = datetime.fromisoformat(response.data['launch_deadline'])
+        self.assertEqual(deadline.timestamp(), self.connection_data['expire_at'])
 
     def test_ticket_expiring_during_validation_does_not_disclose_secrets(self):
         self.cache.consume.side_effect = None
@@ -407,7 +425,8 @@ class RDPLoginAuthorizationTests(SimpleTestCase):
             'username': self.user.username, 'email': self.user.email,
         })
         self.assertNotIn('login_deadline', response.data)
-        self.assertEqual(response.data['launch_deadline'], self.account.date_expired.isoformat())
+        deadline = datetime.fromisoformat(response.data['launch_deadline'])
+        self.assertEqual(deadline.timestamp(), self.connection_data['expire_at'])
         self.assertEqual(response.data['connection'], self.connection_data)
         self.assertNotIn('launch_grant', response.data)
         self.assertEqual(response['Pragma'], 'no-cache')
