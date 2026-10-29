@@ -188,7 +188,7 @@ class CredentialApplicationBinding(JMSOrgBaseModel):
 class CredentialClientInstance(JMSOrgBaseModel):
     class Type(models.TextChoices):
         sdk = 'sdk', _('SDK')
-        agent = 'agent', _('Agent')
+        agent = 'agent', _('PAM Agent')
 
     is_anonymous = False
 

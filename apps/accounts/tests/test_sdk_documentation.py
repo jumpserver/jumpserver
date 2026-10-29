@@ -27,6 +27,7 @@ class SDKDocumentationTests(SimpleTestCase):
         result = materials(application, {
             'type': 'agent', 'app_user': 'orders', 'install_path': '/opt/jumpserver-pam',
             'delivery_mode': 'json', 'systemd_unit': '', 'systemd_action': '',
+            'store_scope': 'all', 'store_format': 'json',
         }, 'https://example.com')
         self.assertIn('https://example.com/api/v1/accounts/client-source/agent/', result['install_command'])
         self.assertIn('go -C ', result['install_command'])
@@ -40,7 +41,7 @@ class SDKDocumentationTests(SimpleTestCase):
             'go': ('go/go.mod', 'go/client.go'),
             'java': ('java/pom.xml', 'java/src/main/java/org/jumpserver/pam/Client.java'),
             'node': ('node/package.json', 'node/index.js'),
-            'agent': ('agent/go.mod', 'agent/cmd/jms-pam-agent/main.go', 'go/go.mod', 'go/client.go'),
+            'agent': ('agent/go.mod', 'agent/cmd/pam-agent/main.go', 'go/go.mod', 'go/client.go'),
         }
         for language, paths in expected.items():
             request = APIRequestFactory().get(f'/api/v1/accounts/client-source/{language}/')
@@ -88,23 +89,26 @@ class SDKDocumentationTests(SimpleTestCase):
         params = {
             'type': 'agent', 'app_user': 'orders', 'install_path': scope.install_path,
             'delivery_mode': 'json', 'systemd_unit': '', 'systemd_action': '',
+            'store_scope': 'all', 'store_format': 'json',
         }
         result = materials(application, params, 'https://example.com')
         import json
         config = json.loads(result['config'])
-        self.assertEqual(config['local_api']['owner'], 'orders')
+        self.assertEqual(config['socket']['owner'], 'orders')
+        self.assertNotIn('instance_id', config)
+        self.assertNotIn('--instance-id', result['install_command'])
         self.assertNotIn('state_file', config)
         self.assertNotIn('event_file', config)
-        self.assertNotIn('socket_path', config['local_api'])
+        self.assertNotIn('path', config['socket'])
         self.assertEqual(config['store']['accounts'], ['all'])
-        self.assertEqual(config['config_version'], 2)
+        self.assertEqual(config['version'], 1)
         self.assertNotIn('delivery', config)
-        self.assertEqual(result['service_name'], 'jms-pam-agent')
+        self.assertEqual(result['service_name'], 'pam-agent')
         self.assertEqual(result['agent_language'], 'go')
-        self.assertIn('/usr/local/bin/jms-pam-agent install', result['registration_command'])
+        self.assertIn('/usr/local/bin/pam-agent install', result['registration_command'])
         self.assertNotIn('python', result['install_command'])
         self.assertNotIn('venv', result['install_command'])
-        self.assertNotIn('jms-pam-agent-scope', result['install_command'])
+        self.assertNotIn('pam-agent-scope', result['install_command'])
 
     def request_documentation(self, language=None):
         params = {} if language is None else {'language': language}

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class AuditSource(TextChoices):
     ADMINISTRATOR = 'Administrator', _('Administrator')
     SDK = 'SDK', _('SDK')
-    AGENT = 'Agent', _('Agent')
+    AGENT = 'Agent', _('PAM Agent')
     JUMPSERVER = 'JumpServer', _('JumpServer')
 
 

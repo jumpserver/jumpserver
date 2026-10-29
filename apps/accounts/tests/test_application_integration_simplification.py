@@ -53,7 +53,7 @@ class ApplicationIntegrationSimplificationTests(CredentialTestCase):
                  'username_field': 'CACHE_USER', 'secret_field': 'CACHE_PASSWORD'},
             ],
         )
-        self.assertEqual(config['config_version'], 1)
+        self.assertEqual(config['version'], 1)
         self.assertEqual(config['store']['accounts'], [str(self.backup.id)])
         service = config['services'][0]
         self.assertTrue(service['allow_account_switch'])

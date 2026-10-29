@@ -60,11 +60,10 @@ def materials(application, params, endpoint):
     )}
     install_path = settings['install_path'].rstrip('/')
     bootstrap = {
-        'config_version': 1,
+        'version': 1,
         'endpoint': endpoint, 'org_id': str(application.org_id),
         'app_id': str(application.id), 'app_secret': application.secret,
-        'instance_id': '<instance-id>',
-        'local_api': {'owner': settings['app_user']},
+        'socket': {'owner': settings['app_user']},
         'services': [],
     }
     if params['store_scope'] != 'none':
@@ -95,12 +94,12 @@ def materials(application, params, endpoint):
         if params['application_check']:
             service['app_check'] = {'path': params['application_check'], 'confirm_on_success': True}
         bootstrap['services'] = [service]
-    filename = 'jms_pam_agent.json'
-    preparation = f'{agent_build_command(endpoint)} &&\nsudo install -m 0755 ./jms-pam-agent /usr/local/bin/jms-pam-agent'
+    filename = 'pam-agent.json'
+    preparation = f'{agent_build_command(endpoint)} &&\nsudo install -m 0755 ./pam-agent /usr/local/bin/pam-agent'
     installation = (
         f'chmod 0600 {filename} && '
-        'sudo /usr/local/bin/jms-pam-agent install '
-        f'--bootstrap {filename} --instance-id "$(hostname)"'
+        'sudo /usr/local/bin/pam-agent install '
+        f'--bootstrap {filename}'
     )
     foreground_unix = foreground_windows = ''
     if setup == 'delivery':
@@ -108,17 +107,17 @@ def materials(application, params, endpoint):
         directory = f'$HOME/.jms-pam-agent/{short_id}'
         foreground_unix = (
             f'# Initialize once\nchmod 0600 {filename}\n'
-            f'./jms-pam-agent init-local --bootstrap ./{filename} '
-            f'--directory "{directory}" --instance-id "$(hostname)"\n'
-            f'# Start or restart\n./jms-pam-agent run --local --config "{directory}/agent.json"'
+            f'./pam-agent init-local --bootstrap ./{filename} '
+            f'--directory "{directory}"\n'
+            f'# Start or restart\n./pam-agent run --local --config "{directory}/agent.json"'
         )
         foreground_windows = (
             f"$agentDir = Join-Path $HOME '.jms-pam-agent\\{short_id}'\n"
             '# Initialize once\n'
-            f".\\jms-pam-agent.exe init-local --bootstrap (Join-Path $PWD '{filename}') "
-            '--directory $agentDir --instance-id $env:COMPUTERNAME\n'
+            f".\\pam-agent.exe init-local --bootstrap (Join-Path $PWD '{filename}') "
+            '--directory $agentDir\n'
             '# Start or restart\n'
-            ".\\jms-pam-agent.exe run --local --config (Join-Path $agentDir 'agent.json')"
+            ".\\pam-agent.exe run --local --config (Join-Path $agentDir 'agent.json')"
         )
     return {
         'type': 'agent', 'config': json.dumps(bootstrap, indent=2), 'filename': filename,
@@ -126,5 +125,5 @@ def materials(application, params, endpoint):
         'install_command': f'{preparation} &&\n{installation}',
         'foreground_unix_command': foreground_unix,
         'foreground_windows_command': foreground_windows,
-        'service_name': 'jms-pam-agent', 'agent_language': 'go',
+        'service_name': 'pam-agent', 'agent_language': 'go',
     }

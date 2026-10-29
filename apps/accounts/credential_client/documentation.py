@@ -36,7 +36,7 @@ def sdk_install_commands(endpoint='https://jumpserver.example.com'):
 def agent_build_command(endpoint='https://jumpserver.example.com'):
     return (
         f'# Go 1.23+\n{client_source_command("agent", endpoint)} &&\n'
-        'go -C ./jms-pam-clients/agent build -trimpath -o ../../jms-pam-agent ./cmd/jms-pam-agent'
+        'go -C ./jms-pam-clients/agent build -trimpath -o ../../pam-agent ./cmd/pam-agent'
     )
 
 
