@@ -6,13 +6,14 @@ from datetime import timedelta
 from urllib.parse import parse_qs, urlsplit
 
 from django.conf import settings
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
 from oauth2_provider.models import get_application_model, get_access_token_model, get_grant_model, get_refresh_token_model
-from oauth2_provider.views import TokenView, RevokeTokenView
 from rest_framework.exceptions import PermissionDenied
 
 from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView, AgentAuthorizationServerView
+from authentication.backends.oauth2_provider.client_views import ClientTokenView, ClientRevokeTokenView
+from authentication.models.client_login_session import ClientLoginSession
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from terminal import agent_service as service
@@ -52,6 +53,7 @@ class AgentOAuthOrganizationTests(TestCase):
     def authorize(self, **extra):
         request = self.factory.post('/authorize/', {**self.authorization, 'allow': 'Authorize', **extra})
         request.user = self.user
+        request._dont_enforce_csrf_checks = True
         return AgentAwareAuthorizationView.as_view()(request)
 
     def code(self, org=None):
@@ -68,7 +70,7 @@ class AgentOAuthOrganizationTests(TestCase):
         })
 
     def token_request(self, data):
-        return TokenView.as_view()(self.factory.post('/token/', data))
+        return ClientTokenView.as_view()(self.factory.post('/token/', data))
 
     def issued(self):
         response = self.exchange(self.code())
@@ -83,6 +85,42 @@ class AgentOAuthOrganizationTests(TestCase):
     def remove_membership(self):
         self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()
         self.assertFalse(self.user.orgs.filter(pk=self.second.pk).exists())
+
+    def test_consent_requires_csrf_protection(self):
+        request = self.factory.post('/authorize/', {**self.authorization, 'allow': 'Authorize'})
+        request.user = self.user
+        response = AgentAwareAuthorizationView.as_view()(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('csrf_failure=1', response['Location'])
+        self.assertFalse(get_grant_model().objects.filter(application=self.app).exists())
+
+    @override_settings(SECURITY_CLIENT_MAX_SESSION_TIME=1)
+    def test_desktop_login_policy_survives_agent_oauth_integration(self):
+        self.app = get_application_model().objects.create(
+            name=settings.OAUTH2_PROVIDER_JUMPSERVER_CLIENT_NAME, client_type='public',
+            authorization_grant_type='authorization-code', redirect_uris='jms2://auth/callback',
+        )
+        self.authorization.update({
+            'client_id': self.app.client_id, 'redirect_uri': 'jms2://auth/callback', 'scope': 'read write',
+        })
+        self.authorization.pop('resource')
+        self.assertEqual(self.authorize().status_code, 400)
+        self.authorization['client_login_policy_version'] = '1'
+        result = self.issued()
+        self.assertEqual(result['client_login_policy']['max_session_time'], 1)
+        session = ClientLoginSession.objects.get(application=self.app)
+        self.assertEqual(result['client_login_expires_at'], session.expires_at.isoformat())
+        self.assertFalse(AgentOAuthBinding.objects.filter(application=self.app).exists())
+        session.expires_at = timezone.now() - timedelta(seconds=1)
+        session.save(update_fields=['expires_at'])
+        response = self.token_request({
+            'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'],
+            'client_id': self.app.client_id,
+        })
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertEqual(json.loads(response.content)['client_login_reason'], 'absolute_timeout')
+        session.refresh_from_db()
+        self.assertEqual(session.revoke_reason, 'absolute_timeout')
 
     def test_consent_lists_only_available_orgs_and_requires_explicit_choice(self):
         request = self.factory.get('/authorize/', self.authorization)
@@ -137,7 +175,7 @@ class AgentOAuthOrganizationTests(TestCase):
 
     def test_revocation_and_missing_binding_fail_closed(self):
         result = self.issued()
-        response = RevokeTokenView.as_view()(self.factory.post('/revoke/', {
+        response = ClientRevokeTokenView.as_view()(self.factory.post('/revoke/', {
             'client_id': self.app.client_id, 'token': result['refresh_token'], 'token_type_hint': 'refresh_token',
         }))
         self.assertEqual(response.status_code, 200)

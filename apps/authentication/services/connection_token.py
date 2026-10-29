@@ -1,4 +1,5 @@
 import json
+from contextlib import nullcontext
 from ipaddress import ip_address
 from datetime import timedelta
 
@@ -62,9 +63,20 @@ def record_connection_token_credential_audit(token, *, result, error=None, reque
     )
 
 
-@transaction.atomic
 def get_connection_token_secret(token, serializer_factory, *, expire_now=True, public_key=''):
     """Return credentials using the shared token validation and consumption rules."""
+    from .client_login_session import client_policy_lock
+
+    with client_policy_lock() if token.client_login_session_id else nullcontext():
+        # Commit a discovered login timeout before the credential transaction.
+        token.validate_client_login_session(mutate=True)
+        return _get_connection_token_secret(
+            token, serializer_factory, expire_now=expire_now, public_key=public_key,
+        )
+
+
+@transaction.atomic
+def _get_connection_token_secret(token, serializer_factory, *, expire_now=True, public_key=''):
     # Serialize credential release with cancellation and competing consumers;
     # discard properties cached on the model before the lock was acquired.
     token = type(token).objects.select_for_update().get(pk=token.pk)
@@ -154,6 +166,11 @@ class ConnectionTokenService(AuthFaceMixin):
     @transaction.atomic
     def create_token(self, serializer):
         self.validate_serializer(serializer)
+        session = getattr(self, 'client_login_session', None)
+        if session:
+            if session.user_id != self.get_user(serializer).pk:
+                raise PermissionDenied(_('Client login session belongs to a different user'))
+            serializer.validated_data['client_login_session'] = session
         if self.verified_remote_addr is not None:
             serializer.context['verified_remote_addr'] = self.verified_remote_addr
         return serializer.save()

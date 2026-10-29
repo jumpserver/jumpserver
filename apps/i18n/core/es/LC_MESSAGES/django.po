@@ -18015,3 +18015,48 @@ msgstr "Actualmente hay %(total)s registros de cuentas gestionadas, de los cuale
 
 msgid "There are currently no pending account risk records."
 msgstr "Actualmente no hay registros de riesgo de cuentas pendientes."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Actualice el cliente de JumpServer para utilizar la política de inicio de sesión configurada."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "La sesión del cliente ha caducado. Vuelva a autenticarse."
+
+msgid "Client login session belongs to a different user"
+msgstr "La sesión del cliente pertenece a otro usuario"
+
+msgid "Client login session"
+msgstr "Sesión del cliente"
+
+msgid "Log in again after exiting the client"
+msgstr "Volver a iniciar sesión después de salir"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "Si se activa, deberá volver a iniciar sesión al cerrar y reiniciar la aplicación de escritorio. Minimizar u ocultar la aplicación no se considera salir. Desactivado de forma predeterminada."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Tiempo de inactividad (minutos)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Vuelva a iniciar sesión al alcanzar el tiempo de espera por inactividad. 0 desactiva el límite (predeterminado). Las acciones reales del teclado y el ratón en la ventana principal, en ventanas independientes de activos y en sitios web integrados cuentan como actividad. Una conexión abierta, la salida en segundo plano y la actualización automática no cuentan. No se pueden registrar las acciones en programas externos como Xshell o MSTSC ni en algunas páginas integradas de otro origen. Usar solo esas áreas, observar durante mucho tiempo sin interactuar o sufrir fallos de envío por problemas de red puede provocar el tiempo de espera por inactividad. El tiempo se calcula desde la última actividad confirmada por el servidor."
+
+msgid "Client login lifetime (minute)"
+msgstr "Duración de la sesión (minutos)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "Se cuenta desde el inicio de sesión en el cliente; la actividad y la renovación del token no la prolongan. 0 desactiva el límite de duración (valor predeterminado). Los ajustes de salida e inactividad siguen vigentes. Vuelva a iniciar sesión cuando termine este plazo."
+
+msgid "Client exit"
+msgstr "Salida del cliente"
+
+msgid "Idle timeout"
+msgstr "Tiempo de inactividad agotado"
+
+msgid "Maximum login time"
+msgstr "Duración máxima de la sesión"
+
+msgid "Client login policy changed"
+msgstr "Se ha modificado la política de inicio de sesión del cliente"
+
+msgid "Authorization revoked"
+msgstr "Autorización revocada"

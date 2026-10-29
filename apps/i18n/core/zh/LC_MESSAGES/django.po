@@ -17459,3 +17459,48 @@ msgstr "当前没有待处理账号风险记录。"
 #, python-format
 msgid "%(count)s account task executions were canceled."
 msgstr "%(count)s 次账号任务执行已取消。"
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "请升级 JumpServer 客户端后使用当前登录策略。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "客户端登录已失效，请重新验证身份。"
+
+msgid "Client login session belongs to a different user"
+msgstr "客户端登录会话属于其他用户"
+
+msgid "Client login session"
+msgstr "客户端登录会话"
+
+msgid "Log in again after exiting the client"
+msgstr "退出后重新登录"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "开启后，客户端进程退出并重新启动时需要重新登录。最小化或隐藏窗口不属于退出。默认关闭。"
+
+msgid "Client login idle timeout (minute)"
+msgstr "空闲超时 (分)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "达到空闲超时后需重新登录。0 表示不启用（默认）。主窗口、独立资产窗口及内置网站中的真实键盘、鼠标操作会计入活动；连接在线、后台输出和自动刷新不算活动。Xshell、MSTSC 等外部软件和部分跨域内嵌页面中的操作无法采集。仅在这些区域操作、长时间只观看，或网络异常导致上报失败时，仍可能触发空闲超时；以服务器最后确认的活动时间为准。"
+
+msgid "Client login lifetime (minute)"
+msgstr "登录有效期 (分)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "从客户端登录开始计时，用户操作和令牌刷新均不延长有效期。0 表示不限制登录时长（默认），退出和空闲超时设置仍然生效。到期后需重新登录。"
+
+msgid "Client exit"
+msgstr "客户端退出"
+
+msgid "Idle timeout"
+msgstr "空闲超时"
+
+msgid "Maximum login time"
+msgstr "登录有效期结束"
+
+msgid "Client login policy changed"
+msgstr "客户端登录策略已变更"
+
+msgid "Authorization revoked"
+msgstr "授权已撤销"

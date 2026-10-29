@@ -8,8 +8,6 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from oauth2_provider.http import OAuth2ResponseRedirect
 from oauth2_provider.models import get_application_model, get_refresh_token_model
-from oauth2_provider.oauth2_validators import OAuth2Validator
-from oauth2_provider.views import AuthorizationView
 from oauthlib.oauth2 import InvalidScopeError, InvalidRequestError, InvalidGrantError
 from oauthlib.oauth2.rfc6749.errors import CustomOAuth2Error
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -17,12 +15,14 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from terminal.agent_service import available_agent_organizations, check_agent_organization
 from terminal.models import AgentApplication, AgentOAuthBinding
 from .agent_forms import AgentAllowForm
+from .client_views import ClientAuthorizationView
+from .validators import ClientOAuth2Validator
 from .views import OAuthAuthorizationServerView
 
 SCOPE = 'agent:access'
 
 
-class AgentOAuth2Validator(OAuth2Validator):
+class AgentOAuth2Validator(ClientOAuth2Validator):
     @staticmethod
     def registration(client):
         if client is None:
@@ -156,7 +156,7 @@ class AgentOAuth2Validator(OAuth2Validator):
         return super().validate_bearer_token(token, scopes, request)
 
 
-class AgentAwareAuthorizationView(AuthorizationView):
+class AgentAwareAuthorizationView(ClientAuthorizationView):
     def agent_registration(self):
         data = self.request.POST if self.request.method == 'POST' else self.request.GET
         return AgentApplication.objects.filter(application__client_id=data.get('client_id')).first()

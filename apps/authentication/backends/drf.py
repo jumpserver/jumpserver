@@ -120,10 +120,33 @@ class PrivateTokenAuthentication(authentication.TokenAuthentication):
 
 
 class OAuth2Authentication(BaseOAuth2Authentication):
+    touch_client_login_session = False
+
     def authenticate(self, request):
+        from authentication.services.client_login_session import (
+            ClientSessionExpired, expired_session_from_receipt, validate_access_token,
+        )
+
         user_token = super().authenticate(request)
+        if not user_token:
+            auth = authentication.get_authorization_header(request).split()
+            if len(auth) == 2 and auth[0].lower() == b'bearer':
+                session = expired_session_from_receipt(
+                    request.headers.get('X-JMS-Client-Login-Session'), auth[1].decode('utf-8', errors='replace'),
+                    'access_token',
+                )
+                if session:
+                    request._request.expired_client_login_session_id = session.pk
+                    raise ClientSessionExpired(session)
         if user_token:
             _, token = user_token
+            try:
+                request.client_login_session = validate_access_token(
+                    token, touch=self.touch_client_login_session and request.method == 'POST',
+                )
+            except ClientSessionExpired as error:
+                request._request.expired_client_login_session_id = error.session_id
+                raise
             update_token_last_used.delay(tokens=(token,))
         return user_token
 

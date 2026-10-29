@@ -17995,3 +17995,48 @@ msgstr "Il y a actuellement %(total)s comptes gérés enregistrés, dont %(activ
 
 msgid "There are currently no pending account risk records."
 msgstr "Il n’y a actuellement aucun risque de compte en attente."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Mettez à jour le client JumpServer pour utiliser la politique de connexion configurée."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "La session du client a expiré. Veuillez vous authentifier à nouveau."
+
+msgid "Client login session belongs to a different user"
+msgstr "La session du client appartient à un autre utilisateur"
+
+msgid "Client login session"
+msgstr "Session du client"
+
+msgid "Log in again after exiting the client"
+msgstr "Se reconnecter après avoir quitté l’application"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "Si cette option est activée, vous devez vous reconnecter après avoir quitté et redémarré l’application de bureau. Réduire ou masquer l’application ne revient pas à la quitter. Option désactivée par défaut."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Délai d’inactivité (minutes)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Reconnectez-vous lorsque le délai d’inactivité est atteint. 0 désactive cette limite (par défaut). Les actions réelles au clavier et à la souris dans la fenêtre principale, les fenêtres de ressources séparées et les sites web intégrés comptent comme activité. Une connexion ouverte, les sorties en arrière-plan et l’actualisation automatique ne comptent pas. Les actions dans des logiciels externes comme Xshell ou MSTSC et dans certaines pages intégrées d’une autre origine ne peuvent pas être captées. Utiliser uniquement ces zones, regarder longtemps sans intervenir ou rencontrer un échec de transmission dû au réseau peut donc déclencher le délai d’inactivité. Le calcul part de la dernière activité confirmée par le serveur."
+
+msgid "Client login lifetime (minute)"
+msgstr "Durée de validité de la connexion (minutes)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "La durée est mesurée à partir de la connexion au client ; l’activité et le renouvellement du jeton ne la prolongent pas. 0 désactive la limite de durée (valeur par défaut). Les paramètres de sortie et d’inactivité restent applicables. Vous devez vous reconnecter à l’expiration de cette durée."
+
+msgid "Client exit"
+msgstr "Fermeture du client"
+
+msgid "Idle timeout"
+msgstr "Délai d’inactivité dépassé"
+
+msgid "Maximum login time"
+msgstr "Durée maximale de connexion"
+
+msgid "Client login policy changed"
+msgstr "La politique de connexion du client a été modifiée"
+
+msgid "Authorization revoked"
+msgstr "Autorisation révoquée"

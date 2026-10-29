@@ -177,6 +177,7 @@ class AgentBoundaryTests(TestCase):
                 self.assertEqual(response.context_data['form'].initial['redirect_uri'], callback)
                 request = factory.post('/authorize/', {**body, 'allow': 'Authorize'}, secure=secure)
                 request.user = self.user
+                request._dont_enforce_csrf_checks = True
                 response = view(request)
                 self.assertEqual(response.status_code, 302)
                 query = parse_qs(urlsplit(response['Location']).query)

@@ -17687,3 +17687,48 @@ msgstr "현재 미처리 계정 위험 기록이 없습니다."
 #, python-format
 msgid "%(count)s account task executions were canceled."
 msgstr "계정 작업 실행 %(count)s건이 취소되었습니다."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "설정된 로그인 정책을 사용하려면 JumpServer 클라이언트를 업그레이드하세요."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "클라이언트 로그인 세션이 만료되었습니다. 다시 인증하세요."
+
+msgid "Client login session belongs to a different user"
+msgstr "클라이언트 로그인 세션이 다른 사용자에게 속해 있습니다"
+
+msgid "Client login session"
+msgstr "클라이언트 로그인 세션"
+
+msgid "Log in again after exiting the client"
+msgstr "종료 후 다시 로그인"
+
+msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
+msgstr "활성화하면 데스크톱 애플리케이션을 종료한 후 다시 시작할 때 다시 로그인해야 합니다. 애플리케이션을 최소화하거나 숨기는 것은 종료로 간주되지 않습니다. 기본값은 비활성화입니다."
+
+msgid "Client login idle timeout (minute)"
+msgstr "유휴 시간 제한(분)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "유휴 시간 제한에 도달하면 다시 로그인해야 합니다. 0은 제한을 사용하지 않음(기본값)입니다. 기본 창, 별도 자산 창, 내장 웹사이트에서 실제로 수행한 키보드와 마우스 조작이 활동으로 기록됩니다. 연결 유지, 백그라운드 출력, 자동 새로고침은 활동에 포함되지 않습니다. Xshell, MSTSC 같은 외부 프로그램과 일부 교차 출처 내장 페이지의 조작은 수집할 수 없습니다. 이러한 영역에서만 조작하거나, 오랫동안 보기만 하거나, 네트워크 문제로 보고가 실패하면 유휴 시간 초과가 발생할 수 있습니다. 시간은 서버가 마지막으로 확인한 활동을 기준으로 계산됩니다."
+
+msgid "Client login lifetime (minute)"
+msgstr "로그인 유효 기간(분)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "클라이언트에 로그인한 시점부터 계산하며, 활동이나 토큰 갱신으로 연장되지 않습니다. 0은 유효 기간 제한 없음을 의미합니다(기본값). 종료 및 유휴 시간 제한 설정은 계속 적용됩니다. 유효 기간이 끝나면 다시 로그인해야 합니다."
+
+msgid "Client exit"
+msgstr "클라이언트 종료"
+
+msgid "Idle timeout"
+msgstr "유휴 시간 초과"
+
+msgid "Maximum login time"
+msgstr "최대 로그인 시간"
+
+msgid "Client login policy changed"
+msgstr "클라이언트 로그인 정책이 변경되었습니다"
+
+msgid "Authorization revoked"
+msgstr "권한이 취소되었습니다"

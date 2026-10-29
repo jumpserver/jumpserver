@@ -108,7 +108,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             # 普通 Token 不支持指定 user
             'user', 'expire_time', 'is_expired', 'date_expired',
             'user_display', 'asset_display', 'is_active',
-            'comment',
+            'comment', 'client_login_session',
         ]
         fields = fields_small + read_only_fields
         extra_kwargs = {
