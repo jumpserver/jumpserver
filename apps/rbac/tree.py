@@ -9,6 +9,7 @@ from treelib import Tree
 from treelib.exceptions import NodeIDAbsentError
 
 from common.tree import TreeNode
+from reports.audit_contract import THEME_PERMISSIONS
 from .models import Permission, ContentType
 
 # 根节点
@@ -71,6 +72,14 @@ extra_nodes_data = [
     {'id': "other", "name": _("Other"), "pId": "view_setting"},
     {'id': "job_audit", "name": _("Job audit"), "pId": "view_audit"},
     {'id': "report_node", "name": _("Report"), "pId": "view_audit"},
+    {'id': 'audit_report_node', 'name': _('Audit reports'), 'pId': 'report_node'},
+    {'id': 'legacy_report_node', 'name': _('Legacy reports'), 'pId': 'report_node'},
+    {'id': 'userloginreport', 'name': _('User login report'), 'pId': 'legacy_report_node'},
+    {'id': 'userchangepasswordreport', 'name': _('User change password report'), 'pId': 'legacy_report_node'},
+    {'id': 'assetstatisticsreport', 'name': _('Asset statistics report'), 'pId': 'legacy_report_node'},
+    {'id': 'assetactivityreport', 'name': _('Asset activity report'), 'pId': 'legacy_report_node'},
+    {'id': 'accountstatisticsreport', 'name': _('Account statistics report'), 'pId': 'legacy_report_node'},
+    {'id': 'accountautomationreport', 'name': _('Account automation report'), 'pId': 'legacy_report_node'},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -143,24 +152,29 @@ if settings.XPACK_ENABLED and settings.JDMC_ENABLED:
 
 
 special_setting_pid_mapper = {
-    "rbac.view_userloginreport": "report_node",
-    "rbac.add_userloginreport": "report_node",
-    "rbac.delete_userloginreport": "report_node",
-    "rbac.view_userchangepasswordreport": "report_node",
-    "rbac.add_userchangepasswordreport": "report_node",
-    "rbac.delete_userchangepasswordreport": "report_node",
-    "rbac.view_assetstatisticsreport": "report_node",
-    "rbac.add_assetstatisticsreport": "report_node",
-    "rbac.delete_assetstatisticsreport": "report_node",
-    "rbac.view_assetactivityreport": "report_node",
-    "rbac.add_assetactivityreport": "report_node",
-    "rbac.delete_assetactivityreport": "report_node",
-    "rbac.view_accountstatisticsreport": "report_node",
-    "rbac.add_accountstatisticsreport": "report_node",
-    "rbac.delete_accountstatisticsreport": "report_node",
-    "rbac.view_accountautomationreport": "report_node",
-    "rbac.add_accountautomationreport": "report_node",
-    "rbac.delete_accountautomationreport": "report_node",
+    'rbac.view_auditreport': 'audit_report_node',
+    'rbac.view_activityreport': 'audit_report_node',
+    'rbac.view_securityreport': 'audit_report_node',
+    'rbac.view_inventoryreport': 'audit_report_node',
+    'rbac.view_accountreport': 'audit_report_node',
+    "rbac.view_userloginreport": "userloginreport",
+    "rbac.add_userloginreport": "userloginreport",
+    "rbac.delete_userloginreport": "userloginreport",
+    "rbac.view_userchangepasswordreport": "userchangepasswordreport",
+    "rbac.add_userchangepasswordreport": "userchangepasswordreport",
+    "rbac.delete_userchangepasswordreport": "userchangepasswordreport",
+    "rbac.view_assetstatisticsreport": "assetstatisticsreport",
+    "rbac.add_assetstatisticsreport": "assetstatisticsreport",
+    "rbac.delete_assetstatisticsreport": "assetstatisticsreport",
+    "rbac.view_assetactivityreport": "assetactivityreport",
+    "rbac.add_assetactivityreport": "assetactivityreport",
+    "rbac.delete_assetactivityreport": "assetactivityreport",
+    "rbac.view_accountstatisticsreport": "accountstatisticsreport",
+    "rbac.add_accountstatisticsreport": "accountstatisticsreport",
+    "rbac.delete_accountstatisticsreport": "accountstatisticsreport",
+    "rbac.view_accountautomationreport": "accountautomationreport",
+    "rbac.add_accountautomationreport": "accountautomationreport",
+    "rbac.delete_accountautomationreport": "accountautomationreport",
     "settings.change_email": "notifications",
     "settings.change_sms": "notifications",
     "settings.change_systemmsgsubscription": "notifications",
@@ -231,6 +245,10 @@ def _sort_action(node):
     if node.isParent:
         return ['zz', 0]
 
+    report_permissions = list(THEME_PERMISSIONS.values())
+    if node.title in report_permissions:
+        return ['auditreport', report_permissions.index(node.title)]
+
     action_resource = node.title.split('.')[-1]
     action, resource = action_resource.split('_', 2)
     action_value_mapper = {
@@ -296,22 +314,21 @@ class CounterTree(Tree):
         node._checked_count = count
         return count
 
-    def add_nodes_to_tree(self, ztree_nodes, retry=0):
-        failed = []
-        for node in ztree_nodes:
-            pid = node.pId
-            if retry == 2:
-                pid = '$ROOT$'
-
-            try:
-                self.create_node(node.name, node.id, pid, data=node)
-            except NodeIDAbsentError:
-                failed.append(node)
-        if retry > 2:
-            return
-        if failed:
-            retry += 1
-            return self.add_nodes_to_tree(failed, retry)
+    def add_nodes_to_tree(self, ztree_nodes):
+        pending = ztree_nodes
+        while pending:
+            failed = []
+            for node in pending:
+                try:
+                    self.create_node(node.name, node.id, node.pId, data=node)
+                except NodeIDAbsentError:
+                    failed.append(node)
+            if len(failed) == len(pending):
+                # Only fall back for missing parents or cycles, not deeper groups.
+                for node in failed:
+                    self.create_node(node.name, node.id, '$ROOT$', data=node)
+                return
+            pending = failed
 
 
 class PermissionTreeUtil:

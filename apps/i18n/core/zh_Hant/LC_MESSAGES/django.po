@@ -17560,3 +17560,31 @@ msgstr "Windows 絕對目錄；home 表示連線帳號的使用者目錄。"
 
 msgid "Select one Linux SSH/SFTP or Windows WinRM account."
 msgstr "請選擇一個 Linux SSH/SFTP 或 Windows WinRM 帳號。"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "審計報告"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "舊版報表"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "可以查看綜合審計報告"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "可以查看運維活動報告"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "可以查看安全事件報告"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "可以查看資產與帳號概況"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "可以查看帳號運維報告"
