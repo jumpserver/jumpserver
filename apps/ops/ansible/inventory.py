@@ -56,9 +56,8 @@ class JMSInventory:
 
     @staticmethod
     def get_username(asset, account):
-        if asset.category == const.Category.DS or (
-                asset.type == const.HostTypes.WINDOWS and account.is_ds_account()
-        ):
+        # 目录服务账号使用 UPN (user@domain) 登录，与 koko 保持一致
+        if asset.category == const.Category.DS or account.is_ds_account():
             return account.full_username
         return account.username
 
@@ -141,7 +140,7 @@ class JMSInventory:
         var = {
             'jms_custom_become': True,
             'jms_custom_become_method': su_method,
-            'jms_custom_become_user': su_from.username,
+            'jms_custom_become_user': su_from.full_username,
             'jms_custom_become_password': su_from_password,
             'jms_custom_become_private_key_path': (
                 su_from.get_private_key_path(path_dir)
