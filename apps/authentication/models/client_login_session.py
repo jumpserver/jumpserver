@@ -23,6 +23,7 @@ class ClientLoginSession(models.Model):
     authenticated_at = models.DateTimeField()
     expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
     policy_expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    is_locked = models.BooleanField(default=False)
     revoked_at = models.DateTimeField(null=True, blank=True, db_index=True)
     revoke_reason = models.CharField(max_length=32, choices=RevokeReason.choices, blank=True, default='')
 

@@ -12,14 +12,19 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.throttling import UserRateThrottle
 from users.models import Preference
 from authentication.backends.drf import OAuth2Authentication
+from authentication.models import ClientLoginSession
 from authentication.services.client_login_session import (
     client_login_session_data, is_client_application, revoke_session, validate_access_token,
 )
 
 
+class ClientSessionControlAuthentication(OAuth2Authentication):
+    allow_locked_client_session = True
+
+
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class ClientSessionStatusView(APIView):
-    authentication_classes = (OAuth2Authentication,)
+    authentication_classes = (ClientSessionControlAuthentication,)
     permission_classes = (IsValidUser,)
     http_method_names = ('get', 'options')
 
@@ -34,6 +39,16 @@ class ClientSessionStatusView(APIView):
             'client_login_policy': session.client_login_policy,
             'client_login_session': client_login_session_data(session),
         }, headers={'Cache-Control': 'no-store'})
+
+
+class ClientSessionLockView(ClientSessionStatusView):
+    http_method_names = ('post', 'options')
+
+    def post(self, request):
+        session = request.client_login_session
+        ClientLoginSession.objects.filter(pk=session.pk).update(is_locked=True)
+        session.is_locked = True
+        return self.get(request)
 
 
 class ClientSessionRevokeView(ClientSessionStatusView):
@@ -85,5 +100,7 @@ class ClientSessionUnlockView(ClientSessionStatusView):
             return Response({'code': 'invalid_client_lock_password',
                              'detail': _('The client lock password is incorrect.')}, status=400)
         session = validate_access_token(request.auth)
+        ClientLoginSession.objects.filter(pk=session.pk).update(is_locked=False)
+        session.is_locked = False
         return Response({'verified': True, 'client_login_session': client_login_session_data(session)},
                         headers={'Cache-Control': 'no-store'})

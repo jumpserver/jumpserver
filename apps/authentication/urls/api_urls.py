@@ -7,7 +7,7 @@ from rest_framework.routers import DefaultRouter
 from .. import api
 from ..api.rdp_login import RDPLoginRedeemApi
 from ..api.client_login_session import (
-    ClientSessionStatusView, ClientSessionRevokeView, ClientSessionUnlockView,
+    ClientSessionStatusView, ClientSessionRevokeView, ClientSessionUnlockView, ClientSessionLockView,
 )
 from ..backends.passkey.urls import urlpatterns as passkey_urlpatterns
 
@@ -24,6 +24,7 @@ router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
 
 urlpatterns = [
+    path('client-login-session/lock/', ClientSessionLockView.as_view(), name='client-login-session-lock'),
     path('client-login-session/status/', ClientSessionStatusView.as_view(), name='client-login-session-status'),
     path('client-login-session/unlock/', ClientSessionUnlockView.as_view(), name='client-login-session-unlock'),
     path('client-login-session/revoke/', ClientSessionRevokeView.as_view(), name='client-login-session-revoke'),

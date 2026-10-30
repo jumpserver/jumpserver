@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from oauth2_provider.models import (
     get_access_token_model, get_application_model, get_grant_model, get_refresh_token_model,
 )
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 
 from common.utils.lock import DistributedLock
 from authentication.models.client_login_session import ClientLoginSession
@@ -38,6 +38,17 @@ class ClientSessionExpired(AuthenticationFailed):
         self.client_login_session = client_login_session_data(session) if session else None
 
 
+class ClientSessionLocked(PermissionDenied):
+    default_code = 'client_locked'
+    default_detail = _('Client is locked. Unlock it on the main page.')
+
+    def __init__(self, session):
+        super().__init__()
+        # Keep boolean session metadata intact instead of converting it to ErrorDetail strings.
+        self.detail = {'code': self.default_code, 'detail': self.default_detail,
+                       'client_login_session': client_login_session_data(session)}
+
+
 def client_session_deadline(session):
     deadlines = [(value, reason) for value, reason in (
         (session.expires_at, 'absolute_timeout'), (session.policy_expires_at, 'policy_changed'),
@@ -55,6 +66,7 @@ def client_login_session_data(session):
         'effective_expires_at': deadline.isoformat() if deadline else None,
         'expiry_reason': reason,
         'server_time': timezone.now().isoformat(),
+        'locked': session.is_locked,
     }
 
 
