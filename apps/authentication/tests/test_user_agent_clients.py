@@ -132,6 +132,8 @@ class UserAgentClientTests(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.data['count'], 1)
                 client = response.data['results'][0]
+                self.assertEqual(client['registration_id'], self.registration.pk)
+                self.assertTrue(client['is_active'])
                 self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
                 self.assertFalse(client['all_organizations'])
                 self.assertEqual(client['status'], 'active')
@@ -169,11 +171,29 @@ class UserAgentClientTests(TestCase):
         path = f'{self.admin_url}?user_id={self.user.pk}'
         client = self.request(path=path, user=self.manager).data['results'][0]
         self.assertEqual(client['status'], 'expired')
+        self.assertTrue(client['is_active'])
         self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
         self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()
         client = self.request(path=path, user=self.manager).data['results'][0]
         self.assertEqual(client['status'], 'active')
         self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
+
+    def test_admin_management_metadata_targets_registration_and_keeps_personal_contract(self):
+        self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        path = f'{self.admin_url}?user_id={self.user.pk}'
+        client = self.request(path=path, user=self.manager).data['results'][0]
+        self.assertEqual(client['id'], self.application.pk)
+        registration_url = f'/api/v1/authentication/agent-clients/{client["registration_id"]}/'
+        for action, active in (('disable', False), ('enable', True)):
+            response = self.request('post', registration_url + action + '/', self.manager)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['client_id'], self.application.client_id)
+            client = self.request(path=path, user=self.manager).data['results'][0]
+            self.assertEqual(client['is_active'], active)
+            self.assertEqual(client['registration_id'], self.registration.pk)
+        personal = self.request(user=self.user).data['results'][0]
+        self.assertNotIn('registration_id', personal)
+        self.assertNotIn('is_active', personal)
 
     def test_revoke_removes_only_own_authorizations_and_keeps_audit(self):
         access, _ = self.authorize(self.user, self.first.pk)

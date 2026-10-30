@@ -117,7 +117,17 @@ class UserAgentClientReadOnlyViewSet(mixins.ListModelMixin, mixins.RetrieveModel
         ).order_by('-created', '-pk')
 
 
+class AdminUserAgentClientSerializer(UserAgentClientSerializer):
+    registration_id = serializers.IntegerField(source='agent_registration.pk', read_only=True)
+    is_active = serializers.BooleanField(source='agent_registration.is_active', read_only=True)
+
+    class Meta(UserAgentClientSerializer.Meta):
+        fields = UserAgentClientSerializer.Meta.fields + ('registration_id', 'is_active')
+        read_only_fields = fields
+
+
 class AdminUserAgentClientViewSet(UserAgentClientReadOnlyViewSet):
+    serializer_class = AdminUserAgentClientSerializer
     permission_classes = [AgentClientAdminPermission]
 
     @cached_property
