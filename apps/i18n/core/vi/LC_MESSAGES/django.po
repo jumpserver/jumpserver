@@ -17802,12 +17802,6 @@ msgstr "Vui lòng nâng cấp ứng dụng khách JumpServer để sử dụng c
 msgid "Client login session expired. Please authenticate again."
 msgstr "Phiên đăng nhập của ứng dụng khách đã hết hạn. Vui lòng xác thực lại."
 
-msgid "Client login session belongs to a different user"
-msgstr "Phiên đăng nhập của ứng dụng khách thuộc về người dùng khác"
-
-msgid "Client login session"
-msgstr "Phiên đăng nhập của ứng dụng khách"
-
 msgid "Log in again after exiting the client"
 msgstr "Đăng nhập lại sau khi thoát"
 

@@ -17443,12 +17443,6 @@ msgstr "請升級 JumpServer 用戶端後使用目前的登入策略。"
 msgid "Client login session expired. Please authenticate again."
 msgstr "用戶端登入已失效，請重新驗證身分。"
 
-msgid "Client login session belongs to a different user"
-msgstr "用戶端登入工作階段屬於其他使用者"
-
-msgid "Client login session"
-msgstr "用戶端登入工作階段"
-
 msgid "Log in again after exiting the client"
 msgstr "退出後重新登入"
 

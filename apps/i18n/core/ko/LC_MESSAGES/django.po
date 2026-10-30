@@ -17694,12 +17694,6 @@ msgstr "설정된 로그인 정책을 사용하려면 JumpServer 클라이언트
 msgid "Client login session expired. Please authenticate again."
 msgstr "클라이언트 로그인 세션이 만료되었습니다. 다시 인증하세요."
 
-msgid "Client login session belongs to a different user"
-msgstr "클라이언트 로그인 세션이 다른 사용자에게 속해 있습니다"
-
-msgid "Client login session"
-msgstr "클라이언트 로그인 세션"
-
 msgid "Log in again after exiting the client"
 msgstr "종료 후 다시 로그인"
 

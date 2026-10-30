@@ -17765,12 +17765,6 @@ msgstr "設定されたログインポリシーを使用するには、JumpServe
 msgid "Client login session expired. Please authenticate again."
 msgstr "クライアントのログインセッションが失効しました。再認証してください。"
 
-msgid "Client login session belongs to a different user"
-msgstr "クライアントのログインセッションは別のユーザーに属しています"
-
-msgid "Client login session"
-msgstr "クライアントのログインセッション"
-
 msgid "Log in again after exiting the client"
 msgstr "終了後に再ログイン"
 

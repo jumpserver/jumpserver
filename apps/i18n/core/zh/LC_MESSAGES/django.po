@@ -17466,12 +17466,6 @@ msgstr "请升级 JumpServer 客户端后使用当前登录策略。"
 msgid "Client login session expired. Please authenticate again."
 msgstr "客户端登录已失效，请重新验证身份。"
 
-msgid "Client login session belongs to a different user"
-msgstr "客户端登录会话属于其他用户"
-
-msgid "Client login session"
-msgstr "客户端登录会话"
-
 msgid "Log in again after exiting the client"
 msgstr "退出后重新登录"
 

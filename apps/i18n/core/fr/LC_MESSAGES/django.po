@@ -18002,12 +18002,6 @@ msgstr "Mettez à jour le client JumpServer pour utiliser la politique de connex
 msgid "Client login session expired. Please authenticate again."
 msgstr "La session du client a expiré. Veuillez vous authentifier à nouveau."
 
-msgid "Client login session belongs to a different user"
-msgstr "La session du client appartient à un autre utilisateur"
-
-msgid "Client login session"
-msgstr "Session du client"
-
 msgid "Log in again after exiting the client"
 msgstr "Se reconnecter après avoir quitté l’application"
 
