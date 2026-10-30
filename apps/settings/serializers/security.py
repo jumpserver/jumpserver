@@ -240,12 +240,10 @@ class SecuritySessionSerializer(serializers.Serializer):
         min_value=0, max_value=99999, required=False,
         label=_('Client idle lock (minute)'),
         help_text=_(
-            '0 disables automatic idle locking (default). System keyboard and mouse input determines '
-            'inactivity for the active site and account only. Activity is not reported for each action; an '
-            'idle timeout or manual lock sends one request to lock this login on the server. Idle timeout '
-            'locks the main page and its managed asset windows even without a lock password. Unlock only on '
-            'the main page after server password verification. New logins open normally; previously locked '
-            'logins stay locked after restoration. External application windows are not protected.'
+            '0 disables automatic locking. After the configured period without system keyboard or mouse '
+            'input, lock the main page and asset windows for the current site and account. Unlock on the '
+            'main page by verifying the lock password online. Locking also applies if no password is '
+            'configured; set it in web personal settings. External application windows are not protected.'
         ),
     )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
