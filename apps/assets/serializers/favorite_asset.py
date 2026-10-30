@@ -97,23 +97,13 @@ class FavoriteAssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
                 })
         return attrs
 
-    @staticmethod
-    def _get_icon(asset, platform):
-        from assets.const import AllTypes
-        support_types = AllTypes.get_types_values(exclude_custom=True)
-        if asset.category == 'device':
-            return 'switch'
-        if asset.type in support_types:
-            return asset.type
-        return 'file'
-
     def get_asset_info(self, obj):
         asset = obj.asset
         platform = asset.platform
         return {
             'id': str(asset.id),
             'name': asset.name,
-            'iconSkin': self._get_icon(asset, platform),
+            'iconSkin': asset.get_icon_skin(),
             'chkDisabled': not asset.is_active,
             'meta': {
                 'type': 'asset',
