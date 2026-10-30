@@ -2,6 +2,7 @@
 #
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 
 from users.models import User, UKeyCertificateBinding
 from common.utils import get_logger
@@ -78,7 +79,7 @@ class UKeyBackend(JMSBaseAuthBackend):
             provider=identity['provider'], certificate_fingerprint=identity['certificate_fingerprint'],
         ).first()
         if not binding or not hardware_serial or binding.hardware_serial != hardware_serial:
-            raise UKeyAuthError('Certificate or UKey is not bound to a user')
+            raise UKeyAuthError(_('Certificate or UKey is not bound to a user'))
         user = binding.user
         if not self.user_can_authenticate(user) or not self.user_allow_authenticate(user):
             raise UKeyAuthError('User is not allowed to authenticate with UKey')

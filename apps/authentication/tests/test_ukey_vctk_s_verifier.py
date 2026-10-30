@@ -30,7 +30,7 @@ def encode(data):
 
 
 def issue_certificate(key, *, issuer_key=None, issuer=None, name='user', ca=False,
-                      serial=123, start=-1, end=1):
+                      serial=123, start=-1, end=1, explicit_ca_false=False):
     now = datetime.now(timezone.utc)
     subject = x509.Name([x509.NameAttribute(x509.NameOID.COMMON_NAME, name)])
     issuer_key = issuer_key or key
@@ -38,7 +38,11 @@ def issue_certificate(key, *, issuer_key=None, issuer=None, name='user', ca=Fals
         x509.CertificateBuilder().subject_name(subject).issuer_name(issuer.subject if issuer else subject)
         .serial_number(serial).public_key(key.public_key())
         .not_valid_before(now + timedelta(days=start)).not_valid_after(now + timedelta(days=end))
-        .add_extension(x509.BasicConstraints(ca=ca, path_length=None), critical=True)
+        .add_extension(
+            x509.UnrecognizedExtension(x509.ExtensionOID.BASIC_CONSTRAINTS, b'\x30\x03\x01\x01\x00')
+            if explicit_ca_false else x509.BasicConstraints(ca=ca, path_length=None),
+            critical=True,
+        )
         .add_extension(x509.SubjectKeyIdentifier.from_public_key(key.public_key()), critical=False)
         .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(issuer_key.public_key()), critical=False)
         .sign(issuer_key, hashes.SHA256())
@@ -151,6 +155,53 @@ class VCTKSVerifierTests(TestCase):
             claims = self.verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'user')
         self.assertEqual(claims, self.identity())
         client.return_value.verify_signed_data.assert_called_once_with(self.signature, 'sha256')
+
+    def test_explicit_ca_false_preserves_signed_certificate_and_p7_bytes(self):
+        leaf = issue_certificate(
+            self.key, issuer_key=self.ca_key, issuer=self.ca, explicit_ca_false=True,
+        )
+        raw = leaf.public_bytes(serialization.Encoding.DER)
+        self.assertNotEqual(Certificate.load(raw).dump(force=True), raw)
+        certificate = vctk_s.checked_certificate(raw)
+        self.assertEqual(certificate.dump(), raw)
+        signature = self.sign_p7(leaf)
+        parsed = vctk_s.load_signed_der(vctk_s.VCTKSContentInfo, signature)
+        self.assertEqual(parsed.dump(), signature)
+        with patch.object(self, 'asn1_cert', certificate), patch.object(self.verifier, '_client') as client:
+            client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
+            claims = self.verifier.verify_proof(encode(raw), encode(signature), CHALLENGE)
+            self.assertEqual(claims, self.identity())
+        self.assertEqual(claims['certificate_fingerprint'], hashlib.sha256(raw).hexdigest())
+        client.return_value.verify_signed_data.assert_called_once_with(encode(signature), 'sha256')
+
+    def test_explicit_ca_false_does_not_allow_trailing_data_or_signature_substitution(self):
+        leaf = issue_certificate(
+            self.key, issuer_key=self.ca_key, issuer=self.ca, explicit_ca_false=True,
+        )
+        raw = leaf.public_bytes(serialization.Encoding.DER)
+        signature = self.sign_p7(leaf)
+        for cert, proof in ((raw + b'\x00', signature), (raw, signature + b'\x00'),
+                            (raw, self.p7)):
+            with self.subTest(cert_size=len(cert), signature_size=len(proof)):
+                with patch.object(self.verifier, '_client') as client, self.assertRaises(UKeyAuthError):
+                    self.verifier.verify_proof(encode(cert), encode(proof), CHALLENGE)
+                client.assert_not_called()
+
+    def test_sm2_attached_signer_preserves_explicit_ca_false_for_both_content_oids(self):
+        certificate = sm2_structure()
+        certificate['tbs_certificate']['extensions'][0]['extn_value'] = asn1_x509.BasicConstraints.load(
+            b'\x30\x03\x01\x01\x00',
+        )
+        raw = certificate.dump()
+        parsed = vctk_s.checked_certificate(raw)
+        self.assertEqual(parsed.dump(), raw)
+        for gm in (False, True):
+            with self.subTest(gm=gm):
+                signature = sm2_p7_structure(parsed, gm=gm).dump()
+                self.assertEqual(vctk_s.check_attached_signer(signature, parsed, CHALLENGE.encode()), 'sm3')
+                content = vctk_s.load_signed_der(vctk_s.VCTKSContentInfo, signature)
+                self.assertEqual(content.dump(), signature)
+                self.assertEqual(content['content']['certificates'][0].chosen.dump(), raw)
 
     def test_changed_challenge_is_rejected_before_remote_verification(self):
         with patch.object(self.verifier, '_client') as client, self.assertRaises(UKeyAuthError):

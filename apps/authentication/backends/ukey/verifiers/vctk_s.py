@@ -70,6 +70,45 @@ class VCTKSContentInfo(cms.ContentInfo):
     }
 
 
+def load_signed_der(cls, data):
+    """Preserve signed bytes while accepting the vendor's explicit CA=false."""
+    value = cls.load(data, strict=True)
+    value.native
+    if len(value) != len(cls._fields):
+        raise ValueError('Unexpected signed data members')
+
+    canonical = cls.load(data, strict=True).dump(force=True)
+    if canonical == data:
+        return value
+
+    # Normalize only a comparison copy. Re-encoding the original certificate
+    # would change its signed content and its binding fingerprint.
+    comparison = cls.load(data, strict=True)
+    if cls is Certificate:
+        certificates = [(None, comparison)]
+    elif comparison['content_type'].dotted in SIGNED_DATA_OIDS:
+        certificates = [
+            (index, item.chosen) for index, item in enumerate(comparison['content']['certificates'])
+            if item.name == 'certificate'
+        ]
+    else:
+        certificates = []
+    for index, certificate in certificates:
+        changed = False
+        for extension in certificate['tbs_certificate']['extensions']:
+            if (extension['extn_id'].native == 'basic_constraints'
+                    and extension['extn_value'].contents == b'\x30\x03\x01\x01\x00'):
+                extension['extn_value'] = {'ca': False}
+                changed = True
+        if changed and index is not None:
+            comparison['content']['certificates'][index] = VCTKSCertificateChoices(
+                name='certificate', value=certificate,
+            )
+    if comparison.dump() != canonical:
+        raise ValueError('Unsupported signed data encoding')
+    return value
+
+
 def certificate_algorithm(certificate):
     algorithm = certificate['tbs_certificate']['subject_public_key_info']['algorithm']
     if algorithm['algorithm'].native == 'rsa':
@@ -90,7 +129,7 @@ def check_certificate_validity(certificate):
 def checked_certificate(data, *, ca=False, check_time=True):
     if not isinstance(data, bytes) or not 1 <= len(data) <= MAX_CERT:
         raise ValueError('Invalid certificate size')
-    certificate = strict_der(Certificate, data)
+    certificate = strict_der(Certificate, data) if ca else load_signed_der(Certificate, data)
     certificate_algorithm(certificate)
     extensions = certificate['tbs_certificate']['extensions']
     extension_ids = [extension['extn_id'].dotted for extension in extensions]
@@ -190,7 +229,7 @@ def _signer_matches(sid, certificate):
 def check_attached_signer(signature, certificate, message):
     if not isinstance(signature, bytes) or not 1 <= len(signature) <= MAX_P7_SIZE:
         raise ValueError('Invalid P7 signature size')
-    content = strict_der(VCTKSContentInfo, signature)
+    content = load_signed_der(VCTKSContentInfo, signature)
     if content['content_type'].dotted not in SIGNED_DATA_OIDS:
         raise ValueError('Attached SignedData required')
     signed = content['content']

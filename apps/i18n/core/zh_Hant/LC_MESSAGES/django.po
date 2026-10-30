@@ -13281,3 +13281,6 @@ msgstr "UKey 挑戰碼請求過於頻繁，請稍後重試"
 
 msgid "VCTK_S random generation check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
 msgstr "VCTK_S 隨機數介面檢查通過，尚未驗證 UKey 簽章及憑證，設定未儲存。"
+
+msgid "Certificate or UKey is not bound to a user"
+msgstr "憑證或 UKey 尚未綁定使用者"
