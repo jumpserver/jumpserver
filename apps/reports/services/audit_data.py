@@ -1,6 +1,6 @@
-"""Bounded, organization-aware data for the audit report document.
+"""Organization-aware data for the audit report document.
 
-Totals are computed by the storage backend; only evidence samples are bounded.
+Grouped distributions are complete; only raw evidence samples are bounded.
 An unavailable or unauthorized source is never represented by a zero count.
 """
 import copy
@@ -37,7 +37,6 @@ from .queries import es_counts, session_platform_counts
 
 logger = logging.getLogger(__name__)
 SAMPLE_LIMIT = 20
-RANK_LIMIT = 10
 
 THEME_CHAPTERS = {theme: tuple(config['chapters']) for theme, config in THEMES.items()}
 CHAPTER_SOURCES = {
@@ -222,14 +221,14 @@ class AuditReportBuilder:
         ):
             grouped = qs.order_by().values(field).annotate(count=Count('id')).order_by('-count', field)
             labels = dict(SessionType.choices) if field == 'type' else {}
-            rows = [{'name': str(labels.get(row[field], row[field])) or _('Not recorded'), 'count': row['count']} for row in grouped[:RANK_LIMIT]]
+            rows = [{'name': str(labels.get(row[field], row[field])) or _('Not recorded'), 'count': row['count']} for row in grouped.iterator()]
             tables.append(table(key, title, [('name', label), ('count', _('Session Count'))], rows,
-                                total=grouped.count(), limit=RANK_LIMIT))
+                                limit=None))
         platforms = session_platform_counts(qs, Asset.objects.all())
         tables.append(table('sessions_by_platform', _('Platform Access Distribution'), [('name', _('Platform')), ('count', _('Session Count'))],
                             [{'name': name or _('Asset deleted or platform not recorded'), 'count': count}
-                             for name, count in platforms.most_common(RANK_LIMIT)],
-                            total=len(platforms), limit=RANK_LIMIT))
+                             for name, count in platforms.most_common()],
+                            limit=None))
         days_count = (self.end - self.start).days + 1
         interval = 'month' if days_count > 92 else 'week' if days_count > 31 else 'day'
         buckets = {}
@@ -624,7 +623,7 @@ class AuditReportBuilder:
 
         qs = Asset.objects.all()
         stats = qs.aggregate(total=Count('id'), active=Count('id', filter=Q(is_active=True)), connected=Count('id', filter=Q(connectivity=Connectivity.OK)))
-        grouped = qs.order_by().values('platform__name').annotate(count=Count('id')).order_by('-count')
+        grouped = qs.order_by().values('platform__name').annotate(count=Count('id')).order_by('-count', 'platform__name')
         failures = [value for value, _label in Connectivity.choices if value not in (Connectivity.OK, Connectivity.UNKNOWN, Connectivity.NA)]
         checks = qs.annotate(report_check=Case(
             When(connectivity=Connectivity.OK, then=Value('success')),
@@ -646,7 +645,7 @@ class AuditReportBuilder:
             metric('active_assets_inventory', _('Currently Enabled Assets'), stats['active'], unit=_('assets')),
             metric('connected_assets', _('Assets with Latest Check Successful'), stats['connected'], unit=_('assets')),
         ], [table('asset_platforms', _('Current Asset Distribution by Platform'), [('name', _('Platform')), ('count', _('Asset Count'))],
-                  [{'name': row['platform__name'] or _('Not recorded'), 'count': row['count']} for row in grouped[:RANK_LIMIT]], total=grouped.count(), limit=RANK_LIMIT),
+                  [{'name': row['platform__name'] or _('Not recorded'), 'count': row['count']} for row in grouped.iterator()], limit=None),
             table('asset_connectivity', _('Stored Asset Connectivity Results'), [
                 ('status', _('Check Result')), ('count', _('Asset Count')), ('latest_checked', _('Most Recent Stored Check')),
             ], check_rows)])
@@ -656,7 +655,7 @@ class AuditReportBuilder:
 
         qs = Account.objects.all()
         stats = qs.aggregate(total=Count('id'), active=Count('id', filter=Q(is_active=True)), connected=Count('id', filter=Q(connectivity=Connectivity.OK)))
-        grouped = qs.order_by().values('asset__name').annotate(count=Count('id')).order_by('-count')
+        grouped = qs.order_by().values('asset__name').annotate(count=Count('id')).order_by('-count', 'asset__name')
         failures = [value for value, _label in Connectivity.choices if value not in (Connectivity.OK, Connectivity.UNKNOWN, Connectivity.NA)]
         checks = qs.annotate(report_check=Case(
             When(connectivity=Connectivity.OK, then=Value('success')),
@@ -678,7 +677,7 @@ class AuditReportBuilder:
             metric('active_accounts', _('Currently Enabled Accounts'), stats['active'], unit=_('accounts')),
             metric('connected_accounts', _('Managed Accounts with Latest Check Successful'), stats['connected'], unit=_('accounts')),
         ], [table('accounts_by_asset', _('Asset Account Count Ranking'), [('name', _('Asset')), ('count', _('Account Count'))],
-                  [{'name': row['asset__name'] or _('Not recorded'), 'count': row['count']} for row in grouped[:RANK_LIMIT]], total=grouped.count(), limit=RANK_LIMIT),
+                  [{'name': row['asset__name'] or _('Not recorded'), 'count': row['count']} for row in grouped.iterator()], limit=None),
             table('account_connectivity', _('Stored Managed Account Connectivity Results'), [
                 ('status', _('Check Result')), ('count', _('Account Count')), ('latest_checked', _('Most Recent Stored Check')),
             ], check_rows)])
