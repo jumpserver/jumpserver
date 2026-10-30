@@ -18691,3 +18691,8 @@ msgid ""
 msgstr ""
 "0 表示关闭自动锁屏。本机无键鼠操作达到设定时长后，锁定当前站点账号的主页面和资产窗口。解锁需在主页面联网验证锁屏密码。未设置密码也会锁定，可前往 "
 "Web 个人设置中设置密码。外部软件窗口不受保护。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 未设置加密密码，请前往个人设置 → 用户认证 → 文件加密进行设置。"

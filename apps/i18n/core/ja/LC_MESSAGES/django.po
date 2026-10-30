@@ -17899,3 +17899,8 @@ msgstr ""
 "0 "
 "は自動ロックを無効にします。システムのキーボードやマウスが設定時間操作されないと、現在のサイトとアカウントのメイン画面と資産ウィンドウをロックします。メイン画面でオンラインのロックパスワード検証後に解除できます。パスワード未設定でもロックされます。Web"
 " の個人設定で設定してください。外部アプリの画面は保護されません。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 暗号化パスワードが未設定です。個人設定 → ユーザー認証 → ファイル暗号化で設定してください。"

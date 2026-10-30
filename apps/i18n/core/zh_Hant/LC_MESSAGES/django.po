@@ -17619,3 +17619,8 @@ msgstr ""
 "0 "
 "表示停用自動鎖定。本機無鍵盤滑鼠操作達到設定時長後，鎖定目前站點帳號的主頁面與資產視窗。須在主頁面連線驗證鎖定密碼後解鎖。尚未設定密碼也會鎖定，可前往 "
 "Web 個人設定中設定密碼。外部軟體視窗不受保護。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 尚未設定加密密碼，請前往個人設定 → 使用者驗證 → 檔案加密進行設定。"

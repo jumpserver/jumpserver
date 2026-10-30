@@ -17828,3 +17828,8 @@ msgstr ""
 "0은 자동 잠금을 끕니다. 시스템 키보드와 마우스 입력이 설정 시간 동안 없으면 현재 사이트 계정의 기본 화면과 자산 창을 잠급니다. "
 "기본 화면에서 온라인으로 잠금 비밀번호를 검증한 후 해제합니다. 비밀번호가 없어도 잠기며 Web 개인 설정에서 설정할 수 있습니다. 외부"
 " 프로그램 창은 보호되지 않습니다."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 암호화 비밀번호가 없습니다. 개인 설정 → 사용자 인증 → 파일 암호화에서 설정하세요."
