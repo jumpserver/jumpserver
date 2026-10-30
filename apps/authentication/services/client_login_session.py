@@ -193,14 +193,15 @@ def _session_operation(mutate):
         yield
 
 
-def validate_session(session_id, *, user_id=None, mutate=False):
+def validate_session(session_id, *, mutate=False):
     with _session_operation(mutate):
         queryset = ClientLoginSession.objects.select_related('user')
         if mutate:
             queryset = queryset.select_for_update()
         session = queryset.filter(pk=session_id).first()
-        return bool(session and (user_id is None or session.user_id == user_id)
-                    and _session_is_valid(session, client_login_policy(), timezone.now(), mutate=mutate))
+        return bool(session and _session_is_valid(
+            session, client_login_policy(), timezone.now(), mutate=mutate,
+        ))
 
 
 def _validate_family(application, user_id, family, *, touch=False, mutate=False):
@@ -269,9 +270,8 @@ def revoke_client_authorizations(reason='policy_changed'):
 
 
 def clear_client_login_sessions():
-    """Keep terminated rows for 30 days and while credentials/tickets refer to them."""
+    """Keep terminated rows for 30 days and while OAuth credentials refer to them."""
     from django.db.models import Exists, OuterRef
-    from authentication.models import ConnectionToken
 
     with client_policy_lock(), transaction.atomic():
         # Authentication checks enforce these deadlines even if cleanup never runs.
@@ -288,9 +288,8 @@ def clear_client_login_sessions():
         refresh_tokens = get_refresh_token_model().objects.filter(
             application_id=OuterRef('application_id'), token_family=OuterRef('token_family'),
         )
-        tickets = ConnectionToken._base_manager.filter(client_login_session_id=OuterRef('pk'))
         sessions = ClientLoginSession.objects.annotate(
-            has_refresh=Exists(refresh_tokens), has_ticket=Exists(tickets),
+            has_refresh=Exists(refresh_tokens),
             has_live_refresh=Exists(refresh_tokens.filter(revoked__isnull=True, access_token__isnull=False)),
         )
         # Tokens may have been revoked by the existing OAuth admin or cleanup path.
@@ -308,4 +307,4 @@ def clear_client_login_sessions():
         ).filter(has_live_session=False)
         get_access_token_model().objects.filter(pk__in=obsolete.values('access_token_id')).delete()
         obsolete.delete()
-        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=30), has_refresh=False, has_ticket=False).delete()
+        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=30), has_refresh=False).delete()

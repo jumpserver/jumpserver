@@ -17924,12 +17924,6 @@ msgstr "Atualize o cliente JumpServer para usar a política de login configurada
 msgid "Client login session expired. Please authenticate again."
 msgstr "A sessão do cliente expirou. Autentique-se novamente."
 
-msgid "Client login session belongs to a different user"
-msgstr "A sessão do cliente pertence a outro usuário"
-
-msgid "Client login session"
-msgstr "Sessão do cliente"
-
 msgid "Log in again after exiting the client"
 msgstr "Entrar novamente após sair"
 

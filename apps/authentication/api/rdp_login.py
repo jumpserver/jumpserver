@@ -9,7 +9,6 @@ from uuid import uuid4
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -126,11 +125,11 @@ def issue_applet_ticket(token):
     }
 
 
-@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class RDPLoginRedeemApi(APIView):
     permission_classes = [IsServiceAccount]
     serializer_class = RDPLoginRedeemSerializer
 
+    @transaction.atomic
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -148,7 +147,6 @@ class RDPLoginRedeemApi(APIView):
             if (ticket.expires_at <= now
                     or not secrets.compare_digest(ticket.password_hash, password_hash)):
                 raise PermissionDenied(gettext('Invalid or expired RDP login authorization'))
-            token.validate_client_login_session(mutate=True)
             applet = check_connection(token)
             check_binding(ticket, token, applet, request.user)
             # The ticket/token deadline only governs this exchange. Once it
@@ -159,7 +157,6 @@ class RDPLoginRedeemApi(APIView):
             # outcome requires a new connection; it never reopens this ticket.
             # Request normal token consumption without accepting client overrides;
             # reusable-token and Kubernetes exceptions follow the shared policy.
-            # Policy changes during preparation are checked at credential release.
             connection = get_connection_token_secret(
                 token, ConnectionTokenSecretSerializer, expire_now=True,
             )

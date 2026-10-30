@@ -17943,12 +17943,6 @@ msgstr "Обновите клиент JumpServer, чтобы использов�
 msgid "Client login session expired. Please authenticate again."
 msgstr "Срок действия сеанса клиента истёк. Пройдите аутентификацию повторно."
 
-msgid "Client login session belongs to a different user"
-msgstr "Сеанс входа клиента принадлежит другому пользователю"
-
-msgid "Client login session"
-msgstr "Сеанс входа клиента"
-
 msgid "Log in again after exiting the client"
 msgstr "Повторный вход после выхода из приложения"
 
