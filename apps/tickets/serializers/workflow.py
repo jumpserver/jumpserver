@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.db import transaction
 from rest_framework import serializers
 
@@ -8,6 +9,7 @@ from tickets.plugins import ticket_plugins
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
+    display_name = serializers.CharField(read_only=True)
     type_label = serializers.CharField(source='get_type_display', read_only=True)
     active_version_number = serializers.IntegerField(source='active_version.number', read_only=True, default=None)
 
@@ -17,7 +19,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workflow
-        fields = ['id', 'name', 'type', 'type_label', 'enabled', 'comment', 'org_id', 'active_version',
+        fields = ['id', 'name', 'display_name', 'type', 'type_label', 'enabled', 'comment', 'org_id', 'active_version',
                   'active_version_number', 'legacy_flow_id', 'migration_notes', 'created_by', 'date_created', 'date_updated']
         read_only_fields = ['org_id', 'active_version', 'legacy_flow_id', 'migration_notes',
                             'created_by', 'date_created', 'date_updated']
@@ -26,16 +28,16 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if self.instance and 'type' in attrs and attrs['type'] != self.instance.type and self.instance.versions.exists():
-            raise serializers.ValidationError({'type': 'A published workflow cannot change ticket type.'})
+            raise serializers.ValidationError({'type': gettext('A published workflow cannot change ticket type.')})
         if attrs.get('enabled') and (not self.instance or not self.instance.active_version_id):
-            raise serializers.ValidationError({'enabled': 'Publish a version before enabling the workflow.'})
+            raise serializers.ValidationError({'enabled': gettext('Publish a version before enabling the workflow.')})
         org_id = self.instance.org_id if self.instance else current_org.id
         qs = Workflow.objects.filter(org_id=org_id, name=attrs.get('name', getattr(self.instance, 'name', '')),
                                      type=attrs.get('type', getattr(self.instance, 'type', '')))
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
-            raise serializers.ValidationError({'name': 'A workflow with this name and type already exists.'})
+            raise serializers.ValidationError({'name': gettext('A workflow with this name and type already exists.')})
         return attrs
 
     def create(self, validated_data):
@@ -60,10 +62,15 @@ class WorkflowPublishSerializer(serializers.Serializer):
 
 class WorkflowVersionSerializer(serializers.ModelSerializer):
     definition = serializers.SerializerMethodField()
+    node_names = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowVersion
-        fields = ['id', 'workflow', 'number', 'published_at', 'created_by', 'definition']
+        fields = ['id', 'workflow', 'number', 'published_at', 'created_by', 'definition', 'node_names']
+
+    @staticmethod
+    def get_node_names(obj):
+        return {node.key: str(obj.workflow.node_display_name(node)) for node in obj.nodes.all()}
 
     @staticmethod
     def get_definition(obj):
@@ -73,8 +80,13 @@ class WorkflowVersionSerializer(serializers.ModelSerializer):
 class ApprovalTaskSerializer(serializers.ModelSerializer):
     ticket = serializers.UUIDField(source='node_instance.instance.ticket_id', read_only=True)
     instance = serializers.UUIDField(source='node_instance.instance_id', read_only=True)
-    node_name = serializers.CharField(source='node_instance.node.name', read_only=True)
+    node_name = serializers.SerializerMethodField()
     deadline = serializers.DateTimeField(source='node_instance.deadline', read_only=True)
+
+    @staticmethod
+    def get_node_name(obj):
+        run = obj.node_instance
+        return str(run.instance.version.workflow.node_display_name(run.node))
 
     class Meta:
         model = ApprovalTask
@@ -86,9 +98,13 @@ class ApprovalTaskSerializer(serializers.ModelSerializer):
 class WorkflowNodeInstanceSerializer(serializers.ModelSerializer):
     config = serializers.JSONField(source='node.config', read_only=True)
     key = serializers.CharField(source='node.key', read_only=True)
-    name = serializers.CharField(source='node.name', read_only=True)
+    name = serializers.SerializerMethodField()
     type = serializers.CharField(source='node.type', read_only=True)
     tasks = ApprovalTaskSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_name(obj):
+        return str(obj.instance.version.workflow.node_display_name(obj.node))
 
     class Meta:
         model = WorkflowNodeInstance

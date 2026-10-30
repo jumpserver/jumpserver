@@ -39,6 +39,11 @@ class ConnectionToken(JMSOrgBaseModel):
         'users.User', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('User')
     )
+    client_login_session = models.ForeignKey(
+        'authentication.ClientLoginSession', on_delete=models.CASCADE,
+        null=True, blank=True, related_name='connection_tokens',
+        verbose_name=_('Client login session'),
+    )
     asset = models.ForeignKey(
         'assets.Asset', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('Asset'),
@@ -188,7 +193,21 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire_at(self):
         return self.permed_account.date_expired.timestamp()
 
+    def validate_client_login_session(self, *, mutate=False):
+        if not self.client_login_session_id:
+            return
+        from authentication.services.client_login_session import validate_session
+        if not validate_session(self.client_login_session_id, user_id=self.user_id, mutate=mutate):
+            raise PermissionDenied(
+                _('Client login session expired. Please authenticate again.'),
+                code='client_session_expired',
+            )
+
     def is_valid(self, include_personal_secret=False, *, check_expiration=True) -> bool:
+        # Established connections use check_expiration=False for their existing
+        # permission checks. Login expiration only prevents new connections.
+        if check_expiration:
+            self.validate_client_login_session()
         if not self.acl_ready:
             raise PermissionDenied(_('Connection ACL requirements are incomplete'))
         if not self.is_active:

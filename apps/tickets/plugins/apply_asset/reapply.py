@@ -1,4 +1,5 @@
 """Prepare a new application without changing the source ticket or its grant."""
+from django.utils.translation import gettext
 from datetime import timedelta
 from urllib.parse import urljoin
 
@@ -41,7 +42,7 @@ def source_ticket(source_id, user):
     with tmp_to_root_org():
         ticket = Ticket.objects.filter(pk=source_id, type='apply_asset').first()
     if not ticket or not reapply_kind(ticket, user):
-        raise PermissionDenied('Only the applicant or authorized beneficiary can reuse this request.')
+        raise PermissionDenied(gettext('Only the applicant or authorized beneficiary can reuse this request.'))
     return ticket
 
 
@@ -63,15 +64,15 @@ def validate_reapplication(attrs, request, source_id):
         for node in Node.objects.filter(pk__in=data.get('apply_nodes', []), org_id=org_id):
             ids.update(str(pk) for pk in node.get_all_assets().values_list('pk', flat=True))
         if assets.filter(pk__in=ids).count() != len(ids):
-            raise ValidationError({'apply_assets': 'Select active assets currently available for application.'})
+            raise ValidationError({'apply_assets': gettext('Select active assets currently available for application.')})
         names = set(Account.objects.filter(asset_id__in=ids, is_active=True).values_list('username', flat=True))
         if any(name not in names and name not in ('@ALL', '@SPEC', '@USER', '@INPUT', '@ANON')
                for name in data.get('apply_accounts', [])):
-            raise ValidationError({'apply_accounts': 'Select existing active accounts on the requested assets.'})
+            raise ValidationError({'apply_accounts': gettext('Select existing active accounts on the requested assets.')})
         if request.user.pk != ticket.applicant_id and attrs['request_data']['apply_users'] != [str(request.user.pk)]:
-            raise PermissionDenied('A beneficiary can only renew access for themselves.')
+            raise PermissionDenied(gettext('A beneficiary can only renew access for themselves.'))
     if parse_datetime(attrs['request_data']['apply_date_expired']) <= timezone.now():
-        raise ValidationError({'apply_date_expired': 'Select a future expiration time.'})
+        raise ValidationError({'apply_date_expired': gettext('Select a future expiration time.')})
     attrs['meta'] = {'source_ticket': source_info(ticket, request.user)}
     if ticket.applicant_id == request.user.pk or org_id != ticket.org_id:
         attrs['meta']['source_ticket']['kind'] = 'reapply'
@@ -83,7 +84,7 @@ class ReapplyAsset(TicketAction):
     def execute(self, ticket, request, kind=None):
         kind = kind or reapply_kind(ticket, request.user)
         if not kind:
-            raise PermissionDenied('This request cannot be reapplied for by this user.')
+            raise PermissionDenied(gettext('This request cannot be reapplied for by this user.'))
         data = ticket.request_data
         instance = getattr(ticket, 'workflow_instance', None)
         context = instance.context if instance else {}

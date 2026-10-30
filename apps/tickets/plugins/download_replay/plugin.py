@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from ..base import TicketPlugin
@@ -38,11 +39,11 @@ class Plugin(TicketPlugin):
         if (not parameters or ticket.type != self.type or instance.ticket_id != ticket.pk or
                 str(instance.org_id) != str(ticket.org_id) or instance.applicant_id != ticket.applicant_id or
                 instance.state != 'approved'):
-            raise WorkflowConfigurationError('The session recording approval is not valid.')
+            raise WorkflowConfigurationError(gettext('The session recording approval is not valid.'))
         session_id, expires_at = parameters
         with tmp_to_org(ticket.org_id):
             if not Session.objects.filter(pk=session_id, org_id=ticket.org_id, has_replay=True).exists():
-                raise WorkflowConfigurationError('The requested session recording is no longer available.')
+                raise WorkflowConfigurationError(gettext('The requested session recording is no longer available.'))
         return {'action': 'grant_replay_download', 'session_id': str(session_id),
                 'expires_at': expires_at.isoformat()}
 
@@ -96,7 +97,7 @@ class Plugin(TicketPlugin):
         from rest_framework.exceptions import ValidationError
 
         if request.query_params.get('field', 'session') != 'session':
-            raise ValidationError({'field': 'Unknown resource field.'})
+            raise ValidationError({'field': gettext('Unknown resource field.')})
 
         serializer = self.get_request_serializer(context={'request': request, 'org_id': org_id})
         sessions = serializer.get_sessions().filter(has_replay=True)
@@ -125,7 +126,7 @@ class Plugin(TicketPlugin):
         from tickets.workflow.errors import WorkflowConfigurationError
         session = Session.objects.filter(pk=ticket.request_data['session'], org_id=ticket.org_id).first()
         if not session:
-            raise WorkflowConfigurationError('The requested session no longer exists.')
+            raise WorkflowConfigurationError(gettext('The requested session no longer exists.'))
         assets = Asset.objects.filter(pk=session.asset_id, org_id=ticket.org_id) if session.asset_id else []
         return {'request': {**ticket.request_data, 'session_asset': session.asset, 'session_user': session.user,
                             'session_account': session.account, 'session_date_start': session.date_start.isoformat()},

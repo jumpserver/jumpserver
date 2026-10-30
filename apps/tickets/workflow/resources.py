@@ -1,4 +1,5 @@
 """Resource amendments share the workflow lock and never cast an approval vote."""
+from django.utils.translation import gettext
 import copy
 import json
 
@@ -29,7 +30,7 @@ def application_assets(request, org_id):
 
 def resource_availability(plugin, request, org_id, data=None):
     if not plugin.resource_serializer:
-        raise ValidationError('This ticket type does not support resource adjustment.')
+        raise ValidationError(gettext('This ticket type does not support resource adjustment.'))
     data = data or request.query_params
     assets = application_assets(request, org_id)
     ids = data.get('apply_assets', []) if plugin.type == 'apply_asset' else [data.get('asset')]
@@ -38,7 +39,7 @@ def resource_availability(plugin, request, org_id, data=None):
     ids = [value for value in ids if value]
     ids = serializers.ListField(child=serializers.UUIDField(), max_length=100).run_validation(ids)
     if ids and assets.filter(pk__in=ids).count() != len(set(ids)):
-        raise ValidationError({'asset': 'Select assets available for application in this organization.'})
+        raise ValidationError({'asset': gettext('Select assets available for application in this organization.')})
     selected = assets.filter(pk__in=ids)
     # Asset permission forms also accept nodes and dynamic account selectors.
     nodes = data.get('apply_nodes', []) if plugin.type == 'apply_asset' else []
@@ -52,7 +53,7 @@ def resource_availability(plugin, request, org_id, data=None):
         view.request = request
         allowed = view.get_queryset().filter(pk__in=node_ids, org_id=org_id)
         if allowed.count() != len(set(node_ids)):
-            raise ValidationError({'apply_nodes': 'Select nodes available for application in this organization.'})
+            raise ValidationError({'apply_nodes': gettext('Select nodes available for application in this organization.')})
         asset_ids = set(ids)
         for node in allowed:
             asset_ids.update(node.get_all_assets().filter(org_id=org_id).values_list('pk', flat=True))
@@ -80,7 +81,7 @@ def validate_description(plugin, attrs, context):
     if not plugin.resources_pending(attrs):
         return
     if not empty:
-        raise ValidationError({'resource_description': 'Select the available resources before submitting.'})
+        raise ValidationError({'resource_description': gettext('Select the available resources before submitting.')})
     attrs['resource_description'] = description
 
 
@@ -92,13 +93,13 @@ def check_adjustment(instance, task, user):
     if (not plugin.resource_serializer or 'legacy' in instance.context or instance.state != 'running'
             or task.state != 'pending' or task.node_instance.state != 'running'
             or (task.node_instance.deadline and task.node_instance.deadline <= timezone.now())):
-        raise WorkflowConflict('This request cannot be adjusted now.')
+        raise WorkflowConflict(gettext('This request cannot be adjusted now.'))
     if (task.assignee_id != user.pk or not available_users(instance.org_id).filter(pk=user.pk).exists()
             or str(user.pk) in excluded_approver_ids(task.node_instance.node.config, instance.context, instance.applicant_id)):
         raise PermissionDenied()
     with tmp_to_org(instance.org_id):
         if not {'assets.view_asset', 'accounts.view_account'}.issubset(user.get_all_permissions()):
-            raise PermissionDenied('Adjusting resources requires asset and account query permissions in this organization.')
+            raise PermissionDenied(gettext('Adjusting resources requires asset and account query permissions in this organization.'))
     return plugin
 
 
@@ -134,7 +135,7 @@ def adjustment_status(instance, user):
 def check_revision(instance, revision):
     current = instance.context.get('resource_revision', 0)
     if (current or revision is not None) and revision != current:
-        raise WorkflowConflict('The request was adjusted. Refresh and review the current resources.')
+        raise WorkflowConflict(gettext('The request was adjusted. Refresh and review the current resources.'))
 
 
 def adjust_resources(engine, instance, task, user, data, reason, revision):
@@ -177,7 +178,7 @@ def adjust_resources(engine, instance, task, user, data, reason, revision):
         # Fail atomically: a bad new branch must not discard the pending review or the previous scope.
         engine._execute(instance, instance.version.nodes.get(type='start'))
         if instance.state != 'running':
-            raise WorkflowConfigurationError('An adjusted request must pass an approval node before completion.')
+            raise WorkflowConfigurationError(gettext('An adjusted request must pass an approval node before completion.'))
     return instance
 
 
@@ -198,11 +199,11 @@ def resource_options(instance, task, user, params):
             return list(Node.objects.filter(org_id=instance.org_id, full_value__icontains=search)
                         .order_by('full_value').values('id', 'full_value')[:100])
         if resource != 'account':
-            raise ValidationError({'resource': 'Unknown resource field.'})
+            raise ValidationError({'resource': gettext('Unknown resource field.')})
         ids = serializers.ListField(child=serializers.UUIDField(), max_length=100).run_validation(
             params.get('assets', '').split(',') if params.get('assets') else [])
         if assets.filter(pk__in=ids).count() != len(set(ids)):
-            raise ValidationError({'assets': 'Select active assets in the ticket organization.'})
+            raise ValidationError({'assets': gettext('Select active assets in the ticket organization.')})
         accounts = Account.objects.filter(asset__in=assets.filter(pk__in=ids)).exclude(username='')
         if plugin.type == 'view_secret':
             from accounts.const import SecretType

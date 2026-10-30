@@ -5,6 +5,7 @@ the same transaction. Business adapters supply a trusted JSON context and consum
 the resulting instance state; this module never provisions access or calls a
 concrete ticket handler.
 """
+from django.utils.translation import gettext
 from datetime import timedelta
 
 from django.db import transaction
@@ -29,9 +30,9 @@ class WorkflowEngine:
     @staticmethod
     def _check_org(org_id, allow_root=False):
         if not org_id or (org_id == Organization.ROOT_ID and not allow_root):
-            raise WorkflowConfigurationError('Workflow instances must belong to a concrete organization.')
+            raise WorkflowConfigurationError(gettext('Workflow instances must belong to a concrete organization.'))
         if not current_org.is_root() and str(current_org.id) != str(org_id):
-            raise PermissionDenied('This workflow belongs to another organization.')
+            raise PermissionDenied(gettext('This workflow belongs to another organization.'))
 
     @staticmethod
     def _event(instance, event_type, *, node=None, task=None, actor=None, **data):
@@ -51,28 +52,31 @@ class WorkflowEngine:
         existing = WorkflowInstance.objects.filter(ticket=ticket).first()
         if existing:
             if existing.version.workflow_id != workflow.pk:
-                raise WorkflowConflict('The ticket already has a different workflow.')
+                raise WorkflowConflict(gettext('The ticket already has a different workflow.'))
             return existing
         if ticket.ticket_steps.exists() or ticket.status != 'open':
-            raise WorkflowConflict('Only new tickets without legacy approval steps can start a workflow.')
+            raise WorkflowConflict(gettext('Only new tickets without legacy approval steps can start a workflow.'))
         # Root definitions can be used by any concrete organization. Resolve
         # approvers against the ticket organization, never the definition's org.
         from orgs.utils import tmp_to_root_org
         with tmp_to_root_org():
             workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
         if workflow.org_id not in (ticket.org_id, Organization.ROOT_ID):
-            raise PermissionDenied('This workflow belongs to another organization.')
+            raise PermissionDenied(gettext('This workflow belongs to another organization.'))
+        if (workflow.org_id == Organization.ROOT_ID and not workflow.is_system
+                and not Workflow.get_org_related_flows(ticket.org_id).filter(pk=workflow.pk).exists()):
+            raise WorkflowConfigurationError(gettext('Select an enabled workflow with a published version.'))
         version = workflow.active_version
         if not workflow.enabled or not version or not version.published_at or version.workflow_id != workflow.pk:
-            raise WorkflowConfigurationError('Select an enabled workflow with a published version.')
+            raise WorkflowConfigurationError(gettext('Select an enabled workflow with a published version.'))
         if ticket.type != workflow.type:
-            raise WorkflowConfigurationError('The workflow type does not match the ticket.')
+            raise WorkflowConfigurationError(gettext('The workflow type does not match the ticket.'))
         snapshot = json_snapshot(context)
         if not isinstance(snapshot, dict):
-            raise WorkflowConfigurationError('The context snapshot must be an object.')
+            raise WorkflowConfigurationError(gettext('The context snapshot must be an object.'))
         applicant = snapshot.setdefault('applicant', {})
         if not isinstance(applicant, dict) or not ticket.applicant_id:
-            raise WorkflowConfigurationError('A workflow requires an applicant.')
+            raise WorkflowConfigurationError(gettext('A workflow requires an applicant.'))
         # Identity is authoritative; adapters may add department/manager metadata.
         applicant.update(user_snapshot(ticket.applicant))
         with tmp_to_org(ticket.org_id):
@@ -98,10 +102,10 @@ class WorkflowEngine:
         if instance.state != InstanceState.running or task.state != TaskState.pending:
             raise WorkflowConflict()
         if not actor or task.assignee_id != actor.pk or not available_users(instance.org_id).filter(pk=actor.pk).exists():
-            raise PermissionDenied('Only the assigned, active organization member may process this task.')
+            raise PermissionDenied(gettext('Only the assigned, active organization member may process this task.'))
         excluded = excluded_approver_ids(task.node_instance.node.config, instance.context, instance.applicant_id)
         if str(actor.pk) in excluded:
-            raise PermissionDenied('This user cannot process this approval task.')
+            raise PermissionDenied(gettext('This user cannot process this approval task.'))
         if task.node_instance.state != NodeState.running:
             raise WorkflowConflict()
         return instance, task
@@ -125,7 +129,7 @@ class WorkflowEngine:
                 strategy = node.config['strategy']
                 run.required = len(users) if strategy == 'all' else node.config.get('required', 1)
                 if run.required > len(users):
-                    raise WorkflowConfigurationError('The quorum exceeds the number of eligible approvers.')
+                    raise WorkflowConfigurationError(gettext('The quorum exceeds the number of eligible approvers.'))
                 if node.config['timeout']:
                     run.deadline = timezone.now() + timedelta(seconds=node.config['timeout'])
                 run.save(update_fields=['required', 'deadline', 'date_updated'])
@@ -213,7 +217,7 @@ class WorkflowEngine:
         from .resources import check_revision
         check_revision(instance, expected_revision)
         if instance.context.get('resources_pending'):
-            raise WorkflowConflict('Complete and save the requested resources before approval.')
+            raise WorkflowConflict(gettext('Complete and save the requested resources before approval.'))
         task.state, task.comment, task.date_finished = TaskState.approved, comment, timezone.now()
         task.save(update_fields=['state', 'comment', 'date_finished', 'date_updated'])
         self._event(instance, 'approval.approved', node=run, task=task, actor=user, comment=comment)
@@ -246,7 +250,7 @@ class WorkflowEngine:
     def cancel(self, instance, user, comment=''):
         instance = self._lock_instance(instance.pk)
         if not user or instance.applicant_id != user.pk:
-            raise PermissionDenied('Only the applicant may withdraw this workflow.')
+            raise PermissionDenied(gettext('Only the applicant may withdraw this workflow.'))
         if instance.state != InstanceState.running:
             raise WorkflowConflict()
         run = instance.node_instances.select_related('node').get(state=NodeState.running)
@@ -256,21 +260,21 @@ class WorkflowEngine:
 
     def _target_user(self, instance, run, target):
         if not available_users(instance.org_id).filter(pk=target.pk).exists():
-            raise WorkflowConfigurationError('The target must be an active member of this organization.')
+            raise WorkflowConfigurationError(gettext('The target must be an active member of this organization.'))
         excluded = excluded_approver_ids(run.node.config, instance.context, instance.applicant_id)
         if str(target.pk) in excluded:
-            raise WorkflowConfigurationError('This user cannot approve this node.')
+            raise WorkflowConfigurationError(gettext('This user cannot approve this node.'))
         if run.tasks.filter(assignee=target).exists():
-            raise WorkflowConfigurationError('The target already participated in this approval node.')
+            raise WorkflowConfigurationError(gettext('The target already participated in this approval node.'))
         if run.tasks.count() >= 1000:
-            raise WorkflowConfigurationError('An approval node supports at most 1000 tasks.')
+            raise WorkflowConfigurationError(gettext('An approval node supports at most 1000 tasks.'))
 
     @transaction.atomic
     def transfer(self, task, user, target, comment=''):
         instance, task = self._lock_task(task, user)
         run = task.node_instance
         if not run.node.config['allow_transfer']:
-            raise PermissionDenied('Transfer is disabled for this node.')
+            raise PermissionDenied(gettext('Transfer is disabled for this node.'))
         if self._expire_if_due(instance, run):
             return instance
         self._target_user(instance, run, target)
@@ -286,7 +290,7 @@ class WorkflowEngine:
         instance, task = self._lock_task(task, user)
         run = task.node_instance
         if not run.node.config['allow_add_approver']:
-            raise PermissionDenied('Adding approvers is disabled for this node.')
+            raise PermissionDenied(gettext('Adding approvers is disabled for this node.'))
         if self._expire_if_due(instance, run):
             return instance
         self._target_user(instance, run, target)

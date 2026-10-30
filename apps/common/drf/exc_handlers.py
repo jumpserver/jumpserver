@@ -52,6 +52,10 @@ def common_exception_handler(exc, context):
 
         if isinstance(exc.detail, str) and isinstance(exc.get_codes(), str):
             data = {'detail': exc.detail, 'code': exc.get_codes()}
+            if isinstance(exc, exceptions.AuthenticationFailed) and getattr(exc, 'client_login_reason', None):
+                data['client_login_reason'] = exc.client_login_reason
+                if getattr(exc, 'client_login_session', None):
+                    data['client_login_session'] = exc.client_login_session
         else:
             data = exc.detail
 

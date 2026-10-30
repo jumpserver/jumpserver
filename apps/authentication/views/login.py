@@ -46,7 +46,9 @@ class UserLoginContextMixin:
     error_origin: str
 
     def get_support_auth_methods(self):
-        query_string = self.request.GET.urlencode()
+        query_params = self.request.GET.copy()
+        query_params.pop('admin', None)
+        query_string = query_params.urlencode()
         all_methods = get_auth_methods()
         methods = []
         for method in all_methods:

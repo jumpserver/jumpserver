@@ -217,6 +217,7 @@ class Config(dict):
         'REDIS_DB_CACHE': 4,
         'REDIS_DB_SESSION': 5,
         'REDIS_DB_WS': 6,
+        'CELERY_TASK_ROUTES': {},
 
         'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://127.0.0.1',
@@ -678,6 +679,9 @@ class Config(dict):
         'SECURITY_DISABLE_VIEW_SECRET': False,
         'SECURITY_MAX_IDLE_TIME': 30,
         'SECURITY_MAX_SESSION_TIME': 24,
+        'SECURITY_CLIENT_REAUTH_ON_EXIT': False,
+        'SECURITY_CLIENT_MAX_IDLE_TIME': 0,
+        'SECURITY_CLIENT_MAX_SESSION_TIME': 0,
         'SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN': 9999,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_EXPIRED_TOKEN_RECORD_KEEP_DAYS': 180,
@@ -757,7 +761,6 @@ class Config(dict):
         'PERM_EXPIRED_FIRST_NOTICE_DAYS': 3,
         'PERM_EXPIRED_DAILY_NOTICE_DAYS': 3,
         'PERM_TREE_REGEN_INTERVAL': 1,
-        'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'en',
         # Luna user preference defaults
         'LUNA_DEFAULT_IS_ASYNC_ASSET_TREE': True,
@@ -880,9 +883,6 @@ class Config(dict):
         # Suggestion api
         'SUGGESTION_LIMIT': 10,
 
-        # oauth2_provider settings 
-        'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60,
-        'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 7,
         'VENDOR': 'JumpServer',
 
         # JDMC
@@ -890,7 +890,6 @@ class Config(dict):
         'JDMC_SOCK_PATH': '',
         'SMALL_LOGO_MODE': os.environ.get('SMALL_LOGO_MODE', False),
 
-        'FLOWER_ENABLED': True,
 
         # x-forwarded-for 相关
         'TRUSTED_IP_VERIFY_ENABLED': False,

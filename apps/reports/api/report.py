@@ -214,7 +214,9 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # OrgManager captures the current organization when constructing the query.
-        queryset = Report.objects.all().order_by('-date_created')
+        # New audit layouts share this model, but have their own validation and
+        # permissions. Legacy endpoints must never edit or delete those rows.
+        queryset = Report.objects.filter(tp__in=CREATABLE_REPORT_TYPES).order_by('-date_created')
         if self.action in ('list', 'retrieve', 'data'):
             queryset = queryset.filter(tp__in=self.get_visible_report_types())
         tp = self.request.query_params.get('tp')

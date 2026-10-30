@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.db.models import Q
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -49,10 +50,11 @@ class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets
         ):
             raise PermissionDenied()
         with tmp_to_root_org():
-            workflows = Workflow.objects.filter(org_id__in=[org_id, Organization.ROOT_ID], type=ticket_type, is_system=False,
-                                                 enabled=True, active_version__published_at__isnull=False)
+            workflows = Workflow.get_org_related_flows(org_id).filter(
+                type=ticket_type, is_system=False, enabled=True, active_version__published_at__isnull=False,
+            )
             workflows = plugin.filter_workflow_options(request, org_id, workflows)
-            return Response([{'id': str(workflow.pk), 'name': workflow.name, 'type': workflow.type}
+            return Response([{'id': str(workflow.pk), 'name': str(workflow.display_name), 'type': workflow.type}
                              for workflow in workflows])
 
     @action(detail=True, methods=['post'])
@@ -79,7 +81,9 @@ class WorkflowInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['ticket', 'state', 'version']
 
     def get_queryset(self):
-        qs = WorkflowInstance.objects.select_related('version').all()
+        qs = WorkflowInstance.objects.select_related('version__workflow').prefetch_related(
+            'node_instances__node', 'node_instances__tasks',
+        )
         if not current_org.is_root():
             qs = qs.filter(org_id=str(current_org.id))
         if not (self.request.user.has_perm('tickets.view_workflowinstance') or
@@ -120,7 +124,9 @@ class ApprovalTaskViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['state', 'node_instance__instance']
 
     def get_queryset(self):
-        qs = ApprovalTask.objects.filter(assignee=self.request.user).select_related('node_instance__node')
+        qs = ApprovalTask.objects.filter(assignee=self.request.user).select_related(
+            'node_instance__node', 'node_instance__instance__version__workflow',
+        )
         if not current_org.is_root():
             qs = qs.filter(node_instance__instance__org_id=current_org.id)
         return qs
@@ -137,7 +143,7 @@ class ApprovalTaskViewSet(viewsets.ReadOnlyModelViewSet):
         if 'target' in data:
             target = available_users(task.node_instance.instance.org_id).filter(pk=data['target']).first()
             if target is None:
-                raise ValidationError({'target': 'Select an active member of this organization.'})
+                raise ValidationError({'target': gettext('Select an active member of this organization.')})
             data['target'] = target
         instance = getattr(WorkflowEngine(), operation)(task, request.user, **data)
         return Response(WorkflowInstanceSerializer(instance).data)

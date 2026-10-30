@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 import json
 
 from django.utils.module_loading import import_string
@@ -22,17 +23,17 @@ class PluginTicketApplySerializer(TicketApplySerializer):
     def validate(self, attrs):
         plugin = get_ticket_plugin(attrs['type'])
         if not plugin.self_service:
-            raise serializers.ValidationError({'type': 'This ticket type is created by its business entrypoint.'})
+            raise serializers.ValidationError({'type': gettext('This ticket type is created by its business entrypoint.')})
         payload = json_snapshot(attrs.pop('request_data'))
         if not isinstance(payload, dict):
-            raise serializers.ValidationError({'request_data': 'Request parameters must be an object.'})
+            raise serializers.ValidationError({'request_data': gettext('Request parameters must be an object.')})
         self.plugin = plugin
         if plugin.apply_serializer:
             serializer = import_string(plugin.apply_serializer)(context=self.context)
             allowed = {name for name, field in serializer.fields.items()
                        if (name.startswith('apply_') or name == 'resource_description') and not field.read_only}
             if payload.keys() - allowed:
-                raise serializers.ValidationError({'request_data': 'Unknown request parameters.'})
+                raise serializers.ValidationError({'request_data': gettext('Unknown request parameters.')})
             self.delegate = type(serializer)(data={**payload, **attrs}, context=self.context)
             self.delegate.is_valid(raise_exception=True)
             return dict(self.delegate.validated_data)

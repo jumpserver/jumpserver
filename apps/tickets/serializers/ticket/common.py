@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -13,7 +14,7 @@ class AssetRequestValidationMixin:
         with tmp_to_org(org_id):
             qs = model.objects.filter(id__in=ids, **kwargs).values_list('id', flat=True)
         if len(qs) != len(set(ids)):
-            raise serializers.ValidationError("Resources must belong to the selected organization.")
+            raise serializers.ValidationError(gettext("Resources must belong to the selected organization."))
         return list(qs)
 
     def validate_apply_accounts(self, accounts):

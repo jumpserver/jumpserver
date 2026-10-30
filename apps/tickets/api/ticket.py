@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import gettext
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -165,11 +166,11 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):
-        raise MethodNotAllowed(request.method, detail='Use the approval-task endpoint with an exact task ID.')
+        raise MethodNotAllowed(request.method, detail=gettext('Use the approval-task endpoint with an exact task ID.'))
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def reject(self, request, *args, **kwargs):
-        raise MethodNotAllowed(request.method, detail='Use the approval-task endpoint with an exact task ID.')
+        raise MethodNotAllowed(request.method, detail=gettext('Use the approval-task endpoint with an exact task ID.'))
 
     @action(detail=True, methods=[PUT], permission_classes=[IsApplicant, ])
     def close(self, request, *args, **kwargs):
@@ -181,4 +182,4 @@ class TicketViewSet(ReportExportMixin, CommonApiMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=[PUT], permission_classes=[IsAuthenticated, ])
     def bulk(self, request, *args, **kwargs):
-        raise MethodNotAllowed(request.method, detail='Use exact approval-task IDs.')
+        raise MethodNotAllowed(request.method, detail=gettext('Use exact approval-task IDs.'))

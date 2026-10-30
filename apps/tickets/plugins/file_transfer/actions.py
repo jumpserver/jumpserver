@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.db import transaction
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -26,7 +27,7 @@ def file_response(record):
         response = FileResponse(record.path.open('rb'), as_attachment=True, filename=record.name,
                                 content_type='application/octet-stream')
     except OSError as exc:
-        raise NotFound('The file is no longer available.') from exc
+        raise NotFound(gettext('The file is no longer available.')) from exc
     response['X-Content-Type-Options'] = 'nosniff'
     return response
 
@@ -42,7 +43,7 @@ class ExecuteTransfer(TicketAction):
 
     def execute(self, ticket, request):
         if request.data:
-            raise ValidationError('Execution uses the approved files and paths; parameters cannot be changed.')
+            raise ValidationError(gettext('Execution uses the approved files and paths; parameters cannot be changed.'))
         with transaction.atomic():
             WorkflowInstance.objects.select_for_update().get(ticket=ticket)
             ticket = Ticket.objects.select_related('workflow_instance', 'applicant').get(pk=ticket.pk)
@@ -71,7 +72,7 @@ class ReviewTransferFile(TicketAction):
 
     def execute(self, ticket, request):
         if ticket.workflow_instance.context.get('file_transfer_version') != 2 or not can_review(ticket, request.user):
-            raise PermissionDenied('Only the applicant and assigned reviewers can inspect uploaded files.')
+            raise PermissionDenied(gettext('Only the applicant and assigned reviewers can inspect uploaded files.'))
         record = requested_file(ticket, request, 'upload')
         return file_response(record)
 
@@ -85,7 +86,7 @@ class DownloadTransferFile(TicketAction):
         record = requested_file(ticket, request, 'download')
         execution = get_object_or_404(TicketTransferExecution, ticket=ticket, org_id=ticket.org_id)
         if not any(item.get('id') == str(record.pk) and item['state'] == 'success' for item in execution.files):
-            raise PermissionDenied('This file has not been retrieved successfully.')
+            raise PermissionDenied(gettext('This file has not been retrieved successfully.'))
         response = file_response(record)
         event(ticket, 'transfer.downloaded', file_id=str(record.pk), name=record.name, sha256=record.sha256)
         return response

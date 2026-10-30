@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
@@ -27,7 +28,7 @@ class Plugin(TicketPlugin):
     def validate_submission(self, ticket, context):
         from tickets.workflow.errors import WorkflowConfigurationError
         if settings.SECURITY_DISABLE_VIEW_SECRET:
-            raise WorkflowConfigurationError('Account password viewing is disabled.')
+            raise WorkflowConfigurationError(gettext('Account password viewing is disabled.'))
 
     def on_approved(self, instance, ticket):
         from datetime import timedelta
@@ -37,18 +38,18 @@ class Plugin(TicketPlugin):
         from tickets.workflow.errors import WorkflowConfigurationError
 
         if settings.SECURITY_DISABLE_VIEW_SECRET:
-            raise WorkflowConfigurationError('Account password viewing is disabled.')
+            raise WorkflowConfigurationError(gettext('Account password viewing is disabled.'))
         snapshots = [a for a in instance.context['accounts'] if a['secret_type'] == SecretType.PASSWORD]
         account_ids = [a['id'] for a in snapshots]
         assets = instance.context['assets']
         if len(assets) != 1 or not account_ids:
-            raise WorkflowConfigurationError('The requested password accounts are no longer available.')
+            raise WorkflowConfigurationError(gettext('The requested password accounts are no longer available.'))
         accounts = Account.objects.filter(
             pk__in=account_ids, asset_id=assets[0]['id'], asset__org_id=instance.org_id,
             asset__is_active=True, secret_type=SecretType.PASSWORD, is_active=True,
         )
         if accounts.count() != len(account_ids):
-            raise WorkflowConfigurationError('The requested password accounts are no longer available.')
+            raise WorkflowConfigurationError(gettext('The requested password accounts are no longer available.'))
         expires_at = timezone.now() + timedelta(seconds=instance.context['duration'])
         for account in accounts:
             TicketSecretAccess.objects.get_or_create(

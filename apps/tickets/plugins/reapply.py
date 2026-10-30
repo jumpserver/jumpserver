@@ -1,4 +1,5 @@
 """Prepare editable requests; never reuse approvals or execution state."""
+from django.utils.translation import gettext
 from copy import deepcopy
 
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -28,7 +29,7 @@ def source_ticket(source_id, user, ticket_type):
     with tmp_to_root_org():
         ticket = Ticket.objects.filter(pk=source_id, type=ticket_type).first()
     if not ticket or not can_reapply(ticket, user):
-        raise PermissionDenied('Only the applicant can reuse an available manual request.')
+        raise PermissionDenied(gettext('Only the applicant can reuse an available manual request.'))
     return ticket
 
 
@@ -42,7 +43,7 @@ class Reapply(TicketAction):
 
     def execute(self, ticket, request):
         if not can_reapply(ticket, request.user):
-            raise PermissionDenied('This request cannot be reapplied for by this user.')
+            raise PermissionDenied(gettext('This request cannot be reapplied for by this user.'))
         if ticket.type == 'apply_asset':
             from .apply_asset.reapply import ReapplyAsset
             return ReapplyAsset().execute(ticket, request, kind='reapply')
@@ -63,12 +64,12 @@ class Reapply(TicketAction):
                     from assets.models import Asset
                     obj = Asset.objects.get(pk=value, org_id=ticket.org_id)
                     if not obj.is_active:
-                        raise ValidationError('Inactive asset.')
+                        raise ValidationError(gettext('Inactive asset.'))
                     option = {'id': str(value), 'name': obj.name, 'address': obj.address}
                 else:
                     obj = serializer.get_sessions().filter(pk=value, has_replay=True).first()
                     if not obj:
-                        raise ValidationError('Recording unavailable.')
+                        raise ValidationError(gettext('Recording unavailable.'))
                     option = {'id': str(value), 'asset': obj.asset, 'account': obj.account,
                               'user': obj.user, 'date_start': obj.date_start.isoformat()}
                 resources[name] = [option]

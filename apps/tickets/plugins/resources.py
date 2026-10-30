@@ -1,4 +1,5 @@
 """Shared resource validation without reading credential-bearing fields."""
+from django.utils.translation import gettext
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
@@ -31,7 +32,7 @@ class AssetAccountRequestSerializer(RequestSerializer):
                 )
                 assets = AssetPermissionPermAssetUtil(permissions).get_all_assets()
             if not assets.filter(pk=value, org_id=self.context['org_id']).exists():
-                raise serializers.ValidationError('Select an asset available for application in this organization.')
+                raise serializers.ValidationError(gettext('Select an asset available for application in this organization.'))
         return value
 
     def get_accounts(self, asset_id):
@@ -67,11 +68,11 @@ def account_context(ticket):
         return {'request': request, 'assets': snapshot_assets(assets, ticket.org_id), 'accounts': []}
     asset = Asset.objects.filter(pk=request['asset'], org_id=ticket.org_id).first()
     if not asset:
-        raise WorkflowConfigurationError('The requested asset no longer exists.')
+        raise WorkflowConfigurationError(gettext('The requested asset no longer exists.'))
     accounts = list(Account.objects.filter(asset=asset, username__in=request['accounts']).values(
         'id', 'username', 'secret_type'))
     if {account['username'] for account in accounts} != set(request['accounts']):
-        raise WorkflowConfigurationError('A requested account no longer exists.')
+        raise WorkflowConfigurationError(gettext('A requested account no longer exists.'))
     for account in accounts:
         account.update(id=str(account['id']), asset_id=str(asset.pk))
     return {'request': request, 'assets': snapshot_assets([asset], ticket.org_id), 'accounts': accounts}
@@ -82,4 +83,4 @@ def validate_snapshot_assets(instance):
     from tickets.workflow.errors import WorkflowConfigurationError
     ids = [asset['id'] for asset in instance.context['assets']]
     if Asset.objects.filter(pk__in=ids, org_id=instance.org_id).count() != len(ids):
-        raise WorkflowConfigurationError('The requested asset was deleted or moved.')
+        raise WorkflowConfigurationError(gettext('The requested asset was deleted or moved.'))

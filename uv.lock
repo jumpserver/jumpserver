@@ -1333,17 +1333,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-proxy"
-version = "1.2.2"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "requests" },
-]
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/0e/ce/e74ef87178b0fbbe7c1c4d53a290d06603690f3ad0386e026675881f966a/django_proxy-1.2.2-py3-none-any.whl", hash = "sha256:f3e54e102cf2d328124f51ce8e76a08cb058ed4aea01bea23148bc785bbccafc" },
-]
-
-[[package]]
 name = "django-radius"
 version = "1.4.0"
 source = { url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" }
@@ -1691,22 +1680,6 @@ wheels = [
 ]
 
 [[package]]
-name = "flower"
-version = "2.0.1"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "celery" },
-    { name = "humanize" },
-    { name = "prometheus-client" },
-    { name = "pytz" },
-    { name = "tornado" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/09/a1/357f1b5d8946deafdcfdd604f51baae9de10aafa2908d0b7322597155f92/flower-2.0.1.tar.gz", hash = "sha256:5ab717b979530770c16afb48b50d2a98d23c3e9fe39851dcf6bc4d01845a02a0" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/a6/ff/ee2f67c0ff146ec98b5df1df637b2bc2d17beeb05df9f427a67bd7a7d79c/flower-2.0.1-py2.py3-none-any.whl", hash = "sha256:9db2c621eeefbc844c8dd88be64aef61e84e2deb29b271e02ab2b5b9f01068e2" },
-]
-
-[[package]]
 name = "forgerypy3"
 version = "0.3.1"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
@@ -2015,15 +1988,6 @@ wheels = [
 ]
 
 [[package]]
-name = "humanize"
-version = "4.16.0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/0a/ea/13a1ef3c12d12662905801495283530251918b70d62d368f1d2e0272c70d/humanize-4.16.0.tar.gz", hash = "sha256:7dc2244a2f84a4bfb1d36c37bac80cd78e35cdc5c119206d87b018e1445f3a3f" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/b0/aa/0b7365d30fed43e7a3449aba1fe20a0a7174d9cf13e282af4e69ac825441/humanize-4.16.0-py3-none-any.whl", hash = "sha256:353eb2f34c09d098b2880eee8bef21832eae6d174f48c5762fff7e5fcb74d01d" },
-]
-
-[[package]]
 name = "hvac"
 version = "1.1.1"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
@@ -2207,7 +2171,7 @@ name = "jinxed"
 version = "2.1.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
-    { name = "ansicon" },
+    { name = "ansicon", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/39/d7/6e6d474ec5eaeca6a61acc17766bb19563b3a372b4b9d92910078f5fe49f/jinxed-2.1.0.tar.gz", hash = "sha256:7e755b831faa2443d44fb4ce7c0202eb9c3ed39bd5bf1193365888f4f6092b54" }
 wheels = [
@@ -2267,11 +2231,11 @@ dependencies = [
     { name = "ansible-runner" },
     { name = "paramiko" },
 ]
-sdist = { hash = "sha256:23a956286b67b6d451baa67aa91fb7c83f17270502e6925adae9da0b3f5b2efa" }
+sdist = { hash = "sha256:2b873eefe07e8acb2ec3e034c63752159fd95c3999e6ebe9ff9887d2a4790928" }
 
 [package.metadata]
 requires-dist = [
-    { name = "ansible-runner", specifier = ">=2.4.0,<2.5" },
+    { name = "ansible-runner" },
     { name = "paramiko", specifier = ">=3.5.1,<4" },
 ]
 
@@ -2356,7 +2320,6 @@ dependencies = [
     { name = "django-formtools" },
     { name = "django-oauth-toolkit" },
     { name = "django-private-storage" },
-    { name = "django-proxy" },
     { name = "django-radius" },
     { name = "django-ranged-response" },
     { name = "django-redis" },
@@ -2379,7 +2342,6 @@ dependencies = [
     { name = "eventlet" },
     { name = "exchangelib" },
     { name = "fido2" },
-    { name = "flower" },
     { name = "future" },
     { name = "geoip2" },
     { name = "gmssl" },
@@ -2544,7 +2506,6 @@ requires-dist = [
     { name = "django-formtools", specifier = "==2.5.1" },
     { name = "django-oauth-toolkit", specifier = "==3.4.1" },
     { name = "django-private-storage", specifier = "==3.1.3" },
-    { name = "django-proxy", specifier = "==1.2.2" },
     { name = "django-radius", url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" },
     { name = "django-ranged-response", specifier = "==0.2.0" },
     { name = "django-redis", specifier = "==5.4.0" },
@@ -2567,7 +2528,6 @@ requires-dist = [
     { name = "eventlet", specifier = "==0.40.3" },
     { name = "exchangelib", specifier = ">=5.1.0" },
     { name = "fido2", specifier = ">=1.1.2" },
-    { name = "flower", specifier = "==2.0.1" },
     { name = "future", specifier = "==0.18.3" },
     { name = "geoip2", specifier = "==4.8.0" },
     { name = "gmssl", specifier = "==3.2.2" },
@@ -3580,15 +3540,6 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/81/74/ba08d81e668ccfe8658d7520a307e63c19862c08eb4ccb26f356c5239a7a/prettytable-3.18.0.tar.gz", hash = "sha256:439217116152244369caf3d9f1caf2f9fe29b03bd79e88d2928c8e718c95d680" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/fe/be/2e6798ace5cc036f5d05d36b7b2fd85346f1a708c87060890b070d0ec607/prettytable-3.18.0-py3-none-any.whl", hash = "sha256:b3346e0e6f79180833aebaac088ae926340586cf6d7d991b9eb125b65f72313a" },
-]
-
-[[package]]
-name = "prometheus-client"
-version = "0.26.0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/52/73/f1334c29c2af4cd9dba6c7817e61b611bd0215e2eb5565c6064a4de18802/prometheus_client-0.26.0.tar.gz", hash = "sha256:04a91bcf94e2cf74a44a1a874d651a2e853ed354b6e822f3b7487751465d5c2b" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/eb/a3/b69efbf4143b5b9859b977770bbbabcc2796b702fa69dc40271e45cd5a56/prometheus_client-0.26.0-py3-none-any.whl", hash = "sha256:fa93d06737aa02bacd05794768508bb97d2fbee28cb3bca04eaae92f0ca953d6" },
 ]
 
 [[package]]
@@ -4746,23 +4697,6 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/eb/07/90078f49e60718d414d5440dc498301f11ff049458e65cf8d27c62a5c9d1/tifffile-2026.8.23.tar.gz", hash = "sha256:bd3c816f166f85c93329a54a0c9a1eccc9968a6a78f91d63b65d7b17675915f2" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/82/38/05347ae8b1b268c068b3ca38822558038f38c6494604837d7ca3cbcceb9c/tifffile-2026.8.23-py3-none-any.whl", hash = "sha256:a03045afce67d97cb4ef56a1cd47eae6ab8115c7e84cfedeb5cadbfbb6d14fbe" },
-]
-
-[[package]]
-name = "tornado"
-version = "6.5.9"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/22/15/ca7aaebb77f850493cba71ace508aeffb896d1ad8976417b48b79823dbd2/tornado-6.5.9.tar.gz", hash = "sha256:4d868544ebdf2fc155239a74397f65ebfea9b4d3635296c96b5dfb0701c354f5" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/a0/4a/4d3459fd2f360dd99233f69f22b36012a42856ace526da2c6da3cb0e6df2/tornado-6.5.9-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:dea3bee433b73d6312d993ce89ad5f2b8d3ed9fde56e79ba5342b9edb78d342a" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/26/4b/5af2f7dcd674e2f1cacef763456f79823404f50954789d6e1ec7a70cd58a/tornado-6.5.9-cp39-abi3-macosx_10_9_x86_64.whl", hash = "sha256:22bed49cdb55292d1d58f46008ba2cc3020e5b84995ef6ae749676c8b5309514" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/9e/0f/38f8d16011de3b1ce2babb4c3bcefb126d2dc47d04878ae3ad5c39a00caa/tornado-6.5.9-cp39-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:0cc0876a58eee9143476f24901b1b8eb4d52443283ade2b6bca650dd1da04f84" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/8c/e9/3888f265d1e287fc63cd61a6696f96a650024e32f9e89c0b1817ac5c40f4/tornado-6.5.9-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:dc0d703cc7ec92b47ebfe236c97cd765c1f2e45744a2e156e6677e54c948274d" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/d6/8b/d2bcf417981fa6f7698ab84a52394a76cf608e6704d266e2e0e29f1fd9d0/tornado-6.5.9-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:93f9ab0226ef625b94cacb7981a5af104f1735ea02f92282abe5c389109fb31d" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/7e/a5/c5cfab11420c3f908238a6c861b8f3864fdbd2b2b87e30c9c16f36a11512/tornado-6.5.9-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:5801bbf94dfde8d21087b6aa0b17f3a5dab6110dfe44e7e4492df5de393ac15b" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/ab/36/5a5da0aa15b7afdd46ece09c004a75af7d00f6a96b692bf696ff94bc2a55/tornado-6.5.9-cp39-abi3-win32.whl", hash = "sha256:dca9f377e80efe5dd4d52a2776b67492a81a39b2d931de169b6b36d0c1da444c" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/34/d7/2446cf3125372e2b4be6483b4b93f360dc50ce2493864755484b23bb50f2/tornado-6.5.9-cp39-abi3-win_amd64.whl", hash = "sha256:f810730ac71eadf009e6e5cb6d534d096887310f5649cff19d7e0d19c0bf4ee7" },
-    { url = "https://mirrors.aliyun.com/pypi/packages/39/70/f1024364bf78fa921c63ef2883d36a3b3b705750c98ae174593afaab7a65/tornado-6.5.9-cp39-abi3-win_arm64.whl", hash = "sha256:b5f4d92798337260c6d9f9f0e400c7539dd5e55cf93479a3f8508c9aa09c2b3b" },
 ]
 
 [[package]]

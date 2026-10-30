@@ -506,6 +506,24 @@ class WebsiteConnectMethodTests(SimpleTestCase):
         self.assertEqual(web_proxy, methods['http'][0])
 
 
+class DB2ConnectMethodTests(SimpleTestCase):
+    @patch('terminal.connect_methods.AppletMethod.get_methods', return_value={})
+    @patch('terminal.connect_methods.VirtualAppMethod.get_methods', return_value={})
+    @patch('terminal.connect_methods.NativeClient.get_methods', return_value={})
+    def test_db2_offers_koko_cli_and_preserves_chen_gui(self, *_):
+        ConnectMethodUtil.refresh_methods()
+        self.addCleanup(ConnectMethodUtil.refresh_methods)
+        methods = ConnectMethodUtil.get_protocols_connect_methods()['db2']
+        self.assertEqual(
+            {(method['component'], method['value']) for method in methods},
+            {('koko', 'web_cli'), ('chen', 'web_gui')},
+        )
+        self.assertEqual(
+            ConnectMethodUtil.get_connect_method('web_cli', Protocol.db2)['component'],
+            'koko',
+        )
+
+
 class DamengConnectMethodTests(SimpleTestCase):
     @override_settings(VENDOR='jumpserver')
     def test_dameng_uses_oracle_enterprise_connection_paths(self):

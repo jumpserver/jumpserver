@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils.module_loading import import_string
 
 
@@ -82,7 +83,7 @@ class TicketPlugin:
             return Reapply()
         handler = self.actions.get(name)
         if not handler:
-            raise NotFound('Unknown ticket action.')
+            raise NotFound(gettext('Unknown ticket action.'))
         return import_string(handler)()
 
     def request_items(self, ticket):
@@ -122,6 +123,6 @@ class TicketPlugin:
             if isinstance(serializer, AssetAccountRequestSerializer):
                 field = request.query_params.get('field', 'accounts')
                 if field != 'accounts':
-                    raise ValidationError({'field': 'Unknown resource field.'})
+                    raise ValidationError({'field': gettext('Unknown resource field.')})
                 return serializer.account_options(request.query_params.get('asset'))
-        raise ValidationError('This ticket type has no resource options.')
+        raise ValidationError(gettext('This ticket type has no resource options.'))

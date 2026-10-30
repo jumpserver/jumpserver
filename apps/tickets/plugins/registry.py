@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 import re
 from importlib import import_module
 from pkgutil import iter_modules
@@ -76,7 +77,7 @@ class TicketPluginRegistry:
             return self._plugins[ticket_type]
         except (KeyError, TypeError):
             from tickets.workflow.errors import WorkflowConfigurationError
-            raise WorkflowConfigurationError(f'Unknown ticket type: {ticket_type}')
+            raise WorkflowConfigurationError(gettext('Unknown ticket type: {ticket_type}').format(ticket_type=ticket_type))
 
     def all(self, *, visible=False):
         self.discover()

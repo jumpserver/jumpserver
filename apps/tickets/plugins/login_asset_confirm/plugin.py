@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from ..base import TicketPlugin
@@ -19,7 +20,7 @@ class Plugin(TicketPlugin):
         ids = {entry['asset_id'] for entry in connections}
         assets = list(Asset.objects.filter(pk__in=ids, org_id=ticket.org_id))
         if not ids or len(assets) != len(ids):
-            raise WorkflowConfigurationError('The requested asset no longer exists.')
+            raise WorkflowConfigurationError(gettext('The requested asset no longer exists.'))
         return {'assets': snapshot_assets(assets, ticket.org_id),
                 'accounts': [{'asset_id': entry['asset_id'], 'username': entry['account']} for entry in connections]}
 

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from hashlib import sha256
 
 from django.db import transaction
@@ -38,7 +39,7 @@ def chain_definitions(definitions):
 def compose_workflows(workflows, org_id, ticket_type):
     workflows = list({str(workflow.pk): workflow for workflow in workflows}.values())
     if not workflows:
-        raise WorkflowConfigurationError('Configure reviewers or select a workflow on the ACL.')
+        raise WorkflowConfigurationError(gettext('Configure reviewers or select a workflow on the ACL.'))
     if len(workflows) == 1:
         return workflows[0]
     versions = [workflow.active_version for workflow in workflows]
@@ -52,7 +53,7 @@ def compose_workflows(workflows, org_id, ticket_type):
         )
         workflow = Workflow.objects.select_for_update().get(pk=workflow.pk)
         if not workflow.is_system:
-            raise WorkflowConfigurationError('The generated workflow name is already in use.')
+            raise WorkflowConfigurationError(gettext('The generated workflow name is already in use.'))
         if not workflow.active_version_id:
             publish_workflow(workflow, definition)
             Workflow.objects.filter(pk=workflow.pk).update(enabled=True)

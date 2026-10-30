@@ -1,4 +1,5 @@
 """Bounded, structured conditions evaluated only against an instance snapshot."""
+from django.utils.translation import gettext
 import math
 import re
 
@@ -12,40 +13,40 @@ RISK_LEVELS = {'low': 0, 'medium': 1, 'high': 2, 'critical': 3}
 
 def validate_condition(condition, depth=0):
     if depth > 8 or not isinstance(condition, dict):
-        raise WorkflowConfigurationError('Conditions must be objects nested at most eight levels.')
+        raise WorkflowConfigurationError(gettext('Conditions must be objects nested at most eight levels.'))
     groups = {'and', 'or', 'not'} & condition.keys()
     if groups:
         if len(condition) != 1:
-            raise WorkflowConfigurationError('A compound condition must have exactly one operator.')
+            raise WorkflowConfigurationError(gettext('A compound condition must have exactly one operator.'))
         key = next(iter(groups))
         children = [condition[key]] if key == 'not' else condition[key]
         if not isinstance(children, list) or not 1 <= len(children) <= 32:
-            raise WorkflowConfigurationError('Condition groups must contain between 1 and 32 conditions.')
+            raise WorkflowConfigurationError(gettext('Condition groups must contain between 1 and 32 conditions.'))
         for child in children:
             validate_condition(child, depth + 1)
         return
     if not {'field', 'operator', 'value'} <= condition.keys() or condition.keys() - {'field', 'operator', 'value', 'quantifier'}:
-        raise WorkflowConfigurationError('Conditions require field, operator and value.')
+        raise WorkflowConfigurationError(gettext('Conditions require field, operator and value.'))
     field, operator, value = condition['field'], condition['operator'], condition['value']
     if not isinstance(field, str) or len(field) > 256 or not re.fullmatch(r'[a-zA-Z][\w]*(?:\.[\w]+)*', field):
-        raise WorkflowConfigurationError('Invalid condition field path.')
+        raise WorkflowConfigurationError(gettext('Invalid condition field path.'))
     if field.split('.')[0] not in ROOTS:
-        raise WorkflowConfigurationError('Unknown workflow context field.')
+        raise WorkflowConfigurationError(gettext('Unknown workflow context field.'))
     if not isinstance(operator, str) or operator not in OPERATORS:
-        raise WorkflowConfigurationError('Unknown condition operator.')
+        raise WorkflowConfigurationError(gettext('Unknown condition operator.'))
     if condition.get('quantifier', 'any') not in ('any', 'all'):
-        raise WorkflowConfigurationError('The condition quantifier must be any or all.')
+        raise WorkflowConfigurationError(gettext('The condition quantifier must be any or all.'))
     if operator == 'exists' and not isinstance(value, bool):
-        raise WorkflowConfigurationError('exists requires a boolean value.')
+        raise WorkflowConfigurationError(gettext('exists requires a boolean value.'))
     if operator in ('in', 'not_in') and not isinstance(value, list):
-        raise WorkflowConfigurationError('in and not_in require a list value.')
+        raise WorkflowConfigurationError(gettext('in and not_in require a list value.'))
     if operator in ('gt', 'gte', 'lt', 'lte'):
         if field in ('risk_level', 'risk.level'):
             if isinstance(value, str) and value in RISK_LEVELS:
                 return
-            raise WorkflowConfigurationError('Risk comparisons require low, medium, high or critical.')
+            raise WorkflowConfigurationError(gettext('Risk comparisons require low, medium, high or critical.'))
         if not is_number(value):
-            raise WorkflowConfigurationError('Ordered comparisons require a number or a known risk level.')
+            raise WorkflowConfigurationError(gettext('Ordered comparisons require a number or a known risk level.'))
 
 
 def is_number(value):
@@ -83,10 +84,10 @@ def compare(actual, operator, expected, field):
     if operator == 'exists':
         return (actual is not MISSING and actual is not None) == expected
     if actual is MISSING or actual is None:
-        raise WorkflowConfigurationError(f'Missing condition context: {field}.')
+        raise WorkflowConfigurationError(gettext('Missing condition context: {field}.').format(field=field))
     if operator in ('eq', 'ne'):
         if type(actual) is not type(expected) and not (is_number(actual) and is_number(expected)):
-            raise WorkflowConfigurationError(f'Incompatible condition value types: {field}.')
+            raise WorkflowConfigurationError(gettext('Incompatible condition value types: {field}.').format(field=field))
         result = equal(actual, expected)
         return result if operator == 'eq' else not result
     if operator in ('in', 'not_in'):
@@ -97,13 +98,13 @@ def compare(actual, operator, expected, field):
             return any(equal(item, expected) for item in actual)
         if isinstance(actual, (str, dict)) and isinstance(expected, str):
             return expected in actual
-        raise WorkflowConfigurationError(f'Invalid contains operand: {field}.')
+        raise WorkflowConfigurationError(gettext('Invalid contains operand: {field}.').format(field=field))
     if field in ('risk_level', 'risk.level'):
         if not isinstance(actual, str) or actual not in RISK_LEVELS:
-            raise WorkflowConfigurationError('Unknown risk level in the snapshot.')
+            raise WorkflowConfigurationError(gettext('Unknown risk level in the snapshot.'))
         actual, expected = RISK_LEVELS[actual], RISK_LEVELS[expected]
     if not is_number(actual) or not is_number(expected):
-        raise WorkflowConfigurationError(f'Invalid ordered comparison: {field}.')
+        raise WorkflowConfigurationError(gettext('Invalid ordered comparison: {field}.').format(field=field))
     return {'gt': actual > expected, 'gte': actual >= expected,
             'lt': actual < expected, 'lte': actual <= expected}[operator]
 

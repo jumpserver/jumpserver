@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
@@ -17,10 +18,10 @@ def publish_workflow(workflow, definition, *, actor=None, expected_version=None)
     if cc_user_ids:
         valid_ids = {str(pk) for pk in available_users(workflow.org_id).filter(pk__in=cc_user_ids).values_list('pk', flat=True)}
         if valid_ids != cc_user_ids:
-            raise WorkflowConfigurationError('CC recipients must be active organization members.')
+            raise WorkflowConfigurationError(gettext('CC recipients must be active organization members.'))
     current = workflow.active_version.number if workflow.active_version_id else 0
     if expected_version is not None and expected_version != current:
-        raise WorkflowConflict('A newer version was published. Reload before publishing.')
+        raise WorkflowConflict(gettext('A newer version was published. Reload before publishing.'))
     number = (workflow.versions.aggregate(latest=Max('number'))['latest'] or 0) + 1
     version = WorkflowVersion.objects.create(
         workflow=workflow, number=number, created_by=str(actor)[:128] if actor else '',

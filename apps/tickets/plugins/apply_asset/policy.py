@@ -22,7 +22,7 @@ def supports_delegated_request(version):
         seen.add((key, has_admin))
         node = nodes[key]
         has_admin |= (node['type'] == 'approval' and
-                      node['config'].get('approvers', {}).get('type') == 'org_admin')
+                      node['config'].get('approvers', {}).get('type') in ('org_admin', 'applicant_manager'))
         if node['type'] == 'end' and not has_admin:
             return False
         pending.extend((target, has_admin) for target in next_nodes[key])

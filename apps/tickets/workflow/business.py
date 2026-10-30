@@ -1,4 +1,5 @@
 """Ticket adapters: trusted input snapshots, atomic effects and notifications."""
+from django.utils.translation import gettext
 from django.db import transaction
 from django.dispatch import receiver
 from django.utils import timezone
@@ -15,7 +16,6 @@ from .signals import workflow_event
 def build_context(ticket):
     plugin = get_ticket_plugin(ticket.type)
     applicant = user_snapshot(ticket.applicant)
-    applicant['manager_id'] = str(ticket.applicant.manager_id) if ticket.applicant.manager_id else None
     with tmp_to_org(ticket.org_id):
         context = plugin.build_context(ticket)
     context.setdefault('request', {}).update(type=ticket.type, title=ticket.title)
@@ -32,9 +32,9 @@ def build_context(ticket):
 def submit_ticket(ticket):
     from .engine import WorkflowEngine
     if not ticket.workflow_id:
-        raise WorkflowConfigurationError('Select a published workflow.')
+        raise WorkflowConfigurationError(gettext('Select a published workflow.'))
     if not ticket.applicant_id or not available_users(ticket.org_id).filter(pk=ticket.applicant_id).exists():
-        raise WorkflowConfigurationError('The applicant must be an active organization member.')
+        raise WorkflowConfigurationError(gettext('The applicant must be an active organization member.'))
     ticket.set_serial_num()
     ticket.set_rel_snapshot()
     context = build_context(ticket)
@@ -55,7 +55,7 @@ def get_system_workflow(org_id, ticket_type, assignees):
     import hashlib
     ids = sorted(str(user.pk) for user in assignees)
     if not ids:
-        raise WorkflowConfigurationError('Configure reviewers or select a workflow on the ACL.')
+        raise WorkflowConfigurationError(gettext('Configure reviewers or select a workflow on the ACL.'))
     digest = hashlib.sha256(','.join(ids).encode()).hexdigest()[:24]
     with tmp_to_org(org_id):
         workflow, _ = Workflow.objects.get_or_create(
@@ -91,16 +91,16 @@ def submit_system_ticket(ticket, assignees, workflow=None):
 def apply_approved_effect(instance, ticket):
     """Dispatch under the instance lock; each handler uses the frozen context."""
     if not available_users(instance.org_id).filter(pk=instance.applicant_id).exists():
-        raise WorkflowConfigurationError('The applicant is no longer eligible for access.')
+        raise WorkflowConfigurationError(gettext('The applicant is no longer eligible for access.'))
     plugin = get_ticket_plugin(ticket.type)
     with tmp_to_org(instance.org_id):
         mode = plugin.get_execution_mode(ticket)
         if instance.context.get('resources_pending'):
-            raise WorkflowConfigurationError('Complete and save the requested resources before approval.')
+            raise WorkflowConfigurationError(gettext('Complete and save the requested resources before approval.'))
         if mode == 'approval_only':
             return None
         if mode not in ('automatic', 'external'):
-            raise WorkflowConfigurationError('Invalid ticket execution mode.')
+            raise WorkflowConfigurationError(gettext('Invalid ticket execution mode.'))
         return plugin.on_approved(instance, ticket)
 
 

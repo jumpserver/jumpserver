@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import gettext
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -291,17 +292,17 @@ class TicketApplySerializer(TicketSerializer):
         from tickets.workflow.approvers import available_users
         from rest_framework.exceptions import PermissionDenied
         if self.instance:
-            raise serializers.ValidationError('Submitted requests are immutable. Withdraw and submit a new request.')
+            raise serializers.ValidationError(gettext('Submitted requests are immutable. Withdraw and submit a new request.'))
         org_id = attrs['org_id']
         if org_id == Organization.ROOT_ID or not Organization.objects.filter(pk=org_id).exists():
-            raise serializers.ValidationError({'org_id': 'Select a concrete organization.'})
+            raise serializers.ValidationError({'org_id': gettext('Select a concrete organization.')})
         user = self.context['request'].user
         applicant_id = attrs.pop('applicant_id', user.pk)
         if applicant_id != user.pk:
-            raise PermissionDenied('The applicant must be the submitting user. Select authorized users in the request parameters.')
+            raise PermissionDenied(gettext('The applicant must be the submitting user. Select authorized users in the request parameters.'))
         applicant = available_users(org_id).filter(pk=applicant_id).first()
         if not applicant:
-            raise serializers.ValidationError({'applicant': 'Select an active member of this organization.'})
+            raise serializers.ValidationError({'applicant': gettext('Select an active member of this organization.')})
         if applicant_id == user.pk and not available_users(org_id).filter(pk=user.pk).exists():
             raise PermissionDenied()
         workflow_id = attrs.pop('workflow_id')
@@ -311,6 +312,6 @@ class TicketApplySerializer(TicketSerializer):
                 type=attrs['type'], enabled=True, active_version__published_at__isnull=False,
             ).first()
         if not workflow:
-            raise serializers.ValidationError({'workflow_id': 'Select an enabled, published workflow for this organization and type.'})
+            raise serializers.ValidationError({'workflow_id': gettext('Select an enabled, published workflow for this organization and type.')})
         attrs.update(workflow=workflow, applicant=applicant)
         return attrs

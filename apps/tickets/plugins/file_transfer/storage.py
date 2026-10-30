@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 import hashlib
 import os
 from datetime import timedelta
@@ -30,7 +31,7 @@ def write_file(record, chunks):
             for chunk in chunks:
                 size += len(chunk)
                 if size > size_limit():
-                    raise ValidationError('File exceeds the transfer size limit.')
+                    raise ValidationError(gettext('File exceeds the transfer size limit.'))
                 digest.update(chunk)
                 target.write(chunk)
         record.size, record.sha256 = size, digest.hexdigest()
@@ -44,13 +45,13 @@ def write_file(record, chunks):
 def stage_upload(user, org_id, upload):
     from users.models import User
     if not valid_filename(upload.name) or upload.size > size_limit():
-        raise ValidationError('Invalid file name or file exceeds the transfer size limit.')
+        raise ValidationError(gettext('Invalid file name or file exceeds the transfer size limit.'))
     with transaction.atomic():
         # Serialize a user's reservations so parallel uploads cannot bypass the quota.
         User.objects.select_for_update().get(pk=user.pk)
         files = TicketTransferFile.objects.filter(owner=user, org_id=org_id, purged_at__isnull=True)
         if files.count() >= MAX_FILES * 5:
-            raise ValidationError('Too many retained ticket files. Wait for expired files to be cleaned up.')
+            raise ValidationError(gettext('Too many retained ticket files. Wait for expired files to be cleaned up.'))
         record = TicketTransferFile.objects.create(owner=user, org_id=org_id, name=upload.name,
                                                    expires_at=timezone.now() + timedelta(hours=24))
     try:
@@ -81,10 +82,10 @@ def claim_files(ticket):
         kind='upload', purged_at__isnull=True, expires_at__gt=timezone.now(),
     ).order_by('id'))
     if len(records) != len(ids) or len({record.name for record in records}) != len(records):
-        raise ValidationError('Files are missing, already submitted, or have duplicate names.')
+        raise ValidationError(gettext('Files are missing, already submitted, or have duplicate names.'))
     for record in records:
         if not record.path.is_file():
-            raise ValidationError('The uploaded file is no longer available.')
+            raise ValidationError(gettext('The uploaded file is no longer available.'))
         record.ticket = ticket
         record.expires_at = timezone.now() + timedelta(days=30)
         record.save(update_fields=['ticket', 'expires_at'])

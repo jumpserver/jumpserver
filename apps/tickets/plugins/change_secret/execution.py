@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from datetime import timedelta
 from types import SimpleNamespace
 
@@ -30,9 +31,9 @@ def validate_context(ticket, context):
               serializer.get_accounts(context['request']['asset']).filter(pk__in=[a[0] for a in expected])
               .values_list('id', 'username', 'secret_type')}
     if not expected or actual != expected:
-        raise WorkflowConfigurationError('The requested accounts changed. Submit a new request.')
+        raise WorkflowConfigurationError(gettext('The requested accounts changed. Submit a new request.'))
     if not ticket.applicant_id or not available_users(ticket.org_id).filter(pk=ticket.applicant_id).exists():
-        raise WorkflowConfigurationError('The applicant is no longer eligible for this operation.')
+        raise WorkflowConfigurationError(gettext('The applicant is no longer eligible for this operation.'))
 
 
 def create_execution(instance, ticket):
@@ -56,7 +57,7 @@ def create_execution(instance, ticket):
     if not created:
         if (str(execution.org_id) != str(instance.org_id) or execution.type != AutomationTypes.change_secret
                 or execution.snapshot.get('ticket_id') != str(ticket.pk)):
-            raise WorkflowConfigurationError('The password change execution conflicts with an existing task.')
+            raise WorkflowConfigurationError(gettext('The password change execution conflicts with an existing task.'))
         return None
     transaction.on_commit(lambda: dispatch_execution(execution.pk), robust=True)
     return {'action': 'submit_change_secret', 'pending': True,
@@ -110,7 +111,7 @@ def execute(execution_id, task_id, hostname):
             validate_context(ticket, ticket.workflow_instance.context)
             if (set(execution.snapshot['accounts']) != {a['id'] for a in ticket.workflow_instance.context['accounts']}
                     or execution.snapshot['assets'] != [ticket.workflow_instance.context['request']['asset']]):
-                raise WorkflowConfigurationError('The execution no longer matches the approved resources.')
+                raise WorkflowConfigurationError(gettext('The execution no longer matches the approved resources.'))
             execution.start()
         except Exception as exc:
             # Never expose runner exceptions: they may contain credentials or remote output.

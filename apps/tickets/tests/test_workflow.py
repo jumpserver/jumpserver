@@ -16,6 +16,7 @@ from assets.models import Asset, Platform
 from assets.serializers import AssetSerializer
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
+from rbac.builtin import BuiltinRole
 from rbac.models import Permission, Role, RoleBinding
 from tickets.api.workflow import WorkflowViewSet, WorkflowInstanceViewSet, ApprovalTaskViewSet
 from tickets.models import (
@@ -309,9 +310,21 @@ class WorkflowTests(TestCase):
                 self.assertEqual(instance.events.filter(type='workflow.error').count(), 1)
                 self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance, state='pending').exists())
 
-    def test_snapshot_manager_resolver(self):
-        instance = self.start(context={'applicant': {'manager_id': str(self.carol.pk)}}, approvers={'type': 'applicant_manager'})
-        self.assertEqual(self.task(instance, self.carol).assignee_id, self.carol.pk)
+    def test_applicant_manager_resolves_ticket_organization_admins(self):
+        admin, _ = Role.objects.get_or_create(id=BuiltinRole.org_admin.id,
+                                              defaults={'name': 'OrgAdmin', 'scope': 'org'})
+        RoleBinding.objects_raw.bulk_create([
+            RoleBinding(user=user, role=admin, org=org, scope='org')
+            for org, user in [(self.org, self.alice), (self.org, self.applicant),
+                              (self.other_org, self.bob), (self.other_org, self.outsider)]
+        ])
+        workflow = self.create_workflow(approvers={'type': 'applicant_manager'})
+        for context in ({}, {'applicant': {'manager_id': str(self.carol.pk)}}):
+            with self.subTest(context=context), tmp_to_root_org():
+                instance = self.start(workflow, context=context)
+            self.assertEqual(instance.state, 'running')
+            self.assertEqual(set(ApprovalTask.objects.filter(node_instance__instance=instance)
+                                 .values_list('assignee_id', flat=True)), {self.alice.pk})
 
     def test_error_after_vote_preserves_vote_and_stops_progress(self):
         definition = approval_definition([self.alice], levels=2)

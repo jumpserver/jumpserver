@@ -1,4 +1,5 @@
 """Server-side context builders. Never include account secrets in a snapshot."""
+from django.utils.translation import gettext
 from collections import defaultdict
 
 from assets.models import Asset
@@ -19,7 +20,7 @@ def snapshot_assets(assets, org_id):
     with tmp_to_org(org_id):
         assets = list(Asset.objects.filter(pk__in=ids, org_id=org_id).select_related('owner', 'platform'))
         if len(assets) != len(ids):
-            raise WorkflowConfigurationError('Requested assets are missing or outside the ticket organization.')
+            raise WorkflowConfigurationError(gettext('Requested assets are missing or outside the ticket organization.'))
         result = []
         for asset in sorted(assets, key=lambda item: str(item.pk)):
             labels = defaultdict(list)
@@ -54,7 +55,7 @@ def snapshot_accounts(selectors, assets, applicant, org_id):
         grant_selectors.extend(account['username'] for account in accounts)
     grant_selectors = sorted(set(grant_selectors))
     if not grant_selectors:
-        raise WorkflowConfigurationError('No accounts matched the request. Select explicit accounts.')
+        raise WorkflowConfigurationError(gettext('No accounts matched the request. Select explicit accounts.'))
     result = [{**account, 'id': str(account['id']), 'asset_id': str(account['asset_id'])} for account in accounts]
     known_names = {account['username'] for account in accounts}
     for selector in selectors:

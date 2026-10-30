@@ -3,6 +3,7 @@
 import os
 
 from celery import Celery
+from celery.signals import worker_init
 from kombu import Exchange, Queue
 
 # set the default Django settings module for the 'celery' program.
@@ -21,9 +22,14 @@ configs = {k: v for k, v in settings.__dict__.items() if k.startswith('CELERY')}
 configs["CELERY_QUEUES"] = [
     Queue("celery", Exchange("celery"), routing_key="celery"),
     Queue("ansible", Exchange("ansible"), routing_key="ansible"),
-    Queue("cloud_sync", Exchange("cloud_sync"), routing_key="cloud_sync"),
 ]
 
 app.namespace = 'CELERY'
 app.conf.update(configs)
 app.autodiscover_tasks(lambda: [app_config.split('.')[0] for app_config in settings.INSTALLED_APPS])
+
+
+@worker_init.connect(weak=False)
+def register_monitor_control(**kwargs):
+    # Register only in workers; web/beat need not import worker internals.
+    from . import monitor_control  # noqa: F401

@@ -209,7 +209,7 @@ class StatusMixin:
             votes = [t for t in tasks if t.state in ('approved', 'rejected')]
             result.append({
                 'state': 'pending' if run.state == 'running' else run.state,
-                'name': run.node.name, 'approval_level': level,
+                'name': str(instance.version.workflow.node_display_name(run.node)), 'approval_level': level,
                 'assignees': [str(t.assignee_id) if t.assignee_id else None for t in tasks],
                 'assignees_display': [t.assignee_snapshot.get('name', '') for t in tasks],
                 'processor': str(votes[-1].assignee_id) if votes else None,

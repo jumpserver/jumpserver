@@ -1,9 +1,10 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import APIException, ValidationError
 
 
 class WorkflowConflict(APIException):
     status_code = 409
-    default_detail = 'The workflow state has changed. Refresh before trying again.'
+    default_detail = _('The workflow state has changed. Refresh before trying again.')
     default_code = 'workflow_conflict'
 
 

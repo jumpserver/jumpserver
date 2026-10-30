@@ -19,7 +19,7 @@
 
 `applicant` 始终是实际提交者。资产授权插件使用 `request_data.apply_users` 保存单个授权用户 UUID 的列表，省略时默认申请人自己。代他人申请需要本组织的 `tickets.apply_asset_for_others` 权限，并且选用的流程每条路径都必须经过组织管理员审批。申请人和授权用户都不能审批该工单，包括转交和加签。受理前后均检查组织和用户有效性；`@USER` 的上下文和授权校验针对授权用户。旧工单没有该参数时仍给原申请人授权。历史多人授权工单保持原有快照和授权，不重新执行。
 
-授权用户通过 `TicketBeneficiary` 关联查询自己的工单和流程实例，并在工单结束时收到结果通知。原 `applicant` 保留发起人、撤回人和审计身份；`applicant_manager` 始终是发起人的直属负责人，代申请需要的组织管理员使用 `org_admin` 审批人解析器。
+授权用户通过 `TicketBeneficiary` 关联查询自己的工单和流程实例，并在工单结束时收到结果通知。原 `applicant` 保留发起人、撤回人和审计身份；`applicant_manager` 与 `org_admin` 均解析为工单所在组织的管理员，均可用于代申请所需的组织管理员审批。
 
 工单公共字段 `origin` 记录创建入口，与类型、执行模式和审批结果分开：用户经申请 API 提交为 `manual`，ACL 等业务入口为 `system`。账号页操作入口提交 `view_secret` 时也标记为 `system`。插件元数据的 `creation_modes` 声明支持 `manual` 和/或 `operation`；同一个类型可以同时支持两种来源，不能按类型推断来源。历史登录、资产连接和命令复核工单在迁移中标记为 `system`。我发起的列表按来源切换，默认只显示进行中，已完结和全部可通过状态筛选查看。
 
@@ -183,7 +183,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 插件接入回归包括：新类型无需修改枚举/模型/路由即可申请、审批、读取结果并执行动作；Boolean/MultipleChoice 参数往返；未知动作和错误 HTTP 方法拒绝；查看者与执行者权限隔离；MFA、限流、过期、跨组织及资源变更拒绝；列表不查询实时授权。Lina 覆盖多个账号依赖字段隔离、组织切换丢弃旧响应、结果刷新、过期和专用表单缺失提示。
 
-需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0033_workflow_foundation`、`users.0008_ticket_workflow_integration` 和 `acls.0007_ticket_workflow_integration`。assets 0033 接在 dev 的 OceanBase 0032 之后。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。为新增类型创建并发布流程后，用户才能提交该类申请。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
+需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0033_workflow_foundation` 和 `acls.0007_ticket_workflow_integration`。assets 0033 接在 dev 的 OceanBase 0032 之后。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。升级执行 migrate 后自动导入旧流程，并为缺少的可见类型补齐已发布、已启用的默认流程，用户无需等待管理员手工创建；默认沿用系统管理员一级或签，已有流程及其停用状态不覆盖。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
 
 在 `tickets.tests.settings` 隔离环境运行 `tickets.tests.test_plugins` 及既有工作流测试。历史迁移和并发测试使用文档 `ticket-workflow-refactor.md` 中的独立 PostgreSQL 测试库，避免 SQLite 的 schema editor 限制。
 
@@ -267,7 +267,7 @@ v2 不创建通用上传/下载 AssetPermission，也不放开 Koko 文件管理
 
 ### 部署与验收
 
-1. 应用 `tickets.0011_ticket_file_transfer`（仅新增文件元数据和单次执行记录两张表），同步部署 Core 与 Lina。API 与 worker 必须共享同一个私有 `SHARE_DIR`，不能由 Web 服务器公开。
+1. 应用 `tickets.0010_ticket_workflow_refactor`（已包含文件元数据和单次执行记录两张表，不再单独新增文件传输迁移），同步部署 Core 与 Lina。API 与 worker 必须共享同一个私有 `SHARE_DIR`，不能由 Web 服务器公开。
 2. 更新并重启 Celery worker 与 beat，确保 worker 消费 `ansible` 队列。`execute_ticket_file_transfer` 执行传输；`maintain_ticket_file_transfers` 每五分钟补发排队任务、标记中断，同一排队记录五分钟内最多补发一次。`cleanup_ticket_transfer_files` 每小时清理过期或工单已终止的文件，每批 100 个，在同一任务中连续处理所有符合条件的批次，不逐文件投递任务。删除失败的文件保留元数据、记录错误并留待下轮重试，不阻断其他文件清理；执行中的文件跳过，删除前再次检查清理条件。文件到期后立即禁止访问，物理删除通常在下一轮小时清理时完成（队列延迟、执行中或删除失败时可能更晚）。
 3. 使用隔离测试资产验收：申请上传→审批人核对附件→批准→申请人执行→核对远端文件及权限；再申请具体路径下载并核对内容。检查审批前、其他用户、不同组织、过期/权限撤销、同名目标、软链接、目录不存在、连接失败和部分文件失败。
 

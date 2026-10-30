@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, override
 
 from common.db.models import JMSBaseModel
 from orgs.mixins.models import JMSOrgBaseModel
@@ -35,7 +35,42 @@ class Workflow(JMSOrgBaseModel):
         ]
 
     def __str__(self):
+        return str(self.display_name)
+
+    @property
+    def display_name(self):
+        if self.is_system and self.created_by == 'Legacy ticket import':
+            return _('Legacy ticket approval')
+        if self.created_by in ('System', 'Legacy workflow import'):
+            with override(None):
+                source_name = str(self.get_type_display())
+            with override('en'):
+                default_name = str(self.get_type_display())
+            if self.name in (source_name, default_name):
+                return self.get_type_display()
         return self.name
+
+    def node_display_name(self, node):
+        # Generated labels remain defaults when a workflow version is copied.
+        if self.created_by in ('System', 'Legacy workflow import', 'Legacy ticket import'):
+            labels = {'start': _('Start'), 'end': _('End'), 'approval': _('Approval'), 'cc': _('CC users')}
+            if node.name.lower() == node.type:
+                return labels.get(node.type, node.name)
+            level = node.name.removeprefix('Approval ')
+            if node.type == 'approval' and node.name.startswith('Approval ') and level.isdecimal():
+                return _('Approval {level}').format(level=level)
+        return node.name
+
+    @classmethod
+    def get_org_related_flows(cls, org_id):
+        from orgs.models import Organization
+        from orgs.utils import tmp_to_root_org
+        with tmp_to_root_org():
+            local = cls.objects.filter(org_id=org_id, is_system=False)
+            inherited = cls.objects.filter(org_id=Organization.ROOT_ID)
+            for ticket_type, name in local.values_list('type', 'name'):
+                inherited = inherited.exclude(type=ticket_type, name__iexact=name)
+            return local | inherited
 
 
 @contextmanager

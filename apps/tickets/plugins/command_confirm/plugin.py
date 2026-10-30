@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from ..base import TicketPlugin
@@ -17,7 +18,7 @@ class Plugin(TicketPlugin):
         session = Session.objects.filter(pk=data.get('apply_from_session')).first() if data.get('apply_from_session') else None
         asset = Asset.objects.filter(pk=session.asset_id, org_id=ticket.org_id).first() if session else None
         if not asset:
-            raise WorkflowConfigurationError('The command session asset no longer exists.')
+            raise WorkflowConfigurationError(gettext('The command session asset no longer exists.'))
         return {'assets': snapshot_assets([asset], ticket.org_id),
                 'accounts': [{'username': data.get('apply_run_account', '')}],
                 'request': {'command': data.get('apply_run_command', ''), 'session_id': str(session.pk),

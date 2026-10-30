@@ -5,7 +5,8 @@ from datetime import timedelta
 
 from celery import shared_task, current_task
 from django.conf import settings
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop
 
@@ -22,6 +23,69 @@ from .models import User
 logger = get_logger(__file__)
 
 
+def _iter_user_batches(users, batch_size=500):
+    # SQL LIMIT bounds mysqlclient's buffered result as well as ORM instances.
+    users = users.order_by('pk')
+    last_pk = None
+    while True:
+        page = users if last_pk is None else users.filter(pk__gt=last_pk)
+        batch = list(page[:batch_size])
+        if not batch:
+            break
+        last_pk = batch[-1].pk
+        yield batch
+        if len(batch) < batch_size:
+            break
+        del batch
+
+
+def _iter_password_expiration_users(batch_size=500):
+    from rbac.builtin import BuiltinRole
+    from rbac.const import Scope
+    from rbac.models import OrgRoleBinding, SystemRoleBinding
+
+    # Use the same scoped managers as User.is_org_admin, including root-org
+    # behavior. Resolve the flag in SQL instead of creating role managers and
+    # issuing role queries for every user.
+    system_admins = SystemRoleBinding.objects.filter(
+        user_id=OuterRef('pk'), role_id=BuiltinRole.system_admin.id,
+        role__scope=Scope.system,
+    )
+    org_admins = OrgRoleBinding.objects.filter(
+        user_id=OuterRef('pk'), role_id=BuiltinRole.org_admin.id,
+        role__scope=Scope.org,
+    )
+    now = timezone.now()
+    not_expired = Q()
+    for is_admin, interval in (
+        (True, settings.SECURITY_PASSWORD_EXPIRATION_TIME_ADMIN),
+        (False, settings.SECURITY_PASSWORD_EXPIRATION_TIME),
+    ):
+        last_updated = now - timedelta(days=int(interval))
+        not_expired |= Q(
+            is_org_admin=is_admin,
+            date_password_last_updated__gte=last_updated,
+        )
+
+    users = User.get_nature_users().filter(
+        source=User.Source.local, is_active=True,
+    ).annotate(
+        is_org_admin=Exists(system_admins) | Exists(org_admins),
+    ).filter(
+        Q(date_expired__isnull=True) | Q(date_expired__gte=now),
+        not_expired,
+    ).only(
+        'id', 'name', 'username', 'email', 'source', 'is_active',
+        'date_expired', 'date_password_last_updated',
+    )
+
+    # Keep the live five-day upper bound in password_will_expired: a password
+    # can enter that window while a large scan is running.
+    for batch in _iter_user_batches(users, batch_size):
+        yield from batch
+        del batch
+
+
 @shared_task(
     verbose_name=_('Check password expired'),
     description=_(
@@ -30,8 +94,7 @@ logger = get_logger(__file__)
     )
 )
 def check_password_expired():
-    users = User.get_nature_users().filter(source=User.Source.local)
-    for user in users:
+    for user in _iter_password_expiration_users():
         if not user.is_valid:
             continue
         if not user.password_will_expired:
@@ -74,25 +137,29 @@ def check_user_expired():
     first_notice_days = settings.USER_EXPIRED_FIRST_NOTICE_DAYS
     daily_notice_days = settings.USER_EXPIRED_DAILY_NOTICE_DAYS
     today = timezone.localdate()
-    date_expired_lt = timezone.now() + timezone.timedelta(days=first_notice_days + 1)
+    now = timezone.now()
+    date_expired_lt = now + timezone.timedelta(days=first_notice_days + 1)
     users = User.get_nature_users() \
-        .filter(source=User.Source.local) \
-        .filter(date_expired__lt=date_expired_lt)
+        .filter(source=User.Source.local, is_active=True) \
+        .filter(date_expired__gte=now, date_expired__lt=date_expired_lt) \
+        .only('id', 'name', 'username', 'is_active', 'date_expired')
 
-    for user in users:
-        if not user.is_valid:
-            continue
-        date_expired = timezone.localtime(user.date_expired).date()
-        remain_days = (date_expired - today).days
-        should_notify = (
-            remain_days == first_notice_days
-            or 0 <= remain_days <= daily_notice_days
-        )
-        if not should_notify:
-            continue
-        msg = "The user {} will expires in {} days"
-        logger.info(msg.format(user, remain_days))
-        UserExpirationReminderMsg(user).publish_async()
+    for batch in _iter_user_batches(users):
+        for user in batch:
+            if not user.is_valid:
+                continue
+            date_expired = timezone.localtime(user.date_expired).date()
+            remain_days = (date_expired - today).days
+            should_notify = (
+                remain_days == first_notice_days
+                or 0 <= remain_days <= daily_notice_days
+            )
+            if not should_notify:
+                continue
+            msg = "The user {} will expires in {} days"
+            logger.info(msg.format(user, remain_days))
+            UserExpirationReminderMsg(user).publish_async()
+        del batch
 
 
 @shared_task(
@@ -148,20 +215,39 @@ def check_unused_users():
         .filter(api_key_q) \
         .exclude(username='admin')
 
-    if not users:
-        return
-
-    print("Some users are not used for a long time, and they will be disabled.")
-    resource_ids = []
-    for user in users:
-        resource_ids.append(user.id)
-        print('  - {}'.format(user.name))
-
-    users.update(is_active=False)
-    from audits.signal_handlers import create_activities
+    from audits.models import ActivityLog
+    from orgs.models import Organization
     if current_task:
         task_id = current_task.request.id
     else:
         task_id = str(uuid.uuid4())
     detail = gettext_noop('The user has not logged in recently and has been disabled.')
-    create_activities(resource_ids, detail, task_id, action=ActivityChoices.task, org_id='')
+    users = users.using(users.select_for_update().db).order_by('pk')
+    last_pk = None
+    while True:
+        page = users if last_pk is None else users.filter(pk__gt=last_pk)
+        with transaction.atomic(using=users.db):
+            # Lock and recheck eligibility before disabling, so a concurrent
+            # login cannot leave the audit describing users we did not disable.
+            batch = list(page.select_for_update().values_list('pk', 'name')[:500])
+            if not batch:
+                break
+            resource_ids = [pk for pk, _ in batch]
+            users.filter(pk__in=resource_ids).update(is_active=False)
+            # Write directly on this connection. The shared activity helper's
+            # buffer can retain failed inserts after this batch is rolled back.
+            ActivityLog.objects.using(users.db).bulk_create(
+                [ActivityLog(
+                    resource_id=pk, detail=detail, detail_id=task_id,
+                    type=ActivityChoices.task, org_id=Organization.ROOT_ID,
+                ) for pk in resource_ids],
+                batch_size=50, ignore_conflicts=True,
+            )
+        if last_pk is None:
+            print("Some users are not used for a long time, and they will be disabled.")
+        for _, name in batch:
+            print('  - {}'.format(name))
+        last_pk = batch[-1][0]
+        if len(batch) < 500:
+            break
+        del batch, resource_ids

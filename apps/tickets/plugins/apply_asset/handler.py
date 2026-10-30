@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -12,7 +13,7 @@ def requested_users(ticket):
     ids = ticket.request_data.get('apply_users', [str(ticket.applicant_id)])
     users = list(available_users(ticket.org_id).filter(pk__in=ids).order_by('id'))
     if not ids or len(users) != len(set(ids)):
-        raise WorkflowConfigurationError('Select active organization members as authorized users.')
+        raise WorkflowConfigurationError(gettext('Select active organization members as authorized users.'))
     return users
 
 
@@ -23,11 +24,11 @@ def build_context(ticket):
     asset_ids = data.get('apply_assets') or []
     nodes = list(Node.objects.filter(pk__in=node_ids, org_id=ticket.org_id))
     if len(nodes) != len(set(node_ids)):
-        raise WorkflowConfigurationError('A requested node was deleted or moved.')
+        raise WorkflowConfigurationError(gettext('A requested node was deleted or moved.'))
     ids = set(asset_ids)
     for node in nodes:
         if node.org_id != ticket.org_id:
-            raise WorkflowConfigurationError('A requested node belongs to another organization.')
+            raise WorkflowConfigurationError(gettext('A requested node belongs to another organization.'))
         ids.update(str(pk) for pk in node.get_all_assets().values_list('pk', flat=True))
     assets = list(Asset.objects.filter(pk__in=ids, org_id=ticket.org_id))
     accounts = data.get('apply_accounts') or []
@@ -35,9 +36,9 @@ def build_context(ticket):
     date_expired = parse_datetime(data['apply_date_expired']) if data.get('apply_date_expired') else None
     pending = bool(data.get('resource_description')) and (not assets or not accounts)
     if len(assets) != len(ids) or (not pending and (not assets or not accounts)):
-        raise WorkflowConfigurationError('Select existing assets and accounts before submitting the request.')
+        raise WorkflowConfigurationError(gettext('Select existing assets and accounts before submitting the request.'))
     if not date_start or not date_expired or date_expired <= date_start:
-        raise WorkflowConfigurationError('A valid access period is required.')
+        raise WorkflowConfigurationError(gettext('A valid access period is required.'))
     context['nodes'] = [{'id': str(n.pk), 'name': n.value} for n in nodes]
     users = requested_users(ticket)
     context['accounts'] = []
@@ -54,7 +55,7 @@ def build_context(ticket):
     from perms.const import ActionChoices
     actions = data.get('apply_actions')
     if not isinstance(actions, int):
-        raise WorkflowConfigurationError('Select valid asset actions.')
+        raise WorkflowConfigurationError(gettext('Select valid asset actions.'))
     context['actions'] = [action.name for action in ActionChoices if action.value & actions]
     context['duration'] = (date_expired - date_start).total_seconds()
     context['request'].update({
@@ -83,16 +84,16 @@ def on_approved(instance, ticket):
     snapshots = requested.get('users', [data['applicant']])
     users = list(available_users(instance.org_id).filter(pk__in=[user['id'] for user in snapshots]))
     if len(users) != len(snapshots):
-        raise WorkflowConfigurationError('An authorized user is no longer an active organization member.')
+        raise WorkflowConfigurationError(gettext('An authorized user is no longer an active organization member.'))
     if '@USER' in requested['account_selectors']:
         names = {user['id']: user['username'] for user in snapshots}
         if any(user.username != names[str(user.pk)] for user in users):
-            raise WorkflowConfigurationError('A dynamic account username changed. Submit a new request.')
+            raise WorkflowConfigurationError(gettext('A dynamic account username changed. Submit a new request.'))
     ids = [asset['id'] for asset in data['assets']]
     with tmp_to_org(instance.org_id):
         assets = Asset.objects.filter(pk__in=ids, org_id=instance.org_id)
         if assets.count() != len(ids):
-            raise WorkflowConfigurationError('A requested asset was deleted or moved. Submit a new request.')
+            raise WorkflowConfigurationError(gettext('A requested asset was deleted or moved. Submit a new request.'))
         if AssetPermission.objects.filter(pk=ticket.pk).exists():
             return
         attrs = {
@@ -105,7 +106,7 @@ def on_approved(instance, ticket):
             'created_by': requested['permission_name'],
         }
         if attrs['date_expired'] <= timezone.now():
-            raise WorkflowConfigurationError('The requested access period has already expired.')
+            raise WorkflowConfigurationError(gettext('The requested access period has already expired.'))
         sync_expire_soon_notice(None, attrs, allow_past=True, disable_if_past=True)
         permission = AssetPermission.objects.create(**attrs)
         # Never grant a live node selection: its membership can grow after approval.

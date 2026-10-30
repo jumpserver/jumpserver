@@ -142,9 +142,13 @@ class PluginRegistryTests(SimpleTestCase):
                       {'source': 'admin', 'target': 'end'}],
         }
         version = SimpleNamespace(published_at=timezone.now(), as_definition=lambda: definition)
-        self.assertFalse(supports_delegated_request(version))
-        definition['edges'][2]['target'] = 'admin'
-        self.assertTrue(supports_delegated_request(version))
+        for approver_type in ('org_admin', 'applicant_manager'):
+            with self.subTest(approver_type=approver_type):
+                definition['nodes'][2]['config']['approvers']['type'] = approver_type
+                definition['edges'][2]['target'] = 'end'
+                self.assertFalse(supports_delegated_request(version))
+                definition['edges'][2]['target'] = 'admin'
+                self.assertTrue(supports_delegated_request(version))
 
 
 class TicketPluginTests(TestCase):
@@ -170,13 +174,13 @@ class TicketPluginTests(TestCase):
         flow.save(update_fields=['enabled'])
         return flow
 
-    def delegated_workflow(self, **config):
+    def delegated_workflow(self, approver_type='org_admin', **config):
         admin, _ = Role.objects.get_or_create(id=BuiltinRole.org_admin.id,
                                               defaults={'name': 'OrgAdmin', 'scope': 'org'})
         RoleBinding.objects_raw.get_or_create(user=self.alice, role=admin, org=self.org,
                                               defaults={'scope': 'org'})
         definition = approval_definition([self.alice], **config)
-        definition['nodes'][1]['config']['approvers'] = {'type': 'org_admin'}
+        definition['nodes'][1]['config']['approvers'] = {'type': approver_type}
         return self.workflow(definition=definition)
 
     def grant_delegation(self):
@@ -820,6 +824,20 @@ class TicketPluginTests(TestCase):
         from rest_framework.exceptions import PermissionDenied
         with self.assertRaises(PermissionDenied):
             self.engine.approve(old_task, self.bob)
+
+    def test_applicant_manager_allows_delegation_and_excludes_applicant_and_beneficiary(self):
+        admin_flow = self.delegated_workflow(approver_type='applicant_manager', exclude_applicant=False)
+        admin = Role.objects.get(pk=BuiltinRole.org_admin.id)
+        RoleBinding.objects_raw.bulk_create([
+            RoleBinding(user=user, role=admin, org=self.org, scope='org')
+            for user in (self.applicant, self.bob)
+        ])
+        ticket = self.ticket(admin_flow)
+        ticket.request_data['apply_users'] = [str(self.bob.pk)]
+        ticket.save(update_fields=['request_data'])
+        instance = submit_ticket(ticket)
+        self.assertEqual(set(ApprovalTask.objects.filter(node_instance__instance=instance)
+                             .values_list('assignee_id', flat=True)), {self.alice.pk})
 
     def test_beneficiary_can_read_ticket_and_instance_and_receives_result(self):
         self.grant_delegation()

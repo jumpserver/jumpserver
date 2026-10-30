@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from ..base import TicketPlugin
@@ -58,7 +59,7 @@ class Plugin(TicketPlugin):
         from tickets.workflow.errors import WorkflowConfigurationError
         if context['request'].get('is_on_behalf') and not supports_delegated_request(ticket.workflow.active_version):
             raise WorkflowConfigurationError(
-                'Requests for another user require organization administrator approval on every path.'
+                gettext('Requests for another user require organization administrator approval on every path.')
             )
 
     def filter_workflow_options(self, request, org_id, workflows):
@@ -92,6 +93,7 @@ class Plugin(TicketPlugin):
             (data.get('apply_assets') or data.get('apply_nodes')) and data.get('apply_accounts'))
 
     def request_items(self, ticket):
+        from accounts.const import AliasAccount
         from assets.models import Asset, Node
         from perms.const import ActionChoices
         data = ticket.request_data
@@ -127,6 +129,7 @@ class Plugin(TicketPlugin):
             date_start = data.get('apply_date_start')
             date_expired = data.get('apply_date_expired')
             notice = data.get('apply_expire_soon_notice_minutes')
+        account_labels = dict(AliasAccount.choices)
         return [
             {'name': 'apply_users', 'label': str(_('Authorized users')),
              'value': users},
@@ -135,7 +138,7 @@ class Plugin(TicketPlugin):
             {'name': 'apply_assets', 'label': str(_('Asset')),
              'value': assets},
             {'name': 'apply_accounts', 'label': str(_('Accounts')),
-             'value': accounts},
+             'value': [str(account_labels.get(account, account)) for account in accounts]},
             {'name': 'apply_actions', 'label': str(_('Actions')),
              'value': ActionChoices.display(actions)},
             {'name': 'apply_date_start', 'label': str(_('Date start')),

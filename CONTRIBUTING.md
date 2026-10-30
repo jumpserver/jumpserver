@@ -38,7 +38,7 @@ contract, the developer must decide whether old clients still work and the revie
 must check that decision. A breaking change in any server component raises
 `MIN_CLIENT_VERSION` in `apps/jumpserver/settings/base.py`; ordinary compatible
 releases leave it unchanged. Luna similarly maintains `MIN_CORE_VERSION`.
-Both initial minimums are `v5.1.0` and both comparisons must pass before connecting.
+Both minimums are currently `v5.2.0` and both comparisons must pass before connecting.
 Do not reuse an already released version number to claim the new mechanism exists.
 
 Anonymous `GET /api/v1/settings/client/compatibility/` returns schema version 1,

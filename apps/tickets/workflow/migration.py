@@ -87,7 +87,7 @@ def import_ticket(ticket_id, apply=False):
                 task_state = old.state if old.state in ('approved', 'rejected') else ('pending' if active else 'cancelled')
                 task = ApprovalTask.objects.create(
                     node_instance=run, assignee=old.assignee, assignee_snapshot={
-                        **user_snapshot(old.assignee), 'name': old.assignee_display,
+                        **user_snapshot(old.assignee), 'display': old.assignee_display,
                     }, state=task_state, date_finished=step.date_updated if task_state != 'pending' else None,
                 )
                 ApprovalTask.objects.filter(pk=task.pk).update(date_created=old.date_created)

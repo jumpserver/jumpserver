@@ -12,4 +12,5 @@ class TicketsConfig(AppConfig):
         ticket_plugins.validate()
         from . import signal_handlers  # noqa
         from . import notifications  # noqa
+        from . import tasks  # noqa
         return super().ready()

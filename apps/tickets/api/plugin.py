@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -20,7 +21,7 @@ class TicketTypeViewSet(viewsets.ViewSet):
     def resource_options(self, request, pk=None):
         org_id = request.query_params.get('org_id', str(current_org.id))
         if org_id == Organization.ROOT_ID or not Organization.objects.filter(pk=org_id).exists():
-            raise ValidationError({'org_id': 'Select a concrete organization.'})
+            raise ValidationError({'org_id': gettext('Select a concrete organization.')})
         if not available_users(org_id).filter(pk=request.user.pk).exists():
             raise PermissionDenied()
         with tmp_to_org(org_id):
@@ -34,18 +35,18 @@ class TicketTypeViewSet(viewsets.ViewSet):
         from common.drf.throttling import FileTransferThrottle
         from tickets.plugins.file_transfer.storage import stage_upload
         if pk != 'file_transfer':
-            raise ValidationError('This ticket type does not accept files.')
+            raise ValidationError(gettext('This ticket type does not accept files.'))
         throttle = FileTransferThrottle()
         if not throttle.allow_request(request, self):
             self.throttled(request, throttle.wait())
         org_id = str(request.data.get('org_id', current_org.id))
         if org_id == Organization.ROOT_ID or not Organization.objects.filter(pk=org_id).exists():
-            raise ValidationError('Select a concrete organization.')
+            raise ValidationError(gettext('Select a concrete organization.'))
         if not available_users(org_id).filter(pk=request.user.pk).exists():
             raise PermissionDenied()
         files = request.FILES.getlist('file')
         if len(files) != 1:
-            raise ValidationError('Upload one file at a time.')
+            raise ValidationError(gettext('Upload one file at a time.'))
         with tmp_to_org(org_id):
             record = stage_upload(request.user, org_id, files[0])
         return Response(record.summary(), status=201)

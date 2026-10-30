@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import timedelta
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -6,6 +7,7 @@ from uuid import uuid4
 from django.db import transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.utils.translation import override
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -127,19 +129,15 @@ class WorkflowBusinessTests(TestCase):
             self.assertEqual(ticket.state, 'expired' if operation == 'expire' else 'closed')
             self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
 
-    def test_manager_and_owner_are_frozen_at_submission(self):
-        User.objects.filter(pk=self.applicant.pk).update(manager=self.alice)
-        self.applicant.refresh_from_db()
+    def test_asset_owner_is_frozen_at_submission(self):
         definition = approval_definition([self.alice], levels=2)
-        definition['nodes'][1]['config']['approvers'] = {'type': 'applicant_manager'}
         definition['nodes'][2]['config']['approvers'] = {'type': 'asset_owner'}
         ticket = self.ticket(self.workflow(definition=definition))
         instance = submit_ticket(ticket)
-        User.objects.filter(pk=self.applicant.pk).update(manager=self.bob)
         Asset.objects.filter(pk=self.asset.pk).update(owner=self.bob)
         self.engine.approve(self.task(instance), self.alice)
         self.assertEqual(self.task(instance).assignee_id, self.alice.pk)
-        self.assertEqual(instance.context['applicant']['manager_id'], str(self.alice.pk))
+        self.assertNotIn('manager_id', instance.context['applicant'])
 
     def test_login_acl_uses_new_engine_in_global_scope(self):
         acl = LoginACL.objects.create(name='Workflow login ACL', action='review')
@@ -289,6 +287,51 @@ class WorkflowBusinessTests(TestCase):
         self.assertTrue(AssetPermission.objects.filter(pk=ticket.pk).exists())
         self.assertEqual(import_ticket(ticket.pk, apply=True)[0], 'SKIP')
 
+    def test_migration_keeps_historical_reviewer_display_for_tasks_and_events(self):
+        for reviewer in (self.alice, None):
+            with self.subTest(reviewer=reviewer):
+                ticket = self.ticket()
+                step = TicketStep.objects.create(ticket=ticket, state='approved', status='closed')
+                display = 'Original reviewer(original-username)'
+                old = TicketAssignee.objects.create(step=step, assignee=reviewer, state='approved')
+                TicketAssignee.objects.filter(pk=old.pk).update(assignee_display=display)
+                Ticket.objects.filter(pk=ticket.pk).update(state='approved', status='closed')
+                import_ticket(ticket.pk, apply=True)
+                instance = WorkflowInstance.objects.get(ticket=ticket)
+                task = instance.node_instances.get(node__type='approval').tasks.get()
+                event = instance.events.get(type='approval.approved')
+                self.assertEqual(task.assignee_snapshot['display'], display)
+                self.assertEqual(event.actor_snapshot, task.assignee_snapshot)
+                self.assertEqual(task.assignee_id, reviewer.pk if reviewer else None)
+                if reviewer:
+                    self.assertEqual(task.assignee_snapshot['name'], reviewer.name)
+                    self.assertEqual(task.assignee_snapshot['username'], reviewer.username)
+
+    def test_account_aliases_are_labels_only_in_request_display_and_export(self):
+        from tickets.serializers.ticket.ticket import TicketSerializer, TicketRequestItemsField
+        ticket = self.ticket()
+        selectors = ['@SPEC', 'ops', '@ALL', '@INPUT', '@USER', '@ANON', '@custom']
+        ticket.request_data['apply_accounts'] = selectors
+        ticket.save(update_fields=['request_data'])
+        for imported in (False, True):
+            with self.subTest(imported=imported):
+                if imported:
+                    Ticket.objects.filter(pk=ticket.pk).update(state='approved', status='closed')
+                    import_ticket(ticket.pk, apply=True)
+                    ticket.refresh_from_db()
+                    frozen = deepcopy(ticket.workflow_instance.context)
+                with override('zh-hans'):
+                    items = TicketSerializer.get_request_items(ticket)
+                    accounts = next(item['value'] for item in items if item['name'] == 'apply_accounts')
+                    expected = (['匿名账号', '手动输入', '指定账号', '同名账号', '@custom', 'ops'] if imported
+                                else ['指定账号', 'ops', '全部', '手动输入', '同名账号', '匿名账号', '@custom'])
+                    self.assertEqual(accounts, expected)
+                    self.assertIn('指定账号', TicketRequestItemsField().to_file_representation(items))
+                ticket.refresh_from_db()
+                self.assertEqual(ticket.request_data['apply_accounts'], selectors)
+                if imported:
+                    self.assertEqual(ticket.workflow_instance.context, frozen)
+
     def test_legacy_self_assignee_can_approve_or_reject_with_original_policy(self):
         for operation, expected in [('approve', 'approved'), ('reject', 'rejected')]:
             with self.subTest(operation=operation):
@@ -343,6 +386,7 @@ class WorkflowBusinessTests(TestCase):
                 getattr(self.engine, operation)(old_task, self.applicant)
 
     def test_legacy_incomplete_context_keeps_request_details_and_export(self):
+        from accounts.const import AliasAccount
         from perms.const import ActionChoices
         from tickets.serializers.ticket.ticket import TicketSerializer, TicketRequestItemsField
         for missing in ('applicant', 'asset'):
@@ -365,14 +409,14 @@ class WorkflowBusinessTests(TestCase):
                 values = {item['name']: item['value'] for item in items}
                 self.assertEqual(values, {
                     'apply_users': ['Former applicant'], 'apply_assets': ['Deleted host'],
-                    'apply_nodes': ['Original node'], 'apply_accounts': ['@ALL'],
+                    'apply_nodes': ['Original node'], 'apply_accounts': [str(AliasAccount.ALL.label)],
                     'apply_actions': ActionChoices.display(0),
                     'apply_date_start': ticket.request_data['apply_date_start'],
                     'apply_date_expired': ticket.request_data['apply_date_expired'],
                     'apply_expire_soon_notice_minutes': 0,
                 })
                 exported = TicketRequestItemsField().to_file_representation(items)
-                for value in ('Former applicant', 'Deleted host', 'Original node', '@ALL',
+                for value in ('Former applicant', 'Deleted host', 'Original node', str(AliasAccount.ALL.label),
                               ticket.request_data['apply_date_start'], ': 0'):
                     self.assertIn(value, exported)
                 self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
@@ -431,7 +475,7 @@ class WorkflowBusinessTests(TestCase):
         flow = self.workflow()
         allowed = self.api_request(WorkflowViewSet, 'options_list', self.applicant, data={'org_id': self.org.id})
         self.assertEqual(allowed.status_code, 200, allowed.data)
-        self.assertEqual(allowed.data[0]['id'], str(flow.pk))
+        self.assertIn(str(flow.pk), {item['id'] for item in allowed.data})
         denied = self.api_request(WorkflowViewSet, 'options_list', self.outsider, data={'org_id': self.org.id})
         self.assertEqual(denied.status_code, 403)
 
