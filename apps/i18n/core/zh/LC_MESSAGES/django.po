@@ -18626,3 +18626,40 @@ msgstr "域名称"
 #: tickets/models/workflow.py:45
 msgid "Legacy ticket approval"
 msgstr "历史工单审批"
+
+msgid "Client idle lock (minute)"
+msgstr "空闲锁屏 (分钟)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 表示关闭空闲锁屏。 "
+"主页面和客户端管理的资产窗口一起锁定，只能在主页面输入当前账号的锁屏密码解锁。登录和连接保持；外部软件不受此锁屏保护。启用后，新登录及恢复的登录默认锁定。"
+" 根据本机系统键鼠输入判断空闲，其他程序中的操作也计入；只对当前激活的站点和账号计时，无需向服务器上报活动。"
+
+msgid "Client lock password"
+msgstr "客户端锁屏密码"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "尚未设置客户端锁屏密码。请前往此站点、此账号的 Web 个人设置中设置，返回后点击刷新。"
+
+msgid "The client lock password is incorrect."
+msgstr "解锁失败，请检查锁屏密码和网络后重试。"
+
+msgid ""
+"Measured from client login; activity and token refresh do not extend it. 0 "
+"disables the lifetime limit (default). Exit and idle lock settings still "
+"apply. Log in again when the lifetime ends."
+msgstr ""
+"从客户端登录开始计时，用户操作和令牌刷新均不延长有效期。0 表示不限制登录时长（默认），退出后重新登录和空闲锁屏设置仍然生效。到期后需重新登录。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr "{} - 未设置加密密码，请前往个人设置 → 登录认证 → 客户端凭证 → 文件加密密码进行设置。"

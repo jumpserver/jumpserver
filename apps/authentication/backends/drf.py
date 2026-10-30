@@ -120,8 +120,6 @@ class PrivateTokenAuthentication(authentication.TokenAuthentication):
 
 
 class OAuth2Authentication(BaseOAuth2Authentication):
-    touch_client_login_session = False
-
     def authenticate(self, request):
         from authentication.services.client_login_session import (
             ClientSessionExpired, expired_session_from_receipt, validate_access_token,
@@ -141,9 +139,7 @@ class OAuth2Authentication(BaseOAuth2Authentication):
         if user_token:
             _, token = user_token
             try:
-                request.client_login_session = validate_access_token(
-                    token, touch=self.touch_client_login_session and request.method == 'POST',
-                )
+                request.client_login_session = validate_access_token(token)
             except ClientSessionExpired as error:
                 request._request.expired_client_login_session_id = error.session_id
                 raise

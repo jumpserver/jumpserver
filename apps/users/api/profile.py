@@ -3,6 +3,9 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import ConnectionToken
+from authentication.backends.drf import SessionAuthentication
+from authentication.permissions import UserConfirmation
+from common.permissions import IsValidUser
 from authentication.permissions import IsValidUserOrConnectionToken
 from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
@@ -16,7 +19,7 @@ from ..models import User
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
     'UserProfileApi', 'UserPasswordApi',
-    'UserPermissionsApi'
+    'UserPermissionsApi', 'UserClientCredentialsApi'
 ]
 
 
@@ -82,3 +85,20 @@ class UserPermissionsApi(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class UserClientCredentialsApi(generics.RetrieveUpdateAPIView):
+    """Personal credentials are managed by the web account, never a desktop bearer."""
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsValidUser,)
+    serializer_class = serializers.UserClientCredentialsSerializer
+    http_method_names = ('get', 'patch', 'head', 'options')
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        if self.request.method == 'PATCH':
+            permissions.append(UserConfirmation())
+        return permissions
+
+    def get_object(self):
+        return {'lock': {}, 'file': {}}

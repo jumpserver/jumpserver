@@ -320,7 +320,7 @@ class BaseFileRenderer(LogMixin, BaseRenderer):
         secret_key = request.user.secret_key
         if not secret_key:
             content = _(
-                "{} - Encryption password not set - Please go to Personal Settings → Preferences → File Encryption "
+                "{} - Encryption password not set - Please go to Personal Settings → Login authentication → Client credentials → File Encryption "
                 "Password to set it.").format(request.user.name)
 
             response['Content-Disposition'] = content_disposition.replace(self.format, 'txt')

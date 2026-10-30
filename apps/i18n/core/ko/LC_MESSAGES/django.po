@@ -17760,3 +17760,42 @@ msgstr "Approval task"
 
 msgid "Workflow event"
 msgstr "Workflow event"
+
+msgid "Client idle lock (minute)"
+msgstr "유휴 잠금 (분)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0은 유휴 잠금을 비활성화합니다. 기본 화면과 관리되는 자산 창을 잠그며 기본 화면에서만 해제할 수 있습니다. 로그인과 연결은 "
+"유지됩니다. 외부 프로그램은 보호되지 않습니다. 활성화하면 새 로그인과 복원된 로그인도 잠금 상태로 시작합니다. 외부 프로그램을 포함한 "
+"시스템 키보드와 마우스 입력은 현재 활성 사이트와 계정의 타이머만 초기화합니다. 활동은 서버에 보고하지 않습니다."
+
+msgid "Client lock password"
+msgstr "클라이언트 잠금 비밀번호"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "잠금 비밀번호가 없습니다. 이 사이트와 계정의 웹 개인 설정에서 설정한 후 돌아와 새로 고치세요."
+
+msgid "The client lock password is incorrect."
+msgstr "잠금 해제에 실패했습니다. 비밀번호와 연결을 확인하세요."
+
+msgid ""
+"Measured from client login; activity and token refresh do not extend it. 0 "
+"disables the lifetime limit (default). Exit and idle lock settings still "
+"apply. Log in again when the lifetime ends."
+msgstr ""
+"클라이언트 로그인부터 계산하며 활동과 토큰 갱신은 기간을 연장하지 않습니다. 0은 기간 제한 없음(기본값)입니다. 종료 후 재로그인과 "
+"유휴 잠금은 별도로 적용됩니다. 만료 후 다시 로그인해야 합니다."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr ""
+"{} - 암호화 비밀번호가 없습니다. 개인 설정 → 로그인 인증 → 클라이언트 자격 증명 → 파일 암호화 비밀번호에서 설정하세요."

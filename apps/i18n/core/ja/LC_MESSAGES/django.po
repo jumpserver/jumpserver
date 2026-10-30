@@ -17831,3 +17831,42 @@ msgstr "Approval task"
 
 msgid "Workflow event"
 msgstr "Workflow event"
+
+msgid "Client idle lock (minute)"
+msgstr "アイドルロック (分)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 はアイドルロックを無効にします。 "
+"メイン画面と管理対象の資産ウィンドウをロックし、メイン画面でのみ解除できます。ログインと接続は維持されます。外部アプリは保護されません。有効時は新規・復元ログインもロック状態から開始します。"
+" 外部アプリを含むシステムのキーボードとマウス入力で、現在のサイトとアカウントのみのタイマーをリセットします。操作はサーバーに送信しません。"
+
+msgid "Client lock password"
+msgstr "クライアントロックパスワード"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "ロックパスワードが未設定です。このサイトとアカウントの Web 個人設定で設定し、戻って更新してください。"
+
+msgid "The client lock password is incorrect."
+msgstr "解除できません。パスワードと接続を確認してください。"
+
+msgid ""
+"Measured from client login; activity and token refresh do not extend it. 0 "
+"disables the lifetime limit (default). Exit and idle lock settings still "
+"apply. Log in again when the lifetime ends."
+msgstr ""
+"クライアントへのログイン時から計測し、操作やトークン更新では延長しません。0 "
+"は期間制限なし（既定）です。終了時の再ログインとアイドルロックは別途適用されます。期限後は再ログインが必要です。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr ""
+"{} - 暗号化パスワードが未設定です。個人設定 → ログイン認証 → クライアント認証情報 → ファイル暗号化パスワードで設定してください。"

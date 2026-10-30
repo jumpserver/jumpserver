@@ -232,20 +232,20 @@ class SecuritySessionSerializer(serializers.Serializer):
         label=_('Client login lifetime (minute)'),
         help_text=_(
             'Measured from client login; activity and token refresh do not extend it. '
-            '0 disables the lifetime limit (default). Exit and idle timeout settings still apply. '
+            '0 disables the lifetime limit (default). Exit and idle lock settings still apply. '
             'Log in again when the lifetime ends.'
         ),
     )
-    SECURITY_CLIENT_MAX_IDLE_TIME = serializers.IntegerField(
+    SECURITY_CLIENT_IDLE_LOCK_TIME = serializers.IntegerField(
         min_value=0, max_value=99999, required=False,
-        label=_('Client login idle timeout (minute)'),
+        label=_('Client idle lock (minute)'),
         help_text=_(
-            'Log in again when the idle timeout is reached. 0 disables the limit (default). '
-            'Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. '
-            'An open connection, background output and automatic refresh do not count. '
-            'Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. '
-            'Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. '
-            'Time is measured from the last activity confirmed by the server.'
+            '0 disables idle locking (default). When enabled, the client starts locked. '
+            'Only the active site and account are checked for system keyboard or mouse inactivity. '
+            'Lock the main page and managed asset windows without ending login or connections. '
+            'Unlock only on the main page with the current account client lock password. '
+            'Set the password in Personal settings > Login authentication > Client credentials. '
+            'External applications are not covered by the client lock.'
         ),
     )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(

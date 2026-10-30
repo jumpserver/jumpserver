@@ -17554,3 +17554,39 @@ msgstr "Windows 絕對目錄；home 表示連線帳號的使用者目錄。"
 
 msgid "Select one Linux SSH/SFTP or Windows WinRM account."
 msgstr "請選擇一個 Linux SSH/SFTP 或 Windows WinRM 帳號。"
+
+msgid "Client idle lock (minute)"
+msgstr "閒置鎖定 (分鐘)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 表示關閉閒置鎖定。 "
+"主頁面與用戶端管理的資產視窗一起鎖定，只能在主頁面輸入目前帳號的鎖定密碼解鎖。登入及連線保持；外部軟體不受此鎖定保護。啟用後，新登入及還原的登入預設鎖定。"
+" 依本機系統鍵鼠輸入判斷閒置，其他程式操作亦計入；僅對目前啟用的網站與帳號計時，無須向伺服器回報活動。"
+
+msgid "Client lock password"
+msgstr "用戶端鎖定密碼"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "尚未設定用戶端鎖定密碼。請前往此網站、此帳號的 Web 個人設定完成設定，返回後按重新整理。"
+
+msgid "The client lock password is incorrect."
+msgstr "解鎖失敗，請檢查密碼與網路後重試。"
+
+msgid ""
+"Measured from client login; activity and token refresh do not extend it. 0 "
+"disables the lifetime limit (default). Exit and idle lock settings still "
+"apply. Log in again when the lifetime ends."
+msgstr "從用戶端登入開始計時，操作及權杖更新均不延長有效期。0 表示不限制登入時長（預設），退出後重新登入及閒置鎖定仍然生效。到期後需重新登入。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr "{} - 尚未設定加密密碼，請前往個人設定 → 登入驗證 → 用戶端憑證 → 檔案加密密碼進行設定。"
