@@ -15,6 +15,7 @@ from oauth2_provider.models import get_application_model
 from oauth2_provider.views.dynamic_client_registration import _build_application_kwargs, _parse_metadata
 from redis.exceptions import RedisError
 
+from authentication.services.agent_clients import REGISTRATION_LOCK
 from common.utils.lock import DistributedLock
 from common.validators import validate_mcp_resource_url
 from terminal.models import AgentApplication
@@ -24,7 +25,6 @@ MAX_BODY_BYTES = 8192
 MAX_REDIRECTS = 4
 MAX_CLIENTS = 4096
 REGISTRATIONS_PER_MINUTE = 30
-REGISTRATION_LOCK = 'agent-oauth-client-registration'
 
 
 def configured_resource():

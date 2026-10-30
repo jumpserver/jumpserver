@@ -11,10 +11,10 @@ from oauth2_provider.models import (
 )
 from redis.exceptions import RedisError
 
-from authentication.backends.oauth2_provider.agent_registration import REGISTRATION_LOCK
 from common.utils.lock import DistributedLock
 from terminal.models import AgentApplication, AgentOAuthBinding
 
+REGISTRATION_LOCK = 'agent-oauth-client-registration'
 MAX_USER_AGENT_CLIENTS = 10
 
 
@@ -71,7 +71,7 @@ def revoke_user_agent_client(user, application, registration):
     return True
 
 
-def cleanup_agent_oauth_clients(*, older_than_days=7, limit=100, on_delete=None):
+def cleanup_agent_oauth_clients(*, older_than_days=7, limit=100):
     if (type(older_than_days) is not int or not 1 <= older_than_days <= 3650
             or type(limit) is not int or not 1 <= limit <= 1000):
         raise ValueError('Use 1-3650 days and a limit of 1-1000 clients')
@@ -123,12 +123,9 @@ def cleanup_agent_oauth_clients(*, older_than_days=7, limit=100, on_delete=None)
                     continue
                 if not lock.locked_by_me():
                     raise AgentClientCleanupBusy('Registration lock expired; retry cleanup')
-                client = {'id': registration.pk, 'client_id': application.client_id, 'name': application.name}
                 try:
                     with transaction.atomic():
                         application.delete()
-                        if on_delete is not None:
-                            on_delete(client)
                 except ProtectedError:
                     result['skipped'] += 1
                     continue
