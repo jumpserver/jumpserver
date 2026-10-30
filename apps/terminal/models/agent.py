@@ -18,7 +18,7 @@ class AgentApplication(models.Model):
 
 
 class AgentOAuthBinding(models.Model):
-    """Organization chosen for one authorization, independent of token rotation."""
+    """OAuth organization scope; ROOT denotes the user's available organizations."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     application = models.ForeignKey('oauth2_provider.Application', on_delete=models.CASCADE)
     org_id = models.UUIDField()

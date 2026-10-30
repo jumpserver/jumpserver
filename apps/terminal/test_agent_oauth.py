@@ -56,12 +56,17 @@ class AgentOAuthOrganizationTests(TestCase):
         request._dont_enforce_csrf_checks = True
         return AgentAwareAuthorizationView.as_view()(request)
 
-    def code(self, org=None):
-        response = self.authorize(organization=str((org or self.second).pk))
+    def code(self, org=None, *, all_organizations=False):
+        response = self.authorize()
         self.assertEqual(response.status_code, 302)
         query = parse_qs(urlsplit(response['Location']).query)
         self.assertEqual(query['state'], ['org-state'])
-        return query['code'][0]
+        code = query['code'][0]
+        if not all_organizations:
+            # Persisted grants from before multi-organization consent must
+            # retain their original scope through exchange and rotation.
+            AgentOAuthBinding.objects.filter(grant__code=code).update(org_id=(org or self.second).pk)
+        return code
 
     def exchange(self, code, **extra):
         return self.token_request({
@@ -122,25 +127,67 @@ class AgentOAuthOrganizationTests(TestCase):
         session.refresh_from_db()
         self.assertEqual(session.revoke_reason, 'absolute_timeout')
 
-    def test_consent_lists_only_available_orgs_and_requires_explicit_choice(self):
+    def test_consent_authorizes_available_orgs_without_a_selector(self):
         request = self.factory.get('/authorize/', self.authorization)
         request.user = self.user
         request.session = {}
         response = AgentAwareAuthorizationView.as_view()(request)
         self.assertEqual(response.status_code, 200)
         response.render()
-        self.assertContains(response, 'name="organization"')
-        self.assertEqual(set(response.context_data['form'].fields['organization'].queryset), {self.first, self.second})
-        for org_id in ('', self.unavailable.pk, Organization.ROOT_ID, Organization.SYSTEM_ID):
-            with self.subTest(org_id=org_id):
-                response = self.authorize(organization=str(org_id))
-                self.assertEqual(response.status_code, 200)
-                self.assertIn('organization', response.context_data['form'].errors)
-                self.assertFalse(get_grant_model().objects.filter(application=self.app).exists())
-        code = self.code()
+        self.assertNotContains(response, 'name="organization"')
+        code = self.code(all_organizations=True)
         binding = AgentOAuthBinding.objects.get(grant__code=code)
-        self.assertEqual(str(binding.org_id), str(self.second.pk))
+        self.assertEqual(str(binding.org_id), service.ALL_AGENT_ORGANIZATIONS)
         self.assertIsNotNone(AgentApplication.objects.get(application=self.app).date_authorized)
+
+    def test_all_organization_consent_rotation_and_current_membership(self):
+        response = self.exchange(self.code(all_organizations=True), org_id=str(self.unavailable.pk))
+        self.assertEqual(response.status_code, 200, response.content)
+        result = json.loads(response.content)
+        principal = self.introspect(result)
+        self.assertTrue(principal['all_organizations'])
+        self.assertEqual(principal['org_id'], service.ALL_AGENT_ORGANIZATIONS)
+        with self.assertRaises(PermissionDenied):
+            self.introspect(result, org_id=str(self.unavailable.pk))
+        self.remove_membership()
+        context, user = service.context_identity(self.node, principal['context_token'])
+        self.assertEqual(list(service.authorized_agent_organizations(user, context['org_id'])), [self.first])
+        response = self.token_request({
+            'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        result = json.loads(response.content)
+        self.assertTrue(self.introspect(result)['all_organizations'])
+        self.first.members.through.objects_raw.filter(user=self.user, org_id=self.first.pk).delete()
+        with self.assertRaises(PermissionDenied):
+            self.introspect(result)
+        self.assertEqual(self.token_request({
+            'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
+        }).status_code, 400)
+        response = self.authorize()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context_data['form'].non_field_errors())
+
+    def test_personal_revocation_rejects_existing_grants_and_refreshes(self):
+        from django.db import transaction
+        from rest_framework.test import APIRequestFactory, force_authenticate
+        from authentication.api.agent_client_user import UserAgentClientViewSet
+
+        response = self.exchange(self.code(all_organizations=True))
+        result = json.loads(response.content)
+        pending_code = self.code(all_organizations=True)
+        request = APIRequestFactory().post('/revoke/')
+        force_authenticate(request, user=self.user)
+        with transaction.atomic():
+            response = UserAgentClientViewSet.as_view({'post': 'revoke'})(request, pk=str(self.app.pk))
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.exchange(pending_code).status_code, 400)
+        self.assertEqual(self.token_request({
+            'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
+        }).status_code, 400)
+        with self.assertRaises(PermissionDenied):
+            self.introspect(result)
+        self.assertFalse(AgentOAuthBinding.objects.filter(user=self.user, application=self.app).exists())
 
     def test_code_exchange_rotation_and_introspection_keep_selected_org(self):
         code = self.code()

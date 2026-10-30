@@ -16,6 +16,9 @@ class PublicSettingSerializer(serializers.Serializer):
 
 
 class PrivateSettingSerializer(PublicSettingSerializer):
+    MCP_ENABLED = serializers.BooleanField()
+    MCP_PUBLIC_URL = serializers.CharField(allow_blank=True)
+    MCP_DCR_ENABLED = serializers.BooleanField()
     WINDOWS_SKIP_ALL_MANUAL_PASSWORD = serializers.BooleanField()
     OLD_PASSWORD_HISTORY_LIMIT_COUNT = serializers.IntegerField()
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField()

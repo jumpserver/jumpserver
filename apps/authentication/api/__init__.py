@@ -18,4 +18,5 @@ from .token import *
 from .face import *
 from .access_token import *
 from .agent_client import *
+from .agent_client_user import *
 from .custom_sso import *

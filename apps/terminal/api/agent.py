@@ -69,7 +69,9 @@ class AgentComponentAPI(APIView):
         account_offset = service.integer(data.get('account_offset', 0), 'account_offset', 0, 100000)
         with tmp_to_org(context['org_id']):
             from django.db.models import Q
-            assets = UserPermAssetUtil(user).get_all_assets().filter(is_active=True)
+            assets = UserPermAssetUtil(user).get_all_assets().filter(
+                is_active=True, org_id__in=service.authorized_agent_org_ids(user, context['org_id']),
+            )
             if data.get('asset_id'):
                 assets = assets.filter(pk=service.identifier(data['asset_id']))
             if search:
@@ -77,17 +79,18 @@ class AgentComponentAPI(APIView):
             results = []
             page = list(assets.order_by('id')[offset:offset + limit + 1])
             for asset in page[:limit]:
-                util = PermAssetDetailUtil(user, asset)
-                protocols = sorted({item.name for item in util.get_permed_protocols_for_user()} & service.SUPPORTED_PROTOCOLS)
-                if not protocols:
-                    continue
-                accounts, account_next = AgentComponentAPI.account_page(user, asset, util, protocols, account_offset)
-                if accounts or account_next is not None:
-                    results.append({
-                        'id': str(asset.id), 'name': asset.name, 'address': asset.address,
-                        'org_id': asset.org_id, 'protocols': protocols, 'accounts': accounts,
-                        'accounts_next_offset': account_next,
-                    })
+                with tmp_to_org(asset.org_id):
+                    util = PermAssetDetailUtil(user, asset)
+                    protocols = sorted({item.name for item in util.get_permed_protocols_for_user()} & service.SUPPORTED_PROTOCOLS)
+                    if not protocols:
+                        continue
+                    accounts, account_next = AgentComponentAPI.account_page(user, asset, util, protocols, account_offset)
+                    if accounts or account_next is not None:
+                        results.append({
+                            'id': str(asset.id), 'name': asset.name, 'address': asset.address,
+                            'org_id': asset.org_id, 'org_name': asset.org.name, 'protocols': protocols, 'accounts': accounts,
+                            'accounts_next_offset': account_next,
+                        })
             return {'results': results[:limit], 'next_offset': offset + limit if len(page) > limit else None}
 
     @staticmethod

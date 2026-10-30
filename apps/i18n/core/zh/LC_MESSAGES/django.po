@@ -17504,3 +17504,9 @@ msgstr "客户端登录策略已变更"
 
 msgid "Authorization revoked"
 msgstr "授权已撤销"
+
+msgid "Allow this application to access assets you are authorized to use across all your available organizations. Asset, account and operation permissions are checked on every request."
+msgstr "允许此应用访问本人在当前所有可访问组织中获授权使用的资产。每次请求仍会检查资产、账号和操作权限。"
+
+msgid "No authorized organizations are available."
+msgstr "没有可访问的已授权组织。"

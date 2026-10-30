@@ -308,6 +308,76 @@ class AgentBoundaryTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(service.authority_exists(self.user.id, self.app.id, issued.id, refresh.token_family))
 
+    def test_all_organizations_discovery_pagination_execution_and_membership_revocation(self):
+        from accounts.models import Account
+        from assets.models import Asset, Platform
+        from perms.models import AssetPermission
+        from terminal.api.agent import AgentComponentAPI
+
+        second = Organization.objects.create(name='Agent multi second')
+        second.add_member(self.user)
+        other = Organization.objects.create(name='Agent multi unavailable')
+        platform = Platform.objects.create(name='Agent multi Linux', category='host', type='linux')
+        platform.protocols.create(name='ssh', port=22)
+        assets = []
+        accounts = []
+        for org in (self.org, second, other):
+            with tmp_to_org(org):
+                asset = Asset.objects.create(name='Same asset name', address='192.0.2.2', platform=platform)
+                asset.protocols.create(name='ssh', port=22)
+                account = Account.objects.create(name='root', username='root', asset=asset, secret='test-only-secret')
+                permission = AssetPermission.objects.create(name='Agent multi access', accounts=['root'], protocols=['ssh'])
+                permission.users.add(self.user)
+                permission.assets.add(asset)
+                assets.append(asset)
+                accounts.append(account)
+        with tmp_to_org(second):
+            denied = Asset.objects.create(name='Not granted', address='192.0.2.3', platform=platform)
+        legacy = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        AgentOAuthBinding.objects.filter(user=self.user, application=self.app).update(org_id=service.ALL_AGENT_ORGANIZATIONS)
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        query = {'context_token': principal['context_token'], 'limit': 1}
+        page = AgentComponentAPI.assets(self.node, query)
+        rows = list(page['results'])
+        while page['next_offset'] is not None:
+            page = AgentComponentAPI.assets(self.node, {**query, 'offset': page['next_offset']})
+            rows.extend(page['results'])
+        self.assertEqual({row['id'] for row in rows}, {str(asset.pk) for asset in assets[:2]})
+        self.assertEqual(len(rows), 2)
+        self.assertEqual({row['org_id'] for row in rows}, {str(self.org.pk), str(second.pk)})
+        self.assertTrue(all(row['org_name'] for row in rows))
+        for asset in (assets[2], denied):
+            self.assertEqual(AgentComponentAPI.assets(self.node, {**query, 'asset_id': str(asset.pk)})['results'], [])
+        connections = []
+        for index, asset in enumerate(assets[:2]):
+            body = {'context_token': principal['context_token'], 'asset_id': str(asset.pk),
+                    'account': str(accounts[index].pk), 'protocol': 'ssh', 'idempotency_key': 'multi-connect'}
+            connection = service.create_session(self.node, body)
+            connections.append(connection)
+            self.assertEqual(service.create_session(self.node, body)['id'], connection['id'])
+            with tmp_to_org(asset.org_id):
+                session = AgentSession.objects.get(pk=connection['id'])
+                self.assertEqual(session.org_id, str(asset.org_id))
+                self.assertEqual(session.actions.get(kind='connect_asset').org_id, str(asset.org_id))
+        with self.assertRaises(Http404):
+            service.create_session(self.node, {**body, 'context_token': legacy['context_token'], 'idempotency_key': 'legacy-denied'})
+        reader = AgentComponentAPI(operation='get')
+        handoff = service.create_action(self.node, {
+            'context_token': principal['context_token'], 'session_id': connections[1]['id'],
+            'kind': 'open_terminal', 'idempotency_key': 'multi-handoff', 'request': {},
+        })
+        with tmp_to_org(second):
+            self.assertEqual(AgentAction.objects.get(pk=handoff['id']).org_id, str(second.pk))
+        self.assertEqual(reader.action_operation(self.node, connections[1]['action_id'], {
+            'context_token': principal['context_token'],
+        })['id'], connections[1]['action_id'])
+        second.members.through.objects_raw.filter(user=self.user, org_id=second.pk).delete()
+        self.assertEqual(AgentComponentAPI.assets(self.node, {**query, 'asset_id': str(assets[1].pk)})['results'], [])
+        with self.assertRaises(PermissionDenied):
+            reader.action_operation(self.node, connections[1]['action_id'], {'context_token': principal['context_token']})
+        with self.assertRaises(Http404):
+            service.create_session(self.node, {**body, 'idempotency_key': 'removed-org'})
+
     def test_real_connection_authorization_idempotency_claim_and_permission_revocation(self):
         from accounts.models import Account
         from assets.models import Asset, Platform

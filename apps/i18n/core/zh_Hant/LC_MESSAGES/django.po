@@ -17481,3 +17481,9 @@ msgstr "用戶端登入策略已變更"
 
 msgid "Authorization revoked"
 msgstr "授權已撤銷"
+
+msgid "Allow this application to access assets you are authorized to use across all your available organizations. Asset, account and operation permissions are checked on every request."
+msgstr "允許此應用程式存取本人在目前所有可存取組織中獲授權使用的資產。每次請求仍會檢查資產、帳號和操作權限。"
+
+msgid "No authorized organizations are available."
+msgstr "沒有可存取的已授權組織。"

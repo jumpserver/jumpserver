@@ -12,7 +12,7 @@ from oauthlib.oauth2 import InvalidScopeError, InvalidRequestError, InvalidGrant
 from oauthlib.oauth2.rfc6749.errors import CustomOAuth2Error
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from terminal.agent_service import available_agent_organizations, check_agent_organization
+from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, check_agent_scope
 from terminal.models import AgentApplication, AgentOAuthBinding
 from .agent_forms import AgentAllowForm
 from .client_views import ClientAuthorizationView
@@ -56,15 +56,11 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
             if resources != [registration.resource]:
                 raise CustomOAuth2Error(error='invalid_target', request=request)
             request.resource = resources
-            org_id = getattr(request, 'agent_organization_id', None)
-            if not org_id:
-                organizations = list(available_agent_organizations(request.user)[:2])
-                if len(organizations) == 1:
-                    org_id = organizations[0].pk
+            org_id = getattr(request, 'agent_organization_id', None) or ALL_AGENT_ORGANIZATIONS
             try:
-                org_id = check_agent_organization(request.user, org_id)
+                check_agent_scope(request.user, org_id)
             except (PermissionDenied, ValidationError):
-                raise InvalidRequestError(description='Select an available organization', request=request)
+                raise InvalidRequestError(description='No authorized organizations are available', request=request)
             with transaction.atomic():
                 # Use the same lock order as cleanup of never-authorized DCR clients.
                 Application = get_application_model()
@@ -104,7 +100,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         if not binding:
             return False
         try:
-            check_agent_organization(request.user, binding.org_id)
+            check_agent_scope(request.user, binding.org_id)
         except (PermissionDenied, ValidationError):
             return False
         return True
@@ -192,8 +188,7 @@ class AgentAwareAuthorizationView(ClientAuthorizationView):
 
     def form_valid(self, form):
         if isinstance(form, AgentAllowForm):
-            organization = form.cleaned_data.get('organization')
-            self.agent_organization_id = str(organization.pk) if organization else None
+            self.agent_organization_id = ALL_AGENT_ORGANIZATIONS
         return super().form_valid(form)
 
     def create_authorization_response(self, request, scopes, credentials, allow):

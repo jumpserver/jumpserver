@@ -12,6 +12,8 @@ from types import SimpleNamespace
 
 from django.core import signing
 from django.db import transaction
+from django.db.models import CharField
+from django.db.models.functions import Cast
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from oauth2_provider.models import get_access_token_model, get_refresh_token_model
@@ -34,6 +36,9 @@ ACTION_KINDS = frozenset((
     'open_terminal',
 ))
 SUPPORTED_PROTOCOLS = frozenset(('ssh', 'sftp', 'mysql', 'mariadb', 'postgresql'))
+# OAuth scope marker. Sessions always use a real organization;
+# this marker never grants root-organization or administrative permissions.
+ALL_AGENT_ORGANIZATIONS = Organization.ROOT_ID
 
 
 class Conflict(APIException):
@@ -93,6 +98,24 @@ def check_agent_organization(user, org_id):
     return org_id
 
 
+def authorized_agent_organizations(user, scope_org_id):
+    organizations = available_agent_organizations(user)
+    if str(scope_org_id) != ALL_AGENT_ORGANIZATIONS:
+        organizations = organizations.filter(pk=identifier(scope_org_id))
+    return organizations
+
+
+def check_agent_scope(user, scope_org_id):
+    if not authorized_agent_organizations(user, scope_org_id).exists():
+        raise PermissionDenied('No authorized organizations are available')
+
+
+def authorized_agent_org_ids(user, scope_org_id):
+    return authorized_agent_organizations(user, scope_org_id).annotate(
+        agent_org_id=Cast('id', CharField()),
+    ).values('agent_org_id')
+
+
 def token_organization_binding(token, refresh=None):
     bindings = AgentOAuthBinding.objects.filter(user_id=token.user_id, application_id=token.application_id)
     binding = bindings.filter(access_token=token).first()
@@ -120,9 +143,11 @@ def introspect(node, data):
     if not binding:
         raise PermissionDenied('OAuth authorization has no organization binding')
     org_id = str(binding.org_id)
-    if data.get('org_id') and str(identifier(data['org_id'])) != org_id:
+    check_agent_scope(token.user, org_id)
+    if data.get('org_id') and not authorized_agent_organizations(token.user, org_id).filter(
+        pk=identifier(data['org_id']),
+    ).exists():
         raise PermissionDenied('Organization does not match this OAuth authorization')
-    check_agent_organization(token.user, org_id)
     if refresh and refresh.revoked is not None:
         raise PermissionDenied('OAuth authorization revoked')
     payload = {
@@ -135,6 +160,7 @@ def introspect(node, data):
     payload['expires'] = expires.timestamp()
     return {
         'user_id': payload['user_id'], 'org_id': org_id, 'client_id': payload['client_id'],
+        'all_organizations': org_id == ALL_AGENT_ORGANIZATIONS,
         'resource': resource, 'scopes': [SCOPE], 'expires_at': expires.isoformat(),
         'context_token': signing.dumps(payload, salt=CONTEXT_SALT),
     }
@@ -146,7 +172,7 @@ def context_identity(node, value):
         if context['node_id'] != str(node.id) or context['expires'] <= timezone.now().timestamp():
             raise PermissionDenied('Execution context expired or belongs to another node')
         user = User.objects.get(pk=context['user_id'])
-        check_agent_organization(user, context['org_id'])
+        check_agent_scope(user, context['org_id'])
         if not AgentApplication.objects.filter(
             application_id=context['application_id'], resource=context['resource'], is_active=True,
         ).exists():
@@ -227,10 +253,11 @@ def check_handoff_authority(session):
 
 
 def same_principal(context, session):
-    if (context['user_id'], context['application_id'], context['org_id']) != (
-        str(session.user_id), session.application_id, session.org_id,
+    if (context['user_id'], context['application_id']) != (str(session.user_id), session.application_id) or (
+        context['org_id'] != ALL_AGENT_ORGANIZATIONS and context['org_id'] != session.org_id
     ):
         raise PermissionDenied('Operation belongs to another authorization context')
+    check_agent_organization(session.user, session.org_id)
 
 
 def session_data(session):
@@ -259,7 +286,14 @@ def create_session(node, data):
         raise ValidationError('Protocol does not have an Agent execution adapter')
     requested = {'asset_id': str(identifier(data['asset_id'])), 'account': account, 'protocol': protocol}
     request_hash = fingerprint(requested)
-    with tmp_to_org(context['org_id']), transaction.atomic():
+    org_id = context['org_id']
+    if org_id == ALL_AGENT_ORGANIZATIONS:
+        with tmp_to_root_org():
+            org_id = get_object_or_404(
+                Asset.objects.filter(org_id__in=authorized_agent_org_ids(user, org_id)),
+                pk=requested['asset_id'], is_active=True,
+            ).org_id
+    with tmp_to_org(org_id), transaction.atomic():
         # Serialize a user's creation requests, including the first request for
         # an idempotency key. Unique constraints remain the final DB boundary.
         User.objects.select_for_update().get(pk=user.pk)
@@ -403,7 +437,14 @@ def create_action(node, data):
         raise ValidationError('Unsupported action kind')
     key = text_field(data['idempotency_key'], 'idempotency_key')
     validate_action_request(kind, data['request'])
-    with tmp_to_org(context['org_id']), transaction.atomic():
+    org_id = context['org_id']
+    if org_id == ALL_AGENT_ORGANIZATIONS:
+        with tmp_to_root_org():
+            org_id = get_object_or_404(
+                AgentSession.objects.filter(org_id__in=authorized_agent_org_ids(user, org_id)),
+                pk=identifier(data['session_id']), terminal=node, user=user, application_id=context['application_id'],
+            ).org_id
+    with tmp_to_org(org_id), transaction.atomic():
         User.objects.select_for_update().get(pk=user.pk)
         session = get_object_or_404(AgentSession.objects.select_for_update(), pk=identifier(data['session_id']), terminal=node)
         same_principal(context, session)

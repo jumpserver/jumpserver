@@ -98,6 +98,25 @@ class MCPSettingsAPITests(TestCase):
         with transaction.atomic():
             return SettingsApi.as_view()(request)
 
+    @override_settings(MCP_ENABLED=True, MCP_DCR_ENABLED=True, MCP_PUBLIC_URL='https://jumpserver.example/koko/mcp')
+    def test_personal_mcp_configuration_is_read_only_and_requires_login(self):
+        from settings.api.public import PublicSettingApi, OpenPublicSettingApi
+
+        request = self.factory.get('/api/v1/settings/public/')
+        with transaction.atomic():
+            self.assertIn(PublicSettingApi.as_view()(request).status_code, (401, 403))
+        force_authenticate(request, user=self.user)
+        response = PublicSettingApi.as_view()(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data['MCP_ENABLED'])
+        self.assertTrue(response.data['MCP_DCR_ENABLED'])
+        self.assertEqual(response.data['MCP_PUBLIC_URL'], 'https://jumpserver.example/koko/mcp')
+        open_response = OpenPublicSettingApi.as_view()(self.factory.get('/api/v1/settings/public/open/'))
+        self.assertTrue({'MCP_ENABLED', 'MCP_PUBLIC_URL', 'MCP_DCR_ENABLED'}.isdisjoint(open_response.data))
+        request = self.factory.patch('/api/v1/settings/public/', {'MCP_ENABLED': False}, format='json')
+        force_authenticate(request, user=self.user)
+        self.assertEqual(PublicSettingApi.as_view()(request).status_code, 405)
+
     def test_existing_auth_configuration_permission_controls_read_write_and_metadata(self):
         for method in ('get', 'patch', 'options'):
             with self.subTest(method=method):
