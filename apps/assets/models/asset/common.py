@@ -59,6 +59,7 @@ SUPPORTED_ICON_SKINS = {
     'general',
     'file',
     'linux',
+    'macos',
 }
 
 class AssetManager(OrgManager):
@@ -441,6 +442,8 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     def get_icon_skin(self):
         if self.category == 'device':
             return 'switch'
+        if self.platform.name.lower() == 'macos':
+            return 'macos'
         platform_type = self.platform.type.lower()
         if platform_type in SUPPORTED_ICON_SKINS:
             return platform_type
