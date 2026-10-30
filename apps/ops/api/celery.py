@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 import re
+import logging
 from django.db.models import Count, F, Q, Window
 from django.db.models.functions import RowNumber
 
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
 from django.utils.translation import gettext as _, gettext_lazy
 from django_celery_beat.models import PeriodicTask
 from django_filters import rest_framework as drf_filters
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -24,8 +26,10 @@ from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerial
 
 __all__ = [
     'CeleryPeriodTaskViewSet', 'CeleryTaskViewSet',
-    'CeleryTaskExecutionViewSet', 'CeleryMonitorAPIView'
+    'CeleryTaskExecutionViewSet', 'CeleryMonitorAPIView', 'CeleryMonitorStopAPIView',
 ]
+
+logger = logging.getLogger(__name__)
 
 
 class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
@@ -49,6 +53,34 @@ class CeleryMonitorAPIView(APIView):
         response = Response(get_monitor_snapshot())
         response['Cache-Control'] = 'no-store'
         return response
+
+
+class MonitorStopSerializer(serializers.Serializer):
+    worker = serializers.RegexField(r'^[\w.@,:-]{1,255}$', max_length=255)
+    task_id = serializers.RegexField(r'^[\w.:-]{1,128}$', max_length=128)
+    mode = serializers.ChoiceField(choices=('waiting', 'running'))
+
+
+class CeleryMonitorStopAPIView(APIView):
+    rbac_perms = {'POST': 'ops.stop_taskmonitor'}
+
+    def post(self, request, *args, **kwargs):
+        serializer = MonitorStopSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        from ops.celery.monitor import CACHE_KEY, stop_worker_task
+        result = stop_worker_task(data['worker'], data['task_id'], data['mode'])
+        logger.info('Task monitor stop: user=%s task=%s worker=%s mode=%s result=%s',
+                    request.user.pk, data['task_id'], data['worker'], data['mode'], result)
+        code = status.HTTP_202_ACCEPTED if result in (
+            'revoked', 'revoke_requested', 'termination_requested',
+        ) else status.HTTP_409_CONFLICT
+        if code == status.HTTP_202_ACCEPTED:
+            try:
+                cache.delete(CACHE_KEY)
+            except Exception:
+                logger.warning('Could not invalidate task monitor snapshot', exc_info=True)
+        return Response({'status': result}, status=code, headers={'Cache-Control': 'no-store'})
 
 
 class CeleryTaskFilterSet(BaseFilterSet):
