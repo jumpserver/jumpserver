@@ -17,8 +17,8 @@ tools, execution semantics and file streaming.
 ## Configuration
 
 Deploy the Core feature and apply normal database migrations before enabling
-MCP access. The initial Agent migration creates execution records, audit evidence
-and OAuth organization bindings together.
+MCP access. The single Agent migration, `terminal.0018_agent_mcp`, creates
+execution records, audit evidence and OAuth organization bindings together.
 
 In Lina, open **System Settings > AI Assistant > MCP**. AI Assistant and MCP use
 separate permission checks and save requests. Old MCP settings links redirect
@@ -115,14 +115,12 @@ Each authorization uses:
 - public-client token and revocation requests without a client secret.
 
 Consent is required on each authorization, without an organization selector.
-New grants cover the signed-in user's currently available organizations,
+Grants cover the signed-in user's currently available organizations,
 excluding global/system organizations. Each request rechecks membership and
 asset, account and protocol permissions; the all-organizations marker grants no
 administrative authority. Connections resolve the actual organization from the
 authorized asset. Clients need not send `X-JMS-ORG`, and a header cannot expand
-the grant. Existing single-organization grants and refresh families retain their
-scope until the user authorizes again. Agent access tokens are rejected as
-ordinary Core API bearer credentials.
+the grant. Agent access tokens are rejected as ordinary Core API bearer credentials.
 
 ## Revocation and registration maintenance
 
@@ -170,7 +168,7 @@ use their separate user and auditor permissions.
 
 | Component operation | Contract |
 | --- | --- |
-| `introspect/` | Validates the external OAuth token, exact resource, organization scope and optional versioned node capabilities; returns a context bound to these values and the user, client and Koko node for at most five minutes |
+| `introspect/` | Validates the external OAuth token, exact resource, all-organization scope and required versioned node capabilities; returns a context bound to these values and the user, client and Koko node for at most five minutes |
 | `assets/` | Searches current authorized assets, accounts and supported protocols using that context |
 | `sessions/` | Creates an idempotent logical asset session and connection action; applies existing connection controls |
 | `sessions/list/`, `sessions/get/` | Lists or recovers public session metadata by ID or original connection key; never returns credentials or restores a transport |
@@ -209,6 +207,28 @@ Koko translates recognized public codes without exposing arbitrary Core error
 bodies or credential details. This error presentation is confined to Agent
 component endpoints; ordinary Core APIs retain their existing contract.
 
+### MCP tool boundary
+
+Koko exposes ten MCP tools. Core component routes and action kinds express
+stable authorization effects rather than duplicating the public tool catalog:
+
+| Koko MCP tool | Core route or action |
+| --- | --- |
+| `search_assets` | `assets/` |
+| `connect_asset` | `sessions/` |
+| `query_sessions` | `operation=get/list` uses `sessions/get/` or `sessions/list/` |
+| `disconnect_asset` | `sessions/<id>/close/` |
+| `execute_command` | Action kind `execute_command` |
+| `query_actions` | `operation=get` uses action get or lookup; `operation=list` uses `actions/list/` |
+| `cancel_action` | `actions/<id>/cancel/` |
+| `file_read` | `operation=list/stat/read/download` maps to `file_list/file_stat/file_read/file_download` |
+| `file_write` | `operation=write/upload/mkdir/rename/remove` maps to `file_write/file_upload/file_mkdir/file_rename/file_remove` |
+| `open_terminal` | Action kind `open_terminal` |
+
+Each file action retains its own connect, download, upload or delete permission
+and audit kind. Component introspection accepts the resource, token and node
+capability declaration; client-selected organization fields are rejected.
+
 ### Execution capabilities and extension
 
 Koko supplies `capabilities` during component-authenticated introspection:
@@ -220,10 +240,9 @@ only protocols in both the declaration and current asset/account permissions.
 
 Session creation applies the same intersection and stores the derived execution
 mode in the existing request JSON. Refreshing capabilities cannot reinterpret
-an existing session or reuse its idempotency key with another mode. Old nodes,
-contexts and sessions retain the original five-protocol compatibility mapping.
-Deploy Core before a Koko version that supplies capability declarations; this
-change adds no database migration.
+an existing session or reuse its idempotency key with another mode. Capability
+declarations and stored execution modes are required; missing or unsupported
+values are rejected. Core contains no protocol-driver fallback list.
 
 Koko owns tool names, tool-specific schemas and execution adapters. Core owns
 stable action policies: permitted execution modes, authorization-relevant

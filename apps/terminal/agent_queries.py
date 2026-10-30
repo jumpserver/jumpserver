@@ -13,7 +13,7 @@ def scoped_queryset(node, data, model):
     with tmp_to_root_org():
         queryset = model.objects.filter(
             user=user, application_id=context['application_id'],
-            org_id__in=service.authorized_agent_org_ids(user, context['org_id']),
+            org_id__in=service.authorized_agent_org_ids(user),
             **{'terminal' if model is AgentSession else 'session__terminal': node},
             **{'resource' if model is AgentSession else 'session__resource': context['resource']},
         )

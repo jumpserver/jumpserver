@@ -95,20 +95,15 @@ def check_agent_organization(user, org_id):
     return org_id
 
 
-def authorized_agent_organizations(user, scope_org_id):
-    organizations = available_agent_organizations(user)
-    if str(scope_org_id) != ALL_AGENT_ORGANIZATIONS:
-        organizations = organizations.filter(pk=identifier(scope_org_id))
-    return organizations
-
-
 def check_agent_scope(user, scope_org_id):
-    if not authorized_agent_organizations(user, scope_org_id).exists():
+    if str(scope_org_id) != ALL_AGENT_ORGANIZATIONS:
+        raise PermissionDenied('Invalid Agent organization scope')
+    if not available_agent_organizations(user).exists():
         raise PermissionDenied('No authorized organizations are available')
 
 
-def authorized_agent_org_ids(user, scope_org_id):
-    return authorized_agent_organizations(user, scope_org_id).annotate(
+def authorized_agent_org_ids(user):
+    return available_agent_organizations(user).annotate(
         agent_org_id=Cast('id', CharField()),
     ).values('agent_org_id')
 
@@ -124,7 +119,7 @@ def token_organization_binding(token, refresh=None):
 
 
 def introspect(node, data):
-    require_keys(data, ('access_token', 'resource', 'org_id', 'capabilities'), ('access_token', 'resource'))
+    require_keys(data, ('access_token', 'resource', 'capabilities'), ('access_token', 'resource', 'capabilities'))
     raw = text_field(data['access_token'], 'access_token', 8192)
     token = get_access_token_model().objects.select_related('user', 'application').filter(
         token_checksum=hashlib.sha256(raw.encode()).hexdigest(),
@@ -141,10 +136,6 @@ def introspect(node, data):
         raise PermissionDenied('OAuth authorization has no organization binding')
     org_id = str(binding.org_id)
     check_agent_scope(token.user, org_id)
-    if data.get('org_id') and not authorized_agent_organizations(token.user, org_id).filter(
-        pk=identifier(data['org_id']),
-    ).exists():
-        raise PermissionDenied('Organization does not match this OAuth authorization')
     if refresh and refresh.revoked is not None:
         raise PermissionDenied('OAuth authorization revoked')
     payload = {
@@ -152,14 +143,13 @@ def introspect(node, data):
         'client_id': token.application.client_id, 'org_id': org_id,
         'token_id': token.pk, 'family': str(refresh.token_family) if refresh and refresh.token_family else '',
         'node_id': str(node.id), 'resource': resource,
+        'capabilities': node_capabilities(data['capabilities']),
     }
-    if 'capabilities' in data:
-        payload['capabilities'] = node_capabilities(data['capabilities'])
     expires = min(token.expires, timezone.now() + timedelta(seconds=CONTEXT_TTL))
     payload['expires'] = expires.timestamp()
     return {
         'user_id': payload['user_id'], 'org_id': org_id, 'client_id': payload['client_id'],
-        'all_organizations': org_id == ALL_AGENT_ORGANIZATIONS,
+        'all_organizations': True,
         'resource': resource, 'scopes': [SCOPE], 'expires_at': expires.isoformat(),
         'context_token': signing.dumps(payload, salt=CONTEXT_SALT),
     }
@@ -172,6 +162,7 @@ def context_identity(node, value):
             raise PermissionDenied('Execution context expired or belongs to another node')
         user = User.objects.get(pk=context['user_id'])
         check_agent_scope(user, context['org_id'])
+        context['capabilities'] = node_capabilities(context.get('capabilities'))
         if not AgentApplication.objects.filter(
             application_id=context['application_id'], resource=context['resource'], is_active=True,
         ).exists():
@@ -179,7 +170,7 @@ def context_identity(node, value):
         if not authority_exists(user.id, context['application_id'], context['token_id'], context['family']):
             raise PermissionDenied('OAuth authorization revoked')
         return context, user
-    except (signing.BadSignature, User.DoesNotExist, KeyError, TypeError, ValueError):
+    except (signing.BadSignature, User.DoesNotExist, KeyError, TypeError, ValueError, ValidationError):
         raise PermissionDenied('Invalid execution context')
 
 
@@ -252,9 +243,7 @@ def check_handoff_authority(session):
 
 
 def same_principal(context, session):
-    if (context['user_id'], context['application_id']) != (str(session.user_id), session.application_id) or (
-        context['org_id'] != ALL_AGENT_ORGANIZATIONS and context['org_id'] != session.org_id
-    ):
+    if (context['user_id'], context['application_id']) != (str(session.user_id), session.application_id):
         raise PermissionDenied('Operation belongs to another authorization context')
     check_agent_organization(session.user, session.org_id)
 
@@ -314,13 +303,11 @@ def create_session(node, data):
         raise ValidationError('Protocol does not have an Agent execution adapter')
     requested = {'asset_id': str(identifier(data['asset_id'])), 'account': account, 'protocol': protocol}
     request_hash = fingerprint(requested)
-    org_id = context['org_id']
-    if org_id == ALL_AGENT_ORGANIZATIONS:
-        with tmp_to_root_org():
-            org_id = get_object_or_404(
-                Asset.objects.filter(org_id__in=authorized_agent_org_ids(user, org_id)),
-                pk=requested['asset_id'], is_active=True,
-            ).org_id
+    with tmp_to_root_org():
+        org_id = get_object_or_404(
+            Asset.objects.filter(org_id__in=authorized_agent_org_ids(user)),
+            pk=requested['asset_id'], is_active=True,
+        ).org_id
     with tmp_to_org(org_id), transaction.atomic():
         # Serialize a user's creation requests, including the first request for
         # an idempotency key. Unique constraints remain the final DB boundary.
@@ -464,7 +451,7 @@ def validate_action_request(kind, request):
         if kind == 'file_write':
             content = request.get('content')
             if not isinstance(content, str) or len(content.encode()) > 65536:
-                raise ValidationError('Use upload_file for content larger than 64 KiB', code='file_content_too_large')
+                raise ValidationError('Use a file upload operation for content larger than 64 KiB', code='file_content_too_large')
     if 'timeout_seconds' in request:
         integer(request['timeout_seconds'], 'timeout_seconds', 1, 600)
 
@@ -478,13 +465,11 @@ def create_action(node, data):
         raise ValidationError('Unsupported action kind')
     key = text_field(data['idempotency_key'], 'idempotency_key')
     validate_action_request(kind, data['request'])
-    org_id = context['org_id']
-    if org_id == ALL_AGENT_ORGANIZATIONS:
-        with tmp_to_root_org():
-            org_id = get_object_or_404(
-                AgentSession.objects.filter(org_id__in=authorized_agent_org_ids(user, org_id)),
-                pk=identifier(data['session_id']), terminal=node, user=user, application_id=context['application_id'],
-            ).org_id
+    with tmp_to_root_org():
+        org_id = get_object_or_404(
+            AgentSession.objects.filter(org_id__in=authorized_agent_org_ids(user)),
+            pk=identifier(data['session_id']), terminal=node, user=user, application_id=context['application_id'],
+        ).org_id
     with tmp_to_org(org_id), transaction.atomic():
         User.objects.select_for_update().get(pk=user.pk)
         session = get_object_or_404(AgentSession.objects.select_for_update(), pk=identifier(data['session_id']), terminal=node)

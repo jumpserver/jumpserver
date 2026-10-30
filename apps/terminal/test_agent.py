@@ -5,6 +5,8 @@ import uuid
 from datetime import timedelta
 from unittest.mock import patch
 
+from django.core import signing
+from django.core.cache import cache
 from django.test import TestCase, SimpleTestCase, RequestFactory, override_settings
 from django.http import Http404, QueryDict
 from django.utils import timezone
@@ -48,6 +50,8 @@ class AgentRequestContractTests(SimpleTestCase):
 
 
 class AgentBoundaryTests(TestCase):
+    capabilities = {'version': 1, 'protocols': {'ssh': 'shell', 'sftp': 'files'}}
+
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(username='agent-boundary-user', name='Agent boundary user')
@@ -65,6 +69,8 @@ class AgentBoundaryTests(TestCase):
         AgentApplication.objects.create(application=cls.app, resource=cls.resource)
 
     def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
         self.org_context = self.enterContext(tmp_to_org(self.org))
         self.token = get_access_token_model().objects.create(
             user=self.user, application=self.app, token=uuid.uuid4().hex, scope=service.SCOPE,
@@ -75,12 +81,12 @@ class AgentBoundaryTests(TestCase):
             token=uuid.uuid4().hex, token_family=uuid.uuid4(), resource=[self.resource],
         )
         for subject in ({'access_token': self.token}, {'refresh_family': self.refresh.token_family}):
-            AgentOAuthBinding.objects.create(user=self.user, application=self.app, org_id=self.org.pk, **subject)
+            AgentOAuthBinding.objects.create(user=self.user, application=self.app, org_id=service.ALL_AGENT_ORGANIZATIONS, **subject)
         self.session = AgentSession.objects.create(
             user=self.user, application=self.app, terminal=self.node, oauth_token=self.token,
             oauth_family=self.refresh.token_family, resource=self.resource, idempotency_key='connection',
             request_hash='0' * 64, date_expires=timezone.now() + timedelta(hours=1),
-            requested={'protocol': 'ssh', 'asset_id': str(uuid.uuid4()), 'account': 'root'},
+            requested={'protocol': 'ssh', 'execution_mode': 'shell', 'asset_id': str(uuid.uuid4()), 'account': 'root'},
         )
         self.action = AgentAction.objects.create(
             session=self.session, user=self.user, application=self.app, kind='file_read',
@@ -109,8 +115,7 @@ class AgentBoundaryTests(TestCase):
         from terminal import agent_queries
         second = Organization.objects.create(name='Agent recovery other')
         second.add_member(self.user)
-        AgentOAuthBinding.objects.filter(user=self.user).update(org_id=service.ALL_AGENT_ORGANIZATIONS)
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         body = {'context_token': principal['context_token']}
         AgentAction.objects.create(session=self.session, user=self.user, application=self.app,
             kind='connect_asset', idempotency_key='connect:recovery', request_hash='1' * 64)
@@ -178,23 +183,31 @@ class AgentBoundaryTests(TestCase):
             self.assertEqual(item.user_display, display)
 
     def test_introspection_binds_resource_org_and_execution_node(self):
-        result = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        result = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         context, user = service.context_identity(self.node, result['context_token'])
-        self.assertEqual(context['org_id'], str(self.org.id))
+        self.assertEqual(context['org_id'], service.ALL_AGENT_ORGANIZATIONS)
         self.assertEqual(user.id, self.user.id)
         with self.assertRaises(PermissionDenied):
             service.context_identity(self.other_node, result['context_token'])
         with self.assertRaises(PermissionDenied):
-            service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource + '/other'})
+            service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource + '/other', 'capabilities': self.capabilities})
         with self.assertRaises(Http404):
             service.owned_session(self.other_node, self.session.id, service.session_capability(self.session), check=False)
+        AgentOAuthBinding.objects.filter(user=self.user).update(org_id=self.org.pk)
+        with self.assertRaises(PermissionDenied):
+            service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
 
     def test_node_capabilities_are_validated_and_bound_to_the_context(self):
-        body = {'access_token': self.token.token, 'resource': self.resource}
+        body = {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities}
         capabilities = {'version': 1, 'protocols': {'ssh': 'shell', 'sqlserver': 'database'}}
         principal = service.introspect(self.node, {**body, 'capabilities': capabilities})
         context, _ = service.context_identity(self.node, principal['context_token'])
         self.assertEqual(service.context_protocols(context), capabilities['protocols'])
+        with self.assertRaises(ValidationError):
+            service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        context.pop('capabilities')
+        with self.assertRaises(PermissionDenied):
+            service.context_identity(self.node, signing.dumps(context, salt=service.CONTEXT_SALT))
         for invalid in (None, {}, {**capabilities, 'version': True}, {**capabilities, 'version': 2},
                         {**capabilities, 'protocols': {}}, {**capabilities, 'protocols': {'ssh': 'unrestricted'}},
                         {**capabilities, 'protocols': {'invalid/protocol': 'shell'}},
@@ -205,11 +218,7 @@ class AgentBoundaryTests(TestCase):
             service.context_identity(self.other_node, principal['context_token'])
 
     def test_declared_protocols_intersect_permissions_and_remain_auditable(self):
-        from django.core.cache import cache
         from terminal.api.agent import AgentComponentAPI
-        # Permission caches outlive TestCase's rolled-back grants.
-        cache.clear()
-        self.addCleanup(cache.clear)
         asset, account, permission = self.handoff_asset()
         asset.platform.protocols.create(name='sqlserver', port=1433)
         asset.protocols.create(name='sqlserver', port=1433)
@@ -238,27 +247,25 @@ class AgentBoundaryTests(TestCase):
         with self.assertRaises(PermissionDenied):
             service.create_session(self.node, {**body, 'idempotency_key': 'not-authorized'})
 
-    def test_capability_changes_do_not_reinterpret_legacy_session_replays(self):
+    def test_capability_changes_cannot_reinterpret_session_replays(self):
         asset, account, _ = self.handoff_asset()
-        body = {'access_token': self.token.token, 'resource': self.resource}
-        legacy = service.introspect(self.node, body)
-        request = {'context_token': legacy['context_token'], 'asset_id': str(asset.id),
-                   'account': str(account.id), 'protocol': 'ssh', 'idempotency_key': 'legacy-replay'}
+        body = {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities}
+        principal = service.introspect(self.node, body)
+        request = {'context_token': principal['context_token'], 'asset_id': str(asset.id),
+                   'account': str(account.id), 'protocol': 'ssh', 'idempotency_key': 'capability-replay'}
         created = service.create_session(self.node, request)
         session = AgentSession.objects.get(pk=created['id'])
         original_hash = session.request_hash
-        session.requested.pop('execution_mode')
-        session.save(update_fields=['requested'])
         principal = service.introspect(self.node, {**body, 'capabilities': {'version': 1, 'protocols': {'ssh': 'shell'}}})
         self.assertEqual(service.create_session(self.node, {**request, 'context_token': principal['context_token']})['id'], created['id'])
         session.refresh_from_db()
         self.assertEqual(session.request_hash, original_hash)
-        self.assertNotIn('execution_mode', session.requested)
+        self.assertEqual(session.requested['execution_mode'], 'shell')
         changed = service.introspect(self.node, {**body, 'capabilities': {'version': 1, 'protocols': {'ssh': 'database'}}})
         with self.assertRaises(service.Conflict):
             service.create_session(self.node, {**request, 'context_token': changed['context_token']})
         with self.assertRaises(ValidationError):
-            service.execution_mode({'protocol': 'unknown'})
+            service.execution_mode({'protocol': 'ssh'})
         with self.assertRaises(ValidationError):
             service.execution_mode({'protocol': 'ssh', 'execution_mode': 'unknown'})
 
@@ -411,7 +418,7 @@ class AgentBoundaryTests(TestCase):
         AgentApplication.objects.filter(application=self.app).update(is_active=False)
         self.assertTrue(get_application_model().objects.filter(pk=other.pk).exists())
         with self.assertRaises(PermissionDenied):
-            service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+            service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         with self.assertRaises(PermissionDenied):
             service.check_session_authority(self.session, connection=False)
 
@@ -426,7 +433,7 @@ class AgentBoundaryTests(TestCase):
             expires=timezone.now() + timedelta(minutes=1), redirect_uri='http://127.0.0.1:45678/callback',
             scope=service.SCOPE, code_challenge=challenge, code_challenge_method='S256', resource=[self.resource],
         )
-        AgentOAuthBinding.objects.create(user=self.user, application=self.app, org_id=self.org.pk, grant=grant)
+        AgentOAuthBinding.objects.create(user=self.user, application=self.app, org_id=service.ALL_AGENT_ORGANIZATIONS, grant=grant)
         body = {'grant_type': 'authorization_code', 'code': grant.code, 'client_id': self.app.client_id,
                 'redirect_uri': grant.redirect_uri, 'resource': self.resource, 'code_verifier': 'b' * 64}
         factory = RequestFactory()
@@ -478,9 +485,7 @@ class AgentBoundaryTests(TestCase):
                 accounts.append(account)
         with tmp_to_org(second):
             denied = Asset.objects.create(name='Not granted', address='192.0.2.3', platform=platform)
-        legacy = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
-        AgentOAuthBinding.objects.filter(user=self.user, application=self.app).update(org_id=service.ALL_AGENT_ORGANIZATIONS)
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         query = {'context_token': principal['context_token'], 'limit': 1}
         page = AgentComponentAPI.assets(self.node, query)
         rows = list(page['results'])
@@ -504,8 +509,6 @@ class AgentBoundaryTests(TestCase):
                 session = AgentSession.objects.get(pk=connection['id'])
                 self.assertEqual(session.org_id, str(asset.org_id))
                 self.assertEqual(session.actions.get(kind='connect_asset').org_id, str(asset.org_id))
-        with self.assertRaises(Http404):
-            service.create_session(self.node, {**body, 'context_token': legacy['context_token'], 'idempotency_key': 'legacy-denied'})
         reader = AgentComponentAPI(operation='get')
         handoff = service.create_action(self.node, {
             'context_token': principal['context_token'], 'session_id': connections[1]['id'],
@@ -537,7 +540,7 @@ class AgentBoundaryTests(TestCase):
         permission = AssetPermission.objects.create(name='Agent test access', accounts=['root'], protocols=['ssh'])
         permission.users.add(self.user)
         permission.assets.add(asset)
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         body = {'context_token': principal['context_token'], 'asset_id': str(asset.id), 'account': str(account.id),
                 'protocol': 'ssh', 'idempotency_key': 'real-connect', 'remote_addr': '127.0.0.1'}
         first = service.create_session(self.node, body)
@@ -688,7 +691,7 @@ class AgentBoundaryTests(TestCase):
         permission = AssetPermission.objects.create(name='Agent handoff access', accounts=['root'], protocols=['ssh'])
         permission.users.add(self.user)
         permission.assets.add(asset)
-        self.session.requested = {'asset_id': str(asset.id), 'account': str(account.id), 'protocol': 'ssh'}
+        self.session.requested = {'asset_id': str(asset.id), 'account': str(account.id), 'protocol': 'ssh', 'execution_mode': 'shell'}
         self.session.save(update_fields=['requested'])
         return asset, account, permission
 
@@ -797,7 +800,7 @@ class AgentBoundaryTests(TestCase):
             assets={'type': 'ids', 'ids': [str(asset.id)]}, accounts=['root'])
         rule.command_groups.add(CommandGroup.objects.create(name='Agent review command', content='whoami'))
         rule.reviewers.add(self.user)
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         for outcome in ('cancel', 'expired', 'policy_changed', 'close'):
             action = AgentAction.objects.create(session=self.session, user=self.user, application=self.app,
                 kind='execute_command', idempotency_key=outcome, request={'command': 'whoami'}, request_hash='6' * 64)
@@ -841,7 +844,7 @@ class AgentBoundaryTests(TestCase):
         shared.save(force_insert=True)
         self.action.kind, self.action.status = 'connect_asset', 'awaiting_approval'
         self.action.save(update_fields=['kind', 'status'])
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         with self.captureOnCommitCallbacks(execute=True):
             AgentComponentAPI(operation='cancel').action_operation(self.node, self.action.id,
                 {'context_token': principal['context_token']})
@@ -874,7 +877,7 @@ class AgentBoundaryTests(TestCase):
         original_token_id = self.session.connection_token_id
         self.session.connection_token.delete()
         self.session.refresh_from_db()
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         data = {'context_token': principal['context_token'], 'session_id': str(self.session.id),
                 'kind': 'open_terminal', 'idempotency_key': 'human-fallback', 'request': {}}
         created = service.create_action(self.node, data)
@@ -931,7 +934,7 @@ class AgentBoundaryTests(TestCase):
         LoginAssetACL.objects.create(name='Agent live face', action='accept', face_online_enabled=True,
             users={'type': 'ids', 'ids': [str(self.user.id)]},
             assets={'type': 'ids', 'ids': [str(asset.id)]}, accounts=['root'])
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         connected = service.create_session(self.node, {
             'context_token': principal['context_token'], 'asset_id': str(asset.id),
             'account': str(account.id), 'protocol': 'ssh', 'idempotency_key': 'face-connect',
@@ -1081,7 +1084,7 @@ class AgentBoundaryTests(TestCase):
         permission = AssetPermission.objects.create(name='Agent manual access', accounts=['@INPUT'], protocols=['ssh'])
         permission.users.add(self.user)
         permission.assets.add(asset)
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         result = service.create_session(self.node, {'context_token': principal['context_token'],
             'asset_id': str(asset.id), 'account': '@INPUT', 'protocol': 'ssh', 'idempotency_key': 'manual'})
         session = AgentSession.objects.get(pk=result['id'])
@@ -1185,7 +1188,7 @@ class AgentBoundaryTests(TestCase):
         session = AgentSession.objects.create(
             user=self.user, application=self.app, terminal=self.node, resource=self.resource,
             idempotency_key='audit-sftp', request_hash='5' * 64, status='closed',
-            requested={'asset_id': str(uuid.uuid4()), 'protocol': 'sftp', 'account': 'deploy'},
+            requested={'asset_id': str(uuid.uuid4()), 'protocol': 'sftp', 'execution_mode': 'files', 'account': 'deploy'},
             date_created=older, date_expires=older + timedelta(hours=1),
         )
         params = {
@@ -1245,7 +1248,7 @@ class AgentBoundaryTests(TestCase):
         permission = AssetPermission.objects.create(name='Agent account page access', accounts=['@ALL', '@INPUT'], protocols=['ssh'])
         permission.users.add(self.user)
         permission.assets.add(asset)
-        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         body = {'context_token': principal['context_token'], 'asset_id': str(asset.id)}
         first = AgentComponentAPI.assets(self.node, body)['results'][0]
         self.assertEqual(len(first['accounts']), 100)

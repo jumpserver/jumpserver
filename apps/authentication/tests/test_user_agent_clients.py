@@ -56,7 +56,7 @@ class UserAgentClientTests(TestCase):
         self.enterContext(tmp_to_org(self.first))
         self.factory = APIRequestFactory()
 
-    def authorize(self, user, org_id):
+    def authorize(self, user):
         access = get_access_token_model().objects.create(
             user=user, application=self.application, token=uuid.uuid4().hex, scope='agent:access',
             resource=[self.registration.resource], expires=timezone.now() + timedelta(minutes=5),
@@ -66,7 +66,7 @@ class UserAgentClientTests(TestCase):
             token_family=uuid.uuid4(), resource=[self.registration.resource],
         )
         for subject in ({'access_token': access}, {'refresh_family': refresh.token_family}):
-            AgentOAuthBinding.objects.create(user=user, application=self.application, org_id=org_id, **subject)
+            AgentOAuthBinding.objects.create(user=user, application=self.application, org_id=ALL_AGENT_ORGANIZATIONS, **subject)
         return access, refresh
 
     def request(self, method='get', path=None, user=None):
@@ -79,10 +79,10 @@ class UserAgentClientTests(TestCase):
             return match.func(request, **match.kwargs)
 
     def test_list_is_self_only_across_orgs_and_never_exposes_credentials(self):
-        self.authorize(self.other, self.first.pk)
+        self.authorize(self.other)
         self.assertEqual(self.request(user=self.user).data['count'], 0)
-        access, refresh = self.authorize(self.user, self.first.pk)
-        self.authorize(self.user, self.second.pk)
+        access, refresh = self.authorize(self.user)
+        self.authorize(self.user)
         for org in (self.first, self.second, Organization.SYSTEM_ID):
             with tmp_to_org(org):
                 response = self.request(user=self.user)
@@ -100,7 +100,7 @@ class UserAgentClientTests(TestCase):
             self.assertIn(self.request(method).status_code, (401, 403))
 
     def test_all_org_scope_tracks_membership_and_refresh_status(self):
-        access, _ = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        access, _ = self.authorize(self.user)
         get_access_token_model().objects.filter(pk=access.pk).update(expires=timezone.now() - timedelta(seconds=1))
         self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()
         client = self.request(user=self.user).data['results'][0]
@@ -109,15 +109,15 @@ class UserAgentClientTests(TestCase):
         self.assertEqual(client['status'], 'active')
         get_refresh_token_model().objects.filter(user=self.user).update(revoked=timezone.now())
         self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'expired')
-        self.authorize(self.user, self.first.pk)
+        self.authorize(self.user)
         client = self.request(user=self.user).data['results'][0]
-        self.assertFalse(client['all_organizations'])
+        self.assertTrue(client['all_organizations'])
         self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
         AgentApplication.objects.filter(pk=self.registration.pk).update(is_active=False)
         self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'disabled')
 
     def test_admins_cannot_use_personal_api_to_read_or_revoke_other_users_clients(self):
-        access, refresh = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        access, refresh = self.authorize(self.user)
         for admin in (self.manager, self.org_manager):
             with self.subTest(admin=admin):
                 path = f'{self.url}?user_id={self.user.pk}'
@@ -132,12 +132,13 @@ class UserAgentClientTests(TestCase):
 
     def test_admin_can_manage_only_own_authorization_of_shared_client(self):
         self.first.add_member(self.manager)
-        self.authorize(self.manager, self.first.pk)
-        access, refresh = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        self.authorize(self.manager)
+        access, refresh = self.authorize(self.user)
         response = self.request(path=f'{self.url}?user_id={self.user.pk}', user=self.manager)
         client = response.data['results'][0]
         self.assertEqual(response.data['count'], 1)
-        self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
+        self.assertTrue(client['all_organizations'])
+        self.assertIn({'id': str(self.first.pk), 'name': self.first.name}, client['organizations'])
         self.assertNotIn('registration_id', client)
         self.assertNotIn('is_active', client)
         path = f'{self.url}{self.application.pk}/revoke/?user_id={self.user.pk}'
@@ -149,9 +150,9 @@ class UserAgentClientTests(TestCase):
         self.assertTrue(AgentApplication.objects.get(pk=self.registration.pk).is_active)
 
     def test_revoke_removes_only_own_authorizations_and_keeps_audit(self):
-        access, _ = self.authorize(self.user, self.first.pk)
-        self.authorize(self.user, self.second.pk)
-        other_access, other_refresh = self.authorize(self.other, ALL_AGENT_ORGANIZATIONS)
+        access, _ = self.authorize(self.user)
+        self.authorize(self.user)
+        other_access, other_refresh = self.authorize(self.other)
         session = AgentSession.objects.create(
             user=self.user, application=self.application, terminal=Terminal.objects.create(name='personal-agent-node'),
             oauth_token=access, resource=self.registration.resource, idempotency_key='personal-history',
@@ -171,7 +172,7 @@ class UserAgentClientTests(TestCase):
         self.assertEqual(self.request('get', f'{self.url}{self.application.pk}/', self.user).status_code, 404)
 
     def test_self_revoke_cannot_touch_another_user_or_rollback_partially(self):
-        access, _ = self.authorize(self.other, ALL_AGENT_ORGANIZATIONS)
+        access, _ = self.authorize(self.other)
         path = f'{self.url}{self.application.pk}/revoke/'
         self.assertEqual(self.request('post', path, self.user).status_code, 404)
         with patch('authentication.api.agent_client_user.record_client_operation', side_effect=RuntimeError('audit unavailable')):
@@ -184,8 +185,8 @@ class UserAgentClientTests(TestCase):
         self.assertEqual(self.application.redirect_uris, 'http://127.0.0.1/callback')
 
     def test_last_user_revoke_recycles_unused_registration_and_audits_its_identity(self):
-        self.authorize(self.user, self.first.pk)
-        self.authorize(self.user, self.second.pk)
+        self.authorize(self.user)
+        self.authorize(self.user)
         path = f'{self.url}{self.application.pk}/revoke/'
         self.assertEqual(self.request('post', path, self.user).status_code, 204)
         self.assertFalse(get_application_model().objects.filter(pk=self.application.pk).exists())
@@ -203,7 +204,7 @@ class UserAgentClientTests(TestCase):
             self.assertIn('removed unused client registration', log.diff['Result'])
 
     def test_last_user_revoke_preserves_cross_org_audit_and_login_history(self):
-        access, _ = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        access, _ = self.authorize(self.user)
         with tmp_to_org(self.second):
             session = AgentSession.objects.create(
                 user=self.user, application=self.application, terminal=Terminal.objects.create(name='recycle-audit-node'),
@@ -239,7 +240,7 @@ class UserAgentClientTests(TestCase):
             self.assertEqual(event.payload_hash, '2' * 64)
 
     def test_recycle_keeps_login_history_without_agent_audit_references(self):
-        self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        self.authorize(self.user)
         login = ClientLoginSession.objects.create(
             application=self.application, user=self.user, token_family=uuid.uuid4(),
             authenticated_at=timezone.now(), last_activity_at=timezone.now(),
@@ -259,7 +260,7 @@ class UserAgentClientTests(TestCase):
         )
         for model, fields in cases:
             with self.subTest(model=model.__name__):
-                self.authorize(self.user, self.first.pk)
+                self.authorize(self.user)
                 other = model.objects.create(user=self.other, application=self.application, **fields)
                 before = model.objects.filter(pk=other.pk).values().get()
                 response = self.request('post', f'{self.url}{self.application.pk}/revoke/', self.user)
@@ -295,7 +296,7 @@ class UserAgentClientConcurrencyTests(TransactionTestCase):
                     user=owner, application=app, code=uuid.uuid4().hex,
                     expires=timezone.now() + timedelta(minutes=5), redirect_uri=app.redirect_uris,
                 )
-                AgentOAuthBinding.objects.create(user=owner, application=app, grant=grant, org_id=org.pk)
+                AgentOAuthBinding.objects.create(user=owner, application=app, grant=grant, org_id=ALL_AGENT_ORGANIZATIONS)
             applications.append(app)
         start = Barrier(2)
 
@@ -337,7 +338,7 @@ class UserAgentClientConcurrencyTests(TransactionTestCase):
             user=owner, application=application, token=uuid.uuid4().hex,
             scope='agent:access', expires=timezone.now() + timedelta(minutes=5),
         )
-        AgentOAuthBinding.objects.create(user=owner, application=application, access_token=access, org_id=org.pk)
+        AgentOAuthBinding.objects.create(user=owner, application=application, access_token=access, org_id=ALL_AGENT_ORGANIZATIONS)
         started = Event()
 
         def revoke():

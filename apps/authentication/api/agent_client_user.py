@@ -66,21 +66,12 @@ class UserAgentClientSerializer(serializers.ModelSerializer):
         )]
 
     def get_organizations(self, obj):
-        organizations = self.context['view'].available_organizations
-        if self.get_all_organizations(obj):
-            return organizations
-        ids = {str(binding.org_id) for binding in self.live_bindings(obj)}
-        return [org for org in organizations if org['id'] in ids]
+        return self.context['view'].available_organizations if self.get_all_organizations(obj) else []
 
     def get_status(self, obj):
         if not obj.agent_registration.is_active:
             return 'disabled'
-        org_ids = {org['id'] for org in self.get_organizations(obj)}
-        for binding in self.live_bindings(obj):
-            if not org_ids or (str(binding.org_id) != ALL_AGENT_ORGANIZATIONS and str(binding.org_id) not in org_ids):
-                continue
-            return 'active'
-        return 'expired'
+        return 'active' if self.get_organizations(obj) else 'expired'
 
 
 class UserAgentClientPagination(LimitOffsetPagination):

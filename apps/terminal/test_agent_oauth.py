@@ -11,7 +11,7 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
 from django.utils.translation import override
 from oauth2_provider.models import get_application_model, get_access_token_model, get_grant_model, get_refresh_token_model
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView, AgentAuthorizationServerView
 from authentication.backends.oauth2_provider.client_views import ClientTokenView, ClientRevokeTokenView
@@ -58,17 +58,12 @@ class AgentOAuthOrganizationTests(TestCase):
         request._dont_enforce_csrf_checks = True
         return AgentAwareAuthorizationView.as_view()(request)
 
-    def code(self, org=None, *, all_organizations=False):
+    def code(self):
         response = self.authorize()
         self.assertEqual(response.status_code, 302)
         query = parse_qs(urlsplit(response['Location']).query)
         self.assertEqual(query['state'], ['org-state'])
-        code = query['code'][0]
-        if not all_organizations:
-            # Persisted grants from before multi-organization consent must
-            # retain their original scope through exchange and rotation.
-            AgentOAuthBinding.objects.filter(grant__code=code).update(org_id=(org or self.second).pk)
-        return code
+        return query['code'][0]
 
     def exchange(self, code, **extra):
         return self.token_request({
@@ -86,7 +81,8 @@ class AgentOAuthOrganizationTests(TestCase):
 
     def introspect(self, result, **extra):
         return service.introspect(self.node, {
-            'access_token': result['access_token'], 'resource': self.resource, **extra,
+            'access_token': result['access_token'], 'resource': self.resource,
+            'capabilities': {'version': 1, 'protocols': {'ssh': 'shell'}}, **extra,
         })
 
     def remove_membership(self):
@@ -106,7 +102,7 @@ class AgentOAuthOrganizationTests(TestCase):
                 user=user, application=app, code=uuid.uuid4().hex, scope=service.SCOPE,
                 redirect_uri=app.redirect_uris, expires=timezone.now() + timedelta(minutes=5),
             )
-            AgentOAuthBinding.objects.create(user=user, application=app, org_id=self.first.pk, grant=grant)
+            AgentOAuthBinding.objects.create(user=user, application=app, org_id=service.ALL_AGENT_ORGANIZATIONS, grant=grant)
             applications.append(app)
         return applications
 
@@ -131,8 +127,8 @@ class AgentOAuthOrganizationTests(TestCase):
     def test_reauthorization_multi_org_and_refresh_share_one_client_slot(self):
         self.fill_client_slots(9)
         result = self.issued()
-        self.code(org=self.first)
-        self.code(org=self.second)
+        self.code()
+        self.code()
         response = self.token_request({
             'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
         })
@@ -145,7 +141,7 @@ class AgentOAuthOrganizationTests(TestCase):
         owner = self.user
         self.user = User.objects.create(username='quota-other-user')
         self.first.add_member(self.user)
-        self.code(org=self.first)
+        self.code()
         self.assertEqual(AgentOAuthBinding.objects.filter(user=self.user).values('application_id').distinct().count(), 1)
         self.user = owner
         self.assertEqual(self.authorize().status_code, 200)
@@ -245,23 +241,23 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response.render()
         self.assertNotContains(response, 'name="organization"')
-        code = self.code(all_organizations=True)
+        code = self.code()
         binding = AgentOAuthBinding.objects.get(grant__code=code)
         self.assertEqual(str(binding.org_id), service.ALL_AGENT_ORGANIZATIONS)
         self.assertIsNotNone(AgentApplication.objects.get(application=self.app).date_authorized)
 
     def test_all_organization_consent_rotation_and_current_membership(self):
-        response = self.exchange(self.code(all_organizations=True), org_id=str(self.unavailable.pk))
+        response = self.exchange(self.code(), org_id=str(self.unavailable.pk))
         self.assertEqual(response.status_code, 200, response.content)
         result = json.loads(response.content)
         principal = self.introspect(result)
         self.assertTrue(principal['all_organizations'])
         self.assertEqual(principal['org_id'], service.ALL_AGENT_ORGANIZATIONS)
-        with self.assertRaises(PermissionDenied):
+        with self.assertRaises(ValidationError):
             self.introspect(result, org_id=str(self.unavailable.pk))
         self.remove_membership()
         context, user = service.context_identity(self.node, principal['context_token'])
-        self.assertEqual(list(service.authorized_agent_organizations(user, context['org_id'])), [self.first])
+        self.assertEqual(list(service.available_agent_organizations(user)), [self.first])
         response = self.token_request({
             'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
         })
@@ -283,9 +279,9 @@ class AgentOAuthOrganizationTests(TestCase):
         from rest_framework.test import APIRequestFactory, force_authenticate
         from authentication.api.agent_client_user import UserAgentClientViewSet
 
-        response = self.exchange(self.code(all_organizations=True))
+        response = self.exchange(self.code())
         result = json.loads(response.content)
-        pending_code = self.code(all_organizations=True)
+        pending_code = self.code()
         request = APIRequestFactory().post('/revoke/')
         force_authenticate(request, user=self.user)
         with transaction.atomic():
@@ -302,14 +298,12 @@ class AgentOAuthOrganizationTests(TestCase):
             self.introspect(result)
         self.assertFalse(AgentOAuthBinding.objects.filter(user=self.user, application=self.app).exists())
 
-    def test_code_exchange_rotation_and_introspection_keep_selected_org(self):
+    def test_code_exchange_rotation_and_introspection_keep_all_organizations(self):
         code = self.code()
         response = self.exchange(code, organization=str(self.first.pk), org_id=str(self.first.pk))
         self.assertEqual(response.status_code, 200, response.content)
         result = json.loads(response.content)
-        self.assertEqual(self.introspect(result)['org_id'], str(self.second.pk))
-        with self.assertRaises(PermissionDenied):
-            self.introspect(result, org_id=str(self.first.pk))
+        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
         refresh = get_refresh_token_model().objects.get(token_checksum=hashlib.sha256(result['refresh_token'].encode()).hexdigest())
         for _ in range(2):
             response = self.token_request({
@@ -318,7 +312,7 @@ class AgentOAuthOrganizationTests(TestCase):
             })
             self.assertEqual(response.status_code, 200, response.content)
             result = json.loads(response.content)
-            self.assertEqual(self.introspect(result)['org_id'], str(self.second.pk))
+            self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
         self.assertEqual(AgentOAuthBinding.objects.filter(refresh_family=refresh.token_family).count(), 1)
         self.assertFalse(AgentOAuthBinding.objects.filter(grant__isnull=False).exists())
 
@@ -326,6 +320,7 @@ class AgentOAuthOrganizationTests(TestCase):
         code = self.code()
         result = self.issued()
         self.remove_membership()
+        self.first.members.through.objects_raw.filter(user=self.user, org_id=self.first.pk).delete()
         self.assertEqual(self.exchange(code).status_code, 400)
         response = self.token_request({'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'],
                                        'client_id': self.app.client_id})
@@ -353,24 +348,20 @@ class AgentOAuthOrganizationTests(TestCase):
                 AgentOAuthBinding.objects.all().delete()
                 self.assertEqual(self.exchange(code).status_code, 400)
                 with self.assertRaises(PermissionDenied):
-                    self.introspect(result, org_id=str(self.first.pk))
+                    self.introspect(result)
                 response = self.token_request({'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'],
                                                'client_id': self.app.client_id})
                 self.assertEqual(response.status_code, 400)
 
     def test_access_token_binding_survives_refresh_row_deletion(self):
         result = self.issued()
-        self.assertEqual(self.introspect(result)['org_id'], str(self.second.pk))
-        with self.assertRaises(PermissionDenied):
-            self.introspect(result, org_id=str(self.first.pk))
+        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
         get_refresh_token_model().objects.filter(
             token_checksum=hashlib.sha256(result['refresh_token'].encode()).hexdigest(),
         ).delete()
-        self.assertEqual(self.introspect(result)['org_id'], str(self.second.pk))
-        with self.assertRaises(PermissionDenied):
-            self.introspect(result, org_id=str(self.first.pk))
+        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
 
-    def test_refresh_without_rotation_and_grace_retry_preserve_org(self):
+    def test_refresh_without_rotation_and_grace_retry_preserve_all_organizations(self):
         for rotate in (False, True):
             with self.subTest(rotate=rotate), self.settings(OAUTH2_PROVIDER={
                 **settings.OAUTH2_PROVIDER, 'ROTATE_REFRESH_TOKEN': rotate, 'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 60,
@@ -381,7 +372,7 @@ class AgentOAuthOrganizationTests(TestCase):
                 for _ in range(2):
                     response = self.token_request(body)
                     self.assertEqual(response.status_code, 200, response.content)
-                    self.assertEqual(self.introspect(json.loads(response.content))['org_id'], str(self.second.pk))
+                    self.assertEqual(self.introspect(json.loads(response.content))['org_id'], service.ALL_AGENT_ORGANIZATIONS)
 
     def test_registration_metadata_follows_current_configuration(self):
         view = AgentAuthorizationServerView.as_view()
@@ -400,9 +391,9 @@ class AgentOAuthOrganizationTests(TestCase):
                                        'client_id': self.app.client_id})
         self.assertEqual(response.status_code, 200, response.content)
         result = json.loads(response.content)
-        self.assertEqual(self.introspect(result)['org_id'], str(self.second.pk))
+        self.assertEqual(self.introspect(result)['org_id'], service.ALL_AGENT_ORGANIZATIONS)
         get_access_token_model().objects.filter(token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest()).delete()
-        self.assertEqual(str(AgentOAuthBinding.objects.get(refresh_family=refresh.token_family).org_id), str(self.second.pk))
+        self.assertEqual(str(AgentOAuthBinding.objects.get(refresh_family=refresh.token_family).org_id), service.ALL_AGENT_ORGANIZATIONS)
         # The provider rejects orphan refresh tokens; the authorization's org still survives.
         response = self.token_request({'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'],
                                        'client_id': self.app.client_id})

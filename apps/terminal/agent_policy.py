@@ -8,12 +8,6 @@ from perms.const import ActionChoices
 
 
 EXECUTION_MODES = frozenset(('shell', 'database', 'files'))
-# Compatibility for nodes and signed contexts created before capability v1.
-# New adapters are declared by Koko, rather than added to this fallback.
-LEGACY_PROTOCOL_MODES = {
-    'ssh': 'shell', 'sftp': 'files', 'mysql': 'database',
-    'mariadb': 'database', 'postgresql': 'database',
-}
 FILE_FIELDS = ('path', 'destination', 'size', 'sha256', 'limit', 'content', 'overwrite', 'timeout_seconds')
 
 
@@ -62,11 +56,11 @@ def node_capabilities(value):
 
 
 def context_protocols(context):
-    return context['capabilities']['protocols'] if 'capabilities' in context else LEGACY_PROTOCOL_MODES
+    return context['capabilities']['protocols']
 
 
 def execution_mode(requested):
-    mode = requested.get('execution_mode') if 'execution_mode' in requested else LEGACY_PROTOCOL_MODES.get(requested['protocol'])
+    mode = requested.get('execution_mode')
     if not isinstance(mode, str) or mode not in EXECUTION_MODES:
         raise ValidationError('Unsupported Agent execution mode')
     return mode

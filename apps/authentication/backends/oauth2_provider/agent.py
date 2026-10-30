@@ -58,9 +58,8 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
             if resources != [registration.resource]:
                 raise CustomOAuth2Error(error='invalid_target', request=request)
             request.resource = resources
-            org_id = getattr(request, 'agent_organization_id', None) or ALL_AGENT_ORGANIZATIONS
             try:
-                check_agent_scope(request.user, org_id)
+                check_agent_scope(request.user, ALL_AGENT_ORGANIZATIONS)
             except (PermissionDenied, ValidationError):
                 raise InvalidRequestError(description='No authorized organizations are available', request=request)
             with transaction.atomic():
@@ -81,7 +80,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
                     raise InvalidRequestError(description=user_agent_client_limit_message(), request=request)
                 grant = self._create_authorization_code(request, code)
                 AgentOAuthBinding.objects.create(
-                    user=request.user, application=request.client, org_id=org_id, grant=grant,
+                    user=request.user, application=request.client, org_id=ALL_AGENT_ORGANIZATIONS, grant=grant,
                 )
                 if registration.date_authorized is None:
                     registration.date_authorized = timezone.now()
@@ -193,16 +192,6 @@ class AgentAwareAuthorizationView(ClientAuthorizationView):
         if registration:
             context['application'] = registration.application
         return context
-
-    def form_valid(self, form):
-        if isinstance(form, AgentAllowForm):
-            self.agent_organization_id = ALL_AGENT_ORGANIZATIONS
-        return super().form_valid(form)
-
-    def create_authorization_response(self, request, scopes, credentials, allow):
-        if self.agent_registration():
-            credentials['agent_organization_id'] = getattr(self, 'agent_organization_id', None)
-        return super().create_authorization_response(request, scopes, credentials, allow)
 
     def get(self, request, *args, **kwargs):
         if AgentApplication.objects.filter(application__client_id=request.GET.get('client_id')).exists():

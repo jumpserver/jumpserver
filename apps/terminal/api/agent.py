@@ -82,10 +82,10 @@ class AgentComponentAPI(APIView):
         offset = service.integer(data.get('offset', 0), 'offset', 0, 100000)
         search = service.text_field(data.get('search', ''), 'search', 128, empty=True)
         account_offset = service.integer(data.get('account_offset', 0), 'account_offset', 0, 100000)
-        with tmp_to_org(context['org_id']):
+        with tmp_to_root_org():
             from django.db.models import Q
             assets = UserPermAssetUtil(user).get_all_assets().filter(
-                is_active=True, org_id__in=service.authorized_agent_org_ids(user, context['org_id']),
+                is_active=True, org_id__in=service.authorized_agent_org_ids(user),
             )
             if data.get('asset_id'):
                 assets = assets.filter(pk=service.identifier(data['asset_id']))
