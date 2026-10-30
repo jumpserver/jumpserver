@@ -71,7 +71,8 @@ class CeleryTask(models.Model):
         verbose_name = _("Celery Task")
         ordering = ('name',)
         permissions = [
-            ('view_taskmonitor', _('Can view task monitor'))
+            ('view_taskmonitor', _('Can view task monitor')),
+            ('stop_taskmonitor', _('Can stop tasks from task monitor')),
         ]
 
 

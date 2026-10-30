@@ -1,8 +1,8 @@
-"""Worker-side, read-only snapshots with bounded output and no task arguments."""
+"""Bounded worker snapshots and targeted task control without task arguments."""
 from itertools import islice
 
 from celery.worker import state as worker_state
-from celery.worker.control import inspect_command
+from celery.worker.control import control_command, inspect_command
 from celery.worker.request import Request
 
 
@@ -13,11 +13,14 @@ QUEUE_LIMIT = 100
 
 def task_summary(request, scheduled=False):
     started = request.time_start
+    delivery = request.delivery_info or {}
+    routing_key = delivery.get('routing_key') if isinstance(delivery, dict) else None
     return {
         'id': str(request.id)[:128], 'name': str(request.name)[:1024],
         'time_start': started if isinstance(started, (int, float)) else None,
         'acknowledged': request.acknowledged,
         'eta': request.eta.isoformat() if scheduled and request.eta else None,
+        'routing_key': routing_key[:128] if isinstance(routing_key, str) else None,
     }
 
 
@@ -53,12 +56,77 @@ def scheduled_requests(timer):
             yield args[0]
 
 
+@control_command()
+def jms_stop_task(state, task_id=None, mode=None, **kwargs):
+    """Stop only a locally observed ordinary task, never an Ansible job."""
+    if not isinstance(task_id, str) or not task_id or len(task_id) > 128:
+        return {'status': 'invalid'}
+    if mode not in ('waiting', 'running'):
+        return {'status': 'invalid'}
+    consumer = state.consumer
+    request = worker_state.requests.get(task_id)
+    if request is None:
+        try:
+            request = next((item for item in scheduled_requests(consumer.timer)
+                            if item.id == task_id), None)
+        except (AttributeError, TypeError, RuntimeError):
+            return {'status': 'unavailable'}
+    if request is None:
+        return {'status': 'not_found'}
+    delivery = request.delivery_info or {}
+    name = getattr(request, '_type', request.name)
+    if (not isinstance(delivery, dict) or delivery.get('routing_key') != 'celery'
+            or getattr(request.task, 'queue', None) == 'ansible'
+            or name in ('ops.tasks.run_ops_job', 'ops.tasks.run_ops_job_execution')):
+        return {'status': 'unsupported_queue'}
+
+    active = request in worker_state.active_requests or bool(request.time_start)
+    pool = consumer.controller.pool
+    prefork = type(pool).__module__ == 'celery.concurrency.prefork'
+    if mode == 'running':
+        if not active:
+            return {'status': 'not_running'}
+        if not prefork:
+            return {'status': 'unsupported_pool'}
+        if not request.worker_pid:
+            return {'status': 'unavailable'}
+        worker_state.revoked.add(task_id)
+        request.terminate(pool, signal='SIGTERM')
+        return {'status': 'termination_requested'}
+
+    if active:
+        return {'status': 'already_running'}
+    result_ref = request._apply_result
+    if result_ref is not None:
+        result = result_ref()
+        future = getattr(result, 'f', None)
+        if future is not None:
+            if not future.cancel():
+                return {'status': 'already_running'}
+            worker_state.revoked.add(task_id)
+            request._announce_revoked('revoked', False, None, False)
+            return {'status': 'revoked'}
+        if not prefork:
+            return {'status': 'unavailable'}
+        # A prefork job may already be in the pool's input buffer. Celery will
+        # terminate its child when it accepts the task if it cannot cancel it.
+        worker_state.revoked.add(task_id)
+        request.terminate(pool, signal='SIGTERM')
+        return {'status': 'termination_requested'}
+    worker_state.revoked.add(task_id)
+    return {'status': 'revoke_requested'}
+
+
 @inspect_command()
 def jms_monitor_snapshot(state, **kwargs):
     consumer = state.consumer
     active = worker_state.active_requests
+    pool_module = type(consumer.controller.pool).__module__
+    pool = {'celery.concurrency.thread': 'threads',
+            'celery.concurrency.prefork': 'prefork'}.get(pool_module, 'unknown')
     result = {
         'concurrency': consumer.controller.concurrency,
+        'pool': pool,
         'processed': worker_state.all_total_count[0],
         'queues': [q.name for q in islice(consumer.task_consumer.queues, QUEUE_LIMIT)],
         'queues_truncated': len(consumer.task_consumer.queues) > QUEUE_LIMIT,

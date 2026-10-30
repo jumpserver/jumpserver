@@ -155,6 +155,7 @@ only_system_permissions = (
     ('settings', 'setting', 'add,change,delete', '*'),
     ('tickets', '*', '*', '*'),
     ('ops', 'celerytask', 'view', 'taskmonitor'),
+    ('ops', 'celerytask', 'stop', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
     ('terminal', 'commandstorage', '*', '*'),
     ('terminal', 'replaystorage', '*', '*'),
