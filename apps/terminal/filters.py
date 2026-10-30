@@ -8,7 +8,7 @@ from orgs.utils import filter_org_queryset
 from terminal.const import RiskLevelChoices
 from terminal.models import AgentAction, AgentSession, Command, CommandStorage, Session
 from terminal.serializers.agent import (
-    ACTION_KIND_CHOICES, ACTION_STATUS_CHOICES, PROTOCOL_CHOICES, SESSION_STATUS_CHOICES,
+    ACTION_KIND_CHOICES, ACTION_STATUS_CHOICES, SESSION_STATUS_CHOICES,
 )
 
 
@@ -25,7 +25,7 @@ class AgentSessionAuditFilterSet(BaseFilterSet):
     client_id = filters.CharFilter(lookup_expr='icontains', label=_('Client ID'))
     asset_id = filters.CharFilter(lookup_expr='iexact', label=_('Asset ID'))
     account = filters.CharFilter(lookup_expr='icontains', label=_('Account'))
-    protocol = filters.ChoiceFilter(choices=PROTOCOL_CHOICES, label=_('Protocol'))
+    protocol = filters.CharFilter(max_length=16, label=_('Protocol'))
     status = filters.ChoiceFilter(choices=SESSION_STATUS_CHOICES, label=_('Status'))
 
     class Meta:

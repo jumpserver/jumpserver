@@ -106,6 +106,78 @@ class AgentBoundaryTests(TestCase):
         with self.assertRaises(Http404):
             service.owned_session(self.other_node, self.session.id, service.session_capability(self.session), check=False)
 
+    def test_node_capabilities_are_validated_and_bound_to_the_context(self):
+        body = {'access_token': self.token.token, 'resource': self.resource}
+        capabilities = {'version': 1, 'protocols': {'ssh': 'shell', 'sqlserver': 'database'}}
+        principal = service.introspect(self.node, {**body, 'capabilities': capabilities})
+        context, _ = service.context_identity(self.node, principal['context_token'])
+        self.assertEqual(service.context_protocols(context), capabilities['protocols'])
+        for invalid in (None, {}, {**capabilities, 'version': True}, {**capabilities, 'version': 2},
+                        {**capabilities, 'protocols': {}}, {**capabilities, 'protocols': {'ssh': 'unrestricted'}},
+                        {**capabilities, 'protocols': {'invalid/protocol': 'shell'}},
+                        {**capabilities, 'protocols': {str(i): 'database' for i in range(33)}}):
+            with self.subTest(capabilities=invalid), self.assertRaises(ValidationError):
+                service.introspect(self.node, {**body, 'capabilities': invalid})
+        with self.assertRaises(PermissionDenied):
+            service.context_identity(self.other_node, principal['context_token'])
+
+    def test_declared_protocols_intersect_permissions_and_remain_auditable(self):
+        from django.core.cache import cache
+        from terminal.api.agent import AgentComponentAPI
+        # Permission caches outlive TestCase's rolled-back grants.
+        cache.clear()
+        self.addCleanup(cache.clear)
+        asset, account, permission = self.handoff_asset()
+        asset.platform.protocols.create(name='sqlserver', port=1433)
+        asset.protocols.create(name='sqlserver', port=1433)
+        permission.protocols = ['ssh', 'sqlserver']
+        permission.save(update_fields=['protocols'])
+        principal = service.introspect(self.node, {
+            'access_token': self.token.token, 'resource': self.resource,
+            'capabilities': {'version': 1, 'protocols': {'sqlserver': 'database'}},
+        })
+        body = {'context_token': principal['context_token'], 'asset_id': str(asset.id)}
+        discovered = AgentComponentAPI.assets(self.node, body)['results'][0]
+        self.assertEqual(discovered['protocols'], ['sqlserver'])
+        self.assertEqual(discovered['accounts'][0]['protocols'], ['sqlserver'])
+        body.update(account=str(account.id), protocol='sqlserver', idempotency_key='declared-protocol')
+        created = service.create_session(self.node, body)
+        session = AgentSession.objects.get(pk=created['id'])
+        self.assertEqual(session.requested['execution_mode'], 'database')
+        self.assertEqual(self.audit_api('sessions', {'protocol': 'sqlserver'})['results'][0]['id'], created['id'])
+        self.assertEqual(self.audit_api('sessions', {'protocol__in': 'ssh,sqlserver'})['count'], 2)
+        with self.assertRaises(ValidationError):
+            service.create_session(self.node, {**body, 'protocol': 'ssh'})
+        permission.protocols = ['ssh']
+        permission.save(update_fields=['protocols'])
+        self.assertEqual(AgentComponentAPI.assets(self.node, {'context_token': principal['context_token']})['results'], [])
+        with self.assertRaises(PermissionDenied):
+            service.create_session(self.node, {**body, 'idempotency_key': 'not-authorized'})
+
+    def test_capability_changes_do_not_reinterpret_legacy_session_replays(self):
+        asset, account, _ = self.handoff_asset()
+        body = {'access_token': self.token.token, 'resource': self.resource}
+        legacy = service.introspect(self.node, body)
+        request = {'context_token': legacy['context_token'], 'asset_id': str(asset.id),
+                   'account': str(account.id), 'protocol': 'ssh', 'idempotency_key': 'legacy-replay'}
+        created = service.create_session(self.node, request)
+        session = AgentSession.objects.get(pk=created['id'])
+        original_hash = session.request_hash
+        session.requested.pop('execution_mode')
+        session.save(update_fields=['requested'])
+        principal = service.introspect(self.node, {**body, 'capabilities': {'version': 1, 'protocols': {'ssh': 'shell'}}})
+        self.assertEqual(service.create_session(self.node, {**request, 'context_token': principal['context_token']})['id'], created['id'])
+        session.refresh_from_db()
+        self.assertEqual(session.request_hash, original_hash)
+        self.assertNotIn('execution_mode', session.requested)
+        changed = service.introspect(self.node, {**body, 'capabilities': {'version': 1, 'protocols': {'ssh': 'database'}}})
+        with self.assertRaises(service.Conflict):
+            service.create_session(self.node, {**request, 'context_token': changed['context_token']})
+        with self.assertRaises(ValidationError):
+            service.execution_mode({'protocol': 'unknown'})
+        with self.assertRaises(ValidationError):
+            service.execution_mode({'protocol': 'ssh', 'execution_mode': 'unknown'})
+
     def test_rotation_preserves_session_but_revocation_blocks_execution(self):
         self.refresh.revoked = timezone.now()
         self.refresh.save(update_fields=['revoked'])
@@ -587,6 +659,48 @@ class AgentBoundaryTests(TestCase):
                     self.assertTrue(result['result']['requires_terminal'])
                     self.assertEqual(result['status'], 'rejected')
             notify.assert_called_once()
+
+    def test_command_context_is_rechecked_before_automatic_dispatch(self):
+        from acls.models import CommandFilterACL, CommandGroup
+        from terminal.api.agent import AgentComponentAPI
+        asset = self.native_session()
+        api = AgentComponentAPI(operation='claim')
+        capability = {'session_token': service.session_capability(self.session)}
+
+        def register(key, request):
+            return AgentAction.objects.create(
+                session=self.session, user=self.user, application=self.app, kind='execute_command',
+                idempotency_key=key, request=request, request_hash=service.fingerprint(request), status='queued',
+            )
+
+        # These benign requests require no target execution to exercise the
+        # dispatch authorization boundary, including pre-existing queued work.
+        contexts = ({'cwd': '/tmp'}, {'env': {'MODE': 'read'}}, {'cwd': '/tmp', 'env': {'MODE': 'read'}})
+        for index, context in enumerate(contexts):
+            action = register(f'unfiltered-{index}', {'command': 'pwd', **context})
+            self.assertTrue(api.action_operation(self.node, action.id, capability)['claimed'])
+        queued = [register(f'filtered-{index}', {'command': 'pwd', **context}) for index, context in enumerate(contexts)]
+        rule = CommandFilterACL.objects.create(name='Agent context filter', action='accept', priority=1,
+            users={'type': 'ids', 'ids': [str(self.user.id)]}, assets={'type': 'ids', 'ids': [str(asset.id)]}, accounts=['root'])
+        group = CommandGroup.objects.create(name='Agent context command', content='pwd')
+        rule.command_groups.add(group)
+        for action in queued:
+            result = api.action_operation(self.node, action.id, capability)
+            self.assertFalse(result['claimed'])
+            self.assertEqual(result['status'], 'rejected')
+            self.assertTrue(result['result']['requires_terminal'])
+            action.refresh_from_db()
+            self.assertIsNone(action.date_started)
+            self.assertEqual(action.request_hash, service.fingerprint(action.request))
+        for policy, command in (('accept', 'date'), ('warning', 'pwd')):
+            rule.action = policy
+            rule.save(update_fields=['action'])
+            action = register(f'{policy}-context', {'command': command, 'env': {'MODE': 'read'}})
+            self.assertFalse(api.action_operation(self.node, action.id, capability)['claimed'])
+            plain = register(f'{policy}-plain', {'command': command, 'cwd': '', 'env': {}})
+            self.assertTrue(api.action_operation(self.node, plain.id, capability)['claimed'])
+        audited = self.audit_api('actions', {'id': str(queued[0].id)})['results'][0]
+        self.assertEqual(audited['status'], 'rejected')
 
     def test_final_actions_close_pending_command_reviews(self):
         from acls.models import CommandFilterACL, CommandGroup

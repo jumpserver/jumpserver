@@ -81,7 +81,7 @@ class AgentComponentAPI(APIView):
             for asset in page[:limit]:
                 with tmp_to_org(asset.org_id):
                     util = PermAssetDetailUtil(user, asset)
-                    protocols = sorted({item.name for item in util.get_permed_protocols_for_user()} & service.SUPPORTED_PROTOCOLS)
+                    protocols = sorted({item.name for item in util.get_permed_protocols_for_user()} & service.context_protocols(context).keys())
                     if not protocols:
                         continue
                     accounts, account_next = AgentComponentAPI.account_page(user, asset, util, protocols, account_offset)

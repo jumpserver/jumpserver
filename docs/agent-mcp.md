@@ -2,7 +2,8 @@
 
 Core provides the authorization and audit boundary for Agent asset operations.
 Koko serves MCP Streamable HTTP and executes SSH, SFTP, MySQL/MariaDB and
-PostgreSQL operations. Lina exposes the Core settings page. docker-web/Nginx
+PostgreSQL operations. Lina exposes system settings, personal clients and audit
+tabs under session and command records. docker-web/Nginx
 provides the external entry points, TLS termination and forwarding.
 
 Clients own OAuth discovery, registration, browser login, token storage and
@@ -19,7 +20,9 @@ Deploy the Core feature and apply normal database migrations before enabling
 MCP access. The initial Agent migration creates execution records, audit evidence
 and OAuth organization bindings together.
 
-In Lina, open **System Settings > Feature Settings > Agent / MCP**. The page uses
+In Lina, open **System Settings > AI Assistant > MCP**. AI Assistant and MCP use
+separate permission checks and save requests. Old MCP settings links redirect
+to this tab. The MCP page uses
 `settings.change_auth` and existing configuration-change auditing. Its API is
 `/api/v1/settings/setting/?category=mcp`.
 
@@ -108,33 +111,40 @@ Each authorization uses:
 
 - `agent:access` scope and the exact MCP `resource` indicator;
 - authorization code with PKCE S256;
-- browser login, explicit consent and a choice of organization;
+- browser login and explicit consent covering the user's available organizations;
 - public-client token and revocation requests without a client secret.
 
-Consent is required on each authorization. The page lists only organizations
-available to the signed-in user and excludes global/system organizations. A
-single organization can be selected automatically; multiple organizations
-require an explicit choice. Every Agent grant, access token and refresh flow
-requires a valid organization binding. The choice is attached to the individual
-authorization and token family, not a mutable default for the user or client.
-
-Introspection obtains the organization from that binding. Clients need not send
-`X-JMS-ORG`; a conflicting header is rejected. Switching organizations requires
-fresh authorization. Refresh preserves the organization and rechecks membership.
-Agent access tokens are rejected as ordinary Core API bearer credentials.
+Consent is required on each authorization, without an organization selector.
+New grants cover the signed-in user's currently available organizations,
+excluding global/system organizations. Each request rechecks membership and
+asset, account and protocol permissions; the all-organizations marker grants no
+administrative authority. Connections resolve the actual organization from the
+authorized asset. Clients need not send `X-JMS-ORG`, and a header cannot expand
+the grant. Existing single-organization grants and refresh families retain their
+scope until the user authorizes again. Agent access tokens are rejected as
+ordinary Core API bearer credentials.
 
 ## Revocation and registration maintenance
 
 Disabling DCR stops new registrations and removes registration discovery. It does
-not revoke existing grants or stop the MCP service. Clients revoke their grants
-through the advertised OAuth revocation endpoint. In **System Settings > Feature
-Settings > Agent / MCP**, platform administrators can list and search clients,
-filter their status and disable a client. The list shows its name, client ID,
-registration time and first authorization time. Disabling affects all users of
-that client and preserves its authorization records and execution history.
-Disabled registrations cannot authorize further execution. This control is
-separate from cancelling an action or closing an asset session; re-enabling and
-general-purpose client deletion are not exposed.
+not revoke existing grants or stop the MCP service. Clients can revoke tokens
+through the advertised OAuth revocation endpoint. In **Personal Settings >
+Agent / MCP**, users see their own clients and connection documentation, across
+all their organizations. Each user can authorize at most ten distinct clients;
+the same client in several organizations counts once. Existing disabled
+registrations still cannot authorize or execute.
+
+The personal API is `/api/v1/authentication/user-agent-clients/`: GET lists the
+current user's clients; POST `{id}/revoke/` revokes that user's authorization in
+all organizations. Other users' grants are preserved. When no authorization
+remains, the unused Agent registration is reclaimed automatically. Referenced
+OAuth identities and execution history are retained; an unreferenced identity
+can be removed. Revocation records an operation audit with operator, source IP,
+client and result. It never lets an ordinary user re-enable a disabled client.
+
+Administrators manage system configuration only. User management and settings
+do not expose personal client lists or client operations; the former
+`agent-clients/` and `agent-client-authorizations/` management APIs are absent.
 Koko rechecks idle sessions too, including database connections with open
 transactions. Its maintenance loop starts batches at least five seconds apart,
 checks up to 16 sessions with one-second request and five-second batch budgets,
@@ -142,26 +152,13 @@ and closes connections on explicit authorization denial or missing sessions.
 Transient service failures are retried; new dispatch still requires Core.
 Batching and network delays mean this is not a five-second node-wide guarantee.
 
-The page's **Clean up unused clients** action removes a bounded batch of
+The existing scheduled OAuth token cleanup removes bounded batches of
 never-authorized dynamic registrations older than seven days, considering at
-most 100 eligible clients per call. Related grants, tokens, sessions or audit
-records prevent deletion; the service rechecks these references under the same
-lock order used by authorization. Authorized clients and execution history are
-retained. The response reports scanned, deleted and skipped counts.
-
-The existing scheduled OAuth token cleanup also invokes this same maintenance
-service and records its summary in task logs. No extra deployment schedule or
-management command is needed. Registration coordination failures leave records
-for a later attempt.
-
-The management API is `/api/v1/authentication/agent-clients/`: GET lists clients,
-POST `{id}/disable/` disables one client and POST `cleanup/` runs the fixed cleanup
-batch. Listing supports pagination, `search` and `is_active` filters. All actions,
-including metadata, require `settings.change_auth` through a **system role**;
-an organization role or organization header cannot grant this global authority.
-Manual disable and cleanup record the operator, source IP, target client and
-result in system-organization operation logs. These APIs use normal Core user
-authentication, not Koko component credentials or Agent MCP tokens.
+most 100 eligible clients per run and recording its summary in task logs.
+Related grants, tokens, sessions or audit records prevent deletion; references
+are rechecked under the authorization lock order. No manual cleanup API, extra
+deployment schedule or management command is needed. Registration coordination
+failures leave records for a later attempt.
 
 ## Component authorization boundary
 
@@ -173,7 +170,7 @@ use their separate user and auditor permissions.
 
 | Component operation | Contract |
 | --- | --- |
-| `introspect/` | Validates the external OAuth token, exact resource and organization binding; returns a context bound to user, client, organization, resource and Koko node for at most five minutes |
+| `introspect/` | Validates the external OAuth token, exact resource, organization scope and optional versioned node capabilities; returns a context bound to these values and the user, client and Koko node for at most five minutes |
 | `assets/` | Searches current authorized assets, accounts and supported protocols using that context |
 | `sessions/` | Creates an idempotent logical asset session and connection action; applies existing connection controls |
 | `sessions/<id>/credentials/` | Releases connection credentials to the bound Koko node once, after authorization |
@@ -194,6 +191,30 @@ Asset discovery supports `asset_id` within the authorized asset set and optional
 `account_offset` (0–100,000). Each asset returns at most 100 accounts with
 `accounts_next_offset`; real account rows are paged before permission expansion.
 
+### Execution capabilities and extension
+
+Koko supplies `capabilities` during component-authenticated introspection:
+version `1` and a `protocols` mapping from adapter names to `shell`, `database`
+or `files`. Declarations allow 1–32 protocol names of at most 16 characters;
+unknown versions, modes and malformed names are rejected. MCP clients cannot
+supply this declaration. Core signs it into the node-bound context and returns
+only protocols in both the declaration and current asset/account permissions.
+
+Session creation applies the same intersection and stores the derived execution
+mode in the existing request JSON. Refreshing capabilities cannot reinterpret
+an existing session or reuse its idempotency key with another mode. Old nodes,
+contexts and sessions retain the original five-protocol compatibility mapping.
+Deploy Core before a Koko version that supplies capability declarations; this
+change adds no database migration.
+
+Koko owns tool names, tool-specific schemas and execution adapters. Core owns
+stable action policies: permitted execution modes, authorization-relevant
+fields, connect/upload/download/delete permissions, approvals, request binding
+and audit. A new driver for an already supported asset protocol or a new tool
+using an existing action needs no Core adapter-list change. A new security
+effect requires an explicit Core policy; node declarations cannot invent
+permissions or bypass connection controls. Unknown actions remain rejected.
+
 ## Approval and human interaction
 
 Session and action idempotency keys are unique per organization, user and client.
@@ -203,6 +224,15 @@ SHA256 and bind the original action, terminal session and current ACL. Changes
 to the ticket or policy invalidate an outstanding approval. SSH commands have a
 4,096-character limit; working directory and environment are explicit fields.
 Agents do not send raw interactive terminal input through these APIs.
+
+When command filters apply, a nonempty working directory or environment cannot
+be authorized from the command text alone. Such a request must match a review
+rule and pass the existing full-request approval. Automatic accept, warning and
+unmatched paths reject contextual requests with a controlled-terminal handoff
+hint. This is checked again at dispatch claim, including previously queued work.
+Context-free commands retain normal command filtering; sessions without command
+filters still support explicit context. Rejected actions and their original
+requests remain auditable.
 
 The `warning` command policy permits execution while retaining the matched rule
 and risk in the action audit and using the existing warning notification flow.

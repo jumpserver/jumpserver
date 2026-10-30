@@ -11,7 +11,6 @@ ACTION_STATUS_CHOICES = [(value, value) for value in sorted(service.FINAL_STATES
     'accepted', 'queued', 'dispatching', 'running', 'awaiting_approval', 'awaiting_input',
 })]
 ACTION_KIND_CHOICES = [(value, value) for value in sorted(service.ACTION_KINDS | {'connect_asset'})]
-PROTOCOL_CHOICES = [(value, value) for value in sorted(service.SUPPORTED_PROTOCOLS)]
 
 
 class AgentAuditSerializer(serializers.Serializer):
@@ -22,7 +21,7 @@ class AgentAuditSerializer(serializers.Serializer):
     client_id = serializers.CharField(read_only=True, label=_('Client ID'))
     asset_id = serializers.CharField(read_only=True, allow_null=True, label=_('Asset ID'))
     account = serializers.CharField(read_only=True, allow_null=True, label=_('Account'))
-    protocol = serializers.ChoiceField(choices=PROTOCOL_CHOICES, read_only=True, label=_('Protocol'))
+    protocol = serializers.CharField(max_length=16, read_only=True, label=_('Protocol'))
     date_created = serializers.DateTimeField(read_only=True, label=_('Date created'))
 
 

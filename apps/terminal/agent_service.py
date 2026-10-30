@@ -21,6 +21,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError, APIExce
 
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
+from terminal.agent_policy import ACTION_POLICIES, context_protocols, execution_mode, node_capabilities
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent
 from users.models import User
 
@@ -30,12 +31,7 @@ SESSION_SALT = 'jumpserver.agent.session.v1'
 CONTEXT_TTL = 300
 SESSION_TTL = 7200
 FINAL_STATES = frozenset(('succeeded', 'failed', 'rejected', 'expired', 'cancelled', 'unknown'))
-ACTION_KINDS = frozenset((
-    'execute_command', 'file_stat', 'file_list', 'file_read', 'file_write', 'file_upload',
-    'file_download', 'file_mkdir', 'file_rename', 'file_remove',
-    'open_terminal',
-))
-SUPPORTED_PROTOCOLS = frozenset(('ssh', 'sftp', 'mysql', 'mariadb', 'postgresql'))
+ACTION_KINDS = frozenset(ACTION_POLICIES)
 # OAuth scope marker. Sessions always use a real organization;
 # this marker never grants root-organization or administrative permissions.
 ALL_AGENT_ORGANIZATIONS = Organization.ROOT_ID
@@ -127,7 +123,7 @@ def token_organization_binding(token, refresh=None):
 
 
 def introspect(node, data):
-    require_keys(data, ('access_token', 'resource', 'org_id'), ('access_token', 'resource'))
+    require_keys(data, ('access_token', 'resource', 'org_id', 'capabilities'), ('access_token', 'resource'))
     raw = text_field(data['access_token'], 'access_token', 8192)
     token = get_access_token_model().objects.select_related('user', 'application').filter(
         token_checksum=hashlib.sha256(raw.encode()).hexdigest(),
@@ -156,6 +152,8 @@ def introspect(node, data):
         'token_id': token.pk, 'family': str(refresh.token_family) if refresh and refresh.token_family else '',
         'node_id': str(node.id), 'resource': resource,
     }
+    if 'capabilities' in data:
+        payload['capabilities'] = node_capabilities(data['capabilities'])
     expires = min(token.expires, timezone.now() + timedelta(seconds=CONTEXT_TTL))
     payload['expires'] = expires.timestamp()
     return {
@@ -245,7 +243,7 @@ def check_handoff_authority(session):
     with tmp_to_org(session.org_id):
         asset = get_object_or_404(Asset, pk=session.requested['asset_id'], is_active=True)
         protocol = session.requested['protocol']
-        if protocol not in SUPPORTED_PROTOCOLS - {'sftp'}:
+        if execution_mode(session.requested) not in ACTION_POLICIES['open_terminal'].modes:
             raise ValidationError('This operation requires a shell or database session')
         account = PermAssetDetailUtil(session.user, asset).validate_permission(session.requested['account'], protocol)
         if not ConnectionToken.has_account_permission(account, protocol) or account.date_expired <= timezone.now():
@@ -282,7 +280,8 @@ def create_session(node, data):
     key = text_field(data['idempotency_key'], 'idempotency_key')
     account = text_field(data['account'], 'account')
     protocol = text_field(data['protocol'], 'protocol', 16)
-    if protocol not in SUPPORTED_PROTOCOLS:
+    mode = context_protocols(context).get(protocol)
+    if mode is None:
         raise ValidationError('Protocol does not have an Agent execution adapter')
     requested = {'asset_id': str(identifier(data['asset_id'])), 'account': account, 'protocol': protocol}
     request_hash = fingerprint(requested)
@@ -299,7 +298,8 @@ def create_session(node, data):
         User.objects.select_for_update().get(pk=user.pk)
         existing = AgentSession.objects.select_for_update().filter(user=user, application_id=context['application_id'], idempotency_key=key).first()
         if existing:
-            if existing.request_hash != request_hash or existing.terminal_id != node.id:
+            if (existing.request_hash != request_hash or existing.terminal_id != node.id
+                    or execution_mode(existing.requested) != mode):
                 raise Conflict('Connection idempotency key belongs to another request or node')
             check_session_authority(existing, connection=False)
             refresh_connection_status(existing)
@@ -312,7 +312,10 @@ def create_session(node, data):
         permitted = PermAssetDetailUtil(user, asset).validate_permission(account, protocol)
         if not permitted or permitted.date_expired <= timezone.now():
             raise PermissionDenied('Asset account or protocol is not authorized')
-        connection_request = {**requested, 'remote_addr': remote_addr, 'requires_credentials': not permitted.has_secret}
+        connection_request = {
+            **requested, 'execution_mode': mode, 'remote_addr': remote_addr,
+            'requires_credentials': not permitted.has_secret,
+        }
         token = None
         # Missing credentials are supplied only by the logged-in owner in
         # Core. Existing managed and cached same-name credentials are reused.
@@ -374,7 +377,7 @@ def create_connection_token(user, requested, credentials=None, *, face_monitor_t
         request.query_params['face_monitor_token'] = face_monitor_token
     values = {
         'asset': requested['asset_id'], 'account': requested['account'], 'protocol': requested['protocol'],
-        'connect_method': 'web_sftp' if requested['protocol'] == 'sftp' else 'web_cli',
+        'connect_method': 'web_sftp' if execution_mode(requested) == 'files' else 'web_cli',
     }
     if credentials:
         require_keys(credentials, ('input_username', 'input_secret', 'input_secret_type'))
@@ -395,11 +398,7 @@ def create_connection_token(user, requested, credentials=None, *, face_monitor_t
 
 
 def validate_action_request(kind, request):
-    fields = {
-        'execute_command': ('command', 'prepared_command', 'cwd', 'env', 'timeout_seconds'),
-        'open_terminal': ('timeout_seconds',),
-    }.get(kind, ('path', 'destination', 'size', 'sha256', 'limit', 'content', 'overwrite', 'timeout_seconds'))
-    require_keys(request, fields)
+    require_keys(request, ACTION_POLICIES[kind].fields)
     if len(canonical(request).encode()) > 65536:
         raise ValidationError('Action request exceeds 64 KiB')
     if kind == 'execute_command':
@@ -452,11 +451,12 @@ def create_action(node, data):
             check_handoff_authority(session)
         else:
             check_session_authority(session)
-        if kind.startswith('file_') and session.connection_token.protocol != 'sftp':
+        mode = execution_mode(session.requested)
+        if kind.startswith('file_') and mode not in ACTION_POLICIES[kind].modes:
             raise ValidationError('File operations require an SFTP session')
-        if kind == 'execute_command' and session.requested['protocol'] != 'ssh' and (data['request'].get('cwd') or data['request'].get('env')):
+        if kind == 'execute_command' and mode != 'shell' and (data['request'].get('cwd') or data['request'].get('env')):
             raise ValidationError('Working directory and environment apply only to SSH execution')
-        if kind == 'execute_command' and session.connection_token.protocol == 'sftp':
+        if kind == 'execute_command' and mode not in ACTION_POLICIES[kind].modes:
             raise ValidationError('This operation requires a shell or database session')
         if kind != 'open_terminal' and (session.status != 'ready' or not session.credentials_released or not session.actions.filter(kind='connect_asset', status='succeeded').exists()):
             raise Conflict('Asset connection is not ready')
@@ -506,12 +506,7 @@ def authorize_action(action):
         if not session.terminal_session_id:
             raise Conflict('A real terminal session must be registered before executing')
     if action.kind.startswith('file_'):
-        required = {
-            'file_read': ActionChoices.download, 'file_download': ActionChoices.download,
-            'file_write': ActionChoices.upload, 'file_upload': ActionChoices.upload,
-            'file_mkdir': ActionChoices.upload, 'file_remove': ActionChoices.delete,
-            'file_rename': ActionChoices.upload | ActionChoices.delete,
-        }.get(action.kind, ActionChoices.connect)
+        required = ACTION_POLICIES[action.kind].permission
         if not ActionChoices.contains(session.connection_token.actions, required):
             raise PermissionDenied('File operation is not permitted')
     if action.kind == 'execute_command':
@@ -559,7 +554,16 @@ def authorize_action(action):
             else:
                 action.status = 'awaiting_approval'
         else:
-            if action.ticket_id and action.policy_hash != policy_hash:
+            # A raw-command ACL cannot authorize changes to lookup, interpreter
+            # startup or working-directory semantics. Only the full-request
+            # review branch above may approve context under command filtering.
+            if (action.request.get('cwd') or action.request.get('env')) and session.connection_token.command_filter_acls:
+                action.status, action.date_finished = 'rejected', timezone.now()
+                action.result = {
+                    'error': 'Command context requires full-request approval under command filtering; use open_terminal or omit cwd/env',
+                    'requires_terminal': True,
+                }
+            elif action.ticket_id and action.policy_hash != policy_hash:
                 action.status, action.date_finished = 'rejected', timezone.now()
                 action.result = {'error': 'Approval policy changed; submit a new operation'}
             else:
@@ -687,7 +691,7 @@ def append_event(action, data):
         raise Conflict('Execution state cannot move backwards')
     if state == 'cancelled' and action.status in ('dispatching', 'running') and payload.get('stop_confirmed') is not True:
         raise ValidationError('Cancellation requires remote stop confirmation; otherwise report unknown')
-    if state == 'succeeded' and action.kind == 'execute_command' and action.session.requested.get('protocol') == 'ssh':
+    if state == 'succeeded' and action.kind == 'execute_command' and execution_mode(action.session.requested) == 'shell':
         if payload.get('exit_code') != 0 or isinstance(payload.get('exit_code'), bool):
             raise ValidationError('Successful SSH execution requires a confirmed zero exit code')
     evidence_limit = 16 * 1024 * 1024 - (0 if state in FINAL_STATES else 128 * 1024)
