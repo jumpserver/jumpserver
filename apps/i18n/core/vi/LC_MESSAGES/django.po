@@ -17874,3 +17874,31 @@ msgstr "Approval task"
 
 msgid "Workflow event"
 msgstr "Workflow event"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "Báo cáo kiểm toán"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "Báo cáo phiên bản cũ"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "Có thể xem báo cáo kiểm toán tổng hợp"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "Có thể xem báo cáo hoạt động vận hành"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "Có thể xem báo cáo sự kiện bảo mật"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "Có thể xem tổng quan tài sản và tài khoản"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "Có thể xem báo cáo vận hành tài khoản"

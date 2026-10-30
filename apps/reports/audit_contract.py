@@ -58,7 +58,16 @@ SOURCE_PERMISSIONS = {
     'account_risks': 'accounts.view_accountrisk',
 }
 
+THEME_PERMISSIONS = {
+    'audit': 'rbac.view_auditreport',
+    'activity': 'rbac.view_activityreport',
+    'security': 'rbac.view_securityreport',
+    'inventory': 'rbac.view_inventoryreport',
+    'account': 'rbac.view_accountreport',
+}
 
 
 def can_view_theme(user, theme):
-    return any(user.has_perm(SOURCE_PERMISSIONS[source]) for source in THEMES[theme]['sources'])
+    return user.has_perm(THEME_PERMISSIONS[theme]) and any(
+        user.has_perm(SOURCE_PERMISSIONS[source]) for source in THEMES[theme]['sources']
+    )

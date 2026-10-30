@@ -17950,3 +17950,31 @@ msgstr "Workflow event"
 #: apps/perms/templates/perms/_asset_permission_renewal_links.html:3
 msgid "Apply for renewal"
 msgstr "Apply for renewal"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "Audit reports"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "Legacy reports"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "Can view comprehensive audit report"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "Can view operations activity report"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "Can view security event report"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "Can view asset and account overview"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "Can view account operations report"

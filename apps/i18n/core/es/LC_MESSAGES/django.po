@@ -18094,3 +18094,31 @@ msgstr "Approval task"
 
 msgid "Workflow event"
 msgstr "Workflow event"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "Informes de auditoría"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "Informes antiguos"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "Puede ver el informe de auditoría integral"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "Puede ver el informe de actividad operativa"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "Puede ver el informe de eventos de seguridad"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "Puede ver el resumen de activos y cuentas"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "Puede ver el informe de operaciones de cuentas"

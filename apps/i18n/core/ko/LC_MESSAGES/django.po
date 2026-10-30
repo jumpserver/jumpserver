@@ -17766,3 +17766,31 @@ msgstr "Approval task"
 
 msgid "Workflow event"
 msgstr "Workflow event"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "감사 보고서"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "이전 보고서"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "종합 감사 보고서를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "운영 활동 보고서를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "보안 이벤트 보고서를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "자산 및 계정 개요를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "계정 운영 보고서를 볼 수 있음"

@@ -18632,3 +18632,31 @@ msgstr "域名称"
 #: tickets/models/workflow.py:45
 msgid "Legacy ticket approval"
 msgstr "历史工单审批"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "审计报告"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "旧版报表"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "可以查看综合审计报告"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "可以查看运维活动报告"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "可以查看安全事件报告"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "可以查看资产与账号概况"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "可以查看账号运维报告"
