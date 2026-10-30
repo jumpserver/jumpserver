@@ -5,12 +5,14 @@ from django.db import transaction
 from django.db.models import Exists, OuterRef
 from django.db.models.deletion import ProtectedError
 from django.utils import timezone
-from oauth2_provider.models import get_application_model
+from oauth2_provider.models import (
+    get_access_token_model, get_application_model, get_grant_model, get_id_token_model, get_refresh_token_model,
+)
 from redis.exceptions import RedisError
 
 from authentication.backends.oauth2_provider.agent_registration import REGISTRATION_LOCK
 from common.utils.lock import DistributedLock
-from terminal.models import AgentApplication
+from terminal.models import AgentApplication, AgentOAuthBinding
 
 
 class AgentClientCleanupBusy(Exception):
@@ -19,6 +21,37 @@ class AgentClientCleanupBusy(Exception):
 
 class AgentClientCleanupUnavailable(Exception):
     pass
+
+
+def revoke_user_agent_client(user, application, registration):
+    """Revoke and recycle while the caller holds both identity row locks."""
+    authorizations = (
+        get_refresh_token_model(), get_access_token_model(), get_grant_model(), get_id_token_model(),
+        AgentOAuthBinding,
+    )
+    for model in authorizations:
+        model.objects.filter(user=user, application=application).delete()
+    if any(model.objects.filter(application=application).exists() for model in authorizations):
+        return False
+
+    # Keep every referenced identity, including login-session history whose FK
+    # would otherwise cascade. Base managers include audit rows in all orgs.
+    referenced = any(
+        relation.related_model._base_manager.filter(**{relation.field.name: application}).exists()
+        for relation in application._meta.related_objects
+        if relation.related_model is not AgentApplication
+    )
+    if not referenced:
+        try:
+            with transaction.atomic():
+                application.delete()
+            return True
+        except ProtectedError:
+            pass
+    application.redirect_uris = ''
+    application.save(update_fields=['redirect_uris'])
+    registration.delete()
+    return True
 
 
 def cleanup_agent_oauth_clients(*, older_than_days=7, limit=100, on_delete=None):

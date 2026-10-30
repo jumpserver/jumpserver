@@ -1,12 +1,12 @@
-"""Self-service MCP authorizations, independent of the selected organization."""
+"""User MCP authorizations, independent of the selected organization."""
 from django.db import transaction
 from django.db.models import Exists, OuterRef, Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from oauth2_provider.models import (
-    get_access_token_model, get_application_model, get_grant_model, get_refresh_token_model,
-    refresh_token_expire_timedelta,
+    get_application_model, get_refresh_token_model, refresh_token_expire_timedelta,
 )
 from rest_framework import mixins, serializers, status
 from rest_framework.decorators import action
@@ -15,13 +15,15 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from audits.const import ActionChoices
+from authentication.services.agent_clients import revoke_user_agent_client
 from common.drf.filters import SearchFilter
 from common.permissions import IsValidUser
 from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, available_agent_organizations
 from terminal.models import AgentApplication, AgentOAuthBinding
-from .agent_client import record_client_operation
+from users.models import User
+from .agent_client import AgentClientAdminPermission, record_client_operation
 
-__all__ = ['UserAgentClientViewSet']
+__all__ = ['UserAgentClientViewSet', 'AdminUserAgentClientViewSet']
 
 
 class UserAgentClientSerializer(serializers.ModelSerializer):
@@ -72,10 +74,10 @@ class UserAgentClientPagination(LimitOffsetPagination):
     max_limit = 100
 
 
-class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+class UserAgentClientReadOnlyViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
     serializer_class = UserAgentClientSerializer
     permission_classes = [IsValidUser]
-    http_method_names = ['get', 'head', 'options', 'post']
+    http_method_names = ['get', 'head', 'options']
     filter_backends = [SearchFilter]
     search_fields = ('name', 'client_id')
     pagination_class = UserAgentClientPagination
@@ -86,16 +88,18 @@ class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, G
         return response
 
     @property
+    def authorization_user(self):
+        return self.request.user
+
+    @cached_property
     def available_organizations(self):
-        if not hasattr(self, '_available_organizations'):
-            self._available_organizations = [
-                {'id': str(org.pk), 'name': org.name}
-                for org in available_agent_organizations(self.request.user)
-            ]
-        return self._available_organizations
+        return [
+            {'id': str(org.pk), 'name': org.name}
+            for org in available_agent_organizations(self.authorization_user)
+        ]
 
     def get_queryset(self):
-        user = self.request.user
+        user = self.authorization_user
         refresh = get_refresh_token_model().objects.filter(
             user=user, application_id=OuterRef('application_id'), token_family=OuterRef('refresh_family'),
             revoked__isnull=True, access_token__isnull=False,
@@ -112,6 +116,19 @@ class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, G
             Prefetch('agentoauthbinding_set', queryset=bindings, to_attr='user_bindings'),
         ).order_by('-created', '-pk')
 
+
+class AdminUserAgentClientViewSet(UserAgentClientReadOnlyViewSet):
+    permission_classes = [AgentClientAdminPermission]
+
+    @cached_property
+    def authorization_user(self):
+        user_id = serializers.UUIDField().run_validation(self.request.query_params.get('user_id'))
+        return get_object_or_404(User, pk=user_id)
+
+
+class UserAgentClientViewSet(UserAgentClientReadOnlyViewSet):
+    http_method_names = ['get', 'head', 'options', 'post']
+
     @action(methods=['post'], detail=True)
     def revoke(self, request, *args, **kwargs):
         client = self.get_object()
@@ -120,9 +137,10 @@ class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, G
             # validated before this revocation must not restore its binding.
             application = get_object_or_404(get_application_model().objects.select_for_update(), pk=client.pk)
             registration = get_object_or_404(AgentApplication.objects.select_for_update(), application=application)
-            for model in (get_refresh_token_model(), get_access_token_model(), get_grant_model(), AgentOAuthBinding):
-                model.objects.filter(user=request.user, application=application).delete()
-            record_client_operation(request, ActionChoices.update, {
-                'id': registration.pk, 'name': application.name, 'client_id': application.client_id,
-            }, 'revoked only the current user authorizations in all organizations')
+            client_info = {'id': registration.pk, 'name': application.name, 'client_id': application.client_id}
+            recycled = revoke_user_agent_client(request.user, application, registration)
+            result = 'revoked only the current user authorizations in all organizations'
+            if recycled:
+                result += '; removed unused client registration'
+            record_client_operation(request, ActionChoices.update, client_info, result)
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,34 +1,55 @@
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
+from threading import Event
 from urllib.parse import urlsplit
 from unittest.mock import patch
 
-from django.test import TestCase
-from django.db import transaction
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.db import close_old_connections, transaction
 from django.urls import resolve
 from django.utils import timezone
-from oauth2_provider.models import get_application_model, get_access_token_model, get_refresh_token_model
+from oauth2_provider.models import (
+    get_application_model, get_access_token_model, get_grant_model, get_id_token_model, get_refresh_token_model,
+)
 from rest_framework.test import APIRequestFactory, force_authenticate
+from oauthlib.common import Request as OAuthRequest
+from oauthlib.oauth2 import InvalidGrantError, InvalidScopeError
 
 from orgs.models import Organization
-from orgs.utils import tmp_to_org
+from audits.models import OperateLog
+from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
+from authentication.models.client_login_session import ClientLoginSession
+from orgs.utils import tmp_to_org, tmp_to_root_org
+from rbac.models import Permission, Role
 from terminal.agent_service import ALL_AGENT_ORGANIZATIONS
-from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, Terminal
+from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
 from users.models import User
 
 
 class UserAgentClientTests(TestCase):
     url = '/api/v1/authentication/user-agent-clients/'
+    admin_url = '/api/v1/authentication/agent-client-authorizations/'
 
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(username='personal-agent-user')
         cls.other = User.objects.create(username='personal-agent-other')
+        cls.manager = User.objects.create(username='personal-agent-manager')
+        cls.org_manager = User.objects.create(username='personal-agent-org-manager')
         cls.first = Organization.objects.create(name='Personal first')
         cls.second = Organization.objects.create(name='Personal second')
         for org in (cls.first, cls.second):
             org.add_member(cls.user)
             org.add_member(cls.other)
+        permission = Permission.objects.get(content_type__app_label='settings', codename='change_auth')
+        role = Role.objects.create(name='Personal client system manager', scope='system')
+        role.permissions.add(permission)
+        cls.manager.system_roles.add(role)
+        role = Role.objects.create(name='Personal client org manager', scope='org')
+        role.permissions.add(permission)
+        with tmp_to_org(cls.first):
+            cls.org_manager.org_roles.add(role)
         cls.application = get_application_model().objects.create(
             name='Personal Agent', client_id='personal-agent-client', client_type='public',
             authorization_grant_type='authorization-code', redirect_uris='http://127.0.0.1/callback',
@@ -101,6 +122,59 @@ class UserAgentClientTests(TestCase):
         AgentApplication.objects.filter(pk=self.registration.pk).update(is_active=False)
         self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'disabled')
 
+    def test_admin_reads_selected_users_authorizations_across_orgs(self):
+        access, refresh = self.authorize(self.user, self.first.pk)
+        self.authorize(self.manager, self.second.pk)
+        self.authorize(self.other, ALL_AGENT_ORGANIZATIONS)
+        for org in (self.first, self.second, Organization.SYSTEM_ID):
+            with tmp_to_org(org):
+                response = self.request(path=f'{self.admin_url}?user_id={self.user.pk}', user=self.manager)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data['count'], 1)
+                client = response.data['results'][0]
+                self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
+                self.assertFalse(client['all_organizations'])
+                self.assertEqual(client['status'], 'active')
+                self.assertNotIn(access.token, str(response.data))
+                self.assertNotIn(refresh.token, str(response.data))
+                self.assertEqual(response['Cache-Control'], 'no-store')
+        path = f'{self.admin_url}{self.application.pk}/?user_id={self.other.pk}'
+        client = self.request(path=path, user=self.manager).data
+        self.assertTrue(client['all_organizations'])
+        self.assertEqual({item['id'] for item in client['organizations']}, {str(self.first.pk), str(self.second.pk)})
+        self.assertEqual(self.request(path=f'{self.admin_url}?user_id={self.org_manager.pk}', user=self.manager).data['count'], 0)
+        self.assertEqual(self.request(path=f'{self.admin_url}?user_id={self.user.pk}&search=missing', user=self.manager).data['count'], 0)
+
+    def test_admin_authorizations_are_read_only_and_require_system_permission(self):
+        access, _ = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        path = f'{self.admin_url}?user_id={self.user.pk}'
+        for user in (None, self.user, self.org_manager):
+            for method in ('get', 'options'):
+                self.assertIn(self.request(method, path, user).status_code, (401, 403))
+        self.assertEqual(self.request('options', path, self.manager).status_code, 200)
+        for method in ('post', 'put', 'patch', 'delete'):
+            self.assertEqual(self.request(method, path, self.manager).status_code, 405)
+        for query, code in (('', 400), ('?user_id=invalid', 400), (f'?user_id={uuid.uuid4()}', 404)):
+            self.assertEqual(self.request(path=self.admin_url + query, user=self.manager).status_code, code)
+        self.assertTrue(get_access_token_model().objects.filter(pk=access.pk).exists())
+        # Supplying another user's ID cannot widen the personal API.
+        self.assertEqual(self.request(path=f'{self.url}?user_id={self.user.pk}', user=self.other).data['count'], 0)
+        self.assertEqual(self.request('get', f'{self.url}{self.application.pk}/?user_id={self.user.pk}', self.other).status_code, 404)
+
+    def test_admin_status_uses_selected_users_refresh_and_membership(self):
+        access, _ = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        self.authorize(self.manager, self.first.pk)
+        get_access_token_model().objects.filter(pk=access.pk).update(expires=timezone.now() - timedelta(seconds=1))
+        get_refresh_token_model().objects.filter(user=self.user).update(revoked=timezone.now())
+        path = f'{self.admin_url}?user_id={self.user.pk}'
+        client = self.request(path=path, user=self.manager).data['results'][0]
+        self.assertEqual(client['status'], 'expired')
+        self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()
+        client = self.request(path=path, user=self.manager).data['results'][0]
+        self.assertEqual(client['status'], 'active')
+        self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
+
     def test_revoke_removes_only_own_authorizations_and_keeps_audit(self):
         access, _ = self.authorize(self.user, self.first.pk)
         self.authorize(self.user, self.second.pk)
@@ -132,3 +206,144 @@ class UserAgentClientTests(TestCase):
                 self.request('post', path, self.other)
         self.assertTrue(get_access_token_model().objects.filter(pk=access.pk).exists())
         self.assertTrue(AgentOAuthBinding.objects.filter(user=self.other).exists())
+        self.assertTrue(AgentApplication.objects.get(pk=self.registration.pk).is_active)
+        self.application.refresh_from_db()
+        self.assertEqual(self.application.redirect_uris, 'http://127.0.0.1/callback')
+
+    def test_last_user_revoke_recycles_unused_registration_and_audits_its_identity(self):
+        self.authorize(self.user, self.first.pk)
+        self.authorize(self.user, self.second.pk)
+        path = f'{self.url}{self.application.pk}/revoke/'
+        self.assertEqual(self.request('post', path, self.user).status_code, 204)
+        self.assertFalse(get_application_model().objects.filter(pk=self.application.pk).exists())
+        self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())
+        self.assertEqual(self.request(user=self.user).data['count'], 0)
+        pending = OAuthRequest('http://localhost/token')
+        pending.client, pending.scopes = self.application, ['agent:access']
+        with self.assertRaises(InvalidScopeError):
+            AgentOAuth2Validator().save_authorization_code(self.application.client_id, {'code': 'late-code'}, pending)
+        with self.assertRaises(InvalidGrantError):
+            AgentOAuth2Validator().save_bearer_token({'scope': 'agent:access'}, pending)
+        with tmp_to_root_org():
+            log = OperateLog.objects.get(resource_id=str(self.registration.pk), resource_type='Agent MCP client')
+            self.assertIn(self.application.client_id, log.diff['Client ID'])
+            self.assertIn('removed unused client registration', log.diff['Result'])
+
+    def test_last_user_revoke_preserves_cross_org_audit_and_login_history(self):
+        access, _ = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        with tmp_to_org(self.second):
+            session = AgentSession.objects.create(
+                user=self.user, application=self.application, terminal=Terminal.objects.create(name='recycle-audit-node'),
+                oauth_token=access, resource=self.registration.resource, idempotency_key='recycle-history',
+                request_hash='0' * 64, date_expires=timezone.now() + timedelta(minutes=5),
+            )
+            action = AgentAction.objects.create(
+                session=session, user=self.user, application=self.application, kind='execute_command',
+                idempotency_key='recycle-action', request_hash='1' * 64, status='succeeded',
+            )
+            event = AgentEvent.objects.create(
+                event_id=uuid.uuid4(), action=action, sequence=1, state='succeeded',
+                payload={'stream': 'stdout', 'data': 'retained output'}, payload_hash='2' * 64,
+            )
+        login = ClientLoginSession.objects.create(
+            application=self.application, user=self.other, token_family=uuid.uuid4(),
+            authenticated_at=timezone.now(), last_activity_at=timezone.now(),
+            revoked_at=timezone.now(), revoke_reason='logout',
+        )
+        response = self.request('post', f'{self.url}{self.application.pk}/revoke/', self.user)
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())
+        self.application.refresh_from_db()
+        self.assertEqual(self.application.client_id, 'personal-agent-client')
+        self.assertEqual(self.application.redirect_uris, '')
+        self.assertTrue(ClientLoginSession.objects.filter(pk=login.pk, user=self.other).exists())
+        with tmp_to_root_org():
+            session.refresh_from_db()
+            self.assertIsNone(session.oauth_token_id)
+            self.assertEqual(AgentAction.objects.get(pk=action.pk).application_id, self.application.pk)
+            event.refresh_from_db()
+            self.assertEqual(event.payload, {'stream': 'stdout', 'data': 'retained output'})
+            self.assertEqual(event.payload_hash, '2' * 64)
+
+    def test_recycle_keeps_login_history_without_agent_audit_references(self):
+        self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        login = ClientLoginSession.objects.create(
+            application=self.application, user=self.user, token_family=uuid.uuid4(),
+            authenticated_at=timezone.now(), last_activity_at=timezone.now(),
+        )
+        self.assertEqual(self.request('post', f'{self.url}{self.application.pk}/revoke/', self.user).status_code, 204)
+        self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())
+        self.assertTrue(ClientLoginSession.objects.filter(pk=login.pk).exists())
+
+    def test_other_users_authorization_records_each_prevent_recycling(self):
+        expires = timezone.now() + timedelta(minutes=5)
+        cases = (
+            (get_access_token_model(), {'token': uuid.uuid4().hex, 'expires': expires}),
+            (get_refresh_token_model(), {'token': uuid.uuid4().hex, 'token_family': uuid.uuid4()}),
+            (get_grant_model(), {'code': uuid.uuid4().hex, 'expires': expires, 'redirect_uri': 'http://127.0.0.1/callback'}),
+            (get_id_token_model(), {'expires': expires}),
+            (AgentOAuthBinding, {'org_id': self.second.pk, 'refresh_family': uuid.uuid4()}),
+        )
+        for model, fields in cases:
+            with self.subTest(model=model.__name__):
+                self.authorize(self.user, self.first.pk)
+                other = model.objects.create(user=self.other, application=self.application, **fields)
+                before = model.objects.filter(pk=other.pk).values().get()
+                response = self.request('post', f'{self.url}{self.application.pk}/revoke/', self.user)
+                self.assertEqual(response.status_code, 204)
+                self.assertEqual(model.objects.filter(pk=other.pk).values().get(), before)
+                self.assertTrue(AgentApplication.objects.get(pk=self.registration.pk).is_active)
+                self.application.refresh_from_db()
+                self.assertEqual(self.application.redirect_uris, 'http://127.0.0.1/callback')
+                other.delete()
+
+
+class UserAgentClientConcurrencyTests(TransactionTestCase):
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_authorization_committed_while_revoke_waits_keeps_shared_registration(self):
+        owner = User.objects.create(username='recycle-concurrent-owner')
+        other = User.objects.create(username='recycle-concurrent-other')
+        org = Organization.objects.create(name='Concurrent client org')
+        org.add_member(owner)
+        org.add_member(other)
+        application = get_application_model().objects.create(
+            name='Concurrent Agent', client_type='public', authorization_grant_type='authorization-code',
+            redirect_uris='http://127.0.0.1/callback', registration_source='dcr',
+        )
+        registration = AgentApplication.objects.create(application=application, resource='https://jumpserver.example/koko/mcp')
+        access = get_access_token_model().objects.create(
+            user=owner, application=application, token=uuid.uuid4().hex,
+            scope='agent:access', expires=timezone.now() + timedelta(minutes=5),
+        )
+        AgentOAuthBinding.objects.create(user=owner, application=application, access_token=access, org_id=org.pk)
+        started = Event()
+
+        def revoke():
+            close_old_connections()
+            try:
+                with tmp_to_org(org):
+                    request = APIRequestFactory().post(f'{UserAgentClientTests.url}{application.pk}/revoke/')
+                    force_authenticate(request, user=owner)
+                    started.set()
+                    match = resolve(request.path)
+                    return match.func(request, **match.kwargs).status_code
+            finally:
+                close_old_connections()
+
+        code = uuid.uuid4().hex
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            with transaction.atomic():
+                get_application_model().objects.select_for_update().get(pk=application.pk)
+                pending_revoke = pool.submit(revoke)
+                self.assertTrue(started.wait(5))
+                self.assertFalse(pending_revoke.done())
+                request = OAuthRequest('http://localhost/authorize')
+                request.client, request.user, request.scopes = application, other, ['agent:access']
+                request.redirect_uri, request.resource = application.redirect_uris, [registration.resource]
+                request.code_challenge, request.code_challenge_method = 'a' * 43, 'S256'
+                AgentOAuth2Validator().save_authorization_code(application.client_id, {'code': code}, request)
+            self.assertEqual(pending_revoke.result(timeout=10), 204)
+        self.assertTrue(AgentApplication.objects.get(pk=registration.pk).is_active)
+        self.assertTrue(get_grant_model().objects.filter(code=code, user=other).exists())
+        self.assertTrue(AgentOAuthBinding.objects.filter(user=other, application=application).exists())
+        self.assertFalse(get_access_token_model().objects.filter(pk=access.pk).exists())

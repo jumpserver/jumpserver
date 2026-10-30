@@ -181,10 +181,13 @@ class AgentOAuthOrganizationTests(TestCase):
         with transaction.atomic():
             response = UserAgentClientViewSet.as_view({'post': 'revoke'})(request, pk=str(self.app.pk))
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(self.exchange(pending_code).status_code, 400)
+        self.assertFalse(AgentApplication.objects.filter(application_id=self.app.pk).exists())
+        # With no audit references, revoking the last authorization also
+        # removes the registration, so cached clients now fail authentication.
+        self.assertEqual(self.exchange(pending_code).status_code, 401)
         self.assertEqual(self.token_request({
             'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
-        }).status_code, 400)
+        }).status_code, 401)
         with self.assertRaises(PermissionDenied):
             self.introspect(result)
         self.assertFalse(AgentOAuthBinding.objects.filter(user=self.user, application=self.app).exists())
