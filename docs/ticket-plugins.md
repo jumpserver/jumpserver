@@ -183,7 +183,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 插件接入回归包括：新类型无需修改枚举/模型/路由即可申请、审批、读取结果并执行动作；Boolean/MultipleChoice 参数往返；未知动作和错误 HTTP 方法拒绝；查看者与执行者权限隔离；MFA、限流、过期、跨组织及资源变更拒绝；列表不查询实时授权。Lina 覆盖多个账号依赖字段隔离、组织切换丢弃旧响应、结果刷新、过期和专用表单缺失提示。
 
-需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0033_workflow_foundation` 和 `acls.0007_ticket_workflow_integration`。assets 0033 接在 dev 的 OceanBase 0032 之后。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。升级执行 migrate 后自动导入旧流程，并为缺少的可见类型补齐已发布、已启用的默认流程，用户无需等待管理员手工创建；默认沿用系统管理员一级或签，已有流程及其停用状态不覆盖。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
+需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0033_workflow_foundation` 和 `acls.0008_ticket_workflow_integration`。assets 0033 接在 dev 的 OceanBase 0032 之后。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。升级执行 migrate 后自动导入旧流程，并为缺少的可见类型补齐已发布、已启用的默认流程，用户无需等待管理员手工创建；默认沿用系统管理员一级或签，已有流程及其停用状态不覆盖。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
 
 在 `tickets.tests.settings` 隔离环境运行 `tickets.tests.test_plugins` 及既有工作流测试。历史迁移和并发测试使用文档 `ticket-workflow-refactor.md` 中的独立 PostgreSQL 测试库，避免 SQLite 的 schema editor 限制。
 
