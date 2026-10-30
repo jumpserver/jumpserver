@@ -3,8 +3,8 @@ from django.urls import path
 from terminal.api.agent import AgentAuditAPI, AgentComponentAPI
 
 urlpatterns = [
-    path(f'{operation}/', AgentComponentAPI.as_view(operation=operation), name=f'agent-{operation}')
-    for operation in ('introspect', 'assets', 'sessions', 'actions')
+    path(f'{operation}/', AgentComponentAPI.as_view(operation=operation), name=f'agent-{operation.replace("/", "-")}')
+    for operation in ('introspect', 'assets', 'sessions', 'actions', 'sessions/list', 'sessions/get', 'actions/list', 'actions/lookup')
 ] + [
     path(f'sessions/<uuid:session_id>/{operation}/', AgentComponentAPI.as_view(operation=operation), name=f'agent-session-{operation}')
     for operation in ('credentials', 'check', 'bind', 'close')

@@ -8,12 +8,13 @@ from rest_framework.permissions import BasePermission
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import APIException, ValidationError
 
 from common.permissions import IsValidUser
 from common.drf.filters import DatetimeRangeFilterBackend, RewriteOrderingFilter, SearchFilter
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from terminal import agent_service as service
+from terminal import agent_queries
 from terminal.const import LoginFrom
 from terminal.models import AgentAction, AgentSession, Session
 from terminal.filters import AgentAuditFilterBackend, AgentActionAuditFilterSet, AgentSessionAuditFilterSet
@@ -35,6 +36,18 @@ class AgentComponentAPI(APIView):
     permission_classes = [IsAgentComponent]
     operation = ''
 
+    def handle_exception(self, exc):
+        response = super().handle_exception(exc)
+        if isinstance(exc, APIException):
+            code = exc.get_codes()
+            while isinstance(code, list) and len(code) == 1:
+                code = code[0]
+            if not isinstance(code, str) or code == 'invalid':
+                code = 'invalid_request'
+            response.data = {'code': code, 'detail': response.data}
+        response['Cache-Control'] = 'no-store'
+        return response
+
     def post(self, request, session_id=None, action_id=None):
         if not isinstance(request.data, dict):
             raise ValidationError('Expected an object')
@@ -47,6 +60,8 @@ class AgentComponentAPI(APIView):
             result = service.create_session(node, data)
         elif self.operation == 'actions':
             result = service.create_action(node, data)
+        elif self.operation in ('sessions/list', 'sessions/get', 'actions/list', 'actions/lookup'):
+            result = agent_queries.query(node, self.operation, data)
         elif session_id:
             result = self.session_operation(node, session_id, data)
         elif action_id:
@@ -91,7 +106,8 @@ class AgentComponentAPI(APIView):
                             'org_id': asset.org_id, 'org_name': asset.org.name, 'protocols': protocols, 'accounts': accounts,
                             'accounts_next_offset': account_next,
                         })
-            return {'results': results[:limit], 'next_offset': offset + limit if len(page) > limit else None}
+            return {'results': results[:limit], 'next_offset': offset + limit if len(page) > limit else None,
+                    'has_more': len(page) > limit}
 
     @staticmethod
     def account_page(user, asset, util, protocols, offset):

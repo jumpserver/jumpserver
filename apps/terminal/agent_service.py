@@ -11,6 +11,7 @@ from datetime import timedelta
 from types import SimpleNamespace
 
 from django.core import signing
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import CharField
 from django.db.models.functions import Cast
@@ -21,7 +22,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError, APIExce
 
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from terminal.agent_policy import ACTION_POLICIES, context_protocols, execution_mode, node_capabilities
+from terminal.agent_policy import ACTION_POLICIES, allowed_actions, context_protocols, execution_mode, node_capabilities
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent
 from users.models import User
 
@@ -258,10 +259,35 @@ def same_principal(context, session):
     check_agent_organization(session.user, session.org_id)
 
 
-def session_data(session):
+def session_capabilities(session):
+    """Current permission hints; execution still performs its own authorization."""
+    from perms.utils import PermAssetDetailUtil
+
+    result = {'allowed_actions': [], 'command_context_requires_review': False}
+    try:
+        check_session_authority(session, connection=False)
+        mode = execution_mode(session.requested)
+        with tmp_to_org(session.org_id):
+            account = PermAssetDetailUtil(session.user, session.requested['asset_id']).validate_permission(
+                session.requested['account'], session.requested['protocol'],
+            )
+            if not account or account.date_expired <= timezone.now():
+                return result
+            result.update(execution_mode=mode, allowed_actions=allowed_actions(mode, account.actions))
+            if session.requested.get('requires_terminal'):
+                result['allowed_actions'] = [kind for kind in result['allowed_actions'] if kind == 'open_terminal']
+            if mode == 'shell' and session.connection_token_id:
+                result['command_context_requires_review'] = bool(session.connection_token.command_filter_acls)
+    except (APIException, ObjectDoesNotExist, KeyError):
+        pass
+    return result
+
+
+def session_data(session, *, include_capabilities=False):
     action = session.actions.filter(kind='connect_asset').first()
-    return {
-        'id': str(session.id), 'status': session.status, 'action_id': str(action.id) if action else None,
+    result = {
+        'id': str(session.id), 'status': session.status,
+        'action_id': str(action.id) if action else None,
         'connection_token_id': str(session.connection_token_id) if session.connection_token_id else None, 'session_token': session_capability(session),
         'terminal_session_id': str(session.terminal_session_id) if session.terminal_session_id else None,
         'approval_url': f'/core/auth/agent/session/{session.id}/',
@@ -269,6 +295,9 @@ def session_data(session):
         'protocol': session.requested.get('protocol', ''),
         'requires_terminal': session.requested.get('requires_terminal', False),
     }
+    if include_capabilities:
+        result['capabilities'] = session_capabilities(session)
+    return result
 
 
 def create_session(node, data):
@@ -303,9 +332,9 @@ def create_session(node, data):
                 raise Conflict('Connection idempotency key belongs to another request or node')
             check_session_authority(existing, connection=False)
             refresh_connection_status(existing)
-            return session_data(existing)
+            return session_data(existing, include_capabilities=True)
         if AgentSession.objects.filter(user=user, date_closed__isnull=True, date_expires__gt=timezone.now()).count() >= 16:
-            raise Conflict('Agent session quota reached')
+            raise Conflict('Agent session quota reached', code='capacity_exceeded')
         asset = get_object_or_404(Asset, pk=requested['asset_id'], is_active=True)
         remote_addr = text_field(data.get('remote_addr', ''), 'remote_addr', 128, empty=True)
         from perms.utils import PermAssetDetailUtil
@@ -341,7 +370,7 @@ def create_session(node, data):
             kind='connect_asset', idempotency_key='connect:' + str(session.id), request=requested,
             request_hash=request_hash, status='queued' if token and token.acl_ready else 'awaiting_approval',
         )
-        return session_data(session)
+        return session_data(session, include_capabilities=True)
 
 
 def refresh_connection_status(session):
@@ -399,8 +428,14 @@ def create_connection_token(user, requested, credentials=None, *, face_monitor_t
 
 def validate_action_request(kind, request):
     require_keys(request, ACTION_POLICIES[kind].fields)
-    if len(canonical(request).encode()) > 65536:
-        raise ValidationError('Action request exceeds 64 KiB')
+    # A 64 KiB text file may expand to six times its size in JSON escapes.
+    maximum = 512 * 1024 if kind == 'file_write' else 65536
+    try:
+        size = len(canonical(request).encode())
+    except (UnicodeError, ValueError, TypeError):
+        raise ValidationError('Invalid action encoding', code='invalid_action_request')
+    if size > maximum:
+        raise ValidationError('Action request exceeds its encoded size limit', code='request_too_large')
     if kind == 'execute_command':
         text_field(request.get('command'), 'command', 4096)
         if 'prepared_command' in request:
@@ -423,6 +458,13 @@ def validate_action_request(kind, request):
             text_field(request['destination'], 'destination', 4096)
         if 'size' in request:
             integer(request['size'], 'size', 0, 1024 * 1024 * 1024)
+        if kind == 'file_list':
+            integer(request.get('limit', 100), 'limit', 1, 200)
+            text_field(request.get('cursor', ''), 'cursor', 512, empty=True)
+        if kind == 'file_write':
+            content = request.get('content')
+            if not isinstance(content, str) or len(content.encode()) > 65536:
+                raise ValidationError('Use upload_file for content larger than 64 KiB', code='file_content_too_large')
     if 'timeout_seconds' in request:
         integer(request['timeout_seconds'], 'timeout_seconds', 1, 600)
 
@@ -453,21 +495,21 @@ def create_action(node, data):
             check_session_authority(session)
         mode = execution_mode(session.requested)
         if kind.startswith('file_') and mode not in ACTION_POLICIES[kind].modes:
-            raise ValidationError('File operations require an SFTP session')
+            raise ValidationError('File operations require an SFTP session', code='sftp_session_required')
         if kind == 'execute_command' and mode != 'shell' and (data['request'].get('cwd') or data['request'].get('env')):
-            raise ValidationError('Working directory and environment apply only to SSH execution')
+            raise ValidationError('Working directory and environment apply only to SSH execution', code='shell_context_required')
         if kind == 'execute_command' and mode not in ACTION_POLICIES[kind].modes:
-            raise ValidationError('This operation requires a shell or database session')
+            raise ValidationError('This operation requires a shell or database session', code='shell_session_required')
         if kind != 'open_terminal' and (session.status != 'ready' or not session.credentials_released or not session.actions.filter(kind='connect_asset', status='succeeded').exists()):
-            raise Conflict('Asset connection is not ready')
+            raise Conflict('Asset connection is not ready', code='connection_not_ready')
         request_hash = fingerprint({'session_id': str(session.id), 'kind': kind, 'request': data['request']})
         existing = AgentAction.objects.filter(user=user, application_id=session.application_id, idempotency_key=key).first()
         if existing:
             if existing.request_hash != request_hash:
-                raise Conflict('Idempotency key was already used for different parameters')
+                raise Conflict('Idempotency key was already used for different parameters', code='idempotency_conflict')
             return action_data(existing)
         if session.actions.exclude(status__in=FINAL_STATES).count() >= 32:
-            raise Conflict('Agent action queue is full')
+            raise Conflict('Agent action queue is full', code='capacity_exceeded')
         action = AgentAction.objects.create(
             session=session, user=user, application_id=session.application_id, org_id=session.org_id,
             kind=kind, idempotency_key=key, request=data['request'], request_hash=request_hash,

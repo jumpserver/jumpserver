@@ -173,9 +173,11 @@ use their separate user and auditor permissions.
 | `introspect/` | Validates the external OAuth token, exact resource, organization scope and optional versioned node capabilities; returns a context bound to these values and the user, client and Koko node for at most five minutes |
 | `assets/` | Searches current authorized assets, accounts and supported protocols using that context |
 | `sessions/` | Creates an idempotent logical asset session and connection action; applies existing connection controls |
+| `sessions/list/`, `sessions/get/` | Lists or recovers public session metadata by ID or original connection key; never returns credentials or restores a transport |
 | `sessions/<id>/credentials/` | Releases connection credentials to the bound Koko node once, after authorization |
 | `sessions/<id>/check/`, `bind/`, `close/` | Revalidates authority, binds the real terminal session, or closes the logical session after dispatched work drains |
 | `actions/` | Registers an immutable operation and its request hash |
+| `actions/list/`, `actions/lookup/` | Finds operation IDs and states in the current user's client, node and currently authorized organizations |
 | `actions/<id>/authorize/`, `claim/` | Rechecks current authority and approvals, then grants dispatch once |
 | `actions/<id>/get/`, `cancel/` | Queries or cancels actions belonging to the authenticated user, client and organization |
 | `actions/<id>/events/` | Accepts ordered execution evidence from the bound node |
@@ -190,6 +192,22 @@ access token must remain unexpired.
 Asset discovery supports `asset_id` within the authorized asset set and optional
 `account_offset` (0–100,000). Each asset returns at most 100 accounts with
 `accounts_next_offset`; real account rows are paged before permission expansion.
+
+Recovery lists use bounded offset pages of at most 100 rows and an optional
+status filter; action lists also accept a session filter. Session recovery
+accepts exactly one session ID or original connection key. Action lookup takes
+the original operation key and an optional session filter; known action IDs use
+the existing action get endpoint. Ambiguous keys across organizations require
+an ID (or an action's session filter). Queries cannot
+select another user, client, node or arbitrary organization. Current session
+capability hints contain permitted action effects, execution mode and whether
+command context needs review; dispatch still rechecks authority and approvals.
+Expired sessions remain historical records and cannot restore a native connection.
+
+Component validation errors include a stable `code` with their existing detail.
+Koko translates recognized public codes without exposing arbitrary Core error
+bodies or credential details. This error presentation is confined to Agent
+component endpoints; ordinary Core APIs retain their existing contract.
 
 ### Execution capabilities and extension
 
@@ -298,7 +316,8 @@ configured end-of-session credential rotation. Repeated closure does not repeat
 that transition.
 
 Limits include 16 live sessions per user in an organization, a two-hour session lifetime, 32 pending
-actions per session, 64 KiB requests, 128 KiB events and 16 MiB evidence per action,
+actions per session, 64 KiB requests (512 KiB encoded JSON for `file_write`, whose
+UTF-8 content is separately limited to 64 KiB), 128 KiB events and 16 MiB evidence per action,
 with space reserved for final evidence. Command approval validity is 15 minutes.
 The single-node release does not fail over uncertain actions to another worker.
 
@@ -321,5 +340,5 @@ python apps/manage.py makemigrations --check --dry-run
 
 These checks cover Core's execution, organization-bound OAuth, registration and
 settings contracts. Deployment acceptance separately exercises browser login,
-organization selection, asset authorization, approvals, handoff, audit access and
+multi-organization authorization, asset authorization, approvals, handoff, audit access and
 reverse-proxy behavior against isolated assets.

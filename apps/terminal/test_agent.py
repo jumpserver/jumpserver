@@ -5,7 +5,7 @@ import uuid
 from datetime import timedelta
 from unittest.mock import patch
 
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import TestCase, SimpleTestCase, RequestFactory, override_settings
 from django.http import Http404, QueryDict
 from django.utils import timezone
 from oauthlib.common import Request as OAuthRequest
@@ -19,6 +19,32 @@ from orgs.utils import tmp_to_org
 from terminal import agent_service as service
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
 from users.models import User
+
+
+class AgentRequestContractTests(SimpleTestCase):
+    def test_text_content_uses_utf8_bytes_and_separate_json_budget(self):
+        for content in ('a' * 65536, '\n' * 65536, '\x00' * 65536, '中' * 21845):
+            service.validate_action_request('file_write', {'path': '/file', 'content': content})
+        for content, code in (('a' * 65537, 'file_content_too_large'),
+                              ('中' * 21846, 'file_content_too_large'), ('\ud800', 'invalid_action_request')):
+            with self.subTest(code=code), self.assertRaises(ValidationError) as raised:
+                service.validate_action_request('file_write', {'path': '/file', 'content': content})
+            self.assertEqual(raised.exception.get_codes(), [code])
+
+    def test_directory_cursor_does_not_expand_other_action_fields(self):
+        service.validate_action_request('file_list', {'path': '/', 'limit': 200, 'cursor': 'position'})
+        for kind in ('file_read', 'file_write'):
+            with self.assertRaises(ValidationError):
+                service.validate_action_request(kind, {'path': '/', 'cursor': 'position'})
+
+    def test_component_errors_keep_stable_codes(self):
+        from terminal.api.agent import AgentComponentAPI
+        view = AgentComponentAPI()
+        view.request = RequestFactory().post('/')
+        view.args, view.kwargs = (), {}
+        response = view.handle_exception(ValidationError('本地化说明', code='file_content_too_large'))
+        self.assertEqual(response.data['code'], 'file_content_too_large')
+        self.assertEqual(response['Cache-Control'], 'no-store')
 
 
 class AgentBoundaryTests(TestCase):
@@ -78,6 +104,63 @@ class AgentBoundaryTests(TestCase):
         service.append_event(self.action, {'session_token': service.session_capability(receipt),
             'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'failed', 'payload': {'error': 'owner deleted'}})
         self.assertEqual(self.action.events.count(), 1)
+
+    def test_recovery_is_scoped_and_never_returns_execution_capabilities(self):
+        from terminal import agent_queries
+        second = Organization.objects.create(name='Agent recovery other')
+        second.add_member(self.user)
+        AgentOAuthBinding.objects.filter(user=self.user).update(org_id=service.ALL_AGENT_ORGANIZATIONS)
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})
+        body = {'context_token': principal['context_token']}
+        AgentAction.objects.create(session=self.session, user=self.user, application=self.app,
+            kind='connect_asset', idempotency_key='connect:recovery', request_hash='1' * 64)
+        with tmp_to_org(second):
+            other = AgentSession.objects.create(user=self.user, application=self.app, terminal=self.node,
+                oauth_token=self.token, resource=self.resource, idempotency_key='connection', request_hash='2' * 64,
+                requested=self.session.requested, date_expires=self.session.date_expires)
+        wrong_node = AgentSession.objects.create(user=self.user, application=self.app, terminal=self.other_node,
+            resource=self.resource, idempotency_key='wrong-node', request_hash='3' * 64,
+            requested=self.session.requested, date_expires=self.session.date_expires)
+        stranger = User.objects.create(username='agent-recovery-stranger')
+        hidden = AgentSession.objects.create(user=stranger, application=self.app, terminal=self.node,
+            resource=self.resource, idempotency_key='stranger', request_hash='4' * 64,
+            requested=self.session.requested, date_expires=self.session.date_expires)
+        other_client = get_application_model().objects.create(name='Other recovery client', client_id='other-recovery')
+        foreign = AgentSession.objects.create(user=self.user, application=other_client, terminal=self.node,
+            resource=self.resource, idempotency_key='foreign', request_hash='5' * 64,
+            requested=self.session.requested, date_expires=self.session.date_expires)
+        AgentAction.objects.create(session=foreign, user=self.user, application=other_client,
+            kind='file_read', idempotency_key='foreign-read', request_hash='5' * 64)
+        page = agent_queries.query(self.node, 'sessions/list', {**body, 'limit': 1})
+        self.assertTrue(page['has_more'])
+        self.assertEqual(len(agent_queries.query(self.node, 'sessions/list', {**body, 'offset': 1})['results']), 1)
+        for identifier in (wrong_node.id, hidden.id, foreign.id):
+            with self.assertRaises(Http404):
+                agent_queries.query(self.node, 'sessions/get', {**body, 'session_id': str(identifier)})
+        with self.assertRaises(service.Conflict):
+            agent_queries.query(self.node, 'sessions/get', {**body, 'idempotency_key': 'connection'})
+        recovered = agent_queries.query(self.node, 'sessions/get', {**body, 'session_id': str(self.session.id)})
+        self.assertTrue(recovered['action_id'])
+        self.assertIn('capabilities', recovered)
+        for key in ('session_token', 'connection_token_id', 'context_token', 'requested'):
+            self.assertNotIn(key, recovered)
+        action = agent_queries.query(self.node, 'actions/lookup', {**body, 'idempotency_key': 'read'})
+        self.assertEqual(action['id'], str(self.action.id))
+        self.assertNotIn('result', action)
+        self.assertEqual(len(agent_queries.query(self.node, 'actions/list', body)['results']), 2)
+        with self.assertRaises(Http404):
+            agent_queries.query(self.node, 'actions/lookup', {**body, 'idempotency_key': 'foreign-read'})
+        for operation, extra in (
+            ('sessions/list', {'user_id': str(stranger.id)}),
+            ('sessions/list', {'session_id': str(self.session.id)}),
+            ('actions/list', {'idempotency_key': 'read'}),
+            ('actions/lookup', {'action_id': str(self.action.id)}),
+        ):
+            with self.subTest(operation=operation), self.assertRaises(ValidationError):
+                agent_queries.query(self.node, operation, {**body, **extra})
+        second.members.through.objects_raw.filter(user=self.user, org_id=second.pk).delete()
+        with self.assertRaises(Http404):
+            agent_queries.query(self.node, 'sessions/get', {**body, 'session_id': str(other.id)})
 
     def test_expired_agent_history_preserves_identity_after_rename_and_delete(self):
         display = str(self.user)
@@ -144,6 +227,7 @@ class AgentBoundaryTests(TestCase):
         created = service.create_session(self.node, body)
         session = AgentSession.objects.get(pk=created['id'])
         self.assertEqual(session.requested['execution_mode'], 'database')
+        self.assertEqual(set(created['capabilities']['allowed_actions']), {'execute_command', 'open_terminal'})
         self.assertEqual(self.audit_api('sessions', {'protocol': 'sqlserver'})['results'][0]['id'], created['id'])
         self.assertEqual(self.audit_api('sessions', {'protocol__in': 'ssh,sqlserver'})['count'], 2)
         with self.assertRaises(ValidationError):

@@ -28,14 +28,22 @@ FILE_MODES = frozenset(('files',))
 ACTION_POLICIES = {
     'execute_command': ActionPolicy(COMMAND_MODES, ('command', 'prepared_command', 'cwd', 'env', 'timeout_seconds'), ActionChoices.connect),
     'open_terminal': ActionPolicy(COMMAND_MODES, ('timeout_seconds',), ActionChoices.connect),
+    'file_list': ActionPolicy(FILE_MODES, FILE_FIELDS + ('cursor',), ActionChoices.connect),
     **{kind: ActionPolicy(FILE_MODES, FILE_FIELDS, permission) for kind, permission in (
-        ('file_stat', ActionChoices.connect), ('file_list', ActionChoices.connect),
+        ('file_stat', ActionChoices.connect),
         ('file_read', ActionChoices.download), ('file_download', ActionChoices.download),
         ('file_write', ActionChoices.upload), ('file_upload', ActionChoices.upload),
         ('file_mkdir', ActionChoices.upload), ('file_remove', ActionChoices.delete),
         ('file_rename', ActionChoices.upload | ActionChoices.delete),
     )},
 }
+
+
+def allowed_actions(mode, permissions):
+    if not ActionChoices.contains(permissions, ActionChoices.connect):
+        return []
+    return sorted(kind for kind, policy in ACTION_POLICIES.items()
+                  if mode in policy.modes and ActionChoices.contains(permissions, policy.permission))
 
 
 def node_capabilities(value):
