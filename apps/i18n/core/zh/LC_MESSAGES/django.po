@@ -17510,3 +17510,7 @@ msgstr "允许此应用访问本人在当前所有可访问组织中获授权使
 
 msgid "No authorized organizations are available."
 msgstr "没有可访问的已授权组织。"
+
+#, python-format
+msgid "You can authorize up to %(limit)s MCP clients. Revoke an existing client in Personal settings > MCP clients before adding another."
+msgstr "每人最多授权 %(limit)s 个 MCP 客户端。请先在个人设置的 MCP 客户端页面撤销一个已有客户端，再授权新客户端。"

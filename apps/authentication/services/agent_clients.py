@@ -1,10 +1,11 @@
-"""Bounded maintenance of unused dynamic Agent OAuth clients."""
+"""Lifecycle and per-user limits for Agent OAuth clients."""
 from datetime import timedelta
 
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 from django.db.models.deletion import ProtectedError
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from oauth2_provider.models import (
     get_access_token_model, get_application_model, get_grant_model, get_id_token_model, get_refresh_token_model,
 )
@@ -13,6 +14,22 @@ from redis.exceptions import RedisError
 from authentication.backends.oauth2_provider.agent_registration import REGISTRATION_LOCK
 from common.utils.lock import DistributedLock
 from terminal.models import AgentApplication, AgentOAuthBinding
+
+MAX_USER_AGENT_CLIENTS = 10
+
+
+def user_agent_client_limit_reached(user, client_id):
+    clients = AgentOAuthBinding.objects.filter(user=user, application__agent_registration__isnull=False)
+    if clients.filter(application__client_id=client_id).exists():
+        return False
+    client_ids = clients.values_list('application_id', flat=True).distinct()[:MAX_USER_AGENT_CLIENTS]
+    return len(client_ids) >= MAX_USER_AGENT_CLIENTS
+
+
+def user_agent_client_limit_message():
+    return _('You can authorize up to %(limit)s MCP clients. Revoke an existing client in Personal settings > MCP clients before adding another.') % {
+        'limit': MAX_USER_AGENT_CLIENTS,
+    }
 
 
 class AgentClientCleanupBusy(Exception):

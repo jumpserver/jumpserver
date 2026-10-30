@@ -2,12 +2,14 @@
 import base64
 import hashlib
 import json
+import uuid
 from datetime import timedelta
 from urllib.parse import parse_qs, urlsplit
 
 from django.conf import settings
 from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
+from django.utils.translation import override
 from oauth2_provider.models import get_application_model, get_access_token_model, get_grant_model, get_refresh_token_model
 from rest_framework.exceptions import PermissionDenied
 
@@ -17,7 +19,7 @@ from authentication.models.client_login_session import ClientLoginSession
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from terminal import agent_service as service
-from terminal.models import AgentApplication, AgentOAuthBinding, Terminal
+from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, Terminal
 from users.models import User
 
 
@@ -90,6 +92,114 @@ class AgentOAuthOrganizationTests(TestCase):
     def remove_membership(self):
         self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()
         self.assertFalse(self.user.orgs.filter(pk=self.second.pk).exists())
+
+    def fill_client_slots(self, count, user=None):
+        user = user or self.user
+        applications = []
+        for _ in range(count):
+            app = get_application_model().objects.create(
+                name='Quota client', client_id=uuid.uuid4().hex, client_type='public',
+                authorization_grant_type='authorization-code', redirect_uris='http://127.0.0.1/callback',
+            )
+            AgentApplication.objects.create(application=app, resource=self.resource)
+            grant = get_grant_model().objects.create(
+                user=user, application=app, code=uuid.uuid4().hex, scope=service.SCOPE,
+                redirect_uri=app.redirect_uris, expires=timezone.now() + timedelta(minutes=5),
+            )
+            AgentOAuthBinding.objects.create(user=user, application=app, org_id=self.first.pk, grant=grant)
+            applications.append(app)
+        return applications
+
+    def test_client_limit_rejects_eleventh_client_in_form_and_validator(self):
+        from oauthlib.common import Request as OAuthRequest
+        from oauthlib.oauth2 import InvalidRequestError
+        from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
+
+        self.fill_client_slots(10)
+        response = self.authorize()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context_data['form'].errors.as_data()['__all__'][0].code, 'mcp_client_limit')
+        request = OAuthRequest('http://localhost/authorize')
+        request.client, request.user, request.scopes = self.app, self.user, [service.SCOPE]
+        request.redirect_uri, request.resource = self.app.redirect_uris, [self.resource]
+        request.code_challenge, request.code_challenge_method = 'a' * 43, 'S256'
+        with self.assertRaises(InvalidRequestError):
+            AgentOAuth2Validator().save_authorization_code(self.app.client_id, {'code': 'over-quota'}, request)
+        self.assertFalse(get_grant_model().objects.filter(application=self.app).exists())
+        self.assertIsNone(AgentApplication.objects.get(application=self.app).date_authorized)
+
+    def test_reauthorization_multi_org_and_refresh_share_one_client_slot(self):
+        self.fill_client_slots(9)
+        result = self.issued()
+        self.code(org=self.first)
+        self.code(org=self.second)
+        response = self.token_request({
+            'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(AgentOAuthBinding.objects.filter(user=self.user).values('application_id').distinct().count(), 10)
+        self.assertEqual(self.introspect(json.loads(response.content))['client_id'], self.app.client_id)
+
+    def test_client_limit_is_per_user_even_for_shared_registrations(self):
+        self.fill_client_slots(10)
+        owner = self.user
+        self.user = User.objects.create(username='quota-other-user')
+        self.first.add_member(self.user)
+        self.code(org=self.first)
+        self.assertEqual(AgentOAuthBinding.objects.filter(user=self.user).values('application_id').distinct().count(), 1)
+        self.user = owner
+        self.assertEqual(self.authorize().status_code, 200)
+        self.assertFalse(AgentOAuthBinding.objects.filter(user=owner, application=self.app).exists())
+
+    def test_revoke_frees_slot_without_removing_client_audit_history(self):
+        from django.db import transaction
+        from rest_framework.test import APIRequestFactory, force_authenticate
+        from authentication.api.agent_client_user import UserAgentClientViewSet
+
+        applications = self.fill_client_slots(10)
+        history = AgentSession.objects.create(
+            user=self.user, application=applications[0], terminal=self.node, resource=self.resource,
+            idempotency_key='quota-history', request_hash='0' * 64, date_expires=timezone.now() + timedelta(minutes=5),
+        )
+        request = APIRequestFactory().post('/revoke/')
+        force_authenticate(request, user=self.user)
+        with transaction.atomic():
+            response = UserAgentClientViewSet.as_view({'post': 'revoke'})(request, pk=str(applications[0].pk))
+        self.assertEqual(response.status_code, 204)
+        self.code()
+        history.refresh_from_db()
+        self.assertEqual(history.application_id, applications[0].pk)
+        self.assertFalse(AgentApplication.objects.filter(application=applications[0]).exists())
+        self.assertEqual(AgentOAuthBinding.objects.filter(user=self.user).values('application_id').distinct().count(), 10)
+
+    def test_disabled_and_expired_clients_still_count_and_cancellation_is_allowed(self):
+        applications = self.fill_client_slots(10)
+        AgentApplication.objects.filter(application=applications[0]).update(is_active=False)
+        get_grant_model().objects.filter(application=applications[1]).update(expires=timezone.now() - timedelta(minutes=1))
+        self.assertTrue(self.authorize().context_data['form'].non_field_errors())
+        response = self.authorize(allow='')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(parse_qs(urlsplit(response['Location']).query)['error'], ['access_denied'])
+
+    def test_client_limit_message_is_localized(self):
+        self.fill_client_slots(10)
+        for language, expected in (('zh', '最多授权 10'), ('zh-hant', '最多授權 10')):
+            with override(language):
+                response = self.authorize()
+                self.assertIn(expected, str(response.context_data['form'].non_field_errors()))
+
+    def test_non_agent_oauth_authorization_is_not_limited(self):
+        self.fill_client_slots(10)
+        self.app = get_application_model().objects.create(
+            name='Ordinary OAuth client', client_type='public', authorization_grant_type='authorization-code',
+            redirect_uris='https://oauth.example/callback',
+        )
+        self.authorization.update(client_id=self.app.client_id, redirect_uri=self.app.redirect_uris, scope='read')
+        self.authorization.pop('resource')
+        response = self.authorize()
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('code', parse_qs(urlsplit(response['Location']).query))
+        self.assertFalse(AgentOAuthBinding.objects.filter(application=self.app).exists())
 
     def test_consent_requires_csrf_protection(self):
         request = self.factory.post('/authorize/', {**self.authorization, 'allow': 'Authorize'})

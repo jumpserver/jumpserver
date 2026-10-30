@@ -17487,3 +17487,7 @@ msgstr "允許此應用程式存取本人在目前所有可存取組織中獲授
 
 msgid "No authorized organizations are available."
 msgstr "沒有可存取的已授權組織。"
+
+#, python-format
+msgid "You can authorize up to %(limit)s MCP clients. Revoke an existing client in Personal settings > MCP clients before adding another."
+msgstr "每人最多授權 %(limit)s 個 MCP 用戶端。請先在個人設定的 MCP 用戶端頁面撤銷一個既有用戶端，再授權新用戶端。"

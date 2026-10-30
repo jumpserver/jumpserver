@@ -1,7 +1,7 @@
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
-from threading import Event
+from threading import Barrier, Event
 from urllib.parse import urlsplit
 from unittest.mock import patch
 
@@ -14,7 +14,7 @@ from oauth2_provider.models import (
 )
 from rest_framework.test import APIRequestFactory, force_authenticate
 from oauthlib.common import Request as OAuthRequest
-from oauthlib.oauth2 import InvalidGrantError, InvalidScopeError
+from oauthlib.oauth2 import InvalidGrantError, InvalidScopeError, InvalidRequestError
 
 from orgs.models import Organization
 from audits.models import OperateLog
@@ -319,6 +319,55 @@ class UserAgentClientTests(TestCase):
 
 
 class UserAgentClientConcurrencyTests(TransactionTestCase):
+    def setUp(self):
+        Organization.expire_orgs_mapping()
+        Organization.default()
+        Organization.system()
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_concurrent_authorizations_cannot_exceed_ten_clients(self):
+        owner = User.objects.create(username='quota-concurrent-owner')
+        org = Organization.objects.create(name='Client quota concurrency')
+        org.add_member(owner)
+        resource = 'https://jumpserver.example/koko/mcp'
+        applications = []
+        for index in range(11):
+            app = get_application_model().objects.create(
+                name='Quota concurrent client', client_id=uuid.uuid4().hex, client_type='public',
+                authorization_grant_type='authorization-code', redirect_uris='http://127.0.0.1/callback',
+            )
+            AgentApplication.objects.create(application=app, resource=resource)
+            if index < 9:
+                grant = get_grant_model().objects.create(
+                    user=owner, application=app, code=uuid.uuid4().hex,
+                    expires=timezone.now() + timedelta(minutes=5), redirect_uri=app.redirect_uris,
+                )
+                AgentOAuthBinding.objects.create(user=owner, application=app, grant=grant, org_id=org.pk)
+            applications.append(app)
+        start = Barrier(2)
+
+        def authorize(app):
+            close_old_connections()
+            try:
+                with tmp_to_org(org):
+                    request = OAuthRequest('http://localhost/authorize')
+                    request.client, request.user, request.scopes = app, owner, ['agent:access']
+                    request.redirect_uri, request.resource = app.redirect_uris, [resource]
+                    request.code_challenge, request.code_challenge_method = 'a' * 43, 'S256'
+                    start.wait(timeout=5)
+                    try:
+                        AgentOAuth2Validator().save_authorization_code(app.client_id, {'code': uuid.uuid4().hex}, request)
+                        return 'authorized'
+                    except InvalidRequestError:
+                        return 'limited'
+            finally:
+                close_old_connections()
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = [pool.submit(authorize, app) for app in applications[9:]]
+            self.assertCountEqual([future.result(timeout=10) for future in results], ['authorized', 'limited'])
+        self.assertEqual(AgentOAuthBinding.objects.filter(user=owner).values('application_id').distinct().count(), 10)
+
     @skipUnlessDBFeature('has_select_for_update')
     def test_authorization_committed_while_revoke_waits_keeps_shared_registration(self):
         owner = User.objects.create(username='recycle-concurrent-owner')

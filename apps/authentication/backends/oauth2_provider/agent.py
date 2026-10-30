@@ -1,6 +1,7 @@
 """OAuth policy for explicitly registered, public Agent clients."""
 from urllib.parse import urlsplit
 
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -14,6 +15,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, check_agent_scope
 from terminal.models import AgentApplication, AgentOAuthBinding
+from authentication.services.agent_clients import user_agent_client_limit_reached, user_agent_client_limit_message
 from .agent_forms import AgentAllowForm
 from .client_views import ClientAuthorizationView
 from .validators import ClientOAuth2Validator
@@ -71,6 +73,12 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
                     raise InvalidRequestError(description='Agent client is no longer available', request=request)
                 if not registration.is_active:
                     raise InvalidRequestError(description='Agent client is disabled', request=request)
+                # Different clients can authorize concurrently. Serialize the
+                # per-user check before reserving a slot with the grant binding.
+                if not get_user_model().objects.select_for_update().filter(pk=request.user.pk).exists():
+                    raise InvalidRequestError(description='User is no longer available', request=request)
+                if user_agent_client_limit_reached(request.user, request.client.client_id):
+                    raise InvalidRequestError(description=user_agent_client_limit_message(), request=request)
                 grant = self._create_authorization_code(request, code)
                 AgentOAuthBinding.objects.create(
                     user=request.user, application=request.client, org_id=org_id, grant=grant,
