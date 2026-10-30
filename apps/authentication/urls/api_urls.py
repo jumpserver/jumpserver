@@ -6,7 +6,9 @@ from rest_framework.routers import DefaultRouter
 
 from .. import api
 from ..api.rdp_login import RDPLoginRedeemApi
-from ..api.client_login_session import ClientSessionActivityView, ClientSessionRevokeView
+from ..api.client_login_session import (
+    ClientSessionStatusView, ClientSessionRevokeView, ClientSessionUnlockView, ClientSessionLockView,
+)
 from ..backends.passkey.urls import urlpatterns as passkey_urlpatterns
 
 app_name = 'authentication'
@@ -22,7 +24,9 @@ router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
 
 urlpatterns = [
-    path('client-login-session/activity/', ClientSessionActivityView.as_view(), name='client-login-session-activity'),
+    path('client-login-session/lock/', ClientSessionLockView.as_view(), name='client-login-session-lock'),
+    path('client-login-session/status/', ClientSessionStatusView.as_view(), name='client-login-session-status'),
+    path('client-login-session/unlock/', ClientSessionUnlockView.as_view(), name='client-login-session-unlock'),
     path('client-login-session/revoke/', ClientSessionRevokeView.as_view(), name='client-login-session-revoke'),
     path('rdp-login/redeem/', RDPLoginRedeemApi.as_view(), name='rdp-login-redeem'),
     path('<str:backend>/qr/unbind/', api.QRUnBindForUserApi.as_view(), name='qr-unbind'),

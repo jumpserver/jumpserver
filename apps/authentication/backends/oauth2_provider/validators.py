@@ -10,7 +10,7 @@ from oauthlib.oauth2 import InvalidGrantError, InvalidRequestError
 
 from authentication.models.client_login_session import ClientLoginSession
 from authentication.services.client_login_session import (
-    CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy, client_login_session_data,
+    CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy, client_login_session_data, client_session_deadline,
     is_client_application, revoke_session, validate_refresh_token_session, client_session_receipt,
 )
 
@@ -47,9 +47,9 @@ class ClientOAuth2Validator(OAuth2Validator):
             authenticated_at = session.authenticated_at if session else None
         policy = getattr(session, 'client_login_policy', None) or client_login_policy()
         lifetime = client_login_lifetime(policy)
-        # Freeze the page policy deadline at login. Editing a policy revokes the
-        # existing sessions; automatic refresh never extends a login.
-        expires_at = session.expires_at if session else None
+        # The original lifetime stays fixed. A policy change has its own earlier
+        # exit deadline; token rotation must respect both without changing either.
+        expires_at = client_session_deadline(session)[0] if session else None
         if lifetime and session is None:
             if authenticated_at is None:
                 raise InvalidGrantError(description='Client login authorization is required.')
@@ -82,7 +82,7 @@ class ClientOAuth2Validator(OAuth2Validator):
         # Return the policy used by this actual, serialized token issuance.
         token['client_login_policy'] = policy
         session = session or request.client_login_session
-        token['client_login_session'] = client_login_session_data(session, policy=policy)
+        token['client_login_session'] = client_login_session_data(session)
         token['client_login_session_receipt'] = client_session_receipt(
             request.client.pk, session.token_family, token,
         )
@@ -142,7 +142,7 @@ class ClientOAuth2Validator(OAuth2Validator):
                 raise InvalidGrantError(description='Client login authorization is required.')
             request.client_login_session = ClientLoginSession.objects.create(
                 user=request.user, application=request.client, token_family=refresh.token_family,
-                authenticated_at=authenticated_at, last_activity_at=authenticated_at,
+                authenticated_at=authenticated_at,
                 expires_at=request.client_login_expires_at,
             )
         return refresh

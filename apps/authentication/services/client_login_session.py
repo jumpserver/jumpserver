@@ -5,14 +5,14 @@ import hashlib
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import transaction
 from django.utils.crypto import constant_time_compare
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from oauth2_provider.models import (
     get_access_token_model, get_application_model, get_grant_model, get_refresh_token_model,
 )
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 
 from common.utils.lock import DistributedLock
 from authentication.models.client_login_session import ClientLoginSession
@@ -20,7 +20,7 @@ from authentication.models.client_login_session import ClientLoginSession
 
 POLICY_FIELDS = (
     'SECURITY_CLIENT_REAUTH_ON_EXIT',
-    'SECURITY_CLIENT_MAX_IDLE_TIME',
+    'SECURITY_CLIENT_IDLE_LOCK_TIME',
     'SECURITY_CLIENT_MAX_SESSION_TIME',
 )
 CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60
@@ -38,21 +38,35 @@ class ClientSessionExpired(AuthenticationFailed):
         self.client_login_session = client_login_session_data(session) if session else None
 
 
-def client_login_session_data(session, *, policy=None):
+class ClientSessionLocked(PermissionDenied):
+    default_code = 'client_locked'
+    default_detail = _('Client is locked. Unlock it on the main page.')
+
+    def __init__(self, session):
+        super().__init__()
+        # Keep boolean session metadata intact instead of converting it to ErrorDetail strings.
+        self.detail = {'code': self.default_code, 'detail': self.default_detail,
+                       'client_login_session': client_login_session_data(session)}
+
+
+def client_session_deadline(session):
+    deadlines = [(value, reason) for value, reason in (
+        (session.expires_at, 'absolute_timeout'), (session.policy_expires_at, 'policy_changed'),
+    ) if value is not None]
+    return min(deadlines, key=lambda item: item[0]) if deadlines else (None, None)
+
+
+def client_login_session_data(session):
     """Serialize the already validated session without another policy/session query."""
-    policy = policy if policy is not None else session.client_login_policy
-    idle_expires_at = (session.last_activity_at + timedelta(minutes=policy['max_idle_time'])
-                       if policy['max_idle_time'] else None)
-    if session.revoked_at is not None and session.revoke_reason == 'idle_timeout':
-        # The original idle policy is not stored. Only this validation can prove
-        # its deadline; historical revocations must not borrow a newer setting.
-        idle_expires_at = getattr(session, 'client_login_idle_expires_at', None)
+    deadline, reason = client_session_deadline(session)
     return {
         'authenticated_at': session.authenticated_at.isoformat(),
         'expires_at': session.expires_at.isoformat() if session.expires_at else None,
-        'last_activity_at': session.last_activity_at.isoformat(),
-        'idle_expires_at': idle_expires_at.isoformat() if idle_expires_at else None,
+        'policy_expires_at': session.policy_expires_at.isoformat() if session.policy_expires_at else None,
+        'effective_expires_at': deadline.isoformat() if deadline else None,
+        'expiry_reason': reason,
         'server_time': timezone.now().isoformat(),
+        'locked': session.is_locked,
     }
 
 
@@ -102,7 +116,7 @@ def client_login_policy():
         values[item.name] = item.cleaned_value
     return {
         'reauth_on_exit': bool(values[POLICY_FIELDS[0]]),
-        'max_idle_time': int(values[POLICY_FIELDS[1]] or 0),
+        'idle_lock_time': int(values[POLICY_FIELDS[1]] or 0),
         'max_session_time': int(values[POLICY_FIELDS[2]] or 0),
     }
 
@@ -169,11 +183,10 @@ def _session_is_valid(session, policy, now, *, mutate=False):
     ).exists()
     if not session.user.is_valid or not live_refresh:
         reason = 'security_revoke'
-    elif session.expires_at and now >= session.expires_at:
-        reason = 'absolute_timeout'
-    elif policy['max_idle_time'] and now >= session.last_activity_at + timedelta(minutes=policy['max_idle_time']):
-        reason = 'idle_timeout'
-        session.client_login_idle_expires_at = session.last_activity_at + timedelta(minutes=policy['max_idle_time'])
+    else:
+        deadline, expiry_reason = client_session_deadline(session)
+        if deadline and now >= deadline:
+            reason = expiry_reason
     session.client_login_reason = reason
     if reason:
         if mutate:
@@ -193,17 +206,18 @@ def _session_operation(mutate):
         yield
 
 
-def validate_session(session_id, *, user_id=None, mutate=False):
+def validate_session(session_id, *, mutate=False):
     with _session_operation(mutate):
         queryset = ClientLoginSession.objects.select_related('user')
         if mutate:
             queryset = queryset.select_for_update()
         session = queryset.filter(pk=session_id).first()
-        return bool(session and (user_id is None or session.user_id == user_id)
-                    and _session_is_valid(session, client_login_policy(), timezone.now(), mutate=mutate))
+        return bool(session and _session_is_valid(
+            session, client_login_policy(), timezone.now(), mutate=mutate,
+        ))
 
 
-def _validate_family(application, user_id, family, *, touch=False, mutate=False):
+def _validate_family(application, user_id, family, *, mutate=False):
     policy = client_login_policy()
     queryset = ClientLoginSession.objects.select_related('user')
     if mutate:
@@ -215,23 +229,16 @@ def _validate_family(application, user_id, family, *, touch=False, mutate=False)
         # Every desktop authorization needs its own server-owned login record.
         return None, False
     valid = _session_is_valid(session, policy, timezone.now(), mutate=mutate)
-    if valid and touch:
-        # No client timestamp and no backdating. Validate BEFORE touching idle time.
-        now = timezone.now()
-        if now > session.last_activity_at:
-            session.last_activity_at = now
-            session.save(update_fields=('last_activity_at',))
     return session, valid
 
 
-def validate_access_token(token, *, touch=False, mutate=False):
+def validate_access_token(token, *, mutate=False):
     if not is_client_application(getattr(token, 'application', None)):
         return None
-    mutate = mutate or touch
     with _session_operation(mutate):
         refresh = get_refresh_token_model().objects.filter(access_token_id=token.pk).first()
         session, valid = _validate_family(
-            token.application, token.user_id, refresh.token_family if refresh else None, touch=touch, mutate=mutate,
+            token.application, token.user_id, refresh.token_family if refresh else None, mutate=mutate,
         )
         # A revoked family cannot become valid when all policies are disabled.
         valid = valid and get_access_token_model().objects.filter(pk=token.pk).exists()
@@ -247,6 +254,17 @@ def validate_refresh_token_session(refresh):
         session, valid = _validate_family(refresh.application, refresh.user_id, refresh.token_family, mutate=True)
         refresh.client_login_session = session
         return valid
+
+
+def schedule_client_policy_expiry():
+    """Keep the original lifetime; schedule a separate exit after a policy change."""
+    from django.db.models import Q
+    deadline = timezone.now() + timedelta(minutes=10)
+    ClientLoginSession.objects.filter(
+        application__in=client_applications(), revoked_at__isnull=True,
+    ).filter(Q(policy_expires_at__isnull=True) | Q(policy_expires_at__gt=deadline)).update(
+        policy_expires_at=deadline,
+    )
 
 
 def revoke_client_authorizations(reason='policy_changed'):
@@ -269,28 +287,23 @@ def revoke_client_authorizations(reason='policy_changed'):
 
 
 def clear_client_login_sessions():
-    """Keep terminated rows for 30 days and while credentials/tickets refer to them."""
-    from django.db.models import Exists, OuterRef
-    from authentication.models import ConnectionToken
+    """Keep terminated rows for 30 days and while OAuth credentials refer to them."""
+    from django.db.models import Exists, OuterRef, Q
 
     with client_policy_lock(), transaction.atomic():
         # Authentication checks enforce these deadlines even if cleanup never runs.
         # Reclaim expired families here so page-only limits also release token rows.
         policy = client_login_policy()
         now = timezone.now()
-        expired = models.Q(expires_at__lte=now)
-        if policy['max_idle_time']:
-            expired |= models.Q(last_activity_at__lte=now - timedelta(minutes=policy['max_idle_time']))
         for session in ClientLoginSession.objects.select_related('user').filter(
-            expired, revoked_at__isnull=True,
+            Q(expires_at__lte=now) | Q(policy_expires_at__lte=now), revoked_at__isnull=True,
         ):
             _session_is_valid(session, policy, now, mutate=True)
         refresh_tokens = get_refresh_token_model().objects.filter(
             application_id=OuterRef('application_id'), token_family=OuterRef('token_family'),
         )
-        tickets = ConnectionToken._base_manager.filter(client_login_session_id=OuterRef('pk'))
         sessions = ClientLoginSession.objects.annotate(
-            has_refresh=Exists(refresh_tokens), has_ticket=Exists(tickets),
+            has_refresh=Exists(refresh_tokens),
             has_live_refresh=Exists(refresh_tokens.filter(revoked__isnull=True, access_token__isnull=False)),
         )
         # Tokens may have been revoked by the existing OAuth admin or cleanup path.
@@ -308,4 +321,4 @@ def clear_client_login_sessions():
         ).filter(has_live_session=False)
         get_access_token_model().objects.filter(pk__in=obsolete.values('access_token_id')).delete()
         obsolete.delete()
-        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=30), has_refresh=False, has_ticket=False).delete()
+        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=30), has_refresh=False).delete()

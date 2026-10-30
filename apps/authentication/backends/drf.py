@@ -120,11 +120,11 @@ class PrivateTokenAuthentication(authentication.TokenAuthentication):
 
 
 class OAuth2Authentication(BaseOAuth2Authentication):
-    touch_client_login_session = False
+    allow_locked_client_session = False
 
     def authenticate(self, request):
         from authentication.services.client_login_session import (
-            ClientSessionExpired, expired_session_from_receipt, validate_access_token,
+            ClientSessionExpired, ClientSessionLocked, expired_session_from_receipt, validate_access_token,
         )
 
         user_token = super().authenticate(request)
@@ -141,12 +141,18 @@ class OAuth2Authentication(BaseOAuth2Authentication):
         if user_token:
             _, token = user_token
             try:
-                request.client_login_session = validate_access_token(
-                    token, touch=self.touch_client_login_session and request.method == 'POST',
-                )
+                request.client_login_session = validate_access_token(token)
             except ClientSessionExpired as error:
                 request._request.expired_client_login_session_id = error.session_id
                 raise
+            session = request.client_login_session
+            # Identity-only bootstrap is needed to restore a locked account; asset/business APIs remain blocked.
+            bootstrap = request.method == 'GET' and request.path_info in (
+                '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+                '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+            )
+            if session and session.is_locked and not (self.allow_locked_client_session or bootstrap):
+                raise ClientSessionLocked(session)
             update_token_last_used.delay(tokens=(token,))
         return user_token
 

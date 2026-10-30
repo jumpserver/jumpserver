@@ -232,20 +232,18 @@ class SecuritySessionSerializer(serializers.Serializer):
         label=_('Client login lifetime (minute)'),
         help_text=_(
             'Measured from client login; activity and token refresh do not extend it. '
-            '0 disables the lifetime limit (default). Exit and idle timeout settings still apply. '
+            '0 disables the lifetime limit (default). Exit and idle lock settings still apply. '
             'Log in again when the lifetime ends.'
         ),
     )
-    SECURITY_CLIENT_MAX_IDLE_TIME = serializers.IntegerField(
+    SECURITY_CLIENT_IDLE_LOCK_TIME = serializers.IntegerField(
         min_value=0, max_value=99999, required=False,
-        label=_('Client login idle timeout (minute)'),
+        label=_('Client idle lock (minute)'),
         help_text=_(
-            'Log in again when the idle timeout is reached. 0 disables the limit (default). '
-            'Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. '
-            'An open connection, background output and automatic refresh do not count. '
-            'Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. '
-            'Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. '
-            'Time is measured from the last activity confirmed by the server.'
+            '0 disables automatic locking. After the configured period without system keyboard or mouse '
+            'input, lock the main page and asset windows for the current site and account. Unlock on the '
+            'main page by verifying the lock password online. Locking also applies if no password is '
+            'configured; set it in web personal settings. External application windows are not protected.'
         ),
     )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(

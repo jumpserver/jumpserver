@@ -4,7 +4,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('authentication', '0016_clientloginsession_expires_at'),
+        ('authentication', '0015_client_screen_lock'),
         ('tickets', '0009_ticketassignee_assignee_display_and_more'),
     ]
 

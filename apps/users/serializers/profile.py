@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -6,7 +7,8 @@ from authentication.const import MFAType
 from common.serializers.fields import EncryptedField, LabeledChoiceField, ListMultipleChoiceField
 from common.utils import validate_ssh_public_key
 from .user import UserSerializer
-from ..models import User, MFAMixin
+from ..models import User, MFAMixin, Preference
+from .preference.lina import FileEncryptSerializer
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
@@ -209,3 +211,46 @@ class UserPermsSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class ClientLockPasswordSerializer(serializers.Serializer):
+    has_password = serializers.SerializerMethodField(label=_('Configured'))
+    password = EncryptedField(required=False, allow_blank=True, max_length=128,
+                              trim_whitespace=False, label=_('New password'))
+    password_again = EncryptedField(required=False, allow_blank=True, max_length=128,
+                                    trim_whitespace=False, label=_('Confirm password'))
+
+    def get_has_password(self, obj):
+        return Preference.objects.filter(user=self.context['request'].user, category='client',
+                                         name='client_lock_password_hash').exists()
+
+    def validate(self, attrs):
+        password = attrs.get('password', '')
+        confirmation = attrs.pop('password_again', '')
+        if password != confirmation:
+            raise serializers.ValidationError({'password_again': _('The newly set password is inconsistent')})
+        if not password:
+            return {}
+        from ..utils import check_password_rules
+        if not check_password_rules(password, is_org_admin=self.context['request'].user.is_org_admin):
+            raise serializers.ValidationError({'password': _('Password does not match security rules')})
+        return {'password': make_password(password)}
+
+
+class UserClientCredentialsSerializer(serializers.Serializer):
+    lock = ClientLockPasswordSerializer(required=False, label=_('Client lock password'))
+    file = FileEncryptSerializer(required=False, label=_('File Encryption'))
+
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        lock_password = validated_data.get('lock', {}).get('password')
+        if lock_password:
+            Preference.objects.update_or_create(user=user, name='client_lock_password_hash', defaults={
+                'category': 'client', 'value': lock_password, 'encrypted': False,
+            })
+        secret_key = validated_data.get('file', {}).get('secret_key')
+        if secret_key:
+            Preference.objects.update_or_create(user=user, name='secret_key', defaults={
+                'category': 'lina', 'value': Preference.encrypt(secret_key), 'encrypted': True,
+            })
+        return instance
