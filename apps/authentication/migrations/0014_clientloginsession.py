@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('token_family', models.UUIDField()),
                 ('authenticated_at', models.DateTimeField()),
+                ('expires_at', models.DateTimeField(blank=True, db_index=True, null=True)),
                 ('last_activity_at', models.DateTimeField()),
                 ('revoked_at', models.DateTimeField(blank=True, db_index=True, null=True)),
                 ('revoke_reason', models.CharField(blank=True, default='', max_length=32, choices=[
