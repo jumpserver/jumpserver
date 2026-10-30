@@ -1,3 +1,4 @@
+from .workflow import WorkflowACLSerializerMixin
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from common.serializers import MethodSerializer
@@ -14,7 +15,7 @@ from ..models import LoginAssetACL
 __all__ = ["LoginAssetACLSerializer"]
 
 
-class LoginAssetACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
+class LoginAssetACLSerializer(WorkflowACLSerializerMixin, BaseSerializer, BulkOrgResourceModelSerializer):
     rules = MethodSerializer(label=_('Rule'))
     action = LabeledChoiceField(
         choices=((ActionChoices.accept, _('Allow')), (ActionChoices.reject, _('Reject'))),
@@ -37,7 +38,7 @@ class LoginAssetACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
 
     class Meta(BaseSerializer.Meta):
         model = LoginAssetACL
-        fields = BaseSerializer.Meta.fields + ['rules', 'review_duration', 'recipients', *LoginAssetACL.CONTROL_FIELDS]
+        fields = BaseSerializer.Meta.fields + ['rules', 'review_duration', 'workflow', 'recipients', *LoginAssetACL.CONTROL_FIELDS]
         extra_kwargs = {
             **BaseSerializer.Meta.extra_kwargs,
             'priority': {
@@ -125,7 +126,8 @@ class LoginAssetACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
         attrs = super().validate(attrs)
         action = attrs.get('action', getattr(self.instance, 'action', ActionChoices.reject))
         review_enabled = attrs.get('review_enabled', getattr(self.instance, 'review_enabled', False))
-        if action == ActionChoices.accept and review_enabled:
+        workflow = attrs.get('workflow', getattr(self.instance, 'workflow', None))
+        if action == ActionChoices.accept and review_enabled and not workflow:
             reviewers = attrs.get('reviewers')
             if reviewers is None:
                 reviewers = self.instance.reviewers.all() if self.instance else []

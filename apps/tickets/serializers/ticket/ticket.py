@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import gettext
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -9,9 +10,11 @@ from common.utils.timezone import dt_formatter, dt_parser
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
-from tickets.const import TicketType, TicketStatus, TicketState, TicketLevel, StepState
-from tickets.models import Ticket, TicketAssignee, TicketFlow
+from tickets.const import TicketType, TicketStatus, TicketState, TicketOrigin, TicketLevel, StepState
+from tickets.models import Ticket, TicketAssignee, Workflow
 from users.models import User
+from tickets.plugins import get_ticket_plugin, ticket_type_choices
+from tickets.workflow.const import NodeState
 
 __all__ = [
     'TicketApplySerializer', 'TicketApproveSerializer', 'TicketSerializer',
@@ -36,10 +39,10 @@ class TicketProcessMapField(serializers.JSONField):
             else:
                 date = None
             details = [
-                (_('Approve level'), dict(TicketLevel.choices).get(step.get('approval_level'))),
+                (_('Approve level'), step.get('name') or dict(TicketLevel.choices).get(step.get('approval_level'), step.get('approval_level'))),
                 (_('Reviewers'), ', '.join(step.get('assignees_display') or [])),
                 (_('Processor'), step.get('processor_display')),
-                (_('State'), dict(StepState.choices).get(state, state)),
+                (_('State'), {**dict(NodeState.choices), **dict(StepState.choices)}.get(state, state)),
                 (_('Date'), date),
             ]
             rows.append('; '.join(f'{label}: {content or "-"}' for label, content in details))
@@ -70,13 +73,28 @@ class TicketSnapshotField(serializers.JSONField):
         return '\n'.join(rows) or '-'
 
 
+class TicketRequestItemsField(serializers.SerializerMethodField):
+    def to_file_representation(self, value):
+        rows = []
+        for item in value:
+            content = item['value']
+            if isinstance(content, list):
+                content = ', '.join(str(part) for part in content)
+            if content is None or content == '':
+                content = '-'
+            rows.append(f"{item['label']}: {content}")
+        return '\n'.join(rows) or '-'
+
+
 class TicketSerializer(OrgResourceModelSerializerMixin):
+    applicant = ObjectRelatedField(read_only=True, attrs=('id', 'name', 'username'))
     type = LabeledChoiceField(choices=TicketType.choices, read_only=True, label=_('Type'))
     status = LabeledChoiceField(
         choices=TicketStatus.choices, read_only=True,
         label=_('Ticket status'),
         help_text=_('Indicates whether the ticket is open or finished')
     )
+    origin = LabeledChoiceField(choices=TicketOrigin.choices, read_only=True, label=_('Ticket origin'))
     state = LabeledChoiceField(
         choices=TicketState.choices, read_only=True,
         label=_('Approval result'),
@@ -91,19 +109,87 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     cc_users = ObjectRelatedField(
         many=True, read_only=True, attrs=('id', 'name', 'username'), label=_('CC users')
     )
-    flow = TicketFlowField(
+    workflow = TicketFlowField(
         read_only=True, attrs=('id', 'name'), label=_('Ticket flow')
     )
+
+    workflow_instance = serializers.SerializerMethodField()
+    my_tasks = serializers.SerializerMethodField()
+    request_items = TicketRequestItemsField(label=_('Request parameters'))
+    execution_mode = serializers.SerializerMethodField()
+    result = serializers.SerializerMethodField()
+    source_ticket = serializers.SerializerMethodField()
+    reapply_action = serializers.SerializerMethodField()
+
+    def get_reapply_action(self, obj):
+        view = self.context.get('view')
+        if not view or view.action not in ('list', 'retrieve'):
+            return None
+        from tickets.plugins.reapply import can_reapply
+        user = getattr(self.context.get('request'), 'user', None)
+        return 'reapply' if can_reapply(obj, user, self.context.setdefault('reapply_memberships', {})) else None
+
+    def get_source_ticket(self, obj):
+        view = self.context.get('view')
+        if view and view.action != 'retrieve':
+            return None
+        source = obj.meta.get('source_ticket')
+        if not source:
+            return None
+        from tickets.models import Ticket
+        from orgs.utils import tmp_to_org
+        user = getattr(self.context.get('request'), 'user', None)
+        can_view = False
+        if user:
+            with tmp_to_org(source['org_id']):
+                can_view = Ticket.get_user_related_tickets(user).filter(pk=source['id']).exists()
+                if not can_view and 'audits.view_ticketaudit' in user.get_all_permissions():
+                    can_view = Ticket.objects.filter(pk=source['id'], org_id=source['org_id']).exists()
+        return {**source, 'can_view': can_view}
+
+    @staticmethod
+    def get_request_items(obj):
+        items = get_ticket_plugin(obj.type).request_items(obj)
+        if obj.request_data.get('resource_description'):
+            items = [item for item in items if item['name'] != 'resource_description']
+            items.insert(0, {'name': 'resource_description', 'label': str(_('Purpose and resource description')),
+                             'value': obj.request_data['resource_description']})
+        return items
+
+    @staticmethod
+    def get_execution_mode(obj):
+        return get_ticket_plugin(obj.type).get_execution_mode(obj)
+
+    def get_result(self, obj):
+        view = self.context.get('view')
+        if not view or view.action != 'retrieve':
+            return None
+        request = self.context.get('request')
+        return get_ticket_plugin(obj.type).get_result(obj, request.user if request else None)
+
+    @staticmethod
+    def get_workflow_instance(obj):
+        instance = getattr(obj, 'workflow_instance', None)
+        return str(instance.pk) if instance else None
+
+    def get_my_tasks(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return []
+        return [str(pk) for pk in obj.approval_tasks.filter(
+            assignee=request.user, state='pending', node_instance__instance__state='running'
+        ).values_list('pk', flat=True)]
 
     class Meta:
         model = Ticket
         fields_mini = ['id', 'title']
-        fields_small = fields_mini + ['org_id', 'flow', 'comment']
+        fields_small = fields_mini + ['org_id', 'workflow', 'comment']
         fields_m2m = ['cc_users']
         read_only_fields = [
             'serial_num', 'process_map', 'approval_step', 'type',
-            'state', 'applicant', 'status', 'date_created',
-            'date_updated', 'org_name', 'rel_snapshot', 'login_asset_connections'
+            'state', 'applicant', 'status', 'origin', 'date_created',
+            'date_updated', 'org_name', 'rel_snapshot', 'workflow_instance', 'my_tasks',
+            'request_data', 'request_items', 'execution_mode', 'result', 'source_ticket', 'reapply_action', 'login_asset_connections'
         ]
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
@@ -116,7 +202,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         tp = self.fields.get('type')
         if not tp:
             return
-        choices = tp.choices
+        choices = dict(ticket_type_choices())
         choices.pop(TicketType.general, None)
         tp.choices = choices.items()
 
@@ -130,20 +216,20 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             for entry in entries
         )
         tokens = {}
-        ticket = None
+        ticket = instance
         if not complete:
-            from tickets.models import ApplyLoginAssetTicket
-            ticket = instance if isinstance(instance, ApplyLoginAssetTicket) else instance.applyloginassetticket
             with tmp_to_org(instance.org_id):
                 if entries is None:
-                    asset = ticket.apply_login_asset
+                    from assets.models import Asset
+                    asset_id = ticket.request_data.get('apply_login_asset')
+                    asset = Asset.objects.filter(pk=asset_id).first() if asset_id else None
                     return [{
                         'asset': {
-                            'id': str(ticket.apply_login_asset_id or ''),
+                            'id': str(ticket.request_data.get('apply_login_asset') or ''),
                             'name': asset.name if asset else ticket.rel_snapshot.get('apply_login_asset', ''),
                             'address': asset.address if asset else '',
                         },
-                        'account': ticket.apply_login_account, 'reason': ticket.comment or '',
+                        'account': ticket.request_data.get('apply_login_account', ''), 'reason': ticket.comment or '',
                     }]
                 tokens = {str(token.pk): token for token in ticket.connection_tokens.select_related('asset')}
         rows = []
@@ -152,7 +238,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             if token and (
                     str(token.asset_id) != entry.get('asset_id')
                     or (token.acl_context or {}).get('username') != entry.get('account')
-                    or str(token.user_id) != str(ticket.apply_login_user_id)
+                    or str(token.user_id) != str(ticket.applicant_id)
             ):
                 token = None
             if 'reason' not in entry and not token:
@@ -178,12 +264,12 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     @classmethod
     def setup_eager_loading(cls, queryset):
         ticket_assignees = TicketAssignee.objects.select_related('assignee')
-        return queryset.select_related('applicant', 'flow').prefetch_related(
+        return queryset.select_related('applicant', 'workflow', 'workflow_instance').prefetch_related(
             Prefetch(
                 'ticket_steps__ticket_assignees',
                 queryset=ticket_assignees,
             ),
-            'cc_users',
+            'cc_users', 'beneficiaries',
         )
 
 
@@ -194,58 +280,38 @@ class TicketApproveSerializer(TicketSerializer):
 
 
 class TicketApplySerializer(TicketSerializer):
-    flow_id = serializers.UUIDField(
-        required=False, write_only=True, label=_('Ticket flow')
-    )
-    org_id = serializers.CharField(
-        required=True, max_length=36, allow_blank=True, label=_("Organization")
-    )
-    applicant = serializers.CharField(required=False, allow_blank=True)
+    workflow_id = serializers.UUIDField(required=True, write_only=True, label=_('Workflow'))
+    org_id = serializers.CharField(required=True, max_length=36, label=_("Organization"))
+    applicant = serializers.UUIDField(required=False, source='applicant_id')
 
     class Meta(TicketSerializer.Meta):
-        fields = TicketSerializer.Meta.fields + ['flow_id']
-
-    def get_applicant(self, applicant_id):
-        current_user = self.context['request'].user
-        want_applicant = User.objects.filter(id=applicant_id).first()
-        if want_applicant and current_user.has_perm('tickets.add_superticket'):
-            applicant = want_applicant
-        else:
-            applicant = current_user
-        return applicant
-
-    @staticmethod
-    def validate_org_id(org_id):
-        org = Organization.get_instance(org_id)
-        if not org:
-            error = _('The organization `{}` does not exist'.format(org_id))
-            raise serializers.ValidationError(error)
-        return org_id
+        fields = TicketSerializer.Meta.fields + ['workflow_id']
 
     def validate(self, attrs):
+        from orgs.utils import tmp_to_root_org
+        from tickets.workflow.approvers import available_users
+        from rest_framework.exceptions import PermissionDenied
         if self.instance:
-            attrs.pop('flow_id', None)
-            return attrs
-
-        ticket_type = attrs.get('type')
-        org_id = attrs.get('org_id')
-        flow_id = attrs.pop('flow_id', None)
-        flows = TicketFlow.get_org_related_flows(org_id=org_id).filter(
-            type=ticket_type
-        ).order_by('date_created')
-        if flow_id:
-            flow = flows.filter(id=flow_id).first()
-            if not flow:
-                error = _('The selected ticket flow is not available')
-                raise serializers.ValidationError({'flow_id': error})
-        else:
-            if flows.count() > 1:
-                error = _('Please select a ticket flow')
-                raise serializers.ValidationError({'flow_id': error})
-            flow = flows.first()
-        if not flow:
-            error = _('The ticket flow `{}` does not exist'.format(ticket_type))
-            raise serializers.ValidationError(error)
-        attrs['flow'] = flow
-        attrs['applicant'] = self.get_applicant(attrs.get('applicant'))
+            raise serializers.ValidationError(gettext('Submitted requests are immutable. Withdraw and submit a new request.'))
+        org_id = attrs['org_id']
+        if org_id == Organization.ROOT_ID or not Organization.objects.filter(pk=org_id).exists():
+            raise serializers.ValidationError({'org_id': gettext('Select a concrete organization.')})
+        user = self.context['request'].user
+        applicant_id = attrs.pop('applicant_id', user.pk)
+        if applicant_id != user.pk:
+            raise PermissionDenied(gettext('The applicant must be the submitting user. Select authorized users in the request parameters.'))
+        applicant = available_users(org_id).filter(pk=applicant_id).first()
+        if not applicant:
+            raise serializers.ValidationError({'applicant': gettext('Select an active member of this organization.')})
+        if applicant_id == user.pk and not available_users(org_id).filter(pk=user.pk).exists():
+            raise PermissionDenied()
+        workflow_id = attrs.pop('workflow_id')
+        with tmp_to_root_org():
+            workflow = Workflow.objects.filter(
+                pk=workflow_id, org_id__in=[org_id, Organization.ROOT_ID],
+                type=attrs['type'], enabled=True, active_version__published_at__isnull=False,
+            ).first()
+        if not workflow:
+            raise serializers.ValidationError({'workflow_id': gettext('Select an enabled, published workflow for this organization and type.')})
+        attrs.update(workflow=workflow, applicant=applicant)
         return attrs

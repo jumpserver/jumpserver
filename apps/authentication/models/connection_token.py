@@ -71,7 +71,7 @@ class ConnectionToken(JMSOrgBaseModel):
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
     date_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_("Date last used"))
     from_ticket = models.ForeignKey(
-        'tickets.ApplyLoginAssetTicket', related_name='connection_tokens',
+        'tickets.Ticket', related_name='connection_tokens',
         on_delete=models.SET_NULL, null=True, blank=True,
         verbose_name=_('From ticket')
     )

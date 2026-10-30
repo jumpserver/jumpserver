@@ -17504,3 +17504,1131 @@ msgstr "客户端登录策略已变更"
 
 msgid "Authorization revoked"
 msgstr "授权已撤销"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "资产负责人"
+
+msgid "Manager"
+msgstr "直属负责人"
+
+msgid "Workflow"
+msgstr "审批流程"
+
+msgid "Approval workflow"
+msgstr "审批流程"
+
+msgid "Workflow version"
+msgstr "流程版本"
+
+msgid "Workflow instance"
+msgstr "流程实例"
+
+msgid "Workflow node"
+msgstr "流程节点"
+
+msgid "Workflow edge"
+msgstr "流程连线"
+
+msgid "Workflow node instance"
+msgstr "节点实例"
+
+msgid "Approval task"
+msgstr "审批任务"
+
+msgid "Workflow event"
+msgstr "流程事件"
+
+#: tickets/plugins
+msgid "View account password"
+msgstr "查看账号密码"
+
+#: tickets/plugins
+msgid "Change account password"
+msgstr "账号改密"
+
+#: tickets/plugins
+msgid "File upload / download"
+msgstr "文件上传下载"
+
+#: tickets/plugins
+msgid "Download session recording"
+msgstr "会话录屏下载"
+
+#: tickets/plugins
+msgid "Authorized users"
+msgstr "授权用户"
+
+#: tickets/plugins
+msgid "Request parameters"
+msgstr "申请参数"
+
+#: tickets/plugins
+msgid "Validity (seconds)"
+msgstr "有效时长（秒）"
+
+#: tickets/plugins
+msgid "File paths"
+msgstr "文件路径"
+
+#: tickets/plugins
+msgid "Direction"
+msgstr "方向"
+
+#: tickets/serializers/ticket/ticket.py
+#: tickets/serializers/ticket/apply_asset.py
+#: tickets/plugins/view_secret/serializer.py
+msgid "Purpose and resource description"
+msgstr "申请用途／资源说明"
+
+#: apps/perms/templates/perms/_asset_permission_renewal_links.html:3
+msgid "Apply for renewal"
+msgstr "申请续期"
+
+msgid "WinRM file transfer root"
+msgstr "WinRM 文件传输根目录"
+
+msgid "Absolute Windows directory; home uses the connected account home directory."
+msgstr "Windows 绝对目录；home 表示连接账号的用户目录。"
+
+msgid "Select one Linux SSH/SFTP or Windows WinRM account."
+msgstr "请选择一个 Linux SSH/SFTP 或 Windows WinRM 账号。"
+
+
+#: accounts/api/account/ticket_secret.py:46 accounts/ticket_secret.py:21
+#: tickets/plugins/view_secret/plugin.py:31
+#: tickets/plugins/view_secret/plugin.py:41
+msgid "Account password viewing is disabled."
+msgstr "账号密码查看功能已关闭。"
+
+#: accounts/api/account/ticket_secret.py:53
+msgid "The requested password account is no longer available."
+msgstr "申请查看密码的账号已不可用。"
+
+#: accounts/api/account/ticket_secret.py:91
+#, python-format
+msgid "View password for %(account)s"
+msgstr "查看 %(account)s 的密码"
+
+#: accounts/ticket_secret.py:28 accounts/ticket_secret.py:30
+msgid "No active approval for this account."
+msgstr "此账号没有有效的审批授权。"
+
+#: accounts/ticket_secret.py:32
+msgid "The approved user is no longer in this organization."
+msgstr "获批用户已不属于此组织。"
+
+#: accounts/ticket_secret.py:40
+msgid "The approved account is no longer available."
+msgstr "获批账号已不可用。"
+
+#: accounts/ticket_secret.py:43
+msgid "The approved account has no password."
+msgstr "获批账号没有密码。"
+
+#: assets/serializers/asset/common.py:216
+msgid "Select an organization before assigning an asset owner."
+msgstr "请先选择组织，再指定资产负责人。"
+
+#: assets/serializers/asset/common.py:219
+msgid "The asset owner must be an active user in the asset organization."
+msgstr "资产负责人必须是资产所属组织内已启用的用户。"
+
+#: authentication/backends/drf.py:98
+msgid "Invalid token."
+msgstr "令牌无效。"
+
+#: authentication/utils.py:46
+msgid "Invalid RDP security layer."
+msgstr "RDP 安全层无效。"
+
+#: common/utils/verify_code.py:51
+msgid "Send verify code email"
+msgstr "发送验证码邮件"
+
+#: common/utils/verify_code.py:55
+msgid ""
+"When resetting a password, forgetting a password, or verifying MFA, this task needs to\n"
+"        be executed to send verification code emails"
+msgstr "在重置密码、忘记密码或验证 MFA 时，执行此任务发送验证码邮件。"
+
+#: jumpserver/context_processor.py:31
+msgid "FIT2CLOUD"
+msgstr "飞致云"
+
+#: ops/api/celery.py:211
+msgid ""
+"Verification code tasks cannot be run again. Please request a new code from "
+"the verification page."
+msgstr "验证码任务不能重新执行，请在验证页面获取新的验证码。"
+
+#: settings/serializers/feature.py:28
+#, python-format
+msgid ""
+"Run Ansible jobs in the persistent container (%(image)s) over SSH. To run "
+"jobs locally instead, disable \"Docker isolation for Ansible\" under System "
+"Settings > Feature Settings > Job Center. Configure the executor address and"
+" SSH credentials before enabling isolation."
+msgstr ""
+"通过 SSH 在常驻容器（%(image)s）中运行 Ansible 作业。如需在本地运行，请在系统设置 > 功能设置 > 作业中心关闭“Ansible"
+" Docker 隔离”。启用隔离前，请配置执行器地址和 SSH 凭据。"
+
+#: terminal/api/applet/host.py:120
+msgid "This builtin applet is retired and cannot be published again."
+msgstr "此内置应用已停用，不能再次发布。"
+
+#: tickets/api/plugin.py:24 tickets/api/plugin.py:44
+#: tickets/serializers/ticket/ticket.py:298
+msgid "Select a concrete organization."
+msgstr "请选择具体组织。"
+
+#: tickets/api/plugin.py:38
+msgid "This ticket type does not accept files."
+msgstr "此工单类型不支持上传文件。"
+
+#: tickets/api/plugin.py:49
+msgid "Upload one file at a time."
+msgstr "请每次上传一个文件。"
+
+#: tickets/api/ticket.py:169 tickets/api/ticket.py:173
+msgid "Use the approval-task endpoint with an exact task ID."
+msgstr "请使用具体审批任务 ID，通过审批任务入口操作。"
+
+#: tickets/api/ticket.py:185
+msgid "Use exact approval-task IDs."
+msgstr "请指定具体的审批任务 ID。"
+
+#: tickets/api/workflow.py:146 tickets/serializers/ticket/ticket.py:305
+msgid "Select an active member of this organization."
+msgstr "请选择此组织内已启用的成员。"
+
+#: tickets/const.py:32
+msgid "Manual request"
+msgstr "手动申请"
+
+#: tickets/const.py:33
+msgid "System triggered"
+msgstr "系统触发"
+
+#: tickets/filters.py:20
+msgid "Beneficiary ID"
+msgstr "使用者 ID"
+
+#: tickets/filters.py:48 tickets/models/ticket/general.py:280
+#: tickets/serializers/ticket/ticket.py:97
+msgid "Ticket origin"
+msgstr "工单来源"
+
+#: tickets/models/instance.py:17 tickets/models/instance.py:37
+msgid "Workflow context and identity are immutable."
+msgstr "不能修改流程上下文和身份信息。"
+
+#: tickets/models/relation.py:30
+msgid "Ticket beneficiary"
+msgstr "工单使用者"
+
+#: tickets/models/workflow.py:31
+msgid "Apply for asset access on behalf of another user"
+msgstr "为其他用户申请资产授权"
+
+#: tickets/models/workflow.py:52 tickets/workflow/const.py:6
+msgid "Start"
+msgstr "开始"
+
+#: tickets/models/workflow.py:52 tickets/workflow/const.py:10
+msgid "End"
+msgstr "结束"
+
+#: tickets/models/workflow.py:57
+#, python-brace-format
+msgid "Approval {level}"
+msgstr "第 {level} 级审批"
+
+#: tickets/models/workflow.py:78
+msgid "Published workflow versions are immutable. Create a new version."
+msgstr "已发布的流程版本不能修改，请创建新版本。"
+
+#: tickets/models/workflow.py:89
+msgid "Workflow definition identity cannot be updated in bulk."
+msgstr "不能批量修改流程定义的标识信息。"
+
+#: tickets/models/workflow.py:100
+msgid "Create workflow versions through the publication service."
+msgstr "请通过流程发布操作创建流程版本。"
+
+#: tickets/models/workflow.py:102
+msgid "Workflow definitions do not support upserts."
+msgstr "流程定义不支持在批量创建冲突时更新。"
+
+#: tickets/models/workflow.py:122
+msgid "Workflow definition identity cannot be changed."
+msgstr "不能修改流程定义的标识信息。"
+
+#: tickets/models/workflow.py:194
+msgid "Workflow edges must connect nodes in the same version."
+msgstr "流程连线只能连接同一版本内的节点。"
+
+#: tickets/notifications.py:191
+msgid "An asset authorization request for you has been processed"
+msgstr "为您申请的资产授权工单已处理"
+
+#: tickets/plugins/apply_asset/handler.py:16
+msgid "Select active organization members as authorized users."
+msgstr "请选择组织内已启用的成员作为授权用户。"
+
+#: tickets/plugins/apply_asset/handler.py:27
+msgid "A requested node was deleted or moved."
+msgstr "申请的节点已被删除或移动。"
+
+#: tickets/plugins/apply_asset/handler.py:31
+msgid "A requested node belongs to another organization."
+msgstr "申请的节点属于其他组织。"
+
+#: tickets/plugins/apply_asset/handler.py:39
+msgid "Select existing assets and accounts before submitting the request."
+msgstr "请先选择现有资产和账号，再提交申请。"
+
+#: tickets/plugins/apply_asset/handler.py:41
+msgid "A valid access period is required."
+msgstr "请设置有效的访问时间范围。"
+
+#: tickets/plugins/apply_asset/handler.py:58
+msgid "Select valid asset actions."
+msgstr "请选择有效的资产操作权限。"
+
+#: tickets/plugins/apply_asset/handler.py:87
+msgid "An authorized user is no longer an active organization member."
+msgstr "授权用户已不再是组织内的有效成员。"
+
+#: tickets/plugins/apply_asset/handler.py:91
+msgid "A dynamic account username changed. Submit a new request."
+msgstr "动态账号的用户名已变更，请重新申请。"
+
+#: tickets/plugins/apply_asset/handler.py:96
+msgid "A requested asset was deleted or moved. Submit a new request."
+msgstr "申请的资产已被删除或移动，请重新申请。"
+
+#: tickets/plugins/apply_asset/handler.py:109
+msgid "The requested access period has already expired."
+msgstr "申请的访问时间范围已过期。"
+
+#: tickets/plugins/apply_asset/plugin.py:62
+#: tickets/serializers/ticket/apply_asset.py:85
+msgid ""
+"Requests for another user require organization administrator approval on "
+"every path."
+msgstr "为其他用户申请时，每条审批路径都必须经过组织管理员审批。"
+
+#: tickets/plugins/apply_asset/reapply.py:45
+msgid "Only the applicant or authorized beneficiary can reuse this request."
+msgstr "仅申请人或获授权的使用者可以再次申请此工单。"
+
+#: tickets/plugins/apply_asset/reapply.py:67
+msgid "Select active assets currently available for application."
+msgstr "请选择当前可申请且已启用的资产。"
+
+#: tickets/plugins/apply_asset/reapply.py:71
+msgid "Select existing active accounts on the requested assets."
+msgstr "请选择申请资产上现有且已启用的账号。"
+
+#: tickets/plugins/apply_asset/reapply.py:73
+msgid "A beneficiary can only renew access for themselves."
+msgstr "使用者只能为自己续期访问权限。"
+
+#: tickets/plugins/apply_asset/reapply.py:75
+msgid "Select a future expiration time."
+msgstr "请选择晚于当前时间的过期时间。"
+
+#: tickets/plugins/apply_asset/reapply.py:87 tickets/plugins/reapply.py:46
+msgid "This request cannot be reapplied for by this user."
+msgstr "此用户不能再次申请该工单。"
+
+#: tickets/plugins/apply_asset/resources.py:32
+#: tickets/plugins/view_secret/serializer.py:39
+#: tickets/serializers/ticket/common.py:17
+msgid "Resources must belong to the selected organization."
+msgstr "资源必须属于所选组织。"
+
+#: tickets/plugins/base.py:86
+msgid "Unknown ticket action."
+msgstr "未知的工单操作。"
+
+#: tickets/plugins/base.py:126 tickets/plugins/download_replay/plugin.py:100
+#: tickets/workflow/resources.py:202
+msgid "Unknown resource field."
+msgstr "未知的资源字段。"
+
+#: tickets/plugins/base.py:128
+msgid "This ticket type has no resource options."
+msgstr "此工单类型没有可选资源。"
+
+#: tickets/plugins/change_secret/execution.py:34
+msgid "The requested accounts changed. Submit a new request."
+msgstr "申请的账号已变更，请重新申请。"
+
+#: tickets/plugins/change_secret/execution.py:36
+msgid "The applicant is no longer eligible for this operation."
+msgstr "申请人已无权执行此操作。"
+
+#: tickets/plugins/change_secret/execution.py:60
+msgid "The password change execution conflicts with an existing task."
+msgstr "此次改密执行与现有任务冲突。"
+
+#: tickets/plugins/change_secret/execution.py:114
+msgid "The execution no longer matches the approved resources."
+msgstr "执行内容与获批资源已不一致。"
+
+#: tickets/plugins/change_secret/serializer.py:10
+msgid "Select active password accounts that allow password changes."
+msgstr "请选择已启用且允许改密的密码账号。"
+
+#: tickets/plugins/change_secret/serializer.py:16
+msgid "A valid license is required to change account passwords."
+msgstr "修改账号密码需要有效的许可证。"
+
+#: tickets/plugins/change_secret/serializer.py:24
+msgid "Enable password changes on the asset platform first."
+msgstr "请先在资产平台中启用改密功能。"
+
+#: tickets/plugins/command_confirm/plugin.py:21
+msgid "The command session asset no longer exists."
+msgstr "命令会话对应的资产已不存在。"
+
+#: tickets/plugins/download_replay/actions.py:29
+msgid "No active approval for this session recording."
+msgstr "此会话录像没有有效的审批授权。"
+
+#: tickets/plugins/download_replay/actions.py:38
+msgid "The approved session recording changed."
+msgstr "获批的会话录像已变更。"
+
+#: tickets/plugins/download_replay/actions.py:50
+#: tickets/plugins/download_replay/plugin.py:46
+msgid "The requested session recording is no longer available."
+msgstr "申请的会话录像已不可用。"
+
+#: tickets/plugins/download_replay/plugin.py:42
+msgid "The session recording approval is not valid."
+msgstr "会话录像审批授权无效。"
+
+#: tickets/plugins/download_replay/plugin.py:129
+msgid "The requested session no longer exists."
+msgstr "申请的会话已不存在。"
+
+#: tickets/plugins/download_replay/serializer.py:23
+msgid "Select an accessible session in this organization."
+msgstr "请选择此组织内有权访问的会话。"
+
+#: tickets/plugins/file_transfer/actions.py:30
+msgid "The file is no longer available."
+msgstr "文件已不可用。"
+
+#: tickets/plugins/file_transfer/actions.py:46
+msgid ""
+"Execution uses the approved files and paths; parameters cannot be changed."
+msgstr "执行时使用获批的文件和路径，不能修改参数。"
+
+#: tickets/plugins/file_transfer/actions.py:75
+msgid "Only the applicant and assigned reviewers can inspect uploaded files."
+msgstr "仅申请人和指定审批人可以查看上传的文件。"
+
+#: tickets/plugins/file_transfer/actions.py:89
+msgid "This file has not been retrieved successfully."
+msgstr "此文件尚未成功获取。"
+
+#: tickets/plugins/file_transfer/plugin.py:40
+msgid "Existing access to every requested account is required."
+msgstr "必须已拥有所有申请账号的访问权限。"
+
+#: tickets/plugins/file_transfer/plugin.py:65
+msgid "The uploaded files expired. Submit a new request."
+msgstr "上传的文件已过期，请重新申请。"
+
+#: tickets/plugins/file_transfer/plugin.py:83
+msgid "The requested account access changed. Submit a new request."
+msgstr "申请账号的访问权限已变更，请重新申请。"
+
+#: tickets/plugins/file_transfer/policy.py:28
+msgid ""
+"Use an absolute Windows drive path without device names, streams or "
+"wildcards."
+msgstr "请使用 Windows 驱动器绝对路径，不得包含设备名称、数据流或通配符。"
+
+#: tickets/plugins/file_transfer/policy.py:33
+msgid "Use an absolute Linux path without wildcards or relative components."
+msgstr "请使用 Linux 绝对路径，不得包含通配符或相对路径片段。"
+
+#: tickets/plugins/file_transfer/policy.py:55
+msgid "Invalid file transfer approval."
+msgstr "文件传输审批授权无效。"
+
+#: tickets/plugins/file_transfer/policy.py:57
+msgid "Only the applicant can execute or download this transfer."
+msgstr "仅申请人可以执行传输或下载传输文件。"
+
+#: tickets/plugins/file_transfer/policy.py:60
+msgid "No active file transfer approval."
+msgstr "没有有效的文件传输审批授权。"
+
+#: tickets/plugins/file_transfer/policy.py:64
+msgid "The approved asset or applicant is no longer available."
+msgstr "获批资产或申请人已不可用。"
+
+#: tickets/plugins/file_transfer/policy.py:73
+msgid "The approved account access changed."
+msgstr "获批账号的访问权限已变更。"
+
+#: tickets/plugins/file_transfer/policy.py:76
+msgid "The approved asset connection changed."
+msgstr "获批资产的连接信息已变更。"
+
+#: tickets/plugins/file_transfer/policy.py:80
+msgid "The connection is restricted by an access control rule."
+msgstr "此连接受到访问控制规则限制。"
+
+#: tickets/plugins/file_transfer/policy.py:89
+msgid "File transfer is excluded by the asset permission policy."
+msgstr "资产授权规则不允许文件传输。"
+
+#: tickets/plugins/file_transfer/serializer.py:15
+msgid "Target directory"
+msgstr "目标目录"
+
+#: tickets/plugins/file_transfer/serializer.py:17
+msgid "Files"
+msgstr "文件"
+
+#: tickets/plugins/file_transfer/serializer.py:20
+msgid "Select active accounts with existing access."
+msgstr "请选择已启用且已有访问权限的账号。"
+
+#: tickets/plugins/file_transfer/serializer.py:39
+msgid "Select an unambiguous password or SSH key account."
+msgstr "请选择可唯一确定的密码或 SSH 密钥账号。"
+
+#: tickets/plugins/file_transfer/serializer.py:43
+msgid "Provide files and a target directory for upload."
+msgstr "请提供要上传的文件和目标目录。"
+
+#: tickets/plugins/file_transfer/serializer.py:51
+msgid "Upload available files belonging to this organization."
+msgstr "请上传属于此组织的有效文件。"
+
+#: tickets/plugins/file_transfer/serializer.py:58
+msgid "Duplicate file names are not allowed."
+msgstr "文件名不能重复。"
+
+#: tickets/plugins/file_transfer/serializer.py:61
+msgid "Provide exact file paths for download."
+msgstr "请提供要下载的文件的完整路径。"
+
+#: tickets/plugins/file_transfer/serializer.py:66
+msgid "Provide distinct file paths."
+msgstr "文件路径不能重复。"
+
+#: tickets/plugins/file_transfer/storage.py:34
+msgid "File exceeds the transfer size limit."
+msgstr "文件超出传输大小限制。"
+
+#: tickets/plugins/file_transfer/storage.py:48
+msgid "Invalid file name or file exceeds the transfer size limit."
+msgstr "文件名无效，或文件超出传输大小限制。"
+
+#: tickets/plugins/file_transfer/storage.py:54
+msgid ""
+"Too many retained ticket files. Wait for expired files to be cleaned up."
+msgstr "保留的工单文件过多，请等待过期文件清理后重试。"
+
+#: tickets/plugins/file_transfer/storage.py:85
+msgid "Files are missing, already submitted, or have duplicate names."
+msgstr "文件不存在、已提交，或文件名重复。"
+
+#: tickets/plugins/file_transfer/storage.py:88
+msgid "The uploaded file is no longer available."
+msgstr "上传的文件已不可用。"
+
+#: tickets/plugins/login_asset_confirm/plugin.py:23
+#: tickets/plugins/resources.py:71
+msgid "The requested asset no longer exists."
+msgstr "申请的资产已不存在。"
+
+#: tickets/plugins/reapply.py:32
+msgid "Only the applicant can reuse an available manual request."
+msgstr "仅申请人可以再次申请有效的手动申请工单。"
+
+#: tickets/plugins/reapply.py:67
+msgid "Inactive asset."
+msgstr "资产未启用。"
+
+#: tickets/plugins/reapply.py:72
+msgid "Recording unavailable."
+msgstr "会话录像不可用。"
+
+#: tickets/plugins/registry.py:80
+#, python-brace-format
+msgid "Unknown ticket type: {ticket_type}"
+msgstr "未知的工单类型：{ticket_type}"
+
+#: tickets/plugins/resources.py:35
+msgid "Select an asset available for application in this organization."
+msgstr "请选择此组织内可申请的资产。"
+
+#: tickets/plugins/resources.py:75
+msgid "A requested account no longer exists."
+msgstr "申请的账号已不存在。"
+
+#: tickets/plugins/resources.py:86
+msgid "The requested asset was deleted or moved."
+msgstr "申请的资产已被删除或移动。"
+
+#: tickets/plugins/view_secret/plugin.py:46
+#: tickets/plugins/view_secret/plugin.py:52
+msgid "The requested password accounts are no longer available."
+msgstr "申请查看密码的账号已不可用。"
+
+#: tickets/plugins/view_secret/serializer.py:17
+#: tickets/plugins/view_secret/serializer.py:34
+msgid "Select active password accounts."
+msgstr "请选择已启用的密码账号。"
+
+#: tickets/serializers/plugin.py:26
+msgid "This ticket type is created by its business entrypoint."
+msgstr "此类工单需要从对应的业务入口发起。"
+
+#: tickets/serializers/plugin.py:29
+msgid "Request parameters must be an object."
+msgstr "申请参数必须是对象。"
+
+#: tickets/serializers/plugin.py:36
+msgid "Unknown request parameters."
+msgstr "包含未知的申请参数。"
+
+#: tickets/serializers/ticket/apply_asset.py:29
+msgid "Authorized user"
+msgstr "授权用户"
+
+#: tickets/serializers/ticket/apply_asset.py:78
+msgid "Select one active organization member."
+msgstr "请选择一名组织内已启用的成员。"
+
+#: tickets/serializers/ticket/apply_asset.py:82
+msgid "You cannot apply for asset access on behalf of another user."
+msgstr "您无权为其他用户申请资产授权。"
+
+#: tickets/serializers/ticket/ticket.py:295
+msgid "Submitted requests are immutable. Withdraw and submit a new request."
+msgstr "已提交的申请不能修改，请撤回后重新提交。"
+
+#: tickets/serializers/ticket/ticket.py:302
+msgid ""
+"The applicant must be the submitting user. Select authorized users in the "
+"request parameters."
+msgstr "申请人必须是提交用户，请在申请参数中选择授权用户。"
+
+#: tickets/serializers/ticket/ticket.py:315
+msgid "Select an enabled, published workflow for this organization and type."
+msgstr "请选择适用于此组织和工单类型、已发布且已启用的审批流程。"
+
+#: tickets/serializers/workflow.py:31
+msgid "A published workflow cannot change ticket type."
+msgstr "已发布的审批流程不能修改工单类型。"
+
+#: tickets/serializers/workflow.py:33
+msgid "Publish a version before enabling the workflow."
+msgstr "请先发布流程版本，再启用审批流程。"
+
+#: tickets/serializers/workflow.py:40
+msgid "A workflow with this name and type already exists."
+msgstr "已存在同名且同类型的审批流程。"
+
+#: tickets/tasks.py:12
+msgid "Expire overdue ticket approvals"
+msgstr "处理超时工单审批"
+
+#: tickets/tasks.py:13
+msgid ""
+"Check approval deadlines every minute and apply the configured timeout "
+"action."
+msgstr "每分钟检查审批截止时间，并按配置执行超时处理。"
+
+#: tickets/tasks.py:30
+msgid "Execute ticket password change"
+msgstr "执行工单改密"
+
+#: tickets/tasks.py:31
+msgid "Change account passwords according to the approved ticket resources."
+msgstr "根据工单获批资源修改账号密码。"
+
+#: tickets/tasks.py:39
+msgid "Dispatch ticket password changes"
+msgstr "调度工单改密任务"
+
+#: tickets/tasks.py:40
+msgid "Dispatch pending password change executions every minute."
+msgstr "每分钟调度待执行的工单改密任务。"
+
+#: tickets/tasks.py:54
+msgid "Execute ticket file transfer"
+msgstr "执行工单文件传输"
+
+#: tickets/tasks.py:55
+msgid "Transfer files according to the approved ticket resources."
+msgstr "根据工单获批资源执行文件传输。"
+
+#: tickets/tasks.py:63
+msgid "Maintain ticket file transfers"
+msgstr "维护工单文件传输任务"
+
+#: tickets/tasks.py:64
+msgid ""
+"Check queued and running file transfers every five minutes and handle "
+"expired transfers."
+msgstr "每五分钟检查排队中和执行中的文件传输，并处理已过期的传输任务。"
+
+#: tickets/tasks.py:73
+msgid "Clean ticket transfer files"
+msgstr "清理工单传输文件"
+
+#: tickets/tasks.py:74
+msgid "Clean expired temporary files from ticket transfers every hour."
+msgstr "每小时清理工单传输中已过期的临时文件。"
+
+#: tickets/workflow/approvers.py:32
+msgid "The snapshot does not contain the required approver IDs."
+msgstr "快照中缺少所需的审批人 ID。"
+
+#: tickets/workflow/approvers.py:36
+msgid "Invalid approver IDs in the snapshot."
+msgstr "快照中的审批人 ID 无效。"
+
+#: tickets/workflow/approvers.py:59
+msgid "An approver group is missing or belongs to another organization."
+msgstr "审批用户组不存在或属于其他组织。"
+
+#: tickets/workflow/approvers.py:70
+msgid "The snapshot does not contain asset owners."
+msgstr "快照中缺少资产负责人。"
+
+#: tickets/workflow/approvers.py:75 tickets/workflow/definition.py:25
+msgid "Unknown approver resolver."
+msgstr "未知的审批人选择方式。"
+
+#: tickets/workflow/approvers.py:79
+msgid ""
+"A configured approver is inactive, missing, or outside the organization."
+msgstr "配置的审批人未启用、不存在或不属于此组织。"
+
+#: tickets/workflow/approvers.py:85
+msgid "An approval node must resolve between 1 and 1000 eligible approvers."
+msgstr "审批节点需要匹配 1 至 1000 名符合条件的审批人。"
+
+#: tickets/workflow/business.py:35
+msgid "Select a published workflow."
+msgstr "请选择已发布的审批流程。"
+
+#: tickets/workflow/business.py:37
+msgid "The applicant must be an active organization member."
+msgstr "申请人必须是组织内已启用的成员。"
+
+#: tickets/workflow/business.py:58 tickets/workflow/composition.py:42
+msgid "Configure reviewers or select a workflow on the ACL."
+msgstr "请在访问控制规则中配置审批人或选择审批流程。"
+
+#: tickets/workflow/business.py:94
+msgid "The applicant is no longer eligible for access."
+msgstr "申请人已不再具备访问资格。"
+
+#: tickets/workflow/business.py:99 tickets/workflow/engine.py:220
+msgid "Complete and save the requested resources before approval."
+msgstr "请先补全并保存申请资源，再通过审批。"
+
+#: tickets/workflow/business.py:103
+msgid "Invalid ticket execution mode."
+msgstr "工单执行方式无效。"
+
+#: tickets/workflow/composition.py:56
+msgid "The generated workflow name is already in use."
+msgstr "自动生成的流程名称已被使用。"
+
+#: tickets/workflow/conditions.py:16
+msgid "Conditions must be objects nested at most eight levels."
+msgstr "条件必须是对象，最多嵌套 8 层。"
+
+#: tickets/workflow/conditions.py:20
+msgid "A compound condition must have exactly one operator."
+msgstr "组合条件必须且只能包含一个运算符。"
+
+#: tickets/workflow/conditions.py:24
+msgid "Condition groups must contain between 1 and 32 conditions."
+msgstr "条件组必须包含 1 至 32 个条件。"
+
+#: tickets/workflow/conditions.py:29
+msgid "Conditions require field, operator and value."
+msgstr "条件必须包含字段、运算符和值。"
+
+#: tickets/workflow/conditions.py:32
+msgid "Invalid condition field path."
+msgstr "条件字段路径无效。"
+
+#: tickets/workflow/conditions.py:34
+msgid "Unknown workflow context field."
+msgstr "未知的流程上下文字段。"
+
+#: tickets/workflow/conditions.py:36
+msgid "Unknown condition operator."
+msgstr "未知的条件运算符。"
+
+#: tickets/workflow/conditions.py:38
+msgid "The condition quantifier must be any or all."
+msgstr "条件匹配方式必须为 any（任意）或 all（全部）。"
+
+#: tickets/workflow/conditions.py:40
+msgid "exists requires a boolean value."
+msgstr "exists 运算符要求布尔值。"
+
+#: tickets/workflow/conditions.py:42
+msgid "in and not_in require a list value."
+msgstr "in 和 not_in 运算符要求列表值。"
+
+#: tickets/workflow/conditions.py:47
+msgid "Risk comparisons require low, medium, high or critical."
+msgstr "风险等级比较只支持 low、medium、high 或 critical。"
+
+#: tickets/workflow/conditions.py:49
+msgid "Ordered comparisons require a number or a known risk level."
+msgstr "大小比较要求数值或有效的风险等级。"
+
+#: tickets/workflow/conditions.py:87
+#, python-brace-format
+msgid "Missing condition context: {field}."
+msgstr "条件上下文缺少字段：{field}。"
+
+#: tickets/workflow/conditions.py:90
+#, python-brace-format
+msgid "Incompatible condition value types: {field}."
+msgstr "条件值类型不匹配：{field}。"
+
+#: tickets/workflow/conditions.py:101
+#, python-brace-format
+msgid "Invalid contains operand: {field}."
+msgstr "contains 运算符的操作数无效：{field}。"
+
+#: tickets/workflow/conditions.py:104
+msgid "Unknown risk level in the snapshot."
+msgstr "快照中的风险等级未知。"
+
+#: tickets/workflow/conditions.py:107
+#, python-brace-format
+msgid "Invalid ordered comparison: {field}."
+msgstr "大小比较无效：{field}。"
+
+#: tickets/workflow/const.py:8
+msgid "Condition"
+msgstr "条件"
+
+#: tickets/workflow/const.py:9
+msgid "CC"
+msgstr "抄送"
+
+#: tickets/workflow/const.py:16 tickets/workflow/const.py:25
+#: tickets/workflow/const.py:33
+msgid "Approved"
+msgstr "已通过"
+
+#: tickets/workflow/const.py:18 tickets/workflow/const.py:28
+#: tickets/workflow/const.py:36
+msgid "Cancelled"
+msgstr "已取消"
+
+#: tickets/workflow/const.py:27
+msgid "Skipped"
+msgstr "已跳过"
+
+#: tickets/workflow/const.py:35
+msgid "Transferred"
+msgstr "已转交"
+
+#: tickets/workflow/context.py:23
+msgid "Requested assets are missing or outside the ticket organization."
+msgstr "申请的资产不存在或不属于工单所在组织。"
+
+#: tickets/workflow/context.py:58
+msgid "No accounts matched the request. Select explicit accounts."
+msgstr "没有匹配的账号，请明确选择账号。"
+
+#: tickets/workflow/definition.py:17
+msgid "Workflow data must contain only finite JSON values."
+msgstr "流程数据必须是有效的 JSON，且不能包含无穷值或非数值。"
+
+#: tickets/workflow/definition.py:19
+msgid "Workflow data exceeds the size limit."
+msgstr "流程数据超出大小限制。"
+
+#: tickets/workflow/definition.py:27
+msgid "Unknown approver configuration field."
+msgstr "未知的审批人配置字段。"
+
+#: tickets/workflow/definition.py:33
+msgid "Approvers require between 1 and 1000 resource IDs."
+msgstr "审批人配置需要 1 至 1000 个资源 ID。"
+
+#: tickets/workflow/definition.py:38
+msgid "Approver resource IDs must be UUIDs."
+msgstr "审批人资源 ID 必须为 UUID。"
+
+#: tickets/workflow/definition.py:41
+msgid "This resolver reads IDs from the request snapshot or organization."
+msgstr "此审批人选择方式从申请快照或组织读取 ID。"
+
+#: tickets/workflow/definition.py:46
+msgid "Unknown approval configuration field."
+msgstr "未知的审批配置字段。"
+
+#: tickets/workflow/definition.py:50
+msgid "Approval strategy must be any, all or quorum."
+msgstr "审批策略必须为 any（或签）、all（会签）或 quorum（指定人数）。"
+
+#: tickets/workflow/definition.py:53
+msgid "Quorum requires a positive approval count up to 1000."
+msgstr "指定审批人数必须为 1 至 1000 的整数。"
+
+#: tickets/workflow/definition.py:55
+msgid "Only quorum accepts a required approval count."
+msgstr "只有指定人数审批策略可以设置所需审批人数。"
+
+#: tickets/workflow/definition.py:58
+#, python-brace-format
+msgid "{key} must be a boolean."
+msgstr "{key} 必须为布尔值。"
+
+#: tickets/workflow/definition.py:61
+msgid "Timeout must be seconds between 0 and 31536000."
+msgstr "超时时间必须为 0 至 31536000 秒。"
+
+#: tickets/workflow/definition.py:63
+msgid "Timeout action must be expire or reject."
+msgstr "超时处理必须为 expire（过期）或 reject（拒绝）。"
+
+#: tickets/workflow/definition.py:68
+msgid "A CC node accepts a list of up to 1000 user IDs."
+msgstr "抄送节点最多接受 1000 个用户 ID。"
+
+#: tickets/workflow/definition.py:72
+msgid "CC user IDs must be UUIDs."
+msgstr "抄送用户 ID 必须为 UUID。"
+
+#: tickets/workflow/definition.py:79
+msgid "A workflow requires nodes and edges."
+msgstr "审批流程必须包含节点和连线。"
+
+#: tickets/workflow/definition.py:82
+msgid "A workflow requires between 2 and 128 nodes."
+msgstr "审批流程必须包含 2 至 128 个节点。"
+
+#: tickets/workflow/definition.py:84
+msgid "A workflow supports at most 256 edges."
+msgstr "审批流程最多支持 256 条连线。"
+
+#: tickets/workflow/definition.py:88
+msgid "Invalid workflow node."
+msgstr "流程节点无效。"
+
+#: tickets/workflow/definition.py:91
+msgid ""
+"Node IDs must be unique strings of up to 64 letters, digits, underscores or "
+"hyphens."
+msgstr "节点 ID 必须唯一，最多包含 64 个字母、数字、下划线或连字符。"
+
+#: tickets/workflow/definition.py:93
+msgid "Unsupported node type."
+msgstr "不支持此节点类型。"
+
+#: tickets/workflow/definition.py:96
+msgid "Node names must be strings of up to 128 characters."
+msgstr "节点名称必须是字符串，且不能超过 128 个字符。"
+
+#: tickets/workflow/definition.py:99
+msgid "Node config must be an object."
+msgstr "节点配置必须是对象。"
+
+#: tickets/workflow/definition.py:107
+msgid "Start and end nodes do not accept configuration."
+msgstr "开始和结束节点不接受配置。"
+
+#: tickets/workflow/definition.py:112
+msgid "Positions require bounded integer x and y coordinates."
+msgstr "节点位置的 x、y 坐标必须是有效范围内的整数。"
+
+#: tickets/workflow/definition.py:117
+msgid "A workflow requires exactly one start and one end."
+msgstr "审批流程必须且只能包含一个开始节点和一个结束节点。"
+
+#: tickets/workflow/definition.py:126
+msgid "Branch suffix must be true or false."
+msgstr "分支后缀必须为 true 或 false。"
+
+#: tickets/workflow/definition.py:130
+msgid "Invalid workflow edge."
+msgstr "流程连线无效。"
+
+#: tickets/workflow/definition.py:133
+msgid "Edges must reference existing nodes."
+msgstr "连线必须引用已存在的节点。"
+
+#: tickets/workflow/definition.py:135
+msgid "Duplicate edges and self loops are not allowed."
+msgstr "不能重复连线或将节点连接到自身。"
+
+#: tickets/workflow/definition.py:139
+msgid "Branch conditions must be booleans."
+msgstr "分支条件必须为布尔值。"
+
+#: tickets/workflow/definition.py:141
+msgid "Edge priority must be a nonnegative bounded integer."
+msgstr "连线优先级必须是有效范围内的非负整数。"
+
+#: tickets/workflow/definition.py:149
+msgid "Only the start node may have no incoming edges."
+msgstr "只有开始节点可以没有输入连线。"
+
+#: tickets/workflow/definition.py:152
+msgid "Conditions require one true and one false branch."
+msgstr "条件节点必须同时包含满足和不满足两个分支。"
+
+#: tickets/workflow/definition.py:154
+msgid "Only condition nodes can branch; end nodes cannot have outgoing edges."
+msgstr "只有条件节点可以分支，结束节点不能有输出连线。"
+
+#: tickets/workflow/definition.py:167
+msgid "Workflows must be acyclic and fully reachable."
+msgstr "审批流程不能形成环路，且所有节点都必须可达。"
+
+#: tickets/workflow/engine.py:33
+msgid "Workflow instances must belong to a concrete organization."
+msgstr "流程实例必须属于具体组织。"
+
+#: tickets/workflow/engine.py:35 tickets/workflow/engine.py:65
+msgid "This workflow belongs to another organization."
+msgstr "此审批流程属于其他组织。"
+
+#: tickets/workflow/engine.py:55
+msgid "The ticket already has a different workflow."
+msgstr "此工单已关联其他审批流程。"
+
+#: tickets/workflow/engine.py:58
+msgid "Only new tickets without legacy approval steps can start a workflow."
+msgstr "只有未包含旧版审批步骤的新工单可以启动流程。"
+
+#: tickets/workflow/engine.py:68 tickets/workflow/engine.py:71
+msgid "Select an enabled workflow with a published version."
+msgstr "请选择已有发布版本且已启用的审批流程。"
+
+#: tickets/workflow/engine.py:73
+msgid "The workflow type does not match the ticket."
+msgstr "审批流程类型与工单不匹配。"
+
+#: tickets/workflow/engine.py:76
+msgid "The context snapshot must be an object."
+msgstr "上下文快照必须是对象。"
+
+#: tickets/workflow/engine.py:79
+msgid "A workflow requires an applicant."
+msgstr "审批流程必须有申请人。"
+
+#: tickets/workflow/engine.py:105
+msgid "Only the assigned, active organization member may process this task."
+msgstr "只有被指派且仍在组织内启用的成员可以处理此任务。"
+
+#: tickets/workflow/engine.py:108
+msgid "This user cannot process this approval task."
+msgstr "此用户无权处理此审批任务。"
+
+#: tickets/workflow/engine.py:132
+msgid "The quorum exceeds the number of eligible approvers."
+msgstr "所需审批人数超过符合条件的审批人数。"
+
+#: tickets/workflow/engine.py:253
+msgid "Only the applicant may withdraw this workflow."
+msgstr "仅申请人可以撤回此流程。"
+
+#: tickets/workflow/engine.py:263
+msgid "The target must be an active member of this organization."
+msgstr "目标用户必须是此组织内已启用的成员。"
+
+#: tickets/workflow/engine.py:266
+msgid "This user cannot approve this node."
+msgstr "此用户无权审批此节点。"
+
+#: tickets/workflow/engine.py:268
+msgid "The target already participated in this approval node."
+msgstr "目标用户已经参与此审批节点。"
+
+#: tickets/workflow/engine.py:270
+msgid "An approval node supports at most 1000 tasks."
+msgstr "一个审批节点最多支持 1000 个审批任务。"
+
+#: tickets/workflow/engine.py:277
+msgid "Transfer is disabled for this node."
+msgstr "此节点不允许转交。"
+
+#: tickets/workflow/engine.py:293
+msgid "Adding approvers is disabled for this node."
+msgstr "此节点不允许加签。"
+
+#: tickets/workflow/errors.py:7
+msgid "The workflow state has changed. Refresh before trying again."
+msgstr "流程状态已变更，请刷新后重试。"
+
+#: tickets/workflow/publication.py:21
+msgid "CC recipients must be active organization members."
+msgstr "抄送人必须是组织内已启用的成员。"
+
+#: tickets/workflow/publication.py:24
+msgid "A newer version was published. Reload before publishing."
+msgstr "已有更新的版本发布，请刷新后再发布。"
+
+#: tickets/workflow/resources.py:33
+msgid "This ticket type does not support resource adjustment."
+msgstr "此工单类型不支持调整资源。"
+
+#: tickets/workflow/resources.py:42
+msgid "Select assets available for application in this organization."
+msgstr "请选择此组织内可申请的资产。"
+
+#: tickets/workflow/resources.py:56
+msgid "Select nodes available for application in this organization."
+msgstr "请选择此组织内可申请的节点。"
+
+#: tickets/workflow/resources.py:84
+msgid "Select the available resources before submitting."
+msgstr "请先选择可用资源，再提交申请。"
+
+#: tickets/workflow/resources.py:96
+msgid "This request cannot be adjusted now."
+msgstr "当前无法调整此申请。"
+
+#: tickets/workflow/resources.py:102
+msgid ""
+"Adjusting resources requires asset and account query permissions in this "
+"organization."
+msgstr "调整资源需要此组织内的资产和账号查询权限。"
+
+#: tickets/workflow/resources.py:138
+msgid "The request was adjusted. Refresh and review the current resources."
+msgstr "申请已调整，请刷新并确认当前资源。"
+
+#: tickets/workflow/resources.py:181
+msgid "An adjusted request must pass an approval node before completion."
+msgstr "调整后的申请必须经过审批节点才能完成。"
+
+#: tickets/workflow/resources.py:206
+msgid "Select active assets in the ticket organization."
+msgstr "请选择工单所在组织内已启用的资产。"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "domain_name"
+msgstr "域名称"
+
+#: tickets/models/workflow.py:45
+msgid "Legacy ticket approval"
+msgstr "历史工单审批"
