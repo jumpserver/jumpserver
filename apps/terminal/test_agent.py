@@ -247,23 +247,12 @@ class AgentBoundaryTests(TestCase):
         with self.assertRaises(DisallowedRedirect):
             view.redirect(callback + '?code=not-issued', self.app)
 
-    def test_disable_client_revokes_agent_access_without_touching_other_apps(self):
-        from rest_framework.test import APIRequestFactory, force_authenticate
-        from authentication.api.agent_client import AgentClientViewSet
-        from rbac.models import Permission, Role
-
-        role = Role.objects.create(name='Agent boundary client manager', scope='system')
-        role.permissions.add(Permission.objects.get(content_type__app_label='settings', codename='change_auth'))
-        self.user.system_roles.add(role)
+    def test_disabled_client_rejects_agent_access_without_touching_other_apps(self):
         other = get_application_model().objects.create(
             name='Other OAuth application', client_id='other-oauth', client_type='public',
             authorization_grant_type='authorization-code',
         )
-        registration = AgentApplication.objects.get(application=self.app)
-        request = APIRequestFactory().post('/api/v1/authentication/agent-clients/disable/')
-        force_authenticate(request, user=self.user)
-        response = AgentClientViewSet.as_view({'post': 'disable'})(request, pk=str(registration.pk))
-        self.assertEqual(response.status_code, 200)
+        AgentApplication.objects.filter(application=self.app).update(is_active=False)
         self.assertTrue(get_application_model().objects.filter(pk=other.pk).exists())
         with self.assertRaises(PermissionDenied):
             service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource})

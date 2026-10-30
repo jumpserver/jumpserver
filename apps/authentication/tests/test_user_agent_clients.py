@@ -21,7 +21,7 @@ from audits.models import OperateLog
 from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
 from authentication.models.client_login_session import ClientLoginSession
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from rbac.models import Permission, Role
+from rbac.models import Role
 from terminal.agent_service import ALL_AGENT_ORGANIZATIONS
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
 from users.models import User
@@ -29,7 +29,6 @@ from users.models import User
 
 class UserAgentClientTests(TestCase):
     url = '/api/v1/authentication/user-agent-clients/'
-    admin_url = '/api/v1/authentication/agent-client-authorizations/'
 
     @classmethod
     def setUpTestData(cls):
@@ -42,14 +41,9 @@ class UserAgentClientTests(TestCase):
         for org in (cls.first, cls.second):
             org.add_member(cls.user)
             org.add_member(cls.other)
-        permission = Permission.objects.get(content_type__app_label='settings', codename='change_auth')
-        role = Role.objects.create(name='Personal client system manager', scope='system')
-        role.permissions.add(permission)
-        cls.manager.system_roles.add(role)
-        role = Role.objects.create(name='Personal client org manager', scope='org')
-        role.permissions.add(permission)
+        cls.manager.system_roles.add_role_system_admin()
         with tmp_to_org(cls.first):
-            cls.org_manager.org_roles.add(role)
+            cls.org_manager.org_roles.add(Role.BuiltinRole.org_admin.get_role())
         cls.application = get_application_model().objects.create(
             name='Personal Agent', client_id='personal-agent-client', client_type='public',
             authorization_grant_type='authorization-code', redirect_uris='http://127.0.0.1/callback',
@@ -122,78 +116,37 @@ class UserAgentClientTests(TestCase):
         AgentApplication.objects.filter(pk=self.registration.pk).update(is_active=False)
         self.assertEqual(self.request(user=self.user).data['results'][0]['status'], 'disabled')
 
-    def test_admin_reads_selected_users_authorizations_across_orgs(self):
-        access, refresh = self.authorize(self.user, self.first.pk)
-        self.authorize(self.manager, self.second.pk)
-        self.authorize(self.other, ALL_AGENT_ORGANIZATIONS)
-        for org in (self.first, self.second, Organization.SYSTEM_ID):
-            with tmp_to_org(org):
-                response = self.request(path=f'{self.admin_url}?user_id={self.user.pk}', user=self.manager)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.data['count'], 1)
-                client = response.data['results'][0]
-                self.assertEqual(client['registration_id'], self.registration.pk)
-                self.assertTrue(client['is_active'])
-                self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
-                self.assertFalse(client['all_organizations'])
-                self.assertEqual(client['status'], 'active')
-                self.assertNotIn(access.token, str(response.data))
-                self.assertNotIn(refresh.token, str(response.data))
+    def test_admins_cannot_use_personal_api_to_read_or_revoke_other_users_clients(self):
+        access, refresh = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        for admin in (self.manager, self.org_manager):
+            with self.subTest(admin=admin):
+                path = f'{self.url}?user_id={self.user.pk}'
+                response = self.request(path=path, user=admin)
+                self.assertEqual(response.data['count'], 0)
                 self.assertEqual(response['Cache-Control'], 'no-store')
-        path = f'{self.admin_url}{self.application.pk}/?user_id={self.other.pk}'
-        client = self.request(path=path, user=self.manager).data
-        self.assertTrue(client['all_organizations'])
-        self.assertEqual({item['id'] for item in client['organizations']}, {str(self.first.pk), str(self.second.pk)})
-        self.assertEqual(self.request(path=f'{self.admin_url}?user_id={self.org_manager.pk}', user=self.manager).data['count'], 0)
-        self.assertEqual(self.request(path=f'{self.admin_url}?user_id={self.user.pk}&search=missing', user=self.manager).data['count'], 0)
-
-    def test_admin_authorizations_are_read_only_and_require_system_permission(self):
-        access, _ = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
-        path = f'{self.admin_url}?user_id={self.user.pk}'
-        for user in (None, self.user, self.org_manager):
-            for method in ('get', 'options'):
-                self.assertIn(self.request(method, path, user).status_code, (401, 403))
-        self.assertEqual(self.request('options', path, self.manager).status_code, 200)
-        for method in ('post', 'put', 'patch', 'delete'):
-            self.assertEqual(self.request(method, path, self.manager).status_code, 405)
-        for query, code in (('', 400), ('?user_id=invalid', 400), (f'?user_id={uuid.uuid4()}', 404)):
-            self.assertEqual(self.request(path=self.admin_url + query, user=self.manager).status_code, code)
+                path = f'{self.url}{self.application.pk}/'
+                self.assertEqual(self.request('get', path + f'?user_id={self.user.pk}', admin).status_code, 404)
+                self.assertEqual(self.request('post', path + f'revoke/?user_id={self.user.pk}', admin).status_code, 404)
         self.assertTrue(get_access_token_model().objects.filter(pk=access.pk).exists())
-        # Supplying another user's ID cannot widen the personal API.
-        self.assertEqual(self.request(path=f'{self.url}?user_id={self.user.pk}', user=self.other).data['count'], 0)
-        self.assertEqual(self.request('get', f'{self.url}{self.application.pk}/?user_id={self.user.pk}', self.other).status_code, 404)
+        self.assertIsNone(get_refresh_token_model().objects.get(pk=refresh.pk).revoked)
 
-    def test_admin_status_uses_selected_users_refresh_and_membership(self):
-        access, _ = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+    def test_admin_can_manage_only_own_authorization_of_shared_client(self):
+        self.first.add_member(self.manager)
         self.authorize(self.manager, self.first.pk)
-        get_access_token_model().objects.filter(pk=access.pk).update(expires=timezone.now() - timedelta(seconds=1))
-        get_refresh_token_model().objects.filter(user=self.user).update(revoked=timezone.now())
-        path = f'{self.admin_url}?user_id={self.user.pk}'
-        client = self.request(path=path, user=self.manager).data['results'][0]
-        self.assertEqual(client['status'], 'expired')
-        self.assertTrue(client['is_active'])
-        self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
-        self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()
-        client = self.request(path=path, user=self.manager).data['results'][0]
-        self.assertEqual(client['status'], 'active')
+        access, refresh = self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
+        response = self.request(path=f'{self.url}?user_id={self.user.pk}', user=self.manager)
+        client = response.data['results'][0]
+        self.assertEqual(response.data['count'], 1)
         self.assertEqual(client['organizations'], [{'id': str(self.first.pk), 'name': self.first.name}])
-
-    def test_admin_management_metadata_targets_registration_and_keeps_personal_contract(self):
-        self.authorize(self.user, ALL_AGENT_ORGANIZATIONS)
-        path = f'{self.admin_url}?user_id={self.user.pk}'
-        client = self.request(path=path, user=self.manager).data['results'][0]
-        self.assertEqual(client['id'], self.application.pk)
-        registration_url = f'/api/v1/authentication/agent-clients/{client["registration_id"]}/'
-        for action, active in (('disable', False), ('enable', True)):
-            response = self.request('post', registration_url + action + '/', self.manager)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.data['client_id'], self.application.client_id)
-            client = self.request(path=path, user=self.manager).data['results'][0]
-            self.assertEqual(client['is_active'], active)
-            self.assertEqual(client['registration_id'], self.registration.pk)
-        personal = self.request(user=self.user).data['results'][0]
-        self.assertNotIn('registration_id', personal)
-        self.assertNotIn('is_active', personal)
+        self.assertNotIn('registration_id', client)
+        self.assertNotIn('is_active', client)
+        path = f'{self.url}{self.application.pk}/revoke/?user_id={self.user.pk}'
+        self.assertEqual(self.request('post', path, self.manager).status_code, 204)
+        self.assertFalse(AgentOAuthBinding.objects.filter(user=self.manager).exists())
+        self.assertTrue(AgentOAuthBinding.objects.filter(user=self.user).exists())
+        self.assertTrue(get_access_token_model().objects.get(pk=access.pk).is_valid())
+        self.assertIsNone(get_refresh_token_model().objects.get(pk=refresh.pk).revoked)
+        self.assertTrue(AgentApplication.objects.get(pk=self.registration.pk).is_active)
 
     def test_revoke_removes_only_own_authorizations_and_keeps_audit(self):
         access, _ = self.authorize(self.user, self.first.pk)

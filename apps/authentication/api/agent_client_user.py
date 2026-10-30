@@ -15,15 +15,29 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from audits.const import ActionChoices
+from audits.handler import create_or_update_operate_log
 from authentication.services.agent_clients import revoke_user_agent_client
 from common.drf.filters import SearchFilter
 from common.permissions import IsValidUser
+from common.utils import get_request_ip
+from orgs.models import Organization
 from terminal.agent_service import ALL_AGENT_ORGANIZATIONS, available_agent_organizations
 from terminal.models import AgentApplication, AgentOAuthBinding
-from users.models import User
-from .agent_client import AgentClientAdminPermission, record_client_operation
 
-__all__ = ['UserAgentClientViewSet', 'AdminUserAgentClientViewSet']
+__all__ = ['UserAgentClientViewSet']
+
+
+def record_client_operation(request, action, client, result):
+    create_or_update_operate_log(
+        action, _('Agent MCP client'), force=True,
+        resource_id=str(client['id']),
+        resource_display=f"{client['name']} ({client['client_id']})" if client['client_id'] else client['name'],
+        user=request.user, org_id=Organization.SYSTEM_ID, remote_addr=get_request_ip(request),
+        after={
+            'Client ID': {'name': 'client_id', 'value': client['client_id']},
+            'Result': {'name': 'result', 'value': result},
+        },
+    )
 
 
 class UserAgentClientSerializer(serializers.ModelSerializer):
@@ -74,10 +88,10 @@ class UserAgentClientPagination(LimitOffsetPagination):
     max_limit = 100
 
 
-class UserAgentClientReadOnlyViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+class UserAgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
     serializer_class = UserAgentClientSerializer
     permission_classes = [IsValidUser]
-    http_method_names = ['get', 'head', 'options']
+    http_method_names = ['get', 'head', 'options', 'post']
     filter_backends = [SearchFilter]
     search_fields = ('name', 'client_id')
     pagination_class = UserAgentClientPagination
@@ -87,19 +101,15 @@ class UserAgentClientReadOnlyViewSet(mixins.ListModelMixin, mixins.RetrieveModel
         response['Cache-Control'] = 'no-store'
         return response
 
-    @property
-    def authorization_user(self):
-        return self.request.user
-
     @cached_property
     def available_organizations(self):
         return [
             {'id': str(org.pk), 'name': org.name}
-            for org in available_agent_organizations(self.authorization_user)
+            for org in available_agent_organizations(self.request.user)
         ]
 
     def get_queryset(self):
-        user = self.authorization_user
+        user = self.request.user
         refresh = get_refresh_token_model().objects.filter(
             user=user, application_id=OuterRef('application_id'), token_family=OuterRef('refresh_family'),
             revoked__isnull=True, access_token__isnull=False,
@@ -115,29 +125,6 @@ class UserAgentClientReadOnlyViewSet(mixins.ListModelMixin, mixins.RetrieveModel
         ).select_related('agent_registration').prefetch_related(
             Prefetch('agentoauthbinding_set', queryset=bindings, to_attr='user_bindings'),
         ).order_by('-created', '-pk')
-
-
-class AdminUserAgentClientSerializer(UserAgentClientSerializer):
-    registration_id = serializers.IntegerField(source='agent_registration.pk', read_only=True)
-    is_active = serializers.BooleanField(source='agent_registration.is_active', read_only=True)
-
-    class Meta(UserAgentClientSerializer.Meta):
-        fields = UserAgentClientSerializer.Meta.fields + ('registration_id', 'is_active')
-        read_only_fields = fields
-
-
-class AdminUserAgentClientViewSet(UserAgentClientReadOnlyViewSet):
-    serializer_class = AdminUserAgentClientSerializer
-    permission_classes = [AgentClientAdminPermission]
-
-    @cached_property
-    def authorization_user(self):
-        user_id = serializers.UUIDField().run_validation(self.request.query_params.get('user_id'))
-        return get_object_or_404(User, pk=user_id)
-
-
-class UserAgentClientViewSet(UserAgentClientReadOnlyViewSet):
-    http_method_names = ['get', 'head', 'options', 'post']
 
     @action(methods=['post'], detail=True)
     def revoke(self, request, *args, **kwargs):
