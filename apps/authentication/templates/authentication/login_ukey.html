@@ -600,7 +600,9 @@
             var certificateSelection = null;
             var selectsCertificate = (ctx.config.capabilities || {}).requires_certificate_selection;
             // External certificates are read after PIN verification, not during detection.
-            if (selectsCertificate) usernameDisplay.parentElement.style.display = 'none';
+            if ((ctx.config.capabilities || {}).binding_mode === 'certificate') {
+                usernameDisplay.parentElement.style.display = 'none';
+            }
             function checkConfig() {
                 if (refreshRequired) return Promise.reject(new Error(MSG.configChanged));
                 if (!(ctx.config.capabilities || {}).uses_one_time_challenge) return Promise.resolve();

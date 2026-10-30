@@ -11,7 +11,8 @@ from .base import BaseCAProvider
 class VCTKSCAProvider(BaseCAProvider):
     id = 'vctk_s'
     label = 'VCTK_S'
-    binding_mode = 'user_sn'
+    binding_mode = 'certificate'
+    sdk_profile = 'sdk_config_vctk_s.yaml'
     uses_one_time_challenge = True
     supported_vendors = ('ji_da',)
     supports_connection_test = True

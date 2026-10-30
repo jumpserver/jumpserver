@@ -1,4 +1,4 @@
-"""Session-bound, single-use challenges for the existing JiDa user/SN identity."""
+"""Session-bound, single-use challenges for JiDa VCTK_S certificate identity."""
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 from types import SimpleNamespace
@@ -10,7 +10,7 @@ from django.test import SimpleTestCase, override_settings
 from authentication.backends.ukey import challenges
 from authentication.backends.ukey.configuration import REVISION
 from authentication.backends.ukey.exceptions import UKeyAuthError, UKeyServiceError
-from authentication.backends.ukey.forms import OneTimeUKeyLoginForm
+from authentication.backends.ukey.forms import VCTKSCertificateLoginForm
 from authentication.backends.ukey.providers import get_provider
 from authentication.tests.test_ukey_vctk_s_config import snapshot
 
@@ -41,12 +41,12 @@ class VCTKSChallengeTests(SimpleTestCase):
         self.generate = generated.start()
         self.addCleanup(generated.stop)
 
-    def test_user_sn_provider_issues_remote_challenge_and_consumes_once(self):
+    def test_certificate_provider_issues_remote_challenge_and_consumes_once(self):
         issued = challenges.issue(self.request, 'login')
         self.generate.assert_called_once_with()
         self.assertEqual(issued['code'], 'ab' * 32)
         self.assertEqual(issued['length'], 64)
-        self.assertEqual(self.provider.binding_mode, 'user_sn')
+        self.assertEqual(self.provider.binding_mode, 'certificate')
         record, state = challenges.consume(self.request, issued['id'], 'login')
         self.assertEqual(record['code'], issued['code'])
         self.assertEqual(state[REVISION], issued['revision'])
@@ -113,9 +113,9 @@ class VCTKSChallengeTests(SimpleTestCase):
         self.generate.assert_not_called()
 
     def test_login_form_requires_id_and_accepts_bounded_attached_p7(self):
-        data = {'username': 'user', 'cert': 'cert', 'signature': 'a' * 43692, 'ukey_sn': 'serial'}
-        self.assertFalse(OneTimeUKeyLoginForm(data=data).is_valid())
+        data = {'username': '', 'cert': 'cert', 'signature': 'a' * 43692, 'ukey_sn': 'serial'}
+        self.assertFalse(VCTKSCertificateLoginForm(data=data).is_valid())
         data['challenge_id'] = 'a' * 43
-        self.assertTrue(OneTimeUKeyLoginForm(data=data).is_valid())
+        self.assertTrue(VCTKSCertificateLoginForm(data=data).is_valid())
         data['signature'] += 'a'
-        self.assertFalse(OneTimeUKeyLoginForm(data=data).is_valid())
+        self.assertFalse(VCTKSCertificateLoginForm(data=data).is_valid())

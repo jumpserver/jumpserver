@@ -1873,6 +1873,7 @@
     "AccountDiscoverList": "アカウントの収集",
     "BaseAccountDiscover": "アカウント収集",
     "DataLastUsed": "さいごしようび",
+    "UKeyCertificateAlgorithmUnsupported": "UKey の署名証明書のアルゴリズムはサポートされていません。",
     "UKeyVCTKSHelp": "既存の JIT UKey クライアントを使用し、VCTK_S サービスで署名を検証します。",
     "UKeyVCTKSServerURL": "VCTK_S 検証サービス URL",
     "UKeyVCTKSServerHelp": "パス、クエリ、フラグメントを含めずに、VCTK_S サービスの完全な HTTP/HTTPS アドレスを入力してください。",

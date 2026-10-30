@@ -1856,6 +1856,7 @@
     "Archive": "Archive",
     "BootstrapTokenTip": "The BOOTSTRAP_TOKEN value is used by panda, koko and other service components when registering.",
     "GetToken": "Get token",
+    "UKeyCertificateAlgorithmUnsupported": "The UKey signing certificate algorithm is unsupported.",
     "UKeyVCTKSHelp": "Use the existing JIT UKey client and verify signatures through the VCTK_S service.",
     "UKeyVCTKSServerURL": "VCTK_S verification service URL",
     "UKeyVCTKSServerHelp": "Enter the full HTTP/HTTPS address of the VCTK_S service, without a path, query or fragment.",

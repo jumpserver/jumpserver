@@ -1,5 +1,4 @@
-"""VCTK_S configuration must preserve the existing JIT Key user/SN flow."""
-from copy import deepcopy
+"""VCTK_S certificate binding must preserve the other providers and JIT PIN operations."""
 from pathlib import Path
 from unittest.mock import patch
 
@@ -55,17 +54,21 @@ class SDKCompatibilityTests(SimpleTestCase):
         self.assertNotIn(b'VCTKSCertificateDigest', builtin.load_sdk_script_content())
         builtin_config = builtin.get_sdk_config(include_admin_pin=True)
         remote_config = remote.get_sdk_config(include_admin_pin=True)
-        for section in ('sdk', 'info', 'operations'):
-            self.assertEqual(builtin_config[section], remote_config[section])
-        expected_login = deepcopy(builtin_config['login'])
-        sign = next(step for step in expected_login['steps'] if step['name'] == 'signChallenge')
-        sign['call'] = 'UKey_P7SignAttach'
-        sign['digest_certificate'] = '{{ ukey.cert }}'
-        index = expected_login['steps'].index(sign)
-        expected_login['steps'][index:index] = deepcopy(expected_login['detect']['steps'])
-        submit = next(step for step in expected_login['steps'] if step.get('type') == 'submit')
-        submit['fields']['challenge_id'] = '{{ challenge.id }}'
-        self.assertEqual(expected_login, remote_config['login'])
+        self.assertEqual(builtin_config['sdk'], remote_config['sdk'])
+        operations = {item['key']: item for item in remote_config['operations']['items']}
+        builtin_operations = {item['key']: item for item in builtin_config['operations']['items']}
+        self.assertEqual(set(operations), {'bindUserUKeySN', 'unbindUserUKeySN', 'resetPin', 'changePIN'})
+        for key in ('resetPin', 'changePIN'):
+            self.assertEqual(operations[key], builtin_operations[key])
+        login = remote_config['login']
+        self.assertEqual([s['name'] for s in login['steps']], ['verifyPin', 'getCert', 'signChallenge', 'submit'])
+        self.assertEqual(login['steps'][-1]['fields']['username'], '')
+        self.assertEqual(login['steps'][-1]['fields']['ukey_sn'], '{{ ukey.devSN }}')
+        self.assertNotIn('compare', remote_config['info']['cert'][0])
+        self.assertEqual(builtin_config['info']['cert'][0]['compare'], '{{ user.username }}')
+        self.assertNotIn('user_detail_url', remote_config['config']['api'])
+        self.assertNotIn('UKey_DeleteCons', repr(remote_config['operations']))
+        self.assertNotIn('UKey_GenKey', repr(remote_config['operations']))
         self.assertEqual(remote_config['config']['pin'], builtin_config['config']['pin'])
         self.assertFalse(remote_config['config']['enroll']['enabled'])
         self.assertTrue(builtin_config['config']['enroll']['enabled'])
@@ -81,6 +84,25 @@ class SDKCompatibilityTests(SimpleTestCase):
         sign = next(step for step in builtin.get_sdk_config()['login']['steps']
                     if step['name'] == 'signChallenge')
         self.assertEqual(sign['call'], 'UKey_SignData')
+
+    def test_binding_proves_possession_before_saving_and_unbind_never_calls_device(self):
+        config = UKeySDKConfig(snapshot()).get_sdk_config()
+        operations = {item['key']: item for item in config['operations']['items']}
+        bind = operations['bindUserUKeySN']['steps']
+        self.assertEqual([step.get('call') or step['body']['action'] for step in bind], [
+            'UKey_VerifyPIN', 'UKey_GetCert', 'challenge', 'UKey_P7SignAttach', 'bind',
+        ])
+        self.assertEqual(bind[3]['digest_certificate'], '{{ ukey.cert }}')
+        self.assertEqual(bind[3]['args'][1], '{{ vars.challenge.code_base64 }}')
+        self.assertEqual(bind[-1]['body']['hardware_serial'], '{{ ukey.devSN }}')
+        self.assertEqual(bind[-1]['url_format'], {'user_id': '{{ user.id }}'})
+        unbind = operations['unbindUserUKeySN']
+        self.assertFalse(unbind['requires_device'])
+        self.assertEqual(len(unbind['steps']), 1)
+        self.assertEqual(unbind['steps'][0]['type'], 'api')
+        self.assertEqual(unbind['steps'][0]['body']['binding_version'], '{{ ukey.binding.binding_version }}')
+        self.assertIn('ukey.binding.hardware_serial', config['operations']['when'])
+        self.assertNotIn('user.ukey_sn', config['operations']['when'])
 
     def test_default_pin_is_admin_only(self):
         config = UKeySDKConfig(snapshot())
@@ -98,9 +120,9 @@ class SDKCompatibilityTests(SimpleTestCase):
                 self.assertEqual(config['config']['asym_alg_name'], algorithm)
                 self.assertEqual(sign['digest_certificate'], '{{ ukey.cert }}')
 
-    def test_certificate_selection_and_identity_remain_user_sn(self):
+    def test_certificate_identity_does_not_require_longmai_container_selection(self):
         provider = get_provider(snapshot())
-        self.assertEqual(provider.binding_mode, 'user_sn')
+        self.assertEqual(provider.binding_mode, 'certificate')
         self.assertFalse(provider.requires_certificate_selection)
         self.assertFalse(provider.supports_enrollment)
         self.assertTrue(provider.expose_default_pin)
@@ -134,7 +156,7 @@ class SettingsTests(SimpleTestCase):
             self.assertIn(key, SECRET_FIELDS)
         provider = next(p for p in result['AUTH_UKEY_CA_PROVIDERS'] if p['id'] == 'vctk_s')
         self.assertEqual(provider['supported_vendors'], ['ji_da'])
-        self.assertEqual(provider['binding_mode'], 'user_sn')
+        self.assertEqual(provider['binding_mode'], 'certificate')
         self.assertEqual(set(provider['fields']), {
             'AUTH_UKEY_VCTK_S_SVS_URL', 'AUTH_UKEY_VCTK_S_TLS_VERIFY',
             'AUTH_UKEY_VCTK_S_TLS_CA_CERT', 'AUTH_UKEY_VCTK_S_ISSUING_CA',

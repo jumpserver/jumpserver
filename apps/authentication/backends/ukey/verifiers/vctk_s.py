@@ -1,4 +1,5 @@
 """Verify existing JiDa UKey identities through the VCTK_S HTTP service."""
+import hashlib
 import re
 from datetime import datetime, timezone
 
@@ -146,7 +147,7 @@ def valid_issuing_cas(certificates):
         yield certificate
 
 
-def verify_certificate_issuer(certificate, cert, issuers, username):
+def verify_certificate_issuer(certificate, cert, issuers):
     unsupported = False
     for issuer in valid_issuing_cas(issuers):
         if (certificate.issuer.dump() != issuer.subject.dump()
@@ -159,9 +160,19 @@ def verify_certificate_issuer(certificate, cert, issuers, username):
             continue
         try:
             issuer_pem = pem.armor('CERTIFICATE', issuer.dump()).decode('ascii')
-            return BuiltinVerifier(issuer_pem).verify_certificate(cert, username)
+            verifier = BuiltinVerifier(issuer_pem)
+            cert_pem = verifier._load_cert_pem(cert)
+            if certificate_algorithm(certificate) == 'sm2':
+                parsed = verifier._load_sm2_cert(cert_pem)
+                verifier._verify_sm2_cert_chain(parsed)
+                verifier._verify_sm2_cert_validity(parsed)
+            else:
+                parsed = verifier._load_rsa_cert(cert_pem)[0]
+                verifier._verify_rsa_cert_chain(parsed)
+                verifier._verify_rsa_cert_validity(parsed)
+            return
         except UKeyCertChainError:
-            # Same-name issuers may use different keys. Identity errors must propagate.
+            # Same-name issuers may use different keys.
             continue
     if unsupported:
         raise UKeyCertUnsupportedAlgorithmError(_('Cross-algorithm CA issuance is not supported.'))
@@ -242,7 +253,10 @@ class VCTKSVerifier(BaseVerifier):
             stage = 'signer_identity'
             digest = check_attached_signer(signature_bytes, certificate, challenge.encode('ascii'))
             stage = 'certificate_trust'
-            claims = verify_certificate_issuer(certificate, cert, issuers, username)
+            verify_certificate_issuer(certificate, cert, issuers)
+            serial = format(certificate.serial_number, 'x')
+            if len(serial) > 64:
+                raise ValueError('Invalid certificate serial number')
         except UKeyAuthError:
             raise
         except Exception as exc:
@@ -256,7 +270,12 @@ class VCTKSVerifier(BaseVerifier):
         except Exception as exc:
             logger.warning('VCTK_S proof rejected: stage=server exception=%s', type(exc).__name__)
             raise UKeyServiceError(_('VCTK_S server verification failed. Check the service settings.')) from None
-        return claims
+        issuer = certificate.issuer.dump() + (certificate.authority_key_identifier or b'')
+        return {
+            'issuer_fingerprint': hashlib.sha256(issuer).hexdigest(),
+            'serial_number': serial,
+            'certificate_fingerprint': hashlib.sha256(certificate.dump()).hexdigest(),
+        }
 
     def generate_challenge(self):
         try:

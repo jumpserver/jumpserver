@@ -1869,6 +1869,7 @@
     "UserActivity": "User activity",
     "SyslogAddr": "Syslog address",
     "NasMountPath": "NAS 마운트 경로",
+    "UKeyCertificateAlgorithmUnsupported": "UKey 서명 인증서 알고리즘이 지원되지 않습니다.",
     "UKeyVCTKSHelp": "기존 JIT UKey 클라이언트를 사용하고 VCTK_S 서비스를 통해 서명을 검증합니다.",
     "UKeyVCTKSServerURL": "VCTK_S 검증 서비스 URL",
     "UKeyVCTKSServerHelp": "경로, 쿼리 또는 프래그먼트 없이 VCTK_S 서비스의 전체 HTTP/HTTPS 주소를 입력하세요.",

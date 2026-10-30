@@ -149,7 +149,7 @@ class VCTKSVerifierTests(TestCase):
         with patch.object(self.verifier, '_client') as client:
             client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
             claims = self.verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'user')
-        self.assertEqual(claims, {'subject_cn': 'user'})
+        self.assertEqual(claims, self.identity())
         client.return_value.verify_signed_data.assert_called_once_with(self.signature, 'sha256')
 
     def test_changed_challenge_is_rejected_before_remote_verification(self):
@@ -170,11 +170,21 @@ class VCTKSVerifierTests(TestCase):
                     self.verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'user')
                 client.return_value.verify_signed_data.assert_called_once()
 
-    def test_wrong_username_is_rejected_before_remote_verification(self):
+    def identity(self):
+        cert = self.asn1_cert
+        return {
+            'certificate_fingerprint': hashlib.sha256(cert.dump()).hexdigest(),
+            'issuer_fingerprint': hashlib.sha256(cert.issuer.dump() + (cert.authority_key_identifier or b'')).hexdigest(),
+            'serial_number': format(cert.serial_number, 'x'),
+        }
+
+    def test_username_is_not_certificate_identity_but_builtin_still_checks_cn(self):
         with patch.object(self.verifier, '_client') as client:
-            with self.assertRaises(UKeyCertCNMismatchError):
-                self.verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'other')
-            client.assert_not_called()
+            client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
+            self.assertEqual(self.verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'admin'), self.identity())
+            client.return_value.verify_signed_data.assert_called_once()
+        with self.assertRaises(UKeyCertCNMismatchError):
+            BuiltinVerifier(self.ca_pem).verify_certificate(self.cert, 'admin')
 
     def test_wrong_issuing_key_is_rejected_before_remote_verification(self):
         wrong_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -293,7 +303,7 @@ class VCTKSVerifierTests(TestCase):
                         client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
                         self.assertEqual(verifier.verify_proof(
                             self.cert, self.signature, CHALLENGE, 'user'
-                        ), {'subject_cn': 'user'})
+                        ), self.identity())
 
     def test_same_name_wrong_key_candidate_does_not_hide_valid_issuer(self):
         wrong_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -311,7 +321,7 @@ class VCTKSVerifierTests(TestCase):
             client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
             self.assertEqual(verifier.verify_proof(
                 self.cert, self.signature, CHALLENGE, 'user'
-            ), {'subject_cn': 'user'})
+            ), self.identity())
 
     def test_expired_matching_ca_cannot_be_replaced_by_unrelated_valid_ca(self):
         expired = issue_certificate(self.ca_key, ca=True, name='test CA', start=-2, end=-1)
@@ -364,7 +374,7 @@ class VCTKSVerifierTests(TestCase):
             client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
             self.assertEqual(verifier.verify_proof(
                 self.cert, self.signature, CHALLENGE, 'user'
-            ), {'subject_cn': 'user'})
+            ), self.identity())
 
     def test_connection_test_only_checks_random_generation(self):
         with patch.object(self.verifier, '_client') as client:

@@ -1879,6 +1879,7 @@
     "AccountDiscoverList": "帳號收集",
     "BaseAccountDiscover": "帳號採集",
     "DataLastUsed": "最後使用日期",
+    "UKeyCertificateAlgorithmUnsupported": "UKey 簽章憑證的演算法不受支援。",
     "UKeyVCTKSHelp": "使用現有吉大正元 UKey 用戶端，透過 VCTK_S 服務完成驗簽。",
     "UKeyVCTKSServerURL": "VCTK_S 驗簽服務位址",
     "UKeyVCTKSServerHelp": "填寫 VCTK_S 服務的完整 HTTP/HTTPS 位址，不包含路徑、查詢參數或片段。",

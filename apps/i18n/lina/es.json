@@ -1869,6 +1869,7 @@
     "UserActivity": "User activity",
     "SyslogAddr": "Syslog address",
     "NasMountPath": "Ruta de montaje NAS",
+    "UKeyCertificateAlgorithmUnsupported": "El algoritmo del certificado de firma UKey no es compatible.",
     "UKeyVCTKSHelp": "Use el cliente JIT UKey existente y verifique las firmas mediante el servicio VCTK_S.",
     "UKeyVCTKSServerURL": "URL del servicio de verificación VCTK_S",
     "UKeyVCTKSServerHelp": "Introduzca la dirección HTTP/HTTPS completa del servicio VCTK_S, sin ruta, consulta ni fragmento.",

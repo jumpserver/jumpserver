@@ -21,7 +21,12 @@ class VCTKSLoginTests(SimpleTestCase):
         self.addCleanup(cache.clear)
         self.state = snapshot()
         self.request = request()
-        self.user = SimpleNamespace(username='user', ukey_sn='serial')
+        self.user = SimpleNamespace(pk='target-user', username='admin', ukey_sn='old-builtin-serial')
+        self.identity = {
+            'certificate_fingerprint': 'c' * 64, 'issuer_fingerprint': 'i' * 64,
+            'serial_number': '1234',
+        }
+        self.binding = SimpleNamespace(user=self.user, hardware_serial='serial', version='version-1')
         self.backend = backends.UKeyBackend()
         patches = (
             patch.object(backends, 'get_snapshot', side_effect=lambda: self.state),
@@ -29,6 +34,7 @@ class VCTKSLoginTests(SimpleTestCase):
             patch.object(backends, 'locked_snapshot', side_effect=self.locked),
             patch.object(self.backend, '_check_user_and_ukey_sn', return_value=self.user),
             patch.object(self.backend, 'user_can_authenticate', return_value=True),
+            patch.object(self.backend, 'user_allow_authenticate', return_value=True),
             patch('authentication.backends.ukey.providers.vctk_s.VCTKSCAProvider.generate_challenge',
                   return_value='ab' * 32),
         )
@@ -37,7 +43,12 @@ class VCTKSLoginTests(SimpleTestCase):
             self.addCleanup(mocked.stop)
         verifier = patch('authentication.backends.ukey.providers.vctk_s.VCTKSCAProvider.verify_proof')
         self.verify = verifier.start()
+        self.verify.return_value = self.identity
         self.addCleanup(verifier.stop)
+        bindings = patch.object(backends.UKeyCertificateBinding.objects, 'select_related')
+        self.bindings = bindings.start()
+        self.addCleanup(bindings.stop)
+        self.bindings.return_value.filter.return_value.first.return_value = self.binding
         self.issued = challenges.issue(self.request, 'login')
         self.proof = {
             'cert': 'certificate', 'signature': 'attached-signature', 'ukey_sn': 'serial',
@@ -50,12 +61,16 @@ class VCTKSLoginTests(SimpleTestCase):
         return nullcontext(self.state)
 
     def authenticate(self):
-        return self.backend.authenticate(self.request, 'user', ukey_proof=self.proof)
+        return self.backend.authenticate(self.request, 'sys_manage', ukey_proof=self.proof)
 
     def test_success_uses_only_the_server_saved_challenge(self):
         self.assertIs(self.authenticate(), self.user)
-        self.verify.assert_called_once_with('certificate', 'attached-signature', 'ab' * 32, 'user')
-        self.backend._check_user_and_ukey_sn.assert_called_once_with('user', 'serial')
+        self.verify.assert_called_once_with('certificate', 'attached-signature', 'ab' * 32)
+        self.backend._check_user_and_ukey_sn.assert_not_called()
+        self.bindings.return_value.filter.assert_called_once_with(
+            provider='vctk_s', certificate_fingerprint='c' * 64,
+        )
+        self.assertEqual(self.request.ukey_binding_version, 'version-1')
         with self.assertRaises(PermissionDenied):
             self.authenticate()
         self.verify.assert_called_once()
@@ -89,6 +104,7 @@ class VCTKSLoginTests(SimpleTestCase):
     def test_config_change_during_remote_verification_cannot_complete_login(self):
         def change(*args):
             self.state = snapshot(**{REVISION: 'new-revision'})
+            return self.identity
 
         self.verify.side_effect = change
         with self.assertRaises(PermissionDenied):
@@ -104,3 +120,19 @@ class VCTKSLoginTests(SimpleTestCase):
             with self.assertRaises(PermissionDenied):
                 self.authenticate()
         self.verify.assert_not_called()
+
+    def test_unbound_or_wrong_hardware_never_falls_back_to_cn_or_builtin_sn(self):
+        for binding in (None, SimpleNamespace(hardware_serial='other')):
+            self.bindings.return_value.filter.return_value.first.return_value = binding
+            self.proof['challenge_id'] = challenges.issue(self.request, 'login')['id']
+            with self.assertRaises(PermissionDenied):
+                self.authenticate()
+        self.backend._check_user_and_ukey_sn.assert_not_called()
+
+    def test_disabled_or_disallowed_bound_account_cannot_login(self):
+        for method in (self.backend.user_can_authenticate, self.backend.user_allow_authenticate):
+            method.return_value = False
+            self.proof['challenge_id'] = challenges.issue(self.request, 'login')['id']
+            with self.assertRaises(PermissionDenied):
+                self.authenticate()
+            method.return_value = True

@@ -209,10 +209,17 @@ class UKeySDKConfig:
             field.update(fields.get(field['key'], {}))
         # 外部证书不以 CN 映射用户名，证书字段只用于展示。
         if self.provider.binding_mode == 'certificate':
-            for field in sdk_config['info']['cert']['fields']:
+            cert_info = sdk_config['info']['cert']
+            for field in cert_info if isinstance(cert_info, list) else cert_info['fields']:
                 field.pop('compare', None)
+        inherited_operations = {
+            item['key']: item for item in sdk_config['operations']['items']
+        }
         for section in ('login', 'operations'):
             sdk_config[section] = override[section]
+        for index, item in enumerate(sdk_config['operations']['items']):
+            if 'inherit' in item:
+                sdk_config['operations']['items'][index] = deepcopy(inherited_operations[item['inherit']])
         sdk_config.setdefault('i18n', {}).update(override['i18n'])
     
     # 当一个 config 值是含这些 key 的 dict 时，视为"算法分支字典"，自动按当前证书算法解析

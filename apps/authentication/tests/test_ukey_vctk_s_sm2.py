@@ -1,5 +1,6 @@
 """Real GmSSL certificate and signature checks; no device or HTTP service needed."""
 import base64
+import hashlib
 import shutil
 import subprocess
 import tempfile
@@ -100,7 +101,7 @@ class VCTKSRealSM2Tests(TestCase):
                     client.return_value.verify_signed_data.side_effect = self.verify_remote_result
                     self.assertEqual(verifier.verify_proof(
                         self.cert, self.signature, self.challenge, 'user'
-                    ), {'subject_cn': 'user'})
+                    ), self.identity())
                     client.return_value.verify_signed_data.assert_called_once()
 
     def test_real_sm2_wrong_ca_and_missing_direct_issuer_fail(self):
@@ -110,11 +111,21 @@ class VCTKSRealSM2Tests(TestCase):
                 verifier.verify_proof(self.cert, self.signature, self.challenge, 'user')
             client.assert_not_called()
 
-    def test_real_sm2_username_mismatch_is_not_swallowed(self):
+    def identity(self):
+        cert = vctk_s.checked_certificate(self.cert_der)
+        return {
+            'certificate_fingerprint': hashlib.sha256(self.cert_der).hexdigest(),
+            'issuer_fingerprint': hashlib.sha256(cert.issuer.dump() + (cert.authority_key_identifier or b'')).hexdigest(),
+            'serial_number': format(cert.serial_number, 'x'),
+        }
+
+    def test_real_sm2_cn_is_display_only_but_builtin_still_requires_match(self):
         verifier = vctk_s.VCTKSVerifier(issuing_ca=self.issuer_pem + self.root_pem)
-        with patch.object(verifier, '_client') as client, self.assertRaises(UKeyCertCNMismatchError):
-            verifier.verify_proof(self.cert, self.signature, self.challenge, 'other')
-        client.assert_not_called()
+        with patch.object(verifier, '_client') as client:
+            client.return_value.verify_signed_data.side_effect = self.verify_remote_result
+            self.assertEqual(verifier.verify_proof(self.cert, self.signature, self.challenge, 'admin'), self.identity())
+        with self.assertRaises(UKeyCertCNMismatchError):
+            BuiltinVerifier(self.issuer_pem).verify_certificate(self.cert, 'admin')
 
     def test_real_sm2_unused_ca_expiry_does_not_block_login(self):
         verifier = vctk_s.VCTKSVerifier(issuing_ca=self.wrong_pem + self.issuer_pem)
@@ -125,7 +136,7 @@ class VCTKSRealSM2Tests(TestCase):
             client.return_value.verify_signed_data.side_effect = self.verify_remote_result
             self.assertEqual(verifier.verify_proof(
                 self.cert, self.signature, self.challenge, 'user'
-            ), {'subject_cn': 'user'})
+            ), self.identity())
 
     def test_real_sm2_and_rsa_cas_can_share_one_file(self):
         from cryptography.hazmat.primitives import serialization
@@ -140,4 +151,4 @@ class VCTKSRealSM2Tests(TestCase):
             client.return_value.verify_signed_data.side_effect = self.verify_remote_result
             self.assertEqual(verifier.verify_proof(
                 self.cert, self.signature, self.challenge, 'user'
-            ), {'subject_cn': 'user'})
+            ), self.identity())

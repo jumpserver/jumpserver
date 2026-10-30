@@ -1867,6 +1867,7 @@
     "NasTest": "连接测试",
     "ArchiveDate": "归档日期",
     "Archive": "归档",
+    "UKeyCertificateAlgorithmUnsupported": "UKey 签名证书的算法不受支持。",
     "UKeyVCTKSHelp": "使用现有吉大正元 UKey 客户端，通过 VCTK_S 服务完成验签。",
     "UKeyVCTKSServerURL": "VCTK_S 验签服务地址",
     "UKeyVCTKSServerHelp": "填写 VCTK_S 服务的完整 HTTP/HTTPS 地址，不包含路径、查询参数或片段。",

@@ -19,7 +19,7 @@ from authentication.mixins import AuthMixin
 from authentication.errors import (
     AuthFailedError, NeedRedirectError
 )
-from .forms import CertificateUKeyLoginForm, OneTimeUKeyLoginForm, UKeyLoginForm
+from .forms import CertificateUKeyLoginForm, OneTimeUKeyLoginForm, UKeyLoginForm, VCTKSCertificateLoginForm
 from users.utils import LoginBlockUtil, LoginIpBlockUtil
 from . import challenges
 from .binding import binding_version
@@ -47,6 +47,8 @@ class UKeyLoginView(AuthMixin, FormView):
         return get_provider(get_snapshot())
 
     def get_form_class(self):
+        if self.provider.id == 'vctk_s':
+            return VCTKSCertificateLoginForm
         if self.provider.binding_mode == 'certificate':
             return CertificateUKeyLoginForm
         if self.provider.uses_one_time_challenge:

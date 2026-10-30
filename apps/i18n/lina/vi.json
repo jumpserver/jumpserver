@@ -1869,6 +1869,7 @@
     "UserActivity": "User activity",
     "SyslogAddr": "Syslog address",
     "NasMountPath": "Đường dẫn gắn NAS",
+    "UKeyCertificateAlgorithmUnsupported": "Thuật toán chứng thư ký UKey không được hỗ trợ.",
     "UKeyVCTKSHelp": "Sử dụng ứng dụng JIT UKey hiện có và xác minh chữ ký qua dịch vụ VCTK_S.",
     "UKeyVCTKSServerURL": "URL dịch vụ xác minh VCTK_S",
     "UKeyVCTKSServerHelp": "Nhập địa chỉ HTTP/HTTPS đầy đủ của dịch vụ VCTK_S, không có đường dẫn, truy vấn hoặc đoạn.",
