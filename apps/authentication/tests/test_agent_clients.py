@@ -12,6 +12,7 @@ from oauth2_provider.models import (
 )
 from oauthlib.common import Request as OAuthRequest
 from oauthlib.oauth2 import InvalidGrantError, InvalidScopeError
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from audits.models import OperateLog
@@ -20,6 +21,7 @@ from authentication.services.agent_clients import AgentClientCleanupBusy, AgentC
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from rbac.models import Permission, Role
+from terminal import agent_service
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
 from users.models import User
 
@@ -74,7 +76,8 @@ class AgentClientManagementTests(TestCase):
         for user in (None, self.user, self.org_manager):
             for method, path in (
                 ('get', self.url), ('options', self.url),
-                ('post', f'{self.url}{self.registration.pk}/disable/'), ('post', self.url + 'cleanup/'),
+                ('post', f'{self.url}{self.registration.pk}/disable/'),
+                ('post', f'{self.url}{self.registration.pk}/enable/'), ('post', self.url + 'cleanup/'),
                 ('delete', f'{self.url}{self.registration.pk}/'),
             ):
                 with self.subTest(user=user, method=method, path=path):
@@ -103,6 +106,7 @@ class AgentClientManagementTests(TestCase):
         self.assertFalse(get_application_model().objects.filter(pk=self.application.pk).exists())
         self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())
         self.assertEqual(self.request('delete', f'{self.url}{self.registration.pk}/', self.manager).status_code, 404)
+        self.assertEqual(self.request('post', f'{self.url}{self.registration.pk}/enable/', self.manager).status_code, 404)
         self.assertTrue(get_application_model().objects.filter(pk=self.other.pk).exists())
 
     def test_delete_revokes_grants_and_preserves_audit_in_other_org(self):
@@ -141,6 +145,7 @@ class AgentClientManagementTests(TestCase):
             self.assertFalse(model.objects.filter(application=self.application).exists())
         self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())
         self.application.refresh_from_db()
+        self.assertEqual(self.request('post', f'{self.url}{self.registration.pk}/enable/', self.manager).status_code, 404)
         self.assertEqual(self.application.redirect_uris, '')
         self.assertEqual(self.application.client_id, 'agent-desktop')
         with tmp_to_root_org():
@@ -198,6 +203,106 @@ class AgentClientManagementTests(TestCase):
                 self.assertIn(self.application.client_id, log.diff['Client ID'])
                 self.assertIn('disabled', log.diff['Result'])
         self.assertEqual(self.request('post', self.url + '99999999/disable/', self.manager).status_code, 404)
+
+    def test_enable_restores_access_and_preserves_identity_authorizations_and_history(self):
+        self.org.add_member(self.user)
+        authorized_at = timezone.now() - timedelta(hours=1)
+        AgentApplication.objects.filter(pk=self.registration.pk).update(date_authorized=authorized_at)
+        token = get_access_token_model().objects.create(
+            user=self.user, application=self.application, token='reenabled-agent-access',
+            scope='agent:access', resource=[self.registration.resource],
+            expires=timezone.now() + timedelta(minutes=5),
+        )
+        refresh = get_refresh_token_model().objects.create(
+            user=self.user, application=self.application, access_token=token,
+            token='reenabled-agent-refresh', token_family=uuid.uuid4(), resource=[self.registration.resource],
+        )
+        binding = AgentOAuthBinding.objects.create(
+            user=self.user, application=self.application, org_id=self.org.pk, access_token=token,
+        )
+        node = Terminal.objects.create(name='reenabled-client-node', type='koko')
+        with tmp_to_org(Organization.DEFAULT_ID):
+            session = AgentSession.objects.create(
+                user=self.user, application=self.application, terminal=node, oauth_token=token,
+                resource=self.registration.resource, idempotency_key='reenabled-client-session',
+                request_hash='0' * 64, date_expires=token.expires,
+            )
+            action = AgentAction.objects.create(
+                session=session, user=self.user, application=self.application, kind='execute_command',
+                idempotency_key='reenabled-client-action', request_hash='1' * 64, status='succeeded',
+            )
+            event = AgentEvent.objects.create(
+                event_id=uuid.uuid4(), action=action, sequence=1, state='succeeded',
+                payload={'data': 'retained output'}, payload_hash='2' * 64,
+            )
+        data = {'access_token': 'reenabled-agent-access', 'resource': self.registration.resource}
+        self.assertEqual(self.request('post', f'{self.url}{self.registration.pk}/disable/', self.manager).status_code, 200)
+        with self.assertRaises(PermissionDenied):
+            agent_service.introspect(node, data)
+        for user in (None, self.user, self.org_manager):
+            self.assertIn(self.request('post', f'{self.url}{self.registration.pk}/enable/', user).status_code, (401, 403))
+        self.assertFalse(AgentApplication.objects.get(pk=self.registration.pk).is_active)
+        for _ in range(2):
+            response = self.request('post', f'{self.url}{self.registration.pk}/enable/', self.manager)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.data['is_active'])
+            self.assertEqual(response.data['client_id'], self.application.client_id)
+            self.assertEqual(response.data['id'], self.registration.pk)
+        self.registration.refresh_from_db()
+        self.application.refresh_from_db()
+        token.refresh_from_db()
+        refresh.refresh_from_db()
+        binding.refresh_from_db()
+        self.assertEqual(self.registration.date_authorized, authorized_at)
+        self.assertEqual(self.application.redirect_uris, 'http://127.0.0.1/callback')
+        self.assertEqual(token.token, 'reenabled-agent-access')
+        self.assertEqual(refresh.token, 'reenabled-agent-refresh')
+        self.assertIsNone(refresh.revoked)
+        self.assertEqual(binding.org_id, self.org.pk)
+        self.assertEqual(agent_service.introspect(node, data)['org_id'], str(self.org.pk))
+        with tmp_to_root_org():
+            session.refresh_from_db()
+            action.refresh_from_db()
+            event.refresh_from_db()
+            self.assertEqual(session.oauth_token_id, token.pk)
+            self.assertEqual(action.application_id, self.application.pk)
+            self.assertEqual((event.payload, event.payload_hash), ({'data': 'retained output'}, '2' * 64))
+            logs = OperateLog.objects.filter(resource_id=str(self.registration.pk), resource_type='Agent MCP client')
+            self.assertEqual(logs.count(), 3)
+            results = [log.diff['Result'] for log in logs]
+            self.assertTrue(any('already enabled' in result for result in results))
+            for log in logs:
+                self.assertEqual(log.user, str(self.manager))
+                self.assertEqual(str(log.org_id), Organization.SYSTEM_ID)
+                self.assertIn(self.application.client_id, log.diff['Client ID'])
+        self.assertTrue(get_application_model().objects.filter(pk=self.other.pk).exists())
+
+    def test_enable_does_not_restore_expired_or_revoked_authorizations(self):
+        self.org.add_member(self.user)
+        token = get_access_token_model().objects.create(
+            user=self.user, application=self.application, token='expired-agent-access',
+            scope='agent:access', resource=[self.registration.resource],
+            expires=timezone.now() - timedelta(minutes=1),
+        )
+        AgentApplication.objects.filter(pk=self.registration.pk).update(is_active=False)
+        response = self.request('post', f'{self.url}{self.registration.pk}/enable/', self.manager)
+        self.assertEqual(response.status_code, 200)
+        token.refresh_from_db()
+        self.assertLess(token.expires, timezone.now())
+        node = Terminal.objects.create(name='expired-client-node', type='koko')
+        with self.assertRaises(PermissionDenied):
+            agent_service.introspect(node, {'access_token': token.token, 'resource': self.registration.resource})
+        token.delete()
+        self.assertEqual(self.request('post', f'{self.url}{self.registration.pk}/enable/', self.manager).status_code, 200)
+        self.assertFalse(get_access_token_model().objects.filter(application=self.application).exists())
+
+    def test_state_change_rolls_back_if_operation_audit_fails(self):
+        for action, initial in (('enable', False), ('disable', True)):
+            AgentApplication.objects.filter(pk=self.registration.pk).update(is_active=initial)
+            with patch('authentication.api.agent_client.record_client_operation', side_effect=RuntimeError('audit unavailable')):
+                with self.assertRaisesMessage(RuntimeError, 'audit unavailable'):
+                    self.request('post', f'{self.url}{self.registration.pk}/{action}/', self.manager)
+            self.assertEqual(AgentApplication.objects.get(pk=self.registration.pk).is_active, initial)
 
     def test_cleanup_returns_bounded_result_and_records_deleted_client(self):
         get_application_model().objects.filter(pk=self.application.pk).update(

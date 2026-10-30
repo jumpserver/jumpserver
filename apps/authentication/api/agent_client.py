@@ -98,6 +98,13 @@ class AgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, JMSGe
 
     @action(methods=['post'], detail=True)
     def disable(self, request, *args, **kwargs):
+        return self._set_active(request, False)
+
+    @action(methods=['post'], detail=True)
+    def enable(self, request, *args, **kwargs):
+        return self._set_active(request, True)
+
+    def _set_active(self, request, active):
         registration = self.get_object()
         with transaction.atomic():
             # Match authorization and cleanup lock order.
@@ -106,12 +113,13 @@ class AgentClientViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, JMSGe
             )
             registration = get_object_or_404(AgentApplication.objects.select_for_update(), pk=registration.pk)
             was_active = registration.is_active
-            AgentApplication.objects.filter(pk=registration.pk).update(is_active=False)
-            registration.is_active = False
+            AgentApplication.objects.filter(pk=registration.pk).update(is_active=active)
+            registration.is_active = active
             registration.application = application
+            state = 'enabled' if active else 'disabled'
             record_client_operation(request, ActionChoices.update, {
                 'id': registration.pk, 'name': application.name, 'client_id': application.client_id,
-            }, 'disabled' if was_active else 'already disabled')
+            }, state if was_active != active else f'already {state}')
         return Response(self.get_serializer(registration).data)
 
     @action(methods=['post'], detail=False)
