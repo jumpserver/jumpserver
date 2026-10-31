@@ -1,8 +1,8 @@
 # Agent MCP authorization and audit
 
 Core provides the authorization and audit boundary for Agent asset operations.
-Koko serves MCP Streamable HTTP and executes SSH, SFTP, MySQL/MariaDB and
-PostgreSQL operations. Lina exposes system settings, personal clients and audit
+Koko serves MCP Streamable HTTP and executes the asset protocols declared by its
+execution adapters. Lina exposes system settings, personal clients and audit
 tabs under session and command records. docker-web/Nginx
 provides the external entry points, TLS termination and forwarding.
 
