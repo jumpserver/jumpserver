@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from perms.const import ActionChoices
 
 
-EXECUTION_MODES = frozenset(('shell', 'database', 'files'))
+EXECUTION_MODES = frozenset(('shell', 'pipeline', 'database', 'files'))
 FILE_FIELDS = ('path', 'destination', 'size', 'sha256', 'limit', 'content', 'overwrite', 'timeout_seconds')
 
 
@@ -17,7 +17,7 @@ class ActionPolicy(NamedTuple):
     permission: int
 
 
-COMMAND_MODES = frozenset(('shell', 'database'))
+COMMAND_MODES = frozenset(('shell', 'pipeline', 'database'))
 FILE_MODES = frozenset(('files',))
 ACTION_POLICIES = {
     'execute_command': ActionPolicy(COMMAND_MODES, ('command', 'prepared_command', 'cwd', 'env', 'timeout_seconds'), ActionChoices.connect),

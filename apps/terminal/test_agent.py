@@ -269,6 +269,35 @@ class AgentBoundaryTests(TestCase):
         with self.assertRaises(ValidationError):
             service.execution_mode({'protocol': 'ssh', 'execution_mode': 'unknown'})
 
+    def test_pipeline_declaration_is_bound_to_session_and_permissions(self):
+        from terminal.api.agent import AgentComponentAPI
+        asset, account, permission = self.handoff_asset()
+        asset.platform.protocols.create(name='winrm', port=5985)
+        asset.protocols.create(name='winrm', port=5985)
+        permission.protocols = ['winrm']
+        permission.save(update_fields=['protocols'])
+        body = {'access_token': self.token.token, 'resource': self.resource,
+                'capabilities': {'version': 1, 'protocols': {'winrm': 'pipeline'}}}
+        principal = service.introspect(self.node, body)
+        discovered = AgentComponentAPI.assets(self.node, {'context_token': principal['context_token']})['results'][0]
+        self.assertEqual(discovered['protocols'], ['winrm'])
+        request = {'context_token': principal['context_token'], 'asset_id': str(asset.id),
+                   'account': str(account.id), 'protocol': 'winrm', 'idempotency_key': 'pipeline-session'}
+        created = service.create_session(self.node, request)
+        session = AgentSession.objects.get(pk=created['id'])
+        self.assertEqual(session.requested['execution_mode'], 'pipeline')
+        self.assertEqual(set(created['capabilities']['allowed_actions']), {'execute_command', 'open_terminal'})
+        self.assertFalse(created['capabilities']['command_context_requires_review'])
+        action = {'context_token': principal['context_token'], 'session_id': created['id'], 'idempotency_key': 'pipeline-action'}
+        with self.assertRaisesMessage(ValidationError, 'SFTP'):
+            service.create_action(self.node, {**action, 'kind': 'file_read', 'request': {'path': '/file'}})
+        for context in ({'cwd': '/tmp'}, {'env': {'PATH': '/tmp'}}):
+            with self.subTest(context=context), self.assertRaisesMessage(ValidationError, 'only to SSH'):
+                service.create_action(self.node, {**action, 'kind': 'execute_command', 'request': {'command': 'Get-Location', **context}})
+        changed = service.introspect(self.node, {**body, 'capabilities': {'version': 1, 'protocols': {'winrm': 'shell'}}})
+        with self.assertRaises(service.Conflict):
+            service.create_session(self.node, {**request, 'context_token': changed['context_token']})
+
     def test_rotation_preserves_session_but_revocation_blocks_execution(self):
         self.refresh.revoked = timezone.now()
         self.refresh.save(update_fields=['revoked'])
@@ -309,6 +338,47 @@ class AgentBoundaryTests(TestCase):
         self.action.refresh_from_db()
         self.assertEqual(self.action.status, 'unknown')
         self.assertEqual(self.action.last_sequence, 3)
+
+    def test_shell_success_cannot_use_pipeline_evidence_instead_of_exit_code(self):
+        self.action.kind = 'execute_command'
+        self.action.save(update_fields=['kind'])
+        event = {'session_token': 'receipt', 'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'succeeded'}
+        for payload in ({}, {'exit_code': None}, {'exit_code': False}, {'exit_code': 0.0}, {'exit_code': 1},
+                        {'pipeline_state': 'Completed', 'had_errors': False, 'exit_code': None}):
+            with self.subTest(payload=payload), self.assertRaises(ValidationError):
+                service.append_event(self.action, {**event, 'payload': payload})
+        self.assertFalse(self.action.events.exists())
+        service.append_event(self.action, {**event, 'payload': {'exit_code': 0}})
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, 'succeeded')
+
+    def test_pipeline_success_requires_explicit_completion_without_errors(self):
+        from terminal.api.agent import AgentComponentAPI
+        self.session.requested = {**self.session.requested, 'protocol': 'winrm', 'execution_mode': 'pipeline'}
+        self.session.save(update_fields=['requested'])
+        self.action.kind = 'execute_command'
+        self.action.save(update_fields=['kind'])
+        event = {'session_token': service.session_capability(self.session), 'event_id': str(uuid.uuid4()),
+                 'sequence': 1, 'state': 'succeeded'}
+        completed = {'pipeline_state': 'Completed', 'had_errors': False, 'exit_code': None}
+        api = AgentComponentAPI(operation='events')
+        for payload in ({'exit_code': 0}, {'pipeline_state': 'Completed'},
+                        *({**completed, 'pipeline_state': state} for state in ('Running', 'Stopped', 'Failed')),
+                        *({**completed, 'had_errors': value} for value in (True, 0, 'false')),
+                        *({**completed, 'exit_code': value} for value in (1, False, 0.0))):
+            with self.subTest(payload=payload), self.assertRaises(ValidationError):
+                api.action_operation(self.node, self.action.id, {**event, 'payload': payload})
+        self.assertFalse(self.action.events.exists())
+        for code in (None, 0):
+            action = AgentAction.objects.create(session=self.session, user=self.user, application=self.app,
+                kind='execute_command', idempotency_key=f'pipeline-{code}', request={'command': 'Get-Location'},
+                request_hash='7' * 64, status='dispatching')
+            payload = {**completed, 'exit_code': code}
+            response = api.action_operation(self.node, action.id, {**event, 'event_id': str(uuid.uuid4()), 'payload': payload})
+            action.refresh_from_db()
+            self.assertEqual(response['status'], 'succeeded')
+            self.assertEqual(action.result, payload)
+            self.assertEqual(action.events.count(), 1)
 
     def test_unclaimed_unknown_receipt_converges_and_cannot_be_replayed(self):
         from terminal.api.agent import AgentComponentAPI

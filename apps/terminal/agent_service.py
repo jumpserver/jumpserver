@@ -236,7 +236,7 @@ def check_handoff_authority(session):
         asset = get_object_or_404(Asset, pk=session.requested['asset_id'], is_active=True)
         protocol = session.requested['protocol']
         if execution_mode(session.requested) not in ACTION_POLICIES['open_terminal'].modes:
-            raise ValidationError('This operation requires a shell or database session')
+            raise ValidationError('This operation requires a command session')
         account = PermAssetDetailUtil(session.user, asset).validate_permission(session.requested['account'], protocol)
         if not ConnectionToken.has_account_permission(account, protocol) or account.date_expired <= timezone.now():
             raise PermissionDenied('Asset account or protocol is not authorized')
@@ -484,7 +484,7 @@ def create_action(node, data):
         if kind == 'execute_command' and mode != 'shell' and (data['request'].get('cwd') or data['request'].get('env')):
             raise ValidationError('Working directory and environment apply only to SSH execution', code='shell_context_required')
         if kind == 'execute_command' and mode not in ACTION_POLICIES[kind].modes:
-            raise ValidationError('This operation requires a shell or database session', code='shell_session_required')
+            raise ValidationError('This operation requires a command session', code='shell_session_required')
         if kind != 'open_terminal' and (session.status != 'ready' or not session.credentials_released or not session.actions.filter(kind='connect_asset', status='succeeded').exists()):
             raise Conflict('Asset connection is not ready', code='connection_not_ready')
         request_hash = fingerprint({'session_id': str(session.id), 'kind': kind, 'request': data['request']})
@@ -718,9 +718,16 @@ def append_event(action, data):
         raise Conflict('Execution state cannot move backwards')
     if state == 'cancelled' and action.status in ('dispatching', 'running') and payload.get('stop_confirmed') is not True:
         raise ValidationError('Cancellation requires remote stop confirmation; otherwise report unknown')
-    if state == 'succeeded' and action.kind == 'execute_command' and execution_mode(action.session.requested) == 'shell':
-        if payload.get('exit_code') != 0 or isinstance(payload.get('exit_code'), bool):
+    if state == 'succeeded' and action.kind == 'execute_command':
+        mode = execution_mode(action.session.requested)
+        exit_code = payload.get('exit_code')
+        if mode == 'shell' and (type(exit_code) is not int or exit_code != 0):
             raise ValidationError('Successful SSH execution requires a confirmed zero exit code')
+        if mode == 'pipeline' and (
+            payload.get('pipeline_state') != 'Completed' or payload.get('had_errors') is not False
+            or (exit_code is not None and (type(exit_code) is not int or exit_code != 0))
+        ):
+            raise ValidationError('Successful pipeline execution requires confirmed completion without errors')
     evidence_limit = 16 * 1024 * 1024 - (0 if state in FINAL_STATES else 128 * 1024)
     if action.evidence_bytes + len(encoded) > evidence_limit:
         raise Conflict('Action evidence quota exceeded')

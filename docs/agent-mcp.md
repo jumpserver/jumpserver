@@ -232,8 +232,8 @@ capability declaration; client-selected organization fields are rejected.
 ### Execution capabilities and extension
 
 Koko supplies `capabilities` during component-authenticated introspection:
-version `1` and a `protocols` mapping from adapter names to `shell`, `database`
-or `files`. Declarations allow 1–32 protocol names of at most 16 characters;
+version `1` and a `protocols` mapping from adapter names to `shell`, `pipeline`,
+`database` or `files`. Declarations allow 1–32 protocol names of at most 16 characters;
 unknown versions, modes and malformed names are rejected. MCP clients cannot
 supply this declaration. Core signs it into the node-bound context and returns
 only protocols in both the declaration and current asset/account permissions.
@@ -243,6 +243,12 @@ mode in the existing request JSON. Refreshing capabilities cannot reinterpret
 an existing session or reuse its idempotency key with another mode. Capability
 declarations and stored execution modes are required; missing or unsupported
 values are rejected. Core contains no protocol-driver fallback list.
+
+The bound execution mode also determines successful command evidence. `shell`
+requires an integer zero process exit code. `pipeline` requires an explicit
+`pipeline_state=Completed`, `had_errors=false`, and either no process exit code
+or an integer zero exit code. Pipeline fields cannot replace process-exit proof
+for a shell session. File and database execution policies remain separate.
 
 Koko owns tool names, tool-specific schemas and execution adapters. Core owns
 stable action policies: permitted execution modes, authorization-relevant
