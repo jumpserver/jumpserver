@@ -721,8 +721,8 @@ def append_event(action, data):
     if state == 'succeeded' and action.kind == 'execute_command':
         mode = execution_mode(action.session.requested)
         exit_code = payload.get('exit_code')
-        if mode == 'shell' and (type(exit_code) is not int or exit_code != 0):
-            raise ValidationError('Successful SSH execution requires a confirmed zero exit code')
+        if mode in ('shell', 'process') and (type(exit_code) is not int or exit_code != 0):
+            raise ValidationError('Successful process execution requires a confirmed zero exit code')
         if mode == 'pipeline' and (
             payload.get('pipeline_state') != 'Completed' or payload.get('had_errors') is not False
             or (exit_code is not None and (type(exit_code) is not int or exit_code != 0))

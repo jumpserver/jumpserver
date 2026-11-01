@@ -339,18 +339,64 @@ class AgentBoundaryTests(TestCase):
         self.assertEqual(self.action.status, 'unknown')
         self.assertEqual(self.action.last_sequence, 3)
 
-    def test_shell_success_cannot_use_pipeline_evidence_instead_of_exit_code(self):
-        self.action.kind = 'execute_command'
-        self.action.save(update_fields=['kind'])
-        event = {'session_token': 'receipt', 'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'succeeded'}
-        for payload in ({}, {'exit_code': None}, {'exit_code': False}, {'exit_code': 0.0}, {'exit_code': 1},
-                        {'pipeline_state': 'Completed', 'had_errors': False, 'exit_code': None}):
-            with self.subTest(payload=payload), self.assertRaises(ValidationError):
-                service.append_event(self.action, {**event, 'payload': payload})
-        self.assertFalse(self.action.events.exists())
-        service.append_event(self.action, {**event, 'payload': {'exit_code': 0}})
-        self.action.refresh_from_db()
-        self.assertEqual(self.action.status, 'succeeded')
+    def test_process_exit_modes_cannot_use_pipeline_evidence_instead_of_exit_code(self):
+        for mode in ('shell', 'process'):
+            self.session.requested = {**self.session.requested, 'execution_mode': mode}
+            self.session.save(update_fields=['requested'])
+            action = AgentAction.objects.create(session=self.session, user=self.user, application=self.app,
+                kind='execute_command', idempotency_key=mode, request={'command': 'command'},
+                request_hash='8' * 64, status='dispatching')
+            event = {'session_token': 'receipt', 'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'succeeded'}
+            for payload in ({}, {'exit_code': None}, {'exit_code': False}, {'exit_code': 0.0}, {'exit_code': 1},
+                            {'pipeline_state': 'Completed', 'had_errors': False, 'exit_code': None}):
+                with self.subTest(mode=mode, payload=payload), self.assertRaises(ValidationError):
+                    service.append_event(action, {**event, 'payload': payload})
+            self.assertFalse(action.events.exists())
+            service.append_event(action, {**event, 'payload': {'exit_code': 0}})
+            action.refresh_from_db()
+            self.assertEqual(action.status, 'succeeded')
+
+    def test_kubernetes_process_session_preserves_authorization_boundaries(self):
+        from accounts.models import Account
+        from assets.models import Asset, Platform
+        from perms.models import AssetPermission
+        from terminal.api.agent import AgentComponentAPI
+        platform = Platform.objects.create(name='Agent Kubernetes', category='cloud', type='k8s')
+        platform.protocols.create(name='k8s', port=443)
+        asset = Asset.objects.create(name='Agent Kubernetes', address='https://192.0.2.2:6443', platform=platform)
+        asset.protocols.create(name='k8s', port=443)
+        account = Account.objects.create(name='reader', username='reader', asset=asset, secret_type='token', secret='test-only-token')
+        permission = AssetPermission.objects.create(name='Agent Kubernetes access', accounts=['reader'], protocols=['k8s'])
+        permission.users.add(self.user)
+        permission.assets.add(asset)
+        principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource,
+            'capabilities': {'version': 1, 'protocols': {'k8s': 'process'}}})
+        context = {'context_token': principal['context_token']}
+        self.assertEqual(AgentComponentAPI.assets(self.node, context)['results'][0]['protocols'], ['k8s'])
+        created = service.create_session(self.node, {**context, 'asset_id': str(asset.id), 'account': str(account.id),
+            'protocol': 'k8s', 'idempotency_key': 'kubernetes-session'})
+        session = AgentSession.objects.get(pk=created['id'])
+        self.assertEqual(session.requested['execution_mode'], 'process')
+        self.assertEqual(set(created['capabilities']['allowed_actions']), {'execute_command', 'open_terminal'})
+        for kind, request in (('file_read', {'path': '/file'}),
+                              ('execute_command', {'command': 'kubectl get pods', 'cwd': '/tmp'}),
+                              ('execute_command', {'command': 'kubectl get pods', 'env': {'PATH': '/tmp'}})):
+            with self.subTest(kind=kind, request=request), self.assertRaises(ValidationError):
+                service.create_action(self.node, {**context, 'session_id': created['id'],
+                    'kind': kind, 'request': request, 'idempotency_key': 'kubernetes-action'})
+        session.status, session.credentials_released = 'ready', True
+        session.save(update_fields=['status', 'credentials_released'])
+        session.actions.filter(kind='connect_asset').update(status='succeeded')
+        command = {'command': 'kubectl get pods --chunk-size=100', 'prepared_command': 'kubectl get pods --chunk-size=100'}
+        action = service.create_action(self.node, {**context, 'session_id': created['id'],
+            'kind': 'execute_command', 'request': command, 'idempotency_key': 'kubernetes-command'})
+        saved = AgentAction.objects.get(pk=action['id'])
+        self.assertEqual(saved.request, command)
+        permission.is_active = False
+        permission.save(update_fields=['is_active'])
+        self.assertEqual(AgentComponentAPI.assets(self.node, context)['results'], [])
+        with self.assertRaises(PermissionDenied):
+            service.authorize_action(saved)
 
     def test_pipeline_success_requires_explicit_completion_without_errors(self):
         from terminal.api.agent import AgentComponentAPI
