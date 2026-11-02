@@ -2,7 +2,31 @@
 from collections import Counter
 from uuid import UUID
 
-from django.db.models import Count
+from django.db.models import Count, Max
+
+
+def session_identity_counts(sessions, field, identity):
+    """Count resources by identity, displaying their latest non-empty session label.
+
+    Aggregate snapshot variants in SQL first, then fold them into one row per
+    identity. This avoids loading individual sessions or running a name lookup
+    for every resource. Deleted resources remain part of the historic report.
+    """
+    grouped = sessions.order_by().values(identity, field).annotate(
+        count=Count('id'), latest=Max('date_start'),
+    )
+    counts = {}
+    for row in grouped.iterator():
+        item = counts.setdefault(row[identity], {'name': '', 'count': 0, 'latest': None})
+        item['count'] += row['count']
+        if not row[field]:
+            continue
+        if item['latest'] is None or (row['latest'], row[field]) > (item['latest'], item['name']):
+            item.update(name=row[field], latest=row['latest'])
+    ordered = sorted(counts.items(), key=lambda pair: (
+        -pair[1]['count'], pair[1]['name'], str(pair[0] or ''),
+    ))
+    return [{'name': item['name'], 'count': item['count']} for _, item in ordered]
 
 
 def session_platform_counts(sessions, assets, batch_size=500):
