@@ -52,6 +52,8 @@ class RemoveAccountManager(AccountBasePlaybookManager):
         self.ensure_unique_inventory_host(host, asset)
         if host.get("error"):
             return host
+        if automation is not None:
+            host["params"] = self.get_params(automation, self.method_type())
 
         inventory_hosts = []
         accounts_to_remove = self.snapshot_asset_account_map.get(str(asset.id), [])
@@ -73,7 +75,8 @@ class RemoveAccountManager(AccountBasePlaybookManager):
             connection_username = (
                 host.get("jms_account", {}).get("username") or ""
             )
-            if escape_jinja2_syntax(username).lower() == connection_username.lower():
+            if self.is_connection_account(
+                    asset, escape_jinja2_syntax(username), connection_username):
                 h["error"] = (
                     "The account used to run this automation cannot be removed"
                 )
@@ -81,6 +84,20 @@ class RemoveAccountManager(AccountBasePlaybookManager):
                 continue
             inventory_hosts.append(h)
         return inventory_hosts
+
+    @staticmethod
+    def is_connection_account(asset, username, connection_username):
+        username, connection_username = username.lower(), connection_username.lower()
+        if username == connection_username:
+            return True
+        if not asset.is_dir_svc():
+            return False
+        # Directory services connect with the UPN (user@domain) while gathered
+        # accounts carry the logon name, so compare the logon names.
+
+        def logon_name(name):
+            return name.split('\\')[-1].split('@', 1)[0]
+        return logon_name(username) == logon_name(connection_username)
 
     def on_host_success(self, host, result):
         account = self.host_account_mapper.get(host)

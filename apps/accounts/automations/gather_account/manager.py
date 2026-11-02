@@ -309,8 +309,10 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         self.host_asset_mapper[host["name"]] = asset
         return host
 
-    def _filter_success_result(self, tp, result):
-        result = GatherAccountsFilter(tp).run(self.method_id_meta_mapper, result)
+    def _filter_success_result(self, tp, result, method_id=None):
+        result = GatherAccountsFilter(tp).run(
+            self.method_id_meta_mapper, result, method_id=method_id
+        )
         return result
 
     @staticmethod
@@ -343,7 +345,10 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         return cls._get_nested_info(result, "debug", "res", "info")
 
     def _collect_asset_account_info(self, asset, info):
-        result = self._filter_success_result(asset.type, info)
+        method_id = getattr(
+            getattr(asset.platform, 'automation', None), 'gather_accounts_method', None
+        )
+        result = self._filter_success_result(asset.type, info, method_id=method_id)
         accounts = []
 
         for username, info in result.items():
