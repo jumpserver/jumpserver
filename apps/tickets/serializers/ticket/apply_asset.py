@@ -78,7 +78,7 @@ class ApplyAssetSerializer(AssetRequestValidationMixin, TicketApplySerializer):
             raise serializers.ValidationError({'apply_users': _('Select one active organization member.')})
         if users[0] != attrs['applicant'].pk:
             with tmp_to_org(attrs['org_id']):
-                if not self.context['request'].user.has_perm('tickets.apply_asset_for_others'):
+                if not self.context['request'].user.has_perm('tickets.apply_assetforothers'):
                     raise PermissionDenied(_('You cannot apply for asset access on behalf of another user.'))
             if not supports_delegated_request(attrs['workflow'].active_version):
                 raise serializers.ValidationError({

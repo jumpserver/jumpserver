@@ -18080,3 +18080,31 @@ msgid ""
 msgstr ""
 "{} - Senha de criptografia não definida. Acesse Preferências pessoais → "
 "Autenticação do usuário → Criptografia de arquivos."
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "Relatórios de auditoria"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "Relatórios antigos"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "Pode visualizar o relatório de auditoria abrangente"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "Pode visualizar o relatório de atividades operacionais"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "Pode visualizar o relatório de eventos de segurança"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "Pode visualizar a visão geral de ativos e contas"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "Pode visualizar o relatório de operações de contas"

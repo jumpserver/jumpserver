@@ -17904,3 +17904,31 @@ msgid ""
 "{} - Encryption password not set - Please go to Personal Settings → User "
 "authentication → File Encryption to set it."
 msgstr "{} - 暗号化パスワードが未設定です。個人設定 → ユーザー認証 → ファイル暗号化で設定してください。"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "監査レポート"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "旧版レポート"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "総合監査レポートを表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "運用活動レポートを表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "セキュリティイベントレポートを表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "資産とアカウントの概要を表示できる"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "アカウント運用レポートを表示できる"
