@@ -13,6 +13,11 @@ on:
         default: 'true'
         type: boolean
 
+permissions:
+  # The job deletes merged pr branches with git push and reads their pull requests with gh.
+  contents: write
+  pull-requests: read
+
 jobs:
   cleanup-branches:
     runs-on: ubuntu-latest

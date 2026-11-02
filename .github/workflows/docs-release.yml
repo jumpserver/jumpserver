@@ -10,6 +10,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   update_docs_changelog:
     runs-on: ubuntu-latest
