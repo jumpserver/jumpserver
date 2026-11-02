@@ -1,5 +1,6 @@
 from ..exceptions import UKeyAuthError
 from .builtin import BuiltinCAProvider
+from .vctk_s import VCTKSCAProvider
 from .xjca import XJCACAProvider
 
 __all__ = ['get_provider', 'get_provider_classes']
@@ -8,6 +9,7 @@ __all__ = ['get_provider', 'get_provider_classes']
 PROVIDERS = {
     'builtin': BuiltinCAProvider,
     'xjca': XJCACAProvider,
+    'vctk_s': VCTKSCAProvider,
 }
 
 

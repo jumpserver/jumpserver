@@ -28,3 +28,15 @@ class CertificateUKeyLoginForm(UKeyLoginForm):
     signature = forms.CharField(required=True, max_length=4096, widget=forms.HiddenInput())
     ukey_sn = forms.CharField(required=True, max_length=128, widget=forms.HiddenInput())
     challenge_id = forms.CharField(required=True, min_length=43, max_length=43, widget=forms.HiddenInput())
+
+
+class OneTimeUKeyLoginForm(UKeyLoginForm):
+    username = forms.CharField(required=True, max_length=128, widget=forms.HiddenInput())
+    cert = forms.CharField(required=True, max_length=21848, widget=forms.HiddenInput())
+    signature = forms.CharField(required=True, max_length=43692, widget=forms.HiddenInput())
+    ukey_sn = forms.CharField(required=True, max_length=128, widget=forms.HiddenInput())
+    challenge_id = forms.CharField(required=True, min_length=43, max_length=43, widget=forms.HiddenInput())
+
+
+class VCTKSCertificateLoginForm(CertificateUKeyLoginForm):
+    signature = forms.CharField(required=True, max_length=43692, widget=forms.HiddenInput())

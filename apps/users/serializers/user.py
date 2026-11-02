@@ -349,8 +349,9 @@ class UserSerializer(
     def clean_ukey_fields(attrs):
         for field in ("ukey_sn",):
             value = attrs.get(field)
-            if value is None:
-                attrs.pop(field, None)
+            # Preserve explicit null for unbinding; an omitted field stays unchanged.
+            if value == "":
+                attrs[field] = None
         return attrs
 
     def check_disallow_self_update_fields(self, attrs):

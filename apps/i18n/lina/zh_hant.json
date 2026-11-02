@@ -1883,5 +1883,22 @@
     "AccountAmount": "帳號數量",
     "AccountDiscoverList": "帳號收集",
     "BaseAccountDiscover": "帳號採集",
-    "DataLastUsed": "最後使用日期"
+    "DataLastUsed": "最後使用日期",
+    "UKeyCertificateListInvalid": "無法識別 UKey 憑證清單格式，請檢查用戶端元件版本。",
+    "UKeyCertificateSelectionChanged": "所選 UKey 憑證已變更，請重新選擇後綁定。",
+    "UKeyCertificateSelectionFailed": "無法設定目前的 UKey 憑證，請重試。",
+    "UKeyCertificateAlgorithmUnsupported": "UKey 簽章憑證的演算法不受支援。",
+    "UKeyVCTKSHelp": "使用現有吉大正元 UKey 用戶端，透過 VCTK_S 服務完成驗簽。",
+    "UKeyVCTKSServerURL": "VCTK_S 驗簽服務位址",
+    "UKeyVCTKSServerHelp": "填寫 VCTK_S 服務的完整 HTTP/HTTPS 位址，不包含路徑、查詢參數或片段。",
+    "UKeyVCTKSIssuingCA": "可信簽發 CA",
+    "UKeyVCTKSIssuingCAHelp": "上傳包含一張或多張可信 CA 憑證的 PEM 檔案（最多 16 張、64 KB），需包含直接簽發 UKey 使用者憑證的 CA，可同時包含根 CA，順序不限。過期或尚未生效的 CA 不用於登入驗證。未上傳新檔案時保留原設定。",
+    "UKeyVCTKSIssuingCAConfigured": "已設定簽發 CA",
+    "UKeyVCTKSIssuingCANotConfigured": "尚未設定簽發 CA",
+    "UKeyVCTKSConnectionPassed": "VCTK_S 隨機數介面檢查通過，尚未驗證 UKey 簽章及憑證，設定未儲存。",
+    "UKeyVCTKSAuthorizationUsername": "業務授權使用者名稱",
+    "UKeyVCTKSAuthorizationPassword": "業務授權密碼",
+    "UKeyVCTKSAuthorizationHelp": "僅在 VCTK_S 服務啟用業務授權時填寫；使用者名稱留空表示不使用業務授權。",
+    "UKeyVCTKSAuthorizationPasswordHelp": "留空保留已儲存的密碼。",
+    "UKeyVCTKSAuthorizationAdvanced": "進階：業務授權（選填）"
 }

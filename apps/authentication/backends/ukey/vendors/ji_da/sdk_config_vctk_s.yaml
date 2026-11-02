@@ -1,0 +1,153 @@
+# VCTK_S uses existing certificates; PIN operations retain the vendor defaults.
+sdk:
+  create: {}
+  setup:
+    steps: []
+
+info:
+  when: "{{ mode === 'admin' || (mode === 'user' && ukey.binding.bound && ukey.devSN === ukey.binding.hardware_serial) }}"
+  device:
+    - key: userUKeySN
+      value: "{{ ukey.binding.hardware_serial }}"
+
+login:
+  detect:
+    setup: true
+    steps:
+      - &read_certificate
+        name: getCert
+        label: "{{ '获取证书' | trans }}"
+        call: UKey_GetCert
+        args: ["{{ config.certType }}"]
+        register: ukey.cert
+        check:
+          expr: "{{ result != null && result !== '' }}"
+          message: "{{ '未检测到证书' | trans }}"
+  steps:
+    - &verify_pin
+      name: verifyPin
+      label: "{{ '验证 PIN' | trans }}"
+      call: UKey_VerifyPIN
+      args: ["{{ input.pin }}"]
+      check:
+        expr: "{{ result === 0 }}"
+        message: "{{ 'PIN 验证失败，错误码: {{ result }}' | trans }}"
+    # SDK config generation inserts a fresh certificate read after PIN.
+    - &sign_challenge
+      name: signChallenge
+      label: "{{ '签名挑战码' | trans }}"
+      call: UKey_P7SignAttach
+      digest_certificate: "{{ ukey.cert }}"
+      args: ["{{ config.digestAlg }}", "{{ challenge.code_base64 }}"]
+      register: vars.signature
+      check:
+        expr: "{{ result != null && result !== '' }}"
+        message: "{{ '签名失败，错误码: {{ result }}' | trans }}"
+    - name: submit
+      label: "{{ '提交登录' | trans }}"
+      type: submit
+      fields:
+        signature: "{{ vars.signature }}"
+        cert: "{{ ukey.cert }}"
+        username: ''
+        ukey_sn: "{{ ukey.devSN }}"
+        challenge_id: "{{ challenge.id }}"
+
+operations:
+  when: "{{ mode === 'admin' || (mode === 'user' && ukey.binding.bound && ukey.devSN === ukey.binding.hardware_serial) }}"
+  items:
+    - key: bindUserUKeySN
+      label: "{{ '绑定设备' | trans }}"
+      hint: "{{ 'Bind the existing certificate without issuing a new certificate.' | trans }}"
+      btnType: primary
+      scope: admin
+      disabled: "{{ !ukey.connected }}"
+      event: [refresh.info.device, refresh.info.cert]
+      steps:
+        - <<: *verify_pin
+          input:
+            title: "{{ '验证用户 PIN' | trans }}"
+            fields:
+              - {key: pin, label: PIN, type: password, required: true}
+        - name: getBindingDevSN
+          label: "{{ '获取设备序列号' | trans }}"
+          call: UKey_GetDevSN
+          args: []
+          register: vars.bindingDevSN
+          check:
+            expr: "{{ typeof result === 'string' && result.length > 0 && result.length <= 128 && result.trim() === result }}"
+            message: "{{ 'Failed to read the UKey device serial number. Reconnect the UKey and retry.' | trans }}"
+        - *read_certificate
+        - type: api
+          method: post
+          url: &binding_url "{{ config.api.certificate_binding_url }}"
+          url_format: &binding_target {user_id: "{{ user.id }}"}
+          body: {action: challenge, revision: "{{ config.revision }}"}
+          register: vars.challenge
+        - <<: *sign_challenge
+          args: ["{{ config.digestAlg }}", "{{ vars.challenge.code_base64 }}"]
+        - name: checkBindingDevSN
+          label: "{{ 'Check binding device' | trans }}"
+          call: UKey_GetDevSN
+          args: []
+          check:
+            expr: "{{ result === vars.bindingDevSN }}"
+            message: "{{ 'The UKey was removed or changed during binding. Retry the operation.' | trans }}"
+        - type: api
+          method: post
+          url: *binding_url
+          url_format: *binding_target
+          body:
+            action: bind
+            revision: "{{ config.revision }}"
+            challenge_id: "{{ vars.challenge.id }}"
+            cert: "{{ ukey.cert }}"
+            signature: "{{ vars.signature }}"
+            hardware_serial: "{{ vars.bindingDevSN }}"
+          register: ukey.binding
+    - key: unbindUserUKeySN
+      label: "{{ '解绑设备' | trans }}"
+      hint: "{{ 'Remove the binding only; keep the UKey certificate and private key.' | trans }}"
+      btnType: danger
+      scope: admin
+      requires_device: false
+      disabled: "{{ !ukey.binding.bound }}"
+      confirm:
+        title: "{{ '解绑设备确认' | trans }}"
+        message: "{{ '确认要解绑 UKey 设备吗？' | trans }}"
+        type: warning
+      event: refresh.info.device
+      steps:
+        - type: api
+          method: post
+          url: *binding_url
+          url_format: *binding_target
+          body:
+            action: unbind
+            revision: "{{ config.revision }}"
+            binding_version: "{{ ukey.binding.binding_version }}"
+          register: ukey.binding
+    - inherit: resetPin
+    - inherit: changePIN
+
+i18n:
+  "Check binding device":
+    zh: "检查绑定设备"
+    zh_hant: "檢查綁定裝置"
+    en: "Check binding device"
+  "Failed to read the UKey device serial number. Reconnect the UKey and retry.":
+    zh: "获取 UKey 设备序列号失败，请重新插入 UKey 后重试。"
+    zh_hant: "取得 UKey 裝置序號失敗，請重新插入 UKey 後重試。"
+    en: "Failed to read the UKey device serial number. Reconnect the UKey and retry."
+  "The UKey was removed or changed during binding. Retry the operation.":
+    zh: "绑定过程中 UKey 已拔出或发生变化，请重试。"
+    zh_hant: "綁定過程中 UKey 已拔出或發生變化，請重試。"
+    en: "The UKey was removed or changed during binding. Retry the operation."
+  "Bind the existing certificate without issuing a new certificate.":
+    zh: "绑定 UKey 中已有的证书，不签发新证书。"
+    zh_hant: "綁定 UKey 中已有的憑證，不簽發新憑證。"
+    en: "Bind the existing certificate without issuing a new certificate."
+  "Remove the binding only; keep the UKey certificate and private key.":
+    zh: "仅解除绑定，保留 UKey 中的证书和私钥。"
+    zh_hant: "僅解除綁定，保留 UKey 中的憑證和私密金鑰。"
+    en: "Remove the binding only; keep the UKey certificate and private key."

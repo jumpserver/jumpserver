@@ -170,51 +170,51 @@ msgstr "無效的 HTTPS 憑證驗證方式"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Invalid certificate service connection parameters"
-msgstr "漁翁驗簽服務連接參數無效"
+msgstr "驗簽服務連接參數無效"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Cannot resolve signature verification service address"
-msgstr "無法解析漁翁驗簽服務位址"
+msgstr "無法解析驗簽服務位址"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Signature verification service resolution timed out"
-msgstr "漁翁驗簽服務位址解析逾時"
+msgstr "驗簽服務位址解析逾時"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service connection or TLS verification failed"
-msgstr "漁翁驗簽服務連接或 TLS 憑證驗證失敗"
+msgstr "驗簽服務連接或 TLS 憑證驗證失敗"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service request is too large"
-msgstr "傳送至漁翁驗簽服務的請求過大"
+msgstr "傳送至驗簽服務的請求過大"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service returned an unexpected HTTP response"
-msgstr "漁翁驗簽服務傳回異常的 HTTP 回應"
+msgstr "驗簽服務傳回異常的 HTTP 回應"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service response timed out"
-msgstr "漁翁驗簽服務回應逾時"
+msgstr "驗簽服務回應逾時"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service response is too large"
-msgstr "漁翁驗簽服務傳回的資料過大"
+msgstr "驗簽服務傳回的資料過大"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Incomplete certificate service response"
-msgstr "漁翁驗簽服務傳回的資料不完整"
+msgstr "驗簽服務傳回的資料不完整"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service connection failed or timed out"
-msgstr "漁翁驗簽服務連接失敗或逾時"
+msgstr "驗簽服務連接失敗或逾時"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Invalid certificate service response"
-msgstr "漁翁驗簽服務傳回的資料無效"
+msgstr "驗簽服務傳回的資料無效"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service rejected the request"
-msgstr "漁翁驗簽服務拒絕了請求"
+msgstr "驗簽服務拒絕了請求"
 
 #: authentication/backends/ukey/verifiers/fisherman.py
 msgid "Invalid certificate serial number"
@@ -13216,3 +13216,87 @@ msgstr "驗證碼有效期限為 {seconds} 秒。"
 #: authentication/password_reset.py users/templates/users/forgot_password.html
 msgid "Service unavailable. Please try again later."
 msgstr "服務暫時無法使用，請稍後重試。"
+
+msgid "VCTK_S verification service URL"
+msgstr "VCTK_S 驗簽服務位址"
+
+msgid "Enter the full HTTP or HTTPS address of the VCTK_S verification service, without an API path."
+msgstr "填寫 VCTK_S 驗簽服務的完整 HTTP 或 HTTPS 位址，不包含 API 路徑。"
+
+msgid "PEM trust certificates for the HTTPS service, separate from the UKey issuing CA. Leave blank to keep the saved certificate."
+msgstr "用於 HTTPS 服務的 PEM 信任憑證，與 UKey 簽發 CA 獨立。留空保留已儲存憑證。"
+
+msgid "VCTK_S trusted issuing CA"
+msgstr "VCTK_S 可信簽發 CA"
+
+msgid "Upload a PEM file containing up to 16 trusted CA certificates (maximum 64 KB). Include the CA that directly issued the UKey certificate; order does not matter. Expired or not-yet-valid CAs are not used for login. Leave blank to keep the saved file."
+msgstr "上傳包含最多 16 張可信 CA 憑證的 PEM 檔案（最大 64 KB），需包含直接簽發 UKey 使用者憑證的 CA，順序不限。過期或尚未生效的 CA 不用於登入驗證。留空保留已儲存檔案。"
+
+msgid "VCTK_S rejected the operation or returned an invalid response."
+msgstr "VCTK_S 拒絕操作或傳回無效回應。"
+
+msgid "Invalid VCTK_S operation"
+msgstr "無效的 VCTK_S 操作"
+
+msgid "Invalid or timed out certificate service response"
+msgstr "憑證服務回應無效或逾時"
+
+msgid "Check the VCTK_S service URL, HTTPS trust settings and issuing CA certificate."
+msgstr "請檢查 VCTK_S 服務位址、HTTPS 信任設定及簽發 CA 憑證。"
+
+msgid "VCTK_S certificate or signature verification failed."
+msgstr "VCTK_S 憑證或簽章驗證失敗。"
+
+msgid "VCTK_S server verification failed. Check the service settings."
+msgstr "VCTK_S 服務端驗簽失敗，請檢查服務設定。"
+
+msgid "VCTK_S version check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
+msgstr "VCTK_S 版本介面檢查通過，尚未驗證 UKey 簽章及憑證，設定未儲存。"
+
+msgid "Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate."
+msgstr "請檢查 VCTK_S 服務位址、業務授權、HTTPS 信任設定及簽發 CA 憑證。"
+
+msgid "Invalid VCTK_S business authorization credentials."
+msgstr "VCTK_S 業務授權憑證無效，請使用不含控制字元的 ASCII 使用者名稱和密碼。"
+
+msgid "VCTK_S business authorization requires a password."
+msgstr "填寫 VCTK_S 業務授權使用者名稱時必須提供密碼。"
+
+msgid "VCTK_S returned an unexpected random number length."
+msgstr "VCTK_S 傳回的隨機數長度不符合要求。"
+
+msgid "Invalid VCTK_S signing algorithm."
+msgstr "VCTK_S 簽章演算法無效。"
+
+msgid "VCTK_S returned an invalid verification result."
+msgstr "VCTK_S 傳回的驗簽結果無效。"
+
+msgid "Business authorization username"
+msgstr "業務授權使用者名稱"
+
+msgid "Business authorization password"
+msgstr "業務授權密碼"
+
+msgid "Only required when the service enables business authorization. Leave blank to disable it."
+msgstr "僅服務啟用業務授權時需要；使用者名稱留空表示不使用業務授權。"
+
+msgid "Leave blank to keep the saved password."
+msgstr "留空保留已儲存的密碼。"
+
+msgid "Invalid or expired UKey challenge"
+msgstr "UKey 挑戰碼無效或已過期，請重新整理頁面後重試"
+
+msgid "UKey challenge has already been used"
+msgstr "UKey 挑戰碼已使用，請重新整理頁面後重試"
+
+msgid "UKey configuration changed; refresh and retry"
+msgstr "UKey 設定已變更，請重新整理頁面後重試"
+
+msgid "Too many UKey challenges; try again later"
+msgstr "UKey 挑戰碼請求過於頻繁，請稍後重試"
+
+msgid "VCTK_S random generation check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
+msgstr "VCTK_S 隨機數介面檢查通過，尚未驗證 UKey 簽章及憑證，設定未儲存。"
+
+msgid "Certificate or UKey is not bound to a user"
+msgstr "憑證或 UKey 尚未綁定使用者"

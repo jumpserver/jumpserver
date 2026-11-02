@@ -1874,5 +1874,22 @@
     "UserActivity": "User activity",
     "SyslogAddr": "Syslog address",
     "NasMountPath": "Путь монтирования NAS",
-    "UploadFileTooLarge": "Ошибка загрузки: файл слишком большой"
+    "UploadFileTooLarge": "Ошибка загрузки: файл слишком большой",
+    "UKeyCertificateListInvalid": "Неизвестный формат списка сертификатов UKey. Проверьте версию клиентского компонента.",
+    "UKeyCertificateSelectionChanged": "Выбранный сертификат UKey изменился. Выберите его повторно перед привязкой.",
+    "UKeyCertificateSelectionFailed": "Не удалось установить текущий сертификат UKey. Повторите попытку.",
+    "UKeyCertificateAlgorithmUnsupported": "Алгоритм сертификата подписи UKey не поддерживается.",
+    "UKeyVCTKSHelp": "Используйте существующий клиент JIT UKey и проверяйте подписи через службу VCTK_S.",
+    "UKeyVCTKSServerURL": "URL службы проверки VCTK_S",
+    "UKeyVCTKSServerHelp": "Введите полный HTTP/HTTPS-адрес службы VCTK_S без пути, параметров запроса и фрагмента.",
+    "UKeyVCTKSIssuingCA": "Доверенный выдающий УЦ",
+    "UKeyVCTKSIssuingCAHelp": "Загрузите PEM-файл с доверенными сертификатами УЦ (до 16 сертификатов, до 64 КБ), включая УЦ, непосредственно выдавший сертификат UKey. Порядок не важен. Просроченные или ещё не действующие УЦ не используются при входе. Оставьте поле пустым, чтобы сохранить текущий файл.",
+    "UKeyVCTKSIssuingCAConfigured": "Выдающий УЦ настроен",
+    "UKeyVCTKSIssuingCANotConfigured": "Выдающий УЦ не настроен",
+    "UKeyVCTKSConnectionPassed": "Проверка генерации случайных чисел VCTK_S выполнена. Подпись и сертификат UKey не проверялись. Настройки не сохранены.",
+    "UKeyVCTKSAuthorizationUsername": "Имя пользователя авторизации сервиса",
+    "UKeyVCTKSAuthorizationPassword": "Пароль авторизации сервиса",
+    "UKeyVCTKSAuthorizationHelp": "Требуется только при включенной авторизации сервиса VCTK_S. Пустое имя пользователя отключает авторизацию.",
+    "UKeyVCTKSAuthorizationPasswordHelp": "Оставьте пустым, чтобы сохранить текущий пароль.",
+    "UKeyVCTKSAuthorizationAdvanced": "Дополнительно: авторизация сервиса (необязательно)"
 }

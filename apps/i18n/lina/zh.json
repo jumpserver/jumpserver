@@ -1871,5 +1871,22 @@
     "GetToken": "获取令牌",
     "NasTest": "连接测试",
     "ArchiveDate": "归档日期",
-    "Archive": "归档"
+    "Archive": "归档",
+    "UKeyCertificateListInvalid": "UKey 证书列表格式无法识别，请检查客户端组件版本。",
+    "UKeyCertificateSelectionChanged": "所选 UKey 证书已变化，请重新选择后绑定。",
+    "UKeyCertificateSelectionFailed": "无法设置当前 UKey 证书，请重试。",
+    "UKeyCertificateAlgorithmUnsupported": "UKey 签名证书的算法不受支持。",
+    "UKeyVCTKSHelp": "使用现有吉大正元 UKey 客户端，通过 VCTK_S 服务完成验签。",
+    "UKeyVCTKSServerURL": "VCTK_S 验签服务地址",
+    "UKeyVCTKSServerHelp": "填写 VCTK_S 服务的完整 HTTP/HTTPS 地址，不包含路径、查询参数或片段。",
+    "UKeyVCTKSIssuingCA": "可信签发 CA",
+    "UKeyVCTKSIssuingCAHelp": "上传包含一张或多张可信 CA 证书的 PEM 文件（最多 16 张、64 KB），需包含直接签发 UKey 用户证书的 CA，可同时包含根 CA，顺序不限。过期或尚未生效的 CA 不用于登录校验。未上传新文件时保留原配置。",
+    "UKeyVCTKSIssuingCAConfigured": "已配置签发 CA",
+    "UKeyVCTKSIssuingCANotConfigured": "尚未配置签发 CA",
+    "UKeyVCTKSConnectionPassed": "VCTK_S 随机数接口检查通过，尚未验证 UKey 签名及证书，配置未保存。",
+    "UKeyVCTKSAuthorizationUsername": "业务授权用户名",
+    "UKeyVCTKSAuthorizationPassword": "业务授权密码",
+    "UKeyVCTKSAuthorizationHelp": "仅当 VCTK_S 服务开启业务授权时填写；用户名留空表示不使用业务授权。",
+    "UKeyVCTKSAuthorizationPasswordHelp": "留空保留已保存的密码。",
+    "UKeyVCTKSAuthorizationAdvanced": "高级：业务授权（可选）"
 }

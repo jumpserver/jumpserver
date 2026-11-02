@@ -13196,3 +13196,48 @@ msgstr "The verification code is valid for {seconds} seconds."
 #: authentication/password_reset.py users/templates/users/forgot_password.html
 msgid "Service unavailable. Please try again later."
 msgstr "Service unavailable. Please try again later."
+
+msgid "Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate."
+msgstr "Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate."
+
+msgid "Invalid VCTK_S business authorization credentials."
+msgstr "Invalid VCTK_S business authorization credentials."
+
+msgid "VCTK_S business authorization requires a password."
+msgstr "VCTK_S business authorization requires a password."
+
+msgid "VCTK_S returned an unexpected random number length."
+msgstr "VCTK_S returned an unexpected random number length."
+
+msgid "Invalid VCTK_S signing algorithm."
+msgstr "Invalid VCTK_S signing algorithm."
+
+msgid "VCTK_S returned an invalid verification result."
+msgstr "VCTK_S returned an invalid verification result."
+
+msgid "Business authorization username"
+msgstr "Business authorization username"
+
+msgid "Business authorization password"
+msgstr "Business authorization password"
+
+msgid "Only required when the service enables business authorization. Leave blank to disable it."
+msgstr "Only required when the service enables business authorization. Leave blank to disable it."
+
+msgid "Leave blank to keep the saved password."
+msgstr "Leave blank to keep the saved password."
+
+msgid "Invalid or expired UKey challenge"
+msgstr "Invalid or expired UKey challenge"
+
+msgid "UKey challenge has already been used"
+msgstr "UKey challenge has already been used"
+
+msgid "UKey configuration changed; refresh and retry"
+msgstr "UKey configuration changed; refresh and retry"
+
+msgid "Too many UKey challenges; try again later"
+msgstr "Too many UKey challenges; try again later"
+
+msgid "VCTK_S random generation check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
+msgstr "VCTK_S random generation check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
