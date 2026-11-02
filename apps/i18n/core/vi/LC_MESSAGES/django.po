@@ -17902,3 +17902,23 @@ msgstr "Có thể xem tổng quan tài sản và tài khoản"
 #: rbac/models/menu.py
 msgid "Can view account operations report"
 msgstr "Có thể xem báo cáo vận hành tài khoản"
+
+#: assets/const/protocol.py:161
+msgid "LDAPS encrypts the connection from the start, usually on port 636. StartTLS upgrades a plain LDAP connection before binding, usually on port 389"
+msgstr "LDAPS mã hóa kết nối ngay từ đầu, thường dùng cổng 636. StartTLS nâng cấp kết nối LDAP chưa mã hóa trước khi liên kết, thường dùng cổng 389"
+
+#: assets/const/protocol.py:175
+msgid "TLS server name"
+msgstr "Tên máy chủ TLS"
+
+#: assets/const/protocol.py:176
+msgid "The name in the server certificate, such as dc01.example.com. Used for SNI and certificate name validation; defaults to the asset address"
+msgstr "Tên trong chứng chỉ máy chủ, ví dụ dc01.example.com. Dùng cho SNI và xác thực tên chứng chỉ; mặc định dùng địa chỉ tài sản"
+
+#: assets/const/protocol.py:186
+msgid "PEM encoded CA certificates used to validate the server certificate; the system trust store is used when empty"
+msgstr "Chứng chỉ CA định dạng PEM dùng để xác thực chứng chỉ máy chủ; để trống thì dùng kho tin cậy của hệ thống"
+
+#: accounts/automations/change_secret/manager.py:66
+msgid "The currently managed password is required when AD passwords are changed with the current password"
+msgstr "Cần mật khẩu đang được quản lý khi đổi mật khẩu AD bằng mật khẩu hiện tại"

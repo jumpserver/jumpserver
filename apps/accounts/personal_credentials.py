@@ -29,6 +29,7 @@ PERSONAL_CREDENTIAL_SECRET_CHOICES = tuple(
 )
 PERSONAL_CREDENTIAL_UNSUPPORTED_PROTOCOLS = frozenset({
     Protocol.chatgpt,
+    Protocol.ldap,
 })
 PERSONAL_CREDENTIAL_PROTOCOL_CHOICES = tuple(
     choice for choice in Protocol.choices

@@ -1,0 +1,46 @@
+id: gather_accounts_by_ldap
+name: "{{ 'LDAP account gather' | trans }}"
+category:
+- ds
+type:
+- windows_ad
+method: gather_accounts
+protocol: ldap
+priority: 50
+params:
+- name: search_base
+  type: str
+  label: "{{ 'Params search_base label' | trans }}"
+  default: ''
+  help_text: "{{ 'Params gather search_base help text' | trans }}"
+i18n:
+  LDAP account gather:
+    zh: 使用 LDAPS/StartTLS 协议发现 AD 域账号
+    ja: LDAPS/StartTLS プロトコルで AD ドメインアカウントを検出
+    en: Discover AD domain accounts over LDAPS/StartTLS
+    es: Descubrir cuentas de dominio AD mediante LDAPS/StartTLS
+    ko: LDAPS/StartTLS 프로토콜로 AD 도메인 계정 검색
+    pt-br: Descobrir contas de domínio AD via LDAPS/StartTLS
+    ru: Обнаружить доменные учетные записи AD через LDAPS/StartTLS
+    vi: Phát hiện tài khoản miền AD qua LDAPS/StartTLS
+    zh-hant: 使用 LDAPS/StartTLS 協定探索 AD 網域帳號
+  Params search_base label:
+    zh: 搜索根
+    ja: 検索ベース
+    en: Search base
+    es: Base de búsqueda
+    ko: 검색 기준
+    pt-br: Base de pesquisa
+    ru: База поиска
+    vi: Gốc tìm kiếm
+    zh-hant: 搜尋根
+  Params gather search_base help text:
+    zh: 只发现此 DN 下的账号，例如 OU=Staff,DC=example,DC=com。留空时发现整个域的账号
+    ja: この DN 配下のアカウントのみ検出します（例：OU=Staff,DC=example,DC=com）。空欄の場合はドメイン全体を検出します
+    en: Only discover accounts under this DN, such as OU=Staff,DC=example,DC=com. When empty, the whole domain is discovered
+    es: Solo descubre cuentas bajo este DN, como OU=Staff,DC=example,DC=com. Si está vacío, se descubre todo el dominio
+    ko: '이 DN 아래의 계정만 검색합니다(예: OU=Staff,DC=example,DC=com). 비워 두면 도메인 전체를 검색합니다'
+    pt-br: Descobre apenas contas sob este DN, como OU=Staff,DC=example,DC=com. Se vazio, todo o domínio é descoberto
+    ru: Обнаруживать только учетные записи под этим DN, например OU=Staff,DC=example,DC=com. Если пусто, обнаруживается весь домен
+    vi: Chỉ phát hiện tài khoản dưới DN này, ví dụ OU=Staff,DC=example,DC=com. Để trống thì phát hiện toàn miền
+    zh-hant: 只探索此 DN 下的帳號，例如 OU=Staff,DC=example,DC=com。留空時探索整個網域的帳號

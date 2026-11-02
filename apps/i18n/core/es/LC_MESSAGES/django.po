@@ -18122,3 +18122,23 @@ msgstr "Puede ver el resumen de activos y cuentas"
 #: rbac/models/menu.py
 msgid "Can view account operations report"
 msgstr "Puede ver el informe de operaciones de cuentas"
+
+#: assets/const/protocol.py:161
+msgid "LDAPS encrypts the connection from the start, usually on port 636. StartTLS upgrades a plain LDAP connection before binding, usually on port 389"
+msgstr "LDAPS cifra la conexión desde el inicio, normalmente en el puerto 636. StartTLS convierte una conexión LDAP sin cifrar en cifrada antes del enlace, normalmente en el puerto 389"
+
+#: assets/const/protocol.py:175
+msgid "TLS server name"
+msgstr "Nombre del servidor TLS"
+
+#: assets/const/protocol.py:176
+msgid "The name in the server certificate, such as dc01.example.com. Used for SNI and certificate name validation; defaults to the asset address"
+msgstr "Nombre del certificado del servidor, como dc01.example.com. Se usa para SNI y la validación del nombre del certificado; de forma predeterminada se usa la dirección del activo"
+
+#: assets/const/protocol.py:186
+msgid "PEM encoded CA certificates used to validate the server certificate; the system trust store is used when empty"
+msgstr "Certificados de CA en formato PEM para validar el certificado del servidor; si está vacío, se usa el almacén de confianza del sistema"
+
+#: accounts/automations/change_secret/manager.py:66
+msgid "The currently managed password is required when AD passwords are changed with the current password"
+msgstr "Se requiere la contraseña administrada actual para cambiar contraseñas de AD con la contraseña actual"

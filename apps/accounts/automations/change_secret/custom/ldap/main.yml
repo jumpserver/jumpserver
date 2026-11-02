@@ -1,0 +1,36 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    ansible_python_interpreter: "{{ local_python_interpreter }}"
+    ansible_become: false
+
+  tasks:
+    - name: Reject unsupported secret type
+      ansible.builtin.fail:
+        msg: "AD accounts only support password secrets"
+      when: account.secret_type != "password"
+
+    - name: Change AD password (ldap3)
+      ad_ldap_user:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        security: "{{ jms_asset.ldap_security | default('ldaps') }}"
+        allow_invalid_cert: "{{ jms_asset.ldap_allow_invalid_cert | default(False) }}"
+        # A gateway tunnel replaces the address; keep validating the asset's own.
+        tls_server_name: >-
+          {{ jms_asset.ldap_tls_server_name | default('', true)
+             or jms_asset.origin_address }}
+        ca_cert: "{{ jms_asset.ldap_ca_cert | default('') }}"
+        domain_name: "{{ jms_asset.spec_info.domain_name | default('') }}"
+        search_base: "{{ params.search_base | default('') }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+        old_password: "{{ account.old_secret | default('') }}"
+        mode: "{{ 'change' if (params.use_current_password | default(False) | bool) else 'reset' }}"
+        enforce_password_history: "{{ params.enforce_password_history | default(False) }}"
+        unlock: "{{ params.unlock | default(False) }}"
+        verify: "{{ check_conn_after_change | default(True) }}"
+        change_started_at: "{{ account.change_started_at | default(0) }}"

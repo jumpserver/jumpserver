@@ -260,6 +260,10 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         primary = [p for p in protocols if p.get('primary')]
         if not primary:
             protocols[0]['primary'] = True
+        for p in protocols:
+            # LDAP is only an automation channel; users cannot connect with it.
+            if p.get('name') == Protocol.ldap:
+                p['public'] = False
         # 这里不设置不行，write_nested 不使用 validated 中的
         self.initial_data['protocols'] = protocols
         return protocols

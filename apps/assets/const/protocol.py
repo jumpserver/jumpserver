@@ -16,6 +16,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     telnet = 'telnet', 'Telnet'
     vnc = 'vnc', 'VNC'
     winrm = 'winrm', 'WinRM'
+    ldap = 'ldap', 'LDAP'
 
     mysql = 'mysql', 'MySQL'
     mariadb = 'mariadb', 'MariaDB'
@@ -154,6 +155,47 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'type': 'bool',
                         'default': False,
                         'label': _('Allow invalid certificate'),
+                    },
+                }
+            },
+            cls.ldap: {
+                'port': 636,
+                'secret_types': ['password'],
+                'setting': {
+                    'security': {
+                        'type': 'choice',
+                        'choices': [('ldaps', 'LDAPS'), ('starttls', 'StartTLS')],
+                        'default': 'ldaps',
+                        'label': _('Security'),
+                        'help_text': _(
+                            'LDAPS encrypts the connection from the start, usually on port 636. '
+                            'StartTLS upgrades a plain LDAP connection before binding, usually on port 389'
+                        )
+                    },
+                    'allow_invalid_cert': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Allow invalid certificate'),
+                    },
+                    'tls_server_name': {
+                        'type': 'str',
+                        'required': False,
+                        'default': '',
+                        'label': _('TLS server name'),
+                        'help_text': _(
+                            'The name in the server certificate, such as dc01.example.com. '
+                            'Used for SNI and certificate name validation; defaults to the asset address'
+                        )
+                    },
+                    'ca_cert': {
+                        'type': 'text',
+                        'required': False,
+                        'default': '',
+                        'label': _('CA certificate'),
+                        'help_text': _(
+                            'PEM encoded CA certificates used to validate the server certificate; '
+                            'the system trust store is used when empty'
+                        )
                     },
                 }
             },

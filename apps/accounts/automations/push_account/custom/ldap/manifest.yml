@@ -1,0 +1,71 @@
+id: push_account_by_ldap
+name: "{{ 'LDAP account push' | trans }}"
+category:
+- ds
+type:
+- windows_ad
+method: push_account
+protocol: ldap
+priority: 50
+params:
+- name: ou
+  type: str
+  label: "{{ 'Params ou label' | trans }}"
+  default: ''
+  help_text: "{{ 'Params ou help text' | trans }}"
+- name: groups
+  type: str
+  label: "{{ 'Params ldap groups label' | trans }}"
+  default: ''
+  help_text: "{{ 'Params ldap groups help text' | trans }}"
+i18n:
+  LDAP account push:
+    zh: 使用 LDAPS/StartTLS 协议在 AD 中创建或更新域账号
+    ja: LDAPS/StartTLS プロトコルで AD ドメインアカウントを作成または更新
+    en: Create or update AD domain account over LDAPS/StartTLS
+    es: Crear o actualizar la cuenta de dominio AD mediante LDAPS/StartTLS
+    ko: LDAPS/StartTLS 프로토콜로 AD 도메인 계정 생성 또는 업데이트
+    pt-br: Criar ou atualizar a conta de domínio AD via LDAPS/StartTLS
+    ru: Создать или обновить доменную учетную запись AD через LDAPS/StartTLS
+    vi: Tạo hoặc cập nhật tài khoản miền AD qua LDAPS/StartTLS
+    zh-hant: 使用 LDAPS/StartTLS 協定在 AD 中建立或更新網域帳號
+  Params ou label:
+    zh: 账号所在 OU
+    ja: アカウントの OU
+    en: Account OU
+    es: OU de la cuenta
+    ko: 계정 OU
+    pt-br: OU da conta
+    ru: OU учетной записи
+    vi: OU của tài khoản
+    zh-hant: 帳號所在 OU
+  Params ou help text:
+    zh: 新账号创建在此 OU 下，例如 OU=Staff,DC=example,DC=com；已有账号也只在此 OU 中查找。留空时在整个域中查找已有账号，新账号创建在 CN=Users
+    ja: 新しいアカウントはこの OU に作成されます（例：OU=Staff,DC=example,DC=com）。既存アカウントもこの OU 内でのみ検索します。空欄の場合は既存アカウントをドメイン全体で検索し、新しいアカウントは CN=Users に作成します
+    en: New accounts are created in this OU, such as OU=Staff,DC=example,DC=com, and existing accounts are looked up only under it. When empty, existing accounts are looked up in the whole domain and new accounts are created in CN=Users
+    es: Las cuentas nuevas se crean en esta OU, como OU=Staff,DC=example,DC=com, y las existentes solo se buscan dentro de ella. Si está vacío, las cuentas existentes se buscan en todo el dominio y las nuevas se crean en CN=Users
+    ko: '새 계정은 이 OU에 생성되며(예: OU=Staff,DC=example,DC=com) 기존 계정도 이 OU에서만 찾습니다. 비워 두면 기존 계정을 도메인 전체에서 찾고 새 계정은 CN=Users에 생성합니다'
+    pt-br: Novas contas são criadas nesta OU, como OU=Staff,DC=example,DC=com, e contas existentes são procuradas apenas nela. Se vazio, contas existentes são procuradas em todo o domínio e novas contas são criadas em CN=Users
+    ru: Новые учетные записи создаются в этом OU, например OU=Staff,DC=example,DC=com; существующие ищутся только в нем. Если пусто, существующие учетные записи ищутся во всем домене, а новые создаются в CN=Users
+    vi: Tài khoản mới được tạo trong OU này, ví dụ OU=Staff,DC=example,DC=com, và tài khoản hiện có chỉ được tìm trong OU này. Để trống thì tìm tài khoản hiện có trong toàn miền và tạo tài khoản mới trong CN=Users
+    zh-hant: 新帳號建立在此 OU 下，例如 OU=Staff,DC=example,DC=com；已有帳號也只在此 OU 中尋找。留空時在整個網域中尋找已有帳號，新帳號建立在 CN=Users
+  Params ldap groups label:
+    zh: 用户组
+    ja: グループ
+    en: Groups
+    es: Grupos
+    ko: 그룹
+    pt-br: Grupos
+    ru: Группы
+    vi: Nhóm
+    zh-hant: 使用者組
+  Params ldap groups help text:
+    zh: 账号要加入的用户组，多个用逗号分隔，需填写已存在的组。只会添加，不会移除账号已有的组
+    ja: アカウントを追加するグループ。複数はコンマで区切り、既存のグループを入力してください。追加のみで、既存のグループからは削除しません
+    en: Groups to add the account to, separated by commas; the groups must exist. Groups are only added, never removed
+    es: Grupos a los que se añade la cuenta, separados por comas; deben existir. Solo se añaden grupos, nunca se quitan
+    ko: 계정을 추가할 그룹이며 여러 개는 쉼표로 구분하고 기존 그룹을 입력하세요. 추가만 하며 기존 그룹에서 제거하지 않습니다
+    pt-br: Grupos aos quais a conta é adicionada, separados por vírgulas; os grupos devem existir. Os grupos apenas são adicionados, nunca removidos
+    ru: Группы, в которые добавляется учетная запись, через запятую; группы должны существовать. Группы только добавляются, но не удаляются
+    vi: Các nhóm cần thêm tài khoản vào, phân tách bằng dấu phẩy; nhóm phải tồn tại. Chỉ thêm nhóm, không bao giờ xóa
+    zh-hant: 帳號要加入的使用者組，多個用逗號分隔，需填寫已存在的組。只會新增，不會移除帳號已有的組
