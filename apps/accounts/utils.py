@@ -102,7 +102,6 @@ class AccountSecretTaskStatus:
         self.queue_status_timeout = queue_status_timeout
         self.default_timeout = default_timeout
         self.delayed_task_countdown = delayed_task_countdown
-        self.enabled = getattr(settings, 'CHANGE_SECRET_AFTER_SESSION_END', False)
 
     def _key(self, identifier):
         return f"{self.prefix}{identifier}"
@@ -126,9 +125,6 @@ class AccountSecretTaskStatus:
             metadata=None,
             use_add=False
     ):
-        if not self.enabled:
-            return
-
         key = self._key(identifier)
         data = {"status": status}
         if metadata:
@@ -143,9 +139,6 @@ class AccountSecretTaskStatus:
         return cache.get(self._key(identifier), {})
 
     def get_status(self, identifier):
-        if not self.enabled:
-            return
-
         record = cache.get(self._key(identifier), {})
         return record.get("status")
 
@@ -153,9 +146,6 @@ class AccountSecretTaskStatus:
         return cache.ttl(self._key(identifier))
 
     def clear(self, identifier):
-        if not self.enabled:
-            return
-
         cache.delete(self._key(identifier))
 
 

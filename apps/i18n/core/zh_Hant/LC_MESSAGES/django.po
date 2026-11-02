@@ -353,6 +353,18 @@ msgid "When disabled, asset account passwords cannot be viewed. Asset connection
 msgstr "關閉後，不能檢視資產帳號密碼，不影響正常連線資產。開啟後仍需相應權限。"
 
 #: settings/serializers/security.py
+msgid "Enter an integer from 300 to 86400 seconds (5 minutes to 24 hours)."
+msgstr "請輸入 300～86400 秒之間的整數（5 分鐘～24 小時）。"
+
+#: settings/serializers/security.py
+msgid "Sets the lifetime of the credential used for automatic client renewal. This does not set a fixed logout countdown. Log in to the client again after changing this setting."
+msgstr "設定用戶端自動續期憑據的有效時長，不代表固定登出倒數計時。修改後需重新登入用戶端。"
+
+#: settings/serializers/security.py
+msgid "Used for connection authentication in transparent proxy character sessions such as SSH and databases; credential expiry does not disconnect established asset connections."
+msgstr "用於 SSH、資料庫等字元型工作階段的透明代理連線認證；憑據過期不會中斷已建立的資產連線。"
+
+#: settings/serializers/security.py
 msgid "Web login lifetime (seconds)"
 msgstr "Web 登入有效期(秒)"
 
@@ -13355,6 +13367,30 @@ msgid "Execution mode"
 msgstr "執行模式"
 
 #: audits/const.py audits/backends/db.py
+msgid "Current version"
+msgstr "升級前版本"
+
+#: audits/backends/db.py
+msgid "Target version"
+msgstr "目標版本"
+
+#: audits/backends/db.py
+msgid "Upgrade result"
+msgstr "升級結果"
+
+#: audits/backends/db.py
+msgid "Succeeded"
+msgstr "成功"
+
+#: audits/backends/db.py
+msgid "Needs attention"
+msgstr "待處理"
+
+#: audits/backends/db.py
+msgid "Version mismatch"
+msgstr "實際版本與目標版本不一致"
+
+#: audits/backends/db.py
 msgid "Request status"
 msgstr "請求狀態"
 
@@ -13365,3 +13401,18 @@ msgstr "單機"
 #: audits/const.py audits/backends/db.py
 msgid "Submitted"
 msgstr "已提交"
+
+msgid "Components"
+msgstr "升級元件"
+
+#: settings/serializers/security.py
+msgid "Change secret plan secure mode"
+msgstr "改密計畫安全模式"
+
+#: settings/serializers/security.py
+msgid "Change secret plans use privileged accounts. When enabled, privileged accounts, root, administrator, and accounts with the same username as the privileged account are excluded. When disabled, an account may change its own password, subject to asset and account permissions."
+msgstr "改密計畫基於特權帳號。啟用後，不處理特權帳號、root、administrator 以及與執行改密的特權帳號同名的帳號；停用後，支援帳號自行修改密碼，實際結果取決於資產及帳號權限。"
+
+#: settings/serializers/security.py
+msgid "When enabled, eligible accounts used in sessions matching a secret rotation login rule are changed after the session ends. To rotate privileged accounts, disable change secret plan secure mode."
+msgstr "啟用後，符合密碼輪換登入規則的工作階段結束時，將更改符合條件的工作階段帳號密碼。輪換特權帳號時需停用改密計畫安全模式。"

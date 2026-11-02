@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -13,7 +14,29 @@ __all__ = [
 from settings.models import LeakPasswords
 
 
+def validate_sangfor_login_lifetime(value):
+    if str(settings.VENDOR).strip().lower() == 'sangfor' and not 300 <= value <= 86400:
+        raise serializers.ValidationError(_(
+            'Enter an integer from 300 to 86400 seconds (5 minutes to 24 hours).'
+        ))
+
+
 class SecurityPasswordRuleSerializer(serializers.Serializer):
+    CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED = serializers.BooleanField(
+        required=False, label=_('Change secret plan secure mode'),
+        help_text=_(
+            'Change secret plans use privileged accounts. When enabled, privileged accounts, root, administrator, '
+            'and accounts with the same username as the privileged account are excluded. When disabled, '
+            'an account may change its own password, subject to asset and account permissions.'
+        )
+    )
+    CHANGE_SECRET_AFTER_SESSION_END = serializers.BooleanField(
+        required=False, label=_('Secret rotation'),
+        help_text=_(
+            'When enabled, eligible accounts used in sessions matching a secret rotation login rule are changed '
+            'after the session ends. To rotate privileged accounts, disable change secret plan secure mode.'
+        )
+    )
     SECURITY_ACCOUNT_SECRET_READ = serializers.BooleanField(
         required=False, label=_('Allow viewing asset account passwords'),
         help_text=_(
@@ -217,6 +240,7 @@ class SecurityAuthSerializer(serializers.Serializer):
 class SecuritySessionSerializer(serializers.Serializer):
     SESSION_COOKIE_AGE = serializers.IntegerField(
         min_value=1, max_value=2147483647, required=False,
+        validators=[validate_sangfor_login_lifetime],
         label=_('Web login lifetime (seconds)'),
         help_text=_(
             'Sets the web login lifetime. By default, web requests renew the session; this is not a fixed logout countdown. '
@@ -248,6 +272,7 @@ class SecuritySessionSerializer(serializers.Serializer):
     )
     OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS = serializers.IntegerField(
         min_value=1, max_value=2147483647, required=False,
+        validators=[validate_sangfor_login_lifetime],
         label=_('Client access token lifetime (seconds)'),
         help_text=_(
             'Sets the client access token lifetime. A refresh token can be used to renew access before expiry. '
@@ -256,6 +281,7 @@ class SecuritySessionSerializer(serializers.Serializer):
     )
     OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS = serializers.IntegerField(
         min_value=1, max_value=2147483647, required=False,
+        validators=[validate_sangfor_login_lifetime],
         label=_('Client refresh token lifetime (seconds)'),
         help_text=_(
             'Sets the lifetime of the credential used for automatic client renewal. For clients that check this lifetime, '
@@ -317,6 +343,31 @@ class SecuritySessionSerializer(serializers.Serializer):
         required=True, label=_('Session share'),
         help_text=_("Enabled, Allows user active session to be shared with other users")
     )
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if str(settings.VENDOR).strip().lower() != 'sangfor':
+            return fields
+
+        fields['OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS'].help_text = _(
+            'Sets the lifetime of the credential used for automatic client renewal. '
+            'This does not set a fixed logout countdown. Log in to the client again after changing this setting.'
+        )
+        range_help = _('Enter an integer from 300 to 86400 seconds (5 minutes to 24 hours).')
+        for name in (
+            'SESSION_COOKIE_AGE',
+            'OAUTH2_PROVIDER_ACCESS_TOKEN_EXPIRE_SECONDS',
+            'OAUTH2_PROVIDER_REFRESH_TOKEN_EXPIRE_SECONDS',
+        ):
+            fields[name].help_text = f'{fields[name].help_text} {range_help}'
+
+        credential_help = _(
+            'Used for connection authentication in transparent proxy character sessions such as SSH and databases; '
+            'credential expiry does not disconnect established asset connections.'
+        )
+        for name in ('CONNECTION_TOKEN_ONETIME_EXPIRATION', 'CONNECTION_TOKEN_REUSABLE_EXPIRATION'):
+            fields[name].help_text = f'{fields[name].help_text} {credential_help}'
+        return fields
 
 
 class SecurityBasicSerializer(serializers.Serializer):

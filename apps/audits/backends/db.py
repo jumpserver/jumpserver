@@ -88,6 +88,10 @@ class OperateLogStore(object):
             _("Primary node"), _("Standby node"), _("Virtual IP"),
             _("Task ID"), _("Execution mode"), _("Request status"),
             _("Single node"), _("Submitted"),
+            _("Version"), _("Current version"), _("Target version"),
+            _("Upgrade result"), _("Succeeded"), _("Failed"), _("Canceled"),
+            _("Needs attention"), _("Version mismatch"), _("Components"),
+            _("Patch upgrade"), _("System upgrade"),
         )
         handler = cls._get_special_handler(op_log.resource_type)
         for k, v in op_log.diff.items():
