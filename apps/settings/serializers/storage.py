@@ -6,7 +6,21 @@ from apps.settings.serializers.cleaning import MIN_VALUE
 from common.serializers.fields import EncryptedField
 from ..const import NAS_MOUNT_PATH
 
-__all__ = ['StorageSettingSerializer']
+__all__ = ['StorageSettingSerializer', 'NasTestSerializer']
+
+
+class NasTestSerializer(serializers.Serializer):
+    NAS_TYPE = serializers.ChoiceField(choices=('nfs', 'cifs'), default='nfs')
+    NAS_HOST = serializers.CharField(max_length=128)
+    NAS_PORT = serializers.IntegerField(min_value=0, max_value=65535, default=0)
+    NAS_SHARE_NAME = serializers.CharField(max_length=256)
+    NAS_USERNAME = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=256)
+    NAS_PASSWORD = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024)
+
+    def validate(self, attrs):
+        if attrs['NAS_TYPE'] == 'cifs' and not attrs.get('NAS_USERNAME'):
+            raise serializers.ValidationError({'NAS_USERNAME': _('NAS username is required for CIFS')})
+        return attrs
 
 
 class StorageSettingSerializer(serializers.Serializer):

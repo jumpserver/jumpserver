@@ -1,5 +1,6 @@
 """VCTK_S certificate binding must preserve the other providers and JIT PIN operations."""
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import SimpleTestCase, override_settings
@@ -193,6 +194,67 @@ class SettingsTests(SimpleTestCase):
         }, context={'snapshot': snapshot()}, partial=True)
         self.assertFalse(serializer.is_valid())
         self.assertIn('AUTH_UKEY_VCTK_S_ISSUING_CA', serializer.errors)
+
+    def run_connection_test(self, state, data):
+        from django.core.cache import cache
+        from settings.api import ukey
+
+        original = dict(state)
+        request = SimpleNamespace(data=data)
+        view = ukey.UKeyTestingAPI()
+        view.request = request
+        view.format_kwarg = None
+        with (
+            patch.object(ukey, 'get_snapshot', return_value=state),
+            patch('common.serializers.fields.decrypt_session_password',
+                  side_effect=lambda value: value.removeprefix('encrypted:')),
+            patch('authentication.backends.ukey.providers.vctk_s.VCTKSVerifier') as verifier,
+            patch('authentication.backends.ukey.configuration.save_settings') as save,
+            patch.object(cache, 'set') as cache_set,
+            patch.object(cache, 'add') as cache_add,
+        ):
+            verifier.return_value.test_connection.return_value = {
+                'connection': True, 'verification': False, 'msg': 'passed',
+            }
+            response = view.post(request)
+            self.assertEqual(response.data, {
+                'connection': True, 'verification': False, 'msg': 'passed',
+            })
+            verifier.return_value.test_connection.assert_called_once_with()
+            self.assertEqual(verifier.call_args.args[0], data.get(
+                'AUTH_UKEY_VCTK_S_SVS_URL', state['AUTH_UKEY_VCTK_S_SVS_URL'],
+            ))
+            save.assert_not_called()
+            cache_set.assert_not_called()
+            cache_add.assert_not_called()
+            self.assertEqual(state, original)
+            return verifier.call_args.kwargs
+
+    def test_connection_password_uses_new_saved_or_empty_value_without_saving(self):
+        password_field = 'AUTH_UKEY_VCTK_S_PASSWORD'
+        for saved, supplied, expected in (
+            ('saved-secret', '', 'saved-secret'),
+            ('saved-secret', 'encrypted:new-secret', 'new-secret'),
+            ('', '', ''),
+        ):
+            with self.subTest(saved=bool(saved), supplied=bool(supplied)):
+                kwargs = self.run_connection_test(snapshot(**{password_field: saved}), {
+                    'AUTH_UKEY_CA_PROVIDER': 'vctk_s', password_field: supplied,
+                })
+                self.assertEqual(kwargs['password'], expected)
+
+    def test_connection_uses_draft_url_and_empty_username_without_requiring_issuing_ca(self):
+        kwargs = self.run_connection_test(snapshot(AUTH_UKEY_VCTK_S_ISSUING_CA=''), {
+            'AUTH_UKEY_CA_PROVIDER': 'vctk_s',
+            'AUTH_UKEY_VCTK_S_SVS_URL': 'http://draft.example.com:8000',
+            'AUTH_UKEY_VCTK_S_USERNAME': '',
+            'AUTH_UKEY_VCTK_S_PASSWORD': 'encrypted: spaced password ',
+            'AUTH_UKEY_VCTK_S_TLS_CA_CERT': '',
+        })
+        self.assertEqual(kwargs['username'], '')
+        self.assertEqual(kwargs['password'], ' spaced password ')
+        self.assertEqual(kwargs['tls_ca_cert'], 'saved-https-ca')
+        self.assertEqual(kwargs['issuing_ca'], '')
 
     def test_public_settings_expose_status_but_not_uploaded_certificates(self):
         result = UKeySettingSerializer(instance=snapshot()).data

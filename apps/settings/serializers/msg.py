@@ -12,11 +12,6 @@ __all__ = [
 ]
 
 
-class MailTestSerializer(serializers.Serializer):
-    EMAIL_FROM = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    EMAIL_RECIPIENT = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-
-
 class EmailSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Email')
 
@@ -56,6 +51,25 @@ class EmailSettingSerializer(serializers.Serializer):
         help_text=_(
             'Whether to use a TLS (secure) connection when talking to the SMTP server. This is used for explicit TLS connections, generally on port 587')
     )
+
+
+class MailTestSerializer(EmailSettingSerializer):
+    EMAIL_PORT = serializers.IntegerField(min_value=1, max_value=65535, required=False)
+    EMAIL_FROM = serializers.EmailField(required=False, allow_null=True, allow_blank=True)
+    EMAIL_RECIPIENT = serializers.EmailField(required=False, allow_null=True, allow_blank=True)
+
+    def to_internal_value(self, data):
+        data = dict(data)
+        if data.get('EMAIL_PROTOCOL') == self.EmailProtocol.exchange:
+            # Exchange uses the service URL; hidden SMTP fields are irrelevant.
+            for name in ('EMAIL_PORT', 'EMAIL_USE_SSL', 'EMAIL_USE_TLS'):
+                data.pop(name, None)
+        return super().to_internal_value(data)
+
+    def validate(self, attrs):
+        if attrs.get('EMAIL_USE_SSL') and attrs.get('EMAIL_USE_TLS'):
+            raise serializers.ValidationError(_('SSL and TLS cannot be enabled at the same time'))
+        return attrs
 
 
 class EmailContentSettingSerializer(serializers.Serializer):

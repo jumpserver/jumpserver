@@ -15,14 +15,15 @@ from .utils import get_logger
 logger = get_logger(__file__)
 
 
-def get_email_connection(**kwargs):
+def get_email_connection(protocol=None, **kwargs):
     email_backend_map = {
         'smtp': 'django.core.mail.backends.smtp.EmailBackend',
         'exchange': 'jumpserver.rewriting.exchange.EmailBackend'
     }
-    return get_connection(
-        backend=email_backend_map.get(settings.EMAIL_PROTOCOL), **kwargs
-    )
+    protocol = settings.EMAIL_PROTOCOL if protocol is None else protocol
+    if protocol == 'exchange' and 'host' in kwargs:
+        kwargs['service_endpoint'] = kwargs.pop('host')
+    return get_connection(backend=email_backend_map.get(protocol), **kwargs)
 
 
 def task_activity_callback(self, subject, message, recipient_list, *args, **kwargs):

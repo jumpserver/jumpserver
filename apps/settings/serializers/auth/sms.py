@@ -114,6 +114,10 @@ class CustomSMSSettingSerializer(BaseSMSSettingSerializer):
     def validate(self, attrs):
         need_params = {'{phone_numbers}', '{code}'}
         params = attrs.get('CUSTOM_SMS_API_PARAMS', {})
+        if not isinstance(params, dict) or not all(isinstance(v, str) for v in params.values()):
+            raise serializers.ValidationError({
+                'CUSTOM_SMS_API_PARAMS': _('Parameters must be an object with string values')
+            })
         # 这里用逗号分隔是保证需要的参数必须是完整的，不能分开在不同的参数中首位相连
         params_string = ','.join(params.values())
         for param in need_params:

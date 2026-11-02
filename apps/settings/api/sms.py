@@ -10,9 +10,9 @@ from rest_framework.response import Response
 
 from common.exceptions import JMSException
 from common.sdk.sms import BACKENDS
-from settings.models import Setting
 from settings.serializers import SMSBackendSerializer
 from .. import serializers
+from ..connection_testing import get_test_config
 
 
 class SMSBackendAPI(ListAPIView):
@@ -47,23 +47,12 @@ class SMSTestingAPI(GenericAPIView):
 
     @property
     def test_code(self):
-        return '6' * settings.SMS_CODE_LENGTH
-
-    @staticmethod
-    def get_or_from_setting(key, value=''):
-        if not value:
-            secret = Setting.objects.filter(name=key).first()
-            if secret:
-                value = secret.cleaned_value
-
-        return value or ''
+        return '6' * self.test_code_length
 
     def get_alibaba_params(self, data):
         init_params = {
             'access_key_id': data['ALIBABA_ACCESS_KEY_ID'],
-            'access_key_secret': self.get_or_from_setting(
-                'ALIBABA_ACCESS_KEY_SECRET', data.get('ALIBABA_ACCESS_KEY_SECRET')
-            )
+            'access_key_secret': data.get('ALIBABA_ACCESS_KEY_SECRET', '')
         }
         send_sms_params = {
             'sign_name': data['ALIBABA_VERIFY_SIGN_NAME'],
@@ -75,9 +64,7 @@ class SMSTestingAPI(GenericAPIView):
     def get_tencent_params(self, data):
         init_params = {
             'secret_id': data['TENCENT_SECRET_ID'],
-            'secret_key': self.get_or_from_setting(
-                'TENCENT_SECRET_KEY', data.get('TENCENT_SECRET_KEY')
-            ),
+            'secret_key': data.get('TENCENT_SECRET_KEY', ''),
             'sdkappid': data['TENCENT_SDKAPPID']
         }
         send_sms_params = {
@@ -90,9 +77,7 @@ class SMSTestingAPI(GenericAPIView):
     def get_huawei_params(self, data):
         init_params = {
             'app_key': data['HUAWEI_APP_KEY'],
-            'app_secret': self.get_or_from_setting(
-                'HUAWEI_APP_SECRET', data.get('HUAWEI_APP_SECRET')
-            ),
+            'app_secret': data.get('HUAWEI_APP_SECRET', ''),
             'url': data['HUAWEI_SMS_ENDPOINT'],
             'sign_channel_num': data['HUAWEI_SIGN_CHANNEL_NUM'],
         }
@@ -107,9 +92,7 @@ class SMSTestingAPI(GenericAPIView):
         init_params = {
             'host': data['CMPP2_HOST'], 'port': data['CMPP2_PORT'],
             'sp_id': data['CMPP2_SP_ID'], 'src_id': data['CMPP2_SRC_ID'],
-            'sp_secret': self.get_or_from_setting(
-                'CMPP2_SP_SECRET', data.get('CMPP2_SP_SECRET')
-            ),
+            'sp_secret': data.get('CMPP2_SP_SECRET', ''),
             'service_id': data['CMPP2_SERVICE_ID'],
         }
         send_sms_params = {
@@ -120,12 +103,17 @@ class SMSTestingAPI(GenericAPIView):
         return init_params, send_sms_params
 
     def get_custom_params(self, data):
-        init_params = {}
+        init_params = {
+            'url': data['CUSTOM_SMS_URL'],
+            'method': data['CUSTOM_SMS_REQUEST_METHOD'],
+            'api_params': data['CUSTOM_SMS_API_PARAMS'],
+            'timeout': 30,
+        }
         send_sms_params = {'template_param': OrderedDict(code=self.test_code)}
         return init_params, send_sms_params
 
     def get_custom_file_params(self, data):
-        return self.get_custom_params(data)
+        return {}, {'template_param': OrderedDict(code=self.test_code)}
 
     def get_params_by_backend(self, backend, data):
         """
@@ -140,14 +128,23 @@ class SMSTestingAPI(GenericAPIView):
         serializer_class = self.backends_serializer.get(backend)
         if serializer_class is None:
             raise JMSException(_('Invalid SMS platform'))
-        serializer = serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        secrets = {
+            'alibaba': ('ALIBABA_ACCESS_KEY_SECRET',),
+            'tencent': ('TENCENT_SECRET_KEY',),
+            'huawei': ('HUAWEI_APP_SECRET',),
+            'cmpp2': ('CMPP2_SP_SECRET',),
+        }
+        data = get_test_config(serializer_class, request.data, secrets.get(backend, ()))
+        length_field = serializers.SMSSettingSerializer().fields['SMS_CODE_LENGTH']
+        self.test_code_length = length_field.run_validation(
+            request.data.get('SMS_CODE_LENGTH', settings.SMS_CODE_LENGTH)
+        )
 
-        test_phone = serializer.validated_data.get('SMS_TEST_PHONE')
+        test_phone = data.get('SMS_TEST_PHONE')
         if not test_phone:
             raise JMSException(code='test_phone_required', detail=_('test_phone is required'))
 
-        init_params, send_sms_params = self.get_params_by_backend(backend, serializer.validated_data)
+        init_params, send_sms_params = self.get_params_by_backend(backend, data)
 
         m = importlib.import_module(f'common.sdk.sms.{backend}', __package__)
         try:

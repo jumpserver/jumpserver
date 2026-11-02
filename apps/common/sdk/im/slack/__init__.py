@@ -113,8 +113,8 @@ class Slack:
         )
         return self._client.user_id, response['user']
 
-    def is_valid(self):
-        return self._client.request('post', URL().AUTH_TEST)
+    def is_valid(self, timeout=None):
+        return self._client.request('post', URL().AUTH_TEST, timeout=timeout)
 
     def convert_to_markdown(self, message):
         blocks = []

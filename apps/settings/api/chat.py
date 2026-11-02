@@ -1,15 +1,16 @@
 import httpx
 import openai
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser, OnlySuperUser
 from .. import serializers
-from ..const import ChatAITypeChoices
+from ..const import ChatAITypeChoices, ChatAIMethodChoices
+from ..connection_testing import get_test_config
 from ..models import ChatPrompt
 from ..prompt import DefaultChatPrompt
 
@@ -21,16 +22,7 @@ class ChatAITestingAPI(GenericAPIView):
     }
 
     def get_config(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = self.serializer_class().data
-        data.update(serializer.validated_data)
-        for k, v in data.items():
-            if v:
-                continue
-            # 页面没有传递值, 从 settings 中获取
-            data[k] = getattr(settings, k, None)
-        return data
+        return get_test_config(self.serializer_class, request.data)
 
     def post(self, request):
         config = self.get_config(request)
@@ -39,6 +31,12 @@ class ChatAITestingAPI(GenericAPIView):
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={'msg': _('Chat AI is not enabled')}
+            )
+
+        if config['CHAT_AI_METHOD'] != ChatAIMethodChoices.api:
+            return Response(
+                {'msg': _('Connection testing is only available in API mode')},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         tp = config['CHAT_AI_TYPE']
@@ -55,20 +53,28 @@ class ChatAITestingAPI(GenericAPIView):
             model = config['DEEPSEEK_MODEL']
             model = model if config['DEEPSEEK_MODEL'] != 'custom' else config['CUSTOM_DEEPSEEK_MODEL']
 
+        if not api_key:
+            field = 'GPT_API_KEY' if tp == ChatAITypeChoices.gpt else 'DEEPSEEK_API_KEY'
+            raise ValidationError({field: _('This field may not be blank.')})
+
         kwargs = {
             'base_url': url or None,
             'api_key': api_key,
+            'timeout': 30,
+            'max_retries': 0,
         }
+        client = None
+        http_client = None
+        ok = False
+        error = ''
         try:
             if proxy:
-                kwargs['http_client'] = httpx.Client(
-                    proxies=proxy,
+                http_client = httpx.Client(
+                    proxy=proxy,
                     transport=httpx.HTTPTransport(local_address='0.0.0.0')
                 )
+                kwargs['http_client'] = http_client
             client = openai.OpenAI(**kwargs)
-
-            ok = False
-            error = ''
 
             client.chat.completions.create(
                 messages=[
@@ -86,6 +92,11 @@ class ChatAITestingAPI(GenericAPIView):
             error = str(e.message)
         except Exception as e:
             ok, error = False, str(e)
+        finally:
+            if client is not None:
+                client.close()
+            elif http_client is not None:
+                http_client.close()
 
         if ok:
             _status, msg = status.HTTP_200_OK, _('Test success')
