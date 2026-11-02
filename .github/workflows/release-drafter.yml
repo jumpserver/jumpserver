@@ -40,14 +40,11 @@ jobs:
           tag: ${{ steps.get_version.outputs.TAG }}
       - name: Upload Quick Start Script
         id: upload-release-quick-start-shell
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./quick_start.sh
-          asset_name: quick_start.sh
-          asset_content_type: application/text
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.get_version.outputs.TAG }}
+        # gh ships on the runner and finds the draft release by its tag.
+        run: gh release upload "$TAG" ./quick_start.sh --clobber
 
   build-and-release:
     needs: create-realese
