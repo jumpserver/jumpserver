@@ -24,6 +24,12 @@ JumpServer is an open-source Privileged Access Management (PAM) platform with AI
 
 <img alt="JumpServer architecture diagram" src="readmes/assets/jumpserver-architecture.gif" />
 
+## Version Maintenance
+
+5.x is actively maintained, 4.10.x is an LTS release, and 3.10.x receives critical fixes only. V3 Community Edition (CE) reaches end of life on **December 31, 2026**, and Enterprise Edition (EE) on **December 31, 2028**.
+
+See [SECURITY.md](SECURITY.md) for version maintenance status and how to report security vulnerabilities.
+
 ## Quickstart
 
 Prepare a clean 64-bit Linux server with at least 4 CPU cores and 8 GB of RAM.
