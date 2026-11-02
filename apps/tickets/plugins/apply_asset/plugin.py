@@ -69,7 +69,7 @@ class Plugin(TicketPlugin):
         if not beneficiary or beneficiary == str(request.user.pk):
             return workflows
         with tmp_to_org(org_id):
-            if not request.user.has_perm('tickets.apply_asset_for_others'):
+            if not request.user.has_perm('tickets.apply_assetforothers'):
                 raise PermissionDenied()
         return [workflow for workflow in workflows.select_related('active_version')
                 if supports_delegated_request(workflow.active_version)]
@@ -153,7 +153,7 @@ class Plugin(TicketPlugin):
         from django.db.models import Q
         from tickets.workflow.approvers import available_users
         users = available_users(org_id)
-        if not request.user.has_perm('tickets.apply_asset_for_others'):
+        if not request.user.has_perm('tickets.apply_assetforothers'):
             users = users.filter(pk=request.user.pk)
         search = request.query_params.get('search', '')[:128]
         if search:
