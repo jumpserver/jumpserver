@@ -90,11 +90,14 @@ class SDKCompatibilityTests(SimpleTestCase):
         operations = {item['key']: item for item in config['operations']['items']}
         bind = operations['bindUserUKeySN']['steps']
         self.assertEqual([step.get('call') or step['body']['action'] for step in bind], [
-            'UKey_VerifyPIN', 'UKey_GetCert', 'challenge', 'UKey_P7SignAttach', 'bind',
+            'UKey_VerifyPIN', 'UKey_GetDevSN', 'UKey_GetCert', 'challenge',
+            'UKey_P7SignAttach', 'UKey_GetDevSN', 'bind',
         ])
-        self.assertEqual(bind[3]['digest_certificate'], '{{ ukey.cert }}')
-        self.assertEqual(bind[3]['args'][1], '{{ vars.challenge.code_base64 }}')
-        self.assertEqual(bind[-1]['body']['hardware_serial'], '{{ ukey.devSN }}')
+        self.assertEqual(bind[1]['register'], 'vars.bindingDevSN')
+        self.assertEqual(bind[4]['digest_certificate'], '{{ ukey.cert }}')
+        self.assertEqual(bind[4]['args'][1], '{{ vars.challenge.code_base64 }}')
+        self.assertEqual(bind[5]['check']['expr'], '{{ result === vars.bindingDevSN }}')
+        self.assertEqual(bind[-1]['body']['hardware_serial'], '{{ vars.bindingDevSN }}')
         self.assertEqual(bind[-1]['url_format'], {'user_id': '{{ user.id }}'})
         unbind = operations['unbindUserUKeySN']
         self.assertFalse(unbind['requires_device'])
@@ -103,6 +106,50 @@ class SDKCompatibilityTests(SimpleTestCase):
         self.assertEqual(unbind['steps'][0]['body']['binding_version'], '{{ ukey.binding.binding_version }}')
         self.assertIn('ukey.binding.hardware_serial', config['operations']['when'])
         self.assertNotIn('user.ukey_sn', config['operations']['when'])
+
+    def test_binding_device_guards_cannot_skip_failure_or_overwrite_polled_serial(self):
+        config = UKeySDKConfig(snapshot()).get_sdk_config()
+        bind = next(item for item in config['operations']['items']
+                    if item['key'] == 'bindUserUKeySN')['steps']
+        guards = [step for step in bind if step.get('call') == 'UKey_GetDevSN']
+        self.assertEqual(len(guards), 2)
+        serial_reader = next(step for step in config['sdk']['setup']['steps']
+                             if step['name'] == 'getDevSN')
+        self.assertEqual(guards[0]['call'], serial_reader['call'])
+        self.assertEqual(guards[0]['register'], 'vars.bindingDevSN')
+        self.assertNotIn('register', guards[1])
+        for step in guards:
+            self.assertEqual(step['args'], [])
+            self.assertNotEqual(step.get('on_error'), 'skip')
+            self.assertIn('expr', step['check'])
+            self.assertIn('message', step['check'])
+        self.assertNotIn('ukey.devSN', repr(bind))
+
+    def test_binding_device_failure_messages_are_localized(self):
+        for language, expected in (
+            ('en', 'Failed to read the UKey device serial number. Reconnect the UKey and retry.'),
+            ('zh', '\u83b7\u53d6 UKey \u8bbe\u5907\u5e8f\u5217\u53f7\u5931\u8d25\uff0c\u8bf7\u91cd\u65b0\u63d2\u5165 UKey \u540e\u91cd\u8bd5\u3002'),
+            ('zh-hant', '\u53d6\u5f97 UKey \u88dd\u7f6e\u5e8f\u865f\u5931\u6557\uff0c\u8acb\u91cd\u65b0\u63d2\u5165 UKey \u5f8c\u91cd\u8a66\u3002'),
+        ):
+            with self.subTest(language=language):
+                config = UKeySDKConfig(snapshot()).get_sdk_config(lang=language)
+                bind = next(item for item in config['operations']['items']
+                            if item['key'] == 'bindUserUKeySN')['steps']
+                self.assertEqual(bind[1]['check']['message'], expected)
+                self.assertNotIn('| trans', bind[5]['check']['message'])
+
+    def test_binding_device_guards_are_not_added_to_other_provider_operations(self):
+        for vendor, provider in (
+            ('ji_da', 'builtin'), ('long_mai', 'builtin'), ('long_mai', 'xjca'),
+        ):
+            with self.subTest(vendor=vendor, provider=provider):
+                config = UKeySDKConfig(snapshot(
+                    AUTH_UKEY_VENDOR=vendor, AUTH_UKEY_CA_PROVIDER=provider,
+                )).get_sdk_config()
+                operations = repr(config['operations'])
+                self.assertNotIn('bindingDevSN', operations)
+                self.assertNotIn('getBindingDevSN', operations)
+                self.assertNotIn('checkBindingDevSN', operations)
 
     def test_default_pin_is_admin_only(self):
         config = UKeySDKConfig(snapshot())

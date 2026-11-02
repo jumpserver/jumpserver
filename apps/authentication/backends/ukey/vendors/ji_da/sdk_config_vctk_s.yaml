@@ -69,6 +69,14 @@ operations:
             title: "{{ '验证用户 PIN' | trans }}"
             fields:
               - {key: pin, label: PIN, type: password, required: true}
+        - name: getBindingDevSN
+          label: "{{ '获取设备序列号' | trans }}"
+          call: UKey_GetDevSN
+          args: []
+          register: vars.bindingDevSN
+          check:
+            expr: "{{ typeof result === 'string' && result.length > 0 && result.length <= 128 && result.trim() === result }}"
+            message: "{{ 'Failed to read the UKey device serial number. Reconnect the UKey and retry.' | trans }}"
         - *read_certificate
         - type: api
           method: post
@@ -78,6 +86,13 @@ operations:
           register: vars.challenge
         - <<: *sign_challenge
           args: ["{{ config.digestAlg }}", "{{ vars.challenge.code_base64 }}"]
+        - name: checkBindingDevSN
+          label: "{{ 'Check binding device' | trans }}"
+          call: UKey_GetDevSN
+          args: []
+          check:
+            expr: "{{ result === vars.bindingDevSN }}"
+            message: "{{ 'The UKey was removed or changed during binding. Retry the operation.' | trans }}"
         - type: api
           method: post
           url: *binding_url
@@ -88,7 +103,7 @@ operations:
             challenge_id: "{{ vars.challenge.id }}"
             cert: "{{ ukey.cert }}"
             signature: "{{ vars.signature }}"
-            hardware_serial: "{{ ukey.devSN }}"
+            hardware_serial: "{{ vars.bindingDevSN }}"
           register: ukey.binding
     - key: unbindUserUKeySN
       label: "{{ '解绑设备' | trans }}"
@@ -116,6 +131,18 @@ operations:
     - inherit: changePIN
 
 i18n:
+  "Check binding device":
+    zh: "检查绑定设备"
+    zh_hant: "檢查綁定裝置"
+    en: "Check binding device"
+  "Failed to read the UKey device serial number. Reconnect the UKey and retry.":
+    zh: "获取 UKey 设备序列号失败，请重新插入 UKey 后重试。"
+    zh_hant: "取得 UKey 裝置序號失敗，請重新插入 UKey 後重試。"
+    en: "Failed to read the UKey device serial number. Reconnect the UKey and retry."
+  "The UKey was removed or changed during binding. Retry the operation.":
+    zh: "绑定过程中 UKey 已拔出或发生变化，请重试。"
+    zh_hant: "綁定過程中 UKey 已拔出或發生變化，請重試。"
+    en: "The UKey was removed or changed during binding. Retry the operation."
   "Bind the existing certificate without issuing a new certificate.":
     zh: "绑定 UKey 中已有的证书，不签发新证书。"
     zh_hant: "綁定 UKey 中已有的憑證，不簽發新憑證。"
