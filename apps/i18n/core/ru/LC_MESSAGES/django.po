@@ -204,6 +204,11 @@ msgstr ""
 "Учётная запись не существует, отключена или не подходит для "
 "этой задачи"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "Не удалось определить имя пользователя (ID аккаунта: %(account_id)s)"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
