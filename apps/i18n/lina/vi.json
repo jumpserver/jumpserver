@@ -1868,5 +1868,22 @@
     "CommandFilterACLs": "Command filter ACLs",
     "UserActivity": "User activity",
     "SyslogAddr": "Syslog address",
-    "NasMountPath": "Đường dẫn gắn NAS"
+    "NasMountPath": "Đường dẫn gắn NAS",
+    "UKeyCertificateListInvalid": "Không nhận dạng được định dạng danh sách chứng chỉ UKey. Hãy kiểm tra phiên bản thành phần máy khách.",
+    "UKeyCertificateSelectionChanged": "Chứng chỉ UKey đã chọn đã thay đổi. Hãy chọn lại trước khi liên kết.",
+    "UKeyCertificateSelectionFailed": "Không thể đặt chứng chỉ UKey hiện tại. Vui lòng thử lại.",
+    "UKeyCertificateAlgorithmUnsupported": "Thuật toán chứng thư ký UKey không được hỗ trợ.",
+    "UKeyVCTKSHelp": "Sử dụng ứng dụng JIT UKey hiện có và xác minh chữ ký qua dịch vụ VCTK_S.",
+    "UKeyVCTKSServerURL": "URL dịch vụ xác minh VCTK_S",
+    "UKeyVCTKSServerHelp": "Nhập địa chỉ HTTP/HTTPS đầy đủ của dịch vụ VCTK_S, không có đường dẫn, truy vấn hoặc đoạn.",
+    "UKeyVCTKSIssuingCA": "CA cấp chứng chỉ đáng tin cậy",
+    "UKeyVCTKSIssuingCAHelp": "Tải lên tệp PEM chứa tối đa 16 chứng chỉ CA tin cậy (tối đa 64 KB), bao gồm CA trực tiếp cấp chứng chỉ UKey. Thứ tự không quan trọng. CA hết hạn hoặc chưa có hiệu lực không được dùng để xác minh đăng nhập. Để trống để giữ tệp đã lưu.",
+    "UKeyVCTKSIssuingCAConfigured": "Đã cấu hình CA cấp chứng chỉ",
+    "UKeyVCTKSIssuingCANotConfigured": "Chưa cấu hình CA cấp chứng chỉ",
+    "UKeyVCTKSConnectionPassed": "Kiểm tra tạo số ngẫu nhiên VCTK_S thành công. Chưa kiểm tra chữ ký và chứng chỉ UKey. Cấu hình chưa được lưu.",
+    "UKeyVCTKSAuthorizationUsername": "Tên người dùng xác thực dịch vụ",
+    "UKeyVCTKSAuthorizationPassword": "Mật khẩu xác thực dịch vụ",
+    "UKeyVCTKSAuthorizationHelp": "Chỉ cần khi dịch vụ VCTK_S bật xác thực. Để trống tên người dùng để không sử dụng xác thực dịch vụ.",
+    "UKeyVCTKSAuthorizationPasswordHelp": "Để trống để giữ mật khẩu đã lưu.",
+    "UKeyVCTKSAuthorizationAdvanced": "Nâng cao: xác thực dịch vụ (tùy chọn)"
 }

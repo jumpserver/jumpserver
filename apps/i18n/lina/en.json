@@ -1855,5 +1855,22 @@
     "ArchiveDate": "Archive date",
     "Archive": "Archive",
     "BootstrapTokenTip": "The BOOTSTRAP_TOKEN value is used by panda, koko and other service components when registering.",
-    "GetToken": "Get token"
+    "GetToken": "Get token",
+    "UKeyCertificateListInvalid": "Unrecognized UKey certificate list. Check the client component version.",
+    "UKeyCertificateSelectionChanged": "The selected UKey certificate has changed. Select it again before binding.",
+    "UKeyCertificateSelectionFailed": "Failed to set the current UKey certificate. Please try again.",
+    "UKeyCertificateAlgorithmUnsupported": "The UKey signing certificate algorithm is unsupported.",
+    "UKeyVCTKSHelp": "Use the existing JIT UKey client and verify signatures through the VCTK_S service.",
+    "UKeyVCTKSServerURL": "VCTK_S verification service URL",
+    "UKeyVCTKSServerHelp": "Enter the full HTTP/HTTPS address of the VCTK_S service, without a path, query or fragment.",
+    "UKeyVCTKSIssuingCA": "Trusted issuing CA",
+    "UKeyVCTKSIssuingCAHelp": "Upload a PEM file containing up to 16 trusted CA certificates (maximum 64 KB), including the CA that directly issued the UKey certificate. Certificate order does not matter. Expired or not-yet-valid CAs are not used for login. Leave the upload empty to keep the saved file.",
+    "UKeyVCTKSIssuingCAConfigured": "Issuing CA configured",
+    "UKeyVCTKSIssuingCANotConfigured": "Issuing CA not configured",
+    "UKeyVCTKSConnectionPassed": "VCTK_S random generation check passed. UKey signature and certificate verification have not been tested. Settings were not saved.",
+    "UKeyVCTKSAuthorizationUsername": "Business authorization username",
+    "UKeyVCTKSAuthorizationPassword": "Business authorization password",
+    "UKeyVCTKSAuthorizationHelp": "Only required when the VCTK_S service enables business authorization. Leave the username blank to disable it.",
+    "UKeyVCTKSAuthorizationPasswordHelp": "Leave blank to keep the saved password.",
+    "UKeyVCTKSAuthorizationAdvanced": "Advanced: business authorization (optional)"
 }

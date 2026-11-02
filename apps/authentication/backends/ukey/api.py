@@ -44,7 +44,7 @@ class UKeySDKScriptFileAPIView(APIView):
         sdk = UKeySDKConfig(snapshot)
         # Builtin clients may use the original URL without version parameters.
         # When supplied, still reject a driver from another configuration.
-        versioned = sdk.provider.binding_mode == 'certificate' or any(
+        versioned = sdk.provider.uses_one_time_challenge or any(
             name in request.query_params for name in ('vendor', 'revision')
         )
         if versioned and (request.query_params.get('vendor') != snapshot['AUTH_UKEY_VENDOR']
@@ -71,6 +71,11 @@ class UKeySDKConfigFileAPIView(APIView):
         sdk = UKeySDKConfig(get_snapshot())
         admin = request.user.is_authenticated and request.user.has_perm('users.change_user')
         data = sdk.get_sdk_config(lang=lang, include_admin_pin=admin)
+        if sdk.provider.id == 'vctk_s' and request.user.is_authenticated:
+            data['config']['own_binding'] = {
+                'user_id': str(request.user.pk),
+                **UKeyCertificateBindingAPI.binding_data(request.user.pk, sdk.provider.id),
+            }
         return Response(data)
 
 
@@ -124,6 +129,10 @@ class UKeyCertificateBindingSerializer(serializers.Serializer):
         return attrs
 
 
+class VCTKSBindingSerializer(UKeyCertificateBindingSerializer):
+    signature = serializers.CharField(max_length=43692, required=False, trim_whitespace=False, write_only=True)
+
+
 @method_decorator(never_cache, name='dispatch')
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 class UKeyCertificateBindingAPI(UserQuerysetMixin, generics.GenericAPIView):
@@ -156,11 +165,12 @@ class UKeyCertificateBindingAPI(UserQuerysetMixin, generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = self.get_serializer(data=request.data)
+        snapshot = get_snapshot()
+        serializer_class = VCTKSBindingSerializer if snapshot['AUTH_UKEY_CA_PROVIDER'] == 'vctk_s' else self.serializer_class
+        serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         try:
-            snapshot = get_snapshot()
             provider = ensure_enabled(snapshot)
             if provider.binding_mode != 'certificate':
                 raise UKeyAuthError('Certificate binding is not supported by this CA provider')

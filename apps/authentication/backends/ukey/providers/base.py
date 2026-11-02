@@ -16,6 +16,9 @@ class BaseCAProvider:
     requires_certificate_selection = False
     expose_default_pin = False
     sdk_profile = None
+    sdk_sign_method = None
+    sdk_digest_algorithm = None
+    sdk_digest_from_certificate = False
     algorithm_label = None
     settings_serializer = ''
     display_fields = ()
@@ -26,9 +29,14 @@ class BaseCAProvider:
         self.snapshot = snapshot
 
     @property
+    def uses_one_time_challenge(self):
+        return self.binding_mode == 'certificate'
+
+    @property
     def capabilities(self):
         return {
             'binding_mode': self.binding_mode,
+            'uses_one_time_challenge': self.uses_one_time_challenge,
             'supports_enrollment': self.supports_enrollment,
             'supports_connection_test': self.supports_connection_test,
             'requires_certificate_selection': self.requires_certificate_selection,

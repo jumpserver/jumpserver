@@ -2,6 +2,7 @@
 #
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 
 from users.models import User, UKeyCertificateBinding
 from common.utils import get_logger
@@ -35,11 +36,22 @@ class UKeyBackend(JMSBaseAuthBackend):
             ukey_sn = ukey_proof.get('ukey_sn')
             provider = get_provider(get_snapshot())
             if provider.binding_mode == 'user_sn':
-                if 'challenge' not in ukey_proof:
+                if provider.uses_one_time_challenge:
+                    if request is None:
+                        raise UKeyAuthError('A UKey login session is required')
+                    record, snapshot = challenges.consume(request, ukey_proof.get('challenge_id'), 'login')
+                    provider = ensure_enabled(snapshot, provider.id)
+                    challenge = record['code']
+                elif 'challenge' not in ukey_proof:
                     raise UKeyAuthError('UKey configuration changed; refresh and retry')
-                # The builtin view reads this challenge from the session cache.
+                else:
+                    # The builtin view reads this challenge from the session cache.
+                    challenge = ukey_proof['challenge']
                 user = self._check_user_and_ukey_sn(username, ukey_sn)
-                provider.verify_proof(cert, signature, ukey_proof['challenge'], username)
+                provider.verify_proof(cert, signature, challenge, username)
+                if provider.uses_one_time_challenge:
+                    with locked_snapshot(snapshot[REVISION]) as current:
+                        ensure_enabled(current, provider.id)
                 if self.user_can_authenticate(user):
                     return user
                 raise PermissionDenied(reason_choices[reason_user_inactive])
@@ -67,7 +79,7 @@ class UKeyBackend(JMSBaseAuthBackend):
             provider=identity['provider'], certificate_fingerprint=identity['certificate_fingerprint'],
         ).first()
         if not binding or not hardware_serial or binding.hardware_serial != hardware_serial:
-            raise UKeyAuthError('Certificate or UKey is not bound to a user')
+            raise UKeyAuthError(_('Certificate or UKey is not bound to a user'))
         user = binding.user
         if not self.user_can_authenticate(user) or not self.user_allow_authenticate(user):
             raise UKeyAuthError('User is not allowed to authenticate with UKey')

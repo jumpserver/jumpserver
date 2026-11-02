@@ -19,7 +19,7 @@ from authentication.mixins import AuthMixin
 from authentication.errors import (
     AuthFailedError, NeedRedirectError
 )
-from .forms import CertificateUKeyLoginForm, UKeyLoginForm
+from .forms import CertificateUKeyLoginForm, OneTimeUKeyLoginForm, UKeyLoginForm, VCTKSCertificateLoginForm
 from users.utils import LoginBlockUtil, LoginIpBlockUtil
 from . import challenges
 from .binding import binding_version
@@ -47,8 +47,12 @@ class UKeyLoginView(AuthMixin, FormView):
         return get_provider(get_snapshot())
 
     def get_form_class(self):
+        if self.provider.id == 'vctk_s':
+            return VCTKSCertificateLoginForm
         if self.provider.binding_mode == 'certificate':
             return CertificateUKeyLoginForm
+        if self.provider.uses_one_time_challenge:
+            return OneTimeUKeyLoginForm
         return UKeyLoginForm
 
     def dispatch(self, request, *args, **kwargs):
@@ -103,7 +107,7 @@ class UKeyLoginView(AuthMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self._clear_pending_auth()
-        if self.provider.binding_mode != 'certificate':
+        if not self.provider.uses_one_time_challenge:
             context['challenge'] = self._generate_and_store_challenge()
             context['ukey_provider'] = self.provider.id
             context['error_msg'] = self.request.session.pop(_UKEY_ERROR_SESSION_KEY, '')
@@ -124,12 +128,13 @@ class UKeyLoginView(AuthMixin, FormView):
     def form_valid(self, form):
         self._clear_pending_auth()
         certificate_binding = self.provider.binding_mode == 'certificate'
+        one_time_challenge = self.provider.uses_one_time_challenge
         username  = form.cleaned_data['username']
         cert      = form.cleaned_data['cert']
         signature = form.cleaned_data['signature']
         ukey_sn   = form.cleaned_data['ukey_sn']
 
-        if not certificate_binding:
+        if not one_time_challenge:
             challenge = self._get_stored_challenge()
             if not challenge:
                 error = _('Authentication challenge expired, please refresh the page and try again.')
@@ -145,7 +150,7 @@ class UKeyLoginView(AuthMixin, FormView):
                 self._check_only_allow_exists_user_auth(username)
 
             proof = {'cert': cert, 'signature': signature, 'ukey_sn': ukey_sn}
-            if certificate_binding:
+            if one_time_challenge:
                 proof['challenge_id'] = form.cleaned_data['challenge_id']
             else:
                 proof['challenge'] = challenge
@@ -175,7 +180,7 @@ class UKeyLoginView(AuthMixin, FormView):
         except Exception as e:
             error_msg = str(e)
         finally:
-            if not certificate_binding:
+            if not one_time_challenge:
                 self._delete_stored_challenge()
         if error_msg:
             return self.get_failed_response(form, username, error_msg)

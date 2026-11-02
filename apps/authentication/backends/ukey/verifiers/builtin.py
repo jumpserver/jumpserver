@@ -28,15 +28,28 @@ class BuiltinVerifier(BaseVerifier):
             self._authenticate_other(cert_pem, username, signature, challenge)
         return {'subject_cn': username}
 
+    def verify_certificate(self, cert, username=''):
+        """Reuse the existing certificate checks with an external signature verifier."""
+        cert_pem = self._load_cert_pem(cert)
+        if self._is_sm2_cert(cert_pem):
+            self._validate_sm2_certificate(cert_pem, username)
+        else:
+            self._validate_rsa_certificate(cert_pem, username)
+        return {'subject_cn': username}
+
     # ── Part 2: SM2 证书校验流程 ──────────────────────────────────────────────
 
     def _authenticate_sm2(self, cert_pem, username, signature, challenge):
         """SM2 证书校验：加载 → 链校验 → 有效期 → CN 比对 → 签名验证。"""
+        sm2_cert = self._validate_sm2_certificate(cert_pem, username)
+        self._verify_sm2_signature(sm2_cert.get_subject_public_key(), signature, challenge)
+
+    def _validate_sm2_certificate(self, cert_pem, username):
         sm2_cert = self._load_sm2_cert(cert_pem)
         self._verify_sm2_cert_chain(sm2_cert)
         self._verify_sm2_cert_validity(sm2_cert)
         self._verify_cert_cn(sm2_cert.get_subject().get('commonName'), username)
-        self._verify_sm2_signature(sm2_cert.get_subject_public_key(), signature, challenge)
+        return sm2_cert
 
     @staticmethod
     def _load_sm2_cert(cert_pem):
@@ -119,11 +132,15 @@ class BuiltinVerifier(BaseVerifier):
 
     def _authenticate_other(self, cert_pem, username, signature, challenge):
         """RSA 证书校验：加载 → 链校验 → 有效期 → CN 比对 → 签名验证。"""
+        _, pub_key = self._validate_rsa_certificate(cert_pem, username)
+        self._verify_rsa_signature(pub_key, signature, challenge)
+
+    def _validate_rsa_certificate(self, cert_pem, username):
         cert, pub_key = self._load_rsa_cert(cert_pem)
         self._verify_rsa_cert_chain(cert)
         self._verify_rsa_cert_validity(cert)
         self._verify_cert_cn(self._extract_rsa_cert_cn(cert), username)
-        self._verify_rsa_signature(pub_key, signature, challenge)
+        return cert, pub_key
 
     @staticmethod
     def _load_rsa_cert(cert_pem):
