@@ -184,7 +184,7 @@ class TicketPluginTests(TestCase):
         return self.workflow(definition=definition)
 
     def grant_delegation(self):
-        permission = Permission.objects.get(codename='apply_asset_for_others', content_type__model='workflow')
+        permission = Permission.objects.get(codename='apply_assetforothers', content_type__model='workflow')
         role = Role.objects.create(name=str(uuid4()), scope='org')
         role.permissions.add(permission)
         RoleBinding.objects_raw.create(user=self.applicant, role=role, org=self.org, scope='org')

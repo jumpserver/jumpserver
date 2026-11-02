@@ -117,7 +117,7 @@ class ReapplyAsset(TicketAction):
             users = [str(request.user.pk)]
         valid_users = list(available_users(ticket.org_id).filter(pk__in=users).values('id', 'name', 'username'))
         if len(valid_users) != 1 or (users != [str(request.user.pk)] and
-                                    'tickets.apply_asset_for_others' not in request.user.get_all_permissions()):
+                                    'tickets.apply_assetforothers' not in request.user.get_all_permissions()):
             warnings['beneficiary'] = True
             valid_users = []
         start = timezone.now()
