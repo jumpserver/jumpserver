@@ -19,9 +19,8 @@ safe_str = lambda x: x
 
 @worker_ready.connect
 def on_app_ready(sender=None, headers=None, **kwargs):
-    if cache.get("CELERY_APP_READY", 0) == 1:
+    if not cache.add("CELERY_APP_READY", 1, 10):
         return
-    cache.set("CELERY_APP_READY", 1, 10)
     tasks = get_after_app_ready_tasks()
     logger.debug("Work ready signal recv")
     logger.debug("Start need start task: [{}]".format(", ".join(tasks)))
