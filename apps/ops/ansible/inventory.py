@@ -201,6 +201,20 @@ class JMSInventory:
                 host['jms_asset']['mongodb_connection_options'] = [
                     connection_options
                 ]
+            if p.name == 'ldap':
+                setting = getattr(p, 'setting', {}) or {}
+                host['jms_asset']['ldap_security'] = (
+                    setting.get('security') or 'ldaps'
+                )
+                host['jms_asset']['ldap_allow_invalid_cert'] = bool(
+                    setting.get('allow_invalid_cert', False)
+                )
+                host['jms_asset']['ldap_tls_server_name'] = escape_jinja2_syntax(
+                    str(setting.get('tls_server_name') or '').strip()
+                )
+                host['jms_asset']['ldap_ca_cert'] = escape_jinja2_syntax(
+                    str(setting.get('ca_cert') or '').strip()
+                )
 
     def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway, path_dir,
                           ansible_config):
@@ -278,6 +292,9 @@ class JMSInventory:
     def fill_ansible_config(ansible_config, protocol):
         if protocol.name in ('ssh', 'winrm', 'rdp'):
             ansible_config['ansible_connection'] = protocol.name
+        if protocol.name == 'ldap':
+            # LDAP methods run local Python modules; gateways tunnel the port.
+            ansible_config['ansible_connection'] = 'local'
         if protocol.name == 'winrm':
             if protocol.setting.get('use_ssl', False):
                 ansible_config['ansible_winrm_scheme'] = 'https'

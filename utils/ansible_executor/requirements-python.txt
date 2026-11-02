@@ -14,3 +14,4 @@ pymssql==2.3.10
 pymongo==4.6.3
 oracledb==3.4.2
 pyfreerdp==0.0.4
+ldap3==2.9.1

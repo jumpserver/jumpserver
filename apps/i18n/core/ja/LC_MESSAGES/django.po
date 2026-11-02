@@ -17865,3 +17865,23 @@ msgstr "資産とアカウントの概要を表示できる"
 #: rbac/models/menu.py
 msgid "Can view account operations report"
 msgstr "アカウント運用レポートを表示できる"
+
+#: assets/const/protocol.py:161
+msgid "LDAPS encrypts the connection from the start, usually on port 636. StartTLS upgrades a plain LDAP connection before binding, usually on port 389"
+msgstr "LDAPS は接続開始時から暗号化し、通常はポート 636 を使用します。StartTLS はバインド前に平文の LDAP 接続を暗号化接続にアップグレードし、通常はポート 389 を使用します"
+
+#: assets/const/protocol.py:175
+msgid "TLS server name"
+msgstr "TLS サーバー名"
+
+#: assets/const/protocol.py:176
+msgid "The name in the server certificate, such as dc01.example.com. Used for SNI and certificate name validation; defaults to the asset address"
+msgstr "サーバー証明書に記載された名前（例：dc01.example.com）。SNI と証明書の名前検証に使用され、既定では資産のアドレスを使用します"
+
+#: assets/const/protocol.py:186
+msgid "PEM encoded CA certificates used to validate the server certificate; the system trust store is used when empty"
+msgstr "サーバー証明書の検証に使用する PEM 形式の CA 証明書。空欄の場合はシステムの信頼ストアを使用します"
+
+#: accounts/automations/change_secret/manager.py:66
+msgid "The currently managed password is required when AD passwords are changed with the current password"
+msgstr "現在のパスワードで AD のパスワードを変更する場合は、現在管理中のパスワードが必要です"
