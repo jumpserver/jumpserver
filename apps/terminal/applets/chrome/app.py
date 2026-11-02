@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 import time
 from enum import Enum
@@ -14,6 +15,42 @@ from common import (Asset, User, Account, Platform, Step)
 from common import (BaseApplication)
 from common import (notify_err_message, block_input, unblock_input)
 from common import get_system_language
+
+
+CHROME_LANGUAGE_ALIASES = {
+    'zh': 'zh-CN', 'zh-hans': 'zh-CN', 'zh-chs': 'zh-CN',
+    'zh-cn': 'zh-CN', 'zh-sg': 'zh-CN',
+    'zh-hant': 'zh-TW', 'zh-cht': 'zh-TW', 'zh-tw': 'zh-TW',
+    'zh-hk': 'zh-TW', 'zh-mo': 'zh-TW',
+    'en': 'en-US',
+}
+LANGUAGE_TAG_PATTERN = re.compile(r'^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$')
+
+
+def to_chrome_language(value):
+    if not isinstance(value, str):
+        return 'en-US'
+    value = value.strip().replace('_', '-')
+    if not LANGUAGE_TAG_PATTERN.fullmatch(value):
+        return 'en-US'
+
+    lower = value.lower()
+    if lower.startswith('zh-hans-'):
+        return 'zh-CN'
+    if lower.startswith('zh-hant-'):
+        return 'zh-TW'
+    if lower in CHROME_LANGUAGE_ALIASES:
+        return CHROME_LANGUAGE_ALIASES[lower]
+
+    parts = lower.split('-')
+    for index in range(1, len(parts)):
+        part = parts[index]
+        if len(part) == 4 and part.isalpha():
+            parts[index] = part.title()
+        elif len(part) == 2 and part.isalpha():
+            parts[index] = part.upper()
+    return '-'.join(parts)
+
 
 class Command(Enum):
     TYPE = 'type'
@@ -244,7 +281,8 @@ class AppletApplication(BaseApplication):
         self.app = WebAPP(app_name=self.app_name, user=self.user,
                           account=self.account, asset=self.asset, platform=self.platform)
         self._tmp_user_dir = tempfile.TemporaryDirectory()
-        lang = self.connect_option.lang if self.connect_option.lang else get_system_language()
+        raw_lang = self.connect_option.lang or get_system_language()
+        lang = to_chrome_language(raw_lang)
         self._chrome_options = default_chrome_driver_options(languag=lang)
         self._chrome_options.add_argument("--app={}".format(self.asset.address))
         self._chrome_options.add_argument("--user-data-dir={}".format(self._tmp_user_dir.name))
