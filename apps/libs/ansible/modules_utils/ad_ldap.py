@@ -3,19 +3,25 @@ import ssl
 from datetime import datetime, timezone
 
 try:
-    from ldap3 import BASE, NONE, SIMPLE, SUBTREE, Connection, Server, Tls
+    from ldap3 import (
+        BASE, MODIFY_ADD, MODIFY_REPLACE, NONE, SIMPLE, SUBTREE, Connection, Server, Tls,
+    )
     from ldap3.core.exceptions import LDAPException, LDAPStartTLSError
     from ldap3.core.results import (
+        RESULT_ATTRIBUTE_OR_VALUE_EXISTS,
         RESULT_CONSTRAINT_VIOLATION,
+        RESULT_ENTRY_ALREADY_EXISTS,
         RESULT_INSUFFICIENT_ACCESS_RIGHTS,
         RESULT_INVALID_CREDENTIALS,
         RESULT_NO_SUCH_OBJECT,
+        RESULT_NOT_ALLOWED_ON_NON_LEAF,
         RESULT_SIZE_LIMIT_EXCEEDED,
         RESULT_SUCCESS,
         RESULT_UNAVAILABLE_CRITICAL_EXTENSION,
         RESULT_UNWILLING_TO_PERFORM,
     )
     from ldap3.utils.conv import escape_filter_chars
+    from ldap3.utils.dn import escape_rdn, parse_dn
 except ImportError:  # pragma: no cover - depends on the executor image
     HAS_LDAP3 = False
     Tls = object
@@ -36,6 +42,8 @@ ERROR_ACCESS_DENIED = 0x5
 ERROR_GEN_FAILURE = 0x1F
 ERROR_INVALID_PASSWORD = 0x56
 ERROR_PASSWORD_RESTRICTION = 0x52D
+ERROR_USER_EXISTS = 0x524
+ERROR_DS_NAME_NOT_UNIQUE = 0x21C8
 
 # Sub-codes in AD bind failures, e.g. "AcceptSecurityContext error, data 52e".
 # Apart from 525/52e/775, AD only reports them when the password is correct.
@@ -52,9 +60,24 @@ BIND_SUBCODES = {
 }
 
 USER_ATTRIBUTES = ['sAMAccountName', 'userPrincipalName']
+PROTECTION_ATTRIBUTES = ['userAccountControl', 'adminCount', 'isCriticalSystemObject']
+GATHER_ATTRIBUTES = [
+    'name', 'sAMAccountName', 'userAccountControl', 'lastLogonTimestamp',
+    'pwdLastSet', 'msDS-UserPasswordExpiryTimeComputed', 'memberOf',
+]
+USER_OBJECT_FILTER = '(&(objectCategory=person)(objectClass=user))'
+PAGED_RESULTS_OID = '1.2.840.113556.1.4.319'
 
 # Seconds between 1601-01-01 (Windows FILETIME epoch) and 1970-01-01.
 FILETIME_EPOCH_OFFSET = 11644473600
+# FILETIME used by AD for "never", e.g. a password that does not expire.
+FILETIME_NEVER = 0x7FFFFFFFFFFFFFFF
+
+UF_ACCOUNTDISABLE = 0x2
+UF_NORMAL_ACCOUNT = 0x200
+
+SAM_ACCOUNT_NAME_MAX_LENGTH = 20
+SAM_ACCOUNT_NAME_INVALID_CHARS = set('"/\\[]:;|=,+*?<>@')
 
 
 def connection_argument_spec():
@@ -148,6 +171,118 @@ def build_user_filter(username):
     return '(&(objectCategory=person)(objectClass=user)%s)' % identity
 
 
+def split_names(value):
+    return [item.strip() for item in (value or '').split(',') if item.strip()]
+
+
+def user_identity(username, domain_name=''):
+    """Return (sAMAccountName, userPrincipalName) for an account username."""
+    username = (username or '').strip()
+    if '\\' in username:
+        username = username.split('\\', 1)[1]
+    if '@' in username:
+        return username.split('@', 1)[0], username
+    domain_name = (domain_name or '').strip().strip('.')
+    return username, ('%s@%s' % (username, domain_name) if domain_name else None)
+
+
+def validate_sam_account_name(sam):
+    if not sam:
+        raise ADLdapError('Username is required', 'USERNAME_REQUIRED')
+    if len(sam) > SAM_ACCOUNT_NAME_MAX_LENGTH:
+        raise ADLdapError(
+            'AD logon names (sAMAccountName) are limited to %d characters: %s' % (
+                SAM_ACCOUNT_NAME_MAX_LENGTH, sam
+            ), 'INVALID_ACCOUNT_NAME',
+        )
+    invalid = sorted(set(sam) & SAM_ACCOUNT_NAME_INVALID_CHARS)
+    if invalid or sam.endswith('.') or any(ord(ch) < 32 for ch in sam):
+        raise ADLdapError(
+            'AD logon name contains characters that are not allowed: %s' % sam,
+            'INVALID_ACCOUNT_NAME',
+        )
+
+
+def first_value(attributes, name):
+    value = (attributes or {}).get(name)
+    if isinstance(value, (list, tuple)):
+        return value[0] if value else None
+    return value
+
+
+def filetime_to_datetime(value):
+    """Convert an AD FILETIME (100 ns since 1601) to an aware UTC datetime."""
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    try:
+        filetime = int(value)
+    except (TypeError, ValueError):
+        return None
+    if filetime <= 0 or filetime >= FILETIME_NEVER:
+        return None
+    return datetime.fromtimestamp(filetime / 10 ** 7 - FILETIME_EPOCH_OFFSET, timezone.utc)
+
+
+def unescape_dn_value(value):
+    """Undo RFC 4514 escaping in an attribute value taken from a DN."""
+    data = bytearray()
+    index = 0
+    while index < len(value):
+        char = value[index]
+        if char == '\\' and index + 1 < len(value):
+            pair = value[index + 1:index + 3]
+            if len(pair) == 2 and re.fullmatch(r'[0-9A-Fa-f]{2}', pair):
+                data.append(int(pair, 16))
+                index += 3
+                continue
+            data.extend(value[index + 1].encode('utf-8'))
+            index += 2
+            continue
+        data.extend(char.encode('utf-8'))
+        index += 1
+    return data.decode('utf-8', 'replace')
+
+
+def rdn_value(dn):
+    """Return the value of the first RDN, e.g. the group name of a group DN."""
+    try:
+        return unescape_dn_value(parse_dn(dn)[0][1])
+    except Exception:
+        return dn
+
+
+def is_protected_entry(attributes):
+    admin_count = first_value(attributes, 'adminCount')
+    critical = first_value(attributes, 'isCriticalSystemObject')
+    return str(admin_count or '').strip() == '1' or str(critical or '').upper() == 'TRUE'
+
+
+def entry_user_detail(entry):
+    """Map an LDAP user entry to the record of the WinRM AD gather method."""
+    attributes = entry.get('attributes') or {}
+
+    def iso(name):
+        value = filetime_to_datetime(first_value(attributes, name))
+        return value.isoformat() if value else None
+
+    try:
+        uac = int(first_value(attributes, 'userAccountControl') or 0)
+    except (TypeError, ValueError):
+        uac = 0
+    member_of = attributes.get('memberOf') or []
+    if isinstance(member_of, str):
+        member_of = [member_of]
+    return {
+        'Name': first_value(attributes, 'name'),
+        'SamAccountName': first_value(attributes, 'sAMAccountName'),
+        'Enabled': not uac & UF_ACCOUNTDISABLE,
+        'LastLogonDate': iso('lastLogonTimestamp'),
+        'PasswordLastSet': iso('pwdLastSet'),
+        'PasswordExpires': iso('msDS-UserPasswordExpiryTimeComputed'),
+        'GlobalGroupMemberships': [rdn_value(dn) for dn in member_of],
+    }
+
+
 def get_win32_code(message):
     matched = re.match(r'\s*([0-9A-Fa-f]{8})\s*:', message or '')
     if not matched:
@@ -214,6 +349,45 @@ def classify_modify_result(result):
         hint = description or 'unknown error'
     return ADLdapError(
         'Change password failed: %s (%s %s)' % (hint, description, message),
+        reason_code, win32_code=win32_code,
+    )
+
+
+def classify_operation_result(result, action, access_hint):
+    """Classify a failed add, delete or modify of an account or group."""
+    code = result.get('result')
+    message = result.get('message') or ''
+    description = result.get('description') or ''
+    win32_code = get_win32_code(message)
+    if win32_code == ERROR_PASSWORD_RESTRICTION:
+        reason_code = 'PASSWORD_POLICY_VIOLATION'
+        hint = ('the password does not meet the domain password policy '
+                '(length, complexity or history)')
+    elif code == RESULT_INSUFFICIENT_ACCESS_RIGHTS or win32_code == ERROR_ACCESS_DENIED:
+        reason_code = 'INSUFFICIENT_ACCESS_RIGHTS'
+        hint = access_hint
+    elif code == RESULT_ENTRY_ALREADY_EXISTS or win32_code in (
+            ERROR_USER_EXISTS, ERROR_DS_NAME_NOT_UNIQUE):
+        reason_code = 'ACCOUNT_EXISTS'
+        hint = ('an object with this name or logon name already exists, '
+                'possibly outside the search scope')
+    elif code == RESULT_NOT_ALLOWED_ON_NON_LEAF:
+        reason_code = 'NOT_LEAF'
+        hint = 'the account has child objects and cannot be deleted'
+    elif code == RESULT_NO_SUCH_OBJECT:
+        reason_code = 'OBJECT_NOT_FOUND'
+        hint = 'the target organizational unit or object does not exist'
+    elif code == RESULT_UNWILLING_TO_PERFORM:
+        reason_code = 'UNWILLING_TO_PERFORM'
+        hint = 'the domain controller refused the operation'
+    elif code == RESULT_CONSTRAINT_VIOLATION:
+        reason_code = 'CONSTRAINT_VIOLATION'
+        hint = 'the domain controller rejected a value'
+    else:
+        reason_code = 'OPERATION_FAILED'
+        hint = description or 'unknown error'
+    return ADLdapError(
+        '%s failed: %s (%s %s)' % (action, hint, description, message),
         reason_code, win32_code=win32_code,
     )
 
@@ -324,18 +498,27 @@ class ADLdapClient:
         except Exception:
             pass
 
-    def find_user(self, conn, username, domain_name='', search_base=''):
+    @staticmethod
+    def resolve_search_base(domain_name='', search_base=''):
         search_base = (search_base or '').strip() or domain_to_base_dn(domain_name)
         if not search_base:
             raise ADLdapError(
                 'Search base is required when the directory service has no '
                 'domain name', 'SEARCH_BASE_REQUIRED',
             )
+        return search_base
+
+    def find_user(self, conn, username, domain_name='', search_base=''):
+        return self.find_user_entry(conn, username, domain_name, search_base)['dn']
+
+    def find_user_entry(self, conn, username, domain_name='', search_base='',
+                        attributes=None):
+        search_base = self.resolve_search_base(domain_name, search_base)
         search_filter = build_user_filter(username)
         try:
             conn.search(
                 search_base, search_filter, search_scope=SUBTREE,
-                attributes=USER_ATTRIBUTES, size_limit=2,
+                attributes=USER_ATTRIBUTES + list(attributes or []), size_limit=2,
             )
         except (LDAPException, OSError) as error:
             raise classify_connection_error(error, conn)
@@ -362,7 +545,153 @@ class ADLdapClient:
                 'AD user not found: %s under %s' % (username, search_base),
                 'USER_NOT_FOUND',
             )
+        return entries[0]
+
+    @staticmethod
+    def find_group(conn, name, search_base):
+        search_filter = '(&(objectClass=group)(|(sAMAccountName=%s)(cn=%s)))' % (
+            escape_filter_chars(name), escape_filter_chars(name)
+        )
+        try:
+            conn.search(search_base, search_filter, search_scope=SUBTREE,
+                        attributes=['sAMAccountName'], size_limit=2)
+        except (LDAPException, OSError) as error:
+            raise classify_connection_error(error, conn)
+        result = conn.result or {}
+        entries = [e for e in (conn.response or []) if e.get('type') == 'searchResEntry']
+        if result.get('result') == RESULT_SIZE_LIMIT_EXCEEDED or len(entries) > 1:
+            raise ADLdapError('More than one AD group matches %s' % name, 'GROUP_AMBIGUOUS')
+        if not entries:
+            raise ADLdapError(
+                'AD group not found: %s under %s' % (name, search_base), 'GROUP_NOT_FOUND'
+            )
         return entries[0]['dn']
+
+    @staticmethod
+    def create_user(conn, container_dn, sam, upn, password):
+        """Create an enabled user with its password in a single add.
+
+        AD only accepts the add when the password meets the policy, so a
+        rejected password never leaves a half-created account behind.
+        """
+        validate_sam_account_name(sam)
+        user_dn = 'CN=%s,%s' % (escape_rdn(sam), container_dn)
+        attributes = {
+            'objectClass': ['top', 'person', 'organizationalPerson', 'user'],
+            'sAMAccountName': sam,
+            'unicodePwd': ('"%s"' % password).encode('utf-16-le'),
+            'userAccountControl': str(UF_NORMAL_ACCOUNT),
+        }
+        if upn:
+            attributes['userPrincipalName'] = upn
+        try:
+            created = conn.add(user_dn, attributes=attributes)
+        except (LDAPException, OSError) as error:
+            raise classify_connection_error(error, conn)
+        if not created:
+            raise classify_operation_result(
+                dict(conn.result or {}), 'Create account',
+                'the login account lacks the Create User Objects permission '
+                'on the target organizational unit',
+            )
+        return user_dn
+
+    @staticmethod
+    def add_to_groups(conn, user_dn, group_dns):
+        """Add the user to groups; existing memberships are kept as is."""
+        added = []
+        for group_dn in group_dns:
+            try:
+                ok = conn.modify(group_dn, {'member': [(MODIFY_ADD, [user_dn])]})
+            except (LDAPException, OSError) as error:
+                raise classify_connection_error(error, conn)
+            result = dict(conn.result or {})
+            if ok:
+                added.append(group_dn)
+            elif result.get('result') not in (
+                    RESULT_ENTRY_ALREADY_EXISTS, RESULT_ATTRIBUTE_OR_VALUE_EXISTS):
+                raise classify_operation_result(
+                    result, 'Add account to group %s' % rdn_value(group_dn),
+                    'the login account lacks write permission on the group members',
+                )
+        return added
+
+    @staticmethod
+    def disable_user(conn, user_dn, user_account_control):
+        """Disable the account. Returns False when it was already disabled."""
+        try:
+            uac = int(user_account_control or UF_NORMAL_ACCOUNT)
+        except (TypeError, ValueError):
+            uac = UF_NORMAL_ACCOUNT
+        if uac & UF_ACCOUNTDISABLE:
+            return False
+        try:
+            ok = conn.modify(user_dn, {
+                'userAccountControl': [(MODIFY_REPLACE, [str(uac | UF_ACCOUNTDISABLE)])]
+            })
+        except (LDAPException, OSError) as error:
+            raise classify_connection_error(error, conn)
+        if not ok:
+            raise classify_operation_result(
+                dict(conn.result or {}), 'Disable account',
+                'the login account lacks write permission on userAccountControl',
+            )
+        return True
+
+    @staticmethod
+    def delete_user(conn, user_dn):
+        try:
+            ok = conn.delete(user_dn)
+        except (LDAPException, OSError) as error:
+            raise classify_connection_error(error, conn)
+        if not ok:
+            raise classify_operation_result(
+                dict(conn.result or {}), 'Delete account',
+                'the login account lacks the Delete User Objects permission',
+            )
+
+    @staticmethod
+    def get_login_sam(conn):
+        """Return the sAMAccountName of the bound account, from Who Am I."""
+        try:
+            identity = conn.extend.standard.who_am_i()
+        except Exception:
+            return None
+        identity = str(identity or '')
+        if identity.startswith('u:'):
+            identity = identity[2:]
+        if '\\' in identity:
+            return identity.split('\\', 1)[1]
+        return identity.split('@', 1)[0] or None
+
+    @staticmethod
+    def search_users(conn, search_base, page_size=500, attributes=None):
+        """Return all user entries under search_base using paged searches."""
+        entries = []
+        cookie = None
+        while True:
+            try:
+                conn.search(
+                    search_base, USER_OBJECT_FILTER, search_scope=SUBTREE,
+                    attributes=attributes or GATHER_ATTRIBUTES,
+                    paged_size=max(int(page_size or 500), 1), paged_cookie=cookie,
+                )
+            except (LDAPException, OSError) as error:
+                raise classify_connection_error(error, conn)
+            result = conn.result or {}
+            if result.get('result') != RESULT_SUCCESS:
+                raise ADLdapError(
+                    'Search AD users failed: %s %s' % (
+                        result.get('description'), result.get('message')
+                    ), 'SEARCH_FAILED',
+                )
+            entries.extend(
+                e for e in (conn.response or []) if e.get('type') == 'searchResEntry'
+            )
+            control = (result.get('controls') or {}).get(PAGED_RESULTS_OID) or {}
+            cookie = (control.get('value') or {}).get('cookie')
+            if not cookie:
+                return entries
 
     @staticmethod
     def set_password(conn, user_dn, new_password, old_password=None,

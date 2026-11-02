@@ -1,0 +1,71 @@
+id: remove_account_by_ldap
+name: "{{ 'LDAP account remove' | trans }}"
+category:
+- ds
+type:
+- windows_ad
+method: remove_account
+protocol: ldap
+priority: 50
+params:
+- name: disable_only
+  type: bool
+  label: "{{ 'Params disable_only label' | trans }}"
+  default: false
+  help_text: "{{ 'Params disable_only help text' | trans }}"
+- name: search_base
+  type: str
+  label: "{{ 'Params search_base label' | trans }}"
+  default: ''
+  help_text: "{{ 'Params remove search_base help text' | trans }}"
+i18n:
+  LDAP account remove:
+    zh: 使用 LDAPS/StartTLS 协议删除 AD 域账号
+    ja: LDAPS/StartTLS プロトコルで AD ドメインアカウントを削除
+    en: Remove AD domain account over LDAPS/StartTLS
+    es: Eliminar la cuenta de dominio AD mediante LDAPS/StartTLS
+    ko: LDAPS/StartTLS 프로토콜로 AD 도메인 계정 삭제
+    pt-br: Remover a conta de domínio AD via LDAPS/StartTLS
+    ru: Удалить доменную учетную запись AD через LDAPS/StartTLS
+    vi: Xóa tài khoản miền AD qua LDAPS/StartTLS
+    zh-hant: 使用 LDAPS/StartTLS 協定刪除 AD 網域帳號
+  Params disable_only label:
+    zh: 仅禁用不删除
+    ja: 削除せず無効化のみ
+    en: Disable only
+    es: Solo deshabilitar
+    ko: 삭제하지 않고 비활성화만
+    pt-br: Apenas desativar
+    ru: Только отключить
+    vi: Chỉ vô hiệu hóa
+    zh-hant: 僅停用不刪除
+  Params disable_only help text:
+    zh: 开启后只禁用账号，不从 AD 中删除，需要对 userAccountControl 属性有写权限。受保护账号（adminCount=1）和执行账号本身始终不会被删除或禁用
+    ja: オンにするとアカウントを無効化するだけで AD から削除しません。userAccountControl 属性への書き込み権限が必要です。保護されたアカウント（adminCount=1）と実行アカウント自体は削除も無効化もされません
+    en: Only disable the account instead of deleting it from AD; requires write access to userAccountControl. Protected accounts (adminCount=1) and the login account itself are never deleted or disabled
+    es: Solo deshabilita la cuenta en lugar de eliminarla de AD; requiere permiso de escritura en userAccountControl. Las cuentas protegidas (adminCount=1) y la propia cuenta de inicio de sesión nunca se eliminan ni deshabilitan
+    ko: 켜면 AD에서 삭제하지 않고 계정을 비활성화만 하며 userAccountControl 특성에 대한 쓰기 권한이 필요합니다. 보호된 계정(adminCount=1)과 실행 계정 자체는 삭제되거나 비활성화되지 않습니다
+    pt-br: Apenas desativa a conta em vez de removê-la do AD; requer permissão de gravação em userAccountControl. Contas protegidas (adminCount=1) e a própria conta de login nunca são removidas nem desativadas
+    ru: Только отключить учетную запись вместо удаления из AD; требуется право записи userAccountControl. Защищенные учетные записи (adminCount=1) и сама учетная запись входа никогда не удаляются и не отключаются
+    vi: Chỉ vô hiệu hóa tài khoản thay vì xóa khỏi AD; cần quyền ghi userAccountControl. Tài khoản được bảo vệ (adminCount=1) và chính tài khoản đăng nhập không bao giờ bị xóa hoặc vô hiệu hóa
+    zh-hant: 開啟後只停用帳號，不從 AD 中刪除，需要對 userAccountControl 屬性有寫入權限。受保護帳號（adminCount=1）和執行帳號本身始終不會被刪除或停用
+  Params search_base label:
+    zh: 搜索根
+    ja: 検索ベース
+    en: Search base
+    es: Base de búsqueda
+    ko: 검색 기준
+    pt-br: Base de pesquisa
+    ru: База поиска
+    vi: Gốc tìm kiếm
+    zh-hant: 搜尋根
+  Params remove search_base help text:
+    zh: 只在此 DN 下查找要删除的账号，例如 OU=Staff,DC=example,DC=com。留空时在整个域中查找
+    ja: 削除するアカウントをこの DN 配下でのみ検索します（例：OU=Staff,DC=example,DC=com）。空欄の場合はドメイン全体を検索します
+    en: Only look up the account to remove under this DN, such as OU=Staff,DC=example,DC=com. When empty, the whole domain is searched
+    es: Solo busca la cuenta a eliminar bajo este DN, como OU=Staff,DC=example,DC=com. Si está vacío, se busca en todo el dominio
+    ko: '삭제할 계정을 이 DN 아래에서만 찾습니다(예: OU=Staff,DC=example,DC=com). 비워 두면 도메인 전체에서 찾습니다'
+    pt-br: Procura a conta a remover apenas sob este DN, como OU=Staff,DC=example,DC=com. Se vazio, todo o domínio é pesquisado
+    ru: Искать удаляемую учетную запись только под этим DN, например OU=Staff,DC=example,DC=com. Если пусто, поиск ведется во всем домене
+    vi: Chỉ tìm tài khoản cần xóa dưới DN này, ví dụ OU=Staff,DC=example,DC=com. Để trống thì tìm trong toàn miền
+    zh-hant: 只在此 DN 下尋找要刪除的帳號，例如 OU=Staff,DC=example,DC=com。留空時在整個網域中尋找

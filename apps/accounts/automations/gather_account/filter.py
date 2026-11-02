@@ -336,12 +336,16 @@ class GatherAccountsFilter:
             username = user_info.get('SamAccountName')
             if not username:
                 continue
+            groups = user_info.get('GlobalGroupMemberships', [])
             result[username] = {
                 'username': username,
                 'date_password_change': parse_date(user_info.get('PasswordLastSet')),
                 'date_password_expired': parse_date(user_info.get('PasswordExpires')),
                 'date_last_login': parse_date(user_info.get('LastLogonDate')),
-                'groups': user_info.get('GlobalGroupMemberships', []),
+                'groups': groups,
+                # Only detail is stored; keep groups there so the next run can
+                # tell an actual group change from an unchanged account.
+                'detail': {'groups': groups},
             }
         return result
 
@@ -368,12 +372,22 @@ class GatherAccountsFilter:
                 result[username] = user
         return result
 
-    def run(self, method_id_meta_mapper, info):
+    @staticmethod
+    def by_ldap_filter(info):
+        # The LDAP gather method returns the records of the WinRM AD method.
+        return GatherAccountsFilter.windows_ad_filter(info)
+
+    def run(self, method_id_meta_mapper, info, method_id=None):
         run_method_name = None
-        for k, v in method_id_meta_mapper.items():
-            if self.tp not in v['type']:
-                continue
-            run_method_name = k.replace(f'{v["method"]}_', '')
+        method = method_id_meta_mapper.get(method_id) if method_id else None
+        if method and self.tp in method['type']:
+            # A type can offer several gather methods; use the configured one.
+            run_method_name = method_id.replace(f'{method["method"]}_', '')
+        if not run_method_name:
+            for k, v in method_id_meta_mapper.items():
+                if self.tp not in v['type']:
+                    continue
+                run_method_name = k.replace(f'{v["method"]}_', '')
 
         if not run_method_name:
             return info
