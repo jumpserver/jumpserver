@@ -107,7 +107,7 @@ class AgentSessionView(LoginRequiredMixin, View):
                 'terminal_url': terminal_url,
             })
             response['Cache-Control'] = 'no-store'
-            response['Referrer-Policy'] = 'no-referrer'
+            response['Referrer-Policy'] = 'same-origin'
             return response
 
 

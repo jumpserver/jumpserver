@@ -973,6 +973,34 @@ class AgentBoundaryTests(TestCase):
         ticket.refresh_from_db()
         self.assertEqual(ticket.state, 'closed')
 
+    def test_browser_handoff_form_preserves_csrf_origin_checks(self):
+        from django.conf import settings
+        from django.test import Client
+        from django.urls import reverse
+        self.handoff_asset()
+        self.action.kind, self.action.status = 'open_terminal', 'awaiting_input'
+        self.action.save(update_fields=['kind', 'status'])
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(self.user)
+        url = reverse('authentication:agent-session', args=[self.session.id]) + f'?action={self.action.id}'
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Referrer-Policy'], 'same-origin')
+        self.assertEqual(response['Cache-Control'], 'no-store')
+        body = {'operation': 'credentials', 'action': str(self.action.id)}
+        response = client.post(url, body, HTTP_ORIGIN='http://testserver')
+        self.assertIn('csrf_failure=1', response.url)
+        body['csrfmiddlewaretoken'] = client.cookies[settings.CSRF_COOKIE_NAME].value
+        for origin in ('null', 'https://other.example'):
+            response = client.post(url, body, HTTP_ORIGIN=origin)
+            self.assertIn('csrf_failure=1', response.url)
+            self.action.refresh_from_db()
+            self.assertIsNone(self.action.interactive_token_id)
+        response = client.post(url, body, HTTP_ORIGIN='http://testserver')
+        self.assertEqual(response.status_code, 302)
+        self.action.refresh_from_db()
+        self.assertEqual(response.url, '/luna/koko/connect?token=' + str(self.action.interactive_token_id))
+
     def test_browser_handoff_after_native_failure_uses_fresh_token_and_real_session(self):
         from accounts.models import Account
         from terminal.agent_views import AgentSessionView
