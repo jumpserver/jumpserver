@@ -1,0 +1,140 @@
+id: change_secret_by_ldap
+name: "{{ 'LDAP account change secret' | trans }}"
+category:
+  - ds
+type:
+  - windows_ad
+method: change_secret
+protocol: ldap
+priority: 50
+params:
+  - name: use_current_password
+    type: bool
+    label: "{{ 'Params use_current_password label' | trans }}"
+    default: false
+    help_text: "{{ 'Params use_current_password help text' | trans }}"
+  - name: enforce_password_history
+    type: bool
+    label: "{{ 'Params enforce_password_history label' | trans }}"
+    default: false
+    help_text: "{{ 'Params enforce_password_history help text' | trans }}"
+  - name: unlock
+    type: bool
+    label: "{{ 'Params unlock label' | trans }}"
+    default: false
+    help_text: "{{ 'Params unlock help text' | trans }}"
+  - name: search_base
+    type: str
+    label: "{{ 'Params search_base label' | trans }}"
+    default: ''
+    help_text: "{{ 'Params search_base help text' | trans }}"
+
+i18n:
+  LDAP account change secret:
+    zh: '使用 LDAPS/StartTLS 协议直接修改 AD 域账号密码'
+    ja: 'LDAPS/StartTLS プロトコルで AD ドメインアカウントのパスワードを直接変更'
+    en: 'Change AD domain account password directly over LDAPS/StartTLS'
+    es: Cambiar la contraseña de la cuenta de dominio AD directamente mediante LDAPS/StartTLS
+    ko: LDAPS/StartTLS 프로토콜로 AD 도메인 계정 비밀번호 직접 변경
+    pt-br: Alterar a senha da conta de domínio AD diretamente via LDAPS/StartTLS
+    ru: Изменить пароль доменной учетной записи AD напрямую через LDAPS/StartTLS
+    vi: Đổi mật khẩu tài khoản miền AD trực tiếp qua LDAPS/StartTLS
+    zh-hant: 使用 LDAPS/StartTLS 協定直接修改 AD 網域帳號密碼
+  Params use_current_password label:
+    zh: '使用原密码修改'
+    ja: '現在のパスワードで変更'
+    en: 'Change with current password'
+    es: Cambiar con la contraseña actual
+    ko: 현재 비밀번호로 변경
+    pt-br: Alterar com a senha atual
+    ru: Изменить с текущим паролем
+    vi: Đổi bằng mật khẩu hiện tại
+    zh-hant: 使用原密碼修改
+  Params use_current_password help text:
+    zh: |
+      关闭（默认）：由特权账号直接重置密码，需要对目标用户有“重置密码”权限，不受密码最短使用期限限制。<br />
+      开启：使用当前托管的密码修改，与用户自助改密一致，需要“更改密码”权限，受密码历史和最短使用期限限制。
+    ja: |
+      オフ（既定）：特権アカウントがパスワードを直接リセットします。対象ユーザーへの「パスワードのリセット」権限が必要で、パスワードの最小有効期間の影響を受けません。<br />
+      オン：現在管理中のパスワードを使用して変更します。ユーザー自身の変更と同じで、「パスワードの変更」権限が必要です。パスワードの履歴と最小有効期間の制限を受けます。
+    en: |
+      Off (default): the privileged account resets the password directly. It needs the Reset Password permission on the target user and ignores the minimum password age.<br />
+      On: changes the password using the currently managed one, like a user changing it. It needs the Change Password permission and is subject to password history and minimum password age.
+    es: |
+      Desactivado (predeterminado): la cuenta privilegiada restablece la contraseña directamente. Requiere el permiso Restablecer contraseña sobre el usuario y no aplica la vigencia mínima de la contraseña.<br />
+      Activado: usa la contraseña administrada actual, como un cambio realizado por el usuario. Requiere el permiso Cambiar contraseña y aplica el historial y la vigencia mínima de contraseñas.
+    ko: |
+      끄기(기본값): 권한 계정이 비밀번호를 직접 재설정합니다. 대상 사용자에 대한 "암호 재설정" 권한이 필요하며 최소 암호 사용 기간의 제한을 받지 않습니다.<br />
+      켜기: 현재 관리 중인 비밀번호로 변경하며 사용자가 직접 변경하는 것과 같습니다. "암호 변경" 권한이 필요하며 암호 기록과 최소 암호 사용 기간의 제한을 받습니다.
+    pt-br: |
+      Desativado (padrão): a conta privilegiada redefine a senha diretamente. Requer a permissão Redefinir senha no usuário e ignora a idade mínima da senha.<br />
+      Ativado: usa a senha gerenciada atual, como uma alteração feita pelo usuário. Requer a permissão Alterar senha e está sujeita ao histórico e à idade mínima da senha.
+    ru: |
+      Выключено (по умолчанию): привилегированная учетная запись сбрасывает пароль напрямую. Требуется право «Сброс пароля» для пользователя; минимальный срок действия пароля не учитывается.<br />
+      Включено: используется текущий управляемый пароль, как при смене пароля самим пользователем. Требуется право «Смена пароля»; учитываются журнал паролей и минимальный срок действия.
+    vi: |
+      Tắt (mặc định): tài khoản đặc quyền đặt lại mật khẩu trực tiếp. Cần quyền Reset Password trên người dùng đích và không bị giới hạn bởi thời hạn tối thiểu của mật khẩu.<br />
+      Bật: dùng mật khẩu đang được quản lý để đổi, giống như người dùng tự đổi. Cần quyền Change Password và chịu giới hạn lịch sử mật khẩu cùng thời hạn tối thiểu.
+    zh-hant: |
+      關閉（預設）：由特權帳號直接重設密碼，需要對目標使用者有「重設密碼」權限，不受密碼最短使用期限限制。<br />
+      開啟：使用目前託管的密碼修改，與使用者自助改密一致，需要「變更密碼」權限，受密碼歷程記錄和最短使用期限限制。
+  Params enforce_password_history label:
+    zh: '遵守密码历史策略'
+    ja: 'パスワードの履歴ポリシーを適用'
+    en: 'Enforce password history'
+    es: Aplicar el historial de contraseñas
+    ko: 암호 기록 정책 적용
+    pt-br: Aplicar o histórico de senhas
+    ru: Учитывать журнал паролей
+    vi: Áp dụng lịch sử mật khẩu
+    zh-hant: 遵守密碼歷程記錄原則
+  Params enforce_password_history help text:
+    zh: '管理员重置时同样拒绝最近使用过的密码。需要域控为 Windows Server 2012 及以上。使用原密码修改时始终遵守该策略'
+    ja: '管理者によるリセットでも、最近使用したパスワードを拒否します。Windows Server 2012 以降のドメイン コントローラーが必要です。現在のパスワードで変更する場合は常に適用されます'
+    en: 'Also reject recently used passwords on administrator reset. Requires Windows Server 2012 or later domain controllers. Changes with the current password always enforce it'
+    es: También rechaza contraseñas usadas recientemente en el restablecimiento por administrador. Requiere controladores de dominio Windows Server 2012 o posterior. Los cambios con la contraseña actual siempre lo aplican
+    ko: 관리자 재설정 시에도 최근 사용한 비밀번호를 거부합니다. Windows Server 2012 이상의 도메인 컨트롤러가 필요합니다. 현재 비밀번호로 변경할 때는 항상 적용됩니다
+    pt-br: Também rejeita senhas usadas recentemente na redefinição pelo administrador. Requer controladores de domínio Windows Server 2012 ou posterior. Alterações com a senha atual sempre o aplicam
+    ru: Отклонять недавно использованные пароли и при сбросе администратором. Требуются контроллеры домена Windows Server 2012 или новее. При смене с текущим паролем применяется всегда
+    vi: Từ chối cả mật khẩu đã dùng gần đây khi quản trị viên đặt lại. Yêu cầu bộ điều khiển miền Windows Server 2012 trở lên. Luôn áp dụng khi đổi bằng mật khẩu hiện tại
+    zh-hant: 管理員重設時同樣拒絕最近使用過的密碼。需要網域控制站為 Windows Server 2012 及以上。使用原密碼修改時始終遵守該原則
+  Params unlock label:
+    zh: '同时解锁账号'
+    ja: 'アカウントのロックも解除'
+    en: 'Unlock account'
+    es: Desbloquear la cuenta
+    ko: 계정 잠금 해제
+    pt-br: Desbloquear a conta
+    ru: Разблокировать учетную запись
+    vi: Mở khóa tài khoản
+    zh-hant: 同時解鎖帳號
+  Params unlock help text:
+    zh: '管理员重置成功后清除账号的锁定状态，需要对 lockoutTime 属性有写权限'
+    ja: '管理者によるリセットの成功後にアカウントのロックを解除します。lockoutTime 属性への書き込み権限が必要です'
+    en: 'Clear the account lockout after a successful administrator reset. Requires write access to the lockoutTime attribute'
+    es: Elimina el bloqueo de la cuenta tras un restablecimiento correcto. Requiere permiso de escritura en el atributo lockoutTime
+    ko: 관리자 재설정에 성공하면 계정 잠금을 해제합니다. lockoutTime 특성에 대한 쓰기 권한이 필요합니다
+    pt-br: Remove o bloqueio da conta após uma redefinição bem-sucedida. Requer permissão de gravação no atributo lockoutTime
+    ru: Снять блокировку учетной записи после успешного сброса. Требуется право записи атрибута lockoutTime
+    vi: Gỡ khóa tài khoản sau khi quản trị viên đặt lại thành công. Cần quyền ghi thuộc tính lockoutTime
+    zh-hant: 管理員重設成功後清除帳號的鎖定狀態，需要對 lockoutTime 屬性有寫入權限
+  Params search_base label:
+    zh: '搜索根'
+    ja: '検索ベース'
+    en: 'Search base'
+    es: Base de búsqueda
+    ko: 검색 기준
+    pt-br: Base de pesquisa
+    ru: База поиска
+    vi: Gốc tìm kiếm
+    zh-hant: 搜尋根
+  Params search_base help text:
+    zh: '查找用户的起始 DN，例如 OU=Staff,DC=example,DC=com。留空时根据目录服务的域名称生成'
+    ja: 'ユーザーを検索する起点の DN（例：OU=Staff,DC=example,DC=com）。空欄の場合はディレクトリ サービスのドメイン名から生成します'
+    en: 'The DN to search users from, such as OU=Staff,DC=example,DC=com. Derived from the directory service domain name when empty'
+    es: DN desde el que se buscan usuarios, como OU=Staff,DC=example,DC=com. Si está vacío, se obtiene del nombre de dominio del servicio de directorio
+    ko: '사용자를 검색할 시작 DN(예: OU=Staff,DC=example,DC=com). 비워 두면 디렉터리 서비스의 도메인 이름으로 생성합니다'
+    pt-br: DN a partir do qual os usuários são pesquisados, como OU=Staff,DC=example,DC=com. Se vazio, é obtido do nome de domínio do serviço de diretório
+    ru: DN, с которого начинается поиск пользователей, например OU=Staff,DC=example,DC=com. Если пусто, формируется из имени домена службы каталогов
+    vi: DN bắt đầu tìm người dùng, ví dụ OU=Staff,DC=example,DC=com. Để trống thì tạo từ tên miền của dịch vụ thư mục
+    zh-hant: 尋找使用者的起始 DN，例如 OU=Staff,DC=example,DC=com。留空時根據目錄服務的網域名稱產生
