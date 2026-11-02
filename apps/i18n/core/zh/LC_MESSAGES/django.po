@@ -169,51 +169,51 @@ msgstr "无效的 HTTPS 证书校验方式"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Invalid certificate service connection parameters"
-msgstr "渔翁验签服务连接参数无效"
+msgstr "验签服务连接参数无效"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Cannot resolve signature verification service address"
-msgstr "无法解析渔翁验签服务地址"
+msgstr "无法解析验签服务地址"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Signature verification service resolution timed out"
-msgstr "渔翁验签服务地址解析超时"
+msgstr "验签服务地址解析超时"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service connection or TLS verification failed"
-msgstr "渔翁验签服务连接或 TLS 证书校验失败"
+msgstr "验签服务连接或 TLS 证书校验失败"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service request is too large"
-msgstr "发送到渔翁验签服务的请求过大"
+msgstr "发送到验签服务的请求过大"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service returned an unexpected HTTP response"
-msgstr "渔翁验签服务返回了异常的 HTTP 响应"
+msgstr "验签服务返回了异常的 HTTP 响应"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service response timed out"
-msgstr "渔翁验签服务响应超时"
+msgstr "验签服务响应超时"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service response is too large"
-msgstr "渔翁验签服务返回的数据过大"
+msgstr "验签服务返回的数据过大"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Incomplete certificate service response"
-msgstr "渔翁验签服务返回的数据不完整"
+msgstr "验签服务返回的数据不完整"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service connection failed or timed out"
-msgstr "渔翁验签服务连接失败或超时"
+msgstr "验签服务连接失败或超时"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Invalid certificate service response"
-msgstr "渔翁验签服务返回的数据无效"
+msgstr "验签服务返回的数据无效"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service rejected the request"
-msgstr "渔翁验签服务拒绝了请求"
+msgstr "验签服务拒绝了请求"
 
 #: authentication/backends/ukey/verifiers/fisherman.py
 msgid "Invalid certificate serial number"

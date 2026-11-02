@@ -170,51 +170,51 @@ msgstr "無效的 HTTPS 憑證驗證方式"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Invalid certificate service connection parameters"
-msgstr "漁翁驗簽服務連接參數無效"
+msgstr "驗簽服務連接參數無效"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Cannot resolve signature verification service address"
-msgstr "無法解析漁翁驗簽服務位址"
+msgstr "無法解析驗簽服務位址"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Signature verification service resolution timed out"
-msgstr "漁翁驗簽服務位址解析逾時"
+msgstr "驗簽服務位址解析逾時"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service connection or TLS verification failed"
-msgstr "漁翁驗簽服務連接或 TLS 憑證驗證失敗"
+msgstr "驗簽服務連接或 TLS 憑證驗證失敗"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service request is too large"
-msgstr "傳送至漁翁驗簽服務的請求過大"
+msgstr "傳送至驗簽服務的請求過大"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service returned an unexpected HTTP response"
-msgstr "漁翁驗簽服務傳回異常的 HTTP 回應"
+msgstr "驗簽服務傳回異常的 HTTP 回應"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service response timed out"
-msgstr "漁翁驗簽服務回應逾時"
+msgstr "驗簽服務回應逾時"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service response is too large"
-msgstr "漁翁驗簽服務傳回的資料過大"
+msgstr "驗簽服務傳回的資料過大"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Incomplete certificate service response"
-msgstr "漁翁驗簽服務傳回的資料不完整"
+msgstr "驗簽服務傳回的資料不完整"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service connection failed or timed out"
-msgstr "漁翁驗簽服務連接失敗或逾時"
+msgstr "驗簽服務連接失敗或逾時"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Invalid certificate service response"
-msgstr "漁翁驗簽服務傳回的資料無效"
+msgstr "驗簽服務傳回的資料無效"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Certificate service rejected the request"
-msgstr "漁翁驗簽服務拒絕了請求"
+msgstr "驗簽服務拒絕了請求"
 
 #: authentication/backends/ukey/verifiers/fisherman.py
 msgid "Invalid certificate serial number"
