@@ -8,7 +8,10 @@ from oauth2_provider.models import get_access_token_model, get_refresh_token_mod
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from oauthlib.oauth2 import InvalidGrantError, InvalidRequestError
 
+from common.utils import get_request_ip
+from jumpserver.utils import get_current_request
 from authentication.models.client_login_session import ClientLoginSession
+from authentication.services.idle_lock import personal_client_login_policy
 from authentication.services.client_login_session import (
     CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy, client_login_session_data, client_session_deadline,
     is_client_application, revoke_session, validate_refresh_token_session, client_session_receipt,
@@ -45,10 +48,10 @@ class ClientOAuth2Validator(OAuth2Validator):
                     application=request.client, token_family=refresh.token_family,
                 ).first()
             authenticated_at = session.authenticated_at if session else None
-        policy = getattr(session, 'client_login_policy', None) or client_login_policy()
+        policy = personal_client_login_policy(request.user.pk, client_login_policy())
         lifetime = client_login_lifetime(policy)
-        # The original lifetime stays fixed. A policy change has its own earlier
-        # exit deadline; token rotation must respect both without changing either.
+        # Settings updates already recalculate each live login's deadline.
+        # Token rotation respects that deadline, including any operation grace.
         expires_at = client_session_deadline(session)[0] if session else None
         if lifetime and session is None:
             if authenticated_at is None:
@@ -140,10 +143,13 @@ class ClientOAuth2Validator(OAuth2Validator):
             authenticated_at = getattr(request, 'client_authenticated_at', None)
             if authenticated_at is None:
                 raise InvalidGrantError(description='Client login authorization is required.')
+            http_request = get_current_request()
             request.client_login_session = ClientLoginSession.objects.create(
                 user=request.user, application=request.client, token_family=refresh.token_family,
                 authenticated_at=authenticated_at,
                 expires_at=request.client_login_expires_at,
+                ip=get_request_ip(http_request) if http_request else None,
+                user_agent=http_request.META.get('HTTP_USER_AGENT', '')[:254] if http_request else '',
             )
         return refresh
 

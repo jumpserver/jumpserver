@@ -214,6 +214,7 @@ class UserPermsSerializer(serializers.Serializer):
 
 
 class ClientLockPasswordSerializer(serializers.Serializer):
+    clear = serializers.BooleanField(write_only=True, required=False, default=False)
     has_password = serializers.SerializerMethodField(label=_('Configured'))
     password = EncryptedField(required=False, allow_blank=True, max_length=128,
                               trim_whitespace=False, label=_('New password'))
@@ -227,6 +228,10 @@ class ClientLockPasswordSerializer(serializers.Serializer):
     def validate(self, attrs):
         password = attrs.get('password', '')
         confirmation = attrs.pop('password_again', '')
+        if attrs.get('clear'):
+            if password or confirmation:
+                raise serializers.ValidationError({'password': _('Choose either setting or clearing the lock password.')})
+            return {'clear': True}
         if password != confirmation:
             raise serializers.ValidationError({'password_again': _('The newly set password is inconsistent')})
         if not password:
@@ -238,12 +243,15 @@ class ClientLockPasswordSerializer(serializers.Serializer):
 
 
 class UserClientCredentialsSerializer(serializers.Serializer):
-    lock = ClientLockPasswordSerializer(required=False, label=_('Client lock password'))
+    lock = ClientLockPasswordSerializer(required=False, label=_('Screen lock password'))
     file = FileEncryptSerializer(required=False, label=_('File Encryption'))
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
-        lock_password = validated_data.get('lock', {}).get('password')
+        lock = validated_data.get('lock', {})
+        if lock.get('clear'):
+            Preference.objects.filter(user=user, category='client', name='client_lock_password_hash').delete()
+        lock_password = lock.get('password')
         if lock_password:
             Preference.objects.update_or_create(user=user, name='client_lock_password_hash', defaults={
                 'category': 'client', 'value': lock_password, 'encrypted': False,
@@ -254,3 +262,65 @@ class UserClientCredentialsSerializer(serializers.Serializer):
                 'category': 'lina', 'value': Preference.encrypt(secret_key), 'encrypted': True,
             })
         return instance
+
+
+
+class UserIdleLockSerializer(serializers.Serializer):
+    web_idle_lock_time = serializers.IntegerField(
+        min_value=0, max_value=99999, allow_null=True, required=False,
+        label=_('Web idle screen lock (minute)'),
+        help_text=_('Leave blank to follow the administrator. A personal value must not exceed the administrator limit.'),
+    )
+    client_idle_lock_time = serializers.IntegerField(
+        min_value=0, max_value=99999, allow_null=True, required=False,
+        label=_('Client idle screen lock (minute)'),
+        help_text=_('Leave blank to follow the administrator. A personal value must not exceed the administrator limit.'),
+    )
+    client_max_session_time = serializers.IntegerField(
+        min_value=0, max_value=99999, allow_null=True, required=False,
+        label=_('Maximum client login lifetime (minute)'),
+    )
+    client_reauth_on_exit = serializers.BooleanField(
+        allow_null=True, required=False, label=_('Log in again after exiting the client'),
+    )
+    client_max_session_limit = serializers.IntegerField(read_only=True)
+    effective_client_max_session_time = serializers.IntegerField(read_only=True)
+    client_reauth_on_exit_required = serializers.BooleanField(read_only=True)
+    effective_client_reauth_on_exit = serializers.BooleanField(read_only=True)
+    web_idle_lock_limit = serializers.IntegerField(read_only=True)
+    client_idle_lock_limit = serializers.IntegerField(read_only=True)
+    effective_web_idle_lock_time = serializers.IntegerField(read_only=True)
+    effective_client_idle_lock_time = serializers.IntegerField(read_only=True)
+    client_login_policy = serializers.JSONField(read_only=True)
+
+    def validate(self, attrs):
+        from authentication.services.idle_lock import idle_lock_limits
+        from authentication.services.client_login_session import client_login_policy
+
+        if attrs.get('client_reauth_on_exit') is False and client_login_policy(use_cache=False)['reauth_on_exit']:
+            raise serializers.ValidationError({
+                'client_reauth_on_exit': _('The administrator requires reauthentication after client exit.'),
+            })
+        for name, maximum in idle_lock_limits().items():
+            value = attrs.get(name)
+            if value is not None and maximum > 0 and (value == 0 or value > maximum):
+                raise serializers.ValidationError({
+                    name: _('The administrator limit is %(minutes)s minutes. Leave blank to follow it.') % {'minutes': maximum},
+                })
+        return attrs
+
+    def update(self, instance, validated_data):
+        from authentication.services.idle_lock import IDLE_LOCK_CATEGORY, idle_lock_preferences
+
+        user = self.context['request'].user
+        for name, value in validated_data.items():
+            if value is None:
+                Preference.objects.filter(user=user, name=name, category=IDLE_LOCK_CATEGORY).delete()
+            else:
+                Preference.objects.update_or_create(user=user, name=name, defaults={
+                    'category': IDLE_LOCK_CATEGORY, 'value': str(int(value)), 'encrypted': False,
+                })
+        if 'client_max_session_time' in validated_data:
+            from authentication.services.client_login_session import client_login_policy, update_client_session_lifetimes
+            update_client_session_lifetimes(client_login_policy(use_cache=False), user_id=user.pk)
+        return idle_lock_preferences(user.pk)

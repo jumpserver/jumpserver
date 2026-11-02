@@ -4,6 +4,7 @@ import hashlib
 
 from django.conf import settings
 from django.core import signing
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.crypto import constant_time_compare
@@ -25,6 +26,7 @@ POLICY_FIELDS = (
 )
 CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60
 CLIENT_SESSION_RECEIPT_SALT = 'authentication.client-login-session-receipt'
+CLIENT_LOGIN_POLICY_CACHE_KEY = 'client-login-policy:v1'
 
 
 class ClientSessionExpired(AuthenticationFailed):
@@ -50,10 +52,10 @@ class ClientSessionLocked(PermissionDenied):
 
 
 def client_session_deadline(session):
-    deadlines = [(value, reason) for value, reason in (
-        (session.expires_at, 'absolute_timeout'), (session.policy_expires_at, 'policy_changed'),
-    ) if value is not None]
-    return min(deadlines, key=lambda item: item[0]) if deadlines else (None, None)
+    # A shortened lifetime already in the past gets a bounded operation grace.
+    if session.policy_expires_at is not None:
+        return session.policy_expires_at, 'policy_changed'
+    return session.expires_at, 'absolute_timeout' if session.expires_at else None
 
 
 def client_login_session_data(session):
@@ -105,20 +107,27 @@ def expired_session_from_receipt(receipt, credential, token_type, *, client_id=N
     return None
 
 
-def client_login_policy():
-    # Settings broadcasts update worker memory asynchronously. Read the three
-    # authoritative values here so policy changes never have a stale-worker gap.
+def client_login_policy(*, use_cache=True):
     from settings.models import Setting
 
+    if use_cache:
+        policy = cache.get(CLIENT_LOGIN_POLICY_CACHE_KEY)
+        if policy is not None:
+            return policy
     values = {name: getattr(settings, name, False if index == 0 else 0)
               for index, name in enumerate(POLICY_FIELDS)}
     for item in Setting.objects.filter(name__in=POLICY_FIELDS):
         values[item.name] = item.cleaned_value
-    return {
+    policy = {
         'reauth_on_exit': bool(values[POLICY_FIELDS[0]]),
         'idle_lock_time': int(values[POLICY_FIELDS[1]] or 0),
         'max_session_time': int(values[POLICY_FIELDS[2]] or 0),
     }
+    if use_cache:
+        # Settings saves invalidate this shared cache on commit. The short TTL
+        # also bounds staleness after a missed invalidation; deadlines live in DB.
+        cache.set(CLIENT_LOGIN_POLICY_CACHE_KEY, policy, timeout=60)
+    return policy
 
 
 def client_policy_enabled(policy=None):
@@ -256,15 +265,52 @@ def validate_refresh_token_session(refresh):
         return valid
 
 
-def schedule_client_policy_expiry():
-    """Keep the original lifetime; schedule a separate exit after a policy change."""
-    from django.db.models import Q
-    deadline = timezone.now() + timedelta(minutes=10)
-    ClientLoginSession.objects.filter(
+def update_client_session_lifetimes(policy, *, user_id=None):
+    """Recalculate live logins from their own login times; never revive expired ones."""
+    from collections import defaultdict
+    from django.db.models import Case, DateTimeField, F, Q, Value, When
+    from users.models import Preference
+    from authentication.services.idle_lock import effective_idle_lock_time
+
+    now = timezone.now()
+    sessions = ClientLoginSession.objects.filter(
         application__in=client_applications(), revoked_at__isnull=True,
-    ).filter(Q(policy_expires_at__isnull=True) | Q(policy_expires_at__gt=deadline)).update(
-        policy_expires_at=deadline,
+    ).filter(
+        Q(policy_expires_at__gt=now) |
+        (Q(policy_expires_at__isnull=True) & (Q(expires_at__isnull=True) | Q(expires_at__gt=now)))
     )
+    if user_id is not None:
+        sessions = sessions.filter(user_id=user_id)
+    preferences = dict(Preference.objects.filter(
+        user_id__in=sessions.values('user_id'), category='security', name='client_max_session_time',
+    ).values_list('user_id', 'value'))
+    groups = defaultdict(list)
+    maximum = policy['max_session_time']
+    for account_id, personal in preferences.items():
+        groups[effective_idle_lock_time(maximum, int(personal))].append(account_id)
+
+    def apply(queryset, minutes):
+        if not minutes:
+            queryset.update(expires_at=None, policy_expires_at=None)
+            return
+        lifetime = timedelta(minutes=minutes)
+        grace_deadline = now + timedelta(minutes=10)
+        queryset.update(
+            expires_at=F('authenticated_at') + lifetime,
+            policy_expires_at=Case(
+                When(authenticated_at__lte=now - lifetime, then=Case(
+                    # Further shortening must not keep extending an existing grace.
+                    When(policy_expires_at__lt=grace_deadline, then=F('policy_expires_at')),
+                    default=Value(grace_deadline), output_field=DateTimeField(),
+                )),
+                default=Value(None), output_field=DateTimeField(),
+            ),
+        )
+
+    # Batch by effective duration; never query personal preferences on ordinary API calls.
+    apply(sessions.exclude(user_id__in=preferences), maximum)
+    for minutes, account_ids in groups.items():
+        apply(sessions.filter(user_id__in=account_ids), minutes)
 
 
 def revoke_client_authorizations(reason='policy_changed'):
@@ -296,7 +342,8 @@ def clear_client_login_sessions():
         policy = client_login_policy()
         now = timezone.now()
         for session in ClientLoginSession.objects.select_related('user').filter(
-            Q(expires_at__lte=now) | Q(policy_expires_at__lte=now), revoked_at__isnull=True,
+            Q(policy_expires_at__lte=now) | Q(policy_expires_at__isnull=True, expires_at__lte=now),
+            revoked_at__isnull=True,
         ):
             _session_is_valid(session, policy, now, mutate=True)
         refresh_tokens = get_refresh_token_model().objects.filter(

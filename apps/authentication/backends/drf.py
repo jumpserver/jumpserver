@@ -158,6 +158,7 @@ class OAuth2Authentication(BaseOAuth2Authentication):
 
 
 class SessionAuthentication(authentication.SessionAuthentication):
+    allow_locked_web_session = False
     def authenticate(self, request):
         """
         Returns a `User` if the request session currently has a logged in user.
@@ -178,7 +179,15 @@ class SessionAuthentication(authentication.SessionAuthentication):
             except exceptions.AuthenticationFailed:
                 return None
 
-        # CSRF passed with authenticated user
+        bootstrap = request.method == 'GET' and request.path_info in (
+            '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+            '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+        ) or (request.path_info == '/api/v1/authentication/user-session/'
+              and request.method in ('GET', 'DELETE'))
+        if not self.allow_locked_web_session and not bootstrap:
+            from authentication.services.web_session_lock import session_locked, WebSessionLocked
+            if session_locked(request.session.session_key, user.pk):
+                raise WebSessionLocked()
         return user, None
 
 

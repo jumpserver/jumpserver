@@ -21,9 +21,12 @@ class ClientLoginSession(models.Model):
     application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, on_delete=models.CASCADE)
     token_family = models.UUIDField()
     authenticated_at = models.DateTimeField()
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=254, blank=True, default='')
     expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
     policy_expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
     is_locked = models.BooleanField(default=False)
+    lock_password_failures = models.PositiveSmallIntegerField(default=0)
     revoked_at = models.DateTimeField(null=True, blank=True, db_index=True)
     revoke_reason = models.CharField(max_length=32, choices=RevokeReason.choices, blank=True, default='')
 

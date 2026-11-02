@@ -42,7 +42,7 @@ def clear_user_confirmation(sender, request, **kwargs):
         return
     for key in (
         'CONFIRM_LEVEL', 'CONFIRM_TYPE', 'CONFIRM_TIME', 'CONFIRM_USER_ID',
-        'passkey_confirm_mfa', 'fido2_state',
+        'passkey_confirm_mfa', 'fido2_state', 'passkey_confirm_purpose', 'lock_password_confirmation',
     ):
         request.session.pop(key, None)
 
