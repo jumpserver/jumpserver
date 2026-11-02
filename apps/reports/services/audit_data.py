@@ -33,7 +33,7 @@ from .evidence import (
     reference, replay_expression, replay_labels, connection_reason,
     error_category_expression, error_category_labels,
 )
-from .queries import es_counts, session_platform_counts
+from .queries import es_counts, session_identity_counts, session_platform_counts
 
 logger = logging.getLogger(__name__)
 SAMPLE_LIMIT = 20
@@ -219,9 +219,15 @@ class AuditReportBuilder:
             ('protocol', 'sessions_by_protocol', _('Connection Protocol Distribution'), _('Protocol')),
             ('type', 'sessions_by_type', _('Session Operation Types'), _('Type')),
         ):
-            grouped = qs.order_by().values(field).annotate(count=Count('id')).order_by('-count', field)
+            if field in {'user', 'asset'}:
+                grouped = session_identity_counts(qs, field, f'report_{field}')
+            else:
+                grouped = (
+                    {'name': row[field], 'count': row['count']}
+                    for row in qs.order_by().values(field).annotate(count=Count('id')).order_by('-count', field).iterator()
+                )
             labels = dict(SessionType.choices) if field == 'type' else {}
-            rows = [{'name': str(labels.get(row[field], row[field])) or _('Not recorded'), 'count': row['count']} for row in grouped.iterator()]
+            rows = [{'name': str(labels.get(row['name'], row['name'])) or _('Not recorded'), 'count': row['count']} for row in grouped]
             tables.append(table(key, title, [('name', label), ('count', _('Session Count'))], rows,
                                 limit=None))
         platforms = session_platform_counts(qs, Asset.objects.all())
@@ -655,7 +661,7 @@ class AuditReportBuilder:
 
         qs = Account.objects.all()
         stats = qs.aggregate(total=Count('id'), active=Count('id', filter=Q(is_active=True)), connected=Count('id', filter=Q(connectivity=Connectivity.OK)))
-        grouped = qs.order_by().values('asset__name').annotate(count=Count('id')).order_by('-count', 'asset__name')
+        grouped = qs.order_by().values('asset_id', 'asset__name').annotate(count=Count('id')).order_by('-count', 'asset__name', 'asset_id')
         failures = [value for value, _label in Connectivity.choices if value not in (Connectivity.OK, Connectivity.UNKNOWN, Connectivity.NA)]
         checks = qs.annotate(report_check=Case(
             When(connectivity=Connectivity.OK, then=Value('success')),
