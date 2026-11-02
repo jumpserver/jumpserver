@@ -10,6 +10,9 @@ on:
       - opened
       - synchronize
       - reopened
+permissions:
+  contents: read
+
 jobs:
   compile-messages-check:
     runs-on: ubuntu-latest

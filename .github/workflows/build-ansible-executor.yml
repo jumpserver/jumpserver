@@ -18,6 +18,11 @@ on:
         type: string
         default: 'linux/amd64'
 
+permissions:
+  contents: read
+  # The lock steps post a commit status with GITHUB_TOKEN.
+  statuses: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest

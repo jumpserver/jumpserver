@@ -9,6 +9,9 @@ on:
         default: '3.11-slim-bullseye-v1'
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   build-and-push:
     runs-on: ubuntu-22.04

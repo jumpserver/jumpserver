@@ -27,6 +27,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
   add-label-if-is-member:
+    permissions:
+      contents: read
+      # gh issue edit swaps the two triage labels.
+      issues: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
