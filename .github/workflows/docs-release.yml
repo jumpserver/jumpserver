@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Update docs changelog
         env:
           TAG_NAME: ${{ inputs.tag_name || github.event.release.tag_name }}
