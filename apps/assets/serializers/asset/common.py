@@ -23,6 +23,7 @@ from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Protocol, Host, Device, Database, Cloud, Web, Custom
+from ...validators import validate_asset_address
 from .template_definition import host_import_template
 
 __all__ = [
@@ -223,6 +224,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         super().__init__(*args, **kwargs)
         self._init_field_choices()
         self._extract_accounts()
+
+    def validate_address(self, value):
+        validate_asset_address(value)
+        return value
 
     def _extract_accounts(self):
         if not getattr(self, 'initial_data', None):
