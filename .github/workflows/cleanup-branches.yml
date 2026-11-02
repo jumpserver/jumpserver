@@ -24,7 +24,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.4.0
       with:
         fetch-depth: 0  # 获取所有分支和提交历史
         
