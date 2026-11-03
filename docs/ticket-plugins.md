@@ -175,7 +175,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 `view_secret` 审批完成后，handler 只创建数据库中的 `TicketSecretAccess` 授权，绑定工单、账号 UUID、申请人、组织与过期时间。详情的 `result.actions` 只向符合条件的申请人展示查看按钮；点击时插件动作及账号取密服务 重新检查工单状态、授权时效、组织成员、账号有效性及全局禁止查看密码配置。若启用了查看密码 MFA 设置，动作入口仍要求 MFA。密码从当前账号读取，不写入工单、事件、缓存或访问链接；审批后轮换密码时读到的是新密码。授权记录是唯一的权威状态，未来可加短时缓存加速，但撤销、过期和全局禁止策略必须保持实时有效。
 
-`tickets.0010_ticket_workflow_refactor` 将四种旧多表继承工单的业务字段和关联 UUID 搬入通用 `request_data`，再删除子表。连接令牌的 `from_ticket` 先由 `authentication.0012_connection_token_ticket` 改为指向 `Ticket`，原 ID 不变。部署时后端与 Lina 需同时切换；旧的四类专用工单地址不再提供。
+`tickets.0010_ticket_workflow_refactor` 将四种旧多表继承工单的业务字段和关联 UUID 搬入通用 `request_data`，再删除子表。连接令牌的 `from_ticket` 先由 `authentication.0015_connection_token_ticket` 改为指向 `Ticket`，原 ID 不变。部署时后端与 Lina 需同时切换；旧的四类专用工单地址不再提供。
 
 ## 部署和验证
 
@@ -183,7 +183,7 @@ handler 在实例锁和审批数据库事务内执行。数据库内的授权可
 
 插件接入回归包括：新类型无需修改枚举/模型/路由即可申请、审批、读取结果并执行动作；Boolean/MultipleChoice 参数往返；未知动作和错误 HTTP 方法拒绝；查看者与执行者权限隔离；MFA、限流、过期、跨组织及资源变更拒绝；列表不查询实时授权。Lina 覆盖多个账号依赖字段隔离、组织切换丢弃旧响应、结果刷新、过期和专用表单缺失提示。
 
-需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0012_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0033_workflow_foundation` 和 `acls.0008_ticket_workflow_integration`。assets 0033 接在 dev 的 OceanBase 0032 之后。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。升级执行 migrate 后自动导入旧流程，并为缺少的可见类型补齐已发布、已启用的默认流程，用户无需等待管理员手工创建；默认沿用系统管理员一级或签，已有流程及其停用状态不覆盖。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
+需要同时部署后端及 Lina，以 dev 迁移为基线，执行 `authentication.0015_connection_token_ticket`、`tickets.0010_ticket_workflow_refactor`、`assets.0033_workflow_foundation` 和 `acls.0008_ticket_workflow_integration`。assets 0033 接在 dev 的 OceanBase 0032 之后。工单重构的模型、业务字段搬迁、代申请权限、历史受益人关联与密码授权表统一在 tickets 0010 中完成。迁移不改历史申请人、不重放历史授权。代申请需给发起人授予新权限，且发布经过组织管理员的流程版本。升级执行 migrate 后自动导入旧流程，并为缺少的可见类型补齐已发布、已启用的默认流程，用户无需等待管理员手工创建；默认沿用系统管理员一级或签，已有流程及其停用状态不覆盖。中文文案加入中简/中繁语言源文件，按既有部署流程编译翻译。
 
 在 `tickets.tests.settings` 隔离环境运行 `tickets.tests.test_plugins` 及既有工作流测试。历史迁移和并发测试使用文档 `ticket-workflow-refactor.md` 中的独立 PostgreSQL 测试库，避免 SQLite 的 schema editor 限制。
 
