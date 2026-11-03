@@ -125,11 +125,14 @@ class AgentAuditView(LoginRequiredMixin, View):
                 raise ValueError
         except (ValueError, TypeError):
             return HttpResponseBadRequest('Invalid audit offset')
-        item, events, after, page = None, [], 0, []
+        item, audit_session, events, after, page = None, None, [], 0, []
         if object_id:
             item = get_object_or_404(queryset, pk=object_id)
             service.record_audit_read(item)
             page = list(item.actions.order_by('-date_created', '-id')[offset:offset + 101]) if self.kind == 'sessions' else []
+            audit_session = item if self.kind == 'sessions' else service.audit_queryset(
+                request.user, AgentSession,
+            ).filter(pk=item.session_id).first()
             if self.kind == 'actions':
                 try:
                     after = int(request.GET.get('after', 0))
@@ -155,6 +158,8 @@ class AgentAuditView(LoginRequiredMixin, View):
             page = list(queryset[offset:offset + 101])
         response = render(request, 'terminal/agent_audit.html', {
             'kind': self.kind, 'item': item, 'items': page[:100], 'events': events[:32],
+            'audit_session': audit_session,
+            'can_view_terminal_session': request.user.has_perm('terminal.view_session'),
             'audit_org_id': item.org_id if item else get_current_org().id,
             'next_events': self.page_url(request, 'after', events[31].sequence) if len(events) > 32 else None,
             'next_page': self.page_url(request, 'offset', offset + 100) if len(page) > 100 else None,

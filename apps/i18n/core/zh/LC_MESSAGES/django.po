@@ -18978,3 +18978,7 @@ msgid ""
 msgstr ""
 "0 表示关闭自动锁屏。 空闲达到设定时间后锁定控制台和 Web 终端，输入锁屏密码解锁。 "
 "管理员设置为默认值和上限，用户可设置得更严格；未自行设置则跟随管理员。"
+
+#: terminal/templates/terminal/agent_audit.html
+msgid "Session operations"
+msgstr "本会话操作"

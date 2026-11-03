@@ -1276,6 +1276,42 @@ class AgentBoundaryTests(TestCase):
             response = OrgMiddleware(lambda req: view(req, object_id=self.action.id))(request)
         self.assertContains(response, f'/core/auth/agent/audit/sessions/?oid={self.org.id}')
         self.assertContains(response, f'/core/auth/agent/audit/actions/?oid={self.org.id}')
+        self.assertContains(response, f'/core/auth/agent/audit/sessions/{self.session.id}/?oid={self.org.id}#session-actions')
+
+    def test_audit_terminal_links_require_terminal_audit_permission(self):
+        from terminal.agent_views import AgentAuditView
+        from terminal.models import Session
+        terminal = Session.objects.create(terminal=self.node)
+        interactive = Session.objects.create(terminal=self.node)
+        self.session.terminal_session = terminal
+        self.session.save(update_fields=['terminal_session'])
+        self.action.interactive_session = interactive
+        self.action.save(update_fields=['interactive_session'])
+        request = RequestFactory().get('/')
+        request.user, request.session = self.user, {}
+        links = [f'/ui/#/audit/sessions/sessions/{item.id}?oid={self.org.id}' for item in (terminal, interactive)]
+        for allowed in (False, True):
+            with self.subTest(allowed=allowed), patch.object(
+                self.user, 'has_perm', side_effect=lambda permission: allowed and permission == 'terminal.view_session',
+            ):
+                response = AgentAuditView.as_view(kind='actions')(request, object_id=self.action.id)
+                for link in links:
+                    (self.assertContains if allowed else self.assertNotContains)(response, link)
+
+    def test_action_audit_navigation_does_not_grant_session_audit_access(self):
+        from terminal.agent_views import AgentAuditView
+        other = User.objects.create(username='agent-navigation-owner')
+        self.session.user = other
+        self.session.save(update_fields=['user'])
+        self.action.user = other
+        self.action.save(update_fields=['user'])
+        request = RequestFactory().get('/')
+        request.user, request.session = self.user, {}
+        with patch.object(self.user, 'has_perm', side_effect=lambda permission: permission == 'terminal.view_agentaction'):
+            response = AgentAuditView.as_view(kind='actions')(request, object_id=self.action.id)
+            self.assertNotContains(response, f'/core/auth/agent/audit/sessions/{self.session.id}/')
+            with self.assertRaises(Http404):
+                AgentAuditView.as_view(kind='sessions')(request, object_id=self.session.id)
 
     def test_audit_html_escapes_output_preserves_newlines_and_isolates_organizations(self):
         from terminal.agent_views import AgentAuditView
@@ -1357,6 +1393,7 @@ class AgentBoundaryTests(TestCase):
         self.assertEqual(session_page['next_offset'], 100)
         page = AgentAuditView.as_view(kind='sessions')(request, object_id=self.session.id)
         self.assertContains(page, '?offset=100')
+        self.assertContains(page, 'id="session-actions"')
 
     def audit_api(self, kind, params=None, method='get'):
         from rest_framework.test import APIRequestFactory, force_authenticate
