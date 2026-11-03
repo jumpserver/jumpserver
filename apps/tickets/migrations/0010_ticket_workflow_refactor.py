@@ -102,7 +102,7 @@ def backfill_beneficiaries(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('tickets', '0009_ticketassignee_assignee_display_and_more'),
-        ('authentication', '0012_connection_token_ticket'),
+        ('authentication', '0015_connection_token_ticket'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
