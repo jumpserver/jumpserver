@@ -1,22 +1,8 @@
 from django.db import connections
-from django.db.models.signals import post_migrate, post_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from orgs.models import Organization
-
-
-@receiver(post_migrate)
-def initialize_approval_workflows(sender, apps=None, using='default', **kwargs):
-    if sender.label != 'tickets' or using != 'default':
-        return
-    if apps is None:
-        from django.apps import apps
-    try:
-        apps.get_model('tickets', 'Workflow')
-    except LookupError:
-        return
-    from tickets.workflow.initialization import initialize_workflows
-    initialize_workflows()
 
 
 @receiver(post_save, sender=Organization)
