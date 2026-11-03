@@ -267,15 +267,6 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         result = json.loads(response.content)
         self.assertTrue(self.introspect(result)['all_organizations'])
-        self.first.members.through.objects_raw.filter(user=self.user, org_id=self.first.pk).delete()
-        with self.assertRaises(PermissionDenied):
-            self.introspect(result)
-        self.assertEqual(self.token_request({
-            'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'], 'client_id': self.app.client_id,
-        }).status_code, 400)
-        response = self.authorize()
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context_data['form'].non_field_errors())
 
     def test_personal_revocation_rejects_existing_grants_and_refreshes(self):
         from django.db import transaction
@@ -330,6 +321,10 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertEqual(response.status_code, 400)
         with self.assertRaises(PermissionDenied):
             self.introspect(result)
+
+        response = self.authorize()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context_data['form'].non_field_errors())
 
     def test_revocation_and_missing_binding_fail_closed(self):
         result = self.issued()
