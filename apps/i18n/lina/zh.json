@@ -405,6 +405,8 @@
     "ClearSuccessMsg": "清除成功",
     "ClickCopy": "点击复制",
     "ClientCertificate": "客户端证书",
+    "ClientSecurity": "客户端安全",
+    "ClientSecurityChangeHelp": "修改任一配置会使已有客户端登录立即失效，需要重新登录。已建立的资产连接继续遵循原有超时规则。",
     "Clipboard": "剪贴板",
     "ClipboardCopyPaste": "剪贴板复制粘贴",
     "Clone": "克隆",

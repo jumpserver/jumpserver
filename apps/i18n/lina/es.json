@@ -404,6 +404,8 @@
     "ClearSuccessMsg": "Limpieza exitosa",
     "ClickCopy": "Hacer clic para copiar",
     "ClientCertificate": "Certificado de cliente",
+    "ClientSecurity": "Seguridad del cliente",
+    "ClientSecurityChangeHelp": "Cambiar cualquiera de estas opciones invalida inmediatamente las sesiones existentes del cliente y requiere volver a iniciar sesión. Las conexiones ya establecidas con los activos siguen sujetas a sus reglas de tiempo de espera existentes.",
     "Clipboard": "Portapapeles",
     "ClipboardCopyPaste": "Copiar y pegar del portapapeles.",
     "Clone": "Clonar",

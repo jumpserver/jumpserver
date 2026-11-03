@@ -407,6 +407,8 @@
     "ClearSuccessMsg": "クリアに成功",
     "ClickCopy": "クリックでコピー",
     "ClientCertificate": "クライアント証明書",
+    "ClientSecurity": "クライアントセキュリティ",
+    "ClientSecurityChangeHelp": "いずれかの設定を変更すると、既存のクライアントログインは直ちに無効になり、再ログインが必要です。確立済みのアセット接続には、既存のタイムアウトルールが引き続き適用されます。",
     "Clipboard": "クリップボード",
     "ClipboardCopyPaste": "クリップボードのコピーペースト",
     "Clone": "クローン",
