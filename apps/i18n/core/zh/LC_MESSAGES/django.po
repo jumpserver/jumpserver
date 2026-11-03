@@ -13773,3 +13773,25 @@ msgstr "许可证无效"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "工单已经关闭"
+
+msgid "Log in again after exiting the client"
+msgstr "退出后重新登录"
+
+msgid "Log in again after exiting the client process. Closing a window to the tray does not count as exit."
+msgstr "退出客户端进程后需要重新登录，关闭窗口到托盘不算退出。"
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "最长登录时间 (分)"
+
+msgid "Counted from client login; token refresh does not extend it. 0 disables this limit. Existing OAuth token expiry and cleanup rules still apply."
+msgstr "从本次客户端登录开始计时，刷新 Token 不会延长。0 表示关闭此限制，原有 Token 有效期和清理规则仍然生效。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "客户端登录已失效，请重新登录。"
+
+msgid ""
+"Please upgrade the JumpServer client to use the configured login policy."
+msgstr "请升级 JumpServer 客户端，以使用配置的登录安全策略。"
+
+msgid "Connect options must be an object."
+msgstr "连接选项必须为对象。"

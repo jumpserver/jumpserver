@@ -44,6 +44,10 @@ def common_exception_handler(exc, context):
         exc = ReferencedByOthers()
 
     if isinstance(exc, exceptions.APIException):
+        if exc.get_codes() == 'client_session_expired':
+            # DRF may turn authentication failures into 403 when the first backend
+            # has no challenge header. Keep client expiry distinct from permissions.
+            exc.status_code = 401
         headers = {}
         if getattr(exc, 'auth_header', None):
             headers['WWW-Authenticate'] = exc.auth_header

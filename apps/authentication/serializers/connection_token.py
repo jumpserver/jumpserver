@@ -61,10 +61,25 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         return validate_account_username(value)
 
     def create(self, validated_data):
+        from authentication.services.client_login_session import connection_session_id
+
         request = self.context.get('request')
         if request:
             validated_data['remote_addr'] = get_request_ip(request)
+            session_id = connection_session_id(getattr(request, 'auth', None))
+            if session_id is not None:
+                validated_data.setdefault('connect_options', {})['_client_login_session'] = session_id
         return super().create(validated_data)
+
+    def validate_connect_options(self, value):
+        # This binding is server-owned; updates must neither forge nor erase it.
+        if not isinstance(value, dict):
+            raise serializers.ValidationError(_('Connect options must be an object.'))
+        value = dict(value)
+        value.pop('_client_login_session', None)
+        if self.instance and '_client_login_session' in self.instance.connect_options:
+            value['_client_login_session'] = self.instance.connect_options['_client_login_session']
+        return value
 
     def get_from_ticket_info(self, instance) -> dict:
         if not instance.from_ticket:

@@ -14306,3 +14306,24 @@ msgstr "Licença inválida"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "A ordem de serviço foi fechada"
+
+msgid "Log in again after exiting the client"
+msgstr "Entrar novamente após sair do cliente"
+
+msgid "Log in again after exiting the client process. Closing a window to the tray does not count as exit."
+msgstr "É necessário entrar novamente após encerrar o processo do cliente. Fechar a janela e manter o cliente na bandeja do sistema não conta como sair."
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "Duração máxima do login do cliente (minutos)"
+
+msgid "Counted from client login; token refresh does not extend it. 0 disables this limit. Existing OAuth token expiry and cleanup rules still apply."
+msgstr "Contada a partir do login no cliente; a renovação do token não a prolonga. 0 desativa este limite. As regras existentes de expiração e limpeza de tokens OAuth continuam em vigor."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "A sessão do cliente expirou. Entre novamente."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Atualize o cliente JumpServer para usar a política de login configurada."
+
+msgid "Connect options must be an object."
+msgstr "As opções de conexão devem ser um objeto."

@@ -167,6 +167,10 @@ class ConnectionToken(JMSOrgBaseModel):
         return self.permed_account.date_expired.timestamp()
 
     def is_valid(self) -> bool:
+        session_id = self.connect_options.get('_client_login_session')
+        if session_id is not None:
+            from authentication.services.client_login_session import validate_connection_session
+            validate_connection_session(session_id)
         if not self.is_active:
             error = _('Connection token inactive')
             raise PermissionDenied(error)
