@@ -408,6 +408,8 @@
     "ClearSuccessMsg": "Clear successful",
     "ClickCopy": "Click to copy",
     "ClientCertificate": "Client certificate",
+    "ClientSecurity": "Client security",
+    "ClientSecurityChangeHelp": "Changing either setting immediately invalidates existing client logins. Sign in again to continue. Established asset connections follow their existing timeout rules.",
     "Clipboard": "Clipboard",
     "ClipboardCopyPaste": "Clipboard copy and paste",
     "Clone": "Clone",

@@ -407,6 +407,8 @@
     "ClearSuccessMsg": "清除成功",
     "ClickCopy": "點擊複製",
     "ClientCertificate": "用戶端證書",
+    "ClientSecurity": "用戶端安全",
+    "ClientSecurityChangeHelp": "修改任一設定會使現有用戶端登入立即失效，需要重新登入。已建立的資產連線繼續遵循原有逾時規則。",
     "Clipboard": "剪貼簿",
     "ClipboardCopyPaste": "剪貼簿複製貼上",
     "Clone": "複製",
