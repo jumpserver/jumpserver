@@ -106,6 +106,10 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
 def signal_of_operate_log_whether_continue(
         sender, instance, created, update_fields=None
 ):
+    # Django Session payloads contain credentials and must never enter operate logs.
+    # Model names alone cannot distinguish them from terminal.Session.
+    if sender._meta.app_label == 'sessions':
+        return False
     condition = True
     if not instance:
         condition = False

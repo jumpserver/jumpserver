@@ -38,7 +38,8 @@ class OAuthAuthorizationServerView(View):
     def get_metadata(self, request) -> Dict[str, Any]:
         base_url = self.get_base_url(request)
         application = get_or_create_jumpserver_client_application()
-        policy = client_login_policy()
+        # Startup restoration must check the authoritative settings before using saved credentials.
+        policy = client_login_policy(use_cache=False)
         lifetime = client_login_lifetime(policy)
         metadata = {
             "issuer": base_url,

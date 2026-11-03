@@ -50,11 +50,15 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
     def login(self, request):
         confirm_mfa = request.GET.get('mfa')
         request.session.pop('passkey_confirm_mfa', None)
+        request.session.pop('passkey_confirm_purpose', None)
         request.session.pop('fido2_state', None)
         if confirm_mfa:
             if not request.user.is_authenticated or settings.SAFE_MODE:
                 raise PermissionDenied(_('Auth failed'))
             request.session['passkey_confirm_mfa'] = str(request.user.pk)
+            from authentication.services.lock_password import LOCK_PASSWORD_PURPOSE
+            if request.GET.get('purpose') == LOCK_PASSWORD_PURPOSE:
+                request.session['passkey_confirm_purpose'] = LOCK_PASSWORD_PURPOSE
         return render(request, 'authentication/passkey.html', {})
 
     def redirect_to_error(self, error):
@@ -92,6 +96,9 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
             request.session['CONFIRM_TIME'] = int(time.time())
             request.session['CONFIRM_TYPE'] = ConfirmType.MFA
+            from authentication.services.lock_password import LOCK_PASSWORD_PURPOSE, mark_lock_password_confirmation
+            if request.session.pop('passkey_confirm_purpose', None) == LOCK_PASSWORD_PURPOSE:
+                mark_lock_password_confirmation(request, 'mfa')
             request.session['CONFIRM_USER_ID'] = str(request.user.pk)
             request.session.pop('passkey_confirm_mfa', None)
             return Response('ok')

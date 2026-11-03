@@ -12,7 +12,6 @@ class ClientLoginSession(models.Model):
     class RevokeReason(models.TextChoices):
         logout = 'logout', _('Logout')
         app_exit = 'app_exit', _('Client exit')
-        idle_timeout = 'idle_timeout', _('Idle timeout')
         absolute_timeout = 'absolute_timeout', _('Maximum login time')
         policy_changed = 'policy_changed', _('Client login policy changed')
         security_revoke = 'security_revoke', _('Authorization revoked')
@@ -22,8 +21,12 @@ class ClientLoginSession(models.Model):
     application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, on_delete=models.CASCADE)
     token_family = models.UUIDField()
     authenticated_at = models.DateTimeField()
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=254, blank=True, default='')
     expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
-    last_activity_at = models.DateTimeField()
+    policy_expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    is_locked = models.BooleanField(default=False)
+    lock_password_failures = models.PositiveSmallIntegerField(default=0)
     revoked_at = models.DateTimeField(null=True, blank=True, db_index=True)
     revoke_reason = models.CharField(max_length=32, choices=RevokeReason.choices, blank=True, default='')
 

@@ -1,4 +1,3 @@
-import re
 from importlib import import_module
 
 from django.conf import settings
@@ -7,29 +6,11 @@ from django.contrib.sessions.backends.cache import (
 )
 from django.core.cache import cache, caches
 
-from common.utils import get_logger
-from jumpserver.utils import get_current_request
-
-logger = get_logger(__file__)
+from . import SessionSaveMixin
 
 
-class SessionStore(DjangoSessionStore):
-    ignore_urls = [
-        r'^/api/v1/users/profile/',
-        r'^/api/v1/authentication/user-session/'
-    ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ignore_pattern = re.compile('|'.join(self.ignore_urls))
-
-    def save(self, *args, **kwargs):
-        request = get_current_request()
-        if request is None or not self.ignore_pattern.match(request.path):
-            try:
-                super().save(*args, **kwargs)
-            except Exception as e:
-                logger.info(f'SessionStore save error: {e}')
+class SessionStore(SessionSaveMixin, DjangoSessionStore):
+    pass
 
 
 class RedisUserSessionManager:
@@ -70,6 +51,11 @@ class RedisUserSessionManager:
     @staticmethod
     def get_keys():
         session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
+        if hasattr(session_store_cls, 'get_model_class'):
+            from django.utils import timezone
+            return list(session_store_cls.get_model_class().objects.filter(
+                expire_date__gt=timezone.now(),
+            ).values_list('session_key', flat=True))
         cache_key_prefix = session_store_cls.cache_key_prefix
         keys = caches[settings.SESSION_CACHE_ALIAS].iter_keys('*')
         return [k.replace(cache_key_prefix, '') for k in keys]

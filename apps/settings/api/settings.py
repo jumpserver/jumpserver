@@ -197,22 +197,24 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         self.prepare_openbao_mount_change(serializer)
         self.prepare_ssh_ca_config(serializer)
         from authentication.services.client_login_session import (
-            client_login_policy, client_policy_lock, revoke_client_authorizations,
+            client_login_policy, client_policy_lock, update_client_session_lifetimes,
         )
 
         policy_fields = {
-            'SECURITY_CLIENT_REAUTH_ON_EXIT', 'SECURITY_CLIENT_MAX_IDLE_TIME',
+            'SECURITY_CLIENT_REAUTH_ON_EXIT', 'SECURITY_CLIENT_IDLE_LOCK_TIME',
             'SECURITY_CLIENT_MAX_SESSION_TIME',
         }
         updating_policy = bool(policy_fields.intersection(self.request.data))
-        # Serialize policy writes with authorization, refresh and credential release.
+        # Serialize policy writes with client authorization and refresh.
         # Read the database here: another worker's settings pub/sub may lag behind.
-        with client_policy_lock() if updating_policy else nullcontext():
+        with client_policy_lock() if (updating_policy or 'SECURITY_WEB_IDLE_LOCK_TIME' in self.request.data) else nullcontext():
             with transaction.atomic():
-                old_policy = client_login_policy() if updating_policy else None
+                old_policy = client_login_policy(use_cache=False) if updating_policy else None
                 self.save_settings(serializer)
-                if updating_policy and old_policy != client_login_policy():
-                    revoke_client_authorizations(reason='policy_changed')
+                if updating_policy:
+                    policy = client_login_policy(use_cache=False)
+                    if old_policy['max_session_time'] != policy['max_session_time']:
+                        update_client_session_lifetimes(policy)
 
     def save_settings(self, serializer):
         post_data_names = list(self.request.data.keys())
@@ -225,6 +227,9 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             changed, setting = Setting.update_or_create(**item)
             if not changed:
                 continue
+            from authentication.services.idle_lock import clamp_idle_lock_preferences
+            if setting.name in ('SECURITY_WEB_IDLE_LOCK_TIME', 'SECURITY_CLIENT_IDLE_LOCK_TIME', 'SECURITY_CLIENT_MAX_SESSION_TIME'):
+                clamp_idle_lock_preferences(setting.name, setting.cleaned_value)
             serializer_data[setting.name] = setting.cleaned_value
 
         setattr(serializer, '_data', serializer_data)

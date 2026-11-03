@@ -2,11 +2,9 @@ import os
 import uuid
 from datetime import timedelta, datetime
 from functools import lru_cache
-from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
-from django.core.cache import caches
 from django.db import models
 from django.db.models import Q, CharField, F, Value
 from django.db.models.functions import Cast, Coalesce, Concat
@@ -363,6 +361,8 @@ class UserLoginLog(models.Model):
 
 
 class UserSession(models.Model):
+    is_locked = models.BooleanField(default=False)
+    lock_password_failures = models.PositiveSmallIntegerField(default=0)
     _OPERATE_LOG_ACTION = {'delete': ActionChoices.finished}
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -394,11 +394,8 @@ class UserSession(models.Model):
 
     @property
     def date_expired(self) -> datetime:
-        session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
-        session_store = session_store_cls(session_key=self.key)
-        cache_key = session_store.cache_key
-        ttl = caches[settings.SESSION_CACHE_ALIAS].ttl(cache_key)
-        return timezone.now() + timedelta(seconds=ttl)
+        from common.sessions import session_expiry
+        return session_expiry(self.key)
 
     @classmethod
     def clear_expired_sessions(cls):
