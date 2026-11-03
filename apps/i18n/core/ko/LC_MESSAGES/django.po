@@ -14062,3 +14062,24 @@ msgstr "라이센스가 유효하지 않습니다."
 
 #~ msgid "Ticket already closed"
 #~ msgstr "작업 요청이 종료되었습니다"
+
+msgid "Log in again after exiting the client"
+msgstr "클라이언트 종료 후 다시 로그인"
+
+msgid "Log in again after exiting the client process. Closing a window to the tray does not count as exit."
+msgstr "클라이언트 프로세스를 종료한 후에는 다시 로그인해야 합니다. 창을 닫아 트레이로 최소화하는 것은 종료로 간주하지 않습니다."
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "클라이언트 최대 로그인 시간(분)"
+
+msgid "Counted from client login; token refresh does not extend it. 0 disables this limit. Existing OAuth token expiry and cleanup rules still apply."
+msgstr "클라이언트 로그인 시점부터 계산하며, 토큰을 갱신해도 연장되지 않습니다. 0으로 설정하면 이 제한이 해제됩니다. 기존 OAuth 토큰 만료 및 정리 규칙은 계속 적용됩니다."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "클라이언트 로그인이 만료되었습니다. 다시 로그인하세요."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "설정된 로그인 정책을 사용하려면 JumpServer 클라이언트를 업그레이드하세요."
+
+msgid "Connect options must be an object."
+msgstr "연결 옵션은 객체여야 합니다."

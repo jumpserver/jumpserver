@@ -184,6 +184,19 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         category_setting_updated.send(sender=self.__class__, category=category, serializer=serializer)
 
     def perform_update(self, serializer):
+        from authentication.services.client_login_session import (
+            POLICY_FIELDS, client_login_policy, client_policy_transaction, revoke_client_authorizations,
+        )
+
+        if not set(serializer.validated_data).intersection(POLICY_FIELDS):
+            return self._perform_update(serializer)
+        with client_policy_transaction():
+            previous = client_login_policy()
+            self._perform_update(serializer)
+            if previous != client_login_policy():
+                revoke_client_authorizations()
+
+    def _perform_update(self, serializer):
         self.prepare_openbao_mount_change(serializer)
         post_data_names = list(self.request.data.keys())
         settings_items = self.parse_serializer_data(serializer)
@@ -287,4 +300,4 @@ class ClientVersionView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        return Response(['4.0.0', '4.1.0', '4.1.1', '4.1.2'], status=status.HTTP_200_OK)
+        return Response(['4.2.0'], status=status.HTTP_200_OK)

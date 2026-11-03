@@ -541,11 +541,20 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
 
     @action(methods=['POST'], detail=False)
     def exchange(self, request, *args, **kwargs):
+        from authentication.services.client_login_session import connection_session_id
+
         pk = request.data.get('id', None) or request.data.get('pk', None)
         # 只能兑换自己使用的 Token
         instance = get_object_or_404(ConnectionToken, pk=pk, user=request.user)
         instance.id = None
         self.validate_exchange_token(instance)
+        # Exchange creates a new authorization; bind the current issuer's login,
+        # including when the source ticket came from Web or an earlier login.
+        instance.connect_options = dict(instance.connect_options)
+        instance.connect_options.pop('_client_login_session', None)
+        session_id = connection_session_id(getattr(request, 'auth', None))
+        if session_id is not None:
+            instance.connect_options['_client_login_session'] = session_id
         instance.date_expired = date_expired_default()
         instance.save()
         serializer = self.get_serializer(instance)

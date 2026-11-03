@@ -207,6 +207,16 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySessionSerializer(serializers.Serializer):
+    SECURITY_CLIENT_REAUTH_ON_EXIT = serializers.BooleanField(
+        required=False, label=_('Log in again after exiting the client'),
+        help_text=_('Log in again after exiting the client process. Closing a window to the tray does not count as exit.'),
+    )
+    SECURITY_CLIENT_MAX_SESSION_TIME = serializers.IntegerField(
+        min_value=0, max_value=99999, required=False,
+        label=_('Maximum client login lifetime (minute)'),
+        help_text=_('Counted from client login; token refresh does not extend it. '
+                    '0 disables this limit. Existing OAuth token expiry and cleanup rules still apply.'),
+    )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
         required=True, label=_('Watermark'),
     )

@@ -14202,3 +14202,26 @@ msgstr "Invalid license"
 
 #~ msgid "Ticket already closed"
 #~ msgstr "Ticket has been closed"
+
+msgid "Log in again after exiting the client"
+msgstr "Log in again after exiting the client"
+
+msgid "Log in again after exiting the client process. Closing a window to the tray does not count as exit."
+msgstr "Log in again after exiting the client process. Closing a window to the tray does not count as exit."
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "Maximum client login lifetime (minute)"
+
+msgid "Counted from client login; token refresh does not extend it. 0 disables this limit. Existing OAuth token expiry and cleanup rules still apply."
+msgstr "Counted from client login; token refresh does not extend it. 0 disables this limit. Existing OAuth token expiry and cleanup rules still apply."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "Client login session expired. Please authenticate again."
+
+msgid ""
+"Please upgrade the JumpServer client to use the configured login policy."
+msgstr ""
+"Please upgrade the JumpServer client to use the configured login policy."
+
+msgid "Connect options must be an object."
+msgstr "Connect options must be an object."
