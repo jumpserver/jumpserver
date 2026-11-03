@@ -8,6 +8,7 @@ on:
     paths:
       - 'apps/**/migrations/**'
       - 'utils/check_migrations.py'
+      - 'apps/common/migration_checks.py'
       - '.github/workflows/check-migrations.yml'
 
 permissions:
