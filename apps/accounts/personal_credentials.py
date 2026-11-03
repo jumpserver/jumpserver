@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from cryptography.exceptions import UnsupportedAlgorithm
+from cryptography.hazmat.primitives import serialization
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -7,8 +9,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied
 
 from accounts.const import AliasAccount, SecretType
-from accounts.utils import validate_account_username, validate_ssh_key
-from common.utils import is_uuid
+from accounts.utils import validate_account_username
+from common.utils import is_uuid, is_openssh_format_key
 from assets.const import AllTypes, Connectivity, Protocol
 from assets.models import Asset
 from orgs.utils import tmp_to_org
@@ -384,6 +386,35 @@ def validate_personal_credential_secret_type(
         })
 
 
+def validate_personal_credential_ssh_key(secret):
+    """Validate SSH key structure without decrypting or rewriting the secret."""
+    try:
+        data = secret.encode('utf-8')
+        if is_openssh_format_key(data):
+            key = serialization.load_ssh_private_key(data, password=None)
+        else:
+            key = serialization.load_pem_private_key(data, password=None)
+        key.public_key().public_bytes(
+            serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH,
+        )
+    except TypeError as error:
+        # Only accept a missing passphrase for encrypted formats Koko can load.
+        if str(error) in (
+            'Key is password-protected, but password was not provided.',
+            'Password was not given but private key is encrypted',
+        ) and data.startswith((
+            b'-----BEGIN OPENSSH PRIVATE KEY-----',
+            b'-----BEGIN RSA PRIVATE KEY-----',
+            b'-----BEGIN EC PRIVATE KEY-----',
+            b'-----BEGIN DSA PRIVATE KEY-----',
+        )):
+            return secret
+        raise serializers.ValidationError(_('private key invalid or passphrase error')) from error
+    except (ValueError, UnsupportedAlgorithm) as error:
+        raise serializers.ValidationError(_('private key invalid or passphrase error')) from error
+    return secret
+
+
 def get_personal_credential_for_use(
         user, asset, protocol, credential_id, version=None, include_secret=False,
         permission_context=None,
@@ -438,7 +469,7 @@ def save_personal_credential(
         platform_protocol, secret_type, field_name='input_secret_type'
     )
     if secret_type == 'ssh_key':
-        secret = validate_ssh_key(secret)
+        secret = validate_personal_credential_ssh_key(secret)
     with tmp_to_org(asset.org_id):
         if credential_id:
             credential = PersonalAssetCredential.objects.select_for_update().filter(

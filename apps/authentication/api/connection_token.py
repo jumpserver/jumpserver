@@ -30,8 +30,9 @@ from accounts.personal_credentials import (
     record_personal_credential_audit,
     save_personal_credential,
     validate_personal_credential_secret_type,
+    validate_personal_credential_ssh_key,
 )
-from accounts.utils import validate_account_username, validate_ssh_key
+from accounts.utils import validate_account_username
 from acls.models import ConnectMethodACL
 from acls.notifications import AssetLoginReminderMsg
 from assets.const import Protocol
@@ -821,7 +822,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
                 field_name='input_secret_type',
             )
             if input_secret_type == SecretType.SSH_KEY:
-                data['input_secret'] = validate_ssh_key(data['input_secret'])
+                data['input_secret'] = validate_personal_credential_ssh_key(data['input_secret'])
             if credential_id and credential_version is None:
                 raise ValidationError({
                     'personal_credential_version': _('This field is required.')

@@ -10,9 +10,10 @@ from accounts.personal_credentials import (
     PersonalCredentialVersionConflict,
     get_personal_credential_permission_context,
     validate_personal_credential_secret_type,
+    validate_personal_credential_ssh_key,
     validate_personal_credential_username,
 )
-from accounts.utils import validate_account_username, validate_ssh_key
+from accounts.utils import validate_account_username
 from assets.const import Connectivity, Protocol
 from assets.models import Asset
 from common.serializers import CommonModelSerializer
@@ -132,7 +133,7 @@ class PersonalAssetCredentialSerializer(CommonModelSerializer):
             })
         validate_personal_credential_secret_type(platform_protocol, secret_type)
         if secret_type == SecretType.SSH_KEY and attrs.get('secret'):
-            attrs['secret'] = validate_ssh_key(attrs['secret'])
+            attrs['secret'] = validate_personal_credential_ssh_key(attrs['secret'])
         return attrs
 
     @transaction.atomic
