@@ -222,6 +222,7 @@ class Config(dict):
         'GLOBAL_ORG_DISPLAY_NAME': '',
         'SITE_URL': 'http://127.0.0.1',
         'USER_GUIDE_URL': '',
+        'USER_FIRST_LOGIN_ENABLED': True,
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
 

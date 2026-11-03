@@ -127,6 +127,13 @@ class UserProfileSerializer(UserSerializer):
             ):
                 self.fields.pop(field, None)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not settings.USER_FIRST_LOGIN_ENABLED and 'is_first_login' in data:
+            # Skip the onboarding prompt without changing the user's stored state.
+            data['is_first_login'] = False
+        return data
+
     @staticmethod
     def get_guide_url(obj) -> str:
         return settings.USER_GUIDE_URL
