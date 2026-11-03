@@ -1,18 +1,13 @@
-"""Prepare usable workflows on upgrade without replacing administrator choices."""
-import logging
+"""Prepare usable workflows for new organizations without replacing administrator choices."""
 
 from django.db import transaction
 
 from orgs.models import Organization
 from orgs.utils import tmp_to_root_org
 from rbac.builtin import BuiltinRole
-from tickets.management.commands.migrate_ticket_workflows import import_flow
 from tickets.models import TicketFlow, Workflow
 from tickets.plugins import ticket_plugins
-from .errors import WorkflowConfigurationError
 from .publication import publish_workflow
-
-logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
@@ -53,21 +48,3 @@ def ensure_default_workflows(org_ids=None):
             ).values_list('id', flat=True))
             for org_id in scopes:
                 create_default_workflow(org_id, plugin)
-
-
-def initialize_workflows():
-    with tmp_to_root_org():
-        for flow in TicketFlow.objects.all().order_by('id').iterator():
-            try:
-                workflow = import_flow(flow, enabled=True, preserve_roles=True)
-                if not workflow.enabled and workflow.migration_notes.get('requires_review'):
-                    logger.warning('Legacy workflow %s requires review before enabling.', flow.pk)
-            except WorkflowConfigurationError as exc:
-                # Never bypass an invalid custom approval rule with a new default.
-                Workflow.objects.get_or_create(
-                    org_id=flow.org_id, type=flow.type, name=flow.name or flow.get_type_display(),
-                    defaults={'legacy_flow_id': flow.pk, 'created_by': 'Legacy workflow import',
-                              'migration_notes': {'requires_review': True, 'error': str(exc.detail)}},
-                )
-                logger.warning('Could not initialize legacy workflow %s: %s', flow.pk, exc.detail)
-        ensure_default_workflows()

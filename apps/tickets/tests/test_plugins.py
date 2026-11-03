@@ -9,6 +9,7 @@ from django.core.signals import request_finished
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+from django.utils.translation import override
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import BasePermission
@@ -1247,6 +1248,13 @@ class TicketPluginTests(TestCase):
         self.assertEqual(self.plugin_action(ticket, 'read_reason').data, {'reason': 'Need access'})
         self.assertEqual(self.plugin_action(ticket, 'read_reason', data={'reason': 'Forged from client'}).status_code, 400)
 
+    def test_historical_general_type_label_does_not_enable_new_submissions(self):
+        ticket = Ticket.objects.create(title='Historical general', type='general', applicant=self.applicant,
+                                       org_id=self.org.id)
+        with override('en'):
+            self.assertEqual(TicketSerializer(ticket).data['type'], {'value': 'general', 'label': 'General'})
+        self.assertNotIn('general', PluginTicketApplySerializer().fields['type'].choices)
+
     def test_catalogue_and_user_options(self):
         factory = APIRequestFactory()
         request = factory.get('/api/v1/tickets/ticket-types/')
@@ -1254,6 +1262,7 @@ class TicketPluginTests(TestCase):
         response = TicketTypeViewSet.as_view({'get': 'list'})(request)
         self.assertEqual(response.status_code, 200)
         self.assertIn('view_secret', {item['type'] for item in response.data})
+        self.assertNotIn('general', {item['type'] for item in response.data})
         for org_id, status in [(self.org.id, 200), (self.other_org.id, 403)]:
             request = factory.get('/', {'org_id': org_id})
             force_authenticate(request, self.applicant)

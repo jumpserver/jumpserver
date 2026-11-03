@@ -1,7 +1,10 @@
 from unittest.mock import patch
 from uuid import uuid4
 
-from django.apps import apps
+from importlib import import_module
+from types import SimpleNamespace
+from django.db.migrations.loader import MigrationLoader
+from django.db import connection
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -12,19 +15,32 @@ from rbac.models import Role, RoleBinding
 from tickets.api.workflow import WorkflowViewSet
 from tickets.models import ApprovalRule, ApprovalTask, Ticket, TicketFlow, Workflow
 from tickets.plugins import get_ticket_plugin, ticket_plugins
-from tickets.signal_handlers.workflow import initialize_approval_workflows
 from tickets.tests import test_workflow as fixtures
 from tickets.workflow.engine import WorkflowEngine
 from tickets.workflow.errors import WorkflowConfigurationError
-from tickets.workflow.initialization import ensure_default_workflows, initialize_workflows
+from tickets.workflow.initialization import ensure_default_workflows
+
+
+def initialize_workflows():
+    migration = import_module("tickets.migrations.0010_ticket_workflow_refactor")
+    state = MigrationLoader(connection).project_state([("tickets", "0010_ticket_workflow_refactor")])
+    migration.migrate_approval_workflows(state.apps, SimpleNamespace(connection=connection))
 
 
 class WorkflowInitializationTests(TestCase):
     setUpTestData = fixtures.WorkflowTests.__dict__['setUpTestData']
     setUp = fixtures.WorkflowTests.setUp
 
+    def test_upgrade_keeps_legacy_ticket_tables(self):
+        tables = set(connection.introspection.table_names())
+        self.assertTrue({
+            'tickets_applyassetticket', 'tickets_applyloginticket',
+            'tickets_applyloginassetticket', 'tickets_applycommandticket',
+            'tickets_applyassetticket_apply_assets', 'tickets_applyassetticket_apply_nodes',
+        }.issubset(tables))
+
     def test_upgrade_initializes_published_options_for_every_visible_type_and_is_repeatable(self):
-        initialize_approval_workflows(apps.get_app_config('tickets'), apps, 'default')
+        initialize_workflows()
         with tmp_to_root_org():
             before = list(Workflow.objects.values_list('id', 'enabled', 'active_version_id'))
         for plugin in ticket_plugins.all(visible=True):
@@ -115,7 +131,7 @@ class WorkflowInitializationTests(TestCase):
         flow = TicketFlow.objects.create(type='general', name='Missing reviewers')
         flow.rules.add(ApprovalRule.objects.create(users={'type': 'ids', 'ids': []}))
         with patch.object(ticket_plugins, 'all', return_value=[get_ticket_plugin('general')]), \
-                self.assertLogs('tickets.workflow.initialization', level='WARNING'):
+                self.assertLogs('tickets.migrations.0010_ticket_workflow_refactor', level='WARNING'):
             initialize_workflows()
         placeholder = Workflow.objects.get(type='general', legacy_flow_id=flow.pk)
         self.assertFalse(placeholder.enabled)
@@ -127,7 +143,7 @@ class WorkflowInitializationTests(TestCase):
             inherited = Workflow.objects.get(org_id=Organization.ROOT_ID, type='apply_asset', is_system=False)
         flow = TicketFlow.objects.create(type='apply_asset', name=inherited.name)
         flow.rules.add(ApprovalRule.objects.create(users={'type': 'ids', 'ids': []}))
-        with self.assertLogs('tickets.workflow.initialization', level='WARNING'):
+        with self.assertLogs('tickets.migrations.0010_ticket_workflow_refactor', level='WARNING'):
             initialize_workflows()
         self.assertFalse(Workflow.get_org_related_flows(self.org.pk).filter(pk=inherited.pk).exists())
         ticket = Ticket.objects.create(type='apply_asset', title='Do not bypass local rule',
@@ -139,7 +155,7 @@ class WorkflowInitializationTests(TestCase):
         selector = {'type': 'attrs', 'attrs': [{'name': 'username', 'match': 'exact', 'value': self.alice.username}]}
         flow = TicketFlow.objects.create(type='general', name='Complex custom rule')
         flow.rules.add(ApprovalRule.objects.create(users=selector))
-        with self.assertLogs('tickets.workflow.initialization', level='WARNING'):
+        with self.assertLogs('tickets.migrations.0010_ticket_workflow_refactor', level='WARNING'):
             initialize_workflows()
         workflow = Workflow.objects.get(legacy_flow_id=flow.pk)
         self.assertFalse(workflow.enabled)
