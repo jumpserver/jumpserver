@@ -404,6 +404,8 @@
     "ClearSuccessMsg": "성공적으로 삭제되었습니다",
     "ClickCopy": "클릭하여 복사",
     "ClientCertificate": "클라이언트 인증서",
+    "ClientSecurity": "클라이언트 보안",
+    "ClientSecurityChangeHelp": "두 설정 중 하나를 변경하면 기존 클라이언트 로그인이 즉시 무효화되므로 다시 로그인해야 합니다. 이미 연결된 자산 연결에는 기존 시간 초과 규칙이 계속 적용됩니다.",
     "Clipboard": "클립보드",
     "ClipboardCopyPaste": "클립보드 복사 및 붙여넣기",
     "Clone": "클론",

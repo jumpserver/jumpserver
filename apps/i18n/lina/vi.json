@@ -404,6 +404,8 @@
     "ClearSuccessMsg": "Xóa thành công",
     "ClickCopy": "Nhấn để sao chép",
     "ClientCertificate": "Chứng chỉ khách hàng",
+    "ClientSecurity": "Bảo mật ứng dụng khách",
+    "ClientSecurityChangeHelp": "Thay đổi một trong hai cấu hình sẽ vô hiệu hóa ngay các phiên đăng nhập hiện có của ứng dụng khách và yêu cầu đăng nhập lại. Các kết nối tài sản đã thiết lập tiếp tục tuân theo các quy tắc hết thời gian chờ hiện có.",
     "Clipboard": "Bảng ghi nhớ",
     "ClipboardCopyPaste": "Sao chép và dán từ clipboard",
     "Clone": "sao chép",
