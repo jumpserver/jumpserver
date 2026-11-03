@@ -35,7 +35,10 @@ class WorkflowViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets
 
     def get_queryset(self):
         # The root organization may manage global and organization definitions.
-        return Workflow.objects.select_related('active_version').filter(is_system=False)
+        queryset = Workflow.objects.all()
+        if not current_org.is_root() and self.action in ('list', 'retrieve', 'versions', 'update', 'partial_update'):
+            queryset = Workflow.get_org_related_flows(current_org.id)
+        return queryset.select_related('active_version').filter(is_system=False)
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='options')
     def options_list(self, request, **kwargs):

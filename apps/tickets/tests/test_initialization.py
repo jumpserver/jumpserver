@@ -81,6 +81,23 @@ class WorkflowInitializationTests(TestCase):
         self.assertEqual(workflow.active_version_id, version.pk)
         self.assertEqual(workflow.versions.count(), 1)
 
+    def test_same_named_legacy_flows_keep_each_organizations_approvers(self):
+        flows = []
+        for org, user in ((self.org, self.alice), (self.other_org, self.outsider)):
+            with tmp_to_org(org):
+                flow = TicketFlow.objects.create(name='Organization approval', type='general')
+                flow.rules.add(ApprovalRule.objects.create(users={'type': 'ids', 'ids': [str(user.pk)]}))
+                flows.append((org, user, flow))
+        initialize_workflows()
+        for org, user, flow in flows:
+            with tmp_to_org(org):
+                workflow = Workflow.objects.get(legacy_flow_id=flow.pk)
+                self.assertEqual(workflow.org_id, org.pk)
+                self.assertTrue(workflow.enabled)
+                self.assertEqual(workflow.active_version.nodes.get(type='approval').config['approvers'],
+                                 {'type': 'user', 'value': [str(user.pk)]})
+                self.assertEqual(Workflow.get_org_related_flows(org.pk).get(type='general').pk, workflow.pk)
+
     def test_local_configuration_is_not_bypassed_by_a_new_global_default(self):
         plugin = get_ticket_plugin('general')
         custom = Workflow.objects.create(type=plugin.type, name='Disabled custom flow')
