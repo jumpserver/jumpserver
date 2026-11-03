@@ -1890,5 +1890,9 @@
     "UKeyVCTKSAuthorizationPassword": "Senha de autorização do serviço",
     "UKeyVCTKSAuthorizationHelp": "Necessário apenas quando a autorização do serviço VCTK_S estiver habilitada. Deixe o usuário em branco para desabilitá-la.",
     "UKeyVCTKSAuthorizationPasswordHelp": "Deixe em branco para manter a senha salva.",
-    "UKeyVCTKSAuthorizationAdvanced": "Avançado: autorização do serviço (opcional)"
+    "UKeyVCTKSAuthorizationAdvanced": "Avançado: autorização do serviço (opcional)",
+    "UKeyBuiltinCARootCertificate": "Certificado raiz de CA integrado",
+    "UKeyTLSCustomSSL": "Usar certificado SSL personalizado",
+    "UKeySSLCertificate": "Certificado SSL",
+    "UKeySSLCertificateHelp": "Envie os certificados de confiança SSL do serviço de verificação (CA ou cadeia de certificados PEM, sem chave privada, até 64 KB). Deixe em branco para manter a configuração salva."
 }

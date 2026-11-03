@@ -19,8 +19,8 @@ msgstr ""
 "X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://zhconvert.org\n"
 
 #: authentication/backends/ukey/providers/builtin.py
-msgid "Builtin CA"
-msgstr "內建 CA"
+msgid "Builtin CA root certificate"
+msgstr "內建 CA 根憑證"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Unexpected error"
@@ -241,8 +241,8 @@ msgid "Use system trust store"
 msgstr "使用系統信任庫"
 
 #: settings/serializers/auth/ukey.py
-msgid "Use custom CA certificate"
-msgstr "使用自訂 CA 憑證"
+msgid "Use custom SSL certificate"
+msgstr "使用自訂 SSL 憑證"
 
 #: settings/serializers/auth/ukey.py
 msgid "Ignore certificate verification (unsafe)"
@@ -253,8 +253,8 @@ msgid "A CA certificate is required."
 msgstr "必須提供 CA 憑證"
 
 #: settings/serializers/auth/ukey.py
-msgid "HTTPS CA certificate"
-msgstr "HTTPS CA 憑證"
+msgid "SSL certificate"
+msgstr "SSL 憑證"
 
 #: settings/serializers/auth/ukey.py
 msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."

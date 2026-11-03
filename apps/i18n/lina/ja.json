@@ -1894,5 +1894,9 @@
     "UKeyVCTKSAuthorizationPassword": "業務認証パスワード",
     "UKeyVCTKSAuthorizationHelp": "VCTK_S サービスで業務認証が有効な場合のみ入力します。ユーザー名を空にすると業務認証を使用しません。",
     "UKeyVCTKSAuthorizationPasswordHelp": "空欄の場合、保存済みのパスワードを保持します。",
-    "UKeyVCTKSAuthorizationAdvanced": "詳細：業務認証（任意）"
+    "UKeyVCTKSAuthorizationAdvanced": "詳細：業務認証（任意）",
+    "UKeyBuiltinCARootCertificate": "組み込み CA ルート証明書",
+    "UKeyTLSCustomSSL": "カスタム SSL 証明書を使用",
+    "UKeySSLCertificate": "SSL 証明書",
+    "UKeySSLCertificateHelp": "検証サービスの SSL 証明書をアップロードしてください（PEM 形式の CA 証明書または証明書チェーン、秘密鍵なし、最大 64 KB）。空欄の場合は保存済みの設定を保持します。"
 }

@@ -13,7 +13,7 @@ from .base import BaseCAProvider
 
 class BuiltinCAProvider(BaseCAProvider):
     id = 'builtin'
-    label = _('Builtin CA')
+    label = _('Builtin CA root certificate')
     binding_mode = 'user_sn'
     supports_enrollment = True
     expose_default_pin = True

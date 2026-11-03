@@ -1888,5 +1888,9 @@
     "UKeyVCTKSAuthorizationPassword": "业务授权密码",
     "UKeyVCTKSAuthorizationHelp": "仅当 VCTK_S 服务开启业务授权时填写；用户名留空表示不使用业务授权。",
     "UKeyVCTKSAuthorizationPasswordHelp": "留空保留已保存的密码。",
-    "UKeyVCTKSAuthorizationAdvanced": "高级：业务授权（可选）"
+    "UKeyVCTKSAuthorizationAdvanced": "高级：业务授权（可选）",
+    "UKeyBuiltinCARootCertificate": "内置 CA 根证书",
+    "UKeyTLSCustomSSL": "使用自定义 SSL 证书",
+    "UKeySSLCertificate": "SSL 证书",
+    "UKeySSLCertificateHelp": "上传验签服务的 SSL 证书（PEM 格式的 CA 证书或证书链，不含私钥，最大 64 KB），留空保留已有配置。"
 }

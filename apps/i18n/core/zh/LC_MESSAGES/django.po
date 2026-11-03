@@ -18,8 +18,8 @@ msgstr ""
 "X-Generator: Poedit 2.4.3\n"
 
 #: authentication/backends/ukey/providers/builtin.py
-msgid "Builtin CA"
-msgstr "内置 CA"
+msgid "Builtin CA root certificate"
+msgstr "内置 CA 根证书"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Unexpected error"
@@ -240,8 +240,8 @@ msgid "Use system trust store"
 msgstr "使用系统信任库"
 
 #: settings/serializers/auth/ukey.py
-msgid "Use custom CA certificate"
-msgstr "使用自定义 CA 证书"
+msgid "Use custom SSL certificate"
+msgstr "使用自定义 SSL 证书"
 
 #: settings/serializers/auth/ukey.py
 msgid "Ignore certificate verification (unsafe)"
@@ -252,8 +252,8 @@ msgid "A CA certificate is required."
 msgstr "必须提供 CA 证书"
 
 #: settings/serializers/auth/ukey.py
-msgid "HTTPS CA certificate"
-msgstr "HTTPS CA 证书"
+msgid "SSL certificate"
+msgstr "SSL 证书"
 
 #: settings/serializers/auth/ukey.py
 msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."

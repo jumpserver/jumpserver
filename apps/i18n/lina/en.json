@@ -1877,5 +1877,9 @@
     "UKeyVCTKSAuthorizationPassword": "Business authorization password",
     "UKeyVCTKSAuthorizationHelp": "Only required when the VCTK_S service enables business authorization. Leave the username blank to disable it.",
     "UKeyVCTKSAuthorizationPasswordHelp": "Leave blank to keep the saved password.",
-    "UKeyVCTKSAuthorizationAdvanced": "Advanced: business authorization (optional)"
+    "UKeyVCTKSAuthorizationAdvanced": "Advanced: business authorization (optional)",
+    "UKeyBuiltinCARootCertificate": "Builtin CA root certificate",
+    "UKeyTLSCustomSSL": "Use custom SSL certificate",
+    "UKeySSLCertificate": "SSL certificate",
+    "UKeySSLCertificateHelp": "Upload SSL trust certificates for the verification service (PEM CA certificates or a certificate chain, no private key, up to 64 KB). Leave blank to keep the saved configuration."
 }

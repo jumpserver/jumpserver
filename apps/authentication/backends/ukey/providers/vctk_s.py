@@ -16,7 +16,7 @@ class VCTKSCAProvider(BaseCAProvider):
     uses_one_time_challenge = True
     supported_vendors = ('ji_da',)
     supports_connection_test = True
-    expose_default_pin = True
+    expose_default_pin = False
     sdk_sign_method = 'UKey_P7SignAttach'
     sdk_digest_from_certificate = True
     settings_serializer = 'settings.serializers.auth.ukey.VCTKSCASettingSerializer'

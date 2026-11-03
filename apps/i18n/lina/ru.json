@@ -1891,5 +1891,9 @@
     "UKeyVCTKSAuthorizationPassword": "Пароль авторизации сервиса",
     "UKeyVCTKSAuthorizationHelp": "Требуется только при включенной авторизации сервиса VCTK_S. Пустое имя пользователя отключает авторизацию.",
     "UKeyVCTKSAuthorizationPasswordHelp": "Оставьте пустым, чтобы сохранить текущий пароль.",
-    "UKeyVCTKSAuthorizationAdvanced": "Дополнительно: авторизация сервиса (необязательно)"
+    "UKeyVCTKSAuthorizationAdvanced": "Дополнительно: авторизация сервиса (необязательно)",
+    "UKeyBuiltinCARootCertificate": "Встроенный корневой сертификат CA",
+    "UKeyTLSCustomSSL": "Использовать собственный сертификат SSL",
+    "UKeySSLCertificate": "Сертификат SSL",
+    "UKeySSLCertificateHelp": "Загрузите доверенные SSL-сертификаты службы проверки (сертификаты CA или цепочку в формате PEM, без закрытого ключа, до 64 КБ). Оставьте пустым, чтобы сохранить настройки."
 }
