@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('authentication', '0013_connectiontoken_shared_review'),
         ('terminal', '0017_applethost_tinker_version'),
-        ('tickets', '0009_ticketassignee_assignee_display_and_more'),
+        ('tickets', '0010_ticket_workflow_refactor'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         migrations.swappable_dependency(settings.OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL),
         migrations.swappable_dependency(settings.OAUTH2_PROVIDER_APPLICATION_MODEL),
@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
                 ('interactive_session', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='agent_interactive_actions', to='terminal.session')),
                 ('interactive_token', models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='agent_interactive_action', to='authentication.connectiontoken')),
-                ('ticket', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='tickets.applycommandticket')),
+                ('ticket', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='tickets.ticket')),
                 ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
                 ('session', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='actions', to='terminal.agentsession')),
             ],

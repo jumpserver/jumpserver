@@ -36,7 +36,7 @@ def create_batch_reviews(tokens):
             continue
         with tmp_to_org(token.org_id):
             rules, assignees = get_pending_review_assignees(token)
-        key = get_review_group_key(token.org_id, assignees)
+        key = get_review_group_key(token.org_id, assignees, rules, token.user_id)
         groups[key].append((token, rules, assignees))
     for entries in groups.values():
         token, rules, assignees = entries[0]

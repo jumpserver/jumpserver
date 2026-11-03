@@ -45,6 +45,7 @@ def check_asset_permission_will_expired():
     end = start + timedelta(days=first_notice_days + 1)
 
     user_asset_remain_day_mapper = defaultdict(dict)
+    user_permission_remain_day_mapper = defaultdict(lambda: defaultdict(set))
     org_perm_remain_day_mapper = defaultdict(dict)
 
     asset_perms = AssetPermission.objects.filter(
@@ -76,6 +77,7 @@ def check_asset_permission_will_expired():
         assets = asset_perm.get_all_assets()
 
         for u in users:
+            user_permission_remain_day_mapper[remain_days][u].add(asset_perm)
             if u in user_asset_remain_day_mapper[remain_days]:
                 user_asset_remain_day_mapper[remain_days][u].update(assets)
             else:
@@ -83,7 +85,9 @@ def check_asset_permission_will_expired():
 
     for day_count, user_asset_mapper in user_asset_remain_day_mapper.items():
         for user, assets in user_asset_mapper.items():
-            PermedAssetsWillExpireUserMsg(user, assets, day_count).publish_async()
+            PermedAssetsWillExpireUserMsg(
+                user, assets, day_count, permissions=user_permission_remain_day_mapper[day_count][user],
+            ).publish_async()
 
     for day_count, org_perm_mapper in org_perm_remain_day_mapper.items():
         for org, perms in org_perm_mapper.items():

@@ -49,6 +49,9 @@ class LoginTypeChoices(TextChoices):
     unknown = "U", _("Unknown")
 
 
+USER_DEVICE_TYPE_CHOICES = [*LoginTypeChoices.choices, ('C', _('Client'))]
+
+
 class ActivityChoices(TextChoices):
     operate_log = 'O', _('Operate log')
     session_log = 'S', _('Session log')

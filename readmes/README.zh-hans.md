@@ -24,6 +24,12 @@ JumpServer 是具备 AI 能力的开源特权访问管理（PAM）平台，为 D
 
 <img alt="JumpServer 架构图" src="assets/jumpserver-architecture.gif" />
 
+## 版本维护
+
+5.x 为活跃维护版本，4.10.x 为 LTS 版本，3.10.x 仅提供关键问题修复。V3 社区版（CE）将于 **2026 年 12 月 31 日**停止维护，企业版（EE）将于 **2028 年 12 月 31 日**停止维护。
+
+请查看 [SECURITY.md](../SECURITY.md)，了解版本维护状态和安全漏洞报告方式。
+
 ## 快速开始
 
 准备一台干净的 64 位 Linux 服务器，至少配备 4 核 CPU 和 8 GB 内存。

@@ -205,7 +205,7 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
     def test_ephemeral_hosted_key_type_survives_validation(self, _allowed):
         view = self.make_view()
         del view._validate
-        view._validate_acl = Mock(return_value=None)
+        view._validate_acl = Mock(return_value={})
         data = view._validate(
             self.user, self.asset, ACCOUNT_ID, 'ssh', 'web_cli',
             permed_account=self.account,
@@ -218,7 +218,8 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         )
         self.assertEqual(data['input_secret_type'], '')
 
-    def test_account_object_overlays_saved_secret_on_the_actual_hosted_account(self):
+    @patch('accounts.provisioning.check_account_ready')
+    def test_account_object_overlays_saved_secret_on_the_actual_hosted_account(self, check_ready):
         token = SimpleNamespace(
             asset=self.asset, account=ACCOUNT_ID, personal_credential_id='credential',
             get_asset_accounts_by_alias=Mock(return_value=self.account),
@@ -230,6 +231,7 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         self.assertEqual(result.id, ACCOUNT_ID)
         self.assertEqual(result.secret, 'saved-private-key')
         self.assertEqual(result.secret_type, 'ssh_key')
+        check_ready.assert_called_once_with(token, self.account)
 
     def test_account_object_rejects_a_new_secret_or_changed_username(self):
         for field, value in (('secret', 'managed-secret'), ('username', 'admin')):

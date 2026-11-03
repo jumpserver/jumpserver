@@ -71,9 +71,9 @@ class Status(models.TextChoices):
 
 class Language(models.TextChoices):
     en = 'en', 'English'
-    fr = 'fr', 'Français'
     zh_hans = 'zh-hans', '中文（简体）'
     zh_hant = 'zh-hant', '中文（繁體）'
+    fr = 'fr', 'Français'
     ja = 'ja', '日本語',
     pt_br = 'pt-br', 'Português (Brasil)'
     es = 'es', 'Español'

@@ -7,6 +7,7 @@ from datetime import timedelta
 from urllib.parse import parse_qs, urlsplit
 
 from django.conf import settings
+from django.core.cache import cache
 from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
 from django.utils.translation import override
@@ -42,6 +43,8 @@ class AgentOAuthOrganizationTests(TestCase):
         AgentApplication.objects.create(application=cls.app, resource=cls.resource)
 
     def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
         self.enterContext(tmp_to_org(self.first))
         self.factory = RequestFactory()
         self.verifier = 'a' * 64

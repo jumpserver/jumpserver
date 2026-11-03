@@ -139,6 +139,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 5985,
                 'secret_types': ['password'],
                 'setting': {
+                    'file_transfer_root': {
+                        'type': 'str',
+                        'default': 'home',
+                        'label': _('WinRM file transfer root'),
+                        'help_text': _('Absolute Windows directory; home uses the connected account home directory.'),
+                    },
                     'use_ssl': {
                         'type': 'bool',
                         'default': False,

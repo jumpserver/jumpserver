@@ -81,7 +81,7 @@ class OracleSysdbaOptionsTests(SimpleTestCase):
             token = SimpleNamespace(
                 user=SimpleNamespace(), asset=asset, account='sys', protocol='oracle',
                 connect_method='db_client', connect_options={'use_sysdba': False},
-                input_username='', personal_credential_id=None,
+                input_username='', personal_credential_id=None, face_monitor_token='',
             )
             view.validate_exchange_token(token)
         self.assertIs(token.connect_options['use_sysdba'], True)

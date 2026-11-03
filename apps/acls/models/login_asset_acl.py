@@ -18,6 +18,10 @@ logger = get_logger(__name__)
 
 
 class LoginAssetACL(UserAssetAccountBaseACL):
+    workflow = models.ForeignKey(
+        'tickets.Workflow', null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+', verbose_name=_('Workflow'),
+    )
     action = models.CharField(
         max_length=64, default=ActionChoices.reject,
         choices=((ActionChoices.accept, _('Accept')), (ActionChoices.reject, _('Reject'))),
@@ -72,7 +76,7 @@ class LoginAssetACL(UserAssetAccountBaseACL):
     def get_match_rule_acls(cls, user, ip, acl_qs=None):
         queryset = acl_qs if acl_qs is not None else cls.get_user_acls(user)
         if hasattr(queryset, 'prefetch_related'):
-            queryset = queryset.order_by('priority', 'name', 'id').prefetch_related('reviewers', 'recipients').iterator(chunk_size=200)
+            queryset = queryset.order_by('priority', 'name', 'id').select_related('workflow__active_version').prefetch_related('reviewers', 'recipients').iterator(chunk_size=200)
         else:
             queryset = sorted(queryset, key=lambda rule: (rule.priority, rule.name, str(rule.id)))
         matched = []
@@ -105,8 +109,19 @@ class LoginAssetACL(UserAssetAccountBaseACL):
     @classmethod
     def get_review_assignees(cls, rules):
         rules = tuple(rules)
+        from orgs.models import Organization
+        from tickets.workflow.errors import WorkflowConfigurationError
+
         by_org = {}
         for rule in rules:
+            if rule.workflow_id:
+                workflow = rule.workflow
+                if (not workflow.enabled or not workflow.active_version_id
+                        or not workflow.active_version.published_at
+                        or workflow.org_id not in (rule.org_id, Organization.ROOT_ID)
+                        or workflow.type != 'login_asset_confirm'):
+                    raise WorkflowConfigurationError('Select an enabled asset connection workflow with a published version.')
+                continue
             reviewers = by_org.setdefault(rule.org_id, {})
             reviewers.update((user.pk, user) for user in rule.reviewers.all())
         assignees = {
@@ -114,7 +129,7 @@ class LoginAssetACL(UserAssetAccountBaseACL):
             for org_id, reviewers in by_org.items()
             for user in cls.filter_available_reviewers(reviewers.values(), org_id)
         }
-        if rules and not assignees:
+        if any(not rule.workflow_id for rule in rules) and not assignees:
             raise JMSException(
                 code='acl_reviewers_unavailable',
                 detail=_('No available reviewers. Contact an administrator.'),
@@ -134,6 +149,14 @@ class LoginAssetACL(UserAssetAccountBaseACL):
 
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def review_configuration(rules):
+        return {
+            str(rule.pk): ({'workflow': str(rule.workflow_id), 'version': str(rule.workflow.active_version_id)}
+                           if rule.workflow_id else {'reviewers': sorted(str(user.pk) for user in rule.reviewers.all())})
+            for rule in rules
+        }
 
     def get_review_cache_key(self, user_id, asset_id, account_username):
         account_digest = sha256(account_username.encode('utf-8')).hexdigest()
@@ -159,14 +182,14 @@ class LoginAssetACL(UserAssetAccountBaseACL):
             logger.exception('Failed to cache asset review exemption for ticket %s', ticket_id)
 
     @classmethod
-    def cache_approved_review(cls, ticket):
+    def cache_approved_review(cls, ticket, instance):
         from tickets.const import TicketState
 
         reviews = ticket.meta.get('login_asset_reviews') or [ticket.meta.get('login_asset_review')]
-        if ticket.state != TicketState.approved:
+        if instance.state != TicketState.approved:
             return
         connections = ticket.meta.get('login_asset_connections') or [{
-            'asset_id': str(ticket.apply_login_asset_id), 'account': ticket.apply_login_account,
+            'asset_id': instance.context['assets'][0]['id'], 'account': instance.context['accounts'][0]['username'],
             'reviews': reviews,
         }]
         for entry in connections:
@@ -179,23 +202,25 @@ class LoginAssetACL(UserAssetAccountBaseACL):
                 acl = cls.objects.filter(id=review.get('acl_id'), is_active=True, review_enabled=True).first()
             if not acl or not acl.review_duration:
                 continue
-            key = acl.get_review_cache_key(ticket.apply_login_user_id, entry['asset_id'], entry['account'])
+            key = acl.get_review_cache_key(ticket.applicant_id, entry['asset_id'], entry['account'])
             if key != review.get('cache_key'):
                 continue
             transaction.on_commit(lambda key=key, timeout=acl.review_duration * 3600: cls._cache_review(key, str(ticket.id), timeout))
 
-    def create_login_asset_review_ticket(self, user, asset, account_username, assignees, org_id, *, review_acls=None, reason='', connections=None):
+    @transaction.atomic
+    def create_login_asset_review_ticket(self, user, asset, account_username, assignees, org_id, workflow=None, *, review_acls=None, reason='', connections=None):
         from tickets.const import TicketType
-        from tickets.models import ApplyLoginAssetTicket
+        from tickets.models import Ticket
         title = _('Login asset confirm') + ' ({})'.format(user)
         data = {
             'title': title,
             'org_id': org_id,
             'applicant': user,
-            'apply_login_user': user,
-            'apply_login_asset': asset,
-            'apply_login_account': account_username,
             'type': TicketType.login_asset_confirm,
+            'request_data': {
+                'apply_login_user': str(user.pk), 'apply_login_asset': str(asset.pk),
+                'apply_login_account': account_username,
+            },
             'comment': reason,
             'meta': {'login_asset_reviews': [
                 {'acl_id': str(rule.id),
@@ -231,8 +256,21 @@ class LoginAssetACL(UserAssetAccountBaseACL):
                     _('Connection reason'), token.acl_context.get('reason', '') or '-',
                 ) for token, connection_rules in connections
             )
-        ticket = ApplyLoginAssetTicket.objects.create(**data)
-        ticket.open_by_system(assignees)
+        from tickets.workflow.composition import compose_workflows
+        from tickets.workflow.business import get_system_workflow
+        rules = {str(rule.pk): rule for rule in (review_acls or (self,))}
+        for connection, connection_rules in connections or ():
+            rules.update((str(rule.pk), rule) for rule in connection_rules)
+        ordered_rules = sorted(rules.values(), key=lambda rule: (rule.priority, rule.name, str(rule.pk)))
+        data['meta']['login_asset_review_config'] = self.review_configuration(ordered_rules)
+        if workflow is None:
+            assignees = self.get_review_assignees(ordered_rules)
+            workflows = [rule.workflow for rule in ordered_rules if rule.workflow_id]
+            if assignees:
+                workflows.append(get_system_workflow(org_id, TicketType.login_asset_confirm, assignees))
+            workflow = compose_workflows(workflows, org_id, TicketType.login_asset_confirm)
+        ticket = Ticket.objects.create(**data)
+        ticket.open_by_system(assignees, workflow=workflow)
         return ticket
 
 

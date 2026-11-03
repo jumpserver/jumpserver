@@ -14007,9 +14007,6 @@ msgstr "許可證匯入成功"
 msgid "Invalid license"
 msgstr "許可證無效"
 
-#~ msgid "Ticket already closed"
-#~ msgstr "工單已經關閉"
-
 #: assets/models/asset/web.py assets/const/protocol.py
 msgid "Success selector"
 msgstr "登入成功選擇器"
@@ -17443,17 +17440,13 @@ msgstr "請升級 JumpServer 用戶端後使用目前的登入策略。"
 msgid "Client login session expired. Please authenticate again."
 msgstr "用戶端登入已失效，請重新驗證身分。"
 
-msgid "Client login session belongs to a different user"
-msgstr "用戶端登入工作階段屬於其他使用者"
-
-msgid "Client login session"
-msgstr "用戶端登入工作階段"
-
 msgid "Log in again after exiting the client"
 msgstr "退出後重新登入"
 
-msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
-msgstr "啟用後，用戶端程序退出並重新啟動時需要重新登入。最小化或隱藏視窗不屬於退出。預設關閉。"
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr "啟用後，用戶端程序退出並重新啟動時需要重新登入。最小化或隱藏視窗不屬於退出。"
 
 msgid "Client login idle timeout (minute)"
 msgstr "閒置逾時（分鐘）"
@@ -17461,8 +17454,8 @@ msgstr "閒置逾時（分鐘）"
 msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
 msgstr "達到閒置逾時後需重新登入。0 表示不啟用（預設）。主視窗、獨立資產視窗及內建網站中的實際鍵盤、滑鼠操作會計入活動；連線在線、背景輸出和自動重新整理不算活動。Xshell、MSTSC 等外部軟體和部分跨來源內嵌頁面中的操作無法擷取。僅在這些區域操作、長時間只觀看，或網路異常導致回報失敗時，仍可能觸發閒置逾時；以伺服器最後確認的活動時間為準。"
 
-msgid "Client login lifetime (minute)"
-msgstr "登入有效期（分鐘）"
+msgid "Maximum client login lifetime (minute)"
+msgstr "最長登入有效期（分）"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "從用戶端登入開始計時，使用者操作和權杖更新均不延長有效期。0 表示不限制登入時長（預設），退出和閒置逾時設定仍然生效。到期後需重新登入。"
@@ -17491,3 +17484,423 @@ msgstr "沒有可存取的已授權組織。"
 #, python-format
 msgid "You can authorize up to %(limit)s MCP clients. Revoke an existing client in Personal settings > MCP clients before adding another."
 msgstr "每人最多授權 %(limit)s 個 MCP 用戶端。請先在個人設定的 MCP 用戶端頁面撤銷一個既有用戶端，再授權新用戶端。"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "資產負責人"
+
+msgid "Manager"
+msgstr "直屬負責人"
+
+msgid "Workflow"
+msgstr "審批流程"
+
+msgid "Approval workflow"
+msgstr "審批流程"
+
+msgid "Workflow version"
+msgstr "流程版本"
+
+msgid "Workflow instance"
+msgstr "流程實例"
+
+msgid "Workflow node"
+msgstr "流程節點"
+
+msgid "Workflow edge"
+msgstr "流程連線"
+
+msgid "Workflow node instance"
+msgstr "節點實例"
+
+msgid "Approval task"
+msgstr "審批任務"
+
+msgid "Workflow event"
+msgstr "流程事件"
+
+#: tickets/plugins
+msgid "View account password"
+msgstr "檢視帳號密碼"
+
+#: tickets/plugins
+msgid "Change account password"
+msgstr "帳號改密"
+
+#: tickets/plugins
+msgid "File upload / download"
+msgstr "檔案上傳下載"
+
+#: tickets/plugins
+msgid "Download session recording"
+msgstr "工作階段錄影下載"
+
+#: tickets/plugins
+msgid "Authorized users"
+msgstr "授權使用者"
+
+#: tickets/plugins
+msgid "Request parameters"
+msgstr "申請參數"
+
+#: tickets/plugins
+msgid "Validity (seconds)"
+msgstr "有效時長（秒）"
+
+#: tickets/plugins
+msgid "File paths"
+msgstr "檔案路徑"
+
+#: tickets/plugins
+msgid "Direction"
+msgstr "方向"
+
+msgid "WinRM file transfer root"
+msgstr "WinRM 檔案傳輸根目錄"
+
+msgid "Absolute Windows directory; home uses the connected account home directory."
+msgstr "Windows 絕對目錄；home 表示連線帳號的使用者目錄。"
+
+msgid "Select one Linux SSH/SFTP or Windows WinRM account."
+msgstr "請選擇一個 Linux SSH/SFTP 或 Windows WinRM 帳號。"
+
+msgid "Client idle lock (minute)"
+msgstr "閒置鎖定 (分)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 表示關閉閒置鎖定。 "
+"主頁面與用戶端管理的資產視窗一起鎖定，只能在主頁面輸入目前帳號的鎖定密碼解鎖。登入及連線保持；外部軟體不受此鎖定保護。啟用後，新登入及還原的登入預設鎖定。"
+" 依本機系統鍵鼠輸入判斷閒置，其他程式操作亦計入；僅對目前啟用的網站與帳號計時，無須向伺服器回報活動。"
+
+msgid "Client lock password"
+msgstr "用戶端鎖定密碼"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "尚未設定用戶端鎖定密碼。請前往此網站、此帳號的 Web 個人設定完成設定，返回後按重新整理。"
+
+msgid "The client lock password is incorrect."
+msgstr "解鎖失敗，請檢查密碼與網路後重試。"
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr ""
+"從每次登入時間起，依最新設定計算。使用者操作和權杖更新不會續期。0 表示不限。設定修改後已逾時的，最多再保留 10 分鐘，到期後需要重新登入。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr "{} - 尚未設定加密密碼，請前往個人設定 → 登入驗證 → 用戶端憑證 → 檔案加密密碼進行設定。"
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0 "
+"表示關閉自動閒置鎖定。依據本機系統鍵盤滑鼠輸入判斷閒置，只對目前啟用的站點與帳號計時。平時不逐次回報活動；閒置逾時或手動鎖定時，通知伺服器鎖定本次登入。"
+" "
+"閒置逾時即鎖定主頁面與對應資產視窗，即使尚未設定密碼。只能在主頁面通過後端密碼驗證後解鎖。新登入正常進入，已鎖定的登入恢復後仍鎖定。外部軟體視窗不受保護。"
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "用戶端已鎖定，請在主頁面解鎖。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"預設 15 分鐘。 0 "
+"表示停用自動鎖定。本機無鍵盤滑鼠操作達到設定時長後，鎖定目前站點帳號的主頁面與資產視窗。須在主頁面連線驗證鎖定密碼後解鎖。尚未設定密碼也會鎖定，可前往 "
+"Web 個人設定中設定密碼。外部軟體視窗不受保護。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 尚未設定加密密碼，請前往個人設定 → 使用者驗證 → 檔案加密進行設定。"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "審計報告"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "舊版報表"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "可以查看綜合審計報告"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "可以查看運維活動報告"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "可以查看安全事件報告"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "可以查看資產與帳號概況"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "可以查看帳號運維報告"
+
+msgid "Locked"
+msgstr "鎖定狀態"
+
+msgid "Screen lock password"
+msgstr "鎖屏密碼"
+
+msgid "Idle screen lock (minute)"
+msgstr "閒置鎖屏 (分)"
+
+msgid "Set a lock password after signing in again."
+msgstr "請重新登入後設定鎖屏密碼。"
+
+msgid "The lock password is incorrect."
+msgstr "鎖屏密碼不正確。"
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr "請先設定身分驗證方式，再修改鎖屏密碼。"
+
+msgid "This verification method is not available."
+msgstr "此驗證方式無法使用。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"預設 15 分鐘，0 表示關閉自動鎖屏。用戶端、控制台和 Web 終端共用。用戶端按系統鍵鼠活動計時，Web "
+"彙總同站點各分頁的活動。閒置到時即鎖屏，未設定密碼也會鎖定。解鎖須線上驗證鎖屏密碼；未設定時可登出並重新登入後設定。外部軟體視窗不受保護。"
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr "鎖屏密碼連續錯誤 5 次，本次登入已登出。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"預設 15 分鐘，0 "
+"表示停用自動鎖屏。依本機系統的鍵鼠活動判斷閒置，到時鎖定用戶端及其資產視窗，即使未設定鎖屏密碼也會鎖定。只能在主視窗由後端驗證密碼後解鎖，外部軟體視窗不受保護。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"預設 15 分鐘，0 表示停用自動鎖屏。控制台與 Web "
+"終端共用，彙總同站點分頁的鍵鼠活動，無法擷取其他網站或外部軟體的活動。即使未設定密碼也會鎖屏，此時可登出後重新登入。"
+
+#~ msgid "Ticket already closed"
+#~ msgstr "工單已經關閉"
+
+msgid "Web session lifetime (second)"
+msgstr "Web 工作階段有效時長 (秒)"
+
+msgid "Renew session on request"
+msgstr "請求續期"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"設定項 SESSION_COOKIE_AGE，單位為秒。修改 Core 的 config.yml 後重新啟動 "
+"Core。新建或續期的工作階段使用新時長，已儲存的到期時間不會立即批次改寫。這不是從登入開始計算的固定最長有效期。Web 與用戶端登入策略相互獨立。"
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"設定項 SESSION_SAVE_EVERY_REQUEST，修改 Core 的 config.yml 後重新啟動 "
+"Core。啟用後，一般請求依工作階段有效時長延長到期時間；停用也不等於固定最長有效期，寫入 Session "
+"仍可能續期。鍵鼠閒置不會直接登出，閒置鎖屏另行設定。"
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0 表示不限制。依每次登入時間及最新設定計算，操作與 Token 更新不會延長。設定約每 60 秒同步；新設定下已逾時的，最多再保留 10 "
+"分鐘。寬限期內延長後未逾時的，取消登出。"
+
+msgid "Web idle screen lock (minute)"
+msgstr "Web 端閒置鎖屏 (分)"
+
+msgid "Client idle screen lock (minute)"
+msgstr "用戶端閒置鎖屏 (分)"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr "留空以跟隨管理員設定，個人設定不得超過管理員上限。"
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr "管理員上限為 %(minutes)s 分鐘，留空表示跟隨管理員設定。"
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"這是全域預設值與上限。未自行設定的使用者始終跟隨此值；個人設定只能小於或等於此值。調低上限時，超出的個人值會一併調低；調高時，已自行設定的值保持不變。"
+
+msgid "Choose either setting or clearing the lock password."
+msgstr "不能同時設定及清空鎖屏密碼。"
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr "全域值為 0 時，使用者可設定 0 停用鎖屏，也可設定正數自行啟用。"
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "管理員要求退出用戶端後重新登入，無法停用。"
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr "管理員未要求啟用時，使用者可以自行啟用。"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"工作階段有效時長與請求續期須修改 Core 的 config.yml 並重新啟動 "
+"Core。新登入採用新設定；已有截止時間不會批次改寫。儲存了獨立時長的工作階段，續期時亦可能保留原時長，須重新登入才採用新時長。 "
+"SESSION_COOKIE_AGE "
+"是儲存工作階段時採用的有效時長，單位為秒，並非從首次登入計算的固定上限。個人資訊顯示的目前到期時間，才是伺服器儲存的截止時間。"
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"預設的 Web 登入或續期後有效時長，單位為秒，並非從首次登入計算的固定上限。修改 Core 的 config.yml 中 "
+"SESSION_COOKIE_AGE 並重新啟動後生效。已有工作階段可能保留原時長，重新登入後採用新時長。"
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"啟用：一般 HTTP 請求會續期，背景請求亦可能續期。停用：一般唯讀請求不續期，但再次驗證身分等修改 Session 的操作仍可能續期。修改 Core "
+"的 config.yml 中 SESSION_SAVE_EVERY_REQUEST 並重新啟動後生效。"
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr "啟用後，關閉瀏覽器通常須重新登入。瀏覽器還原功能可能保留登入 Cookie；需要確保登出時，請按「登出」。此項並非固定最長登入時長的設定。"
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"預設有效時長，單位為秒。<br>每次續期後重新計時：到期時間 = 續期時間 + "
+"有效時長。<br>啟用「請求續期」時，一般請求會續期；停用時，再次驗證身分等修改 Session "
+"的操作仍可能續期。<br>這並非從首次登入計算的固定最長有效期。<br>修改 Core 的 config.yml 中 "
+"SESSION_COOKIE_AGE 並重新啟動後生效。已有工作階段可能保留原時長，重新登入後採用新時長。"
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"啟用：大多數攜帶有效 Web 工作階段的 API 請求都會續期，包括 GET "
+"查詢與背景業務輪詢，不要求有鍵鼠操作。<br>不續期的唯讀查詢：個人資訊、線上狀態（user-session）、鎖屏狀態（session-"
+"lock/status）。<br>停用：一般唯讀請求不續期，但再次驗證身分等修改 Session 的操作仍可能續期。<br>原因：專案將驗證結果寫入 "
+"Session；Django 預設在儲存已修改的 Session 時重新計算相對有效期。<br>修改 Core 的 config.yml 中 "
+"SESSION_SAVE_EVERY_REQUEST 並重新啟動後生效。"
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"啟用後，退出整個瀏覽器應用程式，再次開啟通常須重新登入。<br>只關閉分頁或視窗、最小化不等於退出應用程式，瀏覽器可能仍在背景執行。<br>瀏覽器還原功能可能保留登入"
+" Cookie；需要確保登出時，請按站點的「登出」。<br>此項並非固定最長登入時長的設定。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr "啟用後，退出並重新啟動須重新登入，最小化或隱藏不受影響。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr "0 表示不限制。 從登入時間起計算，到期須重新登入，操作不會延長。 修改後已逾時的登入最多保留 10 分鐘。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the specified idle time. Enter the"
+" lock password in the main window to unlock. External application windows "
+"are not protected."
+msgstr "0 表示關閉自動鎖屏。 閒置達到設定時間後自動鎖屏，在主視窗輸入鎖屏密碼解鎖。外部軟體視窗不受保護。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. Administrator "
+"settings are defaults and limits. Users may choose stricter settings; "
+"otherwise they follow the administrator."
+msgstr ""
+"0 表示關閉自動鎖屏。 閒置達到設定時間後鎖定控制台與 Web 終端，輸入鎖屏密碼解鎖。 "
+"管理員設定為預設值與上限，使用者可設定得更嚴格；未自行設定則跟隨管理員。"

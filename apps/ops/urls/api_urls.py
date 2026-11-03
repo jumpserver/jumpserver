@@ -24,6 +24,7 @@ router.register(r'task-executions', api.CeleryTaskExecutionViewSet, 'task-execut
 
 urlpatterns = [
     path('celery/monitor/', api.CeleryMonitorAPIView.as_view(), name='celery-monitor'),
+    path('celery/monitor/stop/', api.CeleryMonitorStopAPIView.as_view(), name='celery-monitor-stop'),
     path('playbook/<uuid:pk>/file/', api.PlaybookFileViewSet.as_view({
         'get': 'retrieve', 'post': 'create', 'patch': 'partial_update', 'delete': 'destroy',
     }), name='playbook-file'),

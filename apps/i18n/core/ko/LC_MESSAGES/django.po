@@ -14280,9 +14280,6 @@ msgstr "라이센스 가져오기 성공"
 msgid "Invalid license"
 msgstr "라이센스가 유효하지 않습니다."
 
-#~ msgid "Ticket already closed"
-#~ msgstr "작업 요청이 종료되었습니다"
-
 #: templates/resource_download.html
 #, python-format
 msgid "Download %(vendor)s Client"
@@ -17694,17 +17691,15 @@ msgstr "설정된 로그인 정책을 사용하려면 JumpServer 클라이언트
 msgid "Client login session expired. Please authenticate again."
 msgstr "클라이언트 로그인 세션이 만료되었습니다. 다시 인증하세요."
 
-msgid "Client login session belongs to a different user"
-msgstr "클라이언트 로그인 세션이 다른 사용자에게 속해 있습니다"
-
-msgid "Client login session"
-msgstr "클라이언트 로그인 세션"
-
 msgid "Log in again after exiting the client"
 msgstr "종료 후 다시 로그인"
 
-msgid "When enabled, log in again after the desktop application exits and restarts. Minimizing or hiding the application does not count as exiting. Disabled by default."
-msgstr "활성화하면 데스크톱 애플리케이션을 종료한 후 다시 시작할 때 다시 로그인해야 합니다. 애플리케이션을 최소화하거나 숨기는 것은 종료로 간주되지 않습니다. 기본값은 비활성화입니다."
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr ""
+"활성화하면 데스크톱 애플리케이션을 종료한 후 다시 시작할 때 다시 로그인해야 합니다. 애플리케이션을 최소화하거나 숨기는 것은 종료로 "
+"간주되지 않습니다."
 
 msgid "Client login idle timeout (minute)"
 msgstr "유휴 시간 제한(분)"
@@ -17712,8 +17707,8 @@ msgstr "유휴 시간 제한(분)"
 msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
 msgstr "유휴 시간 제한에 도달하면 다시 로그인해야 합니다. 0은 제한을 사용하지 않음(기본값)입니다. 기본 창, 별도 자산 창, 내장 웹사이트에서 실제로 수행한 키보드와 마우스 조작이 활동으로 기록됩니다. 연결 유지, 백그라운드 출력, 자동 새로고침은 활동에 포함되지 않습니다. Xshell, MSTSC 같은 외부 프로그램과 일부 교차 출처 내장 페이지의 조작은 수집할 수 없습니다. 이러한 영역에서만 조작하거나, 오랫동안 보기만 하거나, 네트워크 문제로 보고가 실패하면 유휴 시간 초과가 발생할 수 있습니다. 시간은 서버가 마지막으로 확인한 활동을 기준으로 계산됩니다."
 
-msgid "Client login lifetime (minute)"
-msgstr "로그인 유효 기간(분)"
+msgid "Maximum client login lifetime (minute)"
+msgstr "최대 로그인 유효 기간(분)"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "클라이언트에 로그인한 시점부터 계산하며, 활동이나 토큰 갱신으로 연장되지 않습니다. 0은 유효 기간 제한 없음을 의미합니다(기본값). 종료 및 유휴 시간 제한 설정은 계속 적용됩니다. 유효 기간이 끝나면 다시 로그인해야 합니다."
@@ -17732,3 +17727,394 @@ msgstr "클라이언트 로그인 정책이 변경되었습니다"
 
 msgid "Authorization revoked"
 msgstr "권한이 취소되었습니다"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "자산 담당자"
+
+msgid "Manager"
+msgstr "Manager"
+
+msgid "Workflow"
+msgstr "Workflow"
+
+msgid "Approval workflow"
+msgstr "Approval workflow"
+
+msgid "Workflow version"
+msgstr "Workflow version"
+
+msgid "Workflow instance"
+msgstr "Workflow instance"
+
+msgid "Workflow node"
+msgstr "Workflow node"
+
+msgid "Workflow edge"
+msgstr "Workflow edge"
+
+msgid "Workflow node instance"
+msgstr "Workflow node instance"
+
+msgid "Approval task"
+msgstr "Approval task"
+
+msgid "Workflow event"
+msgstr "Workflow event"
+
+msgid "Client idle lock (minute)"
+msgstr "유휴 잠금 (분)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0은 유휴 잠금을 비활성화합니다. 기본 화면과 관리되는 자산 창을 잠그며 기본 화면에서만 해제할 수 있습니다. 로그인과 연결은 "
+"유지됩니다. 외부 프로그램은 보호되지 않습니다. 활성화하면 새 로그인과 복원된 로그인도 잠금 상태로 시작합니다. 외부 프로그램을 포함한 "
+"시스템 키보드와 마우스 입력은 현재 활성 사이트와 계정의 타이머만 초기화합니다. 활동은 서버에 보고하지 않습니다."
+
+msgid "Client lock password"
+msgstr "클라이언트 잠금 비밀번호"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "잠금 비밀번호가 없습니다. 이 사이트와 계정의 웹 개인 설정에서 설정한 후 돌아와 새로 고치세요."
+
+msgid "The client lock password is incorrect."
+msgstr "잠금 해제에 실패했습니다. 비밀번호와 연결을 확인하세요."
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr ""
+"각 로그인 시간부터 최신 설정으로 계산합니다. 활동과 토큰 갱신은 기간을 늘리지 않습니다. 0은 무제한입니다. 설정 변경으로 기간을 "
+"초과한 경우 최대 10분 후 로그아웃되며 다시 로그인해야 합니다."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr ""
+"{} - 암호화 비밀번호가 없습니다. 개인 설정 → 로그인 인증 → 클라이언트 자격 증명 → 파일 암호화 비밀번호에서 설정하세요."
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0은 자동 유휴 잠금 사용 안 함(기본값). 시스템 키보드와 마우스 입력으로 현재 사이트와 계정의 유휴 시간만 판단합니다. 각 작업을 "
+"보고하지 않으며, 유휴 제한 도달 또는 수동 잠금 시 서버에 이번 로그인의 잠금을 요청합니다. 유휴 시간이 초과되면 비밀번호가 없어도 "
+"기본 화면과 관리되는 자산 창을 잠급니다. 기본 화면에서 서버의 비밀번호 검증에 성공해야 해제됩니다. 새 로그인은 정상 진입하며 잠긴 "
+"로그인은 복원 후에도 잠깁니다. 외부 프로그램 창은 보호되지 않습니다."
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "클라이언트가 잠겼습니다. 기본 화면에서 잠금을 해제하세요."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"기본값은 15분입니다. 0은 자동 잠금을 끕니다. 시스템 키보드와 마우스 입력이 설정 시간 동안 없으면 현재 사이트 계정의 기본 화면과 "
+"자산 창을 잠급니다. 기본 화면에서 온라인으로 잠금 비밀번호를 검증한 후 해제합니다. 비밀번호가 없어도 잠기며 Web 개인 설정에서 "
+"설정할 수 있습니다. 외부 프로그램 창은 보호되지 않습니다."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 암호화 비밀번호가 없습니다. 개인 설정 → 사용자 인증 → 파일 암호화에서 설정하세요."
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "감사 보고서"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "이전 보고서"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "종합 감사 보고서를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "운영 활동 보고서를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "보안 이벤트 보고서를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "자산 및 계정 개요를 볼 수 있음"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "계정 운영 보고서를 볼 수 있음"
+
+msgid "Locked"
+msgstr "잠금 상태"
+
+msgid "Screen lock password"
+msgstr "화면 잠금 비밀번호"
+
+msgid "Idle screen lock (minute)"
+msgstr "유휴 화면 잠금 (분)"
+
+msgid "Set a lock password after signing in again."
+msgstr "다시 로그인한 후 화면 잠금 비밀번호를 설정하세요."
+
+msgid "The lock password is incorrect."
+msgstr "화면 잠금 비밀번호가 올바르지 않습니다."
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr "잠금 비밀번호를 변경하기 전에 본인 확인 방법을 설정하세요."
+
+msgid "This verification method is not available."
+msgstr "이 확인 방법을 사용할 수 없습니다."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"기본값은 15분이며 0은 자동 잠금을 끕니다. 클라이언트, 콘솔, Web 터미널에서 공유합니다. 클라이언트는 시스템 키보드·마우스, "
+"Web은 같은 사이트의 탭 활동으로 판단합니다. 비밀번호가 없어도 유휴 시간이 지나면 잠깁니다. 온라인 비밀번호 확인 후 해제하며, "
+"미설정 시 로그아웃 후 다시 로그인하여 설정할 수 있습니다. 외부 앱 창은 보호하지 않습니다."
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr "잠금 비밀번호를 5회 연속 잘못 입력하여 로그아웃되었습니다."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"기본값은 15분이며 0은 자동 잠금을 끕니다. 시스템 키보드·마우스 활동으로 유휴를 판단하며 비밀번호가 없어도 클라이언트와 자산 창을 "
+"잠급니다. 메인 창에서 서버의 비밀번호 검증 후 해제할 수 있습니다. 외부 프로그램 창은 보호되지 않습니다."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"기본값은 15분이며 0은 자동 잠금을 끕니다. 콘솔과 Web 터미널이 공유하며 같은 사이트의 탭에서 키보드·마우스 활동을 합산합니다. "
+"다른 사이트나 외부 프로그램의 활동은 감지할 수 없습니다. 비밀번호가 없어도 잠기므로 이 경우 로그아웃 후 다시 로그인하세요."
+
+#~ msgid "Ticket already closed"
+#~ msgstr "작업 요청이 종료되었습니다"
+
+msgid "Web session lifetime (second)"
+msgstr "Web 세션 유효 시간 (초)"
+
+msgid "Renew session on request"
+msgstr "요청 시 세션 갱신"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"설정 항목 SESSION_COOKIE_AGE이며 단위는 초입니다. Core의 config.yml을 수정한 뒤 Core를 재시작하세요. "
+"새로 생성하거나 갱신하는 세션에 새 시간을 적용하며 저장된 만료 시각을 즉시 일괄 변경하지 않습니다. 로그인 시점부터의 고정 최대 시간이"
+" 아닙니다. Web과 클라이언트 로그인 정책은 독립적입니다."
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"설정 항목 SESSION_SAVE_EVERY_REQUEST입니다. Core의 config.yml을 수정한 뒤 Core를 재시작하세요. "
+"켜면 일반 요청이 설정된 세션 시간만큼 만료 시각을 연장합니다. 꺼도 고정 최대 시간이 되지 않으며 Session 쓰기 시 갱신될 수 "
+"있습니다. 키보드·마우스 유휴 상태로 로그아웃하지 않으며 유휴 잠금은 별도로 설정합니다."
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0은 무제한입니다. 각 로그인 시각과 최신 설정으로 계산하며 활동이나 Token 갱신으로 연장되지 않습니다. 설정은 약 60초마다 "
+"동기화됩니다. 변경 후 이미 만료되었다면 최대 10분의 유예 후 로그아웃합니다. 유예 중 연장하여 새 제한 내에 들어오면 로그아웃을 "
+"취소합니다."
+
+msgid "Web idle screen lock (minute)"
+msgstr "Web 유휴 화면 잠금(분)"
+
+msgid "Client idle screen lock (minute)"
+msgstr "클라이언트 유휴 화면 잠금(분)"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr "비워 두면 관리자 설정을 따릅니다. 개인 설정은 관리자 상한 이하여야 합니다."
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr "관리자 상한은 %(minutes)s분입니다. 비워 두면 관리자 설정을 따릅니다."
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"전체 기본값이자 상한입니다. 직접 설정하지 않은 사용자는 항상 이 값을 따릅니다. 개인 값은 상한 이하여야 합니다. 상한을 줄이면 "
+"초과하는 개인 값도 줄이며, 늘려도 이미 설정한 개인 값은 유지됩니다."
+
+msgid "Choose either setting or clearing the lock password."
+msgstr "잠금 비밀번호 설정과 삭제를 동시에 할 수 없습니다."
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr "전체 값이 0이면 사용자는 0으로 잠금을 끄거나 양수 시간을 직접 설정할 수 있습니다."
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "관리자가 클라이언트 종료 후 재로그인을 요구합니다."
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr "관리자가 요구하지 않아도 사용자가 직접 활성화할 수 있습니다."
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"유효 시간과 요청 갱신은 Core config.yml에서 변경하고 Core를 재시작해야 합니다. 새 로그인에 적용되며 기존 기한을 일괄 "
+"변경하지 않습니다. 별도 시간을 저장한 세션은 갱신해도 원래 시간을 쓸 수 있어 새 시간 적용에는 재로그인이 필요합니다. "
+"SESSION_COOKIE_AGE는 세션 저장 시 사용하는 유효 시간(초)입니다. 최초 로그인부터의 고정 상한이 아닙니다. 개인 정보의 "
+"현재 만료 시간이 서버에 저장된 실제 기한입니다."
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"로그인 또는 갱신 후 Web 세션의 기본 유효 시간이며 단위는 초입니다. 최초 로그인부터의 고정 상한이 아닙니다. Core "
+"config.yml의 SESSION_COOKIE_AGE를 변경하고 Core를 재시작하세요. 기존 세션은 원래 시간을 유지할 수 있으며 새"
+" 시간은 재로그인 후 적용됩니다."
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"켜짐: 일반 HTTP 요청이 갱신하며 백그라운드 요청도 갱신할 수 있습니다. 꺼짐: 일반 읽기 전용 요청은 갱신하지 않지만 신원 "
+"재확인처럼 Session을 쓰는 작업은 갱신할 수 있습니다. Core config.yml의 "
+"SESSION_SAVE_EVERY_REQUEST를 변경하고 Core를 재시작하세요."
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr ""
+"켜면 브라우저 종료 후 보통 재로그인이 필요합니다. 복원 기능이 로그인 Cookie를 유지할 수 있으므로 확실히 종료하려면 로그아웃을 "
+"사용하세요. 고정된 최대 로그인 시간을 설정하는 항목은 아닙니다."
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"기본 유효 시간이며 단위는 초입니다.<br>갱신할 때마다 다시 계산합니다: 만료 시각 = 갱신 시각 + 유효 시간.<br>요청 갱신을 "
+"켜면 일반 요청이 갱신합니다. 꺼도 신원 재확인처럼 Session을 변경하는 작업은 갱신할 수 있습니다.<br>최초 로그인부터의 고정 "
+"최대 시간이 아닙니다.<br>Core config.yml의 SESSION_COOKIE_AGE를 변경하고 Core를 재시작하세요. 기존 "
+"세션은 원래 시간을 유지할 수 있으며 새 시간은 재로그인 후 적용됩니다."
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"켜짐: 유효한 Web 세션을 사용하는 대부분의 API 요청이 갱신합니다. GET과 백그라운드 업무 폴링도 포함하며 키보드·마우스 조작은 "
+"필요하지 않습니다.<br>갱신하지 않는 읽기 전용 조회: 개인 정보, 온라인 상태(user-session), 잠금 상태(session-"
+"lock/status).<br>꺼짐: 일반 읽기 전용 요청은 갱신하지 않지만 신원 재확인처럼 Session을 변경하는 작업은 갱신할 수 "
+"있습니다.<br>이유: 프로젝트가 확인 결과를 Session에 기록하고 Django는 변경된 Session을 저장할 때 상대 유효 시간을"
+" 기본적으로 다시 계산합니다.<br>Core config.yml의 SESSION_SAVE_EVERY_REQUEST를 변경하고 Core를 "
+"재시작하세요."
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"켜면 브라우저 앱 전체를 종료한 뒤 다시 열 때 보통 재로그인이 필요합니다.<br>탭이나 창을 닫거나 최소화하는 것은 앱 종료와 "
+"다릅니다. 브라우저가 백그라운드에서 계속 실행될 수 있습니다.<br>복원 기능이 로그인 Cookie를 유지할 수 있습니다. 확실히 "
+"종료하려면 사이트의 로그아웃을 사용하세요.<br>고정된 최대 로그인 시간을 설정하는 항목은 아닙니다."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr "종료 후 다시 실행하면 재로그인이 필요합니다. 최소화하거나 숨기는 것은 종료가 아닙니다."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr ""
+"0은 무제한입니다. 로그인 시점부터 계산합니다. 만료 시 재로그인이 필요하며 활동해도 연장되지 않습니다. 변경으로 이미 만료된 로그인에는"
+" 최대 10분의 유예가 주어집니다."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the specified idle time. Enter the"
+" lock password in the main window to unlock. External application windows "
+"are not protected."
+msgstr ""
+"0은 자동 잠금을 끕니다. 설정한 유휴 시간이 지나면 자동 잠깁니다. 기본 창에서 잠금 비밀번호를 입력해 해제합니다. 외부 앱 창은 "
+"보호되지 않습니다."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. Administrator "
+"settings are defaults and limits. Users may choose stricter settings; "
+"otherwise they follow the administrator."
+msgstr ""
+"0은 자동 잠금을 끕니다. 설정한 유휴 시간이 지나면 콘솔과 Web 터미널이 잠깁니다. 잠금 비밀번호를 입력해 해제합니다. 관리자 설정이"
+" 기본값과 상한입니다. 사용자는 더 엄격하게 설정할 수 있으며, 직접 설정하지 않으면 관리자를 따릅니다."

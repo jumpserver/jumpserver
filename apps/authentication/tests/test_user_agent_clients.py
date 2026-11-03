@@ -221,7 +221,7 @@ class UserAgentClientTests(TestCase):
             )
         login = ClientLoginSession.objects.create(
             application=self.application, user=self.other, token_family=uuid.uuid4(),
-            authenticated_at=timezone.now(), last_activity_at=timezone.now(),
+            authenticated_at=timezone.now(),
             revoked_at=timezone.now(), revoke_reason='logout',
         )
         response = self.request('post', f'{self.url}{self.application.pk}/revoke/', self.user)
@@ -243,7 +243,7 @@ class UserAgentClientTests(TestCase):
         self.authorize(self.user)
         login = ClientLoginSession.objects.create(
             application=self.application, user=self.user, token_family=uuid.uuid4(),
-            authenticated_at=timezone.now(), last_activity_at=timezone.now(),
+            authenticated_at=timezone.now(),
         )
         self.assertEqual(self.request('post', f'{self.url}{self.application.pk}/revoke/', self.user).status_code, 204)
         self.assertFalse(AgentApplication.objects.filter(pk=self.registration.pk).exists())

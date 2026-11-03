@@ -43,11 +43,12 @@ def safe_task(task):
         'time_start': started if isinstance(started, (int, float)) else None,
         'acknowledged': task.get('acknowledged') if isinstance(task.get('acknowledged'), bool) else None,
         'eta': str(task.get('eta') or '')[:64] or None,
+        'routing_key': str(task.get('routing_key') or '')[:128] or None,
         'definition_id': None,
     }
 
 
-def inspect_workers(connection):
+def worker_rpc(connection, method, arguments=None, destination=None, timeout=INSPECT_TIMEOUT):
     """One bounded pidbox RPC, without Kombu's default unlimited publish retry.
 
     Use the same wire format as Celery control, but enforce an overall reply
@@ -68,7 +69,11 @@ def inspect_workers(connection):
         for name, snapshot in body.items():
             if len(replies) >= WORKER_LIMIT:
                 break
-            if isinstance(name, str) and isinstance(snapshot, dict) and 'active_count' in snapshot:
+            if isinstance(name, str) and isinstance(snapshot, dict):
+                if destination and name not in destination:
+                    continue
+                if method == 'jms_monitor_snapshot' and 'active_count' not in snapshot:
+                    continue
                 replies[name] = snapshot
 
     with connection.channel() as channel:
@@ -76,15 +81,17 @@ def inspect_workers(connection):
             with Consumer(channel, queues=[queue], callbacks=[receive],
                           accept=mailbox.accept, no_ack=True):
                 Producer(channel, auto_declare=False).publish(
-                    {'method': 'jms_monitor_snapshot', 'arguments': {}, 'destination': None,
+                    {'method': method, 'arguments': arguments or {}, 'destination': destination,
                      'pattern': None, 'matcher': None, 'ticket': ticket,
                      'reply_to': {'exchange': mailbox.reply_exchange.name, 'routing_key': ticket}},
                     exchange=mailbox.exchange.name, declare=[mailbox.exchange],
-                    headers={'clock': mailbox.clock.forward(), 'expires': time.time() + INSPECT_TIMEOUT},
+                    headers={'clock': mailbox.clock.forward(), 'expires': time.time() + timeout},
                     serializer=mailbox.serializer, retry=False,
                 )
-                deadline = time.monotonic() + INSPECT_TIMEOUT
+                deadline = time.monotonic() + timeout
                 while len(replies) < WORKER_LIMIT:
+                    if destination and len(replies) >= len(destination):
+                        break
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
                         break
@@ -96,6 +103,28 @@ def inspect_workers(connection):
             # Match Celery's reply queue cleanup, including the Redis transport.
             channel.after_reply_message_received(queue.name)
     return replies
+
+
+def inspect_workers(connection):
+    return worker_rpc(connection, 'jms_monitor_snapshot')
+
+
+def stop_worker_task(worker, task_id, mode):
+    options = dict(app.conf.broker_transport_options or {})
+    options.update(socket_timeout=1, socket_connect_timeout=1, retry_on_timeout=False)
+    try:
+        with app.connection_for_read(connect_timeout=1, transport_options=options) as connection:
+            connection.ensure_connection(max_retries=0)
+            replies = worker_rpc(connection, 'jms_stop_task',
+                                 {'task_id': task_id, 'mode': mode}, [worker], timeout=5)
+    except Exception:
+        return 'unavailable'
+    response = replies.get(worker, {})
+    status = response.get('status')
+    allowed = {'revoked', 'revoke_requested', 'termination_requested', 'invalid',
+               'not_found', 'unsupported_queue', 'unsupported_pool',
+               'already_running', 'not_running', 'unavailable'}
+    return status if status in allowed else 'unavailable'
 
 
 def queue_depths(connection, names):
@@ -155,6 +184,7 @@ def collect_snapshot(previous=None):
         worker = {
             'name': name, 'status': 'online' if name in online else 'unavailable',
             'concurrency': snapshot.get('concurrency'), 'processed': snapshot.get('processed'),
+            'pool': snapshot.get('pool') if snapshot.get('pool') in ('threads', 'prefork') else 'unknown',
             'queues': snapshot.get('queues', [])[:QUEUE_LIMIT], 'truncated': {},
         }
         for field in ('active', 'reserved', 'scheduled'):

@@ -515,6 +515,8 @@ def command_policy(session, command):
                     'acl': str(rule.id), 'action': rule.action, 'priority': rule.priority,
                     'group': str(group.id), 'type': group.type, 'content': group.content, 'ignore_case': group.ignore_case,
                     'reviewers': sorted(str(pk) for pk in rule.reviewers.values_list('pk', flat=True)),
+                    'workflow': str(rule.workflow_id),
+                    'workflow_version': str(rule.workflow.active_version_id) if rule.workflow_id else None,
                 })
                 return rule, group, digest
     return None, None, fingerprint({'action': 'accept'})
@@ -555,7 +557,7 @@ def authorize_action(action):
                 action.result = {'error': 'Approval policy changed; submit a new operation'}
                 action.date_finished = timezone.now()
             elif not action.ticket_id:
-                if not rule.reviewers.exists():
+                if not rule.workflow_id and not rule.reviewers.exists():
                     raise PermissionDenied('Command approval has no reviewer')
                 ticket = rule.create_command_review_ticket(
                     action.request['command'], session.terminal_session, rule, action.org_id,
@@ -565,10 +567,11 @@ def authorize_action(action):
                 ticket.meta = {**ticket.meta, 'agent_action': {'id': str(action.id), 'request_hash': action.request_hash}}
                 ticket.save(update_fields=['comment', 'meta'])
                 action.ticket, action.policy_hash, action.status = ticket, policy_hash, 'awaiting_approval'
-            elif (action.ticket.meta.get('agent_action') != {'id': str(action.id), 'request_hash': action.request_hash}
-                  or action.ticket.apply_run_command != action.request['command'][:4090]
-                  or str(action.ticket.apply_from_session_id) != str(session.terminal_session_id)
-                  or str(action.ticket.apply_from_cmd_filter_acl_id) != str(rule.id)):
+            elif (action.ticket.type != 'command_confirm'
+                  or action.ticket.meta.get('agent_action') != {'id': str(action.id), 'request_hash': action.request_hash}
+                  or action.ticket.request_data.get('apply_run_command') != action.request['command'][:4090]
+                  or action.ticket.request_data.get('apply_from_session') != str(session.terminal_session_id)
+                  or action.ticket.request_data.get('apply_from_cmd_filter_acl') != str(rule.id)):
                 action.status, action.date_finished = 'rejected', timezone.now()
                 action.result = {'error': 'Approval does not match the immutable action'}
             elif action.ticket.state == 'approved':

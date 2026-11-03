@@ -8,9 +8,12 @@ from oauth2_provider.models import get_access_token_model, get_refresh_token_mod
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from oauthlib.oauth2 import InvalidGrantError, InvalidRequestError
 
+from common.utils import get_request_ip
+from jumpserver.utils import get_current_request
 from authentication.models.client_login_session import ClientLoginSession
+from authentication.services.idle_lock import personal_client_login_policy
 from authentication.services.client_login_session import (
-    CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy, client_login_session_data,
+    CLIENT_ACCESS_TOKEN_EXPIRE_SECONDS, client_login_lifetime, client_login_policy, client_login_session_data, client_session_deadline,
     is_client_application, revoke_session, validate_refresh_token_session, client_session_receipt,
 )
 
@@ -45,11 +48,11 @@ class ClientOAuth2Validator(OAuth2Validator):
                     application=request.client, token_family=refresh.token_family,
                 ).first()
             authenticated_at = session.authenticated_at if session else None
-        policy = getattr(session, 'client_login_policy', None) or client_login_policy()
+        policy = personal_client_login_policy(request.user.pk, client_login_policy())
         lifetime = client_login_lifetime(policy)
-        # Freeze the page policy deadline at login. Editing a policy revokes the
-        # existing sessions; automatic refresh never extends a login.
-        expires_at = session.expires_at if session else None
+        # Settings updates already recalculate each live login's deadline.
+        # Token rotation respects that deadline, including any operation grace.
+        expires_at = client_session_deadline(session)[0] if session else None
         if lifetime and session is None:
             if authenticated_at is None:
                 raise InvalidGrantError(description='Client login authorization is required.')
@@ -82,7 +85,7 @@ class ClientOAuth2Validator(OAuth2Validator):
         # Return the policy used by this actual, serialized token issuance.
         token['client_login_policy'] = policy
         session = session or request.client_login_session
-        token['client_login_session'] = client_login_session_data(session, policy=policy)
+        token['client_login_session'] = client_login_session_data(session)
         token['client_login_session_receipt'] = client_session_receipt(
             request.client.pk, session.token_family, token,
         )
@@ -140,10 +143,13 @@ class ClientOAuth2Validator(OAuth2Validator):
             authenticated_at = getattr(request, 'client_authenticated_at', None)
             if authenticated_at is None:
                 raise InvalidGrantError(description='Client login authorization is required.')
+            http_request = get_current_request()
             request.client_login_session = ClientLoginSession.objects.create(
                 user=request.user, application=request.client, token_family=refresh.token_family,
-                authenticated_at=authenticated_at, last_activity_at=authenticated_at,
+                authenticated_at=authenticated_at,
                 expires_at=request.client_login_expires_at,
+                ip=get_request_ip(http_request) if http_request else None,
+                user_agent=http_request.META.get('HTTP_USER_AGENT', '')[:254] if http_request else '',
             )
         return refresh
 

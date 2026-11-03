@@ -1,4 +1,5 @@
 from hashlib import sha256
+import json
 
 from django.core.cache import cache
 from django.db import transaction
@@ -65,7 +66,8 @@ def face_result(token):
 
 
 def ticket_matches_connection(ticket, token):
-    if str(ticket.apply_login_user_id) != str(token.user_id) or str(ticket.org_id) != str(token.org_id):
+    if (ticket.type != 'login_asset_confirm' or str(ticket.applicant_id) != str(token.user_id)
+            or str(ticket.org_id) != str(token.org_id)):
         return False
     connections = ticket.meta.get('login_asset_connections')
     if connections is not None:
@@ -77,8 +79,8 @@ def ticket_matches_connection(ticket, token):
             and entry.get('account') == token.acl_context.get('username')
             for entry in connections
         )
-    return (str(ticket.apply_login_asset_id) == str(token.asset_id)
-            and ticket.apply_login_account == token.acl_context.get('username'))
+    return (str(ticket.request_data.get('apply_login_asset')) == str(token.asset_id)
+            and ticket.request_data.get('apply_login_account') == token.acl_context.get('username'))
 
 
 def acl_state(token):
@@ -90,17 +92,26 @@ def acl_state(token):
     if 'review' in context.get('requirements', {}):
         try:
             with tmp_to_org(token.org_id):
-                rules, assignees = get_pending_review_assignees(token)
-                if token.from_ticket_id:
-                    review_status = token.from_ticket.state
-                    assigned_ids = {user.pk for user in token.from_ticket.current_assignees}
-                    assignees = [user for user in assignees if user.pk in assigned_ids]
-                if assignees:
-                    review_group = get_review_group_key(token.org_id, assignees)
-            reviewers = [
-                {'id': str(user.pk), 'name': user.name, 'username': user.username}
-                for user in sorted(assignees, key=lambda user: (user.name, user.username, str(user.pk)))
-            ]
+                ticket = token.from_ticket
+                review_status = ticket.state if ticket else ''
+                if review_status in ('approved', 'rejected'):
+                    # Finished reviews display their actors, not the now-empty pending task list.
+                    reviewers = [
+                        {'id': str(task.assignee_id or task.pk),
+                         'name': task.assignee_snapshot.get('name', ''),
+                         'username': task.assignee_snapshot.get('username', '')}
+                        for task in ticket.approval_tasks.filter(state__in=['approved', 'rejected'])
+                    ]
+                else:
+                    rules, assignees = get_pending_review_assignees(token)
+                    if ticket:
+                        assigned_ids = {user.pk for user in ticket.current_assignees}
+                        assignees = [user for user in assignees if user.pk in assigned_ids]
+                    review_group = get_review_group_key(token.org_id, assignees, rules, token.user_id)
+                    reviewers = [
+                        {'id': str(user.pk), 'name': user.name, 'username': user.username}
+                        for user in sorted(assignees, key=lambda user: (user.name, user.username, str(user.pk)))
+                    ]
         except APIException:
             # Presentation must not prevent cancelling an invalidated policy.
             # The advance/credential paths still enforce reviewer availability.
@@ -174,37 +185,35 @@ def close_cancelled_review(ticket):
         close_pending_review(ticket)
 
 
-def get_review_group_key(org_id, assignees):
+def get_review_group_key(org_id, assignees, rules=(), user_id=None):
     """Use the same final assignee set for preview and ticket creation."""
     reviewer_ids = sorted({str(user.pk) for user in assignees})
-    return sha256(f'{org_id}:{",".join(reviewer_ids)}'.encode()).hexdigest()
+    versions = sorted({str(rule.workflow.active_version_id) for rule in rules if rule.workflow_id})
+    return sha256(json.dumps([str(org_id), str(user_id), reviewer_ids, versions]).encode()).hexdigest()
 
 
 def get_pending_review_assignees(token):
-    from tickets.models import ApplyLoginAssetTicket
-
     review_ids = set((token.acl_context or {}).get('review_acls', []))
     rules = list(LoginAssetACL.objects.filter(
         id__in=review_ids, is_active=True, review_enabled=True, action='accept',
-    ).prefetch_related('reviewers'))
+    ).select_related('workflow__active_version').prefetch_related('reviewers').order_by('priority', 'name', 'id'))
     if not rules or {str(rule.pk) for rule in rules} != review_ids:
         raise PermissionDenied(_('ACL changed; start a new connection'))
-    # Apply the ticket's existing applicant rule before previewing or grouping.
-    # A sole applicant remains eligible, as in ordinary ticket creation.
-    assignees = ApplyLoginAssetTicket(applicant=token.user).exclude_applicant(
-        LoginAssetACL.get_review_assignees(rules),
-    )
+    assignees = LoginAssetACL.get_review_assignees(rules)
     if token.from_ticket_id:
         ticket = token.from_ticket
         if not ticket_matches_connection(ticket, token):
             raise PermissionDenied(_('Connection approval is no longer valid'))
-        if ticket.state == 'approved':
-            processor = ticket.processor
-            ticket_ids = {processor.pk} if processor else set()
-        else:
-            ticket_ids = {user.pk for user in ticket.current_assignees}
-        if not ticket_ids.intersection(user.pk for user in assignees):
+        frozen = ticket.meta.get('login_asset_review_config')
+        if frozen is None and not any(rule.workflow_id for rule in rules):
+            # Pre-refactor tickets have no configuration snapshot; retain their reviewer check.
+            assigned = [ticket.processor] if ticket.state == 'approved' else ticket.current_assignees
+            if not {user.pk for user in assigned if user}.intersection(user.pk for user in assignees):
+                raise PermissionDenied(_('ACL changed; start a new connection'))
+        elif frozen is None or any(
+                frozen.get(key) != value for key, value in LoginAssetACL.review_configuration(rules).items()):
             raise PermissionDenied(_('ACL changed; start a new connection'))
+        assignees = list(ticket.current_assignees)
     return rules, assignees
 
 

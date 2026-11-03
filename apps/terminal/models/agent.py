@@ -86,7 +86,7 @@ class AgentAction(OrgModelMixin):
     request_hash = models.CharField(max_length=64)
     status = models.CharField(max_length=32, default='accepted')
     cancel_requested = models.BooleanField(default=False)
-    ticket = models.ForeignKey('tickets.ApplyCommandTicket', null=True, on_delete=models.PROTECT)
+    ticket = models.ForeignKey('tickets.Ticket', null=True, on_delete=models.PROTECT)
     interactive_token = models.OneToOneField('authentication.ConnectionToken', null=True, on_delete=models.SET_NULL, related_name='agent_interactive_action')
     interactive_session = models.ForeignKey('terminal.Session', null=True, on_delete=models.SET_NULL, related_name='agent_interactive_actions')
     policy_hash = models.CharField(max_length=64, blank=True)

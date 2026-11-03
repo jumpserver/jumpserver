@@ -905,6 +905,36 @@ class AgentBoundaryTests(TestCase):
         audited = self.audit_api('actions', {'id': str(queued[0].id)})['results'][0]
         self.assertEqual(audited['status'], 'rejected')
 
+    def test_command_review_uses_current_workflow_without_legacy_reviewers(self):
+        from acls.models import CommandFilterACL, CommandGroup
+        from tickets.models import Workflow
+        from tickets.tests.test_workflow import approval_definition
+        from tickets.workflow.publication import publish_workflow
+        asset = self.native_session()
+        reviewer = User.objects.create(username='agent-workflow-reviewer')
+        self.org.add_member(reviewer)
+        workflow = Workflow.objects.create(name='Agent command workflow', type='command_confirm', enabled=True)
+        definition = approval_definition([reviewer])
+        publish_workflow(workflow, definition)
+        rule = CommandFilterACL.objects.create(name='Agent workflow review', action='review', workflow=workflow,
+            users={'type': 'ids', 'ids': [str(self.user.id)]},
+            assets={'type': 'ids', 'ids': [str(asset.id)]}, accounts=['root'])
+        rule.command_groups.add(CommandGroup.objects.create(name='Agent workflow command', content='whoami'))
+        action = AgentAction.objects.create(session=self.session, user=self.user, application=self.app,
+            kind='execute_command', idempotency_key='workflow-review', request={'command': 'whoami'},
+            request_hash='7' * 64)
+        service.authorize_action(action)
+        self.assertEqual(action.status, 'awaiting_approval')
+        self.assertEqual(action.ticket.workflow_id, workflow.pk)
+        action.ticket.approve(reviewer)
+        action.refresh_from_db()
+        service.authorize_action(action)
+        self.assertEqual(action.status, 'queued')
+        publish_workflow(workflow, definition)
+        action.refresh_from_db()
+        service.authorize_action(action)
+        self.assertEqual(action.status, 'rejected')
+
     def test_final_actions_close_pending_command_reviews(self):
         from acls.models import CommandFilterACL, CommandGroup
         from terminal.api.agent import AgentComponentAPI
@@ -915,7 +945,9 @@ class AgentBoundaryTests(TestCase):
             users={'type': 'ids', 'ids': [str(self.user.id)]},
             assets={'type': 'ids', 'ids': [str(asset.id)]}, accounts=['root'])
         rule.command_groups.add(CommandGroup.objects.create(name='Agent review command', content='whoami'))
-        rule.reviewers.add(self.user)
+        reviewer = User.objects.create(username='agent-pending-reviewer')
+        self.org.add_member(reviewer)
+        rule.reviewers.add(reviewer)
         principal = service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})
         for outcome in ('cancel', 'expired', 'policy_changed', 'close'):
             action = AgentAction.objects.create(session=self.session, user=self.user, application=self.app,
@@ -948,7 +980,9 @@ class AgentBoundaryTests(TestCase):
         rule = LoginAssetACL.objects.create(name='Agent shared login review', action='accept', review_enabled=True,
             users={'type': 'ids', 'ids': [str(self.user.id)]},
             assets={'type': 'ids', 'ids': [str(asset.id)]}, accounts=['root'])
-        rule.reviewers.add(self.user)
+        reviewer = User.objects.create(username='agent-shared-login-reviewer')
+        self.org.add_member(reviewer)
+        rule.reviewers.add(reviewer)
         token = service.create_connection_token(self.user, self.session.requested)
         self.session.connection_token = token
         self.session.save(update_fields=['connection_token'])

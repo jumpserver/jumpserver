@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 from django.test import SimpleTestCase
 from django.utils import timezone
@@ -12,6 +12,14 @@ from users.models import User
 
 
 class ConnectionTokenSessionCheckTests(SimpleTestCase):
+    def setUp(self):
+        for mocked in (
+            patch('authentication.services.connection_acl.validate_connection_policy'),
+            patch.object(User, 'is_superuser', new_callable=PropertyMock, return_value=True),
+        ):
+            mocked.start()
+            self.addCleanup(mocked.stop)
+
     def token(self, model=ConnectionToken):
         now = timezone.now()
         token = model(
