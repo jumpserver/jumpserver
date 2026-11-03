@@ -2,9 +2,12 @@ from django.utils.translation import gettext
 from django.db import transaction
 from rest_framework import serializers
 
-from orgs.utils import current_org
+from orgs.models import Organization
+from orgs.utils import current_org, tmp_to_root_org
 from tickets.models import Workflow, WorkflowVersion, WorkflowInstance, WorkflowNodeInstance, ApprovalTask, WorkflowEvent
 from tickets.workflow.definition import validate_definition
+from tickets.workflow.errors import WorkflowConflict
+from tickets.workflow.publication import publish_workflow
 from tickets.plugins import ticket_plugins
 
 
@@ -12,6 +15,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(read_only=True)
     type_label = serializers.CharField(source='get_type_display', read_only=True)
     active_version_number = serializers.IntegerField(source='active_version.number', read_only=True, default=None)
+    expected_version = serializers.IntegerField(min_value=0, required=False, write_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,18 +24,22 @@ class WorkflowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workflow
         fields = ['id', 'name', 'display_name', 'type', 'type_label', 'enabled', 'comment', 'org_id', 'active_version',
-                  'active_version_number', 'legacy_flow_id', 'migration_notes', 'created_by', 'date_created', 'date_updated']
+                  'active_version_number', 'expected_version', 'legacy_flow_id', 'migration_notes',
+                  'created_by', 'date_created', 'date_updated']
         read_only_fields = ['org_id', 'active_version', 'legacy_flow_id', 'migration_notes',
                             'created_by', 'date_created', 'date_updated']
         # Organization is supplied by the server, not the request body.
         validators = []
 
     def validate(self, attrs):
+        current = self.instance.active_version.number if self.instance and self.instance.active_version_id else 0
+        if 'expected_version' in attrs and attrs['expected_version'] != current:
+            raise WorkflowConflict(gettext('A newer version was published. Reload before publishing.'))
         if self.instance and 'type' in attrs and attrs['type'] != self.instance.type and self.instance.versions.exists():
             raise serializers.ValidationError({'type': gettext('A published workflow cannot change ticket type.')})
         if attrs.get('enabled') and (not self.instance or not self.instance.active_version_id):
             raise serializers.ValidationError({'enabled': gettext('Publish a version before enabling the workflow.')})
-        org_id = self.instance.org_id if self.instance else current_org.id
+        org_id = self.instance.org_id if self.instance and current_org.is_root() else current_org.id
         qs = Workflow.objects.filter(org_id=org_id, name=attrs.get('name', getattr(self.instance, 'name', '')),
                                      type=attrs.get('type', getattr(self.instance, 'type', '')))
         if self.instance:
@@ -41,14 +49,34 @@ class WorkflowSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        validated_data.pop('expected_version', None)
         return super().create({**validated_data, 'org_id': current_org.id,
                                'created_by': str(self.context['request'].user)[:128]})
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        if instance.org_id == Organization.ROOT_ID and not current_org.is_root():
+            # Editing an inherited flow must never change another organization's approvals.
+            with tmp_to_root_org():
+                instance = Workflow.objects.select_for_update().get(pk=instance.pk)
+            self.instance = instance
+            self.validate(validated_data)
+            validated_data.pop('expected_version', None)
+            local = Workflow.objects.create(
+                name=validated_data.get('name', instance.name), type=validated_data.get('type', instance.type),
+                comment=instance.comment, enabled=instance.enabled,
+                migration_notes=instance.migration_notes,
+                created_by=str(self.context['request'].user)[:128],
+            )
+            if instance.active_version_id:
+                publish_workflow(local, instance.active_version.as_definition(),
+                                 actor=self.context['request'].user, expected_version=0)
+                local.refresh_from_db()
+            instance = local
         instance = Workflow.objects.select_for_update().get(pk=instance.pk)
         self.instance = instance
         self.validate(validated_data)
+        validated_data.pop('expected_version', None)
         return super().update(instance, validated_data)
 
 
