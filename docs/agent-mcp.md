@@ -348,7 +348,13 @@ UTF-8 content is separately limited to 64 KiB), 128 KiB events and 16 MiB eviden
 with space reserved for final evidence. Command approval validity is 15 minutes.
 The single-node release does not fail over uncertain actions to another worker.
 
-Normal retention and encrypted-backup policies must cover Agent audit tables.
+The existing daily audit cleanup applies `TERMINAL_SESSION_KEEP_DURATION` to
+Agent audit records too. Sessions closed before the retention cutoff, or expired
+before it without a close receipt, are removed in bounded batches together with
+their actions and events. Live native/interactive connections and recent action
+activity or evidence defer deletion. Removing a Koko component retains its node
+identity and Agent audit history while deleting its service account.
+Encrypted backups must cover the Agent audit tables.
 Connection credential records use the existing token retention task. Active
 Agent connections are excluded from early cleanup until their bounded session
 expires or closes; audit records retain the immutable requested

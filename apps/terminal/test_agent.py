@@ -111,6 +111,55 @@ class AgentBoundaryTests(TestCase):
             'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'failed', 'payload': {'error': 'owner deleted'}})
         self.assertEqual(self.action.events.count(), 1)
 
+    def test_koko_deletion_preserves_agent_history(self):
+        event = AgentEvent.objects.create(
+            event_id=uuid.uuid4(), action=self.action, sequence=1, state='running', payload_hash='0' * 64,
+        )
+        for node in (self.node, self.other_node):
+            with self.subTest(agent_history=node == self.node):
+                account = User.objects.create(username=node.name, is_service_account=True)
+                account_id = account.pk
+                node.user = account
+                node.save(update_fields=['user'])
+                created = node.date_created
+
+                node.delete()
+
+                node.refresh_from_db()
+                self.assertTrue(node.is_deleted)
+                self.assertIsNone(node.user_id)
+                self.assertEqual(node.date_created, created)
+                self.assertFalse(User.objects.filter(pk=account_id).exists())
+        self.session.refresh_from_db()
+        self.assertEqual(self.session.terminal_id, self.node.pk)
+        self.assertTrue(AgentEvent.objects.filter(pk=event.pk, action=self.action).exists())
+
+    def test_component_deletion_failure_restores_service_account_binding(self):
+        account = User.objects.create(username='agent-delete-failure', is_service_account=True)
+        self.node.user = account
+        self.node.save(update_fields=['user'])
+        with patch.object(User, 'delete', side_effect=RuntimeError('Account deletion failed')):
+            with self.assertRaises(RuntimeError):
+                self.node.delete()
+        self.node.refresh_from_db()
+        self.assertFalse(self.node.is_deleted)
+        self.assertEqual(self.node.user_id, account.pk)
+
+    def test_other_component_deletion_keeps_existing_provider_cascade(self):
+        from terminal.models import AppProvider
+
+        node = self.other_node
+        node.type = 'kael'
+        node.user = User.objects.create(username='agent-other-component', is_service_account=True)
+        node.save(update_fields=['type', 'user'])
+        provider = AppProvider.objects.create(name='Agent unrelated provider', terminal=node)
+
+        node.delete()
+
+        node.refresh_from_db()
+        self.assertTrue(node.is_deleted)
+        self.assertFalse(AppProvider.objects.filter(pk=provider.pk).exists())
+
     def test_recovery_is_scoped_and_never_returns_execution_capabilities(self):
         from terminal import agent_queries
         second = Organization.objects.create(name='Agent recovery other')

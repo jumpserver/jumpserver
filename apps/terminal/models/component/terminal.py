@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db import models
+from django.db import models, router, transaction
 from django.utils.translation import gettext_lazy as _
 
 from common.const.signals import OP_LOG_SKIP_SIGNAL
@@ -171,13 +171,20 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         return self.user
 
     def delete(self, using=None, keep_parents=False):
-        if self.user:
-            setattr(self.user, OP_LOG_SKIP_SIGNAL, True)
-            self.user.delete()
-        self.name = self.name + '_' + uuid.uuid4().hex[:8]
-        self.user = None
-        self.is_deleted = True
-        self.save()
+        using = using or router.db_for_write(type(self), instance=self)
+        with transaction.atomic(using=using):
+            service_account = self.user
+            if service_account:
+                if self.type == TypeChoices.koko:
+                    # Keep the Koko row and protected Agent history when the
+                    # service account's deletion follows its reverse relation.
+                    type(self).objects.using(using).filter(pk=self.pk).update(user=None)
+                setattr(service_account, OP_LOG_SKIP_SIGNAL, True)
+                service_account.delete(using=using)
+            self.name = self.name + '_' + uuid.uuid4().hex[:8]
+            self.user = None
+            self.is_deleted = True
+            self.save(using=using)
 
     def __str__(self):
         status = "Active"
