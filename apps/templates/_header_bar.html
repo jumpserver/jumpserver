@@ -45,6 +45,12 @@
 
                 <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
                     <li>
+                        <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}">
+                            <i class="fa fa-flag-checkered"></i>
+                            <span> English</span>
+                        </a>
+                    </li>
+                    <li>
                         <a id="switch_cn" href="{% url 'i18n-switch' lang='zh-hans' %}">
                             <i class="fa fa-flag"></i>
                             <span> 中文</span>
@@ -60,12 +66,6 @@
                         <a id="switch_fr" href="{% url 'i18n-switch' lang='fr' %}">
                             <i class="fa fa-flag-checkered"></i>
                             <span> Français</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}">
-                            <i class="fa fa-flag-checkered"></i>
-                            <span> English</span>
                         </a>
                     </li>
                      <li>
