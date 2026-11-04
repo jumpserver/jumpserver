@@ -15,7 +15,10 @@ from common.utils import lazyproperty
 from ..const import Category, AllTypes, Protocol, SuMethodChoices
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer", "PlatformListSerializer"]
+__all__ = [
+    "PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer",
+    "PlatformProtocolCreateSerializer", "PlatformListSerializer",
+]
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
@@ -151,6 +154,16 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_render_help_text():
         return _('Protocols, format is ["protocol/port"]')
+
+
+class PlatformProtocolCreateSerializer(PlatformProtocolSerializer):
+    platform = serializers.PrimaryKeyRelatedField(
+        queryset=Platform.objects.all(), pk_field=serializers.IntegerField()
+    )
+    port = serializers.IntegerField(label=_("Port"), min_value=0, max_value=65535)
+
+    class Meta(PlatformProtocolSerializer.Meta):
+        fields = PlatformProtocolSerializer.Meta.fields + ['platform']
 
 
 class PlatformCustomField(serializers.Serializer):
