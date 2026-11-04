@@ -263,21 +263,6 @@ class UserFileEncryptionSerializer(FileEncryptSerializer):
         return instance
 
 
-class UserClientCredentialsSerializer(serializers.Serializer):
-    lock = ClientLockPasswordSerializer(required=False, label=_('Screen lock password'))
-    file = FileEncryptSerializer(required=False, label=_('File Encryption'))
-
-    def update(self, instance, validated_data):
-        ClientLockPasswordSerializer(context=self.context).update(
-            instance.get('lock', {}), validated_data.get('lock', {}),
-        )
-        UserFileEncryptionSerializer(context=self.context).update(
-            instance.get('file', {}), validated_data.get('file', {}),
-        )
-        return instance
-
-
-
 class UserIdleLockSerializer(serializers.Serializer):
     web_idle_lock_time = serializers.IntegerField(
         min_value=0, max_value=99999, allow_null=True, required=False,

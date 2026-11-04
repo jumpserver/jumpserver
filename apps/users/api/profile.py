@@ -21,7 +21,7 @@ from ..models import User
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
     'UserProfileApi', 'UserPasswordApi',
-    'UserPermissionsApi', 'UserClientCredentialsApi', 'UserLockPasswordApi',
+    'UserPermissionsApi', 'UserLockPasswordApi',
     'UserFileEncryptionApi', 'UserIdleLockApi'
 ]
 
@@ -132,18 +132,6 @@ class UserLockPasswordApi(UserCredentialApi):
 
 class UserFileEncryptionApi(UserCredentialApi):
     serializer_class = serializers.UserFileEncryptionSerializer
-
-
-class UserClientCredentialsApi(UserCredentialApi):
-    """Keep the combined endpoint available for existing consumers."""
-    serializer_class = serializers.UserClientCredentialsSerializer
-
-    def get_object(self):
-        return {'lock': {}, 'file': {}}
-
-    def get_lock_data(self, data):
-        return data.get('lock', {})
-
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
