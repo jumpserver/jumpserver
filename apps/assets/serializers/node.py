@@ -223,7 +223,7 @@ class CategoryTreeMetricsQuerySerializer(serializers.Serializer):
 
 
 class NodeAddChildrenSerializer(serializers.Serializer):
-    nodes = serializers.ListField()
+    nodes = serializers.ListField(child=serializers.UUIDField())
 
 
 class NodeTaskSerializer(serializers.Serializer):

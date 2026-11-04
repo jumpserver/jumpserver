@@ -82,7 +82,9 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         """ 同时支持 put 和 patch 方法"""
         instance = self.get_object()
-        node_ids = request.data.get("nodes")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        node_ids = serializer.validated_data['nodes']
         children = Node.objects.filter(id__in=node_ids)
         for node in children:
             if node.is_ancestor(instance):
