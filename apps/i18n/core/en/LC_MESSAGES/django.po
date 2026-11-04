@@ -18371,3 +18371,41 @@ msgstr "Asset application scope"
 #: settings/serializers/feature.py
 msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
 msgstr "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+
+msgid "Can view verify account execution"
+msgstr "Can view verify account execution"
+
+msgid "Can add verify account execution"
+msgstr "Can add verify account execution"
+
+msgid "Can view asset connectivity execution"
+msgstr "Can view asset connectivity execution"
+
+msgid "Can add asset connectivity execution"
+msgstr "Can add asset connectivity execution"
+
+msgid "Account usernames. Leave empty to test all active accounts on the selected assets."
+msgstr "Account usernames. Leave empty to test all active accounts on the selected assets."
+
+msgid "Asset / Account"
+msgstr "Asset / Account"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Unsupported"
+msgstr "Unsupported"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Execution results"
+msgstr "Execution results"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "No execution results"
+msgstr "No execution results"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No execution details"
+msgstr "No execution details"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No account changes"
+msgstr "No account changes"

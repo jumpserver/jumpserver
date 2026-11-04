@@ -424,6 +424,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             for username in new_found_users:
                 self.result["new_accounts"].append(
                     {
+                        **self.get_asset_result_metadata(asset),
                         "asset": str(asset),
                         "username": username,
                     }
@@ -441,6 +442,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             for username in lost_users:
                 self.result["lost_accounts"].append(
                     {
+                        **self.get_asset_result_metadata(asset),
                         "asset": str(asset),
                         "username": username,
                     }

@@ -1,0 +1,38 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ execution.snapshot.name|default:_('Report') }}</title>
+    <style>{% include 'automations/report.css' %}</style>
+</head>
+<body>
+<main class="report">
+    <header class="report-heading">
+        <div>
+            <h1>{{ execution.snapshot.name|default:'-' }}</h1>
+            <p class="subtitle">
+                <span>{% block report_type %}{% trans 'Report' %}{% endblock %}</span>{% if execution.get_trigger_display %}<span>{{ execution.get_trigger_display }}</span>{% endif %}
+            </p>
+        </div>
+        {% if execution.status %}<span class="status {{ execution.status }}">{{ execution.get_status_display }}</span>{% endif %}
+    </header>
+
+    <dl class="metadata">
+        <div><dt>{% trans 'Date start' %}</dt><dd>{{ execution.date_start|date:'Y/m/d H:i:s'|default:'-' }}</dd></div>
+        <div><dt>{% trans 'Date end' %}</dt><dd>{{ execution.date_finished|date:'Y/m/d H:i:s'|default:'-' }}</dd></div>
+        <div><dt>{% trans 'Time using' %}</dt><dd>{{ execution.duration|default:0 }} s</dd></div>
+    </dl>
+
+    {% if summary.error %}
+        <section class="notice" role="alert">
+            <strong>{% trans 'Error' %}</strong>
+            <p>{% include 'automations/error_message.html' with error=summary.error %}</p>
+        </section>
+    {% endif %}
+    {% block report_body %}{% endblock %}
+</main>
+</body>
+</html>

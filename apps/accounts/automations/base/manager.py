@@ -343,6 +343,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         error_msg = _("No pending accounts found")
         if not accounts:
             self.result['skipped_assets'].append({
+                **self.get_asset_result_metadata(asset),
                 'asset': str(asset),
                 'reason': str(error_msg),
             })
@@ -427,6 +428,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             ))
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
+                **self.get_asset_result_metadata(account.asset if account else None),
                 'asset': str(account.asset) if account else '',
                 'username': account_label,
                 'account_id': account_id,
@@ -575,6 +577,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             )
             self.summary[result_key] += 1
             self.result[result_key].append({
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": record.comment or '',
             })
@@ -620,6 +623,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             else 'ok_accounts'
         )
         result_item = {
+            **self.get_asset_result_metadata(account.asset),
             "asset": str(account.asset),
             "username": account.username,
         }
@@ -677,6 +681,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.summary[result_key] += 1
         self.result[result_key].append(
             {
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": account.username if account else '',
             }
@@ -723,6 +728,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if account:
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
+                **self.get_asset_result_metadata(account.asset),
                 'asset': str(account.asset),
                 'username': account.username,
                 'error': str(error),
@@ -768,6 +774,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
             self.summary[result_key] += 1
             self.result[result_key].append(
                 {
+                    **self.get_asset_result_metadata(record.asset),
                     "asset": str(record.asset),
                     "username": (
                         record.account.username if record.account else ''
@@ -828,6 +835,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         if not account:
             self.summary['fail_accounts'] += 1
             self.result['fail_accounts'].append({
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": record.comment or '',
                 "error": str(error),
@@ -853,6 +861,7 @@ class BaseChangeSecretPushManager(AccountBasePlaybookManager):
         self.summary['fail_accounts'] += 1
         self.result['fail_accounts'].append(
             {
+                **self.get_asset_result_metadata(record.asset),
                 "asset": str(record.asset),
                 "username": record.account.username,
                 "error": str(error),

@@ -28,6 +28,12 @@ router.register(r'push-account-executions', api.PushAccountExecutionViewSet, 'pu
 router.register(r'push-account-records', api.PushAccountRecordViewSet, 'push-account-record')
 router.register(r'check-account-automations', api.CheckAccountAutomationViewSet, 'check-account-automation')
 router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, 'check-account-execution')
+router.register(r'verify-account-automations', api.VerifyAccountAutomationViewSet, 'verify-account-automation')
+router.register(r'connectivity-automations', api.ConnectivityAutomationViewSet, 'connectivity-automation')
+router.register(r'connectivity-executions', api.ConnectivityExecutionViewSet, 'connectivity-execution')
+router.register(r'verify-account-executions', api.VerifyAccountExecutionViewSet, 'verify-account-execution')
+router.register(r'ping-automations', api.PingAutomationViewSet, 'ping-automation')
+router.register(r'ping-executions', api.PingExecutionViewSet, 'ping-execution')
 router.register(r'account-check-engines', api.CheckAccountEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
@@ -73,6 +79,19 @@ urlpatterns = [
          name='check-account-add-or-remove-node'),
     path('check-account/<uuid:pk>/assets/', api.CheckAccountAssetsListApi.as_view(),
          name='check-account-assets'),
+    path('verify-account/<uuid:pk>/asset/remove/', api.VerifyAccountRemoveAssetApi.as_view(),
+         name='verify-account-remove-asset'),
+    path('verify-account/<uuid:pk>/asset/add/', api.VerifyAccountAddAssetApi.as_view(),
+         name='verify-account-add-asset'),
+    path('verify-account/<uuid:pk>/nodes/', api.VerifyAccountNodeAddRemoveApi.as_view(),
+         name='verify-account-add-or-remove-node'),
+    path('verify-account/<uuid:pk>/assets/', api.VerifyAccountAssetsListApi.as_view(),
+         name='verify-account-assets'),
+
+    path('ping/<uuid:pk>/asset/remove/', api.PingRemoveAssetApi.as_view(), name='ping-remove-asset'),
+    path('ping/<uuid:pk>/asset/add/', api.PingAddAssetApi.as_view(), name='ping-add-asset'),
+    path('ping/<uuid:pk>/nodes/', api.PingNodeAddRemoveApi.as_view(), name='ping-add-or-remove-node'),
+    path('ping/<uuid:pk>/assets/', api.PingAssetsListApi.as_view(), name='ping-assets'),
     path('pam-dashboard/', api.PamDashboardApi.as_view(), name='pam-dashboard'),
     path('change-secret-dashboard/', api.ChangeSecretDashboardApi.as_view(), name='change-secret-dashboard'),
 ]

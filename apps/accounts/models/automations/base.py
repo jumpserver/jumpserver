@@ -43,6 +43,9 @@ class AutomationExecution(AssetAutomationExecution):
 
             ('view_backupaccountexecution', _('Can view backup account execution')),
             ('add_backupaccountexecution', _('Can add backup account execution')),
+
+            ('view_verifyaccountexecution', _('Can view verify account execution')),
+            ('add_verifyaccountexecution', _('Can add verify account execution')),
         ]
 
     def __str__(self):

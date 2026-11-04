@@ -257,6 +257,15 @@ class BaseManager:
         return self.execution.all_assets_group_by_platform()
 
     @staticmethod
+    def get_asset_result_metadata(asset):
+        """Snapshot asset identity for reports without querying live assets later."""
+        return {
+            'asset_id': str(asset.id) if asset else '',
+            'asset_name': asset.name if asset else '',
+            'asset_address': asset.address if asset else '',
+        }
+
+    @staticmethod
     def print_log(message, level='info'):
         print_automation_log(message, level)
 
@@ -544,6 +553,20 @@ class PlaybookPrepareMixin:
             account_selector=self.get_inventory_account_selector(),
         )
         inventory.write_to_file(inventory_path)
+        asset_details = self.result.setdefault('asset_details', {})
+        for host, detail in {
+            **self.get_inventory_hosts(inventory_path),
+            **inventory.exclude_host_details,
+        }.items():
+            asset = detail.get('jms_asset') or {}
+            if not asset.get('id'):
+                continue
+            # Keep only display metadata, never credentials from the inventory.
+            asset_details[host] = {
+                'asset_id': str(asset['id']),
+                'asset_name': asset.get('name', ''),
+                'asset_address': asset.get('origin_address') or asset.get('address', ''),
+            }
         self._inventory_host_labels = {
             host: self.format_inventory_host_label(host, detail)
             for host, detail in inventory.exclude_host_details.items()
@@ -656,7 +679,12 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         self._inventory_host_labels = {}
 
     def get_assets_group_by_platform(self):
-        return self.execution.all_assets_group_by_platform()
+        groups = super().get_assets_group_by_platform()
+        asset_details = self.result.setdefault('asset_details', {})
+        for assets in groups.values():
+            for asset in assets:
+                asset_details[str(asset)] = self.get_asset_result_metadata(asset)
+        return groups
 
     def get_task_display_name(self):
         labels = {
@@ -882,6 +910,11 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         missing_asset_ids = requested_asset_ids - available_asset_ids
         self.summary["total_assets"] += len(missing_asset_ids)
         for asset_id in sorted(missing_asset_ids):
+            self.result.setdefault('asset_details', {})[asset_id] = {
+                'asset_id': asset_id,
+                'asset_name': '',
+                'asset_address': '',
+            }
             self.on_inventory_host_error(
                 asset_id, _("Asset not found or inactive")
             )

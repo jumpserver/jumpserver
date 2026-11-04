@@ -108,6 +108,7 @@ class AutomationExecutionViewSet(
     search_fields = ('id', 'trigger', 'automation__name')
     filterset_class = AutomationExecutionFilterSet
     serializer_class = serializers.AutomationExecutionSerializer
+    execute_task = execute_account_automation_task
     tp: str
 
     def get_queryset(self):
@@ -118,7 +119,7 @@ class AutomationExecutionViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         automation = serializer.validated_data.get('automation')
-        task = execute_account_automation_task.delay(
+        task = self.execute_task.delay(
             pid=str(automation.pk), trigger=Trigger.manual, tp=self.tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)
