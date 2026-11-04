@@ -96,6 +96,13 @@ class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsValidUser,)
     http_method_names = ('get', 'patch', 'head', 'options')
 
+    def get_object(self):
+        return {}
+
+
+class UserLockPasswordApi(BaseUserPasswordSettingsApi):
+    serializer_class = serializers.UserLockPasswordSerializer
+
     def get_permissions(self):
         permissions = super().get_permissions()
         # Metadata clones OPTIONS as PATCH to describe writable fields. Identity
@@ -104,22 +111,12 @@ class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
             permissions.append(self.get_confirmation_permission())
         return permissions
 
-    def get_object(self):
-        return {}
-
-    def get_confirmation_permission(self):
-        return UserConfirmation()
-
-
-class UserLockPasswordApi(BaseUserPasswordSettingsApi):
-    serializer_class = serializers.UserLockPasswordSerializer
-
     def get_confirmation_permission(self):
         data = self.request.data
         if isinstance(data, dict) and (data.get('password') or data.get('password_again') or data.get('clear')):
             from authentication.services.lock_password import LockPasswordConfirmation
             return LockPasswordConfirmation()
-        return super().get_confirmation_permission()
+        return UserConfirmation()
 
     def perform_update(self, serializer):
         super().perform_update(serializer)
