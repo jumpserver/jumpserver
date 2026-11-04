@@ -46,7 +46,10 @@ class WorkflowOrganizationTests(TestCase):
             other = Workflow.objects.create(type='general', name='Other organization approval')
         response = self.request('list', data={'type': 'general'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual({row['id'] for row in response.data['results']}, {str(inherited.pk), str(local.pk)})
+        self.assertEqual({row['id']: (row['org_id'], row['org_name']) for row in response.data['results']}, {
+            str(inherited.pk): (Organization.ROOT_ID, str(Organization.root().name)),
+            str(local.pk): (str(self.org.pk), self.org.name),
+        })
         self.assertEqual(self.request('retrieve', inherited).status_code, 200)
         self.assertEqual(self.request('versions', inherited).data['count'], 2)
         self.assertEqual(self.request('retrieve', other).status_code, 404)
