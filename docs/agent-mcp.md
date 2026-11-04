@@ -192,11 +192,12 @@ Asset discovery supports `asset_id` within the authorized asset set and optional
 `accounts_next_offset`; real account rows are paged before permission expansion.
 
 Recovery lists use bounded offset pages of at most 100 rows and an optional
-status filter; action lists also accept a session filter. Session recovery
-accepts exactly one session ID or original connection key. Action lookup takes
-the original operation key and an optional session filter; known action IDs use
-the existing action get endpoint. Ambiguous keys across organizations require
-an ID (or an action's session filter). Queries cannot
+`status` filter. `actions/list/` requires `session_id` and lists only that
+session's current/recent actions. `sessions/get/` accepts exactly one of
+`session_id` or the original connection `idempotency_key`. `actions/lookup/`
+requires the original operation `idempotency_key`; its `session_id` filter is
+optional. Known action IDs use `actions/<id>/get/`. Ambiguous keys across
+organizations require an ID (or an action's `session_id` filter). Queries cannot
 select another user, client, node or arbitrary organization. Current session
 capability hints contain permitted action effects, execution mode and whether
 command context needs review; dispatch still rechecks authority and approvals.
