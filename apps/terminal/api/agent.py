@@ -229,8 +229,10 @@ class AgentComponentAPI(APIView):
     @transaction.atomic
     def action_operation(self, node, action_id, data):
         with tmp_to_root_org():
+            # Node scoping must not widen the action lock to its parent session.
             action = get_object_or_404(
-                AgentAction.objects.select_for_update(), pk=service.identifier(action_id), session__terminal=node,
+                AgentAction.objects.select_for_update(), pk=service.identifier(action_id),
+                session_id__in=AgentSession.objects.filter(terminal=node).values('id'),
             )
         with tmp_to_org(action.org_id):
             if self.operation in ('get', 'cancel'):

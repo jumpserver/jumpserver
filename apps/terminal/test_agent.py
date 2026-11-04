@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from django.core import signing
 from django.core.cache import cache
-from django.test import TestCase, SimpleTestCase, RequestFactory, override_settings
+from django.test import TestCase, TransactionTestCase, SimpleTestCase, RequestFactory, override_settings
 from django.http import Http404
 from django.utils import timezone
 from oauthlib.common import Request as OAuthRequest
@@ -21,6 +21,50 @@ from orgs.utils import tmp_to_org
 from terminal import agent_service as service
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, AgentAction, AgentEvent, Terminal
 from users.models import User
+
+
+class AgentActionLockTests(TransactionTestCase):
+    def test_polling_does_not_lock_the_parent_session(self):
+        from django.db import connection
+        from terminal.api.agent import AgentComponentAPI
+        if connection.vendor != 'postgresql':
+            self.skipTest('Uses PostgreSQL lock_timeout to bound the concurrent lock probe')
+        cache.clear()
+        self.addCleanup(cache.clear)
+        org = Organization.default()
+        with tmp_to_org(org):
+            user = User.objects.create(username='agent-lock-owner')
+            org.add_member(user)
+            node = Terminal.objects.create(name='agent-lock-node', type='koko')
+            app = get_application_model().objects.create(name='Agent lock client', client_id='agent-lock')
+            resource = 'https://jumpserver.example/koko/mcp'
+            AgentApplication.objects.create(application=app, resource=resource)
+            token = get_access_token_model().objects.create(user=user, application=app, token=uuid.uuid4().hex,
+                scope=service.SCOPE, resource=[resource], expires=timezone.now() + timedelta(minutes=5))
+            AgentOAuthBinding.objects.create(user=user, application=app, access_token=token,
+                org_id=service.ALL_AGENT_ORGANIZATIONS)
+            session = AgentSession.objects.create(user=user, application=app, terminal=node, oauth_token=token,
+                resource=resource, idempotency_key='connection', request_hash='0' * 64,
+                date_expires=token.expires)
+            action = AgentAction.objects.create(session=session, user=user, application=app,
+                kind='connect_asset', idempotency_key='connect', request_hash='1' * 64)
+            principal = service.introspect(node, {'access_token': token.token, 'resource': resource,
+                'capabilities': {'version': 1, 'protocols': {'ssh': 'shell', 'sftp': 'files'}}})
+            parent = connection.copy(alias='agent_parent_lock')
+            try:
+                parent.set_autocommit(False)
+                with parent.cursor() as cursor:
+                    cursor.execute('SELECT id FROM terminal_agentsession WHERE id = %s FOR UPDATE', [session.id])
+                with connection.cursor() as cursor:
+                    cursor.execute("SET lock_timeout TO '200ms'")
+                result = AgentComponentAPI(operation='get').action_operation(node, action.id,
+                    {'context_token': principal['context_token']})
+                self.assertEqual(result['id'], str(action.id))
+            finally:
+                parent.rollback()
+                parent.close()
+                with connection.cursor() as cursor:
+                    cursor.execute('RESET lock_timeout')
 
 
 class AgentRequestContractTests(SimpleTestCase):
