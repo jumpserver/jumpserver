@@ -1,4 +1,5 @@
 from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from django.db import transaction
 from rest_framework import serializers
 
@@ -13,6 +14,7 @@ from tickets.plugins import ticket_plugins
 
 class WorkflowSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(read_only=True)
+    org_name = serializers.CharField(read_only=True, label=_('Org name'), default='')
     type_label = serializers.CharField(source='get_type_display', read_only=True)
     active_version_number = serializers.IntegerField(source='active_version.number', read_only=True, default=None)
     expected_version = serializers.IntegerField(min_value=0, required=False, write_only=True)
@@ -23,8 +25,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workflow
-        fields = ['id', 'name', 'display_name', 'type', 'type_label', 'enabled', 'comment', 'org_id', 'active_version',
-                  'active_version_number', 'expected_version', 'legacy_flow_id', 'migration_notes',
+        fields = ['id', 'name', 'display_name', 'type', 'type_label', 'enabled', 'comment', 'org_id', 'org_name',
+                  'active_version', 'active_version_number', 'expected_version', 'legacy_flow_id', 'migration_notes',
                   'created_by', 'date_created', 'date_updated']
         read_only_fields = ['org_id', 'active_version', 'legacy_flow_id', 'migration_notes',
                             'created_by', 'date_created', 'date_updated']
