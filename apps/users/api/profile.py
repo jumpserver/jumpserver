@@ -90,8 +90,8 @@ class UserPermissionsApi(generics.RetrieveAPIView):
         return self.request.user
 
 
-class UserCredentialApi(generics.RetrieveUpdateAPIView):
-    """Personal credentials are managed by the web account, never a desktop bearer."""
+class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
+    """Shared web-session validation for lock and file-encryption password settings."""
     authentication_classes = (SessionAuthentication,)
     permission_classes = (IsValidUser,)
     http_method_names = ('get', 'patch', 'head', 'options')
@@ -123,14 +123,14 @@ class UserCredentialApi(generics.RetrieveUpdateAPIView):
             self.request.session.pop(LOCK_PASSWORD_PROOF, None)
 
 
-class UserLockPasswordApi(UserCredentialApi):
+class UserLockPasswordApi(BaseUserPasswordSettingsApi):
     serializer_class = serializers.ClientLockPasswordSerializer
 
     def get_lock_data(self, data):
         return data
 
 
-class UserFileEncryptionApi(UserCredentialApi):
+class UserFileEncryptionApi(BaseUserPasswordSettingsApi):
     serializer_class = serializers.UserFileEncryptionSerializer
 
 
