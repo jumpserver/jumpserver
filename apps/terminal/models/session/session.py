@@ -140,10 +140,7 @@ class Session(OrgModelMixin):
             # 会话监控仅支持 normal，不支持 tunnel 和 command
             return False
         support_types = [TerminalType.lion, TerminalType.koko, TerminalType.razor]
-        if self.terminal.type in support_types:
-            return True
-        else:
-            return False
+        return getattr(self.terminal, 'type', None) in support_types
 
     @property
     def can_terminate(self):

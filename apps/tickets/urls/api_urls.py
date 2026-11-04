@@ -20,6 +20,7 @@ router.register('apply-nodes', api.ApplyNodesViewSet, 'apply-nodes')
 
 urlpatterns = [
     path('tickets/<uuid:ticket_id>/session/', api.TicketSessionApi.as_view(), name='ticket-session'),
+    path('tickets/<uuid:ticket_id>/sessions/', api.TicketSessionListApi.as_view(), name='ticket-session-list'),
     path('super-tickets/<uuid:pk>/status/', api.SuperTicketStatusAPI.as_view(), name='super-ticket-status'),
 ]
 urlpatterns += router.urls
