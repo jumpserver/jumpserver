@@ -101,33 +101,31 @@ class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
         # Metadata clones OPTIONS as PATCH to describe writable fields. Identity
         # confirmation protects real writes; it must not hide the form schema.
         if self.request.method == 'PATCH' and self.request._request.method != 'OPTIONS':
-            lock = self.get_lock_data(self.request.data)
-            if isinstance(lock, dict) and (lock.get('password') or lock.get('password_again') or lock.get('clear')):
-                from authentication.services.lock_password import LockPasswordConfirmation
-                permissions.append(LockPasswordConfirmation())
-            else:
-                permissions.append(UserConfirmation())
+            permissions.append(self.get_confirmation_permission())
         return permissions
 
     def get_object(self):
         return {}
 
-    def get_lock_data(self, data):
-        return {}
-
-    def perform_update(self, serializer):
-        serializer.save()
-        lock = self.get_lock_data(serializer.validated_data)
-        if lock.get('password') or lock.get('clear'):
-            from authentication.services.lock_password import LOCK_PASSWORD_PROOF
-            self.request.session.pop(LOCK_PASSWORD_PROOF, None)
+    def get_confirmation_permission(self):
+        return UserConfirmation()
 
 
 class UserLockPasswordApi(BaseUserPasswordSettingsApi):
     serializer_class = serializers.UserLockPasswordSerializer
 
-    def get_lock_data(self, data):
-        return data
+    def get_confirmation_permission(self):
+        data = self.request.data
+        if isinstance(data, dict) and (data.get('password') or data.get('password_again') or data.get('clear')):
+            from authentication.services.lock_password import LockPasswordConfirmation
+            return LockPasswordConfirmation()
+        return super().get_confirmation_permission()
+
+    def perform_update(self, serializer):
+        super().perform_update(serializer)
+        if serializer.validated_data.get('password') or serializer.validated_data.get('clear'):
+            from authentication.services.lock_password import LOCK_PASSWORD_PROOF
+            self.request.session.pop(LOCK_PASSWORD_PROOF, None)
 
 
 class UserFileEncryptionApi(BaseUserPasswordSettingsApi):

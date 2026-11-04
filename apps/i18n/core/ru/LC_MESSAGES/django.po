@@ -18078,6 +18078,9 @@ msgstr ""
 "сервером. Новый вход открывается обычно; заблокированный вход остаётся таким"
 " после восстановления. Внешние окна не защищены."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Веб-сеанс заблокирован. Разблокируйте его перед авторизацией клиента."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Клиент заблокирован. Разблокируйте его на главной странице."
 

@@ -17816,6 +17816,9 @@ msgstr ""
 "기본 화면과 관리되는 자산 창을 잠급니다. 기본 화면에서 서버의 비밀번호 검증에 성공해야 해제됩니다. 새 로그인은 정상 진입하며 잠긴 "
 "로그인은 복원 후에도 잠깁니다. 외부 프로그램 창은 보호되지 않습니다."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "웹 세션이 잠겨 있습니다. 클라이언트를 승인하기 전에 잠금을 해제하세요."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "클라이언트가 잠겼습니다. 기본 화면에서 잠금을 해제하세요."
 

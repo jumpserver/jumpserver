@@ -17935,6 +17935,9 @@ msgstr ""
 "thường; phiên đã khóa vẫn khóa sau khi khôi phục. Cửa sổ ứng dụng ngoài "
 "không được bảo vệ."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Phiên web đang bị khóa. Hãy mở khóa trước khi cấp quyền cho ứng dụng khách."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Ứng dụng khách đã khóa. Hãy mở khóa ở trang chính."
 

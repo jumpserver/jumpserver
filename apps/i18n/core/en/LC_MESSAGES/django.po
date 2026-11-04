@@ -18010,6 +18010,9 @@ msgstr ""
 "previously locked logins stay locked after restoration. External application"
 " windows are not protected."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "The web session is locked. Unlock it before authorizing a client."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Client is locked. Unlock it on the main page."
 

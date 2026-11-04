@@ -18141,6 +18141,9 @@ msgstr ""
 "s’ouvre normalement ; une connexion déjà verrouillée le reste après "
 "restauration. Les fenêtres externes ne sont pas protégées."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "La session web est verrouillée. Déverrouillez-la avant d’autoriser un client."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Le client est verrouillé. Déverrouillez-le sur la page principale."
 

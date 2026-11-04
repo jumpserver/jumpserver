@@ -18061,6 +18061,9 @@ msgstr ""
 "senha. Novos logins abrem normalmente; logins já bloqueados permanecem "
 "bloqueados ao restaurar. Janelas externas não são protegidas."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "A sessão web está bloqueada. Desbloqueie-a antes de autorizar um cliente."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "O cliente está bloqueado. Desbloqueie na página principal."
 

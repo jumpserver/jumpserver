@@ -18679,6 +18679,9 @@ msgstr ""
 " "
 "空闲超时即锁定主页面和对应资产窗口，即使尚未设置密码。只能在主页面通过后端验证密码后解锁。新登录正常进入，已锁定的登录恢复后仍锁定。外部软件窗口不受保护。"
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web 会话已锁定，请先解锁后再授权客户端。"
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "客户端已锁定，请在主页面解锁。"
 

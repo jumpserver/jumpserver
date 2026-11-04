@@ -18160,6 +18160,9 @@ msgstr ""
 " normalmente; una sesión bloqueada sigue así al restaurarla. Las ventanas "
 "externas no están protegidas."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "La sesión web está bloqueada. Desbloquéela antes de autorizar un cliente."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "El cliente está bloqueado. Desbloquéalo desde la página principal."
 

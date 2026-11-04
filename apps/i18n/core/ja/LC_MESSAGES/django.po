@@ -17884,6 +17884,9 @@ msgstr ""
 " "
 "無操作期限になると、パスワード未設定でもメイン画面と管理対象の資産ウィンドウをロックします。メイン画面でサーバーのパスワード検証に成功した場合のみ解除できます。新規ログインは通常どおり開き、ロック済みのログインは復元後もロックを維持します。外部アプリの画面は保護されません。"
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web セッションはロックされています。クライアントを認可する前にロックを解除してください。"
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "クライアントはロックされています。メイン画面で解除してください。"
 

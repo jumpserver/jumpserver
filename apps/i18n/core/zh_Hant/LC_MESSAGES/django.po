@@ -17606,6 +17606,9 @@ msgstr ""
 " "
 "閒置逾時即鎖定主頁面與對應資產視窗，即使尚未設定密碼。只能在主頁面通過後端密碼驗證後解鎖。新登入正常進入，已鎖定的登入恢復後仍鎖定。外部軟體視窗不受保護。"
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web 工作階段已鎖定，請先解鎖後再授權用戶端。"
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "用戶端已鎖定，請在主頁面解鎖。"
 

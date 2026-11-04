@@ -8,7 +8,6 @@ from common.serializers.fields import EncryptedField, LabeledChoiceField, ListMu
 from common.utils import validate_ssh_public_key
 from .user import UserSerializer
 from ..models import User, MFAMixin, Preference
-from .preference.lina import FileEncryptSerializer
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
@@ -253,7 +252,31 @@ class UserLockPasswordSerializer(serializers.Serializer):
         return instance
 
 
-class UserFileEncryptionSerializer(FileEncryptSerializer):
+class UserFileEncryptionSerializer(serializers.Serializer):
+    has_secret_key = serializers.SerializerMethodField(label=_('Configured'))
+    secret_key = EncryptedField(
+        required=False, max_length=1024, write_only=True, allow_blank=True,
+        label=_('New password'),
+    )
+    secret_key_again = EncryptedField(
+        required=False, max_length=1024, write_only=True, allow_blank=True,
+        label=_('Confirm password'),
+    )
+
+    def get_has_secret_key(self, obj):
+        return Preference.objects.filter(
+            user=self.context['request'].user, category='lina', name='secret_key',
+        ).exists()
+
+    def validate(self, attrs):
+        secret_key = attrs.pop('secret_key', None)
+        confirmation = attrs.pop('secret_key_again', None)
+        if (secret_key or confirmation) and secret_key != confirmation:
+            raise serializers.ValidationError({'secret_key_again': _('The newly set password is inconsistent')})
+        if secret_key and confirmation:
+            attrs['secret_key'] = secret_key
+        return attrs
+
     def update(self, instance, validated_data):
         secret_key = validated_data.get('secret_key')
         if secret_key:

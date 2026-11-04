@@ -1,7 +1,7 @@
 import json
 
 from django.db import transaction
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
@@ -13,12 +13,21 @@ from authentication.services.client_login_session import (
     client_login_session_data, client_policy_enabled, client_policy_lock,
     expired_session_from_receipt, is_client_application,
 )
+from authentication.services.web_session_lock import session_locked
 
 
 @method_decorator(never_cache, name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class ClientAuthorizationView(AuthorizationView):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and session_locked(request.session.session_key, request.user.pk):
+            return HttpResponse(
+                _('The web session is locked. Unlock it before authorizing a client.'),
+                status=423, content_type='text/plain; charset=utf-8',
+            )
+        return super().dispatch(request, *args, **kwargs)
+
     def _unsupported_client_response(self, request):
         if not client_policy_enabled():
             return None

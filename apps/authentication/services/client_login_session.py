@@ -215,13 +215,13 @@ def _session_operation(mutate):
         yield
 
 
-def validate_session(session_id, *, mutate=False):
+def validate_session(session_id, *, mutate=False, allow_locked=True):
     with _session_operation(mutate):
         queryset = ClientLoginSession.objects.select_related('user')
         if mutate:
             queryset = queryset.select_for_update()
         session = queryset.filter(pk=session_id).first()
-        return bool(session and _session_is_valid(
+        return bool(session and (allow_locked or not session.is_locked) and _session_is_valid(
             session, client_login_policy(), timezone.now(), mutate=mutate,
         ))
 
