@@ -5,6 +5,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext, gettext_lazy as _
 from django_filters import rest_framework as drf_filters
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -260,10 +261,12 @@ class AssetViewSet(SuggestionMixin, BaseAssetViewSet):
             gateways = asset.zone.gateways
         return self.get_paginated_response_from_queryset(gateways)
 
+    @extend_schema(request=serializers.SyncPlatformProtocolsSerializer, responses={200: None})
     @action(methods=['post'], detail=False, url_path='sync-platform-protocols')
     def sync_platform_protocols(self, request, *args, **kwargs):
-        platform_id = request.data.get('platform_id')
-        platform = get_object_or_404(Platform, pk=platform_id)
+        serializer = serializers.SyncPlatformProtocolsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        platform = get_object_or_404(Platform, pk=serializer.validated_data['platform_id'])
         asset_ids = list(platform.assets.values_list('id', flat=True))
         platform_protocols = list(platform.protocols.values('name', 'port'))
 
