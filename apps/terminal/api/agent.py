@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import APIException, ValidationError
 
 from common.permissions import IsValidUser
+from rbac.permissions import RBACPermission
 from common.drf.filters import DatetimeRangeFilterBackend, RewriteOrderingFilter, SearchFilter
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from terminal import agent_service as service
@@ -235,7 +236,7 @@ class AgentComponentAPI(APIView):
             if self.operation in ('get', 'cancel'):
                 service.require_keys(data, ('context_token', 'offset', 'limit'), ('context_token',))
                 context, _ = service.context_identity(node, data['context_token'])
-                service.same_principal(context, action.session)
+                service.check_result_read(action, context)
                 if self.operation == 'cancel' and action.status not in service.FINAL_STATES:
                     action.cancel_requested = True
                     if action.status not in ('dispatching', 'running'):
@@ -281,13 +282,17 @@ class AgentComponentAPI(APIView):
 
 
 class AgentAuditAPI(GenericAPIView):
-    permission_classes = [IsValidUser]
+    permission_classes = [IsValidUser, RBACPermission]
     kind = 'sessions'
     filter_backends = [AgentAuditFilterBackend, SearchFilter, RewriteOrderingFilter, DatetimeRangeFilterBackend]
     date_range_filter_fields = [('date_created', ('date_from', 'date_to'))]
     page_default_limit = 100
     page_max_limit = 100
     ordering = ('-date_created', '-id')
+
+    @property
+    def perm_model(self):
+        return AgentSession if self.kind == 'sessions' else AgentAction
 
     @property
     def filterset_class(self):
@@ -328,10 +333,6 @@ class AgentAuditAPI(GenericAPIView):
     def get(self, request, object_id=None):
         self.request = request
         queryset = self.get_queryset()
-        try:
-            offset = service.integer(int(request.query_params.get('offset', 0)), 'offset', 0, 10000000)
-        except (ValueError, TypeError):
-            raise ValidationError('Invalid audit offset')
         if object_id:
             item = get_object_or_404(queryset, pk=object_id)
             service.record_audit_read(item)
@@ -347,11 +348,11 @@ class AgentAuditAPI(GenericAPIView):
                 )[:33])
                 result['events'] = [AgentComponentAPI.event_data(item, event) for event in events[:32]]
                 result['next_offset'] = events[31]['sequence'] if len(events) > 32 else None
-            else:
-                page = list(item.actions.order_by('-date_created', '-id')[offset:offset + 101])
-                result['actions'] = [service.action_data(action) for action in page[:100]]
-                result['next_offset'] = offset + 100 if len(page) > 100 else None
         else:
+            try:
+                service.integer(int(request.query_params.get('offset', 0)), 'offset', 0, 10000000)
+            except (ValueError, TypeError):
+                raise ValidationError('Invalid audit offset')
             queryset = self.filter_queryset(queryset)
             page = self.paginate_queryset(queryset)
             response = self.get_paginated_response([self.serialize(item) for item in page])
@@ -377,6 +378,8 @@ class AgentAuditAPI(GenericAPIView):
             return {
                 **service.action_data(item), **context, 'user_display': item.user_display,
                 'user_id': str(item.user_id) if item.user_id else None, 'org_id': item.org_id,
+                'terminal_session_id': str(item.interactive_session_id or parent.terminal_session_id)
+                if item.interactive_session_id or parent.terminal_session_id else None,
             }
         # Never include a session capability or a connection credential in a
         # user-facing audit response.

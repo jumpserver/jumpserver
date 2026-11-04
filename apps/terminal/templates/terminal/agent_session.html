@@ -69,5 +69,4 @@
 {% endif %}
 {% endif %}
 <form method="post">{% csrf_token %}<button class="btn btn-danger" name="operation" value="revoke">{% trans 'Revoke this Agent authorization' %}</button></form>
-<p><a href="/core/auth/agent/audit/sessions/{{ session.id }}/?oid={{ session.org_id }}">{% trans 'View audit' %}</a></p>
 {% endblock %}

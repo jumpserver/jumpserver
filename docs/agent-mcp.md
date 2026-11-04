@@ -171,11 +171,11 @@ use their separate user and auditor permissions.
 | `introspect/` | Validates the external OAuth token, exact resource, all-organization scope and required versioned node capabilities; returns a context bound to these values and the user, client and Koko node for at most five minutes |
 | `assets/` | Searches current authorized assets, accounts and supported protocols using that context |
 | `sessions/` | Creates an idempotent logical asset session and connection action; applies existing connection controls |
-| `sessions/list/`, `sessions/get/` | Lists or recovers public session metadata by ID or original connection key; never returns credentials or restores a transport |
+| `sessions/list/`, `sessions/get/` | Lists active sessions or recovers bounded public metadata by ID/original connection key; never returns credentials or restores a transport |
 | `sessions/<id>/credentials/` | Releases connection credentials to the bound Koko node once, after authorization |
 | `sessions/<id>/check/`, `bind/`, `close/` | Revalidates authority, binds the real terminal session, or closes the logical session after dispatched work drains |
 | `actions/` | Registers an immutable operation and its request hash |
-| `actions/list/`, `actions/lookup/` | Finds operation IDs and states in the current user's client, node and currently authorized organizations |
+| `actions/list/`, `actions/lookup/` | Lists current/recent actions for a required session ID, or finds an action by its original key, within the operational result window |
 | `actions/<id>/authorize/`, `claim/` | Rechecks current authority and approvals, then grants dispatch once |
 | `actions/<id>/get/`, `cancel/` | Queries or cancels actions belonging to the authenticated user, client and organization |
 | `actions/<id>/events/` | Accepts ordered execution evidence from the bound node |
@@ -311,16 +311,34 @@ pause, resume and termination.
 
 ## Audit, limits and recovery
 
-Audit pages are `/core/auth/agent/audit/sessions/` and
-`/core/auth/agent/audit/actions/`; JSON routes are under
-`/api/v1/terminal/agent/audit/`. Owners can inspect their own records, and existing
-organization/system auditors receive the new view permissions. Evidence-detail
-reads generate operation logs. Lists and session action histories use bounded
-100-row offset pages; event pages use immutable sequence cursors. Responses
-include the terminal session, request hash and approval ticket.
-Audit links and page navigation carry `oid` for the record's organization, so
-selecting an OAuth organization different from the browser's current organization
-does not break authorized audit access. The parameter does not grant permission.
+Lina provides Agent sessions under Session Records and Agent actions under
+Command Records. JSON routes remain under `/api/v1/terminal/agent/audit/`.
+Session and action evidence require `terminal.view_agentsession` and
+`terminal.view_agentaction` independently, within the reader's audit organization
+scope. Ownership and OAuth authorization do not grant historical audit browsing.
+Session metadata does not embed action requests or output. Action details include
+their own asset/account/client and terminal session references without requiring
+session audit permission. Terminal replay and retained file downloads retain
+their separate permissions. Evidence-detail reads generate operation logs.
+Audit lists use bounded 100-row offset pages; event pages use immutable sequence
+cursors. Lina navigation carries `oid`, which selects an organization without
+granting access. The standalone Core audit pages and MCP `audit_url` are removed;
+Core keeps owner-only approval, credential and terminal handoff controls for
+valid sessions.
+
+Operational queries remain available without audit permissions. They validate
+the current OAuth user, client, node, resource and organization and the original
+session grant. Session lists contain only unclosed, unexpired sessions. Action
+lists require `session_id` and contain active work in a valid session and final
+results completed less than 15 minutes ago. Known action IDs, original keys,
+cancellation responses and idempotent replay responses follow the same result
+window. `result_expires_at` is fixed at server `date_finished` plus 15 minutes;
+polling, pagination, OAuth refresh and late evidence cannot extend it. Closed or
+expired session metadata can be confirmed for 15 minutes after the earlier of
+closure and expiry. Expired pickup returns HTTP 410 with `result_expired`:
+clients must stop, not refresh OAuth or resubmit the operation. File byte pickup
+and Koko's local journal obey the same Core authorization. Evidence delivery,
+audit access and retention are independent of this operational window.
 
 Each event has a UUID and a strictly increasing per-action sequence. Exact
 retries are acknowledged; changed evidence, gaps and active-state regressions

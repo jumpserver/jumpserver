@@ -8,7 +8,7 @@ from unittest.mock import patch
 from django.core import signing
 from django.core.cache import cache
 from django.test import TestCase, SimpleTestCase, RequestFactory, override_settings
-from django.http import Http404, QueryDict
+from django.http import Http404
 from django.utils import timezone
 from oauthlib.common import Request as OAuthRequest
 from oauthlib.oauth2 import InvalidRequestError
@@ -47,6 +47,9 @@ class AgentRequestContractTests(SimpleTestCase):
         response = view.handle_exception(ValidationError('本地化说明', code='file_content_too_large'))
         self.assertEqual(response.data['code'], 'file_content_too_large')
         self.assertEqual(response['Cache-Control'], 'no-store')
+        response = view.handle_exception(service.ResultExpired())
+        self.assertEqual(response.status_code, 410)
+        self.assertEqual(response.data['code'], 'result_expired')
 
 
 class AgentBoundaryTests(TestCase):
@@ -67,6 +70,13 @@ class AgentBoundaryTests(TestCase):
         )
         cls.resource = 'https://jumpserver.example/koko/mcp'
         AgentApplication.objects.create(application=cls.app, resource=cls.resource)
+        cls.auditor = User.objects.create(username='agent-boundary-auditor')
+        from rbac.models import Role, Permission
+        cls.audit_role = Role.objects.create(name='Agent audit reader', scope='org')
+        cls.audit_role.permissions.add(*Permission.objects.filter(
+            content_type__app_label='terminal', codename__in=('view_agentsession', 'view_agentaction'),
+        ))
+        cls.org.add_member(cls.auditor, role=cls.audit_role)
 
     def setUp(self):
         cache.clear()
@@ -201,7 +211,9 @@ class AgentBoundaryTests(TestCase):
         action = agent_queries.query(self.node, 'actions/lookup', {**body, 'idempotency_key': 'read'})
         self.assertEqual(action['id'], str(self.action.id))
         self.assertNotIn('result', action)
-        self.assertEqual(len(agent_queries.query(self.node, 'actions/list', body)['results']), 2)
+        self.assertEqual(len(agent_queries.query(self.node, 'actions/list', {
+            **body, 'session_id': str(self.session.id),
+        })['results']), 2)
         with self.assertRaises(Http404):
             agent_queries.query(self.node, 'actions/lookup', {**body, 'idempotency_key': 'foreign-read'})
         for operation, extra in (
@@ -215,6 +227,85 @@ class AgentBoundaryTests(TestCase):
         second.members.through.objects_raw.filter(user=self.user, org_id=second.pk).delete()
         with self.assertRaises(Http404):
             agent_queries.query(self.node, 'sessions/get', {**body, 'session_id': str(other.id)})
+
+    def test_result_pickup_expires_without_extending_for_polling_or_late_evidence(self):
+        from terminal import agent_queries
+        from terminal.api.agent import AgentComponentAPI
+        self.action.status = 'succeeded'
+        self.action.date_finished = timezone.now() - timedelta(minutes=14)
+        self.action.result = {'content': 'retained output'}
+        self.action.save(update_fields=['status', 'date_finished', 'result'])
+        deadline = self.action.date_finished + service.RESULT_TTL
+        principal = service.introspect(self.node, {'access_token': self.token.token,
+            'resource': self.resource, 'capabilities': self.capabilities})
+        body = {'context_token': principal['context_token']}
+        read = AgentComponentAPI(operation='get')
+        self.assertEqual(read.action_operation(self.node, self.action.id, body)['result_expires_at'], deadline.isoformat())
+        with patch('terminal.agent_service.timezone.now', return_value=deadline):
+            for operation in ('get', 'cancel'):
+                with self.subTest(operation=operation), self.assertRaises(service.ResultExpired):
+                    AgentComponentAPI(operation=operation).action_operation(self.node, self.action.id, body)
+            with self.assertRaises(service.ResultExpired):
+                agent_queries.query(self.node, 'actions/lookup', {**body, 'idempotency_key': 'read'})
+            self.assertEqual(agent_queries.query(self.node, 'actions/list', {
+                **body, 'session_id': str(self.session.id),
+            })['results'], [])
+            # New OAuth introspection and output pagination cannot renew pickup.
+            renewed = service.introspect(self.node, {'access_token': self.token.token,
+                'resource': self.resource, 'capabilities': self.capabilities})
+            with self.assertRaises(service.ResultExpired):
+                read.action_operation(self.node, self.action.id, {'context_token': renewed['context_token'], 'offset': 1})
+            self.session.date_closed = deadline
+            self.session.save(update_fields=['date_closed'])
+            self.refresh.revoked = deadline
+            self.refresh.save(update_fields=['revoked'])
+            # Component-bound evidence delivery is independent of user result reads.
+            service.append_event(self.action, {'session_token': service.session_capability(self.session),
+                'event_id': str(uuid.uuid4()), 'sequence': 1, 'state': 'succeeded', 'payload': {'size': 3}})
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.date_finished + service.RESULT_TTL, deadline)
+        self.assertEqual(self.action.events.count(), 1)
+        self.assertEqual(self.audit_api('actions', object_id=self.action.id)['result']['content'], 'retained output')
+
+    def test_runtime_lists_require_a_session_and_exclude_inactive_history(self):
+        from terminal import agent_queries
+        principal = service.introspect(self.node, {'access_token': self.token.token,
+            'resource': self.resource, 'capabilities': self.capabilities})
+        body = {'context_token': principal['context_token']}
+        with self.assertRaises(ValidationError):
+            agent_queries.query(self.node, 'actions/list', body)
+        self.action.status = 'succeeded'
+        self.action.save(update_fields=['status'])
+        with self.assertRaises(service.ResultExpired):
+            agent_queries.query(self.node, 'actions/lookup', {**body, 'idempotency_key': 'read'})
+        self.assertEqual(agent_queries.query(self.node, 'actions/list', {
+            **body, 'session_id': str(self.session.id),
+        })['results'], [])
+        self.session.date_expires = timezone.now() - timedelta(minutes=14)
+        self.session.date_closed = timezone.now() - timedelta(minutes=1)
+        self.session.save(update_fields=['date_expires', 'date_closed'])
+        self.assertEqual(agent_queries.query(self.node, 'sessions/list', body)['results'], [])
+        restored = agent_queries.query(self.node, 'sessions/get', {**body, 'session_id': str(self.session.id)})
+        deadline = self.session.date_expires + service.RESULT_TTL
+        self.assertEqual(restored['result_expires_at'], deadline.isoformat())
+        with patch('terminal.agent_service.timezone.now', return_value=deadline):
+            with self.assertRaises(service.ResultExpired):
+                agent_queries.query(self.node, 'sessions/get', {**body, 'idempotency_key': 'connection'})
+
+    def test_expired_idempotent_action_is_never_returned_or_recreated(self):
+        self.handoff_asset()
+        principal = service.introspect(self.node, {'access_token': self.token.token,
+            'resource': self.resource, 'capabilities': self.capabilities})
+        body = {'context_token': principal['context_token'], 'session_id': str(self.session.id),
+                'kind': 'open_terminal', 'idempotency_key': 'old-handoff', 'request': {}}
+        created = service.create_action(self.node, body)
+        self.assertEqual(service.create_action(self.node, body)['id'], created['id'])
+        AgentAction.objects.filter(pk=created['id']).update(
+            status='succeeded', date_finished=timezone.now() - service.RESULT_TTL,
+        )
+        with self.assertRaises(service.ResultExpired):
+            service.create_action(self.node, body)
+        self.assertEqual(self.session.actions.filter(idempotency_key='old-handoff').count(), 1)
 
     def test_expired_agent_history_preserves_identity_after_rename_and_delete(self):
         display = str(self.user)
@@ -1262,79 +1353,67 @@ class AgentBoundaryTests(TestCase):
         with self.assertRaises(ValidationError):
             service.create_connection_token(self.user, {**self.session.requested, 'remote_addr': '192.0.2.12, 127.0.0.1'})
 
-    def test_audit_links_select_authorized_organization_over_browser_cookie(self):
-        from orgs.middleware import OrgMiddleware
-        from terminal.agent_views import AgentAuditView
-        browser_org = Organization.objects.create(name='Agent browser organization')
-        browser_org.add_member(self.user)
-        url = service.action_data(self.action)['audit_url']
-        self.assertTrue(url.endswith(f'?oid={self.org.id}'))
-        request = RequestFactory().get(url, HTTP_COOKIE=f'X-JMS-ORG={browser_org.id}')
-        request.user, request.session = self.user, {}
-        view = AgentAuditView.as_view(kind='actions')
-        with tmp_to_org(browser_org):
-            response = OrgMiddleware(lambda req: view(req, object_id=self.action.id))(request)
-        self.assertContains(response, f'/core/auth/agent/audit/sessions/?oid={self.org.id}')
-        self.assertContains(response, f'/core/auth/agent/audit/actions/?oid={self.org.id}')
-        self.assertContains(response, f'/core/auth/agent/audit/sessions/{self.session.id}/?oid={self.org.id}#session-actions')
+    def test_audit_requires_explicit_permission_even_for_the_owner(self):
+        from terminal.api.agent import AgentComponentAPI
+        principal = service.introspect(self.node, {'access_token': self.token.token,
+            'resource': self.resource, 'capabilities': self.capabilities})
+        for kind, item in (('sessions', self.session), ('actions', self.action)):
+            self.audit_api(kind, user=self.user, status=403)
+            self.audit_api(kind, user=self.user, object_id=item.id, status=403)
+        # Runtime polling needs OAuth ownership, without granting audit browsing.
+        action = AgentComponentAPI(operation='get').action_operation(
+            self.node, self.action.id, {'context_token': principal['context_token']},
+        )
+        self.assertEqual(action['id'], str(self.action.id))
+        self.assertNotIn('audit_url', action)
 
-    def test_audit_terminal_links_require_terminal_audit_permission(self):
-        from terminal.agent_views import AgentAuditView
+    def test_session_and_action_audit_permissions_are_independent(self):
+        from rbac.models import Role, Permission
         from terminal.models import Session
         terminal = Session.objects.create(terminal=self.node)
-        interactive = Session.objects.create(terminal=self.node)
-        self.session.terminal_session = terminal
-        self.session.save(update_fields=['terminal_session'])
-        self.action.interactive_session = interactive
+        self.action.interactive_session = terminal
         self.action.save(update_fields=['interactive_session'])
-        request = RequestFactory().get('/')
-        request.user, request.session = self.user, {}
-        links = [f'/ui/#/audit/sessions/sessions/{item.id}?oid={self.org.id}' for item in (terminal, interactive)]
-        for allowed in (False, True):
-            with self.subTest(allowed=allowed), patch.object(
-                self.user, 'has_perm', side_effect=lambda permission: allowed and permission == 'terminal.view_session',
-            ):
-                response = AgentAuditView.as_view(kind='actions')(request, object_id=self.action.id)
-                for link in links:
-                    (self.assertContains if allowed else self.assertNotContains)(response, link)
+        for kind, codename, item, other in (
+            ('sessions', 'view_agentsession', self.session, self.action),
+            ('actions', 'view_agentaction', self.action, self.session),
+        ):
+            with self.subTest(kind=kind):
+                reader = User.objects.create(username='agent-reader-' + kind)
+                role = Role.objects.create(name='Agent reader ' + kind, scope='org')
+                role.permissions.add(Permission.objects.get(content_type__app_label='terminal', codename=codename))
+                self.org.add_member(reader, role=role)
+                data = self.audit_api(kind, user=reader, object_id=item.id)
+                other_kind = 'actions' if kind == 'sessions' else 'sessions'
+                self.audit_api(other_kind, user=reader, object_id=other.id, status=403)
+                if kind == 'sessions':
+                    self.assertNotIn('actions', data)
+                    self.assertNotIn('result', data)
+                else:
+                    self.assertEqual(data['terminal_session_id'], str(terminal.id))
+                    self.assertEqual(data['asset_id'], self.session.requested['asset_id'])
+                    self.assertIn('events', data)
 
-    def test_action_audit_navigation_does_not_grant_session_audit_access(self):
-        from terminal.agent_views import AgentAuditView
-        other = User.objects.create(username='agent-navigation-owner')
-        self.session.user = other
-        self.session.save(update_fields=['user'])
-        self.action.user = other
-        self.action.save(update_fields=['user'])
-        request = RequestFactory().get('/')
+    def test_old_audit_pages_are_removed_and_expired_handoffs_hide_details(self):
+        from django.urls import resolve, Resolver404
+        from terminal.agent_views import AgentSessionView
+        for path in ('sessions/', 'actions/', f'sessions/{self.session.id}/', f'actions/{self.action.id}/'):
+            with self.assertRaises(Resolver404):
+                resolve('/core/auth/agent/audit/' + path)
+        self.handoff_asset()
+        self.action.kind, self.action.status = 'open_terminal', 'succeeded'
+        self.action.save(update_fields=['kind', 'status'])
+        request = RequestFactory().get('/core/auth/agent/session/', {'action': str(self.action.id)})
         request.user, request.session = self.user, {}
-        with patch.object(self.user, 'has_perm', side_effect=lambda permission: permission == 'terminal.view_agentaction'):
-            response = AgentAuditView.as_view(kind='actions')(request, object_id=self.action.id)
-            self.assertNotContains(response, f'/core/auth/agent/audit/sessions/{self.session.id}/')
-            with self.assertRaises(Http404):
-                AgentAuditView.as_view(kind='sessions')(request, object_id=self.session.id)
-
-    def test_audit_html_escapes_output_preserves_newlines_and_isolates_organizations(self):
-        from terminal.agent_views import AgentAuditView
-        from orgs.utils import tmp_to_root_org
-        service.append_event(self.action, {'session_token': 'receipt', 'event_id': str(uuid.uuid4()),
-            'sequence': 1, 'state': 'running', 'payload': {'stream': 'stdout', 'encoding': 'base64', 'data': base64.b64encode(b'first\n<script>alert(1)</script>').decode()}})
-        request = RequestFactory().get('/core/auth/agent/audit/actions/')
-        request.user = self.user
-        request.session = {}
-        response = AgentAuditView.as_view(kind='actions')(request, object_id=self.action.id)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'first\n&lt;script&gt;alert(1)&lt;/script&gt;')
-        other_org = Organization.objects.create(name='Agent isolated organization')
-        other_user = User.objects.create(username='agent-other-owner', name='Other owner')
-        other_org.add_member(other_user)
-        with tmp_to_org(other_org):
-            foreign = AgentSession.objects.create(user=other_user, application=self.app, terminal=self.node,
-                resource=self.resource, idempotency_key='other-org', request_hash='2' * 64,
-                date_expires=timezone.now() + timedelta(hours=1))
-            foreign_action = AgentAction.objects.create(session=foreign, user=other_user, application=self.app,
-                kind='file_read', idempotency_key='other-org-action', request_hash='3' * 64)
-        with tmp_to_root_org(), self.assertRaises(Http404):
-            AgentAuditView.as_view(kind='actions')(request, object_id=foreign_action.id)
+        response = AgentSessionView.as_view()(request, session_id=self.session.id)
+        self.assertNotContains(response, self.session.requested['asset_id'], status_code=410)
+        self.session.date_expires = timezone.now() - timedelta(seconds=1)
+        self.session.save(update_fields=['date_expires'])
+        request = RequestFactory().get('/core/auth/agent/session/')
+        request.user, request.session = self.user, {}
+        response = AgentSessionView.as_view()(request, session_id=self.session.id)
+        self.assertEqual(response.status_code, 403)
+        self.assertNotContains(response, self.session.requested['asset_id'], status_code=403)
+        self.assertEqual(response['Cache-Control'], 'no-store')
 
     def test_manual_credentials_are_completed_only_by_browser_owner(self):
         from assets.models import Asset, Platform
@@ -1365,45 +1444,37 @@ class AgentBoundaryTests(TestCase):
         self.assertEqual(session.connection_token.input_username, 'manual')
         self.assertEqual(session.connection_token.input_secret, 'private-to-core')
 
-    def test_audit_lists_and_session_actions_are_paginated(self):
-        from terminal.api.agent import AgentAuditAPI
-        from terminal.agent_views import AgentAuditView
+    def test_audit_lists_are_paginated_without_embedding_action_output(self):
         AgentAction.objects.bulk_create([
             AgentAction(session=self.session, user=self.user, application=self.app, kind='file_read',
                         idempotency_key=f'page-{index}', request_hash='4' * 64)
             for index in range(101)
         ])
-        request = RequestFactory().get('/api/v1/terminal/agent/audit/actions/')
-        request.user, request.session, request.query_params = self.user, {}, request.GET
-        api = AgentAuditAPI(kind='actions')
-        first = api.get(request).data
+        first = self.audit_api('actions')
         self.assertEqual(len(first['results']), 100)
         self.assertEqual(first['count'], 102)
         self.assertEqual(first['next_offset'], 100)
-        request.query_params = QueryDict('limit=10000')
-        self.assertEqual(len(api.get(request).data['results']), 100)
-        request.query_params = QueryDict('offset=100')
-        second = api.get(request).data
+        self.assertEqual(len(self.audit_api('actions', {'limit': 10000})['results']), 100)
+        second = self.audit_api('actions', {'offset': 100})
         self.assertEqual(len(second['results']), 2)
         self.assertIsNone(second['next_offset'])
         self.assertFalse({item['id'] for item in first['results']} & {item['id'] for item in second['results']})
-        request.query_params = QueryDict()
-        session_page = AgentAuditAPI(kind='sessions').get(request, self.session.id).data
-        self.assertEqual(len(session_page['actions']), 100)
-        self.assertEqual(session_page['next_offset'], 100)
-        page = AgentAuditView.as_view(kind='sessions')(request, object_id=self.session.id)
-        self.assertContains(page, '?offset=100')
-        self.assertContains(page, 'id="session-actions"')
+        session_page = self.audit_api('sessions', object_id=self.session.id)
+        self.assertNotIn('actions', session_page)
+        for offset in ('invalid', -1, 10000001):
+            self.audit_api('actions', {'offset': offset}, status=400)
 
-    def audit_api(self, kind, params=None, method='get'):
+    def audit_api(self, kind, params=None, method='get', *, user=None, object_id=None, status=200):
+        from django.db import transaction
         from rest_framework.test import APIRequestFactory, force_authenticate
         from terminal.api.agent import AgentAuditAPI
         request = getattr(APIRequestFactory(), method)(
             f'/api/v1/terminal/agent/audit/{kind}/', params or {},
         )
-        force_authenticate(request, self.user)
-        response = AgentAuditAPI.as_view(kind=kind)(request)
-        self.assertEqual(response.status_code, 200, response.data)
+        force_authenticate(request, user or self.auditor)
+        with transaction.atomic():
+            response = AgentAuditAPI.as_view(kind=kind)(request, object_id=object_id)
+        self.assertEqual(response.status_code, status, response.data)
         return response.data
 
     def test_audit_metadata_exposes_search_filters_and_sorting(self):
@@ -1465,7 +1536,7 @@ class AgentBoundaryTests(TestCase):
         self.assertEqual(data['results'][0]['id'], str(session.id))
         self.assertEqual(self.audit_api('sessions', {**params, 'date_from': timezone.now().isoformat()})['count'], 0)
 
-    def test_audit_queries_preserve_owner_and_organization_scope(self):
+    def test_auditors_see_other_owners_only_in_their_authorized_organization(self):
         other = User.objects.create(username='agent-audit-other')
         self.org.add_member(other)
         session = AgentSession.objects.create(
@@ -1477,8 +1548,8 @@ class AgentBoundaryTests(TestCase):
             session=session, user=other, application=self.app, kind='file_read',
             idempotency_key='audit-other-owner', request_hash='7' * 64,
         )
-        self.assertEqual(self.audit_api('sessions', {'id': str(session.id)})['count'], 0)
-        self.assertEqual(self.audit_api('actions', {'session_id': str(session.id)})['count'], 0)
+        self.assertEqual(self.audit_api('sessions', {'id': str(session.id)})['count'], 1)
+        self.assertEqual(self.audit_api('actions', {'session_id': str(session.id)})['count'], 1)
         other_org = Organization.objects.create(name='Agent audit other organization')
         with tmp_to_org(other_org):
             foreign = AgentSession.objects.create(
@@ -1487,6 +1558,15 @@ class AgentBoundaryTests(TestCase):
                 date_expires=timezone.now() + timedelta(hours=1),
             )
         self.assertEqual(self.audit_api('sessions', {'id': str(foreign.id)})['count'], 0)
+        other_org.add_member(self.auditor)
+        with tmp_to_org(other_org):
+            self.audit_api('sessions', user=self.auditor, status=403)
+        from orgs.utils import tmp_to_root_org
+        # Root selection must still filter by audit grants, not org membership.
+        with tmp_to_root_org(), override_settings(XPACK_ENABLED=True), patch.object(self.auditor, 'has_perm', return_value=True):
+            visible = service.audit_queryset(self.auditor, AgentSession)
+            self.assertTrue(visible.filter(pk=self.session.id).exists())
+            self.assertFalse(visible.filter(pk=foreign.id).exists())
 
     def test_access_only_authorization_expires_without_refresh_family(self):
         self.refresh.delete()

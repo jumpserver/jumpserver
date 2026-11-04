@@ -31,6 +31,7 @@ CONTEXT_SALT = 'jumpserver.agent.context.v1'
 SESSION_SALT = 'jumpserver.agent.session.v1'
 CONTEXT_TTL = 300
 SESSION_TTL = 7200
+RESULT_TTL = timedelta(minutes=15)
 FINAL_STATES = frozenset(('succeeded', 'failed', 'rejected', 'expired', 'cancelled', 'unknown'))
 ACTION_KINDS = frozenset(ACTION_POLICIES)
 # OAuth scope marker. Sessions always use a real organization;
@@ -41,6 +42,12 @@ ALL_AGENT_ORGANIZATIONS = Organization.ROOT_ID
 class Conflict(APIException):
     status_code = 409
     default_code = 'agent_conflict'
+
+
+class ResultExpired(APIException):
+    status_code = 410
+    default_code = 'result_expired'
+    default_detail = 'Operation result has expired. Do not repeat the operation.'
 
 
 def canonical(value):
@@ -209,20 +216,49 @@ def owned_session(node, session_id, capability, *, lock=False, check=True):
 
 
 def check_session_authority(session, *, connection=True):
-    if not session.user_id:
-        raise PermissionDenied('Agent session owner no longer exists')
+    check_session_grant(session)
     if session.date_closed or session.date_expires <= timezone.now():
         raise PermissionDenied('Agent session expired or closed')
-    check_agent_organization(session.user, session.org_id)
-    if not AgentApplication.objects.filter(
-        application=session.application, resource=session.resource, is_active=True,
-    ).exists() or not authority_exists(session.user_id, session.application_id, session.oauth_token_id, session.oauth_family):
-        raise PermissionDenied('OAuth authorization revoked')
     if connection and not session.connection_token_id:
         raise Conflict('Complete connection credentials in the browser first')
     if connection:
         with tmp_to_org(session.org_id):
             session.connection_token.is_valid(check_expiration=not session.credentials_released)
+
+
+def check_session_grant(session):
+    if not session.user_id:
+        raise PermissionDenied('Agent session owner no longer exists')
+    check_agent_organization(session.user, session.org_id)
+    if not AgentApplication.objects.filter(
+        application=session.application, resource=session.resource, is_active=True,
+    ).exists() or not authority_exists(session.user_id, session.application_id, session.oauth_token_id, session.oauth_family):
+        raise PermissionDenied('OAuth authorization revoked')
+
+
+def result_deadline(item):
+    if isinstance(item, AgentAction):
+        return item.date_finished + RESULT_TTL if item.status in FINAL_STATES and item.date_finished else None
+    end = min(item.date_expires, item.date_closed) if item.date_closed else item.date_expires
+    return end + RESULT_TTL if item.date_closed or item.date_expires <= timezone.now() else None
+
+
+def check_result_read(item, context):
+    """Operational results are bounded separately from retained audit evidence."""
+    session = item.session if isinstance(item, AgentAction) else item
+    same_principal(context, session)
+    if context['node_id'] != str(session.terminal_id) or context['resource'] != session.resource:
+        raise PermissionDenied('Operation belongs to another execution context')
+    check_session_grant(session)
+    deadline = result_deadline(item)
+    if isinstance(item, AgentAction) and item.status not in FINAL_STATES:
+        if not session.date_closed and session.date_expires > timezone.now():
+            return
+        raise ResultExpired()
+    if isinstance(item, AgentAction) and deadline is None:
+        raise ResultExpired()
+    if deadline is not None and deadline <= timezone.now():
+        raise ResultExpired()
 
 
 def check_handoff_authority(session):
@@ -492,6 +528,7 @@ def create_action(node, data):
         if existing:
             if existing.request_hash != request_hash:
                 raise Conflict('Idempotency key was already used for different parameters', code='idempotency_conflict')
+            check_result_read(existing, context)
             return action_data(existing)
         if session.actions.exclude(status__in=FINAL_STATES).count() >= 32:
             raise Conflict('Agent action queue is full', code='capacity_exceeded')
@@ -635,6 +672,7 @@ def notify_action_warning(action):
 
 
 def action_data(action):
+    deadline = result_deadline(action)
     return {
         'id': str(action.id), 'action_id': str(action.id), 'session_id': str(action.session_id),
         'kind': action.kind, 'status': action.status, 'request_hash': action.request_hash,
@@ -643,7 +681,7 @@ def action_data(action):
         'date_created': action.date_created.isoformat(),
         'date_started': action.date_started.isoformat() if action.date_started else None,
         'date_finished': action.date_finished.isoformat() if action.date_finished else None,
-        'audit_url': f'/core/auth/agent/audit/actions/{action.id}/?oid={action.org_id}',
+        'result_expires_at': deadline.isoformat() if deadline else None,
         'approval_url': f'/ui/#/tickets/tickets/{action.ticket_id}?type=command_confirm' if action.ticket_id else None,
     }
 
@@ -751,14 +789,16 @@ def append_event(action, data):
 
 def audit_queryset(user, model):
     from orgs.utils import get_current_org
+    from rbac.models import RoleBinding
+    permission = f'terminal.view_{model.__name__.lower()}'
+    if not user.has_perm(permission):
+        raise PermissionDenied('Agent audit permission is required')
     queryset = model.objects.all()
-    if get_current_org().is_root() and not user.has_perm('orgs.view_rootorg'):
-        from django.db.models import CharField
-        from django.db.models.functions import Cast
-        org_ids = user.orgs.annotate(agent_org_id=Cast('id', CharField())).values('agent_org_id')
-        queryset = queryset.filter(org_id__in=org_ids)
-    if not user.has_perm(f'terminal.view_{model.__name__.lower()}'):
-        queryset = queryset.filter(user=user)
+    if get_current_org().is_root():
+        if not user.has_perm('orgs.view_rootorg'):
+            raise PermissionDenied('Root organization audit permission is required')
+        orgs = RoleBinding.get_user_has_the_perm_orgs(permission, user)
+        queryset = queryset.filter(org_id__in=[str(org.id) for org in orgs])
     return queryset
 
 
