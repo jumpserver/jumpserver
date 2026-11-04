@@ -17884,6 +17884,9 @@ msgstr ""
 " "
 "無操作期限になると、パスワード未設定でもメイン画面と管理対象の資産ウィンドウをロックします。メイン画面でサーバーのパスワード検証に成功した場合のみ解除できます。新規ログインは通常どおり開き、ロック済みのログインは復元後もロックを維持します。外部アプリの画面は保護されません。"
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web セッションはロックされています。クライアントを認可する前にロックを解除してください。"
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "クライアントはロックされています。メイン画面で解除してください。"
 
@@ -18182,3 +18185,11 @@ msgid ""
 msgstr ""
 "0 で自動ロックを無効にします。 指定した無操作時間でコンソールと Web ターミナルをロックします。ロック用パスワードで解除します。 "
 "管理者設定が既定値と上限です。ユーザーはより厳しい設定にでき、未設定の場合は管理者設定に従います。"
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "資産の申請範囲"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "チケットでアクセス権を申請する際に選択できる資産の範囲を設定します。<br><b>すべての資産：</b>事前の認可がなくても、チケットの所属組織内のすべての資産を選択できます。<br><b>認可された資産：</b>ユーザー本人または所属グループに割り当てられた認可ルールの対象資産を選択できます。無効化されたルール、期限切れのルール、適用開始前のルールも含まれます。<br><b>有効な認可資産：</b>ユーザー本人または所属グループの有効な認可ルールの対象資産のみ選択できます。ルールが有効化され、現在時刻が開始時刻と終了時刻の間にあることが条件です。"

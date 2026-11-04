@@ -21,7 +21,8 @@ from ..models import User
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
     'UserProfileApi', 'UserPasswordApi',
-    'UserPermissionsApi', 'UserClientCredentialsApi', 'UserIdleLockApi'
+    'UserPermissionsApi', 'UserLockPasswordApi',
+    'UserFileEncryptionApi', 'UserIdleLockApi'
 ]
 
 
@@ -89,34 +90,43 @@ class UserPermissionsApi(generics.RetrieveAPIView):
         return self.request.user
 
 
-class UserClientCredentialsApi(generics.RetrieveUpdateAPIView):
-    """Personal credentials are managed by the web account, never a desktop bearer."""
+class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
+    """Shared web-session validation for lock and file-encryption password settings."""
     authentication_classes = (SessionAuthentication,)
     permission_classes = (IsValidUser,)
-    serializer_class = serializers.UserClientCredentialsSerializer
     http_method_names = ('get', 'patch', 'head', 'options')
+
+    def get_object(self):
+        return {}
+
+
+class UserLockPasswordApi(BaseUserPasswordSettingsApi):
+    serializer_class = serializers.UserLockPasswordSerializer
 
     def get_permissions(self):
         permissions = super().get_permissions()
-        if self.request.method == 'PATCH':
-            lock = self.request.data.get('lock', {})
-            if isinstance(lock, dict) and (lock.get('password') or lock.get('password_again') or lock.get('clear')):
-                from authentication.services.lock_password import LockPasswordConfirmation
-                permissions.append(LockPasswordConfirmation())
-            else:
-                permissions.append(UserConfirmation())
+        # Metadata clones OPTIONS as PATCH to describe writable fields. Identity
+        # confirmation protects real writes; it must not hide the form schema.
+        if self.request.method == 'PATCH' and self.request._request.method != 'OPTIONS':
+            permissions.append(self.get_confirmation_permission())
         return permissions
 
-    def get_object(self):
-        return {'lock': {}, 'file': {}}
+    def get_confirmation_permission(self):
+        data = self.request.data
+        if isinstance(data, dict) and (data.get('password') or data.get('password_again') or data.get('clear')):
+            from authentication.services.lock_password import LockPasswordConfirmation
+            return LockPasswordConfirmation()
+        return UserConfirmation()
 
     def perform_update(self, serializer):
-        serializer.save()
-        lock = serializer.validated_data.get('lock', {})
-        if lock.get('password') or lock.get('clear'):
+        super().perform_update(serializer)
+        if serializer.validated_data.get('password') or serializer.validated_data.get('clear'):
             from authentication.services.lock_password import LOCK_PASSWORD_PROOF
             self.request.session.pop(LOCK_PASSWORD_PROOF, None)
 
+
+class UserFileEncryptionApi(BaseUserPasswordSettingsApi):
+    serializer_class = serializers.UserFileEncryptionSerializer
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')

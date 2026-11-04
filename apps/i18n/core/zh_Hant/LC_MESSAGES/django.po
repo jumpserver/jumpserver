@@ -17606,6 +17606,9 @@ msgstr ""
 " "
 "閒置逾時即鎖定主頁面與對應資產視窗，即使尚未設定密碼。只能在主頁面通過後端密碼驗證後解鎖。新登入正常進入，已鎖定的登入恢復後仍鎖定。外部軟體視窗不受保護。"
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web 工作階段已鎖定，請先解鎖後再授權用戶端。"
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "用戶端已鎖定，請在主頁面解鎖。"
 
@@ -17894,3 +17897,11 @@ msgid ""
 msgstr ""
 "0 表示關閉自動鎖屏。 閒置達到設定時間後鎖定控制台與 Web 終端，輸入鎖屏密碼解鎖。 "
 "管理員設定為預設值與上限，使用者可設定得更嚴格；未自行設定則跟隨管理員。"
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "資產申請範圍"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "設定使用者申請資產授權時可在工單中選擇的資產範圍。<br><b>所有資產：</b>可選擇工單所屬組織內的全部資產，無須事先取得授權。<br><b>授權的資產：</b>可選擇本人或所屬使用者群組的授權規則中包含的資產，包括規則已停用、已過期或尚未生效的情況。<br><b>有效授權的資產：</b>僅可選擇本人或所屬使用者群組的有效授權規則中包含的資產。規則須已啟用、已到開始時間且未到結束時間。"

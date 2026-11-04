@@ -18078,6 +18078,9 @@ msgstr ""
 "сервером. Новый вход открывается обычно; заблокированный вход остаётся таким"
 " после восстановления. Внешние окна не защищены."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Веб-сеанс заблокирован. Разблокируйте его перед авторизацией клиента."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Клиент заблокирован. Разблокируйте его на главной странице."
 
@@ -18427,3 +18430,11 @@ msgstr ""
 " простоя. Для разблокировки введите пароль блокировки. Администратор задаёт "
 "значения по умолчанию и ограничения. Пользователь может выбрать более "
 "строгие настройки, иначе следовать администратору."
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "Область запроса доступа к активам"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "Определяет, какие активы пользователи могут выбрать при запросе доступа через заявку.<br><b>Все активы:</b> можно выбрать любой актив в организации заявки, даже если у пользователя ещё нет разрешения.<br><b>Разрешённые активы:</b> можно выбрать активы из правил доступа, назначенных пользователю или его группам, включая отключённые, истёкшие и ещё не вступившие в силу правила.<br><b>Активы с действующим разрешением:</b> можно выбрать только активы из действующих правил, назначенных пользователю или его группам. Правило должно быть включено, а текущее время должно находиться между временем начала и окончания его действия."

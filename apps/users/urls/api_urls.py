@@ -21,7 +21,8 @@ router.register(r'connection-token', auth_api.ConnectionTokenViewSet, 'connectio
 urlpatterns = [
     path('users-groups/tree/', api.UserGroupTreeApi.as_view(), name='users-groups-tree'),
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
-    path('profile/client-credentials/', api.UserClientCredentialsApi.as_view(), name='user-client-credentials'),
+    path('profile/lock-password/', api.UserLockPasswordApi.as_view(), name='user-lock-password'),
+    path('profile/file-encryption/', api.UserFileEncryptionApi.as_view(), name='user-file-encryption'),
     path('profile/idle-lock/', api.UserIdleLockApi.as_view(), name='user-idle-lock'),
     path('profile/password/', api.UserPasswordApi.as_view(), name='user-password'),
     path('profile/mfa/reset/', api.UserResetMFAApi.as_view(), name='my-mfa-reset'),

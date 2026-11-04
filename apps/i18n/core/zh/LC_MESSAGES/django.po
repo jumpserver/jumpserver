@@ -18679,6 +18679,9 @@ msgstr ""
 " "
 "空闲超时即锁定主页面和对应资产窗口，即使尚未设置密码。只能在主页面通过后端验证密码后解锁。新登录正常进入，已锁定的登录恢复后仍锁定。外部软件窗口不受保护。"
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web 会话已锁定，请先解锁后再授权客户端。"
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "客户端已锁定，请在主页面解锁。"
 
@@ -18968,3 +18971,11 @@ msgid ""
 msgstr ""
 "0 表示关闭自动锁屏。 空闲达到设定时间后锁定控制台和 Web 终端，输入锁屏密码解锁。 "
 "管理员设置为默认值和上限，用户可设置得更严格；未自行设置则跟随管理员。"
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "资产申请范围"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "设置用户申请资产授权时可在工单中选择的资产范围。<br><b>所有资产：</b>可选择工单所属组织内的全部资产，无需事先获得授权。<br><b>授权的资产：</b>可选择本人或所属用户组的授权规则中包含的资产，包括规则已停用、已过期或尚未生效的情况。<br><b>有效授权的资产：</b>仅可选择本人或所属用户组的有效授权规则中包含的资产。规则须已启用、已到开始时间且未到结束时间。"

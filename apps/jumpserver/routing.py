@@ -6,6 +6,7 @@ from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
 from django.utils.module_loading import import_string
+from django.utils import timezone
 
 from authentication.backends.drf import (
     SignatureAuthentication,
@@ -52,6 +53,9 @@ def get_signature_user(scope):
                 continue
             user, _ = result
             if user:
+                session = getattr(request, 'client_login_session', None)
+                if session is not None:
+                    scope['client_login_session_id'] = session.pk
                 return user
         except Exception:
             logger.debug('WebSocket authentication failed for %s', backend.__class__.__name__)
@@ -94,7 +98,71 @@ class WsSignatureAuthMiddleware:
             return await WebsocketDenier()(scope, receive, send)
         if user:
             scope['user'] = user
+            scope['header_authenticated'] = True
         return await self.app(scope, receive, send)
+
+
+@database_sync_to_async
+def websocket_session_allowed(scope):
+    user = scope.get('user')
+    if user is None or not user.is_authenticated:
+        return True  # The routed consumer retains its own authentication policy.
+    if not user.is_valid:
+        return False
+    if scope.get('header_authenticated'):
+        session_id = scope.get('client_login_session_id')
+        if session_id is None:
+            return True
+        from authentication.services.client_login_session import validate_session
+        return validate_session(session_id, allow_locked=False)
+    session = scope.get('session')
+    if session is None or not session.session_key or not session.exists(session.session_key):
+        return False
+    from common.sessions import session_expiry
+    expires_at = session_expiry(session.session_key)
+    if expires_at is not None and timezone.now() >= expires_at:
+        return False
+    from authentication.services.web_session_lock import session_locked
+    return not session_locked(session.session_key, user.pk)
+
+
+class WsSessionSecurityMiddleware:
+    """Enforce current lock/revocation/deadline state throughout a socket's life."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        closed = False
+
+        async def check_session():
+            nonlocal closed
+            if closed:
+                return False
+            allowed = await websocket_session_allowed(scope)
+            if closed:
+                return False
+            if allowed:
+                return True
+            closed = True
+            await send({'type': 'websocket.close', 'code': 1008})
+            return False
+
+        async def receive_checked():
+            event = await receive()
+            if event['type'] == 'websocket.receive' and not await check_session():
+                return {'type': 'websocket.disconnect', 'code': 1008}
+            return event
+
+        async def send_checked(event):
+            if closed:
+                return
+            if event['type'] in ('websocket.accept', 'websocket.send') and not await check_session():
+                return
+            await send(event)
+
+        if await check_session():
+            return await self.app(scope, receive_checked, send_checked)
 
 
 class SocketContextMiddleware:
@@ -140,7 +208,7 @@ application = ProtocolTypeRouter({
     "websocket": SocketContextMiddleware(
         WsSignatureAuthMiddleware(
             AuthMiddlewareStack(
-                URLRouter(urlpatterns)
+                WsSessionSecurityMiddleware(URLRouter(urlpatterns))
             )
         )
     ),

@@ -8,7 +8,6 @@ from common.serializers.fields import EncryptedField, LabeledChoiceField, ListMu
 from common.utils import validate_ssh_public_key
 from .user import UserSerializer
 from ..models import User, MFAMixin, Preference
-from .preference.lina import FileEncryptSerializer
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
@@ -213,7 +212,7 @@ class UserPermsSerializer(serializers.Serializer):
         pass
 
 
-class ClientLockPasswordSerializer(serializers.Serializer):
+class UserLockPasswordSerializer(serializers.Serializer):
     clear = serializers.BooleanField(write_only=True, required=False, default=False)
     has_password = serializers.SerializerMethodField(label=_('Configured'))
     password = EncryptedField(required=False, allow_blank=True, max_length=128,
@@ -241,28 +240,50 @@ class ClientLockPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({'password': _('Password does not match security rules')})
         return {'password': make_password(password)}
 
-
-class UserClientCredentialsSerializer(serializers.Serializer):
-    lock = ClientLockPasswordSerializer(required=False, label=_('Screen lock password'))
-    file = FileEncryptSerializer(required=False, label=_('File Encryption'))
-
     def update(self, instance, validated_data):
         user = self.context['request'].user
-        lock = validated_data.get('lock', {})
-        if lock.get('clear'):
+        if validated_data.get('clear'):
             Preference.objects.filter(user=user, category='client', name='client_lock_password_hash').delete()
-        lock_password = lock.get('password')
-        if lock_password:
+        password = validated_data.get('password')
+        if password:
             Preference.objects.update_or_create(user=user, name='client_lock_password_hash', defaults={
-                'category': 'client', 'value': lock_password, 'encrypted': False,
-            })
-        secret_key = validated_data.get('file', {}).get('secret_key')
-        if secret_key:
-            Preference.objects.update_or_create(user=user, name='secret_key', defaults={
-                'category': 'lina', 'value': Preference.encrypt(secret_key), 'encrypted': True,
+                'category': 'client', 'value': password, 'encrypted': False,
             })
         return instance
 
+
+class UserFileEncryptionSerializer(serializers.Serializer):
+    has_secret_key = serializers.SerializerMethodField(label=_('Configured'))
+    secret_key = EncryptedField(
+        required=False, max_length=1024, write_only=True, allow_blank=True,
+        label=_('New password'),
+    )
+    secret_key_again = EncryptedField(
+        required=False, max_length=1024, write_only=True, allow_blank=True,
+        label=_('Confirm password'),
+    )
+
+    def get_has_secret_key(self, obj):
+        return Preference.objects.filter(
+            user=self.context['request'].user, category='lina', name='secret_key',
+        ).exists()
+
+    def validate(self, attrs):
+        secret_key = attrs.pop('secret_key', None)
+        confirmation = attrs.pop('secret_key_again', None)
+        if (secret_key or confirmation) and secret_key != confirmation:
+            raise serializers.ValidationError({'secret_key_again': _('The newly set password is inconsistent')})
+        if secret_key and confirmation:
+            attrs['secret_key'] = secret_key
+        return attrs
+
+    def update(self, instance, validated_data):
+        secret_key = validated_data.get('secret_key')
+        if secret_key:
+            Preference.objects.update_or_create(user=self.context['request'].user, name='secret_key', defaults={
+                'category': 'lina', 'value': Preference.encrypt(secret_key), 'encrypted': True,
+            })
+        return instance
 
 
 class UserIdleLockSerializer(serializers.Serializer):

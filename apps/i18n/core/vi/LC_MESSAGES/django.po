@@ -17935,6 +17935,9 @@ msgstr ""
 "thường; phiên đã khóa vẫn khóa sau khi khôi phục. Cửa sổ ứng dụng ngoài "
 "không được bảo vệ."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Phiên web đang bị khóa. Hãy mở khóa trước khi cấp quyền cho ứng dụng khách."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Ứng dụng khách đã khóa. Hãy mở khóa ở trang chính."
 
@@ -18279,3 +18282,11 @@ msgstr ""
 "nhàn rỗi đã đặt. Nhập mật khẩu khóa để mở khóa. Quản trị viên đặt mặc định "
 "và giới hạn. Người dùng có thể đặt nghiêm ngặt hơn; nếu không tự đặt thì "
 "theo quản trị viên."
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "Phạm vi yêu cầu tài sản"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "Quy định tài sản người dùng có thể chọn khi gửi phiếu yêu cầu quyền truy cập.<br><b>Tất cả tài sản:</b> có thể chọn mọi tài sản trong tổ chức của phiếu, kể cả khi chưa được cấp quyền.<br><b>Tài sản được cấp quyền:</b> có thể chọn tài sản trong các quy tắc cấp quyền được gán cho bản thân hoặc nhóm người dùng của mình, bao gồm cả quy tắc đã tắt, hết hạn hoặc chưa có hiệu lực.<br><b>Tài sản có quyền hợp lệ:</b> chỉ có thể chọn tài sản trong các quy tắc hợp lệ được gán cho bản thân hoặc nhóm người dùng của mình. Quy tắc phải đang bật và thời điểm hiện tại phải nằm giữa thời gian bắt đầu và kết thúc."

@@ -18010,6 +18010,9 @@ msgstr ""
 "previously locked logins stay locked after restoration. External application"
 " windows are not protected."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "The web session is locked. Unlock it before authorizing a client."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Client is locked. Unlock it on the main page."
 
@@ -18360,3 +18363,11 @@ msgstr ""
 "specified idle time. Enter the lock password to unlock. Administrator "
 "settings are defaults and limits. Users may choose stricter settings; "
 "otherwise they follow the administrator."
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "Asset application scope"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."

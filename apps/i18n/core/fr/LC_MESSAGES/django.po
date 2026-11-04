@@ -18141,6 +18141,9 @@ msgstr ""
 "s’ouvre normalement ; une connexion déjà verrouillée le reste après "
 "restauration. Les fenêtres externes ne sont pas protégées."
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "La session web est verrouillée. Déverrouillez-la avant d’autoriser un client."
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "Le client est verrouillé. Déverrouillez-le sur la page principale."
 
@@ -18510,3 +18513,11 @@ msgstr ""
 "de verrouillage pour déverrouiller. L’administrateur définit les valeurs par"
 " défaut et les limites. L’utilisateur peut être plus restrictif ; sinon, il "
 "suit l’administrateur."
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "Périmètre de demande des actifs"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "Définit les actifs que les utilisateurs peuvent sélectionner dans une demande d’accès par ticket.<br><b>Tous les actifs :</b> tous les actifs de l’organisation du ticket peuvent être sélectionnés, même sans autorisation préalable.<br><b>Actifs autorisés :</b> les actifs inclus dans les règles d’autorisation attribuées à l’utilisateur ou à ses groupes peuvent être sélectionnés, y compris les règles désactivées, expirées ou pas encore en vigueur.<br><b>Actifs avec autorisation valide :</b> seuls les actifs inclus dans des règles valides attribuées à l’utilisateur ou à ses groupes peuvent être sélectionnés. La règle doit être activée et l’heure actuelle doit se situer entre son début et sa fin."
