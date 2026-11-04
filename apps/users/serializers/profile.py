@@ -241,26 +241,39 @@ class ClientLockPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({'password': _('Password does not match security rules')})
         return {'password': make_password(password)}
 
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        if validated_data.get('clear'):
+            Preference.objects.filter(user=user, category='client', name='client_lock_password_hash').delete()
+        password = validated_data.get('password')
+        if password:
+            Preference.objects.update_or_create(user=user, name='client_lock_password_hash', defaults={
+                'category': 'client', 'value': password, 'encrypted': False,
+            })
+        return instance
+
+
+class UserFileEncryptionSerializer(FileEncryptSerializer):
+    def update(self, instance, validated_data):
+        secret_key = validated_data.get('secret_key')
+        if secret_key:
+            Preference.objects.update_or_create(user=self.context['request'].user, name='secret_key', defaults={
+                'category': 'lina', 'value': Preference.encrypt(secret_key), 'encrypted': True,
+            })
+        return instance
+
 
 class UserClientCredentialsSerializer(serializers.Serializer):
     lock = ClientLockPasswordSerializer(required=False, label=_('Screen lock password'))
     file = FileEncryptSerializer(required=False, label=_('File Encryption'))
 
     def update(self, instance, validated_data):
-        user = self.context['request'].user
-        lock = validated_data.get('lock', {})
-        if lock.get('clear'):
-            Preference.objects.filter(user=user, category='client', name='client_lock_password_hash').delete()
-        lock_password = lock.get('password')
-        if lock_password:
-            Preference.objects.update_or_create(user=user, name='client_lock_password_hash', defaults={
-                'category': 'client', 'value': lock_password, 'encrypted': False,
-            })
-        secret_key = validated_data.get('file', {}).get('secret_key')
-        if secret_key:
-            Preference.objects.update_or_create(user=user, name='secret_key', defaults={
-                'category': 'lina', 'value': Preference.encrypt(secret_key), 'encrypted': True,
-            })
+        ClientLockPasswordSerializer(context=self.context).update(
+            instance.get('lock', {}), validated_data.get('lock', {}),
+        )
+        UserFileEncryptionSerializer(context=self.context).update(
+            instance.get('file', {}), validated_data.get('file', {}),
+        )
         return instance
 
 
