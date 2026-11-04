@@ -185,7 +185,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolSerializer(label=_("Protocols"), many=True, required=False)
-    automation = PlatformAutomationSerializer(label=_("Automation"), required=False, default=dict)
+    automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
     su_method = LabeledChoiceField(
         choices=SuMethodChoices.choices, label=_("Su method"),
         required=False, default=SuMethodChoices.sudo, allow_null=True
