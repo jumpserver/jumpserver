@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 resolution-markers = [
     "platform_python_implementation == 'PyPy' and sys_platform == 'win32'",
@@ -2171,7 +2171,7 @@ name = "jinxed"
 version = "2.1.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
-    { name = "ansicon", marker = "sys_platform == 'win32'" },
+    { name = "ansicon" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/39/d7/6e6d474ec5eaeca6a61acc17766bb19563b3a372b4b9d92910078f5fe49f/jinxed-2.1.0.tar.gz", hash = "sha256:7e755b831faa2443d44fb4ce7c0202eb9c3ed39bd5bf1193365888f4f6092b54" }
 wheels = [
@@ -2282,6 +2282,7 @@ wheels = [
 name = "jumpserver"
 version = "4.0"
 source = { virtual = "." }
+default-groups = ["dev", "xpack"]
 dependencies = [
     { name = "adal" },
     { name = "aiofiles" },
@@ -4743,7 +4744,7 @@ wheels = [
 
 [[package]]
 name = "twisted"
-version = "26.4.0"
+version = "26.10.0rc1"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "attrs" },
@@ -4754,9 +4755,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "zope-interface" },
 ]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/db/97/6e9beb1e78247ae6dc34114f27d538cf2cb183c4afcd3609dfdf2b0439c8/twisted-26.4.0.tar.gz", hash = "sha256:dbfd0fe1ee409d0243fdd7a6a6ff14f4948cec1fd78e0376291f805e1501fae9" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/78/80/429c3860272b3840fb0c487d41c3cb462519a4d9f329c31254d7115d9290/twisted-26.10.0rc1.tar.gz", hash = "sha256:a2201fed4dd4919b0fe732aa2c4ac95e4dff3ba04cfc10b1383e7aac29005e27" }
 wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/a6/57/bcf4e2370dd218c9aa68a9140a65d86729c73f1d529f7e94786c2766fc72/twisted-26.4.0-py3-none-any.whl", hash = "sha256:dc25ea0ebf6511c24f03232ee9f4afa54b291c5d897990e3a39cc4d14a1ef4c0" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/16/a4/deabc3a2e2e4127059966123dd49fc2a41209c6d5e220f4f46ddeecad770/twisted-26.10.0rc1-py3-none-any.whl", hash = "sha256:9a8689a7ab8180b16917aa585cc4d8dafcef620162b17b8aab3719b485b321e8" },
 ]
 
 [package.optional-dependencies]
