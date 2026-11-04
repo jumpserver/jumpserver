@@ -71,7 +71,8 @@ class FavoriteAssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = FavoriteAsset
-        fields = ['user', 'asset', 'folder', 'asset_info']
+        fields = ['id', 'user', 'asset', 'folder', 'asset_info']
+        read_only_fields = ['id']
 
     def validate(self, attrs):
         request = self.context['request']
