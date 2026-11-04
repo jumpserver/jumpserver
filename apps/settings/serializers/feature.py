@@ -15,6 +15,7 @@ from rest_framework import serializers
 from common.serializers.fields import EncryptedField
 from common.utils import date_expired_default
 from ops.ansible.docker import ANSIBLE_EE_IMAGE
+from tickets.const import TicketApplyAssetScope
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer', 'VaultSettingSerializer',
@@ -352,6 +353,18 @@ class TicketSettingSerializer(serializers.Serializer):
     TICKETS_DIRECT_APPROVE = serializers.BooleanField(
         required=False, default=False, label=_("Approval without login"),
         help_text=_('Allow direct approval ticket without login')
+    )
+    TICKET_APPLY_ASSET_SCOPE = serializers.ChoiceField(
+        choices=TicketApplyAssetScope.choices, required=False,
+        label=_("Asset application scope"),
+        help_text=_(
+            "Specifies which assets users can select when requesting access via a ticket.<br>"
+            "<b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br>"
+            "<b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, "
+            "including inactive, expired and not-yet-effective rules.<br>"
+            "<b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their "
+            "user groups. The rule must be enabled, and the current time must be between its start and end times."
+        )
     )
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,
