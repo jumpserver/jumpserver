@@ -3,22 +3,54 @@
 Use the exact MCP URL supplied in the user's message. This guide is public and
 contains no instance configuration, account information or credentials. Reading
 it does not authorize asset operations. Configure only the client the user is
-currently using, on the machine where that client runs; do not install both
-clients or change JumpServer system settings.
+currently using, on the machine where that client runs. Preserve other clients
+and JumpServer system settings.
 
-## Before configuration
+## Common setup workflow
 
-1. Identify Codex or DeepSeek Harness (DSH), the operating system and the active
-   client profile. If these cannot be identified, ask which client to configure.
+1. Identify the current agent client, its version, operating system and active
+   profile from the available environment and native help. If the target cannot
+   be identified, ask which client to configure; do not assume Codex or DSH.
 2. Preserve unrelated settings. Reuse an existing connection to the exact URL,
    its client ID and OAuth authorization. Do not remove/re-add it to test login.
    If the existing JumpServer connection targets another URL or is disabled,
    stop and explain the conflict rather than replacing or enabling it.
-3. Use native client commands, quoting arguments for the current shell. Never
-   ask for passwords, MFA codes or access/refresh tokens in chat, dump credential
-   files, or install by piping downloaded shell scripts into a shell.
+3. Check that the client supports remote MCP over Streamable HTTP and native
+   OAuth authorization with PKCE S256. New automatic registrations use DCR for
+   public clients with no client secret and exact HTTP IP-loopback callbacks
+   on `127.0.0.1` or `::1`. Cloud clients requiring HTTPS callbacks, client-secret
+   authentication or CIMD-only registration cannot use this registration flow.
+   Report incompatible capabilities; do not change callback or token validation.
+4. Use the matching verified instructions below, or the installed client's
+   native MCP commands/settings and official documentation for its version.
+   Configure the supplied URL as a remote HTTP MCP connection with OAuth and
+   the `agent:access` scope. Let the client handle discovery, registration, PKCE,
+   token storage and refresh. Do not copy another client's commands or guess
+   configuration fields. Quote arguments for the current shell.
+5. Present any required authorization link to the user. The user completes
+   browser login, consent and MFA; never submit them on the user's behalf.
+   Never ask for passwords, MFA codes or access/refresh tokens in chat, dump
+   credential files, or install by piping downloaded shell scripts into a shell.
+6. Verify the live connection and tool discovery using the client's native
+   status/tool list. Report saved configuration, pending authorization, reload
+   required or connected according to what was actually verified. A running
+   chat may need a new session before newly configured tools become available.
 
-## Codex
+If the agent cannot read this guide or configure its current client, explain the
+manual steps using that client's native settings: the supplied MCP URL, remote
+HTTP transport, OAuth and `agent:access`, followed by browser authorization and
+tool discovery. If no supported native setup path can be established, report
+what is missing and stop. Do not switch to another client, invent commands or
+build a replacement OAuth client. MCP asset tools operate on remote assets;
+do not use them to fetch this guide or run local setup commands.
+
+## Verified client instructions
+
+Codex and DSH have been tested. Other clients use the common workflow above;
+protocol compatibility does not by itself establish tested client support.
+Follow only the instructions for the client currently being configured.
+
+### Codex
 
 1. Check `codex mcp --help` and `codex mcp list`. Use the server name `jumpserver`.
    Inspect only the relevant connection's URL and authentication status; do not
@@ -39,7 +71,7 @@ clients or change JumpServer system settings.
    a working MCP connection. If the current chat cannot reload its tools, explain
    that a new session is needed rather than claiming the tools are already usable.
 
-## DeepSeek Harness (DSH)
+### DeepSeek Harness (DSH)
 
 1. Use the existing `dsh-plugin-jumpserver` installation in the active DSH
    profile. Keep its fixed JumpServer name and single-connection configuration.

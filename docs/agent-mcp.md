@@ -17,14 +17,23 @@ tools, execution semantics and file streaming.
 ## One-sentence client setup
 
 Personal Settings > Agent / MCP > Connection Guide provides a **Copy for agent**
-instruction for Codex and DSH alongside the manual Codex commands. The instruction
+instruction for the current agent client alongside the manual Codex commands. It
 supplies this site's `/core/auth/agent/install.md` guide URL and the exact MCP URL
 already available to the signed-in user.
 
 The guide is public, read-only Markdown. It contains generic setup steps, not
 instance settings, user/client lists or credentials; request parameters and Host
 headers do not populate its content. It adds no OAuth, execution or audit rights.
-Codex uses its native MCP management and OAuth commands. DSH's plugin provides
+The common workflow identifies the current client and uses its native remote
+MCP configuration and OAuth support. Missing configuration access falls back to
+manual setup instructions; unsupported client capabilities are reported without
+guessing commands or using asset tools to configure the local client. Automatic
+registration requires public-client DCR and HTTP IP-loopback callbacks as
+described below. Clients requiring cloud callbacks or CIMD-only registration
+cannot use this flow.
+
+Codex and DSH have verified instructions. Codex uses its native MCP management
+and OAuth commands. DSH's plugin provides
 `jumpserver-mcp setup --url` (or `node` with its installed `lib/cli.js`), reusing
 the same state store, client registration and OAuth flow as its existing page.
 Neither path replaces conflicting or disabled connections automatically.
