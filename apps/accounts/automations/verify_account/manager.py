@@ -17,6 +17,8 @@ from accounts.personal_credentials import (
     validate_personal_credential_username,
     validate_personal_credential_verification_protocol,
 )
+from assets.automations.base.manager import BasePlaybookManager
+from assets.automations.base.report import ConnectivityReportMixin
 from common.const import Status
 from common.utils import get_logger
 from ops.ansible.utils import escape_jinja2_syntax, neutralize_jinja2_syntax
@@ -78,7 +80,7 @@ class PersonalCredentialAccount:
         )
 
 
-class VerifyAccountManager(AccountBasePlaybookManager):
+class VerifyAccountManager(ConnectivityReportMixin, AccountBasePlaybookManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -130,6 +132,9 @@ class VerifyAccountManager(AccountBasePlaybookManager):
     @classmethod
     def method_type(cls):
         return AutomationTypes.verify_account
+
+    def get_host_success_log(self, host):
+        return BasePlaybookManager.get_host_success_log(self, host)
 
     def get_target_summary(self):
         if not self.personal_credential_ids:
@@ -443,31 +448,33 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             )
 
     def on_host_success(self, host, result):
+        # Verification has no change/push record. Record its result directly
+        # through the playbook manager instead of the secret-change callbacks.
         account = self.host_account_mapper.get(host)
         if not account:
-            return super().on_host_error(
-                host, 'Account mapping not found', result
+            return BasePlaybookManager.on_host_error(
+                self, host, 'Account mapping not found', result
             )
         record = self.host_record_mapper.get(host)
         if record:
             self.save_verification_result(
                 record, ChangeSecretRecordStatusChoice.success.value
             )
-            return super().on_host_success(host, result)
+            return BasePlaybookManager.on_host_success(self, host, result)
         if getattr(account, 'is_personal_credential', False):
             self.record_personal_credential_result(
                 account, account.id, 'success'
             )
-            return super().on_host_success(host, result)
+            return BasePlaybookManager.on_host_success(self, host, result)
         try:
             account.set_connectivity(Connectivity.OK)
         except Exception as e:
-            super().on_host_error(host, str(e), result)
+            BasePlaybookManager.on_host_error(self, host, str(e), result)
             return
-        super().on_host_success(host, result)
+        BasePlaybookManager.on_host_success(self, host, result)
 
     def on_host_error(self, host, error, result):
-        super().on_host_error(host, error, result)
+        BasePlaybookManager.on_host_error(self, host, error, result)
         record = self.host_record_mapper.get(host)
         if record:
             self.save_verification_result(

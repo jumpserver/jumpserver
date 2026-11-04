@@ -1,0 +1,9 @@
+{% for account in accounts %}
+    {% firstof account.asset_name account.asset '-' as asset_name %}
+    <tr>
+        <td>{% include 'automations/asset_label.html' with asset_name=asset_name asset_address=account.asset_address asset_id=account.asset_id %}</td>
+        <td>{{ account.username|default:'-' }}</td>
+        <td><span class="status {{ tone }}">{{ label }}</span></td>
+        {% if has_errors %}<td class="error-detail">{% include 'automations/error_message.html' with error=account.error %}</td>{% endif %}
+    </tr>
+{% endfor %}

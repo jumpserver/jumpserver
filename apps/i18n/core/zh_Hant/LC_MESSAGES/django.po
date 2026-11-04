@@ -17905,3 +17905,27 @@ msgstr "資產申請範圍"
 #: settings/serializers/feature.py
 msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
 msgstr "設定使用者申請資產授權時可在工單中選擇的資產範圍。<br><b>所有資產：</b>可選擇工單所屬組織內的全部資產，無須事先取得授權。<br><b>授權的資產：</b>可選擇本人或所屬使用者群組的授權規則中包含的資產，包括規則已停用、已過期或尚未生效的情況。<br><b>有效授權的資產：</b>僅可選擇本人或所屬使用者群組的有效授權規則中包含的資產。規則須已啟用、已到開始時間且未到結束時間。"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Unsupported"
+msgstr "不支援"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Execution results"
+msgstr "執行結果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "No execution results"
+msgstr "暫無執行結果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Asset / Account"
+msgstr "資產 / 帳號"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No execution details"
+msgstr "暫無執行明細"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No account changes"
+msgstr "暫無帳號變化"

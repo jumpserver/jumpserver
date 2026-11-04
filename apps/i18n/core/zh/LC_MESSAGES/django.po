@@ -18979,3 +18979,41 @@ msgstr "资产申请范围"
 #: settings/serializers/feature.py
 msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
 msgstr "设置用户申请资产授权时可在工单中选择的资产范围。<br><b>所有资产：</b>可选择工单所属组织内的全部资产，无需事先获得授权。<br><b>授权的资产：</b>可选择本人或所属用户组的授权规则中包含的资产，包括规则已停用、已过期或尚未生效的情况。<br><b>有效授权的资产：</b>仅可选择本人或所属用户组的有效授权规则中包含的资产。规则须已启用、已到开始时间且未到结束时间。"
+
+msgid "Can view verify account execution"
+msgstr "可以查看账号连接性测试执行记录"
+
+msgid "Can add verify account execution"
+msgstr "可以执行账号连接性测试"
+
+msgid "Can view asset connectivity execution"
+msgstr "可以查看资产连接性测试执行记录"
+
+msgid "Can add asset connectivity execution"
+msgstr "可以执行资产连接性测试"
+
+msgid "Account usernames. Leave empty to test all active accounts on the selected assets."
+msgstr "账号用户名。留空表示测试所选资产上的所有启用账号。"
+
+msgid "Asset / Account"
+msgstr "资产 / 账号"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Unsupported"
+msgstr "不支持"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Execution results"
+msgstr "执行结果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "No execution results"
+msgstr "暂无执行结果"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No execution details"
+msgstr "暂无执行明细"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No account changes"
+msgstr "暂无账号变化"

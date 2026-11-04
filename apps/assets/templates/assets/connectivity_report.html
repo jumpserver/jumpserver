@@ -1,0 +1,41 @@
+{% extends 'automations/base_report.html' %}
+{% load i18n %}
+
+{% block report_type %}{% if execution.type == 'verify_account' %}{% trans 'Account' %}{% else %}{% trans 'Asset' %}{% endif %}{% endblock %}
+
+{% block report_body %}
+    <section class="summary" aria-label="{% trans 'Result' %}">
+        <div class="metric"><span class="metric-label">{% trans 'Success' %}</span><strong class="metric-value success">{{ summary.ok_assets|default:0 }}</strong></div>
+        <div class="metric"><span class="metric-label">{% trans 'Failed' %}</span><strong class="metric-value failed">{{ summary.fail_assets|default:0 }}</strong></div>
+        <div class="metric"><span class="metric-label">{% trans 'Unsupported' %}</span><strong class="metric-value unsupported">{{ summary.error_assets|default:0 }}</strong></div>
+    </section>
+
+    <section>
+        <h2>{% trans 'Execution results' %}<span class="result-count">{{ report_rows|length }}</span></h2>
+        <table>
+            <colgroup>
+                <col{% if has_errors %} class="target-with-error"{% endif %}>
+                <col class="status-column">
+                {% if has_errors %}<col>{% endif %}
+            </colgroup>
+            <thead>
+                <tr>
+                    <th scope="col">{% if execution.type == 'verify_account' %}{% trans 'Asset / Account' %}{% else %}{% trans 'Asset' %}{% endif %}</th>
+                    <th scope="col">{% trans 'Status' %}</th>
+                    {% if has_errors %}<th scope="col">{% trans 'Error' %}</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report_rows %}
+                    <tr>
+                        <td>{% include 'automations/asset_label.html' with asset_name=row.target asset_address=row.asset_address asset_id=row.asset_id %}</td>
+                        <td><span class="status {{ row.status }}">{{ row.status_label }}</span></td>
+                        {% if has_errors %}<td class="error-detail">{% include 'automations/error_message.html' with error=row.error %}</td>{% endif %}
+                    </tr>
+                {% empty %}
+                    <tr><td class="empty" colspan="{% if has_errors %}3{% else %}2{% endif %}">{% trans 'No execution results' %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}
