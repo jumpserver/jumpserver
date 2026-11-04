@@ -124,7 +124,7 @@ class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
 
 
 class UserLockPasswordApi(BaseUserPasswordSettingsApi):
-    serializer_class = serializers.ClientLockPasswordSerializer
+    serializer_class = serializers.UserLockPasswordSerializer
 
     def get_lock_data(self, data):
         return data

@@ -213,7 +213,7 @@ class UserPermsSerializer(serializers.Serializer):
         pass
 
 
-class ClientLockPasswordSerializer(serializers.Serializer):
+class UserLockPasswordSerializer(serializers.Serializer):
     clear = serializers.BooleanField(write_only=True, required=False, default=False)
     has_password = serializers.SerializerMethodField(label=_('Configured'))
     password = EncryptedField(required=False, allow_blank=True, max_length=128,
