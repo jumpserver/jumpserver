@@ -14,6 +14,29 @@ Asset credentials and internal execution capabilities are never returned to the
 PC client. Koko's `docs/agent-mcp.md` covers deployment forwarding, client setup,
 tools, execution semantics and file streaming.
 
+## One-sentence client setup
+
+Personal Settings > Agent / MCP > Connection Guide provides a **Copy for agent**
+instruction for Codex and DSH alongside the manual Codex commands. The instruction
+supplies this site's `/core/auth/agent/install.md` guide URL and the exact MCP URL
+already available to the signed-in user.
+
+The guide is public, read-only Markdown. It contains generic setup steps, not
+instance settings, user/client lists or credentials; request parameters and Host
+headers do not populate its content. It adds no OAuth, execution or audit rights.
+Codex uses its native MCP management and OAuth commands. DSH's plugin provides
+`jumpserver-mcp setup --url` (or `node` with its installed `lib/cli.js`), reusing
+the same state store, client registration and OAuth flow as its existing page.
+Neither path replaces conflicting or disabled connections automatically.
+
+An agent needs access to the guide and the current client host's configuration.
+The user completes browser login, consent and MFA; remote loopback callbacks may
+require forwarding, and a running client/profile may require reloading. Setup
+checks connection and tool discovery without operating on assets. The guide is
+read only during setup, not injected into every chat, and the ten-tool catalog
+and existing permission/audit boundaries remain unchanged. No schema migration
+is required.
+
 ## Configuration
 
 Deploy the Core feature and apply normal database migrations before enabling

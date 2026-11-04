@@ -8,7 +8,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from django.conf import settings
 from django.core.cache import cache
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
 from django.utils.translation import override
 from oauth2_provider.models import get_application_model, get_access_token_model, get_grant_model, get_refresh_token_model
@@ -22,6 +22,29 @@ from orgs.utils import tmp_to_org
 from terminal import agent_service as service
 from terminal.models import AgentApplication, AgentOAuthBinding, AgentSession, Terminal
 from users.models import User
+
+
+class AgentInstallGuideTests(SimpleTestCase):
+    def test_public_guide_is_read_only_and_contains_no_instance_or_user_data(self):
+        from django.contrib.auth.models import AnonymousUser
+        from django.urls import resolve, reverse
+
+        url = reverse('authentication:agent-install')
+        view = resolve(url).func
+        request = RequestFactory().get(url, {'access_token': 'private-request-token'}, HTTP_HOST='untrusted.example')
+        request.user = AnonymousUser()
+        with self.settings(MCP_PUBLIC_URL='https://private.example/koko/mcp', SITE_URL='https://private.example'):
+            response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/markdown; charset=utf-8')
+        self.assertEqual(response['Cache-Control'], 'no-store')
+        self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
+        for value in ('private.example', 'untrusted.example', 'private-request-token'):
+            self.assertNotContains(response, value)
+        self.assertContains(response, 'codex mcp login jumpserver --scopes agent:access')
+        self.assertContains(response, 'jumpserver-mcp setup --url')
+        self.assertFalse(getattr(view, 'login_required', True))
+        self.assertEqual(view(RequestFactory().post(url)).status_code, 405)
 
 
 class AgentOAuthOrganizationTests(TestCase):
@@ -81,6 +104,14 @@ class AgentOAuthOrganizationTests(TestCase):
         response = self.exchange(self.code())
         self.assertEqual(response.status_code, 200, response.content)
         return json.loads(response.content)
+
+    def test_install_guide_is_accessible_without_a_logged_in_browser(self):
+        from django.urls import reverse
+
+        response = self.client.get(reverse('authentication:agent-install'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response['Content-Type'].startswith('text/markdown'))
+        self.assertNotContains(response, self.user.username)
 
     def introspect(self, result, **extra):
         return service.introspect(self.node, {

@@ -1,17 +1,32 @@
-"""Owner-only human controls for active Agent sessions."""
+"""Public setup guide and owner-only human controls for Agent sessions."""
 import uuid
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
 from django.views import View
+from oauth2_provider.compat import login_not_required
 from rest_framework.exceptions import APIException
 
 from authentication.services.connection_acl import acl_state, advance_acl
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from terminal import agent_service as service
 from terminal.models import AgentSession
+
+
+@method_decorator(login_not_required, name='dispatch')
+class AgentInstallView(View):
+    http_method_names = ['get', 'head', 'options']
+
+    def get(self, request):
+        # This public guide must not depend on user, organization or site settings.
+        return HttpResponse(render_to_string('terminal/agent_install.md'),
+            content_type='text/markdown; charset=utf-8', headers={
+                'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
+            })
 
 
 class AgentSessionView(LoginRequiredMixin, View):
