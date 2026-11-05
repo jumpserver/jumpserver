@@ -25,7 +25,7 @@ def extract_object_name(exc, index=0):
     if exc.args:
         (msg, *others) = exc.args
     else:
-        return gettext('Object')
+        return ''
     return gettext(msg.split(sep=' ', maxsplit=index + 1)[index])
 
 

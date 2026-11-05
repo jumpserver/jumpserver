@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -50,11 +51,19 @@ class ContentTypeViewSet(JMSModelViewSet):
         return self.get_paginated_response_from_queryset(queryset)
 
 
+@extend_schema_view(
+    destroy=extend_schema(
+        summary=_('Remove a tag from a resource'),
+        description=_('Remove the tag binding and preserve the resource and tag.'),
+        responses={204: None},
+    ),
+)
 class LabelContentTypeResourceViewSet(JMSModelViewSet):
     serializer_class = serializers.ContentTypeResourceSerializer
     rbac_perms = {
         'default': 'labels.view_labeledresource',
         'update': 'labels.change_labeledresource',
+        'destroy': 'labels.delete_labeledresource',
     }
     ordering_fields = ('res_type', 'date_created')
 
@@ -81,6 +90,15 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
         if keyword:
             queryset = content_type.filter_queryset(queryset, keyword)
         return queryset
+
+    def perform_destroy(self, instance):
+        binding = get_object_or_404(
+            LabeledResource,
+            label_id=self.kwargs['label'],
+            res_type_id=self.kwargs['res_type'],
+            res_id=str(instance.pk),
+        )
+        binding.delete()
 
     @staticmethod
     def validate_res_ids(content_type: ContentType, res_ids: list):

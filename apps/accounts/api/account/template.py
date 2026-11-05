@@ -82,3 +82,8 @@ class AccountTemplateSecretsViewSet(AccountRecordViewLogMixin, AccountTemplateVi
         'list': 'accounts.view_accounttemplatesecret',
         'retrieve': 'accounts.view_accounttemplatesecret',
     }
+
+    @classmethod
+    def get_extra_actions(cls):
+        # Secret endpoints expose list/retrieve, not the template management actions.
+        return []
