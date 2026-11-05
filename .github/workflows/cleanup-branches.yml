@@ -13,13 +13,18 @@ on:
         default: 'true'
         type: boolean
 
+permissions:
+  # The job deletes merged pr branches with git push and reads their pull requests with gh.
+  contents: write
+  pull-requests: read
+
 jobs:
   cleanup-branches:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.4.0
       with:
         fetch-depth: 0  # 获取所有分支和提交历史
         

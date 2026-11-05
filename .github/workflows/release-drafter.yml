@@ -17,7 +17,9 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.8.0
+        with:
+          persist-credentials: false
       - name: Get version
         id: get_version
         run: |
@@ -29,7 +31,7 @@ jobs:
           echo "::set-output name=VERSION::$VERSION"
       - name: Create Release
         id: create_release
-        uses: release-drafter/release-drafter@09c613e259eb8d4e7c81c2cb00618eb5fc4575a7 # v5
+        uses: release-drafter/release-drafter@v5.25.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -38,21 +40,20 @@ jobs:
           tag: ${{ steps.get_version.outputs.TAG }}
       - name: Upload Quick Start Script
         id: upload-release-quick-start-shell
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./quick_start.sh
-          asset_name: quick_start.sh
-          asset_content_type: application/text
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.get_version.outputs.TAG }}
+        # gh ships on the runner and finds the draft release by its tag.
+        run: gh release upload "$TAG" ./quick_start.sh --clobber
 
   build-and-release:
     needs: create-realese
     name: Build and Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.8.0
+        with:
+          persist-credentials: false
       - name: Build it and upload
         uses: jumpserver/action-build-upload-assets@master
         env:

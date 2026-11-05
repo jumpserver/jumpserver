@@ -18,6 +18,11 @@ on:
         type: string
         default: 'linux/amd64'
 
+permissions:
+  contents: read
+  # The lock steps post a commit status with GITHUB_TOKEN.
+  statuses: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -31,18 +36,19 @@ jobs:
           "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
         with:
+          persist-credentials: false
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v3.7.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3.12.0
 
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v2.2.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -68,7 +74,7 @@ jobs:
             -c utils/ansible_executor/context
 
       - name: Build and push multi-arch image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v6.19.2
         with:
           platforms: ${{ github.event_name == 'workflow_dispatch' && inputs.platforms || 'linux/amd64,linux/arm64' }}
           push: true
