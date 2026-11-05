@@ -21,7 +21,8 @@ from common.permissions import IsServiceAccount
 from terminal.const import TerminalType
 
 from chat_ai.models import RuntimeStore, RuntimeStoreRecord
-from chat_ai.audit import AuditProjectionInput, apply_audit_projection
+from chat_ai.audit import apply_audit_projection
+from chat_ai.serializers import AuditProjectionInput
 
 
 RUNTIME_STORE_KEY = 'default'
