@@ -254,8 +254,9 @@ class SecuritySessionSerializer(serializers.Serializer):
         min_value=0, max_value=99999, required=False,
         label=_('Client idle screen lock (minute)'),
         help_text=_(
-            '0 disables automatic locking. Each account in use locks after its configured idle time. '
-            'Enter that account\'s lock password in any of its windows to unlock. External application windows are not protected.'
+            '0 disables automatic locking. Locks after the idle timeout. Switching accounts does not reset '
+            'the previous account’s idle time. Enter the lock password to unlock. '
+            'External application windows are not protected.'
         ),
     )
     SECURITY_WEB_IDLE_LOCK_TIME = serializers.IntegerField(
