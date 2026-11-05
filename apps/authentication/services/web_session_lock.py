@@ -3,6 +3,7 @@ from django.utils.crypto import salted_hmac
 from rest_framework.exceptions import PermissionDenied
 
 from audits.models import UserSession
+from common.sessions import closed_pages_locked
 
 
 def session_scope(session_key):
@@ -14,7 +15,19 @@ def lock_cache_key(session_key):
     return 'web-session-lock:' + session_scope(session_key)
 
 
-def session_locked(session_key, user_id):
+def clear_web_session_cache(session_key):
+    if not session_key:
+        return
+    cache.delete_many([
+        lock_cache_key(session_key),
+        'web-session-renewal:' + salted_hmac('session-renewal', session_key).hexdigest(),
+    ])
+
+
+def session_locked(session_key, user_id, policy):
+    # The stored deadline also applies with no page open; no timer or cache write is needed.
+    if closed_pages_locked(policy):
+        return True
     key = lock_cache_key(session_key)
     locked = cache.get(key)
     if locked is None:

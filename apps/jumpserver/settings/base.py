@@ -177,7 +177,7 @@ MIDDLEWARE = [
     'jumpserver.middleware.StartMiddleware',
     *PRE_CUSTOM_MIDDLEWARES,
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'common.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -197,6 +197,7 @@ MIDDLEWARE = [
     'authentication.backends.cas.middleware.CASMiddleware',
     'authentication.middleware.MFAMiddleware',
     'authentication.middleware.ThirdPartyLoginMiddleware',
+    'authentication.middleware.WebSessionLockMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
     'authentication.client_session_middleware.ClientLoginSessionExpiryMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
@@ -259,7 +260,8 @@ CSRF_COOKIE_NAME = '{}csrftoken'.format(SESSION_COOKIE_NAME_PREFIX)
 SESSION_COOKIE_NAME = '{}sessionid'.format(SESSION_COOKIE_NAME_PREFIX)
 
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
-SESSION_SAVE_EVERY_REQUEST = CONFIG.SESSION_SAVE_EVERY_REQUEST
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_RENEW_ON_REQUEST = CONFIG.convert_type('SESSION_RENEW_ON_REQUEST', CONFIG.SESSION_RENEW_ON_REQUEST)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE
 VIEW_ASSET_ONLINE_SESSION_INFO = CONFIG.VIEW_ASSET_ONLINE_SESSION_INFO
 SESSION_ENGINE = "common.sessions.{}".format(CONFIG.SESSION_ENGINE)

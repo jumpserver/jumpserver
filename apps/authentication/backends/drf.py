@@ -147,9 +147,12 @@ class OAuth2Authentication(BaseOAuth2Authentication):
                 raise
             session = request.client_login_session
             # Identity-only bootstrap is needed to restore a locked account; asset/business APIs remain blocked.
-            bootstrap = request.method == 'GET' and request.path_info in (
-                '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
-                '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+            bootstrap = (
+                request.headers.get('X-JMS-Check-Session-Lock') != '1' and request.method == 'GET'
+                and request.path_info in (
+                    '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+                    '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+                )
             )
             if session and session.is_locked and not (self.allow_locked_client_session or bootstrap):
                 raise ClientSessionLocked(session)
@@ -179,14 +182,17 @@ class SessionAuthentication(authentication.SessionAuthentication):
             except exceptions.AuthenticationFailed:
                 return None
 
-        bootstrap = request.method == 'GET' and request.path_info in (
-            '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
-            '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
-        ) or (request.path_info == '/api/v1/authentication/user-session/'
-              and request.method in ('GET', 'DELETE'))
+        # Components use strict profile checks; only UI identity bootstrap may bypass the lock.
+        bootstrap = (
+            request.headers.get('X-JMS-Check-Session-Lock') != '1' and request.method == 'GET'
+            and request.path_info in (
+                '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+                '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+            )
+        )
         if not self.allow_locked_web_session and not bootstrap:
             from authentication.services.web_session_lock import session_locked, WebSessionLocked
-            if session_locked(request.session.session_key, user.pk):
+            if session_locked(request.session.session_key, user.pk, request.session.login_policy):
                 raise WebSessionLocked()
         return user, None
 

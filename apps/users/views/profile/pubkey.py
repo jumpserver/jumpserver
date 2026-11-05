@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views import View
 
 from authentication.serializers import SSHKeySerializer
+from authentication.services.web_session_lock import session_locked, WebSessionLocked
 from common.permissions import IsValidUser
 from common.utils import get_logger, ssh_key_gen
 from common.views.mixins import PermissionsMixin
@@ -19,6 +20,9 @@ class UserPublicKeyGenerateView(PermissionsMixin, View):
     permission_classes = [IsValidUser]
 
     def get(self, request, *args, **kwargs):
+        if session_locked(request.session.session_key, request.user.pk, request.session.login_policy):
+            error = WebSessionLocked()
+            return JsonResponse(error.detail, status=error.status_code)
         username = request.user.username
         serializer = SSHKeySerializer(data=request.GET, context={'request': request})
         if not serializer.is_valid():

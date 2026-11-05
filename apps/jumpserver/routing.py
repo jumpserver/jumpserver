@@ -118,18 +118,36 @@ def websocket_session_allowed(scope):
         from authentication.services.client_login_session import validate_session
         return validate_session(session_id, allow_locked=False)
     session = scope.get('session')
-    if session is None or not session.session_key or not session.exists(session.session_key):
+    if session is None or not session.session_key:
+        return False
+    # Reload instead of trusting the identity cached when the socket connected.
+    data = session.load()
+    session._session_cache = data
+    if data.get('_auth_user_id') != str(user.pk):
+        return False
+    if any(data.get(name) for name in ('auth_mfa_required', 'auth_third_party_required', 'auth_confirm_required')):
         return False
     from common.sessions import session_expiry
     expires_at = session_expiry(session.session_key)
     if expires_at is not None and timezone.now() >= expires_at:
         return False
+    return True
+
+
+@database_sync_to_async
+def websocket_screen_locked(scope):
+    if scope.get('header_authenticated'):
+        return False
+    user = scope.get('user')
+    session = scope.get('session')
+    if user is None or not user.is_authenticated or session is None or not session.session_key:
+        return False
     from authentication.services.web_session_lock import session_locked
-    return not session_locked(session.session_key, user.pk)
+    return session_locked(session.session_key, user.pk, session.login_policy)
 
 
 class WsSessionSecurityMiddleware:
-    """Enforce current lock/revocation/deadline state throughout a socket's life."""
+    """Keep locked Web sockets connected, but reject input until unlocked."""
 
     def __init__(self, app):
         self.app = app
@@ -151,10 +169,15 @@ class WsSessionSecurityMiddleware:
             return False
 
         async def receive_checked():
-            event = await receive()
-            if event['type'] == 'websocket.receive' and not await check_session():
-                return {'type': 'websocket.disconnect', 'code': 1008}
-            return event
+            while True:
+                event = await receive()
+                if event['type'] != 'websocket.receive':
+                    return event
+                if not await check_session():
+                    return {'type': 'websocket.disconnect', 'code': 1008}
+                if not await websocket_screen_locked(scope):
+                    return event
+                # Do not replay commands entered while locked after unlocking.
 
         async def send_checked(event):
             if closed:

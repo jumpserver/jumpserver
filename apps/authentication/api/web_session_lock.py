@@ -1,3 +1,6 @@
+import re
+from datetime import datetime, timezone as datetime_timezone
+
 from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import check_password
@@ -35,7 +38,7 @@ class WebUnlockSerializer(serializers.Serializer):
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
-class WebSessionLockStatusView(APIView):
+class WebSessionStatusView(APIView):
     authentication_classes = (WebSessionControlAuthentication,)
     permission_classes = (IsValidUser,)
 
@@ -51,11 +54,22 @@ class WebSessionLockStatusView(APIView):
     def get(self, request):
         key = request.session.session_key
         session = UserSession.objects.filter(key=key, user=request.user).first()
-        expires = session_expiry(key)
+        page_id = request.headers.get('X-JMS-Page-ID')
+        if page_id is not None:
+            if not re.fullmatch(r'[a-zA-Z0-9-]{1,128}', page_id):
+                raise serializers.ValidationError({'page_id': 'Invalid page ID.'})
+            request.session.update_page(page_id, entering=True)
+        expires = request.session.get_expiry_date() if request.session.login_policy else session_expiry(key)
         idle_limit = idle_lock_limits(use_cache=True)['web_idle_lock_time']
+        policy = request.session.login_policy
+        maximum = (datetime.fromtimestamp(policy['expires_at'], tz=datetime_timezone.utc)
+                   if policy and not policy['renew'] else None)
+        authenticated_at = session.date_created if session else None
+        if policy and policy.get('authenticated_at'):
+            authenticated_at = datetime.fromtimestamp(policy['authenticated_at'], tz=datetime_timezone.utc)
         return Response({
             'scope': session_scope(key),
-            'locked': session_locked(key, request.user.pk),
+            'locked': session_locked(key, request.user.pk, policy),
             'has_password': Preference.objects.filter(user=request.user, category='client', name='client_lock_password_hash').exists(),
             'attempts_remaining': max(0, MAX_LOCK_PASSWORD_FAILURES - (session.lock_password_failures if session else 0)),
             'idle_lock_time': effective_idle_lock_time(
@@ -63,18 +77,18 @@ class WebSessionLockStatusView(APIView):
                 personal_idle_lock_time(request.user.pk, 'web_idle_lock_time'),
             ),
             'idle_lock_time_limit': idle_limit,
-            'authenticated_at': session.date_created.isoformat() if session and session.date_created else None,
+            'authenticated_at': authenticated_at.isoformat() if authenticated_at else None,
             'expires_at': expires.isoformat() if expires else None,
-            'max_expires_at': None,
-            'session_timeout': settings.SESSION_COOKIE_AGE,
-            'sliding_expiry': settings.SESSION_SAVE_EVERY_REQUEST,
+            'max_expires_at': maximum.isoformat() if maximum else None,
+            'session_timeout': policy['duration'] if policy else settings.SESSION_COOKIE_AGE,
+            'sliding_expiry': policy['renew'] if policy else settings.SESSION_RENEW_ON_REQUEST,
             'expire_at_browser_close': request.session.get_expire_at_browser_close(),
             'server_time': timezone.now().isoformat(),
             'user': {'id': str(request.user.pk), 'name': request.user.name, 'username': request.user.username},
         }, headers={'Cache-Control': 'no-store'})
 
 
-class WebSessionLockView(WebSessionLockStatusView):
+class WebSessionLockView(WebSessionStatusView):
     http_method_names = ('post', 'options')
 
     def post(self, request):
@@ -89,7 +103,7 @@ class WebSessionLockView(WebSessionLockStatusView):
 
 
 @method_decorator(sensitive_post_parameters('password'), name='dispatch')
-class WebSessionUnlockView(WebSessionLockStatusView):
+class WebSessionUnlockView(WebSessionStatusView):
     http_method_names = ('post', 'options')
 
     def post(self, request):
@@ -107,7 +121,6 @@ class WebSessionUnlockView(WebSessionLockStatusView):
             failures = record_lock_password_failure(record)
             if failures >= MAX_LOCK_PASSWORD_FAILURES:
                 logout(request)
-                cache.delete(lock_cache_key(key))
                 return Response({'code': LOCK_PASSWORD_LOGOUT_CODE, 'logout_after': 5,
                                  'detail': _('Too many incorrect screen lock passwords. This session has been signed out.')}, status=400)
             return Response({'code': 'invalid_lock_password',
@@ -116,14 +129,5 @@ class WebSessionUnlockView(WebSessionLockStatusView):
         with transaction.atomic():
             UserSession.objects.filter(key=key, user=request.user).update(is_locked=False, lock_password_failures=0)
             transaction.on_commit(lambda: cache.set(lock_cache_key(key), False, timeout=60))
+        request.session.clear_close_lock()
         return self.get(request)
-
-
-class WebSessionLockLogoutView(WebSessionLockStatusView):
-    http_method_names = ('post', 'options')
-
-    def post(self, request):
-        key = request.session.session_key
-        logout(request)
-        cache.delete(lock_cache_key(key))
-        return Response({'login_url': str(settings.LOGIN_URL)})
