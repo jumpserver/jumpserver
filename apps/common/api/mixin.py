@@ -6,8 +6,10 @@ from itertools import chain
 from typing import Callable
 
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.signals import m2m_changed
+from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -100,10 +102,20 @@ class QuerySetMixin:
     slug_field = 'name'
 
     def get_object(self):
-        pk = self.kwargs.get(self.lookup_field)
-        if not pk or is_uuid(pk) or pk.isdigit():
+        pk = self.kwargs.get(self.lookup_url_kwarg or self.lookup_field)
+        if not pk or is_uuid(pk) or str(pk).isdigit():
             return super().get_object()
-        return self.get_queryset().get(**{self.slug_field: pk})
+
+        queryset = self.get_queryset()
+        try:
+            queryset.model._meta.get_field(self.slug_field)
+        except FieldDoesNotExist:
+            return super().get_object()
+
+        queryset = self.filter_queryset(queryset)
+        obj = get_object_or_404(queryset, **{self.slug_field: pk})
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def limit_queryset_if_no_page(self, queryset):
         if self.request.query_params.get('format') in ['csv', 'xlsx']:
@@ -170,7 +182,7 @@ class QuerySetMixin:
             return page
 
         serializer_class = self.get_serializer_class()
-        if page and serializer_class:
+        if page and serializer_class and isinstance(page[0], models.Model):
             # 必须要返回 ids，用于排序
             queryset, ids = self._get_page_again(page, model)
             page = self.setup_eager_loading(queryset, is_paginated=True)
