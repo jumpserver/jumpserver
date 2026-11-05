@@ -42,6 +42,7 @@ class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
         user = self.get_object()
         user.public_key = None
         user.save()
+        user.ssh_keys.update(is_active=False)
         ResetSSHKeyMsg(user).publish_async()
 
 
