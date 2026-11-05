@@ -49,7 +49,7 @@ Kael 在签名的 Runtime Store `record` JSON envelope 中添加可选的 `audit
 生成重复审计数据。终端本地历史或运行时会话的删除不会级联删除 Core 审计记录；升级前已经被清理的
 历史无法通过补录恢复。历史核对会增加 Kael 启动耗时，取决于保留的数据量。
 
-升级顺序：先部署 Core 并执行数据库迁移（包括审计表和 `chat_ai.0003_audit_conversation_permissions`），
+升级顺序：先部署 Core 并执行 `chat_ai.0002_conversation_audit` 迁移，创建审计表和查看权限，
 再部署 Kael 完成补录，最后更新 Lina。新 Kael 要求写入响应包含 `audit_version: 1`，
 防止连接到不支持审计写入的旧 Core。
 写入复用既有提交 ID、revision 校验和有限重试；Core 无法确认持久化时，Kael 不会把该事务作为成功

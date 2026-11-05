@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Chat AI conversation audit',
                 'ordering': ('-date_updated', '-id'),
-                'default_permissions': (),
+                'default_permissions': ('view',),
                 'indexes': [models.Index(fields=['org_id', '-date_updated'], name='chat_ai_audit_org_updated_idx')],
                 'constraints': [],
             },
