@@ -22,6 +22,13 @@ def closed_pages_locked(policy):
     return bool(policy and policy.get('close_lock_at', float('inf')) <= timezone.now().timestamp())
 
 
+def _session_lock(session_key):
+    return DistributedLock(
+        'web-session-save:' + salted_hmac('session-save', session_key).hexdigest(),
+        expire=10,
+    )
+
+
 def web_login_policy():
     # Read once at login so a worker's settings subscription cannot lag behind a save.
     from settings.models import Setting
@@ -124,22 +131,19 @@ class SessionSaveMixin:
     async def aget_expire_at_browser_close(self):
         return await sync_to_async(self.get_expire_at_browser_close)()
 
-    def save(self, *args, **kwargs):
+    def save(self, must_create=False):
         self.ensure_login_policy()
-        existing_login = self.login_policy and self.session_key and not kwargs.get('must_create')
-        lock = nullcontext()
-        if existing_login:
-            lock = DistributedLock(
-                'web-session-save:' + salted_hmac('session-save', self.session_key).hexdigest(),
-                expire=10,
-            )
+        key = self.session_key
+        existing_session = key and not must_create
+        lock = _session_lock(key) if existing_session else nullcontext()
         with lock:
-            if existing_login:
-                # Serialize page membership and ordinary session writes, for either Session backend.
+            if existing_session:
+                # Saves and deletion share the lock so a pending write cannot undo logout.
                 stored = super().load().get(LOGIN_POLICY_KEY)
                 if self.session_key is None:
+                    self._session_key = key
                     raise UpdateError('The login has expired.')
-                if stored and not getattr(self, '_new_login_policy', False):
+                if stored and self.login_policy and not getattr(self, '_new_login_policy', False):
                     policy = dict(self.login_policy)
                     if stored['renewed_at'] > policy['renewed_at']:
                         policy.update(renewed_at=stored['renewed_at'], expires_at=stored['expires_at'])
@@ -174,7 +178,7 @@ class SessionSaveMixin:
                 # A leased presence registry is the upgrade path if crash detection is required.
                 policy.update(pages=sorted(pages), closed_pages=closed[-128:])
                 self._session_cache[LOGIN_POLICY_KEY] = policy
-            result = super().save(*args, **kwargs)
+            result = super().save(must_create=must_create)
             self._new_login_policy = False
             self._page_action = None
             self._clear_close_lock = False
@@ -182,6 +186,16 @@ class SessionSaveMixin:
 
     async def asave(self, *args, **kwargs):
         return await sync_to_async(self.save)(*args, **kwargs)
+
+    def delete(self, session_key=None):
+        key = self.session_key if session_key is None else session_key
+        if key is None:
+            return
+        with _session_lock(key):
+            return super().delete(key)
+
+    async def adelete(self, session_key=None):
+        return await sync_to_async(self.delete)(session_key)
 
 
 def session_expiry(session_key):

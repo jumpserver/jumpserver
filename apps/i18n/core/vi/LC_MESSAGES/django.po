@@ -18263,13 +18263,14 @@ msgstr ""
 
 #: apps/settings/serializers/security.py
 msgid ""
-"0 disables automatic locking. Locks after the specified idle time. Enter the"
-" lock password in the main window to unlock. External application windows "
-"are not protected."
+"0 disables automatic locking. Each account in use locks after its configured"
+" idle time. Enter that account's lock password in any of its windows to "
+"unlock. External application windows are not protected."
 msgstr ""
-"0 tắt khóa tự động. Tự khóa khi hết thời gian nhàn rỗi đã đặt. Nhập mật khẩu"
-" khóa tại cửa sổ chính để mở khóa. Cửa sổ ứng dụng bên ngoài không được bảo "
-"vệ."
+"0 tắt tự động khóa. Mỗi tài khoản đang sử dụng sẽ bị khóa sau thời gian "
+"không hoạt động đã cấu hình riêng. Nhập mật khẩu khóa của tài khoản đó trong"
+" bất kỳ cửa sổ nào của tài khoản để mở khóa. Cửa sổ ứng dụng bên ngoài không"
+" được bảo vệ."
 
 #: settings/serializers/feature.py
 msgid "Asset application scope"

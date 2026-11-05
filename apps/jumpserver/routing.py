@@ -5,8 +5,10 @@ from channels.security.websocket import WebsocketDenier
 from django.core.asgi import get_asgi_application
 from django.core.handlers.asgi import ASGIRequest
 from django.conf import settings
+from django.contrib.auth import get_user, get_user_model
 from django.utils.module_loading import import_string
 from django.utils import timezone
+from types import SimpleNamespace
 
 from authentication.backends.drf import (
     SignatureAuthentication,
@@ -109,9 +111,12 @@ def websocket_session_allowed(scope):
     user = scope.get('user')
     if user is None or not user.is_authenticated:
         return True  # The routed consumer retains its own authentication policy.
-    if not user.is_valid:
-        return False
     if scope.get('header_authenticated'):
+        # A long-lived connection must not retain an account that has been disabled.
+        current_user = get_user_model().objects.filter(pk=user.pk).first()
+        if current_user is None or not current_user.is_valid:
+            return False
+        scope['user'] = current_user
         session_id = scope.get('client_login_session_id')
         if session_id is None:
             return True
@@ -125,6 +130,11 @@ def websocket_session_allowed(scope):
     session._session_cache = data
     if data.get('_auth_user_id') != str(user.pk):
         return False
+    # Reuse HTTP authentication: reload the user and verify the current password hash.
+    current_user = get_user(SimpleNamespace(session=session))
+    if not current_user.is_authenticated or not current_user.is_valid or current_user.pk != user.pk:
+        return False
+    scope['user'] = current_user
     if any(data.get(name) for name in ('auth_mfa_required', 'auth_third_party_required', 'auth_confirm_required')):
         return False
     from common.sessions import session_expiry

@@ -16,8 +16,13 @@ class SessionMiddleware(DjangoSessionMiddleware):
             policy = session.login_policy
             timestamp = timezone.now().timestamp()
             if policy and session.get_expiry_date() <= timezone.now():
-                session.flush()
-            elif (
+                # Another request may have renewed the login or cancelled its close deadline.
+                policy = session.load().get(LOGIN_POLICY_KEY)
+                if policy:
+                    session._session_cache[LOGIN_POLICY_KEY] = policy
+                else:
+                    session.clear()
+            if (
                 policy and policy['renew'] and not policy.get('closing_at') and response.status_code < 400
                 and timestamp - policy['renewed_at'] >= 60
                 and not request.path_info.startswith('/api/v1/authentication/user-session/')
