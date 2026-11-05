@@ -7277,7 +7277,7 @@ msgstr "投稿サイトニュース"
 msgid ""
 "This task needs to be executed for sending internal messages for system "
 "alerts, \n"
-"        work orders, and other notifications"
+"        tickets, and other notifications"
 msgstr "システムの警告やチケットなどを送信するためには、このタスクを実行します"
 
 #: ops/ansible/docker.py:116

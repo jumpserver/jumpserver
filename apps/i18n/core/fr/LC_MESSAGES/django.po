@@ -7248,7 +7248,7 @@ msgstr "Publier le message du site"
 #: notifications/notifications.py:48
 msgid ""
 "This task needs to be executed for sending internal messages for system alerts, \n"
-"        work orders, and other notifications"
+"        tickets, and other notifications"
 msgstr ""
 "Cette tâche doit être exécutée pour envoyer des messages internes pour les alertes système,\n"
 "        les tickets, et autres notifications"

@@ -5877,7 +5877,7 @@ msgstr "Reusable"
 #: authentication/models/connection_token.py:58
 #: perms/models/asset_permission.py:83
 msgid "From ticket"
-msgstr "From Work Order"
+msgstr "From Ticket"
 
 #: authentication/models/connection_token.py:60
 msgid "Face monitor token"
@@ -7300,10 +7300,10 @@ msgstr "Publish site message"
 msgid ""
 "This task needs to be executed for sending internal messages for system "
 "alerts, \n"
-"        work orders, and other notifications"
+"        tickets, and other notifications"
 msgstr ""
 "Execute this task when the system needs to send site messages for alerts, "
-"work orders, etc."
+"tickets, etc."
 
 #: ops/ansible/docker.py:116
 #, python-format
@@ -9785,7 +9785,7 @@ msgstr "Approval without login"
 
 #: settings/serializers/feature.py:214
 msgid "Allow direct approval ticket without login"
-msgstr "Allow direct approval of work orders without login"
+msgstr "Allow direct approval of tickets without login"
 
 #: settings/serializers/feature.py:218
 msgid "Period"
@@ -9794,7 +9794,7 @@ msgstr "Time period"
 #: settings/serializers/feature.py:219
 msgid ""
 "The default authorization time period when applying for assets via a ticket"
-msgstr "Default authorization time period for asset requests in work orders"
+msgstr "Default authorization time period for asset requests in tickets"
 
 #: settings/serializers/feature.py:222
 msgid "hour"
@@ -12283,7 +12283,7 @@ msgstr "Approval Level"
 
 #: tickets/models/flow.py:26
 msgid "Ticket flow approval rule"
-msgstr "Work Order Approval Info"
+msgstr "Ticket Approval Info"
 
 #: tickets/models/flow.py:56 tickets/models/ticket/general.py:318
 #: tickets/serializers/flow.py:43 tickets/serializers/flow.py:116
@@ -12294,11 +12294,11 @@ msgstr "CC users"
 #: tickets/models/flow.py:60 tickets/serializers/ticket/ticket.py:39
 #: tickets/serializers/ticket/ticket.py:87
 msgid "Ticket flow"
-msgstr "Work Order Process"
+msgstr "Ticket Process"
 
 #: tickets/models/relation.py:12
 msgid "Ticket session relation"
-msgstr "Work Order Session"
+msgstr "Ticket Session"
 
 #: tickets/models/ticket/apply_application.py:10
 #: tickets/models/ticket/apply_asset.py:14
@@ -12406,35 +12406,35 @@ msgstr "User Login Review Ticket"
 
 #: tickets/notifications.py:74
 msgid "Ticket basic info"
-msgstr "Work Order Basic Info"
+msgstr "Ticket Basic Info"
 
 #: tickets/notifications.py:75
 msgid "Ticket applied info"
-msgstr "Work Order Request Info"
+msgstr "Ticket Request Info"
 
 #: tickets/notifications.py:119
 msgid "You have a new ticket from {}"
-msgstr "You have a new work order from {}"
+msgstr "You have a new ticket from {}"
 
 #: tickets/notifications.py:123
 msgid "{}: New Ticket - {} ({})"
-msgstr "{}: New Work Order - {} ({})"
+msgstr "{}: New Ticket - {} ({})"
 
 #: tickets/notifications.py:171
 msgid "Your ticket has been processed, processor - {}"
-msgstr "Your work order has been processed, handler - {}"
+msgstr "Your ticket has been processed, handler - {}"
 
 #: tickets/notifications.py:175
 msgid "Ticket has processed - {} ({})"
-msgstr "Your work order has been processed, handler - {} ({})"
+msgstr "Your ticket has been processed, handler - {} ({})"
 
 #: tickets/notifications.py:197
 msgid "A ticket you are copied on has been updated"
-msgstr "A work order you are copied on has been updated"
+msgstr "A ticket you are copied on has been updated"
 
 #: tickets/notifications.py:201
 msgid "Ticket updated - {} ({})"
-msgstr "Work order updated - {} ({})"
+msgstr "Ticket updated - {} ({})"
 
 #: tickets/reporting.py:10
 msgid "Ticket Report"
@@ -12446,11 +12446,11 @@ msgstr "Tickets"
 
 #: tickets/reporting.py:18
 msgid "Closed tickets"
-msgstr "Closed Work Order Count"
+msgstr "Closed Ticket Count"
 
 #: tickets/reporting.py:19
 msgid "Pending tickets"
-msgstr "Pending Work Order Count"
+msgstr "Pending Ticket Count"
 
 #: tickets/reporting.py:20
 msgid "Approved tickets"
@@ -12458,7 +12458,7 @@ msgstr "Tickets"
 
 #: tickets/reporting.py:21
 msgid "Rejected tickets"
-msgstr "Rejected Work Order Count"
+msgstr "Rejected Ticket Count"
 
 #: tickets/reporting.py:22
 msgid "Unique applicants"
@@ -12470,15 +12470,15 @@ msgstr "Organizations"
 
 #: tickets/reporting.py:69
 msgid "Ticket Type Distribution"
-msgstr "Work Order Type Distribution"
+msgstr "Ticket Type Distribution"
 
 #: tickets/reporting.py:74
 msgid "Ticket State Distribution"
-msgstr "Work Order Approval Status Distribution"
+msgstr "Ticket Approval Status Distribution"
 
 #: tickets/reporting.py:79
 msgid "Ticket Status Distribution"
-msgstr "Work Order Status Distribution"
+msgstr "Ticket Status Distribution"
 
 #: tickets/reporting.py:84
 msgid "Organization Top 10"
@@ -12541,7 +12541,7 @@ msgstr "Request Action"
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:91
 msgid "Created by ticket ({}-{})"
-msgstr "Created via work order ({}-{})"
+msgstr "Created via ticket ({}-{})"
 
 #: tickets/serializers/ticket/common.py:84
 msgid "The expiration date should be greater than the start date"
@@ -12561,11 +12561,11 @@ msgstr "The selected workflow is unavailable"
 
 #: tickets/serializers/ticket/ticket.py:132
 msgid "Please select a ticket flow"
-msgstr "Please select work order flow"
+msgstr "Please select ticket flow"
 
 #: tickets/serializers/ticket/ticket.py:136
 msgid "The ticket flow `{}` does not exist"
-msgstr "Work order process `{}` does not exist"
+msgstr "Ticket process `{}` does not exist"
 
 #: tickets/templates/tickets/_msg_ticket.html:22
 msgid "View details"
@@ -12577,12 +12577,12 @@ msgstr "Approve Directly"
 
 #: tickets/templates/tickets/approve_check_password.html:11
 msgid "Ticket information"
-msgstr "Work Order Information"
+msgstr "Ticket Information"
 
 #: tickets/templates/tickets/approve_check_password.html:28
 #: tickets/views/approve.py:42 tickets/views/approve.py:80
 msgid "Ticket approval"
-msgstr "Work Order Approval"
+msgstr "Ticket Approval"
 
 #: tickets/templates/tickets/approve_check_password.html:43
 msgid "Approval"
@@ -12592,7 +12592,7 @@ msgstr "Approve"
 msgid ""
 "This ticket does not exist, the process has ended, or this link has expired"
 msgstr ""
-"The work order does not exist, or the workflow has ended, or this link has "
+"The ticket does not exist, or the workflow has ended, or this link has "
 "expired"
 
 #: tickets/views/approve.py:71
@@ -12602,7 +12602,7 @@ msgstr "Click the button below to approve or reject"
 #: tickets/views/approve.py:81
 msgid "After successful authentication, this ticket can be approved directly"
 msgstr ""
-"After successful authentication, the work order can be approved directly"
+"After successful authentication, the ticket can be approved directly"
 
 #: tickets/views/approve.py:105
 msgid "Illegal approval action"
@@ -12610,7 +12610,7 @@ msgstr "Invalid approval Action"
 
 #: tickets/views/approve.py:121
 msgid "This user is not authorized to approve this ticket"
-msgstr "This user is not authorized to approve this work order"
+msgstr "This user is not authorized to approve this ticket"
 
 #: users/api/preference.py:122 users/api/preference.py:128
 msgid "Invalid preference fields"

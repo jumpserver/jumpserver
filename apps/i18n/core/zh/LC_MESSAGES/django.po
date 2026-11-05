@@ -7170,7 +7170,7 @@ msgstr "发布站内消息"
 msgid ""
 "This task needs to be executed for sending internal messages for system "
 "alerts, \n"
-"        work orders, and other notifications"
+"        tickets, and other notifications"
 msgstr "系统一些告警，工单等需要发送站内信时执行该任务"
 
 #: ops/ansible/docker.py:116
