@@ -669,7 +669,15 @@ class JobExecution(JMSOrgBaseModel):
         print(f'\033[31m{message}\033[0m')
         raise Exception(message)
 
+    def is_upload_cancelled(self):
+        if self.job_type != Types.upload_file:
+            return False
+        args = Job.objects.filter(pk=self.job_id).values_list('args', flat=True).first()
+        return bool(json.loads(args or '{}').get('upload_cancelled'))
+
     def before_start(self):
+        if self.is_upload_cancelled():
+            raise Exception(_('Task canceled by user'))
         self.check_assets_perms()
         self.check_assets_acls()
 
@@ -684,6 +692,9 @@ class JobExecution(JMSOrgBaseModel):
         ssh_tunnel = SSHTunnelManager()
         ssh_tunnel.local_gateway_prepare(runner)
         try:
+            if self.job_type == Types.upload_file:
+                # Also catch cancellation while the runner is still preparing its transport.
+                kwargs['cancel_callback'] = self.is_upload_cancelled
             cb = runner.run(**kwargs)
             self.set_result(cb)
             return cb
