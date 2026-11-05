@@ -13197,8 +13197,8 @@ msgstr "The verification code is valid for {seconds} seconds."
 msgid "Service unavailable. Please try again later."
 msgstr "Service unavailable. Please try again later."
 
-msgid "Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate."
-msgstr "Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate."
+msgid "Check the VCTK_S service URL, business authorization and HTTPS trust settings."
+msgstr "Check the VCTK_S service URL, business authorization and HTTPS trust settings."
 
 msgid "Invalid VCTK_S business authorization credentials."
 msgstr "Invalid VCTK_S business authorization credentials."

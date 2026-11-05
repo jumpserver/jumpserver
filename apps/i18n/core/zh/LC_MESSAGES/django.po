@@ -13429,8 +13429,8 @@ msgstr "VCTK_S 服务端验签失败，请检查服务配置。"
 msgid "VCTK_S version check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
 msgstr "VCTK_S 版本接口检查通过，尚未验证 UKey 签名及证书，配置未保存。"
 
-msgid "Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate."
-msgstr "请检查 VCTK_S 服务地址、业务授权、HTTPS 信任设置及签发 CA 证书。"
+msgid "Check the VCTK_S service URL, business authorization and HTTPS trust settings."
+msgstr "请检查 VCTK_S 服务地址、业务授权及 HTTPS 信任设置。"
 
 msgid "Invalid VCTK_S business authorization credentials."
 msgstr "VCTK_S 业务授权凭据无效，请使用不含控制字符的 ASCII 用户名和密码。"
