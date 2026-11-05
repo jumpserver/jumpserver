@@ -7217,9 +7217,12 @@ msgstr "任务 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
-#: ops/api/job.py:66
-msgid "Login to asset {}({}) is rejected by login asset ACL ({})"
-msgstr "登录资产 {}({}) 被拒绝，由登录资产规则 ACL ({}) 限制"
+#: ops/const.py:85
+#, python-brace-format
+msgid ""
+"Access to asset {asset} ({address}) is denied by a login control policy. "
+"Contact your administrator."
+msgstr "登录控制策略已拒绝访问资产 {asset}（{address}），请联系管理员。"
 
 #: ops/api/job.py:173
 msgid "Duplicate file exists"
