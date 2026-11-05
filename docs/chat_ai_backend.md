@@ -8,6 +8,7 @@ Core 仍承担以下职责：
 - 向 Kael 提供启用状态和模型 Provider 配置。
 - 校验 Kael 代表最终用户调用 Core API 时携带的短期委托凭证，并继续执行正常的组织隔离和 RBAC。
 - 通过内部 Runtime Store API 持久化 Kael 的 journal。问答数据因此仍保存在 JumpServer 数据库中。
+- 将 Kael 上报的审计数据保存为独立的会话、消息审计表，提供列表、搜索和详情查询。
 - 在 OpenAPI Schema 中提供工具调用所需的权限元数据。
 
 ## 服务关系
@@ -18,10 +19,38 @@ Lina ── Chat AI 请求 ──> Kael
                          ├── 用户委托请求 ──> JumpServer Core API
                          │
                          └── journal ──> JumpServer Runtime Store
+
+Lina ── AI 会话审计 ──> JumpServer Core ──> 审计会话 / 消息表
 ```
 
 JumpServer 的 `web` 服务直接承载 Runtime Store 和被委托的业务 API。部署时不再启动独立的
 Python Chat AI 进程或额外监听端口。
+
+## AI 会话审计
+
+审计台直接使用 Core 的只读接口：
+
+- `GET /api/v1/chat-ai/audit/conversations/`：列表和分页；`search` 支持标题、用户姓名、用户名，沿用 Core 的搜索语法。
+- `GET /api/v1/chat-ai/audit/conversations/{id}/`：会话详情；访问记录写入 Core 操作日志。
+- `OPTIONS /api/v1/chat-ai/audit/conversations/`：列表及搜索元数据。
+
+这些接口保留超级管理员限制，并严格按当前组织隔离。查询不访问 Kael，也不要求开启 AI 功能，
+因此可以在 Kael 停机或禁用 AI 后查询已经写入的历史。
+
+Kael 在签名的 Runtime Store `record` JSON envelope 中添加可选的 `audit` 对象，包含
+`version: 1`、`conversations` 和 `messages` 数组。原有 `payload` 仍是 Core 不解析的运行时数据；
+`audit` 是单独校验的 JSON 数据协议，并受整个 record 的提交 HMAC 保护。Core 在同一个数据库事务中
+提交 journal 和审计数据，按稳定的会话、消息 ID 更新，不接受资源所属组织、用户或会话的变更。
+回复在完成、失败或取消时上报；问题在提交时上报。Core 对保存的标题、正文和错误文本进行脱敏。
+
+普通会话和终端 AI 都上报审计记录。Kael 启动时分批补录当前仍保留的历史，重复启动或中断重试不会
+生成重复审计数据。终端本地历史或运行时会话的删除不会级联删除 Core 审计记录；升级前已经被清理的
+历史无法通过补录恢复。历史核对会增加 Kael 启动耗时，取决于保留的数据量。
+
+升级顺序：先部署 Core 并执行 `chat_ai.0002_conversation_audit` 迁移，再部署 Kael 完成补录，
+最后更新 Lina。新 Kael 要求写入响应包含 `audit_version: 1`，防止连接到不支持审计写入的旧 Core。
+写入复用既有提交 ID、revision 校验和有限重试；Core 无法确认持久化时，Kael 不会把该事务作为成功
+提交返回。旧 Kael 的 `/kael/api/v1/admin/audit/conversations` 读接口已移除。
 
 ## Core 配置
 
@@ -86,7 +115,7 @@ POST /api/v1/chat-ai/runtime-store/
 接口使用 Access Key HTTP Signature 认证。认证用户必须是服务账号，并绑定到
 `type=kael` 的 Terminal；普通用户、其他组件服务账号和用户委托票据都不能访问。
 
-Runtime Store 是全局有序、只追加的 journal。Core 将 `record` 作为不透明字符串保存，但会验证
+Runtime Store 是全局有序、只追加的 journal。Core 将 `record` 的运行时 payload 作为不透明数据保存，但会验证
 JSONL envelope、payload checksum、提交完整性和 revision。单条 record 上限为 64 MiB。
 
 ### 读取
@@ -154,8 +183,8 @@ default
 }
 ```
 
-`record` 必须是恰好一行的 JSON，且只能包含 `version`、`created_at`、`payload` 和
-`checksum`。当前 `version` 为 `1`；`payload` 是 Base64，`checksum` 是 payload 解码后字节的
+`record` 必须是恰好一行的 JSON，包含 `version`、`created_at`、`payload`、`checksum`，
+以及可选的 `audit` 对象。当前 `version` 为 `1`；`payload` 是 Base64，`checksum` 是 payload 解码后字节的
 SHA-256。
 
 `integrity` 使用当前请求 Access Key 的 secret 签名：
