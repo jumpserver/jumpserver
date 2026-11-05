@@ -30,7 +30,8 @@ from ops.filters import JobExecutionFilterSet, JobFilterSet
 from ops.models import Job, JobExecution, JMSPermedInventory
 from ops.models.job import check_upload_permission, match_rejected_login_asset_acl
 from ops.serializers.job import (
-    JobSerializer, JobExecutionSerializer, JobExecutionResultSerializer, FileSerializer, JobTaskStopSerializer
+    JobSerializer, JobExecutionSerializer, JobExecutionResultSerializer, FileSerializer, JobTaskStopSerializer,
+    FileUploadCancelSerializer,
 )
 from ops.utils import merge_nodes_and_assets
 
@@ -80,7 +81,7 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
 
     def check_permissions(self, request):
         # job: upload_file
-        if self.action == 'upload' or request.data.get('type') == Types.upload_file:
+        if self.action in ('upload', 'cancel_upload') or request.data.get('type') == Types.upload_file:
             return super().check_permissions(request)
         # job: adhoc, playbook
         if not settings.SECURITY_COMMAND_EXECUTION:
@@ -157,6 +158,7 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
             permission_classes=[IsValidUser, ],
             throttle_classes=[FileTransferThrottle],
             url_path='upload')
+    @transaction.atomic
     def upload(self, request, *args, **kwargs):
         uploaded_files = request.FILES.getlist('files')
         serializer = self.get_serializer(data=request.data)
@@ -177,8 +179,13 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
                 status=400)
 
         job_id = request.data.get('job_id', '')
-        job = get_object_or_404(Job, pk=job_id, creator=request.user)
+        # Serialize upload finalization with cancellation, including after the client disconnects.
+        job = get_object_or_404(
+            Job.objects.select_for_update(), pk=job_id, creator=request.user, type=Types.upload_file
+        )
         job_args = json.loads(job.args)
+        if job_args.get('upload_cancelled'):
+            return Response({'error': _("Task canceled by user")}, status=409)
         src_path_info = []
         upload_file_dir = safe_join(settings.SHARE_DIR, 'job_upload_file', job_id)
         for uploaded_file in uploaded_files:
@@ -194,6 +201,32 @@ class JobViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
         job.save()
         self.run_job(job, serializer)
         return Response({'task_id': serializer.data.get('task_id')}, status=201)
+
+    @action(methods=[POST], detail=False, serializer_class=FileUploadCancelSerializer,
+            permission_classes=[IsValidUser], url_path='cancel-upload')
+    @transaction.atomic
+    def cancel_upload(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        job = get_object_or_404(
+            Job.objects.select_for_update(), pk=serializer.validated_data['job_id'],
+            creator=request.user, type=Types.upload_file,
+        )
+        executions = list(job.executions.all())
+        if executions and all(execution.is_finished for execution in executions):
+            return Response({'cancelled': False, 'task_id': str(executions[0].id)})
+        job_args = json.loads(job.args)
+        job_args['upload_cancelled'] = True
+        job.args = json.dumps(job_args)
+        job.save()
+        for execution in executions:
+            if execution.is_finished:
+                continue
+            execution.stop()
+            transaction.on_commit(
+                lambda task_id=str(execution.id): AsyncResult(task_id, app=app).revoke()
+            )
+        return Response({'cancelled': True})
 
 
 class JobExecutionViewSet(LoginAssetACLCheckMixin, OrgBulkModelViewSet):
