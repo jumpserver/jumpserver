@@ -57,6 +57,9 @@ Kael 在签名的 Runtime Store `record` JSON envelope 中添加可选的 `audit
 升级顺序：先部署 Core 并执行 `chat_ai.0002_conversation_audit` 迁移，创建审计表和查看权限，
 再部署 Kael 完成补录，最后更新 Lina。新 Kael 要求写入响应包含 `audit_version: 1`，
 防止连接到不支持审计写入的旧 Core。
+`0002` 在 MySQL/MariaDB 上将审计标题、用户姓名/用户名、消息正文/错误和 journal `record`
+列设为 `utf8mb4`，允许保存 emoji 等四字节字符；已使用 `utf8mb4` 的列保持原有排序规则。
+已经执行过旧版 `0002` 的环境需单独同步这些列，修改迁移文件后再次运行 `migrate` 不会重做已应用的迁移。
 写入复用既有提交 ID、revision 校验和有限重试；Core 无法确认持久化时，Kael 不会把该事务作为成功
 提交返回。旧 Kael 的 `/kael/api/v1/admin/audit/conversations` 读接口已移除。
 
