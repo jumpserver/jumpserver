@@ -1,0 +1,184 @@
+from unittest.mock import AsyncMock, Mock, patch
+
+from accounts.clients.python.jms_pam import Client
+from accounts.clients.python.jms_pam.client import CLIENT_PATH
+from accounts.credential_client.events import _publish_stream
+from accounts.credential_rotation.manager import CredentialRotationManager
+from accounts.models import (
+    Account,
+    ApplicationAudit,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    CredentialClientInstance,
+    IntegrationApplication,
+)
+from accounts.ws import CredentialClientAuthMiddleware, CredentialEventConsumer
+from asgiref.sync import async_to_sync
+from assets.const import Category
+from assets.models import Asset, Platform
+from channels.db import database_sync_to_async
+from channels.testing import WebsocketCommunicator
+from django.db import transaction
+from django.test import TransactionTestCase, override_settings
+from orgs.models import Organization
+from orgs.utils import set_current_org, set_to_root_org, tmp_to_org
+
+
+@override_settings(CHANNEL_LAYERS={
+    'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'},
+})
+class CredentialEventStreamTests(TransactionTestCase):
+    def setUp(self):
+        self.org = Organization.default()
+        set_current_org(self.org)
+        platform = Platform.objects.create(
+            name='CredentialStreamPostgreSQL', category=Category.DATABASE,
+            type='postgresql',
+        )
+        asset = Asset.objects.create(
+            name='credential-stream-db', address='127.0.0.1', platform=platform,
+        )
+        self.account = Account.objects.create(
+            name='app', username='app', asset=asset, secret='secret',
+        )
+        self.application = IntegrationApplication.objects.create(
+            name='stream-app', secret='stream-secret', credential_notifications_enabled=True,
+            accounts={'type': 'ids', 'ids': [str(self.account.id)]},
+        )
+        self.credential = ApplicationCredential.objects.create(
+            name='Stream policy', mode=ApplicationCredential.Mode.subscription,
+        )
+        self.credential.subscription_accounts.add(self.account)
+        CredentialApplicationBinding.objects.create(
+            credential=self.credential, application=self.application,
+        )
+
+    def tearDown(self):
+        set_to_root_org()
+        super().tearDown()
+
+    def _post_teardown(self):
+        super()._post_teardown()
+        Organization.expire_orgs_mapping()
+        set_to_root_org()
+
+    def test_signed_connection_receives_snapshot_and_updates_online_state(self):
+        async_to_sync(self._run_connection)()
+        client = CredentialClientInstance.objects.get(instance_id='stream-instance')
+        self.assertIsNotNone(client.date_last_seen)
+        self.assertEqual(client.remote_addr, '2001:db8::7')
+        self.assertTrue(client.event_receipts_supported)
+        self.assertTrue(ApplicationAudit.objects.filter(
+            service_id=self.application.id,
+            instance_id=client.instance_id, event='credential_stream_connected', remote_addr='2001:db8::7',
+        ).exists())
+        self.assertTrue(ApplicationAudit.objects.filter(
+            service_id=self.application.id,
+            instance_id=client.instance_id, event='credential_stream_disconnected',
+        ).exists())
+
+    def test_unsigned_connection_is_rejected(self):
+        async_to_sync(self._run_unsigned_connection)()
+
+    def test_signed_connection_reports_rotation_receipts(self):
+        alternate = Account.objects.create(
+            name='alternate', username='alternate', asset=self.account.asset, secret='alternate-secret',
+        )
+        self.application.credential_notifications_enabled = False
+        self.application.accounts = {'type': 'ids', 'ids': [str(self.account.id), str(alternate.id)]}
+        self.application.save()
+        self.credential.mode = ApplicationCredential.Mode.alternating_rotation
+        self.credential.account = self.account
+        self.credential.active_account = self.account
+        self.credential.alternate_account = alternate
+        self.credential.save()
+        async_to_sync(self._receive_rotation)()
+        events = list(self.credential.rotation_records.first().events.all())
+        self.assertEqual(len(events), 4)
+        for event in events:
+            self.assertEqual(len(event.recipients), 1)
+            self.assertIsNotNone(event.recipients[0]['received_at'])
+            self.assertEqual(event.recipients[0]['instance_id'], 'stream-instance')
+
+    async def _receive_rotation(self):
+        communicator = await self._connect()
+        snapshot = await communicator.receive_json_from()  # Initial snapshot is not a receipt.
+        self.assertEqual(snapshot['credentials'][0]['account_switch'], self.credential.account_switch)
+        self.assertEqual(snapshot['credentials'][0]['account_id'], str(self.account.id))
+
+        @database_sync_to_async
+        def start():
+            with tmp_to_org(self.org), transaction.atomic():
+                CredentialRotationManager(self.credential.id)._publish(self.credential)
+
+        await start()
+        for _ in range(4):
+            event = await communicator.receive_json_from()
+            self.assertEqual(event['account_switch'], self.credential.account_switch)
+            self.assertEqual(event['account_id'], str(self.credential.alternate_account_id))
+            await communicator.send_json_to({'event': 'received', 'event_id': event['event_id']})
+        await communicator.send_json_to({'event': 'ping'})
+        self.assertEqual(await communicator.receive_json_from(), {'event': 'pong'})
+        await communicator.disconnect()
+
+    def test_published_event_includes_subscription_selector(self):
+        CredentialClientInstance.objects.create(
+            application=self.application, instance_id='publisher', type='sdk',
+        )
+        event = ApplicationAudit.objects.create(
+            event='credential_secret_updated', service_id=self.application.id,
+            credential_id=self.credential.id,
+            credential_key=self.credential.account_key(self.account.id),
+            account_id=self.account.id, revision=self.account.version,
+        )
+        layer = Mock(group_send=AsyncMock())
+        with patch('accounts.credential_client.events.get_channel_layer', return_value=layer):
+            _publish_stream(event.id, 'credential.secret.updated')
+        payload = layer.group_send.await_args.args[1]['payload']
+        self.assertEqual(payload['credential_mode'], ApplicationCredential.Mode.subscription)
+        self.assertEqual(payload['account_id'], str(self.account.id))
+
+    async def _run_unsigned_connection(self):
+        app = CredentialClientAuthMiddleware(CredentialEventConsumer.as_asgi())
+        communicator = WebsocketCommunicator(
+            app,
+            '/ws/accounts/credential-events/'
+            '?instance_id=unsigned',
+        )
+        connected, code = await communicator.connect()
+        self.assertFalse(connected)
+        self.assertEqual(code, 4401)
+
+    async def _connect(self):
+        sdk = Client('http://testserver', app_id=str(self.application.id), app_secret=self.application.secret, instance_id='stream-instance', org_id=str(self.org.id))
+        headers = []
+        for header in sdk._event_stream_headers():
+            name, value = header.split(': ', 1)
+            headers.append((name.lower().encode(), value.encode()))
+        headers.append((b'x-forwarded-for', b'2001:db8::7'))
+        path = (
+            '/ws/accounts/credential-events/'
+            '?instance_id=stream-instance'
+        )
+        app = CredentialClientAuthMiddleware(CredentialEventConsumer.as_asgi())
+        communicator = WebsocketCommunicator(app, path, headers=headers)
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+        return communicator
+
+    async def _run_connection(self):
+        communicator = await self._connect()
+        snapshot = await communicator.receive_json_from()
+        self.assertTrue(snapshot['credentials'][0].pop('event_id'))
+        self.assertEqual(snapshot['credentials'][0].pop('account_revision'), self.account.version)
+        self.assertEqual(snapshot, {
+            'event': 'snapshot',
+            'authorized_account_ids': [str(self.account.id)],
+            'credentials': [{
+                'key': self.credential.account_key(self.account.id),
+                'account_id': str(self.account.id),
+                'credential_mode': ApplicationCredential.Mode.subscription,
+                'revision': self.account.version,
+            }],
+        })
+        await communicator.disconnect()

@@ -10,7 +10,7 @@ from rest_framework import authentication, exceptions
 from oauth2_provider.contrib.rest_framework import OAuth2Authentication as BaseOAuth2Authentication
 from oauth2_provider.models import get_access_token_model
 
-from accounts.models import IntegrationApplication
+from accounts.models import CredentialClientInstance, IntegrationApplication
 from common.auth import signature
 from common.auth.cache import BEARER_TOKEN_KEY, valid_token_format, valid_uuid
 from common.decorators import merge_delay_run
@@ -247,11 +247,32 @@ class ServiceAuthentication(signature.SignatureAuthentication):
             return None, None
         return obj, obj.secret
 
+    @staticmethod
+    def get_ip_group(obj):
+        return obj.ip_group
+
     def is_ip_allow(self, key_id, request):
         obj = self.get_object(key_id)
-        if not contains_ip(get_request_ip(request), obj.ip_group):
+        if not obj:
             return False
-        return True
+        return contains_ip(get_request_ip(request), self.get_ip_group(obj))
 
     def after_authenticate_update_date(self, user):
         update_service_integration_last_used.delay((user.id,))
+
+
+class CredentialAgentAuthentication(ServiceAuthentication):
+    source = 'jms-pam-agent'
+
+    def get_object(self, key_id):
+        return CredentialClientInstance.objects.filter(
+            id=key_id, type=CredentialClientInstance.Type.agent,
+            is_active=True, application__is_active=True,
+        ).select_related('application').first()
+
+    @staticmethod
+    def get_ip_group(obj):
+        return obj.application.ip_group
+
+    def after_authenticate_update_date(self, user):
+        update_service_integration_last_used.delay((user.application_id,))

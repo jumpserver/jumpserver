@@ -7,6 +7,8 @@ from . import api
 app_name = 'accounts'
 
 router = BulkRouter()
+router.register(r'application-audits', api.ApplicationAuditViewSet, 'application-audit')
+router.register(r'application-event-logs', api.ApplicationEventLogViewSet, 'application-event-log')
 
 router.register(r'accounts', api.AccountViewSet, 'account')
 router.register(r'virtual-accounts', api.VirtualAccountViewSet, 'virtual-account')
@@ -37,8 +39,23 @@ router.register(r'ping-executions', api.PingExecutionViewSet, 'ping-execution')
 router.register(r'account-check-engines', api.CheckAccountEngineViewSet, 'account-check-engine')
 router.register(r'account-risks', api.AccountRiskViewSet, 'account-risks')
 router.register(r'integration-applications', api.IntegrationApplicationViewSet, 'integration-apps')
+router.register(r'application-webhooks', api.ApplicationWebhookViewSet, 'application-webhook')
+router.register(r'application-credentials', api.ApplicationCredentialViewSet, 'application-credential')
+router.register(
+    r'credential-application-bindings',
+    api.CredentialApplicationBindingViewSet,
+    'credential-application-binding',
+)
+router.register(
+    r'credential-client-instances',
+    api.CredentialClientInstanceViewSet,
+    'credential-client-instance',
+)
+router.register(r'credential-client', api.CredentialClientViewSet, 'credential-client')
 
 urlpatterns = [
+    path('client-source/<slug:language>/', api.PAMClientSourceDownloadAPI.as_view(), name='pam-client-source'),
+    path('python-sdk/', api.PythonSDKDownloadAPI.as_view(), name='python-sdk-download'),
     path('accounts/<uuid:pk>/reveal-by-ticket/', api.AccountTicketSecretAPI.as_view(),
          name='account-ticket-secret'),
     path('accounts/<uuid:pk>/request-secret-ticket/', api.AccountTicketSecretRequestAPI.as_view(),

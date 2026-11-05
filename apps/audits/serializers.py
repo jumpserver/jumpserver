@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import format_lazy
 from rest_framework import serializers
 
 from audits.backends.db import OperateLogStore
@@ -17,6 +18,43 @@ from .const import (
     MFAChoices, LoginStatusChoices,
     LoginTypeChoices, ActivityChoices, USER_DEVICE_TYPE_CHOICES,
 )
+
+
+class ServiceAccessLogSerializer(serializers.ModelSerializer):
+    source = serializers.ChoiceField(
+        choices=[('SDK', _('SDK')), ('Agent', _('PAM Agent')),
+                 ('Administrator', _('Administrator')), ('JumpServer', _('JumpServer'))],
+        read_only=True, label=_('Source'),
+    )
+    result = serializers.ChoiceField(
+        choices=[('success', _('Success')), ('failed', _('Failed'))],
+        read_only=True, label=_('Result'),
+    )
+
+    class Meta:
+        model = models.IntegrationApplicationLog
+        fields_mini = ['id']
+        fields_small = fields_mini + ['remote_addr', 'service', 'service_id', 'asset', 'account', 'datetime']
+        fields = fields_small + [
+            'asset_id', 'account_id', 'credential_id', 'credential_key', 'instance_id',
+            'source', 'result', 'revision', 'summary',
+        ]
+        read_only_fields = fields
+        extra_kwargs = {
+            'id': {'label': _('ID')},
+            'service': {'label': _('Application')},
+            'service_id': {'label': _('Application ID')},
+            'asset_id': {'label': _('Asset ID')},
+            'account_id': {'label': format_lazy('{} ID', _('Account'))},
+            'credential_id': {'label': _('Credential ID')},
+            'instance_id': {'label': _('Instance ID')},
+            'credential_key': {'label': _('Credential key')},
+            'revision': {'label': _('Revision')},
+            'summary': {'label': _('Detail')},
+            'remote_addr': {'label': _('Remote Address')},
+            'asset': {'label': _('Asset')}, 'account': {'label': _('Account')},
+            'datetime': {'label': _('Datetime')},
+        }
 
 
 class JobLogSerializer(JobExecutionSerializer):
@@ -251,19 +289,3 @@ class UserSessionSerializer(serializers.ModelSerializer):
                 return session is not None and session.pk == obj['id']
             return request.session.session_key == obj['key']
         return request.session.session_key == obj.key
-
-
-class ServiceAccessLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.IntegrationApplicationLog
-        fields_mini = ['id']
-        fields_small = fields_mini + [
-            'remote_addr', 'service', 'service_id', 'asset', 'account', 'datetime'
-        ]
-        fields = fields_small
-        extra_kwargs = {
-            'remote_addr': {'label': _('Remote Address')},
-            'asset': {'label': _('Asset')},
-            'account': {'label': _('Account')},
-            'datetime': {'label': _('Datetime')},
-        }
