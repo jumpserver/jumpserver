@@ -4,9 +4,10 @@ from collections import defaultdict
 from django.db.models import Case, CharField, Count, Exists, IntegerField, Max, Min, OuterRef, Q, Subquery, Value, When
 from django.db.models.functions import Cast, Coalesce
 from rest_framework.exceptions import NotFound
+from django.utils.dateparse import parse_datetime
 
 from accounts.const import ApplicationEvent, AuditEvent
-from accounts.models import Account, ApplicationAudit, CredentialClientInstance, CredentialRotationEvent
+from accounts.models import Account, ApplicationAudit, CredentialClientInstance, CredentialClientStatus, CredentialRotationEvent
 from common.utils import get_log_keep_day
 
 
@@ -255,15 +256,24 @@ def cycle_detail(credential, cycle_id):
     }
     confirmations = ApplicationAudit.objects.filter(
         credential_id=credential.id, org_id=credential.org_id,
-        event=AuditEvent.CREDENTIAL_CONFIRMED, result='success',
+        event__in=(AuditEvent.CREDENTIAL_CONFIRMED, AuditEvent.CREDENTIAL_CONFIRMATION_SKIPPED), result='success',
         revision__in=[event.revision for event in events],
     ).order_by('date_created', 'id')
     if events[0].rotation_id:
         confirmations = confirmations.filter(rotation_id=events[0].rotation_id)
-    confirmed = {}
+    confirmed, skipped = {}, {}
     for audit in confirmations:
         identity = (str(audit.service_id), audit.source.lower(), audit.instance_id, audit.revision)
-        confirmed.setdefault(identity, audit.date_created.isoformat())
+        results = skipped if audit.event == AuditEvent.CREDENTIAL_CONFIRMATION_SKIPPED else confirmed
+        results.setdefault(identity, audit.date_created.isoformat())
+    failure_reviews = {}
+    for event in events:
+        for recipient in event.recipients:
+            if recipient.get('failure_review'):
+                failure_reviews[(recipient['id'], event.revision)] = recipient['failure_review']
+    for state in CredentialClientStatus.objects.filter(binding__credential=credential, client_id__in=clients):
+        if state.application_failure:
+            failure_reviews[(str(state.client_id), state.application_failure['revision'])] = state.application_failure
     rows = []
     rotation_accounts = summary['rotation_accounts']
     published_account = rotation_accounts['source'] if rotation_accounts else None
@@ -286,9 +296,23 @@ def cycle_detail(credential, cycle_id):
             identity = (
                 recipient['application']['id'], recipient['type'], recipient['instance_id'], event.revision,
             )
+            failure_review = failure_reviews.get((recipient['id'], event.revision), {}) if requires_confirmation else {}
+            if failure_review:
+                failure_review = {**failure_review, 'can_review': bool(
+                    failure_review.get('review_required') and failure_review.get('revision') == credential.current_revision
+                )}
+            confirmed_at = confirmed.get(identity) if requires_confirmation else None
+            skipped_at = skipped.get(identity) if requires_confirmation and identity not in confirmed else None
+            if failure_review:
+                failed_at = parse_datetime(failure_review['failed_at'])
+                if confirmed_at and parse_datetime(confirmed_at) <= failed_at:
+                    confirmed_at = None
+                if skipped_at and parse_datetime(skipped_at) <= failed_at:
+                    skipped_at = None
             recipients.append({
-                **recipient, 'is_active': active, 'online': bool(active and client.online),
-                'confirmed_at': confirmed.get(identity) if requires_confirmation else None,
+                **recipient, 'failure_review': failure_review, 'is_active': active, 'online': bool(active and client.online),
+                'confirmed_at': confirmed_at,
+                'skipped_at': skipped_at,
             })
         rows.append({
             'id': str(event.source_event_id), 'event': event.event, 'sequence': sequence,
@@ -302,6 +326,9 @@ def cycle_detail(credential, cycle_id):
             'recipient_count': len(recipients),
             'received_count': sum(bool(item['received_at']) for item in recipients),
             'confirmed_count': sum(bool(item['confirmed_at']) for item in recipients),
+            'skipped_count': sum(bool(item['skipped_at']) for item in recipients),
+            'review_required_count': sum(bool(item['failure_review'].get('review_required')) for item in recipients),
+            'admin_approved_count': sum(bool(item['failure_review'].get('reviewed_at')) for item in recipients),
             'recipients': recipients,
         })
     return {

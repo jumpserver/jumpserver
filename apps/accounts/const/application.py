@@ -23,6 +23,8 @@ class AuditEvent(TextChoices):
     CLIENT_ENABLED = 'client_enabled', _('Client enabled')
     CLIENT_DISABLED = 'client_disabled', _('Client disabled')
     CREDENTIAL_FETCHED = 'credential_fetched', _('Credential fetched')
+    APPLICATION_FAILURE_REVIEWED = 'application_failure_reviewed', _('Application failure reviewed')
+    CREDENTIAL_CONFIRMATION_SKIPPED = 'credential_confirmation_skipped', _('Application check skipped')
     CREDENTIAL_CONFIRMED = 'credential_confirmed', _('Credential confirmed')
     CREDENTIAL_SECRET_UPDATED = 'credential_secret_updated', _('Account secret updated')
     CREDENTIAL_SWITCH_PUBLISHED = 'credential_switch_published', _('Account switch published')

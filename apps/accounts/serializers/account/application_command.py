@@ -27,5 +27,5 @@ class ApplicationCommandPollSerializer(serializers.Serializer):
 
 class ApplicationCommandResultSerializer(ApplicationCommandPollSerializer):
     command_id = serializers.UUIDField()
-    status = serializers.ChoiceField(choices=['running', 'success', 'failed'])
+    status = serializers.ChoiceField(choices=['running', 'success', 'failed', 'skip'])
     error_code = serializers.RegexField(r'^[a-zA-Z0-9_.-]*$', max_length=64, required=False, default='', allow_blank=True)

@@ -28,13 +28,19 @@ __all__ = [
     'CredentialAgentSyncSerializer',
     'CredentialAccessWizardSerializer',
     'CredentialChangeRetrySerializer', 'CredentialRotationReasonSerializer',
-    'CredentialRotationForceStopSerializer',
+    'CredentialRotationForceStopSerializer', 'CredentialFailureReviewSerializer',
 ]
 
 
 SYSTEMD_UNIT = re.compile(r'^[A-Za-z0-9_.@:-]+\.service$')
 DELIVERY_MODES = [('json', _('JSON files')), ('environment', _('Environment files')), ('socket', _('Unix socket'))]
 SYSTEMD_ACTIONS = [('reload', _('Reload')), ('restart', _('Restart'))]
+
+
+class CredentialFailureReviewSerializer(serializers.Serializer):
+    client_id = serializers.UUIDField()
+    failure_id = serializers.UUIDField()
+    reason = serializers.CharField(max_length=512, allow_blank=False, trim_whitespace=True)
 
 
 class CredentialRotationReasonSerializer(serializers.Serializer):
@@ -405,7 +411,7 @@ class CredentialClientStatusSerializer(serializers.ModelSerializer):
         model = CredentialClientStatus
         fields = [
             'id', 'credential', 'fetched_revision', 'delivered_revision', 'applied_revision',
-            'applied_account', 'required_revision', 'is_rotation_participant',
+            'applied_account', 'required_revision', 'is_rotation_participant', 'confirmation_skipped', 'application_failure',
             'date_last_seen', 'date_fetched', 'date_delivered', 'date_applied',
         ]
         read_only_fields = fields
@@ -632,7 +638,7 @@ class CredentialConfirmSerializer(CredentialStateSerializer):
 
 class CredentialEventResultSerializer(serializers.Serializer):
     event_id = serializers.UUIDField()
-    status = serializers.ChoiceField(choices=('success', 'failed'), default='success')
+    status = serializers.ChoiceField(choices=('success', 'failed', 'skip'), default='success')
     error_code = serializers.CharField(max_length=128, required=False, allow_blank=True, default='')
     instance_id = serializers.CharField(max_length=128, required=False)
 
@@ -793,7 +799,7 @@ class CredentialAccessWizardSerializer(serializers.Serializer):
                 raise serializers.ValidationError({'secret_field': _('Username and secret fields must be different.')})
             if attrs['service_action_type'] == 'script':
                 self.validate_local_path(attrs['service_script'], 'service_script')
-            if attrs['application_check'] or attrs['agent_setup'] == 'rotation':
+            if attrs['application_check']:
                 self.validate_local_path(attrs['application_check'], 'application_check')
             # Rules own business updates and actions. Do not also execute the
             # default EnvironmentFile delivery's global systemd action.

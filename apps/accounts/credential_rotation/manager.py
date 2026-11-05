@@ -4,7 +4,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import ApplicationEvent, AuditEvent
+from accounts.const import ApplicationEvent, AuditEvent, AuditSource
 from accounts.credential_client.audit import record
 from accounts.credential_client.events import enqueue
 from accounts.models import (
@@ -104,6 +104,44 @@ class CredentialRotationManager:
         return credential
 
     @transaction.atomic
+    def review_application_failure(self, client_id, failure_id, reason, operator):
+        from rest_framework.exceptions import ValidationError
+        from .source_traffic import start_if_ready
+        credential = self._get_locked_credential()
+        state = CredentialClientStatus.objects.select_for_update().select_related('client').filter(
+            binding__credential=credential, client_id=client_id,
+        ).first()
+        failure = dict(state.application_failure or {}) if state else {}
+        if (not failure or failure.get('id') != str(failure_id)
+                or failure.get('revision') != credential.current_revision
+                or failure.get('account_id') != str(credential.active_account_id)):
+            raise ValidationError(_('The application failure is superseded. Refresh and review the current failure.'))
+        if not failure.get('review_required'):
+            return credential
+        if not reason.strip():
+            raise ValidationError(_('Provide a reason for continuing after the application failure.'))
+        failure.update(review_required=False, reviewed_at=timezone.now().isoformat(),
+                       reviewed_by=operator, reason=reason.strip())
+        state.application_failure = failure
+        state.save(update_fields=['application_failure', 'date_updated'])
+        from accounts.models import ApplicationCommand, CredentialRotationEvent
+        event = CredentialRotationEvent.objects.select_for_update().filter(source_event_id=failure['event_id']).first()
+        if event is None:
+            event = ApplicationCommand.objects.select_for_update().filter(source_event_id=failure['event_id']).first()
+        if event:
+            for recipient in event.recipients:
+                if recipient['id'] == str(client_id):
+                    recipient['failure_review'] = failure
+            event.save(update_fields=['recipients', 'date_updated'])
+        record(AuditEvent.APPLICATION_FAILURE_REVIEWED, credential=credential,
+               application=state.client.application, operator=operator, source=AuditSource.ADMINISTRATOR,
+               instance_id=state.client.instance_id,
+               summary=reason.strip(), changes=[{'field': 'application_failure', 'before': None, 'after': failure}])
+        if credential.status == credential.Status.waiting_switch:
+            start_if_ready(credential)
+        return credential
+
+    @transaction.atomic
     def check_usage(self):
         from .source_traffic import blocker, notify_ready, remember, start_if_ready
 
@@ -176,6 +214,8 @@ class CredentialRotationManager:
             or rotation.change_execution_id != credential.change_execution_id
             or outcome(credential, credential.change_execution) != 'success'
         ):
+            return credential
+        if credential.get_blockers():
             return credential
         event = record(
             AuditEvent.SECRET_CHANGE_COMPLETED, credential=credential,

@@ -12,8 +12,8 @@ from accounts.models import (
 from .audit import record
 
 
-def apply_rotation_result(client, source, account_id, account_revision):
-    from .manager import CredentialClientManager, client_uses_credential
+def rotation_state(client, source, account_id, account_revision):
+    from .manager import client_uses_credential
     credential = ApplicationCredential.objects.select_for_update(of=('self',)).select_related(
         'active_account',
     ).filter(id=source.credential_id, is_active=True, applications=client.application).first()
@@ -27,9 +27,45 @@ def apply_rotation_result(client, source, account_id, account_revision):
         raise ValidationError(_('The event account version is superseded.'))
     binding = CredentialApplicationBinding.objects.get(credential=credential, application=client.application)
     state, _created = CredentialClientStatus.objects.get_or_create(binding=binding, client=client)
+    return credential, state
+
+
+def apply_rotation_result(client, source, account_id, account_revision, skipped=False):
+    from .manager import CredentialClientManager
+    credential, state = rotation_state(client, source, account_id, account_revision)
     manager = object.__new__(CredentialClientManager)
     manager.client, manager.application = client, client.application
-    manager._confirm_status(state, credential, timezone.now())
+    manager._confirm_status(state, credential, timezone.now(), skipped=skipped)
+
+
+def record_rotation_failure(client, source, account_id, account_revision, error_code):
+    from uuid import uuid4
+    credential, state = rotation_state(client, source, account_id, account_revision)
+    previous = state.application_failure or {}
+    # An unreviewed failure survives retries and later successful/skipped reports.
+    if (previous.get('review_required') and previous.get('revision') == source.revision
+            and previous.get('account_id') == str(account_id)
+            and previous.get('account_revision') == account_revision):
+        return previous
+    state.application_failure = {
+        'id': str(uuid4()), 'event_id': str(source.id), 'revision': source.revision,
+        'account_id': str(account_id), 'account_revision': account_revision,
+        'error_code': error_code, 'failed_at': timezone.now().isoformat(),
+        'review_required': True,
+    }
+    state.save(update_fields=['application_failure', 'date_updated'])
+    if credential.status in (credential.Status.waiting_switch, credential.Status.ready_for_change):
+        if credential.status == credential.Status.ready_for_change:
+            credential.status = credential.Status.waiting_switch
+            credential.save(update_fields=['status', 'date_updated'])
+        rotation = credential.rotation_records.filter(status='running', date_finished__isnull=True).first()
+        if rotation:
+            traffic = rotation.participant_snapshot.get('source_traffic', {})
+            for key in ('switch_confirmed_at', 'started_at'):
+                traffic.pop(key, None)
+            rotation.save(update_fields=['participant_snapshot', 'date_updated'])
+
+    return state.application_failure
 
 
 @transaction.atomic
@@ -53,15 +89,19 @@ def report(client, event_id, status='success', error_code=''):
                       and item['application']['id'] == str(client.application_id)), None)
     if recipient is None:
         raise NotFound()
-    if recipient.get('status') == 'success':
-        return {'accepted': False, 'status': 'success'}
+    if recipient.get('status') == status:
+        return {'accepted': False, 'status': recipient['status']}
     source = ApplicationAudit.objects.get(id=event_id, org_id=client.org_id)
     if event.event not in ApplicationEvent.credential_application_events():
         raise ValidationError(_('This event does not request a credential application result.'))
-    if status == 'success':
-        credential = ApplicationCredential.objects.filter(id=source.credential_id).first()
+    credential = ApplicationCredential.objects.filter(id=source.credential_id).first()
+    if status == 'failed' and credential and credential.mode == 'alternating_rotation':
+        recipient['failure_review'] = record_rotation_failure(
+            client, source, recipient.get('account_id'), recipient.get('account_revision'), error_code)
+    if status in ('success', 'skip'):
         if credential and credential.mode == 'alternating_rotation':
-            apply_rotation_result(client, source, recipient.get('account_id'), recipient.get('account_revision'))
+            apply_rotation_result(client, source, recipient.get('account_id'), recipient.get('account_revision'),
+                                  skipped=status == 'skip')
         else:
             account = client.application.get_accounts().filter(id=recipient.get('account_id')).first()
             if not account or account.version != recipient.get('account_revision'):
@@ -72,7 +112,8 @@ def report(client, event_id, status='success', error_code=''):
                      error_code=error_code if status == 'failed' else '')
     event.save(update_fields=['recipients', 'date_updated'])
     record(AuditEvent.COMMAND_RESULT, client=client, operation_id=event_id,
-           result=status, summary=error_code or event.event)
+           result='failed' if status == 'failed' else 'success',
+           summary=error_code or f'{event.event}: {status}')
     return {'accepted': True, 'status': status}
 
 

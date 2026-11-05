@@ -67,6 +67,16 @@ class ApplicationCommandTests(CredentialTestCase):
         self.assertFalse(commands.report(self.client, command.id, 'failed')['accepted'])
         self.assertEqual(commands.pending(self.client), [])
 
+    def test_switch_check_can_skip_after_claim_but_restart_cannot(self):
+        command = self.send(commands.SWITCH, credential_id=self.credential.id)
+        commands.report(self.client, command.id, 'running')
+        self.assertEqual(commands.report(self.client, command.id, 'skip')['status'], 'skip')
+        self.assertEqual(commands.pending(self.client), [])
+        command = self.send()
+        commands.report(self.client, command.id, 'running')
+        with self.assertRaises(ValidationError):
+            commands.report(self.client, command.id, 'skip')
+
     def test_unselected_instance_cannot_claim_or_report(self):
         command = self.send()
         with self.assertRaises(NotFound):

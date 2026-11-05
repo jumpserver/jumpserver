@@ -402,13 +402,20 @@ class CredentialClientManager:
         self._confirm_status(state, credential, now)
         return {'key': credential.key, 'revision': credential.current_revision}
 
-    def _confirm_status(self, state, credential, now):
+    def _confirm_status(self, state, credential, now, skipped=False):
+        # A later skipped check cannot downgrade an existing verified result.
+        if (skipped and not state.confirmation_skipped
+                and state.applied_revision == credential.current_revision
+                and state.applied_account_id == credential.active_account_id):
+            skipped = False
         values = {
             'applied_revision': credential.current_revision,
+            'confirmation_skipped': skipped,
             'applied_account_id': credential.active_account_id,
         }
         if any(getattr(state, field) != value for field, value in values.items()):
-            record(AuditEvent.CREDENTIAL_CONFIRMED, credential=credential, client=self.client)
+            record(AuditEvent.CREDENTIAL_CONFIRMATION_SKIPPED if skipped else AuditEvent.CREDENTIAL_CONFIRMED,
+                   credential=credential, client=self.client)
             values['date_applied'] = now
         self._save_status(state, now, values)
         if credential.status == credential.Status.waiting_switch:

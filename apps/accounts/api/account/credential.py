@@ -154,6 +154,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     search_fields = ('name', 'key', 'comment')
     ordering_fields = ('name', 'status', 'date_last_rotated', 'date_created')
     rbac_perms = {
+        'review_application_failure': 'accounts.change_applicationcredential',
         'start_cycle': 'accounts.change_applicationcredential',
         'start_rotation': 'accounts.change_applicationcredential',
         'check_usage': 'accounts.change_applicationcredential',
@@ -267,6 +268,15 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             }, status=status.HTTP_409_CONFLICT)
         serializer = self.get_serializer(credential)
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=True, url_path='review-application-failure')
+    def review_application_failure(self, request, *args, **kwargs):
+        params = serializers.CredentialFailureReviewSerializer(data=request.data)
+        params.is_valid(raise_exception=True)
+        credential = CredentialRotationManager(self.get_object().id).review_application_failure(
+            **params.validated_data, operator=request.user.name,
+        )
+        return Response(self.get_serializer(credential).data)
 
     @action(methods=['get'], detail=True, url_path='rotation-status')
     def rotation_status(self, request, *args, **kwargs):

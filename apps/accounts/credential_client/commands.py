@@ -22,7 +22,7 @@ from .events import application_group
 
 SWITCH = ApplicationCommandEvent.ACCOUNT_SWITCH_REQUESTED
 RESTART = ApplicationCommandEvent.APPLICATION_RESTART_REQUESTED
-TERMINAL = {'success', 'failed', 'timeout'}
+TERMINAL = {'success', 'failed', 'timeout', 'skip'}
 logger = get_logger(__name__)
 
 
@@ -242,12 +242,19 @@ def report(client, command_id, status, error_code=''):
     else:
         if recipient['status'] != 'running':
             raise ValidationError(_('Claim the event before reporting an execution result.'))
-        if status == 'success' and command.event == SWITCH:
+        if status == 'skip' and command.event != SWITCH:
+            raise ValidationError(_('Only account-switch application checks can be skipped.'))
+        if status == 'failed' and command.event == SWITCH:
+            from .event_results import record_rotation_failure
+            recipient['failure_review'] = record_rotation_failure(client, command.source_event, command.payload['account_id'],
+                                    command.payload.get('account_revision'), error_code)
+        if status in ('success', 'skip') and command.event == SWITCH:
             from .event_results import apply_rotation_result
             apply_rotation_result(client, command.source_event, command.payload['account_id'],
-                                  command.payload.get('account_revision'))
+                                  command.payload.get('account_revision'), skipped=status == 'skip')
         recipient.update(status=status, finished_at=now, error_code=error_code if status == 'failed' else '')
     command.save(update_fields=['recipients', 'date_updated'])
     record(AuditEvent.COMMAND_RESULT, application=client.application, client=client,
-           operation_id=command.id, result=status, summary=error_code or command.event)
+           operation_id=command.id, result='failed' if status == 'failed' else 'success',
+           summary=error_code or f'{command.event}: {status}')
     return {'accepted': True, 'status': status}

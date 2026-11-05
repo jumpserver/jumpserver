@@ -60,7 +60,7 @@ def _final_state(item):
             'online', 'applied_account', 'desired_account', 'fetched_revision',
             'delivered_revision', 'applied_revision', 'required_revision',
             'date_last_seen', 'date_fetched', 'date_delivered', 'date_applied',
-            'status', 'blocking',
+            'status', 'blocking', 'confirmation_skipped', 'application_failure',
         )
     }
 
@@ -169,15 +169,21 @@ def _state(credential, rotation, participant, state, now):
         and client.date_last_seen >= now - timedelta(minutes=2)
     )
     applied_account = state.applied_account if state else None
+    failure = state.application_failure if state else {}
+    current_failure = failure and failure.get('revision') == required_revision
     if excluded:
         name = 'excluded'
+    elif current_failure and failure.get('review_required'):
+        name = 'review_required'
+    elif current_failure and failure.get('reviewed_at'):
+        name = 'approved'
     elif not online:
         name = 'offline'
     elif (
         state.applied_account_id == desired_account.id
         and state.applied_revision == required_revision
     ):
-        name = 'switched'
+        name = 'skipped' if state.confirmation_skipped else 'switched'
     elif max(state.fetched_revision, state.delivered_revision) >= required_revision:
         name = 'awaiting_confirmation'
     elif source_account and state.applied_account_id == source_account.id:
@@ -186,7 +192,10 @@ def _state(credential, rotation, participant, state, now):
         name = 'stale_confirmation'
     else:
         name = 'unknown'
-    blocking = not excluded and credential.status in BLOCKING_PHASES and name != 'switched'
+    blocking = not excluded and (
+        credential.status in BLOCKING_PHASES and name not in ('switched', 'skipped', 'approved')
+        or name == 'review_required' and credential.status != credential.Status.idle
+    )
     return {
         **participant,
         'online': online,
@@ -200,6 +209,8 @@ def _state(credential, rotation, participant, state, now):
         'date_fetched': _date(state.date_fetched) if state else None,
         'date_delivered': _date(state.date_delivered) if state else None,
         'date_applied': _date(state.date_applied) if state else None,
+        'confirmation_skipped': bool(state and state.confirmation_skipped),
+        'application_failure': failure if current_failure else {},
         'status': name,
         'blocking': blocking,
     }
@@ -225,23 +236,31 @@ def _application_summary(instances, warnings):
     for item in instances:
         application = item['application']
         summary = applications.setdefault(application['id'], {
-            'application': application, 'total': 0, 'switched': 0, 'blocking': 0,
+            'application': application, 'total': 0, 'switched': 0, 'skipped': 0, 'approved': 0, 'blocking': 0,
             'status': 'not_switched',
         })
         if item['status'] == 'excluded':
             continue
         summary['total'] += 1
         summary['switched'] += item['status'] == 'switched'
+        summary['skipped'] += item['status'] == 'skipped'
+        summary['approved'] += item['status'] == 'approved'
         summary['blocking'] += item['blocking']
     for warning in warnings:
         application = warning['application']
         applications.setdefault(application['id'], {
-            'application': application, 'total': 0, 'switched': 0, 'blocking': 0,
+            'application': application, 'total': 0, 'switched': 0, 'skipped': 0, 'approved': 0, 'blocking': 0,
             'status': 'no_instance',
         })
     for item in applications.values():
         if not item['total']:
             item['status'] = 'no_instance'
+        elif item['approved'] and item['switched'] + item['skipped'] + item['approved'] == item['total']:
+            item['status'] = 'all_processed'
+        elif item['skipped'] == item['total']:
+            item['status'] = 'all_skipped'
+        elif item['switched'] + item['skipped'] == item['total'] and item['skipped']:
+            item['status'] = 'all_processed'
         elif item['switched'] == item['total']:
             item['status'] = 'all_switched'
         elif item['switched']:
@@ -282,7 +301,7 @@ def build(credential, rotation=None, now=None):
         'total': len(instances),
         'blocking': sum(item['blocking'] for item in instances),
         **{name: counts[name] for name in (
-            'switched', 'using_source', 'awaiting_confirmation', 'stale_confirmation',
+            'switched', 'skipped', 'approved', 'review_required', 'using_source', 'awaiting_confirmation', 'stale_confirmation',
             'offline', 'unknown', 'excluded',
         )},
     }

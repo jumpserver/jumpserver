@@ -73,7 +73,7 @@ def start_if_ready(credential, rotation=None, now=None):
     traffic = info(credential, rotation, now)
     event = record(
         AuditEvent.ROTATION_STEP, credential=credential, account=rotation.source_account,
-        summary='All participating clients confirmed the account switch; source secret-fetch observation started.',
+        summary='All participating clients confirmed the switch or skipped application checks; source secret-fetch observation started.',
     )
     remember(rotation, event, traffic)
     enqueue(event, ApplicationEvent.ROTATION_SOURCE_WAITING, rotation=rotation)

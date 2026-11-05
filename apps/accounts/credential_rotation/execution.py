@@ -75,6 +75,8 @@ def dispatch(execution_id, org_id):
 @transaction.atomic
 def execute(rotation_id, operator='', previous_execution_id=None, reason=''):
     credential, rotation = locked_rotation(rotation_id)
+    if credential.get_blockers():
+        raise JMSException(_('Review application failures and wait for participating instances before changing secrets.'))
     existing = rotation.change_execution
     if existing:
         if previous_execution_id is None or str(existing.id) != str(previous_execution_id):

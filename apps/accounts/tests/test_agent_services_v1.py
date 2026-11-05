@@ -2,6 +2,7 @@ from uuid import uuid4
 from unittest.mock import patch, PropertyMock
 
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 from accounts.credential_client.event_results import report
 from accounts.credential_client.manager import CredentialClientManager, client_uses_credential
@@ -51,6 +52,169 @@ class AgentServicesV1Tests(CredentialTestCase):
         self.assertTrue(client_uses_credential(client, self.credential))
         report(client, item['event_id'])
         self.assertEqual(CredentialClientStatus.objects.get(client=client).applied_revision, self.credential.revision)
+
+    def test_skip_unblocks_rotation_without_recording_application_confirmation(self):
+        from accounts.credential_rotation.manager import CredentialRotationManager
+        from accounts.credential_rotation.cycles import cycle_detail
+        from accounts.credential_rotation.participants import build
+
+        self.sync(switching=[str(self.primary.id)])
+        CredentialRotationManager(self.credential.id).start()
+        self.credential.refresh_from_db()
+        result = self.sync(switching=[str(self.primary.id)])
+        item = next(row for row in result['credentials'] if row['key'] == self.credential.key)
+        client = CredentialClientInstance.objects.get(instance_id='services-v1')
+        client.date_last_seen = timezone.now()
+        client.save(update_fields=['date_last_seen'])
+        self.assertTrue(report(client, item['event_id'], 'skip')['accepted'])
+        self.assertFalse(report(client, item['event_id'], 'skip')['accepted'])
+        state = CredentialClientStatus.objects.get(client=client)
+        self.assertTrue(state.confirmation_skipped)
+        self.assertFalse(self.credential.get_blockers())
+        self.assertEqual(build(self.credential)['instances'][0]['status'], 'skipped')
+        self.assertEqual(build(self.credential)['applications'][0]['switched'], 0)
+        self.assertEqual(build(self.credential)['applications'][0]['skipped'], 1)
+        audits = ApplicationAudit.objects.filter(credential_id=self.credential.id, revision=self.credential.revision)
+        self.assertTrue(audits.filter(event='credential_confirmation_skipped').exists())
+        self.assertFalse(audits.filter(event='credential_confirmed').exists())
+        detail = cycle_detail(self.credential, self.credential.rotation_records.first().id)
+        event = next(row for row in detail['events'] if row['id'] == item['event_id'])
+        self.assertEqual(event['skipped_count'], 1)
+        self.assertEqual(event['confirmed_count'], 0)
+        self.assertIsNotNone(event['recipients'][0]['skipped_at'])
+        self.assertIsNone(event['recipients'][0]['confirmed_at'])
+        # A later explicit check upgrades skip to a real confirmation.
+        report(client, item['event_id'], 'success')
+        state.refresh_from_db()
+        self.assertFalse(state.confirmation_skipped)
+        self.assertTrue(audits.filter(event='credential_confirmed').exists())
+
+    def test_skip_rejects_superseded_account_versions(self):
+        result = self.sync(switching=[str(self.primary.id)])
+        item = result['credentials'][0]
+        client = CredentialClientInstance.objects.get(instance_id='services-v1')
+        self.credential.revision += 1
+        self.credential.save(update_fields=['revision'])
+        with self.assertRaises(ValidationError):
+            report(client, item['event_id'], 'skip')
+        self.assertFalse(CredentialClientStatus.objects.filter(client=client, confirmation_skipped=True).exists())
+
+    def test_failure_requires_admin_review_even_after_successful_retry(self):
+        from accounts.credential_rotation.manager import CredentialRotationManager
+        from accounts.credential_rotation.cycles import cycle_detail
+        from accounts.credential_rotation.participants import build
+        self.sync(switching=[str(self.primary.id)])
+        CredentialClientInstance.objects.update(date_last_seen=timezone.now())
+        manager = CredentialRotationManager(self.credential.id)
+        manager.start()
+        self.credential.refresh_from_db()
+        item = next(row for row in self.sync(switching=[str(self.primary.id)])['credentials'] if row['key'] == self.credential.key)
+        client = CredentialClientInstance.objects.get(instance_id='services-v1')
+        report(client, item['event_id'], 'skip')
+        manager.check_usage()
+        report(client, item['event_id'], 'failed', 'application_failed')
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.status, 'waiting_switch')
+        state = CredentialClientStatus.objects.get(client=client)
+        failure = state.application_failure
+        self.assertTrue(failure['review_required'])
+        self.assertIsNone(build(self.credential)['source_traffic'])
+        for result in ('skip', 'success'):
+            report(client, item['event_id'], result)
+            _, blockers = manager.check_usage()
+            self.assertEqual(blockers[0]['reason'], 'review_required')
+        with self.assertRaises(ValidationError):
+            manager.review_application_failure(client.id, uuid4(), 'reviewed', self.admin.name)
+        with self.assertRaises(ValidationError):
+            manager.review_application_failure(client.id, failure['id'], ' ', self.admin.name)
+        detail = cycle_detail(self.credential, self.credential.rotation_records.first().id)
+        publication = next(row for row in detail['events'] if row['id'] == item['event_id'])
+        self.assertEqual(publication['review_required_count'], 1)
+        manager.review_application_failure(client.id, failure['id'], 'Validated the application manually', self.admin.name)
+        self.assertFalse(self.credential.get_blockers())
+        manager.check_usage()
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.status, 'ready_for_change')
+        state.refresh_from_db()
+        self.assertFalse(state.application_failure['review_required'])
+        self.assertEqual(state.application_failure['reviewed_by'], self.admin.name)
+        self.assertEqual(ApplicationAudit.objects.filter(event='application_failure_reviewed').count(), 1)
+        # Review requires administrative permission; a new failure cannot reuse an old approval.
+        from accounts.api.account.credential import ApplicationCredentialViewSet
+        from users.models import User
+        view = ApplicationCredentialViewSet.as_view({'post': 'review_application_failure'})
+        data = {'client_id': str(client.id), 'failure_id': failure['id'], 'reason': 'Reviewed'}
+        outsider = User.objects.create_user(username='review-outsider', password='test-password')
+        from django.db import transaction
+        with transaction.atomic():
+            response = view(self.request('post', '/review-application-failure/', data, user=outsider), pk=self.credential.id)
+            self.assertEqual(response.status_code, 403)
+        response = view(self.request('post', '/review-application-failure/', data), pk=self.credential.id)
+        self.assertEqual(response.status_code, 200, response.data)
+        report(client, item['event_id'], 'failed', 'failed_again')
+        state.refresh_from_db()
+        self.assertNotEqual(state.application_failure['id'], failure['id'])
+        self.assertTrue(state.application_failure['review_required'])
+        ApplicationCredential.objects.filter(pk=self.credential.pk).update(status='changing_secret')
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.get_blockers()[0]['reason'], 'review_required')
+        with self.assertRaises(ValidationError):
+            manager.review_application_failure(client.id, failure['id'], 'stale approval', self.admin.name)
+
+    def test_admin_can_release_failed_result_without_fabricating_application_success(self):
+        from accounts.credential_rotation.manager import CredentialRotationManager
+        from accounts.credential_rotation.cycles import cycle_detail
+        self.sync(switching=[str(self.primary.id)])
+        CredentialClientInstance.objects.update(date_last_seen=timezone.now())
+        manager = CredentialRotationManager(self.credential.id)
+        manager.start()
+        self.credential.refresh_from_db()
+        item = next(row for row in self.sync(switching=[str(self.primary.id)])['credentials'] if row['key'] == self.credential.key)
+        client = CredentialClientInstance.objects.get(instance_id='services-v1')
+        report(client, item['event_id'], 'failed', 'application_failed')
+        failure = CredentialClientStatus.objects.get(client=client).application_failure
+        manager.review_application_failure(client.id, failure['id'], 'Proceed after manual review', self.admin.name)
+        self.assertFalse(self.credential.get_blockers())
+        detail = cycle_detail(self.credential, self.credential.rotation_records.first().id)
+        event = next(row for row in detail['events'] if row['id'] == item['event_id'])
+        self.assertEqual(event['recipients'][0]['status'], 'failed')
+        self.assertEqual(event['admin_approved_count'], 1)
+        self.assertEqual(event['confirmed_count'], 0)
+        self.assertEqual(event['skipped_count'], 0)
+
+    def test_failed_initial_delivery_requires_review_before_starting_rotation(self):
+        from accounts.credential_rotation.manager import CredentialRotationManager
+        from common.exceptions import JMSException
+        item = next(row for row in self.sync(switching=[str(self.primary.id)])['credentials'] if row['key'] == self.credential.key)
+        client = CredentialClientInstance.objects.get(instance_id='services-v1')
+        report(client, item['event_id'], 'failed', 'initial_delivery_failed')
+        manager = CredentialRotationManager(self.credential.id)
+        with self.assertRaises(JMSException):
+            manager.start()
+        failure = CredentialClientStatus.objects.get(client=client).application_failure
+        manager.review_application_failure(client.id, failure['id'], 'Initial delivery reviewed', self.admin.name)
+        manager.start()
+        self.credential.refresh_from_db()
+        self.assertEqual(self.credential.status, 'waiting_switch')
+
+    def test_skipping_one_instance_does_not_resolve_other_instances(self):
+        from accounts.credential_rotation.manager import CredentialRotationManager
+        from accounts.credential_rotation.participants import build
+
+        for name in ('first', 'second'):
+            self.sync(switching=[str(self.primary.id)], instance=name)
+        CredentialClientInstance.objects.update(date_last_seen=timezone.now())
+        CredentialRotationManager(self.credential.id).start()
+        self.credential.refresh_from_db()
+        for index, name in enumerate(('first', 'second')):
+            result = self.sync(switching=[str(self.primary.id)], instance=name)
+            item = next(row for row in result['credentials'] if row['key'] == self.credential.key)
+            client = CredentialClientInstance.objects.get(instance_id=name)
+            report(client, item['event_id'], 'skip' if index == 0 else 'success')
+            self.assertEqual(len(self.credential.get_blockers()), 1 if index == 0 else 0)
+        progress = build(self.credential)
+        self.assertEqual(progress['summary']['skipped'], 1)
+        self.assertEqual(progress['summary']['switched'], 1)
 
     def test_unknown_switch_account_is_not_authorized_and_unassociated_account_is_fixed(self):
         third = Account.objects.create(name='third', username='third', asset=self.asset, secret='third-secret')

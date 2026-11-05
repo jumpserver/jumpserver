@@ -14,7 +14,7 @@ from accounts.credential_client.events import enqueue
 from accounts.credential_client.audit import record
 from accounts.models import (
     Account, ApplicationCredential, AutomationExecution, CredentialRotationRecord,
-    VerifyAccountAutomation,
+    VerifyAccountAutomation, CredentialClientStatus,
 )
 from common.const import Status
 from common.exceptions import JMSException
@@ -60,6 +60,12 @@ def check(credential):
         or credential.status != ApplicationCredential.Status.idle
     ):
         raise JMSException(_('Only active, idle alternating rotation policies can start rotation.'))
+    if CredentialClientStatus.objects.filter(
+        binding__credential=credential, client__is_active=True, client__application__is_active=True,
+        application_failure__review_required=True,
+        application_failure__revision=credential.current_revision,
+    ).exists():
+        raise JMSException(_('Review application failures before starting another rotation.'))
     accounts = [credential.account, credential.alternate_account]
     if any(a is None for a in accounts):
         raise JMSException(_('The rotation account configuration is incomplete.'))

@@ -264,6 +264,8 @@ class CredentialClientStatus(JMSOrgBaseModel):
     fetched_revision = models.PositiveIntegerField(default=0, verbose_name=_('Fetched revision'))
     delivered_revision = models.PositiveIntegerField(default=0, verbose_name=_('Delivered revision'))
     applied_revision = models.PositiveIntegerField(default=0, verbose_name=_('Applied revision'))
+    confirmation_skipped = models.BooleanField(default=False, verbose_name=_('Application check skipped'))
+    application_failure = models.JSONField(default=dict, blank=True, verbose_name=_('Application failure review'))
     applied_account = models.ForeignKey(
         'accounts.Account', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='+', verbose_name=_('Applied account')

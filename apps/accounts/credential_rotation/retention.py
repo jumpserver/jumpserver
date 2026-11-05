@@ -98,5 +98,6 @@ def protected_audits():
         Q(id__in=events.values('source_event_id'))
         | Q(rotation_id__in=CredentialRotationRecord.objects.values('id'))
         | Q(operation_id__in=events.exclude(cycle_id=None).values('cycle_id'))
-        | Q(event=AuditEvent.CREDENTIAL_CONFIRMED, retained_confirmation=True)
+        | Q(event__in=(AuditEvent.CREDENTIAL_CONFIRMED, AuditEvent.CREDENTIAL_CONFIRMATION_SKIPPED),
+            retained_confirmation=True)
     )
