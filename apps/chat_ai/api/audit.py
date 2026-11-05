@@ -1,6 +1,6 @@
 from django.db.models import Count, Max, Q
 from django.utils import translation
-from rest_framework import mixins, serializers
+from rest_framework import mixins
 from rest_framework.response import Response
 
 from audits.const import ActionChoices
@@ -10,41 +10,8 @@ from orgs.utils import current_org
 from rbac.permissions import RBACPermission
 
 from chat_ai.filters import ConversationAuditFilterSet
-from chat_ai.models import AuditConversation, AuditMessage
-
-
-class AuditMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AuditMessage
-        fields = (
-            'id', 'role', 'content', 'status', 'error',
-            'input_tokens', 'output_tokens', 'date_created',
-        )
-
-
-class AuditConversationSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    message_count = serializers.IntegerField(read_only=True)
-    question_count = serializers.IntegerField(read_only=True)
-    last_question_at = serializers.DateTimeField(read_only=True)
-
-    class Meta:
-        model = AuditConversation
-        fields = (
-            'id', 'title', 'assistant', 'profile', 'status', 'user', 'message_count',
-            'question_count', 'last_question_at', 'date_created', 'date_updated',
-        )
-
-    @staticmethod
-    def get_user(obj):
-        return {'id': str(obj.subject_id), 'name': obj.subject_name, 'username': obj.subject_username}
-
-
-class AuditConversationDetailSerializer(AuditConversationSerializer):
-    messages = AuditMessageSerializer(many=True, read_only=True)
-
-    class Meta(AuditConversationSerializer.Meta):
-        fields = AuditConversationSerializer.Meta.fields + ('messages',)
+from chat_ai.models import AuditConversation
+from chat_ai.serializers import AuditConversationDetailSerializer, AuditConversationSerializer
 
 
 class ConversationAuditViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, JMSGenericViewSet):
