@@ -15,7 +15,10 @@ from common.utils import lazyproperty
 from ..const import Category, AllTypes, Protocol, SuMethodChoices
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer", "PlatformListSerializer"]
+__all__ = [
+    "PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer",
+    "PlatformProtocolCreateSerializer", "PlatformListSerializer",
+]
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
@@ -153,6 +156,16 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         return _('Protocols, format is ["protocol/port"]')
 
 
+class PlatformProtocolCreateSerializer(PlatformProtocolSerializer):
+    platform = serializers.PrimaryKeyRelatedField(
+        queryset=Platform.objects.all(), pk_field=serializers.IntegerField()
+    )
+    port = serializers.IntegerField(label=_("Port"), min_value=0, max_value=65535)
+
+    class Meta(PlatformProtocolSerializer.Meta):
+        fields = PlatformProtocolSerializer.Meta.fields + ['platform']
+
+
 class PlatformCustomField(serializers.Serializer):
     TYPE_CHOICES = [(t, t) for t, c in type_field_map.items()]
     name = serializers.CharField(label=_("Name"), max_length=128)
@@ -172,7 +185,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolSerializer(label=_("Protocols"), many=True, required=False)
-    automation = PlatformAutomationSerializer(label=_("Automation"), required=False, default=dict)
+    automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
     su_method = LabeledChoiceField(
         choices=SuMethodChoices.choices, label=_("Su method"),
         required=False, default=SuMethodChoices.sudo, allow_null=True

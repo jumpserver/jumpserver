@@ -18,6 +18,7 @@ class TemplateRotationTests(SimpleTestCase):
         account.save = Mock()
         record = SimpleNamespace(account=account, asset=account.asset, new_secret='rotated-secret', id='record-id')
         manager = object.__new__(manager_class)
+        manager.execution = SimpleNamespace(snapshot={})
         manager.name_record_mapper = {'host': record}
         manager.summary = defaultdict(int)
         manager.result = defaultdict(list)

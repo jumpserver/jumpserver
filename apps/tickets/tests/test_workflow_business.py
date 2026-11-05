@@ -1,10 +1,12 @@
 from copy import deepcopy
 from datetime import timedelta
+from importlib import import_module
 from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
 
-from django.db import transaction
+from django.db import connection, transaction
+from django.db.migrations.loader import MigrationLoader
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.translation import override
@@ -27,9 +29,22 @@ from tickets.tests.test_workflow import approval_definition
 from tickets.workflow.business import submit_ticket, submit_system_ticket
 from tickets.workflow.engine import WorkflowEngine
 from tickets.workflow.errors import WorkflowConfigurationError, WorkflowConflict
-from tickets.workflow.migration import import_ticket
 from tickets.workflow.publication import publish_workflow
 from users.models import User
+
+
+convert_ticket = import_module('tickets.migrations.0010_ticket_workflow_refactor').import_ticket
+
+
+def import_ticket(ticket_id):
+    state = MigrationLoader(connection).project_state([('tickets', '0010_ticket_workflow_refactor')])
+    TicketModel = state.apps.get_model('tickets', 'Ticket')
+    if WorkflowInstance.objects.filter(ticket_id=ticket_id).exists():
+        return 'SKIP', []
+    with transaction.atomic():
+        warnings = convert_ticket(state.apps, connection.alias, TicketModel.objects.get(pk=ticket_id))
+    instance = WorkflowInstance.objects.get(ticket_id=ticket_id)
+    return f'IMPORTED ({instance.state})', warnings
 
 
 class WorkflowBusinessTests(TestCase):
@@ -277,15 +292,14 @@ class WorkflowBusinessTests(TestCase):
         second = TicketStep.objects.create(ticket=ticket, level=2, state='pending', status='active')
         TicketAssignee.objects.create(step=second, assignee=self.bob)
         Ticket.objects.filter(pk=ticket.pk).update(approval_step=2)
-        self.assertEqual(import_ticket(ticket.pk)[0], 'WOULD IMPORT (running)')
         self.assertFalse(WorkflowInstance.objects.filter(ticket=ticket).exists())
-        import_ticket(ticket.pk, apply=True)
+        import_ticket(ticket.pk)
         instance = WorkflowInstance.objects.get(ticket=ticket)
         self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
         self.assertEqual(instance.events.filter(type='approval.approved').count(), 1)
         self.engine.approve(self.task(instance, self.bob), self.bob)
         self.assertTrue(AssetPermission.objects.filter(pk=ticket.pk).exists())
-        self.assertEqual(import_ticket(ticket.pk, apply=True)[0], 'SKIP')
+        self.assertEqual(import_ticket(ticket.pk)[0], 'SKIP')
 
     def test_migration_keeps_historical_reviewer_display_for_tasks_and_events(self):
         for reviewer in (self.alice, None):
@@ -296,7 +310,7 @@ class WorkflowBusinessTests(TestCase):
                 old = TicketAssignee.objects.create(step=step, assignee=reviewer, state='approved')
                 TicketAssignee.objects.filter(pk=old.pk).update(assignee_display=display)
                 Ticket.objects.filter(pk=ticket.pk).update(state='approved', status='closed')
-                import_ticket(ticket.pk, apply=True)
+                import_ticket(ticket.pk)
                 instance = WorkflowInstance.objects.get(ticket=ticket)
                 task = instance.node_instances.get(node__type='approval').tasks.get()
                 event = instance.events.get(type='approval.approved')
@@ -317,7 +331,7 @@ class WorkflowBusinessTests(TestCase):
             with self.subTest(imported=imported):
                 if imported:
                     Ticket.objects.filter(pk=ticket.pk).update(state='approved', status='closed')
-                    import_ticket(ticket.pk, apply=True)
+                    import_ticket(ticket.pk)
                     ticket.refresh_from_db()
                     frozen = deepcopy(ticket.workflow_instance.context)
                 with override('zh-hans'):
@@ -338,7 +352,7 @@ class WorkflowBusinessTests(TestCase):
                 ticket = self.ticket()
                 step = TicketStep.objects.create(ticket=ticket, state='pending', status='active')
                 TicketAssignee.objects.create(step=step, assignee=self.applicant)
-                self.assertEqual(import_ticket(ticket.pk, apply=True), ('IMPORTED (running)', []))
+                self.assertEqual(import_ticket(ticket.pk), ('IMPORTED (running)', []))
                 instance = WorkflowInstance.objects.get(ticket=ticket)
                 task = self.task(instance, self.applicant)
                 with self.assertRaises(PermissionDenied):
@@ -359,7 +373,7 @@ class WorkflowBusinessTests(TestCase):
         second = TicketStep.objects.create(ticket=ticket, level=2, state='pending')
         for user in (self.applicant, self.bob):
             TicketAssignee.objects.create(step=second, assignee=user)
-        import_ticket(ticket.pk, apply=True)
+        import_ticket(ticket.pk)
         instance = WorkflowInstance.objects.get(ticket=ticket)
         self.engine.approve(self.task(instance), self.alice)
         self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
@@ -400,7 +414,7 @@ class WorkflowBusinessTests(TestCase):
                 if missing == 'applicant':
                     ticket.applicant = None
                 ticket.save()
-                result, warnings = import_ticket(ticket.pk, apply=True)
+                result, warnings = import_ticket(ticket.pk)
                 self.assertEqual(result, 'IMPORTED (approved)')
                 self.assertTrue(warnings)
                 Ticket.objects.filter(pk=ticket.pk).update(rel_snapshot={})
@@ -439,7 +453,7 @@ class WorkflowBusinessTests(TestCase):
         TicketAssignee.objects.create(step=step, assignee=self.alice, state='approved')
         Ticket.objects.filter(pk=ticket.pk).update(state='approved', status='closed')
         with patch('tickets.workflow.business.apply_approved_effect') as effect:
-            import_ticket(ticket.pk, apply=True)
+            import_ticket(ticket.pk)
             effect.assert_not_called()
         self.assertEqual(WorkflowInstance.objects.get(ticket=ticket).state, 'approved')
         self.assertFalse(AssetPermission.objects.filter(pk=ticket.pk).exists())
@@ -551,7 +565,7 @@ class WorkflowBusinessTests(TestCase):
         ticket.save(update_fields=['request_data'])
         step = TicketStep.objects.create(ticket=ticket, state='pending', status='active')
         TicketAssignee.objects.create(step=step, assignee=self.alice)
-        result, warnings = import_ticket(ticket.pk, apply=True)
+        result, warnings = import_ticket(ticket.pk)
         self.assertEqual(result, 'IMPORTED (error)')
         self.assertTrue(warnings)
         ticket.refresh_from_db()

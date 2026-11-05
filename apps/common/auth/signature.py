@@ -44,6 +44,9 @@ class SignatureAuthentication(authentication.BaseAuthentication):
     def after_authenticate_update_date(self, user):
         pass
 
+    def validate_authenticated_request(self, request, user, key_id):
+        pass
+
     def authenticate_header(self, request):
         """
         DRF sends this for unauthenticated responses if we're the primary
@@ -117,5 +120,6 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         if not verified:
             raise exceptions.AuthenticationFailed(gettext(FAILED))
 
+        self.validate_authenticated_request(request, user, fields["keyid"])
         self.after_authenticate_update_date(user)
         return user, fields["keyid"]

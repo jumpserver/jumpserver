@@ -7,6 +7,7 @@ from datetime import timedelta
 from urllib.parse import parse_qs, urlsplit
 
 from django.conf import settings
+from django.contrib.sessions.backends.cache import SessionStore
 from django.core.cache import cache
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
@@ -81,6 +82,7 @@ class AgentOAuthOrganizationTests(TestCase):
     def authorize(self, **extra):
         request = self.factory.post('/authorize/', {**self.authorization, 'allow': 'Authorize', **extra})
         request.user = self.user
+        request.session = SessionStore()
         request._dont_enforce_csrf_checks = True
         return AgentAwareAuthorizationView.as_view()(request)
 
@@ -270,7 +272,7 @@ class AgentOAuthOrganizationTests(TestCase):
     def test_consent_authorizes_available_orgs_without_a_selector(self):
         request = self.factory.get('/authorize/', self.authorization)
         request.user = self.user
-        request.session = {}
+        request.session = SessionStore()
         response = AgentAwareAuthorizationView.as_view()(request)
         self.assertEqual(response.status_code, 200)
         response.render()

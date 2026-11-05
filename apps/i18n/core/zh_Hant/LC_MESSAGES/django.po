@@ -17616,6 +17616,9 @@ msgstr ""
 " "
 "閒置逾時即鎖定主頁面與對應資產視窗，即使尚未設定密碼。只能在主頁面通過後端密碼驗證後解鎖。新登入正常進入，已鎖定的登入恢復後仍鎖定。外部軟體視窗不受保護。"
 
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web 工作階段已鎖定，請先解鎖後再授權用戶端。"
+
 msgid "Client is locked. Unlock it on the main page."
 msgstr "用戶端已鎖定，請在主頁面解鎖。"
 
@@ -17904,3 +17907,113 @@ msgid ""
 msgstr ""
 "0 表示關閉自動鎖屏。 閒置達到設定時間後鎖定控制台與 Web 終端，輸入鎖屏密碼解鎖。 "
 "管理員設定為預設值與上限，使用者可設定得更嚴格；未自行設定則跟隨管理員。"
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "資產申請範圍"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "設定使用者申請資產授權時可在工單中選擇的資產範圍。<br><b>所有資產：</b>可選擇工單所屬組織內的全部資產，無須事先取得授權。<br><b>授權的資產：</b>可選擇本人或所屬使用者群組的授權規則中包含的資產，包括規則已停用、已過期或尚未生效的情況。<br><b>有效授權的資產：</b>僅可選擇本人或所屬使用者群組的有效授權規則中包含的資產。規則須已啟用、已到開始時間且未到結束時間。"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Unsupported"
+msgstr "不支援"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Execution results"
+msgstr "執行結果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "No execution results"
+msgstr "暫無執行結果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Asset / Account"
+msgstr "資產 / 帳號"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No execution details"
+msgstr "暫無執行明細"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No account changes"
+msgstr "暫無帳號變化"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 對話稽核"
+
+#: accounts/notifications.py
+msgid "Account rotation preparation is ready"
+msgstr "帳號輪換準備已就緒"
+
+#: accounts/notifications.py
+msgid "Credential policy \"{name}\" is aligned. No application has requested the standby account Secret for {days} days. Sign in and manually start account switching."
+msgstr "憑據策略「{name}」已完成帳號對齊，備用帳號已連續 {days} 天沒有被應用呼叫 API 取得憑據。請登入系統，手動發起帳號切換。"
+
+#: accounts/credential_client/commands.py
+msgid "Select enabled connection instances belonging to this application."
+msgstr "請選擇屬於目前應用且已啟用的連線實例。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an authorized account rotation policy for this application."
+msgstr "請選擇目前應用已授權的帳號輪換策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Select an account rotation policy."
+msgstr "請選擇帳號輪換策略。"
+
+#: accounts/credential_client/commands.py
+msgid "Wait for the account secret change to finish."
+msgstr "請等待帳號改密完成。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected connection instances do not all have access to this credential."
+msgstr "部分所選連線實例沒有該憑據的接入權限。"
+
+#: accounts/credential_client/commands.py
+msgid "The selected Agent must be configured to restart its application service."
+msgstr "所選 Agent 必須已設定為允許重新啟動應用服務。"
+
+#: accounts/credential_client/commands.py
+msgid "Claim the event before reporting an execution result."
+msgstr "請先申請執行事件，再回報執行結果。"
+
+#: accounts/credential_client/commands.py
+msgid "Confirm the requested account version before reporting success."
+msgstr "請先確認實際使用請求中的帳號版本，再回報成功。"
+
+#: accounts/credential_client/commands.py
+msgid "Invalid command ID."
+msgstr "無效的事件執行編號。"
+
+msgid "Only active, idle policies can start a new cycle."
+msgstr "只有已啟用且閒置的策略才能發起新週期。"
+
+msgid "No authorized subscription accounts are available for notification."
+msgstr "沒有可通知的已授權訂閱帳號。"
+
+msgid "Wait for the current account secret changes to finish before republishing."
+msgstr "請等待目前帳號改密結束後，再重新發佈憑據通知。"
+
+msgid "Credential notification republished"
+msgstr "重新發佈憑據通知"
+
+msgid "Completed policy cycles are retained from their end time. Active cycles, cycles requiring attention, and their dependent audit and confirmation records are preserved."
+msgstr "已結束週期從結束時間起計算保留期。進行中、需要處理的週期及其依賴的稽核和應用確認記錄將保留。"
+
+msgid "Clean expired application audits, completed policy cycles and webhook delivery records."
+msgstr "清理過期的應用稽核、已結束的策略週期和 Webhook 投遞記錄。"
+
+msgid "The start time must be earlier than the end time."
+msgstr "開始時間必須早於結束時間。"
+
+msgid "Verify backup account before switching"
+msgstr "切換前驗證備用帳號"
+
+msgid "Verify the backup account from the server before switching. When disabled, ensure the backup account is usable yourself."
+msgstr "切換前由服務端驗證備用帳號；關閉後，請自行確保備用帳號可用。"
+
+msgid "Backup account verification skipped by policy"
+msgstr "已依策略跳過備用帳號驗證"

@@ -92,6 +92,9 @@ class Setting(models.Model):
         setting_changed.send(sender=cls, name=name, item=item)
 
     def refresh_setting(self):
+        # This limit is configured in config.yml; an old UI setting must not override it.
+        if self.name == 'APPLICATION_ACCOUNT_SCOPE_LIMIT':
+            return
         value = self.cleaned_value
         setattr(settings, self.name, value)
         self.refresh_ldap_timeout_if_need(value)

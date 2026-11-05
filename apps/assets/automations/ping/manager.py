@@ -1,11 +1,12 @@
 from assets.const import AutomationTypes, Connectivity
 from common.utils import get_logger
 from ..base.manager import BasePlaybookManager
+from ..base.report import ConnectivityReportMixin
 
 logger = get_logger(__name__)
 
 
-class PingManager(BasePlaybookManager):
+class PingManager(ConnectivityReportMixin, BasePlaybookManager):
     ansible_account_prefer = ''
 
     def __init__(self, *args, **kwargs):

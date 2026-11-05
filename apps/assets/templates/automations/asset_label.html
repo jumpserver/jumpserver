@@ -1,0 +1,4 @@
+{% load i18n %}
+<span class="asset-label"{% if asset_address or asset_id %} title="{% if asset_address %}{% trans 'Address' %}: {{ asset_address }}{% endif %}{% if asset_address and asset_id %}&#10;{% endif %}{% if asset_id %}UUID: {{ asset_id }}{% endif %}"{% endif %}>
+    <span class="asset-name">{{ asset_name|default:'-' }}</span>
+</span>

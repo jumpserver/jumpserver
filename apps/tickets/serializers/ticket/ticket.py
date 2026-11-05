@@ -203,7 +203,8 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         if not tp:
             return
         choices = dict(ticket_type_choices())
-        choices.pop(TicketType.general, None)
+        if not tp.read_only:
+            choices.pop(TicketType.general, None)
         tp.choices = choices.items()
 
     @staticmethod

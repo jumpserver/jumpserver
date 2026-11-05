@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.db.models import F, Value, CharField, Q, BooleanField, Case, DateTimeField, Exists, OuterRef, When
 from django.db.models.functions import Cast, Coalesce
-from django.http import HttpResponse, FileResponse, Http404
+from django.http import HttpResponse, FileResponse, Http404, JsonResponse
 from django.utils import timezone
 from django.utils.translation import gettext
 from django.utils.encoding import escape_uri_path
@@ -45,7 +45,7 @@ from .const import ActivityChoices, ActionChoices
 from .filters import (
     FTPLogFilterSet, JobLogFilterSet, OperateLogFilterSet,
     JobsAuditFilterSet,
-    PasswordChangeLogFilterSet, ServiceAccessLogFilterSet,
+    PasswordChangeLogFilterSet,
     UserLoginLogFilterSet, UserSessionFilterSet, ClientUserSessionFilterSet,
 )
 from .models import (
@@ -62,11 +62,37 @@ from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer, JobsAuditSerializer,
-    ServiceAccessLogSerializer, OperateLogFullSerializer
+    OperateLogFullSerializer, ServiceAccessLogSerializer
 )
 from .utils import construct_userlogin_usernames, record_operate_log_and_activity_log
 
 logger = get_logger(__name__)
+
+
+class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
+    model = IntegrationApplicationLog
+    serializer_class = ServiceAccessLogSerializer
+    extra_filter_backends = [DatetimeRangeFilterBackend]
+    date_range_filter_fields = [('datetime', ('date_from', 'date_to'))]
+    filterset_fields = [
+        'id', 'service', 'service_id', 'asset', 'asset_id', 'account', 'account_id',
+        'remote_addr', 'instance_id', 'source', 'result', 'credential_id',
+        'credential_key', 'revision', 'summary',
+    ]
+    search_fields = ['id', 'service', 'service_id', 'asset', 'account', 'instance_id',
+                     'remote_addr', 'credential_key', 'summary']
+    ordering_fields = ['datetime']
+    ordering = ['-datetime', '-id']
+
+    def get_queryset(self):
+        from accounts.models import IntegrationApplication
+        queryset = super().get_queryset()
+        if not current_org.is_root():
+            application_ids = IntegrationApplication.objects.filter(org_id=str(current_org.id)).values('id')
+            queryset = queryset.filter(
+                Q(org_id=str(current_org.id)) | Q(org_id='', service_id__in=application_ids)
+            )
+        return queryset
 
 
 class JobLogAuditViewSet(ReportExportMixin, OrgReadonlyModelViewSet):
@@ -151,8 +177,11 @@ class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
         ftp_storage = self.get_storage()
         local_path, url = ftp_storage.get_file_path_url()
         if local_path is None:
-            # url => error message
-            return HttpResponse(url)
+            logger.warning('FTP file unavailable for log %s: %s', ftp_log.id, url)
+            return JsonResponse({
+                'detail': gettext('File not found'),
+                'code': 'file_not_found',
+            }, status=status.HTTP_404_NOT_FOUND)
 
         file = open(default_storage.path(local_path), 'rb')
         response = FileResponse(file)
@@ -499,16 +528,3 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         for client in clients:
             revoke_session(client, 'security_revoke')
         return Response(status=status.HTTP_200_OK)
-
-
-class ServiceAccessLogViewSet(OrgReadonlyModelViewSet):
-    model = IntegrationApplicationLog
-    serializer_class = ServiceAccessLogSerializer
-    filterset_class = ServiceAccessLogFilterSet
-    extra_filter_backends = [DatetimeRangeFilterBackend]
-    date_range_filter_fields = [
-        ('datetime', ('date_from', 'date_to'))
-    ]
-    search_fields = ('service', 'asset', 'account', 'remote_addr')
-    ordering_fields = ('datetime',)
-    ordering = ['-datetime']

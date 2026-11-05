@@ -92,6 +92,10 @@ class JobTaskStopSerializer(serializers.Serializer):
         ref_name = "JobTaskStopSerializer"
 
 
+class FileUploadCancelSerializer(serializers.Serializer):
+    job_id = serializers.UUIDField()
+
+
 class JobExecutionSerializer(BulkOrgResourceModelSerializer):
     parameters = serializers.DictField(label=_('Parameters'), required=False, default=dict)
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())

@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from acls.models import CommandFilterACL, CommandGroup
 from common.api import JMSBulkModelViewSet
@@ -14,6 +15,7 @@ from orgs.utils import current_org
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
+from terminal.backends.command.receipt import ComponentCommandReceipt
 from terminal.const import RiskLevelChoices
 from terminal.exceptions import StorageInvalid
 from terminal.filters import CommandFilter
@@ -184,17 +186,21 @@ class CommandViewSet(JMSBulkModelViewSet):
         return qs
 
     def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, many=True)
-        if serializer.is_valid():
-            ok = self.command_store.bulk_save(serializer.validated_data)
-            if ok:
-                return Response("ok", status=201)
-            else:
-                return Response("Save error", status=500)
+        receipt = request.headers.get('X-JMS-Audit-Protocol') == '1'
+        serializer_class = self.serializer_class
+        if receipt:
+            from terminal.serializers.command import SessionCommandReceiptSerializer
+            serializer_class = SessionCommandReceiptSerializer
+        serializer = serializer_class(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        if receipt:
+            delivery = ComponentCommandReceipt(request.user, self.command_store)
+            return Response(delivery.save(serializer.validated_data), status=HTTP_201_CREATED)
+        ok = self.command_store.bulk_save(serializer.validated_data)
+        if ok:
+            return Response("ok", status=HTTP_201_CREATED)
         else:
-            msg = "Command not valid: {}".format(serializer.errors)
-            logger.error(msg)
-            return Response({"msg": msg}, status=401)
+            return Response("Save error", status=HTTP_400_BAD_REQUEST)
 
 
 class InsecureCommandAlertAPI(generics.CreateAPIView):

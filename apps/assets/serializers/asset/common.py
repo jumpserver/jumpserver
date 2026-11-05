@@ -29,8 +29,13 @@ __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
-    'AccountSecretSerializer', 'AssetProtocolsPermsSerializer', 'AssetLabelSerializer'
+    'AccountSecretSerializer', 'AssetProtocolsPermsSerializer', 'AssetLabelSerializer',
+    'SyncPlatformProtocolsSerializer',
 ]
+
+
+class SyncPlatformProtocolsSerializer(serializers.Serializer):
+    platform_id = serializers.IntegerField()
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):

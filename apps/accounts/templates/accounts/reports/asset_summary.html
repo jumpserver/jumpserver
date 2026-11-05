@@ -1,0 +1,7 @@
+{% load i18n %}
+<dl class="scope-summary">
+    <div><dt>{% trans 'Assets amount' %}</dt><dd>{{ summary.total_assets|default:0 }}</dd></div>
+    <div><dt>{% trans 'Asset success count' %}</dt><dd>{{ summary.ok_assets|default:0 }}</dd></div>
+    <div><dt>{% trans 'Asset failed count' %}</dt><dd>{{ summary.fail_assets|default:0 }}</dd></div>
+    <div><dt>{% trans 'Asset not support count' %}</dt><dd>{{ summary.error_assets|default:0 }}</dd></div>
+</dl>

@@ -1,0 +1,92 @@
+from unittest.mock import patch
+
+from accounts.models import (
+    Account,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    IntegrationApplication,
+)
+from assets.const import Category
+from assets.models import Asset, Platform
+from django.test import TestCase
+from orgs.models import Organization
+from orgs.utils import set_current_org, set_to_root_org
+from rest_framework.test import APIRequestFactory, force_authenticate
+from users.models import User
+
+
+class CredentialTestCase(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        # TestCase rolls back organization rows but not the process-local mapping.
+        Organization.expire_orgs_mapping()
+        self.org = Organization.default()
+        set_current_org(self.org)
+        self.admin = User.objects.create_superuser(
+            username='credential-admin', password='password',
+            name='Credential admin', email='credential-admin@example.com',
+        )
+        self.platform = Platform.objects.create(
+            name='CredentialTestPostgreSQL',
+            category=Category.DATABASE,
+            type='postgresql',
+        )
+        self.asset = Asset.objects.create(
+            name='credential-test-pg', address='127.0.0.1',
+            platform=self.platform,
+        )
+        self.primary = Account.objects.create(
+            name='account-a', username='account-a', asset=self.asset,
+            secret='primary-secret',
+        )
+        self.backup = Account.objects.create(
+            name='account-b', username='account-b', asset=self.asset,
+            secret='backup-secret',
+        )
+        self.application = IntegrationApplication.objects.create(
+            name='order-service', secret='application-secret',
+            accounts={
+                'type': 'ids',
+                'ids': [str(self.primary.id), str(self.backup.id)],
+            },
+        )
+        self.credential = ApplicationCredential.objects.create(
+            name='PostgreSQL primary',
+            mode=ApplicationCredential.Mode.alternating_rotation,
+            account=self.primary,
+            alternate_account=self.backup,
+            active_account=self.primary,
+            source_no_traffic_days=0,
+        )
+        CredentialApplicationBinding.objects.create(
+            credential=self.credential, application=self.application,
+        )
+        # State-machine tests assume successful backup verification; the real
+        # preflight lifecycle is exercised separately in CredentialPreflightTests.
+        from accounts.credential_rotation import CredentialRotationManager
+        self.precheck_patch = patch(
+            'accounts.credential_rotation.preflight.start',
+            side_effect=lambda credential, operator='', operator_id=None:
+                CredentialRotationManager(credential.id)._publish(credential, operator),
+        )
+        self.precheck_patch.start()
+        self.addCleanup(self.precheck_patch.stop)
+
+    def _post_teardown(self):
+        try:
+            super()._post_teardown()
+        finally:
+            Organization.expire_orgs_mapping()
+            set_to_root_org()
+
+    def request(self, method, path, data=None, user=None):
+        creator = getattr(self.factory, method)
+        request = creator(
+            path, data=data or {}, format='json',
+            HTTP_X_JMS_ORG=str(self.org.id),
+            HTTP_X_JMS_CLIENT_VERSION='1.0.0',
+            HTTP_X_JMS_PROTOCOL_VERSION='1',
+            HTTP_X_JMS_CONFIG_SCHEMA_VERSION='0',
+        )
+        force_authenticate(request, user=user or self.admin)
+        return request

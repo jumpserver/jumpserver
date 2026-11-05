@@ -9,6 +9,7 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
@@ -16,7 +17,9 @@ from assets.const import AllTypes
 from assets.models import (
     Platform, PlatformPackage, Node, Asset, PlatformProtocol, PlatformAutomation,
 )
-from assets.serializers import PlatformSerializer, PlatformProtocolSerializer, PlatformListSerializer
+from assets.serializers import (
+    PlatformSerializer, PlatformProtocolSerializer, PlatformProtocolCreateSerializer, PlatformListSerializer,
+)
 from assets.utils.platform_package import (
     locate_package_root,
 )
@@ -29,6 +32,9 @@ from rbac.models import RoleBinding
 __all__ = ['AssetPlatformViewSet', 'PlatformAutomationMethodsApi', 'PlatformProtocolViewSet']
 
 
+def _check_platform_editable(platform):
+    if platform.internal:
+        raise PermissionDenied({"detail": gettext("Internal platform")})
 
 
 class PlatformFilter(filters.FilterSet):
@@ -115,10 +121,8 @@ class AssetPlatformViewSet(JMSModelViewSet):
             return super().check_permissions(request)
 
     def check_object_permissions(self, request, obj):
-        if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
-            self.permission_denied(
-                request, message={"detail": gettext("Internal platform")}
-            )
+        if request.method.lower() in ['delete', 'put', 'patch']:
+            _check_platform_editable(obj)
         return super().check_object_permissions(request, obj)
 
     @action(methods=['post'], detail=False, url_path='filter-nodes-assets')
@@ -190,11 +194,19 @@ class AssetPlatformViewSet(JMSModelViewSet):
 
 class PlatformProtocolViewSet(JMSModelViewSet):
     queryset = PlatformProtocol.objects.all()
-    serializer_class = PlatformProtocolSerializer
+    serializer_classes = {
+        'post': PlatformProtocolCreateSerializer,
+        'default': PlatformProtocolSerializer,
+    }
     filterset_fields = ['name', 'platform__name']
     rbac_perms = {
-        '*': 'assets.add_platform'
+        'create': 'assets.change_platform',
+        '*': 'assets.add_platform',
     }
+
+    def perform_create(self, serializer):
+        _check_platform_editable(serializer.validated_data['platform'])
+        super().perform_create(serializer)
 
 
 class PlatformAutomationMethodsApi(generics.ListAPIView):

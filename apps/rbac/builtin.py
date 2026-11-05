@@ -57,6 +57,7 @@ _auditor_perms = (
     ('assets', 'asset', 'view', 'asset'),
     ('users', 'user', 'view', 'user'),
     ('audits', '*', '*', '*'),
+    ('chat_ai', 'auditconversation', 'view', 'auditconversation'),
     ('audits', 'joblog', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),

@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from django.core import signing
 from django.core.cache import cache
+from django.contrib.sessions.backends.cache import SessionStore
 from django.test import TestCase, TransactionTestCase, SimpleTestCase, RequestFactory, override_settings
 from django.http import Http404
 from django.utils import timezone
@@ -668,11 +669,13 @@ class AgentBoundaryTests(TestCase):
                         'code_challenge': 'x' * 43, 'code_challenge_method': 'S256'}
                 request = factory.get('/authorize/', body, secure=secure)
                 request.user = self.user
+                request.session = SessionStore()
                 response = view(request)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.context_data['form'].initial['redirect_uri'], callback)
                 request = factory.post('/authorize/', {**body, 'allow': 'Authorize'}, secure=secure)
                 request.user = self.user
+                request.session = SessionStore()
                 request._dont_enforce_csrf_checks = True
                 response = view(request)
                 self.assertEqual(response.status_code, 302)

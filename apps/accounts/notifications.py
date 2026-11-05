@@ -1,5 +1,6 @@
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html
 from premailer import transform
 
 from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storage
@@ -7,6 +8,26 @@ from notifications.notifications import UserMessage
 from terminal.models.component.storage import ReplayStorage
 from users.models import User
 from users.utils import activate_user_language
+
+
+
+
+class CredentialSourceReadyMsg(UserMessage):
+    subject = _('Account rotation is ready for source secret change')
+
+    def __init__(self, user, credential):
+        self.credential = credential
+        super().__init__(user)
+
+    def get_html_msg(self):
+        return {
+            'subject': str(self.subject),
+            'message': format_html('<p>{}</p>', _(
+                'Credential policy "{name}" has switched to the backup account. '
+                'Required client confirmations are complete, and the original account had no successful '
+                'JumpServer secret fetch for {days} days. The original account secret can now be changed.'
+            ).format(name=self.credential.name, days=self.credential.source_no_traffic_days)),
+        }
 
 
 class AccountBackupExecutionTaskMsg:

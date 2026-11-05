@@ -35,7 +35,7 @@ from ops.ansible import (
 from ops.ansible.exception import CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
-from ops.const import Types, RunasPolicies, JobStatus, JobModules
+from ops.const import Types, RunasPolicies, JobStatus, JobModules, LOGIN_ASSET_ACL_DENIED
 from ops.utils import merge_nodes_and_assets
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
@@ -658,22 +658,26 @@ class JobExecution(JMSOrgBaseModel):
             self.check_command_acl()
 
     def check_login_asset_acls(self, ip=None):
-        asset, acl = match_rejected_login_asset_acl(
+        asset, _acl = match_rejected_login_asset_acl(
             self.creator, self.inventory.assets, self.current_job.runas, ip
         )
         if not asset:
             return
-        print(
-            "\033[31mLogin to asset {}({}) is rejected by login asset ACL ({})\033[0m"
-            .format(asset.name, asset.address, acl)
+        message = LOGIN_ASSET_ACL_DENIED.format(
+            asset=asset.name, address=asset.address
         )
-        raise Exception(
-            "Login to asset {}({}) is rejected by login asset ACL ({})".format(
-                asset.name, asset.address, acl
-            )
-        )
+        print(f'\033[31m{message}\033[0m')
+        raise Exception(message)
+
+    def is_upload_cancelled(self):
+        if self.job_type != Types.upload_file:
+            return False
+        args = Job.objects.filter(pk=self.job_id).values_list('args', flat=True).first()
+        return bool(json.loads(args or '{}').get('upload_cancelled'))
 
     def before_start(self):
+        if self.is_upload_cancelled():
+            raise Exception(_('Task canceled by user'))
         self.check_assets_perms()
         self.check_assets_acls()
 
@@ -688,6 +692,9 @@ class JobExecution(JMSOrgBaseModel):
         ssh_tunnel = SSHTunnelManager()
         ssh_tunnel.local_gateway_prepare(runner)
         try:
+            if self.job_type == Types.upload_file:
+                # Also catch cancellation while the runner is still preparing its transport.
+                kwargs['cancel_callback'] = self.is_upload_cancelled
             cb = runner.run(**kwargs)
             self.set_result(cb)
             return cb

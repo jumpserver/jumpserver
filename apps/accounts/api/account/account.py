@@ -285,6 +285,11 @@ class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
         'retrieve': 'accounts.view_accountsecret',
     }
 
+    @classmethod
+    def get_extra_actions(cls):
+        # Secret endpoints expose list/retrieve, not the account management actions.
+        return []
+
 
 class AssetAccountBulkCreateApi(CreateAPIView):
     serializer_class = serializers.AssetAccountBulkSerializer

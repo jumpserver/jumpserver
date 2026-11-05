@@ -1,0 +1,813 @@
+import re
+from pathlib import PurePosixPath
+
+from accounts.credential_client.documentation import sdk_languages
+from accounts.models import (
+    Account,
+    ApplicationCredential,
+    CredentialApplicationBinding,
+    CredentialClientInstance,
+    CredentialClientStatus,
+    IntegrationApplication,
+)
+from common.serializers.fields import ObjectRelatedField
+from django.db import transaction
+from django.db.models import Count, Prefetch
+from django.utils.translation import gettext_lazy as _
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from rest_framework import serializers
+
+__all__ = [
+    'ApplicationCredentialSerializer', 'ApplicationCredentialListSerializer',
+    'CredentialApplicationBindingSerializer',
+    'CredentialClientInstanceSerializer', 'CredentialClientStatusSerializer',
+    'CredentialFetchSerializer', 'AuthorizedAccountsSerializer',
+    'CredentialClientInfoSerializer', 'CredentialPolicyQuerySerializer', 'ApplicationStatusReportSerializer',
+    'CredentialPolicyListSerializer',
+    'CredentialConfirmSerializer', 'CredentialAgentRegisterSerializer', 'CredentialEventResultSerializer',
+    'CredentialAgentSyncSerializer',
+    'CredentialAccessWizardSerializer',
+    'CredentialChangeRetrySerializer', 'CredentialRotationReasonSerializer',
+    'CredentialRotationForceStopSerializer', 'CredentialFailureReviewSerializer',
+]
+
+
+SYSTEMD_UNIT = re.compile(r'^[A-Za-z0-9_.@:-]+\.service$')
+DELIVERY_MODES = [('json', _('JSON files')), ('environment', _('Environment files')), ('socket', _('Unix socket'))]
+SYSTEMD_ACTIONS = [('reload', _('Reload')), ('restart', _('Restart'))]
+
+
+class CredentialFailureReviewSerializer(serializers.Serializer):
+    client_id = serializers.UUIDField()
+    failure_id = serializers.UUIDField()
+    reason = serializers.CharField(max_length=512, allow_blank=False, trim_whitespace=True)
+
+
+class CredentialRotationReasonSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=512, required=False, default='', allow_blank=True)
+
+
+class CredentialRotationForceStopSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=512, allow_blank=False)
+
+
+class CredentialChangeRetrySerializer(CredentialRotationReasonSerializer):
+    execution_id = serializers.UUIDField()
+    reason = serializers.CharField(max_length=512, allow_blank=False)
+
+
+class SubscribedAccountField(ObjectRelatedField):
+    asset_field = ObjectRelatedField(read_only=True, attrs=('id', 'name', 'address'))
+
+    def to_representation(self, value):
+        data = super().to_representation(value)
+        data['asset'] = self.asset_field.to_representation(value.asset)
+        return data
+
+    def _get_openapi_object_schema(self):
+        schema = super()._get_openapi_object_schema()
+        schema['properties']['asset'] = self.asset_field.get_schema()
+        return schema
+
+
+class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
+    rotation = serializers.SerializerMethodField()
+    rotation_phase = serializers.SerializerMethodField()
+    precheck = serializers.SerializerMethodField()
+    mode = serializers.ChoiceField(choices=['alternating_rotation'], default='alternating_rotation')
+    subscription_all_authorized = serializers.BooleanField(required=False)
+
+
+    @staticmethod
+    def get_precheck(instance):
+        from accounts.credential_rotation.preflight import info
+        return info(instance) if instance.mode == ApplicationCredential.Mode.alternating_rotation else None
+
+    @staticmethod
+    def get_rotation(instance):
+        from accounts.credential_rotation.execution import execution_info
+        return execution_info(instance)
+
+    @staticmethod
+    def get_rotation_phase(instance):
+        if instance.status != ApplicationCredential.Status.waiting_switch:
+            return instance.status
+        from accounts.credential_rotation.participants import build
+        return build(instance)['rotation_phase']
+
+    account = ObjectRelatedField(
+        queryset=Account.objects, attrs=('id', 'name', 'username', 'secret_type'),
+        label=_('Account'), required=False, allow_null=True
+    )
+    alternate_account = ObjectRelatedField(
+        queryset=Account.objects, attrs=('id', 'name', 'username'),
+        label=_('Alternate account'), required=False, allow_null=True
+    )
+    active_account = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name', 'username'),
+        label=_('Active account')
+    )
+    asset = serializers.SerializerMethodField(label=_('Asset'))
+    applications_amount = serializers.IntegerField(read_only=True)
+    blockers = serializers.SerializerMethodField(label=_('Blockers'))
+    applications = ObjectRelatedField(
+        queryset=IntegrationApplication.objects, many=True, required=True,
+        attrs=('id', 'name'), label=_('Integration applications')
+    )
+    subscription_accounts = SubscribedAccountField(
+        queryset=Account.objects, many=True, required=False,
+        attrs=('id', 'name', 'username', 'asset_id'), label=_('Subscribed accounts'),
+    )
+    change_execution = ObjectRelatedField(read_only=True, attrs=('id', 'status', 'date_finished'))
+
+    class Meta:
+        model = ApplicationCredential
+        fields_mini = ['id', 'name', 'key']
+        fields_small = fields_mini + [
+            'mode', 'asset', 'account', 'alternate_account', 'subscription_accounts',
+            'subscription_all_authorized',
+            'active_account', 'revision', 'status', 'rotation_phase', 'is_active',
+            'source_no_traffic_days', 'verify_before_switch',
+            'date_last_rotated', 'applications_amount',
+        ]
+        fields = fields_small + [
+            'applications', 'change_execution', 'rotation', 'precheck', 'blockers',
+            'rotation_cancelled', 'date_rotation_started',
+            'date_created', 'date_updated', 'created_by', 'comment',
+        ]
+        read_only_fields = [
+            'key', 'active_account', 'revision', 'status',
+            'applications_amount', 'blockers',
+            'rotation_cancelled', 'date_rotation_started', 'date_last_rotated',
+        ]
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        return queryset.select_related(
+            'account__asset__platform', 'alternate_account', 'active_account', 'change_execution'
+        ).prefetch_related(
+            'applications',
+            Prefetch('subscription_accounts', queryset=Account.objects.select_related('asset')),
+        ).annotate(
+            applications_amount=Count('applications', distinct=True),
+        )
+
+    @staticmethod
+    def get_asset(instance):
+        asset = instance.asset
+        if not asset:
+            return None
+        return {
+            'id': str(asset.id),
+            'name': asset.name,
+            'address': asset.address,
+            'platform': {
+                'id': str(asset.platform_id),
+                'name': asset.platform.name,
+                'category': asset.platform.category,
+                'type': asset.platform.type,
+            },
+        }
+
+    @staticmethod
+    def get_blockers(instance):
+        if instance.status == ApplicationCredential.Status.idle:
+            return []
+        return instance.get_blockers()
+
+    def validate(self, attrs):
+        from accounts.credential_rotation.preflight import check_ownership
+        attrs = self.validate_accounts(attrs)
+        accounts = [
+            attrs.get('account', getattr(self.instance, 'account', None)),
+            attrs.get('alternate_account', getattr(self.instance, 'alternate_account', None)),
+        ]
+        mode = attrs.get('mode') or getattr(
+            self.instance, 'mode', ApplicationCredential.Mode.subscription
+        )
+        if mode == ApplicationCredential.Mode.alternating_rotation:
+            check_ownership(self.instance or ApplicationCredential(), accounts)
+        applications = attrs.get('applications')
+        if applications is None and self.instance:
+            applications = list(self.instance.applications.all())
+        if not applications:
+            raise serializers.ValidationError({'applications': _('Select at least one application.')})
+        if mode == ApplicationCredential.Mode.subscription:
+            all_authorized = attrs.get(
+                'subscription_all_authorized',
+                bool(self.instance and self.instance.subscription_all_authorized),
+            )
+            selected = attrs.get('subscription_accounts')
+            if selected is None and self.instance:
+                selected = list(self.instance.subscription_accounts.all())
+            if all_authorized:
+                attrs['subscription_accounts'] = []
+                selected = []
+            if not selected and not all_authorized:
+                raise serializers.ValidationError({'subscription_accounts': _(
+                    'Select at least one account to subscribe to.'
+                )})
+            if selected:
+                required = {item.id for item in selected}
+                unauthorized = [
+                    application.name for application in applications
+                    if not required.issubset(set(application.get_accounts().values_list('id', flat=True)))
+                ]
+                if unauthorized:
+                    raise serializers.ValidationError({'subscription_accounts': _(
+                        'These applications are not authorized for every subscribed account: {names}'
+                    ).format(names=', '.join(unauthorized))})
+            attrs['subscription_all_authorized'] = all_authorized
+        elif attrs.get('subscription_accounts') or attrs.get('subscription_all_authorized'):
+            raise serializers.ValidationError({'subscription_accounts': _(
+                'Subscribed accounts are only available for credential change subscriptions.'
+            )})
+        if mode == ApplicationCredential.Mode.alternating_rotation:
+            required = {item.id for item in accounts if item}
+            unauthorized = [
+                application.name for application in applications
+                if not required.issubset(set(application.get_accounts().values_list('id', flat=True)))
+            ]
+            if unauthorized:
+                raise serializers.ValidationError({'applications': _(
+                    'These applications are not authorized for every credential account: {names}'
+                ).format(names=', '.join(unauthorized))})
+        return attrs
+
+    def validate_accounts(self, attrs):
+        if (self.instance and 'verify_before_switch' in attrs
+                and attrs['verify_before_switch'] != self.instance.verify_before_switch):
+            from accounts.credential_rotation.preflight import info
+            precheck = info(self.instance)
+            if precheck and precheck['status'] == 'checking':
+                raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
+        if self.instance and self.instance.status != ApplicationCredential.Status.idle:
+            for field in ('account', 'alternate_account', 'is_active', 'source_no_traffic_days', 'verify_before_switch'):
+                if field in attrs and attrs[field] != getattr(self.instance, field):
+                    raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
+            if 'applications' in attrs and {
+                item.id for item in attrs['applications']
+            } != set(self.instance.applications.values_list('id', flat=True)):
+                raise serializers.ValidationError(_('Credential settings cannot be changed during rotation.'))
+        if self.instance and 'mode' in attrs and attrs['mode'] != self.instance.mode:
+            raise serializers.ValidationError({'mode': _('The credential policy mode cannot be changed.')})
+        account = attrs.get('account') or getattr(self.instance, 'account', None)
+        mode = attrs.get('mode') or getattr(self.instance, 'mode', ApplicationCredential.Mode.subscription)
+        alternate = attrs.get('alternate_account', getattr(self.instance, 'alternate_account', None))
+        if mode == ApplicationCredential.Mode.subscription:
+            attrs['account'] = None
+            attrs['alternate_account'] = None
+            attrs['active_account'] = None
+            return attrs
+        if not account:
+            raise serializers.ValidationError({'account': _(
+                'This field is required for alternating dual-account rotation.'
+            )})
+        if not alternate:
+            raise serializers.ValidationError({'alternate_account': _(
+                'This field is required for alternating dual-account rotation.'
+            )})
+        if not account:
+            return attrs
+        if account.id == alternate.id:
+            raise serializers.ValidationError(_('The initial and alternate accounts must be different.'))
+        if account.asset_id != alternate.asset_id:
+            raise serializers.ValidationError(_('The initial and alternate accounts must belong to the same asset.'))
+        if account.org_id != alternate.org_id:
+            raise serializers.ValidationError(_('The initial and alternate accounts must belong to the same organization.'))
+        if account.secret_type != alternate.secret_type:
+            raise serializers.ValidationError(_('The initial and alternate accounts must use the same secret type.'))
+        return attrs
+
+    @staticmethod
+    def sync_applications(instance, applications):
+        from accounts.const import ApplicationEvent, AuditEvent
+        from accounts.credential_client.audit import record
+        from accounts.credential_client.events import enqueue
+
+        wanted = {application.id: application for application in applications}
+        removed = list(instance.application_bindings.exclude(
+            application_id__in=wanted
+        ).select_related('application'))
+        instance.application_bindings.filter(id__in=[item.id for item in removed]).delete()
+        existing = set(instance.application_bindings.values_list('application_id', flat=True))
+        added = [
+            CredentialApplicationBinding(
+                credential=instance, application=application, org_id=instance.org_id,
+            )
+            for application_id, application in wanted.items() if application_id not in existing
+        ]
+        CredentialApplicationBinding.objects.bulk_create(added)
+        from accounts.credential_client.access import publish_application_scope
+        for application in (binding.application for binding in added):
+            publish_application_scope(application)
+        for binding in added:
+            event = record(
+                AuditEvent.AUTHORIZATION_GRANTED, credential=instance,
+                application=binding.application,
+            )
+            enqueue(event, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
+
+    def create(self, validated_data):
+        from accounts.credential_rotation.preflight import check_ownership
+        applications = validated_data.pop('applications')
+        accounts = [validated_data.get('account'), validated_data.get('alternate_account')]
+        # Lock shared accounts before inserting a new credential, then recheck ownership.
+        with transaction.atomic():
+            list(Account.objects.select_for_update().filter(
+                pk__in=[a.pk for a in accounts if a],
+            ).order_by('id'))
+            if validated_data.get('mode', ApplicationCredential.Mode.subscription) == ApplicationCredential.Mode.alternating_rotation:
+                check_ownership(ApplicationCredential(), accounts)
+                validated_data['active_account'] = validated_data['account']
+            instance = super().create(validated_data)
+            self.sync_applications(instance, applications)
+            return instance
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        from accounts.credential_rotation.preflight import check_ownership
+        instance = ApplicationCredential.objects.select_for_update().get(pk=instance.pk)
+        # Recheck stage constraints against the locked, current credential.
+        self.instance = instance
+        validated_data = self.validate(validated_data)
+        applications = validated_data.pop('applications', None)
+        previous_accounts = set(instance.subscription_accounts.values_list('id', flat=True))
+        previous_all = instance.subscription_all_authorized
+        account = validated_data.get('account', instance.account)
+        accounts = [account, validated_data.get('alternate_account', instance.alternate_account)]
+        # Existing bindings already exclude competing claims. Lock only newly
+        # acquired accounts, avoiding lock inversion with subscription publication.
+        existing_ids = {instance.account_id, instance.alternate_account_id}
+        list(Account.objects.select_for_update().filter(
+            pk__in=[a.pk for a in accounts if a and a.pk not in existing_ids],
+        ).order_by('id'))
+        if instance.mode == ApplicationCredential.Mode.alternating_rotation:
+            check_ownership(instance, accounts)
+        if account and instance.active_account_id not in {item.id for item in accounts if item}:
+            validated_data['active_account'] = account
+            validated_data['revision'] = instance.revision + 1
+        instance = super().update(instance, validated_data)
+        if applications is not None:
+            self.sync_applications(instance, applications)
+        if instance.mode == ApplicationCredential.Mode.subscription and (
+            previous_all != instance.subscription_all_authorized
+            or previous_accounts != set(instance.subscription_accounts.values_list('id', flat=True))
+        ):
+            from accounts.const import ApplicationEvent, AuditEvent
+            from accounts.credential_client.audit import record
+            from accounts.credential_client.events import enqueue
+            event = record(AuditEvent.CONFIGURATION_UPDATED, credential=instance)
+            enqueue(event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
+        return instance
+
+
+class ApplicationCredentialListSerializer(ApplicationCredentialSerializer):
+    subscription_accounts_amount = serializers.IntegerField(read_only=True)
+    subscription_assets_amount = serializers.IntegerField(read_only=True)
+    subscription_accounts_preview = SubscribedAccountField(
+        read_only=True, many=True, attrs=('id', 'name', 'username', 'asset_id'),
+    )
+
+    class Meta(ApplicationCredentialSerializer.Meta):
+        fields_small = [
+            field for field in ApplicationCredentialSerializer.Meta.fields_small
+            if field != 'subscription_accounts'
+        ] + [
+            'subscription_accounts_amount', 'subscription_assets_amount',
+            'subscription_accounts_preview',
+        ]
+        fields = fields_small
+        relation_count_fields = {'applications_amount': 'applications'}
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        # Keep the list payload bounded: count the scope and fetch at most three
+        # accounts per policy. Application counts use the batch helper.
+        return queryset.select_related(
+            'account__asset__platform', 'alternate_account', 'active_account',
+        ).prefetch_related(
+            Prefetch(
+                'subscription_accounts',
+                queryset=Account.objects.select_related('asset').only(
+                    'id', 'name', 'username', 'asset_id',
+                    'asset__id', 'asset__name', 'asset__address',
+                ).order_by('name', 'username', 'id')[:3],
+                to_attr='subscription_accounts_preview',
+            ),
+        ).annotate(
+            subscription_accounts_amount=Count('subscription_accounts', distinct=True),
+            subscription_assets_amount=Count('subscription_accounts__asset_id', distinct=True),
+        )
+
+
+class CredentialClientStatusSerializer(serializers.ModelSerializer):
+    credential = serializers.SerializerMethodField(label=_('Credential policy'))
+    applied_account = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name', 'username'), label=_('Applied account')
+    )
+
+    class Meta:
+        model = CredentialClientStatus
+        fields = [
+            'id', 'credential', 'fetched_revision', 'delivered_revision', 'applied_revision',
+            'applied_account', 'required_revision', 'is_rotation_participant', 'confirmation_skipped', 'application_failure',
+            'date_last_seen', 'date_fetched', 'date_delivered', 'date_applied',
+        ]
+        read_only_fields = fields
+
+    @staticmethod
+    def get_credential(instance):
+        credential = instance.binding.credential
+        return {
+            'id': str(credential.id), 'name': credential.name,
+            'key': credential.key, 'status': credential.status, 'mode': credential.mode,
+        }
+
+
+class CredentialClientInstanceSerializer(BulkOrgResourceModelSerializer):
+    reported_accounts = serializers.SerializerMethodField()
+    credentials = ObjectRelatedField(
+        source='application.application_credentials', many=True, read_only=True, attrs=('id', 'name'),
+    )
+    application = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name'), label=_('Integration application')
+    )
+    online = serializers.SerializerMethodField(label=_('Online'))
+    credential_statuses = CredentialClientStatusSerializer(many=True, read_only=True)
+    configuration_current = serializers.SerializerMethodField()
+    upgrade_required = serializers.SerializerMethodField()
+    reason = serializers.CharField(
+        write_only=True, required=False, allow_blank=True, max_length=512,
+    )
+
+    class Meta:
+        model = CredentialClientInstance
+        fields_mini = ['id', 'instance_id', 'type']
+        fields_small = fields_mini + [
+            'application', 'online', 'date_last_seen', 'remote_addr', 'is_active',
+            'application_status', 'date_status_reported',
+            'reported_accounts',
+        ]
+        fields = fields_small + [
+            'client_version', 'protocol_version', 'config_schema_version',
+            'config_digest', 'configuration_current', 'upgrade_required',
+            'sync_status', 'sync_error', 'date_last_synced',
+            'credential_statuses', 'credentials', 'reason', 'date_created', 'date_updated', 'comment',
+        ]
+        read_only_fields = [
+            'id', 'instance_id', 'type', 'application', 'online',
+            'client_version', 'protocol_version', 'config_schema_version',
+            'config_digest', 'configuration_current', 'upgrade_required',
+            'sync_status', 'sync_error', 'date_last_synced',
+            'date_last_seen', 'remote_addr', 'credential_statuses', 'date_created', 'date_updated',
+            'application_status', 'date_status_reported',
+            'reported_accounts',
+        ]
+
+    def get_reported_accounts(self, instance):
+        # Resolve names once for the entire page. Historical reports remain
+        # snapshots; missing accounts fall back to their reported IDs in the UI.
+        if not hasattr(self, '_reported_accounts'):
+            instances = getattr(self.parent, 'instance', None)
+            if instances is None:
+                instances = [instance]
+            ids, org_ids = set(), set()
+            for client in instances:
+                ids.update((client.application_status or {}).get('account_ids', []))
+                org_ids.add(client.org_id)
+            self._reported_accounts = {
+                str(account.id): account for account in Account.objects.filter(
+                    id__in=ids, org_id__in=org_ids,
+                ).select_related('asset').only(
+                    'id', 'name', 'username', 'org_id', 'asset_id', 'asset__id', 'asset__name',
+                )
+            }
+        result = []
+        for account_id in (instance.application_status or {}).get('account_ids', []):
+            account = self._reported_accounts.get(account_id)
+            if account is None or account.org_id != instance.org_id:
+                continue
+            result.append({
+                'id': str(account.id), 'name': account.name, 'username': account.username,
+                'asset': {'id': str(account.asset_id), 'name': account.asset.name},
+            })
+        return result
+
+    @staticmethod
+    def get_online(instance):
+        return bool(instance.online and instance.is_valid)
+
+    @staticmethod
+    def get_configuration_current(instance):
+        if instance.type != CredentialClientInstance.Type.agent or not instance.config_digest:
+            return None
+        from accounts.credential_client.manager import CredentialClientManager
+        return instance.config_digest == CredentialClientManager.agent_configuration_digest(
+            instance.application, instance.delivery_scope
+        )
+
+    @staticmethod
+    def get_upgrade_required(instance):
+        from accounts.credential_client.protocol import supports_versions
+        return not supports_versions(
+            instance.protocol_version, instance.config_schema_version,
+            is_agent=instance.type == CredentialClientInstance.Type.agent,
+        )
+
+    def validate(self, attrs):
+        if (
+            self.instance and self.instance.is_active
+            and attrs.get('is_active') is False
+            and self.instance.credential_statuses.exclude(
+                binding__credential__status=ApplicationCredential.Status.idle,
+            ).exists()
+            and not attrs.get('reason', '').strip()
+        ):
+            raise serializers.ValidationError({
+                'reason': _('Explain why the rotating client should be excluded.')
+            })
+        return attrs
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        reason = validated_data.pop('reason', '').strip()
+        if instance.is_active and validated_data.get('is_active') is False:
+            from accounts.credential_rotation.participants import exclude
+
+            credential_ids = list(instance.credential_statuses.exclude(
+                binding__credential__status=ApplicationCredential.Status.idle,
+            ).values_list('binding__credential_id', flat=True))
+            locked_credentials = ApplicationCredential.objects.select_for_update().filter(
+                id__in=credential_ids,
+            ).order_by('id')
+            credentials = {credential.id: credential for credential in locked_credentials}
+            states = list(CredentialClientStatus.objects.select_for_update(of=('self',)).select_related(
+                'binding__credential', 'binding__application',
+                'applied_account',
+            ).filter(client=instance, binding__credential_id__in=credentials))
+            for credential_id, credential in credentials.items():
+                exclude(
+                    credential,
+                    [state for state in states if state.binding.credential_id == credential_id],
+                    reason,
+                )
+        instance._application_audit_summary = reason
+        try:
+            return super().update(instance, validated_data)
+        finally:
+            del instance._application_audit_summary
+
+
+class CredentialApplicationBindingSerializer(BulkOrgResourceModelSerializer):
+    credential = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name', 'key', 'status'),
+        label=_('Credential policy')
+    )
+    application = ObjectRelatedField(
+        read_only=True, attrs=('id', 'name'),
+        label=_('Integration application')
+    )
+    clients_amount = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = CredentialApplicationBinding
+        fields = [
+            'id', 'credential', 'application', 'clients_amount',
+            'date_created', 'date_updated', 'comment',
+        ]
+        read_only_fields = fields
+
+
+class CredentialFetchSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=64, required=False)
+    account_id = serializers.UUIDField(required=False)
+    instance_id = serializers.CharField(max_length=128, required=False)
+
+    def validate(self, attrs):
+        if bool(attrs.get('key')) == bool(attrs.get('account_id')):
+            raise serializers.ValidationError(_('Provide exactly one of key or account_id.'))
+        return attrs
+
+
+class AuthorizedAccountsSerializer(serializers.Serializer):
+    instance_id = serializers.CharField(max_length=128, required=False)
+    limit = serializers.IntegerField(min_value=1, max_value=500, default=200)
+    offset = serializers.IntegerField(min_value=0, default=0)
+    search = serializers.CharField(max_length=128, required=False, allow_blank=True)
+
+
+class CredentialClientInfoSerializer(serializers.Serializer):
+    instance_id = serializers.CharField(max_length=128, required=False)
+
+
+class ApplicationStatusReportSerializer(CredentialClientInfoSerializer):
+    status = serializers.ChoiceField(choices=('starting', 'running', 'degraded', 'stopping', 'stopped', 'error'))
+    account_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200, default=list)
+    error_code = serializers.RegexField(r'^[A-Za-z0-9_.:-]*$', max_length=128, allow_blank=True, default='')
+
+    def validate_account_ids(self, values):
+        if len(values) != len(set(values)):
+            raise serializers.ValidationError(_('Duplicate account IDs are not allowed.'))
+        return values
+
+
+class CredentialPolicyListSerializer(CredentialClientInfoSerializer):
+    search = serializers.CharField(max_length=128, default='', allow_blank=True)
+
+
+class CredentialPolicyQuerySerializer(CredentialClientInfoSerializer):
+    key = serializers.CharField(max_length=64, required=False)
+    policy_id = serializers.UUIDField(required=False)
+
+    def validate(self, attrs):
+        if bool(attrs.get('key')) == bool(attrs.get('policy_id')):
+            raise serializers.ValidationError(_('Provide exactly one of key or policy_id.'))
+        return attrs
+
+
+class CredentialStateSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=64)
+    revision = serializers.IntegerField(min_value=1)
+    account_id = serializers.UUIDField()
+
+
+class CredentialConfirmSerializer(CredentialStateSerializer):
+    instance_id = serializers.CharField(max_length=128, required=False)
+
+
+class CredentialEventResultSerializer(serializers.Serializer):
+    event_id = serializers.UUIDField()
+    status = serializers.ChoiceField(choices=('success', 'failed', 'skip'), default='success')
+    error_code = serializers.CharField(max_length=128, required=False, allow_blank=True, default='')
+    instance_id = serializers.CharField(max_length=128, required=False)
+
+
+class CredentialAgentRegisterSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    instance_id = serializers.CharField(max_length=128)
+    name = serializers.CharField(max_length=128, required=False, allow_blank=True)
+    client_version = serializers.CharField(max_length=32)
+    protocol_version = serializers.IntegerField(min_value=1)
+    config_schema_version = serializers.IntegerField(min_value=1)
+
+
+class CredentialRevisionSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=64)
+    revision = serializers.IntegerField(min_value=0)
+
+
+class CredentialDeliveryScopeSerializer(serializers.Serializer):
+    keys = serializers.ListField(child=serializers.CharField(max_length=128), max_length=200)
+    account_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200)
+    include_authorized = serializers.BooleanField(required=False)
+    all_authorized = serializers.BooleanField(required=False)
+    switch_account_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200, required=False)
+
+    def validate(self, attrs):
+        keys = attrs['keys']
+        accounts = [str(value) for value in attrs['account_ids']]
+        if len(keys) != len(set(keys)) or len(accounts) != len(set(accounts)):
+            raise serializers.ValidationError(_('Duplicate delivery selectors are not allowed.'))
+        if attrs.get('include_authorized'):
+            switching = [str(value) for value in attrs.get('switch_account_ids', [])]
+            if keys or len(switching) != len(set(switching)):
+                raise serializers.ValidationError(_('Service scopes require unique account IDs and no policy keys.'))
+            return {
+                'keys': [], 'account_ids': sorted(accounts), 'include_authorized': True,
+                'all_authorized': attrs.get('all_authorized', False),
+                'switch_account_ids': sorted(switching),
+            }
+        if attrs.get('all_authorized') or attrs.get('switch_account_ids'):
+            raise serializers.ValidationError(_('Account storage and switching require include_authorized.'))
+        return {'keys': sorted(keys), 'account_ids': sorted(accounts)}
+
+
+class CredentialAgentSyncSerializer(serializers.Serializer):
+    restart_supported = serializers.BooleanField(required=False, default=False)
+    instance_id = serializers.CharField(max_length=128, required=False)
+    config_digest = serializers.CharField(max_length=64, required=False, allow_blank=True)
+    credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
+    delivered_credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
+    delivery_scope = CredentialDeliveryScopeSerializer(required=True)
+    sync_status = serializers.ChoiceField(
+        choices=['', 'success', 'error'], required=False, default='', allow_blank=True,
+    )
+    sync_error = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
+
+
+class ServiceAccountAccessSerializer(serializers.Serializer):
+    account_id = serializers.UUIDField()
+    alias = serializers.RegexField(r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, required=False, allow_blank=True, default='')
+    username_field = serializers.RegexField(r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, default='DB_USER')
+    secret_field = serializers.RegexField(r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, default='DB_PASSWORD')
+
+
+class CredentialAccessWizardSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=CredentialClientInstance.Type.choices)
+    sdk_language = serializers.ChoiceField(
+        choices=[item['value'] for item in sdk_languages()], default='python',
+    )
+    app_user = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
+    install_path = serializers.CharField(max_length=256, required=False, default='/opt/jumpserver-pam')
+    delivery_mode = serializers.ChoiceField(
+        choices=DELIVERY_MODES, default='json',
+    )
+    systemd_unit = serializers.CharField(max_length=128, required=False, default='', allow_blank=True)
+    systemd_action = serializers.ChoiceField(
+        choices=SYSTEMD_ACTIONS, default='restart',
+    )
+    agent_setup = serializers.ChoiceField(
+        choices=['delivery', 'config_update', 'rotation'], default='delivery',
+    )
+    account_id = serializers.UUIDField(required=False)
+    config_file = serializers.CharField(max_length=1024, required=False, default='', allow_blank=True)
+    config_format = serializers.ChoiceField(choices=['auto', 'env', 'yaml'], default='auto')
+    username_field = serializers.RegexField(
+        r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, required=False, default='DB_USER',
+    )
+    secret_field = serializers.RegexField(
+        r'^[A-Za-z_][A-Za-z0-9_]*$', max_length=128, required=False, default='DB_PASSWORD',
+    )
+    service_action_type = serializers.ChoiceField(
+        choices=['systemd', 'script', 'none'], default='systemd',
+    )
+    service_script = serializers.CharField(max_length=1024, required=False, default='', allow_blank=True)
+    application_check = serializers.CharField(max_length=1024, required=False, default='', allow_blank=True)
+    store_scope = serializers.ChoiceField(choices=['none', 'all', 'selected'], default='all')
+    store_format = serializers.ChoiceField(choices=['json', 'environment'], default='json')
+    store_accounts = serializers.ListField(child=serializers.UUIDField(), max_length=200, default=list)
+    service_name = serializers.RegexField(r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$', default='sample-app')
+    service_accounts = ServiceAccountAccessSerializer(many=True, required=False, max_length=20)
+    allow_account_switch = serializers.BooleanField(default=False)
+    update_on_notification = serializers.BooleanField(default=True)
+
+    @staticmethod
+    def validate_local_path(value, field):
+        if not value.startswith('/') or value == '/' or any(char in value for char in '\n\r\x00'):
+            raise serializers.ValidationError({field: _('Enter an absolute local file path.')})
+        return value
+
+    def validate(self, attrs):
+        application = self.context['application']
+        if not application.is_active:
+            raise serializers.ValidationError(_('The application is disabled.'))
+        if attrs['type'] == CredentialClientInstance.Type.agent and not attrs['app_user']:
+            raise serializers.ValidationError({'app_user': _('This field is required for Agent access.')})
+        path = attrs['install_path']
+        if not path.startswith('/') or path == '/' or any(char in path for char in '\n\r\x00'):
+            raise serializers.ValidationError({'install_path': _('Enter an absolute installation directory.')})
+        unit = attrs['systemd_unit'].strip()
+        configured_rule = attrs['type'] == 'agent' and attrs['agent_setup'] != 'delivery'
+        if attrs['type'] == 'agent':
+            application.assert_account_limit()
+            if attrs['store_scope'] == 'selected':
+                selected = attrs['store_accounts']
+                if (not selected or len(selected) != len(set(selected))
+                        or application.get_accounts().filter(id__in=selected).count() != len(selected)):
+                    raise serializers.ValidationError({'store_accounts': _('Select unique authorized accounts.')})
+        if configured_rule:
+            accounts = attrs.get('service_accounts')
+            if accounts is None and 'account_id' in attrs:
+                accounts = [{'account_id': attrs['account_id'], 'alias': '',
+                             'username_field': attrs['username_field'], 'secret_field': attrs['secret_field']}]
+            if not accounts:
+                raise serializers.ValidationError({'service_accounts': _('Select an account authorized for this application.')})
+            allowed = set(application.get_accounts().values_list('id', flat=True))
+            aliases, fields = set(), set()
+            for account in accounts:
+                if account['account_id'] not in allowed:
+                    raise serializers.ValidationError({'service_accounts': _('Select an account authorized for this application.')})
+                alias = account['alias']
+                if (len(accounts) > 1 and not alias) or (alias and alias in aliases):
+                    raise serializers.ValidationError({'service_accounts': _('Multiple accounts require unique aliases.')})
+                aliases.add(alias)
+                for field in (account['username_field'], account['secret_field']):
+                    if field in fields:
+                        raise serializers.ValidationError({'service_accounts': _('Mapped configuration fields must be unique.')})
+                    fields.add(field)
+            attrs['service_accounts'] = accounts
+            attrs['allow_account_switch'] = attrs['agent_setup'] == 'rotation' or attrs['allow_account_switch']
+            self.validate_local_path(attrs['config_file'], 'config_file')
+            if attrs['config_format'] == 'auto' and PurePosixPath(attrs['config_file']).suffix.lower() not in (
+                '.txt', '.env', '.properties', '.yml', '.yaml',
+            ):
+                raise serializers.ValidationError({'config_file': _(
+                    'For other extensions, select env or yaml explicitly. Complex formats require a local template or script.'
+                )})
+            if attrs['username_field'] == attrs['secret_field']:
+                raise serializers.ValidationError({'secret_field': _('Username and secret fields must be different.')})
+            if attrs['service_action_type'] == 'script':
+                self.validate_local_path(attrs['service_script'], 'service_script')
+            if attrs['application_check']:
+                self.validate_local_path(attrs['application_check'], 'application_check')
+            # Rules own business updates and actions. Do not also execute the
+            # default EnvironmentFile delivery's global systemd action.
+            attrs['delivery_mode'] = 'json'
+        if configured_rule and attrs['service_action_type'] == 'systemd':
+            if not SYSTEMD_UNIT.fullmatch(unit):
+                raise serializers.ValidationError({'systemd_unit': _('Enter one systemd .service unit name.')})
+            attrs['systemd_unit'] = unit
+        else:
+            attrs['systemd_unit'] = ''
+        return attrs
