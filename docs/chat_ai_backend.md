@@ -241,7 +241,9 @@ Core；全新环境只会创建上述两张 Runtime Store 表。
 
 主要实现位置：
 
-- `apps/chat_ai/api/runtime_store.py`：认证、校验、CAS、分页和 receipt。
+- `apps/chat_ai/api/runtime_store.py`：认证、签名校验、CAS、分页和 receipt。
+- `apps/chat_ai/serializers.py`：Runtime Store 请求校验、响应序列化，以及会话审计的输入输出序列化。
+- `apps/chat_ai/const.py`、`apps/chat_ai/utils.py`：journal 协议常量和共享 JSON 校验函数。
 - `apps/chat_ai/models.py`：Runtime Store head 与 journal record。
 - `apps/chat_ai/authentication.py`：用户委托认证。
 - `apps/chat_ai/delegation.py`、`apps/chat_ai/signing.py`：委托校验和密钥轮换。
