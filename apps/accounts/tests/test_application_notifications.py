@@ -36,7 +36,7 @@ class ApplicationNotificationTests(CredentialTestCase):
         self.primary.save()
         self.primary.refresh_from_db()
         audit = ApplicationAudit.objects.filter(
-            account_id=self.primary.id, event='credential_published',
+            account_id=self.primary.id, event='credential_secret_updated',
         ).latest('date_created')
         return CredentialRotationEvent.objects.get(source_event_id=audit.id)
 

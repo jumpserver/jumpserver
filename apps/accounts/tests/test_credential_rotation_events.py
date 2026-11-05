@@ -71,22 +71,25 @@ class RotationEventTests(CredentialTestCase):
             item for item in update['recipients'] if item['instance_id'] == self.client.instance_id
         )
         self.assertIsNotNone(recipient['received_at'])
+        publication = next(item for item in response.data['results'] if item['event'] == 'credential.switch.published')
+        self.assertEqual(publication['rotation_accounts']['source']['id'], str(self.primary.id))
+        self.assertEqual(publication['account_switch']['to_account']['id'], str(self.backup.id))
+        self.assertFalse(publication['account_switch']['reverting'])
         self.assertNotIn(self.primary.secret, str(response.data))
 
     def test_order_and_gap_do_not_infer_receipt_from_a_later_event(self):
         self.publish()
         events = list(self.rotation.events.all())
         self.assertEqual([event.event for event in events], [
-            'credential.updated', 'rotation.started', 'rotation.waiting_for_app',
-            'rotation.source.waiting',
+            'credential.switch.published', 'rotation.started', 'rotation.waiting_for_app',
         ])
-        self.assertEqual([event.sequence for event in events], [1, 2, 3, 4])
+        self.assertEqual([event.sequence for event in events], [1, 2, 3])
         self.assertTrue(receive(self.client.id, self.org.id, events[2].source_event_id))
         self.assertTrue(receive(self.client.id, self.org.id, events[0].source_event_id))
         result = timeline(self.credential)
         client = next(row for row in result['instances'] if row['id'] == str(self.client.id))
         self.assertEqual(client['latest_event_id'], str(events[2].source_event_id))
-        self.assertEqual((client['received_count'], client['event_count'], client['missing_count']), (2, 4, 1))
+        self.assertEqual((client['received_count'], client['event_count'], client['missing_count']), (2, 3, 1))
         self.assertIsNone(client['receipts'][1]['received_at'])
         old = next(row for row in result['instances'] if row['id'] == str(self.old_client.id))
         self.assertFalse(old['supports_receipts'])
@@ -160,12 +163,12 @@ class RotationEventTests(CredentialTestCase):
         count = self.rotation.events.count()
         audit = record(AuditEvent.AUTHORIZATION_GRANTED, credential=self.credential)
         self.assertEqual(audit.rotation_id, self.rotation.id)
-        enqueue(audit, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(audit, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
         self.assertEqual(self.rotation.events.count(), count)
         self.manager.start()
         current = self.credential.rotation_records.first()
         self.assertNotEqual(current.id, self.rotation.id)
-        self.assertEqual(current.events.count(), 4)
+        self.assertEqual(current.events.count(), 3)
         self.assertEqual(self.rotation.events.count(), count)
 
     def test_only_targeted_events_count_for_late_joiners(self):
@@ -256,7 +259,7 @@ class SubscriptionEventTests(CredentialTestCase):
             id__in=previous_ids,
         ).order_by('published_at', 'id'))
         expected = [
-            'credential.change.started', 'credential.change.completed', 'credential.updated',
+            'credential.change.started', 'credential.change.completed', 'credential.secret.updated',
         ]
         self.assertEqual([event.event for event in events], expected)
         self.assertTrue(all(event.rotation_id is None for event in events))
@@ -289,7 +292,7 @@ class RotationReceiptConsumerTests(SimpleTestCase):
         consumer = CredentialEventConsumer()
         consumer.client = Mock(id=uuid4())
         consumer.send_json = AsyncMock()
-        payload = {'event': 'credential.updated', 'event_id': str(uuid4())}
+        payload = {'event': 'credential.secret.updated', 'event_id': str(uuid4())}
         message = {'payload': payload, 'recipient_ids': [str(uuid4())]}
         async_to_sync(consumer.credential_event)(message)
         consumer.send_json.assert_not_called()

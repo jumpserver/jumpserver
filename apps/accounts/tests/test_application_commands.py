@@ -4,11 +4,7 @@ from unittest.mock import Mock, patch
 
 from accounts.api.account.application import IntegrationApplicationViewSet
 from accounts.api.account.credential import CredentialClientViewSet
-from accounts.clients.python.jms_pam.common.credential import Credential
-from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.clients.python.jms_pam.credential.v1.credential_client import (
-    CredentialClient,
-)
+from accounts.clients.python.jms_pam import Client
 from accounts.credential_client import commands
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.models import (
@@ -198,23 +194,23 @@ class ApplicationCommandTests(CredentialTestCase):
 
 class ApplicationCommandSDKTests(SimpleTestCase):
     def setUp(self):
-        self.client = CredentialClient(Credential('app', 'secret'), 'sdk', ClientProfile(endpoint='https://testserver'))
+        self.client = Client('https://testserver', app_id='app', app_secret='secret', instance_id='sdk')
         self.addCleanup(self.client.close)
 
     def test_duplicate_request_does_not_execute_handler_twice(self):
         handler = Mock()
-        self.client.ReportApplicationCommandResult = Mock(side_effect=[
-            SimpleNamespace(Accepted=True, Status='running'), SimpleNamespace(Accepted=True, Status='running'), SimpleNamespace(Accepted=False, Status='running'),
+        self.client.report_application_command_result = Mock(side_effect=[
+            SimpleNamespace(accepted=True, status='running'), SimpleNamespace(accepted=True, status='running'), SimpleNamespace(accepted=False, status='running'),
         ])
         event = {'command_id': 'command'}
-        self.client.ExecuteApplicationCommand(event, handler)
-        self.client.ExecuteApplicationCommand(event, handler)
+        self.client.execute_application_command(event, handler)
+        self.client.execute_application_command(event, handler)
         handler.assert_called_once_with(event)
 
     def test_handler_failure_reports_failed_result(self):
-        self.client.ReportApplicationCommandResult = Mock(return_value=SimpleNamespace(Accepted=True, Status='running'))
+        self.client.report_application_command_result = Mock(return_value=SimpleNamespace(accepted=True, status='running'))
         with self.assertRaises(RuntimeError):
-            self.client.ExecuteApplicationCommand({'command_id': 'command'}, Mock(side_effect=RuntimeError('failed')))
-        result = self.client.ReportApplicationCommandResult.call_args.args[0]
-        self.assertEqual(result.Status, 'failed')
-        self.assertEqual(result.ErrorCode, 'execution_failed')
+            self.client.execute_application_command({'command_id': 'command'}, Mock(side_effect=RuntimeError('failed')))
+        result = self.client.report_application_command_result.call_args.kwargs
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(result['error_code'], 'execution_failed')

@@ -58,7 +58,7 @@ def clean_cycles(expired_at):
             codes = [row.event for row in rows]
             # Keep incomplete and failed operations available for investigation.
             if ApplicationEvent.CREDENTIAL_CHANGE_STARTED in codes and codes[-1] not in (
-                ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED, ApplicationEvent.CREDENTIAL_UPDATED,
+                ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED, ApplicationEvent.CREDENTIAL_SECRET_UPDATED,
             ):
                 continue
             if ApplicationEvent.CREDENTIAL_CHANGE_FAILED in codes:
@@ -76,7 +76,7 @@ def clean_cycles(expired_at):
                 credential_id__in=ApplicationCredential.objects.filter(mode='alternating_rotation').values('id'),
             ).exists()
             if switching and any(
-                row.event == ApplicationEvent.CREDENTIAL_UPDATED
+                row.event in ApplicationEvent.credential_application_events()
                 and any(recipient.get('status') != 'success' for recipient in row.recipients)
                 for row in rows
             ):

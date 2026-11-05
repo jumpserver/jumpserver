@@ -44,5 +44,5 @@ def start(credential_id, operator='', operator_id=None):
             credential_key=credential.account_key(account.id), revision=account.version,
             operation_id=cycle_id, source=AuditSource.ADMINISTRATOR, operator=operator,
         )
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
     return credential, cycle_id

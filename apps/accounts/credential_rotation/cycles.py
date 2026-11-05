@@ -28,23 +28,78 @@ def _ordered(events):
     return sorted(events, key=lambda event: (event.published_at, event.id))
 
 
-def _context(events, org_id):
+def event_account_data(events, org_id):
     audits = {
         audit.id: audit for audit in ApplicationAudit.objects.filter(
             id__in=[event.source_event_id for event in events], org_id=org_id,
         )
     }
+    account_ids = {audit.account_id for audit in audits.values() if audit.account_id}
+    for event in events:
+        if event.rotation_id:
+            account_ids.update((
+                event.rotation.source_account_id, event.rotation.target_account_id,
+                event.rotation.change_account_id,
+            ))
     accounts = {
         account.id: {
             'id': str(account.id), 'name': account.name, 'username': account.username,
             'asset': {'name': account.asset.name, 'address': account.asset.address},
         }
         for account in Account.objects.filter(
-            id__in=[audit.account_id for audit in audits.values() if audit.account_id],
+            id__in=account_ids,
             org_id=org_id,
         ).select_related('asset')
     }
     return audits, accounts
+
+
+def _rotation_accounts(rotation, accounts):
+    if not rotation:
+        return None
+    return {
+        role: accounts.get(getattr(rotation, f'{role}_account_id'))
+        for role in ('source', 'target', 'change')
+    }
+
+
+def event_account_context(event, audit, accounts, published_account=None):
+    rotation = event.rotation
+    rotation_accounts = _rotation_accounts(rotation, accounts)
+    if not rotation_accounts:
+        return {}
+    account_change = next((
+        change for change in (audit.changes if audit else [])
+        if change['field'] == 'active_account_id'
+    ), None)
+    published_id = account_change['after'] if account_change else None
+    if not published_id:
+        published_id = next((
+            item['account_id'] for item in event.recipients if item.get('account_id')
+        ), None)
+    if published_id:
+        published_account = next((
+            account for account in rotation_accounts.values()
+            if account and account['id'] == str(published_id)
+        ), None)
+    elif event.event == ApplicationEvent.CREDENTIAL_SWITCH_PUBLISHED:
+        reverting = audit and audit.event == AuditEvent.ROTATION_CANCELLED
+        published_account = rotation_accounts['source' if reverting else 'target']
+    elif event.event in (ApplicationEvent.ROTATION_STARTED, ApplicationEvent.ROTATION_WAITING):
+        published_account = rotation_accounts['target']
+    account_switch = None
+    if published_account and event.event == ApplicationEvent.CREDENTIAL_SWITCH_PUBLISHED:
+        reverting = published_account['id'] == str(rotation.source_account_id)
+        account_switch = {
+            'from_account': rotation_accounts['target' if reverting else 'source'],
+            'to_account': published_account,
+            'reverting': reverting,
+        }
+    return {
+        'rotation_accounts': rotation_accounts,
+        'published_account': published_account,
+        'account_switch': account_switch,
+    }
 
 
 def _summary(events, audits, accounts):
@@ -65,16 +120,21 @@ def _summary(events, audits, accounts):
         kind = 'subscription_refresh'
         status = 'published'
     elif any(code.startswith('credential.change.') for code in codes):
-        kind = 'subscription' if audit and audit.operation_id else 'legacy'
+        kind = 'subscription'
         status = {
             ApplicationEvent.CREDENTIAL_CHANGE_FAILED: 'failed',
             ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED: 'success',
-            ApplicationEvent.CREDENTIAL_UPDATED: 'success',
+            ApplicationEvent.CREDENTIAL_SECRET_UPDATED: 'success',
         }.get(last.event, 'running')
     else:
         kind = 'update' if audit and audit.operation_id else 'event'
         status = 'published'
     cycle_accounts = {}
+    rotation_accounts = _rotation_accounts(rotation, accounts)
+    if rotation_accounts:
+        cycle_accounts.update({
+            account['id']: account for account in rotation_accounts.values() if account
+        })
     for event in events:
         source = audits.get(event.source_event_id)
         if source and source.account_id:
@@ -90,6 +150,7 @@ def _summary(events, audits, accounts):
         'date_started': first.published_at.isoformat(),
         'date_last_event': last.published_at.isoformat(),
         'event_count': len(events), 'account': account, 'accounts': list(cycle_accounts.values()),
+        'rotation_accounts': rotation_accounts,
         'latest_event': last.event,
     }
 
@@ -117,7 +178,7 @@ def cycle_directory(credential, limit=20, offset=0, *, kind='', status='', start
             When(rotation_status__isnull=False, then=Value('rotation')),
             When(republished=1, then=Value('subscription_refresh')),
             When(has_change__gt=0, has_operation=1, then=Value('subscription')),
-            When(has_change__gt=0, then=Value('legacy')),
+            When(has_change__gt=0, then=Value('subscription')),
             When(has_operation=1, then=Value('update')),
             default=Value('event'), output_field=CharField(),
         ),
@@ -129,7 +190,7 @@ def cycle_directory(credential, limit=20, offset=0, *, kind='', status='', start
             When(republished=1, then=Value('published')),
             When(has_change__gt=0, last_code=ApplicationEvent.CREDENTIAL_CHANGE_FAILED, then=Value('failed')),
             When(has_change__gt=0, last_code__in=(
-                ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED, ApplicationEvent.CREDENTIAL_UPDATED,
+                ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED, ApplicationEvent.CREDENTIAL_SECRET_UPDATED,
             ), then=Value('success')),
             When(has_change__gt=0, then=Value('running')),
             default=Value('published'), output_field=CharField(),
@@ -147,7 +208,7 @@ def cycle_directory(credential, limit=20, offset=0, *, kind='', status='', start
     count = groups.count()
     cycle_ids = [item['cycle_key'] for item in groups[offset:offset + limit]]
     events = list(queryset.filter(cycle_key__in=cycle_ids).select_related('rotation'))
-    audits, accounts = _context(events, credential.org_id)
+    audits, accounts = event_account_data(events, credential.org_id)
     by_cycle = defaultdict(list)
     for event in events:
         by_cycle[event.cycle_key].append(event)
@@ -155,7 +216,7 @@ def cycle_directory(credential, limit=20, offset=0, *, kind='', status='', start
         status__in=('preparing', 'running'), date_finished__isnull=True,
     ).first()
     current = list(queryset.filter(rotation=current_rotation).select_related('rotation')) if current_rotation else []
-    current_audits, current_accounts = _context(current, credential.org_id) if current else ({}, {})
+    current_audits, current_accounts = event_account_data(current, credential.org_id) if current else ({}, {})
     return {
         'count': count,
         'results': [_summary(by_cycle[key], audits, accounts) for key in cycle_ids],
@@ -165,19 +226,24 @@ def cycle_directory(credential, limit=20, offset=0, *, kind='', status='', start
 
 
 def cycle_detail(credential, cycle_id):
-    from .preparation import cycle_info
+    from .participants import build
     from .source_traffic import info as source_traffic_info
     events = _ordered(list(policy_events(credential).filter(
         cycle_key=cycle_id,
     ).select_related('rotation')))
     if not events:
         raise NotFound()
-    audits, accounts = _context(events, credential.org_id)
+    audits, accounts = event_account_data(events, credential.org_id)
     summary = _summary(events, audits, accounts)
     rotation = events[0].rotation
-    preparation = cycle_info(credential, rotation)
-    observations = (rotation.participant_snapshot.get('preparation', {}).get('event_observations', {})
-                    if rotation else {})
+    # Events record publication order; they do not prove that a waiting step
+    # has finished. Use the same live progress as the policy list for open cycles.
+    rotation_status = None
+    if rotation and not rotation.date_finished:
+        progress = build(credential, rotation)
+        rotation_status = {
+            key: progress[key] for key in ('credential_status', 'rotation_phase', 'summary')
+        }
     traffic_snapshot = (rotation.participant_snapshot.get('source_traffic', {}) if rotation else {})
     source_traffic = (source_traffic_info(credential, rotation) if rotation else None) or traffic_snapshot.get('final')
     traffic_observations = traffic_snapshot.get('event_observations', {})
@@ -199,11 +265,16 @@ def cycle_detail(credential, cycle_id):
         identity = (str(audit.service_id), audit.source.lower(), audit.instance_id, audit.revision)
         confirmed.setdefault(identity, audit.date_created.isoformat())
     rows = []
+    rotation_accounts = summary['rotation_accounts']
+    published_account = rotation_accounts['source'] if rotation_accounts else None
     for sequence, event in enumerate(events, start=1):
         audit = audits.get(event.source_event_id)
+        # Event selectors and the ordered cycle preserve historical switch direction.
+        context = event_account_context(event, audit, accounts, published_account)
+        published_account = context.get('published_account')
         requires_confirmation = (
             (event.rotation_id is not None or credential.mode == credential.Mode.alternating_rotation)
-            and event.event == ApplicationEvent.CREDENTIAL_UPDATED
+            and event.event in ApplicationEvent.credential_application_events()
         )
         recipients = []
         for recipient in event.recipients:
@@ -225,7 +296,7 @@ def cycle_detail(credential, cycle_id):
             'result': audit.result if audit else None,
             'account_id': str(audit.account_id) if audit and audit.account_id else None,
             'account': accounts.get(audit.account_id) if audit else None,
-            'preparation': observations.get(str(event.source_event_id)),
+            **context,
             'source_traffic': traffic_observations.get(str(event.source_event_id)),
             'requires_confirmation': requires_confirmation,
             'recipient_count': len(recipients),
@@ -233,4 +304,7 @@ def cycle_detail(credential, cycle_id):
             'confirmed_count': sum(bool(item['confirmed_at']) for item in recipients),
             'recipients': recipients,
         })
-    return {**summary, 'preparation': preparation, 'source_traffic': source_traffic, 'events': rows}
+    return {
+        **summary, 'rotation_status': rotation_status,
+        'source_traffic': source_traffic, 'events': rows,
+    }

@@ -56,7 +56,7 @@ def report(client, event_id, status='success', error_code=''):
     if recipient.get('status') == 'success':
         return {'accepted': False, 'status': 'success'}
     source = ApplicationAudit.objects.get(id=event_id, org_id=client.org_id)
-    if event.event != ApplicationEvent.CREDENTIAL_UPDATED:
+    if event.event not in ApplicationEvent.credential_application_events():
         raise ValidationError(_('This event does not request a credential application result.'))
     if status == 'success':
         credential = ApplicationCredential.objects.filter(id=source.credential_id).first()
@@ -87,7 +87,7 @@ def snapshot_result_event(client, credential, account, revision):
     if credential is None:
         sources = sources.filter(account_id=account.id)
     for event in CredentialRotationEvent.objects.filter(
-        source_event_id__in=sources.values('id'), event=ApplicationEvent.CREDENTIAL_UPDATED,
+        source_event_id__in=sources.values('id'), event__in=ApplicationEvent.credential_application_events(),
         org_id=client.org_id,
     ).order_by('-published_at'):
         if any(item['id'] == str(client.id) and item.get('account_id') == str(account.id)
@@ -102,7 +102,7 @@ def snapshot_result_event(client, credential, account, revision):
         from django.db.models import Max
         sequence = (rotation.events.aggregate(value=Max('sequence'))['value'] or 0) + 1
     CredentialRotationEvent.objects.create(
-        rotation=rotation, source_event_id=source.id, event=ApplicationEvent.CREDENTIAL_UPDATED,
+        rotation=rotation, source_event_id=source.id, event=ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED,
         sequence=sequence, revision=revision, org_id=client.org_id,
         recipients=[{
             'id': str(client.id), 'instance_id': client.instance_id, 'type': client.type,
@@ -126,7 +126,7 @@ def record_account_progress(client, account_id, revision, stage):
         org_id=client.org_id, application_relations__application_id=client.application_id,
     ).values('id')
     for event in CredentialRotationEvent.objects.select_for_update().filter(
-        source_event_id__in=sources, event=ApplicationEvent.CREDENTIAL_UPDATED, org_id=client.org_id,
+        source_event_id__in=sources, event__in=ApplicationEvent.credential_application_events(), org_id=client.org_id,
     ):
         changed = False
         for recipient in event.recipients:

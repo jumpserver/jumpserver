@@ -122,7 +122,7 @@ class ApplicationAuditTests(CredentialTestCase):
         self.credential.status = 'waiting_revert'
         self.credential.save(update_fields=['revision', 'status'])
         audit = ApplicationAudit.objects.filter(credential_id=self.credential.id).latest('date_created')
-        self.assertEqual(audit.event, 'credential_published')
+        self.assertEqual(audit.event, 'credential_refresh_requested')
         self.assertEqual({change['field'] for change in audit.changes}, {'revision', 'status'})
 
     def test_application_account_revocation_notifies_bound_clients(self):
@@ -150,7 +150,7 @@ class ApplicationAuditTests(CredentialTestCase):
         self.primary.secret = 'new-test-secret'
         self.primary.save()
         event = ApplicationAudit.objects.filter(
-            event='credential_published', service_id=self.application.id, credential_id__isnull=True,
+            event='credential_secret_updated', service_id=self.application.id, credential_id__isnull=True,
             account_id=self.primary.id,
         ).first()
         self.assertIsNotNone(event)

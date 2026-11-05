@@ -25,10 +25,10 @@ TRACKED_NON_ROTATION_EVENTS = {
     ApplicationEvent.CREDENTIAL_CHANGE_STARTED,
     ApplicationEvent.CREDENTIAL_CHANGE_COMPLETED,
     ApplicationEvent.CREDENTIAL_CHANGE_FAILED,
-    ApplicationEvent.CREDENTIAL_UPDATED,
-    ApplicationEvent.CREDENTIAL_REVOKED,
+    ApplicationEvent.CREDENTIAL_SECRET_UPDATED,
+    ApplicationEvent.CREDENTIAL_SWITCH_PUBLISHED,
+    ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED,
     ApplicationEvent.APPLICATION_SCOPE_UPDATED,
-    ApplicationEvent.CONFIGURATION_UPDATED,
 }
 
 
@@ -38,7 +38,6 @@ def application_group(application_id):
 
 def enqueue(event, code, rotation=None, *, notify=True):
     """Publish one domain event; delivery never participates in the source transaction."""
-    code = ApplicationEvent.canonical(code)
     try:
         with transaction.atomic():
             if rotation is not None:
@@ -75,10 +74,7 @@ def _clients(event, code):
                 credential_notifications_enabled=True,
             ),
         )
-    if event.credential_id and code not in (
-        ApplicationEvent.CREDENTIAL_REVOKED, ApplicationEvent.APPLICATION_SCOPE_UPDATED,
-        ApplicationEvent.CONFIGURATION_UPDATED,
-    ):
+    if event.credential_id and code != ApplicationEvent.APPLICATION_SCOPE_UPDATED:
         clients = clients.filter(
             application__credential_bindings__credential_id=event.credential_id,
         )
@@ -240,14 +236,9 @@ def _enqueue_webhooks(event, code):
         for application in IntegrationApplication.objects.filter(id__in=application_ids)
     }
     for webhook in webhooks:
-        # Keep the event code promised to existing receivers, including in the
-        # rendered body and durable delivery record. A rule subscribing to both aliases
-        # receives one delivery, using the canonical name.
-        canonical = ApplicationEvent.canonical(code)
-        delivery_code = next((value for value in (canonical, code, *webhook.events)
-                              if value in webhook.events and ApplicationEvent.canonical(value) == canonical), None)
-        if delivery_code is None:
+        if code not in webhook.events:
             continue
+        delivery_code = code
         application = next((
             applications[item.id] for item in webhook.applications.all()
             if item.id in applications

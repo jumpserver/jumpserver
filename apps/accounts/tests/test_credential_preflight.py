@@ -238,7 +238,7 @@ class CredentialPreflightTests(CredentialTestCase):
         original = User.has_perm
         with patch.object(User, 'has_perm', lambda user, perm, *args, **kwargs:
                           perm != 'accounts.verify_account' and original(user, perm, *args, **kwargs)):
-            for action in ('start_rotation', 'start_cycle', 'prepare_rotation'):
+            for action in ('start_rotation', 'start_cycle'):
                 with self.subTest(action=action), transaction.atomic():
                     view = ApplicationCredentialViewSet.as_view({'post': action})
                     response = view(self.request('post', '/'), pk=self.credential.id)
@@ -309,7 +309,7 @@ class CredentialPreflightTests(CredentialTestCase):
         original = User.has_perm
         with patch.object(User, 'has_perm', lambda user, perm, *args, **kwargs:
                           perm != 'accounts.verify_account' and original(user, perm, *args, **kwargs)):
-            for action in ('start_rotation', 'start_cycle', 'prepare_rotation'):
+            for action in ('start_rotation', 'start_cycle'):
                 view = ApplicationCredentialViewSet.as_view({'post': action})
                 with transaction.atomic():
                     response = view(self.request('post', '/'), pk=self.credential.id)

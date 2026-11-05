@@ -2,16 +2,6 @@ from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
 
-EVENT_NAME_ALIASES = {
-    'rotation.verification.skipped': 'rotation.verify.skipped',
-    'rotation.verification.started': 'rotation.verify.started',
-    'rotation.verification.failed': 'rotation.verify.failed',
-    'rotation.verification.cancelled': 'rotation.verify.cancelled',
-    'application.scope.updated': 'app.scope.updated',
-    'application.restart.requested': 'app.restart.requested',
-    'rotation.waiting_for_application': 'rotation.waiting_for_app',
-    'configuration.updated': 'app.scope.updated',
-}
 
 
 class AuditSource(TextChoices):
@@ -34,7 +24,9 @@ class AuditEvent(TextChoices):
     CLIENT_DISABLED = 'client_disabled', _('Client disabled')
     CREDENTIAL_FETCHED = 'credential_fetched', _('Credential fetched')
     CREDENTIAL_CONFIRMED = 'credential_confirmed', _('Credential confirmed')
-    CREDENTIAL_PUBLISHED = 'credential_published', _('Credential published')
+    CREDENTIAL_SECRET_UPDATED = 'credential_secret_updated', _('Account secret updated')
+    CREDENTIAL_SWITCH_PUBLISHED = 'credential_switch_published', _('Account switch published')
+    CREDENTIAL_REFRESH_REQUESTED = 'credential_refresh_requested', _('Credential refresh requested')
     CREDENTIAL_REPUBLISHED = 'credential_republished', _('Credential notification republished')
     CREDENTIAL_STREAM_CONNECTED = 'credential_stream_connected', _('Credential stream connected')
     CREDENTIAL_STREAM_DISCONNECTED = 'credential_stream_disconnected', _('Credential stream disconnected')
@@ -53,15 +45,10 @@ class ApplicationEvent(TextChoices):
     ROTATION_VERIFICATION_SKIPPED = 'rotation.verify.skipped', _('Backup account verification skipped by policy')
     ROTATION_VERIFICATION_FAILED = 'rotation.verify.failed', _('Backup account verification failed')
     ROTATION_VERIFICATION_CANCELLED = 'rotation.verify.cancelled', _('Backup account verification cancelled')
-    ROTATION_PREPARATION_STARTED = 'rotation.preparation.started', _('Rotation preparation started')
-    ROTATION_ACCOUNTS_ALIGNED = 'rotation.accounts.aligned', _('Rotation accounts aligned')
-    ROTATION_STANDBY_WAITING = 'rotation.standby.waiting', _('Observing standby account usage')
-    ROTATION_PREPARATION_READY = 'rotation.preparation.ready', _('Rotation preparation ready')
-    ROTATION_PREPARATION_CANCELLED = 'rotation.preparation.cancelled', _('Rotation preparation cancelled')
-    CREDENTIAL_UPDATED = 'credential.updated', _('Credential updated')
-    CREDENTIAL_REVOKED = 'credential.revoked', _('Credential revoked (legacy)')
+    CREDENTIAL_SECRET_UPDATED = 'credential.secret.updated', _('Account secret updated')
+    CREDENTIAL_SWITCH_PUBLISHED = 'credential.switch.published', _('Account switch published')
+    CREDENTIAL_REFRESH_REQUESTED = 'credential.refresh.requested', _('Credential refresh requested')
     APPLICATION_SCOPE_UPDATED = 'app.scope.updated', _('Application scope updated')
-    CONFIGURATION_UPDATED = 'configuration.updated', _('Application scope updated (legacy)')
     CREDENTIAL_CHANGE_STARTED = 'credential.change.started', _('Credential change started')
     CREDENTIAL_CHANGE_COMPLETED = 'credential.change.completed', _('Credential change completed')
     CREDENTIAL_CHANGE_FAILED = 'credential.change.failed', _('Credential change failed')
@@ -74,17 +61,15 @@ class ApplicationEvent(TextChoices):
     ROTATION_FAILED = 'rotation.failed', _('Rotation failed')
 
     @classmethod
-    def canonical(cls, value):
-        return EVENT_NAME_ALIASES.get(value, value) if isinstance(value, str) else value
+    def credential_application_events(cls):
+        return (cls.CREDENTIAL_SECRET_UPDATED, cls.CREDENTIAL_SWITCH_PUBLISHED, cls.CREDENTIAL_REFRESH_REQUESTED)
+
 
 
 class ApplicationCommandEvent(TextChoices):
     ACCOUNT_SWITCH_REQUESTED = 'credential.switch.requested', _('Account switch requested')
     APPLICATION_RESTART_REQUESTED = 'app.restart.requested', _('Application restart requested')
 
-    @classmethod
-    def canonical(cls, value):
-        return EVENT_NAME_ALIASES.get(value, value) if isinstance(value, str) else value
 
 
 

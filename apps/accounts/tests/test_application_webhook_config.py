@@ -108,7 +108,7 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
             'url': 'https://8.8.8.8/hooks/private-token',
             'method': 'POST',
             'headers': {'Authorization': 'Bearer private-header'},
-            'events': [ApplicationEvent.CREDENTIAL_UPDATED],
+            'events': [ApplicationEvent.CREDENTIAL_SECRET_UPDATED],
             'body_template': {'event': '{{ event.code }}'},
         }
         data.update(overrides)
@@ -120,16 +120,17 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
         view = ApplicationWebhookViewSet.as_view({'get': 'metadata'})
         response = view(self.request('get', self.webhook_path + 'metadata/'))
         self.assertEqual(response.status_code, 200)
-        self.assertIn(ApplicationEvent.CREDENTIAL_UPDATED, {
+        self.assertIn(ApplicationEvent.CREDENTIAL_SECRET_UPDATED, {
             item['value'] for item in response.data['event_options']
         })
         self.assertEqual(set(response.data['template_variables'][0]), {'name', 'label', 'default'})
 
-    def test_legacy_scope_event_can_still_be_saved_without_changing_its_wire_name(self):
+    def test_retired_scope_event_is_rejected(self):
         response = self.create_webhook(events=['configuration.updated'])
-        self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual(response.data['events'], ['configuration.updated'])
-        self.assertNotIn('configuration.updated', ApplicationWebhook().events)
+        self.assertEqual(response.status_code, 400)
+        response = self.create_webhook(events=['app.scope.updated'])
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['events'], ['app.scope.updated'])
 
     def test_sensitive_configuration_is_excluded_from_global_operate_logs(self):
         self.assertNotIn('ApplicationWebhook', MODELS_NEED_RECORD)
@@ -191,7 +192,7 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
         webhook_id = created.data['id']
         test = ApplicationWebhookViewSet.as_view({'post': 'test_webhook'})
         request = self.request('post', self.webhook_path + 'test/', {
-            'event': ApplicationEvent.CREDENTIAL_UPDATED,
+            'event': ApplicationEvent.CREDENTIAL_SECRET_UPDATED,
         })
         with patch(
             'accounts.credential_client.webhook_delivery.send_webhook', return_value=204,
@@ -199,4 +200,4 @@ class ApplicationWebhookConfigAPITests(CredentialTestCase):
             response = test(request, pk=webhook_id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'success': True, 'status_code': 204, 'reason': ''})
-        self.assertEqual(sender.call_args.args[3], {'event': ApplicationEvent.CREDENTIAL_UPDATED})
+        self.assertEqual(sender.call_args.args[3], {'event': ApplicationEvent.CREDENTIAL_SECRET_UPDATED})

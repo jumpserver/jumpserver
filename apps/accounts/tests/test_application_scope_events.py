@@ -63,23 +63,12 @@ class ApplicationScopeEventTests(CredentialTestCase):
         self.assertIsNone(self.application.get_account(account_id=self.primary.id))
 
     def test_retired_revocation_is_not_a_default_webhook_event(self):
-        self.assertNotIn(ApplicationEvent.CREDENTIAL_REVOKED, default_application_webhook_events())
+        self.assertIn(ApplicationEvent.APPLICATION_SCOPE_UPDATED, default_application_webhook_events())
         self.assertIn(ApplicationEvent.APPLICATION_SCOPE_UPDATED, default_application_webhook_events())
 
-    def test_legacy_command_name_is_accepted_and_normalized(self):
+    def test_retired_command_name_is_rejected(self):
         from accounts.serializers.account.application_command import ApplicationCommandSerializer
         serializer = ApplicationCommandSerializer(data={
             'event': 'application.restart.requested', 'client_ids': [str(self.client.id)],
         })
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        self.assertEqual(serializer.validated_data['event'], ApplicationCommandEvent.APPLICATION_RESTART_REQUESTED)
-        self.assertEqual(serializer.validated_data['event'], 'app.restart.requested')
-
-    def test_event_aliases_normalize_for_existing_subscriptions(self):
-        for old, new in (
-            ('rotation.verification.started', 'rotation.verify.started'),
-            ('rotation.verification.skipped', 'rotation.verify.skipped'),
-            ('rotation.waiting_for_application', 'rotation.waiting_for_app'),
-            ('application.scope.updated', 'app.scope.updated'),
-        ):
-            self.assertEqual(ApplicationEvent.canonical(old), new)
+        self.assertFalse(serializer.is_valid())

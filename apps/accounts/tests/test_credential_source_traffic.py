@@ -1,4 +1,4 @@
-"""The source-account fetch window begins only after the backup is published."""
+"""The source-account fetch window begins after all clients confirm switching."""
 from datetime import timedelta
 from unittest.mock import patch
 
@@ -6,15 +6,15 @@ from django.db import transaction
 from django.utils import timezone
 
 from accounts.api.account.application import IntegrationApplicationViewSet
-from accounts.api.account.credential import ApplicationCredentialViewSet
+from accounts.api.account.credential import ApplicationCredentialViewSet, CredentialClientViewSet
 from accounts.credential_client.manager import CredentialClientManager
 from accounts.credential_rotation import CredentialRotationManager, preflight
 from accounts.credential_rotation.cycles import cycle_detail
 from accounts.credential_rotation.execution import execute
-from accounts.credential_rotation.preparation import record_secret_access
+from accounts.credential_rotation.source_traffic import record_secret_access
 from accounts.credential_rotation.source_traffic import info as source_traffic_info
 from accounts.models import Account, ChangeSecretAutomation, CredentialClientInstance
-from accounts.serializers import ApplicationCredentialSerializer
+from accounts.serializers import ApplicationCredentialListSerializer, ApplicationCredentialSerializer
 from accounts.tests.base import CredentialTestCase
 from common.exceptions import JMSException
 
@@ -27,9 +27,9 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         self.credential.source_no_traffic_days = 1
         self.credential.save(update_fields=['source_no_traffic_days'])
 
-    def legacy_fetch(self, account):
-        view = IntegrationApplicationViewSet.as_view({'get': 'get_account_secret'})
-        return view(self.request('get', '/', {'account_id': str(account.id)}, user=self.application))
+    def fetch_account(self, account):
+        view = CredentialClientViewSet.as_view({'get': 'credential'})
+        return view(self.request('get', '/', {'account_id': str(account.id), 'instance_id': 'source-observer'}, user=self.application))
 
     def start_switch(self):
         with patch('accounts.credential_rotation.manager.timezone.now', return_value=self.started):
@@ -39,7 +39,7 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         self.assertEqual(self.credential.status, 'waiting_switch')
         return self.credential.rotation_records.first()
 
-    def test_new_duration_name_and_legacy_alias(self):
+    def test_source_observation_duration_validation(self):
         self.assertEqual(self.credential._meta.get_field('source_no_traffic_days').default, 7)
         for value in (0, -1, 3651, 1.5):
             serializer = ApplicationCredentialSerializer(
@@ -47,16 +47,15 @@ class CredentialSourceTrafficTests(CredentialTestCase):
             )
             self.assertFalse(serializer.is_valid(), value)
         serializer = ApplicationCredentialSerializer(
-            self.credential, data={'standby_no_traffic_days': 14}, partial=True,
+            self.credential, data={'source_no_traffic_days': 14}, partial=True,
         )
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.save().source_no_traffic_days, 14)
         self.assertEqual(serializer.data['source_no_traffic_days'], 14)
-        self.assertEqual(serializer.data['standby_no_traffic_days'], 14)
 
     def test_switch_has_no_prior_alignment_or_backup_idle_gate(self):
-        with patch('accounts.credential_rotation.preparation.timezone.now', return_value=self.started):
-            self.assertEqual(self.legacy_fetch(self.backup).status_code, 200)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=self.started):
+            self.assertEqual(self.fetch_account(self.backup).status_code, 200)
         rotation = self.start_switch()
         self.assertEqual(rotation.source_account_id, self.primary.id)
         self.assertEqual(rotation.target_account_id, self.backup.id)
@@ -72,16 +71,16 @@ class CredentialSourceTrafficTests(CredentialTestCase):
     def test_source_fetch_resets_window_but_backup_fetch_does_not(self):
         rotation = self.start_switch()
         access_at = self.started + timedelta(hours=12)
-        with patch('accounts.credential_rotation.preparation.timezone.now', return_value=access_at):
-            self.assertEqual(self.legacy_fetch(self.primary).status_code, 200)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=access_at):
+            self.assertEqual(self.fetch_account(self.primary).status_code, 200)
         with patch('accounts.credential_rotation.source_traffic.timezone.now',
                    return_value=self.started + timedelta(days=1)):
             _, blockers = self.manager.check_usage()
         self.assertEqual(blockers[0]['reason'], 'source_secret_access')
         self.assertEqual(blockers[0]['source_traffic']['eligible_at'],
                          (access_at + timedelta(days=1)).isoformat())
-        with patch('accounts.credential_rotation.preparation.timezone.now', return_value=access_at + timedelta(hours=1)):
-            self.assertEqual(self.legacy_fetch(self.backup).status_code, 200)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=access_at + timedelta(hours=1)):
+            self.assertEqual(self.fetch_account(self.backup).status_code, 200)
         with patch('accounts.credential_rotation.source_traffic.timezone.now',
                    return_value=access_at + timedelta(days=1)):
             _, blockers = self.manager.check_usage()
@@ -92,32 +91,13 @@ class CredentialSourceTrafficTests(CredentialTestCase):
             self.credential, rotation.id,
         )['events']])
 
-    def test_legacy_source_user_must_fetch_backup_after_switch(self):
-        with patch('accounts.credential_rotation.preparation.timezone.now',
-                   return_value=self.started - timedelta(seconds=1)):
-            self.assertEqual(self.legacy_fetch(self.primary).status_code, 200)
-        rotation = self.start_switch()
-        self.assertEqual(
-            rotation.participant_snapshot['legacy_applications'][0]['id'],
-            str(self.application.id),
-        )
-        with patch('accounts.credential_rotation.source_traffic.timezone.now',
-                   return_value=self.started + timedelta(days=1)):
-            _, blockers = self.manager.check_usage()
-        self.assertEqual(blockers[0]['reason'], 'using_source')
-        with patch('accounts.credential_rotation.preparation.timezone.now',
-                   return_value=self.started + timedelta(hours=1)):
-            self.assertEqual(self.legacy_fetch(self.backup).status_code, 200)
-        with patch('accounts.credential_rotation.source_traffic.timezone.now',
-                   return_value=self.started + timedelta(days=1)):
-            self.assertEqual(self.manager.check_usage()[1], [])
 
     def test_stale_account_edits_preserve_latest_source_fetch(self):
         self.start_switch()
         stale = Account.objects.get(pk=self.primary.pk)
         fetched_at = self.started + timedelta(hours=1)
-        with patch('accounts.credential_rotation.preparation.timezone.now', return_value=fetched_at):
-            self.assertEqual(self.legacy_fetch(self.primary).status_code, 200)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=fetched_at):
+            self.assertEqual(self.fetch_account(self.primary).status_code, 200)
         stale.comment = 'Updated from an older account object'
         stale.save()
         self.primary.refresh_from_db()
@@ -128,9 +108,9 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         ready_at = self.started + timedelta(days=1)
         with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=ready_at):
             self.assertEqual(self.manager.check_usage()[1], [])
-        with patch('accounts.credential_rotation.preparation.timezone.now',
+        with patch('accounts.credential_rotation.source_traffic.timezone.now',
                    return_value=ready_at + timedelta(seconds=1)):
-            self.assertEqual(self.legacy_fetch(self.primary).status_code, 200)
+            self.assertEqual(self.fetch_account(self.primary).status_code, 200)
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.status, 'waiting_switch')
         with self.assertRaises(JMSException):
@@ -153,6 +133,116 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         CredentialClientInstance.objects.filter(pk=client.client.pk).update(date_last_seen=timezone.now())
         self.assertEqual(self.manager.check_usage()[1][0]['reason'], 'source_secret_access')
 
+    def test_display_phase_follows_client_switch_and_source_observation(self):
+        from accounts.credential_rotation.participants import build
+
+        client = CredentialClientManager(self.application, instance_id='phase-sdk')
+        CredentialClientInstance.objects.filter(pk=client.client.pk).update(date_last_seen=timezone.now())
+        fetched = client.fetch(self.credential.key, '127.0.0.1')
+        client.confirm(self.credential.key, fetched['revision'], self.primary.id)
+        self.start_switch()
+
+        def assert_phase(expected):
+            self.credential.refresh_from_db()
+            self.assertEqual(build(self.credential)['rotation_phase'], expected)
+            detail = cycle_detail(self.credential, self.credential.rotation_records.first().id)
+            self.assertEqual(detail['rotation_status']['rotation_phase'], expected)
+            self.assertEqual(detail['rotation_status']['credential_status'], self.credential.status)
+            for serializer in (ApplicationCredentialSerializer, ApplicationCredentialListSerializer):
+                data = serializer(self.credential).data
+                self.assertEqual(data['rotation_phase'], expected)
+                self.assertEqual(data['status']['value'], self.credential.status)
+
+        assert_phase('waiting_switch')
+        self.assertIsNone(source_traffic_info(self.credential))
+        self.assertNotIn('rotation.source.waiting', [event['event'] for event in cycle_detail(
+            self.credential, self.credential.rotation_records.first().id,
+        )['events']])
+        fetched = client.fetch(self.credential.key, '127.0.0.1')
+        client.confirm(self.credential.key, fetched['revision'], self.backup.id)
+        CredentialClientInstance.objects.filter(pk=client.client.pk).update(date_last_seen=timezone.now())
+        assert_phase('waiting_source')
+        self.assertEqual(self.credential.status, 'waiting_switch')
+        self.assertEqual(self.manager.check_usage()[1][0]['reason'], 'source_secret_access')
+
+        with patch('accounts.credential_rotation.source_traffic.timezone.now',
+                   return_value=self.started + timedelta(days=1, seconds=1)):
+            # Readiness still requires the participant to be online.
+            CredentialClientInstance.objects.filter(pk=client.client.pk).update(
+                date_last_seen=self.started + timedelta(days=1, seconds=1),
+            )
+            self.assertEqual(self.manager.check_usage()[1], [])
+            assert_phase('ready_for_change')
+
+        record_secret_access(self.primary)
+        assert_phase('waiting_source')
+        CredentialClientInstance.objects.filter(pk=client.client.pk).update(
+            date_last_seen=self.started - timedelta(minutes=3),
+        )
+        assert_phase('waiting_switch')
+
+    def test_receipts_and_partial_confirmation_do_not_start_the_observation_window(self):
+        from accounts.credential_rotation.events import receive
+
+        clients = [CredentialClientManager(self.application, instance_id=f'wait-client-{i}') for i in range(2)]
+        for client in clients:
+            client.fetch(self.credential.key, '127.0.0.1')
+        rotation = self.start_switch()
+        publication = rotation.events.get(event='credential.switch.published')
+        for client in clients:
+            receive(client.client.id, self.org.id, publication.source_event_id)
+        self.assertIsNone(source_traffic_info(self.credential))
+        self.assertFalse(rotation.events.filter(event='rotation.source.waiting').exists())
+
+        first_confirmation = self.started + timedelta(days=2)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=first_confirmation):
+            fetched = clients[0].fetch(self.credential.key, '127.0.0.1')
+            clients[0].confirm(self.credential.key, fetched['revision'], self.backup.id)
+            self.assertIsNone(source_traffic_info(self.credential))
+            self.assertTrue(self.manager.check_usage()[1])
+        self.assertFalse(rotation.events.filter(event='rotation.source.waiting').exists())
+
+        confirmed_at = self.started + timedelta(days=3)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=confirmed_at):
+            CredentialClientInstance.objects.filter(pk__in=[client.client.pk for client in clients]).update(
+                date_last_seen=confirmed_at,
+            )
+            fetched = clients[1].fetch(self.credential.key, '127.0.0.1')
+            clients[1].confirm(self.credential.key, fetched['revision'], self.backup.id)
+            traffic = source_traffic_info(self.credential)
+            self.assertEqual(traffic['started_at'], confirmed_at.isoformat())
+            self.assertEqual(traffic['eligible_at'], (confirmed_at + timedelta(days=1)).isoformat())
+            self.assertEqual(traffic['remaining_seconds'], 86400)
+            clients[1].confirm(self.credential.key, fetched['revision'], self.backup.id)
+            self.assertEqual(rotation.events.filter(event='rotation.source.waiting').count(), 1)
+            self.assertEqual(self.manager.check_usage()[1][0]['reason'], 'source_secret_access')
+
+    def test_legacy_open_observation_restarts_after_application_confirmation(self):
+        client = CredentialClientManager(self.application, instance_id='legacy-observer')
+        client.fetch(self.credential.key, '127.0.0.1')
+        rotation = self.start_switch()
+        rotation.refresh_from_db()
+        rotation.participant_snapshot['source_traffic']['started_at'] = self.started.isoformat()
+        rotation.save(update_fields=['participant_snapshot'])
+        confirmed_at = self.started + timedelta(days=3)
+        with patch('accounts.credential_rotation.source_traffic.timezone.now', return_value=confirmed_at):
+            self.assertIsNone(source_traffic_info(self.credential))
+            self.assertTrue(self.manager.check_usage()[1])
+            CredentialClientInstance.objects.filter(pk=client.client.pk).update(date_last_seen=confirmed_at)
+            fetched = client.fetch(self.credential.key, '127.0.0.1')
+            client.confirm(self.credential.key, fetched['revision'], self.backup.id)
+            traffic = source_traffic_info(self.credential)
+            self.assertEqual(traffic['started_at'], confirmed_at.isoformat())
+            self.assertFalse(traffic['ready'])
+
+    def test_finished_cycle_does_not_use_live_progress_from_another_cycle(self):
+        rotation = self.start_switch()
+        self.manager.cancel()
+        self.assertEqual(self.manager.complete()[1], [])
+        self.manager.start()
+        self.credential.refresh_from_db()
+        self.assertIsNone(cycle_detail(self.credential, rotation.id)['rotation_status'])
+
     def test_direct_source_fetch_is_denied_during_secret_change(self):
         self.start_switch()
         previous = self.primary.date_last_secret_access
@@ -160,22 +250,22 @@ class CredentialSourceTrafficTests(CredentialTestCase):
         self.credential.save(update_fields=['status'])
         with transaction.atomic():
             with self.assertRaises(JMSException):
-                record_secret_access(self.primary, self.application)
+                record_secret_access(self.primary)
         with transaction.atomic():
-            self.assertNotEqual(self.legacy_fetch(self.primary).status_code, 200)
+            self.assertNotEqual(self.fetch_account(self.primary).status_code, 200)
         direct = CredentialClientManager(self.application, instance_id='direct-source-sdk')
         with transaction.atomic():
             with self.assertRaises(JMSException):
                 direct.fetch('', '127.0.0.1', self.primary.id)
         self.primary.refresh_from_db()
         self.assertEqual(self.primary.date_last_secret_access, previous)
-        self.assertEqual(self.legacy_fetch(self.backup).status_code, 200)
+        self.assertEqual(self.fetch_account(self.backup).status_code, 200)
 
     def test_execution_rechecks_source_fetches_under_policy_lock(self):
         self.started -= timedelta(days=2)
         rotation = self.start_switch()
         self.assertEqual(self.manager.check_usage()[1], [])
-        self.assertEqual(self.legacy_fetch(self.primary).status_code, 200)
+        self.assertEqual(self.fetch_account(self.primary).status_code, 200)
         self.credential.status = self.credential.Status.ready_for_change
         self.credential.save(update_fields=['status'])
         automation = ChangeSecretAutomation.objects.create(

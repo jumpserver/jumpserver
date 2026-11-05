@@ -119,11 +119,11 @@ def publish_subscription_credentials_for_account(account, revision=None, operati
     revision = account.version if revision is None else revision
     for application in account_applications(account):
         event = record(
-            AuditEvent.CREDENTIAL_PUBLISHED, application=application, account=account,
+            AuditEvent.CREDENTIAL_SECRET_UPDATED, application=application, account=account,
             credential_key=ApplicationCredential.account_key(account.id),
             revision=revision, operation_id=operation_id,
         )
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED,
+        enqueue(event, ApplicationEvent.CREDENTIAL_SECRET_UPDATED,
                 notify=application.credential_notifications_enabled)
 
 
@@ -152,7 +152,9 @@ def get_audit_event(instance, created, before, after):
         return AuditEvent.CLIENT_ENABLED if instance.is_active else AuditEvent.CLIENT_DISABLED
     if isinstance(instance, ApplicationCredential) and not created:
         if before.get('revision') != after['revision']:
-            return AuditEvent.CREDENTIAL_PUBLISHED
+            if before.get('active_account_id') != after['active_account_id']:
+                return AuditEvent.CREDENTIAL_SWITCH_PUBLISHED
+            return AuditEvent.CREDENTIAL_REFRESH_REQUESTED
         if before.get('status') != after['status']:
             return AuditEvent.ROTATION_STEP
     return AuditEvent.CONFIGURATION_CREATED if created else AuditEvent.CONFIGURATION_UPDATED
@@ -168,8 +170,11 @@ def notify_model_change(instance, event, changes):
         rotation = instance.rotation_records.filter(
             status__in=('running', 'preparing'), date_finished__isnull=True,
         ).first()
-    if event.event == AuditEvent.CREDENTIAL_PUBLISHED:
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED, rotation=rotation)
+    if event.event in (AuditEvent.CREDENTIAL_SWITCH_PUBLISHED, AuditEvent.CREDENTIAL_REFRESH_REQUESTED):
+        code = (ApplicationEvent.CREDENTIAL_SWITCH_PUBLISHED
+                if event.event == AuditEvent.CREDENTIAL_SWITCH_PUBLISHED
+                else ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
+        enqueue(event, code, rotation=rotation)
     elif event.event == AuditEvent.ROTATION_STEP:
         if instance.status in (
             ApplicationCredential.Status.change_failed,
@@ -243,7 +248,7 @@ def application_binding_changed(sender, instance, created=False, signal=None, **
     if credential:
         event = record(AuditEvent.AUTHORIZATION_GRANTED, credential=credential,
                        application=application, applications=[application])
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
 
 
 def before_application_binding_deleted(sender, instance, **kwargs):

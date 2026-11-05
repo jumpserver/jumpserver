@@ -24,9 +24,6 @@ class ApplicationCredential(JMSOrgBaseModel):
 
     class Status(models.TextChoices):
         idle = 'idle', _('Idle')
-        preparing = 'preparing', _('Aligning accounts')
-        waiting_standby = 'waiting_standby', _('Observing standby account usage')
-        ready_to_switch = 'ready_to_switch', _('Ready for account switch')
         waiting_switch = 'waiting_switch', _('Waiting for account switch')
         ready_for_change = 'ready_for_change', _('Ready for secret change')
         changing_secret = 'changing_secret', _('Changing secret')
@@ -129,14 +126,7 @@ class ApplicationCredential(JMSOrgBaseModel):
             return None
         return {'account_ids': sorted((str(self.account_id), str(self.alternate_account_id)))}
 
-    @property
-    def standby_no_traffic_days(self):
-        # Compatibility for older API clients and historical preparation records.
-        return self.source_no_traffic_days
 
-    @standby_no_traffic_days.setter
-    def standby_no_traffic_days(self, value):
-        self.source_no_traffic_days = value
 
     @property
     def current_revision(self):
@@ -212,7 +202,7 @@ class CredentialClientInstance(JMSOrgBaseModel):
         null=True, blank=True, verbose_name=_('Configuration schema version')
     )
     config_digest = models.CharField(max_length=64, blank=True, default='', verbose_name=_('Configuration digest'))
-    # None preserves the legacy all-bound-policies behavior. Explicit local
+    # Explicit local
     # rules advertise only the accounts/keys this Agent can apply.
     delivery_scope = models.JSONField(null=True, blank=True, default=None)
     restart_supported = models.BooleanField(default=False)

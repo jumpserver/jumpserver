@@ -13,12 +13,9 @@ from accounts.api.account.credential import (
     CredentialClientInstanceViewSet,
     CredentialClientViewSet,
 )
-from accounts.clients.python.jms_pam.common.abstract_client import HTTPSignatureAuth
-from accounts.clients.python.jms_pam.common.credential import Credential
-from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.clients.python.jms_pam.credential.v1.credential_client import (
-    CredentialClient,
-)
+from accounts.clients.python.jms_pam._auth import HTTPSignatureAuth
+from accounts.clients.python.jms_pam import Client
+from accounts.clients.python.jms_pam.client import CLIENT_PATH
 from accounts.credential_client.access import materials
 from accounts.credential_client.documentation import sdk_example
 from accounts.credential_client.manager import CredentialClientManager
@@ -490,10 +487,7 @@ class ApplicationAccessStreamTests(TransactionTestCase):
         set_to_root_org()
 
     async def connect(self, source='jms-pam', schema=None, after_connect=None):
-        sdk = CredentialClient(
-            Credential(str(self.application.id), self.application.secret), 'automatic-stream',
-            ClientProfile(endpoint='http://testserver', org_id=str(self.org.id), source=source),
-        )
+        sdk = Client('http://testserver', app_id=str(self.application.id), app_secret=self.application.secret, instance_id='automatic-stream', org_id=str(self.org.id), source=source)
         if schema is not None:
             prepared = requests.Request('GET', sdk._event_stream_url().replace('ws://', 'http://'), headers={
                 'Accept': 'application/json', 'Date': formatdate(usegmt=True), 'X-JMS-ORG': str(self.org.id),

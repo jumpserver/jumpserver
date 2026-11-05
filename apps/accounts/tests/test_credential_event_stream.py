@@ -1,10 +1,7 @@
 from unittest.mock import AsyncMock, Mock, patch
 
-from accounts.clients.python.jms_pam.common.credential import Credential
-from accounts.clients.python.jms_pam.common.profile.client_profile import ClientProfile
-from accounts.clients.python.jms_pam.credential.v1.credential_client import (
-    CredentialClient,
-)
+from accounts.clients.python.jms_pam import Client
+from accounts.clients.python.jms_pam.client import CLIENT_PATH
 from accounts.credential_client.events import _publish_stream
 from accounts.credential_rotation.manager import CredentialRotationManager
 from accounts.models import (
@@ -129,14 +126,14 @@ class CredentialEventStreamTests(TransactionTestCase):
             application=self.application, instance_id='publisher', type='sdk',
         )
         event = ApplicationAudit.objects.create(
-            event='credential_published', service_id=self.application.id,
+            event='credential_secret_updated', service_id=self.application.id,
             credential_id=self.credential.id,
             credential_key=self.credential.account_key(self.account.id),
             account_id=self.account.id, revision=self.account.version,
         )
         layer = Mock(group_send=AsyncMock())
         with patch('accounts.credential_client.events.get_channel_layer', return_value=layer):
-            _publish_stream(event.id, 'credential.updated')
+            _publish_stream(event.id, 'credential.secret.updated')
         payload = layer.group_send.await_args.args[1]['payload']
         self.assertEqual(payload['credential_mode'], ApplicationCredential.Mode.subscription)
         self.assertEqual(payload['account_id'], str(self.account.id))
@@ -153,13 +150,7 @@ class CredentialEventStreamTests(TransactionTestCase):
         self.assertEqual(code, 4401)
 
     async def _connect(self):
-        sdk = CredentialClient(
-            Credential(str(self.application.id), self.application.secret),
-            'stream-instance',
-            ClientProfile(
-                endpoint='http://testserver', org_id=str(self.org.id),
-            ),
-        )
+        sdk = Client('http://testserver', app_id=str(self.application.id), app_secret=self.application.secret, instance_id='stream-instance', org_id=str(self.org.id))
         headers = []
         for header in sdk._event_stream_headers():
             name, value = header.split(': ', 1)

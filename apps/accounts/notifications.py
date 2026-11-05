@@ -10,21 +10,6 @@ from users.models import User
 from users.utils import activate_user_language
 
 
-class CredentialPreparationReadyMsg(UserMessage):
-    subject = _('Account rotation preparation is ready')
-
-    def __init__(self, user, credential):
-        self.credential = credential
-        super().__init__(user)
-
-    def get_html_msg(self):
-        return {
-            'subject': str(self.subject),
-            'message': format_html('<p>{}</p>', _(
-                'Credential policy "{name}" is aligned. No application has requested the standby '
-                'account Secret for {days} days. Sign in and manually start account switching.'
-            ).format(name=self.credential.name, days=self.credential.standby_no_traffic_days)),
-        }
 
 
 class CredentialSourceReadyMsg(UserMessage):

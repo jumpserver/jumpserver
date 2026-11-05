@@ -61,7 +61,7 @@ class CredentialEventQuerySerializer(drf_serializers.Serializer):
     client_type = drf_serializers.ChoiceField(choices=['', 'sdk', 'agent'], default='')
     state = drf_serializers.ChoiceField(choices=['', 'online', 'offline', 'inactive'], default='')
     kind = drf_serializers.ChoiceField(
-        choices=['', 'rotation', 'subscription', 'subscription_refresh', 'update', 'event', 'legacy'], default='',
+        choices=['', 'rotation', 'subscription', 'subscription_refresh', 'update', 'event'], default='',
     )
     cycle_status = drf_serializers.ChoiceField(
         choices=['', 'preparing', 'running', 'success', 'failed', 'cancelled', 'published'], default='',
@@ -155,8 +155,6 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     ordering_fields = ('name', 'status', 'date_last_rotated', 'date_created')
     rbac_perms = {
         'start_cycle': 'accounts.change_applicationcredential',
-        'prepare_rotation': 'accounts.change_applicationcredential',
-        'check_preparation': 'accounts.change_applicationcredential',
         'start_rotation': 'accounts.change_applicationcredential',
         'check_usage': 'accounts.change_applicationcredential',
         'check_secret_change': 'accounts.change_applicationcredential',
@@ -223,20 +221,7 @@ class ApplicationCredentialViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             'cycle_id': str(cycle_id),
         }, status=status.HTTP_201_CREATED)
 
-    @action(methods=['post'], detail=True, url_path='prepare')
-    def prepare_rotation(self, request, *args, **kwargs):
-        credential = self.get_object()
-        if credential.verify_before_switch and not request.user.has_perm('accounts.verify_account'):
-            raise PermissionDenied()
-        credential = CredentialRotationManager(credential.id).prepare(request.user.name, request.user.id)
-        return Response(self.get_serializer(credential).data)
 
-    @action(methods=['post'], detail=True, url_path='check-preparation')
-    def check_preparation(self, request, *args, **kwargs):
-        # Compatibility endpoint for older clients. New cycles use preflight
-        # verification followed by source traffic observation after switching.
-        credential = self.get_object()
-        return Response(self.get_serializer(credential).data)
 
     @action(methods=['post'], detail=True, url_path='start')
     def start_rotation(self, request, *args, **kwargs):

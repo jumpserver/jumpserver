@@ -39,25 +39,25 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         )
         self.webhook.applications.add(self.application)
 
-    def enqueue_event(self, code=ApplicationEvent.CREDENTIAL_UPDATED):
-        event = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=self.credential)
+    def enqueue_event(self, code=ApplicationEvent.CREDENTIAL_SECRET_UPDATED):
+        event = record(AuditEvent.CREDENTIAL_SECRET_UPDATED, credential=self.credential)
         with patch(
             'accounts.credential_client.events._dispatch_webhook',
         ) as dispatch, self.captureOnCommitCallbacks(execute=True):
             enqueue(event, code)
         return event, dispatch
 
-    def test_scope_event_keeps_legacy_webhook_body_and_delivery_code(self):
-        self.webhook.events = [ApplicationEvent.CONFIGURATION_UPDATED]
+    def test_scope_event_uses_current_code_in_body_and_delivery(self):
+        self.webhook.events = [ApplicationEvent.APPLICATION_SCOPE_UPDATED]
         self.webhook.save(update_fields=['events'])
         event, dispatch = self.enqueue_event(ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         delivery = ApplicationEventDelivery.objects.get(event=event, webhook=self.webhook)
-        self.assertEqual(delivery.code, 'configuration.updated')
-        self.assertEqual(delivery.body['event'], 'configuration.updated')
+        self.assertEqual(delivery.code, 'app.scope.updated')
+        self.assertEqual(delivery.body['event'], 'app.scope.updated')
         dispatch.assert_called_once()
 
-    def test_scope_event_aliases_do_not_duplicate_delivery(self):
-        self.webhook.events = [ApplicationEvent.CONFIGURATION_UPDATED, ApplicationEvent.APPLICATION_SCOPE_UPDATED]
+    def test_duplicate_scope_filters_do_not_duplicate_delivery(self):
+        self.webhook.events = [ApplicationEvent.APPLICATION_SCOPE_UPDATED, ApplicationEvent.APPLICATION_SCOPE_UPDATED]
         self.webhook.save(update_fields=['events'])
         event, dispatch = self.enqueue_event(ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         deliveries = ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook)
@@ -65,15 +65,15 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.assertEqual(deliveries.get().body['event'], 'app.scope.updated')
         dispatch.assert_called_once()
 
-    def test_legacy_scope_event_also_reaches_canonical_subscription(self):
+    def test_scope_event_reaches_subscription(self):
         self.webhook.events = [ApplicationEvent.APPLICATION_SCOPE_UPDATED]
         self.webhook.save(update_fields=['events'])
-        event, _ = self.enqueue_event(ApplicationEvent.CONFIGURATION_UPDATED)
+        event, _ = self.enqueue_event(ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         delivery = ApplicationEventDelivery.objects.get(event=event, webhook=self.webhook)
         self.assertEqual(delivery.code, 'app.scope.updated')
         self.assertEqual(delivery.body['event'], 'app.scope.updated')
 
-    def test_legacy_scope_history_remains_visible_with_the_current_label(self):
+    def test_retired_scope_history_is_excluded(self):
         from accounts.credential_rotation.events import subscription_events, timeline
         self.credential.mode = 'subscription'
         self.credential.account = self.credential.alternate_account = self.credential.active_account = None
@@ -83,8 +83,8 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
             source_event_id=source.id, event='configuration.updated', sequence=1,
             revision=1, recipients=[],
         )
-        self.assertTrue(subscription_events(self.credential).filter(id=event.id).exists())
-        self.assertEqual(timeline(self.credential)['events'][0]['event'], 'app.scope.updated')
+        self.assertFalse(subscription_events(self.credential).filter(id=event.id).exists())
+        self.assertNotIn(str(source.id), [item['id'] for item in timeline(self.credential)['events']])
         event.refresh_from_db()
         self.assertEqual(event.event, 'configuration.updated')
 
@@ -96,7 +96,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.assertEqual(delivery.url, 'https://hooks.example/events')
         self.assertEqual(delivery.headers, {'Authorization': 'Bearer saved-token'})
         self.assertEqual(delivery.body, {
-            'event': 'credential.updated', 'application': 'order-service',
+            'event': 'credential.secret.updated', 'application': 'order-service',
             'revision': self.credential.revision,
         })
         self.assertAlmostEqual(
@@ -107,7 +107,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.webhook.url = 'https://changed.example/events'
         self.webhook.headers = {'Authorization': 'changed'}
         self.webhook.save(update_fields=['url', 'headers'])
-        enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(event, ApplicationEvent.CREDENTIAL_SECRET_UPDATED)
         self.assertEqual(ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook).count(), 1)
         delivery.refresh_from_db()
         self.assertEqual(delivery.url, 'https://hooks.example/events')
@@ -135,7 +135,7 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
         self.assertNotIn('saved-token', content)
 
     def test_disabled_or_unselected_webhook_is_not_enqueued(self):
-        self.webhook.events = [ApplicationEvent.CREDENTIAL_REVOKED]
+        self.webhook.events = [ApplicationEvent.APPLICATION_SCOPE_UPDATED]
         self.webhook.save(update_fields=['events'])
         event, dispatch = self.enqueue_event()
         self.assertFalse(ApplicationEventDelivery.objects.filter(event=event, webhook=self.webhook).exists())
@@ -151,10 +151,10 @@ class ApplicationWebhookDeliveryTests(CredentialTestCase):
     def test_invalid_stored_template_does_not_break_event_enqueue(self):
         self.webhook.body_template = {'event': '{{ unknown.field }}'}
         self.webhook.save(update_fields=['body_template'])
-        event = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=self.credential)
+        event = record(AuditEvent.CREDENTIAL_SECRET_UPDATED, credential=self.credential)
 
         with patch('accounts.credential_client.events.logger') as logger:
-            enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+            enqueue(event, ApplicationEvent.CREDENTIAL_SECRET_UPDATED)
 
         self.assertFalse(ApplicationEventDelivery.objects.filter(event=event).exists())
         logger.warning.assert_called_once_with(

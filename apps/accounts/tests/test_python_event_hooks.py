@@ -44,7 +44,7 @@ class PythonEventHookTests(TestCase):
             }
         )
         self.subscription = {
-            "event": "credential.updated",
+            "event": "credential.secret.updated",
             "account_id": "account",
             "credential_key": "database:account",
             "credential_mode": "subscription",
@@ -52,7 +52,6 @@ class PythonEventHookTests(TestCase):
         self.client.get_credential = Mock(return_value=self.credential)
         self.client.confirm_credential = Mock()
         self.client.on_credential_changed = Mock()
-        self.client.on_credential_revoked = Mock()
         self.client.on_event = Mock()
         self.client.on_event_error = Mock()
 
@@ -86,18 +85,15 @@ class PythonEventHookTests(TestCase):
         self.client.confirm_credential.assert_not_called()
 
     def test_lifecycle_commands_and_policy_subscription_events_do_not_fetch(self):
-        revoked = {"event": "credential.revoked", "credential_key": "database"}
         self.watch(
             [
                 {"event": "credential.rotation.completed"},
                 {"event": "app.scope.updated"},
                 {**self.subscription, "account_id": None},
                 {**self.subscription, "command_id": "command"},
-                revoked,
             ]
         )
         self.client.get_credential.assert_not_called()
-        self.client.on_credential_revoked.assert_called_once_with(revoked)
 
     def test_outdated_api_revision_is_retried_without_application(self):
         dispatcher = EventDispatcher(self.client)
@@ -175,7 +171,6 @@ class PythonEventHookTests(TestCase):
         self.client.get_credential.side_effect = RuntimeError("failed")
         for event in (
             {"event": "snapshot", "credentials": []},
-            {"event": "credential.revoked"},
             {"event": "app.scope.updated"},
         ):
             dispatcher._dispatch(self.subscription)
@@ -360,7 +355,7 @@ class PythonEventHookTests(TestCase):
             client.on_event_error = Mock()
             dispatcher = EventDispatcher(client)
             dispatcher._dispatch({
-                "event": "credential.updated", "event_id": "event-one", "account_id": "account",
+                "event": "credential.secret.updated", "event_id": "event-one", "account_id": "account",
                 "account_revision": 2, "credential_mode": "subscription",
             })
             client.confirm_event.assert_called_once_with(

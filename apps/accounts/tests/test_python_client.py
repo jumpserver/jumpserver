@@ -198,7 +198,7 @@ class PythonClientTests(TestCase):
         self.assertEqual(data["error_code"], "execution_failed")
 
     def test_event_iterator_acknowledges_before_yield_and_closes(self):
-        event = {"event": "credential.updated", "event_id": "event"}
+        event = {"event": "credential.secret.updated", "event_id": "event"}
         connection = Mock(recv=Mock(return_value=json.dumps(event)))
         with patch(
             "accounts.clients.python.jms_pam._events.websocket.create_connection",
@@ -270,7 +270,7 @@ class PythonClientTests(TestCase):
         self.client.session.request.return_value.close.assert_called_once()
 
     def test_close_cancels_active_stream_and_prevents_session_reuse(self):
-        event = {"event": "credential.updated", "event_id": "event"}
+        event = {"event": "credential.secret.updated", "event_id": "event"}
         connection = Mock(recv=Mock(return_value=json.dumps(event)))
         with patch(
             "accounts.clients.python.jms_pam._events.websocket.create_connection",

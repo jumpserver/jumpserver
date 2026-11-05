@@ -15,9 +15,6 @@ from accounts.models import (
 
 SNAPSHOT_VERSION = 1
 BLOCKING_PHASES = {
-    ApplicationCredential.Status.preparing,
-    ApplicationCredential.Status.waiting_standby,
-    ApplicationCredential.Status.ready_to_switch,
     ApplicationCredential.Status.waiting_switch,
     ApplicationCredential.Status.ready_for_change,
     ApplicationCredential.Status.change_failed,
@@ -254,44 +251,6 @@ def _application_summary(instances, warnings):
     return sorted(applications.values(), key=lambda item: item['application']['name'])
 
 
-def _legacy_instances(credential, rotation):
-    if not rotation:
-        return []
-    snapshot = rotation.participant_snapshot or {}
-    applications = snapshot.get('legacy_applications', [])
-    started = snapshot.get('legacy_switch_started_at')
-    if not applications or not started:
-        return []
-    desired = credential.active_account
-    source = rotation.target_account if desired.id == rotation.source_account_id else rotation.source_account
-    accesses = {(str(row['service_id']), str(row['account_id'])): row['latest']
-                for row in ApplicationAudit.objects.filter(
-                    event=AuditEvent.CREDENTIAL_FETCHED, result='success', credential_id__isnull=True,
-                    service_id__in=[app['id'] for app in applications],
-                    account_id__in=[desired.id, source.id], date_created__gte=parse_datetime(started),
-                ).values('service_id', 'account_id').annotate(latest=Max('date_created'))}
-    for application_id, accounts in snapshot.get('api_accesses', {}).items():
-        for account_id, value in accounts.items():
-            accessed_at = parse_datetime(value)
-            if accessed_at >= parse_datetime(started):
-                accesses[(application_id, account_id)] = accessed_at
-    instances = []
-    for app in applications:
-        target_access = accesses.get((app['id'], str(desired.id)))
-        source_access = accesses.get((app['id'], str(source.id)))
-        switched = bool(target_access and (not source_access or target_access > source_access))
-        instances.append({
-            'application': {'id': app['id'], 'name': app['name']},
-            'client': {'id': f"api:{app['id']}", 'instance_id': 'API', 'type': 'api'},
-            'status': 'switched' if switched else 'using_source',
-            'applied_account': _account(desired if switched else source),
-            'desired_account': _account(desired), 'online': bool(target_access or source_access),
-            'applied_revision': credential.revision if switched else 0,
-            'required_revision': credential.revision,
-            'date_last_seen': _date(max(filter(None, [target_access, source_access]), default=None)),
-            'blocking': credential.status in BLOCKING_PHASES and not switched,
-        })
-    return instances
 
 
 def build(credential, rotation=None, now=None):
@@ -314,7 +273,6 @@ def build(credential, rotation=None, now=None):
         _state(credential, rotation, item, by_client.get(item['client']['id']), now)
         for item in participants
     ]
-    instances.extend(_legacy_instances(credential, rotation))
     instances.sort(key=lambda item: (
         not item['blocking'], item['application']['name'], item['client']['instance_id'],
     ))
@@ -337,9 +295,17 @@ def build(credential, rotation=None, now=None):
         'applied_account': (item['applied_account'] or {}).get('id', ''),
         'date_last_seen': item['date_last_seen'],
     } for item in instances if item['blocking']]
+    traffic = source_traffic_info(credential, rotation, now)
     return {
         'rotation_id': str(rotation.id) if rotation else None,
         'credential_status': credential.status,
+        # The switch state also covers the source-account observation window.
+        # Keep the workflow state stable, but expose the actual waiting phase.
+        'rotation_phase': (
+            'waiting_source'
+            if credential.status == credential.Status.waiting_switch and not blockers and traffic
+            else credential.status
+        ),
         'source_account': _account(rotation.source_account) if rotation else None,
         'switch_source_account': _account(
             rotation.target_account
@@ -349,7 +315,7 @@ def build(credential, rotation=None, now=None):
         'target_account': _account(rotation.target_account) if rotation else None,
         'desired_account': _account(credential.active_account),
         'change_account': _account(rotation.change_account) if rotation else None,
-        'source_traffic': source_traffic_info(credential, rotation, now),
+        'source_traffic': traffic,
         'required_revision': credential.revision,
         'summary': summary,
         'applications': _application_summary(instances, warnings),

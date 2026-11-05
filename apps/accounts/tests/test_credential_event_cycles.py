@@ -62,7 +62,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         self.assertEqual(detail['status'], 'success')
         self.assertEqual(detail['account']['id'], str(self.primary.id))
         self.assertEqual([event['event'] for event in detail['events']], [
-            'credential.change.started', 'credential.change.completed', 'credential.updated',
+            'credential.change.started', 'credential.change.completed', 'credential.secret.updated',
         ])
         self.assertTrue(all(not event['requires_confirmation'] for event in detail['events']))
 
@@ -79,7 +79,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         self.assertEqual(failed['status'], 'failed')
         self.assertEqual(failed['event_count'], 2)
         self.assertEqual(succeeded['status'], 'success')
-        self.assertNotIn('credential.updated', [event['event'] for event in failed['events']])
+        self.assertNotIn('credential.secret.updated', [event['event'] for event in failed['events']])
 
     def test_direct_updates_do_not_merge_by_date_or_revision(self):
         self.subscription()
@@ -99,8 +99,8 @@ class CredentialEventCycleTests(CredentialTestCase):
         enqueue(global_event, ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         other = ApplicationCredential.objects.create(name='Other subscription', mode='subscription')
         CredentialApplicationBinding.objects.create(credential=other, application=self.application)
-        foreign = record(AuditEvent.CREDENTIAL_PUBLISHED, credential=other)
-        enqueue(foreign, ApplicationEvent.CREDENTIAL_UPDATED)
+        foreign = record(AuditEvent.CREDENTIAL_SECRET_UPDATED, credential=other)
+        enqueue(foreign, ApplicationEvent.CREDENTIAL_SECRET_UPDATED)
         self.assertEqual(cycle_directory(self.credential)['count'], 1)
         self.assertEqual(cycle_detail(self.credential, change.id)['event_count'], 1)
         self.credential.org_id = uuid4()
@@ -129,6 +129,10 @@ class CredentialEventCycleTests(CredentialTestCase):
         manager.start()
         self.credential.refresh_from_db()
         first = self.credential.rotation_records.first()
+        client = CredentialClientManager(self.application, instance_id=self.client.instance_id)
+        fetched = client.fetch(self.credential.key, '127.0.0.1')
+        client.confirm(self.credential.key, fetched['revision'], self.backup.id)
+        first.refresh_from_db()
         manager._finish(self.credential, first, 'success')
         manager.start()
         second = self.credential.rotation_records.first()
@@ -138,8 +142,54 @@ class CredentialEventCycleTests(CredentialTestCase):
         self.assertEqual(latest['results'][0]['id'], str(second.id))
         self.assertEqual(older['results'][0]['id'], str(first.id))
         self.assertEqual(cycle_detail(self.credential, first.id)['event_count'], 5)
-        self.assertIsNone(cycle_detail(self.credential, first.id)['preparation'])
         self.assertIsNotNone(cycle_detail(self.credential, first.id)['source_traffic'])
+
+    def test_rotation_events_identify_switch_and_secret_change_accounts(self):
+        manager = CredentialRotationManager(self.credential.id)
+        manager.start()
+        rotation = self.credential.rotation_records.first()
+        detail = cycle_detail(self.credential, rotation.id)
+        accounts = detail['rotation_accounts']
+        self.assertEqual(accounts['source']['id'], str(self.primary.id))
+        self.assertEqual(accounts['target']['id'], str(self.backup.id))
+        self.assertEqual(accounts['change']['id'], str(self.primary.id))
+        self.assertEqual(accounts['target']['username'], self.backup.username)
+        self.assertEqual(accounts['target']['asset']['name'], self.asset.name)
+        publication = detail['events'][0]
+        self.assertEqual(publication['account_switch'], {
+            'from_account': accounts['source'], 'to_account': accounts['target'],
+            'reverting': False,
+        })
+        self.assertTrue(all(event['rotation_accounts'] == accounts for event in detail['events']))
+        self.assertTrue(all(event['published_account'] == accounts['target'] for event in detail['events']))
+        manager._finish(self.credential, rotation, 'success')
+        manager.start()
+        # A later B -> A rotation must not rewrite the first cycle's A -> B events.
+        self.assertEqual(cycle_detail(self.credential, rotation.id)['events'][0], publication)
+        latest = cycle_directory(self.credential)['results'][0]
+        self.assertEqual(latest['rotation_accounts']['source']['id'], str(self.backup.id))
+        self.assertEqual(latest['rotation_accounts']['target']['id'], str(self.primary.id))
+
+    def test_cancelled_rotation_keeps_both_publication_directions_without_clients(self):
+        self.client.delete()
+        manager = CredentialRotationManager(self.credential.id)
+        manager.start()
+        rotation = self.credential.rotation_records.first()
+        manager.cancel('Return to the original account')
+        events = cycle_detail(self.credential, rotation.id)['events']
+        publications = [event for event in events if event['event'] == 'credential.switch.published']
+        self.assertGreaterEqual(len(publications), 2)
+        self.assertTrue(all(event['recipient_count'] == 0 for event in publications))
+        self.assertEqual(publications[0]['account_switch']['from_account']['id'], str(self.primary.id))
+        self.assertEqual(publications[0]['account_switch']['to_account']['id'], str(self.backup.id))
+        self.assertFalse(publications[0]['account_switch']['reverting'])
+        for event in publications[1:]:
+            self.assertEqual(event['account_switch']['from_account']['id'], str(self.backup.id))
+            self.assertEqual(event['account_switch']['to_account']['id'], str(self.primary.id))
+            self.assertTrue(event['account_switch']['reverting'])
+        self.assertEqual(events[-1]['published_account']['id'], str(self.primary.id))
+        self.assertNotIn('primary-secret', str(events))
+        self.assertNotIn('backup-secret', str(events))
 
     def test_event_receipt_is_separate_from_application_confirmation(self):
         manager = CredentialRotationManager(self.credential.id)
@@ -205,7 +255,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         rotation = self.credential.rotation_records.first()
         manager._finish(self.credential, rotation, 'success')
         grant = record(AuditEvent.AUTHORIZATION_GRANTED, credential=self.credential)
-        enqueue(grant, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(grant, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
         self.assertEqual(cycle_directory(self.credential)['count'], 2)
         detail = cycle_detail(self.credential, grant.id)
         self.assertEqual(detail['kind'], 'event')
@@ -221,7 +271,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         client_manager.confirm(self.credential.key, self.credential.revision, self.credential.active_account_id)
         manager._finish(self.credential, rotation, 'success')
         grant = record(AuditEvent.AUTHORIZATION_GRANTED, credential=self.credential)
-        enqueue(grant, ApplicationEvent.CREDENTIAL_UPDATED)
+        enqueue(grant, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
         detail = cycle_detail(self.credential, grant.id)
         self.assertEqual(detail['events'][0]['confirmed_count'], 1)
         self.assertEqual(detail['events'][0]['received_count'], 0)
@@ -270,7 +320,7 @@ class CredentialEventCycleTests(CredentialTestCase):
         enqueue(audit, ApplicationEvent.CREDENTIAL_CHANGE_STARTED)
         CredentialRotationEvent.objects.filter(source_event_id=audit.id).update(cycle_id=None)
         detail = cycle_detail(self.credential, audit.id)
-        self.assertEqual(detail['kind'], 'legacy')
+        self.assertEqual(detail['kind'], 'subscription')
         self.assertEqual(detail['event_count'], 1)
 
     def test_cycle_filters_apply_before_pagination_and_count(self):

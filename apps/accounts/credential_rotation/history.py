@@ -19,7 +19,7 @@ def events_for(credential):
 
 def event_data(event, recipient):
     return {
-        'id': str(event.source_event_id), 'event': ApplicationEvent.canonical(event.event),
+        'id': str(event.source_event_id), 'event': event.event,
         'published_at': event.published_at.isoformat(), 'revision': event.revision,
         'rotation_id': str(event.rotation_id) if event.rotation_id else None,
         'received_at': recipient['received_at'], 'publish_result': recipient['publish_result'],

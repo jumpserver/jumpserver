@@ -41,12 +41,10 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
     serializer_classes = {
         'default': serializers.IntegrationApplicationSerializer,
         'retrieve': serializers.IntegrationApplicationDetailSerializer,
-        'get_account_secret': serializers.IntegrationAccountSecretSerializer,
     }
     rbac_perms = {
         'get_once_secret': 'accounts.change_integrationapplication',
         'reset_secret': 'accounts.change_integrationapplication',
-        'get_account_secret': 'accounts.view_integrationapplication',
         'get_sdks_info': 'accounts.view_integrationapplication',
         'credential_events': 'accounts.view_integrationapplication',
         'access_materials': 'accounts.change_integrationapplication',
@@ -116,6 +114,8 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
 
     @action(['GET'], detail=True, url_path='credential-events')
     def credential_events(self, request, *args, **kwargs):
+        from accounts.credential_rotation.cycles import event_account_context, event_account_data
+
         application = self.get_object()
         try:
             limit = min(max(int(request.query_params.get('limit', 30)), 1), 100)
@@ -130,16 +130,11 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             org_id=application.org_id, source_event_id__in=source_ids,
         ).order_by('-published_at', '-id')
         count = events.count()
-        page = list(events[offset:offset + limit])
-        audits = {
-            str(audit.id): audit for audit in ApplicationAudit.objects.filter(
-                id__in=[event.source_event_id for event in page],
-                org_id=application.org_id,
-            )
-        }
+        page = list(events.select_related('rotation')[offset:offset + limit])
+        audits, accounts = event_account_data(page, application.org_id)
         results = []
         for event in page:
-            audit = audits.get(str(event.source_event_id))
+            audit = audits.get(event.source_event_id)
             recipients = [
                 {
                     'instance_id': recipient['instance_id'],
@@ -159,7 +154,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
             ]
             results.append({
                 'id': str(event.source_event_id),
-                'event': ApplicationEvent.canonical(event.event),
+                'event': event.event,
                 'notification_enabled': event.notification_enabled,
                 'operation_id': str(audit.operation_id) if audit and audit.operation_id else None,
                 'result': audit.result if audit else '',
@@ -170,6 +165,7 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
                 'credential_id': str(audit.credential_id) if audit and audit.credential_id else None,
                 'credential': audit.credential if audit else '',
                 'account': audit.account if audit else '',
+                **event_account_context(event, audit, accounts),
                 'recipients': recipients,
             })
         return Response({'count': count, 'results': results})
@@ -201,36 +197,6 @@ class IntegrationApplicationViewSet(ApplicationAuditMixin, OrgBulkModelViewSet):
         response['Cache-Control'] = 'no-store'
         return response
 
-    @action(['GET'], detail=False, url_path='account-secret',
-            permission_classes=[RBACPermission])
-    def get_account_secret(self, request, *args, **kwargs):
-        self.start_audit(AuditEvent.CREDENTIAL_FETCHED, application=request.user,
-                         remote_addr=get_request_ip(request))
-        serializer = self.get_serializer(data=request.query_params)
-        if not serializer.is_valid():
-            return Response({'error': serializer.errors}, status=400)
-
-        service = request.user
-        account = service.get_account(**serializer.data)
-        if not account:
-            msg = _('Account not found')
-            raise JMSException(code='Not found', detail='%s' % msg)
-        # 根据配置决定是否返回密码
-        secret = None if settings.SECURITY_DISABLE_VIEW_SECRET else account.secret
-        if secret is not None:
-            from accounts.credential_rotation.preparation import record_secret_access
-            record_secret_access(account, service)
-        call = record_access(application=service, account=account, remote_addr=get_request_ip(request),
-                             source='SDK', result='success' if secret is not None else 'failed',
-                             summary='Legacy account-secret access.')
-        record(AuditEvent.CREDENTIAL_FETCHED, application=service, account=account,
-               remote_addr=get_request_ip(request), result='success' if secret is not None else 'failed',
-               summary='Legacy account-secret access.', id=call.id)
-        response = Response(data={'id': request.user.id, 'secret': secret})
-        response['X-API-Deprecated'] = 'true'
-        response['Warning'] = '299 JumpServer "Use /api/v1/accounts/credential-client/credential/ instead."'
-        response['Cache-Control'] = 'no-store'
-        return response
 
 
 class ApplicationWebhookViewSet(OrgBulkModelViewSet):

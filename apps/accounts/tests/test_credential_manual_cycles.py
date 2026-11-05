@@ -40,7 +40,7 @@ class CredentialManualCycleTests(CredentialTestCase):
         self.assertEqual(detail['event_count'], 2)
         self.assertEqual({row['id'] for row in detail['accounts']}, {str(self.primary.id), str(self.backup.id)})
         for event in detail['events']:
-            self.assertEqual(event['event'], 'credential.updated')
+            self.assertEqual(event['event'], 'credential.refresh.requested')
             self.assertFalse(event['requires_confirmation'])
             self.assertEqual(event['received_count'], 0)
             source = ApplicationAudit.objects.get(id=event['id'])
@@ -135,18 +135,6 @@ class CredentialManualCycleTests(CredentialTestCase):
             start(self.credential.id)
         self.assertFalse(ApplicationAudit.objects.filter(event=AuditEvent.CREDENTIAL_REPUBLISHED).exists())
 
-    def test_rotation_new_cycle_starts_preparation_and_prevents_an_overlapping_cycle(self):
-        credential, first = start(self.credential.id, self.admin.name, self.admin.id)
-        self.assertEqual(credential.status, 'preparing')
-        self.assertEqual(credential.active_account_id, self.primary.id)
-        self.assertEqual(cycle_detail(credential, first)['kind'], 'rotation')
-        with self.assertRaises(JMSException):
-            start(self.credential.id)
-        CredentialRotationManager(credential.id).cancel('Start another preparation')
-        credential, second = start(credential.id, self.admin.name, self.admin.id)
-        self.assertNotEqual(first, second)
-        self.assertEqual(cycle_detail(credential, first)['status'], 'cancelled')
-        self.assertEqual(cycle_detail(credential, second)['status'], 'preparing')
 
     def test_start_cycle_api_returns_the_new_cycle_and_respects_organization(self):
         self.subscription()

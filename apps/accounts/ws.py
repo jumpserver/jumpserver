@@ -6,7 +6,7 @@ from accounts.api.account.credential import (
     CredentialClientApplicationAgentAuthentication,
     CredentialClientServiceAuthentication,
 )
-from accounts.const import AuditEvent
+from accounts.const import ApplicationEvent, AuditEvent
 from accounts.credential_client.audit import record
 from accounts.credential_client.events import application_group
 from accounts.credential_client.manager import CredentialClientManager
@@ -212,8 +212,8 @@ class CredentialEventConsumer(AsyncJsonWebsocketConsumer):
         if 'recipient_ids' in event and str(self.client.id) not in event['recipient_ids']:
             return
         await self.send_json(event['payload'])
-        if event['payload']['event'] in ('app.scope.updated', 'configuration.updated', 'credential.revoked') or (
-            event['payload']['event'] == 'credential.updated'
+        if event['payload']['event'] == 'app.scope.updated' or (
+            event['payload']['event'] in ApplicationEvent.credential_application_events()
             and event['payload'].get('credential_mode') == 'subscription'
             and not event['payload'].get('account_id')
         ):

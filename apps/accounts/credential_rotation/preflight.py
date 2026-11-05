@@ -57,7 +57,7 @@ def check(credential):
     if (
         not credential.is_active
         or credential.mode != ApplicationCredential.Mode.alternating_rotation
-        or credential.status not in (ApplicationCredential.Status.idle, ApplicationCredential.Status.ready_to_switch)
+        or credential.status != ApplicationCredential.Status.idle
     ):
         raise JMSException(_('Only active, idle alternating rotation policies can start rotation.'))
     accounts = [credential.account, credential.alternate_account]
@@ -133,7 +133,7 @@ def info(credential):
     if not credential.verify_before_switch:
         return None
     execution = latest(credential)
-    if not execution or credential.status not in ('idle', 'ready_to_switch'):
+    if not execution or credential.status != 'idle':
         return None
     state = (execution.summary or {}).get('precheck_status', 'checking')
     code = (execution.summary or {}).get('precheck_error', '')
@@ -157,23 +157,17 @@ def start(credential, operator='', operator_id=None):
     stale = credential.rotation_records.filter(
         status='preparing', date_finished__isnull=True,
     ).first()
-    if stale and not (stale.participant_snapshot or {}).get('preparation'):
+    if stale:
         stale.status = 'failed'
         stale.date_finished = timezone.now()
         stale.save(update_fields=['status', 'date_finished'])
     account = credential.target_account
-    rotation = None
-    if credential.status == credential.Status.ready_to_switch:
-        rotation = credential.rotation_records.filter(
-            status='preparing', date_finished__isnull=True,
-        ).first()
-    if rotation is None:
-        rotation = CredentialRotationRecord.objects.create(
-            credential=credential, source_account=credential.active_account,
-            target_account=account, change_account=credential.active_account,
-            change_account_version_at_start=credential.active_account.version,
-            status='preparing', created_by=operator,
-        )
+    rotation = CredentialRotationRecord.objects.create(
+        credential=credential, source_account=credential.active_account,
+        target_account=account, change_account=credential.active_account,
+        change_account_version_at_start=credential.active_account.version,
+        status='preparing', created_by=operator,
+    )
     if not credential.verify_before_switch:
         from .manager import CredentialRotationManager
         event = record(
@@ -240,7 +234,7 @@ def fail(execution_id, code, detail=None):
             rotation = CredentialRotationRecord.objects.filter(
                 pk=rotation_id, status='preparing', date_finished__isnull=True,
             ).first()
-            if rotation and not (rotation.participant_snapshot or {}).get('preparation'):
+            if rotation:
                 rotation.status = 'cancelled' if code == 'cancelled' else 'failed'
                 rotation.date_finished = timezone.now()
                 rotation.save(update_fields=['status', 'date_finished'])

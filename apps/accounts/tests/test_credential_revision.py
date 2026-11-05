@@ -70,14 +70,14 @@ class CredentialRevisionTests(CredentialTestCase):
 
     def test_password_update_publishes_once(self):
         ApplicationAudit.objects.filter(
-            service_id=self.application.id, event='credential_published',
+            service_id=self.application.id, event='credential_secret_updated',
         ).delete()
         self.primary.secret = 'first-change'
         self.primary.save()
         self.credential.refresh_from_db()
         self.assertEqual(self.credential.current_revision, 8)
         event = ApplicationAudit.objects.get(
-            service_id=self.application.id, event='credential_published',
+            service_id=self.application.id, event='credential_secret_updated',
         )
         self.primary.refresh_from_db()
         self.assertEqual(event.credential_key, self.credential.account_key(self.primary.id))
@@ -104,9 +104,9 @@ class CredentialRevisionTests(CredentialTestCase):
         self.assertEqual(self.credential.revision, 8)
         events = list(ApplicationAudit.objects.filter(
             service_id=self.application.id,
-            event__in=['secret_change_completed', 'credential_published'],
+            event__in=['secret_change_completed', 'credential_secret_updated'],
         ).order_by('date_created', 'id').values_list('event', flat=True))
-        self.assertEqual(events, ['secret_change_completed', 'credential_published'])
+        self.assertEqual(events, ['secret_change_completed', 'credential_secret_updated'])
 
     def test_metadata_and_repeated_save_do_not_publish(self):
         self.primary.comment = 'metadata only'

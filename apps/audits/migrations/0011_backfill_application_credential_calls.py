@@ -59,6 +59,6 @@ def backfill_calls(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('audits', '0010_application_credential_call_records'),
-        ('accounts', '0028_applicationcredential_verify_before_switch'),
+        ('accounts', '0013_application_credentials'),
     ]
     operations = [migrations.RunPython(backfill_calls, migrations.RunPython.noop)]

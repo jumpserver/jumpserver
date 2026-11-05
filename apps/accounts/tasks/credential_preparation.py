@@ -8,20 +8,9 @@ from orgs.utils import tmp_to_root_org, tmp_to_org
 
 @shared_task(verbose_name=_('Check credential rotation readiness'))
 @register_as_period_task(interval=60)
-def check_credential_preparations():
-    from accounts.credential_rotation.preparation import PHASES, notify_ready
+def check_credential_readiness():
     from accounts.credential_rotation.manager import CredentialRotationManager
     from accounts.models import ApplicationCredential
-    with tmp_to_root_org():
-        policies = list(ApplicationCredential.objects.filter(
-            is_active=True, mode='alternating_rotation', status__in=PHASES,
-        ).values_list('id', 'org_id'))
-    for credential_id, org_id in policies:
-        try:
-            with tmp_to_org(org_id):
-                notify_ready(credential_id)
-        except Exception:
-            get_logger(__name__).exception('Cannot check rotation preparation %s', credential_id)
     with tmp_to_root_org():
         switched = list(ApplicationCredential.objects.filter(
             is_active=True, mode='alternating_rotation', status='waiting_switch',

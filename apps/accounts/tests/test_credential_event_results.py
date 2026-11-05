@@ -58,7 +58,7 @@ class CredentialEventResultTests(CredentialTestCase):
         event_id = self.event()
         self.assertEqual(self.event(), event_id)
         tracked = CredentialRotationEvent.objects.get(source_event_id=event_id)
-        self.assertEqual(tracked.event, ApplicationEvent.CREDENTIAL_UPDATED)
+        self.assertEqual(tracked.event, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
         self.assertEqual(tracked.recipients[0]['account_revision'], self.primary.version)
 
     def test_subscription_event_freezes_its_own_account_version(self):
@@ -69,5 +69,5 @@ class CredentialEventResultTests(CredentialTestCase):
         event = SimpleNamespace(credential_id=self.credential.id, account_id=self.primary.id, revision=7)
         from unittest.mock import patch
         with patch('accounts.credential_client.events._clients', return_value=CredentialClientInstance.objects.filter(id=self.instance.id)):
-            recipients = _recipients(event, ApplicationEvent.CREDENTIAL_UPDATED)
+            recipients = _recipients(event, ApplicationEvent.CREDENTIAL_SECRET_UPDATED)
         self.assertEqual(recipients[0]['account_revision'], 7)

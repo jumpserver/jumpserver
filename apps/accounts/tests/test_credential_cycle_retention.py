@@ -23,7 +23,7 @@ class CredentialCycleRetentionTests(CredentialTestCase):
 
     def event(self, code, *, cycle_id=None, rotation=None, old=True, revision=1):
         audit = record(
-            AuditEvent.CREDENTIAL_PUBLISHED, credential=self.credential,
+            AuditEvent.CREDENTIAL_SECRET_UPDATED, credential=self.credential,
             operation_id=cycle_id, revision=revision,
         )
         enqueue(audit, code, rotation=rotation)
@@ -100,7 +100,7 @@ class CredentialCycleRetentionTests(CredentialTestCase):
         self.assertTrue(CredentialRotationRecord.objects.filter(id=rotation.id).exists())
 
     def test_confirmation_for_retained_revision_survives_even_without_rotation_id(self):
-        source = self.event(ApplicationEvent.CREDENTIAL_UPDATED, old=False, revision=9)
+        source = self.event(ApplicationEvent.CREDENTIAL_SECRET_UPDATED, old=False, revision=9)
         confirmation = record(
             AuditEvent.CREDENTIAL_CONFIRMED, credential=self.credential, revision=9,
         )
@@ -114,7 +114,7 @@ class CredentialCycleRetentionTests(CredentialTestCase):
         self.assertFalse(ApplicationAudit.objects.filter(id=unrelated.id).exists())
 
     def test_cleanup_is_idempotent_and_removes_expired_standalone_events(self):
-        audit = self.event(ApplicationEvent.CREDENTIAL_REVOKED)
+        audit = self.event(ApplicationEvent.APPLICATION_SCOPE_UPDATED)
         clean_application_records_period()
         clean_application_records_period()
         self.assertFalse(CredentialRotationEvent.objects.filter(source_event_id=audit.id).exists())
@@ -150,7 +150,7 @@ class CredentialCycleRetentionTests(CredentialTestCase):
         self.assertEqual(cycle_detail(self.credential, operation)['event_count'], 2)
 
     def test_account_switch_grant_waiting_for_application_is_retained(self):
-        audit = self.event(ApplicationEvent.CREDENTIAL_UPDATED)
+        audit = self.event(ApplicationEvent.CREDENTIAL_SECRET_UPDATED)
         CredentialRotationEvent.objects.filter(source_event_id=audit.id).update(recipients=[{'status': 'pending'}])
         clean_application_records_period()
         self.assertTrue(CredentialRotationEvent.objects.filter(source_event_id=audit.id).exists())

@@ -1,18 +1,12 @@
-from importlib import import_module
-from types import SimpleNamespace
 from unittest.mock import patch
-from uuid import uuid4
 
-from django.apps import apps
-from django.db import connection
 from django.test import override_settings
 
 from accounts.credential_client.manager import CredentialClientManager
-from accounts.models import ApplicationAudit, CredentialClientInstance, IntegrationApplication
+from accounts.models import CredentialClientInstance
 from accounts.serializers import CredentialClientInstanceSerializer
 from accounts.tests import test_application_access as access_tests
 from accounts.tests.base import CredentialTestCase
-from orgs.utils import tmp_to_root_org
 
 
 @override_settings(TRUSTED_IP_VERIFY_ENABLED=False)
@@ -76,35 +70,3 @@ class CredentialClientIPTests(CredentialTestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertNotIn('remote_addr', serializer.validated_data)
         self.assertTrue(serializer.fields['remote_addr'].read_only)
-
-    def test_backfill_matches_application_org_instance_and_client_type(self):
-        sdk = CredentialClientInstance.objects.create(
-            application=self.application, instance_id='historical', type='sdk',
-        )
-        agent = CredentialClientInstance.objects.create(
-            application=self.application, instance_id='historical', type='agent',
-        )
-        other = IntegrationApplication.objects.create(name='Other IP application')
-        values = dict(event='credential_fetched', service_id=self.application.id, instance_id='historical')
-        ApplicationAudit.objects.create(**values, source='SDK', remote_addr='198.51.100.1')
-        ApplicationAudit.objects.create(**values, source='Agent', remote_addr='2001:db8::1')
-        ApplicationAudit.objects.create(**values, source='SDK', remote_addr='198.51.100.2')
-        ApplicationAudit.objects.create(**values, source='SDK', result='failed', remote_addr='198.51.100.3')
-        ApplicationAudit.objects.create(**values, source='Administrator', remote_addr='198.51.100.4')
-        ApplicationAudit.objects.create(**{**values, 'service_id': other.id}, source='SDK', remote_addr='198.51.100.5')
-        foreign = ApplicationAudit.objects.create(**values, source='SDK', remote_addr='198.51.100.6')
-        ApplicationAudit.objects.filter(id=foreign.id).update(org_id=str(uuid4()))
-        backfill = import_module('accounts.migrations.0025_credentialclientinstance_remote_addr').backfill_remote_addr
-        with tmp_to_root_org():
-            backfill(apps, SimpleNamespace(connection=connection))
-        sdk.refresh_from_db()
-        agent.refresh_from_db()
-        self.assertEqual(sdk.remote_addr, '198.51.100.2')
-        self.assertEqual(agent.remote_addr, '2001:db8::1')
-        # Reapplying the backfill never overwrites a newly observed address.
-        sdk.remote_addr = '203.0.113.9'
-        sdk.save(update_fields=['remote_addr'])
-        with tmp_to_root_org():
-            backfill(apps, SimpleNamespace(connection=connection))
-        sdk.refresh_from_db()
-        self.assertEqual(sdk.remote_addr, '203.0.113.9')

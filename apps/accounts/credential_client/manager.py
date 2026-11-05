@@ -101,25 +101,6 @@ class CredentialClientManager:
             raise PermissionDenied(_(
                 'The credential policy is not bound to this application.'
             ), code='credential_not_bound')
-        if credential.mode == ApplicationCredential.Mode.subscription:
-            # Accept pre-account-key selectors during client upgrades. New push
-            # scopes and events use account:<uuid> and never emit this alias.
-            if not separator or not account_id:
-                raise JMSException(_('Credential policy not found.'), code='credential_not_found')
-            if not credential.subscription_all_authorized and not credential.subscription_accounts.filter(
-                id=account_id
-            ).exists():
-                raise PermissionDenied(_(
-                    'This account is not selected by the credential change subscription.'
-                ), code='credential_not_selected')
-            account = self.application.get_accounts().select_related(
-                'asset__platform'
-            ).filter(id=account_id).first()
-            if not account:
-                raise PermissionDenied(_(
-                    'The application is not authorized for this credential account.'
-                ), code='credential_not_authorized')
-            return credential, account
         if separator or not credential.authorized_applications().filter(id=self.application.id).exists():
             raise PermissionDenied(_(
                 'The application is not authorized for every credential account.'
@@ -175,7 +156,7 @@ class CredentialClientManager:
             self._save_status(state, timezone.now(), {
                 'fetched_revision': binding.credential.current_revision,
             }, fetched=True)
-        from accounts.credential_rotation.preparation import record_secret_access
+        from accounts.credential_rotation.source_traffic import record_secret_access
         record_secret_access(account)
         call = record_access(client=self.client, account=account, credential_key=key,
                              revision=revision, remote_addr=remote_addr)
@@ -211,8 +192,8 @@ class CredentialClientManager:
         payload = self._account_payload(key, revision, account)
         if credential.account_switch:
             payload['account_switch'] = credential.account_switch
-        from accounts.credential_rotation.preparation import record_secret_access
-        record_secret_access(account, self.application)
+        from accounts.credential_rotation.source_traffic import record_secret_access
+        record_secret_access(account)
         now = timezone.now()
         binding = CredentialApplicationBinding.objects.get(
             credential=credential, application=self.application
@@ -430,9 +411,10 @@ class CredentialClientManager:
             record(AuditEvent.CREDENTIAL_CONFIRMED, credential=credential, client=self.client)
             values['date_applied'] = now
         self._save_status(state, now, values)
+        if credential.status == credential.Status.waiting_switch:
+            from accounts.credential_rotation.source_traffic import start_if_ready
+            start_if_ready(credential, now=now)
 
-        from accounts.credential_rotation.preparation import refresh
-        refresh(credential)
 
     def _save_status(self, state, now, values, fetched=False):
         changed = {field: value for field, value in values.items() if getattr(state, field) != value}
@@ -608,18 +590,11 @@ class CredentialClientManager:
             binding = CredentialApplicationBinding.objects.get(
                 application=self.application, credential=policy,
             )
-            if held:
-                state, _created = CredentialClientStatus.objects.get_or_create(
-                    binding=binding, client=self.client,
-                )
-            else:
-                # Older callers may report delivery after an explicit push-key
-                # fetch without including held versions in this synchronization.
-                state = CredentialClientStatus.objects.filter(
-                    binding=binding, client=self.client,
-                ).first()
-                if not state:
-                    continue
+            if not held:
+                continue
+            state, _created = CredentialClientStatus.objects.get_or_create(
+                binding=binding, client=self.client,
+            )
             values = {}
             # Existing policy-level revision fields remain summaries. Group all
             # accounts first so differing account versions cannot oscillate the

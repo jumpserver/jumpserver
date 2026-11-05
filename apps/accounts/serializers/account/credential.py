@@ -66,19 +66,11 @@ class SubscribedAccountField(ObjectRelatedField):
 
 class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     rotation = serializers.SerializerMethodField()
+    rotation_phase = serializers.SerializerMethodField()
     precheck = serializers.SerializerMethodField()
-    preparation = serializers.SerializerMethodField()
     mode = serializers.ChoiceField(choices=['alternating_rotation'], default='alternating_rotation')
     subscription_all_authorized = serializers.BooleanField(required=False)
-    standby_no_traffic_days = serializers.IntegerField(
-        source='source_no_traffic_days', min_value=1, max_value=3650,
-        required=False, help_text=_('Deprecated alias for source_no_traffic_days.'),
-    )
 
-    @staticmethod
-    def get_preparation(instance):
-        from accounts.credential_rotation.preparation import info
-        return info(instance) if instance.mode == ApplicationCredential.Mode.alternating_rotation else None
 
     @staticmethod
     def get_precheck(instance):
@@ -89,6 +81,13 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
     def get_rotation(instance):
         from accounts.credential_rotation.execution import execution_info
         return execution_info(instance)
+
+    @staticmethod
+    def get_rotation_phase(instance):
+        if instance.status != ApplicationCredential.Status.waiting_switch:
+            return instance.status
+        from accounts.credential_rotation.participants import build
+        return build(instance)['rotation_phase']
 
     account = ObjectRelatedField(
         queryset=Account.objects, attrs=('id', 'name', 'username', 'secret_type'),
@@ -121,12 +120,12 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
             'mode', 'asset', 'account', 'alternate_account', 'subscription_accounts',
             'subscription_all_authorized',
-            'active_account', 'revision', 'status', 'is_active',
-            'source_no_traffic_days', 'standby_no_traffic_days', 'verify_before_switch',
+            'active_account', 'revision', 'status', 'rotation_phase', 'is_active',
+            'source_no_traffic_days', 'verify_before_switch',
             'date_last_rotated', 'applications_amount',
         ]
         fields = fields_small + [
-            'applications', 'change_execution', 'rotation', 'precheck', 'preparation', 'blockers',
+            'applications', 'change_execution', 'rotation', 'precheck', 'blockers',
             'rotation_cancelled', 'date_rotation_started',
             'date_created', 'date_updated', 'created_by', 'comment',
         ]
@@ -171,11 +170,6 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
         return instance.get_blockers()
 
     def validate(self, attrs):
-        initial = getattr(self, 'initial_data', {})
-        if 'source_no_traffic_days' in initial and 'standby_no_traffic_days' in initial:
-            raise serializers.ValidationError({
-                'source_no_traffic_days': _('Use only one no-secret-fetch duration field.'),
-            })
         from accounts.credential_rotation.preflight import check_ownership
         attrs = self.validate_accounts(attrs)
         accounts = [
@@ -200,10 +194,6 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
             selected = attrs.get('subscription_accounts')
             if selected is None and self.instance:
                 selected = list(self.instance.subscription_accounts.all())
-            # Preserve clients that switch a legacy all-account subscription by
-            # submitting an explicit list without the new boolean field.
-            if 'subscription_accounts' in attrs and 'subscription_all_authorized' not in attrs:
-                all_authorized = False
             if all_authorized:
                 attrs['subscription_accounts'] = []
                 selected = []
@@ -310,7 +300,7 @@ class ApplicationCredentialSerializer(BulkOrgResourceModelSerializer):
                 AuditEvent.AUTHORIZATION_GRANTED, credential=instance,
                 application=binding.application,
             )
-            enqueue(event, ApplicationEvent.CREDENTIAL_UPDATED)
+            enqueue(event, ApplicationEvent.CREDENTIAL_REFRESH_REQUESTED)
 
     def create(self, validated_data):
         from accounts.credential_rotation.preflight import check_ownership
@@ -693,7 +683,7 @@ class CredentialAgentSyncSerializer(serializers.Serializer):
     config_digest = serializers.CharField(max_length=64, required=False, allow_blank=True)
     credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
     delivered_credentials = CredentialRevisionSerializer(many=True, required=False, default=list)
-    delivery_scope = CredentialDeliveryScopeSerializer(required=False, allow_null=True)
+    delivery_scope = CredentialDeliveryScopeSerializer(required=True)
     sync_status = serializers.ChoiceField(
         choices=['', 'success', 'error'], required=False, default='', allow_blank=True,
     )

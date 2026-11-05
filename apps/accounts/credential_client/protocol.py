@@ -1,4 +1,4 @@
-"""Stable wire compatibility, independent of SDK and local file versions."""
+"""Current application credential protocol and Agent configuration schema."""
 
 SUPPORTED_PROTOCOL_VERSIONS = (1,)
 SUPPORTED_AGENT_CONFIG_SCHEMA_VERSIONS = (1,)

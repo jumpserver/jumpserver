@@ -112,7 +112,7 @@ class PythonLatestCredentialTests(TestCase):
                 "event": "snapshot",
                 "credentials": [{"key": "other-policy", "account_id": "account"}],
             },
-            {"event": "credential.revoked"},
+            {"event": "app.scope.updated", "authorized_account_ids": []},
             {"event": "snapshot", "credentials": [{"key": [], "account_id": {}}]},
         ):
             with self.subTest(event=event):
@@ -150,7 +150,7 @@ class PythonLatestCredentialTests(TestCase):
         worker.start()
         try:
             self.assertTrue(entered.wait(2))
-            self.client._reconcile_latest_credentials({"event": "credential.revoked"})
+            self.client._reconcile_latest_credentials({"event": "app.scope.updated", "authorized_account_ids": []})
         finally:
             release.set()
             worker.join(2)
@@ -167,7 +167,7 @@ class PythonLatestCredentialTests(TestCase):
         self.respond({**self.payload, "key": "database:account"})
         self.client.get_credential(account_id="account")
         self.client._reconcile_latest_credentials(
-            {"event": "credential.revoked", "credential_key": "database"}
+            {"event": "app.scope.updated", "authorized_account_ids": []}
         )
         self.outage()
         with self.assertRaises(PAMError):
@@ -206,7 +206,7 @@ class PythonLatestCredentialTests(TestCase):
         )
         dispatcher = EventDispatcher(self.client)
         event = {
-            "event": "credential.updated",
+            "event": "credential.secret.updated",
             "credential_mode": "alternating_rotation",
             "credential_key": "database",
             "revision": 3,
