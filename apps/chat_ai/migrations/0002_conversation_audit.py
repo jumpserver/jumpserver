@@ -4,6 +4,42 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def enable_audit_unicode(apps, schema_editor):
+    """Legacy MySQL databases can still default to three-byte UTF-8."""
+    connection = schema_editor.connection
+    if connection.vendor != 'mysql':
+        return
+
+    text_fields = {
+        'AuditConversation': ('subject_name', 'subject_username', 'title'),
+        'AuditMessage': ('content', 'error'),
+        # The signed journal also contains the audit JSON, including its text.
+        'RuntimeStoreRecord': ('record',),
+    }
+    quote = schema_editor.quote_name
+    for model_name, field_names in text_fields.items():
+        model = apps.get_model('chat_ai', model_name)
+        table = model._meta.db_table
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT COLUMN_NAME, CHARACTER_SET_NAME FROM information_schema.COLUMNS '
+                'WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s',
+                [table],
+            )
+            charsets = dict(cursor.fetchall())
+        changes = []
+        for name in field_names:
+            field = model._meta.get_field(name)
+            if charsets.get(field.column) == 'utf8mb4':
+                continue
+            changes.append(
+                f'MODIFY COLUMN {quote(field.column)} {field.db_type(connection)} '
+                'CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL'
+            )
+        if changes:
+            schema_editor.execute(f'ALTER TABLE {quote(table)} {", ".join(changes)}')
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -58,4 +94,5 @@ class Migration(migrations.Migration):
                 'constraints': [],
             },
         ),
+        migrations.RunPython(enable_audit_unicode, migrations.RunPython.noop, atomic=False),
     ]
