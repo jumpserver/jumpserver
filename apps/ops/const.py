@@ -81,6 +81,10 @@ class JobStatus(models.TextChoices):
 CELERY_LOG_MAGIC_MARK = b'\x00\x00\x00\x00\x00'
 
 COMMAND_EXECUTION_DISABLED = _('Command execution disabled')
+LOGIN_ASSET_ACL_DENIED = _(
+    'Access to asset {asset} ({address}) is denied by a login control policy. '
+    'Contact your administrator.'
+)
 
 
 class Scope(models.TextChoices):

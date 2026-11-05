@@ -41,7 +41,7 @@ __all__ = [
 
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
-from ops.const import COMMAND_EXECUTION_DISABLED
+from ops.const import COMMAND_EXECUTION_DISABLED, LOGIN_ASSET_ACL_DENIED
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from perms.const import ActionChoices
@@ -58,13 +58,11 @@ def set_task_to_serializer_data(serializer, task_id):
 class LoginAssetACLCheckMixin:
 
     def check_login_asset_acls(self, user, assets, account, ip):
-        asset, acl = match_rejected_login_asset_acl(user, assets, account, ip)
+        asset, _acl = match_rejected_login_asset_acl(user, assets, account, ip)
         if not asset:
             return
-        raise PermissionDenied(_(
-            "Login to asset {}({}) is rejected by login asset ACL ({})".format(
-                asset.name, asset.address, acl
-            )
+        raise PermissionDenied(LOGIN_ASSET_ACL_DENIED.format(
+            asset=asset.name, address=asset.address
         ))
 
 

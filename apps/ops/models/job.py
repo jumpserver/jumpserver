@@ -35,7 +35,7 @@ from ops.ansible import (
 from ops.ansible.exception import CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
-from ops.const import Types, RunasPolicies, JobStatus, JobModules
+from ops.const import Types, RunasPolicies, JobStatus, JobModules, LOGIN_ASSET_ACL_DENIED
 from ops.utils import merge_nodes_and_assets
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
@@ -658,20 +658,16 @@ class JobExecution(JMSOrgBaseModel):
             self.check_command_acl()
 
     def check_login_asset_acls(self, ip=None):
-        asset, acl = match_rejected_login_asset_acl(
+        asset, _acl = match_rejected_login_asset_acl(
             self.creator, self.inventory.assets, self.current_job.runas, ip
         )
         if not asset:
             return
-        print(
-            "\033[31mLogin to asset {}({}) is rejected by login asset ACL ({})\033[0m"
-            .format(asset.name, asset.address, acl)
+        message = LOGIN_ASSET_ACL_DENIED.format(
+            asset=asset.name, address=asset.address
         )
-        raise Exception(
-            "Login to asset {}({}) is rejected by login asset ACL ({})".format(
-                asset.name, asset.address, acl
-            )
-        )
+        print(f'\033[31m{message}\033[0m')
+        raise Exception(message)
 
     def before_start(self):
         self.check_assets_perms()
