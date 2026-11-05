@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from django.core.cache import cache
 from django.utils.translation import gettext, gettext as _
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -10,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework_bulk.generics import BulkModelViewSet
 
 from authentication.permissions import UserConfirmation, ConfirmType
+from authentication.schema import CONFIRMATION_REQUIRED_RESPONSE
 from common.api import CommonApiMixin, SuggestionMixin
 from common.permissions import IsValidUser
 from common.drf.filters import AttrRulesFilterBackend
@@ -266,6 +268,33 @@ class UserResetMFAApi(UserQuerysetMixin, generics.GenericAPIView):
     permission_classes = [IsValidUser, RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {'POST': 'users.change_user'}
 
+    @extend_schema(
+        request=None,
+        description=(
+            'Reset another user\'s active MFA methods that support reset. Requires users.change_user. '
+            'When identity confirmation is enabled, the current operator must complete MFA confirmation; '
+            'password confirmation alone is insufficient. Confirm the operator, not the target user.\n\n'
+            '1. GET /api/v1/authentication/confirm/?confirm_type=mfa to discover an available method.\n'
+            '2. POST /api/v1/authentication/confirm/ with confirm_type=mfa, mfa_type (for example otp), '
+            'and secret_key containing the operator\'s valid code for code-based methods.\n'
+            '3. Preserve the session cookie returned by confirmation and send it with the same authentication '
+            'credentials on subsequent requests. GET /api/v1/authentication/confirm/check/?confirm_type=mfa '
+            'must return 200 "ok".\n'
+            '4. POST this endpoint in that session before confirmation expires. MFA confirmation is valid '
+            'for SECURITY_MFA_VERIFY_TTL seconds (default 3600), subject to session expiry.\n\n'
+            'No request body is needed; msg is a response-only field. X-JMS-CONFIRM is not a supported '
+            'confirmation mechanism. HTTP 412 includes the required confirmation type, failure reason, '
+            'confirmation lifetime and confirmation endpoint. An operator without an available MFA method '
+            'must configure and enable one first. Self-reset is rejected; resetting a superuser requires '
+            'the operator to be a superuser.'
+        ),
+        responses={
+            200: serializers.ResetOTPSerializer,
+            400: OpenApiResponse(response={'type': 'object'}, description='Self-reset is not supported.'),
+            403: OpenApiResponse(response={'type': 'object'}, description='Insufficient permissions.'),
+            412: CONFIRMATION_REQUIRED_RESPONSE,
+        },
+    )
     def post(self, request, *args, **kwargs):
         user = self.get_object() if kwargs.get('pk') else request.user
         if user == request.user:

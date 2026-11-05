@@ -1,6 +1,8 @@
 import time
 
 from django.conf import settings
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions
 
 from authentication.const import ConfirmType
@@ -21,11 +23,18 @@ class UserConfirmation(permissions.BasePermission):
             return True
 
         session = getattr(request, 'session', {})
+        confirm_user_id = session.get('CONFIRM_USER_ID')
         if not request.user.is_authenticated or \
-                session.get('CONFIRM_USER_ID') != str(request.user.pk):
+                confirm_user_id != str(request.user.pk):
             for key in ('CONFIRM_LEVEL', 'CONFIRM_TYPE', 'CONFIRM_TIME', 'CONFIRM_USER_ID'):
                 session.pop(key, None)
-            raise UserConfirmRequired(code=self.min_type)
+            if confirm_user_id:
+                raise self.confirmation_required(
+                    'user_mismatch', _('The confirmation belongs to a different user.'),
+                )
+            raise self.confirmation_required(
+                'missing_confirmation', _('No identity confirmation was found in the current session.'),
+            )
         confirm_level = session.get('CONFIRM_LEVEL')
         confirm_type = session.get('CONFIRM_TYPE')
         confirm_time = session.get('CONFIRM_TIME')
@@ -34,12 +43,32 @@ class UserConfirmation(permissions.BasePermission):
         now = int(time.time())
 
         if not confirm_level or not confirm_time:
-            raise UserConfirmRequired(code=self.min_type)
+            raise self.confirmation_required(
+                'missing_confirmation', _('No identity confirmation was found in the current session.'),
+            )
 
-        if confirm_level < self.min_level or \
-                confirm_time < now - ttl:
-            raise UserConfirmRequired(code=self.min_type)
+        if confirm_level < self.min_level:
+            raise self.confirmation_required(
+                'insufficient_confirmation', _('The current confirmation does not meet the required level.'),
+            )
+        if confirm_time < now - ttl:
+            raise self.confirmation_required(
+                'confirmation_expired',
+                _('The identity confirmation has expired (valid for %(ttl)s seconds).') % {'ttl': ttl},
+            )
         return True
+
+    def confirmation_required(self, reason, message):
+        ttl = self.get_ttl(self.min_type)
+        instructions = _(
+            'Confirm the current user with %(confirm_type)s, then retry with the same session cookie. '
+            'This confirmation is valid for %(ttl)s seconds while the session remains valid.'
+        ) % {'confirm_type': self.min_type, 'ttl': ttl}
+        error = UserConfirmRequired(
+            code=self.min_type, detail=f'{message} {instructions}', reason=reason, confirm_ttl=ttl,
+        )
+        error.detail['confirm_url'] = reverse('api-auth:confirm-list')
+        return error
 
     def get_ttl(self, confirm_type):
         if confirm_type == ConfirmType.MFA:

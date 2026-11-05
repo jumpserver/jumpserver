@@ -44,13 +44,18 @@ class ReferencedByOthers(JMSException):
 class UserConfirmRequired(JMSException):
     status_code = status.HTTP_412_PRECONDITION_FAILED
 
-    def __init__(self, code=None):
-        detail = {
+    def __init__(self, code=None, *, detail=None, reason=None, confirm_ttl=None):
+        payload = {
             'type': 'user_confirm_required',
             'code': code,
-            'detail': _('This action require confirm current user')
+            'detail': detail or _('This action require confirm current user'),
         }
-        super().__init__(detail=detail, code=code)
+        if reason is not None:
+            payload['reason'] = reason
+        super().__init__(detail=payload, code=code)
+        if confirm_ttl is not None:
+            # APIException coerces values to strings; keep the TTL numeric in JSON.
+            self.detail['confirm_ttl'] = confirm_ttl
 
 
 class UnexpectError(JMSException):
