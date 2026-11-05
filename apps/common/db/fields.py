@@ -19,6 +19,8 @@ from .utils import Encryptor
 from .validators import PortRangeValidator
 
 __all__ = [
+    "UnicodeCharField",
+    "UnicodeTextField",
     "JsonMixin",
     "JsonDictMixin",
     "JsonListMixin",
@@ -41,6 +43,24 @@ __all__ = [
     "JSONManyToManyField",
     "RelatedManager",
 ]
+
+
+class _UnicodeFieldMixin:
+    """Use full Unicode on MySQL, leaving other backends' defaults intact."""
+
+    def db_parameters(self, connection):
+        params = super().db_parameters(connection)
+        if connection.vendor == 'mysql' and params.get('collation') is None:
+            params['collation'] = 'utf8mb4_general_ci'
+        return params
+
+
+class UnicodeCharField(_UnicodeFieldMixin, models.CharField):
+    pass
+
+
+class UnicodeTextField(_UnicodeFieldMixin, models.TextField):
+    pass
 
 
 class JsonMixin:

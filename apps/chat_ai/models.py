@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.db.fields import UnicodeCharField, UnicodeTextField
 from common.db.models import JMSBaseModel
 from orgs.mixins.models import OrgModelMixin
 
@@ -31,7 +32,7 @@ class RuntimeStoreRecord(JMSBaseModel):
     revision = models.PositiveBigIntegerField()
     commit_id = models.UUIDField(unique=True)
     snapshot = models.BooleanField(default=False)
-    record = models.TextField()
+    record = UnicodeTextField()
 
     class Meta:
         db_table = 'chat_ai_runtime_store_record'
@@ -57,9 +58,9 @@ class AuditConversation(OrgModelMixin):
 
     id = models.UUIDField(primary_key=True)
     subject_id = models.UUIDField()
-    subject_name = models.CharField(max_length=128, blank=True)
-    subject_username = models.CharField(max_length=128, blank=True)
-    title = models.TextField(blank=True)
+    subject_name = UnicodeCharField(max_length=128, blank=True)
+    subject_username = UnicodeCharField(max_length=128, blank=True)
+    title = UnicodeTextField(blank=True)
     assistant = models.CharField(max_length=64, blank=True)
     profile = models.CharField(max_length=64, blank=True)
     status = models.CharField(max_length=32, blank=True)
@@ -78,9 +79,9 @@ class AuditMessage(OrgModelMixin):
     id = models.CharField(max_length=128, primary_key=True)
     conversation = models.ForeignKey(AuditConversation, on_delete=models.CASCADE, related_name='messages')
     role = models.CharField(max_length=16)
-    content = models.TextField(blank=True)
+    content = UnicodeTextField(blank=True)
     status = models.CharField(max_length=32, blank=True)
-    error = models.TextField(blank=True)
+    error = UnicodeTextField(blank=True)
     input_tokens = models.PositiveBigIntegerField(default=0)
     output_tokens = models.PositiveBigIntegerField(default=0)
     date_created = models.DateTimeField()
