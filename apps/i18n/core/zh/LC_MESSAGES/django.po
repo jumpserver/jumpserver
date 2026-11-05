@@ -19024,3 +19024,53 @@ msgstr "暂无账号变化"
 #: chat_ai/models.py
 msgid "Chat AI conversation audit"
 msgstr "AI 会话审计"
+
+#: authentication/serializers/confirm.py
+msgid "Confirmation type returned by GET /api/v1/authentication/confirm/."
+msgstr "GET /api/v1/authentication/confirm/ 返回的确认类型。"
+
+#: authentication/serializers/confirm.py
+msgid "Required for MFA confirmation. Select an enabled method of the current user, such as otp."
+msgstr "MFA 确认时必填。请选择当前用户已启用的验证方式，例如 otp。"
+
+#: authentication/serializers/confirm.py
+msgid "Current user's password or MFA code. Required for password and code-based MFA confirmation."
+msgstr "当前用户的密码或 MFA 验证码。密码确认和使用验证码的 MFA 确认时必填。"
+
+#: authentication/serializers/confirm.py authentication/confirm/mfa.py
+msgid "This field is required for MFA confirmation."
+msgstr "MFA 确认时必须填写此字段。"
+
+#: authentication/serializers/confirm.py
+msgid "This field is required for password confirmation."
+msgstr "密码确认时必须填写此字段。"
+
+#: authentication/confirm/mfa.py
+msgid "This field is required for code-based MFA confirmation."
+msgstr "使用验证码进行 MFA 确认时必须填写此字段。"
+
+#: authentication/api/confirm.py
+msgid "No available confirmation method for the current user. Configure and enable MFA, then retry."
+msgstr "当前用户没有可用的身份确认方式。请先配置并启用 MFA，再重试。"
+
+#: authentication/permissions.py
+msgid "The confirmation belongs to a different user."
+msgstr "此确认状态属于其他用户。"
+
+#: authentication/permissions.py
+msgid "No identity confirmation was found in the current session."
+msgstr "当前会话中没有身份确认记录。"
+
+#: authentication/permissions.py
+msgid "The current confirmation does not meet the required level."
+msgstr "当前身份确认未达到此操作要求的确认级别。"
+
+#: authentication/permissions.py
+#, python-format
+msgid "The identity confirmation has expired (valid for %(ttl)s seconds)."
+msgstr "身份确认已过期（有效期为 %(ttl)s 秒）。"
+
+#: authentication/permissions.py
+#, python-format
+msgid "Confirm the current user with %(confirm_type)s, then retry with the same session cookie. This confirmation is valid for %(ttl)s seconds while the session remains valid."
+msgstr "请使用 %(confirm_type)s 确认当前用户身份，然后携带同一会话 Cookie 重试。在会话仍有效的前提下，此类确认的有效期为 %(ttl)s 秒。"
