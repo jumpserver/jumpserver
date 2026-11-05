@@ -15,6 +15,7 @@ from orgs.utils import current_org
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
+from terminal.backends.command.receipt import ComponentCommandReceipt
 from terminal.const import RiskLevelChoices
 from terminal.exceptions import StorageInvalid
 from terminal.filters import CommandFilter
@@ -190,14 +191,13 @@ class CommandViewSet(JMSBulkModelViewSet):
         if receipt:
             from terminal.serializers.command import SessionCommandReceiptSerializer
             serializer_class = SessionCommandReceiptSerializer
-            if not getattr(self.command_store, 'supports_idempotent_receipts', False):
-                return Response({'error': 'Command storage does not support durable audit receipts'}, status=503)
         serializer = serializer_class(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
+        if receipt:
+            delivery = ComponentCommandReceipt(request.user, self.command_store)
+            return Response(delivery.save(serializer.validated_data), status=HTTP_201_CREATED)
         ok = self.command_store.bulk_save(serializer.validated_data)
         if ok:
-            if receipt:
-                return Response({'audit_protocol': 1, 'event_ids': [str(c['id']) for c in serializer.validated_data]}, status=201)
             return Response("ok", status=HTTP_201_CREATED)
         else:
             return Response("Save error", status=HTTP_400_BAD_REQUEST)

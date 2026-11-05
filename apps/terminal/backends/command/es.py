@@ -4,7 +4,9 @@ from datetime import datetime
 
 import pytz
 
-from common.plugins.es import ES, bulk, RequestError, BadRequestError
+from elasticsearch8.helpers import bulk as bulk8
+
+from common.plugins.es import ES, ESClientV6, ESClientV8, bulk, RequestError, BadRequestError
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -25,24 +27,30 @@ class CommandStore(ES):
                 # midnight/restart. Receipt events always use their UTC day.
                 date = datetime.fromtimestamp(command['timestamp'], tz=pytz.UTC).strftime('%Y-%m-%d')
                 index = f'{self.index_prefix}-{date}'
-                self._ensure_receipt_index(index)
-            action = dict(_index=index, _type=self.doc_type, _source=self.make_data(command))
+            self._ensure_receipt_index(index)
+            action = dict(_index=index, _source=self.make_data(command))
+            if isinstance(self.client, ESClientV6):
+                action['_type'] = self.doc_type
             if command.get('id'):
                 action['_id'] = str(command['id'])
             actions.append(action)
-        return bulk(self.es, actions, index=self.index, raise_on_error=raise_on_error)
+        save = bulk8 if isinstance(self.client, ESClientV8) else bulk
+        count, errors = save(self.es, actions, raise_on_error=raise_on_error)
+        return count == len(commands) and not errors
 
     def _ensure_receipt_index(self, index):
         if index in self._receipt_indices:
             return
         mappings = self.client.get_mapping(self.properties)
-        mappings['aliases'] = {self.query_index: {}}
+        if self.is_index_by_date:
+            mappings['aliases'] = {self.query_index: {}}
         try:
             self.es.indices.create(index=index, body=mappings)
         except (RequestError, BadRequestError) as exc:
             if exc.error != 'resource_already_exists_exception':
                 raise
         self._receipt_indices.add(index)
+
     def __init__(self, config):
         properties = {
             "session": {
