@@ -18409,3 +18409,7 @@ msgstr "No execution details"
 #: accounts/templates/accounts/reports/account_results.html
 msgid "No account changes"
 msgstr "No account changes"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI conversation audit"

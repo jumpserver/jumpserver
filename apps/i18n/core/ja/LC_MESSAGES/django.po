@@ -18193,3 +18193,7 @@ msgstr "資産の申請範囲"
 #: settings/serializers/feature.py
 msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
 msgstr "チケットでアクセス権を申請する際に選択できる資産の範囲を設定します。<br><b>すべての資産：</b>事前の認可がなくても、チケットの所属組織内のすべての資産を選択できます。<br><b>認可された資産：</b>ユーザー本人または所属グループに割り当てられた認可ルールの対象資産を選択できます。無効化されたルール、期限切れのルール、適用開始前のルールも含まれます。<br><b>有効な認可資産：</b>ユーザー本人または所属グループの有効な認可ルールの対象資産のみ選択できます。ルールが有効化され、現在時刻が開始時刻と終了時刻の間にあることが条件です。"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 会話監査"

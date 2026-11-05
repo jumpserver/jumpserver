@@ -18532,3 +18532,7 @@ msgstr "Ámbito de solicitud de activos"
 #: settings/serializers/feature.py
 msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
 msgstr "Define qué activos pueden seleccionar los usuarios al solicitar acceso mediante un ticket.<br><b>Todos los activos:</b> permite seleccionar todos los activos de la organización del ticket, aunque el usuario no tenga una autorización previa.<br><b>Activos autorizados:</b> permite seleccionar los activos incluidos en las reglas de autorización asignadas al usuario o a sus grupos, incluidas las reglas desactivadas, caducadas o aún no vigentes.<br><b>Activos con autorización válida:</b> solo permite seleccionar los activos incluidos en reglas válidas asignadas al usuario o a sus grupos. La regla debe estar activada y la hora actual debe estar entre su inicio y su finalización."
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "Auditoría de conversaciones de IA"

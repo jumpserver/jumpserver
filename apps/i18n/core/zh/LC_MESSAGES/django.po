@@ -19017,3 +19017,7 @@ msgstr "暂无执行明细"
 #: accounts/templates/accounts/reports/account_results.html
 msgid "No account changes"
 msgstr "暂无账号变化"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 会话审计"

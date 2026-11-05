@@ -68,7 +68,7 @@ class AuditConversation(models.Model):
     source_revision = models.PositiveBigIntegerField()
 
     class Meta:
-        default_permissions = ()
+        default_permissions = ('view',)
         ordering = ('-date_updated', '-id')
         indexes = [models.Index(fields=('org_id', '-date_updated'), name='chat_ai_audit_org_updated_idx')]
         verbose_name = _('Chat AI conversation audit')

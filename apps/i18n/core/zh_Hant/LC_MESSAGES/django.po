@@ -17929,3 +17929,7 @@ msgstr "暫無執行明細"
 #: accounts/templates/accounts/reports/account_results.html
 msgid "No account changes"
 msgstr "暫無帳號變化"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 對話稽核"

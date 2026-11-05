@@ -34,7 +34,9 @@ Python Chat AI 进程或额外监听端口。
 - `GET /api/v1/chat-ai/audit/conversations/{id}/`：会话详情；访问记录写入 Core 操作日志。
 - `OPTIONS /api/v1/chat-ai/audit/conversations/`：列表及搜索元数据。
 
-这些接口保留超级管理员限制，并严格按当前组织隔离。查询不访问 Kael，也不要求开启 AI 功能，
+这些接口使用 `chat_ai.view_auditconversation` 权限，并严格按当前组织隔离。内置系统审计员和组织
+审计员拥有该只读权限，自定义角色可在审计台权限树中单独授权；普通用户不会自动获得审计权限。
+前端菜单、列表和详情使用同一权限。查询不访问 Kael，也不要求开启 AI 功能，
 因此可以在 Kael 停机或禁用 AI 后查询已经写入的历史。
 
 Kael 在签名的 Runtime Store `record` JSON envelope 中添加可选的 `audit` 对象，包含
@@ -47,8 +49,9 @@ Kael 在签名的 Runtime Store `record` JSON envelope 中添加可选的 `audit
 生成重复审计数据。终端本地历史或运行时会话的删除不会级联删除 Core 审计记录；升级前已经被清理的
 历史无法通过补录恢复。历史核对会增加 Kael 启动耗时，取决于保留的数据量。
 
-升级顺序：先部署 Core 并执行 `chat_ai.0002_conversation_audit` 迁移，再部署 Kael 完成补录，
-最后更新 Lina。新 Kael 要求写入响应包含 `audit_version: 1`，防止连接到不支持审计写入的旧 Core。
+升级顺序：先部署 Core 并执行数据库迁移（包括审计表和 `chat_ai.0003_audit_conversation_permissions`），
+再部署 Kael 完成补录，最后更新 Lina。新 Kael 要求写入响应包含 `audit_version: 1`，
+防止连接到不支持审计写入的旧 Core。
 写入复用既有提交 ID、revision 校验和有限重试；Core 无法确认持久化时，Kael 不会把该事务作为成功
 提交返回。旧 Kael 的 `/kael/api/v1/admin/audit/conversations` 读接口已移除。
 
