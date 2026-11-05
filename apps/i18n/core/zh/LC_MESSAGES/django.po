@@ -18,8 +18,8 @@ msgstr ""
 "X-Generator: Poedit 2.4.3\n"
 
 #: authentication/backends/ukey/providers/builtin.py
-msgid "Builtin CA"
-msgstr "内置 CA"
+msgid "Builtin CA root certificate"
+msgstr "内置 CA 根证书"
 
 #: authentication/backends/ukey/clients/fisherman.py
 msgid "Unexpected error"
@@ -240,8 +240,8 @@ msgid "Use system trust store"
 msgstr "使用系统信任库"
 
 #: settings/serializers/auth/ukey.py
-msgid "Use custom CA certificate"
-msgstr "使用自定义 CA 证书"
+msgid "Use custom SSL certificate"
+msgstr "使用自定义 SSL 证书"
 
 #: settings/serializers/auth/ukey.py
 msgid "Ignore certificate verification (unsafe)"
@@ -252,8 +252,8 @@ msgid "A CA certificate is required."
 msgstr "必须提供 CA 证书"
 
 #: settings/serializers/auth/ukey.py
-msgid "HTTPS CA certificate"
-msgstr "HTTPS CA 证书"
+msgid "SSL certificate"
+msgstr "SSL 证书"
 
 #: settings/serializers/auth/ukey.py
 msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."
@@ -13429,8 +13429,8 @@ msgstr "VCTK_S 服务端验签失败，请检查服务配置。"
 msgid "VCTK_S version check passed. UKey signature and certificate verification have not been tested. Settings were not saved."
 msgstr "VCTK_S 版本接口检查通过，尚未验证 UKey 签名及证书，配置未保存。"
 
-msgid "Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate."
-msgstr "请检查 VCTK_S 服务地址、业务授权、HTTPS 信任设置及签发 CA 证书。"
+msgid "Check the VCTK_S service URL, business authorization and HTTPS trust settings."
+msgstr "请检查 VCTK_S 服务地址、业务授权及 HTTPS 信任设置。"
 
 msgid "Invalid VCTK_S business authorization credentials."
 msgstr "VCTK_S 业务授权凭据无效，请使用不含控制字符的 ASCII 用户名和密码。"

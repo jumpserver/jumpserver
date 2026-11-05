@@ -4,14 +4,14 @@ import hashlib
 import shutil
 import subprocess
 import tempfile
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import TestCase, skipUnless
 from unittest.mock import patch
 
 from asn1crypto import pem
 
-from authentication.backends.ukey.exceptions import UKeyCertChainError, UKeyCertCNMismatchError
+from authentication.backends.ukey.clients.fisherman import SVSError
+from authentication.backends.ukey.exceptions import UKeyCertCNMismatchError, UKeyServiceError
 from authentication.backends.ukey.verifiers import vctk_s
 from authentication.backends.ukey.verifiers.builtin import BuiltinVerifier
 
@@ -91,26 +91,6 @@ class VCTKSRealSM2Tests(TestCase):
         self.assertTrue(verifier.verify(signed['signer_infos'][0]['signature'].native))
         return {'plain': self.challenge.encode(), 'certificate': self.cert_der}
 
-    def test_real_sm2_bundle_order_and_wrong_same_name_key(self):
-        for bundle in (self.root_pem + self.issuer_pem, self.issuer_pem + self.root_pem,
-                       self.wrong_pem + self.root_pem + self.issuer_pem):
-            with self.subTest(first=bundle[:80]):
-                verifier = vctk_s.VCTKSVerifier('http://192.0.2.1', issuing_ca=bundle)
-                verifier.validate_config()
-                with patch.object(verifier, '_client') as client:
-                    client.return_value.verify_signed_data.side_effect = self.verify_remote_result
-                    self.assertEqual(verifier.verify_proof(
-                        self.cert, self.signature, self.challenge, 'user'
-                    ), self.identity())
-                    client.return_value.verify_signed_data.assert_called_once()
-
-    def test_real_sm2_wrong_ca_and_missing_direct_issuer_fail(self):
-        for bundle in (self.wrong_pem, self.root_pem):
-            verifier = vctk_s.VCTKSVerifier(issuing_ca=bundle)
-            with patch.object(verifier, '_client') as client, self.assertRaises(UKeyCertChainError):
-                verifier.verify_proof(self.cert, self.signature, self.challenge, 'user')
-            client.assert_not_called()
-
     def identity(self):
         cert = vctk_s.checked_certificate(self.cert_der)
         return {
@@ -119,36 +99,28 @@ class VCTKSRealSM2Tests(TestCase):
             'serial_number': format(cert.serial_number, 'x'),
         }
 
+    def test_real_sm2_proof_requires_no_local_issuing_ca(self):
+        verifier = vctk_s.VCTKSVerifier('http://192.0.2.1')
+        verifier.validate_config()
+        with patch.object(verifier, '_client') as client:
+            client.return_value.verify_signed_data.side_effect = self.verify_remote_result
+            self.assertEqual(verifier.verify_proof(
+                self.cert, self.signature, self.challenge,
+            ), self.identity())
+            client.return_value.verify_signed_data.assert_called_once_with(self.signature, 'sm3')
+
+    def test_real_sm2_remote_trust_rejection_cannot_return_an_identity(self):
+        verifier = vctk_s.VCTKSVerifier('http://192.0.2.1')
+        with patch.object(verifier, '_client') as client:
+            client.return_value.verify_signed_data.side_effect = SVSError('FF1C0C10')
+            with self.assertRaises(UKeyServiceError):
+                verifier.verify_proof(self.cert, self.signature, self.challenge)
+            client.return_value.verify_signed_data.assert_called_once_with(self.signature, 'sm3')
+
     def test_real_sm2_cn_is_display_only_but_builtin_still_requires_match(self):
-        verifier = vctk_s.VCTKSVerifier(issuing_ca=self.issuer_pem + self.root_pem)
+        verifier = vctk_s.VCTKSVerifier('http://192.0.2.1')
         with patch.object(verifier, '_client') as client:
             client.return_value.verify_signed_data.side_effect = self.verify_remote_result
             self.assertEqual(verifier.verify_proof(self.cert, self.signature, self.challenge, 'admin'), self.identity())
         with self.assertRaises(UKeyCertCNMismatchError):
             BuiltinVerifier(self.issuer_pem).verify_certificate(self.cert, 'admin')
-
-    def test_real_sm2_unused_ca_expiry_does_not_block_login(self):
-        verifier = vctk_s.VCTKSVerifier(issuing_ca=self.wrong_pem + self.issuer_pem)
-        # Only the unused one-day CA has expired at this instant.
-        future = datetime.now(timezone.utc) + timedelta(days=1, hours=1)
-        with patch.object(vctk_s, 'datetime') as clock, patch.object(verifier, '_client') as client:
-            clock.now.return_value = future
-            client.return_value.verify_signed_data.side_effect = self.verify_remote_result
-            self.assertEqual(verifier.verify_proof(
-                self.cert, self.signature, self.challenge, 'user'
-            ), self.identity())
-
-    def test_real_sm2_and_rsa_cas_can_share_one_file(self):
-        from cryptography.hazmat.primitives import serialization
-        from cryptography.hazmat.primitives.asymmetric import rsa
-        from authentication.tests.test_ukey_vctk_s_verifier import issue_certificate
-
-        rsa_ca = issue_certificate(
-            rsa.generate_private_key(public_exponent=65537, key_size=2048), ca=True, name='RSA CA'
-        ).public_bytes(serialization.Encoding.PEM).decode()
-        verifier = vctk_s.VCTKSVerifier(issuing_ca=rsa_ca + self.issuer_pem)
-        with patch.object(verifier, '_client') as client:
-            client.return_value.verify_signed_data.side_effect = self.verify_remote_result
-            self.assertEqual(verifier.verify_proof(
-                self.cert, self.signature, self.challenge, 'user'
-            ), self.identity())

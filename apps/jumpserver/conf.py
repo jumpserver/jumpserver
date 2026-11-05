@@ -282,7 +282,6 @@ class Config(dict):
         'AUTH_UKEY_VCTK_S_SVS_URL': '',
         'AUTH_UKEY_VCTK_S_TLS_VERIFY': 'system',
         'AUTH_UKEY_VCTK_S_TLS_CA_CERT': '',
-        'AUTH_UKEY_VCTK_S_ISSUING_CA': '',
         'AUTH_UKEY_VCTK_S_CONNECT_TIMEOUT': 3,
         'AUTH_UKEY_VCTK_S_READ_TIMEOUT': 5,
         'AUTH_UKEY_VCTK_S_USERNAME': '',

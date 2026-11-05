@@ -1878,7 +1878,7 @@
     "UKeyCertificateSelectionChanged": "El certificado UKey seleccionado ha cambiado. Selecciónelo de nuevo antes de vincularlo.",
     "UKeyCertificateSelectionFailed": "No se pudo establecer el certificado UKey actual. Inténtelo de nuevo.",
     "UKeyCertificateAlgorithmUnsupported": "El algoritmo del certificado de firma UKey no es compatible.",
-    "UKeyVCTKSHelp": "Use el cliente JIT UKey existente y verifique las firmas mediante el servicio VCTK_S.",
+    "UKeyVCTKSHelp": "Configure el servicio de verificación de firmas VCTK_S antes de iniciar sesión con un UKey JiDa y el servicio VCTK_S. Cambiar el método de autenticación no eliminará la configuración existente. Haga clic en «Prueba» para verificar la configuración actual del formulario. La prueba no guarda los cambios; haga clic en «Enviar» para guardarlos.",
     "UKeyVCTKSServerURL": "URL del servicio de verificación VCTK_S",
     "UKeyVCTKSServerHelp": "Introduzca la dirección HTTP/HTTPS completa del servicio VCTK_S, sin ruta, consulta ni fragmento.",
     "UKeyVCTKSIssuingCA": "CA emisora de confianza",
@@ -1890,5 +1890,8 @@
     "UKeyVCTKSAuthorizationPassword": "Contraseña de autorización del servicio",
     "UKeyVCTKSAuthorizationHelp": "Solo es necesario cuando el servicio VCTK_S tiene habilitada la autorización. Deje el usuario vacío para deshabilitarla.",
     "UKeyVCTKSAuthorizationPasswordHelp": "Deje el campo vacío para conservar la contraseña guardada.",
-    "UKeyVCTKSAuthorizationAdvanced": "Avanzado: autorización del servicio (opcional)"
+    "UKeyBuiltinCARootCertificate": "Certificado raíz de CA integrado",
+    "UKeyTLSCustomSSL": "Usar certificado SSL personalizado",
+    "UKeySSLCertificate": "Certificado SSL",
+    "UKeySSLCertificateHelp": "Cargue los certificados de confianza SSL del servicio de verificación (CA o cadena de certificados PEM, sin clave privada, hasta 64 KB). Deje en blanco para conservar la configuración guardada."
 }

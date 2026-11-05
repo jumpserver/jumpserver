@@ -3,7 +3,7 @@ import hashlib
 import re
 from datetime import datetime, timezone
 
-from asn1crypto import cms, core, pem
+from asn1crypto import cms, core
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger
@@ -11,11 +11,8 @@ from ..clients.fisherman import (
     Certificate, MAX_CERT, SM2_OID, SVSError, decode_base64, strict_der,
 )
 from ..clients.vctk_s import MAX_P7_SIZE, VCTKSClient
-from ..exceptions import (
-    UKeyAuthError, UKeyCertChainError, UKeyCertUnsupportedAlgorithmError, UKeyServiceError,
-)
+from ..exceptions import UKeyAuthError, UKeyServiceError
 from .base import BaseVerifier
-from .builtin import BuiltinVerifier
 
 logger = get_logger(__name__)
 
@@ -23,15 +20,6 @@ SIGNED_DATA_OIDS = {'1.2.840.113549.1.7.2', '1.2.156.10197.6.1.4.2.2'}
 DATA_OIDS = {'1.2.840.113549.1.7.1', '1.2.156.10197.6.1.4.2.1'}
 SM3_OID = '1.2.156.10197.1.401'
 SHA256_OID = '2.16.840.1.101.3.4.2.1'
-MAX_CA_BUNDLE_SIZE = 65536
-MAX_CA_CERTIFICATES = 16
-CA_PEM_PATTERN = re.compile(
-    r'-----BEGIN CERTIFICATE-----([A-Za-z0-9+/=\s]+?)-----END CERTIFICATE-----'
-)
-
-
-class VCTKSCAConfigError(UKeyAuthError):
-    """A certificate-field error, separate from HTTP service configuration."""
 
 
 class CertificatePolicyError(ValueError):
@@ -145,79 +133,6 @@ def checked_certificate(data, *, ca=False, check_time=True):
     return certificate
 
 
-def load_issuing_cas(value):
-    """Load explicitly trusted issuers, without making idle CA expiry fatal."""
-    if (not isinstance(value, str) or not value.strip() or not value.isascii()
-            or len(value) > MAX_CA_BUNDLE_SIZE):
-        raise VCTKSCAConfigError(_('Upload a PEM CA certificate file of at most 64 KB.'))
-    certificates, seen, end = [], set(), 0
-    for index, match in enumerate(CA_PEM_PATTERN.finditer(value), 1):
-        if index > MAX_CA_CERTIFICATES:
-            raise VCTKSCAConfigError(_('Upload at most 16 CA certificates.'))
-        if value[end:match.start()].strip():
-            raise VCTKSCAConfigError(_('Invalid PEM content before CA certificate %(index)d.') % {'index': index})
-        try:
-            encoded = re.sub(r'\s+', '', match.group(1))
-            der = decode_base64(encoded, MAX_CERT)
-            certificate = checked_certificate(der, ca=True, check_time=False)
-        except Exception as exc:
-            # ASN.1 parser exceptions can contain certificate data.
-            reason = str(exc) if isinstance(exc, CertificatePolicyError) else str(
-                _('Invalid or unsupported CA certificate')
-            )
-            raise VCTKSCAConfigError(_('CA certificate %(index)d: %(reason)s.') % {
-                'index': index, 'reason': reason,
-            }) from None
-        if der not in seen:
-            seen.add(der)
-            certificates.append(certificate)
-        end = match.end()
-    if not certificates or value[end:].strip():
-        raise VCTKSCAConfigError(_('Invalid PEM CA certificate file or trailing content.'))
-    return certificates
-
-
-def valid_issuing_cas(certificates):
-    for certificate in certificates:
-        try:
-            check_certificate_validity(certificate)
-        except ValueError:
-            continue
-        yield certificate
-
-
-def verify_certificate_issuer(certificate, cert, issuers):
-    unsupported = False
-    for issuer in valid_issuing_cas(issuers):
-        if (certificate.issuer.dump() != issuer.subject.dump()
-                or (certificate.authority_key_identifier is not None and issuer.key_identifier is not None
-                    and certificate.authority_key_identifier != issuer.key_identifier)):
-            continue
-        # The existing SM2/RSA backends do not support cross-algorithm issuance.
-        if certificate_algorithm(certificate) != certificate_algorithm(issuer):
-            unsupported = True
-            continue
-        try:
-            issuer_pem = pem.armor('CERTIFICATE', issuer.dump()).decode('ascii')
-            verifier = BuiltinVerifier(issuer_pem)
-            cert_pem = verifier._load_cert_pem(cert)
-            if certificate_algorithm(certificate) == 'sm2':
-                parsed = verifier._load_sm2_cert(cert_pem)
-                verifier._verify_sm2_cert_chain(parsed)
-                verifier._verify_sm2_cert_validity(parsed)
-            else:
-                parsed = verifier._load_rsa_cert(cert_pem)[0]
-                verifier._verify_rsa_cert_chain(parsed)
-                verifier._verify_rsa_cert_validity(parsed)
-            return
-        except UKeyCertChainError:
-            # Same-name issuers may use different keys.
-            continue
-    if unsupported:
-        raise UKeyCertUnsupportedAlgorithmError(_('Cross-algorithm CA issuance is not supported.'))
-    raise UKeyCertChainError(_('No valid trusted CA could verify the UKey certificate.'))
-
-
 def _signer_matches(sid, certificate):
     if sid.name == 'issuer_and_serial_number':
         return (sid.chosen['issuer'].dump() == certificate.issuer.dump()
@@ -258,9 +173,8 @@ def check_attached_signer(signature, certificate, message):
 
 
 class VCTKSVerifier(BaseVerifier):
-    def __init__(self, url='', *, issuing_ca='', tls_verify='system', tls_ca_cert='',
+    def __init__(self, url='', *, tls_verify='system', tls_ca_cert='',
                  connect_timeout=3, read_timeout=5, username='', password=''):
-        self.issuing_ca = issuing_ca
         self.connection = dict(
             url=url, tls_verify=tls_verify, tls_ca_cert=tls_ca_cert,
             connect_timeout=connect_timeout, read_timeout=read_timeout,
@@ -275,11 +189,8 @@ class VCTKSVerifier(BaseVerifier):
             self._client()
         except Exception:
             raise UKeyAuthError(_(
-                'Check the VCTK_S service URL, business authorization, HTTPS trust settings and issuing CA certificate.'
+                'Check the VCTK_S service URL, business authorization and HTTPS trust settings.'
             )) from None
-        issuers = load_issuing_cas(self.issuing_ca)
-        if not any(valid_issuing_cas(issuers)):
-            raise VCTKSCAConfigError(_('At least one trusted CA certificate must currently be valid.'))
 
     def verify_proof(self, cert, signature, challenge, username=''):
         stage = 'parse'
@@ -288,11 +199,8 @@ class VCTKSVerifier(BaseVerifier):
                 raise ValueError('Invalid challenge')
             certificate = checked_certificate(decode_base64(cert, MAX_CERT))
             signature_bytes = decode_base64(signature, MAX_P7_SIZE)
-            issuers = load_issuing_cas(self.issuing_ca)
             stage = 'signer_identity'
             digest = check_attached_signer(signature_bytes, certificate, challenge.encode('ascii'))
-            stage = 'certificate_trust'
-            verify_certificate_issuer(certificate, cert, issuers)
             serial = format(certificate.serial_number, 'x')
             if len(serial) > 64:
                 raise ValueError('Invalid certificate serial number')
@@ -302,6 +210,8 @@ class VCTKSVerifier(BaseVerifier):
             logger.warning('VCTK_S proof rejected: stage=%s exception=%s', stage, type(exc).__name__)
             raise UKeyAuthError(_('VCTK_S certificate or signature verification failed.')) from None
         try:
+            # The VCTK_S service validates certificate trust and the signature.
+            # Bind its authenticated result to the exact proof checked above.
             result = self._client().verify_signed_data(signature, digest)
             if (result['plain'] != challenge.encode('ascii')
                     or result['certificate'] != certificate.dump()):

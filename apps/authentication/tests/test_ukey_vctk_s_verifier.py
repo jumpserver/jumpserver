@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from asn1crypto import algos, cms, keys, pem, x509 as asn1_x509
+from asn1crypto import algos, cms, keys, x509 as asn1_x509
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
@@ -130,7 +130,7 @@ class VCTKSVerifierTests(TestCase):
         )
 
     def setUp(self):
-        self.verifier = vctk_s.VCTKSVerifier(URL, issuing_ca=self.ca_pem)
+        self.verifier = vctk_s.VCTKSVerifier(URL)
 
     def verify_rsa_p7(self, signature, digest_algorithm):
         self.assertEqual(digest_algorithm, 'sha256')
@@ -155,6 +155,45 @@ class VCTKSVerifierTests(TestCase):
             claims = self.verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'user')
         self.assertEqual(claims, self.identity())
         client.return_value.verify_signed_data.assert_called_once_with(self.signature, 'sha256')
+
+    def test_config_needs_only_service_settings_and_never_calls_the_service(self):
+        self.verifier.validate_config()
+        with patch.object(self.verifier, '_client') as client:
+            self.verifier.validate_config()
+            client.assert_called_once_with()
+            client.return_value.verify_signed_data.assert_not_called()
+            client.return_value.generate_random.assert_not_called()
+        with self.assertRaises(UKeyAuthError) as error:
+            vctk_s.VCTKSVerifier('invalid-url').validate_config()
+        self.assertNotIn('issuing CA', str(error.exception))
+
+    def test_untrusted_certificate_is_rejected_by_remote_service_without_local_ca(self):
+        with patch.object(self.verifier, '_client') as client:
+            client.return_value.verify_signed_data.side_effect = SVSError(
+                'FF1C0C10: trusted CA certificate validation failed',
+            )
+            with self.assertRaises(UKeyServiceError):
+                self.verifier.verify_proof(self.cert, self.signature, CHALLENGE)
+        client.return_value.verify_signed_data.assert_called_once_with(self.signature, 'sha256')
+
+    def test_service_unavailability_cannot_fall_back_to_builtin_verification(self):
+        with patch.object(self.verifier, '_client') as client, patch.object(BuiltinVerifier, 'verify_proof') as builtin:
+            client.return_value.verify_signed_data.side_effect = OSError('Connection refused')
+            with self.assertRaises(UKeyServiceError):
+                self.verifier.verify_proof(self.cert, self.signature, CHALLENGE)
+            builtin.assert_not_called()
+
+    def test_tampered_attached_signature_is_rejected_by_remote_verification(self):
+        content = vctk_s.VCTKSContentInfo.load(self.p7)
+        signature = content['content']['signer_infos'][0]['signature'].native
+        content['content']['signer_infos'][0]['signature'] = (
+            signature[:-1] + bytes([signature[-1] ^ 1])
+        )
+        with patch.object(self.verifier, '_client') as client:
+            client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
+            with self.assertRaises(UKeyServiceError):
+                self.verifier.verify_proof(self.cert, encode(content.dump()), CHALLENGE)
+        client.return_value.verify_signed_data.assert_called_once()
 
     def test_explicit_ca_false_preserves_signed_certificate_and_p7_bytes(self):
         leaf = issue_certificate(
@@ -236,17 +275,6 @@ class VCTKSVerifierTests(TestCase):
             client.return_value.verify_signed_data.assert_called_once()
         with self.assertRaises(UKeyCertCNMismatchError):
             BuiltinVerifier(self.ca_pem).verify_certificate(self.cert, 'admin')
-
-    def test_wrong_issuing_key_is_rejected_before_remote_verification(self):
-        wrong_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        wrong_ca = issue_certificate(wrong_key, ca=True, name='test CA', serial=1)
-        # The genuine CA name alone must not establish trust.
-        verifier = vctk_s.VCTKSVerifier(
-            URL, issuing_ca=wrong_ca.public_bytes(serialization.Encoding.PEM).decode(),
-        )
-        with patch.object(verifier, '_client') as client, self.assertRaises(UKeyAuthError):
-            verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'user')
-        client.assert_not_called()
 
     def test_valid_issuer_metadata_still_requires_cryptographic_certificate_signature(self):
         tampered = self.asn1_cert.copy()
@@ -331,102 +359,6 @@ class VCTKSVerifierTests(TestCase):
         with self.assertRaises(ValueError):
             vctk_s.check_attached_signer(content.dump(force=True), self.asn1_cert, CHALLENGE.encode())
 
-    def test_config_accepts_ca_bundles_but_not_leaf_or_only_expired_ca(self):
-        self.verifier.validate_config()
-        self.assertEqual(vctk_s.certificate_algorithm(vctk_s.load_issuing_cas(self.ca_pem)[0]), 'rsa')
-        self.assertEqual(len(vctk_s.load_issuing_cas(self.ca_pem * 2)), 1)
-        expired = issue_certificate(self.ca_key, ca=True, name='test CA', start=-2, end=-1)
-        for value in ('', self.leaf.public_bytes(serialization.Encoding.PEM).decode(),
-                      expired.public_bytes(serialization.Encoding.PEM).decode()):
-            with self.subTest(size=len(value)), self.assertRaises(vctk_s.VCTKSCAConfigError):
-                vctk_s.VCTKSVerifier(URL, issuing_ca=value).validate_config()
-
-    def test_multi_ca_order_and_unused_expired_ca_do_not_affect_login(self):
-        other_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        for dates in ({}, {'start': -2, 'end': -1}, {'start': 1, 'end': 2}):
-            other = issue_certificate(other_key, ca=True, name='other CA', **dates)
-            other_pem = other.public_bytes(serialization.Encoding.PEM).decode()
-            for bundle in (other_pem + self.ca_pem, self.ca_pem + other_pem):
-                with self.subTest(dates=dates, first_is_other=bundle.startswith(other_pem)):
-                    verifier = vctk_s.VCTKSVerifier(URL, issuing_ca=bundle)
-                    verifier.validate_config()
-                    with patch.object(verifier, '_client') as client:
-                        client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
-                        self.assertEqual(verifier.verify_proof(
-                            self.cert, self.signature, CHALLENGE, 'user'
-                        ), self.identity())
-
-    def test_same_name_wrong_key_candidate_does_not_hide_valid_issuer(self):
-        wrong_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        wrong_ca = Certificate.load(issue_certificate(
-            wrong_key, ca=True, name='test CA'
-        ).public_bytes(serialization.Encoding.DER))
-        # Make issuer metadata match too: only a real signature check distinguishes it.
-        for extension in wrong_ca['tbs_certificate']['extensions']:
-            if extension['extn_id'].native == 'key_identifier':
-                extension['extn_value'] = self.asn1_cert.authority_key_identifier
-        wrong_pem = pem.armor('CERTIFICATE', wrong_ca.dump()).decode()
-        verifier = vctk_s.VCTKSVerifier(URL, issuing_ca=wrong_pem + self.ca_pem)
-        self.assertEqual(len(vctk_s.load_issuing_cas(verifier.issuing_ca)), 2)
-        with patch.object(verifier, '_client') as client:
-            client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
-            self.assertEqual(verifier.verify_proof(
-                self.cert, self.signature, CHALLENGE, 'user'
-            ), self.identity())
-
-    def test_expired_matching_ca_cannot_be_replaced_by_unrelated_valid_ca(self):
-        expired = issue_certificate(self.ca_key, ca=True, name='test CA', start=-2, end=-1)
-        unrelated = issue_certificate(self.ca_key, ca=True, name='unrelated CA')
-        bundle = ''.join(c.public_bytes(serialization.Encoding.PEM).decode() for c in (expired, unrelated))
-        verifier = vctk_s.VCTKSVerifier(URL, issuing_ca=bundle)
-        with patch.object(verifier, '_client') as client, self.assertRaises(UKeyCertChainError):
-            verifier.verify_proof(self.cert, self.signature, CHALLENGE, 'user')
-        client.assert_not_called()
-
-    def test_uploaded_root_does_not_implicitly_trust_a_p7_intermediate(self):
-        root_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        root = issue_certificate(root_key, ca=True, name='root')
-        intermediate = issue_certificate(self.ca_key, issuer_key=root_key, issuer=root, ca=True, name='test CA')
-        signature = (
-            pkcs7.PKCS7SignatureBuilder().set_data(CHALLENGE.encode())
-            .add_signer(self.leaf, self.key, hashes.SHA256()).add_certificate(intermediate)
-            .sign(serialization.Encoding.DER, [pkcs7.PKCS7Options.Binary])
-        )
-        verifier = vctk_s.VCTKSVerifier(URL, issuing_ca=root.public_bytes(serialization.Encoding.PEM).decode())
-        with patch.object(verifier, '_client') as client, self.assertRaises(UKeyCertChainError):
-            verifier.verify_proof(self.cert, encode(signature), CHALLENGE, 'user')
-        client.assert_not_called()
-
-    def test_bundle_rejects_garbage_and_limits_certificate_count_and_size(self):
-        for value in ('garbage' + self.ca_pem, self.ca_pem + 'garbage',
-                      self.ca_pem + '-----BEGIN CERTIFICATE-----broken',
-                      self.ca_pem + '-----BEGIN PUBLIC KEY-----\nAA==\n-----END PUBLIC KEY-----',
-                      self.ca_pem * 17, self.ca_pem + ' ' * vctk_s.MAX_CA_BUNDLE_SIZE,
-                      '\ud800' + self.ca_pem,
-                      '-----BEGIN CERTIFICATE-----\n'
-                      + encode(b'\x00' * (vctk_s.MAX_CERT + 1))
-                      + '\n-----END CERTIFICATE-----'):
-            with self.subTest(size=len(value)), self.assertRaises(vctk_s.VCTKSCAConfigError):
-                vctk_s.load_issuing_cas(value)
-
-    def test_bad_certificate_reports_its_position_without_echoing_contents(self):
-        with self.assertRaises(vctk_s.VCTKSCAConfigError) as error:
-            vctk_s.load_issuing_cas(
-                self.ca_pem + self.leaf.public_bytes(serialization.Encoding.PEM).decode()
-            )
-        self.assertIn('2:', str(error.exception))
-        self.assertNotIn('BEGIN CERTIFICATE', str(error.exception))
-
-    def test_mixed_rsa_sm2_bundle_does_not_change_rsa_proof(self):
-        sm2_ca = pem.armor('CERTIFICATE', sm2_structure(ca=True).dump()).decode()
-        verifier = vctk_s.VCTKSVerifier(URL, issuing_ca=sm2_ca + self.ca_pem)
-        verifier.validate_config()
-        with patch.object(verifier, '_client') as client:
-            client.return_value.verify_signed_data.side_effect = self.verify_rsa_p7
-            self.assertEqual(verifier.verify_proof(
-                self.cert, self.signature, CHALLENGE, 'user'
-            ), self.identity())
-
     def test_connection_test_only_checks_random_generation(self):
         with patch.object(self.verifier, '_client') as client:
             result = self.verifier.test_connection()
@@ -457,8 +389,7 @@ class VCTKSSM2StructureTests(TestCase):
                     vctk_s.check_attached_signer(
                         sm2_p7_structure(leaf, gm=gm, chain=(ca,)).dump(), leaf, CHALLENGE.encode(),
                     )
-                    loaded = vctk_s.load_issuing_cas(pem.armor('CERTIFICATE', ca.dump()).decode())[0]
-                    self.assertEqual(vctk_s.certificate_algorithm(loaded), 'sm2')
+                    self.assertEqual(vctk_s.certificate_algorithm(vctk_s.checked_certificate(leaf.dump())), 'sm2')
 
     def test_shared_sm2_checks_keep_chain_validity_and_cn_before_signature(self):
         verifier = BuiltinVerifier('test CA')

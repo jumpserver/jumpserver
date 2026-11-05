@@ -1878,7 +1878,7 @@
     "UKeyCertificateSelectionChanged": "선택한 UKey 인증서가 변경되었습니다. 연결하기 전에 다시 선택하세요.",
     "UKeyCertificateSelectionFailed": "현재 UKey 인증서를 설정하지 못했습니다. 다시 시도하세요.",
     "UKeyCertificateAlgorithmUnsupported": "UKey 서명 인증서 알고리즘이 지원되지 않습니다.",
-    "UKeyVCTKSHelp": "기존 JIT UKey 클라이언트를 사용하고 VCTK_S 서비스를 통해 서명을 검증합니다.",
+    "UKeyVCTKSHelp": "JiDa UKey와 VCTK_S 서비스로 로그인하기 전에 VCTK_S 서명 검증 서비스를 설정하세요. 인증 방식을 변경해도 기존 설정은 삭제되지 않습니다. “테스트”를 클릭하여 현재 화면의 설정을 검증하세요. 테스트는 변경 사항을 저장하지 않습니다. 저장하려면 “제출”을 클릭하세요.",
     "UKeyVCTKSServerURL": "VCTK_S 검증 서비스 URL",
     "UKeyVCTKSServerHelp": "경로, 쿼리 또는 프래그먼트 없이 VCTK_S 서비스의 전체 HTTP/HTTPS 주소를 입력하세요.",
     "UKeyVCTKSIssuingCA": "신뢰할 발급 CA",
@@ -1890,5 +1890,8 @@
     "UKeyVCTKSAuthorizationPassword": "업무 인증 비밀번호",
     "UKeyVCTKSAuthorizationHelp": "VCTK_S 서비스에서 업무 인증이 활성화된 경우에만 입력합니다. 사용자 이름을 비워 두면 업무 인증을 사용하지 않습니다.",
     "UKeyVCTKSAuthorizationPasswordHelp": "비워 두면 저장된 비밀번호를 유지합니다.",
-    "UKeyVCTKSAuthorizationAdvanced": "고급: 업무 인증(선택 사항)"
+    "UKeyBuiltinCARootCertificate": "내장 CA 루트 인증서",
+    "UKeyTLSCustomSSL": "사용자 지정 SSL 인증서 사용",
+    "UKeySSLCertificate": "SSL 인증서",
+    "UKeySSLCertificateHelp": "검증 서비스의 SSL 신뢰 인증서를 업로드하세요(PEM CA 인증서 또는 인증서 체인, 개인 키 제외, 최대 64 KB). 비워 두면 저장된 설정을 유지합니다."
 }

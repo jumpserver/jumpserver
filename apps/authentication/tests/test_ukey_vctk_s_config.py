@@ -1,4 +1,4 @@
-"""VCTK_S certificate binding must preserve the other providers and JIT PIN operations."""
+"""VCTK_S binding preserves other providers and requires PINs only for signing."""
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -28,7 +28,6 @@ def snapshot(**overrides):
         'AUTH_UKEY_DEFAULT_PIN': '123456',
         'AUTH_UKEY_CA_CERT_CONTENT': '',
         'AUTH_UKEY_VCTK_S_SVS_URL': 'http://192.0.2.1:8000',
-        'AUTH_UKEY_VCTK_S_ISSUING_CA': 'saved-issuing-ca',
         'AUTH_UKEY_VCTK_S_TLS_VERIFY': 'system',
         'AUTH_UKEY_VCTK_S_TLS_CA_CERT': 'saved-https-ca',
         'AUTH_UKEY_VCTK_S_USERNAME': 'business-user',
@@ -47,7 +46,7 @@ class SDKCompatibilityTests(SimpleTestCase):
         self.reverse.start()
         self.addCleanup(self.reverse.stop)
 
-    def test_reuses_original_jida_script_detection_pin_and_submit(self):
+    def test_reuses_original_jida_script_detection_and_submit_without_pin_management(self):
         builtin = UKeySDKConfig(snapshot(AUTH_UKEY_CA_PROVIDER='builtin'))
         remote = UKeySDKConfig(snapshot())
         self.assertTrue(remote.load_sdk_script_content().startswith(builtin.load_sdk_script_content()))
@@ -58,9 +57,9 @@ class SDKCompatibilityTests(SimpleTestCase):
         self.assertEqual(builtin_config['sdk'], remote_config['sdk'])
         operations = {item['key']: item for item in remote_config['operations']['items']}
         builtin_operations = {item['key']: item for item in builtin_config['operations']['items']}
-        self.assertEqual(set(operations), {'bindUserUKeySN', 'unbindUserUKeySN', 'resetPin', 'changePIN'})
+        self.assertEqual(set(operations), {'bindUserUKeySN', 'unbindUserUKeySN'})
         for key in ('resetPin', 'changePIN'):
-            self.assertEqual(operations[key], builtin_operations[key])
+            self.assertIn(key, builtin_operations)
         login = remote_config['login']
         self.assertEqual([s['name'] for s in login['steps']], ['verifyPin', 'getCert', 'signChallenge', 'submit'])
         self.assertEqual(login['steps'][-1]['fields']['username'], '')
@@ -70,7 +69,8 @@ class SDKCompatibilityTests(SimpleTestCase):
         self.assertNotIn('user_detail_url', remote_config['config']['api'])
         self.assertNotIn('UKey_DeleteCons', repr(remote_config['operations']))
         self.assertNotIn('UKey_GenKey', repr(remote_config['operations']))
-        self.assertEqual(remote_config['config']['pin'], builtin_config['config']['pin'])
+        self.assertNotIn('pin', remote_config['config'])
+        self.assertEqual(builtin_config['config']['pin']['default'], '123456')
         self.assertFalse(remote_config['config']['enroll']['enabled'])
         self.assertTrue(builtin_config['config']['enroll']['enabled'])
         self.assertTrue(remote_config['config']['capabilities']['uses_one_time_challenge'])
@@ -152,10 +152,28 @@ class SDKCompatibilityTests(SimpleTestCase):
                 self.assertNotIn('getBindingDevSN', operations)
                 self.assertNotIn('checkBindingDevSN', operations)
 
-    def test_default_pin_is_admin_only(self):
-        config = UKeySDKConfig(snapshot())
-        self.assertNotIn('pin', config.get_sdk_config()['config'])
-        self.assertEqual(config.get_sdk_config(include_admin_pin=True)['config']['pin']['default'], '123456')
+    def test_default_pin_is_not_exposed_for_vctks_even_to_admins(self):
+        for include_admin_pin in (False, True):
+            with self.subTest(include_admin_pin=include_admin_pin):
+                result = UKeySDKConfig(snapshot()).get_sdk_config(include_admin_pin=include_admin_pin)
+                self.assertNotIn('pin', result['config'])
+                self.assertFalse(result['config']['capabilities']['expose_default_pin'])
+                self.assertEqual(
+                    {item['key'] for item in result['operations']['items']},
+                    {'bindUserUKeySN', 'unbindUserUKeySN'},
+                )
+
+    def test_builtin_providers_keep_pin_management_and_admin_only_default_pin(self):
+        for vendor in ('ji_da', 'long_mai'):
+            with self.subTest(vendor=vendor):
+                config = UKeySDKConfig(snapshot(AUTH_UKEY_VENDOR=vendor, AUTH_UKEY_CA_PROVIDER='builtin'))
+                self.assertNotIn('pin', config.get_sdk_config()['config'])
+                result = config.get_sdk_config(include_admin_pin=True)
+                self.assertEqual(result['config']['pin']['default'], '123456')
+                self.assertTrue(result['config']['capabilities']['expose_default_pin'])
+                operations = {item['key'] for item in result['operations']['items']}
+                change_pin_key = 'changePIN' if vendor == 'ji_da' else 'changePin'
+                self.assertTrue({'resetPin', change_pin_key} <= operations)
 
     def test_ca_algorithm_never_selects_login_signing_digest(self):
         for algorithm in ('RSA', 'SM2', 'RSA / SM2', ''):
@@ -173,7 +191,7 @@ class SDKCompatibilityTests(SimpleTestCase):
         self.assertEqual(provider.binding_mode, 'certificate')
         self.assertFalse(provider.requires_certificate_selection)
         self.assertFalse(provider.supports_enrollment)
-        self.assertTrue(provider.expose_default_pin)
+        self.assertFalse(provider.expose_default_pin)
         with self.assertRaises(UKeyAuthError):
             get_provider(snapshot(AUTH_UKEY_VENDOR='long_mai'))
 
@@ -188,12 +206,55 @@ class SDKCompatibilityTests(SimpleTestCase):
 
 
 class SettingsTests(SimpleTestCase):
-    def test_ca_parse_error_is_reported_on_the_ca_upload_field(self):
-        serializer = UKeySettingSerializer(data={
-            'AUTH_UKEY_VCTK_S_ISSUING_CA': 'not a certificate',
-        }, context={'snapshot': snapshot()}, partial=True)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('AUTH_UKEY_VCTK_S_ISSUING_CA', serializer.errors)
+    def test_builtin_and_ssl_labels_keep_existing_provider_and_tls_identifiers(self):
+        builtin = get_provider(snapshot(AUTH_UKEY_CA_PROVIDER='builtin'))
+        self.assertEqual(str(builtin.label), 'Builtin CA root certificate')
+        from settings.serializers.auth.ukey import VCTKSCASettingSerializer, XJCACASettingSerializer
+
+        for serializer, prefix in (
+            (VCTKSCASettingSerializer(), 'AUTH_UKEY_VCTK_S'),
+            (XJCACASettingSerializer(), 'AUTH_UKEY_XJCA'),
+        ):
+            with self.subTest(prefix=prefix):
+                choices = serializer.fields[prefix + '_TLS_VERIFY'].choices
+                self.assertEqual(set(choices), {'system', 'custom', 'insecure'})
+                self.assertEqual(str(choices['custom']), 'Use custom SSL certificate')
+                self.assertEqual(str(serializer.fields[prefix + '_TLS_CA_CERT'].label), 'SSL certificate')
+
+    def test_omitted_authorization_preserves_saved_credentials_on_save_and_test(self):
+        with patch('authentication.backends.ukey.providers.vctk_s.VCTKSVerifier') as verifier:
+            serializer = UKeySettingSerializer(
+                data={'AUTH_UKEY_VCTK_S_SVS_URL': 'http://192.0.2.1:8000'},
+                partial=True, context={'snapshot': snapshot()},
+            )
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+            self.assertEqual(verifier.call_args.kwargs['username'], snapshot()['AUTH_UKEY_VCTK_S_USERNAME'])
+            self.assertEqual(verifier.call_args.kwargs['password'], snapshot()['AUTH_UKEY_VCTK_S_PASSWORD'])
+            self.assertNotIn('AUTH_UKEY_VCTK_S_USERNAME', serializer.validated_data)
+            self.assertNotIn('AUTH_UKEY_VCTK_S_PASSWORD', serializer.validated_data)
+        serializer = UKeyTestingSerializer(data={
+            'AUTH_UKEY_CA_PROVIDER': 'vctk_s', 'AUTH_UKEY_VENDOR': 'ji_da',
+            'AUTH_UKEY_VCTK_S_SVS_URL': 'http://192.0.2.1:8000',
+        }, context={'snapshot': snapshot()})
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        with patch('authentication.backends.ukey.providers.vctk_s.VCTKSVerifier') as verifier:
+            get_provider({**snapshot(), **serializer.validated_data}).verifier
+            self.assertEqual(verifier.call_args.kwargs['username'], snapshot()['AUTH_UKEY_VCTK_S_USERNAME'])
+            self.assertEqual(verifier.call_args.kwargs['password'], snapshot()['AUTH_UKEY_VCTK_S_PASSWORD'])
+
+    def test_save_needs_no_issuing_ca_and_ignores_legacy_saved_values(self):
+        for legacy in (None, '', 'not a certificate'):
+            state = snapshot()
+            if legacy is not None:
+                state['AUTH_UKEY_VCTK_S_ISSUING_CA'] = legacy
+            with self.subTest(legacy=legacy):
+                serializer = UKeySettingSerializer(data={
+                    'AUTH_UKEY_CA_PROVIDER': 'vctk_s',
+                    'AUTH_UKEY_VCTK_S_SVS_URL': 'http://192.0.2.1:8000',
+                }, context={'snapshot': state}, partial=True)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+                self.assertNotIn('AUTH_UKEY_VCTK_S_ISSUING_CA', serializer.validated_data)
+                self.assertEqual(get_provider(state).ca_algorithm, 'RSA / SM2')
 
     def run_connection_test(self, state, data):
         from django.core.cache import cache
@@ -254,13 +315,16 @@ class SettingsTests(SimpleTestCase):
         self.assertEqual(kwargs['username'], '')
         self.assertEqual(kwargs['password'], ' spaced password ')
         self.assertEqual(kwargs['tls_ca_cert'], 'saved-https-ca')
-        self.assertEqual(kwargs['issuing_ca'], '')
+        self.assertNotIn('issuing_ca', kwargs)
 
-    def test_public_settings_expose_status_but_not_uploaded_certificates(self):
-        result = UKeySettingSerializer(instance=snapshot()).data
-        self.assertTrue(result['AUTH_UKEY_VCTK_S_ISSUING_CA_CONFIGURED'])
-        for key in ('AUTH_UKEY_VCTK_S_ISSUING_CA', 'AUTH_UKEY_VCTK_S_TLS_CA_CERT',
-                    'AUTH_UKEY_VCTK_S_PASSWORD'):
+    def test_public_settings_omit_issuing_ca_and_keep_tls_secrets_write_only(self):
+        serializer = UKeySettingSerializer(instance=snapshot(AUTH_UKEY_VCTK_S_ISSUING_CA='legacy-ca'))
+        result = serializer.data
+        for key in ('AUTH_UKEY_VCTK_S_ISSUING_CA', 'AUTH_UKEY_VCTK_S_ISSUING_CA_CONFIGURED'):
+            self.assertNotIn(key, result)
+            self.assertNotIn(key, serializer.fields)
+            self.assertNotIn(key, SECRET_FIELDS)
+        for key in ('AUTH_UKEY_VCTK_S_TLS_CA_CERT', 'AUTH_UKEY_VCTK_S_PASSWORD'):
             self.assertNotIn(key, result)
             self.assertIn(key, SECRET_FIELDS)
         provider = next(p for p in result['AUTH_UKEY_CA_PROVIDERS'] if p['id'] == 'vctk_s')
@@ -268,12 +332,11 @@ class SettingsTests(SimpleTestCase):
         self.assertEqual(provider['binding_mode'], 'certificate')
         self.assertEqual(set(provider['fields']), {
             'AUTH_UKEY_VCTK_S_SVS_URL', 'AUTH_UKEY_VCTK_S_TLS_VERIFY',
-            'AUTH_UKEY_VCTK_S_TLS_CA_CERT', 'AUTH_UKEY_VCTK_S_ISSUING_CA',
+            'AUTH_UKEY_VCTK_S_TLS_CA_CERT',
             'AUTH_UKEY_VCTK_S_USERNAME', 'AUTH_UKEY_VCTK_S_PASSWORD',
         })
-        self.assertEqual(set(provider['connection_fields']), set(provider['fields']) - {
-            'AUTH_UKEY_VCTK_S_ISSUING_CA',
-        })
+        self.assertEqual(set(provider['connection_fields']), set(provider['fields']))
+        self.assertNotIn('AUTH_UKEY_VCTK_S_ISSUING_CA', provider['secret_fields'])
 
     def test_blank_password_keeps_saved_secret_and_empty_username_disables_authorization(self):
         with patch('authentication.backends.ukey.providers.vctk_s.VCTKSVerifier') as verifier:
@@ -291,22 +354,21 @@ class SettingsTests(SimpleTestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertNotIn('AUTH_UKEY_VCTK_S_PASSWORD', serializer.validated_data)
 
-    def test_blank_upload_keeps_saved_ca_during_validation(self):
+    def test_blank_upload_keeps_saved_https_ca_during_validation(self):
         state = snapshot()
         with patch('authentication.backends.ukey.providers.vctk_s.VCTKSVerifier') as verifier:
             serializer = UKeySettingSerializer(
-                data={'AUTH_UKEY_VCTK_S_ISSUING_CA': '', 'AUTH_UKEY_VCTK_S_TLS_CA_CERT': ''},
+                data={'AUTH_UKEY_VCTK_S_TLS_CA_CERT': ''},
                 partial=True, context={'snapshot': state},
             )
             self.assertTrue(serializer.is_valid(), serializer.errors)
-            self.assertEqual(verifier.call_args.kwargs['issuing_ca'], 'saved-issuing-ca')
+            self.assertNotIn('issuing_ca', verifier.call_args.kwargs)
             self.assertEqual(verifier.call_args.kwargs['tls_ca_cert'], 'saved-https-ca')
 
     def test_missing_required_settings_and_incompatible_vendor(self):
-        for missing in ('AUTH_UKEY_VCTK_S_SVS_URL', 'AUTH_UKEY_VCTK_S_ISSUING_CA'):
-            with self.subTest(missing=missing), self.assertRaises(ValidationError) as error:
-                get_provider(snapshot(**{missing: ''})).validate_config()
-            self.assertIn(missing, error.exception.detail)
+        with self.assertRaises(ValidationError) as error:
+            get_provider(snapshot(AUTH_UKEY_VCTK_S_SVS_URL='')).validate_config()
+        self.assertIn('AUTH_UKEY_VCTK_S_SVS_URL', error.exception.detail)
         serializer = UKeySettingSerializer(
             data={'AUTH_UKEY_VENDOR': 'long_mai'}, partial=True, context={'snapshot': snapshot()},
         )

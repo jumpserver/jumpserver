@@ -18,8 +18,8 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: authentication/backends/ukey/providers/builtin.py
-msgid "Builtin CA"
-msgstr "組み込み CA"
+msgid "Builtin CA root certificate"
+msgstr "組み込み CA ルート証明書"
 
 #: settings/serializers/auth/ukey.py
 msgid "Fisherman signature verification service URL"
@@ -38,8 +38,8 @@ msgid "Use system trust store"
 msgstr "システムの信頼ストアを使用"
 
 #: settings/serializers/auth/ukey.py
-msgid "Use custom CA certificate"
-msgstr "カスタム CA 証明書を使用"
+msgid "Use custom SSL certificate"
+msgstr "カスタム SSL 証明書を使用"
 
 #: settings/serializers/auth/ukey.py
 msgid "Ignore certificate verification (unsafe)"
@@ -50,8 +50,8 @@ msgid "A CA certificate is required."
 msgstr "CA 証明書を指定してください。"
 
 #: settings/serializers/auth/ukey.py
-msgid "HTTPS CA certificate"
-msgstr "HTTPS CA 証明書"
+msgid "SSL certificate"
+msgstr "SSL 証明書"
 
 #: settings/serializers/auth/ukey.py
 msgid "Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, without a private key (maximum 64 KB). Leave blank to keep the saved certificate. This does not affect UKey certificate verification."

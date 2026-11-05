@@ -1,4 +1,4 @@
-# VCTK_S uses existing certificates; PIN operations retain the vendor defaults.
+# VCTK_S uses existing certificates and verifies PINs only for binding and login.
 sdk:
   create: {}
   setup:
@@ -127,8 +127,6 @@ operations:
             revision: "{{ config.revision }}"
             binding_version: "{{ ukey.binding.binding_version }}"
           register: ukey.binding
-    - inherit: resetPin
-    - inherit: changePIN
 
 i18n:
   "Check binding device":

@@ -41,21 +41,14 @@ class VCTKSCASettingSerializer(serializers.Serializer):
     AUTH_UKEY_VCTK_S_TLS_VERIFY = serializers.ChoiceField(
         choices=[
             ('system', _('Use system trust store')),
-            ('custom', _('Use custom CA certificate')),
+            ('custom', _('Use custom SSL certificate')),
             ('insecure', _('Ignore certificate verification (unsafe)')),
         ], required=False, label=_('Certificate verification'),
     )
     AUTH_UKEY_VCTK_S_TLS_CA_CERT = EncryptedField(
-        required=False, allow_blank=True, max_length=65536, label=_('HTTPS CA certificate'),
+        required=False, allow_blank=True, max_length=65536, label=_('SSL certificate'),
         help_text=_('PEM trust certificates for the HTTPS service, separate from the UKey issuing CA. '
                     'Leave blank to keep the saved certificate.'),
-    )
-    AUTH_UKEY_VCTK_S_ISSUING_CA = EncryptedField(
-        required=False, allow_blank=True, max_length=65536,
-        label=_('VCTK_S trusted issuing CA'),
-        help_text=_('Upload a PEM file containing up to 16 trusted CA certificates (maximum 64 KB). '
-                    'Include the CA that directly issued the UKey certificate; order does not matter. '
-                    'Expired or not-yet-valid CAs are not used for login. Leave blank to keep the saved file.'),
     )
 
 
@@ -71,12 +64,12 @@ class XJCACASettingSerializer(serializers.Serializer):
     AUTH_UKEY_XJCA_TLS_VERIFY = serializers.ChoiceField(
         choices=[
             ('system', _('Use system trust store')),
-            ('custom', _('Use custom CA certificate')),
+            ('custom', _('Use custom SSL certificate')),
             ('insecure', _('Ignore certificate verification (unsafe)')),
         ], required=False, label=_('Certificate verification'),
     )
     AUTH_UKEY_XJCA_TLS_CA_CERT = EncryptedField(
-        required=False, allow_blank=True, max_length=65536, label=_('HTTPS CA certificate'),
+        required=False, allow_blank=True, max_length=65536, label=_('SSL certificate'),
         help_text=_(
             'Upload a PEM CA certificate or certificate chain for the Fisherman HTTPS service, '
             'without a private key (maximum 64 KB). Leave blank to keep the saved certificate. '
@@ -126,7 +119,6 @@ class UKeySettingSerializer(serializers.Serializer):
         choices=[], default='builtin', label=_('CA provider'),
     )
     AUTH_UKEY_CA_PROVIDERS = serializers.SerializerMethodField()
-    AUTH_UKEY_VCTK_S_ISSUING_CA_CONFIGURED = serializers.SerializerMethodField()
     AUTH_UKEY_CONFIG_REVISION = serializers.CharField(required=False, max_length=32)
     AUTH_UKEY_CHALLENGE_TTL = serializers.IntegerField(
         default=300, min_value=60, max_value=3600, label=_('Challenge TTL (seconds)'),
@@ -175,9 +167,6 @@ class UKeySettingSerializer(serializers.Serializer):
             return _('Unknown')
         provider = provider_class(obj)
         return provider.algorithm_label or provider.ca_algorithm or _('Auto-Detect After Upload')
-
-    def get_AUTH_UKEY_VCTK_S_ISSUING_CA_CONFIGURED(self, obj):
-        return bool(obj.get('AUTH_UKEY_VCTK_S_ISSUING_CA'))
 
     def validate(self, attrs):
         from authentication.backends.ukey.configuration import SECRET_FIELDS, get_snapshot

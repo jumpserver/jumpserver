@@ -1878,7 +1878,7 @@
     "UKeyCertificateSelectionChanged": "Chứng chỉ UKey đã chọn đã thay đổi. Hãy chọn lại trước khi liên kết.",
     "UKeyCertificateSelectionFailed": "Không thể đặt chứng chỉ UKey hiện tại. Vui lòng thử lại.",
     "UKeyCertificateAlgorithmUnsupported": "Thuật toán chứng thư ký UKey không được hỗ trợ.",
-    "UKeyVCTKSHelp": "Sử dụng ứng dụng JIT UKey hiện có và xác minh chữ ký qua dịch vụ VCTK_S.",
+    "UKeyVCTKSHelp": "Hãy cấu hình dịch vụ xác minh chữ ký VCTK_S trước khi đăng nhập bằng UKey JiDa và dịch vụ VCTK_S. Thay đổi phương thức xác thực sẽ không xóa cài đặt hiện có. Nhấp vào “Kiểm tra” để xác minh cấu hình hiện tại trên biểu mẫu. Việc kiểm tra không lưu thay đổi; nhấp vào “Gửi” để lưu.",
     "UKeyVCTKSServerURL": "URL dịch vụ xác minh VCTK_S",
     "UKeyVCTKSServerHelp": "Nhập địa chỉ HTTP/HTTPS đầy đủ của dịch vụ VCTK_S, không có đường dẫn, truy vấn hoặc đoạn.",
     "UKeyVCTKSIssuingCA": "CA cấp chứng chỉ đáng tin cậy",
@@ -1890,5 +1890,8 @@
     "UKeyVCTKSAuthorizationPassword": "Mật khẩu xác thực dịch vụ",
     "UKeyVCTKSAuthorizationHelp": "Chỉ cần khi dịch vụ VCTK_S bật xác thực. Để trống tên người dùng để không sử dụng xác thực dịch vụ.",
     "UKeyVCTKSAuthorizationPasswordHelp": "Để trống để giữ mật khẩu đã lưu.",
-    "UKeyVCTKSAuthorizationAdvanced": "Nâng cao: xác thực dịch vụ (tùy chọn)"
+    "UKeyBuiltinCARootCertificate": "Chứng thư gốc CA tích hợp",
+    "UKeyTLSCustomSSL": "Sử dụng chứng thư SSL tùy chỉnh",
+    "UKeySSLCertificate": "Chứng thư SSL",
+    "UKeySSLCertificateHelp": "Tải lên chứng thư tin cậy SSL của dịch vụ xác minh (chứng thư CA hoặc chuỗi chứng thư PEM, không có khóa riêng, tối đa 64 KB). Để trống để giữ cấu hình đã lưu."
 }
