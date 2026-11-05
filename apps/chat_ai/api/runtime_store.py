@@ -21,6 +21,7 @@ from common.permissions import IsServiceAccount
 from terminal.const import TerminalType
 
 from chat_ai.models import RuntimeStore, RuntimeStoreRecord
+from chat_ai.audit import AuditProjectionInput, apply_audit_projection
 
 
 RUNTIME_STORE_KEY = 'default'
@@ -118,8 +119,7 @@ class RuntimeStoreAppendSerializer(StrictSerializer):
                 raise serializers.ValidationError({'integrity': gettext('A hexadecimal string is required.')})
         return super().to_internal_value(data)
 
-    @staticmethod
-    def validate_record(value):
+    def validate_record(self, value):
         if len(value.encode('utf-8')) > MAX_RECORD_BYTES:
             raise serializers.ValidationError(gettext('The journal record exceeds the 64 MiB limit.'))
 
@@ -130,7 +130,8 @@ class RuntimeStoreAppendSerializer(StrictSerializer):
             envelope = json.loads(line, object_pairs_hook=_object_without_duplicate_keys)
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
             raise serializers.ValidationError(gettext('The journal record is not valid JSON.')) from exc
-        if not isinstance(envelope, dict) or set(envelope) != JOURNAL_RECORD_FIELDS:
+        allowed_fields = (JOURNAL_RECORD_FIELDS, JOURNAL_RECORD_FIELDS | {'audit'})
+        if not isinstance(envelope, dict) or set(envelope) not in allowed_fields:
             raise serializers.ValidationError(
                 gettext('The journal record must contain version, created_at, payload, and checksum.')
             )
@@ -156,6 +157,10 @@ class RuntimeStoreAppendSerializer(StrictSerializer):
         digest = hashlib.sha256(raw).digest()
         if not hmac.compare_digest(digest, supplied):
             raise serializers.ValidationError(gettext('The journal record checksum does not match its payload.'))
+        if 'audit' in envelope:
+            audit = AuditProjectionInput(data=envelope['audit'])
+            audit.is_valid(raise_exception=True)
+            self.audit_projection = audit.validated_data
         return value
 
 
@@ -328,6 +333,9 @@ class RuntimeStoreView(APIView):
                 return self._revision_conflict(store.revision)
             else:
                 revision = store.revision + 1
+                audit = getattr(serializer, 'audit_projection', None)
+                if audit is not None:
+                    apply_audit_projection(audit, revision)
                 RuntimeStoreRecord.objects.create(
                     store=store,
                     revision=revision,
@@ -349,6 +357,7 @@ class RuntimeStoreView(APIView):
                 'revision': revision,
                 'commit_id': str(commit_id),
                 'receipt': receipt,
+                'audit_version': 1,
             },
             status=status.HTTP_201_CREATED,
         )

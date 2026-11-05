@@ -49,3 +49,44 @@ class RuntimeStoreRecord(JMSBaseModel):
             ),
         ]
         verbose_name = _('Chat AI runtime store record')
+
+
+class AuditConversation(models.Model):
+    """Independent audit history; runtime deletion must not delete this record."""
+
+    id = models.UUIDField(primary_key=True)
+    org_id = models.CharField(max_length=36, db_index=True)
+    subject_id = models.UUIDField()
+    subject_name = models.CharField(max_length=128, blank=True)
+    subject_username = models.CharField(max_length=128, blank=True)
+    title = models.TextField(blank=True)
+    assistant = models.CharField(max_length=64, blank=True)
+    profile = models.CharField(max_length=64, blank=True)
+    status = models.CharField(max_length=32, blank=True)
+    date_created = models.DateTimeField()
+    date_updated = models.DateTimeField()
+    source_revision = models.PositiveBigIntegerField()
+
+    class Meta:
+        default_permissions = ()
+        ordering = ('-date_updated', '-id')
+        indexes = [models.Index(fields=('org_id', '-date_updated'), name='chat_ai_audit_org_updated_idx')]
+        verbose_name = _('Chat AI conversation audit')
+
+
+class AuditMessage(models.Model):
+    id = models.CharField(max_length=128, primary_key=True)
+    conversation = models.ForeignKey(AuditConversation, on_delete=models.CASCADE, related_name='messages')
+    role = models.CharField(max_length=16)
+    content = models.TextField(blank=True)
+    status = models.CharField(max_length=32, blank=True)
+    error = models.TextField(blank=True)
+    input_tokens = models.PositiveBigIntegerField(default=0)
+    output_tokens = models.PositiveBigIntegerField(default=0)
+    date_created = models.DateTimeField()
+    source_revision = models.PositiveBigIntegerField()
+
+    class Meta:
+        default_permissions = ()
+        ordering = ('date_created', 'id')
+        verbose_name = _('Chat AI audit message')
