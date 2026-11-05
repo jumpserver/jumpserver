@@ -184,10 +184,19 @@ class CommandViewSet(JMSBulkModelViewSet):
         return qs
 
     def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, many=True)
+        receipt = request.headers.get('X-JMS-Audit-Protocol') == '1'
+        serializer_class = self.serializer_class
+        if receipt:
+            from terminal.serializers.command import SessionCommandReceiptSerializer
+            serializer_class = SessionCommandReceiptSerializer
+            if not getattr(self.command_store, 'supports_idempotent_receipts', False):
+                return Response({'error': 'Command storage does not support durable audit receipts'}, status=503)
+        serializer = serializer_class(data=request.data, many=True)
         if serializer.is_valid():
             ok = self.command_store.bulk_save(serializer.validated_data)
             if ok:
+                if receipt:
+                    return Response({'audit_protocol': 1, 'event_ids': [str(c['id']) for c in serializer.validated_data]}, status=201)
                 return Response("ok", status=201)
             else:
                 return Response("Save error", status=500)

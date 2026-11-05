@@ -8,7 +8,7 @@ from terminal.const import RiskLevelChoices
 from terminal.models import Command
 
 logger = get_logger(__name__)
-__all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
+__all__ = ['SessionCommandSerializer', 'SessionCommandReceiptSerializer', 'InsecureCommandAlertSerializer']
 
 
 class SimpleSessionCommandSerializer(serializers.ModelSerializer):
@@ -88,3 +88,9 @@ class SessionCommandSerializer(SessionCommandSerializerMixin, SimpleSessionComma
         fields = SimpleSessionCommandSerializer.Meta.fields + [
             'id', 'account', 'output', 'timestamp', 'timestamp_display', 'remote_addr'
         ]
+
+
+class SessionCommandReceiptSerializer(SessionCommandSerializer):
+    # Only the component upload endpoint opts in. Ordinary command APIs retain
+    # their read-only id contract; repeated SQL executions get different ids.
+    id = serializers.UUIDField(required=True)
