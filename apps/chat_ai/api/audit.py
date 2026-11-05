@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from audits.const import ActionChoices
 from audits.handler import create_or_update_operate_log
 from common.api import JMSGenericViewSet
-from common.permissions import OnlySuperUser
 from orgs.utils import current_org
+from rbac.permissions import RBACPermission
 
 from chat_ai.filters import ConversationAuditFilterSet
 from chat_ai.models import AuditConversation, AuditMessage
@@ -48,7 +48,7 @@ class AuditConversationDetailSerializer(AuditConversationSerializer):
 
 
 class ConversationAuditViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, JMSGenericViewSet):
-    permission_classes = (OnlySuperUser,)
+    permission_classes = (RBACPermission,)
     http_method_names = ('get', 'head', 'options')
     filterset_class = ConversationAuditFilterSet
     search_fields = ('title', 'subject_name', 'subject_username')

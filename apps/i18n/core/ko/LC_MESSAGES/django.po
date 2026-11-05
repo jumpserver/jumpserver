@@ -18129,3 +18129,7 @@ msgstr "자산 신청 범위"
 #: settings/serializers/feature.py
 msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
 msgstr "티켓으로 자산 접근 권한을 신청할 때 선택할 수 있는 자산 범위를 설정합니다.<br><b>모든 자산:</b> 사전 권한이 없어도 티켓 소속 조직의 모든 자산을 선택할 수 있습니다.<br><b>권한이 부여된 자산:</b> 본인 또는 소속 사용자 그룹에 할당된 권한 규칙에 포함된 자산을 선택할 수 있습니다. 비활성화되었거나 만료되었거나 아직 적용되지 않은 규칙도 포함됩니다.<br><b>유효한 권한의 자산:</b> 본인 또는 소속 사용자 그룹의 유효한 권한 규칙에 포함된 자산만 선택할 수 있습니다. 규칙이 활성화되어 있고 현재 시간이 시작 시간과 종료 시간 사이에 있어야 합니다."
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 대화 감사"

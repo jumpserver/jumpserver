@@ -132,6 +132,7 @@ special_pid_mapper = {
     'accounts.view_verifyaccountexecution': 'connectivity_node',
     'accounts.add_verifyaccountexecution': 'connectivity_node',
     'audits.ftplog': 'terminal',
+    'chat_ai.auditconversation': 'audits',
     'perms.view_myassets': 'my_assets',
     'ops.job': 'operation_center',
     'ops.adhoc': 'operation_center',
