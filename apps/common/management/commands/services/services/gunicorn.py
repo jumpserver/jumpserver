@@ -28,6 +28,7 @@ class GunicornService(BaseService):
             '--access-logformat', log_format,
             '--access-logfile', '-'
         ]
+        cmd.extend(['--config', os.path.join(BASE_DIR, 'utils', 'gunicorn_runtime.py')])
         if DEBUG:
             cmd.append('--reload')
         return cmd
@@ -35,8 +36,3 @@ class GunicornService(BaseService):
     @property
     def cwd(self):
         return APPS_DIR
-
-    def start_other(self):
-        from terminal.startup import CoreTerminal
-        core_terminal = CoreTerminal()
-        core_terminal.start_heartbeat_thread()

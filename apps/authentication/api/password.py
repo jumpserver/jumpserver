@@ -19,6 +19,7 @@ from authentication.serializers import (
     PasswordVerifySerializer, ResetPasswordCodeSerializer
 )
 from authentication.utils import check_user_property_is_correct
+from common.auth.cache import PASSWORD_PREVIEW_SEND_AT_KEY, get_password_preview
 from common.permissions import IsValidUser
 from common.utils.random import random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
@@ -45,7 +46,7 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
 
     @staticmethod
     def safe_send_code(token, code, target, form_type, content, user_info):
-        token_sent_key = '{}_send_at'.format(token)
+        token_sent_key = PASSWORD_PREVIEW_SEND_AT_KEY.format(token=token)
         token_send_at = cache.get(token_sent_key, 0)
         if token_send_at:
             raise IntervalTooShort(60)
@@ -80,7 +81,7 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         token = request.GET.get('token')
-        user_info = cache.get(token)
+        user_info = get_password_preview(token)
         if not user_info:
             return HttpResponseRedirect(reverse('authentication:forgot-previewing'))
 

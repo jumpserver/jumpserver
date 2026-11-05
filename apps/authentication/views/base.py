@@ -50,20 +50,28 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, IMClientMixin, View):
     def create_user_if_not_exist(self, user_id, **kwargs):
         user = None
         user_attr = self.client.get_user_detail(user_id, **kwargs)
-        try:
-            exists = User.objects.filter(username=user_attr['username']).exists()
-            if not check_only_allow_exist_user_auth(not exists):
-                return None, (self.msg_client_err, self.request.error_message)
+        username = user_attr['username']
+        external_id_field = f'{self.user_type}_id'
 
-            user, create = User.objects.get_or_create(
-                username=user_attr['username'], defaults=user_attr
+        # A matching username does not prove ownership of an existing local
+        # account. Existing users must authenticate locally and use the
+        # dedicated bind flow before they can sign in with this provider.
+        if User.objects.filter(username=username).exists():
+            msg = _(
+                'A local account with the same username already exists. '
+                'Please log in with another authentication method and bind '
+                'this account before using it to log in.'
             )
+            return None, (self.msg_user_not_bound_err, msg)
 
-            setattr(user, f'{self.user_type}_id', user_id)
-            if create:
-                setattr(user, 'source', self.user_type)
-                bind_user_to_org_role(user)
-            user.save()
+        if not check_only_allow_exist_user_auth(True):
+            return None, (self.msg_client_err, self.request.error_message)
+
+        try:
+            user_attr[external_id_field] = user_id
+            user_attr['source'] = self.user_type
+            user = User.objects.create(**user_attr)
+            bind_user_to_org_role(user)
         except IntegrityError as err:
             logger.error(f'{self.msg_client_err}: create user error: {err}')
 

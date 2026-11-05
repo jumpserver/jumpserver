@@ -1,9 +1,11 @@
+import json
 import uuid
-from collections import defaultdict
+from tempfile import TemporaryFile
 
 from celery import shared_task, current_task
 from django.conf import settings
-from django.db.models import Count
+from django.db import router, transaction
+from django.db.models import Count, Q
 from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from accounts.const import AutomationTypes
@@ -46,6 +48,53 @@ def remove_accounts_task(gather_account_ids):
     quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
 
 
+def _iter_obsolete_history_batches(history_model, keep_count, batch_size=500, *, using=None):
+    # HistoricalAccount has an auto-increment history_id. Leave histories
+    # created during this run for the next cleanup, including backdated ones.
+    manager = history_model.objects.using(using)
+    last_history_id = manager.order_by('-history_id').values_list(
+        'history_id', flat=True,
+    ).first()
+    if last_history_id is None:
+        return
+    histories = manager.filter(history_id__lte=last_history_id)
+    accounts = histories.order_by('id').values('id').annotate(
+        count=Count('history_id'),
+    ).filter(count__gt=keep_count).values_list('id', flat=True)
+
+    last_account_id = None
+    while True:
+        page = accounts if last_account_id is None else accounts.filter(id__gt=last_account_id)
+        account_ids = list(page[:batch_size])
+        if not account_ids:
+            return
+        last_account_id = account_ids[-1]
+        for account_id in account_ids:
+            account_histories = histories.filter(id=account_id)
+            # Match simple-history's newest-first ordering, including ties.
+            cutoff = list(account_histories.order_by(
+                '-history_date', '-history_id',
+            ).values_list('history_date', 'history_id')[keep_count - 1:keep_count])
+            if not cutoff:
+                continue
+            cutoff_date, cutoff_id = cutoff[0]
+            obsolete = account_histories.filter(
+                Q(history_date__lt=cutoff_date)
+                | Q(history_date=cutoff_date, history_id__lt=cutoff_id)
+            ).order_by('history_id')
+            last_deleted_id = None
+            while True:
+                page = obsolete if last_deleted_id is None else obsolete.filter(
+                    history_id__gt=last_deleted_id,
+                )
+                history_ids = list(page.values_list('history_id', flat=True)[:batch_size])
+                if not history_ids:
+                    break
+                last_deleted_id = history_ids[-1]
+                # Keep the account, snapshot and retention filters on deletion.
+                yield obsolete.filter(history_id__in=history_ids)
+
+
 @shared_task(
     verbose_name=_('Clean historical accounts'),
     description=_(
@@ -64,29 +113,26 @@ def clean_historical_accounts():
         return
     limit = settings.HISTORY_ACCOUNT_CLEAN_LIMIT
     limit += 1  # 因为当前账号的密码是最新的那条历史记录，因此保留 n 条历史，实际上应该保留 n+1 条历史记录
-    
-
-    history_ids_to_be_deleted = []
-    history_model = Account.history.model
-    history_id_mapper = defaultdict(list)
-
-    ids = history_model.objects.values('id').annotate(count=Count('id')) \
-        .filter(count__gte=limit).values_list('id', flat=True)
-
-    if not ids:
-        return
-
-    for i in history_model.objects.filter(id__in=ids):
-        _id = str(i.id)
-        history_id_mapper[_id].append(i.history_id)
-
-    for history_ids in history_id_mapper.values():
-        history_ids_to_be_deleted.extend(history_ids[limit:])
-    history_qs = history_model.objects.filter(history_id__in=history_ids_to_be_deleted)
-
-    resource_ids = list(history_qs.values_list('history_id', flat=True))
-    history_qs.delete()
 
     task_id = current_task.request.id if current_task else str(uuid.uuid4())
     detail = gettext_noop('Remove historical accounts that are out of range.')
-    create_activities(resource_ids, detail, task_id, action=ActivityChoices.task, org_id='')
+    history_model = Account.history.model
+    using = router.db_for_write(history_model)
+    # Keep the original commit boundary: delete all histories first, then write
+    # activities. An activity failure must not restore rows whose Vault secrets
+    # were already removed by post_delete. This private file holds only IDs.
+    with TemporaryFile(mode='w+t', encoding='utf-8') as activity_batches:
+        with transaction.atomic(using=using):
+            for history_qs in _iter_obsolete_history_batches(history_model, limit, using=using):
+                # Recheck and lock the bounded batch so concurrent cleanup cannot
+                # produce duplicate deletion activities for rows already removed.
+                resource_ids = list(history_qs.select_for_update().values_list('history_id', flat=True))
+                if not resource_ids:
+                    continue
+                activity_batches.write(json.dumps(resource_ids) + '\n')
+                # ORM deletion is required: post_delete also removes Vault entries.
+                history_qs.filter(history_id__in=resource_ids).delete()
+            activity_batches.flush()
+        activity_batches.seek(0)
+        for line in activity_batches:
+            create_activities(json.loads(line), detail, task_id, action=ActivityChoices.task, org_id='')

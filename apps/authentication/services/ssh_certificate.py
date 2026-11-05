@@ -23,6 +23,13 @@ def get_ssh_ca_client(config=None):
     ) or getattr(
         settings, 'VAULT_OPENBAO_ADDR', ''
     )
+    ca_cert_file = getattr(config, 'SSH_CA_OPENBAO_CACERT_FILE', '')
+    if not ca_cert_file and addr.rstrip('/') in (
+        'http://openbao:8200', 'https://openbao:8200',
+    ):
+        # The installer mounts the built-in OpenBao CA for Vault storage.
+        # External SSH CAs must use their own configured trust material.
+        ca_cert_file = getattr(settings, 'VAULT_OPENBAO_CACERT_FILE', '')
     return OpenBaoSSHCAClient(
         addr=addr,
         token=getattr(config, 'SSH_CA_OPENBAO_TOKEN', ''),
@@ -30,7 +37,8 @@ def get_ssh_ca_client(config=None):
         role=getattr(config, 'SSH_CA_OPENBAO_ROLE', 'jumpserver'),
         timeout=getattr(config, 'SSH_CA_OPENBAO_TIMEOUT', 10),
         verify_tls=getattr(config, 'SSH_CA_OPENBAO_VERIFY_TLS', True),
-        ca_cert_file=getattr(config, 'SSH_CA_OPENBAO_CACERT_FILE', ''),
+        ca_cert=getattr(config, 'SSH_CA_OPENBAO_CACERT_CONTENT', ''),
+        ca_cert_file=ca_cert_file,
     )
 
 

@@ -17,6 +17,10 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
+        # A poll can arrive after the login guard has cleared the review markers.
+        if (request.user.is_authenticated and not request.session.get('auth_ticket_id')
+                and not request.session.get('auth_confirm_required')):
+            return Response({"msg": "ok"})
         try:
             self.check_user_login_confirm()
             self.request.session['auth_third_party_done'] = 1

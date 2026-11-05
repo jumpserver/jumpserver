@@ -15,8 +15,8 @@ class JMSObjectDoesNotExist(APIException):
     default_detail = _('%s object does not exist.')
 
     def __init__(self, detail=None, code=None, object_name=None):
-        if detail is None and object_name:
-            detail = self.default_detail % object_name
+        if detail is None:
+            detail = (self.default_detail % (object_name or '')).strip()
         super(JMSObjectDoesNotExist, self).__init__(detail=detail, code=code)
 
 

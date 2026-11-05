@@ -5,6 +5,7 @@ import ldap
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.utils.translation import gettext
 from django_auth_ldap.backend import _LDAPUser, LDAPBackend, valid_cache_key
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
@@ -188,7 +189,7 @@ class LDAPUser(_LDAPUser):
 
     def _authenticate_user_dn(self, password):
         if self.dn is None:
-            raise self.AuthenticationFailed("failed to map the username to a DN.")
+            raise self.AuthenticationFailed(gettext("failed to map the username to a DN."))
 
         self._connection = None
         self._connection_bound = False
@@ -197,7 +198,7 @@ class LDAPUser(_LDAPUser):
             sticky = self.settings.BIND_AS_AUTHENTICATING_USER
             self._bind_as(self.dn, password, sticky=sticky)
         except ldap.INVALID_CREDENTIALS:
-            raise self.AuthenticationFailed("user DN/password rejected by LDAP server.")
+            raise self.AuthenticationFailed(gettext("user DN/password rejected by LDAP server."))
 
     def _search_for_user_dn(self):
         """

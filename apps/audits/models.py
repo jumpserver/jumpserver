@@ -2,11 +2,9 @@ import os
 import uuid
 from datetime import timedelta, datetime
 from functools import lru_cache
-from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
-from django.core.cache import caches
 from django.db import models
 from django.db.models import Q, CharField, F, Value
 from django.db.models.functions import Cast, Coalesce, Concat
@@ -20,6 +18,7 @@ from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
 from terminal.models import default_storage
+from tickets.models import Ticket
 from .const import (
     OperateChoices,
     ActionChoices,
@@ -31,6 +30,7 @@ from .const import (
 
 __all__ = [
     "JobLog",
+    "TicketAudit",
     "FTPLog",
     "OperateLog",
     "UserSession",
@@ -67,6 +67,13 @@ class JobLog(JobExecution):
     class Meta:
         proxy = True
         verbose_name = _("Job audit log")
+
+
+class TicketAudit(Ticket):
+    class Meta:
+        proxy = True
+        default_permissions = ('view',)
+        verbose_name = _("Ticket audit")
 
 
 class FTPLog(OrgModelMixin):
@@ -344,9 +351,18 @@ class UserLoginLog(models.Model):
     class Meta:
         ordering = ["-datetime", "username"]
         verbose_name = _("User login log")
+        indexes = [
+            models.Index(fields=['username', 'datetime'], name='login_log_username_date_idx'),
+            models.Index(
+                fields=['username', 'status', 'city', 'datetime'],
+                name='login_log_username_city_idx',
+            ),
+        ]
 
 
 class UserSession(models.Model):
+    is_locked = models.BooleanField(default=False)
+    lock_password_failures = models.PositiveSmallIntegerField(default=0)
     _OPERATE_LOG_ACTION = {'delete': ActionChoices.finished}
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -378,11 +394,8 @@ class UserSession(models.Model):
 
     @property
     def date_expired(self) -> datetime:
-        session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
-        session_store = session_store_cls(session_key=self.key)
-        cache_key = session_store.cache_key
-        ttl = caches[settings.SESSION_CACHE_ALIAS].ttl(cache_key)
-        return timezone.now() + timedelta(seconds=ttl)
+        from common.sessions import session_expiry
+        return session_expiry(self.key)
 
     @classmethod
     def clear_expired_sessions(cls):

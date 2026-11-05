@@ -3,7 +3,6 @@ import re
 from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
@@ -18,6 +17,11 @@ def validate_asset_address(value):
     if value != value.strip():
         raise ValidationError(
             _('The address cannot contain leading or trailing whitespace')
+        )
+
+    if value.startswith('#jinja2:'):
+        raise ValidationError(
+            _('The address cannot contain Ansible template override syntax')
         )
 
     if _JINJA_DELIMITER_RE.search(value):
@@ -54,17 +58,6 @@ def validate_ip_or_hostname(value):
             or not all(_HOST_LABEL_RE.fullmatch(label) for label in labels)
     ):
         raise ValidationError(_('Enter a valid IP address or hostname'))
-
-
-def web_xpack_fields(config):
-    """Configured Web features that require a valid enterprise license."""
-    if settings.XPACK_LICENSE_IS_VALID:
-        return []
-    fields = [name for name in ('allowed_urls', 'script', 'success_selector', 'interactive_selector')
-              if config.get(name)]
-    if config.get('autofill') == 'script':
-        fields.append('autofill')
-    return fields
 
 
 def normalize_web_origin(value):

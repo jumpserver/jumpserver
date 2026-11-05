@@ -10,6 +10,7 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View, TemplateView
 from rest_framework.views import APIView
@@ -33,6 +34,10 @@ class LunaView(View):
 class I18NView(View):
     def get(self, request, lang):
         referer_url = request.META.get('HTTP_REFERER', '/')
+        if not url_has_allowed_host_and_scheme(
+            referer_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            referer_url = '/'
         response = HttpResponseRedirect(referer_url)
         expires = timezone.now() + timezone.timedelta(days=365)
         response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang, expires=expires)
@@ -74,12 +79,12 @@ class ResourceDownload(TemplateView):
     @lazyproperty
     def versions_content(self):
         more_downloads = os.environ.get('MORE_DOWNLOADS_URL', '')
-        default_versions = """
+        from terminal.const import TINKER_TARGET_VERSION
+        default_versions = f"""
         MRD_VERSION=10.6.7
         OPENSSH_VERSION=v9.4.0.0
-        TINKER_VERSION=v0.1.6
+        TINKER_VERSION={TINKER_TARGET_VERSION}
         VIDEO_PLAYER_VERSION=0.5.2
-        CLIENT_VERSION=5.0.0
         """
         version_file = os.path.join(settings.DATA_DIR, 'version.txt')
         try:
@@ -88,13 +93,8 @@ class ResourceDownload(TemplateView):
         except OSError:
             versions = default_versions
 
-        client_version = os.environ.get('CLIENT_VERSION', '')
-        client_version_override = (
-            f'CLIENT_VERSION={client_version}' if client_version else ''
-        )
         return f"""
         {versions}
-        {client_version_override}
         VENDOR={settings.VENDOR}
         MORE_DOWNLOADS_URL={more_downloads}
         """
@@ -109,6 +109,19 @@ class ResourceDownload(TemplateView):
                 continue
             key, value = line.split('=', 1)
             meta[key] = value
+
+        client_version = ''
+        core_version = settings.VERSION.strip().removeprefix('v')
+        if core_version != 'dev':
+            for version in (meta.get('CLIENT_VERSION', ''), settings.VERSION):
+                version = version.strip().removeprefix('v')
+                if re.fullmatch(
+                    r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)'
+                    r'(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?', version
+                ):
+                    client_version = version
+                    break
+        meta['CLIENT_VERSION'] = client_version
         return meta
 
     def get_context_data(self, **kwargs):

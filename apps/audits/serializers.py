@@ -16,7 +16,7 @@ from . import models
 from .const import (
     ActionChoices, OperateChoices,
     MFAChoices, LoginStatusChoices,
-    LoginTypeChoices, ActivityChoices,
+    LoginTypeChoices, ActivityChoices, USER_DEVICE_TYPE_CHOICES,
 )
 
 
@@ -92,7 +92,7 @@ class JobsAuditSerializer(JobSerializer):
         invalid_fields = submitted_fields - allowed_fields
         if invalid_fields:
             raise serializers.ValidationError(
-                f"Updating  {', '.join(invalid_fields)} fields is not allowed"
+                _('Updating %(fields)s fields is not allowed') % {'fields': ', '.join(invalid_fields)}
             )
         return attrs
 
@@ -113,7 +113,7 @@ class FTPLogSerializer(serializers.ModelSerializer):
 
 class UserLoginLogSerializer(serializers.ModelSerializer):
     mfa = LabeledChoiceField(choices=MFAChoices.choices, label=_("MFA"))
-    type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))
+    type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Login type"))
     status = LabeledChoiceField(choices=LoginStatusChoices.choices, label=_("Status"))
     city = serializers.ReadOnlyField(source='city_display', label=_("Login city"))
 
@@ -260,7 +260,8 @@ class FileSerializer(serializers.Serializer):
 
 
 class UserSessionSerializer(serializers.ModelSerializer):
-    type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))
+    type = LabeledChoiceField(choices=USER_DEVICE_TYPE_CHOICES, label=_("Type"))
+    is_locked = serializers.BooleanField(read_only=True, default=False, label=_("Locked"))
     user = ObjectRelatedField(required=False, queryset=User.objects, label=_('User'))
     date_expired = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", label=_('Date expired'))
     is_current_user_session = serializers.SerializerMethodField()
@@ -271,7 +272,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'type', 'ip', 'city', 'user_agent', 'user', 'is_current_user_session',
-            'backend', 'backend_display', 'is_active', 'date_created', 'date_expired'
+            'backend', 'backend_display', 'is_active', 'is_locked', 'date_created', 'date_expired'
         ]
         fields = fields_small
         extra_kwargs = {
@@ -282,4 +283,9 @@ class UserSessionSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request:
             return False
+        if isinstance(obj, dict):
+            if obj['type'] == 'C':
+                session = getattr(request, 'client_login_session', None)
+                return session is not None and session.pk == obj['id']
+            return request.session.session_key == obj['key']
         return request.session.session_key == obj.key

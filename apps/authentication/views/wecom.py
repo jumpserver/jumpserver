@@ -133,12 +133,6 @@ class WeComQRLoginView(WeComQRMixin, View):
 class WeComQRLoginCallbackView(WeComQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
 
-    def verify_state(self):
-        session_key = wecom_tool.WECOM_STATE_SESSION_KEY
-        if session_key in self.request.session:
-            return super().verify_state()
-        return wecom_tool.check_state(self.request.GET.get('state'))
-
     client_type_path = 'common.sdk.im.wecom.WeCom'
     client_auth_params = {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
     user_type = 'wecom'
@@ -154,7 +148,7 @@ class WeComOAuthLoginView(WeComOAuthMixin, View):
 
     @pre_save_next_to_session()
     def get(self, request: HttpRequest):
-        redirect_url = request.GET.get('redirect_url')
+        redirect_url = request.GET.get('redirect_url') or request.GET.get('next')
         redirect_uri = reverse('authentication:wecom-oauth-login-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
         url = self.get_oauth_url(redirect_uri)

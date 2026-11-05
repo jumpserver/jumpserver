@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 import re
+import sys
 import threading
 import time
 import uuid
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
+from weakref import WeakValueDictionary
 
 from django.core.cache import cache
 from django.db import models, transaction
@@ -317,13 +319,25 @@ class FamilyMixin:
 
 class NodeAllAssetsMappingMixin:
     # { org_id: { node_key: [ asset1_id, asset2_id ] } }
-    orgid_nodekey_assetsid_mapping = defaultdict(dict)
-    locks_for_get_mapping_from_cache = defaultdict(threading.Lock)
+    orgid_nodekey_assetsid_mapping = OrderedDict()
+    locks_for_get_mapping_from_cache = WeakValueDictionary()
+    _mapping_cache_lock = threading.RLock()
+    _mapping_cache_metadata = {}
+    # Redis remains the shared source; large organizations are not duplicated
+    # indefinitely in every Web/worker/beat process.
+    _mapping_cache_max_bytes = 8 * 1024 * 1024
+    _mapping_cache_max_orgs = 32
+    _mapping_cache_ttl = 60
 
     @classmethod
     def get_lock(cls, org_id):
-        lock = cls.locks_for_get_mapping_from_cache[str(org_id)]
-        return lock
+        with cls._mapping_cache_lock:
+            org_id = str(org_id)
+            lock = cls.locks_for_get_mapping_from_cache.get(org_id)
+            if lock is None:
+                lock = threading.Lock()
+                cls.locks_for_get_mapping_from_cache[org_id] = lock
+            return lock
 
     @classmethod
     def get_node_all_asset_ids_mapping(cls, org_id):
@@ -339,17 +353,60 @@ class NodeAllAssetsMappingMixin:
     # from memory
     @classmethod
     def get_node_all_asset_ids_mapping_from_memory(cls, org_id):
-        mapping = cls.orgid_nodekey_assetsid_mapping.get(org_id, {})
-        return mapping
+        org_id = str(org_id)
+        with cls._mapping_cache_lock:
+            cls._expire_old_memory_mappings()
+            mapping = cls.orgid_nodekey_assetsid_mapping.get(org_id)
+            if mapping is None:
+                return {}
+            cls.orgid_nodekey_assetsid_mapping.move_to_end(org_id)
+            return mapping
 
     @classmethod
     def set_node_all_asset_ids_mapping_to_memory(cls, org_id, mapping):
-        cls.orgid_nodekey_assetsid_mapping[org_id] = mapping
+        # Conservatively count repeated references too. Stop as soon as this
+        # entry exceeds the budget rather than allocating a recursive seen set.
+        size = sys.getsizeof(mapping)
+        for key, values in mapping.items():
+            size += sys.getsizeof(key) + sys.getsizeof(values)
+            if size > cls._mapping_cache_max_bytes:
+                break
+            for value in values:
+                size += sys.getsizeof(value)
+                if size > cls._mapping_cache_max_bytes:
+                    break
+            if size > cls._mapping_cache_max_bytes:
+                break
+        with cls._mapping_cache_lock:
+            cls.expire_node_all_asset_ids_memory_mapping(org_id)
+            cls._expire_old_memory_mappings()
+            if size > cls._mapping_cache_max_bytes:
+                return
+            total = sum(meta[1] for meta in cls._mapping_cache_metadata.values())
+            while cls.orgid_nodekey_assetsid_mapping and (
+                total + size > cls._mapping_cache_max_bytes
+                or len(cls.orgid_nodekey_assetsid_mapping) >= cls._mapping_cache_max_orgs
+            ):
+                oldest = next(iter(cls.orgid_nodekey_assetsid_mapping))
+                total -= cls._mapping_cache_metadata[oldest][1]
+                cls.expire_node_all_asset_ids_memory_mapping(oldest)
+            org_id = str(org_id)
+            cls.orgid_nodekey_assetsid_mapping[org_id] = mapping
+            cls._mapping_cache_metadata[org_id] = (time.monotonic() + cls._mapping_cache_ttl, size)
+
+    @classmethod
+    def _expire_old_memory_mappings(cls):
+        now = time.monotonic()
+        expired = [key for key, (expires, _) in cls._mapping_cache_metadata.items() if expires <= now]
+        for key in expired:
+            cls.expire_node_all_asset_ids_memory_mapping(key)
 
     @classmethod
     def expire_node_all_asset_ids_memory_mapping(cls, org_id):
-        org_id = str(org_id)
-        cls.orgid_nodekey_assetsid_mapping.pop(org_id, None)
+        with cls._mapping_cache_lock:
+            org_id = str(org_id)
+            cls.orgid_nodekey_assetsid_mapping.pop(org_id, None)
+            cls._mapping_cache_metadata.pop(org_id, None)
 
     @classmethod
     def expire_all_orgs_node_all_asset_ids_memory_mapping(cls):

@@ -1,6 +1,6 @@
 from django.views.generic import FormView
-from django import forms
 from django.utils.translation import gettext_lazy as _
+from django import forms
 
 from authentication import errors
 from authentication.mixins import AuthMixin
@@ -12,7 +12,7 @@ from common.utils import FlashMessageUtil
 
 
 class UserFaceCaptureForm(forms.Form):
-    code = forms.CharField(label='MFA Code', max_length=128, required=False)
+    code = forms.CharField(label=_('MFA Code'), max_length=128, required=False)
 
 
 class UserFaceCaptureView(AuthMixin, FormView):

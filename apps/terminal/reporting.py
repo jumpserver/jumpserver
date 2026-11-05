@@ -12,22 +12,24 @@ class SessionReportExporter(BaseListReportExporter):
 
     def get_summary_sections(self):
         sessions = self.records
-        success_sessions = [item for item in sessions if item.is_success]
-        failed_sessions = [item for item in sessions if not item.is_success]
-        finished_sessions = [item for item in sessions if item.is_finished]
-        active_sessions = [item for item in sessions if not item.is_finished]
-        replay_sessions = [item for item in sessions if item.has_replay]
-        command_sessions = [item for item in sessions if item.has_command]
+        success_count = finished_count = replay_count = command_count = 0
+        for item in sessions:
+            success_count += bool(item.is_success)
+            finished_count += bool(item.is_finished)
+            replay_count += bool(item.has_replay)
+            command_count += bool(item.has_command)
+        failed_count = len(sessions) - success_count
+        active_count = len(sessions) - finished_count
 
         overview = OrderedDict([
             (_('Total records'), len(sessions)),
-            (_('Successful sessions'), len(success_sessions)),
-            (_('Failed sessions'), len(failed_sessions)),
-            (_('Finished sessions'), len(finished_sessions)),
-            (_('Active sessions'), len(active_sessions)),
-            (_('Success rate'), self.format_percent(len(success_sessions), len(sessions))),
-            (_('Sessions with replay'), len(replay_sessions)),
-            (_('Sessions with commands'), len(command_sessions)),
+            (_('Successful sessions'), success_count),
+            (_('Failed sessions'), failed_count),
+            (_('Finished sessions'), finished_count),
+            (_('Active sessions'), active_count),
+            (_('Success rate'), self.format_percent(success_count, len(sessions))),
+            (_('Sessions with replay'), replay_count),
+            (_('Sessions with commands'), command_count),
             (_('Unique users'), len({item.user_id or item.user for item in sessions if item.user or item.user_id})),
             (_('Unique assets'), len({item.asset_id or item.asset for item in sessions if item.asset or item.asset_id})),
             (_('Unique terminals'), len({
@@ -40,6 +42,7 @@ class SessionReportExporter(BaseListReportExporter):
         login_from_counter = Counter()
         user_counter = Counter()
         asset_counter = Counter()
+        resource_labels = {}
         terminal_counter = Counter()
         ip_counter = Counter()
         duration_bucket_counter = Counter({
@@ -64,10 +67,16 @@ class SessionReportExporter(BaseListReportExporter):
             protocol_counter[str(session.protocol or '-')] += 1
             login_from_counter[str(session.login_from_display or '-')] += 1
 
-            if session.user:
-                user_counter[str(session.user)] += 1
-            if session.asset:
-                asset_counter[str(session.asset)] += 1
+            for field, counter in (('user', user_counter), ('asset', asset_counter)):
+                label = getattr(session, field)
+                identity = getattr(session, f'{field}_id') or label
+                if not identity:
+                    continue
+                counter[identity] += 1
+                key = (field, identity)
+                recorded = (session.date_start, label)
+                if label and (key not in resource_labels or recorded > resource_labels[key]):
+                    resource_labels[key] = recorded
             if session.terminal_display:
                 terminal_counter[str(session.terminal_display)] += 1
             if session.remote_addr:
@@ -96,6 +105,14 @@ class SessionReportExporter(BaseListReportExporter):
                 self.format_percent(item['success'], item['total']),
             ])
 
+        def resource_rows(field, counter):
+            rows = [
+                (resource_labels.get((field, identity), (None, _('Not recorded')))[1], count, identity)
+                for identity, count in counter.items()
+            ]
+            rows.sort(key=lambda row: (-row[1], str(row[0]), str(row[2])))
+            return [[name, count] for name, count, _identity in rows[:10]]
+
         return [
             self.build_key_value_section(_('Overview'), overview.items()),
             self.build_table_section(
@@ -116,12 +133,12 @@ class SessionReportExporter(BaseListReportExporter):
             self.build_table_section(
                 _('User Top 10'),
                 [_('User'), _('Count')],
-                self.build_counter_rows(user_counter, top_n=10),
+                resource_rows('user', user_counter),
             ),
             self.build_table_section(
                 _('Asset Top 10'),
                 [_('Asset'), _('Count')],
-                self.build_counter_rows(asset_counter, top_n=10),
+                resource_rows('asset', asset_counter),
             ),
             self.build_table_section(
                 _('Terminal Top 10'),

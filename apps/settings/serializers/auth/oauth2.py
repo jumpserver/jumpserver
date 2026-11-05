@@ -77,7 +77,8 @@ class OAuth2SettingSerializer(serializers.Serializer):
         required=True, label=_('User attribute'),
         help_text=_(
             'User attribute mapping, where the `key` is this system user attribute name and the '
-            '`value` is the OAuth2 service user attribute name'
+            '`value` is the OAuth2 service user attribute name. '
+            'Use dot-separated paths for nested attributes, e.g. `attributes.account_no`'
         )
     )
     AUTH_OAUTH2_ALWAYS_UPDATE_USER = serializers.BooleanField(

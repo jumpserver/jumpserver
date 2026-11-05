@@ -93,6 +93,10 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Ping asset',
+                'permissions': [
+                    ('view_pingexecution', 'Can view asset connectivity execution'),
+                    ('add_pingexecution', 'Can add asset connectivity execution'),
+                ],
             },
             bases=('assets.assetbaseautomation',),
         ),

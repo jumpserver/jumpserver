@@ -3,6 +3,7 @@ from common.utils import (
 )
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext
 from users.face_codec import get_face_codec
 
 logger = get_logger(__file__)
@@ -20,20 +21,20 @@ class FaceMixin:
 
     def get_face_vector(self) -> list[float]:
         if not self.face_vector:
-            raise ValidationError("Face vector is not set.")
+            raise ValidationError(gettext("Face vector is not set."))
         codec = get_face_codec()
         if not codec:
-            raise ValidationError("Face recognition backend is not available.")
+            raise ValidationError(gettext("Face recognition backend is not available."))
         return codec.decode_code(str(self.face_vector))
 
     def check_face(
         self, code, distance_threshold=None, similarity_threshold=None
     ) -> bool:
         if not self.face_vector:
-            raise ValidationError("Face vector is not set.")
+            raise ValidationError(gettext("Face vector is not set."))
         codec = get_face_codec()
         if not codec:
-            raise ValidationError("Face recognition backend is not available.")
+            raise ValidationError(gettext("Face recognition backend is not available."))
         distance_threshold = (
             settings.FACE_RECOGNITION_DISTANCE_THRESHOLD
             if distance_threshold is None

@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
@@ -123,7 +123,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         else:
             template = template_id
         if not template:
-            raise serializers.ValidationError({'template': 'Template not found'})
+            raise serializers.ValidationError({'template': gettext('Template not found')})
 
         self._template = template
         try:
@@ -459,7 +459,7 @@ class AssetAccountBulkSerializer(
         if template:
             su_from = template.get_su_from_account(asset)
         elif su_from_username:
-            su_from = asset.accounts.filter(username=su_from_username).first()
+            su_from = asset.find_account(su_from_username)
         validated_data['su_from'] = su_from
 
     def perform_create(self, vd, handler):

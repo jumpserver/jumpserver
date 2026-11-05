@@ -8,7 +8,7 @@ else:
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, NOT_PROVIDED, OneToOneField
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
@@ -187,7 +187,7 @@ class BulkListSerializerMixin:
                 elif "pk" in item:
                     pk = item["pk"]
                 else:
-                    raise ValidationError("id or pk not in data")
+                    raise ValidationError(gettext("id or pk not in data"))
                 child = self.instance.get(pk=pk)
                 self.child.instance = child
                 self.child.initial_data = item

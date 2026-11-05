@@ -1,18 +1,6 @@
-name: Build and Push Ansible Executor Image
+name: Build Legacy Ansible Executor Image (deprecated)
 
 on:
-  pull_request:
-    branches:
-        - 'dev'
-        - 'dev_osm'
-        - 'v*'
-    paths:
-        - utils/ansible_executor/**
-        - apps/libs/ansible/**
-    types:
-        - opened
-        - synchronize
-        - reopened
   workflow_dispatch:
     inputs:
       branch:

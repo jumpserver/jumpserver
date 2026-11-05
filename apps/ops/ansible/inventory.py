@@ -4,11 +4,13 @@ import os
 import re
 import shlex
 import sys
+import tempfile
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
 from assets import const
+from .utils import escape_jinja2_syntax
 
 __all__ = ['JMSInventory']
 
@@ -98,8 +100,14 @@ class JMSInventory:
             proxy_command_args.extend(["-W", "%h:%p", "-q", "--", gateway_target])
 
         if gateway.password:
-            password = escape_ssh_config_percent(gateway.password)
-            proxy_command_args = ["sshpass", "-p", password, *proxy_command_args]
+            # Keep secrets out of both sshpass and its parent SSH command line.
+            with tempfile.NamedTemporaryFile(
+                mode='w', encoding='utf-8', prefix='.gateway-password-', dir=path_dir, delete=False,
+            ) as password_file:
+                password_file.write(gateway.password)
+            proxy_command_args = [
+                "sshpass", "-f", escape_ssh_config_percent(password_file.name), *proxy_command_args,
+            ]
 
         proxy_command_value = "ProxyCommand=" + shell_join(proxy_command_args)
         return {"ansible_ssh_common_args": "-o " + shlex.quote(proxy_command_value)}
@@ -107,13 +115,13 @@ class JMSInventory:
     def make_account_ansible_vars(self, asset, account, path_dir):
         username = self.get_username(asset, account)
         var = {
-            'ansible_user': username,
+            'ansible_user': escape_jinja2_syntax(username),
         }
         if not account.secret:
             return var
 
         if account.secret_type == 'password':
-            var['ansible_password'] = account.escape_jinja2_syntax(account.secret)
+            var['ansible_password'] = escape_jinja2_syntax(account.secret)
         elif account.secret_type == 'ssh_key':
             var['ansible_ssh_private_key_file'] = account.get_private_key_path(path_dir)
         return var
@@ -126,7 +134,7 @@ class JMSInventory:
         su_method = su_from_auth['ansible_become_method']
         su_from = account.su_from
         su_from_password = (
-            account.escape_jinja2_syntax(su_from.secret)
+            escape_jinja2_syntax(su_from.secret)
             if su_from.secret_type == 'password'
             else None
         )
@@ -207,7 +215,7 @@ class JMSInventory:
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
-            su_from_auth = account.get_ansible_become_auth()
+            su_from_auth = account.get_ansible_become_auth(path_dir=path_dir)
             host.update(su_from_auth)
             host.update(self.make_custom_become_ansible_vars(account, su_from_auth, path_dir))
         elif platform.su_enabled and not su_from and \
@@ -232,7 +240,7 @@ class JMSInventory:
                         host['ansible_become_user'] = 'root'
                     if account.secret_type == 'password':
                         host['ansible_become_password'] = (
-                            account.escape_jinja2_syntax(account.secret)
+                            escape_jinja2_syntax(account.secret)
                         )
         else:
             host.update(self.make_account_ansible_vars(asset, account, path_dir))
@@ -304,16 +312,17 @@ class JMSInventory:
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': tp, 'category': category,
                 'protocol': protocol.name, 'port': protocol.port,
-                'spec_info': asset.spec_info, 'secret_info': secret_info,
+                'spec_info': escape_jinja2_syntax(asset.spec_info),
+                'secret_info': secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
                 'origin_address': asset.address
             },
             'jms_account': {
                 'id': str(account.id),
-                'name': account.name,
-                'username': username,
+                'name': escape_jinja2_syntax(account.name),
+                'username': escape_jinja2_syntax(username),
                 'privileged': account.privileged,
-                'secret': account.escape_jinja2_syntax(account.secret),
+                'secret': escape_jinja2_syntax(account.secret),
                 'secret_type': account.secret_type, 'private_key_path': account.get_private_key_path(path_dir)
             } if account else None
         })

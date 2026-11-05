@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -77,17 +78,43 @@ class AutomationAddAssetApi(generics.UpdateAPIView):
             return Response({"error": serializer.errors})
 
 
+NODE_UPDATE_ACTIONS = ('add', 'remove')
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name='action', type=str, location=OpenApiParameter.QUERY,
+            required=True, enum=NODE_UPDATE_ACTIONS,
+            description=_('Add nodes to or remove nodes from the automation.'),
+        ),
+    ],
+    responses={
+        200: {
+            'type': 'object',
+            'properties': {'msg': {'type': 'string', 'enum': ['ok']}},
+            'required': ['msg'],
+        },
+        400: {
+            'type': 'object',
+            'properties': {
+                'error': {'oneOf': [{'type': 'string'}, {'type': 'object'}]},
+            },
+            'required': ['error'],
+        },
+    },
+)
 class AutomationNodeAddRemoveApi(generics.UpdateAPIView):
     model = BaseAutomation
     serializer_class = serializers.UpdateNodeSerializer
     http_method_names = ['patch']
 
     def update(self, request, *args, **kwargs):
-        action_params = ['add', 'remove']
+        action_params = NODE_UPDATE_ACTIONS
         action = request.query_params.get('action')
         if action not in action_params:
             err_info = _("The parameter 'action' must be [{}]".format(','.join(action_params)))
-            return Response({"error": err_info})
+            return Response({"error": err_info}, status=status.HTTP_400_BAD_REQUEST)
 
         instance = self.get_object()
         serializer = self.serializer_class(data=request.data)
@@ -98,7 +125,7 @@ class AutomationNodeAddRemoveApi(generics.UpdateAPIView):
                 getattr(instance.nodes, action)(*tuple(nodes))
             return Response({"msg": "ok"})
         else:
-            return Response({"error": serializer.errors})
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AutomationExecutionViewSet(
@@ -108,6 +135,7 @@ class AutomationExecutionViewSet(
     search_fields = ('id', 'trigger', 'automation__name')
     filterset_class = AutomationExecutionFilterSet
     serializer_class = serializers.AutomationExecutionSerializer
+    execute_task = execute_account_automation_task
     tp: str
 
     def get_queryset(self):
@@ -131,7 +159,7 @@ class AutomationExecutionViewSet(
             return Response({
                 'task': str(execution.id), 'credential_id': str(rotation.credential_id),
             }, status=status.HTTP_201_CREATED)
-        task = execute_account_automation_task.delay(
+        task = self.execute_task.delay(
             pid=str(automation.pk), trigger=Trigger.manual, tp=self.tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)

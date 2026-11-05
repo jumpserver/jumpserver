@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 import ipaddress
-from datetime import datetime, timedelta
+from datetime import timedelta
 from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
 from django.shortcuts import reverse
 from django.templatetags.static import static
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
 
 from audits.models import UserLoginLog
 from assets.const import Protocol
@@ -21,18 +23,32 @@ from .notifications import DifferentCityLoginMessage
 logger = get_logger(__file__)
 
 
-def should_use_oracle_sysdba(connect_options, protocol):
-    return protocol == Protocol.oracle and is_true(
-        (connect_options or {}).get('use_sysdba', False)
-    )
+def should_use_oracle_sysdba(connect_options, protocol, asset=None):
+    if protocol != Protocol.oracle:
+        return False
+    if is_true((connect_options or {}).get('use_sysdba', False)):
+        return True
+    if asset is None:
+        return False
+    # A default false submitted by a client must not disable the platform role.
+    oracle = asset.platform.protocols.filter(name=Protocol.oracle).first()
+    return oracle is not None and is_true((oracle.setting or {}).get('sysdba', False))
 
 
-def get_effective_connect_options(connect_options, protocol):
+def get_effective_connect_options(connect_options, protocol, asset=None):
     options = dict(connect_options or {})
+    if protocol != Protocol.rdp:
+        options.pop('rdp_security', None)
+    elif 'rdp_security' in options and options['rdp_security'] not in (
+        'default', 'any', 'rdp', 'tls', 'nla',
+    ):
+        raise ValidationError({
+            'connect_options': {'rdp_security': _('Invalid RDP security layer.')},
+        })
     if protocol != Protocol.oracle:
         options.pop('use_sysdba', None)
         return options
-    options['use_sysdba'] = should_use_oracle_sysdba(options, protocol)
+    options['use_sysdba'] = should_use_oracle_sysdba(options, protocol, asset)
     return options
 
 
@@ -46,20 +62,17 @@ def check_different_city_login_if_need(user, request):
     if is_private:
         return
     usernames = [user.username, f"{user.name}({user.username})"]
-    last_user_login = UserLoginLog.objects.exclude(
-        city__in=city_white
-    ).filter(username__in=usernames, status=True).first()
-    if not last_user_login:
+    login_logs = UserLoginLog.objects.filter(
+        username__in=usernames, status=True,
+    ).exclude(city__in=city_white)
+    if not login_logs.exists():
         return
 
     city = get_ip_city(ip)
-    last_cities = UserLoginLog.objects.filter(
-        datetime__gte=datetime.now() - timedelta(days=7),
-        username__in=usernames,
-        status=True
-    ).exclude(city__in=city_white).values_list('city', flat=True).distinct()
-
-    if city in last_cities:
+    if login_logs.filter(
+        datetime__gte=timezone.now() - timedelta(days=7),
+        city=city,
+    ).exists():
         return
 
     DifferentCityLoginMessage(user, ip, city).publish_async()

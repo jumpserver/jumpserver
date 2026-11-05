@@ -1,3 +1,4 @@
+from .workflow import WorkflowACLSerializerMixin
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -32,7 +33,7 @@ class CommandGroupSerializer(BulkOrgResourceModelSerializer):
         fields = ['id', 'name', 'type', 'content', 'ignore_case', 'comment']
 
 
-class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
+class CommandFilterACLSerializer(WorkflowACLSerializerMixin, BaseSerializer, BulkOrgResourceModelSerializer):
     command_groups = ObjectRelatedField(
         queryset=CommandGroup.objects, many=True, required=False, label=_('Command group')
     )
@@ -46,7 +47,7 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
             'command_groups_amount': 'command_groups',
         }
         amount_fields = list(relation_count_fields)
-        fields = BaseSerializer.Meta.fields + ['command_groups'] + amount_fields
+        fields = BaseSerializer.Meta.fields + ['command_groups', 'workflow'] + amount_fields
         action_choices_exclude = [
             ActionChoices.notice,
             ActionChoices.face_verify,

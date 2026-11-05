@@ -233,7 +233,9 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
 
         items = {
             _("User"): command['user'],
+            _("Source"): command.get('source', _('Job')),
             _("Level"): level,
+            _("Reason"): command.get('reason', ''),
             _("Protocol"): command.get('_protocol', ''),
             _("Remote addr"): command.get('_remote_addr', ''),
             _("Policy"): cmd_acl_name or cmd_group_name or '',

@@ -7,13 +7,18 @@ from django.core.cache import cache
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication as BaseOAuth2Authentication
+from oauth2_provider.models import get_access_token_model
 
 from accounts.models import CredentialClientInstance, IntegrationApplication
 from common.auth import signature
+from common.auth.cache import BEARER_TOKEN_KEY, valid_token_format, valid_uuid
 from common.decorators import merge_delay_run
 from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip, get_request_ip
 from users.models import User
 from ..models import AccessKey, PrivateToken
+
+OAuthAccessToken = get_access_token_model()
 
 
 def date_more_than(d, seconds):
@@ -24,10 +29,13 @@ def date_more_than(d, seconds):
 def update_token_last_used(tokens=()):
     access_keys_ids = [token.id for token in tokens if isinstance(token, AccessKey)]
     private_token_keys = [token.key for token in tokens if isinstance(token, PrivateToken)]
+    oauth_token_ids = [token.id for token in tokens if isinstance(token, OAuthAccessToken)]
     if len(access_keys_ids) > 0:
         AccessKey.objects.filter(id__in=access_keys_ids).update(date_last_used=timezone.now())
     if len(private_token_keys) > 0:
         PrivateToken.objects.filter(key__in=private_token_keys).update(date_last_used=timezone.now())
+    if len(oauth_token_ids) > 0:
+        OAuthAccessToken.objects.filter(id__in=oauth_token_ids).update(updated=timezone.now())
 
 
 @merge_delay_run(ttl=60)
@@ -77,9 +85,22 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
 
     @staticmethod
     def authenticate_credentials(token):
+        # Other Bearer backends (including OAuth2) must still get a chance.
+        if not valid_token_format(token, 36):
+            return None, None
+        cache_key = BEARER_TOKEN_KEY.format(token=token)
+        missing = object()
+        user_id = cache.get(cache_key, missing)
+        if user_id is missing:
+            return None, None
+        if not valid_uuid(user_id):
+            cache.delete(cache_key)
+            raise exceptions.AuthenticationFailed(_('Invalid token.'))
         model = get_user_model()
-        user_id = cache.get(token)
         user = get_object_or_none(model, id=user_id)
+        if user is None or not user.is_valid:
+            cache.delete(cache_key)
+            raise exceptions.AuthenticationFailed(_('User is inactive or expired.'))
         return user, None
 
     def authenticate_header(self, request):
@@ -98,7 +119,46 @@ class PrivateTokenAuthentication(authentication.TokenAuthentication):
         return user, token
 
 
+class OAuth2Authentication(BaseOAuth2Authentication):
+    allow_locked_client_session = False
+
+    def authenticate(self, request):
+        from authentication.services.client_login_session import (
+            ClientSessionExpired, ClientSessionLocked, expired_session_from_receipt, validate_access_token,
+        )
+
+        user_token = super().authenticate(request)
+        if not user_token:
+            auth = authentication.get_authorization_header(request).split()
+            if len(auth) == 2 and auth[0].lower() == b'bearer':
+                session = expired_session_from_receipt(
+                    request.headers.get('X-JMS-Client-Login-Session'), auth[1].decode('utf-8', errors='replace'),
+                    'access_token',
+                )
+                if session:
+                    request._request.expired_client_login_session_id = session.pk
+                    raise ClientSessionExpired(session)
+        if user_token:
+            _, token = user_token
+            try:
+                request.client_login_session = validate_access_token(token)
+            except ClientSessionExpired as error:
+                request._request.expired_client_login_session_id = error.session_id
+                raise
+            session = request.client_login_session
+            # Identity-only bootstrap is needed to restore a locked account; asset/business APIs remain blocked.
+            bootstrap = request.method == 'GET' and request.path_info in (
+                '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+                '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+            )
+            if session and session.is_locked and not (self.allow_locked_client_session or bootstrap):
+                raise ClientSessionLocked(session)
+            update_token_last_used.delay(tokens=(token,))
+        return user_token
+
+
 class SessionAuthentication(authentication.SessionAuthentication):
+    allow_locked_web_session = False
     def authenticate(self, request):
         """
         Returns a `User` if the request session currently has a logged in user.
@@ -119,7 +179,15 @@ class SessionAuthentication(authentication.SessionAuthentication):
             except exceptions.AuthenticationFailed:
                 return None
 
-        # CSRF passed with authenticated user
+        bootstrap = request.method == 'GET' and request.path_info in (
+            '/api/v1/users/profile/', '/api/v1/users/profile/permissions/',
+            '/api/v1/orgs/orgs/current/', '/api/v1/settings/public/',
+        ) or (request.path_info == '/api/v1/authentication/user-session/'
+              and request.method in ('GET', 'DELETE'))
+        if not self.allow_locked_web_session and not bootstrap:
+            from authentication.services.web_session_lock import session_locked, WebSessionLocked
+            if session_locked(request.session.session_key, user.pk):
+                raise WebSessionLocked()
         return user, None
 
 
@@ -131,6 +199,7 @@ class SignatureAuthentication(signature.SignatureAuthentication):
     # will be what the client has sent, in the case that both RSA
     # and HMAC are supported at your site (and also for expansion).
     model = get_user_model()
+    access_key = None
 
     def fetch_user_data(self, key_id, algorithm="hmac-sha256"):
         # ...
@@ -140,10 +209,14 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             if not key.is_valid:
                 return None, None
             user, secret = key.user, str(key.secret)
-            after_authenticate_update_date(user, key)
+            self.access_key = key
             return user, secret
         except (AccessKey.DoesNotExist, exceptions.ValidationError):
             return None, None
+
+    def after_authenticate_update_date(self, user):
+        # Key lookup precedes IP/signature checks; only this success hook records usage.
+        after_authenticate_update_date(user, self.access_key)
 
     def is_ip_allow(self, key_id, request):
         try:

@@ -6,6 +6,7 @@ from drf_spectacular.contrib.django_filters import DjangoFilterExtension
 from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.generators import SchemaGenerator
 
+from common.drf.filters import CustomFilterBackend
 from rbac.permissions import RBACPermission
 
 
@@ -175,22 +176,22 @@ class CustomAutoSchema(AutoSchema):
         else:
             return description
 
-    def get_filter_parameters(self):
-        if not self.should_filter():
-            return []
-
-        fields = []
-        if hasattr(self.view, 'get_filter_backends'):
+    def get_filter_backends(self):
+        if callable(getattr(self.view, 'get_filter_backends', None)):
             backends = self.view.get_filter_backends()
-        elif hasattr(self.view, 'filter_backends'):
-            backends = self.view.filter_backends
         else:
-            backends = []
-        for filter_backend in backends:
-            fields += self.probe_inspectors(
-                self.filter_inspectors, 'get_filter_parameters', filter_backend()
-            ) or []
-        return fields
+            backends = getattr(self.view, 'filter_backends', [])
+        if self._is_list_view():
+            return backends
+        # Parameters handled by the view can also belong to detail/write APIs.
+        # Keep queryset filtering parameters limited to list operations.
+        return [backend for backend in backends if issubclass(backend, CustomFilterBackend)]
+
+    def get_response_serializers(self):
+        # Allow views with different input/output bodies to describe the output.
+        if callable(getattr(self.view, 'get_response_serializer', None)):
+            return self.view.get_response_serializer()
+        return super().get_response_serializers()
 
     def get_auth(self):
         return [{'Bearer': []}]
@@ -430,6 +431,11 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
         field = self.target
         description = getattr(field, 'help_text', '') or ''
         title = getattr(field, 'label', '') or ''
+        choices = list(field.choices)
+        value_schema = build_basic_type(type(next((value for value in choices if value is not None), '')))
+        value_schema['enum'] = choices
+        if None in choices:
+            value_schema['nullable'] = True
         
         if getattr(field, 'many', False):
             return {
@@ -437,7 +443,7 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
                 'items': {
                     'type': 'object',
                     'properties': {
-                        'value': {'type': 'string'},
+                        'value': value_schema,
                         'label': {'type': 'string'}
                     }
                 },
@@ -448,7 +454,7 @@ class LabeledChoiceFieldExtension(OpenApiSerializerFieldExtension):
             return {
                 'type': 'object',
                 'properties': {
-                    'value': {'type': 'string'},
+                    'value': value_schema,
                     'label': {'type': 'string'}
                 },
                 'description': description,

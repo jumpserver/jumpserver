@@ -10,9 +10,9 @@ __all__ = ['WeComSettingSerializer']
 class WeComSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('WeCom')
 
-    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label='Corporation ID')
-    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label='App Agent ID')
-    WECOM_SECRET = EncryptedField(max_length=256, required=False, label='App Secret')
+    WECOM_CORPID = serializers.CharField(max_length=256, required=True, label=_('Corporation ID'))
+    WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label=_('App Agent ID'))
+    WECOM_SECRET = EncryptedField(max_length=256, required=False, label=_('App Secret'))
     AUTH_WECOM = serializers.BooleanField(default=False, label=_('WeCom'))
     WECOM_RENAME_ATTRIBUTES = serializers.JSONField(
         required=False, label=_('User attribute'),

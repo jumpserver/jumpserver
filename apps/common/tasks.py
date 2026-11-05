@@ -31,26 +31,7 @@ def task_activity_callback(self, subject, message, recipient_list, *args, **kwar
     return resource_ids,
 
 
-@shared_task(
-    verbose_name=_("Send email"),
-    activity_callback=task_activity_callback,
-    description=_(
-        "This task will be executed when sending email notifications"
-    )
-)
-def send_mail_async(*args, **kwargs):
-    """ Using celery to send email async
-
-    You can use it as django send_mail function
-
-    Example:
-    send_mail_sync.delay(subject, message, from_mail, recipient_list, fail_silently=False, html_message=None)
-
-    Also, you can ignore the from_mail, unlike django send_mail, from_email is not a required args:
-
-    Example:
-    send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
-    """
+def deliver_mail(*args, safe_errors=False, **kwargs):
     from users.utils import activate_user_language
 
     if len(args) == 3:
@@ -81,7 +62,34 @@ def send_mail_async(*args, **kwargs):
             with activate_user_language(user):
                 send_mail(connection=get_email_connection(), *args, **kwargs)
         except Exception as e:
+            if safe_errors:
+                # SMTP 异常可能回显正文，必须在此处打印日志前去敏；
+                # 仅在外层验证码任务捕获异常，无法阻止这里的日志泄露。
+                raise RuntimeError('Verification email delivery failed') from None
             logger.error(f"Sending mail to {user.email} error: {e}")
+
+
+@shared_task(
+    verbose_name=_("Send email"),
+    activity_callback=task_activity_callback,
+    description=_(
+        "This task will be executed when sending email notifications"
+    )
+)
+def send_mail_async(*args, **kwargs):
+    """ Using celery to send email async
+
+    You can use it as django send_mail function
+
+    Example:
+    send_mail_sync.delay(subject, message, from_mail, recipient_list, fail_silently=False, html_message=None)
+
+    Also, you can ignore the from_mail, unlike django send_mail, from_email is not a required args:
+
+    Example:
+    send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
+    """
+    deliver_mail(*args, **kwargs)
 
 
 @shared_task(

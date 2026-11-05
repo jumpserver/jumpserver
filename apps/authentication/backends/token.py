@@ -1,6 +1,7 @@
 from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext
 
 from authentication.models import TempToken
 from .base import JMSBaseAuthBackend
@@ -20,7 +21,9 @@ class TempTokenAuthBackend(JMSBaseAuthBackend):
         if not token:
             return None
         if not token.is_valid:
-            raise PermissionDenied('Token is invalid, expired at {}'.format(token.date_expired))
+            raise PermissionDenied(
+                gettext('Token is invalid, expired at {}').format(token.date_expired)
+            )
 
         token.verified = True
         token.date_verified = timezone.now()

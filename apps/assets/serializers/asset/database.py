@@ -61,7 +61,7 @@ class DatabaseSerializer(AssetSerializer):
 
         if platform.type in [
             'mysql', 'mariadb', 'oracle', 'sqlserver',
-            'db2', 'dameng', 'clickhouse', 'redis'
+            'db2', 'dameng', 'oceanbase', 'clickhouse', 'redis'
         ]:
             db_field.required = False
             db_field.allow_blank = True

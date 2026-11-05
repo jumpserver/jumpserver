@@ -9,6 +9,7 @@ MODELS_NEED_RECORD = set()
 
 
 class OperateChoices(TextChoices):
+    create = "create", _("Create file")
     mkdir = "mkdir", _("Mkdir")
     rmdir = "rmdir", _("Rmdir")
     delete = "delete", _("Delete")
@@ -46,6 +47,9 @@ class LoginTypeChoices(TextChoices):
     web = "W", _("Web")
     terminal = "T", _("Terminal")
     unknown = "U", _("Unknown")
+
+
+USER_DEVICE_TYPE_CHOICES = [*LoginTypeChoices.choices, ('C', _('Client'))]
 
 
 class ActivityChoices(TextChoices):

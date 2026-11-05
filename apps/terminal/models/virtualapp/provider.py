@@ -1,6 +1,6 @@
 from django.db import models, transaction
 from django.core.cache import cache
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
 from accounts.const import SecretType
@@ -52,21 +52,21 @@ class AppProvider(JMSBaseModel):
 
     def bind_terminal(self, terminal):
         if not terminal:
-            raise ValidationError('Request user has no terminal')
+            raise ValidationError(gettext('Request user has no terminal'))
         if terminal.type != 'panda':
-            raise ValidationError('Only Panda terminals can bind an application provider')
+            raise ValidationError(gettext('Only Panda terminals can bind an application provider'))
 
         with transaction.atomic():
             provider = self.__class__.objects.select_for_update().get(pk=self.pk)
             if provider.terminal_id and provider.terminal_id != terminal.pk:
-                raise ValidationError('Provider is already bound to another terminal')
+                raise ValidationError(gettext('Provider is already bound to another terminal'))
             terminal = terminal.__class__.objects.select_for_update().get(pk=terminal.pk)
             bound_provider = self.__class__.objects.select_for_update().filter(
                 terminal=terminal,
             ).exclude(pk=self.pk).first()
             if bound_provider:
                 if bound_provider.host_id:
-                    raise ValidationError('Terminal is already bound to another provider')
+                    raise ValidationError(gettext('Terminal is already bound to another provider'))
                 bound_provider.delete()
 
             self.terminal = terminal

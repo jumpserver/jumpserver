@@ -12,6 +12,8 @@
     <li>{% trans 'Expiration time' %}: {{ date_expired|date:'Y-m-d H:i' }}</li>
 </ul>
 
+{% include 'perms/_asset_permission_renewal_links.html' %}
+
 <br>
 <p>
     {% trans 'If you have any question, please contact the administrator' %}

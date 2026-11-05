@@ -183,9 +183,13 @@ def _parse_gateway_args(gateway_args):
 
     password = None
     if os.path.basename(args[0]) == 'sshpass':
-        if len(args) < 4 or args[1] != '-p':
+        if len(args) < 4 or args[1] not in ('-p', '-f'):
             raise ValueError('Unsupported sshpass gateway arguments')
-        password = args[2]
+        if args[1] == '-f':
+            with open(_unescape_ssh_config_percent(args[2]), encoding='utf-8') as password_file:
+                password = password_file.readline().rstrip('\n')
+        else:
+            password = _unescape_ssh_config_percent(args[2])
         args = args[3:]
 
     if not args or os.path.basename(args[0]) != 'ssh':
@@ -259,7 +263,7 @@ def _parse_gateway_args(gateway_args):
         raise ValueError('Invalid SSH gateway port')
 
     return {
-        'password': _unescape_ssh_config_percent(password),
+        'password': password,
         'port': port,
         'username': _unescape_ssh_config_percent(username),
         'remote_addr': _unescape_ssh_config_percent(remote_addr),

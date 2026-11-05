@@ -1,8 +1,9 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
-from common.utils import reverse, lazyproperty
-from orgs.utils import tmp_to_org
+from common.exceptions import JMSException
+from common.utils import lazyproperty, get_request_ip_or_data
 from .. import serializers
 from ..models import LoginAssetACL
 
@@ -33,51 +34,23 @@ class LoginAssetCheckAPI(CreateAPIView):
         user = self.serializer.user
         asset = self.serializer.asset
 
-        # 用户满足的 acls
-        queryset = LoginAssetACL.objects.all()
-        q = LoginAssetACL.users.get_filter_q(LoginAssetACL, 'users', user)
-        queryset = queryset.filter(q)
-        q = LoginAssetACL.assets.get_filter_q(LoginAssetACL, 'assets', asset)
-        queryset = queryset.filter(q)
         account_username = self.serializer.validated_data.get('account_username')
-        queryset = queryset.filter(accounts__contains=account_username)
-
-        with tmp_to_org(self.serializer.asset.org):
-            acl = queryset.valid().first()
-
-        if acl:
-            need_review = True
-            response_data = self._get_response_data_of_need_review(acl)
-        else:
-            need_review = False
-            response_data = {}
-        response_data['need_review'] = need_review
-        return response_data
-
-    def _get_response_data_of_need_review(self, acl) -> dict:
-        ticket = LoginAssetACL.create_login_asset_review_ticket(
-            user=self.serializer.user,
-            asset=self.serializer.asset,
-            account_username=self.serializer.validated_data.get('account_username'),
-            assignees=acl.reviewers.all(),
-            org_id=self.serializer.asset.org.id,
+        queryset = LoginAssetACL.filter_queryset(
+            user=user, asset=asset, account_username=account_username,
         )
-        review_status_url = reverse(
-            view_name='api-tickets:super-ticket-status',
-            kwargs={'pk': str(ticket.id)}
+        acl = LoginAssetACL.get_match_rule_acls(
+            user, get_request_ip_or_data(self.request), queryset,
         )
-        ticket_detail_url = reverse(
-            view_name='api-tickets:ticket-detail',
-            kwargs={'pk': str(ticket.id)},
-            external=True, api_to_ui=True
-        )
-        ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
-        ticket_assignees = ticket.current_step.ticket_assignees.all()
-        data = {
-            'check_review_status': {'method': 'GET', 'url': review_status_url},
-            'close_review': {'method': 'DELETE', 'url': review_status_url},
-            'ticket_detail_url': ticket_detail_url,
-            'reviewers': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees],
-            'ticket_id': str(ticket.id)
+        if acl and acl.is_action(acl.ActionChoices.reject):
+            raise JMSException(
+                code='acl_reject', detail=_('ACL action is reject: {}({})').format(acl.name, acl.id),
+            )
+
+        reviews = acl.pending_reviews(user, asset, account_username) if acl else ()
+        return {
+            'need_review': bool(reviews),
+            'requirements': [
+                field.removesuffix('_enabled') for field in LoginAssetACL.CONTROL_FIELDS
+                if acl and acl.enabled(field)
+            ],
         }
-        return data

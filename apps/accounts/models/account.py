@@ -379,31 +379,35 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
         return self.history.count()
 
     def get_su_from_accounts(self):
-        """ 排除自己和以自己为 su-from 的账号 """
-        return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
+        """ 资产账号及加入的目录服务账号，排除自己和以自己为 su-from 的账号 """
+        return self.asset.all_accounts.exclude(id=self.id).exclude(su_from=self)
 
-    def make_account_ansible_vars(self, su_from):
+    def make_account_ansible_vars(self, su_from, path_dir=None):
+        from ops.ansible.utils import escape_jinja2_syntax
+
         var = {
-            'ansible_user': su_from.username,
+            'ansible_user': escape_jinja2_syntax(su_from.username),
         }
         if not su_from.secret:
             return var
         if su_from.secret_type == SecretType.PASSWORD:
-            var['ansible_password'] = self.escape_jinja2_syntax(
+            var['ansible_password'] = escape_jinja2_syntax(
                 su_from.secret
             )
         elif su_from.secret_type == SecretType.SSH_KEY:
-            var['ansible_ssh_private_key_file'] = su_from.private_key_path
+            var['ansible_ssh_private_key_file'] = (
+                su_from.get_private_key_path(path_dir) if path_dir else su_from.private_key_path
+            )
         return var
 
-    def get_ansible_become_auth(self):
+    def get_ansible_become_auth(self, path_dir=None):
         su_from = self.su_from
         platform = self.platform
         auth = {'ansible_become': False}
         if not (platform.su_enabled and su_from):
             return auth
 
-        auth.update(self.make_account_ansible_vars(su_from))
+        auth.update(self.make_account_ansible_vars(su_from, path_dir))
 
         become_method = platform.ansible_become_method
         if become_method == 'sudo':
@@ -420,28 +424,14 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount, JSONFilterMixin):
             )
         auth['ansible_become'] = True
         auth['ansible_become_method'] = become_method
-        auth['ansible_become_user'] = self.username
+        from ops.ansible.utils import escape_jinja2_syntax
+
+        auth['ansible_become_user'] = escape_jinja2_syntax(self.username)
         if password:
             auth['ansible_become_password'] = (
-                self.escape_jinja2_syntax(password)
+                escape_jinja2_syntax(password)
             )
         return auth
-
-    @staticmethod
-    def escape_jinja2_syntax(value):
-        if not isinstance(value, str):
-            return value
-
-        def escape(v):
-            v = v.replace('{{', '__TEMP_OPEN_BRACES__') \
-                .replace('}}', '__TEMP_CLOSE_BRACES__')
-
-            v = v.replace('__TEMP_OPEN_BRACES__', '{{ "{{" }}') \
-                .replace('__TEMP_CLOSE_BRACES__', '{{ "}}" }}')
-
-            return v.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
-
-        return escape(value)
 
     def update_last_login_date(self):
         Account.objects.filter(pk=self.pk).update(date_last_login=timezone.now())

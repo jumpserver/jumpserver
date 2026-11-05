@@ -7,6 +7,7 @@ app_name = 'reports'
 
 router = DefaultRouter()
 router.register('reports', api.ReportViewSet, 'report')
+router.register('audit-reports', api.AuditReportViewSet, 'audit-report')
 
 urlpatterns = [
     path('reports/users/', api.UserReportApi.as_view(), name='user-list'),

@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#. Django's single-field uniqueness validation message.
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s có cùng giá trị %(field_label)s đã tồn tại. Vui lòng thay đổi %(field_label)s."
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -194,6 +199,11 @@ msgstr ""
 "Không tìm thấy tài khoản, tài khoản không hoạt động hoặc không đủ điều kiện "
 "cho tác vụ này"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "Không thể xác định tên đăng nhập (ID tài khoản: %(account_id)s)"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
@@ -363,7 +373,7 @@ msgstr "Mã thông hành"
 
 #: accounts/const/account.py:10
 msgid "API key"
-msgstr "API key"
+msgstr "Khóa API"
 
 #: accounts/const/account.py:14 common/db/fields.py:230 perms/filters.py:79
 #: settings/serializers/terminal.py:14 tickets/const.py:17
@@ -538,7 +548,7 @@ msgstr "SFTP"
 #: terminal/const.py:80 terminal/models/session/sharing.py:128
 #: tickets/views/approve.py:130
 msgid "Success"
-msgstr "Success"
+msgstr "Thành công"
 
 #: accounts/const/automation.py:117 common/const/choices.py:64
 #: common/const/choices.py:127 terminal/const.py:79
@@ -852,7 +862,7 @@ msgstr "Ngày truy cập lần cuối"
 
 #: accounts/models/account.py:106
 msgid "Access by"
-msgstr "Access by"
+msgstr "Truy cập bằng"
 
 #: accounts/models/account.py:107
 msgid "Date change secret"
@@ -1314,7 +1324,7 @@ msgstr "Phát hiện tài khoản"
 
 #: accounts/models/automations/gather_account.py:115
 msgid "Is sync account"
-msgstr "Is sync account"
+msgstr "Đồng bộ tài khoản"
 
 #: accounts/models/automations/gather_account.py:118
 msgid "Check risk"
@@ -2230,6 +2240,10 @@ msgstr "Tên tài sản, địa chỉ hoặc ID"
 msgid "Connect methods"
 msgstr "Phương thức kết nối"
 
+#: acls/serializers/connect_method.py
+msgid "Select at least one connection method"
+msgstr "Vui lòng chọn ít nhất một phương thức kết nối"
+
 #: acls/apps.py:7
 msgid "App Acls"
 msgstr "ACLs"
@@ -2560,7 +2574,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* biểu thị cho việc khớp tất cả. Ví dụ: 192.168.10.1, 192.168.1.0/24, "
+"Ký tự * biểu thị cho việc khớp tất cả. Ví dụ: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -3679,7 +3693,7 @@ msgstr "Nền tảng"
 #: assets/models/asset/common.py:206 assets/models/zone.py:22
 #: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:403
 msgid "Zone"
-msgstr "Tên miền"
+msgstr "Miền"
 
 #: assets/models/asset/common.py:209 assets/serializers/asset/common.py:181
 #: assets/serializers/automations/base.py:21 ops/serializers/job.py:22
@@ -4369,11 +4383,11 @@ msgstr ""
 
 #: assets/serializers/platform.py:212
 msgid "Assets can be connected using a zone gateway"
-msgstr "Tài sản có thể kết nối qua cổng khu vực"
+msgstr "Tài sản có thể kết nối qua cổng của miền"
 
 #: assets/serializers/platform.py:214
 msgid "Default zone"
-msgstr "Tên miền mặc định"
+msgstr "Miền mặc định"
 
 #: assets/serializers/platform.py:241
 msgid "type is required"
@@ -6870,7 +6884,7 @@ msgstr ""
 
 #: common/drf/renders/mixins.py:37 labels/serializers.py:25
 msgid "Resource count"
-msgstr "Resource count"
+msgstr "Số lượng tài nguyên"
 
 #: common/drf/renders/mixins.py:46
 msgid "Export all"
@@ -7202,10 +7216,6 @@ msgstr "Tài khoản của bạn đã được tạo thành công"
 #: jumpserver/context_processor.py:16
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer"
-
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "Dịch vụ Flower không khả dụng, vui lòng kiểm tra"
 
 #: jumpserver/views/other.py:28
 msgid ""
@@ -7758,7 +7768,7 @@ msgstr "Thời gian thực hiện tiếp theo"
 
 #: ops/serializers/job.py:17
 msgid "Run on save"
-msgstr "Run on save"
+msgstr "Chạy khi lưu"
 
 #: ops/serializers/job.py:94 terminal/serializers/session.py:66
 msgid "Is finished"
@@ -8001,7 +8011,7 @@ msgstr "Số lượng nhóm người dùng"
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
-msgstr "Zones amount"
+msgstr "Số lượng miền"
 
 #: orgs/serializers.py:16
 msgid "Gateways amount"
@@ -8188,7 +8198,7 @@ msgid "Send asset permission expired notification"
 msgstr "Gửi thông báo hết hạn quyền tài sản"
 
 #: perms/tasks.py:52
-#, fuzzy
+
 #| msgid ""
 #| "Check every day at 10 a.m. and send a notification message to users "
 #| "associated with \n"
@@ -8627,6 +8637,42 @@ msgstr "Mô hình đã chọn không tồn tại hoặc không khả dụng. Vui
 #: settings/api/chat.py
 msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "Không tìm thấy điểm cuối của nhà cung cấp mô hình. Vui lòng kiểm tra URL cơ sở."
+
+#: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} Nhà cung cấp phải hỗ trợ Responses API (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "Nhà cung cấp không trả về luồng sự kiện Responses API."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Luồng Responses API không thành công: {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Luồng Responses API đã kết thúc mà không có sự kiện hoàn tất thành công."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Luồng Responses API trả về một mục đầu ra chưa hoàn tất."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Các đoạn văn bản trong luồng Responses API bị thiếu hoặc không khớp với đầu ra cuối cùng."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Luồng tham số công cụ của Responses API không khớp với lệnh gọi công cụ cuối cùng."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API trả về lệnh gọi công cụ kiểm tra tình trạng không hợp lệ (tên, ID lệnh gọi hoặc tham số)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "Mô hình không trả về đúng nonce kiểm tra tình trạng sau khi nhận được kết quả công cụ."
 
 #: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
@@ -9725,7 +9771,7 @@ msgstr "Địa chỉ cơ bản của dịch vụ trò chuyện."
 #: settings/serializers/feature.py:173 settings/serializers/feature.py:188
 #: templates/_header_bar.html:96
 msgid "API Key"
-msgstr "API Key"
+msgstr "Khóa API"
 
 #: settings/serializers/feature.py:177 settings/serializers/feature.py:192
 msgid ""
@@ -9838,6 +9884,26 @@ msgstr "Bố cục bàn phím"
 #: settings/serializers/luna.py:41 users/serializers/preference/luna.py:49
 msgid "RDP client option"
 msgstr "Tùy chọn khách hàng RDP"
+
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "Chuyển hướng máy in"
+
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Áp dụng tổ hợp phím Windows"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "Trên máy tính cục bộ"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "Trên máy tính từ xa"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "Chỉ khi sử dụng toàn màn hình"
 
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
@@ -12776,7 +12842,7 @@ msgstr "Tài khoản email"
 
 #: users/models/user/__init__.py:82 users/serializers/user.py:265
 msgid "Is service account"
-msgstr "Is service account"
+msgstr "Là tài khoản dịch vụ"
 
 #: users/models/user/__init__.py:84
 msgid "Avatar"
@@ -13014,7 +13080,7 @@ msgstr "Quản trị viên tổ chức"
 
 #: users/serializers/user.py:140
 msgid "Can public key authentication"
-msgstr "Can public key authentication"
+msgstr "Cho phép xác thực bằng khóa công khai"
 
 #: users/serializers/user.py:145
 msgid "Can UKey authentication"
@@ -14114,11 +14180,11 @@ msgstr "Hiển thị nhà cung cấp dịch vụ"
 
 #: xpack/plugins/cloud/serializers/account.py:135
 msgid "Regions must be a JSON object."
-msgstr ""
+msgstr "Các vùng phải là một đối tượng JSON."
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:32
 msgid "Access key id"
-msgstr "Access key id"
+msgstr "ID khóa truy cập"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:59
 msgid "Subscription ID"
@@ -14154,7 +14220,7 @@ msgstr "Miền người dùng"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:157
 msgid "Project ID"
-msgstr "dự án"
+msgstr "ID dự án"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:164
 msgid "Cert File"
@@ -14224,7 +14290,7 @@ msgstr "Thời gian timeout kiểm tra"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:261
 msgid "Project"
-msgstr "dự án"
+msgstr "Dự án"
 
 #: xpack/plugins/cloud/serializers/task.py:168
 msgid "History count"
@@ -14356,9 +14422,6 @@ msgstr "Nhập giấy phép thành công"
 msgid "Invalid license"
 msgstr "Giấy phép không hợp lệ"
 
-#~ msgid "Ticket already closed"
-#~ msgstr "Phiếu công việc đã đóng"
-
 #: templates/resource_download.html
 #, python-format
 msgid "Download %(vendor)s Client"
@@ -14442,3 +14505,3792 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "Không thể xác minh thông tin xác thực vì ACL đăng nhập tài sản yêu cầu một thao tác bổ sung."
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "Thời gian thông báo phải sau thời điểm hiện tại."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "Quyền truy cập tài sản sắp hết hạn"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Thời gian hết hạn"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "Dịch vụ cấp chứng chỉ SSH của OpenBao không khả dụng: %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "Nhập mã thông báo dịch vụ OpenBao."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "Mã thông báo dịch vụ OpenBao không hợp lệ, đã hết hạn hoặc thiếu quyền cần thiết. Kiểm tra mã thông báo và chính sách truy cập."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "Mã thông báo dịch vụ OpenBao không có quyền truy cập %(resource)s. Cấp quyền %(capability)s cho đường dẫn này."
+
+#: accounts/api/account/application.py:79
+msgid "Successfully refreshed secret"
+msgstr "Đã làm mới bí mật thành công"
+
+#: accounts/api/account/personal.py:93
+msgid "Inactive personal credentials cannot be tested"
+msgstr "Không thể kiểm tra thông tin xác thực cá nhân chưa kích hoạt"
+
+#: accounts/automations/change_secret/manager.py:43
+msgid "The currently managed password is required when Oracle password changes use the REPLACE clause"
+msgstr "Cần mật khẩu đang được quản lý khi đổi mật khẩu Oracle bằng mệnh đề REPLACE"
+
+#: accounts/automations/verify_account/manager.py:137
+#, python-format
+msgid "Targets: %(credentials)s personal credential(s) on %(assets)s asset(s)"
+msgstr "Mục tiêu: %(credentials)s thông tin xác thực cá nhân trên %(assets)s tài sản"
+
+#: accounts/const/account.py:8
+msgid "SSH certificate"
+msgstr "Chứng chỉ SSH"
+
+#: accounts/exceptions.py:43
+msgid "SSH certificate signing is unavailable. Please retry or contact your administrator."
+msgstr "Không thể ký chứng chỉ SSH. Vui lòng thử lại hoặc liên hệ quản trị viên."
+
+#: accounts/exceptions.py:51
+msgid "This account follows template credentials. Confirm to stop following and modify its credentials."
+msgstr "Tài khoản đang theo thông tin xác thực của mẫu. Hãy xác nhận dừng theo mẫu để sửa thông tin xác thực."
+
+#: accounts/models/account.py:119
+msgid "Follow template"
+msgstr "Theo mẫu"
+
+#: accounts/models/account.py:177
+msgid "The source account template is unavailable."
+msgstr "Mẫu tài khoản nguồn không khả dụng."
+
+#: accounts/models/account.py:179
+#: accounts/serializers/account/account.py:176
+msgid "Account and template secret types must match."
+msgstr "Loại bí mật của tài khoản và mẫu phải khớp nhau."
+
+#: accounts/models/account.py:196
+msgid "Disable template following before editing credentials."
+msgstr "Hãy dừng theo mẫu trước khi sửa thông tin xác thực."
+
+#: accounts/models/account.py:216
+msgid "Disable template following before changing the source."
+msgstr "Hãy dừng theo mẫu trước khi đổi nguồn."
+
+#: accounts/models/account.py:218
+msgid "Disable template following before changing the secret type."
+msgstr "Hãy dừng theo mẫu trước khi đổi loại bí mật."
+
+#: accounts/models/account.py:225
+msgid "Save the following state with the credential snapshot."
+msgstr "Hãy lưu trạng thái theo mẫu cùng bản chụp thông tin xác thực."
+
+#: accounts/models/account.py:228
+msgid "Provide credentials when changing the secret type."
+msgstr "Cần cung cấp thông tin xác thực khi đổi loại bí mật."
+
+#: accounts/models/account.py:240
+msgid "Only template accounts can follow a template."
+msgstr "Chỉ tài khoản từ mẫu mới có thể theo mẫu."
+
+#: accounts/models/base.py:29
+msgid "Update template following through account save to preserve credentials."
+msgstr "Hãy cập nhật trạng thái theo mẫu bằng cách lưu tài khoản để giữ thông tin xác thực."
+
+#: accounts/models/base.py:32
+msgid "Disable template following before editing credentials or their source."
+msgstr "Hãy dừng theo mẫu trước khi sửa thông tin xác thực hoặc nguồn của chúng."
+
+#: accounts/models/personal.py:17
+msgid "Owner"
+msgstr "Chủ sở hữu"
+
+#: accounts/models/personal.py:36
+#: accounts/personal_credentials.py:144
+#: accounts/personal_credentials.py:180
+msgid "Personal asset credential"
+msgstr "Thông tin xác thực tài sản cá nhân"
+
+#: accounts/models/template.py:102
+msgid "Disable account template following before changing the secret type."
+msgstr "Hãy dừng theo mẫu tài khoản trước khi đổi loại bí mật."
+
+#: accounts/personal_credentials.py:162
+msgid "Operation"
+msgstr "Thao tác"
+
+#: accounts/personal_credentials.py:170
+msgid "Failure reason"
+msgstr "Lý do thất bại"
+
+#: accounts/personal_credentials.py:196
+msgid "The personal credential has been updated. Please refresh and try again."
+msgstr "Thông tin xác thực cá nhân đã thay đổi. Hãy tải lại trang và thử lại."
+
+#: accounts/personal_credentials.py:204
+msgid "Invalid user"
+msgstr "Người dùng không hợp lệ"
+
+#: accounts/personal_credentials.py:206
+msgid "Asset is inactive"
+msgstr "Tài sản chưa kích hoạt"
+
+#: accounts/personal_credentials.py:209
+msgid "Protocol is not supported for personal credentials"
+msgstr "Thông tin xác thực cá nhân không hỗ trợ giao thức này"
+
+#: accounts/personal_credentials.py:219
+msgid "Personal credentials require a manual or empty-secret asset account"
+msgstr "Thông tin xác thực cá nhân yêu cầu tài khoản tài sản nhập thủ công hoặc có bí mật trống"
+
+#: accounts/personal_credentials.py:230
+msgid "You do not have account permission for this asset"
+msgstr "Bạn không có quyền tài khoản đối với tài sản này"
+
+#: accounts/personal_credentials.py:240
+msgid "Personal credentials require an empty-secret asset account"
+msgstr "Thông tin xác thực cá nhân yêu cầu tài khoản tài sản có bí mật trống"
+
+#: accounts/personal_credentials.py:252
+msgid "Personal credential username must match the asset account"
+msgstr "Tên người dùng của thông tin xác thực cá nhân phải khớp tài khoản tài sản"
+
+#: accounts/personal_credentials.py:301
+msgid "Credential verification method is unavailable"
+msgstr "Phương thức xác minh thông tin xác thực không khả dụng"
+
+#: accounts/personal_credentials.py:307
+msgid "Personal credential verification does not allow custom automation methods"
+msgstr "Xác minh thông tin xác thực cá nhân không cho phép phương thức tự động hóa tùy chỉnh"
+
+#: accounts/personal_credentials.py:338
+msgid "The configured credential verification method does not support this protocol"
+msgstr "Phương thức xác minh đã cấu hình không hỗ trợ giao thức này"
+
+#: accounts/personal_credentials.py:355
+msgid "Secret type is not supported by this protocol"
+msgstr "Giao thức này không hỗ trợ loại bí mật đó"
+
+#: accounts/personal_credentials.py:383
+#: accounts/personal_credentials.py:421
+#: accounts/serializers/account/personal.py:188
+msgid "Personal credential not found"
+msgstr "Không tìm thấy thông tin xác thực cá nhân"
+
+#: accounts/personal_credentials.py:450
+#: accounts/personal_credentials.py:469
+#: accounts/serializers/account/personal.py:169
+#: accounts/serializers/account/personal.py:211
+msgid "A personal credential with these fields already exists"
+msgstr "Đã có thông tin xác thực cá nhân với các trường này"
+
+#: accounts/risk_handlers.py:44
+#, python-format
+msgid "Invalid risk type: %(type)s"
+msgstr "Loại rủi ro không hợp lệ: %(type)s"
+
+#: accounts/serializers/account/account.py:126
+msgid "Template not found"
+msgstr "Không tìm thấy mẫu"
+
+#: accounts/serializers/account/account.py:172
+msgid "Following requires a valid account template in the same organization."
+msgstr "Để theo mẫu, cần mẫu tài khoản hợp lệ trong cùng tổ chức."
+
+#: accounts/serializers/account/account.py:178
+msgid "Following accounts use template credentials."
+msgstr "Tài khoản theo mẫu sử dụng thông tin xác thực của mẫu."
+
+#: accounts/serializers/account/account.py:183
+msgid "Disable template following before editing this field."
+msgstr "Hãy dừng theo mẫu trước khi sửa trường này."
+
+#: accounts/serializers/account/account.py:293
+msgid "Asset IP"
+msgstr "IP tài sản"
+
+#: accounts/serializers/account/account.py:321
+#: accounts/serializers/account/account.py:409
+msgid "Only applies to template accounts. Credentials are read from the current template."
+msgstr "Chỉ áp dụng cho tài khoản từ mẫu. Thông tin xác thực được đọc từ mẫu hiện tại."
+
+#: accounts/serializers/account/account.py:355
+msgid "Source template"
+msgstr "Mẫu nguồn"
+
+#: accounts/serializers/account/base.py:68
+msgid "SSH certificate accounts cannot push or rotate credentials"
+msgstr "Tài khoản chứng chỉ SSH không hỗ trợ đẩy hoặc luân chuyển thông tin xác thực"
+
+#: accounts/serializers/account/personal.py:48
+msgid "Expected version"
+msgstr "Phiên bản dự kiến"
+
+#: accounts/serializers/account/personal.py:74
+#: assets/serializers/node.py:196
+#: settings/api/ssh_ca.py:37
+msgid "This field may not be blank."
+msgstr "Trường này không được để trống."
+
+#: accounts/serializers/account/personal.py:91
+msgid "Username cannot be changed"
+msgstr "Không thể đổi tên người dùng"
+
+#: accounts/serializers/account/personal.py:96
+msgid "Asset cannot be changed"
+msgstr "Không thể đổi tài sản"
+
+#: accounts/serializers/account/personal.py:98
+msgid "Protocol cannot be changed"
+msgstr "Không thể đổi giao thức"
+
+#: accounts/serializers/account/personal.py:106
+msgid "This field is only valid when updating"
+msgstr "Trường này chỉ hợp lệ khi cập nhật"
+
+#: accounts/serializers/account/personal.py:112
+#: accounts/serializers/account/personal.py:149
+#: accounts/serializers/account/personal.py:181
+msgid "Asset is not in the current organization"
+msgstr "Tài sản không thuộc tổ chức hiện tại"
+
+#: accounts/serializers/account/personal.py:128
+msgid "A new secret is required when changing the secret type"
+msgstr "Cần bí mật mới khi đổi loại bí mật"
+
+#: accounts/serializers/account/service.py:57
+#, python-format
+msgid "At least one of the following fields must be provided: %(fields)s."
+msgstr "Phải cung cấp ít nhất một trường sau: %(fields)s."
+
+#: accounts/tasks/template.py:16
+msgid "Synchronize template properties to following accounts without changing credentials."
+msgstr "Đồng bộ thuộc tính mẫu với tài khoản theo mẫu mà không đổi thông tin xác thực."
+
+#: accounts/tasks/verify_account.py:69
+#: accounts/tasks/verify_account.py:88
+msgid "Verify personal credential connectivity"
+msgstr "Kiểm tra kết nối bằng thông tin xác thực cá nhân"
+
+#: accounts/tasks/verify_account.py:70
+msgid "Verify a user's personal asset credential"
+msgstr "Xác minh thông tin xác thực tài sản cá nhân của người dùng"
+
+#: accounts/tasks/verify_account.py:106
+msgid "Personal credential verification failed"
+msgstr "Xác minh thông tin xác thực cá nhân thất bại"
+
+#: accounts/templates/accounts/gather_account_report.html:76
+#: accounts/templates/accounts/gather_account_report.html:116
+msgid "No."
+msgstr "STT"
+
+#: acls/models/login_asset_acl.py:18
+msgid "Review exemption duration (hours)"
+msgstr "Thời gian miễn phê duyệt (giờ)"
+
+#: acls/models/login_asset_acl.py:19
+msgid "0 means approval is required for every connection."
+msgstr "0 nghĩa là mỗi lần kết nối đều cần phê duyệt."
+
+#: acls/serializers/base.py:114
+msgid "Account usernames, or @ALL to match all accounts."
+msgstr "Tên người dùng tài khoản, hoặc @ALL để khớp mọi tài khoản."
+
+#: acls/serializers/command_acl.py:24
+msgid "Use \"command\" for literal command names. Each line matches that command as a standalone word anywhere in the input, so \"rm\" also matches \"rm -rf\" and \"sudo rm\". Use \"regex\" only for custom patterns."
+msgstr "Dùng \"command\" cho tên lệnh nguyên văn. Mỗi dòng khớp lệnh như một từ độc lập ở bất kỳ vị trí nào trong đầu vào, nên \"rm\" cũng khớp \"rm -rf\" và \"sudo rm\". Chỉ dùng \"regex\" cho mẫu tùy chỉnh."
+
+#: assets/api/asset/asset.py:51
+#: assets/models/zone.py:20
+#: assets/serializers/domain.py:41
+msgid "CIDR ranges"
+msgstr "Dải CIDR"
+
+#: assets/api/asset/asset.py:52
+msgid "Exclude zone"
+msgstr "Vùng loại trừ"
+
+#: assets/api/favorite_asset.py:133
+msgid "Some assets are not authorized for this user."
+msgstr "Một số tài sản chưa được cấp quyền cho người dùng này."
+
+#: assets/api/platform.py:120
+msgid "Internal platform"
+msgstr "Nền tảng nội bộ"
+
+#: assets/api/platform.py:169
+msgid "Missing platform.yml in package"
+msgstr "Gói thiếu platform.yml"
+
+#: assets/const/protocol.py:150
+msgid "Allow invalid certificate"
+msgstr "Cho phép chứng chỉ không hợp lệ"
+
+#: assets/const/protocol.py:333
+#: assets/models/asset/web.py:22
+msgid "Interactive selector"
+msgstr "Bộ chọn tương tác"
+
+#: assets/const/protocol.py:334
+#: assets/models/asset/web.py:23
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "Vùng xác minh tương tác tùy chọn, ví dụ css=#mfa-dialog. Loại trừ thông tin xác thực và nút hiện mật khẩu."
+
+#: assets/const/protocol.py:342
+#: assets/models/asset/web.py:17
+msgid "Selector for an element that appears only after a successful login, e.g. css=#dashboard. Required for basic autofill."
+msgstr "Bộ chọn phần tử chỉ hiện sau khi đăng nhập thành công, ví dụ css=#dashboard. Bắt buộc cho tự động điền cơ bản."
+
+#: assets/models/asset/web.py:9
+#: assets/serializers/asset/web.py:16
+msgid "Allowed sites"
+msgstr "Trang web được phép"
+
+#: assets/models/zone.py:21
+msgid "Auto assign new assets"
+msgstr "Tự động gán tài sản mới"
+
+#: assets/serializers/asset/web.py:75
+msgid "Invalid selector"
+msgstr "Bộ chọn không hợp lệ"
+
+#: assets/serializers/domain.py:34
+#, python-format
+msgid "Invalid CIDR: %s"
+msgstr "CIDR không hợp lệ: %s"
+
+#: assets/serializers/domain.py:74
+msgid "At least one CIDR is required when auto assignment is enabled."
+msgstr "Cần ít nhất một CIDR khi bật gán tự động."
+
+#: assets/serializers/favorite_asset.py:35
+#: assets/serializers/favorite_asset.py:82
+#: assets/serializers/favorite_asset.py:148
+msgid "Invalid favorite folder."
+msgstr "Thư mục yêu thích không hợp lệ."
+
+#: assets/serializers/favorite_asset.py:40
+msgid "A folder cannot be moved below itself."
+msgstr "Không thể chuyển thư mục vào bên trong chính nó."
+
+#: assets/serializers/favorite_asset.py:58
+msgid "A folder with this name already exists under the parent folder."
+msgstr "Đã có thư mục cùng tên trong thư mục cha."
+
+#: assets/serializers/favorite_asset.py:96
+msgid "Asset is not authorized for this user."
+msgstr "Tài sản chưa được cấp quyền cho người dùng này."
+
+#: assets/validators.py:24
+msgid "The address cannot contain Ansible template override syntax"
+msgstr "Địa chỉ không được chứa cú pháp ghi đè mẫu Ansible"
+
+#: assets/validators.py:64
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "Nhập nguồn HTTP/HTTPS không có đường dẫn, thông tin xác thực hoặc ký tự đại diện."
+
+#: assets/validators.py:88
+msgid "Enter at most 128 script steps."
+msgstr "Nhập tối đa 128 bước kịch bản."
+
+#: assets/validators.py:92
+#: assets/validators.py:101
+msgid "Invalid script step."
+msgstr "Bước kịch bản không hợp lệ."
+
+#: assets/validators.py:95
+msgid "Script step numbers must be unique positive integers."
+msgstr "Số bước phải là số nguyên dương và không trùng nhau."
+
+#: assets/validators.py:98
+msgid "Unsupported script command."
+msgstr "Lệnh kịch bản không được hỗ trợ."
+
+#: assets/validators.py:105
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "Thời gian chờ bước phải từ 1 đến 180 giây."
+
+#: assets/validators.py:109
+msgid "The success command must be the last step."
+msgstr "Lệnh thành công phải là bước cuối cùng."
+
+#: audits/const.py:12
+msgid "Create file"
+msgstr "Tạo tệp"
+
+#: audits/models.py:78
+msgid "Ticket audit"
+msgstr "Kiểm toán phiếu yêu cầu"
+
+#: audits/serializers.py:57
+#, python-format
+msgid "Updating %(fields)s fields is not allowed"
+msgstr "Không được cập nhật các trường %(fields)s"
+
+#: authentication/api/connection_token.py:532
+#: authentication/serializers/connection_token.py:96
+msgid "Personal credential connection tokens cannot be reusable"
+msgstr "Không được tái sử dụng mã kết nối dùng thông tin xác thực cá nhân"
+
+#: authentication/api/connection_token.py:763
+msgid "Personal credentials can only be managed by their owner"
+msgstr "Chỉ chủ sở hữu được quản lý thông tin xác thực cá nhân"
+
+#: authentication/api/connection_token.py:802
+msgid "A personal credential ID is required when a version is provided"
+msgstr "Cần ID thông tin xác thực cá nhân khi cung cấp phiên bản"
+
+#: authentication/api/connection_token.py:810
+msgid "Do not submit a username or secret when using a saved credential"
+msgstr "Không gửi tên người dùng hoặc bí mật khi dùng thông tin xác thực đã lưu"
+
+#: authentication/api/connection_token.py:909
+#: authentication/models/connection_token.py:204
+msgid "Connect method is not allowed for this asset"
+msgstr "Tài sản này không cho phép phương thức kết nối đó"
+
+#: authentication/api/connection_token.py:1246
+msgid "Token is expired at: {}"
+msgstr "Mã đã hết hạn lúc: {}"
+
+#: authentication/api/connection_token.py:1259
+msgid "Not allow to view secret"
+msgstr "Không được xem bí mật"
+
+#: authentication/api/connection_token.py:1263
+msgid "Tinker must redeem its RDP login ticket to obtain credentials"
+msgstr "Tinker phải đổi vé đăng nhập RDP để lấy thông tin xác thực"
+
+#: authentication/api/connection_token.py:1268
+msgid "Token {} is not valid"
+msgstr "Mã {} không hợp lệ"
+
+#: authentication/api/connection_token.py:1290
+#: authentication/api/rdp_login.py:144
+msgid "Invalid connection token"
+msgstr "Mã kết nối không hợp lệ"
+
+#: authentication/api/connection_token.py:1299
+msgid "Token expired"
+msgstr "Mã đã hết hạn"
+
+#: authentication/api/face.py:55
+msgid "missing field 'face_code'"
+msgstr "Thiếu trường 'face_code'"
+
+#: authentication/api/face.py:70
+msgid "token not exists or expired"
+msgstr "Mã không tồn tại hoặc đã hết hạn"
+
+#: authentication/api/face.py:129
+msgid "Token does not belong to the current face capture."
+msgstr "Mã không thuộc phiên thu thập khuôn mặt hiện tại."
+
+#: authentication/api/face.py:135
+msgid "Token does not exist or has expired."
+msgstr "Mã không tồn tại hoặc đã hết hạn."
+
+#: authentication/api/face.py:246
+msgid "face codes not matched"
+msgstr "Dữ liệu khuôn mặt không khớp"
+
+#: authentication/api/rdp_login.py:42
+msgid "Only user and admin connection tokens support RDP token login"
+msgstr "Chỉ mã kết nối người dùng và quản trị viên hỗ trợ đăng nhập RDP bằng mã"
+
+#: authentication/api/rdp_login.py:47
+msgid "Connection permission is no longer valid"
+msgstr "Quyền kết nối không còn hiệu lực"
+
+#: authentication/api/rdp_login.py:51
+msgid "An enabled Applet connection is required"
+msgstr "Cần kết nối ứng dụng từ xa đã bật"
+
+#: authentication/api/rdp_login.py:57
+msgid "A Tinker component must be bound to this host"
+msgstr "Máy chủ này phải được liên kết với thành phần Tinker"
+
+#: authentication/api/rdp_login.py:63
+msgid "Applet is not available on this host"
+msgstr "Ứng dụng từ xa không khả dụng trên máy chủ này"
+
+#: authentication/api/rdp_login.py:67
+msgid "This component is not authorized for the host"
+msgstr "Thành phần này chưa được cấp quyền cho máy chủ"
+
+#: authentication/api/rdp_login.py:74
+msgid "The connection authorization has changed"
+msgstr "Ủy quyền kết nối đã thay đổi"
+
+#: authentication/api/rdp_login.py:97
+#, python-format
+msgid "No compatible Applet host is available. Upgrade and redeploy an applet host with Tinker %(minimum)s or later."
+msgstr "Không có máy chủ ứng dụng tương thích. Hãy nâng cấp Tinker lên %(minimum)s trở lên và triển khai lại máy chủ ứng dụng."
+
+#: authentication/api/rdp_login.py:115
+msgid "Unable to issue an RDP login credential"
+msgstr "Không thể cấp thông tin xác thực đăng nhập RDP"
+
+#: authentication/api/rdp_login.py:140
+#: authentication/api/rdp_login.py:149
+msgid "Invalid or expired RDP login authorization"
+msgstr "Ủy quyền đăng nhập RDP không hợp lệ hoặc đã hết hạn"
+
+#: authentication/api/rdp_login.py:156
+msgid "RDP login ticket has already been used"
+msgstr "Vé đăng nhập RDP đã được sử dụng"
+
+#: authentication/api/sso.py:90
+msgid "authkey is required"
+msgstr "Cần có authkey"
+
+#: authentication/api/token.py:46
+msgid "MFA unset, please set first"
+msgstr "Chưa thiết lập xác thực đa yếu tố, hãy thiết lập trước"
+
+#: authentication/backends/drf.py:94
+msgid "User is inactive or expired."
+msgstr "Người dùng chưa kích hoạt hoặc đã hết hạn."
+
+#: authentication/backends/ldap.py:192
+msgid "failed to map the username to a DN."
+msgstr "Không thể ánh xạ tên người dùng sang DN."
+
+#: authentication/backends/ldap.py:201
+msgid "user DN/password rejected by LDAP server."
+msgstr "Máy chủ LDAP từ chối DN hoặc mật khẩu người dùng."
+
+#: authentication/backends/passkey/fido.py:108
+#: authentication/backends/passkey/fido.py:146
+msgid "No state found"
+msgstr "Không tìm thấy trạng thái"
+
+#: authentication/backends/token.py:25
+msgid "Token is invalid, expired at {}"
+msgstr "Mã không hợp lệ, đã hết hạn lúc {}"
+
+#: authentication/errors/mfa.py:13
+msgid "Code invalid, can not get user info"
+msgstr "Mã không hợp lệ, không thể lấy thông tin người dùng"
+
+#: authentication/mixins.py:611
+msgid "Face recognition token is missing from the session."
+msgstr "Phiên thiếu mã nhận diện khuôn mặt."
+
+#: authentication/mixins.py:619
+#, python-format
+msgid "Face recognition context does not exist for token: %(token)s"
+msgstr "Không có ngữ cảnh nhận diện khuôn mặt cho mã: %(token)s"
+
+#: authentication/mixins.py:626
+msgid "Face recognition is not yet completed."
+msgstr "Nhận diện khuôn mặt chưa hoàn tất."
+
+#: authentication/mixins.py:634
+msgid "Face code is missing from the context."
+msgstr "Ngữ cảnh thiếu dữ liệu khuôn mặt."
+
+#: authentication/models/connection_token.py:54
+msgid "Personal credential ID"
+msgstr "ID thông tin xác thực cá nhân"
+
+#: authentication/models/connection_token.py:57
+#: authentication/serializers/connection_token.py:31
+msgid "Personal credential version"
+msgstr "Phiên bản thông tin xác thực cá nhân"
+
+#: authentication/models/connection_token.py:255
+msgid "Personal credential version is missing"
+msgstr "Thiếu phiên bản thông tin xác thực cá nhân"
+
+#: authentication/models/connection_token.py:287
+msgid "Personal credential is no longer available"
+msgstr "Thông tin xác thực cá nhân không còn khả dụng"
+
+#: authentication/models/connection_token.py:333
+msgid "No provider available, please check the virtual app publication and provider status"
+msgstr "Không có nhà cung cấp khả dụng; hãy kiểm tra trạng thái phát hành ứng dụng ảo và nhà cung cấp"
+
+#: authentication/models/connection_token.py:383
+msgid "Personal credential no longer matches the asset account"
+msgstr "Thông tin xác thực cá nhân không còn khớp tài khoản tài sản"
+
+#: authentication/notifications.py:17
+msgid "Temporary password"
+msgstr "Mật khẩu tạm thời"
+
+#: authentication/notifications.py:20
+msgid "Private token"
+msgstr "Mã riêng tư"
+
+#: authentication/notifications.py:41
+msgid "Credential created reminder"
+msgstr "Thông báo tạo thông tin xác thực"
+
+#: authentication/notifications.py:45
+#: authentication/templates/authentication/_msg_credential_created.html:5
+msgid "Credential type"
+msgstr "Loại thông tin xác thực"
+
+#: authentication/notifications.py:46
+#: authentication/templates/authentication/_msg_credential_created.html:6
+msgid "Identifier"
+msgstr "Mã định danh"
+
+#: authentication/notifications.py:73
+msgid "Credential activity summary"
+msgstr "Tóm tắt hoạt động thông tin xác thực"
+
+#: authentication/notifications.py:77
+msgid "Credential activity"
+msgstr "Hoạt động thông tin xác thực"
+
+#: authentication/serializers/connect_token_secret.py:164
+msgid "SSH public key"
+msgstr "Khóa công khai SSH"
+
+#: authentication/serializers/connect_token_secret.py:268
+msgid "Virtual app provider is required"
+msgstr "Cần nhà cung cấp ứng dụng ảo"
+
+#: authentication/serializers/connect_token_secret.py:270
+msgid "Virtual app provider requires an SSH host"
+msgstr "Nhà cung cấp ứng dụng ảo cần máy chủ SSH"
+
+#: authentication/serializers/connect_token_secret.py:273
+msgid "Virtual app provider requires an active SSH account"
+msgstr "Nhà cung cấp ứng dụng ảo cần tài khoản SSH hoạt động"
+
+#: authentication/serializers/connection_token.py:27
+msgid "Save personal credential"
+msgstr "Lưu thông tin xác thực cá nhân"
+
+#: authentication/serializers/rdp_login.py:22
+#: authentication/serializers/rdp_login.py:27
+#: authentication/serializers/rdp_login.py:30
+msgid "Invalid login credential"
+msgstr "Thông tin xác thực đăng nhập không hợp lệ"
+
+#: authentication/serializers/token.py:67
+msgid "user id {} not exist"
+msgstr "ID người dùng {} không tồn tại"
+
+#: authentication/services/rdp_login.py:18
+msgid "RDP login ticket cache is unavailable"
+msgstr "Bộ nhớ đệm vé đăng nhập RDP không khả dụng"
+
+#: authentication/services/ssh_certificate.py:47
+msgid "SSH public key is too long"
+msgstr "Khóa công khai SSH quá dài"
+
+#: authentication/services/ssh_certificate.py:53
+msgid "An SSH certificate cannot be signed again"
+msgstr "Không thể ký lại chứng chỉ SSH"
+
+#: authentication/services/ssh_certificate.py:64
+msgid "Asset permission has expired"
+msgstr "Quyền tài sản đã hết hạn"
+
+#: authentication/services/ssh_certificate.py:74
+msgid "The account does not use SSH certificate authentication"
+msgstr "Tài khoản không dùng xác thực bằng chứng chỉ SSH"
+
+#: authentication/services/ssh_certificate.py:76
+msgid "Virtual accounts cannot use SSH certificate authentication"
+msgstr "Tài khoản ảo không thể xác thực bằng chứng chỉ SSH"
+
+#: authentication/services/ssh_certificate.py:78
+msgid "SSH certificate accounts require a username"
+msgstr "Tài khoản chứng chỉ SSH cần tên người dùng"
+
+#: authentication/services/ssh_certificate.py:80
+msgid "SSH certificates only support SSH and SFTP protocols"
+msgstr "Chứng chỉ SSH chỉ hỗ trợ SSH và SFTP"
+
+#: authentication/tasks.py:43
+msgid "Send credential activity summary"
+msgstr "Gửi tóm tắt hoạt động thông tin xác thực"
+
+#: authentication/tasks.py:44
+msgid "Send users a summary of credential creation and successful use in the past 24 hours"
+msgstr "Gửi người dùng bản tóm tắt việc tạo và sử dụng thành công thông tin xác thực trong 24 giờ qua"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:2
+#: authentication/templates/authentication/_msg_credential_created.html:2
+#, python-format
+msgid "Hello %(name)s,"
+msgstr "Xin chào %(name)s,"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:3
+msgid "The following credential activity occurred in the past 24 hours."
+msgstr "Các hoạt động thông tin xác thực sau đã diễn ra trong 24 giờ qua."
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:16
+msgid "If you do not recognize this activity, revoke the credential and contact your administrator immediately."
+msgstr "Nếu không nhận ra hoạt động này, hãy thu hồi thông tin xác thực và liên hệ quản trị viên ngay."
+
+#: authentication/templates/authentication/_msg_credential_created.html:3
+msgid "A new credential was created for your account."
+msgstr "Thông tin xác thực mới đã được tạo cho tài khoản của bạn."
+
+#: authentication/templates/authentication/_msg_credential_created.html:10
+msgid "If this was not you, revoke the credential and contact your administrator immediately."
+msgstr "Nếu không phải bạn thực hiện, hãy thu hồi thông tin xác thực và liên hệ quản trị viên ngay."
+
+#: authentication/templates/authentication/face_capture.html:60
+#: authentication/templates/authentication/face_capture.html:145
+msgid "Face recognition failed"
+msgstr "Nhận diện khuôn mặt thất bại"
+
+#: authentication/templates/authentication/face_capture.html:93
+msgid "Failed to start face recognition"
+msgstr "Không thể bắt đầu nhận diện khuôn mặt"
+
+#: authentication/templates/authentication/face_capture.html:129
+msgid "Face capture expired. Please retry."
+msgstr "Thu thập khuôn mặt đã hết hạn. Hãy thử lại."
+
+#: authentication/templates/authentication/passkey.html:8
+msgid "Login passkey"
+msgstr "Đăng nhập bằng khóa truy cập"
+
+#: authentication/views/base.py:61
+msgid "A local account with the same username already exists. Please log in with another authentication method and bind this account before using it to log in."
+msgstr "Đã có tài khoản cục bộ cùng tên. Hãy đăng nhập bằng cách khác và liên kết tài khoản này trước khi dùng để đăng nhập."
+
+#: chat_ai/api/runtime_store.py:39
+msgid "The runtime store request exceeds the 64 MiB record limit."
+msgstr "Yêu cầu kho thời gian chạy vượt giới hạn bản ghi 64 MiB."
+
+#: chat_ai/api/runtime_store.py:58
+#, python-format
+msgid "JSON parse error - %(error)s"
+msgstr "Lỗi phân tích JSON: %(error)s"
+
+#: chat_ai/api/runtime_store.py:62
+msgid "Only a Kael terminal service account may access the runtime store."
+msgstr "Chỉ tài khoản dịch vụ thiết bị đầu cuối Kael được truy cập kho thời gian chạy."
+
+#: chat_ai/api/runtime_store.py:75
+msgid "A JSON object is required."
+msgstr "Cần một đối tượng JSON."
+
+#: chat_ai/api/runtime_store.py:79
+#, python-format
+msgid "Unknown field(s): %(fields)s."
+msgstr "Trường không xác định: %(fields)s."
+
+#: chat_ai/api/runtime_store.py:108
+msgid "A UUID string is required."
+msgstr "Cần một chuỗi UUID."
+
+#: chat_ai/api/runtime_store.py:111
+msgid "A non-negative integer is required."
+msgstr "Cần một số nguyên không âm."
+
+#: chat_ai/api/runtime_store.py:114
+msgid "A boolean is required."
+msgstr "Cần một giá trị boolean."
+
+#: chat_ai/api/runtime_store.py:116
+msgid "A string is required."
+msgstr "Cần một chuỗi."
+
+#: chat_ai/api/runtime_store.py:118
+msgid "A hexadecimal string is required."
+msgstr "Cần một chuỗi thập lục phân."
+
+#: chat_ai/api/runtime_store.py:124
+msgid "The journal record exceeds the 64 MiB limit."
+msgstr "Bản ghi nhật ký vượt giới hạn 64 MiB."
+
+#: chat_ai/api/runtime_store.py:128
+msgid "The journal record must contain exactly one JSON line."
+msgstr "Bản ghi nhật ký phải chứa đúng một dòng JSON."
+
+#: chat_ai/api/runtime_store.py:132
+msgid "The journal record is not valid JSON."
+msgstr "Bản ghi nhật ký không phải JSON hợp lệ."
+
+#: chat_ai/api/runtime_store.py:135
+msgid "The journal record must contain version, created_at, payload, and checksum."
+msgstr "Bản ghi nhật ký phải chứa version, created_at, payload và checksum."
+
+#: chat_ai/api/runtime_store.py:139
+msgid "Unsupported journal record version."
+msgstr "Phiên bản bản ghi nhật ký không được hỗ trợ."
+
+#: chat_ai/api/runtime_store.py:146
+msgid "The journal record created_at is invalid."
+msgstr "Trường created_at của bản ghi nhật ký không hợp lệ."
+
+#: chat_ai/api/runtime_store.py:150
+#: chat_ai/api/runtime_store.py:155
+msgid "The journal record payload or checksum is invalid."
+msgstr "Trường payload hoặc checksum của bản ghi nhật ký không hợp lệ."
+
+#: chat_ai/api/runtime_store.py:158
+msgid "The journal record checksum does not match its payload."
+msgstr "Tổng kiểm tra của bản ghi nhật ký không khớp nội dung."
+
+#: chat_ai/api/runtime_store.py:234
+msgid "Invalid runtime store access key."
+msgstr "Khóa truy cập kho thời gian chạy không hợp lệ."
+
+#: chat_ai/api/runtime_store.py:311
+msgid "Invalid runtime store commit integrity."
+msgstr "Tính toàn vẹn lần ghi kho thời gian chạy không hợp lệ."
+
+#: chat_ai/api/runtime_store.py:361
+msgid "The runtime store revision has changed."
+msgstr "Phiên bản kho thời gian chạy đã thay đổi."
+
+#: chat_ai/authentication.py:21
+msgid "Invalid Chat AI delegation credential."
+msgstr "Thông tin xác thực ủy quyền trò chuyện AI không hợp lệ."
+
+#: chat_ai/authentication.py:25
+msgid "Chat AI delegation operation mismatch."
+msgstr "Thao tác ủy quyền trò chuyện AI không khớp."
+
+#: chat_ai/authentication.py:27
+msgid "Chat AI delegation organization mismatch."
+msgstr "Tổ chức ủy quyền trò chuyện AI không khớp."
+
+#: chat_ai/authentication.py:30
+msgid "Chat AI delegation organization context mismatch."
+msgstr "Ngữ cảnh tổ chức ủy quyền trò chuyện AI không khớp."
+
+#: chat_ai/authentication.py:32
+msgid "Chat AI delegation request mismatch."
+msgstr "Yêu cầu ủy quyền trò chuyện AI không khớp."
+
+#: chat_ai/authentication.py:41
+msgid "Chat AI delegation request could not be verified."
+msgstr "Không thể xác minh yêu cầu ủy quyền trò chuyện AI."
+
+#: chat_ai/authentication.py:43
+msgid "Chat AI delegation request body mismatch."
+msgstr "Nội dung yêu cầu ủy quyền trò chuyện AI không khớp."
+
+#: chat_ai/authentication.py:48
+msgid "Chat AI delegation replay protection is unavailable."
+msgstr "Chức năng chống phát lại ủy quyền trò chuyện AI không khả dụng."
+
+#: chat_ai/authentication.py:50
+msgid "Chat AI delegation credential was already used."
+msgstr "Thông tin xác thực ủy quyền trò chuyện AI đã được dùng."
+
+#: chat_ai/authentication.py:53
+msgid "Chat AI delegation user is invalid."
+msgstr "Người dùng ủy quyền trò chuyện AI không hợp lệ."
+
+#: chat_ai/models.py:20
+msgid "Chat AI runtime store"
+msgstr "Kho thời gian chạy trò chuyện AI"
+
+#: chat_ai/models.py:28
+msgid "Runtime store"
+msgstr "Kho thời gian chạy"
+
+#: chat_ai/models.py:51
+msgid "Chat AI runtime store record"
+msgstr "Bản ghi kho thời gian chạy trò chuyện AI"
+
+#: common/auth/signature.py:13
+msgid "Invalid signature."
+msgstr "Chữ ký không hợp lệ."
+
+#: common/auth/signature.py:14
+msgid "Ip is not in access ip list."
+msgstr "IP không nằm trong danh sách được phép truy cập."
+
+#: common/db/fields.py:611
+msgid "Invalid JSON data for JSONManyToManyField."
+msgstr "Dữ liệu JSON cho JSONManyToManyField không hợp lệ."
+
+#: common/drf/exc_handlers.py:66
+#: jumpserver/views/error_views.py:20
+msgid "Server internal error"
+msgstr "Lỗi nội bộ máy chủ"
+
+#: common/drf/filters.py:1011
+msgid "attr_rules should be base64"
+msgstr "attr_rules phải được mã hóa Base64"
+
+#: common/drf/filters.py:1015
+msgid "attr_rules should be json"
+msgstr "attr_rules phải ở định dạng JSON"
+
+#: common/drf/parsers/excel.py:43
+#: common/drf/parsers/excel.py:70
+#: common/drf/parsers/excel.py:80
+msgid "Excel worksheet exceeds import limits"
+msgstr "Trang tính Excel vượt giới hạn nhập"
+
+#: common/drf/parsers/excel.py:62
+#: common/drf/parsers/excel.py:64
+msgid "Invalid excel worksheet range"
+msgstr "Phạm vi trang tính Excel không hợp lệ"
+
+#: common/drf/parsers/excel.py:74
+#: common/drf/parsers/excel.py:107
+msgid "Too many excel worksheets"
+msgstr "Quá nhiều trang tính Excel"
+
+#: common/drf/parsers/excel.py:113
+msgid "Excel workbook exceeds import limits"
+msgstr "Sổ làm việc Excel vượt giới hạn nhập"
+
+#: common/sdk/im/exceptions.py:8
+msgid "HTTP status is not 200"
+msgstr "Trạng thái HTTP không phải 200"
+
+#: common/sdk/im/exceptions.py:13
+msgid "Error code is not 0"
+msgstr "Mã lỗi không phải 0"
+
+#: common/sdk/im/exceptions.py:18
+msgid "Response data key error"
+msgstr "Lỗi khóa dữ liệu phản hồi"
+
+#: common/sdk/sms/custom_file.py:48
+msgid "Custom file SMS sending failed"
+msgstr "Gửi SMS bằng tệp tùy chỉnh thất bại"
+
+#: common/serializers/mixin.py:190
+msgid "id or pk not in data"
+msgstr "Dữ liệu thiếu id hoặc pk"
+
+#: jumpserver/middleware.py:157
+msgid "Service temporarily unavailable"
+msgstr "Dịch vụ tạm thời không khả dụng"
+
+#: jumpserver/middleware.py:158
+msgid "Database operation failed, please try again later."
+msgstr "Thao tác cơ sở dữ liệu thất bại. Hãy thử lại sau."
+
+#: notifications/api/notifications.py:218
+msgid "template_name is required"
+msgstr "Cần có template_name"
+
+#: notifications/serializers/notifications.py:58
+#, python-format
+msgid "Template syntax error at line: %(line)s"
+msgstr "Lỗi cú pháp mẫu tại dòng: %(line)s"
+
+#: ops/api/playbook.py:77
+msgid "Invalid clone_from id"
+msgstr "ID clone_from không hợp lệ"
+
+#: ops/api/playbook.py:81
+msgid "clone playbook file not found"
+msgstr "Không tìm thấy tệp Playbook để sao chép"
+
+#: ops/api/playbook.py:93
+msgid "Unzip failed"
+msgstr "Giải nén thất bại"
+
+#: ops/models/job.py:342
+#, python-brace-format
+msgid "Undefined job variable: {name}"
+msgstr "Biến tác vụ chưa định nghĩa: {name}"
+
+#: ops/models/job.py:544
+#: ops/models/job.py:590
+msgid "Quick command"
+msgstr "Lệnh nhanh"
+
+#: ops/models/job.py:545
+msgid "Matched a command filter policy"
+msgstr "Khớp chính sách lọc lệnh"
+
+#: ops/models/job.py:591
+msgid "Matched the job center command blacklist"
+msgstr "Khớp danh sách chặn lệnh của trung tâm tác vụ"
+
+#: ops/serializers/variable.py:114
+msgid "One of 'job', 'adhoc', or 'playbook' is required."
+msgstr "Cần một trong các trường 'job', 'adhoc' hoặc 'playbook'."
+
+#: ops/serializers/variable.py:123
+msgid "Invalid job, adhoc, or playbook ID."
+msgstr "ID job, adhoc hoặc playbook không hợp lệ."
+
+#: ops/serializers/variable.py:155
+#, python-format
+msgid "Invalid options format: %(error)s"
+msgstr "Định dạng tùy chọn không hợp lệ: %(error)s"
+
+#: ops/ws.py:71
+msgid "Task not found"
+msgstr "Không tìm thấy tác vụ"
+
+#: ops/ws.py:87
+msgid "No permission"
+msgstr "Không có quyền"
+
+#: perms/filters.py:93
+msgid "Include inherited permissions"
+msgstr "Bao gồm quyền kế thừa"
+
+#: perms/filters.py:180
+#: users/tree.py:107
+msgid "Ungrouped users"
+msgstr "Người dùng chưa phân nhóm"
+
+#: perms/models/asset_permission.py:83
+#: tickets/models/ticket/apply_asset.py:23
+msgid "Expiration-soon notice minutes"
+msgstr "Thời gian báo trước hết hạn (phút)"
+
+#: perms/models/asset_permission.py:86
+msgid "Expiration-soon notice time"
+msgstr "Thời điểm thông báo sắp hết hạn"
+
+#: perms/models/asset_permission.py:89
+msgid "Expiration-soon notice sent time"
+msgstr "Thời điểm gửi thông báo sắp hết hạn"
+
+#: perms/serializers/tree.py:44
+msgid "This list may not be empty."
+msgstr "Danh sách này không được để trống."
+
+#: perms/tasks.py:131
+msgid "Send asset permission expiration-soon notification"
+msgstr "Gửi thông báo quyền tài sản sắp hết hạn"
+
+#: perms/tasks.py:133
+msgid "Check due asset permission expiration-soon notices every minute and enqueue notifications"
+msgstr "Mỗi phút kiểm tra thông báo quyền tài sản sắp hết hạn đến hạn gửi và đưa vào hàng đợi"
+
+#: perms/utils/expire_soon_notice.py:28
+msgid "Ensure this value is greater than 0."
+msgstr "Đảm bảo giá trị lớn hơn 0."
+
+#: rbac/serializers/rolebinding.py:57
+msgid "Only organization roles can be bound"
+msgstr "Chỉ được liên kết vai trò tổ chức"
+
+#: rbac/tree.py:68
+msgid "System tools"
+msgstr "Công cụ hệ thống"
+
+#: reports/api/report.py:133
+msgid "Unsupported report type"
+msgstr "Loại báo cáo không được hỗ trợ"
+
+#: reports/api/report.py:135
+msgid "Report type can not be modified"
+msgstr "Không thể đổi loại báo cáo"
+
+#: reports/api/report.py:142
+msgid "Invalid days"
+msgstr "Số ngày không hợp lệ"
+
+#: reports/api/report.py:144
+msgid "Days must be one of: 1, 7, 30"
+msgstr "Số ngày phải là 1, 7 hoặc 30"
+
+#: reports/api/report.py:149
+msgid "Filters must be a dict"
+msgstr "Bộ lọc phải là từ điển"
+
+#: reports/api/report.py:233
+msgid "Builtin report template can not be modified"
+msgstr "Không thể sửa mẫu báo cáo tích hợp"
+
+#: reports/api/report.py:238
+msgid "Builtin report template can not be deleted"
+msgstr "Không thể xóa mẫu báo cáo tích hợp"
+
+#: settings/api/chat.py:149
+msgid "Unable to connect to the model provider"
+msgstr "Không thể kết nối nhà cung cấp mô hình"
+
+#: settings/api/chat.py:199
+msgid "Please select or enter a model first"
+msgstr "Hãy chọn hoặc nhập mô hình trước"
+
+#: settings/api/chat.py:240
+msgid "The provider is reachable, but the selected model does not support the required tool calls"
+msgstr "Có thể kết nối nhà cung cấp nhưng mô hình đã chọn không hỗ trợ các lệnh gọi công cụ cần thiết"
+
+#: settings/models.py:176
+msgid "Can change basic setting"
+msgstr "Có thể đổi cài đặt cơ bản"
+
+#: settings/models.py:177
+msgid "Can change system tools setting"
+msgstr "Có thể đổi cài đặt công cụ hệ thống"
+
+#: settings/serializers/auth/dingtalk.py:13
+msgid "Agent ID"
+msgstr "ID tác nhân"
+
+#: settings/serializers/auth/dingtalk.py:14
+#: settings/serializers/auth/sms.py:67
+msgid "App Key"
+msgstr "Khóa ứng dụng"
+
+#: settings/serializers/auth/dingtalk.py:15
+#: settings/serializers/auth/feishu.py:16
+#: settings/serializers/auth/lark.py:15
+#: settings/serializers/auth/sms.py:68
+#: settings/serializers/auth/wecom.py:15
+msgid "App Secret"
+msgstr "Bí mật ứng dụng"
+
+#: settings/serializers/auth/feishu.py:15
+#: settings/serializers/auth/lark.py:14
+msgid "App ID"
+msgstr "ID ứng dụng"
+
+#: settings/serializers/auth/oauth2.py:79
+msgid "User attribute mapping, where the `key` is this system user attribute name and the `value` is the OAuth2 service user attribute name. Use dot-separated paths for nested attributes, e.g. `attributes.account_no`"
+msgstr "Ánh xạ thuộc tính người dùng: `key` là tên thuộc tính trong hệ thống này, `value` là tên thuộc tính dịch vụ OAuth2. Dùng đường dẫn phân tách bằng dấu chấm cho thuộc tính lồng nhau, ví dụ `attributes.account_no`"
+
+#: settings/serializers/auth/saml2.py:30
+msgid "Controls verification when downloading IDP Metadata"
+msgstr "Điều khiển xác minh khi tải siêu dữ liệu IDP"
+
+#: settings/serializers/auth/slack.py:16
+msgid "Client bot Token"
+msgstr "Mã bot máy khách"
+
+#: settings/serializers/auth/sms.py:50
+msgid "Access Key ID"
+msgstr "ID khóa truy cập"
+
+#: settings/serializers/auth/sms.py:52
+msgid "Access Key Secret"
+msgstr "Bí mật khóa truy cập"
+
+#: settings/serializers/auth/sms.py:59
+msgid "Secret ID"
+msgstr "ID bí mật"
+
+#: settings/serializers/auth/sms.py:60
+msgid "Secret Key"
+msgstr "Khóa bí mật"
+
+#: settings/serializers/auth/sms.py:61
+msgid "SDK APP ID"
+msgstr "ID ứng dụng SDK"
+
+#: settings/serializers/auth/wecom.py:13
+msgid "Corporation ID"
+msgstr "ID doanh nghiệp"
+
+#: settings/serializers/auth/wecom.py:14
+msgid "App Agent ID"
+msgstr "ID tác nhân ứng dụng"
+
+#: settings/serializers/feature.py:39
+msgid "Enter a valid HTTP or HTTPS URL."
+msgstr "Nhập URL HTTP hoặc HTTPS hợp lệ."
+
+#: settings/serializers/feature.py:53
+msgid "Enter a new credential when changing its destination."
+msgstr "Nhập thông tin xác thực mới khi đổi đích đến."
+
+#: settings/serializers/feature.py:186
+#: settings/serializers/feature.py:226
+msgid "Verify TLS certificate"
+msgstr "Xác minh chứng chỉ TLS"
+
+#: settings/serializers/feature.py:192
+#: settings/serializers/feature.py:232
+msgid "PEM CA certificate used to verify the OpenBao server"
+msgstr "Chứng chỉ CA PEM dùng để xác minh máy chủ OpenBao"
+
+#: settings/serializers/feature.py:202
+msgid "OpenBao SSH CA"
+msgstr "Cơ quan chứng thực SSH OpenBao"
+
+#: settings/serializers/feature.py:220
+msgid "Certificate validity (seconds)"
+msgstr "Hiệu lực chứng chỉ (giây)"
+
+#: settings/serializers/feature.py:237
+msgid "Allowed source addresses"
+msgstr "Địa chỉ nguồn được phép"
+
+#: settings/serializers/feature.py:238
+msgid "Comma-separated CIDRs seen by the target SSH server"
+msgstr "Các CIDR mà máy chủ SSH đích thấy, phân tách bằng dấu phẩy"
+
+#: settings/serializers/feature.py:297
+msgid "Built-in API"
+msgstr "API tích hợp"
+
+#: settings/serializers/feature.py:297
+msgid "iframe embed"
+msgstr "Nhúng iframe"
+
+#: settings/serializers/feature.py:301
+msgid "iframe URL"
+msgstr "URL iframe"
+
+#: settings/serializers/feature.py:302
+msgid "The page URL loaded in the isolated AI assistant iframe."
+msgstr "URL trang được tải trong iframe riêng biệt của trợ lý AI."
+
+#: settings/serializers/feature.py:308
+msgid "OpenAI-compatible API base URL, usually ending in /v1."
+msgstr "URL cơ sở API tương thích OpenAI, thường kết thúc bằng /v1."
+
+#: settings/serializers/feature.py:315
+msgid "HTTP proxy used to reach the model provider. For example: http://ip:port"
+msgstr "Proxy HTTP để truy cập nhà cung cấp mô hình. Ví dụ: http://ip:port"
+
+#: settings/serializers/feature.py:319
+msgid "Discover models from the provider or enter a model ID manually."
+msgstr "Lấy danh sách mô hình từ nhà cung cấp hoặc nhập ID mô hình thủ công."
+
+#: settings/utils/ldap.py:90
+msgid "Invalid LDAP distinguishedName encoding"
+msgstr "Mã hóa distinguishedName LDAP không hợp lệ"
+
+#: settings/utils/ldap.py:97
+msgid "LDAP user distinguishedName is empty, cannot map OU group"
+msgstr "distinguishedName người dùng LDAP trống, không thể ánh xạ nhóm OU"
+
+#: settings/utils/ldap.py:103
+msgid "Invalid LDAP distinguishedName: {}"
+msgstr "distinguishedName LDAP không hợp lệ: {}"
+
+#: settings/utils/ldap.py:111
+msgid "LDAP distinguishedName has no OU, cannot map user group: {}"
+msgstr "distinguishedName LDAP không có OU, không thể ánh xạ nhóm: {}"
+
+#: settings/utils/ldap.py:121
+msgid "LDAP distinguishedName has no OU, cannot map user group"
+msgstr "distinguishedName LDAP không có OU, không thể ánh xạ nhóm"
+
+#: settings/utils/ldap.py:126
+msgid "LDAP OU group name exceeds {} characters: {}"
+msgstr "Tên nhóm OU LDAP vượt quá {} ký tự: {}"
+
+#: settings/utils/ldap.py:561
+msgid "LDAP user groups must be a list"
+msgstr "Nhóm người dùng LDAP phải là danh sách"
+
+#: settings/utils/ldap.py:573
+msgid "Failed to map LDAP user group from distinguishedName: no OU found"
+msgstr "Không thể ánh xạ nhóm LDAP từ distinguishedName: không tìm thấy OU"
+
+#: settings/ws.py:299
+msgid "Invalid organization IDs"
+msgstr "ID tổ chức không hợp lệ"
+
+#: settings/ws.py:302
+msgid "Invalid target organizations"
+msgstr "Tổ chức đích không hợp lệ"
+
+#: settings/ws.py:306
+msgid "A target organization is required"
+msgstr "Cần tổ chức đích"
+
+#: templates/500.html:7
+msgid "Server error"
+msgstr "Lỗi máy chủ"
+
+#: templates/500.html:10
+msgid "Server error occur, contact administrator"
+msgstr "Máy chủ gặp lỗi, hãy liên hệ quản trị viên"
+
+#: templates/_copyright.html:3
+msgid "Copyright"
+msgstr "Bản quyền"
+
+#: terminal/api/applet/applet.py:143
+msgid "Applet is not null"
+msgstr "Ứng dụng từ xa không được để trống"
+
+#: terminal/api/applet/host.py:31
+msgid "Needs attention"
+msgstr "Cần xử lý"
+
+#: terminal/api/applet/host.py:78
+msgid "Windows runtime accounts are managed locally by Tinker."
+msgstr "Tinker quản lý cục bộ các tài khoản chạy Windows."
+
+#: terminal/api/session/session.py:362
+msgid "Replay index not found."
+msgstr "Không tìm thấy chỉ mục bản ghi."
+
+#: terminal/api/session/session.py:365
+msgid "Replay index is invalid."
+msgstr "Chỉ mục bản ghi không hợp lệ."
+
+#: terminal/api/session/session.py:368
+msgid "Replay index is unavailable."
+msgstr "Chỉ mục bản ghi không khả dụng."
+
+#: terminal/api/virtualapp/provider.py:93
+msgid "Wait for the current deployment to finish before deleting the provider"
+msgstr "Chờ triển khai hiện tại hoàn tất trước khi xóa nhà cung cấp"
+
+#: terminal/api/virtualapp/provider.py:182
+msgid "A deployment is already pending or running for this provider"
+msgstr "Nhà cung cấp đã có tác vụ triển khai đang chờ hoặc đang chạy"
+
+#: terminal/api/virtualapp/virtualapp.py:115
+msgid "Image architecture is required"
+msgstr "Cần kiến trúc ảnh"
+
+#: terminal/automations/deploy_app_provider/__init__.py:35
+msgid "Invalid virtual application offline manifest"
+msgstr "Bản kê ngoại tuyến ứng dụng ảo không hợp lệ"
+
+#: terminal/automations/deploy_app_provider/__init__.py:69
+msgid "Invalid Panda offline image ID"
+msgstr "ID ảnh Panda ngoại tuyến không hợp lệ"
+
+#: terminal/automations/deploy_app_provider/__init__.py:127
+msgid "No deployable SSH host: check the privileged account and platform automation"
+msgstr "Không có máy chủ SSH để triển khai: kiểm tra tài khoản đặc quyền và tự động hóa nền tảng"
+
+#: terminal/automations/deploy_app_provider/__init__.py:130
+msgid "Application provider deployment requires SSH"
+msgstr "Triển khai nhà cung cấp ứng dụng cần SSH"
+
+#: terminal/automations/deploy_app_provider/__init__.py:154
+msgid "Provider terminal must be Panda"
+msgstr "Thiết bị đầu cuối nhà cung cấp phải là Panda"
+
+#: terminal/automations/deploy_applet_host/__init__.py:111
+msgid "Applet host terminal must be Tinker"
+msgstr "Thiết bị đầu cuối máy chủ ứng dụng phải là Tinker"
+
+#: terminal/automations/deploy_applet_host/__init__.py:122
+msgid "Tinker component has no active access key"
+msgstr "Thành phần Tinker không có khóa truy cập hoạt động"
+
+#: terminal/automations/deploy_applet_host/__init__.py:140
+#: terminal/automations/deploy_applet_host/__init__.py:158
+msgid "Tinker component binding changed during deployment"
+msgstr "Liên kết thành phần Tinker thay đổi trong khi triển khai"
+
+#: terminal/automations/deploy_applet_host/__init__.py:147
+msgid "Unconfirmed Tinker component is not a service account"
+msgstr "Thành phần Tinker chưa xác nhận không phải tài khoản dịch vụ"
+
+#: terminal/automations/deploy_applet_host/__init__.py:180
+msgid "applet is required for uninstall_applet"
+msgstr "uninstall_applet yêu cầu applet"
+
+#: terminal/const.py:91
+msgid "Built-in browser"
+msgstr "Trình duyệt tích hợp"
+
+#: terminal/models/applet/applet.py:115
+#: terminal/models/virtualapp/virtualapp.py:80
+msgid "Missing name in manifest.yml"
+msgstr "manifest.yml thiếu tên"
+
+#: terminal/models/applet/host.py:16
+msgid "Tinker version"
+msgstr "Phiên bản Tinker"
+
+#: terminal/models/applet/host.py:50
+#: terminal/models/virtualapp/provider.py:55
+msgid "Request user has no terminal"
+msgstr "Người dùng yêu cầu không có thiết bị đầu cuối"
+
+#: terminal/models/applet/host.py:52
+msgid "Only Tinker terminals can bind an applet host"
+msgstr "Chỉ thiết bị đầu cuối Tinker được liên kết máy chủ ứng dụng"
+
+#: terminal/models/applet/host.py:56
+msgid "Terminal is not bound to this applet host"
+msgstr "Thiết bị đầu cuối chưa liên kết với máy chủ ứng dụng này"
+
+#: terminal/models/component/endpoint.py:18
+msgid "Web proxy port"
+msgstr "Cổng proxy web"
+
+#: terminal/models/session/sharing.py:172
+msgid "Session sharing or user does not exist"
+msgstr "Chia sẻ phiên hoặc người dùng không tồn tại"
+
+#: terminal/models/virtualapp/provider.py:57
+msgid "Only Panda terminals can bind an application provider"
+msgstr "Chỉ thiết bị đầu cuối Panda được liên kết nhà cung cấp ứng dụng"
+
+#: terminal/models/virtualapp/provider.py:62
+msgid "Provider is already bound to another terminal"
+msgstr "Nhà cung cấp đã liên kết với thiết bị đầu cuối khác"
+
+#: terminal/models/virtualapp/provider.py:69
+msgid "Terminal is already bound to another provider"
+msgstr "Thiết bị đầu cuối đã liên kết với nhà cung cấp khác"
+
+#: terminal/models/virtualapp/provider.py:109
+msgid "Provider host is required before deployment"
+msgstr "Cần máy chủ nhà cung cấp trước khi triển khai"
+
+#: terminal/models/virtualapp/provider.py:111
+msgid "Provider deployment requires a Linux host"
+msgstr "Triển khai nhà cung cấp cần máy chủ Linux"
+
+#: terminal/models/virtualapp/provider.py:114
+msgid "A valid SSH port different from the Panda API port is required"
+msgstr "Cần cổng SSH hợp lệ khác cổng API Panda"
+
+#: terminal/models/virtualapp/provider.py:117
+msgid "An active root or privileged SSH account with a password or private key is required"
+msgstr "Cần tài khoản SSH root hoặc đặc quyền đang hoạt động với mật khẩu hoặc khóa riêng"
+
+#: terminal/models/virtualapp/provider.py:120
+msgid "Disable the provider and wait for all containers to exit before deployment"
+msgstr "Tắt nhà cung cấp và chờ mọi bộ chứa thoát trước khi triển khai"
+
+#: terminal/models/virtualapp/provider.py:124
+#, python-format
+msgid "Invalid offline deployment resources: %s"
+msgstr "Tài nguyên triển khai ngoại tuyến không hợp lệ: %s"
+
+#: terminal/models/virtualapp/provider.py:130
+msgid "Select a Panda image already loaded on the provider or prepare the Installer offline resources"
+msgstr "Chọn ảnh Panda đã nạp trên nhà cung cấp hoặc chuẩn bị tài nguyên ngoại tuyến Installer"
+
+#: terminal/models/virtualapp/provider.py:135
+msgid "Container port range must not include the SSH port"
+msgstr "Dải cổng bộ chứa không được gồm cổng SSH"
+
+#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:59
+msgid "Invalid Core URL."
+msgstr "URL Core không hợp lệ."
+
+#: terminal/serializers/terminal.py:138
+msgid "Only Tinker can bind an applet host"
+msgstr "Chỉ Tinker được liên kết máy chủ ứng dụng"
+
+#: terminal/serializers/terminal.py:141
+msgid "Applet host is missing or already bound"
+msgstr "Máy chủ ứng dụng không tồn tại hoặc đã liên kết"
+
+#: terminal/serializers/terminal.py:162
+msgid "App provider not found"
+msgstr "Không tìm thấy nhà cung cấp ứng dụng"
+
+#: terminal/serializers/virtualapp_provider.py:57
+msgid "Enter a valid HTTP or HTTPS Core URL"
+msgstr "Nhập URL Core HTTP hoặc HTTPS hợp lệ"
+
+#: terminal/serializers/virtualapp_provider.py:71
+msgid "Enter a valid Docker image reference"
+msgstr "Nhập tham chiếu ảnh Docker hợp lệ"
+
+#: terminal/serializers/virtualapp_provider.py:79
+msgid "Use a port range between 1 and 65535, excluding the Panda API port 9001"
+msgstr "Dùng dải cổng từ 1 đến 65535, không gồm cổng API Panda 9001"
+
+#: terminal/serializers/virtualapp_provider.py:181
+msgid "The provider host cannot be removed"
+msgstr "Không thể gỡ máy chủ nhà cung cấp"
+
+#: terminal/serializers/virtualapp_provider.py:188
+msgid "Host name and address are required"
+msgstr "Cần tên và địa chỉ máy chủ"
+
+#: terminal/serializers/virtualapp_provider.py:195
+msgid "An application provider with this name already exists"
+msgstr "Đã có nhà cung cấp ứng dụng cùng tên"
+
+#: terminal/serializers/virtualapp_provider.py:200
+msgid "Application provider host is required"
+msgstr "Cần máy chủ nhà cung cấp ứng dụng"
+
+#: terminal/serializers/virtualapp_provider.py:216
+msgid "Wait for the current deployment to finish before editing the provider"
+msgstr "Chờ triển khai hiện tại hoàn tất trước khi sửa nhà cung cấp"
+
+#: terminal/serializers/virtualapp_provider.py:261
+msgid "Use the application publication API to publish images"
+msgstr "Dùng API phát hành ứng dụng để phát hành ảnh"
+
+#: terminal/tasks.py:157
+msgid "Application provider deployment failed; see the Ansible task log"
+msgstr "Triển khai nhà cung cấp ứng dụng thất bại; xem nhật ký tác vụ Ansible"
+
+#: terminal/utils/tinker.py:33
+#, python-format
+msgid "Tinker version %(version)s is unavailable for connections. Upgrade and redeploy this applet host with Tinker %(minimum)s or later."
+msgstr "Tinker %(version)s không dùng được để kết nối. Hãy nâng cấp máy chủ này lên Tinker %(minimum)s trở lên và triển khai lại."
+
+#: terminal/utils/tinker.py:35
+msgid "not reported"
+msgstr "Chưa báo cáo"
+
+#: terminal/utils/virtualapp.py:52
+msgid "Unsafe path in application image archive"
+msgstr "Đường dẫn không an toàn trong tệp lưu trữ ảnh ứng dụng"
+
+#: terminal/utils/virtualapp.py:64
+msgid "Invalid application image archive read size"
+msgstr "Kích thước đọc tệp lưu trữ ảnh ứng dụng không hợp lệ"
+
+#: terminal/utils/virtualapp.py:66
+msgid "Application image archive validation timed out"
+msgstr "Xác minh tệp lưu trữ ảnh ứng dụng hết thời gian"
+
+#: terminal/utils/virtualapp.py:70
+msgid "Application image archive exceeds the unpacked size limit"
+msgstr "Tệp lưu trữ ảnh ứng dụng vượt giới hạn kích thước giải nén"
+
+#: terminal/utils/virtualapp.py:77
+msgid "Invalid or sparse entry in application image archive"
+msgstr "Mục không hợp lệ hoặc thưa trong tệp lưu trữ ảnh ứng dụng"
+
+#: terminal/utils/virtualapp.py:81
+msgid "Sparse entries are not supported in application image archives"
+msgstr "Tệp lưu trữ ảnh ứng dụng không hỗ trợ mục thưa"
+
+#: terminal/utils/virtualapp.py:94
+msgid "Application image archive has oversized tar metadata"
+msgstr "Siêu dữ liệu tar của tệp lưu trữ ảnh ứng dụng quá lớn"
+
+#: terminal/utils/virtualapp.py:115
+msgid "Duplicate or too many entries in application image archive"
+msgstr "Tệp lưu trữ ảnh ứng dụng có mục trùng lặp hoặc quá nhiều mục"
+
+#: terminal/utils/virtualapp.py:117
+msgid "Application image archive contains an unsupported entry"
+msgstr "Tệp lưu trữ ảnh ứng dụng có mục không được hỗ trợ"
+
+#: terminal/utils/virtualapp.py:129
+msgid "Invalid Docker image manifest"
+msgstr "Bản kê ảnh Docker không hợp lệ"
+
+#: terminal/utils/virtualapp.py:135
+msgid "Too many image configurations in application image archive"
+msgstr "Quá nhiều cấu hình ảnh trong tệp lưu trữ ứng dụng"
+
+#: terminal/utils/virtualapp.py:144
+msgid "Invalid or too many OCI manifests in application image archive"
+msgstr "Bản kê OCI không hợp lệ hoặc quá nhiều trong tệp lưu trữ ảnh ứng dụng"
+
+#: terminal/utils/virtualapp.py:149
+msgid "Invalid application image archive"
+msgstr "Tệp lưu trữ ảnh ứng dụng không hợp lệ"
+
+#: terminal/utils/virtualapp.py:151
+msgid "Upload a Docker save archive containing one application image"
+msgstr "Tải lên tệp lưu trữ Docker save chứa một ảnh ứng dụng"
+
+#: terminal/utils/virtualapp.py:155
+msgid "Application image archive does not contain the configured image name and tag"
+msgstr "Tệp lưu trữ không chứa tên và thẻ ảnh đã cấu hình"
+
+#: terminal/utils/virtualapp.py:158
+msgid "Application image archive has no valid image configuration"
+msgstr "Tệp lưu trữ không có cấu hình ảnh hợp lệ"
+
+#: terminal/utils/virtualapp.py:164
+msgid "Application image archive is missing image layers"
+msgstr "Tệp lưu trữ thiếu các lớp ảnh"
+
+#: terminal/utils/virtualapp.py:167
+msgid "Application image archive must contain one Linux platform"
+msgstr "Tệp lưu trữ phải chứa một nền tảng Linux duy nhất"
+
+#: terminal/utils/virtualapp.py:219
+msgid "Invalid application image archive metadata"
+msgstr "Siêu dữ liệu tệp lưu trữ ảnh ứng dụng không hợp lệ"
+
+#: terminal/utils/virtualapp.py:251
+msgid "Virtual application no longer exists"
+msgstr "Ứng dụng ảo không còn tồn tại"
+
+#: terminal/utils/virtualapp.py:253
+msgid "Virtual application changed; upload or publish its current image again"
+msgstr "Ứng dụng ảo đã thay đổi; hãy tải lên hoặc phát hành lại ảnh hiện tại"
+
+#: terminal/utils/virtualapp.py:260
+msgid "Upload a Docker save image as .tar, .tar.zst or .zst"
+msgstr "Tải lên ảnh Docker save dạng .tar, .tar.zst hoặc .zst"
+
+#: terminal/utils/virtualapp.py:262
+#: terminal/utils/virtualapp.py:274
+msgid "Application image archive must be no larger than 10 GiB"
+msgstr "Tệp lưu trữ ảnh ứng dụng không được vượt 10 GiB"
+
+#: terminal/utils/virtualapp.py:304
+msgid "No application image archive for this architecture"
+msgstr "Không có tệp lưu trữ ảnh ứng dụng cho kiến trúc này"
+
+#: terminal/utils/virtualapp.py:324
+msgid "Invalid offline application image archive path"
+msgstr "Đường dẫn tệp lưu trữ ảnh ứng dụng ngoại tuyến không hợp lệ"
+
+#: terminal/utils/virtualapp.py:340
+msgid "Offline application image cannot be staged; upload it again"
+msgstr "Không thể chuẩn bị ảnh ứng dụng ngoại tuyến; hãy tải lên lại"
+
+#: tickets/api/flow.py:32
+msgid "Inherited ticket flows cannot be deleted"
+msgstr "Không thể xóa quy trình phiếu yêu cầu kế thừa"
+
+#: tickets/models/ticket/general.py:99
+msgid "Assignee"
+msgstr "Người xử lý"
+
+#: users/api/user.py:187
+msgid "Not a valid org"
+msgstr "Tổ chức không hợp lệ"
+
+#: users/models/user/_face.py:24
+#: users/models/user/_face.py:34
+msgid "Face vector is not set."
+msgstr "Chưa thiết lập dữ liệu khuôn mặt."
+
+#: users/models/user/_face.py:27
+#: users/models/user/_face.py:37
+msgid "Face recognition backend is not available."
+msgstr "Bộ xử lý nhận diện khuôn mặt không khả dụng."
+
+#: users/serializers/tree.py:37
+msgid "parent_type and parent_id must be provided together."
+msgstr "Phải cung cấp parent_type và parent_id cùng nhau."
+
+#: users/serializers/tree.py:41
+msgid "Search and parent parameters cannot be used together."
+msgstr "Không được dùng tham số tìm kiếm cùng tham số cha."
+
+#: users/serializers/tree.py:45
+msgid "Offset is only supported when loading children."
+msgstr "Chỉ hỗ trợ độ lệch khi tải mục con."
+
+#: users/serializers/tree.py:52
+msgid "Enter a valid UUID."
+msgstr "Nhập UUID hợp lệ."
+
+#: users/views/profile/reset.py:134
+msgid "Verification code has been used more than 3 times, please re-verify"
+msgstr "Mã xác minh đã dùng hơn 3 lần, hãy xác minh lại"
+
+#: xpack/plugins/cloud/api.py:161
+msgid "Query params account_id is not uuid"
+msgstr "Tham số truy vấn account_id không phải UUID"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:81
+msgid "eg. https://IP:9440/api/nutanix/v3/"
+msgstr "Ví dụ: https://IP:9440/api/nutanix/v3/"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "SC domain name"
+msgstr "Tên miền SC"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:136
+msgid "eg. http://IP:8080/zstack"
+msgstr "Ví dụ: http://IP:8080/zstack"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:144
+msgid "eg. http://CLOUDTOWER_IP"
+msgstr "Ví dụ: http://CLOUDTOWER_IP"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:151
+msgid "eg. https://IP:8006/api2/json"
+msgstr "Ví dụ: https://IP:8006/api2/json"
+
+#: xpack/plugins/facelive/backend.py:29
+msgid "Face recognition dependencies are unavailable; run uv sync --group xpack"
+msgstr "Thiếu các phần phụ thuộc nhận diện khuôn mặt; chạy uv sync --group xpack"
+
+#: xpack/plugins/facelive/backend.py:72
+msgid "OpenCV image must be a BGR image"
+msgstr "Ảnh OpenCV phải ở định dạng BGR"
+
+#: xpack/plugins/facelive/backend.py:74
+#: xpack/plugins/facelive/backend.py:111
+msgid "Camera frame resolution is too low"
+msgstr "Độ phân giải khung hình máy ảnh quá thấp"
+
+#: xpack/plugins/facelive/backend.py:97
+#: xpack/plugins/facelive/backend.py:104
+msgid "Invalid camera frame"
+msgstr "Khung hình máy ảnh không hợp lệ"
+
+#: xpack/plugins/facelive/backend.py:100
+msgid "Camera frame is empty or too large"
+msgstr "Khung hình máy ảnh trống hoặc quá lớn"
+
+#: xpack/plugins/facelive/backend.py:106
+msgid "Camera frame is too large"
+msgstr "Khung hình máy ảnh quá lớn"
+
+#: xpack/plugins/facelive/backend.py:109
+msgid "Unable to decode camera frame"
+msgstr "Không thể giải mã khung hình máy ảnh"
+
+#: xpack/plugins/facelive/backend.py:183
+msgid "Multiple similar faces detected; keep only one person in view"
+msgstr "Phát hiện nhiều khuôn mặt tương tự; chỉ giữ một người trong khung hình"
+
+#: xpack/plugins/facelive/backend.py:193
+msgid "None of FACE_RECOGNITION_PROVIDERS are available"
+msgstr "Không có bộ xử lý nào trong FACE_RECOGNITION_PROVIDERS khả dụng"
+
+#: xpack/plugins/facelive/backend.py:209
+msgid "FACE_RECOGNITION_DEVICE is gpu but no accelerated ONNX provider is available"
+msgstr "FACE_RECOGNITION_DEVICE là gpu nhưng không có bộ xử lý ONNX tăng tốc"
+
+#: xpack/plugins/facelive/challenge.py:16
+msgid "Turn your head left and right, then face forward"
+msgstr "Quay đầu sang trái và phải rồi nhìn thẳng"
+
+#: xpack/plugins/facelive/challenge.py:17
+msgid "Nod once, then face forward"
+msgstr "Gật đầu một lần rồi nhìn thẳng"
+
+#: xpack/plugins/facelive/challenge.py:18
+msgid "Open and close your mouth"
+msgstr "Mở rồi ngậm miệng"
+
+#: xpack/plugins/facelive/challenge.py:65
+msgid "Look straight at the camera"
+msgstr "Nhìn thẳng vào máy ảnh"
+
+#: xpack/plugins/facelive/codec.py:27
+msgid "Face vector is invalid"
+msgstr "Vectơ khuôn mặt không hợp lệ"
+
+#: xpack/plugins/facelive/codec.py:30
+msgid "Face vector magnitude is zero"
+msgstr "Độ lớn vectơ khuôn mặt bằng không"
+
+#: xpack/plugins/facelive/codec.py:38
+#: xpack/plugins/facelive/codec.py:53
+msgid "Face vector has an invalid dimension"
+msgstr "Số chiều vectơ khuôn mặt không hợp lệ"
+
+#: xpack/plugins/facelive/codec.py:45
+msgid "Face vector is missing"
+msgstr "Thiếu vectơ khuôn mặt"
+
+#: xpack/plugins/facelive/codec.py:50
+msgid "Face vector has an invalid size"
+msgstr "Kích thước vectơ khuôn mặt không hợp lệ"
+
+#: xpack/plugins/facelive/codec.py:60
+msgid "Face vector has an unsupported format"
+msgstr "Định dạng vectơ khuôn mặt không được hỗ trợ"
+
+#: xpack/plugins/facelive/codec.py:71
+msgid "Face vectors use different dimensions"
+msgstr "Các vectơ khuôn mặt có số chiều khác nhau"
+
+#: xpack/plugins/facelive/codec.py:105
+msgid "Face vector is not valid base64"
+msgstr "Vectơ khuôn mặt không phải Base64 hợp lệ"
+
+#: xpack/plugins/facelive/consumer.py:62
+msgid "Unsupported message type"
+msgstr "Loại thông điệp không được hỗ trợ"
+
+#: xpack/plugins/facelive/consumer.py:73
+msgid "Camera frame is missing"
+msgstr "Thiếu khung hình máy ảnh"
+
+#: xpack/plugins/facelive/consumer.py:113
+msgid "Face recognition service is unavailable"
+msgstr "Dịch vụ nhận diện khuôn mặt không khả dụng"
+
+#: xpack/plugins/facelive/context.py:40
+msgid "Invalid face capture token"
+msgstr "Mã thu thập khuôn mặt không hợp lệ"
+
+#: xpack/plugins/facelive/context.py:48
+msgid "Face capture token does not exist or has expired"
+msgstr "Mã thu thập khuôn mặt không tồn tại hoặc đã hết hạn"
+
+#: xpack/plugins/facelive/context.py:50
+msgid "Face capture has already finished"
+msgstr "Thu thập khuôn mặt đã kết thúc"
+
+#: xpack/plugins/facelive/context.py:60
+msgid "Face capture token does not belong to this session"
+msgstr "Mã thu thập khuôn mặt không thuộc phiên này"
+
+#: xpack/plugins/facelive/context.py:62
+msgid "Face capture context has no target user"
+msgstr "Ngữ cảnh thu thập khuôn mặt không có người dùng đích"
+
+#: xpack/plugins/facelive/context.py:66
+msgid "Face capture target user does not exist"
+msgstr "Người dùng đích của thu thập khuôn mặt không tồn tại"
+
+#: xpack/plugins/facelive/context.py:69
+#: xpack/plugins/facelive/context.py:86
+msgid "No face feature is bound for this user"
+msgstr "Người dùng này chưa liên kết đặc trưng khuôn mặt"
+
+#: xpack/plugins/facelive/context.py:78
+msgid "Authentication is required for online face monitoring"
+msgstr "Cần xác thực để giám sát khuôn mặt trực tuyến"
+
+#: xpack/plugins/facelive/context.py:81
+msgid "Face monitor token does not exist or has expired"
+msgstr "Mã giám sát khuôn mặt không tồn tại hoặc đã hết hạn"
+
+#: xpack/plugins/facelive/context.py:83
+msgid "Face monitor token belongs to another user"
+msgstr "Mã giám sát khuôn mặt thuộc người dùng khác"
+
+#: xpack/plugins/facelive/context.py:98
+msgid "Face capture token expired before completion"
+msgstr "Mã thu thập khuôn mặt hết hạn trước khi hoàn tất"
+
+#: xpack/plugins/facelive/context.py:139
+msgid "Connection token no longer exists"
+msgstr "Mã kết nối không còn tồn tại"
+
+#: xpack/plugins/facelive/context.py:146
+msgid "Face recognition is disabled"
+msgstr "Nhận diện khuôn mặt chưa bật"
+
+#: xpack/plugins/facelive/liveness.py:67
+msgid "FACE_LIVENESS_MODEL_PATH must reference a validated anti-spoof ONNX model"
+msgstr "FACE_LIVENESS_MODEL_PATH phải trỏ đến mô hình ONNX chống giả mạo đã xác minh"
+
+#: xpack/plugins/facelive/liveness.py:72
+msgid "ONNX Runtime is unavailable"
+msgstr "ONNX Runtime không khả dụng"
+
+#: xpack/plugins/facelive/liveness.py:92
+msgid "GPU liveness was requested but no accelerated ONNX provider is available"
+msgstr "Đã yêu cầu kiểm tra người thật bằng GPU nhưng không có bộ xử lý ONNX tăng tốc"
+
+#: xpack/plugins/facelive/liveness.py:115
+msgid "FACE_LIVENESS_LIVE_INDEX is outside model output"
+msgstr "FACE_LIVENESS_LIVE_INDEX nằm ngoài phạm vi đầu ra mô hình"
+
+#: xpack/plugins/facelive/liveness.py:128
+msgid "Anti-spoof ONNX input must have four dimensions"
+msgstr "Đầu vào ONNX chống giả mạo phải có bốn chiều"
+
+#: xpack/plugins/facelive/liveness.py:134
+msgid "Anti-spoof ONNX input must be RGB"
+msgstr "Đầu vào ONNX chống giả mạo phải ở định dạng RGB"
+
+#: xpack/plugins/facelive/liveness.py:189
+#, python-format
+msgid "Unknown liveness mode: %(mode)s"
+msgstr "Chế độ kiểm tra người thật không xác định: %(mode)s"
+
+#: xpack/plugins/facelive/monitor.py:128
+msgid "Camera monitoring connection closed"
+msgstr "Kết nối giám sát máy ảnh đã đóng"
+
+#: xpack/plugins/facelive/monitor.py:135
+msgid "Face monitor state is unavailable"
+msgstr "Trạng thái giám sát khuôn mặt không khả dụng"
+
+#: xpack/plugins/facelive/monitor.py:237
+msgid "Face monitor timed out"
+msgstr "Giám sát khuôn mặt hết thời gian"
+
+#: xpack/plugins/facelive/sessions.py:67
+msgid "Face flow has already finished"
+msgstr "Quy trình nhận diện khuôn mặt đã kết thúc"
+
+#: xpack/plugins/facelive/sessions.py:83
+msgid "Face verification timed out"
+msgstr "Xác minh khuôn mặt hết thời gian"
+
+#: xpack/plugins/facelive/sessions.py:85
+msgid "The liveness action was not completed in time"
+msgstr "Chưa hoàn thành động tác kiểm tra người thật trong thời gian quy định"
+
+#: xpack/plugins/facelive/sessions.py:96
+msgid "Place one face fully inside the camera area"
+msgstr "Đặt trọn một khuôn mặt trong vùng máy ảnh"
+
+#: xpack/plugins/facelive/sessions.py:103
+msgid "Move closer to the camera"
+msgstr "Đến gần máy ảnh hơn"
+
+#: xpack/plugins/facelive/sessions.py:109
+msgid "Frozen or replayed camera frames detected"
+msgstr "Phát hiện khung hình máy ảnh bị đóng băng hoặc phát lại"
+
+#: xpack/plugins/facelive/sessions.py:121
+msgid "The stored face template uses a different model; bind the face again"
+msgstr "Mẫu khuôn mặt đã lưu dùng mô hình khác; hãy liên kết lại khuôn mặt"
+
+#: xpack/plugins/facelive/sessions.py:124
+msgid "The current face does not match the selected user"
+msgstr "Khuôn mặt hiện tại không khớp người dùng đã chọn"
+
+#: xpack/plugins/facelive/sessions.py:126
+msgid "The face changed during enrollment"
+msgstr "Khuôn mặt thay đổi trong khi đăng ký"
+
+#: xpack/plugins/facelive/sessions.py:152
+msgid "Liveness passed once; online face monitoring is now active"
+msgstr "Đã qua kiểm tra người thật; giám sát khuôn mặt trực tuyến đã bật"
+
+#: xpack/plugins/facelive/sessions.py:216
+#, python-format
+msgid "Captured %(count)s face samples"
+msgstr "Đã thu thập %(count)s mẫu khuôn mặt"
+
+#: xpack/plugins/facelive/sessions.py:223
+msgid "Checking liveness; keep your face clear and well lit"
+msgstr "Đang kiểm tra người thật; giữ khuôn mặt rõ nét và đủ sáng"
+
+#: xpack/plugins/facelive/sessions.py:228
+#, python-format
+msgid "Capturing face samples %(count)s/%(total)s"
+msgstr "Đang thu thập mẫu khuôn mặt %(count)s/%(total)s"
+
+#: xpack/plugins/facelive/sessions.py:256
+msgid "Face identity, liveness, and action challenge passed"
+msgstr "Đã qua xác minh danh tính khuôn mặt, người thật và động tác"
+
+#: xpack/plugins/facelive/sessions.py:273
+#, python-format
+msgid "%(name)s is in the camera area"
+msgstr "%(name)s nằm trong vùng máy ảnh"
+
+#: xpack/plugins/facelive/sessions.py:277
+msgid "Target face is not visible"
+msgstr "Không thấy khuôn mặt đích"
+
+#: xpack/plugins/facelive/sessions.py:279
+msgid "Target face does not match"
+msgstr "Khuôn mặt đích không khớp"
+
+#: xpack/plugins/facelive/sessions.py:285
+msgid "The monitored session has been paused"
+msgstr "Phiên được giám sát đã tạm dừng"
+
+#: xpack/plugins/facelive/sessions.py:287
+#, python-format
+msgid "Target left the camera area; callback in %(seconds)ss"
+msgstr "Đối tượng rời vùng máy ảnh; gọi lại sau %(seconds)s giây"
+
+#: xpack/plugins/facelive/sessions.py:324
+#: xpack/plugins/facelive/sessions.py:330
+#: xpack/plugins/facelive/sessions.py:337
+msgid "Repeated camera frame detected"
+msgstr "Phát hiện khung hình máy ảnh lặp lại"
+
+#: xpack/plugins/facelive/sessions.py:480
+msgid "Waiting for the selected face to match"
+msgstr "Đang chờ khuôn mặt khớp với người đã chọn"
+
+#: xpack/plugins/facelive/sessions.py:482
+msgid "Checking liveness; move naturally and keep the image clear"
+msgstr "Đang kiểm tra người thật; cử động tự nhiên và giữ hình ảnh rõ nét"
+
+#: xpack/plugins/facelive/sessions.py:485
+msgid "Finalizing face verification"
+msgstr "Đang hoàn tất xác minh khuôn mặt"
+
+#: xpack/plugins/jdmc/api/mail.py:30
+msgid "Mail sent successfully"
+msgstr "Đã gửi email thành công"
+
+#: xpack/plugins/jdmc/serializers.py:6
+msgid "Email addresses of the recipients"
+msgstr "Địa chỉ email người nhận"
+
+#: xpack/plugins/jdmc/serializers.py:7
+msgid "Subject of the mail"
+msgstr "Tiêu đề email"
+
+#: xpack/plugins/jdmc/serializers.py:8
+msgid "Message of the email"
+msgstr "Nội dung email"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "Tóm tắt quản trị và khuyến nghị"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "Tổng quan chỉ số chính"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "Phân tích hoạt động vận hành"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "Phân tích sự kiện bảo mật"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "Tổng quan tài sản và tài khoản"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "Phân tích vận hành tài khoản"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "Báo cáo kiểm toán tổng hợp"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "Thu thập hoạt động hoạt động, sự kiện an ninh, tài sản và tài khoản cho các kiểm toán hàng tháng, hàng năm hoặc hàng năm."
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "Báo cáo hoạt động vận hành"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "Kiểm tra những người đã thực hiện các phiên, lệnh, và các hoạt động tệp trên mỗi tài sản."
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "Báo cáo sự kiện bảo mật"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "Kiểm tra các lệnh rủi ro cao, bất thường đăng nhập, và từ chối truy cập, phân biệt các thất bại từ các sự kiện bảo mật."
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "Báo cáo vận hành tài khoản"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "Xem xét kết quả và thất bại của các nhiệm vụ tự động hóa tài khoản."
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "Bạn không được phép xem dữ liệu cho chủ đề báo cáo này."
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "Ngày kết thúc không được trước ngày bắt đầu."
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "Báo cáo có thể bao gồm tối đa 366 ngày. Hãy chọn khoảng thời gian ngắn hơn."
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "Ngày kết thúc không được sau hôm nay. Với kỳ hiện tại, hãy thống kê đến hôm nay."
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "Các chương được duplicate hoặc không thuộc về chủ đề báo cáo được chọn."
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "Chọn ít nhất một chương chứa dữ liệu thống kê."
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "Phiên truy cập tài sản"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "Bản ghi lệnh"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "Nhật ký đăng nhập"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "Nhật ký thao tác"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "Truyền tệp"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "Tài sản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "Tài khoản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "Tác vụ tự động hóa tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "Nhật ký đổi mật khẩu người dùng nền tảng"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（kho lưu trữ khả dụng）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "Lệnh bị cảnh báo"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "Lệnh bị chặn theo quy tắc"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "Lệnh bị từ chối phê duyệt"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "Lệnh đã được phê duyệt"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "Lệnh có phê duyệt bị hủy"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "Chủ đề báo cáo không được hỗ trợ"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "Chọn ngày bắt đầu và ngày kết thúc"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "Ngày bắt đầu không thể là muộn hơn ngày kết thúc, và báo cáo có thể bao gồm tối đa 366 ngày"
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "Ngày kết thúc không được sau hôm nay"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "Chọn các phần báo cáo không trùng lặp"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "Các chương được chọn không thuộc chủ đề báo cáo này"
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "Số phiên"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "lần"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "Người dùng hoạt động"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "người dùng"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "Tài sản đã truy cập"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "tài sản"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "Kết nối thất bại"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "Trạng thái ghi hình phiên"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "5 nguyên nhân kết nối thất bại hàng đầu"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "Xếp hạng truy cập theo người dùng"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "Xếp hạng truy cập theo tài sản"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "Phân bố giao thức kết nối"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "Loại thao tác phiên"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "Phân bố truy cập theo nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "Xu hướng phiên tài sản theo ngày"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "Xu hướng phiên tài sản theo tuần"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "Xu hướng phiên tài sản theo tháng"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "Các phiên truy cập tài sản gần đây"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "Bản ghi cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "bản ghi"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "Thông tin phê duyệt lệnh trong cùng phiên"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "Đăng nhập thành công"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "Đăng nhập thất bại"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "Bản ghi đăng nhập bị hạn chế"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "Từ chối theo chính sách đăng nhập"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "Đăng nhập thất bại gần đây"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "Dấu hiệu đăng nhập từ thành phố mới"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "Dấu hiệu đăng nhập từ thành phố mới cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "Loại thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "5 đối tượng chịu ảnh hưởng hàng đầu của lỗi thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "Thao tác tệp thất bại gần đây"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "Lượt thực thi tác vụ tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "Thực thi thành công"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "Thực thi thất bại hoặc gặp lỗi"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "Thực thi chưa hoàn tất"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "Loại và kết quả tác vụ tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "Tác vụ tài khoản thất bại gần đây"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "Tỷ lệ tác vụ thất bại hoặc lỗi"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "5 dấu hiệu lỗi đổi mật khẩu hàng đầu"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "Tài khoản đổi mật khẩu cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "Đăng nhập hạn chế hoặc từ chối chính sách đã được ghi lại. Kiểm tra rằng nguồn, danh tính người dùng và chính sách truy cập được mong đợi."
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "Số lệnh"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "Kết quả xử lý lệnh cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "Không lưu lý do từ chối riêng; hãy xem thảo luận trong phiếu"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "Chưa được ghi nhận"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "Bản ghi đăng nhập từ địa chỉ loopback"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "từ chối"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "Số thao tác nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "Từ chối theo chính sách thao tác"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "Chi tiết từ chối theo chính sách"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "Số thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "Thao tác tệp thất bại"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "Tỷ lệ lỗi thao tác tệp"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "Tổng tài sản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "Tài sản hiện đang bật"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "Phân bố tài sản hiện tại theo nền tảng"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "Tài khoản hiện đang bật"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "Xếp hạng tài sản theo số tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "Tài sản đổi mật khẩu cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "Tài khoản đổi mật khẩu cần kiểm tra"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "Tài sản đã bị xóa"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "Lượt đổi mật khẩu người dùng nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "Lượt đổi mật khẩu người dùng nền tảng gần đây"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "Có %(count)s lệnh bị cảnh báo hoặc từ chối. Kiểm tra mục đích và căn cứ phê duyệt trong ngữ cảnh của phiên."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "Lịch hoạt động chứa %(count)s từ chối chính sách. Kiểm tra các tài nguyên và chính sách bị từ chối trong chi tiết kiểm toán."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "%(count)s thay đổi mật khẩu người dùng nền tảng đã được ghi lại. Kiểm tra các nhà khai thác và thay đổi lý luận khi cần thiết."
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "Trạng thái ghi hình"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "Nguyên nhân đã ghi"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "Số lần thất bại"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "Thời gian bắt đầu"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "Người dùng nền tảng"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "Tài khoản tài sản"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "Kết quả kết nối"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "Nguyên nhân kết nối thất bại"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "Phiên gốc"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "Chưa ghi người xử lý"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "Phiếu phê duyệt"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "Thời gian yêu cầu"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "Lệnh được yêu cầu"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "Quy tắc tại thời điểm đó"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "Người xử lý"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "Lý do từ chối"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "Phiên liên quan"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "IP nguồn"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "Thành phố"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "Số thao tác"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "Đường dẫn tệp"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "Loại tác vụ"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "Số lần thực thi"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "Bản ghi thực thi gốc"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "Loại dấu hiệu lỗi"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "Số bản ghi tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "Thời gian ghi"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "Dấu hiệu lỗi"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "Bản ghi thực thi"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "Tài sản đã xóa hoặc nền tảng chưa được ghi"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "Kết quả xử lý"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "Chưa ghi tên quy tắc tại thời điểm đó"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "Số tài sản"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "Số tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "Người thao tác"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "Đã đánh dấu có bản ghi"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "Không hỗ trợ ghi hình"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "Phiên đang diễn ra"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "Không thể tạo bản ghi"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "Không thể tải bản ghi lên"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "Không thể chuyển đổi bản ghi"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "Không có cờ ghi hình"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "Kết nối thất bại; không áp dụng"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "Kết nối thất bại (không ghi thêm nguyên nhân)"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "Chưa ghi nguyên nhân kết nối thất bại"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "Liên quan đến xác thực"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "Hết thời gian thực thi hoặc kết nối"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "Liên quan đến mạng hoặc kết nối"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "Liên quan đến từ chối quyền"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "Đối tượng không tồn tại hoặc không khả dụng"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "Liên quan đến xác minh kết quả"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "Chưa ghi nguyên nhân lỗi"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "Lỗi khác (xem bản ghi gốc)"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100; giá trị càng nhỏ thì độ ưu tiên càng cao.\n"
+"Trong các quy tắc khớp, chọn nhóm có độ ưu tiên cao nhất. Chỉ cần một quy tắc từ chối là kết nối bị chặn; nếu tất cả đều cho phép, kết hợp các biện pháp kiểm soát kết nối đã bật."
+
+msgid "A valid license is required"
+msgstr "Cần có giấy phép hợp lệ."
+
+msgid "ACL changed; start a new connection"
+msgstr "ACL đã thay đổi; hãy bắt đầu kết nối mới."
+
+msgid "Account is ready."
+msgstr "Tài khoản đã sẵn sàng."
+
+msgid "Account permission is no longer available"
+msgstr "Quyền của tài khoản không còn hiệu lực."
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "Chuẩn bị tài khoản không thành công. Hãy liên hệ quản trị viên."
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr ""
+"Cấp phát tài khoản thất bại. Hãy cung cấp mã tác vụ cho quản trị viên."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "Nền tảng tài sản này chưa bật chức năng cấp phát tài khoản."
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"Tên người dùng hoặc @ALL cho mọi tài khoản, @SPEC kèm các tên được chỉ định "
+"và @USER cho tài khoản cùng tên với người dùng hiện tại."
+
+msgid "Administrator permission is no longer available"
+msgstr "Quyền quản trị viên không còn hiệu lực."
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"Sau khi được phê duyệt, cùng người dùng có thể kết nối lại cùng tài sản và "
+"tài khoản theo quy tắc này trong số giờ đã chỉ định. 0 yêu cầu phê duyệt mỗi"
+" lần. Thay đổi không ảnh hưởng đến các quyền miễn phê duyệt hiện có."
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr ""
+"Cho phép sẽ áp dụng các biện pháp kiểm soát kết nối; Từ chối sẽ chặn kết "
+"nối."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "Chưa được phép tự động cấp phát tài khoản cùng tên."
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"Chỉ tự động cấp phát tài khoản cùng tên trước lần kết nối đầu tiên; tái sử "
+"dụng tài khoản được quản lý hiện có mà không cấp phát lại. Nền tảng tài sản "
+"phải hỗ trợ cấp phát tài khoản."
+
+msgid "Cancel connections individually."
+msgstr "Hãy hủy từng kết nối riêng lẻ."
+
+msgid "Complete the current connection step first"
+msgstr "Hãy hoàn tất bước kết nối hiện tại trước."
+
+msgid "Connection ACL context"
+msgstr "Ngữ cảnh ACL kết nối"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "Chưa hoàn tất các bước kiểm tra ACL kết nối."
+
+msgid "Connection approval is no longer valid"
+msgstr "Phê duyệt kết nối không còn hiệu lực."
+
+msgid "Connection details"
+msgstr "Chi tiết kết nối"
+
+msgid "Connection is no longer available"
+msgstr "Kết nối này không còn hiệu lực. Hãy bắt đầu kết nối mới."
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "Không thể thay đổi tham số kết nối; hãy tạo token kết nối mới."
+
+msgid "Connection reason"
+msgstr "Lý do kết nối"
+
+msgid "Connection review was rejected or closed"
+msgstr "Yêu cầu phê duyệt kết nối đã bị từ chối hoặc đóng."
+
+msgid "Connection token does not match this session."
+msgstr "Token kết nối không khớp với phiên này."
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "Đang tạo tài khoản và cấu hình thông tin đăng nhập."
+
+msgid "Duplicate connection tokens."
+msgstr "Có token kết nối trùng lặp."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "Nhập lý do kết nối (tối đa 4096 ký tự)."
+
+msgid "Enter a reason before connecting."
+msgstr "Nhập lý do trước khi kết nối."
+
+msgid "Exemption period"
+msgstr "Thời gian miễn phê duyệt"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "Ngữ cảnh giám sát khuôn mặt thuộc về người dùng khác."
+
+msgid "Face monitoring does not belong to this session"
+msgstr "Giám sát khuôn mặt không thuộc phiên này."
+
+msgid "Face verification"
+msgstr "Xác minh khuôn mặt"
+
+msgid "Face verification does not belong to this connection"
+msgstr "Xác minh khuôn mặt không thuộc kết nối này."
+
+msgid "Face verification failed"
+msgstr "Xác minh khuôn mặt thất bại."
+
+msgid "Face verification is no longer available"
+msgstr "Không thể tiếp tục xác minh khuôn mặt."
+
+msgid "Face verification session expired; retry verification"
+msgstr "Phiên xác minh khuôn mặt đã hết hạn; hãy xác minh lại."
+
+msgid "Face verification session is no longer current"
+msgstr "Phiên xác minh khuôn mặt không còn là phiên hiện tại."
+
+msgid "First-login same-name account push"
+msgstr "Cấp phát tài khoản cùng tên khi kết nối lần đầu"
+
+msgid "MFA verification"
+msgstr "Xác minh MFA"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "Không có người phê duyệt khả dụng. Hãy liên hệ quản trị viên."
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr ""
+"Thông báo cho người nhận đã chọn khi người dùng yêu cầu kết nối tài sản. "
+"Thông báo không có nghĩa là kết nối đã thành công."
+
+msgid "Online face monitoring context is no longer available"
+msgstr "Ngữ cảnh giám sát khuôn mặt liên tục không còn hiệu lực."
+
+msgid "Online face monitoring context is required"
+msgstr "Cần có ngữ cảnh giám sát khuôn mặt liên tục."
+
+msgid "Online face verification requires Web Terminal"
+msgstr "Xác minh khuôn mặt liên tục yêu cầu Web Terminal."
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "Quyền kết nối bằng tài khoản này không còn hiệu lực."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "Hãy chuẩn bị tài khoản cùng tên trước khi kết nối."
+
+msgid "Push same-name account on first connection"
+msgstr "Cấp phát tài khoản cùng tên khi kết nối lần đầu"
+
+msgid "Require approval"
+msgstr "Yêu cầu phê duyệt"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr ""
+"Yêu cầu phê duyệt trước khi kết nối, trừ khi đang trong thời gian miễn phê "
+"duyệt hợp lệ."
+
+msgid "Rotate password"
+msgstr "Đổi mật khẩu"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"Đổi thông tin bí mật của tài khoản kết nối sau khi phiên kết thúc. Cần bật "
+"chức năng đổi sau khi kết thúc phiên trong hệ thống và đổi tự động trên tài "
+"khoản đang hoạt động."
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr ""
+"Việc cấp phát tài khoản cùng tên sử dụng thông tin đăng nhập do máy chủ quản"
+" lý."
+
+msgid "Secret rotation after session end is disabled"
+msgstr "Chức năng đổi thông tin bí mật sau khi kết thúc phiên đã bị tắt."
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr ""
+"Chọn phương thức MFA đang hoạt động; nếu chưa có, hãy đăng ký MFA trước."
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr ""
+"Chọn ít nhất một người phê duyệt đang hoạt động và chưa hết hạn trong tổ "
+"chức này."
+
+msgid "Select at least one notification recipient."
+msgstr "Chọn ít nhất một người nhận thông báo."
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr ""
+"Chọn người phê duyệt khi bật yêu cầu phê duyệt. Kết nối bị chặn nếu không có"
+" người phê duyệt khả dụng."
+
+msgid "Send notification"
+msgstr "Gửi thông báo"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr ""
+"Tài khoản cùng tên hiện có đang bị vô hiệu hóa. Hãy liên hệ quản trị viên."
+
+msgid "The same-name account username is determined by the server."
+msgstr "Tên người dùng của tài khoản cùng tên do máy chủ xác định."
+
+msgid "This MFA method does not send a verification code"
+msgstr "Phương thức MFA này không gửi mã xác minh."
+
+msgid "This connection does not require this step"
+msgstr "Kết nối này không cần bước này."
+
+msgid "This field cannot be submitted."
+msgstr "Không được gửi trường này."
+
+msgid "This field does not belong to the current step."
+msgstr "Trường này không thuộc bước hiện tại."
+
+msgid "This push method does not support create-only mode"
+msgstr "Phương thức cấp phát này không hỗ trợ chế độ chỉ tạo mới."
+
+msgid "This username cannot be provisioned automatically."
+msgstr "Không thể tự động cấp phát tài khoản với tên người dùng này."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Sử dụng Web Terminal để hoàn tất xác minh khuôn mặt."
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr ""
+"Xác minh mã MFA đã đăng ký trước khi kết nối. Chặn kết nối nếu chưa đăng ký "
+"phương thức MFA dùng mã."
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr ""
+"Xác minh khuôn mặt người dùng trước khi kết nối. Cần bật nhận diện khuôn mặt"
+" của hệ thống và đăng ký khuôn mặt."
+
+msgid "Waiting to push the same-name account."
+msgstr "Đang chờ cấp phát tài khoản cùng tên."
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Chỉ dành cho Web Terminal: xác minh khuôn mặt trước khi kết nối và giám sát "
+"suốt phiên. Cần bật nhận diện khuôn mặt của hệ thống và đăng ký khuôn mặt."
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "Giám sát khuôn mặt liên tục"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "Cấp phát tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Account Health"
+msgstr "Tình trạng tài khoản"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "Tác vụ tài khoản cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "Tài sản có rủi ro đang chờ xử lý"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "Đang chờ xem xét"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "Thông tin xác thực đề xuất đã được xác minh"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "Kiểm tra điều kiện kết nối và phiên gốc trước khi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "Kiểm tra việc tạo, tải lên và lưu trữ bản ghi hình của phiên gốc."
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "Quyết định xử lý lệnh cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "Đối chiếu thay đổi được phát hiện với quyền truy cập đã phê duyệt và xác nhận kết quả xử lý."
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "Xác nhận thông tin xác thực mới đã được đồng bộ và có thể truy cập."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "Xác nhận thay đổi vị trí có phù hợp với việc đi công tác, sử dụng proxy hoặc truy cập dự kiến hay không."
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "Bản ghi rủi ro đã xác nhận"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "Lần kết nối thất bại cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "Xác minh thông tin xác thực thất bại"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "Đang xác minh thông tin xác thực"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "Chi tiết rủi ro tài khoản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "Rủi ro tài khoản hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "Bản ghi rủi ro hiện tại"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "Lần đăng nhập thất bại cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "Thao tác tệp cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "Tiến độ xử lý"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "Bản ghi rủi ro đã bỏ qua"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "Vấn đề"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "Lần đổi mật khẩu sau đó đã thành công"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "Lần đăng nhập từ thành phố mới cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "Bước tiếp theo"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "Hiện không có bản ghi rủi ro tài khoản nào."
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "Bản ghi gốc"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "Bản ghi rủi ro đang chờ xử lý"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "Rủi ro đang chờ xử lý theo loại"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "Thao tác bị chính sách từ chối cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "Bản ghi hình cần xem xét"
+
+#: reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "Danh sách kiểm tra khắc phục"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "Xem xét và đồng bộ thông tin xác thực đề xuất đã được xác minh; chỉ xác minh thành công chưa đủ để xác nhận đã khôi phục."
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "Xem xét mục đích của lệnh, quy tắc khớp và lịch sử phê duyệt trong phiên gốc."
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "Xem xét thao tác bị từ chối và xác nhận chính sách truy cập đúng như dự kiến."
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "Xem xét nhật ký thực thi và các đối tượng bị ảnh hưởng, khắc phục nguyên nhân rồi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "Xem xét đường dẫn tệp, quyền truy cập và phiên gốc trước khi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "Xem xét kết quả xác minh và bản ghi thực thi gốc trước khi thử lại."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "Xem xét lý do bỏ qua lần thất bại này có còn phù hợp hay không."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "Xem xét lý do bỏ qua rủi ro này có còn phù hợp hay không."
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "Số lượng rủi ro"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "Thời gian cập nhật"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "Thời gian xác minh"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "Xác minh thông tin xác thực đề xuất và chỉ đồng bộ sau khi xác nhận có thể truy cập."
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "Xác minh nguồn đăng nhập và danh tính tài khoản, sau đó xem xét nhật ký xác thực."
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "Đợi quá trình xác minh hoàn tất trước khi quyết định có đồng bộ thông tin xác thực hay không."
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "Đọc được"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "ID bản ghi"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "Căn cứ"
+
+msgid "%(count)s account task executions were canceled."
+msgstr "Đã hủy %(count)s lượt thực thi tác vụ tài khoản."
+
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "Cần kiểm tra bản ghi của %(count)s phiên đã hoàn tất thành công. Hãy kiểm tra việc tạo, tải lên và lưu trữ bản ghi."
+
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "Cần xác minh danh tính người dùng và vị trí truy cập của %(count)s bản ghi đăng nhập từ thành phố mới."
+
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s bản ghi đăng nhập nền tảng sử dụng địa chỉ nguồn loopback. Hãy xác nhận đó là truy cập cục bộ hay yêu cầu được proxy chuyển tiếp."
+
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "Có %(count)s lượt đăng nhập nền tảng thất bại. Hãy kiểm tra người dùng liên quan, địa chỉ nguồn và lý do đã ghi nhận."
+
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "%(failed)s trên %(total)s thao tác tệp đã thất bại (%(rate)s%%). Hãy kiểm tra tài sản, tài khoản, đường dẫn tệp liên quan và các phiên gốc."
+
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "Đã ghi nhận %(sessions)s phiên tài sản: %(success)s kết nối thành công và %(failed)s kết nối thất bại, liên quan đến %(users)s người dùng và %(assets)s tài sản."
+
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "Đã thực thi %(total)s tác vụ tài khoản: %(success)s thành công, %(failed)s thất bại hoặc gặp lỗi và %(pending)s vẫn chưa hoàn tất."
+
+msgid "Account Risks to Review"
+msgstr "Rủi ro tài khoản cần xem xét"
+
+msgid "Accounts Identified in Pending Risks"
+msgstr "Tài khoản liên quan đến rủi ro đang chờ xử lý"
+
+msgid "Affected Accounts"
+msgstr "Tài khoản bị ảnh hưởng"
+
+msgid "Affected Assets"
+msgstr "Tài sản bị ảnh hưởng"
+
+msgid "Assets with Latest Check Successful"
+msgstr "Tài sản có lần kiểm tra gần nhất thành công"
+
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "Thiết lập thông tin xác thực riêng cho từng tài khoản bị ảnh hưởng, đồng bộ các dịch vụ phụ thuộc và xác minh quyền truy cập."
+
+msgid "Check Result"
+msgstr "Kết quả kiểm tra"
+
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "Đối chiếu các khóa được phép với các khóa đã phê duyệt và xóa khóa chưa được phê duyệt."
+
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "Đối chiếu thay đổi thành viên nhóm với quyền truy cập đã phê duyệt và thu hồi các đặc quyền chưa được phê duyệt."
+
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "Đối chiếu thay đổi quyền sudo với quyền truy cập đã phê duyệt và thu hồi các đặc quyền chưa được phê duyệt."
+
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "Xác nhận chủ sở hữu và mục đích của tài khoản, sau đó đưa tài khoản đã phê duyệt vào quản lý hoặc vô hiệu hóa tài khoản không được phép."
+
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "Xác nhận việc xóa đã được phê duyệt hay chưa, sau đó đối soát danh sách tài khoản được quản lý."
+
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "Xác nhận tài khoản còn cần thiết hay không, sau đó vô hiệu hóa tài khoản không sử dụng sau khi được phê duyệt."
+
+msgid "Current Managed Accounts"
+msgstr "Tài khoản hiện được quản lý"
+
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "Hiện có %(pending)s bản ghi rủi ro tài khoản đang chờ xử lý, liên quan đến %(accounts)s tài khoản riêng biệt trên %(assets)s tài sản. Hãy xem xét các tài khoản bị ảnh hưởng theo loại rủi ro."
+
+msgid "Latest Check Failed"
+msgstr "Lần kiểm tra gần nhất thất bại"
+
+msgid "Latest Check Successful"
+msgstr "Lần kiểm tra gần nhất thành công"
+
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "Tài khoản được quản lý có lần kiểm tra gần nhất thành công"
+
+msgid "Most Recent Stored Check"
+msgstr "Lần kiểm tra được ghi nhận gần nhất"
+
+msgid "No Check Result"
+msgstr "Chưa có kết quả kiểm tra"
+
+msgid "No listed security events were found in the available records for this period."
+msgstr "Không tìm thấy các sự kiện bảo mật đã liệt kê trong những bản ghi hiện có của kỳ này."
+
+msgid "Not Applicable"
+msgstr "Không áp dụng"
+
+msgid "Password Changes with Subsequent Progress"
+msgstr "Thay đổi mật khẩu đã có tiến triển tiếp theo"
+
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "Gia hạn thông tin xác thực đã hết hạn và kiểm tra các tác vụ phụ thuộc cũng như quyền truy cập tài khoản."
+
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "Thay mật khẩu yếu bằng một mật khẩu mạnh và riêng biệt, sau đó xác minh quyền truy cập tài khoản."
+
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "Kiểm tra các kết nối thất bại dựa trên tài sản, tài khoản liên quan và lý do đã ghi nhận."
+
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "Kiểm tra nhật ký tác vụ thất bại và các tài khoản bị ảnh hưởng; ưu tiên các mục chưa giải quyết trước những bản ghi đã có tiến triển tiếp theo."
+
+msgid "Review risks"
+msgstr "Xem xét rủi ro"
+
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "Xem xét phát hiện đã được xác nhận và kiểm tra trạng thái hiện tại của tài khoản."
+
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "Tài khoản có rủi ro khớp với tài khoản được quản lý"
+
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "Tài khoản có rủi ro không khớp với tài khoản được quản lý"
+
+msgid "Risk List"
+msgstr "Danh sách rủi ro"
+
+msgid "Risk Records"
+msgstr "Bản ghi rủi ro"
+
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "Thay đổi thông tin xác thực theo chính sách luân phiên và xác minh các dịch vụ phụ thuộc."
+
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "Thay đổi thông tin xác thực có thể đã bị lộ, xem xét các lượt truy cập gần đây và xác minh dịch vụ phụ thuộc."
+
+msgid "Stored Asset Connectivity Results"
+msgstr "Kết quả kiểm tra kết nối tài sản đã lưu"
+
+msgid "Stored Managed Account Connectivity Results"
+msgstr "Kết quả kiểm tra kết nối tài khoản được quản lý đã lưu"
+
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "Hiện có %(total)s tài sản, trong đó %(active)s tài sản được bật."
+
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "Hiện có %(total)s bản ghi tài khoản được quản lý, trong đó %(active)s được bật."
+
+msgid "There are currently no pending account risk records."
+msgstr "Hiện không có bản ghi rủi ro tài khoản nào đang chờ xử lý."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Vui lòng nâng cấp ứng dụng khách JumpServer để sử dụng chính sách đăng nhập đã cấu hình."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "Phiên đăng nhập của ứng dụng khách đã hết hạn. Vui lòng xác thực lại."
+
+msgid "Log in again after exiting the client"
+msgstr "Đăng nhập lại sau khi thoát"
+
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr ""
+"Khi bật, bạn cần đăng nhập lại sau khi thoát và khởi động lại ứng dụng máy "
+"tính. Thu nhỏ hoặc ẩn ứng dụng không được tính là thoát."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Thời gian chờ không hoạt động (phút)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Đăng nhập lại khi đạt thời gian chờ do không hoạt động. 0 tắt giới hạn này (mặc định). Thao tác bàn phím và chuột thực tế trong cửa sổ chính, cửa sổ tài sản riêng và các trang web tích hợp được tính là hoạt động. Kết nối đang mở, đầu ra nền và tự động làm mới không được tính. Không thể ghi nhận thao tác trong phần mềm bên ngoài như Xshell hoặc MSTSC và một số trang nhúng khác nguồn. Chỉ thao tác trong các khu vực này, chỉ xem trong thời gian dài hoặc gửi báo cáo thất bại do sự cố mạng vẫn có thể gây hết thời gian chờ do không hoạt động. Thời gian được tính từ hoạt động cuối cùng do máy chủ xác nhận."
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "Thời hạn đăng nhập tối đa (phút)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "Tính từ lúc đăng nhập vào ứng dụng khách; hoạt động và việc làm mới token không kéo dài thời hạn. Giá trị 0 tắt giới hạn thời hạn (mặc định). Các cài đặt về thoát ứng dụng và thời gian chờ không hoạt động vẫn áp dụng. Bạn cần đăng nhập lại khi hết thời hạn."
+
+msgid "Client exit"
+msgstr "Thoát ứng dụng khách"
+
+msgid "Idle timeout"
+msgstr "Hết thời gian chờ không hoạt động"
+
+msgid "Maximum login time"
+msgstr "Thời gian đăng nhập tối đa"
+
+msgid "Client login policy changed"
+msgstr "Chính sách đăng nhập của ứng dụng khách đã thay đổi"
+
+msgid "Authorization revoked"
+msgstr "Quyền truy cập đã bị thu hồi"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "Người phụ trách tài sản"
+
+msgid "Manager"
+msgstr "Manager"
+
+msgid "Workflow"
+msgstr "Workflow"
+
+msgid "Approval workflow"
+msgstr "Approval workflow"
+
+msgid "Workflow version"
+msgstr "Workflow version"
+
+msgid "Workflow instance"
+msgstr "Workflow instance"
+
+msgid "Workflow node"
+msgstr "Workflow node"
+
+msgid "Workflow edge"
+msgstr "Workflow edge"
+
+msgid "Workflow node instance"
+msgstr "Workflow node instance"
+
+msgid "Approval task"
+msgstr "Approval task"
+
+msgid "Workflow event"
+msgstr "Workflow event"
+
+msgid "Client idle lock (minute)"
+msgstr "Khóa khi không hoạt động (phút)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 tắt khóa khi không hoạt động. Trang chính và cửa sổ tài sản được quản lý "
+"khóa cùng nhau; chỉ mở khóa ở trang chính. Phiên đăng nhập và kết nối vẫn "
+"hoạt động. Ứng dụng ngoài không được bảo vệ. Khi bật, đăng nhập mới và phiên"
+" khôi phục bắt đầu ở trạng thái khóa. Thao tác bàn phím và chuột của hệ "
+"thống, kể cả ứng dụng ngoài, chỉ đặt lại bộ đếm cho trang và tài khoản đang "
+"kích hoạt. Không báo cáo hoạt động lên máy chủ."
+
+msgid "Client lock password"
+msgstr "Mật khẩu khóa ứng dụng khách"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr ""
+"Chưa đặt mật khẩu khóa. Hãy đặt trong cài đặt cá nhân trên web của trang và "
+"tài khoản này, rồi quay lại và làm mới."
+
+msgid "The client lock password is incorrect."
+msgstr "Mở khóa thất bại. Kiểm tra mật khẩu và kết nối."
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr ""
+"Tính từ mỗi lần đăng nhập theo cấu hình mới nhất. Hoạt động và làm mới token"
+" không kéo dài thời hạn. 0 là không giới hạn. Nếu thay đổi làm phiên quá "
+"hạn, cho phép thêm tối đa 10 phút trước khi đăng xuất và cần đăng nhập lại."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr ""
+"{} - Chưa đặt mật khẩu mã hóa. Vào Cài đặt cá nhân → Xác thực đăng nhập → "
+"Thông tin xác thực ứng dụng khách → Mật khẩu mã hóa tệp."
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0 tắt khóa tự động (mặc định). Thời gian không hoạt động chỉ tính cho trang "
+"và tài khoản đang dùng, dựa trên bàn phím và chuột của hệ thống. Không gửi "
+"từng thao tác; khi hết thời gian hoặc khóa thủ công, ứng dụng gửi yêu cầu "
+"khóa phiên đăng nhập này tới máy chủ. Hết thời gian sẽ khóa trang chính và "
+"cửa sổ tài sản được quản lý, kể cả khi chưa đặt mật khẩu. Chỉ trang chính có"
+" thể mở khóa sau khi máy chủ xác minh mật khẩu. Đăng nhập mới mở bình "
+"thường; phiên đã khóa vẫn khóa sau khi khôi phục. Cửa sổ ứng dụng ngoài "
+"không được bảo vệ."
+
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Phiên web đang bị khóa. Hãy mở khóa trước khi cấp quyền cho ứng dụng khách."
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "Ứng dụng khách đã khóa. Hãy mở khóa ở trang chính."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"Mặc định: 15 phút. 0 tắt khóa tự động. Khi không có thao tác bàn phím hoặc "
+"chuột của hệ thống trong thời gian đã đặt, trang chính và cửa sổ tài sản của"
+" trang và tài khoản hiện tại sẽ bị khóa. Mở khóa trên trang chính bằng cách "
+"xác minh mật khẩu khóa trực tuyến. Chưa đặt mật khẩu vẫn bị khóa; hãy đặt "
+"trong cài đặt cá nhân Web. Cửa sổ ứng dụng ngoài không được bảo vệ."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr ""
+"{} - Chưa đặt mật khẩu mã hóa. Vào Cài đặt cá nhân → Xác thực người dùng → "
+"Mã hóa tệp."
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "Báo cáo kiểm toán"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "Báo cáo phiên bản cũ"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "Có thể xem báo cáo kiểm toán tổng hợp"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "Có thể xem báo cáo hoạt động vận hành"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "Có thể xem báo cáo sự kiện bảo mật"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "Có thể xem tổng quan tài sản và tài khoản"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "Có thể xem báo cáo vận hành tài khoản"
+
+msgid "Locked"
+msgstr "Trạng thái khóa"
+
+msgid "Screen lock password"
+msgstr "Mật khẩu khóa màn hình"
+
+msgid "Idle screen lock (minute)"
+msgstr "Khóa khi không hoạt động (phút)"
+
+msgid "Set a lock password after signing in again."
+msgstr "Hãy đăng nhập lại để đặt mật khẩu khóa màn hình."
+
+msgid "The lock password is incorrect."
+msgstr "Mật khẩu khóa màn hình không đúng."
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr ""
+"Hãy cấu hình cách xác minh danh tính trước khi đổi mật khẩu khóa màn hình."
+
+msgid "This verification method is not available."
+msgstr "Không thể dùng phương thức xác minh này."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"Mặc định 15 phút; 0 tắt khóa tự động. Dùng chung cho ứng dụng, bảng điều "
+"khiển và terminal Web. Ứng dụng dùng hoạt động bàn phím/chuột hệ thống; Web "
+"tổng hợp các tab cùng trang. Vẫn khóa dù chưa đặt mật khẩu. Mở khóa cần xác "
+"minh trực tuyến; nếu chưa đặt, hãy đăng xuất rồi đăng nhập lại để đặt. Cửa "
+"sổ ứng dụng bên ngoài không được bảo vệ."
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr ""
+"Sai mật khẩu khóa màn hình 5 lần liên tiếp. Phiên đăng nhập này đã kết thúc."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"Mặc định 15 phút. 0 tắt tự động khóa. Dùng hoạt động bàn phím và chuột của "
+"hệ thống. Khóa ứng dụng và các cửa sổ tài sản dù chưa đặt mật khẩu. Mở khóa "
+"tại cửa sổ chính sau khi máy chủ xác minh mật khẩu. Phần mềm bên ngoài không"
+" được bảo vệ."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"Mặc định 15 phút. 0 tắt tự động khóa. Bảng điều khiển và Web terminal dùng "
+"chung cấu hình, tổng hợp hoạt động từ các thẻ của trang này. Không theo dõi "
+"được trang khác hoặc phần mềm bên ngoài. Vẫn khóa khi chưa đặt mật khẩu; khi"
+" đó hãy đăng xuất rồi đăng nhập lại."
+
+#~ msgid "Ticket already closed"
+#~ msgstr "Phiếu công việc đã đóng"
+
+msgid "Web session lifetime (second)"
+msgstr "Thời hạn phiên Web (giây)"
+
+msgid "Renew session on request"
+msgstr "Gia hạn phiên theo yêu cầu"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"SESSION_COOKIE_AGE, tính bằng giây. Sửa config.yml của Core rồi khởi động "
+"lại Core. Phiên mới hoặc được gia hạn dùng thời hạn mới; thời điểm hết hạn "
+"đã lưu không bị đổi hàng loạt ngay. Đây không phải giới hạn cố định từ lúc "
+"đăng nhập. Chính sách Web và ứng dụng độc lập nhau."
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"SESSION_SAVE_EVERY_REQUEST. Sửa config.yml của Core rồi khởi động lại Core. "
+"Khi bật, yêu cầu thông thường gia hạn phiên theo thời lượng đã cấu hình. Tắt"
+" không tạo giới hạn cố định: ghi vào Session vẫn có thể gia hạn. Không đăng "
+"xuất do bàn phím hoặc chuột nhàn rỗi; khóa nhàn rỗi được cấu hình riêng."
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0 là không giới hạn. Tính từ mỗi lần đăng nhập theo cấu hình mới nhất. Hoạt "
+"động và làm mới Token không kéo dài thời hạn. Cấu hình đồng bộ khoảng mỗi 60"
+" giây. Nếu thay đổi làm phiên đã hết hạn, cho tối đa 10 phút trước khi đăng "
+"xuất. Tăng thời hạn trong thời gian ân hạn sẽ hủy đăng xuất nếu phiên nằm "
+"trong giới hạn mới."
+
+msgid "Web idle screen lock (minute)"
+msgstr "Khóa Web khi nhàn rỗi (phút)"
+
+msgid "Client idle screen lock (minute)"
+msgstr "Khóa ứng dụng khách khi nhàn rỗi (phút)"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr ""
+"Để trống để theo quản trị viên. Giá trị cá nhân không được vượt giới hạn của"
+" quản trị viên."
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr ""
+"Giới hạn quản trị viên là %(minutes)s phút. Để trống để theo giá trị này."
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"Giá trị mặc định và giới hạn tối đa toàn hệ thống. Người chưa tự đặt luôn "
+"theo giá trị này. Giá trị cá nhân không được vượt giới hạn. Giảm giới hạn "
+"cũng giảm các giá trị cá nhân lớn hơn; tăng giới hạn giữ nguyên các giá trị "
+"đã tự đặt."
+
+msgid "Choose either setting or clearing the lock password."
+msgstr "Không thể vừa đặt vừa xóa mật khẩu khóa màn hình."
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr ""
+"Nếu giá trị toàn hệ thống là 0, người dùng có thể chọn 0 để tắt khóa hoặc "
+"đặt thời gian cá nhân dương."
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "Quản trị viên yêu cầu đăng nhập lại sau khi thoát ứng dụng."
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr "Người dùng có thể tự bật khi quản trị viên không bắt buộc."
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"Đổi thời lượng và gia hạn trong config.yml của Core, rồi khởi động lại Core."
+" Lần đăng nhập mới dùng cấu hình mới; hạn đã lưu không bị sửa hàng loạt. "
+"Phiên lưu thời lượng riêng có thể vẫn giữ giá trị cũ khi gia hạn; đăng nhập "
+"lại để áp dụng thời lượng mới. SESSION_COOKIE_AGE là thời lượng tính bằng "
+"giây dùng khi lưu phiên. Đây không phải giới hạn cố định tính từ lần đăng "
+"nhập đầu. Thời điểm hết hạn hiện tại trong thông tin cá nhân là hạn được lưu"
+" trên máy chủ."
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"Thời lượng Web mặc định sau khi đăng nhập hoặc gia hạn, tính bằng giây. Đây "
+"không phải giới hạn cố định từ lần đăng nhập đầu. Đổi SESSION_COOKIE_AGE "
+"trong config.yml của Core rồi khởi động lại Core. Phiên cũ có thể giữ thời "
+"lượng trước đó; đăng nhập lại để áp dụng thời lượng mới."
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"Bật: yêu cầu HTTP thông thường gia hạn phiên, gồm cả yêu cầu nền. Tắt: yêu "
+"cầu chỉ đọc thông thường không gia hạn, nhưng ghi Session như xác minh danh "
+"tính vẫn có thể gia hạn. Đổi SESSION_SAVE_EVERY_REQUEST trong config.yml của"
+" Core và khởi động lại Core."
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr ""
+"Khi bật, đóng trình duyệt thường yêu cầu đăng nhập lại. Chức năng khôi phục "
+"có thể giữ Cookie; hãy dùng Đăng xuất để chắc chắn kết thúc đăng nhập. Cấu "
+"hình này không đặt thời lượng đăng nhập tối đa cố định."
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"Thời lượng mặc định, tính bằng giây.<br>Mỗi lần gia hạn sẽ tính lại: thời "
+"điểm hết hạn = thời điểm gia hạn + thời lượng.<br>Khi bật gia hạn, yêu cầu "
+"thông thường sẽ gia hạn. Khi tắt, thao tác ghi Session như xác minh danh "
+"tính vẫn có thể gia hạn.<br>Đây không phải giới hạn tối đa cố định từ lần "
+"đăng nhập đầu.<br>Đổi SESSION_COOKIE_AGE trong config.yml của Core và khởi "
+"động lại Core. Phiên cũ có thể giữ thời lượng riêng; đăng nhập lại để áp "
+"dụng thời lượng mới."
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"Bật: đa số yêu cầu API với phiên Web hợp lệ sẽ gia hạn, gồm truy vấn GET và "
+"thăm dò nghiệp vụ nền. Không cần thao tác chuột hay bàn phím.<br>Truy vấn "
+"chỉ đọc được loại trừ: hồ sơ, trạng thái trực tuyến (user-session) và trạng "
+"thái khóa (session-lock/status).<br>Tắt: yêu cầu chỉ đọc thông thường không "
+"gia hạn, nhưng xác minh danh tính và thao tác ghi Session khác vẫn có thể "
+"gia hạn.<br>Lý do: dự án ghi kết quả xác minh vào Session; Django lưu phiên "
+"đã thay đổi và mặc định tính lại thời hạn tương đối.<br>Đổi "
+"SESSION_SAVE_EVERY_REQUEST trong config.yml của Core và khởi động lại Core."
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"Khi bật, thoát toàn bộ ứng dụng trình duyệt rồi mở lại thường yêu cầu đăng "
+"nhập lại.<br>Chỉ đóng tab hoặc cửa sổ hay thu nhỏ không phải thoát ứng dụng;"
+" trình duyệt có thể vẫn chạy nền.<br>Khôi phục trình duyệt có thể giữ "
+"Cookie. Dùng Đăng xuất trên trang để chắc chắn kết thúc đăng nhập.<br>Cấu "
+"hình này không đặt thời lượng đăng nhập tối đa cố định."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr ""
+"Phải đăng nhập lại sau khi thoát và khởi động lại. Thu nhỏ hoặc ẩn ứng dụng "
+"không tính là thoát."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr ""
+"0 là không giới hạn. Tính từ lúc đăng nhập. Hết hạn phải đăng nhập lại; hoạt"
+" động không kéo dài thời hạn. Nếu thay đổi khiến phiên đã quá hạn, được thêm"
+" tối đa 10 phút."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the specified idle time. Enter the"
+" lock password in the main window to unlock. External application windows "
+"are not protected."
+msgstr ""
+"0 tắt khóa tự động. Tự khóa khi hết thời gian nhàn rỗi đã đặt. Nhập mật khẩu"
+" khóa tại cửa sổ chính để mở khóa. Cửa sổ ứng dụng bên ngoài không được bảo "
+"vệ."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. Administrator "
+"settings are defaults and limits. Users may choose stricter settings; "
+"otherwise they follow the administrator."
+msgstr ""
+"0 tắt khóa tự động. Khóa bảng điều khiển và Web terminal khi hết thời gian "
+"nhàn rỗi đã đặt. Nhập mật khẩu khóa để mở khóa. Quản trị viên đặt mặc định "
+"và giới hạn. Người dùng có thể đặt nghiêm ngặt hơn; nếu không tự đặt thì "
+"theo quản trị viên."
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "Phạm vi yêu cầu tài sản"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "Quy định tài sản người dùng có thể chọn khi gửi phiếu yêu cầu quyền truy cập.<br><b>Tất cả tài sản:</b> có thể chọn mọi tài sản trong tổ chức của phiếu, kể cả khi chưa được cấp quyền.<br><b>Tài sản được cấp quyền:</b> có thể chọn tài sản trong các quy tắc cấp quyền được gán cho bản thân hoặc nhóm người dùng của mình, bao gồm cả quy tắc đã tắt, hết hạn hoặc chưa có hiệu lực.<br><b>Tài sản có quyền hợp lệ:</b> chỉ có thể chọn tài sản trong các quy tắc hợp lệ được gán cho bản thân hoặc nhóm người dùng của mình. Quy tắc phải đang bật và thời điểm hiện tại phải nằm giữa thời gian bắt đầu và kết thúc."
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "Kiểm tra cuộc trò chuyện AI"

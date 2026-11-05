@@ -253,10 +253,18 @@ class RoleMixin:
         return data
 
     @lazyproperty
+    def _role_and_perms_by_org(self):
+        return {}
+
+    @property
     def cached_role_and_perms(self):
         key = self.PERM_CACHE_KEY.format(self.id, current_org.id)
+        # A user instance can be reused inside tmp_to_org during one request.
+        if key in self._role_and_perms_by_org:
+            return self._role_and_perms_by_org[key]
         data = cache.get(key)
         if data:
+            self._role_and_perms_by_org[key] = data
             return data
 
         data = {
@@ -265,6 +273,7 @@ class RoleMixin:
             "perms": self.get_all_permissions(),
         }
         cache.set(key, data, 60 * 60)
+        self._role_and_perms_by_org[key] = data
         return data
 
     @lazyproperty
@@ -290,7 +299,7 @@ class RoleMixin:
         key = cls.PERM_ORG_KEY.format("*")
         cache.delete_pattern(key)
 
-    @lazyproperty
+    @property
     def perms(self):
         return self.cached_role_and_perms["perms"]
 

@@ -1,8 +1,13 @@
 # ~*~ coding: utf-8 ~*~
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import ConnectionToken
+from authentication.backends.drf import SessionAuthentication
+from authentication.permissions import UserConfirmation
+from common.permissions import IsValidUser
 from authentication.permissions import IsValidUserOrConnectionToken
 from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
@@ -16,7 +21,8 @@ from ..models import User
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
     'UserProfileApi', 'UserPasswordApi',
-    'UserPermissionsApi'
+    'UserPermissionsApi', 'UserLockPasswordApi',
+    'UserFileEncryptionApi', 'UserIdleLockApi'
 ]
 
 
@@ -36,6 +42,7 @@ class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
         user = self.get_object()
         user.public_key = None
         user.save()
+        user.ssh_keys.update(is_active=False)
         ResetSSHKeyMsg(user).publish_async()
 
 
@@ -82,3 +89,66 @@ class UserPermissionsApi(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
+    """Shared web-session validation for lock and file-encryption password settings."""
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsValidUser,)
+    http_method_names = ('get', 'patch', 'head', 'options')
+
+    def get_object(self):
+        return {}
+
+
+class UserLockPasswordApi(BaseUserPasswordSettingsApi):
+    serializer_class = serializers.UserLockPasswordSerializer
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        # Metadata clones OPTIONS as PATCH to describe writable fields. Identity
+        # confirmation protects real writes; it must not hide the form schema.
+        if self.request.method == 'PATCH' and self.request._request.method != 'OPTIONS':
+            permissions.append(self.get_confirmation_permission())
+        return permissions
+
+    def get_confirmation_permission(self):
+        data = self.request.data
+        if isinstance(data, dict) and (data.get('password') or data.get('password_again') or data.get('clear')):
+            from authentication.services.lock_password import LockPasswordConfirmation
+            return LockPasswordConfirmation()
+        return UserConfirmation()
+
+    def perform_update(self, serializer):
+        super().perform_update(serializer)
+        if serializer.validated_data.get('password') or serializer.validated_data.get('clear'):
+            from authentication.services.lock_password import LOCK_PASSWORD_PROOF
+            self.request.session.pop(LOCK_PASSWORD_PROOF, None)
+
+
+class UserFileEncryptionApi(BaseUserPasswordSettingsApi):
+    serializer_class = serializers.UserFileEncryptionSerializer
+
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class UserIdleLockApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsValidUser,)
+    serializer_class = serializers.UserIdleLockSerializer
+    http_method_names = ('get', 'patch', 'head', 'options')
+
+    def get_object(self):
+        from authentication.services.idle_lock import idle_lock_preferences
+        return idle_lock_preferences(self.request.user.pk)
+
+    def update(self, request, *args, **kwargs):
+        from authentication.services.client_login_session import client_policy_lock
+
+        # Share the existing policy lock so validation and administrator clamping agree.
+        with client_policy_lock(), transaction.atomic():
+            response = super().update(request, *args, **kwargs)
+            session = getattr(request, 'client_login_session', None)
+            if session is not None:
+                from authentication.services.client_login_session import client_login_session_data
+                session.refresh_from_db()
+                response.data['client_login_session'] = client_login_session_data(session)
+            return response

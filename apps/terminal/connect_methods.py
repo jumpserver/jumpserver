@@ -158,14 +158,14 @@ class ConnectMethodUtil:
                 'web_methods': [WebMethod.web_cli],
                 'listen': [Protocol.http, Protocol.ssh, Protocol.sftp],
                 'support': [
-                    Protocol.ssh, Protocol.telnet, Protocol.sftp,
+                    Protocol.ssh, Protocol.telnet, Protocol.winrm, Protocol.sftp,
                     Protocol.redis, Protocol.mongodb,
                     Protocol.k8s, Protocol.clickhouse,
                     Protocol.http,
 
                     Protocol.mysql, Protocol.mariadb,
                     Protocol.sqlserver, Protocol.postgresql,
-                    Protocol.oracle, Protocol.dameng,
+                    Protocol.oracle, Protocol.dameng, Protocol.db2,
                 ],
                 # 限制客户端的协议，比如 koko 虽然也支持 数据库的 ssh 连接，但是不再这里拉起
                 # Listen协议: [Asset协议]

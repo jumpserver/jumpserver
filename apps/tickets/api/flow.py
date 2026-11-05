@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
@@ -58,6 +60,15 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
         queryset = TicketFlow.get_org_related_flows()
         return queryset
 
+    @staticmethod
+    def check_org_access(user, org_id):
+        try:
+            org_id = UUID(org_id)
+        except (TypeError, ValueError, AttributeError):
+            raise PermissionDenied() from None
+        if not user.is_superuser and not user.orgs.filter(id=org_id).exists():
+            raise PermissionDenied()
+
     @action(
         detail=False, methods=[GET], permission_classes=[IsAuthenticated],
         url_path='options'
@@ -68,6 +79,7 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
         if not ticket_type or not org_id:
             return Response([])
 
+        self.check_org_access(request.user, org_id)
         flows = TicketFlow.get_org_related_flows(org_id=org_id).filter(
             type=ticket_type
         ).prefetch_related('cc_users').order_by('name', 'date_created')
@@ -84,6 +96,7 @@ class TicketFlowViewSet(JMSBulkModelViewSet):
         if not ticket_type or not org_id:
             return Response([])
 
+        self.check_org_access(request.user, org_id)
         flow_id = request.query_params.get('flow_id')
         flows = TicketFlow.get_org_related_flows(org_id=org_id).filter(type=ticket_type)
         if flow_id:

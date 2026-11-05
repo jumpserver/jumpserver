@@ -1,6 +1,7 @@
 import os
 
 from django.template.loader import render_to_string
+from django.utils.translation import gettext
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
@@ -214,7 +215,7 @@ class TemplateViewSet(JMSGenericViewSet):
     def reset(self, request):
         template_name = request.data.get('template_name')
         if not template_name:
-            return Response({'ok': False, 'error': 'template_name is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'ok': False, 'error': gettext('template_name is required')}, status=status.HTTP_400_BAD_REQUEST)
         data_path = _get_data_template_path(template_name)
         edit_path = _get_edit_template_path(template_name)
         try:

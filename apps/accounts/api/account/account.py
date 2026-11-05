@@ -149,7 +149,7 @@ class AccountViewSet(OrgBulkModelViewSet):
             accounts = account.get_su_from_accounts()
         elif asset_id:
             asset = get_object_or_404(Asset, pk=asset_id)
-            accounts = asset.accounts.all()
+            accounts = asset.all_accounts
         else:
             accounts = Account.objects.none()
         accounts = self.filter_queryset(accounts)
@@ -284,6 +284,11 @@ class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
         'list': 'accounts.view_accountsecret',
         'retrieve': 'accounts.view_accountsecret',
     }
+
+    @classmethod
+    def get_extra_actions(cls):
+        # Secret endpoints expose list/retrieve, not the account management actions.
+        return []
 
 
 class AssetAccountBulkCreateApi(CreateAPIView):

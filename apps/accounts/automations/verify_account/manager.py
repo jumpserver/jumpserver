@@ -14,10 +14,14 @@ from accounts.personal_credentials import (
     record_personal_credential_audit,
     validate_personal_credential_secret_type,
     validate_personal_credential_test_acl,
+    validate_personal_credential_username,
     validate_personal_credential_verification_protocol,
 )
+from assets.automations.base.manager import BasePlaybookManager
+from assets.automations.base.report import ConnectivityReportMixin
 from common.const import Status
 from common.utils import get_logger
+from ops.ansible.utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 from users.models import User
 from ..base.manager import AccountBasePlaybookManager
 
@@ -65,11 +69,7 @@ class PersonalCredentialAccount:
         return None
 
     @staticmethod
-    def escape_jinja2_syntax(value):
-        return Account.escape_jinja2_syntax(value)
-
-    @staticmethod
-    def get_ansible_become_auth():
+    def get_ansible_become_auth(path_dir=None):
         return {'ansible_become': False}
 
     def get_private_key_path(self, path):
@@ -80,7 +80,7 @@ class PersonalCredentialAccount:
         )
 
 
-class VerifyAccountManager(AccountBasePlaybookManager):
+class VerifyAccountManager(ConnectivityReportMixin, AccountBasePlaybookManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -132,6 +132,9 @@ class VerifyAccountManager(AccountBasePlaybookManager):
     @classmethod
     def method_type(cls):
         return AutomationTypes.verify_account
+
+    def get_host_success_log(self, host):
+        return BasePlaybookManager.get_host_success_log(self, host)
 
     def get_target_summary(self):
         if not self.personal_credential_ids:
@@ -187,6 +190,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                         credential.protocol,
                     )
                 )
+                validate_personal_credential_username(permission_account, credential.username)
                 validate_personal_credential_secret_type(
                     platform_protocol, credential.secret_type
                 )
@@ -291,11 +295,11 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             else:
                 self.found_account_ids.add(account_id)
             h = deepcopy(host)
-            h['name'] += '(' + account.username + ')'
+            h['name'] += '(' + neutralize_jinja2_syntax(account.username) + ')'
             self.host_account_mapper[h['name']] = account
             h['account'] = {
-                'username': account.username,
-                'full_username': account.full_username,
+                'username': escape_jinja2_syntax(account.username),
+                'full_username': escape_jinja2_syntax(account.full_username),
             }
             record = self.get_recovery_record(asset.id, account.id)
             if self.recovery_record_map and not record:
@@ -319,14 +323,14 @@ class VerifyAccountManager(AccountBasePlaybookManager):
 
             h['secret_type'] = account.secret_type
             h['account'] = {
-                'name': account.name,
-                'username': account.username,
-                'full_username': account.full_username,
+                'name': escape_jinja2_syntax(account.name),
+                'username': escape_jinja2_syntax(account.username),
+                'full_username': escape_jinja2_syntax(account.full_username),
                 'privileged': account.privileged,
                 'secret_type': account.secret_type,
-                'secret': account.escape_jinja2_syntax(secret),
+                'secret': escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,
-                'become': account.get_ansible_become_auth(),
+                'become': account.get_ansible_become_auth(path_dir=path_dir),
             }
             if account.platform.type == 'oracle':
                 use_sysdba = (
@@ -444,31 +448,33 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             )
 
     def on_host_success(self, host, result):
+        # Verification has no change/push record. Record its result directly
+        # through the playbook manager instead of the secret-change callbacks.
         account = self.host_account_mapper.get(host)
         if not account:
-            return super().on_host_error(
-                host, 'Account mapping not found', result
+            return BasePlaybookManager.on_host_error(
+                self, host, 'Account mapping not found', result
             )
         record = self.host_record_mapper.get(host)
         if record:
             self.save_verification_result(
                 record, ChangeSecretRecordStatusChoice.success.value
             )
-            return super().on_host_success(host, result)
+            return BasePlaybookManager.on_host_success(self, host, result)
         if getattr(account, 'is_personal_credential', False):
             self.record_personal_credential_result(
                 account, account.id, 'success'
             )
-            return super().on_host_success(host, result)
+            return BasePlaybookManager.on_host_success(self, host, result)
         try:
             account.set_connectivity(Connectivity.OK)
         except Exception as e:
-            super().on_host_error(host, str(e), result)
+            BasePlaybookManager.on_host_error(self, host, str(e), result)
             return
-        super().on_host_success(host, result)
+        BasePlaybookManager.on_host_success(self, host, result)
 
     def on_host_error(self, host, error, result):
-        super().on_host_error(host, error, result)
+        BasePlaybookManager.on_host_error(self, host, error, result)
         record = self.host_record_mapper.get(host)
         if record:
             self.save_verification_result(

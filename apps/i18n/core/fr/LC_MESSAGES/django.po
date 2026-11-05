@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+#. Django's single-field uniqueness validation message.
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "Un élément « %(model_name)s » avec la même valeur pour « %(field_label)s » existe déjà. Modifiez « %(field_label)s »."
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -191,6 +196,11 @@ msgstr "Le compte est déjà en cours de traitement, ignoré : %(account)s"
 #: accounts/automations/base/manager.py:396
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "Compte introuvable, inactif, ou non éligible pour cette tâche"
+
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "Impossible de déterminer le nom d'utilisateur (ID du compte : %(account_id)s)"
 
 #: accounts/automations/base/manager.py:516
 #, python-format
@@ -2229,6 +2239,10 @@ msgstr "Nom, adresse ou ID de l'actif"
 #: acls/api/connect_method.py:16 acls/models/connect_method.py:10
 msgid "Connect methods"
 msgstr "Méthodes de connexion"
+
+#: acls/serializers/connect_method.py
+msgid "Select at least one connection method"
+msgstr "Sélectionnez au moins une méthode de connexion"
 
 #: acls/apps.py:7
 msgid "App Acls"
@@ -4456,7 +4470,7 @@ msgid ""
 " be executed"
 msgstr ""
 "Cette tâche sera exécutée en cliquant sur « Tester la connexion » dans « "
-"Détails du domaine - Passerelle »"
+"Détails de la zone - Passerelle »"
 
 #: assets/tasks/utils.py:16
 msgid "Asset has been disabled, skipped: {}"
@@ -7143,10 +7157,6 @@ msgstr "Votre compte a été créé avec succès"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer - Un PAM open source"
 
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "<h1>Service Flower indisponible, veuillez vérifier</h1>"
-
 #: jumpserver/views/other.py:28
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
@@ -7941,7 +7951,7 @@ msgstr "Nombre de groupes d'utilisateurs"
 
 #: orgs/serializers.py:15
 msgid "Domains amount"
-msgstr "Nombre de domaines"
+msgstr "Nombre de zones"
 
 #: orgs/serializers.py:16
 msgid "Gateways amount"
@@ -9814,6 +9824,26 @@ msgstr "Disposition du clavier"
 #: settings/serializers/luna.py:41 users/serializers/preference/luna.py:49
 msgid "RDP client option"
 msgstr "Option du client RDP"
+
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "Redirection des imprimantes"
+
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Appliquer les combinaisons de touches Windows"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "Sur cet ordinateur"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "Sur l’ordinateur distant"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "Uniquement en plein écran"
 
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
@@ -14476,6 +14506,42 @@ msgstr ""
 "l’URL de base."
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} Le fournisseur doit prendre en charge l’API Responses (/responses)."
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "Le fournisseur n’a pas renvoyé de flux d’événements de l’API Responses."
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Le flux de l’API Responses a échoué : {detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Le flux de l’API Responses s’est terminé sans événement de fin réussie."
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Le flux de l’API Responses a renvoyé un élément de sortie incomplet."
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Les fragments du flux de texte de l’API Responses sont absents ou ne correspondent pas à la sortie finale."
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Le flux des arguments de l’outil de l’API Responses ne correspond pas à l’appel final de l’outil."
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "L’API Responses a renvoyé un appel d’outil de vérification de l’état non valide (nom, ID de l’appel ou arguments)."
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "Le modèle n’a pas renvoyé correctement le nonce de vérification de l’état après avoir reçu le résultat de l’outil."
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr ""
 "La limite de requêtes du fournisseur du modèle a été dépassée. Réessayez "
@@ -14609,9 +14675,6 @@ msgstr ""
 msgid "Published version"
 msgstr "Version publiée"
 
-#~ msgid "Ticket already closed"
-#~ msgstr "Le ticket est déjà fermé"
-
 #: accounts/personal_credentials.py:213
 msgid "Protocol is not supported by this asset"
 msgstr "Cet actif ne prend pas en charge ce protocole"
@@ -14625,3 +14688,3840 @@ msgid ""
 "Credential verification is unavailable because the asset login "
 "ACL requires an additional action"
 msgstr "La vérification des identifiants est indisponible car l’ACL de connexion à l’actif nécessite une action supplémentaire."
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "L’heure de notification doit être postérieure à l’heure actuelle."
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "L’autorisation d’accès à l’actif va bientôt expirer"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "Date et heure d’expiration"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "Le service de signature de certificats SSH OpenBao est indisponible : %(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "Saisissez un jeton de service OpenBao."
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "Le jeton de service OpenBao est invalide, a expiré ou ne dispose pas des autorisations nécessaires. Vérifiez le jeton et sa politique d’accès."
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "Le jeton de service OpenBao ne peut pas accéder à %(resource)s. Accordez l’autorisation %(capability)s pour ce chemin."
+
+#: accounts/api/account/application.py:79
+msgid "Successfully refreshed secret"
+msgstr "Secret actualisé avec succès"
+
+#: accounts/api/account/personal.py:93
+msgid "Inactive personal credentials cannot be tested"
+msgstr "Impossible de tester des identifiants personnels inactifs"
+
+#: accounts/automations/change_secret/manager.py:43
+msgid "The currently managed password is required when Oracle password changes use the REPLACE clause"
+msgstr "Le mot de passe actuellement géré est requis pour modifier un mot de passe Oracle avec la clause REPLACE"
+
+#: accounts/automations/verify_account/manager.py:137
+#, python-format
+msgid "Targets: %(credentials)s personal credential(s) on %(assets)s asset(s)"
+msgstr "Cibles : %(credentials)s identifiants personnels sur %(assets)s actifs"
+
+#: accounts/const/account.py:8
+msgid "SSH certificate"
+msgstr "Certificat SSH"
+
+#: accounts/exceptions.py:43
+msgid "SSH certificate signing is unavailable. Please retry or contact your administrator."
+msgstr "La signature des certificats SSH est indisponible. Réessayez ou contactez votre administrateur."
+
+#: accounts/exceptions.py:51
+msgid "This account follows template credentials. Confirm to stop following and modify its credentials."
+msgstr "Ce compte suit les identifiants du modèle. Confirmez l'arrêt du suivi pour modifier ses identifiants."
+
+#: accounts/models/account.py:119
+msgid "Follow template"
+msgstr "Suivre le modèle"
+
+#: accounts/models/account.py:177
+msgid "The source account template is unavailable."
+msgstr "Le modèle de compte source est indisponible."
+
+#: accounts/models/account.py:179
+#: accounts/serializers/account/account.py:176
+msgid "Account and template secret types must match."
+msgstr "Les types de secret du compte et du modèle doivent correspondre."
+
+#: accounts/models/account.py:196
+msgid "Disable template following before editing credentials."
+msgstr "Désactivez le suivi du modèle avant de modifier les identifiants."
+
+#: accounts/models/account.py:216
+msgid "Disable template following before changing the source."
+msgstr "Désactivez le suivi du modèle avant de changer la source."
+
+#: accounts/models/account.py:218
+msgid "Disable template following before changing the secret type."
+msgstr "Désactivez le suivi du modèle avant de changer le type de secret."
+
+#: accounts/models/account.py:225
+msgid "Save the following state with the credential snapshot."
+msgstr "Enregistrez l'état du suivi avec l'instantané des identifiants."
+
+#: accounts/models/account.py:228
+msgid "Provide credentials when changing the secret type."
+msgstr "Fournissez des identifiants lors du changement de type de secret."
+
+#: accounts/models/account.py:240
+msgid "Only template accounts can follow a template."
+msgstr "Seuls les comptes issus d'un modèle peuvent suivre un modèle."
+
+#: accounts/models/base.py:29
+msgid "Update template following through account save to preserve credentials."
+msgstr "Mettez à jour le suivi en enregistrant le compte pour conserver les identifiants."
+
+#: accounts/models/base.py:32
+msgid "Disable template following before editing credentials or their source."
+msgstr "Désactivez le suivi du modèle avant de modifier les identifiants ou leur source."
+
+#: accounts/models/personal.py:17
+msgid "Owner"
+msgstr "Propriétaire"
+
+#: accounts/models/personal.py:36
+#: accounts/personal_credentials.py:144
+#: accounts/personal_credentials.py:180
+msgid "Personal asset credential"
+msgstr "Identifiant personnel d'actif"
+
+#: accounts/models/template.py:102
+msgid "Disable account template following before changing the secret type."
+msgstr "Désactivez le suivi du modèle de compte avant de changer le type de secret."
+
+#: accounts/personal_credentials.py:162
+msgid "Operation"
+msgstr "Opération"
+
+#: accounts/personal_credentials.py:170
+msgid "Failure reason"
+msgstr "Motif de l'échec"
+
+#: accounts/personal_credentials.py:196
+msgid "The personal credential has been updated. Please refresh and try again."
+msgstr "L'identifiant personnel a été mis à jour. Actualisez la page et réessayez."
+
+#: accounts/personal_credentials.py:204
+msgid "Invalid user"
+msgstr "Utilisateur non valide"
+
+#: accounts/personal_credentials.py:206
+msgid "Asset is inactive"
+msgstr "L'actif est inactif"
+
+#: accounts/personal_credentials.py:209
+msgid "Protocol is not supported for personal credentials"
+msgstr "Protocole non pris en charge pour les identifiants personnels"
+
+#: accounts/personal_credentials.py:219
+msgid "Personal credentials require a manual or empty-secret asset account"
+msgstr "Les identifiants personnels nécessitent un compte d'actif manuel ou sans secret"
+
+#: accounts/personal_credentials.py:230
+msgid "You do not have account permission for this asset"
+msgstr "Vous n'avez pas d'autorisation de compte pour cet actif"
+
+#: accounts/personal_credentials.py:240
+msgid "Personal credentials require an empty-secret asset account"
+msgstr "Les identifiants personnels nécessitent un compte d'actif sans secret"
+
+#: accounts/personal_credentials.py:252
+msgid "Personal credential username must match the asset account"
+msgstr "Le nom d'utilisateur de l'identifiant personnel doit correspondre au compte de l'actif"
+
+#: accounts/personal_credentials.py:301
+msgid "Credential verification method is unavailable"
+msgstr "La méthode de vérification des identifiants est indisponible"
+
+#: accounts/personal_credentials.py:307
+msgid "Personal credential verification does not allow custom automation methods"
+msgstr "La vérification des identifiants personnels n'autorise pas les méthodes d'automatisation personnalisées"
+
+#: accounts/personal_credentials.py:338
+msgid "The configured credential verification method does not support this protocol"
+msgstr "La méthode de vérification des identifiants configurée ne prend pas en charge ce protocole"
+
+#: accounts/personal_credentials.py:355
+msgid "Secret type is not supported by this protocol"
+msgstr "Ce protocole ne prend pas en charge ce type de secret"
+
+#: accounts/personal_credentials.py:383
+#: accounts/personal_credentials.py:421
+#: accounts/serializers/account/personal.py:188
+msgid "Personal credential not found"
+msgstr "Identifiant personnel introuvable"
+
+#: accounts/personal_credentials.py:450
+#: accounts/personal_credentials.py:469
+#: accounts/serializers/account/personal.py:169
+#: accounts/serializers/account/personal.py:211
+msgid "A personal credential with these fields already exists"
+msgstr "Un identifiant personnel avec ces champs existe déjà"
+
+#: accounts/risk_handlers.py:44
+#, python-format
+msgid "Invalid risk type: %(type)s"
+msgstr "Type de risque non valide : %(type)s"
+
+#: accounts/serializers/account/account.py:126
+msgid "Template not found"
+msgstr "Modèle introuvable"
+
+#: accounts/serializers/account/account.py:172
+msgid "Following requires a valid account template in the same organization."
+msgstr "Le suivi nécessite un modèle de compte valide dans la même organisation."
+
+#: accounts/serializers/account/account.py:178
+msgid "Following accounts use template credentials."
+msgstr "Les comptes qui suivent un modèle utilisent ses identifiants."
+
+#: accounts/serializers/account/account.py:183
+msgid "Disable template following before editing this field."
+msgstr "Désactivez le suivi du modèle avant de modifier ce champ."
+
+#: accounts/serializers/account/account.py:293
+msgid "Asset IP"
+msgstr "IP de l'actif"
+
+#: accounts/serializers/account/account.py:321
+#: accounts/serializers/account/account.py:409
+msgid "Only applies to template accounts. Credentials are read from the current template."
+msgstr "Uniquement pour les comptes issus d'un modèle. Les identifiants sont lus depuis le modèle actuel."
+
+#: accounts/serializers/account/account.py:355
+msgid "Source template"
+msgstr "Modèle source"
+
+#: accounts/serializers/account/base.py:68
+msgid "SSH certificate accounts cannot push or rotate credentials"
+msgstr "Les comptes avec certificat SSH ne peuvent ni déployer ni renouveler leurs identifiants"
+
+#: accounts/serializers/account/personal.py:48
+msgid "Expected version"
+msgstr "Version attendue"
+
+#: accounts/serializers/account/personal.py:74
+#: assets/serializers/node.py:196
+#: settings/api/ssh_ca.py:37
+msgid "This field may not be blank."
+msgstr "Ce champ ne peut pas être vide."
+
+#: accounts/serializers/account/personal.py:91
+msgid "Username cannot be changed"
+msgstr "Le nom d'utilisateur ne peut pas être modifié"
+
+#: accounts/serializers/account/personal.py:96
+msgid "Asset cannot be changed"
+msgstr "L'actif ne peut pas être modifié"
+
+#: accounts/serializers/account/personal.py:98
+msgid "Protocol cannot be changed"
+msgstr "Le protocole ne peut pas être modifié"
+
+#: accounts/serializers/account/personal.py:106
+msgid "This field is only valid when updating"
+msgstr "Ce champ est valide uniquement lors d'une mise à jour"
+
+#: accounts/serializers/account/personal.py:112
+#: accounts/serializers/account/personal.py:149
+#: accounts/serializers/account/personal.py:181
+msgid "Asset is not in the current organization"
+msgstr "L'actif n'appartient pas à l'organisation actuelle"
+
+#: accounts/serializers/account/personal.py:128
+msgid "A new secret is required when changing the secret type"
+msgstr "Un nouveau secret est requis lors du changement de type de secret"
+
+#: accounts/serializers/account/service.py:57
+#, python-format
+msgid "At least one of the following fields must be provided: %(fields)s."
+msgstr "Au moins un des champs suivants est requis : %(fields)s."
+
+#: accounts/tasks/template.py:16
+msgid "Synchronize template properties to following accounts without changing credentials."
+msgstr "Synchronisez les propriétés du modèle avec les comptes qui le suivent sans modifier les identifiants."
+
+#: accounts/tasks/verify_account.py:69
+#: accounts/tasks/verify_account.py:88
+msgid "Verify personal credential connectivity"
+msgstr "Vérifier la connectivité des identifiants personnels"
+
+#: accounts/tasks/verify_account.py:70
+msgid "Verify a user's personal asset credential"
+msgstr "Vérifier l'identifiant personnel d'actif d'un utilisateur"
+
+#: accounts/tasks/verify_account.py:106
+msgid "Personal credential verification failed"
+msgstr "Échec de vérification des identifiants personnels"
+
+#: accounts/templates/accounts/gather_account_report.html:76
+#: accounts/templates/accounts/gather_account_report.html:116
+msgid "No."
+msgstr "N°"
+
+#: acls/models/login_asset_acl.py:18
+msgid "Review exemption duration (hours)"
+msgstr "Durée d'exemption d'approbation (heures)"
+
+#: acls/models/login_asset_acl.py:19
+msgid "0 means approval is required for every connection."
+msgstr "0 impose une approbation à chaque connexion."
+
+#: acls/serializers/base.py:114
+msgid "Account usernames, or @ALL to match all accounts."
+msgstr "Noms d'utilisateur des comptes, ou @ALL pour tous les comptes."
+
+#: acls/serializers/command_acl.py:24
+msgid "Use \"command\" for literal command names. Each line matches that command as a standalone word anywhere in the input, so \"rm\" also matches \"rm -rf\" and \"sudo rm\". Use \"regex\" only for custom patterns."
+msgstr "Utilisez \"command\" pour les noms de commandes littéraux. Chaque ligne recherche la commande comme mot entier dans toute la saisie : \"rm\" correspond aussi à \"rm -rf\" et \"sudo rm\". Utilisez \"regex\" uniquement pour des motifs personnalisés."
+
+#: assets/api/asset/asset.py:51
+#: assets/models/zone.py:20
+#: assets/serializers/domain.py:41
+msgid "CIDR ranges"
+msgstr "Plages CIDR"
+
+#: assets/api/asset/asset.py:52
+msgid "Exclude zone"
+msgstr "Zone exclue"
+
+#: assets/api/favorite_asset.py:133
+msgid "Some assets are not authorized for this user."
+msgstr "Certains actifs ne sont pas autorisés pour cet utilisateur."
+
+#: assets/api/platform.py:120
+msgid "Internal platform"
+msgstr "Plateforme interne"
+
+#: assets/api/platform.py:169
+msgid "Missing platform.yml in package"
+msgstr "platform.yml absent du paquet"
+
+#: assets/const/protocol.py:150
+msgid "Allow invalid certificate"
+msgstr "Autoriser un certificat non valide"
+
+#: assets/const/protocol.py:333
+#: assets/models/asset/web.py:22
+msgid "Interactive selector"
+msgstr "Sélecteur interactif"
+
+#: assets/const/protocol.py:334
+#: assets/models/asset/web.py:23
+msgid "Optional interactive verification area, e.g. css=#mfa-dialog. Exclude credentials and password visibility controls."
+msgstr "Zone de vérification interactive facultative, par ex. css=#mfa-dialog. Excluez les identifiants et les contrôles d'affichage du mot de passe."
+
+#: assets/const/protocol.py:342
+#: assets/models/asset/web.py:17
+msgid "Selector for an element that appears only after a successful login, e.g. css=#dashboard. Required for basic autofill."
+msgstr "Sélecteur d'un élément affiché uniquement après une connexion réussie, par ex. css=#dashboard. Requis pour le remplissage automatique de base."
+
+#: assets/models/asset/web.py:9
+#: assets/serializers/asset/web.py:16
+msgid "Allowed sites"
+msgstr "Sites autorisés"
+
+#: assets/models/zone.py:21
+msgid "Auto assign new assets"
+msgstr "Affecter automatiquement les nouveaux actifs"
+
+#: assets/serializers/asset/web.py:75
+msgid "Invalid selector"
+msgstr "Sélecteur non valide"
+
+#: assets/serializers/domain.py:34
+#, python-format
+msgid "Invalid CIDR: %s"
+msgstr "CIDR non valide : %s"
+
+#: assets/serializers/domain.py:74
+msgid "At least one CIDR is required when auto assignment is enabled."
+msgstr "Au moins un CIDR est requis pour l'affectation automatique."
+
+#: assets/serializers/favorite_asset.py:35
+#: assets/serializers/favorite_asset.py:82
+#: assets/serializers/favorite_asset.py:148
+msgid "Invalid favorite folder."
+msgstr "Dossier de favoris non valide."
+
+#: assets/serializers/favorite_asset.py:40
+msgid "A folder cannot be moved below itself."
+msgstr "Un dossier ne peut pas être déplacé sous lui-même."
+
+#: assets/serializers/favorite_asset.py:58
+msgid "A folder with this name already exists under the parent folder."
+msgstr "Un dossier de ce nom existe déjà dans le dossier parent."
+
+#: assets/serializers/favorite_asset.py:96
+msgid "Asset is not authorized for this user."
+msgstr "Cet actif n'est pas autorisé pour cet utilisateur."
+
+#: assets/validators.py:24
+msgid "The address cannot contain Ansible template override syntax"
+msgstr "L'adresse ne peut pas contenir de syntaxe de remplacement de modèle Ansible"
+
+#: assets/validators.py:64
+msgid "Enter an HTTP/HTTPS origin without a path, credentials or wildcard."
+msgstr "Saisissez une origine HTTP/HTTPS sans chemin, identifiants ni caractère générique."
+
+#: assets/validators.py:88
+msgid "Enter at most 128 script steps."
+msgstr "Saisissez au maximum 128 étapes de script."
+
+#: assets/validators.py:92
+#: assets/validators.py:101
+msgid "Invalid script step."
+msgstr "Étape de script non valide."
+
+#: assets/validators.py:95
+msgid "Script step numbers must be unique positive integers."
+msgstr "Les numéros d'étape doivent être des entiers positifs uniques."
+
+#: assets/validators.py:98
+msgid "Unsupported script command."
+msgstr "Commande de script non prise en charge."
+
+#: assets/validators.py:105
+msgid "Step timeout must be between 1 and 180 seconds."
+msgstr "Le délai d'une étape doit être compris entre 1 et 180 secondes."
+
+#: assets/validators.py:109
+msgid "The success command must be the last step."
+msgstr "La commande de réussite doit être la dernière étape."
+
+#: audits/const.py:12
+msgid "Create file"
+msgstr "Créer un fichier"
+
+#: audits/models.py:78
+msgid "Ticket audit"
+msgstr "Audit des tickets"
+
+#: audits/serializers.py:57
+#, python-format
+msgid "Updating %(fields)s fields is not allowed"
+msgstr "La modification des champs %(fields)s n'est pas autorisée"
+
+#: authentication/api/connection_token.py:532
+#: authentication/serializers/connection_token.py:96
+msgid "Personal credential connection tokens cannot be reusable"
+msgstr "Les jetons de connexion avec identifiants personnels ne peuvent pas être réutilisables"
+
+#: authentication/api/connection_token.py:763
+msgid "Personal credentials can only be managed by their owner"
+msgstr "Seul le propriétaire peut gérer ses identifiants personnels"
+
+#: authentication/api/connection_token.py:802
+msgid "A personal credential ID is required when a version is provided"
+msgstr "L'ID de l'identifiant personnel est requis lorsqu'une version est fournie"
+
+#: authentication/api/connection_token.py:810
+msgid "Do not submit a username or secret when using a saved credential"
+msgstr "Ne fournissez ni nom d'utilisateur ni secret avec des identifiants enregistrés"
+
+#: authentication/api/connection_token.py:909
+#: authentication/models/connection_token.py:204
+msgid "Connect method is not allowed for this asset"
+msgstr "Cette méthode de connexion n'est pas autorisée pour cet actif"
+
+#: authentication/api/connection_token.py:1246
+msgid "Token is expired at: {}"
+msgstr "Le jeton a expiré le : {}"
+
+#: authentication/api/connection_token.py:1259
+msgid "Not allow to view secret"
+msgstr "L'affichage du secret n'est pas autorisé"
+
+#: authentication/api/connection_token.py:1263
+msgid "Tinker must redeem its RDP login ticket to obtain credentials"
+msgstr "Tinker doit échanger son ticket de connexion RDP pour obtenir les identifiants"
+
+#: authentication/api/connection_token.py:1268
+msgid "Token {} is not valid"
+msgstr "Le jeton {} n'est pas valide"
+
+#: authentication/api/connection_token.py:1290
+#: authentication/api/rdp_login.py:144
+msgid "Invalid connection token"
+msgstr "Jeton de connexion non valide"
+
+#: authentication/api/connection_token.py:1299
+msgid "Token expired"
+msgstr "Jeton expiré"
+
+#: authentication/api/face.py:55
+msgid "missing field 'face_code'"
+msgstr "Champ 'face_code' manquant"
+
+#: authentication/api/face.py:70
+msgid "token not exists or expired"
+msgstr "Le jeton n'existe pas ou a expiré"
+
+#: authentication/api/face.py:129
+msgid "Token does not belong to the current face capture."
+msgstr "Le jeton n'appartient pas à la capture faciale actuelle."
+
+#: authentication/api/face.py:135
+msgid "Token does not exist or has expired."
+msgstr "Le jeton n'existe pas ou a expiré."
+
+#: authentication/api/face.py:246
+msgid "face codes not matched"
+msgstr "Les données faciales ne correspondent pas"
+
+#: authentication/api/rdp_login.py:42
+msgid "Only user and admin connection tokens support RDP token login"
+msgstr "Seuls les jetons de connexion utilisateur et administrateur permettent la connexion RDP par jeton"
+
+#: authentication/api/rdp_login.py:47
+msgid "Connection permission is no longer valid"
+msgstr "L'autorisation de connexion n'est plus valide"
+
+#: authentication/api/rdp_login.py:51
+msgid "An enabled Applet connection is required"
+msgstr "Une connexion d'application distante activée est requise"
+
+#: authentication/api/rdp_login.py:57
+msgid "A Tinker component must be bound to this host"
+msgstr "Un composant Tinker doit être lié à cet hôte"
+
+#: authentication/api/rdp_login.py:63
+msgid "Applet is not available on this host"
+msgstr "L'application distante est indisponible sur cet hôte"
+
+#: authentication/api/rdp_login.py:67
+msgid "This component is not authorized for the host"
+msgstr "Ce composant n'est pas autorisé pour cet hôte"
+
+#: authentication/api/rdp_login.py:74
+msgid "The connection authorization has changed"
+msgstr "L'autorisation de connexion a changé"
+
+#: authentication/api/rdp_login.py:97
+#, python-format
+msgid "No compatible Applet host is available. Upgrade and redeploy an applet host with Tinker %(minimum)s or later."
+msgstr "Aucun hôte d'applications compatible n'est disponible. Mettez à niveau et redéployez un hôte avec Tinker %(minimum)s ou ultérieur."
+
+#: authentication/api/rdp_login.py:115
+msgid "Unable to issue an RDP login credential"
+msgstr "Impossible d'émettre un identifiant de connexion RDP"
+
+#: authentication/api/rdp_login.py:140
+#: authentication/api/rdp_login.py:149
+msgid "Invalid or expired RDP login authorization"
+msgstr "Autorisation de connexion RDP non valide ou expirée"
+
+#: authentication/api/rdp_login.py:156
+msgid "RDP login ticket has already been used"
+msgstr "Le ticket de connexion RDP a déjà été utilisé"
+
+#: authentication/api/sso.py:90
+msgid "authkey is required"
+msgstr "authkey est requis"
+
+#: authentication/api/token.py:46
+msgid "MFA unset, please set first"
+msgstr "L'authentification multifacteur n'est pas configurée ; configurez-la d'abord"
+
+#: authentication/backends/drf.py:94
+msgid "User is inactive or expired."
+msgstr "L'utilisateur est inactif ou son compte a expiré."
+
+#: authentication/backends/ldap.py:192
+msgid "failed to map the username to a DN."
+msgstr "Impossible d'associer le nom d'utilisateur à un DN."
+
+#: authentication/backends/ldap.py:201
+msgid "user DN/password rejected by LDAP server."
+msgstr "Le serveur LDAP a rejeté le DN ou le mot de passe."
+
+#: authentication/backends/passkey/fido.py:108
+#: authentication/backends/passkey/fido.py:146
+msgid "No state found"
+msgstr "État introuvable"
+
+#: authentication/backends/token.py:25
+msgid "Token is invalid, expired at {}"
+msgstr "Le jeton est invalide ; il a expiré le {}"
+
+#: authentication/errors/mfa.py:13
+msgid "Code invalid, can not get user info"
+msgstr "Code non valide ; impossible de récupérer l'utilisateur"
+
+#: authentication/mixins.py:611
+msgid "Face recognition token is missing from the session."
+msgstr "Le jeton de reconnaissance faciale est absent de la session."
+
+#: authentication/mixins.py:619
+#, python-format
+msgid "Face recognition context does not exist for token: %(token)s"
+msgstr "Aucun contexte de reconnaissance faciale pour le jeton : %(token)s"
+
+#: authentication/mixins.py:626
+msgid "Face recognition is not yet completed."
+msgstr "La reconnaissance faciale n'est pas encore terminée."
+
+#: authentication/mixins.py:634
+msgid "Face code is missing from the context."
+msgstr "Les données faciales sont absentes du contexte."
+
+#: authentication/models/connection_token.py:54
+msgid "Personal credential ID"
+msgstr "ID d'identifiant personnel"
+
+#: authentication/models/connection_token.py:57
+#: authentication/serializers/connection_token.py:31
+msgid "Personal credential version"
+msgstr "Version de l'identifiant personnel"
+
+#: authentication/models/connection_token.py:255
+msgid "Personal credential version is missing"
+msgstr "Version de l'identifiant personnel manquante"
+
+#: authentication/models/connection_token.py:287
+msgid "Personal credential is no longer available"
+msgstr "L'identifiant personnel n'est plus disponible"
+
+#: authentication/models/connection_token.py:333
+msgid "No provider available, please check the virtual app publication and provider status"
+msgstr "Aucun fournisseur disponible ; vérifiez la publication de l'application virtuelle et l'état du fournisseur"
+
+#: authentication/models/connection_token.py:383
+msgid "Personal credential no longer matches the asset account"
+msgstr "L'identifiant personnel ne correspond plus au compte de l'actif"
+
+#: authentication/notifications.py:17
+msgid "Temporary password"
+msgstr "Mot de passe temporaire"
+
+#: authentication/notifications.py:20
+msgid "Private token"
+msgstr "Jeton privé"
+
+#: authentication/notifications.py:41
+msgid "Credential created reminder"
+msgstr "Notification de création d'identifiant"
+
+#: authentication/notifications.py:45
+#: authentication/templates/authentication/_msg_credential_created.html:5
+msgid "Credential type"
+msgstr "Type d'identifiant"
+
+#: authentication/notifications.py:46
+#: authentication/templates/authentication/_msg_credential_created.html:6
+msgid "Identifier"
+msgstr "Identifiant"
+
+#: authentication/notifications.py:73
+msgid "Credential activity summary"
+msgstr "Résumé d'activité des identifiants"
+
+#: authentication/notifications.py:77
+msgid "Credential activity"
+msgstr "Activité des identifiants"
+
+#: authentication/serializers/connect_token_secret.py:164
+msgid "SSH public key"
+msgstr "Clé publique SSH"
+
+#: authentication/serializers/connect_token_secret.py:268
+msgid "Virtual app provider is required"
+msgstr "Un fournisseur d'applications virtuelles est requis"
+
+#: authentication/serializers/connect_token_secret.py:270
+msgid "Virtual app provider requires an SSH host"
+msgstr "Le fournisseur d'applications virtuelles nécessite un hôte SSH"
+
+#: authentication/serializers/connect_token_secret.py:273
+msgid "Virtual app provider requires an active SSH account"
+msgstr "Le fournisseur d'applications virtuelles nécessite un compte SSH actif"
+
+#: authentication/serializers/connection_token.py:27
+msgid "Save personal credential"
+msgstr "Enregistrer l'identifiant personnel"
+
+#: authentication/serializers/rdp_login.py:22
+#: authentication/serializers/rdp_login.py:27
+#: authentication/serializers/rdp_login.py:30
+msgid "Invalid login credential"
+msgstr "Identifiant de connexion non valide"
+
+#: authentication/serializers/token.py:67
+msgid "user id {} not exist"
+msgstr "L'ID utilisateur {} n'existe pas"
+
+#: authentication/services/rdp_login.py:18
+msgid "RDP login ticket cache is unavailable"
+msgstr "Le cache des tickets de connexion RDP est indisponible"
+
+#: authentication/services/ssh_certificate.py:47
+msgid "SSH public key is too long"
+msgstr "La clé publique SSH est trop longue"
+
+#: authentication/services/ssh_certificate.py:53
+msgid "An SSH certificate cannot be signed again"
+msgstr "Un certificat SSH ne peut pas être signé de nouveau"
+
+#: authentication/services/ssh_certificate.py:64
+msgid "Asset permission has expired"
+msgstr "L'autorisation de l'actif a expiré"
+
+#: authentication/services/ssh_certificate.py:74
+msgid "The account does not use SSH certificate authentication"
+msgstr "Le compte n'utilise pas l'authentification par certificat SSH"
+
+#: authentication/services/ssh_certificate.py:76
+msgid "Virtual accounts cannot use SSH certificate authentication"
+msgstr "Les comptes virtuels ne peuvent pas utiliser l'authentification par certificat SSH"
+
+#: authentication/services/ssh_certificate.py:78
+msgid "SSH certificate accounts require a username"
+msgstr "Les comptes avec certificat SSH nécessitent un nom d'utilisateur"
+
+#: authentication/services/ssh_certificate.py:80
+msgid "SSH certificates only support SSH and SFTP protocols"
+msgstr "Les certificats SSH prennent en charge uniquement SSH et SFTP"
+
+#: authentication/tasks.py:43
+msgid "Send credential activity summary"
+msgstr "Envoyer le résumé d'activité des identifiants"
+
+#: authentication/tasks.py:44
+msgid "Send users a summary of credential creation and successful use in the past 24 hours"
+msgstr "Envoyer aux utilisateurs un résumé des identifiants créés et utilisés avec succès au cours des dernières 24 heures"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:2
+#: authentication/templates/authentication/_msg_credential_created.html:2
+#, python-format
+msgid "Hello %(name)s,"
+msgstr "Bonjour %(name)s,"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:3
+msgid "The following credential activity occurred in the past 24 hours."
+msgstr "L'activité suivante des identifiants a eu lieu au cours des dernières 24 heures."
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:16
+msgid "If you do not recognize this activity, revoke the credential and contact your administrator immediately."
+msgstr "Si vous ne reconnaissez pas cette activité, révoquez l'identifiant et contactez immédiatement votre administrateur."
+
+#: authentication/templates/authentication/_msg_credential_created.html:3
+msgid "A new credential was created for your account."
+msgstr "Un nouvel identifiant a été créé pour votre compte."
+
+#: authentication/templates/authentication/_msg_credential_created.html:10
+msgid "If this was not you, revoke the credential and contact your administrator immediately."
+msgstr "Si vous n'êtes pas à l'origine de cette action, révoquez l'identifiant et contactez immédiatement votre administrateur."
+
+#: authentication/templates/authentication/face_capture.html:60
+#: authentication/templates/authentication/face_capture.html:145
+msgid "Face recognition failed"
+msgstr "Échec de la reconnaissance faciale"
+
+#: authentication/templates/authentication/face_capture.html:93
+msgid "Failed to start face recognition"
+msgstr "Impossible de démarrer la reconnaissance faciale"
+
+#: authentication/templates/authentication/face_capture.html:129
+msgid "Face capture expired. Please retry."
+msgstr "La capture faciale a expiré. Réessayez."
+
+#: authentication/templates/authentication/passkey.html:8
+msgid "Login passkey"
+msgstr "Connexion par clé d'accès"
+
+#: authentication/views/base.py:61
+msgid "A local account with the same username already exists. Please log in with another authentication method and bind this account before using it to log in."
+msgstr "Un compte local porte déjà ce nom. Connectez-vous par une autre méthode et liez ce compte avant de l'utiliser pour vous connecter."
+
+#: chat_ai/api/runtime_store.py:39
+msgid "The runtime store request exceeds the 64 MiB record limit."
+msgstr "La requête du stockage d'exécution dépasse la limite de 64 MiB par enregistrement."
+
+#: chat_ai/api/runtime_store.py:58
+#, python-format
+msgid "JSON parse error - %(error)s"
+msgstr "Erreur d'analyse JSON : %(error)s"
+
+#: chat_ai/api/runtime_store.py:62
+msgid "Only a Kael terminal service account may access the runtime store."
+msgstr "Seul un compte de service de terminal Kael peut accéder au stockage d'exécution."
+
+#: chat_ai/api/runtime_store.py:75
+msgid "A JSON object is required."
+msgstr "Un objet JSON est requis."
+
+#: chat_ai/api/runtime_store.py:79
+#, python-format
+msgid "Unknown field(s): %(fields)s."
+msgstr "Champs inconnus : %(fields)s."
+
+#: chat_ai/api/runtime_store.py:108
+msgid "A UUID string is required."
+msgstr "Une chaîne UUID est requise."
+
+#: chat_ai/api/runtime_store.py:111
+msgid "A non-negative integer is required."
+msgstr "Un entier positif ou nul est requis."
+
+#: chat_ai/api/runtime_store.py:114
+msgid "A boolean is required."
+msgstr "Un booléen est requis."
+
+#: chat_ai/api/runtime_store.py:116
+msgid "A string is required."
+msgstr "Une chaîne est requise."
+
+#: chat_ai/api/runtime_store.py:118
+msgid "A hexadecimal string is required."
+msgstr "Une chaîne hexadécimale est requise."
+
+#: chat_ai/api/runtime_store.py:124
+msgid "The journal record exceeds the 64 MiB limit."
+msgstr "L'enregistrement du journal dépasse la limite de 64 MiB."
+
+#: chat_ai/api/runtime_store.py:128
+msgid "The journal record must contain exactly one JSON line."
+msgstr "L'enregistrement doit contenir exactement une ligne JSON."
+
+#: chat_ai/api/runtime_store.py:132
+msgid "The journal record is not valid JSON."
+msgstr "L'enregistrement du journal n'est pas un JSON valide."
+
+#: chat_ai/api/runtime_store.py:135
+msgid "The journal record must contain version, created_at, payload, and checksum."
+msgstr "L'enregistrement doit contenir version, created_at, payload et checksum."
+
+#: chat_ai/api/runtime_store.py:139
+msgid "Unsupported journal record version."
+msgstr "Version d'enregistrement non prise en charge."
+
+#: chat_ai/api/runtime_store.py:146
+msgid "The journal record created_at is invalid."
+msgstr "Le champ created_at de l'enregistrement est invalide."
+
+#: chat_ai/api/runtime_store.py:150
+#: chat_ai/api/runtime_store.py:155
+msgid "The journal record payload or checksum is invalid."
+msgstr "Le payload ou le checksum de l'enregistrement est invalide."
+
+#: chat_ai/api/runtime_store.py:158
+msgid "The journal record checksum does not match its payload."
+msgstr "La somme de contrôle ne correspond pas au contenu de l'enregistrement."
+
+#: chat_ai/api/runtime_store.py:234
+msgid "Invalid runtime store access key."
+msgstr "Clé d'accès au stockage d'exécution invalide."
+
+#: chat_ai/api/runtime_store.py:311
+msgid "Invalid runtime store commit integrity."
+msgstr "Intégrité de validation du stockage d'exécution invalide."
+
+#: chat_ai/api/runtime_store.py:361
+msgid "The runtime store revision has changed."
+msgstr "La révision du stockage d'exécution a changé."
+
+#: chat_ai/authentication.py:21
+msgid "Invalid Chat AI delegation credential."
+msgstr "Identifiant de délégation du chat IA invalide."
+
+#: chat_ai/authentication.py:25
+msgid "Chat AI delegation operation mismatch."
+msgstr "L'opération de délégation du chat IA ne correspond pas."
+
+#: chat_ai/authentication.py:27
+msgid "Chat AI delegation organization mismatch."
+msgstr "L'organisation de délégation du chat IA ne correspond pas."
+
+#: chat_ai/authentication.py:30
+msgid "Chat AI delegation organization context mismatch."
+msgstr "Le contexte d'organisation de la délégation du chat IA ne correspond pas."
+
+#: chat_ai/authentication.py:32
+msgid "Chat AI delegation request mismatch."
+msgstr "La requête de délégation du chat IA ne correspond pas."
+
+#: chat_ai/authentication.py:41
+msgid "Chat AI delegation request could not be verified."
+msgstr "Impossible de vérifier la requête de délégation du chat IA."
+
+#: chat_ai/authentication.py:43
+msgid "Chat AI delegation request body mismatch."
+msgstr "Le corps de la requête de délégation du chat IA ne correspond pas."
+
+#: chat_ai/authentication.py:48
+msgid "Chat AI delegation replay protection is unavailable."
+msgstr "La protection anti-rejeu de délégation du chat IA est indisponible."
+
+#: chat_ai/authentication.py:50
+msgid "Chat AI delegation credential was already used."
+msgstr "L'identifiant de délégation du chat IA a déjà été utilisé."
+
+#: chat_ai/authentication.py:53
+msgid "Chat AI delegation user is invalid."
+msgstr "L'utilisateur de délégation du chat IA est invalide."
+
+#: chat_ai/models.py:20
+msgid "Chat AI runtime store"
+msgstr "Stockage d'exécution du chat IA"
+
+#: chat_ai/models.py:28
+msgid "Runtime store"
+msgstr "Stockage d'exécution"
+
+#: chat_ai/models.py:51
+msgid "Chat AI runtime store record"
+msgstr "Enregistrement du stockage d'exécution du chat IA"
+
+#: common/auth/signature.py:13
+msgid "Invalid signature."
+msgstr "Signature non valide."
+
+#: common/auth/signature.py:14
+msgid "Ip is not in access ip list."
+msgstr "L'IP n'est pas dans la liste d'accès autorisé."
+
+#: common/db/fields.py:611
+msgid "Invalid JSON data for JSONManyToManyField."
+msgstr "Données JSON invalides pour JSONManyToManyField."
+
+#: common/drf/exc_handlers.py:66
+#: jumpserver/views/error_views.py:20
+msgid "Server internal error"
+msgstr "Erreur interne du serveur"
+
+#: common/drf/filters.py:1011
+msgid "attr_rules should be base64"
+msgstr "attr_rules doit être encodé en Base64"
+
+#: common/drf/filters.py:1015
+msgid "attr_rules should be json"
+msgstr "attr_rules doit être du JSON"
+
+#: common/drf/parsers/excel.py:43
+#: common/drf/parsers/excel.py:70
+#: common/drf/parsers/excel.py:80
+msgid "Excel worksheet exceeds import limits"
+msgstr "La feuille Excel dépasse les limites d'importation"
+
+#: common/drf/parsers/excel.py:62
+#: common/drf/parsers/excel.py:64
+msgid "Invalid excel worksheet range"
+msgstr "Plage de feuille Excel non valide"
+
+#: common/drf/parsers/excel.py:74
+#: common/drf/parsers/excel.py:107
+msgid "Too many excel worksheets"
+msgstr "Trop de feuilles Excel"
+
+#: common/drf/parsers/excel.py:113
+msgid "Excel workbook exceeds import limits"
+msgstr "Le classeur Excel dépasse les limites d'importation"
+
+#: common/sdk/im/exceptions.py:8
+msgid "HTTP status is not 200"
+msgstr "Le statut HTTP n'est pas 200"
+
+#: common/sdk/im/exceptions.py:13
+msgid "Error code is not 0"
+msgstr "Le code d'erreur n'est pas 0"
+
+#: common/sdk/im/exceptions.py:18
+msgid "Response data key error"
+msgstr "Erreur de clé dans les données de réponse"
+
+#: common/sdk/sms/custom_file.py:48
+msgid "Custom file SMS sending failed"
+msgstr "Échec d'envoi du SMS par fichier personnalisé"
+
+#: common/serializers/mixin.py:190
+msgid "id or pk not in data"
+msgstr "id ou pk absent des données"
+
+#: jumpserver/middleware.py:157
+msgid "Service temporarily unavailable"
+msgstr "Service temporairement indisponible"
+
+#: jumpserver/middleware.py:158
+msgid "Database operation failed, please try again later."
+msgstr "Échec de l'opération de base de données. Réessayez plus tard."
+
+#: notifications/api/notifications.py:218
+msgid "template_name is required"
+msgstr "template_name est requis"
+
+#: notifications/serializers/notifications.py:58
+#, python-format
+msgid "Template syntax error at line: %(line)s"
+msgstr "Erreur de syntaxe du modèle à la ligne : %(line)s"
+
+#: ops/api/playbook.py:77
+msgid "Invalid clone_from id"
+msgstr "ID clone_from non valide"
+
+#: ops/api/playbook.py:81
+msgid "clone playbook file not found"
+msgstr "Fichier Playbook à cloner introuvable"
+
+#: ops/api/playbook.py:93
+msgid "Unzip failed"
+msgstr "Échec de décompression"
+
+#: ops/models/job.py:342
+#, python-brace-format
+msgid "Undefined job variable: {name}"
+msgstr "Variable de tâche non définie : {name}"
+
+#: ops/models/job.py:544
+#: ops/models/job.py:590
+msgid "Quick command"
+msgstr "Commande rapide"
+
+#: ops/models/job.py:545
+msgid "Matched a command filter policy"
+msgstr "Correspond à une règle de filtrage des commandes"
+
+#: ops/models/job.py:591
+msgid "Matched the job center command blacklist"
+msgstr "Correspond à la liste noire des commandes du centre de tâches"
+
+#: ops/serializers/variable.py:114
+msgid "One of 'job', 'adhoc', or 'playbook' is required."
+msgstr "Un des champs 'job', 'adhoc' ou 'playbook' est requis."
+
+#: ops/serializers/variable.py:123
+msgid "Invalid job, adhoc, or playbook ID."
+msgstr "ID de job, adhoc ou playbook non valide."
+
+#: ops/serializers/variable.py:155
+#, python-format
+msgid "Invalid options format: %(error)s"
+msgstr "Format d'options invalide : %(error)s"
+
+#: ops/ws.py:71
+msgid "Task not found"
+msgstr "Tâche introuvable"
+
+#: ops/ws.py:87
+msgid "No permission"
+msgstr "Autorisation refusée"
+
+#: perms/filters.py:93
+msgid "Include inherited permissions"
+msgstr "Inclure les autorisations héritées"
+
+#: perms/filters.py:180
+#: users/tree.py:107
+msgid "Ungrouped users"
+msgstr "Utilisateurs sans groupe"
+
+#: perms/models/asset_permission.py:83
+#: tickets/models/ticket/apply_asset.py:23
+msgid "Expiration-soon notice minutes"
+msgstr "Préavis d'expiration (minutes)"
+
+#: perms/models/asset_permission.py:86
+msgid "Expiration-soon notice time"
+msgstr "Heure de notification d'expiration prochaine"
+
+#: perms/models/asset_permission.py:89
+msgid "Expiration-soon notice sent time"
+msgstr "Heure d'envoi de la notification d'expiration prochaine"
+
+#: perms/serializers/tree.py:44
+msgid "This list may not be empty."
+msgstr "Cette liste ne peut pas être vide."
+
+#: perms/tasks.py:131
+msgid "Send asset permission expiration-soon notification"
+msgstr "Envoyer une notification d'expiration prochaine des autorisations d'actifs"
+
+#: perms/tasks.py:133
+msgid "Check due asset permission expiration-soon notices every minute and enqueue notifications"
+msgstr "Vérifier chaque minute les notifications d'expiration d'autorisations à envoyer et les mettre en file"
+
+#: perms/utils/expire_soon_notice.py:28
+msgid "Ensure this value is greater than 0."
+msgstr "Assurez-vous que cette valeur est supérieure à 0."
+
+#: rbac/serializers/rolebinding.py:57
+msgid "Only organization roles can be bound"
+msgstr "Seuls les rôles d'organisation peuvent être liés"
+
+#: rbac/tree.py:68
+msgid "System tools"
+msgstr "Outils système"
+
+#: reports/api/report.py:133
+msgid "Unsupported report type"
+msgstr "Type de rapport non pris en charge"
+
+#: reports/api/report.py:135
+msgid "Report type can not be modified"
+msgstr "Le type de rapport ne peut pas être modifié"
+
+#: reports/api/report.py:142
+msgid "Invalid days"
+msgstr "Nombre de jours non valide"
+
+#: reports/api/report.py:144
+msgid "Days must be one of: 1, 7, 30"
+msgstr "Le nombre de jours doit être 1, 7 ou 30"
+
+#: reports/api/report.py:149
+msgid "Filters must be a dict"
+msgstr "Les filtres doivent être un dictionnaire"
+
+#: reports/api/report.py:233
+msgid "Builtin report template can not be modified"
+msgstr "Le modèle de rapport intégré ne peut pas être modifié"
+
+#: reports/api/report.py:238
+msgid "Builtin report template can not be deleted"
+msgstr "Le modèle de rapport intégré ne peut pas être supprimé"
+
+#: settings/api/chat.py:149
+msgid "Unable to connect to the model provider"
+msgstr "Impossible de joindre le fournisseur du modèle"
+
+#: settings/api/chat.py:199
+msgid "Please select or enter a model first"
+msgstr "Sélectionnez ou saisissez d'abord un modèle"
+
+#: settings/api/chat.py:240
+msgid "The provider is reachable, but the selected model does not support the required tool calls"
+msgstr "Le fournisseur est accessible, mais le modèle choisi ne prend pas en charge les appels d'outils requis"
+
+#: settings/models.py:176
+msgid "Can change basic setting"
+msgstr "Peut modifier les paramètres de base"
+
+#: settings/models.py:177
+msgid "Can change system tools setting"
+msgstr "Peut modifier les paramètres des outils système"
+
+#: settings/serializers/auth/dingtalk.py:13
+msgid "Agent ID"
+msgstr "ID de l'agent"
+
+#: settings/serializers/auth/dingtalk.py:14
+#: settings/serializers/auth/sms.py:67
+msgid "App Key"
+msgstr "Clé d'application"
+
+#: settings/serializers/auth/dingtalk.py:15
+#: settings/serializers/auth/feishu.py:16
+#: settings/serializers/auth/lark.py:15
+#: settings/serializers/auth/sms.py:68
+#: settings/serializers/auth/wecom.py:15
+msgid "App Secret"
+msgstr "Secret d'application"
+
+#: settings/serializers/auth/feishu.py:15
+#: settings/serializers/auth/lark.py:14
+msgid "App ID"
+msgstr "ID de l'application"
+
+#: settings/serializers/auth/oauth2.py:79
+msgid "User attribute mapping, where the `key` is this system user attribute name and the `value` is the OAuth2 service user attribute name. Use dot-separated paths for nested attributes, e.g. `attributes.account_no`"
+msgstr "Correspondance des attributs utilisateur : `key` est le nom d'attribut de ce système et `value` celui du service OAuth2. Utilisez des chemins séparés par des points pour les attributs imbriqués, par ex. `attributes.account_no`"
+
+#: settings/serializers/auth/saml2.py:30
+msgid "Controls verification when downloading IDP Metadata"
+msgstr "Contrôle la vérification lors du téléchargement des métadonnées IDP"
+
+#: settings/serializers/auth/slack.py:16
+msgid "Client bot Token"
+msgstr "Jeton du bot client"
+
+#: settings/serializers/auth/sms.py:50
+msgid "Access Key ID"
+msgstr "ID de la clé d'accès"
+
+#: settings/serializers/auth/sms.py:52
+msgid "Access Key Secret"
+msgstr "Secret de la clé d'accès"
+
+#: settings/serializers/auth/sms.py:59
+msgid "Secret ID"
+msgstr "ID du secret"
+
+#: settings/serializers/auth/sms.py:60
+msgid "Secret Key"
+msgstr "Clé secrète"
+
+#: settings/serializers/auth/sms.py:61
+msgid "SDK APP ID"
+msgstr "ID d'application SDK"
+
+#: settings/serializers/auth/wecom.py:13
+msgid "Corporation ID"
+msgstr "ID de l'entreprise"
+
+#: settings/serializers/auth/wecom.py:14
+msgid "App Agent ID"
+msgstr "ID de l'agent d'application"
+
+#: settings/serializers/feature.py:39
+msgid "Enter a valid HTTP or HTTPS URL."
+msgstr "Saisissez une URL HTTP ou HTTPS valide."
+
+#: settings/serializers/feature.py:53
+msgid "Enter a new credential when changing its destination."
+msgstr "Saisissez un nouvel identifiant lors du changement de destination."
+
+#: settings/serializers/feature.py:186
+#: settings/serializers/feature.py:226
+msgid "Verify TLS certificate"
+msgstr "Vérifier le certificat TLS"
+
+#: settings/serializers/feature.py:192
+#: settings/serializers/feature.py:232
+msgid "PEM CA certificate used to verify the OpenBao server"
+msgstr "Certificat CA PEM pour vérifier le serveur OpenBao"
+
+#: settings/serializers/feature.py:202
+msgid "OpenBao SSH CA"
+msgstr "Autorité de certification SSH OpenBao"
+
+#: settings/serializers/feature.py:220
+msgid "Certificate validity (seconds)"
+msgstr "Validité du certificat (secondes)"
+
+#: settings/serializers/feature.py:237
+msgid "Allowed source addresses"
+msgstr "Adresses sources autorisées"
+
+#: settings/serializers/feature.py:238
+msgid "Comma-separated CIDRs seen by the target SSH server"
+msgstr "CIDR vus par le serveur SSH cible, séparés par des virgules"
+
+#: settings/serializers/feature.py:297
+msgid "Built-in API"
+msgstr "API intégrée"
+
+#: settings/serializers/feature.py:297
+msgid "iframe embed"
+msgstr "Intégration iframe"
+
+#: settings/serializers/feature.py:301
+msgid "iframe URL"
+msgstr "URL de l'iframe"
+
+#: settings/serializers/feature.py:302
+msgid "The page URL loaded in the isolated AI assistant iframe."
+msgstr "URL de la page chargée dans l'iframe isolée de l'assistant IA."
+
+#: settings/serializers/feature.py:308
+msgid "OpenAI-compatible API base URL, usually ending in /v1."
+msgstr "URL de base de l'API compatible OpenAI, généralement terminée par /v1."
+
+#: settings/serializers/feature.py:315
+msgid "HTTP proxy used to reach the model provider. For example: http://ip:port"
+msgstr "Proxy HTTP pour joindre le fournisseur du modèle. Exemple : http://ip:port"
+
+#: settings/serializers/feature.py:319
+msgid "Discover models from the provider or enter a model ID manually."
+msgstr "Découvrez les modèles du fournisseur ou saisissez un ID manuellement."
+
+#: settings/utils/ldap.py:90
+msgid "Invalid LDAP distinguishedName encoding"
+msgstr "Encodage du distinguishedName LDAP invalide"
+
+#: settings/utils/ldap.py:97
+msgid "LDAP user distinguishedName is empty, cannot map OU group"
+msgstr "Le distinguishedName de l'utilisateur LDAP est vide ; impossible d'associer le groupe OU"
+
+#: settings/utils/ldap.py:103
+msgid "Invalid LDAP distinguishedName: {}"
+msgstr "distinguishedName LDAP invalide : {}"
+
+#: settings/utils/ldap.py:111
+msgid "LDAP distinguishedName has no OU, cannot map user group: {}"
+msgstr "Le distinguishedName LDAP ne contient pas d'OU ; impossible d'associer le groupe : {}"
+
+#: settings/utils/ldap.py:121
+msgid "LDAP distinguishedName has no OU, cannot map user group"
+msgstr "Le distinguishedName LDAP ne contient pas d'OU ; impossible d'associer le groupe"
+
+#: settings/utils/ldap.py:126
+msgid "LDAP OU group name exceeds {} characters: {}"
+msgstr "Le nom du groupe OU LDAP dépasse {} caractères : {}"
+
+#: settings/utils/ldap.py:561
+msgid "LDAP user groups must be a list"
+msgstr "Les groupes d'utilisateurs LDAP doivent être une liste"
+
+#: settings/utils/ldap.py:573
+msgid "Failed to map LDAP user group from distinguishedName: no OU found"
+msgstr "Impossible d'associer le groupe LDAP depuis distinguishedName : aucune OU"
+
+#: settings/ws.py:299
+msgid "Invalid organization IDs"
+msgstr "ID d'organisation non valides"
+
+#: settings/ws.py:302
+msgid "Invalid target organizations"
+msgstr "Organisations cibles non valides"
+
+#: settings/ws.py:306
+msgid "A target organization is required"
+msgstr "Une organisation cible est requise"
+
+#: templates/500.html:7
+msgid "Server error"
+msgstr "Erreur du serveur"
+
+#: templates/500.html:10
+msgid "Server error occur, contact administrator"
+msgstr "Erreur du serveur ; contactez l'administrateur"
+
+#: templates/_copyright.html:3
+msgid "Copyright"
+msgstr "Droits d'auteur"
+
+#: terminal/api/applet/applet.py:143
+msgid "Applet is not null"
+msgstr "L'application distante ne peut pas être vide"
+
+#: terminal/api/applet/host.py:31
+msgid "Needs attention"
+msgstr "Intervention requise"
+
+#: terminal/api/applet/host.py:78
+msgid "Windows runtime accounts are managed locally by Tinker."
+msgstr "Les comptes d'exécution Windows sont gérés localement par Tinker."
+
+#: terminal/api/session/session.py:362
+msgid "Replay index not found."
+msgstr "Index d'enregistrement introuvable."
+
+#: terminal/api/session/session.py:365
+msgid "Replay index is invalid."
+msgstr "L'index d'enregistrement est invalide."
+
+#: terminal/api/session/session.py:368
+msgid "Replay index is unavailable."
+msgstr "L'index d'enregistrement est indisponible."
+
+#: terminal/api/virtualapp/provider.py:93
+msgid "Wait for the current deployment to finish before deleting the provider"
+msgstr "Attendez la fin du déploiement avant de supprimer le fournisseur"
+
+#: terminal/api/virtualapp/provider.py:182
+msgid "A deployment is already pending or running for this provider"
+msgstr "Un déploiement est déjà en attente ou en cours pour ce fournisseur"
+
+#: terminal/api/virtualapp/virtualapp.py:115
+msgid "Image architecture is required"
+msgstr "L'architecture de l'image est requise"
+
+#: terminal/automations/deploy_app_provider/__init__.py:35
+msgid "Invalid virtual application offline manifest"
+msgstr "Manifeste hors ligne d'application virtuelle invalide"
+
+#: terminal/automations/deploy_app_provider/__init__.py:69
+msgid "Invalid Panda offline image ID"
+msgstr "ID d'image Panda hors ligne invalide"
+
+#: terminal/automations/deploy_app_provider/__init__.py:127
+msgid "No deployable SSH host: check the privileged account and platform automation"
+msgstr "Aucun hôte SSH déployable : vérifiez le compte privilégié et l'automatisation de la plateforme"
+
+#: terminal/automations/deploy_app_provider/__init__.py:130
+msgid "Application provider deployment requires SSH"
+msgstr "Le déploiement du fournisseur d'applications nécessite SSH"
+
+#: terminal/automations/deploy_app_provider/__init__.py:154
+msgid "Provider terminal must be Panda"
+msgstr "Le terminal du fournisseur doit être Panda"
+
+#: terminal/automations/deploy_applet_host/__init__.py:111
+msgid "Applet host terminal must be Tinker"
+msgstr "Le terminal de l'hôte d'applications doit être Tinker"
+
+#: terminal/automations/deploy_applet_host/__init__.py:122
+msgid "Tinker component has no active access key"
+msgstr "Le composant Tinker n'a pas de clé d'accès active"
+
+#: terminal/automations/deploy_applet_host/__init__.py:140
+#: terminal/automations/deploy_applet_host/__init__.py:158
+msgid "Tinker component binding changed during deployment"
+msgstr "La liaison du composant Tinker a changé pendant le déploiement"
+
+#: terminal/automations/deploy_applet_host/__init__.py:147
+msgid "Unconfirmed Tinker component is not a service account"
+msgstr "Le composant Tinker non confirmé n'est pas un compte de service"
+
+#: terminal/automations/deploy_applet_host/__init__.py:180
+msgid "applet is required for uninstall_applet"
+msgstr "applet est requis pour uninstall_applet"
+
+#: terminal/const.py:91
+msgid "Built-in browser"
+msgstr "Navigateur intégré"
+
+#: terminal/models/applet/applet.py:115
+#: terminal/models/virtualapp/virtualapp.py:80
+msgid "Missing name in manifest.yml"
+msgstr "Nom absent de manifest.yml"
+
+#: terminal/models/applet/host.py:16
+msgid "Tinker version"
+msgstr "Version de Tinker"
+
+#: terminal/models/applet/host.py:50
+#: terminal/models/virtualapp/provider.py:55
+msgid "Request user has no terminal"
+msgstr "L'utilisateur demandeur n'a pas de terminal"
+
+#: terminal/models/applet/host.py:52
+msgid "Only Tinker terminals can bind an applet host"
+msgstr "Seuls les terminaux Tinker peuvent lier un hôte d'applications"
+
+#: terminal/models/applet/host.py:56
+msgid "Terminal is not bound to this applet host"
+msgstr "Le terminal n'est pas lié à cet hôte d'applications"
+
+#: terminal/models/component/endpoint.py:18
+msgid "Web proxy port"
+msgstr "Port du proxy web"
+
+#: terminal/models/session/sharing.py:172
+msgid "Session sharing or user does not exist"
+msgstr "Le partage de session ou l'utilisateur n'existe pas"
+
+#: terminal/models/virtualapp/provider.py:57
+msgid "Only Panda terminals can bind an application provider"
+msgstr "Seuls les terminaux Panda peuvent lier un fournisseur d'applications"
+
+#: terminal/models/virtualapp/provider.py:62
+msgid "Provider is already bound to another terminal"
+msgstr "Le fournisseur est déjà lié à un autre terminal"
+
+#: terminal/models/virtualapp/provider.py:69
+msgid "Terminal is already bound to another provider"
+msgstr "Le terminal est déjà lié à un autre fournisseur"
+
+#: terminal/models/virtualapp/provider.py:109
+msgid "Provider host is required before deployment"
+msgstr "Un hôte de fournisseur est requis avant le déploiement"
+
+#: terminal/models/virtualapp/provider.py:111
+msgid "Provider deployment requires a Linux host"
+msgstr "Le déploiement du fournisseur nécessite un hôte Linux"
+
+#: terminal/models/virtualapp/provider.py:114
+msgid "A valid SSH port different from the Panda API port is required"
+msgstr "Un port SSH valide différent du port API Panda est requis"
+
+#: terminal/models/virtualapp/provider.py:117
+msgid "An active root or privileged SSH account with a password or private key is required"
+msgstr "Un compte SSH root ou privilégié actif avec mot de passe ou clé privée est requis"
+
+#: terminal/models/virtualapp/provider.py:120
+msgid "Disable the provider and wait for all containers to exit before deployment"
+msgstr "Désactivez le fournisseur et attendez l'arrêt de tous les conteneurs avant le déploiement"
+
+#: terminal/models/virtualapp/provider.py:124
+#, python-format
+msgid "Invalid offline deployment resources: %s"
+msgstr "Ressources de déploiement hors ligne invalides : %s"
+
+#: terminal/models/virtualapp/provider.py:130
+msgid "Select a Panda image already loaded on the provider or prepare the Installer offline resources"
+msgstr "Sélectionnez une image Panda déjà chargée chez le fournisseur ou préparez les ressources hors ligne de l'installateur"
+
+#: terminal/models/virtualapp/provider.py:135
+msgid "Container port range must not include the SSH port"
+msgstr "La plage de ports des conteneurs ne doit pas inclure le port SSH"
+
+#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:59
+msgid "Invalid Core URL."
+msgstr "URL Core invalide."
+
+#: terminal/serializers/terminal.py:138
+msgid "Only Tinker can bind an applet host"
+msgstr "Seul Tinker peut lier un hôte d'applications"
+
+#: terminal/serializers/terminal.py:141
+msgid "Applet host is missing or already bound"
+msgstr "L'hôte d'applications est absent ou déjà lié"
+
+#: terminal/serializers/terminal.py:162
+msgid "App provider not found"
+msgstr "Fournisseur d'applications introuvable"
+
+#: terminal/serializers/virtualapp_provider.py:57
+msgid "Enter a valid HTTP or HTTPS Core URL"
+msgstr "Saisissez une URL Core HTTP ou HTTPS valide"
+
+#: terminal/serializers/virtualapp_provider.py:71
+msgid "Enter a valid Docker image reference"
+msgstr "Saisissez une référence d'image Docker valide"
+
+#: terminal/serializers/virtualapp_provider.py:79
+msgid "Use a port range between 1 and 65535, excluding the Panda API port 9001"
+msgstr "Utilisez une plage entre 1 et 65535, excluant le port API Panda 9001"
+
+#: terminal/serializers/virtualapp_provider.py:181
+msgid "The provider host cannot be removed"
+msgstr "L'hôte du fournisseur ne peut pas être retiré"
+
+#: terminal/serializers/virtualapp_provider.py:188
+msgid "Host name and address are required"
+msgstr "Le nom et l'adresse de l'hôte sont requis"
+
+#: terminal/serializers/virtualapp_provider.py:195
+msgid "An application provider with this name already exists"
+msgstr "Un fournisseur d'applications de ce nom existe déjà"
+
+#: terminal/serializers/virtualapp_provider.py:200
+msgid "Application provider host is required"
+msgstr "Un hôte de fournisseur d'applications est requis"
+
+#: terminal/serializers/virtualapp_provider.py:216
+msgid "Wait for the current deployment to finish before editing the provider"
+msgstr "Attendez la fin du déploiement avant de modifier le fournisseur"
+
+#: terminal/serializers/virtualapp_provider.py:261
+msgid "Use the application publication API to publish images"
+msgstr "Utilisez l'API de publication d'applications pour publier les images"
+
+#: terminal/tasks.py:157
+msgid "Application provider deployment failed; see the Ansible task log"
+msgstr "Échec du déploiement du fournisseur ; consultez le journal de tâche Ansible"
+
+#: terminal/utils/tinker.py:33
+#, python-format
+msgid "Tinker version %(version)s is unavailable for connections. Upgrade and redeploy this applet host with Tinker %(minimum)s or later."
+msgstr "Tinker %(version)s ne permet pas les connexions. Mettez à niveau et redéployez cet hôte avec Tinker %(minimum)s ou ultérieur."
+
+#: terminal/utils/tinker.py:35
+msgid "not reported"
+msgstr "Non signalé"
+
+#: terminal/utils/virtualapp.py:52
+msgid "Unsafe path in application image archive"
+msgstr "Chemin non sécurisé dans l'archive d'image d'application"
+
+#: terminal/utils/virtualapp.py:64
+msgid "Invalid application image archive read size"
+msgstr "Taille de lecture de l'archive d'image invalide"
+
+#: terminal/utils/virtualapp.py:66
+msgid "Application image archive validation timed out"
+msgstr "Délai de validation de l'archive d'image dépassé"
+
+#: terminal/utils/virtualapp.py:70
+msgid "Application image archive exceeds the unpacked size limit"
+msgstr "L'archive d'image dépasse la limite de taille décompressée"
+
+#: terminal/utils/virtualapp.py:77
+msgid "Invalid or sparse entry in application image archive"
+msgstr "Entrée invalide ou clairsemée dans l'archive d'image"
+
+#: terminal/utils/virtualapp.py:81
+msgid "Sparse entries are not supported in application image archives"
+msgstr "Les archives d'images ne prennent pas en charge les entrées clairsemées"
+
+#: terminal/utils/virtualapp.py:94
+msgid "Application image archive has oversized tar metadata"
+msgstr "Les métadonnées tar de l'archive d'image sont trop volumineuses"
+
+#: terminal/utils/virtualapp.py:115
+msgid "Duplicate or too many entries in application image archive"
+msgstr "Entrées dupliquées ou trop nombreuses dans l'archive d'image"
+
+#: terminal/utils/virtualapp.py:117
+msgid "Application image archive contains an unsupported entry"
+msgstr "L'archive d'image contient une entrée non prise en charge"
+
+#: terminal/utils/virtualapp.py:129
+msgid "Invalid Docker image manifest"
+msgstr "Manifeste d'image Docker invalide"
+
+#: terminal/utils/virtualapp.py:135
+msgid "Too many image configurations in application image archive"
+msgstr "Trop de configurations d'image dans l'archive"
+
+#: terminal/utils/virtualapp.py:144
+msgid "Invalid or too many OCI manifests in application image archive"
+msgstr "Manifestes OCI invalides ou trop nombreux dans l'archive"
+
+#: terminal/utils/virtualapp.py:149
+msgid "Invalid application image archive"
+msgstr "Archive d'image d'application invalide"
+
+#: terminal/utils/virtualapp.py:151
+msgid "Upload a Docker save archive containing one application image"
+msgstr "Téléversez une archive Docker save contenant une seule image d'application"
+
+#: terminal/utils/virtualapp.py:155
+msgid "Application image archive does not contain the configured image name and tag"
+msgstr "L'archive ne contient pas le nom et l'étiquette d'image configurés"
+
+#: terminal/utils/virtualapp.py:158
+msgid "Application image archive has no valid image configuration"
+msgstr "L'archive ne contient pas de configuration d'image valide"
+
+#: terminal/utils/virtualapp.py:164
+msgid "Application image archive is missing image layers"
+msgstr "Des couches d'image sont absentes de l'archive"
+
+#: terminal/utils/virtualapp.py:167
+msgid "Application image archive must contain one Linux platform"
+msgstr "L'archive doit contenir une seule plateforme Linux"
+
+#: terminal/utils/virtualapp.py:219
+msgid "Invalid application image archive metadata"
+msgstr "Métadonnées d'archive d'image invalides"
+
+#: terminal/utils/virtualapp.py:251
+msgid "Virtual application no longer exists"
+msgstr "L'application virtuelle n'existe plus"
+
+#: terminal/utils/virtualapp.py:253
+msgid "Virtual application changed; upload or publish its current image again"
+msgstr "L'application virtuelle a changé ; téléversez ou publiez à nouveau son image actuelle"
+
+#: terminal/utils/virtualapp.py:260
+msgid "Upload a Docker save image as .tar, .tar.zst or .zst"
+msgstr "Téléversez une image Docker save au format .tar, .tar.zst ou .zst"
+
+#: terminal/utils/virtualapp.py:262
+#: terminal/utils/virtualapp.py:274
+msgid "Application image archive must be no larger than 10 GiB"
+msgstr "L'archive d'image ne doit pas dépasser 10 GiB"
+
+#: terminal/utils/virtualapp.py:304
+msgid "No application image archive for this architecture"
+msgstr "Aucune archive d'image pour cette architecture"
+
+#: terminal/utils/virtualapp.py:324
+msgid "Invalid offline application image archive path"
+msgstr "Chemin d'archive d'image hors ligne invalide"
+
+#: terminal/utils/virtualapp.py:340
+msgid "Offline application image cannot be staged; upload it again"
+msgstr "Impossible de préparer l'image hors ligne ; téléversez-la à nouveau"
+
+#: tickets/api/flow.py:32
+msgid "Inherited ticket flows cannot be deleted"
+msgstr "Les workflows de tickets hérités ne peuvent pas être supprimés"
+
+#: tickets/models/ticket/general.py:99
+msgid "Assignee"
+msgstr "Responsable"
+
+#: users/api/user.py:187
+msgid "Not a valid org"
+msgstr "Organisation non valide"
+
+#: users/models/user/_face.py:24
+#: users/models/user/_face.py:34
+msgid "Face vector is not set."
+msgstr "Les données faciales ne sont pas configurées."
+
+#: users/models/user/_face.py:27
+#: users/models/user/_face.py:37
+msgid "Face recognition backend is not available."
+msgstr "Le moteur de reconnaissance faciale est indisponible."
+
+#: users/serializers/tree.py:37
+msgid "parent_type and parent_id must be provided together."
+msgstr "parent_type et parent_id doivent être fournis ensemble."
+
+#: users/serializers/tree.py:41
+msgid "Search and parent parameters cannot be used together."
+msgstr "Les paramètres de recherche et de parent ne peuvent pas être combinés."
+
+#: users/serializers/tree.py:45
+msgid "Offset is only supported when loading children."
+msgstr "Le décalage est pris en charge uniquement lors du chargement des enfants."
+
+#: users/serializers/tree.py:52
+msgid "Enter a valid UUID."
+msgstr "Saisissez un UUID valide."
+
+#: users/views/profile/reset.py:134
+msgid "Verification code has been used more than 3 times, please re-verify"
+msgstr "Le code a été utilisé plus de 3 fois ; recommencez la vérification"
+
+#: xpack/plugins/cloud/api.py:161
+msgid "Query params account_id is not uuid"
+msgstr "Le paramètre account_id n'est pas un UUID valide"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:81
+msgid "eg. https://IP:9440/api/nutanix/v3/"
+msgstr "Par ex. https://IP:9440/api/nutanix/v3/"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "SC domain name"
+msgstr "Nom de domaine SC"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:136
+msgid "eg. http://IP:8080/zstack"
+msgstr "Par ex. http://IP:8080/zstack"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:144
+msgid "eg. http://CLOUDTOWER_IP"
+msgstr "Par ex. http://CLOUDTOWER_IP"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:151
+msgid "eg. https://IP:8006/api2/json"
+msgstr "Par ex. https://IP:8006/api2/json"
+
+#: xpack/plugins/facelive/backend.py:29
+msgid "Face recognition dependencies are unavailable; run uv sync --group xpack"
+msgstr "Dépendances de reconnaissance faciale indisponibles ; exécutez uv sync --group xpack"
+
+#: xpack/plugins/facelive/backend.py:72
+msgid "OpenCV image must be a BGR image"
+msgstr "L'image OpenCV doit être au format BGR"
+
+#: xpack/plugins/facelive/backend.py:74
+#: xpack/plugins/facelive/backend.py:111
+msgid "Camera frame resolution is too low"
+msgstr "La résolution de la caméra est trop faible"
+
+#: xpack/plugins/facelive/backend.py:97
+#: xpack/plugins/facelive/backend.py:104
+msgid "Invalid camera frame"
+msgstr "Image de caméra invalide"
+
+#: xpack/plugins/facelive/backend.py:100
+msgid "Camera frame is empty or too large"
+msgstr "L'image de caméra est vide ou trop volumineuse"
+
+#: xpack/plugins/facelive/backend.py:106
+msgid "Camera frame is too large"
+msgstr "L'image de caméra est trop volumineuse"
+
+#: xpack/plugins/facelive/backend.py:109
+msgid "Unable to decode camera frame"
+msgstr "Impossible de décoder l'image de caméra"
+
+#: xpack/plugins/facelive/backend.py:183
+msgid "Multiple similar faces detected; keep only one person in view"
+msgstr "Plusieurs visages similaires détectés ; gardez une seule personne dans le champ"
+
+#: xpack/plugins/facelive/backend.py:193
+msgid "None of FACE_RECOGNITION_PROVIDERS are available"
+msgstr "Aucun moteur de FACE_RECOGNITION_PROVIDERS n'est disponible"
+
+#: xpack/plugins/facelive/backend.py:209
+msgid "FACE_RECOGNITION_DEVICE is gpu but no accelerated ONNX provider is available"
+msgstr "FACE_RECOGNITION_DEVICE vaut gpu, mais aucun moteur ONNX accéléré n'est disponible"
+
+#: xpack/plugins/facelive/challenge.py:16
+msgid "Turn your head left and right, then face forward"
+msgstr "Tournez la tête à gauche et à droite, puis regardez devant vous"
+
+#: xpack/plugins/facelive/challenge.py:17
+msgid "Nod once, then face forward"
+msgstr "Hochez la tête une fois, puis regardez devant vous"
+
+#: xpack/plugins/facelive/challenge.py:18
+msgid "Open and close your mouth"
+msgstr "Ouvrez puis fermez la bouche"
+
+#: xpack/plugins/facelive/challenge.py:65
+msgid "Look straight at the camera"
+msgstr "Regardez droit vers la caméra"
+
+#: xpack/plugins/facelive/codec.py:27
+msgid "Face vector is invalid"
+msgstr "Vecteur facial invalide"
+
+#: xpack/plugins/facelive/codec.py:30
+msgid "Face vector magnitude is zero"
+msgstr "La norme du vecteur facial est nulle"
+
+#: xpack/plugins/facelive/codec.py:38
+#: xpack/plugins/facelive/codec.py:53
+msgid "Face vector has an invalid dimension"
+msgstr "La dimension du vecteur facial est invalide"
+
+#: xpack/plugins/facelive/codec.py:45
+msgid "Face vector is missing"
+msgstr "Vecteur facial absent"
+
+#: xpack/plugins/facelive/codec.py:50
+msgid "Face vector has an invalid size"
+msgstr "La taille du vecteur facial est invalide"
+
+#: xpack/plugins/facelive/codec.py:60
+msgid "Face vector has an unsupported format"
+msgstr "Format de vecteur facial non pris en charge"
+
+#: xpack/plugins/facelive/codec.py:71
+msgid "Face vectors use different dimensions"
+msgstr "Les vecteurs faciaux ont des dimensions différentes"
+
+#: xpack/plugins/facelive/codec.py:105
+msgid "Face vector is not valid base64"
+msgstr "Le vecteur facial n'est pas un Base64 valide"
+
+#: xpack/plugins/facelive/consumer.py:62
+msgid "Unsupported message type"
+msgstr "Type de message non pris en charge"
+
+#: xpack/plugins/facelive/consumer.py:73
+msgid "Camera frame is missing"
+msgstr "Image de caméra manquante"
+
+#: xpack/plugins/facelive/consumer.py:113
+msgid "Face recognition service is unavailable"
+msgstr "Le service de reconnaissance faciale est indisponible"
+
+#: xpack/plugins/facelive/context.py:40
+msgid "Invalid face capture token"
+msgstr "Jeton de capture faciale invalide"
+
+#: xpack/plugins/facelive/context.py:48
+msgid "Face capture token does not exist or has expired"
+msgstr "Le jeton de capture faciale n'existe pas ou a expiré"
+
+#: xpack/plugins/facelive/context.py:50
+msgid "Face capture has already finished"
+msgstr "La capture faciale est déjà terminée"
+
+#: xpack/plugins/facelive/context.py:60
+msgid "Face capture token does not belong to this session"
+msgstr "Le jeton de capture faciale n'appartient pas à cette session"
+
+#: xpack/plugins/facelive/context.py:62
+msgid "Face capture context has no target user"
+msgstr "Le contexte de capture faciale n'a pas d'utilisateur cible"
+
+#: xpack/plugins/facelive/context.py:66
+msgid "Face capture target user does not exist"
+msgstr "L'utilisateur cible de la capture faciale n'existe pas"
+
+#: xpack/plugins/facelive/context.py:69
+#: xpack/plugins/facelive/context.py:86
+msgid "No face feature is bound for this user"
+msgstr "Aucune donnée faciale n'est liée à cet utilisateur"
+
+#: xpack/plugins/facelive/context.py:78
+msgid "Authentication is required for online face monitoring"
+msgstr "L'authentification est requise pour la surveillance faciale en ligne"
+
+#: xpack/plugins/facelive/context.py:81
+msgid "Face monitor token does not exist or has expired"
+msgstr "Le jeton de surveillance faciale n'existe pas ou a expiré"
+
+#: xpack/plugins/facelive/context.py:83
+msgid "Face monitor token belongs to another user"
+msgstr "Le jeton de surveillance faciale appartient à un autre utilisateur"
+
+#: xpack/plugins/facelive/context.py:98
+msgid "Face capture token expired before completion"
+msgstr "Le jeton de capture faciale a expiré avant la fin"
+
+#: xpack/plugins/facelive/context.py:139
+msgid "Connection token no longer exists"
+msgstr "Le jeton de connexion n'existe plus"
+
+#: xpack/plugins/facelive/context.py:146
+msgid "Face recognition is disabled"
+msgstr "La reconnaissance faciale est désactivée"
+
+#: xpack/plugins/facelive/liveness.py:67
+msgid "FACE_LIVENESS_MODEL_PATH must reference a validated anti-spoof ONNX model"
+msgstr "FACE_LIVENESS_MODEL_PATH doit désigner un modèle ONNX anti-usurpation validé"
+
+#: xpack/plugins/facelive/liveness.py:72
+msgid "ONNX Runtime is unavailable"
+msgstr "ONNX Runtime est indisponible"
+
+#: xpack/plugins/facelive/liveness.py:92
+msgid "GPU liveness was requested but no accelerated ONNX provider is available"
+msgstr "La détection du vivant par GPU est demandée, mais aucun moteur ONNX accéléré n'est disponible"
+
+#: xpack/plugins/facelive/liveness.py:115
+msgid "FACE_LIVENESS_LIVE_INDEX is outside model output"
+msgstr "FACE_LIVENESS_LIVE_INDEX est hors de la sortie du modèle"
+
+#: xpack/plugins/facelive/liveness.py:128
+msgid "Anti-spoof ONNX input must have four dimensions"
+msgstr "L'entrée ONNX anti-usurpation doit avoir quatre dimensions"
+
+#: xpack/plugins/facelive/liveness.py:134
+msgid "Anti-spoof ONNX input must be RGB"
+msgstr "L'entrée ONNX anti-usurpation doit être au format RGB"
+
+#: xpack/plugins/facelive/liveness.py:189
+#, python-format
+msgid "Unknown liveness mode: %(mode)s"
+msgstr "Mode de détection du vivant inconnu : %(mode)s"
+
+#: xpack/plugins/facelive/monitor.py:128
+msgid "Camera monitoring connection closed"
+msgstr "Connexion de surveillance caméra fermée"
+
+#: xpack/plugins/facelive/monitor.py:135
+msgid "Face monitor state is unavailable"
+msgstr "L'état de surveillance faciale est indisponible"
+
+#: xpack/plugins/facelive/monitor.py:237
+msgid "Face monitor timed out"
+msgstr "Délai de surveillance faciale dépassé"
+
+#: xpack/plugins/facelive/sessions.py:67
+msgid "Face flow has already finished"
+msgstr "Le processus facial est déjà terminé"
+
+#: xpack/plugins/facelive/sessions.py:83
+msgid "Face verification timed out"
+msgstr "Délai de vérification faciale dépassé"
+
+#: xpack/plugins/facelive/sessions.py:85
+msgid "The liveness action was not completed in time"
+msgstr "L'action de détection du vivant n'a pas été terminée à temps"
+
+#: xpack/plugins/facelive/sessions.py:96
+msgid "Place one face fully inside the camera area"
+msgstr "Placez un seul visage entièrement dans le champ de la caméra"
+
+#: xpack/plugins/facelive/sessions.py:103
+msgid "Move closer to the camera"
+msgstr "Rapprochez-vous de la caméra"
+
+#: xpack/plugins/facelive/sessions.py:109
+msgid "Frozen or replayed camera frames detected"
+msgstr "Images de caméra figées ou rejouées détectées"
+
+#: xpack/plugins/facelive/sessions.py:121
+msgid "The stored face template uses a different model; bind the face again"
+msgstr "Le modèle facial enregistré utilise un autre moteur ; enregistrez à nouveau votre visage"
+
+#: xpack/plugins/facelive/sessions.py:124
+msgid "The current face does not match the selected user"
+msgstr "Le visage actuel ne correspond pas à l'utilisateur sélectionné"
+
+#: xpack/plugins/facelive/sessions.py:126
+msgid "The face changed during enrollment"
+msgstr "Le visage a changé pendant l'enregistrement"
+
+#: xpack/plugins/facelive/sessions.py:152
+msgid "Liveness passed once; online face monitoring is now active"
+msgstr "Détection du vivant réussie ; surveillance faciale en ligne activée"
+
+#: xpack/plugins/facelive/sessions.py:216
+#, python-format
+msgid "Captured %(count)s face samples"
+msgstr "%(count)s échantillons faciaux capturés"
+
+#: xpack/plugins/facelive/sessions.py:223
+msgid "Checking liveness; keep your face clear and well lit"
+msgstr "Vérification du vivant ; gardez le visage net et bien éclairé"
+
+#: xpack/plugins/facelive/sessions.py:228
+#, python-format
+msgid "Capturing face samples %(count)s/%(total)s"
+msgstr "Capture d'échantillons faciaux %(count)s/%(total)s"
+
+#: xpack/plugins/facelive/sessions.py:256
+msgid "Face identity, liveness, and action challenge passed"
+msgstr "Identité faciale, détection du vivant et défi gestuel validés"
+
+#: xpack/plugins/facelive/sessions.py:273
+#, python-format
+msgid "%(name)s is in the camera area"
+msgstr "%(name)s est dans le champ de la caméra"
+
+#: xpack/plugins/facelive/sessions.py:277
+msgid "Target face is not visible"
+msgstr "Le visage cible n'est pas visible"
+
+#: xpack/plugins/facelive/sessions.py:279
+msgid "Target face does not match"
+msgstr "Le visage cible ne correspond pas"
+
+#: xpack/plugins/facelive/sessions.py:285
+msgid "The monitored session has been paused"
+msgstr "La session surveillée a été suspendue"
+
+#: xpack/plugins/facelive/sessions.py:287
+#, python-format
+msgid "Target left the camera area; callback in %(seconds)ss"
+msgstr "La personne a quitté le champ ; rappel dans %(seconds)s s"
+
+#: xpack/plugins/facelive/sessions.py:324
+#: xpack/plugins/facelive/sessions.py:330
+#: xpack/plugins/facelive/sessions.py:337
+msgid "Repeated camera frame detected"
+msgstr "Image de caméra répétée détectée"
+
+#: xpack/plugins/facelive/sessions.py:480
+msgid "Waiting for the selected face to match"
+msgstr "En attente de correspondance avec le visage sélectionné"
+
+#: xpack/plugins/facelive/sessions.py:482
+msgid "Checking liveness; move naturally and keep the image clear"
+msgstr "Vérification du vivant ; bougez naturellement et gardez une image nette"
+
+#: xpack/plugins/facelive/sessions.py:485
+msgid "Finalizing face verification"
+msgstr "Finalisation de la vérification faciale"
+
+#: xpack/plugins/jdmc/api/mail.py:30
+msgid "Mail sent successfully"
+msgstr "E-mail envoyé avec succès"
+
+#: xpack/plugins/jdmc/serializers.py:6
+msgid "Email addresses of the recipients"
+msgstr "Adresses e-mail des destinataires"
+
+#: xpack/plugins/jdmc/serializers.py:7
+msgid "Subject of the mail"
+msgstr "Objet de l'e-mail"
+
+#: xpack/plugins/jdmc/serializers.py:8
+msgid "Message of the email"
+msgstr "Corps de l'e-mail"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "Synthèse de gestion et recommandations"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "Vue d’ensemble des indicateurs"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "Analyse des activités d’exploitation"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "Analyse des événements de sécurité"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "Vue d’ensemble des actifs et des comptes"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "Analyse des opérations sur les comptes"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "Rapport d’audit complet"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "Résumez l’activité des opérations, les événements de sécurité, les actifs et les comptes pour les audits mensuels, trimestriels ou annuels."
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "Rapport d’activité d’exploitation"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "Réviser qui a effectué des sessions, des commandes et des opérations de fichier sur chaque actif."
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "Rapport sur les événements de sécurité"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "Réviser les commandes à risque élevé, les anomalies de connexion et les refus d’accès, distinguant les échecs des événements de sécurité."
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "Rapport sur les opérations de comptes"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "Revue les résultats et les échecs des tâches d'automatisation des comptes."
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "Vous n'avez pas la permission de voir les données pour ce thème de rapport."
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "La date de fin ne peut pas être antérieure à la date de début."
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "Un rapport peut couvrir au maximum 366 jours. Sélectionnez une période plus courte."
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "La date de fin ne peut pas être postérieure à aujourd’hui. Pour la période en cours, limitez le rapport à aujourd’hui."
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "Les chapitres sont dupliqués ou ne font pas partie du thème du rapport sélectionné."
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "Sélectionnez au moins un chapitre contenant des données statistiques."
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "Sessions sur les actifs"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "Enregistrements de commandes"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "Journaux de connexion"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "Journaux des opérations"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "Transferts de fichiers"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "Actifs actuels"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "Comptes actuels"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "Tâches d’automatisation des comptes"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "Journaux de changement de mot de passe des utilisateurs de la plateforme"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（stockages disponibles）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "Commandes avec alerte"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "Commandes bloquées par des règles"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "Commandes refusées à l’approbation"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "Commandes approuvées"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "Commandes dont l’approbation a été annulée"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "Thème de rapport non pris en charge"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "Sélectionnez une date de début et une date de fin"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "La date de début ne peut pas être plus tard que la date de fin, et le rapport peut couvrir jusqu'à 366 jours."
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "La date de fin ne peut pas être postérieure à aujourd’hui"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "Sélectionnez les sections sans doublons"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "Les chapitres sélectionnés ne font pas partie du thème de ce rapport"
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "Nombre de sessions"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "fois"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "Utilisateurs actifs"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "utilisateurs"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "Actifs consultés"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "actifs"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "Échecs de connexion"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "État de l’enregistrement de session"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "5 principaux motifs d’échec de connexion"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "Classement des accès par utilisateur"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "Classement des accès par actif"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "Répartition des protocoles de connexion"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "Types d’opérations de session"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "Répartition des accès par plateforme"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "Évolution quotidienne des sessions sur les actifs"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "Évolution hebdomadaire des sessions sur les actifs"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "Évolution mensuelle des sessions sur les actifs"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "Sessions récentes sur les actifs"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "Enregistrements à vérifier"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "enregistrements"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "Indices d’approbation des commandes de la même session"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "Connexions réussies"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "Connexions échouées"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "Connexions restreintes"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "Refus par la politique de connexion"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "Dernières connexions échouées"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "Indices de connexion depuis une nouvelle ville"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "Indices à vérifier pour les connexions depuis une nouvelle ville"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "Types d’opérations sur fichiers"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "5 principales cibles touchées par les échecs sur fichiers"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "Dernières opérations sur fichiers échouées"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "Exécutions des tâches sur les comptes"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "Exécutions réussies"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "Exécutions échouées ou en erreur"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "Exécutions inachevées"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "Types et résultats des tâches sur les comptes"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "Dernières tâches sur les comptes échouées"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "Taux d’échec ou d’erreur des tâches"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "5 principaux indices d’erreur de changement de mot de passe"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "Comptes dont le changement de mot de passe doit être vérifié"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "Des connexions restreintes ou des refus de politique ont été enregistrées. Vérifiez que la source, l'identité de l'utilisateur et la politique d'accès sont attendus."
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "Nombre de commandes"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "Décisions sur les commandes à vérifier"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "Aucun motif de refus distinct n’a été enregistré ; consultez la discussion du ticket"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "Non enregistré"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "Connexions depuis une adresse de boucle locale"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "rejeté"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "Nombre d’opérations sur la plateforme"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "Refus de la politique d’opération"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "Détails des refus de politique"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "Nombre d’opérations sur fichiers"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "Opérations sur fichiers échouées"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "Taux d’échec des opérations sur fichiers"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "Total actuel des actifs"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "Actifs actuellement activés"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "Répartition actuelle des actifs par plateforme"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "comptes"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "Comptes actuellement activés"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "Classement des actifs par nombre de comptes"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "Actifs dont les changements de mot de passe doivent être vérifiés"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "Comptes dont les changements de mot de passe doivent être vérifiés"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "Actif supprimé"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "Changements de mot de passe des utilisateurs de la plateforme"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "Derniers changements de mot de passe des utilisateurs de la plateforme"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "%(count)s commandes ayant déclenché une alerte ou ayant été rejetées ont été enregistrées. Vérifiez leur usage et le fondement de l’approbation dans le contexte de la session."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "Le journal d'exploitation contient %(count)s dénigres de politique. Consultez les ressources et les politiques refusées dans les détails d'audit."
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "%(count)s changements de mot de passe utilisateur de la plateforme ont été enregistrés. Consultez les opérateurs et modifiez la raison si nécessaire."
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "État de l’enregistrement"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "Motif enregistré"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "Nombre d’échecs"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "Heure de début"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "Utilisateur de la plateforme"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "Compte de l’actif"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "Résultat de la connexion"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "Motif de l’échec de connexion"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "Session d’origine"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "Aucun responsable enregistré"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "Ticket d’approbation"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "Heure de la demande"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "Commande demandée"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "Règle en vigueur à ce moment"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "Responsable"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "Motif du refus"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "Session associée"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "IP source"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "Ville"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "Nombre d’opérations"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "Chemin du fichier"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "Type de tâche"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "Nombre d’exécutions"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "Enregistrement d’exécution d’origine"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "Catégorie de l’indice d’erreur"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "Nombre d’enregistrements de comptes"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "Heure de l’enregistrement"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "Indice d’erreur"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "Enregistrement d’exécution"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "Actif supprimé ou plateforme non enregistrée"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "Résultat de la décision"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "Nom de la règle historique non enregistré"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "Nombre d’actifs"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "Nombre de comptes"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "Opérateur"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "Enregistrement signalé comme présent"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "Enregistrement non pris en charge"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "Session en cours"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "Échec de la création de l’enregistrement"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "Échec du téléversement de l’enregistrement"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "Échec de la conversion de l’enregistrement"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "Aucun indicateur d’enregistrement"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "Échec de connexion ; sans objet"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "Échec de connexion (aucun détail supplémentaire enregistré)"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "Motif de l’échec de connexion non enregistré"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "Lié à l’authentification"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "Délai d’exécution ou de connexion dépassé"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "Lié au réseau ou à la connexion"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "Lié à un refus d’autorisation"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "Cible introuvable ou indisponible"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "Lié à la vérification du résultat"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "Motif de l’erreur non enregistré"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "Autre erreur (consultez l’enregistrement d’origine)"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100 ; plus la valeur est faible, plus la priorité est élevée.\n"
+"Parmi les règles correspondantes, retenez le groupe de priorité la plus élevée. Si une règle refuse la connexion, celle-ci est bloquée ; si toutes l’autorisent, leurs contrôles de connexion activés sont combinés."
+
+msgid "A valid license is required"
+msgstr "Une licence valide est requise."
+
+msgid "ACL changed; start a new connection"
+msgstr "L’ACL a changé ; lancez une nouvelle connexion."
+
+msgid "Account is ready."
+msgstr "Le compte est prêt."
+
+msgid "Account permission is no longer available"
+msgstr "L’autorisation du compte n’est plus disponible."
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "La préparation du compte n’a pas abouti. Contactez un administrateur."
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr ""
+"Le provisionnement du compte a échoué. Communiquez l’identifiant de la tâche"
+" à un administrateur."
+
+msgid "Account push is not enabled for this asset platform."
+msgstr ""
+"Le provisionnement des comptes n’est pas activé pour cette plateforme "
+"d’actifs."
+
+msgid ""
+"Account usernames or @ALL (all accounts), @SPEC with specified usernames, "
+"and @USER (the current user's same-name account)."
+msgstr ""
+"Noms d’utilisateur, @ALL pour tous les comptes, @SPEC suivi des noms "
+"spécifiés et @USER pour le compte portant le même nom que l’utilisateur "
+"actuel."
+
+msgid "Administrator permission is no longer available"
+msgstr "L’autorisation d’administrateur n’est plus disponible."
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr ""
+"Après approbation, le même utilisateur peut se reconnecter au même actif et "
+"au même compte via cette règle pendant le nombre d’heures indiqué. 0 exige "
+"une approbation à chaque connexion. Les modifications n’affectent pas les "
+"exemptions existantes."
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr ""
+"Autoriser applique les contrôles de connexion ; Refuser bloque la connexion."
+
+msgid "Automatic same-name account push is not authorized."
+msgstr ""
+"Le provisionnement automatique d’un compte portant le même nom n’est pas "
+"autorisé."
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr ""
+"Provisionne automatiquement uniquement les comptes portant le même nom avant"
+" leur première connexion ; réutilise les comptes gérés existants. La "
+"plateforme de l’actif doit prendre en charge le provisionnement des comptes."
+
+msgid "Cancel connections individually."
+msgstr "Annulez les connexions individuellement."
+
+msgid "Complete the current connection step first"
+msgstr "Terminez d’abord l’étape de connexion en cours."
+
+msgid "Connection ACL context"
+msgstr "Contexte ACL de la connexion"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "Les vérifications ACL de la connexion ne sont pas terminées."
+
+msgid "Connection approval is no longer valid"
+msgstr "L’approbation de la connexion n’est plus valide."
+
+msgid "Connection details"
+msgstr "Détails de la connexion"
+
+msgid "Connection is no longer available"
+msgstr "Cette connexion n’est plus disponible. Lancez une nouvelle connexion."
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr ""
+"Les paramètres de connexion ne peuvent pas être modifiés ; créez un nouveau "
+"jeton de connexion."
+
+msgid "Connection reason"
+msgstr "Motif de la connexion"
+
+msgid "Connection review was rejected or closed"
+msgstr "La demande d’approbation de la connexion a été refusée ou fermée."
+
+msgid "Connection token does not match this session."
+msgstr "Le jeton de connexion ne correspond pas à cette session."
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "Création du compte et configuration de ses identifiants de connexion."
+
+msgid "Duplicate connection tokens."
+msgstr "Des jetons de connexion sont en double."
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "Saisissez le motif de la connexion (4096 caractères maximum)."
+
+msgid "Enter a reason before connecting."
+msgstr "Saisissez un motif avant de vous connecter."
+
+msgid "Exemption period"
+msgstr "Durée d’exemption"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr ""
+"Le contexte de surveillance faciale appartient à un autre utilisateur."
+
+msgid "Face monitoring does not belong to this session"
+msgstr "La surveillance faciale ne correspond pas à cette session."
+
+msgid "Face verification"
+msgstr "Vérification faciale"
+
+msgid "Face verification does not belong to this connection"
+msgstr "La vérification faciale ne correspond pas à cette connexion."
+
+msgid "Face verification failed"
+msgstr "La vérification faciale a échoué."
+
+msgid "Face verification is no longer available"
+msgstr "La vérification faciale n’est plus disponible."
+
+msgid "Face verification session expired; retry verification"
+msgstr ""
+"La session de vérification faciale a expiré ; recommencez la vérification."
+
+msgid "Face verification session is no longer current"
+msgstr "La session de vérification faciale n’est plus la session actuelle."
+
+msgid "First-login same-name account push"
+msgstr "Provisionnement d’un compte de même nom à la première connexion"
+
+msgid "MFA verification"
+msgstr "Vérification MFA"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "Aucun approbateur disponible. Contactez un administrateur."
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr ""
+"Notifie les destinataires sélectionnés lorsqu’un utilisateur demande une "
+"connexion à un actif. La notification ne signifie pas que la connexion a "
+"réussi."
+
+msgid "Online face monitoring context is no longer available"
+msgstr "Le contexte de surveillance faciale continue n’est plus disponible."
+
+msgid "Online face monitoring context is required"
+msgstr "Le contexte de surveillance faciale continue est requis."
+
+msgid "Online face verification requires Web Terminal"
+msgstr "La vérification faciale continue nécessite le terminal Web."
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "L’autorisation de se connecter avec ce compte n’est plus disponible."
+
+msgid "Prepare the same-name account before connecting."
+msgstr "Préparez le compte portant le même nom avant de vous connecter."
+
+msgid "Push same-name account on first connection"
+msgstr "Provisionner le compte de même nom à la première connexion"
+
+msgid "Require approval"
+msgstr "Exiger une approbation"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr ""
+"Exige une approbation avant la connexion, sauf pendant une période "
+"d’exemption valide."
+
+msgid "Rotate password"
+msgstr "Renouveler le mot de passe"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr ""
+"Renouvelle le secret du compte connecté à la fin de la session. Nécessite "
+"d’activer la rotation en fin de session dans le système et la rotation "
+"automatique sur un compte actif."
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr ""
+"Le provisionnement des comptes de même nom utilise des identifiants gérés "
+"par le serveur."
+
+msgid "Secret rotation after session end is disabled"
+msgstr "La rotation des secrets en fin de session est désactivée."
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr ""
+"Sélectionnez une méthode MFA active ; si aucune n’est disponible, configurez"
+" d’abord MFA."
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr ""
+"Sélectionnez au moins un approbateur actif et non expiré de cette "
+"organisation."
+
+msgid "Select at least one notification recipient."
+msgstr "Sélectionnez au moins un destinataire de notification."
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr ""
+"Sélectionnez des approbateurs lorsque l’approbation est activée. Les "
+"connexions sont bloquées si aucun approbateur n’est disponible."
+
+msgid "Send notification"
+msgstr "Envoyer une notification"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr ""
+"Le compte existant portant le même nom est inactif. Contactez un "
+"administrateur."
+
+msgid "The same-name account username is determined by the server."
+msgstr ""
+"Le nom d’utilisateur du compte de même nom est déterminé par le serveur."
+
+msgid "This MFA method does not send a verification code"
+msgstr "Cette méthode MFA n’envoie pas de code de vérification."
+
+msgid "This connection does not require this step"
+msgstr "Cette connexion ne nécessite pas cette étape."
+
+msgid "This field cannot be submitted."
+msgstr "Ce champ ne peut pas être envoyé."
+
+msgid "This field does not belong to the current step."
+msgstr "Ce champ n’appartient pas à l’étape en cours."
+
+msgid "This push method does not support create-only mode"
+msgstr ""
+"Cette méthode de provisionnement ne prend pas en charge le mode création "
+"uniquement."
+
+msgid "This username cannot be provisioned automatically."
+msgstr "Ce nom d’utilisateur ne peut pas être provisionné automatiquement."
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "Utilisez le terminal Web pour effectuer la vérification faciale."
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr ""
+"Vérifie un code MFA configuré avant la connexion. Bloque les connexions si "
+"aucune méthode MFA basée sur un code n’est configurée."
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr ""
+"Vérifie le visage de l’utilisateur avant la connexion. Nécessite la "
+"reconnaissance faciale du système et un visage enregistré."
+
+msgid "Waiting to push the same-name account."
+msgstr "En attente de provisionnement du compte portant le même nom."
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr ""
+"Terminal Web uniquement : vérifie le visage avant la connexion et le "
+"surveille pendant toute la session. Nécessite la reconnaissance faciale du "
+"système et un visage enregistré."
+
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "Surveillance faciale continue"
+
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "Provisionner le compte"
+
+#: reports/services/audit_data.py
+msgid "Account Health"
+msgstr "État des comptes"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "Tâches de comptes à examiner"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "Actifs présentant des risques en attente"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "En attente d’examen"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "Données d’authentification candidates vérifiées"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "Vérifiez les conditions de connexion et la session d’origine avant de réessayer."
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "Vérifiez la création, le téléversement et le stockage de l’enregistrement de la session d’origine."
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "Décisions sur les commandes à examiner"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "Comparez le changement détecté avec les accès approuvés et confirmez le résultat du traitement."
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "Confirmez que les données d’authentification les plus récentes sont synchronisées et que l’accès fonctionne."
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "Confirmez si le changement de localisation correspond à un déplacement, à l’utilisation d’un proxy ou à un accès attendu."
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "Enregistrements de risques confirmés"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "Échecs de connexion à examiner"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "Échec de la vérification des données d’authentification"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "Vérification des données d’authentification en cours"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "Détails des risques actuels des comptes"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "Risques actuels des comptes"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "Enregistrements de risques actuels"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "Échecs d’authentification à examiner"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "Opérations sur les fichiers à examiner"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "Avancement du traitement"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "Enregistrements de risques ignorés"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "Problème"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "Un changement de mot de passe ultérieur a réussi"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "Connexions depuis de nouvelles villes à examiner"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "Prochaine étape"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "Aucun enregistrement de risque de compte n’est actuellement disponible."
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "Enregistrement d’origine"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "Enregistrements de risques en attente"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "Risques en attente par type"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "Refus par les politiques à examiner"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "Enregistrements de session à examiner"
+
+#: reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "Liste de contrôle des mesures correctives"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "Examinez et synchronisez les données d’authentification candidates vérifiées ; la vérification seule ne confirme pas le rétablissement."
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "Examinez l’objectif de la commande, la règle correspondante et l’historique d’approbation dans la session d’origine."
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "Examinez l’opération refusée et confirmez que la politique d’accès est celle attendue."
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "Examinez le journal d’exécution et les cibles concernées, corrigez la cause, puis réessayez."
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "Examinez le chemin du fichier, les autorisations d’accès et la session d’origine avant de réessayer."
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "Examinez le résultat de la vérification et l’exécution d’origine avant de réessayer."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "Vérifiez si la raison d’ignorer cet échec est toujours valable."
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "Vérifiez si la raison d’ignorer ce risque est toujours valable."
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "Nombre de risques"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "Mis à jour"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "Heure de vérification"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "Vérifiez les données d’authentification candidates et synchronisez-les uniquement après avoir confirmé que l’accès fonctionne."
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "Vérifiez la source de la connexion et l’identité du compte, puis examinez le journal d’authentification."
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "Attendez la fin de la vérification avant de décider de synchroniser les données d’authentification."
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "Lisible"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "Identifiant de l’enregistrement"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "Référence"
+
+msgid "%(count)s account task executions were canceled."
+msgstr "%(count)s exécutions de tâches de comptes ont été annulées."
+
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "%(count)s sessions réussies et terminées nécessitent une vérification de l’enregistrement. Vérifiez sa création, son transfert et son stockage."
+
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "%(count)s connexions depuis une nouvelle ville nécessitent une vérification de l’identité de l’utilisateur et du lieu d’accès."
+
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s connexions à la plateforme utilisent des adresses source de boucle locale. Vérifiez s’il s’agit d’accès locaux ou de requêtes relayées par un proxy."
+
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "%(count)s connexions à la plateforme ont échoué. Examinez les utilisateurs concernés, les adresses source et les motifs consignés."
+
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "%(failed)s opérations sur fichiers sur %(total)s ont échoué (%(rate)s%%). Examinez les actifs, comptes et chemins de fichiers concernés, ainsi que les sessions d’origine."
+
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "%(sessions)s sessions d’actifs ont été enregistrées : %(success)s connexions réussies et %(failed)s échecs, impliquant %(users)s utilisateurs et %(assets)s actifs."
+
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "%(total)s tâches de comptes ont été exécutées : %(success)s réussies, %(failed)s en échec ou en erreur, et %(pending)s restent inachevées."
+
+msgid "Account Risks to Review"
+msgstr "Risques des comptes à examiner"
+
+msgid "Accounts Identified in Pending Risks"
+msgstr "Comptes concernés par les risques en attente"
+
+msgid "Affected Accounts"
+msgstr "Comptes concernés"
+
+msgid "Affected Assets"
+msgstr "Actifs concernés"
+
+msgid "Assets with Latest Check Successful"
+msgstr "Actifs dont le dernier contrôle a réussi"
+
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "Attribuez un identifiant secret unique à chaque compte concerné, synchronisez les services dépendants et vérifiez l’accès."
+
+msgid "Check Result"
+msgstr "Résultat du contrôle"
+
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "Comparez les clés autorisées aux clés approuvées et supprimez celles qui n’ont pas été approuvées."
+
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "Comparez les changements d’appartenance aux groupes avec les accès approuvés et retirez les privilèges non approuvés."
+
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "Comparez les changements de permissions sudo avec les accès approuvés et retirez les privilèges non approuvés."
+
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "Confirmez le propriétaire et l’usage du compte, puis prenez en gestion les comptes approuvés ou désactivez les comptes non autorisés."
+
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "Vérifiez si la suppression a été approuvée, puis mettez en cohérence l’inventaire des comptes gérés."
+
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "Vérifiez si le compte est toujours nécessaire, puis désactivez les comptes inutilisés après approbation."
+
+msgid "Current Managed Accounts"
+msgstr "Comptes actuellement gérés"
+
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "Actuellement, %(pending)s risques de comptes en attente concernent %(accounts)s comptes distincts sur %(assets)s actifs. Examinez les comptes concernés par type de risque."
+
+msgid "Latest Check Failed"
+msgstr "Échec du dernier contrôle"
+
+msgid "Latest Check Successful"
+msgstr "Dernier contrôle réussi"
+
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "Comptes gérés dont le dernier contrôle a réussi"
+
+msgid "Most Recent Stored Check"
+msgstr "Contrôle enregistré le plus récent"
+
+msgid "No Check Result"
+msgstr "Aucun résultat de contrôle"
+
+msgid "No listed security events were found in the available records for this period."
+msgstr "Aucun des événements de sécurité répertoriés n’a été trouvé dans les enregistrements disponibles pour cette période."
+
+msgid "Not Applicable"
+msgstr "Sans objet"
+
+msgid "Password Changes with Subsequent Progress"
+msgstr "Changements de mot de passe avec suivi ultérieur"
+
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "Renouvelez l’identifiant secret expiré et vérifiez les tâches dépendantes ainsi que l’accès au compte."
+
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "Remplacez le mot de passe faible par un mot de passe robuste et unique, puis vérifiez l’accès au compte."
+
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "Examinez les échecs de connexion à partir des actifs et comptes concernés et des motifs consignés."
+
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "Examinez les journaux des tâches en échec et les comptes concernés ; traitez d’abord les éléments non résolus, avant ceux ayant fait l’objet d’un suivi."
+
+msgid "Review risks"
+msgstr "Examiner les risques"
+
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "Examinez le constat confirmé et vérifiez l’état actuel du compte."
+
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "Comptes à risque correspondant à des comptes gérés"
+
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "Comptes à risque sans correspondance avec les comptes gérés"
+
+msgid "Risk List"
+msgstr "Liste des risques"
+
+msgid "Risk Records"
+msgstr "Enregistrements de risque"
+
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "Renouvelez l’identifiant secret conformément à la politique de rotation et vérifiez les services dépendants."
+
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "Renouvelez l’identifiant secret potentiellement exposé, examinez les accès récents et vérifiez les services dépendants."
+
+msgid "Stored Asset Connectivity Results"
+msgstr "Résultats enregistrés de connectivité des actifs"
+
+msgid "Stored Managed Account Connectivity Results"
+msgstr "Résultats enregistrés de connectivité des comptes gérés"
+
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "Il y a actuellement %(total)s actifs, dont %(active)s sont activés."
+
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "Il y a actuellement %(total)s comptes gérés enregistrés, dont %(active)s sont activés."
+
+msgid "There are currently no pending account risk records."
+msgstr "Il n’y a actuellement aucun risque de compte en attente."
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "Mettez à jour le client JumpServer pour utiliser la politique de connexion configurée."
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "La session du client a expiré. Veuillez vous authentifier à nouveau."
+
+msgid "Log in again after exiting the client"
+msgstr "Se reconnecter après avoir quitté l’application"
+
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr ""
+"Si cette option est activée, vous devez vous reconnecter après avoir quitté "
+"et redémarré l’application de bureau. Réduire ou masquer l’application ne "
+"revient pas à la quitter."
+
+msgid "Client login idle timeout (minute)"
+msgstr "Délai d’inactivité (minutes)"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "Reconnectez-vous lorsque le délai d’inactivité est atteint. 0 désactive cette limite (par défaut). Les actions réelles au clavier et à la souris dans la fenêtre principale, les fenêtres de ressources séparées et les sites web intégrés comptent comme activité. Une connexion ouverte, les sorties en arrière-plan et l’actualisation automatique ne comptent pas. Les actions dans des logiciels externes comme Xshell ou MSTSC et dans certaines pages intégrées d’une autre origine ne peuvent pas être captées. Utiliser uniquement ces zones, regarder longtemps sans intervenir ou rencontrer un échec de transmission dû au réseau peut donc déclencher le délai d’inactivité. Le calcul part de la dernière activité confirmée par le serveur."
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "Durée maximale de validité de la connexion (minutes)"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "La durée est mesurée à partir de la connexion au client ; l’activité et le renouvellement du jeton ne la prolongent pas. 0 désactive la limite de durée (valeur par défaut). Les paramètres de sortie et d’inactivité restent applicables. Vous devez vous reconnecter à l’expiration de cette durée."
+
+msgid "Client exit"
+msgstr "Fermeture du client"
+
+msgid "Idle timeout"
+msgstr "Délai d’inactivité dépassé"
+
+msgid "Maximum login time"
+msgstr "Durée maximale de connexion"
+
+msgid "Client login policy changed"
+msgstr "La politique de connexion du client a été modifiée"
+
+msgid "Authorization revoked"
+msgstr "Autorisation révoquée"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "Responsable de l’actif"
+
+msgid "Manager"
+msgstr "Manager"
+
+msgid "Workflow"
+msgstr "Workflow"
+
+msgid "Approval workflow"
+msgstr "Approval workflow"
+
+msgid "Workflow version"
+msgstr "Workflow version"
+
+msgid "Workflow instance"
+msgstr "Workflow instance"
+
+msgid "Workflow node"
+msgstr "Workflow node"
+
+msgid "Workflow edge"
+msgstr "Workflow edge"
+
+msgid "Workflow node instance"
+msgstr "Workflow node instance"
+
+msgid "Approval task"
+msgstr "Approval task"
+
+msgid "Workflow event"
+msgstr "Workflow event"
+
+msgid "Client idle lock (minute)"
+msgstr "Verrouillage après inactivité (minute)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 désactive le verrouillage automatique. La page principale et les fenêtres "
+"gérées se verrouillent ensemble ; seul la page principale permet le "
+"déverrouillage. La session et les connexions restent actives. Les "
+"applications externes ne sont pas protégées. Les sessions nouvelles et "
+"restaurées démarrent verrouillées si cette option est activée. Les entrées "
+"clavier et souris du système, y compris dans les applications externes, "
+"réinitialisent uniquement le délai du site et du compte actifs. Aucune "
+"activité n’est envoyée au serveur."
+
+msgid "Client lock password"
+msgstr "Mot de passe de verrouillage du client"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr ""
+"Aucun mot de passe de verrouillage. Définissez-le dans les paramètres "
+"personnels Web de ce site et de ce compte, puis revenez et actualisez."
+
+msgid "The client lock password is incorrect."
+msgstr "Échec du déverrouillage. Vérifiez le mot de passe et la connexion."
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr ""
+"Calculée depuis chaque connexion selon le dernier réglage. L’activité et le "
+"renouvellement des jetons ne la prolongent pas. 0 signifie illimité. Si une "
+"modification dépasse la durée, un délai de 10 minutes maximum précède la "
+"déconnexion et une nouvelle connexion est nécessaire."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr ""
+"{} - Mot de passe non défini. Allez dans Paramètres personnels → "
+"Authentification de connexion → Identifiants du client → Mot de passe de "
+"chiffrement des fichiers."
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0 désactive le verrouillage automatique (par défaut). Les entrées clavier et"
+" souris du système déterminent l’inactivité du site et du compte actifs "
+"uniquement. Aucune activité n’est envoyée à chaque action ; le délai ou un "
+"verrouillage manuel envoie une demande de verrouillage au serveur. Le délai "
+"verrouille la page principale et les fenêtres de ressources gérées, même "
+"sans mot de passe défini. Seule la page principale permet de déverrouiller "
+"après vérification du mot de passe par le serveur. Une nouvelle connexion "
+"s’ouvre normalement ; une connexion déjà verrouillée le reste après "
+"restauration. Les fenêtres externes ne sont pas protégées."
+
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "La session web est verrouillée. Déverrouillez-la avant d’autoriser un client."
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "Le client est verrouillé. Déverrouillez-le sur la page principale."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"Valeur par défaut : 15 minutes. 0 désactive le verrouillage automatique. "
+"Sans saisie clavier ou souris du système pendant le délai défini, la page "
+"principale et les fenêtres de ressources du site et du compte actifs se "
+"verrouillent. Déverrouillez sur la page principale en vérifiant le mot de "
+"passe en ligne. Le verrouillage s’applique même sans mot de passe ; "
+"définissez-le dans les paramètres personnels Web. Les fenêtres externes ne "
+"sont pas protégées."
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr ""
+"{} - Mot de passe de chiffrement non défini. Allez dans Paramètres "
+"personnels → Authentification utilisateur → Chiffrement des fichiers."
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "Rapports d’audit"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "Anciens rapports"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "Peut consulter le rapport d’audit complet"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "Peut consulter le rapport d’activité opérationnelle"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "Peut consulter le rapport des événements de sécurité"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "Peut consulter la synthèse des actifs et des comptes"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "Peut consulter le rapport des opérations sur les comptes"
+
+msgid "Locked"
+msgstr "Verrouillage"
+
+msgid "Screen lock password"
+msgstr "Mot de passe de verrouillage"
+
+msgid "Idle screen lock (minute)"
+msgstr "Verrouillage après inactivité (min)"
+
+msgid "Set a lock password after signing in again."
+msgstr "Reconnectez-vous pour définir un mot de passe de verrouillage."
+
+msgid "The lock password is incorrect."
+msgstr "Le mot de passe de verrouillage est incorrect."
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr ""
+"Configurez une méthode de vérification d’identité avant de modifier le mot "
+"de passe de verrouillage."
+
+msgid "This verification method is not available."
+msgstr "Cette méthode de vérification est indisponible."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"Par défaut : 15 minutes ; 0 désactive le verrouillage automatique. Partagé "
+"entre client, console et terminal Web. Le client utilise l’activité "
+"clavier/souris du système ; le Web regroupe les onglets de ce site. "
+"L’inactivité verrouille même sans mot de passe. Le déverrouillage exige sa "
+"vérification en ligne ; sinon, déconnectez-vous puis reconnectez-vous pour "
+"le définir. Les fenêtres des applications externes ne sont pas protégées."
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr ""
+"Cinq mots de passe de verrouillage incorrects consécutifs. Cette session a "
+"été fermée."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"Par défaut, 15 minutes. 0 désactive le verrouillage automatique. Utilise le "
+"clavier et la souris du système. Verrouille le client et ses fenêtres de "
+"ressources, même sans mot de passe. Déverrouillez dans la fenêtre principale"
+" après vérification sur le serveur. Les applications externes ne sont pas "
+"protégées."
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"Par défaut, 15 minutes. 0 désactive le verrouillage automatique. La console "
+"et le terminal Web partagent le réglage et regroupent l’activité des onglets"
+" de ce site. Les autres sites et applications ne sont pas surveillés. Le "
+"verrouillage s’applique même sans mot de passe ; déconnectez-vous puis "
+"reconnectez-vous dans ce cas."
+
+#~ msgid "Ticket already closed"
+#~ msgstr "Le ticket est déjà fermé"
+
+msgid "Web session lifetime (second)"
+msgstr "Durée de session Web (seconde)"
+
+msgid "Renew session on request"
+msgstr "Renouveler la session à chaque requête"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"SESSION_COOKIE_AGE, en secondes. Modifiez config.yml de Core puis redémarrez"
+" Core. Les sessions nouvelles ou renouvelées utilisent la nouvelle durée ; "
+"les échéances enregistrées ne sont pas immédiatement réécrites. Ce n’est pas"
+" une limite fixe depuis la connexion. Les politiques Web et client sont "
+"indépendantes."
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"SESSION_SAVE_EVERY_REQUEST. Modifiez config.yml de Core puis redémarrez "
+"Core. Lorsque ce paramètre est activé, les requêtes ordinaires renouvellent "
+"la session pour la durée configurée. Le désactiver n’impose pas de limite "
+"fixe : écrire dans Session peut encore renouveler la session. L’inactivité "
+"du clavier ou de la souris ne déconnecte pas ; le verrouillage se configure "
+"séparément."
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0 signifie illimité. Calculé depuis chaque connexion avec le dernier "
+"réglage. L’activité et le renouvellement du Token ne le prolongent pas. Les "
+"réglages sont synchronisés environ toutes les 60 secondes. Si un changement "
+"rend la connexion expirée, un délai maximal de 10 minutes précède la "
+"déconnexion. Une prolongation pendant ce délai annule la déconnexion si la "
+"connexion respecte la nouvelle limite."
+
+msgid "Web idle screen lock (minute)"
+msgstr "Verrouillage Web après inactivité (min)"
+
+msgid "Client idle screen lock (minute)"
+msgstr "Verrouillage du client après inactivité (min)"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr ""
+"Laissez vide pour suivre le réglage administrateur. La valeur personnelle ne"
+" peut pas dépasser sa limite."
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr ""
+"La limite administrateur est de %(minutes)s minutes. Laissez vide pour la "
+"suivre."
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"Valeur globale par défaut et maximale. Les utilisateurs sans réglage "
+"personnel suivent toujours cette valeur. Les valeurs personnelles ne peuvent"
+" pas la dépasser. Réduire le maximum réduit les valeurs personnelles "
+"supérieures ; l’augmenter conserve les valeurs personnalisées."
+
+msgid "Choose either setting or clearing the lock password."
+msgstr ""
+"Vous ne pouvez pas définir et effacer le mot de passe de verrouillage "
+"simultanément."
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr ""
+"Si la valeur globale est 0, les utilisateurs peuvent choisir 0 pour "
+"désactiver le verrouillage ou un délai personnel positif."
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "L’administrateur impose une reconnexion après fermeture du client."
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr ""
+"Les utilisateurs peuvent l’activer eux-mêmes si l’administrateur ne l’impose"
+" pas."
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"Modifiez la durée et le renouvellement dans config.yml de Core, puis "
+"redémarrez Core. Les nouvelles connexions utilisent les nouveaux réglages ; "
+"les échéances existantes ne sont pas réécrites en bloc. Une session ayant sa"
+" propre durée peut la conserver au renouvellement ; reconnectez-vous pour "
+"appliquer la nouvelle durée. SESSION_COOKIE_AGE est la durée en secondes "
+"appliquée lors de la sauvegarde d’une session. Ce n’est pas un plafond fixe "
+"depuis la connexion initiale. L’expiration actuelle des informations "
+"personnelles est l’échéance conservée sur le serveur."
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"Durée Web par défaut après connexion ou renouvellement, en secondes. Ce "
+"n’est pas un plafond fixe depuis la première connexion. Modifiez "
+"SESSION_COOKIE_AGE dans config.yml de Core, puis redémarrez Core. Les "
+"sessions existantes peuvent garder leur durée précédente ; reconnectez-vous "
+"pour appliquer la nouvelle."
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"Activé : les requêtes HTTP ordinaires renouvellent la session, y compris "
+"celles en arrière-plan. Désactivé : les lectures ordinaires ne renouvellent "
+"pas, mais une écriture de Session, par exemple une vérification d’identité, "
+"peut encore le faire. Modifiez SESSION_SAVE_EVERY_REQUEST dans config.yml de"
+" Core et redémarrez Core."
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr ""
+"Si activé, fermer le navigateur impose généralement une reconnexion. La "
+"restauration du navigateur peut conserver les cookies ; utilisez Déconnexion"
+" pour terminer la connexion avec certitude. Ce réglage ne définit pas une "
+"durée maximale fixe."
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"Durée par défaut, en secondes.<br>Chaque renouvellement relance le délai : "
+"expiration = heure du renouvellement + durée.<br>Avec le renouvellement "
+"activé, les requêtes ordinaires renouvellent. Même désactivé, une écriture "
+"de Session, comme une vérification d’identité, peut encore renouveler.<br>Ce"
+" n’est pas un plafond fixe depuis la première connexion.<br>Modifiez "
+"SESSION_COOKIE_AGE dans config.yml de Core et redémarrez Core. Les sessions "
+"existantes peuvent garder leur durée ; reconnectez-vous pour appliquer la "
+"nouvelle."
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"Activé : la plupart des requêtes API avec une session Web valide "
+"renouvellent, y compris GET et les interrogations métier en arrière-plan. "
+"Aucune activité clavier ou souris n’est nécessaire.<br>Lectures exclues : "
+"profil, état en ligne (user-session) et état de verrouillage (session-"
+"lock/status).<br>Désactivé : les lectures ordinaires ne renouvellent pas, "
+"mais la vérification d’identité et les autres écritures de Session peuvent "
+"encore renouveler.<br>Cause : le projet écrit le résultat de vérification "
+"dans Session ; Django sauvegarde la session modifiée et recalcule par défaut"
+" son expiration relative.<br>Modifiez SESSION_SAVE_EVERY_REQUEST dans "
+"config.yml de Core et redémarrez Core."
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"Si activé, quitter complètement l’application du navigateur impose "
+"généralement une reconnexion à sa réouverture.<br>Fermer un onglet ou une "
+"fenêtre, ou réduire, ne quitte pas l’application ; le navigateur peut rester"
+" actif en arrière-plan.<br>La restauration du navigateur peut conserver les "
+"cookies. Utilisez Déconnexion sur le site pour terminer la connexion avec "
+"certitude.<br>Ce réglage ne définit pas une durée maximale fixe."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr ""
+"Exige une nouvelle connexion après avoir quitté et relancé le client. "
+"Réduire ou masquer la fenêtre ne compte pas comme quitter."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr ""
+"0 signifie illimité. Calculé depuis la connexion. Reconnectez-vous à "
+"l’expiration ; l’activité ne prolonge pas la durée. Si la modification rend "
+"une connexion expirée, un délai maximal de 10 minutes est accordé."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the specified idle time. Enter the"
+" lock password in the main window to unlock. External application windows "
+"are not protected."
+msgstr ""
+"0 désactive le verrouillage automatique. Verrouille après le délai "
+"d’inactivité indiqué. Saisissez le mot de passe de verrouillage dans la "
+"fenêtre principale. Les applications externes ne sont pas protégées."
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. Administrator "
+"settings are defaults and limits. Users may choose stricter settings; "
+"otherwise they follow the administrator."
+msgstr ""
+"0 désactive le verrouillage automatique. Verrouille la console et le "
+"terminal Web après le délai d’inactivité indiqué. Saisissez le mot de passe "
+"de verrouillage pour déverrouiller. L’administrateur définit les valeurs par"
+" défaut et les limites. L’utilisateur peut être plus restrictif ; sinon, il "
+"suit l’administrateur."
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "Périmètre de demande des actifs"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "Définit les actifs que les utilisateurs peuvent sélectionner dans une demande d’accès par ticket.<br><b>Tous les actifs :</b> tous les actifs de l’organisation du ticket peuvent être sélectionnés, même sans autorisation préalable.<br><b>Actifs autorisés :</b> les actifs inclus dans les règles d’autorisation attribuées à l’utilisateur ou à ses groupes peuvent être sélectionnés, y compris les règles désactivées, expirées ou pas encore en vigueur.<br><b>Actifs avec autorisation valide :</b> seuls les actifs inclus dans des règles valides attribuées à l’utilisateur ou à ses groupes peuvent être sélectionnés. La règle doit être activée et l’heure actuelle doit se situer entre son début et sa fin."
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "Audit des conversations IA"

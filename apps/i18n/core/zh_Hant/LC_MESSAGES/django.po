@@ -19,6 +19,11 @@ msgstr ""
 "X-ZhConverter: 繁化姬 dict-74c8d060-r1048 @ 2024/04/07 18:19:20 | https://"
 "zhconvert.org\n"
 
+#. Django's single-field uniqueness validation message.
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "已存在相同%(field_label)s的%(model_name)s，請修改%(field_label)s。"
+
 #: accounts/api/account/account.py:193
 #: accounts/serializers/account/account.py:182
 #: accounts/serializers/account/account.py:363
@@ -194,6 +199,11 @@ msgstr "帳號正在處理中，已跳過：%(account)s"
 msgid "Account not found, inactive, or not eligible for this task"
 msgstr "帳號不存在、已停用或不符合此任務的條件"
 
+#: accounts/automations/base/manager.py
+#, python-format
+msgid "Unable to resolve username (account ID: %(account_id)s)"
+msgstr "無法解析使用者名稱（帳號 ID：%(account_id)s）"
+
 #: accounts/automations/base/manager.py:516
 #, python-format
 msgid ""
@@ -346,18 +356,18 @@ msgstr "SSH 金鑰"
 
 #: accounts/const/account.py:8 authentication/models/access_key.py:45
 msgid "Access key"
-msgstr "Access key"
+msgstr "訪問密鑰"
 
 #: accounts/const/account.py:9 authentication/backends/passkey/models.py:16
 #: authentication/models/sso_token.py:14
 #: authentication/serializers/token.py:121 settings/serializers/feature.py:97
 #: settings/serializers/feature.py:113
 msgid "Token"
-msgstr "Token"
+msgstr "令牌"
 
 #: accounts/const/account.py:10
 msgid "API key"
-msgstr "API key"
+msgstr "API 密鑰"
 
 #: accounts/const/account.py:14 common/db/fields.py:230 perms/filters.py:79
 #: settings/serializers/terminal.py:14 tickets/const.py:17
@@ -977,7 +987,7 @@ msgstr "帳號管理"
 #: accounts/models/application.py:22 authentication/models/access_key.py:21
 #: terminal/models/component/endpoint.py:109
 msgid "IP group"
-msgstr "IPグループ"
+msgstr "IP 組"
 
 #: accounts/models/application.py:23
 #: authentication/backends/passkey/models.py:14
@@ -2177,6 +2187,10 @@ msgstr "資產名稱、地址或 ID"
 msgid "Connect methods"
 msgstr "連接方式"
 
+#: acls/serializers/connect_method.py
+msgid "Select at least one connection method"
+msgstr "請至少選擇一種連接方式"
+
 #: acls/apps.py:7
 msgid "App Acls"
 msgstr "存取控制"
@@ -2505,7 +2519,7 @@ msgid ""
 "With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"使用 * 比對所有位址。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
 "db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:48 audits/reporting.py:246
@@ -3196,7 +3210,7 @@ msgstr "不適用"
 
 #: assets/const/automation.py:8
 msgid "OK"
-msgstr "Success"
+msgstr "成功"
 
 #: assets/const/automation.py:10
 msgid "RDP error"
@@ -3963,7 +3977,7 @@ msgstr "自訂屬性"
 #: assets/models/utils.py:18
 #, python-format
 msgid "%(value)s is not an even number"
-msgstr "%(value)s is not an even number"
+msgstr "%(value)s 不是偶數"
 
 #: assets/notifications.py:12
 msgid ""
@@ -4425,7 +4439,7 @@ msgstr "臨時密碼"
 #: settings/serializers/auth/passkey.py:8
 #: settings/serializers/auth/passkey.py:11
 msgid "Passkey"
-msgstr "Passkey"
+msgstr "通行密鑰"
 
 #: audits/backends/db.py:17
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
@@ -4825,7 +4839,7 @@ msgstr "賬號 Top 10"
 #: audits/reporting.py:118 audits/reporting.py:326 audits/reporting.py:423
 #: terminal/reporting.py:132
 msgid "IP Top 10"
-msgstr "IP Top 10"
+msgstr "前 10 個 IP"
 
 #: audits/reporting.py:123
 msgid "Filename Top 10"
@@ -5781,7 +5795,7 @@ msgstr "過期時間"
 
 #: authentication/models/sso_token.py:20
 msgid "SSO token"
-msgstr "SSO token"
+msgstr "單點登錄令牌"
 
 #: authentication/models/temp_token.py:12
 msgid "Verified"
@@ -5801,7 +5815,7 @@ msgstr "OAuth 名稱"
 
 #: authentication/notifications.py:59
 msgid "OAuth ID"
-msgstr "OAuth ID"
+msgstr "OAuth 識別碼"
 
 #: authentication/notifications.py:70
 msgid "binding reminder"
@@ -6991,10 +7005,6 @@ msgstr "你的帳號已創建成功"
 msgid "JumpServer - An open-source PAM"
 msgstr "JumpServer 開源堡壘機"
 
-#: jumpserver/views/celery_flower.py:22
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "Flower 服務不可用，請檢查"
-
 #: jumpserver/views/other.py:28
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
@@ -7213,7 +7223,7 @@ msgstr "空白"
 
 #: ops/const.py:35
 msgid "VCS"
-msgstr "VCS"
+msgstr "版本控制"
 
 #: ops/const.py:39 ops/models/adhoc.py:44 ops/models/variable.py:26
 msgid "Adhoc"
@@ -7257,7 +7267,7 @@ msgstr "SQLServer"
 
 #: ops/const.py:57 ops/const.py:70
 msgid "Raw"
-msgstr "Raw"
+msgstr "原始命令"
 
 #: ops/const.py:58
 msgid "HUAWEI"
@@ -7325,7 +7335,7 @@ msgstr "間隔"
 #: ops/mixin.py:39 ops/mixin.py:111 ops/mixin.py:169
 #: settings/serializers/auth/ldap.py:85 settings/serializers/auth/ldap_ha.py:67
 msgid "Crontab"
-msgstr "Crontab"
+msgstr "定時規則"
 
 #: ops/mixin.py:43 ops/mixin.py:177
 msgid "Start Datetime"
@@ -7448,7 +7458,7 @@ msgstr "作業"
 
 #: ops/models/job.py:284
 msgid "Material"
-msgstr "Material"
+msgstr "作業內容"
 
 #: ops/models/job.py:286
 msgid "Material Type"
@@ -7464,7 +7474,7 @@ msgstr "創建方式"
 
 #: ops/models/playbook.py:35
 msgid "VCS URL"
-msgstr "VCS URL"
+msgstr "版本控制地址"
 
 #: ops/models/variable.py:11 ops/serializers/variable.py:22
 msgid "Variable name"
@@ -7683,7 +7693,7 @@ msgstr "在 JumpServer 中用於連接此資產的埠"
 
 #: ops/variables.py:31
 msgid "ID of the job"
-msgstr "Job ID"
+msgstr "作業 ID"
 
 #: ops/variables.py:32
 msgid "Name of the job"
@@ -7947,7 +7957,7 @@ msgid "Send asset permission expired notification"
 msgstr "發送資產權限過期通知"
 
 #: perms/tasks.py:52
-#, fuzzy
+
 #| msgid ""
 #| "Check every day at 10 a.m. and send a notification message to users "
 #| "associated with \n"
@@ -7992,7 +8002,7 @@ msgstr "{} 至少有一個系統角色"
 
 #: rbac/apps.py:7
 msgid "App RBAC"
-msgstr "RBAC"
+msgstr "應用角色權限"
 
 #: rbac/builtin.py:125
 msgid "SystemAdmin"
@@ -8186,7 +8196,7 @@ msgstr "控制台"
 
 #: rbac/tree.py:25
 msgid "Pam view"
-msgstr "PAM"
+msgstr "特權訪問管理視圖"
 
 #: rbac/tree.py:26
 msgid "Workbench view"
@@ -8389,6 +8399,42 @@ msgid "The model provider endpoint was not found. Please check the Base URL."
 msgstr "找不到模型服務介面，請檢查服務位址。"
 
 #: settings/api/chat.py
+msgid "{detail} The provider must support the Responses API (/responses)."
+msgstr "{detail} 模型服務商必須支援 Responses API（/responses）。"
+
+#: settings/api/chat.py
+msgid "The provider did not return a Responses API event stream."
+msgstr "模型服務商未返回 Responses API 事件流。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream failed: {detail}"
+msgstr "Responses API 串流回應失敗：{detail}"
+
+#: settings/api/chat.py
+msgid "The Responses API stream ended without a successful completion event."
+msgstr "Responses API 串流已結束，但未收到成功完成事件。"
+
+#: settings/api/chat.py
+msgid "The Responses API stream returned an incomplete output item."
+msgstr "Responses API 串流返回了未完成的輸出項。"
+
+#: settings/api/chat.py
+msgid "The Responses API text stream is missing or does not match the final output."
+msgstr "Responses API 缺少文字串流增量，或增量與最終輸出不一致。"
+
+#: settings/api/chat.py
+msgid "The Responses API tool argument stream does not match the final tool call."
+msgstr "Responses API 的工具參數串流與最終工具呼叫不一致。"
+
+#: settings/api/chat.py
+msgid "The Responses API returned an invalid health-check tool call (name, call ID, or arguments)."
+msgstr "Responses API 返回的健康檢查工具呼叫無效，請檢查工具名稱、呼叫 ID 或參數。"
+
+#: settings/api/chat.py
+msgid "The model did not correctly return the health-check nonce after receiving the tool result."
+msgstr "模型收到工具結果後，未正確返回健康檢查隨機值。"
+
+#: settings/api/chat.py
 msgid "The model provider request limit was exceeded. Please try again later."
 msgstr "已超過模型服務商的請求頻率限制，請稍後重試。"
 
@@ -8433,7 +8479,7 @@ msgstr "測試手機號碼 該欄位是必填項。"
 
 #: settings/apps.py:7
 msgid "App Settings"
-msgstr "System Settings"
+msgstr "系統設置"
 
 #: settings/const.py:13
 msgid "Embed"
@@ -8885,11 +8931,11 @@ msgstr "請求方式"
 
 #: settings/serializers/auth/oauth2.py:50 settings/serializers/auth/oidc.py:90
 msgid "Userinfo endpoint"
-msgstr "User information endpoint address"
+msgstr "用戶信息端點地址"
 
 #: settings/serializers/auth/oauth2.py:53 settings/serializers/auth/oidc.py:93
 msgid "End session endpoint"
-msgstr "Logout session endpoint address"
+msgstr "註銷會話端點地址"
 
 #: settings/serializers/auth/oauth2.py:57
 msgid "When the user signs out, they also be logged out from the OAuth2 server"
@@ -8909,7 +8955,7 @@ msgstr "OIDC"
 
 #: settings/serializers/auth/oidc.py:17
 msgid "Base site URL"
-msgstr "JumpServer address"
+msgstr "JumpServer 地址"
 
 #: settings/serializers/auth/oidc.py:18
 msgid "The current site's URL is used to construct the callback address"
@@ -8925,7 +8971,7 @@ msgstr "共享會話"
 
 #: settings/serializers/auth/oidc.py:36
 msgid "Ignore SSL verification"
-msgstr "Ignore SSL certificate verification"
+msgstr "忽略 SSL 證書驗證"
 
 #: settings/serializers/auth/oidc.py:41
 msgid ""
@@ -8976,15 +9022,15 @@ msgstr ""
 
 #: settings/serializers/auth/oidc.py:87
 msgid "JWKS endpoint"
-msgstr "jwks endpoint address"
+msgstr "jwks 端點地址"
 
 #: settings/serializers/auth/oidc.py:96
 msgid "Signature algorithm"
-msgstr "Signature algorithm"
+msgstr "簽章演算法"
 
 #: settings/serializers/auth/oidc.py:99
 msgid "Signing key"
-msgstr "Signature Key"
+msgstr "簽名 Key"
 
 #: settings/serializers/auth/oidc.py:102
 msgid "Scopes"
@@ -8992,11 +9038,11 @@ msgstr "連接範圍"
 
 #: settings/serializers/auth/oidc.py:105
 msgid "ID Token max age (s)"
-msgstr "Token validity time (seconds)"
+msgstr "令牌有效時間 (秒)"
 
 #: settings/serializers/auth/oidc.py:108
 msgid "ID Token include claims"
-msgstr "Claims"
+msgstr "聲明"
 
 #: settings/serializers/auth/oidc.py:111
 msgid "Use state"
@@ -9012,7 +9058,7 @@ msgstr "只有 SSL 域名可以使用 Passkey(通行金鑰)認證"
 
 #: settings/serializers/auth/passkey.py:15
 msgid "FIDO Server ID"
-msgstr "Passkey Application Domain"
+msgstr "Passkey 服務域名"
 
 #: settings/serializers/auth/passkey.py:17
 msgid ""
@@ -9024,11 +9070,11 @@ msgstr ""
 
 #: settings/serializers/auth/passkey.py:22
 msgid "FIDO Server name"
-msgstr "Passkey Application Name"
+msgstr "Passkey 服務名稱"
 
 #: settings/serializers/auth/radius.py:23
 msgid "OTP in RADIUS"
-msgstr "Use Radius OTP"
+msgstr "使用 Radius OTP"
 
 #: settings/serializers/auth/radius.py:24
 msgid "* Using OTP in RADIUS means users can employ RADIUS as a method for MFA"
@@ -9040,11 +9086,11 @@ msgstr "SAML2"
 
 #: settings/serializers/auth/saml2.py:18
 msgid "IDP Metadata URL"
-msgstr "IDP Metadata Address"
+msgstr "IDP Metadata 地址"
 
 #: settings/serializers/auth/saml2.py:21
 msgid "IDP Metadata XML"
-msgstr "IDP Metadata XML"
+msgstr "身份提供商元數據 XML"
 
 #: settings/serializers/auth/saml2.py:24
 msgid "SP advanced settings"
@@ -9425,12 +9471,12 @@ msgstr "地域"
 
 #: settings/serializers/feature.py:142 terminal/serializers/storage.py:33
 msgid "Access key ID"
-msgstr "Access key ID(AK)"
+msgstr "訪問密鑰 ID（AK）"
 
 #: settings/serializers/feature.py:146 terminal/serializers/storage.py:37
 #: xpack/plugins/cloud/serializers/account_attrs.py:35
 msgid "Access key secret"
-msgstr "Access key secret(SK)"
+msgstr "訪問密鑰密文（SK）"
 
 #: settings/serializers/feature.py:151 settings/serializers/feature.py:154
 msgid "Chat AI"
@@ -9457,7 +9503,7 @@ msgstr "聊天服務的基本地址。"
 #: settings/serializers/feature.py:173 settings/serializers/feature.py:188
 #: templates/_header_bar.html:96
 msgid "API Key"
-msgstr "API Key"
+msgstr "API 密鑰"
 
 #: settings/serializers/feature.py:177 settings/serializers/feature.py:192
 msgid ""
@@ -9568,6 +9614,26 @@ msgstr "鍵盤布局"
 #: settings/serializers/luna.py:41 users/serializers/preference/luna.py:49
 msgid "RDP client option"
 msgstr "RDP 用戶端選項"
+
+#: users/serializers/preference/luna.py:52
+msgid "Printer redirection"
+msgstr "印表機重新導向"
+
+#: users/serializers/preference/luna.py:56
+msgid "Apply Windows key combinations"
+msgstr "Windows 組合鍵生效位置"
+
+#: users/const.py:38
+msgid "On the local computer"
+msgstr "在本機電腦上"
+
+#: users/const.py:39
+msgid "On the remote computer"
+msgstr "在遠端電腦上"
+
+#: users/const.py:40
+msgid "Only when using full screen"
+msgstr "僅在全螢幕顯示時"
 
 #: settings/serializers/luna.py:45 users/serializers/preference/luna.py:53
 msgid "RDP color quality"
@@ -12552,10 +12618,7 @@ msgid ""
 "*! The password for file encryption, used for decryption when the system "
 "sends emails containing file attachments. <br>Such as: account backup files, "
 "account password change results files"
-msgstr ""
-"File Encryption Password, when the system sends mails containing file "
-"attachments, use this password for decryption.<br>For example: Account "
-"backup file, Account password change result file"
+msgstr "文件加密密碼，當系統發送的郵件中包含文件附件時，使用此密碼進行解密。<br>如：賬號備份文件、賬號改密結果文件"
 
 #: users/serializers/preference/lina.py:39 users/serializers/profile.py:41
 msgid "The newly set password is inconsistent"
@@ -12604,8 +12667,7 @@ msgstr "系統角色"
 msgid ""
 "System roles are roles at the system level, and they will take effect across "
 "all organizations"
-msgstr ""
-"System role is a system-level role, it will be effective in all organizations"
+msgstr "系統角色是系統級別的角色，將在所有組織中生效"
 
 #: users/serializers/user.py:61
 msgid "Org roles"
@@ -12615,9 +12677,7 @@ msgstr "組織角色"
 msgid ""
 "Org roles are roles at the organization level, and they will only take "
 "effect within current organization"
-msgstr ""
-"Organization role is an organization-level role, it is only effective within "
-"the current organization"
+msgstr "組織角色是組織級別的角色，僅在當前組織內有效"
 
 #: users/serializers/user.py:70
 msgid "Organizations and roles"
@@ -12680,10 +12740,7 @@ msgid ""
 "User source identifies where the user was created, which could be AD or "
 "other sources.There are security settings that can restrict users to log in "
 "to the system only from the sources."
-msgstr ""
-"User origin identifies the location where the user was created. It can be AD "
-"or other sources. Security settings can restrict users to log in to the "
-"system only from designated sources."
+msgstr "用戶來源標識用戶的創建位置，可以是 AD 或其他來源。安全設置可以限制用戶只能從指定來源登錄系統。"
 
 #: users/serializers/user.py:266
 msgid "Is org admin"
@@ -12716,9 +12773,7 @@ msgstr "有公鑰"
 #: users/serializers/user.py:441
 msgid ""
 "* For security, only a partial of users is displayed. You can search for more"
-msgstr ""
-"*For security reasons, only a portion of users is displayed. You can search "
-"for more"
+msgstr "* 為安全起見，只顯示部分用戶。您可以搜索更多"
 
 #: users/serializers/user.py:477
 msgid "name not unique"
@@ -13062,9 +13117,7 @@ msgstr "XPack"
 msgid ""
 "Based on the current task configuration, assets that do not match the "
 "strategy will skipped."
-msgstr ""
-"According to the current task configuration, assets that do not conform to "
-"the \"\" policy will be skipped."
+msgstr "根據當前任務配置，不符合策略的資產將被跳過。"
 
 #: xpack/plugins/cloud/api.py:73
 msgid "Test connection successful"
@@ -13076,8 +13129,7 @@ msgstr "測試連接失敗：{}"
 
 #: xpack/plugins/cloud/api.py:209
 msgid "User {} deleted the current resource and released the assets"
-msgstr ""
-"User {} deleted the assets that have been released by the current resource"
+msgstr "用戶 {} 刪除了當前資源已釋放的資產"
 
 #: xpack/plugins/cloud/const.py:8
 msgid "Alibaba Cloud"
@@ -13254,11 +13306,11 @@ msgstr "帳號"
 
 #: xpack/plugins/cloud/manager.py:105
 msgid "Synchronization History List"
-msgstr "Synchronous history list"
+msgstr "同步歷史列表"
 
 #: xpack/plugins/cloud/manager.py:105
 msgid "Synchronization Instance List"
-msgstr "Synchronous instance list"
+msgstr "同步實例列表"
 
 #: xpack/plugins/cloud/manager.py:109
 msgid "To be released"
@@ -13271,22 +13323,19 @@ msgstr "同步地區"
 #: xpack/plugins/cloud/manager.py:149
 #, python-format
 msgid "Get instances of region \"%s\" error, error: %s"
-msgstr ""
-"An error occurred while getting the instances of Region \"%s\", Error: %s"
+msgstr "獲取區域 \"%s\" 的實例錯誤，錯誤：%s"
 
 #: xpack/plugins/cloud/manager.py:195
 #, python-format
 msgid "Failed to synchronize the instance \"%s\""
-msgstr "Unable to synchronize instance %s"
+msgstr "無法同步實例 %s"
 
 #: xpack/plugins/cloud/manager.py:386
 #, python-format
 msgid ""
 "The updated platform of asset \"%s\" is inconsistent with the original "
 "platform type. Skip platform and protocol updates"
-msgstr ""
-"The update platform of asset \"%s\" is not consistent with the original "
-"platform type. Skip platform and protocol updates"
+msgstr "資產 \"%s\" 的更新平台與原平台類型不一致。跳過平台和協議更新"
 
 #: xpack/plugins/cloud/manager.py:443
 #, python-format
@@ -13306,7 +13355,7 @@ msgstr "資產 \"%s\" 已更新"
 #: xpack/plugins/cloud/manager.py:457
 #, python-format
 msgid "Prepare to create asset \"%s\""
-msgstr "Preparing to create asset %s"
+msgstr "準備創建資產 %s"
 
 #: xpack/plugins/cloud/manager.py:478
 #, python-format
@@ -13704,7 +13753,7 @@ msgstr "華東-宿遷"
 #: xpack/plugins/cloud/providers/lan.py:79
 #, python-format
 msgid "Port \"%(port)s\" of instance IP \"%(ip)s\" is not reachable"
-msgstr "The port%(port)s of Instance IP %(ip)s is inaccessible."
+msgstr "實例 IP %(ip)s 的端口%(port)s 無法訪問"
 
 #: xpack/plugins/cloud/providers/scp.py:108
 msgid "Empty"
@@ -13720,11 +13769,11 @@ msgstr "服務商顯示"
 
 #: xpack/plugins/cloud/serializers/account.py:135
 msgid "Regions must be a JSON object."
-msgstr ""
+msgstr "區域必須為 JSON 物件。"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:32
 msgid "Access key id"
-msgstr "Access key id"
+msgstr "訪問密鑰 ID"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:59
 msgid "Subscription ID"
@@ -13829,7 +13878,7 @@ msgstr "測試超時時間"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:261
 msgid "Project"
-msgstr "project"
+msgstr "項目"
 
 #: xpack/plugins/cloud/serializers/task.py:168
 msgid "History count"
@@ -13957,9 +14006,6 @@ msgstr "許可證匯入成功"
 #: xpack/plugins/license/api.py:56
 msgid "Invalid license"
 msgstr "許可證無效"
-
-#~ msgid "Ticket already closed"
-#~ msgstr "工單已經關閉"
 
 #: assets/models/asset/web.py assets/const/protocol.py
 msgid "Success selector"
@@ -14096,6 +14142,3797 @@ msgstr "無效的 CIDR：%s"
 
 msgid "At least one CIDR is required when auto assignment is enabled."
 msgstr "啟用自動納入時，至少需要設定一個 CIDR 網段。"
+
+#: perms/utils/expire_soon_notice.py:36
+msgid "The notice time must be in the future."
+msgstr "提醒時間必須晚於目前時間。"
+
+#: perms/notifications.py:23
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:7
+msgid "Asset permission is about to expire"
+msgstr "資產授權即將到期"
+
+#: perms/templates/perms/_msg_asset_permission_expire_soon.html:12
+msgid "Expiration time"
+msgstr "到期時間"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "OpenBao SSH CA is not available: %(error)s"
+msgstr "SSH 憑證簽發服務無法使用：%(error)s"
+
+#: accounts/backends/openbao/service.py
+msgid "Enter an OpenBao service token."
+msgstr "請輸入 OpenBao 服務權杖。"
+
+#: accounts/backends/openbao/service.py
+msgid "The OpenBao service token is invalid, expired, or lacks permission. Check the token and its access policy."
+msgstr "服務權杖無效、已過期或權限不足，請檢查服務權杖及存取原則。"
+
+#: accounts/backends/openbao/service.py
+#, python-format
+msgid "The OpenBao service token cannot access %(resource)s. Grant %(capability)s permission for this path."
+msgstr "服務權杖無權存取 %(resource)s，請為該路徑授予 %(capability)s 權限。"
+
+#: accounts/api/account/application.py:79
+msgid "Successfully refreshed secret"
+msgstr "密文刷新成功"
+
+#: accounts/api/account/personal.py:93
+msgid "Inactive personal credentials cannot be tested"
+msgstr "無法測試未啓用的個人憑據"
+
+#: accounts/automations/change_secret/manager.py:43
+msgid "The currently managed password is required when Oracle password changes use the REPLACE clause"
+msgstr "使用 REPLACE 子句修改 Oracle 密碼時，必須提供當前托管的密碼"
+
+#: accounts/automations/verify_account/manager.py:137
+#, python-format
+msgid "Targets: %(credentials)s personal credential(s) on %(assets)s asset(s)"
+msgstr "目標：%(assets)s 個資產上的 %(credentials)s 個個人憑據"
+
+#: accounts/const/account.py:8
+msgid "SSH certificate"
+msgstr "SSH 證書"
+
+#: accounts/exceptions.py:43
+msgid "SSH certificate signing is unavailable. Please retry or contact your administrator."
+msgstr "SSH 證書簽發服務不可用，請重試或聯繫管理員。"
+
+#: accounts/exceptions.py:51
+msgid "This account follows template credentials. Confirm to stop following and modify its credentials."
+msgstr "此賬號正在跟隨模板憑據，請確認停止跟隨後再修改憑據。"
+
+#: accounts/models/account.py:119
+msgid "Follow template"
+msgstr "跟隨模板"
+
+#: accounts/models/account.py:177
+msgid "The source account template is unavailable."
+msgstr "來源賬號模板不可用。"
+
+#: accounts/models/account.py:179
+#: accounts/serializers/account/account.py:176
+msgid "Account and template secret types must match."
+msgstr "賬號與模板的密文類型必須一致。"
+
+#: accounts/models/account.py:196
+msgid "Disable template following before editing credentials."
+msgstr "請先停止跟隨模板，再修改憑據。"
+
+#: accounts/models/account.py:216
+msgid "Disable template following before changing the source."
+msgstr "請先停止跟隨模板，再修改來源。"
+
+#: accounts/models/account.py:218
+msgid "Disable template following before changing the secret type."
+msgstr "請先停止跟隨模板，再修改密文類型。"
+
+#: accounts/models/account.py:225
+msgid "Save the following state with the credential snapshot."
+msgstr "請將模板跟隨狀態與憑據快照一並保存。"
+
+#: accounts/models/account.py:228
+msgid "Provide credentials when changing the secret type."
+msgstr "修改密文類型時必須提供憑據。"
+
+#: accounts/models/account.py:240
+msgid "Only template accounts can follow a template."
+msgstr "只有來源為模板的賬號才能跟隨模板。"
+
+#: accounts/models/base.py:29
+msgid "Update template following through account save to preserve credentials."
+msgstr "請通過保存賬號來更新模板跟隨狀態，以保留憑據。"
+
+#: accounts/models/base.py:32
+msgid "Disable template following before editing credentials or their source."
+msgstr "請先停止跟隨模板，再修改憑據或其來源。"
+
+#: accounts/models/personal.py:17
+msgid "Owner"
+msgstr "所有者"
+
+#: accounts/models/personal.py:36
+#: accounts/personal_credentials.py:144
+#: accounts/personal_credentials.py:180
+msgid "Personal asset credential"
+msgstr "個人資產憑據"
+
+#: accounts/models/template.py:102
+msgid "Disable account template following before changing the secret type."
+msgstr "請先停止跟隨賬號模板，再修改密文類型。"
+
+#: accounts/personal_credentials.py:162
+msgid "Operation"
+msgstr "操作"
+
+#: accounts/personal_credentials.py:170
+msgid "Failure reason"
+msgstr "失敗原因"
+
+#: accounts/personal_credentials.py:196
+msgid "The personal credential has been updated. Please refresh and try again."
+msgstr "個人憑據已更新，請刷新後重試。"
+
+#: accounts/personal_credentials.py:204
+msgid "Invalid user"
+msgstr "無效用戶"
+
+#: accounts/personal_credentials.py:206
+msgid "Asset is inactive"
+msgstr "資產未啓用"
+
+#: accounts/personal_credentials.py:209
+msgid "Protocol is not supported for personal credentials"
+msgstr "個人憑據不支持此協議"
+
+#: accounts/personal_credentials.py:219
+msgid "Personal credentials require a manual or empty-secret asset account"
+msgstr "個人憑據需要手動輸入或密文為空的資產賬號"
+
+#: accounts/personal_credentials.py:230
+msgid "You do not have account permission for this asset"
+msgstr "您沒有此資產的賬號權限"
+
+#: accounts/personal_credentials.py:240
+msgid "Personal credentials require an empty-secret asset account"
+msgstr "個人憑據需要密文為空的資產賬號"
+
+#: accounts/personal_credentials.py:252
+msgid "Personal credential username must match the asset account"
+msgstr "個人憑據的用戶名必須與資產賬號一致"
+
+#: accounts/personal_credentials.py:301
+msgid "Credential verification method is unavailable"
+msgstr "憑據校驗方法不可用"
+
+#: accounts/personal_credentials.py:307
+msgid "Personal credential verification does not allow custom automation methods"
+msgstr "個人憑據校驗不允許使用自定義自動化方法"
+
+#: accounts/personal_credentials.py:338
+msgid "The configured credential verification method does not support this protocol"
+msgstr "配置的憑據校驗方法不支持此協議"
+
+#: accounts/personal_credentials.py:355
+msgid "Secret type is not supported by this protocol"
+msgstr "此協議不支持該密文類型"
+
+#: accounts/personal_credentials.py:383
+#: accounts/personal_credentials.py:421
+#: accounts/serializers/account/personal.py:188
+msgid "Personal credential not found"
+msgstr "未找到個人憑據"
+
+#: accounts/personal_credentials.py:450
+#: accounts/personal_credentials.py:469
+#: accounts/serializers/account/personal.py:169
+#: accounts/serializers/account/personal.py:211
+msgid "A personal credential with these fields already exists"
+msgstr "已存在具有相同字段的個人憑據"
+
+#: accounts/risk_handlers.py:44
+#, python-format
+msgid "Invalid risk type: %(type)s"
+msgstr "無效的風險類型：%(type)s"
+
+#: accounts/serializers/account/account.py:126
+msgid "Template not found"
+msgstr "未找到模板"
+
+#: accounts/serializers/account/account.py:172
+msgid "Following requires a valid account template in the same organization."
+msgstr "跟隨模板需要選擇同一組織內的有效賬號模板。"
+
+#: accounts/serializers/account/account.py:178
+msgid "Following accounts use template credentials."
+msgstr "跟隨模板的賬號使用模板中的憑據。"
+
+#: accounts/serializers/account/account.py:183
+msgid "Disable template following before editing this field."
+msgstr "請先停止跟隨模板，再修改此字段。"
+
+#: accounts/serializers/account/account.py:293
+msgid "Asset IP"
+msgstr "資產 IP"
+
+#: accounts/serializers/account/account.py:321
+#: accounts/serializers/account/account.py:409
+msgid "Only applies to template accounts. Credentials are read from the current template."
+msgstr "僅適用於從模板創建的賬號，憑據從當前模板讀取。"
+
+#: accounts/serializers/account/account.py:355
+msgid "Source template"
+msgstr "來源模板"
+
+#: accounts/serializers/account/base.py:68
+msgid "SSH certificate accounts cannot push or rotate credentials"
+msgstr "SSH 證書賬號不支持推送或輪換憑據"
+
+#: accounts/serializers/account/personal.py:48
+msgid "Expected version"
+msgstr "預期版本"
+
+#: accounts/serializers/account/personal.py:74
+#: assets/serializers/node.py:196
+#: settings/api/ssh_ca.py:37
+msgid "This field may not be blank."
+msgstr "此字段不能為空。"
+
+#: accounts/serializers/account/personal.py:91
+msgid "Username cannot be changed"
+msgstr "用戶名不能修改"
+
+#: accounts/serializers/account/personal.py:96
+msgid "Asset cannot be changed"
+msgstr "資產不能修改"
+
+#: accounts/serializers/account/personal.py:98
+msgid "Protocol cannot be changed"
+msgstr "協議不能修改"
+
+#: accounts/serializers/account/personal.py:106
+msgid "This field is only valid when updating"
+msgstr "此字段僅在更新時有效"
+
+#: accounts/serializers/account/personal.py:112
+#: accounts/serializers/account/personal.py:149
+#: accounts/serializers/account/personal.py:181
+msgid "Asset is not in the current organization"
+msgstr "資產不屬於當前組織"
+
+#: accounts/serializers/account/personal.py:128
+msgid "A new secret is required when changing the secret type"
+msgstr "修改密文類型時必須提供新的密文"
+
+#: accounts/serializers/account/service.py:57
+#, python-format
+msgid "At least one of the following fields must be provided: %(fields)s."
+msgstr "必須至少提供以下字段之一：%(fields)s。"
+
+#: accounts/tasks/template.py:16
+msgid "Synchronize template properties to following accounts without changing credentials."
+msgstr "將模板屬性同步到跟隨模板的賬號，保留現有憑據。"
+
+#: accounts/tasks/verify_account.py:69
+#: accounts/tasks/verify_account.py:88
+msgid "Verify personal credential connectivity"
+msgstr "校驗個人憑據的可連接性"
+
+#: accounts/tasks/verify_account.py:70
+msgid "Verify a user's personal asset credential"
+msgstr "校驗用戶的個人資產憑據"
+
+#: accounts/tasks/verify_account.py:106
+msgid "Personal credential verification failed"
+msgstr "個人憑據校驗失敗"
+
+#: accounts/templates/accounts/gather_account_report.html:76
+#: accounts/templates/accounts/gather_account_report.html:116
+msgid "No."
+msgstr "序號"
+
+#: acls/models/login_asset_acl.py:18
+msgid "Review exemption duration (hours)"
+msgstr "免審批時長（小時）"
+
+#: acls/models/login_asset_acl.py:19
+msgid "0 means approval is required for every connection."
+msgstr "0 表示每次連接都需要審批。"
+
+#: acls/serializers/base.py:114
+msgid "Account usernames, or @ALL to match all accounts."
+msgstr "填寫賬號用戶名，或使用 @ALL 匹配所有賬號。"
+
+#: acls/serializers/command_acl.py:24
+msgid "Use \"command\" for literal command names. Each line matches that command as a standalone word anywhere in the input, so \"rm\" also matches \"rm -rf\" and \"sudo rm\". Use \"regex\" only for custom patterns."
+msgstr "使用 \"command\" 匹配命令名稱。每行命令會匹配輸入中任意位置的獨立單詞，因此 \"rm\" 也會匹配 \"rm -rf\" 和 \"sudo rm\"。僅在需要自定義匹配模式時使用 \"regex\"。"
+
+#: assets/api/favorite_asset.py:133
+msgid "Some assets are not authorized for this user."
+msgstr "部分資產未授權給此用戶。"
+
+#: assets/api/platform.py:120
+msgid "Internal platform"
+msgstr "內置平台"
+
+#: assets/api/platform.py:169
+msgid "Missing platform.yml in package"
+msgstr "安裝包中缺少 platform.yml"
+
+#: assets/const/protocol.py:150
+msgid "Allow invalid certificate"
+msgstr "允許無效證書"
+
+#: assets/models/asset/web.py:9
+#: assets/serializers/asset/web.py:16
+msgid "Allowed sites"
+msgstr "允許訪問的站點"
+
+#: assets/serializers/asset/web.py:75
+msgid "Invalid selector"
+msgstr "無效的選擇器"
+
+#: assets/serializers/favorite_asset.py:35
+#: assets/serializers/favorite_asset.py:82
+#: assets/serializers/favorite_asset.py:148
+msgid "Invalid favorite folder."
+msgstr "無效的收藏夾。"
+
+#: assets/serializers/favorite_asset.py:40
+msgid "A folder cannot be moved below itself."
+msgstr "不能將文件夾移動到自身或其子文件夾下。"
+
+#: assets/serializers/favorite_asset.py:58
+msgid "A folder with this name already exists under the parent folder."
+msgstr "父文件夾下已存在同名文件夾。"
+
+#: assets/serializers/favorite_asset.py:96
+msgid "Asset is not authorized for this user."
+msgstr "此資產未授權給此用戶。"
+
+#: assets/validators.py:24
+msgid "The address cannot contain Ansible template override syntax"
+msgstr "地址不能包含 Ansible 模板覆蓋語法"
+
+#: audits/const.py:12
+msgid "Create file"
+msgstr "創建文件"
+
+#: audits/models.py:78
+msgid "Ticket audit"
+msgstr "工單審計"
+
+#: audits/serializers.py:57
+#, python-format
+msgid "Updating %(fields)s fields is not allowed"
+msgstr "不允許更新以下字段：%(fields)s"
+
+#: authentication/api/connection_token.py:532
+#: authentication/serializers/connection_token.py:96
+msgid "Personal credential connection tokens cannot be reusable"
+msgstr "個人憑據的連接令牌不能重復使用"
+
+#: authentication/api/connection_token.py:763
+msgid "Personal credentials can only be managed by their owner"
+msgstr "個人憑據只能由其所有者管理"
+
+#: authentication/api/connection_token.py:802
+msgid "A personal credential ID is required when a version is provided"
+msgstr "提供版本號時必須同時提供個人憑據 ID"
+
+#: authentication/api/connection_token.py:810
+msgid "Do not submit a username or secret when using a saved credential"
+msgstr "使用已保存的憑據時，請勿提交用戶名或密文"
+
+#: authentication/api/connection_token.py:909
+#: authentication/models/connection_token.py:204
+msgid "Connect method is not allowed for this asset"
+msgstr "此資產不允許使用該連接方式"
+
+#: authentication/api/connection_token.py:1246
+msgid "Token is expired at: {}"
+msgstr "令牌已於 {} 過期"
+
+#: authentication/api/connection_token.py:1259
+msgid "Not allow to view secret"
+msgstr "不允許查看密文"
+
+#: authentication/api/connection_token.py:1263
+msgid "Tinker must redeem its RDP login ticket to obtain credentials"
+msgstr "Tinker 必須兌換 RDP 登錄票據才能獲取憑據"
+
+#: authentication/api/connection_token.py:1268
+msgid "Token {} is not valid"
+msgstr "令牌 {} 無效"
+
+#: authentication/api/connection_token.py:1290
+#: authentication/api/rdp_login.py:144
+msgid "Invalid connection token"
+msgstr "無效的連接令牌"
+
+#: authentication/api/connection_token.py:1299
+msgid "Token expired"
+msgstr "令牌已過期"
+
+#: authentication/api/face.py:55
+msgid "missing field 'face_code'"
+msgstr "缺少字段 'face_code'"
+
+#: authentication/api/face.py:70
+msgid "token not exists or expired"
+msgstr "令牌不存在或已過期"
+
+#: authentication/api/face.py:129
+msgid "Token does not belong to the current face capture."
+msgstr "令牌不屬於當前人臉採集流程。"
+
+#: authentication/api/face.py:135
+msgid "Token does not exist or has expired."
+msgstr "令牌不存在或已過期。"
+
+#: authentication/api/face.py:246
+msgid "face codes not matched"
+msgstr "人臉特徵不匹配"
+
+#: authentication/api/rdp_login.py:42
+msgid "Only user and admin connection tokens support RDP token login"
+msgstr "只有用戶和管理員連接令牌支持 RDP 令牌登錄"
+
+#: authentication/api/rdp_login.py:47
+msgid "Connection permission is no longer valid"
+msgstr "連接權限已失效"
+
+#: authentication/api/rdp_login.py:51
+msgid "An enabled Applet connection is required"
+msgstr "需要已啓用的遠程應用連接"
+
+#: authentication/api/rdp_login.py:57
+msgid "A Tinker component must be bound to this host"
+msgstr "此主機必須綁定 Tinker 組件"
+
+#: authentication/api/rdp_login.py:63
+msgid "Applet is not available on this host"
+msgstr "此主機上的遠程應用不可用"
+
+#: authentication/api/rdp_login.py:67
+msgid "This component is not authorized for the host"
+msgstr "此組件未獲得該主機的授權"
+
+#: authentication/api/rdp_login.py:74
+msgid "The connection authorization has changed"
+msgstr "連接授權已變更"
+
+#: authentication/api/rdp_login.py:97
+#, python-format
+msgid "No compatible Applet host is available. Upgrade and redeploy an applet host with Tinker %(minimum)s or later."
+msgstr "沒有可用的兼容應用主機，請將應用主機的 Tinker 升級到 %(minimum)s 或更高版本並重新部署。"
+
+#: authentication/api/rdp_login.py:115
+msgid "Unable to issue an RDP login credential"
+msgstr "無法簽發 RDP 登錄憑據"
+
+#: authentication/api/rdp_login.py:140
+#: authentication/api/rdp_login.py:149
+msgid "Invalid or expired RDP login authorization"
+msgstr "RDP 登錄授權無效或已過期"
+
+#: authentication/api/rdp_login.py:156
+msgid "RDP login ticket has already been used"
+msgstr "RDP 登錄票據已被使用"
+
+#: authentication/api/sso.py:90
+msgid "authkey is required"
+msgstr "必須提供認證密鑰"
+
+#: authentication/api/token.py:46
+msgid "MFA unset, please set first"
+msgstr "尚未設置多因子認證，請先完成設置"
+
+#: authentication/backends/drf.py:94
+msgid "User is inactive or expired."
+msgstr "用戶未啓用或已過期。"
+
+#: authentication/backends/ldap.py:192
+msgid "failed to map the username to a DN."
+msgstr "無法將用戶名映射為 DN。"
+
+#: authentication/backends/ldap.py:201
+msgid "user DN/password rejected by LDAP server."
+msgstr "LDAP 服務器拒絕了用戶 DN 或密碼。"
+
+#: authentication/backends/passkey/fido.py:108
+#: authentication/backends/passkey/fido.py:146
+msgid "No state found"
+msgstr "未找到認證狀態"
+
+#: authentication/backends/token.py:25
+msgid "Token is invalid, expired at {}"
+msgstr "令牌無效，已於 {} 過期"
+
+#: authentication/errors/mfa.py:13
+msgid "Code invalid, can not get user info"
+msgstr "驗證碼無效，無法獲取用戶信息"
+
+#: authentication/mixins.py:611
+msgid "Face recognition token is missing from the session."
+msgstr "會話中缺少人臉識別令牌。"
+
+#: authentication/mixins.py:619
+#, python-format
+msgid "Face recognition context does not exist for token: %(token)s"
+msgstr "令牌 %(token)s 對應的人臉識別上下文不存在"
+
+#: authentication/mixins.py:626
+msgid "Face recognition is not yet completed."
+msgstr "人臉識別尚未完成。"
+
+#: authentication/mixins.py:634
+msgid "Face code is missing from the context."
+msgstr "上下文中缺少人臉特徵。"
+
+#: authentication/models/connection_token.py:54
+msgid "Personal credential ID"
+msgstr "個人憑據 ID"
+
+#: authentication/models/connection_token.py:57
+#: authentication/serializers/connection_token.py:31
+msgid "Personal credential version"
+msgstr "個人憑據版本"
+
+#: authentication/models/connection_token.py:255
+msgid "Personal credential version is missing"
+msgstr "缺少個人憑據版本"
+
+#: authentication/models/connection_token.py:287
+msgid "Personal credential is no longer available"
+msgstr "個人憑據已不可用"
+
+#: authentication/models/connection_token.py:333
+msgid "No provider available, please check the virtual app publication and provider status"
+msgstr "沒有可用的應用提供者，請檢查虛擬應用的發佈狀態和應用提供者狀態"
+
+#: authentication/models/connection_token.py:383
+msgid "Personal credential no longer matches the asset account"
+msgstr "個人憑據與資產賬號已不再匹配"
+
+#: authentication/notifications.py:17
+msgid "Temporary password"
+msgstr "臨時密碼"
+
+#: authentication/notifications.py:20
+msgid "Private token"
+msgstr "私有令牌"
+
+#: authentication/notifications.py:41
+msgid "Credential created reminder"
+msgstr "憑據創建提醒"
+
+#: authentication/notifications.py:45
+#: authentication/templates/authentication/_msg_credential_created.html:5
+msgid "Credential type"
+msgstr "憑據類型"
+
+#: authentication/notifications.py:46
+#: authentication/templates/authentication/_msg_credential_created.html:6
+msgid "Identifier"
+msgstr "標識"
+
+#: authentication/notifications.py:73
+msgid "Credential activity summary"
+msgstr "憑據活動摘要"
+
+#: authentication/notifications.py:77
+msgid "Credential activity"
+msgstr "憑據活動"
+
+#: authentication/serializers/connect_token_secret.py:164
+msgid "SSH public key"
+msgstr "SSH 公鑰"
+
+#: authentication/serializers/connect_token_secret.py:268
+msgid "Virtual app provider is required"
+msgstr "必須選擇虛擬應用提供者"
+
+#: authentication/serializers/connect_token_secret.py:270
+msgid "Virtual app provider requires an SSH host"
+msgstr "虛擬應用提供者需要支持 SSH 的主機"
+
+#: authentication/serializers/connect_token_secret.py:273
+msgid "Virtual app provider requires an active SSH account"
+msgstr "虛擬應用提供者需要已啓用的 SSH 賬號"
+
+#: authentication/serializers/connection_token.py:27
+msgid "Save personal credential"
+msgstr "保存個人憑據"
+
+#: authentication/serializers/rdp_login.py:22
+#: authentication/serializers/rdp_login.py:27
+#: authentication/serializers/rdp_login.py:30
+msgid "Invalid login credential"
+msgstr "無效的登錄憑據"
+
+#: authentication/serializers/token.py:67
+msgid "user id {} not exist"
+msgstr "用戶 ID {} 不存在"
+
+#: authentication/services/rdp_login.py:18
+msgid "RDP login ticket cache is unavailable"
+msgstr "RDP 登錄票據緩存不可用"
+
+#: authentication/services/ssh_certificate.py:47
+msgid "SSH public key is too long"
+msgstr "SSH 公鑰過長"
+
+#: authentication/services/ssh_certificate.py:53
+msgid "An SSH certificate cannot be signed again"
+msgstr "不能再次簽發已有的 SSH 證書"
+
+#: authentication/services/ssh_certificate.py:64
+msgid "Asset permission has expired"
+msgstr "資產授權已過期"
+
+#: authentication/services/ssh_certificate.py:74
+msgid "The account does not use SSH certificate authentication"
+msgstr "此賬號未使用 SSH 證書認證"
+
+#: authentication/services/ssh_certificate.py:76
+msgid "Virtual accounts cannot use SSH certificate authentication"
+msgstr "虛擬賬號不能使用 SSH 證書認證"
+
+#: authentication/services/ssh_certificate.py:78
+msgid "SSH certificate accounts require a username"
+msgstr "SSH 證書賬號必須設置用戶名"
+
+#: authentication/services/ssh_certificate.py:80
+msgid "SSH certificates only support SSH and SFTP protocols"
+msgstr "SSH 證書僅支持 SSH 和 SFTP 協議"
+
+#: authentication/tasks.py:43
+msgid "Send credential activity summary"
+msgstr "發送憑據活動摘要"
+
+#: authentication/tasks.py:44
+msgid "Send users a summary of credential creation and successful use in the past 24 hours"
+msgstr "向用戶發送過去 24 小時內憑據創建和成功使用情況的摘要"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:2
+#: authentication/templates/authentication/_msg_credential_created.html:2
+#, python-format
+msgid "Hello %(name)s,"
+msgstr "您好，%(name)s："
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:3
+msgid "The following credential activity occurred in the past 24 hours."
+msgstr "以下是您過去 24 小時內的憑據活動情況。"
+
+#: authentication/templates/authentication/_msg_credential_activity_digest.html:16
+msgid "If you do not recognize this activity, revoke the credential and contact your administrator immediately."
+msgstr "如發現非本人操作，請立即撤銷相關憑據並聯繫管理員。"
+
+#: authentication/templates/authentication/_msg_credential_created.html:3
+msgid "A new credential was created for your account."
+msgstr "您的賬號已創建新的憑據。"
+
+#: authentication/templates/authentication/_msg_credential_created.html:10
+msgid "If this was not you, revoke the credential and contact your administrator immediately."
+msgstr "如非本人操作，請立即撤銷該憑據並聯繫管理員。"
+
+#: authentication/templates/authentication/face_capture.html:60
+#: authentication/templates/authentication/face_capture.html:145
+msgid "Face recognition failed"
+msgstr "人臉識別失敗"
+
+#: authentication/templates/authentication/face_capture.html:93
+msgid "Failed to start face recognition"
+msgstr "啓動人臉識別失敗"
+
+#: authentication/templates/authentication/face_capture.html:129
+msgid "Face capture expired. Please retry."
+msgstr "人臉採集已過期，請重試。"
+
+#: authentication/templates/authentication/passkey.html:8
+msgid "Login passkey"
+msgstr "通行密鑰登錄"
+
+#: authentication/views/base.py:61
+msgid "A local account with the same username already exists. Please log in with another authentication method and bind this account before using it to log in."
+msgstr "已存在同名本地賬號，請先使用其他認證方式登錄並綁定此賬號，再使用此方式登錄。"
+
+#: chat_ai/api/runtime_store.py:39
+msgid "The runtime store request exceeds the 64 MiB record limit."
+msgstr "運行時存儲請求超出了 64 MiB 的記錄大小限制。"
+
+#: chat_ai/api/runtime_store.py:58
+#, python-format
+msgid "JSON parse error - %(error)s"
+msgstr "JSON 解析錯誤 - %(error)s"
+
+#: chat_ai/api/runtime_store.py:62
+msgid "Only a Kael terminal service account may access the runtime store."
+msgstr "只有 Kael 終端服務賬號可以訪問運行時存儲。"
+
+#: chat_ai/api/runtime_store.py:75
+msgid "A JSON object is required."
+msgstr "必須提供 JSON 對象。"
+
+#: chat_ai/api/runtime_store.py:79
+#, python-format
+msgid "Unknown field(s): %(fields)s."
+msgstr "未知字段：%(fields)s。"
+
+#: chat_ai/api/runtime_store.py:108
+msgid "A UUID string is required."
+msgstr "必須提供 UUID 字符串。"
+
+#: chat_ai/api/runtime_store.py:111
+msgid "A non-negative integer is required."
+msgstr "必須提供非負整數。"
+
+#: chat_ai/api/runtime_store.py:114
+msgid "A boolean is required."
+msgstr "必須提供布爾值。"
+
+#: chat_ai/api/runtime_store.py:116
+msgid "A string is required."
+msgstr "必須提供字符串。"
+
+#: chat_ai/api/runtime_store.py:118
+msgid "A hexadecimal string is required."
+msgstr "必須提供十六進制字符串。"
+
+#: chat_ai/api/runtime_store.py:124
+msgid "The journal record exceeds the 64 MiB limit."
+msgstr "日誌記錄超出了 64 MiB 的大小限制。"
+
+#: chat_ai/api/runtime_store.py:128
+msgid "The journal record must contain exactly one JSON line."
+msgstr "日誌記錄必須恰好包含一行 JSON 數據。"
+
+#: chat_ai/api/runtime_store.py:132
+msgid "The journal record is not valid JSON."
+msgstr "日誌記錄不是有效的 JSON 數據。"
+
+#: chat_ai/api/runtime_store.py:135
+msgid "The journal record must contain version, created_at, payload, and checksum."
+msgstr "日誌記錄必須包含 version、created_at、payload 和 checksum 字段。"
+
+#: chat_ai/api/runtime_store.py:139
+msgid "Unsupported journal record version."
+msgstr "不支持此日誌記錄版本。"
+
+#: chat_ai/api/runtime_store.py:146
+msgid "The journal record created_at is invalid."
+msgstr "日誌記錄的 created_at 無效。"
+
+#: chat_ai/api/runtime_store.py:150
+#: chat_ai/api/runtime_store.py:155
+msgid "The journal record payload or checksum is invalid."
+msgstr "日誌記錄的 payload 或 checksum 無效。"
+
+#: chat_ai/api/runtime_store.py:158
+msgid "The journal record checksum does not match its payload."
+msgstr "日誌記錄的校驗和與其數據內容不匹配。"
+
+#: chat_ai/api/runtime_store.py:234
+msgid "Invalid runtime store access key."
+msgstr "無效的運行時存儲訪問密鑰。"
+
+#: chat_ai/api/runtime_store.py:311
+msgid "Invalid runtime store commit integrity."
+msgstr "運行時存儲提交的完整性校驗無效。"
+
+#: chat_ai/api/runtime_store.py:361
+msgid "The runtime store revision has changed."
+msgstr "運行時存儲的版本已變更。"
+
+#: chat_ai/authentication.py:21
+msgid "Invalid Chat AI delegation credential."
+msgstr "無效的 AI 聊天委託憑據。"
+
+#: chat_ai/authentication.py:25
+msgid "Chat AI delegation operation mismatch."
+msgstr "AI 聊天委託操作不匹配。"
+
+#: chat_ai/authentication.py:27
+msgid "Chat AI delegation organization mismatch."
+msgstr "AI 聊天委託的組織不匹配。"
+
+#: chat_ai/authentication.py:30
+msgid "Chat AI delegation organization context mismatch."
+msgstr "AI 聊天委託的組織上下文不匹配。"
+
+#: chat_ai/authentication.py:32
+msgid "Chat AI delegation request mismatch."
+msgstr "AI 聊天委託請求不匹配。"
+
+#: chat_ai/authentication.py:41
+msgid "Chat AI delegation request could not be verified."
+msgstr "無法驗證 AI 聊天委託請求。"
+
+#: chat_ai/authentication.py:43
+msgid "Chat AI delegation request body mismatch."
+msgstr "AI 聊天委託請求體不匹配。"
+
+#: chat_ai/authentication.py:48
+msgid "Chat AI delegation replay protection is unavailable."
+msgstr "AI 聊天委託的防重放服務不可用。"
+
+#: chat_ai/authentication.py:50
+msgid "Chat AI delegation credential was already used."
+msgstr "AI 聊天委託憑據已被使用。"
+
+#: chat_ai/authentication.py:53
+msgid "Chat AI delegation user is invalid."
+msgstr "AI 聊天委託的用戶無效。"
+
+#: chat_ai/models.py:20
+msgid "Chat AI runtime store"
+msgstr "AI 聊天運行時存儲"
+
+#: chat_ai/models.py:28
+msgid "Runtime store"
+msgstr "運行時存儲"
+
+#: chat_ai/models.py:51
+msgid "Chat AI runtime store record"
+msgstr "AI 聊天運行時存儲記錄"
+
+#: common/auth/signature.py:13
+msgid "Invalid signature."
+msgstr "無效的簽名。"
+
+#: common/auth/signature.py:14
+msgid "Ip is not in access ip list."
+msgstr "IP 不在允許訪問的列表中。"
+
+#: common/db/fields.py:611
+msgid "Invalid JSON data for JSONManyToManyField."
+msgstr "JSONManyToManyField 的 JSON 數據無效。"
+
+#: common/drf/exc_handlers.py:66
+#: jumpserver/views/error_views.py:20
+msgid "Server internal error"
+msgstr "服務器內部錯誤"
+
+#: common/drf/filters.py:1011
+msgid "attr_rules should be base64"
+msgstr "attr_rules 必須使用 Base64 編碼"
+
+#: common/drf/filters.py:1015
+msgid "attr_rules should be json"
+msgstr "attr_rules 必須為 JSON 格式"
+
+#: common/drf/parsers/excel.py:43
+#: common/drf/parsers/excel.py:70
+#: common/drf/parsers/excel.py:80
+msgid "Excel worksheet exceeds import limits"
+msgstr "Excel 工作表超出導入限制"
+
+#: common/drf/parsers/excel.py:62
+#: common/drf/parsers/excel.py:64
+msgid "Invalid excel worksheet range"
+msgstr "無效的 Excel 工作表範圍"
+
+#: common/drf/parsers/excel.py:74
+#: common/drf/parsers/excel.py:107
+msgid "Too many excel worksheets"
+msgstr "Excel 工作表數量過多"
+
+#: common/drf/parsers/excel.py:113
+msgid "Excel workbook exceeds import limits"
+msgstr "Excel 工作簿超出導入限制"
+
+#: common/sdk/im/exceptions.py:8
+msgid "HTTP status is not 200"
+msgstr "HTTP 狀態碼不是 200"
+
+#: common/sdk/im/exceptions.py:13
+msgid "Error code is not 0"
+msgstr "錯誤碼不是 0"
+
+#: common/sdk/im/exceptions.py:18
+msgid "Response data key error"
+msgstr "響應數據的鍵錯誤"
+
+#: common/sdk/sms/custom_file.py:48
+msgid "Custom file SMS sending failed"
+msgstr "自定義文件短信發送失敗"
+
+#: common/serializers/mixin.py:190
+msgid "id or pk not in data"
+msgstr "數據中缺少 id 或 pk"
+
+#: jumpserver/middleware.py:157
+msgid "Service temporarily unavailable"
+msgstr "服務暫時不可用"
+
+#: jumpserver/middleware.py:158
+msgid "Database operation failed, please try again later."
+msgstr "數據庫操作失敗，請稍後重試。"
+
+#: notifications/api/notifications.py:218
+msgid "template_name is required"
+msgstr "必須提供 template_name"
+
+#: notifications/serializers/notifications.py:58
+#, python-format
+msgid "Template syntax error at line: %(line)s"
+msgstr "模板第 %(line)s 行存在語法錯誤"
+
+#: ops/api/playbook.py:77
+msgid "Invalid clone_from id"
+msgstr "無效的 clone_from ID"
+
+#: ops/api/playbook.py:81
+msgid "clone playbook file not found"
+msgstr "未找到要克隆的 Playbook 文件"
+
+#: ops/api/playbook.py:93
+msgid "Unzip failed"
+msgstr "解壓失敗"
+
+#: ops/models/job.py:342
+#, python-brace-format
+msgid "Undefined job variable: {name}"
+msgstr "未定義的作業變量：{name}"
+
+#: ops/models/job.py:544
+#: ops/models/job.py:590
+msgid "Quick command"
+msgstr "快捷命令"
+
+#: ops/models/job.py:545
+msgid "Matched a command filter policy"
+msgstr "命中命令過濾策略"
+
+#: ops/models/job.py:591
+msgid "Matched the job center command blacklist"
+msgstr "命中作業中心命令黑名單"
+
+#: ops/serializers/variable.py:114
+msgid "One of 'job', 'adhoc', or 'playbook' is required."
+msgstr "必須提供 'job'、'adhoc' 或 'playbook' 中的一項。"
+
+#: ops/serializers/variable.py:123
+msgid "Invalid job, adhoc, or playbook ID."
+msgstr "無效的作業、即時任務或 Playbook ID。"
+
+#: ops/serializers/variable.py:155
+#, python-format
+msgid "Invalid options format: %(error)s"
+msgstr "選項格式無效：%(error)s"
+
+#: ops/ws.py:71
+msgid "Task not found"
+msgstr "未找到任務"
+
+#: ops/ws.py:87
+msgid "No permission"
+msgstr "沒有權限"
+
+#: perms/filters.py:93
+msgid "Include inherited permissions"
+msgstr "包含繼承的權限"
+
+#: perms/filters.py:180
+#: users/tree.py:107
+msgid "Ungrouped users"
+msgstr "未分組用戶"
+
+#: perms/models/asset_permission.py:83
+#: tickets/models/ticket/apply_asset.py:23
+msgid "Expiration-soon notice minutes"
+msgstr "到期前通知時間（分鐘）"
+
+#: perms/models/asset_permission.py:86
+msgid "Expiration-soon notice time"
+msgstr "到期前通知時間"
+
+#: perms/models/asset_permission.py:89
+msgid "Expiration-soon notice sent time"
+msgstr "到期前通知發送時間"
+
+#: perms/serializers/tree.py:44
+msgid "This list may not be empty."
+msgstr "此列表不能為空。"
+
+#: perms/tasks.py:131
+msgid "Send asset permission expiration-soon notification"
+msgstr "發送資產授權即將到期通知"
+
+#: perms/tasks.py:133
+msgid "Check due asset permission expiration-soon notices every minute and enqueue notifications"
+msgstr "每分鐘檢查需要發送的資產授權到期提醒，並將通知加入隊列"
+
+#: perms/utils/expire_soon_notice.py:28
+msgid "Ensure this value is greater than 0."
+msgstr "請確保此值大於 0。"
+
+#: rbac/serializers/rolebinding.py:57
+msgid "Only organization roles can be bound"
+msgstr "只能綁定組織角色"
+
+#: reports/api/report.py:133
+msgid "Unsupported report type"
+msgstr "不支持此報表類型"
+
+#: reports/api/report.py:135
+msgid "Report type can not be modified"
+msgstr "報表類型不能修改"
+
+#: reports/api/report.py:142
+msgid "Invalid days"
+msgstr "無效的天數"
+
+#: reports/api/report.py:144
+msgid "Days must be one of: 1, 7, 30"
+msgstr "天數必須為 1、7 或 30"
+
+#: reports/api/report.py:149
+msgid "Filters must be a dict"
+msgstr "篩選條件必須為字典"
+
+#: reports/api/report.py:233
+msgid "Builtin report template can not be modified"
+msgstr "不能修改內置報表模板"
+
+#: reports/api/report.py:238
+msgid "Builtin report template can not be deleted"
+msgstr "不能刪除內置報表模板"
+
+#: settings/api/chat.py:149
+msgid "Unable to connect to the model provider"
+msgstr "無法連接到模型提供商"
+
+#: settings/api/chat.py:199
+msgid "Please select or enter a model first"
+msgstr "請先選擇或輸入模型"
+
+#: settings/api/chat.py:240
+msgid "The provider is reachable, but the selected model does not support the required tool calls"
+msgstr "可以連接到模型提供商，但所選模型不支持所需的工具調用"
+
+#: settings/models.py:176
+msgid "Can change basic setting"
+msgstr "基本設置"
+
+#: settings/serializers/auth/dingtalk.py:13
+msgid "Agent ID"
+msgstr "代理 ID"
+
+#: settings/serializers/auth/dingtalk.py:14
+#: settings/serializers/auth/sms.py:67
+msgid "App Key"
+msgstr "應用密鑰"
+
+#: settings/serializers/auth/dingtalk.py:15
+#: settings/serializers/auth/feishu.py:16
+#: settings/serializers/auth/lark.py:15
+#: settings/serializers/auth/sms.py:68
+#: settings/serializers/auth/wecom.py:15
+msgid "App Secret"
+msgstr "應用密文"
+
+#: settings/serializers/auth/feishu.py:15
+#: settings/serializers/auth/lark.py:14
+msgid "App ID"
+msgstr "應用 ID"
+
+#: settings/serializers/auth/oauth2.py:79
+msgid "User attribute mapping, where the `key` is this system user attribute name and the `value` is the OAuth2 service user attribute name. Use dot-separated paths for nested attributes, e.g. `attributes.account_no`"
+msgstr "用戶屬性映射，`key` 為本系統的用戶屬性名，`value` 為 OAuth2 服務的用戶屬性名。嵌套屬性使用點分隔的路徑，例如 `attributes.account_no`"
+
+#: settings/serializers/auth/saml2.py:30
+msgid "Controls verification when downloading IDP Metadata"
+msgstr "控制下載 IDP Metadata 時的 TLS 證書校驗"
+
+#: settings/serializers/auth/slack.py:16
+msgid "Client bot Token"
+msgstr "客戶端機器人令牌"
+
+#: settings/serializers/auth/sms.py:50
+msgid "Access Key ID"
+msgstr "訪問密鑰 ID"
+
+#: settings/serializers/auth/sms.py:52
+msgid "Access Key Secret"
+msgstr "訪問密鑰密文"
+
+#: settings/serializers/auth/sms.py:59
+msgid "Secret ID"
+msgstr "密鑰 ID"
+
+#: settings/serializers/auth/sms.py:60
+msgid "Secret Key"
+msgstr "密鑰"
+
+#: settings/serializers/auth/sms.py:61
+msgid "SDK APP ID"
+msgstr "SDK 應用 ID"
+
+#: settings/serializers/auth/wecom.py:13
+msgid "Corporation ID"
+msgstr "企業 ID"
+
+#: settings/serializers/auth/wecom.py:14
+msgid "App Agent ID"
+msgstr "應用代理 ID"
+
+#: settings/serializers/feature.py:39
+msgid "Enter a valid HTTP or HTTPS URL."
+msgstr "請輸入有效的 HTTP 或 HTTPS 地址。"
+
+#: settings/serializers/feature.py:53
+msgid "Enter a new credential when changing its destination."
+msgstr "修改憑據的目標地址時，請輸入新的憑據。"
+
+#: settings/serializers/feature.py:186
+#: settings/serializers/feature.py:226
+msgid "Verify TLS certificate"
+msgstr "校驗 TLS 證書"
+
+#: settings/serializers/feature.py:192
+#: settings/serializers/feature.py:232
+msgid "PEM CA certificate used to verify the OpenBao server"
+msgstr "用於校驗 OpenBao 服務器的 PEM 格式 CA 證書"
+
+#: settings/serializers/feature.py:202
+msgid "OpenBao SSH CA"
+msgstr "OpenBao SSH 證書頒發機構"
+
+#: settings/serializers/feature.py:220
+msgid "Certificate validity (seconds)"
+msgstr "證書有效期（秒）"
+
+#: settings/serializers/feature.py:237
+msgid "Allowed source addresses"
+msgstr "允許的來源地址"
+
+#: settings/serializers/feature.py:238
+msgid "Comma-separated CIDRs seen by the target SSH server"
+msgstr "目標 SSH 服務器所見的來源地址，以逗號分隔的 CIDR 網段表示"
+
+#: settings/serializers/feature.py:297
+msgid "Built-in API"
+msgstr "內置 API"
+
+#: settings/serializers/feature.py:297
+msgid "iframe embed"
+msgstr "iframe 嵌入"
+
+#: settings/serializers/feature.py:301
+msgid "iframe URL"
+msgstr "iframe 地址"
+
+#: settings/serializers/feature.py:302
+msgid "The page URL loaded in the isolated AI assistant iframe."
+msgstr "在獨立的 AI 助手 iframe 中加載的頁面地址。"
+
+#: settings/serializers/feature.py:308
+msgid "OpenAI-compatible API base URL, usually ending in /v1."
+msgstr "兼容 OpenAI 的 API 基礎地址，通常以 /v1 結尾。"
+
+#: settings/serializers/feature.py:315
+msgid "HTTP proxy used to reach the model provider. For example: http://ip:port"
+msgstr "用於連接模型提供商的 HTTP 代理，例如：http://ip:port"
+
+#: settings/serializers/feature.py:319
+msgid "Discover models from the provider or enter a model ID manually."
+msgstr "從模型提供商獲取模型列表，或手動輸入模型 ID。"
+
+#: settings/utils/ldap.py:90
+msgid "Invalid LDAP distinguishedName encoding"
+msgstr "無效的 LDAP distinguishedName 編碼"
+
+#: settings/utils/ldap.py:97
+msgid "LDAP user distinguishedName is empty, cannot map OU group"
+msgstr "LDAP 用戶的 distinguishedName 為空，無法映射 OU 用戶組"
+
+#: settings/utils/ldap.py:103
+msgid "Invalid LDAP distinguishedName: {}"
+msgstr "無效的 LDAP distinguishedName：{}"
+
+#: settings/utils/ldap.py:111
+msgid "LDAP distinguishedName has no OU, cannot map user group: {}"
+msgstr "LDAP distinguishedName 中沒有 OU，無法映射用戶組：{}"
+
+#: settings/utils/ldap.py:121
+msgid "LDAP distinguishedName has no OU, cannot map user group"
+msgstr "LDAP distinguishedName 中沒有 OU，無法映射用戶組"
+
+#: settings/utils/ldap.py:126
+msgid "LDAP OU group name exceeds {} characters: {}"
+msgstr "LDAP OU 用戶組名稱超過 {} 個字符：{}"
+
+#: settings/utils/ldap.py:561
+msgid "LDAP user groups must be a list"
+msgstr "LDAP 用戶組必須為列表"
+
+#: settings/utils/ldap.py:573
+msgid "Failed to map LDAP user group from distinguishedName: no OU found"
+msgstr "無法從 distinguishedName 映射 LDAP 用戶組：未找到 OU"
+
+#: settings/ws.py:299
+msgid "Invalid organization IDs"
+msgstr "無效的組織 ID"
+
+#: settings/ws.py:302
+msgid "Invalid target organizations"
+msgstr "無效的目標組織"
+
+#: settings/ws.py:306
+msgid "A target organization is required"
+msgstr "必須指定目標組織"
+
+#: templates/500.html:7
+msgid "Server error"
+msgstr "服務器錯誤"
+
+#: templates/500.html:10
+msgid "Server error occur, contact administrator"
+msgstr "服務器發生錯誤，請聯繫管理員"
+
+#: templates/_copyright.html:3
+msgid "Copyright"
+msgstr "版權所有"
+
+#: terminal/api/applet/applet.py:143
+msgid "Applet is not null"
+msgstr "遠程應用不能為空"
+
+#: terminal/api/applet/host.py:31
+msgid "Needs attention"
+msgstr "需要處理"
+
+#: terminal/api/applet/host.py:78
+msgid "Windows runtime accounts are managed locally by Tinker."
+msgstr "Windows 運行賬號由 Tinker 在本地管理。"
+
+#: terminal/api/session/session.py:362
+msgid "Replay index not found."
+msgstr "未找到錄像索引。"
+
+#: terminal/api/session/session.py:365
+msgid "Replay index is invalid."
+msgstr "錄像索引無效。"
+
+#: terminal/api/session/session.py:368
+msgid "Replay index is unavailable."
+msgstr "錄像索引不可用。"
+
+#: terminal/api/virtualapp/provider.py:93
+msgid "Wait for the current deployment to finish before deleting the provider"
+msgstr "請等待當前部署完成後再刪除應用提供者"
+
+#: terminal/api/virtualapp/provider.py:182
+msgid "A deployment is already pending or running for this provider"
+msgstr "此應用提供者已有等待中或運行中的部署任務"
+
+#: terminal/api/virtualapp/virtualapp.py:115
+msgid "Image architecture is required"
+msgstr "必須指定鏡像架構"
+
+#: terminal/automations/deploy_app_provider/__init__.py:35
+msgid "Invalid virtual application offline manifest"
+msgstr "無效的虛擬應用離線清單"
+
+#: terminal/automations/deploy_app_provider/__init__.py:69
+msgid "Invalid Panda offline image ID"
+msgstr "無效的 Panda 離線鏡像 ID"
+
+#: terminal/automations/deploy_app_provider/__init__.py:127
+msgid "No deployable SSH host: check the privileged account and platform automation"
+msgstr "沒有可部署的 SSH 主機，請檢查特權賬號和平台自動化配置"
+
+#: terminal/automations/deploy_app_provider/__init__.py:130
+msgid "Application provider deployment requires SSH"
+msgstr "部署應用提供者需要 SSH 協議"
+
+#: terminal/automations/deploy_app_provider/__init__.py:154
+msgid "Provider terminal must be Panda"
+msgstr "應用提供者的終端必須為 Panda"
+
+#: terminal/automations/deploy_applet_host/__init__.py:111
+msgid "Applet host terminal must be Tinker"
+msgstr "應用主機的終端必須為 Tinker"
+
+#: terminal/automations/deploy_applet_host/__init__.py:122
+msgid "Tinker component has no active access key"
+msgstr "Tinker 組件沒有已啓用的訪問密鑰"
+
+#: terminal/automations/deploy_applet_host/__init__.py:140
+#: terminal/automations/deploy_applet_host/__init__.py:158
+msgid "Tinker component binding changed during deployment"
+msgstr "部署過程中 Tinker 組件的綁定關係已變更"
+
+#: terminal/automations/deploy_applet_host/__init__.py:147
+msgid "Unconfirmed Tinker component is not a service account"
+msgstr "待確認的 Tinker 組件未使用服務賬號"
+
+#: terminal/automations/deploy_applet_host/__init__.py:180
+msgid "applet is required for uninstall_applet"
+msgstr "執行 uninstall_applet 時必須指定遠程應用"
+
+#: terminal/const.py:91
+msgid "Built-in browser"
+msgstr "內置瀏覽器"
+
+#: terminal/models/applet/applet.py:115
+#: terminal/models/virtualapp/virtualapp.py:80
+msgid "Missing name in manifest.yml"
+msgstr "manifest.yml 中缺少名稱"
+
+#: terminal/models/applet/host.py:16
+msgid "Tinker version"
+msgstr "Tinker 版本"
+
+#: terminal/models/applet/host.py:50
+#: terminal/models/virtualapp/provider.py:55
+msgid "Request user has no terminal"
+msgstr "請求用戶沒有關聯的終端"
+
+#: terminal/models/applet/host.py:52
+msgid "Only Tinker terminals can bind an applet host"
+msgstr "只有 Tinker 終端可以綁定應用主機"
+
+#: terminal/models/applet/host.py:56
+msgid "Terminal is not bound to this applet host"
+msgstr "終端未綁定到此應用主機"
+
+#: terminal/models/session/sharing.py:172
+msgid "Session sharing or user does not exist"
+msgstr "會話分享或用戶不存在"
+
+#: terminal/models/virtualapp/provider.py:57
+msgid "Only Panda terminals can bind an application provider"
+msgstr "只有 Panda 終端可以綁定應用提供者"
+
+#: terminal/models/virtualapp/provider.py:62
+msgid "Provider is already bound to another terminal"
+msgstr "應用提供者已綁定到其他終端"
+
+#: terminal/models/virtualapp/provider.py:69
+msgid "Terminal is already bound to another provider"
+msgstr "終端已綁定到其他應用提供者"
+
+#: terminal/models/virtualapp/provider.py:109
+msgid "Provider host is required before deployment"
+msgstr "部署前必須設置應用提供者主機"
+
+#: terminal/models/virtualapp/provider.py:111
+msgid "Provider deployment requires a Linux host"
+msgstr "部署應用提供者需要 Linux 主機"
+
+#: terminal/models/virtualapp/provider.py:114
+msgid "A valid SSH port different from the Panda API port is required"
+msgstr "必須設置有效的 SSH 端口，且不能與 Panda API 端口相同"
+
+#: terminal/models/virtualapp/provider.py:117
+msgid "An active root or privileged SSH account with a password or private key is required"
+msgstr "需要已啓用且配置了密碼或私鑰的 root 或特權 SSH 賬號"
+
+#: terminal/models/virtualapp/provider.py:120
+msgid "Disable the provider and wait for all containers to exit before deployment"
+msgstr "請先禁用應用提供者，並等待所有容器退出後再部署"
+
+#: terminal/models/virtualapp/provider.py:124
+#, python-format
+msgid "Invalid offline deployment resources: %s"
+msgstr "無效的離線部署資源：%s"
+
+#: terminal/models/virtualapp/provider.py:130
+msgid "Select a Panda image already loaded on the provider or prepare the Installer offline resources"
+msgstr "請選擇已加載到應用提供者上的 Panda 鏡像，或準備 Installer 離線資源"
+
+#: terminal/models/virtualapp/provider.py:135
+msgid "Container port range must not include the SSH port"
+msgstr "容器端口範圍不能包含 SSH 端口"
+
+#: terminal/serializers/applet_host.py:55
+#: terminal/serializers/applet_host.py:59
+msgid "Invalid Core URL."
+msgstr "無效的 Core 地址。"
+
+#: terminal/serializers/terminal.py:138
+msgid "Only Tinker can bind an applet host"
+msgstr "只有 Tinker 可以綁定應用主機"
+
+#: terminal/serializers/terminal.py:141
+msgid "Applet host is missing or already bound"
+msgstr "應用主機不存在或已被綁定"
+
+#: terminal/serializers/terminal.py:162
+msgid "App provider not found"
+msgstr "未找到應用提供者"
+
+#: terminal/serializers/virtualapp_provider.py:57
+msgid "Enter a valid HTTP or HTTPS Core URL"
+msgstr "請輸入有效的 HTTP 或 HTTPS Core 地址"
+
+#: terminal/serializers/virtualapp_provider.py:71
+msgid "Enter a valid Docker image reference"
+msgstr "請輸入有效的 Docker 鏡像引用"
+
+#: terminal/serializers/virtualapp_provider.py:79
+msgid "Use a port range between 1 and 65535, excluding the Panda API port 9001"
+msgstr "請使用 1 到 65535 之間的端口範圍，且不能包含 Panda API 端口 9001"
+
+#: terminal/serializers/virtualapp_provider.py:181
+msgid "The provider host cannot be removed"
+msgstr "不能移除應用提供者主機"
+
+#: terminal/serializers/virtualapp_provider.py:188
+msgid "Host name and address are required"
+msgstr "必須填寫主機名稱和地址"
+
+#: terminal/serializers/virtualapp_provider.py:195
+msgid "An application provider with this name already exists"
+msgstr "已存在同名應用提供者"
+
+#: terminal/serializers/virtualapp_provider.py:200
+msgid "Application provider host is required"
+msgstr "必須設置應用提供者主機"
+
+#: terminal/serializers/virtualapp_provider.py:216
+msgid "Wait for the current deployment to finish before editing the provider"
+msgstr "請等待當前部署完成後再編輯應用提供者"
+
+#: terminal/serializers/virtualapp_provider.py:261
+msgid "Use the application publication API to publish images"
+msgstr "請使用應用發佈 API 發佈鏡像"
+
+#: terminal/tasks.py:157
+msgid "Application provider deployment failed; see the Ansible task log"
+msgstr "應用提供者部署失敗，請查看 Ansible 任務日誌"
+
+#: terminal/utils/tinker.py:33
+#, python-format
+msgid "Tinker version %(version)s is unavailable for connections. Upgrade and redeploy this applet host with Tinker %(minimum)s or later."
+msgstr "Tinker %(version)s 無法用於連接，請將此應用主機的 Tinker 升級到 %(minimum)s 或更高版本並重新部署。"
+
+#: terminal/utils/tinker.py:35
+msgid "not reported"
+msgstr "未上報"
+
+#: terminal/utils/virtualapp.py:52
+msgid "Unsafe path in application image archive"
+msgstr "應用鏡像歸檔中存在不安全的路徑"
+
+#: terminal/utils/virtualapp.py:64
+msgid "Invalid application image archive read size"
+msgstr "應用鏡像歸檔的讀取大小無效"
+
+#: terminal/utils/virtualapp.py:66
+msgid "Application image archive validation timed out"
+msgstr "應用鏡像歸檔校驗超時"
+
+#: terminal/utils/virtualapp.py:70
+msgid "Application image archive exceeds the unpacked size limit"
+msgstr "應用鏡像歸檔超出解包大小限制"
+
+#: terminal/utils/virtualapp.py:77
+msgid "Invalid or sparse entry in application image archive"
+msgstr "應用鏡像歸檔中存在無效條目或稀疏文件條目"
+
+#: terminal/utils/virtualapp.py:81
+msgid "Sparse entries are not supported in application image archives"
+msgstr "應用鏡像歸檔不支持稀疏文件條目"
+
+#: terminal/utils/virtualapp.py:94
+msgid "Application image archive has oversized tar metadata"
+msgstr "應用鏡像歸檔的 tar 元數據過大"
+
+#: terminal/utils/virtualapp.py:115
+msgid "Duplicate or too many entries in application image archive"
+msgstr "應用鏡像歸檔中存在重復條目或條目數量過多"
+
+#: terminal/utils/virtualapp.py:117
+msgid "Application image archive contains an unsupported entry"
+msgstr "應用鏡像歸檔中包含不支持的條目"
+
+#: terminal/utils/virtualapp.py:129
+msgid "Invalid Docker image manifest"
+msgstr "無效的 Docker 鏡像清單"
+
+#: terminal/utils/virtualapp.py:135
+msgid "Too many image configurations in application image archive"
+msgstr "應用鏡像歸檔中的鏡像配置數量過多"
+
+#: terminal/utils/virtualapp.py:144
+msgid "Invalid or too many OCI manifests in application image archive"
+msgstr "應用鏡像歸檔中的 OCI 清單無效或數量過多"
+
+#: terminal/utils/virtualapp.py:149
+msgid "Invalid application image archive"
+msgstr "無效的應用鏡像歸檔"
+
+#: terminal/utils/virtualapp.py:151
+msgid "Upload a Docker save archive containing one application image"
+msgstr "請上傳通過 Docker save 導出且僅包含一個應用鏡像的歸檔"
+
+#: terminal/utils/virtualapp.py:155
+msgid "Application image archive does not contain the configured image name and tag"
+msgstr "應用鏡像歸檔中沒有配置的鏡像名稱和標籤"
+
+#: terminal/utils/virtualapp.py:158
+msgid "Application image archive has no valid image configuration"
+msgstr "應用鏡像歸檔中沒有有效的鏡像配置"
+
+#: terminal/utils/virtualapp.py:164
+msgid "Application image archive is missing image layers"
+msgstr "應用鏡像歸檔中缺少鏡像層"
+
+#: terminal/utils/virtualapp.py:167
+msgid "Application image archive must contain one Linux platform"
+msgstr "應用鏡像歸檔必須僅包含一個 Linux 平台"
+
+#: terminal/utils/virtualapp.py:219
+msgid "Invalid application image archive metadata"
+msgstr "應用鏡像歸檔的元數據無效"
+
+#: terminal/utils/virtualapp.py:251
+msgid "Virtual application no longer exists"
+msgstr "虛擬應用已不存在"
+
+#: terminal/utils/virtualapp.py:253
+msgid "Virtual application changed; upload or publish its current image again"
+msgstr "虛擬應用已變更，請重新上傳或發佈當前鏡像"
+
+#: terminal/utils/virtualapp.py:260
+msgid "Upload a Docker save image as .tar, .tar.zst or .zst"
+msgstr "請上傳通過 Docker save 導出的 .tar、.tar.zst 或 .zst 格式鏡像"
+
+#: terminal/utils/virtualapp.py:262
+#: terminal/utils/virtualapp.py:274
+msgid "Application image archive must be no larger than 10 GiB"
+msgstr "應用鏡像歸檔大小不能超過 10 GiB"
+
+#: terminal/utils/virtualapp.py:304
+msgid "No application image archive for this architecture"
+msgstr "沒有適用於此架構的應用鏡像歸檔"
+
+#: terminal/utils/virtualapp.py:324
+msgid "Invalid offline application image archive path"
+msgstr "無效的離線應用鏡像歸檔路徑"
+
+#: terminal/utils/virtualapp.py:340
+msgid "Offline application image cannot be staged; upload it again"
+msgstr "無法暫存離線應用鏡像，請重新上傳"
+
+#: tickets/api/flow.py:32
+msgid "Inherited ticket flows cannot be deleted"
+msgstr "不能刪除繼承的工單流程"
+
+#: tickets/models/ticket/general.py:99
+msgid "Assignee"
+msgstr "處理人"
+
+#: users/api/user.py:187
+msgid "Not a valid org"
+msgstr "無效的組織"
+
+#: users/models/user/_face.py:24
+#: users/models/user/_face.py:34
+msgid "Face vector is not set."
+msgstr "尚未設置人臉特徵。"
+
+#: users/models/user/_face.py:27
+#: users/models/user/_face.py:37
+msgid "Face recognition backend is not available."
+msgstr "人臉識別後端不可用。"
+
+#: users/serializers/tree.py:37
+msgid "parent_type and parent_id must be provided together."
+msgstr "必須同時提供 parent_type 和 parent_id。"
+
+#: users/serializers/tree.py:41
+msgid "Search and parent parameters cannot be used together."
+msgstr "搜索參數與父級參數不能同時使用。"
+
+#: users/serializers/tree.py:45
+msgid "Offset is only supported when loading children."
+msgstr "僅在加載子項時支持偏移量。"
+
+#: users/serializers/tree.py:52
+msgid "Enter a valid UUID."
+msgstr "請輸入有效的 UUID。"
+
+#: users/views/profile/reset.py:134
+msgid "Verification code has been used more than 3 times, please re-verify"
+msgstr "驗證碼使用次數已超過 3 次，請重新驗證"
+
+#: xpack/plugins/cloud/api.py:161
+msgid "Query params account_id is not uuid"
+msgstr "查詢參數 account_id 不是有效的 UUID"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:81
+msgid "eg. https://IP:9440/api/nutanix/v3/"
+msgstr "例如：https://IP:9440/api/nutanix/v3/"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:108
+msgid "SC domain name"
+msgstr "SC 域名"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:136
+msgid "eg. http://IP:8080/zstack"
+msgstr "例如：http://IP:8080/zstack"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:144
+msgid "eg. http://CLOUDTOWER_IP"
+msgstr "例如：http://CLOUDTOWER_IP"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:151
+msgid "eg. https://IP:8006/api2/json"
+msgstr "例如：https://IP:8006/api2/json"
+
+#: xpack/plugins/facelive/backend.py:29
+msgid "Face recognition dependencies are unavailable; run uv sync --group xpack"
+msgstr "人臉識別依賴不可用，請運行 uv sync --group xpack"
+
+#: xpack/plugins/facelive/backend.py:72
+msgid "OpenCV image must be a BGR image"
+msgstr "OpenCV 圖像必須為 BGR 格式"
+
+#: xpack/plugins/facelive/backend.py:74
+#: xpack/plugins/facelive/backend.py:111
+msgid "Camera frame resolution is too low"
+msgstr "攝像頭畫面分辨率過低"
+
+#: xpack/plugins/facelive/backend.py:97
+#: xpack/plugins/facelive/backend.py:104
+msgid "Invalid camera frame"
+msgstr "無效的攝像頭畫面"
+
+#: xpack/plugins/facelive/backend.py:100
+msgid "Camera frame is empty or too large"
+msgstr "攝像頭畫面為空或過大"
+
+#: xpack/plugins/facelive/backend.py:106
+msgid "Camera frame is too large"
+msgstr "攝像頭畫面過大"
+
+#: xpack/plugins/facelive/backend.py:109
+msgid "Unable to decode camera frame"
+msgstr "無法解碼攝像頭畫面"
+
+#: xpack/plugins/facelive/backend.py:183
+msgid "Multiple similar faces detected; keep only one person in view"
+msgstr "檢測到多張相似人臉，請確保畫面中只有一人"
+
+#: xpack/plugins/facelive/backend.py:193
+msgid "None of FACE_RECOGNITION_PROVIDERS are available"
+msgstr "FACE_RECOGNITION_PROVIDERS 中配置的推理後端均不可用"
+
+#: xpack/plugins/facelive/backend.py:209
+msgid "FACE_RECOGNITION_DEVICE is gpu but no accelerated ONNX provider is available"
+msgstr "FACE_RECOGNITION_DEVICE 已設為 gpu，但沒有可用的 ONNX 加速推理後端"
+
+#: xpack/plugins/facelive/challenge.py:16
+msgid "Turn your head left and right, then face forward"
+msgstr "請左右轉頭，然後面向前方"
+
+#: xpack/plugins/facelive/challenge.py:17
+msgid "Nod once, then face forward"
+msgstr "請點頭一次，然後面向前方"
+
+#: xpack/plugins/facelive/challenge.py:18
+msgid "Open and close your mouth"
+msgstr "請張嘴後閉嘴"
+
+#: xpack/plugins/facelive/challenge.py:65
+msgid "Look straight at the camera"
+msgstr "請正視攝像頭"
+
+#: xpack/plugins/facelive/codec.py:27
+msgid "Face vector is invalid"
+msgstr "人臉特徵無效"
+
+#: xpack/plugins/facelive/codec.py:30
+msgid "Face vector magnitude is zero"
+msgstr "人臉特徵向量的模長為零"
+
+#: xpack/plugins/facelive/codec.py:38
+#: xpack/plugins/facelive/codec.py:53
+msgid "Face vector has an invalid dimension"
+msgstr "人臉特徵向量的維度無效"
+
+#: xpack/plugins/facelive/codec.py:45
+msgid "Face vector is missing"
+msgstr "缺少人臉特徵"
+
+#: xpack/plugins/facelive/codec.py:50
+msgid "Face vector has an invalid size"
+msgstr "人臉特徵數據大小無效"
+
+#: xpack/plugins/facelive/codec.py:60
+msgid "Face vector has an unsupported format"
+msgstr "不支持此人臉特徵格式"
+
+#: xpack/plugins/facelive/codec.py:71
+msgid "Face vectors use different dimensions"
+msgstr "人臉特徵向量的維度不一致"
+
+#: xpack/plugins/facelive/codec.py:105
+msgid "Face vector is not valid base64"
+msgstr "人臉特徵不是有效的 Base64 數據"
+
+#: xpack/plugins/facelive/consumer.py:62
+msgid "Unsupported message type"
+msgstr "不支持此消息類型"
+
+#: xpack/plugins/facelive/consumer.py:73
+msgid "Camera frame is missing"
+msgstr "缺少攝像頭畫面"
+
+#: xpack/plugins/facelive/consumer.py:113
+msgid "Face recognition service is unavailable"
+msgstr "人臉識別服務不可用"
+
+#: xpack/plugins/facelive/context.py:40
+msgid "Invalid face capture token"
+msgstr "無效的人臉採集令牌"
+
+#: xpack/plugins/facelive/context.py:48
+msgid "Face capture token does not exist or has expired"
+msgstr "人臉採集令牌不存在或已過期"
+
+#: xpack/plugins/facelive/context.py:50
+msgid "Face capture has already finished"
+msgstr "人臉採集已結束"
+
+#: xpack/plugins/facelive/context.py:60
+msgid "Face capture token does not belong to this session"
+msgstr "人臉採集令牌不屬於當前會話"
+
+#: xpack/plugins/facelive/context.py:62
+msgid "Face capture context has no target user"
+msgstr "人臉採集上下文中沒有目標用戶"
+
+#: xpack/plugins/facelive/context.py:66
+msgid "Face capture target user does not exist"
+msgstr "人臉採集的目標用戶不存在"
+
+#: xpack/plugins/facelive/context.py:69
+#: xpack/plugins/facelive/context.py:86
+msgid "No face feature is bound for this user"
+msgstr "此用戶尚未綁定人臉特徵"
+
+#: xpack/plugins/facelive/context.py:78
+msgid "Authentication is required for online face monitoring"
+msgstr "在線人臉監控需要先完成身份認證"
+
+#: xpack/plugins/facelive/context.py:81
+msgid "Face monitor token does not exist or has expired"
+msgstr "人臉監控令牌不存在或已過期"
+
+#: xpack/plugins/facelive/context.py:83
+msgid "Face monitor token belongs to another user"
+msgstr "人臉監控令牌屬於其他用戶"
+
+#: xpack/plugins/facelive/context.py:98
+msgid "Face capture token expired before completion"
+msgstr "人臉採集令牌在採集完成前已過期"
+
+#: xpack/plugins/facelive/context.py:139
+msgid "Connection token no longer exists"
+msgstr "連接令牌已不存在"
+
+#: xpack/plugins/facelive/context.py:146
+msgid "Face recognition is disabled"
+msgstr "人臉識別未啓用"
+
+#: xpack/plugins/facelive/liveness.py:67
+msgid "FACE_LIVENESS_MODEL_PATH must reference a validated anti-spoof ONNX model"
+msgstr "FACE_LIVENESS_MODEL_PATH 必須指向經過驗證的防偽 ONNX 模型"
+
+#: xpack/plugins/facelive/liveness.py:72
+msgid "ONNX Runtime is unavailable"
+msgstr "ONNX Runtime 不可用"
+
+#: xpack/plugins/facelive/liveness.py:92
+msgid "GPU liveness was requested but no accelerated ONNX provider is available"
+msgstr "已啓用 GPU 活體檢測，但沒有可用的 ONNX 加速推理後端"
+
+#: xpack/plugins/facelive/liveness.py:115
+msgid "FACE_LIVENESS_LIVE_INDEX is outside model output"
+msgstr "FACE_LIVENESS_LIVE_INDEX 超出模型輸出範圍"
+
+#: xpack/plugins/facelive/liveness.py:128
+msgid "Anti-spoof ONNX input must have four dimensions"
+msgstr "防偽 ONNX 模型的輸入必須為四維數據"
+
+#: xpack/plugins/facelive/liveness.py:134
+msgid "Anti-spoof ONNX input must be RGB"
+msgstr "防偽 ONNX 模型的輸入必須為 RGB 格式"
+
+#: xpack/plugins/facelive/liveness.py:189
+#, python-format
+msgid "Unknown liveness mode: %(mode)s"
+msgstr "未知的活體檢測模式：%(mode)s"
+
+#: xpack/plugins/facelive/monitor.py:128
+msgid "Camera monitoring connection closed"
+msgstr "攝像頭監控連接已關閉"
+
+#: xpack/plugins/facelive/monitor.py:135
+msgid "Face monitor state is unavailable"
+msgstr "人臉監控狀態不可用"
+
+#: xpack/plugins/facelive/monitor.py:237
+msgid "Face monitor timed out"
+msgstr "人臉監控超時"
+
+#: xpack/plugins/facelive/sessions.py:67
+msgid "Face flow has already finished"
+msgstr "人臉識別流程已結束"
+
+#: xpack/plugins/facelive/sessions.py:83
+msgid "Face verification timed out"
+msgstr "人臉驗證超時"
+
+#: xpack/plugins/facelive/sessions.py:85
+msgid "The liveness action was not completed in time"
+msgstr "未在規定時間內完成活體檢測動作"
+
+#: xpack/plugins/facelive/sessions.py:96
+msgid "Place one face fully inside the camera area"
+msgstr "請將一張人臉完整置於攝像頭畫面內"
+
+#: xpack/plugins/facelive/sessions.py:103
+msgid "Move closer to the camera"
+msgstr "請靠近攝像頭"
+
+#: xpack/plugins/facelive/sessions.py:109
+msgid "Frozen or replayed camera frames detected"
+msgstr "檢測到凍結或重放的攝像頭畫面"
+
+#: xpack/plugins/facelive/sessions.py:121
+msgid "The stored face template uses a different model; bind the face again"
+msgstr "已保存的人臉模板使用了不同的模型，請重新綁定人臉"
+
+#: xpack/plugins/facelive/sessions.py:124
+msgid "The current face does not match the selected user"
+msgstr "當前人臉與所選用戶不匹配"
+
+#: xpack/plugins/facelive/sessions.py:126
+msgid "The face changed during enrollment"
+msgstr "採集過程中人臉發生變化"
+
+#: xpack/plugins/facelive/sessions.py:152
+msgid "Liveness passed once; online face monitoring is now active"
+msgstr "活體檢測已通過，在線人臉監控已啓用"
+
+#: xpack/plugins/facelive/sessions.py:216
+#, python-format
+msgid "Captured %(count)s face samples"
+msgstr "已採集 %(count)s 個人臉樣本"
+
+#: xpack/plugins/facelive/sessions.py:223
+msgid "Checking liveness; keep your face clear and well lit"
+msgstr "正在檢測活體，請保持面部清晰且光線充足"
+
+#: xpack/plugins/facelive/sessions.py:228
+#, python-format
+msgid "Capturing face samples %(count)s/%(total)s"
+msgstr "正在採集人臉樣本 %(count)s/%(total)s"
+
+#: xpack/plugins/facelive/sessions.py:256
+msgid "Face identity, liveness, and action challenge passed"
+msgstr "人臉身份驗證、活體檢測和動作驗證均已通過"
+
+#: xpack/plugins/facelive/sessions.py:273
+#, python-format
+msgid "%(name)s is in the camera area"
+msgstr "%(name)s 位於攝像頭畫面內"
+
+#: xpack/plugins/facelive/sessions.py:277
+msgid "Target face is not visible"
+msgstr "未檢測到目標人臉"
+
+#: xpack/plugins/facelive/sessions.py:279
+msgid "Target face does not match"
+msgstr "目標人臉不匹配"
+
+#: xpack/plugins/facelive/sessions.py:285
+msgid "The monitored session has been paused"
+msgstr "受監控的會話已暫停"
+
+#: xpack/plugins/facelive/sessions.py:287
+#, python-format
+msgid "Target left the camera area; callback in %(seconds)ss"
+msgstr "目標已離開攝像頭畫面，將在 %(seconds)s 秒後觸發回調"
+
+#: xpack/plugins/facelive/sessions.py:324
+#: xpack/plugins/facelive/sessions.py:330
+#: xpack/plugins/facelive/sessions.py:337
+msgid "Repeated camera frame detected"
+msgstr "檢測到重復的攝像頭畫面"
+
+#: xpack/plugins/facelive/sessions.py:480
+msgid "Waiting for the selected face to match"
+msgstr "正在等待人臉與所選用戶匹配"
+
+#: xpack/plugins/facelive/sessions.py:482
+msgid "Checking liveness; move naturally and keep the image clear"
+msgstr "正在檢測活體，請自然活動並保持畫面清晰"
+
+#: xpack/plugins/facelive/sessions.py:485
+msgid "Finalizing face verification"
+msgstr "正在完成人臉驗證"
+
+#: xpack/plugins/jdmc/api/mail.py:30
+msgid "Mail sent successfully"
+msgstr "郵件發送成功"
+
+#: xpack/plugins/jdmc/serializers.py:6
+msgid "Email addresses of the recipients"
+msgstr "收件人的電子郵箱地址"
+
+#: xpack/plugins/jdmc/serializers.py:7
+msgid "Subject of the mail"
+msgstr "郵件主題"
+
+#: xpack/plugins/jdmc/serializers.py:8
+msgid "Message of the email"
+msgstr "郵件正文"
+
+#: reports/audit_contract.py
+msgid "Management Summary and Recommendations"
+msgstr "管理摘要與建議"
+
+#: reports/audit_contract.py
+msgid "Key Overview"
+msgstr "關鍵概況"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Analysis"
+msgstr "運維活動分析"
+
+#: reports/audit_contract.py
+msgid "Security Event Analysis"
+msgstr "安全事件分析"
+
+#: reports/audit_contract.py
+msgid "Asset and Account Overview"
+msgstr "資產與帳號概況"
+
+#: reports/audit_contract.py
+msgid "Account Operations Analysis"
+msgstr "帳號運維分析"
+
+#: reports/audit_contract.py
+msgid "Comprehensive Audit Report"
+msgstr "綜合審計報告"
+
+#: reports/audit_contract.py
+msgid "Summarize operations activity, security events, assets, and accounts for monthly, quarterly, or annual audits."
+msgstr "匯總運維活動、安全事件與資產帳號情況，適合月度、季度和年度審計。"
+
+#: reports/audit_contract.py
+msgid "Operations Activity Report"
+msgstr "運維活動報告"
+
+#: reports/audit_contract.py
+msgid "Review who performed sessions, commands, and file operations on each asset."
+msgstr "瞭解誰在什麼資產上進行了多少次會話、命令與文件操作。"
+
+#: reports/audit_contract.py
+msgid "Security Event Report"
+msgstr "安全事件報告"
+
+#: reports/audit_contract.py
+msgid "Review high-risk commands, login anomalies, and access denials, distinguishing failures from security events."
+msgstr "核查高風險命令、登錄異常與訪問拒絕，區分失敗記錄和風險事件。"
+
+#: reports/audit_contract.py
+msgid "Account Operations Report"
+msgstr "帳號運維報告"
+
+#: reports/audit_contract.py
+msgid "Review the outcomes and failures of account automation tasks."
+msgstr "瞭解帳號自動化任務的執行結果與失敗情況，便於安排復核。"
+
+#: reports/api/audit.py
+msgid "You do not have permission to view data for this report theme."
+msgstr "當前用戶無權查看這個報告主題的數據。"
+
+#: reports/api/audit.py
+msgid "The end date cannot be earlier than the start date."
+msgstr "結束日期不能早於開始日期。"
+
+#: reports/api/audit.py
+msgid "A report can cover at most 366 days. Select a shorter date range."
+msgstr "單份報告最多包含 366 天，請縮小日期範圍。"
+
+#: reports/api/audit.py
+msgid "The end date cannot be later than today. For the current period, report through today."
+msgstr "結束日期不能晚於今天。當期報告請統計到今天。"
+
+#: reports/api/audit.py
+msgid "Chapters are duplicated or do not belong to the selected report theme."
+msgstr "章節重復或不屬於所選報告主題。"
+
+#: reports/api/audit.py
+msgid "Select at least one chapter containing statistical data."
+msgstr "請至少選擇一個包含統計數據的章節。"
+
+#: reports/services/audit_data.py
+msgid "Asset Sessions"
+msgstr "資產會話"
+
+#: reports/services/audit_data.py
+msgid "Command Records"
+msgstr "命令記錄"
+
+#: reports/services/audit_data.py
+msgid "Login Logs"
+msgstr "登錄日誌"
+
+#: reports/services/audit_data.py
+msgid "Operation Logs"
+msgstr "操作日誌"
+
+#: reports/services/audit_data.py
+msgid "File Transfers"
+msgstr "文件傳輸"
+
+#: reports/services/audit_data.py
+msgid "Current Assets"
+msgstr "當前資產"
+
+#: reports/services/audit_data.py
+msgid "Current Accounts"
+msgstr "當前帳號"
+
+#: reports/services/audit_data.py
+msgid "Account Automation Tasks"
+msgstr "帳號自動化任務"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Change Logs"
+msgstr "平台用戶改密日誌"
+
+#: reports/services/audit_data.py
+msgid " (available stores)"
+msgstr "（可用存儲）"
+
+#: reports/services/audit_data.py
+msgid "Alerted Commands"
+msgstr "告警命令"
+
+#: reports/services/audit_data.py
+msgid "Commands Blocked by Rules"
+msgstr "規則阻斷命令"
+
+#: reports/services/audit_data.py
+msgid "Approval-Rejected Commands"
+msgstr "審批拒絕命令"
+
+#: reports/services/audit_data.py
+msgid "Approval-Approved Commands"
+msgstr "審批通過命令"
+
+#: reports/services/audit_data.py
+msgid "Approval-Canceled Commands"
+msgstr "取消審批命令"
+
+#: reports/services/audit_data.py
+msgid "Unsupported report theme"
+msgstr "不支持的報告主題"
+
+#: reports/services/audit_data.py
+msgid "Select a start date and an end date"
+msgstr "請選擇開始日期和結束日期"
+
+#: reports/services/audit_data.py
+msgid "The start date cannot be later than the end date, and the report can cover at most 366 days"
+msgstr "開始日期不能晚於結束日期，報告範圍最多為 366 天"
+
+#: reports/services/audit_data.py
+msgid "The end date cannot be later than today"
+msgstr "結束日期不能晚於今天"
+
+#: reports/services/audit_data.py
+msgid "Select report chapters without duplicates"
+msgstr "請選擇報告章節，且不要重復選擇"
+
+#: reports/services/audit_data.py
+msgid "The selected chapters do not belong to this report theme"
+msgstr "所選章節不屬於當前報告主題"
+
+#: reports/services/audit_data.py
+msgid "Session Count"
+msgstr "會話次數"
+
+#: reports/services/audit_data.py
+msgid "times"
+msgstr "次"
+
+#: reports/services/audit_data.py
+msgid "Active Users"
+msgstr "活躍用戶"
+
+#: reports/services/audit_data.py
+msgid "users"
+msgstr "人"
+
+#: reports/services/audit_data.py
+msgid "Accessed Assets"
+msgstr "訪問資產"
+
+#: reports/services/audit_data.py
+msgid "assets"
+msgstr "台"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures"
+msgstr "連接失敗"
+
+#: reports/services/audit_data.py
+msgid "Session Recording Status"
+msgstr "會話錄影狀態"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Connection Failure Reasons"
+msgstr "連接失敗原因 Top 5"
+
+#: reports/services/audit_data.py
+msgid "User Access Ranking"
+msgstr "用戶訪問排行"
+
+#: reports/services/audit_data.py
+msgid "Asset Access Ranking"
+msgstr "資產訪問排行"
+
+#: reports/services/audit_data.py
+msgid "Connection Protocol Distribution"
+msgstr "連接協議分布"
+
+#: reports/services/audit_data.py
+msgid "Session Operation Types"
+msgstr "會話操作類型"
+
+#: reports/services/audit_data.py
+msgid "Platform Access Distribution"
+msgstr "平台訪問分布"
+
+#: reports/services/audit_data.py
+msgid "Daily Asset Session Trend"
+msgstr "每日資產會話趨勢"
+
+#: reports/services/audit_data.py
+msgid "Weekly Asset Session Trend"
+msgstr "每周資產會話趨勢"
+
+#: reports/services/audit_data.py
+msgid "Monthly Asset Session Trend"
+msgstr "每月資產會話趨勢"
+
+#: reports/services/audit_data.py
+msgid "Recent Asset Sessions"
+msgstr "最近資產會話明細"
+
+#: reports/services/audit_data.py
+msgid "Recordings Requiring Review"
+msgstr "錄影待核查"
+
+#: reports/services/audit_data.py
+msgid "records"
+msgstr "條"
+
+#: reports/services/audit_data.py
+msgid "Command Approval Clues from the Same Session"
+msgstr "同會話命令審批線索"
+
+#: reports/services/audit_data.py
+msgid "Successful Logins"
+msgstr "成功登錄次數"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins"
+msgstr "失敗登錄次數"
+
+#: reports/services/audit_data.py
+msgid "Restricted Login Records"
+msgstr "登錄受限記錄"
+
+#: reports/services/audit_data.py
+msgid "Login Policy Denials"
+msgstr "登錄策略拒絕"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Logins"
+msgstr "最近失敗登錄記錄"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Clues"
+msgstr "新城市登錄線索"
+
+#: reports/services/audit_data.py
+msgid "New-City Login Review Clues"
+msgstr "新城市登錄復核線索"
+
+#: reports/services/audit_data.py
+msgid "File Operation Types"
+msgstr "文件操作類型"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Affected File Operation Targets"
+msgstr "文件失敗影響範圍 Top 5"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed File Operations"
+msgstr "最近失敗的文件操作"
+
+#: reports/services/audit_data.py
+msgid "Account Task Executions"
+msgstr "帳號任務執行次數"
+
+#: reports/services/audit_data.py
+msgid "Successful Executions"
+msgstr "執行成功"
+
+#: reports/services/audit_data.py
+msgid "Failed or Errored Executions"
+msgstr "執行失敗或錯誤"
+
+#: reports/services/audit_data.py
+msgid "Incomplete Executions"
+msgstr "尚未完成"
+
+#: reports/services/audit_data.py
+msgid "Account Task Types and Results"
+msgstr "帳號任務類型與結果"
+
+#: reports/services/audit_data.py
+msgid "Recent Failed Account Tasks"
+msgstr "最近失敗的帳號任務"
+
+#: reports/services/audit_data.py
+msgid "Task Failure or Error Rate"
+msgstr "任務失敗或錯誤佔比"
+
+#: reports/services/audit_data.py
+msgid "Top 5 Password-Change Error Clues"
+msgstr "改密錯誤線索 Top 5"
+
+#: reports/services/audit_data.py
+msgid "Password-Change Accounts Requiring Review"
+msgstr "改密帳號待核查清單"
+
+#: reports/services/audit_data.py
+msgid "Restricted logins or policy denials were recorded. Verify that the source, user identity, and access policy are expected."
+msgstr "存在登錄受限或策略拒絕記錄，建議核對訪問來源、用戶身份和訪問策略是否符合預期。"
+
+#: reports/services/audit_data.py
+msgid "Command Count"
+msgstr "命令次數"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions Requiring Review"
+msgstr "需復核的命令處置記錄"
+
+#: reports/services/audit_data.py
+msgid "No separate rejection reason was saved; review the ticket discussion"
+msgstr "未保存獨立拒絕理由，請查看工單討論"
+
+#: reports/services/audit_data.py
+msgid "Not recorded"
+msgstr "未記錄"
+
+#: reports/services/audit_data.py
+msgid "Loopback Address Login Records"
+msgstr "回環地址登錄記錄"
+
+#: reports/services/audit_data.py
+msgid "Rejected"
+msgstr "拒絕"
+
+#: reports/services/audit_data.py
+msgid "Platform Operation Count"
+msgstr "平台操作次數"
+
+#: reports/services/audit_data.py
+msgid "Operation Policy Denials"
+msgstr "操作策略拒絕"
+
+#: reports/services/audit_data.py
+msgid "Policy Denial Details"
+msgstr "策略拒絕明細"
+
+#: reports/services/audit_data.py
+msgid "File Operation Count"
+msgstr "文件操作次數"
+
+#: reports/services/audit_data.py
+msgid "Failed File Operations"
+msgstr "文件操作失敗"
+
+#: reports/services/audit_data.py
+msgid "File Operation Failure Rate"
+msgstr "文件操作失敗佔比"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Total"
+msgstr "當前資產總數"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Assets"
+msgstr "當前啓用資產"
+
+#: reports/services/audit_data.py
+msgid "Current Asset Distribution by Platform"
+msgstr "當前平台資產分布"
+
+#: reports/services/audit_data.py
+msgid "accounts"
+msgstr "個"
+
+#: reports/services/audit_data.py
+msgid "Currently Enabled Accounts"
+msgstr "當前啓用帳號"
+
+#: reports/services/audit_data.py
+msgid "Asset Account Count Ranking"
+msgstr "資產帳號數量排行"
+
+#: reports/services/audit_data.py
+msgid "Assets with Password Changes Requiring Review"
+msgstr "改密待核查資產"
+
+#: reports/services/audit_data.py
+msgid "Accounts with Password Changes Requiring Review"
+msgstr "改密待核查帳號"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted"
+msgstr "資產已刪除"
+
+#: reports/services/audit_data.py
+msgid "Platform User Password Changes"
+msgstr "平台用戶改密次數"
+
+#: reports/services/audit_data.py
+msgid "Recent Platform User Password Changes"
+msgstr "最近平台用戶密碼變更"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s alerted or rejected commands were recorded. Review their purpose and approval basis in the session context."
+msgstr "記錄到 %(count)s 條告警或被拒絕的命令，請結合會話上下文復核命令用途與審批依據。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "The operation log contains %(count)s policy denials. Check the denied resources and policies in the audit details."
+msgstr "操作日誌包含 %(count)s 條策略拒絕記錄，請在審計明細中確認被拒絕的資源和策略。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform user password changes were recorded. Review the operators and change rationale as needed."
+msgstr "本週期記錄 %(count)s 次平台用戶密碼變更，請按需核對操作人與變更依據。"
+
+#: reports/services/audit_data.py
+msgid "Recording Status"
+msgstr "錄影狀態"
+
+#: reports/services/audit_data.py
+msgid "Recorded Reason"
+msgstr "日誌記錄的原因"
+
+#: reports/services/audit_data.py
+msgid "Failure Count"
+msgstr "失敗次數"
+
+#: reports/services/audit_data.py
+msgid "Start Time"
+msgstr "開始時間"
+
+#: reports/services/audit_data.py
+msgid "Platform User"
+msgstr "平台用戶"
+
+#: reports/services/audit_data.py
+msgid "Asset Account"
+msgstr "資產帳號"
+
+#: reports/services/audit_data.py
+msgid "Connection Result"
+msgstr "連接結果"
+
+#: reports/services/audit_data.py
+msgid "Connection Failure Reason"
+msgstr "連接失敗原因"
+
+#: reports/services/audit_data.py
+msgid "Original Session"
+msgstr "原始會話"
+
+#: reports/services/audit_data.py
+msgid "No reviewer recorded"
+msgstr "尚未記錄處理人"
+
+#: reports/services/audit_data.py
+msgid "Approval Ticket"
+msgstr "審批單"
+
+#: reports/services/audit_data.py
+msgid "Request Time"
+msgstr "申請時間"
+
+#: reports/services/audit_data.py
+msgid "Requested Command"
+msgstr "申請命令"
+
+#: reports/services/audit_data.py
+msgid "Rule at the Time"
+msgstr "當時規則"
+
+#: reports/services/audit_data.py
+msgid "Reviewer"
+msgstr "處理人"
+
+#: reports/services/audit_data.py
+msgid "Rejection Reason"
+msgstr "拒絕理由"
+
+#: reports/services/audit_data.py
+msgid "Related Session"
+msgstr "關聯會話"
+
+#: reports/services/audit_data.py
+msgid "Source IP"
+msgstr "來源 IP"
+
+#: reports/services/audit_data.py
+msgid "City"
+msgstr "城市"
+
+#: reports/services/audit_data.py
+msgid "Operation Count"
+msgstr "次數"
+
+#: reports/services/audit_data.py
+msgid "File Path"
+msgstr "文件路徑"
+
+#: reports/services/audit_data.py
+msgid "Task Type"
+msgstr "任務類型"
+
+#: reports/services/audit_data.py
+msgid "Execution Count"
+msgstr "執行次數"
+
+#: reports/services/audit_data.py
+msgid "Original Execution Record"
+msgstr "原始執行記錄"
+
+#: reports/services/audit_data.py
+msgid "Error Clue Category"
+msgstr "錯誤線索分類"
+
+#: reports/services/audit_data.py
+msgid "Account Record Count"
+msgstr "帳號記錄數"
+
+#: reports/services/audit_data.py
+msgid "Record Time"
+msgstr "記錄時間"
+
+#: reports/services/audit_data.py
+msgid "Error Clue"
+msgstr "錯誤線索"
+
+#: reports/services/audit_data.py
+msgid "Execution Record"
+msgstr "執行記錄"
+
+#: reports/services/audit_data.py
+msgid "Asset deleted or platform not recorded"
+msgstr "資產已刪除或平台未記錄"
+
+#: reports/services/audit_data.py
+msgid "Decision"
+msgstr "處理結果"
+
+#: reports/services/audit_data.py
+msgid "Historical rule name not recorded"
+msgstr "歷史規則名稱未記錄"
+
+#: reports/services/audit_data.py
+msgid "Asset Count"
+msgstr "資產數"
+
+#: reports/services/audit_data.py
+msgid "Account Count"
+msgstr "帳號數"
+
+#: reports/services/audit_data.py
+msgid "Operator"
+msgstr "操作人"
+
+#: reports/services/evidence.py
+msgid "Recording marked present"
+msgstr "有錄影記錄"
+
+#: reports/services/evidence.py
+msgid "Recording unsupported"
+msgstr "不支持錄影"
+
+#: reports/services/evidence.py
+msgid "Session in progress"
+msgstr "會話進行中"
+
+#: reports/services/evidence.py
+msgid "Recording creation failed"
+msgstr "錄影創建失敗"
+
+#: reports/services/evidence.py
+msgid "Recording upload failed"
+msgstr "錄影上傳失敗"
+
+#: reports/services/evidence.py
+msgid "Recording conversion failed"
+msgstr "錄影轉換失敗"
+
+#: reports/services/evidence.py
+msgid "No recording flag"
+msgstr "未標記有錄影"
+
+#: reports/services/evidence.py
+msgid "Connection failed; not applicable"
+msgstr "連接失敗，不適用"
+
+#: reports/services/evidence.py
+msgid "Connection failed (no further reason recorded)"
+msgstr "連接失敗（未記錄更詳細原因）"
+
+#: reports/services/evidence.py
+msgid "Connection failure reason not recorded"
+msgstr "未記錄連接失敗原因"
+
+#: reports/services/evidence.py
+msgid "Authentication-related"
+msgstr "身份驗證相關"
+
+#: reports/services/evidence.py
+msgid "Execution or connection timeout"
+msgstr "執行或連接超時"
+
+#: reports/services/evidence.py
+msgid "Network or connection-related"
+msgstr "網絡或連接相關"
+
+#: reports/services/evidence.py
+msgid "Permission denial-related"
+msgstr "權限拒絕相關"
+
+#: reports/services/evidence.py
+msgid "Target missing or unavailable"
+msgstr "目標不存在或不可用"
+
+#: reports/services/evidence.py
+msgid "Result verification-related"
+msgstr "結果驗證相關"
+
+#: reports/services/evidence.py
+msgid "Error reason not recorded"
+msgstr "未記錄錯誤原因"
+
+#: reports/services/evidence.py
+msgid "Other error (review the original record)"
+msgstr "其他錯誤（需查看原始記錄）"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Only matching rules at the highest priority are applied. Any rejection at that priority denies access; otherwise their enabled controls are combined."
+msgstr "僅使用最高優先順序的符合規則；同優先順序中有拒絕則拒絕連線，全部允許時合併已啟用的控制項。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "The entire rule is skipped when approval is enabled but no reviewers are selected."
+msgstr "啟用審批且未選擇審批人時，略過整條規則。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Account usernames or @ALL (all accounts), @SPEC with specified usernames, and @USER (the current user's same-name account)."
+msgstr "填寫帳號使用者名稱，使用 @ALL 符合所有帳號，使用 @SPEC 加指定使用者名稱符合指定帳號，使用 @USER 符合目前使用者的同名帳號。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "0 means approval is required for every connection. After approval, the same user can reconnect to the same asset and account through this rule within the exemption period. Changing the duration does not alter existing exemptions."
+msgstr "0 表示每次連線都需要審批。審批通過後，同一使用者在免審期間內，可透過本規則再次連線至同一資產的同一帳號。修改時長不影響已有免審資格。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Users who receive connection notifications when notification is enabled. No notification is sent if no recipients are selected."
+msgstr "啟用通知後，向所選使用者傳送連線通知；接收人為空時不傳送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, a non-empty connection reason must be entered before connecting."
+msgstr "符合允許規則時，連線前必須填寫非空的連線原因，填寫後才能繼續。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, verify an enrolled code-based MFA method before connecting. Connections are blocked if none is enrolled."
+msgstr "符合允許規則時，連線前須通過已綁定的驗證碼型 MFA 驗證；未綁定可用方式時阻止連線。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, approval is required before connecting, unless a valid approval exemption applies. With no reviewers selected, the entire rule is skipped."
+msgstr "符合允許規則時，核准後才能連線；有效免審期間內可免審。審批人為空時略過整條規則。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, notify the selected recipients during connection request and token validation, without waiting for a successful connection. No notification is sent if no recipients are selected."
+msgstr "符合允許規則時，在連線申請、Token 驗證階段向所選接收人傳送通知，無需等待實際連線成功；接收人為空時不傳送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, face verification must pass before connecting. System face recognition must be enabled and the user must enroll a face."
+msgstr "符合允許規則時，連線前須通過人臉驗證。需啟用系統人臉辨識功能，並完成使用者人臉登錄。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches, Web Terminal requires face verification before connecting and continues monitoring during the session. System face recognition and user face enrollment are required."
+msgstr "符合允許規則時，僅允許透過 Web 終端連線；連線前進行人臉驗證，工作階段期間持續偵測。需啟用系統人臉辨識並完成人臉登錄。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "When an allow rule matches a same-name account, generate managed credentials and provision the account before its first connection. Existing managed accounts are reused; ordinary accounts skip provisioning. The asset platform must support account provisioning."
+msgstr "符合允許規則且使用同名帳號時，首次連線前自動產生託管憑證並推送帳號；已有託管帳號直接重用，一般帳號不推送。需資產平台支援帳號推送。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "At session end, a matching allow rule queues automatic secret rotation for the connected account. System rotation after session end must be enabled, and the account must be active with automatic secret rotation enabled."
+msgstr "工作階段結束時符合允許規則，則為本次連線帳號觸發自動改密。需系統啟用工作階段結束後改密，且帳號處於啟用狀態並已啟用自動改密。"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Connection reason"
+msgstr "連線原因"
+
+#: acls/serializers/login_asset_acl.py
+msgid "MFA verification"
+msgstr "MFA 驗證"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Require approval"
+msgstr "需要審批"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Send notification"
+msgstr "發送通知"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Face verification"
+msgstr "人臉驗證"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Push account"
+msgstr "推送帳號"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Rotate password"
+msgstr "輪換密碼"
+
+#: acls/serializers/login_asset_acl.py
+msgid "Exemption period"
+msgstr "免審時長"
+
+#: acls/serializers/login_asset_acl.py
+msgctxt "Asset connection ACL"
+msgid "Face online"
+msgstr "人臉在線"
+
+msgid ""
+"1-100; lower values have higher priority.\n"
+"Select the highest-priority group from the rules that match. Any Reject in that group blocks the connection; if all Allow, combine their enabled connection controls."
+msgstr ""
+"1–100，數值越小，優先順序越高。\n"
+"從符合條件的規則中，選取優先順序最高的一組；組內任一規則拒絕則拒絕連線，全部允許則合併各規則啟用的連線控制。"
+
+msgid "A valid license is required"
+msgstr "需要有效的授權。"
+
+msgid "ACL changed; start a new connection"
+msgstr "存取規則已變更，請重新連線。"
+
+msgid "Account is ready."
+msgstr "帳號已準備完成。"
+
+msgid "Account permission is no longer available"
+msgstr "帳號權限已失效。"
+
+msgid "Account preparation has not succeeded. Contact an administrator."
+msgstr "帳號準備未成功，請聯絡管理員。"
+
+msgid "Account push failed. Contact an administrator with the task ID."
+msgstr "帳號推送失敗，請將工作編號提供給管理員處理。"
+
+msgid "Account push is not enabled for this asset platform."
+msgstr "此資產平台未啟用帳號推送。"
+
+msgid "Administrator permission is no longer available"
+msgstr "管理員權限已失效。"
+
+msgid ""
+"After approval, allow reconnects by the same user to the same asset and "
+"account under this rule for this many hours. 0 requires approval every time."
+" Changes do not affect existing exemptions."
+msgstr "審批通過後，同一使用者在指定小時內透過本規則重新連線同一資產、帳號可免審。0 表示每次審批；修改時長不影響已有免審資格。"
+
+msgid "Allow applies the connection controls; Reject blocks the connection."
+msgstr "允許時套用連線控制，拒絕時阻止連線。"
+
+msgid "Automatic same-name account push is not authorized."
+msgstr "未授權自動推送同名帳號。"
+
+msgid ""
+"Automatically provision only same-name accounts before their first "
+"connection; reuse existing managed accounts without provisioning them again."
+" Requires account provisioning support on the asset platform."
+msgstr "僅同名帳號首次連線前自動推送，已有託管帳號則重用而不推送；需資產平台支援帳號推送。"
+
+msgid "Cancel connections individually."
+msgstr "請逐一取消連線。"
+
+msgid "Complete the current connection step first"
+msgstr "請先完成目前的連線步驟。"
+
+msgid "Connection ACL context"
+msgstr "連線 ACL 上下文"
+
+msgid "Connection ACL requirements are incomplete"
+msgstr "連線 ACL 驗證尚未完成。"
+
+msgid "Connection approval is no longer valid"
+msgstr "連線審批已失效，請重新申請。"
+
+msgid "Connection details"
+msgstr "連線明細"
+
+msgid "Connection is no longer available"
+msgstr "本次連線已失效，請重新發起連線。"
+
+msgid "Connection parameters cannot be changed; create a new connection token"
+msgstr "連線參數不可修改，請建立新的連線 Token。"
+
+msgid "Connection review was rejected or closed"
+msgstr "連線審批已拒絕或關閉。"
+
+msgid "Connection token does not match this session."
+msgstr "連線 Token 與目前工作階段不符。"
+
+msgid "Creating the account and configuring its login credentials."
+msgstr "正在建立帳號並設定登入憑證。"
+
+msgid "Duplicate connection tokens."
+msgstr "存在重複的連線 Token。"
+
+msgid "Enter a connection reason (up to 4096 characters)."
+msgstr "請輸入連線原因，最多 4096 個字元。"
+
+msgid "Enter a reason before connecting."
+msgstr "連線前必須填寫原因。"
+
+msgid "Face monitoring context belongs to a different user"
+msgstr "人臉監測上下文屬於其他使用者。"
+
+msgid "Face monitoring does not belong to this session"
+msgstr "人臉在線監測與目前工作階段不符。"
+
+msgid "Face verification does not belong to this connection"
+msgstr "人臉驗證與目前連線不符。"
+
+msgid "Face verification failed"
+msgstr "人臉驗證失敗。"
+
+msgid "Face verification is no longer available"
+msgstr "目前連線無法繼續人臉驗證。"
+
+msgid "Face verification session expired; retry verification"
+msgstr "人臉驗證工作階段已過期，請重新驗證。"
+
+msgid "Face verification session is no longer current"
+msgstr "人臉驗證已失效，請重新驗證。"
+
+msgid "First-login same-name account push"
+msgstr "首次連線同名帳號推送"
+
+msgid "No available reviewers. Contact an administrator."
+msgstr "無可用的審批人，請聯絡管理員。"
+
+msgid ""
+"Notify the selected recipients when a user requests an asset connection. A "
+"notification does not mean the connection succeeded."
+msgstr "使用者發起資產連線時通知所選接收人，通知不代表連線成功。"
+
+msgid "Online face monitoring context is no longer available"
+msgstr "人臉在線監測已失效，請重新連線。"
+
+msgid "Online face monitoring context is required"
+msgstr "缺少人臉在線監測上下文。"
+
+msgid "Online face verification requires Web Terminal"
+msgstr "人臉在線驗證需要使用 Web 終端。"
+
+msgid "Permission to connect to this account is no longer available."
+msgstr "連線此帳號的權限已失效。"
+
+msgid "Prepare the same-name account before connecting."
+msgstr "請先完成同名帳號準備再連線。"
+
+msgid "Push same-name account on first connection"
+msgstr "首次連線時推送同名帳號"
+
+msgid ""
+"Require approval before connecting, except during a valid exemption period."
+msgstr "連線前須審批通過；有效免審期間內無需重複審批。"
+
+msgid ""
+"Rotate the connected account's secret after the session ends. Requires "
+"system rotation after session end and automatic rotation on an active "
+"account."
+msgstr "工作階段結束後自動改密；需啟用系統「工作階段結束後改密」和帳號「自動改密」，且帳號已啟用。"
+
+msgid "Same-name account provisioning uses server-managed credentials."
+msgstr "同名帳號推送使用伺服器管理的憑證。"
+
+msgid "Secret rotation after session end is disabled"
+msgstr "未啟用工作階段結束後改密。"
+
+msgid "Select an active MFA method; enroll MFA first if none are available."
+msgstr "請選擇可用的 MFA 方式；若無可用方式，請先綁定 MFA。"
+
+msgid "Select at least one active, unexpired reviewer from this organization."
+msgstr "請至少選擇一名本組織內已啟用且未過期的審批人。"
+
+msgid "Select at least one notification recipient."
+msgstr "請至少選擇一名通知接收人。"
+
+msgid ""
+"Select reviewers when approval is enabled. Connections are blocked if no "
+"reviewers are available."
+msgstr "啟用審批後必須選擇審批人；無可用審批人時無法連線。"
+
+msgid "The existing same-name account is inactive. Contact an administrator."
+msgstr "已有同名帳號未啟用，請聯絡管理員。"
+
+msgid "The same-name account username is determined by the server."
+msgstr "同名帳號的使用者名稱由伺服器決定。"
+
+msgid "This MFA method does not send a verification code"
+msgstr "此 MFA 方式不發送驗證碼。"
+
+msgid "This connection does not require this step"
+msgstr "本次連線無需執行此步驟。"
+
+msgid "This field cannot be submitted."
+msgstr "不允許提交此欄位。"
+
+msgid "This field does not belong to the current step."
+msgstr "此欄位不屬於目前步驟。"
+
+msgid "This push method does not support create-only mode"
+msgstr "此推送方式不支援僅建立模式。"
+
+msgid "This username cannot be provisioned automatically."
+msgstr "此使用者名稱不支援自動推送。"
+
+msgid "Use Web Terminal to complete face verification"
+msgstr "請使用 Web 終端完成人臉驗證。"
+
+msgid ""
+"Verify an enrolled MFA code before connecting. Block connections if no code-"
+"based MFA method is enrolled."
+msgstr "連線前驗證已綁定的 MFA 驗證碼；未綁定驗證碼類型的 MFA 時無法連線。"
+
+msgid ""
+"Verify the user's face before connecting. Requires system face recognition "
+"and an enrolled face."
+msgstr "連線前驗證人臉；需啟用系統人臉辨識並完成人臉登錄。"
+
+msgid "Waiting to push the same-name account."
+msgstr "等待推送同名帳號。"
+
+msgid ""
+"Web Terminal only: verify the user's face before connecting and monitor "
+"throughout the session. Requires system face recognition and an enrolled "
+"face."
+msgstr "僅支援 Web 終端，連線前驗證人臉，工作階段期間持續監測；需啟用人臉辨識並完成人臉登錄。"
+
+#: reports/audit_contract.py reports/services/audit_data.py
+msgid "Account Health"
+msgstr "帳號健康"
+
+#: reports/services/audit_data.py
+msgid "Account Tasks to Review"
+msgstr "待查核帳號任務"
+
+#: reports/services/audit_data.py
+msgid "Assets with Pending Risks"
+msgstr "存在待處理風險的資產"
+
+#: reports/services/audit_data.py
+msgid "Awaiting review"
+msgstr "待查核"
+
+#: reports/services/audit_data.py
+msgid "Candidate credential verified"
+msgstr "候選憑證驗證通過"
+
+#: reports/services/audit_data.py
+msgid "Check connection conditions and the original session before retrying."
+msgstr "重試前請檢查連線條件和原始工作階段。"
+
+#: reports/services/audit_data.py
+msgid "Check recording creation, upload, and storage for the original session."
+msgstr "請檢查原始工作階段的錄影產生、上傳和儲存情況。"
+
+#: reports/services/audit_data.py
+msgid "Command Decisions to Review"
+msgstr "待查核命令處置"
+
+#: reports/services/audit_data.py
+msgid "Compare the detected change with approved access and confirm the handling result."
+msgstr "請將偵測到的變化與已核准的存取權限進行比較，並確認處置結果。"
+
+#: reports/services/audit_data.py
+msgid "Confirm that the newer credential is synchronized and access works."
+msgstr "請確認較新的憑證已同步且能夠正常存取。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the location change matches travel, proxy use, or expected access."
+msgstr "請確認地點變化是否符合出差、代理使用或預期存取情況。"
+
+#: reports/services/audit_data.py
+msgid "Confirmed Risk Records"
+msgstr "已確認風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Connection Failures to Review"
+msgstr "待查核連線失敗"
+
+#: reports/services/audit_data.py
+msgid "Credential verification failed"
+msgstr "憑證驗證失敗"
+
+#: reports/services/audit_data.py
+msgid "Credential verification in progress"
+msgstr "憑證驗證中"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risk Details"
+msgstr "目前帳號風險明細"
+
+#: reports/services/audit_data.py
+msgid "Current Account Risks"
+msgstr "目前帳號風險"
+
+#: reports/services/audit_data.py
+msgid "Current Risk Records"
+msgstr "目前風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Failed Logins to Review"
+msgstr "待查核登入失敗"
+
+#: reports/services/audit_data.py
+msgid "File Operations to Review"
+msgstr "待查核檔案操作"
+
+#: reports/services/audit_data.py
+msgid "Handling Progress"
+msgstr "處置進度"
+
+#: reports/services/audit_data.py
+msgid "Ignored Risk Records"
+msgstr "已忽略風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Issue"
+msgstr "問題"
+
+#: reports/services/audit_data.py
+msgid "Later password change succeeded"
+msgstr "後續改密成功"
+
+#: reports/services/audit_data.py
+msgid "New-City Logins to Review"
+msgstr "待查核異地登入"
+
+#: reports/services/audit_data.py
+msgid "Next Step"
+msgstr "下一步操作"
+
+#: reports/services/audit_data.py
+msgid "No account risk records are currently available."
+msgstr "目前沒有可用的帳號風險記錄。"
+
+#: reports/services/audit_data.py
+msgid "Original Record"
+msgstr "原始記錄"
+
+#: reports/services/audit_data.py
+msgid "Pending Risk Records"
+msgstr "待處理風險記錄"
+
+#: reports/services/audit_data.py
+msgid "Pending Risks by Type"
+msgstr "待處理風險類型分布"
+
+#: reports/services/audit_data.py
+msgid "Policy Denials to Review"
+msgstr "待查核策略拒絕"
+
+#: reports/services/audit_data.py
+msgid "Recordings to Review"
+msgstr "待查核錄影"
+
+#: reports/audit_contract.py reports/services/audit_data.py
+msgid "Remediation Checklist"
+msgstr "異常處置清單"
+
+#: reports/services/audit_data.py
+msgid "Review and synchronize the verified candidate credential; verification alone does not confirm recovery."
+msgstr "請查核並同步已通過驗證的候選憑證；僅驗證通過並不能確認已恢復。"
+
+#: reports/services/audit_data.py
+msgid "Review the command purpose, matched rule, and approval trail in the original session."
+msgstr "請在原始工作階段中查核命令用途、符合規則和審批記錄。"
+
+#: reports/services/audit_data.py
+msgid "Review the denied operation and confirm that the access policy is expected."
+msgstr "請查核被拒絕的操作，確認存取策略符合預期。"
+
+#: reports/services/audit_data.py
+msgid "Review the execution log and affected targets, correct the cause, then retry."
+msgstr "請查看執行日誌和受影響對象，修正原因後重試。"
+
+#: reports/services/audit_data.py
+msgid "Review the file path, access permissions, and original session before retrying."
+msgstr "重試前請查核檔案路徑、存取權限和原始工作階段。"
+
+#: reports/services/audit_data.py
+msgid "Review the verification result and original execution before retrying."
+msgstr "重試前請查核驗證結果和原始執行記錄。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this failure still applies."
+msgstr "請查核忽略此次失敗的原因是否仍然適用。"
+
+#: reports/services/audit_data.py
+msgid "Review whether the reason for ignoring this risk still applies."
+msgstr "請查核忽略此風險的原因是否仍然適用。"
+
+#: reports/services/audit_data.py
+msgid "Risk Count"
+msgstr "風險數量"
+
+#: reports/services/audit_data.py
+msgid "Updated"
+msgstr "更新時間"
+
+#: reports/services/audit_data.py
+msgid "Verification Time"
+msgstr "驗證時間"
+
+#: reports/services/audit_data.py
+msgid "Verify the candidate credential and synchronize it only after confirming that access works."
+msgstr "請驗證候選憑證，確認能夠正常存取後再同步。"
+
+#: reports/services/audit_data.py
+msgid "Verify the login source and account identity, then review the authentication log."
+msgstr "請核實登入來源及帳號身分，然後查看驗證日誌。"
+
+#: reports/services/audit_data.py
+msgid "Wait for verification to finish before deciding whether to synchronize the credential."
+msgstr "請等待驗證完成，再決定是否同步憑證。"
+
+#: reports/services/assessment.py
+msgid "Readable"
+msgstr "可讀取"
+
+#: reports/services/assessment.py
+msgid "Reference"
+msgstr "參考依據"
+
+#: reports/services/assessment.py
+msgid "Record ID"
+msgstr "記錄 ID"
+
+#: reports/services/audit_data.py
+msgid "Review failed connections using the affected assets, accounts, and recorded reasons."
+msgstr "根據涉及的資產、帳號及記錄原因核查連線失敗。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s completed successful sessions require recording review. Check recording creation, upload, and storage."
+msgstr "已結束且連線成功的工作階段中，有 %(count)s 次需要核查錄影。請檢查錄影產生、上傳及儲存。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s new-city login records require review of user identity and access location."
+msgstr "%(count)s 筆新城市登入記錄需要核查使用者身分和存取地點。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform login records use loopback source addresses. Confirm whether these are local accesses or proxy-forwarded requests."
+msgstr "%(count)s 筆平台登入記錄使用回環來源位址。請確認是本機存取還是經代理轉送的請求。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s platform logins failed. Review the affected users, source addresses, and recorded reasons."
+msgstr "%(count)s 次平台登入失敗。請核查涉及的使用者、來源位址及記錄原因。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(failed)s of %(total)s file operations failed (%(rate)s%%). Review the affected assets, accounts, file paths, and original sessions."
+msgstr "%(total)s 次檔案操作中有 %(failed)s 次失敗（%(rate)s%%）。請核查涉及的資產、帳號、檔案路徑及原始工作階段。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(sessions)s asset sessions were recorded: %(success)s connections succeeded and %(failed)s failed, involving %(users)s users and %(assets)s assets."
+msgstr "共記錄 %(sessions)s 次資產工作階段，其中 %(success)s 次連線成功、%(failed)s 次連線失敗，涉及 %(users)s 名使用者和 %(assets)s 台資產。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(total)s account tasks were executed: %(success)s succeeded, %(failed)s failed or errored, and %(pending)s remain incomplete."
+msgstr "共執行 %(total)s 次帳號工作，其中 %(success)s 次成功、%(failed)s 次失敗或錯誤，%(pending)s 次尚未完成。"
+
+#: reports/services/audit_data.py
+msgid "Account Risks to Review"
+msgstr "待處理帳號風險"
+
+#: reports/services/audit_data.py
+msgid "Accounts Identified in Pending Risks"
+msgstr "待處理風險涉及帳號"
+
+#: reports/services/audit_data.py
+msgid "Affected Accounts"
+msgstr "涉及帳號數"
+
+#: reports/services/audit_data.py
+msgid "Affected Assets"
+msgstr "涉及資產數"
+
+#: reports/services/audit_data.py
+msgid "Assets with Latest Check Successful"
+msgstr "最近檢測成功的資產"
+
+#: reports/services/audit_data.py
+msgid "Assign a unique credential to each affected account, synchronize dependent services, and verify access."
+msgstr "為每個受影響帳號設定獨立憑證，同步相依服務並驗證存取。"
+
+#: reports/services/audit_data.py
+msgid "Check Result"
+msgstr "檢測結果"
+
+#: reports/services/audit_data.py
+msgid "Compare authorized keys with approved keys, and remove unapproved keys."
+msgstr "核對授權金鑰與已核准金鑰，移除未經核准的金鑰。"
+
+#: reports/services/audit_data.py
+msgid "Compare group membership changes with approved access, and remove unapproved privileges."
+msgstr "對照已核准權限核查使用者群組變更，移除未經核准的權限。"
+
+#: reports/services/audit_data.py
+msgid "Compare sudo permission changes with approved access, and remove unapproved privileges."
+msgstr "對照已核准權限核查 sudo 權限變更，移除未經核准的權限。"
+
+#: reports/services/audit_data.py
+msgid "Confirm the account owner and purpose, then manage approved accounts or disable unauthorized accounts."
+msgstr "確認帳號歸屬與用途，將已核准帳號納入管理，或停用未獲授權帳號。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether deletion was approved, then reconcile the managed account inventory."
+msgstr "確認帳號刪除是否經過核准，再核對納管帳號清單。"
+
+#: reports/services/audit_data.py
+msgid "Confirm whether the account is still needed, then disable unused accounts after approval."
+msgstr "確認帳號是否仍需使用，經核准後停用閒置帳號。"
+
+#: reports/services/audit_data.py
+msgid "Current Managed Accounts"
+msgstr "目前納管帳號"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "Currently, %(pending)s pending account risk records involve %(accounts)s distinct accounts on %(assets)s assets. Review the affected accounts by risk type."
+msgstr "目前 %(pending)s 筆待處理帳號風險記錄涉及 %(assets)s 台資產上的 %(accounts)s 個不同帳號。請按風險類型核查涉及的帳號。"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Failed"
+msgstr "最近檢測失敗"
+
+#: reports/services/audit_data.py
+msgid "Latest Check Successful"
+msgstr "最近檢測成功"
+
+#: reports/services/audit_data.py
+msgid "Managed Accounts with Latest Check Successful"
+msgstr "最近檢測成功的納管帳號"
+
+#: reports/services/audit_data.py
+msgid "Most Recent Stored Check"
+msgstr "最近記錄的檢測時間"
+
+#: reports/services/audit_data.py
+msgid "No Check Result"
+msgstr "無檢測結果"
+
+#: reports/services/audit_data.py
+msgid "No listed security events were found in the available records for this period."
+msgstr "本期可用記錄中未發現所列安全事件。"
+
+#: reports/services/audit_data.py
+msgid "Not Applicable"
+msgstr "不適用"
+
+#: reports/services/audit_data.py
+msgid "Password Changes with Subsequent Progress"
+msgstr "已有後續進展的改密記錄"
+
+#: reports/services/audit_data.py
+msgid "Renew the expired credential and verify dependent tasks and account access."
+msgstr "更新已過期的憑證，並驗證相依工作及帳號存取。"
+
+#: reports/services/audit_data.py
+msgid "Replace the weak password with a strong unique password, then verify account access."
+msgstr "將弱密碼更換為獨立的高強度密碼，再驗證帳號存取。"
+
+#: reports/services/audit_data.py
+msgid "Review failed task logs and affected accounts; prioritize unresolved items before records with subsequent progress."
+msgstr "核查失敗工作日誌及涉及帳號，優先處理尚未解決的項目，再複核已有後續進展的記錄。"
+
+#: reports/services/audit_data.py
+msgid "Review risks"
+msgstr "查看風險"
+
+#: reports/services/audit_data.py
+msgid "Review the confirmed finding and verify the current account state."
+msgstr "複核已確認的風險，並檢查帳號目前狀態。"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Matched to Managed Accounts"
+msgstr "已對應納管帳號的風險帳號"
+
+#: reports/services/audit_data.py
+msgid "Risk Accounts Not Matched to Managed Accounts"
+msgstr "未對應納管帳號的風險帳號"
+
+#: reports/services/audit_data.py
+msgid "Risk List"
+msgstr "風險清單"
+
+#: reports/services/audit_data.py
+msgid "Risk Records"
+msgstr "風險記錄數"
+
+#: reports/services/audit_data.py
+msgid "Rotate the credential according to the rotation policy and verify dependent services."
+msgstr "按輪替策略更換憑證，並驗證相依服務。"
+
+#: reports/services/audit_data.py
+msgid "Rotate the potentially exposed credential, review recent access, and verify dependent services."
+msgstr "更換可能外洩的憑證，複核近期存取並驗證相依服務。"
+
+#: reports/services/audit_data.py
+msgid "Stored Asset Connectivity Results"
+msgstr "資產連線檢測結果"
+
+#: reports/services/audit_data.py
+msgid "Stored Managed Account Connectivity Results"
+msgstr "納管帳號連線檢測結果"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s assets, of which %(active)s are enabled."
+msgstr "目前共有 %(total)s 台資產，其中 %(active)s 台已啟用。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "There are currently %(total)s managed account records, of which %(active)s are enabled."
+msgstr "目前共有 %(total)s 筆納管帳號記錄，其中 %(active)s 筆已啟用。"
+
+#: reports/services/audit_data.py
+msgid "There are currently no pending account risk records."
+msgstr "目前沒有待處理帳號風險記錄。"
+
+#: reports/services/audit_data.py
+#, python-format
+msgid "%(count)s account task executions were canceled."
+msgstr "%(count)s 次帳號工作執行已取消。"
+
+msgid "Please upgrade the JumpServer client to use the configured login policy."
+msgstr "請升級 JumpServer 用戶端後使用目前的登入策略。"
+
+msgid "Client login session expired. Please authenticate again."
+msgstr "用戶端登入已失效，請重新驗證身分。"
+
+msgid "Log in again after exiting the client"
+msgstr "退出後重新登入"
+
+msgid ""
+"When enabled, log in again after the desktop application exits and restarts."
+" Minimizing or hiding the application does not count as exiting."
+msgstr "啟用後，用戶端程序退出並重新啟動時需要重新登入。最小化或隱藏視窗不屬於退出。"
+
+msgid "Client login idle timeout (minute)"
+msgstr "閒置逾時（分鐘）"
+
+msgid "Log in again when the idle timeout is reached. 0 disables the limit (default). Real keyboard and mouse input in the main window, separate asset windows and built-in websites counts as activity. An open connection, background output and automatic refresh do not count. Input in external software such as Xshell or MSTSC, and in some cross-origin embedded pages, cannot be captured. Using only these areas, watching without input for a long time, or failed reports due to network issues may still trigger the idle timeout. Time is measured from the last activity confirmed by the server."
+msgstr "達到閒置逾時後需重新登入。0 表示不啟用（預設）。主視窗、獨立資產視窗及內建網站中的實際鍵盤、滑鼠操作會計入活動；連線在線、背景輸出和自動重新整理不算活動。Xshell、MSTSC 等外部軟體和部分跨來源內嵌頁面中的操作無法擷取。僅在這些區域操作、長時間只觀看，或網路異常導致回報失敗時，仍可能觸發閒置逾時；以伺服器最後確認的活動時間為準。"
+
+msgid "Maximum client login lifetime (minute)"
+msgstr "最長登入有效期（分）"
+
+msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
+msgstr "從用戶端登入開始計時，使用者操作和權杖更新均不延長有效期。0 表示不限制登入時長（預設），退出和閒置逾時設定仍然生效。到期後需重新登入。"
+
+msgid "Client exit"
+msgstr "用戶端退出"
+
+msgid "Idle timeout"
+msgstr "閒置逾時"
+
+msgid "Maximum login time"
+msgstr "登入有效期結束"
+
+msgid "Client login policy changed"
+msgstr "用戶端登入策略已變更"
+
+msgid "Authorization revoked"
+msgstr "授權已撤銷"
+
+#: assets/models/asset/common.py assets/serializers/asset/common.py
+msgid "Asset owner"
+msgstr "資產負責人"
+
+msgid "Manager"
+msgstr "直屬負責人"
+
+msgid "Workflow"
+msgstr "審批流程"
+
+msgid "Approval workflow"
+msgstr "審批流程"
+
+msgid "Workflow version"
+msgstr "流程版本"
+
+msgid "Workflow instance"
+msgstr "流程實例"
+
+msgid "Workflow node"
+msgstr "流程節點"
+
+msgid "Workflow edge"
+msgstr "流程連線"
+
+msgid "Workflow node instance"
+msgstr "節點實例"
+
+msgid "Approval task"
+msgstr "審批任務"
+
+msgid "Workflow event"
+msgstr "流程事件"
+
+#: tickets/plugins
+msgid "View account password"
+msgstr "檢視帳號密碼"
+
+#: tickets/plugins
+msgid "Change account password"
+msgstr "帳號改密"
+
+#: tickets/plugins
+msgid "File upload / download"
+msgstr "檔案上傳下載"
+
+#: tickets/plugins
+msgid "Download session recording"
+msgstr "工作階段錄影下載"
+
+#: tickets/plugins
+msgid "Authorized users"
+msgstr "授權使用者"
+
+#: tickets/plugins
+msgid "Request parameters"
+msgstr "申請參數"
+
+#: tickets/plugins
+msgid "Validity (seconds)"
+msgstr "有效時長（秒）"
+
+#: tickets/plugins
+msgid "File paths"
+msgstr "檔案路徑"
+
+#: tickets/plugins
+msgid "Direction"
+msgstr "方向"
+
+msgid "WinRM file transfer root"
+msgstr "WinRM 檔案傳輸根目錄"
+
+msgid "Absolute Windows directory; home uses the connected account home directory."
+msgstr "Windows 絕對目錄；home 表示連線帳號的使用者目錄。"
+
+msgid "Select one Linux SSH/SFTP or Windows WinRM account."
+msgstr "請選擇一個 Linux SSH/SFTP 或 Windows WinRM 帳號。"
+
+msgid "Client idle lock (minute)"
+msgstr "閒置鎖定 (分)"
+
+msgid ""
+"0 disables idle locking (default). When enabled, the client starts locked. "
+"Only the active site and account are checked for system keyboard or mouse "
+"inactivity. Lock the main page and managed asset windows without ending "
+"login or connections. Unlock only on the main page with the current account "
+"client lock password. Set the password in Personal settings > Login "
+"authentication > Client credentials. External applications are not covered "
+"by the client lock."
+msgstr ""
+"0 表示關閉閒置鎖定。 "
+"主頁面與用戶端管理的資產視窗一起鎖定，只能在主頁面輸入目前帳號的鎖定密碼解鎖。登入及連線保持；外部軟體不受此鎖定保護。啟用後，新登入及還原的登入預設鎖定。"
+" 依本機系統鍵鼠輸入判斷閒置，其他程式操作亦計入；僅對目前啟用的網站與帳號計時，無須向伺服器回報活動。"
+
+msgid "Client lock password"
+msgstr "用戶端鎖定密碼"
+
+msgid "Set a client lock password in the web personal settings first."
+msgstr "尚未設定用戶端鎖定密碼。請前往此網站、此帳號的 Web 個人設定完成設定，返回後按重新整理。"
+
+msgid "The client lock password is incorrect."
+msgstr "解鎖失敗，請檢查密碼與網路後重試。"
+
+msgid ""
+"Calculated from each login time using the latest setting. Activity and token"
+" refresh do not extend it. 0 means unlimited. If a change makes a login "
+"overdue, allow up to 10 minutes before sign-out and signing in again."
+msgstr ""
+"從每次登入時間起，依最新設定計算。使用者操作和權杖更新不會續期。0 表示不限。設定修改後已逾時的，最多再保留 10 分鐘，到期後需要重新登入。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → Login "
+"authentication → Client credentials → File Encryption Password to set it."
+msgstr "{} - 尚未設定加密密碼，請前往個人設定 → 登入驗證 → 用戶端憑證 → 檔案加密密碼進行設定。"
+
+msgid ""
+"0 disables automatic idle locking (default). System keyboard and mouse input"
+" determines inactivity for the active site and account only. Activity is not"
+" reported for each action; an idle timeout or manual lock sends one request "
+"to lock this login on the server. Idle timeout locks the main page and its "
+"managed asset windows even without a lock password. Unlock only on the main "
+"page after server password verification. New logins open normally; "
+"previously locked logins stay locked after restoration. External application"
+" windows are not protected."
+msgstr ""
+"0 "
+"表示關閉自動閒置鎖定。依據本機系統鍵盤滑鼠輸入判斷閒置，只對目前啟用的站點與帳號計時。平時不逐次回報活動；閒置逾時或手動鎖定時，通知伺服器鎖定本次登入。"
+" "
+"閒置逾時即鎖定主頁面與對應資產視窗，即使尚未設定密碼。只能在主頁面通過後端密碼驗證後解鎖。新登入正常進入，已鎖定的登入恢復後仍鎖定。外部軟體視窗不受保護。"
+
+msgid "The web session is locked. Unlock it before authorizing a client."
+msgstr "Web 工作階段已鎖定，請先解鎖後再授權用戶端。"
+
+msgid "Client is locked. Unlock it on the main page."
+msgstr "用戶端已鎖定，請在主頁面解鎖。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. After the configured "
+"period without system keyboard or mouse input, lock the main page and asset "
+"windows for the current site and account. Unlock on the main page by "
+"verifying the lock password online. Locking also applies if no password is "
+"configured; set it in web personal settings. External application windows "
+"are not protected."
+msgstr ""
+"預設 15 分鐘。 0 "
+"表示停用自動鎖定。本機無鍵盤滑鼠操作達到設定時長後，鎖定目前站點帳號的主頁面與資產視窗。須在主頁面連線驗證鎖定密碼後解鎖。尚未設定密碼也會鎖定，可前往 "
+"Web 個人設定中設定密碼。外部軟體視窗不受保護。"
+
+msgid ""
+"{} - Encryption password not set - Please go to Personal Settings → User "
+"authentication → File Encryption to set it."
+msgstr "{} - 尚未設定加密密碼，請前往個人設定 → 使用者驗證 → 檔案加密進行設定。"
+
+#: rbac/tree.py
+msgid "Audit reports"
+msgstr "審計報告"
+
+#: rbac/tree.py
+msgid "Legacy reports"
+msgstr "舊版報表"
+
+#: rbac/models/menu.py
+msgid "Can view comprehensive audit report"
+msgstr "可以查看綜合審計報告"
+
+#: rbac/models/menu.py
+msgid "Can view operations activity report"
+msgstr "可以查看運維活動報告"
+
+#: rbac/models/menu.py
+msgid "Can view security event report"
+msgstr "可以查看安全事件報告"
+
+#: rbac/models/menu.py
+msgid "Can view asset and account overview"
+msgstr "可以查看資產與帳號概況"
+
+#: rbac/models/menu.py
+msgid "Can view account operations report"
+msgstr "可以查看帳號運維報告"
+
+msgid "Locked"
+msgstr "鎖定狀態"
+
+msgid "Screen lock password"
+msgstr "鎖屏密碼"
+
+msgid "Idle screen lock (minute)"
+msgstr "閒置鎖屏 (分)"
+
+msgid "Set a lock password after signing in again."
+msgstr "請重新登入後設定鎖屏密碼。"
+
+msgid "The lock password is incorrect."
+msgstr "鎖屏密碼不正確。"
+
+msgid ""
+"Configure an identity verification method before changing the lock password."
+msgstr "請先設定身分驗證方式，再修改鎖屏密碼。"
+
+msgid "This verification method is not available."
+msgstr "此驗證方式無法使用。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the desktop "
+"client, console and Web terminal. Desktop uses system keyboard/mouse "
+"activity; Web combines activity in tabs on this site. Idle locks even "
+"without a password. Unlock requires online password verification; if unset, "
+"sign out and sign in again to set it. External applications are not "
+"protected."
+msgstr ""
+"預設 15 分鐘，0 表示關閉自動鎖屏。用戶端、控制台和 Web 終端共用。用戶端按系統鍵鼠活動計時，Web "
+"彙總同站點各分頁的活動。閒置到時即鎖屏，未設定密碼也會鎖定。解鎖須線上驗證鎖屏密碼；未設定時可登出並重新登入後設定。外部軟體視窗不受保護。"
+
+msgid ""
+"Too many incorrect screen lock passwords. This session has been signed out."
+msgstr "鎖屏密碼連續錯誤 5 次，本次登入已登出。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Uses system "
+"keyboard/mouse activity. Locks the desktop client and its asset windows even"
+" without a lock password. Unlock on the main window with online password "
+"verification. External applications are not protected."
+msgstr ""
+"預設 15 分鐘，0 "
+"表示停用自動鎖屏。依本機系統的鍵鼠活動判斷閒置，到時鎖定用戶端及其資產視窗，即使未設定鎖屏密碼也會鎖定。只能在主視窗由後端驗證密碼後解鎖，外部軟體視窗不受保護。"
+
+msgid ""
+"Default: 15 minutes. 0 disables automatic locking. Shared by the console and"
+" Web terminal. Uses keyboard/mouse activity across tabs on this site; other "
+"sites and external applications cannot be monitored. Locks the current Web "
+"login even without a lock password. If unset, sign out and sign in again."
+msgstr ""
+"預設 15 分鐘，0 表示停用自動鎖屏。控制台與 Web "
+"終端共用，彙總同站點分頁的鍵鼠活動，無法擷取其他網站或外部軟體的活動。即使未設定密碼也會鎖屏，此時可登出後重新登入。"
+
+#~ msgid "Ticket already closed"
+#~ msgstr "工單已經關閉"
+
+msgid "Web session lifetime (second)"
+msgstr "Web 工作階段有效時長 (秒)"
+
+msgid "Renew session on request"
+msgstr "請求續期"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New or renewed sessions use the new duration; stored expiry times are "
+"not immediately rewritten. This is not a fixed maximum since login. Web and "
+"desktop login policies are independent."
+msgstr ""
+"設定項 SESSION_COOKIE_AGE，單位為秒。修改 Core 的 config.yml 後重新啟動 "
+"Core。新建或續期的工作階段使用新時長，已儲存的到期時間不會立即批次改寫。這不是從登入開始計算的固定最長有效期。Web 與用戶端登入策略相互獨立。"
+
+msgid ""
+"SESSION_SAVE_EVERY_REQUEST. Change it in Core config.yml and restart Core. "
+"When enabled, ordinary requests renew the Web session for the configured "
+"duration. Disabling it does not impose a fixed maximum: writing to the "
+"session can still renew it. Keyboard/mouse inactivity does not sign out the "
+"user; idle screen locking is configured separately."
+msgstr ""
+"設定項 SESSION_SAVE_EVERY_REQUEST，修改 Core 的 config.yml 後重新啟動 "
+"Core。啟用後，一般請求依工作階段有效時長延長到期時間；停用也不等於固定最長有效期，寫入 Session "
+"仍可能續期。鍵鼠閒置不會直接登出，閒置鎖屏另行設定。"
+
+msgid ""
+"0 means unlimited. Calculated from each login time using the latest setting."
+" Activity and token refresh do not extend it. Settings sync about every 60 "
+"seconds. If a change makes a login overdue, allow up to 10 minutes before "
+"sign-out. Extending the limit during grace cancels sign-out if the login is "
+"within the new limit."
+msgstr ""
+"0 表示不限制。依每次登入時間及最新設定計算，操作與 Token 更新不會延長。設定約每 60 秒同步；新設定下已逾時的，最多再保留 10 "
+"分鐘。寬限期內延長後未逾時的，取消登出。"
+
+msgid "Web idle screen lock (minute)"
+msgstr "Web 端閒置鎖屏 (分)"
+
+msgid "Client idle screen lock (minute)"
+msgstr "用戶端閒置鎖屏 (分)"
+
+msgid ""
+"Leave blank to follow the administrator. A personal value must not exceed "
+"the administrator limit."
+msgstr "留空以跟隨管理員設定，個人設定不得超過管理員上限。"
+
+#, python-format
+msgid ""
+"The administrator limit is %(minutes)s minutes. Leave blank to follow it."
+msgstr "管理員上限為 %(minutes)s 分鐘，留空表示跟隨管理員設定。"
+
+msgid ""
+"Global default and maximum. Users who have not customized it follow this "
+"value. Personal values must not exceed it. Lowering the maximum also lowers "
+"larger personal values; raising it keeps customized values."
+msgstr ""
+"這是全域預設值與上限。未自行設定的使用者始終跟隨此值；個人設定只能小於或等於此值。調低上限時，超出的個人值會一併調低；調高時，已自行設定的值保持不變。"
+
+msgid "Choose either setting or clearing the lock password."
+msgstr "不能同時設定及清空鎖屏密碼。"
+
+msgid ""
+"When the global value is 0, users may choose 0 to disable locking or a "
+"positive personal timeout."
+msgstr "全域值為 0 時，使用者可設定 0 停用鎖屏，也可設定正數自行啟用。"
+
+msgid "The administrator requires reauthentication after client exit."
+msgstr "管理員要求退出用戶端後重新登入，無法停用。"
+
+msgid ""
+"Users may enable it themselves when the administrator does not require it."
+msgstr "管理員未要求啟用時，使用者可以自行啟用。"
+
+msgid ""
+"SESSION_COOKIE_AGE, in seconds. Change it in Core config.yml and restart "
+"Core. New logins use the new duration. Existing expiry times are not "
+"immediately rewritten. Renewals use the new duration unless the session has "
+"its own saved duration; sign in again to apply the new duration to those "
+"sessions. This is not a fixed maximum since login. Web and desktop login "
+"policies are independent."
+msgstr ""
+"工作階段有效時長與請求續期須修改 Core 的 config.yml 並重新啟動 "
+"Core。新登入採用新設定；已有截止時間不會批次改寫。儲存了獨立時長的工作階段，續期時亦可能保留原時長，須重新登入才採用新時長。 "
+"SESSION_COOKIE_AGE "
+"是儲存工作階段時採用的有效時長，單位為秒，並非從首次登入計算的固定上限。個人資訊顯示的目前到期時間，才是伺服器儲存的截止時間。"
+
+msgid ""
+"Default Web session duration, in seconds, after login or renewal. It is not "
+"a fixed maximum since the first login. Change SESSION_COOKIE_AGE in Core "
+"config.yml and restart Core. Existing sessions may keep their saved "
+"duration; sign in again to apply the new duration."
+msgstr ""
+"預設的 Web 登入或續期後有效時長，單位為秒，並非從首次登入計算的固定上限。修改 Core 的 config.yml 中 "
+"SESSION_COOKIE_AGE 並重新啟動後生效。已有工作階段可能保留原時長，重新登入後採用新時長。"
+
+msgid ""
+"Enabled: ordinary HTTP requests, including background requests, renew the "
+"session. Disabled: ordinary read-only requests do not renew it, but session "
+"writes such as identity verification still can. Change "
+"SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core."
+msgstr ""
+"啟用：一般 HTTP 請求會續期，背景請求亦可能續期。停用：一般唯讀請求不續期，但再次驗證身分等修改 Session 的操作仍可能續期。修改 Core "
+"的 config.yml 中 SESSION_SAVE_EVERY_REQUEST 並重新啟動後生效。"
+
+msgid ""
+"Enabled: closing the browser normally requires signing in again. Browser "
+"session restore may keep login cookies; use Sign out to end the login "
+"reliably. This does not set a fixed maximum login duration."
+msgstr "啟用後，關閉瀏覽器通常須重新登入。瀏覽器還原功能可能保留登入 Cookie；需要確保登出時，請按「登出」。此項並非固定最長登入時長的設定。"
+
+msgid ""
+"Default duration, in seconds.<br>Each renewal restarts the clock: expiry = "
+"renewal time + duration.<br>Ordinary requests renew it when request renewal "
+"is enabled; session writes such as identity verification can still renew it "
+"when disabled.<br>This is not a fixed maximum from the first "
+"login.<br>Change SESSION_COOKIE_AGE in Core config.yml and restart Core. "
+"Existing sessions may retain their saved duration; sign in again to apply "
+"the new duration."
+msgstr ""
+"預設有效時長，單位為秒。<br>每次續期後重新計時：到期時間 = 續期時間 + "
+"有效時長。<br>啟用「請求續期」時，一般請求會續期；停用時，再次驗證身分等修改 Session "
+"的操作仍可能續期。<br>這並非從首次登入計算的固定最長有效期。<br>修改 Core 的 config.yml 中 "
+"SESSION_COOKIE_AGE 並重新啟動後生效。已有工作階段可能保留原時長，重新登入後採用新時長。"
+
+msgid ""
+"Enabled: most API requests using a valid Web session renew it, including GET"
+" queries and background business polling. Mouse or keyboard activity is not "
+"required.<br>Excluded read-only queries: profile, online status (user-"
+"session), and lock status (session-lock/status).<br>Disabled: ordinary read-"
+"only requests do not renew it, but identity verification and other session "
+"writes still can.<br>Why: the project writes the verification result to "
+"Session; Django saves the modified session and recalculates its relative "
+"expiry by default.<br>Change SESSION_SAVE_EVERY_REQUEST in Core config.yml "
+"and restart Core."
+msgstr ""
+"啟用：大多數攜帶有效 Web 工作階段的 API 請求都會續期，包括 GET "
+"查詢與背景業務輪詢，不要求有鍵鼠操作。<br>不續期的唯讀查詢：個人資訊、線上狀態（user-session）、鎖屏狀態（session-"
+"lock/status）。<br>停用：一般唯讀請求不續期，但再次驗證身分等修改 Session 的操作仍可能續期。<br>原因：專案將驗證結果寫入 "
+"Session；Django 預設在儲存已修改的 Session 時重新計算相對有效期。<br>修改 Core 的 config.yml 中 "
+"SESSION_SAVE_EVERY_REQUEST 並重新啟動後生效。"
+
+msgid ""
+"Enabled: after quitting the entire browser application, opening it again "
+"normally requires signing in.<br>Closing a tab or window, or minimizing it, "
+"is not the same as quitting the application; the browser may still be "
+"running in the background.<br>Browser session restore may preserve login "
+"cookies. Use the site Sign out action to reliably end the login.<br>This "
+"does not set a fixed maximum login duration."
+msgstr ""
+"啟用後，退出整個瀏覽器應用程式，再次開啟通常須重新登入。<br>只關閉分頁或視窗、最小化不等於退出應用程式，瀏覽器可能仍在背景執行。<br>瀏覽器還原功能可能保留登入"
+" Cookie；需要確保登出時，請按站點的「登出」。<br>此項並非固定最長登入時長的設定。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"Require a new login after exiting and restarting. Minimizing or hiding the "
+"client does not count as exiting."
+msgstr "啟用後，退出並重新啟動須重新登入，最小化或隱藏不受影響。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 means unlimited. Counted from login. Sign in again when it expires; "
+"activity does not extend it. A login already overdue after a change gets up "
+"to 10 more minutes."
+msgstr "0 表示不限制。 從登入時間起計算，到期須重新登入，操作不會延長。 修改後已逾時的登入最多保留 10 分鐘。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks after the specified idle time. Enter the"
+" lock password in the main window to unlock. External application windows "
+"are not protected."
+msgstr "0 表示關閉自動鎖屏。 閒置達到設定時間後自動鎖屏，在主視窗輸入鎖屏密碼解鎖。外部軟體視窗不受保護。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables automatic locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. Administrator "
+"settings are defaults and limits. Users may choose stricter settings; "
+"otherwise they follow the administrator."
+msgstr ""
+"0 表示關閉自動鎖屏。 閒置達到設定時間後鎖定控制台與 Web 終端，輸入鎖屏密碼解鎖。 "
+"管理員設定為預設值與上限，使用者可設定得更嚴格；未自行設定則跟隨管理員。"
+
+#: settings/serializers/feature.py
+msgid "Asset application scope"
+msgstr "資產申請範圍"
+
+#: settings/serializers/feature.py
+msgid "Specifies which assets users can select when requesting access via a ticket.<br><b>All assets:</b> All assets in the ticket's organization, even if the user has no existing permission.<br><b>Permed assets:</b> Assets included in permission rules assigned to the user or their user groups, including inactive, expired and not-yet-effective rules.<br><b>Permed valid assets:</b> Assets included in valid permission rules assigned to the user or their user groups. The rule must be enabled, and the current time must be between its start and end times."
+msgstr "設定使用者申請資產授權時可在工單中選擇的資產範圍。<br><b>所有資產：</b>可選擇工單所屬組織內的全部資產，無須事先取得授權。<br><b>授權的資產：</b>可選擇本人或所屬使用者群組的授權規則中包含的資產，包括規則已停用、已過期或尚未生效的情況。<br><b>有效授權的資產：</b>僅可選擇本人或所屬使用者群組的有效授權規則中包含的資產。規則須已啟用、已到開始時間且未到結束時間。"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Unsupported"
+msgstr "不支援"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Execution results"
+msgstr "執行結果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "No execution results"
+msgstr "暫無執行結果"
+
+#: assets/templates/assets/connectivity_report.html
+msgid "Asset / Account"
+msgstr "資產 / 帳號"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No execution details"
+msgstr "暫無執行明細"
+
+#: accounts/templates/accounts/reports/account_results.html
+msgid "No account changes"
+msgstr "暫無帳號變化"
+
+#: chat_ai/models.py
+msgid "Chat AI conversation audit"
+msgstr "AI 對話稽核"
 
 #: accounts/notifications.py
 msgid "Account rotation preparation is ready"

@@ -8,6 +8,7 @@ from accounts.const import AutomationTypes
 from accounts.models import Account, GatheredAccount, AccountRisk
 from common.const import ConfirmOrIgnore
 from common.utils import get_logger
+from ops.ansible.utils import escape_jinja2_syntax, neutralize_jinja2_syntax
 from ..base.manager import AccountBasePlaybookManager
 
 logger = get_logger(__name__)
@@ -58,9 +59,9 @@ class RemoveAccountManager(AccountBasePlaybookManager):
         for account in accounts_to_remove:
             username = account.get("username")
             h = deepcopy(host)
-            h["name"] += "(" + (username or "-") + ")"
+            h["name"] += "(" + (neutralize_jinja2_syntax(username) or "-") + ")"
             self.host_account_mapper[h["name"]] = account
-            h["account"] = {"username": username}
+            h["account"] = {"username": escape_jinja2_syntax(username)}
             if not username:
                 h["error"] = "Account username is empty"
                 inventory_hosts.append(h)
@@ -72,7 +73,7 @@ class RemoveAccountManager(AccountBasePlaybookManager):
             connection_username = (
                 host.get("jms_account", {}).get("username") or ""
             )
-            if username.lower() == connection_username.lower():
+            if escape_jinja2_syntax(username).lower() == connection_username.lower():
                 h["error"] = (
                     "The account used to run this automation cannot be removed"
                 )

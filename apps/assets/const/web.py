@@ -3,6 +3,9 @@ from django.utils.translation import gettext_lazy as _
 from .base import BaseType
 
 
+WEB_ADVANCED_FIELDS = ('allowed_urls', 'script', 'success_selector', 'interactive_selector')
+
+
 class WebTypes(BaseType):
     WEBSITE = 'website', _('Website')
 

@@ -266,7 +266,7 @@ class CheckAccountManager(BaseManager):
         if address and str(address) not in asset_label:
             asset_label = f'{asset_label}[{address}]'
         self.result[risk].append({
-            'asset_id': str(account.asset_id),
+            **self.get_asset_result_metadata(account.asset),
             'asset': asset_label,
             'username': account.username,
         })

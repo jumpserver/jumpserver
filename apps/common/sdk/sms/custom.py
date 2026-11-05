@@ -27,7 +27,7 @@ class CustomSMS(BaseSMSClient):
                 code=template_param.get('code'), phone_numbers=phone_numbers_str
             )
 
-        logger.info(f'Custom sms send: phone_numbers={phone_numbers}, param={params}')
+        logger.info('Custom SMS send: recipients=%s', len(phone_numbers))
         if settings.CUSTOM_SMS_REQUEST_METHOD == 'post':
             action = requests.post
             kwargs = {'json': params}
@@ -38,8 +38,8 @@ class CustomSMS(BaseSMSClient):
             response = action(url=settings.CUSTOM_SMS_URL, verify=settings.VERIFY_EXTERNAL_SSL, **kwargs)
             response.raise_for_status()
         except Exception as exc:
-            logger.error('Custom sms error: {}'.format(exc))
-            raise JMSException(exc)
+            logger.error('Custom SMS request failed: %s', type(exc).__name__)
+            raise JMSException('Custom SMS request failed') from None
 
 
 client = CustomSMS

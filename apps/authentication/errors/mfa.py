@@ -1,5 +1,5 @@
-from django.utils.translation import gettext_lazy as _
 
+from django.utils.translation import gettext_lazy as _
 from common.exceptions import JMSException
 
 
@@ -10,7 +10,7 @@ class SSOAuthClosed(JMSException):
 
 class WeComCodeInvalid(JMSException):
     default_code = 'wecom_code_invalid'
-    default_detail = 'Code invalid, can not get user info'
+    default_detail = _('Code invalid, can not get user info')
 
 
 class WeComBindAlready(JMSException):

@@ -6,6 +6,8 @@ import requests
 
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.db import transaction
+from django.utils.crypto import constant_time_compare
 from django.utils.http import urlencode
 from django.conf import settings
 from django.urls import reverse
@@ -35,14 +37,38 @@ class OAuth2Backend(RedirectAuthBackend):
     def is_enabled():
         return settings.AUTH_OAUTH2
 
+    @staticmethod
+    def get_userinfo_attr(userinfo, attr, default=''):
+        if not isinstance(userinfo, dict) or not isinstance(attr, str):
+            return default
+        # Keep literal top-level keys (including dots) compatible with existing mappings.
+        if attr in userinfo:
+            return userinfo[attr]
+        value = userinfo
+        for key in attr.split('.'):
+            if not isinstance(value, dict) or key not in value:
+                return default
+            value = value[key]
+        return value
+
+    @transaction.atomic
     def get_or_create_user_from_userinfo(self, request, userinfo):
         log_prompt = "Get or Create user [OAuth2Backend]: {}"
         logger.debug(log_prompt.format('start'))
 
         # Construct user attrs value
         user_attrs = {}
-        for field, attr in settings.AUTH_OAUTH2_USER_ATTR_MAP.items():
-            user_attrs[field] = userinfo.get(attr, '')
+        attr_map = settings.AUTH_OAUTH2_USER_ATTR_MAP
+        for field, attr in attr_map.items():
+            if field == 'groups':
+                continue
+            user_attrs[field] = self.get_userinfo_attr(userinfo, attr)
+        group_attr = attr_map.get('groups')
+        if isinstance(group_attr, str) and group_attr:
+            missing = object()
+            groups = self.get_userinfo_attr(userinfo, group_attr, default=missing)
+            if groups is not missing:
+                user_attrs['groups'] = groups
 
         username = user_attrs.get('username')
         if not username:
@@ -54,15 +80,20 @@ class OAuth2Backend(RedirectAuthBackend):
         email = construct_user_email(user_attrs.get('username'), email)
         user_attrs.update({'email': email})
 
+        groups_present = 'groups' in user_attrs
+        groups = user_attrs.pop('groups', None)
         logger.debug(log_prompt.format(user_attrs))
         user, created = get_user_model().objects.get_or_create(
             username=username, defaults=user_attrs
         )
+        signal_attrs = user_attrs.copy()
+        if groups_present:
+            signal_attrs['groups'] = groups
         logger.debug(log_prompt.format("user: {}|created: {}".format(user, created)))
         logger.debug(log_prompt.format("Send signal => oauth2 create or update user"))
         oauth2_create_or_update_user.send(
             sender=self.__class__, request=request, user=user, created=created,
-            attrs=user_attrs
+            attrs=signal_attrs
         )
         return user, created
 
@@ -103,17 +134,14 @@ class OAuth2Backend(RedirectAuthBackend):
             logger.error(log_prompt.format('code is missing'))
             return None
 
-        if settings.AUTH_OAUTH2_USE_STATE:
-            if state is None:
-                logger.error(log_prompt.format('state is missing'))
-                return None
-
-            session_state = request.session.get('oauth2_state')
-            if not session_state or session_state != state:
-                logger.error(log_prompt.format('state parameter mismatch'))
-                return None
-
-            request.session.pop('oauth2_state', None)
+        session_state = request.session.pop('oauth2_state', None)
+        if (
+            not isinstance(state, str) or not isinstance(session_state, str)
+            or not state or not session_state
+            or not constant_time_compare(state, session_state)
+        ):
+            logger.error(log_prompt.format('state parameter mismatch'))
+            return None
 
         query_dict = {
             'grant_type': 'authorization_code', 'code': code,

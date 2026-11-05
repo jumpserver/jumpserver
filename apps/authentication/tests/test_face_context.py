@@ -1,8 +1,11 @@
+from contextlib import nullcontext
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
+from django.utils import translation
 from rest_framework.exceptions import NotFound
+from rest_framework.test import APIRequestFactory
 
 from authentication.api.face import FaceContextApi
 from authentication.api.connection_token import ConnectionTokenViewSet
@@ -11,6 +14,32 @@ from authentication.mixins import AuthFaceMixin
 
 
 class FaceContextApiTest(SimpleTestCase):
+    @patch("authentication.api.face.cache")
+    def test_status_localizes_capture_timeout_errors_in_chinese(self, cache):
+        messages = {
+            "Face verification timed out": "人脸验证超时，请重试。",
+            "The liveness action was not completed in time": "未在规定时间内完成活体动作，请重试。",
+        }
+        token = "c" * 32
+        request = APIRequestFactory().get("/api/v1/authentication/face/context/", {"token": token})
+        request.session = {FACE_SESSION_KEY: token}
+        view = FaceContextApi.as_view(authentication_classes=[])
+
+        for message, translated in messages.items():
+            with self.subTest(message=message), translation.override("zh-hans"):
+                cache.get.return_value = {
+                    "is_finished": True,
+                    "success": False,
+                    "error_message": message,
+                }
+
+                response = view(request)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data["error_message"], translated)
+                self.assertTrue(response.data["is_finished"])
+                self.assertFalse(response.data["success"])
+
     @patch("authentication.api.face.cache")
     def test_status_rejects_token_from_an_older_capture(self, cache):
         view = FaceContextApi()
@@ -57,11 +86,18 @@ class FaceContextCreationTest(SimpleTestCase):
         view = ConnectionTokenViewSet()
         view.request = SimpleNamespace(
             user=SimpleNamespace(id="asset-user", is_face_code_set=True),
-            session={},
+            session={}, data={},
         )
         response = SimpleNamespace(data={"id": "connection-id"})
 
-        view.create_face_verify(response)
+        connection = Mock(pk='connection-id', user_id='asset-user', is_expired=False,
+                          acl_context={'requirements': {'face': 'pending'}})
+        with patch('authentication.api.connection_token.transaction.atomic', side_effect=nullcontext), \
+                patch('authentication.api.connection_token.ConnectionToken.objects.select_for_update') as query, \
+                patch('authentication.services.connection_acl.acl_state', return_value={}):
+            query.return_value.get.return_value = connection
+            view.create_face_verify(response)
+        self.assertEqual(connection.acl_context['face_token'], response.data['face_token'])
 
         token = response.data["face_token"]
         self.assertEqual(view.request.session[FACE_SESSION_KEY], token)

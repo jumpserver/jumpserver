@@ -1,9 +1,11 @@
 from io import BytesIO
-
-from openpyxl import Workbook
-from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+import json
+import re
+from tempfile import TemporaryFile
 
 from .base import BaseFileRenderer
+
+ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 
 class ExcelFileRenderer(BaseFileRenderer):
@@ -15,35 +17,50 @@ class ExcelFileRenderer(BaseFileRenderer):
     row_count = 0
 
     def initial_writer(self):
+        from openpyxl import Workbook
+
         self.row_count = 0
-        self.wb = Workbook()
-        self.ws = self.wb.active
+        self.column_lengths = []
+        self._row_file = TemporaryFile(mode='w+t', encoding='utf-8')
+        self.wb = Workbook(write_only=True)
+        self.ws = self.wb.create_sheet()
 
     def write_row(self, row):
         self.row_count += 1
-        self.ws.row_dimensions[self.row_count].height = 20
-        column_count = 0
-        for cell_value in row:
-            # 处理非法字符
-            column_count += 1
-            cell_value = ILLEGAL_CHARACTERS_RE.sub(r'', str(cell_value))
-            cell = self.ws.cell(row=self.row_count, column=column_count, value=str(cell_value))
-            # 设置单元格格式为纯文本, 防止执行公式
-            cell.data_type = 's'
+        values = [ILLEGAL_CHARACTERS_RE.sub('', str(value)) for value in row]
+        for index, value in enumerate(values):
+            if index == len(self.column_lengths):
+                self.column_lengths.append(0)
+            self.column_lengths[index] = max(self.column_lengths[index], len(value))
+        # Column dimensions precede sheet data in write-only XLSX. Spool rows
+        # privately to disk so widths can still reflect every exported value.
+        self._row_file.write(json.dumps(values, ensure_ascii=False) + '\n')
 
     def after_render(self):
-        for col in self.ws.columns:
-            max_length = 0
-            column = col[0].column_letter
-            for cell in col:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(cell.value)
-            adjusted_width = (max_length + 2) * 1.0
-            adjusted_width = 300 if adjusted_width > 300 else adjusted_width
-            adjusted_width = 30 if adjusted_width < 30 else adjusted_width
-            self.ws.column_dimensions[column].width = adjusted_width
+        from openpyxl.cell import WriteOnlyCell
+        from openpyxl.utils import get_column_letter
+
+        for index, length in enumerate(self.column_lengths, start=1):
+            self.ws.column_dimensions[get_column_letter(index)].width = min(300, max(30, length + 2))
+        self._row_file.seek(0)
+        for index, line in enumerate(self._row_file, start=1):
+            self.ws.row_dimensions[index].height = 20
+            cells = []
+            for value in json.loads(line):
+                cell = WriteOnlyCell(self.ws, value=value)
+                cell.data_type = 's'
+                cells.append(cell)
+            self.ws.append(cells)
+            # The row XML is already written; do not accumulate row dimensions.
+            del self.ws.row_dimensions[index]
 
     def get_rendered_value(self):
         buffer = BytesIO()
         self.wb.save(buffer)
         return buffer.getvalue()
+
+    def close_writer(self):
+        row_file = getattr(self, '_row_file', None)
+        if row_file is not None:
+            row_file.close()
+            self._row_file = None

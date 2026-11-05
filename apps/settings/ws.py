@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.cache import cache
 from django.utils import translation
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.utils import close_old_connections, safe_db_connection
 from common.utils import get_logger
@@ -194,6 +194,9 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
         config = {
             'server_uri': serializer.validated_data.get(f"{prefix}SERVER_URI"),
+            'connect_timeout': serializer.validated_data.get(
+                f'{prefix}CONNECT_TIMEOUT', getattr(settings, f'{prefix}CONNECT_TIMEOUT')
+            ),
             'bind_dn': serializer.validated_data.get(f"{prefix}BIND_DN"),
             'start_tls': serializer.validated_data.get(f"{prefix}START_TLS", False),
             'cacert_content': serializer.validated_data.get(f"{prefix}CACERT_CONTENT"),
@@ -293,14 +296,14 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     def get_orgs(org_ids):
         if org_ids:
             if not isinstance(org_ids, list) or not all(isinstance(oid, str) for oid in org_ids):
-                raise ValidationError('Invalid organization IDs')
+                raise ValidationError(gettext('Invalid organization IDs'))
             orgs = list(Organization.objects.filter(id__in=org_ids))
             if len(orgs) != len(set(org_ids)) or any(org.is_root() or org.is_system() for org in orgs):
-                raise ValidationError('Invalid target organizations')
+                raise ValidationError(gettext('Invalid target organizations'))
         else:
             orgs = [current_org]
             if current_org.is_root() or current_org.is_system():
-                raise ValidationError('A target organization is required')
+                raise ValidationError(gettext('A target organization is required'))
         return orgs
 
     def get_ldap_users(self, username_list, cache_police):

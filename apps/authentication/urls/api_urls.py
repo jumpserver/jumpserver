@@ -5,6 +5,13 @@ from django.conf import settings
 from rest_framework.routers import DefaultRouter
 
 from .. import api
+from ..api.rdp_login import RDPLoginRedeemApi
+from ..api.client_login_session import (
+    ClientSessionStatusView, ClientSessionRevokeView, ClientSessionUnlockView, ClientSessionLockView,
+)
+from ..api.web_session_lock import (
+    WebSessionLockStatusView, WebSessionLockView, WebSessionUnlockView, WebSessionLockLogoutView,
+)
 from ..backends.passkey.urls import urlpatterns as passkey_urlpatterns
 
 app_name = 'authentication'
@@ -20,6 +27,15 @@ router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
 
 urlpatterns = [
+    path('session-lock/status/', WebSessionLockStatusView.as_view(), name='web-session-lock-status'),
+    path('session-lock/lock/', WebSessionLockView.as_view(), name='web-session-lock'),
+    path('session-lock/unlock/', WebSessionUnlockView.as_view(), name='web-session-unlock'),
+    path('session-lock/logout/', WebSessionLockLogoutView.as_view(), name='web-session-lock-logout'),
+    path('client-login-session/lock/', ClientSessionLockView.as_view(), name='client-login-session-lock'),
+    path('client-login-session/status/', ClientSessionStatusView.as_view(), name='client-login-session-status'),
+    path('client-login-session/unlock/', ClientSessionUnlockView.as_view(), name='client-login-session-unlock'),
+    path('client-login-session/revoke/', ClientSessionRevokeView.as_view(), name='client-login-session-revoke'),
+    path('rdp-login/redeem/', RDPLoginRedeemApi.as_view(), name='rdp-login-redeem'),
     path('<str:backend>/qr/unbind/', api.QRUnBindForUserApi.as_view(), name='qr-unbind'),
     path('<str:backend>/qr/unbind/<uuid:user_id>/', api.QRUnBindForAdminApi.as_view(), name='qr-unbind-for-admin'),
 

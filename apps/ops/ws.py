@@ -4,6 +4,7 @@ import os
 import aiofiles
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.utils.translation import gettext
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
@@ -20,6 +21,7 @@ logger = get_logger(__name__)
 
 class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
     disconnected = False
+    log_task = None
     user_tasks = (
         'ops.tasks.run_ops_job',
         'ops.tasks.run_ops_job_execution',
@@ -66,7 +68,7 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         task_id = content.get('task')
         task = await self.get_task(task_id)
         if not task:
-            await self.send_json({'message': 'Task not found', 'task': task_id})
+            await self.send_json({'message': gettext('Task not found'), 'task': task_id})
             return
 
         admin_auditor_role_ids = {
@@ -82,12 +84,31 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
         user_can_view = task.creator == user or (task.name in self.user_tasks and has_perms)
         # (有管理员或审计员角色) 或者 (任务是用户自己创建的 或者 有查看任务日志权限), 其他情况没有权限
         if not (has_admin_auditor_role or user_can_view):
-            await self.send_json({'message': 'No permission', 'task': task_id})
+            await self.send_json({'message': gettext('No permission'), 'task': task_id})
             return
 
         task_type = content.get('type', 'celery')
         log_path = self.get_log_path(task_id, task_type)
-        await self.async_handle_task(task_id, log_path, task_type)
+        await self.cancel_log_task()
+        self.log_task = asyncio.create_task(
+            self.async_handle_task(task_id, log_path, task_type)
+        )
+        self.log_task.add_done_callback(self.on_log_task_done)
+
+    @staticmethod
+    def on_log_task_done(task):
+        if task.cancelled():
+            return
+        error = task.exception()
+        if error:
+            logger.error('Task log streaming failed', exc_info=error)
+
+    async def cancel_log_task(self):
+        if self.log_task is None:
+            return
+        self.log_task.cancel()
+        await asyncio.gather(self.log_task, return_exceptions=True)
+        self.log_task = None
 
     async def async_handle_task(
             self, task_id, log_path, log_type='celery'
@@ -162,4 +183,5 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer, OrgMixin):
 
     async def disconnect(self, close_code):
         self.disconnected = True
+        await self.cancel_log_task()
         close_old_connections()

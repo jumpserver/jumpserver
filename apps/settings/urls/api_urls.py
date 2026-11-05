@@ -35,6 +35,7 @@ urlpatterns = [
     path('public/open/', api.OpenPublicSettingApi.as_view(), name='open-public-setting'),
     path('server-info/', api.ServerInfoApi.as_view(), name='server-info'),
     path('i18n/<str:name>/', api.ComponentI18nApi.as_view(), name='i18n-data'),
+    path('client/compatibility/', api.ClientCompatibilityView.as_view(), name='client-compatibility'),
     path('client/versions/', api.ClientVersionView.as_view(), name='client-version'),
 ]
 

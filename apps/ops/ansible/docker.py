@@ -2,50 +2,29 @@ import os
 import shutil
 
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
 
-from common.utils.safe import safe_run_cmd
-from .exception import AnsibleDockerImageNotFound
+from .execution import get_ansible_execution_backend, use_ansible_ssh_executor
 
-ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor:latest'
-ANSIBLE_EE_PYTHON_INTERPRETER = '/usr/bin/python3.14'
+ANSIBLE_EE_IMAGE = 'jumpserver/ansible-executor'
 
 __all__ = [
     'ANSIBLE_EE_IMAGE',
-    'ANSIBLE_EE_PYTHON_INTERPRETER',
-    'use_ansible_docker_isolation',
     'docker_extravars',
-    'docker_isolation_kwargs',
     'prepare_isolated_ansible_cfg',
     'prepare_isolated_ansible_runtime',
     'stage_inventory_for_docker',
-    'ensure_ansible_docker_image',
 ]
-
-
-def use_ansible_docker_isolation():
-    return settings.ANSIBLE_DOCKER_ENABLED
 
 
 def docker_extravars(extra_vars):
     extravars = dict(extra_vars or {})
-    if use_ansible_docker_isolation():
-        extravars.setdefault('local_python_interpreter', ANSIBLE_EE_PYTHON_INTERPRETER)
+    if use_ansible_ssh_executor():
+        extravars.setdefault('local_python_interpreter', '/usr/bin/python3')
     return extravars
 
 
-def docker_isolation_kwargs(project_dir):
-    return {
-        'process_isolation': True,
-        'process_isolation_executable': 'docker',
-        'container_image': ANSIBLE_EE_IMAGE,
-        'container_options': ['--network=jms_net'],
-        'container_volume_mounts': [f'{project_dir}:{project_dir}:Z'],
-    }
-
-
 def prepare_isolated_ansible_cfg(project_dir):
-    if not use_ansible_docker_isolation():
+    if get_ansible_execution_backend() == 'native':
         return
     src = os.path.join(settings.APPS_DIR, 'libs', 'ansible', 'ansible.cfg')
     dst = os.path.join(project_dir, 'ansible.cfg')
@@ -60,7 +39,7 @@ def prepare_isolated_ansible_runtime(project_dir):
     core image.  Always use the modules shipped with the current application
     so playbooks and module argument specs stay in sync.
     """
-    if not use_ansible_docker_isolation():
+    if get_ansible_execution_backend() == 'native':
         return {}
 
     prepare_isolated_ansible_cfg(project_dir)
@@ -96,7 +75,7 @@ def prepare_isolated_ansible_runtime(project_dir):
 
 
 def stage_inventory_for_docker(project_dir, inventory_path):
-    if not use_ansible_docker_isolation():
+    if get_ansible_execution_backend() == 'native':
         return inventory_path
     standard_dir = os.path.join(project_dir, 'inventory')
     standard_path = os.path.join(standard_dir, 'hosts')
@@ -105,18 +84,3 @@ def stage_inventory_for_docker(project_dir, inventory_path):
     os.makedirs(standard_dir, mode=0o700, exist_ok=True)
     shutil.copy2(inventory_path, standard_path)
     return standard_path
-
-
-def ensure_ansible_docker_image():
-    if not use_ansible_docker_isolation():
-        return
-    result = safe_run_cmd(['docker', 'image', 'inspect', ANSIBLE_EE_IMAGE], quiet=True)
-    if not result or result.returncode != 0:
-        raise AnsibleDockerImageNotFound(
-            _('The Ansible Docker image "%(image)s" was not found. '
-              'To run jobs locally instead, disable "Docker isolation for Ansible" under '
-              'System Settings > Feature Settings > Job Center. '
-              'To continue using the Docker execution environment, run this command on the '
-              'Ansible worker: docker pull %(image)s')
-            % {'image': ANSIBLE_EE_IMAGE}
-        )

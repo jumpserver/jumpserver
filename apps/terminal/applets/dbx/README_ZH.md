@@ -4,10 +4,11 @@
 
 ### 组成
 
-主程序与驱动在同一个安装包内，解压到 `C:\Program Files\DBX`：
+主程序、驱动与 WebView2 安装器在同一个安装包内，解压到 `C:\Program Files\DBX`：
 
 - 主程序：`C:\Program Files\DBX\DBX.exe`，可通过全局环境变量 `DBX_HOME` 指定其他安装目录
 - 驱动：`C:\Program Files\DBX\agents`，含 JRE 21 与 Oracle、达梦等驱动，可通过全局环境变量 `DBX_DRIVERS_HOME` 指定其他目录
+- WebView2：`C:\Program Files\DBX\webview2`，DBX 依赖的 Microsoft Edge WebView2 Runtime 离线安装器，部署应用时自动执行，日志写在同目录的 `install.log`，发布机无需另行安装；已装有可用运行时（包括更新的版本）的发布机不受影响
 
 MySQL、MariaDB、PostgreSQL、SQLServer、ClickHouse、MongoDB、Redis 使用 DBX 内置驱动，无需额外组件；Oracle、达梦连接时会自动从安装目录复制驱动到当前会话用户目录，JRE 直接使用安装目录中的那份，均无需联网下载。
 

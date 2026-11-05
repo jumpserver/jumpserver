@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q, Count
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, MethodNotAllowed
 from rest_framework.response import Response
@@ -92,6 +94,13 @@ class CheckAccountExecutionViewSet(AutomationExecutionViewSet):
         return HttpResponse(report)
 
 
+@extend_schema_view(
+    create=extend_schema(exclude=True),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(exclude=True),
+    bulk_update=extend_schema(exclude=True),
+    partial_bulk_update=extend_schema(exclude=True),
+)
 class AccountRiskViewSet(OrgBulkModelViewSet):
     model = AccountRisk
     search_fields = ["username", "asset__name"]
@@ -112,10 +121,13 @@ class AccountRiskViewSet(OrgBulkModelViewSet):
     }
 
     def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed("PUT")
+        raise MethodNotAllowed(request.method)
 
     def create(self, request, *args, **kwargs):
-        raise MethodNotAllowed("POST")
+        raise MethodNotAllowed(request.method)
+
+    def bulk_update(self, request, *args, **kwargs):
+        raise MethodNotAllowed(request.method)
 
     @action(methods=["get"], detail=False, url_path="assets")
     def assets(self, request, *args, **kwargs):
@@ -168,12 +180,25 @@ class CheckAccountEngineViewSet(JMSModelViewSet):
 
         return CheckAccountEngine.get_default_engines()
 
+    def get_object(self):
+        pk = self.kwargs.get(self.lookup_url_kwarg or self.lookup_field)
+        try:
+            engine_id = str(CheckAccountEngine._meta.pk.to_python(pk))
+        except (DjangoValidationError, TypeError, ValueError):
+            raise Http404 from None
+
+        for engine in self.filter_queryset(self.get_queryset()):
+            if engine['id'] == engine_id:
+                self.check_object_permissions(self.request, engine)
+                return engine
+        raise Http404
+
     def filter_queryset(self, queryset: list):
         search = self.request.GET.get('search')
         if search is not None:
             queryset = [
                 item for item in queryset
-                if search in item['name'] or item['comment']
+                if search in str(item['name']) or search in str(item['comment'])
             ]
         return queryset
 

@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
 from accounts.const import AutomationTypes, Source
@@ -41,7 +41,7 @@ class RiskHandler:
         attr = f"handle_{tp}"
 
         if not hasattr(self, attr):
-            raise ValidationError(f"Invalid risk type: {tp}")
+            raise ValidationError(gettext('Invalid risk type: %(type)s') % {'type': tp})
 
         getattr(self, attr)()
         risk = self.update_risk_if_need(tp)
@@ -151,7 +151,7 @@ class RiskHandler:
         account = self.asset.accounts.filter(username=self.username, secret_type=SecretType.PASSWORD).first()
 
         if not account:
-            raise ValidationError("Account not found")
+            raise ValidationError(gettext("Account not found"))
 
         execution.snapshot = {
             "assets": [str(asset.id)],

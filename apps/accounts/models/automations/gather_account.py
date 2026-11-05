@@ -5,12 +5,16 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.const import AutomationTypes, Source
 from accounts.models import Account
+from accounts.utils import is_account_username_valid
 from common.const import ConfirmOrIgnore
+from common.utils import get_logger
 from common.utils.timezone import is_date_more_than
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
 __all__ = ['GatherAccountsAutomation', 'GatheredAccount']
+
+logger = get_logger(__name__)
 
 
 class GatheredAccount(JMSOrgBaseModel):
@@ -51,9 +55,19 @@ class GatheredAccount(JMSOrgBaseModel):
     @classmethod
     def bulk_create_accounts(cls, gathered_accounts):
         account_objs = []
+        skipped_ga_ids = []
         for gathered_account in gathered_accounts:
             asset_id = gathered_account.asset_id
             username = gathered_account.username
+            # 防御性过滤：历史遗留或异常写入的非法用户名不允许转正为正式账号，
+            # 避免其进入账号自动化时被 Ansible 当作 Jinja2 模板渲染
+            if not is_account_username_valid(username):
+                skipped_ga_ids.append(gathered_account.id)
+                logger.warning(
+                    "Skip syncing gathered account with illegal username: "
+                    "asset=%s username=%r", asset_id, username
+                )
+                continue
             account = Account(
                 asset_id=asset_id, username=username,
                 name=username, source=Source.DISCOVERY,
@@ -62,7 +76,10 @@ class GatheredAccount(JMSOrgBaseModel):
             account_objs.append(account)
         Account.objects.bulk_create(account_objs, ignore_conflicts=True)
 
-        ga_ids = [ga.id for ga in gathered_accounts]
+        ga_ids = [
+            ga.id for ga in gathered_accounts
+            if ga.id not in skipped_ga_ids
+        ]
         GatheredAccount.objects.filter(id__in=ga_ids).update(status=ConfirmOrIgnore.confirmed)
 
     @classmethod

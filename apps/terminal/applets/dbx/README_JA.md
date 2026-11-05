@@ -4,10 +4,11 @@
 
 ### 構成
 
-アプリケーションとドライバは 1 つのインストールパッケージにまとめられ、`C:\Program Files\DBX` に展開されます:
+アプリケーション、ドライバ、WebView2 インストーラーは 1 つのインストールパッケージにまとめられ、`C:\Program Files\DBX` に展開されます:
 
 - アプリケーション：`C:\Program Files\DBX\DBX.exe`、グローバル環境変数 `DBX_HOME` で別のインストール先を指定できます
 - ドライバ：`C:\Program Files\DBX\agents`、JRE 21 と Oracle、達夢のドライバを含みます。グローバル環境変数 `DBX_DRIVERS_HOME` で別のディレクトリを指定できます
+- WebView2：`C:\Program Files\DBX\webview2`、DBX が依存する Microsoft Edge WebView2 Runtime のオフラインインストーラー。アプリのデプロイ時に自動で実行され、ログは同じディレクトリの `install.log` に出力されるため、ホストへの個別インストールは不要です。利用可能なランタイム（より新しいバージョンを含む）が既にあるホストには影響しません
 
 MySQL、MariaDB、PostgreSQL、SQLServer、ClickHouse、MongoDB、Redis は DBX 内蔵ドライバを使用するため、追加コンポーネントは不要です。Oracle と達夢は接続時にインストールディレクトリから現在のセッションユーザーのディレクトリへドライバが自動コピーされ、JRE はインストールディレクトリのものをそのまま使用します。いずれもインターネット接続は不要です。
 

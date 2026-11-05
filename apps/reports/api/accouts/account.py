@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from collections import defaultdict
-
 from django.db.models import Count, Q, F, Value
 from django.db.models.functions import Concat
 from django.http import JsonResponse
-from django.utils import timezone
 from rest_framework.views import APIView
 
 from accounts.const import Source
@@ -15,7 +12,7 @@ from common.permissions import IsValidLicense
 from common.utils import lazyproperty
 from rbac.permissions import RBACPermission
 from reports.api.assets.base import group_stats
-from reports.mixins import DateRangeMixin
+from reports.mixins import DateRangeMixin, aggregate_by_date
 
 __all__ = ['AccountStatisticApi']
 
@@ -38,14 +35,11 @@ class AccountStatisticApi(DateRangeMixin, APIView):
     def get_change_secret_account_metrics(self):
         filtered_queryset = self.filter_by_date_range(self.base_qs, 'date_change_secret')
 
-        data = defaultdict(set)
-        for t, _id in filtered_queryset.values_list('date_change_secret', 'id'):
-            dt_local = timezone.localtime(t)
-            date_str = str(dt_local.date())
-            data[date_str].add(_id)
-
-        metrics = [len(data.get(str(d), set())) for d in self.date_range_list]
-        return metrics
+        data = aggregate_by_date(
+            filtered_queryset, 'date_change_secret', self.date_range_list,
+            localtime=True, total=Count('id', distinct=True),
+        )
+        return [data[day]['total'] for day in self.date_range_list]
 
     def get(self, request, *args, **kwargs):
         qs = self.base_qs

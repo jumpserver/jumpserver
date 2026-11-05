@@ -14,9 +14,12 @@
                 <h1 id="download-title">{% blocktrans with vendor=VENDOR %}Download {{ vendor }} Client{% endblocktrans %}</h1>
                 <p>{% trans 'Choose the installer for your operating system.' %}</p>
             </div>
-            <span class="download-version">{% trans 'Version' %} {{ CLIENT_VERSION }}</span>
+            {% if CLIENT_VERSION %}
+                <span class="download-version">{% trans 'Version' %} {{ CLIENT_VERSION }}</span>
+            {% endif %}
         </div>
 
+        {% if CLIENT_VERSION %}
         <div class="download-platforms">
             <section class="download-card" aria-labelledby="windows-title">
                 <div class="download-platform-heading">
@@ -50,6 +53,7 @@
                 <p class="download-filename">{{ VENDOR }}Client_{{ CLIENT_VERSION }}_aarch64.dmg</p>
             </section>
         </div>
+        {% endif %}
 
         <section class="download-more" aria-labelledby="more-downloads-title">
             <i class="fa fa-github download-github-icon" aria-hidden="true"></i>

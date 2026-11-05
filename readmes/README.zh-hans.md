@@ -1,6 +1,6 @@
 <div align="center">
   <a name="readme-top"></a>
-  <a href="https://jumpserver.com" target="_blank"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
+  <a href="https://jumpserver.com" target="_blank"><img src="assets/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
   
 ## 开源特权访问管理（PAM）平台（堡垒机）
 
@@ -12,7 +12,7 @@
 [![][github-release-shield]][github-release-link]
 [![][github-stars-shield]][github-stars-link]
 
-[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
+[English](/README.md) · [中文(简体)](/readmes/README.zh-hans.md) · [中文(繁體)](/readmes/README.zh-hant.md) · [日本語](/readmes/README.ja.md) · [Português (Brasil)](/readmes/README.pt-br.md) · [Español](/readmes/README.es.md) · [Français](/readmes/README.fr.md) · [Русский](/readmes/README.ru.md) · [한국어](/readmes/README.ko.md) · [Tiếng Việt](/readmes/README.vi.md)
 
 </div>
 
@@ -22,7 +22,13 @@
 
 JumpServer 是具备 AI 能力的开源特权访问管理（PAM）平台，为 DevOps 和 IT 团队提供统一的工作空间，安全访问 SSH、RDP、Kubernetes、数据库、网站、RemoteApp、VirtualApp 等资源。
 
-<img alt="JumpServer 架构图" src="assets/jumpserver-architecture.png" />
+<img alt="JumpServer 架构图" src="assets/jumpserver-architecture.gif" />
+
+## 版本维护
+
+5.x 为活跃维护版本，4.10.x 为 LTS 版本，3.10.x 仅提供关键问题修复。V3 社区版（CE）将于 **2026 年 12 月 31 日**停止维护，企业版（EE）将于 **2028 年 12 月 31 日**停止维护。
+
+请查看 [SECURITY.md](../SECURITY.md)，了解版本维护状态和安全漏洞报告方式。
 
 ## 快速开始
 
@@ -32,7 +38,7 @@ JumpServer 是具备 AI 能力的开源特权访问管理（PAM）平台，为 D
 curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
 ```
 
-在浏览器中访问 JumpServer： `http://your-jumpserver-ip/`
+在浏览器中打开 `https://<jumpserver-host>/`，将 `<jumpserver-host>` 替换为运行 JumpServer 的主机 IP 地址或域名。
 
 - 用户名: `admin`
 - 密码: `ChangeMe`
@@ -40,28 +46,28 @@ curl -sSL https://github.com/jumpserver/jumpserver/releases/latest/download/quic
 ## 截图
 
 <p align="center">
-  <img src="assets/screenshot-01.png" alt="JumpServer 特权访问管理仪表盘" width="49%" />
-  <img src="assets/screenshot-02.png" alt="JumpServer 资产管理" width="49%" />
+  <img src="assets/screenshot-01.png" alt="JumpServer 特权访问管理仪表盘" title="JumpServer 特权访问管理仪表盘" width="49%" />
+  <img src="assets/screenshot-02.png" alt="JumpServer 资产管理" title="JumpServer 资产管理" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-03.png" alt="JumpServer SSH 连接对话框" width="49%" />
-  <img src="assets/screenshot-04.png" alt="JumpServer 终端 AI 提问" width="49%" />
+  <img src="assets/screenshot-03.png" alt="JumpServer SSH 连接对话框" title="JumpServer SSH 连接对话框" width="49%" />
+  <img src="assets/screenshot-04.png" alt="JumpServer 终端 AI 提问" title="JumpServer 终端 AI 提问" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-05.png" alt="JumpServer AI 助手" width="49%" />
-  <img src="assets/screenshot-06.png" alt="JumpServer 远程桌面会话" width="49%" />
+  <img src="assets/screenshot-05.png" alt="JumpServer AI 助手" title="JumpServer AI 助手" width="49%" />
+  <img src="assets/screenshot-06.png" alt="JumpServer 远程桌面会话" title="JumpServer 远程桌面会话" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-07.png" alt="JumpServer 浅色主题终端资产面板" width="49%" />
-  <img src="assets/screenshot-08.png" alt="JumpServer 浅色主题 SSH 会话" width="49%" />
+  <img src="assets/screenshot-07.png" alt="KoKo TUI asset browser with searchable authorized assets" title="KoKo TUI asset browser with searchable authorized assets" width="49%" />
+  <img src="assets/screenshot-08.png" alt="KoKo TUI multi-session manager for switching between active SSH sessions" title="KoKo TUI multi-session manager for switching between active SSH sessions" width="49%" />
 </p>
 
 <p align="center">
-  <img src="assets/screenshot-09.png" alt="JumpServer 深色主题终端资产面板" width="49%" />
-  <img src="assets/screenshot-10.png" alt="JumpServer 深色主题 SSH 会话" width="49%" />
+  <img src="assets/screenshot-09.png" alt="KoKo classic text-mode home screen with connection shortcuts" title="KoKo classic text-mode home screen with connection shortcuts" width="49%" />
+  <img src="assets/screenshot-10.png" alt="KoKo classic text-mode asset list with authorized SSH targets" title="KoKo classic text-mode asset list with authorized SSH targets" width="49%" />
 </p>
 
 ## 组件

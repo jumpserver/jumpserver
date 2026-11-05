@@ -1,5 +1,5 @@
 type: zip # exe, zip, manual
-source: jms:///download/applets/DBX-0.6.17-agents-0.2.114-windows-x64.zip
+source: jms:///download/applets/DBX-0.6.17-agents-0.2.114-offline-windows-x64.zip
 arguments:
 destination: C:\Program Files
 program: C:\Program Files\DBX\DBX.exe

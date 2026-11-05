@@ -43,6 +43,7 @@ SUPPORTED_ICON_SKINS = {
     'sqlserver',
     'db2',
     'dameng',
+    'oceanbase',
     'website',
     'chatgpt',
     'clickhouse',
@@ -210,6 +211,10 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     platform = models.ForeignKey(
         Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets'
     )
+    owner = models.ForeignKey(
+        'users.User', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='owned_assets', verbose_name=_('Asset owner'),
+    )
     zone = models.ForeignKey(
         "assets.Zone", null=True, blank=True, related_name='assets',
         verbose_name=_("Zone"), on_delete=models.SET_NULL
@@ -310,6 +315,16 @@ class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, 
     def dc_accounts(self):
         queryset = self.accounts.model.objects.filter(asset__in=[*self.joined_dir_svcs])
         return queryset
+
+    def find_account(self, username, secret_type=None):
+        """ 按用户名查找可用账号，同名时优先资产自身账号，其次是加入的目录服务账号 """
+        lookup = {'username': username}
+        if secret_type:
+            lookup['secret_type'] = secret_type
+        account = self.accounts.filter(**lookup).first()
+        if account is None:
+            account = self.dc_accounts.filter(**lookup).first()
+        return account
 
     @lazyproperty
     def all_valid_accounts(self):

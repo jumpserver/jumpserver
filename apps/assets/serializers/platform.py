@@ -5,7 +5,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from assets.models import Asset
-from assets.validators import web_xpack_fields
 from common.serializers import (
     WritableNestedModelSerializer, type_field_map, MethodSerializer,
     DictSerializer, create_serializer_class, ResourceLabelsMixin,
@@ -16,7 +15,10 @@ from common.utils import lazyproperty
 from ..const import Category, AllTypes, Protocol, SuMethodChoices
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer", "PlatformListSerializer"]
+__all__ = [
+    "PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer",
+    "PlatformProtocolCreateSerializer", "PlatformListSerializer",
+]
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
@@ -142,14 +144,6 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         name = '{}ProtocolSettingSerializer'.format(protocol.capitalize())
         return create_serializer_class(name, setting_fields)()
 
-    def validate(self, cleaned_data):
-        name = cleaned_data.get('name', getattr(self.instance, 'name', None))
-        if name in ('http', 'https') and web_xpack_fields(cleaned_data.get('setting', {})):
-            raise serializers.ValidationError({'setting': _('A valid enterprise license is required.')})
-        if name in ['winrm']:
-            cleaned_data['public'] = False
-        return cleaned_data
-
     def to_file_representation(self, data):
         return '{name}/{port}'.format(**data)
 
@@ -160,6 +154,16 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_render_help_text():
         return _('Protocols, format is ["protocol/port"]')
+
+
+class PlatformProtocolCreateSerializer(PlatformProtocolSerializer):
+    platform = serializers.PrimaryKeyRelatedField(
+        queryset=Platform.objects.all(), pk_field=serializers.IntegerField()
+    )
+    port = serializers.IntegerField(label=_("Port"), min_value=0, max_value=65535)
+
+    class Meta(PlatformProtocolSerializer.Meta):
+        fields = PlatformProtocolSerializer.Meta.fields + ['platform']
 
 
 class PlatformCustomField(serializers.Serializer):
@@ -181,7 +185,7 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolSerializer(label=_("Protocols"), many=True, required=False)
-    automation = PlatformAutomationSerializer(label=_("Automation"), required=False, default=dict)
+    automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
     su_method = LabeledChoiceField(
         choices=SuMethodChoices.choices, label=_("Su method"),
         required=False, default=SuMethodChoices.sudo, allow_null=True

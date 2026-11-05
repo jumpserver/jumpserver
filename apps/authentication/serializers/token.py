@@ -64,7 +64,7 @@ class BearerTokenSerializer(serializers.Serializer):
             user = get_object_or_none(User, pk=user_id)
             if not user:
                 raise serializers.ValidationError(
-                    "user id {} not exist".format(user_id)
+                    _('user id {} not exist').format(user_id)
                 )
         return user
 

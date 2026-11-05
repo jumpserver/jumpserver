@@ -47,7 +47,10 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Celery Task',
                 'ordering': ('name',),
-                'permissions': [('view_taskmonitor', 'Can view task monitor')],
+                'permissions': [
+                    ('view_taskmonitor', 'Can view task monitor'),
+                    ('stop_taskmonitor', 'Can stop tasks from task monitor'),
+                ],
             },
         ),
         migrations.CreateModel(

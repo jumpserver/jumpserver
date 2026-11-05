@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q, Manager, QuerySet
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.utils import contains_ip
@@ -19,6 +19,8 @@ from .utils import Encryptor
 from .validators import PortRangeValidator
 
 __all__ = [
+    "UnicodeCharField",
+    "UnicodeTextField",
     "JsonMixin",
     "JsonDictMixin",
     "JsonListMixin",
@@ -41,6 +43,24 @@ __all__ = [
     "JSONManyToManyField",
     "RelatedManager",
 ]
+
+
+class _UnicodeFieldMixin:
+    """Use full Unicode on MySQL, leaving other backends' defaults intact."""
+
+    def db_parameters(self, connection):
+        params = super().db_parameters(connection)
+        if connection.vendor == 'mysql' and params.get('collation') is None:
+            params['collation'] = 'utf8mb4_general_ci'
+        return params
+
+
+class UnicodeCharField(_UnicodeFieldMixin, models.CharField):
+    pass
+
+
+class UnicodeTextField(_UnicodeFieldMixin, models.TextField):
+    pass
 
 
 class JsonMixin:
@@ -611,5 +631,5 @@ class JSONManyToManyField(models.JSONField):
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
         if not isinstance(value, dict):
-            raise ValidationError("Invalid JSON data for JSONManyToManyField.")
+            raise ValidationError(gettext("Invalid JSON data for JSONManyToManyField."))
         self.check_value(value, self.allow_empty_ids)

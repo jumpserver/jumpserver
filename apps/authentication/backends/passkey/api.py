@@ -50,11 +50,15 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
     def login(self, request):
         confirm_mfa = request.GET.get('mfa')
         request.session.pop('passkey_confirm_mfa', None)
+        request.session.pop('passkey_confirm_purpose', None)
         request.session.pop('fido2_state', None)
         if confirm_mfa:
             if not request.user.is_authenticated or settings.SAFE_MODE:
                 raise PermissionDenied(_('Auth failed'))
             request.session['passkey_confirm_mfa'] = str(request.user.pk)
+            from authentication.services.lock_password import LOCK_PASSWORD_PURPOSE
+            if request.GET.get('purpose') == LOCK_PASSWORD_PURPOSE:
+                request.session['passkey_confirm_purpose'] = LOCK_PASSWORD_PURPOSE
         return render(request, 'authentication/passkey.html', {})
 
     def redirect_to_error(self, error):
@@ -73,7 +77,8 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
             raise PermissionDenied(_('Auth failed'))
 
         if request.method == 'GET':
-            auth_data = auth_begin(request)
+            # MFA 确认与登录保持一致：使用可发现凭证（空 allowCredentials）
+            auth_data = auth_begin(request, discoverable=bool(confirm_user_id))
             return JsonResponse(dict(auth_data))
 
         try:
@@ -85,11 +90,15 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
             return self.redirect_to_error(_('Auth failed'))
 
         if confirm_user_id:
+            # 可发现凭证可能选到其他用户的钥匙，必须校验归属当前登录用户
             if user.pk != request.user.pk:
                 return self.redirect_to_error(_('Auth failed'))
             request.session['CONFIRM_LEVEL'] = ConfirmType.values.index('mfa') + 1
             request.session['CONFIRM_TIME'] = int(time.time())
             request.session['CONFIRM_TYPE'] = ConfirmType.MFA
+            from authentication.services.lock_password import LOCK_PASSWORD_PURPOSE, mark_lock_password_confirmation
+            if request.session.pop('passkey_confirm_purpose', None) == LOCK_PASSWORD_PURPOSE:
+                mark_lock_password_confirmation(request, 'mfa')
             request.session['CONFIRM_USER_ID'] = str(request.user.pk)
             request.session.pop('passkey_confirm_mfa', None)
             return Response('ok')

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import shlex
 import sys
 import uuid
@@ -20,21 +21,21 @@ __all__ = ["Job", "JobExecution", "JMSPermedInventory"]
 from simple_history.models import HistoricalRecords
 
 from accounts.models import Account
-from acls.models import CommandFilterACL, DataMaskingRule
+from acls.models import CommandFilterACL, DataMaskingRule, LoginAssetACL
 from assets.const import Protocol
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import (
     JMSInventory, AdHocRunner, PlaybookRunner, TaskLogCallback, UploadFileRunner,
-    neutralize_jinja2_syntax,
+    escape_jinja2_syntax, neutralize_jinja2_syntax, quote_ansible_module_arg,
 )
 
 """stop all ssh child processes of the given ansible process pid."""
 from ops.ansible.exception import CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
-from ops.const import Types, RunasPolicies, JobStatus, JobModules
+from ops.const import Types, RunasPolicies, JobStatus, JobModules, LOGIN_ASSET_ACL_DENIED
 from ops.utils import merge_nodes_and_assets
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
@@ -68,6 +69,19 @@ def check_upload_permission(host, *, user, asset, account, **kwargs):
             'Asset ({asset}) authorization lacks upload permissions'
         ).format(asset=asset.name)
     return host
+
+
+def match_rejected_login_asset_acl(user, assets, account, ip=None):
+    for asset in assets:
+        acls = LoginAssetACL.filter_queryset(
+            user=user, asset=asset, account_username=account
+        )
+        acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
+        if not acl:
+            continue
+        if not acl.allows_noninteractive_for(user, account, asset):
+            return asset, acl
+    return None, None
 
 
 def get_parent_keys(key, include_self=True):
@@ -323,12 +337,34 @@ class JobExecution(JMSOrgBaseModel):
     def inventory(self):
         return self.current_job.inventory
 
+    @cached_property
+    def extra_vars(self):
+        if isinstance(self.parameters, str):
+            parameters = json.loads(self.parameters)
+        else:
+            parameters = dict(self.parameters) if self.parameters else {}
+        parameters = sanitize_job_extra_vars(parameters)
+        parameters.update(self.gather_static_variables())
+        return parameters
+
+    @cached_property
+    def rendered_args(self):
+        def replace_variable(match):
+            name = match.group(1)
+            if name not in self.extra_vars:
+                raise ValueError(_('Undefined job variable: {name}').format(name=name))
+            value = self.extra_vars[name]
+            return '' if value is None else str(value)
+
+        # Substitute plain names once; never evaluate user-supplied Jinja expressions.
+        return re.sub(r'{{\s*(jms_\w+)\s*}}', replace_variable, self.current_job.args or '')
+
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
 
         module = self.current_job.module
-        args = neutralize_jinja2_syntax(self.current_job.args or '')
+        args = escape_jinja2_syntax(self.rendered_args)
 
         db_modules = ('mysql', 'postgresql', 'sqlserver', 'oracle')
         db_module_name_map = {
@@ -359,7 +395,11 @@ class JobExecution(JMSOrgBaseModel):
             if module == 'mssql_script':
                 login_args += "encryption={{jms_asset.encryption | default(None) }} " \
                               "tds_version={{jms_asset.tds_version | default(None) }} "
-            shell = "{} {}=\"{}\" ".format(login_args, query_token, args)
+            # Keep user SQL inside query/script, then set login_* so injected
+            # connection keys cannot override inventory.
+            shell = '{}="{}" {}'.format(
+                query_token, quote_ansible_module_arg(args), login_args
+            )
             return module, shell
 
         if module == 'win_shell':
@@ -379,7 +419,7 @@ class JobExecution(JMSOrgBaseModel):
 
         if module == JobModules.huawei.value:
             module = 'ce_command'
-            shell = "commands=\"{}\" ".format(args)
+            shell = 'commands="{}" '.format(quote_ansible_module_arg(args))
 
         return module, shell
 
@@ -392,12 +432,7 @@ class JobExecution(JMSOrgBaseModel):
             self.result.update({"excludes": inv.exclude_hosts})
             self.save()
 
-        if isinstance(self.parameters, str):
-            extra_vars = json.loads(self.parameters)
-        else:
-            extra_vars = dict(self.parameters) if self.parameters else {}
-        extra_vars = sanitize_job_extra_vars(extra_vars)
-        extra_vars.update(self.gather_static_variables())
+        extra_vars = self.extra_vars
 
         if self.current_job.type == Types.adhoc:
             module, args = self.compile_shell()
@@ -482,6 +517,8 @@ class JobExecution(JMSOrgBaseModel):
     def set_result(self, cb):
         status_mapper = {
             'successful': JobStatus.success,
+            # stop() records user cancellation as a terminal failure.
+            'canceled': JobStatus.failed,
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
@@ -491,6 +528,11 @@ class JobExecution(JMSOrgBaseModel):
         else:
             this.result = cb.result
         this.result = json.loads(json.dumps(this.result).replace('\\u0000', ''))
+        # Ansible may preserve non-UTF-8 bytes as surrogates, which PostgreSQL JSON rejects.
+        for field in ('result', 'summary'):
+            value = json.dumps(getattr(this, field), ensure_ascii=False)
+            value = value.encode('utf-8', errors='replace').decode('utf-8')
+            setattr(this, field, json.loads(value))
         this.finish_task()
 
     def finish_task(self):
@@ -505,20 +547,28 @@ class JobExecution(JMSOrgBaseModel):
 
     def match_command_group(self, acl, asset):
         for cg in acl.command_groups.all():
-            matched, __ = cg.match(self.current_job.args)
+            matched, __ = cg.match(self.rendered_args)
             if matched:
                 if acl.is_action(CommandFilterACL.ActionChoices.accept):
                     return True
                 elif acl.is_action(CommandFilterACL.ActionChoices.reject) or acl.is_action(
                         CommandFilterACL.ActionChoices.review):
                     print("\033[31mcommand \'{}\' on asset {}({}) is rejected by acl {}\033[0m"
-                          .format(self.current_job.args, asset.name, asset.address, acl))
+                          .format(self.rendered_args, asset.name, asset.address, acl))
                     CommandExecutionAlert({
                         "assets": self.inventory.assets,
                         "input": self.material,
                         "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
+                        "source": _('Quick command') if self.current_job.instant else _('Job'),
+                        "reason": _('Matched a command filter policy'),
+                        "_cmd_filter_acl": acl,
                     }).publish_async()
+                    self.summary.update({
+                        'unexecuted': len(self.inventory.assets),
+                        'error_code': 'command_acl_rejected',
+                    })
+                    self.save(update_fields=['summary'])
                     raise Exception("command is rejected by ACL")
                 elif acl.is_action(CommandFilterACL.ActionChoices.warning):
                     command = {
@@ -549,16 +599,18 @@ class JobExecution(JMSOrgBaseModel):
             for acl in acls:
                 if self.match_command_group(acl, asset):
                     break
-        command = self.current_job.args
+        command = self.rendered_args
         if command and set(command.split()).intersection(set(settings.SECURITY_COMMAND_BLACKLIST)):
             CommandExecutionAlert({
                 "assets": self.inventory.assets,
                 "input": self.material,
                 "risk_level": RiskLevelChoices.reject,
                 "user": self.creator,
+                "source": _('Quick command') if self.current_job.instant else _('Job'),
+                "reason": _('Matched the job center command blacklist'),
             }).publish_async()
             raise CommandInBlackListException(
-                "Command is rejected by black list: {}".format(self.current_job.args))
+                "Command is rejected by black list: {}".format(command))
 
     def check_danger_keywords(self):
         lines = self.job.playbook.check_dangerous_keywords()
@@ -605,7 +657,27 @@ class JobExecution(JMSOrgBaseModel):
         if self.current_job.type == 'adhoc':
             self.check_command_acl()
 
+    def check_login_asset_acls(self, ip=None):
+        asset, _acl = match_rejected_login_asset_acl(
+            self.creator, self.inventory.assets, self.current_job.runas, ip
+        )
+        if not asset:
+            return
+        message = LOGIN_ASSET_ACL_DENIED.format(
+            asset=asset.name, address=asset.address
+        )
+        print(f'\033[31m{message}\033[0m')
+        raise Exception(message)
+
+    def is_upload_cancelled(self):
+        if self.job_type != Types.upload_file:
+            return False
+        args = Job.objects.filter(pk=self.job_id).values_list('args', flat=True).first()
+        return bool(json.loads(args or '{}').get('upload_cancelled'))
+
     def before_start(self):
+        if self.is_upload_cancelled():
+            raise Exception(_('Task canceled by user'))
         self.check_assets_perms()
         self.check_assets_acls()
 
@@ -620,6 +692,9 @@ class JobExecution(JMSOrgBaseModel):
         ssh_tunnel = SSHTunnelManager()
         ssh_tunnel.local_gateway_prepare(runner)
         try:
+            if self.job_type == Types.upload_file:
+                # Also catch cancellation while the runner is still preparing its transport.
+                kwargs['cancel_callback'] = self.is_upload_cancelled
             cb = runner.run(**kwargs)
             self.set_result(cb)
             return cb
@@ -637,6 +712,25 @@ class JobExecution(JMSOrgBaseModel):
 
     def stop(self):
         from ops.signal_handlers import job_execution_stop_pub_sub
+        remote_path = os.path.join(self.private_dir, 'remote.json')
+        try:
+            with open(remote_path) as stream:
+                remote = json.load(stream)
+        except FileNotFoundError:
+            remote = {}
+        if remote.get('backend') == 'ssh':
+            job_id = str(uuid.UUID(remote['job_id']))
+            # Pub/sub listeners may live in Celery's parent process. Persist the
+            # request in the shared task directory so prefork workers see it too.
+            try:
+                cancel_path = os.path.join(self.private_dir, f'cancel-{job_id}')
+                fd = os.open(cancel_path, os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+                os.close(fd)
+            except FileNotFoundError:
+                pass  # The runner has already finished and cleaned its directory.
+            job_execution_stop_pub_sub.publish(remote)
+            self.set_error('Job stop by "user cancel"')
+            return
         pid_path = os.path.join(self.private_dir, "local.pid")
         if os.path.exists(pid_path):
             with open(pid_path) as f:

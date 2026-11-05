@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils._os import safe_join
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
 from assets.utils.platform_package import locate_package_root
@@ -77,7 +77,7 @@ class VirtualApp(JMSBaseModel):
             manifest = yaml_load_with_i18n(f)
 
         if not manifest.get('name', ''):
-            raise ValidationError({'error': 'Missing name in manifest.yml'})
+            raise ValidationError({'error': gettext('Missing name in manifest.yml')})
         return manifest
 
     @staticmethod
