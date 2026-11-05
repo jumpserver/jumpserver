@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.db.models import F, Value, CharField, Q, BooleanField, Case, DateTimeField, Exists, OuterRef, When
 from django.db.models.functions import Cast, Coalesce
-from django.http import HttpResponse, FileResponse, Http404
+from django.http import HttpResponse, FileResponse, Http404, JsonResponse
 from django.utils import timezone
 from django.utils.translation import gettext
 from django.utils.encoding import escape_uri_path
@@ -151,8 +151,11 @@ class FTPLogViewSet(ReportExportMixin, OrgModelViewSet):
         ftp_storage = self.get_storage()
         local_path, url = ftp_storage.get_file_path_url()
         if local_path is None:
-            # url => error message
-            return HttpResponse(url)
+            logger.warning('FTP file unavailable for log %s: %s', ftp_log.id, url)
+            return JsonResponse({
+                'detail': gettext('File not found'),
+                'code': 'file_not_found',
+            }, status=status.HTTP_404_NOT_FOUND)
 
         file = open(default_storage.path(local_path), 'rb')
         response = FileResponse(file)

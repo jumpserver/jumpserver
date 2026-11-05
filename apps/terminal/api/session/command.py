@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from acls.models import CommandFilterACL, CommandGroup
 from common.api import JMSBulkModelViewSet
@@ -185,16 +186,12 @@ class CommandViewSet(JMSBulkModelViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
-        if serializer.is_valid():
-            ok = self.command_store.bulk_save(serializer.validated_data)
-            if ok:
-                return Response("ok", status=201)
-            else:
-                return Response("Save error", status=500)
+        serializer.is_valid(raise_exception=True)
+        ok = self.command_store.bulk_save(serializer.validated_data)
+        if ok:
+            return Response("ok", status=HTTP_201_CREATED)
         else:
-            msg = "Command not valid: {}".format(serializer.errors)
-            logger.error(msg)
-            return Response({"msg": msg}, status=401)
+            return Response("Save error", status=HTTP_400_BAD_REQUEST)
 
 
 class InsecureCommandAlertAPI(generics.CreateAPIView):

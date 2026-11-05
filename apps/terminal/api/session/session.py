@@ -18,6 +18,7 @@ from rest_framework import viewsets, views
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from audits.const import ActionChoices
 from audits.handler import create_or_update_operate_log
@@ -264,21 +265,17 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         session = get_object_or_404(Session, id=session_id)
         serializer = self.serializer_class(data=request.data)
 
-        if serializer.is_valid():
-            file = serializer.validated_data['file']
-            # 兼容旧版本 API 未指定 version 为 2 的情况
-            version = serializer.validated_data.get('version', 2)
-            name, err = session.save_replay_to_storage_with_version(file, version)
-            if not name:
-                msg = "Failed save replay `{}`: {}".format(session_id, err)
-                logger.error(msg)
-                return Response({'msg': str(err)}, status=400)
-            url = default_storage.url(name)
-            return Response({'url': url}, status=201)
-        else:
-            msg = 'Upload data invalid: {}'.format(serializer.errors)
+        serializer.is_valid(raise_exception=True)
+        file = serializer.validated_data['file']
+        # 兼容旧版本 API 未指定 version 为 2 的情况
+        version = serializer.validated_data.get('version', 2)
+        name, err = session.save_replay_to_storage_with_version(file, version)
+        if not name:
+            msg = "Failed save replay `{}`: {}".format(session_id, err)
             logger.error(msg)
-            return Response({'msg': serializer.errors}, status=401)
+            return Response({'msg': str(err)}, status=HTTP_400_BAD_REQUEST)
+        url = default_storage.url(name)
+        return Response({'url': url}, status=HTTP_201_CREATED)
 
     @staticmethod
     def get_replay_data(session, url):
