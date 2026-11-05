@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
+from orgs.mixins.models import OrgModelMixin
 
 
 class RuntimeStore(JMSBaseModel):
@@ -51,11 +52,10 @@ class RuntimeStoreRecord(JMSBaseModel):
         verbose_name = _('Chat AI runtime store record')
 
 
-class AuditConversation(models.Model):
+class AuditConversation(OrgModelMixin):
     """Independent audit history; runtime deletion must not delete this record."""
 
     id = models.UUIDField(primary_key=True)
-    org_id = models.CharField(max_length=36, db_index=True)
     subject_id = models.UUIDField()
     subject_name = models.CharField(max_length=128, blank=True)
     subject_username = models.CharField(max_length=128, blank=True)
@@ -74,7 +74,7 @@ class AuditConversation(models.Model):
         verbose_name = _('Chat AI conversation audit')
 
 
-class AuditMessage(models.Model):
+class AuditMessage(OrgModelMixin):
     id = models.CharField(max_length=128, primary_key=True)
     conversation = models.ForeignKey(AuditConversation, on_delete=models.CASCADE, related_name='messages')
     role = models.CharField(max_length=16)
@@ -89,4 +89,10 @@ class AuditMessage(models.Model):
     class Meta:
         default_permissions = ()
         ordering = ('date_created', 'id')
+        indexes = [
+            models.Index(
+                fields=('conversation', 'role', 'date_created'),
+                name='chat_ai_audit_msg_stats_idx',
+            ),
+        ]
         verbose_name = _('Chat AI audit message')

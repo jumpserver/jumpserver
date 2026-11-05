@@ -4,6 +4,7 @@ import re
 from rest_framework.exceptions import ValidationError
 
 from chat_ai.models import AuditConversation, AuditMessage
+from orgs.utils import tmp_to_root_org
 
 
 SECRET_PATTERNS = [
@@ -22,8 +23,10 @@ def sanitize_audit_text(value):
     return value[:32768].strip()
 
 
+@tmp_to_root_org()
 def apply_audit_projection(data, revision):
     """Called under the runtime-store row lock, inside its commit transaction."""
+    # A signed Kael commit can contain records from multiple organizations.
     for item in data['conversations']:
         values = dict(item)
         pk = values.pop('id')
@@ -38,11 +41,13 @@ def apply_audit_projection(data, revision):
     for item in data['messages']:
         values = dict(item)
         pk = values.pop('id')
-        if not AuditConversation.objects.filter(pk=values['conversation_id']).exists():
+        conversation = AuditConversation.objects.only('org_id').filter(pk=values['conversation_id']).first()
+        if conversation is None:
             raise ValidationError('The audit conversation must be written before its messages.')
         existing = AuditMessage.objects.filter(pk=pk).first()
         if existing and existing.conversation_id != values['conversation_id']:
             raise ValidationError('An audit message cannot change its conversation.')
+        values['org_id'] = conversation.org_id
         for field in ('content', 'error'):
             values[field] = sanitize_audit_text(values.get(field, ''))
         AuditMessage.objects.update_or_create(pk=pk, defaults={**values, 'source_revision': revision})

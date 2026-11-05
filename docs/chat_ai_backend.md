@@ -39,6 +39,11 @@ Python Chat AI 进程或额外监听端口。
 前端菜单、列表和详情使用同一权限。查询不访问 Kael，也不要求开启 AI 功能，
 因此可以在 Kael 停机或禁用 AI 后查询已经写入的历史。
 
+会话和消息审计模型继承 `OrgModelMixin`，通过组织感知的 manager 隔离查询，并保留 Kael 上报的
+记录 ID 和时间。消息的 `org_id` 由所属会话确定，不接受单独指定。消息表的
+`(conversation_id, role, date_created)` 联合索引用于列表中的消息数、提问数和最后提问时间统计；
+会话表保留 `(org_id, date_updated)` 索引。
+
 Kael 在签名的 Runtime Store `record` JSON envelope 中添加可选的 `audit` 对象，包含
 `version: 1`、`conversations` 和 `messages` 数组。原有 `payload` 仍是 Core 不解析的运行时数据；
 `audit` 是单独校验的 JSON 数据协议，并受整个 record 的提交 HMAC 保护。Core 在同一个数据库事务中
