@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='AuditConversation',
             fields=[
                 ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('org_id', models.CharField(db_index=True, max_length=36)),
+                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('subject_id', models.UUIDField()),
                 ('subject_name', models.CharField(blank=True, max_length=128)),
                 ('subject_username', models.CharField(blank=True, max_length=128)),
@@ -39,6 +39,7 @@ class Migration(migrations.Migration):
             name='AuditMessage',
             fields=[
                 ('id', models.CharField(max_length=128, primary_key=True, serialize=False)),
+                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('conversation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='chat_ai.auditconversation')),
                 ('role', models.CharField(max_length=16)),
                 ('content', models.TextField(blank=True)),
@@ -53,7 +54,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Chat AI audit message',
                 'ordering': ('date_created', 'id'),
                 'default_permissions': (),
-                'indexes': [],
+                'indexes': [models.Index(fields=['conversation', 'role', 'date_created'], name='chat_ai_audit_msg_stats_idx')],
                 'constraints': [],
             },
         ),

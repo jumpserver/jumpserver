@@ -49,10 +49,14 @@ class AuditConversationDetailSerializer(AuditConversationSerializer):
 
 class AuditConversationInput(serializers.ModelSerializer):
     id = serializers.UUIDField()
+    org_id = serializers.CharField(max_length=36)
 
     class Meta:
         model = AuditConversation
-        exclude = ('source_revision',)
+        fields = (
+            'id', 'org_id', 'subject_id', 'subject_name', 'subject_username', 'title',
+            'assistant', 'profile', 'status', 'date_created', 'date_updated',
+        )
         extra_kwargs = {'title': {'allow_blank': True}}
 
 
@@ -63,7 +67,10 @@ class AuditMessageInput(serializers.ModelSerializer):
 
     class Meta:
         model = AuditMessage
-        exclude = ('conversation', 'source_revision')
+        fields = (
+            'id', 'conversation_id', 'role', 'content', 'status', 'error',
+            'input_tokens', 'output_tokens', 'date_created',
+        )
 
 
 class AuditProjectionInput(serializers.Serializer):
