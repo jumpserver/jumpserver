@@ -107,7 +107,8 @@ class SessionSaveMixin:
 
     def clear_close_lock(self):
         # Only a verified unlock may clear a close deadline that has already passed.
-        self._clear_close_lock = True
+        policy = self.login_policy or {}
+        self._clear_close_lock = policy.get('close_lock_at'), tuple(policy.get('closed_pages', ()))
         self.save()
         self.modified = False
 
@@ -154,8 +155,11 @@ class SessionSaveMixin:
                     self._session_cache[LOGIN_POLICY_KEY] = policy
             if self.login_policy and self.get_expiry_date() <= timezone.now():
                 raise UpdateError('The login has expired.')
-            if getattr(self, '_clear_close_lock', False) and self.login_policy:
-                self._session_cache[LOGIN_POLICY_KEY].pop('close_lock_at', None)
+            if (close_lock := getattr(self, '_clear_close_lock', None)) and self.login_policy:
+                policy = self._session_cache[LOGIN_POLICY_KEY]
+                # A close arriving during verification must keep its lock deadline.
+                if close_lock == (policy.get('close_lock_at'), tuple(policy.get('closed_pages', ()))):
+                    policy.pop('close_lock_at', None)
             if action := getattr(self, '_page_action', None):
                 page_id, entering, lock_on_close = action
                 policy = dict(self.login_policy)
@@ -181,7 +185,7 @@ class SessionSaveMixin:
             result = super().save(must_create=must_create)
             self._new_login_policy = False
             self._page_action = None
-            self._clear_close_lock = False
+            self._clear_close_lock = None
             return result
 
     async def asave(self, *args, **kwargs):
