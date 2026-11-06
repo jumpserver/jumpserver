@@ -18007,3 +18007,79 @@ msgstr "切換前由服務端驗證備用帳號；關閉後，請自行確保備
 
 msgid "Backup account verification skipped by policy"
 msgstr "已依策略跳過備用帳號驗證"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "雲資源 ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "最近發現時間"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "首次缺失時間"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "連續未發現次數"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "待複核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "衝突"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "完整掃描中未發現該雲資源"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "該雲資源不再符合同步策略"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "該地域已移出同步範圍"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "雲資源綁定存在衝突，需要人工複核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "發現了該雲資源，但未選擇匯入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "發現了該雲資源，但尚未匯入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "雲資源已變更，但未啟用自動更新"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "雲地域掃描逾時"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "雲地域掃描結果不完整"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "雲地域傳回了無效的掃描結果"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "雲地域掃描失敗"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "無補充說明"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "首次發現時間"

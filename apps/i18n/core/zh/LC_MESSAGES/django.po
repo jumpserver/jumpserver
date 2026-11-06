@@ -20235,3 +20235,79 @@ msgstr "身份确认已过期（有效期为 %(ttl)s 秒）。"
 #, python-format
 msgid "Confirm the current user with %(confirm_type)s, then retry with the same session cookie. This confirmation is valid for %(ttl)s seconds while the session remains valid."
 msgstr "请使用 %(confirm_type)s 确认当前用户身份，然后携带同一会话 Cookie 重试。在会话仍有效的前提下，此类确认的有效期为 %(ttl)s 秒。"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "云资源 ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "最近发现时间"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "首次缺失时间"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "连续未发现次数"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "待复核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "冲突"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "完整扫描中未发现该云资源"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "该云资源不再匹配同步策略"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "该地域已移出同步范围"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "云资源绑定存在冲突，需要人工复核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "发现了该云资源，但未选择导入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "发现了该云资源，但尚未导入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "云资源已变化，但未启用自动更新"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "云地域扫描超时"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "云地域扫描结果不完整"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "云地域返回了无效的扫描结果"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "云地域扫描失败"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "无补充说明"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "首次发现时间"

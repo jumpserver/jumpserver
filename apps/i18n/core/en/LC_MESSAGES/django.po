@@ -18413,3 +18413,79 @@ msgstr "No account changes"
 #: chat_ai/models.py
 msgid "Chat AI conversation audit"
 msgstr "AI conversation audit"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "External ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "Last seen at"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "First missing at"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "Consecutive not found"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "Pending review"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "Conflict"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "The cloud resource was not found during a complete scan"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "The cloud resource no longer matches the synchronization strategy"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "The region was removed from the synchronization scope"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "The cloud resource binding needs manual review"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "The cloud resource was discovered but not selected for import"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "The cloud resource was discovered but not imported"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "The cloud resource changed, but automatic updates are disabled"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "The cloud region scan timed out"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "The cloud region scan returned incomplete results"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "The cloud region returned an invalid scan result"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "The cloud region could not be scanned"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "No additional details"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "First seen at"

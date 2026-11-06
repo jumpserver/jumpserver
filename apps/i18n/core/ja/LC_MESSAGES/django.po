@@ -18206,3 +18206,79 @@ msgstr "期限切れのアプリケーション監査、完了したポリシー
 
 msgid "The start time must be earlier than the end time."
 msgstr "開始時刻は終了時刻より前である必要があります。"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "クラウドリソース ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "最終検出日時"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "最初の欠落日時"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "連続未検出回数"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "確認待ち"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "競合"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "完全なスキャンでクラウドリソースが検出されませんでした"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "クラウドリソースは同期戦略に一致しなくなりました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "リージョンが同期範囲から除外されました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "クラウドリソースの関連付けを手動で確認してください"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "クラウドリソースは検出されましたが、インポート対象に選択されていません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "クラウドリソースは検出されましたが、インポートされていません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "クラウドリソースは変更されていますが、自動更新が無効です"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "クラウドリージョンのスキャンがタイムアウトしました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "クラウドリージョンのスキャン結果が不完全です"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "クラウドリージョンから無効なスキャン結果が返されました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "クラウドリージョンをスキャンできませんでした"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "追加情報はありません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "初回検出日時"
