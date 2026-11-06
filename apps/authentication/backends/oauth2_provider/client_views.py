@@ -13,7 +13,7 @@ from authentication.services.client_login_session import (
     client_login_session_data, client_policy_enabled, client_policy_lock,
     expired_session_from_receipt, is_client_application,
 )
-from authentication.services.web_session_lock import session_locked
+from common.sessions import policy_locked
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -21,9 +21,7 @@ from authentication.services.web_session_lock import session_locked
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class ClientAuthorizationView(AuthorizationView):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and session_locked(
-            request.session.session_key, request.user.pk, request.session.login_policy,
-        ):
+        if request.user.is_authenticated and policy_locked(request.session.login_policy):
             return HttpResponse(
                 _('The web session is locked. Unlock it before authorizing a client.'),
                 status=423, content_type='text/plain; charset=utf-8',

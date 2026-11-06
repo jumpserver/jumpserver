@@ -9,7 +9,7 @@ from common.serializers.fields import LabeledChoiceField
 class DatabaseSpecSerializer(serializers.ModelSerializer):
     class Meta:
         model = Database
-        fields = ['db_name', 'use_ssl', 'allow_invalid_cert']
+        fields = ['db_name', 'use_ssl', 'allow_invalid_cert', 'pg_ssl_mode']
 
 
 class WebSpecSerializer(serializers.ModelSerializer):

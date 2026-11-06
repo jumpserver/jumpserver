@@ -20,12 +20,11 @@ from audits.models import UserSession
 from authentication.backends.drf import SessionAuthentication
 from authentication.services.idle_lock import personal_idle_lock_time, effective_idle_lock_time, idle_lock_limits
 from authentication.services.lock_password import (
-    MAX_LOCK_PASSWORD_FAILURES, LOCK_PASSWORD_LOGOUT_CODE, record_lock_password_failure,
+    MAX_LOCK_PASSWORD_FAILURES, LOCK_PASSWORD_LOGOUT_CODE,
 )
 from authentication.services.web_session_lock import session_scope
 from common.permissions import IsValidUser
 from common.sessions import SessionStateConflict, normalize_security_state, session_expiry
-from common.utils import get_request_ip
 from users.models import Preference
 
 
@@ -100,7 +99,7 @@ class WebSessionStatusView(APIView):
                             if policy.get('unlocked_at') else None),
             'locked': policy['locked'],
             'has_password': Preference.objects.filter(user=request.user, category='security', name='lock_password_hash').exists(),
-            'attempts_remaining': max(0, MAX_LOCK_PASSWORD_FAILURES - (session.lock_password_failures if session else 0)),
+            'attempts_remaining': max(0, MAX_LOCK_PASSWORD_FAILURES - policy['lock_password_failures']),
             'idle_lock_time': effective_idle_lock_time(
                 idle_limit,
                 personal_idle_lock_time(request.user.pk, 'web_idle_lock_time'),
@@ -127,12 +126,6 @@ class WebSessionLockView(WebSessionStatusView):
                     return conflict
                 if conflict := self.set_locked(request, True):
                     return conflict
-                key = request.session.session_key
-                if not UserSession.objects.filter(key=key, user=request.user).update(is_locked=True):
-                    UserSession.objects.create(
-                        user=request.user, key=key, is_locked=True, type='W', ip=get_request_ip(request),
-                        user_agent=request.META.get('HTTP_USER_AGENT', '')[:254],
-                    )
                 return self.status(request)
         except UpdateError:
             raise NotAuthenticated()
@@ -157,13 +150,8 @@ class WebSessionUnlockView(WebSessionStatusView):
                 if credential is None:
                     return Response({'code': 'lock_password_unset',
                                      'detail': _('Set a lock password after signing in again.')}, status=400)
-                key = request.session.session_key
                 if not check_password(serializer.validated_data['password'], credential.value):
-                    record, _created = UserSession.objects.get_or_create(
-                        key=key, user=request.user,
-                        defaults={'ip': get_request_ip(request), 'type': 'W', 'is_locked': True},
-                    )
-                    failures = record_lock_password_failure(record)
+                    failures = request.session.record_lock_password_failure(request.data['expected_version'])
                     if failures >= MAX_LOCK_PASSWORD_FAILURES:
                         logout(request)
                         return Response({'code': LOCK_PASSWORD_LOGOUT_CODE, 'logout_after': 5,
@@ -174,7 +162,8 @@ class WebSessionUnlockView(WebSessionStatusView):
                                      'detail': _('The lock password is incorrect.')}, status=400)
                 if conflict := self.set_locked(request, False):
                     return conflict
-                UserSession.objects.filter(key=key, user=request.user).update(is_locked=False, lock_password_failures=0)
                 return self.status(request)
+        except SessionStateConflict:
+            return self.conflict(request)
         except UpdateError:
             raise NotAuthenticated()
