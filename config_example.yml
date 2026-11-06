@@ -99,6 +99,18 @@ REDIS_PORT: 6379
 # 资产树/类型树节点是否返回统计数量，默认 true
 # TREE_NODE_AMOUNT_ENABLED: true
 
+# RDP 文件签名，默认关闭。修改后需重新加载 Core 配置。
+# RDP_SIGN_ENABLED: false
+# RDP_SIGN_CERT: rdp_signer.crt
+# RDP_SIGN_CERT_KEY: rdp_signer.key
+# 证书和私钥位于 Core 的 data/certs 目录；安装器已将 CONFIG_DIR/certs 挂载到该目录。
+# 使用有效、匹配且具有 codeSigning EKU 的 PEM 证书和无口令私钥，建议使用 RSA 2048 位或更高。
+# 私钥仅允许服务运行用户读取；所有 Core 节点需部署一致的证书和密钥。
+# Windows 客户端必须信任相应的签名证书链，启用前需验证发布者显示与实际连接。
+# 启用后签名失败将返回 HTTP 503 / rdp_signing_failed，不降级为未签名文件。
+# 此策略同时影响 RDP 下载、jms:// 客户端启动及使用 RDP 的 Applet/RemoteApp。
+# 需要恢复原有未签名行为时，关闭 RDP_SIGN_ENABLED 并重新加载 Core 配置。
+
 # 开启人脸识别 XPACK 功能
 #FACE_RECOGNITION_ENABLED: true
 #FACE_RECOGNITION_DISTANCE_THRESHOLD': 0.35

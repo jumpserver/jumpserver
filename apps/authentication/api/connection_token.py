@@ -2,7 +2,12 @@ import base64
 import json
 import os
 import urllib.parse
+from struct import pack
 
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.serialization import pkcs7
+from cryptography.x509.oid import ExtendedKeyUsageOID
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -44,9 +49,154 @@ __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet', 'AdminConnec
 logger = get_logger(__name__)
 
 
+class RDPFileSigningError(JMSException):
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    default_code = 'rdp_signing_failed'
+    default_detail = _('RDP file signing failed. Please contact the administrator.')
+
+
 class RDPFileClientProtocolURLMixin:
     request: Request
     get_serializer: callable
+
+    RDP_SIGN_SECURE_SETTINGS = [
+        ('full address:s:', 'Full Address'),
+        ('alternate full address:s:', 'Alternate Full Address'),
+        ('pcb:s:', 'PCB'),
+        ('use redirection server name:i:', 'Use Redirection Server Name'),
+        ('server port:i:', 'Server Port'),
+        ('negotiate security layer:i:', 'Negotiate Security Layer'),
+        ('enablecredsspsupport:i:', 'EnableCredSspSupport'),
+        ('disableconnectionsharing:i:', 'DisableConnectionSharing'),
+        ('autoreconnection enabled:i:', 'AutoReconnection Enabled'),
+        ('gatewayhostname:s:', 'GatewayHostname'),
+        ('gatewayusagemethod:i:', 'GatewayUsageMethod'),
+        ('gatewayprofileusagemethod:i:', 'GatewayProfileUsageMethod'),
+        ('gatewaycredentialssource:i:', 'GatewayCredentialsSource'),
+        ('support url:s:', 'Support URL'),
+        ('promptcredentialonce:i:', 'PromptCredentialOnce'),
+        ('require pre-authentication:i:', 'Require pre-authentication'),
+        ('pre-authentication server address:s:', 'Pre-authentication server address'),
+        ('alternate shell:s:', 'Alternate Shell'),
+        ('shell working directory:s:', 'Shell Working Directory'),
+        ('remoteapplicationprogram:s:', 'RemoteApplicationProgram'),
+        ('remoteapplicationexpandworkingdir:s:', 'RemoteApplicationExpandWorkingdir'),
+        ('remoteapplicationmode:i:', 'RemoteApplicationMode'),
+        ('remoteapplicationguid:s:', 'RemoteApplicationGuid'),
+        ('remoteapplicationname:s:', 'RemoteApplicationName'),
+        ('remoteapplicationicon:s:', 'RemoteApplicationIcon'),
+        ('remoteapplicationfile:s:', 'RemoteApplicationFile'),
+        ('remoteapplicationfileextensions:s:', 'RemoteApplicationFileExtensions'),
+        ('remoteapplicationcmdline:s:', 'RemoteApplicationCmdLine'),
+        ('remoteapplicationexpandcmdline:s:', 'RemoteApplicationExpandCmdLine'),
+        ('prompt for credentials:i:', 'Prompt For Credentials'),
+        ('authentication level:i:', 'Authentication Level'),
+        ('audiomode:i:', 'AudioMode'),
+        ('redirectdrives:i:', 'RedirectDrives'),
+        ('redirectprinters:i:', 'RedirectPrinters'),
+        ('redirectcomports:i:', 'RedirectCOMPorts'),
+        ('redirectsmartcards:i:', 'RedirectSmartCards'),
+        ('redirectposdevices:i:', 'RedirectPOSDevices'),
+        ('redirectclipboard:i:', 'RedirectClipboard'),
+        ('devicestoredirect:s:', 'DevicesToRedirect'),
+        ('drivestoredirect:s:', 'DrivesToRedirect'),
+        ('loadbalanceinfo:s:', 'LoadBalanceInfo'),
+        ('redirectdirectx:i:', 'RedirectDirectX'),
+        ('rdgiskdcproxy:i:', 'RDGIsKDCProxy'),
+        ('kdcproxyname:s:', 'KDCProxyName'),
+        ('eventloguploadaddress:s:', 'EventLogUploadAddress'),
+        ('redirectwebauthn:i:', 'RedirectWebAuthn'),
+    ]
+
+    @classmethod
+    def _collect_rdp_sign_lines(cls, settings_lines):
+        signnames = []
+        signlines = []
+        for prefix, sign_name in cls.RDP_SIGN_SECURE_SETTINGS:
+            for line in settings_lines:
+                if line.startswith(prefix):
+                    signnames.append(sign_name)
+                    signlines.append(line)
+        return signnames, signlines
+
+    @classmethod
+    def _try_sign_rdp_content(cls, content):
+        if not settings.RDP_SIGN_ENABLED:
+            return content
+
+        stage = 'read_certificate'
+        try:
+            cert_dir = os.path.join(settings.PROJECT_DIR, 'data', 'certs')
+            certfile = os.path.join(cert_dir, settings.RDP_SIGN_CERT)
+            keyfile = os.path.join(cert_dir, settings.RDP_SIGN_CERT_KEY)
+            with open(certfile, 'rb') as certificate_file:
+                certificate_pem = certificate_file.read()
+            stage = 'load_certificate'
+            certificate = x509.load_pem_x509_certificate(certificate_pem)
+
+            stage = 'read_private_key'
+            with open(keyfile, 'rb') as private_key_file:
+                private_key_pem = private_key_file.read()
+            stage = 'load_private_key'
+            private_key = serialization.load_pem_private_key(private_key_pem, password=None)
+
+            stage = 'validate_certificate_dates'
+            if not certificate.not_valid_before_utc <= timezone.now() <= certificate.not_valid_after_utc:
+                raise ValueError('Certificate is not currently valid')
+            stage = 'validate_certificate_usage'
+            usage = certificate.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
+            if ExtendedKeyUsageOID.CODE_SIGNING not in usage:
+                raise ValueError('Certificate does not allow code signing')
+            stage = 'validate_private_key'
+            certificate_public_key = certificate.public_key().public_bytes(
+                serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+            private_public_key = private_key.public_key().public_bytes(
+                serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+            if certificate_public_key != private_public_key:
+                raise ValueError('Certificate and private key do not match')
+
+            stage = 'prepare_content'
+            settings_lines = []
+            full_address = None
+            alternate_full_address = None
+            for line in content.splitlines():
+                if not line.strip() or line.startswith(('signature:s:', 'signscope:s:')):
+                    continue
+                if line.startswith('full address:s:'):
+                    full_address = line[len('full address:s:'):]
+                elif line.startswith('alternate full address:s:'):
+                    alternate_full_address = line[len('alternate full address:s:'):]
+                settings_lines.append(line)
+            if full_address and not alternate_full_address:
+                settings_lines.append(f'alternate full address:s:{full_address}')
+            signnames, signlines = cls._collect_rdp_sign_lines(settings_lines)
+            if not signnames:
+                raise ValueError('No protected RDP settings to sign')
+            msgtext = '\r\n'.join(signlines) + '\r\nsignscope:s:' + ','.join(signnames) + '\r\n\x00'
+
+            stage = 'generate_signature'
+            signature = (
+                pkcs7.PKCS7SignatureBuilder()
+                .set_data(msgtext.encode('UTF-16LE'))
+                .add_signer(certificate, private_key, hashes.SHA256())
+                .sign(serialization.Encoding.DER, [
+                    pkcs7.PKCS7Options.Binary,
+                    pkcs7.PKCS7Options.DetachedSignature,
+                    pkcs7.PKCS7Options.NoAttributes,
+                ])
+            )
+            signature_blob = pack('<III', 0x00010001, 1, len(signature)) + signature
+            signature_value = base64.b64encode(signature_blob).decode('ascii')
+            signed_lines = settings_lines + [
+                f'signscope:s:{",".join(signnames)}',
+                f'signature:s:{signature_value}',
+            ]
+            return '\r\n'.join(signed_lines) + '\r\n'
+        except Exception as error:
+            logger.error('RDP file signing failed: stage=%s error_type=%s', stage, type(error).__name__)
+            raise RDPFileSigningError() from None
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
@@ -163,6 +313,7 @@ class RDPFileClientProtocolURLMixin:
         for k, v in rdp_options.items():
             content += f'{k}:{v}\n'
 
+        content = self._try_sign_rdp_content(content)
         return filename, content
 
     @staticmethod

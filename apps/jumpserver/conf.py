@@ -823,6 +823,9 @@ class Config(dict):
 
         'REMOTE_APP_STORE_URL': 'https://apps.fit2cloud.com/jumpserver',
         'LANGUAGES_SUPPORTED': '',
+        'RDP_SIGN_ENABLED': False,
+        'RDP_SIGN_CERT': 'rdp_signer.crt',
+        'RDP_SIGN_CERT_KEY': 'rdp_signer.key',
     }
 
     old_config_map = {
