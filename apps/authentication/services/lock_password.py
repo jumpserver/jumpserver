@@ -1,42 +1,4 @@
-import time
-
 from django.db import transaction
-from rest_framework.permissions import BasePermission
-from rest_framework.throttling import UserRateThrottle
-
-from common.exceptions import UserConfirmRequired
-
-LOCK_PASSWORD_PURPOSE = 'lock_password'
-LOCK_PASSWORD_PROOF = 'lock_password_confirmation'
-
-
-class LockPasswordConfirmationThrottle(UserRateThrottle):
-    scope = 'lock_password_confirmation'
-    rate = '5/minute'
-
-
-def confirmation_type(user):
-    return 'password' if user.source == user.Source.local else 'mfa'
-
-
-def mark_lock_password_confirmation(request, method):
-    if method == confirmation_type(request.user):
-        request.session[LOCK_PASSWORD_PROOF] = {
-            'user': str(request.user.pk), 'method': method, 'at': time.time(),
-        }
-
-
-class LockPasswordConfirmation(BasePermission):
-    def has_permission(self, request, view):
-        proof = request.session.get(LOCK_PASSWORD_PROOF, {})
-        method = confirmation_type(request.user)
-        when = proof.get('at') if isinstance(proof, dict) else None
-        if (isinstance(when, (int, float)) and 0 <= time.time() - when <= 300
-                and proof.get('user') == str(request.user.pk) and proof.get('method') == method):
-            return True
-        error = UserConfirmRequired(code=method)
-        error.detail['purpose'] = LOCK_PASSWORD_PURPOSE
-        raise error
 
 
 MAX_LOCK_PASSWORD_FAILURES = 5

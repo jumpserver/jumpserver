@@ -51,7 +51,7 @@ class UserConfirmation(permissions.BasePermission):
             raise self.confirmation_required(
                 'insufficient_confirmation', _('The current confirmation does not meet the required level.'),
             )
-        if confirm_time < now - ttl:
+        if confirm_time <= now - ttl:
             raise self.confirmation_required(
                 'confirmation_expired',
                 _('The identity confirmation has expired (valid for %(ttl)s seconds).') % {'ttl': ttl},

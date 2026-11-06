@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema_serializer
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema_serializer
 from rest_framework import serializers
 
 from .const import ConfirmType
@@ -15,6 +15,10 @@ class ConfirmationMethodSerializer(serializers.Serializer):
 class ConfirmationOptionsSerializer(serializers.Serializer):
     confirm_type = serializers.ChoiceField(choices=ConfirmType.choices)
     content = ConfirmationMethodSerializer(many=True)
+    relogin_required = serializers.BooleanField(
+        required=False,
+        help_text='Only present for relogin. False allows reuse of the recent login; true requires a new login.',
+    )
 
 
 class ConfirmationRequiredSerializer(serializers.Serializer):
@@ -27,10 +31,9 @@ class ConfirmationRequiredSerializer(serializers.Serializer):
     )
     confirm_ttl = serializers.IntegerField(
         required=False,
-        help_text='Validity in seconds of a new confirmation of the required type, subject to session expiry.',
+        help_text='Maximum confirmation validity in seconds; relogin is measured from login, not confirmation.',
     )
     confirm_url = serializers.CharField(required=False, help_text='Endpoint for discovering and submitting confirmation.')
-    purpose = serializers.CharField(required=False, help_text='Present for a purpose-specific confirmation requirement.')
 
 
 CONFIRMATION_REQUIRED_RESPONSE = OpenApiResponse(
@@ -38,9 +41,10 @@ CONFIRMATION_REQUIRED_RESPONSE = OpenApiResponse(
     description=(
         'Confirm the current operator using the type in code, then retry with the same session cookie. '
         'reason distinguishes missing confirmation, a different user, insufficient level and expiry. '
-        'confirm_ttl is the validity of a new confirmation, not the remaining session lifetime. '
-        'MFA uses SECURITY_MFA_VERIFY_TTL (default 3600 seconds); ordinary password/relogin confirmation '
-        'defaults to 300 seconds. Purpose-specific confirmation may have its own lifetime.'
+        'confirm_ttl is the maximum confirmation window, not the remaining session lifetime. '
+        'MFA uses SECURITY_MFA_VERIFY_TTL (default 3600 seconds); password confirmation defaults to '
+        '300 seconds. Relogin can only reuse the remaining portion of the first 300 seconds after '
+        'the original Session authentication; recording confirmation never extends that deadline.'
     ),
     examples=[OpenApiExample(
         'Password confirmation does not satisfy MFA',
@@ -65,11 +69,7 @@ CONFIRMATION_BAD_REQUEST_RESPONSE = OpenApiResponse(
     response={'type': 'object'},
     description=(
         'Invalid or missing parameters return field-specific errors. An unavailable confirmation backend '
-        'or an incorrect password/MFA code returns an error message. No confirmation is recorded.'
+        'or an incorrect password/MFA code returns an error message. Relogin outside the recent-login '
+        'window returns code=relogin_required. No confirmation is recorded.'
     ),
-)
-
-CONFIRMATION_PURPOSE_PARAMETER = OpenApiParameter(
-    name='purpose', enum=['lock_password'],
-    description='Use lock_password only when confirming a lock-password change.',
 )

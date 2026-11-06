@@ -238,7 +238,7 @@ class UserLockPasswordSerializer(serializers.Serializer):
         from ..utils import check_password_rules
         if not check_password_rules(password, is_org_admin=self.context['request'].user.is_org_admin):
             raise serializers.ValidationError({'password': _('Password does not match security rules')})
-        return {'password': make_password(password)}
+        return {'password': password}
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
@@ -247,7 +247,7 @@ class UserLockPasswordSerializer(serializers.Serializer):
         password = validated_data.get('password')
         if password:
             Preference.objects.update_or_create(user=user, name='client_lock_password_hash', defaults={
-                'category': 'client', 'value': password, 'encrypted': False,
+                'category': 'client', 'value': make_password(password), 'encrypted': False,
             })
         return instance
 
