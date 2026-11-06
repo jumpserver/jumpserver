@@ -14,7 +14,7 @@ from django.utils.translation import override
 from oauth2_provider.models import get_application_model, get_access_token_model, get_grant_model, get_refresh_token_model
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView, AgentAuthorizationServerView
+from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView, AgentAuthorizationServerView, AgentIdentityView
 from authentication.backends.oauth2_provider.client_views import ClientTokenView, ClientRevokeTokenView
 from authentication.models.client_login_session import ClientLoginSession
 from common.sessions.cache import SessionStore
@@ -120,6 +120,63 @@ class AgentOAuthOrganizationTests(TestCase):
             'access_token': result['access_token'], 'resource': self.resource,
             'capabilities': {'version': 1, 'protocols': {'ssh': 'shell'}}, **extra,
         })
+
+    def identity(self, result, resource=None):
+        from django.urls import reverse
+
+        with self.settings(MCP_ENABLED=True, MCP_PUBLIC_URL=self.resource, MCP_DCR_ENABLED=False):
+            return self.client.get(reverse('authentication:oauth2-provider:agent-identity'),
+                                   {'resource': resource or self.resource},
+                                   HTTP_AUTHORIZATION='Bearer ' + result['access_token'])
+
+    def test_agent_identity_returns_only_the_bearer_subject_without_general_api_access(self):
+        from oauthlib.common import Request as OAuthRequest
+        from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
+        from django.urls import resolve, reverse
+
+        result = self.issued()
+        response = self.identity(result)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {'sub': str(self.user.id)})
+        self.assertIn('no-store', response['Cache-Control'])
+        self.assertFalse(AgentOAuth2Validator().validate_bearer_token(
+            result['access_token'], [], OAuthRequest('http://localhost/api/v1/users/profile/'),
+        ))
+        view = resolve(reverse('authentication:oauth2-provider:agent-identity')).func
+        self.assertFalse(view.login_required)
+        request = self.factory.get('/identity/', {'resource': self.resource})
+        request.user = self.user
+        with self.settings(MCP_ENABLED=True, MCP_PUBLIC_URL=self.resource):
+            self.assertEqual(view(request).status_code, 401)
+            self.assertEqual(view(self.factory.post('/identity/')).status_code, 405)
+        with self.settings(MCP_ENABLED=False):
+            self.assertEqual(view(request).status_code, 404)
+        with self.settings(SITE_URL='https://jumpserver.example'):
+            metadata = AgentAuthorizationServerView().get_metadata(self.factory.get('/metadata'))
+        self.assertTrue(metadata['agent_identity_endpoint'].endswith(reverse('authentication:oauth2-provider:agent-identity')))
+
+    def test_agent_identity_rechecks_resource_scope_expiry_revocation_binding_and_user(self):
+        for invalid in ('resource', 'scope', 'expired', 'revoked', 'disabled', 'unbound', 'inactive_user'):
+            with self.subTest(invalid=invalid):
+                AgentApplication.objects.filter(application=self.app).update(is_active=True)
+                User.objects.filter(pk=self.user.pk).update(is_active=True)
+                result = self.issued()
+                token = get_access_token_model().objects.get(token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest())
+                if invalid == 'scope':
+                    get_access_token_model().objects.filter(pk=token.pk).update(scope='read')
+                elif invalid == 'expired':
+                    get_access_token_model().objects.filter(pk=token.pk).update(expires=timezone.now() - timedelta(seconds=1))
+                elif invalid == 'revoked':
+                    get_refresh_token_model().objects.filter(access_token=token).update(revoked=timezone.now())
+                elif invalid == 'disabled':
+                    AgentApplication.objects.filter(application=self.app).update(is_active=False)
+                elif invalid == 'unbound':
+                    AgentOAuthBinding.objects.filter(application=self.app).delete()
+                elif invalid == 'inactive_user':
+                    User.objects.filter(pk=self.user.pk).update(is_active=False)
+                response = self.identity(result, self.resource + '/other' if invalid == 'resource' else None)
+                self.assertEqual(response.status_code, 401, response.content)
+                self.assertEqual(json.loads(response.content), {'error': 'invalid_token'})
 
     def remove_membership(self):
         self.second.members.through.objects_raw.filter(user=self.user, org_id=self.second.pk).delete()

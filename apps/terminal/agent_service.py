@@ -1,7 +1,7 @@
 """Core-owned authorization and state transitions for the Agent executor.
 
-OAuth tokens are accepted only by the component introspection endpoint. Signed
-context and session capabilities are bound to the registered execution node.
+OAuth tokens grant only component introspection and their own subject lookup.
+Signed context and session capabilities are bound to the registered execution node.
 They never replace the user's asset permission and connection ACL checks.
 """
 import hashlib
@@ -125,15 +125,15 @@ def token_organization_binding(token, refresh=None):
     return None
 
 
-def introspect(node, data):
-    require_keys(data, ('access_token', 'resource', 'capabilities'), ('access_token', 'resource', 'capabilities'))
-    raw = text_field(data['access_token'], 'access_token', 8192)
+def agent_token_authority(raw, resource):
+    """The same live authority check serves component introspection and subject lookup."""
+    raw = text_field(raw, 'access_token', 8192)
     token = get_access_token_model().objects.select_related('user', 'application').filter(
         token_checksum=hashlib.sha256(raw.encode()).hexdigest(),
     ).first()
     if not token or not token.is_valid([SCOPE]) or not token.user or not token.user.is_valid:
         raise PermissionDenied('Invalid or expired MCP token', code='invalid_token')
-    resource = text_field(data['resource'], 'resource', 512)
+    resource = text_field(resource, 'resource', 512)
     registration = AgentApplication.objects.filter(application=token.application, is_active=True).first()
     if not registration or registration.resource != resource or token.resource != [resource]:
         raise PermissionDenied('Token is not issued for this MCP resource', code='invalid_token')
@@ -145,6 +145,13 @@ def introspect(node, data):
     check_agent_scope(token.user, org_id)
     if refresh and refresh.revoked is not None:
         raise PermissionDenied('OAuth authorization revoked')
+    return token, refresh, org_id
+
+
+def introspect(node, data):
+    require_keys(data, ('access_token', 'resource', 'capabilities'), ('access_token', 'resource', 'capabilities'))
+    token, refresh, org_id = agent_token_authority(data['access_token'], data['resource'])
+    resource = token.resource[0]
     payload = {
         'user_id': str(token.user_id), 'application_id': token.application_id,
         'client_id': token.application.client_id, 'org_id': org_id,

@@ -154,6 +154,21 @@ administrative authority. Connections resolve the actual organization from the
 authorized asset. Clients need not send `X-JMS-ORG`, and a header cannot expand
 the grant. Agent access tokens are rejected as ordinary Core API bearer credentials.
 
+Native clients that already have a Core login must bind MCP authorization to that
+same user. Metadata advertises `agent_identity_endpoint`, currently
+`/core/auth/oauth2-provider/agent-identity/`. Send a GET with `Authorization: Bearer
+<agent-access-token>` and the exact `resource` query parameter. The response is
+only `{"sub": "<user UUID>"}` and is never cached. It reuses introspection's live
+token, scope, resource, registration, organization binding and revocation checks;
+cookies cannot authenticate it, and no execution capability is returned. DCR may
+be disabled after registration while this lookup remains available.
+
+Luna pins discovery's issuer and this endpoint to its already authenticated Core
+origin. It compares `sub` with the trusted Core profile ID before saving a new or
+refreshed token and before using saved authorization. A different browser account
+must fail this comparison and authorize again with the correct account. This is
+not OpenID Connect UserInfo and does not grant access to the normal profile API.
+
 ## Revocation and registration maintenance
 
 Disabling DCR stops new registrations and removes registration discovery. It does
