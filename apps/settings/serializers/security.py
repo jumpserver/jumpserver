@@ -220,23 +220,19 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 class SecuritySessionSerializer(serializers.Serializer):
     SESSION_COOKIE_AGE = serializers.IntegerField(
-        read_only=True, label=_('Web session lifetime (second)'),
+        min_value=1, max_value=31536000, required=False, label=_('Web session lifetime (second)'),
         help_text=_(
-            'Default duration, in seconds.<br>'
-            'Each renewal restarts the clock: expiry = renewal time + duration.<br>'
-            'Ordinary requests renew it when request renewal is enabled; session writes such as identity verification can still renew it when disabled.<br>'
-            'This is not a fixed maximum from the first login.<br>'
-            'Change SESSION_COOKIE_AGE in Core config.yml and restart Core. Existing sessions may retain their saved duration; sign in again to apply the new duration.'
+            'When renewal is disabled, the login expires after this duration, even if the session is saved or identity is verified again. '
+            'When renewal is enabled, each renewal grants this duration again. '
+            'Changes apply to new logins without restarting Core.'
         ),
     )
-    SESSION_SAVE_EVERY_REQUEST = serializers.BooleanField(
-        read_only=True, label=_('Renew session on request'),
+    SESSION_RENEW_ON_REQUEST = serializers.BooleanField(
+        required=False, label=_('Renew session on request'),
         help_text=_(
-            'Enabled: most API requests using a valid Web session renew it, including GET queries and background business polling. Mouse or keyboard activity is not required.<br>'
-            'Excluded read-only queries: profile, online status (user-session), and lock status (session-lock/status).<br>'
-            'Disabled: ordinary read-only requests do not renew it, but identity verification and other session writes still can.<br>'
-            'Why: the project writes the verification result to Session; Django saves the modified session and recalculates its relative expiry by default.<br>'
-            'Change SESSION_SAVE_EVERY_REQUEST in Core config.yml and restart Core.'
+            'Requests can extend the session at most once per minute. Background business requests also count; '
+            'profile, online-status and lock-status polling do not. '
+            'Disabled: the expiry time stays fixed. Changes apply to new logins without restarting Core.'
         ),
     )
     SECURITY_CLIENT_REAUTH_ON_EXIT = serializers.BooleanField(
@@ -258,17 +254,20 @@ class SecuritySessionSerializer(serializers.Serializer):
         min_value=0, max_value=99999, required=False,
         label=_('Client idle screen lock (minute)'),
         help_text=_(
-            '0 disables automatic locking. Locks after the specified idle time. Enter the lock password in '
-            'the main window to unlock. External application windows are not protected.'
+            '0 disables automatic locking. Locks after the idle timeout. Switching accounts does not reset '
+            'the previous account’s idle time. Enter the lock password to unlock. '
+            'External application windows are not protected.'
         ),
     )
     SECURITY_WEB_IDLE_LOCK_TIME = serializers.IntegerField(
         min_value=0, max_value=99999, required=False,
         label=_('Web idle screen lock (minute)'),
         help_text=_(
-            '0 disables automatic locking. Locks the console and Web terminal after the specified idle time. '
-            'Enter the lock password to unlock. Administrator settings are defaults and limits. Users may '
-            'choose stricter settings; otherwise they follow the administrator.'
+            '0 disables idle locking. Locks the console and Web terminal after the specified idle time. '
+            'Enter the lock password to unlock. With idle locking enabled, closing all pages also locks this login '
+            'after 10 seconds. Close-page sign-out takes priority. Refreshing or reopening within 10 seconds cancels this. '
+            'Administrator settings are defaults and limits. Users may choose stricter settings; otherwise they follow '
+            'the administrator.'
         ),
     )
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField(
@@ -301,12 +300,12 @@ class SecuritySessionSerializer(serializers.Serializer):
         help_text=_('If idle time more than it, disconnect connection.')
     )
     SESSION_EXPIRE_AT_BROWSER_CLOSE = serializers.BooleanField(
-        required=False, default=False, label=_('Session expire at browser closed'),
+        required=False, default=False, label=_('Log in again when the browser closes'),
         help_text=_(
-            'Enabled: after quitting the entire browser application, opening it again normally requires signing in.<br>'
-            'Closing a tab or window, or minimizing it, is not the same as quitting the application; the browser may still be running in the background.<br>'
-            'Browser session restore may preserve login cookies. Use the site Sign out action to reliably end the login.<br>'
-            'This does not set a fixed maximum login duration.'
+            'End this login 10 seconds after all console and Web terminal pages for it close. '
+            'Refreshing or reopening a page within 10 seconds cancels sign-out. '
+            'A browser crash may prevent the close report; use Sign out to reliably end the login. '
+            'Changes apply to new logins.'
         )
     )
     VIEW_ASSET_ONLINE_SESSION_INFO = serializers.BooleanField(

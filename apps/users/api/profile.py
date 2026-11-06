@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import ConnectionToken
 from authentication.backends.drf import SessionAuthentication
+from authentication.const import ConfirmType
 from authentication.permissions import UserConfirmation
 from common.permissions import IsValidUser
 from authentication.permissions import IsValidUserOrConnectionToken
@@ -104,26 +105,12 @@ class BaseUserPasswordSettingsApi(generics.RetrieveUpdateAPIView):
 class UserLockPasswordApi(BaseUserPasswordSettingsApi):
     serializer_class = serializers.UserLockPasswordSerializer
 
-    def get_permissions(self):
-        permissions = super().get_permissions()
-        # Metadata clones OPTIONS as PATCH to describe writable fields. Identity
-        # confirmation protects real writes; it must not hide the form schema.
-        if self.request.method == 'PATCH' and self.request._request.method != 'OPTIONS':
-            permissions.append(self.get_confirmation_permission())
-        return permissions
-
-    def get_confirmation_permission(self):
-        data = self.request.data
-        if isinstance(data, dict) and (data.get('password') or data.get('password_again') or data.get('clear')):
-            from authentication.services.lock_password import LockPasswordConfirmation
-            return LockPasswordConfirmation()
-        return UserConfirmation()
-
     def perform_update(self, serializer):
-        super().perform_update(serializer)
+        # Check parsed changes, not raw input: e.g. clear="true" is a real mutation,
+        # while an empty PATCH and form metadata do not require confirmation.
         if serializer.validated_data.get('password') or serializer.validated_data.get('clear'):
-            from authentication.services.lock_password import LOCK_PASSWORD_PROOF
-            self.request.session.pop(LOCK_PASSWORD_PROOF, None)
+            UserConfirmation.require(ConfirmType.RELOGIN)().has_permission(self.request, self)
+        super().perform_update(serializer)
 
 
 class UserFileEncryptionApi(BaseUserPasswordSettingsApi):

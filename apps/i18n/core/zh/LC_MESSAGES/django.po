@@ -17452,7 +17452,7 @@ msgid "Client login session expired. Please authenticate again."
 msgstr "客户端登录已失效，请重新验证身份。"
 
 msgid "Log in again after exiting the client"
-msgstr "退出后重新登录"
+msgstr "客户端退出后重新登录"
 
 msgid ""
 "When enabled, log in again after the desktop application exits and restarts."
@@ -17466,7 +17466,7 @@ msgid "Log in again when the idle timeout is reached. 0 disables the limit (defa
 msgstr "达到空闲超时后需重新登录。0 表示不启用（默认）。主窗口、独立资产窗口及内置网站中的真实键盘、鼠标操作会计入活动；连接在线、后台输出和自动刷新不算活动。Xshell、MSTSC 等外部软件和部分跨域内嵌页面中的操作无法采集。仅在这些区域操作、长时间只观看，或网络异常导致上报失败时，仍可能触发空闲超时；以服务器最后确认的活动时间为准。"
 
 msgid "Maximum client login lifetime (minute)"
-msgstr "最长登录有效期 (分)"
+msgstr "客户端最长登录有效期 (分)"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "从客户端登录开始计时，用户操作和令牌刷新均不延长有效期。0 表示不限制登录时长（默认），退出和空闲超时设置仍然生效。到期后需重新登录。"
@@ -18942,20 +18942,10 @@ msgstr "0 表示不限制。 从登录时间起计算，到期需重新登录，
 
 #: apps/settings/serializers/security.py
 msgid ""
-"0 disables automatic locking. Locks after the specified idle time. Enter the"
-" lock password in the main window to unlock. External application windows "
-"are not protected."
-msgstr "0 表示关闭自动锁屏。 空闲达到设定时间后自动锁屏，在主窗口输入锁屏密码解锁。外部软件窗口不受保护。"
-
-#: apps/settings/serializers/security.py
-msgid ""
-"0 disables automatic locking. Locks the console and Web terminal after the "
-"specified idle time. Enter the lock password to unlock. Administrator "
-"settings are defaults and limits. Users may choose stricter settings; "
-"otherwise they follow the administrator."
-msgstr ""
-"0 表示关闭自动锁屏。 空闲达到设定时间后锁定控制台和 Web 终端，输入锁屏密码解锁。 "
-"管理员设置为默认值和上限，用户可设置得更严格；未自行设置则跟随管理员。"
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
+msgstr "0 表示关闭自动锁屏。空闲超时后锁定，切换账号不会重置原账号的空闲时间。输入锁屏密码解锁，外部软件窗口不受保护。"
 
 #: settings/serializers/feature.py
 msgid "Asset application scope"
@@ -20235,6 +20225,63 @@ msgstr "身份确认已过期（有效期为 %(ttl)s 秒）。"
 #, python-format
 msgid "Confirm the current user with %(confirm_type)s, then retry with the same session cookie. This confirmation is valid for %(ttl)s seconds while the session remains valid."
 msgstr "请使用 %(confirm_type)s 确认当前用户身份，然后携带同一会话 Cookie 重试。在会话仍有效的前提下，此类确认的有效期为 %(ttl)s 秒。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 表示关闭空闲锁屏。 空闲达到设定时间后锁定控制台和 Web 终端，输入锁屏密码解锁。 开启空闲锁屏后，关闭全部页面 10 "
+"秒后也会锁定；开启关闭页面退出则优先注销，刷新或 10 秒内重开可取消。 管理员设置为默认值和上限，用户可设置得更严格；未自行设置则跟随管理员。"
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr "关闭续期时，从登录成功开始固定计时，保存会话或再次验证身份不延长。开启续期时，每次续期重新获得此时长。修改后新登录生效，无需重启。"
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr "普通请求最多每分钟续期一次，后台业务请求也会续期；个人资料、在线状态和锁屏状态轮询除外。关闭后固定到期。修改后新登录生效，无需重启。"
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "浏览器退出后重新登录"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr "退出整个浏览器应用后需要重新登录，关闭标签页或窗口不属于退出。浏览器恢复功能可能保留登录，可靠结束请点击退出登录。修改后新登录生效。"
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr "浏览器退出或关闭全部页面后重新登录"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"开启后，同次登录的控制台和 Web 终端页面全部关闭约 10 "
+"秒后注销；刷新或期间重新打开会取消注销。浏览器异常退出可能无法上报，可靠结束请点击退出登录。修改后新登录生效。"
+
+msgid "Session policy"
+msgstr "会话策略"
+
+msgid "Log in again when the browser closes"
+msgstr "浏览器关闭时重新登录"
 
 #: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
 msgid "External ID"

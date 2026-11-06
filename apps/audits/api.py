@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from importlib import import_module
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone as datetime_timezone
 
 from django.conf import settings
 from django.db.models import F, Value, CharField, Q, BooleanField, Case, DateTimeField, Exists, OuterRef, When
@@ -405,10 +405,11 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = UserSessionSerializer
     pagination_class = UserDevicePagination
     page_no_limit = True  # Apply the unpaged cap after merging both sources.
-    ordering_fields = ('id', 'date_created', 'ip', 'type', 'backend', 'is_active', 'is_locked')
+    ordering_fields = ('id', 'date_created', 'ip', 'type', 'backend', 'is_active')
     device_fields = (
         'id', 'user_id', 'ip', 'city', 'user_agent', 'type', 'backend',
         'date_created', 'is_active', 'date_expired', 'is_locked', 'key',
+        'policy_expires_at',
     )
     filterset_class = UserSessionFilterSet
     search_fields = [
@@ -459,15 +460,54 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return queryset
 
     def device_rows(self, rows):
+        if not rows:
+            return rows
+        from authentication.services.client_login_session import client_login_policy
+        from authentication.services.idle_lock import (
+            IDLE_LOCK_CATEGORY, PERSONAL_SETTINGS, effective_idle_lock_time,
+            idle_lock_limits, personal_client_login_policy,
+        )
+        from common.sessions import policy_locked, policy_expiry, session_login_policies
+        from users.models import Preference
         from .models import _get_city_display
 
         users = User.objects.in_bulk({row['user_id'] for row in rows})
+        preferences = {user_id: {} for user_id in users}
+        for user_id, name, value in Preference.objects.filter(
+            user_id__in=users, category=IDLE_LOCK_CATEGORY, name__in=PERSONAL_SETTINGS,
+        ).values_list('user_id', 'name', 'value'):
+            preferences[user_id][name] = value
+        web_policies = session_login_policies([row['key'] for row in rows if row['type'] != 'C'])
+        web_idle_limit = idle_lock_limits(use_cache=True)['web_idle_lock_time']
+        client_policy = client_login_policy() if any(row['type'] == 'C' for row in rows) else None
         for row in rows:
             row['user'] = users[row['user_id']]
             row['city_display'] = _get_city_display(row['ip'], row['city'])
             row['backend_display'] = gettext(row['backend'])
-            if row['type'] != 'C':
-                row['date_expired'] = UserSession(key=row['key']).date_expired
+            personal = preferences[row['user_id']]
+            if row['type'] == 'C':
+                policy = personal_client_login_policy(row['user_id'], client_policy, preferences=personal)
+                grace = row['policy_expires_at']
+                row['session_policy'] = {
+                    'duration': policy['max_session_time'] * 60, 'renew': False,
+                    'reauth_on_exit': policy['reauth_on_exit'], 'idle_lock_time': policy['idle_lock_time'],
+                    'grace_expires_at': grace.isoformat() if grace else None,
+                }
+            else:
+                policy = web_policies.get(row['key'])
+                row['is_locked'] = policy_locked(policy, legacy_locked=row['is_locked'])
+                row['date_expired'] = (
+                    datetime.fromtimestamp(policy_expiry(policy),
+                                           tz=datetime_timezone.utc) if policy
+                    else UserSession(key=row['key']).date_expired
+                )
+                row['session_policy'] = {
+                    'duration': policy['duration'], 'renew': policy['renew'],
+                    'reauth_on_exit': policy['browser_close'],
+                    'idle_lock_time': effective_idle_lock_time(
+                        web_idle_limit, int(personal['web_idle_lock_time']) if 'web_idle_lock_time' in personal else None,
+                    ), 'grace_expires_at': None,
+                } if policy else None
         return rows
 
     def list(self, request, *args, **kwargs):
@@ -475,6 +515,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         web = self.filter_queryset(self.get_queryset().annotate(
             is_active=Case(When(key__in=active_keys, then=True), default=False, output_field=BooleanField()),
             date_expired=Value(None, DateTimeField()),
+            policy_expires_at=Value(None, DateTimeField()),
         ))
         original_filterset = self.filterset_class
         self.filterset_class = ClientUserSessionFilterSet
@@ -499,8 +540,11 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         pk = kwargs.get(self.lookup_field)
         if not is_uuid(pk):
             raise Http404
-        if self.get_queryset().filter(pk=pk).exists():
-            return super().retrieve(request, *args, **kwargs)
+        instance = self.get_queryset().filter(pk=pk).first()
+        if instance is not None:
+            self.check_object_permissions(request, instance)
+            row = {field: getattr(instance, field, None) for field in self.device_fields}
+            return Response(self.get_serializer(self.device_rows([row])[0]).data)
         row = self.get_client_queryset().filter(pk=pk).values(*self.device_fields).first()
         if row is None:
             raise Http404

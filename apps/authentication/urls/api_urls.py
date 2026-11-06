@@ -10,7 +10,7 @@ from ..api.client_login_session import (
     ClientSessionStatusView, ClientSessionRevokeView, ClientSessionUnlockView, ClientSessionLockView,
 )
 from ..api.web_session_lock import (
-    WebSessionLockStatusView, WebSessionLockView, WebSessionUnlockView, WebSessionLockLogoutView,
+    WebSessionStatusView, WebSessionLockView, WebSessionUnlockView,
 )
 from ..backends.passkey.urls import urlpatterns as passkey_urlpatterns
 
@@ -27,10 +27,9 @@ router.register('ssh-key', api.SSHkeyViewSet, 'ssh-key')
 router.register('access-tokens', api.AccessTokenViewSet, 'access-token')
 
 urlpatterns = [
-    path('session-lock/status/', WebSessionLockStatusView.as_view(), name='web-session-lock-status'),
+    path('web-session/status/', WebSessionStatusView.as_view(), name='web-session-status'),
     path('session-lock/lock/', WebSessionLockView.as_view(), name='web-session-lock'),
     path('session-lock/unlock/', WebSessionUnlockView.as_view(), name='web-session-unlock'),
-    path('session-lock/logout/', WebSessionLockLogoutView.as_view(), name='web-session-lock-logout'),
     path('client-login-session/lock/', ClientSessionLockView.as_view(), name='client-login-session-lock'),
     path('client-login-session/status/', ClientSessionStatusView.as_view(), name='client-login-session-status'),
     path('client-login-session/unlock/', ClientSessionUnlockView.as_view(), name='client-login-session-unlock'),

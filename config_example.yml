@@ -16,8 +16,10 @@ BOOTSTRAP_TOKEN:
 # LOG_LEVEL: DEBUG
 # LOG_DIR:
 
-# Session expiration setting, Default 1 hour, Also set expired on on browser close
-# 浏览器Session过期时间，默认 1 小时, 也可以设置浏览器关闭则过期
+# Web session lifetime; these settings can also be changed in System settings without restarting.
+# Web 会话有效时长；也可在系统设置中修改，无需重启。
+# When browser-close expiry is enabled, closing all console/Web terminal pages ends this login after 10 seconds.
+# 开启浏览器关闭时重新登录后，全部控制台和 Web 终端页面关闭约 10 秒后，会话失效。
 # SESSION_COOKIE_AGE: 3600
 # SESSION_EXPIRE_AT_BROWSER_CLOSE: false
 
@@ -319,11 +321,10 @@ REDIS_PORT: 6379
 # 是否开启 Luna 水印
 # SECURITY_WATERMARK_ENABLED: False
 
-# 浏览器关闭页面后，会话过期
-# SESSION_EXPIRE_AT_BROWSER_CLOSE: False
-
-# 每次 api 请求，session 续期
-# SESSION_SAVE_EVERY_REQUEST: True
+# 请求触发会话续期，同一个会话每分钟最多续期一次。关闭时，从登录成功开始固定计时。
+# 页面中的“系统设置 → 安全设置 → Web 端”可在线修改，新登录生效，无需重启。
+# SESSION_RENEW_ON_REQUEST: False
+# 兼容旧配置 SESSION_SAVE_EVERY_REQUEST，新配置优先。
 
 # 仅允许用户从来源处登录
 # ONLY_ALLOW_AUTH_FROM_SOURCE: False

@@ -21,7 +21,9 @@ from authentication.services.web_session_lock import session_locked
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class ClientAuthorizationView(AuthorizationView):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and session_locked(request.session.session_key, request.user.pk):
+        if request.user.is_authenticated and session_locked(
+            request.session.session_key, request.user.pk, request.session.login_policy,
+        ):
             return HttpResponse(
                 _('The web session is locked. Unlock it before authorizing a client.'),
                 status=423, content_type='text/plain; charset=utf-8',

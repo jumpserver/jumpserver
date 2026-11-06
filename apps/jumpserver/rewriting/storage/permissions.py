@@ -70,6 +70,13 @@ def allow_access(private_file):
         return False
     if not path_perm:
         return False
+    if path_perm == 'none':
+        return True
+    if request.user.is_authenticated and request.session.session_key:
+        from authentication.services.web_session_lock import session_locked
+
+        if session_locked(request.session.session_key, request.user.pk, request.session.login_policy):
+            return False
     if path_base == 'playbooks':
         from django.db.models import Q
         from ops.const import Scope
@@ -82,8 +89,7 @@ def allow_access(private_file):
         ).exists()
     if path_base == 'replay':
         return allow_replay_access(private_file)
-    if path_perm == 'none' or request.user.has_perms([path_perm]):
-        # 不需要权限检查，任何人都可以访问
+    if request.user.has_perms([path_perm]):
         return True
     if path_perm == 'default':
         return request.user.is_authenticated and request.user.is_staff

@@ -172,6 +172,14 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
                 obj[item] = getattr(settings, item)
             else:
                 obj[item] = Config.defaults[item]
+        if 'SESSION_RENEW_ON_REQUEST' in fields:
+            from common.sessions import web_login_policy
+            policy = web_login_policy()
+            obj.update({
+                'SESSION_COOKIE_AGE': policy['duration'],
+                'SESSION_RENEW_ON_REQUEST': policy['renew'],
+                'SESSION_EXPIRE_AT_BROWSER_CLOSE': policy['browser_close'],
+            })
         return obj
 
     def parse_serializer_data(self, serializer):
