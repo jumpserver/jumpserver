@@ -362,8 +362,6 @@ class UserLoginLog(models.Model):
 
 
 class UserSession(models.Model):
-    is_locked = models.BooleanField(default=False)
-    lock_password_failures = models.PositiveSmallIntegerField(default=0)
     _OPERATE_LOG_ACTION = {'delete': ActionChoices.finished}
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)

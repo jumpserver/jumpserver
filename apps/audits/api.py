@@ -495,7 +495,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
                 }
             else:
                 policy = web_policies.get(row['key'])
-                row['is_locked'] = policy_locked(policy, legacy_locked=row['is_locked'])
+                row['is_locked'] = policy_locked(policy)
                 row['date_expired'] = (
                     datetime.fromtimestamp(policy_expiry(policy),
                                            tz=datetime_timezone.utc) if policy
@@ -514,6 +514,8 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         active_keys = user_session_manager.get_active_keys()
         web = self.filter_queryset(self.get_queryset().annotate(
             is_active=Case(When(key__in=active_keys, then=True), default=False, output_field=BooleanField()),
+            # Keep the union projection aligned; Web lock state comes from Session below.
+            is_locked=Value(False, BooleanField()),
             date_expired=Value(None, DateTimeField()),
             policy_expires_at=Value(None, DateTimeField()),
         ))

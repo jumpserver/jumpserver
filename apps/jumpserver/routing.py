@@ -152,8 +152,8 @@ def websocket_screen_locked(scope):
     session = scope.get('session')
     if user is None or not user.is_authenticated or session is None or not session.session_key:
         return False
-    from authentication.services.web_session_lock import session_locked
-    return session_locked(session.session_key, user.pk, session.login_policy)
+    from common.sessions import policy_locked
+    return policy_locked(session.login_policy)
 
 
 class WsSessionSecurityMiddleware:

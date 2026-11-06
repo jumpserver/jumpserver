@@ -22,10 +22,11 @@ class SessionStateConflict(Exception):
     pass
 
 
-def normalize_security_state(policy, *, legacy_locked=False):
+def normalize_security_state(policy):
     """A due close action is deterministic, including before its next persisted write."""
     policy = dict(policy)
-    policy.setdefault('locked', legacy_locked)
+    policy.setdefault('locked', False)
+    policy.setdefault('lock_password_failures', 0)
     policy.setdefault('state_version', 0)
     if 'pending_close' not in policy:
         for name, action in (('closing_at', 'logout'), ('close_lock_at', 'lock')):
@@ -48,8 +49,8 @@ def policy_expiry(policy):
     return min(policy['expires_at'], policy.get('closing_at', float('inf')), close_at)
 
 
-def policy_locked(policy, *, legacy_locked=False):
-    return normalize_security_state(policy, legacy_locked=legacy_locked)['locked'] if policy else legacy_locked
+def policy_locked(policy):
+    return normalize_security_state(policy)['locked'] if policy else False
 
 
 def _session_lock(session_key, *, renew=False):
@@ -101,7 +102,7 @@ class SessionSaveMixin:
             self._session_key = None
             return {}
         if policy:
-            data[LOGIN_POLICY_KEY] = self._security_policy(policy, user_id=data.get('_auth_user_id'))
+            data[LOGIN_POLICY_KEY] = normalize_security_state(policy)
         return data
 
     async def aload(self):
@@ -113,11 +114,7 @@ class SessionSaveMixin:
         policy['expires_at'] = expires_at.timestamp() if expires_at else timestamp + policy['duration']
         policy['renewed_at'] = min(timestamp, policy['expires_at'] - policy['duration'])
         policy['authenticated_at'] = None if expires_at else timestamp
-        policy.update(locked=False, state_version=0)
-        if expires_at:
-            # Adopt an older login without discarding an existing screen lock.
-            policy.pop('locked')
-            policy = self._security_policy(policy)
+        policy.update(locked=False, state_version=0, lock_password_failures=0)
         self[LOGIN_POLICY_KEY] = policy
 
     def ensure_login_policy(self):
@@ -139,16 +136,6 @@ class SessionSaveMixin:
         self.save()
         # Already saved under the session lock; the response middleware need not save it again.
         self.modified = False
-
-    def _security_policy(self, policy, *, user_id=None):
-        legacy_locked = False
-        if 'locked' not in policy:
-            from audits.models import UserSession
-            legacy_locked = UserSession.objects.filter(
-                key=self.session_key,
-                user_id=user_id or getattr(self, '_session_cache', {}).get('_auth_user_id'), is_locked=True,
-            ).exists()
-        return normalize_security_state(policy, legacy_locked=legacy_locked)
 
     @contextmanager
     def control(self):
@@ -180,6 +167,15 @@ class SessionSaveMixin:
         finally:
             self._lock_action = None
 
+    def record_lock_password_failure(self, expected_version):
+        self._lock_failure_version = expected_version
+        try:
+            self.save()
+            self.modified = False
+            return self.login_policy['lock_password_failures']
+        finally:
+            self._lock_failure_version = None
+
     async def aget_expiry_date(self, **kwargs):
         return await sync_to_async(self.get_expiry_date)(**kwargs)
 
@@ -210,7 +206,7 @@ class SessionSaveMixin:
                 # Saves and deletion share the lock so a pending write cannot undo logout.
                 stored = super().load().get(LOGIN_POLICY_KEY)
                 if stored:
-                    stored = self._security_policy(stored)
+                    stored = normalize_security_state(stored)
                 if self.session_key is None:
                     self._session_key = key
                     raise UpdateError('The login has expired.')
@@ -218,7 +214,8 @@ class SessionSaveMixin:
                     policy = normalize_security_state(self.login_policy)
                     if stored['renewed_at'] > policy['renewed_at']:
                         policy.update(renewed_at=stored['renewed_at'], expires_at=stored['expires_at'])
-                    for name in ('locked', 'state_version', 'unlocked_at', 'pending_close', 'pages', 'closed_pages'):
+                    for name in ('locked', 'state_version', 'lock_password_failures', 'unlocked_at',
+                                 'pending_close', 'pages', 'closed_pages'):
                         policy.pop(name, None)
                         if name in stored:
                             policy[name] = stored[name]
@@ -226,12 +223,14 @@ class SessionSaveMixin:
             if self.login_policy and self.get_expiry_date() <= timezone.now():
                 raise UpdateError('The login has expired.')
             if self.login_policy:
-                policy = self._security_policy(self.login_policy)
+                policy = normalize_security_state(self.login_policy)
                 self._session_cache[LOGIN_POLICY_KEY] = policy
                 if lock_action := getattr(self, '_lock_action', None):
                     locked, expected_version = lock_action
                     if expected_version != policy['state_version']:
                         raise SessionStateConflict()
+                    if not locked:
+                        policy['lock_password_failures'] = 0
                     pending = policy.get('pending_close')
                     if policy['locked'] != locked or (pending and pending['action'] == 'lock'):
                         policy['locked'] = locked
@@ -240,6 +239,16 @@ class SessionSaveMixin:
                             policy['unlocked_at'] = timezone.now().timestamp()
                         if pending and pending['action'] == 'lock':
                             policy.pop('pending_close')
+                failure_version = getattr(self, '_lock_failure_version', None)
+                if failure_version is not None:
+                    from authentication.services.lock_password import MAX_LOCK_PASSWORD_FAILURES
+
+                    if failure_version != policy['state_version'] or not policy['locked']:
+                        raise SessionStateConflict()
+                    # Apply increments only after merging the latest state under the session lock.
+                    policy['lock_password_failures'] = min(
+                        policy['lock_password_failures'] + 1, MAX_LOCK_PASSWORD_FAILURES,
+                    )
                 if action := getattr(self, '_page_action', None):
                     page_id, entering, lock_on_close = action
                     pages = set(policy.get('pages', ()))
