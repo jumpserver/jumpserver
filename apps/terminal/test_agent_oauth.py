@@ -129,6 +129,38 @@ class AgentOAuthOrganizationTests(TestCase):
                                    {'resource': resource or self.resource},
                                    HTTP_AUTHORIZATION='Bearer ' + result['access_token'])
 
+    def test_external_mcp_registration_tokens_and_introspection_need_no_identity_lookup(self):
+        with self.settings(MCP_ENABLED=True, MCP_DCR_ENABLED=True, MCP_PUBLIC_URL=self.resource,
+                           SITE_URL='http://jumpserver.example'):
+            metadata = AgentAuthorizationServerView().get_metadata(self.factory.get('/metadata'))
+            self.assertIn('agent_identity_endpoint', metadata)
+            response = self.client.post(urlsplit(metadata['registration_endpoint']).path, json.dumps({
+                'client_name': 'External MCP client', 'redirect_uris': ['http://127.0.0.1/callback'],
+                'token_endpoint_auth_method': 'none', 'grant_types': ['authorization_code', 'refresh_token'],
+                'response_types': ['code'], 'scope': service.SCOPE,
+            }), content_type='application/json')
+            self.assertEqual(response.status_code, 201, response.content)
+            self.app = get_application_model().objects.get(client_id=json.loads(response.content)['client_id'])
+            self.authorization['client_id'] = self.app.client_id
+            self.assertFalse(ClientLoginSession.objects.filter(user=self.user).exists())
+
+            # External clients ignore the identity extension and use browser PKCE consent only.
+            response = self.exchange(self.code(), resource=self.resource)
+            self.assertEqual(response.status_code, 200, response.content)
+            issued = json.loads(response.content)
+            self.assertEqual(self.introspect(issued)['client_id'], self.app.client_id)
+            with self.settings(MCP_DCR_ENABLED=False):
+                response = self.token_request({
+                    'grant_type': 'refresh_token', 'refresh_token': issued['refresh_token'],
+                    'client_id': self.app.client_id, 'resource': self.resource,
+                })
+                self.assertEqual(response.status_code, 200, response.content)
+                principal = self.introspect(json.loads(response.content))
+            self.assertEqual(principal['user_id'], str(self.user.id))
+            self.assertEqual(principal['resource'], self.resource)
+            self.assertEqual(principal['scopes'], [service.SCOPE])
+            self.assertFalse(ClientLoginSession.objects.filter(user=self.user).exists())
+
     def test_agent_identity_returns_only_the_bearer_subject_without_general_api_access(self):
         from oauthlib.common import Request as OAuthRequest
         from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
