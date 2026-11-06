@@ -218,8 +218,9 @@ def user_display_expression():
 
 class PasswordChangeLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    user = models.CharField(max_length=128, verbose_name=_("User"))
-    change_by = models.CharField(max_length=128, verbose_name=_("Change by"))
+    # User displays contain name(username): 128 + 128 + 2 characters.
+    user = models.CharField(max_length=258, verbose_name=_("User"))
+    change_by = models.CharField(max_length=258, verbose_name=_("Change by"))
     remote_addr = models.CharField(
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
     )

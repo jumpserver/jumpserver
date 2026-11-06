@@ -65,7 +65,10 @@ class User(
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_("Username"))
     name = models.CharField(max_length=128, verbose_name=_("Name"))
-    email = fields.EncryptCharField(max_length=128, unique=True, verbose_name=_("Email"))
+    # 256 UTF-8 characters need up to 1440 base64 characters with AES-GCM metadata.
+    email = fields.EncryptCharField(
+        max_length=256, storage_max_length=1536, unique=True, verbose_name=_("Email")
+    )
     email_lookup = models.CharField(
         max_length=128, blank=True, null=True, verbose_name=_("Email lookup")
     )
