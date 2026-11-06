@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from accounts.utils import validate_account_username
 from accounts.const import AliasAccount
+from assets.const import Protocol
 from common.utils import get_request_ip_or_data
 from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
@@ -80,7 +81,10 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True
     )
     from_ticket_info = serializers.SerializerMethodField(label=_("Ticket info"))
-    actions = ActionChoicesField(read_only=True, label=_("Actions"))
+    actions = ActionChoicesField(
+        read_only=True, label=_("Actions"),
+        help_text=_("Granted actions, calculated from asset permissions."),
+    )
     save_personal_credential = serializers.BooleanField(
         required=False, default=False, write_only=True,
         label=_("Save personal credential"),
@@ -112,6 +116,17 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         ]
         fields = fields_small + read_only_fields
         extra_kwargs = {
+            'asset': {
+                'required': True, 'allow_null': False,
+                'help_text': _('Asset ID. Required when creating a connection token.'),
+            },
+            'account': {
+                'help_text': _('Account ID, or a virtual account alias such as @INPUT, @USER or @ANON.'),
+            },
+            'protocol': {
+                'default': Protocol.ssh,
+                'help_text': _('Connection protocol. Defaults to ssh when omitted.'),
+            },
             'face_monitor_token': {'read_only': True},
             'personal_credential_id': {'required': False, 'allow_null': True},
             'from_ticket': {'read_only': True},
