@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 #
 from django.urls import path
+from django.db import transaction
 
 from . import views
-from .client_views import ClientAuthorizationView, ClientTokenView, ClientRevokeTokenView
+from .agent import AgentAwareAuthorizationView, AgentIdentityView
+from .agent_registration import AgentClientRegistrationView
+from .client_views import ClientTokenView, ClientRevokeTokenView
 
 
 urlpatterns = [
-    path("authorize/", ClientAuthorizationView.as_view(), name="authorize"),
+    path("register/", transaction.non_atomic_requests(AgentClientRegistrationView.as_view()), name="agent-register"),
+    path("agent-identity/", AgentIdentityView.as_view(), name="agent-identity"),
+    path("authorize/", AgentAwareAuthorizationView.as_view(), name="authorize"),
     path("token/", ClientTokenView.as_view(), name="token"),
     path("revoke/", ClientRevokeTokenView.as_view(), name="revoke-token"),
     path(".well-known/oauth-authorization-server", views.OAuthAuthorizationServerView.as_view(), name="oauth-authorization-server"),

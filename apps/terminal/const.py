@@ -119,6 +119,7 @@ class LoginFrom(TextChoices):
     WT = 'WT', 'Web Terminal'
     DT = 'DT', 'DB Terminal'
     VT = 'VT', 'VNC Terminal'
+    AG = 'AG', 'Agent'
 
     @classmethod
     def as_dict(cls):

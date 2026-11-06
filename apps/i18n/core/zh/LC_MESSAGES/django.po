@@ -20234,6 +20234,20 @@ msgstr "身份确认已过期（有效期为 %(ttl)s 秒）。"
 msgid "Confirm the current user with %(confirm_type)s, then retry with the same session cookie. This confirmation is valid for %(ttl)s seconds while the session remains valid."
 msgstr "请使用 %(confirm_type)s 确认当前用户身份，然后携带同一会话 Cookie 重试。在会话仍有效的前提下，此类确认的有效期为 %(ttl)s 秒。"
 
+msgid "Allow this application to access assets you are authorized to use across all your available organizations. Asset, account and operation permissions are checked on every request."
+msgstr "允许此应用访问本人在当前所有可访问组织中获授权使用的资产。每次请求仍会检查资产、账号和操作权限。"
+
+msgid "No authorized organizations are available."
+msgstr "没有可访问的已授权组织。"
+
+#, python-format
+msgid "You can authorize up to %(limit)s MCP clients. Revoke an existing client in Personal settings > MCP clients before adding another."
+msgstr "每人最多授权 %(limit)s 个 MCP 客户端。请先在个人设置的 MCP 客户端页面撤销一个已有客户端，再授权新客户端。"
+
+#: terminal/templates/terminal/agent_audit.html
+msgid "Session operations"
+msgstr "本会话操作"
+
 #: apps/settings/serializers/security.py
 msgid ""
 "0 disables idle locking. Locks the console and Web terminal after the "

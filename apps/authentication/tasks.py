@@ -197,7 +197,17 @@ def clean_expire_token():
         now = timezone.now()
         days = settings.SECURITY_EXPIRED_TOKEN_RECORD_KEEP_DAYS
         expired_time = now - datetime.timedelta(days=days)
-        count = ConnectionToken.objects.filter(date_expired__lt=expired_time).delete()
+        from terminal.models import AgentSession, AgentAction
+        active_agent_tokens = AgentSession.objects.filter(
+            date_closed__isnull=True, date_expires__gt=now,
+        ).exclude(connection_token_id=None).values('connection_token_id')
+        handoff_tokens = AgentAction.objects.filter(
+            kind='open_terminal', status__in=('dispatching', 'awaiting_input'),
+            session__date_closed__isnull=True, session__date_expires__gt=now,
+        ).exclude(interactive_token_id=None).values('interactive_token_id')
+        count = ConnectionToken.objects.filter(date_expired__lt=expired_time).exclude(
+            id__in=active_agent_tokens,
+        ).exclude(id__in=handoff_tokens).delete()
         logging.info('Deleted %d expired connection tokens.', count[0])
         count = TempToken.objects.filter(date_expired__lt=expired_time).delete()
         logging.info('Deleted %d temporary tokens.', count[0])
@@ -208,7 +218,16 @@ def clean_expire_token():
 def clear_oauth2_provider_expired_tokens():
     """Reclaim obsolete credentials; request-time checks enforce login expiry."""
     from oauth2_provider.models import clear_expired
+    from authentication.services.agent_clients import (
+        AgentClientCleanupBusy, AgentClientCleanupUnavailable, cleanup_agent_oauth_clients,
+    )
     from authentication.services.client_login_session import clear_client_login_sessions
 
     clear_client_login_sessions()
     clear_expired()
+    try:
+        result = cleanup_agent_oauth_clients()
+    except (AgentClientCleanupBusy, AgentClientCleanupUnavailable) as exc:
+        logging.warning('Skipped unused Agent OAuth client cleanup: %s', exc)
+        return
+    logging.info('Unused Agent OAuth client cleanup: %s', result)

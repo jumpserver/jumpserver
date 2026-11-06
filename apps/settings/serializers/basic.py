@@ -1,6 +1,9 @@
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.utils.mcp import get_mcp_authorization_server
 from orgs.models import Organization
 
 
@@ -34,8 +37,14 @@ class BasicSettingSerializer(serializers.Serializer):
     @staticmethod
     def validate_SITE_URL(s):
         if not s:
-            return 'http://127.0.0.1'
-        return s.strip('/')
+            s = 'http://127.0.0.1'
+        s = s.strip('/')
+        if settings.MCP_ENABLED:
+            try:
+                get_mcp_authorization_server(s)
+            except ImproperlyConfigured as exc:
+                raise serializers.ValidationError(_('Agent MCP requires an HTTP or HTTPS Site URL.')) from exc
+        return s
 
     @staticmethod
     def validate_GLOBAL_ORG_DISPLAY_NAME(s):

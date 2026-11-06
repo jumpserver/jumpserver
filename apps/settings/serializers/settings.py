@@ -15,6 +15,7 @@ from .auth import (
 from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
 from .luna import LunaSettingSerializer
+from .mcp import MCPSettingSerializer
 from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
@@ -74,6 +75,7 @@ class SettingsSerializer(
     AuthSettingSerializer,
     TerminalSettingSerializer,
     LunaSettingSerializer,
+    MCPSettingSerializer,
     SecuritySettingSerializer,
     WeComSettingSerializer,
     DingTalkSettingSerializer,
