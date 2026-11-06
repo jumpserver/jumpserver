@@ -99,7 +99,7 @@ class WebSessionStatusView(APIView):
             'unlocked_at': (datetime.fromtimestamp(policy['unlocked_at'], tz=datetime_timezone.utc).isoformat()
                             if policy.get('unlocked_at') else None),
             'locked': policy['locked'],
-            'has_password': Preference.objects.filter(user=request.user, category='client', name='client_lock_password_hash').exists(),
+            'has_password': Preference.objects.filter(user=request.user, category='security', name='lock_password_hash').exists(),
             'attempts_remaining': max(0, MAX_LOCK_PASSWORD_FAILURES - (session.lock_password_failures if session else 0)),
             'idle_lock_time': effective_idle_lock_time(
                 idle_limit,
@@ -152,7 +152,7 @@ class WebSessionUnlockView(WebSessionStatusView):
                 if not request.session.login_policy['locked']:
                     return self.status(request)
                 credential = Preference.objects.filter(
-                    user=request.user, category='client', name='client_lock_password_hash',
+                    user=request.user, category='security', name='lock_password_hash',
                 ).first()
                 if credential is None:
                     return Response({'code': 'lock_password_unset',

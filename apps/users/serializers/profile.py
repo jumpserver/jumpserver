@@ -221,8 +221,8 @@ class UserLockPasswordSerializer(serializers.Serializer):
                                     trim_whitespace=False, label=_('Confirm password'))
 
     def get_has_password(self, obj):
-        return Preference.objects.filter(user=self.context['request'].user, category='client',
-                                         name='client_lock_password_hash').exists()
+        return Preference.objects.filter(user=self.context['request'].user, category='security',
+                                         name='lock_password_hash').exists()
 
     def validate(self, attrs):
         password = attrs.get('password', '')
@@ -243,11 +243,11 @@ class UserLockPasswordSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         user = self.context['request'].user
         if validated_data.get('clear'):
-            Preference.objects.filter(user=user, category='client', name='client_lock_password_hash').delete()
+            Preference.objects.filter(user=user, category='security', name='lock_password_hash').delete()
         password = validated_data.get('password')
         if password:
-            Preference.objects.update_or_create(user=user, name='client_lock_password_hash', defaults={
-                'category': 'client', 'value': make_password(password), 'encrypted': False,
+            Preference.objects.update_or_create(user=user, name='lock_password_hash', defaults={
+                'category': 'security', 'value': make_password(password), 'encrypted': False,
             })
         return instance
 
