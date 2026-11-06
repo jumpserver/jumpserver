@@ -2479,6 +2479,10 @@ msgstr "Правила подключения активов"
 msgid "Login asset confirm"
 msgstr "Проверка входа в актив"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr "Вход в MFA acl"
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "Уведомление о входе пользователя"

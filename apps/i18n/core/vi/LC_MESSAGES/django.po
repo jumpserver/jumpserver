@@ -2465,6 +2465,10 @@ msgstr "Kiểm soát truy cập tài sản đăng nhập"
 msgid "Login asset confirm"
 msgstr "Kiểm tra tài sản đăng nhập"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr "Đăng nhập vào MFA ACL"
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "Nhắc nhở người dùng đăng nhập"

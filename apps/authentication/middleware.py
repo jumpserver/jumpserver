@@ -75,6 +75,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             self.check_is_block()
             self._check_third_party_login_acl()
             self._check_login_acl(request.user, ip)
+            self._check_login_mfa_acl(request.user, ip)
         except Exception as e:
             if getattr(request, 'user_need_delete', False):
                 request.user.delete()

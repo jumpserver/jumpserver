@@ -2490,6 +2490,10 @@ msgstr "Control de acceso a los activos en el inicio de sesión"
 msgid "Login asset confirm"
 msgstr "Revisión de activos al inicio de sesión"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr "Inicio MFA ACL"
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "Notificación de inicio de sesión del usuario"

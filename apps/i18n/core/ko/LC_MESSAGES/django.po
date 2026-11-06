@@ -2438,6 +2438,10 @@ msgstr "로그인 자산 접근 제어"
 msgid "Login asset confirm"
 msgstr "로그인 자산 재검토"
 
+#: acls/models/login_mfa_acl.py:20
+msgid "Login MFA acl"
+msgstr "MFA ACL 에 로그인합니다"
+
 #: acls/notifications.py:14
 msgid "User login reminder"
 msgstr "사용자 로그인 알림"

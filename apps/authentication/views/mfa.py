@@ -111,6 +111,18 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
         user = self.get_user_from_session()
         mfa_context = self.get_user_mfa_context(user)
         kwargs.update(mfa_context)
+
+        # 检查是否有 MFA ACL 配置的 MFA 类型
+        acl_mfa_type = self.request.session.get('auth_mfa_acl_type')
+        if acl_mfa_type:
+            kwargs['acl_mfa_type'] = acl_mfa_type
+            # 限制只显示 ACL 配置的 MFA 类型
+            user_mfa_types = list(user.active_mfa_backends_mapper.keys())
+            if acl_mfa_type in user_mfa_types:
+                kwargs['mfa_backends'] = [
+                    backend for backend in kwargs.get('mfa_backends', [])
+                    if backend.name == acl_mfa_type
+                ]
         return kwargs
 
 

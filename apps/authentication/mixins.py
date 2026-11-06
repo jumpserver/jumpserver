@@ -23,7 +23,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext, gettext as _
 from rest_framework.request import Request
 
-from acls.models import LoginACL
+from acls.models import LoginACL, LoginMFAACL
 from jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from common.utils import (
     get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil,
@@ -363,6 +363,22 @@ class MFAMixin:
         if self.request.session.get('auth_mfa') and \
                 self.request.session.get('auth_mfa_username') == user.username:
             return
+
+        # 检查是否有 MFA ACL 规则明确要求跳过 MFA 验证（管理员策略优先）
+        if self.request.session.get('auth_mfa_skip'):
+            return
+
+        # 检查是否有 MFA ACL 规则匹配，如果有则使用配置的 MFA 类型
+        acl_mfa_type = self.request.session.get('auth_mfa_acl_type')
+        if acl_mfa_type:
+            # 检查用户是否激活了该 MFA 类型
+            user_mfa_types = list(user.active_mfa_backends_mapper.keys())
+            if acl_mfa_type in user_mfa_types:
+                raise errors.MFARequiredError(mfa_types=(acl_mfa_type,))
+            # 如果用户未激活 ACL 配置的 MFA 类型，则使用用户已激活的 MFA 类型
+            raise errors.MFARequiredError(mfa_types=tuple(user_mfa_types))
+
+        # 如果没有ACL策略，再检查用户自身的MFA设置
         if not user.mfa_enabled:
             return
 
@@ -395,7 +411,9 @@ class MFAMixin:
 
     def _do_check_user_mfa(self, code, mfa_type, user=None):
         user = user if user else self.get_user_from_session()
-        if not user.mfa_enabled:
+        # 如果有ACL策略要求MFA，即使用户没有启用MFA也要验证
+        acl_mfa_type = self.request.session.get('auth_mfa_acl_type')
+        if not user.mfa_enabled and not acl_mfa_type:
             return
         # 监测 MFA 是不是屏蔽了
         ip = self.get_request_ip()
@@ -504,6 +522,32 @@ class AuthACLMixin:
         if acl.is_action(acl.ActionChoices.notice):
             self.request.session['auth_notice_required'] = '1'
             self.request.session['auth_acl_id'] = str(acl.id)
+
+    def _check_login_mfa_acl(self, user, ip):
+        """
+        检查 LoginMFAACL 规则，根据动作设置相应的验证策略
+        """
+        acl = LoginMFAACL.get_match_rules(user, ip)
+        if not acl:
+            # 如果没有匹配到任何策略，应该清除所有相关标记，回退到用户个人设置
+            self.request.session.pop('auth_mfa_acl_type', None)
+            self.request.session.pop('auth_mfa_skip', None)
+            return
+
+        # 只有动作为"接受"时才要求MFA验证
+        if acl.is_action(acl.ActionChoices.accept):
+            # 设置需要的 MFA 类型到 session 中
+            self.request.session['auth_mfa_acl_type'] = acl.mfa_type
+            self.request.session['auth_mfa_acl_id'] = str(acl.id)
+            # 清除跳过标记
+            self.request.session.pop('auth_mfa_skip', None)
+
+        # 动作为"拒绝"时，跳过 MFA 验证（管理员策略覆盖用户个人设置）
+        elif acl.is_action(acl.ActionChoices.reject):
+            self.request.session['auth_mfa_skip'] = True
+            self.request.session['auth_mfa_acl_id'] = str(acl.id)
+            # 清除 MFA 类型要求
+            self.request.session.pop('auth_mfa_acl_type', None)
 
     def _check_third_party_login_acl(self):
         request = self.request
@@ -683,6 +727,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
         # 校验login-acl规则
         self._check_login_acl(user, ip)
+        self._check_login_mfa_acl(user, ip)
 
         # post check
         self._check_password_require_reset_or_not(user)
@@ -729,6 +774,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, AuthFaceMixin, MFA
 
         self._check_is_block(user.username)
         self._check_login_acl(user, ip)
+        self._check_login_mfa_acl(user, ip)
 
         LoginBlockUtil(user.username, ip).clean_failed_count()
         LoginIpBlockUtil(ip).clean_block_if_need()
