@@ -18130,3 +18130,48 @@ msgstr "無補充說明"
 #: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
 msgid "First seen at"
 msgstr "首次發現時間"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, conflicts "
+"%(conflict)s, released %(released)s"
+msgstr ""
+"資源統計：新增 %(new)s，更新 %(updated)s，無變化 %(nochange)s，待複核 %(stale)s，失敗 "
+"%(failed)s，略過 %(skip)s，衝突 %(conflict)s，已釋放 %(released)s"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Regions: total %(total)s, succeeded %(succeeded)s, failed %(failed)s, "
+"incomplete %(incomplete)s, not scanned %(unscanned)s"
+msgstr ""
+"地域掃描：共 %(total)s，成功 %(succeeded)s，失敗 %(failed)s，掃描不完整 %(incomplete)s，未掃描 "
+"%(unscanned)s"
+
+#: xpack/plugins/cloud/manager.py
+msgid "Interactive import does not automatically release assets."
+msgstr "本次為互動式匯入，不執行自動釋放。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is enabled for resources confirmed missing by a complete "
+"scan."
+msgstr "本次已啟用自動釋放，僅處理完整掃描確認缺失的雲端資源。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is disabled; missing cloud resources require manual "
+"review."
+msgstr "本次未啟用自動釋放，缺失的雲端資源保留為待複核。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Resource failures and scan or task errors are counted separately. A task can"
+" fail even when no individual resource failed."
+msgstr "資源失敗數與掃描或任務錯誤分別統計；即使失敗資源數為 0，任務仍可能失敗。"
+
+#: xpack/plugins/cloud/const.py
+msgid "Partial"
+msgstr "部分成功"
