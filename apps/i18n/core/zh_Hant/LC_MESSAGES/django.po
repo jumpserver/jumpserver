@@ -13416,3 +13416,36 @@ msgstr "改密計畫基於特權帳號。啟用後，不處理特權帳號、roo
 #: settings/serializers/security.py
 msgid "When enabled, eligible accounts used in sessions matching a secret rotation login rule are changed after the session ends. To rotate privileged accounts, disable change secret plan secure mode."
 msgstr "啟用後，符合密碼輪換登入規則的工作階段結束時，將更改符合條件的工作階段帳號密碼。輪換特權帳號時需停用改密計畫安全模式。"
+
+msgid "RDP file signing"
+msgstr "RDP 檔案簽章"
+
+msgid "RDP signing certificate"
+msgstr "RDP 簽章憑證"
+
+msgid "RDP signing private key"
+msgstr "RDP 簽章私鑰"
+
+msgid "RDP signing certificate status"
+msgstr "簽章憑證狀態"
+
+msgid "Not configured or invalid"
+msgstr "未設定或設定無效"
+
+msgid "Core data/certs"
+msgstr "Core data/certs"
+
+msgid "Upload a valid PEM Code Signing certificate and its matching unencrypted RSA or EC private key."
+msgstr "請上傳有效且包含 Code Signing 用途的 PEM 憑證，以及與之匹配的無密碼 RSA 或 EC 私鑰。"
+
+msgid "Sign RDP connection files. If signing fails, provide an unsigned file."
+msgstr "為 RDP 連線檔案簽章，失敗時提供未簽章檔案。"
+
+msgid "Upload a PEM certificate with Code Signing EKU. Leave empty to keep the current certificate."
+msgstr "上傳包含 Code Signing 延伸金鑰用途的 PEM 憑證，留空保留原憑證。"
+
+msgid "Upload the matching unencrypted PEM private key. Leave empty to keep the current key."
+msgstr "上傳與憑證匹配的無密碼 PEM 私鑰，留空保留原私鑰。"
+
+msgid "Unable to save RDP signing files. Check certificate directory permissions and retry."
+msgstr "無法儲存 RDP 簽章檔案，請檢查憑證目錄權限後重試。"

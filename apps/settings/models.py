@@ -12,6 +12,7 @@ from rest_framework.utils.encoders import JSONEncoder
 from common.db.models import JMSBaseModel
 from common.db.utils import Encryptor
 from common.utils import get_logger
+from common.utils.rdp_signing import RDP_SIGN_SETTING_NAMES
 from .const import ChatAITypeChoices
 from .signals import setting_changed
 
@@ -85,16 +86,29 @@ class Setting(models.Model):
             settings_list = cls.objects.all()
             for setting in settings_list:
                 setting.refresh_setting()
+            cls.refresh_rdp_signing_settings()
         except (ProgrammingError, OperationalError):
             pass
 
     @classmethod
     def refresh_item(cls, name):
+        if name in RDP_SIGN_SETTING_NAMES:
+            cls.refresh_rdp_signing_settings()
+            return
         item = cls.objects.filter(name=name).first()
         if not item:
             return
         item.refresh_setting()
         setting_changed.send(sender=cls, name=name, item=item)
+
+    @classmethod
+    def refresh_rdp_signing_settings(cls):
+        values = {name: getattr(settings, name) for name in RDP_SIGN_SETTING_NAMES}
+        for item in cls.objects.filter(name__in=RDP_SIGN_SETTING_NAMES):
+            values[item.name] = item.cleaned_value
+        for name, value in values.items():
+            setattr(settings, name, value)
+        settings.RDP_SIGNING_CONFIG = values
 
     @classmethod
     def get_syslog_settings(cls):

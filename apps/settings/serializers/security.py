@@ -1,8 +1,13 @@
+from cryptography.hazmat.primitives import hashes
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
+from common.utils.rdp_signing import (
+    get_rdp_signing_config, load_rdp_signing_material, RDPSigningMaterialError, RDP_SIGN_SETTING_NAMES,
+    RDP_SIGN_UPLOAD_NAMES, validate_rdp_signing_material,
+)
 
 __all__ = [
     'SecurityPasswordRuleSerializer', 'SecuritySessionSerializer',
@@ -238,6 +243,60 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySessionSerializer(serializers.Serializer):
+    RDP_SIGN_ENABLED = serializers.BooleanField(
+        required=False, label=_('RDP file signing'),
+        help_text=_('Sign RDP connection files. If signing fails, provide an unsigned file.'),
+    )
+    RDP_SIGN_CERT_CONTENT = serializers.CharField(
+        required=False, allow_blank=True, write_only=True, max_length=65536,
+        trim_whitespace=False, label=_('RDP signing certificate'),
+        help_text=_('Upload a PEM certificate with Code Signing EKU. Leave empty to keep the current certificate.'),
+    )
+    RDP_SIGN_KEY_CONTENT = serializers.CharField(
+        required=False, allow_blank=True, write_only=True, max_length=65536,
+        trim_whitespace=False, label=_('RDP signing private key'),
+        help_text=_('Upload the matching unencrypted PEM private key. Leave empty to keep the current key.'),
+    )
+    RDP_SIGN_CERT_INFO = serializers.SerializerMethodField(label=_('RDP signing certificate status'))
+
+    def get_RDP_SIGN_CERT_INFO(self, instance):
+        try:
+            certificate, _private_key = load_rdp_signing_material()
+        except RDPSigningMaterialError:
+            return _('Not configured or invalid')
+        source = _('Core data/certs')
+        fingerprint = certificate.fingerprint(hashes.SHA256()).hex(':')
+        expires = certificate.not_valid_after_utc.isoformat()
+        return f'{source}; SHA256: {fingerprint}; {expires}'
+
+    def validate(self, attrs):
+        for name in ('RDP_SIGN_CERT_CONTENT', 'RDP_SIGN_KEY_CONTENT'):
+            if attrs.get(name) == '':
+                attrs.pop(name)
+        if not any(name in attrs for name in RDP_SIGN_SETTING_NAMES + RDP_SIGN_UPLOAD_NAMES):
+            return attrs
+        config = get_rdp_signing_config()
+        if self.instance:
+            config.update({name: self.instance[name] for name in RDP_SIGN_SETTING_NAMES if name in self.instance})
+        config.update({name: value for name, value in attrs.items() if name in RDP_SIGN_SETTING_NAMES})
+        uploaded = any(name in attrs for name in ('RDP_SIGN_CERT_CONTENT', 'RDP_SIGN_KEY_CONTENT'))
+        if not config['RDP_SIGN_ENABLED'] and not uploaded:
+            return attrs
+        try:
+            if uploaded:
+                if not all(attrs.get(name) for name in RDP_SIGN_UPLOAD_NAMES):
+                    raise RDPSigningMaterialError('incomplete_upload')
+                validate_rdp_signing_material(*(attrs[name].encode('utf-8') for name in RDP_SIGN_UPLOAD_NAMES))
+            else:
+                load_rdp_signing_material()
+        except RDPSigningMaterialError:
+            raise serializers.ValidationError({
+                'RDP_SIGN_CERT_CONTENT': _(
+                    'Upload a valid PEM Code Signing certificate and its matching unencrypted RSA or EC private key.'
+                ),
+            }) from None
+        return attrs
+
     SESSION_COOKIE_AGE = serializers.IntegerField(
         min_value=1, max_value=2147483647, required=False,
         validators=[validate_sangfor_login_lifetime],

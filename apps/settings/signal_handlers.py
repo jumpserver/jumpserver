@@ -17,6 +17,7 @@ from common.decorators import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
+from common.utils.rdp_signing import RDP_SIGN_SETTING_NAMES
 from .const import NAS_MOUNT_PATH
 from .models import Setting, SYSLOG_SETTING_NAMES
 from .signals import setting_changed
@@ -38,6 +39,7 @@ class SettingSubPub(LazyRedisPubSub):
 setting_pub_sub = SettingSubPub()
 SETTING_UPDATED = 'SETTING_UPDATED'
 SYSLOG_CONFIG_UPDATED = 'SYSLOG_CONFIG_UPDATED'
+RDP_SIGNING_CONFIG_UPDATED = 'RDP_SIGNING_CONFIG_UPDATED'
 
 
 @receiver(post_save, sender=Setting)
@@ -46,6 +48,9 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if not instance:
         return
     if getattr(instance, '_skip_settings_refresh_notification', False):
+        return
+    if instance.name in RDP_SIGN_SETTING_NAMES:
+        publish_rdp_signing_config_changed()
         return
     if instance.name in SYSLOG_SETTING_NAMES:
         publish_syslog_config_changed()
@@ -103,6 +108,11 @@ def publish_syslog_config_changed():
     setting_pub_sub.publish(event)
 
 
+def publish_rdp_signing_config_changed():
+    Setting.refresh_rdp_signing_settings()
+    setting_pub_sub.publish({'event': RDP_SIGNING_CONFIG_UPDATED})
+
+
 def refresh_settings(event):
     event_name = event['event']
     if event_name == SETTING_UPDATED:
@@ -110,6 +120,8 @@ def refresh_settings(event):
     elif event_name == SYSLOG_CONFIG_UPDATED:
         Setting.refresh_syslog_settings(event['values'])
         setting_changed.send(sender=Setting, name='SYSLOG_CONFIG')
+    elif event_name == RDP_SIGNING_CONFIG_UPDATED:
+        Setting.refresh_rdp_signing_settings()
     elif event_name == 'UKEY_CONFIG_UPDATED':
         from authentication.backends.ukey.configuration import refresh_config
         refresh_config()

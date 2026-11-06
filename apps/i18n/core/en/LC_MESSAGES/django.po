@@ -13306,3 +13306,36 @@ msgstr "Single node"
 #: audits/const.py audits/backends/db.py
 msgid "Submitted"
 msgstr "Submitted"
+
+msgid "RDP file signing"
+msgstr "RDP file signing"
+
+msgid "RDP signing certificate"
+msgstr "RDP signing certificate"
+
+msgid "RDP signing private key"
+msgstr "RDP signing private key"
+
+msgid "RDP signing certificate status"
+msgstr "RDP signing certificate status"
+
+msgid "Not configured or invalid"
+msgstr "Not configured or invalid"
+
+msgid "Core data/certs"
+msgstr "Core data/certs"
+
+msgid "Upload a valid PEM Code Signing certificate and its matching unencrypted RSA or EC private key."
+msgstr "Upload a valid PEM Code Signing certificate and its matching unencrypted RSA or EC private key."
+
+msgid "Sign RDP connection files. If signing fails, provide an unsigned file."
+msgstr "Sign RDP connection files. If signing fails, provide an unsigned file."
+
+msgid "Upload a PEM certificate with Code Signing EKU. Leave empty to keep the current certificate."
+msgstr "Upload a PEM certificate with Code Signing EKU. Leave empty to keep the current certificate."
+
+msgid "Upload the matching unencrypted PEM private key. Leave empty to keep the current key."
+msgstr "Upload the matching unencrypted PEM private key. Leave empty to keep the current key."
+
+msgid "Unable to save RDP signing files. Check certificate directory permissions and retry."
+msgstr "Unable to save RDP signing files. Check certificate directory permissions and retry."

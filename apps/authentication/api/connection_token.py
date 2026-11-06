@@ -4,10 +4,8 @@ import os
 import urllib.parse
 from struct import pack
 
-from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
-from cryptography.x509.oid import ExtendedKeyUsageOID
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -27,6 +25,7 @@ from common.exceptions import JMSException
 from common.utils import random_string, get_logger, get_request_ip_or_data
 from common.utils.django import get_request_os
 from common.utils.http import is_true, is_false
+from common.utils.rdp_signing import get_rdp_signing_config, load_rdp_signing_material, RDPSigningMaterialError
 from orgs.mixins.api import RootOrgViewMixin
 from orgs.utils import tmp_to_org
 from perms.models import ActionChoices
@@ -47,12 +46,6 @@ from ..serializers import (
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet', 'AdminConnectionTokenViewSet']
 logger = get_logger(__name__)
-
-
-class RDPFileSigningError(JMSException):
-    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
-    default_code = 'rdp_signing_failed'
-    default_detail = _('RDP file signing failed. Please contact the administrator.')
 
 
 class RDPFileClientProtocolURLMixin:
@@ -121,41 +114,14 @@ class RDPFileClientProtocolURLMixin:
 
     @classmethod
     def _try_sign_rdp_content(cls, content):
-        if not settings.RDP_SIGN_ENABLED:
-            return content
-
-        stage = 'read_certificate'
+        stage = 'load_signing_config'
         try:
-            cert_dir = os.path.join(settings.PROJECT_DIR, 'data', 'certs')
-            certfile = os.path.join(cert_dir, settings.RDP_SIGN_CERT)
-            keyfile = os.path.join(cert_dir, settings.RDP_SIGN_CERT_KEY)
-            with open(certfile, 'rb') as certificate_file:
-                certificate_pem = certificate_file.read()
-            stage = 'load_certificate'
-            certificate = x509.load_pem_x509_certificate(certificate_pem)
+            config = get_rdp_signing_config()
+            if not config['RDP_SIGN_ENABLED']:
+                return content
 
-            stage = 'read_private_key'
-            with open(keyfile, 'rb') as private_key_file:
-                private_key_pem = private_key_file.read()
-            stage = 'load_private_key'
-            private_key = serialization.load_pem_private_key(private_key_pem, password=None)
-
-            stage = 'validate_certificate_dates'
-            if not certificate.not_valid_before_utc <= timezone.now() <= certificate.not_valid_after_utc:
-                raise ValueError('Certificate is not currently valid')
-            stage = 'validate_certificate_usage'
-            usage = certificate.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
-            if ExtendedKeyUsageOID.CODE_SIGNING not in usage:
-                raise ValueError('Certificate does not allow code signing')
-            stage = 'validate_private_key'
-            certificate_public_key = certificate.public_key().public_bytes(
-                serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo,
-            )
-            private_public_key = private_key.public_key().public_bytes(
-                serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo,
-            )
-            if certificate_public_key != private_public_key:
-                raise ValueError('Certificate and private key do not match')
+            stage = 'load_signing_material'
+            certificate, private_key = load_rdp_signing_material()
 
             stage = 'prepare_content'
             settings_lines = []
@@ -195,8 +161,13 @@ class RDPFileClientProtocolURLMixin:
             ]
             return '\r\n'.join(signed_lines) + '\r\n'
         except Exception as error:
-            logger.error('RDP file signing failed: stage=%s error_type=%s', stage, type(error).__name__)
-            raise RDPFileSigningError() from None
+            if isinstance(error, RDPSigningMaterialError):
+                stage = error.stage
+            logger.warning(
+                'RDP file signing failed; returning unsigned content: stage=%s error_type=%s',
+                stage, type(error).__name__,
+            )
+            return content
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {

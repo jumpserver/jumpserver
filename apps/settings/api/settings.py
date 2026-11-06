@@ -9,11 +9,13 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.serializers import SerializerMethodField
 from rest_framework.views import APIView
 
 from authentication.const import ConfirmType
 from authentication.permissions import UserConfirmation
 from common.utils import get_logger
+from common.utils.rdp_signing import get_rdp_signing_config, RDP_SIGN_SETTING_NAMES, RDP_SIGN_UPLOAD_NAMES
 from jumpserver.conf import Config
 from rbac.models import RoleBinding
 from rbac.permissions import RBACPermission
@@ -155,9 +157,18 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         if self.request.query_params.get('category') == 'ukey':
             from authentication.backends.ukey.configuration import get_snapshot
             return dict(get_snapshot())
-        items = self.get_fields().keys()
+        fields = self.get_fields()
+        signing_config = get_rdp_signing_config() if any(name in fields for name in RDP_SIGN_SETTING_NAMES) else {}
         obj = {}
-        for item in items:
+        for item, field in fields.items():
+            if item in RDP_SIGN_UPLOAD_NAMES:
+                obj[item] = ''
+                continue
+            if item in signing_config:
+                obj[item] = signing_config[item]
+                continue
+            if isinstance(field, SerializerMethodField):
+                continue
             if hasattr(settings, item):
                 obj[item] = getattr(settings, item)
             else:
@@ -170,6 +181,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         encrypted_items = [name for name, field in fields.items() if field.write_only]
         category = self.request.query_params.get('category', '')
         for name, value in serializer.validated_data.items():
+            if name in RDP_SIGN_UPLOAD_NAMES:
+                continue
             encrypted = name in encrypted_items
             if encrypted and value in ['', None]:
                 continue
@@ -189,6 +202,23 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             serializer._data = save_settings(self.request.data, serializers.UKeySettingSerializer)
             self.send_signal(serializer)
             return
+        rdp_data = {
+            name: value for name, value in serializer.validated_data.items()
+            if name in RDP_SIGN_SETTING_NAMES + RDP_SIGN_UPLOAD_NAMES
+        }
+        rdp_config = None
+        if rdp_data:
+            rdp_serializer = serializers.SecuritySessionSerializer(
+                instance=serializer.instance, data=rdp_data, partial=True,
+            )
+            rdp_serializer.is_valid(raise_exception=True)
+            from ..utils.rdp_signing import save_rdp_signing_settings
+            if rdp_serializer.validated_data:
+                rdp_config = save_rdp_signing_settings(
+                    rdp_serializer.validated_data, self.request.query_params.get('category', ''),
+                )
+            for name in RDP_SIGN_SETTING_NAMES + RDP_SIGN_UPLOAD_NAMES:
+                serializer.validated_data.pop(name, None)
         post_data_names = list(self.request.data.keys())
         settings_items = [
             item for item in self.parse_serializer_data(serializer)
@@ -210,8 +240,12 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         ]
         other_items = [
             item for item in settings_items
-            if item['name'] not in SYSLOG_SETTING_NAMES
+            if item['name'] not in SYSLOG_SETTING_NAMES + RDP_SIGN_SETTING_NAMES
         ]
+        if rdp_config is not None:
+            effective_instance = {**serializer.instance}
+            effective_instance.update(rdp_config)
+            serializer_data.update(serializer.to_representation(effective_instance))
 
         for item in other_items:
             changed, setting = Setting.update_or_create(**item)
