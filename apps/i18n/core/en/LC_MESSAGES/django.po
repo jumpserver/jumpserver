@@ -18557,12 +18557,10 @@ msgstr "First seen at"
 #, python-format
 msgid ""
 "Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
-"review %(stale)s, failed %(failed)s, skipped %(skip)s, conflicts "
-"%(conflict)s, released %(released)s"
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
 msgstr ""
 "Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
-"review %(stale)s, failed %(failed)s, skipped %(skip)s, conflicts "
-"%(conflict)s, released %(released)s"
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
 
 #: xpack/plugins/cloud/manager.py
 #, python-format

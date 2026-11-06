@@ -18151,11 +18151,10 @@ msgstr "不允許刪除類型為「{}」的儲存設定"
 #, python-format
 msgid ""
 "Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
-"review %(stale)s, failed %(failed)s, skipped %(skip)s, conflicts "
-"%(conflict)s, released %(released)s"
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
 msgstr ""
 "資源統計：新增 %(new)s，更新 %(updated)s，無變化 %(nochange)s，待複核 %(stale)s，失敗 "
-"%(failed)s，略過 %(skip)s，衝突 %(conflict)s，已釋放 %(released)s"
+"%(failed)s，略過 %(skip)s，已釋放 %(released)s"
 
 #: xpack/plugins/cloud/manager.py
 #, python-format

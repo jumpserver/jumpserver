@@ -20387,11 +20387,10 @@ msgstr "不允许删除类型为“{}”的存储配置"
 #, python-format
 msgid ""
 "Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
-"review %(stale)s, failed %(failed)s, skipped %(skip)s, conflicts "
-"%(conflict)s, released %(released)s"
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
 msgstr ""
 "资源统计：新增 %(new)s，更新 %(updated)s，无变化 %(nochange)s，待复核 %(stale)s，失败 "
-"%(failed)s，跳过 %(skip)s，冲突 %(conflict)s，已释放 %(released)s"
+"%(failed)s，跳过 %(skip)s，已释放 %(released)s"
 
 #: xpack/plugins/cloud/manager.py
 #, python-format

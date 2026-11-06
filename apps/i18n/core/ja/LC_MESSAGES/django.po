@@ -18338,11 +18338,10 @@ msgstr "初回検出日時"
 #, python-format
 msgid ""
 "Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
-"review %(stale)s, failed %(failed)s, skipped %(skip)s, conflicts "
-"%(conflict)s, released %(released)s"
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
 msgstr ""
 "リソース: 新規 %(new)s、更新 %(updated)s、変更なし %(nochange)s、要確認 %(stale)s、失敗 "
-"%(failed)s、スキップ %(skip)s、競合 %(conflict)s、解放済み %(released)s"
+"%(failed)s、スキップ %(skip)s、解放済み %(released)s"
 
 #: xpack/plugins/cloud/manager.py
 #, python-format
