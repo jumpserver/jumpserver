@@ -190,6 +190,8 @@ class EncryptTextField(EncryptMixin, models.TextField):
 
 
 class EncryptCharField(EncryptMixin, models.CharField):
+    """Optionally keep plaintext validation separate from ciphertext storage."""
+
     @staticmethod
     def change_max_length(kwargs):
         kwargs.setdefault("max_length", 1024)
@@ -199,12 +201,34 @@ class EncryptCharField(EncryptMixin, models.CharField):
         max_length = max_length * 2
         kwargs["max_length"] = max_length
 
-    def __init__(self, *args, **kwargs):
-        self.change_max_length(kwargs)
+    def __init__(self, *args, storage_max_length=None, **kwargs):
+        self.storage_max_length = storage_max_length
+        if storage_max_length is None:
+            self.change_max_length(kwargs)
         super().__init__(*args, **kwargs)
+
+    def db_type_parameters(self, connection):
+        params = super().db_type_parameters(connection)
+        if self.storage_max_length is not None:
+            params['max_length'] = self.storage_max_length
+        return params
+
+    def db_parameters(self, connection):
+        params = super().db_parameters(connection)
+        if (
+            self.storage_max_length is not None
+            and connection.vendor == 'mysql'
+            and params['collation'] is None
+        ):
+            # Ciphertext is base64 ASCII; avoid an oversized utf8mb4 unique index.
+            params['collation'] = 'ascii_bin'
+        return params
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
+        if self.storage_max_length is not None:
+            kwargs['storage_max_length'] = self.storage_max_length
+            return name, path, args, kwargs
         max_length = kwargs.pop("max_length")
         if max_length > 255:
             max_length = max_length // 2

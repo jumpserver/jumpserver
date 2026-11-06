@@ -120,6 +120,8 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
             },
             "job": {
                 "label": _("Job"),
+                "required": True,
+                "allow_null": False,
             }
         }
 

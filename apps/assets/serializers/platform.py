@@ -11,7 +11,6 @@ from common.serializers import (
     CommonSerializerMixin
 )
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
-from common.utils import lazyproperty
 from ..const import Category, AllTypes, Protocol, SuMethodChoices
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
@@ -232,25 +231,18 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         self.set_initial_value()
 
     def set_initial_value(self):
-        if not hasattr(self, 'initial_data'):
+        if not isinstance(getattr(self, 'initial_data', None), dict):
             return
 
+        self.initial_data = self.initial_data.copy()
         name = self.initial_data.get('name')
-        if name is not None and ' ' in name:
+        if isinstance(name, str) and ' ' in name:
             self.initial_data['name'] = name.replace(' ', '-')
 
         if self.instance:
             return
-        if not self.initial_data.get('automation'):
+        if 'automation' not in self.initial_data:
             self.initial_data['automation'] = {}
-
-    @property
-    def platform_category_type(self):
-        if self.instance:
-            return self.instance.category, self.instance.type
-        if self.initial_data:
-            return self.initial_data.get('category'), self.initial_data.get('type')
-        raise serializers.ValidationError({'type': _("type is required")})
 
     def add_type_choices(self, name, label):
         tp = self.fields['type']
@@ -260,12 +252,6 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
     @staticmethod
     def get_has_package(obj):
         return bool(obj.package_id and obj.package.exists)
-
-    @lazyproperty
-    def constraints(self):
-        category, tp = self.platform_category_type
-        constraints = AllTypes.get_constraints(category, tp)
-        return constraints
 
     def validate_protocols(self, protocols):
         if not protocols:
@@ -277,18 +263,26 @@ class PlatformSerializer(ResourceLabelsMixin, CommonSerializerMixin, WritableNes
         self.initial_data['protocols'] = protocols
         return protocols
 
-    def validate_su_enabled(self, su_enabled):
-        return su_enabled and self.constraints.get('su_enabled', False)
-
-    def validate_gateway_enabled(self, gateway_enabled):
-        return gateway_enabled and self.constraints.get('gateway_enabled', False)
-
-    def validate_automation(self, automation):
-        automation = automation or {}
-        ansible_enabled = automation.get('ansible_enabled', False) \
-                          and self.constraints['automation'].get('ansible_enabled', False)
-        automation['ansible_enable'] = ansible_enabled
-        return automation
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        # Cross-field constraints must run after required fields and choice
+        # objects have been validated and converted to their scalar values.
+        category = attrs.get('category', getattr(self.instance, 'category', None))
+        tp = attrs.get('type', getattr(self.instance, 'type', None))
+        constraints = AllTypes.get_constraints(category, tp)
+        for name in ('su_enabled', 'gateway_enabled'):
+            if name in attrs:
+                attrs[name] = attrs[name] and constraints.get(name, False)
+        automation = attrs.get('automation', {})
+        if 'ansible_enabled' in automation:
+            automation['ansible_enabled'] = (
+                automation['ansible_enabled']
+                and constraints.get('automation', {}).get('ansible_enabled', False)
+            )
+            # drf-writable-nested validates reverse relations again from the
+            # initial input, so carry the constrained value into that input.
+            self.initial_data['automation']['ansible_enabled'] = automation['ansible_enabled']
+        return attrs
 
 
 class PlatformListSerializer(PlatformSerializer):

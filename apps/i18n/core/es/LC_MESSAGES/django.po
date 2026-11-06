@@ -18020,7 +18020,7 @@ msgid "Client login session expired. Please authenticate again."
 msgstr "La sesión del cliente ha caducado. Vuelva a autenticarse."
 
 msgid "Log in again after exiting the client"
-msgstr "Volver a iniciar sesión después de salir"
+msgstr "Volver a iniciar sesión al salir del cliente"
 
 msgid ""
 "When enabled, log in again after the desktop application exits and restarts."
@@ -18037,7 +18037,7 @@ msgid "Log in again when the idle timeout is reached. 0 disables the limit (defa
 msgstr "Vuelva a iniciar sesión al alcanzar el tiempo de espera por inactividad. 0 desactiva el límite (predeterminado). Las acciones reales del teclado y el ratón en la ventana principal, en ventanas independientes de activos y en sitios web integrados cuentan como actividad. Una conexión abierta, la salida en segundo plano y la actualización automática no cuentan. No se pueden registrar las acciones en programas externos como Xshell o MSTSC ni en algunas páginas integradas de otro origen. Usar solo esas áreas, observar durante mucho tiempo sin interactuar o sufrir fallos de envío por problemas de red puede provocar el tiempo de espera por inactividad. El tiempo se calcula desde la última actividad confirmada por el servidor."
 
 msgid "Maximum client login lifetime (minute)"
-msgstr "Duración máxima de la sesión (minutos)"
+msgstr "Duración máxima del inicio de sesión del cliente (min)"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "Se cuenta desde el inicio de sesión en el cliente; la actividad y la renovación del token no la prolongan. 0 desactiva el límite de duración (valor predeterminado). Los ajustes de salida e inactividad siguen vigentes. Vuelva a iniciar sesión cuando termine este plazo."
@@ -18504,26 +18504,14 @@ msgstr ""
 
 #: apps/settings/serializers/security.py
 msgid ""
-"0 disables automatic locking. Locks after the specified idle time. Enter the"
-" lock password in the main window to unlock. External application windows "
-"are not protected."
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
 msgstr ""
-"0 desactiva el bloqueo automático. Se bloquea tras el tiempo de inactividad "
-"indicado. Desbloquee con la contraseña de bloqueo en la ventana principal. "
-"Las aplicaciones externas no están protegidas."
-
-#: apps/settings/serializers/security.py
-msgid ""
-"0 disables automatic locking. Locks the console and Web terminal after the "
-"specified idle time. Enter the lock password to unlock. Administrator "
-"settings are defaults and limits. Users may choose stricter settings; "
-"otherwise they follow the administrator."
-msgstr ""
-"0 desactiva el bloqueo automático. Bloquea la consola y el terminal Web tras"
-" el tiempo de inactividad indicado. Introduzca la contraseña de bloqueo para"
-" desbloquear. El administrador define valores predeterminados y límites. El "
-"usuario puede elegir opciones más estrictas; en otro caso, sigue al "
-"administrador."
+"0 desactiva el bloqueo automático. Se bloquea al superar el tiempo de "
+"inactividad. Cambiar de cuenta no reinicia la inactividad de la cuenta "
+"anterior. Introduzca la contraseña de bloqueo para desbloquear. Las "
+"aplicaciones externas no están protegidas."
 
 #: settings/serializers/feature.py
 msgid "Asset application scope"
@@ -18536,3 +18524,83 @@ msgstr "Define qué activos pueden seleccionar los usuarios al solicitar acceso 
 #: chat_ai/models.py
 msgid "Chat AI conversation audit"
 msgstr "Auditoría de conversaciones de IA"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 desactiva el bloqueo por inactividad. Bloquea la consola y el terminal Web"
+" tras el tiempo de inactividad indicado. Introduzca la contraseña de bloqueo"
+" para desbloquear. Con el bloqueo por inactividad activado, cerrar todas las"
+" páginas también bloquea esta sesión tras 10 segundos. El cierre de sesión "
+"al cerrar las páginas tiene prioridad. Actualizar o reabrir en 10 segundos "
+"lo cancela. El administrador define valores predeterminados y límites. El "
+"usuario puede elegir opciones más estrictas; en otro caso, sigue al "
+"administrador."
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr ""
+"Sin renovación, el inicio de sesión caduca tras esta duración, aunque se "
+"guarde la sesión o se verifique de nuevo la identidad. Con renovación, cada "
+"renovación concede de nuevo esta duración. Los cambios se aplican a los "
+"nuevos inicios de sesión sin reiniciar Core."
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr ""
+"Las solicitudes renuevan la sesión como máximo una vez por minuto. También "
+"cuentan las solicitudes de negocio en segundo plano, excepto las consultas "
+"del perfil, la presencia y el bloqueo. Al desactivarlo, el vencimiento es "
+"fijo. Los cambios se aplican a los nuevos inicios de sesión sin reiniciar "
+"Core."
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "Volver a iniciar sesión al salir del navegador"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr ""
+"Exigir un nuevo inicio de sesión tras salir de la aplicación del navegador. "
+"Cerrar una pestaña o ventana no cuenta. La restauración del navegador puede "
+"conservar la sesión; ciérrela explícitamente para finalizarla con seguridad."
+" Los cambios se aplican a nuevos inicios de sesión."
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr ""
+"Volver a iniciar sesión al salir del navegador o cerrar todas las páginas"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"Al cerrar todas las páginas de consola y terminal Web de este inicio de "
+"sesión, se cerrará la sesión tras unos 10 segundos. Actualizar o reabrir una"
+" página durante ese plazo cancela el cierre. Un fallo del navegador puede "
+"impedir el aviso; use Cerrar sesión para finalizarla de forma fiable. Los "
+"cambios afectan a nuevos inicios de sesión."
+
+msgid "Session policy"
+msgstr "Política de sesión"
+
+msgid "Log in again when the browser closes"
+msgstr "Volver a iniciar sesión al cerrar el navegador"

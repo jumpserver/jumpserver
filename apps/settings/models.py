@@ -96,6 +96,9 @@ class Setting(models.Model):
         if self.name == 'APPLICATION_ACCOUNT_SCOPE_LIMIT':
             return
         value = self.cleaned_value
+        if self.name == 'SESSION_SAVE_EVERY_REQUEST':
+            settings.SESSION_SAVE_EVERY_REQUEST = False
+            return
         setattr(settings, self.name, value)
         self.refresh_ldap_timeout_if_need(value)
         self.refresh_keycloak_to_openid_if_need()

@@ -265,6 +265,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
     user = ObjectRelatedField(required=False, queryset=User.objects, label=_('User'))
     date_expired = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", label=_('Date expired'))
     is_current_user_session = serializers.SerializerMethodField()
+    session_policy = serializers.JSONField(read_only=True, default=None, label=_('Session policy'))
     city = serializers.ReadOnlyField(source='city_display', label=_("Login city"))
 
     class Meta:
@@ -272,7 +273,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'type', 'ip', 'city', 'user_agent', 'user', 'is_current_user_session',
-            'backend', 'backend_display', 'is_active', 'is_locked', 'date_created', 'date_expired'
+            'backend', 'backend_display', 'is_active', 'is_locked', 'date_created', 'date_expired', 'session_policy'
         ]
         fields = fields_small
         extra_kwargs = {

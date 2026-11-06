@@ -282,15 +282,12 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
 
     def login_it(self, user):
         auth_login(self.request, user)
-        # 如果设置了自动登录，那需要设置 session_id cookie 的有效期
-        if self.request.session.get('auto_login'):
-            age = self.request.session.get_expiry_age()
-            self.request.session.set_expiry(age)
 
     def get_redirect_url(self, *args, **kwargs):
         try:
             user = self.get_user_from_session()
             self.check_user_mfa_if_need(user)
+            review_required = self.request.session.get('auth_confirm_required')
             self.check_user_login_confirm_if_need(user)
         except (errors.CredentialError, errors.SessionEmptyError) as e:
             return self.format_redirect_url(self.login_url)
@@ -303,6 +300,10 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         except errors.PasswordTooSimple as e:
             return e.url
         else:
+            if review_required and self.request.session.get('auth_third_party_required'):
+                # Reviewer exemptions can finish here without polling the approval API.
+                self.request.session['auth_third_party_done'] = 1
+                self.request.session.pop('auth_third_party_required', None)
             self.login_it(user)
             self.send_auth_signal(success=True, user=user)
             self.clear_auth_mark()
@@ -378,6 +379,9 @@ class UserLogoutView(TemplateView):
     def get(self, request, *args, **kwargs):
         backend_logout_url = self.get_backend_logout_url()
         if backend_logout_url:
+            # Preserve provider logout data until its handler completes, while clearing local caches now.
+            from authentication.services.web_session_lock import clear_web_session_cache
+            clear_web_session_cache(request.session.session_key)
             return redirect(backend_logout_url)
 
         auth_logout(request)

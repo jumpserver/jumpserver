@@ -8536,7 +8536,15 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
-#: settings/api/ldap.py:92
+#: settings/api/ldap.py:41
+msgid "LDAP server is not configured. Please configure it in Authentication settings."
+msgstr "未配置 LDAP 服务器，请先在认证设置中完成配置。"
+
+#: settings/api/ldap.py:52
+msgid "Unable to load LDAP users. Please try again later or contact the administrator."
+msgstr "获取 LDAP 用户失败，请稍后重试或联系管理员。"
+
+#: settings/api/ldap.py:58
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr "用户未同步，请点击同步用户按钮"
@@ -17452,7 +17460,7 @@ msgid "Client login session expired. Please authenticate again."
 msgstr "客户端登录已失效，请重新验证身份。"
 
 msgid "Log in again after exiting the client"
-msgstr "退出后重新登录"
+msgstr "客户端退出后重新登录"
 
 msgid ""
 "When enabled, log in again after the desktop application exits and restarts."
@@ -17466,7 +17474,7 @@ msgid "Log in again when the idle timeout is reached. 0 disables the limit (defa
 msgstr "达到空闲超时后需重新登录。0 表示不启用（默认）。主窗口、独立资产窗口及内置网站中的真实键盘、鼠标操作会计入活动；连接在线、后台输出和自动刷新不算活动。Xshell、MSTSC 等外部软件和部分跨域内嵌页面中的操作无法采集。仅在这些区域操作、长时间只观看，或网络异常导致上报失败时，仍可能触发空闲超时；以服务器最后确认的活动时间为准。"
 
 msgid "Maximum client login lifetime (minute)"
-msgstr "最长登录有效期 (分)"
+msgstr "客户端最长登录有效期 (分)"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "从客户端登录开始计时，用户操作和令牌刷新均不延长有效期。0 表示不限制登录时长（默认），退出和空闲超时设置仍然生效。到期后需重新登录。"
@@ -18942,20 +18950,10 @@ msgstr "0 表示不限制。 从登录时间起计算，到期需重新登录，
 
 #: apps/settings/serializers/security.py
 msgid ""
-"0 disables automatic locking. Locks after the specified idle time. Enter the"
-" lock password in the main window to unlock. External application windows "
-"are not protected."
-msgstr "0 表示关闭自动锁屏。 空闲达到设定时间后自动锁屏，在主窗口输入锁屏密码解锁。外部软件窗口不受保护。"
-
-#: apps/settings/serializers/security.py
-msgid ""
-"0 disables automatic locking. Locks the console and Web terminal after the "
-"specified idle time. Enter the lock password to unlock. Administrator "
-"settings are defaults and limits. Users may choose stricter settings; "
-"otherwise they follow the administrator."
-msgstr ""
-"0 表示关闭自动锁屏。 空闲达到设定时间后锁定控制台和 Web 终端，输入锁屏密码解锁。 "
-"管理员设置为默认值和上限，用户可设置得更严格；未自行设置则跟随管理员。"
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
+msgstr "0 表示关闭自动锁屏。空闲超时后锁定，切换账号不会重置原账号的空闲时间。输入锁屏密码解锁，外部软件窗口不受保护。"
 
 #: settings/serializers/feature.py
 msgid "Asset application scope"
@@ -20249,3 +20247,196 @@ msgstr "每人最多授权 %(limit)s 个 MCP 客户端。请先在个人设置�
 #: terminal/templates/terminal/agent_audit.html
 msgid "Session operations"
 msgstr "本会话操作"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 表示关闭空闲锁屏。 空闲达到设定时间后锁定控制台和 Web 终端，输入锁屏密码解锁。 开启空闲锁屏后，关闭全部页面 10 "
+"秒后也会锁定；开启关闭页面退出则优先注销，刷新或 10 秒内重开可取消。 管理员设置为默认值和上限，用户可设置得更严格；未自行设置则跟随管理员。"
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr "关闭续期时，从登录成功开始固定计时，保存会话或再次验证身份不延长。开启续期时，每次续期重新获得此时长。修改后新登录生效，无需重启。"
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr "普通请求最多每分钟续期一次，后台业务请求也会续期；个人资料、在线状态和锁屏状态轮询除外。关闭后固定到期。修改后新登录生效，无需重启。"
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "浏览器退出后重新登录"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr "退出整个浏览器应用后需要重新登录，关闭标签页或窗口不属于退出。浏览器恢复功能可能保留登录，可靠结束请点击退出登录。修改后新登录生效。"
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr "浏览器退出或关闭全部页面后重新登录"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"开启后，同次登录的控制台和 Web 终端页面全部关闭约 10 "
+"秒后注销；刷新或期间重新打开会取消注销。浏览器异常退出可能无法上报，可靠结束请点击退出登录。修改后新登录生效。"
+
+msgid "Session policy"
+msgstr "会话策略"
+
+msgid "Log in again when the browser closes"
+msgstr "浏览器关闭时重新登录"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "云资源 ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "最近发现时间"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "首次缺失时间"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "连续未发现次数"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "待复核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "冲突"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "完整扫描中未发现该云资源"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "该云资源不再匹配同步策略"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "该地域已移出同步范围"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "云资源绑定存在冲突，需要人工复核"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "发现了该云资源，但未选择导入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "发现了该云资源，但尚未导入"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "云资源已变化，但未启用自动更新"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "云地域扫描超时"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "云地域扫描结果不完整"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "云地域返回了无效的扫描结果"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "云地域扫描失败"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "无补充说明"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "首次发现时间"
+
+#: settings/api/settings.py
+msgid "Invalid settings category."
+msgstr "无效的配置分组。"
+
+#: settings/serializers/security.py
+msgid "Provide either ip or a non-empty ips list."
+msgstr "请提供 ip 或非空的 ips 列表。"
+
+#: settings/serializers/security.py
+msgid "Provide only one of ip or ips."
+msgstr "ip 和 ips 只能提供其中一个。"
+
+#: terminal/api/component/storage.py
+msgid "Deleting storage of type \"{}\" is not allowed"
+msgstr "不允许删除类型为“{}”的存储配置"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
+msgstr ""
+"资源统计：新增 %(new)s，更新 %(updated)s，无变化 %(nochange)s，待复核 %(stale)s，失败 "
+"%(failed)s，跳过 %(skip)s，已释放 %(released)s"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Regions: total %(total)s, succeeded %(succeeded)s, failed %(failed)s, "
+"incomplete %(incomplete)s, not scanned %(unscanned)s"
+msgstr ""
+"地域扫描：共 %(total)s，成功 %(succeeded)s，失败 %(failed)s，扫描不完整 %(incomplete)s，未扫描 "
+"%(unscanned)s"
+
+#: xpack/plugins/cloud/manager.py
+msgid "Interactive import does not automatically release assets."
+msgstr "本次为交互式导入，不执行自动释放。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is enabled for resources confirmed missing by a complete "
+"scan."
+msgstr "本次已启用自动释放，仅处理完整扫描确认缺失的云资源。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is disabled; missing cloud resources require manual "
+"review."
+msgstr "本次未启用自动释放，缺失的云资源保留为待复核。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Resource failures and scan or task errors are counted separately. A task can"
+" fail even when no individual resource failed."
+msgstr "资源失败数与扫描或任务错误分别统计；即使失败资源数为 0，任务仍可能失败。"
+
+#: xpack/plugins/cloud/const.py
+msgid "Partial"
+msgstr "部分成功"

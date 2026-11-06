@@ -8,7 +8,7 @@ from .mixin import LDAPSerializerMixin
 
 __all__ = [
     'LDAPTestConfigSerializer', 'LDAPUserSerializer', 'LDAPTestLoginSerializer',
-    'LDAPSettingSerializer',
+    'LDAPSettingSerializer', 'LDAPUserQuerySerializer',
 ]
 
 
@@ -30,6 +30,13 @@ class LDAPTestConfigSerializer(serializers.Serializer):
 class LDAPTestLoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=1024, required=True)
     password = EncryptedField(max_length=2014, required=True, label=_("Password"))
+
+
+class LDAPUserQuerySerializer(serializers.Serializer):
+    category = serializers.ChoiceField(
+        choices=(User.Source.ldap.value, User.Source.ldap_ha.value),
+        default=User.Source.ldap.value,
+    )
 
 
 class LDAPUserSerializer(serializers.Serializer):

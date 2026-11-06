@@ -6,6 +6,7 @@ from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
 from django.shortcuts import reverse
+from django.urls import resolve, Resolver404
 from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -21,6 +22,20 @@ from users.models import User
 from .notifications import DifferentCityLoginMessage
 
 logger = get_logger(__file__)
+
+
+def is_logout_request(request):
+    if not request.path_info.endswith('/logout/'):
+        return False
+    try:
+        match = request.resolver_match or resolve(request.path_info, urlconf=getattr(request, 'urlconf', None))
+    except Resolver404:
+        return False
+    return match.view_name in {
+        'authentication:logout', 'authentication:openid:logout',
+        'authentication:cas:cas-logout', 'authentication:saml2:saml2-logout',
+        'authentication:oauth2:logout',
+    }
 
 
 def should_use_oracle_sysdba(connect_options, protocol, asset=None):

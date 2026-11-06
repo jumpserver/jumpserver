@@ -16,6 +16,7 @@ def parse_playbook_name(path):
 
 
 class PlaybookSerializer(ScopeSerializerMixin, CommonBulkModelSerializer, WritableNestedModelSerializer):
+    name = serializers.CharField(max_length=128, label=_('Name'))
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     path = serializers.FileField(required=False)
     variable = PlaybookVariableSerializer(many=True, required=False, allow_null=True, label=_('Variable'))

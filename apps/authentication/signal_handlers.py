@@ -42,13 +42,23 @@ def clear_user_confirmation(sender, request, **kwargs):
         return
     for key in (
         'CONFIRM_LEVEL', 'CONFIRM_TYPE', 'CONFIRM_TIME', 'CONFIRM_USER_ID',
-        'passkey_confirm_mfa', 'fido2_state', 'passkey_confirm_purpose', 'lock_password_confirmation',
+        'passkey_confirm_mfa', 'fido2_state',
     ):
         request.session.pop(key, None)
 
 
+@receiver(user_logged_out)
+def clear_logged_out_web_session(sender, request, **kwargs):
+    if request is not None:
+        from authentication.services.web_session_lock import clear_web_session_cache
+        clear_web_session_cache(request.session.session_key)
+
+
 @receiver(user_logged_in)
 def on_user_auth_login_success(sender, user, request, **kwargs):
+    if hasattr(request.session, 'start_login') and not request.session.login_policy:
+        # SSO callbacks and the final guard may log in the same Session twice.
+        request.session.start_login()
     # 失效 perms 缓存
     user.expire_rbac_perms_cache()
 
@@ -57,7 +67,8 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             and user.mfa_enabled \
             and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
-    auth_backend = request.session.get('auth_backend', request.session.get(BACKEND_SESSION_KEY))
+    auth_backend = request.session.get(BACKEND_SESSION_KEY) or request.session.get('auth_backend')
+    request.session['auth_backend'] = auth_backend
     if not request.session.get("auth_third_party_done") and \
             auth_backend in AUTHENTICATION_BACKENDS_THIRD_PARTY:
         request.session['auth_third_party_required'] = 1

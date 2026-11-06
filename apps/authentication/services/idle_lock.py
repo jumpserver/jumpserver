@@ -45,10 +45,11 @@ def effective_idle_lock_time(maximum, personal):
     return maximum if personal in (None, 0) else min(personal, maximum)
 
 
-def personal_client_login_policy(user_id, policy):
-    preferences = dict(Preference.objects.filter(
-        user_id=user_id, category=IDLE_LOCK_CATEGORY, name__in=PERSONAL_SETTINGS,
-    ).values_list('name', 'value'))
+def personal_client_login_policy(user_id, policy, *, preferences=None):
+    if preferences is None:
+        preferences = dict(Preference.objects.filter(
+            user_id=user_id, category=IDLE_LOCK_CATEGORY, name__in=PERSONAL_SETTINGS,
+        ).values_list('name', 'value'))
     result = dict(policy)
     for field, name in (('idle_lock_time', 'client_idle_lock_time'),
                         ('max_session_time', 'client_max_session_time')):

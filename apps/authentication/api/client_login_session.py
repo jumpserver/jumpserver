@@ -75,7 +75,7 @@ class ClientSessionUnlockView(ClientSessionStatusView):
 
     def get(self, request):
         configured = Preference.objects.filter(
-            user=request.user, category='client', name='client_lock_password_hash',
+            user=request.user, category='security', name='lock_password_hash',
         ).exists()
         return Response({
             'has_password': configured,
@@ -87,7 +87,7 @@ class ClientSessionUnlockView(ClientSessionStatusView):
         serializer = ClientUnlockSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         credential = Preference.objects.filter(
-            user=request.user, category='client', name='client_lock_password_hash',
+            user=request.user, category='security', name='lock_password_hash',
         ).first()
         if not credential:
             return Response({'code': 'client_lock_password_unset',

@@ -17763,7 +17763,7 @@ msgid "Client login session expired. Please authenticate again."
 msgstr "クライアントのログインセッションが失効しました。再認証してください。"
 
 msgid "Log in again after exiting the client"
-msgstr "終了後に再ログイン"
+msgstr "クライアント終了後に再ログイン"
 
 msgid ""
 "When enabled, log in again after the desktop application exits and restarts."
@@ -17777,7 +17777,7 @@ msgid "Log in again when the idle timeout is reached. 0 disables the limit (defa
 msgstr "アイドルタイムアウトに達すると再ログインが必要です。0 は制限なし（既定）です。メインウィンドウ、独立したアセットウィンドウ、内蔵ブラウザーで表示するサイトでの実際のキーボード・マウス操作が活動として記録されます。接続の維持、バックグラウンド出力、自動更新は活動に含まれません。Xshell、MSTSC などの外部ソフトウェアや、一部のクロスオリジン埋め込みページでの操作は取得できません。これらの領域だけを操作する場合、長時間操作せずに閲覧する場合、またはネットワークの問題で報告に失敗した場合も、アイドルタイムアウトが発生することがあります。時間はサーバーが最後に確認した活動から計算されます。"
 
 msgid "Maximum client login lifetime (minute)"
-msgstr "ログインの最大有効期間（分）"
+msgstr "クライアントの最長ログイン有効期間 (分)"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "クライアントへのログイン時から計測し、操作やトークンの更新では延長されません。0 は有効期間の制限なしです（デフォルト）。終了時とアイドルタイムアウトの設定は引き続き適用されます。有効期間が終了すると再ログインが必要になります。"
@@ -18169,22 +18169,12 @@ msgstr ""
 
 #: apps/settings/serializers/security.py
 msgid ""
-"0 disables automatic locking. Locks after the specified idle time. Enter the"
-" lock password in the main window to unlock. External application windows "
-"are not protected."
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
 msgstr ""
-"0 で自動ロックを無効にします。 "
-"指定した無操作時間で自動ロックします。メインウィンドウでロック用パスワードを入力して解除します。外部アプリのウィンドウは保護されません。"
-
-#: apps/settings/serializers/security.py
-msgid ""
-"0 disables automatic locking. Locks the console and Web terminal after the "
-"specified idle time. Enter the lock password to unlock. Administrator "
-"settings are defaults and limits. Users may choose stricter settings; "
-"otherwise they follow the administrator."
-msgstr ""
-"0 で自動ロックを無効にします。 指定した無操作時間でコンソールと Web ターミナルをロックします。ロック用パスワードで解除します。 "
-"管理者設定が既定値と上限です。ユーザーはより厳しい設定にでき、未設定の場合は管理者設定に従います。"
+"0 "
+"は自動ロックを無効にします。アイドル時間を超えるとロックします。アカウントを切り替えても、前のアカウントのアイドル時間はリセットされません。ロックパスワードで解除できます。外部アプリのウィンドウは保護されません。"
 
 #: settings/serializers/feature.py
 msgid "Asset application scope"
@@ -18206,3 +18196,184 @@ msgstr "期限切れのアプリケーション監査、完了したポリシー
 
 msgid "The start time must be earlier than the end time."
 msgstr "開始時刻は終了時刻より前である必要があります。"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 で無操作によるロックを無効にします。 指定した無操作時間でコンソールと Web ターミナルをロックします。ロック用パスワードで解除します。 "
+"無操作によるロックが有効な場合、すべてのページを閉じても10秒後にロックされます。ページ終了時のログアウト設定が優先されます。更新や10秒以内の再表示でキャンセルされます。"
+" 管理者設定が既定値と上限です。ユーザーはより厳しい設定にでき、未設定の場合は管理者設定に従います。"
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr ""
+"更新が無効の場合、ログイン成功時からこの時間が経過すると期限切れになります。セッションの保存や再認証では延長されません。有効の場合、更新のたびにこの時間が再設定されます。変更は再起動なしで新しいログインに適用されます。"
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr ""
+"リクエストによるセッション更新は1分間に最大1回です。バックグラウンドの業務リクエストも対象ですが、プロフィール、オンライン状態、ロック状態のポーリングは除きます。無効の場合、期限は固定されます。変更は再起動なしで新しいログインに適用されます。"
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "ブラウザー終了後に再ログイン"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr ""
+"ブラウザーアプリの終了後に再ログインを要求します。タブやウィンドウを閉じる操作は含みません。セッション復元によりログインが保持される場合があります。確実に終了するにはログアウトしてください。変更は新しいログインに適用されます。"
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr "ブラウザー終了または全ページ閉鎖後に再ログイン"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"同じログインのコンソールと Web "
+"ターミナルをすべて閉じると、約10秒後にログアウトします。更新や10秒以内の再表示でキャンセルされます。異常終了時は通知できない場合があります。確実に終了するにはログアウトしてください。変更は新しいログインに適用されます。"
+
+msgid "Session policy"
+msgstr "セッションポリシー"
+
+msgid "Log in again when the browser closes"
+msgstr "ブラウザーを閉じた後に再ログイン"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "External ID"
+msgstr "クラウドリソース ID"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Last seen at"
+msgstr "最終検出日時"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale since"
+msgstr "最初の欠落日時"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Missing count"
+msgstr "連続未検出回数"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Stale"
+msgstr "確認待ち"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Conflict"
+msgstr "競合"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "Cloud resource was not found in a complete scan"
+msgstr "完全なスキャンでクラウドリソースが検出されませんでした"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource no longer matches the synchronization strategy"
+msgstr "クラウドリソースは同期戦略に一致しなくなりました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The region was removed from the synchronization scope"
+msgstr "リージョンが同期範囲から除外されました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource binding needs manual review"
+msgstr "クラウドリソースの関連付けを手動で確認してください"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The discovered resource was not selected for import"
+msgstr "クラウドリソースは検出されましたが、インポート対象に選択されていません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The resource was discovered but was not imported"
+msgstr "クラウドリソースは検出されましたが、インポートされていません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud resource changed, but automatic update is disabled"
+msgstr "クラウドリソースは変更されていますが、自動更新が無効です"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan timed out"
+msgstr "クラウドリージョンのスキャンがタイムアウトしました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan did not return a complete result"
+msgstr "クラウドリージョンのスキャン結果が不完全です"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region scan returned an invalid result"
+msgstr "クラウドリージョンから無効なスキャン結果が返されました"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "The cloud region could not be scanned"
+msgstr "クラウドリージョンをスキャンできませんでした"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "No additional details"
+msgstr "追加情報はありません"
+
+#: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
+msgid "First seen at"
+msgstr "初回検出日時"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Resources: new %(new)s, updated %(updated)s, unchanged %(nochange)s, to "
+"review %(stale)s, failed %(failed)s, skipped %(skip)s, released %(released)s"
+msgstr ""
+"リソース: 新規 %(new)s、更新 %(updated)s、変更なし %(nochange)s、要確認 %(stale)s、失敗 "
+"%(failed)s、スキップ %(skip)s、解放済み %(released)s"
+
+#: xpack/plugins/cloud/manager.py
+#, python-format
+msgid ""
+"Regions: total %(total)s, succeeded %(succeeded)s, failed %(failed)s, "
+"incomplete %(incomplete)s, not scanned %(unscanned)s"
+msgstr ""
+"リージョンスキャン: 合計 %(total)s、成功 %(succeeded)s、失敗 %(failed)s、不完全 "
+"%(incomplete)s、未スキャン %(unscanned)s"
+
+#: xpack/plugins/cloud/manager.py
+msgid "Interactive import does not automatically release assets."
+msgstr "対話式インポートではアセットを自動的に解放しません。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is enabled for resources confirmed missing by a complete "
+"scan."
+msgstr "自動解放が有効です。完全なスキャンで存在しないことを確認したクラウドリソースのみを対象とします。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Automatic release is disabled; missing cloud resources require manual "
+"review."
+msgstr "自動解放は無効です。見つからないクラウドリソースは手動で確認する必要があります。"
+
+#: xpack/plugins/cloud/manager.py
+msgid ""
+"Resource failures and scan or task errors are counted separately. A task can"
+" fail even when no individual resource failed."
+msgstr "リソースの失敗とスキャンやタスクのエラーは別々に集計されます。個別のリソースに失敗がなくても、タスクが失敗する場合があります。"
+
+#: xpack/plugins/cloud/const.py
+msgid "Partial"
+msgstr "一部成功"

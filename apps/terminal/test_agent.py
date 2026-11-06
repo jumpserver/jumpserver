@@ -7,7 +7,6 @@ from unittest.mock import patch
 
 from django.core import signing
 from django.core.cache import cache
-from django.contrib.sessions.backends.cache import SessionStore
 from django.test import TestCase, TransactionTestCase, SimpleTestCase, RequestFactory, override_settings
 from django.http import Http404
 from django.utils import timezone
@@ -17,6 +16,7 @@ from oauth2_provider.models import get_application_model, get_access_token_model
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
+from common.sessions.cache import SessionStore
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from terminal import agent_service as service

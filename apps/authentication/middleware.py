@@ -1,17 +1,48 @@
 import base64
+import re
 
 from django.conf import settings
 from django.contrib.auth import logout as auth_logout
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, reverse, render
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
 
 from authentication import mixins
+from authentication.utils import is_logout_request
 from audits.signal_handlers import send_login_info_to_reviewers
 from common.utils import gen_key_pair, gen_gm_key_pair
 from common.utils import get_request_ip
+
+
+def _login_redirect(request, url):
+    # This bootstrap API must not turn an unfinished SSO login into an HTML lock-status response.
+    if request.path_info == '/api/v1/authentication/web-session/status/':
+        return JsonResponse({'code': 'authentication_required', 'login_url': url}, status=401)
+    return redirect(url)
+
+
+class WebSessionLockMiddleware(MiddlewareMixin):
+    # Legacy Django account and business views do not use DRF SessionAuthentication.
+    # Keep login, MFA, identity confirmation and independent credentials outside this gate.
+    protected_paths = re.compile(
+        r'^/core/(?:auth/(?:profile/|(?:wecom|dingtalk|feishu|lark|slack)/'
+        r'(?:bind/start/|qr/bind/))|reports/|ops/|tickets/direct-approve/)'
+    )
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if not self.protected_paths.match(request.path_info) or not request.user.is_authenticated:
+            return None
+        session = request.session
+        if not session.session_key:
+            return None
+        from authentication.services.web_session_lock import session_locked, WebSessionLocked
+
+        if session_locked(session.session_key, request.user.pk, session.login_policy):
+            error = WebSessionLocked()
+            return JsonResponse(error.detail, status=error.status_code)
+        return None
 
 
 class MFAMiddleware:
@@ -28,11 +59,14 @@ class MFAMiddleware:
         # 若先执行 view，拒绝响应返回时写操作已经提交。
         if not request.session.get('auth_mfa_required') or request.user.is_anonymous:
             return self.get_response(request)
+        if is_logout_request(request):
+            return self.get_response(request)
 
         # 这个是 mfa 登录页需要的请求, 也得放出来, 用户其实已经在 CAS/OIDC 中完成登录了
         white_urls = [
             'login/mfa', 'mfa/select', 'face/context', 'jsi18n/', '/static/',
-            '/profile/otp', '/logout/', '/media/'
+            '/profile/otp', '/media/',
+            '/api/v1/authentication/passkeys/login/'
         ]
         for url in white_urls:
             if request.path.find(url) > -1:
@@ -43,10 +77,10 @@ class MFAMiddleware:
             return HttpResponse('', status=401)
 
         url = reverse('authentication:login-mfa') + '?_=middleware'
-        return redirect(url)
+        return _login_redirect(request, url)
 
 
-class ThirdPartyLoginMiddleware(mixins.AuthMixin):
+class ThirdPartyLoginMiddleware:
     """OpenID、CAS、SAML2登录规则设置验证"""
 
     def __init__(self, get_response):
@@ -58,34 +92,40 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         # 必须先做登录 ACL / 复核判断再进 view，否则拒绝或待审时写操作已经提交。
         if request.user.is_anonymous or not request.session.get('auth_third_party_required'):
             return response if response is not None else self.get_response(request)
+        if is_logout_request(request):
+            return response if response is not None else self.get_response(request)
         white_urls = [
             'jsi18n/', '/static/',
             'login/guard', 'login/wait-confirm',
             'login-confirm-ticket/status',
             'settings/public/open',
-            'core/auth/login', 'core/auth/logout'
+            'core/auth/login'
         ]
         for url in white_urls:
             if request.path.find(url) > -1:
                 return response if response is not None else self.get_response(request)
 
         ip = get_request_ip(request)
+        # Middleware instances are shared by concurrent requests; authentication state is not.
+        auth = mixins.AuthMixin()
+        auth.request = request
         try:
-            self.request = request
-            self.check_is_block()
-            self._check_third_party_login_acl()
-            self._check_login_acl(request.user, ip)
+            auth._check_is_block(request.user.username)
+            auth._check_third_party_login_acl()
+            auth._check_login_acl(request.user, ip)
         except Exception as e:
             if getattr(request, 'user_need_delete', False):
                 request.user.delete()
             else:
                 error_message = getattr(e, 'msg', None)
                 error_message = error_message or str(e)
-                self.send_auth_signal(
+                auth.send_auth_signal(
                     success=False, username=request.user.username,
                     reason=error_message, request=request
                 )
             auth_logout(request)
+            if request.path_info == '/api/v1/authentication/web-session/status/':
+                return _login_redirect(request, reverse('authentication:login') + '?admin=1')
             context = {
                 'title': _('Authentication failed'),
                 'message': _('Authentication failed (before login check failed): {}').format(e),
@@ -95,23 +135,25 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             }
             return render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
         else:
-            if self.request.session.get('auth_confirm_required'):
+            if request.session.get('auth_confirm_required'):
                 guard_url = reverse('authentication:login-guard')
                 args = request.META.get('QUERY_STRING', '')
                 if args:
                     guard_url = "%s?%s" % (guard_url, args)
-                return redirect(guard_url)
+                return _login_redirect(request, guard_url)
+            request.session['auth_third_party_done'] = 1
+            request.session.pop('auth_third_party_required', None)
             if response is None:
                 response = self.get_response(request)
-            self.send_auth_signal(success=True, user=request.user, request=request)
-            request.session.pop('auth_third_party_required', '')
+            if not request.session.get('auth_mfa_required'):
+                auth.send_auth_signal(success=True, user=request.user, request=request)
             return response
         finally:
             if request.session.get('can_send_notifications') and \
-                    self.request.session.get('auth_notice_required'):
+                    request.session.get('auth_notice_required'):
                 request.session['can_send_notifications'] = False
-                user_log_id = self.request.session.get('user_log_id')
-                auth_acl_id = self.request.session.get('auth_acl_id')
+                user_log_id = request.session.get('user_log_id')
+                auth_acl_id = request.session.get('auth_acl_id')
                 send_login_info_to_reviewers(user_log_id, auth_acl_id)
 
 

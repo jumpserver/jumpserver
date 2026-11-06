@@ -17800,7 +17800,7 @@ msgid "Client login session expired. Please authenticate again."
 msgstr "Phiên đăng nhập của ứng dụng khách đã hết hạn. Vui lòng xác thực lại."
 
 msgid "Log in again after exiting the client"
-msgstr "Đăng nhập lại sau khi thoát"
+msgstr "Đăng nhập lại sau khi thoát ứng dụng khách"
 
 msgid ""
 "When enabled, log in again after the desktop application exits and restarts."
@@ -17816,7 +17816,7 @@ msgid "Log in again when the idle timeout is reached. 0 disables the limit (defa
 msgstr "Đăng nhập lại khi đạt thời gian chờ do không hoạt động. 0 tắt giới hạn này (mặc định). Thao tác bàn phím và chuột thực tế trong cửa sổ chính, cửa sổ tài sản riêng và các trang web tích hợp được tính là hoạt động. Kết nối đang mở, đầu ra nền và tự động làm mới không được tính. Không thể ghi nhận thao tác trong phần mềm bên ngoài như Xshell hoặc MSTSC và một số trang nhúng khác nguồn. Chỉ thao tác trong các khu vực này, chỉ xem trong thời gian dài hoặc gửi báo cáo thất bại do sự cố mạng vẫn có thể gây hết thời gian chờ do không hoạt động. Thời gian được tính từ hoạt động cuối cùng do máy chủ xác nhận."
 
 msgid "Maximum client login lifetime (minute)"
-msgstr "Thời hạn đăng nhập tối đa (phút)"
+msgstr "Thời gian đăng nhập tối đa của ứng dụng khách (phút)"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "Tính từ lúc đăng nhập vào ứng dụng khách; hoạt động và việc làm mới token không kéo dài thời hạn. Giá trị 0 tắt giới hạn thời hạn (mặc định). Các cài đặt về thoát ứng dụng và thời gian chờ không hoạt động vẫn áp dụng. Bạn cần đăng nhập lại khi hết thời hạn."
@@ -18263,25 +18263,13 @@ msgstr ""
 
 #: apps/settings/serializers/security.py
 msgid ""
-"0 disables automatic locking. Locks after the specified idle time. Enter the"
-" lock password in the main window to unlock. External application windows "
-"are not protected."
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
 msgstr ""
-"0 tắt khóa tự động. Tự khóa khi hết thời gian nhàn rỗi đã đặt. Nhập mật khẩu"
-" khóa tại cửa sổ chính để mở khóa. Cửa sổ ứng dụng bên ngoài không được bảo "
-"vệ."
-
-#: apps/settings/serializers/security.py
-msgid ""
-"0 disables automatic locking. Locks the console and Web terminal after the "
-"specified idle time. Enter the lock password to unlock. Administrator "
-"settings are defaults and limits. Users may choose stricter settings; "
-"otherwise they follow the administrator."
-msgstr ""
-"0 tắt khóa tự động. Khóa bảng điều khiển và Web terminal khi hết thời gian "
-"nhàn rỗi đã đặt. Nhập mật khẩu khóa để mở khóa. Quản trị viên đặt mặc định "
-"và giới hạn. Người dùng có thể đặt nghiêm ngặt hơn; nếu không tự đặt thì "
-"theo quản trị viên."
+"0 tắt tự động khóa. Khóa khi hết thời gian nhàn rỗi. Chuyển tài khoản không "
+"đặt lại thời gian nhàn rỗi của tài khoản trước. Nhập mật khẩu khóa để mở "
+"khóa. Cửa sổ ứng dụng bên ngoài không được bảo vệ."
 
 #: settings/serializers/feature.py
 msgid "Asset application scope"
@@ -18294,3 +18282,78 @@ msgstr "Quy định tài sản người dùng có thể chọn khi gửi phiếu
 #: chat_ai/models.py
 msgid "Chat AI conversation audit"
 msgstr "Kiểm tra cuộc trò chuyện AI"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0 tắt khóa do không hoạt động. Khóa bảng điều khiển và Web terminal khi hết "
+"thời gian nhàn rỗi đã đặt. Nhập mật khẩu khóa để mở khóa. Khi bật khóa do "
+"không hoạt động, đóng tất cả các trang cũng khóa phiên sau 10 giây. Đăng "
+"xuất khi đóng trang được ưu tiên. Làm mới hoặc mở lại trong 10 giây sẽ hủy "
+"thao tác này. Quản trị viên đặt mặc định và giới hạn. Người dùng có thể đặt "
+"nghiêm ngặt hơn; nếu không tự đặt thì theo quản trị viên."
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr ""
+"Khi tắt gia hạn, phiên đăng nhập hết hạn sau khoảng thời gian này kể từ lúc "
+"đăng nhập thành công, dù phiên được lưu hay danh tính được xác minh lại. Khi"
+" bật, mỗi lần gia hạn sẽ cấp lại khoảng thời gian này. Thay đổi áp dụng cho "
+"lần đăng nhập mới mà không cần khởi động lại Core."
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr ""
+"Các yêu cầu gia hạn phiên tối đa một lần mỗi phút. Yêu cầu nghiệp vụ chạy "
+"nền cũng được tính, trừ truy vấn hồ sơ, trạng thái trực tuyến và trạng thái "
+"khóa. Khi tắt, thời điểm hết hạn được giữ cố định. Thay đổi áp dụng cho lần "
+"đăng nhập mới mà không cần khởi động lại Core."
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "Đăng nhập lại sau khi thoát trình duyệt"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr ""
+"Yêu cầu đăng nhập lại sau khi thoát ứng dụng trình duyệt. Đóng tab hoặc cửa "
+"sổ không được tính là thoát. Khôi phục trình duyệt có thể giữ lại phiên; hãy"
+" dùng Đăng xuất để kết thúc chắc chắn. Thay đổi áp dụng cho lần đăng nhập "
+"mới."
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr "Đăng nhập lại sau khi thoát trình duyệt hoặc đóng mọi trang"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"Sau khi đóng mọi trang bảng điều khiển và Web terminal của lần đăng nhập "
+"này, phiên kết thúc sau khoảng 10 giây. Làm mới hoặc mở lại trang trong thời"
+" gian đó sẽ hủy đăng xuất. Sự cố trình duyệt có thể ngăn thông báo; hãy dùng"
+" Đăng xuất để kết thúc chắc chắn. Thay đổi áp dụng cho lần đăng nhập mới."
+
+msgid "Session policy"
+msgstr "Chính sách phiên"
+
+msgid "Log in again when the browser closes"
+msgstr "Đăng nhập lại khi đóng trình duyệt"

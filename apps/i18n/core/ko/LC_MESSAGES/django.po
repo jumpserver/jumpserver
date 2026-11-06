@@ -17692,7 +17692,7 @@ msgid "Client login session expired. Please authenticate again."
 msgstr "클라이언트 로그인 세션이 만료되었습니다. 다시 인증하세요."
 
 msgid "Log in again after exiting the client"
-msgstr "종료 후 다시 로그인"
+msgstr "클라이언트 종료 후 다시 로그인"
 
 msgid ""
 "When enabled, log in again after the desktop application exits and restarts."
@@ -17708,7 +17708,7 @@ msgid "Log in again when the idle timeout is reached. 0 disables the limit (defa
 msgstr "유휴 시간 제한에 도달하면 다시 로그인해야 합니다. 0은 제한을 사용하지 않음(기본값)입니다. 기본 창, 별도 자산 창, 내장 웹사이트에서 실제로 수행한 키보드와 마우스 조작이 활동으로 기록됩니다. 연결 유지, 백그라운드 출력, 자동 새로고침은 활동에 포함되지 않습니다. Xshell, MSTSC 같은 외부 프로그램과 일부 교차 출처 내장 페이지의 조작은 수집할 수 없습니다. 이러한 영역에서만 조작하거나, 오랫동안 보기만 하거나, 네트워크 문제로 보고가 실패하면 유휴 시간 초과가 발생할 수 있습니다. 시간은 서버가 마지막으로 확인한 활동을 기준으로 계산됩니다."
 
 msgid "Maximum client login lifetime (minute)"
-msgstr "최대 로그인 유효 기간(분)"
+msgstr "클라이언트 최대 로그인 유효 시간 (분)"
 
 msgid "Measured from client login; activity and token refresh do not extend it. 0 disables the lifetime limit (default). Exit and idle timeout settings still apply. Log in again when the lifetime ends."
 msgstr "클라이언트에 로그인한 시점부터 계산하며, 활동이나 토큰 갱신으로 연장되지 않습니다. 0은 유효 기간 제한 없음을 의미합니다(기본값). 종료 및 유휴 시간 제한 설정은 계속 적용됩니다. 유효 기간이 끝나면 다시 로그인해야 합니다."
@@ -18105,22 +18105,12 @@ msgstr ""
 
 #: apps/settings/serializers/security.py
 msgid ""
-"0 disables automatic locking. Locks after the specified idle time. Enter the"
-" lock password in the main window to unlock. External application windows "
-"are not protected."
+"0 disables automatic locking. Locks after the idle timeout. Switching "
+"accounts does not reset the previous account’s idle time. Enter the lock "
+"password to unlock. External application windows are not protected."
 msgstr ""
-"0은 자동 잠금을 끕니다. 설정한 유휴 시간이 지나면 자동 잠깁니다. 기본 창에서 잠금 비밀번호를 입력해 해제합니다. 외부 앱 창은 "
-"보호되지 않습니다."
-
-#: apps/settings/serializers/security.py
-msgid ""
-"0 disables automatic locking. Locks the console and Web terminal after the "
-"specified idle time. Enter the lock password to unlock. Administrator "
-"settings are defaults and limits. Users may choose stricter settings; "
-"otherwise they follow the administrator."
-msgstr ""
-"0은 자동 잠금을 끕니다. 설정한 유휴 시간이 지나면 콘솔과 Web 터미널이 잠깁니다. 잠금 비밀번호를 입력해 해제합니다. 관리자 설정이"
-" 기본값과 상한입니다. 사용자는 더 엄격하게 설정할 수 있으며, 직접 설정하지 않으면 관리자를 따릅니다."
+"0은 자동 잠금을 비활성화합니다. 유휴 시간이 초과되면 잠깁니다. 계정을 전환해도 이전 계정의 유휴 시간은 초기화되지 않습니다. 잠금 "
+"비밀번호로 해제합니다. 외부 앱 창은 보호되지 않습니다."
 
 #: settings/serializers/feature.py
 msgid "Asset application scope"
@@ -18133,3 +18123,67 @@ msgstr "티켓으로 자산 접근 권한을 신청할 때 선택할 수 있는 
 #: chat_ai/models.py
 msgid "Chat AI conversation audit"
 msgstr "AI 대화 감사"
+
+#: apps/settings/serializers/security.py
+msgid ""
+"0 disables idle locking. Locks the console and Web terminal after the "
+"specified idle time. Enter the lock password to unlock. With idle locking "
+"enabled, closing all pages also locks this login after 10 seconds. Close-"
+"page sign-out takes priority. Refreshing or reopening within 10 seconds "
+"cancels this. Administrator settings are defaults and limits. Users may "
+"choose stricter settings; otherwise they follow the administrator."
+msgstr ""
+"0은 유휴 잠금을 끕니다. 설정한 유휴 시간이 지나면 콘솔과 Web 터미널이 잠깁니다. 잠금 비밀번호를 입력해 해제합니다. 유휴 잠금이 "
+"켜져 있으면 모든 페이지를 닫아도 10초 후 잠깁니다. 페이지 종료 시 로그아웃 설정이 우선합니다. 10초 안에 새로 고치거나 다시 열면"
+" 취소됩니다. 관리자 설정이 기본값과 상한입니다. 사용자는 더 엄격하게 설정할 수 있으며, 직접 설정하지 않으면 관리자를 따릅니다."
+
+#: apps/settings/serializers/security.py:222
+msgid ""
+"When renewal is disabled, the login expires after this duration, even if the"
+" session is saved or identity is verified again. When renewal is enabled, "
+"each renewal grants this duration again. Changes apply to new logins without"
+" restarting Core."
+msgstr ""
+"갱신을 끄면 로그인 성공 시점부터 이 시간이 지나면 만료됩니다. 세션 저장이나 재인증으로 연장되지 않습니다. 갱신을 켜면 갱신할 때마다 "
+"이 시간이 다시 적용됩니다. 변경 사항은 재시작 없이 새 로그인에 적용됩니다."
+
+#: apps/settings/serializers/security.py:230
+msgid ""
+"Requests can extend the session at most once per minute. Background business"
+" requests also count; profile, online-status and lock-status polling do not."
+" Disabled: the expiry time stays fixed. Changes apply to new logins without "
+"restarting Core."
+msgstr ""
+"요청에 의한 세션 갱신은 분당 최대 한 번입니다. 백그라운드 업무 요청도 포함되지만 프로필, 온라인 상태, 잠금 상태 조회는 제외됩니다."
+" 끄면 만료 시간이 고정됩니다. 변경 사항은 재시작 없이 새 로그인에 적용됩니다."
+
+#: apps/settings/serializers/security.py:299
+msgid "Log in again after exiting the browser"
+msgstr "브라우저 종료 후 다시 로그인"
+
+#: apps/settings/serializers/security.py:299
+msgid ""
+"Require a new login after quitting the browser application. Closing a tab or"
+" window does not count. Browser session restore may preserve the login; use "
+"Sign out to reliably end it. Changes apply to new logins."
+msgstr ""
+"브라우저 앱을 종료한 후 다시 로그인해야 합니다. 탭이나 창을 닫는 것은 포함되지 않습니다. 브라우저 복원 기능이 로그인을 유지할 수 "
+"있으므로 확실히 종료하려면 로그아웃하세요. 변경 사항은 새 로그인에 적용됩니다."
+
+msgid "Log in again after exiting the browser or closing all JumpServer pages"
+msgstr "브라우저 종료 또는 모든 페이지를 닫은 후 다시 로그인"
+
+msgid ""
+"End this login 10 seconds after all console and Web terminal pages for it "
+"close. Refreshing or reopening a page within 10 seconds cancels sign-out. A "
+"browser crash may prevent the close report; use Sign out to reliably end the"
+" login. Changes apply to new logins."
+msgstr ""
+"같은 로그인의 콘솔과 Web 터미널 페이지를 모두 닫으면 약 10초 후 로그아웃됩니다. 10초 안에 새로 고치거나 다시 열면 취소됩니다."
+" 비정상 종료 시 알리지 못할 수 있으므로 확실히 종료하려면 로그아웃하세요. 변경 사항은 새 로그인에 적용됩니다."
+
+msgid "Session policy"
+msgstr "세션 정책"
+
+msgid "Log in again when the browser closes"
+msgstr "브라우저를 닫으면 다시 로그인"
