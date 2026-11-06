@@ -37,9 +37,10 @@ class WebSessionLockMiddleware(MiddlewareMixin):
         session = request.session
         if not session.session_key:
             return None
-        from authentication.services.web_session_lock import session_locked, WebSessionLocked
+        from authentication.services.web_session_lock import WebSessionLocked
+        from common.sessions import policy_locked
 
-        if session_locked(session.session_key, request.user.pk, session.login_policy):
+        if policy_locked(session.login_policy):
             error = WebSessionLocked()
             return JsonResponse(error.detail, status=error.status_code)
         return None

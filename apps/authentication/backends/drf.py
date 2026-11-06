@@ -191,8 +191,10 @@ class SessionAuthentication(authentication.SessionAuthentication):
             )
         )
         if not self.allow_locked_web_session and not bootstrap:
-            from authentication.services.web_session_lock import session_locked, WebSessionLocked
-            if session_locked(request.session.session_key, user.pk, request.session.login_policy):
+            from authentication.services.web_session_lock import WebSessionLocked
+            from common.sessions import policy_locked
+
+            if policy_locked(request.session.login_policy):
                 raise WebSessionLocked()
         return user, None
 

@@ -73,9 +73,9 @@ def allow_access(private_file):
     if path_perm == 'none':
         return True
     if request.user.is_authenticated and request.session.session_key:
-        from authentication.services.web_session_lock import session_locked
+        from common.sessions import policy_locked
 
-        if session_locked(request.session.session_key, request.user.pk, request.session.login_policy):
+        if policy_locked(request.session.login_policy):
             return False
     if path_base == 'playbooks':
         from django.db.models import Q
