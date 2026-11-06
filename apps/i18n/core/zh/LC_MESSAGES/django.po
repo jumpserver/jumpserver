@@ -8536,7 +8536,15 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test smtp setting"
 msgstr "测试 smtp 设置"
 
-#: settings/api/ldap.py:92
+#: settings/api/ldap.py:41
+msgid "LDAP server is not configured. Please configure it in Authentication settings."
+msgstr "未配置 LDAP 服务器，请先在认证设置中完成配置。"
+
+#: settings/api/ldap.py:52
+msgid "Unable to load LDAP users. Please try again later or contact the administrator."
+msgstr "获取 LDAP 用户失败，请稍后重试或联系管理员。"
+
+#: settings/api/ldap.py:58
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
 msgstr "用户未同步，请点击同步用户按钮"

@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
-from rest_framework.views import Response
 
+from common.exceptions import JMSException
 from common.utils import get_logger
 from users.models import User
-from ..const import ImportStatus
 from ..models import Setting
-from ..serializers import LDAPUserSerializer
+from ..serializers import LDAPUserQuerySerializer, LDAPUserSerializer
 from ..utils import (
     LDAPServerUtil, LDAPCacheUtil,
     LDAP_USE_CACHE_FLAGS
@@ -17,6 +18,7 @@ from ..utils import (
 logger = get_logger(__file__)
 
 
+@extend_schema(parameters=[LDAPUserQuerySerializer])
 class LDAPUserListApi(generics.ListAPIView):
     serializer_class = LDAPUserSerializer
     perm_model = Setting
@@ -24,26 +26,37 @@ class LDAPUserListApi(generics.ListAPIView):
         'list': 'settings.change_auth'
     }
 
-    def get_queryset_from_cache(self):
-        search_value = self.request.query_params.get('search')
-        category = self.request.query_params.get('category')
-        users = LDAPCacheUtil(category=category).search(search_value=search_value)
-        return users
-
-    def get_queryset_from_server(self):
-        search_value = self.request.query_params.get('search')
-        category = self.request.query_params.get('category')
-        users = LDAPServerUtil(category=category).search(search_value=search_value)
-        return users
-
     def get_queryset(self):
         if hasattr(self, 'swagger_fake_view'):
             return User.objects.none()
+
+        # Keep explicit empty values from being treated as omitted HTML fields.
+        query = LDAPUserQuerySerializer(data=self.request.query_params.dict())
+        query.is_valid(raise_exception=True)
+        category = query.validated_data['category']
+        server_uri = getattr(settings, f'AUTH_{category.upper()}_SERVER_URI')
+        if not (server_uri or '').strip():
+            raise JMSException(
+                code='ldap_not_configured',
+                detail=_('LDAP server is not configured. Please configure it in Authentication settings.'),
+            )
+
         cache_police = self.request.query_params.get('cache_police', True)
-        if cache_police in LDAP_USE_CACHE_FLAGS:
-            users = self.get_queryset_from_cache()
-        else:
-            users = self.get_queryset_from_server()
+        util_class = LDAPCacheUtil if cache_police in LDAP_USE_CACHE_FLAGS else LDAPServerUtil
+        try:
+            users = util_class(category=category).search(search_value=self.request.query_params.get('search'))
+        except Exception as exc:
+            logger.exception('Failed to query %s users', category)
+            raise JMSException(
+                code='ldap_query_failed',
+                detail=_('Unable to load LDAP users. Please try again later or contact the administrator.'),
+            ) from exc
+
+        if users is None:
+            raise JMSException(
+                code='ldap_users_not_synchronized',
+                detail=_('Users are not synchronized, please click the user synchronization button'),
+            )
         return users
 
     @staticmethod
@@ -72,22 +85,3 @@ class LDAPUserListApi(generics.ListAPIView):
         queryset = self.processing_queryset(queryset)
         queryset = self.sort_queryset(queryset)
         return queryset
-
-    def list(self, request, *args, **kwargs):
-        cache_police = self.request.query_params.get('cache_police', True)
-        # 不是用缓存
-        if cache_police not in LDAP_USE_CACHE_FLAGS:
-            return super().list(request, *args, **kwargs)
-
-        try:
-            queryset = self.get_queryset()
-        except Exception as e:
-            data = {'error': str(e)}
-            return Response(data=data, status=400)
-
-        # 缓存有数据
-        if queryset is not None:
-            return super().list(request, *args, **kwargs)
-        else:
-            data = {'msg': _('Users are not synchronized, please click the user synchronization button')}
-            return Response(data=data, status=400)

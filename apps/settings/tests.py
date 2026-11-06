@@ -6,6 +6,9 @@ from django.conf import settings
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth.models import AnonymousUser
 from django.test import SimpleTestCase, override_settings
+from django.urls import path
+from drf_spectacular.generators import SchemaGenerator
+from rest_framework.test import APIRequestFactory
 
 from jumpserver.conf import Config
 from jumpserver.rewriting.smtp import EmailBackend
@@ -14,6 +17,7 @@ from settings.serializers.feature import ChatAISettingSerializer
 from settings.serializers.cleaning import CleaningSerializer
 from settings.serializers.msg import EmailSettingSerializer
 from settings.ws import LdapWebsocket
+from settings.utils.ldap import LDAPServerUtil
 from users.models import User
 
 
@@ -164,7 +168,110 @@ class ChatAISettingSerializerTestCase(SimpleTestCase):
         self.assertIn('CHAT_AI_EMBED_URL', serializer.errors)
 
 
+@override_settings(
+    DEBUG_DEV=False,
+    AUTH_LDAP_SERVER_URI='ldap://primary.example.test',
+    AUTH_LDAP_HA_SERVER_URI='ldap://secondary.example.test',
+)
 class LDAPUserListApiTest(SimpleTestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.api = LDAPUserListApi.as_view(
+            authentication_classes=[], permission_classes=[], throttle_classes=[],
+        )
+        self.cache_get = self.enterContext(patch('settings.utils.ldap.cache.get', return_value=[]))
+        self.server_search = self.enterContext(patch.object(
+            LDAPServerUtil, 'search', autospec=True, return_value=[],
+        ))
+
+    def get(self, **params):
+        request = self.factory.get('/api/v1/settings/ldap/users/', {'limit': 1, **params})
+        response = self.api(request)
+        response.render()
+        self.assertEqual(response['Content-Type'], 'application/json')
+        return response
+
+    def test_default_and_explicit_categories_work_on_both_query_paths(self):
+        for params, category in [({}, 'ldap'), ({'category': 'ldap'}, 'ldap'),
+                                 ({'category': 'ldap_ha'}, 'ldap_ha')]:
+            for cache_police in ('1', '0'):
+                with self.subTest(params=params, cache_police=cache_police):
+                    self.cache_get.reset_mock()
+                    self.server_search.reset_mock()
+                    response = self.get(cache_police=cache_police, **params)
+                    self.assertEqual(response.status_code, 200)
+                    if cache_police == '1':
+                        self.cache_get.assert_called_once_with(f'CACHE_KEY_{category.upper()}_USERS')
+                        self.server_search.assert_not_called()
+                    else:
+                        self.assertEqual(self.server_search.call_args.args[0].config.category, category)
+                        self.server_search.assert_called_once()
+                        self.cache_get.assert_not_called()
+
+    def test_invalid_categories_are_rejected_before_querying(self):
+        for category in ('', 'unknown', 'LDAP'):
+            for cache_police in ('1', '0'):
+                with self.subTest(category=category, cache_police=cache_police):
+                    response = self.get(category=category, cache_police=cache_police)
+                    self.assertEqual(response.status_code, 400)
+                    self.assertIn('category', response.data)
+        self.cache_get.assert_not_called()
+        self.server_search.assert_not_called()
+
+    def test_missing_server_configuration_is_a_business_error(self):
+        for category in ('ldap', 'ldap_ha'):
+            for server_uri in ('', None, '  '):
+                for cache_police in ('1', '0'):
+                    with self.subTest(category=category, server_uri=server_uri, cache_police=cache_police), \
+                            self.settings(**{f'AUTH_{category.upper()}_SERVER_URI': server_uri}):
+                        response = self.get(category=category, cache_police=cache_police)
+                        self.assertEqual(response.status_code, 400)
+                        self.assertEqual(response.data['code'], 'ldap_not_configured')
+                        self.assertEqual(set(response.data), {'detail', 'code'})
+        self.cache_get.assert_not_called()
+        self.server_search.assert_not_called()
+
+    def test_unsynchronized_users_have_a_structured_error(self):
+        self.cache_get.return_value = None
+        response = self.get(category='ldap')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['code'], 'ldap_users_not_synchronized')
+        self.assertEqual(set(response.data), {'detail', 'code'})
+
+    def test_query_failures_are_logged_without_exposing_exception_text(self):
+        for cache_police, query in [('1', self.cache_get), ('0', self.server_search)]:
+            with self.subTest(cache_police=cache_police), patch('settings.api.ldap.logger.exception') as log:
+                query.side_effect = RuntimeError('internal traceback marker')
+                response = self.get(category='ldap', cache_police=cache_police)
+                query.side_effect = None
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.data['code'], 'ldap_query_failed')
+                self.assertNotIn(b'internal traceback marker', response.content)
+                log.assert_called_once()
+
+    def test_success_keeps_user_fields_search_and_pagination(self):
+        for cache_police in ('1', '0'):
+            with self.subTest(cache_police=cache_police), patch('settings.api.ldap.User.objects.all') as users:
+                users.return_value.values_list.return_value = ['alice']
+                entries = [{'username': 'alice', 'name': 'Alice', 'email': 'alice@example.test', 'groups': ['Ops']}]
+                self.cache_get.return_value = entries
+                self.server_search.return_value = entries
+                response = self.get(category='ldap', cache_police=cache_police, search='alice')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data['count'], 1)
+                self.assertEqual(response.data['results'], [{**entries[0], 'id': 'alice', 'existing': True}])
+                if cache_police == '0':
+                    self.assertEqual(self.server_search.call_args.kwargs['search_value'], 'alice')
+
+    def test_schema_documents_the_category_default_and_choices(self):
+        url = 'api/v1/settings/ldap/users/'
+        schema = SchemaGenerator(patterns=[path(url, LDAPUserListApi.as_view())]).get_schema(public=True)
+        parameters = schema['paths'][f'/{url}']['get']['parameters']
+        category = next(parameter for parameter in parameters if parameter['name'] == 'category')
+        self.assertEqual(category['schema']['enum'], ['ldap', 'ldap_ha'])
+        self.assertEqual(category['schema']['default'], 'ldap')
+        self.assertFalse(category.get('required', False))
+
     def test_sort_ignores_missing_field(self):
         view = LDAPUserListApi()
         view.request = SimpleNamespace(query_params={'order': 'date_updated'})
