@@ -20366,3 +20366,19 @@ msgstr "无补充说明"
 #: xpack/plugins/cloud/models.py xpack/plugins/cloud/serializers/task.py
 msgid "First seen at"
 msgstr "首次发现时间"
+
+#: settings/api/settings.py
+msgid "Invalid settings category."
+msgstr "无效的配置分组。"
+
+#: settings/serializers/security.py
+msgid "Provide either ip or a non-empty ips list."
+msgstr "请提供 ip 或非空的 ips 列表。"
+
+#: settings/serializers/security.py
+msgid "Provide only one of ip or ips."
+msgstr "ip 和 ips 只能提供其中一个。"
+
+#: terminal/api/component/storage.py
+msgid "Deleting storage of type \"{}\" is not allowed"
+msgstr "不允许删除类型为“{}”的存储配置"

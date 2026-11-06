@@ -30,8 +30,11 @@ class BaseStorageViewSetMixin(CommonApiMixin):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.type_null_or_server or instance.is_default:
+        if instance.is_default:
             data = {'msg': _('Deleting the default storage is not allowed')}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        if instance.type_null_or_server:
+            data = {'msg': _('Deleting storage of type "{}" is not allowed').format(instance.type)}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         used_by = instance.used_by()
         if used_by:
