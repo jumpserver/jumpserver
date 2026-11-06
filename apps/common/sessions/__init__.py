@@ -1,6 +1,6 @@
 import json
 import re
-from contextlib import nullcontext
+from contextlib import contextmanager, nullcontext
 from datetime import datetime, timezone as datetime_timezone
 from importlib import import_module
 from math import ceil
@@ -18,14 +18,44 @@ LOGIN_POLICY_KEY = '_jms_login_policy'
 PAGE_CLOSE_GRACE_SECONDS = 10
 
 
-def closed_pages_locked(policy):
-    return bool(policy and policy.get('close_lock_at', float('inf')) <= timezone.now().timestamp())
+class SessionStateConflict(Exception):
+    pass
 
 
-def _session_lock(session_key):
+def normalize_security_state(policy, *, legacy_locked=False):
+    """A due close action is deterministic, including before its next persisted write."""
+    policy = dict(policy)
+    policy.setdefault('locked', legacy_locked)
+    policy.setdefault('state_version', 0)
+    if 'pending_close' not in policy:
+        for name, action in (('closing_at', 'logout'), ('close_lock_at', 'lock')):
+            if name in policy:
+                policy['pending_close'] = {'action': action, 'at': policy[name]}
+                break
+    policy.pop('closing_at', None)
+    policy.pop('close_lock_at', None)
+    pending = policy.get('pending_close')
+    if pending and pending['action'] == 'lock' and pending['at'] <= timezone.now().timestamp():
+        policy['locked'] = True
+        policy['state_version'] += 1
+        policy.pop('pending_close')
+    return policy
+
+
+def policy_expiry(policy):
+    pending = policy.get('pending_close')
+    close_at = pending['at'] if pending and pending['action'] == 'logout' else float('inf')
+    return min(policy['expires_at'], policy.get('closing_at', float('inf')), close_at)
+
+
+def policy_locked(policy, *, legacy_locked=False):
+    return normalize_security_state(policy, legacy_locked=legacy_locked)['locked'] if policy else legacy_locked
+
+
+def _session_lock(session_key, *, renew=False):
     return DistributedLock(
         'web-session-save:' + salted_hmac('session-save', session_key).hexdigest(),
-        expire=10,
+        expire=None if renew else 10, reentrant=True,
     )
 
 
@@ -67,10 +97,11 @@ class SessionSaveMixin:
     def load(self):
         data = super().load()
         policy = data.get(LOGIN_POLICY_KEY)
-        if (policy and min(policy['expires_at'], policy.get('closing_at', policy['expires_at']))
-                <= timezone.now().timestamp()):
+        if policy and policy_expiry(policy) <= timezone.now().timestamp():
             self._session_key = None
             return {}
+        if policy:
+            data[LOGIN_POLICY_KEY] = self._security_policy(policy, user_id=data.get('_auth_user_id'))
         return data
 
     async def aload(self):
@@ -82,8 +113,12 @@ class SessionSaveMixin:
         policy['expires_at'] = expires_at.timestamp() if expires_at else timestamp + policy['duration']
         policy['renewed_at'] = min(timestamp, policy['expires_at'] - policy['duration'])
         policy['authenticated_at'] = None if expires_at else timestamp
+        policy.update(locked=False, state_version=0)
+        if expires_at:
+            # Adopt an older login without discarding an existing screen lock.
+            policy.pop('locked')
+            policy = self._security_policy(policy)
         self[LOGIN_POLICY_KEY] = policy
-        self._new_login_policy = True
 
     def ensure_login_policy(self):
         if self.get('_auth_user_id') and not self.login_policy:
@@ -92,7 +127,7 @@ class SessionSaveMixin:
 
     def get_expiry_date(self, **kwargs):
         if policy := self.login_policy:
-            expires_at = min(policy['expires_at'], policy.get('closing_at', policy['expires_at']))
+            expires_at = policy_expiry(policy)
             return datetime.fromtimestamp(expires_at, tz=datetime_timezone.utc)
         return super().get_expiry_date(**kwargs)
 
@@ -105,12 +140,45 @@ class SessionSaveMixin:
         # Already saved under the session lock; the response middleware need not save it again.
         self.modified = False
 
-    def clear_close_lock(self):
-        # Only a verified unlock may clear a close deadline that has already passed.
-        policy = self.login_policy or {}
-        self._clear_close_lock = policy.get('close_lock_at'), tuple(policy.get('closed_pages', ()))
-        self.save()
-        self.modified = False
+    def _security_policy(self, policy, *, user_id=None):
+        legacy_locked = False
+        if 'locked' not in policy:
+            from audits.models import UserSession
+            legacy_locked = UserSession.objects.filter(
+                key=self.session_key,
+                user_id=user_id or getattr(self, '_session_cache', {}).get('_auth_user_id'), is_locked=True,
+            ).exists()
+        return normalize_security_state(policy, legacy_locked=legacy_locked)
+
+    @contextmanager
+    def control(self):
+        """Serialize security mutations with page changes, ordinary saves and logout."""
+        key = self.session_key
+        if not key:
+            raise UpdateError('The login has expired.')
+        with _session_lock(key, renew=True):
+            pending_data = dict(self._session_cache) if self.modified and hasattr(self, '_session_cache') else None
+            data = self.load()
+            self._session_cache = data
+            if not data.get('_auth_user_id') or self.session_key is None:
+                raise UpdateError('The login has expired.')
+            if pending_data is not None:
+                # Login middleware may just have completed MFA/SSO in this request.
+                # Retain its additions/removals, but always take security state from storage.
+                pending_data.pop(LOGIN_POLICY_KEY, None)
+                if LOGIN_POLICY_KEY in data:
+                    pending_data[LOGIN_POLICY_KEY] = data[LOGIN_POLICY_KEY]
+                self._session_cache = pending_data
+            self.ensure_login_policy()
+            yield
+
+    def set_locked(self, locked, expected_version):
+        self._lock_action = locked, expected_version
+        try:
+            self.save()
+            self.modified = False
+        finally:
+            self._lock_action = None
 
     async def aget_expiry_date(self, **kwargs):
         return await sync_to_async(self.get_expiry_date)(**kwargs)
@@ -141,51 +209,61 @@ class SessionSaveMixin:
             if existing_session:
                 # Saves and deletion share the lock so a pending write cannot undo logout.
                 stored = super().load().get(LOGIN_POLICY_KEY)
+                if stored:
+                    stored = self._security_policy(stored)
                 if self.session_key is None:
                     self._session_key = key
                     raise UpdateError('The login has expired.')
-                if stored and self.login_policy and not getattr(self, '_new_login_policy', False):
-                    policy = dict(self.login_policy)
+                if stored and self.login_policy:
+                    policy = normalize_security_state(self.login_policy)
                     if stored['renewed_at'] > policy['renewed_at']:
                         policy.update(renewed_at=stored['renewed_at'], expires_at=stored['expires_at'])
-                    for name in ('closing_at', 'close_lock_at', 'pages', 'closed_pages'):
+                    for name in ('locked', 'state_version', 'unlocked_at', 'pending_close', 'pages', 'closed_pages'):
                         policy.pop(name, None)
                         if name in stored:
                             policy[name] = stored[name]
                     self._session_cache[LOGIN_POLICY_KEY] = policy
             if self.login_policy and self.get_expiry_date() <= timezone.now():
                 raise UpdateError('The login has expired.')
-            if (close_lock := getattr(self, '_clear_close_lock', None)) and self.login_policy:
-                policy = self._session_cache[LOGIN_POLICY_KEY]
-                # A close arriving during verification must keep its lock deadline.
-                if close_lock == (policy.get('close_lock_at'), tuple(policy.get('closed_pages', ()))):
-                    policy.pop('close_lock_at', None)
-            if action := getattr(self, '_page_action', None):
-                page_id, entering, lock_on_close = action
-                policy = dict(self.login_policy)
-                pages = set(policy.get('pages', ()))
-                closed = list(policy.get('closed_pages', ()))
-                if page_id not in closed:
-                    if entering:
-                        pages.add(page_id)
-                        policy.pop('closing_at', None)
-                        if not closed_pages_locked(policy):
-                            policy.pop('close_lock_at', None)
-                    else:
-                        pages.discard(page_id)
-                        closed.append(page_id)
-                        if not pages and (policy['browser_close'] or lock_on_close):
-                            deadline = 'closing_at' if policy['browser_close'] else 'close_lock_at'
-                            policy[deadline] = min(policy.get(deadline, float('inf')),
-                                                   timezone.now().timestamp() + PAGE_CLOSE_GRACE_SECONDS)
-                # ponytail: retain 128 closed IDs for reordered delivery, not crash detection.
-                # A leased presence registry is the upgrade path if crash detection is required.
-                policy.update(pages=sorted(pages), closed_pages=closed[-128:])
+            if self.login_policy:
+                policy = self._security_policy(self.login_policy)
                 self._session_cache[LOGIN_POLICY_KEY] = policy
+                if lock_action := getattr(self, '_lock_action', None):
+                    locked, expected_version = lock_action
+                    if expected_version != policy['state_version']:
+                        raise SessionStateConflict()
+                    pending = policy.get('pending_close')
+                    if policy['locked'] != locked or (pending and pending['action'] == 'lock'):
+                        policy['locked'] = locked
+                        policy['state_version'] += 1
+                        if not locked:
+                            policy['unlocked_at'] = timezone.now().timestamp()
+                        if pending and pending['action'] == 'lock':
+                            policy.pop('pending_close')
+                if action := getattr(self, '_page_action', None):
+                    page_id, entering, lock_on_close = action
+                    pages = set(policy.get('pages', ()))
+                    closed = list(policy.get('closed_pages', ()))
+                    if page_id not in closed:
+                        if entering:
+                            pages.add(page_id)
+                            if policy.pop('pending_close', None):
+                                policy['state_version'] += 1
+                        else:
+                            pages.discard(page_id)
+                            closed.append(page_id)
+                            if not pages and (policy['browser_close'] or lock_on_close):
+                                if not policy.get('pending_close'):
+                                    policy['pending_close'] = {
+                                        'action': 'logout' if policy['browser_close'] else 'lock',
+                                        'at': timezone.now().timestamp() + PAGE_CLOSE_GRACE_SECONDS,
+                                    }
+                                    policy['state_version'] += 1
+                    # ponytail: retain 128 closed IDs for reordered delivery, not crash detection.
+                    # A leased presence registry is the upgrade path if crash detection is required.
+                    policy.update(pages=sorted(pages), closed_pages=closed[-128:])
             result = super().save(must_create=must_create)
-            self._new_login_policy = False
             self._page_action = None
-            self._clear_close_lock = None
             return result
 
     async def asave(self, *args, **kwargs):

@@ -467,7 +467,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
             IDLE_LOCK_CATEGORY, PERSONAL_SETTINGS, effective_idle_lock_time,
             idle_lock_limits, personal_client_login_policy,
         )
-        from common.sessions import closed_pages_locked, session_login_policies
+        from common.sessions import policy_locked, policy_expiry, session_login_policies
         from users.models import Preference
         from .models import _get_city_display
 
@@ -495,9 +495,9 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
                 }
             else:
                 policy = web_policies.get(row['key'])
-                row['is_locked'] = row['is_locked'] or closed_pages_locked(policy)
+                row['is_locked'] = policy_locked(policy, legacy_locked=row['is_locked'])
                 row['date_expired'] = (
-                    datetime.fromtimestamp(min(policy['expires_at'], policy.get('closing_at', policy['expires_at'])),
+                    datetime.fromtimestamp(policy_expiry(policy),
                                            tz=datetime_timezone.utc) if policy
                     else UserSession(key=row['key']).date_expired
                 )

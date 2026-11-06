@@ -3,7 +3,7 @@ from django.utils.crypto import salted_hmac
 from rest_framework.exceptions import PermissionDenied
 
 from audits.models import UserSession
-from common.sessions import closed_pages_locked
+from common.sessions import policy_locked
 
 
 def session_scope(session_key):
@@ -25,17 +25,11 @@ def clear_web_session_cache(session_key):
 
 
 def session_locked(session_key, user_id, policy):
-    # The stored deadline also applies with no page open; no timer or cache write is needed.
-    if closed_pages_locked(policy):
-        return True
-    key = lock_cache_key(session_key)
-    locked = cache.get(key)
-    if locked is None:
-        locked = UserSession.objects.filter(key=session_key, user_id=user_id, is_locked=True).exists()
-        # A concurrent lock/unlock must win over an older cache-miss reader.
-        cache.add(key, locked, timeout=60)
-        locked = cache.get(key, locked)
-    return locked
+    if policy and 'locked' in policy:
+        return policy_locked(policy)
+    # Existing logins are adopted into their Session policy on the first status/save.
+    legacy_locked = UserSession.objects.filter(key=session_key, user_id=user_id, is_locked=True).exists()
+    return policy_locked(policy, legacy_locked=legacy_locked)
 
 
 class WebSessionLocked(PermissionDenied):
