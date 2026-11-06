@@ -18131,6 +18131,22 @@ msgstr "無補充說明"
 msgid "First seen at"
 msgstr "首次發現時間"
 
+#: settings/api/settings.py
+msgid "Invalid settings category."
+msgstr "無效的設定分組。"
+
+#: settings/serializers/security.py
+msgid "Provide either ip or a non-empty ips list."
+msgstr "請提供 ip 或非空的 ips 清單。"
+
+#: settings/serializers/security.py
+msgid "Provide only one of ip or ips."
+msgstr "ip 和 ips 只能提供其中一個。"
+
+#: terminal/api/component/storage.py
+msgid "Deleting storage of type \"{}\" is not allowed"
+msgstr "不允許刪除類型為「{}」的儲存設定"
+
 #: xpack/plugins/cloud/manager.py
 #, python-format
 msgid ""

@@ -8,7 +8,9 @@ from django.core.cache import cache
 from django.db import transaction
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
 from django.views.static import serve
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -139,8 +141,17 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         return Setting.objects.all()
 
+    def get_category(self):
+        category = self.request.query_params.get('category', 'basic')
+        if category not in self.serializer_class_mapper:
+            raise ValidationError({
+                'category': [_('Invalid settings category.')],
+                'valid_categories': list(self.serializer_class_mapper),
+            })
+        return category
+
     def check_permissions(self, request):
-        category = request.query_params.get('category', 'basic')
+        category = self.get_category()
         perm_required = self.rbac_category_permissions.get(category)
 
         if perm_required == 'settings.view_setting' and \
@@ -152,10 +163,38 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             self.permission_denied(request)
 
     def get_serializer_class(self):
-        category = self.request.query_params.get('category', 'basic')
-        default = serializers.BasicSettingSerializer
-        cls = self.serializer_class_mapper.get(category, default)
-        return cls
+        return self.serializer_class_mapper[self.get_category()]
+
+    category_parameters = [
+        OpenApiParameter(
+            'category', str, OpenApiParameter.QUERY,
+            enum=list(serializer_class_mapper), default='basic',
+            description='Settings group. Omitted values default to basic; unknown values return 400.',
+        ),
+        OpenApiParameter(
+            'X-Settings-Category', str, OpenApiParameter.HEADER,
+            enum=list(serializer_class_mapper), response=True,
+            description='The settings group used for this request.',
+        ),
+    ]
+
+    @extend_schema(parameters=category_parameters)
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(parameters=category_parameters)
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @extend_schema(parameters=category_parameters)
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        if 200 <= response.status_code < 300:
+            response['X-Settings-Category'] = self.get_category()
+        return response
 
     def get_fields(self):
         serializer = self.get_serializer_class()()
@@ -186,7 +225,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         data = []
         fields = self.get_fields()
         encrypted_items = [name for name, field in fields.items() if field.write_only]
-        category = self.request.query_params.get('category', '')
+        category = self.get_category()
         for name, value in serializer.validated_data.items():
             encrypted = name in encrypted_items
             if encrypted and value in ['', None]:
@@ -198,7 +237,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         return data
 
     def send_signal(self, serializer):
-        category = self.request.query_params.get('category', '')
+        category = self.get_category()
         category_setting_updated.send(sender=self.__class__, category=category, serializer=serializer)
 
     def perform_update(self, serializer):

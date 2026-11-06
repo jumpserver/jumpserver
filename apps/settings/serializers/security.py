@@ -9,7 +9,8 @@ __all__ = [
     'SecurityPasswordRuleSerializer', 'SecuritySessionSerializer',
     'SecurityAuthSerializer', 'SecuritySettingSerializer',
     'SecurityLoginLimitSerializer', 'SecurityBasicSerializer',
-    'SecurityBlockIPSerializer', 'LeakPasswordPSerializer'
+    'SecurityBlockIPSerializer', 'SecurityUnlockIPSerializer',
+    'SecurityUnlockIPResultSerializer', 'LeakPasswordPSerializer'
 ]
 
 from settings.models import LeakPasswords
@@ -356,6 +357,37 @@ class SecuritySettingSerializer(
 class SecurityBlockIPSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)
     ip = serializers.CharField(max_length=1024, required=False, allow_blank=True)
+
+
+class LoginIPAddressField(serializers.IPAddressField):
+    """Validate IPs without changing the spelling used by login cache keys."""
+
+    def to_internal_value(self, data):
+        super().to_internal_value(data)
+        return data.strip()
+
+
+class SecurityUnlockIPSerializer(serializers.Serializer):
+    ip = LoginIPAddressField(
+        required=False, help_text=_('Provide either ip or a non-empty ips list.'),
+    )
+    ips = serializers.ListField(
+        child=LoginIPAddressField(), required=False, allow_empty=False,
+        help_text=_('Provide either ip or a non-empty ips list.'),
+    )
+
+    def validate(self, attrs):
+        if 'ip' not in attrs and 'ips' not in attrs:
+            raise serializers.ValidationError({
+                'ip': [_('Provide either ip or a non-empty ips list.')],
+            })
+        if 'ip' in attrs and 'ips' in attrs:
+            raise serializers.ValidationError(_('Provide only one of ip or ips.'))
+        return attrs
+
+
+class SecurityUnlockIPResultSerializer(serializers.Serializer):
+    ips = serializers.ListField(child=serializers.IPAddressField())
 
 
 class LeakPasswordPSerializer(serializers.ModelSerializer):
