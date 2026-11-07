@@ -140,7 +140,7 @@ class JMSInventory:
         var = {
             'jms_custom_become': True,
             'jms_custom_become_method': su_method,
-            'jms_custom_become_user': su_from.full_username,
+            'jms_custom_become_user': escape_jinja2_syntax(su_from.full_username),
             'jms_custom_become_password': su_from_password,
             'jms_custom_become_private_key_path': (
                 su_from.get_private_key_path(path_dir)
