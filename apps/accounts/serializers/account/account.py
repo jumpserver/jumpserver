@@ -288,6 +288,14 @@ class AccountAssetSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_('Asset not found'))
 
 
+class SuFromAccountRelatedField(ObjectRelatedField):
+    def to_representation(self, value):
+        data = super().to_representation(value)
+        # 目录服务账号显示 UPN (user@domain)
+        data['username'] = value.full_username
+        return data
+
+
 class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
     asset_address = serializers.CharField(source='asset.address', read_only=True, label=_('Asset IP'))
@@ -295,7 +303,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         choices=Source.choices, label=_("Source"), required=False,
         allow_null=True, default=Source.LOCAL
     )
-    su_from = ObjectRelatedField(
+    su_from = SuFromAccountRelatedField(
         required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
         label=_('Su from'), attrs=('id', 'name', 'username')
     )
@@ -330,7 +338,8 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related(
             'asset', 'asset__platform',
-            'asset__platform__automation'
+            'asset__platform__automation',
+            'su_from__asset__platform', 'su_from__asset__ds'
         )
         return queryset
 
@@ -374,6 +383,11 @@ class AccountDetailSerializer(AccountSerializer):
         model = Account
         fields = AccountSerializer.Meta.fields + ['has_secret', 'spec_info', 'source_template']
         read_only_fields = AccountSerializer.Meta.read_only_fields + ['has_secret']
+
+
+class SuFromAccountSerializer(AccountSerializer):
+    # 切换自下拉框显示 "名称(用户名)"，目录服务账号显示 UPN (user@domain)
+    username = serializers.CharField(source='full_username', read_only=True, label=_('Username'))
 
 
 class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):

@@ -152,8 +152,8 @@ class AccountViewSet(OrgBulkModelViewSet):
             accounts = asset.all_accounts
         else:
             accounts = Account.objects.none()
-        accounts = self.filter_queryset(accounts)
-        serializer = serializers.AccountSerializer(accounts, many=True)
+        accounts = self.filter_queryset(accounts).select_related('asset__platform', 'asset__ds')
+        serializer = serializers.SuFromAccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
 
     @action(
