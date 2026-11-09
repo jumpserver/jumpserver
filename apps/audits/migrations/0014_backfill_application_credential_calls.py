@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
 
     replaces = [('audits', '0011_backfill_application_credential_calls')]
     dependencies = [
-        ('audits', '0010_application_credential_call_records'),
+        ('audits', '0013_application_credential_call_records'),
         ('accounts', '0013_application_credentials'),
     ]
     operations = [migrations.RunPython(backfill_calls, migrations.RunPython.noop)]
