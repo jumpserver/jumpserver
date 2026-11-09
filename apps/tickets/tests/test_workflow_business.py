@@ -132,7 +132,7 @@ class WorkflowBusinessTests(TestCase):
 
     def test_expiry_and_withdrawal_close_ticket_without_grant(self):
         for operation in ('expire', 'cancel'):
-            ticket = self.ticket(self.workflow(timeout=1))
+            ticket = self.ticket(self.workflow(timeout=60))
             instance = submit_ticket(ticket)
             if operation == 'expire':
                 instance.node_instances.filter(state='running').update(deadline=timezone.now() - timedelta(seconds=1))
