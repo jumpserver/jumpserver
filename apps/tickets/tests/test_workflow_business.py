@@ -591,6 +591,7 @@ class WorkflowBusinessTests(TestCase):
         previous = Ticket.objects.count()
         response = self.api_request(TicketViewSet, 'open', self.applicant, data={**payload, 'workflow_id': str(invalid.pk)}, method='post', can_audit=True)
         self.assertEqual(response.status_code, 400, response.data)
+        self.assertIn(self.asset.name, str(response.data))
         self.assertEqual(Ticket.objects.count(), previous)
 
     def test_all_accounts_expands_before_conditions_and_does_not_grant_future_names(self):

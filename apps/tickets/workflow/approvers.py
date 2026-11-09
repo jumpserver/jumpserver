@@ -27,13 +27,17 @@ def available_users(org_id):
     )
 
 
-def snapshot_ids(values):
+def snapshot_ids(values, asset_name):
     if not isinstance(values, list) or not values:
-        raise WorkflowConfigurationError(gettext('The snapshot does not contain the required approver IDs.'))
+        raise WorkflowConfigurationError(gettext(
+            'Asset "{asset}" has no owner. Set its owner on the asset edit page.'
+        ).format(asset=asset_name))
     try:
         return {str(UUID(value)) for value in values}
     except (ValueError, TypeError, AttributeError):
-        raise WorkflowConfigurationError(gettext('Invalid approver IDs in the snapshot.'))
+        raise WorkflowConfigurationError(gettext(
+            'Asset "{asset}" has invalid owner information. Set its owner on the asset edit page.'
+        ).format(asset=asset_name))
 
 
 def excluded_approver_ids(config, context, applicant_id):
@@ -58,7 +62,7 @@ def resolve_approvers(config, context, org_id, applicant_id):
             if groups.count() != len(spec['value']):
                 raise WorkflowConfigurationError(gettext('An approver group is missing or belongs to another organization.'))
             users = users.filter(groups__in=groups)
-    elif kind in ('role', 'org_admin', 'applicant_manager'):
+    elif kind in ('role', 'org_admin'):
         roles = spec['value'] if kind == 'role' else [BuiltinRole.org_admin.id]
         bindings = RoleBinding.objects_raw.filter(role_id__in=roles).filter(
             Q(scope='org', org_id=org_id) | Q(scope='system', org__isnull=True)
@@ -67,15 +71,30 @@ def resolve_approvers(config, context, org_id, applicant_id):
     elif kind == 'asset_owner':
         assets = context.get('assets')
         if not isinstance(assets, list) or not assets:
-            raise WorkflowConfigurationError(gettext('The snapshot does not contain asset owners.'))
+            raise WorkflowConfigurationError(gettext(
+                'This request has no assets. Select assets or use another approver source.'
+            ))
         explicit_ids = set()
+        asset_owners = []
         for asset in assets:
-            explicit_ids.update(snapshot_ids(asset.get('owner_ids') if isinstance(asset, dict) else None))
+            if not isinstance(asset, dict):
+                raise WorkflowConfigurationError(gettext('Invalid asset information in the request.'))
+            name = asset.get('name') or asset.get('id') or '-'
+            owner_ids = snapshot_ids(asset.get('owner_ids'), name)
+            asset_owners.append((name, owner_ids))
+            explicit_ids.update(owner_ids)
     else:
         raise WorkflowConfigurationError(gettext('Unknown approver resolver.'))
     if explicit_ids is not None:
         users = users.filter(pk__in=explicit_ids)
-        if {str(pk) for pk in users.values_list('pk', flat=True)} != explicit_ids:
+        eligible_ids = {str(pk) for pk in users.values_list('pk', flat=True)}
+        if eligible_ids != explicit_ids:
+            if kind == 'asset_owner':
+                names = ', '.join(name for name, ids in asset_owners if ids - eligible_ids)
+                raise WorkflowConfigurationError(gettext(
+                    'The owners of these assets are unavailable (inactive, expired, deleted, or outside this organization): '
+                    '{assets}. Set valid owners on the asset edit page.'
+                ).format(assets=names))
             raise WorkflowConfigurationError(gettext('A configured approver is inactive, missing, or outside the organization.'))
     excluded = excluded_approver_ids(config, context, applicant_id)
     if excluded:

@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.db import transaction
 from django.test import SimpleTestCase, TestCase
 from django.utils import timezone
+from django.utils.translation import override
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -75,6 +76,7 @@ class WorkflowDefinitionTests(SimpleTestCase):
             {'strategy': 'quorum', 'required': True}, {'timeout_action': 'approve'},
             {'timeout': -1}, {'allow_transfer': 'true'}, {'approvers': {'type': []}},
             {'approvers': {'type': 'user', 'value': ['not-a-uuid']}}, {'script': 'print(1)'},
+            {'approvers': {'type': 'applicant_manager'}},
         ]:
             definition = deepcopy(self.definition)
             definition['nodes'][1]['config'].update(spec)
@@ -301,7 +303,7 @@ class WorkflowTests(TestCase):
             {'approvers': {'type': 'user', 'value': [str(self.outsider.pk)]}},
             {'strategy': 'quorum', 'required': 3},
             {'approvers': {'type': 'asset_owner'}},
-            {'approvers': {'type': 'applicant_manager'}},
+            {'approvers': {'type': 'org_admin'}},
             {'approvers': {'type': 'user', 'value': [str(self.applicant.pk)]}},
         ]:
             with self.subTest(config=config):
@@ -310,7 +312,7 @@ class WorkflowTests(TestCase):
                 self.assertEqual(instance.events.filter(type='workflow.error').count(), 1)
                 self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance, state='pending').exists())
 
-    def test_applicant_manager_resolves_ticket_organization_admins(self):
+    def test_org_admin_resolves_ticket_organization_admins(self):
         admin, _ = Role.objects.get_or_create(id=BuiltinRole.org_admin.id,
                                               defaults={'name': 'OrgAdmin', 'scope': 'org'})
         RoleBinding.objects_raw.bulk_create([
@@ -318,13 +320,43 @@ class WorkflowTests(TestCase):
             for org, user in [(self.org, self.alice), (self.org, self.applicant),
                               (self.other_org, self.bob), (self.other_org, self.outsider)]
         ])
-        workflow = self.create_workflow(approvers={'type': 'applicant_manager'})
-        for context in ({}, {'applicant': {'manager_id': str(self.carol.pk)}}):
-            with self.subTest(context=context), tmp_to_root_org():
-                instance = self.start(workflow, context=context)
-            self.assertEqual(instance.state, 'running')
-            self.assertEqual(set(ApprovalTask.objects.filter(node_instance__instance=instance)
-                                 .values_list('assignee_id', flat=True)), {self.alice.pk})
+        workflow = self.create_workflow(approvers={'type': 'org_admin'})
+        with tmp_to_root_org():
+            instance = self.start(workflow)
+        self.assertEqual(instance.state, 'running')
+        self.assertEqual(set(ApprovalTask.objects.filter(node_instance__instance=instance)
+                             .values_list('assignee_id', flat=True)), {self.alice.pk})
+
+    def test_asset_owner_errors_identify_the_asset_and_fail_closed(self):
+        cases = [
+            ([], '资产“数据库”未配置负责人，请在资产编辑页面设置负责人。'),
+            (['invalid-id'], '资产“数据库”的负责人信息无效，请在资产编辑页面重新设置负责人。'),
+            ([str(self.outsider.pk)], '以下资产的负责人不可用（未启用、已过期、已删除或不属于当前组织）：数据库。请在资产编辑页面设置有效负责人。'),
+        ]
+        for owner_ids, expected in cases:
+            with self.subTest(owner_ids=owner_ids), override('zh'):
+                instance = self.start(context={'assets': [
+                    {'name': '正常资产', 'owner_ids': [str(self.alice.pk)]},
+                    {'name': '数据库', 'owner_ids': owner_ids},
+                ]}, approvers={'type': 'asset_owner'})
+                self.assertEqual(instance.state, 'error')
+                self.assertEqual(instance.events.get(type='workflow.error').data['detail'], expected)
+                self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance).exists())
+
+    def test_asset_owner_errors_report_inactive_expired_and_deleted_owners(self):
+        for changes in ({'is_active': False}, {'date_expired': timezone.now() - timedelta(days=1)}, None):
+            with self.subTest(changes=changes), transaction.atomic(), override('zh'):
+                if changes is None:
+                    User.objects.filter(pk=self.alice.pk).delete()
+                else:
+                    User.objects.filter(pk=self.alice.pk).update(**changes)
+                instance = self.start(context={'assets': [
+                    {'name': '数据库', 'owner_ids': [str(self.alice.pk)]},
+                ]}, approvers={'type': 'asset_owner'})
+                self.assertEqual(instance.state, 'error')
+                self.assertIn('数据库', instance.events.get(type='workflow.error').data['detail'])
+                self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance).exists())
+                transaction.set_rollback(True)
 
     def test_error_after_vote_preserves_vote_and_stops_progress(self):
         definition = approval_definition([self.alice], levels=2)

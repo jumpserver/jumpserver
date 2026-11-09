@@ -7,7 +7,7 @@ from uuid import UUID
 from .conditions import validate_condition
 from .errors import WorkflowConfigurationError
 
-RESOLVERS = {'user', 'user_group', 'role', 'org_admin', 'applicant_manager', 'asset_owner'}
+RESOLVERS = {'user', 'user_group', 'role', 'org_admin', 'asset_owner'}
 
 
 def json_snapshot(value, max_bytes=262144):
