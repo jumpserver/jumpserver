@@ -15,6 +15,7 @@ from common.decorators import merge_delay_run
 from common.signals import django_ready
 from common.utils import get_logger, i18n_fmt
 from common.utils.connection import RedisPubSub
+from settings.signals import setting_changed
 from .exceptions import VaultException
 from .models import Account, AccountTemplate, PersonalAssetCredential
 from .tasks.push_account import push_accounts_to_assets_task
@@ -141,3 +142,9 @@ def subscribe_vault_change(sender, **kwargs):
     logger.debug("Start subscribe vault change")
 
     vault_pub_sub.subscribe(lambda name: refresh_vault_client())
+
+
+@receiver(setting_changed)
+def refresh_openbao_token(sender, name, **kwargs):
+    if name == 'VAULT_OPENBAO_TOKEN':
+        refresh_vault_client()
