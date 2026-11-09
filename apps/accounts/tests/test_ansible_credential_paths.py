@@ -10,16 +10,19 @@ from django.conf import settings
 from django.test import SimpleTestCase, override_settings
 
 from accounts.models import Account
+from assets.models import Asset, Platform
 
 
 class AnsibleCredentialPathTests(SimpleTestCase):
     def test_become_key_is_written_into_the_task_directory(self):
-        login = Account(username='login', secret_type='ssh_key', secret='test-private-key')
+        host = Asset(name='login-host', platform=Platform(name='Linux', category='host', type='linux'))
+        login = Account(username='login', secret_type='ssh_key', secret='test-private-key', asset=host)
         account = Account(username='target', secret_type='password', secret='target-password',
                           su_from=login)
         account.platform = SimpleNamespace(su_enabled=True, ansible_become_method='su')
         with TemporaryDirectory() as root:
             auth = account.get_ansible_become_auth(path_dir=root)
+            self.assertEqual(auth['ansible_user'], 'login')
             key = Path(auth['ansible_ssh_private_key_file'])
             self.assertEqual(key.parent, Path(root))
             self.assertEqual(key.read_text(), login.secret)

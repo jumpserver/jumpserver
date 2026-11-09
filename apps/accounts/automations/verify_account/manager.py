@@ -69,6 +69,11 @@ class PersonalCredentialAccount:
         return None
 
     @staticmethod
+    def is_ds_account():
+        # 个人凭据的用户名即登录用户名（目录服务账号已保存为 UPN），不再拼接域名
+        return False
+
+    @staticmethod
     def get_ansible_become_auth(path_dir=None):
         return {'ansible_become': False}
 
