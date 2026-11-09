@@ -94,6 +94,18 @@ class WorkflowDefinitionTests(SimpleTestCase):
             with self.subTest(definition=definition), self.assertRaises(WorkflowConfigurationError):
                 validate_definition(definition)
 
+    def test_approval_timeout_requires_whole_minutes(self):
+        for seconds in (0, 60, 120, 31536000):
+            definition = deepcopy(self.definition)
+            definition['nodes'][1]['config']['timeout'] = seconds
+            with self.subTest(seconds=seconds):
+                self.assertEqual(validate_definition(definition)['nodes'][1]['config']['timeout'], seconds)
+        for seconds in (1, 59, 61, -60, 31536060, 60.0, True, None):
+            definition = deepcopy(self.definition)
+            definition['nodes'][1]['config']['timeout'] = seconds
+            with self.subTest(seconds=seconds), self.assertRaises(WorkflowConfigurationError):
+                validate_definition(definition)
+
     def test_rejects_disconnected_cycle_and_missing_condition_branch(self):
         graph = deepcopy(self.definition)
         for key in ('a', 'b'):

@@ -18391,8 +18391,8 @@ msgid "{key} must be a boolean."
 msgstr "{key} 必须为布尔值。"
 
 #: tickets/workflow/definition.py:61
-msgid "Timeout must be seconds between 0 and 31536000."
-msgstr "超时时间必须为 0 至 31536000 秒。"
+msgid "Timeout must be whole minutes between 1 and 525600, or 0 for no deadline."
+msgstr "超时时间必须为 1 至 525600 的整分钟数，0 表示不超时。"
 
 #: tickets/workflow/definition.py:63
 msgid "Timeout action must be expire or reject."

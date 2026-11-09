@@ -57,8 +57,8 @@ def validate_approval(config):
         if type(config.setdefault(key, default)) is not bool:
             raise WorkflowConfigurationError(gettext('{key} must be a boolean.').format(key=key))
     timeout = config.setdefault('timeout', 0)
-    if type(timeout) is not int or not 0 <= timeout <= 31536000:
-        raise WorkflowConfigurationError(gettext('Timeout must be seconds between 0 and 31536000.'))
+    if type(timeout) is not int or not 0 <= timeout <= 31536000 or timeout % 60:
+        raise WorkflowConfigurationError(gettext('Timeout must be whole minutes between 1 and 525600, or 0 for no deadline.'))
     if config.setdefault('timeout_action', 'expire') not in ('expire', 'reject'):
         raise WorkflowConfigurationError(gettext('Timeout action must be expire or reject.'))
 
