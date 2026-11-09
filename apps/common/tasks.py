@@ -1,4 +1,5 @@
 import os
+from contextlib import nullcontext
 
 from celery import shared_task
 from django.conf import settings
@@ -32,6 +33,8 @@ def task_activity_callback(self, subject, message, recipient_list, *args, **kwar
 
 
 def deliver_mail(*args, safe_errors=False, **kwargs):
+    from users.utils import activate_user_language
+
     args = list(args)
     if len(args) == 3:
         args[0] = (settings.EMAIL_SUBJECT_PREFIX or '') + args[0]
@@ -41,10 +44,6 @@ def deliver_mail(*args, safe_errors=False, **kwargs):
     subject = args[0] if len(args) > 0 else kwargs.get('subject')
     recipient_list = args[3] if len(args) > 3 else kwargs.get('recipient_list')
     recipient_list = list(dict.fromkeys(recipient_list))
-    if len(args) > 3:
-        args[3] = recipient_list
-    else:
-        kwargs['recipient_list'] = recipient_list
     logger.info(
         _(
             "Sending email: subject=%(subject)r, "
@@ -56,14 +55,28 @@ def deliver_mail(*args, safe_errors=False, **kwargs):
         },
     )
 
-    try:
-        send_mail(connection=get_email_connection(), *args, **kwargs)
-    except Exception as e:
-        if safe_errors:
-            # SMTP 异常可能回显正文，必须在此处打印日志前去敏；
-            # 仅在外层验证码任务捕获异常，无法阻止这里的日志泄露。
-            raise RuntimeError('Verification email delivery failed') from None
-        logger.error(f"Sending mail to {recipient_list} error: {e}")
+    email_lookup_list = [text_hmac_sha256(email) for email in recipient_list]
+    users = User.objects.filter(email_lookup__in=email_lookup_list).all()
+    users_by_email = {}
+    for user in users:
+        # shortcut: shared mailboxes use username order; pass user identity if account-specific language is required.
+        users_by_email.setdefault(user.email_lookup, user)
+
+    for recipient, email_lookup in zip(recipient_list, email_lookup_list):
+        if len(args) > 3:
+            args[3] = [recipient]
+        else:
+            kwargs['recipient_list'] = [recipient]
+        user = users_by_email.get(email_lookup)
+        try:
+            with activate_user_language(user) if user else nullcontext():
+                send_mail(connection=get_email_connection(), *args, **kwargs)
+        except Exception as e:
+            if safe_errors:
+                # SMTP 异常可能回显正文，必须在此处打印日志前去敏；
+                # 仅在外层验证码任务捕获异常，无法阻止这里的日志泄露。
+                raise RuntimeError('Verification email delivery failed') from None
+            logger.error(f"Sending mail to {recipient} error: {e}")
 
 
 @shared_task(
