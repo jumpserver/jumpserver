@@ -18219,3 +18219,8 @@ msgid ""
 "outside this organization): {assets}. Set valid owners on the asset edit "
 "page."
 msgstr "以下資產的負責人無法使用（未啟用、已過期、已刪除或不屬於目前組織）：{assets}。請在資產編輯頁面設定有效負責人。"
+
+#: tickets/workflow/conditions.py:34
+#, python-brace-format
+msgid "Unknown workflow context field: {field}."
+msgstr "未知的流程上下文字段：{field}。"
