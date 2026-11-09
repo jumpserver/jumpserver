@@ -18259,8 +18259,9 @@ msgid "Invalid condition field path."
 msgstr "条件字段路径无效。"
 
 #: tickets/workflow/conditions.py:34
-msgid "Unknown workflow context field."
-msgstr "未知的流程上下文字段。"
+#, python-brace-format
+msgid "Unknown workflow context field: {field}."
+msgstr "未知的流程上下文字段：{field}。"
 
 #: tickets/workflow/conditions.py:36
 msgid "Unknown condition operator."

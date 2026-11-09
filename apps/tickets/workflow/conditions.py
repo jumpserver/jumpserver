@@ -31,7 +31,7 @@ def validate_condition(condition, depth=0):
     if not isinstance(field, str) or len(field) > 256 or not re.fullmatch(r'[a-zA-Z][\w]*(?:\.[\w]+)*', field):
         raise WorkflowConfigurationError(gettext('Invalid condition field path.'))
     if field.split('.')[0] not in ROOTS:
-        raise WorkflowConfigurationError(gettext('Unknown workflow context field.'))
+        raise WorkflowConfigurationError(gettext('Unknown workflow context field: {field}.').format(field=field))
     if not isinstance(operator, str) or operator not in OPERATORS:
         raise WorkflowConfigurationError(gettext('Unknown condition operator.'))
     if condition.get('quantifier', 'any') not in ('any', 'all'):
