@@ -20426,3 +20426,32 @@ msgstr "资源失败数与扫描或任务错误分别统计；即使失败资源
 #: xpack/plugins/cloud/const.py
 msgid "Partial"
 msgstr "部分成功"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid "Asset \"{asset}\" has no owner. Set its owner on the asset edit page."
+msgstr "资产“{asset}”未配置负责人，请在资产编辑页面设置负责人。"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"Asset \"{asset}\" has invalid owner information. Set its owner on the asset "
+"edit page."
+msgstr "资产“{asset}”的负责人信息无效，请在资产编辑页面重新设置负责人。"
+
+#: tickets/workflow/approvers.py
+msgid ""
+"This request has no assets. Select assets or use another approver source."
+msgstr "当前申请没有资产，请选择资产或使用其他审批人来源。"
+
+#: tickets/workflow/approvers.py
+msgid "Invalid asset information in the request."
+msgstr "申请中的资产信息无效。"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"The owners of these assets are unavailable (inactive, expired, deleted, or "
+"outside this organization): {assets}. Set valid owners on the asset edit "
+"page."
+msgstr "以下资产的负责人不可用（未启用、已过期、已删除或不属于当前组织）：{assets}。请在资产编辑页面设置有效负责人。"
