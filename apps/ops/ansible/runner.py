@@ -26,6 +26,16 @@ __all__ = [
     'escape_jinja2_syntax', 'neutralize_jinja2_syntax', 'quote_ansible_module_arg',
 ]
 
+# Block user-supplied Ansible plugins and configuration, not remote task files.
+UNSAFE_PLAYBOOK_PATTERNS = (
+    'ansible.cfg', '.ansible.cfg',
+    'action_plugins', 'library', 'module_utils', 'plugins', 'modules', 'ansible_collections',
+    'callback_plugins', 'filter_plugins', 'lookup_plugins', 'vars_plugins',
+    'test_plugins', 'connection_plugins', 'inventory_plugins', 'cache_plugins',
+    'strategy_plugins', 'become_plugins', 'terminal_plugins', 'cliconf_plugins',
+    'netconf_plugins', 'httpapi_plugins', 'shell_plugins', 'doc_fragments',
+)
+
 
 def quote_ansible_module_arg(value):
     """Keep user text inside one double-quoted Ansible module arg."""
@@ -124,8 +134,35 @@ class PlaybookRunner:
         entry = os.path.basename(self.playbook)
         playbook_dir = os.path.dirname(self.playbook)
         project_playbook_dir = os.path.join(self.project_dir, "project")
+        # Platform automation already opts into Ansible's trusted execution mode.
+        trusted = bool(self.envs.get('ANSIBLE_SUPER_MODE'))
+        ignore = None if trusted else shutil.ignore_patterns(*UNSAFE_PLAYBOOK_PATTERNS)
         if os.path.realpath(playbook_dir) != os.path.realpath(project_playbook_dir):
-            shutil.copytree(playbook_dir, project_playbook_dir, dirs_exist_ok=True)
+            # Rebuild from scratch so stale files from a previous run cannot survive.
+            if os.path.exists(project_playbook_dir):
+                shutil.rmtree(project_playbook_dir)
+            shutil.copytree(
+                playbook_dir, project_playbook_dir,
+                ignore=ignore,
+                symlinks=not trusted,
+            )
+        if not trusted:
+            # Also sanitize playbooks already staged in the task's project directory.
+            for root, dirs, files in os.walk(project_playbook_dir):
+                ignored = ignore(root, dirs + files)
+                for name in list(dirs) + files:
+                    path = os.path.join(root, name)
+                    if os.path.islink(path):
+                        os.unlink(path)
+                    elif name in ignored:
+                        if name in dirs:
+                            shutil.rmtree(path)
+                        else:
+                            os.unlink(path)
+                    else:
+                        continue
+                    if name in dirs:
+                        dirs.remove(name)
         self.playbook = entry
 
     def prepare_safe_inputs(self):
