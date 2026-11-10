@@ -105,7 +105,29 @@
           ansible.builtin.assert:
             that:
               - not nla_policy.exists or (nla_policy.type == 'REG_DWORD' and nla_policy.value == 0)
-            fail_msg: Disable the Require user authentication using NLA policy for this host, apply it, and redeploy.
+            fail_msg: |-
+              RDP Group Policy is incompatible with Tinker auto-login: "Require user authentication for remote connections by using Network Level Authentication".
+              Observed policy UserAuthentication: type={{ nla_policy.type | default('unknown') }}, value={{ nla_policy.value | default('unknown') }}. Required: REG_DWORD 0 or not configured.
+              Policy location: Computer Configuration > Administrative Templates > Windows Components > Remote Desktop Services > Remote Desktop Session Host > Security.
+              Set this policy to Disabled in its source GPO. For a local policy, use gpedit.msc on this host; for a domain policy, ask the domain administrator to change the winning GPO.
+              Run "gpupdate /target:computer /force" on this host, then redeploy.
+
+        - name: Read the password prompt Group Policy setting
+          ansible.windows.win_reg_stat:
+            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+            name: fPromptForPassword
+          register: password_prompt_policy
+
+        - name: Check that Group Policy permits automatic RDP logon
+          ansible.builtin.assert:
+            that:
+              - not password_prompt_policy.exists or (password_prompt_policy.type == 'REG_DWORD' and password_prompt_policy.value == 0)
+            fail_msg: |-
+              RDP Group Policy is incompatible with Tinker auto-login: "Always prompt for password upon connection".
+              Observed policy fPromptForPassword: type={{ password_prompt_policy.type | default('unknown') }}, value={{ password_prompt_policy.value | default('unknown') }}. Required: REG_DWORD 0 or not configured.
+              Policy location: Computer Configuration > Administrative Templates > Windows Components > Remote Desktop Services > Remote Desktop Session Host > Security.
+              Set this policy to Disabled in its source GPO. For a local policy, use gpedit.msc on this host; for a domain policy, ask the domain administrator to change the winning GPO.
+              Run "gpupdate /target:computer /force" on this host, then redeploy.
 
         - name: Disable NLA for the RDP-Tcp listener
           ansible.windows.win_regedit:
@@ -178,9 +200,9 @@
       tags: [install]
       rescue:
         - fail:
-            msg: >-
+            msg: |-
               Applet host installation or runtime configuration failed at "{{ ansible_failed_task.name }}".
-              Resolve the task error and redeploy.
+              {{ ansible_failed_result.msg | default('Review the failed task output for details.', true) }}
 
     - block:
         - name: Configure Tinker and import its component key
@@ -226,6 +248,14 @@
             type: dword
             state: present
 
+        - name: Disable the password prompt for the RDP-Tcp listener
+          ansible.windows.win_regedit:
+            path: HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp
+            name: fPromptForPassword
+            data: 0
+            type: dword
+            state: present
+
         # Restart exactly once. Only the read-only readiness check below retries.
         - name: Refresh Remote Desktop Services after Tinker is ready
           ansible.windows.win_service:
@@ -240,25 +270,39 @@
             name: UmRdpService
             state: started
 
-        - name: Verify NLA and RDP listener after the service refresh
+        - name: Verify RDP login settings and listener after the service refresh
           ansible.windows.win_powershell:
             script: |
               $ErrorActionPreference = 'Stop'
               $Ansible.Changed = $false
               $namespace = 'root/cimv2/terminalservices'
               $listenerPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'
-              function Assert-NLADisabled {
+              $nlaPolicyName = 'Require user authentication for remote connections by using Network Level Authentication'
+              $passwordPromptPolicyName = 'Always prompt for password upon connection'
+              $policyInstructions = 'Policy location: Computer Configuration > Administrative Templates > Windows Components > Remote Desktop Services > Remote Desktop Session Host > Security. Set the conflicting policy to Disabled in its source GPO: use gpedit.msc for local policies, or ask the domain administrator for domain policies. Run "gpupdate /target:computer /force", then redeploy.'
+              function Assert-RdpLoginSettings {
                   $policyPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
                   if (Test-Path -LiteralPath $policyPath) {
                       $policy = Get-ItemProperty -LiteralPath $policyPath
-                      if ($policy.UserAuthentication -eq 1) { throw 'Group Policy still requires NLA.' }
+                      if ($policy.UserAuthentication -eq 1) {
+                          throw "Group Policy still requires NLA (UserAuthentication=1): '$nlaPolicyName'. $policyInstructions"
+                      }
+                      if ($policy.fPromptForPassword -eq 1) {
+                          throw "Group Policy still requires a password prompt (fPromptForPassword=1): '$passwordPromptPolicyName'. $policyInstructions"
+                      }
                   }
                   $local = Get-ItemProperty -LiteralPath $listenerPath
                   $effective = @(Get-CimInstance -Namespace $namespace -ClassName Win32_TSGeneralSetting `
                       -Filter "TerminalName='RDP-Tcp'")
                   if ($local.UserAuthentication -ne 0 -or $effective.Count -ne 1 -or
                       $effective[0].UserAuthenticationRequired -ne 0) {
-                      throw "NLA is not disabled: registry=$($local.UserAuthentication), WMI=$($effective.UserAuthenticationRequired)."
+                      throw "RDP-Tcp NLA configuration did not take effect. Expected UserAuthentication=0 and WMI UserAuthenticationRequired=0; observed registry=$($local.UserAuthentication), WMI=$($effective.UserAuthenticationRequired). Listener: $listenerPath. Check '$nlaPolicyName'. $policyInstructions"
+                  }
+                  $logon = @(Get-CimInstance -Namespace $namespace -ClassName Win32_TSLogonSetting `
+                      -Filter "TerminalName='RDP-Tcp'" -Property TerminalName,PromptForPassword,PolicySourcePromptForPassword)
+                  if ($local.fPromptForPassword -ne 0 -or $logon.Count -ne 1 -or
+                      $logon[0].PromptForPassword -ne 0) {
+                      throw "RDP-Tcp password prompt configuration did not take effect. Expected fPromptForPassword=0 and WMI PromptForPassword=0; observed registry=$($local.fPromptForPassword), WMI=$($logon.PromptForPassword). Listener: $listenerPath. Check '$passwordPromptPolicyName'. $policyInstructions"
                   }
                   return $local
               }
@@ -266,7 +310,7 @@
               if (@($services | Where-Object Status -ne 'Running').Count) {
                   throw 'Tinker, TermService and UmRdpService must all be running.'
               }
-              $local = Assert-NLADisabled
+              $local = Assert-RdpLoginSettings
               $server = @(Get-CimInstance -Namespace $namespace -ClassName Win32_TerminalServiceSetting)
               if ($server.Count -ne 1 -or $server[0].AllowTSConnections -ne 1) {
                   throw 'Remote Desktop connections are not allowed.'
@@ -326,8 +370,8 @@
                   $client.Dispose()
               }
               Start-Sleep -Seconds 2
-              $null = Assert-NLADisabled
-              $Ansible.Result = @{ Port = $port; NLARequired = $false; NegotiatedProtocol = 'TLS' }
+              $null = Assert-RdpLoginSettings
+              $Ansible.Result = @{ Port = $port; NLARequired = $false; PromptForPassword = $false; NegotiatedProtocol = 'TLS' }
           register: rdp_ready
           until: rdp_ready is succeeded
           retries: 6
@@ -336,6 +380,15 @@
       tags: [deploy]
       rescue:
         - fail:
-            msg: >-
+            msg: |-
               Tinker configuration, startup, health or RDP readiness check failed at "{{ ansible_failed_task.name }}".
-              Resolve the task error and redeploy.
+              {% if ansible_failed_task.no_log | default(false) or ansible_failed_result._ansible_no_log | default(false) %}
+              Failure details are hidden because this task handles component credentials.
+              {% else %}
+              {% set errors = ansible_failed_result.error | default([], true) %}
+              {% if errors %}
+              {{ (errors[0].exception | default({}, true)).message | default(ansible_failed_result.msg | default('Review the failed task output for details.', true), true) }}
+              {% else %}
+              {{ ansible_failed_result.msg | default('Review the failed task output for details.', true) }}
+              {% endif %}
+              {% endif %}

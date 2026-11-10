@@ -7,7 +7,7 @@ from uuid import UUID
 from .conditions import validate_condition
 from .errors import WorkflowConfigurationError
 
-RESOLVERS = {'user', 'user_group', 'role', 'org_admin', 'applicant_manager', 'asset_owner'}
+RESOLVERS = {'user', 'user_group', 'role', 'org_admin', 'asset_owner'}
 
 
 def json_snapshot(value, max_bytes=262144):
@@ -57,8 +57,8 @@ def validate_approval(config):
         if type(config.setdefault(key, default)) is not bool:
             raise WorkflowConfigurationError(gettext('{key} must be a boolean.').format(key=key))
     timeout = config.setdefault('timeout', 0)
-    if type(timeout) is not int or not 0 <= timeout <= 31536000:
-        raise WorkflowConfigurationError(gettext('Timeout must be seconds between 0 and 31536000.'))
+    if type(timeout) is not int or not 0 <= timeout <= 31536000 or timeout % 60:
+        raise WorkflowConfigurationError(gettext('Timeout must be whole minutes between 1 and 525600, or 0 for no deadline.'))
     if config.setdefault('timeout_action', 'expire') not in ('expire', 'reject'):
         raise WorkflowConfigurationError(gettext('Timeout action must be expire or reject.'))
 

@@ -221,7 +221,7 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 class SecuritySessionSerializer(serializers.Serializer):
     SESSION_COOKIE_AGE = serializers.IntegerField(
-        min_value=1, max_value=31536000, required=False, label=_('Web session lifetime (second)'),
+        min_value=300, max_value=31536000, required=False, label=_('Web session lifetime (second)'),
         help_text=_(
             'When renewal is disabled, the login expires after this duration, even if the session is saved or identity is verified again. '
             'When renewal is enabled, each renewal grants this duration again. '

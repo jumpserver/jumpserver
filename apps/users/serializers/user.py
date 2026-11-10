@@ -3,11 +3,13 @@
 from functools import partial
 
 from django.conf import settings
+from django.db import IntegrityError, transaction
 from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import ResourceLabelsMixin, CommonBulkModelSerializer
+from common.serializers.common import UniqueBulkListSerializer
 from authentication.const import MFAType
 from common.serializers.fields import (
     EncryptedField,
@@ -112,6 +114,10 @@ class RolesSerializerMixin(serializers.Serializer):
         return fields
 
 
+class UserBulkListSerializer(UniqueBulkListSerializer):
+    unique_field = 'username'
+
+
 class UserSerializer(
     RolesSerializerMixin, ResourceLabelsMixin, CommonBulkModelSerializer
 ):
@@ -180,6 +186,7 @@ class UserSerializer(
 
     class Meta:
         model = User
+        list_serializer_class = UserBulkListSerializer
         # mini 是指能识别对象的最小单元
         fields_mini = ["id", "name", "username"]
         # 只能写的字段, 这个虽然无法在框架上生效，但是更多对我们是提醒
@@ -385,7 +392,7 @@ class UserSerializer(
             request.password_strategy = password_strategy
         return attrs
 
-    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
+    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created, instance=None):
         m2m_values = {}
         for f, default_roles in self.custom_m2m_fields.items():
             roles = validated_data.pop(f, None)
@@ -395,18 +402,31 @@ class UserSerializer(
                 ]
             m2m_values[f] = roles
 
-        instance = save_handler(validated_data)
-        for field_name, value in m2m_values.items():
-            if value is None:
-                continue
-            field = getattr(instance, field_name)
-            field.set(value)
-        return instance
+        try:
+            with transaction.atomic():
+                instance = save_handler(validated_data)
+                for field_name, value in m2m_values.items():
+                    if value is None:
+                        continue
+                    field = getattr(instance, field_name)
+                    field.set(value)
+                return instance
+        except IntegrityError:
+            # Query after the savepoint rolls back to keep the transaction usable.
+            username = validated_data.get('username', getattr(instance, 'username', None))
+            users = User.objects.filter(username=username)
+            if not created and instance is not None:
+                users = users.exclude(pk=instance.pk)
+            if users.exists():
+                raise serializers.ValidationError(
+                    {'username': _('This field must be unique.')}, code='unique',
+                )
+            raise
 
     def update(self, instance, validated_data):
         save_handler = partial(super().update, instance)
         instance = self.save_and_set_custom_m2m_fields(
-            validated_data, save_handler, created=False
+            validated_data, save_handler, created=False, instance=instance
         )
         if validated_data.get('public_key'):
             post_user_change_password.send(instance.__class__, user=instance)

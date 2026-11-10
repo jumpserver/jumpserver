@@ -3,7 +3,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('audits', '0016_merge_application_credential_calls'),
+        ('audits', '0012_userloginlog_lookup_indexes'),
+        ('audits', '0014_backfill_application_credential_calls'),
     ]
 
     operations = [

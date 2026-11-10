@@ -18259,8 +18259,9 @@ msgid "Invalid condition field path."
 msgstr "条件字段路径无效。"
 
 #: tickets/workflow/conditions.py:34
-msgid "Unknown workflow context field."
-msgstr "未知的流程上下文字段。"
+#, python-brace-format
+msgid "Unknown workflow context field: {field}."
+msgstr "未知的流程上下文字段：{field}。"
 
 #: tickets/workflow/conditions.py:36
 msgid "Unknown condition operator."
@@ -18390,8 +18391,8 @@ msgid "{key} must be a boolean."
 msgstr "{key} 必须为布尔值。"
 
 #: tickets/workflow/definition.py:61
-msgid "Timeout must be seconds between 0 and 31536000."
-msgstr "超时时间必须为 0 至 31536000 秒。"
+msgid "Timeout must be whole minutes between 1 and 525600, or 0 for no deadline."
+msgstr "超时时间必须为 1 至 525600 的整分钟数，0 表示不超时。"
 
 #: tickets/workflow/definition.py:63
 msgid "Timeout action must be expire or reject."
@@ -20440,3 +20441,32 @@ msgstr "资源失败数与扫描或任务错误分别统计；即使失败资源
 #: xpack/plugins/cloud/const.py
 msgid "Partial"
 msgstr "部分成功"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid "Asset \"{asset}\" has no owner. Set its owner on the asset edit page."
+msgstr "资产“{asset}”未配置负责人，请在资产编辑页面设置负责人。"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"Asset \"{asset}\" has invalid owner information. Set its owner on the asset "
+"edit page."
+msgstr "资产“{asset}”的负责人信息无效，请在资产编辑页面重新设置负责人。"
+
+#: tickets/workflow/approvers.py
+msgid ""
+"This request has no assets. Select assets or use another approver source."
+msgstr "当前申请没有资产，请选择资产或使用其他审批人来源。"
+
+#: tickets/workflow/approvers.py
+msgid "Invalid asset information in the request."
+msgstr "申请中的资产信息无效。"
+
+#: tickets/workflow/approvers.py
+#, python-brace-format
+msgid ""
+"The owners of these assets are unavailable (inactive, expired, deleted, or "
+"outside this organization): {assets}. Set valid owners on the asset edit "
+"page."
+msgstr "以下资产的负责人不可用（未启用、已过期、已删除或不属于当前组织）：{assets}。请在资产编辑页面设置有效负责人。"

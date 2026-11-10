@@ -224,7 +224,7 @@ class CredentialCallLogTests(CredentialTestCase):
         IntegrationApplicationLog.objects.filter(id=old.id).update(datetime=date)
         audit = record('credential_fetched', application=self.application, account=self.primary)
         ApplicationAudit.objects.filter(id=audit.id).update(date_created=date)
-        migration = importlib.import_module('audits.migrations.0015_backfill_application_credential_calls')
+        migration = importlib.import_module('audits.migrations.0014_backfill_application_credential_calls')
         with connection.schema_editor() as editor:
             migration.backfill_calls(apps, editor)
             migration.backfill_calls(apps, editor)

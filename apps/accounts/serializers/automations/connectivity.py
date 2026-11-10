@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import AutomationTypes
-from accounts.models import VerifyAccountAutomation
+from accounts.models import ConnectivityRecord, VerifyAccountAutomation
 from assets.const import AutomationTypes as AssetAutomationTypes
 from assets.models import BaseAutomation, PingAutomation
 from assets.serializers.automations import AutomationExecutionSerializer
@@ -14,6 +14,7 @@ __all__ = [
     'PingAutomationSerializer', 'PingAutomationListSerializer',
     'VerifyAccountExecutionSerializer', 'PingExecutionSerializer',
     'ConnectivityAutomationListSerializer', 'ConnectivityExecutionListSerializer',
+    'ConnectivityRecordSerializer',
 ]
 
 
@@ -114,3 +115,18 @@ class VerifyAccountExecutionSerializer(ConnectivityExecutionSerializer):
 
 class PingExecutionSerializer(ConnectivityExecutionSerializer):
     automation = ObjectRelatedField(queryset=PingAutomation.objects, required=True)
+
+
+class ConnectivityRecordSerializer(serializers.ModelSerializer):
+    execution = serializers.UUIDField(source='execution_id', read_only=True, label=_('Execution'))
+    type = LabeledChoiceField(choices=ConnectivityRecord.Type.choices, read_only=True, label=_('Type'))
+    status = LabeledChoiceField(choices=ConnectivityRecord.Status.choices, read_only=True, label=_('Result'))
+
+    class Meta:
+        model = ConnectivityRecord
+        fields = [
+            'id', 'execution', 'type', 'asset', 'asset_id', 'asset_address',
+            'account', 'account_id', 'username', 'privileged', 'status',
+            'date_start', 'date_finished', 'error',
+        ]
+        read_only_fields = fields

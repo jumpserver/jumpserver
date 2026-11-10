@@ -118,7 +118,7 @@ class WorkflowEngine:
             # Preserve the accepted vote and the diagnostic, without approving
             # a request whose next step cannot be evaluated or assigned.
             instance.refresh_from_db()
-            self._finish(instance, InstanceState.error, detail=str(exc.detail))
+            self._finish(instance, InstanceState.error, detail='; '.join(str(message) for message in exc.detail))
 
     def _execute(self, instance, node):
         while node:

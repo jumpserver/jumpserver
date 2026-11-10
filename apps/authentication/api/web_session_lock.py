@@ -1,7 +1,6 @@
 import re
 from datetime import datetime, timezone as datetime_timezone
 
-from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import check_password
 from django.contrib.sessions.backends.base import UpdateError
@@ -16,7 +15,6 @@ from rest_framework.exceptions import APIException, NotAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from audits.models import UserSession
 from authentication.backends.drf import SessionAuthentication
 from authentication.services.idle_lock import personal_idle_lock_time, effective_idle_lock_time, idle_lock_limits
 from authentication.services.lock_password import (
@@ -24,7 +22,7 @@ from authentication.services.lock_password import (
 )
 from authentication.services.web_session_lock import session_scope
 from common.permissions import IsValidUser
-from common.sessions import SessionStateConflict, normalize_security_state, session_expiry
+from common.sessions import SessionStateConflict, normalize_security_state
 from users.models import Preference
 
 
@@ -82,15 +80,12 @@ class WebSessionStatusView(APIView):
 
     def status(self, request):
         key = request.session.session_key
-        session = UserSession.objects.filter(key=key, user=request.user).first()
-        expires = request.session.get_expiry_date() if request.session.login_policy else session_expiry(key)
+        expires = request.session.get_expiry_date()
         idle_limit = idle_lock_limits(use_cache=True)['web_idle_lock_time']
         policy = request.session.login_policy
         maximum = (datetime.fromtimestamp(policy['expires_at'], tz=datetime_timezone.utc)
-                   if policy and not policy['renew'] else None)
-        authenticated_at = session.date_created if session else None
-        if policy and policy.get('authenticated_at'):
-            authenticated_at = datetime.fromtimestamp(policy['authenticated_at'], tz=datetime_timezone.utc)
+                   if not policy['renew'] else None)
+        authenticated_at = datetime.fromtimestamp(policy['authenticated_at'], tz=datetime_timezone.utc)
         policy = normalize_security_state(policy)
         return Response({
             'scope': session_scope(key),
@@ -105,11 +100,11 @@ class WebSessionStatusView(APIView):
                 personal_idle_lock_time(request.user.pk, 'web_idle_lock_time'),
             ),
             'idle_lock_time_limit': idle_limit,
-            'authenticated_at': authenticated_at.isoformat() if authenticated_at else None,
+            'authenticated_at': authenticated_at.isoformat(),
             'expires_at': expires.isoformat() if expires else None,
             'max_expires_at': maximum.isoformat() if maximum else None,
-            'session_timeout': policy['duration'] if policy else settings.SESSION_COOKIE_AGE,
-            'sliding_expiry': policy['renew'] if policy else settings.SESSION_RENEW_ON_REQUEST,
+            'session_timeout': policy['duration'],
+            'sliding_expiry': policy['renew'],
             'expire_at_browser_close': request.session.get_expire_at_browser_close(),
             'server_time': timezone.now().isoformat(),
             'user': {'id': str(request.user.pk), 'name': request.user.name, 'username': request.user.username},

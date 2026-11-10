@@ -18357,3 +18357,21 @@ msgstr "Chính sách phiên"
 
 msgid "Log in again when the browser closes"
 msgstr "Đăng nhập lại khi đóng trình duyệt"
+
+#. DRF integer validation used by Web session lifetime settings.
+#, python-brace-format
+msgid "Ensure this value is greater than or equal to {min_value}."
+msgstr "Đảm bảo giá trị này lớn hơn hoặc bằng {min_value}."
+
+#, python-brace-format
+msgid "Ensure this value is less than or equal to {max_value}."
+msgstr "Đảm bảo giá trị này nhỏ hơn hoặc bằng {max_value}."
+
+msgid "A valid integer is required."
+msgstr "Cần nhập một số nguyên hợp lệ."
+
+msgid "This field may not be null."
+msgstr "Trường này không được để trống."
+
+msgid "String value too large."
+msgstr "Chuỗi quá dài."

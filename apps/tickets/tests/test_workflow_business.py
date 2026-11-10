@@ -132,7 +132,7 @@ class WorkflowBusinessTests(TestCase):
 
     def test_expiry_and_withdrawal_close_ticket_without_grant(self):
         for operation in ('expire', 'cancel'):
-            ticket = self.ticket(self.workflow(timeout=1))
+            ticket = self.ticket(self.workflow(timeout=60))
             instance = submit_ticket(ticket)
             if operation == 'expire':
                 instance.node_instances.filter(state='running').update(deadline=timezone.now() - timedelta(seconds=1))
@@ -591,6 +591,7 @@ class WorkflowBusinessTests(TestCase):
         previous = Ticket.objects.count()
         response = self.api_request(TicketViewSet, 'open', self.applicant, data={**payload, 'workflow_id': str(invalid.pk)}, method='post', can_audit=True)
         self.assertEqual(response.status_code, 400, response.data)
+        self.assertIn(self.asset.name, str(response.data))
         self.assertEqual(Ticket.objects.count(), previous)
 
     def test_all_accounts_expands_before_conditions_and_does_not_grant_future_names(self):

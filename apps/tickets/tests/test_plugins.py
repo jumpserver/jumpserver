@@ -143,13 +143,11 @@ class PluginRegistryTests(SimpleTestCase):
                       {'source': 'admin', 'target': 'end'}],
         }
         version = SimpleNamespace(published_at=timezone.now(), as_definition=lambda: definition)
-        for approver_type in ('org_admin', 'applicant_manager'):
-            with self.subTest(approver_type=approver_type):
-                definition['nodes'][2]['config']['approvers']['type'] = approver_type
-                definition['edges'][2]['target'] = 'end'
-                self.assertFalse(supports_delegated_request(version))
-                definition['edges'][2]['target'] = 'admin'
-                self.assertTrue(supports_delegated_request(version))
+        self.assertFalse(supports_delegated_request(version))
+        definition['edges'][2]['target'] = 'admin'
+        self.assertTrue(supports_delegated_request(version))
+        definition['nodes'][2]['config']['approvers']['type'] = 'applicant_manager'
+        self.assertFalse(supports_delegated_request(version))
 
 
 class TicketPluginTests(TestCase):
@@ -826,8 +824,8 @@ class TicketPluginTests(TestCase):
         with self.assertRaises(PermissionDenied):
             self.engine.approve(old_task, self.bob)
 
-    def test_applicant_manager_allows_delegation_and_excludes_applicant_and_beneficiary(self):
-        admin_flow = self.delegated_workflow(approver_type='applicant_manager', exclude_applicant=False)
+    def test_org_admin_allows_delegation_and_excludes_applicant_and_beneficiary(self):
+        admin_flow = self.delegated_workflow(exclude_applicant=False)
         admin = Role.objects.get(pk=BuiltinRole.org_admin.id)
         RoleBinding.objects_raw.bulk_create([
             RoleBinding(user=user, role=admin, org=self.org, scope='org')

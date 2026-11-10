@@ -24,7 +24,7 @@ from .models import (
     Account, AccountRisk, AutomationExecution, BackupAccountAutomation,
     ChangeSecretAutomation, ChangeSecretRecord, CheckAccountAutomation,
     GatheredAccount, IntegrationApplication,
-    PushSecretRecord, RiskChoice,
+    PushSecretRecord, RiskChoice, ConnectivityRecord,
 )
 from .utils import account_secret_task_status
 
@@ -419,3 +419,13 @@ class ChangeSecretStatusFilterSet(BaseFilterSet):
         }
         matched = [_id for _id, v in data_map.items() if v == value]
         return queryset.filter(id__in=matched)
+
+
+
+class ConnectivityRecordFilterSet(drf_filters.FilterSet):
+    execution_id = drf_filters.UUIDFilter(label=_('Execution ID'))
+    automation_id = drf_filters.UUIDFilter(field_name='execution__automation_id', label=_('Task'))
+
+    class Meta:
+        model = ConnectivityRecord
+        fields = ['execution_id', 'automation_id', 'type']

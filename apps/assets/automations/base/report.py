@@ -3,9 +3,9 @@ import re
 from django.utils.translation import gettext as _
 
 
+INVENTORY_UUID = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 INVENTORY_ASSET_ID = re.compile(
-    r'__[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-    r'(?=\(.*\)$|$)',
+    rf'__(?P<asset_id>{INVENTORY_UUID})(?:__account_{INVENTORY_UUID})?(?=\(.*\)$|$)',
     re.IGNORECASE,
 )
 
@@ -14,13 +14,17 @@ class ConnectivityReportMixin:
     def get_report_template(self):
         return 'assets/connectivity_report.html'
 
+    def get_report_failure_labels(self, result):
+        return {}
+
     def get_report_context(self):
         context = super().get_report_context()
         result = context['result'] or {}
         asset_details = result.get('asset_details', {})
+        failure_labels = self.get_report_failure_labels(result)
         rows = []
 
-        def add_row(target, status, label, error=''):
+        def add_row(target, status, label, error='', target_label=''):
             target = str(target)
             asset = asset_details.get(target, {})
             match = INVENTORY_ASSET_ID.search(target)
@@ -28,8 +32,8 @@ class ConnectivityReportMixin:
             if asset.get('asset_name') and match:
                 name += target[match.end():]
             rows.append({
-                'target': name,
-                'asset_id': asset.get('asset_id') or (match.group()[2:] if match else ''),
+                'target': target_label or name,
+                'asset_id': asset.get('asset_id') or (match['asset_id'] if match else ''),
                 'asset_address': asset.get('asset_address', ''),
                 'status': status,
                 'status_label': label,
@@ -37,7 +41,7 @@ class ConnectivityReportMixin:
             })
 
         for target, error in result.get('fail_assets', []):
-            add_row(target, 'failed', _('Failed'), error)
+            add_row(target, 'failed', _('Failed'), error, failure_labels.get(str(target), ''))
         for target in result.get('error_assets', []):
             add_row(target, 'unsupported', _('Unsupported'))
         for target in result.get('ok_assets', []):

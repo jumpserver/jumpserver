@@ -149,6 +149,17 @@ class HostedPersonalCredentialTestCase(SimpleTestCase):
         view._validate = Mock(return_value={'input_username': ''})
         return view
 
+    def test_manual_account_does_not_replace_empty_username_with_alias(self):
+        view = self.make_view()
+        view.get_remote_addr = lambda: '127.0.0.1'
+        data = {
+            'asset': self.asset, 'account': '@INPUT', 'protocol': 'ssh',
+            'connect_method': 'web_cli', 'connect_options': {}, 'input_username': '',
+        }
+        view.validate_serializer(SimpleNamespace(validated_data=data))
+        self.assertEqual(view.input_username, '')
+        view._validate.assert_called_once()
+
     @patch('authentication.services.connection_token.get_request_ip_or_data', return_value='127.0.0.1')
     @patch('authentication.services.connection_token.get_personal_credential_permission_context')
     @patch('authentication.services.connection_token.get_personal_credential_for_use')
