@@ -183,11 +183,19 @@ class BulkListSerializerMixin:
             try:
                 # prepare child serializer to only handle one instance
                 if "id" in item:
-                    pk = item["id"]
+                    pk_attr = "id"
                 elif "pk" in item:
-                    pk = item["pk"]
+                    pk_attr = "pk"
                 else:
                     raise ValidationError(gettext("id or pk not in data"))
+                pk = item[pk_attr]
+                id_field = self.child.fields.get("id") or self.child.fields.get("pk")
+                if id_field is not None:
+                    try:
+                        # Validate even read-only IDs before using them in an ORM lookup.
+                        pk = id_field.to_internal_value(pk)
+                    except ValidationError as exc:
+                        raise ValidationError({pk_attr: exc.detail}) from exc
                 child = self.instance.get(pk=pk)
                 self.child.instance = child
                 self.child.initial_data = item
