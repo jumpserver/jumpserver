@@ -3,7 +3,7 @@ import re
 from contextlib import contextmanager, nullcontext
 from datetime import datetime, timezone as datetime_timezone
 from importlib import import_module
-from math import ceil
+from math import ceil, isfinite
 
 from asgiref.sync import sync_to_async
 from django.conf import settings
@@ -22,19 +22,36 @@ class SessionStateConflict(Exception):
     pass
 
 
+def valid_login_policy(policy):
+    """Only the current, complete login state may retain authentication."""
+    def timestamp(value):
+        # Keep timestamps representable by datetime (before year 10000).
+        return type(value) in (int, float) and 0 < value < 253402300800 and isfinite(value)
+
+    if not isinstance(policy, dict) or {'closing_at', 'close_lock_at'} & policy.keys():
+        return False
+    if any(type(policy.get(name)) is not bool for name in ('locked', 'renew', 'browser_close')):
+        return False
+    if any(type(policy.get(name)) is not int or policy[name] < minimum for name, minimum in (
+        ('duration', 1), ('state_version', 0), ('lock_password_failures', 0),
+    )):
+        return False
+    if not all(timestamp(policy.get(name)) for name in ('authenticated_at', 'expires_at', 'renewed_at')):
+        return False
+    pending = policy.get('pending_close')
+    if pending is not None and not (
+        isinstance(pending, dict) and pending.get('action') in ('lock', 'logout') and timestamp(pending.get('at'))
+    ):
+        return False
+    if policy.get('unlocked_at') is not None and not timestamp(policy['unlocked_at']):
+        return False
+    return all(isinstance(policy[name], list) and all(isinstance(page, str) for page in policy[name])
+               for name in ('pages', 'closed_pages') if name in policy)
+
+
 def normalize_security_state(policy):
     """A due close action is deterministic, including before its next persisted write."""
     policy = dict(policy)
-    policy.setdefault('locked', False)
-    policy.setdefault('lock_password_failures', 0)
-    policy.setdefault('state_version', 0)
-    if 'pending_close' not in policy:
-        for name, action in (('closing_at', 'logout'), ('close_lock_at', 'lock')):
-            if name in policy:
-                policy['pending_close'] = {'action': action, 'at': policy[name]}
-                break
-    policy.pop('closing_at', None)
-    policy.pop('close_lock_at', None)
     pending = policy.get('pending_close')
     if pending and pending['action'] == 'lock' and pending['at'] <= timezone.now().timestamp():
         policy['locked'] = True
@@ -46,7 +63,7 @@ def normalize_security_state(policy):
 def policy_expiry(policy):
     pending = policy.get('pending_close')
     close_at = pending['at'] if pending and pending['action'] == 'logout' else float('inf')
-    return min(policy['expires_at'], policy.get('closing_at', float('inf')), close_at)
+    return min(policy['expires_at'], close_at)
 
 
 def policy_locked(policy):
@@ -98,7 +115,9 @@ class SessionSaveMixin:
     def load(self):
         data = super().load()
         policy = data.get(LOGIN_POLICY_KEY)
-        if policy and policy_expiry(policy) <= timezone.now().timestamp():
+        if (data.get('_auth_user_id') or policy is not None) and (
+            not valid_login_policy(policy) or policy_expiry(policy) <= timezone.now().timestamp()
+        ):
             self._session_key = None
             return {}
         if policy:
@@ -108,19 +127,14 @@ class SessionSaveMixin:
     async def aload(self):
         return await sync_to_async(self.load)()
 
-    def start_login(self, policy=None, expires_at=None):
+    def start_login(self, policy=None):
         policy = dict(web_login_policy() if policy is None else policy)
         timestamp = timezone.now().timestamp()
-        policy['expires_at'] = expires_at.timestamp() if expires_at else timestamp + policy['duration']
-        policy['renewed_at'] = min(timestamp, policy['expires_at'] - policy['duration'])
-        policy['authenticated_at'] = None if expires_at else timestamp
+        policy['expires_at'] = timestamp + policy['duration']
+        policy['renewed_at'] = timestamp
+        policy['authenticated_at'] = timestamp
         policy.update(locked=False, state_version=0, lock_password_failures=0)
         self[LOGIN_POLICY_KEY] = policy
-
-    def ensure_login_policy(self):
-        if self.get('_auth_user_id') and not self.login_policy:
-            # Adopt an existing login without granting it a fresh full lifetime.
-            self.start_login(expires_at=session_expiry(self.session_key) if self.session_key else None)
 
     def get_expiry_date(self, **kwargs):
         if policy := self.login_policy:
@@ -129,7 +143,6 @@ class SessionSaveMixin:
         return super().get_expiry_date(**kwargs)
 
     def update_page(self, page_id, entering, *, lock_on_close=False):
-        self.ensure_login_policy()
         if not self.login_policy:
             return
         self._page_action = page_id, entering, lock_on_close
@@ -156,7 +169,6 @@ class SessionSaveMixin:
                 if LOGIN_POLICY_KEY in data:
                     pending_data[LOGIN_POLICY_KEY] = data[LOGIN_POLICY_KEY]
                 self._session_cache = pending_data
-            self.ensure_login_policy()
             yield
 
     def set_locked(self, locked, expected_version):
@@ -197,14 +209,18 @@ class SessionSaveMixin:
         return await sync_to_async(self.get_expire_at_browser_close)()
 
     def save(self, must_create=False):
-        self.ensure_login_policy()
+        if (self.get('_auth_user_id') or self.login_policy is not None) and not valid_login_policy(self.login_policy):
+            raise UpdateError('The login has expired.')
         key = self.session_key
         existing_session = key and not must_create
         lock = _session_lock(key) if existing_session else nullcontext()
         with lock:
             if existing_session:
                 # Saves and deletion share the lock so a pending write cannot undo logout.
-                stored = super().load().get(LOGIN_POLICY_KEY)
+                data = super().load()
+                stored = data.get(LOGIN_POLICY_KEY)
+                if (data.get('_auth_user_id') or stored is not None) and not valid_login_policy(stored):
+                    raise UpdateError('The login has expired.')
                 if stored:
                     stored = normalize_security_state(stored)
                 if self.session_key is None:
@@ -306,8 +322,15 @@ def session_login_policies(session_keys):
         return {}
     store_class = import_module(settings.SESSION_ENGINE).SessionStore
     if hasattr(store_class, 'get_model_class'):
-        records = store_class.get_model_class().objects.filter(session_key__in=session_keys)
-        return {record.session_key: record.get_decoded().get(LOGIN_POLICY_KEY) for record in records}
-    keys = {key: store_class(session_key=key).cache_key for key in session_keys}
-    data = caches[settings.SESSION_CACHE_ALIAS].get_many(keys.values())
-    return {key: data.get(cache_key, {}).get(LOGIN_POLICY_KEY) for key, cache_key in keys.items()}
+        records = store_class.get_model_class().objects.filter(session_key__in=session_keys, expire_date__gt=timezone.now())
+        sessions = {record.session_key: record.get_decoded() for record in records}
+    else:
+        keys = {key: store_class(session_key=key).cache_key for key in session_keys}
+        data = caches[settings.SESSION_CACHE_ALIAS].get_many(keys.values())
+        sessions = {key: data.get(cache_key, {}) for key, cache_key in keys.items()}
+    timestamp = timezone.now().timestamp()
+    return {
+        key: normalize_security_state(policy) for key, data in sessions.items()
+        if data.get('_auth_user_id') and valid_login_policy(policy := data.get(LOGIN_POLICY_KEY))
+        and policy_expiry(policy) > timestamp
+    }
