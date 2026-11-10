@@ -204,6 +204,7 @@ def clean_expire_token():
     logging.info('Cleaned expired temporary and connection tokens.')
 
 
+@shared_task
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def clear_oauth2_provider_expired_tokens():
     """Reclaim obsolete credentials; request-time checks enforce login expiry."""
