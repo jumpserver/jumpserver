@@ -19,15 +19,7 @@
              (user_info.stdout_lines[1:]
               | map('regex_replace', ':.*$', '') | list) }}
 
-    - name: Record existing account for connection provisioning
-      ansible.builtin.set_fact:
-        jms_account_existing: true
-      when:
-        - jms_create_only | default(false) | bool
-        - user_exists
-
-    - name: Create and configure only missing accounts
-      when: not (jms_account_existing | default(false) | bool)
+    - name: Push account credentials
       block:
         - name: "Add {{ account.username }} user"
           ansible.builtin.user:
@@ -136,7 +128,7 @@
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         auth_only: true
         fail_on_unknown: false
-        change_succeeded: "{{ not (jms_account_existing | default(false)) and not (change_secret_result.failed | default(false)) }}"
+        change_succeeded: "{{ not (change_secret_result.failed | default(false)) }}"
       when:
        - account.secret_type == "password"
        - check_conn_after_change or change_secret_result.failed | default(false)
@@ -155,7 +147,7 @@
         old_ssh_version: "{{ jms_asset.old_ssh_version | default(False) }}"
         auth_only: true
         fail_on_unknown: false
-        change_succeeded: "{{ not (jms_account_existing | default(false)) and not (change_secret_result.failed | default(false)) }}"
+        change_succeeded: "{{ not (change_secret_result.failed | default(false)) }}"
       when:
        - account.secret_type == "ssh_key"
        - check_conn_after_change or change_secret_result.failed | default(false)

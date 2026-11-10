@@ -1,3 +1,4 @@
+import json
 import os
 import time
 from collections import defaultdict
@@ -53,6 +54,46 @@ class DefaultCallback:
 
     def is_success(self):
         return self.status == "success"
+
+    @staticmethod
+    def format_task_output(data):
+        output = data.get('stdout')
+        if data.get('event') != 'runner_on_ok':
+            return output
+        event_data = data.get('event_data') or {}
+        result = event_data.get('res') or {}
+        if result.get('_ansible_no_log'):
+            return output
+        probe = (
+            (result.get('ansible_facts') or {}).get('jms_credential_probe')
+            or result
+        )
+        if probe.get('auth_status') != 'unknown' or probe.get('_ansible_no_log'):
+            return output
+
+        # An inconclusive probe exits normally so that account automation can
+        # distinguish it from rejected credentials. Do not display it as a
+        # successful verification or change the underlying Ansible result.
+        host = event_data.get('host') or event_data.get('remote_addr') or ''
+        delegated = (result.get('_ansible_delegated_vars') or {}).get('ansible_host')
+        if delegated:
+            host = f'{host} -> {delegated}'
+        reason_code = probe.get('reason_code') or 'PROBE_ERROR'
+        verification_error = reason_code in {
+            'SSH_TIMEOUT', 'CONNECTION_FAILED', 'SSH_PROTOCOL_ERROR',
+            'NETWORK_OR_GATEWAY_ERROR', 'PROBE_ERROR',
+        }
+        # A failed probe is an error at this step, even though it leaves the
+        # remote credential's validity unknown at the account level.
+        color = '31' if verification_error else '33'
+        label = 'verification error' if verification_error else 'verification pending'
+        detail = {'reason_code': reason_code}
+        if probe.get('msg'):
+            detail['msg'] = probe['msg']
+        # Only log diagnostic fields; result/invocation may contain credentials.
+        detail = json.dumps(detail, ensure_ascii=False)
+        host = json.dumps(str(host), ensure_ascii=False)[1:-1]
+        return f'\033[0;{color}m{label}: [{host}] => {detail}\033[0m'
 
     def event_handler(self, data, **kwargs):
         event = data.get("event", None)
@@ -291,7 +332,7 @@ class DefaultCallback:
 
 
 class TaskLogCallback(DefaultCallback):
-    """Persist raw ansible-runner output for a Celery task."""
+    """Persist Ansible output with credential verification outcomes for a task."""
 
     def __init__(self, task_id=None):
         super().__init__()
@@ -316,7 +357,7 @@ class TaskLogCallback(DefaultCallback):
         self.task_log.flush()
 
     def event_handler(self, data, **kwargs):
-        self.write_task_output(data.get('stdout'))
+        self.write_task_output(self.format_task_output(data))
         return super().event_handler(data, **kwargs)
 
     def close(self):
