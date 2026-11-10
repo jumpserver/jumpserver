@@ -8,6 +8,7 @@ from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
+from ops.celery import app
 from ops.serializers.job import JobExecutionSerializer, JobSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from terminal.models import Session
@@ -165,6 +166,14 @@ class OperateLogSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def get_resource(instance) -> str:
+        # Stored logs contain either the message ID or its English translation.
+        if instance.resource_type in ('Celery Task Execution', 'Celery task execution'):
+            task_name, separator, execution_id = instance.resource.rpartition(': ')
+            if separator and execution_id:
+                task = app.tasks.get(task_name)
+                verbose_name = getattr(task, 'verbose_name', None)
+                if verbose_name:
+                    return f'{verbose_name}: {execution_id}'
         return i18n_trans(instance.resource)
 
 
