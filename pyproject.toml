@@ -200,7 +200,7 @@ xpack = [
 ]
 
 [tool.uv.sources]
-ansible-core = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.5.zip" }
+ansible-core = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.6.zip" }
 ansible-runner = { url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip" }
 jms-ansible-executor = { url = "https://github.com/jumpserver/ansible-executor/archive/refs/tags/v0.1.0.zip" }
 django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
