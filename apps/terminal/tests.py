@@ -196,6 +196,38 @@ class SessionErrorReasonSerializerTests(SimpleTestCase):
         self.assertIn('error_reason', serializer.errors)
 
 
+class SessionPartialUpdateTests(SimpleTestCase):
+    def test_partial_update_does_not_rewrite_unchanged_timestamps(self):
+        session = Session(
+            protocol='ssh', is_finished=False, is_success=True,
+            date_start=timezone.now(),
+        )
+        original_date_start = session.date_start
+        serializer = SessionSerializer(
+            instance=session, data={'date_end': timezone.now()}, partial=True,
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        with patch.object(session, 'save') as save:
+            serializer.save()
+
+        save.assert_called_once_with(update_fields=['date_end'])
+        self.assertEqual(session.date_start, original_date_start)
+
+    def test_replay_failure_clear_is_saved_with_changed_fields(self):
+        session = Session(
+            protocol='ssh', error_reason=SessionErrorReason.replay_unsupported,
+        )
+        serializer = SessionSerializer(instance=session, data={'has_replay': True}, partial=True)
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        with patch.object(session, 'save') as save:
+            serializer.save()
+
+        save.assert_called_once_with(update_fields=['has_replay', 'error_reason'])
+        self.assertEqual(session.error_reason, '')
+
+
 class PackageRootLocateTests(SimpleTestCase):
     def make_file(self, base_dir, relative_path):
         path = os.path.join(base_dir, relative_path)

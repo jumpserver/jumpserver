@@ -255,7 +255,12 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
                 is_finished and not instance.is_finished and instance.is_success
         ):
             self.enqueue_change_secret_task(instance)
-        return super().update(instance, validated_data)
+        # DRF's default update saves every model field. Restrict the write to
+        # fields changed by this request so unchanged session timestamps are not rewritten.
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save(update_fields=list(validated_data))
+        return instance
 
 
 class SessionDisplaySerializer(SessionSerializer):
