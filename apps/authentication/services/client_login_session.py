@@ -15,6 +15,7 @@ from oauth2_provider.models import (
 )
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 
+from common.utils import get_log_keep_day
 from common.utils.lock import DistributedLock
 from authentication.models.client_login_session import ClientLoginSession
 
@@ -333,7 +334,7 @@ def revoke_client_authorizations(reason='policy_changed'):
 
 
 def clear_client_login_sessions():
-    """Keep terminated rows for 30 days and while OAuth credentials refer to them."""
+    """Keep terminated rows for the login-log retention period and while credentials refer to them."""
     from django.db.models import Exists, OuterRef, Q
 
     with client_policy_lock(), transaction.atomic():
@@ -368,4 +369,5 @@ def clear_client_login_sessions():
         ).filter(has_live_session=False)
         get_access_token_model().objects.filter(pk__in=obsolete.values('access_token_id')).delete()
         obsolete.delete()
-        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=30), has_refresh=False).delete()
+        days = get_log_keep_day('LOGIN_LOG_KEEP_DAYS')
+        sessions.filter(revoked_at__lt=timezone.now() - timedelta(days=days), has_refresh=False).delete()
