@@ -3,7 +3,7 @@ from django.core.cache import cache
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 
-from . import LOGIN_POLICY_KEY
+from . import LOGIN_POLICY_KEY, policy_locked
 
 
 class SessionMiddleware(DjangoSessionMiddleware):
@@ -22,7 +22,8 @@ class SessionMiddleware(DjangoSessionMiddleware):
                 else:
                     session.clear()
             if (
-                policy and policy['renew'] and not policy.get('pending_close') and response.status_code < 400
+                policy and policy['renew'] and not policy_locked(policy)
+                and not policy.get('pending_close') and response.status_code < 400
                 and timestamp - policy['renewed_at'] >= 60
                 and not request.path_info.startswith('/api/v1/authentication/user-session/')
                 and not (request.method in ('GET', 'HEAD') and session.renewal_exclusions.match(request.path_info))

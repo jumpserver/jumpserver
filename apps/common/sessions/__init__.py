@@ -228,7 +228,8 @@ class SessionSaveMixin:
                     raise UpdateError('The login has expired.')
                 if stored and self.login_policy:
                     policy = normalize_security_state(self.login_policy)
-                    if stored['renewed_at'] > policy['renewed_at']:
+                    # An earlier response must not extend a login that is now locked.
+                    if stored['locked'] or stored['renewed_at'] > policy['renewed_at']:
                         policy.update(renewed_at=stored['renewed_at'], expires_at=stored['expires_at'])
                     for name in ('locked', 'state_version', 'lock_password_failures', 'unlocked_at',
                                  'pending_close', 'pages', 'closed_pages'):
