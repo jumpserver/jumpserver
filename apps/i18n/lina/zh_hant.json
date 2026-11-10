@@ -1107,6 +1107,7 @@
     "RDPSignCertificate": "RDP 簽章憑證",
     "RDPSignCertificateHelp": "請同時上傳 PEM 格式的程式碼簽章憑證（.crt/.pem）與對應私鑰；留空保留現有設定。",
     "RDPSignCertificateStatus": "簽章憑證狀態",
+    "RDPSignCertificateInvalid": "簽章憑證未設定或無效，請上傳有效憑證與對應私鑰後儲存。",
     "RDPSignEnabled": "RDP 檔案簽章",
     "RDPSignEnabledHelp": "為 RDP 連線檔案簽章，失敗時提供未簽章檔案。是否允許連線取決於用戶端安全原則。",
     "RDPSignPrivateKey": "RDP 簽章私鑰",

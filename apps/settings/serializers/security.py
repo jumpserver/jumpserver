@@ -258,6 +258,14 @@ class SecuritySessionSerializer(serializers.Serializer):
         help_text=_('Upload the matching unencrypted PEM private key. Leave empty to keep the current key.'),
     )
     RDP_SIGN_CERT_INFO = serializers.SerializerMethodField(label=_('RDP signing certificate status'))
+    RDP_SIGN_CERT_VALID = serializers.SerializerMethodField()
+
+    def get_RDP_SIGN_CERT_VALID(self, instance) -> bool:
+        try:
+            load_rdp_signing_material()
+        except RDPSigningMaterialError:
+            return False
+        return True
 
     def get_RDP_SIGN_CERT_INFO(self, instance):
         try:

@@ -1103,6 +1103,7 @@
     "RDPSignCertificate": "RDP signing certificate",
     "RDPSignCertificateHelp": "Upload a PEM code signing certificate (.crt/.pem) and its matching private key together. Leave empty to keep the current configuration.",
     "RDPSignCertificateStatus": "Signing certificate status",
+    "RDPSignCertificateInvalid": "Signing certificate not configured or invalid. Upload a valid certificate and its matching private key, then save.",
     "RDPSignEnabled": "RDP file signing",
     "RDPSignEnabledHelp": "Sign RDP connection files. If signing fails, provide an unsigned file. Client security policies still apply.",
     "RDPSignPrivateKey": "RDP signing private key",

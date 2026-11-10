@@ -1107,6 +1107,7 @@
     "RDPSignCertificate": "RDP 签名证书",
     "RDPSignCertificateHelp": "请同时上传 PEM 格式的代码签名证书（.crt/.pem）和匹配私钥；留空保留现有配置。",
     "RDPSignCertificateStatus": "签名证书状态",
+    "RDPSignCertificateInvalid": "签名证书未配置或无效，请上传有效证书及匹配私钥后保存。",
     "RDPSignEnabled": "RDP 文件签名",
     "RDPSignEnabledHelp": "为 RDP 连接文件签名，失败时提供未签名文件。是否允许连接取决于客户端安全策略。",
     "RDPSignPrivateKey": "RDP 签名私钥",
