@@ -428,6 +428,9 @@ class VerifyAccountManager(ConnectivityReportMixin, AccountBasePlaybookManager):
         if details:
             self.result['unavailable_account_details'] = details
         for account_id in sorted(missing_account_ids):
+            self.result.setdefault('account_details', {})[account_id] = {
+                **details.get(account_id, {}), 'account_id': account_id,
+            }
             self._inventory_host_labels[account_id] = self.format_unavailable_account_label(
                 account_id, details,
             )
