@@ -495,11 +495,12 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
                 }
             else:
                 policy = web_policies.get(row['key'])
+                row['is_active'] = bool(policy)
                 row['is_locked'] = policy_locked(policy)
                 row['date_expired'] = (
                     datetime.fromtimestamp(policy_expiry(policy),
                                            tz=datetime_timezone.utc) if policy
-                    else UserSession(key=row['key']).date_expired
+                    else None
                 )
                 row['session_policy'] = {
                     'duration': policy['duration'], 'renew': policy['renew'],

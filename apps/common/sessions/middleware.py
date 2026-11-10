@@ -12,7 +12,6 @@ class SessionMiddleware(DjangoSessionMiddleware):
         renewal_key = None
         renewal = None
         if session is not None and response.status_code < 500:
-            session.ensure_login_policy()
             policy = session.login_policy
             timestamp = timezone.now().timestamp()
             if policy and session.get_expiry_date() <= timezone.now():

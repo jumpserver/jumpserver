@@ -23,14 +23,12 @@ class RedisUserSessionManager:
 
     @staticmethod
     def check_active(session_key):
-        # Web devices are online while their server-side login remains valid.
-        from django.utils import timezone
-        from . import session_expiry
-        expiry = session_expiry(session_key)
-        return expiry is not None and expiry > timezone.now()
+        from . import session_login_policies
+        return bool(session_login_policies([session_key]).get(session_key))
 
     def get_active_keys(self):
-        return self.get_keys()
+        from . import session_login_policies
+        return [key for key, policy in session_login_policies(self.get_keys()).items() if policy]
 
     @staticmethod
     def get_keys():
