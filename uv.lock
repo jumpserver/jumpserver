@@ -297,21 +297,6 @@ wheels = [
 ]
 
 [[package]]
-name = "ansible-builder"
-version = "3.1.1"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "bindep" },
-    { name = "jsonschema" },
-    { name = "packaging" },
-    { name = "pyyaml" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/fe/6b/0525894e5dd510c3a67da0b8819209333ca939cfa94b7f0d3ef041a628ec/ansible_builder-3.1.1.tar.gz", hash = "sha256:9d88bc15acc7d31056d0c51914a6102dac8e5ad73f9f2d35ba98378c89714ed2" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/a5/d0/e4a46f92084fcd6a94ca038645b1580316d3a6e0a8be28709bc4e00367cd/ansible_builder-3.1.1-py3-none-any.whl", hash = "sha256:a8246022edb92ca27ea95e87c7af30bcb2752f108dcc75fbf96e77196dff1072" },
-]
-
-[[package]]
 name = "ansible-core"
 version = "2.16.18"
 source = { url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.6.zip" }
@@ -629,21 +614,6 @@ source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/7c/58/1546c970afcd2a2428b1bfafecf2371d8951cc34b46701bea73f4280989e/billiard-4.2.1.tar.gz", hash = "sha256:12b641b0c539073fc8d3f5b8b7be998956665c4233c7c1fcd66a7e677c4fb36f" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/30/da/43b15f28fe5f9e027b41c539abc5469052e9d48fd75f8ff094ba2a0ae767/billiard-4.2.1-py3-none-any.whl", hash = "sha256:40b59a4ac8806ba2c2369ea98d876bc6108b051c227baffd928c644d15d8f3cb" },
-]
-
-[[package]]
-name = "bindep"
-version = "2.14.0"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-dependencies = [
-    { name = "distro" },
-    { name = "packaging" },
-    { name = "parsley" },
-    { name = "pbr" },
-]
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/be/c2/a549e0286fd2711e401dc240184fb89c06e2ff1642fb7c6cac7a95fe0c8c/bindep-2.14.0.tar.gz", hash = "sha256:0c804c7e48dd17db24cb39121ade7171f684fb463c8aa01d0338cd11d254364a" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/6e/50/b102034fbff7f86dc1120ba72309c12a9a4937e02b941e7c7a301879dc0f/bindep-2.14.0-py3-none-any.whl", hash = "sha256:235181c6f79f3a3edb831a6ae55f61185bc1de0f7761904d906507e9a5d801c9" },
 ]
 
 [[package]]
@@ -2289,7 +2259,6 @@ dependencies = [
     { name = "amqp" },
     { name = "annotated-types" },
     { name = "ansible" },
-    { name = "ansible-builder" },
     { name = "ansible-core" },
     { name = "ansible-runner" },
     { name = "asn1crypto" },
@@ -2475,7 +2444,6 @@ requires-dist = [
     { name = "amqp", specifier = "==5.1.1" },
     { name = "annotated-types", specifier = ">=0.6.0" },
     { name = "ansible", specifier = "==9.13.0" },
-    { name = "ansible-builder", specifier = ">=3.1.1" },
     { name = "ansible-core", url = "https://github.com/jumpserver-dev/ansible/archive/refs/tags/v2.16.18.6.zip" },
     { name = "ansible-runner", url = "https://github.com/jumpserver-dev/ansible-runner/archive/refs/tags/v2.4.0.2.zip" },
     { name = "asn1crypto", specifier = "==1.5.1" },
@@ -3390,15 +3358,6 @@ dependencies = [
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/7d/15/ad6ce226e8138315f2451c2aeea985bf35ee910afb477bae7477dc3a8f3b/paramiko-3.5.1.tar.gz", hash = "sha256:b2c665bc45b2b215bd7d7f039901b14b067da00f3a11e6640995fd58f2664822" }
 wheels = [
     { url = "https://mirrors.aliyun.com/pypi/packages/15/f8/c7bd0ef12954a81a1d3cea60a13946bd9a49a0036a5927770c461eade7ae/paramiko-3.5.1-py3-none-any.whl", hash = "sha256:43b9a0501fc2b5e70680388d9346cf252cfb7d00b0667c39e80eb43a408b8f61" },
-]
-
-[[package]]
-name = "parsley"
-version = "1.3"
-source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
-sdist = { url = "https://mirrors.aliyun.com/pypi/packages/06/52/cac2f9e78c26cff8bb518bdb4f2b5a0c7058dec7a62087ed48fe87478ef0/Parsley-1.3.tar.gz", hash = "sha256:9444278d47161d5f2be76a767809a3cbe6db4db822f46a4fd7481d4057208d41" }
-wheels = [
-    { url = "https://mirrors.aliyun.com/pypi/packages/2b/d6/4fed8d65e28a970e1c5cb33ce9c7e22e3de745e1b2ae37af051ef16aea3b/Parsley-1.3-py2.py3-none-any.whl", hash = "sha256:c3bc417b8c7e3a96c87c0f2f751bfd784ed5156ffccebe2f84330df5685f8dc3" },
 ]
 
 [[package]]

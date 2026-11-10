@@ -47,7 +47,8 @@ installer 通过 `env_file` 传入自定义连接参数，Compose 仅分别指�
 不再获得执行容器的 UID 和文件隔离。执行器连接失败会报错，不自动降级到本地。
 实验性配置 `ANSIBLE_EXECUTION_BACKEND` 已移除，不再覆盖这个开关。
 旧 `jumpserver/ansible-executor` 逐任务 Docker 执行方式已停用，不能只替换旧镜像的标签；
-需按上文部署常驻 SSH 服务。旧镜像构建文件仅保留为历史参考，不再自动构建发布。
+需按上文部署常驻 SSH 服务。执行器镜像统一由配套 `jumpserver/ansible-executor`
+仓库构建发布，Core 不再保留旧镜像构建流程。
 部署这个后端时还需更新 Python 依赖（`uv sync --frozen`）。
 
 任务通过 Runner transmit/worker 流协议传输，不使用 SFTP。上传文件、生成的
