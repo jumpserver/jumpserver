@@ -9,6 +9,7 @@ from accounts.const import (
     AutomationTypes, ChangeSecretRecordStatusChoice, Connectivity, SecretType,
 )
 from accounts.models import Account, ChangeSecretRecord, PersonalAssetCredential
+from accounts.models.automations.verify_account import get_target_account_details
 from accounts.personal_credentials import (
     get_personal_credential_permission_context,
     record_personal_credential_audit,
@@ -26,6 +27,7 @@ from users.models import User
 from ..base.manager import AccountBasePlaybookManager
 
 logger = get_logger(__name__)
+UNAVAILABLE_ACCOUNT_ERROR = 'Account not found or inactive'
 
 
 class PersonalCredentialAccount:
@@ -252,13 +254,23 @@ class VerifyAccountManager(ConnectivityReportMixin, AccountBasePlaybookManager):
         self.load_accounts_by_asset()
         return self._accounts_by_asset_id.get(str(asset.id), [])
 
+    @staticmethod
+    def format_inventory_host_label(host, detail):
+        if isinstance(detail, dict):
+            account = detail.get('account') or {}
+            if account.get('full_username'):
+                detail = {
+                    **detail, 'account': {**account, 'username': account['full_username']},
+                }
+        return BasePlaybookManager.format_inventory_host_label(host, detail)
+
     def get_execution_account_label(self, detail):
         # Verification connects with the target credential, overriding the
         # privileged account initially selected for the asset inventory.
         account = detail.get('account') or {}
         protocol = (detail.get('jms_asset') or {}).get('protocol')
         username = account.get('username')
-        if protocol in ('winrm', 'rdp'):
+        if protocol in ('ssh', 'winrm', 'rdp'):
             username = account.get('full_username') or username
         auth = {}
         if protocol == 'ssh' and account.get('secret_type') == SecretType.PASSWORD:
@@ -300,11 +312,14 @@ class VerifyAccountManager(ConnectivityReportMixin, AccountBasePlaybookManager):
             else:
                 self.found_account_ids.add(account_id)
             h = deepcopy(host)
-            h['name'] += '(' + neutralize_jinja2_syntax(account.username) + ')'
+            full_username = account.full_username
+            # Joined directory and local accounts can share a username on this asset.
+            h['name'] += f'__account_{account_id}({neutralize_jinja2_syntax(full_username)})'
             self.host_account_mapper[h['name']] = account
             h['account'] = {
+                'id': account_id,
                 'username': escape_jinja2_syntax(account.username),
-                'full_username': escape_jinja2_syntax(account.full_username),
+                'full_username': escape_jinja2_syntax(full_username),
             }
             record = self.get_recovery_record(asset.id, account.id)
             if self.recovery_record_map and not record:
@@ -327,16 +342,14 @@ class VerifyAccountManager(ConnectivityReportMixin, AccountBasePlaybookManager):
                 secret = self.generate_public_key(secret)
 
             h['secret_type'] = account.secret_type
-            h['account'] = {
+            h['account'].update({
                 'name': escape_jinja2_syntax(account.name),
-                'username': escape_jinja2_syntax(account.username),
-                'full_username': escape_jinja2_syntax(account.full_username),
                 'privileged': account.privileged,
                 'secret_type': account.secret_type,
                 'secret': escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,
                 'become': account.get_ansible_become_auth(path_dir=path_dir),
-            }
+            })
             if account.platform.type == 'oracle':
                 use_sysdba = (
                     account.privileged and
@@ -368,14 +381,57 @@ class VerifyAccountManager(ConnectivityReportMixin, AccountBasePlaybookManager):
             'verification_status', 'verification_error', 'date_verified',
         ])
 
+    def resolve_unavailable_account_details(self, account_ids, saved_details):
+        snapshot_details = self.execution.snapshot.get('target_account_details', {})
+        details = {}
+        for account_id in account_ids:
+            identity = snapshot_details.get(account_id) or saved_details.get(account_id)
+            if identity and identity.get('username'):
+                details[account_id] = identity
+
+        missing_ids = account_ids - details.keys()
+        if missing_ids:
+            accounts = Account.objects.filter(
+                id__in=missing_ids, org_id=self.execution.org_id,
+            )
+            details.update(get_target_account_details(accounts))
+        return details
+
+    @staticmethod
+    def format_unavailable_account_label(account_id, details):
+        identity = details.get(account_id, {})
+        username = identity.get('username')
+        if not username:
+            return str(_(
+                'Unable to resolve username (account ID: %(account_id)s)'
+            ) % {'account_id': account_id})
+        asset_name = identity.get('asset_name')
+        return f'{asset_name} / {username}' if asset_name else username
+
+    def get_report_failure_labels(self, result):
+        account_ids = {
+            str(target) for target, error in result.get('fail_assets', [])
+            if error == UNAVAILABLE_ACCOUNT_ERROR and str(target) in self.account_ids
+        }
+        details = self.resolve_unavailable_account_details(
+            account_ids, result.get('unavailable_account_details', {}),
+        )
+        return {
+            account_id: self.format_unavailable_account_label(account_id, details)
+            for account_id in account_ids
+        }
+
     def get_runners(self):
         runners = super().get_runners()
-        for account_id in sorted(
-                self.account_ids - self.found_account_ids
-        ):
-            super().on_inventory_host_error(
-                account_id, 'Account not found or inactive'
+        missing_account_ids = self.account_ids - self.found_account_ids
+        details = self.resolve_unavailable_account_details(missing_account_ids, {})
+        if details:
+            self.result['unavailable_account_details'] = details
+        for account_id in sorted(missing_account_ids):
+            self._inventory_host_labels[account_id] = self.format_unavailable_account_label(
+                account_id, details,
             )
+            super().on_inventory_host_error(account_id, UNAVAILABLE_ACCOUNT_ERROR)
             for key, record_id in self.recovery_record_map.items():
                 if not key.endswith(f'-{account_id}'):
                     continue

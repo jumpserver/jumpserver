@@ -553,9 +553,10 @@ class PlaybookPrepareMixin:
             account_selector=self.get_inventory_account_selector(),
         )
         inventory.write_to_file(inventory_path)
+        inventory_hosts = self.get_inventory_hosts(inventory_path)
         asset_details = self.result.setdefault('asset_details', {})
         for host, detail in {
-            **self.get_inventory_hosts(inventory_path),
+            **inventory_hosts,
             **inventory.exclude_host_details,
         }.items():
             asset = detail.get('jms_asset') or {}
@@ -567,6 +568,13 @@ class PlaybookPrepareMixin:
                 'asset_name': asset.get('name', ''),
                 'asset_address': asset.get('origin_address') or asset.get('address', ''),
             }
+        if str(self.method_type()) in ('ping', 'verify_account'):
+            from .account_results import account_snapshot
+            account_details = self.result.setdefault('account_details', {})
+            for host, detail in inventory_hosts.items():
+                snapshot = account_snapshot(detail, str(self.method_type()))
+                if snapshot:
+                    account_details[host] = snapshot
         self._inventory_host_labels = {
             host: self.format_inventory_host_label(host, detail)
             for host, detail in inventory.exclude_host_details.items()
