@@ -56,7 +56,7 @@ def legacy_ping_accounts(lines):
     return identities
 
 
-def execution_account_results(result, execution_type, log_lines=()):
+def execution_account_results(result, execution_type, log_lines=(), include_unresolved=False):
     result = result or {}
     outcomes = {}
     for target in result.get('ok_assets', []):
@@ -71,7 +71,7 @@ def execution_account_results(result, execution_type, log_lines=()):
     )
     rows, unresolved = [], 0
     for target, (status, error) in outcomes.items():
-        identity = details.get(target)
+        identity = details.get(target) or result.get('unavailable_account_details', {}).get(target)
         match = TARGET.fullmatch(target)
         if not identity and match and 'account_details' not in result:
             asset = assets.get(target, {})
@@ -93,7 +93,17 @@ def execution_account_results(result, execution_type, log_lines=()):
                     identity = {**candidates[0], 'asset_id': match['id']}
         if not identity or not identity.get('username'):
             unresolved += 1
-            continue
+            if not include_unresolved:
+                continue
+            # Keep the actual outcome even when old logs have been removed.
+            # Never substitute a currently enabled account for a historical one.
+            identity = {
+                **assets.get(target, {}),
+                **({'asset_id': match['id'], 'asset_name': match['name']} if match else {}),
+                **(identity or {}),
+            }
+        if execution_type == 'verify_account' and not match:
+            identity = {**identity, 'account_id': target}
         row = {key: str(identity.get(key) or '') for key in SAFE_FIELDS}
         row.update({
             'id': target, 'status': status, 'error': error,
@@ -103,16 +113,23 @@ def execution_account_results(result, execution_type, log_lines=()):
     return {'rows': rows, 'unresolved': unresolved}
 
 
-def get_execution_account_results(execution):
+def get_execution_account_results(execution, include_unresolved=False):
     result = execution.result or {}
+    if execution.type == 'verify_account':
+        snapshot_details = (execution.snapshot or {}).get('target_account_details', {})
+        result = {
+            **result, 'unavailable_account_details': {
+                **snapshot_details, **result.get('unavailable_account_details', {}),
+            },
+        }
     if execution.type != 'ping' or 'account_details' in result:
-        return execution_account_results(result, execution.type)
+        return execution_account_results(result, execution.type, include_unresolved=include_unresolved)
     from django.conf import settings
     from ops.utils import get_task_log_path
     path = get_task_log_path(settings.CELERY_LOG_DIR, execution.id, create=False)
     try:
         with open(path, encoding='utf-8', errors='replace') as log:
             # Stream the log, retaining only whitelisted identity fields.
-            return execution_account_results(result, execution.type, log)
+            return execution_account_results(result, execution.type, log, include_unresolved=include_unresolved)
     except OSError:
-        return execution_account_results(result, execution.type)
+        return execution_account_results(result, execution.type, include_unresolved=include_unresolved)

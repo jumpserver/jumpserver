@@ -1344,6 +1344,15 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         )
         return run_kwargs
 
+    def save_connectivity_records(self):
+        if self.execution.type in ('ping', 'verify_account'):
+            from accounts.automations.connectivity import save_connectivity_records
+            save_connectivity_records(self.execution)
+
+    def update_execution(self):
+        super().update_execution()
+        self.save_connectivity_records()
+
     def update_batch_progress(self, completed, total, current=None):
         self.summary['completed_batches'] = completed
         self.summary['total_batches'] = total
@@ -1359,6 +1368,7 @@ class BasePlaybookManager(PlaybookPrepareMixin, BaseManager):
         try:
             with safe_atomic_db_connection():
                 self.execution.save(update_fields=['summary', 'result'])
+                self.save_connectivity_records()
         except Exception:
             logger.exception(
                 'Save automation batch progress failed: execution=%s',
