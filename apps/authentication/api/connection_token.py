@@ -861,7 +861,7 @@ class ConnectionTokenViewSet(AuthFaceMixin, ExtraActionApiMixin, RootOrgViewMixi
         self.input_username = self.get_input_username(data)
         if account_name == AliasAccount.INPUT:
             # Manual account input can reach Luna directly, so validate before ACL/token creation.
-            self.input_username = validate_account_username(self.input_username)
+            self.input_username = validate_account_username(data.get('input_username', ''))
             data['input_username'] = self.input_username
         _data = self._validate(
             user, asset, account_name, protocol, connect_method,
