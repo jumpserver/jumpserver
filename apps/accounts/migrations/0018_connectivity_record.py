@@ -5,17 +5,6 @@ import uuid
 from django.db import migrations, models
 
 
-def backfill_records(apps, schema_editor):
-    from accounts.automations.connectivity import backfill_connectivity_records
-
-    using = schema_editor.connection.alias
-    execution_model = apps.get_model('assets', 'AutomationExecution')
-    record_model = apps.get_model('accounts', 'ConnectivityRecord')
-    backfill_connectivity_records(
-        execution_model._base_manager.using(using).all(), record_model, using,
-    )
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -52,5 +41,4 @@ class Migration(migrations.Migration):
                 'constraints': [],
             },
         ),
-        migrations.RunPython(backfill_records, migrations.RunPython.noop),
     ]
