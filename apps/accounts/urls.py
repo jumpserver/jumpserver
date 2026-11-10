@@ -33,6 +33,7 @@ router.register(r'check-account-executions', api.CheckAccountExecutionViewSet, '
 router.register(r'verify-account-automations', api.VerifyAccountAutomationViewSet, 'verify-account-automation')
 router.register(r'connectivity-automations', api.ConnectivityAutomationViewSet, 'connectivity-automation')
 router.register(r'connectivity-executions', api.ConnectivityExecutionViewSet, 'connectivity-execution')
+router.register(r'connectivity-records', api.ConnectivityRecordViewSet, 'connectivity-record')
 router.register(r'verify-account-executions', api.VerifyAccountExecutionViewSet, 'verify-account-execution')
 router.register(r'ping-automations', api.PingAutomationViewSet, 'ping-automation')
 router.register(r'ping-executions', api.PingExecutionViewSet, 'ping-execution')

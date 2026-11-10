@@ -19,8 +19,15 @@ def execute_credential_precheck(execution_id, org_id):
 
 
 def quickstart_automation_by_snapshot(task_name, tp, task_snapshot=None):
-    from accounts.models import AutomationExecution
+    from accounts.const import AutomationTypes
+    from accounts.models import Account, AutomationExecution
+    from accounts.models.automations.verify_account import get_target_account_details
+
     data = generate_automation_execution_data(task_name, tp, task_snapshot)
+    snapshot = data['snapshot']
+    if tp == AutomationTypes.verify_account and snapshot.get('accounts'):
+        accounts = Account.objects.filter(id__in=snapshot['accounts'])
+        snapshot['target_account_details'] = get_target_account_details(accounts)
 
     pk = data['id']
     if AutomationExecution.objects.filter(id=pk).exists():

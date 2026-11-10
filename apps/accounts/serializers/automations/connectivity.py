@@ -14,6 +14,7 @@ __all__ = [
     'PingAutomationSerializer', 'PingAutomationListSerializer',
     'VerifyAccountExecutionSerializer', 'PingExecutionSerializer',
     'ConnectivityAutomationListSerializer', 'ConnectivityExecutionListSerializer',
+    'ConnectivityRecordSerializer',
 ]
 
 
@@ -85,10 +86,17 @@ class PingAutomationListSerializer(AutomationListSerializerMixin, PingAutomation
 
 
 class ConnectivityExecutionSerializer(AutomationExecutionSerializer):
+    account_results = serializers.SerializerMethodField(label=_('Accounts'))
+
+    @staticmethod
+    def get_account_results(obj):
+        from assets.automations.base.account_results import get_execution_account_results
+        return get_execution_account_results(obj)
+
     class Meta(AutomationExecutionSerializer.Meta):
-        fields = AutomationExecutionSerializer.Meta.fields + ['summary', 'result']
+        fields = AutomationExecutionSerializer.Meta.fields + ['summary', 'result', 'account_results']
         read_only_fields = AutomationExecutionSerializer.Meta.read_only_fields + [
-            'id', 'summary', 'result',
+            'id', 'summary', 'result', 'account_results',
         ]
 
 
@@ -114,3 +122,18 @@ class VerifyAccountExecutionSerializer(ConnectivityExecutionSerializer):
 
 class PingExecutionSerializer(ConnectivityExecutionSerializer):
     automation = ObjectRelatedField(queryset=PingAutomation.objects, required=True)
+
+
+class ConnectivityRecordSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    execution = serializers.UUIDField(read_only=True, label=_('Execution'))
+    type = LabeledChoiceField(choices=[('ping', _('Asset')), ('verify_account', _('Account'))], read_only=True, label=_('Type'))
+    asset = serializers.CharField(read_only=True, label=_('Asset'))
+    asset_address = serializers.CharField(read_only=True, label=_('Address'))
+    account = serializers.CharField(read_only=True, label=_('Account'))
+    username = serializers.CharField(read_only=True, label=_('Username'))
+    privileged = serializers.BooleanField(read_only=True, allow_null=True, label=_('Privileged'))
+    status = LabeledChoiceField(choices=[('success', _('Success')), ('failed', _('Failed'))], read_only=True, label=_('Result'))
+    date_start = serializers.DateTimeField(read_only=True, allow_null=True, label=_('Date start'))
+    date_finished = serializers.DateTimeField(read_only=True, allow_null=True, label=_('Date finished'))
+    error = serializers.CharField(read_only=True, label=_('Error'))
