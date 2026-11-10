@@ -125,7 +125,6 @@ def _start(account, user, protocol):
         'secret_type': account.secret_type, 'secret_strategy': SecretStrategy.custom,
         'check_conn_after_change': True, 'params': params,
         'first_login': {'user_id': str(user.id), 'protocol': protocol, 'remote_addr': getattr(account, '_provisioning_ip', '')},
-        'create_only': True,
         'record_map': {f'{account.asset_id}-{account.id}': str(record_id)},
     }
     data = generate_automation_execution_data(
