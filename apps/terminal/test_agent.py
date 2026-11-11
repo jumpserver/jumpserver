@@ -488,8 +488,12 @@ class AgentBoundaryTests(TestCase):
     def test_rotation_preserves_session_but_revocation_blocks_execution(self):
         self.refresh.revoked = timezone.now()
         self.refresh.save(update_fields=['revoked'])
-        replacement = get_refresh_token_model().objects.create(
+        access = get_access_token_model().objects.create(
             user=self.user, application=self.app, token=uuid.uuid4().hex,
+            scope=service.SCOPE, resource=[self.resource], expires=timezone.now() + timedelta(minutes=5),
+        )
+        replacement = get_refresh_token_model().objects.create(
+            user=self.user, application=self.app, access_token=access, token=uuid.uuid4().hex,
             token_family=self.refresh.token_family, resource=[self.resource],
         )
         self.token.delete()
@@ -688,7 +692,7 @@ class AgentBoundaryTests(TestCase):
                 self.assertEqual(grant.redirect_uri, callback)
                 self.assertEqual(grant.resource, [self.resource])
 
-    def test_loopback_redirect_exception_is_limited_to_active_registered_agent(self):
+    def test_loopback_redirect_exception_is_limited_to_registered_agent(self):
         from django.core.exceptions import DisallowedRedirect
         from authentication.backends.oauth2_provider.agent import AgentAwareAuthorizationView
 
@@ -708,19 +712,16 @@ class AgentBoundaryTests(TestCase):
                 with self.assertRaises(DisallowedRedirect):
                     view.redirect(target, self.app)
         view.request = RequestFactory().post('/authorize/', {'redirect_uri': callback})
-        AgentApplication.objects.filter(application=self.app).update(is_active=False)
-        with self.assertRaises(DisallowedRedirect):
-            view.redirect(callback + '?error=access_denied', self.app)
         AgentApplication.objects.filter(application=self.app).delete()
         with self.assertRaises(DisallowedRedirect):
             view.redirect(callback + '?code=not-issued', self.app)
 
-    def test_disabled_client_rejects_agent_access_without_touching_other_apps(self):
+    def test_removed_registration_rejects_agent_access_without_touching_other_apps(self):
         other = get_application_model().objects.create(
             name='Other OAuth application', client_id='other-oauth', client_type='public',
             authorization_grant_type='authorization-code',
         )
-        AgentApplication.objects.filter(application=self.app).update(is_active=False)
+        AgentApplication.objects.filter(application=self.app).delete()
         self.assertTrue(get_application_model().objects.filter(pk=other.pk).exists())
         with self.assertRaises(PermissionDenied):
             service.introspect(self.node, {'access_token': self.token.token, 'resource': self.resource, 'capabilities': self.capabilities})

@@ -20245,6 +20245,9 @@ msgstr "没有可访问的已授权组织。"
 msgid "You can authorize up to %(limit)s MCP clients. Revoke an existing client in Personal settings > MCP clients before adding another."
 msgstr "每人最多授权 %(limit)s 个 MCP 客户端。请先在个人设置的 MCP 客户端页面撤销一个已有客户端，再授权新客户端。"
 
+msgid "This MCP client is already authorized to another user. Revoke the previous authorization or register a new client before signing in."
+msgstr "此 MCP 客户端已有其他用户的有效授权。请先撤销原授权，或注册新客户端，再登录授权。"
+
 #: terminal/templates/terminal/agent_audit.html
 msgid "Session operations"
 msgstr "本会话操作"

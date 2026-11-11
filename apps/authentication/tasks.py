@@ -220,11 +220,13 @@ def clear_oauth2_provider_expired_tokens():
     from oauth2_provider.models import clear_expired
     from authentication.services.agent_clients import (
         AgentClientCleanupBusy, AgentClientCleanupUnavailable, cleanup_agent_oauth_clients,
+        cleanup_agent_oauth_bindings,
     )
     from authentication.services.client_login_session import clear_client_login_sessions
 
     clear_client_login_sessions()
     clear_expired()
+    logging.info('Agent OAuth binding cleanup: %s', cleanup_agent_oauth_bindings())
     try:
         result = cleanup_agent_oauth_clients()
     except (AgentClientCleanupBusy, AgentClientCleanupUnavailable) as exc:

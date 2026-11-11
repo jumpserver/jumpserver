@@ -108,7 +108,7 @@ as an installation test.
 
 The administrator must enable MCP. New automatic registrations require DCR;
 existing registered clients may reuse their authorization when DCR is off.
-Each user can authorize at most ten clients. Stop on disabled service/client,
+Each user can authorize at most ten clients. Stop on a disabled service,
 registration restrictions or quota errors; do not create replacement clients or
 retry unchanged failures. Users consent to their currently authorized
 organizations without choosing an organization. Asset permissions, approvals

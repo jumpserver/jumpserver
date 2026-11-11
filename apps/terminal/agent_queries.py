@@ -2,9 +2,10 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Exists, OuterRef, Prefetch, Q
 from django.utils import timezone
-from oauth2_provider.models import get_access_token_model, get_refresh_token_model
+from oauth2_provider.models import get_access_token_model
 from rest_framework.exceptions import ValidationError
 
+from authentication.services.agent_clients import active_agent_refresh_tokens
 from orgs.utils import tmp_to_root_org
 from terminal import agent_service as service
 from terminal.models import AgentAction, AgentSession
@@ -17,12 +18,12 @@ def scoped_queryset(node, context, user, model):
             org_id__in=service.authorized_agent_org_ids(user),
             **{'terminal' if model is AgentSession else 'session__terminal': node},
             **{'resource' if model is AgentSession else 'session__resource': context['resource']},
-            application__agent_registration__is_active=True,
+            application__agent_registration__isnull=False,
         )
         path = '' if model is AgentSession else 'session__'
-        refresh = get_refresh_token_model().objects.filter(
+        refresh = active_agent_refresh_tokens().filter(
             token_family=OuterRef(path + 'oauth_family'), user_id=OuterRef(path + 'user_id'),
-            application_id=OuterRef(path + 'application_id'), revoked__isnull=True,
+            application_id=OuterRef(path + 'application_id'),
         )
         access = get_access_token_model().objects.filter(
             pk=OuterRef(path + 'oauth_token_id'), user_id=OuterRef(path + 'user_id'),

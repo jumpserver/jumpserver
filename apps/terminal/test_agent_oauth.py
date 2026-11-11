@@ -161,22 +161,24 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertFalse(AgentOAuth2Validator().validate_bearer_token(
             result['access_token'], [], OAuthRequest('http://localhost/api/v1/users/profile/'),
         ))
+        for credential in (self.app.client_id, result['access_token']):
+            response = self.client.get('/api/v1/users/profile/', HTTP_AUTHORIZATION=f'Bearer {credential}')
+            self.assertIn(response.status_code, (401, 403))
 
     def test_introspection_rechecks_resource_scope_expiry_revocation_binding_and_user(self):
-        for invalid in ('resource', 'scope', 'expired', 'revoked', 'disabled', 'unbound', 'inactive_user'):
+        for invalid in ('client_id', 'resource', 'scope', 'expired', 'revoked', 'unbound', 'inactive_user'):
             with self.subTest(invalid=invalid):
-                AgentApplication.objects.filter(application=self.app).update(is_active=True)
                 User.objects.filter(pk=self.user.pk).update(is_active=True)
                 result = self.issued()
                 token = get_access_token_model().objects.get(token_checksum=hashlib.sha256(result['access_token'].encode()).hexdigest())
-                if invalid == 'scope':
+                if invalid == 'client_id':
+                    result['access_token'] = self.app.client_id
+                elif invalid == 'scope':
                     get_access_token_model().objects.filter(pk=token.pk).update(scope='read')
                 elif invalid == 'expired':
                     get_access_token_model().objects.filter(pk=token.pk).update(expires=timezone.now() - timedelta(seconds=1))
                 elif invalid == 'revoked':
                     get_refresh_token_model().objects.filter(access_token=token).update(revoked=timezone.now())
-                elif invalid == 'disabled':
-                    AgentApplication.objects.filter(application=self.app).update(is_active=False)
                 elif invalid == 'unbound':
                     AgentOAuthBinding.objects.filter(application=self.app).delete()
                 elif invalid == 'inactive_user':
@@ -236,7 +238,7 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertEqual(AgentOAuthBinding.objects.filter(user=self.user).values('application_id').distinct().count(), 10)
         self.assertEqual(self.introspect(json.loads(response.content))['client_id'], self.app.client_id)
 
-    def test_client_limit_is_per_user_even_for_shared_registrations(self):
+    def test_client_limit_is_per_user(self):
         self.fill_client_slots(10)
         owner = self.user
         self.user = User.objects.create(username='quota-other-user')
@@ -268,10 +270,9 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertFalse(AgentApplication.objects.filter(application=applications[0]).exists())
         self.assertEqual(AgentOAuthBinding.objects.filter(user=self.user).values('application_id').distinct().count(), 10)
 
-    def test_disabled_and_expired_clients_still_count_and_cancellation_is_allowed(self):
+    def test_expired_clients_still_count_and_cancellation_is_allowed(self):
         applications = self.fill_client_slots(10)
-        AgentApplication.objects.filter(application=applications[0]).update(is_active=False)
-        get_grant_model().objects.filter(application=applications[1]).update(expires=timezone.now() - timedelta(minutes=1))
+        get_grant_model().objects.filter(application=applications[0]).update(expires=timezone.now() - timedelta(minutes=1))
         self.assertTrue(self.authorize().context_data['form'].non_field_errors())
         response = self.authorize(allow='')
         self.assertEqual(response.status_code, 302)
@@ -296,6 +297,10 @@ class AgentOAuthOrganizationTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn('code', parse_qs(urlsplit(response['Location']).query))
         self.assertFalse(AgentOAuthBinding.objects.filter(application=self.app).exists())
+        self.user = User.objects.create(username='ordinary-oauth-other-user')
+        self.first.add_member(self.user)
+        self.assertEqual(self.authorize().status_code, 302)
+        self.assertEqual(get_grant_model().objects.filter(application=self.app).count(), 2)
 
     def test_consent_requires_csrf_protection(self):
         request = self.factory.post('/authorize/', {**self.authorization, 'allow': 'Authorize'})
@@ -447,6 +452,84 @@ class AgentOAuthOrganizationTests(TestCase):
                 response = self.token_request({'grant_type': 'refresh_token', 'refresh_token': result['refresh_token'],
                                                'client_id': self.app.client_id})
                 self.assertEqual(response.status_code, 400)
+
+    def test_client_can_switch_users_only_after_previous_authorization_is_revoked(self):
+        from django.db import transaction
+        from oauthlib.common import Request as OAuthRequest
+        from oauthlib.oauth2 import InvalidRequestError
+        from rest_framework.test import APIRequestFactory, force_authenticate
+        from authentication.api.agent_client_user import UserAgentClientViewSet
+        from authentication.backends.oauth2_provider.agent import AgentOAuth2Validator
+
+        previous_user = self.user
+        previous = self.issued()
+        principal = self.introspect(previous)
+        refresh = get_refresh_token_model().objects.get(application=self.app, revoked__isnull=True)
+        session = AgentSession.objects.create(
+            user=previous_user, application=self.app, terminal=self.node, oauth_family=refresh.token_family,
+            resource=self.resource, idempotency_key='before-user-switch', request_hash='0' * 64,
+            date_expires=timezone.now() + timedelta(minutes=5),
+        )
+        self.user = User.objects.create(username='agent-next-user')
+        self.first.add_member(self.user)
+        denied = self.authorize()
+        self.assertEqual(denied.status_code, 200)
+        self.assertEqual(denied.context_data['form'].errors.as_data()['__all__'][0].code, 'mcp_client_in_use')
+        self.assertNotIn(previous_user.username, str(denied.context_data['form'].non_field_errors()))
+        pending = OAuthRequest('http://localhost/authorize')
+        pending.client, pending.user, pending.scopes = self.app, self.user, [service.SCOPE]
+        pending.redirect_uri, pending.resource = self.app.redirect_uris, [self.resource]
+        pending.code_challenge, pending.code_challenge_method = 'a' * 43, 'S256'
+        with self.assertRaises(InvalidRequestError):
+            AgentOAuth2Validator().save_authorization_code(self.app.client_id, {'code': 'no-takeover'}, pending)
+        # Public registration identifiers cannot revoke the user's credentials.
+        response = ClientRevokeTokenView.as_view()(self.factory.post('/revoke/', {
+            'client_id': self.app.client_id, 'token': self.app.client_id,
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.introspect(previous)['user_id'], str(previous_user.pk))
+        rotated = self.token_request({
+            'grant_type': 'refresh_token', 'client_id': self.app.client_id, 'refresh_token': previous['refresh_token'],
+        })
+        self.assertEqual(rotated.status_code, 200, rotated.content)
+        previous = json.loads(rotated.content)
+        revoked = ClientRevokeTokenView.as_view()(self.factory.post('/revoke/', {
+            'client_id': self.app.client_id, 'token': previous['refresh_token'], 'token_type_hint': 'refresh_token',
+        }))
+        self.assertEqual(revoked.status_code, 200)
+        current = self.issued()
+        self.assertEqual(self.introspect(current)['user_id'], str(self.user.pk))
+        self.assertFalse(AgentOAuthBinding.objects.filter(application=self.app, user=previous_user).exists())
+        self.app.refresh_from_db()
+        self.assertIsNone(self.app.user_id)
+        session.refresh_from_db()
+        self.assertEqual((session.user_id, session.application_id), (previous_user.pk, self.app.pk))
+        with self.assertRaises(PermissionDenied):
+            service.context_identity(self.node, principal['context_token'])
+        request = APIRequestFactory().post('/revoke/')
+        force_authenticate(request, user=previous_user)
+        with transaction.atomic():
+            response = UserAgentClientViewSet.as_view({'post': 'revoke'})(request, pk=str(self.app.pk))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(self.introspect(current)['user_id'], str(self.user.pk))
+
+    def test_conflicting_legacy_authorizations_fail_closed(self):
+        result = self.issued()
+        principal = self.introspect(result)
+        other = User.objects.create(username='agent-conflicting-user')
+        grant = get_grant_model().objects.create(
+            user=other, application=self.app, code='legacy-conflicting-code',
+            redirect_uri=self.app.redirect_uris, expires=timezone.now() + timedelta(minutes=5),
+        )
+        AgentOAuthBinding.objects.create(user=other, application=self.app, grant=grant)
+        with self.assertRaises(PermissionDenied):
+            self.introspect(result)
+        with self.assertRaises(PermissionDenied):
+            service.context_identity(self.node, principal['context_token'])
+        response = self.token_request({
+            'grant_type': 'refresh_token', 'client_id': self.app.client_id, 'refresh_token': result['refresh_token'],
+        })
+        self.assertEqual(response.status_code, 400)
 
     def test_access_token_binding_survives_refresh_row_deletion(self):
         result = self.issued()

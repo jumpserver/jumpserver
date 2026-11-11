@@ -13,7 +13,6 @@ class AgentApplication(models.Model):
         'oauth2_provider.Application', on_delete=models.CASCADE, related_name='agent_registration',
     )
     resource = models.URLField(max_length=512)
-    is_active = models.BooleanField(default=True)
     date_authorized = models.DateTimeField(null=True)
 
 

@@ -60,6 +60,12 @@ the updated code. Revoke any earlier single-organization authorizations before
 dropping the column, requiring fresh consent for all available organizations.
 Editing an applied migration does not remove the old column.
 
+The Agent registration has no enable/disable flag or permanent owner field.
+For pre-release databases with `terminal_agentapplication.is_active`, explicitly
+revoke authorizations and recycle disabled registrations before dropping that
+column. Do not turn formerly disabled registrations into usable clients merely
+by removing the flag. Retain referenced OAuth identities and audit evidence.
+
 In Lina, open **System Settings > AI Assistant > MCP**. AI Assistant and MCP use
 separate permission checks and save requests. Old MCP settings links redirect
 to this tab. The MCP page uses
@@ -162,6 +168,25 @@ administrative authority. Connections resolve the actual organization from the
 authorized asset. Clients need not send `X-JMS-ORG`, and a header cannot expand
 the grant. Agent access tokens are rejected as ordinary Core API bearer credentials.
 
+The `client_id` is a public registration identifier, never an authentication
+credential. After interactive login and consent, the client exchanges the
+short-lived authorization code with its PKCE verifier for an access token.
+Every MCP request, including file transfers, requires `Authorization: Bearer`
+with that token. Koko authenticates to Core as a component for introspection;
+Core validates the token's user, scope, exact resource, expiry, revocation and
+subject binding before issuing a short-lived component-bound context. Neither
+a client ID nor an MCP token authenticates to ordinary Core business APIs.
+
+A registered Agent client can have effective authorization for only one user at
+a time. The application stores no permanent user ownership: consent and token
+issuance use the existing subject bindings and serialize on the OAuth application
+row. A different user must wait until all previous effective authorizations have
+been revoked or expired, then complete fresh browser consent and PKCE. Knowing
+the public client ID cannot revoke another user's authorization. The original
+client can use its old token at the OAuth revocation endpoint before switching
+accounts; the same client ID remains reusable. Same-user reauthorization and
+refresh remain supported. Ordinary OAuth clients are unaffected by this rule.
+
 External MCP clients continue to connect directly to the configured Koko MCP
 address, using an existing registered client ID or DCR when enabled. Their
 browser consent, PKCE S256, exact `resource`, token refresh and component
@@ -176,16 +201,22 @@ not revoke existing grants or stop the MCP service. Clients can revoke tokens
 through the advertised OAuth revocation endpoint. In **Personal Settings >
 Agent / MCP**, users see their own clients and connection documentation, across
 all their organizations. Each user can authorize at most ten distinct clients;
-the same client in several organizations counts once. Existing disabled
-registrations still cannot authorize or execute.
+the same client in several organizations counts once. Clients with expired
+bindings still occupy their personal list slot until revoked or reused by a
+new user after the previous authorization has ended.
 
 The personal API is `/api/v1/authentication/user-agent-clients/`: GET lists the
 current user's clients; POST `{id}/revoke/` revokes that user's authorization in
-all organizations. Other users' grants are preserved. When no authorization
-remains, the unused Agent registration is reclaimed automatically. Referenced
-OAuth identities and execution history are retained; an unreferenced identity
+all organizations. When no authorization remains, the unused Agent registration
+is reclaimed automatically. Referenced OAuth identities and execution history
+are retained; an unreferenced identity
 can be removed. Revocation records an operation audit with operator, source IP,
-client and result. It never lets an ordinary user re-enable a disabled client.
+client and result. This personal removal reclaims the registration; use the
+OAuth token revocation endpoint when retaining the client ID for reuse.
+Revocation never deletes another user's authorization or audit history, even if
+an older database contains shared registrations. Conflicting effective bindings
+from several users fail closed; revoke the old authorizations before reusing
+such a client.
 
 Administrators manage system configuration only. User management and settings
 do not expose personal client lists or client operations; the former
@@ -197,9 +228,16 @@ and closes connections on explicit authorization denial or missing sessions.
 Transient service failures are retried; new dispatch still requires Core.
 Batching and network delays mean this is not a five-second node-wide guarantee.
 
-The existing scheduled OAuth token cleanup removes bounded batches of
-never-authorized dynamic registrations older than seven days, considering at
-most 100 eligible clients per run and recording its summary in task logs.
+The existing scheduled OAuth token cleanup also removes at most 500 stale
+subject bindings per run, preserving unexpired grants, usable access tokens and
+live refresh families. While expired bindings remain, the newest one is kept
+when a client has no effective authorization, so the personal entry can still
+be removed. A new user's consent removes the previous users' inactive bindings
+under the same application lock. None of this cleanup deletes execution audits.
+
+It also removes bounded batches of never-authorized dynamic registrations older
+than seven days, considering at most 100 eligible clients per run and recording
+its summary in task logs.
 Related grants, tokens, sessions or audit records prevent deletion; references
 are rechecked under the authorization lock order. No manual cleanup API, extra
 deployment schedule or management command is needed. Registration coordination
@@ -230,7 +268,7 @@ use their separate user and auditor permissions.
 Session capabilities bind the node and durable session; they never carry asset
 credentials. Each new operation rechecks the grant, user, organization,
 connection controls and asset permissions. Normal token rotation preserves the
-grant family. Revocation, removal of the user or permissions, or a disabled
+grant family. Revocation, removal of the user or permissions, or a removed
 registration prevents further dispatch. Without a refresh family, the original
 access token must remain unexpired.
 

@@ -60,7 +60,6 @@ class AgentClientRegistrationTests(TestCase):
         self.assertEqual(app.client_secret, '')
         self.assertFalse(app.skip_authorization)
         self.assertEqual(app.agent_registration.resource, 'https://jumpserver.example/koko/mcp')
-        self.assertTrue(app.agent_registration.is_active)
         self.assertIsNone(app.agent_registration.date_authorized)
         self.assertEqual(app.registration_source, app.RegistrationSource.DCR)
         self.assertTrue(app.redirect_uri_allowed('http://127.0.0.1:49152/callback/client'))

@@ -164,7 +164,6 @@ class MCPSettingsAPITests(TestCase):
         response = AgentClientRegistrationView.as_view()(RequestFactory().post('/register/', {}, content_type='application/json'))
         self.assertEqual(response.status_code, 404)
         registration.refresh_from_db()
-        self.assertTrue(registration.is_active)
         self.assertEqual(registration.resource, resource)
         self.assertIn('MCP_DCR_ENABLED', SettingsSerializer().fields)
 

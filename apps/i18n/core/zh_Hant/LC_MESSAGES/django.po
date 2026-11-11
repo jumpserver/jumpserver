@@ -17485,6 +17485,9 @@ msgstr "沒有可存取的已授權組織。"
 msgid "You can authorize up to %(limit)s MCP clients. Revoke an existing client in Personal settings > MCP clients before adding another."
 msgstr "每人最多授權 %(limit)s 個 MCP 用戶端。請先在個人設定的 MCP 用戶端頁面撤銷一個既有用戶端，再授權新用戶端。"
 
+msgid "This MCP client is already authorized to another user. Revoke the previous authorization or register a new client before signing in."
+msgstr "此 MCP 用戶端已有其他使用者的有效授權。請先撤銷原授權，或註冊新用戶端，再登入授權。"
+
 #: assets/models/asset/common.py assets/serializers/asset/common.py
 msgid "Asset owner"
 msgstr "資產負責人"

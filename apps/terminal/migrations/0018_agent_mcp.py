@@ -25,7 +25,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('resource', models.URLField(max_length=512)),
-                ('is_active', models.BooleanField(default=True)),
                 ('date_authorized', models.DateTimeField(null=True)),
                 ('application', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='agent_registration', to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
             ],

@@ -125,6 +125,8 @@ def token_authorization_binding(token, refresh=None):
 
 def agent_token_authority(raw, resource):
     """Validate current MCP token authority for component introspection."""
+    from authentication.services.agent_clients import has_other_agent_authorizations
+
     raw = text_field(raw, 'access_token', 8192)
     token = get_access_token_model().objects.select_related('user', 'application').filter(
         token_checksum=hashlib.sha256(raw.encode()).hexdigest(),
@@ -132,12 +134,14 @@ def agent_token_authority(raw, resource):
     if not token or not token.is_valid([SCOPE]) or not token.user or not token.user.is_valid:
         raise PermissionDenied('Invalid or expired MCP token', code='invalid_token')
     resource = text_field(resource, 'resource', 512)
-    registration = AgentApplication.objects.filter(application=token.application, is_active=True).first()
+    registration = AgentApplication.objects.filter(application=token.application).first()
     if not registration or registration.resource != resource or token.resource != [resource]:
         raise PermissionDenied('Token is not issued for this MCP resource', code='invalid_token')
     refresh = get_refresh_token_model().objects.filter(access_token=token).first()
     if not token_authorization_binding(token, refresh):
         raise PermissionDenied('OAuth authorization has no subject binding')
+    if has_other_agent_authorizations(token.user_id, token.application_id):
+        raise PermissionDenied('OAuth authorization conflicts with another user')
     check_agent_scope(token.user)
     if refresh and refresh.revoked is not None:
         raise PermissionDenied('OAuth authorization revoked')
@@ -177,9 +181,9 @@ def context_identity(node, value):
         check_agent_scope(user)
         context['capabilities'] = node_capabilities(context.get('capabilities'))
         if not AgentApplication.objects.filter(
-            application_id=context['application_id'], resource=context['resource'], is_active=True,
+            application_id=context['application_id'], resource=context['resource'],
         ).exists():
-            raise PermissionDenied('Agent application disabled')
+            raise PermissionDenied('Agent client registration is no longer available')
         if not authority_exists(user.id, context['application_id'], context['token_id'], context['family']):
             raise PermissionDenied('OAuth authorization revoked')
         return context, user
@@ -188,9 +192,13 @@ def context_identity(node, value):
 
 
 def authority_exists(user_id, application_id, token_id, family):
+    from authentication.services.agent_clients import active_agent_refresh_tokens, has_other_agent_authorizations
+
+    if has_other_agent_authorizations(user_id, application_id):
+        return False
     if family:
-        return get_refresh_token_model().objects.filter(
-            token_family=family, user_id=user_id, application_id=application_id, revoked__isnull=True,
+        return active_agent_refresh_tokens().filter(
+            token_family=family, user_id=user_id, application_id=application_id,
         ).exists()
     return get_access_token_model().objects.filter(
         pk=token_id, user_id=user_id, application_id=application_id, expires__gt=timezone.now(),
@@ -237,7 +245,7 @@ def check_session_grant(session):
         raise PermissionDenied('Agent session owner no longer exists')
     check_agent_organization(session.user, session.org_id)
     if not AgentApplication.objects.filter(
-        application=session.application, resource=session.resource, is_active=True,
+        application=session.application, resource=session.resource,
     ).exists() or not authority_exists(session.user_id, session.application_id, session.oauth_token_id, session.oauth_family):
         raise PermissionDenied('OAuth authorization revoked')
 

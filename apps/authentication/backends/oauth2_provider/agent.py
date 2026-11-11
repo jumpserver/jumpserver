@@ -15,7 +15,10 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from terminal.agent_service import check_agent_scope
 from terminal.models import AgentApplication, AgentOAuthBinding
-from authentication.services.agent_clients import user_agent_client_limit_reached, user_agent_client_limit_message
+from authentication.services.agent_clients import (
+    agent_authorization_conflict_message, agent_oauth_bindings, has_other_agent_authorizations,
+    user_agent_client_limit_reached, user_agent_client_limit_message,
+)
 from .agent_forms import AgentAllowForm
 from .client_views import ClientAuthorizationView
 from .validators import ClientOAuth2Validator
@@ -34,7 +37,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
         registration = self.registration(client)
         if registration:
-            if not registration.is_active or set(scopes) != {SCOPE}:
+            if set(scopes) != {SCOPE}:
                 return False
         elif SCOPE in scopes:
             return False
@@ -50,7 +53,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         if SCOPE in request.scopes and registration is None:
             raise InvalidScopeError(request=request)
         if registration:
-            if not registration.is_active or set(request.scopes) != {SCOPE}:
+            if set(request.scopes) != {SCOPE}:
                 raise InvalidScopeError(request=request)
             if request.code_challenge_method != 'S256' or not request.code_challenge:
                 raise InvalidRequestError(description='Agent clients require S256 PKCE', request=request)
@@ -70,14 +73,19 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
                     registration = AgentApplication.objects.select_for_update().get(pk=registration.pk)
                 except (Application.DoesNotExist, AgentApplication.DoesNotExist):
                     raise InvalidRequestError(description='Agent client is no longer available', request=request)
-                if not registration.is_active:
-                    raise InvalidRequestError(description='Agent client is disabled', request=request)
+                if has_other_agent_authorizations(request.user.pk, request.client.pk):
+                    raise InvalidRequestError(description=agent_authorization_conflict_message(), request=request)
                 # Different clients can authorize concurrently. Serialize the
                 # per-user check before reserving a slot with the grant binding.
                 if not get_user_model().objects.select_for_update().filter(pk=request.user.pk).exists():
                     raise InvalidRequestError(description='User is no longer available', request=request)
                 if user_agent_client_limit_reached(request.user, request.client.client_id):
                     raise InvalidRequestError(description=user_agent_client_limit_message(), request=request)
+                # An inactive registration can be reused after its previous
+                # authorization ends, without retaining another user's entry.
+                agent_oauth_bindings().filter(application=request.client, is_live=False).exclude(
+                    user=request.user,
+                ).delete()
                 grant = self._create_authorization_code(request, code)
                 AgentOAuthBinding.objects.create(
                     user=request.user, application=request.client, grant=grant,
@@ -101,7 +109,9 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
         registration = self.registration(request.client)
         if not registration:
             return True
-        if not registration.is_active or not request.user or not request.user.is_valid:
+        if not request.user or not request.user.is_valid:
+            return False
+        if has_other_agent_authorizations(request.user.pk, request.client.pk):
             return False
         binding = self.authorization_binding(request)
         if not binding:
@@ -153,7 +163,7 @@ class AgentOAuth2Validator(ClientOAuth2Validator):
     def _check_and_set_request_resource(self, request):
         super()._check_and_set_request_resource(request)
         registration = self.registration(request.client)
-        if registration and (not registration.is_active or request.resource != [registration.resource]):
+        if registration and request.resource != [registration.resource]:
             raise CustomOAuth2Error(error='invalid_target', request=request)
 
     def validate_bearer_token(self, token, scopes, request):
@@ -199,7 +209,7 @@ class AgentAwareAuthorizationView(ClientAuthorizationView):
         return super().get(request, *args, **kwargs)
 
     def redirect(self, redirect_to, application):
-        if application and AgentApplication.objects.filter(application=application, is_active=True).exists():
+        if application and AgentApplication.objects.filter(application=application).exists():
             data = self.request.POST if self.request.method == 'POST' else self.request.GET
             callback = data.get('redirect_uri') or self.oauth2_data.get('redirect_uri', '')
             source, target = urlsplit(callback), urlsplit(redirect_to)
