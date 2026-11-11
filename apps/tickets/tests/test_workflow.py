@@ -339,6 +339,28 @@ class WorkflowTests(TestCase):
         self.assertEqual(set(ApprovalTask.objects.filter(node_instance__instance=instance)
                              .values_list('assignee_id', flat=True)), {self.alice.pk})
 
+    def test_empty_approver_group_is_not_reported_as_an_exclusion(self):
+        group = UserGroup.objects.create(name='Empty reviewers')
+        with override('en'):
+            instance = self.start(approvers={'type': 'user_group', 'value': [str(group.pk)]})
+        self.assertEqual(instance.state, 'error')
+        self.assertEqual(instance.events.get(type='workflow.error').data['detail'],
+                         'An approval node must resolve between 1 and 1000 eligible approvers.')
+
+    def test_excluded_approver_error_identifies_the_current_approval_level(self):
+        definition = approval_definition([self.alice], levels=2)
+        definition['nodes'][2]['config']['approvers']['value'] = [str(self.applicant.pk)]
+        with override('en'):
+            instance = self.start(self.create_workflow(definition))
+            task = self.task(instance, self.alice)
+            self.assertEqual(self.engine.approve(task, self.alice).state, 'error')
+        self.assertEqual(instance.events.get(type='workflow.error').data['detail'],
+                         'Approval 2 has no eligible approvers after excluding the applicant or authorized users. '
+                         'Adjust the approvers or select another workflow.')
+        task.refresh_from_db()
+        self.assertEqual(task.state, 'approved')
+        self.assertFalse(ApprovalTask.objects.filter(node_instance__instance=instance, state='pending').exists())
+
     def test_asset_owner_errors_identify_the_asset_and_fail_closed(self):
         cases = [
             ([], '资产“数据库”未配置负责人，请在资产编辑页面设置负责人。'),

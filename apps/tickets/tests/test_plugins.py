@@ -724,6 +724,29 @@ class TicketPluginTests(TestCase):
         allowed = self.serializer(data)
         self.assertTrue(allowed.is_valid(), allowed.errors)
 
+    def test_delegated_request_reports_excluded_approvers_without_creating_ticket(self):
+        self.grant_delegation()
+        for approvers in ([self.applicant], [self.bob], [self.applicant, self.bob]):
+            with self.subTest(approvers=approvers), override('zh'):
+                definition = approval_definition(approvers, levels=2, exclude_applicant=False)
+                definition['nodes'][2]['config']['approvers'] = {'type': 'org_admin'}
+                data = self.payload(
+                    'apply_asset', apply_users=[str(self.bob.pk)], apply_assets=[str(self.asset.pk)],
+                    apply_accounts=['root'], apply_actions=['connect'],
+                    apply_date_start=timezone.now().isoformat(),
+                    apply_date_expired=(timezone.now() + timedelta(hours=1)).isoformat(),
+                )
+                data['workflow_id'] = str(self.workflow(definition=definition).pk)
+                count = Ticket.objects.count()
+                request = APIRequestFactory().post('/api/v1/tickets/tickets/open/', data, format='json')
+                force_authenticate(request, self.applicant)
+                with transaction.atomic(), patch('rbac.permissions.RBACPermission.has_permission', return_value=True):
+                    response = TicketViewSet.as_view({'post': 'open'})(request)
+                self.assertEqual(response.status_code, 400, response.data)
+                self.assertEqual(str(response.data[0]),
+                                 '第 1 级审批排除申请人或授权用户后，无可用审批人。请调整审批人配置或选择其他流程。')
+                self.assertEqual(Ticket.objects.count(), count)
+
     @override_settings(TICKET_APPLY_ASSET_SCOPE='all', XPACK_LICENSE_IS_VALID=True,
                        CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED=False)
     def test_account_options_match_asset_and_submission_rules(self):

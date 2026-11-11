@@ -49,7 +49,8 @@ def excluded_approver_ids(config, context, applicant_id):
     return ids
 
 
-def resolve_approvers(config, context, org_id, applicant_id):
+def resolve_approvers(node_instance, context, org_id, applicant_id):
+    config = node_instance.node.config
     spec = config['approvers']
     kind = spec['type']
     users = available_users(org_id)
@@ -97,9 +98,18 @@ def resolve_approvers(config, context, org_id, applicant_id):
                 ).format(assets=names))
             raise WorkflowConfigurationError(gettext('A configured approver is inactive, missing, or outside the organization.'))
     excluded = excluded_approver_ids(config, context, applicant_id)
+    candidates = users
     if excluded:
         users = users.exclude(pk__in=excluded)
     result = list(users.distinct().order_by('id')[:1001])
+    if not result and excluded and candidates.exists():
+        runs = node_instance.instance.node_instances
+        started_at = runs.filter(node__type='start').latest('date_created').date_created
+        level = runs.filter(node__type='approval', date_created__gte=started_at).count()
+        raise WorkflowConfigurationError(gettext(
+            'Approval {level} has no eligible approvers after excluding the applicant or authorized users. '
+            'Adjust the approvers or select another workflow.'
+        ).format(level=level))
     if not result or len(result) > 1000:
         raise WorkflowConfigurationError(gettext('An approval node must resolve between 1 and 1000 eligible approvers.'))
     return result

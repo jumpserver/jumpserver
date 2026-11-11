@@ -125,7 +125,7 @@ class WorkflowEngine:
             run = WorkflowNodeInstance.objects.create(instance=instance, node=node)
             self._event(instance, 'node.entered', node=run, key=node.key, name=node.name)
             if node.type == 'approval':
-                users = resolve_approvers(node.config, instance.context, instance.org_id, instance.applicant_id)
+                users = resolve_approvers(run, instance.context, instance.org_id, instance.applicant_id)
                 strategy = node.config['strategy']
                 run.required = len(users) if strategy == 'all' else node.config.get('required', 1)
                 if run.required > len(users):
